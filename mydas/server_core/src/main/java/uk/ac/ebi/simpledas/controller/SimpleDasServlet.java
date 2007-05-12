@@ -5,8 +5,11 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 import uk.ac.ebi.simpledas.datasource.ReferenceDataSource;
-import uk.ac.ebi.simpledas.exceptions.DataSourceException;
+import uk.ac.ebi.simpledas.datasource.RangeHandlingReferenceDataSource;
+import uk.ac.ebi.simpledas.exceptions.*;
 import uk.ac.ebi.simpledas.model.DasEntryPoint;
+import uk.ac.ebi.simpledas.model.DasSequence;
+import uk.ac.ebi.simpledas.model.DasFeature;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,8 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
@@ -63,13 +65,25 @@ public class SimpleDasServlet extends HttpServlet {
 
      [PREFIX]/das/dsnname/entry_points
      [PREFIX]/das/dsnname/dna
-     [PREFIX]/das/dsnname/sequence
+     [PREFIX]/das/dsnname/sequenceString
      [PREFIX]/das/DSNNAME/types
      [PREFIX]/das/dsnname/features
      [PREFIX]/das/dsnname/link
      [PREFIX]/das/dsnname/stylesheet
      */
     private static final Pattern REQUEST_URI_PATTERN = Pattern.compile ("/das/([^\\s/?]+)/?([^\\s/?]*)$");
+
+    /**
+     * Pattern used to parse a segment range, as used for the dna and sequenceString commands.
+     * This can be used based on the assumption that the segments have already been split
+     * into indidual Strings (i.e. by splitting on the ; character).
+     * Three groups are returned from a match as follows:
+     * Group 1: segment name
+     * Group 3: start coordinate
+     * Group 4: stop coordinate
+     */
+    private static final Pattern SEGMENT_RANGE_PATTERN = Pattern.compile ("^segment=([^:\\s]*)(:(\\d+),(\\d+))?$"
+);
 
     private static DataSourceManager DATA_SOURCE_MANAGER = null;
 
@@ -111,7 +125,7 @@ public class SimpleDasServlet extends HttpServlet {
     /*
         Response Header line values
      */
-    private static final String HEADER_VALUE_CAPABILITIES = "dsn/1.0; dna/1.0; types/1.0; stylesheet/1.0; features/1.0; entry_points/1.0; error-segment/1.0; unknown-segment/1.0; feature-by-id/1.0; group-by-id/1.0; component/1.0; supercomponent/1.0; sequence/1.0";
+    private static final String HEADER_VALUE_CAPABILITIES = "dsn/1.0; dna/1.0; types/1.0; stylesheet/1.0; features/1.0; entry_points/1.0; error-segment/1.0; unknown-segment/1.0; feature-by-id/1.0; group-by-id/1.0; component/1.0; supercomponent/1.0; sequenceString/1.0";
     private static final String HEADER_VALUE_DAS_VERSION = "DAS/1.5";
 
 
@@ -135,11 +149,14 @@ public class SimpleDasServlet extends HttpServlet {
     /**
      * This method will ensure that all the plugins are registered and call
      * the corresonding init() method on all of the plugins.
+     *
+     * Also initialises the XMLPullParser factory.
      * @throws ServletException
      */
     public void init() throws ServletException {
         super.init();
 
+        // Initialise data sources.
         if (DATA_SOURCE_MANAGER == null){
             DATA_SOURCE_MANAGER = new DataSourceManager(this.getServletContext());
             try{
@@ -162,7 +179,6 @@ public class SimpleDasServlet extends HttpServlet {
                 throw new IllegalStateException ("Fatal Exception thrown at initialisation.  Cannot initialise the PullParserFactory required to allow generation of the DAS XML.", xppe);
             }
         }
-
     }
 
     /**
@@ -210,7 +226,7 @@ public class SimpleDasServlet extends HttpServlet {
      */
     private void doHandle(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Parse the request URI (e.g. /das/dsnname/sequence).
+        // Parse the request URI (e.g. /das/dsnname/sequenceString).
         String queryString = request.getQueryString();
 
         if (logger.isDebugEnabled()){
@@ -388,13 +404,60 @@ public class SimpleDasServlet extends HttpServlet {
     private void dnaCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
             throws XmlPullParserException, IOException, DataSourceException{
         // Is this a reference source?
-        if (dsnConfig instanceof ReferenceDataSource){
+        if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
             // Fine - process command.
+            try{
+                Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
+                // Got some sequences, so all is OK.
+                writeHeader (request, response, STATUS_200_OK, true);
+                // Build the XML.
+                XmlSerializer serializer;
+                serializer = PULL_PARSER_FACTORY.newSerializer();
+                PrintWriter out = null;
+                try{
+                    out = getResponseWriter(request, response);
+                    serializer.setOutput(out);
+                    serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+                    serializer.startDocument(null, false);
+                    serializer.text("\n");
+                    serializer.docdecl(" DASDNA SYSTEM \"http://www.biodas.org/dtd/dasdna.dtd\"");
+                    serializer.text("\n");
+                    // Now the body of the DASDNA xml.
+                    serializer.startTag (DAS_XML_NAMESPACE, "DASDNA");
+                    for (SequenceReporter sequenceReporter : sequences){
+                        serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
+                        serializer.attribute(DAS_XML_NAMESPACE, "id", sequenceReporter.getSegmentName());
+                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(sequenceReporter.getStart()));
+                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(sequenceReporter.getStop()));
+                        serializer.attribute(DAS_XML_NAMESPACE, "version", sequenceReporter.getSequenceVersion());
+                            serializer.startTag(DAS_XML_NAMESPACE, "DNA");
+                            serializer.attribute(DAS_XML_NAMESPACE, "length", Integer.toString(sequenceReporter.getSequenceString().length()));
+                            serializer.text(sequenceReporter.getSequenceString());
+                            serializer.endTag(DAS_XML_NAMESPACE, "DNA");
+                        serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
+                    }
+                    serializer.endTag (DAS_XML_NAMESPACE, "DASDNA");
+                }
+                finally{
+                    if (out != null){
+                        out.close();
+                    }
+                }
+            } catch (CoordinateErrorException e) {
+                logger.error("The requested coordinates were out of range", e);
+                writeHeader(request, response, STATUS_405_COORDINATE_ERROR, false);
+            } catch (BadReferenceObjectException e) {
+                logger.error("At least one of the requested segments was not found by the dsn.", e);
+                writeHeader(request, response, STATUS_403_BAD_REFERENCE_OBJECT, false);
+            } catch (BadCommandArgumentsException e) {
+                logger.error("The format of the command arguments was not recognised");
+                writeHeader (request, response, STATUS_402_BAD_COMMAND_ARGUMENTS, false);
+            }
         }
         else {
             // Not a reference source.
             logger.error ("Attempt to call the dna command on the " + dsnConfig.getId() + " dsn.  This is not a reference source.");
-            writeHeader (request, response, STATUS_501_UNIMPLEMENTED_FEATURE, true);
+            writeHeader (request, response, STATUS_501_UNIMPLEMENTED_FEATURE, false);
         }
     }
 
@@ -485,13 +548,58 @@ public class SimpleDasServlet extends HttpServlet {
     private void sequenceCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
             throws XmlPullParserException, IOException, DataSourceException {
         // Is this a reference source?
-        if (dsnConfig instanceof ReferenceDataSource){
+        if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
             // Fine - process command.
+            try{
+                Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
+                // Got some sequences, so all is OK.
+                writeHeader (request, response, STATUS_200_OK, true);
+                // Build the XML.
+                XmlSerializer serializer;
+                serializer = PULL_PARSER_FACTORY.newSerializer();
+                PrintWriter out = null;
+                try{
+                    out = getResponseWriter(request, response);
+                    serializer.setOutput(out);
+                    serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+                    serializer.startDocument(null, false);
+                    serializer.text("\n");
+                    serializer.docdecl(" DASSEQUENCE SYSTEM \"http://www.biodas.org/dtd/dassequence.dtd\"");
+                    serializer.text("\n");
+                    // Now the body of the DASDNA xml.
+                    serializer.startTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
+                    for (SequenceReporter sequenceReporter : sequences){
+                        serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
+                        serializer.attribute(DAS_XML_NAMESPACE, "id", sequenceReporter.getSegmentName());
+                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(sequenceReporter.getStart()));
+                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(sequenceReporter.getStop()));
+                        serializer.attribute(DAS_XML_NAMESPACE, "moltype", sequenceReporter.getSequenceMoleculeType());
+                        serializer.attribute(DAS_XML_NAMESPACE, "version", sequenceReporter.getSequenceVersion());
+                        serializer.text(sequenceReporter.getSequenceString());
+                        serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
+                    }
+                    serializer.endTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
+                }
+                finally{
+                    if (out != null){
+                        out.close();
+                    }
+                }
+            } catch (CoordinateErrorException e) {
+                logger.error("The requested coordinates were out of range", e);
+                writeHeader(request, response, STATUS_405_COORDINATE_ERROR, false);
+            } catch (BadReferenceObjectException e) {
+                logger.error("At least one of the requested segments was not found by the dsn.", e);
+                writeHeader(request, response, STATUS_403_BAD_REFERENCE_OBJECT, false);
+            } catch (BadCommandArgumentsException e) {
+                logger.error("The format of the command arguments was not recognised");
+                writeHeader (request, response, STATUS_402_BAD_COMMAND_ARGUMENTS, false);
+            }
         }
         else {
             // Not a reference source.
-            logger.error ("Attempt to call the sequence command on the " + dsnConfig.getId() + " dsn.  This is not a reference source.");
-            writeHeader (request, response, STATUS_501_UNIMPLEMENTED_FEATURE, true);
+            logger.error ("Attempt to call the dna command on the " + dsnConfig.getId() + " dsn.  This is not a reference source.");
+            writeHeader (request, response, STATUS_501_UNIMPLEMENTED_FEATURE, false);
         }
     }
 
@@ -503,19 +611,71 @@ public class SimpleDasServlet extends HttpServlet {
      * @param dsnConfig
      * @param queryString
      */
-    private void getFeatureCollection(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
+    private Collection<DasFeature> getFeatureCollection(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
             throws XmlPullParserException, IOException, DataSourceException{
+        return Collections.EMPTY_LIST;
     }
 
     /**
      * Helper method used by both the dnaCommand and the sequenceCommand
-     * @param request
-     * @param response
      * @param dsnConfig
      * @param queryString
      */
-    private void getSequence(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-            throws XmlPullParserException, IOException, DataSourceException{
+    private Collection<SequenceReporter> getSequences(DataSourceConfiguration dsnConfig, String queryString)
+            throws BadReferenceObjectException, CoordinateErrorException, DataSourceException, BadCommandArgumentsException {
+
+        ReferenceDataSource refDsn = (ReferenceDataSource) dsnConfig.getDataSource();
+        if (refDsn == null){
+            throw new DataSourceException ("An attempt has been made to retrieve a sequenceString from datasource " + dsnConfig.getId() + " however the DataSource object is null.");
+        }
+        Collection<SequenceReporter> sequenceCollection = new ArrayList<SequenceReporter>();
+        // Parse the queryString to retrieve all the DasSequence objects.
+        if (queryString == null || queryString.length() == 0){
+             throw new BadCommandArgumentsException("Expecting at least one reference in the query string, but found nothing.");
+        }
+        // Split on the ; (delineates separate references in the query string)
+        String[] referenceStrings = queryString.split(";");
+        for (String referenceString : referenceStrings){
+            Matcher referenceStringMatcher = SEGMENT_RANGE_PATTERN.matcher(referenceString);
+            if (referenceStringMatcher.find()){
+                String segmentName = referenceStringMatcher.group(1);
+                String startString = referenceStringMatcher.group(3);
+                String stopString = referenceStringMatcher.group(4);
+                Integer start = null;
+                Integer stop = null;
+                if (startString != null && stopString.length() > 0){
+                    // Don't need to check stopString - the regex looks after that.
+                    start = new Integer(startString);
+                    stop = new Integer(stopString);
+                }
+                if (start != null){
+                    // Getting a restricted sequenceString - and the data source will handle the restriction.
+                    DasSequence sequence;
+                    if (refDsn instanceof RangeHandlingReferenceDataSource){
+                        sequence = ((RangeHandlingReferenceDataSource)refDsn).getSequence(segmentName, start, stop);
+                    }
+                    else {
+                        sequence = refDsn.getSequence(segmentName);
+                    }
+                    if (sequence == null) throw new BadReferenceObjectException(segmentName, "Segment cannot be found.");
+                    sequenceCollection.add (new SequenceReporter(sequence, start, stop));
+                }
+                else {
+                    // Request for a complete sequenceString
+                    DasSequence sequence = refDsn.getSequence(segmentName);
+                    if (sequence == null) throw new BadReferenceObjectException(segmentName, "Segment cannot be found.");
+                    sequenceCollection.add (new SequenceReporter(sequence));
+                }
+            }
+            else {
+                throw new BadCommandArgumentsException("The query string format is not recognized.");
+            }
+        }
+        if (sequenceCollection.size() ==0){
+            // The query string did not include any segment references.
+            throw new BadCommandArgumentsException("The query string format is not recognized.");
+        }
+        return sequenceCollection;
     }
 
 

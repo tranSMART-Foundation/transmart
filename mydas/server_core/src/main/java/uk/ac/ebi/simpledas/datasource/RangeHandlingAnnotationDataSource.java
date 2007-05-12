@@ -1,7 +1,7 @@
 package uk.ac.ebi.simpledas.datasource;
 
 import uk.ac.ebi.simpledas.exceptions.DataSourceException;
-import uk.ac.ebi.simpledas.exceptions.SegmentNotFoundException;
+import uk.ac.ebi.simpledas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.simpledas.model.DasFeature;
 
 import java.util.List;
@@ -33,9 +33,9 @@ public interface RangeHandlingAnnotationDataSource extends AnnotationDataSource{
      * @param start
      * @param stop
      * @return
-     * @throws SegmentNotFoundException
+     * @throws BadReferenceObjectException
      * @throws DataSourceException
      */
-    public List<DasFeature> getFeatures(String segmentReference, int start, int stop) throws SegmentNotFoundException, DataSourceException;
+    public List<DasFeature> getFeatures(String segmentReference, int start, int stop) throws BadReferenceObjectException, DataSourceException;
 
 }

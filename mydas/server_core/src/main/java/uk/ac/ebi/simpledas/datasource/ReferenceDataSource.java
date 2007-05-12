@@ -1,7 +1,7 @@
 package uk.ac.ebi.simpledas.datasource;
 
 import uk.ac.ebi.simpledas.exceptions.DataSourceException;
-import uk.ac.ebi.simpledas.exceptions.SegmentNotFoundException;
+import uk.ac.ebi.simpledas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.simpledas.model.DasEntryPoint;
 import uk.ac.ebi.simpledas.model.DasSequence;
 
@@ -19,15 +19,14 @@ public interface ReferenceDataSource extends AnnotationDataSource{
     /**
      * Extends the ReferenceDataSource inteface to allow the creation of an Annotation
      * data source.  The only significant difference is that a Reference data source can also
-     * serve the sequence of the requested segment.
-     * @param segmentReference being the name of the sequence being requested.
-     * @return a DasSequence object, holding the sequence and start / end coordinates of the sequence.
-     * @throws SegmentNotFoundException to inform the SimpleDasServlet that the
-     * segment requested is not available from this DataSource.
+     * serve the sequenceString of the requested segment.
+     * @param segmentReference being the name of the sequenceString being requested.
+     * @return a DasSequence object, holding the sequenceString and start / end coordinates of the sequenceString
+     * or null if the reference is not found.
      * @throws DataSourceException to encapsulate any exceptions thrown by the datasource
      * and allow the SimpleDasServlet to return a decent error header to the client.
      */
-    public DasSequence getSequence (String segmentReference) throws SegmentNotFoundException, DataSourceException;
+    public DasSequence getSequence (String segmentReference) throws BadReferenceObjectException, DataSourceException;
 
     /**
      * Returns the value to be returned from the entry_points command, specifically

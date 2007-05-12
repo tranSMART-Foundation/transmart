@@ -209,7 +209,6 @@ public class DataSourceConfiguration {
      */
     boolean loadDataSource() throws DataSourceException{
         datasourceOK = false;    // Pessimistic start.
-        // TODO Write the code for loading the datasource.
         try{
             ClassLoader classLoader = this.getClass().getClassLoader();
             Class dataSourceClass = classLoader.loadClass(className);

@@ -70,7 +70,7 @@ public class DasEntryPoint {
     private boolean subparts;
 
     /**
-     * Object used to define a positive orientation of a sequence.
+     * Object used to define a positive orientation of a sequenceString.
      */
     public static final Orientation POSITIVE_ORIENTATION = new Orientation(){
         public String toString(){
@@ -79,7 +79,7 @@ public class DasEntryPoint {
     };
 
     /**
-     * Object used to define a negative orientation of a sequence.
+     * Object used to define a negative orientation of a sequenceString.
      */
     public static final Orientation NEGATIVE_ORIENTATION = new Orientation(){
         public String toString(){
@@ -88,7 +88,7 @@ public class DasEntryPoint {
     };
 
     /**
-     * Object used to define that the sequence has no intrinsic orientation.
+     * Object used to define that the sequenceString has no intrinsic orientation.
      * This is the default value of the DasEntryPoint.
      */
     public static final Orientation NO_INTRINSIC_ORIENTATION = POSITIVE_ORIENTATION;

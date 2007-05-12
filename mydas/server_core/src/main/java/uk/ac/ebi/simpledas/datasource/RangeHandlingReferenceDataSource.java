@@ -1,9 +1,11 @@
 package uk.ac.ebi.simpledas.datasource;
 
-import uk.ac.ebi.simpledas.exceptions.SegmentNotFoundException;
+import uk.ac.ebi.simpledas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.simpledas.exceptions.DataSourceException;
+import uk.ac.ebi.simpledas.exceptions.CoordinateErrorException;
 import uk.ac.ebi.simpledas.model.DasSequence;
 import uk.ac.ebi.simpledas.model.DasFeature;
+import uk.ac.ebi.simpledas.model.DasRestrictedSequence;
 
 import java.util.List;
 
@@ -16,9 +18,9 @@ import java.util.List;
  *
  *
  * If your datasource implements only the {@link uk.ac.ebi.simpledas.datasource.ReferenceDataSource} interface,
- * the SimpleDasServlet will handle restricting the sequence returned to
+ * the SimpleDasServlet will handle restricting the sequenceString returned to
  * the start / stop coordinates in the request and you will only need to
- * implement the <code>getSequence (String segmentReference) : String</code>
+ * implement the <code>getSequenceString (String segmentReference) : String</code>
  * method.
  *
  * If you also implement this interface, this will allow you to take control
@@ -27,17 +29,18 @@ import java.util.List;
 public interface RangeHandlingReferenceDataSource extends ReferenceDataSource{
 
     /**
-     *
+     * TODO Detailed documentation required here.
      * If you also implement this interface, this will allow you to take control
-     * of filtering the sequence returned by start / stop coordinates in your ReferenceDataSource.
+     * of filtering the sequenceString returned by start / stop coordinates in your ReferenceDataSource.
      * @param segmentReference
      * @param start
      * @param stop
-     * @return
-     * @throws uk.ac.ebi.simpledas.exceptions.SegmentNotFoundException
+     * @return a DasSequence object for the reference, or null if it is not found.
+     * @throws uk.ac.ebi.simpledas.exceptions.BadReferenceObjectException
      * @throws uk.ac.ebi.simpledas.exceptions.DataSourceException
+     * @throws uk.ac.ebi.simpledas.exceptions.CoordinateErrorException
      */
-    public DasSequence getSequence (String segmentReference, int start, int stop) throws SegmentNotFoundException, DataSourceException;
+    public DasRestrictedSequence getSequence (String segmentReference, int start, int stop) throws CoordinateErrorException, BadReferenceObjectException, DataSourceException;
 
     /**
      * Implement this method to allow you to take control
@@ -48,8 +51,8 @@ public interface RangeHandlingReferenceDataSource extends ReferenceDataSource{
      * @param start
      * @param stop
      * @return
-     * @throws SegmentNotFoundException
+     * @throws BadReferenceObjectException
      * @throws DataSourceException
      */
-    public List<DasFeature> getFeatures(String segmentReference, int start, int stop) throws SegmentNotFoundException, DataSourceException;
+    public List<DasFeature> getFeatures(String segmentReference, int start, int stop) throws BadReferenceObjectException, DataSourceException;
 }
