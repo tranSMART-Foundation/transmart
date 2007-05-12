@@ -10,7 +10,7 @@ import uk.ac.ebi.simpledas.exceptions.CoordinateErrorException;
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
  */
-public class SequenceReporter {
+class SequenceReporter {
 
     private boolean restricted;
 

@@ -44,7 +44,7 @@ public class SimpleDasServlet extends HttpServlet {
      * Define a static logger variable so that it references the
      * Logger instance named "XMLUnmarshaller".
      */
-    private static Logger logger = Logger.getLogger(SimpleDasServlet.class);
+    private static final Logger logger = Logger.getLogger(SimpleDasServlet.class);
 
     /**
      * This pattern is used to parse the URI part of the request.
@@ -87,7 +87,7 @@ public class SimpleDasServlet extends HttpServlet {
 
     private static DataSourceManager DATA_SOURCE_MANAGER = null;
 
-    public static final String RESOURCE_FOLDER = "/WEB-INF/classes/";
+    private static final String RESOURCE_FOLDER = "/WEB-INF/classes/";
 
     private static final String CONFIGURATION_FILE_NAME = RESOURCE_FOLDER + "SimpleDasServerConfig.xml";
 

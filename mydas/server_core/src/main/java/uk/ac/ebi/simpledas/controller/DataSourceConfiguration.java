@@ -35,7 +35,7 @@ public class DataSourceConfiguration {
      * Define a static logger variable so that it references the
      * Logger instance named "XMLUnmarshaller".
      */
-    private static Logger logger = Logger.getLogger(DataSourceConfiguration.class);
+    private static final Logger logger = Logger.getLogger(DataSourceConfiguration.class);
 
     private static final List<Class> DATA_SOURCE_INTERFACES = new ArrayList<Class>(4);
 
@@ -49,47 +49,47 @@ public class DataSourceConfiguration {
     /**
      * Holds the mandatory value for /DASDSN/DSN/SOURCE/@id
      */
-    private String id;
+    private final String id;
 
     /**
      * Holds the optional value for /DASDSN/DSN/SOURCE
      */
-    private String name;
+    private final String name;
 
     /**
      * Holds the optional value for /DASDSN/DSN/SOURCE/@version
      */
-    private String version;
+    private final String version;
 
     /**
      * Holds the optional value for /DASDSN/DSN/MAPMASTER
      */
-    private String mapmaster;
+    private final String mapmaster;
 
     /**
      * Holds the optional value for /DASDSN/DSN/DESCRIPTION
      */
-    private String description;
+    private final String description;
 
     /**
      * Holds the optional value for /DASDSN/DSN/DESCRIPTION/@href
      */
-    private URL descriptionHref;
+    private final URL descriptionHref;
 
     /**
      * Holds the name of the stylesheet for the plugin
      */
-    private String styleSheet;
+    private final String styleSheet;
 
     /**
      * The fully qualified class of the data source plugin.
      */
-    private String className;
+    private final String className;
 
     /**
      * Holds a Map of key value pairs defined by the plugin developer.
      */
-    private Map<String,String> dataSourceProperties;
+    private final Map<String,String> dataSourceProperties;
 
     /**
      * A reference to the dataSource itself, once it is loaded.

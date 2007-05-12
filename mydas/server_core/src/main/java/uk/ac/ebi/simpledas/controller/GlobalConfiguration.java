@@ -14,17 +14,17 @@ public class GlobalConfiguration {
     /**
      * The baseURL used in the ./GFF/@href element
      */
-    String baseURL = null;
+    private String baseURL = null;
 
     /**
      * Default stylesheet.  Can be overridden by individual DSNs
      */
-    String defaultStyleSheet = null;
+    private String defaultStyleSheet = null;
 
     /**
      * A boolean to indicate if the response should be gzipped or not.
      */
-    boolean gzipped = false;
+    private boolean gzipped = false;
 
     /**
      * A Map of arbitrary key / value pairs that can be passed into the
@@ -33,7 +33,7 @@ public class GlobalConfiguration {
      * Accessible from the DataSources, so may be useful as global parameters
      * by the plugin implementor.
      */
-    Map<String, String> globalParameters = null;
+    private Map<String, String> globalParameters = null;
 
 
     public GlobalConfiguration(String baseURL, boolean gzipped, String defaultStyleSheet, Map<String, String> globalParameters) {

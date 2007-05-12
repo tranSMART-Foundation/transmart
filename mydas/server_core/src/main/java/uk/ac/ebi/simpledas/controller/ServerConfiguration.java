@@ -13,11 +13,11 @@ import java.util.Map;
  */
 public class ServerConfiguration {
 
-    List<String> liveDsnNames = null;
+    private List<String> liveDsnNames = null;
 
-    private GlobalConfiguration globalConfiguration;
+    private final GlobalConfiguration globalConfiguration;
 
-    private Map<String, DataSourceConfiguration> dataSourceConfigMap;
+    private final Map<String, DataSourceConfiguration> dataSourceConfigMap;
 
 
     public ServerConfiguration(GlobalConfiguration globalConfiguration, Map<String, DataSourceConfiguration> dataSourceConfigList) {

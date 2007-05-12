@@ -67,7 +67,7 @@ public class ConfigXmlUnmarshaller {
 	 * Define a static logger variable so that it references the
 	 * Logger instance named "XMLUnmarshaller".
 	 */
-	private static Logger logger = Logger.getLogger(ConfigXmlUnmarshaller.class);
+	private static final Logger logger = Logger.getLogger(ConfigXmlUnmarshaller.class);
 
     /**
      * The Factory for the XmlPullParser.

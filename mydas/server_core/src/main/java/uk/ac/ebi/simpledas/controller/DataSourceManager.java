@@ -22,7 +22,7 @@ public class DataSourceManager {
      * Define a static logger variable so that it references the
      * Logger instance named "AbstractKrakenDataSource".
      */
-    private static Logger logger = Logger.getLogger(DataSourceManager.class);
+    private static final Logger logger = Logger.getLogger(DataSourceManager.class);
 
     private ServletContext svCon;
 

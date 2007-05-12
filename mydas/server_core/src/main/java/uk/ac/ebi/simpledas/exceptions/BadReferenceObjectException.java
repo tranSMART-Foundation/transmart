@@ -16,7 +16,7 @@ public class BadReferenceObjectException extends Exception{
     /**
      * The name / accession of the segment being queried.
      */
-    private String segment;
+    private final String segment;
 
     public BadReferenceObjectException(String segment, String message){
         super(message);
