@@ -2,11 +2,11 @@ package uk.ac.ebi.simpledas.example;
 
 import uk.ac.ebi.simpledas.controller.DataSourceConfiguration;
 import uk.ac.ebi.simpledas.exceptions.DataSourceException;
-import uk.ac.ebi.simpledas.exceptions.SegmentNotFoundException;
+import uk.ac.ebi.simpledas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.simpledas.model.DasFeature;
 import uk.ac.ebi.simpledas.model.DasSequence;
 import uk.ac.ebi.simpledas.model.DasEntryPoint;
-import uk.ac.ebi.simpledas.datasource.RangeHandlingReferenceDataSource;
+import uk.ac.ebi.simpledas.datasource.ReferenceDataSource;
 
 import javax.servlet.ServletContext;
 import java.util.*;
@@ -18,7 +18,7 @@ import java.util.*;
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
  */
-public class TESTDataSource implements RangeHandlingReferenceDataSource {
+public class TESTDataSource implements ReferenceDataSource {
 
     ServletContext svCon;
     Map<String, String> globalParameters;
@@ -82,34 +82,37 @@ public class TESTDataSource implements RangeHandlingReferenceDataSource {
      *                         interface.  It will then be the responsibility of your AnnotationDataSource plugin to
      *                         restrict the features returned for the requested range.
      * @return a List of DasFeature objects.
-     * @throws uk.ac.ebi.simpledas.exceptions.SegmentNotFoundException
+     * @throws uk.ac.ebi.simpledas.exceptions.BadReferenceObjectException
      *
      * @throws uk.ac.ebi.simpledas.exceptions.DataSourceException
      *
      */
-    public List<DasFeature> getFeatures(String segmentReference) throws SegmentNotFoundException, DataSourceException {
+    public List<DasFeature> getFeatures(String segmentReference) throws BadReferenceObjectException, DataSourceException {
         return Collections.EMPTY_LIST;
     }
 
     /**
      * Extends the {@link uk.ac.ebi.simpledas.datasource.ReferenceDataSource} inteface to allow the creation of an Annotation
      * data source.  The only significant difference is that a Reference data source can also
-     * serve the sequence of the requested segment.
+     * serve the sequenceString of the requested segment.
      *
-     * @param segmentReference being the name of the sequence being requested.
-     * @return a {@link DasSequence} object, holding the sequence and start / end coordinates of the sequence.
-     * @throws uk.ac.ebi.simpledas.exceptions.SegmentNotFoundException
+     * @param segmentReference being the name of the sequenceString being requested.
+     * @return a {@link DasSequence} object, holding the sequenceString and start / end coordinates of the sequenceString.
+     * @throws uk.ac.ebi.simpledas.exceptions.BadReferenceObjectException
      *          to inform the {@link uk.ac.ebi.simpledas.controller.SimpleDasServlet} that the
      *          segment requested is not available from this DataSource.
      * @throws uk.ac.ebi.simpledas.exceptions.DataSourceException
      *          to encapsulate any exceptions thrown by the datasource
      *          and allow the SimpleDasServlet to return a decent error header to the client.
      */
-    public DasSequence getSequence(String segmentReference) throws SegmentNotFoundException, DataSourceException {
-        DasSequence sequence = new DasSequence();
-
-        return sequence;
-
+    public DasSequence getSequence(String segmentReference) throws BadReferenceObjectException, DataSourceException {
+        if (segmentReference.equals ("one")){
+            return new DasSequence("one", "FFDYASTDFYASDFAUFDYFVSHCVYTDASVCYT", 1, "Up-to-date", DasSequence.TYPE_PROTEIN);
+        }
+        else if (segmentReference.equals("two")){
+            return new DasSequence("two", "cgatcatcagctacgtacgatcagtccgtacgatcgatcagcatcaca", 1, "Up-to-date", DasSequence.TYPE_DNA);
+        }
+        else throw new BadReferenceObjectException(segmentReference, "Not found");
     }
 
     /**
@@ -145,13 +148,7 @@ public class TESTDataSource implements RangeHandlingReferenceDataSource {
         return entryPoints;
     }
 
-    public DasSequence getSequence(String segmentReference, int start, int stop) throws SegmentNotFoundException, DataSourceException {
-        DasSequence sequence = new DasSequence();
-
-        return sequence;
-    }
-
-    public List<DasFeature> getFeatures(String segmentReference, int start, int stop) throws SegmentNotFoundException, DataSourceException {
+    public List<DasFeature> getFeatures(String segmentReference, int start, int stop) throws BadReferenceObjectException, DataSourceException {
         return Collections.EMPTY_LIST;
     }
 }
