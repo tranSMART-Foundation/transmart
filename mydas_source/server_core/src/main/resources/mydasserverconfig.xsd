@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="mydasserver">
+        <xs:annotation>
+            <xs:documentation>
+                This is the root element of the mydasserverconfig.xml file, used to configure a
+                Mydas server installation with one or more data sources defined.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="global">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The global element holds details of configuration common to the entire server.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="baseurl"  minOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        The URL of the DAS server up to an including /das (e.g. http://www.ebi.ac.uk/das-srv/uniprot/das)
+                                    </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:anyURI">
+                                         </xs:extension>
+                                    </xs:simpleContent>                                    
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="gzipped"  nillable="false">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        A boolean switch indicating if the output from the DAS server should be compressed or not.
+                                    </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:boolean">
+                                        </xs:extension>
+                                    </xs:simpleContent>                                    
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="default-stylesheet" type="xs:string"  nillable="false">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        The name of the default DAS stylesheet to be used for all of the defined datasources.  This can
+                                        be overridden for individual datasources by including a stylesheet element for them.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        Any number of additional properties can be annotated on the server as a whole. These name / value pairs 
+                                        will be available to all of the data sources defined for the server instance.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="datasources">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The enclosing element for one or more datasource definitions.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="datasource" maxOccurs="unbounded" minOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        Configuration for a single data source.  All the information annotated in this element
+                                        will be available to the DataSource class.
+                                    </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="class" type="xs:string" minOccurs="1" maxOccurs="1"  nillable="false">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    The fully qualified class name of the DataSource.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="stylesheet" type="xs:string" minOccurs="0" maxOccurs="1"  nillable="false">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    The optional name of the DAS stylesheet to be used for this datasource.  This will override the 
+                                                    default stylesheet defined in the global settings section.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    Any number of additional properties, consisting of a name and a value can
+                                                    be annotated for each individual data source.  All such properties are available
+                                                    to the DataSource code of course.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="id" type="xs:string" use="required" >
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                This is the mandatory data source ID, as provided in the /DASDSN/DSN/SOURCE/@id attribute of the XML
+                                                returned by the DAS dsn command.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:attribute>
+                                    <xs:attribute name="name" type="xs:string" use="required">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                This is the mandatory data source name, as provided in the /DASDSN/DSN/SOURCE element of the XML
+                                                returned by the DAS dsn command.  It may or may not be same as the id.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:attribute>
+                                    <xs:attribute name="version" type="xs:string" use="optional">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                This is the optional data source version, as provided in the /DASDSN/DSN/SOURCE/@version attribute of the XML
+                                                returned by the DAS dsn command.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:attribute>
+                                    <xs:attribute name="mapmaster" type="xs:string" use="required">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                This is the mandatory data source version, as provided in the /DASDSN/DSN/MAPMASTER element of the XML
+                                                returned by the DAS dsn command.  For a reference server, this should echo its own URL.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:attribute>
+                                    <xs:attribute name="description" type="xs:string" use="optional">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                This is the optional data source description, as provided in the /DASDSN/DSN/DESCRIPTION element of the XML
+                                                returned by the DAS dsn command.  For a reference server, this should echo its own URL.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:attribute>
+                                    <xs:attribute name="description-href" type="xs:string" use="optional">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                This is the optional data source description href attribute, as provided in the /DASDSN/DSN/DESCRIPTION/@href attribute of the XML
+                                                returned by the DAS dsn command.  For a reference server, this should echo its own URL.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:attribute>                                      
+                                </xs:complexType>                                
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="propertyType">
+        <xs:attribute name="key" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    Properties will be made available to the DataSource developer as a java.util.Map of keys and values, with this attribute
+                    containing the key.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="value" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    Properties will be made available to the DataSource developer as a java.util.Map of keys and values, with this attribute
+                    containing the value.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+</xs:schema>

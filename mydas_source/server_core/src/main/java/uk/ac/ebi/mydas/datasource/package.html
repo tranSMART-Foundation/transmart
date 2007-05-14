@@ -1,0 +1,85 @@
+<body>
+<p>
+    This package contains the interfaces and utility classes that you should use to build
+    your own datasource plugin.
+</p>
+<p>
+    As far as possible, this API has been designed to make it possible to create plugins to
+    any data source without making any assumptions about the API that you wish to use to
+    achieve this, apart from the very simple, DAS oriented API provided here.
+</p>
+<h2>
+    Getting Started with your Implementation
+</h2>
+<p>
+    First of all, it is highly recommended that you become familiar with the
+    <a href="http://biodas.org/documents/spec.html">
+         Distributed Sequence Annotation System (DAS) 1.53
+    </a>
+    specification document.  This is a complete and concise description of the
+    DAS protocol which is implemented in this API.
+</p>
+<p>
+    Two kinds of DAS server are specified:
+</p>
+<ul>
+    <li>
+        <a href="#annotationServer">Annotation Servers</a> provide feature information
+        for the segments / entry points that they cover.
+    </li>
+    <li>
+        <a href="#referenceServer">Reference Servers</a> extend annotation servers
+        and are able to return both the sequence of the segment and, in the case
+        of nucleic acid DAS servers, the hierarchical structure of the assembly.
+    </li>
+</ul>
+<a name="annotationServer"/>
+<h2>
+    Implementing an Annotation Server
+</h2>
+<p>
+    If you are implementing an annotation server, you should implement the
+    {@link uk.ac.ebi.mydas.datasource.AnnotationDataSource} interface.
+</p>
+<p>
+    By default, the MydasServlet will handle requests for features within a range on
+    the requested segment (e.g. if the DAS client requests only features between residues 200
+    and 400, it will automatically filter the features that your plugin returns to include only
+    the correct features).
+</p>
+<p>
+    It is possible however, that this mechanism may be inneficient for your data source, especially
+    if you have a large number of very massive segments with a lot of annotation.  In this case,
+    you <b>may</b> additionally implement the {@link uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource} interface
+    which will allow you to take control of the filtering of features by coordinate at the query level.
+</p>
+<a name="referenceServer"/>
+<h2>
+    Implementing a Reference Server
+</h2>
+<p>
+    If you are implementing a reference server, you should implement the
+    {@link uk.ac.ebi.mydas.datasource.ReferenceDataSource} interface.
+</p>
+<p>
+    By default, the MydasServlet will handle requests for both sequence and features within a range on
+    the requested segment (e.g. if the DAS client requests only features or sequence between residues 200
+    and 400, it will automatically filter the features / sequence that your plugin returns to include only
+    the correct features or sequence).
+</p>
+<p>
+    It is possible however, that this mechanism may be inneficient for your data source, especially
+    if you have a large number of very massive segments with a lot of annotation.  In this case,
+    you <b>may</b> additionally implement the {@link uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource} and / or
+    the {@link uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource} interfaces
+    which will allow you to take control of filtering at the query level.
+</p>
+<p>
+    The {@link uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource}
+    interface will allow you to filter features
+    by their coordinates and the
+    {@link uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource} interface
+    will allow you to filter sequence by coordinates.  <i>You can implement one or both of
+    these interfaces as is most appropriate for your reference data source.</i>
+</p>
+</body>
