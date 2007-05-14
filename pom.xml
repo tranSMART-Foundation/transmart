@@ -1,0 +1,17 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>uk.ac.ebi.mydas.example</groupId>
+    <artifactId>mydas_master</artifactId>
+    <packaging>pom</packaging>
+    <version>0.1-SNAPSHOT</version>
+    <name>mydas_example Maven Webapp</name>
+    <url>http://ebi.ac.uk</url>
+
+    <modules>
+        <module>server_core</module>
+        <module>example_server_installation</module>
+    </modules>
+
+</project>
