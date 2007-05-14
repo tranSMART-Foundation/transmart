@@ -61,6 +61,20 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
+            <!-- Maven can be used to build javadocs from the source. (The source has been
+            carefully documented, so this should be useful).
+
+            To generate the javadocs, use mvn javadoc:javadoc
+
+            To package the javadocs, use mvn javadoc:jar
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <overview/>
+                </configuration>
+            </plugin>
         </plugins>
         <finalName>mydas</finalName>
     </build>

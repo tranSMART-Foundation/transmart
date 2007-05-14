@@ -5,6 +5,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
 import uk.ac.ebi.mydas.model.DasFeature;
 import uk.ac.ebi.mydas.model.DasRestrictedSequence;
+import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 
 import java.util.List;
 
@@ -53,5 +54,5 @@ public interface RangeHandlingReferenceDataSource extends ReferenceDataSource{
      * @throws BadReferenceObjectException
      * @throws DataSourceException
      */
-    public List<DasFeature> getFeatures(String segmentReference, int start, int stop) throws BadReferenceObjectException, DataSourceException;
+    public List<DasAnnotatedSegment> getFeatures(String segmentReference, int start, int stop) throws CoordinateErrorException, BadReferenceObjectException, DataSourceException;
 }

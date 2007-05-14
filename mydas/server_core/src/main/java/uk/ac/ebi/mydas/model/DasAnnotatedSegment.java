@@ -3,6 +3,7 @@ package uk.ac.ebi.mydas.model;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
 import java.util.Collection;
+import java.util.Comparator;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -10,11 +11,19 @@ import java.util.Collection;
  * Time: 15:26:17
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
+ *
+ * The DasAnnotatedSegment is used as a holder for {@link DasFeature}, as well as describing the
+ * segment that is annotated with these features.
+ *
+ * A Data Source is required to be able to return a {@link Collection<DasAnnotatedSegment>} of these objects.
  */
 public class DasAnnotatedSegment extends DasSegment{
 
     /**
-     * A collection of DasFeature objects, being the features annotated on this segment.
+     * A collection of {@link DasFeature} objects, being the features annotated on this segment.
+     * Holds the complete contents of a /DASGFF/GFF/SEGMENT/FEATURE element (for the features request)
+     * and is used to derive the contents of the
+     * /DASTYPES/GFF/SEGMENT/TYPE element (for the types request).
      */
     Collection<DasFeature> features;
 
@@ -40,7 +49,26 @@ public class DasAnnotatedSegment extends DasSegment{
      */
     String type;
 
-
+    /**
+     * Constructor for a DasAnnotatedSegment object that ensures that the object is valid.
+     * See the documentation of the various getters to find out where in DAS XML these fields may be used.
+     * @param segmentId <b>Required.</b> This is the identifier for the segment / sequence under query.
+     * @param startCoordinate <b>Required.</b> Start position of the feature
+     * <i>DAS servers are often required to serve non-positional features, such as descriptions (of the entire
+     * segment) or related citations.  A commonly accepted mechanism is to give non-positional features start
+     * and end coordinates of 0, however this is not enforced and is not part of the DAS 1.53 specification.</i>
+     * @param stopCoordinate <b>Required.</b> Stop position of the feature.
+     * @param version <b>Required.</b> a String indicating the version of the segment that is annotated.  What this
+     * version consists of is not defined - may be a date, a checksum, a version number etc.  If you are
+     * developing an annotation server, you must implement the same mechanism as the 'map master' reference server
+     * that your server uses as authority.
+     * @param segmentLabel <b>Optional.</b> A human readable label for the segment.  If this is not given (null or
+     * empty string) the segment ID will be used in its place.
+     * @param features being a Collection of zero or more {@link DasFeature} objects.  Each of these objects describes a single
+     * feature.
+     * @throws DataSourceException to allow you to handle problems with the data source, such as SQLExceptions,
+     * parsing errors etc.
+     */
     public DasAnnotatedSegment(String segmentId, int startCoordinate, int stopCoordinate, String version, String segmentLabel, Collection<DasFeature> features)
             throws DataSourceException {
         super(startCoordinate, stopCoordinate, segmentId, version);
@@ -49,8 +77,11 @@ public class DasAnnotatedSegment extends DasSegment{
     }
 
     /**
-     * Returns a collection of DasFeature objects, being the features annotated on this segment.
-     * @return a collection of DasFeature objects, being the features annotated on this segment.
+     * Returns a collection of {@link DasFeature} objects, being the features annotated on this segment.
+     * Holds the complete contents of a /DASGFF/GFF/SEGMENT/FEATURE element (for the features request)
+     * and is used to derive the contents of the
+     * /DASTYPES/GFF/SEGMENT/TYPE element (for the types request).
+     * @return a collection of {@link DasFeature} objects, being the features annotated on this segment.
      */
     public Collection<DasFeature> getFeatures() {
         return features;

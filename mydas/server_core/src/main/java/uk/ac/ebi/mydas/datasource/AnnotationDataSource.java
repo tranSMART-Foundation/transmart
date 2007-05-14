@@ -1,9 +1,9 @@
 package uk.ac.ebi.mydas.datasource;
 
 import uk.ac.ebi.mydas.controller.DataSourceConfiguration;
-import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
-import uk.ac.ebi.mydas.model.DasFeature;
+import uk.ac.ebi.mydas.exceptions.DataSourceException;
+import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 
 import javax.servlet.ServletContext;
 import java.util.List;
@@ -64,7 +64,7 @@ public interface AnnotationDataSource {
     public void destroy ();
 
     /**
-     * This method returns a List of DasFeature objects, describing the Features
+     * This method returns a List of DasAnnotatedSegment objects, describing the annotated segment and the features
      * of the segmentReference passed in as argument.
      * @param segmentReference being the reference of the segment requested in the DAS request (not including
      * start and stop coordinates)
@@ -73,15 +73,17 @@ public interface AnnotationDataSource {
      * the MydasServlet will handle restricting the features returned to
      * the start / stop coordinates in the request and you will only need to
      * implement this method to return Features.  If on the other hand, your data source
-     * includes massive segments, you may wish to implement the {@link uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource}
+     * includes massive segments, you may wish to implement the {@link RangeHandlingAnnotationDataSource}
      * interface.  It will then be the responsibility of your AnnotationDataSource plugin to
      * restrict the features returned for the requested range.
      *
-     * @return a List of DasFeature objects.
+     * @return a List of DasAnnotatedSegment objects.  Each of these objects describes the segment that is annotated, limited
+     * to the information required for the /DASGFF/GFF/SEGMENT element.  Each also references a Collection of
+     * DasFeature objects.
      * @throws BadReferenceObjectException
      * @throws DataSourceException
      */
-    public List<DasFeature> getFeatures(String segmentReference) throws BadReferenceObjectException, DataSourceException;
+    public List<DasAnnotatedSegment> getFeatures(String segmentReference) throws BadReferenceObjectException, DataSourceException;
 
 
     

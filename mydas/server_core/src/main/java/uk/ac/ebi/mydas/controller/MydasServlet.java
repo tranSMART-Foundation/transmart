@@ -27,7 +27,7 @@ import java.util.zip.GZIPOutputStream;
  * User: phil
  * Date: 04-May-2007
  * Time: 12:10:01
- * A simple DAS server allowing the easy creation of plugins to different data
+ * A DAS server allowing the easy creation of plugins to different data
  * sources that does not tie in the plugin developer to any particular API
  * (apart from the very simple interfaces defined by this API.)
  *
@@ -471,6 +471,7 @@ public class MydasServlet extends HttpServlet {
 
     private void featuresCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
             throws XmlPullParserException, IOException, DataSourceException{
+        // 
     }
 
     private void entryPointsCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
@@ -511,7 +512,7 @@ public class MydasServlet extends HttpServlet {
                         serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
                         serializer.attribute(DAS_XML_NAMESPACE, "id", entryPoint.getSegmentId());
                         serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(entryPoint.getStartCoordinate()));
-                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(entryPoint.getEndCoordinate()));
+                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(entryPoint.getStopCoordinate()));
                         if (entryPoint.getType() != null && entryPoint.getType().length() > 0){
                             serializer.attribute(DAS_XML_NAMESPACE, "type", entryPoint.getType());
                         }

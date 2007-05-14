@@ -23,7 +23,7 @@ class SequenceReporter {
 
     SequenceReporter(DasSequence sequence, int requestedStart, int requestedStop) throws CoordinateErrorException {
         if (requestedStart < sequence.getStartCoordinate() || requestedStop > sequence.getStopCoordinate()){
-            throw new CoordinateErrorException(sequence.getSegmentName(), requestedStart,  requestedStop);
+            throw new CoordinateErrorException(sequence.getSegmentId(), requestedStart,  requestedStop);
         }
         this.restricted = true;
         this.requestedStart = requestedStart;
@@ -43,7 +43,7 @@ class SequenceReporter {
     }
 
     String getSegmentName(){
-        return sequence.getSegmentName();
+        return sequence.getSegmentId();
     }
 
     String getSequenceVersion(){
