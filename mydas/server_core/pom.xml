@@ -2,11 +2,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>uk.ac.ebi.simpledas</groupId>
-    <artifactId>simpledas</artifactId>
+    <groupId>uk.ac.ebi.mydas</groupId>
+    <artifactId>mydas</artifactId>
     <packaging>jar</packaging>
     <version>0.1-SNAPSHOT</version>
-    <name>simpledas Maven Webapp</name>
+    <name>mydas Maven Webapp</name>
     <url>http://ebi.ac.uk</url>
 
     <dependencies>
@@ -62,7 +62,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>simpledas</finalName>
+        <finalName>mydas</finalName>
     </build>
     
 </project>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="simpledasserver">
+    <xs:element name="mydasserver">
         <xs:annotation>
             <xs:documentation>
-                This is the root element of the simpledasserverconfig.xml file, used to configure a
-                SimpleDAS server installation with one or more data sources defined.
+                This is the root element of the mydasserverconfig.xml file, used to configure a
+                Mydas server installation with one or more data sources defined.
             </xs:documentation>
         </xs:annotation>
         <xs:complexType>
