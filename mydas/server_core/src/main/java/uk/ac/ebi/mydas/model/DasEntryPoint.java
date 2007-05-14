@@ -34,7 +34,7 @@ public class DasEntryPoint {
      * For the entry_point command, provides the value for the
      * <code>/DASEP/ENTRY_POINTS/SEGMENT/@stop</code> attribute.
      */
-    private int endCoordinate;
+    private int stopCoordinate;
 
     /**
      * The type of the entry point
@@ -111,7 +111,7 @@ public class DasEntryPoint {
      * @param startCoordinate <b>Mandatory</b>. The start coordinate of the entry point.
      * For the entry_point command, provides the value for the
      * <code>/DASEP/ENTRY_POINTS/SEGMENT/@start</code> attribute.
-     * @param endCoordinate <b>Mandatory</b>. The end coordinate of the entry point.
+     * @param stopCoordinate <b>Mandatory</b>. The end coordinate of the entry point.
      * For the entry_point command, provides the value for the
      * <code>/DASEP/ENTRY_POINTS/SEGMENT/@stop</code> attribute.
      * @param type <b>Optional</b>. May in the future be used to support ontology-based feature typing, according to the
@@ -131,7 +131,7 @@ public class DasEntryPoint {
      * For the entry_point command, provides the value for the
      * <code>/DASEP/ENTRY_POINTS/SEGMENT</code> element.
      */
-    public DasEntryPoint(String segmentId, int startCoordinate, int endCoordinate, String type, Orientation orientation, String description, boolean hasSubparts)
+    public DasEntryPoint(String segmentId, int startCoordinate, int stopCoordinate, String type, Orientation orientation, String description, boolean hasSubparts)
             throws DataSourceException {
         if (segmentId == null || segmentId.length() == 0){
             throw new DataSourceException("A new DasEntryPoint object must be initialised with a segmentId.");
@@ -139,7 +139,7 @@ public class DasEntryPoint {
 
         this.segmentId = segmentId;
         this.startCoordinate = startCoordinate;
-        this.endCoordinate = endCoordinate;
+        this.stopCoordinate = stopCoordinate;
         this.type = type;
         this.orientation = (orientation == null)
                 ? NO_INTRINSIC_ORIENTATION
@@ -174,8 +174,8 @@ public class DasEntryPoint {
      * <code>/DASEP/ENTRY_POINTS/SEGMENT/@stop</code> attribute.
      * @return the end coordinate of the entry point.
      */
-    public int getEndCoordinate() {
-        return endCoordinate;
+    public int getStopCoordinate() {
+        return stopCoordinate;
     }
 
     /**
