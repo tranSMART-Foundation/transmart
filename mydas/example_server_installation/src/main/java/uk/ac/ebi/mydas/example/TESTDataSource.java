@@ -6,6 +6,7 @@ import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.model.DasFeature;
 import uk.ac.ebi.mydas.model.DasSequence;
 import uk.ac.ebi.mydas.model.DasEntryPoint;
+import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
 
 import javax.servlet.ServletContext;
@@ -87,7 +88,7 @@ public class TESTDataSource implements ReferenceDataSource {
      * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
      *
      */
-    public List<DasFeature> getFeatures(String segmentReference) throws BadReferenceObjectException, DataSourceException {
+    public List<DasAnnotatedSegment> getFeatures(String segmentReference) throws BadReferenceObjectException, DataSourceException {
         return Collections.EMPTY_LIST;
     }
 
