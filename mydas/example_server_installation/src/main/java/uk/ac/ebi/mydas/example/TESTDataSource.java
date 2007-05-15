@@ -18,6 +18,9 @@ import java.util.*;
  * Time: 14:46:59
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
+ *
+ * This test data source is used in conjunction with the WebIntegrationTest test class to test
+ * the running web application.
  */
 public class TESTDataSource implements ReferenceDataSource {
 
@@ -93,6 +96,21 @@ public class TESTDataSource implements ReferenceDataSource {
     }
 
     /**
+     * Returns a Collection of {@link DasEntryPoint} objects to implement the entry_point command.
+     *
+     * @return a Collection of {@link DasEntryPoint} objects
+     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
+     *          to encapsulate any exceptions thrown by the datasource
+     *          and allow the {@link uk.ac.ebi.mydas.controller.MydasServlet} to return a decent error header to the client.
+     */
+    public Collection<DasEntryPoint> getEntryPoints() throws DataSourceException {
+        List<DasEntryPoint> entryPoints = new ArrayList<DasEntryPoint>();
+        entryPoints.add (new DasEntryPoint("one", 1, 34, "Protein", null, "Its a protein!", false));
+        entryPoints.add (new DasEntryPoint("two", 1, 48, "DNA", DasEntryPoint.POSITIVE_ORIENTATION, "Its a chromosome!", false));
+        return entryPoints;
+    }
+
+    /**
      * Extends the {@link uk.ac.ebi.mydas.datasource.ReferenceDataSource} inteface to allow the creation of an Annotation
      * data source.  The only significant difference is that a Reference data source can also
      * serve the sequenceString of the requested segment.
@@ -134,20 +152,6 @@ public class TESTDataSource implements ReferenceDataSource {
         return "Version 1.1";
     }
 
-    /**
-     * Returns a Collection of {@link DasEntryPoint} objects to implement the entry_point command.
-     *
-     * @return a Collection of {@link DasEntryPoint} objects
-     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
-     *          to encapsulate any exceptions thrown by the datasource
-     *          and allow the {@link uk.ac.ebi.mydas.controller.MydasServlet} to return a decent error header to the client.
-     */
-    public Collection<DasEntryPoint> getEntryPoints() throws DataSourceException {
-        List<DasEntryPoint> entryPoints = new ArrayList<DasEntryPoint>();
-        entryPoints.add (new DasEntryPoint("Q12345", 1, 123, "Protein", null, "Its a protein!", false));
-        entryPoints.add (new DasEntryPoint("Chromosome 1", 1, 1234534534, "DNA", DasEntryPoint.POSITIVE_ORIENTATION, "Its a chromosome!", true));
-        return entryPoints;
-    }
 
     public List<DasFeature> getFeatures(String segmentReference, int start, int stop) throws BadReferenceObjectException, DataSourceException {
         return Collections.EMPTY_LIST;
