@@ -87,7 +87,8 @@ public class MydasServlet extends HttpServlet {
 
     private static DataSourceManager DATA_SOURCE_MANAGER = null;
 
-    private static final String RESOURCE_FOLDER = "/WEB-INF/classes/";
+    private static final String RESOURCE_FOLDER = "";
+//    private static final String RESOURCE_FOLDER = "/WEB-INF/classes/";
 
     private static final String CONFIGURATION_FILE_NAME = RESOURCE_FOLDER + "MydasServerConfig.xml";
 
