@@ -8,6 +8,7 @@ import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 import javax.servlet.ServletContext;
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -83,7 +84,7 @@ public interface AnnotationDataSource {
      * @throws BadReferenceObjectException
      * @throws DataSourceException
      */
-    public List<DasAnnotatedSegment> getFeatures(String segmentReference) throws BadReferenceObjectException, DataSourceException;
+    public Collection<DasAnnotatedSegment> getFeatures(String segmentReference) throws BadReferenceObjectException, DataSourceException;
 
 
     

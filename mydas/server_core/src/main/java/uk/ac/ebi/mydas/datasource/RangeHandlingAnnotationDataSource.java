@@ -4,7 +4,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.model.DasFeature;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -36,6 +36,6 @@ public interface RangeHandlingAnnotationDataSource extends AnnotationDataSource{
      * @throws BadReferenceObjectException
      * @throws DataSourceException
      */
-    public List<DasFeature> getFeatures(String segmentReference, int start, int stop) throws BadReferenceObjectException, DataSourceException;
+    public Collection<DasFeature> getFeatures(String segmentReference, int start, int stop) throws BadReferenceObjectException, DataSourceException;
 
 }

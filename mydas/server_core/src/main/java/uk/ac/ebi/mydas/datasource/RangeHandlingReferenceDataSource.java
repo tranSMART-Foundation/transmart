@@ -8,6 +8,7 @@ import uk.ac.ebi.mydas.model.DasRestrictedSequence;
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 
 import java.util.List;
+import java.util.Collection;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -54,5 +55,5 @@ public interface RangeHandlingReferenceDataSource extends ReferenceDataSource{
      * @throws BadReferenceObjectException
      * @throws DataSourceException
      */
-    public List<DasAnnotatedSegment> getFeatures(String segmentReference, int start, int stop) throws CoordinateErrorException, BadReferenceObjectException, DataSourceException;
+    public Collection<DasAnnotatedSegment> getFeatures(String segmentReference, int start, int stop) throws CoordinateErrorException, BadReferenceObjectException, DataSourceException;
 }
