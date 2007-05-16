@@ -3,7 +3,6 @@ package uk.ac.ebi.mydas.example;
 import uk.ac.ebi.mydas.controller.DataSourceConfiguration;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
-import uk.ac.ebi.mydas.model.DasFeature;
 import uk.ac.ebi.mydas.model.DasSequence;
 import uk.ac.ebi.mydas.model.DasEntryPoint;
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
@@ -91,8 +90,8 @@ public class TESTDataSource implements ReferenceDataSource {
      * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
      *
      */
-    public List<DasAnnotatedSegment> getFeatures(String segmentReference) throws BadReferenceObjectException, DataSourceException {
-        return Collections.EMPTY_LIST;
+    public DasAnnotatedSegment getFeatures(String segmentReference) throws BadReferenceObjectException, DataSourceException {
+        return null;
     }
 
     /**
@@ -150,10 +149,5 @@ public class TESTDataSource implements ReferenceDataSource {
      */
     public String getEntryPointVersion() throws DataSourceException {
         return "Version 1.1";
-    }
-
-
-    public List<DasFeature> getFeatures(String segmentReference, int start, int stop) throws BadReferenceObjectException, DataSourceException {
-        return Collections.EMPTY_LIST;
     }
 }
