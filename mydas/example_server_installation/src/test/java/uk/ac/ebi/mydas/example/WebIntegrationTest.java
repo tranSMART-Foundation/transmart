@@ -33,7 +33,10 @@ import org.mortbay.jetty.webapp.WebAppContext;
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
  *
- * Performs a complete test of the mydas API, using the TESTDataSource.
+ * Performs a comprehensive test of the mydas API, using the TESTDataSource
+ * which is an implementation of the ReferenceDataSource interface.
+ *
+ * TODO: Add tests of additional data sources that implement the remaining three available interfaces
  *
  */
 public class WebIntegrationTest extends net.sourceforge.jwebunit.WebTestCase {
