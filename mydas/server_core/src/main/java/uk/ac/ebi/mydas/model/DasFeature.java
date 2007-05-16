@@ -1,8 +1,35 @@
+/*
+ * Copyright 2007 Philip Jones, EMBL-European Bioinformatics Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *
+ * For further details of the mydas project, including source code,
+ * downloads and documentation, please see:
+ *
+ * http://code.google.com/p/mydas/
+ *
+ */
+
 package uk.ac.ebi.mydas.model;
+
+import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -52,6 +79,29 @@ public class DasFeature {
 
     private final Collection<DasGroup> groups;
 
+    public static final String ORIENTATION_NOT_APPLICABLE = "0";
+    public static final String ORIENTATION_SENSE_STRAND = "+";
+    public static final String ORIENTATION_ANTISENSE_STRAND = "-";
+
+    public static final String PHASE_READING_FRAME_0 = "0";
+    public static final String PHASE_READING_FRAME_1 = "1";
+    public static final String PHASE_READING_FRAME_2 = "2";
+    public static final String PHASE_NOT_APPLICABLE = "-";
+
+    private static final List<String> VALID_ORIENTATIONS = new ArrayList<String>(3);
+    private static final List<String> VALID_PHASES = new ArrayList<String>(4);
+
+    static {
+        VALID_ORIENTATIONS.add(ORIENTATION_NOT_APPLICABLE);
+        VALID_ORIENTATIONS.add(ORIENTATION_ANTISENSE_STRAND);
+        VALID_ORIENTATIONS.add(ORIENTATION_SENSE_STRAND);
+
+        VALID_PHASES.add(PHASE_NOT_APPLICABLE);
+        VALID_PHASES.add(PHASE_READING_FRAME_0);
+        VALID_PHASES.add(PHASE_READING_FRAME_1);
+        VALID_PHASES.add(PHASE_READING_FRAME_2);
+    }
+
 
     public DasFeature(String featureId,
                       String featureLabel,
@@ -69,8 +119,21 @@ public class DasFeature {
                       Collection<String> notes,
                       Map<URL, String> links,
                       Collection<DasTarget> targets,
-                      Collection<DasGroup> groups) {
+                      Collection<DasGroup> groups) throws DataSourceException {
 
+        if (orientation == null) {
+            orientation = ORIENTATION_NOT_APPLICABLE;
+        }
+        if (phase == null){
+            phase = PHASE_NOT_APPLICABLE;
+        }
+
+        if (! VALID_ORIENTATIONS.contains(orientation)){
+            throw new DataSourceException ("An attempt to instantiate a DasFeature object with an invalid orientation has been detected.");
+        }
+        if (! VALID_PHASES.contains(phase)){
+            throw new DataSourceException ("An attempt to instantiate a DasFeature object with an invalid phase has been detected.");
+        }
         this.featureId = featureId;
         this.featureLabel = featureLabel;
         this.typeId = typeId;

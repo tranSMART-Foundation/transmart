@@ -1,3 +1,26 @@
+/*
+ * Copyright 2007 Philip Jones, EMBL-European Bioinformatics Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *
+ * For further details of the mydas project, including source code,
+ * downloads and documentation, please see:
+ *
+ * http://code.google.com/p/mydas/
+ *
+ */
+
 package uk.ac.ebi.mydas.controller;
 
 import org.apache.log4j.Logger;
@@ -651,25 +674,27 @@ public class MydasServlet extends HttpServlet {
                         serializeFeatureTargetElements(feature.getTargets(), serializer);
 
                         // GROUP elements
-                        for (DasGroup group : feature.getGroups()){
-                            serializer.startTag(DAS_XML_NAMESPACE, "GROUP");
-                            serializer.attribute(DAS_XML_NAMESPACE, "id", group.getGroupId());
-                            if (group.getGroupLabel() != null && group.getGroupLabel().length() > 0){
-                                serializer.attribute(DAS_XML_NAMESPACE, "label", group.getGroupLabel());
+                        if (feature.getGroups() != null){
+                            for (DasGroup group : feature.getGroups()){
+                                serializer.startTag(DAS_XML_NAMESPACE, "GROUP");
+                                serializer.attribute(DAS_XML_NAMESPACE, "id", group.getGroupId());
+                                if (group.getGroupLabel() != null && group.getGroupLabel().length() > 0){
+                                    serializer.attribute(DAS_XML_NAMESPACE, "label", group.getGroupLabel());
+                                }
+                                if (group.getGroupType() != null && group.getGroupType().length() > 0){
+                                    serializer.attribute(DAS_XML_NAMESPACE, "type", group.getGroupType());
+                                }
+                                // GROUP/NOTE elements
+                                serializeFeatureNoteElements(group.getNotes(), serializer);
+
+                                // GROUP/LINK elements
+                                serializeFeatureLinkElements(group.getLinks(), serializer);
+
+                                // GROUP/TARGET elements
+                                serializeFeatureTargetElements(group.getTargets(), serializer);
+
+                                serializer.endTag(DAS_XML_NAMESPACE, "GROUP");
                             }
-                            if (group.getGroupType() != null && group.getGroupType().length() > 0){
-                                serializer.attribute(DAS_XML_NAMESPACE, "type", group.getGroupType());
-                            }
-                            // GROUP/NOTE elements
-                            serializeFeatureNoteElements(group.getNotes(), serializer);
-
-                            // GROUP/LINK elements
-                            serializeFeatureLinkElements(group.getLinks(), serializer);
-
-                            // GROUP/TARGET elements
-                            serializeFeatureTargetElements(group.getTargets(), serializer);
-
-                            serializer.endTag(DAS_XML_NAMESPACE, "GROUP");
                         }
 
                         serializer.endTag(DAS_XML_NAMESPACE, "FEATURE");
