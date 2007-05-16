@@ -605,10 +605,10 @@ public class MydasServlet extends HttpServlet {
                         serializer.startTag(DAS_XML_NAMESPACE, "FEATURE");
                         serializer.attribute(DAS_XML_NAMESPACE, "id", feature.getFeatureId());
                         if (feature.getFeatureLabel() == null || feature.getFeatureLabel().length() == 0){
-                            serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureLabel());
+                            serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureId());
                         }
                         else {
-                            serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureId());
+                            serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureLabel());
                         }
 
                         // TYPE element
