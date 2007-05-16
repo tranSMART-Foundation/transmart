@@ -26,10 +26,12 @@ package uk.ac.ebi.mydas.datasource;
 import uk.ac.ebi.mydas.controller.DataSourceConfiguration;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
+import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 
 import javax.servlet.ServletContext;
 import java.util.Map;
+import java.util.Collection;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -112,5 +114,47 @@ public interface AnnotationDataSource {
     public DasAnnotatedSegment getFeatures(String segmentId) throws BadReferenceObjectException, DataSourceException;
 
 
+    /**
+     * <b>For some Datasources, especially ones with many entry points, this method may be hard or impossible
+     * to implement.  If this is the case, you should just throw an {@link UnimplementedFeatureException} as your
+     * implementation of this method, so that a suitable error HTTP header
+     * (X-DAS-Status: 501 Unimplemented feature) is returned to the DAS client as
+     * described in the DAS 1.53 protocol.</b><br/><br/>
+     *
+     * This method is used by the features command when no segments are included, but feature_id and / or
+     * group_id filters have been included, to meet the following specification:<br/><br/>
+     *
+     * "<b>feature_id</b> (zero or more; new in 1.5)<br/>
+     * Instead of, or in addition to, <b>segment</b> arguments, you may provide one or more <b>feature_id</b>
+     * arguments, whose values are the identifiers of particular features.  If the server supports this operation,
+     * it will translate the feature ID into the segment(s) that strictly enclose them and return the result in
+     * the <i>features</i> response.  It is possible for the server to return multiple segments if the requested
+     * feature is present in multiple locations.
+     * <b>group_id</b> (zero or more; new in 1.5)<br/>
+     * The <b>group_id</b> argument, is similar to <b>feature_id</b>, but retrieves segments that contain
+     * the indicated feature group."  (Direct quote from the DAS 1.53 specification, available from
+     * <a href="http://biodas.org/documents/spec.html">http://biodas.org/documents/spec.html</a>.)
+     *
+     * Note that if segments are included in the request, this method is not used, so feature_id and group_id
+     * filters accompanying a list of segments will work, even if your implementation of this method throws an
+     * {@link UnimplementedFeatureException}.
+     *
+     * @param featureIdCollection a Collection&lt;String&gt; of feature_id values included in the features command / request.
+     * May be a <code>java.util.Collections.EMPTY_LIST</code> but will <b>not</b> be null.
+     * @param groupIdCollection a Collection&lt;String&gt; of group_id values included in the features command / request.
+     * May be a <code>java.util.Collections.EMPTY_LIST</code> but will <b>not</b> be null.
+     * @return A Collection of {@link DasAnnotatedSegment} objects. These describe the segments that is annotated, limited
+     * to the information required for the /DASGFF/GFF/SEGMENT element.  Each References a Collection of
+     * DasFeature objects.   Note that this is a basic Collection - this gives you complete control over the details
+     * of the Collection type - so you can create your own comparators etc.
+     * @throws DataSourceException should be thrown if there is any
+     * fatal problem with loading this data source.  <bold>It is highly desirable for the implementation to test itself in this init method and throw
+     * a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
+     * and read a record.</bold>
+     * @throws uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException  Throw this if you cannot
+     * provide a working implementation of this method.
+     */
+    public Collection<DasAnnotatedSegment> getFeatures (Collection<String> featureIdCollection, Collection<String> groupIdCollection)
+            throws UnimplementedFeatureException, DataSourceException;
     
 }

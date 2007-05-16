@@ -614,6 +614,14 @@ public class MydasServlet extends HttpServlet {
                         // TYPE element
                         serializer.startTag(DAS_XML_NAMESPACE, "TYPE");
                         serializer.attribute(DAS_XML_NAMESPACE, "id", feature.getTypeId());
+
+                        // Handle DasReferenceFeatures.
+                        if (feature instanceof DasComponentFeature){
+                            DasComponentFeature refFeature = (DasComponentFeature) feature;
+                            serializer.attribute(DAS_XML_NAMESPACE, "reference", "yes");
+                            serializer.attribute(DAS_XML_NAMESPACE, "superparts", (refFeature.hasSuperParts()) ? "yes" : "no");
+                            serializer.attribute(DAS_XML_NAMESPACE, "subparts", (refFeature.hasSubParts()) ? "yes" : "no");
+                        }
                         if (categorize){
                             if (feature.getTypeCategory() != null && feature.getTypeCategory().length() > 0){
                                 serializer.attribute(DAS_XML_NAMESPACE, "category", feature.getTypeCategory());

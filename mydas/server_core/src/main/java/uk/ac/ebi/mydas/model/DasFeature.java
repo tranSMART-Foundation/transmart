@@ -40,44 +40,42 @@ import java.util.ArrayList;
  */
 public class DasFeature {
 
-    private final String featureId;
+    protected final String featureId;
 
-    private final String featureLabel;
+    protected final String featureLabel;
 
-    private final String typeId;
+    protected final String typeId;
 
-    private final String typeCategory;
+    protected final String typeCategory;
 
-    private final String typeLabel;
+    protected final String typeLabel;
 
-    private final boolean typeIsReference;
+    protected final String methodId;
 
-    private final String methodId;
-
-    private final String methodLabel;
+    protected final String methodLabel;
 
     /*
      * <i>DAS servers are often required to serve non-positional features, such as descriptions (of the entire
      * segment) or related citations.  A commonly accepted mechanism is to give non-positional features start
      * and end coordinates of 0, however this is not enforced and is not part of the DAS 1.53 specification.</i>
      */
-    private final int startCoodinate;
+    protected final int startCoodinate;
 
-    private final int endCoordinate;
+    protected final int endCoordinate;
 
-    private final Double score;
+    protected final Double score;
 
-    private final String orientation;
+    protected final String orientation;
 
-    private final String phase;
+    protected final String phase;
 
-    private final Collection<String> notes;
+    protected final Collection<String> notes;
 
-    private final Map<URL, String> links;
+    protected final Map<URL, String> links;
 
-    private final Collection<DasTarget> targets;
+    protected final Collection<DasTarget> targets;
 
-    private final Collection<DasGroup> groups;
+    protected final Collection<DasGroup> groups;
 
     public static final String ORIENTATION_NOT_APPLICABLE = "0";
     public static final String ORIENTATION_SENSE_STRAND = "+";
@@ -102,13 +100,11 @@ public class DasFeature {
         VALID_PHASES.add(PHASE_READING_FRAME_2);
     }
 
-
     public DasFeature(String featureId,
                       String featureLabel,
                       String typeId,
                       String typeCategory,
                       String typeLabel,
-                      boolean typeIsReference,
                       String methodId,
                       String methodLabel,
                       int startCoodinate,
@@ -139,7 +135,6 @@ public class DasFeature {
         this.typeId = typeId;
         this.typeCategory = typeCategory;
         this.typeLabel = typeLabel;
-        this.typeIsReference = typeIsReference;
         this.methodId = methodId;
         this.methodLabel = methodLabel;
         this.startCoodinate = startCoodinate;
@@ -172,10 +167,6 @@ public class DasFeature {
 
     public String getTypeLabel() {
         return typeLabel;
-    }
-
-    public boolean isTypeIsReference() {
-        return typeIsReference;
     }
 
     public String getMethodId() {
