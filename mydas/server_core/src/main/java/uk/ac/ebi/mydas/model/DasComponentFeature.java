@@ -52,8 +52,8 @@ public class DasComponentFeature extends DasFeature {
      * <b>Note</b> You should NOT add a component
      * @param featureId
      * @param featureLabel
-     * @param componentId
-     * @param componentLabel
+     * @param targetSegmentId
+     * @param componentTargetLabel
      * @param startCoordinateOnComponent
      * @param endCoordinateOnComponent
      * @param typeId
@@ -67,17 +67,16 @@ public class DasComponentFeature extends DasFeature {
      * @param phase
      * @param notes
      * @param links
-     * @param targets
-     * @param groups
      * @throws DataSourceException
      */
-    public DasComponentFeature(String featureId,
+    private DasComponentFeature(String featureId,
                         String featureLabel,
-                        String componentId,
-                        String componentLabel,
+                        String targetSegmentId,
+                        String componentTargetLabel,
                         int startCoordinateOnComponent,
                         int endCoordinateOnComponent,
                         String typeId,
+                        String category,
                         String typeLabel,
                         String methodId,
                         String methodLabel,
@@ -87,15 +86,13 @@ public class DasComponentFeature extends DasFeature {
                         String orientation,
                         String phase,
                         Collection<String> notes,
-                        Map<URL, String> links,
-                        Collection<DasTarget> targets,
-                        Collection<DasGroup> groups
-    ) throws DataSourceException {
+                        Map<URL, String> links)
+            throws DataSourceException {
         super(
                 featureId,
                 featureLabel,
                 typeId,
-                "component",
+                category,
                 typeLabel,
                 methodId,
                 methodLabel,
@@ -106,19 +103,19 @@ public class DasComponentFeature extends DasFeature {
                 phase,
                 notes,
                 links,
-                (targets == null) ? new ArrayList<DasTarget>(1) : targets,
-                groups
+                new ArrayList<DasTarget>(1),
+                null
         );
-        DasTarget componentTarget = new DasTarget(componentId, startCoordinateOnComponent, endCoordinateOnComponent, componentLabel);
+        DasTarget componentTarget = new DasTarget(targetSegmentId, startCoordinateOnComponent, endCoordinateOnComponent, componentTargetLabel);
         this.getTargets().add (componentTarget);
     }
 
 
-    public DasComponentFeature(DasAnnotatedSegment segment, String segmentType) throws DataSourceException {
+    public DasComponentFeature(DasAnnotatedSegment segment) throws DataSourceException {
         super(
                 segment.getSegmentId(),
                 null,
-                segmentType,
+                "ThisSegment",
                 "component",
                 null,
                 "assembly",
@@ -149,18 +146,112 @@ public class DasComponentFeature extends DasFeature {
         return superComponents != null && superComponents.size() > 0;
     }
 
-    public void addSubComponent(DasComponentFeature subComponent){
+    public void addSubComponent(String componentFeatureId,
+                                int startCoordinateOnComponent,
+                                int stopCoordinateOnComponent,
+                                int startCoordinateOnSegment,
+                                int stopCoordinateOnSegment,
+                                String componentFeatureLabel,
+                                String componentTypeId,
+                                String componentTypeLabel,
+                                String targetSegmentId,
+                                String componentTargetLabel,
+                                String componentMethodId,
+                                String componentMethodLabel,
+                                Double componentScore,
+                                String componentOrientation,
+                                String componentPhase,
+                                Collection<String> componentNotes,
+                                Map<URL, String> componentLinks
+
+                                ) throws DataSourceException {
+
         if (subComponents == null){
             subComponents =  new ArrayList<DasComponentFeature>();
         }
-        subComponents.add (subComponent);
+
+        DasComponentFeature newSubComponent = new DasComponentFeature(
+                componentFeatureId,
+                componentFeatureLabel,
+                targetSegmentId,
+                componentTargetLabel,
+                startCoordinateOnComponent,
+                stopCoordinateOnComponent,
+                componentTypeId,
+                "component",
+                componentTypeLabel,
+                componentMethodId,
+                componentMethodLabel,
+                startCoordinateOnSegment,
+                stopCoordinateOnSegment,
+                componentScore,
+                componentOrientation,
+                componentPhase,
+                componentNotes,
+                componentLinks
+        );
+
+        subComponents.add (newSubComponent);
+        newSubComponent.addSuperComponent(this);
     }
 
-    public void addSuperComponent(DasComponentFeature superComponent){
+    private void addSubComponent (DasComponentFeature subComponentFeature){
+        if (subComponents == null){
+            subComponents =  new ArrayList<DasComponentFeature>();
+        }
+        subComponents.add (subComponentFeature);
+    }
+
+    public void addSuperComponent(String componentFeatureId,
+                                int startCoordinateOnComponent,
+                                int stopCoordinateOnComponent,
+                                int startCoordinateOnSegment,
+                                int stopCoordinateOnSegment,
+                                String componentFeatureLabel,
+                                String componentTypeId,
+                                String componentTypeLabel,
+                                String targetSegmentId,
+                                String componentTargetLabel,
+                                String componentMethodId,
+                                String componentMethodLabel,
+                                Double componentScore,
+                                String componentOrientation,
+                                String componentPhase,
+                                Collection<String> componentNotes,
+                                Map<URL, String> componentLinks) throws DataSourceException {
         if (superComponents == null){
             superComponents =  new ArrayList<DasComponentFeature>();
         }
-        superComponents.add (superComponent);
+        DasComponentFeature newSuperComponent = new DasComponentFeature(
+                componentFeatureId,
+                componentFeatureLabel,
+                targetSegmentId,
+                componentTargetLabel,
+                startCoordinateOnComponent,
+                stopCoordinateOnComponent,
+                componentTypeId,
+                "supercomponent",
+                componentTypeLabel,
+                componentMethodId,
+                componentMethodLabel,
+                startCoordinateOnSegment,
+                stopCoordinateOnSegment,
+                componentScore,
+                componentOrientation,
+                componentPhase,
+                componentNotes,
+                componentLinks
+        );
+        superComponents.add (newSuperComponent);
+        // Relationship needs to go both ways...
+        newSuperComponent.addSubComponent(this);
+    }
+
+    private void addSuperComponent (DasComponentFeature superComponentFeature){
+        if (superComponents == null){
+            superComponents =  new ArrayList<DasComponentFeature>();
+        }
+        superComponents.add (superComponentFeature);
     }
 
     public Collection<DasComponentFeature> getSubComponents() {
@@ -192,6 +283,4 @@ public class DasComponentFeature extends DasFeature {
     public boolean isTypeIsReference() {
         return true;
     }
-
-    
 }

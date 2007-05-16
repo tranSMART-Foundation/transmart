@@ -50,6 +50,8 @@ public class DasAnnotatedSegment extends DasSegment{
      */
     Collection<DasFeature> features;
 
+    DasComponentFeature selfComponent;
+
     /**
      * The label for this segment.  Used for the features command for attribute
      * /DASGFF/GFF/SEGMENT/@label
@@ -104,7 +106,16 @@ public class DasAnnotatedSegment extends DasSegment{
      * @return a collection of {@link DasFeature} objects, being the features annotated on this segment.
      */
     public Collection<DasFeature> getFeatures() {
-        return features;
+        if (selfComponent == null){
+            return features;
+        }
+        else {
+            Collection<DasFeature> allFeatures = new ArrayList(features);
+            allFeatures.add(selfComponent);
+            allFeatures.addAll(selfComponent.getDeepSubComponents());
+            allFeatures.addAll(selfComponent.getDeepSuperComponents());
+            return allFeatures;
+        }
     }
 
     /**
@@ -158,5 +169,22 @@ public class DasAnnotatedSegment extends DasSegment{
      */
     public String getType() {
         return type;
+    }
+
+    /**
+     * TODO Create some detailed documentation of how to build an assembly using this mechanism.
+     * This method creates and returns the component feature that represents this
+     * annotated segment.  To add to the assembly, use this method to retrieve the
+     * 'self' component and then add subparts or superparts to this.  (This can
+     * be done recursively, to create a map of components to any level.)
+     * @return a DasComponentFeature object that is the segment itself represented
+     * as a component.
+     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
+     */
+    public DasComponentFeature getSelfComponentFeature() throws DataSourceException{
+        if (selfComponent == null){
+            selfComponent = new DasComponentFeature(this);
+        }
+        return selfComponent;
     }
 }
