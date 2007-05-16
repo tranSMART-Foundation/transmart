@@ -1,13 +1,11 @@
 package uk.ac.ebi.mydas.datasource;
 
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
-import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
-import uk.ac.ebi.mydas.model.DasFeature;
+import uk.ac.ebi.mydas.exceptions.DataSourceException;
+import uk.ac.ebi.mydas.model.DasRestrictedAnnotatedSegment;
 import uk.ac.ebi.mydas.model.DasRestrictedSequence;
-import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 
-import java.util.List;
 import java.util.Collection;
 
 /**
@@ -22,10 +20,14 @@ import java.util.Collection;
  * the MydasServlet will handle restricting the sequenceString returned to
  * the start / stop coordinates in the request and you will only need to
  * implement the <code>getSequenceString (String segmentReference) : String</code>
- * method.
+ * method and the <code>getFeatures (String segmentReference) : Collection&gt;DasFeature&lt;</code> method.
  *
- * If you also implement this interface, this will allow you to take control
- * of filtering by start / stop coordinates in your ReferenceDataSource.
+ * Implementing this interface however will allow you to take control
+ * of filtering by start / stop coordinates in your ReferenceDataSource for both the sequence
+ * and the features.
+ *
+ * This is seful if your DAS source includes massive segments, otherwise don't bother - just implement a
+ * {@link ReferenceDataSource}.
  */
 public interface RangeHandlingReferenceDataSource extends ReferenceDataSource{
 
@@ -47,7 +49,17 @@ public interface RangeHandlingReferenceDataSource extends ReferenceDataSource{
      * Implement this method to allow you to take control
      * of filtering by start / stop coordinates in your AnnotationDataSource.
      *
-     * Useful if your DAS source includes massive segments.
+     * Note that this returns a Collection of DasRestrictedAnnotatedSegment objects.  When the DAS features command
+     * is called, including restrictions on the start and stop coordinates of the matching features, the
+     * DasRestrictedAnnotatedSegment will just return all the features that the data source had added to it, so it
+     * is the responsibility of the data source to filter these features by coordinate.
+     *
+     * The DAS 1.53 specification is ambiguous about how a match by coordinate is defined.  It is up to you whether matching
+     * features should fall strictly within the start and stop coordinates, or whether they may merely overlap with the
+     * specified region.
+     *
+     * Useful if your DAS source includes massive segments, otherwise don't bother - just implement a
+     * ReferenceDataSource.
      * @param segmentReference
      * @param start
      * @param stop
@@ -55,5 +67,5 @@ public interface RangeHandlingReferenceDataSource extends ReferenceDataSource{
      * @throws BadReferenceObjectException
      * @throws DataSourceException
      */
-    public Collection<DasAnnotatedSegment> getFeatures(String segmentReference, int start, int stop) throws CoordinateErrorException, BadReferenceObjectException, DataSourceException;
+    public DasRestrictedAnnotatedSegment getFeatures(String segmentReference, int start, int stop) throws CoordinateErrorException, BadReferenceObjectException, DataSourceException;
 }

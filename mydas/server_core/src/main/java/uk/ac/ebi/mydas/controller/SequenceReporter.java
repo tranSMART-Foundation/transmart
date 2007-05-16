@@ -10,7 +10,7 @@ import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
  */
-class SequenceReporter {
+class SequenceReporter{
 
     private boolean restricted;
 
@@ -21,14 +21,16 @@ class SequenceReporter {
     private DasSequence sequence;
 
 
-    SequenceReporter(DasSequence sequence, int requestedStart, int requestedStop) throws CoordinateErrorException {
+    SequenceReporter(DasSequence sequence, SegmentQuery segmentQuery) throws CoordinateErrorException {
+
+        this.restricted = true;
+        this.requestedStart = segmentQuery.getStartCoordinate();
+        this.requestedStop = segmentQuery.getStopCoordinate(); 
+        this.sequence = sequence;
+
         if (requestedStart < sequence.getStartCoordinate() || requestedStop > sequence.getStopCoordinate()){
             throw new CoordinateErrorException(sequence.getSegmentId(), requestedStart,  requestedStop);
         }
-        this.restricted = true;
-        this.requestedStart = requestedStart;
-        this.requestedStop = requestedStop;
-        this.sequence = sequence;
     }
 
     SequenceReporter(DasSequence sequence){

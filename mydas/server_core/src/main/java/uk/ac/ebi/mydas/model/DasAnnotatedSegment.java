@@ -3,7 +3,7 @@ package uk.ac.ebi.mydas.model;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
 import java.util.Collection;
-import java.util.Comparator;
+import java.util.ArrayList;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -53,11 +53,8 @@ public class DasAnnotatedSegment extends DasSegment{
      * Constructor for a DasAnnotatedSegment object that ensures that the object is valid.
      * See the documentation of the various getters to find out where in DAS XML these fields may be used.
      * @param segmentId <b>Required.</b> This is the identifier for the segment / sequence under query.
-     * @param startCoordinate <b>Required.</b> Start position of the feature
-     * <i>DAS servers are often required to serve non-positional features, such as descriptions (of the entire
-     * segment) or related citations.  A commonly accepted mechanism is to give non-positional features start
-     * and end coordinates of 0, however this is not enforced and is not part of the DAS 1.53 specification.</i>
-     * @param stopCoordinate <b>Required.</b> Stop position of the feature.
+     * @param startCoordinate <b>Required.</b> Start coordinate of the segment.
+     * @param stopCoordinate <b>Required.</b> Stop coordinate of the segment.
      * @param version <b>Required.</b> a String indicating the version of the segment that is annotated.  What this
      * version consists of is not defined - may be a date, a checksum, a version number etc.  If you are
      * developing an annotation server, you must implement the same mechanism as the 'map master' reference server
@@ -85,6 +82,31 @@ public class DasAnnotatedSegment extends DasSegment{
      */
     public Collection<DasFeature> getFeatures() {
         return features;
+    }
+
+    /**
+     * This method returns features within the specified coordinates as requested.  Configurable - the
+     *
+     * @param requestedStart being the start coordinate requested by the client.
+     * @param requestedStop being the stop coordinate requested by the client.
+     * @param strictlyEnclosed a boolean to indicate if matching features must be strictly enclosed within the
+     * requestedStart and requestedStop.  if this value is false, then an overlap is sufficient for a match.
+     * @return a Collection<DasFeature> of the DasFeature objects that match.
+     */
+    public Collection<DasFeature> getFeatures(int requestedStart, int requestedStop, boolean strictlyEnclosed){
+        Collection<DasFeature> restrictedFeatures = new ArrayList<DasFeature>(this.features.size());
+        if (features != null){
+            for (DasFeature feature : features){
+                if (strictlyEnclosed && requestedStart <= feature.getStartCoordinate() && requestedStop >= feature.getStopCoordinate()){
+                    restrictedFeatures.add (feature);
+                }
+                else if (! strictlyEnclosed && (requestedStop >= feature.getStartCoordinate() && requestedStop <= feature.getStopCoordinate())
+                        || (requestedStart >= feature.getStartCoordinate() && requestedStart <= feature.getStopCoordinate())){
+                    restrictedFeatures.add (feature);
+                }
+            }
+        }
+        return restrictedFeatures;
     }
 
     /**

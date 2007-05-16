@@ -6,9 +6,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 
 import javax.servlet.ServletContext;
-import java.util.List;
 import java.util.Map;
-import java.util.Collection;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -17,7 +15,7 @@ import java.util.Collection;
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
  *
- * This interface should be implemented to create a MydasServlet plugin.
+ * This interface should be implemented to create a {@link uk.ac.ebi.mydas.controller.MydasServlet} plugin.
  *
  * All related configuration can be entered in the ServerConfig.xml file
  * including the fully qualified name of the AnnotationDataSource class, so it can be registered with the
@@ -66,25 +64,29 @@ public interface AnnotationDataSource {
 
     /**
      * This method returns a List of DasAnnotatedSegment objects, describing the annotated segment and the features
-     * of the segmentReference passed in as argument.
-     * @param segmentReference being the reference of the segment requested in the DAS request (not including
+     * of the segmentId passed in as argument.
+     * @param segmentId being the reference of the segment requested in the DAS request (not including
      * start and stop coordinates)
      *
      * If your datasource implements only this interface,
      * the MydasServlet will handle restricting the features returned to
      * the start / stop coordinates in the request and you will only need to
      * implement this method to return Features.  If on the other hand, your data source
-     * includes massive segments, you may wish to implement the {@link RangeHandlingAnnotationDataSource}
+     * includes massive segments, you may wish to implement the {@link uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource}
      * interface.  It will then be the responsibility of your AnnotationDataSource plugin to
      * restrict the features returned for the requested range.
      *
-     * @return a List of DasAnnotatedSegment objects.  Each of these objects describes the segment that is annotated, limited
-     * to the information required for the /DASGFF/GFF/SEGMENT element.  Each also references a Collection of
-     * DasFeature objects.
-     * @throws BadReferenceObjectException
-     * @throws DataSourceException
+     * @return A DasAnnotatedSegment object.  This describes the segment that is annotated, limited
+     * to the information required for the /DASGFF/GFF/SEGMENT element.  References a Collection of
+     * DasFeature objects.   Note that this is a basic Collection - this gives you complete control over the details
+     * of the Collection type - so you can create your own comparators etc.
+     * @throws BadReferenceObjectException in the event that your server does not include information about this segment.
+     * @throws DataSourceException should be thrown if there is any
+     * fatal problem with loading this data source.  <bold>It is highly desirable for the implementation to test itself in this init method and throw
+     * a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
+     * and read a record.</bold>
      */
-    public Collection<DasAnnotatedSegment> getFeatures(String segmentReference) throws BadReferenceObjectException, DataSourceException;
+    public DasAnnotatedSegment getFeatures(String segmentId) throws BadReferenceObjectException, DataSourceException;
 
 
     
