@@ -186,7 +186,27 @@ public class TESTDataSource implements ReferenceDataSource {
                         null,
                         null
                 ));
-                return new DasAnnotatedSegment("two", 1, 48, "Up-to-date", "two_label", twoFeatures);
+                DasAnnotatedSegment segmentTwo = new DasAnnotatedSegment("two", 1, 48, "Up-to-date", "two_label", twoFeatures);
+                DasComponentFeature selfComponent = segmentTwo.getSelfComponentFeature();
+                selfComponent.addSubComponent(
+                        "Contig:A",
+                        100,
+                        110,
+                        20,
+                        30,
+                        null,
+                        "Contig",
+                        "a contig",
+                        "contigA_id",
+                        "Contig A",
+                        "component",
+                        null,
+                        0.0,
+                        DasFeature.ORIENTATION_SENSE_STRAND,
+                        DasFeature.PHASE_READING_FRAME_0,
+                        Collections.singleton("This is a sub-component with a different coordinate system."),
+                        null);
+                return segmentTwo;
             }
             else throw new BadReferenceObjectException(segmentReference, "Not found");
         }
