@@ -1,15 +1,38 @@
+/*
+ * Copyright 2007 Philip Jones, EMBL-European Bioinformatics Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *
+ * For further details of the mydas project, including source code,
+ * downloads and documentation, please see:
+ *
+ * http://code.google.com/p/mydas/
+ *
+ */
+
 package uk.ac.ebi.mydas.example;
 
 import uk.ac.ebi.mydas.controller.DataSourceConfiguration;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
-import uk.ac.ebi.mydas.model.DasSequence;
-import uk.ac.ebi.mydas.model.DasEntryPoint;
-import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
+import uk.ac.ebi.mydas.model.*;
 import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
 
 import javax.servlet.ServletContext;
 import java.util.*;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -68,6 +91,7 @@ public class TESTDataSource implements ReferenceDataSource {
      * to clean up resources such as database connections as required.
      */
     public void destroy() {
+        // In this case, nothing to do.
     }
 
     /**
@@ -91,7 +115,86 @@ public class TESTDataSource implements ReferenceDataSource {
      *
      */
     public DasAnnotatedSegment getFeatures(String segmentReference) throws BadReferenceObjectException, DataSourceException {
-        return null;
+        try{
+            if (segmentReference.equals ("one")){
+                Collection<DasFeature> oneFeatures = new ArrayList<DasFeature>(2);
+                DasTarget target = new DasTarget("oneTargetId", 20, 30, "oneTargetName");
+                DasGroup group = new DasGroup(
+                        "oneGroupId",
+                        "one Group Label",
+                        "onegrouptype",
+                        Collections.singleton("A note on the group for reference one."),
+                        Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
+                        Collections.singleton(target)
+                );
+                oneFeatures.add(new DasFeature(
+                        "oneFeatureIdOne",
+                        "one Feature Label One",
+                        "oneFeatureTypeIdOne",
+                        "oneFeatureCategoryOne",
+                        "one Feature Type Label One",
+                        false,
+                        "oneFeatureMethodIdOne",
+                        "one Feature Method Label One",
+                        5,
+                        10,
+                        123.45,
+                        DasFeature.ORIENTATION_NOT_APPLICABLE,
+                        DasFeature.PHASE_NOT_APPLICABLE,
+                        Collections.singleton("This is a note relating to feature one of segment one."),
+                        Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
+                        Collections.singleton(target),
+                        Collections.singleton(group)
+                ));
+                oneFeatures.add(new DasFeature(
+                        "oneFeatureIdTwo",
+                        "one Feature Label Two",
+                        "oneFeatureTypeIdTwo",
+                        "oneFeatureCategoryTwo",
+                        "one Feature Type Label Two",
+                        false,
+                        "oneFeatureMethodIdTwo",
+                        "one Feature Method Label Two",
+                        18,
+                        25,
+                        96.3,
+                        DasFeature.ORIENTATION_NOT_APPLICABLE,
+                        DasFeature.PHASE_NOT_APPLICABLE,
+                        Collections.singleton("This is a note relating to feature two of segment one."),
+                        Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
+                        null,
+                        null
+                ));
+                return new DasAnnotatedSegment("one", 1, 34, "Up-to-date", "one_label", oneFeatures);
+            }
+            else if (segmentReference.equals("two")){
+                Collection<DasFeature> twoFeatures = new ArrayList<DasFeature>(2);
+                twoFeatures.add(new DasFeature(
+                        "twoFeatureIdOne",
+                        "two Feature Label One",
+                        "twoFeatureTypeIdOne",
+                        "twoFeatureCategoryOne",
+                        "two Feature Type Label One",
+                        false,
+                        "twoFeatureMethodIdOne",
+                        "two Featur eMethod Label One",
+                        9,
+                        33,
+                        1000.01,
+                        DasFeature.ORIENTATION_SENSE_STRAND,
+                        DasFeature.PHASE_READING_FRAME_0,
+                        Collections.singleton("This is a note relating to feature one of segment two."),
+                        Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
+                        null,
+                        null
+                ));
+                return new DasAnnotatedSegment("two", 1, 48, "Up-to-date", "two_label", twoFeatures);
+            }
+            else throw new BadReferenceObjectException(segmentReference, "Not found");
+        }
+        catch (MalformedURLException e) {
+            throw new DataSourceException("Tried to create an invalid URL for a LINK element.", e);
+        }
     }
 
     /**
