@@ -31,6 +31,10 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
  * Time: 15:20:03
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
+ *
+ * Abstract parent class of all classes that describe a segment, such as the
+ * DasSequence class that includes details of the sequence of the segment and the
+ * DasFeature class that holds all of the features of a segment.
  */
 public abstract class DasSegment {
     
@@ -45,7 +49,7 @@ public abstract class DasSegment {
         if (segmentId == null || segmentId.length() == 0){
             throw new DataSourceException("An attempt has been made to instantiate a DasSegment object that has no segmentId");
         }
-        // And a version.
+        // Check that it has a version.
         if (version == null  || version.length() == 0){
             throw new DataSourceException("An attempt has been made to instantiate a DasSegment object that has no version");
         }

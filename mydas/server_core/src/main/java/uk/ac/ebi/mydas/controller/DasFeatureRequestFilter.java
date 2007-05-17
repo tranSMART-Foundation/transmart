@@ -28,6 +28,7 @@ import uk.ac.ebi.mydas.model.DasGroup;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -80,6 +81,22 @@ public class DasFeatureRequestFilter {
             if (groupIds == null) groupIds = new ArrayList<String>();
             groupIds.add (groupId);
         }
+    }
+
+    boolean containsFeatureIds(){
+        return featureIds != null && featureIds.size() > 0;
+    }
+
+    boolean containsGroupIds(){
+        return groupIds != null && groupIds.size() > 0;
+    }
+
+    Collection<String> getFeatureIds(){
+        return (featureIds == null) ? Collections.EMPTY_LIST : featureIds;
+    }
+
+    Collection<String> getGroupIds(){
+        return (groupIds == null) ? Collections.EMPTY_LIST : groupIds;
     }
 
     /**

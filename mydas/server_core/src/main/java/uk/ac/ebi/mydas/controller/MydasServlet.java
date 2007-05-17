@@ -38,8 +38,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -110,10 +109,10 @@ public class MydasServlet extends HttpServlet {
 
     private static DataSourceManager DATA_SOURCE_MANAGER = null;
 
-    private static final String RESOURCE_FOLDER = "";
+    private static final String RESOURCE_FOLDER = "/";
 //    private static final String RESOURCE_FOLDER = "/WEB-INF/classes/";
 
-    private static final String CONFIGURATION_FILE_NAME = RESOURCE_FOLDER + "/MydasServerConfig.xml";
+    private static final String CONFIGURATION_FILE_NAME = RESOURCE_FOLDER + "MydasServerConfig.xml";
 
     /*
      Status codes for the DAS server.
@@ -218,25 +217,25 @@ public class MydasServlet extends HttpServlet {
     }
 
     /**
-     * Delegates to the doHandle method
+     * Delegates to the parseAndHandleRequest method
      * @param request
      * @param response
      * @throws ServletException
      * @throws IOException
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doHandle(request, response);
+        parseAndHandleRequest(request, response);
     }
 
     /**
-     * Delegates to the doHandle method
+     * Delegates to the parseAndHandleRequest method
      * @param request
      * @param response
      * @throws ServletException
      * @throws IOException
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doHandle(request, response);
+        parseAndHandleRequest(request, response);
     }
 
     /**
@@ -248,8 +247,9 @@ public class MydasServlet extends HttpServlet {
      * @throws ServletException in the event of an internal error
      * @throws IOException in the event of a low level I/O error.
      */
-    private void doHandle(HttpServletRequest request, HttpServletResponse response)
+    private void parseAndHandleRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         // Parse the request URI (e.g. /das/dsnname/sequenceString).
         String queryString = request.getQueryString();
 
@@ -259,9 +259,19 @@ public class MydasServlet extends HttpServlet {
         }
 
         Matcher match = REQUEST_URI_PATTERN.matcher(request.getRequestURI());
-        if (match.find()){
-            try{
-                // Check first for the dsn command
+
+        try{
+            // Belt and braces to ensure that no null pointers are thrown later.
+            if (DATA_SOURCE_MANAGER == null ||
+                DATA_SOURCE_MANAGER.getServerConfiguration() == null ||
+                DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration() == null ||
+                DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap() == null){
+
+                throw new ConfigurationException("The datasources were not initialized successfully.");
+            }
+
+            if (match.find()){
+                // Check first for the dsn command (has a different format to all the others, so start here).
                 if (COMMAND_DSN.equals(match.group(1))){
                     // Handle dsn command, after checking there is no guff in the URI after it.
                     if (match.group(2) == null || match.group(2).length() == 0){
@@ -270,7 +280,7 @@ public class MydasServlet extends HttpServlet {
                     }
                     else {
                         // Starts off looking like the dsn command, but has some other stuff after it...
-                        writeHeader (request, response, STATUS_400_BAD_COMMAND, false);
+                        throw new BadCommandException("A bad dsn command has been sent to the server, including unrecognised additional query parameters.");
                     }
                 }
 
@@ -303,43 +313,49 @@ public class MydasServlet extends HttpServlet {
                                 sequenceCommand (request, response, dataSourceConfig, queryString);
                             }
                             else {
-                                // The command is not recognised.
-                                writeHeader (request, response, STATUS_400_BAD_COMMAND, false);
+                                throw new BadCommandException("The command is not recognised.");
                             }
                         }
                         else{
-                            // The dataSource requested did not initialise successfully.
-                            logger.error(command + " called on a DataSource that did not initialise successfully.");
-                            writeHeader(request, response, STATUS_401_BAD_DATA_SOURCE, false);
+                            throw new BadDataSourceException("The datasource was not correctly initialised.");
                         }
                     }
                     else {
-                        // The datasource requested does not exist.
-                        logger.error(command + " called on a non-existent data source.");
-                        writeHeader(request, response, STATUS_401_BAD_DATA_SOURCE, false);
+                        throw new BadDataSourceException("The requested datasource does not exist.");
                     }
                 }
-            } catch (XmlPullParserException xppe) {
-                // A problem has occurred when attempting to marshall out XML.
-                logger.error("XmlPullParserException thrown when attempting to ouput XML.", xppe);
-                writeHeader (request, response, STATUS_500_SERVER_ERROR, false);
-            } catch (DataSourceException dse){
-                // A data source has thrown a DataSourceException.
-                logger.error("DataSourceException thrown by a data source.", dse);
-                writeHeader(request, response, STATUS_500_SERVER_ERROR, false);
-            } catch (BadCommandArgumentsException bcae) {
-                logger.error("BadCommandArgumentsException thrown", bcae);
-                writeHeader(request, response, STATUS_402_BAD_COMMAND_ARGUMENTS, false);
-            } catch (BadReferenceObjectException broe) {
-                logger.error("BadReferenceObjectException thrown", broe);
-                writeHeader(request, response, STATUS_403_BAD_REFERENCE_OBJECT, false);
-            } catch (CoordinateErrorException e) {
-                e.printStackTrace();
+            }
+            else {
+                throw new BadCommandException("The command is not recognised.");
             }
         }
-        else {
-            // The command is not recognised.
-            writeHeader (request, response, STATUS_400_BAD_COMMAND, false);
+        catch (XmlPullParserException xppe) {
+            logger.error("XmlPullParserException thrown when attempting to ouput XML.", xppe);
+            writeHeader (request, response, STATUS_500_SERVER_ERROR, false);
+        } catch (DataSourceException dse){
+            logger.error("DataSourceException thrown by a data source.", dse);
+            writeHeader(request, response, STATUS_500_SERVER_ERROR, false);
+        } catch (BadCommandArgumentsException bcae) {
+            logger.error("BadCommandArgumentsException thrown", bcae);
+            writeHeader(request, response, STATUS_402_BAD_COMMAND_ARGUMENTS, false);
+        } catch (BadReferenceObjectException broe) {
+            logger.error("BadReferenceObjectException thrown", broe);
+            writeHeader(request, response, STATUS_403_BAD_REFERENCE_OBJECT, false);
+        } catch (CoordinateErrorException cee) {
+            logger.error("CoordinateErrorException thrown", cee);
+            writeHeader(request, response, STATUS_405_COORDINATE_ERROR, false);
+        } catch (UnimplementedFeatureException efe) {
+            logger.error("UnimplementedFeatureException thrown", efe);
+            writeHeader(request, response, STATUS_501_UNIMPLEMENTED_FEATURE, false);
+        } catch (BadCommandException bce) {
+            logger.error("BadCommandException thrown", bce);
+            writeHeader(request, response, STATUS_400_BAD_COMMAND, false);
+        } catch (BadDataSourceException bdse) {
+            logger.error("BadDataSourceException thrown", bdse);
+            writeHeader(request, response, STATUS_401_BAD_DATA_SOURCE, false);
+        } catch (ConfigurationException ce) {
+            logger.error("ConfigurationException thrown: This mydas installation was not correctly initialised.", ce);
+            writeHeader(request, response, STATUS_500_SERVER_ERROR, false);
         }
     }
 
@@ -375,7 +391,7 @@ public class MydasServlet extends HttpServlet {
                 // Build the XML.
                 XmlSerializer serializer;
                 serializer = PULL_PARSER_FACTORY.newSerializer();
-                PrintWriter out = null;
+                BufferedWriter out = null;
                 try{
                     out = getResponseWriter(request, response);
                     serializer.setOutput(out);
@@ -434,62 +450,51 @@ public class MydasServlet extends HttpServlet {
     }
 
     private void dnaCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-            throws XmlPullParserException, IOException, DataSourceException{
+            throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException,
+            BadReferenceObjectException, BadCommandArgumentsException, CoordinateErrorException {
         // Is this a reference source?
         if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
             // Fine - process command.
+            Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
+            // Got some sequences, so all is OK.
+            writeHeader (request, response, STATUS_200_OK, true);
+            // Build the XML.
+            XmlSerializer serializer;
+            serializer = PULL_PARSER_FACTORY.newSerializer();
+            BufferedWriter out = null;
             try{
-                Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
-                // Got some sequences, so all is OK.
-                writeHeader (request, response, STATUS_200_OK, true);
-                // Build the XML.
-                XmlSerializer serializer;
-                serializer = PULL_PARSER_FACTORY.newSerializer();
-                PrintWriter out = null;
-                try{
-                    out = getResponseWriter(request, response);
-                    serializer.setOutput(out);
-                    serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
-                    serializer.startDocument(null, false);
-                    serializer.text("\n");
-                    serializer.docdecl(" DASDNA SYSTEM \"http://www.biodas.org/dtd/dasdna.dtd\"");
-                    serializer.text("\n");
-                    // Now the body of the DASDNA xml.
-                    serializer.startTag (DAS_XML_NAMESPACE, "DASDNA");
-                    for (SequenceReporter sequenceReporter : sequences){
-                        serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
-                        serializer.attribute(DAS_XML_NAMESPACE, "id", sequenceReporter.getSegmentName());
-                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(sequenceReporter.getStart()));
-                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(sequenceReporter.getStop()));
-                        serializer.attribute(DAS_XML_NAMESPACE, "version", sequenceReporter.getSequenceVersion());
-                        serializer.startTag(DAS_XML_NAMESPACE, "DNA");
-                        serializer.attribute(DAS_XML_NAMESPACE, "length", Integer.toString(sequenceReporter.getSequenceString().length()));
-                        serializer.text(sequenceReporter.getSequenceString());
-                        serializer.endTag(DAS_XML_NAMESPACE, "DNA");
-                        serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
-                    }
-                    serializer.endTag (DAS_XML_NAMESPACE, "DASDNA");
+                out = getResponseWriter(request, response);
+                serializer.setOutput(out);
+                serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+                serializer.startDocument(null, false);
+                serializer.text("\n");
+                serializer.docdecl(" DASDNA SYSTEM \"http://www.biodas.org/dtd/dasdna.dtd\"");
+                serializer.text("\n");
+                // Now the body of the DASDNA xml.
+                serializer.startTag (DAS_XML_NAMESPACE, "DASDNA");
+                for (SequenceReporter sequenceReporter : sequences){
+                    serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
+                    serializer.attribute(DAS_XML_NAMESPACE, "id", sequenceReporter.getSegmentName());
+                    serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(sequenceReporter.getStart()));
+                    serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(sequenceReporter.getStop()));
+                    serializer.attribute(DAS_XML_NAMESPACE, "version", sequenceReporter.getSequenceVersion());
+                    serializer.startTag(DAS_XML_NAMESPACE, "DNA");
+                    serializer.attribute(DAS_XML_NAMESPACE, "length", Integer.toString(sequenceReporter.getSequenceString().length()));
+                    serializer.text(sequenceReporter.getSequenceString());
+                    serializer.endTag(DAS_XML_NAMESPACE, "DNA");
+                    serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
                 }
-                finally{
-                    if (out != null){
-                        out.close();
-                    }
+                serializer.endTag (DAS_XML_NAMESPACE, "DASDNA");
+            }
+            finally{
+                if (out != null){
+                    out.close();
                 }
-            } catch (CoordinateErrorException e) {
-                logger.error("The requested coordinates were out of range", e);
-                writeHeader(request, response, STATUS_405_COORDINATE_ERROR, false);
-            } catch (BadReferenceObjectException e) {
-                logger.error("At least one of the requested segments was not found by the dsn.", e);
-                writeHeader(request, response, STATUS_403_BAD_REFERENCE_OBJECT, false);
-            } catch (BadCommandArgumentsException e) {
-                logger.error("The format of the command arguments was not recognised");
-                writeHeader (request, response, STATUS_402_BAD_COMMAND_ARGUMENTS, false);
             }
         }
         else {
             // Not a reference source.
-            logger.error ("Attempt to call the dna command on the " + dsnConfig.getId() + " dsn.  This is not a reference source.");
-            writeHeader (request, response, STATUS_501_UNIMPLEMENTED_FEATURE, false);
+            throw new UnimplementedFeatureException("An attempt to request sequence information from an anntation server has been detected.");
         }
     }
 
@@ -498,17 +503,68 @@ public class MydasServlet extends HttpServlet {
     }
 
     private void stylesheetCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-            throws XmlPullParserException, IOException, DataSourceException{
+            throws BadCommandArgumentsException, UnimplementedFeatureException, IOException {
+        // Check the queryString is empty (as it should be).
+        if (queryString != null && queryString.trim().length() > 0){
+            throw new BadCommandArgumentsException("Arguments have been passed to the stylesheet command, which does not expect any.");
+        }
+        // Get the name of the stylesheet.
+        String stylesheetFileName;
+        if (dsnConfig.getStyleSheet() != null && dsnConfig.getStyleSheet().trim().length() > 0){
+            stylesheetFileName = dsnConfig.getStyleSheet().trim();
+        }
+        // These next lines look like potential null-pointer hell - but note that this has been checked robustly in the
+        // calling method, so all OK.
+        else if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDefaultStyleSheet() != null
+            && DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDefaultStyleSheet().trim().length() > 0){
+            stylesheetFileName = DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDefaultStyleSheet().trim();
+        }
+        else {
+            throw new UnimplementedFeatureException("This data source has not defined a stylesheet.");
+        }
+
+        // Need to create a FileReader to read in the stylesheet, wrapped by a PrintStream to stream it out to the browser.
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+        try{
+            reader = new BufferedReader(
+                  new InputStreamReader (
+                            getServletContext().getResourceAsStream(RESOURCE_FOLDER + stylesheetFileName)
+                  )
+            );
+
+            if (reader.ready()){
+                //OK, managed to open an input reader from the stylesheet, so output the success header.
+                writeHeader (request, response, STATUS_200_OK, true);
+                writer = getResponseWriter(request, response);
+                while (reader.ready()){
+                    writer.write(reader.readLine());
+                }
+            }
+        }
+        finally{
+            if (reader != null){
+                reader.close();
+            }
+            if (writer != null){
+                writer.close();
+            }
+        }
     }
 
     private void featuresCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-            throws XmlPullParserException, IOException, DataSourceException, BadCommandArgumentsException, BadReferenceObjectException, CoordinateErrorException {
+            throws XmlPullParserException, IOException, DataSourceException, BadCommandArgumentsException,
+            BadReferenceObjectException, CoordinateErrorException, UnimplementedFeatureException {
         // Parse the queryString to retrieve the individual parts of the query.
         if (queryString == null || queryString.length() == 0){
             throw new BadCommandArgumentsException("Expecting at least one reference in the query string, but found nothing.");
         }
 
         List<SegmentQuery> requestedSegments = new ArrayList<SegmentQuery>();
+        /************************************************************************\
+         * Parse the query string                                               *
+         ************************************************************************/
+
         // Split on the ; (delineates the separate parts of the query)
         String[] queryParts = queryString.split(";");
         DasFeatureRequestFilter filter = new DasFeatureRequestFilter ();
@@ -564,15 +620,47 @@ public class MydasServlet extends HttpServlet {
             }
         }
 
-        Collection<FeaturesReporter> featuresReporterCollection = getFeatureCollection(dsnConfig, requestedSegments);
+        /************************************************************************\
+         * Query the DataSource                                                 *
+         ************************************************************************/
+
+        // if segments have been included in the request, use the getFeatureCollection method to retrieve them
+        // from the data source.  (getFeatureCollection method shared with the 'types' command.)
+        Collection<FeaturesReporter> featuresReporterCollection;
+        if (requestedSegments.size() > 0){
+            featuresReporterCollection = getFeatureCollection(dsnConfig, requestedSegments);
+        }
+        else {
+            // No segments have been requested, so instead check for either feature_id or group_id filters.
+            // (If neither of these are present, then throw a BadCommandArgumentsException)
+            if (filter.containsFeatureIds() || filter.containsGroupIds()){
+                Collection<DasAnnotatedSegment> annotatedSegments =
+                        dsnConfig.getDataSource().getFeatures(filter.getFeatureIds(), filter.getGroupIds());
+                if (annotatedSegments != null){
+                    featuresReporterCollection = new ArrayList<FeaturesReporter>(annotatedSegments.size());
+                    for (DasAnnotatedSegment segment : annotatedSegments){
+                        featuresReporterCollection.add (new FeaturesReporter(segment));
+                    }
+                }
+                else {
+                    // Nothing returned from the datasource.
+                    featuresReporterCollection = Collections.EMPTY_LIST;
+                }
+            }
+            else {
+                throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
+            }
+        }
         // OK - got a Collection of FeaturesReporter objects, so get on with marshalling them out.
         writeHeader (request, response, STATUS_200_OK, true);
 
-        // Build the XML.
+        /************************************************************************\
+         * Build the XML                                                        *
+         ************************************************************************/
 
         XmlSerializer serializer;
         serializer = PULL_PARSER_FACTORY.newSerializer();
-        PrintWriter out = null;
+        BufferedWriter out = null;
         try{
             out = getResponseWriter(request, response);
             serializer.setOutput(out);
@@ -762,7 +850,7 @@ public class MydasServlet extends HttpServlet {
     }
 
     private void entryPointsCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-            throws XmlPullParserException, IOException, DataSourceException{
+            throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException {
 
         if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
             // Fine - process command.
@@ -777,7 +865,7 @@ public class MydasServlet extends HttpServlet {
             //OK, got our entry points, so write out the XML.
             XmlSerializer serializer;
             serializer = PULL_PARSER_FACTORY.newSerializer();
-            PrintWriter out = null;
+            BufferedWriter out = null;
             try{
                 out = getResponseWriter(request, response);
                 serializer.setOutput(out);
@@ -826,75 +914,68 @@ public class MydasServlet extends HttpServlet {
         }
         else {
             // Not a reference source.
-            logger.error ("Attempt to call the entry_points command on the " + dsnConfig.getId() + " dsn.  This is not a reference source.");
-            writeHeader (request, response, STATUS_501_UNIMPLEMENTED_FEATURE, false);
+            throw new UnimplementedFeatureException("An attempt to request entry_point information from an annotation server has been detected.");
         }
     }
 
 
 
     private void sequenceCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-            throws XmlPullParserException, IOException, DataSourceException {
+            throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException,
+            BadReferenceObjectException, BadCommandArgumentsException, CoordinateErrorException {
         // Is this a reference source?
         if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
             // Fine - process command.
+            Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
+            // Got some sequences, so all is OK.
+            writeHeader (request, response, STATUS_200_OK, true);
+            // Build the XML.
+            XmlSerializer serializer;
+            serializer = PULL_PARSER_FACTORY.newSerializer();
+            BufferedWriter out = null;
             try{
-                Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
-                // Got some sequences, so all is OK.
-                writeHeader (request, response, STATUS_200_OK, true);
-                // Build the XML.
-                XmlSerializer serializer;
-                serializer = PULL_PARSER_FACTORY.newSerializer();
-                PrintWriter out = null;
-                try{
-                    out = getResponseWriter(request, response);
-                    serializer.setOutput(out);
-                    serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
-                    serializer.startDocument(null, false);
-                    serializer.text("\n");
-                    serializer.docdecl(" DASSEQUENCE SYSTEM \"http://www.biodas.org/dtd/dassequence.dtd\"");
-                    serializer.text("\n");
-                    // Now the body of the DASDNA xml.
-                    serializer.startTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
-                    for (SequenceReporter sequenceReporter : sequences){
-                        serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
-                        serializer.attribute(DAS_XML_NAMESPACE, "id", sequenceReporter.getSegmentName());
-                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(sequenceReporter.getStart()));
-                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(sequenceReporter.getStop()));
-                        serializer.attribute(DAS_XML_NAMESPACE, "moltype", sequenceReporter.getSequenceMoleculeType());
-                        serializer.attribute(DAS_XML_NAMESPACE, "version", sequenceReporter.getSequenceVersion());
-                        serializer.text(sequenceReporter.getSequenceString());
-                        serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
-                    }
-                    serializer.endTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
+                out = getResponseWriter(request, response);
+                serializer.setOutput(out);
+                serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+                serializer.startDocument(null, false);
+                serializer.text("\n");
+                serializer.docdecl(" DASSEQUENCE SYSTEM \"http://www.biodas.org/dtd/dassequence.dtd\"");
+                serializer.text("\n");
+                // Now the body of the DASDNA xml.
+                serializer.startTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
+                for (SequenceReporter sequenceReporter : sequences){
+                    serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
+                    serializer.attribute(DAS_XML_NAMESPACE, "id", sequenceReporter.getSegmentName());
+                    serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(sequenceReporter.getStart()));
+                    serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(sequenceReporter.getStop()));
+                    serializer.attribute(DAS_XML_NAMESPACE, "moltype", sequenceReporter.getSequenceMoleculeType());
+                    serializer.attribute(DAS_XML_NAMESPACE, "version", sequenceReporter.getSequenceVersion());
+                    serializer.text(sequenceReporter.getSequenceString());
+                    serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
                 }
-                finally{
-                    if (out != null){
-                        out.close();
-                    }
+                serializer.endTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
+            }
+            finally{
+                if (out != null){
+                    out.close();
                 }
-            } catch (CoordinateErrorException e) {
-                logger.error("The requested coordinates were out of range", e);
-                writeHeader(request, response, STATUS_405_COORDINATE_ERROR, false);
-            } catch (BadReferenceObjectException e) {
-                logger.error("At least one of the requested segments was not found by the dsn.", e);
-                writeHeader(request, response, STATUS_403_BAD_REFERENCE_OBJECT, false);
-            } catch (BadCommandArgumentsException e) {
-                logger.error("The format of the command arguments was not recognised");
-                writeHeader (request, response, STATUS_402_BAD_COMMAND_ARGUMENTS, false);
             }
         }
         else {
             // Not a reference source.
-            logger.error ("Attempt to call the dna command on the " + dsnConfig.getId() + " dsn.  This is not a reference source.");
-            writeHeader (request, response, STATUS_501_UNIMPLEMENTED_FEATURE, false);
+            throw new UnimplementedFeatureException("An attempt to request sequence information from an anntation server has been detected.");
         }
     }
 
 
     /**
      * Helper method used by both the featuresCommand and typesCommand.
-
+     * @param dsnConfig
+     * @param requestedSegments
+     * @return
+     * @throws DataSourceException
+     * @throws BadReferenceObjectException
+     * @throws CoordinateErrorException
      */
     private Collection<FeaturesReporter> getFeatureCollection(DataSourceConfiguration dsnConfig,
                                                               List <SegmentQuery> requestedSegments)
@@ -935,6 +1016,11 @@ public class MydasServlet extends HttpServlet {
      * Helper method used by both the dnaCommand and the sequenceCommand
      * @param dsnConfig
      * @param queryString
+     * @return
+     * @throws BadReferenceObjectException
+     * @throws CoordinateErrorException
+     * @throws DataSourceException
+     * @throws BadCommandArgumentsException
      */
     private Collection<SequenceReporter> getSequences(DataSourceConfiguration dsnConfig, String queryString)
             throws BadReferenceObjectException, CoordinateErrorException, DataSourceException, BadCommandArgumentsException {
@@ -1018,15 +1104,15 @@ public class MydasServlet extends HttpServlet {
      * @return a PrintWriter that will either produce plain or gzipped output.
      * @throws IOException due to a problem with initiating the output stream or writer.
      */
-    private PrintWriter getResponseWriter (HttpServletRequest request, HttpServletResponse response)
+    private BufferedWriter getResponseWriter (HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         if (compressResponse(request)){
             // Wrap the response writer in a Zipstream.
             GZIPOutputStream zipStream = new GZIPOutputStream(response.getOutputStream());
-            return new PrintWriter(zipStream);
+            return new BufferedWriter (new PrintWriter(zipStream));
         }
         else {
-            return response.getWriter();
+            return new BufferedWriter (response.getWriter());
         }
     }
 

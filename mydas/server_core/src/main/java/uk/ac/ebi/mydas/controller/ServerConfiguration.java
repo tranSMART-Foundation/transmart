@@ -26,6 +26,7 @@ package uk.ac.ebi.mydas.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -54,7 +55,7 @@ public class ServerConfiguration {
     }
 
     public Map<String, DataSourceConfiguration> getDataSourceConfigMap() {
-        return dataSourceConfigMap;
+        return (dataSourceConfigMap == null) ? Collections.EMPTY_MAP : dataSourceConfigMap;
     }
 
     /**

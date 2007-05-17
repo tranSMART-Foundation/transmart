@@ -136,7 +136,7 @@ public interface AnnotationDataSource {
      * <a href="http://biodas.org/documents/spec.html">http://biodas.org/documents/spec.html</a>.)
      *
      * Note that if segments are included in the request, this method is not used, so feature_id and group_id
-     * filters accompanying a list of segments will work, even if your implementation of this method throws an
+     * filters accompanying a list of segments will work correctly, even if your implementation of this method throws an
      * {@link UnimplementedFeatureException}.
      *
      * @param featureIdCollection a Collection&lt;String&gt; of feature_id values included in the features command / request.
