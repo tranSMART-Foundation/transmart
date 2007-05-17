@@ -23,7 +23,7 @@
   -->
 
 <mydasserver xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="mydasserverconfig.xsdrces/mydasserverconfig.xsd">
+ xsi:noNamespaceSchemaLocation="http://mydas.googlecode.com/svn/trunk/mydas/server_core/src/main/resources/mydasserverconfig.xsd">
     <!-- The global element holds details of configuration common to the entire server. -->
     <global>
         <!-- The URL of the DAS server up to and including /das/ (e.g. http://www.ebi.ac.uk/das-srv/uniprot/das/)
