@@ -117,6 +117,92 @@
                                                 </xs:documentation>
                                             </xs:annotation>
                                         </xs:element>
+                                        <xs:element name="features-strictly-enclosed" minOccurs="1" maxOccurs="1" nillable="false">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    If 'true' then when segment coordinates are included in the 
+                                                    request, only features that are entirely enclosed within the coordinates are returned.
+                                                    If 'false' then all features that overlap with the coordinates are returned.  Handles an
+                                                    ambiguity in the DAS 1.53 specification - see section "Retrieve the Annotations Across a Segment".
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                    <xs:extension base="xs:boolean">
+                                                    </xs:extension>
+                                                </xs:simpleContent>                                    
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="use-feature-id-for-feature-label" minOccurs="1" maxOccurs="1" nillable="false">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    If 'true' then if no feature label is provided by the data source, the feature id will
+                                                    automatically be reported as the feature label.  (Of course, if a feature label is 
+                                                    provided, this will override the feature id.)
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                    <xs:extension base="xs:boolean">
+                                                    </xs:extension>
+                                                </xs:simpleContent>                                    
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="types" minOccurs="1" maxOccurs="1" nillable="false">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    Includes a list of types that are reported by the types command.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="type" minOccurs="0" maxOccurs="unbounded">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                Any number of types that are reported by the 'types' command.
+                                                                Note that feature types not included in this list are returned by the types command
+                                                                if they are annotated on the segment requested.  Note that 'method' and 'category' 
+                                                                information given here will override these values reported for individual
+                                                                features, should they differ.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                        <xs:complexType>
+                                                            <xs:attribute name="id" type="xs:string" use="required">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The mandatory id for the type.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:attribute>    
+                                                            <xs:attribute name="method" type="xs:string" use="optional">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The optional method for the type.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:attribute>  
+                                                            <xs:attribute name="category" type="xs:string" use="optional">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The optional category for the type.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:attribute> 
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>    
+                                                <xs:attribute name="include-types-with-zero-count" type="xs:boolean" use="required">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            If 'true' then all of the types specified in this element will be listed by the types command
+                                                            even if they do not appear for the requested segment.
+                                                            If 'false', if the types command includes 'segment' arguments, only the feature types
+                                                            actually annotated on the requested segments will be listed.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>
+                                            </xs:complexType>
+                                        </xs:element>
                                         <xs:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded">
                                             <xs:annotation>
                                                 <xs:documentation>
