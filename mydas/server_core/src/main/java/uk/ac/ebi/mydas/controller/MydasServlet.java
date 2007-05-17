@@ -503,7 +503,7 @@ public class MydasServlet extends HttpServlet {
     }
 
     private void stylesheetCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-            throws BadCommandArgumentsException, UnimplementedFeatureException, IOException {
+            throws BadCommandArgumentsException, UnimplementedFeatureException, IOException, DataSourceException {
         // Check the queryString is empty (as it should be).
         if (queryString != null && queryString.trim().length() > 0){
             throw new BadCommandArgumentsException("Arguments have been passed to the stylesheet command, which does not expect any.");
@@ -540,6 +540,9 @@ public class MydasServlet extends HttpServlet {
                 while (reader.ready()){
                     writer.write(reader.readLine());
                 }
+            }
+            else {
+                throw new DataSourceException("A problem has occurred reading in the stylesheet from the open stream");
             }
         }
         finally{
