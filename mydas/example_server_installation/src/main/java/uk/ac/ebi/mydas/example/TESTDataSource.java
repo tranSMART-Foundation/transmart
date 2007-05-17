@@ -190,8 +190,8 @@ public class TESTDataSource implements ReferenceDataSource {
                 DasComponentFeature selfComponent = segmentTwo.getSelfComponentFeature();
                 selfComponent.addSubComponent(
                         "Contig:A",
-                        100,
-                        110,
+                        1,
+                        200,
                         20,
                         30,
                         null,
@@ -206,6 +206,75 @@ public class TESTDataSource implements ReferenceDataSource {
                         DasFeature.PHASE_READING_FRAME_0,
                         Collections.singleton("This is a sub-component with a different coordinate system."),
                         null);
+                selfComponent.addSubComponent(
+                        "Contig:B",
+                        20,620,
+                        400,1000,
+                        null,
+                        "Contig",
+                        null,
+                        "B",
+                        null,
+                        "component",
+                        null,
+                        0.00,
+                        DasFeature.ORIENTATION_SENSE_STRAND,
+                        DasFeature.PHASE_READING_FRAME_0,
+                        null,
+                        null
+                );
+                DasComponentFeature c = selfComponent.addSubComponent(
+                        "Contig:C",
+                        80,280,
+                        200,400,
+                        null,
+                        "Contig",
+                        null,
+                        "C",
+                        null,
+                        "component",
+                        null,
+                        0.00,
+                        DasFeature.ORIENTATION_SENSE_STRAND,
+                        DasFeature.PHASE_READING_FRAME_0,
+                        null,
+                        null
+                );
+                c.addSubComponent(
+                        "Contig:C.1",
+                        80,280,
+                        200,400,
+                        null,
+                        "Contig",
+                        null,
+                        "C.1",
+                        null,
+                        "component",
+                        null,
+                        0.00,
+                        DasFeature.ORIENTATION_SENSE_STRAND,
+                        DasFeature.PHASE_READING_FRAME_0,
+                        null,
+                        null
+                );
+
+                // And a super component
+                selfComponent.addSuperComponent("ParentChromosome",
+                        1,1000,
+                        1,34,
+                        null,
+                        "Chromosome",
+                        null,
+                        "Parent",
+                        null,
+                        "supercomponent",
+                        null,
+                        0.00,
+                        DasFeature.ORIENTATION_SENSE_STRAND,
+                        DasFeature.PHASE_READING_FRAME_0,
+                        null,
+                        null
+                );
                 return segmentTwo;
             }
             else throw new BadReferenceObjectException(segmentReference, "Not found");
