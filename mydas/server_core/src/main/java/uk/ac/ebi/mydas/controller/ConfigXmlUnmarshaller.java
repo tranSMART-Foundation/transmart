@@ -36,6 +36,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -77,6 +78,8 @@ public class ConfigXmlUnmarshaller {
     private static final String ELEMENT_TYPES = "types";
 
     private static final String ELEMENT_TYPE = "type";
+
+    private static final String ELEMENT_DNA_COMMAND_ENABLED = "dna-command-enabled";
 
     private static final String ATTRIBUTE_KEY = "key";
 
@@ -342,9 +345,11 @@ public class ConfigXmlUnmarshaller {
         String styleSheet = null;
         Map<String, String> dataSourceProperties = new HashMap<String, String>();
         String className = null;
-        Boolean featuresStrictlyEnclosed = false;
-        Boolean useFeatureIdForFeatureLabel = false;
-        Collection<Type> types = null;
+        boolean dnaCommandEnabled = false;
+        boolean featuresStrictlyEnclosed = false;
+        boolean useFeatureIdForFeatureLabel = false;
+        boolean includeTypesWithZeroCount = false;
+        Collection<Type> types = new ArrayList<Type>();
 
 
         while (! (xpp.next() == XmlPullParser.END_TAG && ELEMENT_DATASOURCE.equals(xpp.getName()))) {
@@ -358,6 +363,24 @@ public class ConfigXmlUnmarshaller {
                 }
                 else if (ELEMENT_PROPERTY.equals(tagName)){
                     processProperty(xpp, dataSourceProperties);
+                }
+                else if (ELEMENT_DNA_COMMAND_ENABLED.equals(tagName)){
+                    dnaCommandEnabled = "true".equalsIgnoreCase(processSimpleElementTextOnly(xpp, ELEMENT_DNA_COMMAND_ENABLED, true));
+                }
+                else if (ELEMENT_FEATURES_STRICTLY_ENCLOSED.equals(tagName)){
+                    featuresStrictlyEnclosed = "true".equalsIgnoreCase(processSimpleElementTextOnly(xpp, ELEMENT_FEATURES_STRICTLY_ENCLOSED, true));
+                }
+                else if (ELEMENT_USE_FEATURE_ID_FOR_FEATURE_LABEL.equals(tagName)){
+                    useFeatureIdForFeatureLabel = "true".equalsIgnoreCase(processSimpleElementTextOnly(xpp, ELEMENT_USE_FEATURE_ID_FOR_FEATURE_LABEL, true));
+                }
+                else if (ELEMENT_TYPES.equals(tagName)){
+                    includeTypesWithZeroCount = "true".equalsIgnoreCase(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_INCLUDE_TYPES_WITH_ZERO_COUNT));
+                }
+                else if (ELEMENT_TYPE.equals(tagName)){
+                    Type type = processTypesElement(xpp);
+                    if (type != null){
+                        types.add (type);
+                    }
                 }
             }
         }
@@ -381,9 +404,27 @@ public class ConfigXmlUnmarshaller {
 
 
         return new DataSourceConfiguration(id, name, version, mapmaster, description, descriptionHref, styleSheet, dataSourceProperties, className,
+                dnaCommandEnabled,
                 featuresStrictlyEnclosed,
                 useFeatureIdForFeatureLabel,
+                includeTypesWithZeroCount,
                 types);
+    }
+
+    private Type processTypesElement(XmlPullParser xpp) throws IOException, XmlPullParserException, ConfigurationException {
+        String id = null;
+        String category = null;
+        String method = null;
+
+        id = xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_ID);
+        category = xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_CATEGORY);
+        method = xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_METHOD);
+
+        if (id == null || id.length() == 0){
+            throw new ConfigurationException("A type tag has been included in the server configuration XML with no value for the id attribute.");
+        }
+
+        return new Type(id, category, method);
     }
 
 

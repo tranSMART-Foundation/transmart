@@ -145,6 +145,17 @@ public class DataSourceConfiguration {
     private boolean datasourceOK;
 
     /**
+     * A boolean flag to indicate if the dna command is enabled.
+     */
+    private boolean dnaCommandEnabled;
+
+    /**
+     * Boolean flag indicating if types with a count of zero should be included in the
+     * output of the types command.
+     */
+    private boolean includeTypesWithZeroCount;
+
+    /**
      * Package access only - instances of this class can be created by the MydasServlet
      * when it reads the configuration file.
      * @param id the mandatory value for /DASDSN/DSN/SOURCE/@id
@@ -172,8 +183,10 @@ public class DataSourceConfiguration {
                                    String styleSheet,
                                    Map<String, String> dataSourceProperties,
                                    String className,
+                                   boolean dnaCommandEnabled,
                                    boolean featuresStrictlyEnclosed,
                                    boolean useFeatureIdForFeatureLabel,
+                                   boolean includeTypesWithZeroCount,
                                    Collection<Type> types) {
         this.id = id;
         this.name = name;
@@ -184,8 +197,10 @@ public class DataSourceConfiguration {
         this.styleSheet = styleSheet;
         this.dataSourceProperties = dataSourceProperties;
         this.className = className;
+        this.dnaCommandEnabled = dnaCommandEnabled;
         this.featuresStrictlyEnclosed = featuresStrictlyEnclosed;
         this.useFeatureIdForFeatureLabel = useFeatureIdForFeatureLabel;
+        this.includeTypesWithZeroCount = includeTypesWithZeroCount;
         this.types = types;
     }
 
@@ -253,6 +268,15 @@ public class DataSourceConfiguration {
         return dataSourceProperties;
     }
 
+
+    /**
+     * returns a flag to indicate if the dna command is enabled.
+     * @return a flag to indicate if the dna command is enabled.
+     */
+    public boolean isDnaCommandEnabled() {
+        return dnaCommandEnabled;
+    }
+
     /**
      * Returns a flag to indicate if features should only be returned if they appear strictly
      * within the coordinates given.
@@ -271,6 +295,17 @@ public class DataSourceConfiguration {
      */
     public boolean isUseFeatureIdForFeatureLabel() {
         return useFeatureIdForFeatureLabel;
+    }
+
+
+    /**
+     * Returns flag indicating if types with a count of zero should be included in the
+     * output of the types command.
+     * @return flag indicating if types with a count of zero should be included in the
+     * output of the types command.
+     */
+    public boolean isIncludeTypesWithZeroCount() {
+        return includeTypesWithZeroCount;
     }
 
     /**
