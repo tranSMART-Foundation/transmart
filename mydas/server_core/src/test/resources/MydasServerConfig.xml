@@ -23,7 +23,7 @@
   -->
 
 <mydasserver xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="./mydasserverconfig.xsd">
+ xsi:noNamespaceSchemaLocation="http://mydas.googlecode.com/svn/trunk/mydas/server_core/src/main/resources/mydasserverconfig.xsd">
     <!-- The global element holds details of configuration common to the entire server. -->
     <global>
         <!-- The URL of the DAS server up to an including /das/ (e.g. http://www.ebi.ac.uk/das-srv/uniprot/das/) -->
@@ -65,6 +65,14 @@
             <!-- These properties are made available to the plugin class
             through the DataSource interface, so the plugin author can 
             add arbitrary additional configutation to their data source.-->
+            <dna-command-enabled>true</dna-command-enabled>
+            <features-strictly-enclosed>true</features-strictly-enclosed>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <types include-types-with-zero-count="true">
+                <type id="HELIX" category="Structure" method="X-ray"/>
+                <type id="STRAND" category="Structure" method="X-ray"/>
+                <type id="VARSPLIC" category="Variant"/>
+            </types>
             <property key="dsn1key1" value="dsn1value1"/>
             <property key="dsn1key2" value="dsn1value2"/>
         </datasource>
@@ -75,6 +83,10 @@
                     description="dsnDescription2"
                     description-href="http://dsnDescriptionHref2">
             <class>fully.qualified.class.2</class>
+            <dna-command-enabled>false</dna-command-enabled>
+            <features-strictly-enclosed>false</features-strictly-enclosed>
+            <use-feature-id-for-feature-label>false</use-feature-id-for-feature-label>
+            <types include-types-with-zero-count="false"/>
         </datasource>
     </datasources>
 </mydasserver>

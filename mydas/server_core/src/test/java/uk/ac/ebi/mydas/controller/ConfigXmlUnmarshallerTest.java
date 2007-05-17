@@ -137,6 +137,11 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                     Assert.assertEquals("Missing dsn property",
                             dsnProps.get("dsn1key2"),
                             "dsn1value2");
+                    Assert.assertTrue("dna-command-enabled not as expected", dsnConfig.isDnaCommandEnabled());
+                    Assert.assertTrue("features-strictly-enclosed not as expected", dsnConfig.isFeaturesStrictlyEnclosed());
+                    Assert.assertTrue("use-feature-id-for-feature-label", dsnConfig.isUseFeatureIdForFeatureLabel());
+                    Assert.assertTrue("include-types-with-zero-count", dsnConfig.isIncludeTypesWithZeroCount());
+                    Assert.assertEquals("Unexpected number of types returned", dsnConfig.getTypes().size(), 3);
                 }
                 else if ("dsnId2".equals (dsnConfig.getId())){
                     found2 = true;
@@ -160,6 +165,11 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                     Assert.assertEquals("Unexpected number of properties",
                             0,
                             dsnConfig.getDataSourceProperties().size());
+                    Assert.assertFalse("dna-command-enabled not as expected", dsnConfig.isDnaCommandEnabled());
+                    Assert.assertFalse("features-strictly-enclosed not as expected", dsnConfig.isFeaturesStrictlyEnclosed());
+                    Assert.assertFalse("use-feature-id-for-feature-label", dsnConfig.isUseFeatureIdForFeatureLabel());
+                    Assert.assertFalse("include-types-with-zero-count", dsnConfig.isIncludeTypesWithZeroCount());
+                    Assert.assertEquals("Unexpected number of types returned", dsnConfig.getTypes().size(), 0);
                 }
             }
             Assert.assertTrue("Did not find dsn1 definition.", found1);
