@@ -117,6 +117,23 @@
                                                 </xs:documentation>
                                             </xs:annotation>
                                         </xs:element>
+                                        <xs:element name="dna-command-enabled" minOccurs="1" maxOccurs="1" nillable="false">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    This setting indicates if the dna command is enabled or not for this data source.
+                                                    Clearly this may be set to false for servers that serve only protein sequence and 
+                                                    annotation.  Note that the mydas DAS server makes no attempt to check that a 
+                                                    valid DNA, RNA or protein sequence is being served by the sequence command - this
+                                                    is the responsibility of the data source itself.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                    <xs:extension base="xs:boolean">
+                                                    </xs:extension>
+                                                </xs:simpleContent>                                    
+                                            </xs:complexType>
+                                        </xs:element>
                                         <xs:element name="features-strictly-enclosed" minOccurs="1" maxOccurs="1" nillable="false">
                                             <xs:annotation>
                                                 <xs:documentation>
