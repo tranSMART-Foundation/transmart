@@ -37,19 +37,44 @@ import java.net.URL;
  * Time: 16:08:39
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
+ *
+ * The DasComponentFeature allows you to build an assembly that can be served from
+ * a reference server. (There is nothing stopping you from doing this on an annotation server,
+ * but this is not normal practice.)
+ *
+ * It is highly recommended that you read the section <b>'Fetching Sequence Assemblies'</b> in the DAS 1.53
+ * specification before using this part of the mydas API.
+ *
+ * To get started, you first of all need to create a DasAnnotatedSegment object (essentially a 'feature holder' that
+ * you would normally use to hold a Collection of DasFeature objects annotated on a particular segment.
+ *
+ * Once you have this object, call the <code>public DasComponentFeature getSelfComponentFeature()</code>
+ * method, which will return a  DasComponentFeature representing the DasAnnotatedSegment.  You can then add
+ * subparts or superparts to this object using the
+ * <code>public DasComponentFeature addSubComponent(args...)</code> and
+ * <code>public DasComponentFeature addSuperComponent(args...)</code> methods.  These methods also return
+ * DasComponentFeature objects, to which in turn you can add further subparts or superparts.  This will allow
+ * these subparts or superparts to report their status correctly.
+ * 
+ * Note that while it is theoretically possible to construct an assembly to any depth in this way, there is no
+ * point in going beyond three tiers of components (up or down the assembly) as only two are reported by the
+ * features command, with the third tier being hinted at in the /DASGFF/GFF/SEGMENT/FEATURE/TYPE/@superparts or
+ * /DASGFF/GFF/SEGMENT/FEATURE/TYPE/@subparts attributes of the second-tier components.
  */
 public class DasComponentFeature extends DasFeature {
 
-    Collection<DasComponentFeature> subComponents = null;
+    /**
+     * 
+     */
+    private Collection<DasComponentFeature> subComponents = null;
 
-    Collection<DasComponentFeature> superComponents = null;
+    private Collection<DasComponentFeature> superComponents = null;
 
     /**
      * This class is designed to simplify the process of building an assembly using features in DAS.
      * After constructing one of these components, it is possible to add DasComponent or DasSuperComponent
      * objects to this instance, in order to describe a hierarchical assembly.
      *
-     * <b>Note</b> You should NOT add a component
      * @param featureId
      * @param featureLabel
      * @param targetSegmentId
@@ -130,12 +155,14 @@ public class DasComponentFeature extends DasFeature {
                 new ArrayList<DasTarget>(1),
                 null
         );
-        this.getTargets().add(new DasTarget(
-                segment.getSegmentId(),
-                segment.getStartCoordinate(),
-                segment.getStopCoordinate(),
-                segment.getSegmentLabel()
-        ));
+        this.getTargets().add(
+                new DasTarget(
+                    segment.getSegmentId(),
+                    segment.getStartCoordinate(),
+                    segment.getStopCoordinate(),
+                    segment.getSegmentLabel()
+                )
+        );
     }
 
     public boolean hasSubParts(){
@@ -146,11 +173,12 @@ public class DasComponentFeature extends DasFeature {
         return superComponents != null && superComponents.size() > 0;
     }
 
-    public void addSubComponent(String componentFeatureId,
-                                int startCoordinateOnComponent,
-                                int stopCoordinateOnComponent,
+    public DasComponentFeature addSubComponent(
+                                String componentFeatureId,
                                 int startCoordinateOnSegment,
                                 int stopCoordinateOnSegment,
+                                int startCoordinateOnComponent,
+                                int stopCoordinateOnComponent,
                                 String componentFeatureLabel,
                                 String componentTypeId,
                                 String componentTypeLabel,
@@ -192,7 +220,10 @@ public class DasComponentFeature extends DasFeature {
         );
 
         subComponents.add (newSubComponent);
+        // Relationship needs to go both ways so the subpart and superpart attributes
+        // are set correctly....
         newSubComponent.addSuperComponent(this);
+        return newSubComponent;
     }
 
     private void addSubComponent (DasComponentFeature subComponentFeature){
@@ -202,11 +233,11 @@ public class DasComponentFeature extends DasFeature {
         subComponents.add (subComponentFeature);
     }
 
-    public void addSuperComponent(String componentFeatureId,
-                                int startCoordinateOnComponent,
-                                int stopCoordinateOnComponent,
+    public DasComponentFeature addSuperComponent(String componentFeatureId,
                                 int startCoordinateOnSegment,
                                 int stopCoordinateOnSegment,
+                                int startCoordinateOnComponent,
+                                int stopCoordinateOnComponent,
                                 String componentFeatureLabel,
                                 String componentTypeId,
                                 String componentTypeLabel,
@@ -243,8 +274,10 @@ public class DasComponentFeature extends DasFeature {
                 componentLinks
         );
         superComponents.add (newSuperComponent);
-        // Relationship needs to go both ways...
+        // Relationship needs to go both ways so the subpart and superpart attributes
+        // are set correctly....
         newSuperComponent.addSubComponent(this);
+        return newSuperComponent;
     }
 
     private void addSuperComponent (DasComponentFeature superComponentFeature){
@@ -254,28 +287,26 @@ public class DasComponentFeature extends DasFeature {
         superComponents.add (superComponentFeature);
     }
 
-    public Collection<DasComponentFeature> getSubComponents() {
+    private Collection<DasComponentFeature> getSubComponents() {
         return (subComponents == null) ? Collections.EMPTY_LIST : subComponents;
     }
 
-    public Collection<DasComponentFeature> getDeepSubComponents() {
+    public Collection<DasComponentFeature> getReportableSubComponents() {
         Collection<DasComponentFeature> deepComponents = new ArrayList<DasComponentFeature>();
         for (DasComponentFeature component : getSubComponents()) {
             deepComponents.add(component);
-            deepComponents.addAll(component.getSubComponents());
         }
         return deepComponents;
     }
 
-    public Collection<DasComponentFeature> getSuperComponents() {
+    private Collection<DasComponentFeature> getSuperComponents() {
         return (superComponents == null) ? Collections.EMPTY_LIST : superComponents;
     }
 
-    public Collection<DasComponentFeature> getDeepSuperComponents() {
+    public Collection<DasComponentFeature> getReportableSuperComponents() {
         Collection<DasComponentFeature> deepSuperComponents = new ArrayList<DasComponentFeature>();
         for (DasComponentFeature component : getSuperComponents()) {
             deepSuperComponents.add(component);
-            deepSuperComponents.addAll(component.getSuperComponents());
         }
         return deepSuperComponents;
     }

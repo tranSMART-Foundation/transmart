@@ -103,6 +103,9 @@ public class DasAnnotatedSegment extends DasSegment{
      * Holds the complete contents of a /DASGFF/GFF/SEGMENT/FEATURE element (for the features request)
      * and is used to derive the contents of the
      * /DASTYPES/GFF/SEGMENT/TYPE element (for the types request).
+     *
+     * If the das source has added DasComponentFeatures to the DasAnnotatedSegment, they will all be added
+     * to the Collection as well.
      * @return a collection of {@link DasFeature} objects, being the features annotated on this segment.
      */
     public Collection<DasFeature> getFeatures() {
@@ -110,10 +113,10 @@ public class DasAnnotatedSegment extends DasSegment{
             return features;
         }
         else {
-            Collection<DasFeature> allFeatures = new ArrayList(features);
+            Collection<DasFeature> allFeatures = new ArrayList<DasFeature>(features);
             allFeatures.add(selfComponent);
-            allFeatures.addAll(selfComponent.getDeepSubComponents());
-            allFeatures.addAll(selfComponent.getDeepSuperComponents());
+            allFeatures.addAll(selfComponent.getReportableSubComponents());
+            allFeatures.addAll(selfComponent.getReportableSuperComponents());
             return allFeatures;
         }
     }
