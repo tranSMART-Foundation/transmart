@@ -34,6 +34,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -121,6 +122,24 @@ public class DataSourceConfiguration {
     private AnnotationDataSource dataSource;
 
     /**
+     * Flag to indicate if features should only be returned if they appear strictly
+     * within the coordinates given.
+     */
+    private boolean featuresStrictlyEnclosed;
+
+    /**
+     * Flag to indicate if the feature id should be used for the label
+     * if no label is set by the data source.
+     */
+    private boolean useFeatureIdForFeatureLabel;
+
+    /**
+     * A Collection of the types for the data source, loaded from the server configuration
+     * for this dsn.
+     */
+    private Collection<Type> types;
+
+    /**
      * A boolean flag to indicate if the datasource failed on initialisation.
      */
     private boolean datasourceOK;
@@ -137,6 +156,12 @@ public class DataSourceConfiguration {
      * @param styleSheet the name of the stylesheet for the plugin
      * @param dataSourceProperties a Map of key value pairs defined by the plugin developer.
      * @param className the fully qualified class of the data source plugin.
+     * @param featuresStrictlyEnclosed indicates if features should only be returned if they appear strictly
+     * within the coordinates given.
+     * @param useFeatureIdForFeatureLabel indicates if the feature id should be used for the label
+     * if no label is set by the data source.
+     * @param types A Collection of the types for the data source, loaded from the server configuration
+     * for this dsn.
      */
     DataSourceConfiguration(String id,
                                    String name,
@@ -146,7 +171,10 @@ public class DataSourceConfiguration {
                                    URL descriptionHref,
                                    String styleSheet,
                                    Map<String, String> dataSourceProperties,
-                                   String className) {
+                                   String className,
+                                   boolean featuresStrictlyEnclosed,
+                                   boolean useFeatureIdForFeatureLabel,
+                                   Collection<Type> types) {
         this.id = id;
         this.name = name;
         this.version = version;
@@ -156,6 +184,9 @@ public class DataSourceConfiguration {
         this.styleSheet = styleSheet;
         this.dataSourceProperties = dataSourceProperties;
         this.className = className;
+        this.featuresStrictlyEnclosed = featuresStrictlyEnclosed;
+        this.useFeatureIdForFeatureLabel = useFeatureIdForFeatureLabel;
+        this.types = types;
     }
 
     /**
@@ -220,6 +251,36 @@ public class DataSourceConfiguration {
      */
     public Map<String, String> getDataSourceProperties() {
         return dataSourceProperties;
+    }
+
+    /**
+     * Returns a flag to indicate if features should only be returned if they appear strictly
+     * within the coordinates given.
+     * @return a flag to indicate if features should only be returned if they appear strictly
+     * within the coordinates given.
+     */
+    public boolean isFeaturesStrictlyEnclosed() {
+        return featuresStrictlyEnclosed;
+    }
+
+    /**
+     * Returns a flag to indicate if the feature id should be used for the label
+     * if no label is set by the data source.
+     * @return a flag to indicate if the feature id should be used for the label
+     * if no label is set by the data source.
+     */
+    public boolean isUseFeatureIdForFeatureLabel() {
+        return useFeatureIdForFeatureLabel;
+    }
+
+    /**
+     * Returns a Collection of the types for the data source, loaded from the server configuration
+     * for this dsn.
+     * @return a Collection of the types for the data source, loaded from the server configuration
+     * for this dsn.
+     */
+    public Collection<Type> getTypes() {
+        return types;
     }
 
     /**

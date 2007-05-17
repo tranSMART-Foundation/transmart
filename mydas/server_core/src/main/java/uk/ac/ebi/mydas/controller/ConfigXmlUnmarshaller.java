@@ -35,6 +35,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collection;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -69,6 +70,14 @@ public class ConfigXmlUnmarshaller {
 
     private static final String ELEMENT_STYLESHEET = "stylesheet";
 
+    private static final String ELEMENT_FEATURES_STRICTLY_ENCLOSED = "features-strictly-enclosed";
+
+    private static final String ELEMENT_USE_FEATURE_ID_FOR_FEATURE_LABEL = "use-feature-id-for-feature-label";
+
+    private static final String ELEMENT_TYPES = "types";
+
+    private static final String ELEMENT_TYPE = "type";
+
     private static final String ATTRIBUTE_KEY = "key";
 
     private static final String ATTRIBUTE_VALUE = "value";
@@ -84,6 +93,12 @@ public class ConfigXmlUnmarshaller {
     private static final String ATTRIBUTE_DESCRIPTION = "description";
 
     private static final String ATTRIBUTE_DESCRIPTION_HREF = "description-href";
+
+    private static final String ATTRIBUTE_INCLUDE_TYPES_WITH_ZERO_COUNT = "include-types-with-zero-count";
+
+    private static final String ATTRIBUTE_CATEGORY = "category";
+
+    private static final String ATTRIBUTE_METHOD = "method";
 
 
     /**
@@ -327,6 +342,10 @@ public class ConfigXmlUnmarshaller {
         String styleSheet = null;
         Map<String, String> dataSourceProperties = new HashMap<String, String>();
         String className = null;
+        Boolean featuresStrictlyEnclosed = false;
+        Boolean useFeatureIdForFeatureLabel = false;
+        Collection<Type> types = null;
+
 
         while (! (xpp.next() == XmlPullParser.END_TAG && ELEMENT_DATASOURCE.equals(xpp.getName()))) {
             if (xpp.getEventType() == XmlPullParser.START_TAG) {
@@ -361,7 +380,10 @@ public class ConfigXmlUnmarshaller {
         }
 
 
-        return new DataSourceConfiguration(id, name, version, mapmaster, description, descriptionHref, styleSheet, dataSourceProperties, className);
+        return new DataSourceConfiguration(id, name, version, mapmaster, description, descriptionHref, styleSheet, dataSourceProperties, className,
+                featuresStrictlyEnclosed,
+                useFeatureIdForFeatureLabel,
+                types);
     }
 
 
