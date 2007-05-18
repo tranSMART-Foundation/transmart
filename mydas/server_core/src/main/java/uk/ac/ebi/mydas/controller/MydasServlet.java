@@ -452,49 +452,56 @@ public class MydasServlet extends HttpServlet {
     private void dnaCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
             throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException,
             BadReferenceObjectException, BadCommandArgumentsException, CoordinateErrorException {
-        // Is this a reference source?
-        if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
-            // Fine - process command.
-            Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
-            // Got some sequences, so all is OK.
-            writeHeader (request, response, STATUS_200_OK, true);
-            // Build the XML.
-            XmlSerializer serializer;
-            serializer = PULL_PARSER_FACTORY.newSerializer();
-            BufferedWriter out = null;
-            try{
-                out = getResponseWriter(request, response);
-                serializer.setOutput(out);
-                serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
-                serializer.startDocument(null, false);
-                serializer.text("\n");
-                serializer.docdecl(" DASDNA SYSTEM \"http://www.biodas.org/dtd/dasdna.dtd\"");
-                serializer.text("\n");
-                // Now the body of the DASDNA xml.
-                serializer.startTag (DAS_XML_NAMESPACE, "DASDNA");
-                for (SequenceReporter sequenceReporter : sequences){
-                    serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
-                    serializer.attribute(DAS_XML_NAMESPACE, "id", sequenceReporter.getSegmentName());
-                    serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(sequenceReporter.getStart()));
-                    serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(sequenceReporter.getStop()));
-                    serializer.attribute(DAS_XML_NAMESPACE, "version", sequenceReporter.getSequenceVersion());
-                    serializer.startTag(DAS_XML_NAMESPACE, "DNA");
-                    serializer.attribute(DAS_XML_NAMESPACE, "length", Integer.toString(sequenceReporter.getSequenceString().length()));
-                    serializer.text(sequenceReporter.getSequenceString());
-                    serializer.endTag(DAS_XML_NAMESPACE, "DNA");
-                    serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
+        // Is the dna command enabled?
+        if (dsnConfig.isDnaCommandEnabled()){
+            // Is this a reference source?
+            if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
+                // All good - process command.
+                Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
+                // Got some sequences, so all is OK.
+                writeHeader (request, response, STATUS_200_OK, true);
+                // Build the XML.
+                XmlSerializer serializer;
+                serializer = PULL_PARSER_FACTORY.newSerializer();
+                BufferedWriter out = null;
+                try{
+                    out = getResponseWriter(request, response);
+                    serializer.setOutput(out);
+                    serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+                    serializer.startDocument(null, false);
+                    serializer.text("\n");
+                    serializer.docdecl(" DASDNA SYSTEM \"http://www.biodas.org/dtd/dasdna.dtd\"");
+                    serializer.text("\n");
+                    // Now the body of the DASDNA xml.
+                    serializer.startTag (DAS_XML_NAMESPACE, "DASDNA");
+                    for (SequenceReporter sequenceReporter : sequences){
+                        serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
+                        serializer.attribute(DAS_XML_NAMESPACE, "id", sequenceReporter.getSegmentName());
+                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(sequenceReporter.getStart()));
+                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(sequenceReporter.getStop()));
+                        serializer.attribute(DAS_XML_NAMESPACE, "version", sequenceReporter.getSequenceVersion());
+                        serializer.startTag(DAS_XML_NAMESPACE, "DNA");
+                        serializer.attribute(DAS_XML_NAMESPACE, "length", Integer.toString(sequenceReporter.getSequenceString().length()));
+                        serializer.text(sequenceReporter.getSequenceString());
+                        serializer.endTag(DAS_XML_NAMESPACE, "DNA");
+                        serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
+                    }
+                    serializer.endTag (DAS_XML_NAMESPACE, "DASDNA");
                 }
-                serializer.endTag (DAS_XML_NAMESPACE, "DASDNA");
+                finally{
+                    if (out != null){
+                        out.close();
+                    }
+                }
             }
-            finally{
-                if (out != null){
-                    out.close();
-                }
+            else {
+                // Not a reference source.
+                throw new UnimplementedFeatureException("The dna command has been called on an annotation server.");
             }
         }
-        else {
-            // Not a reference source.
-            throw new UnimplementedFeatureException("An attempt to request sequence information from an anntation server has been detected.");
+        else{
+            // dna command disabled
+            throw new UnimplementedFeatureException("The dna command has been disabled for this data source.");
         }
     }
 
@@ -690,16 +697,16 @@ public class MydasServlet extends HttpServlet {
                 if (featuresReporter.getSegmentLabel() != null && featuresReporter.getSegmentLabel().length() > 0){
                     serializer.attribute(DAS_XML_NAMESPACE, "label", featuresReporter.getSegmentLabel());
                 }
-                for (DasFeature feature : featuresReporter.getFeatures()){
+                for (DasFeature feature : featuresReporter.getFeatures(dsnConfig.isFeaturesStrictlyEnclosed())){
                     // Check the feature passes the filter.
                     if (filter.featurePasses(feature)){
                         serializer.startTag(DAS_XML_NAMESPACE, "FEATURE");
                         serializer.attribute(DAS_XML_NAMESPACE, "id", feature.getFeatureId());
-                        if (feature.getFeatureLabel() == null || feature.getFeatureLabel().length() == 0){
-                            serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureId());
-                        }
-                        else {
+                        if (feature.getFeatureLabel() != null && feature.getFeatureLabel().length() > 0){
                             serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureLabel());
+                        }
+                        else if (dsnConfig.isUseFeatureIdForFeatureLabel()){
+                            serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureId());
                         }
 
                         // TYPE element

@@ -59,9 +59,9 @@ public class FeaturesReporter {
         this.annotatedSegment = annotatedSegment;
     }
 
-    Collection<DasFeature> getFeatures() {
+    Collection<DasFeature> getFeatures(boolean strictlyEnclosed) {
         return (restricted)
-                ? annotatedSegment.getFeatures(requestedStart, requestedStop, false)
+                ? annotatedSegment.getFeatures(requestedStart, requestedStop, strictlyEnclosed)
                 : annotatedSegment.getFeatures();
     }
 
