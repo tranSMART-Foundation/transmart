@@ -28,6 +28,8 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import java.util.Collection;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
+
 /**
  * Created Using IntelliJ IDEA.
  * Date: 14-May-2007
@@ -41,6 +43,12 @@ import java.util.ArrayList;
  * A Data Source is required to be able to return a {@link Collection<DasAnnotatedSegment>} of these objects.
  */
 public class DasAnnotatedSegment extends DasSegment{
+
+    /**
+     * Define a static logger variable so that it references the
+     * Logger instance named "XMLUnmarshaller".
+     */
+    private static final Logger logger = Logger.getLogger(DasAnnotatedSegment.class);
 
     /**
      * A collection of {@link DasFeature} objects, being the features annotated on this segment.
@@ -122,7 +130,7 @@ public class DasAnnotatedSegment extends DasSegment{
     }
 
     /**
-     * This method returns features within the specified coordinates as requested.  Configurable - the
+     * This method returns features within the specified coordinates as requested.
      *
      * @param requestedStart being the start coordinate requested by the client.
      * @param requestedStop being the stop coordinate requested by the client.
@@ -131,14 +139,30 @@ public class DasAnnotatedSegment extends DasSegment{
      * @return a Collection<DasFeature> of the DasFeature objects that match.
      */
     public Collection<DasFeature> getFeatures(int requestedStart, int requestedStop, boolean strictlyEnclosed){
-        Collection<DasFeature> restrictedFeatures = new ArrayList<DasFeature>(this.features.size());
+        if (logger.isDebugEnabled()){
+            logger.debug("DasAnnotatedSegment.getFeatures (start, stop, strictlyEnclosed) called.  StrictlyEnclosed = " + strictlyEnclosed);
+        }
+        Collection<DasFeature> allFeatures = this.getFeatures();
+        Collection<DasFeature> restrictedFeatures = new ArrayList<DasFeature>(allFeatures.size());
         if (features != null){
-            for (DasFeature feature : features){
+            for (DasFeature feature : allFeatures){
                 if (strictlyEnclosed && requestedStart <= feature.getStartCoordinate() && requestedStop >= feature.getStopCoordinate()){
+
+                    if (logger.isDebugEnabled()){
+                        logger.debug("Strictly enclosed.  Feature passed: Requested start: " + requestedStart + ". Requested stop: " +
+                        requestedStop + ". Feature start: " + feature.getStartCoordinate() + ". Feature stop: " + feature.getStopCoordinate());
+                    }
+                    
                     restrictedFeatures.add (feature);
                 }
-                else if (! strictlyEnclosed && (requestedStop >= feature.getStartCoordinate() && requestedStop <= feature.getStopCoordinate())
-                        || (requestedStart >= feature.getStartCoordinate() && requestedStart <= feature.getStopCoordinate())){
+                else if ((! strictlyEnclosed) && ((requestedStop >= feature.getStartCoordinate() && requestedStop <= feature.getStopCoordinate())
+                        || (requestedStart >= feature.getStartCoordinate() && requestedStart <= feature.getStopCoordinate()))){
+
+                    if (logger.isDebugEnabled()){
+                        logger.debug("Overlap only.  Feature passed: Requested start: " + requestedStart + ". Requested stop: " + 
+                        requestedStop + ". Feature start: " + feature.getStartCoordinate() + ". Feature stop: " + feature.getStopCoordinate());
+                    }
+
                     restrictedFeatures.add (feature);
                 }
             }

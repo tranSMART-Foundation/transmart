@@ -202,6 +202,10 @@ public class DataSourceConfiguration {
         this.useFeatureIdForFeatureLabel = useFeatureIdForFeatureLabel;
         this.includeTypesWithZeroCount = includeTypesWithZeroCount;
         this.types = types;
+
+        if (logger.isDebugEnabled()){
+            logger.debug("New DataSourceConfiguration instantiated: \n" + this.toString());
+        }
     }
 
     /**
@@ -419,7 +423,17 @@ public class DataSourceConfiguration {
             .append ("' version: '")
             .append (version)
             .append ("' description: '")
-            .append (description);
+            .append (description)
+            .append ("' features strictly enclosed: '")
+            .append (featuresStrictlyEnclosed)
+            .append ("' dna command enabled :'")
+            .append (dnaCommandEnabled)
+            .append ("' use feature id for feature label: '")
+            .append (useFeatureIdForFeatureLabel)
+            .append ("' include types with zero count: '")
+            .append (includeTypesWithZeroCount)
+            .append ("' Types: ")
+            .append (types.toString());
         return buf.toString();
     }
 }
