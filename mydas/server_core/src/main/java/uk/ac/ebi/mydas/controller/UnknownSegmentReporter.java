@@ -37,11 +37,11 @@ public class UnknownSegmentReporter implements FeaturesReporter{
     public UnknownSegmentReporter(SegmentQuery query){
         this.query = query;
     }
-    public int getStart() {
+    public Integer getStart() {
         return query.getStartCoordinate();
     }
 
-    public int getStop() {
+    public Integer getStop() {
         return query.getStopCoordinate();
     }
 

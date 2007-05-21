@@ -32,9 +32,9 @@ package uk.ac.ebi.mydas.controller;
  */
 public interface FeaturesReporter {
 
-    public int getStart();
+    public Integer getStart();
 
-    public int getStop();
+    public Integer getStop();
 
     public String getSegmentId();
 

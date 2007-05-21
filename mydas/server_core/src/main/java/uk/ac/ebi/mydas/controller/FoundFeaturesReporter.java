@@ -65,13 +65,13 @@ public class FoundFeaturesReporter implements FeaturesReporter {
                 : annotatedSegment.getFeatures();
     }
 
-    public int getStart(){
+    public Integer getStart(){
         return (restricted)
                 ? requestedStart
                 : annotatedSegment.getStartCoordinate();
     }
 
-    public int getStop(){
+    public Integer getStop(){
         return (restricted)
                 ? requestedStop
                 : annotatedSegment.getStopCoordinate();

@@ -582,7 +582,7 @@ public class MydasServlet extends HttpServlet {
 
         // Build a Map of Types to DasType counts. (the counts being Integer objects set to 'null' until
         // a count is retrieved.
-        Map<DasType, Integer> allTypesReport = null;
+        Map<DasType, Integer> allTypesReport;
         Collection<DasType> allTypes = dsnConfig.getDataSource().getTypes();
         if (allTypes != null){
             allTypesReport = new HashMap<DasType, Integer>(allTypes.size());
@@ -852,7 +852,7 @@ public class MydasServlet extends HttpServlet {
 
     private void featuresCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
             throws XmlPullParserException, IOException, DataSourceException, BadCommandArgumentsException,
-            UnimplementedFeatureException {
+            UnimplementedFeatureException, BadReferenceObjectException, CoordinateErrorException {
         // Parse the queryString to retrieve the individual parts of the query.
         if (queryString == null || queryString.length() == 0){
             throw new BadCommandArgumentsException("Expecting at least one reference in the query string, but found nothing.");
@@ -926,7 +926,7 @@ public class MydasServlet extends HttpServlet {
         // from the data source.  (getFeatureCollection method shared with the 'types' command.)
         Collection<FeaturesReporter> featuresReporterCollection;
         if (requestedSegments.size() > 0){
-            featuresReporterCollection = getFeatureCollection(dsnConfig, requestedSegments);
+            featuresReporterCollection = getFeatureCollection(dsnConfig, requestedSegments, true);
         }
         else {
             // No segments have been requested, so instead check for either feature_id or group_id filters.
@@ -978,8 +978,12 @@ public class MydasServlet extends HttpServlet {
                 if (featuresReporter instanceof UnknownSegmentReporter){
                     serializer.startTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
                     serializer.attribute(DAS_XML_NAMESPACE, "id", featuresReporter.getSegmentId());
-                    serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(featuresReporter.getStart()));
-                    serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(featuresReporter.getStop()));
+                    if (featuresReporter.getStart() != null){
+                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(featuresReporter.getStart()));
+                    }
+                    if (featuresReporter.getStop() != null){
+                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(featuresReporter.getStop()));
+                    }
                     serializer.endTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
                 }
                 else {
@@ -1288,7 +1292,7 @@ public class MydasServlet extends HttpServlet {
                                                               List <SegmentQuery> requestedSegments,
                                                               boolean unknownSegmentsHandled
                                 )
-            throws DataSourceException, BadReferenceObjectException {
+            throws DataSourceException, BadReferenceObjectException, CoordinateErrorException {
         List<FeaturesReporter> featuresReporterList = new ArrayList<FeaturesReporter>(requestedSegments.size());
         AnnotationDataSource dataSource = dsnConfig.getDataSource();
         for (SegmentQuery segmentQuery : requestedSegments){
@@ -1325,12 +1329,12 @@ public class MydasServlet extends HttpServlet {
                 else {
                     throw broe;
                 }
-            } catch (CoordinateErrorException e) {
+            } catch (CoordinateErrorException cee) {
                 if (unknownSegmentsHandled){
                     featuresReporterList.add(new UnknownSegmentReporter(segmentQuery));
                 }
                 else {
-                    throw e;
+                    throw cee;
                 }
             }
         }
