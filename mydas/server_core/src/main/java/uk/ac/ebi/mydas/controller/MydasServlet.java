@@ -506,7 +506,49 @@ public class MydasServlet extends HttpServlet {
     }
 
     private void typesCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-            throws XmlPullParserException, IOException, DataSourceException{
+            throws BadCommandArgumentsException, BadReferenceObjectException, DataSourceException, CoordinateErrorException {
+        // Parse the queryString to retrieve the individual parts of the query.
+
+        List<SegmentQuery> requestedSegments = new ArrayList<SegmentQuery>();
+        List<String> typeFilter = new ArrayList<String>();
+        /************************************************************************\
+         * Parse the query string                                               *
+         ************************************************************************/
+        // It is legal for the query string to be empty for the types command.
+        if (queryString != null && queryString.length() > 0){
+            // Split on the ; (delineates the separate parts of the query)
+            String[] queryParts = queryString.split(";");
+            for (String queryPart : queryParts){
+                boolean queryPartParsable = false;
+                // Now determine what each part is, and construct the query.
+                Matcher segmentRangeMatcher = SEGMENT_RANGE_PATTERN.matcher(queryPart);
+                if (segmentRangeMatcher.find()){
+                    requestedSegments.add (new SegmentQuery (segmentRangeMatcher));
+                    queryPartParsable = true;
+                }
+                else{
+                    // Split the queryPart on "=" and see if the result is parsable.
+                    String[] queryPartKeysValues = queryPart.split("=");
+                    if (queryPartKeysValues.length != 2){
+                        // All of the remaining query parts are key=value pairs, so this is a bad argument.
+                        throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
+                    }
+                    String key = queryPartKeysValues[0];
+                    String value = queryPartKeysValues[1];
+                    // Check for typeId restriction
+                    if ("type".equals (key)){
+                        typeFilter.add(value);
+                        queryPartParsable = true;
+                    }
+                }
+                // If not parsable, throw a BadCommandArgumentsException
+                if (! queryPartParsable){
+                    throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
+                }
+            }
+        }
+        // TODO Need to report either a single segment with no id, start or stop that describes
+        // TODO all of the types, or several segments, one for each requested segment decribing the types.
     }
 
     private void stylesheetCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)

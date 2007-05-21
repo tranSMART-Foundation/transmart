@@ -34,7 +34,7 @@ package uk.ac.ebi.mydas.controller;
  * Loading the types from the server configuration and holding details of the types
  * for a particular request.  Note that the equals method only compares the id.
  */
-public class Type implements Cloneable{
+public class Type{
 
     private String id;
 
@@ -75,5 +75,16 @@ public class Type implements Cloneable{
 
     public int hashCode() {
         return id.hashCode();
+    }
+
+    public String toString(){
+        StringBuffer buf = new StringBuffer("Type.  id: '");
+        buf .append (id)
+            .append ("' category: '")
+            .append (category)
+            .append ("' method: '")
+            .append (method)
+            .append ("'");
+        return buf.toString();
     }
 }
