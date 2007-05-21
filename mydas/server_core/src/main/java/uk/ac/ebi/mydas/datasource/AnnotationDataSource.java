@@ -28,6 +28,7 @@ import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
+import uk.ac.ebi.mydas.model.DasType;
 
 import javax.servlet.ServletContext;
 import java.util.Map;
@@ -69,7 +70,8 @@ public interface AnnotationDataSource {
      * @param dataSourceConfig containing the pertinent information frmo the ServerConfig.xml
      * file for this datasource, including (optionally) a Map of datasource specific configuration.
      * @throws uk.ac.ebi.mydas.exceptions.DataSourceException should be thrown if there is any
-     * fatal problem with loading this data source.  <bold>It is highly desirable for the implementation to test itself in this init method and throw
+     * fatal problem with loading this data source.  <bold>It is highly desirable
+     * for the implementation to test itself in this init method and throw
      * a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
      * and read a record.</bold>
      */
@@ -97,7 +99,8 @@ public interface AnnotationDataSource {
      * the MydasServlet will handle restricting the features returned to
      * the start / stop coordinates in the request and you will only need to
      * implement this method to return Features.  If on the other hand, your data source
-     * includes massive segments, you may wish to implement the {@link uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource}
+     * includes massive segments, you may wish to implement the
+     * {@link uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource}
      * interface.  It will then be the responsibility of your AnnotationDataSource plugin to
      * restrict the features returned for the requested range.
      *
@@ -107,11 +110,29 @@ public interface AnnotationDataSource {
      * of the Collection type - so you can create your own comparators etc.
      * @throws BadReferenceObjectException in the event that your server does not include information about this segment.
      * @throws DataSourceException should be thrown if there is any
-     * fatal problem with loading this data source.  <bold>It is highly desirable for the implementation to test itself in this init method and throw
+     * fatal problem with loading this data source.  <bold>It is highly desirable
+     * for the implementation to test itself in this init method and throw
      * a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
      * and read a record.</bold>
      */
     public DasAnnotatedSegment getFeatures(String segmentId) throws BadReferenceObjectException, DataSourceException;
+
+
+    /**
+     * This method is used to implement the DAS types command.  (See <a href="http://biodas.org/documents/spec.html#types">
+     * DAS 1.53 Specification : types command</a>.  This method should return a Collection containing <b>all</b> the
+     * types described by the data source (one DasType object for each type ID).
+     *
+     * For some data sources it may be desirable to populate this Collection from a configuration file or to
+     *
+     * @return a Collection of DasType objects - one for each type id described by the data source.  
+     * @throws DataSourceException should be thrown if there is any
+     * fatal problem with loading this data source.  <bold>It is highly desirable
+     * for the implementation to test itself in this init method and throw
+     * a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
+     * and read a record.</bold>
+     */
+    public Collection<DasType> getTypes() throws DataSourceException;
 
 
     /**
@@ -148,7 +169,8 @@ public interface AnnotationDataSource {
      * DasFeature objects.   Note that this is a basic Collection - this gives you complete control over the details
      * of the Collection type - so you can create your own comparators etc.
      * @throws DataSourceException should be thrown if there is any
-     * fatal problem with loading this data source.  <bold>It is highly desirable for the implementation to test itself in this init method and throw
+     * fatal problem with loading this data source.  <bold>It is highly desirable for the
+     *  implementation to test itself in this init method and throw
      * a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
      * and read a record.</bold>
      * @throws uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException  Throw this if you cannot
@@ -156,5 +178,35 @@ public interface AnnotationDataSource {
      */
     public Collection<DasAnnotatedSegment> getFeatures (Collection<String> featureIdCollection, Collection<String> groupIdCollection)
             throws UnimplementedFeatureException, DataSourceException;
-    
+
+    /**
+     * This method allows the DAS server to report a total count for a particular type ID
+     * for all annotations across the entire data source.  If it is not possible to retrieve this value from your dsn, you
+     * should throw a {@link UnimplementedFeatureException} to indicate this.
+     * @param typeId as a String.  Please see <a href="http://biodas.org/documents/spec.html#types">
+     * DAS 1.53 Specification : types command</a>
+     * @return The total count <i>across the entire data source</i> (not
+     * just for one segment) for the specified type id.
+     */
+    public int getTotalCountForType(String typeId) throws UnimplementedFeatureException, DataSourceException;
+
+    /**
+     * The mydas DAS server implements caching within the server.  This method is provided to allow the DSN to warn
+     * the mydas server that the cache should be emptied for this data source, because (for example) the underlying
+     * data source has changed.
+     *
+     * (This method will always be called prior to returning data to clients from the cache).
+     *
+     * The most simple implementation of this method, i.e. for a static data source, should simply return false
+     * so that caching is used.
+     * @return false if it is safe to use cached data.  True if the underlying data source has changed, so cached data
+     * may be dirty.
+     * @throws DataSourceException should be thrown if there is any
+     * fatal problem with loading this data source.  <bold>It is highly desirable for the implementation
+     *  to test itself in this init method and throw
+     * a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
+     * and read a record.</bold>
+     */
+    public boolean emptyCache() throws DataSourceException;
+
 }

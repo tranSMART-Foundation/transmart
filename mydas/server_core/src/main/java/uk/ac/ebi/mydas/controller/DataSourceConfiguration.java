@@ -29,6 +29,7 @@ import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource;
 import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
 import uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
+import uk.ac.ebi.mydas.model.DasType;
 
 import java.net.URL;
 import java.util.Map;
@@ -137,7 +138,7 @@ public class DataSourceConfiguration {
      * A Collection of the types for the data source, loaded from the server configuration
      * for this dsn.
      */
-    private Collection<Type> types;
+    private Collection<DasType> types;
 
     /**
      * A boolean flag to indicate if the datasource failed on initialisation.
@@ -168,26 +169,24 @@ public class DataSourceConfiguration {
      * @param dataSourceProperties a Map of key value pairs defined by the plugin developer.
      * @param className the fully qualified class of the data source plugin.
      * @param featuresStrictlyEnclosed indicates if features should only be returned if they appear strictly
-     * within the coordinates given.
+* within the coordinates given.
      * @param useFeatureIdForFeatureLabel indicates if the feature id should be used for the label
-     * if no label is set by the data source.
-     * @param types A Collection of the types for the data source, loaded from the server configuration
-     * for this dsn.
+* if no label is set by the data source.
      */
     DataSourceConfiguration(String id,
-                                   String name,
-                                   String version,
-                                   String mapmaster,
-                                   String description,
-                                   URL descriptionHref,
-                                   String styleSheet,
-                                   Map<String, String> dataSourceProperties,
-                                   String className,
-                                   boolean dnaCommandEnabled,
-                                   boolean featuresStrictlyEnclosed,
-                                   boolean useFeatureIdForFeatureLabel,
-                                   boolean includeTypesWithZeroCount,
-                                   Collection<Type> types) {
+                            String name,
+                            String version,
+                            String mapmaster,
+                            String description,
+                            URL descriptionHref,
+                            String styleSheet,
+                            Map<String, String> dataSourceProperties,
+                            String className,
+                            boolean dnaCommandEnabled,
+                            boolean featuresStrictlyEnclosed,
+                            boolean useFeatureIdForFeatureLabel,
+                            boolean includeTypesWithZeroCount
+    ) {
         this.id = id;
         this.name = name;
         this.version = version;
@@ -201,7 +200,6 @@ public class DataSourceConfiguration {
         this.featuresStrictlyEnclosed = featuresStrictlyEnclosed;
         this.useFeatureIdForFeatureLabel = useFeatureIdForFeatureLabel;
         this.includeTypesWithZeroCount = includeTypesWithZeroCount;
-        this.types = types;
 
         if (logger.isDebugEnabled()){
             logger.debug("New DataSourceConfiguration instantiated: \n" + this.toString());
@@ -312,15 +310,7 @@ public class DataSourceConfiguration {
         return includeTypesWithZeroCount;
     }
 
-    /**
-     * Returns a Collection of the types for the data source, loaded from the server configuration
-     * for this dsn.
-     * @return a Collection of the types for the data source, loaded from the server configuration
-     * for this dsn.
-     */
-    public Collection<Type> getTypes() {
-        return types;
-    }
+
 
     /**
      * This method is called by the DataSourceManager to load
@@ -417,13 +407,13 @@ public class DataSourceConfiguration {
      */
     public String toString(){
         StringBuffer buf = new StringBuffer("DataSourceConfiguration: id: '");
-        buf .append (id)
+        buf .append ((id == null) ? "null" : id)
             .append ("' name: '")
-            .append (name)
+            .append ((name == null) ? "null" : name)
             .append ("' version: '")
-            .append (version)
+            .append ((version == null) ? "null" : version)
             .append ("' description: '")
-            .append (description)
+            .append ((description == null) ? "null" : description)
             .append ("' features strictly enclosed: '")
             .append (featuresStrictlyEnclosed)
             .append ("' dna command enabled :'")
@@ -433,7 +423,7 @@ public class DataSourceConfiguration {
             .append ("' include types with zero count: '")
             .append (includeTypesWithZeroCount)
             .append ("' Types: ")
-            .append (types.toString());
+            .append ((types == null) ? "null" : types.toString());
         return buf.toString();
     }
 }

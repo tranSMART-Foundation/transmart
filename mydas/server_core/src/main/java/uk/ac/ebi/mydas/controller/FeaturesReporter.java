@@ -41,14 +41,14 @@ public class FeaturesReporter {
 
     private boolean restricted;
 
-    private int requestedStart;
+    private Integer requestedStart;
 
-    private int requestedStop;
+    private Integer requestedStop;
 
     private DasAnnotatedSegment annotatedSegment;
 
     FeaturesReporter(DasAnnotatedSegment annotatedSegment, SegmentQuery segmentQuery){
-        this.restricted = true;
+        this.restricted = segmentQuery.getStartCoordinate() != null;
         this.requestedStart = segmentQuery.getStartCoordinate();
         this.requestedStop = segmentQuery.getStopCoordinate();
         this.annotatedSegment = annotatedSegment;

@@ -506,7 +506,7 @@ public class MydasServlet extends HttpServlet {
     }
 
     private void typesCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-            throws BadCommandArgumentsException, BadReferenceObjectException, DataSourceException, CoordinateErrorException {
+            throws BadCommandArgumentsException, BadReferenceObjectException, DataSourceException, CoordinateErrorException, IOException, XmlPullParserException {
         // Parse the queryString to retrieve the individual parts of the query.
 
         List<SegmentQuery> requestedSegments = new ArrayList<SegmentQuery>();
@@ -547,8 +547,203 @@ public class MydasServlet extends HttpServlet {
                 }
             }
         }
-        // TODO Need to report either a single segment with no id, start or stop that describes
-        // TODO all of the types, or several segments, one for each requested segment decribing the types.
+        if (requestedSegments.size() == 0){
+            // Process the types command for all types - not segment specific.
+            typesCommandAllTypes(request, response, dsnConfig, typeFilter);
+        }
+        else {
+            // Process the types command for specific segments.
+            typesCommandSpecificSegments(request, response, dsnConfig, requestedSegments, typeFilter);
+        }
+    }
+
+
+
+    private void typesCommandAllTypes (HttpServletRequest request, HttpServletResponse response,
+                                       DataSourceConfiguration dsnConfig, List<String> typeFilter)
+            throws DataSourceException, XmlPullParserException, IOException {
+        // Handle no segments indicated - just give a single 'dummy' segment that describes the types for the
+        // whole dsn.
+
+        // Build a Map of Types to DasType counts. (the counts being Integer objects set to 'null' until
+        // a count is retrieved.
+        Map<DasType, Integer> allTypesReport = null;
+        Collection<DasType> allTypes = dsnConfig.getDataSource().getTypes();
+        if (allTypes != null){
+            allTypesReport = new HashMap<DasType, Integer>(allTypes.size());
+            for (DasType type : allTypes){
+                if (type != null){
+                    // Check if the type_ids have been filtered in the request.
+                    if (typeFilter.size() == 0 || typeFilter.contains(type.getId())){
+                        // Attempt to get a count of the types from the dsn. (May not be implemented.)
+                        Integer typeCount;
+                        try{
+                            typeCount = dsnConfig.getDataSource().getTotalCountForType (type.getId());
+                        } catch (UnimplementedFeatureException e) {
+                            typeCount = null;
+                        }
+                        allTypesReport.put (type, typeCount);
+                    }
+                }
+            }
+        }
+        else{
+            allTypesReport = Collections.EMPTY_MAP;
+        }
+
+        writeHeader (request, response, STATUS_200_OK, true);
+        // Build the XML.
+        XmlSerializer serializer;
+        serializer = PULL_PARSER_FACTORY.newSerializer();
+        BufferedWriter out = null;
+        try{
+            out = getResponseWriter(request, response);
+            serializer.setOutput(out);
+            serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+            serializer.startDocument(null, false);
+            serializer.text("\n");
+            serializer.docdecl(" DASTYPES SYSTEM \"http://www.biodas.org/dtd/dastypes.dtd\"");
+            serializer.text("\n");
+            // Now the body of the DASTYPES xml.
+            serializer.startTag (DAS_XML_NAMESPACE, "DASTYPES");
+            serializer.startTag (DAS_XML_NAMESPACE, "GFF");
+            serializer.attribute(DAS_XML_NAMESPACE, "version", "1.0");
+            serializer.attribute(DAS_XML_NAMESPACE, "href", this.buildRequestHref(request));
+            serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
+            // No id, start, stop, type attributes.
+            serializer.attribute(DAS_XML_NAMESPACE, "version", dsnConfig.getVersion());
+            serializer.attribute(DAS_XML_NAMESPACE, "label", "Complete datasource summary");
+            // Iterate over the allTypeReport for the TYPE elements.
+            for (DasType type : allTypesReport.keySet()){
+                serializer.startTag(DAS_XML_NAMESPACE, "TYPE");
+                serializer.attribute(DAS_XML_NAMESPACE, "id", type.getId());
+                if (type.getMethod() != null && type.getMethod().length() > 0){
+                    serializer.attribute(DAS_XML_NAMESPACE, "method", type.getMethod());
+                }
+                if (type.getCategory() != null && type.getCategory().length() > 0){
+                    serializer.attribute(DAS_XML_NAMESPACE, "category", type.getCategory());
+                }
+                if (allTypesReport.get(type) != null){
+                    serializer.text(Integer.toString(allTypesReport.get(type)));
+                }
+                serializer.endTag(DAS_XML_NAMESPACE, "TYPE");
+            }
+            serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
+            serializer.endTag (DAS_XML_NAMESPACE, "GFF");
+            serializer.endTag (DAS_XML_NAMESPACE, "DASTYPES");
+        }
+        finally{
+            if (out != null){
+                out.close();
+            }
+        }
+    }
+
+    private void typesCommandSpecificSegments(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, List<SegmentQuery> requestedSegments, List<String> typeFilter)
+            throws DataSourceException, BadReferenceObjectException, XmlPullParserException, IOException {
+        Map <FeaturesReporter, Map<DasType, Integer>> typesReport =
+                new HashMap<FeaturesReporter, Map<DasType, Integer>>(requestedSegments.size());
+        // For each segment, populate the typesReport with 'all types' if necessary and then add types and counts.
+        for (SegmentQuery segmentQuery : requestedSegments){
+            // Try to get the features for this segment
+            DasAnnotatedSegment segment = dsnConfig.getDataSource().getFeatures(segmentQuery.getSegmentId());
+            if (segment != null){
+                FeaturesReporter segmentReporter = new FeaturesReporter(segment, segmentQuery);
+                Map<DasType, Integer> segmentTypes = new HashMap<DasType, Integer>();
+                // Add these objects to the typesReport.
+                typesReport.put(segmentReporter, segmentTypes);
+                /////////////////////////////////////////////////////////////////////////////////////////////
+                // If required in configuration, add all the types from the server to the segmentTypes map
+                if (dsnConfig.isIncludeTypesWithZeroCount()){
+                    Collection<DasType> allTypes = dsnConfig.getDataSource().getTypes();
+                    // Iterate over allTypes and add each type to the segment types report with a count of zero.
+                    for (DasType type : allTypes){
+                        // (Filtering as requested for type ids)
+                        if (type != null && (typeFilter.size() == 0 || typeFilter.contains(type.getId())))
+                            segmentTypes.put(type, 0);
+                    }
+                }
+                // Handled 'include types with zero count'.
+                /////////////////////////////////////////////////////////////////////////////////////////////
+
+                /////////////////////////////////////////////////////////////////////////////////////////////
+                // Now iterate over the features of the segment and update the types report.
+                for (DasFeature feature : segmentReporter.getFeatures(dsnConfig.isFeaturesStrictlyEnclosed())){
+                    // (Filtering as requested for type ids)
+                    if (typeFilter.size() == 0 || typeFilter.contains(feature.getTypeId())){
+                        DasType featureType = new DasType(feature.getTypeId(), feature.getTypeCategory(), feature.getMethodId());
+                        if (segmentTypes.keySet().contains(featureType)){
+                            segmentTypes.put(featureType, segmentTypes.get(featureType) + 1);
+                        }
+                        else {
+                            segmentTypes.put(featureType, 1);
+                        }
+                    }
+                }
+                // Finished with actual features
+                /////////////////////////////////////////////////////////////////////////////////////////////
+            }
+        }
+
+        // OK, successfully built a Map of the types for all the requested segments, so iterate over this and report.
+         writeHeader (request, response, STATUS_200_OK, true);
+        // Build the XML.
+        XmlSerializer serializer;
+        serializer = PULL_PARSER_FACTORY.newSerializer();
+        BufferedWriter out = null;
+        try{
+            out = getResponseWriter(request, response);
+            serializer.setOutput(out);
+            serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+            serializer.startDocument(null, false);
+            serializer.text("\n");
+            serializer.docdecl(" DASTYPES SYSTEM \"http://www.biodas.org/dtd/dastypes.dtd\"");
+            serializer.text("\n");
+            // Now the body of the DASTYPES xml.
+            serializer.startTag (DAS_XML_NAMESPACE, "DASTYPES");
+            serializer.startTag (DAS_XML_NAMESPACE, "GFF");
+            serializer.attribute(DAS_XML_NAMESPACE, "version", "1.0");
+            serializer.attribute(DAS_XML_NAMESPACE, "href", this.buildRequestHref(request));
+            for (FeaturesReporter featureReporter : typesReport.keySet()){
+                serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
+                serializer.attribute(DAS_XML_NAMESPACE, "id", featureReporter.getSegmentId());
+                serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(featureReporter.getStart()));
+                serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(featureReporter.getStop()));
+                if (featureReporter.getType() != null && featureReporter.getType().length() > 0){
+                    serializer.attribute(DAS_XML_NAMESPACE, "type", featureReporter.getType());
+                }
+                serializer.attribute(DAS_XML_NAMESPACE, "version", featureReporter.getVersion());
+                if (featureReporter.getSegmentLabel() != null && featureReporter.getSegmentLabel().length() > 0){
+                    serializer.attribute(DAS_XML_NAMESPACE, "label", featureReporter.getSegmentLabel());
+                }
+                // Now for the types.
+                Map<DasType, Integer> typeMap = typesReport.get(featureReporter);
+                for (DasType type : typeMap.keySet()){
+                    Integer count = typeMap.get(type);
+
+                    serializer.startTag(DAS_XML_NAMESPACE, "TYPE");
+                    serializer.attribute(DAS_XML_NAMESPACE, "id", type.getId());
+                    if (type.getMethod() != null && type.getMethod().length() > 0){
+                        serializer.attribute(DAS_XML_NAMESPACE, "method", type.getMethod());
+                    }
+                    if (type.getCategory() != null && type.getCategory().length() > 0){
+                        serializer.attribute(DAS_XML_NAMESPACE, "category", type.getCategory());
+                    }
+                    if (count != null){
+                        serializer.text(Integer.toString(count));
+                    }
+                    serializer.endTag(DAS_XML_NAMESPACE, "TYPE");
+                }
+                serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
+            }
+            serializer.endTag (DAS_XML_NAMESPACE, "GFF");
+            serializer.endTag (DAS_XML_NAMESPACE, "DASTYPES");
+        }
+        finally{
+            if (out != null){
+                out.close();
+            }
+        }
     }
 
     private void stylesheetCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
@@ -1194,33 +1389,4 @@ public class MydasServlet extends HttpServlet {
         }
         return requestURL.toString();
     }
-
-
-    /*
-
-    // Build the XML.
-            XmlSerializer serializer;
-            serializer = PULL_PARSER_FACTORY.newSerializer();
-            PrintWriter out = null;
-            try{
-                out = getResponseWriter(request, response);
-                serializer.setOutput(out);
-                serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
-                serializer.startDocument(null, false);
-                serializer.text("\n");
-                serializer.docdecl(" DASDSN SYSTEM \"http://www.biodas.org/dtd/dasdsn.dtd\"");
-                serializer.text("\n");
-
-                // Rest of the XML.
-
-                serializer.flush();
-            }
-            finally{
-                if (out != null){
-                    out.close();
-                }
-            }
-
-     */
-
 }

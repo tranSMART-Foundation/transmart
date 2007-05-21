@@ -21,7 +21,7 @@
  *
  */
 
-package uk.ac.ebi.mydas.controller;
+package uk.ac.ebi.mydas.model;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -34,7 +34,7 @@ package uk.ac.ebi.mydas.controller;
  * Loading the types from the server configuration and holding details of the types
  * for a particular request.  Note that the equals method only compares the id.
  */
-public class Type{
+public class DasType {
 
     private String id;
 
@@ -43,7 +43,7 @@ public class Type{
     private String method;
 
 
-    public Type(String id, String category, String method){
+    public DasType(String id, String category, String method){
         if (id == null || id.length() == 0){
             throw new IllegalArgumentException("id must not be null or an empty String");
         }
@@ -64,21 +64,30 @@ public class Type{
         return method;
     }
 
+
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Type type = (Type) o;
+        DasType dasType = (DasType) o;
 
-        return (id.equals(type.id));
+        if (category != null ? !category.equals(dasType.category) : dasType.category != null) return false;
+        if (!id.equals(dasType.id)) return false;
+        if (method != null ? !method.equals(dasType.method) : dasType.method != null) return false;
+
+        return true;
     }
 
     public int hashCode() {
-        return id.hashCode();
+        int result;
+        result = id.hashCode();
+        result = 31 * result + (category != null ? category.hashCode() : 0);
+        result = 31 * result + (method != null ? method.hashCode() : 0);
+        return result;
     }
 
     public String toString(){
-        StringBuffer buf = new StringBuffer("Type.  id: '");
+        StringBuffer buf = new StringBuffer("DasType.  id: '");
         buf .append (id)
             .append ("' category: '")
             .append (category)

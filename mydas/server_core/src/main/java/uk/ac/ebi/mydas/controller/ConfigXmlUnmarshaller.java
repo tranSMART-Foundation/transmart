@@ -28,6 +28,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import uk.ac.ebi.mydas.exceptions.ConfigurationException;
+import uk.ac.ebi.mydas.model.DasType;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -75,11 +76,9 @@ public class ConfigXmlUnmarshaller {
 
     private static final String ELEMENT_USE_FEATURE_ID_FOR_FEATURE_LABEL = "use-feature-id-for-feature-label";
 
-    private static final String ELEMENT_TYPES = "types";
-
-    private static final String ELEMENT_TYPE = "type";
-
     private static final String ELEMENT_DNA_COMMAND_ENABLED = "dna-command-enabled";
+
+    private static final String ELEMENT_INCLUDE_TYPES_WITH_ZERO_COUNT = "include-types-with-zero-count";
 
     private static final String ATTRIBUTE_KEY = "key";
 
@@ -96,14 +95,7 @@ public class ConfigXmlUnmarshaller {
     private static final String ATTRIBUTE_DESCRIPTION = "description";
 
     private static final String ATTRIBUTE_DESCRIPTION_HREF = "description-href";
-
-    private static final String ATTRIBUTE_INCLUDE_TYPES_WITH_ZERO_COUNT = "include-types-with-zero-count";
-
-    private static final String ATTRIBUTE_CATEGORY = "category";
-
-    private static final String ATTRIBUTE_METHOD = "method";
-
-
+    
     /**
 	 * Define a static logger variable so that it references the
 	 * Logger instance named "XMLUnmarshaller".
@@ -324,15 +316,15 @@ public class ConfigXmlUnmarshaller {
             throws IOException, XmlPullParserException, ConfigurationException{
 
         // Retrieve all the attributes of the datasource element first.
-        String id = xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_ID);
-        String name = xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_NAME);
+        String id = nullifyEmptyString(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_ID));
+        String name = nullifyEmptyString(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_NAME));
         String version = nullifyEmptyString(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_VERSION));
-        String mapmaster = xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_MAPMASTER);
+        String mapmaster = nullifyEmptyString(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_MAPMASTER));
         String description = nullifyEmptyString(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_DESCRIPTION));
-        String hrefString = xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_DESCRIPTION_HREF);
+        String hrefString = nullifyEmptyString(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_DESCRIPTION_HREF));
         URL descriptionHref;
         try{
-            descriptionHref = (hrefString == null || hrefString.length() == 0)
+            descriptionHref = (hrefString == null)
                 ? null
                 : new URL(hrefString);
         }
@@ -349,14 +341,12 @@ public class ConfigXmlUnmarshaller {
         boolean featuresStrictlyEnclosed = false;
         boolean useFeatureIdForFeatureLabel = false;
         boolean includeTypesWithZeroCount = false;
-        Collection<Type> types = new ArrayList<Type>();
-
 
         while (! (xpp.next() == XmlPullParser.END_TAG && ELEMENT_DATASOURCE.equals(xpp.getName()))) {
             if (xpp.getEventType() == XmlPullParser.START_TAG) {
                 final String tagName = xpp.getName();
 				if (ELEMENT_CLASS.equals(tagName)) {
-                    className = processSimpleElementTextOnly(xpp, ELEMENT_CLASS, true);
+                    className = nullifyEmptyString(processSimpleElementTextOnly(xpp, ELEMENT_CLASS, true));
                 }
                 else if (ELEMENT_STYLESHEET.equals(tagName)){
                     styleSheet = nullifyEmptyString(processSimpleElementTextOnly(xpp, ELEMENT_STYLESHEET, false));
@@ -373,32 +363,26 @@ public class ConfigXmlUnmarshaller {
                 else if (ELEMENT_USE_FEATURE_ID_FOR_FEATURE_LABEL.equals(tagName)){
                     useFeatureIdForFeatureLabel = "true".equalsIgnoreCase(processSimpleElementTextOnly(xpp, ELEMENT_USE_FEATURE_ID_FOR_FEATURE_LABEL, true));
                 }
-                else if (ELEMENT_TYPES.equals(tagName)){
-                    includeTypesWithZeroCount = "true".equalsIgnoreCase(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_INCLUDE_TYPES_WITH_ZERO_COUNT));
-                }
-                else if (ELEMENT_TYPE.equals(tagName)){
-                    Type type = processTypesElement(xpp);
-                    if (type != null){
-                        types.add (type);
-                    }
+                else if (ELEMENT_INCLUDE_TYPES_WITH_ZERO_COUNT.equals(tagName)){
+                    includeTypesWithZeroCount = "true".equalsIgnoreCase(processSimpleElementTextOnly(xpp, ELEMENT_INCLUDE_TYPES_WITH_ZERO_COUNT, true));
                 }
             }
         }
 
         // Check for incomplete data.
-        if (className == null || className.length() == 0){
+        if (className == null){
             throw new ConfigurationException("Please check your XML configuration file.  No value has been given for one of the /mydasserver/datasources/datasource/class elements.");
         }
 
-        if (id == null || id.length() == 0){
+        if (id == null){
             throw new ConfigurationException("Please check your XML configuration file.  No value has been given for one of the mandatory /mydasserver/datasources/datasource/@id attributes.");
         }
 
-        if (name == null || name.length() == 0){
+        if (name == null){
             throw new ConfigurationException("Please check your XML configuration file.  No value has been given for one of the mandatory /mydasserver/datasources/datasource/@name attributes.");
         }
 
-        if (mapmaster == null || mapmaster.length() == 0){
+        if (mapmaster == null){
             throw new ConfigurationException("Please check your XML configuration file.  No value has been given for one of the mandatory /mydasserver/datasources/datasource/@mapmaster attributes.");
         }
 
@@ -407,26 +391,9 @@ public class ConfigXmlUnmarshaller {
                 dnaCommandEnabled,
                 featuresStrictlyEnclosed,
                 useFeatureIdForFeatureLabel,
-                includeTypesWithZeroCount,
-                types);
+                includeTypesWithZeroCount
+        );
     }
-
-    private Type processTypesElement(XmlPullParser xpp) throws IOException, XmlPullParserException, ConfigurationException {
-        String id = null;
-        String category = null;
-        String method = null;
-
-        id = xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_ID);
-        category = xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_CATEGORY);
-        method = xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_METHOD);
-
-        if (id == null || id.length() == 0){
-            throw new ConfigurationException("A type tag has been included in the server configuration XML with no value for the id attribute.");
-        }
-
-        return new Type(id, category, method);
-    }
-
 
     /**
      * Helper method that adds a property (key, value pair) to the Map of properties
@@ -435,9 +402,9 @@ public class ConfigXmlUnmarshaller {
      * @param propertyMap the Map of properties to be populated.
      */
     private void processProperty(XmlPullParser xpp, Map<String, String> propertyMap) {
-        String key = xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_KEY);
-        String value = xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_VALUE);
-        if (key != null && value != null && key.length() > 0 && value.length() > 0){
+        String key = nullifyEmptyString(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_KEY));
+        String value = nullifyEmptyString(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_VALUE));
+        if (key != null && value != null){
             propertyMap.put(key, value);
         }
     }
@@ -449,7 +416,7 @@ public class ConfigXmlUnmarshaller {
      * @return a String with 1 or more characters, or null.
      */
     private String nullifyEmptyString(String value){
-        if (value != null && value.length() == 0){
+        if (value != null && value.trim().length() == 0){
             return null;
         }
         else {
