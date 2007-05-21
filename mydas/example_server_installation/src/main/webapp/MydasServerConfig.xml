@@ -85,17 +85,12 @@
             provided, this will override the feature id.) -->
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             
-            <!-- Includes a list of types that are reported by the types command.
-            If include-types-with-zero-count='true' then all of the types specified in this element
-            will be listed by the types command
-            even if they do not appear for the requested segment.
+            <!--
+            If include-types-with-zero-count='true' then all of the types present in the data source
+            will be listed by the types command even if they do not appear for the requested segment.
             If 'false', if the types command includes 'segment' arguments, only the feature types
             actually annotated on the requested segments will be listed.-->
-            <types include-types-with-zero-count="true">
-                <type id="oneFeatureTypeIdOne" category="oneFeatureCategoryOne" method="oneFeatureMethodIdOne"/>
-                <type id="oneFeatureTypeIdTwo" category="oneFeatureCategoryTwo" method="oneFeatureMethodIdTwo"/>
-                <type id="twoFeatureTypeIdOne" category="twoFeatureCategoryOne" method="twoFeatureMethodIdOne"/>
-            </types>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
             
             <!-- These properties are made available to the plugin class
             through the DataSource interface, so the plugin author can 

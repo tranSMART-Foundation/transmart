@@ -133,7 +133,7 @@ public class TESTDataSource implements ReferenceDataSource {
                         "one Feature Label One",
                         "oneFeatureTypeIdOne",
                         "oneFeatureCategoryOne",
-                        "one Feature Type Label One",
+                        "one Feature DasType Label One",
                         "oneFeatureMethodIdOne",
                         "one Feature Method Label One",
                         5,
@@ -151,7 +151,7 @@ public class TESTDataSource implements ReferenceDataSource {
                         "one Feature Label Two",
                         "oneFeatureTypeIdTwo",
                         "oneFeatureCategoryTwo",
-                        "one Feature Type Label Two",
+                        "one Feature DasType Label Two",
                         "oneFeatureMethodIdTwo",
                         "one Feature Method Label Two",
                         18,
@@ -173,7 +173,7 @@ public class TESTDataSource implements ReferenceDataSource {
                         "two Feature Label One",
                         "twoFeatureTypeIdOne",
                         "twoFeatureCategoryOne",
-                        "two Feature Type Label One",
+                        "two Feature DasType Label One",
                         "twoFeatureMethodIdOne",
                         "two Featur eMethod Label One",
                         9,
@@ -285,6 +285,31 @@ public class TESTDataSource implements ReferenceDataSource {
     }
 
     /**
+     * This method is used to implement the DAS types command.  (See <a href="http://biodas.org/documents/spec.html#types">
+     * DAS 1.53 Specification : types command</a>.  This method should return a Collection containing <b>all</b> the
+     * types described by the data source (one DasType object for each type ID).
+     * <p/>
+     * For some data sources it may be desirable to populate this Collection from a configuration file or to
+     *
+     * @return a Collection of DasType objects - one for each type id described by the data source.
+     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
+     *          should be thrown if there is any
+     *          fatal problem with loading this data source.  <bold>It is highly desirable
+     *          for the implementation to test itself in this init method and throw
+     *          a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
+     *          and read a record.</bold>
+     */
+    public Collection<DasType> getTypes() throws DataSourceException {
+        Collection<DasType> types = new ArrayList<DasType>(5);
+        types.add (new DasType("oneFeatureTypeIdOne", "oneFeatureCategoryOne", "oneFeatureMethodIdOne"));
+        types.add (new DasType("oneFeatureTypeIdTwo", "oneFeatureCategoryTwo", "oneFeatureMethodIdTwo"));
+        types.add (new DasType("twoFeatureTypeIdOne", "twoFeatureCategoryOne", "twoFeatureMethodIdOne"));
+        types.add (new DasType("Chromosome", null, null));
+        types.add (new DasType("Contig", null, null));
+        return types;
+    }
+
+    /**
      * <b>For some Datasources, especially ones with many entry points, this method may be hard or impossible
      * to implement.  If this is the case, you should just throw an {@link uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException} as your
      * implementation of this method, so that a suitable error HTTP header
@@ -328,6 +353,43 @@ public class TESTDataSource implements ReferenceDataSource {
      */
     public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Collection<String> groupIdCollection) throws UnimplementedFeatureException, DataSourceException {
         throw new UnimplementedFeatureException("\"This test class, it is not ready yet!\" (in a Swedish accent)");
+    }
+
+    /**
+     * This method allows the DAS server to report a total count for a particular type ID
+     * for all annotations across the entire data source.  If it is not possible to retrieve this value from your dsn, you
+     * should throw a {@link uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException} to indicate this.
+     *
+     * @param typeId as a String.  Please see <a href="http://biodas.org/documents/spec.html#types">
+     *               DAS 1.53 Specification : types command</a>
+     * @return The total count <i>across the entire data source</i> (not
+     *         just for one segment) for the specified type id.
+     */
+    public int getTotalCountForType(String typeId) throws UnimplementedFeatureException, DataSourceException {
+        return 0;
+    }
+
+    /**
+     * The mydas DAS server implements caching within the server.  This method is provided to allow the DSN to warn
+     * the mydas server that the cache should be emptied for this data source, because (for example) the underlying
+     * data source has changed.
+     * <p/>
+     * (This method will always be called prior to returning data to clients from the cache).
+     * <p/>
+     * The most simple implementation of this method, i.e. for a static data source, should simply return false
+     * so that caching is used.
+     *
+     * @return false if it is safe to use cached data.  True if the underlying data source has changed, so cached data
+     *         may be dirty.
+     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
+     *          should be thrown if there is any
+     *          fatal problem with loading this data source.  <bold>It is highly desirable for the implementation
+     *          to test itself in this init method and throw
+     *          a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
+     *          and read a record.</bold>
+     */
+    public boolean emptyCache() throws DataSourceException {
+        return false;
     }
 
     /**
