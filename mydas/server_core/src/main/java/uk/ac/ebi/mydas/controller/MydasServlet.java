@@ -133,11 +133,23 @@ public class MydasServlet extends HttpServlet {
     private static final String COMMAND_DSN = "dsn";
     private static final String COMMAND_DNA = "dna";
     private static final String COMMAND_TYPES = "types";
+    private static final String COMMAND_LINK = "link";
     private static final String COMMAND_STYLESHEET = "stylesheet";
     private static final String COMMAND_FEATURES = "features";
     private static final String COMMAND_ENTRY_POINTS = "entry_points";
     private static final String COMMAND_SEQUENCE = "sequence";
 
+    /**
+     * List<String> of valid 'field' parameters for the link command.
+     */
+    public static final List<String> VALID_LINK_COMMAND_FIELDS = new ArrayList<String>(5);
+    static {
+        VALID_LINK_COMMAND_FIELDS.add(AnnotationDataSource.LINK_FIELD_CATEGORY);
+        VALID_LINK_COMMAND_FIELDS.add(AnnotationDataSource.LINK_FIELD_FEATURE);
+        VALID_LINK_COMMAND_FIELDS.add(AnnotationDataSource.LINK_FIELD_METHOD);
+        VALID_LINK_COMMAND_FIELDS.add(AnnotationDataSource.LINK_FIELD_TARGET);
+        VALID_LINK_COMMAND_FIELDS.add(AnnotationDataSource.LINK_FIELD_TYPE);
+    }
     /*
         Response Header line keys
      */
@@ -294,7 +306,7 @@ public class MydasServlet extends HttpServlet {
                     if (dataSourceConfig != null){
                         // Check the datasource is alive.
                         if (dataSourceConfig.isOK()){
-                            if (COMMAND_DNA.equals(command)){
+                            if      (COMMAND_DNA.equals(command)){
                                 dnaCommand (request, response, dataSourceConfig, queryString);
                             }
                             else if (COMMAND_TYPES.equals(command)){
@@ -311,6 +323,9 @@ public class MydasServlet extends HttpServlet {
                             }
                             else if (COMMAND_SEQUENCE.equals(command)){
                                 sequenceCommand (request, response, dataSourceConfig, queryString);
+                            }
+                            else if (COMMAND_LINK.equals(command)){
+                                linkCommand (response, dataSourceConfig, queryString);
                             }
                             else {
                                 throw new BadCommandException("The command is not recognised.");
@@ -797,6 +812,43 @@ public class MydasServlet extends HttpServlet {
                 writer.close();
             }
         }
+    }
+
+    private void linkCommand(HttpServletResponse response, DataSourceConfiguration dataSourceConfig, String queryString)
+            throws IOException, BadCommandArgumentsException, DataSourceException, UnimplementedFeatureException {
+        // Parse the request
+        if (queryString == null || queryString.length() == 0){
+            throw new BadCommandArgumentsException("The link command has been called with no arguments.");
+        }
+        String[] queryParts = queryString.split(";");
+        if (queryParts.length != 2){
+            throw new BadCommandArgumentsException("The wrong number of arguments have been passed to the link command.");
+        }
+        String field = null;
+        String id = null;
+        for (String keyValuePair : queryParts){
+            // Split the key=value pairs
+            String[] queryPartKeysValues = keyValuePair.split("=");
+            if (queryPartKeysValues.length != 2){
+                throw new BadCommandArgumentsException("keys and values cannot be extracted from the arguments to the link command");
+            }
+            if ("field".equals(queryPartKeysValues[0])){
+                field = queryPartKeysValues[1];
+            }
+            else if ("id".equals(queryPartKeysValues[0])){
+                id = queryPartKeysValues[1];
+            }
+            else {
+                throw new BadCommandArgumentsException("unknown key to one of the command arguments to the link command");
+            }
+        }
+        if (field == null || ! VALID_LINK_COMMAND_FIELDS.contains(field) || id == null){
+            throw new BadCommandArgumentsException("The link command must be passed a valid field and id argument.");
+        }
+
+        URL url = dataSourceConfig.getDataSource().getLinkURL(field, id);
+
+        response.sendRedirect(url.toString());
     }
 
     private void featuresCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
