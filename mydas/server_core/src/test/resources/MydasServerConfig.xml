@@ -68,11 +68,7 @@
             <dna-command-enabled>true</dna-command-enabled>
             <features-strictly-enclosed>true</features-strictly-enclosed>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
-            <types include-types-with-zero-count="true">
-                <type id="HELIX" category="Structure" method="X-ray"/>
-                <type id="STRAND" category="Structure" method="X-ray"/>
-                <type id="VARSPLIC" category="Variant"/>
-            </types>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
             <property key="dsn1key1" value="dsn1value1"/>
             <property key="dsn1key2" value="dsn1value2"/>
         </datasource>
@@ -86,7 +82,7 @@
             <dna-command-enabled>false</dna-command-enabled>
             <features-strictly-enclosed>false</features-strictly-enclosed>
             <use-feature-id-for-feature-label>false</use-feature-id-for-feature-label>
-            <types include-types-with-zero-count="false"/>
+            <include-types-with-zero-count>false</include-types-with-zero-count>
         </datasource>
     </datasources>
 </mydasserver>

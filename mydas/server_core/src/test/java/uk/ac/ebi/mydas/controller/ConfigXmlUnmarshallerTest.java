@@ -141,7 +141,6 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                     Assert.assertTrue("features-strictly-enclosed not as expected", dsnConfig.isFeaturesStrictlyEnclosed());
                     Assert.assertTrue("use-feature-id-for-feature-label", dsnConfig.isUseFeatureIdForFeatureLabel());
                     Assert.assertTrue("include-types-with-zero-count", dsnConfig.isIncludeTypesWithZeroCount());
-                    Assert.assertEquals("Unexpected number of types returned", dsnConfig.getTypes().size(), 3);
                 }
                 else if ("dsnId2".equals (dsnConfig.getId())){
                     found2 = true;
@@ -169,7 +168,6 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                     Assert.assertFalse("features-strictly-enclosed not as expected", dsnConfig.isFeaturesStrictlyEnclosed());
                     Assert.assertFalse("use-feature-id-for-feature-label", dsnConfig.isUseFeatureIdForFeatureLabel());
                     Assert.assertFalse("include-types-with-zero-count", dsnConfig.isIncludeTypesWithZeroCount());
-                    Assert.assertEquals("Unexpected number of types returned", dsnConfig.getTypes().size(), 0);
                 }
             }
             Assert.assertTrue("Did not find dsn1 definition.", found1);
