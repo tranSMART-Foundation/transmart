@@ -37,7 +37,7 @@ import java.util.Collection;
  * Wraps a DasAnnotatedSegment object with details of the request encapsulated, i.e. the requested
  * start and stop coordinates.
  */
-public class FeaturesReporter {
+public class FoundFeaturesReporter implements FeaturesReporter {
 
     private boolean restricted;
 
@@ -47,14 +47,14 @@ public class FeaturesReporter {
 
     private DasAnnotatedSegment annotatedSegment;
 
-    FeaturesReporter(DasAnnotatedSegment annotatedSegment, SegmentQuery segmentQuery){
+    FoundFeaturesReporter(DasAnnotatedSegment annotatedSegment, SegmentQuery segmentQuery){
         this.restricted = segmentQuery.getStartCoordinate() != null;
         this.requestedStart = segmentQuery.getStartCoordinate();
         this.requestedStop = segmentQuery.getStopCoordinate();
         this.annotatedSegment = annotatedSegment;
     }
 
-    FeaturesReporter(DasAnnotatedSegment annotatedSegment){
+    FoundFeaturesReporter(DasAnnotatedSegment annotatedSegment){
         this.restricted = false;
         this.annotatedSegment = annotatedSegment;
     }
@@ -65,19 +65,19 @@ public class FeaturesReporter {
                 : annotatedSegment.getFeatures();
     }
 
-    int getStart(){
+    public int getStart(){
         return (restricted)
                 ? requestedStart
                 : annotatedSegment.getStartCoordinate();
     }
 
-    int getStop(){
+    public int getStop(){
         return (restricted)
                 ? requestedStop
                 : annotatedSegment.getStopCoordinate();
     }
 
-    String getSegmentId(){
+    public String getSegmentId(){
         return annotatedSegment.getSegmentId();
     }
 

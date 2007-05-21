@@ -167,7 +167,7 @@ public interface AnnotationDataSource {
      * <b>group_id</b> (zero or more; new in 1.5)<br/>
      * The <b>group_id</b> argument, is similar to <b>feature_id</b>, but retrieves segments that contain
      * the indicated feature group."  (Direct quote from the DAS 1.53 specification, available from
-     * <a href="http://biodas.org/documents/spec.html">http://biodas.org/documents/spec.html</a>.)
+     * <a href="http://biodas.org/documents/spec.html#features">http://biodas.org/documents/spec.html#features</a>.)
      *
      * Note that if segments are included in the request, this method is not used, so feature_id and group_id
      * filters accompanying a list of segments will work correctly, even if your implementation of this method throws an

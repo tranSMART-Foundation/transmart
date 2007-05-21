@@ -393,6 +393,54 @@ public class TESTDataSource implements ReferenceDataSource {
     }
 
     /**
+     * This method returns a URL, based upon a request built as part of the DAS 'link' command.
+     * The nature of this URL is entirely up to the data source implementor.
+     * <p/>
+     * The mydas servlet will redirect to the URL provided.  This command is intended for use in an internet browser,
+     * so the URL returned should be a valid internet address.  The page can return content of any MIME type and
+     * is intended to be 'human readable' rather than material for consumption by a DAS client.
+     * <p/>
+     * The link command takes two mandatory
+     * arguments:
+     * <ul>
+     * <li>
+     * a 'field' parameter which is limited to one of five valid values.  This method is guaranteed
+     * to be called with the 'field' parameter set to one of these values (any other request will be handled as
+     * an error by the mydas DAS server servlet.)  The 'field' parameter will be one of the five static String constants
+     * that are members of the AnnotationDataSource interface.
+     * </li>
+     * <li>
+     * an 'id' field.  Again, this will be validated by the mydas servlet to ensure that it
+     * is a non-null, non-zero length String.
+     * </li>
+     * See <a href="http://biodas.org/documents/spec.html#feature_linking">DAS 1.53 Specification: Linking to a Feature</a>
+     * for details.
+     * <p/>
+     * If your data source does not implement this method, an UnimplementedFeatureException should be thrown.
+     *
+     * @param field one of 'feature', 'type', 'method', 'category' or 'target' as documented in the DAS 1.53
+     *              specification
+     * @param id    being the ID of the indicated annotation field
+     * @return a valid URL.
+     * @throws uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException
+     *          in the event that the DAS data source
+     *          does not implement the link command
+     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
+     *          should be thrown if there is any
+     *          fatal problem with loading this data source.  <bold>It is highly desirable for the implementation
+     *          to test itself in this init method and throw
+     *          a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
+     *          and read a record.</bold>
+     */
+    public URL getLinkURL(String field, String id) throws UnimplementedFeatureException, DataSourceException {
+        try{
+        return new URL("http://code.google.com/p/mydas/");
+        } catch (MalformedURLException e) {
+            throw new DataSourceException("Invalid URL!", e);
+        }
+    }
+
+    /**
      * Returns a Collection of {@link DasEntryPoint} objects to implement the entry_point command.
      *
      * @return a Collection of {@link DasEntryPoint} objects

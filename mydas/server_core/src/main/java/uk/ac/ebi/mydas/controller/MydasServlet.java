@@ -275,9 +275,9 @@ public class MydasServlet extends HttpServlet {
         try{
             // Belt and braces to ensure that no null pointers are thrown later.
             if (DATA_SOURCE_MANAGER == null ||
-                DATA_SOURCE_MANAGER.getServerConfiguration() == null ||
-                DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration() == null ||
-                DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap() == null){
+                    DATA_SOURCE_MANAGER.getServerConfiguration() == null ||
+                    DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration() == null ||
+                    DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap() == null){
 
                 throw new ConfigurationException("The datasources were not initialized successfully.");
             }
@@ -656,14 +656,14 @@ public class MydasServlet extends HttpServlet {
 
     private void typesCommandSpecificSegments(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, List<SegmentQuery> requestedSegments, List<String> typeFilter)
             throws DataSourceException, BadReferenceObjectException, XmlPullParserException, IOException {
-        Map <FeaturesReporter, Map<DasType, Integer>> typesReport =
-                new HashMap<FeaturesReporter, Map<DasType, Integer>>(requestedSegments.size());
+        Map <FoundFeaturesReporter, Map<DasType, Integer>> typesReport =
+                new HashMap<FoundFeaturesReporter, Map<DasType, Integer>>(requestedSegments.size());
         // For each segment, populate the typesReport with 'all types' if necessary and then add types and counts.
         for (SegmentQuery segmentQuery : requestedSegments){
             // Try to get the features for this segment
             DasAnnotatedSegment segment = dsnConfig.getDataSource().getFeatures(segmentQuery.getSegmentId());
             if (segment != null){
-                FeaturesReporter segmentReporter = new FeaturesReporter(segment, segmentQuery);
+                FoundFeaturesReporter segmentReporter = new FoundFeaturesReporter(segment, segmentQuery);
                 Map<DasType, Integer> segmentTypes = new HashMap<DasType, Integer>();
                 // Add these objects to the typesReport.
                 typesReport.put(segmentReporter, segmentTypes);
@@ -701,7 +701,7 @@ public class MydasServlet extends HttpServlet {
         }
 
         // OK, successfully built a Map of the types for all the requested segments, so iterate over this and report.
-         writeHeader (request, response, STATUS_200_OK, true);
+        writeHeader (request, response, STATUS_200_OK, true);
         // Build the XML.
         XmlSerializer serializer;
         serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -719,7 +719,7 @@ public class MydasServlet extends HttpServlet {
             serializer.startTag (DAS_XML_NAMESPACE, "GFF");
             serializer.attribute(DAS_XML_NAMESPACE, "version", "1.0");
             serializer.attribute(DAS_XML_NAMESPACE, "href", this.buildRequestHref(request));
-            for (FeaturesReporter featureReporter : typesReport.keySet()){
+            for (FoundFeaturesReporter featureReporter : typesReport.keySet()){
                 serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
                 serializer.attribute(DAS_XML_NAMESPACE, "id", featureReporter.getSegmentId());
                 serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(featureReporter.getStart()));
@@ -775,7 +775,7 @@ public class MydasServlet extends HttpServlet {
         // These next lines look like potential null-pointer hell - but note that this has been checked robustly in the
         // calling method, so all OK.
         else if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDefaultStyleSheet() != null
-            && DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDefaultStyleSheet().trim().length() > 0){
+                && DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDefaultStyleSheet().trim().length() > 0){
             stylesheetFileName = DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDefaultStyleSheet().trim();
         }
         else {
@@ -787,9 +787,9 @@ public class MydasServlet extends HttpServlet {
         BufferedWriter writer = null;
         try{
             reader = new BufferedReader(
-                  new InputStreamReader (
+                    new InputStreamReader (
                             getServletContext().getResourceAsStream(RESOURCE_FOLDER + stylesheetFileName)
-                  )
+                    )
             );
 
             if (reader.ready()){
@@ -847,13 +847,12 @@ public class MydasServlet extends HttpServlet {
         }
 
         URL url = dataSourceConfig.getDataSource().getLinkURL(field, id);
-
-        response.sendRedirect(url.toString());
+        response.sendRedirect(response.encodeRedirectURL(url.toString()));
     }
 
     private void featuresCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
             throws XmlPullParserException, IOException, DataSourceException, BadCommandArgumentsException,
-            BadReferenceObjectException, CoordinateErrorException, UnimplementedFeatureException {
+            UnimplementedFeatureException {
         // Parse the queryString to retrieve the individual parts of the query.
         if (queryString == null || queryString.length() == 0){
             throw new BadCommandArgumentsException("Expecting at least one reference in the query string, but found nothing.");
@@ -938,7 +937,7 @@ public class MydasServlet extends HttpServlet {
                 if (annotatedSegments != null){
                     featuresReporterCollection = new ArrayList<FeaturesReporter>(annotatedSegments.size());
                     for (DasAnnotatedSegment segment : annotatedSegments){
-                        featuresReporterCollection.add (new FeaturesReporter(segment));
+                        featuresReporterCollection.add (new FoundFeaturesReporter(segment));
                     }
                 }
                 else {
@@ -950,7 +949,7 @@ public class MydasServlet extends HttpServlet {
                 throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
             }
         }
-        // OK - got a Collection of FeaturesReporter objects, so get on with marshalling them out.
+        // OK - got a Collection of FoundFeaturesReporter objects, so get on with marshalling them out.
         writeHeader (request, response, STATUS_200_OK, true);
 
         /************************************************************************\
@@ -961,6 +960,7 @@ public class MydasServlet extends HttpServlet {
         serializer = PULL_PARSER_FACTORY.newSerializer();
         BufferedWriter out = null;
         try{
+            boolean referenceSource = dsnConfig.getDataSource() instanceof ReferenceDataSource;
             out = getResponseWriter(request, response);
             serializer.setOutput(out);
             serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
@@ -975,127 +975,137 @@ public class MydasServlet extends HttpServlet {
             serializer.attribute(DAS_XML_NAMESPACE, "version", "1.0");
             serializer.attribute(DAS_XML_NAMESPACE, "href", buildRequestHref(request));
             for (FeaturesReporter featuresReporter : featuresReporterCollection){
-                serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
-                serializer.attribute(DAS_XML_NAMESPACE, "id", featuresReporter.getSegmentId());
-                serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(featuresReporter.getStart()));
-                serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(featuresReporter.getStop()));
-                if (featuresReporter.getType() != null && featuresReporter.getType().length() > 0){
-                    serializer.attribute(DAS_XML_NAMESPACE, "type", featuresReporter.getType());
+                if (featuresReporter instanceof UnknownSegmentReporter){
+                    serializer.startTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
+                    serializer.attribute(DAS_XML_NAMESPACE, "id", featuresReporter.getSegmentId());
+                    serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(featuresReporter.getStart()));
+                    serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(featuresReporter.getStop()));
+                    serializer.endTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
                 }
-                serializer.attribute(DAS_XML_NAMESPACE, "version", featuresReporter.getVersion());
-                if (featuresReporter.getSegmentLabel() != null && featuresReporter.getSegmentLabel().length() > 0){
-                    serializer.attribute(DAS_XML_NAMESPACE, "label", featuresReporter.getSegmentLabel());
-                }
-                for (DasFeature feature : featuresReporter.getFeatures(dsnConfig.isFeaturesStrictlyEnclosed())){
-                    // Check the feature passes the filter.
-                    if (filter.featurePasses(feature)){
-                        serializer.startTag(DAS_XML_NAMESPACE, "FEATURE");
-                        serializer.attribute(DAS_XML_NAMESPACE, "id", feature.getFeatureId());
-                        if (feature.getFeatureLabel() != null && feature.getFeatureLabel().length() > 0){
-                            serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureLabel());
-                        }
-                        else if (dsnConfig.isUseFeatureIdForFeatureLabel()){
-                            serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureId());
-                        }
-
-                        // TYPE element
-                        serializer.startTag(DAS_XML_NAMESPACE, "TYPE");
-                        serializer.attribute(DAS_XML_NAMESPACE, "id", feature.getTypeId());
-
-                        // Handle DasReferenceFeatures.
-                        if (feature instanceof DasComponentFeature){
-                            DasComponentFeature refFeature = (DasComponentFeature) feature;
-                            serializer.attribute(DAS_XML_NAMESPACE, "reference", "yes");
-                            serializer.attribute(DAS_XML_NAMESPACE, "superparts", (refFeature.hasSuperParts()) ? "yes" : "no");
-                            serializer.attribute(DAS_XML_NAMESPACE, "subparts", (refFeature.hasSubParts()) ? "yes" : "no");
-                        }
-                        if (categorize){
-                            if (feature.getTypeCategory() != null && feature.getTypeCategory().length() > 0){
-                                serializer.attribute(DAS_XML_NAMESPACE, "category", feature.getTypeCategory());
-                            }
-                            else {
-                                // To prevent the DAS server from dying, if no category has been set, but
-                                // a category is required, spit out the type ID again as the category.
-                                serializer.attribute(DAS_XML_NAMESPACE, "category", feature.getTypeId());
-                            }
-                        }
-                        if (feature.getTypeLabel() != null && feature.getTypeLabel().length() > 0){
-                            serializer.text(feature.getTypeLabel());
-                        }
-                        serializer.endTag(DAS_XML_NAMESPACE, "TYPE");
-
-                        // METHOD element
-                        serializer.startTag(DAS_XML_NAMESPACE, "METHOD");
-                        if (feature.getMethodId() != null && feature.getMethodId().length() > 0){
-                            serializer.attribute(DAS_XML_NAMESPACE, "id", feature.getMethodId());
-                        }
-                        if (feature.getMethodLabel() != null && feature.getMethodLabel().length() > 0){
-                            serializer.text(feature.getMethodLabel());
-                        }
-                        serializer.endTag(DAS_XML_NAMESPACE, "METHOD");
-
-                        // START element
-                        serializer.startTag(DAS_XML_NAMESPACE, "START");
-                        serializer.text(Integer.toString(feature.getStartCoordinate()));
-                        serializer.endTag(DAS_XML_NAMESPACE, "START");
-
-                        // END element
-                        serializer.startTag(DAS_XML_NAMESPACE, "END");
-                        serializer.text(Integer.toString(feature.getStopCoordinate()));
-                        serializer.endTag(DAS_XML_NAMESPACE, "END");
-
-                        // SCORE element
-                        serializer.startTag(DAS_XML_NAMESPACE, "SCORE");
-                        serializer.text ((feature.getScore() == null) ? "-" : Double.toString(feature.getScore()));
-                        serializer.endTag(DAS_XML_NAMESPACE, "SCORE");
-
-                        // ORIENTATION element
-                        serializer.startTag(DAS_XML_NAMESPACE, "ORIENTATION");
-                        serializer.text (feature.getOrientation());
-                        serializer.endTag(DAS_XML_NAMESPACE, "ORIENTATION");
-
-                        // PHASE element
-                        serializer.startTag(DAS_XML_NAMESPACE, "PHASE");
-                        serializer.text (feature.getPhase());
-                        serializer.endTag(DAS_XML_NAMESPACE, "PHASE");
-
-                        // NOTE elements
-                        serializeFeatureNoteElements(feature.getNotes(), serializer);
-
-                        // LINK elements
-                        serializeFeatureLinkElements(feature.getLinks(), serializer);
-
-                        // TARGET elements
-                        serializeFeatureTargetElements(feature.getTargets(), serializer);
-
-                        // GROUP elements
-                        if (feature.getGroups() != null){
-                            for (DasGroup group : feature.getGroups()){
-                                serializer.startTag(DAS_XML_NAMESPACE, "GROUP");
-                                serializer.attribute(DAS_XML_NAMESPACE, "id", group.getGroupId());
-                                if (group.getGroupLabel() != null && group.getGroupLabel().length() > 0){
-                                    serializer.attribute(DAS_XML_NAMESPACE, "label", group.getGroupLabel());
-                                }
-                                if (group.getGroupType() != null && group.getGroupType().length() > 0){
-                                    serializer.attribute(DAS_XML_NAMESPACE, "type", group.getGroupType());
-                                }
-                                // GROUP/NOTE elements
-                                serializeFeatureNoteElements(group.getNotes(), serializer);
-
-                                // GROUP/LINK elements
-                                serializeFeatureLinkElements(group.getLinks(), serializer);
-
-                                // GROUP/TARGET elements
-                                serializeFeatureTargetElements(group.getTargets(), serializer);
-
-                                serializer.endTag(DAS_XML_NAMESPACE, "GROUP");
-                            }
-                        }
-
-                        serializer.endTag(DAS_XML_NAMESPACE, "FEATURE");
+                else {
+                    FoundFeaturesReporter foundFeaturesReporter = (FoundFeaturesReporter) featuresReporter;
+                    serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
+                    serializer.attribute(DAS_XML_NAMESPACE, "id", foundFeaturesReporter.getSegmentId());
+                    serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(foundFeaturesReporter.getStart()));
+                    serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(foundFeaturesReporter.getStop()));
+                    if (foundFeaturesReporter.getType() != null && foundFeaturesReporter.getType().length() > 0){
+                        serializer.attribute(DAS_XML_NAMESPACE, "type", foundFeaturesReporter.getType());
                     }
+                    serializer.attribute(DAS_XML_NAMESPACE, "version", foundFeaturesReporter.getVersion());
+                    if (foundFeaturesReporter.getSegmentLabel() != null && foundFeaturesReporter.getSegmentLabel().length() > 0){
+                        serializer.attribute(DAS_XML_NAMESPACE, "label", foundFeaturesReporter.getSegmentLabel());
+                    }
+                    for (DasFeature feature : foundFeaturesReporter.getFeatures(dsnConfig.isFeaturesStrictlyEnclosed())){
+                        // Check the feature passes the filter.
+                        if (filter.featurePasses(feature)){
+                            serializer.startTag(DAS_XML_NAMESPACE, "FEATURE");
+                            serializer.attribute(DAS_XML_NAMESPACE, "id", feature.getFeatureId());
+                            if (feature.getFeatureLabel() != null && feature.getFeatureLabel().length() > 0){
+                                serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureLabel());
+                            }
+                            else if (dsnConfig.isUseFeatureIdForFeatureLabel()){
+                                serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureId());
+                            }
+
+                            // TYPE element
+                            serializer.startTag(DAS_XML_NAMESPACE, "TYPE");
+                            serializer.attribute(DAS_XML_NAMESPACE, "id", feature.getTypeId());
+
+                            // Handle DasReferenceFeatures.
+                            if (feature instanceof DasComponentFeature){
+                                DasComponentFeature refFeature = (DasComponentFeature) feature;
+                                serializer.attribute(DAS_XML_NAMESPACE, "reference", "yes");
+                                serializer.attribute(DAS_XML_NAMESPACE, "superparts", (refFeature.hasSuperParts()) ? "yes" : "no");
+                                serializer.attribute(DAS_XML_NAMESPACE, "subparts", (refFeature.hasSubParts()) ? "yes" : "no");
+                            }
+                            if (categorize){
+                                if (feature.getTypeCategory() != null && feature.getTypeCategory().length() > 0){
+                                    serializer.attribute(DAS_XML_NAMESPACE, "category", feature.getTypeCategory());
+                                }
+                                else {
+                                    // To prevent the DAS server from dying, if no category has been set, but
+                                    // a category is required, spit out the type ID again as the category.
+                                    serializer.attribute(DAS_XML_NAMESPACE, "category", feature.getTypeId());
+                                }
+                            }
+                            if (feature.getTypeLabel() != null && feature.getTypeLabel().length() > 0){
+                                serializer.text(feature.getTypeLabel());
+                            }
+                            serializer.endTag(DAS_XML_NAMESPACE, "TYPE");
+
+                            // METHOD element
+                            serializer.startTag(DAS_XML_NAMESPACE, "METHOD");
+                            if (feature.getMethodId() != null && feature.getMethodId().length() > 0){
+                                serializer.attribute(DAS_XML_NAMESPACE, "id", feature.getMethodId());
+                            }
+                            if (feature.getMethodLabel() != null && feature.getMethodLabel().length() > 0){
+                                serializer.text(feature.getMethodLabel());
+                            }
+                            serializer.endTag(DAS_XML_NAMESPACE, "METHOD");
+
+                            // START element
+                            serializer.startTag(DAS_XML_NAMESPACE, "START");
+                            serializer.text(Integer.toString(feature.getStartCoordinate()));
+                            serializer.endTag(DAS_XML_NAMESPACE, "START");
+
+                            // END element
+                            serializer.startTag(DAS_XML_NAMESPACE, "END");
+                            serializer.text(Integer.toString(feature.getStopCoordinate()));
+                            serializer.endTag(DAS_XML_NAMESPACE, "END");
+
+                            // SCORE element
+                            serializer.startTag(DAS_XML_NAMESPACE, "SCORE");
+                            serializer.text ((feature.getScore() == null) ? "-" : Double.toString(feature.getScore()));
+                            serializer.endTag(DAS_XML_NAMESPACE, "SCORE");
+
+                            // ORIENTATION element
+                            serializer.startTag(DAS_XML_NAMESPACE, "ORIENTATION");
+                            serializer.text (feature.getOrientation());
+                            serializer.endTag(DAS_XML_NAMESPACE, "ORIENTATION");
+
+                            // PHASE element
+                            serializer.startTag(DAS_XML_NAMESPACE, "PHASE");
+                            serializer.text (feature.getPhase());
+                            serializer.endTag(DAS_XML_NAMESPACE, "PHASE");
+
+                            // NOTE elements
+                            serializeFeatureNoteElements(feature.getNotes(), serializer);
+
+                            // LINK elements
+                            serializeFeatureLinkElements(feature.getLinks(), serializer);
+
+                            // TARGET elements
+                            serializeFeatureTargetElements(feature.getTargets(), serializer);
+
+                            // GROUP elements
+                            if (feature.getGroups() != null){
+                                for (DasGroup group : feature.getGroups()){
+                                    serializer.startTag(DAS_XML_NAMESPACE, "GROUP");
+                                    serializer.attribute(DAS_XML_NAMESPACE, "id", group.getGroupId());
+                                    if (group.getGroupLabel() != null && group.getGroupLabel().length() > 0){
+                                        serializer.attribute(DAS_XML_NAMESPACE, "label", group.getGroupLabel());
+                                    }
+                                    if (group.getGroupType() != null && group.getGroupType().length() > 0){
+                                        serializer.attribute(DAS_XML_NAMESPACE, "type", group.getGroupType());
+                                    }
+                                    // GROUP/NOTE elements
+                                    serializeFeatureNoteElements(group.getNotes(), serializer);
+
+                                    // GROUP/LINK elements
+                                    serializeFeatureLinkElements(group.getLinks(), serializer);
+
+                                    // GROUP/TARGET elements
+                                    serializeFeatureTargetElements(group.getTargets(), serializer);
+
+                                    serializer.endTag(DAS_XML_NAMESPACE, "GROUP");
+                                }
+                            }
+
+                            serializer.endTag(DAS_XML_NAMESPACE, "FEATURE");
+                        }
+                    }
+                    serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
                 }
-                serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
             }
             serializer.endTag(DAS_XML_NAMESPACE, "GFF");
             serializer.endTag(DAS_XML_NAMESPACE, "DASGFF");
@@ -1273,39 +1283,55 @@ public class MydasServlet extends HttpServlet {
      * @param requestedSegments
      * @return
      * @throws DataSourceException
-     * @throws BadReferenceObjectException
-     * @throws CoordinateErrorException
      */
     private Collection<FeaturesReporter> getFeatureCollection(DataSourceConfiguration dsnConfig,
-                                                              List <SegmentQuery> requestedSegments)
-            throws DataSourceException, BadReferenceObjectException, CoordinateErrorException {
+                                                              List <SegmentQuery> requestedSegments,
+                                                              boolean unknownSegmentsHandled
+                                )
+            throws DataSourceException, BadReferenceObjectException {
         List<FeaturesReporter> featuresReporterList = new ArrayList<FeaturesReporter>(requestedSegments.size());
         AnnotationDataSource dataSource = dsnConfig.getDataSource();
         for (SegmentQuery segmentQuery : requestedSegments){
-            if (segmentQuery.getStartCoordinate() == null){
-                // Easy request - just want all the features on the segment.
-                featuresReporterList.add(new FeaturesReporter(dataSource.getFeatures(segmentQuery.getSegmentId())));
-            }
-            else {
-                // Restricted to coordinates.
-                DasAnnotatedSegment annotatedSegment;
-                if (dataSource instanceof RangeHandlingAnnotationDataSource){
-                    annotatedSegment = ((RangeHandlingAnnotationDataSource)dataSource).getFeatures(
-                            segmentQuery.getSegmentId(),
-                            segmentQuery.getStartCoordinate(),
-                            segmentQuery.getStopCoordinate());
-                }
-                else if (dataSource instanceof RangeHandlingReferenceDataSource){
-                    annotatedSegment = ((RangeHandlingReferenceDataSource)dataSource).getFeatures(
-                            segmentQuery.getSegmentId(),
-                            segmentQuery.getStartCoordinate(),
-                            segmentQuery.getStopCoordinate());
+            try{
+                if (segmentQuery.getStartCoordinate() == null){
+                    // Easy request - just want all the features on the segment.
+                    featuresReporterList.add(new FoundFeaturesReporter(dataSource.getFeatures(segmentQuery.getSegmentId())));
                 }
                 else {
-                    annotatedSegment = dataSource.getFeatures(
-                            segmentQuery.getSegmentId());
+                    // Restricted to coordinates.
+                    DasAnnotatedSegment annotatedSegment;
+                    if (dataSource instanceof RangeHandlingAnnotationDataSource){
+                        annotatedSegment = ((RangeHandlingAnnotationDataSource)dataSource).getFeatures(
+                                segmentQuery.getSegmentId(),
+                                segmentQuery.getStartCoordinate(),
+                                segmentQuery.getStopCoordinate());
+                    }
+                    else if (dataSource instanceof RangeHandlingReferenceDataSource){
+                        annotatedSegment = ((RangeHandlingReferenceDataSource)dataSource).getFeatures(
+                                segmentQuery.getSegmentId(),
+                                segmentQuery.getStartCoordinate(),
+                                segmentQuery.getStopCoordinate());
+                    }
+                    else {
+                        annotatedSegment = dataSource.getFeatures(
+                                segmentQuery.getSegmentId());
+                    }
+                    featuresReporterList.add(new FoundFeaturesReporter(annotatedSegment, segmentQuery));
                 }
-                featuresReporterList.add(new FeaturesReporter(annotatedSegment, segmentQuery));
+            } catch (BadReferenceObjectException broe) {
+                if (unknownSegmentsHandled){
+                    featuresReporterList.add(new UnknownSegmentReporter(segmentQuery));
+                }
+                else {
+                    throw broe;
+                }
+            } catch (CoordinateErrorException e) {
+                if (unknownSegmentsHandled){
+                    featuresReporterList.add(new UnknownSegmentReporter(segmentQuery));
+                }
+                else {
+                    throw e;
+                }
             }
         }
         return featuresReporterList;
