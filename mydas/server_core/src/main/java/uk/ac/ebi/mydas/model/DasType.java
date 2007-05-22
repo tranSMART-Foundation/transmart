@@ -32,17 +32,33 @@ package uk.ac.ebi.mydas.model;
  *
  * This class has two jobs:
  * Loading the types from the server configuration and holding details of the types
- * for a particular request.  Note that the equals method only compares the id.
+ * for a particular request.
  */
 public class DasType {
 
+    /**
+     * the type id
+     */
     private String id;
 
+    /**
+     * The category of the type (optional).
+     */
     private String category;
 
+    /**
+     * the method of the type (optional).
+     */
     private String method;
 
-
+    /**
+     * Constructor for a DasType object.  The id field is mandatory, however the category and / or the method
+     * are optional parameters.
+     * @param id <b>Mandatory</b> the id of the type. Will throw an IllegalArgumentException if this is not set
+     * to a non-null, non-zero length String.
+     * @param category <i>Optional</i> the category of the type.
+     * @param method <i>Optional</i> the method of the type.
+     */
     public DasType(String id, String category, String method){
         if (id == null || id.length() == 0){
             throw new IllegalArgumentException("id must not be null or an empty String");
@@ -52,19 +68,36 @@ public class DasType {
         this.method = method;
     }
 
+    /**
+     * Returns the type id.
+     * @return the type id.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Returns the category, or null if this has not been set.
+     * @return the category, or null if this has not been set.
+     */
     public String getCategory() {
         return category;
     }
 
+    /**
+     * Returns the method, or null if this has not been set.
+     * @return the method, or null if this has not been set.
+     */
     public String getMethod() {
         return method;
     }
 
 
+    /**
+     * Implementation of equals method.
+     * @param o object to compare with.
+     * @return boolean indicating equality
+     */
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -78,6 +111,10 @@ public class DasType {
         return true;
     }
 
+    /**
+     * Implementation of hashcode method.
+     * @return unique integer for each (distinct, by equals method) instance.
+     */
     public int hashCode() {
         int result;
         result = id.hashCode();
@@ -86,13 +123,17 @@ public class DasType {
         return result;
     }
 
+    /**
+     * To string simple representation of this object.
+     * @return
+     */
     public String toString(){
         StringBuffer buf = new StringBuffer("DasType.  id: '");
         buf .append (id)
             .append ("' category: '")
-            .append (category)
+            .append ((category == null) ? "null" : category)
             .append ("' method: '")
-            .append (method)
+            .append ((method == null) ? "null" : method)
             .append ("'");
         return buf.toString();
     }
