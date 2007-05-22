@@ -54,6 +54,10 @@ public interface AnnotationDataSource {
 
     /*
      Valid link command field parameters
+
+     (Note that the mydas servlet validates the link command for you - it is
+     guaranteed that any calls to the getLinkURL() method will include valid
+     field values.)
      */
     public static final String LINK_FIELD_FEATURE = "feature";
     public static final String LINK_FIELD_TYPE = "type";

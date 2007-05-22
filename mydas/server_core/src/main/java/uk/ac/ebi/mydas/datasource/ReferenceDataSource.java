@@ -40,16 +40,15 @@ import java.util.Collection;
 public interface ReferenceDataSource extends AnnotationDataSource{
 
     /**
-     * Extends the ReferenceDataSource inteface to allow the creation of an Annotation
-     * data source.  The only significant difference is that a Reference data source can also
-     * serve the sequenceString of the requested segment.
-     * @param segmentReference being the name of the sequenceString being requested.
-     * @return a DasSequence object, holding the sequenceString and start / end coordinates of the sequenceString
-     * or null if the reference is not found.
+     * Returns a DasSequence object that describes the sequence for the requested segment id. (e.g. accession)
+     * @param segmentId being the name / accession of the sequence being requested.
+     * @return a DasSequence object, holding the sequenceString, version and start / end coordinates of the sequence.
      * @throws DataSourceException to encapsulate any exceptions thrown by the datasource
      * and allow the MydasServlet to return a decent error header to the client.
+     * @throws uk.ac.ebi.mydas.exceptions.BadReferenceObjectException should be thrown if the segment requested does not
+     * exist in this data source.
      */
-    public DasSequence getSequence (String segmentReference) throws BadReferenceObjectException, DataSourceException;
+    public DasSequence getSequence (String segmentId) throws BadReferenceObjectException, DataSourceException;
 
     /**
      * Returns the value to be returned from the entry_points command, specifically
@@ -67,6 +66,8 @@ public interface ReferenceDataSource extends AnnotationDataSource{
 
     /**
      * Returns a Collection of DasEntryPoint objects to implement the entry_point command.
+     * The DasEntryPoint object encapsulates information including the segment id, the
+     * start coordinate, end coordinate, type, orientation and description of a segment.
      * @return a Collection of DasEntryPoint objects
      * @throws DataSourceException to encapsulate any exceptions thrown by the datasource
      * and allow the MydasServlet to return a decent error header to the client.
