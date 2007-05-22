@@ -37,7 +37,7 @@ import java.util.Collection;
  * Wraps a DasAnnotatedSegment object with details of the request encapsulated, i.e. the requested
  * start and stop coordinates.
  */
-public class FoundFeaturesReporter implements FeaturesReporter {
+public class FoundFeaturesReporter implements SegmentReporter {
 
     private boolean restricted;
 

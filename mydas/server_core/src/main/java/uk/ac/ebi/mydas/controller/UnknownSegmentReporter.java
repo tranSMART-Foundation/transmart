@@ -30,7 +30,7 @@ package uk.ac.ebi.mydas.controller;
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
  */
-public class UnknownSegmentReporter implements FeaturesReporter{
+public class UnknownSegmentReporter implements SegmentReporter {
 
     SegmentQuery query;
 

@@ -230,10 +230,10 @@ public class MydasServlet extends HttpServlet {
 
     /**
      * Delegates to the parseAndHandleRequest method
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
+     * @param request containing details of the request, including the command and command arguments.
+     * @param response to which the HTTP header / XML response will be written
+     * @throws ServletException as defined in the HTTPServlet interface.
+     * @throws IOException as defined in the HTTPServlet interface.
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         parseAndHandleRequest(request, response);
@@ -241,10 +241,10 @@ public class MydasServlet extends HttpServlet {
 
     /**
      * Delegates to the parseAndHandleRequest method
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
+     * @param request containing details of the request, including the command and command arguments.
+     * @param response to which the HTTP header / XML response will be written
+     * @throws ServletException as defined in the HTTPServlet interface.
+     * @throws IOException as defined in the HTTPServlet interface.
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         parseAndHandleRequest(request, response);
@@ -252,8 +252,12 @@ public class MydasServlet extends HttpServlet {
 
     /**
      * Handles requests encoded as GET or POST.
-     * First of all splits up the request and then delegates to appropriate method
-     * to feed this request.
+     * First of all splits up the request and then delegates to an appropriate method
+     * to respond to this request.  Only basic checking of the request is done here - checking of command
+     * arguments is the responsibility of the handling method.
+     *
+     * This method also handles all exceptions that can be reported as defined DAS errors and returns the
+     * appropriate X-DAS-STATUS HTTP header in the event of a problem.
      * @param request The http request object.
      * @param response The response - normally an XML file in HTTP/1.0 protocol.
      * @throws ServletException in the event of an internal error
@@ -343,44 +347,52 @@ public class MydasServlet extends HttpServlet {
             else {
                 throw new BadCommandException("The command is not recognised.");
             }
-        }
-        catch (XmlPullParserException xppe) {
-            logger.error("XmlPullParserException thrown when attempting to ouput XML.", xppe);
-            writeHeader (request, response, STATUS_500_SERVER_ERROR, false);
-        } catch (DataSourceException dse){
-            logger.error("DataSourceException thrown by a data source.", dse);
-            writeHeader(request, response, STATUS_500_SERVER_ERROR, false);
-        } catch (BadCommandArgumentsException bcae) {
-            logger.error("BadCommandArgumentsException thrown", bcae);
-            writeHeader(request, response, STATUS_402_BAD_COMMAND_ARGUMENTS, false);
-        } catch (BadReferenceObjectException broe) {
-            logger.error("BadReferenceObjectException thrown", broe);
-            writeHeader(request, response, STATUS_403_BAD_REFERENCE_OBJECT, false);
-        } catch (CoordinateErrorException cee) {
-            logger.error("CoordinateErrorException thrown", cee);
-            writeHeader(request, response, STATUS_405_COORDINATE_ERROR, false);
-        } catch (UnimplementedFeatureException efe) {
-            logger.error("UnimplementedFeatureException thrown", efe);
-            writeHeader(request, response, STATUS_501_UNIMPLEMENTED_FEATURE, false);
         } catch (BadCommandException bce) {
             logger.error("BadCommandException thrown", bce);
             writeHeader(request, response, STATUS_400_BAD_COMMAND, false);
         } catch (BadDataSourceException bdse) {
             logger.error("BadDataSourceException thrown", bdse);
             writeHeader(request, response, STATUS_401_BAD_DATA_SOURCE, false);
+        } catch (BadCommandArgumentsException bcae) {
+            logger.error("BadCommandArgumentsException thrown", bcae);
+            writeHeader(request, response, STATUS_402_BAD_COMMAND_ARGUMENTS, false);
+        } catch (BadReferenceObjectException broe) {
+            logger.error("BadReferenceObjectException thrown", broe);
+            writeHeader(request, response, STATUS_403_BAD_REFERENCE_OBJECT, false);
+        } catch (BadStylesheetException bse) {
+            logger.error("BadStylesheetException thrown:", bse);
+            writeHeader(request, response, STATUS_404_BAD_STYLESHEET, false);
+        } catch (CoordinateErrorException cee) {
+            logger.error("CoordinateErrorException thrown", cee);
+            writeHeader(request, response, STATUS_405_COORDINATE_ERROR, false);
+        } catch (XmlPullParserException xppe) {
+            logger.error("XmlPullParserException thrown when attempting to ouput XML.", xppe);
+            writeHeader (request, response, STATUS_500_SERVER_ERROR, false);
+        } catch (DataSourceException dse){
+            logger.error("DataSourceException thrown by a data source.", dse);
+            writeHeader(request, response, STATUS_500_SERVER_ERROR, false);
         } catch (ConfigurationException ce) {
             logger.error("ConfigurationException thrown: This mydas installation was not correctly initialised.", ce);
+            writeHeader(request, response, STATUS_500_SERVER_ERROR, false);
+        } catch (UnimplementedFeatureException efe) {
+            logger.error("UnimplementedFeatureException thrown", efe);
+            writeHeader(request, response, STATUS_501_UNIMPLEMENTED_FEATURE, false);
+        }
+
+        // Catch all for any remaining exceptions - it is not expected that this should be called however.
+        catch (Exception e){
+            logger.error("Exception thrown... This is serious, and unexpected.  status 500 has been returned - need to look into this.", e);
             writeHeader(request, response, STATUS_500_SERVER_ERROR, false);
         }
     }
 
     /**
      * Implements the dsn command.  Only reports dsns that have initialised successfully.
-     * @param request
-     * @param response
-     * @param queryString
-     * @throws XmlPullParserException
-     * @throws IOException
+     * @param request to allow writing of the HTTP header
+     * @param response to which the HTTP header and DASDSN XML are written
+     * @param queryString to check no spurious arguments have been passed to the command
+     * @throws XmlPullParserException in the event of an error being thrown when writing out the XML
+     * @throws IOException in the event of an error being thrown when writing out the XML
      */
     private void dsnCommand(HttpServletRequest request, HttpServletResponse response, String queryString)
             throws XmlPullParserException, IOException{
@@ -762,7 +774,7 @@ public class MydasServlet extends HttpServlet {
     }
 
     private void stylesheetCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-            throws BadCommandArgumentsException, UnimplementedFeatureException, IOException, DataSourceException {
+            throws BadCommandArgumentsException, IOException, BadStylesheetException {
         // Check the queryString is empty (as it should be).
         if (queryString != null && queryString.trim().length() > 0){
             throw new BadCommandArgumentsException("Arguments have been passed to the stylesheet command, which does not expect any.");
@@ -779,7 +791,7 @@ public class MydasServlet extends HttpServlet {
             stylesheetFileName = DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDefaultStyleSheet().trim();
         }
         else {
-            throw new UnimplementedFeatureException("This data source has not defined a stylesheet.");
+            throw new BadStylesheetException("This data source has not defined a stylesheet.");
         }
 
         // Need to create a FileReader to read in the stylesheet, wrapped by a PrintStream to stream it out to the browser.
@@ -801,7 +813,7 @@ public class MydasServlet extends HttpServlet {
                 }
             }
             else {
-                throw new DataSourceException("A problem has occurred reading in the stylesheet from the open stream");
+                throw new BadStylesheetException("A problem has occurred reading in the stylesheet from the open stream");
             }
         }
         finally{
@@ -814,6 +826,21 @@ public class MydasServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Implements the link command.  This is done using a simple mechanism - the request is parsed and checked for
+     * correctness, then the 'field' and 'id' are passed to the DSN that should return a well formed URL.  This method
+     * then redirects the browser to the URL specified.  This mechanism gets around any problems with odd MIME types
+     * in the results page.
+     * @param response which is redirected to the URL specified (unless there is a problem, in which case the
+     * appropriate X-DAS-STATUS will be sent instead)
+     * @param dataSourceConfig holding configuration of the dsn and the data source object itself.
+     * @param queryString from which the 'field' and 'id' parameters are parsed.
+     * @throws IOException during handling of the response
+     * @throws BadCommandArgumentsException if the arguments to the link command are not as specified in the
+     * DAS 1.53 specification
+     * @throws DataSourceException to handle problems from the DSN.
+     * @throws UnimplementedFeatureException if the DSN reports that it does not implement this command.
+     */
     private void linkCommand(HttpServletResponse response, DataSourceConfiguration dataSourceConfig, String queryString)
             throws IOException, BadCommandArgumentsException, DataSourceException, UnimplementedFeatureException {
         // Parse the request
@@ -850,6 +877,25 @@ public class MydasServlet extends HttpServlet {
         response.sendRedirect(response.encodeRedirectURL(url.toString()));
     }
 
+    /**
+     * This method handles the complete features command, including all variants as specified in DAS 1.53.
+     *
+     * @param request to allow the writing of the http header
+     * @param response to which the http header and the XML are written.
+     * @param dsnConfig holding configuration of the dsn and the data source object itself.
+     * @param queryString from which the requested segments and other allowed parameters are parsed.
+     * @throws XmlPullParserException in the event of a problem with writing out the DASFEATURE XML file.
+     * @throws IOException during writing of the XML
+     * @throws DataSourceException to capture any error returned from the data source.
+     * @throws BadCommandArgumentsException if the arguments to the feature command are not as specified in the
+     * DAS 1.53 specification
+     * @throws UnimplementedFeatureException if the dsn reports that it cannot handle an aspect of the feature
+     * command (although all dsns are required to implement at least the basic feature command).
+     * @throws BadReferenceObjectException will not be thrown, but a helper method used by this method
+     * can throw this exception under some circumstances (but not when called by the featureCommand method!)
+     * @throws CoordinateErrorException will not be thrown, but a helper method used by this method
+     * can throw this exception under some circumstances (but not when called by the featureCommand method!)
+     */
     private void featuresCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
             throws XmlPullParserException, IOException, DataSourceException, BadCommandArgumentsException,
             UnimplementedFeatureException, BadReferenceObjectException, CoordinateErrorException {
@@ -924,9 +970,9 @@ public class MydasServlet extends HttpServlet {
 
         // if segments have been included in the request, use the getFeatureCollection method to retrieve them
         // from the data source.  (getFeatureCollection method shared with the 'types' command.)
-        Collection<FeaturesReporter> featuresReporterCollection;
+        Collection<SegmentReporter> segmentReporterCollections;
         if (requestedSegments.size() > 0){
-            featuresReporterCollection = getFeatureCollection(dsnConfig, requestedSegments, true);
+            segmentReporterCollections = getFeatureCollection(dsnConfig, requestedSegments, true);
         }
         else {
             // No segments have been requested, so instead check for either feature_id or group_id filters.
@@ -935,14 +981,14 @@ public class MydasServlet extends HttpServlet {
                 Collection<DasAnnotatedSegment> annotatedSegments =
                         dsnConfig.getDataSource().getFeatures(filter.getFeatureIds(), filter.getGroupIds());
                 if (annotatedSegments != null){
-                    featuresReporterCollection = new ArrayList<FeaturesReporter>(annotatedSegments.size());
+                    segmentReporterCollections = new ArrayList<SegmentReporter>(annotatedSegments.size());
                     for (DasAnnotatedSegment segment : annotatedSegments){
-                        featuresReporterCollection.add (new FoundFeaturesReporter(segment));
+                        segmentReporterCollections.add (new FoundFeaturesReporter(segment));
                     }
                 }
                 else {
                     // Nothing returned from the datasource.
-                    featuresReporterCollection = Collections.EMPTY_LIST;
+                    segmentReporterCollections = Collections.EMPTY_LIST;
                 }
             }
             else {
@@ -974,20 +1020,20 @@ public class MydasServlet extends HttpServlet {
             serializer.startTag(DAS_XML_NAMESPACE, "GFF");
             serializer.attribute(DAS_XML_NAMESPACE, "version", "1.0");
             serializer.attribute(DAS_XML_NAMESPACE, "href", buildRequestHref(request));
-            for (FeaturesReporter featuresReporter : featuresReporterCollection){
-                if (featuresReporter instanceof UnknownSegmentReporter){
+            for (SegmentReporter segmentReporter : segmentReporterCollections){
+                if (segmentReporter instanceof UnknownSegmentReporter){
                     serializer.startTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
-                    serializer.attribute(DAS_XML_NAMESPACE, "id", featuresReporter.getSegmentId());
-                    if (featuresReporter.getStart() != null){
-                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(featuresReporter.getStart()));
+                    serializer.attribute(DAS_XML_NAMESPACE, "id", segmentReporter.getSegmentId());
+                    if (segmentReporter.getStart() != null){
+                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(segmentReporter.getStart()));
                     }
-                    if (featuresReporter.getStop() != null){
-                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(featuresReporter.getStop()));
+                    if (segmentReporter.getStop() != null){
+                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(segmentReporter.getStop()));
                     }
                     serializer.endTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
                 }
                 else {
-                    FoundFeaturesReporter foundFeaturesReporter = (FoundFeaturesReporter) featuresReporter;
+                    FoundFeaturesReporter foundFeaturesReporter = (FoundFeaturesReporter) segmentReporter;
                     serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
                     serializer.attribute(DAS_XML_NAMESPACE, "id", foundFeaturesReporter.getSegmentId());
                     serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(foundFeaturesReporter.getStart()));
@@ -1123,6 +1169,13 @@ public class MydasServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Helper method - serializes out the NOTE element which is used in two places in the DASFEATURE XML file.
+     * (Hence factored out).
+     * @param notes being a Collection of Strings, each of which is a note to be serialized.
+     * @param serializer to write out the XML
+     * @throws IOException during writing of the XML.
+     */
     private void serializeFeatureNoteElements(Collection<String> notes, XmlSerializer serializer) throws IOException {
         if (notes != null){
             for (String note : notes){
@@ -1133,6 +1186,13 @@ public class MydasServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Helper method - serializes out the LINK element which is used in two places in the DASFEATURE XML file.
+     * (Hence factored out).
+     * @param links being a Map of URL to String, with the String being an optional human-readable form of the URL.
+     * @param serializer to write out the XML
+     * @throws IOException during writing of the XML.
+     */
     private void serializeFeatureLinkElements(Map<URL, String> links, XmlSerializer serializer) throws IOException {
         if (links != null){
             for (URL url : links.keySet()){
@@ -1147,6 +1207,13 @@ public class MydasServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Helper method - serializes out the TARGET element which is used in two places in the DASFEATURE XML file.
+     * (Hence factored out).
+     * @param targets being a Collection of DasTarget objects, encapsulating the details of the targets.
+     * @param serializer to write out the XML
+     * @throws IOException during writing of the XML.
+     */
     private void serializeFeatureTargetElements(Collection<DasTarget> targets, XmlSerializer serializer) throws IOException {
         if (targets != null){
             for (DasTarget target : targets){
@@ -1162,8 +1229,25 @@ public class MydasServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Implements the entry_points command.
+     * @param request to allow the writing of the http header
+     * @param response to which the http header and the XML are written.
+     * @param dsnConfig holding configuration of the dsn and the data source object itself.
+     * @param queryString to be checked for bad arguments (there should be no arguments to this command)
+     * @throws XmlPullParserException in the event of a problem with writing out the DASENTRYPOINT XML file.
+     * @throws IOException during writing of the XML
+     * @throws DataSourceException to capture any error returned from the data source.
+     * @throws UnimplementedFeatureException if the dsn reports that it cannot return entry_points.
+     * @throws BadCommandArgumentsException in the event that spurious arguments have been passed in the queryString.
+     */
     private void entryPointsCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-            throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException {
+            throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException, BadCommandArgumentsException {
+
+        // Check not spurious arguments have been passed to this command.
+        if (queryString != null && queryString.trim().length() > 0){
+            throw new BadCommandArgumentsException("Unexpected arguments have been passed to the entry_points command.");
+        }
 
         if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
             // Fine - process command.
@@ -1232,7 +1316,21 @@ public class MydasServlet extends HttpServlet {
     }
 
 
-
+    /**
+     * Implements the sequence command.  Delegates to the getSequences method to return the requested sequences.
+     * @param request to allow the writing of the http header
+     * @param response to which the http header and the XML are written.
+     * @param dsnConfig holding configuration of the dsn and the data source object itself.
+     * @param queryString from which the requested segments are parsed.
+     * @throws XmlPullParserException in the event of a problem with writing out the DASSEQUENCE XML file.
+     * @throws IOException during writing of the XML
+     * @throws DataSourceException to capture any error returned from the data source.
+     * @throws UnimplementedFeatureException if the dsn reports that it cannot return sequence.
+     * @throws BadReferenceObjectException in the event that the segment id is not known to the dsn
+     * @throws BadCommandArgumentsException if the arguments to the sequence command are not as specified in the
+     * DAS 1.53 specification
+     * @throws CoordinateErrorException if the requested coordinates are outside those of the segment id requested.
+     */
     private void sequenceCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
             throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException,
             BadReferenceObjectException, BadCommandArgumentsException, CoordinateErrorException {
@@ -1282,24 +1380,35 @@ public class MydasServlet extends HttpServlet {
 
 
     /**
-     * Helper method used by both the featuresCommand and typesCommand.
-     * @param dsnConfig
-     * @param requestedSegments
-     * @return
-     * @throws DataSourceException
+     * Helper method used by both the featuresCommand and typesCommand to return a Collection of SegmentReporter objects.
+     *
+     * The SegmentReporter interface is implemented to allow both correctly returned segments and missing segments
+     * to be returned.
+     * @param dsnConfig holding configuration of the dsn and the data source object itself.
+     * @param requestedSegments being a List of SegmentQuery objects, which encapsulate the segment request (including
+     * the segment id and optional start / stop coordinates)
+     * @return a Collection of FeatureReporter objects that wrap the DasFeature objects returned from the data source
+     * @throws DataSourceException to capture any error returned from the data source that cannot be handled in a more
+     * elegant manner.
+     * @param unknownSegmentsHandled to indicate if the calling method is able to report missing segments (i.e.
+     * the feature command can return errorsegment / unknownsegment).
+     * @throws uk.ac.ebi.mydas.exceptions.BadReferenceObjectException thrown if unknownSegmentsHandled is false and
+     * the segment id is not known to the DSN.
+     * @throws uk.ac.ebi.mydas.exceptions.CoordinateErrorException thrown if unknownSegmentsHandled is false and
+     * the segment coordinates are out of scope for the provided segment id.
      */
-    private Collection<FeaturesReporter> getFeatureCollection(DataSourceConfiguration dsnConfig,
+    private Collection<SegmentReporter> getFeatureCollection(DataSourceConfiguration dsnConfig,
                                                               List <SegmentQuery> requestedSegments,
                                                               boolean unknownSegmentsHandled
                                 )
             throws DataSourceException, BadReferenceObjectException, CoordinateErrorException {
-        List<FeaturesReporter> featuresReporterList = new ArrayList<FeaturesReporter>(requestedSegments.size());
+        List<SegmentReporter> segmentReporterLists = new ArrayList<SegmentReporter>(requestedSegments.size());
         AnnotationDataSource dataSource = dsnConfig.getDataSource();
         for (SegmentQuery segmentQuery : requestedSegments){
             try{
                 if (segmentQuery.getStartCoordinate() == null){
                     // Easy request - just want all the features on the segment.
-                    featuresReporterList.add(new FoundFeaturesReporter(dataSource.getFeatures(segmentQuery.getSegmentId())));
+                    segmentReporterLists.add(new FoundFeaturesReporter(dataSource.getFeatures(segmentQuery.getSegmentId())));
                 }
                 else {
                     // Restricted to coordinates.
@@ -1320,36 +1429,37 @@ public class MydasServlet extends HttpServlet {
                         annotatedSegment = dataSource.getFeatures(
                                 segmentQuery.getSegmentId());
                     }
-                    featuresReporterList.add(new FoundFeaturesReporter(annotatedSegment, segmentQuery));
+                    segmentReporterLists.add(new FoundFeaturesReporter(annotatedSegment, segmentQuery));
                 }
             } catch (BadReferenceObjectException broe) {
                 if (unknownSegmentsHandled){
-                    featuresReporterList.add(new UnknownSegmentReporter(segmentQuery));
+                    segmentReporterLists.add(new UnknownSegmentReporter(segmentQuery));
                 }
                 else {
                     throw broe;
                 }
             } catch (CoordinateErrorException cee) {
                 if (unknownSegmentsHandled){
-                    featuresReporterList.add(new UnknownSegmentReporter(segmentQuery));
+                    segmentReporterLists.add(new UnknownSegmentReporter(segmentQuery));
                 }
                 else {
                     throw cee;
                 }
             }
         }
-        return featuresReporterList;
+        return segmentReporterLists;
     }
 
     /**
      * Helper method used by both the dnaCommand and the sequenceCommand
-     * @param dsnConfig
-     * @param queryString
-     * @return
-     * @throws BadReferenceObjectException
-     * @throws CoordinateErrorException
-     * @throws DataSourceException
-     * @throws BadCommandArgumentsException
+     * @param dsnConfig holding configuration of the dsn and the data source object itself.
+     * @param queryString to be parsed, which includes details of the requested segments
+     * @return a Collection of SequenceReporter objects.  The SequenceReporter wraps the DasSequence object
+     * to provide additional functionality that is hidden (for simplicity) from the dsn developer.
+     * @throws BadReferenceObjectException if the segment id is not available from the data source
+     * @throws CoordinateErrorException if the requested coordinates fall outside those of the requested segment id
+     * @throws DataSourceException to capture any error returned from the data source.
+     * @throws BadCommandArgumentsException if the arguments to the command are not recognised.
      */
     private Collection<SequenceReporter> getSequences(DataSourceConfiguration dsnConfig, String queryString)
             throws BadReferenceObjectException, CoordinateErrorException, DataSourceException, BadCommandArgumentsException {
@@ -1459,6 +1569,11 @@ public class MydasServlet extends HttpServlet {
     }
 
 
+    /**
+     * Helper method that re-constructs the URL that was used to query the service.
+     * @param request to retrieve elements of the URL
+     * @return the URL that was used to query the service.
+     */
     private String buildRequestHref(HttpServletRequest request) {
         StringBuffer requestURL = new StringBuffer(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getBaseURL());
         String requestURI = request.getRequestURI();

@@ -21,22 +21,24 @@
  *
  */
 
-package uk.ac.ebi.mydas.controller;
+package uk.ac.ebi.mydas.exceptions;
 
 /**
  * Created Using IntelliJ IDEA.
- * Date: 21-May-2007
- * Time: 17:59:48
+ * Date: 22-May-2007
+ * Time: 09:35:45
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
+ * Used to signal a bad stylesheet.
  */
-public interface FeaturesReporter {
+public class BadStylesheetException extends Exception{
 
-    public Integer getStart();
+    public BadStylesheetException (String message){
+        super (message);
+    }
 
-    public Integer getStop();
-
-    public String getSegmentId();
-
+    public BadStylesheetException (String message, Throwable exception){
+        super (message, exception);
+    }
 
 }
