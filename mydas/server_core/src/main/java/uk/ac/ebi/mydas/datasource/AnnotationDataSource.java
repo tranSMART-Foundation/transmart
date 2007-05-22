@@ -31,11 +31,9 @@ import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 import uk.ac.ebi.mydas.model.DasType;
 
 import javax.servlet.ServletContext;
-import java.util.Map;
-import java.util.Collection;
-import java.util.List;
-import java.util.ArrayList;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Created Using IntelliJ IDEA.

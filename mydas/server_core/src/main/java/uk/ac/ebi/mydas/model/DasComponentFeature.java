@@ -42,10 +42,19 @@ import java.net.URL;
  * a reference server. (There is nothing stopping you from doing this on an annotation server,
  * but this is not normal practice.)
  *
- * It is highly recommended that you read the section <b>'Fetching Sequence Assemblies'</b> in the DAS 1.53
- * specification before using this part of the mydas API.
+ * It is highly recommended that you read through the specification section
+ * <a href ="http://biodas.org/documents/spec.html#assemblies">
+ *    DAS 1.53: Fetching Sequence Assemblies
+ * </a>
+ * before proceeding, if you have not done so already.
  *
- * To get started, you first of all need to create a DasAnnotatedSegment object (essentially a 'feature holder' that
+ * More complete documentation of the DasComponentFeature mechanism for
+ * fetching sequence assemblies can be found on the project wiki pages:
+ * <a href="http://code.google.com/p/mydas/wiki/HOWTO_Build_Sequence_Assemblies">
+ *     Building Sequence Assemblies using DasComponentFeature objects
+ * </a>
+ *
+ * To get started, you first of all need to create a DasAnnotatedSegment object (essentially a 'feature holder') that
  * you would normally use to hold a Collection of DasFeature objects annotated on a particular segment.
  *
  * Once you have this object, call the <code>public DasComponentFeature getSelfComponentFeature()</code>
@@ -63,56 +72,30 @@ import java.net.URL;
  */
 public class DasComponentFeature extends DasFeature {
 
-    /**
-     * 
-     */
     private Collection<DasComponentFeature> subComponents = null;
 
     private Collection<DasComponentFeature> superComponents = null;
 
-    /**
-     * This class is designed to simplify the process of building an assembly using features in DAS.
-     * After constructing one of these components, it is possible to add DasComponent or DasSuperComponent
-     * objects to this instance, in order to describe a hierarchical assembly.
-     *
-     * @param featureId
-     * @param featureLabel
-     * @param targetSegmentId
-     * @param componentTargetLabel
-     * @param startCoordinateOnComponent
-     * @param endCoordinateOnComponent
-     * @param typeId
-     * @param typeLabel
-     * @param methodId
-     * @param methodLabel
-     * @param startCoodinateOnSegment
-     * @param endCoordinateOnSegment
-     * @param score
-     * @param orientation
-     * @param phase
-     * @param notes
-     * @param links
-     * @throws DataSourceException
-     */
     private DasComponentFeature(String featureId,
-                        String featureLabel,
-                        String targetSegmentId,
-                        String componentTargetLabel,
-                        int startCoordinateOnComponent,
-                        int endCoordinateOnComponent,
-                        String typeId,
-                        String category,
-                        String typeLabel,
-                        String methodId,
-                        String methodLabel,
-                        int startCoodinateOnSegment,
-                        int endCoordinateOnSegment,
-                        Double score,
-                        String orientation,
-                        String phase,
-                        Collection<String> notes,
-                        Map<URL, String> links)
-            throws DataSourceException {
+                    String featureLabel,
+                    String targetSegmentId,
+                    String componentTargetLabel,
+                    int startCoordinateOnComponent,
+                    int endCoordinateOnComponent,
+                    String typeId,
+                    String category,
+                    String typeLabel,
+                    String methodId,
+                    String methodLabel,
+                    int startCoodinateOnSegment,
+                    int endCoordinateOnSegment,
+                    Double score,
+                    String orientation,
+                    String phase,
+                    Collection<String> notes,
+                    Map<URL, String> links)
+        throws DataSourceException {
+
         super(
                 featureId,
                 featureLabel,
@@ -136,7 +119,7 @@ public class DasComponentFeature extends DasFeature {
     }
 
 
-    public DasComponentFeature(DasAnnotatedSegment segment) throws DataSourceException {
+    DasComponentFeature(DasAnnotatedSegment segment) throws DataSourceException {
         super(
                 segment.getSegmentId(),
                 null,
@@ -165,14 +148,44 @@ public class DasComponentFeature extends DasFeature {
         );
     }
 
+    /**
+     * This method is called by the mydas servlet to determine if there are any subparts to this component.
+     * @return a boolean indicating if the component has sub-components.
+     */
     public boolean hasSubParts(){
         return subComponents != null && subComponents.size() > 0;
     }
 
+    /**
+     * This method is called by the mydas servlet to determine if there are any superparts to this component.
+     * @return a boolean indicating if the component has super-components.
+     */
     public boolean hasSuperParts(){
         return superComponents != null && superComponents.size() > 0;
     }
 
+    /**
+     *
+     * @param componentFeatureId
+     * @param startCoordinateOnSegment
+     * @param stopCoordinateOnSegment
+     * @param startCoordinateOnComponent
+     * @param stopCoordinateOnComponent
+     * @param componentFeatureLabel
+     * @param componentTypeId
+     * @param componentTypeLabel
+     * @param targetSegmentId
+     * @param componentTargetLabel
+     * @param componentMethodId
+     * @param componentMethodLabel
+     * @param componentScore
+     * @param componentOrientation
+     * @param componentPhase
+     * @param componentNotes
+     * @param componentLinks
+     * @return
+     * @throws DataSourceException
+     */
     public DasComponentFeature addSubComponent(
                                 String componentFeatureId,
                                 int startCoordinateOnSegment,
@@ -233,6 +246,28 @@ public class DasComponentFeature extends DasFeature {
         subComponents.add (subComponentFeature);
     }
 
+    /**
+     *
+     * @param componentFeatureId
+     * @param startCoordinateOnSegment
+     * @param stopCoordinateOnSegment
+     * @param startCoordinateOnComponent
+     * @param stopCoordinateOnComponent
+     * @param componentFeatureLabel
+     * @param componentTypeId
+     * @param componentTypeLabel
+     * @param targetSegmentId
+     * @param componentTargetLabel
+     * @param componentMethodId
+     * @param componentMethodLabel
+     * @param componentScore
+     * @param componentOrientation
+     * @param componentPhase
+     * @param componentNotes
+     * @param componentLinks
+     * @return
+     * @throws DataSourceException
+     */
     public DasComponentFeature addSuperComponent(String componentFeatureId,
                                 int startCoordinateOnSegment,
                                 int stopCoordinateOnSegment,
@@ -291,6 +326,10 @@ public class DasComponentFeature extends DasFeature {
         return (subComponents == null) ? Collections.EMPTY_LIST : subComponents;
     }
 
+    /**
+     *
+     * @return
+     */
     public Collection<DasComponentFeature> getReportableSubComponents() {
         Collection<DasComponentFeature> deepComponents = new ArrayList<DasComponentFeature>();
         for (DasComponentFeature component : getSubComponents()) {
@@ -303,6 +342,10 @@ public class DasComponentFeature extends DasFeature {
         return (superComponents == null) ? Collections.EMPTY_LIST : superComponents;
     }
 
+    /**
+     *
+     * @return
+     */
     public Collection<DasComponentFeature> getReportableSuperComponents() {
         Collection<DasComponentFeature> deepSuperComponents = new ArrayList<DasComponentFeature>();
         for (DasComponentFeature component : getSuperComponents()) {
@@ -311,6 +354,10 @@ public class DasComponentFeature extends DasFeature {
         return deepSuperComponents;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isTypeIsReference() {
         return true;
     }

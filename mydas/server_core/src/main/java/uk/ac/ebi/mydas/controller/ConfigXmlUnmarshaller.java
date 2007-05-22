@@ -28,7 +28,6 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import uk.ac.ebi.mydas.exceptions.ConfigurationException;
-import uk.ac.ebi.mydas.model.DasType;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -36,8 +35,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * Created Using IntelliJ IDEA.

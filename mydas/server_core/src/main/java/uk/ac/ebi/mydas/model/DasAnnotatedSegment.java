@@ -199,14 +199,26 @@ public class DasAnnotatedSegment extends DasSegment{
     }
 
     /**
-     * TODO Create some detailed documentation of how to build an assembly using this mechanism.
-     * This method creates and returns the component feature that represents this
+     * This method creates and returns the component feature that represents <code>this</code>
      * annotated segment.  To add to the assembly, use this method to retrieve the
      * 'self' component and then add subparts or superparts to this.  (This can
      * be done recursively, to create a map of components to any level.)
+     *
+     * It is highly recommended that you read through the specification section
+     * <a href ="http://biodas.org/documents/spec.html#assemblies">
+     *    DAS 1.53: Fetching Sequence Assemblies
+     * </a>
+     * before proceeding, if you have not done so already.
+     *
+     * More complete documentation of the DasComponentFeature mechanism for
+     * fetching sequence assemblies can be found on the project wiki pages:
+     * <a href="http://code.google.com/p/mydas/wiki/HOWTO_Build_Sequence_Assemblies">
+     *     Building Sequence Assemblies using DasComponentFeature objects
+     * </a>
      * @return a DasComponentFeature object that is the segment itself represented
      * as a component.
-     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
+     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException to wrap any exceptions thrown within the data
+     * source, such as SQLExceptions etc.
      */
     public DasComponentFeature getSelfComponentFeature() throws DataSourceException{
         if (selfComponent == null){
