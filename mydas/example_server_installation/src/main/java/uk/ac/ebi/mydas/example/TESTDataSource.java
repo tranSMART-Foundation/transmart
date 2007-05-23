@@ -85,10 +85,6 @@ public class TESTDataSource implements ReferenceDataSource {
         this.config = dataSourceConfig;
     }
 
-    public DataSourceConfiguration getConfiguration() {
-        return config;
-    }
-
     /**
      * This method is called when the DAS server is shut down and should be used
      * to clean up resources such as database connections as required.
