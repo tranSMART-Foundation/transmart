@@ -96,9 +96,6 @@ public interface AnnotationDataSource {
                       DataSourceConfiguration dataSourceConfig)
             throws DataSourceException;
 
-    public DataSourceConfiguration getConfiguration();
-
-
     /**
      * This method is called when the DAS server is shut down and should be used
      * to clean up resources such as database connections as required.

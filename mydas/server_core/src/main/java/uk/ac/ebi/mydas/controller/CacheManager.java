@@ -23,7 +23,6 @@
 
 package uk.ac.ebi.mydas.controller;
 
-import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 
 /**
@@ -35,7 +34,8 @@ import com.opensymphony.oscache.general.GeneralCacheAdministrator;
  *
  * The CacheManager is passed to the data source to allow it to control caching
  * in the mydas servlet.  At present, this is limited to a single method allowing
- * the data source to empty the cache.
+ * the data source to empty the cache (just for the DSN that this
+ * CacheManager is registered with).
  */
 public class CacheManager {
 
@@ -49,12 +49,22 @@ public class CacheManager {
      */
     private DataSourceConfiguration dsnConfig;
 
+    /**
+     * Constructor for the CacheManager object, that can includes a reference to the GeneralCacheAdministrator
+     * and the data source configuration.
+     * @param cacheAdministrator
+     * @param dsnConfig
+     */
     CacheManager (GeneralCacheAdministrator cacheAdministrator, DataSourceConfiguration dsnConfig){
         this.dsnConfig = dsnConfig;
         this.cacheAdministrator = cacheAdministrator;
     }
 
-    public void emptyCache() throws DataSourceException {
+    /**
+     * This method empties the cache (implemented using Open Symphony Cache) for the data source
+     * that this CacheManager is registered with.
+     */
+    public void emptyCache() {
         if (dsnConfig.isOK()){
             cacheAdministrator.flushGroup(dsnConfig.getName());
         }

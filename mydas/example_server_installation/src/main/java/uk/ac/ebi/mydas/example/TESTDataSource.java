@@ -169,6 +169,7 @@ public class TESTDataSource implements ReferenceDataSource {
                 return new DasAnnotatedSegment("one", 1, 34, "Up-to-date", "one_label", oneFeatures);
             }
             else if (segmentReference.equals("two")){
+
                 Collection<DasFeature> twoFeatures = new ArrayList<DasFeature>(2);
                 twoFeatures.add(new DasFeature(
                         "twoFeatureIdOne",
@@ -473,6 +474,8 @@ public class TESTDataSource implements ReferenceDataSource {
         else throw new BadReferenceObjectException(segmentReference, "Not found");
     }
 
+
+
     /**
      * Returns the value to be returned from the entry_points command, specifically
      * the /DASEP/ENTRY_POINTS/@version attribute.
@@ -488,6 +491,8 @@ public class TESTDataSource implements ReferenceDataSource {
      *          and allow the {@link uk.ac.ebi.mydas.controller.MydasServlet} to return a decent error header to the client.
      */
     public String getEntryPointVersion() throws DataSourceException {
+        // Arbitrarily empty the cache when the entry_points command is called for testing purposes.
+        this.cacheManager.emptyCache();
         return "Version 1.1";
     }
 }
