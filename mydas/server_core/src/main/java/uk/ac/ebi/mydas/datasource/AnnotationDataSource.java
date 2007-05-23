@@ -244,6 +244,7 @@ public interface AnnotationDataSource {
      * an 'id' field.  Again, this will be validated by the mydas servlet to ensure that it
      * is a non-null, non-zero length String.
      * </li>
+     * <ul>
      * See <a href="http://biodas.org/documents/spec.html#feature_linking">DAS 1.53 Specification: Linking to a Feature</a>
      * for details.
      *
