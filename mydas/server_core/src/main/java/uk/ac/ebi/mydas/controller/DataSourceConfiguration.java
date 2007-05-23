@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.opensymphony.oscache.general.GeneralCacheAdministrator;
+
 /**
  * Created Using IntelliJ IDEA.
  * Date: 04-May-2007
@@ -157,6 +159,11 @@ public class DataSourceConfiguration {
     private boolean includeTypesWithZeroCount;
 
     /**
+     * Stores the cache group for caching purposes.
+     */
+    private String[] cacheGroup = new String[1];
+
+    /**
      * Package access only - instances of this class can be created by the MydasServlet
      * when it reads the configuration file.
      * @param id the mandatory value for /DASDSN/DSN/SOURCE/@id
@@ -172,6 +179,8 @@ public class DataSourceConfiguration {
 * within the coordinates given.
      * @param useFeatureIdForFeatureLabel indicates if the feature id should be used for the label
 * if no label is set by the data source.
+     * @param dnaCommandEnabled
+     * @param includeTypesWithZeroCount
      */
     DataSourceConfiguration(String id,
                             String name,
@@ -189,6 +198,7 @@ public class DataSourceConfiguration {
     ) {
         this.id = id;
         this.name = name;
+        this.cacheGroup[0] = name;
         this.version = version;
         this.mapmaster = mapmaster;
         this.description = description;
@@ -425,5 +435,13 @@ public class DataSourceConfiguration {
             .append ("' Types: ")
             .append ((types == null) ? "null" : types.toString());
         return buf.toString();
+    }
+
+    /**
+     * Returns the cache group for use with OSCache.
+     * @return the cache group for use with OSCache.
+     */
+    String[] getCacheGroup(){
+        return cacheGroup;
     }
 }

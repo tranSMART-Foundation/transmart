@@ -24,6 +24,7 @@
 package uk.ac.ebi.mydas.datasource;
 
 import uk.ac.ebi.mydas.controller.DataSourceConfiguration;
+import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
@@ -202,27 +203,28 @@ public interface AnnotationDataSource {
      * DAS 1.53 Specification : types command</a>
      * @return The total count <i>across the entire data source</i> (not
      * just for one segment) for the specified type id.
+     * @throws uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException if your data source is unable to supply this
+     * information.
+     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException should be thrown if there is any
+     * fatal problem with loading this data source.  <bold>It is highly desirable for the
+     *  implementation to test itself in this init method and throw
+     * a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
+     * and read a record.</bold>
      */
     public int getTotalCountForType(String typeId) throws UnimplementedFeatureException, DataSourceException;
 
     /**
-     * The mydas DAS server implements caching within the server.  This method is provided to allow the DSN to warn
-     * the mydas server that the cache should be emptied for this data source, because (for example) the underlying
-     * data source has changed.
+     * The mydas DAS server implements caching within the server.  This method passes your datasource a reference
+     * to a {@link CacheManager} object.  To implement this method, you should simply retain a reference to this object.
+     * In your code you can then make use of this object to manipulate caching in the mydas servlet.
      *
-     * (This method will always be called prior to returning data to clients from the cache).
-     *
-     * The most simple implementation of this method, i.e. for a static data source, should simply return false
-     * so that caching is used.
-     * @return false if it is safe to use cached data.  True if the underlying data source has changed, so cached data
-     * may be dirty.
-     * @throws DataSourceException should be thrown if there is any
-     * fatal problem with loading this data source.  <bold>It is highly desirable for the implementation
-     *  to test itself in this init method and throw
-     * a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
-     * and read a record.</bold>
+     * At present the {@link CacheManager} class provides you with a single method public void emptyCache() that
+     * you can call if (for example) the underlying data source has changed.
+     * 
+     * @param cacheManager a reference to a {@link CacheManager} object that the data source can use to empty
+     * the cache for this data source.
      */
-    public boolean emptyCache() throws DataSourceException;
+    public void registerCacheManager(CacheManager cacheManager);
 
     /**
      * This method returns a URL, based upon a request built as part of the DAS 'link' command.

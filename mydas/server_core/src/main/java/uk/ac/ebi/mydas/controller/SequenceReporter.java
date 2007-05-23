@@ -45,20 +45,16 @@ class SequenceReporter{
 
 
     SequenceReporter(DasSequence sequence, SegmentQuery segmentQuery) throws CoordinateErrorException {
-
-        this.restricted = true;
-        this.requestedStart = segmentQuery.getStartCoordinate();
-        this.requestedStop = segmentQuery.getStopCoordinate(); 
+        this.restricted = segmentQuery.getStartCoordinate() != null;
+        if (restricted){
+            this.requestedStart = segmentQuery.getStartCoordinate();
+            this.requestedStop = segmentQuery.getStopCoordinate();
+        }
         this.sequence = sequence;
 
-        if (requestedStart < sequence.getStartCoordinate() || requestedStop > sequence.getStopCoordinate()){
+        if (restricted && (requestedStart < sequence.getStartCoordinate() || requestedStop > sequence.getStopCoordinate())){
             throw new CoordinateErrorException(sequence.getSegmentId(), requestedStart,  requestedStop);
         }
-    }
-
-    SequenceReporter(DasSequence sequence){
-        this.restricted = false;
-        this.sequence = sequence;
     }
 
     String getSequenceString() throws CoordinateErrorException {

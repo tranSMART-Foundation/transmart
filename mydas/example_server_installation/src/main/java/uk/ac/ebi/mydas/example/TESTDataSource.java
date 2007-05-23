@@ -24,6 +24,7 @@
 package uk.ac.ebi.mydas.example;
 
 import uk.ac.ebi.mydas.controller.DataSourceConfiguration;
+import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
@@ -47,6 +48,7 @@ import java.net.MalformedURLException;
  */
 public class TESTDataSource implements ReferenceDataSource {
 
+    CacheManager cacheManager = null;
     ServletContext svCon;
     Map<String, String> globalParameters;
     DataSourceConfiguration config;
@@ -370,26 +372,18 @@ public class TESTDataSource implements ReferenceDataSource {
     }
 
     /**
-     * The mydas DAS server implements caching within the server.  This method is provided to allow the DSN to warn
-     * the mydas server that the cache should be emptied for this data source, because (for example) the underlying
-     * data source has changed.
+     * The mydas DAS server implements caching within the server.  This method passes your datasource a reference
+     * to a {@link uk.ac.ebi.mydas.controller.CacheManager} object.  To implement this method, you should simply retain a reference to this object.
+     * In your code you can then make use of this object to manipulate caching in the mydas servlet.
      * <p/>
-     * (This method will always be called prior to returning data to clients from the cache).
-     * <p/>
-     * The most simple implementation of this method, i.e. for a static data source, should simply return false
-     * so that caching is used.
+     * At present the {@link uk.ac.ebi.mydas.controller.CacheManager} class provides you with a single method public void emptyCache() that
+     * you can call if (for example) the underlying data source has changed.
      *
-     * @return false if it is safe to use cached data.  True if the underlying data source has changed, so cached data
-     *         may be dirty.
-     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
-     *          should be thrown if there is any
-     *          fatal problem with loading this data source.  <bold>It is highly desirable for the implementation
-     *          to test itself in this init method and throw
-     *          a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
-     *          and read a record.</bold>
+     * @param cacheManager a reference to a {@link uk.ac.ebi.mydas.controller.CacheManager} object that the data source can use to empty
+     *                     the cache for this data source.
      */
-    public boolean emptyCache() throws DataSourceException {
-        return false;
+    public void registerCacheManager(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
     }
 
     /**

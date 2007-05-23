@@ -45,6 +45,9 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 import java.net.URL;
 
+import com.opensymphony.oscache.base.NeedsRefreshException;
+import com.opensymphony.oscache.general.GeneralCacheAdministrator;
+
 /**
  * Created Using IntelliJ IDEA.
  * User: phil
@@ -180,6 +183,8 @@ public class MydasServlet extends HttpServlet {
     private static final String INDENTATION_PROPERTY = "http://xmlpull.org/v1/doc/properties.html#serializer-indentation";
     private static final String INDENTATION_PROPERTY_VALUE = "  ";
 
+    private static GeneralCacheAdministrator CACHE_MANAGER = null;
+
 
     /**
      * This method will ensure that all the plugins are registered and call
@@ -191,11 +196,16 @@ public class MydasServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
 
+        // Initialize the GeneralCacheAdministrator.
+        if (CACHE_MANAGER == null){
+            CACHE_MANAGER = new GeneralCacheAdministrator();
+        }
+
         // Initialise data sources.
         if (DATA_SOURCE_MANAGER == null){
             DATA_SOURCE_MANAGER = new DataSourceManager(this.getServletContext());
             try{
-                DATA_SOURCE_MANAGER.init(CONFIGURATION_FILE_NAME);
+                DATA_SOURCE_MANAGER.init(CACHE_MANAGER, CONFIGURATION_FILE_NAME);
             }
             catch (Exception e){
                 // Something fatal has happened.  Need to barf out at this point and warn the person who has deployed the service.
@@ -214,6 +224,8 @@ public class MydasServlet extends HttpServlet {
                 throw new IllegalStateException ("Fatal Exception thrown at initialisation.  Cannot initialise the PullParserFactory required to allow generation of the DAS XML.", xppe);
             }
         }
+
+
     }
 
     /**
@@ -222,7 +234,7 @@ public class MydasServlet extends HttpServlet {
      */
     public void destroy() {
         super.destroy();
-
+        
         if (DATA_SOURCE_MANAGER != null){
             DATA_SOURCE_MANAGER.destroy();
         }
@@ -1461,8 +1473,7 @@ public class MydasServlet extends HttpServlet {
      * @throws DataSourceException to capture any error returned from the data source.
      * @throws BadCommandArgumentsException if the arguments to the command are not recognised.
      */
-    private Collection<SequenceReporter> getSequences(DataSourceConfiguration dsnConfig, String queryString)
-            throws BadReferenceObjectException, CoordinateErrorException, DataSourceException, BadCommandArgumentsException {
+    private Collection<SequenceReporter> getSequences(DataSourceConfiguration dsnConfig, String queryString) throws DataSourceException, BadCommandArgumentsException, BadReferenceObjectException, CoordinateErrorException {
 
         ReferenceDataSource refDsn = (ReferenceDataSource) dsnConfig.getDataSource();
         if (refDsn == null){
@@ -1479,30 +1490,69 @@ public class MydasServlet extends HttpServlet {
             Matcher referenceStringMatcher = SEGMENT_RANGE_PATTERN.matcher(referenceString);
             if (referenceStringMatcher.find()){
                 SegmentQuery segmentQuery = new SegmentQuery(referenceStringMatcher);
-                if (segmentQuery.getStartCoordinate() != null){
-                    // Getting a restricted sequenceString - and the data source will handle the restriction.
-                    DasSequence sequence;
-                    if (refDsn instanceof RangeHandlingReferenceDataSource){
-                        sequence = ((RangeHandlingReferenceDataSource)refDsn).getSequence(
-                                segmentQuery.getSegmentId(),
-                                segmentQuery.getStartCoordinate(),
-                                segmentQuery.getStopCoordinate()
-                        );
-                    }
-                    else {
-                        sequence = refDsn.getSequence(segmentQuery.getSegmentId());
-                    }
-                    if (sequence == null) throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "Segment cannot be found.");
-                    sequenceCollection.add (new SequenceReporter(
-                            sequence,
-                            segmentQuery));
+                DasSequence sequence;
+
+                // Build the key name for the cache.
+                StringBuffer cacheKeyBuffer = new StringBuffer(dsnConfig.getName());
+                cacheKeyBuffer.append("_SEQUENCE_");
+                if (refDsn instanceof RangeHandlingReferenceDataSource){
+                    // May return DasSequence objects containing partial sequences, so include segment id, start and stop coordinates in the key:
+                    cacheKeyBuffer.append(segmentQuery.toString());
                 }
                 else {
-                    // Request for a complete sequenceString
-                    DasSequence sequence = refDsn.getSequence(segmentQuery.getSegmentId());
-                    if (sequence == null) throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "Segment cannot be found.");
-                    sequenceCollection.add (new SequenceReporter(sequence));
+                    // Otherwise will only return complete sequences, so store on segment id only:
+                    cacheKeyBuffer.append(segmentQuery.getSegmentId());
                 }
+                String cacheKey = cacheKeyBuffer.toString();
+
+
+                try{
+                    // flushCache checks with the data source if the cache needs emptying, and does so if required.
+                    sequence = (DasSequence) CACHE_MANAGER.getFromCache(cacheKey);
+                    if (logger.isDebugEnabled()){
+                        logger.debug("Sequence retrieved from cache: " + sequence.getSegmentId());
+                    }
+                } catch (NeedsRefreshException nre){
+                    try{
+                        if (segmentQuery.getStartCoordinate() != null){
+                            // Getting a restricted sequenceString - and the data source will handle the restriction.
+                            if (refDsn instanceof RangeHandlingReferenceDataSource){
+                                sequence = ((RangeHandlingReferenceDataSource)refDsn).getSequence(
+                                        segmentQuery.getSegmentId(),
+                                        segmentQuery.getStartCoordinate(),
+                                        segmentQuery.getStopCoordinate()
+                                );
+                                CACHE_MANAGER.putInCache(cacheKey, sequence, dsnConfig.getCacheGroup());
+                            }
+                            else {
+                                sequence = refDsn.getSequence(segmentQuery.getSegmentId());
+                                CACHE_MANAGER.putInCache(cacheKey, sequence, dsnConfig.getCacheGroup());
+                            }
+                        }
+                        else {
+                            // Request for a complete sequenceString
+                            sequence = refDsn.getSequence(segmentQuery.getSegmentId());
+                            CACHE_MANAGER.putInCache(cacheKey, sequence, dsnConfig.getCacheGroup());
+                        }
+                    } catch (BadReferenceObjectException broe) {
+                        CACHE_MANAGER.cancelUpdate(cacheKey);
+                        throw broe;
+                    } catch (DataSourceException dse) {
+                        CACHE_MANAGER.cancelUpdate(cacheKey);
+                        throw dse;
+                    } catch (CoordinateErrorException cee) {
+                        CACHE_MANAGER.cancelUpdate(cacheKey);
+                        throw cee;
+                    }
+                    if (logger.isDebugEnabled()){
+                        logger.debug("Sequence retrieved from DSN (not cached): " + sequence.getSegmentId());
+                    }
+                }
+                // Belt and braces - the various getSequence methods throw BadReferenceObjectException -
+                // but just in case the dsn 
+                // fails to throw this appropriately and instead return a null sequence object...
+                if (sequence == null) throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "Segment cannot be found.");
+                sequenceCollection.add (new SequenceReporter(sequence, segmentQuery));
             }
             else {
                 throw new BadCommandArgumentsException("The query string format is not recognized.");
@@ -1585,5 +1635,10 @@ public class MydasServlet extends HttpServlet {
                     .append (queryString);
         }
         return requestURL.toString();
+    }
+
+
+    GeneralCacheAdministrator getCacheManager() {
+        return CACHE_MANAGER;
     }
 }

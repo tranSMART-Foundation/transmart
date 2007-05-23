@@ -32,6 +32,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.opensymphony.oscache.general.GeneralCacheAdministrator;
+
 /**
  * Created Using IntelliJ IDEA.
  * Date: 04-May-2007
@@ -55,9 +57,9 @@ public class DataSourceManager {
         this.svCon = servletContext;
     }
 
-    public void init(String configurationFileName) throws IOException, ConfigurationException {
+    public void init(GeneralCacheAdministrator cacheAdministrator, String configurationFileName) throws IOException, ConfigurationException {
         loadConfiguration(configurationFileName);
-        initialiseDataSources();
+        initialiseDataSources(cacheAdministrator);
     }
 
     /**
@@ -87,10 +89,9 @@ public class DataSourceManager {
      * the data sources.
      * @throws uk.ac.ebi.mydas.exceptions.ConfigurationException in the event that the loadConfiguration method has not been called
      * (a logic error) or has failed to load the expected objects.
-     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException in the event that a problem
-     * occurs when initialising an individual DataSource.
+     * @param cacheAdministrator being a reference to the GeneralCacheAdministrator.
      */
-    private void initialiseDataSources() throws ConfigurationException {
+    private void initialiseDataSources(GeneralCacheAdministrator cacheAdministrator) throws ConfigurationException {
         if (serverConfiguration == null){
             throw new ConfigurationException ("An attempt to initialise the data sources has been made, but there is no valid ServerConfiguration object.");
         }
@@ -104,9 +105,14 @@ public class DataSourceManager {
                 if (dsnConfig.loadDataSource()){
                     dsnConfig.getDataSource().init(svCon, serverConfiguration.getGlobalConfiguration().getGlobalParameters(), dsnConfig);
                 }
-                if (! dsnConfig.isOK()){
+                if (dsnConfig.isOK()){
+                    // Register a CacheManager object with the dsn, so it can control caching in the servlet.
+                    dsnConfig.getDataSource().registerCacheManager(new CacheManager(cacheAdministrator, dsnConfig));
+                }
+                else {
                     logger.error("Data Source Failed to Load and Initialise: " + dsnConfig.toString());
                 }
+                // Register the
             } catch (DataSourceException e) {
                 // This particular data source has failed to initalise.  Still try to do the rest and log this failure.
                 logger.error("Data Source Failed to Load and Initialise: " + dsnConfig.toString());

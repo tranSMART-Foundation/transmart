@@ -64,4 +64,15 @@ public class SegmentQuery {
     public Integer getStopCoordinate() {
         return stopCoordinate;
     }
+
+    public String toString(){
+        StringBuffer buf = new StringBuffer(segmentId);
+        if (startCoordinate != null){
+            // The regex pattern used to construct this object
+            // guarantees that ((startCoordinate == null) == (stopCoordinate == null))
+            buf.append ('_').append(startCoordinate);
+            buf.append ('_').append(stopCoordinate);
+        }
+        return buf.toString();
+    }
 }
