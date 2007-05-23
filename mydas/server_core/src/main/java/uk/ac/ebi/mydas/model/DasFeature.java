@@ -59,7 +59,7 @@ public class DasFeature {
      * segment) or related citations.  A commonly accepted mechanism is to give non-positional features start
      * and end coordinates of 0, however this is not enforced and is not part of the DAS 1.53 specification.</i>
      */
-    protected final int startCoodinate;
+    protected final int startCoordinate;
 
     protected final int endCoordinate;
 
@@ -137,7 +137,7 @@ public class DasFeature {
         this.typeLabel = typeLabel;
         this.methodId = methodId;
         this.methodLabel = methodLabel;
-        this.startCoodinate = startCoodinate;
+        this.startCoordinate = startCoodinate;
         this.endCoordinate = endCoordinate;
         this.score = score;
         this.orientation = orientation;
@@ -178,7 +178,7 @@ public class DasFeature {
     }
 
     public int getStartCoordinate() {
-        return startCoodinate;
+        return startCoordinate;
     }
 
     public int getStopCoordinate() {
