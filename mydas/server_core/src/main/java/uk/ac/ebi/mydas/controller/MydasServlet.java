@@ -234,7 +234,7 @@ public class MydasServlet extends HttpServlet {
      */
     public void destroy() {
         super.destroy();
-        
+
         if (DATA_SOURCE_MANAGER != null){
             DATA_SOURCE_MANAGER.destroy();
         }
@@ -596,7 +596,30 @@ public class MydasServlet extends HttpServlet {
         }
     }
 
+    private Collection<DasType> getAllTypes (DataSourceConfiguration dsnConfig) throws DataSourceException {
+        Collection<DasType> allTypes;
+        String cacheKey = dsnConfig.getName() + "_ALL_TYPES";
 
+        try{
+            allTypes = (Collection<DasType>) CACHE_MANAGER.getFromCache(cacheKey);
+            if (logger.isDebugEnabled()){
+                logger.debug("ALL TYPES RETRIEVED FROM CACHE.");
+            }
+        } catch (NeedsRefreshException nre) {
+            try{
+                allTypes = dsnConfig.getDataSource().getTypes();
+                CACHE_MANAGER.putInCache(cacheKey, allTypes, dsnConfig.getCacheGroup());
+                if (logger.isDebugEnabled()){
+                    logger.debug("ALL TYPES RETRIEVED FROM DSN (Not in Cache).");
+                }
+            }
+            catch (DataSourceException dse){
+                CACHE_MANAGER.cancelUpdate(cacheKey);
+                throw dse;
+            }
+        }
+        return (allTypes == null) ? Collections.EMPTY_LIST : allTypes;
+    }
 
     private void typesCommandAllTypes (HttpServletRequest request, HttpServletResponse response,
                                        DataSourceConfiguration dsnConfig, List<String> typeFilter)
@@ -607,27 +630,35 @@ public class MydasServlet extends HttpServlet {
         // Build a Map of Types to DasType counts. (the counts being Integer objects set to 'null' until
         // a count is retrieved.
         Map<DasType, Integer> allTypesReport;
-        Collection<DasType> allTypes = dsnConfig.getDataSource().getTypes();
-        if (allTypes != null){
-            allTypesReport = new HashMap<DasType, Integer>(allTypes.size());
-            for (DasType type : allTypes){
-                if (type != null){
-                    // Check if the type_ids have been filtered in the request.
-                    if (typeFilter.size() == 0 || typeFilter.contains(type.getId())){
-                        // Attempt to get a count of the types from the dsn. (May not be implemented.)
-                        Integer typeCount;
+        Collection<DasType> allTypes = getAllTypes (dsnConfig);
+        allTypesReport = new HashMap<DasType, Integer>(allTypes.size());
+        for (DasType type : allTypes){
+            if (type != null){
+                // Check if the type_ids have been filtered in the request.
+                if (typeFilter.size() == 0 || typeFilter.contains(type.getId())){
+                    // Attempt to get a count of the types from the dsn. (May not be implemented.)
+                    Integer typeCount;
+                    StringBuffer keyBuf = new StringBuffer(dsnConfig.getName());
+                    keyBuf.append("_TYPECOUNT_").append (type.getId());
+                    String cacheKey = keyBuf.toString();
+
+                    try{
+                        typeCount = (Integer) CACHE_MANAGER.getFromCache(cacheKey);
+                    } catch (NeedsRefreshException nre) {
                         try{
                             typeCount = dsnConfig.getDataSource().getTotalCountForType (type.getId());
-                        } catch (UnimplementedFeatureException e) {
+                            CACHE_MANAGER.putInCache(cacheKey, typeCount, dsnConfig.getCacheGroup());
+                        } catch (UnimplementedFeatureException ufe) {
                             typeCount = null;
+                            CACHE_MANAGER.putInCache(cacheKey, typeCount, dsnConfig.getCacheGroup());
+                        } catch (DataSourceException dse){
+                            CACHE_MANAGER.cancelUpdate(cacheKey);
+                            throw dse;
                         }
-                        allTypesReport.put (type, typeCount);
                     }
+                    allTypesReport.put (type, typeCount);
                 }
             }
-        }
-        else{
-            allTypesReport = Collections.EMPTY_MAP;
         }
 
         writeHeader (request, response, STATUS_200_OK, true);
@@ -679,22 +710,22 @@ public class MydasServlet extends HttpServlet {
     }
 
     private void typesCommandSpecificSegments(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, List<SegmentQuery> requestedSegments, List<String> typeFilter)
-            throws DataSourceException, BadReferenceObjectException, XmlPullParserException, IOException {
+            throws DataSourceException, BadReferenceObjectException, XmlPullParserException, IOException, CoordinateErrorException {
         Map <FoundFeaturesReporter, Map<DasType, Integer>> typesReport =
                 new HashMap<FoundFeaturesReporter, Map<DasType, Integer>>(requestedSegments.size());
         // For each segment, populate the typesReport with 'all types' if necessary and then add types and counts.
-        for (SegmentQuery segmentQuery : requestedSegments){
+        Collection<SegmentReporter> segmentReporters = this.getFeatureCollection(dsnConfig, requestedSegments, false);
+        for (SegmentReporter uncastReporter : segmentReporters){
             // Try to get the features for this segment
-            DasAnnotatedSegment segment = dsnConfig.getDataSource().getFeatures(segmentQuery.getSegmentId());
-            if (segment != null){
-                FoundFeaturesReporter segmentReporter = new FoundFeaturesReporter(segment, segmentQuery);
+            if (uncastReporter instanceof FoundFeaturesReporter){
+                FoundFeaturesReporter segmentReporter = (FoundFeaturesReporter) uncastReporter;
                 Map<DasType, Integer> segmentTypes = new HashMap<DasType, Integer>();
                 // Add these objects to the typesReport.
                 typesReport.put(segmentReporter, segmentTypes);
                 /////////////////////////////////////////////////////////////////////////////////////////////
                 // If required in configuration, add all the types from the server to the segmentTypes map
                 if (dsnConfig.isIncludeTypesWithZeroCount()){
-                    Collection<DasType> allTypes = dsnConfig.getDataSource().getTypes();
+                    Collection<DasType> allTypes = getAllTypes (dsnConfig);
                     // Iterate over allTypes and add each type to the segment types report with a count of zero.
                     for (DasType type : allTypes){
                         // (Filtering as requested for type ids)
@@ -719,9 +750,9 @@ public class MydasServlet extends HttpServlet {
                         }
                     }
                 }
-                // Finished with actual features
-                /////////////////////////////////////////////////////////////////////////////////////////////
             }
+            // Finished with actual features
+            /////////////////////////////////////////////////////////////////////////////////////////////
         }
 
         // OK, successfully built a Map of the types for all the requested segments, so iterate over this and report.
@@ -884,8 +915,39 @@ public class MydasServlet extends HttpServlet {
         if (field == null || ! VALID_LINK_COMMAND_FIELDS.contains(field) || id == null){
             throw new BadCommandArgumentsException("The link command must be passed a valid field and id argument.");
         }
+        URL url;
 
-        URL url = dataSourceConfig.getDataSource().getLinkURL(field, id);
+        // Build the key name for the cache.
+        StringBuffer cacheKeyBuffer = new StringBuffer(dataSourceConfig.getName());
+        cacheKeyBuffer.append("_LINK_")
+                .append(field)
+                .append('_')
+                .append(id);
+        String cacheKey = cacheKeyBuffer.toString();
+
+        try{
+            url = (URL) CACHE_MANAGER.getFromCache(cacheKey);
+            if (logger.isDebugEnabled()){
+                logger.debug("LINK RETRIEVED FROM CACHE: " + url.toString());
+            }
+        } catch (NeedsRefreshException e) {
+            try{
+                url = dataSourceConfig.getDataSource().getLinkURL(field, id);
+                CACHE_MANAGER.putInCache(cacheKey, url, dataSourceConfig.getCacheGroup());
+            }
+            catch (UnimplementedFeatureException ufe){
+                CACHE_MANAGER.cancelUpdate(cacheKey);
+                throw ufe;
+            }
+            catch (DataSourceException dse){
+                CACHE_MANAGER.cancelUpdate(cacheKey);
+                throw dse;
+            }
+            if (logger.isDebugEnabled()){
+                logger.debug("LINK RETRIEVED FROM DSN (NOT CACHED): " + url.toString());
+            }
+        }
+
         response.sendRedirect(response.encodeRedirectURL(url.toString()));
     }
 
@@ -1410,39 +1472,79 @@ public class MydasServlet extends HttpServlet {
      * the segment coordinates are out of scope for the provided segment id.
      */
     private Collection<SegmentReporter> getFeatureCollection(DataSourceConfiguration dsnConfig,
-                                                              List <SegmentQuery> requestedSegments,
-                                                              boolean unknownSegmentsHandled
-                                )
+                                                             List <SegmentQuery> requestedSegments,
+                                                             boolean unknownSegmentsHandled
+    )
             throws DataSourceException, BadReferenceObjectException, CoordinateErrorException {
         List<SegmentReporter> segmentReporterLists = new ArrayList<SegmentReporter>(requestedSegments.size());
         AnnotationDataSource dataSource = dsnConfig.getDataSource();
         for (SegmentQuery segmentQuery : requestedSegments){
             try{
-                if (segmentQuery.getStartCoordinate() == null){
-                    // Easy request - just want all the features on the segment.
-                    segmentReporterLists.add(new FoundFeaturesReporter(dataSource.getFeatures(segmentQuery.getSegmentId())));
+                DasAnnotatedSegment annotatedSegment;
+
+                // Build the key name for the cache.
+                StringBuffer cacheKeyBuffer = new StringBuffer(dsnConfig.getName());
+                cacheKeyBuffer.append("_FEATURES_");
+                if (dataSource instanceof RangeHandlingAnnotationDataSource || dataSource instanceof RangeHandlingReferenceDataSource){
+                    // May return DasSequence objects containing partial sequences, so include segment id, start and stop coordinates in the key:
+                    cacheKeyBuffer.append(segmentQuery.toString());
                 }
                 else {
-                    // Restricted to coordinates.
-                    DasAnnotatedSegment annotatedSegment;
-                    if (dataSource instanceof RangeHandlingAnnotationDataSource){
-                        annotatedSegment = ((RangeHandlingAnnotationDataSource)dataSource).getFeatures(
-                                segmentQuery.getSegmentId(),
-                                segmentQuery.getStartCoordinate(),
-                                segmentQuery.getStopCoordinate());
-                    }
-                    else if (dataSource instanceof RangeHandlingReferenceDataSource){
-                        annotatedSegment = ((RangeHandlingReferenceDataSource)dataSource).getFeatures(
-                                segmentQuery.getSegmentId(),
-                                segmentQuery.getStartCoordinate(),
-                                segmentQuery.getStopCoordinate());
-                    }
-                    else {
-                        annotatedSegment = dataSource.getFeatures(
-                                segmentQuery.getSegmentId());
-                    }
-                    segmentReporterLists.add(new FoundFeaturesReporter(annotatedSegment, segmentQuery));
+                    // Otherwise will only return complete sequences, so store on segment id only:
+                    cacheKeyBuffer.append(segmentQuery.getSegmentId());
                 }
+                String cacheKey = cacheKeyBuffer.toString();
+
+                try{
+                    annotatedSegment = (DasAnnotatedSegment) CACHE_MANAGER.getFromCache(cacheKey);
+                    if (logger.isDebugEnabled()){
+                        logger.debug("FEATURES RETRIEVED FROM CACHE: " + annotatedSegment.getSegmentId());
+                    }
+                    if (annotatedSegment == null){
+                        // This should not happen - segment requests that fail are not cached.
+                        throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "Obtained an annotatedSegment from the cache for this segment.  It was null, so assume this is a bad segment id.");
+                    }
+                }
+                catch (NeedsRefreshException nre){
+                    try{
+                        if (segmentQuery.getStartCoordinate() == null){
+                            // Easy request - just want all the features on the segment.
+                            annotatedSegment = dataSource.getFeatures(segmentQuery.getSegmentId());
+                        }
+                        else {
+                            // Restricted to coordinates.
+                            if (dataSource instanceof RangeHandlingAnnotationDataSource){
+                                annotatedSegment = ((RangeHandlingAnnotationDataSource)dataSource).getFeatures(
+                                        segmentQuery.getSegmentId(),
+                                        segmentQuery.getStartCoordinate(),
+                                        segmentQuery.getStopCoordinate());
+                            }
+                            else if (dataSource instanceof RangeHandlingReferenceDataSource){
+                                annotatedSegment = ((RangeHandlingReferenceDataSource)dataSource).getFeatures(
+                                        segmentQuery.getSegmentId(),
+                                        segmentQuery.getStartCoordinate(),
+                                        segmentQuery.getStopCoordinate());
+                            }
+                            else {
+                                annotatedSegment = dataSource.getFeatures(
+                                        segmentQuery.getSegmentId());
+                            }
+                        }
+                        if (logger.isDebugEnabled()){
+                            logger.debug("FEATURES NOT IN CACHE: " + annotatedSegment.getSegmentId());
+                        }
+                        CACHE_MANAGER.putInCache(cacheKey, annotatedSegment, dsnConfig.getCacheGroup());
+                    }
+                    catch (BadReferenceObjectException broe) {
+                        CACHE_MANAGER.cancelUpdate(cacheKey);
+                        throw broe;
+                    }
+                    catch (CoordinateErrorException cee) {
+                        CACHE_MANAGER.cancelUpdate(cacheKey);
+                        throw cee;
+                    }
+                }
+                segmentReporterLists.add(new FoundFeaturesReporter(annotatedSegment, segmentQuery));
             } catch (BadReferenceObjectException broe) {
                 if (unknownSegmentsHandled){
                     segmentReporterLists.add(new UnknownSegmentReporter(segmentQuery));
@@ -1510,7 +1612,7 @@ public class MydasServlet extends HttpServlet {
                     // flushCache checks with the data source if the cache needs emptying, and does so if required.
                     sequence = (DasSequence) CACHE_MANAGER.getFromCache(cacheKey);
                     if (logger.isDebugEnabled()){
-                        logger.debug("Sequence retrieved from cache: " + sequence.getSegmentId());
+                        logger.debug("SEQUENCE RETRIEVED FROM CACHE: " + sequence.getSegmentId());
                     }
                 } catch (NeedsRefreshException nre){
                     try{
@@ -1522,6 +1624,8 @@ public class MydasServlet extends HttpServlet {
                                         segmentQuery.getStartCoordinate(),
                                         segmentQuery.getStopCoordinate()
                                 );
+                                // These putInCache calls include a group, being the dsn name to allow a DSN to
+                                // remove all cached data if it requires.
                                 CACHE_MANAGER.putInCache(cacheKey, sequence, dsnConfig.getCacheGroup());
                             }
                             else {

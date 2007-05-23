@@ -49,8 +49,10 @@ public class FoundFeaturesReporter implements SegmentReporter {
 
     FoundFeaturesReporter(DasAnnotatedSegment annotatedSegment, SegmentQuery segmentQuery){
         this.restricted = segmentQuery.getStartCoordinate() != null;
-        this.requestedStart = segmentQuery.getStartCoordinate();
-        this.requestedStop = segmentQuery.getStopCoordinate();
+        if (restricted){
+            this.requestedStart = segmentQuery.getStartCoordinate();
+            this.requestedStop = segmentQuery.getStopCoordinate();
+        }
         this.annotatedSegment = annotatedSegment;
     }
 
