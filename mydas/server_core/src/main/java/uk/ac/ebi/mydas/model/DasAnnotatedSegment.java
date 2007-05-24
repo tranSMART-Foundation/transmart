@@ -23,12 +23,11 @@
 
 package uk.ac.ebi.mydas.model;
 
+import org.apache.log4j.Logger;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
-import java.util.Collection;
 import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
+import java.util.Collection;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -85,10 +84,10 @@ public class DasAnnotatedSegment extends DasSegment{
     /**
      * Constructor for a DasAnnotatedSegment object that ensures that the object is valid.
      * See the documentation of the various getters to find out where in DAS XML these fields may be used.
-     * @param segmentId <b>Required.</b> This is the identifier for the segment / sequence under query.
-     * @param startCoordinate <b>Required.</b> Start coordinate of the segment.
-     * @param stopCoordinate <b>Required.</b> Stop coordinate of the segment.
-     * @param version <b>Required.</b> a String indicating the version of the segment that is annotated.  What this
+     * @param segmentId <b>Mandatory</b> This is the identifier for the segment / sequence under query.
+     * @param startCoordinate <b>Mandatory</b> Start coordinate of the segment.
+     * @param stopCoordinate <b>Mandatory</b> Stop coordinate of the segment.
+     * @param version <b>Mandatory</b> a String indicating the version of the segment that is annotated.  What this
      * version consists of is not defined - may be a date, a checksum, a version number etc.  If you are
      * developing an annotation server, you must implement the same mechanism as the 'map master' reference server
      * that your server uses as authority.

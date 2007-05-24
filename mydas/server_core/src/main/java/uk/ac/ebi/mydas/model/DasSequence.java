@@ -23,11 +23,11 @@
 
 package uk.ac.ebi.mydas.model;
 
-import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
+import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -35,12 +35,47 @@ import java.util.ArrayList;
  * Time: 10:31:11
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
- * TODO Document this class in detail.
+ * This class is returned by the getSequence method of the implemented
+ * datasource interface to represent a sequence and provide the necessary
+ * information to construct a
+ * /DASSEQUENCE/SEQUENCE element in response to the sequence command, or the
+ * /DASDNA/SEQUENCE element in response to the dna command.
  */
 public class DasSequence extends DasSegment{
 
+    /**
+     *  <b>Mandatory</b> sequence String used to populate the
+     * /DASSEQUENCE/SEQUENCE element (sequence command) or the
+     * /DASDNA/SEQUENCE/DNA element (dna command).
+     */
     protected String sequenceString;
+
+
+    /**
+     * <b>Mandatory</b> value indicating the type of molecule.
+     *
+     * Used to populate the
+     * /DASSEQUENCE/SEQUENCE/@moltype attribute in response to the
+     * sequence command.
+     *
+     * Must be one of:
+     * <ul>
+     *      <li>
+     *           DasSequence.TYPE_DNA
+     *      </li>
+     *      <li>
+     *           DasSequence.TYPE_ssRNA
+     *      </li>
+     *      <li>
+     *           DasSequence.TYPE_dsRNA
+     *      </li>
+     *      <li>
+     *           DasSequence.TYPE_PROTEIN
+     *      </li>
+     * </ul>
+     */
     protected String molType;
+
     public static final String TYPE_DNA = "DNA";
     public static final String TYPE_ssRNA = "ssRNA";
     public static final String TYPE_dsRNA = "dsRNA";
@@ -55,21 +90,37 @@ public class DasSequence extends DasSegment{
     }
 
     /**
-     * @param sequence
-     * @param startCoordinate
-     * @param version
-     * @param molType
-     * @param segmentName
-     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
+     * @param sequence <b>Mandatory</b> sequence String used to populate the
+     * /DASSEQUENCE/SEQUENCE element (sequence command) or the
+     * /DASDNA/SEQUENCE/DNA element (dna command).
+     * @param startCoordinate <b>Mandatory</b> start coordinate of the sequence.
+     * @param version  <b>Mandatory</b> version of the sequence.  Typically may be
+     * a date, version number or checksum.  Used to populate the
+     * /DASSEQUENCE/SEQUENCE/@version attribute or the /DASDNA/SEQUENCE/@version
+     * attribute.
+     * @param molType <b>Mandatory</b> value indicating the type of molecule.
+     * Used to populate the
+     * /DASSEQUENCE/SEQUENCE/@moltype attribute in response to the
+     * sequence command.
+     * Must be one of:
+     * <ul><li>DasSequence.TYPE_DNA</li>
+     *      <li>DasSequence.TYPE_ssRNA</li>
+     *      <li>DasSequence.TYPE_dsRNA</li>
+     *      <li>DasSequence.TYPE_PROTEIN</li></ul>
+     * @param segmentId <b>Mandatory</b> id of the segment.
+     * Representing the /DASSEQUENCE/SEQUENCE/@id attribute or the /DASDNA/SEQUENCE/@id
+     * attribute.
+     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException in the event that
+     * there is a problem with the information used to instantiate this object.
      */
-    public DasSequence(String segmentName, String sequence, int startCoordinate, String version, String molType)
+    public DasSequence(String segmentId, String sequence, int startCoordinate, String version, String molType)
             throws DataSourceException {
 
         super(startCoordinate,
                 (sequence == null)
                         ? startCoordinate
                         : startCoordinate + sequence.length() - 1,
-                segmentName,
+                segmentId,
                 version);
         // Check there is a sequenceString
         if (sequence == null || sequence.length() == 0){

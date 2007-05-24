@@ -37,10 +37,26 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
  * DasFeature class that holds all of the features of a segment.
  */
 public abstract class DasSegment {
-    
+
+    /**
+     * <b>Mandatory</b> id of the segment.
+     */
     protected String segmentId;
+
+    /**
+     * <b>Mandatory</b> start coordinate of the segment.
+     */
     protected int startCoordinate;
+
+    /**
+     * <b>Mandatory</b> stop coordinate of the segment.
+     */
     protected int stopCoordinate;
+
+    /**
+     * <b>Mandatory</b> version of the segment. Typically this will be
+     * a version number, date or checksum for the sequence.
+     */
     protected String version;
 
     public DasSegment(int startCoordinate, int stopCoordinate, String segmentId, String version) 

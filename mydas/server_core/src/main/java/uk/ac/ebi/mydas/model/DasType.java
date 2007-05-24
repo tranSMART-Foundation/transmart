@@ -125,7 +125,7 @@ public class DasType {
 
     /**
      * To string simple representation of this object.
-     * @return
+     * @return simple representation of this object.
      */
     public String toString(){
         StringBuffer buf = new StringBuffer("DasType.  id: '");
