@@ -31,6 +31,17 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
  * Time: 17:03:30
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
+ *
+ * This class encapsulates the data held in a
+ * /DASGFF/GFF/SEGMENT/FEATURE/TARGET or
+ * /DASGFF/GFF/SEGMENT/FEATURE/GROUP/TARGET element
+ * as the response to the features command.
+ *
+ * Please see the
+ * <a href="http://biodas.org/documents/spec.html#features">
+ * DAS 1.53 Specification: Retrieve the Annotations Across a Segment
+ * </a>
+ * for details of the use of the <TARGET/> element.
  */
 public class DasTarget {
 
@@ -40,6 +51,7 @@ public class DasTarget {
      * feature command:
      *
      * /DASGFF/GFF/SEGMENT/FEATURE/TARGET/@id
+     * /DASGFF/GFF/SEGMENT/FEATURE/GROUP/TARGET/@id
      */
     private String targetId;
 
@@ -49,6 +61,7 @@ public class DasTarget {
      * feature command:
      *
      * /DASGFF/GFF/SEGMENT/FEATURE/TARGET
+     * /DASGFF/GFF/SEGMENT/FEATURE/GROUP/TARGET
      */
     private String targetName;
 
@@ -58,6 +71,7 @@ public class DasTarget {
      * feature command:
      *
      * /DASGFF/GFF/SEGMENT/FEATURE/TARGET/@start
+     * /DASGFF/GFF/SEGMENT/FEATURE/GROUP/TARGET/@start
      */
     private int startCoordinate;
 
@@ -67,6 +81,7 @@ public class DasTarget {
      * feature command:
      *
      * /DASGFF/GFF/SEGMENT/FEATURE/TARGET/@stop
+     * /DASGFF/GFF/SEGMENT/FEATURE/GROUP/TARGET/@stop
      */
     private int stopCoordinate;
 
@@ -76,18 +91,22 @@ public class DasTarget {
      * the following attribute in the response to the
      * feature command:
      * /DASGFF/GFF/SEGMENT/FEATURE/TARGET/@id
+     * /DASGFF/GFF/SEGMENT/FEATURE/GROUP/TARGET/@id
      * @param startCoordinate <b>Mandatory</b> field, corresponds to
      * the following attribute in the response to the
      * feature command:
      * /DASGFF/GFF/SEGMENT/FEATURE/TARGET/@start
+     * /DASGFF/GFF/SEGMENT/FEATURE/GROUP/TARGET/@start
      * @param stopCoordinate <b>Mandatory</b> field, corresponds to
      * the following attribute in the response to the
      * feature command:
      * /DASGFF/GFF/SEGMENT/FEATURE/TARGET/@stop
+     * /DASGFF/GFF/SEGMENT/FEATURE/GROUP/TARGET/@stop
      * @param targetName <b>Optional</b> field, corresponds to
      * the value of the following element in the response to the
      * feature command:
      * /DASGFF/GFF/SEGMENT/FEATURE/TARGET
+     * /DASGFF/GFF/SEGMENT/FEATURE/GROUP/TARGET
      * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
      * if the targetId attribute has not been set to a valid value (i.e. non-zero length String).
      */
