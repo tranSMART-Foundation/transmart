@@ -69,4 +69,14 @@ public class CacheManager {
             cacheAdministrator.flushGroup(dsnConfig.getName());
         }
     }
+
+    /**
+     * Use with care - gives the datasource access to the OSCache GeneralCacheManager being
+     * used by the mydas server.
+     * @return gives the datasource access to the OSCache GeneralCacheManager being
+     * used by the mydas server.
+     */
+    public GeneralCacheAdministrator getCacheAdministrator(){
+        return cacheAdministrator;
+    }
 }

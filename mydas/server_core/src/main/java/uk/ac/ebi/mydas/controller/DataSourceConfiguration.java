@@ -137,12 +137,6 @@ public class DataSourceConfiguration {
     private boolean useFeatureIdForFeatureLabel;
 
     /**
-     * A Collection of the types for the data source, loaded from the server configuration
-     * for this dsn.
-     */
-    private Collection<DasType> types;
-
-    /**
      * A boolean flag to indicate if the datasource failed on initialisation.
      */
     private boolean datasourceOK;
@@ -198,7 +192,7 @@ public class DataSourceConfiguration {
     ) {
         this.id = id;
         this.name = name;
-        this.cacheGroup[0] = name;
+        this.cacheGroup[0] = id;
         this.version = version;
         this.mapmaster = mapmaster;
         this.description = description;
@@ -431,9 +425,7 @@ public class DataSourceConfiguration {
             .append ("' use feature id for feature label: '")
             .append (useFeatureIdForFeatureLabel)
             .append ("' include types with zero count: '")
-            .append (includeTypesWithZeroCount)
-            .append ("' Types: ")
-            .append ((types == null) ? "null" : types.toString());
+            .append (includeTypesWithZeroCount);
         return buf.toString();
     }
 

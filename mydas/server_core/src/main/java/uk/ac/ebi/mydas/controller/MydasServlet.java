@@ -598,7 +598,7 @@ public class MydasServlet extends HttpServlet {
 
     private Collection<DasType> getAllTypes (DataSourceConfiguration dsnConfig) throws DataSourceException {
         Collection<DasType> allTypes;
-        String cacheKey = dsnConfig.getName() + "_ALL_TYPES";
+        String cacheKey = dsnConfig.getId() + "_ALL_TYPES";
 
         try{
             allTypes = (Collection<DasType>) CACHE_MANAGER.getFromCache(cacheKey);
@@ -638,7 +638,7 @@ public class MydasServlet extends HttpServlet {
                 if (typeFilter.size() == 0 || typeFilter.contains(type.getId())){
                     // Attempt to get a count of the types from the dsn. (May not be implemented.)
                     Integer typeCount;
-                    StringBuffer keyBuf = new StringBuffer(dsnConfig.getName());
+                    StringBuffer keyBuf = new StringBuffer(dsnConfig.getId());
                     keyBuf.append("_TYPECOUNT_").append (type.getId());
                     String cacheKey = keyBuf.toString();
 
@@ -918,7 +918,7 @@ public class MydasServlet extends HttpServlet {
         URL url;
 
         // Build the key name for the cache.
-        StringBuffer cacheKeyBuffer = new StringBuffer(dataSourceConfig.getName());
+        StringBuffer cacheKeyBuffer = new StringBuffer(dataSourceConfig.getId());
         cacheKeyBuffer.append("_LINK_")
                 .append(field)
                 .append('_')
@@ -1483,7 +1483,7 @@ public class MydasServlet extends HttpServlet {
                 DasAnnotatedSegment annotatedSegment;
 
                 // Build the key name for the cache.
-                StringBuffer cacheKeyBuffer = new StringBuffer(dsnConfig.getName());
+                StringBuffer cacheKeyBuffer = new StringBuffer(dsnConfig.getId());
                 cacheKeyBuffer.append("_FEATURES_");
                 if (dataSource instanceof RangeHandlingAnnotationDataSource || dataSource instanceof RangeHandlingReferenceDataSource){
                     // May return DasSequence objects containing partial sequences, so include segment id, start and stop coordinates in the key:
@@ -1595,7 +1595,7 @@ public class MydasServlet extends HttpServlet {
                 DasSequence sequence;
 
                 // Build the key name for the cache.
-                StringBuffer cacheKeyBuffer = new StringBuffer(dsnConfig.getName());
+                StringBuffer cacheKeyBuffer = new StringBuffer(dsnConfig.getId());
                 cacheKeyBuffer.append("_SEQUENCE_");
                 if (refDsn instanceof RangeHandlingReferenceDataSource){
                     // May return DasSequence objects containing partial sequences, so include segment id, start and stop coordinates in the key:
