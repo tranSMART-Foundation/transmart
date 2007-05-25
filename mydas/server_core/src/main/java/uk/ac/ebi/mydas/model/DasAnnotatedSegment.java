@@ -106,6 +106,20 @@ public class DasAnnotatedSegment extends DasSegment{
     }
 
     /**
+     * Convenience method - if you are creating a DasAnnotatedSegment, but already have a DasSequence object for the
+     * same segment, you can use the sequence to build the DasAnnotatedSegment easily.
+     * @param sequence being a valid DasSequence object that represents the same segment.
+     * @param segmentLabel <b>Optional.</b> A human readable label for the segment.  If this is not given (null or
+     * empty string) the segment ID will be used in its place.
+     * @param features being a Collection of zero or more {@link DasFeature} objects.  Each of these objects describes a single
+     * feature.
+     * @throws DataSourceException to allow you to handle problems with the data source, such as SQLExceptions,
+     * parsing errors etc.
+     */
+    public DasAnnotatedSegment(DasSequence sequence, String segmentLabel, Collection<DasFeature> features) throws DataSourceException {
+        this (sequence.getSegmentId(), sequence.getStartCoordinate(), sequence.getStopCoordinate(), sequence.getVersion(), segmentLabel, features);
+    }
+    /**
      * Returns a collection of {@link DasFeature} objects, being the features annotated on this segment.
      * Holds the complete contents of a /DASGFF/GFF/SEGMENT/FEATURE element (for the features request)
      * and is used to derive the contents of the
