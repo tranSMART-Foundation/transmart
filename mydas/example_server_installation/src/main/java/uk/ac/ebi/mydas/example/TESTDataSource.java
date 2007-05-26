@@ -23,18 +23,18 @@
 
 package uk.ac.ebi.mydas.example;
 
-import uk.ac.ebi.mydas.controller.DataSourceConfiguration;
 import uk.ac.ebi.mydas.controller.CacheManager;
-import uk.ac.ebi.mydas.exceptions.DataSourceException;
+import uk.ac.ebi.mydas.controller.DataSourceConfiguration;
+import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
+import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.model.*;
-import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
 
 import javax.servlet.ServletContext;
-import java.util.*;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -137,8 +137,8 @@ public class TESTDataSource implements ReferenceDataSource {
                         5,
                         10,
                         123.45,
-                        DasFeature.ORIENTATION_NOT_APPLICABLE,
-                        DasFeature.PHASE_NOT_APPLICABLE,
+                        DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
+                        DasPhase.PHASE_NOT_APPLICABLE,
                         Collections.singleton("This is a note relating to feature one of segment one."),
                         Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
                         Collections.singleton(target),
@@ -155,8 +155,8 @@ public class TESTDataSource implements ReferenceDataSource {
                         18,
                         25,
                         96.3,
-                        DasFeature.ORIENTATION_NOT_APPLICABLE,
-                        DasFeature.PHASE_NOT_APPLICABLE,
+                        DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
+                        DasPhase.PHASE_NOT_APPLICABLE,
                         Collections.singleton("This is a note relating to feature two of segment one."),
                         Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
                         null,
@@ -178,8 +178,8 @@ public class TESTDataSource implements ReferenceDataSource {
                         9,
                         33,
                         1000.01,
-                        DasFeature.ORIENTATION_SENSE_STRAND,
-                        DasFeature.PHASE_READING_FRAME_0,
+                        DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
+                        DasPhase.PHASE_READING_FRAME_0,
                         Collections.singleton("This is a note relating to feature one of segment two."),
                         Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
                         null,
@@ -201,8 +201,8 @@ public class TESTDataSource implements ReferenceDataSource {
                         "component",
                         null,
                         0.0,
-                        DasFeature.ORIENTATION_SENSE_STRAND,
-                        DasFeature.PHASE_READING_FRAME_0,
+                        DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
+                        DasPhase.PHASE_READING_FRAME_0,
                         Collections.singleton("This is a sub-component with a different coordinate system."),
                         null);
                 selfComponent.addSubComponent(
@@ -217,8 +217,8 @@ public class TESTDataSource implements ReferenceDataSource {
                         "component",
                         null,
                         0.00,
-                        DasFeature.ORIENTATION_SENSE_STRAND,
-                        DasFeature.PHASE_READING_FRAME_0,
+                        DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
+                        DasPhase.PHASE_READING_FRAME_0,
                         null,
                         null
                 );
@@ -234,8 +234,8 @@ public class TESTDataSource implements ReferenceDataSource {
                         "component",
                         null,
                         0.00,
-                        DasFeature.ORIENTATION_SENSE_STRAND,
-                        DasFeature.PHASE_READING_FRAME_0,
+                        DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
+                        DasPhase.PHASE_READING_FRAME_0,
                         null,
                         null
                 );
@@ -251,8 +251,8 @@ public class TESTDataSource implements ReferenceDataSource {
                         "component",
                         null,
                         0.00,
-                        DasFeature.ORIENTATION_SENSE_STRAND,
-                        DasFeature.PHASE_READING_FRAME_0,
+                        DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
+                        DasPhase.PHASE_READING_FRAME_0,
                         null,
                         null
                 );
@@ -269,8 +269,8 @@ public class TESTDataSource implements ReferenceDataSource {
                         "supercomponent",
                         null,
                         0.00,
-                        DasFeature.ORIENTATION_SENSE_STRAND,
-                        DasFeature.PHASE_READING_FRAME_0,
+                        DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
+                        DasPhase.PHASE_READING_FRAME_0,
                         null,
                         null
                 );
@@ -442,7 +442,7 @@ public class TESTDataSource implements ReferenceDataSource {
     public Collection<DasEntryPoint> getEntryPoints() throws DataSourceException {
         List<DasEntryPoint> entryPoints = new ArrayList<DasEntryPoint>();
         entryPoints.add (new DasEntryPoint("one", 1, 34, "Protein", null, "Its a protein!", false));
-        entryPoints.add (new DasEntryPoint("two", 1, 48, "DNA", DasEntryPoint.POSITIVE_ORIENTATION, "Its a chromosome!", false));
+        entryPoints.add (new DasEntryPoint("two", 1, 48, "DNA", DasEntryPointOrientation.POSITIVE_ORIENTATION, "Its a chromosome!", false));
         return entryPoints;
     }
 

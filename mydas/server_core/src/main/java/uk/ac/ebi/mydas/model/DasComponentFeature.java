@@ -25,11 +25,11 @@ package uk.ac.ebi.mydas.model;
 
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -90,8 +90,8 @@ public class DasComponentFeature extends DasFeature {
                     int startCoodinateOnSegment,
                     int endCoordinateOnSegment,
                     Double score,
-                    String orientation,
-                    String phase,
+                    DasFeatureOrientation orientation,
+                    DasPhase phase,
                     Collection<String> notes,
                     Map<URL, String> links)
         throws DataSourceException {
@@ -131,8 +131,8 @@ public class DasComponentFeature extends DasFeature {
                 segment.getStartCoordinate(),
                 segment.getStopCoordinate(),
                 0.00,
-                DasFeature.ORIENTATION_NOT_APPLICABLE,
-                DasFeature.PHASE_NOT_APPLICABLE,
+                DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
+                DasPhase.PHASE_NOT_APPLICABLE,
                 null,
                 null,
                 new ArrayList<DasTarget>(1),
@@ -200,8 +200,8 @@ public class DasComponentFeature extends DasFeature {
                                 String componentMethodId,
                                 String componentMethodLabel,
                                 Double componentScore,
-                                String componentOrientation,
-                                String componentPhase,
+                                DasFeatureOrientation componentOrientation,
+                                DasPhase componentPhase,
                                 Collection<String> componentNotes,
                                 Map<URL, String> componentLinks
 
@@ -281,8 +281,8 @@ public class DasComponentFeature extends DasFeature {
                                 String componentMethodId,
                                 String componentMethodLabel,
                                 Double componentScore,
-                                String componentOrientation,
-                                String componentPhase,
+                                DasFeatureOrientation componentOrientation,
+                                DasPhase componentPhase,
                                 Collection<String> componentNotes,
                                 Map<URL, String> componentLinks) throws DataSourceException {
         if (superComponents == null){

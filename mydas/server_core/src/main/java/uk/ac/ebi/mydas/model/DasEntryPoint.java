@@ -75,7 +75,7 @@ public class DasEntryPoint {
      * For the entry_point command, provides the value for the
      * <code>/DASEP/ENTRY_POINTS/SEGMENT/@orientation</code> attribute.
      */
-    private DasSequenceOrientation orientation;
+    private DasEntryPointOrientation orientation;
 
     /**
      * An optional description of the entry point.
@@ -121,7 +121,7 @@ public class DasEntryPoint {
      * For the entry_point command, provides the value for the
      * <code>/DASEP/ENTRY_POINTS/SEGMENT</code> element.
      */
-    public DasEntryPoint(String segmentId, int startCoordinate, int stopCoordinate, String type, DasSequenceOrientation orientation, String description, boolean hasSubparts)
+    public DasEntryPoint(String segmentId, int startCoordinate, int stopCoordinate, String type, DasEntryPointOrientation orientation, String description, boolean hasSubparts)
             throws DataSourceException {
         if (segmentId == null || segmentId.length() == 0){
             throw new DataSourceException("A new DasEntryPoint object must be initialised with a segmentId.");
@@ -132,7 +132,7 @@ public class DasEntryPoint {
         this.stopCoordinate = stopCoordinate;
         this.type = type;
         this.orientation = (orientation == null)
-                ? DasSequenceOrientation.NO_INTRINSIC_ORIENTATION
+                ? DasEntryPointOrientation.NO_INTRINSIC_ORIENTATION
                 : orientation;
         this.description = description;
         this.subparts = hasSubparts;
@@ -187,7 +187,7 @@ public class DasEntryPoint {
      * <code>/DASEP/ENTRY_POINTS/SEGMENT/@orientation</code> attribute.
      * @return the orientation of the entry point.
      */
-    public DasSequenceOrientation getOrientation() {
+    public DasEntryPointOrientation getOrientation() {
         return orientation;
     }
 
