@@ -28,8 +28,6 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -162,7 +160,7 @@ public class DasFeature {
      * For the features command, provides the value for
      * /DASGFF/GFF/SEGMENT/FEATURE/ORIENTATION
      */
-    protected final String orientation;
+    protected final DasFeatureOrientation orientation;
 
     /**
      * <b>Mandatory</b>
@@ -176,7 +174,7 @@ public class DasFeature {
      * For the features command, provides the value for
      * /DASGFF/GFF/SEGMENT/FEATURE/PHASE
      */
-    protected final String phase;
+    protected final DasPhase phase;
 
     /**
      * <b>Optional</b> - May be <code>null</code>.
@@ -226,29 +224,6 @@ public class DasFeature {
      * for details of how this class maps to the DAS XML.
      */
     protected final Collection<DasGroup> groups;
-
-    public static final String ORIENTATION_NOT_APPLICABLE = "0";
-    public static final String ORIENTATION_SENSE_STRAND = "+";
-    public static final String ORIENTATION_ANTISENSE_STRAND = "-";
-
-    public static final String PHASE_READING_FRAME_0 = "0";
-    public static final String PHASE_READING_FRAME_1 = "1";
-    public static final String PHASE_READING_FRAME_2 = "2";
-    public static final String PHASE_NOT_APPLICABLE = "-";
-
-    private static final List<String> VALID_ORIENTATIONS = new ArrayList<String>(3);
-    private static final List<String> VALID_PHASES = new ArrayList<String>(4);
-
-    static {
-        VALID_ORIENTATIONS.add(ORIENTATION_NOT_APPLICABLE);
-        VALID_ORIENTATIONS.add(ORIENTATION_ANTISENSE_STRAND);
-        VALID_ORIENTATIONS.add(ORIENTATION_SENSE_STRAND);
-
-        VALID_PHASES.add(PHASE_NOT_APPLICABLE);
-        VALID_PHASES.add(PHASE_READING_FRAME_0);
-        VALID_PHASES.add(PHASE_READING_FRAME_1);
-        VALID_PHASES.add(PHASE_READING_FRAME_2);
-    }
 
     /**
      *
@@ -317,8 +292,8 @@ public class DasFeature {
                       int startCoordinate,
                       int endCoordinate,
                       Double score,
-                      String orientation,
-                      String phase,
+                      DasFeatureOrientation orientation,
+                      DasPhase phase,
                       Collection<String> notes,
                       Map<URL, String> links,
                       Collection<DasTarget> targets,
@@ -328,17 +303,10 @@ public class DasFeature {
             throw new DataSourceException ("An attempt to instantiate a DasFeature object without the minimal required mandatory values.");
         }
         if (orientation == null) {
-            orientation = ORIENTATION_NOT_APPLICABLE;
+            orientation = DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE;
         }
         if (phase == null){
-            phase = PHASE_NOT_APPLICABLE;
-        }
-
-        if (! VALID_ORIENTATIONS.contains(orientation)){
-            throw new DataSourceException ("An attempt to instantiate a DasFeature object with an invalid orientation has been detected.");
-        }
-        if (! VALID_PHASES.contains(phase)){
-            throw new DataSourceException ("An attempt to instantiate a DasFeature object with an invalid phase has been detected.");
+            phase = DasPhase.PHASE_NOT_APPLICABLE;
         }
         this.featureId = featureId;
         this.featureLabel = featureLabel;
@@ -400,11 +368,11 @@ public class DasFeature {
     }
 
     public String getOrientation() {
-        return orientation;
+        return orientation.toString();
     }
 
     public String getPhase() {
-        return phase;
+        return phase.toString();
     }
 
     public Collection<String> getNotes() {
