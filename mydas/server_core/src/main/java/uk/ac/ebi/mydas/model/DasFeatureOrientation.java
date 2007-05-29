@@ -29,8 +29,12 @@ package uk.ac.ebi.mydas.model;
  * Time: 15:35:39
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
+ *
+ * This enumeration provides the three possibilities for the mandatory
+ * /DASGFF/GFF/SEGMENT/FEATURE/ORIENTATION element.
  */
 public enum DasFeatureOrientation {
+
     ORIENTATION_NOT_APPLICABLE("0"),
     ORIENTATION_SENSE_STRAND("+"),
     ORIENTATION_ANTISENSE_STRAND("-");

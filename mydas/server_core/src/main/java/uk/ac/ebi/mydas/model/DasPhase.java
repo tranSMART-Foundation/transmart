@@ -29,6 +29,9 @@ package uk.ac.ebi.mydas.model;
  * Time: 15:40:09
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
+ *
+ * This enumeration provides the four possibilities for the mandatory
+ * /DASGFF/GFF/SEGMENT/FEATURE/PHASE element.
  */
 public enum DasPhase {
     PHASE_READING_FRAME_0("0"),

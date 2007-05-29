@@ -30,7 +30,8 @@ package uk.ac.ebi.mydas.model;
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
  * The DasEntryPointOrientation enum is used to represent the
- * orientation of the entry point.
+ * orientation of the entry point as reported in the
+ * /DASEP/ENTRY_POINTS/SEGMENT/@orientation attribute.
  */
     public enum DasEntryPointOrientation {
         /**
