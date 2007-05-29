@@ -39,7 +39,7 @@ public enum DasPhase {
     PHASE_READING_FRAME_2 ("2"),
     PHASE_NOT_APPLICABLE ("-");
 
-    private String representation;
+    private final String representation;
 
     private DasPhase (String representation){
         this.representation = representation;

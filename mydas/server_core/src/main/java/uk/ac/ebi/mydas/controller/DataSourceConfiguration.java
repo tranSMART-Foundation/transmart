@@ -25,19 +25,10 @@ package uk.ac.ebi.mydas.controller;
 
 import org.apache.log4j.Logger;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
-import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource;
-import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
-import uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
-import uk.ac.ebi.mydas.model.DasType;
 
 import java.net.URL;
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collection;
-
-import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -63,15 +54,6 @@ public class DataSourceConfiguration {
      * Logger instance named "XMLUnmarshaller".
      */
     private static final Logger logger = Logger.getLogger(DataSourceConfiguration.class);
-
-    private static final List<Class> DATA_SOURCE_INTERFACES = new ArrayList<Class>(4);
-
-    static{
-        DATA_SOURCE_INTERFACES.add (AnnotationDataSource.class);
-        DATA_SOURCE_INTERFACES.add (RangeHandlingAnnotationDataSource.class);
-        DATA_SOURCE_INTERFACES.add (ReferenceDataSource.class);
-        DATA_SOURCE_INTERFACES.add (RangeHandlingReferenceDataSource.class);
-    }
 
     /**
      * Holds the mandatory value for /DASDSN/DSN/SOURCE/@id
@@ -128,13 +110,13 @@ public class DataSourceConfiguration {
      * Flag to indicate if features should only be returned if they appear strictly
      * within the coordinates given.
      */
-    private boolean featuresStrictlyEnclosed;
+    private final boolean featuresStrictlyEnclosed;
 
     /**
      * Flag to indicate if the feature id should be used for the label
      * if no label is set by the data source.
      */
-    private boolean useFeatureIdForFeatureLabel;
+    private final boolean useFeatureIdForFeatureLabel;
 
     /**
      * A boolean flag to indicate if the datasource failed on initialisation.
@@ -144,18 +126,18 @@ public class DataSourceConfiguration {
     /**
      * A boolean flag to indicate if the dna command is enabled.
      */
-    private boolean dnaCommandEnabled;
+    private final boolean dnaCommandEnabled;
 
     /**
      * Boolean flag indicating if types with a count of zero should be included in the
      * output of the types command.
      */
-    private boolean includeTypesWithZeroCount;
+    private final boolean includeTypesWithZeroCount;
 
     /**
      * Stores the cache group for caching purposes.
      */
-    private String[] cacheGroup = new String[1];
+    private final String[] cacheGroup = new String[1];
 
     /**
      * Package access only - instances of this class can be created by the MydasServlet

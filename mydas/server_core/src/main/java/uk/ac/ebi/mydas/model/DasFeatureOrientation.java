@@ -39,7 +39,7 @@ public enum DasFeatureOrientation {
     ORIENTATION_SENSE_STRAND("+"),
     ORIENTATION_ANTISENSE_STRAND("-");
 
-    private String representation;
+    private final String representation;
 
     private DasFeatureOrientation(String representation){
         this.representation = representation;

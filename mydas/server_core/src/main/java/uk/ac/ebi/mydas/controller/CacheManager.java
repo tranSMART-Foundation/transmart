@@ -42,12 +42,12 @@ public class CacheManager {
     /**
      * Reference to the GeneralCacheAdministrator object.
      */
-    private GeneralCacheAdministrator cacheAdministrator;
+    private final GeneralCacheAdministrator cacheAdministrator;
 
     /**
      * Reference to the data source configuration.
      */
-    private DataSourceConfiguration dsnConfig;
+    private final DataSourceConfiguration dsnConfig;
 
     /**
      * Constructor for the CacheManager object, that can includes a reference to the GeneralCacheAdministrator

@@ -32,7 +32,7 @@ package uk.ac.ebi.mydas.controller;
  */
 public class UnknownSegmentReporter implements SegmentReporter {
 
-    SegmentQuery query;
+    final SegmentQuery query;
 
     public UnknownSegmentReporter(SegmentQuery query){
         this.query = query;

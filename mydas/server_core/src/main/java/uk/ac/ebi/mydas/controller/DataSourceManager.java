@@ -23,6 +23,7 @@
 
 package uk.ac.ebi.mydas.controller;
 
+import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.mydas.exceptions.ConfigurationException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
@@ -31,8 +32,6 @@ import javax.servlet.ServletContext;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -49,7 +48,7 @@ public class DataSourceManager {
      */
     private static final Logger logger = Logger.getLogger(DataSourceManager.class);
 
-    private ServletContext svCon;
+    private final ServletContext svCon;
 
     private ServerConfiguration serverConfiguration;
 

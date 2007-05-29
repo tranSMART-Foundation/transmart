@@ -23,8 +23,8 @@
 
 package uk.ac.ebi.mydas.controller;
 
-import uk.ac.ebi.mydas.model.DasSequence;
 import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
+import uk.ac.ebi.mydas.model.DasSequence;
 
 /**
  * Created using IntelliJ IDEA.
@@ -35,13 +35,13 @@ import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
  */
 class SequenceReporter{
 
-    private boolean restricted;
+    private final boolean restricted;
 
     private int requestedStart;
 
     private int requestedStop;
 
-    private DasSequence sequence;
+    private final DasSequence sequence;
 
 
     SequenceReporter(DasSequence sequence, SegmentQuery segmentQuery) throws CoordinateErrorException {

@@ -25,6 +25,7 @@ package uk.ac.ebi.mydas.controller;
 
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 import uk.ac.ebi.mydas.model.DasFeature;
+
 import java.util.Collection;
 
 /**
@@ -39,13 +40,13 @@ import java.util.Collection;
  */
 public class FoundFeaturesReporter implements SegmentReporter {
 
-    private boolean restricted;
+    private final boolean restricted;
 
     private Integer requestedStart;
 
     private Integer requestedStop;
 
-    private DasAnnotatedSegment annotatedSegment;
+    private final DasAnnotatedSegment annotatedSegment;
 
     FoundFeaturesReporter(DasAnnotatedSegment annotatedSegment, SegmentQuery segmentQuery){
         this.restricted = segmentQuery.getStartCoordinate() != null;

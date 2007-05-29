@@ -21,7 +21,7 @@ public enum XDasStatus {
     STATUS_500_SERVER_ERROR ("500"),
     STATUS_501_UNIMPLEMENTED_FEATURE ("501");
 
-    private String errorCode;
+    private final String errorCode;
 
     private XDasStatus(String errorCode){
         this.errorCode = errorCode;

@@ -34,11 +34,11 @@ import java.util.regex.Matcher;
  */
 public class SegmentQuery {
 
-    private String segmentId;
+    private final String segmentId;
 
-    private Integer startCoordinate;
+    private final Integer startCoordinate;
 
-    private Integer stopCoordinate;
+    private final Integer stopCoordinate;
 
     public SegmentQuery(Matcher segmentRangePatternMatcher){
         segmentId = segmentRangePatternMatcher.group(1);
