@@ -71,7 +71,7 @@ public class CacheManager {
     }
 
     /**
-     * Use with care - gives the datasource access to the OSCache GeneralCacheManager being
+     * <b>Use with care</b> - gives the datasource access to the OSCache GeneralCacheManager being
      * used by the mydas server.
      * @return gives the datasource access to the OSCache GeneralCacheManager being
      * used by the mydas server.
