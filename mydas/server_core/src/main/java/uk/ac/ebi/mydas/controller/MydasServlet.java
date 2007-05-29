@@ -23,14 +23,16 @@
 
 package uk.ac.ebi.mydas.controller;
 
+import com.opensymphony.oscache.base.NeedsRefreshException;
+import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 import org.apache.log4j.Logger;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
-import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
-import uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource;
-import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
+import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource;
+import uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource;
+import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
 import uk.ac.ebi.mydas.exceptions.*;
 import uk.ac.ebi.mydas.model.*;
 
@@ -39,14 +41,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
-import java.net.URL;
-
-import com.opensymphony.oscache.base.NeedsRefreshException;
-import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -116,19 +115,6 @@ public class MydasServlet extends HttpServlet {
 //    private static final String RESOURCE_FOLDER = "/WEB-INF/classes/";
 
     private static final String CONFIGURATION_FILE_NAME = RESOURCE_FOLDER + "MydasServerConfig.xml";
-
-    /*
-     Status codes for the DAS server.
-     */
-    private static final String STATUS_200_OK = "200";
-    private static final String STATUS_400_BAD_COMMAND = "400";
-    private static final String STATUS_401_BAD_DATA_SOURCE = "401";
-    private static final String STATUS_402_BAD_COMMAND_ARGUMENTS = "402";
-    private static final String STATUS_403_BAD_REFERENCE_OBJECT = "403";
-    private static final String STATUS_404_BAD_STYLESHEET = "404";
-    private static final String STATUS_405_COORDINATE_ERROR = "405";
-    private static final String STATUS_500_SERVER_ERROR = "500";
-    private static final String STATUS_501_UNIMPLEMENTED_FEATURE = "501";
 
     /*
      Commands handled by the servlet.
@@ -361,40 +347,40 @@ public class MydasServlet extends HttpServlet {
             }
         } catch (BadCommandException bce) {
             logger.error("BadCommandException thrown", bce);
-            writeHeader(request, response, STATUS_400_BAD_COMMAND, false);
+            writeHeader(request, response, XDasStatus.STATUS_400_BAD_COMMAND, false);
         } catch (BadDataSourceException bdse) {
             logger.error("BadDataSourceException thrown", bdse);
-            writeHeader(request, response, STATUS_401_BAD_DATA_SOURCE, false);
+            writeHeader(request, response, XDasStatus.STATUS_401_BAD_DATA_SOURCE, false);
         } catch (BadCommandArgumentsException bcae) {
             logger.error("BadCommandArgumentsException thrown", bcae);
-            writeHeader(request, response, STATUS_402_BAD_COMMAND_ARGUMENTS, false);
+            writeHeader(request, response, XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, false);
         } catch (BadReferenceObjectException broe) {
             logger.error("BadReferenceObjectException thrown", broe);
-            writeHeader(request, response, STATUS_403_BAD_REFERENCE_OBJECT, false);
+            writeHeader(request, response, XDasStatus.STATUS_403_BAD_REFERENCE_OBJECT, false);
         } catch (BadStylesheetException bse) {
             logger.error("BadStylesheetException thrown:", bse);
-            writeHeader(request, response, STATUS_404_BAD_STYLESHEET, false);
+            writeHeader(request, response, XDasStatus.STATUS_404_BAD_STYLESHEET, false);
         } catch (CoordinateErrorException cee) {
             logger.error("CoordinateErrorException thrown", cee);
-            writeHeader(request, response, STATUS_405_COORDINATE_ERROR, false);
+            writeHeader(request, response, XDasStatus.STATUS_405_COORDINATE_ERROR, false);
         } catch (XmlPullParserException xppe) {
             logger.error("XmlPullParserException thrown when attempting to ouput XML.", xppe);
-            writeHeader (request, response, STATUS_500_SERVER_ERROR, false);
+            writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
         } catch (DataSourceException dse){
             logger.error("DataSourceException thrown by a data source.", dse);
-            writeHeader(request, response, STATUS_500_SERVER_ERROR, false);
+            writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
         } catch (ConfigurationException ce) {
             logger.error("ConfigurationException thrown: This mydas installation was not correctly initialised.", ce);
-            writeHeader(request, response, STATUS_500_SERVER_ERROR, false);
+            writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
         } catch (UnimplementedFeatureException efe) {
             logger.error("UnimplementedFeatureException thrown", efe);
-            writeHeader(request, response, STATUS_501_UNIMPLEMENTED_FEATURE, false);
+            writeHeader(request, response, XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE, false);
         }
 
         // Catch all for any remaining exceptions - it is not expected that this should be called however.
         catch (Exception e){
             logger.error("Exception thrown... This is serious, and unexpected.  status 500 has been returned - need to look into this.", e);
-            writeHeader(request, response, STATUS_500_SERVER_ERROR, false);
+            writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
         }
     }
 
@@ -410,7 +396,7 @@ public class MydasServlet extends HttpServlet {
             throws XmlPullParserException, IOException{
         // Check the configuration has been loaded successfully
         if (DATA_SOURCE_MANAGER.getServerConfiguration() == null){
-            writeHeader (request, response, STATUS_500_SERVER_ERROR, false);
+            writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
             logger.error("A request has been made to the das server, however initialisation failed - possibly the mydasserverconfig.xml file was not found.");
             return;
         }
@@ -421,12 +407,12 @@ public class MydasServlet extends HttpServlet {
             List<String> dsns = DATA_SOURCE_MANAGER.getServerConfiguration().getDsnNames();
             // Check there is at least one dsn.  (Mandatory in the dsn XML output).
             if (dsns == null || dsns.size() == 0){
-                writeHeader (request, response, STATUS_500_SERVER_ERROR, false);
+                writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
                 logger.error("The dsn command has been called, but no dsns have been initialised successfully.");
             }
             else{
                 // At least one dsn is OK.
-                writeHeader (request, response, STATUS_200_OK, true);
+                writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
                 // Build the XML.
                 XmlSerializer serializer;
                 serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -484,7 +470,7 @@ public class MydasServlet extends HttpServlet {
         else {
             // If fallen through to here, then the dsn command is not recognised
             // as it has rubbish in the query string.
-            writeHeader (request, response, STATUS_402_BAD_COMMAND_ARGUMENTS, true);
+            writeHeader (request, response, XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, true);
         }
     }
 
@@ -498,7 +484,7 @@ public class MydasServlet extends HttpServlet {
                 // All good - process command.
                 Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
                 // Got some sequences, so all is OK.
-                writeHeader (request, response, STATUS_200_OK, true);
+                writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
                 // Build the XML.
                 XmlSerializer serializer;
                 serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -663,7 +649,7 @@ public class MydasServlet extends HttpServlet {
             }
         }
 
-        writeHeader (request, response, STATUS_200_OK, true);
+        writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
         // Build the XML.
         XmlSerializer serializer;
         serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -758,7 +744,7 @@ public class MydasServlet extends HttpServlet {
         }
 
         // OK, successfully built a Map of the types for all the requested segments, so iterate over this and report.
-        writeHeader (request, response, STATUS_200_OK, true);
+        writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
         // Build the XML.
         XmlSerializer serializer;
         serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -851,7 +837,7 @@ public class MydasServlet extends HttpServlet {
 
             if (reader.ready()){
                 //OK, managed to open an input reader from the stylesheet, so output the success header.
-                writeHeader (request, response, STATUS_200_OK, true);
+                writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
                 writer = getResponseWriter(request, response);
                 while (reader.ready()){
                     writer.write(reader.readLine());
@@ -1072,7 +1058,7 @@ public class MydasServlet extends HttpServlet {
             }
         }
         // OK - got a Collection of FoundFeaturesReporter objects, so get on with marshalling them out.
-        writeHeader (request, response, STATUS_200_OK, true);
+        writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
 
         /************************************************************************\
          * Build the XML                                                        *
@@ -1334,7 +1320,7 @@ public class MydasServlet extends HttpServlet {
                 throw new DataSourceException("The dsn " + dsnConfig.getId() + "is returning null for the entry point version, which is invalid.");
             }
             // Looks like all is OK.
-            writeHeader (request, response, STATUS_200_OK, true);
+            writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
             //OK, got our entry points, so write out the XML.
             XmlSerializer serializer;
             serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -1415,7 +1401,7 @@ public class MydasServlet extends HttpServlet {
             // Fine - process command.
             Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
             // Got some sequences, so all is OK.
-            writeHeader (request, response, STATUS_200_OK, true);
+            writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
             // Build the XML.
             XmlSerializer serializer;
             serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -1680,10 +1666,10 @@ public class MydasServlet extends HttpServlet {
      * @param compressionAllowed to indicate if the specific response should be gzipped. (e.g. an error message with
      * no content should not set the compressed header.)
      */
-    private void writeHeader (HttpServletRequest request, HttpServletResponse response, String status, boolean compressionAllowed){
+    private void writeHeader (HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed){
         response.setHeader(HEADER_KEY_X_DAS_VERSION, HEADER_VALUE_DAS_VERSION);
         response.setHeader(HEADER_KEY_X_DAS_CAPABILITIES, HEADER_VALUE_CAPABILITIES);
-        response.setHeader(HEADER_KEY_X_DAS_STATUS, status);
+        response.setHeader(HEADER_KEY_X_DAS_STATUS, status.toString());
         if (compressionAllowed && compressResponse (request)){
             response.setHeader(ENCODING_RESPONSE_HEADER_KEY, ENCODING_GZIPPED);
         }
