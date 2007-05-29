@@ -354,18 +354,24 @@ public class TESTDataSource implements ReferenceDataSource {
         throw new UnimplementedFeatureException("\"This test class, it is not ready yet!\" (in a Swedish accent)");
     }
 
-    /**
-     * This method allows the DAS server to report a total count for a particular type ID
+   /**
+     * This method allows the DAS server to report a total count for a particular type
      * for all annotations across the entire data source.  If it is not possible to retrieve this value from your dsn, you
-     * should throw a {@link uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException} to indicate this.
-     *
-     * @param typeId as a String.  Please see <a href="http://biodas.org/documents/spec.html#types">
-     *               DAS 1.53 Specification : types command</a>
+     * should return <code>null</code>.
+     * @param type containing the information needed to retrieve the type count
+     * (type id and optionally the method id and category id.  Note that the last two may
+     * be null, which needs to be taken into account by the implementation.)
      * @return The total count <i>across the entire data source</i> (not
-     *         just for one segment) for the specified type id.
+     * just for one segment) for the specified type.  If it is not possible to determine
+     * this count, this method should return <code>null</code>.
+     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException should be thrown if there is any
+     * fatal problem with loading this data source.  <bold>It is highly desirable for the
+     *  implementation to test itself in this init method and throw
+     * a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
+     * and read a record.</bold>
      */
-    public int getTotalCountForType(String typeId) throws UnimplementedFeatureException, DataSourceException {
-        return 0;
+    public Integer getTotalCountForType(DasType type) throws DataSourceException {
+       return null;
     }
 
     /**

@@ -639,17 +639,19 @@ public class MydasServlet extends HttpServlet {
                     // Attempt to get a count of the types from the dsn. (May not be implemented.)
                     Integer typeCount;
                     StringBuffer keyBuf = new StringBuffer(dsnConfig.getId());
-                    keyBuf.append("_TYPECOUNT_").append (type.getId());
+                    keyBuf  .append("_TYPECOUNT_ID_")
+                            .append (type.getId())
+                            .append ("_CAT_")
+                            .append ((type.getCategory() == null) ? "null" : type.getCategory())
+                            .append ("_METHOD_")
+                            .append ((type.getMethod() == null ) ? "null" : type.getMethod());
                     String cacheKey = keyBuf.toString();
 
                     try{
                         typeCount = (Integer) CACHE_MANAGER.getFromCache(cacheKey);
                     } catch (NeedsRefreshException nre) {
                         try{
-                            typeCount = dsnConfig.getDataSource().getTotalCountForType (type.getId());
-                            CACHE_MANAGER.putInCache(cacheKey, typeCount, dsnConfig.getCacheGroup());
-                        } catch (UnimplementedFeatureException ufe) {
-                            typeCount = null;
+                            typeCount = dsnConfig.getDataSource().getTotalCountForType (type);
                             CACHE_MANAGER.putInCache(cacheKey, typeCount, dsnConfig.getCacheGroup());
                         } catch (DataSourceException dse){
                             CACHE_MANAGER.cancelUpdate(cacheKey);
