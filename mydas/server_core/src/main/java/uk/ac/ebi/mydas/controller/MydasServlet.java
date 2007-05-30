@@ -1258,13 +1258,15 @@ public class MydasServlet extends HttpServlet {
     private void serializeFeatureLinkElements(Map<URL, String> links, XmlSerializer serializer) throws IOException {
         if (links != null){
             for (URL url : links.keySet()){
-                serializer.startTag(DAS_XML_NAMESPACE, "LINK");
-                serializer.attribute(DAS_XML_NAMESPACE, "href", url.toString());
-                String linkText = links.get(url);
-                if (linkText != null && linkText.length() > 0){
-                    serializer.text(linkText);
+                if (url != null){
+                    serializer.startTag(DAS_XML_NAMESPACE, "LINK");
+                    serializer.attribute(DAS_XML_NAMESPACE, "href", url.toString());
+                    String linkText = links.get(url);
+                    if (linkText != null && linkText.length() > 0){
+                        serializer.text(linkText);
+                    }
+                    serializer.endTag(DAS_XML_NAMESPACE, "LINK");
                 }
-                serializer.endTag(DAS_XML_NAMESPACE, "LINK");
             }
         }
     }
