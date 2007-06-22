@@ -34,6 +34,11 @@ import java.util.*;
  */
 public class GlobalConfiguration {
 
+
+    private static final String PROC_INST_START = "xml-stylesheet href=\"";
+
+    private static final String PROC_INST_END = "\" type=\"text/xsl\"";
+
     /**
      * The baseURL used in the ./GFF/@href element
      */
@@ -114,9 +119,6 @@ public class GlobalConfiguration {
      */
     private Map<String, String> globalParameters = null;
 
-    private static final String PROC_INST_START = "xml-stylesheet href=\"";
-
-    private static final String PROC_INST_END = "\" type=\"text/xsl\"";
     
     public GlobalConfiguration(String baseURL, String defaultStyleSheet, boolean gzipped, boolean slashDasPointsToDsn, String dsnXSLT, String dnaXSLT, String entryPointsXSLT, String sequenceXSLT, String featuresXSLT, String typesXSLT, Map<String, String> globalParameters) {
         this.baseURL = baseURL;
