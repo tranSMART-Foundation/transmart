@@ -33,11 +33,53 @@
         
         <!-- A boolean switch indicating if the output from the DAS server should be compressed or not. -->
         <gzipped>false</gzipped>
+
+        <!-- If set to true, then if the browser points to /das or /das/ then
+            the output of the dsn command should be displayed.  This is
+            useful for creating a home page based upon the data source
+            details.-->
+        <slash-das-points-to-dsn>true</slash-das-points-to-dsn>
         
         <!-- The name of the default DAS stylesheet to be used for all of the defined datasources.
         This can be overridden for individual datasources by including a stylesheet element for them. -->
         <default-stylesheet>TEST.style</default-stylesheet>
-        
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+            to present the dsn command response in a human-readable format.
+            Optional - the processing instruction will only be included if this
+            element is present. -->
+        <dsn-xslt-url>http://www.ebi.ac.uk/~aquinn/xsl/mydas/dsn.xsl</dsn-xslt-url>
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+            to present the dna command response in a human-readable format.
+            Optional - the processing instruction will only be included if this
+            element is present. -->
+        <dna-xslt-url>http://www.ebi.ac.uk/~pjones/dna.xsl</dna-xslt-url>
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+            to present the entry-points command response in a human-readable format.
+            Optional - the processing instruction will only be included if this
+            element is present.-->
+        <entry-points-xslt-url>http://www.ebi.ac.uk/~pjones/entry-point.xsl</entry-points-xslt-url>
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+          to present the sequence command response in a human-readable format.
+          Optional - the processing instruction will only be included if this
+          element is present. -->
+        <sequence-xslt-url>http://www.ebi.ac.uk/~pjones/sequence.xsl</sequence-xslt-url>
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+            to present the features command response in a human-readable format.
+            Optional - the processing instruction will only be included if this
+            element is present. -->
+        <features-xslt-url>http://www.ebi.ac.uk/~pjones/features.xsl</features-xslt-url>
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+            to present the types command response in a human-readable format.
+            Optional - the processing instruction will only be included if this
+            element is present. -->
+        <types-xslt-url>http://www.ebi.ac.uk/~pjones/types.xsl</types-xslt-url>
+
         <!-- These global properties are made available to all the plugin classes
         through the DataSource interface, so the plugin author can
         add arbitrary additional configuration to their data source. -->
