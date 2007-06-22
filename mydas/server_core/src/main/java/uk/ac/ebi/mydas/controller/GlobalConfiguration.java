@@ -50,6 +50,62 @@ public class GlobalConfiguration {
     private boolean gzipped = false;
 
     /**
+     * If set to true, then if the browser points to /das or /das/ then
+        the output of the dsn command should be displayed.  This is
+        useful for creating a home page based upon the data source
+        details.
+     */
+    private boolean slashDasPointsToDsn = false;
+
+    /**
+     * Gives the URI of an XSLT transformation that can be used by the browser
+        to present the dsn command response in a human-readable format.
+        Optional - the processing instruction will only be included if this
+        element is present.
+     */
+    private String dsnXSLT = null;
+
+    /**
+     * Gives the URI of an XSLT transformation that can be used by the browser
+        to present the dna command response in a human-readable format.
+        Optional - the processing instruction will only be included if this
+        element is present.
+     */
+    private String dnaXSLT = null;
+
+    /**
+     * Gives the URI of an XSLT transformation that can be used by the browser
+        to present the entry-points command response in a human-readable format.
+        Optional - the processing instruction will only be included if this
+        element is present.
+     */
+    private String entryPointsXSLT = null;
+
+    /**
+     * Gives the URI of an XSLT transformation that can be used by the browser
+      to present the sequence command response in a human-readable format.
+      Optional - the processing instruction will only be included if this
+      element is present.
+     */
+    private String sequenceXSLT = null;
+
+    /**
+     * Gives the URI of an XSLT transformation that can be used by the browser
+        to present the features command response in a human-readable format.
+        Optional - the processing instruction will only be included if this
+        element is present.
+     */
+    private String featuresXSLT = null;
+
+    /**
+     * Gives the URI of an XSLT transformation that can be used by the browser
+        to present the types command response in a human-readable format.
+        Optional - the processing instruction will only be included if this
+        element is present.
+     */
+    private String typesXSLT = null;
+
+    /**
      * A Map of arbitrary key / value pairs that can be passed into the
      * server from the MydasServerConfig.xml file.
      *
@@ -58,13 +114,36 @@ public class GlobalConfiguration {
      */
     private Map<String, String> globalParameters = null;
 
+    private static final String PROC_INST_START = "xml-stylesheet href=\"";
 
-    public GlobalConfiguration(String baseURL, boolean gzipped, String defaultStyleSheet, Map<String, String> globalParameters) {
+    private static final String PROC_INST_END = "\" type=\"text/xsl\"";
+    
+    public GlobalConfiguration(String baseURL, String defaultStyleSheet, boolean gzipped, boolean slashDasPointsToDsn, String dsnXSLT, String dnaXSLT, String entryPointsXSLT, String sequenceXSLT, String featuresXSLT, String typesXSLT, Map<String, String> globalParameters) {
         this.baseURL = baseURL;
-        this.gzipped = gzipped;
-        this.globalParameters = globalParameters;
         this.defaultStyleSheet = defaultStyleSheet;
+        this.gzipped = gzipped;
+        this.slashDasPointsToDsn = slashDasPointsToDsn;
+        if (dsnXSLT != null)
+            this.dsnXSLT = PROC_INST_START + dsnXSLT.trim() + PROC_INST_END;
+        if (dnaXSLT != null)
+            this.dnaXSLT = PROC_INST_START + dnaXSLT.trim() + PROC_INST_END;
+        if (entryPointsXSLT != null)
+            this.entryPointsXSLT = PROC_INST_START + entryPointsXSLT.trim() + PROC_INST_END;
+        if (sequenceXSLT != null)
+            this.sequenceXSLT = PROC_INST_START + sequenceXSLT.trim() + PROC_INST_END;
+        if (featuresXSLT != null)
+            this.featuresXSLT = PROC_INST_START + featuresXSLT.trim() + PROC_INST_END;
+        if (typesXSLT != null)
+            this.typesXSLT = PROC_INST_START + typesXSLT.trim() + PROC_INST_END;
+        this.globalParameters = globalParameters;
     }
+
+//    public GlobalConfiguration(String baseURL, boolean gzipped, String defaultStyleSheet, Map<String, String> globalParameters) {
+//        this.baseURL = baseURL;
+//        this.gzipped = gzipped;
+//        this.globalParameters = globalParameters;
+//        this.defaultStyleSheet = defaultStyleSheet;
+//    }
 
     public String getBaseURL() {
         return baseURL;
@@ -83,4 +162,32 @@ public class GlobalConfiguration {
         return globalParameters;
     }
 
+
+    public boolean isSlashDasPointsToDsn() {
+        return slashDasPointsToDsn;
+    }
+
+    public String getDsnXSLT() {
+        return dsnXSLT;
+    }
+
+    public String getDnaXSLT() {
+        return dnaXSLT;
+    }
+
+    public String getEntryPointsXSLT() {
+        return entryPointsXSLT;
+    }
+
+    public String getSequenceXSLT() {
+        return sequenceXSLT;
+    }
+
+    public String getFeaturesXSLT() {
+        return featuresXSLT;
+    }
+
+    public String getTypesXSLT() {
+        return typesXSLT;
+    }
 }

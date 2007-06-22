@@ -57,6 +57,20 @@ public class ConfigXmlUnmarshaller {
 
     private static final String ELEMENT_GZIPPED = "gzipped";
 
+    private static final String ELEMENT_SLASH_DAS_POINTS_TO_DSN = "slash-das-points-to-dsn";
+
+    private static final String ELEMENT_DSN_XSLT = "dsn-xslt-url";
+
+    private static final String ELEMENT_DNA_XSLT = "dna-xslt-url";
+
+    private static final String ELEMENT_ENTRY_POINTS_XSLT = "entry-points-xslt-url";
+
+    private static final String ELEMENT_SEQUENCE_XSLT = "sequence-xslt-url";
+
+    private static final String ELEMENT_FEATURES_XSLT = "features-xslt-url";
+
+    private static final String ELEMENT_TYPES_XSLT = "types-xslt-url";
+
     private static final String ELEMENT_DEFAULT_STYLESHEET = "default-stylesheet";
 
     private static final String ELEMENT_PROPERTY = "property";
@@ -224,6 +238,13 @@ public class ConfigXmlUnmarshaller {
         String baseURL = null;
         String defaultStylesheet = null;
         boolean gzipped = false;
+        boolean slashDasToDsn = false;
+        String dsnXSLT = null;
+        String dnaXSLT = null;
+        String entryPointXSLT = null;
+        String sequenceXSLT = null;
+        String featuresXSLT = null;
+        String typesXSLT = null;
         Map<String, String> globalParameters = new HashMap<String, String>();
 
         while (! (xpp.next() == XmlPullParser.END_TAG && ELEMENT_GLOBAL.equals(xpp.getName()))) {
@@ -250,8 +271,29 @@ public class ConfigXmlUnmarshaller {
                 else if (ELEMENT_GZIPPED.equals(tagName)) {
                     gzipped = "true".equalsIgnoreCase(processSimpleElementTextOnly (xpp, ELEMENT_GZIPPED, true));
                 }
+                else if (ELEMENT_SLASH_DAS_POINTS_TO_DSN.equals(tagName)){
+                    slashDasToDsn = "true".equalsIgnoreCase(processSimpleElementTextOnly (xpp, ELEMENT_SLASH_DAS_POINTS_TO_DSN, true));
+                }
                 else if (ELEMENT_DEFAULT_STYLESHEET.equals(tagName)) {
                     defaultStylesheet = processSimpleElementTextOnly (xpp, ELEMENT_DEFAULT_STYLESHEET, true);
+                }
+                else if (ELEMENT_DSN_XSLT.equals(tagName)){
+                    dsnXSLT = processSimpleElementTextOnly (xpp, ELEMENT_DSN_XSLT, true);
+                }
+                else if (ELEMENT_DNA_XSLT.equals(tagName)){
+                    dnaXSLT = processSimpleElementTextOnly (xpp, ELEMENT_DNA_XSLT, true);
+                }
+                else if (ELEMENT_ENTRY_POINTS_XSLT.equals(tagName)){
+                    entryPointXSLT = processSimpleElementTextOnly (xpp, ELEMENT_ENTRY_POINTS_XSLT, true);
+                }
+                else if (ELEMENT_SEQUENCE_XSLT.equals(tagName)){
+                    sequenceXSLT = processSimpleElementTextOnly (xpp, ELEMENT_SEQUENCE_XSLT, true);
+                }
+                else if (ELEMENT_FEATURES_XSLT.equals(tagName)){
+                    featuresXSLT = processSimpleElementTextOnly (xpp, ELEMENT_FEATURES_XSLT, true);
+                }
+                else if (ELEMENT_TYPES_XSLT.equals(tagName)){
+                    typesXSLT = processSimpleElementTextOnly (xpp, ELEMENT_TYPES_XSLT, true);
                 }
                 else if (ELEMENT_PROPERTY.equals(tagName)){
                     processProperty(xpp, globalParameters);
@@ -265,7 +307,17 @@ public class ConfigXmlUnmarshaller {
             throw new ConfigurationException ("Please check your XML configuration file.  No value has been given for the /mydasserver/global/default-stylesheet element.");
         }
 
-        return new GlobalConfiguration(baseURL, gzipped, defaultStylesheet, globalParameters);
+        return new GlobalConfiguration(baseURL,
+                defaultStylesheet,
+                gzipped,
+                slashDasToDsn,
+                dsnXSLT,
+                dnaXSLT,
+                entryPointXSLT,
+                sequenceXSLT,
+                featuresXSLT,
+                typesXSLT,
+                globalParameters);
     }
 
 

@@ -98,6 +98,8 @@ public class MydasServlet extends HttpServlet {
      */
     private static final Pattern REQUEST_URI_PATTERN = Pattern.compile ("/das/([^\\s/?]+)/?([^\\s/?]*)$");
 
+    private static final Pattern DAS_ONLY_URI_PATTERN = Pattern.compile ("/das[/]?$");
+
     /**
      * Pattern used to parse a segment range, as used for the dna and sequenceString commands.
      * This can be used based on the assumption that the segments have already been split
@@ -342,6 +344,12 @@ public class MydasServlet extends HttpServlet {
                     }
                 }
             }
+            else if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().isSlashDasPointsToDsn()
+                    && DAS_ONLY_URI_PATTERN.matcher(request.getRequestURI()).matches()){
+                // Just /das or /das/ has been given as the URL.  This server is configured to point
+                // this to the dsn command, so do so.
+                dsnCommand (request, response, queryString);
+            }
             else {
                 throw new BadCommandException("The command is not recognised.");
             }
@@ -423,6 +431,10 @@ public class MydasServlet extends HttpServlet {
                     serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
                     serializer.startDocument(null, false);
                     serializer.text("\n");
+                    if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDsnXSLT() != null){
+                        serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDsnXSLT());
+                        serializer.text("\n");
+                    }
                     serializer.docdecl(" DASDSN SYSTEM \"http://www.biodas.org/dtd/dasdsn.dtd\"");
                     serializer.text("\n");
                     serializer.startTag (DAS_XML_NAMESPACE, "DASDSN");
@@ -495,6 +507,10 @@ public class MydasServlet extends HttpServlet {
                     serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
                     serializer.startDocument(null, false);
                     serializer.text("\n");
+                    if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDnaXSLT() != null){
+                        serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDnaXSLT());
+                        serializer.text("\n");
+                    }
                     serializer.docdecl(" DASDNA SYSTEM \"http://www.biodas.org/dtd/dasdna.dtd\"");
                     serializer.text("\n");
                     // Now the body of the DASDNA xml.
@@ -660,6 +676,10 @@ public class MydasServlet extends HttpServlet {
             serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
             serializer.startDocument(null, false);
             serializer.text("\n");
+            if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getTypesXSLT() != null){
+                serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getTypesXSLT());
+                serializer.text("\n");
+            }
             serializer.docdecl(" DASTYPES SYSTEM \"http://www.biodas.org/dtd/dastypes.dtd\"");
             serializer.text("\n");
             // Now the body of the DASTYPES xml.
@@ -755,6 +775,10 @@ public class MydasServlet extends HttpServlet {
             serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
             serializer.startDocument(null, false);
             serializer.text("\n");
+            if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getTypesXSLT() != null){
+                serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getTypesXSLT());
+                serializer.text("\n");
+            }
             serializer.docdecl(" DASTYPES SYSTEM \"http://www.biodas.org/dtd/dastypes.dtd\"");
             serializer.text("\n");
             // Now the body of the DASTYPES xml.
@@ -1074,6 +1098,10 @@ public class MydasServlet extends HttpServlet {
             serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
             serializer.startDocument(null, false);
             serializer.text("\n");
+            if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getFeaturesXSLT() != null){
+                serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getFeaturesXSLT());
+                serializer.text("\n");
+            }
             serializer.docdecl(" DASGFF SYSTEM \"http://www.biodas.org/dtd/dasgff.dtd\"");
             serializer.text("\n");
 
@@ -1333,6 +1361,10 @@ public class MydasServlet extends HttpServlet {
                 serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
                 serializer.startDocument(null, false);
                 serializer.text("\n");
+                if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getEntryPointsXSLT() != null){
+                    serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getEntryPointsXSLT());
+                    serializer.text("\n");
+                }
                 serializer.docdecl(" DASEP SYSTEM \"http://www.biodas.org/dtd/dasep.dtd\"");
                 serializer.text("\n");
 
@@ -1414,6 +1446,10 @@ public class MydasServlet extends HttpServlet {
                 serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
                 serializer.startDocument(null, false);
                 serializer.text("\n");
+                if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getSequenceXSLT() != null){
+                    serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getSequenceXSLT());
+                    serializer.text("\n");
+                }
                 serializer.docdecl(" DASSEQUENCE SYSTEM \"http://www.biodas.org/dtd/dassequence.dtd\"");
                 serializer.text("\n");
                 // Now the body of the DASDNA xml.
