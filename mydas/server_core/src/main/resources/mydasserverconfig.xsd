@@ -66,11 +66,87 @@
                                     </xs:simpleContent>                                    
                                 </xs:complexType>
                             </xs:element>
+                            <xs:element name="slash-das-points-to-dsn"  nillable="false">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        If set to true, then if the browser points to /das or /das/ then
+                                        the output of the dsn command should be displayed.  This is 
+                                        useful for creating a home page based upon the data source
+                                        details.
+                                    </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:boolean">
+                                        </xs:extension>
+                                    </xs:simpleContent>                                    
+                                </xs:complexType>
+                            </xs:element>
                             <xs:element name="default-stylesheet" type="xs:string"  nillable="false">
                                 <xs:annotation>
                                     <xs:documentation>
                                         The name of the default DAS stylesheet to be used for all of the defined datasources.  This can
                                         be overridden for individual datasources by including a stylesheet element for them.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="dsn-xslt-url" type="xs:anyURI"  nillable="false" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        Gives the URI of an XSLT transformation that can be used by the browser
+                                        to present the dsn command response in a human-readable format.
+                                        Optional - the processing instruction will only be included if this
+                                        element is present.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="dna-xslt-url" type="xs:anyURI"  nillable="false" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        Gives the URI of an XSLT transformation that can be used by the browser
+                                        to present the dna command response in a human-readable format.
+                                        Optional - the processing instruction will only be included if this
+                                        element is present.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="entry-points-xslt-url" type="xs:anyURI"  nillable="false" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        Gives the URI of an XSLT transformation that can be used by the browser
+                                        to present the entry-points command response in a human-readable format.
+                                        Optional - the processing instruction will only be included if this
+                                        element is present.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="sequence-xslt-url" type="xs:anyURI"  nillable="false" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                          Gives the URI of an XSLT transformation that can be used by the browser
+                                          to present the sequence command response in a human-readable format.
+                                          Optional - the processing instruction will only be included if this
+                                          element is present.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="features-xslt-url" type="xs:anyURI"  nillable="false" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        Gives the URI of an XSLT transformation that can be used by the browser
+                                        to present the features command response in a human-readable format.
+                                        Optional - the processing instruction will only be included if this
+                                        element is present.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="types-xslt-url" type="xs:anyURI"  nillable="false" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        Gives the URI of an XSLT transformation that can be used by the browser
+                                        to present the types command response in a human-readable format.
+                                        Optional - the processing instruction will only be included if this
+                                        element is present.
                                     </xs:documentation>
                                 </xs:annotation>
                             </xs:element>
