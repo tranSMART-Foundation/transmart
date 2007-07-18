@@ -48,37 +48,40 @@
             to present the dsn command response in a human-readable format.
             Optional - the processing instruction will only be included if this
             element is present. -->
-        <dsn-xslt-url>http://www.ebi.ac.uk/~aquinn/xsl/mydas/dsn.xsl</dsn-xslt-url>
+        <dsn-xslt-url>/xslt/dsn.xsl</dsn-xslt-url>
+
+        <!-- NOTE - THE XSLTs LISTED BELOW (COMMENTED OUT) ARE UNDER DEVELOPMENT, SO NOT
+        CURRENTLY AVAILABLE.-->
 
         <!-- Gives the URI of an XSLT transformation that can be used by the browser
             to present the dna command response in a human-readable format.
             Optional - the processing instruction will only be included if this
             element is present. -->
-        <dna-xslt-url>http://www.ebi.ac.uk/~pjones/dna.xsl</dna-xslt-url>
+        <!--<dna-xslt-url>/xslt/dna.xsl</dna-xslt-url>-->
 
         <!-- Gives the URI of an XSLT transformation that can be used by the browser
             to present the entry-points command response in a human-readable format.
             Optional - the processing instruction will only be included if this
             element is present.-->
-        <entry-points-xslt-url>http://www.ebi.ac.uk/~pjones/entry-point.xsl</entry-points-xslt-url>
+        <!--<entry-points-xslt-url>/xslt/entry-point.xsl</entry-points-xslt-url>-->
 
         <!-- Gives the URI of an XSLT transformation that can be used by the browser
           to present the sequence command response in a human-readable format.
           Optional - the processing instruction will only be included if this
           element is present. -->
-        <sequence-xslt-url>http://www.ebi.ac.uk/~pjones/sequence.xsl</sequence-xslt-url>
+        <!--<sequence-xslt-url>/xslt/sequence.xsl</sequence-xslt-url>-->
 
         <!-- Gives the URI of an XSLT transformation that can be used by the browser
             to present the features command response in a human-readable format.
             Optional - the processing instruction will only be included if this
             element is present. -->
-        <features-xslt-url>http://www.ebi.ac.uk/~pjones/features.xsl</features-xslt-url>
+        <!--<features-xslt-url>/xslt/features.xsl</features-xslt-url>-->
 
         <!-- Gives the URI of an XSLT transformation that can be used by the browser
             to present the types command response in a human-readable format.
             Optional - the processing instruction will only be included if this
             element is present. -->
-        <types-xslt-url>http://www.ebi.ac.uk/~pjones/types.xsl</types-xslt-url>
+        <!--<types-xslt-url>/xslt/types.xsl</types-xslt-url>-->
 
         <!-- These global properties are made available to all the plugin classes
         through the DataSource interface, so the plugin author can
