@@ -46,7 +46,7 @@ public class WebIntegrationTest extends net.sourceforge.jwebunit.WebTestCase {
     protected void setUp() throws Exception {
         // Port 0 means "assign arbitrarily port number"
         server = new Server(0);
-        server.addHandler(new WebAppContext("src/main/webapp", "/das"));
+        server.addHandler(new WebAppContext("./src/main/webapp", "/"));
         server.start();
 
         // getLocalPort returns the port that was actually assigned
