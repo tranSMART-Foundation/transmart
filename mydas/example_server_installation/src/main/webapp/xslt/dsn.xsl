@@ -29,7 +29,7 @@
  * http://eric.van-der-vlist.com/blog/2368_The_influence_of_microformats_on_style-free_stylesheets.item
  *
  * @author  Antony Quinn
- * @version $Id$
+ * @version $Id:$
  * @since   1.0
  */
  -->
