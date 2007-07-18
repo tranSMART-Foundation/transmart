@@ -97,8 +97,10 @@ public class MydasServlet extends HttpServlet {
      [PREFIX]/das/dsnname/stylesheet
      */
     private static final Pattern REQUEST_URI_PATTERN = Pattern.compile ("/das/([^\\s/?]+)/?([^\\s/?]*)$");
+//    private static final Pattern REQUEST_URI_PATTERN = Pattern.compile ("/([^\\s/?]+)/?([^\\s/?]*)$");
 
     private static final Pattern DAS_ONLY_URI_PATTERN = Pattern.compile ("/das[/]?$");
+//    private static final Pattern DAS_ONLY_URI_PATTERN = Pattern.compile ("[/]?$");
 
     /**
      * Pattern used to parse a segment range, as used for the dna and sequenceString commands.
@@ -304,6 +306,11 @@ public class MydasServlet extends HttpServlet {
                 else {
                     String dsnName = match.group(1);
                     String command = match.group(2);
+                    if (logger.isDebugEnabled()){
+                        logger.debug("dsnName: '" + dsnName + "'");
+                        logger.debug("command: '" + command + "'");
+                    }
+
                     // Attempt to retrieve the DataSource
                     DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get(dsnName);
                     // Check if the datasource exists.
@@ -345,7 +352,7 @@ public class MydasServlet extends HttpServlet {
                 }
             }
             else if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().isSlashDasPointsToDsn()
-                    && DAS_ONLY_URI_PATTERN.matcher(request.getRequestURI()).matches()){
+                    && DAS_ONLY_URI_PATTERN.matcher(request.getRequestURI()).find()){
                 // Just /das or /das/ has been given as the URL.  This server is configured to point
                 // this to the dsn command, so do so.
                 dsnCommand (request, response, queryString);
