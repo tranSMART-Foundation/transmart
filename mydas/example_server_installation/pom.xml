@@ -92,7 +92,7 @@
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>maven-jetty-plugin</artifactId>
                 <configuration>
-                    <contextPath>/das</contextPath>
+                    <contextPath>/</contextPath>
                 </configuration>
             </plugin>
         </plugins>
