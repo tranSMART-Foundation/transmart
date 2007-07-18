@@ -36,7 +36,6 @@
 
     <servlet-mapping>
       <servlet-name>MydasServlet</servlet-name>
-      <url-pattern>/*</url-pattern>
+      <url-pattern>/das/*</url-pattern>
     </servlet-mapping>
-
 </web-app>
