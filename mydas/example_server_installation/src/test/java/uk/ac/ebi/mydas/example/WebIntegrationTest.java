@@ -62,7 +62,7 @@ public class WebIntegrationTest extends net.sourceforge.jwebunit.WebTestCase {
         assertTextPresent("<!DOCTYPE DASDSN SYSTEM \"http://www.biodas.org/dtd/dasdsn.dtd\">");
         assertTextPresent("<DASDSN>");
         assertTextPresent("<DSN>");
-        assertTextPresent("<SOURCE id=\"test\" version=\"0.1\">test</SOURCE>");
+        assertTextPresent("<SOURCE id=\"test\" version=\"1.0\">test</SOURCE>");
         assertTextPresent("<MAPMASTER>http://localhost:8080/das/test</MAPMASTER>");
         assertTextPresent("<DESCRIPTION>Test Data Source</DESCRIPTION>");
         assertTextPresent("</DSN>");

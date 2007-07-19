@@ -101,7 +101,7 @@
         -->
         <datasource id="test"
                     name="test"
-                    version="0.1"
+                    version="1.0"
                     mapmaster="http://localhost:8080/das/test"
                     description="Test Data Source"
                     description-href="http://www.ebi.ac.uk/~pjones">
