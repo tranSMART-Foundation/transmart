@@ -1,3 +1,26 @@
+/*
+  ~ Copyright 2007 Antony Quinn, EMBL-European Bioinformatics Institute
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  ~
+  ~ For further details of the mydas project, including source code,
+  ~ downloads and documentation, please see:
+  ~
+  ~ http://code.google.com/p/mydas/
+  ~
+*/
+
 html {
 	background-color: white;
 	color: black;
@@ -18,35 +41,39 @@ span.entity, a:hover, a:active {
 	border-top: 1pt solid gray;
 }
 
-table
-{
-    margin: 0.5em 0;
+table   {
+    /*margin: 0.25em 0;*/
     border-collapse: collapse;
 }
-
-td, th
-{
+td, th  {
     padding: 0.25em;
-    border: 1pt solid #ADB9CC;
+    /*border: 1pt solid #ADB9CC;*/
 }
 
 td.banner   {
-    padding: 0.25em;
+    /*padding: 0.25em;*/
     border: 0;
 }
 
 .header {
     /*background-color:   #CC9966;*/
-    background-color:   #996633;
+    /*background-color:   #996633;*/
     /*background-color:   #207a7a*/
+    background-color:   #96c688;
+}
+
+.header, a:hover, a:active {
+    background-color: #96c688;
 }
 
 .footer  {
     font-size: 75%;
     color: white;
-    background-color:   #996633;
+    /*background-color:   #996633;*/
+    background-color:   #96c688;
 }
 
+/* Sortable table */
 table.sortable {
 	border-spacing: 0;
 	border: 1px solid #000;
@@ -60,11 +87,11 @@ table.sortable th, table.sortable td {
 	border-color: #444;
 }
 table.sortable th {
-	border-width: 0px 1px 1px 1px;
+	border-width: 0 1px 1px 1px;
 	background-color: #ccc;
 }
 table.sortable td {
-	border-width: 0px 1px 0px 1px;
+	border-width: 0 1px 0 1px;
 }
 table.sortable tr.odd td {
 	background-color: #ddd;
@@ -105,7 +132,7 @@ span.graphic    {
 span.graphic-padding    {
     float:          left;
     height:         14px;
-    border-width:   0px;
+    border-width:   0;
 }
 span.graphic-line    {
     float:          left;
