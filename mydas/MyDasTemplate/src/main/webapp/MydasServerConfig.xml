@@ -31,7 +31,10 @@
         This should be the external URL.  (Allows correct access to the service through reverse-proxies etc.)-->
         <baseurl>http://localhost:8080/das/</baseurl>
         
-        <!-- A boolean switch indicating if the output from the DAS server should be compressed or not. -->
+        <!-- A boolean switch indicating if the output from the DAS server should be compressed or not.
+
+         Note that compression does not work with jetty, hence this is set to false here, but you are
+         advised to set this to true for deploying your DAS source on a full featured web server. -->
         <gzipped>false</gzipped>
 
         <!-- If set to true, then if the browser points to /das or /das/ then
@@ -51,7 +54,8 @@
         <dsn-xslt-url>/xslt/dsn.xsl</dsn-xslt-url>
 
         <!-- NOTE - THE XSLTs LISTED BELOW (COMMENTED OUT) ARE UNDER DEVELOPMENT, SO NOT
-        CURRENTLY AVAILABLE.-->
+        CURRENTLY AVAILABLE.  You can of course substitute your own XSLT and provide a link
+        to it here. -->
 
         <!-- Gives the URI of an XSLT transformation that can be used by the browser
             to present the dna command response in a human-readable format.
@@ -102,11 +106,11 @@
         <datasource id="template"
                     name="template"
                     version="0.1"
-                    mapmaster="http://localhost:8080/das/template"
-                    description="Template Data Source"
+                    mapmaster="http://www.ebi.ac.uk/das-srv/uniprot/das/ipi"
+                    description="Template Annotation Data Source"
                     description-href="http://code.google.com/p/mydas/">
             <!-- The fully qualified class name of the DataSource. -->
-            <class>uk.ac.ebi.mydas.template.TemplateDataSource</class>
+            <class>uk.ac.ebi.mydas.template.TemplateAnnotationDataSource</class>
             
             <!-- The optional name of the DAS stylesheet to be used for this datasource.
             This will override the default stylesheet defined in the global settings section. -->
