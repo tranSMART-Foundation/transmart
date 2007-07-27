@@ -36,7 +36,7 @@
         <dependency>
             <groupId>uk.ac.ebi.mydas</groupId>
             <artifactId>mydas</artifactId>
-            <version>1.0</version>
+            <version>1.0.1</version>
         </dependency>
 
         <dependency>
