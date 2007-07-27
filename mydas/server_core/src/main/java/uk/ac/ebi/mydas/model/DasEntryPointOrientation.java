@@ -23,6 +23,8 @@
 
 package uk.ac.ebi.mydas.model;
 
+import java.io.Serializable;
+
 /**
  * Created using IntelliJ IDEA.
  * Date: 26-May-2007
@@ -33,7 +35,7 @@ package uk.ac.ebi.mydas.model;
  * orientation of the entry point as reported in the
  * /DASEP/ENTRY_POINTS/SEGMENT/@orientation attribute.
  */
-    public enum DasEntryPointOrientation {
+    public enum DasEntryPointOrientation implements Serializable {
         /**
          * Object used to define a positive orientation of a sequenceString.
          */

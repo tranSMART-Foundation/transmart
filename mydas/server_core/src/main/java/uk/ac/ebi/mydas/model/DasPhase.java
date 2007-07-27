@@ -23,6 +23,8 @@
 
 package uk.ac.ebi.mydas.model;
 
+import java.io.Serializable;
+
 /**
  * Created using IntelliJ IDEA.
  * Date: 26-May-2007
@@ -33,7 +35,7 @@ package uk.ac.ebi.mydas.model;
  * This enumeration provides the four possibilities for the mandatory
  * /DASGFF/GFF/SEGMENT/FEATURE/PHASE element.
  */
-public enum DasPhase {
+public enum DasPhase implements Serializable {
     PHASE_READING_FRAME_0("0"),
     PHASE_READING_FRAME_1 ("1"),
     PHASE_READING_FRAME_2 ("2"),

@@ -25,6 +25,8 @@ package uk.ac.ebi.mydas.model;
 
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
+import java.io.Serializable;
+
 /**
  * Created Using IntelliJ IDEA.
  * Date: 14-May-2007
@@ -43,7 +45,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
  * </a>
  * for details of the use of the <TARGET/> element.
  */
-public class DasTarget {
+public class DasTarget implements Serializable {
 
     /**
      * <b>Mandatory</b> field, corresponds to

@@ -23,6 +23,8 @@
 
 package uk.ac.ebi.mydas.model;
 
+import java.io.Serializable;
+
 /**
  * Created using IntelliJ IDEA.
  * Date: 26-May-2007
@@ -33,7 +35,7 @@ package uk.ac.ebi.mydas.model;
  * This enumeration provides the three possibilities for the mandatory
  * /DASGFF/GFF/SEGMENT/FEATURE/ORIENTATION element.
  */
-public enum DasFeatureOrientation {
+public enum DasFeatureOrientation implements Serializable {
 
     ORIENTATION_NOT_APPLICABLE("0"),
     ORIENTATION_SENSE_STRAND("+"),

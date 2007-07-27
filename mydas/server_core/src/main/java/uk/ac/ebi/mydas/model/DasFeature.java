@@ -28,6 +28,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
+import java.io.Serializable;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -43,7 +44,7 @@ import java.util.Map;
  * using <code>null</code> as described in the JavaDoc for the
  * constructor.
  */
-public class DasFeature {
+public class DasFeature implements Serializable {
 
     /**
      * <b>Mandatory</b>

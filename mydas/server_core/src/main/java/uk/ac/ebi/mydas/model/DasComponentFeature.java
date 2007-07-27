@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.io.Serializable;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -70,7 +71,7 @@ import java.util.Map;
  * features command, with the third tier being hinted at in the /DASGFF/GFF/SEGMENT/FEATURE/TYPE/@superparts or
  * /DASGFF/GFF/SEGMENT/FEATURE/TYPE/@subparts attributes of the second-tier components.
  */
-public class DasComponentFeature extends DasFeature {
+public class DasComponentFeature extends DasFeature implements Serializable {
 
     private Collection<DasComponentFeature> subComponents = null;
 

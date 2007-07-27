@@ -25,6 +25,8 @@ package uk.ac.ebi.mydas.model;
 
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
+import java.io.Serializable;
+
 /**
  * Created Using IntelliJ IDEA.
  * Date: 10-May-2007
@@ -36,7 +38,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
  * available for a single /DASEP/ENTRY_POINTS/SEGMENT element
  * as returned by the entry_point command.
  */
-public class DasEntryPoint {
+public class DasEntryPoint implements Serializable {
 
     /**
      * The id of the entry point (or segment)

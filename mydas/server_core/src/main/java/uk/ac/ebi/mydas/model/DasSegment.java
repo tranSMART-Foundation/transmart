@@ -25,6 +25,8 @@ package uk.ac.ebi.mydas.model;
 
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
+import java.io.Serializable;
+
 /**
  * Created Using IntelliJ IDEA.
  * Date: 14-May-2007
@@ -36,7 +38,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
  * DasSequence class that includes details of the sequence of the segment and the
  * DasFeature class that holds all of the features of a segment.
  */
-public abstract class DasSegment {
+public abstract class DasSegment implements Serializable {
 
     /**
      * <b>Mandatory</b> id of the segment.

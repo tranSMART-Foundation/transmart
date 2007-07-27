@@ -28,6 +28,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.Serializable;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -41,7 +42,7 @@ import java.util.List;
  * /DASSEQUENCE/SEQUENCE element in response to the sequence command, or the
  * /DASDNA/SEQUENCE element in response to the dna command.
  */
-public class DasSequence extends DasSegment{
+public class DasSequence extends DasSegment implements Serializable {
 
     /**
      *  <b>Mandatory</b> sequence String used to populate the

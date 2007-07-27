@@ -26,6 +26,7 @@ package uk.ac.ebi.mydas.model;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
 import java.util.Collection;
+import java.io.Serializable;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -34,7 +35,7 @@ import java.util.Collection;
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
  */
-public class DasRestrictedAnnotatedSegment extends DasAnnotatedSegment{
+public class DasRestrictedAnnotatedSegment extends DasAnnotatedSegment implements Serializable {
     /**
      * Constructor for a DasAnnotatedSegment object that ensures that the object is valid.
      * See the documentation of the various getters to find out where in DAS XML these fields may be used.

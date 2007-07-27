@@ -28,6 +28,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.io.Serializable;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -41,7 +42,7 @@ import java.util.Collection;
  *
  * A Data Source is required to be able to return a {@link Collection<DasAnnotatedSegment>} of these objects.
  */
-public class DasAnnotatedSegment extends DasSegment{
+public class DasAnnotatedSegment extends DasSegment implements Serializable {
 
     /**
      * Define a static logger variable so that it references the

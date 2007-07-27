@@ -28,6 +28,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
+import java.io.Serializable;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -46,7 +47,7 @@ import java.util.Map;
  * </a>
  * for details of the use of the <GROUP/> element.
  */
-public class DasGroup {
+public class DasGroup implements Serializable {
 
     /**
      * <b>Mandatory</b> field, corresponds to

@@ -23,6 +23,8 @@
 
 package uk.ac.ebi.mydas.model;
 
+import java.io.Serializable;
+
 /**
  * Created Using IntelliJ IDEA.
  * Date: 17-May-2007
@@ -34,7 +36,7 @@ package uk.ac.ebi.mydas.model;
  * Loading the types from the server configuration and holding details of the types
  * for a particular request.
  */
-public class DasType {
+public class DasType implements Serializable {
 
     /**
      * the type id

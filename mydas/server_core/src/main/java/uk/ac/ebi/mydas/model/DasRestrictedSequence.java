@@ -25,6 +25,8 @@ package uk.ac.ebi.mydas.model;
 
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
+import java.io.Serializable;
+
 /**
  * Created using IntelliJ IDEA.
  * Date: 12-May-2007
@@ -38,7 +40,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
  * on the assumption that the data source has already restricted
  * the sequence.
  */
-public class DasRestrictedSequence extends DasSequence{
+public class DasRestrictedSequence extends DasSequence implements Serializable {
 
     /**
      * Constructor for a DasRestrictedSequence object.
