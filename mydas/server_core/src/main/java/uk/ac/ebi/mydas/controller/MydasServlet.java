@@ -363,40 +363,68 @@ public class MydasServlet extends HttpServlet {
         } catch (BadCommandException bce) {
             logger.error("BadCommandException thrown", bce);
             writeHeader(request, response, XDasStatus.STATUS_400_BAD_COMMAND, false);
+            reportError(XDasStatus.STATUS_400_BAD_COMMAND, "Bad Command - Command not recognised as a valid DAS command.", request, response);
         } catch (BadDataSourceException bdse) {
             logger.error("BadDataSourceException thrown", bdse);
             writeHeader(request, response, XDasStatus.STATUS_401_BAD_DATA_SOURCE, false);
+            reportError(XDasStatus.STATUS_401_BAD_DATA_SOURCE, "Bad Data Source", request, response);
         } catch (BadCommandArgumentsException bcae) {
             logger.error("BadCommandArgumentsException thrown", bcae);
             writeHeader(request, response, XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, false);
+            reportError(XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, "Bad Command Arguments - Command not recognised as a valid DAS command.", request, response);
         } catch (BadReferenceObjectException broe) {
             logger.error("BadReferenceObjectException thrown", broe);
             writeHeader(request, response, XDasStatus.STATUS_403_BAD_REFERENCE_OBJECT, false);
+            reportError(XDasStatus.STATUS_403_BAD_REFERENCE_OBJECT, "Unrecognised reference object: the requested segment is not available from this server.", request, response);
         } catch (BadStylesheetException bse) {
             logger.error("BadStylesheetException thrown:", bse);
             writeHeader(request, response, XDasStatus.STATUS_404_BAD_STYLESHEET, false);
+            reportError(XDasStatus.STATUS_404_BAD_STYLESHEET, "Bad Stylesheet.", request, response);
         } catch (CoordinateErrorException cee) {
             logger.error("CoordinateErrorException thrown", cee);
             writeHeader(request, response, XDasStatus.STATUS_405_COORDINATE_ERROR, false);
+            reportError(XDasStatus.STATUS_405_COORDINATE_ERROR, "Coordinate error - the requested coordinates are outside the scope of the requested segment.", request, response);
         } catch (XmlPullParserException xppe) {
             logger.error("XmlPullParserException thrown when attempting to ouput XML.", xppe);
             writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+            reportError(XDasStatus.STATUS_500_SERVER_ERROR, "An error has occurred when attempting to output the DAS XML.", request, response);
         } catch (DataSourceException dse){
             logger.error("DataSourceException thrown by a data source.", dse);
             writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+            reportError(XDasStatus.STATUS_500_SERVER_ERROR, "The data source has thrown a 'DataSourceException' indicating a software error has occurred: " + dse.getMessage(), request, response);
         } catch (ConfigurationException ce) {
             logger.error("ConfigurationException thrown: This mydas installation was not correctly initialised.", ce);
             writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+            reportError(XDasStatus.STATUS_500_SERVER_ERROR, "This installation of MyDas is not correctly configured.", request, response);
         } catch (UnimplementedFeatureException efe) {
             logger.error("UnimplementedFeatureException thrown", efe);
             writeHeader(request, response, XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE, false);
+            reportError(XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE, "Unimplemented feature: this DAS server cannot serve the request you have made.", request, response);
         }
 
-        // Catch all for any remaining exceptions - it is not expected that this should be called however.
-        catch (Exception e){
-            logger.error("Exception thrown... This is serious, and unexpected.  status 500 has been returned - need to look into this.", e);
-            writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+    }
+
+    private void reportError (XDasStatus dasStatus, String errorMessage, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Writer out = response.getWriter();
+        out.write("<html><head><title>DAS Error</title></head><body><h2>MyDas Error Message</h2><h4>Request: <code>");
+        out.write(request.getRequestURI());
+        if (request.getQueryString() != null){
+            out.write('?');
+            out.write(request.getQueryString());
         }
+        out.write("</code></h4>");
+        if (dasStatus != null){
+            out.write("<h4>");
+            out.write(HEADER_KEY_X_DAS_STATUS);
+            out.write(": ");
+            out.write(dasStatus.toString());
+            out.write("</h4>");
+        }
+        out.write("<h4>Error: <span style='color:red'>");
+        out.write(errorMessage);
+        out.write("</span></h4></body></html>");
+        out.flush();
+        out.close();
     }
 
     /**
