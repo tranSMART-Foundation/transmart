@@ -28,7 +28,7 @@
     <groupId>uk.ac.ebi.mydas.example</groupId>
     <artifactId>mydas_example</artifactId>
     <packaging>war</packaging>
-    <version>1.0</version>
+    <version>1.0.2</version>
     <name>mydas_example Maven Webapp</name>
     <url>http://ebi.ac.uk</url>
 
