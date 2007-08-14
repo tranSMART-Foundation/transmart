@@ -22,20 +22,68 @@
   -->
 
 <!DOCTYPE web-app PUBLIC
- "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
- "http://java.sun.com/dtd/web-app_2_3.dtd" >
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-    
-  <display-name>Simple DAS Servlet</display-name>
+
+    <display-name>Simple DAS Servlet</display-name>
 
     <servlet>
-      <servlet-name>MydasServlet</servlet-name>
-      <servlet-class>uk.ac.ebi.mydas.controller.MydasServlet</servlet-class>
+        <servlet-name>MydasServlet</servlet-name>
+        <servlet-class>uk.ac.ebi.mydas.controller.MydasServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>EmptyCache</servlet-name>
+        <servlet-class>uk.ac.ebi.mydas.controller.EmptyCache</servlet-class>
     </servlet>
 
     <servlet-mapping>
-      <servlet-name>MydasServlet</servlet-name>
-      <url-pattern>/das/*</url-pattern>
+        <servlet-name>MydasServlet</servlet-name>
+        <url-pattern>/das/*</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>EmptyCache</servlet-name>
+        <url-pattern>/flushcache</url-pattern>
+    </servlet-mapping>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Empty Cache</web-resource-name>
+            <url-pattern>/flushcache</url-pattern>
+            <http-method>POST</http-method>
+            <http-method>GET</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>
+                Role required to allow emptying of the MyDas cache
+                via an http request.
+            </description>
+            <role-name>mydas-admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!--
+       The ability to empty the MyDas cache via HTTP is protected
+       by simple role based security, defined in the security-constraint
+       element above.  You can of course modify
+       or even remove this security constraint. (The latter is not
+       recommended).
+
+       How the role (given here as 'mydas-admin') is granted depends
+       on the type of servlet container you are using to run MyDas
+       and is beyond the scope of these notes - please see your servlet
+       container documentation.
+    -->
+
+    <!-- Security roles referenced by this web application -->
+    <security-role>
+        <description>
+            The role that is required to empty the MyDas cache
+        </description>
+        <role-name>mydas-admin</role-name>
+    </security-role>
+
 </web-app>
