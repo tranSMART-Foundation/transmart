@@ -173,7 +173,7 @@ public class MydasServlet extends HttpServlet {
     private static final String INDENTATION_PROPERTY = "http://xmlpull.org/v1/doc/properties.html#serializer-indentation";
     private static final String INDENTATION_PROPERTY_VALUE = "  ";
 
-    private static GeneralCacheAdministrator CACHE_MANAGER = null;
+    static GeneralCacheAdministrator CACHE_MANAGER = null;
 
 
     /**
