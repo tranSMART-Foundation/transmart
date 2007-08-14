@@ -35,7 +35,7 @@ import java.util.Map;
  * Date: 04-May-2007
  * Time: 13:21:06
  *
- * This class holds details of the datasource, limited to those set int the ServerConfig.xml
+ * This class holds details of the datasource, limited to those set in the ServerConfig.xml
  * file.  An instance of this class is passed to implementations of AnnotationDataSource when the init() method
  * is called, allowing the AnnotationDataSource access to its configuration in a transparent manner.
  *
