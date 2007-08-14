@@ -68,9 +68,8 @@
         </license>
     </licenses>
     <scm>
-        <url>
-            http://mydas.googlecode.com/svn/
-        </url>
+        <url>http://mydas.googlecode.com/svn/</url>
+        <connection>http://mydas.googlecode.com/svn/</connection>
     </scm>
     <dependencies>
         
