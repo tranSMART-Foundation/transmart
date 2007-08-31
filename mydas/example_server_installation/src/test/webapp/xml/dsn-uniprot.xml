@@ -1,0 +1,40 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE DASDSN SYSTEM "http://www.biodas.org/dtd/dasdsn.dtd">
+<?xml-stylesheet href="../../../main/webapp/xslt/dsn.xsl" type="text/xsl"?>        
+<DASDSN>
+  <DSN>
+    <SOURCE id="ipi-tryptic" version="2.0">International Protein Index Predicted Tryptic Peptides</SOURCE>
+    <MAPMASTER>http://www.ebi.ac.uk/das-srv/uniprot/das/ipi</MAPMASTER>
+    <DESCRIPTION>Theoretical tryptic peptides based upon a complete and successful digest of the requested proteins with trypsin.</DESCRIPTION>
+  </DSN>
+  <DSN>
+    <SOURCE id="uniprot-tryptic" version="2.0">UniProt Predicted Tryptic Peptides</SOURCE>
+    <MAPMASTER>http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot</MAPMASTER>
+    <DESCRIPTION>Theoretical tryptic peptides based upon a complete and successful digest of the requested proteins with trypsin.</DESCRIPTION>
+  </DSN>
+  <DSN>
+    <SOURCE id="uniprot-goa" version="2.0">GO Annotation of UniProt</SOURCE>
+    <MAPMASTER>http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot</MAPMASTER>
+    <DESCRIPTION>The GOA project aims to provide high-quality Gene Ontology (GO) annotations to proteins in the UniProt Knowledgebase (UniProtKB) and International Protein Index (IPI) and is a central dataset for other major multi-species databases; such as Ensembl and NCBI.</DESCRIPTION>
+  </DSN>
+  <DSN>
+    <SOURCE id="uniparc" version="2.0">UniProt Archive (UniParc)</SOURCE>
+    <MAPMASTER>http://www.ebi.ac.uk/das-srv/uniprot/das/uniparc</MAPMASTER>
+    <DESCRIPTION>UniProt Archive (UniParc) is part of UniProt project. It is a non-redundant archive of protein sequences extracted from public databases UniProtKB/Swiss-Prot, UniProtKB/TrEMBL, PIR-PSD, EMBL, EMBL WGS, Ensembl, IPI, PDB, PIR-PSD, RefSeq, FlyBase, WormBase, H-Invitational Database, TROME database, European Patent Office proteins, United States Patent and Trademark Office proteins (USPTO) and Japan Patent Office proteins.</DESCRIPTION>
+  </DSN>
+  <DSN>
+    <SOURCE id="uniprot" version="2.0">UniProt</SOURCE>
+    <MAPMASTER>http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot</MAPMASTER>
+    <DESCRIPTION>UniProt (Universal Protein Resource) is the world's most comprehensive catalog of information on proteins. It is a central repository of protein sequence and function created by joining the information contained in Swiss-Prot, TrEMBL, and PIR.</DESCRIPTION>
+  </DSN>
+  <DSN>
+    <SOURCE id="aristotle" version="2.0">Legacy 'aristotle' DSN</SOURCE>
+    <MAPMASTER>http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle</MAPMASTER>
+    <DESCRIPTION>Legacy data source to support clients and code that queries the previous UniProt DAS server where IPI, UniParc and UniProt are all served from a single DSN 'aristotle'</DESCRIPTION>
+  </DSN>
+  <DSN>
+    <SOURCE id="ipi" version="2.0">International Protein Index</SOURCE>
+    <MAPMASTER>http://www.ebi.ac.uk/das-srv/uniprot/das/ipi</MAPMASTER>
+    <DESCRIPTION>IPI provides a top level guide to the main databases that describe the proteomes of higher eukaryotic organisms. IPI: 1. effectively maintains a database of cross references between the primary data sources  2. provides minimally redundant yet maximally complete sets of proteins for featured species (one sequence per transcript)  3. maintains stable identifiers (with incremental versioning) to allow the tracking of sequences in IPI between IPI releases.  IPI is updated monthly in accordance with the latest data released by the primary data sources.</DESCRIPTION>
+  </DSN>
+</DASDSN>

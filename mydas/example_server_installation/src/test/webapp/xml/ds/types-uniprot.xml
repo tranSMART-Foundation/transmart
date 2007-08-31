@@ -1,0 +1,56 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE DASTYPES SYSTEM "http://www.biodas.org/dtd/dastypes.dtd">
+<?xml-stylesheet href="../../../../main/webapp/xslt/types.xsl" type="text/xsl"?>
+<DASTYPES>
+  <GFF version="1.0" href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/types">
+    <SEGMENT version="2.0" label="Complete datasource summary">
+      <TYPE id="ProDom" method="ProDom" category="Domain annotations">14</TYPE>
+      <TYPE id="ZN_FNG" method="UNIPROT" category="Regions">123</TYPE>
+      <TYPE id="STRAND" method="UNIPROT" category="Secondary structure"/>
+      <TYPE id="PANTHER" method="PANTHER" category="Domain annotations"/>
+      <TYPE id="CONFLICT" method="UNIPROT" category="Experimental info"/>
+      <TYPE id="NON_CONS" method="UNIPROT" category="Experimental info"/>
+      <TYPE id="TRANSIT" method="UNIPROT" category="Molecule Processing"/>
+      <TYPE id="COILED" method="UNIPROT" category="Regions"/>
+      <TYPE id="LIPID" method="UNIPROT" category="Amino acid modifications(pre and PTM)"/>
+      <TYPE id="SITE" method="UNIPROT" category="Sites"/>
+      <TYPE id="REPEAT" method="UNIPROT" category="Regions"/>
+      <TYPE id="PEPTIDE" method="UNIPROT" category="Molecule Processing"/>
+      <TYPE id="MOD_RES" method="UNIPROT" category="Amino acid modifications(pre and PTM)"/>
+      <TYPE id="TURN" method="UNIPROT" category="Secondary structure"/>
+      <TYPE id="DNA_BIND" method="UNIPROT" category="Regions"/>
+      <TYPE id="PRINTS" method="PRINTS" category="Domain annotations"/>
+      <TYPE id="MOTIF" method="UNIPROT" category="Regions"/>
+      <TYPE id="METAL" method="UNIPROT" category="Sites"/>
+      <TYPE id="DOMAIN" method="UNIPROT" category="Regions"/>
+      <TYPE id="VAR_SEQ" method="UNIPROT" category="Natural variations"/>
+      <TYPE id="DISULFID" method="UNIPROT" category="Amino acid modifications(pre and PTM)"/>
+      <TYPE id="CARBOHYD" method="UNIPROT" category="Amino acid modifications(pre and PTM)"/>
+      <TYPE id="SE_CYS" method="UNIPROT" category="Amino acid modifications(pre and PTM)"/>
+      <TYPE id="MUTAGEN" method="UNIPROT" category="Experimental info"/>
+      <TYPE id="PIR" method="PIR" category="Domain annotations"/>
+      <TYPE id="HELIX" method="UNIPROT" category="Secondary structure"/>
+      <TYPE id="CROSSLNK" method="UNIPROT" category="Amino acid modifications(pre and PTM)"/>
+      <TYPE id="Pfam" method="Pfam" category="Domain annotations"/>
+      <TYPE id="NON_TER" method="UNIPROT" category="Experimental info"/>
+      <TYPE id="PROSITE" method="PROSITE" category="Domain annotations"/>
+      <TYPE id="Scop" category="Domain annotations"/>
+      <TYPE id="SIGNAL" method="UNIPROT" category="Molecule Processing"/>
+      <TYPE id="TIGRFAMs" method="TIGRFAMs" category="Domain annotations"/>
+      <TYPE id="PROPEP" method="UNIPROT" category="Molecule Processing"/>
+      <TYPE id="BINDING" method="UNIPROT" category="Sites"/>
+      <TYPE id="NP_BIND" method="UNIPROT" category="Regions"/>
+      <TYPE id="TRANSMEM" method="UNIPROT" category="Regions"/>
+      <TYPE id="VARIANT" method="UNIPROT" category="Natural variations"/>
+      <TYPE id="TOPO_DOM" method="UNIPROT" category="Regions"/>
+      <TYPE id="COMPBIAS" method="UNIPROT" category="Regions"/>
+      <TYPE id="UNSURE" method="UNIPROT" category="Experimental info"/>
+      <TYPE id="REGION" method="UNIPROT" category="Regions"/>
+      <TYPE id="INIT_MET" method="UNIPROT" category="Molecule Processing"/>
+      <TYPE id="CHAIN" method="UNIPROT" category="Molecule Processing"/>
+      <TYPE id="CA_BIND" method="UNIPROT" category="Regions"/>
+      <TYPE id="Smart" method="SMART" category="Domain annotations"/>
+      <TYPE id="ACT_SITE" method="UNIPROT" category="Sites"/>
+    </SEGMENT>
+  </GFF>
+</DASTYPES>

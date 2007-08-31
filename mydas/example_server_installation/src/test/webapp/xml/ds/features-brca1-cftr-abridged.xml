@@ -1,0 +1,155 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE DASGFF SYSTEM "http://www.biodas.org/dtd/dasgff.dtd">
+<?xml-stylesheet href="../../../../main/webapp/xslt/features.xsl" type="text/xsl"?>
+<DASGFF>
+  <GFF version="1.0" href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features?segment=BRCA1_HUMAN;segment=CFTR_HUMAN">
+    <SEGMENT id="BRCA1_HUMAN" start="1" stop="1863" version="e40f752dedf675e2f7c99142ebb2607a">
+      <FEATURE id="P38398" label="P38398">
+        <TYPE id="description" category="description">description</TYPE>
+        <METHOD id="Standard">Swiss-Prot</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>RECOMENDED : Breast cancer type 1 susceptibility protein</NOTE>
+        <NOTE>SYNONYM : RING finger protein 53</NOTE>
+        <LINK href="http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=P38398">http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=P38398</LINK>
+      </FEATURE>
+      <FEATURE id="9606" label="Homo sapiens (Human)">
+        <TYPE id="dbxref" category="dbxref">dbxref</TYPE>
+        <METHOD id="TAX-ID">TAX-ID</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <LINK href="http://www.ebi.ac.uk/newt/display?search=9606">http://www.ebi.ac.uk/newt/display?search=9606</LINK>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_3D-structure" label="P38398_KEYWORD_3D-structure">
+        <TYPE id="KEYWORD" category="KEYWORD">3D-structure</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>3D-structure</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1245_1245" label="P38398_MOD_RES_1245_1245">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1245</START>
+        <END>1245</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_21_21" label="P38398_VARIANT_21_21">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>21</START>
+        <END>21</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="pubmed:10500182" label="pubmed:10500182">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Lorick K.L., Jensen J.P., Fang S., Ong A.M., Hatakeyama S., Weissman A.M. (1999). "RING fingers mediate ubiquitin-conjugating enzyme (E2)-dependent ubiquitination.", Proc. Natl. Acad. Sci. U.S.A., 96 11364-11369</NOTE>
+        <LINK href="http://dx.doi.org/10.1073/pnas.96.20.11364">Resolve DOI: 10.1073/pnas.96.20.11364</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10500182">View in CiteXplore</LINK>
+      </FEATURE>
+    </SEGMENT>
+    <SEGMENT id="CFTR_HUMAN" start="1" stop="1480" version="f29b8c0a9056a0f7680f3290d259b6ac">
+      <FEATURE id="P13569" label="P13569">
+        <TYPE id="description" category="description">description</TYPE>
+        <METHOD id="Standard">Swiss-Prot</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>RECOMENDED : Cystic fibrosis transmembrane conductance regulator</NOTE>
+        <NOTE>SYNONYM : CFTR</NOTE>
+        <NOTE>SYNONYM : cAMP-dependent chloride channel</NOTE>
+        <NOTE>SYNONYM : ATP-binding cassette transporter sub-family C member 7</NOTE>
+        <LINK href="http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=P13569">http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=P13569</LINK>
+      </FEATURE>
+      <FEATURE id="9606" label="Homo sapiens (Human)">
+        <TYPE id="dbxref" category="dbxref">dbxref</TYPE>
+        <METHOD id="TAX-ID">TAX-ID</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <LINK href="http://www.ebi.ac.uk/newt/display?search=9606">http://www.ebi.ac.uk/newt/display?search=9606</LINK>
+      </FEATURE>
+      <FEATURE id="P13569_KEYWORD_ATP-binding" label="P13569_KEYWORD_ATP-binding">
+        <TYPE id="KEYWORD" category="KEYWORD">ATP-binding</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>ATP-binding</NOTE>
+      </FEATURE>
+      <FEATURE id="P13569_TRANSMEM_221_241" label="P13569_TRANSMEM_221_241">
+        <TYPE id="TRANSMEM" category="Regions">transmembrane region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>221</START>
+        <END>241</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P13569_TOPO_DOM_242_307" label="P13569_TOPO_DOM_242_307">
+        <TYPE id="TOPO_DOM" category="Regions">topological domain</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>242</START>
+        <END>307</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P13569_MOD_RES_795_795" label="P13569_MOD_RES_795_795">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>795</START>
+        <END>795</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P13569_VARIANT_141_141" label="P13569_VARIANT_141_141">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>141</START>
+        <END>141</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="pubmed:" label="pubmed:">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>de Meeus A., Guittard C., Desgeorges M., Carles S., Demaille J., Claustres M. (1998). "Genetic findings in congenital bilateral aplasia of vas deferens patients and identification of six novel mutations.", Hum. Mutat., 12 480-480</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=">View in CiteXplore</LINK>
+      </FEATURE>
+   </SEGMENT>
+  </GFF>
+</DASGFF>
