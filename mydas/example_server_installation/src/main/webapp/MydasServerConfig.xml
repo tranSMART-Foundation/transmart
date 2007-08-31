@@ -75,13 +75,13 @@
             to present the features command response in a human-readable format.
             Optional - the processing instruction will only be included if this
             element is present. -->
-        <!--<features-xslt-url>/xslt/features.xsl</features-xslt-url>-->
+        <features-xslt-url>/xslt/features.xsl</features-xslt-url>
 
         <!-- Gives the URI of an XSLT transformation that can be used by the browser
             to present the types command response in a human-readable format.
             Optional - the processing instruction will only be included if this
             element is present. -->
-        <!--<types-xslt-url>/xslt/types.xsl</types-xslt-url>-->
+        <types-xslt-url>/xslt/types.xsl</types-xslt-url>
 
         <!-- These global properties are made available to all the plugin classes
         through the DataSource interface, so the plugin author can
