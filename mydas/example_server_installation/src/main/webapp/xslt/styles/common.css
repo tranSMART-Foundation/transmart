@@ -8,7 +8,7 @@
   ~ http://www.apache.org/licenses/LICENSE-2.0
   ~
   ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ distributed under the License is distributed on an "AS IS" BASIS, t
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
@@ -139,3 +139,26 @@ span.graphic-line    {
     margin-top:     1%;
     border-width:   1px;
     border-style:   solid;
+}
+
+/* Toggle switch */
+span.switch {
+    cursor:         pointer;
+    font-family:    "Courier New", Courier, sans-serif;
+}
+
+/* Warning messages */
+div.warning {
+    color:          red;
+    font-weight:    bold;
+}
+
+/* Hidden elements */
+.hide, .feature-segment-id	{
+    display:        none;
+}
+
+/* Number formatting */
+.start, .end, .score, .sequence-length, .segment-version, .count    {
+    text-align: right;
+}
