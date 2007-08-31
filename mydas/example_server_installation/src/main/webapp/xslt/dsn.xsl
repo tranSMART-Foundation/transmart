@@ -45,14 +45,16 @@
                 omit-xml-declaration="yes"
                 standalone="yes"/>
 
+    <!-- HTML template -->
     <xsl:param name="template-uri" select="'dsn.html'"/>
 
-    <xsl:param name="resource-uri" select="''"/>
+    <!-- Location  for CSS, images ...etc relative to the DAS URL, eg. http://host/das/dsn-name/features -->
+    <xsl:param name="resource-uri" select="'../xslt/'"/>
 
     <!-- Source XML document (DSN XML) -->
     <xsl:variable name="source" select="/"/>
 
-    <!-- HTML template -->
+    <!-- Load HTML template into variable -->
     <xsl:variable name="layout" select="document($template-uri)"/>
 
     <!-- Start matching nodes in the HTML template -->
@@ -134,12 +136,6 @@
         <xsl:copy>
             <xsl:apply-templates select="@*" mode="stylefree-layout"/>
             <xsl:value-of select="$dsn/DESCRIPTION"/>
-        </xsl:copy>
-    </xsl:template>
-
-    <xsl:template match="@*|node()" mode="stylefree-layout">
-        <xsl:copy>
-            <xsl:apply-templates select="@*|node()" mode="stylefree-layout"/>
         </xsl:copy>
     </xsl:template>
 
