@@ -6,7 +6,7 @@
  * <xsl:param name="resource-uri" select="'../web/'"/>
  *
  * @author  Antony Quinn
- * @version $Id$
+ * @version $Id:$
  * @since   1.0
  */
  -->
@@ -40,6 +40,14 @@
                 </xsl:attribute>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <!-- Set image path for sortable table -->
+    <xsl:template match="script[not(@src)]" mode="stylefree-layout">
+        <xsl:copy>
+            <xsl:apply-templates select="@*" mode="stylefree-layout"/>
+            var image_path = "<xsl:value-of select="$resource-uri"/>images/";
+        </xsl:copy>
     </xsl:template>
 
 </xsl:stylesheet>
