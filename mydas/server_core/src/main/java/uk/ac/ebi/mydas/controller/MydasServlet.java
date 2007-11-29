@@ -120,23 +120,46 @@ public class MydasServlet extends HttpServlet {
 
     private static final String CONFIGURATION_FILE_NAME = RESOURCE_FOLDER + "MydasServerConfig.xml";
 
-    /*
-     Commands handled by the servlet.
-     */
-    private static final String COMMAND_DSN = "dsn";
-    private static final String COMMAND_DNA = "dna";
-    private static final String COMMAND_TYPES = "types";
-    private static final String COMMAND_LINK = "link";
-    private static final String COMMAND_STYLESHEET = "stylesheet";
-    private static final String COMMAND_FEATURES = "features";
-    private static final String COMMAND_ENTRY_POINTS = "entry_points";
-    private static final String COMMAND_SEQUENCE = "sequence";
+	/**
+	 * Private enum that is used by this class to match valid commands.
+	 */
+	enum Commands{
+
+		COMMAND_DSN("dsn"),
+		COMMAND_DNA ("dna"),
+		COMMAND_TYPES ("types"),
+		COMMAND_LINK ("link"),
+		COMMAND_STYLESHEET ("stylesheet"),
+		COMMAND_FEATURES ("features"),
+		COMMAND_ENTRY_POINTS ("entry_points"),
+		COMMAND_SEQUENCE ("sequence");
+
+		private String commandString;
+
+		/**
+		 * Constructor that sets the commmand string to match.
+		 * @param commandString being the String signifying the command.
+		 */
+		Commands (String commandString){
+		    this.commandString = commandString;
+		}
+
+		/**
+		 * Returns true of the String passed in as argument is the command.
+		 * @param command being the string parsed from the URL.
+		 * @return true, if the commmand is recognised.
+		 */
+		boolean matches (String command){
+			return this.commandString.equals(command);
+		}
+	}
 
     /**
      * List<String> of valid 'field' parameters for the link command.
      */
     public static final List<String> VALID_LINK_COMMAND_FIELDS = new ArrayList<String>(5);
-    static {
+
+	static {
         VALID_LINK_COMMAND_FIELDS.add(AnnotationDataSource.LINK_FIELD_CATEGORY);
         VALID_LINK_COMMAND_FIELDS.add(AnnotationDataSource.LINK_FIELD_FEATURE);
         VALID_LINK_COMMAND_FIELDS.add(AnnotationDataSource.LINK_FIELD_METHOD);
@@ -290,7 +313,7 @@ public class MydasServlet extends HttpServlet {
 
             if (match.find()){
                 // Check first for the dsn command (has a different format to all the others, so start here).
-                if (COMMAND_DSN.equals(match.group(1))){
+                if (Commands.COMMAND_DSN.matches(match.group(1))){
                     // Handle dsn command, after checking there is no guff in the URI after it.
                     if (match.group(2) == null || match.group(2).length() == 0){
                         // All good, send command.
@@ -317,25 +340,25 @@ public class MydasServlet extends HttpServlet {
                     if (dataSourceConfig != null){
                         // Check the datasource is alive.
                         if (dataSourceConfig.isOK()){
-                            if      (COMMAND_DNA.equals(command)){
+                            if      (Commands.COMMAND_DNA.matches(command)){
                                 dnaCommand (request, response, dataSourceConfig, queryString);
                             }
-                            else if (COMMAND_TYPES.equals(command)){
+                            else if (Commands.COMMAND_TYPES.matches(command)){
                                 typesCommand (request, response, dataSourceConfig, queryString);
                             }
-                            else if (COMMAND_STYLESHEET.equals(command)){
+                            else if (Commands.COMMAND_STYLESHEET.matches(command)){
                                 stylesheetCommand (request, response, dataSourceConfig, queryString);
                             }
-                            else if (COMMAND_FEATURES.equals(command)){
+                            else if (Commands.COMMAND_FEATURES.matches(command)){
                                 featuresCommand (request, response, dataSourceConfig, queryString);
                             }
-                            else if (COMMAND_ENTRY_POINTS.equals(command)){
+                            else if (Commands.COMMAND_ENTRY_POINTS.matches(command)){
                                 entryPointsCommand (request, response, dataSourceConfig, queryString);
                             }
-                            else if (COMMAND_SEQUENCE.equals(command)){
+                            else if (Commands.COMMAND_SEQUENCE.matches(command)){
                                 sequenceCommand (request, response, dataSourceConfig, queryString);
                             }
-                            else if (COMMAND_LINK.equals(command)){
+                            else if (Commands.COMMAND_LINK.matches(command)){
                                 linkCommand (response, dataSourceConfig, queryString);
                             }
                             else {
@@ -563,7 +586,8 @@ public class MydasServlet extends HttpServlet {
                         serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
                     }
                     serializer.endTag (DAS_XML_NAMESPACE, "DASDNA");
-                }
+					serializer.flush();
+				}
                 finally{
                     if (out != null){
                         out.close();
@@ -595,12 +619,10 @@ public class MydasServlet extends HttpServlet {
             // Split on the ; (delineates the separate parts of the query)
             String[] queryParts = queryString.split(";");
             for (String queryPart : queryParts){
-                boolean queryPartParsable = false;
                 // Now determine what each part is, and construct the query.
                 Matcher segmentRangeMatcher = SEGMENT_RANGE_PATTERN.matcher(queryPart);
                 if (segmentRangeMatcher.find()){
                     requestedSegments.add (new SegmentQuery (segmentRangeMatcher));
-                    queryPartParsable = true;
                 }
                 else{
                     // Split the queryPart on "=" and see if the result is parsable.
@@ -614,14 +636,12 @@ public class MydasServlet extends HttpServlet {
                     // Check for typeId restriction
                     if ("type".equals (key)){
                         typeFilter.add(value);
-                        queryPartParsable = true;
                     }
                 }
-                // If not parsable, throw a BadCommandArgumentsException
-                if (! queryPartParsable){
-                    throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
-                }
-            }
+                // Previously a check was included here for unparsable parameters.  This has now
+				// been removed, so that MyDas will be less fussy about new parameters, e.g. those included
+				// in the DAS 1.53E spec.  (Unknown parameters will just be ignored.)
+			}
         }
         if (requestedSegments.size() == 0){
             // Process the types command for all types - not segment specific.
@@ -744,7 +764,8 @@ public class MydasServlet extends HttpServlet {
             serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
             serializer.endTag (DAS_XML_NAMESPACE, "GFF");
             serializer.endTag (DAS_XML_NAMESPACE, "DASTYPES");
-        }
+			serializer.flush();
+		}
         finally{
             if (out != null){
                 out.close();
@@ -855,7 +876,8 @@ public class MydasServlet extends HttpServlet {
             }
             serializer.endTag (DAS_XML_NAMESPACE, "GFF");
             serializer.endTag (DAS_XML_NAMESPACE, "DASTYPES");
-        }
+			serializer.flush();
+		}
         finally{
             if (out != null){
                 out.close();
@@ -901,7 +923,8 @@ public class MydasServlet extends HttpServlet {
                 while (reader.ready()){
                     writer.write(reader.readLine());
                 }
-            }
+				writer.flush();
+			}
             else {
                 throw new BadStylesheetException("A problem has occurred reading in the stylesheet from the open stream");
             }
@@ -938,8 +961,8 @@ public class MydasServlet extends HttpServlet {
             throw new BadCommandArgumentsException("The link command has been called with no arguments.");
         }
         String[] queryParts = queryString.split(";");
-        if (queryParts.length != 2){
-            throw new BadCommandArgumentsException("The wrong number of arguments have been passed to the link command.");
+        if (queryParts.length < 2){
+            throw new BadCommandArgumentsException("Not enough arguments have been passed to the link command.");
         }
         String field = null;
         String id = null;
@@ -955,10 +978,9 @@ public class MydasServlet extends HttpServlet {
             else if ("id".equals(queryPartKeysValues[0])){
                 id = queryPartKeysValues[1];
             }
-            else {
-                throw new BadCommandArgumentsException("unknown key to one of the command arguments to the link command");
-            }
-        }
+            // Was previously checking religiously for arguments that are not supported and throwing exceptions.
+			// Now just ignoring them, to prevent problems with new DAS parameters, e.g. from DAS 1.53E.
+		}
         if (field == null || ! VALID_LINK_COMMAND_FIELDS.contains(field) || id == null){
             throw new BadCommandArgumentsException("The link command must be passed a valid field and id argument.");
         }
@@ -1035,12 +1057,10 @@ public class MydasServlet extends HttpServlet {
         DasFeatureRequestFilter filter = new DasFeatureRequestFilter ();
         boolean categorize = true;
         for (String queryPart : queryParts){
-            boolean queryPartParsable = false;
             // Now determine what each part is, and construct the query.
             Matcher segmentRangeMatcher = SEGMENT_RANGE_PATTERN.matcher(queryPart);
             if (segmentRangeMatcher.find()){
                 requestedSegments.add (new SegmentQuery (segmentRangeMatcher));
-                queryPartParsable = true;
             }
             else{
                 // Split the queryPart on "=" and see if the result is parsable.
@@ -1054,36 +1074,31 @@ public class MydasServlet extends HttpServlet {
                 // Check for typeId restriction
                 if ("type".equals (key)){
                     filter.addTypeId(value);
-                    queryPartParsable = true;
                 }
                 // else check for categoryId restriction
                 else if ("category".equals (key)){
                     filter.addCategoryId(value);
-                    queryPartParsable = true;
                 }
                 // else check for categorize restriction
                 else if ("categorize".equals (key)){
                     if ("no".equals(value)){
                         categorize = false;
                     }
-                    queryPartParsable = true;
                 }
                 // else check for featureId restriction
                 else if ("feature_id".equals (key)){
                     filter.addFeatureId(value);
-                    queryPartParsable = true;
                 }
                 // else check for groupId restriction
                 else if ("group_id".equals (key)){
                     filter.addGroupId(value);
-                    queryPartParsable = true;
                 }
-            }
-            // If not parsable, throw a BadCommandArgumentsException
-            if (! queryPartParsable){
-                throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
-            }
-        }
+				// Any command parameters that are not recognised should be ignored
+				// This is a change from version 1.01 - some 1.53E commands were causing
+				// service failure.
+			}
+
+		}
 
         /************************************************************************\
          * Query the DataSource                                                 *
@@ -1714,18 +1729,17 @@ public class MydasServlet extends HttpServlet {
                     }
                 }
                 // Belt and braces - the various getSequence methods throw BadReferenceObjectException -
-                // but just in case the dsn 
+                // but just in case the dsn
                 // fails to throw this appropriately and instead return a null sequence object...
                 if (sequence == null) throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "Segment cannot be found.");
                 sequenceCollection.add (new SequenceReporter(sequence, segmentQuery));
             }
-            else {
-                throw new BadCommandArgumentsException("The query string format is not recognized.");
-            }
+			// MyDas is being made less fussy about parameters that it does not recognise as new
+			// DAS features are added, e.g. to DAS 1.53E, hence any parameters that do not match are just ignored.
         }
         if (sequenceCollection.size() ==0){
             // The query string did not include any segment references.
-            throw new BadCommandArgumentsException("The query string format is not recognized.");
+            throw new BadCommandArgumentsException("The query string did not include any segments, so no sequence can be returned.");
         }
         return sequenceCollection;
     }
