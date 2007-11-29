@@ -28,7 +28,7 @@
     <groupId>uk.ac.ebi.mydas</groupId>
     <artifactId>mydas</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <name>mydas Distributed Annotation Server</name>
     <url>http://code.google.com/p/mydas/</url>
     <description>
@@ -49,7 +49,7 @@
         * The server allows XSLT transforms of the DAS XML to be configured
             to provide a simple DAS client view (limited to the single DAS
             source).
-        
+
         More details of the DAS protocol, DAS servers and DAS clients can
         be found at http://www.biodas.org/wiki/Main_Page.
 
@@ -72,7 +72,7 @@
         <connection>http://mydas.googlecode.com/svn/</connection>
     </scm>
     <dependencies>
-        
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -152,5 +152,5 @@
         </plugins>
         <finalName>mydas</finalName>
     </build>
-    
+
 </project>
