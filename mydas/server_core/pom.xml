@@ -87,8 +87,9 @@
 	<scm>
         <url>http://mydas.googlecode.com/svn/</url>
         <connection>http://mydas.googlecode.com/svn/</connection>
-    </scm>
-    <dependencies>
+	</scm>
+
+	<dependencies>
 
         <dependency>
             <groupId>junit</groupId>
