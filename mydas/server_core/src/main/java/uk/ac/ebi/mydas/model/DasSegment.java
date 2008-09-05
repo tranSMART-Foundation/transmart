@@ -48,12 +48,12 @@ public abstract class DasSegment implements Serializable {
     /**
      * <b>Mandatory</b> start coordinate of the segment.
      */
-    protected int startCoordinate;
+    protected Integer startCoordinate;
 
     /**
      * <b>Mandatory</b> stop coordinate of the segment.
      */
-    protected int stopCoordinate;
+    protected Integer stopCoordinate;
 
     /**
      * <b>Mandatory</b> version of the segment. Typically this will be
@@ -61,7 +61,7 @@ public abstract class DasSegment implements Serializable {
      */
     protected String version;
 
-    public DasSegment(int startCoordinate, int stopCoordinate, String segmentId, String version) 
+    public DasSegment(Integer startCoordinate, Integer stopCoordinate, String segmentId, String version)
         throws DataSourceException{
         // Check that it has an ID.
         if (segmentId == null || segmentId.length() == 0){
@@ -81,11 +81,11 @@ public abstract class DasSegment implements Serializable {
         return segmentId;
     }
 
-    public int getStartCoordinate() {
+    public Integer getStartCoordinate() {
         return startCoordinate;
     }
 
-    public int getStopCoordinate() {
+    public Integer getStopCoordinate() {
         return stopCoordinate;
     }
 
