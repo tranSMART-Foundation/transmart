@@ -368,12 +368,12 @@ public class DasFeature implements Serializable {
         return score;
     }
 
-    public String getOrientation() {
-        return orientation.toString();
+    public DasFeatureOrientation getOrientation() {
+        return orientation;
     }
 
-    public String getPhase() {
-        return phase.toString();
+    public DasPhase getPhase() {
+        return phase;
     }
 
     public Collection<String> getNotes() {
