@@ -293,13 +293,17 @@ public class MydasServlet extends HttpServlet {
 
         // Parse the request URI (e.g. /das/dsnname/sequenceString).
         String queryString = request.getQueryString();
+        if (queryString != null){
+            // Get rid of any multiple slashes in the request.
+            queryString = queryString.replaceAll("/{2,}", "/");
+        }
 
         if (logger.isDebugEnabled()){
             logger.debug("RequestURI: '" + request.getRequestURI() + "'");
             logger.debug("Query String: '" + queryString + "'");
         }
 
-        Matcher match = REQUEST_URI_PATTERN.matcher(request.getRequestURI());
+        Matcher match = REQUEST_URI_PATTERN.matcher(request.getRequestURI().replaceAll("/{2,}", "/"));
 
         try{
             // Belt and braces to ensure that no null pointers are thrown later.
@@ -1176,8 +1180,12 @@ public class MydasServlet extends HttpServlet {
                     FoundFeaturesReporter foundFeaturesReporter = (FoundFeaturesReporter) segmentReporter;
                     serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
                     serializer.attribute(DAS_XML_NAMESPACE, "id", foundFeaturesReporter.getSegmentId());
-                    serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(foundFeaturesReporter.getStart()));
-                    serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(foundFeaturesReporter.getStop()));
+                    serializer.attribute(DAS_XML_NAMESPACE, "start", (foundFeaturesReporter.getStart() == null)
+                            ? ""
+                            : Integer.toString(foundFeaturesReporter.getStart()));
+                    serializer.attribute(DAS_XML_NAMESPACE, "stop", (foundFeaturesReporter.getStop() == null)
+                            ? ""
+                            : Integer.toString(foundFeaturesReporter.getStop()));
                     if (foundFeaturesReporter.getType() != null && foundFeaturesReporter.getType().length() > 0){
                         serializer.attribute(DAS_XML_NAMESPACE, "type", foundFeaturesReporter.getType());
                     }
@@ -1250,12 +1258,12 @@ public class MydasServlet extends HttpServlet {
 
                             // ORIENTATION element
                             serializer.startTag(DAS_XML_NAMESPACE, "ORIENTATION");
-                            serializer.text (feature.getOrientation());
+                            serializer.text (feature.getOrientation().toString());
                             serializer.endTag(DAS_XML_NAMESPACE, "ORIENTATION");
 
                             // PHASE element
                             serializer.startTag(DAS_XML_NAMESPACE, "PHASE");
-                            serializer.text (feature.getPhase());
+                            serializer.text (feature.getPhase().toString());
                             serializer.endTag(DAS_XML_NAMESPACE, "PHASE");
 
                             // NOTE elements
