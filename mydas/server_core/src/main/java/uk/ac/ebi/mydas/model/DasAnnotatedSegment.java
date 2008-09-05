@@ -99,7 +99,7 @@ public class DasAnnotatedSegment extends DasSegment implements Serializable {
      * @throws DataSourceException to allow you to handle problems with the data source, such as SQLExceptions,
      * parsing errors etc.
      */
-    public DasAnnotatedSegment(String segmentId, int startCoordinate, int stopCoordinate, String version, String segmentLabel, Collection<DasFeature> features)
+    public DasAnnotatedSegment(String segmentId, Integer startCoordinate, Integer stopCoordinate, String version, String segmentLabel, Collection<DasFeature> features)
             throws DataSourceException {
         super(startCoordinate, stopCoordinate, segmentId, version);
         this.features = features;
@@ -169,8 +169,10 @@ public class DasAnnotatedSegment extends DasSegment implements Serializable {
                     
                     restrictedFeatures.add (feature);
                 }
-                else if ((! strictlyEnclosed) && ((requestedStop >= feature.getStartCoordinate() && requestedStop <= feature.getStopCoordinate())
-                        || (requestedStart >= feature.getStartCoordinate() && requestedStart <= feature.getStopCoordinate()))){
+                else if ((! strictlyEnclosed) &&
+                          ((requestedStop >= feature.getStartCoordinate() && requestedStop <= feature.getStopCoordinate())
+                        || (requestedStart >= feature.getStartCoordinate() && requestedStart <= feature.getStopCoordinate())
+                        || (requestedStart <= feature.getStartCoordinate() && requestedStop >= feature.getStopCoordinate()))){
 
                     if (logger.isDebugEnabled()){
                         logger.debug("Overlap only.  Feature passed: Requested start: " + requestedStart + ". Requested stop: " + 
