@@ -1,0 +1,3488 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE DASGFF SYSTEM "http://www.biodas.org/dtd/dasgff.dtd">
+<DASGFF>
+  <GFF version="1.0" href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features?segment=Q12345;segment=A4_HUMAN">
+    <SEGMENT id="Q12345" start="1" stop="250" version="956ea858a9117b5a81741669b83b5a7a">
+      <FEATURE id="Q12345" label="Q12345">
+        <TYPE id="description" category="description">description</TYPE>
+        <METHOD id="Standard">Swiss-Prot</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>RECOMENDED : Ino eighty subunit 3</NOTE>
+        <LINK href="http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=Q12345">http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=Q12345</LINK>
+      </FEATURE>
+      <FEATURE id="4932" label="Saccharomyces cerevisiae (Baker's yeast)">
+        <TYPE id="dbxref" category="dbxref">dbxref</TYPE>
+        <METHOD id="TAX-ID">TAX-ID</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <LINK href="http://www.ebi.ac.uk/newt/display?search=4932">http://www.ebi.ac.uk/newt/display?search=4932</LINK>
+      </FEATURE>
+      <FEATURE id="Q12345_KEYWORD_Complete proteome" label="Q12345_KEYWORD_Complete proteome">
+        <TYPE id="KEYWORD" category="KEYWORD">Complete proteome</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Complete proteome</NOTE>
+      </FEATURE>
+      <FEATURE id="Q12345_KEYWORD_Direct protein sequencing" label="Q12345_KEYWORD_Direct protein sequencing">
+        <TYPE id="KEYWORD" category="KEYWORD">Direct protein sequencing</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Direct protein sequencing</NOTE>
+      </FEATURE>
+      <FEATURE id="Q12345_KEYWORD_Nucleus" label="Q12345_KEYWORD_Nucleus">
+        <TYPE id="KEYWORD" category="KEYWORD">Nucleus</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Nucleus</NOTE>
+      </FEATURE>
+      <FEATURE id="Q12345_KEYWORD_Transcription" label="Q12345_KEYWORD_Transcription">
+        <TYPE id="KEYWORD" category="KEYWORD">Transcription</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Transcription</NOTE>
+      </FEATURE>
+      <FEATURE id="Q12345_KEYWORD_Transcription regulation" label="Q12345_KEYWORD_Transcription regulation">
+        <TYPE id="KEYWORD" category="KEYWORD">Transcription regulation</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Transcription regulation</NOTE>
+      </FEATURE>
+      <FEATURE id="Q12345_CHAIN_1_250" label="Chain : Ino eighty subunit 3">
+        <TYPE id="SO:0000419" category="inferred by curator (ECO:0000001)">mature_protein_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1</START>
+        <END>250</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Ino eighty subunit 3</NOTE>
+      </FEATURE>
+      <FEATURE id="pubmed:9169871" label="pubmed:9169871">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Johnston M., Hillier L.W., Riles L., Albermann K., Andre B., Ansorge W., Benes V., Brueckner M., Delius H., Dubois E., Duesterhoeft A., Entian K.-D., Floeth M., Goffeau A., Hebling U., Heumann K., Heuss-Neitzel D., Hilbert H., Hilger F., Kleine K., Koetter P., Louis E.J., Messenguy F., Mewes H.-W., Miosga T., Moestl D., Mueller-Auer S., Nentwich U., Obermaier B., Piravandi E., Pohl T.M., Portetelle D., Purnelle B., Rechmann S., Rieger M., Rinke M., Rose M., Scharfe M., Scherens B., Scholler P., Schwager C., Schwarz S., Underwood A.P., Urrestarazu L.A., Vandenbol M., Verhasselt P., Vierendeels F., Voet M., Volckaert G., Voss H., Wambutt R., Wedler E., Wedler H., Zimmermann F.K., Zollner A., Hani J., Hoheisel J.D. (1997). "The nucleotide sequence of Saccharomyces cerevisiae chromosome XII.", Nature, 387 87-90</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9169871">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12887900" label="pubmed:12887900">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Shen X., Ranallo R., Choi E., Wu C. (2003). "Involvement of actin-related proteins in ATP-dependent chromatin remodeling.", Mol. Cell, 12 147-155</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12887900">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1016/S1097-2765(03)00264-8">Resolve DOI: 10.1016/S1097-2765(03)00264-8</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:14562095" label="pubmed:14562095">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Huh W.-K., Falvo J.V., Gerke L.C., Carroll A.S., Howson R.W., Weissman J.S., O'Shea E.K. (2003). "Global analysis of protein localization in budding yeast.", Nature, 425 686-691</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=14562095">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/nature02026">Resolve DOI: 10.1038/nature02026</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:14562106" label="pubmed:14562106">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Ghaemmaghami S., Huh W.-K., Bower K., Howson R.W., Belle A., Dephoure N., O'Shea E.K., Weissman J.S. (2003). "Global analysis of protein expression in yeast.", Nature, 425 737-741</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=14562106">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/nature02046">Resolve DOI: 10.1038/nature02046</LINK>
+      </FEATURE>
+    </SEGMENT>
+    <SEGMENT id="A4_HUMAN" start="1" stop="770" version="7dd43312cd29a262acdc0517230bc5ca">
+      <FEATURE id="P05067" label="P05067">
+        <TYPE id="description" category="description">description</TYPE>
+        <METHOD id="Standard">Swiss-Prot</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>RECOMENDED : Amyloid beta A4 protein precursor</NOTE>
+        <NOTE>SYNONYM : APP</NOTE>
+        <NOTE>SYNONYM : ABPP</NOTE>
+        <NOTE>SYNONYM : Alzheimer disease amyloid protein</NOTE>
+        <NOTE>SYNONYM : Cerebral vascular amyloid peptide</NOTE>
+        <NOTE>SYNONYM : CVAP</NOTE>
+        <NOTE>SYNONYM : Protease nexin-II</NOTE>
+        <NOTE>SYNONYM : PN-II</NOTE>
+        <NOTE>SYNONYM : APPI</NOTE>
+        <NOTE>SYNONYM : PreA4</NOTE>
+        <LINK href="http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=P05067">http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=P05067</LINK>
+      </FEATURE>
+      <FEATURE id="9606" label="Homo sapiens (Human)">
+        <TYPE id="dbxref" category="dbxref">dbxref</TYPE>
+        <METHOD id="TAX-ID">TAX-ID</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <LINK href="http://www.ebi.ac.uk/newt/display?search=9606">http://www.ebi.ac.uk/newt/display?search=9606</LINK>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_3D-structure" label="P05067_KEYWORD_3D-structure">
+        <TYPE id="KEYWORD" category="KEYWORD">3D-structure</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>3D-structure</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Alternative splicing" label="P05067_KEYWORD_Alternative splicing">
+        <TYPE id="KEYWORD" category="KEYWORD">Alternative splicing</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Alternative splicing</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Alzheimer disease" label="P05067_KEYWORD_Alzheimer disease">
+        <TYPE id="KEYWORD" category="KEYWORD">Alzheimer disease</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Alzheimer disease</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Amyloid" label="P05067_KEYWORD_Amyloid">
+        <TYPE id="KEYWORD" category="KEYWORD">Amyloid</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Amyloid</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Apoptosis" label="P05067_KEYWORD_Apoptosis">
+        <TYPE id="KEYWORD" category="KEYWORD">Apoptosis</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Apoptosis</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Cell adhesion" label="P05067_KEYWORD_Cell adhesion">
+        <TYPE id="KEYWORD" category="KEYWORD">Cell adhesion</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cell adhesion</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Coated pit" label="P05067_KEYWORD_Coated pit">
+        <TYPE id="KEYWORD" category="KEYWORD">Coated pit</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Coated pit</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Copper" label="P05067_KEYWORD_Copper">
+        <TYPE id="KEYWORD" category="KEYWORD">Copper</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Copper</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Direct protein sequencing" label="P05067_KEYWORD_Direct protein sequencing">
+        <TYPE id="KEYWORD" category="KEYWORD">Direct protein sequencing</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Direct protein sequencing</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Disease mutation" label="P05067_KEYWORD_Disease mutation">
+        <TYPE id="KEYWORD" category="KEYWORD">Disease mutation</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Disease mutation</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Endocytosis" label="P05067_KEYWORD_Endocytosis">
+        <TYPE id="KEYWORD" category="KEYWORD">Endocytosis</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Endocytosis</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Glycoprotein" label="P05067_KEYWORD_Glycoprotein">
+        <TYPE id="KEYWORD" category="KEYWORD">Glycoprotein</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Glycoprotein</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Heparin-binding" label="P05067_KEYWORD_Heparin-binding">
+        <TYPE id="KEYWORD" category="KEYWORD">Heparin-binding</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Heparin-binding</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Iron" label="P05067_KEYWORD_Iron">
+        <TYPE id="KEYWORD" category="KEYWORD">Iron</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Iron</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Membrane" label="P05067_KEYWORD_Membrane">
+        <TYPE id="KEYWORD" category="KEYWORD">Membrane</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Membrane</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Metal-binding" label="P05067_KEYWORD_Metal-binding">
+        <TYPE id="KEYWORD" category="KEYWORD">Metal-binding</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Metal-binding</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Notch signaling pathway" label="P05067_KEYWORD_Notch signaling pathway">
+        <TYPE id="KEYWORD" category="KEYWORD">Notch signaling pathway</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Notch signaling pathway</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Phosphoprotein" label="P05067_KEYWORD_Phosphoprotein">
+        <TYPE id="KEYWORD" category="KEYWORD">Phosphoprotein</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Phosphoprotein</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Polymorphism" label="P05067_KEYWORD_Polymorphism">
+        <TYPE id="KEYWORD" category="KEYWORD">Polymorphism</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Polymorphism</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Protease inhibitor" label="P05067_KEYWORD_Protease inhibitor">
+        <TYPE id="KEYWORD" category="KEYWORD">Protease inhibitor</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Protease inhibitor</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Proteoglycan" label="P05067_KEYWORD_Proteoglycan">
+        <TYPE id="KEYWORD" category="KEYWORD">Proteoglycan</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Proteoglycan</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Serine protease inhibitor" label="P05067_KEYWORD_Serine protease inhibitor">
+        <TYPE id="KEYWORD" category="KEYWORD">Serine protease inhibitor</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Serine protease inhibitor</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Signal" label="P05067_KEYWORD_Signal">
+        <TYPE id="KEYWORD" category="KEYWORD">Signal</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Signal</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Transmembrane" label="P05067_KEYWORD_Transmembrane">
+        <TYPE id="KEYWORD" category="KEYWORD">Transmembrane</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Transmembrane</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_KEYWORD_Zinc" label="P05067_KEYWORD_Zinc">
+        <TYPE id="KEYWORD" category="KEYWORD">Zinc</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Zinc</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_SIGNAL_1_17" label="Signal peptide">
+        <TYPE id="SO:0000418" category="inferred by curator (ECO:0000001)">signal_peptide</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1</START>
+        <END>17</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_CHAIN_18_770" label="Chain : Amyloid beta A4 protein">
+        <TYPE id="SO:0000419" category="inferred by curator (ECO:0000001)">mature_protein_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>18</START>
+        <END>770</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Amyloid beta A4 protein</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CHAIN_18_687" label="Chain : Soluble APP-alpha">
+        <TYPE id="SO:0000419" category="inferred by curator (ECO:0000001)">mature_protein_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>18</START>
+        <END>687</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Soluble APP-alpha</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CHAIN_18_671" label="Chain : Soluble APP-beta">
+        <TYPE id="SO:0000419" category="inferred by curator (ECO:0000001)">mature_protein_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>18</START>
+        <END>671</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Soluble APP-beta</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CHAIN_672_770" label="Chain : C99">
+        <TYPE id="SO:0000419" category="inferred by curator (ECO:0000001)">mature_protein_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>672</START>
+        <END>770</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>C99</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CHAIN_672_713" label="Chain : Beta-amyloid protein 42">
+        <TYPE id="SO:0000419" category="inferred by curator (ECO:0000001)">mature_protein_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>672</START>
+        <END>713</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Beta-amyloid protein 42</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CHAIN_672_711" label="Chain : Beta-amyloid protein 40">
+        <TYPE id="SO:0000419" category="inferred by curator (ECO:0000001)">mature_protein_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>672</START>
+        <END>711</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Beta-amyloid protein 40</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CHAIN_688_770" label="Chain : C83">
+        <TYPE id="SO:0000419" category="inferred by curator (ECO:0000001)">mature_protein_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>688</START>
+        <END>770</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>C83</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_PEPTIDE_688_713" label="Peptide: P3(42). /FTId=PRO_0000000095">
+        <TYPE id="SO:0001064" category="inferred by curator (ECO:0000001)">active_peptide</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>688</START>
+        <END>713</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>P3(42). /FTId=PRO_0000000095</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_PEPTIDE_688_711" label="Peptide: P3(40). /FTId=PRO_0000000096">
+        <TYPE id="SO:0001064" category="inferred by curator (ECO:0000001)">active_peptide</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>688</START>
+        <END>711</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>P3(40). /FTId=PRO_0000000096</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CHAIN_712_770" label="Chain : Gamma-CTF(59)">
+        <TYPE id="SO:0000419" category="inferred by curator (ECO:0000001)">mature_protein_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>712</START>
+        <END>770</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Gamma-CTF(59)</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CHAIN_714_770" label="Chain : Gamma-CTF(57)">
+        <TYPE id="SO:0000419" category="inferred by curator (ECO:0000001)">mature_protein_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>714</START>
+        <END>770</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Gamma-CTF(57)</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CHAIN_721_770" label="Chain : Gamma-CTF(50)">
+        <TYPE id="SO:0000419" category="inferred by curator (ECO:0000001)">mature_protein_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>721</START>
+        <END>770</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Gamma-CTF(50)</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CHAIN_740_770" label="Chain : C31">
+        <TYPE id="SO:0000419" category="inferred by curator (ECO:0000001)">mature_protein_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>740</START>
+        <END>770</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>C31</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_TOPO_DOM_18_699" label="Topological domain: Extracellular">
+        <TYPE id="SO:0001072" category="inferred by curator (ECO:0000001)">extramembrane</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>18</START>
+        <END>699</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Extracellular</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_TRANSMEM_700_723" label="Transmembrane">
+        <TYPE id="SO:0001077" category="inferred by curator (ECO:0000001)">transmembrane</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>700</START>
+        <END>723</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_TOPO_DOM_724_770" label="Topological domain: Cytoplasmic">
+        <TYPE id="SO:0001072" category="inferred by curator (ECO:0000001)">extramembrane</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>724</START>
+        <END>770</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cytoplasmic</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_DOMAIN_291_341" label="Domain: BPTI/Kunitz inhibitor">
+        <TYPE id="SO:0000417" category="inferred by curator (ECO:0000001)">polypeptide_domain</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>291</START>
+        <END>341</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>BPTI/Kunitz inhibitor</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_REGION_96_110" label="Region: Heparin-binding">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>96</START>
+        <END>110</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Heparin-binding</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_REGION_181_188" label="Region: Zinc-binding">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>181</START>
+        <END>188</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Zinc-binding</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_REGION_391_423" label="Region: Heparin-binding">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>391</START>
+        <END>423</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Heparin-binding</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_REGION_491_522" label="Region: Heparin-binding">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>491</START>
+        <END>522</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Heparin-binding</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_REGION_523_540" label="Region: Collagen-binding">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>523</START>
+        <END>540</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Collagen-binding</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_REGION_732_751" label="Region: Interaction with G(o)-alpha">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>732</START>
+        <END>751</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Interaction with G(o)-alpha</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MOTIF_724_734" label="Motif : Basolateral sorting signal">
+        <TYPE id="SO:0001067" category="inferred by curator (ECO:0000001)">polypeptide_motif</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>724</START>
+        <END>734</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Basolateral sorting signal</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MOTIF_759_762" label="Motif : NPXY motif; contains endocytosis signal">
+        <TYPE id="SO:0001067" category="inferred by curator (ECO:0000001)">polypeptide_motif</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>759</START>
+        <END>762</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>NPXY motif; contains endocytosis signal</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_COMPBIAS_230_260" label="Compositional bias : Asp/Glu-rich (acidic)">
+        <TYPE id="SO:0001066" category="inferred by curator (ECO:0000001)">compositionally_biased_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>230</START>
+        <END>260</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Asp/Glu-rich (acidic)</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_COMPBIAS_274_280" label="Compositional bias : Poly-Thr">
+        <TYPE id="SO:0001066" category="inferred by curator (ECO:0000001)">compositionally_biased_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>274</START>
+        <END>280</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Poly-Thr</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_METAL_137_137" label="Metal binding: Copper">
+        <TYPE id="SO:0001092" category="inferred by curator (ECO:0000001)">metal_contact</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>137</START>
+        <END>137</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Copper</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_METAL_147_147" label="Metal binding: Copper">
+        <TYPE id="SO:0001092" category="inferred by curator (ECO:0000001)">metal_contact</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>147</START>
+        <END>147</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Copper</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_METAL_149_149" label="Metal binding: Copper">
+        <TYPE id="SO:0001092" category="inferred by curator (ECO:0000001)">metal_contact</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>149</START>
+        <END>149</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Copper</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_METAL_151_151" label="Metal binding: Copper">
+        <TYPE id="SO:0001092" category="inferred by curator (ECO:0000001)">metal_contact</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>151</START>
+        <END>151</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Copper</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_METAL_677_677" label="Metal binding: Copper or zinc">
+        <TYPE id="SO:0001092" category="inferred by curator (ECO:0000001)">metal_contact</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>677</START>
+        <END>677</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Copper or zinc</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_METAL_681_681" label="Metal binding: Copper or zinc">
+        <TYPE id="SO:0001092" category="inferred by curator (ECO:0000001)">metal_contact</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>681</START>
+        <END>681</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Copper or zinc</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_METAL_684_684" label="Metal binding: Copper or zinc">
+        <TYPE id="SO:0001092" category="inferred by curator (ECO:0000001)">metal_contact</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>684</START>
+        <END>684</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Copper or zinc</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_METAL_685_685" label="Metal binding: Copper or zinc">
+        <TYPE id="SO:0001092" category="inferred by curator (ECO:0000001)">metal_contact</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>685</START>
+        <END>685</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Copper or zinc</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_SITE_144_144" label="Site : Required for Cu(2+) reduction">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>144</START>
+        <END>144</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Required for Cu(2+) reduction</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_SITE_301_302" label="Site : Reactive bond">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>301</START>
+        <END>302</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Reactive bond</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_SITE_671_672" label="Site : Cleavage; by beta-secretase">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>671</START>
+        <END>672</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cleavage; by beta-secretase</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_SITE_672_673" label="Site : Cleavage; by caspase-6; when associated with variant 670-N-L-671">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>672</START>
+        <END>673</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cleavage; by caspase-6; when associated with variant 670-N-L-671</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_SITE_687_688" label="Site : Cleavage; by alpha-secretase">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>687</START>
+        <END>688</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cleavage; by alpha-secretase</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_SITE_704_704" label="Site : Implicated in free radical propagation">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>704</START>
+        <END>704</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Implicated in free radical propagation</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_SITE_706_706" label="Site : Susceptible to oxidation">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>706</START>
+        <END>706</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Susceptible to oxidation</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_SITE_711_712" label="Site : Cleavage; by gamma-secretase; site 1">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>711</START>
+        <END>712</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cleavage; by gamma-secretase; site 1</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_SITE_713_714" label="Site : Cleavage; by gamma-secretase; site 2">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>713</START>
+        <END>714</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cleavage; by gamma-secretase; site 2</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_SITE_720_721" label="Site : Cleavage; by gamma-secretase; site 3">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>720</START>
+        <END>721</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cleavage; by gamma-secretase; site 3</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_SITE_739_740" label="Site : Cleavage; by caspase-6, caspase-8 or caspase-9">
+        <TYPE id="SO:0000839" category="inferred by curator (ECO:0000001)">polypeptide_region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>739</START>
+        <END>740</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cleavage; by caspase-6, caspase-8 or caspase-9</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MOD_RES_198_198" label="Modified residue: Phosphoserine; by CK2">
+        <TYPE id="SO:0001089" category="inferred by curator (ECO:0000001)">post_translational_modification</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>198</START>
+        <END>198</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Phosphoserine; by CK2</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MOD_RES_206_206" label="Modified residue: Phosphoserine; by CK1">
+        <TYPE id="SO:0001089" category="inferred by curator (ECO:0000001)">post_translational_modification</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>206</START>
+        <END>206</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Phosphoserine; by CK1</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MOD_RES_729_729" label="Modified residue: Phosphothreonine">
+        <TYPE id="SO:0001089" category="inferred by curator (ECO:0000001)">post_translational_modification</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>729</START>
+        <END>729</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Phosphothreonine</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MOD_RES_730_730" label="Modified residue: Phosphoserine; by APP-kinase I">
+        <TYPE id="SO:0001089" category="inferred by curator (ECO:0000001)">post_translational_modification</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>730</START>
+        <END>730</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Phosphoserine; by APP-kinase I</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MOD_RES_743_743" label="Modified residue: Phosphothreonine; by CDK5 and MAPK10">
+        <TYPE id="SO:0001089" category="inferred by curator (ECO:0000001)">post_translational_modification</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>743</START>
+        <END>743</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Phosphothreonine; by CDK5 and MAPK10</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MOD_RES_757_757" label="Modified residue: Phosphotyrosine">
+        <TYPE id="SO:0001089" category="inferred by curator (ECO:0000001)">post_translational_modification</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>757</START>
+        <END>757</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Phosphotyrosine</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CARBOHYD_542_542" label="Glycosylation: N-linked (GlcNAc...)">
+        <TYPE id="MOD:00693" category="inferred by curator (ECO:0000001)">glycosylated residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>542</START>
+        <END>542</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>N-linked (GlcNAc...)</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CARBOHYD_571_571" label="Glycosylation: N-linked (GlcNAc...)">
+        <TYPE id="MOD:00693" category="inferred by curator (ECO:0000001)">glycosylated residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>571</START>
+        <END>571</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>N-linked (GlcNAc...)</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CARBOHYD_656_656" label="Glycosylation: (chondroitin sulfate); in L-APP isoforms; O-linked (Xyl...)">
+        <TYPE id="MOD:00693" category="inferred by curator (ECO:0000001)">glycosylated residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>656</START>
+        <END>656</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>(chondroitin sulfate); in L-APP isoforms</NOTE>
+        <NOTE>O-linked (Xyl...)</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_DISULFID_144_158" label="Disulfide bond">
+        <TYPE id="MOD:00689" category="inferred by curator (ECO:0000001)">disulfide crosslinked residues</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>144</START>
+        <END>158</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_DISULFID_291_341" label="Disulfide bond">
+        <TYPE id="MOD:00689" category="inferred by curator (ECO:0000001)">disulfide crosslinked residues</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>291</START>
+        <END>341</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_DISULFID_300_324" label="Disulfide bond">
+        <TYPE id="MOD:00689" category="inferred by curator (ECO:0000001)">disulfide crosslinked residues</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>300</START>
+        <END>324</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_DISULFID_316_337" label="Disulfide bond">
+        <TYPE id="MOD:00689" category="inferred by curator (ECO:0000001)">disulfide crosslinked residues</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>316</START>
+        <END>337</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_VAR_SEQ_19_74" label="Alternative sequence ">
+        <TYPE id="SO:0001149" category="inferred by curator (ECO:0000001)">alternative_sequence_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>19</START>
+        <END>74</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_VAR_SEQ_289_363" label="Alternative sequence ">
+        <TYPE id="SO:0001149" category="inferred by curator (ECO:0000001)">alternative_sequence_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>289</START>
+        <END>363</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_VAR_SEQ_289_289" label="Alternative sequence : E -&gt; V">
+        <TYPE id="SO:0001149" category="inferred by curator (ECO:0000001)">alternative_sequence_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>289</START>
+        <END>289</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>E -&gt; V</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VAR_SEQ_290_364" label="Alternative sequence ">
+        <TYPE id="SO:0001149" category="inferred by curator (ECO:0000001)">alternative_sequence_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>290</START>
+        <END>364</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_VAR_SEQ_290_345" label="Alternative sequence ">
+        <TYPE id="SO:0001149" category="inferred by curator (ECO:0000001)">alternative_sequence_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>290</START>
+        <END>345</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_VAR_SEQ_290_305" label="Alternative sequence : VCSEQAETGPCRAMIS -&gt; KWYKEVHSGQARWLML">
+        <TYPE id="SO:0001149" category="inferred by curator (ECO:0000001)">alternative_sequence_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>290</START>
+        <END>305</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>VCSEQAETGPCRAMIS -&gt; KWYKEVHSGQARWLML</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VAR_SEQ_306_770" label="Alternative sequence ">
+        <TYPE id="SO:0001149" category="inferred by curator (ECO:0000001)">alternative_sequence_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>306</START>
+        <END>770</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_VAR_SEQ_345_345" label="Alternative sequence : M -&gt; I">
+        <TYPE id="SO:0001149" category="inferred by curator (ECO:0000001)">alternative_sequence_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>345</START>
+        <END>345</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>M -&gt; I</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VAR_SEQ_346_364" label="Alternative sequence ">
+        <TYPE id="SO:0001149" category="inferred by curator (ECO:0000001)">alternative_sequence_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>346</START>
+        <END>364</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_VAR_SEQ_364_364" label="Alternative sequence : L -&gt; V">
+        <TYPE id="SO:0001149" category="inferred by curator (ECO:0000001)">alternative_sequence_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>364</START>
+        <END>364</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>L -&gt; V</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VAR_SEQ_637_654" label="Alternative sequence ">
+        <TYPE id="SO:0001149" category="inferred by curator (ECO:0000001)">alternative_sequence_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>637</START>
+        <END>654</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_501_501" label="Natural variant: E -&gt; K">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>501</START>
+        <END>501</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>E -&gt; K</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_665_665" label="Natural variant: E -&gt; D">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>665</START>
+        <END>665</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>E -&gt; D</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_670_671" label="Natural variant: KM -&gt; NL">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>670</START>
+        <END>671</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>KM -&gt; NL</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_692_692" label="Natural variant: A -&gt; G">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>692</START>
+        <END>692</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>A -&gt; G</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_693_693" label="Natural variant: E -&gt; G">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>693</START>
+        <END>693</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>E -&gt; G</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_693_693" label="Natural variant: E -&gt; K">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>693</START>
+        <END>693</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>E -&gt; K</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_693_693" label="Natural variant: E -&gt; Q">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>693</START>
+        <END>693</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>E -&gt; Q</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_694_694" label="Natural variant: D -&gt; N">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>694</START>
+        <END>694</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>D -&gt; N</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_705_705" label="Natural variant: L -&gt; V">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>705</START>
+        <END>705</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>L -&gt; V</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_713_713" label="Natural variant: A -&gt; T">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>713</START>
+        <END>713</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>A -&gt; T</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_713_713" label="Natural variant: A -&gt; V">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>713</START>
+        <END>713</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>A -&gt; V</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_714_714" label="Natural variant: T -&gt; A">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>714</START>
+        <END>714</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>T -&gt; A</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_714_714" label="Natural variant: T -&gt; I">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>714</START>
+        <END>714</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>T -&gt; I</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_715_715" label="Natural variant: V -&gt; M">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>715</START>
+        <END>715</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>V -&gt; M</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_716_716" label="Natural variant: I -&gt; V">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>716</START>
+        <END>716</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>I -&gt; V</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_717_717" label="Natural variant: V -&gt; F">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>717</START>
+        <END>717</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>V -&gt; F</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_717_717" label="Natural variant: V -&gt; G">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>717</START>
+        <END>717</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>V -&gt; G</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_717_717" label="Natural variant: V -&gt; I">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>717</START>
+        <END>717</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>V -&gt; I</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_717_717" label="Natural variant: V -&gt; L">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>717</START>
+        <END>717</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>V -&gt; L</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_VARIANT_723_723" label="Natural variant: L -&gt; P">
+        <TYPE id="SO:0001147" category="inferred by curator (ECO:0000001)">natural_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>723</START>
+        <END>723</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>L -&gt; P</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_99_102" label="Mutagenesis: KRGR -&gt; NQGG; Reduced heparin-binding">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>99</START>
+        <END>102</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>KRGR -&gt; NQGG</NOTE>
+        <NOTE>Reduced heparin-binding</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_137_137" label="Mutagenesis: H -&gt; N; Binds copper. Forms dimer">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>137</START>
+        <END>137</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>H -&gt; N</NOTE>
+        <NOTE>Binds copper. Forms dimer</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_141_141" label="Mutagenesis: M -&gt; T; Binds copper. Forms dimer">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>141</START>
+        <END>141</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>M -&gt; T</NOTE>
+        <NOTE>Binds copper. Forms dimer</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_144_144" label="Mutagenesis: C -&gt; S; Binds copper. No dimer formation. No copper reducing activity">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>144</START>
+        <END>144</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>C -&gt; S</NOTE>
+        <NOTE>Binds copper. No dimer formation. No copper reducing activity</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_147_149" label="Mutagenesis: HLH -&gt; ALA; 50% decrease in copper reducing activity">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>147</START>
+        <END>149</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>HLH -&gt; ALA</NOTE>
+        <NOTE>50% decrease in copper reducing activity</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_147_147" label="Mutagenesis: H -&gt; A; Some decrease in copper reducing activity">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>147</START>
+        <END>147</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>H -&gt; A</NOTE>
+        <NOTE>Some decrease in copper reducing activity</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_147_147" label="Mutagenesis: H -&gt; N; Binds copper. Forms dimer">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>147</START>
+        <END>147</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>H -&gt; N</NOTE>
+        <NOTE>Binds copper. Forms dimer</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_147_147" label="Mutagenesis: H -&gt; Y; Greatly reduced copper-mediated low-density lipoprotein oxidation">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>147</START>
+        <END>147</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>H -&gt; Y</NOTE>
+        <NOTE>Greatly reduced copper-mediated low-density lipoprotein oxidation</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_151_151" label="Mutagenesis: H -&gt; K; Greatly reduced copper-mediated low-density lipoprotein oxidation">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>151</START>
+        <END>151</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>H -&gt; K</NOTE>
+        <NOTE>Greatly reduced copper-mediated low-density lipoprotein oxidation</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_151_151" label="Mutagenesis: H -&gt; N; Binds copper. Forms dimer">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>151</START>
+        <END>151</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>H -&gt; N</NOTE>
+        <NOTE>Binds copper. Forms dimer</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_198_198" label="Mutagenesis: S -&gt; A; Greatly reduced casein kinase phosphorylation">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>198</START>
+        <END>198</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>S -&gt; A</NOTE>
+        <NOTE>Greatly reduced casein kinase phosphorylation</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_206_206" label="Mutagenesis: S -&gt; A; Reduced casein kinase phosphorylation">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>206</START>
+        <END>206</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>S -&gt; A</NOTE>
+        <NOTE>Reduced casein kinase phosphorylation</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_499_499" label="Mutagenesis: R -&gt; A; Reduced affinity for heparin; when associated with A-503">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>499</START>
+        <END>499</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>R -&gt; A</NOTE>
+        <NOTE>Reduced affinity for heparin; when associated with A-503</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_503_503" label="Mutagenesis: K -&gt; A; Reduced affinity for heparin; when associated with A-499">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>503</START>
+        <END>503</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>K -&gt; A</NOTE>
+        <NOTE>Reduced affinity for heparin; when associated with A-499</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_656_656" label="Mutagenesis: S -&gt; A; Abolishes chondroitin sulfate binding in L-APP733 isoform">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>656</START>
+        <END>656</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>S -&gt; A</NOTE>
+        <NOTE>Abolishes chondroitin sulfate binding in L-APP733 isoform</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_676_676" label="Mutagenesis: R -&gt; G; 60-70% zinc-induced beta-APP (28) peptide aggregation">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>676</START>
+        <END>676</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>R -&gt; G</NOTE>
+        <NOTE>60-70% zinc-induced beta-APP (28) peptide aggregation</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_681_681" label="Mutagenesis: Y -&gt; F; 60-70% zinc-induced beta-APP (28) peptide aggregation">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>681</START>
+        <END>681</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Y -&gt; F</NOTE>
+        <NOTE>60-70% zinc-induced beta-APP (28) peptide aggregation</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_684_684" label="Mutagenesis: H -&gt; R; Only 23% zinc-induced beta-APP (28) peptide aggregation">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>684</START>
+        <END>684</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>H -&gt; R</NOTE>
+        <NOTE>Only 23% zinc-induced beta-APP (28) peptide aggregation</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_704_704" label="Mutagenesis: G -&gt; V; Reduced protein oxidation. No hippocampal neuron toxicity">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>704</START>
+        <END>704</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>G -&gt; V</NOTE>
+        <NOTE>Reduced protein oxidation. No hippocampal neuron toxicity</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_706_706" label="Mutagenesis: M -&gt; L; Reduced lipid peroxidation inhibition">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>706</START>
+        <END>706</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>M -&gt; L</NOTE>
+        <NOTE>Reduced lipid peroxidation inhibition</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_706_706" label="Mutagenesis: M -&gt; V; No free radical production. No hippocampal neuron toxicity">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>706</START>
+        <END>706</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>M -&gt; V</NOTE>
+        <NOTE>No free radical production. No hippocampal neuron toxicity</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_717_717" label="Mutagenesis: V -&gt; C,S; Unchanged beta-APP42/total APP- beta ratio">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>717</START>
+        <END>717</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>V -&gt; C,S</NOTE>
+        <NOTE>Unchanged beta-APP42/total APP- beta ratio</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_717_717" label="Mutagenesis: V -&gt; F,G,I; Increased beta-APP42/beta-APP40 ratio">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>717</START>
+        <END>717</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>V -&gt; F,G,I</NOTE>
+        <NOTE>Increased beta-APP42/beta-APP40 ratio</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_717_717" label="Mutagenesis: V -&gt; K; Decreased beta-APP42/total APP-beta ratio">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>717</START>
+        <END>717</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>V -&gt; K</NOTE>
+        <NOTE>Decreased beta-APP42/total APP-beta ratio</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_717_717" label="Mutagenesis: V -&gt; M; Increased beta-APP42/beta-APP40 ratio. No change in apoptosis after caspase cleavage">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>717</START>
+        <END>717</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>V -&gt; M</NOTE>
+        <NOTE>Increased beta-APP42/beta-APP40 ratio. No change in apoptosis after caspase cleavage</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_728_728" label="Mutagenesis: Y -&gt; A; No effect on APBA1 nor APBB1 binding. Greatly reduces the binding to APPBP2. APP internalization unchanged. No change in beta-APP42 secretion">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>728</START>
+        <END>728</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Y -&gt; A</NOTE>
+        <NOTE>No effect on APBA1 nor APBB1 binding. Greatly reduces the binding to APPBP2. APP internalization unchanged. No change in beta-APP42 secretion</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_739_739" label="Mutagenesis: D -&gt; A; No cleavage by caspases during apoptosis">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>739</START>
+        <END>739</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>D -&gt; A</NOTE>
+        <NOTE>No cleavage by caspases during apoptosis</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_739_739" label="Mutagenesis: D -&gt; N; No effect on FADD-induced apoptosis">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>739</START>
+        <END>739</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>D -&gt; N</NOTE>
+        <NOTE>No effect on FADD-induced apoptosis</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_743_743" label="Mutagenesis: T -&gt; A; Greatly reduces the binding to SHC1 and APBB family members; no effect on NGF-stimulated neurite extension">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>743</START>
+        <END>743</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>T -&gt; A</NOTE>
+        <NOTE>Greatly reduces the binding to SHC1 and APBB family members; no effect on NGF-stimulated neurite extension</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_743_743" label="Mutagenesis: T -&gt; E; Reduced NGF-stimulated neurite extension. No effect on APP maturation">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>743</START>
+        <END>743</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>T -&gt; E</NOTE>
+        <NOTE>Reduced NGF-stimulated neurite extension. No effect on APP maturation</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_756_756" label="Mutagenesis: G -&gt; A; APP internalization unchanged. No change in beta-APP42 secretion">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>756</START>
+        <END>756</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>G -&gt; A</NOTE>
+        <NOTE>APP internalization unchanged. No change in beta-APP42 secretion</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_757_757" label="Mutagenesis: Y -&gt; A; Little APP internalization. Reduced beta-APP42 secretion">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>757</START>
+        <END>757</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Y -&gt; A</NOTE>
+        <NOTE>Little APP internalization. Reduced beta-APP42 secretion</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_757_757" label="Mutagenesis: Y -&gt; G; Loss of binding to MAPK8IP1, APBA1, APBB1, APPBP2 and SHC1">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>757</START>
+        <END>757</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Y -&gt; G</NOTE>
+        <NOTE>Loss of binding to MAPK8IP1, APBA1, APBB1, APPBP2 and SHC1</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_759_759" label="Mutagenesis: N -&gt; A; No binding to APBA1, no effect on APBB1 binding. Little APP internalization. Reduced beta-APP42 secretion">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>759</START>
+        <END>759</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>N -&gt; A</NOTE>
+        <NOTE>No binding to APBA1, no effect on APBB1 binding. Little APP internalization. Reduced beta-APP42 secretion</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_760_760" label="Mutagenesis: P -&gt; A; Little APP internalization. Reduced beta-APP42 secretion">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>760</START>
+        <END>760</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>P -&gt; A</NOTE>
+        <NOTE>Little APP internalization. Reduced beta-APP42 secretion</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_MUTAGEN_762_762" label="Mutagenesis: Y -&gt; A; Loss of binding to APBA1 and APBB1. APP internalization unchanged. No change in beta-APP42 secretion">
+        <TYPE id="SO:0001148" category="inferred by curator (ECO:0000001)">mutated_variant_site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>762</START>
+        <END>762</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Y -&gt; A</NOTE>
+        <NOTE>Loss of binding to APBA1 and APBB1. APP internalization unchanged. No change in beta-APP42 secretion</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CONFLICT_15_16" label="Sequence conflict: AR -&gt; VW">
+        <TYPE id="SO:0001085" category="inferred by curator (ECO:0000001)">sequence_conflict</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>15</START>
+        <END>16</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>AR -&gt; VW</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CONFLICT_647_647" label="Sequence conflict: D -&gt; E">
+        <TYPE id="SO:0001085" category="inferred by curator (ECO:0000001)">sequence_conflict</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>647</START>
+        <END>647</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>D -&gt; E</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CONFLICT_724_724" label="Sequence conflict">
+        <TYPE id="SO:0001085" category="inferred by curator (ECO:0000001)">sequence_conflict</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>724</START>
+        <END>724</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_CONFLICT_731_731" label="Sequence conflict: I -&gt; N">
+        <TYPE id="SO:0001085" category="inferred by curator (ECO:0000001)">sequence_conflict</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>731</START>
+        <END>731</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>I -&gt; N</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_CONFLICT_757_757" label="Sequence conflict: Y -&gt; S">
+        <TYPE id="SO:0001085" category="inferred by curator (ECO:0000001)">sequence_conflict</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>757</START>
+        <END>757</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Y -&gt; S</NOTE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_33_35" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>33</START>
+        <END>35</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_43_45" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>43</START>
+        <END>45</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_TURN_47_49" label="Turn">
+        <TYPE id="SO:0001128" category="inferred by curator (ECO:0000001)">turn</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>47</START>
+        <END>49</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_52_54" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>52</START>
+        <END>54</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_HELIX_66_76" label="Helix">
+        <TYPE id="SO:0001117" category="inferred by curator (ECO:0000001)">alpha_helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>66</START>
+        <END>76</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_82_87" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>82</START>
+        <END>87</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_92_94" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>92</START>
+        <END>94</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_97_99" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>97</START>
+        <END>99</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_HELIX_100_102" label="Helix">
+        <TYPE id="SO:0001117" category="inferred by curator (ECO:0000001)">alpha_helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>100</START>
+        <END>102</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_103_106" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>103</START>
+        <END>106</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_110_112" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>110</START>
+        <END>112</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_115_119" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>115</START>
+        <END>119</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_134_139" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>134</START>
+        <END>139</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_HELIX_147_160" label="Helix">
+        <TYPE id="SO:0001117" category="inferred by curator (ECO:0000001)">alpha_helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>147</START>
+        <END>160</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_163_174" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>163</START>
+        <END>174</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_TURN_175_177" label="Turn">
+        <TYPE id="SO:0001128" category="inferred by curator (ECO:0000001)">turn</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>175</START>
+        <END>177</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_178_188" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>178</START>
+        <END>188</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_HELIX_288_292" label="Helix">
+        <TYPE id="SO:0001117" category="inferred by curator (ECO:0000001)">alpha_helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>288</START>
+        <END>292</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_299_301" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>299</START>
+        <END>301</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_304_310" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>304</START>
+        <END>310</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_TURN_311_314" label="Turn">
+        <TYPE id="SO:0001128" category="inferred by curator (ECO:0000001)">turn</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>311</START>
+        <END>314</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_315_321" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>315</START>
+        <END>321</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_323_325" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>323</START>
+        <END>325</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_STRAND_331_333" label="Beta Strand ">
+        <TYPE id="SO:0001111" category="inferred by curator (ECO:0000001)">beta_strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>331</START>
+        <END>333</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_HELIX_334_341" label="Helix">
+        <TYPE id="SO:0001117" category="inferred by curator (ECO:0000001)">alpha_helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>334</START>
+        <END>341</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_HELIX_461_482" label="Helix">
+        <TYPE id="SO:0001117" category="inferred by curator (ECO:0000001)">alpha_helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>461</START>
+        <END>482</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_HELIX_487_518" label="Helix">
+        <TYPE id="SO:0001117" category="inferred by curator (ECO:0000001)">alpha_helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>487</START>
+        <END>518</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_HELIX_520_549" label="Helix">
+        <TYPE id="SO:0001117" category="inferred by curator (ECO:0000001)">alpha_helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>520</START>
+        <END>549</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_HELIX_552_566" label="Helix">
+        <TYPE id="SO:0001117" category="inferred by curator (ECO:0000001)">alpha_helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>552</START>
+        <END>566</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_HELIX_673_697" label="Helix">
+        <TYPE id="SO:0001117" category="inferred by curator (ECO:0000001)">alpha_helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>673</START>
+        <END>697</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_HELIX_703_706" label="Helix">
+        <TYPE id="SO:0001117" category="inferred by curator (ECO:0000001)">alpha_helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>703</START>
+        <END>706</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P05067_TURN_707_710" label="Turn">
+        <TYPE id="SO:0001128" category="inferred by curator (ECO:0000001)">turn</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>707</START>
+        <END>710</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="pubmed:2881207" label="pubmed:2881207">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Kang J., Lemaire H.-G., Unterbeck A., Salbaum J.M., Masters C.L., Grzeschik K.-H., Multhaup G., Beyreuther K., Mueller-Hill B. (1987). "The precursor of Alzheimer's disease amyloid A4 protein resembles a cell-surface receptor.", Nature, 325 733-736</NOTE>
+        <LINK href="http://dx.doi.org/10.1038/325733a0">Resolve DOI: 10.1038/325733a0</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2881207">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2893289" label="pubmed:2893289">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Ponte P., Gonzalez-Dewhitt P., Schilling J., Miller J., Hsu D., Greenberg B., Davis K., Wallace W., Lieberburg I., Fuller F., Cordell B. (1988). "A new A4 amyloid mRNA contains a domain homologous to serine proteinase inhibitors.", Nature, 331 525-527</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2893289">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/331525a0">Resolve DOI: 10.1038/331525a0</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2783775" label="pubmed:2783775">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Lemaire H.-G., Salbaum J.M., Multhaup G., Kang J., Bayney R.M., Unterbeck A., Beyreuther K., Mueller-Hill B. (1989). "The PreA4(695) precursor protein of Alzheimer's disease A4 amyloid is encoded by 16 exons.", Nucleic Acids Res., 17 517-522</NOTE>
+        <LINK href="http://dx.doi.org/10.1093/nar/17.2.517">Resolve DOI: 10.1093/nar/17.2.517</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2783775">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2110105" label="pubmed:2110105">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Yoshikai S., Sasaki H., Doh-ura K., Furuya H., Sakaki Y. (1990). "Genomic organization of the human amyloid beta-protein precursor gene.", Gene, 87 257-263</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/0378-1119(90)90310-N">Resolve DOI: 10.1016/0378-1119(90)90310-N</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2110105">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1908403" label="pubmed:1908403">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Yoshikai S., Sasaki H., Doh-ura K., Furuya H., Sakaki Y. (1991). "", Gene, 102 291-292</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1908403">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1016/0378-1119(91)90093-Q">Resolve DOI: 10.1016/0378-1119(91)90093-Q</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1587857" label="pubmed:1587857">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Koenig G., Moenning U., Czech C., Prior R., Banati R., Schreiter-Gasser U., Bauer J., Masters C.L., Beyreuther K. (1992). "Identification and differential expression of a novel alternative splice isoform of the beta A4 amyloid precursor protein (APP) mRNA in leukocytes and brain microglial cells.", J. Biol. Chem., 267 10804-10809</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1587857">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9108164" label="pubmed:9108164">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Hattori M., Tsukahara F., Furuhata Y., Tanahashi H., Hirose M., Saito M., Tsukuni S., Sakaki Y. (1997). "A novel method for making nested deletions and its application for sequencing of a 300 kb region of human APP locus.", Nucleic Acids Res., 25 1802-1808</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9108164">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1093/nar/25.9.1802">Resolve DOI: 10.1093/nar/25.9.1802</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12859342" label="pubmed:12859342">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Tang K., Wang C., Shen C., Sheng S., Ravid R., Jing N. (2003). "Identification of a novel alternative splicing isoform of human amyloid precursor protein gene, APP639.", Eur. J. Neurosci., 18 102-108</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12859342">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1046/j.1460-9568.2003.02731.x">Resolve DOI: 10.1046/j.1460-9568.2003.02731.x</LINK>
+      </FEATURE>
+      <FEATURE id="submission_9" label="submission_9">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="Unpublished/no plans to publish">Unpublished/no plans to publish</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Livingston R.J., Rieder M.J., Rajkumar N., Downing T.K., Olson A.N., Nguyen C.P., Gildersleeve H., Cassidy C.M., Johnson E.J., Swanson J.E., McFarland I., Yool B., Park C., Nickerson D.A. (2005). "NIEHS-SNPs, environmental genome project, NIEHS ES15478, Department of Genome Sciences, Seattle, WA (URL: http://egp.gs.washington.edu).", </NOTE>
+      </FEATURE>
+      <FEATURE id="pubmed:15489334" label="pubmed:15489334">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Anonymous (2004). "The status, quality, and expansion of the NIH full-length cDNA project: the Mammalian Gene Collection (MGC).", Genome Res., 14 2121-2127</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=15489334">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1101/gr.2596504">Resolve DOI: 10.1101/gr.2596504</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:3140222" label="pubmed:3140222">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Schon E.A., Mita S., Sadlock J., Herbert J. (1988). "A cDNA specifying the human amyloid beta precursor protein (ABPP) encodes a 95-kDa polypeptide.", Nucleic Acids Res., 16 9351-9351</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=3140222">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1093/nar/16.19.9351">Resolve DOI: 10.1093/nar/16.19.9351</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:" label="pubmed:">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Schon E.A., Mita S., Sadlock J., Herbert J. (1988). "", Nucleic Acids Res., 16 11402-11402</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2538123" label="pubmed:2538123">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>La Fauci G., Lahiri D.K., Salton S.R., Robakis N.K. (1989). "Characterization of the 5'-end region and the first two exons of the beta-protein precursor gene.", Biochem. Biophys. Res. Commun., 159 297-304</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/0006-291X(89)92437-6">Resolve DOI: 10.1016/0006-291X(89)92437-6</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2538123">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:3597385" label="pubmed:3597385">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>van Nostrand W.E., Cunningham D.D. (1987). "Purification of protease nexin II from human fibroblasts.", J. Biol. Chem., 262 8508-8514</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=3597385">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12665801" label="pubmed:12665801">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Gevaert K., Goethals M., Martens L., Van Damme J., Staes A., Thomas G.R., Vandekerckhove J. (2003). "Exploring proteomes and analyzing protein processing by mass spectrometric identification of sorted N-terminal peptides.", Nat. Biotechnol., 21 566-569</NOTE>
+        <LINK href="http://dx.doi.org/10.1038/nbt810">Resolve DOI: 10.1038/nbt810</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12665801">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2569763" label="pubmed:2569763">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>de Sauvage F., Octave J.-N. (1989). "A novel mRNA of the A4 amyloid precursor gene coding for a possibly secreted protein.", Science, 245 651-653</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2569763">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:3035574" label="pubmed:3035574">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Robakis N.K., Ramakrishna N., Wolfe G., Wisniewski H.M. (1987). "Molecular cloning and characterization of a cDNA encoding the cerebrovascular and the neuritic plaque amyloid peptides.", Proc. Natl. Acad. Sci. U.S.A., 84 4190-4194</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=3035574">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2893290" label="pubmed:2893290">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Tanzi R.E., McClatchey A.I., Lamperti E.D., Villa-Komaroff L., Gusella J.F., Neve R.L. (1988). "Protease inhibitor domain encoded by an amyloid protein precursor mRNA associated with Alzheimer's disease.", Nature, 331 528-530</NOTE>
+        <LINK href="http://dx.doi.org/10.1038/331528a0">Resolve DOI: 10.1038/331528a0</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2893290">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2893291" label="pubmed:2893291">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Kitaguchi N., Takahashi Y., Tokushima Y., Shiojiri S., Ito H. (1988). "Novel precursor of Alzheimer's disease amyloid protein shows protease inhibitory activity.", Nature, 331 530-532</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2893291">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/331530a0">Resolve DOI: 10.1038/331530a0</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2893379" label="pubmed:2893379">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Zain S.B., Salim M., Chou W.G., Sajdel-Sulkowska E.M., Majocha R.E., Marotta C.A. (1988). "Molecular cloning of amyloid cDNA derived from mRNA of the Alzheimer disease brain: coding and noncoding regions of the fetal precursor mRNA are expressed in the cortex.", Proc. Natl. Acad. Sci. U.S.A., 85 929-933</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2893379">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8576160" label="pubmed:8576160">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Beher D., Hesse L., Masters C.L., Multhaup G. (1996). "Regulation of amyloid protein precursor (APP) binding to collagen and mapping of the binding sites on APP and collagen type I.", J. Biol. Chem., 271 1613-1620</NOTE>
+        <LINK href="http://dx.doi.org/10.1074/jbc.271.3.1613">Resolve DOI: 10.1074/jbc.271.3.1613</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8576160">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8476439" label="pubmed:8476439">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Denman R.B., Rosenzcwaig R., Miller D.L. (1993). "A system for studying the effect(s) of familial Alzheimer disease mutations on the processing of the beta-amyloid peptide precursor.", Biochem. Biophys. Res. Commun., 192 96-103</NOTE>
+        <LINK href="http://dx.doi.org/10.1006/bbrc.1993.1386">Resolve DOI: 10.1006/bbrc.1993.1386</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8476439">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2675837" label="pubmed:2675837">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Johnstone E.M., Chaney M.O., Moore R.E., Ward K.E., Norris F.H., Little S.P. (1989). "Alzheimer's disease amyloid peptide is encoded by two exons and shows similarity to soybean trypsin inhibitor.", Biochem. Biophys. Res. Commun., 163 1248-1255</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2675837">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1016/0006-291X(89)91112-1">Resolve DOI: 10.1016/0006-291X(89)91112-1</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8109908" label="pubmed:8109908">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Wisniewski T., Lalowski M., Levy E., Marques M.R.F., Frangione B. (1994). "The amino acid sequence of neuritic plaque amyloid from a familial Alzheimer's disease patient.", Ann. Neurol., 35 245-246</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8109908">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8229004" label="pubmed:8229004">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Vigo-Pelfrey C., Lee D., Keim P., Lieberburg I., Schenk D.B. (1993). "Characterization of beta-amyloid peptide from human cerebrospinal fluid.", J. Neurochem., 61 1965-1968</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8229004">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:3312495" label="pubmed:3312495">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Pardridge W.M., Vinters H.V., Yang J., Eisenberg J., Choi T.B., Tourtellotte W.W., Huebner V., Shively J.E. (1987). "Amyloid angiopathy of Alzheimer's disease: amino acid composition and partial sequence of a 4,200-dalton peptide isolated from cortical microvessels.", J. Neurochem., 49 1394-1401</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=3312495">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8248178" label="pubmed:8248178">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Roher A.E., Lowenson J.D., Clarke S., Woods A.S., Cotter R.J., Gowing E., Ball M.J. (1993). "Beta-amyloid-(1-42) is a major component of cerebrovascular amyloid deposits: implications for the pathology of Alzheimer disease.", Proc. Natl. Acad. Sci. U.S.A., 90 10836-10840</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8248178">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:3810169" label="pubmed:3810169">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Goldgaber D., Lerman M.I., McBride O.W., Saffiotti U., Gajdusek D.C. (1987). "Characterization and chromosomal localization of a cDNA encoding brain amyloid of Alzheimer's disease.", Science, 235 877-880</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=3810169">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2949367" label="pubmed:2949367">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Tanzi R.E., Gusella J.F., Watkins P.C., Bruns G.A., George-Hyslop P., Van Keuren M.L., Patterson D., Pagan S., Kurnit D.M., Neve R.L. (1987). "Amyloid beta protein gene: cDNA, mRNA distribution, and genetic linkage near the Alzheimer locus.", Science, 235 880-884</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2949367">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:7737970" label="pubmed:7737970">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Pangalos M.N., Efthimiopoulos S., Shioi J., Robakis N.K. (1995). "The chondroitin sulfate attachment site of appican is formed by splicing out exon 15 of the amyloid precursor gene.", J. Biol. Chem., 270 10388-10391</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=7737970">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1074/jbc.270.18.10388">Resolve DOI: 10.1074/jbc.270.18.10388</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9168929" label="pubmed:9168929">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Walter M.F., Mason P.E., Mason R.P. (1997). "Alzheimer's disease amyloid beta peptide 25-35 inhibits lipid peroxidation as a result of its membrane interactions.", Biochem. Biophys. Res. Commun., 233 760-764</NOTE>
+        <LINK href="http://dx.doi.org/10.1006/bbrc.1997.6547">Resolve DOI: 10.1006/bbrc.1997.6547</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9168929">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11775062" label="pubmed:11775062">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Kontush A. (2001). "Alzheimer's amyloid-beta as a preventive antioxidant for brain lipoproteins.", Cell. Mol. Neurobiol., 21 299-315</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11775062">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1023/A:1012629603390">Resolve DOI: 10.1023/A:1012629603390</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2506449" label="pubmed:2506449">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Oltersdorf T., Fritz L.C., Schenk D.B., Lieberburg I., Johnson-Wood K.L., Beattie E.C., Ward P.J., Blacher R.W., Dovey H.F., Sinha S. (1989). "The secreted form of the Alzheimer's amyloid precursor protein with the Kunitz domain is protease nexin-II.", Nature, 341 144-147</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2506449">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/341144a0">Resolve DOI: 10.1038/341144a0</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1969731" label="pubmed:1969731">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Kido H., Fukutomi A., Schilling J., Wang Y., Cordell B., Katunuma N. (1990). "Protease-specificity of Kunitz inhibitor domain of Alzheimer's disease amyloid protein precursor.", Biochem. Biophys. Res. Commun., 167 716-721</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/0006-291X(90)92084-D">Resolve DOI: 10.1016/0006-291X(90)92084-D</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1969731">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8344894" label="pubmed:8344894">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Bush A.I., Multhaup G., Moir R.D., Williamson T.G., Small D.H., Rumble B., Pollwein P., Beyreuther K., Masters C.L. (1993). "A novel zinc(II) binding site modulates the function of the beta A4 amyloid protein precursor of Alzheimer's disease.", J. Biol. Chem., 268 16109-16112</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8344894">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8446172" label="pubmed:8446172">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Nishimoto I., Okamoto T., Matsuura Y., Takahashi S., Okamoto T., Murayama Y., Ogata E. (1993). "Alzheimer amyloid protein precursor complexes with brain GTP-binding protein G(o).", Nature, 362 75-79</NOTE>
+        <LINK href="http://dx.doi.org/10.1038/362075a0">Resolve DOI: 10.1038/362075a0</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8446172">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:7913895" label="pubmed:7913895">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Hesse L., Beher D., Masters C.L., Multhaup G. (1994). "The beta A4 amyloid precursor protein binding to copper.", FEBS Lett., 349 109-116</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=7913895">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1016/0014-5793(94)00658-X">Resolve DOI: 10.1016/0014-5793(94)00658-X</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8158260" label="pubmed:8158260">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Small D.H., Nurcombe V., Reed G., Clarris H., Moir R., Beyreuther K., Masters C.L. (1994). "A heparin-binding domain in the amyloid protein precursor of Alzheimer's disease is involved in the regulation of neurite outgrowth.", J. Neurosci., 14 2117-2127</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8158260">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8886002" label="pubmed:8886002">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Maruyama K., Tomita T., Shinozaki K., Kume H., Asada H., Saido T.C., Ishiura S., Iwatsubo T., Obata K. (1996). "Familial Alzheimer's disease-linked mutations at Val717 of amyloid precursor protein are specific for the increased secretion of A beta 42(43).", Biochem. Biophys. Res. Commun., 227 730-735</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8886002">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1006/bbrc.1996.1577">Resolve DOI: 10.1006/bbrc.1996.1577</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8626687" label="pubmed:8626687">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Chow N., Korenberg J.R., Chen X.-N., Neve R.L. (1996). "APP-BP1, a novel protein that binds to the carboxyl-terminal region of the amyloid precursor protein.", J. Biol. Chem., 271 11339-11346</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8626687">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1074/jbc.271.19.11339">Resolve DOI: 10.1074/jbc.271.19.11339</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8887653" label="pubmed:8887653">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Borg J.-P., Ooi J., Levy E., Margolis B. (1996). "The phosphotyrosine interaction domains of X11 and FE65 bind to distinct sites on the YENPTY motif of amyloid precursor protein.", Mol. Cell. Biol., 16 6229-6241</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8887653">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8855266" label="pubmed:8855266">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Guenette S.Y., Chen J., Jondro P.D., Tanzi R.E. (1996). "Association of a novel human FE65-like protein with the cytoplasmic domain of the beta-amyloid precursor protein.", Proc. Natl. Acad. Sci. U.S.A., 93 10832-10837</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8855266">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1073/pnas.93.20.10832">Resolve DOI: 10.1073/pnas.93.20.10832</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9357988" label="pubmed:9357988">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Mok S.S., Sberna G., Heffernan D., Cappai R., Galatis D., Clarris H.J., Sawyer W.H., Beyreuther K., Masters C.L., Small D.H. (1997). "Expression and analysis of heparin-binding regions of the amyloid precursor protein of Alzheimer's disease.", FEBS Lett., 415 303-307</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9357988">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1016/S0014-5793(97)01146-0">Resolve DOI: 10.1016/S0014-5793(97)01146-0</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9338779" label="pubmed:9338779">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Yan S.D., Fu J., Soto C., Chen X., Zhu H., Al-Mohanna F., Collinson K., Zhu A., Stern E., Saido T., Tohyama M., Ogawa S., Roher A., Stern D. (1997). "An intracellular protein that binds amyloid-beta peptide and mediates neurotoxicity in Alzheimer's disease.", Nature, 389 689-695</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9338779">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/39522">Resolve DOI: 10.1038/39522</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9843960" label="pubmed:9843960">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Zheng P., Eastman J., Vande Pol S., Pimplikar S.W. (1998). "PAT1, a microtubule-interacting protein, recognizes the basolateral sorting signal of amyloid precursor protein.", Proc. Natl. Acad. Sci. U.S.A., 95 14745-14750</NOTE>
+        <LINK href="http://dx.doi.org/10.1073/pnas.95.25.14745">Resolve DOI: 10.1073/pnas.95.25.14745</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9843960">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10413512" label="pubmed:10413512">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Liu S.T., Howlett G., Barrow C.J. (1999). "Histidine-13 is a crucial residue in the zinc ion-induced aggregation of the A beta peptide of Alzheimer's disease.", Biochemistry, 38 9373-9378</NOTE>
+        <LINK href="http://dx.doi.org/10.1021/bi990205o">Resolve DOI: 10.1021/bi990205o</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10413512">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10535332" label="pubmed:10535332">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Varadarajan S., Yatin S., Kanski J., Jahanshahi F., Butterfield D.A. (1999). "Methionine residue 35 is important in amyloid beta-peptide-associated free radical oxidative stress.", Brain Res. Bull., 50 133-141</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10535332">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1016/S0361-9230(99)00093-3">Resolve DOI: 10.1016/S0361-9230(99)00093-3</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9890987" label="pubmed:9890987">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Tomita S., Ozaki T., Taru H., Oguchi S., Takeda S., Yagi Y., Sakiyama S., Kirino Y., Suzuki T. (1999). "Interaction of a neuron-specific protein containing PDZ domains with Alzheimer's amyloid precursor protein.", J. Biol. Chem., 274 2243-2254</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9890987">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1074/jbc.274.4.2243">Resolve DOI: 10.1074/jbc.274.4.2243</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10383380" label="pubmed:10383380">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Perez R.G., Soriano S., Hayes J.D., Ostaszewski B., Xia W., Selkoe D.J., Chen X., Stokin G.B., Koo E.H. (1999). "Mutagenesis identifies new signals for beta-amyloid precursor protein endocytosis, turnover, and the generation of secreted fragments, including Abeta42.", J. Biol. Chem., 274 18851-18856</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10383380">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1074/jbc.274.27.18851">Resolve DOI: 10.1074/jbc.274.27.18851</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10461923" label="pubmed:10461923">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Ruiz F.H., Gonzalez M., Bodini M., Opazo C., Inestrosa N.C. (1999). "Cysteine 144 is a key residue in the copper reduction by the beta-amyloid precursor protein.", J. Neurochem., 73 1288-1292</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10461923">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10816430" label="pubmed:10816430">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Tokuda T., Calero M., Matsubara E., Vidal R., Kumar A., Permanne B., Zlokovic B., Smith J.D., Ladu M.J., Rostagno A., Frangione B., Ghiso J. (2000). "Lipidation of apolipoprotein E influences its isoform-specific interaction with Alzheimer's amyloid beta peptides.", Biochem. J., 348 359-365</NOTE>
+        <LINK href="http://dx.doi.org/10.1042/0264-6021:3480359">Resolve DOI: 10.1042/0264-6021:3480359</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10816430">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10681545" label="pubmed:10681545">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Wang H.-Y., Lee D.H.S., D'Andrea M.R., Peterson P.A., Shank R.P., Reitz A.B. (2000). "Beta-amyloid(1-42) binds to alpha7 nicotinic acetylcholine receptor with high affinity. Implications for Alzheimer's disease pathology.", J. Biol. Chem., 275 5626-5632</NOTE>
+        <LINK href="http://dx.doi.org/10.1074/jbc.275.8.5626">Resolve DOI: 10.1074/jbc.275.8.5626</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10681545">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12214090" label="pubmed:12214090">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Passer B., Pellegrini L., Russo C., Siegel R.M., Lenardo M.J., Schettini G., Bachmann M., Tabaton M., D'Adamio L. (2000). "Generation of an apoptotic intracellular peptide by gamma-secretase cleavage of Alzheimer's amyloid beta protein precursor.", J. Alzheimers Dis., 2 289-301</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12214090">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11689470" label="pubmed:11689470">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Yazawa H., Yu Z.-X., Takeda K., Le Y., Gong W., Ferrans V.J., Oppenheim J.J., Li C.C.H., Wang J.M. (2001). "Beta amyloid peptide (Abeta42) is internalized via the G-protein-coupled receptor FPRL1 and forms fibrillar aggregates in macrophages.", FASEB J., 15 2454-2462</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11689470">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1096/fj.01-0251com">Resolve DOI: 10.1096/fj.01-0251com</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11278849" label="pubmed:11278849">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Kajkowski E.M., Lo C.F., Ning X., Walker S., Sofia H.J., Wang W., Edris W., Chanda P., Wagner E., Vile S., Ryan K., McHendry-Rinde B., Smith S.C., Wood A., Rhodes K.J., Kennedy J.D., Bard J., Jacobsen J.S., Ozenberger B.A. (2001). "Beta-amyloid peptide-induced apoptosis regulated by a novel protein containing a G protein activation module.", J. Biol. Chem., 276 18748-18756</NOTE>
+        <LINK href="http://dx.doi.org/10.1074/jbc.M011161200">Resolve DOI: 10.1074/jbc.M011161200</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11278849">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11274207" label="pubmed:11274207">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Curtain C.C., Ali F., Volitakis I., Cherny R.A., Norton R.S., Beyreuther K., Barrow C.J., Masters C.L., Bush A.I., Barnham K.J. (2001). "Alzheimer's disease amyloid-beta binds copper and zinc to generate an allosterically ordered structure containing superoxide dismutase-like subunits.", J. Biol. Chem., 276 20466-20473</NOTE>
+        <LINK href="http://dx.doi.org/10.1074/jbc.M100175200">Resolve DOI: 10.1074/jbc.M100175200</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11274207">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11438549" label="pubmed:11438549">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Scheuermann S., Hambsch B., Hesse L., Stumm J., Schmidt C., Beher D., Bayer T.A., Beyreuther K., Multhaup G. (2001). "Homodimerization of amyloid precursor protein and its implication in the amyloidogenic pathway of Alzheimer's disease.", J. Biol. Chem., 276 33923-33929</NOTE>
+        <LINK href="http://dx.doi.org/10.1074/jbc.M105410200">Resolve DOI: 10.1074/jbc.M105410200</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11438549">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11544248" label="pubmed:11544248">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Kimberly W.T., Zheng J.B., Guenette S.Y., Selkoe D.J. (2001). "The intracellular domain of the beta-amyloid precursor protein is stabilized by Fe65 and translocates to the nucleus in a notch-like manner.", J. Biol. Chem., 276 40288-40292</NOTE>
+        <LINK href="http://dx.doi.org/10.1074/jbc.C100447200">Resolve DOI: 10.1074/jbc.C100447200</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11544248">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11238726" label="pubmed:11238726">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Ohsawa I., Takamura C., Kohsaka S. (2001). "Fibulin-1 binds the amino-terminal head of beta-amyloid precursor protein and modulates its physiological function.", J. Neurochem., 76 1411-1420</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11238726">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11943163" label="pubmed:11943163">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Rank K.B., Pauley A.M., Bhattacharya K., Wang Z., Evans D.B., Fleck T.J., Johnston J.A., Sharma S.K. (2002). "Direct interaction of soluble human recombinant tau protein with Abeta 1-42 results in tau aggregation and hyperphosphorylation by tau protein kinase II.", FEBS Lett., 514 263-268</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/S0014-5793(02)02376-1">Resolve DOI: 10.1016/S0014-5793(02)02376-1</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11943163">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11724784" label="pubmed:11724784">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Scheinfeld M.H., Roncarati R., Vito P., Lopez P.A., Abdallah M., D'Adamio L. (2002). "Jun NH2-terminal kinase (JNK) interacting protein 1 (JIP1) binds the cytoplasmic domain of the Alzheimer's beta-amyloid precursor protein (APP).", J. Biol. Chem., 277 3767-3775</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11724784">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1074/jbc.M108357200">Resolve DOI: 10.1074/jbc.M108357200</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11784781" label="pubmed:11784781">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>White A.R., Multhaup G., Galatis D., McKinstry W.J., Parker M.W., Pipkorn R., Beyreuther K., Masters C.L., Cappai R. (2002). "Contrasting species-dependent modulation of copper-mediated neurotoxicity by the Alzheimer's disease amyloid precursor protein.", J. Neurosci., 22 365-376</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11784781">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12032279" label="pubmed:12032279">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Bush A.I., Tanzi R.E. (2002). "The galvanization of beta-amyloid in Alzheimer's disease.", Proc. Natl. Acad. Sci. U.S.A., 99 7317-7319</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12032279">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1073/pnas.122249699">Resolve DOI: 10.1073/pnas.122249699</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8131745" label="pubmed:8131745">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Suzuki T., Oishi M., Marshak D.R., Czernik A.J., Nairn A.C., Greengard P. (1994). "Cell cycle-dependent regulation of the phosphorylation and metabolism of the Alzheimer amyloid precursor protein.", EMBO J., 13 1114-1122</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8131745">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8999878" label="pubmed:8999878">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Walter J., Capell A., Hung A.Y., Langen H., Schnoelzer M., Thinakaran G., Sisodia S.S., Selkoe D.J., Haass C. (1997). "Ectodomain phosphorylation of beta-amyloid precursor protein at two distinct cellular locations.", J. Biol. Chem., 272 1896-1903</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8999878">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1074/jbc.272.3.1896">Resolve DOI: 10.1074/jbc.272.3.1896</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9585534" label="pubmed:9585534">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Multhaup G., Ruppert T., Schlicksupp A., Hesse L., Bill E., Pipkorn R., Masters C.L., Beyreuther K. (1998). "Copper-binding amyloid precursor protein undergoes a site-specific fragmentation in the reduction of hydrogen peroxide.", Biochemistry, 37 7224-7230</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9585534">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1021/bi980022m">Resolve DOI: 10.1021/bi980022m</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10319819" label="pubmed:10319819">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Gervais F.G., Xu D., Robertson G.S., Vaillancourt J.P., Zhu Y., Huang J., LeBlanc A., Smith D., Rigby M., Shearman M.S., Clarke E.E., Zheng H., van der Ploeg L.H.T., Ruffolo S.C., Thornberry N.A., Xanthoudakis S., Zamboni R.J., Roy S., Nicholson D.W. (1999). "Involvement of caspases in proteolytic cleavage of Alzheimer's amyloid-beta precursor protein and amyloidogenic A beta peptide formation.", Cell, 97 395-406</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10319819">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1016/S0092-8674(00)80748-5">Resolve DOI: 10.1016/S0092-8674(00)80748-5</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10341243" label="pubmed:10341243">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Ando K., Oishi M., Takeda S., Iijima K., Isohara T., Nairn A.C., Kirino Y., Greengard P., Suzuki T. (1999). "Role of phosphorylation of Alzheimer's amyloid precursor protein during neuronal differentiation.", J. Neurosci., 19 4421-4427</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10341243">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10806211" label="pubmed:10806211">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Walter J., Schindzielorz A., Hartung B., Haass C. (2000). "Phosphorylation of the beta-amyloid precursor protein at the cell surface by ectocasein kinases 1 and 2.", J. Biol. Chem., 275 23523-23529</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10806211">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1074/jbc.M002850200">Resolve DOI: 10.1074/jbc.M002850200</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10742146" label="pubmed:10742146">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Lu D.C., Rabizadeh S., Chandra S., Shayya R.F., Ellerby L.M., Ye X., Salvesen G.S., Koo E.H., Bredesen D.E. (2000). "A second cytotoxic proteolytic peptide derived from amyloid beta-protein precursor.", Nat. Med., 6 397-404</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10742146">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/74656">Resolve DOI: 10.1038/74656</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11517218" label="pubmed:11517218">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Ando K., Iijima K., Elliott J.I., Kirino Y., Suzuki T. (2001). "Phosphorylation-dependent regulation of the interaction of amyloid precursor protein with Fe65 affects the production of beta-amyloid.", J. Biol. Chem., 276 40353-40361</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11517218">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1074/jbc.M104059200">Resolve DOI: 10.1074/jbc.M104059200</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11146006" label="pubmed:11146006">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Standen C.L., Brownlees J., Grierson A.J., Kesavapany S., Lau K.-F., McLoughlin D.M., Miller C.C.J. (2001). "Phosphorylation of thr(668) in the cytoplasmic domain of the Alzheimer's disease amyloid precursor protein by stress-activated protein kinase 1b (Jun N-terminal kinase-3).", J. Neurochem., 76 316-320</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11146006">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11851430" label="pubmed:11851430">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Weidemann A., Eggert S., Reinhard F.B.M., Vogel M., Paliga K., Baier G., Masters C.L., Beyreuther K., Evin G. (2002). "A novel epsilon-cleavage within the transmembrane domain of the Alzheimer amyloid precursor protein demonstrates homology with Notch processing.", Biochemistry, 41 2825-2835</NOTE>
+        <LINK href="http://dx.doi.org/10.1021/bi015794o">Resolve DOI: 10.1021/bi015794o</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11851430">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11877420" label="pubmed:11877420">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Tarr P.E., Roncarati R., Pelicci G., Pelicci P.G., D'Adamio L. (2002). "Tyrosine phosphorylation of the beta-amyloid precursor protein cytoplasmic tail promotes interaction with Shc.", J. Biol. Chem., 277 16798-16804</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11877420">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1074/jbc.M110286200">Resolve DOI: 10.1074/jbc.M110286200</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:16335952" label="pubmed:16335952">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Liu T., Qian W.-J., Gritsenko M.A., Camp D.G. II, Monroe M.E., Moore R.J., Smith R.D. (2005). "Human plasma N-glycoproteome analysis by immunoaffinity subtraction, hydrazide chemistry, and mass spectrometry.", J. Proteome Res., 4 2070-2080</NOTE>
+        <LINK href="http://dx.doi.org/10.1021/pr0502065">Resolve DOI: 10.1021/pr0502065</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=16335952">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2900137" label="pubmed:2900137">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Dyrks T., Weidemann A., Multhaup G., Salbaum J.M., Lemaire H.-G., Kang J., Mueller-Hill B., Masters C.L., Beyreuther K. (1988). "Identification, transmembrane orientation and biogenesis of the amyloid A4 precursor of Alzheimer's disease.", EMBO J., 7 949-957</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2900137">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12142279" label="pubmed:12142279">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Annaert W., De Strooper B. (2002). "A cell biological perspective on Alzheimer's disease.", Annu. Rev. Cell Dev. Biol., 18 25-51</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12142279">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1146/annurev.cellbio.18.020402.142302">Resolve DOI: 10.1146/annurev.cellbio.18.020402.142302</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2125487" label="pubmed:2125487">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Hynes T.R., Randal M., Kennedy L.A., Eigenbrot C., Kossiakof A.A. (1990). "X-ray crystal structure of the protease inhibitor domain of Alzheimer's amyloid beta-protein precursor.", Biochemistry, 29 10018-10022</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2125487">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1021/bi00495a002">Resolve DOI: 10.1021/bi00495a002</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1718421" label="pubmed:1718421">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Heald S.L., Tilton R.F. Jr., Hammond L.S., Lee A., Bayney R.M., Kamarck M.E., Ramabhadran T.V., Dreyer R.N., Davis G., Unterbeck A., Tamburini P.P. (1991). "Sequential NMR resonance assignment and structure determination of the Kunitz-type inhibitor domain of the Alzheimer's beta-amyloid precursor protein.", Biochemistry, 30 10467-10478</NOTE>
+        <LINK href="http://dx.doi.org/10.1021/bi00107a015">Resolve DOI: 10.1021/bi00107a015</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1718421">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:7516706" label="pubmed:7516706">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Talafous J., Marcinowski K.J., Klopman G., Zagorski M.G. (1994). "Solution structure of residues 1-28 of the amyloid beta-peptide.", Biochemistry, 33 7788-7796</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=7516706">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1021/bi00191a006">Resolve DOI: 10.1021/bi00191a006</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:7588758" label="pubmed:7588758">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Sticht H., Bayer P., Willbold D., Dames S., Hilbich C., Beyreuther K., Frank R.W., Rosch P. (1995). "Structure of amyloid A4-(1-40)-peptide of Alzheimer's disease.", Eur. J. Biochem., 233 293-298</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=7588758">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8973180" label="pubmed:8973180">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Kohno T., Kobayashi K., Maeda T., Sato K., Takashima A. (1996). "Three-dimensional structures of the amyloid beta peptide (25-35) in membrane-mimicking environment.", Biochemistry, 35 16094-16104</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8973180">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1021/bi961598j">Resolve DOI: 10.1021/bi961598j</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9300481" label="pubmed:9300481">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Scheidig A.J., Hynes T.R., Pelletier L.A., Wells J.A., Kossiakoff A.A. (1997). "Crystal structures of bovine chymotrypsin and trypsin complexed to the inhibitor domain of Alzheimer's amyloid beta-protein precursor (APPI) and basic pancreatic trypsin inhibitor (BPTI): engineering of inhibitors with altered specificities.", Protein Sci., 6 1806-1824</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9300481">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9693002" label="pubmed:9693002">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Coles M., Bicknell W., Watson A.A., Fairlie D.P., Craik D.J. (1998). "Solution structure of amyloid beta-peptide(1-40) in a water-micelle environment. Is the membrane-spanning domain where we think it is?", Biochemistry, 37 11064-11077</NOTE>
+        <LINK href="http://dx.doi.org/10.1021/bi972979f">Resolve DOI: 10.1021/bi972979f</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9693002">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10201399" label="pubmed:10201399">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Rossjohn J., Cappai R., Feil S.C., Henry A., McKinstry W.J., Galatis D., Hesse L., Multhaup G., Beyreuther K., Masters C.L., Parker M.W. (1999). "Crystal structure of the N-terminal, growth factor-like domain of Alzheimer amyloid precursor protein.", Nat. Struct. Biol., 6 327-331</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10201399">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/7562">Resolve DOI: 10.1038/7562</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10821838" label="pubmed:10821838">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Miravalle L., Tokuda T., Chiarle R., Giaccone G., Bugiani O., Tagliavini F., Frangione B., Ghiso J. (2000). "Substitutions at codon 22 of Alzheimer's Abeta peptide induce diverse conformational changes and apoptotic effects in human cerebral endothelial cells.", J. Biol. Chem., 275 27110-27116</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10821838">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1074/jbc.M003154200">Resolve DOI: 10.1074/jbc.M003154200</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10940221" label="pubmed:10940221">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Zhang S., Iwata K., Lachenmann M.J., Peng J.W., Li S., Stimson E.R., Lu Y., Felix A.M., Maggio J.E., Lee J.P. (2000). "The Alzheimer's peptide a beta adopts a collapsed coil structure in water.", J. Struct. Biol., 130 130-141</NOTE>
+        <LINK href="http://dx.doi.org/10.1006/jsbi.2000.4288">Resolve DOI: 10.1006/jsbi.2000.4288</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10940221">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10940222" label="pubmed:10940222">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Poulsen S.-A., Watson A.A., Craik D.J. (2000). "Solution structures in aqueous SDS micelles of two amyloid beta peptides of Abeta(1-28) mutated at the alpha-secretase cleavage site.", J. Struct. Biol., 130 142-152</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10940222">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1006/jsbi.2000.4267">Resolve DOI: 10.1006/jsbi.2000.4267</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:15304215" label="pubmed:15304215">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Wang Y., Ha Y. (2004). "The X-ray structure of an antiparallel dimer of the human amyloid precursor protein E2 domain.", Mol. Cell, 15 343-353</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/j.molcel.2004.06.037">Resolve DOI: 10.1016/j.molcel.2004.06.037</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=15304215">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1363811" label="pubmed:1363811">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Hardy J. (1992). "Framing beta-amyloid.", Nat. Genet., 1 233-234</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1363811">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/ng0792-233">Resolve DOI: 10.1038/ng0792-233</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:2111584" label="pubmed:2111584">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Levy E., Carman M.D., Fernandez-Madrid I.J., Power M.D., Lieberburg I., van Duinen S.G., Bots G.T.A.M., Luyendijk W., Frangione B. (1990). "Mutation of the Alzheimer's disease amyloid gene in hereditary cerebral hemorrhage, Dutch type.", Science, 248 1124-1126</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2111584">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1671712" label="pubmed:1671712">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Goate A., Chartier-Harlin M.-C., Mullan M., Brown J., Crawford F., Fidani L., Giuffra L., Haynes A., Irving N., James L., Mant R., Newton P., Rooke K., Roques P., Talbot C., Pericak-Vance M., Roses A.D., Williamson R., Rossor M., Owen M., Hardy J. (1991). "Segregation of a missense mutation in the amyloid precursor protein gene with familial Alzheimer's disease.", Nature, 349 704-706</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1671712">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/349704a0">Resolve DOI: 10.1038/349704a0</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1908231" label="pubmed:1908231">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Yoshioka K., Miki T., Katsuya T., Ogihara T., Sakaki Y. (1991). "The 717Val--&gt;Ile substitution in amyloid precursor protein is associated with familial Alzheimer's disease regardless of ethnic groups.", Biochem. Biophys. Res. Commun., 178 1141-1146</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/0006-291X(91)91011-Z">Resolve DOI: 10.1016/0006-291X(91)91011-Z</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1908231">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1678058" label="pubmed:1678058">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Naruse S., Igarashi S., Kobayashi H., Aoki K., Inuzuka T., Kaneko K., Shimizu T., Iihara K., Kojima T., Miyatake T., Tsuji S. (1991). "Mis-sense mutation Val-&gt;Ile in exon 17 of amyloid precursor protein gene in Japanese familial Alzheimer's disease.", Lancet, 337 978-979</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/0140-6736(91)91612-X">Resolve DOI: 10.1016/0140-6736(91)91612-X</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1678058">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1944558" label="pubmed:1944558">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Chartier-Harlin M.-C., Crawford F., Houlden H., Warren A., Hughes D., Fidani L., Goate A., Rossor M., Roques P., Hardy J., Mullan M. (1991). "Early-onset Alzheimer's disease caused by mutations at codon 717 of the beta-amyloid precursor protein gene.", Nature, 353 844-846</NOTE>
+        <LINK href="http://dx.doi.org/10.1038/353844a0">Resolve DOI: 10.1038/353844a0</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1944558">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1925564" label="pubmed:1925564">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Murrell J.R., Farlow M., Ghetti B., Benson M.D. (1991). "A mutation in the amyloid precursor protein associated with hereditary Alzheimer's disease.", Science, 254 97-99</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1925564">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1415269" label="pubmed:1415269">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Kamino K., Orr H.T., Payami H., Wijsman E.M., Alonso M.E., Pulst S.M., Anderson L., O'Dahl S., Nemens E., White J.A., Sadovnick A.D., Ball M.J., Kaye J., Warren A., McInnis M.G., Antonarakis S.E., Korenberg J.R., Sharma V., Kukull W., Larson E., Heston L.L., Martin G.M., Bird T.D., Schellenberg G.D. (1992). "Linkage and mutational analysis of familial Alzheimer disease kindreds for the APP gene region.", Am. J. Hum. Genet., 51 998-1014</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1415269">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1303239" label="pubmed:1303239">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Hendriks L., van Duijn C.M., Cras P., Cruts M., Van Hul W., van Harskamp F., Warren A., McInnis M.G., Antonarakis S.E., Martin J.J., Hofman A., Van Broeckhoven C. (1992). "Presenile dementia and cerebral haemorrhage linked to a mutation at codon 692 of the beta-amyloid precursor protein gene.", Nat. Genet., 1 218-221</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1303239">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/ng0692-218">Resolve DOI: 10.1038/ng0692-218</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1302033" label="pubmed:1302033">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Mullan M., Crawford F., Axelman K., Houlden H., Lilius L., Winblad B., Lannfelt L. (1992). "A pathogenic mutation for probable Alzheimer's disease in the APP gene at the N-terminus of beta-amyloid.", Nat. Genet., 1 345-347</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1302033">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/ng0892-345">Resolve DOI: 10.1038/ng0892-345</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1307241" label="pubmed:1307241">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Jones C.T., Morris S., Yates C.M., Moffoot A., Sharpe C., Brock D.J.H., St Clair D. (1992). "Mutation in codon 713 of the beta amyloid precursor protein gene presenting with schizophrenia.", Nat. Genet., 1 306-309</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1307241">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/ng0792-306">Resolve DOI: 10.1038/ng0792-306</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:1303275" label="pubmed:1303275">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Carter D.A., Desmarais E., Bellis M., Campion D., Clerget-Darpoux F., Brice A., Agid Y., Jaillard-Serradt A., Mallet J. (1992). "More missense in amyloid gene.", Nat. Genet., 2 255-256</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1303275">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/ng1292-255">Resolve DOI: 10.1038/ng1292-255</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8267572" label="pubmed:8267572">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Liepnieks J.J., Ghetti B., Farlow M., Roses A.D., Benson M.D. (1993). "Characterization of amyloid fibril beta-peptide in familial Alzheimer's disease with APP717 mutations.", Biochem. Biophys. Res. Commun., 197 386-392</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8267572">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1006/bbrc.1993.2491">Resolve DOI: 10.1006/bbrc.1993.2491</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8154870" label="pubmed:8154870">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Peacock M.L., Murman D.L., Sima A.A.F., Warren J.T. Jr., Roses A.D., Fink J.K. (1994). "Novel amyloid precursor protein gene mutation (codon 665Asp) in a patient with late-onset Alzheimer's disease.", Ann. Neurol., 35 432-438</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8154870">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8290042" label="pubmed:8290042">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Farlow M., Murrell J., Ghetti B., Unverzagt F., Zeldenrust S., Benson M.D. (1994). "Clinical characteristics in a kindred with early-onset Alzheimer's disease and their linkage to a G--&gt;T change at position 2149 of the amyloid precursor protein gene.", Neurology, 44 105-111</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8290042">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8577393" label="pubmed:8577393">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Brooks W.S., Martins R.N., De Voecht J., Nicholson G.A., Schofield P.R., Kwok J.B.J., Fisher C., Yeung L.U., Van Broeckhoven C. (1995). "A mutation in codon 717 of the amyloid precursor protein gene in an Australian family with Alzheimer's disease.", Neurosci. Lett., 199 183-186</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/0304-3940(95)12046-7">Resolve DOI: 10.1016/0304-3940(95)12046-7</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8577393">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9328472" label="pubmed:9328472">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Eckman C.B., Mehta N.D., Crook R., Perez-Tur J., Prihar G., Pfeiffer E., Graff-Radford N., Hinder P., Yager D., Zenk B., Refolo L.M., Prada C.M., Younkin S.G., Hutton M., Hardy J. (1997). "A new pathogenic mutation in the APP gene (I716V) increases the relative proportion of A beta 42(43).", Hum. Mol. Genet., 6 2087-2089</NOTE>
+        <LINK href="http://dx.doi.org/10.1093/hmg/6.12.2087">Resolve DOI: 10.1093/hmg/6.12.2087</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9328472">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9754958" label="pubmed:9754958">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cras P., van Harskamp F., Hendriks L., Ceuterick C., van Duijn C.M., Stefanko S.Z., Hofman A., Kros J.M., Van Broeckhoven C., Martin J.J. (1998). "Presenile Alzheimer dementia characterized by amyloid angiopathy and large amyloid core type senile plaques in the APP 692Ala--&gt;Gly mutation.", Acta Neuropathol., 96 253-260</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9754958">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1007/s004010050892">Resolve DOI: 10.1007/s004010050892</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10097173" label="pubmed:10097173">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Ancolio K., Dumanchin C., Barelli H., Warter J.-M., Brice A., Campion D., Frebourg T., Checler F. (1999). "Unusual phenotypic alteration of beta amyloid precursor protein (betaAPP) maturation by a new Val-715 --&gt; Met betaAPP-770 mutation responsible for probable early-onset Alzheimer's disease.", Proc. Natl. Acad. Sci. U.S.A., 96 4119-4124</NOTE>
+        <LINK href="http://dx.doi.org/10.1073/pnas.96.7.4119">Resolve DOI: 10.1073/pnas.96.7.4119</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10097173">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10631141" label="pubmed:10631141">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Finckh U., Mueller-Thomsen T., Mann U., Eggers C., Marksteiner J., Meins W., Binetti G., Alberici A., Hock C., Nitsch R.M., Gal A. (2000). "High prevalence of pathogenic mutations in patients with early-onset dementia detected by sequence analyses of four different genes.", Am. J. Hum. Genet., 66 110-117</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10631141">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1086/302702">Resolve DOI: 10.1086/302702</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10665499" label="pubmed:10665499">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Kwok J.B.J., Li Q.X., Hallupp M., Whyte S., Ames D., Beyreuther K., Masters C.L., Schofield P.R. (2000). "Novel Leu723Pro amyloid precursor protein mutation increases amyloid beta42(43) peptide levels and induces apoptosis.", Ann. Neurol., 47 249-253</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10665499">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1002/1531-8249(200002)47:2&lt;249::AID-ANA18&gt;3.0.CO;2-8">Resolve DOI: 10.1002/1531-8249(200002)47:2&lt;249::AID-ANA18&gt;3.0.CO;2-8</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10867787" label="pubmed:10867787">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Murrell J.R., Hake A.M., Quaid K.A., Farlow M.R., Ghetti B. (2000). "Early-onset Alzheimer disease caused by a new mutation (V717L) in the amyloid precursor protein gene.", Arch. Neurol., 57 885-887</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10867787">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1001/archneur.57.6.885">Resolve DOI: 10.1001/archneur.57.6.885</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11063718" label="pubmed:11063718">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Kumar-Singh S., De Jonghe C., Cruts M., Kleinert R., Wang R., Mercken M., De Strooper B., Vanderstichele H., Loefgren A., Vanderhoeven I., Backhovens H., Vanmechelen E., Kroisel P.M., Van Broeckhoven C. (2000). "Nonfibrillar diffuse amyloid deposition due to a gamma(42)-secretase site mutation points to an essential role for N-truncated A beta(42) in Alzheimer's disease.", Hum. Mol. Genet., 9 2589-2598</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11063718">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1093/hmg/9.18.2589">Resolve DOI: 10.1093/hmg/9.18.2589</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11409420" label="pubmed:11409420">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Grabowski T.J., Cho H.S., Vonsattel J.P.G., Rebeck G.W., Greenberg S.M. (2001). "Novel amyloid precursor protein mutation in an Iowa family with dementia and severe cerebral amyloid angiopathy.", Ann. Neurol., 49 697-705</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11409420">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1002/ana.1009">Resolve DOI: 10.1002/ana.1009</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11311152" label="pubmed:11311152">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Walsh D.M., Hartley D.M., Condron M.M., Selkoe D.J., Teplow D.B. (2001). "In vitro studies of amyloid beta-protein fibril assembly and toxicity provide clues to the aetiology of Flemish variant (Ala692--&gt;Gly) Alzheimer's disease.", Biochem. J., 355 869-877</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11311152">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11528419" label="pubmed:11528419">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Nilsberth C., Westlind-Danielsson A., Eckman C.B., Condron M.M., Axelman K., Forsell C., Stenh C., Luthman J., Teplow D.B., Younkin S.G., Naeslund J., Lannfelt L. (2001). "The 'Arctic' APP mutation (E693G) causes Alzheimer's disease by enhanced Abeta protofibril formation.", Nat. Neurosci., 4 887-893</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11528419">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/nn0901-887">Resolve DOI: 10.1038/nn0901-887</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12034808" label="pubmed:12034808">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Pasalar P., Najmabadi H., Noorian A.R., Moghimi B., Jannati A., Soltanzadeh A., Krefft T., Crook R., Hardy J. (2002). "An Iranian family with Alzheimer's disease caused by a novel APP mutation (Thr714Ala).", Neurology, 58 1574-1575</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12034808">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12654973" label="pubmed:12654973">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Greenberg S.M., Shin Y., Grabowski T.J., Cooper G.E., Rebeck G.W., Iglesias S., Chapon F., Tournier-Lasserve E., Baron J.-C. (2003). "Hemorrhagic stroke associated with the Iowa amyloid precursor protein mutation.", Neurology, 60 1020-1022</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12654973">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:15365148" label="pubmed:15365148">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Rossi G., Giaccone G., Maletta R., Morbin M., Capobianco R., Mangieri M., Giovagnoli A.R., Bizzi A., Tomaino C., Perri M., Di Natale M., Tagliavini F., Bugiani O., Bruni A.C. (2004). "A family with Alzheimer disease and strokes associated with A713T mutation of the APP gene.", Neurology, 63 910-912</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=15365148">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:16178030" label="pubmed:16178030">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Obici L., Demarchi A., de Rosa G., Bellotti V., Marciano S., Donadei S., Arbustini E., Palladini G., Diegoli M., Genovese E., Ferrari G., Coverlizza S., Merlini G. (2005). "A novel AbetaPP mutation exclusively associated with cerebral amyloid angiopathy.", Ann. Neurol., 58 639-644</NOTE>
+        <LINK href="http://dx.doi.org/10.1002/ana.20571">Resolve DOI: 10.1002/ana.20571</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=16178030">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:15668448" label="pubmed:15668448">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Edwards-Lee T., Ringman J.M., Chung J., Werner J., Morgan A., St George Hyslop P., Thompson P., Dutton R., Mlikotic A., Rogaeva E., Hardy J. (2005). "An African American family with early-onset Alzheimer disease and an APP (T714I) mutation.", Neurology, 64 377-379</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=15668448">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1212/01.WNL.0000149761.70566.3E">Resolve DOI: 10.1212/01.WNL.0000149761.70566.3E</LINK>
+      </FEATURE>
+    </SEGMENT>
+  </GFF>
+</DASGFF>
