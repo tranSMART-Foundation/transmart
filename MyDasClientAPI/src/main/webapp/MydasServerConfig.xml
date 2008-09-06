@@ -103,15 +103,14 @@
         description: This is the optional data source description, as provided in the /DASDSN/DSN/DESCRIPTION element of the XML returned by the DAS dsn command. For a reference server, this should echo its own URL.
         description-href: This is the optional data source description href attribute, as provided in the /DASDSN/DSN/DESCRIPTION/@href attribute of the XML returned by the DAS dsn command. For a reference server, this should echo its own URL.
         -->
-        <datasource id="consensus"
-                    name="ConsensusDataSource"
+        <datasource id="proxy"
+                    name="proxyDataSource"
                     version="0.1"
                     mapmaster="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot"
-                    description="ConsensusDataSource"
+                    description="ProxyDataSource"
                     description-href="http://code.google.com/p/mydas/">
-             The fully qualified class name of the DataSource.
-            <!--<class>uk.ac.ebi.mydas.proxy.ReportAllProxyDasServer</class>-->
-            <class>uk.ac.ebi.mydas.proxy.ConsensusDataSource</class>
+             <!--The fully qualified class name of the DataSource.-->
+            <class>uk.ac.ebi.mydas.proxy.ReportAllProxyDasServer</class>
 
             <!-- The optional name of the DAS stylesheet to be used for this datasource.
             This will override the default stylesheet defined in the global settings section. -->
