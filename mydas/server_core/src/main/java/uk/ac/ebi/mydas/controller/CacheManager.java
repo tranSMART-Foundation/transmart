@@ -66,7 +66,7 @@ public class CacheManager {
      */
     public void emptyCache() {
         if (dsnConfig.isOK()){
-            cacheAdministrator.flushGroup(dsnConfig.getName());
+            cacheAdministrator.flushGroup(dsnConfig.getId());
         }
     }
 
