@@ -34,7 +34,7 @@ public class DasQueryRunnerThread implements Runnable{
 
     private StringBuffer responseBuffer = new StringBuffer();
 
-    DasQueryRunnerThread(HttpClient client, String urlQueryString){
+    public DasQueryRunnerThread(HttpClient client, String urlQueryString){
         this.urlQueryString = urlQueryString;
         this.httpClient = client;
     }
