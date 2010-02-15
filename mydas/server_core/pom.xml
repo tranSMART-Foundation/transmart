@@ -39,36 +39,7 @@
     <packaging>jar</packaging>
     
     <name>mydas Distributed Annotation Server</name>
-    <url>http://code.google.com/p/mydas/</url>
-    <description>
-        This project aims to offer an easy-to-extend Java DAS server framework.
-        It offers several advantages:
-
-        * Implementing data sources is very easy but also flexible and powerful.
-        * Data caching is built into the system, with access to the caching
-        mechanism made available to the data sources.
-        * All aspects of the server are highly configurable, including
-        selecting options where the DAS 1.53 specification offers
-        choices to the implementor.
-        * The latest Java technologies have been used throughout the
-        system to optimise performance and simplify data source development.
-        * Wherever possible the same terminology is used in the API as in
-        the DAS specification and XML - again, making data source
-        development more easy.
-        * The server allows XSLT transforms of the DAS XML to be configured
-        to provide a simple DAS client view (limited to the single DAS
-        source).
-
-        More details of the DAS protocol, DAS servers and DAS clients can
-        be found at http://www.biodas.org/wiki/Main_Page.
-
-        The first version of this server is a complete implementation of
-        Distributed Sequence Annotation System (DAS) Version 1.53.
-        If you are interested in learning more about DAS 1.53, the
-        specification is highly recommended as a concise and complete
-        description of the DAS protocol that can be obtained from:
-        http://biodas.org/documents/spec.html
-    </description>
+    
     
 
     <dependencies>
