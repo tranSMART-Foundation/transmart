@@ -37,18 +37,18 @@
 
         * Implementing data sources is very easy but also flexible and powerful.
         * Data caching is built into the system, with access to the caching
-            mechanism made available to the data sources.
+        mechanism made available to the data sources.
         * All aspects of the server are highly configurable, including
-            selecting options where the DAS 1.53 specification offers
-            choices to the implementor.
+        selecting options where the DAS 1.53 specification offers
+        choices to the implementor.
         * The latest Java technologies have been used throughout the
-            system to optimise performance and simplify data source development.
+        system to optimise performance and simplify data source development.
         * Wherever possible the same terminology is used in the API as in
-            the DAS specification and XML - again, making data source
-            development more easy.
+        the DAS specification and XML - again, making data source
+        development more easy.
         * The server allows XSLT transforms of the DAS XML to be configured
-            to provide a simple DAS client view (limited to the single DAS
-            source).
+        to provide a simple DAS client view (limited to the single DAS
+        source).
 
         More details of the DAS protocol, DAS servers and DAS clients can
         be found at http://www.biodas.org/wiki/Main_Page.
@@ -68,11 +68,11 @@
         </license>
     </licenses>
 
-	<distributionManagement>
-		<repository>
+    <distributionManagement>
+        <repository>
             <id>ebi-repo</id>
             <name>EBI Repository</name>
-             <!--the url can pint to any server that can see/write to the maven home directory-->
+            <!--the url can pint to any server that can see/write to the maven home directory-->
             <url>scp://lobster.ebi.ac.uk/homes/maven/public_html/m2repo</url>
         </repository>
 
@@ -84,17 +84,17 @@
         </snapshotRepository>
     </distributionManagement>
 
-	<scm>
+    <scm>
         <url>http://mydas.googlecode.com/svn/</url>
         <connection>http://mydas.googlecode.com/svn/</connection>
-	</scm>
+    </scm>
 
-	<dependencies>
+    <dependencies>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.3.1</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
 
@@ -108,8 +108,8 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.4</version>
-			<scope>compile</scope>
-		</dependency>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>log4j</groupId>
@@ -169,19 +169,19 @@
                 </configuration>
             </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-		</plugins>
+        </plugins>
         <finalName>mydas</finalName>
     </build>
 

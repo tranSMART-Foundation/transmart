@@ -23,6 +23,7 @@
 
 package uk.ac.ebi.mydas.example;
 
+import net.sourceforge.jwebunit.junit.WebTestCase;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.webapp.WebAppContext;
 
@@ -39,7 +40,7 @@ import org.mortbay.jetty.webapp.WebAppContext;
  * TODO: Add tests of additional data sources that implement the remaining three available interfaces
  *
  */
-public class WebIntegrationTest extends net.sourceforge.jwebunit.WebTestCase {
+public class WebIntegrationTest extends WebTestCase {
 
     private Server server;
 
@@ -54,8 +55,7 @@ public class WebIntegrationTest extends net.sourceforge.jwebunit.WebTestCase {
         getTestContext().setBaseUrl("http://localhost:" + actualPort + "/das");
     }
 
-    public void test_DSN_request() {
-        System.out.println("Testing XML returned for DSN request");
+    public void testDsnRequest() {
         // Check XML response
         beginAt("/dsn");
         assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
