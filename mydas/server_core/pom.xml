@@ -28,12 +28,12 @@
     
     <groupId>uk.ac.ebi.mydas</groupId>
     <artifactId>mydas</artifactId>
-    <version>1.0.5</version>
+    <version>${project-version}</version>
 
     <parent>
-        <groupId>uk.ac.ebi.mydas.example</groupId>
+        <groupId>uk.ac.ebi.mydas</groupId>
         <artifactId>mydas_master</artifactId>
-        <version>1.0.5</version>
+        <version>${project-version}</version>
     </parent>
 
     <packaging>jar</packaging>

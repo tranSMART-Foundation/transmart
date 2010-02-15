@@ -5,7 +5,7 @@
     <groupId>uk.ac.ebi.mydas.template</groupId>
     <artifactId>MyDasTemplate</artifactId>
     <packaging>war</packaging>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <name>MyDasTemplate Maven Webapp</name>
     <url>http://maven.apache.org</url>
 
@@ -39,21 +39,26 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>uk.ac.ebi.mydas</groupId>
             <artifactId>mydas</artifactId>
-            <version>1.0.5</version>
+            <version>1.0.6</version>
         </dependency>
 
         <dependency>
-            <groupId>jwebunit</groupId>
-            <artifactId>jwebunit</artifactId>
-            <version>1.2</version>
-            <scope>test</scope>
+            <groupId>net.sourceforge.jwebunit</groupId>
+            <artifactId>jwebunit-core</artifactId>
+            <version>2.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sourceforge.jwebunit</groupId>
+            <artifactId>jwebunit-htmlunit-plugin</artifactId>
+            <version>2.2</version>
         </dependency>
 
 		<dependency>
@@ -98,8 +103,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
 
