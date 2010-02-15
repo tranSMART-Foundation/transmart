@@ -25,10 +25,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+    
     <groupId>uk.ac.ebi.mydas</groupId>
     <artifactId>mydas</artifactId>
-    <packaging>jar</packaging>
     <version>1.0.5</version>
+
+    <parent>
+        <groupId>uk.ac.ebi.mydas.example</groupId>
+        <artifactId>mydas_master</artifactId>
+        <version>1.0.5</version>
+    </parent>
+
+    <packaging>jar</packaging>
+    
     <name>mydas Distributed Annotation Server</name>
     <url>http://code.google.com/p/mydas/</url>
     <description>
@@ -60,34 +69,7 @@
         description of the DAS protocol that can be obtained from:
         http://biodas.org/documents/spec.html
     </description>
-    <licenses>
-        <license>
-            <name>The Apache Software License 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <distributionManagement>
-        <repository>
-            <id>ebi-repo</id>
-            <name>EBI Repository</name>
-            <!--the url can pint to any server that can see/write to the maven home directory-->
-            <url>scp://lobster.ebi.ac.uk/homes/maven/public_html/m2repo</url>
-        </repository>
-
-        <snapshotRepository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>ebi-repo-snapshots</id>
-            <name>EBI Snapshots Repository</name>
-            <url>scp://lobster.ebi.ac.uk/homes/maven/public_html/m2repo_snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <scm>
-        <url>http://mydas.googlecode.com/svn/</url>
-        <connection>http://mydas.googlecode.com/svn/</connection>
-    </scm>
+    
 
     <dependencies>
 
@@ -114,7 +96,7 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
+            <version>1.2.15</version>
         </dependency>
 
         <dependency>
@@ -132,56 +114,19 @@
         <dependency>
             <groupId>opensymphony</groupId>
             <artifactId>oscache</artifactId>
-            <version>2.3</version>
+            <version>2.4</version>
         </dependency>
 
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.1</version>
+            <version>1.1.1</version>
         </dependency>
 
     </dependencies>
 
     <!-- Passing in configuration to javac to indicate that this is a Java 5 source & target build.-->
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
-            <!-- Maven can be used to build javadocs from the source. (The source has been
-            carefully documented, so this should be useful).
-
-            To generate the javadocs, use mvn javadoc:javadoc
-
-            To package the javadocs, use mvn javadoc:jar
-            -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <overview/>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-        </plugins>
         <finalName>mydas</finalName>
     </build>
 

@@ -32,37 +32,11 @@
     <name>mydas_example Maven Webapp</name>
     <url>http://ebi.ac.uk</url>
 
-    <repositories>
-        <repository>
-            <id>ebi-repo</id>
-            <name>The EBI internal repository</name>
-            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>ebi-repo-snapshots</id>
-            <name>The EBI internal repository</name>
-            <url>http://www.ebi.ac.uk/~maven/m2repo_snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>selenium</id>
-            <name>Selenium release repository</name>
-            <url>http://archiva.openqa.org/repository/releases/</url>
-        </repository>
-    </repositories>
+    <parent>
+        <groupId>uk.ac.ebi.mydas.example</groupId>
+        <artifactId>mydas_master</artifactId>
+        <version>1.0.5</version>
+    </parent>
 
     <dependencies>
         <dependency>
@@ -120,15 +94,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
-
             <!-- The jetty plugin allows testing of the DAS service within the Maven build.
                             (Run using mvn jetty:run-war) -->
             <plugin>
