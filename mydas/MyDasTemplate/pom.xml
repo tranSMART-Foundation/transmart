@@ -10,30 +10,13 @@
     <url>http://maven.apache.org</url>
 
 	<repositories>
-		<repository>
-			<id>ebi-repo</id>
-			<name>The EBI internal repository</name>
-			<url>http://www.ebi.ac.uk/~maven/m2repo</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>ebi-repo-snapshots</id>
-			<name>The EBI internal repository</name>
-			<url>http://www.ebi.ac.uk/~maven/m2repo_snapshots</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+        <repository>
+            <id>google-code-mydas</id>
+            <name>google-code-mydas</name>
+            <layout>default</layout>
+            <url>http://mydas.googlecode.com/svn/repository/</url>
+        </repository>
+    </repositories>
 
 	<dependencies>
         <dependency>

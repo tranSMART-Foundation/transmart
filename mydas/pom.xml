@@ -49,21 +49,14 @@
         </license>
     </licenses>
 
-    <distributionManagement>
+    <repositories>
         <repository>
-            <id>ebi-repo</id>
-            <name>EBI Repository</name>
-            <!--the url can pint to any server that can see/write to the maven home directory-->
-            <url>scp://lobster.ebi.ac.uk/homes/maven/public_html/m2repo</url>
+            <id>google-code-mydas</id>
+            <name>google-code-mydas</name>
+            <layout>default</layout>
+            <url>http://mydas.googlecode.com/svn/repository/</url>
         </repository>
-
-        <snapshotRepository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>ebi-repo-snapshots</id>
-            <name>EBI Snapshots Repository</name>
-            <url>scp://lobster.ebi.ac.uk/homes/maven/public_html/m2repo_snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
+    </repositories>
 
     
     <description>
