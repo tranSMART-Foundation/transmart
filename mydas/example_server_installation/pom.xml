@@ -28,21 +28,21 @@
     <groupId>uk.ac.ebi.mydas.example</groupId>
     <artifactId>mydas_example</artifactId>
     <packaging>war</packaging>
-    <version>${project-version}</version>
+    <version>1.0.6</version>
     <name>mydas_example Maven Webapp</name>
     <url>http://www.ebi.ac.uk</url>
 
     <parent>
         <groupId>uk.ac.ebi.mydas</groupId>
         <artifactId>mydas_master</artifactId>
-        <version>${project-version}</version>
+        <version>1.0.6</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>uk.ac.ebi.mydas</groupId>
             <artifactId>mydas</artifactId>
-            <version>${project-version}</version>
+            <version>1.0.6</version>
         </dependency>
 
         <dependency>
