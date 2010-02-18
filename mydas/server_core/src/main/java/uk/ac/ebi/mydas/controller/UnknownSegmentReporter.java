@@ -23,6 +23,10 @@
 
 package uk.ac.ebi.mydas.controller;
 
+import java.io.IOException;
+
+import org.xmlpull.v1.XmlSerializer;
+
 /**
  * Created Using IntelliJ IDEA.
  * Date: 21-May-2007
@@ -48,4 +52,17 @@ public class UnknownSegmentReporter implements SegmentReporter {
     public String getSegmentId() {
         return query.getSegmentId();
     }
+    void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,boolean referenceSource) throws IllegalArgumentException, IllegalStateException, IOException{
+        serializer.startTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
+        serializer.attribute(DAS_XML_NAMESPACE, "id", this.getSegmentId());
+        if (this.getStart() != null){
+            serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(this.getStart()));
+        }
+        if (this.getStop() != null){
+            serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(this.getStop()));
+        }
+        serializer.endTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
+    	
+    }
+
 }

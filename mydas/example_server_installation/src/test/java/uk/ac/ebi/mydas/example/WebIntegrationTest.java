@@ -124,4 +124,45 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("<SEQUENCE id=\"two\" start=\"1\" stop=\"48\" moltype=\"DNA\" version=\"Up-to-date\">cgatcatcagctacgtacgatcagtccgtacgatcgatcagcatcaca</SEQUENCE>");
         assertTextPresent("</DASSEQUENCE>");
     }
+    public void test_types_command_all(){
+        beginAt("/test/types");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+        assertTextPresent("<!DOCTYPE DASTYPES SYSTEM \"http://www.biodas.org/dtd/dastypes.dtd\">");
+        assertTextPresent("<DASTYPES>");
+        assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" method=\"oneFeatureMethodIdOne\" category=\"oneFeatureCategoryOne\" />");
+        assertTextPresent("<TYPE id=\"oneFeatureTypeIdTwo\" method=\"oneFeatureMethodIdTwo\" category=\"oneFeatureCategoryTwo\" />");
+        assertTextPresent("<TYPE id=\"twoFeatureTypeIdOne\" method=\"twoFeatureMethodIdOne\" category=\"twoFeatureCategoryOne\" />");
+        assertTextPresent("</DASTYPES>");
+    }
+    public void test_features_command_unknown(){
+        beginAt("/test/features?segment=unknown");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+        assertTextPresent("<!DOCTYPE DASGFF SYSTEM \"http://www.biodas.org/dtd/dasgff.dtd\">");
+        assertTextPresent("<ERRORSEGMENT id=\"unknown\" />");
+    }
+    public void test_features_command_one(){
+        beginAt("/test/features?segment=one");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+        assertTextPresent("<!DOCTYPE DASGFF SYSTEM \"http://www.biodas.org/dtd/dasgff.dtd\">");
+        assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+        assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
+        assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
+        assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\">one Feature Method Label One</METHOD>");
+        assertTextPresent("START>5</START>");
+        assertTextPresent("<END>10</END>");
+        assertTextPresent("<SCORE>123.45</SCORE>");
+        assertTextPresent("<ORIENTATION>0</ORIENTATION>");
+        assertTextPresent("<PHASE>-</PHASE>");
+        assertTextPresent("<NOTE>This is a note relating to feature one of segment one.</NOTE>");
+        assertTextPresent("<LINK href=\"http://code.google.com/p/mydas/\">mydas project home page.</LINK>");
+        assertTextPresent("<TARGET id=\"oneTargetId\" start=\"20\" stop=\"30\">oneTargetName</TARGET>");
+        assertTextPresent("<GROUP id=\"oneGroupId\" label=\"one Group Label\" type=\"onegrouptype\">");
+        assertTextPresent("<NOTE>A note on the group for reference one.</NOTE>");
+        assertTextPresent("<LINK href=\"http://code.google.com/p/mydas/\">mydas project home page.</LINK>");
+        assertTextPresent("<TARGET id=\"oneTargetId\" start=\"20\" stop=\"30\">oneTargetName</TARGET>");
+        assertTextPresent("</GROUP>");
+        assertTextPresent("</FEATURE>");
+        assertTextPresent("<FEATURE id=\"oneFeatureIdTwo\" label=\"one Feature Label Two\">");
+        assertTextPresent("</SEGMENT>");
+    }
 }

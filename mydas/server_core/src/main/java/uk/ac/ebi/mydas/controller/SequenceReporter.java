@@ -26,6 +26,8 @@ package uk.ac.ebi.mydas.controller;
 import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
 import uk.ac.ebi.mydas.model.DasSequence;
 
+import org.xmlpull.v1.XmlSerializer;
+
 /**
  * Created using IntelliJ IDEA.
  * Date: 12-May-2007
@@ -85,5 +87,19 @@ class SequenceReporter{
         return (restricted)
                 ? requestedStop
                 : sequence.getStopCoordinate();
+    }
+    
+    void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer) throws java.io.IOException, IllegalArgumentException, IllegalStateException, CoordinateErrorException{
+        serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
+        serializer.attribute(DAS_XML_NAMESPACE, "id", this.getSegmentName());
+        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(this.getStart()));
+        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(this.getStop()));
+        serializer.attribute(DAS_XML_NAMESPACE, "version", this.getSequenceVersion());
+        serializer.startTag(DAS_XML_NAMESPACE, "DNA");
+        serializer.attribute(DAS_XML_NAMESPACE, "length", Integer.toString(this.getSequenceString().length()));
+        serializer.text(this.getSequenceString());
+        serializer.endTag(DAS_XML_NAMESPACE, "DNA");
+        serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
+    	
     }
 }

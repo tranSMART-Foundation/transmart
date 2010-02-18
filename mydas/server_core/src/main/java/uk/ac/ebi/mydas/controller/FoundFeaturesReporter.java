@@ -28,6 +28,8 @@ import uk.ac.ebi.mydas.model.DasFeature;
 
 import java.util.Collection;
 
+import org.xmlpull.v1.XmlSerializer;
+
 /**
  * Created using IntelliJ IDEA.
  * Date: 12-May-2007
@@ -94,6 +96,10 @@ public class FoundFeaturesReporter implements SegmentReporter {
 
     String getVersion(){
         return annotatedSegment.getVersion();
+    }
+    
+    void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer){
+    	
     }
 
 }

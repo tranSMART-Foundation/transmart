@@ -35,6 +35,7 @@ import uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource;
 import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
 import uk.ac.ebi.mydas.exceptions.*;
 import uk.ac.ebi.mydas.model.*;
+import uk.ac.ebi.mydas.extendedmodel.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -578,16 +579,7 @@ public class MydasServlet extends HttpServlet {
                     // Now the body of the DASDNA xml.
                     serializer.startTag (DAS_XML_NAMESPACE, "DASDNA");
                     for (SequenceReporter sequenceReporter : sequences){
-                        serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
-                        serializer.attribute(DAS_XML_NAMESPACE, "id", sequenceReporter.getSegmentName());
-                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(sequenceReporter.getStart()));
-                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(sequenceReporter.getStop()));
-                        serializer.attribute(DAS_XML_NAMESPACE, "version", sequenceReporter.getSequenceVersion());
-                        serializer.startTag(DAS_XML_NAMESPACE, "DNA");
-                        serializer.attribute(DAS_XML_NAMESPACE, "length", Integer.toString(sequenceReporter.getSequenceString().length()));
-                        serializer.text(sequenceReporter.getSequenceString());
-                        serializer.endTag(DAS_XML_NAMESPACE, "DNA");
-                        serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
+                    	sequenceReporter.serialize(DAS_XML_NAMESPACE,serializer);
                     }
                     serializer.endTag (DAS_XML_NAMESPACE, "DASDNA");
 					serializer.flush();
@@ -752,18 +744,7 @@ public class MydasServlet extends HttpServlet {
             serializer.attribute(DAS_XML_NAMESPACE, "label", "Complete datasource summary");
             // Iterate over the allTypeReport for the TYPE elements.
             for (DasType type : allTypesReport.keySet()){
-                serializer.startTag(DAS_XML_NAMESPACE, "TYPE");
-                serializer.attribute(DAS_XML_NAMESPACE, "id", type.getId());
-                if (type.getMethod() != null && type.getMethod().length() > 0){
-                    serializer.attribute(DAS_XML_NAMESPACE, "method", type.getMethod());
-                }
-                if (type.getCategory() != null && type.getCategory().length() > 0){
-                    serializer.attribute(DAS_XML_NAMESPACE, "category", type.getCategory());
-                }
-                if (allTypesReport.get(type) != null){
-                    serializer.text(Integer.toString(allTypesReport.get(type)));
-                }
-                serializer.endTag(DAS_XML_NAMESPACE, "TYPE");
+            	(new DasTypeE (type)).serialize(DAS_XML_NAMESPACE, serializer, allTypesReport.get(type));
             }
             serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
             serializer.endTag (DAS_XML_NAMESPACE, "GFF");
@@ -861,20 +842,7 @@ public class MydasServlet extends HttpServlet {
                 // Now for the types.
                 Map<DasType, Integer> typeMap = typesReport.get(featureReporter);
                 for (DasType type : typeMap.keySet()){
-                    Integer count = typeMap.get(type);
-
-                    serializer.startTag(DAS_XML_NAMESPACE, "TYPE");
-                    serializer.attribute(DAS_XML_NAMESPACE, "id", type.getId());
-                    if (type.getMethod() != null && type.getMethod().length() > 0){
-                        serializer.attribute(DAS_XML_NAMESPACE, "method", type.getMethod());
-                    }
-                    if (type.getCategory() != null && type.getCategory().length() > 0){
-                        serializer.attribute(DAS_XML_NAMESPACE, "category", type.getCategory());
-                    }
-                    if (count != null){
-                        serializer.text(Integer.toString(count));
-                    }
-                    serializer.endTag(DAS_XML_NAMESPACE, "TYPE");
+                	(new DasTypeE (type)).serialize(DAS_XML_NAMESPACE, serializer, typeMap.get(type));
                 }
                 serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
             }
@@ -1166,15 +1134,16 @@ public class MydasServlet extends HttpServlet {
             serializer.attribute(DAS_XML_NAMESPACE, "href", buildRequestHref(request));
             for (SegmentReporter segmentReporter : segmentReporterCollections){
                 if (segmentReporter instanceof UnknownSegmentReporter){
-                    serializer.startTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
-                    serializer.attribute(DAS_XML_NAMESPACE, "id", segmentReporter.getSegmentId());
-                    if (segmentReporter.getStart() != null){
-                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(segmentReporter.getStart()));
-                    }
-                    if (segmentReporter.getStop() != null){
-                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(segmentReporter.getStop()));
-                    }
-                    serializer.endTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
+                	((UnknownSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, referenceSource);
+//                    serializer.startTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
+//                    serializer.attribute(DAS_XML_NAMESPACE, "id", segmentReporter.getSegmentId());
+//                    if (segmentReporter.getStart() != null){
+//                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(segmentReporter.getStart()));
+//                    }
+//                    if (segmentReporter.getStop() != null){
+//                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(segmentReporter.getStop()));
+//                    }
+//                    serializer.endTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
                 }
                 else {
                     FoundFeaturesReporter foundFeaturesReporter = (FoundFeaturesReporter) segmentReporter;
