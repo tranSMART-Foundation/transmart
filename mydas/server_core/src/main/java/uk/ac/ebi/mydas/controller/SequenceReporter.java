@@ -89,17 +89,32 @@ class SequenceReporter{
                 : sequence.getStopCoordinate();
     }
     
+    // For the command sequence
     void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer) throws java.io.IOException, IllegalArgumentException, IllegalStateException, CoordinateErrorException{
+    	this.serialize(DAS_XML_NAMESPACE, serializer,false);
+    }
+    
+    //Generic method, to support sequence and dna.
+    void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,boolean dna) throws java.io.IOException, IllegalArgumentException, IllegalStateException, CoordinateErrorException{
         serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
         serializer.attribute(DAS_XML_NAMESPACE, "id", this.getSegmentName());
         serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(this.getStart()));
         serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(this.getStop()));
         serializer.attribute(DAS_XML_NAMESPACE, "version", this.getSequenceVersion());
-        serializer.startTag(DAS_XML_NAMESPACE, "DNA");
-        serializer.attribute(DAS_XML_NAMESPACE, "length", Integer.toString(this.getSequenceString().length()));
+
+        if (dna){
+        	serializer.startTag(DAS_XML_NAMESPACE, "DNA");
+        	serializer.attribute(DAS_XML_NAMESPACE, "length", Integer.toString(this.getSequenceString().length()));
+        } else {
+            serializer.attribute(DAS_XML_NAMESPACE, "moltype", this.getSequenceMoleculeType());
+        }
         serializer.text(this.getSequenceString());
-        serializer.endTag(DAS_XML_NAMESPACE, "DNA");
+
+        if (dna){
+        	serializer.endTag(DAS_XML_NAMESPACE, "DNA");
+        }
         serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
+        
     	
     }
 }

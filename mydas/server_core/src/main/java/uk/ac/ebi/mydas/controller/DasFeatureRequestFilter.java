@@ -104,7 +104,7 @@ public class DasFeatureRequestFilter {
      * @param feature being the DasFeature under test.
      * @return a boolean - true if the DasFeature passes the filter, false otherwise
      */
-    boolean featurePasses(DasFeature feature){
+    public boolean featurePasses(DasFeature feature){
 
         if (!(featureIds == null || (feature.getFeatureId() != null && featureIds.contains(feature.getFeatureId())))){
             return false;

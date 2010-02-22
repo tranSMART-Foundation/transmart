@@ -579,7 +579,7 @@ public class MydasServlet extends HttpServlet {
                     // Now the body of the DASDNA xml.
                     serializer.startTag (DAS_XML_NAMESPACE, "DASDNA");
                     for (SequenceReporter sequenceReporter : sequences){
-                    	sequenceReporter.serialize(DAS_XML_NAMESPACE,serializer);
+                    	sequenceReporter.serialize(DAS_XML_NAMESPACE,serializer,true);
                     }
                     serializer.endTag (DAS_XML_NAMESPACE, "DASDNA");
 					serializer.flush();
@@ -1135,143 +1135,8 @@ public class MydasServlet extends HttpServlet {
             for (SegmentReporter segmentReporter : segmentReporterCollections){
                 if (segmentReporter instanceof UnknownSegmentReporter){
                 	((UnknownSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, referenceSource);
-//                    serializer.startTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
-//                    serializer.attribute(DAS_XML_NAMESPACE, "id", segmentReporter.getSegmentId());
-//                    if (segmentReporter.getStart() != null){
-//                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(segmentReporter.getStart()));
-//                    }
-//                    if (segmentReporter.getStop() != null){
-//                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(segmentReporter.getStop()));
-//                    }
-//                    serializer.endTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
-                }
-                else {
-                    FoundFeaturesReporter foundFeaturesReporter = (FoundFeaturesReporter) segmentReporter;
-                    serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
-                    serializer.attribute(DAS_XML_NAMESPACE, "id", foundFeaturesReporter.getSegmentId());
-                    serializer.attribute(DAS_XML_NAMESPACE, "start", (foundFeaturesReporter.getStart() == null)
-                            ? ""
-                            : Integer.toString(foundFeaturesReporter.getStart()));
-                    serializer.attribute(DAS_XML_NAMESPACE, "stop", (foundFeaturesReporter.getStop() == null)
-                            ? ""
-                            : Integer.toString(foundFeaturesReporter.getStop()));
-                    if (foundFeaturesReporter.getType() != null && foundFeaturesReporter.getType().length() > 0){
-                        serializer.attribute(DAS_XML_NAMESPACE, "type", foundFeaturesReporter.getType());
-                    }
-                    serializer.attribute(DAS_XML_NAMESPACE, "version", foundFeaturesReporter.getVersion());
-                    if (foundFeaturesReporter.getSegmentLabel() != null && foundFeaturesReporter.getSegmentLabel().length() > 0){
-                        serializer.attribute(DAS_XML_NAMESPACE, "label", foundFeaturesReporter.getSegmentLabel());
-                    }
-                    for (DasFeature feature : foundFeaturesReporter.getFeatures(dsnConfig.isFeaturesStrictlyEnclosed())){
-                        // Check the feature passes the filter.
-                        if (filter.featurePasses(feature)){
-                            serializer.startTag(DAS_XML_NAMESPACE, "FEATURE");
-                            serializer.attribute(DAS_XML_NAMESPACE, "id", feature.getFeatureId());
-                            if (feature.getFeatureLabel() != null && feature.getFeatureLabel().length() > 0){
-                                serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureLabel());
-                            }
-                            else if (dsnConfig.isUseFeatureIdForFeatureLabel()){
-                                serializer.attribute(DAS_XML_NAMESPACE, "label", feature.getFeatureId());
-                            }
-
-                            // TYPE element
-                            serializer.startTag(DAS_XML_NAMESPACE, "TYPE");
-                            serializer.attribute(DAS_XML_NAMESPACE, "id", feature.getTypeId());
-
-                            // Handle DasReferenceFeatures.
-                            if (feature instanceof DasComponentFeature){
-                                DasComponentFeature refFeature = (DasComponentFeature) feature;
-                                serializer.attribute(DAS_XML_NAMESPACE, "reference", "yes");
-                                serializer.attribute(DAS_XML_NAMESPACE, "superparts", (refFeature.hasSuperParts()) ? "yes" : "no");
-                                serializer.attribute(DAS_XML_NAMESPACE, "subparts", (refFeature.hasSubParts()) ? "yes" : "no");
-                            }
-                            if (categorize){
-                                if (feature.getTypeCategory() != null && feature.getTypeCategory().length() > 0){
-                                    serializer.attribute(DAS_XML_NAMESPACE, "category", feature.getTypeCategory());
-                                }
-                                else {
-                                    // To prevent the DAS server from dying, if no category has been set, but
-                                    // a category is required, spit out the type ID again as the category.
-                                    serializer.attribute(DAS_XML_NAMESPACE, "category", feature.getTypeId());
-                                }
-                            }
-                            if (feature.getTypeLabel() != null && feature.getTypeLabel().length() > 0){
-                                serializer.text(feature.getTypeLabel());
-                            }
-                            serializer.endTag(DAS_XML_NAMESPACE, "TYPE");
-
-                            // METHOD element
-                            serializer.startTag(DAS_XML_NAMESPACE, "METHOD");
-                            if (feature.getMethodId() != null && feature.getMethodId().length() > 0){
-                                serializer.attribute(DAS_XML_NAMESPACE, "id", feature.getMethodId());
-                            }
-                            if (feature.getMethodLabel() != null && feature.getMethodLabel().length() > 0){
-                                serializer.text(feature.getMethodLabel());
-                            }
-                            serializer.endTag(DAS_XML_NAMESPACE, "METHOD");
-
-                            // START element
-                            serializer.startTag(DAS_XML_NAMESPACE, "START");
-                            serializer.text(Integer.toString(feature.getStartCoordinate()));
-                            serializer.endTag(DAS_XML_NAMESPACE, "START");
-
-                            // END element
-                            serializer.startTag(DAS_XML_NAMESPACE, "END");
-                            serializer.text(Integer.toString(feature.getStopCoordinate()));
-                            serializer.endTag(DAS_XML_NAMESPACE, "END");
-
-                            // SCORE element
-                            serializer.startTag(DAS_XML_NAMESPACE, "SCORE");
-                            serializer.text ((feature.getScore() == null) ? "-" : Double.toString(feature.getScore()));
-                            serializer.endTag(DAS_XML_NAMESPACE, "SCORE");
-
-                            // ORIENTATION element
-                            serializer.startTag(DAS_XML_NAMESPACE, "ORIENTATION");
-                            serializer.text (feature.getOrientation().toString());
-                            serializer.endTag(DAS_XML_NAMESPACE, "ORIENTATION");
-
-                            // PHASE element
-                            serializer.startTag(DAS_XML_NAMESPACE, "PHASE");
-                            serializer.text (feature.getPhase().toString());
-                            serializer.endTag(DAS_XML_NAMESPACE, "PHASE");
-
-                            // NOTE elements
-                            serializeFeatureNoteElements(feature.getNotes(), serializer);
-
-                            // LINK elements
-                            serializeFeatureLinkElements(feature.getLinks(), serializer);
-
-                            // TARGET elements
-                            serializeFeatureTargetElements(feature.getTargets(), serializer);
-
-                            // GROUP elements
-                            if (feature.getGroups() != null){
-                                for (DasGroup group : feature.getGroups()){
-                                    serializer.startTag(DAS_XML_NAMESPACE, "GROUP");
-                                    serializer.attribute(DAS_XML_NAMESPACE, "id", group.getGroupId());
-                                    if (group.getGroupLabel() != null && group.getGroupLabel().length() > 0){
-                                        serializer.attribute(DAS_XML_NAMESPACE, "label", group.getGroupLabel());
-                                    }
-                                    if (group.getGroupType() != null && group.getGroupType().length() > 0){
-                                        serializer.attribute(DAS_XML_NAMESPACE, "type", group.getGroupType());
-                                    }
-                                    // GROUP/NOTE elements
-                                    serializeFeatureNoteElements(group.getNotes(), serializer);
-
-                                    // GROUP/LINK elements
-                                    serializeFeatureLinkElements(group.getLinks(), serializer);
-
-                                    // GROUP/TARGET elements
-                                    serializeFeatureTargetElements(group.getTargets(), serializer);
-
-                                    serializer.endTag(DAS_XML_NAMESPACE, "GROUP");
-                                }
-                            }
-
-                            serializer.endTag(DAS_XML_NAMESPACE, "FEATURE");
-                        }
-                    }
-                    serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
+                } else {
+                	((FoundFeaturesReporter) segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, filter, categorize, dsnConfig.isFeaturesStrictlyEnclosed(), dsnConfig.isUseFeatureIdForFeatureLabel());
                 }
             }
             serializer.endTag(DAS_XML_NAMESPACE, "GFF");
@@ -1282,68 +1147,6 @@ public class MydasServlet extends HttpServlet {
         finally{
             if (out != null){
                 out.close();
-            }
-        }
-    }
-
-    /**
-     * Helper method - serializes out the NOTE element which is used in two places in the DASFEATURE XML file.
-     * (Hence factored out).
-     * @param notes being a Collection of Strings, each of which is a note to be serialized.
-     * @param serializer to write out the XML
-     * @throws IOException during writing of the XML.
-     */
-    private void serializeFeatureNoteElements(Collection<String> notes, XmlSerializer serializer) throws IOException {
-        if (notes != null){
-            for (String note : notes){
-                serializer.startTag(DAS_XML_NAMESPACE, "NOTE");
-                serializer.text (note);
-                serializer.endTag(DAS_XML_NAMESPACE, "NOTE");
-            }
-        }
-    }
-
-    /**
-     * Helper method - serializes out the LINK element which is used in two places in the DASFEATURE XML file.
-     * (Hence factored out).
-     * @param links being a Map of URL to String, with the String being an optional human-readable form of the URL.
-     * @param serializer to write out the XML
-     * @throws IOException during writing of the XML.
-     */
-    private void serializeFeatureLinkElements(Map<URL, String> links, XmlSerializer serializer) throws IOException {
-        if (links != null){
-            for (URL url : links.keySet()){
-                if (url != null){
-                    serializer.startTag(DAS_XML_NAMESPACE, "LINK");
-                    serializer.attribute(DAS_XML_NAMESPACE, "href", url.toString());
-                    String linkText = links.get(url);
-                    if (linkText != null && linkText.length() > 0){
-                        serializer.text(linkText);
-                    }
-                    serializer.endTag(DAS_XML_NAMESPACE, "LINK");
-                }
-            }
-        }
-    }
-
-    /**
-     * Helper method - serializes out the TARGET element which is used in two places in the DASFEATURE XML file.
-     * (Hence factored out).
-     * @param targets being a Collection of DasTarget objects, encapsulating the details of the targets.
-     * @param serializer to write out the XML
-     * @throws IOException during writing of the XML.
-     */
-    private void serializeFeatureTargetElements(Collection<DasTarget> targets, XmlSerializer serializer) throws IOException {
-        if (targets != null){
-            for (DasTarget target : targets){
-                serializer.startTag(DAS_XML_NAMESPACE, "TARGET");
-                serializer.attribute(DAS_XML_NAMESPACE, "id", target.getTargetId());
-                serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(target.getStartCoordinate()));
-                serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(target.getStopCoordinate()));
-                if (target.getTargetName() != null && target.getTargetName().length() > 0){
-                    serializer.text(target.getTargetName());
-                }
-                serializer.endTag(DAS_XML_NAMESPACE, "TARGET");
             }
         }
     }
@@ -1404,21 +1207,7 @@ public class MydasServlet extends HttpServlet {
                 // Now for the individual segments.
                 for (DasEntryPoint entryPoint : entryPoints){
                     if (entryPoint != null){
-                        serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
-                        serializer.attribute(DAS_XML_NAMESPACE, "id", entryPoint.getSegmentId());
-                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(entryPoint.getStartCoordinate()));
-                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(entryPoint.getStopCoordinate()));
-                        if (entryPoint.getType() != null && entryPoint.getType().length() > 0){
-                            serializer.attribute(DAS_XML_NAMESPACE, "type", entryPoint.getType());
-                        }
-                        serializer.attribute(DAS_XML_NAMESPACE, "orientation", entryPoint.getOrientation().toString());
-                        if (entryPoint.hasSubparts()){
-                            serializer.attribute(DAS_XML_NAMESPACE, "subparts", "yes");
-                        }
-                        if (entryPoint.getDescription() != null && entryPoint.getDescription().length() > 0){
-                            serializer.text(entryPoint.getDescription());
-                        }
-                        serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
+                    	(new DasEntryPointE(entryPoint)).serialize(DAS_XML_NAMESPACE, serializer);
                     }
                 }
                 serializer.endTag(DAS_XML_NAMESPACE, "ENTRY_POINTS");
@@ -1482,14 +1271,7 @@ public class MydasServlet extends HttpServlet {
                 // Now the body of the DASDNA xml.
                 serializer.startTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
                 for (SequenceReporter sequenceReporter : sequences){
-                    serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
-                    serializer.attribute(DAS_XML_NAMESPACE, "id", sequenceReporter.getSegmentName());
-                    serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(sequenceReporter.getStart()));
-                    serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(sequenceReporter.getStop()));
-                    serializer.attribute(DAS_XML_NAMESPACE, "moltype", sequenceReporter.getSequenceMoleculeType());
-                    serializer.attribute(DAS_XML_NAMESPACE, "version", sequenceReporter.getSequenceVersion());
-                    serializer.text(sequenceReporter.getSequenceString());
-                    serializer.endTag(DAS_XML_NAMESPACE, "SEQUENCE");
+                	sequenceReporter.serialize(DAS_XML_NAMESPACE,serializer);
                 }
                 serializer.endTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
             }

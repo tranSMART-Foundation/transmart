@@ -24,8 +24,13 @@
 package uk.ac.ebi.mydas.controller;
 
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
+import uk.ac.ebi.mydas.model.DasComponentFeature;
 import uk.ac.ebi.mydas.model.DasFeature;
+import uk.ac.ebi.mydas.model.DasGroup;
+import uk.ac.ebi.mydas.exceptions.DataSourceException;
+import uk.ac.ebi.mydas.extendedmodel.*;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.xmlpull.v1.XmlSerializer;
@@ -98,7 +103,26 @@ public class FoundFeaturesReporter implements SegmentReporter {
         return annotatedSegment.getVersion();
     }
     
-    void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer){
+    void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,DasFeatureRequestFilter filter,boolean categorize,boolean isFeaturesStrictlyEnclosed, boolean isUseFeatureIdForFeatureLabel) throws IllegalArgumentException, IllegalStateException, IOException, DataSourceException{
+        serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
+        serializer.attribute(DAS_XML_NAMESPACE, "id", this.getSegmentId());
+        serializer.attribute(DAS_XML_NAMESPACE, "start", (this.getStart() == null)
+                ? ""
+                : Integer.toString(this.getStart()));
+        serializer.attribute(DAS_XML_NAMESPACE, "stop", (this.getStop() == null)
+                ? ""
+                : Integer.toString(this.getStop()));
+        if (this.getType() != null && this.getType().length() > 0){
+            serializer.attribute(DAS_XML_NAMESPACE, "type", this.getType());
+        }
+        serializer.attribute(DAS_XML_NAMESPACE, "version", this.getVersion());
+        if (this.getSegmentLabel() != null && this.getSegmentLabel().length() > 0){
+            serializer.attribute(DAS_XML_NAMESPACE, "label", this.getSegmentLabel());
+        }
+        for (DasFeature feature : this.getFeatures(isFeaturesStrictlyEnclosed)){
+        	(new DasFeatureE(feature)).serialize(DAS_XML_NAMESPACE, serializer, filter, categorize, isFeaturesStrictlyEnclosed, isUseFeatureIdForFeatureLabel);
+        }
+        serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
     	
     }
 
