@@ -21,7 +21,7 @@
  *
  */
 
-package uk.ac.ebi.mydas.controller;
+package uk.ac.ebi.mydas.configuration;
 
 import java.util.ArrayList;
 import java.util.List;

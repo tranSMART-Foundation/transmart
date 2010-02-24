@@ -25,10 +25,17 @@ package uk.ac.ebi.mydas.controller;
 
 import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 import org.apache.log4j.Logger;
+
+import uk.ac.ebi.mydas.configuration.ConfigurationManager;
+import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.Mydasserver;
+import uk.ac.ebi.mydas.configuration.ServerConfiguration;
 import uk.ac.ebi.mydas.exceptions.ConfigurationException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
 import javax.servlet.ServletContext;
+import javax.xml.bind.JAXBException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -70,16 +77,13 @@ public class DataSourceManager {
      * @throws java.io.IOException in the event of a problem with reading the file.
      */
     private void loadConfiguration(String fileName) throws IOException, ConfigurationException {
-        BufferedReader reader = null;
+    	ConfigurationManager cm = new ConfigurationManager();
         try{
-            reader = new BufferedReader(new InputStreamReader(svCon.getResourceAsStream(fileName)));
-            ConfigXmlUnmarshaller unmarshaller = new ConfigXmlUnmarshaller();
-            serverConfiguration = unmarshaller.unMarshall(reader);
-        }
-        finally{
-            if (reader != null){
-                reader.close();
-            }
+        	//Changing the reader of the configuration file for a JaxB based component
+        	cm.unmarshal(svCon.getResourceAsStream(fileName));
+        	serverConfiguration=cm.getServerConfiguration();
+		} catch (JAXBException e) {
+			e.printStackTrace();
         }
     }
 

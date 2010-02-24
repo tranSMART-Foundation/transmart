@@ -23,7 +23,10 @@
 
 package uk.ac.ebi.mydas.controller;
 
+import java.io.IOException;
+
 import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
+import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.model.DasSequence;
 
 import org.xmlpull.v1.XmlSerializer;
@@ -89,13 +92,32 @@ class SequenceReporter{
                 : sequence.getStopCoordinate();
     }
     
-    // For the command sequence
+    /**
+     * Wrapper for the method serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,boolean dna) to get the format of the DAS command sequence 
+     * @param DAS_XML_NAMESPACE XML namespace to link with the elements to create
+     * @param serializer Object where the XML is been written
+	 * @throws IOException If the XML writer have an error
+	 * @throws IllegalStateException a method has been invoked at an illegal or inappropriate time.
+	 * @throws IllegalArgumentException indicate that a method has been passed an illegal or inappropriate argument.
+     * @throws CoordinateErrorException indicating that a request for sequenceString of features over a particular range of coordinates is out of range of the segment itself
+     */
     void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer) throws java.io.IOException, IllegalArgumentException, IllegalStateException, CoordinateErrorException{
     	this.serialize(DAS_XML_NAMESPACE, serializer,false);
     }
     
-    //Generic method, to support sequence and dna.
-    void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,boolean dna) throws java.io.IOException, IllegalArgumentException, IllegalStateException, CoordinateErrorException{
+    /**
+	 * Generates the piece of XML into the XML serializer object to describe a Sequence.
+	 * It supprots the formats of the DAs commands sequence and the deprecated dna 
+     * @param DAS_XML_NAMESPACE XML namespace to link with the elements to create
+     * @param serializer Object where the XML is been written
+     * @param dna indicates if should have the format of the command dna(true) or the format of the sequence command(false)
+	 * @throws IOException If the XML writer have an error
+	 * @throws IllegalStateException a method has been invoked at an illegal or inappropriate time.
+	 * @throws IllegalArgumentException indicate that a method has been passed an illegal or inappropriate argument.
+     * @throws CoordinateErrorException indicating that a request for sequenceString of features over a particular range of coordinates is out of range of the segment itself
+     */
+    void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,boolean dna) 
+    	throws java.io.IOException, IllegalArgumentException, IllegalStateException, CoordinateErrorException{
         serializer.startTag(DAS_XML_NAMESPACE, "SEQUENCE");
         serializer.attribute(DAS_XML_NAMESPACE, "id", this.getSegmentName());
         serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(this.getStart()));

@@ -23,6 +23,8 @@
 
 package uk.ac.ebi.mydas.controller;
 
+import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+
 import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 
 /**

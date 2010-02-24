@@ -52,7 +52,17 @@ public class UnknownSegmentReporter implements SegmentReporter {
     public String getSegmentId() {
         return query.getSegmentId();
     }
-    void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,boolean referenceSource) throws IllegalArgumentException, IllegalStateException, IOException{
+	/**
+	 * Generates the piece of XML into the XML serializer object to describe an ErrorSegment or an UnknownSegment 
+	 * @param DAS_XML_NAMESPACE XML namespace to link with the elements to create
+	 * @param serializer Object where the XML is been written 
+	 * @param referenceSource indicates if the reference server has answered.
+	 * @throws IOException If the XML writer have an error
+	 * @throws IllegalStateException a method has been invoked at an illegal or inappropriate time.
+	 * @throws IllegalArgumentException indicate that a method has been passed an illegal or inappropriate argument.
+	 */
+    void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,boolean referenceSource) 
+    	throws IllegalArgumentException, IllegalStateException, IOException{
         serializer.startTag(DAS_XML_NAMESPACE, (referenceSource) ? "ERRORSEGMENT" : "UNKNOWNSEGMENT");
         serializer.attribute(DAS_XML_NAMESPACE, "id", this.getSegmentId());
         if (this.getStart() != null){

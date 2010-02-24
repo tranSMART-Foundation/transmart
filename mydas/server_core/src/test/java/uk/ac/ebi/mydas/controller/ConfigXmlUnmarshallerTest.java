@@ -26,6 +26,10 @@ package uk.ac.ebi.mydas.controller;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
+
+import uk.ac.ebi.mydas.configuration.ConfigurationManager;
+import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.ServerConfiguration;
 import uk.ac.ebi.mydas.exceptions.ConfigurationException;
 
 import java.io.BufferedReader;
@@ -33,6 +37,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.Map;
+
+import javax.xml.bind.JAXBException;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -67,16 +73,16 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
      * @throws ConfigurationException in the event of a failure in reading the XML file.
      */
     public void testUnMarshaller() throws ConfigurationException{
-        ConfigXmlUnmarshaller unmarshaller = new ConfigXmlUnmarshaller();
-        BufferedReader reader = null;
+		ConfigurationManager cm = new ConfigurationManager();
         try{
             ClassLoader thisClassLoader = this.getClass().getClassLoader();
-            reader = new BufferedReader(
-                    new InputStreamReader (thisClassLoader.getResourceAsStream("MydasServerConfig.xml"))
-            );
-            Assert.assertNotNull("The BufferedReader for the test configuration file is null.",
-                    reader);
-            ServerConfiguration serverConfig = unmarshaller.unMarshall(reader);
+        	try {
+				cm.unmarshal(thisClassLoader.getResourceAsStream("MydasServerConfig.xml"));
+			} catch (JAXBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            ServerConfiguration serverConfig = cm.getServerConfiguration();
             Assert.assertNotNull("The unmarshaller has returned a null ServerConfiguration.",
                     serverConfig);
             Assert.assertNotNull("The GlobalConfiguration is null",
@@ -174,13 +180,13 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
             Assert.assertTrue("Did not find dsn2 definition.", found2);
         }
         finally{
-            if (reader != null){
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+//            if (reader != null){
+//                try {
+//                    reader.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
         }
     }
 }

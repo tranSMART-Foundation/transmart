@@ -101,6 +101,7 @@ public class DasFeatureRequestFilter {
 
     /**
      * Returns true if the tested DasFeature passes all the filters.
+     * Method changed to public in order to be reach it by the serializer of the DasFeatureE
      * @param feature being the DasFeature under test.
      * @return a boolean - true if the DasFeature passes the filter, false otherwise
      */

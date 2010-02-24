@@ -11,18 +11,37 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.model.DasGroup;
 import uk.ac.ebi.mydas.model.DasTarget;
 
+/**
+ * Class that extends the basic DasGroup bean from the model to support serializing tasks
+ * @author Gustavo Salazar
+ *
+ */
 public class DasGroupE extends DasGroup {
 
 	public DasGroupE(String groupId, String groupLabel, String groupType,
 			Collection<String> notes, Map<URL, String> links,
 			Collection<DasTarget> targets) throws DataSourceException {
 		super(groupId, groupLabel, groupType, notes, links, targets);
-		// TODO Auto-generated constructor stub
 	}
+	
+	/**
+	 * Constructor to create a copy from a DasGroup
+	 * @param group DasGroup with all its data loaded.
+	 * @throws DataSourceException in case a problem in the creation
+	 */
 	public DasGroupE(DasGroup group) throws DataSourceException {
 		super(group.getGroupId(),group.getGroupLabel(),group.getGroupType(),group.getNotes(),group.getLinks(),group.getTargets());
 	}
 	
+	/**
+	 * Generates the piece of XML into the XML serializer object to describe a Dasgroup 
+	 * @param DAS_XML_NAMESPACE XML namespace to link with the elements to create
+	 * @param serializer Object where the XML is been written 
+	 * @throws IOException If the XML writer have an error
+	 * @throws IllegalStateException a method has been invoked at an illegal or inappropriate time.
+	 * @throws IllegalArgumentException indicate that a method has been passed an illegal or inappropriate argument.
+	 * @throws DataSourceException indicate that there is something wrong with the data source
+	 */
 	public void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException, DataSourceException {
         serializer.startTag(DAS_XML_NAMESPACE, "GROUP");
         serializer.attribute(DAS_XML_NAMESPACE, "id", this.getGroupId());

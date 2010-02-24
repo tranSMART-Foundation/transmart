@@ -21,7 +21,7 @@
  *
  */
 
-package uk.ac.ebi.mydas.controller;
+package uk.ac.ebi.mydas.configuration;
 
 import org.apache.log4j.Logger;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
@@ -158,7 +158,7 @@ public class DataSourceConfiguration {
      * @param dnaCommandEnabled
      * @param includeTypesWithZeroCount
      */
-    DataSourceConfiguration(String id,
+     DataSourceConfiguration(String id,
                             String name,
                             String version,
                             String mapmaster,
@@ -306,7 +306,7 @@ public class DataSourceConfiguration {
      * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
      * if a problem occurs when attempting to instantiate the DataSource class.
      */
-    boolean loadDataSource() throws DataSourceException{
+    public boolean loadDataSource() throws DataSourceException{
         datasourceOK = false;    // Pessimistic start.
         try{
             ClassLoader classLoader = this.getClass().getClassLoader();
@@ -338,7 +338,7 @@ public class DataSourceConfiguration {
      * attempts to access a DataSource that has not loaded successfully without
      * checking first! (That would be a bug, by the way).
      */
-    AnnotationDataSource getDataSource() throws DataSourceException {
+    public AnnotationDataSource getDataSource() throws DataSourceException {
         if (! datasourceOK){
             throw new DataSourceException ("An attempt has been made to access an AnnotationDataSource that has not been successfully loaded.");
         }
@@ -415,7 +415,7 @@ public class DataSourceConfiguration {
      * Returns the cache group for use with OSCache.
      * @return the cache group for use with OSCache.
      */
-    String[] getCacheGroup(){
+    public String[] getCacheGroup(){
         return cacheGroup;
     }
 }

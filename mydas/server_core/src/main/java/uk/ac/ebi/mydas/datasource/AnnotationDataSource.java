@@ -23,7 +23,7 @@
 
 package uk.ac.ebi.mydas.datasource;
 
-import uk.ac.ebi.mydas.controller.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
 import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
