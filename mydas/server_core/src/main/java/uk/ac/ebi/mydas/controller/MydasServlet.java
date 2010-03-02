@@ -133,7 +133,8 @@ public class MydasServlet extends HttpServlet {
 		COMMAND_STYLESHEET ("stylesheet"),
 		COMMAND_FEATURES ("features"),
 		COMMAND_ENTRY_POINTS ("entry_points"),
-		COMMAND_SEQUENCE ("sequence");
+		COMMAND_SEQUENCE ("sequence"),
+		COMMAND_SOURCE ("source");
 
 		private String commandString;
 
@@ -303,11 +304,19 @@ public class MydasServlet extends HttpServlet {
 						// Starts off looking like the dsn command, but has some other stuff after it...
 						throw new BadCommandException("A bad dsn command has been sent to the server, including unrecognised additional query parameters.");
 					}
+					// Check for the source command (similar command to dsn).
+				} else if (Commands.COMMAND_SOURCE.matches(match.group(1))){
+					// Handle source command, in contrast with dsn, source can have extra info 
+					dasCommands.sourceCommand (request, response, queryString,null);
 				}
 
-				// Not the dsn command, so handle other commands (which are datasource specific)
+				// Not the dsn the source command either the source(explicit), so handle other commands (which are datasource specific)
 				else {
 					String dsnName = match.group(1);
+					if (match.group(2) == null || match.group(2).length() == 0){
+						// Source command for an specific DSN 
+						dasCommands.sourceCommand (request, response, queryString,dsnName);
+					}
 					String command = match.group(2);
 					if (logger.isDebugEnabled()){
 						logger.debug("dsnName: '" + dsnName + "'");

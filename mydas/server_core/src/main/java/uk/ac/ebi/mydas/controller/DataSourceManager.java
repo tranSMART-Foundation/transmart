@@ -58,6 +58,7 @@ public class DataSourceManager {
     private final ServletContext svCon;
 
     private ServerConfiguration serverConfiguration;
+    private ConfigurationManager configManager;
 
     protected DataSourceManager(ServletContext servletContext) {
         this.svCon = servletContext;
@@ -77,11 +78,11 @@ public class DataSourceManager {
      * @throws java.io.IOException in the event of a problem with reading the file.
      */
     private void loadConfiguration(String fileName) throws IOException, ConfigurationException {
-    	ConfigurationManager cm = new ConfigurationManager();
+    	configManager = new ConfigurationManager();
         try{
         	//Changing the reader of the configuration file for a JaxB based component
-        	cm.unmarshal(svCon.getResourceAsStream(fileName));
-        	serverConfiguration=cm.getServerConfiguration();
+        	configManager.unmarshal(svCon.getResourceAsStream(fileName));
+        	serverConfiguration=configManager.getServerConfiguration();
 		} catch (JAXBException e) {
 			e.printStackTrace();
         }
@@ -153,5 +154,9 @@ public class DataSourceManager {
     public ServerConfiguration getServerConfiguration() {
         return serverConfiguration;
     }
+
+	public ConfigurationManager getConfigManager() {
+		return configManager;
+	}
 
 }

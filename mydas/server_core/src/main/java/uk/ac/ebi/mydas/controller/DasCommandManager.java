@@ -28,6 +28,11 @@ import com.opensymphony.oscache.base.NeedsRefreshException;
 import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.PropertyType;
+import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource;
+import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version;
+import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.Coordinates;
+import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.Capability;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource;
 import uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource;
@@ -1196,4 +1201,114 @@ public class DasCommandManager {
 	private void writeHeader (HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed){
 		this.mydasServlet.writeHeader(request, response, status, compressionAllowed);
 	}
+
+
+//DAS 1.6 commands:
+	/**
+	 * Implements the source command.  Only reports sources that have initialized successfully.
+	 * @param request to allow writing of the HTTP header
+	 * @param response to which the HTTP header and DASDSN XML are written
+	 * @param queryString to check no spurious arguments have been passed to the command
+	 * @throws XmlPullParserException in the event of an error being thrown when writing out the XML
+	 * @throws IOException in the event of an error being thrown when writing out the XML
+	 */
+	void sourceCommand(HttpServletRequest request, HttpServletResponse response, String queryString,String source)
+	throws XmlPullParserException, IOException{
+		// Check the configuration has been loaded successfully
+		if (DATA_SOURCE_MANAGER.getServerConfiguration() == null){
+			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+			logger.error("A request has been made to the das server, however initialisation failed - possibly the mydasserverconfig.xml file was not found.");
+			return;
+		}
+		// All fine.
+		// Get the list of dsn from the DataSourceManager
+		List<String> dsns = DATA_SOURCE_MANAGER.getServerConfiguration().getDsnNames();
+		// Check there is at least one dsn.  (Mandatory in the dsn XML output).
+		if (dsns == null || dsns.size() == 0){
+			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+			logger.error("The source command has been called, but no sources have been initialised successfully.");
+		} else{
+			// At least one dsn is OK.
+			writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+			// Build the XML.
+			XmlSerializer serializer;
+			serializer = PULL_PARSER_FACTORY.newSerializer();
+			BufferedWriter out = null;
+			try{
+				out = getResponseWriter(request, response);
+				serializer.setOutput(out);
+				serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+				serializer.startDocument(null, false);
+				serializer.text("\n");
+				if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDsnXSLT() != null){
+					serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDsnXSLT());
+					serializer.text("\n");
+				}
+				serializer.startTag (DAS_XML_NAMESPACE, "SOURCES");
+				for (String dsn : dsns){
+					Datasource dsnConfig2 = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfig(dsn).getConfig();
+					serializer.startTag (DAS_XML_NAMESPACE, "SOURCE");
+					serializer.attribute(DAS_XML_NAMESPACE, "uri", dsnConfig2.getUri());
+					if (dsnConfig2.getDocHref() != null && dsnConfig2.getDocHref().length() > 0){
+						serializer.attribute(DAS_XML_NAMESPACE, "doc_href", dsnConfig2.getDocHref());
+					}
+					serializer.attribute(DAS_XML_NAMESPACE, "title", dsnConfig2.getTitle());
+					serializer.attribute(DAS_XML_NAMESPACE, "description", dsnConfig2.getDescription());
+					
+					serializer.startTag (DAS_XML_NAMESPACE, "MAINTAINER");
+					serializer.attribute(DAS_XML_NAMESPACE, "email", dsnConfig2.getMaintainer().getEmail());
+					serializer.endTag (DAS_XML_NAMESPACE, "MAINTAINER");
+
+					for(Version version:dsnConfig2.getVersion()){
+						serializer.startTag (DAS_XML_NAMESPACE, "VERSION");
+						serializer.attribute(DAS_XML_NAMESPACE, "uri", version.getUri());
+						serializer.attribute(DAS_XML_NAMESPACE, "created", version.getCreated().toString());
+						for(Coordinates coordinates:version.getCoordinates()){
+							serializer.startTag (DAS_XML_NAMESPACE, "COORDINATES");
+							serializer.attribute(DAS_XML_NAMESPACE, "uri", coordinates.getUri());
+							serializer.attribute(DAS_XML_NAMESPACE, "source", coordinates.getSource());
+							serializer.attribute(DAS_XML_NAMESPACE, "authority", coordinates.getAuthority());
+							if ( (coordinates.getTaxid()!=null) && (coordinates.getTaxid().length()>0) )
+								serializer.attribute(DAS_XML_NAMESPACE, "taxid", coordinates.getTaxid());
+							if ( (coordinates.getVersion()!=null) && (coordinates.getVersion().length()>0) )
+								serializer.attribute(DAS_XML_NAMESPACE, "version", coordinates.getVersion());
+							serializer.attribute(DAS_XML_NAMESPACE, "test_range", coordinates.getTestRange());
+							serializer.text(coordinates.getValue());
+							serializer.endTag (DAS_XML_NAMESPACE, "COORDINATES");							
+						}
+						for(Capability capability:version.getCapability()){
+							serializer.startTag (DAS_XML_NAMESPACE, "CAPABILITY");
+							serializer.attribute(DAS_XML_NAMESPACE, "type", capability.getType());
+							if ( (capability.getQueryUri()!=null) && (capability.getQueryUri().length()>0) )
+								serializer.attribute(DAS_XML_NAMESPACE, "query_uri", capability.getQueryUri());
+							serializer.endTag (DAS_XML_NAMESPACE, "CAPABILITY");							
+						}
+						serializer.endTag (DAS_XML_NAMESPACE, "VERSION");
+					}
+					
+					for(PropertyType pt:dsnConfig2.getProperty()){
+						serializer.startTag (DAS_XML_NAMESPACE, "PROPERTY");
+						serializer.attribute(DAS_XML_NAMESPACE, "name", pt.getKey());
+						serializer.attribute(DAS_XML_NAMESPACE, "value", pt.getValue());
+						serializer.endTag (DAS_XML_NAMESPACE, "PROPERTY");
+					}
+					
+					serializer.endTag (DAS_XML_NAMESPACE, "SOURCE");
+				}
+				serializer.endTag (DAS_XML_NAMESPACE, "SOURCES");
+				serializer.flush();
+			}
+			finally{
+				if (out != null){
+					out.close();
+				}
+			}
+		}
+	}
+
+
+
+
+
+
 }

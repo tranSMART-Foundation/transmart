@@ -112,18 +112,18 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
             boolean found2 = false;
             for (DataSourceConfiguration dsnConfig : dsnCollection){
                 Assert.assertTrue("An unexpected dsn ID has been found",
-                        ("dsnId1".equals (dsnConfig.getId()) || "dsnId2".equals (dsnConfig.getId())));
-                if ("dsnId1".equals (dsnConfig.getId())){
+                        ("http://www.ebi.ac.uk/dsnId1".equals (dsnConfig.getId()) || "http://www.ebi.ac.uk/dsnId2".equals (dsnConfig.getId())));
+                if ("http://www.ebi.ac.uk/dsnId1".equals (dsnConfig.getId())){
                     found1 = true;
                     Assert.assertEquals("Unexpected dsn name",
                             dsnConfig.getName(),
                             "dsnName1");
                     Assert.assertEquals("Unexpected dsn version",
                             dsnConfig.getVersion(),
-                            "0.1");
+                            "http://www.ebi.ac.uk/test");
                     Assert.assertEquals("Unexpected mapmaster",
                             dsnConfig.getMapmaster(),
-                            "mapmaster1");
+                            "http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle");
                     Assert.assertEquals("Unexpected description",
                             dsnConfig.getDescription(),
                             "dsnDescription1");
@@ -148,17 +148,17 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                     Assert.assertTrue("use-feature-id-for-feature-label", dsnConfig.isUseFeatureIdForFeatureLabel());
                     Assert.assertTrue("include-types-with-zero-count", dsnConfig.isIncludeTypesWithZeroCount());
                 }
-                else if ("dsnId2".equals (dsnConfig.getId())){
+                else if ("http://www.ebi.ac.uk/dsnId2".equals (dsnConfig.getId())){
                     found2 = true;
                     Assert.assertEquals("Unexpected dsn name",
                             dsnConfig.getName(),
                             "dsnName2");
                     Assert.assertEquals("Unexpected dsn version",
                             dsnConfig.getVersion(),
-                            "0.2");
+                            "http://www.ebi.ac.uk/test2");
                     Assert.assertEquals("Unexpected mapmaster",
                             dsnConfig.getMapmaster(),
-                            "mapmaster2");
+                            "http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle");
                     Assert.assertEquals("Unexpected description",
                             dsnConfig.getDescription(),
                             "dsnDescription2");

@@ -62,8 +62,8 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("<!DOCTYPE DASDSN SYSTEM \"http://www.biodas.org/dtd/dasdsn.dtd\">");
         assertTextPresent("<DASDSN>");
         assertTextPresent("<DSN>");
-        assertTextPresent("<SOURCE id=\"test\" version=\"1.0\">test</SOURCE>");
-        assertTextPresent("<MAPMASTER>http://localhost:8080/das/test</MAPMASTER>");
+        assertTextPresent("<SOURCE id=\"test\" version=\"test\">test</SOURCE>");
+        assertTextPresent("<MAPMASTER>http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle</MAPMASTER>");
         assertTextPresent("<DESCRIPTION>Test Data Source</DESCRIPTION>");
         assertTextPresent("</DSN>");
         assertTextPresent("</DASDSN>");
@@ -165,4 +165,21 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("<FEATURE id=\"oneFeatureIdTwo\" label=\"one Feature Label Two\">");
         assertTextPresent("</SEGMENT>");
     }
+    
+    
+    public void testSourceRequest() {
+        // Check XML response
+        beginAt("/source");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+        assertTextPresent("<SOURCES>");
+        assertTextPresent("<SOURCE uri=\"test\" doc_href=\"http://www.ebi.ac.uk/~pjones\" title=\"test\" description=\"Test Data Source\">");
+        assertTextPresent("<MAINTAINER email=\"test@ebi.ac.uk\" />");
+        assertTextPresent("<VERSION uri=\"test\" created=\"2010-03-01\">");
+        assertTextPresent("<COORDINATES uri=\"http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle\" source=\"Protein Sequence\" authority=\"UniProt\" test_range=\"P00280\">UniProt,Protein Sequence</COORDINATES>");
+        assertTextPresent("<CAPABILITY type=\"das1:features\" query_uri=\"http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features\" />");
+        assertTextPresent("</VERSION>");
+        assertTextPresent("</SOURCE>");
+        assertTextPresent("</SOURCES>");
+    }
+
 }

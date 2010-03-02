@@ -84,35 +84,29 @@ public class ConfigurationManager {
 	}
 	/**
 	 * Maps the information of sources of the configurationDocument into a set of DataSourceConfiguration objects
+	 * 
+	 * WARNING: this method have changed just to support the new format of the configuration, 
+	 * but it requires more work on it because here is working under the assumption of 1 version and 1 coordinate system.  
+	 * 
 	 * @return hash table that has as keys the id of the source, and as value a DataSourceConfiguration object
 	 * @throws ConfigurationException in case the XML configuration file has some empty fields or malformed URLs
 	 */
 	private Map<String, DataSourceConfiguration> getDataSourceConfigMap() throws ConfigurationException{
         Map<String, DataSourceConfiguration> dataSourceConfigList = new HashMap<String, DataSourceConfiguration>();
         for (uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource datasource:this.configurationDocument.getDatasources().getDatasource()){
-            String id = datasource.getId();
-            String name = datasource.getName();
-            String version = datasource.getVersion();
-            String mapmaster = datasource.getMapmaster();
-            String description = datasource.getDescription();
-            String hrefString = datasource.getDescriptionHref();
-            URL descriptionHref;
+            String id = datasource.getUri().toString();
+            String name = datasource.getTitle();
+            String mapmaster = datasource.getVersion().get(0).getCoordinates().get(0).uri;
+            String hrefString = datasource.getDocHref();
             try{
-                descriptionHref = (hrefString == null)
-                    ? null
-                    : new URL(hrefString);
+                new URL(hrefString);
             }
             catch (MalformedURLException murle){
                 logger.error ("MalformedURLException thrown when attempting to build a URL from : '" + hrefString + "'");
                 throw new ConfigurationException ("Please check the XML configuration file.  The URL '" + hrefString + "' that has have given in the /mydasserver/datasources/datasource/@description-href attribute is not valid.", murle);
             }
-            String styleSheet = datasource.getStylesheet();
             
-            String className = datasource.getClazz();
-            boolean dnaCommandEnabled = datasource.getDnaCommandEnabled()!=null?datasource.getDnaCommandEnabled().value:false;
-            boolean featuresStrictlyEnclosed = datasource.getFeaturesStrictlyEnclosed()!=null?datasource.getFeaturesStrictlyEnclosed().value:false;
-            boolean useFeatureIdForFeatureLabel = datasource.getUseFeatureIdForFeatureLabel()!=null?datasource.getUseFeatureIdForFeatureLabel().value:false;
-            boolean includeTypesWithZeroCount = datasource.getIncludeTypesWithZeroCount()!=null?datasource.getIncludeTypesWithZeroCount().value:false;
+            String className = datasource.getVersion().get(0).getClazz();
             Map<String, String> dataSourceProperties = new HashMap<String, String>();
             for (PropertyType property: datasource.getProperty())
             	dataSourceProperties.put(property.key, property.value);
@@ -134,12 +128,7 @@ public class ConfigurationManager {
                 throw new ConfigurationException("Please check your XML configuration file.  No value has been given for one of the mandatory /mydasserver/datasources/datasource/@mapmaster attributes.");
             }
             
-            DataSourceConfiguration dsnConfig=new DataSourceConfiguration(id, name, version, mapmaster, description, descriptionHref, styleSheet, dataSourceProperties, className,
-                    dnaCommandEnabled,
-                    featuresStrictlyEnclosed,
-                    useFeatureIdForFeatureLabel,
-                    includeTypesWithZeroCount
-            );
+            DataSourceConfiguration dsnConfig=new DataSourceConfiguration(datasource);
             dataSourceConfigList.put(dsnConfig.getId(), dsnConfig);
         	
         }
