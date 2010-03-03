@@ -132,7 +132,7 @@ public class TESTDataSource implements ReferenceDataSource {
                         "oneFeatureTypeIdOne",
                         "oneFeatureCategoryOne",
                         "one Feature DasType Label One",
-                        "oneFeatureMethodIdOne",
+                        "CV:00001",
                         "one Feature Method Label One",
                         5,
                         10,
@@ -150,7 +150,7 @@ public class TESTDataSource implements ReferenceDataSource {
                         "oneFeatureTypeIdTwo",
                         "oneFeatureCategoryTwo",
                         "one Feature DasType Label Two",
-                        "oneFeatureMethodIdTwo",
+                        "CV:00002",
                         "one Feature Method Label Two",
                         18,
                         25,
@@ -173,7 +173,7 @@ public class TESTDataSource implements ReferenceDataSource {
                         "twoFeatureTypeIdOne",
                         "twoFeatureCategoryOne",
                         "two Feature DasType Label One",
-                        "twoFeatureMethodIdOne",
+                        "CV:00001",
                         "two Featur eMethod Label One",
                         9,
                         33,
@@ -300,9 +300,9 @@ public class TESTDataSource implements ReferenceDataSource {
      */
     public Collection<DasType> getTypes() throws DataSourceException {
         Collection<DasType> types = new ArrayList<DasType>(5);
-        types.add (new DasType("oneFeatureTypeIdOne", "oneFeatureCategoryOne", "oneFeatureMethodIdOne"));
-        types.add (new DasType("oneFeatureTypeIdTwo", "oneFeatureCategoryTwo", "oneFeatureMethodIdTwo"));
-        types.add (new DasType("twoFeatureTypeIdOne", "twoFeatureCategoryOne", "twoFeatureMethodIdOne"));
+        types.add (new DasType("oneFeatureTypeIdOne", "oneFeatureCategoryOne", "CV:00001"));
+        types.add (new DasType("oneFeatureTypeIdTwo", "oneFeatureCategoryTwo", "CV:00002"));
+        types.add (new DasType("twoFeatureTypeIdOne", "twoFeatureCategoryOne", "CV:00003"));
         types.add (new DasType("Chromosome", null, null));
         types.add (new DasType("Contig", null, null));
         return types;
@@ -371,7 +371,18 @@ public class TESTDataSource implements ReferenceDataSource {
      * and read a record.</bold>
      */
     public Integer getTotalCountForType(DasType type) throws DataSourceException {
-       return null;
+    	if (type.getId()=="Contig")
+    		return new Integer(3);
+    	if (type.getId()=="Chromosome")
+    		return new Integer(1);
+    	if (type.getId()=="oneFeatureTypeIdTwo")
+    		return new Integer(1);
+    	if (type.getId()=="twoFeatureTypeIdOne")
+    		return new Integer(1);
+    	if (type.getId()=="oneFeatureTypeIdOne")
+    		return new Integer(1);
+    	
+    	return null;
     }
 
     /**

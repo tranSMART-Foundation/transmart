@@ -36,6 +36,7 @@ import java.io.Serializable;
  * Loading the types from the server configuration and holding details of the types
  * for a particular request.
  */
+@SuppressWarnings("serial")
 public class DasType implements Serializable {
 
     /**
@@ -49,9 +50,15 @@ public class DasType implements Serializable {
     private String category;
 
     /**
+     * @deprecated
      * the method of the type (optional).
      */
     private String method;
+
+    /**
+     * The cvId attribute (optional, recommended) is the ID of a term from a relevant controlled vocabulary (SO, MOD, BS).
+     */
+    private String cvId;
 
     /**
      * Constructor for a DasType object.  The id field is mandatory, however the category and / or the method
@@ -59,15 +66,15 @@ public class DasType implements Serializable {
      * @param id <b>Mandatory</b> the id of the type. Will throw an IllegalArgumentException if this is not set
      * to a non-null, non-zero length String.
      * @param category <i>Optional</i> the category of the type.
-     * @param method <i>Optional</i> the method of the type.
+     * @param cvId <i>Optional, Recommended </i> is the ID of a term from a relevant controlled vocabulary (SO, MOD, BS).
      */
-    public DasType(String id, String category, String method){
+    public DasType(String id, String category, String cvId){
         if (id == null || id.length() == 0){
             throw new IllegalArgumentException("id must not be null or an empty String");
         }
         this.id = id;
         this.category = category;
-        this.method = method;
+        this.cvId = cvId;
     }
 
     /**
@@ -87,6 +94,7 @@ public class DasType implements Serializable {
     }
 
     /**
+     * @deprecated
      * Returns the method, or null if this has not been set.
      * @return the method, or null if this has not been set.
      */
@@ -108,7 +116,7 @@ public class DasType implements Serializable {
 
         if (category != null ? !category.equals(dasType.category) : dasType.category != null) return false;
         if (!id.equals(dasType.id)) return false;
-        if (method != null ? !method.equals(dasType.method) : dasType.method != null) return false;
+        if (cvId != null ? !cvId.equals(dasType.cvId) : dasType.cvId != null) return false;
 
         return true;
     }
@@ -121,7 +129,7 @@ public class DasType implements Serializable {
         int result;
         result = id.hashCode();
         result = 31 * result + (category != null ? category.hashCode() : 0);
-        result = 31 * result + (method != null ? method.hashCode() : 0);
+        result = 31 * result + (cvId != null ? cvId.hashCode() : 0);
         return result;
     }
 
@@ -135,8 +143,12 @@ public class DasType implements Serializable {
             .append ("' category: '")
             .append ((category == null) ? "null" : category)
             .append ("' method: '")
-            .append ((method == null) ? "null" : method)
+            .append ((cvId == null) ? "null" : cvId)
             .append ("'");
         return buf.toString();
     }
+
+	public String getCvId() {
+		return cvId;
+	}
 }

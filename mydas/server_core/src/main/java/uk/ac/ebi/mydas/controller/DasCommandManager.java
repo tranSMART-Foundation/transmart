@@ -358,53 +358,6 @@ public class DasCommandManager {
 		}
 		return sequenceCollection;
 	}
-	void typesCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-	throws BadCommandArgumentsException, BadReferenceObjectException, DataSourceException, CoordinateErrorException, IOException, XmlPullParserException {
-//		Parse the queryString to retrieve the individual parts of the query.
-
-		List<SegmentQuery> requestedSegments = new ArrayList<SegmentQuery>();
-		List<String> typeFilter = new ArrayList<String>();
-		/************************************************************************\
-		 * Parse the query string                                               *
-		 ************************************************************************/
-//		It is legal for the query string to be empty for the types command.
-		if (queryString != null && queryString.length() > 0){
-			// Split on the ; (delineates the separate parts of the query)
-			String[] queryParts = queryString.split(";");
-			for (String queryPart : queryParts){
-				// Now determine what each part is, and construct the query.
-				Matcher segmentRangeMatcher = SEGMENT_RANGE_PATTERN.matcher(queryPart);
-				if (segmentRangeMatcher.find()){
-					requestedSegments.add (new SegmentQuery (segmentRangeMatcher));
-				}
-				else{
-					// Split the queryPart on "=" and see if the result is parsable.
-					String[] queryPartKeysValues = queryPart.split("=");
-					if (queryPartKeysValues.length != 2){
-						// All of the remaining query parts are key=value pairs, so this is a bad argument.
-						throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
-					}
-					String key = queryPartKeysValues[0];
-					String value = queryPartKeysValues[1];
-					// Check for typeId restriction
-					if ("type".equals (key)){
-						typeFilter.add(value);
-					}
-				}
-				// Previously a check was included here for unparsable parameters.  This has now
-				// been removed, so that MyDas will be less fussy about new parameters, e.g. those included
-				// in the DAS 1.53E spec.  (Unknown parameters will just be ignored.)
-			}
-		}
-		if (requestedSegments.size() == 0){
-			// Process the types command for all types - not segment specific.
-			typesCommandAllTypes(request, response, dsnConfig, typeFilter);
-		}
-		else {
-			// Process the types command for specific segments.
-			typesCommandSpecificSegments(request, response, dsnConfig, requestedSegments, typeFilter);
-		}
-	}
 
 	@SuppressWarnings("unchecked")
 	private Collection<DasType> getAllTypes (DataSourceConfiguration dsnConfig) throws DataSourceException {
@@ -454,8 +407,8 @@ public class DasCommandManager {
 					.append (type.getId())
 					.append ("_CAT_")
 					.append ((type.getCategory() == null) ? "null" : type.getCategory())
-					.append ("_METHOD_")
-					.append ((type.getMethod() == null ) ? "null" : type.getMethod());
+					.append ("_CVID_")
+					.append ((type.getCvId() == null ) ? "null" : type.getCvId());
 					String cacheKey = keyBuf.toString();
 
 					try{
@@ -489,8 +442,8 @@ public class DasCommandManager {
 				serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getTypesXSLT());
 				serializer.text("\n");
 			}
-			serializer.docdecl(" DASTYPES SYSTEM \"http://www.biodas.org/dtd/dastypes.dtd\"");
-			serializer.text("\n");
+//			serializer.docdecl(" DASTYPES SYSTEM \"http://www.biodas.org/dtd/dastypes.dtd\"");
+//			serializer.text("\n");
 			// Now the body of the DASTYPES xml.
 			serializer.startTag (DAS_XML_NAMESPACE, "DASTYPES");
 			serializer.startTag (DAS_XML_NAMESPACE, "GFF");
@@ -827,176 +780,6 @@ public class DasCommandManager {
 			}
 		}
 	}
-	/**
-	 * Implements the entry_points command.
-	 * @param request to allow the writing of the http header
-	 * @param response to which the http header and the XML are written.
-	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
-	 * @param queryString to be checked for bad arguments (there should be no arguments to this command)
-	 * @throws XmlPullParserException in the event of a problem with writing out the DASENTRYPOINT XML file.
-	 * @throws IOException during writing of the XML
-	 * @throws DataSourceException to capture any error returned from the data source.
-	 * @throws UnimplementedFeatureException if the dsn reports that it cannot return entry_points.
-	 * @throws BadCommandArgumentsException in the event that spurious arguments have been passed in the queryString.
-	 */
-	void entryPointsCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-	throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException, BadCommandArgumentsException {
-
-		int start=-1;
-		int stop=-1;
-		if (queryString != null && queryString.trim().length() > 0){
-			String[] queryParts = queryString.split("=");
-			if (!queryParts[0].equals("rows"))
-				throw new BadCommandArgumentsException("Unexpected arguments have been passed to the entry_points command.");
-			String[] rows = queryParts[1].split("-");
-			try{
-				start=Integer.parseInt(rows[0]);
-			} catch (NumberFormatException nfe){ 
-				throw new BadCommandArgumentsException("Unexpected arguments(not numeric) have been passed to the entry_points command."); 
-			}
-			try{ 
-				stop=Integer.parseInt(rows[1]); 
-			} catch (NumberFormatException nfe){ 
-				throw new BadCommandArgumentsException("Unexpected arguments(not numeric) have been passed to the entry_points command."); 
-			}
-			if (stop<start)
-				throw new BadCommandArgumentsException("Unexpected arguments(stop lower than start) have been passed to the entry_points command.");
-		}
-
-		if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
-			// Fine - process command.
-			ReferenceDataSource refDsn = (ReferenceDataSource) dsnConfig.getDataSource();
-			Collection<DasEntryPoint> entryPoints = refDsn.getEntryPoints();
-			// Check that an entry point version has been set.
-			if (refDsn.getEntryPointVersion() == null){
-				throw new DataSourceException("The dsn " + dsnConfig.getId() + "is returning null for the entry point version, which is invalid.");
-			}
-			// Looks like all is OK.
-			writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
-			//OK, got our entry points, so write out the XML.
-			XmlSerializer serializer;
-			serializer = PULL_PARSER_FACTORY.newSerializer();
-			BufferedWriter out = null;
-			try{
-				out = getResponseWriter(request, response);
-				serializer.setOutput(out);
-				serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
-				serializer.startDocument(null, false);
-				serializer.text("\n");
-				if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getEntryPointsXSLT() != null){
-					serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getEntryPointsXSLT());
-					serializer.text("\n");
-				}
-//				serializer.docdecl(" DASEP SYSTEM \"http://www.biodas.org/dtd/dasep.dtd\"");
-//				serializer.text("\n");
-
-				// Rest of the XML.
-				serializer.startTag(DAS_XML_NAMESPACE, "DASEP");
-				serializer.startTag(DAS_XML_NAMESPACE, "ENTRY_POINTS");
-				serializer.attribute(DAS_XML_NAMESPACE, "href", buildRequestHref(request));
-				if (refDsn.getEntryPointVersion()!=null)
-					serializer.attribute(DAS_XML_NAMESPACE, "version", refDsn.getEntryPointVersion());
-				serializer.attribute(DAS_XML_NAMESPACE, "total", ""+entryPoints.size());
-
-				if (start>-1)
-					serializer.attribute(DAS_XML_NAMESPACE, "start", ""+start);
-				else 
-					start=1;
-				if (stop>-1)
-					serializer.attribute(DAS_XML_NAMESPACE, "end", ""+stop);
-				else
-					stop=entryPoints.size();
-
-				Iterator<DasEntryPoint> iterator = entryPoints.iterator();
-				for (int i=0;i<start-1;i++)
-					iterator.next();
-				//DasEntryPoint[] entryPointsA = (DasEntryPoint[]) entryPoints.toArray();
-				// Now for the individual segments.
-				for (int i=start-1;i<stop;i++){
-					//DasEntryPoint entryPoint=entryPointsA[i];
-					DasEntryPoint entryPoint=iterator.next();
-					if (entryPoint != null){
-						(new DasEntryPointE(entryPoint)).serialize(DAS_XML_NAMESPACE, serializer);
-					}
-				}
-				serializer.endTag(DAS_XML_NAMESPACE, "ENTRY_POINTS");
-				serializer.startTag(DAS_XML_NAMESPACE, "QUERY");
-				serializer.text(""+queryString);
-				serializer.endTag(DAS_XML_NAMESPACE, "QUERY");
-				
-				serializer.endTag(DAS_XML_NAMESPACE, "DASEP");
-
-				serializer.flush();
-			}
-			finally{
-				if (out != null){
-					out.close();
-				}
-			}
-		}
-		else {
-			// Not a reference source.
-			throw new UnimplementedFeatureException("An attempt to request entry_point information from an annotation server has been detected.");
-		}
-	}
-	/**
-	 * Implements the sequence command.  Delegates to the getSequences method to return the requested sequences.
-	 * @param request to allow the writing of the http header
-	 * @param response to which the http header and the XML are written.
-	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
-	 * @param queryString from which the requested segments are parsed.
-	 * @throws XmlPullParserException in the event of a problem with writing out the DASSEQUENCE XML file.
-	 * @throws IOException during writing of the XML
-	 * @throws DataSourceException to capture any error returned from the data source.
-	 * @throws UnimplementedFeatureException if the dsn reports that it cannot return sequence.
-	 * @throws BadReferenceObjectException in the event that the segment id is not known to the dsn
-	 * @throws BadCommandArgumentsException if the arguments to the sequence command are not as specified in the
-	 * DAS 1.53 specification
-	 * @throws CoordinateErrorException if the requested coordinates are outside those of the segment id requested.
-	 */
-	void sequenceCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-			throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException, BadReferenceObjectException, BadCommandArgumentsException, CoordinateErrorException {
-		
-		// Is this a reference source?
-		if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
-			// Fine - process command.
-			Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
-			// Got some sequences, so all is OK.
-			writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
-			// Build the XML.
-			XmlSerializer serializer;
-			serializer = PULL_PARSER_FACTORY.newSerializer();
-			BufferedWriter out = null;
-			try{
-				out = getResponseWriter(request, response);
-				serializer.setOutput(out);
-				serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
-				serializer.startDocument(null, false);
-				serializer.text("\n");
-				if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getSequenceXSLT() != null){
-					serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getSequenceXSLT());
-					serializer.text("\n");
-				}
-//				serializer.docdecl(" DASSEQUENCE SYSTEM \"http://www.biodas.org/dtd/dassequence.dtd\"");
-//				serializer.text("\n");
-				// Now the body of the DASDNA xml.
-				serializer.startTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
-				for (SequenceReporter sequenceReporter : sequences){
-					sequenceReporter.serialize(DAS_XML_NAMESPACE,serializer);
-				}
-				serializer.endTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
-			}
-			finally{
-				if (out != null){
-					out.close();
-				}
-			}
-		}
-		else {
-			// Not a reference source.
-			throw new UnimplementedFeatureException("An attempt to request sequence information from an anntation server has been detected.");
-		}
-	}
 
 	/**
 	 * Implements the link command.  This is done using a simple mechanism - the request is parsed and checked for
@@ -1241,7 +1024,9 @@ public class DasCommandManager {
 	}
 
 
+	
 //DAS 1.6 commands:
+	
 	/**
 	 * Implements the source command.  Only reports sources that have initialized successfully.
 	 * @param request to allow writing of the HTTP header
@@ -1344,7 +1129,225 @@ public class DasCommandManager {
 		}
 	}
 
+	/**
+	 * Implements the entry_points command.
+	 * @param request to allow the writing of the http header
+	 * @param response to which the http header and the XML are written.
+	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
+	 * @param queryString to be checked for bad arguments (there should be no arguments to this command)
+	 * @throws XmlPullParserException in the event of a problem with writing out the DASENTRYPOINT XML file.
+	 * @throws IOException during writing of the XML
+	 * @throws DataSourceException to capture any error returned from the data source.
+	 * @throws UnimplementedFeatureException if the dsn reports that it cannot return entry_points.
+	 * @throws BadCommandArgumentsException in the event that spurious arguments have been passed in the queryString.
+	 */
+	void entryPointsCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
+	throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException, BadCommandArgumentsException {
 
+		int start=-1;
+		int stop=-1;
+		if (queryString != null && queryString.trim().length() > 0){
+			String[] queryParts = queryString.split("=");
+			if (!queryParts[0].equals("rows"))
+				throw new BadCommandArgumentsException("Unexpected arguments have been passed to the entry_points command.");
+			String[] rows = queryParts[1].split("-");
+			try{
+				start=Integer.parseInt(rows[0]);
+			} catch (NumberFormatException nfe){ 
+				throw new BadCommandArgumentsException("Unexpected arguments(not numeric) have been passed to the entry_points command."); 
+			}
+			try{ 
+				stop=Integer.parseInt(rows[1]); 
+			} catch (NumberFormatException nfe){ 
+				throw new BadCommandArgumentsException("Unexpected arguments(not numeric) have been passed to the entry_points command."); 
+			}
+			if (stop<start)
+				throw new BadCommandArgumentsException("Unexpected arguments(stop lower than start) have been passed to the entry_points command.");
+		}
+
+		if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
+			// Fine - process command.
+			ReferenceDataSource refDsn = (ReferenceDataSource) dsnConfig.getDataSource();
+			Collection<DasEntryPoint> entryPoints = refDsn.getEntryPoints();
+			// Check that an entry point version has been set.
+			if (refDsn.getEntryPointVersion() == null){
+				throw new DataSourceException("The dsn " + dsnConfig.getId() + "is returning null for the entry point version, which is invalid.");
+			}
+			// Looks like all is OK.
+			writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+			//OK, got our entry points, so write out the XML.
+			XmlSerializer serializer;
+			serializer = PULL_PARSER_FACTORY.newSerializer();
+			BufferedWriter out = null;
+			try{
+				out = getResponseWriter(request, response);
+				serializer.setOutput(out);
+				serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+				serializer.startDocument(null, false);
+				serializer.text("\n");
+				if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getEntryPointsXSLT() != null){
+					serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getEntryPointsXSLT());
+					serializer.text("\n");
+				}
+//				serializer.docdecl(" DASEP SYSTEM \"http://www.biodas.org/dtd/dasep.dtd\"");
+//				serializer.text("\n");
+
+				// Rest of the XML.
+				serializer.startTag(DAS_XML_NAMESPACE, "DASEP");
+				serializer.startTag(DAS_XML_NAMESPACE, "ENTRY_POINTS");
+				serializer.attribute(DAS_XML_NAMESPACE, "href", buildRequestHref(request));
+				if (refDsn.getEntryPointVersion()!=null)
+					serializer.attribute(DAS_XML_NAMESPACE, "version", refDsn.getEntryPointVersion());
+				serializer.attribute(DAS_XML_NAMESPACE, "total", ""+entryPoints.size());
+
+				if (start>-1)
+					serializer.attribute(DAS_XML_NAMESPACE, "start", ""+start);
+				else 
+					start=1;
+				if (stop>-1)
+					serializer.attribute(DAS_XML_NAMESPACE, "end", ""+stop);
+				else
+					stop=entryPoints.size();
+
+				Iterator<DasEntryPoint> iterator = entryPoints.iterator();
+				for (int i=0;i<start-1;i++)
+					iterator.next();
+				//DasEntryPoint[] entryPointsA = (DasEntryPoint[]) entryPoints.toArray();
+				// Now for the individual segments.
+				for (int i=start-1;i<stop;i++){
+					//DasEntryPoint entryPoint=entryPointsA[i];
+					DasEntryPoint entryPoint=iterator.next();
+					if (entryPoint != null){
+						(new DasEntryPointE(entryPoint)).serialize(DAS_XML_NAMESPACE, serializer);
+					}
+				}
+				serializer.endTag(DAS_XML_NAMESPACE, "ENTRY_POINTS");
+				serializer.startTag(DAS_XML_NAMESPACE, "QUERY");
+				serializer.text(""+queryString);
+				serializer.endTag(DAS_XML_NAMESPACE, "QUERY");
+				
+				serializer.endTag(DAS_XML_NAMESPACE, "DASEP");
+
+				serializer.flush();
+			}
+			finally{
+				if (out != null){
+					out.close();
+				}
+			}
+		}
+		else {
+			// Not a reference source.
+			throw new UnimplementedFeatureException("An attempt to request entry_point information from an annotation server has been detected.");
+		}
+	}
+	
+	/**
+	 * Implements the sequence command.  Delegates to the getSequences method to return the requested sequences.
+	 * @param request to allow the writing of the http header
+	 * @param response to which the http header and the XML are written.
+	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
+	 * @param queryString from which the requested segments are parsed.
+	 * @throws XmlPullParserException in the event of a problem with writing out the DASSEQUENCE XML file.
+	 * @throws IOException during writing of the XML
+	 * @throws DataSourceException to capture any error returned from the data source.
+	 * @throws UnimplementedFeatureException if the dsn reports that it cannot return sequence.
+	 * @throws BadReferenceObjectException in the event that the segment id is not known to the dsn
+	 * @throws BadCommandArgumentsException if the arguments to the sequence command are not as specified in the
+	 * DAS 1.53 specification
+	 * @throws CoordinateErrorException if the requested coordinates are outside those of the segment id requested.
+	 */
+	void sequenceCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
+			throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException, BadReferenceObjectException, BadCommandArgumentsException, CoordinateErrorException {
+		
+		// Is this a reference source?
+		if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
+			// Fine - process command.
+			Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
+			// Got some sequences, so all is OK.
+			writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+			// Build the XML.
+			XmlSerializer serializer;
+			serializer = PULL_PARSER_FACTORY.newSerializer();
+			BufferedWriter out = null;
+			try{
+				out = getResponseWriter(request, response);
+				serializer.setOutput(out);
+				serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+				serializer.startDocument(null, false);
+				serializer.text("\n");
+				if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getSequenceXSLT() != null){
+					serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getSequenceXSLT());
+					serializer.text("\n");
+				}
+//				serializer.docdecl(" DASSEQUENCE SYSTEM \"http://www.biodas.org/dtd/dassequence.dtd\"");
+//				serializer.text("\n");
+				// Now the body of the DASDNA xml.
+				serializer.startTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
+				for (SequenceReporter sequenceReporter : sequences){
+					sequenceReporter.serialize(DAS_XML_NAMESPACE,serializer);
+				}
+				serializer.endTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
+			}
+			finally{
+				if (out != null){
+					out.close();
+				}
+			}
+		}
+		else {
+			// Not a reference source.
+			throw new UnimplementedFeatureException("An attempt to request sequence information from an anntation server has been detected.");
+		}
+	}
+
+	void typesCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
+	throws BadCommandArgumentsException, BadReferenceObjectException, DataSourceException, CoordinateErrorException, IOException, XmlPullParserException {
+//		Parse the queryString to retrieve the individual parts of the query.
+
+		List<SegmentQuery> requestedSegments = new ArrayList<SegmentQuery>();
+		List<String> typeFilter = new ArrayList<String>();
+		/************************************************************************\
+		 * Parse the query string                                               *
+		 ************************************************************************/
+//		It is legal for the query string to be empty for the types command.
+		if (queryString != null && queryString.length() > 0){
+			// Split on the ; (delineates the separate parts of the query)
+			String[] queryParts = queryString.split(";");
+			for (String queryPart : queryParts){
+				// Now determine what each part is, and construct the query.
+				Matcher segmentRangeMatcher = SEGMENT_RANGE_PATTERN.matcher(queryPart);
+				if (segmentRangeMatcher.find()){
+					requestedSegments.add (new SegmentQuery (segmentRangeMatcher));
+				}
+				else{
+					// Split the queryPart on "=" and see if the result is parsable.
+					String[] queryPartKeysValues = queryPart.split("=");
+					if (queryPartKeysValues.length != 2){
+						// All of the remaining query parts are key=value pairs, so this is a bad argument.
+						throw new BadCommandArgumentsException("Bad command arguments to the types command: " + queryString);
+					}
+					String key = queryPartKeysValues[0];
+					String value = queryPartKeysValues[1];
+					// Check for typeId restriction
+					if ("type".equals (key)){
+						typeFilter.add(value);
+					}
+				}
+				// Previously a check was included here for unparsable parameters.  This has now
+				// been removed, so that MyDas will be less fussy about new parameters, e.g. those included
+				// in the DAS 1.53E spec.  (Unknown parameters will just be ignored.)
+			}
+		}
+		if (requestedSegments.size() == 0){
+			// Process the types command for all types - not segment specific.
+			typesCommandAllTypes(request, response, dsnConfig, typeFilter);
+		}
+		else {
+			// Process the types command for specific segments.
+			typesCommandSpecificSegments(request, response, dsnConfig, requestedSegments, typeFilter);
+		}
+	}
 
 
 

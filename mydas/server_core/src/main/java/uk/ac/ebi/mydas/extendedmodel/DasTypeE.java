@@ -4,40 +4,26 @@ import java.io.IOException;
 
 import org.xmlpull.v1.XmlSerializer;
 
-import uk.ac.ebi.mydas.exceptions.DataSourceException;
-import uk.ac.ebi.mydas.model.DasComponentFeature;
-import uk.ac.ebi.mydas.model.DasFeature;
 import uk.ac.ebi.mydas.model.DasType;
 
+@SuppressWarnings("serial")
 public class DasTypeE extends DasType {
 	private String label;
 
-	public DasTypeE(String id, String category, String method) {
-		super(id, category, method);
+	public DasTypeE(String id, String category, String cvId) {
+		super(id, category, cvId);
 	}
-	public DasTypeE(String id, String category, String method,String label) {
-		super(id, category, method);
+	public DasTypeE(String id, String category, String cvId,String label) {
+		super(id, category, cvId);
 		this.label=label;
 	}
 	public DasTypeE(DasType type) {
-		super(type.getId(), type.getCategory(), type.getMethod());
+		super(type.getId(), type.getCategory(), type.getCvId());
 	}
 	public void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,Integer count) throws IllegalArgumentException, IllegalStateException, IOException{
 		this.serialize( DAS_XML_NAMESPACE, serializer, count,true,false,false,false);
 	}	
 
-	/**
-	 * @param DAS_XML_NAMESPACE
-	 * @param serializer
-	 * @param count
-	 * @param categorize
-	 * @param hasReferenceFeatures
-	 * @param hasSubParts
-	 * @param hasSuperParts
-	 * @throws IllegalArgumentException
-	 * @throws IllegalStateException
-	 * @throws IOException
-	 */
 	/**
 	 * Generates the piece of XML into the XML serializer object to describe a DasType 
 	 * @param DAS_XML_NAMESPACE XML namespace to link with the elements to create
@@ -56,8 +42,8 @@ public class DasTypeE extends DasType {
 
 		serializer.startTag(DAS_XML_NAMESPACE, "TYPE");
 		serializer.attribute(DAS_XML_NAMESPACE, "id", this.getId());
-		if (this.getMethod() != null && this.getMethod().length() > 0){
-			serializer.attribute(DAS_XML_NAMESPACE, "method", this.getMethod());
+		if (this.getCvId() != null && this.getCvId().length() > 0){
+			serializer.attribute(DAS_XML_NAMESPACE, "cvId", this.getCvId());
 		}
 		// Handle DasReferenceFeatures.
 		if (hasReferenceFeatures){

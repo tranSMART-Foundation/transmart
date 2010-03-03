@@ -137,14 +137,30 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("<SEQUENCE id=\"two\" start=\"1\" stop=\"48\" version=\"Up-to-date\" label=\"label_two\">cgatcatcagctacgtacgatcagtccgtacgatcgatcagcatcaca</SEQUENCE>");
         assertTextPresent("</DASSEQUENCE>");
     }
+    public void test_types_command_filter(){
+        beginAt("/test/types?segment=one");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+        assertTextPresent("<DASTYPES>");
+        assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+        assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">1</TYPE>");
+        assertTextPresent("<TYPE id=\"oneFeatureTypeIdTwo\" cvId=\"CV:00002\" category=\"oneFeatureCategoryTwo\">1</TYPE>");
+        assertTextPresent("<TYPE id=\"twoFeatureTypeIdOne\" cvId=\"CV:00003\" category=\"twoFeatureCategoryOne\">0</TYPE>");
+        assertTextPresent("<TYPE id=\"Chromosome\" category=\"Chromosome\">0</TYPE>");
+        assertTextPresent("<TYPE id=\"Contig\" category=\"Contig\">0</TYPE>");
+        assertTextPresent("</SEGMENT>");
+        assertTextPresent("</DASTYPES>");
+    }
     public void test_types_command_all(){
         beginAt("/test/types");
         assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-        assertTextPresent("<!DOCTYPE DASTYPES SYSTEM \"http://www.biodas.org/dtd/dastypes.dtd\">");
         assertTextPresent("<DASTYPES>");
-        assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" method=\"oneFeatureMethodIdOne\" category=\"oneFeatureCategoryOne\" />");
-        assertTextPresent("<TYPE id=\"oneFeatureTypeIdTwo\" method=\"oneFeatureMethodIdTwo\" category=\"oneFeatureCategoryTwo\" />");
-        assertTextPresent("<TYPE id=\"twoFeatureTypeIdOne\" method=\"twoFeatureMethodIdOne\" category=\"twoFeatureCategoryOne\" />");
+        assertTextPresent("<SEGMENT version=\"test\" label=\"Complete datasource summary\">");
+        assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">1</TYPE>");
+        assertTextPresent("<TYPE id=\"oneFeatureTypeIdTwo\" cvId=\"CV:00002\" category=\"oneFeatureCategoryTwo\">1</TYPE>");
+        assertTextPresent("<TYPE id=\"twoFeatureTypeIdOne\" cvId=\"CV:00003\" category=\"twoFeatureCategoryOne\">1</TYPE>");
+        assertTextPresent("<TYPE id=\"Chromosome\" category=\"Chromosome\">1</TYPE>");
+        assertTextPresent("<TYPE id=\"Contig\" category=\"Contig\">3</TYPE>");
+        assertTextPresent("</SEGMENT>");
         assertTextPresent("</DASTYPES>");
     }
     public void test_features_command_unknown(){
@@ -160,7 +176,7 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
         assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
         assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
-        assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\">one Feature Method Label One</METHOD>");
+        assertTextPresent("<METHOD id=\"CV:00001\">one Feature Method Label One</METHOD>");
         assertTextPresent("START>5</START>");
         assertTextPresent("<END>10</END>");
         assertTextPresent("<SCORE>123.45</SCORE>");
