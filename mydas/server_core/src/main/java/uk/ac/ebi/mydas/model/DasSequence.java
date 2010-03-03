@@ -42,6 +42,7 @@ import java.io.Serializable;
  * /DASSEQUENCE/SEQUENCE element in response to the sequence command, or the
  * /DASDNA/SEQUENCE element in response to the dna command.
  */
+@SuppressWarnings("serial")
 public class DasSequence extends DasSegment implements Serializable {
 
     /**
@@ -53,6 +54,7 @@ public class DasSequence extends DasSegment implements Serializable {
 
 
     /**
+     * @deprecated DAS1.6 does not include a moltype attribute
      * <b>Mandatory</b> value indicating the type of molecule.
      *
      * Used to populate the
@@ -75,7 +77,7 @@ public class DasSequence extends DasSegment implements Serializable {
      *      </li>
      * </ul>
      */
-    protected String molType;
+     protected String molType;
 
     public static final String TYPE_DNA = "DNA";
     public static final String TYPE_ssRNA = "ssRNA";
@@ -91,6 +93,11 @@ public class DasSequence extends DasSegment implements Serializable {
     }
 
     /**
+     * The label attribute (optional) supplies a human readable label for display purposes. If omitted, it is assumed the ID is suitable for display.
+     */
+    private String label;
+    
+    /**
      * @param sequence <b>Mandatory</b> sequence String used to populate the
      * /DASSEQUENCE/SEQUENCE element (sequence command) or the
      * /DASDNA/SEQUENCE/DNA element (dna command).
@@ -99,7 +106,10 @@ public class DasSequence extends DasSegment implements Serializable {
      * a date, version number or checksum.  Used to populate the
      * /DASSEQUENCE/SEQUENCE/@version attribute or the /DASDNA/SEQUENCE/@version
      * attribute.
-     * @param molType <b>Mandatory</b> value indicating the type of molecule.
+     * @param label The label attribute (optional) supplies a human readable 
+     * label for display purposes. If omitted, it is assumed the ID is 
+     * suitable for display.
+     * @param molType <b>DEPRECATED</b> value indicating the type of molecule.
      * Used to populate the
      * /DASSEQUENCE/SEQUENCE/@moltype attribute in response to the
      * sequence command.
@@ -114,7 +124,7 @@ public class DasSequence extends DasSegment implements Serializable {
      * @throws uk.ac.ebi.mydas.exceptions.DataSourceException in the event that
      * there is a problem with the information used to instantiate this object.
      */
-    public DasSequence(String segmentId, String sequence, int startCoordinate, String version, String molType)
+    public DasSequence(String segmentId, String sequence, int startCoordinate, String version, String label)
             throws DataSourceException {
 
         super(startCoordinate,
@@ -127,13 +137,9 @@ public class DasSequence extends DasSegment implements Serializable {
         if (sequence == null || sequence.length() == 0){
             throw new DataSourceException ("An attempt has been made to instantiate a DasSequence object that has no sequenceString");
         }
-         // Check the type is one of the permitted types.
-        if (molType == null || ! PERMITTED_TYPES.contains(molType)){
-            throw new DataSourceException ("An attempt has been made to instantiate a DasSequence object that is not one of the permitted types (provided as public static String members of the DasSequence object).");
-        }
 
-        this.molType = molType;
         this.sequenceString = sequence;
+        this.label=label;
     }
 
 
@@ -146,7 +152,14 @@ public class DasSequence extends DasSegment implements Serializable {
         return sequenceString.substring(requestedStart - startCoordinate, requestedStop - startCoordinate + 1);
     }
 
+    /**
+     * @deprecated
+     */
     public String getMolType() {
         return molType;
+    }
+
+    public String getLabel(){
+    	return label;
     }
 }

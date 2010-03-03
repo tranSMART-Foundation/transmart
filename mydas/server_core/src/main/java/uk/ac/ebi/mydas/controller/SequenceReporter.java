@@ -75,6 +75,9 @@ class SequenceReporter{
     String getSequenceVersion(){
         return sequence.getVersion();
     }
+    String getSequenceLabel(){
+        return sequence.getLabel();
+    }
 
     String getSequenceMoleculeType(){
         return sequence.getMolType();
@@ -123,13 +126,15 @@ class SequenceReporter{
         serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(this.getStart()));
         serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(this.getStop()));
         serializer.attribute(DAS_XML_NAMESPACE, "version", this.getSequenceVersion());
+        if ((!dna) && (this.getSequenceLabel()!=null) && (this.getSequenceLabel().length()>0)) 
+        	serializer.attribute(DAS_XML_NAMESPACE, "label", this.getSequenceLabel());
+        
 
         if (dna){
         	serializer.startTag(DAS_XML_NAMESPACE, "DNA");
         	serializer.attribute(DAS_XML_NAMESPACE, "length", Integer.toString(this.getSequenceString().length()));
-        } else {
-            serializer.attribute(DAS_XML_NAMESPACE, "moltype", this.getSequenceMoleculeType());
-        }
+        } 
+        
         serializer.text(this.getSequenceString());
 
         if (dna){

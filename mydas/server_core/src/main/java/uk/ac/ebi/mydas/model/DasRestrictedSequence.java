@@ -40,10 +40,12 @@ import java.io.Serializable;
  * on the assumption that the data source has already restricted
  * the sequence.
  */
+@SuppressWarnings("serial")
 public class DasRestrictedSequence extends DasSequence implements Serializable {
 
     /**
      * Constructor for a DasRestrictedSequence object.
+     * Changed to eliminate the deprecated attribute molType and add the label attribute
      * @param segmentId being the requested segment ID.
      * @param sequence being the sequence set by the data source.  Note that
      * it is assumed that the data source is restricting this to the sequence
@@ -51,25 +53,10 @@ public class DasRestrictedSequence extends DasSequence implements Serializable {
      * @param startCoordinate being the requested start coordinate.
      * @param version being the sequence version.  May be a date,
      * version number or checksum etc.
-     * @param molType being one of:
-     * <ul>
-     *      <li>
-     *           DasSequence.TYPE_DNA
-     *      </li>
-     *      <li>
-     *           DasSequence.TYPE_ssRNA
-     *      </li>
-     *      <li>
-     *           DasSequence.TYPE_dsRNA
-     *      </li>
-     *      <li>
-     *           DasSequence.TYPE_PROTEIN
-     *      </li>
-     * </ul>
      * @throws DataSourceException to capture any exception thrown by the super constructor.
      */
-    public DasRestrictedSequence(String segmentId, String sequence, int startCoordinate, String version, String molType) throws DataSourceException {
-        super(segmentId, sequence, startCoordinate, version, molType);
+    public DasRestrictedSequence(String segmentId, String sequence, int startCoordinate, String version,String label) throws DataSourceException {
+        super(segmentId, sequence, startCoordinate, version, label);
     }
 
     /**

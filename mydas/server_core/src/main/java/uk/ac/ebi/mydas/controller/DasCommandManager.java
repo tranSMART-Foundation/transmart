@@ -887,8 +887,8 @@ public class DasCommandManager {
 					serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getEntryPointsXSLT());
 					serializer.text("\n");
 				}
-				serializer.docdecl(" DASEP SYSTEM \"http://www.biodas.org/dtd/dasep.dtd\"");
-				serializer.text("\n");
+//				serializer.docdecl(" DASEP SYSTEM \"http://www.biodas.org/dtd/dasep.dtd\"");
+//				serializer.text("\n");
 
 				// Rest of the XML.
 				serializer.startTag(DAS_XML_NAMESPACE, "DASEP");
@@ -955,8 +955,8 @@ public class DasCommandManager {
 	 * @throws CoordinateErrorException if the requested coordinates are outside those of the segment id requested.
 	 */
 	void sequenceCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
-	throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException,
-	BadReferenceObjectException, BadCommandArgumentsException, CoordinateErrorException {
+			throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException, BadReferenceObjectException, BadCommandArgumentsException, CoordinateErrorException {
+		
 		// Is this a reference source?
 		if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
 			// Fine - process command.
@@ -977,8 +977,8 @@ public class DasCommandManager {
 					serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getSequenceXSLT());
 					serializer.text("\n");
 				}
-				serializer.docdecl(" DASSEQUENCE SYSTEM \"http://www.biodas.org/dtd/dassequence.dtd\"");
-				serializer.text("\n");
+//				serializer.docdecl(" DASSEQUENCE SYSTEM \"http://www.biodas.org/dtd/dassequence.dtd\"");
+//				serializer.text("\n");
 				// Now the body of the DASDNA xml.
 				serializer.startTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
 				for (SequenceReporter sequenceReporter : sequences){
