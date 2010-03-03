@@ -468,10 +468,10 @@ public class TESTDataSource implements ReferenceDataSource {
      */
     public DasSequence getSequence(String segmentReference) throws BadReferenceObjectException, DataSourceException {
         if (segmentReference.equals ("one")){
-            return new DasSequence("one", "FFDYASTDFYASDFAUFDYFVSHCVYTDASVCYT", 1, "Up-to-date", DasSequence.TYPE_PROTEIN);
+            return new DasSequence("one", "FFDYASTDFYASDFAUFDYFVSHCVYTDASVCYT", 1, "Up-to-date",null);
         }
         else if (segmentReference.equals("two")){
-            return new DasSequence("two", "cgatcatcagctacgtacgatcagtccgtacgatcgatcagcatcaca", 1, "Up-to-date", DasSequence.TYPE_DNA);
+            return new DasSequence("two", "cgatcatcagctacgtacgatcagtccgtacgatcgatcagcatcaca", 1, "Up-to-date","label_two");
         }
         else throw new BadReferenceObjectException(segmentReference, "Not found");
     }

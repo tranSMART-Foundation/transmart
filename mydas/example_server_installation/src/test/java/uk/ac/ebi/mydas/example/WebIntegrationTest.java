@@ -124,19 +124,17 @@ public class WebIntegrationTest extends WebTestCase {
     public void test_sequence_command_simple(){
         beginAt("/test/sequence?segment=one");
         assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-        assertTextPresent("<!DOCTYPE DASSEQUENCE SYSTEM \"http://www.biodas.org/dtd/dassequence.dtd\">");
         assertTextPresent("<DASSEQUENCE>");
-        assertTextPresent("<SEQUENCE id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" moltype=\"Protein\">FFDYASTDFYASDFAUFDYFVSHCVYTDASVCYT</SEQUENCE>");
+        assertTextPresent("<SEQUENCE id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\">FFDYASTDFYASDFAUFDYFVSHCVYTDASVCYT</SEQUENCE>");
         assertTextPresent("</DASSEQUENCE>");
     }
 
     public void test_sequence_command_complex(){
         beginAt("/test/sequence?segment=one:3,8;segment=two");
         assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-        assertTextPresent("<!DOCTYPE DASSEQUENCE SYSTEM \"http://www.biodas.org/dtd/dassequence.dtd\">");
         assertTextPresent("<DASSEQUENCE>");
-        assertTextPresent("<SEQUENCE id=\"one\" start=\"3\" stop=\"8\" version=\"Up-to-date\" moltype=\"Protein\">DYASTD</SEQUENCE>");
-        assertTextPresent("<SEQUENCE id=\"two\" start=\"1\" stop=\"48\" version=\"Up-to-date\" moltype=\"DNA\">cgatcatcagctacgtacgatcagtccgtacgatcgatcagcatcaca</SEQUENCE>");
+        assertTextPresent("<SEQUENCE id=\"one\" start=\"3\" stop=\"8\" version=\"Up-to-date\">DYASTD</SEQUENCE>");
+        assertTextPresent("<SEQUENCE id=\"two\" start=\"1\" stop=\"48\" version=\"Up-to-date\" label=\"label_two\">cgatcatcagctacgtacgatcagtccgtacgatcgatcagcatcaca</SEQUENCE>");
         assertTextPresent("</DASSEQUENCE>");
     }
     public void test_types_command_all(){
