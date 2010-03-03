@@ -69,18 +69,33 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("</DASDSN>");
     }
 
+    /*
+     * Changed to test the DAS 1.6 format
+     */
     public void test_entry_points_request(){
         beginAt("/test/entry_points");
         assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-        assertTextPresent("<!DOCTYPE DASEP SYSTEM \"http://www.biodas.org/dtd/dasep.dtd\">");
         assertTextPresent("<DASEP>");
-        assertTextPresent("<ENTRY_POINTS href=\"http://localhost:8080/das/test/entry_points\" version=\"Version 1.1\">");
-        assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" type=\"Protein\" orientation=\"+\">Its a protein!</SEGMENT>");
-        assertTextPresent("<SEGMENT id=\"two\" start=\"1\" stop=\"48\" type=\"DNA\" orientation=\"+\">Its a chromosome!</SEGMENT>");
+        assertTextPresent("<ENTRY_POINTS href=\"http://localhost:8080/das/test/entry_points\" version=\"Version 1.1\" total=\"2\">");
+        assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"1\" type=\"Protein\" orientation=\"+\">Its a protein!</SEGMENT>");
+        assertTextPresent("<SEGMENT id=\"two\" start=\"1\" stop=\"48\" type=\"DNA\" orientation=\"+\" subparts=\"yes\">Its a chromosome!</SEGMENT>");
         assertTextPresent("</ENTRY_POINTS>");
         assertTextPresent("</DASEP>");
     }
 
+    /*
+     * Changed to test the DAS 1.6 format
+     */
+    public void test_entry_points_request_with_rows(){
+        beginAt("/test/entry_points?rows=2-2");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+        assertTextPresent("<DASEP>");
+        assertTextPresent("<ENTRY_POINTS href=\"http://localhost:8080/das/test/entry_points?rows=2-2\" version=\"Version 1.1\" total=\"2\" start=\"2\" end=\"2\">");
+        assertTextNotPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"1\" type=\"Protein\" orientation=\"+\">Its a protein!</SEGMENT>");
+        assertTextPresent("<SEGMENT id=\"two\" start=\"1\" stop=\"48\" type=\"DNA\" orientation=\"+\" subparts=\"yes\">Its a chromosome!</SEGMENT>");
+        assertTextPresent("</ENTRY_POINTS>");
+        assertTextPresent("</DASEP>");
+    }
     public void test_dna_command_simple(){
         beginAt("/test/dna?segment=one");
         assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");

@@ -447,8 +447,8 @@ public class TESTDataSource implements ReferenceDataSource {
      */
     public Collection<DasEntryPoint> getEntryPoints() throws DataSourceException {
         List<DasEntryPoint> entryPoints = new ArrayList<DasEntryPoint>();
-        entryPoints.add (new DasEntryPoint("one", 1, 34, "Protein", null, "Its a protein!", false));
-        entryPoints.add (new DasEntryPoint("two", 1, 48, "DNA", DasEntryPointOrientation.POSITIVE_ORIENTATION, "Its a chromosome!", false));
+        entryPoints.add (new DasEntryPoint("one", 1, 34, "Protein","1", null, "Its a protein!", false));
+        entryPoints.add (new DasEntryPoint("two", 1, 48, "DNA",null, DasEntryPointOrientation.POSITIVE_ORIENTATION, "Its a chromosome!", true));
         return entryPoints;
     }
 

@@ -68,7 +68,12 @@ public class DasEntryPoint implements Serializable {
      */
     private String type;
 
-
+    /**
+     * Added for DAS1.6
+     * The version attribute (optional) indicates the version of the reference object, used for coordinate systems which are not themselves versioned.
+     */
+    private String version;
+    
     /**
      * The orientation of the entry point.  Three
      * possible values are available for this and are defined
@@ -123,7 +128,7 @@ public class DasEntryPoint implements Serializable {
      * For the entry_point command, provides the value for the
      * <code>/DASEP/ENTRY_POINTS/SEGMENT</code> element.
      */
-    public DasEntryPoint(String segmentId, int startCoordinate, int stopCoordinate, String type, DasEntryPointOrientation orientation, String description, boolean hasSubparts)
+    public DasEntryPoint(String segmentId, int startCoordinate, int stopCoordinate, String type, String version, DasEntryPointOrientation orientation, String description, boolean hasSubparts)
             throws DataSourceException {
         if (segmentId == null || segmentId.length() == 0){
             throw new DataSourceException("A new DasEntryPoint object must be initialised with a segmentId.");
@@ -133,6 +138,7 @@ public class DasEntryPoint implements Serializable {
         this.startCoordinate = startCoordinate;
         this.stopCoordinate = stopCoordinate;
         this.type = type;
+        this.version=version;
         this.orientation = (orientation == null)
                 ? DasEntryPointOrientation.NO_INTRINSIC_ORIENTATION
                 : orientation;
@@ -213,4 +219,8 @@ public class DasEntryPoint implements Serializable {
     public boolean hasSubparts() {
         return subparts;
     }
+
+	public String getVersion() {
+		return version;
+	}
 }

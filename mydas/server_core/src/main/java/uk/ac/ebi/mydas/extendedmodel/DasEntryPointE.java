@@ -18,10 +18,10 @@ public class DasEntryPointE extends DasEntryPoint {
 
 
 	public DasEntryPointE(String segmentId, int startCoordinate,
-			int stopCoordinate, String type,
+			int stopCoordinate, String type,String version,
 			DasEntryPointOrientation orientation, String description,
 			boolean hasSubparts) throws DataSourceException {
-		super(segmentId, startCoordinate, stopCoordinate, type, orientation,
+		super(segmentId, startCoordinate, stopCoordinate, type,version, orientation,
 				description, hasSubparts);
 	}
 	
@@ -31,7 +31,7 @@ public class DasEntryPointE extends DasEntryPoint {
 	 * @throws DataSourceException
 	 */
 	public DasEntryPointE(DasEntryPoint entryPoint) throws DataSourceException {
-		super(entryPoint.getSegmentId(), entryPoint.getStartCoordinate(), entryPoint.getStopCoordinate(), entryPoint.getType(), entryPoint.getOrientation(),entryPoint.getDescription(), entryPoint.hasSubparts());
+		super(entryPoint.getSegmentId(), entryPoint.getStartCoordinate(), entryPoint.getStopCoordinate(), entryPoint.getType(),entryPoint.getVersion(), entryPoint.getOrientation(),entryPoint.getDescription(), entryPoint.hasSubparts());
 	}
 	
     /**
@@ -47,6 +47,9 @@ public class DasEntryPointE extends DasEntryPoint {
         serializer.attribute(DAS_XML_NAMESPACE, "id", this.getSegmentId());
         serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(this.getStartCoordinate()));
         serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(this.getStopCoordinate()));
+        if (this.getVersion() != null && this.getVersion().length() > 0){
+            serializer.attribute(DAS_XML_NAMESPACE, "version", this.getVersion());
+        }
         if (this.getType() != null && this.getType().length() > 0){
             serializer.attribute(DAS_XML_NAMESPACE, "type", this.getType());
         }

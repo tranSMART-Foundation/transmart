@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -841,9 +842,25 @@ public class DasCommandManager {
 	void entryPointsCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
 	throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException, BadCommandArgumentsException {
 
-		// Check not spurious arguments have been passed to this command.
+		int start=-1;
+		int stop=-1;
 		if (queryString != null && queryString.trim().length() > 0){
-			throw new BadCommandArgumentsException("Unexpected arguments have been passed to the entry_points command.");
+			String[] queryParts = queryString.split("=");
+			if (!queryParts[0].equals("rows"))
+				throw new BadCommandArgumentsException("Unexpected arguments have been passed to the entry_points command.");
+			String[] rows = queryParts[1].split("-");
+			try{
+				start=Integer.parseInt(rows[0]);
+			} catch (NumberFormatException nfe){ 
+				throw new BadCommandArgumentsException("Unexpected arguments(not numeric) have been passed to the entry_points command."); 
+			}
+			try{ 
+				stop=Integer.parseInt(rows[1]); 
+			} catch (NumberFormatException nfe){ 
+				throw new BadCommandArgumentsException("Unexpected arguments(not numeric) have been passed to the entry_points command."); 
+			}
+			if (stop<start)
+				throw new BadCommandArgumentsException("Unexpected arguments(stop lower than start) have been passed to the entry_points command.");
 		}
 
 		if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
@@ -877,15 +894,36 @@ public class DasCommandManager {
 				serializer.startTag(DAS_XML_NAMESPACE, "DASEP");
 				serializer.startTag(DAS_XML_NAMESPACE, "ENTRY_POINTS");
 				serializer.attribute(DAS_XML_NAMESPACE, "href", buildRequestHref(request));
-				serializer.attribute(DAS_XML_NAMESPACE, "version", refDsn.getEntryPointVersion());
+				if (refDsn.getEntryPointVersion()!=null)
+					serializer.attribute(DAS_XML_NAMESPACE, "version", refDsn.getEntryPointVersion());
+				serializer.attribute(DAS_XML_NAMESPACE, "total", ""+entryPoints.size());
 
+				if (start>-1)
+					serializer.attribute(DAS_XML_NAMESPACE, "start", ""+start);
+				else 
+					start=1;
+				if (stop>-1)
+					serializer.attribute(DAS_XML_NAMESPACE, "end", ""+stop);
+				else
+					stop=entryPoints.size();
+
+				Iterator<DasEntryPoint> iterator = entryPoints.iterator();
+				for (int i=0;i<start-1;i++)
+					iterator.next();
+				//DasEntryPoint[] entryPointsA = (DasEntryPoint[]) entryPoints.toArray();
 				// Now for the individual segments.
-				for (DasEntryPoint entryPoint : entryPoints){
+				for (int i=start-1;i<stop;i++){
+					//DasEntryPoint entryPoint=entryPointsA[i];
+					DasEntryPoint entryPoint=iterator.next();
 					if (entryPoint != null){
 						(new DasEntryPointE(entryPoint)).serialize(DAS_XML_NAMESPACE, serializer);
 					}
 				}
 				serializer.endTag(DAS_XML_NAMESPACE, "ENTRY_POINTS");
+				serializer.startTag(DAS_XML_NAMESPACE, "QUERY");
+				serializer.text(""+queryString);
+				serializer.endTag(DAS_XML_NAMESPACE, "QUERY");
+				
 				serializer.endTag(DAS_XML_NAMESPACE, "DASEP");
 
 				serializer.flush();
