@@ -24,7 +24,6 @@
 package uk.ac.ebi.mydas.controller;
 
 import uk.ac.ebi.mydas.model.DasFeature;
-import uk.ac.ebi.mydas.model.DasGroup;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,6 +47,9 @@ public class DasFeatureRequestFilter {
 
     private Collection<String> featureIds = null;
 
+    /**
+     * @deprecated
+     */
     private Collection<String> groupIds = null;
 
 
@@ -76,6 +78,9 @@ public class DasFeatureRequestFilter {
         }
     }
 
+    /**
+     * @deprecated
+     */
     void addGroupId (String groupId){
         if (groupId != null){
             if (groupIds == null) groupIds = new ArrayList<String>();
@@ -87,16 +92,28 @@ public class DasFeatureRequestFilter {
         return featureIds != null && featureIds.size() > 0;
     }
 
+	/**
+	 * @deprecated
+	 */    
     boolean containsGroupIds(){
         return groupIds != null && groupIds.size() > 0;
     }
 
     Collection<String> getFeatureIds(){
-        return (featureIds == null) ? Collections.EMPTY_LIST : featureIds;
+        if (featureIds == null)
+			return Collections.emptyList();
+		else
+			return featureIds;
     }
 
+	/**
+	 * @deprecated
+	 */    
     Collection<String> getGroupIds(){
-        return (groupIds == null) ? Collections.EMPTY_LIST : groupIds;
+        if (groupIds == null)
+			return Collections.emptyList();
+		else
+			return groupIds;
     }
 
     /**
@@ -111,29 +128,30 @@ public class DasFeatureRequestFilter {
             return false;
         }
 
-        if (!(typeIds == null || (feature.getTypeId() != null && typeIds.contains(feature.getTypeId())))){
+        if (!(typeIds == null || (feature.getType().getId() != null && typeIds.contains(feature.getType().getId())))){
             return false;
         }
 
-        if (!(categoryIds == null || (feature.getTypeCategory() != null && categoryIds.contains(feature.getTypeCategory())))){
+        if (!(categoryIds == null || (feature.getType().getCategory() != null && categoryIds.contains(feature.getType().getCategory())))){
             return false;
         }
 
-        if (groupIds != null){
-            if (feature.getGroups() == null){
-                return false;
-            }
-
-            boolean matchesGroupId = false;
-            for (DasGroup dasGroup : feature.getGroups()){
-                if (dasGroup.getGroupId() != null && groupIds.contains(dasGroup.getGroupId())){
-                    matchesGroupId = true;
-                }
-            }
-
-            if (! matchesGroupId)
-                return false;
-        }
+        //DAS1.6: groups are not part of the specs anymore, then the filter by group is eliminated 
+//        if (groupIds != null){
+//            if (feature.getGroups() == null){
+//                return false;
+//            }
+//
+//            boolean matchesGroupId = false;
+//            for (DasGroup dasGroup : feature.getGroups()){
+//                if (dasGroup.getGroupId() != null && groupIds.contains(dasGroup.getGroupId())){
+//                    matchesGroupId = true;
+//                }
+//            }
+//
+//            if (! matchesGroupId)
+//                return false;
+//        }
 
         return true;
     }

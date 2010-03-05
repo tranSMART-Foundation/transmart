@@ -4,9 +4,9 @@ import java.io.IOException;
 
 import org.xmlpull.v1.XmlSerializer;
 
-import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.model.DasMethod;
 
+@SuppressWarnings("serial")
 public class DasMethodE extends DasMethod {
 
 	/**
@@ -14,8 +14,16 @@ public class DasMethodE extends DasMethod {
 	 * @param id Method id
 	 * @param label label of the method
 	 */
-	public DasMethodE(String id, String label) {
-		super(id, label);
+	public DasMethodE(String id, String label,String cvId) {
+		super(id, label,cvId);
+	}
+	/**
+	 * Constructor to create a method from the parent
+	 * @param id Method id
+	 * @param label label of the method
+	 */
+	public DasMethodE(DasMethod method) {
+		super(method.getId(), method.getLabel(),method.getCvId());
 	}
 	/**
 	 * Generates the piece of XML into the XML serializer object to describe a DasMethod 
@@ -29,6 +37,9 @@ public class DasMethodE extends DasMethod {
         serializer.startTag(DAS_XML_NAMESPACE, "METHOD");
         if (this.getId() != null && this.getId().length() > 0){
             serializer.attribute(DAS_XML_NAMESPACE, "id", this.getId());
+        }
+        if (this.getCvId() != null && this.getCvId().length() > 0){
+            serializer.attribute(DAS_XML_NAMESPACE, "cvId", this.getCvId());
         }
         if (this.getLabel() != null && this.getLabel().length() > 0){
             serializer.text(this.getLabel());

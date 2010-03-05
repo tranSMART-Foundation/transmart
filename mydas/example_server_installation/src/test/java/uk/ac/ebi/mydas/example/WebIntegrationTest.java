@@ -166,32 +166,44 @@ public class WebIntegrationTest extends WebTestCase {
     public void test_features_command_unknown(){
         beginAt("/test/features?segment=unknown");
         assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-        assertTextPresent("<!DOCTYPE DASGFF SYSTEM \"http://www.biodas.org/dtd/dasgff.dtd\">");
         assertTextPresent("<ERRORSEGMENT id=\"unknown\" />");
     }
     public void test_features_command_one(){
         beginAt("/test/features?segment=one");
         assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-        assertTextPresent("<!DOCTYPE DASGFF SYSTEM \"http://www.biodas.org/dtd/dasgff.dtd\">");
         assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
         assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
-        assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
-        assertTextPresent("<METHOD id=\"CV:00001\">one Feature Method Label One</METHOD>");
+        assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
+        assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
         assertTextPresent("START>5</START>");
         assertTextPresent("<END>10</END>");
         assertTextPresent("<SCORE>123.45</SCORE>");
-        assertTextPresent("<ORIENTATION>0</ORIENTATION>");
-        assertTextPresent("<PHASE>-</PHASE>");
+        assertTextNotPresent("<ORIENTATION>0</ORIENTATION>");
+        assertTextNotPresent("<PHASE>-</PHASE>");
         assertTextPresent("<NOTE>This is a note relating to feature one of segment one.</NOTE>");
         assertTextPresent("<LINK href=\"http://code.google.com/p/mydas/\">mydas project home page.</LINK>");
         assertTextPresent("<TARGET id=\"oneTargetId\" start=\"20\" stop=\"30\">oneTargetName</TARGET>");
-        assertTextPresent("<GROUP id=\"oneGroupId\" label=\"one Group Label\" type=\"onegrouptype\">");
-        assertTextPresent("<NOTE>A note on the group for reference one.</NOTE>");
-        assertTextPresent("<LINK href=\"http://code.google.com/p/mydas/\">mydas project home page.</LINK>");
-        assertTextPresent("<TARGET id=\"oneTargetId\" start=\"20\" stop=\"30\">oneTargetName</TARGET>");
-        assertTextPresent("</GROUP>");
         assertTextPresent("</FEATURE>");
         assertTextPresent("<FEATURE id=\"oneFeatureIdTwo\" label=\"one Feature Label Two\">");
+        assertTextPresent("</SEGMENT>");
+    }
+    public void test_features_command_one_maxbins(){
+        beginAt("/test/features?segment=one;maxbins=1");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+        assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+        assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
+        assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
+        assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
+        assertTextPresent("START>5</START>");
+        assertTextPresent("<END>10</END>");
+        assertTextPresent("<SCORE>123.45</SCORE>");
+        assertTextNotPresent("<ORIENTATION>0</ORIENTATION>");
+        assertTextNotPresent("<PHASE>-</PHASE>");
+        assertTextPresent("<NOTE>This is a note relating to feature one of segment one.</NOTE>");
+        assertTextPresent("<LINK href=\"http://code.google.com/p/mydas/\">mydas project home page.</LINK>");
+        assertTextPresent("<TARGET id=\"oneTargetId\" start=\"20\" stop=\"30\">oneTargetName</TARGET>");
+        assertTextPresent("</FEATURE>");
+        assertTextNotPresent("<FEATURE id=\"oneFeatureIdTwo\" label=\"one Feature Label Two\">");
         assertTextPresent("</SEGMENT>");
     }
     

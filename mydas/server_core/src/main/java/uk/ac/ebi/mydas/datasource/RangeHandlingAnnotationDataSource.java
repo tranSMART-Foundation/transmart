@@ -70,6 +70,6 @@ public interface RangeHandlingAnnotationDataSource extends AnnotationDataSource{
      * @throws uk.ac.ebi.mydas.exceptions.CoordinateErrorException should be thrown if the requested coordinates
      * fall outside the bounds of the requested segments.
      */
-    public DasAnnotatedSegment getFeatures(String segmentId, int start, int stop) throws BadReferenceObjectException, CoordinateErrorException, DataSourceException;
+    public DasAnnotatedSegment getFeatures(String segmentId, int start, int stop,Integer maxbins) throws BadReferenceObjectException, CoordinateErrorException, DataSourceException;
 
 }

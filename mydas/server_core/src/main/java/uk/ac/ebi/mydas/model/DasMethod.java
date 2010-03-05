@@ -1,6 +1,7 @@
 package uk.ac.ebi.mydas.model;
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class DasMethod implements Serializable{
     /**
      * the method id
@@ -12,11 +13,18 @@ public class DasMethod implements Serializable{
      */
     private String label;
     
+    /**
+     * Added for DAS1.6
+     * Ontology term ID from the Evidence Codes Ontology.
+     */
+    private String cvId;
+    
     public DasMethod(){}
 
-	public DasMethod(String id, String label) {
+	public DasMethod(String id, String label,String cvId) {
 		this.id = id;
 		this.label = label;
+		this.cvId=cvId;
 	}
 
 	public String getId() {
@@ -33,6 +41,10 @@ public class DasMethod implements Serializable{
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public String getCvId() {
+		return cvId;
 	}
     
 	

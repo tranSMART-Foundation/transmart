@@ -474,7 +474,7 @@ public class DasCommandManager {
 		Map <FoundFeaturesReporter, Map<DasType, Integer>> typesReport =
 			new HashMap<FoundFeaturesReporter, Map<DasType, Integer>>(requestedSegments.size());
 		// For each segment, populate the typesReport with 'all types' if necessary and then add types and counts.
-		Collection<SegmentReporter> segmentReporters = this.getFeatureCollection(dsnConfig, requestedSegments, false);
+		Collection<SegmentReporter> segmentReporters = this.getFeatureCollection(dsnConfig, requestedSegments, false,null);
 		for (SegmentReporter uncastReporter : segmentReporters){
 			// Try to get the features for this segment
 			if (uncastReporter instanceof FoundFeaturesReporter){
@@ -500,8 +500,8 @@ public class DasCommandManager {
 				// Now iterate over the features of the segment and update the types report.
 				for (DasFeature feature : segmentReporter.getFeatures(dsnConfig.isFeaturesStrictlyEnclosed())){
 					// (Filtering as requested for type ids)
-					if (typeFilter.size() == 0 || typeFilter.contains(feature.getTypeId())){
-						DasType featureType = new DasType(feature.getTypeId(), feature.getTypeCategory(), feature.getMethodId());
+					if (typeFilter.size() == 0 || typeFilter.contains(feature.getType().getId())){
+						DasType featureType = feature.getType();
 						if (segmentTypes.keySet().contains(featureType)){
 							segmentTypes.put(featureType, segmentTypes.get(featureType) + 1);
 						}
@@ -658,6 +658,7 @@ public class DasCommandManager {
 		String[] queryParts = queryString.split(";");
 		DasFeatureRequestFilter filter = new DasFeatureRequestFilter ();
 		boolean categorize = true;
+		Integer maxbins=null;
 		for (String queryPart : queryParts){
 			// Now determine what each part is, and construct the query.
 			Matcher segmentRangeMatcher = SEGMENT_RANGE_PATTERN.matcher(queryPart);
@@ -691,10 +692,19 @@ public class DasCommandManager {
 				else if ("feature_id".equals (key)){
 					filter.addFeatureId(value);
 				}
-				// else check for groupId restriction
-				else if ("group_id".equals (key)){
-					filter.addGroupId(value);
+				// else check for maxbean restriction
+				else if ("maxbins".equals (key)){
+					try{
+						maxbins = new Integer(value);
+					}catch(NumberFormatException nfe){
+						throw new BadCommandArgumentsException("Bad command arguments to the features command. the maxbeans attribute should be Numeric: " + queryString);
+					}
 				}
+				// DAS1.6: The groups have been eliminated, and with it the filter by group
+				//else check for groupId restriction
+//				else if ("group_id".equals (key)){
+//					filter.addGroupId(value);
+//				}
 				// Any command parameters that are not recognised should be ignored
 				// This is a change from version 1.01 - some 1.53E commands were causing
 				// service failure.
@@ -710,14 +720,14 @@ public class DasCommandManager {
 		// from the data source.  (getFeatureCollection method shared with the 'types' command.)
 		Collection<SegmentReporter> segmentReporterCollections;
 		if (requestedSegments.size() > 0){
-			segmentReporterCollections = getFeatureCollection(dsnConfig, requestedSegments, true);
+			segmentReporterCollections = getFeatureCollection(dsnConfig, requestedSegments, true,maxbins);
 		}
 		else {
 			// No segments have been requested, so instead check for either feature_id or group_id filters.
 			// (If neither of these are present, then throw a BadCommandArgumentsException)
-			if (filter.containsFeatureIds() || filter.containsGroupIds()){
+			if (filter.containsFeatureIds() ){
 				Collection<DasAnnotatedSegment> annotatedSegments =
-					dsnConfig.getDataSource().getFeatures(filter.getFeatureIds(), filter.getGroupIds());
+					dsnConfig.getDataSource().getFeatures(filter.getFeatureIds(),maxbins);
 				if (annotatedSegments != null){
 					segmentReporterCollections = new ArrayList<SegmentReporter>(annotatedSegments.size());
 					for (DasAnnotatedSegment segment : annotatedSegments){
@@ -754,13 +764,13 @@ public class DasCommandManager {
 				serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getFeaturesXSLT());
 				serializer.text("\n");
 			}
-			serializer.docdecl(" DASGFF SYSTEM \"http://www.biodas.org/dtd/dasgff.dtd\"");
-			serializer.text("\n");
+//			serializer.docdecl(" DASGFF SYSTEM \"http://www.biodas.org/dtd/dasgff.dtd\"");
+//			serializer.text("\n");
 
 			// Rest of the XML.
 			serializer.startTag(DAS_XML_NAMESPACE, "DASGFF");
 			serializer.startTag(DAS_XML_NAMESPACE, "GFF");
-			serializer.attribute(DAS_XML_NAMESPACE, "version", "1.0");
+			//the version has been deprecated from  
 			serializer.attribute(DAS_XML_NAMESPACE, "href", buildRequestHref(request));
 			for (SegmentReporter segmentReporter : segmentReporterCollections){
 				if (segmentReporter instanceof UnknownSegmentReporter){
@@ -882,7 +892,7 @@ public class DasCommandManager {
 	 */
 	private Collection<SegmentReporter> getFeatureCollection(DataSourceConfiguration dsnConfig,
 			List <SegmentQuery> requestedSegments,
-			boolean unknownSegmentsHandled
+			boolean unknownSegmentsHandled,Integer maxbins
 	)
 	throws DataSourceException, BadReferenceObjectException, CoordinateErrorException {
 		List<SegmentReporter> segmentReporterLists = new ArrayList<SegmentReporter>(requestedSegments.size());
@@ -894,6 +904,8 @@ public class DasCommandManager {
 				// Build the key name for the cache.
 				StringBuffer cacheKeyBuffer = new StringBuffer(dsnConfig.getId());
 				cacheKeyBuffer.append("_FEATURES_");
+				if (maxbins!=null)
+					cacheKeyBuffer.append("_MAXBEANS_"+maxbins+"_");
 				if (dataSource instanceof RangeHandlingAnnotationDataSource || dataSource instanceof RangeHandlingReferenceDataSource){
 					// May return DasSequence objects containing partial sequences, so include segment id, start and stop coordinates in the key:
 					cacheKeyBuffer.append(segmentQuery.toString());
@@ -918,7 +930,7 @@ public class DasCommandManager {
 					try{
 						if (segmentQuery.getStartCoordinate() == null){
 							// Easy request - just want all the features on the segment.
-							annotatedSegment = dataSource.getFeatures(segmentQuery.getSegmentId());
+							annotatedSegment = dataSource.getFeatures(segmentQuery.getSegmentId(),maxbins);
 						}
 						else {
 							// Restricted to coordinates.
@@ -926,17 +938,20 @@ public class DasCommandManager {
 								annotatedSegment = ((RangeHandlingAnnotationDataSource)dataSource).getFeatures(
 										segmentQuery.getSegmentId(),
 										segmentQuery.getStartCoordinate(),
-										segmentQuery.getStopCoordinate());
+										segmentQuery.getStopCoordinate(),
+										maxbins);
 							}
 							else if (dataSource instanceof RangeHandlingReferenceDataSource){
 								annotatedSegment = ((RangeHandlingReferenceDataSource)dataSource).getFeatures(
 										segmentQuery.getSegmentId(),
 										segmentQuery.getStartCoordinate(),
-										segmentQuery.getStopCoordinate());
+										segmentQuery.getStopCoordinate(),
+										maxbins);
 							}
 							else {
 								annotatedSegment = dataSource.getFeatures(
-										segmentQuery.getSegmentId());
+										segmentQuery.getSegmentId(),
+										maxbins);
 							}
 						}
 						if (logger.isDebugEnabled()){

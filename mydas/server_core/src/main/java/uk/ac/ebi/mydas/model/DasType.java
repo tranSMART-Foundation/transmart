@@ -60,6 +60,8 @@ public class DasType implements Serializable {
      */
     private String cvId;
 
+    private String label;
+
     /**
      * Constructor for a DasType object.  The id field is mandatory, however the category and / or the method
      * are optional parameters.
@@ -68,13 +70,14 @@ public class DasType implements Serializable {
      * @param category <i>Optional</i> the category of the type.
      * @param cvId <i>Optional, Recommended </i> is the ID of a term from a relevant controlled vocabulary (SO, MOD, BS).
      */
-    public DasType(String id, String category, String cvId){
+    public DasType(String id, String category, String cvId,String label){
         if (id == null || id.length() == 0){
             throw new IllegalArgumentException("id must not be null or an empty String");
         }
         this.id = id;
         this.category = category;
         this.cvId = cvId;
+        this.label=label;
     }
 
     /**
@@ -150,5 +153,8 @@ public class DasType implements Serializable {
 
 	public String getCvId() {
 		return cvId;
+	}
+	public String getLabel() {
+		return label;
 	}
 }

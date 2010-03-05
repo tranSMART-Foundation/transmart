@@ -67,6 +67,7 @@ public class DasFeature implements Serializable {
     protected final String featureLabel;
 
     /**
+     * @deprecated
      * <b>Mandatory</b>
      *
      * For the features command, provides the value for
@@ -75,9 +76,10 @@ public class DasFeature implements Serializable {
      * For the types command, provides the value for
      * /DASTYPES/GFF/SEGMENT/TYPE/@id
      */
-    protected final String typeId;
+    protected  String typeId;
 
     /**
+     * @deprecated
      *  <b>Optional</b> but recommended
      *
      * For the features command, provides the value for
@@ -86,34 +88,60 @@ public class DasFeature implements Serializable {
      * For the types command, provides the value for
      * /DASTYPES/GFF/SEGMENT/TYPE/@category
      */
-    protected final String typeCategory;
+    protected  String typeCategory;
 
     /**
+     * @deprecated
      *  <b>Optional</b>
      *
      * For the features command, provides the value for
      * /DASGFF/GFF/SEGMENT/FEATURE/TYPE
      */
-    protected final String typeLabel;
+    protected  String typeLabel;
 
     /**
+     * @deprecated
      *  <b>Optional</b> but highly recommended!
      *
      * For the features command, provides the value for
      * /DASGFF/GFF/SEGMENT/FEATURE/METHOD/@id
      */
-    protected final String methodId;
+    protected  String methodId;
 
     /**
+     * @deprecated
      *  <b>Optional</b>
      *
      * For the features command, provides the value for
      * /DASGFF/GFF/SEGMENT/FEATURE/METHOD
      */
-    protected final String methodLabel;
+    protected  String methodLabel;
 
+    
     /**
+     * 
+     * Created for DAS1.6
      * <b>Mandatory</b>
+     * 
+     * Each feature has just one TYPE field, which indicates the type of the annotation.
+     * 
+     */
+    protected final DasType type;
+    
+    /**
+     * 
+     * Created for DAS1.6
+     * <b>Mandatory</b>
+     * 
+     * Each feature has one <METHOD> field, which identifies the method used to identify the feature.
+     * 
+     */
+    protected final DasMethod method;
+    
+    
+    /**
+     * Updated for DAS1.6
+     * <b>Optional</b>
      *
      * For the features command, provides the value for
      * /DASGFF/GFF/SEGMENT/FEATURE/START
@@ -123,11 +151,15 @@ public class DasFeature implements Serializable {
      * <i>DAS servers are often required to serve non-positional features, such as descriptions (of the entire
      * segment) or related citations.  A commonly accepted mechanism is to give non-positional features start
      * and end coordinates of 0, however this is not enforced and is not part of the DAS 1.53 specification.</i>
-     */
+     * 
+     * DAS 1.6: <i>It will be omitted if equal to 0, where is indicating a non-positional feature</i>
+     * 
+     */    
     protected final int startCoordinate;
 
     /**
-     * <b>Mandatory</b>
+     * Updated for DAS1.6
+     * <b>Optional</b>
      *
      * For the features command, provides the value for
      * /DASGFF/GFF/SEGMENT/FEATURE/END
@@ -137,19 +169,26 @@ public class DasFeature implements Serializable {
      * <i>DAS servers are often required to serve non-positional features, such as descriptions (of the entire
      * segment) or related citations.  A commonly accepted mechanism is to give non-positional features start
      * and end coordinates of 0, however this is not enforced and is not part of the DAS 1.53 specification.</i>
+     * 
+     * DAS 1.6: <i>It will be omitted if equal to 0, where is indicating a non-positional feature</i>
      */
     protected final int endCoordinate;
 
     /**
-     * <b>Mandatory</b>
+     * Updated for DAS1.6
+     * <b>optional; one per FEATURE</b>
      *
      * For the features command, provides the value for
      * /DASGFF/GFF/SEGMENT/FEATURE/SCORE
+     * 
+     * null will be serialize as '-' If this field is inapplicable
+     * 
      */
     protected final Double score;
 
     /**
-     * <b>Mandatory</b>
+     * Updated for DAS1.6
+     * <b>Optional; one per FEATURE</b>
      *
      * Select a value from:
      * <ul>
@@ -160,11 +199,18 @@ public class DasFeature implements Serializable {
      *
      * For the features command, provides the value for
      * /DASGFF/GFF/SEGMENT/FEATURE/ORIENTATION
+
+     * This tag indicates the orientation of the feature relative to 
+     * the direction of transcription. It may be 0 for features that 
+     * are unrelated to transcription, +, for features that are on the 
+     * sense strand, and -, for features on the antisense strand. 
+     * If this tag is omitted, a value of 0 is assumed.
      */
     protected final DasFeatureOrientation orientation;
 
     /**
-     * <b>Mandatory</b>
+     * Updated for DAS1.6
+     * <b>Optional; one per FEATURE</b>
      *
      * Select a value from:
      * DasFeature.PHASE_READING_FRAME_0
@@ -174,6 +220,12 @@ public class DasFeature implements Serializable {
      *
      * For the features command, provides the value for
      * /DASGFF/GFF/SEGMENT/FEATURE/PHASE
+     * 
+     * This tag indicates the position of the feature relative to open 
+     * reading frame, if any. It may be one of the integers 0, 1 or 2, 
+     * corresponding to each of the three reading frames, or - if the 
+     * feature is unrelated to a reading frame. 
+     * If this tag is omitted, a value of - is assumed.
      */
     protected final DasPhase phase;
 
@@ -214,6 +266,23 @@ public class DasFeature implements Serializable {
     protected final Collection<DasTarget> targets;
 
     /**
+     * Created for DAS 1.6
+     * 
+     * These tags identify other features that are parents 
+     * of this feature within a hierarchy. 
+     */
+    protected Collection<String> parents;
+
+    /**
+     * Created for DAS 1.6
+     * 
+     * These tags identify other features that are children 
+     * of this feature within a hierarchy. 
+     */
+    protected Collection<String> parts;
+    
+    /**
+     * @deprecated
      * <b>Optional</b> - May be <code>null</code>.
      *
      * For the features command, provides the values for
@@ -224,7 +293,7 @@ public class DasFeature implements Serializable {
      * See the documentation of the {@link DasGroup} class
      * for details of how this class maps to the DAS XML.
      */
-    protected final Collection<DasGroup> groups;
+    protected  Collection<DasGroup> groups;
 
     /**
      *
@@ -285,11 +354,8 @@ public class DasFeature implements Serializable {
      */
     public DasFeature(String featureId,
                       String featureLabel,
-                      String typeId,
-                      String typeCategory,
-                      String typeLabel,
-                      String methodId,
-                      String methodLabel,
+                      DasType type,
+                      DasMethod method,
                       int startCoordinate,
                       int endCoordinate,
                       Double score,
@@ -298,9 +364,10 @@ public class DasFeature implements Serializable {
                       Collection<String> notes,
                       Map<URL, String> links,
                       Collection<DasTarget> targets,
-                      Collection<DasGroup> groups) throws DataSourceException {
+                      Collection<String> parents,
+                      Collection<String> parts) throws DataSourceException {
 
-        if (featureId == null || typeId == null){
+        if (featureId == null || type == null){
             throw new DataSourceException ("An attempt to instantiate a DasFeature object without the minimal required mandatory values.");
         }
         if (orientation == null) {
@@ -311,11 +378,8 @@ public class DasFeature implements Serializable {
         }
         this.featureId = featureId;
         this.featureLabel = featureLabel;
-        this.typeId = typeId;
-        this.typeCategory = typeCategory;
-        this.typeLabel = typeLabel;
-        this.methodId = methodId;
-        this.methodLabel = methodLabel;
+        this.type = type;
+        this.method = method;
         this.startCoordinate = startCoordinate;
         this.endCoordinate = endCoordinate;
         this.score = score;
@@ -324,7 +388,8 @@ public class DasFeature implements Serializable {
         this.notes = notes;
         this.links = links;
         this.targets = targets;
-        this.groups = groups;
+        this.parents = parents;
+        this.parts = parts;
     }
 
 
@@ -336,22 +401,37 @@ public class DasFeature implements Serializable {
         return featureLabel;
     }
 
+    /**
+     * @deprecated
+     */
     public String getTypeId() {
         return typeId;
     }
 
+    /**
+     * @deprecated
+     */
     public String getTypeCategory() {
         return typeCategory;
     }
 
+    /**
+     * @deprecated
+     */
     public String getTypeLabel() {
         return typeLabel;
     }
 
+    /**
+     * @deprecated
+     */
     public String getMethodId() {
         return methodId;
     }
 
+    /**
+     * @deprecated
+     */
     public String getMethodLabel() {
         return methodLabel;
     }
@@ -388,6 +468,9 @@ public class DasFeature implements Serializable {
         return targets;
     }
 
+    /**
+     * @deprecated
+     */
     public Collection<DasGroup> getGroups() {
         return groups;
     }
@@ -403,18 +486,16 @@ public class DasFeature implements Serializable {
         if (startCoordinate != that.startCoordinate) return false;
         if (!featureId.equals(that.featureId)) return false;
         if (featureLabel != null ? !featureLabel.equals(that.featureLabel) : that.featureLabel != null) return false;
-        if (groups != null ? !groups.equals(that.groups) : that.groups != null) return false;
+        if (parents != null ? !parents.equals(that.parents) : that.parents != null) return false;
+        if (parts != null ? !parts.equals(that.parts) : that.parts != null) return false;
         if (links != null ? !links.equals(that.links) : that.links != null) return false;
-        if (methodId != null ? !methodId.equals(that.methodId) : that.methodId != null) return false;
-        if (methodLabel != null ? !methodLabel.equals(that.methodLabel) : that.methodLabel != null) return false;
+        if (method != null ? !method.equals(that.method) : that.method != null) return false;
         if (notes != null ? !notes.equals(that.notes) : that.notes != null) return false;
         if (!orientation.equals(that.orientation)) return false;
         if (!phase.equals(that.phase)) return false;
         if (!score.equals(that.score)) return false;
         if (targets != null ? !targets.equals(that.targets) : that.targets != null) return false;
-        if (typeCategory != null ? !typeCategory.equals(that.typeCategory) : that.typeCategory != null) return false;
-        if (!typeId.equals(that.typeId)) return false;
-        if (typeLabel != null ? !typeLabel.equals(that.typeLabel) : that.typeLabel != null) return false;
+        if (!type.equals(that.type)) return false;
 
         return true;
     }
@@ -423,11 +504,8 @@ public class DasFeature implements Serializable {
         int result;
         result = featureId.hashCode();
         result = 31 * result + (featureLabel != null ? featureLabel.hashCode() : 0);
-        result = 31 * result + typeId.hashCode();
-        result = 31 * result + (typeCategory != null ? typeCategory.hashCode() : 0);
-        result = 31 * result + (typeLabel != null ? typeLabel.hashCode() : 0);
-        result = 31 * result + (methodId != null ? methodId.hashCode() : 0);
-        result = 31 * result + (methodLabel != null ? methodLabel.hashCode() : 0);
+        result = 31 * result + type.hashCode();
+        result = 31 * result + (method != null ? method.hashCode() : 0);
         result = 31 * result + startCoordinate;
         result = 31 * result + endCoordinate;
         result = 31 * result + score.hashCode();
@@ -436,7 +514,28 @@ public class DasFeature implements Serializable {
         result = 31 * result + (notes != null ? notes.hashCode() : 0);
         result = 31 * result + (links != null ? links.hashCode() : 0);
         result = 31 * result + (targets != null ? targets.hashCode() : 0);
-        result = 31 * result + (groups != null ? groups.hashCode() : 0);
+        result = 31 * result + (parents != null ? parents.hashCode() : 0);
+        result = 31 * result + (parts != null ? parts.hashCode() : 0);
         return result;
     }
+
+
+	public DasType getType() {
+		return type;
+	}
+
+
+	public DasMethod getMethod() {
+		return method;
+	}
+
+
+	public Collection<String> getParents() {
+		return parents;
+	}
+
+
+	public Collection<String> getParts() {
+		return parts;
+	}
 }

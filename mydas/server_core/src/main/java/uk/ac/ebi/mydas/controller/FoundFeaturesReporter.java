@@ -24,6 +24,7 @@
 package uk.ac.ebi.mydas.controller;
 
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
+import uk.ac.ebi.mydas.model.DasComponentFeature;
 import uk.ac.ebi.mydas.model.DasFeature;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.extendedmodel.*;
@@ -125,15 +126,26 @@ public class FoundFeaturesReporter implements SegmentReporter {
 		serializer.attribute(DAS_XML_NAMESPACE, "stop", (this.getStop() == null)
 				? ""
 						: Integer.toString(this.getStop()));
+		
 		if (this.getType() != null && this.getType().length() > 0){
 			serializer.attribute(DAS_XML_NAMESPACE, "type", this.getType());
 		}
-		serializer.attribute(DAS_XML_NAMESPACE, "version", this.getVersion());
+		//version is ptional in DAS 1.6
+		if (this.getVersion()!=null)
+			serializer.attribute(DAS_XML_NAMESPACE, "version", this.getVersion());
+		
 		if (this.getSegmentLabel() != null && this.getSegmentLabel().length() > 0){
 			serializer.attribute(DAS_XML_NAMESPACE, "label", this.getSegmentLabel());
 		}
 		for (DasFeature feature : this.getFeatures(isFeaturesStrictlyEnclosed)){
-			(new DasFeatureE(feature)).serialize(DAS_XML_NAMESPACE, serializer, filter, categorize, isUseFeatureIdForFeatureLabel);
+            boolean hasSuperParts=false;
+            boolean hasSubParts=false;
+            if (feature instanceof DasComponentFeature){
+                DasComponentFeature refFeature = (DasComponentFeature)(DasFeature)feature;
+                hasSuperParts=refFeature.hasSuperParts();
+                hasSubParts=refFeature.hasSubParts();
+            }
+			(new DasFeatureE(feature)).serialize(DAS_XML_NAMESPACE, serializer, filter, categorize, isUseFeatureIdForFeatureLabel,feature instanceof DasComponentFeature,hasSuperParts,hasSubParts);
 		}
 		serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
 

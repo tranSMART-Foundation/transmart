@@ -24,6 +24,7 @@
 package uk.ac.ebi.mydas.model;
 
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
+import uk.ac.ebi.mydas.extendedmodel.DasFeatureE;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -71,7 +72,8 @@ import java.io.Serializable;
  * features command, with the third tier being hinted at in the /DASGFF/GFF/SEGMENT/FEATURE/TYPE/@superparts or
  * /DASGFF/GFF/SEGMENT/FEATURE/TYPE/@subparts attributes of the second-tier components.
  */
-public class DasComponentFeature extends DasFeature implements Serializable {
+@SuppressWarnings("serial")
+public class DasComponentFeature extends DasFeatureE implements Serializable {
 
     private Collection<DasComponentFeature> subComponents = null;
 
@@ -83,11 +85,8 @@ public class DasComponentFeature extends DasFeature implements Serializable {
                     String componentTargetLabel,
                     int startCoordinateOnComponent,
                     int endCoordinateOnComponent,
-                    String typeId,
-                    String category,
-                    String typeLabel,
-                    String methodId,
-                    String methodLabel,
+                    DasType type,
+                    DasMethod method,
                     int startCoodinateOnSegment,
                     int endCoordinateOnSegment,
                     Double score,
@@ -98,21 +97,19 @@ public class DasComponentFeature extends DasFeature implements Serializable {
         throws DataSourceException {
 
         super(
-                featureId,
-                featureLabel,
-                typeId,
-                category,
-                typeLabel,
-                methodId,
-                methodLabel,
-                startCoodinateOnSegment,
-                endCoordinateOnSegment,
-                score,
-                orientation,
-                phase,
-                notes,
-                links,
+        		featureId, 
+        		featureLabel, 
+        		type, 
+        		method, 
+        		startCoodinateOnSegment, 
+        		endCoordinateOnSegment,
+				score, 
+				orientation, 
+				phase, 
+				notes, 
+				links, 
                 new ArrayList<DasTarget>(1),
+                null,
                 null
         );
         DasTarget componentTarget = new DasTarget(targetSegmentId, startCoordinateOnComponent, endCoordinateOnComponent, componentTargetLabel);
@@ -122,23 +119,22 @@ public class DasComponentFeature extends DasFeature implements Serializable {
 
     DasComponentFeature(DasAnnotatedSegment segment) throws DataSourceException {
         super(
-                segment.getSegmentId(),
-                null,
-                "ThisSegment",
-                "component",
-                null,
-                "assembly",
-                null,
+        		segment.getSegmentId(),
+        		null, 
+        		new DasType("ThisSegment", "component", null,null), 
+        		new DasMethod("assembly", null,null), 
                 segment.getStartCoordinate(),
                 segment.getStopCoordinate(),
-                0.00,
+				0.00, 
                 DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
                 DasPhase.PHASE_NOT_APPLICABLE,
                 null,
                 null,
                 new ArrayList<DasTarget>(1),
+                null,
                 null
         );
+
         this.getTargets().add(
                 new DasTarget(
                     segment.getSegmentId(),
@@ -165,28 +161,6 @@ public class DasComponentFeature extends DasFeature implements Serializable {
         return superComponents != null && superComponents.size() > 0;
     }
 
-    /**
-     *
-     * @param componentFeatureId
-     * @param startCoordinateOnSegment
-     * @param stopCoordinateOnSegment
-     * @param startCoordinateOnComponent
-     * @param stopCoordinateOnComponent
-     * @param componentFeatureLabel
-     * @param componentTypeId
-     * @param componentTypeLabel
-     * @param targetSegmentId
-     * @param componentTargetLabel
-     * @param componentMethodId
-     * @param componentMethodLabel
-     * @param componentScore
-     * @param componentOrientation
-     * @param componentPhase
-     * @param componentNotes
-     * @param componentLinks
-     * @return
-     * @throws DataSourceException
-     */
     public DasComponentFeature addSubComponent(
                                 String componentFeatureId,
                                 int startCoordinateOnSegment,
@@ -194,12 +168,10 @@ public class DasComponentFeature extends DasFeature implements Serializable {
                                 int startCoordinateOnComponent,
                                 int stopCoordinateOnComponent,
                                 String componentFeatureLabel,
-                                String componentTypeId,
-                                String componentTypeLabel,
+                                DasType componentType,
                                 String targetSegmentId,
                                 String componentTargetLabel,
-                                String componentMethodId,
-                                String componentMethodLabel,
+                                DasMethod componentMethod,
                                 Double componentScore,
                                 DasFeatureOrientation componentOrientation,
                                 DasPhase componentPhase,
@@ -213,27 +185,27 @@ public class DasComponentFeature extends DasFeature implements Serializable {
         }
 
         DasComponentFeature newSubComponent = new DasComponentFeature(
-                componentFeatureId,
-                componentFeatureLabel,
-                targetSegmentId,
-                componentTargetLabel,
-                startCoordinateOnComponent,
-                stopCoordinateOnComponent,
-                componentTypeId,
-                "component",
-                componentTypeLabel,
-                componentMethodId,
-                componentMethodLabel,
-                startCoordinateOnSegment,
-                stopCoordinateOnSegment,
-                componentScore,
-                componentOrientation,
-                componentPhase,
-                componentNotes,
-                componentLinks
+            componentFeatureId,
+            componentFeatureLabel,
+            targetSegmentId,
+            componentTargetLabel,
+            startCoordinateOnComponent,
+            stopCoordinateOnComponent,
+            componentType, //Category should be component
+            componentMethod,
+            startCoordinateOnSegment,
+            stopCoordinateOnSegment,
+            componentScore,
+            componentOrientation,
+            componentPhase,
+            componentNotes,
+            componentLinks
         );
 
         subComponents.add (newSubComponent);
+        if(parts==null)
+        	parts =  new ArrayList<String>();
+        parts.add(newSubComponent.getFeatureId());
         // Relationship needs to go both ways so the subpart and superpart attributes
         // are set correctly....
         newSubComponent.addSuperComponent(this);
@@ -244,6 +216,10 @@ public class DasComponentFeature extends DasFeature implements Serializable {
         if (subComponents == null){
             subComponents =  new ArrayList<DasComponentFeature>();
         }
+        if(parts==null)
+        	parts =  new ArrayList<String>();
+        
+        parts.add(subComponentFeature.getFeatureId());
         subComponents.add (subComponentFeature);
     }
 
@@ -275,12 +251,10 @@ public class DasComponentFeature extends DasFeature implements Serializable {
                                 int startCoordinateOnComponent,
                                 int stopCoordinateOnComponent,
                                 String componentFeatureLabel,
-                                String componentTypeId,
-                                String componentTypeLabel,
+                                DasType componentType,
                                 String targetSegmentId,
                                 String componentTargetLabel,
-                                String componentMethodId,
-                                String componentMethodLabel,
+                                DasMethod componentMethod,
                                 Double componentScore,
                                 DasFeatureOrientation componentOrientation,
                                 DasPhase componentPhase,
@@ -296,11 +270,8 @@ public class DasComponentFeature extends DasFeature implements Serializable {
                 componentTargetLabel,
                 startCoordinateOnComponent,
                 stopCoordinateOnComponent,
-                componentTypeId,
-                "supercomponent",
-                componentTypeLabel,
-                componentMethodId,
-                componentMethodLabel,
+                componentType,//Should be supercomponent
+                componentMethod,
                 startCoordinateOnSegment,
                 stopCoordinateOnSegment,
                 componentScore,
@@ -310,6 +281,9 @@ public class DasComponentFeature extends DasFeature implements Serializable {
                 componentLinks
         );
         superComponents.add (newSuperComponent);
+        if(parents==null)
+        	parents =  new ArrayList<String>();
+        parents.add(newSuperComponent.getFeatureId());
         // Relationship needs to go both ways so the subpart and superpart attributes
         // are set correctly....
         newSuperComponent.addSubComponent(this);
@@ -320,11 +294,17 @@ public class DasComponentFeature extends DasFeature implements Serializable {
         if (superComponents == null){
             superComponents =  new ArrayList<DasComponentFeature>();
         }
+        if(parents==null)
+        	parents =  new ArrayList<String>();
+        parents.add(superComponentFeature.getFeatureId());
         superComponents.add (superComponentFeature);
     }
 
     private Collection<DasComponentFeature> getSubComponents() {
-        return (subComponents == null) ? Collections.EMPTY_LIST : subComponents;
+        if (subComponents == null)
+			return Collections.emptyList();
+		else
+			return subComponents;
     }
 
     /**
@@ -340,8 +320,11 @@ public class DasComponentFeature extends DasFeature implements Serializable {
     }
 
     private Collection<DasComponentFeature> getSuperComponents() {
-        return (superComponents == null) ? Collections.EMPTY_LIST : superComponents;
-    }
+        if (subComponents == null)
+			return Collections.emptyList();
+		else
+			return superComponents;
+   }
 
     /**
      *

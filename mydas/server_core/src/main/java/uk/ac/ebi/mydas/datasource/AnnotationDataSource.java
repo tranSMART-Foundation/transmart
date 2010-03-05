@@ -128,7 +128,7 @@ public interface AnnotationDataSource {
      * a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
      * and read a record.</bold>
      */
-    public DasAnnotatedSegment getFeatures(String segmentId) throws BadReferenceObjectException, DataSourceException;
+    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbeans) throws BadReferenceObjectException, DataSourceException;
 
 
     /**
@@ -189,7 +189,7 @@ public interface AnnotationDataSource {
      * @throws uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException  Throw this if you cannot
      * provide a working implementation of this method.
      */
-    public Collection<DasAnnotatedSegment> getFeatures (Collection<String> featureIdCollection, Collection<String> groupIdCollection)
+    public Collection<DasAnnotatedSegment> getFeatures (Collection<String> featureIdCollection, Integer maxbins)
             throws UnimplementedFeatureException, DataSourceException;
 
     /**

@@ -113,27 +113,16 @@ public class TESTDataSource implements ReferenceDataSource {
      * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
      *
      */
-    public DasAnnotatedSegment getFeatures(String segmentReference) throws BadReferenceObjectException, DataSourceException {
+    public DasAnnotatedSegment getFeatures(String segmentReference,Integer maxbins) throws BadReferenceObjectException, DataSourceException {
         try{
             if (segmentReference.equals ("one")){
                 Collection<DasFeature> oneFeatures = new ArrayList<DasFeature>(2);
                 DasTarget target = new DasTarget("oneTargetId", 20, 30, "oneTargetName");
-                DasGroup group = new DasGroup(
-                        "oneGroupId",
-                        "one Group Label",
-                        "onegrouptype",
-                        Collections.singleton("A note on the group for reference one."),
-                        Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
-                        Collections.singleton(target)
-                );
                 oneFeatures.add(new DasFeature(
                         "oneFeatureIdOne",
                         "one Feature Label One",
-                        "oneFeatureTypeIdOne",
-                        "oneFeatureCategoryOne",
-                        "one Feature DasType Label One",
-                        "CV:00001",
-                        "one Feature Method Label One",
+                        new DasType("oneFeatureTypeIdOne", "oneFeatureCategoryOne", "CV:00001","one Feature DasType Label One"),
+                        new DasMethod("oneFeatureMethodIdOne","one Feature Method Label One","ECO:12345"),
                         5,
                         10,
                         123.45,
@@ -142,16 +131,15 @@ public class TESTDataSource implements ReferenceDataSource {
                         Collections.singleton("This is a note relating to feature one of segment one."),
                         Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
                         Collections.singleton(target),
-                        Collections.singleton(group)
+                        null,
+                        null
                 ));
-                oneFeatures.add(new DasFeature(
+                if (maxbins==null)
+                	oneFeatures.add(new DasFeature(
                         "oneFeatureIdTwo",
                         "one Feature Label Two",
-                        "oneFeatureTypeIdTwo",
-                        "oneFeatureCategoryTwo",
-                        "one Feature DasType Label Two",
-                        "CV:00002",
-                        "one Feature Method Label Two",
+                        new DasType("oneFeatureTypeIdTwo", "oneFeatureCategoryTwo", "CV:00002","one Feature DasType Label Two"),
+                        new DasMethod("oneFeatureMethodIdTwo","one Feature Method Label Two",null),
                         18,
                         25,
                         96.3,
@@ -159,9 +147,11 @@ public class TESTDataSource implements ReferenceDataSource {
                         DasPhase.PHASE_NOT_APPLICABLE,
                         Collections.singleton("This is a note relating to feature two of segment one."),
                         Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
+
+                        null,
                         null,
                         null
-                ));
+                	));
                 return new DasAnnotatedSegment("one", 1, 34, "Up-to-date", "one_label", oneFeatures);
             }
             else if (segmentReference.equals("two")){
@@ -170,11 +160,8 @@ public class TESTDataSource implements ReferenceDataSource {
                 twoFeatures.add(new DasFeature(
                         "twoFeatureIdOne",
                         "two Feature Label One",
-                        "twoFeatureTypeIdOne",
-                        "twoFeatureCategoryOne",
-                        "two Feature DasType Label One",
-                        "CV:00001",
-                        "two Featur eMethod Label One",
+                        new DasType("twoFeatureTypeIdOne", "twoFeatureCategoryOne", "CV:00001","two Feature DasType Label One"),
+                        new DasMethod("twoFeatureMethodIdTwo","two Featur eMethod Label One",null),
                         9,
                         33,
                         1000.01,
@@ -182,6 +169,7 @@ public class TESTDataSource implements ReferenceDataSource {
                         DasPhase.PHASE_READING_FRAME_0,
                         Collections.singleton("This is a note relating to feature one of segment two."),
                         Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
+                        null,
                         null,
                         null
                 ));
@@ -194,12 +182,10 @@ public class TESTDataSource implements ReferenceDataSource {
                         20,
                         30,
                         null,
-                        "Contig",
-                        "a contig",
+                        new DasType("Contig","component",null,"a contig"),
                         "contigA_id",
                         "Contig A",
-                        "component",
-                        null,
+                        new DasMethod("component", null,null),
                         0.0,
                         DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
                         DasPhase.PHASE_READING_FRAME_0,
@@ -210,12 +196,10 @@ public class TESTDataSource implements ReferenceDataSource {
                         20,620,
                         400,1000,
                         null,
-                        "Contig",
-                        null,
+                        new DasType("Contig","component",null,null),
                         "B",
                         null,
-                        "component",
-                        null,
+                        new DasMethod("component",null,null),
                         0.00,
                         DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
                         DasPhase.PHASE_READING_FRAME_0,
@@ -227,12 +211,10 @@ public class TESTDataSource implements ReferenceDataSource {
                         80,280,
                         200,400,
                         null,
-                        "Contig",
-                        null,
+                        new DasType("Contig", "component",null,null),
                         "C",
                         null,
-                        "component",
-                        null,
+                        new DasMethod("component",null,null),
                         0.00,
                         DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
                         DasPhase.PHASE_READING_FRAME_0,
@@ -244,12 +226,10 @@ public class TESTDataSource implements ReferenceDataSource {
                         80,280,
                         200,400,
                         null,
-                        "Contig",
-                        null,
+                        new DasType("Contig","component",null,null),
                         "C.1",
                         null,
-                        "component",
-                        null,
+                        new DasMethod("component",null,null),
                         0.00,
                         DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
                         DasPhase.PHASE_READING_FRAME_0,
@@ -262,12 +242,10 @@ public class TESTDataSource implements ReferenceDataSource {
                         1,1000,
                         1,34,
                         null,
-                        "Chromosome",
-                        null,
+                        new DasType("Chromosome","supercomponent",null,null),
                         "Parent",
                         null,
-                        "supercomponent",
-                        null,
+                        new DasMethod("supercomponent",null,null),
                         0.00,
                         DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
                         DasPhase.PHASE_READING_FRAME_0,
@@ -300,11 +278,11 @@ public class TESTDataSource implements ReferenceDataSource {
      */
     public Collection<DasType> getTypes() throws DataSourceException {
         Collection<DasType> types = new ArrayList<DasType>(5);
-        types.add (new DasType("oneFeatureTypeIdOne", "oneFeatureCategoryOne", "CV:00001"));
-        types.add (new DasType("oneFeatureTypeIdTwo", "oneFeatureCategoryTwo", "CV:00002"));
-        types.add (new DasType("twoFeatureTypeIdOne", "twoFeatureCategoryOne", "CV:00003"));
-        types.add (new DasType("Chromosome", null, null));
-        types.add (new DasType("Contig", null, null));
+        types.add (new DasType("oneFeatureTypeIdOne", "oneFeatureCategoryOne", "CV:00001",null));
+        types.add (new DasType("oneFeatureTypeIdTwo", "oneFeatureCategoryTwo", "CV:00002",null));
+        types.add (new DasType("twoFeatureTypeIdOne", "twoFeatureCategoryOne", "CV:00003",null));
+        types.add (new DasType("Chromosome", null, null,null));
+        types.add (new DasType("Contig", null, null,null));
         return types;
     }
 
@@ -350,7 +328,7 @@ public class TESTDataSource implements ReferenceDataSource {
      *          Throw this if you cannot
      *          provide a working implementation of this method.
      */
-    public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Collection<String> groupIdCollection) throws UnimplementedFeatureException, DataSourceException {
+    public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins) throws UnimplementedFeatureException, DataSourceException {
         throw new UnimplementedFeatureException("\"This test class, it is not ready yet!\" (in a Swedish accent)");
     }
 
@@ -508,4 +486,5 @@ public class TESTDataSource implements ReferenceDataSource {
         this.cacheManager.emptyCache();
         return "Version 1.1";
     }
+
 }

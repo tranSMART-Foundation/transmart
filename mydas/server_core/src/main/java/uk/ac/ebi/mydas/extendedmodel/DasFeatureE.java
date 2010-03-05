@@ -12,27 +12,30 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.model.DasComponentFeature;
 import uk.ac.ebi.mydas.model.DasFeature;
 import uk.ac.ebi.mydas.model.DasFeatureOrientation;
-import uk.ac.ebi.mydas.model.DasGroup;
+import uk.ac.ebi.mydas.model.DasMethod;
 import uk.ac.ebi.mydas.model.DasPhase;
 import uk.ac.ebi.mydas.model.DasTarget;
+import uk.ac.ebi.mydas.model.DasType;
 
 /**
  * Class that extends the basic DasFeature bean from the model to support serializing tasks
  * @author Gustavo Salazar
  *
  */
+@SuppressWarnings("serial")
 public class DasFeatureE extends DasFeature {
 
-	public DasFeatureE(String featureId, String featureLabel, String typeId,
-			String typeCategory, String typeLabel, String methodId,
-			String methodLabel, int startCoordinate, int endCoordinate,
+
+
+	
+	public DasFeatureE(String featureId, String featureLabel, DasType type,
+			DasMethod method, int startCoordinate, int endCoordinate,
 			Double score, DasFeatureOrientation orientation, DasPhase phase,
 			Collection<String> notes, Map<URL, String> links,
-			Collection<DasTarget> targets, Collection<DasGroup> groups)
-			throws DataSourceException {
-		super(featureId, featureLabel, typeId, typeCategory, typeLabel,
-				methodId, methodLabel, startCoordinate, endCoordinate, score,
-				orientation, phase, notes, links, targets, groups);
+			Collection<DasTarget> targets, Collection<String> parents,
+			Collection<String> parts) throws DataSourceException {
+		super(featureId, featureLabel, type, method, startCoordinate, endCoordinate,
+				score, orientation, phase, notes, links, targets, parents, parts);
 	}
 	/**
 	 * Constructor to create a copy from a DasFeature
@@ -40,12 +43,12 @@ public class DasFeatureE extends DasFeature {
 	 * @throws DataSourceException in case a problem in the creation
 	 */
 	public DasFeatureE(DasFeature feature) throws DataSourceException{
-		super(feature.getFeatureId(), feature.getFeatureLabel(), feature.getTypeId(), feature.getTypeCategory(), feature.getTypeLabel(),
-				feature.getMethodId(), feature.getMethodLabel(), feature.getStartCoordinate(), feature.getStopCoordinate(), feature.getScore(),
-				feature.getOrientation(), feature.getPhase(), feature.getNotes(), feature.getLinks(), feature.getTargets(), feature.getGroups());
+		super(feature.getFeatureId(), feature.getFeatureLabel(), feature.getType(), 
+				feature.getMethod(), feature.getStartCoordinate(), feature.getStopCoordinate(),
+				feature.getScore(), feature.getOrientation(), feature.getPhase(), feature.getNotes(), 
+				feature.getLinks(), feature.getTargets(), feature.getParents(), feature.getParts());
 		
 	}
-	
 	/**
 	 * Generates the piece of XML into the XML serializer object to describe a DasFeature 
 	 * @param DAS_XML_NAMESPACE XML namespace to link with the elements to create
@@ -59,7 +62,7 @@ public class DasFeatureE extends DasFeature {
 	 * @throws IllegalArgumentException indicate that a method has been passed an illegal or inappropriate argument.
 	 * @throws DataSourceException indicate that there is something wrong with the data source
 	 */
-	public void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,DasFeatureRequestFilter filter,boolean categorize, boolean isUseFeatureIdForFeatureLabel) 
+	public void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,DasFeatureRequestFilter filter,boolean categorize, boolean isUseFeatureIdForFeatureLabel, boolean hasReferences, boolean hasSuperParts,boolean hasSubParts) 
 		throws IllegalArgumentException, IllegalStateException, IOException, DataSourceException {
         // Check the feature passes the filter.
         if (filter.featurePasses(this)){
@@ -73,44 +76,45 @@ public class DasFeatureE extends DasFeature {
             }
 
             // TYPE element
-            boolean hasReferences=false;
-            boolean hasSuperParts=false;
-            boolean hasSubParts=false;
-            if ((DasFeature)this instanceof DasComponentFeature){
-            	hasReferences=true;
-                DasComponentFeature refFeature = (DasComponentFeature)(DasFeature)this;
-                hasSuperParts=refFeature.hasSuperParts();
-                hasSubParts=refFeature.hasSubParts();
-            }
-        	(new DasTypeE (this.getTypeId(),this.getTypeCategory(),null,this.getTypeLabel())).serialize(DAS_XML_NAMESPACE, serializer, null,categorize,hasReferences,hasSubParts,hasSuperParts);
+        	(new DasTypeE (this.getType())).serialize(DAS_XML_NAMESPACE, serializer, null,categorize,hasReferences,hasSubParts,hasSuperParts);
 
             // METHOD element
-        	(new DasMethodE(this.getMethodId(),this.getMethodLabel())).serialize(DAS_XML_NAMESPACE, serializer);
+        	(new DasMethodE(this.getMethod())).serialize(DAS_XML_NAMESPACE, serializer);
 
-            // START element
-            serializer.startTag(DAS_XML_NAMESPACE, "START");
-            serializer.text(Integer.toString(this.getStartCoordinate()));
-            serializer.endTag(DAS_XML_NAMESPACE, "START");
-
-            // END element
-            serializer.startTag(DAS_XML_NAMESPACE, "END");
-            serializer.text(Integer.toString(this.getStopCoordinate()));
-            serializer.endTag(DAS_XML_NAMESPACE, "END");
+        	//DAS1.6 START and END are optional for the cases of non positional features
+        	if ((this.getStartCoordinate()!=0) || (this.getStopCoordinate()!=0)){
+	            // START element
+	            serializer.startTag(DAS_XML_NAMESPACE, "START");
+	            serializer.text(Integer.toString(this.getStartCoordinate()));
+	            serializer.endTag(DAS_XML_NAMESPACE, "START");
+	
+	            // END element
+	            serializer.startTag(DAS_XML_NAMESPACE, "END");
+	            serializer.text(Integer.toString(this.getStopCoordinate()));
+	            serializer.endTag(DAS_XML_NAMESPACE, "END");
+        	}
 
             // SCORE element
-            serializer.startTag(DAS_XML_NAMESPACE, "SCORE");
-            serializer.text ((this.getScore() == null) ? "-" : Double.toString(this.getScore()));
-            serializer.endTag(DAS_XML_NAMESPACE, "SCORE");
-
+        	// DAS 1.6: The value of - is assumed if the tag is omitted entirely. therefore it is optional.
+        	if (this.getScore() != null){
+	            serializer.startTag(DAS_XML_NAMESPACE, "SCORE");
+	            serializer.text (Double.toString(this.getScore()));
+	            serializer.endTag(DAS_XML_NAMESPACE, "SCORE");
+        	}
             // ORIENTATION element
-            serializer.startTag(DAS_XML_NAMESPACE, "ORIENTATION");
-            serializer.text (this.getOrientation().toString());
-            serializer.endTag(DAS_XML_NAMESPACE, "ORIENTATION");
-
+        	// DAS 1.6: The value of 0 is assumed if the tag is omitted entirely. therefore it is optional.
+        	if ((this.getOrientation()!=null) &&(this.getOrientation()!=DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE)){
+	            serializer.startTag(DAS_XML_NAMESPACE, "ORIENTATION");
+	            serializer.text (this.getOrientation().toString());
+	            serializer.endTag(DAS_XML_NAMESPACE, "ORIENTATION");
+        	}
             // PHASE element
-            serializer.startTag(DAS_XML_NAMESPACE, "PHASE");
-            serializer.text (this.getPhase().toString());
-            serializer.endTag(DAS_XML_NAMESPACE, "PHASE");
+        	// DAS 1.6: The value of - is assumed if the tag is omitted entirely. therefore it is optional.
+            if ((this.getPhase()!=null) && (this.getPhase()!=DasPhase.PHASE_NOT_APPLICABLE)){
+	        	serializer.startTag(DAS_XML_NAMESPACE, "PHASE");
+	            serializer.text (this.getPhase().toString());
+	            serializer.endTag(DAS_XML_NAMESPACE, "PHASE");
+            }
 
             // NOTE elements
             if (this.getNotes() != null){
@@ -137,13 +141,21 @@ public class DasFeatureE extends DasFeature {
                 }
             }
 
-
-            // GROUP elements
-            if (this.getGroups() != null){
-                for (DasGroup group : this.getGroups()){
-                	(new DasGroupE(group)).serialize(DAS_XML_NAMESPACE, serializer);
+            if (parents != null){
+                for (String parent : this.getParents()){
+                    serializer.startTag(DAS_XML_NAMESPACE, "PARENT");
+                    serializer.attribute(DAS_XML_NAMESPACE, "id", parent);
+                    serializer.endTag(DAS_XML_NAMESPACE, "PARENT");
                 }
             }
+            if (parts != null){
+                for (String part : this.getParts()){
+                    serializer.startTag(DAS_XML_NAMESPACE, "PART");
+                    serializer.attribute(DAS_XML_NAMESPACE, "id", part);
+                    serializer.endTag(DAS_XML_NAMESPACE, "PART");
+                }
+            }
+
 
             serializer.endTag(DAS_XML_NAMESPACE, "FEATURE");
         }

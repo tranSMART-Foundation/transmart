@@ -31,6 +31,7 @@ import java.util.Map;
 import java.io.Serializable;
 
 /**
+ * @deprecated
  * Created Using IntelliJ IDEA.
  * Date: 14-May-2007
  * Time: 17:03:37

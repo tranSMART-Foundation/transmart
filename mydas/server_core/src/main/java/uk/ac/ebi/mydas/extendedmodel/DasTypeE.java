@@ -8,17 +8,12 @@ import uk.ac.ebi.mydas.model.DasType;
 
 @SuppressWarnings("serial")
 public class DasTypeE extends DasType {
-	private String label;
 
-	public DasTypeE(String id, String category, String cvId) {
-		super(id, category, cvId);
-	}
 	public DasTypeE(String id, String category, String cvId,String label) {
-		super(id, category, cvId);
-		this.label=label;
+		super(id, category, cvId,label);
 	}
 	public DasTypeE(DasType type) {
-		super(type.getId(), type.getCategory(), type.getCvId());
+		super(type.getId(), type.getCategory(), type.getCvId(),type.getLabel());
 	}
 	public void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,Integer count) throws IllegalArgumentException, IllegalStateException, IOException{
 		this.serialize( DAS_XML_NAMESPACE, serializer, count,true,false,false,false);
@@ -67,12 +62,6 @@ public class DasTypeE extends DasType {
 		}
 		serializer.endTag(DAS_XML_NAMESPACE, "TYPE");
 
-	}
-	public String getLabel() {
-		return label;
-	}
-	public void setLabel(String label) {
-		this.label = label;
 	}
 
 }
