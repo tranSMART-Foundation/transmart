@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 
 import uk.ac.ebi.mydas.configuration.ConfigurationManager;
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
-import uk.ac.ebi.mydas.configuration.Mydasserver;
 import uk.ac.ebi.mydas.configuration.ServerConfiguration;
 import uk.ac.ebi.mydas.exceptions.ConfigurationException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
@@ -36,9 +35,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import javax.servlet.ServletContext;
 import javax.xml.bind.JAXBException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 /**
  * Created Using IntelliJ IDEA.

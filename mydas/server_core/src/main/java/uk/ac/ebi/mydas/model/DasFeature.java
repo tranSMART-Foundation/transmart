@@ -44,6 +44,7 @@ import java.io.Serializable;
  * using <code>null</code> as described in the JavaDoc for the
  * constructor.
  */
+@SuppressWarnings("serial")
 public class DasFeature implements Serializable {
 
     /**
@@ -519,6 +520,23 @@ public class DasFeature implements Serializable {
         return result;
     }
 
+    public String toString() {
+        String result="";
+        result = result + (featureLabel != null ? " LABEL: "+featureLabel : "");
+        result = result + " TYPE: "+type.toString();
+        result = result + (method != null ? "METHOD "+method.toString() : "");
+        result = result + " START: "+startCoordinate;
+        result = result + " STOP: "+endCoordinate;
+        result = result + " SCORE: "+score;
+        result = result + " ORIENTATION: "+orientation;
+        result = result + " PHASE: "+phase.hashCode();
+        result = result + (notes != null ? " NOTES: "+notes.toString() : "");
+        result = result + (links != null ? " LINKS: "+links.toString() : "");
+        result = result + (targets != null ? " TARGETS: "+targets.toString() : "");
+        result = result + (parents != null ? " PARENTS: "+parents.toString() : "");
+        result = result + (parts != null ? " PARTS: "+parts.toString() : "");
+        return result;
+    }
 
 	public DasType getType() {
 		return type;

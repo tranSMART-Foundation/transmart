@@ -315,12 +315,13 @@ public class DasComponentFeature extends DasFeatureE implements Serializable {
         Collection<DasComponentFeature> deepComponents = new ArrayList<DasComponentFeature>();
         for (DasComponentFeature component : getSubComponents()) {
             deepComponents.add(component);
+//            deepComponents.addAll(component.getReportableSubComponents());
         }
         return deepComponents;
     }
 
     private Collection<DasComponentFeature> getSuperComponents() {
-        if (subComponents == null)
+        if (superComponents == null)
 			return Collections.emptyList();
 		else
 			return superComponents;
@@ -344,5 +345,16 @@ public class DasComponentFeature extends DasFeatureE implements Serializable {
      */
     public boolean isTypeIsReference() {
         return true;
+    }
+    public String toString(){
+    	String text ="Feature :"+super.toString();
+    	text += "| supercomponents : {";
+//        for (DasComponentFeature component : getSuperComponents()) 
+//        	text += "-"+component.toString()+"-";
+    	text += "} | subcomponents : {";
+        for (DasComponentFeature component : getSubComponents()) 
+        	text += "-"+component.toString()+"-";
+    	
+    	return text+"}";
     }
 }

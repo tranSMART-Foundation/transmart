@@ -173,47 +173,45 @@ public class TESTDataSource implements ReferenceDataSource {
                         null,
                         null
                 ));
-                DasAnnotatedSegment segmentTwo = new DasAnnotatedSegment("two", 1, 48, "Up-to-date", "two_label", twoFeatures);
+                DasAnnotatedSegment segmentTwo = new DasAnnotatedSegment("two", 1, 1000, "Up-to-date", "two_label", twoFeatures);
                 DasComponentFeature selfComponent = segmentTwo.getSelfComponentFeature();
                 selfComponent.addSubComponent(
                         "Contig:A",
-                        1,
-                        200,
-                        20,
-                        30,
+                        1, 200,
+                        1, 200,
                         null,
-                        new DasType("Contig","component",null,"a contig"),
-                        "contigA_id",
+                        new DasType("contig","component","SO:0000149",null),
+                        "Contig-A",
                         "Contig A",
-                        new DasMethod("component", null,null),
+                        new DasMethod("component",null,null),
                         0.0,
                         DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
                         DasPhase.PHASE_READING_FRAME_0,
-                        Collections.singleton("This is a sub-component with a different coordinate system."),
+                        Collections.singleton("This is a sub-component."),
                         null);
                 selfComponent.addSubComponent(
                         "Contig:B",
-                        20,620,
                         400,1000,
+                        20,620,
                         null,
-                        new DasType("Contig","component",null,null),
-                        "B",
-                        null,
+                        new DasType("contig","component","SO:0000149",null),
+                        "Contig-B",
+                        "Contig B",
                         new DasMethod("component",null,null),
                         0.00,
                         DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
                         DasPhase.PHASE_READING_FRAME_0,
-                        null,
+                        Collections.singleton("This is a sub-component with different coordinate system."),
                         null
                 );
                 DasComponentFeature c = selfComponent.addSubComponent(
                         "Contig:C",
-                        80,280,
                         200,400,
+                        80,280,
                         null,
-                        new DasType("Contig", "component",null,null),
-                        "C",
-                        null,
+                        new DasType("contig","component","SO:0000149",null),
+                        "Contig-C",
+                        "Contig C",
                         new DasMethod("component",null,null),
                         0.00,
                         DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
@@ -223,12 +221,12 @@ public class TESTDataSource implements ReferenceDataSource {
                 );
                 c.addSubComponent(
                         "Contig:C.1",
-                        80,280,
                         200,400,
+                        80,280,
                         null,
-                        new DasType("Contig","component",null,null),
-                        "C.1",
-                        null,
+                        new DasType("contig","component","SO:0000149",null),
+                        "Contig-C.1",
+                        "Contig C.1",
                         new DasMethod("component",null,null),
                         0.00,
                         DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
@@ -239,10 +237,10 @@ public class TESTDataSource implements ReferenceDataSource {
 
                 // And a super component
                 selfComponent.addSuperComponent("ParentChromosome",
+                        1,10000,
                         1,1000,
-                        1,34,
                         null,
-                        new DasType("Chromosome","supercomponent",null,null),
+                        new DasType("Chromosome","supercomponent","SO:0000340",null),
                         "Parent",
                         null,
                         new DasMethod("supercomponent",null,null),
@@ -252,6 +250,8 @@ public class TESTDataSource implements ReferenceDataSource {
                         null,
                         null
                 );
+                //System.out.println("SELFS:["+selfComponent.toString()+"]");
+                
                 return segmentTwo;
             }
             else throw new BadReferenceObjectException(segmentReference, "Not found");

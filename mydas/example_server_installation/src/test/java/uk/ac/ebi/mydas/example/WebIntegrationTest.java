@@ -206,6 +206,48 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextNotPresent("<FEATURE id=\"oneFeatureIdTwo\" label=\"one Feature Label Two\">");
         assertTextPresent("</SEGMENT>");
     }
+    public void test_features_command_two_parts(){
+        beginAt("/test/features?segment=two;category=component");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+        assertTextPresent("<SEGMENT id=\"two\" start=\"1\" stop=\"1000\" version=\"Up-to-date\" label=\"two_label\">");
+        assertTextPresent("<FEATURE id=\"two\" label=\"two\">");
+        assertTextPresent("<TYPE id=\"ThisSegment\" reference=\"yes\" superparts=\"yes\" subparts=\"yes\" category=\"component\" />");
+        assertTextPresent("<METHOD id=\"assembly\" />");
+        assertTextPresent("<START>1</START>");
+        assertTextPresent("<END>1000</END>");
+        assertTextPresent("<TARGET id=\"two\" start=\"1\" stop=\"1000\">two_label</TARGET>");
+        assertTextPresent("<PARENT id=\"ParentChromosome\" />");
+        assertTextPresent("<PART id=\"Contig:A\" />");
+        assertTextPresent("<PART id=\"Contig:B\" />");
+        assertTextPresent("<PART id=\"Contig:C\" />");
+        assertTextPresent("</FEATURE>");
+        assertTextPresent("<FEATURE id=\"Contig:A\" label=\"Contig:A\">");
+        assertTextPresent("<TYPE id=\"contig\" cvId=\"SO:0000149\" reference=\"yes\" superparts=\"yes\" subparts=\"no\" category=\"component\" />");
+        assertTextPresent("<END>200</END>");
+        assertTextPresent("<ORIENTATION>+</ORIENTATION>");
+        assertTextPresent("<PHASE>0</PHASE>");
+        assertTextPresent("<NOTE>This is a sub-component.</NOTE>");
+        assertTextPresent("<TARGET id=\"Contig-A\" start=\"1\" stop=\"200\">Contig A</TARGET>");
+        assertTextPresent("<PARENT id=\"two\" />");
+        assertTextPresent("<FEATURE id=\"Contig:B\" label=\"Contig:B\">");
+        assertTextPresent("<START>400</START>");
+        assertTextPresent("<END>1000</END>");
+        assertTextPresent("<NOTE>This is a sub-component with different coordinate system.</NOTE>");
+        assertTextPresent("<TARGET id=\"Contig-B\" start=\"20\" stop=\"620\">Contig B</TARGET>");
+        assertTextPresent("<PARENT id=\"two\" />");
+        assertTextPresent("<FEATURE id=\"Contig:C\" label=\"Contig:C\">");
+        assertTextPresent("<TYPE id=\"contig\" cvId=\"SO:0000149\" reference=\"yes\" superparts=\"yes\" subparts=\"yes\" category=\"component\" />");
+        assertTextPresent("<START>200</START>");
+        assertTextPresent("<END>400</END>");
+        assertTextPresent("<TARGET id=\"Contig-C\" start=\"80\" stop=\"280\">Contig C</TARGET>");
+        assertTextPresent("<PARENT id=\"two\" />");
+        assertTextPresent("<PART id=\"Contig:C.1\" />");
+//        assertTextPresent("<FEATURE id=\"Contig:C.1\" label=\"Contig:C.1\">");
+//        assertTextPresent("<START>200</START>");
+//        assertTextPresent("<END>400</END>");
+//        assertTextPresent("<TARGET id=\"Contig-C.1\" start=\"80\" stop=\"280\">Contig C.1</TARGET>");
+//        assertTextPresent("<PARENT id=\"Contig:C\" />");
+    }
     
     
     public void testSourceRequest() {
