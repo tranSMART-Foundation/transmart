@@ -36,6 +36,7 @@ import uk.ac.ebi.mydas.model.structure.DasChain;
 import uk.ac.ebi.mydas.model.structure.DasObject;
 import uk.ac.ebi.mydas.model.structure.DasStructure;
 import uk.ac.ebi.mydas.model.structure.Group;
+import uk.ac.ebi.mydas.model.structure.GroupType;
 
 import javax.servlet.ServletContext;
 import java.net.MalformedURLException;
@@ -493,7 +494,6 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource {
         return "Version 1.1";
     }
 
-	@Override
 	public DasStructure getStructure(String structureId,
 			Collection<String> chainIdCollection,
 			Collection<String> modelIdCollection)
@@ -507,7 +507,7 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource {
 		atoms.add(new DasAtom(42.328,7.024,30.23,"O","4",null,null,null));
 		atoms.add(new DasAtom(42.965,3.707,29.74,"CB","5",null,null,null));
 		atoms.add(new DasAtom(42.754,3.284,28.41,"OG","6",null,null,null));
-		Group group=new Group("SER","amino","1",null,atoms);
+		Group group=new Group("SER",GroupType.TYPE_AMINO,"1",null,atoms);
 		DasChain chain=new DasChain("A",null,null,Collections.singleton(group));
 		DasStructure structure=new DasStructure(obj, null, Collections.singleton(chain), null);
 		return structure;

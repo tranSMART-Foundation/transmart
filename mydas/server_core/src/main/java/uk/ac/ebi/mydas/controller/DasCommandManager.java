@@ -1376,6 +1376,22 @@ public class DasCommandManager {
 			typesCommandSpecificSegments(request, response, dsnConfig, requestedSegments, typeFilter);
 		}
 	}
+	
+	/**
+	 * Implements the structure command.  Delegates to the getStructure method to return the requested structure.
+	 * @param request to allow the writing of the http header
+	 * @param response to which the http header and the XML are written.
+	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
+	 * @param queryString from which the requested structures are parsed.
+	 * @throws XmlPullParserException in the event of a problem with writing out the DASSEQUENCE XML file.
+	 * @throws IOException during writing of the XML
+	 * @throws DataSourceException to capture any error returned from the data source.
+	 * @throws UnimplementedFeatureException if the dsn reports that it cannot return sequence.
+	 * @throws BadReferenceObjectException in the event that the segment id is not known to the dsn
+	 * @throws BadCommandArgumentsException if the arguments to the sequence command are not as specified in the
+	 * DAS 1.6 specification
+	 * @throws CoordinateErrorException if the requested coordinates are outside those of the segment id requested.
+	 */
 	void structureCommand(HttpServletRequest request,
 			HttpServletResponse response,
 			DataSourceConfiguration dsnConfig, String queryString) throws DataSourceException, UnimplementedFeatureException, BadCommandArgumentsException, XmlPullParserException, IOException, BadReferenceObjectException {
@@ -1385,6 +1401,7 @@ public class DasCommandManager {
 			List<String> models = new ArrayList<String>();
 			String query =null;
 			if (queryString != null && queryString.length() > 0){
+				//divide the query String
 				String[] queryParts = queryString.split(";");
 				for (String queryPart : queryParts){
 					String[] queryPartKeysValues = queryPart.split("=");
@@ -1395,18 +1412,22 @@ public class DasCommandManager {
 					String key = queryPartKeysValues[0];
 					String value = queryPartKeysValues[1];
 					
+					//Structure to query
 					if ("query".equals (key)){
 						query = value;
+					//Filter by Chain
 					}else if ("chain".equals (key)){
 						if (chains==null)
 							chains = new ArrayList<String>();
 						chains.add(value);
+					//Filter by Model
 					}else if ("model".equals (key)){
 						if (models==null)
 							models = new ArrayList<String>();
 						models.add(value);
 					}
 				}
+				//query is mandatory
 				if (query==null)
 					throw new BadCommandArgumentsException("Bad command arguments - missing the query argument of the command structure: " + queryString);
 				// Looks like all is OK.
@@ -1434,7 +1455,7 @@ public class DasCommandManager {
 			}
 			
 		} else {
-			// Not a reference source.
+			// Not an structure source.
 			throw new UnimplementedFeatureException("An attempt to request structure information from a non-structure server has been detected.");
 		}
 		

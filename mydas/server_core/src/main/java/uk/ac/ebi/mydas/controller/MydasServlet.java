@@ -123,6 +123,7 @@ public class MydasServlet extends HttpServlet {
 
 	/**
 	 * Private enum that is used by this class to match valid commands.
+	 * The command structure was added to support the new capability in DAS1.6
 	 */
 	enum Commands{
 
@@ -348,7 +349,7 @@ public class MydasServlet extends HttpServlet {
 							else if (Commands.COMMAND_SEQUENCE.matches(command)){
 								dasCommands.sequenceCommand (request, response, dataSourceConfig, queryString);
 							}
-							else if (Commands.COMMAND_STRUCTURE.matches(command)){
+							else if (Commands.COMMAND_STRUCTURE.matches(command)){ //for the command structure DAS1.6
 								dasCommands.structureCommand (request, response, dataSourceConfig, queryString);
 							}
 							else if (Commands.COMMAND_LINK.matches(command)){

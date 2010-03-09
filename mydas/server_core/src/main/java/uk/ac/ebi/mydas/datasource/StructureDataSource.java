@@ -30,8 +30,23 @@ import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.model.structure.DasStructure;
 
 
+/**
+ * @author Gustavo Salazar, EMBL-EBI, gsalazar@ebi.ac.uk
+ *
+ * Interface to implement in the case the datasource have the capability of return 3d sequences
+ */
 public interface StructureDataSource {
 
+    /**
+     * This method returns a DasStructure object, describing the structure
+     * of the structureId passed in as argument.
+     * @param structureId This is the ID of the reference structure.
+     *
+     * @return A DasStructure object.  a protein 3D structure, including metadata and coordinates. 
+     * @throws BadReferenceObjectException in the event that your server does not include information about this segment.
+     * @throws DataSourceException should be thrown if there is any
+     * fatal problem with loading this data source. 
+     */
     public DasStructure getStructure (String structureId,Collection<String> chainIdCollection,Collection<String> modelIdCollection) throws BadReferenceObjectException, DataSourceException;
 
 }
