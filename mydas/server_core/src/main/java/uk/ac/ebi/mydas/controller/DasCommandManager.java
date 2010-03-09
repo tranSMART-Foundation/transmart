@@ -38,6 +38,7 @@ import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource;
 import uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource;
 import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
+import uk.ac.ebi.mydas.datasource.StructureDataSource;
 import uk.ac.ebi.mydas.exceptions.BadCommandArgumentsException;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.BadStylesheetException;
@@ -51,6 +52,7 @@ import uk.ac.ebi.mydas.model.DasEntryPoint;
 import uk.ac.ebi.mydas.model.DasFeature;
 import uk.ac.ebi.mydas.model.DasSequence;
 import uk.ac.ebi.mydas.model.DasType;
+import uk.ac.ebi.mydas.model.structure.DasStructure;
 
 public class DasCommandManager {
 	/**
@@ -567,6 +569,17 @@ public class DasCommandManager {
 			}
 		}
 	}
+	
+	/**
+	 * Given that this command just return a copy of a predefined stylesheet, there is nothing to modify for DAS1.6
+	 * @param request
+	 * @param response
+	 * @param dsnConfig
+	 * @param queryString
+	 * @throws BadCommandArgumentsException
+	 * @throws IOException
+	 * @throws BadStylesheetException
+	 */
 	void stylesheetCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
 	throws BadCommandArgumentsException, IOException, BadStylesheetException {
 //		Check the queryString is empty (as it should be).
@@ -1362,6 +1375,69 @@ public class DasCommandManager {
 			// Process the types command for specific segments.
 			typesCommandSpecificSegments(request, response, dsnConfig, requestedSegments, typeFilter);
 		}
+	}
+	void structureCommand(HttpServletRequest request,
+			HttpServletResponse response,
+			DataSourceConfiguration dsnConfig, String queryString) throws DataSourceException, UnimplementedFeatureException, BadCommandArgumentsException, XmlPullParserException, IOException, BadReferenceObjectException {
+		// Is this a structure source?
+		if (dsnConfig.getDataSource() instanceof StructureDataSource){
+			List<String> chains = null;
+			List<String> models = new ArrayList<String>();
+			String query =null;
+			if (queryString != null && queryString.length() > 0){
+				String[] queryParts = queryString.split(";");
+				for (String queryPart : queryParts){
+					String[] queryPartKeysValues = queryPart.split("=");
+					if (queryPartKeysValues.length != 2){
+						// All of the remaining query parts are key=value pairs, so this is a bad argument.
+						throw new BadCommandArgumentsException("Bad command arguments to the structure command: " + queryString);
+					}
+					String key = queryPartKeysValues[0];
+					String value = queryPartKeysValues[1];
+					
+					if ("query".equals (key)){
+						query = value;
+					}else if ("chain".equals (key)){
+						if (chains==null)
+							chains = new ArrayList<String>();
+						chains.add(value);
+					}else if ("model".equals (key)){
+						if (models==null)
+							models = new ArrayList<String>();
+						models.add(value);
+					}
+				}
+				if (query==null)
+					throw new BadCommandArgumentsException("Bad command arguments - missing the query argument of the command structure: " + queryString);
+				// Looks like all is OK.
+				writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+
+				XmlSerializer serializer;
+				serializer = PULL_PARSER_FACTORY.newSerializer();
+				BufferedWriter out = null;
+				DasStructure structure = ((StructureDataSource)dsnConfig.getDataSource()).getStructure(query, chains, models);
+				try{
+					out = getResponseWriter(request, response);
+					serializer.setOutput(out);
+					serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+					serializer.startDocument(null, false);
+					serializer.text("\n");
+					structure.serialize(DAS_XML_NAMESPACE, serializer);
+					serializer.flush();
+				}
+				finally{
+					if (out != null){
+						out.close();
+					}
+				}
+					
+			}
+			
+		} else {
+			// Not a reference source.
+			throw new UnimplementedFeatureException("An attempt to request structure information from a non-structure server has been detected.");
+		}
+		
 	}
 
 

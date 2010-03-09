@@ -265,4 +265,30 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("</SOURCES>");
     }
 
+    public void testStylesheet() {
+        beginAt("/test/stylesheet");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"yes\"?>");
+        assertTextPresent("<DASSTYLE>");
+        assertTextPresent("<STYLESHEET>");
+        assertTextPresent("<CATEGORY id=\"default\">");
+    	
+    }
+    
+    public void testStructure() {
+        beginAt("/test/structure?query=2ii9");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+        assertTextPresent("<dasstructure>");
+        assertTextPresent("<object dbAccessionId=\"2ii9\" objectVersion=\"20-MAR-07\" dbSource=\"PDB\" dbVersion=\"20070116\" dbCoordSys=\"PDBresnum,Protein Structure\" />");
+        assertTextPresent("<chain id=\"A\">");
+        assertTextPresent("<group name=\"SER\" type=\"amino\" groupID=\"1\">");
+        assertTextPresent("<atom atomID=\"1\" atomName=\"N\" x=\"44.18\" y=\"5.327\" z=\"31.168\" />");
+        assertTextPresent("<atom atomID=\"2\" atomName=\"CA\" x=\"43.672\" y=\"5.068\" z=\"29.781\" />");
+        assertTextPresent("<atom atomID=\"3\" atomName=\"C\" x=\"42.728\" y=\"6.217\" z=\"29.365\" />");
+        assertTextPresent("<atom atomID=\"4\" atomName=\"O\" x=\"42.328\" y=\"7.024\" z=\"30.23\" />");
+        assertTextPresent("<atom atomID=\"5\" atomName=\"CB\" x=\"42.965\" y=\"3.707\" z=\"29.74\" />");
+        assertTextPresent("<atom atomID=\"6\" atomName=\"OG\" x=\"42.754\" y=\"3.284\" z=\"28.41\" />");
+        assertTextPresent("</group>");
+        assertTextPresent("</chain>");
+        assertTextPresent("</dasstructure>");
+    }
 }

@@ -26,10 +26,16 @@ package uk.ac.ebi.mydas.example;
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
 import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
+import uk.ac.ebi.mydas.datasource.StructureDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.model.*;
+import uk.ac.ebi.mydas.model.structure.DasAtom;
+import uk.ac.ebi.mydas.model.structure.DasChain;
+import uk.ac.ebi.mydas.model.structure.DasObject;
+import uk.ac.ebi.mydas.model.structure.DasStructure;
+import uk.ac.ebi.mydas.model.structure.Group;
 
 import javax.servlet.ServletContext;
 import java.net.MalformedURLException;
@@ -46,7 +52,7 @@ import java.util.*;
  * This test data source is used in conjunction with the WebIntegrationTest test class to test
  * the running web application.
  */
-public class TESTDataSource implements ReferenceDataSource {
+public class TESTDataSource implements ReferenceDataSource,StructureDataSource {
 
     CacheManager cacheManager = null;
     ServletContext svCon;
@@ -486,5 +492,25 @@ public class TESTDataSource implements ReferenceDataSource {
         this.cacheManager.emptyCache();
         return "Version 1.1";
     }
+
+	@Override
+	public DasStructure getStructure(String structureId,
+			Collection<String> chainIdCollection,
+			Collection<String> modelIdCollection)
+			throws BadReferenceObjectException, DataSourceException {
+
+		DasObject obj=new DasObject("2ii9", null, "20-MAR-07", null, "PDB", "20070116", "PDBresnum,Protein Structure");
+		Collection<DasAtom> atoms = new ArrayList<DasAtom>(6);
+		atoms.add(new DasAtom(44.18,5.327,31.168,"N","1",null,null,null));
+		atoms.add(new DasAtom(43.672,5.068,29.781,"CA","2",null,null,null));
+		atoms.add(new DasAtom(42.728,6.217,29.365,"C","3",null,null,null));
+		atoms.add(new DasAtom(42.328,7.024,30.23,"O","4",null,null,null));
+		atoms.add(new DasAtom(42.965,3.707,29.74,"CB","5",null,null,null));
+		atoms.add(new DasAtom(42.754,3.284,28.41,"OG","6",null,null,null));
+		Group group=new Group("SER","amino","1",null,atoms);
+		DasChain chain=new DasChain("A",null,null,Collections.singleton(group));
+		DasStructure structure=new DasStructure(obj, null, Collections.singleton(chain), null);
+		return structure;
+	}
 
 }
