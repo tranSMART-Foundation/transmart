@@ -135,6 +135,7 @@ public class MydasServlet extends HttpServlet {
 		COMMAND_FEATURES ("features"),
 		COMMAND_ENTRY_POINTS ("entry_points"),
 		COMMAND_SEQUENCE ("sequence"),
+		COMMAND_ALIGNMENT ("alignment"),
 		COMMAND_STRUCTURE ("structure"),
 		COMMAND_SOURCE ("source");
 
@@ -351,6 +352,9 @@ public class MydasServlet extends HttpServlet {
 							}
 							else if (Commands.COMMAND_STRUCTURE.matches(command)){ //for the command structure DAS1.6
 								dasCommands.structureCommand (request, response, dataSourceConfig, queryString);
+							}
+							else if (Commands.COMMAND_ALIGNMENT.matches(command)){ //for the command alignment DAS1.6
+								dasCommands.alignmentCommand (request, response, dataSourceConfig, queryString);
 							}
 							else if (Commands.COMMAND_LINK.matches(command)){
 								dasCommands.linkCommand (response, dataSourceConfig, queryString);

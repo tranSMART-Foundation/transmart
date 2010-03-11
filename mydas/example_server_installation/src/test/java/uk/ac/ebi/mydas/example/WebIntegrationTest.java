@@ -291,4 +291,24 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("</chain>");
         assertTextPresent("</dasstructure>");
     }
+    public void testAlignment() {
+        beginAt("/test/alignment?query=PF03344");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+        assertTextPresent("<dasalignment>");
+        assertTextPresent("<alignment alignType=\"Pfam Full Alignment\" name=\"PF03344\" position=\"1\" max=\"84\">");
+        assertTextPresent("<alignObject dbAccessionId=\"PF03344\" objectVersion=\"93d32837b9b401f3bac6ef3d21f9193c\" intObjectId=\"A2V6V1\" type=\"PROTEIN\" dbSource=\"Pfam\" dbVersion=\"24.0\" dbCoordSys=\"UniProt\">");
+        assertTextPresent("<sequence>TPSSVEMDISSSRKQSEEPFTTVLENGAGMVSSTSFNGGVSPHNWGDSGPPCKKSRKEKKQTGSGPLGNSYVERQRSVHEK</sequence>");
+        assertTextPresent("</alignObject>");
+        assertTextPresent("<alignObject dbAccessionId=\"PF03344\" objectVersion=\"28a2bfce7453560927cd37b695907c5e\" intObjectId=\"Q4R3H3\" type=\"PROTEIN\" dbSource=\"Pfam\" dbVersion=\"24.0\" dbCoordSys=\"UniProt\">");
+        assertTextPresent("<sequence>MAQDAFRDVGIRLQERRHLDLIYNFGCHLTDDYRPGIDPALSDPVLARRLRENRSLAMSRLDEVISKYAMLQDKSEEGERKKRRARLQGTSSHSEDTPASLDSGEGPSGMASQGCPSASKAETDDEEDEESDEEEEEEEDEEEEEEEEEEATDSEEEEDLEQMQEGQEDDEEEEEEEEAAGKDGDGSPMSSPQISTEKNLEPGKQISRSSGEQQNKVSPLLLSEEPLAPSSIDAESNGEQPEELTLEEESPVSQLFELEIEALPLDTPSSVEMDISSSRKQSEEPFTTVLENGAGMVSSTSFNGGVSPHNWGDSGPPCKKSRKEKKQTGSGPLGNSYVERQRSVHEKNGKKICTLPSPPSPLASLAPVADSSTRVDSPSHGLVTSSLCIPSPAQLSQTPQSQPPRPSTYKTSVATQCDPEEIIVLSDSD</sequence>");
+        assertTextPresent("<block blockOrder=\"1\">");
+        assertTextPresent("<segment intObjectId=\"A2V6V1\" start=\"1\" end=\"81\">");
+        assertTextPresent("<cigar>78I4M11DI23D6I8DI38D2IDI3DI7DI8D4I28DI16D3I4D3I5DIDI7D9I11D2I4D67I10D12I11D3ID3I45D28I26DI13D25I115DI5DI4DIDI4DI7D6I15D2I12D3I3DI5D4I8D22I19D2I5D5I6D7IDIDI5D3I7D37I5D2I4DI7D2I2D2IDI10D5I5D7I4D3I6DI8DI17D7I3M2I9MI14MI29M10I13M6I3M6DI20D6I12D9I11D3I20D6M167I</cigar>");
+        assertTextPresent("</segment>");
+        assertTextPresent("<segment intObjectId=\"Q4R3H3\" start=\"1\" end=\"429\">");
+        assertTextPresent("<cigar>82I11DI23D6I8DI38D2IDI3DI7DI8D4I28DI16D3I4D3I5DIDI7D9I11D2I4D67I10D12I11D3ID3I45D28I26DI13D25I42D73MI5MI4MIMI4MID6M6ID14MI13M3I3MI5M4IM2D5M22I19M2I5M5I6M7IMIMI5M3I16M18I15M2I12M2I2M2IMI4M3D3M5I5M7I4M3I6MI8MI20MI6M2I9MI14MI29M10I49M6I55M173I</cigar>");
+        assertTextPresent("</block>");
+        assertTextPresent("</alignment>");
+        assertTextPresent("</dasalignment>");
+    }
 }

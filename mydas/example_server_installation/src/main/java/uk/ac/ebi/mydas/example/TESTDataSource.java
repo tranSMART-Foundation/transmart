@@ -25,12 +25,19 @@ package uk.ac.ebi.mydas.example;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
 import uk.ac.ebi.mydas.controller.CacheManager;
+import uk.ac.ebi.mydas.datasource.AlignmentDataSource;
 import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
 import uk.ac.ebi.mydas.datasource.StructureDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.model.*;
+import uk.ac.ebi.mydas.model.alignment.AlignObject;
+import uk.ac.ebi.mydas.model.alignment.AlignType;
+import uk.ac.ebi.mydas.model.alignment.Alignment;
+import uk.ac.ebi.mydas.model.alignment.Block;
+import uk.ac.ebi.mydas.model.alignment.DasAlignment;
+import uk.ac.ebi.mydas.model.alignment.Segment;
 import uk.ac.ebi.mydas.model.structure.DasAtom;
 import uk.ac.ebi.mydas.model.structure.DasChain;
 import uk.ac.ebi.mydas.model.structure.DasObject;
@@ -53,7 +60,7 @@ import java.util.*;
  * This test data source is used in conjunction with the WebIntegrationTest test class to test
  * the running web application.
  */
-public class TESTDataSource implements ReferenceDataSource,StructureDataSource {
+public class TESTDataSource implements ReferenceDataSource,StructureDataSource,AlignmentDataSource {
 
     CacheManager cacheManager = null;
     ServletContext svCon;
@@ -511,6 +518,23 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource {
 		DasChain chain=new DasChain("A",null,null,Collections.singleton(group));
 		DasStructure structure=new DasStructure(obj, null, Collections.singleton(chain), null);
 		return structure;
+	}
+
+	public DasAlignment getAlignment(String alignmentId,
+			Collection<String> subjects, String subjectcoordsys,
+			Integer rowStart, Integer rowEnd, Integer colStart, Integer colEnd)
+			throws BadReferenceObjectException, DataSourceException {
+
+		Collection<AlignObject> alignObjects= new ArrayList<AlignObject>(2);
+		alignObjects.add(new AlignObject("PF03344", "93d32837b9b401f3bac6ef3d21f9193c", "A2V6V1", AlignType.TYPE_PROTEIN, "Pfam", "24.0","UniProt",null, "TPSSVEMDISSSRKQSEEPFTTVLENGAGMVSSTSFNGGVSPHNWGDSGPPCKKSRKEKKQTGSGPLGNSYVERQRSVHEK"));
+		alignObjects.add(new AlignObject("PF03344", "28a2bfce7453560927cd37b695907c5e", "Q4R3H3", AlignType.TYPE_PROTEIN, "Pfam", "24.0","UniProt",null, "MAQDAFRDVGIRLQERRHLDLIYNFGCHLTDDYRPGIDPALSDPVLARRLRENRSLAMSRLDEVISKYAMLQDKSEEGERKKRRARLQGTSSHSEDTPASLDSGEGPSGMASQGCPSASKAETDDEEDEESDEEEEEEEDEEEEEEEEEEATDSEEEEDLEQMQEGQEDDEEEEEEEEAAGKDGDGSPMSSPQISTEKNLEPGKQISRSSGEQQNKVSPLLLSEEPLAPSSIDAESNGEQPEELTLEEESPVSQLFELEIEALPLDTPSSVEMDISSSRKQSEEPFTTVLENGAGMVSSTSFNGGVSPHNWGDSGPPCKKSRKEKKQTGSGPLGNSYVERQRSVHEKNGKKICTLPSPPSPLASLAPVADSSTRVDSPSHGLVTSSLCIPSPAQLSQTPQSQPPRPSTYKTSVATQCDPEEIIVLSDSD"));
+		Map<String, Double> scores=null;
+		Collection<Segment> segments= new ArrayList<Segment>(2);
+		segments.add(new Segment("A2V6V1", 1, 81, null, "78I4M11DI23D6I8DI38D2IDI3DI7DI8D4I28DI16D3I4D3I5DIDI7D9I11D2I4D67I10D12I11D3ID3I45D28I26DI13D25I115DI5DI4DIDI4DI7D6I15D2I12D3I3DI5D4I8D22I19D2I5D5I6D7IDIDI5D3I7D37I5D2I4DI7D2I2D2IDI10D5I5D7I4D3I6DI8DI17D7I3M2I9MI14MI29M10I13M6I3M6DI20D6I12D9I11D3I20D6M167I"));
+		segments.add(new Segment("Q4R3H3", 1, 429, null, "82I11DI23D6I8DI38D2IDI3DI7DI8D4I28DI16D3I4D3I5DIDI7D9I11D2I4D67I10D12I11D3ID3I45D28I26DI13D25I42D73MI5MI4MIMI4MID6M6ID14MI13M3I3MI5M4IM2D5M22I19M2I5M5I6M7IMIMI5M3I16M18I15M2I12M2I2M2IMI4M3D3M5I5M7I4M3I6MI8MI20MI6M2I9MI14MI29M10I49M6I55M173I"));
+		Collection<Block> blocks= Collections.singleton(new Block(null, "1", segments));
+		Alignment alignment = new Alignment("Pfam Full Alignment", "PF03344", null, 1, 84, alignObjects, scores, blocks);
+		return new DasAlignment(Collections.singleton(alignment));
 	}
 
 }

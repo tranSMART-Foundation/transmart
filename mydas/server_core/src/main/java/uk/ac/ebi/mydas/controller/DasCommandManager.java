@@ -34,6 +34,7 @@ import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource;
 import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version;
 import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.Coordinates;
 import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.Capability;
+import uk.ac.ebi.mydas.datasource.AlignmentDataSource;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource;
 import uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource;
@@ -52,6 +53,7 @@ import uk.ac.ebi.mydas.model.DasEntryPoint;
 import uk.ac.ebi.mydas.model.DasFeature;
 import uk.ac.ebi.mydas.model.DasSequence;
 import uk.ac.ebi.mydas.model.DasType;
+import uk.ac.ebi.mydas.model.alignment.DasAlignment;
 import uk.ac.ebi.mydas.model.structure.DasStructure;
 
 public class DasCommandManager {
@@ -1458,7 +1460,110 @@ public class DasCommandManager {
 			// Not an structure source.
 			throw new UnimplementedFeatureException("An attempt to request structure information from a non-structure server has been detected.");
 		}
-		
+	}
+	/**
+	 * Implements the alignment command.  Delegates to the getAlignment method to return the requested alignment.
+	 * @param request to allow the writing of the http header
+	 * @param response to which the http header and the XML are written.
+	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
+	 * @param queryString from which the requested structures are parsed.
+	 * @throws XmlPullParserException in the event of a problem with writing out the DASSEQUENCE XML file.
+	 * @throws IOException during writing of the XML
+	 * @throws DataSourceException to capture any error returned from the data source.
+	 * @throws UnimplementedFeatureException if the dsn reports that it cannot return sequence.
+	 * @throws BadReferenceObjectException in the event that the segment id is not known to the dsn
+	 * @throws BadCommandArgumentsException if the arguments to the sequence command are not as specified in the
+	 * DAS 1.6 specification
+	 * @throws CoordinateErrorException if the requested coordinates are outside those of the segment id requested.
+	 */
+	void alignmentCommand(HttpServletRequest request,
+			HttpServletResponse response,
+			DataSourceConfiguration dsnConfig, String queryString) throws DataSourceException, UnimplementedFeatureException, BadCommandArgumentsException, XmlPullParserException, IOException, BadReferenceObjectException {
+		// Is this an alignment source?
+		if (dsnConfig.getDataSource() instanceof AlignmentDataSource){
+			List<String> subjects = null;
+			String query =null;
+			String subjectcoordsys =null;
+			Integer rowStart =null;
+			Integer rowEnd =null;
+			Integer colStart =null;
+			Integer colEnd =null;
+			if (queryString != null && queryString.length() > 0){
+				//divide the query String
+				String[] queryParts = queryString.split(";");
+				for (String queryPart : queryParts){
+					String[] queryPartKeysValues = queryPart.split("=");
+					if (queryPartKeysValues.length != 2){
+						// All of the remaining query parts are key=value pairs, so this is a bad argument.
+						throw new BadCommandArgumentsException("Bad command arguments to the alignment command: " + queryString);
+					}
+					String key = queryPartKeysValues[0];
+					String value = queryPartKeysValues[1];
+					
+					//Structure to query
+					if ("query".equals (key)){
+						query = value;
+					//Filter by Chain
+					}else if ("subject".equals (key)){
+						if (subjects==null)
+							subjects = new ArrayList<String>();
+						subjects.add(value);
+					//Filter by Model
+					}else if ("subjectcoordsys".equals (key)){
+						subjectcoordsys=value;
+					}else if ("rows".equals (key)){
+						String[] rowParts = queryString.split("-");
+						if (rowParts.length != 2)
+							throw new BadCommandArgumentsException("Bad command arguments to the alignment command: " + queryString);
+						try {
+							rowStart = new Integer(rowParts[0]);
+							rowEnd = new Integer(rowParts[1]);
+						} catch(NumberFormatException nfe){
+							throw new BadCommandArgumentsException("Bad command arguments to the alignment command: " + queryString,nfe);
+						}
+					}else if ("cols".equals (key)){
+						String[] colParts = queryString.split("-");
+						if (colParts.length != 2)
+							throw new BadCommandArgumentsException("Bad command arguments to the alignment command: " + queryString);
+						try {
+							colStart = new Integer(colParts[0]);
+							colEnd = new Integer(colParts[1]);
+						} catch(NumberFormatException nfe){
+							throw new BadCommandArgumentsException("Bad command arguments to the alignment command: " + queryString,nfe);
+						}
+					}
+				}
+				//query is mandatory
+				if (query==null)
+					throw new BadCommandArgumentsException("Bad command arguments - missing the query argument of the command alignment: " + queryString);
+				// Looks like all is OK.
+				writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+
+				XmlSerializer serializer;
+				serializer = PULL_PARSER_FACTORY.newSerializer();
+				BufferedWriter out = null;
+				DasAlignment alignment = ((AlignmentDataSource)dsnConfig.getDataSource()).getAlignment(query, subjects, subjectcoordsys, rowStart, rowEnd, colStart, colEnd);
+				try{
+					out = getResponseWriter(request, response);
+					serializer.setOutput(out);
+					serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+					serializer.startDocument(null, false);
+					serializer.text("\n");
+					alignment.serialize(DAS_XML_NAMESPACE, serializer);
+					serializer.flush();
+				}
+				finally{
+					if (out != null){
+						out.close();
+					}
+				}
+					
+			}
+			
+		} else {
+			// Not an alignment source.
+			throw new UnimplementedFeatureException("An attempt to request structure information from a non-structure server has been detected.");
+		}
 	}
 
 
