@@ -48,6 +48,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.extendedmodel.DasEntryPointE;
 import uk.ac.ebi.mydas.extendedmodel.DasTypeE;
+import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 import uk.ac.ebi.mydas.model.DasEntryPoint;
 import uk.ac.ebi.mydas.model.DasFeature;
@@ -127,7 +128,7 @@ public class DasCommandManager {
 	throws XmlPullParserException, IOException{
 		// Check the configuration has been loaded successfully
 		if (DATA_SOURCE_MANAGER.getServerConfiguration() == null){
-			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
 			logger.error("A request has been made to the das server, however initialisation failed - possibly the mydasserverconfig.xml file was not found.");
 			return;
 		}
@@ -138,11 +139,11 @@ public class DasCommandManager {
 			List<String> dsns = DATA_SOURCE_MANAGER.getServerConfiguration().getDsnNames();
 			// Check there is at least one dsn.  (Mandatory in the dsn XML output).
 			if (dsns == null || dsns.size() == 0){
-				writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+				writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
 				logger.error("The dsn command has been called, but no dsns have been initialised successfully.");
 			} else{
 				// At least one dsn is OK.
-				writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+				writeHeader (request, response, XDasStatus.STATUS_200_OK, true,null);
 				// Build the XML.
 				XmlSerializer serializer;
 				serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -204,7 +205,7 @@ public class DasCommandManager {
 		else {
 			// If fallen through to here, then the dsn command is not recognised
 			// as it has rubbish in the query string.
-			writeHeader (request, response, XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, true);
+			writeHeader (request, response, XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, true,null);
 		}
 	}
 	void dnaCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
@@ -217,7 +218,7 @@ public class DasCommandManager {
 				// All good - process command.
 				Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
 				// Got some sequences, so all is OK.
-				writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+				writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 				// Build the XML.
 				XmlSerializer serializer;
 				serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -261,11 +262,13 @@ public class DasCommandManager {
 
 	/**
 	 * Helper method used by both the dnaCommand and the sequenceCommand
+	 * 
+     * DAS1.6: The exception for a bad reference object (reference sequence unknown) [deprecated in favour of Exception Handling] 
+     * 
 	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
 	 * @param queryString to be parsed, which includes details of the requested segments
 	 * @return a Collection of SequenceReporter objects.  The SequenceReporter wraps the DasSequence object
 	 * to provide additional functionality that is hidden (for simplicity) from the dsn developer.
-	 * @throws BadReferenceObjectException if the segment id is not available from the data source
 	 * @throws CoordinateErrorException if the requested coordinates fall outside those of the requested segment id
 	 * @throws DataSourceException to capture any error returned from the data source.
 	 * @throws BadCommandArgumentsException if the arguments to the command are not recognised.
@@ -431,7 +434,7 @@ public class DasCommandManager {
 			}
 		}
 
-		writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+		writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 		// Build the XML.
 		XmlSerializer serializer;
 		serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -520,7 +523,7 @@ public class DasCommandManager {
 		}
 
 		// OK, successfully built a Map of the types for all the requested segments, so iterate over this and report.
-		writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+		writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 		// Build the XML.
 		XmlSerializer serializer;
 		serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -615,7 +618,7 @@ public class DasCommandManager {
 
 			if (reader.ready()){
 				//OK, managed to open an input reader from the stylesheet, so output the success header.
-				writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+				writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 				writer = getResponseWriter(request, response);
 				while (reader.ready()){
 					writer.write(reader.readLine());
@@ -650,7 +653,6 @@ public class DasCommandManager {
 	 * DAS 1.53 specification
 	 * @throws UnimplementedFeatureException if the dsn reports that it cannot handle an aspect of the feature
 	 * command (although all dsns are required to implement at least the basic feature command).
-	 * @throws BadReferenceObjectException will not be thrown, but a helper method used by this method
 	 * can throw this exception under some circumstances (but not when called by the featureCommand method!)
 	 * @throws CoordinateErrorException will not be thrown, but a helper method used by this method
 	 * can throw this exception under some circumstances (but not when called by the featureCommand method!)
@@ -736,8 +738,7 @@ public class DasCommandManager {
 		Collection<SegmentReporter> segmentReporterCollections;
 		if (requestedSegments.size() > 0){
 			segmentReporterCollections = getFeatureCollection(dsnConfig, requestedSegments, true,maxbins);
-		}
-		else {
+		} else {
 			// No segments have been requested, so instead check for either feature_id or group_id filters.
 			// (If neither of these are present, then throw a BadCommandArgumentsException)
 			if (filter.containsFeatureIds() ){
@@ -746,7 +747,10 @@ public class DasCommandManager {
 				if (annotatedSegments != null){
 					segmentReporterCollections = new ArrayList<SegmentReporter>(annotatedSegments.size());
 					for (DasAnnotatedSegment segment : annotatedSegments){
-						segmentReporterCollections.add (new FoundFeaturesReporter(segment));
+						if (segment instanceof DasUnknownFeatureSegment){
+							segmentReporterCollections.add (new UnknownFeatureSegmentReporter(segment.getSegmentId()));
+						}else
+							segmentReporterCollections.add (new FoundFeaturesReporter(segment));
 					}
 				}
 				else {
@@ -759,7 +763,7 @@ public class DasCommandManager {
 			}
 		}
 		// OK - got a Collection of FoundFeaturesReporter objects, so get on with marshalling them out.
-		writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+		writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 
 		/************************************************************************\
 		 * Build the XML                                                        *
@@ -790,7 +794,9 @@ public class DasCommandManager {
 			for (SegmentReporter segmentReporter : segmentReporterCollections){
 				if (segmentReporter instanceof UnknownSegmentReporter){
 					((UnknownSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, referenceSource);
-				} else {
+				} else if (segmentReporter instanceof UnknownFeatureSegmentReporter){
+					((UnknownFeatureSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer);
+				} else {	
 					((FoundFeaturesReporter) segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, filter, categorize, dsnConfig.isFeaturesStrictlyEnclosed(), dsnConfig.isUseFeatureIdForFeatureLabel());
 				}
 			}
@@ -900,7 +906,6 @@ public class DasCommandManager {
 	 * elegant manner.
 	 * @param unknownSegmentsHandled to indicate if the calling method is able to report missing segments (i.e.
 	 * the feature command can return errorsegment / unknownsegment).
-	 * @throws uk.ac.ebi.mydas.exceptions.BadReferenceObjectException thrown if unknownSegmentsHandled is false and
 	 * the segment id is not known to the DSN.
 	 * @throws uk.ac.ebi.mydas.exceptions.CoordinateErrorException thrown if unknownSegmentsHandled is false and
 	 * the segment coordinates are out of scope for the provided segment id.
@@ -1048,9 +1053,10 @@ public class DasCommandManager {
 	 * @param request required to determine if the client will accept a compressed response
 	 * @param compressionAllowed to indicate if the specific response should be gzipped. (e.g. an error message with
 	 * no content should not set the compressed header.)
+	 * @throws IOException 
 	 */
-	private void writeHeader (HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed){
-		this.mydasServlet.writeHeader(request, response, status, compressionAllowed);
+	private void writeHeader (HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed,String capabilities) throws IOException{
+		this.mydasServlet.writeHeader(request, response, status, compressionAllowed,capabilities);
 	}
 
 
@@ -1069,7 +1075,7 @@ public class DasCommandManager {
 	throws XmlPullParserException, IOException{
 		// Check the configuration has been loaded successfully
 		if (DATA_SOURCE_MANAGER.getServerConfiguration() == null){
-			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
 			logger.error("A request has been made to the das server, however initialisation failed - possibly the mydasserverconfig.xml file was not found.");
 			return;
 		}
@@ -1078,11 +1084,11 @@ public class DasCommandManager {
 		List<String> dsns = DATA_SOURCE_MANAGER.getServerConfiguration().getDsnNames();
 		// Check there is at least one dsn.  (Mandatory in the dsn XML output).
 		if (dsns == null || dsns.size() == 0){
-			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
 			logger.error("The source command has been called, but no sources have been initialised successfully.");
 		} else{
 			// At least one dsn is OK.
-			writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+			writeHeader (request, response, XDasStatus.STATUS_200_OK, true,null);
 			// Build the XML.
 			XmlSerializer serializer;
 			serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -1204,7 +1210,7 @@ public class DasCommandManager {
 				throw new DataSourceException("The dsn " + dsnConfig.getId() + "is returning null for the entry point version, which is invalid.");
 			}
 			// Looks like all is OK.
-			writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+			writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 			//OK, got our entry points, so write out the XML.
 			XmlSerializer serializer;
 			serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -1274,6 +1280,9 @@ public class DasCommandManager {
 	
 	/**
 	 * Implements the sequence command.  Delegates to the getSequences method to return the requested sequences.
+	 * 
+     * DAS1.6: The exception for a bad reference object (reference sequence unknown) [deprecated in favour of Exception Handling] 
+     * 
 	 * @param request to allow the writing of the http header
 	 * @param response to which the http header and the XML are written.
 	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
@@ -1282,7 +1291,6 @@ public class DasCommandManager {
 	 * @throws IOException during writing of the XML
 	 * @throws DataSourceException to capture any error returned from the data source.
 	 * @throws UnimplementedFeatureException if the dsn reports that it cannot return sequence.
-	 * @throws BadReferenceObjectException in the event that the segment id is not known to the dsn
 	 * @throws BadCommandArgumentsException if the arguments to the sequence command are not as specified in the
 	 * DAS 1.53 specification
 	 * @throws CoordinateErrorException if the requested coordinates are outside those of the segment id requested.
@@ -1295,7 +1303,7 @@ public class DasCommandManager {
 			// Fine - process command.
 			Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
 			// Got some sequences, so all is OK.
-			writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+			writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 			// Build the XML.
 			XmlSerializer serializer;
 			serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -1381,6 +1389,9 @@ public class DasCommandManager {
 	
 	/**
 	 * Implements the structure command.  Delegates to the getStructure method to return the requested structure.
+	 * 
+     * DAS1.6: The exception for a bad reference object (reference sequence unknown) [deprecated in favour of Exception Handling] 
+     * 
 	 * @param request to allow the writing of the http header
 	 * @param response to which the http header and the XML are written.
 	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
@@ -1389,7 +1400,6 @@ public class DasCommandManager {
 	 * @throws IOException during writing of the XML
 	 * @throws DataSourceException to capture any error returned from the data source.
 	 * @throws UnimplementedFeatureException if the dsn reports that it cannot return sequence.
-	 * @throws BadReferenceObjectException in the event that the segment id is not known to the dsn
 	 * @throws BadCommandArgumentsException if the arguments to the sequence command are not as specified in the
 	 * DAS 1.6 specification
 	 * @throws CoordinateErrorException if the requested coordinates are outside those of the segment id requested.
@@ -1433,7 +1443,7 @@ public class DasCommandManager {
 				if (query==null)
 					throw new BadCommandArgumentsException("Bad command arguments - missing the query argument of the command structure: " + queryString);
 				// Looks like all is OK.
-				writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+				writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 
 				XmlSerializer serializer;
 				serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -1463,6 +1473,7 @@ public class DasCommandManager {
 	}
 	/**
 	 * Implements the alignment command.  Delegates to the getAlignment method to return the requested alignment.
+	 * 
 	 * @param request to allow the writing of the http header
 	 * @param response to which the http header and the XML are written.
 	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
@@ -1471,7 +1482,6 @@ public class DasCommandManager {
 	 * @throws IOException during writing of the XML
 	 * @throws DataSourceException to capture any error returned from the data source.
 	 * @throws UnimplementedFeatureException if the dsn reports that it cannot return sequence.
-	 * @throws BadReferenceObjectException in the event that the segment id is not known to the dsn
 	 * @throws BadCommandArgumentsException if the arguments to the sequence command are not as specified in the
 	 * DAS 1.6 specification
 	 * @throws CoordinateErrorException if the requested coordinates are outside those of the segment id requested.
@@ -1537,7 +1547,7 @@ public class DasCommandManager {
 				if (query==null)
 					throw new BadCommandArgumentsException("Bad command arguments - missing the query argument of the command alignment: " + queryString);
 				// Looks like all is OK.
-				writeHeader (request, response, XDasStatus.STATUS_200_OK, true);
+				writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 
 				XmlSerializer serializer;
 				serializer = PULL_PARSER_FACTORY.newSerializer();

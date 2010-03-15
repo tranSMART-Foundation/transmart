@@ -23,6 +23,7 @@
 
 package uk.ac.ebi.mydas.example;
 
+import net.sourceforge.jwebunit.exception.TestingEngineResponseException;
 import net.sourceforge.jwebunit.junit.WebTestCase;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.webapp.WebAppContext;
@@ -187,6 +188,25 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("<FEATURE id=\"oneFeatureIdTwo\" label=\"one Feature Label Two\">");
         assertTextPresent("</SEGMENT>");
     }
+    public void test_features_command_featureids(){
+        beginAt("/test/features?feature_id=oneFeatureIdOne;feature_id=unknown");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+        assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+        assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
+        assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
+        assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
+        assertTextPresent("START>5</START>");
+        assertTextPresent("<END>10</END>");
+        assertTextPresent("<SCORE>123.45</SCORE>");
+        assertTextNotPresent("<ORIENTATION>0</ORIENTATION>");
+        assertTextNotPresent("<PHASE>-</PHASE>");
+        assertTextPresent("<NOTE>This is a note relating to feature one of segment one.</NOTE>");
+        assertTextPresent("<LINK href=\"http://code.google.com/p/mydas/\">mydas project home page.</LINK>");
+        assertTextPresent("<TARGET id=\"oneTargetId\" start=\"20\" stop=\"30\">oneTargetName</TARGET>");
+        assertTextPresent("</FEATURE>");
+        assertTextPresent("</SEGMENT>");
+        assertTextPresent("<UNKNOWNFEATURE id=\"unknown\" /");
+    }
     public void test_features_command_one_maxbins(){
         beginAt("/test/features?segment=one;maxbins=1");
         assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
@@ -310,5 +330,53 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("</block>");
         assertTextPresent("</alignment>");
         assertTextPresent("</dasalignment>");
+    }
+    public void testError_BadCommand() {
+    	try {
+    		beginAt("/test/unknowncommand");
+    	} catch(TestingEngineResponseException te){
+    	}finally{
+            this.assertResponseCode(400);
+            this.assertHeaderEquals("X-DAS-Status", "400");
+    	}
+    }
+    
+    //TODO: if is just sent the source name it response as the sources command
+    public void testError_BadDataSource() {
+    	try {
+    		beginAt("/unknowndatasource/features");
+    	} catch(TestingEngineResponseException te){
+    	}finally{
+            this.assertResponseCode(400);
+            this.assertHeaderEquals("X-DAS-Status", "401");
+    	}
+    }
+    public void testError_BadCommandArguments() {
+    	try {
+            beginAt("/test/features?unknownargument=x");
+    	} catch(TestingEngineResponseException te){
+    	}finally{
+            this.assertResponseCode(400);
+            this.assertHeaderEquals("X-DAS-Status", "402");
+    	}
+    }
+    //TODO: Create another source that doesn't have stylesheet to test
+//    public void testError_BadStylesheet() {
+//    	try {
+//            beginAt("/test2/stylesheet");
+//    	} catch(TestingEngineResponseException te){
+//    	}finally{
+//            this.assertResponseCode(400);
+//            this.assertHeaderEquals("X-DAS-Status", "402");
+//    	}
+//    }
+    public void testError_CommandNoImplementedIntheDatasource() {
+    	try {
+            beginAt("/test/link?field=method;id=ID");
+    	} catch(TestingEngineResponseException te){
+    	}finally{
+            this.assertResponseCode(500);
+            this.assertHeaderEquals("X-DAS-Status", "501");
+    	}
     }
 }

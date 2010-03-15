@@ -119,6 +119,7 @@ public class MydasServlet extends HttpServlet {
 	 */
 	private static final String HEADER_KEY_X_DAS_VERSION = "X-DAS-Version";
 	private static final String HEADER_KEY_X_DAS_STATUS = "X-DAS-Status";
+	private static final String HEADER_KEY_X_DAS_SERVER = "X-DAS-Server";
 	private static final String HEADER_KEY_X_DAS_CAPABILITIES = "X-DAS-Capabilities";
 
 	/**
@@ -170,8 +171,9 @@ public class MydasServlet extends HttpServlet {
 	/*
 	Response Header line values
 	 */
-	private static final String HEADER_VALUE_CAPABILITIES = "dsn/1.0; dna/1.0; types/1.0; stylesheet/1.0; features/1.0; entry_points/1.0; error-segment/1.0; unknown-segment/1.0; feature-by-id/1.0; group-by-id/1.0; component/1.0; supercomponent/1.0; sequenceString/1.0";
-	private static final String HEADER_VALUE_DAS_VERSION = "DAS/1.5";
+//	private static final String HEADER_VALUE_CAPABILITIES = "dsn/1.0; dna/1.0; types/1.0; stylesheet/1.0; features/1.0; entry_points/1.0; error-segment/1.0; unknown-segment/1.0; feature-by-id/1.0; group-by-id/1.0; component/1.0; supercomponent/1.0; sequenceString/1.0";
+	private static final String HEADER_VALUE_DAS_VERSION = "DAS/1.6";
+	private static final String HEADER_VALUE_DAS_SERVER = "MyDAS1.6";
 
 	private static XmlPullParserFactory PULL_PARSER_FACTORY = null;
 
@@ -383,43 +385,43 @@ public class MydasServlet extends HttpServlet {
 			}
 		} catch (BadCommandException bce) {
 			logger.error("BadCommandException thrown", bce);
-			writeHeader(request, response, XDasStatus.STATUS_400_BAD_COMMAND, false);
+			writeHeader(request, response, XDasStatus.STATUS_400_BAD_COMMAND, false,null);
 			reportError(XDasStatus.STATUS_400_BAD_COMMAND, "Bad Command - Command not recognised as a valid DAS command.", request, response);
 		} catch (BadDataSourceException bdse) {
 			logger.error("BadDataSourceException thrown", bdse);
-			writeHeader(request, response, XDasStatus.STATUS_401_BAD_DATA_SOURCE, false);
+			writeHeader(request, response, XDasStatus.STATUS_401_BAD_DATA_SOURCE, false,null);
 			reportError(XDasStatus.STATUS_401_BAD_DATA_SOURCE, "Bad Data Source", request, response);
 		} catch (BadCommandArgumentsException bcae) {
 			logger.error("BadCommandArgumentsException thrown", bcae);
-			writeHeader(request, response, XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, false);
+			writeHeader(request, response, XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, false,null);
 			reportError(XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, "Bad Command Arguments - Command not recognised as a valid DAS command.", request, response);
 		} catch (BadReferenceObjectException broe) {
 			logger.error("BadReferenceObjectException thrown", broe);
-			writeHeader(request, response, XDasStatus.STATUS_403_BAD_REFERENCE_OBJECT, false);
+			writeHeader(request, response, XDasStatus.STATUS_403_BAD_REFERENCE_OBJECT, false,null);
 			reportError(XDasStatus.STATUS_403_BAD_REFERENCE_OBJECT, "Unrecognised reference object: the requested segment is not available from this server.", request, response);
 		} catch (BadStylesheetException bse) {
 			logger.error("BadStylesheetException thrown:", bse);
-			writeHeader(request, response, XDasStatus.STATUS_404_BAD_STYLESHEET, false);
+			writeHeader(request, response, XDasStatus.STATUS_404_BAD_STYLESHEET, false,null);
 			reportError(XDasStatus.STATUS_404_BAD_STYLESHEET, "Bad Stylesheet.", request, response);
 		} catch (CoordinateErrorException cee) {
 			logger.error("CoordinateErrorException thrown", cee);
-			writeHeader(request, response, XDasStatus.STATUS_405_COORDINATE_ERROR, false);
+			writeHeader(request, response, XDasStatus.STATUS_405_COORDINATE_ERROR, false,null);
 			reportError(XDasStatus.STATUS_405_COORDINATE_ERROR, "Coordinate error - the requested coordinates are outside the scope of the requested segment.", request, response);
 		} catch (XmlPullParserException xppe) {
 			logger.error("XmlPullParserException thrown when attempting to ouput XML.", xppe);
-			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
 			reportError(XDasStatus.STATUS_500_SERVER_ERROR, "An error has occurred when attempting to output the DAS XML.", request, response);
 		} catch (DataSourceException dse){
 			logger.error("DataSourceException thrown by a data source.", dse);
-			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
 			reportError(XDasStatus.STATUS_500_SERVER_ERROR, "The data source has thrown a 'DataSourceException' indicating a software error has occurred: " + dse.getMessage(), request, response);
 		} catch (ConfigurationException ce) {
 			logger.error("ConfigurationException thrown: This mydas installation was not correctly initialised.", ce);
-			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false);
+			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
 			reportError(XDasStatus.STATUS_500_SERVER_ERROR, "This installation of MyDas is not correctly configured.", request, response);
 		} catch (UnimplementedFeatureException efe) {
 			logger.error("UnimplementedFeatureException thrown", efe);
-			writeHeader(request, response, XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE, false);
+			writeHeader(request, response, XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE, false,null);
 			reportError(XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE, "Unimplemented feature: this DAS server cannot serve the request you have made.", request, response);
 		}
 
@@ -455,13 +457,25 @@ public class MydasServlet extends HttpServlet {
 	 * @param request required to determine if the client will accept a compressed response
 	 * @param compressionAllowed to indicate if the specific response should be gzipped. (e.g. an error message with
 	 * no content should not set the compressed header.)
+	 * @throws IOException 
 	 */
-	void writeHeader (HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed){
+	void writeHeader (HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed,String capabilities) throws IOException{
 		response.setHeader(HEADER_KEY_X_DAS_VERSION, HEADER_VALUE_DAS_VERSION);
-		response.setHeader(HEADER_KEY_X_DAS_CAPABILITIES, HEADER_VALUE_CAPABILITIES);
+		if (capabilities!=null)
+			response.setHeader(HEADER_KEY_X_DAS_CAPABILITIES, capabilities);
 		response.setHeader(HEADER_KEY_X_DAS_STATUS, status.toString());
+		response.setHeader(HEADER_KEY_X_DAS_SERVER,HEADER_VALUE_DAS_SERVER);
 		if (compressionAllowed && compressResponse (request)){
 			response.setHeader(ENCODING_RESPONSE_HEADER_KEY, ENCODING_GZIPPED);
+		}
+		if (	status==XDasStatus.STATUS_400_BAD_COMMAND || 
+				status==XDasStatus.STATUS_401_BAD_DATA_SOURCE ||
+				status==XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS){
+					response.sendError(400);
+		} else if (status==XDasStatus.STATUS_404_BAD_STYLESHEET){
+			response.sendError(404);
+		} else if (status==XDasStatus.STATUS_500_SERVER_ERROR || status==XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE){
+			response.sendError(500);
 		}
 	}
 

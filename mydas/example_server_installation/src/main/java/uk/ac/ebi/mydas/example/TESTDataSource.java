@@ -31,6 +31,7 @@ import uk.ac.ebi.mydas.datasource.StructureDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
+import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
 import uk.ac.ebi.mydas.model.*;
 import uk.ac.ebi.mydas.model.alignment.AlignObject;
 import uk.ac.ebi.mydas.model.alignment.AlignType;
@@ -122,12 +123,12 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
      *                         interface.  It will then be the responsibility of your AnnotationDataSource plugin to
      *                         restrict the features returned for the requested range.
      * @return a List of DasFeature objects.
-     * @throws uk.ac.ebi.mydas.exceptions.BadReferenceObjectException
      *
      * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
+     * @throws BadReferenceObjectException 
      *
      */
-    public DasAnnotatedSegment getFeatures(String segmentReference,Integer maxbins) throws BadReferenceObjectException, DataSourceException {
+    public DasAnnotatedSegment getFeatures(String segmentReference,Integer maxbins) throws DataSourceException, BadReferenceObjectException {
         try{
             if (segmentReference.equals ("one")){
                 Collection<DasFeature> oneFeatures = new ArrayList<DasFeature>(2);
@@ -268,9 +269,9 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
                 
                 return segmentTwo;
             }
+//            else return null; // TODO: check the right XML for a bad reference object
             else throw new BadReferenceObjectException(segmentReference, "Not found");
-        }
-        catch (MalformedURLException e) {
+        } catch (MalformedURLException e) {
             throw new DataSourceException("Tried to create an invalid URL for a LINK element.", e);
         }
     }
@@ -343,7 +344,35 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
      *          provide a working implementation of this method.
      */
     public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins) throws UnimplementedFeatureException, DataSourceException {
-        throw new UnimplementedFeatureException("\"This test class, it is not ready yet!\" (in a Swedish accent)");
+    	Collection<DasAnnotatedSegment> segments = new ArrayList<DasAnnotatedSegment>(featureIdCollection.size());
+    	for (String featureId: featureIdCollection){
+    		if (featureId.equals("oneFeatureIdOne")){
+                Collection<DasFeature> oneFeatures = new ArrayList<DasFeature>(1);
+                DasTarget target = new DasTarget("oneTargetId", 20, 30, "oneTargetName");
+                try {
+					oneFeatures.add(new DasFeature(
+					        "oneFeatureIdOne",
+					        "one Feature Label One",
+					        new DasType("oneFeatureTypeIdOne", "oneFeatureCategoryOne", "CV:00001","one Feature DasType Label One"),
+					        new DasMethod("oneFeatureMethodIdOne","one Feature Method Label One","ECO:12345"),
+					        5,
+					        10,
+					        123.45,
+					        DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
+					        DasPhase.PHASE_NOT_APPLICABLE,
+					        Collections.singleton("This is a note relating to feature one of segment one."),
+					        Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
+					        Collections.singleton(target),
+					        null,
+					        null
+					));
+				} catch (MalformedURLException e) {}
+                segments.add(new DasAnnotatedSegment("one", 1, 34, "Up-to-date", "one_label", oneFeatures));
+    		} else {
+    			segments.add(new DasUnknownFeatureSegment(featureId));
+    		}
+    	}
+    	return segments;
     }
 
    /**
@@ -433,11 +462,7 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
      *          and read a record.</bold>
      */
     public URL getLinkURL(String field, String id) throws UnimplementedFeatureException, DataSourceException {
-        try{
-        return new URL("http://code.google.com/p/mydas/");
-        } catch (MalformedURLException e) {
-            throw new DataSourceException("Invalid URL!", e);
-        }
+        throw new UnimplementedFeatureException("Link URL is not implemented");
     }
 
     /**
@@ -462,14 +487,13 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
      *
      * @param segmentReference being the name of the sequenceString being requested.
      * @return a {@link DasSequence} object, holding the sequenceString and start / end coordinates of the sequenceString.
-     * @throws uk.ac.ebi.mydas.exceptions.BadReferenceObjectException
      *          to inform the {@link uk.ac.ebi.mydas.controller.MydasServlet} that the
      *          segment requested is not available from this DataSource.
      * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
      *          to encapsulate any exceptions thrown by the datasource
      *          and allow the MydasServlet to return a decent error header to the client.
      */
-    public DasSequence getSequence(String segmentReference) throws BadReferenceObjectException, DataSourceException {
+    public DasSequence getSequence(String segmentReference) throws DataSourceException,BadReferenceObjectException {
         if (segmentReference.equals ("one")){
             return new DasSequence("one", "FFDYASTDFYASDFAUFDYFVSHCVYTDASVCYT", 1, "Up-to-date",null);
         }
@@ -504,7 +528,7 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
 	public DasStructure getStructure(String structureId,
 			Collection<String> chainIdCollection,
 			Collection<String> modelIdCollection)
-			throws BadReferenceObjectException, DataSourceException {
+			throws DataSourceException {
 
 		DasObject obj=new DasObject("2ii9", null, "20-MAR-07", null, "PDB", "20070116", "PDBresnum,Protein Structure");
 		Collection<DasAtom> atoms = new ArrayList<DasAtom>(6);
@@ -523,7 +547,7 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
 	public DasAlignment getAlignment(String alignmentId,
 			Collection<String> subjects, String subjectcoordsys,
 			Integer rowStart, Integer rowEnd, Integer colStart, Integer colEnd)
-			throws BadReferenceObjectException, DataSourceException {
+			throws DataSourceException {
 
 		Collection<AlignObject> alignObjects= new ArrayList<AlignObject>(2);
 		alignObjects.add(new AlignObject("PF03344", "93d32837b9b401f3bac6ef3d21f9193c", "A2V6V1", AlignType.TYPE_PROTEIN, "Pfam", "24.0","UniProt",null, "TPSSVEMDISSSRKQSEEPFTTVLENGAGMVSSTSFNGGVSPHNWGDSGPPCKKSRKEKKQTGSGPLGNSYVERQRSVHEK"));

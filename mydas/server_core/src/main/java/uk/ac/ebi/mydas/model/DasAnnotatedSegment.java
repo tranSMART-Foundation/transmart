@@ -42,6 +42,7 @@ import java.io.Serializable;
  *
  * A Data Source is required to be able to return a {@link Collection<DasAnnotatedSegment>} of these objects.
  */
+@SuppressWarnings("serial")
 public class DasAnnotatedSegment extends DasSegment implements Serializable {
 
     /**

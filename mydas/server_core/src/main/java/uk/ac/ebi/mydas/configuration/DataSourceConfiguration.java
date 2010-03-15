@@ -24,6 +24,8 @@
 package uk.ac.ebi.mydas.configuration;
 
 import org.apache.log4j.Logger;
+
+import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.Capability;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
@@ -213,8 +215,7 @@ public class DataSourceConfiguration {
         String className=config.getVersion().get(0).getClazz();
         try{
             ClassLoader classLoader = this.getClass().getClassLoader();
-            Class dataSourceClass = classLoader.loadClass(className);
-            dataSource = (AnnotationDataSource) dataSourceClass.newInstance();
+            dataSource = (AnnotationDataSource) (classLoader.loadClass(className)).newInstance();
             if (dataSource != null){
                 datasourceOK = true;
             }
@@ -326,5 +327,12 @@ public class DataSourceConfiguration {
 
 	public Mydasserver.Datasources.Datasource getConfig() {
 		return config;
+	}
+
+	public String getCapabilities() {
+		String capabilities="";
+		for (Capability cap:config.getVersion().get(0).getCapability())
+			capabilities += " "+cap.getType()+";";
+		return capabilities;
 	}
 }
