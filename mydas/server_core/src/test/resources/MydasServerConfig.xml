@@ -58,7 +58,7 @@
             <!-- The fully qualified class name of the DataSource. -->
 			<maintainer email="test@ebi.ac.uk" />
 
-            <version uri="http://www.ebi.ac.uk/test" created="2010-03-01">
+            <version uri="http://www.ebi.ac.uk/dsnId1" created="2010-03-01">
 				<class>fully.qualified.class.1</class>
 				<coordinates 	uri="http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle"
 								source="Protein Sequence"
@@ -85,7 +85,7 @@
                     description="dsnDescription2"
                     doc_href="http://dsnDescriptionHref2">
 			<maintainer email="test@ebi.ac.uk" />
-            <version uri="http://www.ebi.ac.uk/test2" created="2010-03-01">
+            <version uri="http://www.ebi.ac.uk/dsnId2" created="2010-03-01">
 	            <class>fully.qualified.class.2</class>
 				<coordinates 	uri="http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle"
 								source="Protein Sequence"

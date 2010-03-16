@@ -458,7 +458,7 @@ public class DasCommandManager {
 			serializer.attribute(DAS_XML_NAMESPACE, "href", this.buildRequestHref(request));
 			serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
 			// No id, start, stop, type attributes.
-			serializer.attribute(DAS_XML_NAMESPACE, "version", dsnConfig.getVersion());
+			//serializer.attribute(DAS_XML_NAMESPACE, "version", dsnConfig.getVersion());
 			serializer.attribute(DAS_XML_NAMESPACE, "label", "Complete datasource summary");
 			// Iterate over the allTypeReport for the TYPE elements.
 			for (DasType type : allTypesReport.keySet()){
@@ -1104,55 +1104,62 @@ public class DasCommandManager {
 					serializer.text("\n");
 				}
 				serializer.startTag (DAS_XML_NAMESPACE, "SOURCES");
+				List<String> versionsadded= new ArrayList<String>();
+				
 				for (String dsn : dsns){
-					Datasource dsnConfig2 = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfig(dsn).getConfig();
-					serializer.startTag (DAS_XML_NAMESPACE, "SOURCE");
-					serializer.attribute(DAS_XML_NAMESPACE, "uri", dsnConfig2.getUri());
-					if (dsnConfig2.getDocHref() != null && dsnConfig2.getDocHref().length() > 0){
-						serializer.attribute(DAS_XML_NAMESPACE, "doc_href", dsnConfig2.getDocHref());
-					}
-					serializer.attribute(DAS_XML_NAMESPACE, "title", dsnConfig2.getTitle());
-					serializer.attribute(DAS_XML_NAMESPACE, "description", dsnConfig2.getDescription());
-					
-					serializer.startTag (DAS_XML_NAMESPACE, "MAINTAINER");
-					serializer.attribute(DAS_XML_NAMESPACE, "email", dsnConfig2.getMaintainer().getEmail());
-					serializer.endTag (DAS_XML_NAMESPACE, "MAINTAINER");
-
-					for(Version version:dsnConfig2.getVersion()){
-						serializer.startTag (DAS_XML_NAMESPACE, "VERSION");
-						serializer.attribute(DAS_XML_NAMESPACE, "uri", version.getUri());
-						serializer.attribute(DAS_XML_NAMESPACE, "created", version.getCreated().toString());
-						for(Coordinates coordinates:version.getCoordinates()){
-							serializer.startTag (DAS_XML_NAMESPACE, "COORDINATES");
-							serializer.attribute(DAS_XML_NAMESPACE, "uri", coordinates.getUri());
-							serializer.attribute(DAS_XML_NAMESPACE, "source", coordinates.getSource());
-							serializer.attribute(DAS_XML_NAMESPACE, "authority", coordinates.getAuthority());
-							if ( (coordinates.getTaxid()!=null) && (coordinates.getTaxid().length()>0) )
-								serializer.attribute(DAS_XML_NAMESPACE, "taxid", coordinates.getTaxid());
-							if ( (coordinates.getVersion()!=null) && (coordinates.getVersion().length()>0) )
-								serializer.attribute(DAS_XML_NAMESPACE, "version", coordinates.getVersion());
-							serializer.attribute(DAS_XML_NAMESPACE, "test_range", coordinates.getTestRange());
-							serializer.text(coordinates.getValue());
-							serializer.endTag (DAS_XML_NAMESPACE, "COORDINATES");							
+					if (source==null || source.equals(dsn)){
+						if (!versionsadded.contains(dsn)){
+							Datasource dsnConfig2 = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfig(dsn).getConfig();
+							serializer.startTag (DAS_XML_NAMESPACE, "SOURCE");
+							serializer.attribute(DAS_XML_NAMESPACE, "uri", dsnConfig2.getUri());
+							if (dsnConfig2.getDocHref() != null && dsnConfig2.getDocHref().length() > 0){
+								serializer.attribute(DAS_XML_NAMESPACE, "doc_href", dsnConfig2.getDocHref());
+							}
+							serializer.attribute(DAS_XML_NAMESPACE, "title", dsnConfig2.getTitle());
+							serializer.attribute(DAS_XML_NAMESPACE, "description", dsnConfig2.getDescription());
+							
+							serializer.startTag (DAS_XML_NAMESPACE, "MAINTAINER");
+							serializer.attribute(DAS_XML_NAMESPACE, "email", dsnConfig2.getMaintainer().getEmail());
+							serializer.endTag (DAS_XML_NAMESPACE, "MAINTAINER");
+		
+							for(Version version:dsnConfig2.getVersion()){
+								versionsadded.add(version.getUri());
+								serializer.startTag (DAS_XML_NAMESPACE, "VERSION");
+								serializer.attribute(DAS_XML_NAMESPACE, "uri", version.getUri());
+								serializer.attribute(DAS_XML_NAMESPACE, "created", version.getCreated().toString());
+								for(Coordinates coordinates:version.getCoordinates()){
+									serializer.startTag (DAS_XML_NAMESPACE, "COORDINATES");
+									serializer.attribute(DAS_XML_NAMESPACE, "uri", coordinates.getUri());
+									serializer.attribute(DAS_XML_NAMESPACE, "source", coordinates.getSource());
+									serializer.attribute(DAS_XML_NAMESPACE, "authority", coordinates.getAuthority());
+									if ( (coordinates.getTaxid()!=null) && (coordinates.getTaxid().length()>0) )
+										serializer.attribute(DAS_XML_NAMESPACE, "taxid", coordinates.getTaxid());
+									if ( (coordinates.getVersion()!=null) && (coordinates.getVersion().length()>0) )
+										serializer.attribute(DAS_XML_NAMESPACE, "version", coordinates.getVersion());
+									serializer.attribute(DAS_XML_NAMESPACE, "test_range", coordinates.getTestRange());
+									serializer.text(coordinates.getValue());
+									serializer.endTag (DAS_XML_NAMESPACE, "COORDINATES");							
+								}
+								for(Capability capability:version.getCapability()){
+									serializer.startTag (DAS_XML_NAMESPACE, "CAPABILITY");
+									serializer.attribute(DAS_XML_NAMESPACE, "type", capability.getType());
+									if ( (capability.getQueryUri()!=null) && (capability.getQueryUri().length()>0) )
+										serializer.attribute(DAS_XML_NAMESPACE, "query_uri", capability.getQueryUri());
+									serializer.endTag (DAS_XML_NAMESPACE, "CAPABILITY");							
+								}
+								serializer.endTag (DAS_XML_NAMESPACE, "VERSION");
+							}
+							
+							for(PropertyType pt:dsnConfig2.getProperty()){
+								serializer.startTag (DAS_XML_NAMESPACE, "PROPERTY");
+								serializer.attribute(DAS_XML_NAMESPACE, "name", pt.getKey());
+								serializer.attribute(DAS_XML_NAMESPACE, "value", pt.getValue());
+								serializer.endTag (DAS_XML_NAMESPACE, "PROPERTY");
+							}
+							
+							serializer.endTag (DAS_XML_NAMESPACE, "SOURCE");
 						}
-						for(Capability capability:version.getCapability()){
-							serializer.startTag (DAS_XML_NAMESPACE, "CAPABILITY");
-							serializer.attribute(DAS_XML_NAMESPACE, "type", capability.getType());
-							if ( (capability.getQueryUri()!=null) && (capability.getQueryUri().length()>0) )
-								serializer.attribute(DAS_XML_NAMESPACE, "query_uri", capability.getQueryUri());
-							serializer.endTag (DAS_XML_NAMESPACE, "CAPABILITY");							
-						}
-						serializer.endTag (DAS_XML_NAMESPACE, "VERSION");
 					}
-					
-					for(PropertyType pt:dsnConfig2.getProperty()){
-						serializer.startTag (DAS_XML_NAMESPACE, "PROPERTY");
-						serializer.attribute(DAS_XML_NAMESPACE, "name", pt.getKey());
-						serializer.attribute(DAS_XML_NAMESPACE, "value", pt.getValue());
-						serializer.endTag (DAS_XML_NAMESPACE, "PROPERTY");
-					}
-					
-					serializer.endTag (DAS_XML_NAMESPACE, "SOURCE");
 				}
 				serializer.endTag (DAS_XML_NAMESPACE, "SOURCES");
 				serializer.flush();

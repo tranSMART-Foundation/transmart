@@ -127,10 +127,10 @@ public class ConfigurationManager {
             if (mapmaster == null){
                 throw new ConfigurationException("Please check your XML configuration file.  No value has been given for one of the mandatory /mydasserver/datasources/datasource/@mapmaster attributes.");
             }
-            
-            DataSourceConfiguration dsnConfig=new DataSourceConfiguration(datasource);
-            dataSourceConfigList.put(dsnConfig.getId(), dsnConfig);
-        	
+            for (int i=0;i<datasource.getVersion().size();i++){
+	            DataSourceConfiguration dsnConfig=new DataSourceConfiguration(datasource,i);
+	            dataSourceConfigList.put(dsnConfig.getId(), dsnConfig);
+            }
         }
         	
         return dataSourceConfigList;

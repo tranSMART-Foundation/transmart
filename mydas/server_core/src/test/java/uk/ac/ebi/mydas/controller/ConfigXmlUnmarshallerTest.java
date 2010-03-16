@@ -120,7 +120,7 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                             "dsnName1");
                     Assert.assertEquals("Unexpected dsn version",
                             dsnConfig.getVersion(),
-                            "http://www.ebi.ac.uk/test");
+                            "2010-03-01");
                     Assert.assertEquals("Unexpected mapmaster",
                             dsnConfig.getMapmaster(),
                             "http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle");
@@ -155,7 +155,7 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                             "dsnName2");
                     Assert.assertEquals("Unexpected dsn version",
                             dsnConfig.getVersion(),
-                            "http://www.ebi.ac.uk/test2");
+                            "2010-03-01");
                     Assert.assertEquals("Unexpected mapmaster",
                             dsnConfig.getMapmaster(),
                             "http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle");

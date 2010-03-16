@@ -42,7 +42,7 @@
 
         <!-- The name of the default DAS stylesheet to be used for all of the defined datasources.
         This can be overridden for individual datasources by including a stylesheet element for them. -->
-        <default-stylesheet>TEST.style</default-stylesheet>
+        <!--<default-stylesheet>TEST.style</default-stylesheet>-->
 
         <!-- Gives the URI of an XSLT transformation that can be used by the browser
             to present the dsn command response in a human-readable format.
@@ -116,6 +116,16 @@
 
 				
 			</version>
+			<version uri="test2" created="2010-01-01">
+	            <class>uk.ac.ebi.mydas.example.TestDataSourceOld</class>
+				<coordinates 	uri="http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle"
+								source="Protein Sequence"
+								authority="UniProt"
+								test_range="P00280">UniProt,Protein Sequence</coordinates>
+				<capability type="das1:features"     query_uri="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features" />
+
+				
+			</version>
 
             <!-- The optional name of the DAS stylesheet to be used for this datasource.
             This will override the default stylesheet defined in the global settings section. -->
@@ -149,6 +159,28 @@
             <!-- These properties are made available to the plugin class
             through the DataSource interface, so the plugin author can
             add arbitrary additional configuration to their data source.-->
+        </datasource>
+        <datasource uri="testSecond"
+                    title="testSecond"
+                    description="Second Test Data Source"
+                    doc_href="http://thesecondtest.com">
+            <!-- The fully qualified class name of the DataSource. -->
+			
+			<maintainer email="testsecond@ebi.ac.uk" />
+			<version uri="testSecond" created="2010-03-10">
+	            <class>uk.ac.ebi.mydas.example.TestDataSourceSecond</class>
+				<coordinates 	uri="http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle"
+								source="Protein Sequence"
+								authority="UniProt"
+								test_range="P00280">UniProt,Protein Sequence</coordinates>
+				<capability type="das1:features"     query_uri="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features" />
+		        <capability type="das1:types"        query_uri="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/types" />
+			</version>
+
+            <dna-command-enabled>true</dna-command-enabled>
+            <features-strictly-enclosed>true</features-strictly-enclosed>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
     </datasources>
 </mydasserver>

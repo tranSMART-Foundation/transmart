@@ -72,9 +72,10 @@ public class DataSourceConfiguration {
     private boolean datasourceOK;
 
     private final Mydasserver.Datasources.Datasource config;
-    
-    public DataSourceConfiguration(Mydasserver.Datasources.Datasource config){
+    private int versionPosition;
+    public DataSourceConfiguration(Mydasserver.Datasources.Datasource config, int versionPosition){
     	this.config=config;
+    	this.versionPosition=versionPosition;
     }
 
     /**
@@ -88,7 +89,7 @@ public class DataSourceConfiguration {
      * @return the mandatory value for /DASDSN/DSN/SOURCE/@id
      */
     public String getId() {
-        return config.getUri();
+        return config.getVersion().get(this.versionPosition).getUri();
     }
 
     /**
@@ -102,20 +103,18 @@ public class DataSourceConfiguration {
     /**
      * Returns the optional value for /DASDSN/DSN/SOURCE/@version
      * 
-     * WARNING: assuming first version!
      * @return the optional value for /DASDSN/DSN/SOURCE/@version
      */
     public String getVersion() {
-        return config.getVersion().get(0).getUri();
+        return config.getVersion().get(this.versionPosition).getCreated().toString();
     }
 
     /**
-     * WARNING: assuming first version and first coordinate system
      * Returns the optional value for /DASDSN/DSN/MAPMASTER
      * @return the optional value for /DASDSN/DSN/MAPMASTER
      */
     public String getMapmaster() {
-        return config.getVersion().get(0).getCoordinates().get(0).getUri();
+        return config.getVersion().get(this.versionPosition).getCoordinates().get(0).getUri();
     }
 
     /**
@@ -203,8 +202,6 @@ public class DataSourceConfiguration {
      * This method is called by the DataSourceManager to load
      * the datasource.
      * 
-     * WARNING: Assuming the first version of the source
-     * 
      * @return a boolean indicating if the load was successful or not.
      * (This value is also stored in the datasourceOK flag, for later retrieval.)
      * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
@@ -212,7 +209,7 @@ public class DataSourceConfiguration {
      */
     public boolean loadDataSource() throws DataSourceException{
         datasourceOK = false;    // Pessimistic start.
-        String className=config.getVersion().get(0).getClazz();
+        String className=config.getVersion().get(this.versionPosition).getClazz();
         try{
             ClassLoader classLoader = this.getClass().getClassLoader();
             dataSource = (AnnotationDataSource) (classLoader.loadClass(className)).newInstance();
@@ -331,7 +328,7 @@ public class DataSourceConfiguration {
 
 	public String getCapabilities() {
 		String capabilities="";
-		for (Capability cap:config.getVersion().get(0).getCapability())
+		for (Capability cap:config.getVersion().get(this.versionPosition).getCapability())
 			capabilities += " "+cap.getType()+";";
 		return capabilities;
 	}

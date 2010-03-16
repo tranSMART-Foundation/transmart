@@ -269,7 +269,6 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
                 
                 return segmentTwo;
             }
-//            else return null; // TODO: check the right XML for a bad reference object
             else throw new BadReferenceObjectException(segmentReference, "Not found");
         } catch (MalformedURLException e) {
             throw new DataSourceException("Tried to create an invalid URL for a LINK element.", e);

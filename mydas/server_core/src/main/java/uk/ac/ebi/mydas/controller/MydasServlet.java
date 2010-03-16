@@ -272,7 +272,6 @@ public class MydasServlet extends HttpServlet {
 	 */
 	private void parseAndHandleRequest(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException, IOException {
-
 		// Parse the request URI (e.g. /das/dsnname/sequenceString).
 		String queryString = request.getQueryString();
 		if (queryString != null){
@@ -282,9 +281,8 @@ public class MydasServlet extends HttpServlet {
 
 		if (logger.isDebugEnabled()){
 			logger.debug("RequestURI: '" + request.getRequestURI() + "'");
-			logger.debug("Query String: '" + queryString + "'");
+			logger.debug("Query String2: '" + queryString + "'");
 		}
-
 		Matcher match = REQUEST_URI_PATTERN.matcher(request.getRequestURI().replaceAll("/{2,}", "/"));
 
 		try{
@@ -320,7 +318,9 @@ public class MydasServlet extends HttpServlet {
 					String dsnName = match.group(1);
 					if (match.group(2) == null || match.group(2).length() == 0){
 						// Source command for an specific DSN 
-						dasCommands.sourceCommand (request, response, queryString,dsnName);
+						// Attempt to retrieve the DataSource
+						if (null!=DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get(dsnName))
+							dasCommands.sourceCommand (request, response, queryString,dsnName);
 					}
 					String command = match.group(2);
 					if (logger.isDebugEnabled()){

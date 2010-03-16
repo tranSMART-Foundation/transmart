@@ -63,12 +63,14 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("<!DOCTYPE DASDSN SYSTEM \"http://www.biodas.org/dtd/dasdsn.dtd\">");
         assertTextPresent("<DASDSN>");
         assertTextPresent("<DSN>");
-        assertTextPresent("<SOURCE id=\"test\" version=\"test\">test</SOURCE>");
+        assertTextPresent("<SOURCE id=\"test\" version=\"2010-03-01\">test</SOURCE>");
+        assertTextPresent("<SOURCE id=\"test2\" version=\"2010-01-01\">test</SOURCE>");
         assertTextPresent("<MAPMASTER>http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle</MAPMASTER>");
         assertTextPresent("<DESCRIPTION>Test Data Source</DESCRIPTION>");
         assertTextPresent("</DSN>");
         assertTextPresent("</DASDSN>");
     }
+
 
     /*
      * Changed to test the DAS 1.6 format
@@ -155,7 +157,7 @@ public class WebIntegrationTest extends WebTestCase {
         beginAt("/test/types");
         assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
         assertTextPresent("<DASTYPES>");
-        assertTextPresent("<SEGMENT version=\"test\" label=\"Complete datasource summary\">");
+        assertTextPresent("<SEGMENT label=\"Complete datasource summary\">");
         assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">1</TYPE>");
         assertTextPresent("<TYPE id=\"oneFeatureTypeIdTwo\" cvId=\"CV:00002\" category=\"oneFeatureCategoryTwo\">1</TYPE>");
         assertTextPresent("<TYPE id=\"twoFeatureTypeIdOne\" cvId=\"CV:00003\" category=\"twoFeatureCategoryOne\">1</TYPE>");
@@ -278,10 +280,28 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("<SOURCE uri=\"test\" doc_href=\"http://www.ebi.ac.uk/~pjones\" title=\"test\" description=\"Test Data Source\">");
         assertTextPresent("<MAINTAINER email=\"test@ebi.ac.uk\" />");
         assertTextPresent("<VERSION uri=\"test\" created=\"2010-03-01\">");
+        assertTextPresent("<VERSION uri=\"test2\" created=\"2010-01-01\">");
         assertTextPresent("<COORDINATES uri=\"http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle\" source=\"Protein Sequence\" authority=\"UniProt\" test_range=\"P00280\">UniProt,Protein Sequence</COORDINATES>");
         assertTextPresent("<CAPABILITY type=\"das1:features\" query_uri=\"http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features\" />");
         assertTextPresent("</VERSION>");
         assertTextPresent("</SOURCE>");
+        assertTextPresent("<SOURCE uri=\"testSecond\" doc_href=\"http://thesecondtest.com\" title=\"testSecond\" description=\"Second Test Data Source\">");
+        assertTextPresent("</SOURCES>");
+    }
+    public void testSourcePernameRequest() {
+        // Check XML response
+        beginAt("/test");
+        assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+        assertTextPresent("<SOURCES>");
+        assertTextPresent("<SOURCE uri=\"test\" doc_href=\"http://www.ebi.ac.uk/~pjones\" title=\"test\" description=\"Test Data Source\">");
+        assertTextPresent("<MAINTAINER email=\"test@ebi.ac.uk\" />");
+        assertTextPresent("<VERSION uri=\"test\" created=\"2010-03-01\">");
+        assertTextPresent("<VERSION uri=\"test2\" created=\"2010-01-01\">");
+        assertTextPresent("<COORDINATES uri=\"http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle\" source=\"Protein Sequence\" authority=\"UniProt\" test_range=\"P00280\">UniProt,Protein Sequence</COORDINATES>");
+        assertTextPresent("<CAPABILITY type=\"das1:features\" query_uri=\"http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features\" />");
+        assertTextPresent("</VERSION>");
+        assertTextPresent("</SOURCE>");
+        assertTextNotPresent("<SOURCE uri=\"testSecond\" doc_href=\"http://thesecondtest.com\" title=\"testSecond\" description=\"Second Test Data Source\">");
         assertTextPresent("</SOURCES>");
     }
 
@@ -341,10 +361,9 @@ public class WebIntegrationTest extends WebTestCase {
     	}
     }
     
-    //TODO: if is just sent the source name it response as the sources command
     public void testError_BadDataSource() {
     	try {
-    		beginAt("/unknowndatasource/features");
+    		beginAt("/unknowndatasource");
     	} catch(TestingEngineResponseException te){
     	}finally{
             this.assertResponseCode(400);
@@ -361,15 +380,15 @@ public class WebIntegrationTest extends WebTestCase {
     	}
     }
     //TODO: Create another source that doesn't have stylesheet to test
-//    public void testError_BadStylesheet() {
-//    	try {
-//            beginAt("/test2/stylesheet");
-//    	} catch(TestingEngineResponseException te){
-//    	}finally{
-//            this.assertResponseCode(400);
-//            this.assertHeaderEquals("X-DAS-Status", "402");
-//    	}
-//    }
+    public void testError_BadStylesheet() {
+    	try {
+            beginAt("/testSecond/stylesheet");
+    	} catch(TestingEngineResponseException te){
+    	}finally{
+            this.assertResponseCode(404);
+            this.assertHeaderEquals("X-DAS-Status", "404");
+    	}
+    }
     public void testError_CommandNoImplementedIntheDatasource() {
     	try {
             beginAt("/test/link?field=method;id=ID");
