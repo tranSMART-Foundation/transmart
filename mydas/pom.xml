@@ -113,7 +113,6 @@
 	<modules>
         <module>server_core</module>
         <module>example_server_installation</module>
-		<module>MyDasTemplate</module>
     </modules>
 
     <build>
