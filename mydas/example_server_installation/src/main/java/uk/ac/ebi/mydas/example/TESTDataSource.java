@@ -36,8 +36,11 @@ import uk.ac.ebi.mydas.model.*;
 import uk.ac.ebi.mydas.model.alignment.AlignObject;
 import uk.ac.ebi.mydas.model.alignment.AlignType;
 import uk.ac.ebi.mydas.model.alignment.Alignment;
+import uk.ac.ebi.mydas.model.alignment.AlignmentMatrix;
+import uk.ac.ebi.mydas.model.alignment.AlignmentVector;
 import uk.ac.ebi.mydas.model.alignment.Block;
 import uk.ac.ebi.mydas.model.alignment.DasAlignment;
+import uk.ac.ebi.mydas.model.alignment.Geo3D;
 import uk.ac.ebi.mydas.model.alignment.Segment;
 import uk.ac.ebi.mydas.model.structure.DasAtom;
 import uk.ac.ebi.mydas.model.structure.DasChain;
@@ -556,7 +559,8 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
 		segments.add(new Segment("A2V6V1", 1, 81, null, "78I4M11DI23D6I8DI38D2IDI3DI7DI8D4I28DI16D3I4D3I5DIDI7D9I11D2I4D67I10D12I11D3ID3I45D28I26DI13D25I115DI5DI4DIDI4DI7D6I15D2I12D3I3DI5D4I8D22I19D2I5D5I6D7IDIDI5D3I7D37I5D2I4DI7D2I2D2IDI10D5I5D7I4D3I6DI8DI17D7I3M2I9MI14MI29M10I13M6I3M6DI20D6I12D9I11D3I20D6M167I"));
 		segments.add(new Segment("Q4R3H3", 1, 429, null, "82I11DI23D6I8DI38D2IDI3DI7DI8D4I28DI16D3I4D3I5DIDI7D9I11D2I4D67I10D12I11D3ID3I45D28I26DI13D25I42D73MI5MI4MIMI4MID6M6ID14MI13M3I3MI5M4IM2D5M22I19M2I5M5I6M7IMIMI5M3I16M18I15M2I12M2I2M2IMI4M3D3M5I5M7I4M3I6MI8MI20MI6M2I9MI14MI29M10I49M6I55M173I"));
 		Collection<Block> blocks= Collections.singleton(new Block(null, "1", segments));
-		Alignment alignment = new Alignment("Pfam Full Alignment", "PF03344", null, 1, 84, alignObjects, scores, blocks);
+		Collection<Geo3D> geo3ds= Collections.singleton(new Geo3D("interiorId", new AlignmentVector(1.1,2.2,3.3), new AlignmentMatrix(1.1,1.2,1.3,2.1,2.2,2.3,3.1,3.2,3.3)));
+		Alignment alignment = new Alignment("Pfam Full Alignment", "PF03344", null, 1, 84, alignObjects, scores, blocks,geo3ds);
 		return new DasAlignment(Collections.singleton(alignment));
 	}
 

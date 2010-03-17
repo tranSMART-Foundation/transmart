@@ -27,6 +27,7 @@ public class Alignment {
 	protected final Collection<AlignObject> alignObjects;
     protected final Map<String, Double> scores;
 	protected final Collection<Block> blocks;
+	protected final Collection<Geo3D> geo3Ds;
 	
 	/**
 	 * @param alignType <b>Optional</b> Type of the alignment
@@ -41,7 +42,7 @@ public class Alignment {
 	 */
 	public Alignment(String alignType, String name, String description,
 			Integer position, Integer max, Collection<AlignObject> alignObjects,
-			Map<String, Double> scores, Collection<Block> blocks) throws DataSourceException {
+			Map<String, Double> scores, Collection<Block> blocks,Collection<Geo3D> geo3Ds) throws DataSourceException {
 
 		if (alignObjects == null || alignObjects.size()<2 ){
             throw new DataSourceException ("An attempt to instantiate a DasAlignment object without the minimal required mandatory values.");
@@ -57,6 +58,7 @@ public class Alignment {
 		this.alignObjects = alignObjects;
 		this.scores = scores;
 		this.blocks = blocks;
+		this.geo3Ds=geo3Ds;
 	}
 
 	/**
@@ -95,6 +97,10 @@ public class Alignment {
 			for (Block block: blocks)
 				block.serialize( DAS_XML_NAMESPACE,  serializer);
 		
+		if (geo3Ds!=null)
+			for (Geo3D geo3D: geo3Ds)
+				geo3D.serialize( DAS_XML_NAMESPACE,  serializer);
+
 		serializer.endTag(DAS_XML_NAMESPACE,"alignment");
 		
 	}

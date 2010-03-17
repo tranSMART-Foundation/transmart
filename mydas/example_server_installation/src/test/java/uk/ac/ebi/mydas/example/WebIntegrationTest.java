@@ -348,6 +348,10 @@ public class WebIntegrationTest extends WebTestCase {
         assertTextPresent("<segment intObjectId=\"Q4R3H3\" start=\"1\" end=\"429\">");
         assertTextPresent("<cigar>82I11DI23D6I8DI38D2IDI3DI7DI8D4I28DI16D3I4D3I5DIDI7D9I11D2I4D67I10D12I11D3ID3I45D28I26DI13D25I42D73MI5MI4MIMI4MID6M6ID14MI13M3I3MI5M4IM2D5M22I19M2I5M5I6M7IMIMI5M3I16M18I15M2I12M2I2M2IMI4M3D3M5I5M7I4M3I6MI8MI20MI6M2I9MI14MI29M10I49M6I55M173I</cigar>");
         assertTextPresent("</block>");
+        assertTextPresent("<geo3D intObjectId=\"interiorId\">");
+        assertTextPresent("<vector x=\"1.1\" y=\"2.2\" z=\"3.3\" />");
+        assertTextPresent("<matrix mat11=\"1.1\" mat12=\"1.2\" mat13=\"1.3\" mat21=\"2.1\" mat22=\"2.2\" mat23=\"2.3\" mat31=\"3.1\" mat32=\"3.2\" mat33=\"3.3\" />");
+        assertTextPresent("</geo3D>");
         assertTextPresent("</alignment>");
         assertTextPresent("</dasalignment>");
     }
