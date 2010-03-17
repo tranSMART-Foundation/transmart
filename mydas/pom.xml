@@ -28,7 +28,7 @@
     
     <groupId>uk.ac.ebi.mydas</groupId>
     <artifactId>mydas_master</artifactId>
-    <version>1.0.6</version>
+    <version>1.6.0</version>
 
     <packaging>pom</packaging>
     <name>mydas_example Maven Webapp</name>
@@ -113,6 +113,7 @@
 	<modules>
         <module>server_core</module>
         <module>example_server_installation</module>
+		<module>MyDasTemplate</module>
     </modules>
 
     <build>
