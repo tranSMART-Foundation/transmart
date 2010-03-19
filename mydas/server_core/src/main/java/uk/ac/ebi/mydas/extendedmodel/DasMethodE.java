@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.xmlpull.v1.XmlSerializer;
 
+import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.model.DasMethod;
 
 @SuppressWarnings("serial")
@@ -13,16 +14,18 @@ public class DasMethodE extends DasMethod {
 	 * Constructor to create a method from the value of its content
 	 * @param id Method id
 	 * @param label label of the method
+	 * @throws DataSourceException 
 	 */
-	public DasMethodE(String id, String label,String cvId) {
+	public DasMethodE(String id, String label,String cvId) throws DataSourceException {
 		super(id, label,cvId);
 	}
 	/**
 	 * Constructor to create a method from the parent
 	 * @param id Method id
 	 * @param label label of the method
+	 * @throws DataSourceException 
 	 */
-	public DasMethodE(DasMethod method) {
+	public DasMethodE(DasMethod method) throws DataSourceException {
 		super(method.getId(), method.getLabel(),method.getCvId());
 	}
 	/**

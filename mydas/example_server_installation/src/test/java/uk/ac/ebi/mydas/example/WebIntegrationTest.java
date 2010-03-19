@@ -274,7 +274,7 @@ public class WebIntegrationTest extends WebTestCase {
     
     public void testSourceRequest() {
         // Check XML response
-        beginAt("/source");
+        beginAt("/sources");
         assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
         assertTextPresent("<SOURCES>");
         assertTextPresent("<SOURCE uri=\"test\" doc_href=\"http://www.ebi.ac.uk/~pjones\" title=\"test\" description=\"Test Data Source\">");

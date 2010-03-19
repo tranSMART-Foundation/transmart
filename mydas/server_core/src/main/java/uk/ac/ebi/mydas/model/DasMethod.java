@@ -1,6 +1,8 @@
 package uk.ac.ebi.mydas.model;
 import java.io.Serializable;
 
+import uk.ac.ebi.mydas.exceptions.DataSourceException;
+
 @SuppressWarnings("serial")
 public class DasMethod implements Serializable{
     /**
@@ -21,7 +23,12 @@ public class DasMethod implements Serializable{
     
     public DasMethod(){}
 
-	public DasMethod(String id, String label,String cvId) {
+    
+	public DasMethod(String id, String label,String cvId) throws DataSourceException {
+		//The id is mandatory
+        if (id == null || id.trim().length()<1){
+            throw new DataSourceException ("An attempt to instantiate a DasFeature object without the minimal required mandatory values.");
+        }
 		this.id = id;
 		this.label = label;
 		this.cvId=cvId;

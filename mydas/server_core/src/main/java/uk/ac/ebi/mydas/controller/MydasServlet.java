@@ -138,7 +138,7 @@ public class MydasServlet extends HttpServlet {
 		COMMAND_SEQUENCE ("sequence"),
 		COMMAND_ALIGNMENT ("alignment"),
 		COMMAND_STRUCTURE ("structure"),
-		COMMAND_SOURCE ("source");
+		COMMAND_SOURCES ("sources");
 
 		private String commandString;
 
@@ -308,7 +308,7 @@ public class MydasServlet extends HttpServlet {
 						throw new BadCommandException("A bad dsn command has been sent to the server, including unrecognised additional query parameters.");
 					}
 					// Check for the source command (similar command to dsn).
-				} else if (Commands.COMMAND_SOURCE.matches(match.group(1))){
+				} else if (Commands.COMMAND_SOURCES.matches(match.group(1))){
 					// Handle source command, in contrast with dsn, source can have extra info 
 					dasCommands.sourceCommand (request, response, queryString,null);
 				}

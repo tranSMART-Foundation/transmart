@@ -368,7 +368,7 @@ public class DasFeature implements Serializable {
                       Collection<String> parents,
                       Collection<String> parts) throws DataSourceException {
 
-        if (featureId == null || type == null){
+        if (featureId == null || type == null || method==null){
             throw new DataSourceException ("An attempt to instantiate a DasFeature object without the minimal required mandatory values.");
         }
         if (orientation == null) {

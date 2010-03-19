@@ -76,6 +76,11 @@ public class DataSourceConfiguration {
     public DataSourceConfiguration(Mydasserver.Datasources.Datasource config, int versionPosition){
     	this.config=config;
     	this.versionPosition=versionPosition;
+    	this.cacheGroup[0] = config.getUri();
+
+        if (logger.isDebugEnabled()){
+            logger.debug("New DataSourceConfiguration instantiated: \n" + this.toString());
+        }
     }
 
     /**
