@@ -201,6 +201,35 @@
             <include-types-with-zero-count>true</include-types-with-zero-count>
 			<property key="gff_file" value="fickett-tss.gff" />
         </datasource>
+
+        <datasource uri="examplepipes"
+                    title="separatedByPipes"
+                    description="Data source testing a new parser"
+                    doc_href="http://mydas.googlecode.com">
+			<maintainer email="gsalazar@ebi.ac.uk" />
+
+			<version uri="examplepipes" created="2010-03-19">
+	            <class>uk.ac.ebi.mydas.examples.SeparatedByPipesDataSource</class>
+				<coordinates 	uri="CS_DS94"
+								source="Gene_ID"
+								authority="Ensembl"
+								taxid="9606"
+								test_range="ENSG00000160916">ENSEMBL, Genomic</coordinates>
+				<capability type="das1:sources"		 	query_uri="http://localhost:8080/das/examplepipes" />
+				<capability type="das1:types"			query_uri="http://localhost:8080/das/examplepipes/types" />
+				<capability type="das1:features"		query_uri="http://localhost:8080/das/examplepipes/features?segment=5" />
+				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplepipes/features?feature_id=ENSE00001865818" />
+				<capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
+				<capability type="das1:unknown-feature"	/>
+			</version>
+
+            <dna-command-enabled>true</dna-command-enabled>
+            <features-strictly-enclosed>true</features-strictly-enclosed>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+			<property key="pipes_file" value="testGenes.txt" />
+        </datasource>
+
     </datasources>
 </mydasserver>
 

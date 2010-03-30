@@ -64,7 +64,7 @@ public class GFF2Parser {
 		Double score=null;
 		if (!parts[5].equals(".")){
 			try{
-				score =Double.parseDouble(parts[6]);
+				score =Double.parseDouble(parts[5]);
 			}catch (NumberFormatException nfe){
 				throw new Exception("Parsing Error: the feature "+parts[2]+" has a bad score field ["+parts[6]+"]",nfe );
 			}
@@ -97,6 +97,21 @@ public class GFF2Parser {
 		for (DasAnnotatedSegment segment:segments){
 			if (segment.getSegmentId().equals(parts[0])){
 				segment.getFeatures().add(feature);
+				
+				if (feature.getStartCoordinate()<segment.getStartCoordinate()){
+					DasAnnotatedSegment newSegment = new DasAnnotatedSegment(segment.getSegmentId(),feature.getStartCoordinate(),segment.getStopCoordinate(),segment.getVersion(),segment.getSegmentLabel(), segment.getFeatures());
+					segments.add(newSegment);
+					segments.remove(segment);
+					segment=newSegment;
+				}
+				if (feature.getStopCoordinate()>segment.getStopCoordinate()){
+					DasAnnotatedSegment newSegment = new DasAnnotatedSegment(segment.getSegmentId(),segment.getStartCoordinate(),feature.getStopCoordinate(),segment.getVersion(),segment.getSegmentLabel(), segment.getFeatures());
+					segments.add(newSegment);
+					segments.remove(segment);
+					segment=newSegment;
+				}
+					
+				
 				added=true;
 				break;
 			}
@@ -104,7 +119,7 @@ public class GFF2Parser {
 		if(!added){
 			ArrayList<DasFeature> features=new ArrayList<DasFeature>();
 			features.add(feature);
-			segments.add(new DasAnnotatedSegment(parts[0],new Integer(parts[4]),new Integer(parts[5]),"FromFile",parts[0], features));
+			segments.add(new DasAnnotatedSegment(parts[0],new Integer(parts[3]),new Integer(parts[4]),"FromFile",parts[0], features));
 		}
 	}
 	private DasType getType(String type){
@@ -123,7 +138,7 @@ public class GFF2Parser {
 	
 	public static void main(String[] a){
 		try {
-			GFF2Parser parser = new GFF2Parser((new FileInputStream("/Users/4ndr01d3/Documents/EBI/fickett-tss.gff")));
+			GFF2Parser parser = new GFF2Parser((new FileInputStream("/Users/4ndr01d3/Documents/EBI/MyDasTemplate/src/main/webapp/CHROMOSOME_MtDNA.gff")));
 			parser.parse();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

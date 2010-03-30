@@ -47,9 +47,7 @@ public class GFFFileDataSource implements AnnotationDataSource {
 		this.globalParameters = globalParameters;
 		this.config = dataSourceConfig;
 		path = config.getDataSourceProperties().get("gff_file");
-		System.out.println("PATH:"+path);
 		try {
-			System.out.println("REAL PATH:"+servletContext.getRealPath(path));
 			GFF2Parser parser = new GFF2Parser(new FileInputStream(servletContext.getRealPath(path)));
 			segments = parser.parse();
 			types = parser.getTypes();
