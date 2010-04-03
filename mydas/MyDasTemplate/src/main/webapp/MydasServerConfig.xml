@@ -182,15 +182,15 @@
 
 			<version uri="examplegff" created="2010-03-19">
 	            <class>uk.ac.ebi.mydas.examples.GFFFileDataSource</class>
-				<coordinates 	uri="CS_DS94"
-								source="Gene_ID"
-								authority="Ensembl"
-								taxid="9606"
-								test_range="ENSG00000160916">UniProt,Protein Sequence</coordinates>
+				<coordinates 	uri="http://www.notARealCoordinateSystem.com"
+								source="-"
+								authority="unknown"
+								taxid="0000"
+								test_range="L47615.1">TEST INFO</coordinates>
 				<capability type="das1:sources"		 	query_uri="http://localhost:8080/das/examplegff" />
 				<capability type="das1:types"			query_uri="http://localhost:8080/das/examplegff/types" />
-				<capability type="das1:features"		query_uri="http://localhost:8080/das/examplegff/features?segment=U29912.1" />
-				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplegff/features?feature_id=GFF_feature_1" />
+				<capability type="das1:features"		query_uri="http://localhost:8080/das/examplegff/features" />
+				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplegff/features" />
 				<capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
 				<capability type="das1:unknown-feature"	/>
 			</version>
@@ -210,15 +210,15 @@
 
 			<version uri="examplepipes" created="2010-03-19">
 	            <class>uk.ac.ebi.mydas.examples.SeparatedByPipesDataSource</class>
-				<coordinates 	uri="CS_DS94"
+				<coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
 								source="Gene_ID"
 								authority="Ensembl"
 								taxid="9606"
-								test_range="ENSG00000160916">ENSEMBL, Genomic</coordinates>
+								test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
 				<capability type="das1:sources"		 	query_uri="http://localhost:8080/das/examplepipes" />
 				<capability type="das1:types"			query_uri="http://localhost:8080/das/examplepipes/types" />
-				<capability type="das1:features"		query_uri="http://localhost:8080/das/examplepipes/features?segment=5" />
-				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplepipes/features?feature_id=ENSE00001865818" />
+				<capability type="das1:features"		query_uri="http://localhost:8080/das/examplepipes/features" />
+				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplepipes/features" />
 				<capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
 				<capability type="das1:unknown-feature"	/>
 			</version>
@@ -228,6 +228,33 @@
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
 			<property key="pipes_file" value="testGenes.txt" />
+        </datasource>
+		
+        <datasource uri="ensemblTest"
+                    title="Ensembl Test"
+                    description="Data source test using the ensmbl database"
+                    doc_href="http://mydas.googlecode.com">
+			<maintainer email="gsalazar@ebi.ac.uk" />
+
+			<version uri="ensemblTest" created="2010-04-01">
+	            <class>uk.ac.ebi.mydas.examples.EnsemblTestDataSource</class>
+				<coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+								source="Gene_ID"
+								authority="Ensembl"
+								taxid="9606"
+								test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+				<capability type="das1:sources"		 	query_uri="http://localhost:8080/das/ensemblTest" />
+				<capability type="das1:types"			query_uri="http://localhost:8080/das/ensemblTest/types" />
+				<capability type="das1:features"		query_uri="http://localhost:8080/das/ensemblTest/features" />
+				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/ensemblTest/features" />
+				<capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/ensemblTest/stylesheet" />
+				<capability type="das1:unknown-feature"	/>
+			</version>
+
+            <dna-command-enabled>true</dna-command-enabled>
+            <features-strictly-enclosed>true</features-strictly-enclosed>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
 
     </datasources>

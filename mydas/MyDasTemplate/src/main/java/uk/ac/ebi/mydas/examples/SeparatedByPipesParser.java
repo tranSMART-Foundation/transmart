@@ -28,9 +28,9 @@ public class SeparatedByPipesParser {
 	 */
 	private ArrayList<DasType> types;
 	/**
-	 * Types to be used in the data source: chromosome, gene, transcript and exon
+	 * Types to be used in the data source:  gene, transcript and exon
 	 */
-	private DasType chromosomeType,geneType,transcriptType,exonType;
+	private DasType geneType,transcriptType,exonType;
 	/**
 	 * As this data source just have one method, it can be defined as a parameter to facilitate its use
 	 */
@@ -45,11 +45,9 @@ public class SeparatedByPipesParser {
 		scanner= new Scanner(gffdoc);
 		segments= new ArrayList<DasAnnotatedSegment>();
 		types= new ArrayList<DasType>();
-		chromosomeType= new DasType("Chromosome", null, "SO:0000340", "Chromosome");
 		geneType= new DasType("Gene", null, "SO:0000704", "Gene");
 		transcriptType= new DasType("Transcript", null, "SO:0000673", "Transcript");
 		exonType= new DasType("Exon", null, "SO:0000147", "Exon");
-		types.add(chromosomeType);
 		types.add(geneType);
 		types.add(transcriptType);
 		types.add(exonType);
