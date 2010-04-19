@@ -1,5 +1,6 @@
 package uk.ac.ebi.mydas.example;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -8,10 +9,14 @@ import java.util.Collections;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
 import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
+import uk.ac.ebi.mydas.datasource.CommandExtender;
+import uk.ac.ebi.mydas.exceptions.BadCommandException;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
@@ -28,7 +33,7 @@ import uk.ac.ebi.mydas.model.DasType;
  * @author 4ndr01d3
  *
  */
-public class TestDataSourceSecond implements AnnotationDataSource {
+public class TestDataSourceSecond implements AnnotationDataSource, CommandExtender {
 
 	CacheManager cacheManager = null;
 	ServletContext svCon;
@@ -132,6 +137,24 @@ public class TestDataSourceSecond implements AnnotationDataSource {
 
 	public void registerCacheManager(CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
+	}
+
+	public void executeOtherCommand(HttpServletRequest request,
+			HttpServletResponse response,
+			DataSourceConfiguration dataSourceConfig,
+			String command,String queryString)
+			throws BadCommandException, DataSourceException {
+		System.out.println("Command: {"+command+"}");
+		System.out.println("QueryString: {"+queryString+"}");
+		if (command.equals("newCommand"))
+			try {
+				response.setContentType("text/xml");
+				response.getWriter().write("<?xml version=\"1.0\" ?>\n<newcommand>RESPONSE</newcommand>");
+				return;
+			} catch (IOException e) {
+				throw new DataSourceException("Problems writing the response",e);
+			}
+		throw new BadCommandException("The command is not recognised. Query: {"+queryString+"}");
 	}
 
 }

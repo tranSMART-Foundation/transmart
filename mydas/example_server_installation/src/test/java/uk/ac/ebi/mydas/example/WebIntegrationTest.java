@@ -383,7 +383,7 @@ public class WebIntegrationTest extends WebTestCase {
             this.assertHeaderEquals("X-DAS-Status", "402");
     	}
     }
-    //TODO: Create another source that doesn't have stylesheet to test
+    
     public void testError_BadStylesheet() {
     	try {
             beginAt("/testSecond/stylesheet");
@@ -400,6 +400,20 @@ public class WebIntegrationTest extends WebTestCase {
     	}finally{
             this.assertResponseCode(500);
             this.assertHeaderEquals("X-DAS-Status", "501");
+    	}
+    }
+    public void testNewCommand() {
+        beginAt("/testSecond/newCommand");
+        assertTextPresent("<?xml version=\"1.0\" ?>");
+        assertTextPresent("<newcommand>RESPONSE</newcommand>");
+    }
+    public void testError_BadNewCommand() {
+    	try {
+    		beginAt("/testSecond/badnewcommand");
+    	} catch(TestingEngineResponseException te){
+    	}finally{
+            this.assertResponseCode(400);
+            this.assertHeaderEquals("X-DAS-Status", "400");
     	}
     }
 }

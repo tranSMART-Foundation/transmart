@@ -36,11 +36,13 @@ import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.
 import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.Capability;
 import uk.ac.ebi.mydas.datasource.AlignmentDataSource;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
+import uk.ac.ebi.mydas.datasource.CommandExtender;
 import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource;
 import uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource;
 import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
 import uk.ac.ebi.mydas.datasource.StructureDataSource;
 import uk.ac.ebi.mydas.exceptions.BadCommandArgumentsException;
+import uk.ac.ebi.mydas.exceptions.BadCommandException;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.BadStylesheetException;
 import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
@@ -1581,6 +1583,35 @@ public class DasCommandManager {
 			// Not an alignment source.
 			throw new UnimplementedFeatureException("An attempt to request structure information from a non-structure server has been detected.");
 		}
+	}
+	
+	/**
+	 * In case of a data source has implemented the CommandExtender Interface. It invokes its method to execute commands out of the spec.
+	 * Otherwise a BadCommandException is thrown.
+	 * 
+	 * @param request to allow the writing of the http header
+	 * @param response to which the http header and the XML are written.
+	 * @param dataSourceConfig holding configuration of the dsn and the data source object itself.
+	 * @param queryString from which the requested structures are parsed.
+	 * @throws BadCommandException in the case the interface Command extender haven't beeen implemented or 
+	 */
+	public void otherCommand(	HttpServletRequest request,
+								HttpServletResponse response,
+								DataSourceConfiguration dataSourceConfig, 
+								String command,
+								String queryString) 
+			throws BadCommandException {
+		
+		try {
+			if (dataSourceConfig.getDataSource() instanceof CommandExtender){
+				((CommandExtender)dataSourceConfig.getDataSource()).executeOtherCommand(request, response, dataSourceConfig, command, queryString);
+			}else{
+				throw new BadCommandException("The command is not recognised.");
+			}
+		} catch (DataSourceException e) {
+			throw new BadCommandException("Data source impossible to recover for extended commands",e);
+		}
+		
 	}
 
 

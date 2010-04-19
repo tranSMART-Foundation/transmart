@@ -362,7 +362,7 @@ public class MydasServlet extends HttpServlet {
 								dasCommands.linkCommand (response, dataSourceConfig, queryString);
 							}
 							else {
-								throw new BadCommandException("The command is not recognised.");
+								dasCommands.otherCommand(request, response,dataSourceConfig,command,queryString);
 							}
 						}
 						else{
