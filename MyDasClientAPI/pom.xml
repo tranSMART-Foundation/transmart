@@ -4,10 +4,17 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>uk.ac.ebi.mydas.client</groupId>
     <artifactId>MyDasClient</artifactId>
-    <packaging>jar</packaging>
-    <version>1.0</version>
+    <packaging>war</packaging>
+    <version>1.6.0</version>
     <name>MyDas Client API</name>
     <url>http://maven.apache.org</url>
+
+    <repositories>
+        <repository>
+            <id>mirror-ibib</id>
+            <url>http://mirrors.ibiblio.org/pub/mirrors/maven2/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -20,7 +27,7 @@
         <dependency>
             <groupId>uk.ac.ebi.mydas</groupId>
             <artifactId>mydas</artifactId>
-            <version>1.0.6</version>
+            <version>1.6.0</version>
         </dependency>
 
         <dependency>

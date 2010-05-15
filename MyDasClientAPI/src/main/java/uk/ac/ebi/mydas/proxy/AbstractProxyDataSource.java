@@ -28,17 +28,17 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
+import uk.ac.ebi.mydas.client.QueryAwareDasAnnotatedSegment;
+import uk.ac.ebi.mydas.client.RegexPatterns;
+import uk.ac.ebi.mydas.client.xml.DasFeatureXmlUnmarshaller;
+import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
 import uk.ac.ebi.mydas.controller.CacheManager;
-import uk.ac.ebi.mydas.controller.DataSourceConfiguration;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 import uk.ac.ebi.mydas.model.DasType;
-import uk.ac.ebi.mydas.client.RegexPatterns;
-import uk.ac.ebi.mydas.client.QueryAwareDasAnnotatedSegment;
-import uk.ac.ebi.mydas.client.xml.DasFeatureXmlUnmarshaller;
 
 import javax.servlet.ServletContext;
 import java.io.BufferedReader;
@@ -58,16 +58,19 @@ import java.util.regex.Pattern;
  * Time: 16:51:37
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
- *
- * NOTE TO DATA SOURCE DEVELOPERS:
- *
- * This template is based upon the AnnotationDataSource interface,
- * there are however three other interfaces available that may be
- * more appropriate for your needs, described here:
- *
- * <a href="http://code.google.com/p/mydas/wiki/HOWTO_WritePluginIntro">
- *     Writing a MyDas Data Source - Selecting the Best Inteface
- * </a>
+ *         <p/>
+ *         NOTE TO DATA SOURCE DEVELOPERS:
+ *         <p/>
+ *         This template is based upon the AnnotationDataSource interface,
+ *         there are however three other interfaces available that may be
+ *         more appropriate for your needs, described here:
+ *         <p/>
+ *         <a href="http://code.google.com/p/mydas/wiki/HOWTO_WritePluginIntro">
+ *         Writing a MyDas Data Source - Selecting the Best Inteface
+ *         </a>
+ *         <p/>
+ *         This version of the AbstractProxyDataSource has been implemented against the new
+ *         MyDAS 1.6 implementation and is therefore DAS 1.6 compliant.
  */
 public abstract class AbstractProxyDataSource implements AnnotationDataSource {
 
@@ -154,29 +157,27 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
         Map<String, String> dataSourceProps = dataSourceConfig.getDataSourceProperties();
         // TODO Check that these proxy settings are used correctly by HttpClient.
         // Check if a proxy is required.
-        if (dataSourceProps.containsKey(HTTP_PROXY_SET) && "true".equalsIgnoreCase (dataSourceProps.get(HTTP_PROXY_SET))){
-            sysProperties.put(HTTP_PROXY_SET,  "true");
+        if (dataSourceProps.containsKey(HTTP_PROXY_SET) && "true".equalsIgnoreCase(dataSourceProps.get(HTTP_PROXY_SET))) {
+            sysProperties.put(HTTP_PROXY_SET, "true");
             // Check that the host is provided, otherwise throw an exception.
-            if (! (dataSourceProps.containsKey(HTTP_PROXY_HOST) && (dataSourceProps.get(HTTP_PROXY_HOST)).length() > 0)){
-                throw new DataSourceException ("MydasServerConfig.xml error: The 'http.proxySet' property has been set to 'true', but no 'http.proxyHost' value has been provided.");
+            if (!(dataSourceProps.containsKey(HTTP_PROXY_HOST) && (dataSourceProps.get(HTTP_PROXY_HOST)).length() > 0)) {
+                throw new DataSourceException("MydasServerConfig.xml error: The 'http.proxySet' property has been set to 'true', but no 'http.proxyHost' value has been provided.");
             }
             sysProperties.put(HTTP_PROXY_HOST, dataSourceProps.get(HTTP_PROXY_HOST));
             setSystemProperty(sysProperties, dataSourceProps, HTTP_PROXY_PORT);
             setSystemProperty(sysProperties, dataSourceProps, HTTP_PROXY_USER);
             setSystemProperty(sysProperties, dataSourceProps, HTTP_PROXY_PASSWORD);
             setSystemProperty(sysProperties, dataSourceProps, HTTP_NON_PROXY_HOSTS);
-        }
-        else {
-            sysProperties.put(HTTP_PROXY_SET,  "false");
+        } else {
+            sysProperties.put(HTTP_PROXY_SET, "false");
         }
 
         // Configure the HTTP request timeout (optional - defaults to 4 seconds).
-        if (dataSourceProps.containsKey(HTTP_TIMEOUT)){
+        if (dataSourceProps.containsKey(HTTP_TIMEOUT)) {
             String timeoutString = dataSourceProps.get(HTTP_TIMEOUT);
-            if (RegexPatterns.INTEGER_PATTERN.matcher(timeoutString).matches()){
+            if (RegexPatterns.INTEGER_PATTERN.matcher(timeoutString).matches()) {
                 connectionTimeout = Integer.parseInt(timeoutString);
-            }
-            else {
+            } else {
                 throw new DataSourceException("The " + HTTP_TIMEOUT + " parameter in the MydasServerConfig.xml file must be a valid integer.  It is currently set to '" + timeoutString + "'");
             }
         }
@@ -188,28 +189,27 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
 
         // Get the list of source DAS Servers and store.
         Set<String> keys = dataSourceProps.keySet();
-        for (String key : keys){
-            if (key.startsWith("dasServer")){
-                String serverURLString = dataSourceProps.get (key);
+        for (String key : keys) {
+            if (key.startsWith("dasServer")) {
+                String serverURLString = dataSourceProps.get(key);
                 // Check that the URL looks good.
-                try{
+                try {
                     // Just attempt to make a URL out of it (immediately discarded, but just to check the URL is well formed).
                     new URL(serverURLString);
                     // Check that the URL ends with /das/datasourcename
                     Matcher match = PATTERN_VALID_DAS_SERVER_URL.matcher(serverURLString);
-                    if (match.find()){
-                        if ("dsn".equals(match.group(1))){
+                    if (match.find()) {
+                        if ("dsn".equals(match.group(1))) {
                             LOGGER.error("For the AbstractProxyDataSource, a source DAS Server has been configured with a URL ending /das/dsn rather than ending with a specific data source name.");
-                        }
-                        else {
+                        } else {
                             // Remove any trailing slash.
-                            if (match.group(1).length() == 1){
+                            if (match.group(1).length() == 1) {
                                 serverURLString = serverURLString.substring(0, serverURLString.length() - 1);
                                 LOGGER.debug("Attempted to remove trailing space.  Ended up with: " + serverURLString);
                             }
                             // Now attempt to query the server, warn if it fails (but still add it?).
 //                            checkServerRunning(httpClient, serverURLString);
-                            remoteDataSources.add (serverURLString);
+                            remoteDataSources.add(serverURLString);
                         }
                     }
                 } catch (MalformedURLException e) {
@@ -218,23 +218,23 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
             }
         }
         // Check that at least one remote data source has been initialised.
-        if (remoteDataSources.size() == 0){
+        if (remoteDataSources.size() == 0) {
             LOGGER.fatal("No remote DAS data sources have been successfully initialised.  Please check your settings in the MydasServerConfig.xml file.");
-            throw new DataSourceException ("No remote DAS data sources have been successfully initialised.  Please check your settings in the MydasServerConfig.xml file.");
+            throw new DataSourceException("No remote DAS data sources have been successfully initialised.  Please check your settings in the MydasServerConfig.xml file.");
         }
     }
 
-    private void setSystemProperty (Properties sysProperties, Map<String, String> dataSourceProps, String propertyName){
-        if (dataSourceProps.containsKey(propertyName) && (dataSourceProps.get(propertyName)).length() > 0){
+    private void setSystemProperty(Properties sysProperties, Map<String, String> dataSourceProps, String propertyName) {
+        if (dataSourceProps.containsKey(propertyName) && (dataSourceProps.get(propertyName)).length() > 0) {
             sysProperties.put(propertyName, dataSourceProps.get(propertyName));
         }
     }
 
-    private void checkServerRunning (HttpClient client, String urlString){
+    private void checkServerRunning(HttpClient client, String urlString) {
         GetMethod method = null;
         // Query the types command
         urlString = urlString + "/types";
-        try{
+        try {
             LOGGER.debug("connecting to " + urlString);
             URL url = new URL(urlString);
             // Create a method instance.
@@ -244,16 +244,14 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
 
             if (statusCode != HttpStatus.SC_OK) {
                 LOGGER.warn("Remote DAS Service at '" + url + "' failed: Returned HTTP status code :" + statusCode + " with status :" + method.getStatusLine());
-            }
-            else {
+            } else {
                 // Read the response body.
                 String responseString = new String(method.getResponseBody());
                 // Check for a valid </DASTYPES> element.
-                if (responseString.contains("</DASTYPES>")){
-                    LOGGER.info ("The types request\n\n" + urlString + "\n\nwas successful and returned the XML:\n\n"+ responseString);
-                }
-                else {
-                    LOGGER.warn ("The types request\n\n" + urlString + "\n\nFAILED and returned:\n\n"+ responseString);
+                if (responseString.contains("</DASTYPES>")) {
+                    LOGGER.info("The types request\n\n" + urlString + "\n\nwas successful and returned the XML:\n\n" + responseString);
+                } else {
+                    LOGGER.warn("The types request\n\n" + urlString + "\n\nFAILED and returned:\n\n" + responseString);
                 }
             }
         } catch (MalformedURLException e) {
@@ -262,7 +260,7 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
             LOGGER.error("IOException thrown when requesting URL " + urlString, e);
         }
         finally {
-            if (method != null){
+            if (method != null) {
                 method.releaseConnection();
             }
         }
@@ -275,6 +273,7 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
     public void destroy() {
         // Nothing to do - no resources tied up.
     }
+
 
     /**
      * This method returns a List of DasAnnotatedSegment objects, describing the annotated segment and the features
@@ -304,28 +303,31 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
      *          a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
      *          and read a record.</bold>
      */
-    public DasAnnotatedSegment getFeatures(String segmentId) throws BadReferenceObjectException, DataSourceException {
+    @Override
+    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxBins) throws BadReferenceObjectException, DataSourceException {
         Collection<QueryAwareDasAnnotatedSegment> annotatedSegments = new ArrayList<QueryAwareDasAnnotatedSegment>();
         LOGGER.debug("Data sources: " + remoteDataSources);
         Collection<DasQueryRunnerThread> proxies = new ArrayList<DasQueryRunnerThread>(remoteDataSources.size());
         // Request features from all the attached DAS sources... then do something clever with them...
 
         // Run all the queries in separate Threads...
-        for (String dsnUrlString : remoteDataSources){
-            String queryUrlString = new StringBuilder(dsnUrlString)
+        for (String dsnUrlString : remoteDataSources) {
+            StringBuilder queryURL = new StringBuilder(dsnUrlString)
                     .append("/features?segment=")
-                    .append(segmentId)
-                    .toString();
-            DasQueryRunnerThread runner = new DasQueryRunnerThread(httpClient, queryUrlString);
-            proxies.add (runner);
+                    .append(segmentId);
+            if (maxBins != null) {
+                queryURL.append(";maxbins=").append(maxBins);
+            }
+            DasQueryRunnerThread runner = new DasQueryRunnerThread(httpClient, queryURL.toString());
+            proxies.add(runner);
             EXEC.execute(runner);
         }
 
         // Loop until they have all completed. (Check every 20 milliseconds)
-        while (true){
+        while (true) {
             boolean allFinished = true;
-            for (DasQueryRunnerThread runner : proxies){
-                if (! runner.isFinished()){
+            for (DasQueryRunnerThread runner : proxies) {
+                if (!runner.isFinished()) {
                     allFinished = false;
                 }
             }
@@ -339,21 +341,21 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
         }
 
         // Request features from all the attached DAS sources... then do something clever with them...
-        for (DasQueryRunnerThread runner : proxies){
-            if (LOGGER.isDebugEnabled()){
+        for (DasQueryRunnerThread runner : proxies) {
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Processing response from " + runner.getUrlQueryString());
             }
             String responseString = runner.getResponseString();
             // Check that this is a valid DASGFF containing a complete segment (not an errorsegment or unknownsegment)
             // Do this the simple way for the moment...
-            if (runner.isSuccessful() && responseString != null && responseString.contains("</SEGMENT>") && responseString.contains("</DASGFF>")){
+            if (runner.isSuccessful() && responseString != null && responseString.contains("</SEGMENT>") && responseString.contains("</DASGFF>")) {
                 // OK, looks like this is a good file and complete, so parse and collect the resulting DasAnnotatedSegments.
                 BufferedReader reader = null;
-                try{
+                try {
                     reader = new BufferedReader(new StringReader(responseString));
                     DasFeatureXmlUnmarshaller unmarshaller = new DasFeatureXmlUnmarshaller();
                     Collection<QueryAwareDasAnnotatedSegment> segments = unmarshaller.unMarshall(reader);
-                    for (QueryAwareDasAnnotatedSegment segment : segments){
+                    for (QueryAwareDasAnnotatedSegment segment : segments) {
                         segment.setQueryURL(runner.getUrlQueryString());
                     }
                     annotatedSegments.addAll(segments);
@@ -362,7 +364,7 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
                     // Don't barfe out here - the other proxy data sources may work.
                     LOGGER.error("An IOException was thrown when attempting to xml the XML from " + runner.getUrlQueryString());
                 } finally {
-                    if (reader != null){
+                    if (reader != null) {
                         try {
                             reader.close();
                         } catch (IOException e) {
@@ -375,17 +377,63 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
         }
 
         // Delegate to the subclass method to work out how to coalesce multiple annotated segments.
-        if (annotatedSegments.size() == 0){
-            throw new BadReferenceObjectException (segmentId, "None of the data sources queried by this proxy DAS service recognise this segment.");
+        if (annotatedSegments.size() == 0) {
+            throw new BadReferenceObjectException(segmentId, "None of the data sources queried by this proxy DAS service recognise this segment.");
         }
 
         return coalesceDasAnnotatedSegments(annotatedSegments);
     }
 
+    /**
+     * <b>For some Datasources, especially ones with many entry points, this method may be hard or impossible
+     * to implement.  If this is the case, you should just throw an {@link uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException} as your
+     * implementation of this method, so that a suitable error HTTP header
+     * (X-DAS-Status: 501 Unimplemented feature) is returned to the DAS client as
+     * described in the DAS 1.53 protocol.</b><br/><br/>
+     * <p/>
+     * This method is used by the features command when no segments are included, but feature_id and / or
+     * group_id filters have been included, to meet the following specification:<br/><br/>
+     * <p/>
+     * "<b>feature_id</b> (zero or more; new in 1.5)<br/>
+     * Instead of, or in addition to, <b>segment</b> arguments, you may provide one or more <b>feature_id</b>
+     * arguments, whose values are the identifiers of particular features.  If the server supports this operation,
+     * it will translate the feature ID into the segment(s) that strictly enclose them and return the result in
+     * the <i>features</i> response.  It is possible for the server to return multiple segments if the requested
+     * feature is present in multiple locations.
+     * <b>group_id</b> (zero or more; new in 1.5)<br/>
+     * The <b>group_id</b> argument, is similar to <b>feature_id</b>, but retrieves segments that contain
+     * the indicated feature group."  (Direct quote from the DAS 1.53 specification, available from
+     * <a href="http://biodas.org/documents/spec.html#features">http://biodas.org/documents/spec.html#features</a>.)
+     * <p/>
+     * Note that if segments are included in the request, this method is not used, so feature_id and group_id
+     * filters accompanying a list of segments will work correctly, even if your implementation of this method throws an
+     * {@link uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException}.
+     *
+     * @param featureIdCollection a Collection&lt;String&gt; of feature_id values included in the features command / request.
+     *                            May be a <code>java.util.Collections.EMPTY_LIST</code> but will <b>not</b> be null.
+     * @return A Collection of {@link uk.ac.ebi.mydas.model.DasAnnotatedSegment} objects. These describe the segments that is annotated, limited
+     *         to the information required for the /DASGFF/GFF/SEGMENT element.  Each References a Collection of
+     *         DasFeature objects.   Note that this is a basic Collection - this gives you complete control over the details
+     *         of the Collection type - so you can create your own comparators etc.
+     * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
+     *          should be thrown if there is any
+     *          fatal problem with loading this data source.  <bold>It is highly desirable for the
+     *          implementation to test itself in this init method and throw
+     *          a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
+     *          and read a record.</bold>
+     * @throws uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException
+     *          Throw this if you cannot
+     *          provide a working implementation of this method.
+     */
+    @Override
+    public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins) throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("This proxy DAS server cannot query by featureIdCollection.");
+    }
 
     /**
      * This method must be implemented by a concrete subclass that will determine how the data source merges (or not!)
      * features from different data sources.
+     *
      * @param annotatedSegments being all of the DasAnnotatedSegments that contribute to the final result
      * @return a single DasAnnotatedSegment comprising all of the features returned from multiple DAS sources.
      */

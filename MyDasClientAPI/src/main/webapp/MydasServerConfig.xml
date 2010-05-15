@@ -23,7 +23,7 @@
   -->
 
 <mydasserver xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="http://mydas.googlecode.com/svn/trunk/mydas/server_core/src/main/resources/mydasserverconfig.xsd">
+             xsi:noNamespaceSchemaLocation="http://mydas.googlecode.com/svn/trunk/mydas/server_core/src/main/resources/mydasserverconfig.xsd">
     <!-- The global element holds details of configuration common to the entire server. -->
     <global>
 
@@ -103,14 +103,27 @@
         description: This is the optional data source description, as provided in the /DASDSN/DSN/DESCRIPTION element of the XML returned by the DAS dsn command. For a reference server, this should echo its own URL.
         description-href: This is the optional data source description href attribute, as provided in the /DASDSN/DSN/DESCRIPTION/@href attribute of the XML returned by the DAS dsn command. For a reference server, this should echo its own URL.
         -->
-        <datasource id="proxy"
-                    name="proxyDataSource"
-                    version="0.1"
-                    mapmaster="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot"
+        <datasource uri="s4proxy"
+                    title="S4ProxyDataSource"
                     description="ProxyDataSource"
-                    description-href="http://code.google.com/p/mydas/">
-             <!--The fully qualified class name of the DataSource.-->
-            <class>uk.ac.ebi.mydas.proxy.ReportAllProxyDasServer</class>
+                    description-href="http://www.ebi.ac.uk"
+                    doc_href="http://code.google.com/p/mydas/">
+
+            <maintainer email="pjones@ebi.ac.uk"/>
+
+            <version uri="s4proxy" created="2010-05-14">
+                <class>uk.ac.ebi.mydas.proxy.ReportAllProxyDasServer</class>
+
+                <coordinates uri="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot"
+                             source="Protein Sequence"
+                             authority="UniProt"
+                             test_range="P00280">UniProt,Protein Sequence
+                </coordinates>
+
+                <capability type="das1:features" query_uri="http://localhost:8080/das/s4proxy/features"/>
+
+
+            </version>
 
             <!-- The optional name of the DAS stylesheet to be used for this datasource.
             This will override the default stylesheet defined in the global settings section. -->
@@ -141,51 +154,46 @@
             actually annotated on the requested segments will be listed.-->
             <include-types-with-zero-count>true</include-types-with-zero-count>
 
-			<!-- CONSENSUS SERVER-SPECIFIC SETTINGS -->
+            <!-- CONSENSUS SERVER-SPECIFIC SETTINGS -->
 
-			<!-- If your Consensus Server needs to use a proxy server
-			to access the DAS servers that it provides the proxy for,
-			configure the proxyHost and proxyPort properties and set the
-			proxySet property = "true".  (Just set this property to "false"
-			if you are not using a proxy - the proxyHost and proxyPort settings
-			will be ignored.) -->
-			<property key="http.proxySet" value="false"/>
-			<property key="http.proxyHost" value="www-proxy.ebi.ac.uk"/>
-			<property key="http.proxyPort" value="3128"/>
+            <!-- If your Consensus Server needs to use a proxy server
+               to access the DAS servers that it provides the proxy for,
+               configure the proxyHost and proxyPort properties and set the
+               proxySet property = "true".  (Just set this property to "false"
+               if you are not using a proxy - the proxyHost and proxyPort settings
+               will be ignored.) -->
+            <property key="http.proxySet" value="false"/>
+            <property key="http.proxyHost" value="www-proxy.ebi.ac.uk"/>
+            <property key="http.proxyPort" value="3128"/>
 
-			<!-- If your proxy does not require a username / password, Delete
-			or comment out the following two lines.-->
-			<property key="http.proxyUser" value="username"/>
-			<property key="http.proxyPassword" value="password"/>
-
-
-			<!-- List any hosts that should be connected too DIRECTLY and not through
-				the proxy server. The value can be a list of hosts, each seperated by a |,
-				and in addition a wildcard character (*) can be used for matching.
-
-				For example: <property key="http.nonProxyHosts" value="*.foo.com|localhost"/>
-
-			If you do not need this setting, delete or comment out the following line.-->
-			<property key="http.nonProxyHosts" value="localhost"/>
+            <!-- If your proxy does not require a username / password, Delete
+               or comment out the following two lines.-->
+            <property key="http.proxyUser" value="username"/>
+            <property key="http.proxyPassword" value="password"/>
 
 
-			<!-- Add any number of source DAS servers below.  All of these servers will
-			be queried with the request sent to this proxy server.
+            <!-- List any hosts that should be connected too DIRECTLY and not through
+                   the proxy server. The value can be a list of hosts, each seperated by a |,
+                   and in addition a wildcard character (*) can be used for matching.
 
-			The URLS should be absolute and include the data source name.
+                   For example: <property key="http.nonProxyHosts" value="*.foo.com|localhost"/>
 
-			The property keys should be of the form "dasServer1", "dasServer2", "dasServer3", ... "dasServer10" etc.
+               If you do not need this setting, delete or comment out the following line.-->
+            <property key="http.nonProxyHosts" value="localhost"/>
 
-			<property key="dasServer1" value="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot"/>
-			<property key="dasServer2" value="http://das.ensembl.org/das/interpro"/>
-			-->
-			<property key="dasServer1" value="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot"/>
-			<property key="dasServer2" value="http://das.ensembl.org/das/interpro"/>
-			<property key="dasServer3" value="http://www.protonet.cs.huji.ac.il/das/everest"/>
-			<property key="dasServer4" value="http://www.ebi.ac.uk/das-srv/proteindas/das/saslig"/>
-			<property key="dasServer5" value="http://cathwww.biochem.ucl.ac.uk:9000/das/gene3d_cath"/>
-			<property key="dasServer6" value="http://genome.cbs.dtu.dk:9000/das/signalp"/>
-			<property key="dasServer7" value="http://pongo.biocomp.unibo.it/das/dasdb"/>
+
+            <!-- Add any number of source DAS servers below.  All of these servers will
+               be queried with the request sent to this proxy server.
+
+               The URLS should be absolute and include the data source name.
+
+               The property keys should be of the form "dasServer1", "dasServer2", "dasServer3", ... "dasServer10" etc.
+
+               <property key="dasServer1" value="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot"/>
+               <property key="dasServer2" value="http://das.ensembl.org/das/interpro"/>
+               -->
+            <property key="dasServer1" value="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot_summary"/>
+            <property key="dasServer2" value="http://www.ebi.ac.uk/das-srv/interpro/das/InterPro"/>
 
             <!-- The HTTP request timeout in milliseconds for DAS server requests -->
             <property key="http.timeout" value="2000"/>
