@@ -9,11 +9,10 @@ import java.io.IOException;
 import uk.ac.ebi.mydas.client.RegexPatterns;
 
 /**
- * Created by IntelliJ IDEA.
- * User: phil
+ * Abstract class for parsing XML using PullParser API.
+ * @author Phil Jones
  * Date: 07-Aug-2008
  * Time: 15:34:03
- * To change this template use File | Settings | File Templates.
  */
 public abstract class AbstractXmlUnmarshaller {
 

@@ -13,10 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Created by IntelliJ IDEA.
- * User: phil
- * Date: 19-May-2008
- * Time: 15:51:42
  * <p/>
  * Unmarshaller for DAS 1.6 Sequence XML.
  * Unmarshalls the XML into the MyDas sequence class structure.
@@ -27,10 +23,15 @@ import java.util.Collection;
  * <!DOCTYPE DASSEQUENCE SYSTEM "http://www.biodas.org/dtd/dassequence.dtd">
  * <DASSEQUENCE>
  * <SEQUENCE id="id" start="start" stop="stop"
- * moltype="moltype" version="X.XX">
+ * label="alternative_id" version="X.XX">
  * atttcttggcgtaaataagagtctcaatgagactctcagaagaaaattgataaatattat
  * </SEQUENCE>
  * </DASSEQUENCE>
+ *
+ * @author Phil Jones
+ * Date: 19-May-2008
+ * Time: 15:51:42
+ *
  */
 public class DasSequenceXmlUnmarshaller extends AbstractXmlUnmarshaller {
     /**
@@ -47,7 +48,6 @@ public class DasSequenceXmlUnmarshaller extends AbstractXmlUnmarshaller {
     private static final String NAMESPACE = null;
     private static final String ELEMENT_DASSEQUENCE = "DASSEQUENCE";
     private static final String ELEMENT_SEQUENCE = "SEQUENCE";
-
     private static final String ATTRIBUTE_VERSION = "version";
     private static final String ATTRIBUTE_ID = "id";
     private static final String ATTRIBUTE_START = "start";

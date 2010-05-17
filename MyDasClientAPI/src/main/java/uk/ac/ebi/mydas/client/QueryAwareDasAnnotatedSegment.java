@@ -10,12 +10,12 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 
 /**
- * Created by IntelliJ IDEA.
- * User: phil
- * Date: 30-Jun-2008
- * Time: 15:19:56
  * This class acts as a DasAnnotatedSegment, but is also able to store details
  * of the URL from which the segment originates.
+ * @author Phil Jones
+ * Date: 30-Jun-2008
+ * Time: 15:19:56
+ *
  */
 public class QueryAwareDasAnnotatedSegment extends DasAnnotatedSegment {
 

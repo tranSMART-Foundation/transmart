@@ -21,10 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: phil
- * Date: 19-May-2008
- * Time: 15:51:42
+
  * <p/>
  * Unmarshaller for DAS 1.53 Feature XML.
  * Unmarshalls the XML into the MyDas feature class structure.
@@ -47,16 +44,16 @@ import java.util.Map;
  * <NOTE> note text </NOTE>
  * <LINK href="url"> link text </LINK>
  * <TARGET id="id" start="x" stop="y">target name</TARGET>
- * <GROUP id="id" label="label" type="type">
- * <NOTE> note text </NOTE>
- * <LINK href="url"> link text </LINK>
- * <TARGET id="id" start="x" stop="y">target name</TARGET>
- * </GROUP>
+ * <PARENT id=""/>
+ * <PART id=""/>
  * </FEATURE>
  * ...
  * </SEGMENT>
  * </GFF>
  * </DASGFF>
+ * @author Phil Jones
+ * Date: 19-May-2008
+ * Time: 15:51:42
  */
 public class DasFeatureXmlUnmarshaller extends AbstractXmlUnmarshaller {
     /**

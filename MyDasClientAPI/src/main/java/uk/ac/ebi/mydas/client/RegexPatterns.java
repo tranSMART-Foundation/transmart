@@ -3,11 +3,10 @@ package uk.ac.ebi.mydas.client;
 import java.util.regex.Pattern;
 
 /**
- * Created by IntelliJ IDEA.
- * User: phil
+ * Standard regular expressions.
+ * @author Phil Jones
  * Date: 25-Jun-2008
  * Time: 12:45:34
- * To change this template use File | Settings | File Templates.
  */
 public abstract class RegexPatterns {
     /**
