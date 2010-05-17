@@ -4,25 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>uk.ac.ebi.mydas.client</groupId>
     <artifactId>MyDasClient</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <version>1.6.0</version>
     <name>MyDas Client API</name>
     <url>http://maven.apache.org</url>
 
-    <repositories>
-        <repository>
-            <id>mirror-ibib</id>
-            <url>http://mirrors.ibiblio.org/pub/mirrors/maven2/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.7</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>uk.ac.ebi.mydas</groupId>
@@ -31,11 +18,12 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.0.1</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
+            <scope>test</scope>
         </dependency>
-
+        
     </dependencies>
 
     <build>
@@ -48,17 +36,6 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-
-            <!-- The jetty plugin allows testing of the DAS service within the Maven build.
-             (Run using mvn jetty:run-war) -->
-            <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>maven-jetty-plugin</artifactId>
-                <configuration>
-                    <contextPath>/</contextPath>
-                </configuration>
-            </plugin>
         </plugins>
-        <finalName>MyDasClient</finalName>
     </build>
 </project>
