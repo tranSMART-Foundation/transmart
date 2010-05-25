@@ -15,10 +15,7 @@ import uk.ac.ebi.mydas.model.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
 
@@ -230,7 +227,9 @@ public class DasFeatureXmlUnmarshaller extends AbstractXmlUnmarshaller {
         DasFeatureOrientation orientation = DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE;
         DasPhase phase = DasPhase.PHASE_NOT_APPLICABLE;
         Collection<String> notes = new ArrayList<String>();
-        Map<URL, String> links = new HashMap<URL, String>();
+        // Using a LinkedHashMap, as it maintains the keys in the order in which they were added
+        // (so should maintain the order of the links in the parsed XML).
+        Map<URL, String> links = new LinkedHashMap<URL, String>();
         Collection<DasTarget> targets = new ArrayList<DasTarget>();
         Collection<String> parents = new ArrayList<String>();
         Collection<String> parts = new ArrayList<String>();
