@@ -319,8 +319,10 @@ public class MydasServlet extends HttpServlet {
 					if (match.group(2) == null || match.group(2).length() == 0){
 						// Source command for an specific DSN 
 						// Attempt to retrieve the DataSource
-						if (null!=DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get(dsnName))
+						if (null!=DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get(dsnName)){
 							dasCommands.sourceCommand (request, response, queryString,dsnName);
+							return;
+						}
 					}
 					String command = match.group(2);
 					if (logger.isDebugEnabled()){
