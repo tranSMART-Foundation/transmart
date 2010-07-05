@@ -95,6 +95,14 @@
 									</xs:documentation>
 								</xs:annotation>
 							</xs:element>
+                            <xs:element name="sources-xslt-url" type="xs:anyURI" nillable="false" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>
+										Gives the URI of an XSLT transformation that can be used by the browser to present the sources command response in a human-readable format. 
+										Optional - the processing instruction will only be included if this element is present.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
 							<xs:element name="dna-xslt-url" type="xs:anyURI" nillable="false" minOccurs="0">
 								<xs:annotation>
 									<xs:documentation>
@@ -411,6 +419,24 @@
 											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
+                                    <xs:attribute name="mapmaster" type="xs:anyURI" use="optional">
+										<xs:annotation>
+											<xs:documentation>
+												The mapmaster (optional) attribute is a URL location pointing to the 'reference source' for the coordinate system. 
+												The target may be any browser-readable MIME-type.
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+                                    <xs:attribute name="max_entry_points" type="xs:integer" use="optional">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The max_entry_points (optional) attribute is a integer defining the maximum number of entry points
+                                                that a data source commits to retrieve when entry_points command is used.
+                                                This is particularly useful and recommended for data sources as UniProt with a large number
+                                                of entry points.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:attribute>
 								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
