@@ -1152,12 +1152,12 @@ public class DasCommandManager {
 								serializer.endTag (DAS_XML_NAMESPACE, "VERSION");
 							}
 							
-							for(PropertyType pt:dsnConfig2.getProperty()){
-								serializer.startTag (DAS_XML_NAMESPACE, "PROPERTY");
-								serializer.attribute(DAS_XML_NAMESPACE, "name", pt.getKey());
-								serializer.attribute(DAS_XML_NAMESPACE, "value", pt.getValue());
-								serializer.endTag (DAS_XML_NAMESPACE, "PROPERTY");
-							}
+//							for(PropertyType pt:dsnConfig2.getProperty()){
+//								serializer.startTag (DAS_XML_NAMESPACE, "PROPERTY");
+//								serializer.attribute(DAS_XML_NAMESPACE, "name", pt.getKey());
+//								serializer.attribute(DAS_XML_NAMESPACE, "value", pt.getValue());
+//								serializer.endTag (DAS_XML_NAMESPACE, "PROPERTY");
+//							}
 							
 							serializer.endTag (DAS_XML_NAMESPACE, "SOURCE");
 						}
