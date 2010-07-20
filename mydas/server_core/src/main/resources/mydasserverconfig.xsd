@@ -419,10 +419,10 @@
 											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
-                                    <xs:attribute name="mapmaster" type="xs:anyURI" use="optional">
+                                    <xs:attribute name="mapmaster" type="xs:anyURI" use="required">
 										<xs:annotation>
 											<xs:documentation>
-												The mapmaster (optional) attribute is a URL location pointing to the 'reference source' for the coordinate system. 
+												The mapmaster attribute is a URL location pointing to the 'reference source' for the coordinate system. 
 												The target may be any browser-readable MIME-type.
 											</xs:documentation>
 										</xs:annotation>
