@@ -1,0 +1,123 @@
+<html>
+
+<!--
+/**
+ * HTML template to represent DAS SOURCES response.
+ * Based on dsn.hmtl on MyDas distribution (Antony Quinn)
+ * @author Leyla Garcia
+ * @version $Id$
+ * @since   1.0
+ */
+ -->
+<head>
+    <title>Mydas: Data Source</title>
+    <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="/xslt/styles/common.css"/>
+    <script type="text/javascript">
+        var image_path = "/xslt/images/";
+    </script>
+    <script type="text/javascript" src="/xslt/scripts/main.js"></script>
+    <script type="text/javascript" src="/xslt/scripts/sortable.js"></script>
+    <script type="text/javascript">
+        function init(){
+            document.getElementById('sources').style.display = 'block';
+            document.getElementById('xml').style.display='none';
+            //alert(document.getElementById('xml').style.display);
+        }
+    </script>
+</head>
+
+<body onload="init()">
+
+    <div class="header">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td class="banner">
+                    <a href="http://code.google.com/p/mydas/">
+                        <img src="/xslt/images/mydas_logo_small.png" alt="MyDas Distributed Annotation Server"/>
+                    </a>
+                </td>
+                <td class="banner" align="right">
+                    <span style="font-size:170%; color:white;">
+                        coordinate systems
+                    </span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <div><p></p></div>
+
+    <div id="mainbody">
+          <p>Format:
+            <input type="radio" name="format" onclick="document.getElementById('sources').style.display='block';document.getElementById('xml').style.display='none';" value="Table" checked="checked"/>Table
+            <input type="radio" name="format" onclick="document.getElementById('xml').style.display='block';document.getElementById('sources').style.display='none';" value="XML"/>XML
+          </p>
+    </div>
+
+    <div><p></p></div>
+
+    <div id="sources" class="sources">
+        <table id="coordinated-systems"
+               class="sortable"
+               cellpadding="0"
+               cellspacing="0"
+               width="100%">
+            <!-- Column headings -->
+            <tr class="head">
+                <th>URI</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Reference</th>
+                <th>Capabilities</th>
+                <th>Coordinate System</th>
+                <th>Source</th>
+                <th>Authority</th>
+                <th>Taxon ID</th>
+                <th>Test Range</th>
+                <th>Contact</th>
+            </tr>
+            <!-- Row template -->
+            <tr class="template">
+                <td class="version-uri">uniprot</td><!--version-uri-->
+                <td class="short-name">UniProt</td> <!--title-->
+                <td class="description"> <!--description-->
+                    UniProt (Universal Protein Resource) is the world's most comprehensive catalog of
+                    information on proteins. It is a central repository of protein sequence and function
+                    created by joining the information contained in Swiss-Prot, TrEMBL, and PIR.
+                </td>
+                <td class="doc-href">UniProt</td> <!--doc-href-->
+                <td class="capabilities"> <!--capabilities-->
+                    <a href="http://www.ebi.ac.uk/tc-test/das-srv/uniprot/das/uniprot/entry_points">
+                        das1:entry_points
+                    </a><br/>
+                    <a href="http://www.ebi.ac.uk/tc-test/das-srv/uniprot/das/uniprot/sequence?segment=P99999">
+                        das1:sequence
+                    </a><br/>
+                    <a href="http://www.ebi.ac.uk/tc-test/das-srv/uniprot/das/uniprot/features?segment=P99999">
+                        das1:features
+                    </a>
+                </td>
+                <td class="coordinate">http://www.dasregistry.org/dasregistry/coordsys/CS_DS6</td> <!--coordinate system-->
+                <td class="coordinate-source">Protein sequence</td> <!--coordinate-source-->
+                <td class="authority">UniProt</td> <!--authority-->
+                <td class="taxon-id">12345</td> <!--taxon-->
+                <td class="test-range">12345</td> <!--taxon-->
+                <td class="maintainer">mail@mail.com</td> <!--maintainer-->
+            </tr>
+        </table>
+    </div>
+
+    <div><p></p></div>
+    
+    <div id="xml" style="font-family:courier;display:none;">
+    <p><div class="xml" style="font-family:courier;display:none;"></div></p>
+    </div>
+
+    <div><p></p></div>
+    
+    <div class="footer" align="right">
+        European Bioinformatics Institute &#169; 2007. All rights reserved.
+    </div>
+
+</body>
+</html>
