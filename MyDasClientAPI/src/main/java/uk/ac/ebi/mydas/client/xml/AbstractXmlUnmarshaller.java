@@ -23,18 +23,11 @@ public abstract class AbstractXmlUnmarshaller {
     protected static XmlPullParserFactory FACTORY = null;
 
     protected String getElementText(XmlPullParser xpp, String elementName) throws XmlPullParserException, IOException {
-        if (! xpp.isEmptyElementTag()){
-            // Check for a label.
-            while (! (xpp.next() == XmlPullParser.END_TAG && elementName.equals(xpp.getName()))) {
-                if (xpp.getEventType() == XmlPullParser.TEXT) {
-                    String currentText = xpp.getText();
-                    if (currentText != null){
-                        currentText = currentText.trim();
-                        if (currentText.length() > 0) {
-                            return currentText;
-                        }
-                    }
-                }
+        if (xpp.isEmptyElementTag()) return null;
+        // Check for a label.
+        while (! (xpp.next() == XmlPullParser.END_TAG && elementName.equals(xpp.getName()))) {
+            if (xpp.getEventType() == XmlPullParser.TEXT) {
+                return trimmedStringOrNull(xpp.getText());
             }
         }
         return null;

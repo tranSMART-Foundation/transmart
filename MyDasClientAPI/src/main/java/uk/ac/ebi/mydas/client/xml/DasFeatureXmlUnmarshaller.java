@@ -297,7 +297,10 @@ public class DasFeatureXmlUnmarshaller extends AbstractXmlUnmarshaller {
                             throw new XmlPullParserException("Unexpected character in <PHASE/> element - not valid DASGFF at line " + xpp.getLineNumber());
                     }
                 } else if (ELEMENT_NOTE.equals(elemName)) {
-                    notes.add(getElementText(xpp, ELEMENT_NOTE));
+                    final String noteText = getElementText(xpp, ELEMENT_NOTE);
+                    if (noteText != null){
+                        notes.add(noteText);
+                    }
                 } else if (ELEMENT_LINK.equals(elemName)) {
                     processLinkElement(xpp, links);
                 } else if (ELEMENT_TARGET.equals(elemName)) {
