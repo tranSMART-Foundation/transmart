@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.PropertyType;
 import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.datasource.CommandExtender;
@@ -37,7 +38,7 @@ public class TestDataSourceSecond implements AnnotationDataSource, CommandExtend
 
 	CacheManager cacheManager = null;
 	ServletContext svCon;
-	Map<String, String> globalParameters;
+	Map<String, PropertyType> globalParameters;
 	DataSourceConfiguration config;
 
 	public void destroy() {
@@ -127,7 +128,7 @@ public class TestDataSourceSecond implements AnnotationDataSource, CommandExtend
 	}
 
 	public void init(ServletContext servletContext,
-			Map<String, String> globalParameters,
+			Map<String, PropertyType> globalParameters,
 			DataSourceConfiguration dataSourceConfig)
 	throws DataSourceException {
 		this.svCon = servletContext;

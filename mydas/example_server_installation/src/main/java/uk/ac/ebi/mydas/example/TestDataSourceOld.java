@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.PropertyType;
 import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
@@ -32,7 +33,7 @@ public class TestDataSourceOld implements AnnotationDataSource {
 
 	CacheManager cacheManager = null;
 	ServletContext svCon;
-	Map<String, String> globalParameters;
+	Map<String, PropertyType> globalParameters;
 	DataSourceConfiguration config;
 
 	public void destroy() {
@@ -122,7 +123,7 @@ public class TestDataSourceOld implements AnnotationDataSource {
 	}
 
 	public void init(ServletContext servletContext,
-			Map<String, String> globalParameters,
+			Map<String, PropertyType> globalParameters,
 			DataSourceConfiguration dataSourceConfig)
 	throws DataSourceException {
 		this.svCon = servletContext;

@@ -24,6 +24,7 @@
 package uk.ac.ebi.mydas.example;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.PropertyType;
 import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.AlignmentDataSource;
 import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
@@ -68,7 +69,7 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
 
     CacheManager cacheManager = null;
     ServletContext svCon;
-    Map<String, String> globalParameters;
+    Map<String, PropertyType> globalParameters;
     DataSourceConfiguration config;
     /**
      * This method is called by the {@link uk.ac.ebi.mydas.controller.MydasServlet} class at Servlet initialisation.
@@ -97,7 +98,7 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
      *          a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
      *          and read a record.</bold>
      */
-    public void init(ServletContext servletContext, Map<String, String> globalParameters, DataSourceConfiguration dataSourceConfig) throws DataSourceException {
+    public void init(ServletContext servletContext, Map<String, PropertyType> globalParameters, DataSourceConfiguration dataSourceConfig) throws DataSourceException {
         this.svCon = servletContext;
         this.globalParameters = globalParameters;
         this.config = dataSourceConfig;
@@ -329,8 +330,6 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
      * {@link uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException}.
      *
      * @param featureIdCollection a Collection&lt;String&gt; of feature_id values included in the features command / request.
-     *                            May be a <code>java.util.Collections.EMPTY_LIST</code> but will <b>not</b> be null.
-     * @param groupIdCollection   a Collection&lt;String&gt; of group_id values included in the features command / request.
      *                            May be a <code>java.util.Collections.EMPTY_LIST</code> but will <b>not</b> be null.
      * @return A Collection of {@link uk.ac.ebi.mydas.model.DasAnnotatedSegment} objects. These describe the segments that is annotated, limited
      *         to the information required for the /DASGFF/GFF/SEGMENT element.  Each References a Collection of
