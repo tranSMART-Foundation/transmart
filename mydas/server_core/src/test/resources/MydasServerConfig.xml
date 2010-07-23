@@ -37,7 +37,7 @@
         through the DataSource interface, so the plugin author can
         add arbitrary additional configuration to their data source. -->
         <property key="TestKeyGlobal1" value="TestValueGlobal1"/>
-        <property key="TestKeyGlobal2" value="TestValueGlobal2"/>
+        <property key="TestKeyGlobal2" value="TestValueGlobal2" visibility="true"/>
     </global>
     <!-- The enclosing element for one or more datasource definitions. -->
     <datasources>
@@ -54,7 +54,8 @@
         <datasource uri="http://www.ebi.ac.uk/dsnId1"
                     title="dsnName1"
                     description="dsnDescription1"
-                    doc_href="http://dsnDescriptionHref1">
+                    doc_href="http://dsnDescriptionHref1"
+                    mapmaster="http://dsnId1.mapmaster">
             <!-- The fully qualified class name of the DataSource. -->
 			<maintainer email="test@ebi.ac.uk" />
 
@@ -65,7 +66,8 @@
 								authority="UniProt"
 								test_range="P00280">UniProt,Protein Sequence</coordinates>
 				<capability type="das1:features"     query_uri="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features" />
-				
+				<property key="dsn1key1" value="dsn1value1"/>
+                <property key="dsn1key2" value="dsn1value2" visibility="true"/>
 			</version>
             <!-- The optional name of the DAS stylesheet to be used for this datasource.
             This will override the default stylesheet defined in the global settings section. -->
@@ -77,13 +79,12 @@
             <features-strictly-enclosed>true</features-strictly-enclosed>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
-            <property key="dsn1key1" value="dsn1value1"/>
-            <property key="dsn1key2" value="dsn1value2"/>
         </datasource>
         <datasource uri="http://www.ebi.ac.uk/dsnId2"
                     title="dsnName2"
                     description="dsnDescription2"
-                    doc_href="http://dsnDescriptionHref2">
+                    doc_href="http://dsnDescriptionHref2"
+                    mapmaster="http://dsnId2.mapmaster">
 			<maintainer email="test@ebi.ac.uk" />
             <version uri="http://www.ebi.ac.uk/dsnId2" created="2010-03-01">
 	            <class>fully.qualified.class.2</class>

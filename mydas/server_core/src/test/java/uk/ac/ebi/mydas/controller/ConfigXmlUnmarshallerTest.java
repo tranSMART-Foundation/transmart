@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 
 import uk.ac.ebi.mydas.configuration.ConfigurationManager;
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.PropertyType;
 import uk.ac.ebi.mydas.configuration.ServerConfiguration;
 import uk.ac.ebi.mydas.exceptions.ConfigurationException;
 
@@ -97,16 +98,24 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
             Assert.assertEquals("The number of global properties is not as expected.",
                     2,
                     serverConfig.getGlobalConfiguration().getGlobalParameters().size());
-            Map<String, String> globalProps = serverConfig.getGlobalConfiguration().getGlobalParameters();
+            //Properties also includes visibility (since 1.6.1)
+            Map<String, PropertyType> globalProps = serverConfig.getGlobalConfiguration().getGlobalParameters();
             Assert.assertEquals("Missing global property",
-                    globalProps.get("TestKeyGlobal1"),
+                    globalProps.get("TestKeyGlobal1").getValue(),
                     "TestValueGlobal1");
+            Assert.assertEquals("Visibility should be false in TestKeyGlobal1 property",
+                    globalProps.get("TestKeyGlobal1").getVisibility().booleanValue(),
+                    false);
             Assert.assertEquals("Missing global property",
-                    globalProps.get("TestKeyGlobal2"),
+                    globalProps.get("TestKeyGlobal2").getValue(),
                     "TestValueGlobal2");
+            Assert.assertEquals("Visibility should be true in TestKeyGlobal2 property",
+                    globalProps.get("TestKeyGlobal2").getVisibility().booleanValue(),
+                    true);
             Assert.assertEquals("The number of dsns is not as expected",
                     2,
                     serverConfig.getDataSourceConfigMap().size());
+            //DSN collection
             Collection<DataSourceConfiguration> dsnCollection = serverConfig.getDataSourceConfigMap().values();
             boolean found1 = false;
             boolean found2 = false;
@@ -123,7 +132,7 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                             "2010-03-01");
                     Assert.assertEquals("Unexpected mapmaster",
                             dsnConfig.getMapmaster(),
-                            "http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle");
+                            "http://dsnId1.mapmaster");
                     Assert.assertEquals("Unexpected description",
                             dsnConfig.getDescription(),
                             "dsnDescription1");
@@ -136,13 +145,17 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                     Assert.assertEquals("Unexpected number of properties",
                             2,
                             dsnConfig.getDataSourceProperties().size());
-                    Map<String, String> dsnProps = dsnConfig.getDataSourceProperties();
+                    //Properties
+                    Map<String, PropertyType> dsnProps = dsnConfig.getDataSourceProperties();
                     Assert.assertEquals("Missing dsn property",
-                            dsnProps.get("dsn1key1"),
+                            dsnProps.get("dsn1key1").getValue(),
                             "dsn1value1");
                     Assert.assertEquals("Missing dsn property",
-                            dsnProps.get("dsn1key2"),
+                            dsnProps.get("dsn1key2").getValue(),
                             "dsn1value2");
+                    Assert.assertEquals("Visibility should be true in dsn1key2 property",
+                            dsnProps.get("dsn1key2").getVisibility().booleanValue(),
+                            true);
                     Assert.assertTrue("dna-command-enabled not as expected", dsnConfig.isDnaCommandEnabled());
                     Assert.assertTrue("features-strictly-enclosed not as expected", dsnConfig.isFeaturesStrictlyEnclosed());
                     Assert.assertTrue("use-feature-id-for-feature-label", dsnConfig.isUseFeatureIdForFeatureLabel());
@@ -158,7 +171,7 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                             "2010-03-01");
                     Assert.assertEquals("Unexpected mapmaster",
                             dsnConfig.getMapmaster(),
-                            "http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle");
+                            "http://dsnId2.mapmaster");
                     Assert.assertEquals("Unexpected description",
                             dsnConfig.getDescription(),
                             "dsnDescription2");
