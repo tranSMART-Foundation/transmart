@@ -139,4 +139,53 @@
         </xsl:copy>
     </xsl:template>
 
+    <!--XML format - div xml-->
+    <xsl:template match="node()[@class='xml']" mode="stylefree-layout">
+        <xsl:copy>
+            <xsl:for-each select="$source">
+                <xsl:choose>
+                    <xsl:when test="*">
+                        <xsl:apply-templates select="@*" mode="xml-att"/>
+                        <xsl:apply-templates select="*" mode="xml-main"/>
+                    </xsl:when>
+                    <xsl:when test="text()">
+                        <span style="color:blue">&lt;<xsl:value-of select="name()"/></span><xsl:apply-templates select="@*" mode="xml-att"/><span style="color:blue">&gt;</span><xsl:apply-templates select="text()" mode="xml-text"/><span style="color:blue">&lt;/<xsl:value-of select="name()"/>&gt;</span><br/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <span style="color:blue">&lt;<xsl:value-of select="name()"/></span><xsl:apply-templates select="@*" mode="xml-att"/><span style="color:blue"> /&gt;</span><br/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
+        </xsl:copy>
+    </xsl:template>
+    <!--XML format - internal xml-->
+    <xsl:template match="*" mode="xml-main">
+        <xsl:choose>
+            <xsl:when test="*">
+                <span style="color:blue">&lt;<xsl:value-of select="name()"/></span>
+                <xsl:apply-templates select="@*" mode="xml-att"/>
+                <span style="color:blue">&gt;</span>
+                <div style="margin-left: 1em">
+                <xsl:apply-templates select="*" mode="xml-main"/>
+                </div>
+                <span style="color:blue">&lt;/<xsl:value-of select="name()"/>&gt;</span>
+                <br/>
+            </xsl:when>
+            <xsl:when test="text()">
+                <span style="color:blue">&lt;<xsl:value-of select="name()"/></span><xsl:apply-templates select="@*" mode="xml-att"/><span style="color:blue">&gt;</span><xsl:apply-templates select="text()" mode="xml-text"/><span style="color:blue">&lt;/<xsl:value-of select="name()"/>&gt;</span><br/>
+            </xsl:when>
+            <xsl:otherwise>
+                <span style="color:blue">&lt;<xsl:value-of select="name()"/></span><xsl:apply-templates select="@*" mode="xml-att"/><span style="color:blue"> /&gt;</span><br/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <!--XML format - attribute-->
+    <xsl:template match="@*" mode="xml-att">
+        <span style="color:purple"><xsl:text>&#160;</xsl:text><xsl:value-of select="name()"/>=&quot;</span><span style="color:red"><xsl:value-of select="."/></span><span style="color:purple">&quot;</span>
+    </xsl:template>
+    <!--XML format - text-->
+    <xsl:template match="text()" mode="xml-text">
+        <div style="margin-left: 1em; color:black"><xsl:value-of select="."/></div>
+    </xsl:template>
+
 </xsl:stylesheet>
