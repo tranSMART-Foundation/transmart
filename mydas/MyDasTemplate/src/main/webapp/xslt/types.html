@@ -32,13 +32,15 @@
  */
  -->
 <head>
-    <title>MyDas: Types</title>
-    <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="styles/common.css"/>
+    <title>MyDas: Data Sources</title>
+    <!--Using absolute URL's avoid weird behaviours when there is a / at the end of the request -->
+    <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="http://localhost:8080/xslt/styles/common.css"/>
     <script type="text/javascript">
-        var image_path = "images/";
+        //README: This variable must be set up in sortable.js (otherwise it will be resolved as a relative URL )
+        //var image_path = "http://localhost:8080/xslt/images/";
     </script>
-    <script type="text/javascript" src="scripts/main.js"></script>
-    <script type="text/javascript" src="scripts/sortable.js"></script>
+    <script type="text/javascript" src="http://localhost:8080/xslt/scripts/main.js"></script>
+    <script type="text/javascript" src="http://localhost:8080/xslt/scripts/sortable.js"></script>
 </head>
 
 <body>
@@ -48,7 +50,7 @@
             <tr>
                 <td class="banner">
                     <a href="http://code.google.com/p/mydas/">
-                        <img src="images/mydas_logo_small.png" alt="MyDas Distributed Annotation Server"/>
+                        <img src="http://localhost:8080/xslt/images/mydas_logo_small.png" alt="MyDas Distributed Annotation Server"/>
                     </a>
                 </td>
                 <td class="banner" align="right">

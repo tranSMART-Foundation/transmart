@@ -33,22 +33,28 @@
  -->
 <head>
     <title>MyDas: Data Sources</title>
-    <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="styles/common.css"/>
+    <!--Using absolute URL's avoid weird behaviours when there is a / at the end of the request -->
+    <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="http://localhost:8080/xslt/styles/common.css"/>
     <script type="text/javascript">
-        var image_path = "images/";
+        //README: This variable must be set up in sortable.js (otherwise it will be resolved as a relative URL )
+        //var image_path = "http://localhost:8080/xslt/images/";
+        function init(){
+            document.getElementById('dsn').style.display = 'block';
+            document.getElementById('xml').style.display='none';
+        }
     </script>
-    <script type="text/javascript" src="scripts/main.js"></script>
-    <script type="text/javascript" src="scripts/sortable.js"></script>
+    <script type="text/javascript" src="http://localhost:8080/xslt/scripts/main.js"></script>
+    <script type="text/javascript" src="http://localhost:8080/xslt/scripts/sortable.js"></script>
 </head>
 
-<body>
+<body onload="init()">
 
     <div class="header">
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
                 <td class="banner">
                     <a href="http://code.google.com/p/mydas/">
-                        <img src="images/mydas_logo_small.png" alt="MyDas Distributed Annotation Server"/>
+                        <img src="http://localhost:8080/xslt/images/mydas_logo_small.png" alt="MyDas Distributed Annotation Server"/>
                     </a>
                 </td>
                 <td class="banner" align="right">
@@ -60,9 +66,18 @@
         </table>
     </div>
 
-    <div><p/></div>
+    <div><p></p></div>
 
-    <div class="dsn">
+    <div id="mainbody">
+          <p>Format:
+            <input type="radio" name="format" onclick="document.getElementById('dsn').style.display='block';document.getElementById('xml').style.display='none';" value="Table" checked="checked"/>Table
+            <input type="radio" name="format" onclick="document.getElementById('xml').style.display='block';document.getElementById('dsn').style.display='none';" value="XML"/>XML
+          </p>
+    </div>
+
+    <div><p></p></div>
+
+    <div id="dsn" class="dsn">
 
         <table id="data-sources"
                class="sortable"
@@ -111,7 +126,13 @@
 
     </div>
 
-    <div><p/></div>
+    <div><p></p></div>
+
+    <div id="xml" style="font-family:courier;display:none;">
+    <p><div class="xml" style="font-family:courier;display:none;"></div></p>
+    </div>
+
+    <div><p></p></div>
 
     <div class="footer" align="right">
         European Bioinformatics Institute &#169; 2007. All rights reserved.

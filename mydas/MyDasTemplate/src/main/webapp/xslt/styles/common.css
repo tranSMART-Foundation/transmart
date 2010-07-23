@@ -27,7 +27,7 @@ html {
 	font-family: Verdana, Arial, "Lucida Grande", sans-serif;
     /*font-family: helvetica, "trebuchet MS", arial, sans-serif;*/
 }
- 
+
 a, img, img.drawing {
 	border: 0;
 }
@@ -87,11 +87,11 @@ table.sortable th, table.sortable td {
 	border-color: #444;
 }
 table.sortable th {
-	border-width: 0 1px 1px 1px;
+	border-width: 0px 1px 1px 1px;
 	background-color: #ccc;
 }
 table.sortable td {
-	border-width: 0 1px 0 1px;
+	border-width: 0px 1px 0px 1px;
 }
 table.sortable tr.odd td {
 	background-color: #ddd;
@@ -132,7 +132,7 @@ span.graphic    {
 span.graphic-padding    {
     float:          left;
     height:         14px;
-    border-width:   0;
+    border-width:   0px;
 }
 span.graphic-line    {
     float:          left;

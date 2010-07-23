@@ -8,7 +8,7 @@ Copyright (c) 1997-2006 Stuart Langridge, Joost de Valk.
 */
 
 /* Change these values */
-//var image_path = "images/";
+var image_path = "http://localhost:8080/xslt/images/";
 var image_up = "arrow-up.gif";
 var image_down = "arrow-down.gif";
 var image_none = "arrow-none.gif";
@@ -36,7 +36,7 @@ function ts_makeSortable(table) {
 		var firstRow = table.rows[0];
 	}
 	if (!firstRow) return;
-	
+
 	// We have a first row: assume it's the header, and make its contents clickable links
 	for (var i=0;i<firstRow.cells.length;i++) {
 		var cell = firstRow.cells[i];
@@ -53,7 +53,7 @@ function ts_getInnerText(el) {
 	if (typeof el == "undefined") { return el };
 	if (el.innerText) return el.innerText;	//Not needed but it is faster
 	var str = "";
-	
+
 	var cs = el.childNodes;
 	var l = cs.length;
 	for (var i = 0; i < l; i++) {
@@ -79,7 +79,7 @@ function ts_resortTable(lnk) {
 	var td = lnk.parentNode;
 	var column = td.cellIndex;
 	var table = getParent(td,'TABLE');
-	
+
 	// Work out a type for the column
 	if (table.rows.length <= 1) return;
 	var itm = ts_getInnerText(table.rows[1].cells[column]);
@@ -91,10 +91,10 @@ function ts_resortTable(lnk) {
 	SORT_COLUMN_INDEX = column;
 	var firstRow = new Array();
 	var newRows = new Array();
-	for (i=0;i<table.rows[0].length;i++) { 
-		firstRow[i] = table.rows[0][i]; 
+	for (i=0;i<table.rows[0].length;i++) {
+		firstRow[i] = table.rows[0][i];
 	}
-	for (j=1;j<table.rows.length;j++) { 
+	for (j=1;j<table.rows.length;j++) {
 		newRows[j-1] = table.rows[j];
 	}
 
@@ -107,21 +107,21 @@ function ts_resortTable(lnk) {
 	} else {
 			ARROW = '&nbsp;&nbsp;<img src="'+ image_path + image_down + '" alt="&darr;"/>';
 			span.setAttribute('sortdir','down');
-	} 
-	
+	}
+
     // We appendChild rows that already exist to the tbody, so it moves them rather than creating new ones
     // don't do sortbottom rows
-    for (i=0; i<newRows.length; i++) { 
+    for (i=0; i<newRows.length; i++) {
 		if (!newRows[i].className || (newRows[i].className && (newRows[i].className.indexOf('sortbottom') == -1))) {
 			table.tBodies[0].appendChild(newRows[i]);
 		}
 	}
     // do sortbottom rows only
     for (i=0; i<newRows.length; i++) {
-		if (newRows[i].className && (newRows[i].className.indexOf('sortbottom') != -1)) 
+		if (newRows[i].className && (newRows[i].className.indexOf('sortbottom') != -1))
 			table.tBodies[0].appendChild(newRows[i]);
 	}
-    
+
 	// Delete any other arrows there may be showing
 	var allspans = document.getElementsByTagName("span");
 	for (var ci=0;ci<allspans.length;ci++) {
@@ -131,9 +131,9 @@ function ts_resortTable(lnk) {
 			}
 		}
 	}
-			
+
 	span.innerHTML = ARROW;
-	alternate(table);		
+	alternate(table);
 }
 
 function getParent(el, pTagName) {
@@ -153,10 +153,10 @@ function ts_sort_date(a,b) {
 			dt1 = aa.substr(6,4)+aa.substr(3,2)+aa.substr(0,2);
 	} else {
 			yr = aa.substr(6,2);
-			if (parseInt(yr) < 50) { 
-				yr = '20'+yr; 
-			} else { 
-				yr = '19'+yr; 
+			if (parseInt(yr) < 50) {
+				yr = '20'+yr;
+			} else {
+				yr = '19'+yr;
 			}
 			dt1 = yr+aa.substr(3,2)+aa.substr(0,2);
 	}
@@ -164,34 +164,34 @@ function ts_sort_date(a,b) {
 			dt2 = bb.substr(6,4)+bb.substr(3,2)+bb.substr(0,2);
 	} else {
 			yr = bb.substr(6,2);
-			if (parseInt(yr) < 50) { 
-				yr = '20'+yr; 
-			} else { 
-				yr = '19'+yr; 
+			if (parseInt(yr) < 50) {
+				yr = '20'+yr;
+			} else {
+				yr = '19'+yr;
 			}
 			dt2 = yr+bb.substr(3,2)+bb.substr(0,2);
 	}
 	if (dt1==dt2) {
 		return 0;
 	}
-	if (dt1<dt2) { 
+	if (dt1<dt2) {
 		return -1;
 	}
 	return 1;
 }
 
-function ts_sort_currency(a,b) { 
+function ts_sort_currency(a,b) {
 	aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]).replace(/[^0-9.]/g,'');
 	bb = ts_getInnerText(b.cells[SORT_COLUMN_INDEX]).replace(/[^0-9.]/g,'');
 	return parseFloat(aa) - parseFloat(bb);
 }
 
-function ts_sort_numeric(a,b) { 
+function ts_sort_numeric(a,b) {
 	aa = parseFloat(ts_getInnerText(a.cells[SORT_COLUMN_INDEX]));
 	if (isNaN(aa)) {
 		aa = 0;
 	}
-	bb = parseFloat(ts_getInnerText(b.cells[SORT_COLUMN_INDEX])); 
+	bb = parseFloat(ts_getInnerText(b.cells[SORT_COLUMN_INDEX]));
 	if (isNaN(bb)) {
 		bb = 0;
 	}
@@ -236,7 +236,7 @@ function addEvent(elm, evType, fn, useCapture)
 	} else {
 		alert("Handler could not be removed");
 	}
-} 
+}
 
 function replace(s, t, u) {
   /*
@@ -277,7 +277,7 @@ function alternate(table) {
 					tableRows[j].className = replace(tableRows[j].className, 'even', 'odd');
 				}
 				tableRows[j].className += " odd";
-			} 
+			}
 		}
 	}
 }
