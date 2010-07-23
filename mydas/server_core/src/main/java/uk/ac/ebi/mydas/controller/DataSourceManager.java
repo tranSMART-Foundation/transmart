@@ -97,7 +97,7 @@ public class DataSourceManager {
             throw new ConfigurationException ("An attempt to initialise the data sources has been made, but there is no valid ServerConfiguration object.");
         }
         if (serverConfiguration.getGlobalConfiguration() == null){
-            throw new ConfigurationException ("An attempt to initilise the data sources has been made, but the Global Configuration has not been loaded.");
+            throw new ConfigurationException ("An attempt to initialise the data sources has been made, but the Global Configuration has not been loaded.");
         }
         // Iterate over the DSN configs and attempt to initialise each in turn.
         for (DataSourceConfiguration dsnConfig : serverConfiguration.getDataSourceConfigMap().values()){
@@ -116,6 +116,7 @@ public class DataSourceManager {
                 // Register the
             } catch (DataSourceException e) {
                 // This particular data source has failed to initalise.  Still try to do the rest and log this failure.
+                e.printStackTrace(); //borrame
                 logger.error("Data Source Failed to Load and Initialise: " + dsnConfig.toString());
             }
         }

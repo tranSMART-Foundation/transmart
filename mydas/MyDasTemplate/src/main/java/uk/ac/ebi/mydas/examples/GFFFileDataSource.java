@@ -5,6 +5,7 @@ package uk.ac.ebi.mydas.examples;
 import javax.servlet.ServletContext;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.PropertyType;
 import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
@@ -27,11 +28,11 @@ import java.util.Map;
  * Data Source that reads a GFF 2 file which path has been specified in the 
  * configuration file as a property of the datasource element
  */
-public class GFFFileDataSource implements AnnotationDataSource {
+public class GFFFileDataSource implements AnnotationDataSource { 
 
 	CacheManager cacheManager = null;
 	ServletContext svCon;
-	Map<String, String> globalParameters;
+	Map<String, PropertyType> globalParameters;
 	DataSourceConfiguration config;
 	String path;
 	private Collection<DasAnnotatedSegment> segments;
@@ -42,11 +43,11 @@ public class GFFFileDataSource implements AnnotationDataSource {
 	 * The path is recovery from the configuration, the file is then parsed and 
 	 * keep in memory as a DasSegment collection object that is queried for each method
 	 */
-	public void init(ServletContext servletContext, Map<String, String> globalParameters, DataSourceConfiguration dataSourceConfig) throws DataSourceException {
+	public void init(ServletContext servletContext, Map<String, PropertyType> globalParameters, DataSourceConfiguration dataSourceConfig) throws DataSourceException {
 		this.svCon = servletContext;
 		this.globalParameters = globalParameters;
 		this.config = dataSourceConfig;
-		path = config.getDataSourceProperties().get("gff_file");
+		path = config.getDataSourceProperties().get("gff_file").getValue();
 		try {
 			GFF2Parser parser = new GFF2Parser(new FileInputStream(servletContext.getRealPath(path)));
 			segments = parser.parse();

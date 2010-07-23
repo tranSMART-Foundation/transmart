@@ -62,6 +62,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *                   &lt;/element>
  *                   &lt;element name="default-stylesheet" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                   &lt;element name="dsn-xslt-url" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
+ *                   &lt;element name="sources-xslt-url" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
  *                   &lt;element name="dna-xslt-url" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
  *                   &lt;element name="entry-points-xslt-url" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
  *                   &lt;element name="sequence-xslt-url" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
@@ -163,12 +164,13 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *                                 &lt;/simpleContent>
  *                               &lt;/complexType>
  *                             &lt;/element>
- *                             &lt;element name="property" type="{}propertyType" maxOccurs="unbounded" minOccurs="0"/>
  *                           &lt;/sequence>
  *                           &lt;attribute name="uri" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
  *                           &lt;attribute name="title" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *                           &lt;attribute name="description" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *                           &lt;attribute name="doc_href" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+ *                           &lt;attribute name="mapmaster" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+ *                           &lt;attribute name="max_entry_points" type="{http://www.w3.org/2001/XMLSchema}integer" />
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
@@ -343,12 +345,13 @@ public class Mydasserver {
      *                       &lt;/simpleContent>
      *                     &lt;/complexType>
      *                   &lt;/element>
-     *                   &lt;element name="property" type="{}propertyType" maxOccurs="unbounded" minOccurs="0"/>
      *                 &lt;/sequence>
      *                 &lt;attribute name="uri" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
      *                 &lt;attribute name="title" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
      *                 &lt;attribute name="description" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
      *                 &lt;attribute name="doc_href" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+     *                 &lt;attribute name="mapmaster" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+     *                 &lt;attribute name="max_entry_points" type="{http://www.w3.org/2001/XMLSchema}integer" />
      *               &lt;/restriction>
      *             &lt;/complexContent>
      *           &lt;/complexType>
@@ -490,12 +493,13 @@ public class Mydasserver {
          *             &lt;/simpleContent>
          *           &lt;/complexType>
          *         &lt;/element>
-         *         &lt;element name="property" type="{}propertyType" maxOccurs="unbounded" minOccurs="0"/>
          *       &lt;/sequence>
          *       &lt;attribute name="uri" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
          *       &lt;attribute name="title" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
          *       &lt;attribute name="description" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
          *       &lt;attribute name="doc_href" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+         *       &lt;attribute name="mapmaster" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+         *       &lt;attribute name="max_entry_points" type="{http://www.w3.org/2001/XMLSchema}integer" />
          *     &lt;/restriction>
          *   &lt;/complexContent>
          * &lt;/complexType>
@@ -511,8 +515,8 @@ public class Mydasserver {
             "dnaCommandEnabled",
             "featuresStrictlyEnclosed",
             "useFeatureIdForFeatureLabel",
-            "includeTypesWithZeroCount",
-            "property"
+            "includeTypesWithZeroCount"
+            //,"property" //Data source properties come from the version element and are not allowed out of it (since 1.6.1)
         })
         public static class Datasource {
 
@@ -529,7 +533,7 @@ public class Mydasserver {
             protected Mydasserver.Datasources.Datasource.UseFeatureIdForFeatureLabel useFeatureIdForFeatureLabel;
             @XmlElement(name = "include-types-with-zero-count", required = true)
             protected Mydasserver.Datasources.Datasource.IncludeTypesWithZeroCount includeTypesWithZeroCount;
-            protected List<PropertyType> property;
+            //protected List<PropertyType> property; //Data source properties come from the version element and are not allowed out of it (since 1.6.1)
             @XmlAttribute(name = "uri", required = true)
             @XmlSchemaType(name = "anyURI")
             protected String uri;
@@ -540,6 +544,12 @@ public class Mydasserver {
             @XmlAttribute(name = "doc_href")
             @XmlSchemaType(name = "anyURI")
             protected String docHref;
+            @XmlAttribute(name = "mapmaster", required = true) //since 1.6.1
+            @XmlSchemaType(name = "anyURI")
+            protected String mapmaster;
+            @XmlAttribute(name = "max_entry_points") //since 1.6.1
+            @XmlSchemaType(name = "integer")
+            protected Integer maxEntryPoints;
 
             /**
              * Gets the value of the maintainer property.
@@ -736,12 +746,13 @@ public class Mydasserver {
              * 
              * 
              */
+            /*Data source properties come from the version element and are not allowed out of it (since 1.6.1)
             public List<PropertyType> getProperty() {
                 if (property == null) {
                     property = new ArrayList<PropertyType>();
                 }
                 return this.property;
-            }
+            }*/
 
             /**
              * Gets the value of the uri property.
@@ -839,6 +850,53 @@ public class Mydasserver {
                 this.docHref = value;
             }
 
+            /**
+             * Gets the value of the mapmaster property.
+             * (since 1.6.1)
+             * @return
+             *     possible object is
+             *     {@link String }
+             *
+             */
+            public String getMapmaster() {
+                return mapmaster;
+            }
+
+            /**
+             * Sets the value of the mapmaster property.
+             * (since 1.6.1)
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *
+             */
+            public void setMapmaster(String value) {
+                this.mapmaster = value;
+            }
+
+            /**
+             * Gets the value of the maxEntryPoints property.
+             * (since 1.6.1)
+             * @return
+             *     possible object is
+             *     {@link Integer }
+             *
+             */
+            public Integer getMaxEntryPoints() {
+                return maxEntryPoints;
+            }
+
+            /**
+             * Sets the value of the maxEntryPoints property.
+             * (since 1.6.1)
+             * @param value
+             *     allowed object is
+             *     {@link Integer }
+             *
+             */
+            public void setMaxEntryPoints(Integer value) {
+                this.maxEntryPoints = value;
+            }
 
             /**
              * <p>Java class for anonymous complex type.
@@ -1660,6 +1718,7 @@ public class Mydasserver {
      *         &lt;/element>
      *         &lt;element name="default-stylesheet" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *         &lt;element name="dsn-xslt-url" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
+     *         &lt;element name="sources-xslt-url" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
      *         &lt;element name="dna-xslt-url" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
      *         &lt;element name="entry-points-xslt-url" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
      *         &lt;element name="sequence-xslt-url" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
@@ -1681,6 +1740,7 @@ public class Mydasserver {
         "slashDasPointsToDsn",
         "defaultStylesheet",
         "dsnXsltUrl",
+        "sourcesXsltUrl",
         "dnaXsltUrl",
         "entryPointsXsltUrl",
         "sequenceXsltUrl",
@@ -1701,6 +1761,9 @@ public class Mydasserver {
         @XmlElement(name = "dsn-xslt-url")
         @XmlSchemaType(name = "anyURI")
         protected String dsnXsltUrl;
+        @XmlElement(name = "sources-xslt-url")  //since 1.6.1
+        @XmlSchemaType(name = "anyURI")
+        protected String sourcesXsltUrl;
         @XmlElement(name = "dna-xslt-url")
         @XmlSchemaType(name = "anyURI")
         protected String dnaXsltUrl;
@@ -1836,6 +1899,30 @@ public class Mydasserver {
          */
         public void setDsnXsltUrl(String value) {
             this.dsnXsltUrl = value;
+        }
+
+        /**
+         * Gets the value of the sourcesXsltUrl property.
+         * (since 1.6.1)
+         * @return
+         *     possible object is
+         *     {@link String }
+         *
+         */
+        public String getSourcesXsltUrl() {
+            return sourcesXsltUrl;
+        }
+
+        /**
+         * Sets the value of the sourcesXsltUrl property.
+         * (since 1.6.1)
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *
+         */
+        public void setSourcesXsltUrl(String value) {
+            this.sourcesXsltUrl = value;
         }
 
         /**

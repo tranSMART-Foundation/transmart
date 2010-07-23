@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.PropertyType;
 import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
@@ -25,20 +26,20 @@ import uk.ac.ebi.mydas.model.DasType;
 public class SeparatedByPipesDataSource implements AnnotationDataSource {
 	CacheManager cacheManager = null;
 	ServletContext svCon;
-	Map<String, String> globalParameters;
+	Map<String, PropertyType> globalParameters;
 	DataSourceConfiguration config;
 	String path;
 	private Collection<DasAnnotatedSegment> segments;
 	private Collection<DasType> types;
 
 	public void init(ServletContext servletContext,
-			Map<String, String> globalParameters,
+			Map<String, PropertyType> globalParameters,
 			DataSourceConfiguration dataSourceConfig)
 			throws DataSourceException {
 		this.svCon = servletContext;
 		this.globalParameters = globalParameters;
 		this.config = dataSourceConfig;
-		path = config.getDataSourceProperties().get("pipes_file");
+		path = config.getDataSourceProperties().get("pipes_file").getValue();
 		try {
 			SeparatedByPipesParser parser = new SeparatedByPipesParser(new FileInputStream(servletContext.getRealPath(path)));
 			segments = parser.parse();

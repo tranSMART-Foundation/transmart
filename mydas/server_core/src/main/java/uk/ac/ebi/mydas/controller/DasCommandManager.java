@@ -264,9 +264,9 @@ public class DasCommandManager {
 
 	/**
 	 * Helper method used by both the dnaCommand and the sequenceCommand
-	 * 
-     * DAS1.6: The exception for a bad reference object (reference sequence unknown) [deprecated in favour of Exception Handling] 
-     * 
+	 *
+     * DAS1.6: The exception for a bad reference object (reference sequence unknown) [deprecated in favour of Exception Handling]
+     *
 	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
 	 * @param queryString to be parsed, which includes details of the requested segments
 	 * @return a Collection of SequenceReporter objects.  The SequenceReporter wraps the DasSequence object
@@ -480,10 +480,11 @@ public class DasCommandManager {
 
 	private void typesCommandSpecificSegments(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, List<SegmentQuery> requestedSegments, List<String> typeFilter)
 	throws DataSourceException, BadReferenceObjectException, XmlPullParserException, IOException, CoordinateErrorException {
-		Map <FoundFeaturesReporter, Map<DasType, Integer>> typesReport =
-			new HashMap<FoundFeaturesReporter, Map<DasType, Integer>>(requestedSegments.size());
+		Map <SegmentReporter, Map<DasType, Integer>> typesReport =
+			new HashMap<SegmentReporter, Map<DasType, Integer>>(requestedSegments.size());
 		// For each segment, populate the typesReport with 'all types' if necessary and then add types and counts.
-		Collection<SegmentReporter> segmentReporters = this.getFeatureCollection(dsnConfig, requestedSegments, false,null);
+        // Always handle error/unknown segments
+		Collection<SegmentReporter> segmentReporters = this.getFeatureCollection(dsnConfig, requestedSegments, true,null);
 		for (SegmentReporter uncastReporter : segmentReporters){
 			// Try to get the features for this segment
 			if (uncastReporter instanceof FoundFeaturesReporter){
@@ -519,7 +520,12 @@ public class DasCommandManager {
 						}
 					}
 				}
-			}
+			} else if (uncastReporter instanceof UnknownSegmentReporter) {
+                UnknownSegmentReporter segmentReporter = (UnknownSegmentReporter) uncastReporter;
+                Map<DasType, Integer> segmentTypes = new HashMap<DasType, Integer>();
+				// Add these objects to the typesReport.
+				typesReport.put(segmentReporter, segmentTypes);
+            }
 			// Finished with actual features
 			/////////////////////////////////////////////////////////////////////////////////////////////
 		}
@@ -547,24 +553,31 @@ public class DasCommandManager {
 			serializer.startTag (DAS_XML_NAMESPACE, "GFF");
 			serializer.attribute(DAS_XML_NAMESPACE, "version", "1.0");
 			serializer.attribute(DAS_XML_NAMESPACE, "href", this.buildRequestHref(request));
-			for (FoundFeaturesReporter featureReporter : typesReport.keySet()){
-				serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
-				serializer.attribute(DAS_XML_NAMESPACE, "id", featureReporter.getSegmentId());
-				serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(featureReporter.getStart()));
-				serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(featureReporter.getStop()));
-				if (featureReporter.getType() != null && featureReporter.getType().length() > 0){
-					serializer.attribute(DAS_XML_NAMESPACE, "type", featureReporter.getType());
-				}
-				serializer.attribute(DAS_XML_NAMESPACE, "version", featureReporter.getVersion());
-				if (featureReporter.getSegmentLabel() != null && featureReporter.getSegmentLabel().length() > 0){
-					serializer.attribute(DAS_XML_NAMESPACE, "label", featureReporter.getSegmentLabel());
-				}
-				// Now for the types.
-				Map<DasType, Integer> typeMap = typesReport.get(featureReporter);
-				for (DasType type : typeMap.keySet()){
-					(new DasTypeE (type)).serialize(DAS_XML_NAMESPACE, serializer, typeMap.get(type));
-				}
-				serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
+			for (SegmentReporter segmentReporter : typesReport.keySet()){
+                if (segmentReporter instanceof UnknownSegmentReporter){
+                    boolean referenceSource = dsnConfig.getDataSource() instanceof ReferenceDataSource;
+					((UnknownSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, referenceSource);
+                } else if (segmentReporter instanceof FoundFeaturesReporter){
+                    FoundFeaturesReporter featureReporter = (FoundFeaturesReporter) segmentReporter;
+                    serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
+                    serializer.attribute(DAS_XML_NAMESPACE, "id", featureReporter.getSegmentId());
+                    serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(featureReporter.getStart()));
+                    serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(featureReporter.getStop()));
+                    if (featureReporter.getType() != null && featureReporter.getType().length() > 0){
+                        serializer.attribute(DAS_XML_NAMESPACE, "type", featureReporter.getType());
+                    }
+                    serializer.attribute(DAS_XML_NAMESPACE, "version", featureReporter.getVersion());
+                    if (featureReporter.getSegmentLabel() != null && featureReporter.getSegmentLabel().length() > 0){
+                        serializer.attribute(DAS_XML_NAMESPACE, "label", featureReporter.getSegmentLabel());
+                    }
+                    // Now for the types.
+                    Map<DasType, Integer> typeMap = typesReport.get(featureReporter);
+                    for (DasType type : typeMap.keySet()){
+                        (new DasTypeE (type)).serialize(DAS_XML_NAMESPACE, serializer, typeMap.get(type));
+                    }
+                    serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
+                }
+
 			}
 			serializer.endTag (DAS_XML_NAMESPACE, "GFF");
 			serializer.endTag (DAS_XML_NAMESPACE, "DASTYPES");
@@ -576,7 +589,7 @@ public class DasCommandManager {
 			}
 		}
 	}
-	
+
 	/**
 	 * Given that this command just return a copy of a predefined stylesheet, there is nothing to modify for DAS1.6
 	 * @param request
@@ -739,7 +752,7 @@ public class DasCommandManager {
 		// from the data source.  (getFeatureCollection method shared with the 'types' command.)
 		Collection<SegmentReporter> segmentReporterCollections;
 		if (requestedSegments.size() > 0){
-			segmentReporterCollections = getFeatureCollection(dsnConfig, requestedSegments, true,maxbins);
+			segmentReporterCollections = getFeatureCollection(dsnConfig, requestedSegments, true, maxbins);
 		} else {
 			// No segments have been requested, so instead check for either feature_id or group_id filters.
 			// (If neither of these are present, then throw a BadCommandArgumentsException)
@@ -791,14 +804,14 @@ public class DasCommandManager {
 			// Rest of the XML.
 			serializer.startTag(DAS_XML_NAMESPACE, "DASGFF");
 			serializer.startTag(DAS_XML_NAMESPACE, "GFF");
-			//the version has been deprecated from  
+			//the version has been deprecated from
 			serializer.attribute(DAS_XML_NAMESPACE, "href", buildRequestHref(request));
 			for (SegmentReporter segmentReporter : segmentReporterCollections){
 				if (segmentReporter instanceof UnknownSegmentReporter){
 					((UnknownSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, referenceSource);
 				} else if (segmentReporter instanceof UnknownFeatureSegmentReporter){
 					((UnknownFeatureSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer);
-				} else {	
+				} else {
 					((FoundFeaturesReporter) segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, filter, categorize, dsnConfig.isFeaturesStrictlyEnclosed(), dsnConfig.isUseFeatureIdForFeatureLabel());
 				}
 			}
@@ -1055,16 +1068,16 @@ public class DasCommandManager {
 	 * @param request required to determine if the client will accept a compressed response
 	 * @param compressionAllowed to indicate if the specific response should be gzipped. (e.g. an error message with
 	 * no content should not set the compressed header.)
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private void writeHeader (HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed,String capabilities) throws IOException{
 		this.mydasServlet.writeHeader(request, response, status, compressionAllowed,capabilities);
 	}
 
 
-	
+
 //DAS 1.6 commands:
-	
+
 	/**
 	 * Implements the source command.  Only reports sources that have initialized successfully.
 	 * @param request to allow writing of the HTTP header
@@ -1101,13 +1114,13 @@ public class DasCommandManager {
 				serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
 				serializer.startDocument(null, false);
 				serializer.text("\n");
-				if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDsnXSLT() != null){
-					serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getDsnXSLT());
+				if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getSourcesXSLT() != null){
+					serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getSourcesXSLT());
 					serializer.text("\n");
 				}
 				serializer.startTag (DAS_XML_NAMESPACE, "SOURCES");
 				List<String> versionsadded= new ArrayList<String>();
-				
+
 				for (String dsn : dsns){
 					if (source==null || source.equals(dsn)){
 						if (!versionsadded.contains(dsn)){
@@ -1119,11 +1132,11 @@ public class DasCommandManager {
 							}
 							serializer.attribute(DAS_XML_NAMESPACE, "title", dsnConfig2.getTitle());
 							serializer.attribute(DAS_XML_NAMESPACE, "description", dsnConfig2.getDescription());
-							
+
 							serializer.startTag (DAS_XML_NAMESPACE, "MAINTAINER");
 							serializer.attribute(DAS_XML_NAMESPACE, "email", dsnConfig2.getMaintainer().getEmail());
 							serializer.endTag (DAS_XML_NAMESPACE, "MAINTAINER");
-		
+
 							for(Version version:dsnConfig2.getVersion()){
 								versionsadded.add(version.getUri());
 								serializer.startTag (DAS_XML_NAMESPACE, "VERSION");
@@ -1140,25 +1153,28 @@ public class DasCommandManager {
 										serializer.attribute(DAS_XML_NAMESPACE, "version", coordinates.getVersion());
 									serializer.attribute(DAS_XML_NAMESPACE, "test_range", coordinates.getTestRange());
 									serializer.text(coordinates.getValue());
-									serializer.endTag (DAS_XML_NAMESPACE, "COORDINATES");							
+									serializer.endTag (DAS_XML_NAMESPACE, "COORDINATES");
 								}
 								for(Capability capability:version.getCapability()){
 									serializer.startTag (DAS_XML_NAMESPACE, "CAPABILITY");
 									serializer.attribute(DAS_XML_NAMESPACE, "type", capability.getType());
 									if ( (capability.getQueryUri()!=null) && (capability.getQueryUri().length()>0) )
 										serializer.attribute(DAS_XML_NAMESPACE, "query_uri", capability.getQueryUri());
-									serializer.endTag (DAS_XML_NAMESPACE, "CAPABILITY");							
+									serializer.endTag (DAS_XML_NAMESPACE, "CAPABILITY");
 								}
 								serializer.endTag (DAS_XML_NAMESPACE, "VERSION");
 							}
-							
-//							for(PropertyType pt:dsnConfig2.getProperty()){
-//								serializer.startTag (DAS_XML_NAMESPACE, "PROPERTY");
-//								serializer.attribute(DAS_XML_NAMESPACE, "name", pt.getKey());
-//								serializer.attribute(DAS_XML_NAMESPACE, "value", pt.getValue());
-//								serializer.endTag (DAS_XML_NAMESPACE, "PROPERTY");
-//							}
-							
+							//1.6.1 Properties come from version and are not allowed in data sources
+                            //1.61. Only properties with visibility true will be reported in source command response
+							for(PropertyType pt:dsnConfig2.getVersion().get(0).getProperty()){
+                                if (pt.getVisibility()) {
+                                    serializer.startTag (DAS_XML_NAMESPACE, "PROPERTY");
+                                    serializer.attribute(DAS_XML_NAMESPACE, "name", pt.getKey());
+                                    serializer.attribute(DAS_XML_NAMESPACE, "value", pt.getValue());
+                                    serializer.endTag (DAS_XML_NAMESPACE, "PROPERTY");
+                                }
+							}
+
 							serializer.endTag (DAS_XML_NAMESPACE, "SOURCE");
 						}
 					}
@@ -1198,13 +1214,13 @@ public class DasCommandManager {
 			String[] rows = queryParts[1].split("-");
 			try{
 				start=Integer.parseInt(rows[0]);
-			} catch (NumberFormatException nfe){ 
-				throw new BadCommandArgumentsException("Unexpected arguments(not numeric) have been passed to the entry_points command."); 
+			} catch (NumberFormatException nfe){
+				throw new BadCommandArgumentsException("Unexpected arguments(not numeric) have been passed to the entry_points command.");
 			}
-			try{ 
-				stop=Integer.parseInt(rows[1]); 
-			} catch (NumberFormatException nfe){ 
-				throw new BadCommandArgumentsException("Unexpected arguments(not numeric) have been passed to the entry_points command."); 
+			try{
+				stop=Integer.parseInt(rows[1]);
+			} catch (NumberFormatException nfe){
+				throw new BadCommandArgumentsException("Unexpected arguments(not numeric) have been passed to the entry_points command.");
 			}
 			if (stop<start)
 				throw new BadCommandArgumentsException("Unexpected arguments(stop lower than start) have been passed to the entry_points command.");
@@ -1247,7 +1263,7 @@ public class DasCommandManager {
 
 				if (start>-1)
 					serializer.attribute(DAS_XML_NAMESPACE, "start", ""+start);
-				else 
+				else
 					start=1;
 				if (stop>-1)
 					serializer.attribute(DAS_XML_NAMESPACE, "end", ""+stop);
@@ -1270,7 +1286,7 @@ public class DasCommandManager {
 				serializer.startTag(DAS_XML_NAMESPACE, "QUERY");
 				serializer.text(""+queryString);
 				serializer.endTag(DAS_XML_NAMESPACE, "QUERY");
-				
+
 				serializer.endTag(DAS_XML_NAMESPACE, "DASEP");
 
 				serializer.flush();
@@ -1286,12 +1302,12 @@ public class DasCommandManager {
 			throw new UnimplementedFeatureException("An attempt to request entry_point information from an annotation server has been detected.");
 		}
 	}
-	
+
 	/**
 	 * Implements the sequence command.  Delegates to the getSequences method to return the requested sequences.
-	 * 
-     * DAS1.6: The exception for a bad reference object (reference sequence unknown) [deprecated in favour of Exception Handling] 
-     * 
+	 *
+     * DAS1.6: The exception for a bad reference object (reference sequence unknown) [deprecated in favour of Exception Handling]
+     *
 	 * @param request to allow the writing of the http header
 	 * @param response to which the http header and the XML are written.
 	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
@@ -1306,7 +1322,7 @@ public class DasCommandManager {
 	 */
 	void sequenceCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
 			throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException, BadReferenceObjectException, BadCommandArgumentsException, CoordinateErrorException {
-		
+
 		// Is this a reference source?
 		if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
 			// Fine - process command.
@@ -1395,12 +1411,12 @@ public class DasCommandManager {
 			typesCommandSpecificSegments(request, response, dsnConfig, requestedSegments, typeFilter);
 		}
 	}
-	
+
 	/**
 	 * Implements the structure command.  Delegates to the getStructure method to return the requested structure.
-	 * 
-     * DAS1.6: The exception for a bad reference object (reference sequence unknown) [deprecated in favour of Exception Handling] 
-     * 
+	 *
+     * DAS1.6: The exception for a bad reference object (reference sequence unknown) [deprecated in favour of Exception Handling]
+     *
 	 * @param request to allow the writing of the http header
 	 * @param response to which the http header and the XML are written.
 	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
@@ -1432,7 +1448,7 @@ public class DasCommandManager {
 					}
 					String key = queryPartKeysValues[0];
 					String value = queryPartKeysValues[1];
-					
+
 					//Structure to query
 					if ("query".equals (key)){
 						query = value;
@@ -1472,9 +1488,9 @@ public class DasCommandManager {
 						out.close();
 					}
 				}
-					
+
 			}
-			
+
 		} else {
 			// Not an structure source.
 			throw new UnimplementedFeatureException("An attempt to request structure information from a non-structure server has been detected.");
@@ -1482,7 +1498,7 @@ public class DasCommandManager {
 	}
 	/**
 	 * Implements the alignment command.  Delegates to the getAlignment method to return the requested alignment.
-	 * 
+	 *
 	 * @param request to allow the writing of the http header
 	 * @param response to which the http header and the XML are written.
 	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
@@ -1518,7 +1534,7 @@ public class DasCommandManager {
 					}
 					String key = queryPartKeysValues[0];
 					String value = queryPartKeysValues[1];
-					
+
 					//Structure to query
 					if ("query".equals (key)){
 						query = value;
@@ -1576,32 +1592,32 @@ public class DasCommandManager {
 						out.close();
 					}
 				}
-					
+
 			}
-			
+
 		} else {
 			// Not an alignment source.
 			throw new UnimplementedFeatureException("An attempt to request structure information from a non-structure server has been detected.");
 		}
 	}
-	
+
 	/**
 	 * In case of a data source has implemented the CommandExtender Interface. It invokes its method to execute commands out of the spec.
 	 * Otherwise a BadCommandException is thrown.
-	 * 
+	 *
 	 * @param request to allow the writing of the http header
 	 * @param response to which the http header and the XML are written.
 	 * @param dataSourceConfig holding configuration of the dsn and the data source object itself.
 	 * @param queryString from which the requested structures are parsed.
-	 * @throws BadCommandException in the case the interface Command extender haven't beeen implemented or 
+	 * @throws BadCommandException in the case the interface Command extender haven't beeen implemented or
 	 */
 	public void otherCommand(	HttpServletRequest request,
 								HttpServletResponse response,
-								DataSourceConfiguration dataSourceConfig, 
+								DataSourceConfiguration dataSourceConfig,
 								String command,
-								String queryString) 
+								String queryString)
 			throws BadCommandException {
-		
+
 		try {
 			if (dataSourceConfig.getDataSource() instanceof CommandExtender){
 				((CommandExtender)dataSourceConfig.getDataSource()).executeOtherCommand(request, response, dataSourceConfig, command, queryString);
@@ -1611,7 +1627,7 @@ public class DasCommandManager {
 		} catch (DataSourceException e) {
 			throw new BadCommandException("Data source impossible to recover for extended commands",e);
 		}
-		
+
 	}
 
 

@@ -24,6 +24,7 @@
 package uk.ac.ebi.mydas.datasource;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.PropertyType;
 import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
@@ -92,7 +93,7 @@ public interface AnnotationDataSource {
      * and read a record.</bold>
      */
     public void init (ServletContext servletContext,
-                      Map<String,String> globalParameters,
+                      Map<String, PropertyType> globalParameters,
                       DataSourceConfiguration dataSourceConfig)
             throws DataSourceException;
 
@@ -175,7 +176,6 @@ public interface AnnotationDataSource {
      *
      * @param featureIdCollection a Collection&lt;String&gt; of feature_id values included in the features command / request.
      * May be a <code>java.util.Collections.EMPTY_LIST</code> but will <b>not</b> be null.
-     * @param groupIdCollection a Collection&lt;String&gt; of group_id values included in the features command / request.
      * May be a <code>java.util.Collections.EMPTY_LIST</code> but will <b>not</b> be null.
      * @return A Collection of {@link DasAnnotatedSegment} objects. These describe the segments that is annotated, limited
      * to the information required for the /DASGFF/GFF/SEGMENT element.  Each References a Collection of

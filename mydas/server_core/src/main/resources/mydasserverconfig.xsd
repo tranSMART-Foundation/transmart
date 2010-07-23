@@ -68,7 +68,7 @@
 							<xs:element name="slash-das-points-to-dsn" nillable="false">
 								<xs:annotation>
 									<xs:documentation>
-										If set to true, then if the browser points to /das or /das/ then the output of the dsn command should be displayed.
+										If set to true, then if the browser points to /das or /das/ then the output of the sources command should be displayed.
 										This is useful for creating a home page based upon the data source details.
 									</xs:documentation>
 								</xs:annotation>
@@ -95,7 +95,7 @@
 									</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-                            <xs:element name="sources-xslt-url" type="xs:anyURI" nillable="false" minOccurs="0">
+							<xs:element name="sources-xslt-url" type="xs:anyURI" nillable="false" minOccurs="0">
 								<xs:annotation>
 									<xs:documentation>
 										Gives the URI of an XSLT transformation that can be used by the browser to present the sources command response in a human-readable format. 
@@ -381,6 +381,7 @@
 												</xs:simpleContent>
 											</xs:complexType>
 										</xs:element>
+										<!-- Data source properties come from version element and are not allowed out of it (since 1.6.1) 
 										<xs:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded">
 											<xs:annotation>
 												<xs:documentation>
@@ -388,7 +389,7 @@
 													All such properties are available to the DataSource code of course.
 												</xs:documentation>
 											</xs:annotation>
-										</xs:element>
+										</xs:element-->
 									</xs:sequence>
 									<xs:attribute name="uri" type="xs:anyURI" use="required">
 										<xs:annotation>
@@ -419,24 +420,26 @@
 											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
-                                    <xs:attribute name="mapmaster" type="xs:anyURI" use="required">
+                                    <!--since 1.6.1 (again)-->
+									<xs:attribute name="mapmaster" type="xs:anyURI" use="required">
 										<xs:annotation>
 											<xs:documentation>
-												The mapmaster attribute is a URL location pointing to the 'reference source' for the coordinate system. 
+												The mapmaster attribute is a URL location pointing to the 'reference source' for the coordinate system.
 												The target may be any browser-readable MIME-type.
 											</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
-                                    <xs:attribute name="max_entry_points" type="xs:integer" use="optional">
-                                        <xs:annotation>
-                                            <xs:documentation>
-                                                The max_entry_points (optional) attribute is a integer defining the maximum number of entry points
-                                                that a data source commits to retrieve when entry_points command is used.
-                                                This is particularly useful and recommended for data sources as UniProt with a large number
-                                                of entry points.
-                                            </xs:documentation>
-                                        </xs:annotation>
-                                    </xs:attribute>
+                                    <!--since 1.6.1-->
+									<xs:attribute name="max_entry_points" type="xs:integer" use="optional">
+										<xs:annotation>
+											<xs:documentation>
+												The max_entry_points (optional) attribute is a integer defining the maximum number of entry points
+												that a data source commits to retrieve when entry_points command is used.
+												This is particularly useful and recommended for data sources as UniProt with a large number
+												of entry points.
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
 								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
@@ -457,6 +460,16 @@
 			<xs:annotation>
 				<xs:documentation>
 					Properties will be made available to the DataSource developer as a java.util.Map of keys and values, with this attribute containing the value.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <!-- since 1.6.1 -->
+		<xs:attribute name="visibility" type="xs:boolean" use="optional">
+			<xs:annotation>
+				<xs:documentation>
+					Properties will be made available to the DataSource developer as a java.util.Map of keys and values, with this attribute containing the value.
+					By default, visibility is false. Only properties with visibility true will be reported as elements in the sources
+					command response
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>

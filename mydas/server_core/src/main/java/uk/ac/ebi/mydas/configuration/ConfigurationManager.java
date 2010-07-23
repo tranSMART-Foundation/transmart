@@ -61,20 +61,22 @@ public class ConfigurationManager {
         boolean gzipped =(this.configurationDocument.getGlobal().getGzipped()!=null)?this.configurationDocument.getGlobal().getGzipped().value:false;
         boolean slashDasToDsn = this.configurationDocument.getGlobal().getSlashDasPointsToDsn()!=null?this.configurationDocument.getGlobal().getSlashDasPointsToDsn().value:false;
         String dsnXSLT = this.configurationDocument.getGlobal().getDsnXsltUrl();
+        String sourcesXSLT = this.configurationDocument.getGlobal().getSourcesXsltUrl();  //since 1.6.1
         String dnaXSLT = this.configurationDocument.getGlobal().getDnaXsltUrl();
         String entryPointXSLT = this.configurationDocument.getGlobal().getEntryPointsXsltUrl();
         String sequenceXSLT = this.configurationDocument.getGlobal().getSequenceXsltUrl();
         String featuresXSLT = this.configurationDocument.getGlobal().getFeaturesXsltUrl();
         String typesXSLT = this.configurationDocument.getGlobal().getTypesXsltUrl();
-        Map<String, String> globalParameters = new HashMap<String, String>();
+        Map<String, PropertyType> globalParameters = new HashMap<String, PropertyType>();
         for (PropertyType property: this.configurationDocument.getGlobal().getProperty())
-        	globalParameters.put(property.key, property.value);
+        	globalParameters.put(property.key, property);
         
         return new GlobalConfiguration(baseURL,
                 defaultStylesheet,
                 gzipped,
                 slashDasToDsn,
                 dsnXSLT,
+                sourcesXSLT,
                 dnaXSLT,
                 entryPointXSLT,
                 sequenceXSLT,
@@ -96,7 +98,7 @@ public class ConfigurationManager {
         for (uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource datasource:this.configurationDocument.getDatasources().getDatasource()){
             String id = datasource.getUri().toString();
             String name = datasource.getTitle();
-            String mapmaster = datasource.getVersion().get(0).getCoordinates().get(0).uri;
+            String mapmaster = datasource.getMapmaster(); //it was datasource.getVersion().get(0).getCoordinates().get(0).uri; (changed since 1.6.1)
             String hrefString = datasource.getDocHref();
             try{
                 new URL(hrefString);
@@ -105,11 +107,12 @@ public class ConfigurationManager {
                 logger.error ("MalformedURLException thrown when attempting to build a URL from : '" + hrefString + "'");
                 throw new ConfigurationException ("Please check the XML configuration file.  The URL '" + hrefString + "' that has have given in the /mydasserver/datasources/datasource/@description-href attribute is not valid.", murle);
             }
-            
             String className = datasource.getVersion().get(0).getClazz();
-            Map<String, String> dataSourceProperties = new HashMap<String, String>();
-            for (PropertyType property: datasource.getProperty())
-            	dataSourceProperties.put(property.key, property.value);
+            Map<String, PropertyType> dataSourceProperties = new HashMap<String, PropertyType>();
+            //1.6.1 Properties come version and are not allowed in data sources
+            for (PropertyType property: datasource.getVersion().get(0).getProperty()) {
+                dataSourceProperties.put(property.key, property);
+            }
             // Check for incomplete data.
 
             if (className == null){

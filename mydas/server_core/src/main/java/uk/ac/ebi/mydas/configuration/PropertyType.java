@@ -40,6 +40,8 @@ public class PropertyType {
     protected String key;
     @XmlAttribute(name = "value", required = true)
     protected String value;
+    @XmlAttribute(name = "visibility") //since 1.6.1, false by default
+    protected Boolean visibility = false;
 
     /**
      * Gets the value of the key property.
@@ -89,4 +91,25 @@ public class PropertyType {
         this.value = value;
     }
 
+    /**
+     * Gets the value of the visibility property.
+     * (since 1.6.1)
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     */
+    public Boolean getVisibility() {
+        return visibility;
+    }
+    /**
+     * Sets the value of the visibility property.
+     *
+     * @param visibility
+     *     allowed object is
+     *     {@link Boolean }
+     *
+     */
+    public void setVisibility(Boolean visibility) {
+        this.visibility = visibility;
+    }
 }

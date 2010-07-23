@@ -119,7 +119,8 @@ public class DataSourceConfiguration {
      * @return the optional value for /DASDSN/DSN/MAPMASTER
      */
     public String getMapmaster() {
-        return config.getVersion().get(this.versionPosition).getCoordinates().get(0).getUri();
+        //return config.getVersion().get(this.versionPosition).getCoordinates().get(0).getUri();
+        return config.getMapmaster();
     }
 
     /**
@@ -152,12 +153,13 @@ public class DataSourceConfiguration {
 
     /**
      * Returns a Map of key value pairs defined by the plugin developer.
+     * Properties for data sources come from the version element and are not allowed out of it (since 1.6.1).
      * @return a Map of key value pairs defined by the plugin developer.
      */
-    public Map<String, String> getDataSourceProperties() {
-    	Map<String, String> props = new HashMap<String, String>();
-    	for (PropertyType pt:config.getProperty())
-    		props.put(pt.key, pt.value);
+    public Map<String, PropertyType> getDataSourceProperties() {
+    	Map<String, PropertyType> props = new HashMap<String, PropertyType>();
+    	for (PropertyType pt:config.getVersion().get(0).getProperty())
+    		props.put(pt.key, pt);
         return props;
     }
 

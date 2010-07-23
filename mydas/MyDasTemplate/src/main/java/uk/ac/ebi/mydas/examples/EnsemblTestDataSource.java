@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.PropertyType;
 import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
@@ -24,12 +25,12 @@ import uk.ac.ebi.mydas.model.DasType;
 public class EnsemblTestDataSource implements RangeHandlingAnnotationDataSource{
 	CacheManager cacheManager = null;
 	ServletContext svCon;
-	Map<String, String> globalParameters;
+	Map<String, PropertyType> globalParameters;
 	DataSourceConfiguration config;
 	EnsemblTestManager ensembl;
 
 	public void init(ServletContext servletContext,
-			Map<String, String> globalParameters,
+			Map<String, PropertyType> globalParameters,
 			DataSourceConfiguration dataSourceConfig)
 			throws DataSourceException {
 		this.svCon = servletContext;

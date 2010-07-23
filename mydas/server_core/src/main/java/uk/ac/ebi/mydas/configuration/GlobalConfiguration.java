@@ -72,6 +72,14 @@ public class GlobalConfiguration {
 
     /**
      * Gives the URI of an XSLT transformation that can be used by the browser
+     * to present the sources command response in a human-readable format.
+     * Optional - the processing instruction will only be included if this
+     * element is present.
+     */
+    private String sourcesXSLT = null;
+
+    /**
+     * Gives the URI of an XSLT transformation that can be used by the browser
         to present the dna command response in a human-readable format.
         Optional - the processing instruction will only be included if this
         element is present.
@@ -117,16 +125,18 @@ public class GlobalConfiguration {
      * Accessible from the DataSources, so may be useful as global parameters
      * by the plugin implementor.
      */
-    private Map<String, String> globalParameters = null;
+    private Map<String, PropertyType> globalParameters = null;
 
     
-    public GlobalConfiguration(String baseURL, String defaultStyleSheet, boolean gzipped, boolean slashDasPointsToDsn, String dsnXSLT, String dnaXSLT, String entryPointsXSLT, String sequenceXSLT, String featuresXSLT, String typesXSLT, Map<String, String> globalParameters) {
+    public GlobalConfiguration(String baseURL, String defaultStyleSheet, boolean gzipped, boolean slashDasPointsToDsn, String dsnXSLT, String sourcesXSLT, String dnaXSLT, String entryPointsXSLT, String sequenceXSLT, String featuresXSLT, String typesXSLT, Map<String, PropertyType> globalParameters) {
         this.baseURL = baseURL;
         this.defaultStyleSheet = defaultStyleSheet;
         this.gzipped = gzipped;
         this.slashDasPointsToDsn = slashDasPointsToDsn;
         if (dsnXSLT != null)
             this.dsnXSLT = PROC_INST_START + dsnXSLT.trim() + PROC_INST_END;
+        if (sourcesXSLT != null)
+            this.sourcesXSLT = PROC_INST_START + sourcesXSLT.trim() + PROC_INST_END;
         if (dnaXSLT != null)
             this.dnaXSLT = PROC_INST_START + dnaXSLT.trim() + PROC_INST_END;
         if (entryPointsXSLT != null)
@@ -160,7 +170,7 @@ public class GlobalConfiguration {
         return gzipped;
     }
 
-    public Map<String, String> getGlobalParameters() {
+    public Map<String, PropertyType> getGlobalParameters() {
         return globalParameters;
     }
 
@@ -171,6 +181,10 @@ public class GlobalConfiguration {
 
     public String getDsnXSLT() {
         return dsnXSLT;
+    }
+
+    public String getSourcesXSLT() {  //since 1.6.1
+        return sourcesXSLT;
     }
 
     public String getDnaXSLT() {
