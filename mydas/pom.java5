@@ -1,0 +1,158 @@
+<!--
+  ~ Copyright 2007 Philip Jones, EMBL-European Bioinformatics Institute
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  ~
+  ~ For further details of the mydas project, including source code,
+  ~ downloads and documentation, please see:
+  ~
+  ~ http://code.google.com/p/mydas/
+  ~
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>uk.ac.ebi.mydas</groupId>
+    <artifactId>mydas_master</artifactId>
+    <version>1.6.0_j5</version>
+
+    <packaging>pom</packaging>
+    <name>mydas_example Maven Webapp</name>
+    <url>http://code.google.com/p/mydas/</url>
+
+	<licenses>
+        <license>
+            <name>The Apache Software License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <repositories>
+        <repository>
+            <id>google-code-mydas</id>
+            <name>google-code-mydas</name>
+            <layout>default</layout>
+            <url>http://mydas.googlecode.com/svn/repository/</url>
+        </repository>
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Maven 2 Repository</name>
+			<url>http://download.java.net/maven/2</url>
+		</repository>
+		<repository>
+			<id>maven-repository.dev.java.net</id>
+			<name>Java.net Maven 1 Repository (legacy)</name>
+			<url>http://download.java.net/maven/1</url>
+			<layout>legacy</layout>
+		</repository>
+    </repositories>
+
+    <pluginRepositories>
+		<pluginRepository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Maven 2 Repository</name>
+			<url>http://download.java.net/maven/2</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>maven-repository.dev.java.net</id>
+			<name>Java.net Maven 1 Repository (legacy)</name>
+			<url>http://download.java.net/maven/1</url>
+			<layout>legacy</layout>
+		</pluginRepository>
+	</pluginRepositories>
+    <description>
+        This project aims to offer an easy-to-extend Java DAS server framework.
+        It offers several advantages:
+
+        * Implementing data sources is very easy but also flexible and powerful.
+        * Data caching is built into the system, with access to the caching
+        mechanism made available to the data sources.
+        * All aspects of the server are highly configurable, including
+        selecting options where the DAS 1.53 specification offers
+        choices to the implementor.
+        * The latest Java technologies have been used throughout the
+        system to optimise performance and simplify data source development.
+        * Wherever possible the same terminology is used in the API as in
+        the DAS specification and XML - again, making data source
+        development more easy.
+        * The server allows XSLT transforms of the DAS XML to be configured
+        to provide a simple DAS client view (limited to the single DAS
+        source).
+
+        More details of the DAS protocol, DAS servers and DAS clients can
+        be found at http://www.biodas.org/wiki/Main_Page.
+
+        The first version of this server is a complete implementation of
+        Distributed Sequence Annotation System (DAS) Version 1.53.
+        If you are interested in learning more about DAS 1.53, the
+        specification is highly recommended as a concise and complete
+        description of the DAS protocol that can be obtained from:
+        http://biodas.org/documents/spec.html
+    </description>
+
+    <scm>
+        <url>http://mydas.googlecode.com/svn/</url>
+        <connection>http://mydas.googlecode.com/svn/</connection>
+    </scm>
+
+	<modules>
+        <module>server_core</module>
+        <module>example_server_installation</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <!-- Maven can be used to build javadocs from the source. (The source has been
+            carefully documented, so this should be useful).
+
+            To generate the javadocs, use mvn javadoc:javadoc
+
+            To package the javadocs, use mvn javadoc:jar
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <overview/>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

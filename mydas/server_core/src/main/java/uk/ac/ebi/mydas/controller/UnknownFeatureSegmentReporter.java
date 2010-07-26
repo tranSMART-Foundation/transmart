@@ -49,7 +49,6 @@ public class UnknownFeatureSegmentReporter implements SegmentReporter {
 	 * Generates the piece of XML into the XML serializer object to describe an UnknownFeature segment
 	 * @param DAS_XML_NAMESPACE XML namespace to link with the elements to create
 	 * @param serializer Object where the XML is been written 
-	 * @param referenceSource indicates if the reference server has answered.
 	 * @throws IOException If the XML writer have an error
 	 * @throws IllegalStateException a method has been invoked at an illegal or inappropriate time.
 	 * @throws IllegalArgumentException indicate that a method has been passed an illegal or inappropriate argument.
@@ -60,12 +59,10 @@ public class UnknownFeatureSegmentReporter implements SegmentReporter {
 	    serializer.attribute(DAS_XML_NAMESPACE, "id", this.getSegmentId());
 	    serializer.endTag(DAS_XML_NAMESPACE, "UNKNOWNFEATURE");
     }
-	@Override
 	public Integer getStart() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	@Override
 	public Integer getStop() {
 		// TODO Auto-generated method stub
 		return null;
