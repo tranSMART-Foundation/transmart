@@ -104,13 +104,13 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                     globalProps.get("TestKeyGlobal1").getValue(),
                     "TestValueGlobal1");
             Assert.assertEquals("Visibility should be false in TestKeyGlobal1 property",
-                    globalProps.get("TestKeyGlobal1").getVisibility().booleanValue(),
+                    globalProps.get("TestKeyGlobal1").isVisibility(),
                     false);
             Assert.assertEquals("Missing global property",
                     globalProps.get("TestKeyGlobal2").getValue(),
                     "TestValueGlobal2");
             Assert.assertEquals("Visibility should be true in TestKeyGlobal2 property",
-                    globalProps.get("TestKeyGlobal2").getVisibility().booleanValue(),
+                    globalProps.get("TestKeyGlobal2").isVisibility(),
                     true);
             Assert.assertEquals("The number of dsns is not as expected",
                     2,
@@ -154,7 +154,7 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                             dsnProps.get("dsn1key2").getValue(),
                             "dsn1value2");
                     Assert.assertEquals("Visibility should be true in dsn1key2 property",
-                            dsnProps.get("dsn1key2").getVisibility().booleanValue(),
+                            dsnProps.get("dsn1key2").isVisibility(),
                             true);
                     Assert.assertTrue("dna-command-enabled not as expected", dsnConfig.isDnaCommandEnabled());
                     Assert.assertTrue("features-strictly-enclosed not as expected", dsnConfig.isFeaturesStrictlyEnclosed());

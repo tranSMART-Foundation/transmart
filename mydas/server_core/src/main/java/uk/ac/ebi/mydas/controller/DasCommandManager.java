@@ -1167,7 +1167,7 @@ public class DasCommandManager {
 							//1.6.1 Properties come from version and are not allowed in data sources
                             //1.61. Only properties with visibility true will be reported in source command response
 							for(PropertyType pt:dsnConfig2.getVersion().get(0).getProperty()){
-                                if (pt.getVisibility()) {
+                                if (pt.isVisibility()) {
                                     serializer.startTag (DAS_XML_NAMESPACE, "PROPERTY");
                                     serializer.attribute(DAS_XML_NAMESPACE, "name", pt.getKey());
                                     serializer.attribute(DAS_XML_NAMESPACE, "value", pt.getValue());

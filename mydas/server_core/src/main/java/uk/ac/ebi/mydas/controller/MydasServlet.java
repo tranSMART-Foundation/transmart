@@ -310,7 +310,7 @@ public class MydasServlet extends HttpServlet {
 					// Check for the source command (similar command to dsn).
 				} else if (Commands.COMMAND_SOURCES.matches(match.group(1))){
 					// Handle source command, in contrast with dsn, source can have extra info 
-					dasCommands.sourceCommand (request, response, queryString,null);
+					dasCommands.sourceCommand (request, response, queryString, null);
 				}
 
 				// Not the dsn the source command either the source(explicit), so handle other commands (which are datasource specific)
@@ -379,8 +379,9 @@ public class MydasServlet extends HttpServlet {
 			else if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().isSlashDasPointsToDsn()
 					&& DAS_ONLY_URI_PATTERN.matcher(request.getRequestURI()).find()){
 				// Just /das or /das/ has been given as the URL.  This server is configured to point
-				// this to the dsn command, so do so.
-				dasCommands.dsnCommand (request, response, queryString);
+				// this to the sources command, so do so.
+                dasCommands.sourceCommand(request, response, queryString,null);
+				//dasCommands.dsnCommand (request, response, queryString); //since 1.6 sources is the default command
 			}
 			else {
 				throw new BadCommandException("The command is not recognised.");

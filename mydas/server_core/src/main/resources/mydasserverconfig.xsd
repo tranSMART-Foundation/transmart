@@ -464,7 +464,7 @@
 			</xs:annotation>
 		</xs:attribute>
         <!-- since 1.6.1 -->
-		<xs:attribute name="visibility" type="xs:boolean" use="optional">
+		<xs:attribute name="visibility" type="xs:boolean" use="optional" default="false">
 			<xs:annotation>
 				<xs:documentation>
 					Properties will be made available to the DataSource developer as a java.util.Map of keys and values, with this attribute containing the value.
