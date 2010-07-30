@@ -87,9 +87,11 @@ public class DasCommandManager {
 	 * Group 3: start coordinate
 	 * Group 4: stop coordinate
 	 */
-	private static final Pattern SEGMENT_RANGE_PATTERN = Pattern.compile ("^segment=([^:\\s]*)(:(\\d+),(\\d+))?$");
+    //pattern can include negative numbers (since 1.6.1)
+	private static final Pattern SEGMENT_RANGE_PATTERN = Pattern.compile ("^segment=([^:\\s]*)(:([-]?(\\d+)),([-]?(\\d+)))?$");
+    private static final Pattern ROWS_RANGE_PATTERN = Pattern.compile ("^rows=([-]?(\\d+))-([-]?(\\d+))$");
 
-	public DasCommandManager(DataSourceManager dsm,GeneralCacheAdministrator cache,MydasServlet mydasServlet){
+	public DasCommandManager(DataSourceManager dsm, GeneralCacheAdministrator cache, MydasServlet mydasServlet){
 		this.mydasServlet=mydasServlet;
 		CACHE_MANAGER=cache;
 		DATA_SOURCE_MANAGER=dsm;
@@ -218,7 +220,7 @@ public class DasCommandManager {
 			// Is this a reference source?
 			if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
 				// All good - process command.
-				Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
+				Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString, true);
 				// Got some sequences, so all is OK.
 				writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 				// Build the XML.
@@ -240,7 +242,13 @@ public class DasCommandManager {
 					// Now the body of the DASDNA xml.
 					serializer.startTag (DAS_XML_NAMESPACE, "DASDNA");
 					for (SequenceReporter sequenceReporter : sequences){
-						sequenceReporter.serialize(DAS_XML_NAMESPACE,serializer,true);
+                        if (sequenceReporter instanceof FoundSequenceReporter) {
+						    FoundSequenceReporter foundSequenceReporter = (FoundSequenceReporter)sequenceReporter;
+                            foundSequenceReporter.serialize(DAS_XML_NAMESPACE,serializer,true);
+                        } else if (sequenceReporter instanceof ErrorSequenceReporter) {
+						    ErrorSequenceReporter errorSequenceReporter = (ErrorSequenceReporter)sequenceReporter;
+                            errorSequenceReporter.serialize(DAS_XML_NAMESPACE,serializer);
+                        }
 					}
 					serializer.endTag (DAS_XML_NAMESPACE, "DASDNA");
 					serializer.flush();
@@ -275,8 +283,7 @@ public class DasCommandManager {
 	 * @throws DataSourceException to capture any error returned from the data source.
 	 * @throws BadCommandArgumentsException if the arguments to the command are not recognised.
 	 */
-	private Collection<SequenceReporter> getSequences(DataSourceConfiguration dsnConfig, String queryString) throws DataSourceException, BadCommandArgumentsException, BadReferenceObjectException, CoordinateErrorException {
-
+	private Collection<SequenceReporter> getSequences(DataSourceConfiguration dsnConfig, String queryString, boolean unknownSegmentsHandled) throws DataSourceException, BadCommandArgumentsException, BadReferenceObjectException, CoordinateErrorException {
 		ReferenceDataSource refDsn = (ReferenceDataSource) dsnConfig.getDataSource();
 		if (refDsn == null){
 			throw new DataSourceException ("An attempt has been made to retrieve a sequenceString from datasource " + dsnConfig.getId() + " however the DataSource object is null.");
@@ -289,75 +296,157 @@ public class DasCommandManager {
 		// Split on the ; (delineates separate references in the query string)
 		String[] referenceStrings = queryString.split(";");
 		for (String referenceString : referenceStrings){
-			Matcher referenceStringMatcher = SEGMENT_RANGE_PATTERN.matcher(referenceString);
-			if (referenceStringMatcher.find()){
-				SegmentQuery segmentQuery = new SegmentQuery(referenceStringMatcher);
-				DasSequence sequence;
+            Matcher referenceStringMatcher = SEGMENT_RANGE_PATTERN.matcher(referenceString);
+            if (referenceStringMatcher.find()){
+                SegmentQuery segmentQuery = new SegmentQuery(referenceStringMatcher);
+                try {
+                    DasSequence sequence;
 
-				// Build the key name for the cache.
-				StringBuffer cacheKeyBuffer = new StringBuffer(dsnConfig.getId());
-				cacheKeyBuffer.append("_SEQUENCE_");
-				if (refDsn instanceof RangeHandlingReferenceDataSource){
-					// May return DasSequence objects containing partial sequences, so include segment id, start and stop coordinates in the key:
-					cacheKeyBuffer.append(segmentQuery.toString());
-				}
-				else {
-					// Otherwise will only return complete sequences, so store on segment id only:
-					cacheKeyBuffer.append(segmentQuery.getSegmentId());
-				}
-				String cacheKey = cacheKeyBuffer.toString();
+                    // Build the key name for the cache.
+                    StringBuffer cacheKeyBuffer = new StringBuffer(dsnConfig.getId());
+                    cacheKeyBuffer.append("_SEQUENCE_");
+                    if (refDsn instanceof RangeHandlingReferenceDataSource){
+                        // May return DasSequence objects containing partial sequences, so include segment id, start and stop coordinates in the key:
+                        cacheKeyBuffer.append(segmentQuery.toString());
+                    } else {
+                        // Otherwise will only return complete sequences, so store on segment id only:
+                        cacheKeyBuffer.append(segmentQuery.getSegmentId());
+                    }
+                    String cacheKey = cacheKeyBuffer.toString();
 
+                    try{
+                        // flushCache checks with the data source if the cache needs emptying, and does so if required.
+                        sequence = (DasSequence) CACHE_MANAGER.getFromCache(cacheKey);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("SEQUENCE RETRIEVED FROM CACHE: " + sequence.getSegmentId());
+                        }
+                        // Belt and braces - the various getSequence methods throw BadReferenceObjectException -
+                        // but just in case the dsn
+                        // fails to throw this appropriately and instead return a null sequence object...
+                        if (sequence == null) {
+                            throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "Segment cannot be found.");
+                        } else {
+                            //Segment exist and was retrieved from cache
+                            //If segment query start < sequence start or  query stop > sequence stop an ERRORSEGMENT should be reported (since 1.6.1)
+                            if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
+                                boolean error = false;
+                                if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
+                                    if ((segmentQuery.getStartCoordinate() == 0) && (segmentQuery.getStopCoordinate() == 0)) {
+                                        //0,0 not allowed for sequences: ERROR
+                                        error = true;
+                                    } else if ( (segmentQuery.getStartCoordinate() < 0) || (segmentQuery.getStopCoordinate() < 0) ) {
+                                        //negative values in range are not allowed: ERROR
+                                        error = true;
+                                    } else if (segmentQuery.getStartCoordinate() > segmentQuery.getStopCoordinate()) {
+                                        //start cannot be greater that stop: ERROR
+                                        error = true;
+                                    } else if ( ( (sequence.getStartCoordinate() <= segmentQuery.getStartCoordinate()) &&
+                                                  (segmentQuery.getStartCoordinate() <= sequence.getStopCoordinate() ) )
+                                        &&  (sequence.getStartCoordinate() <= segmentQuery.getStopCoordinate())  ) {
+                                        //start is bounded (cannot be 0), stop is greater or equal to real init: OK
+                                        error = false;
+                                    } else {
+                                        error = true;
+                                    }
+                                }
+                                if (error) {
+                                    if (logger.isDebugEnabled()){
+                                        logger.debug("SEGMENT START & STOP OUT OF BOUNDS: " +
+                                            "query(" + segmentQuery.getStartCoordinate() + ", " + segmentQuery.getStopCoordinate() + ") " +
+                                            "vs bounds(" + sequence.getStartCoordinate() + ", " + sequence.getStopCoordinate() + ")");
+                                    }
+                                    throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "start and stop out of segment bounds", new IndexOutOfBoundsException("start and stop out of segment bounds"));
+                                }
+                            }
+                        }
+                    } catch (NeedsRefreshException nre){
+                        try{
+                            if (segmentQuery.getStartCoordinate() == null){
+                                // Request for a complete sequenceString
+                                sequence = refDsn.getSequence(segmentQuery.getSegmentId());
+                            } else {
+                                // Getting a restricted sequenceString - and the data source will handle the restriction.
+                                if (refDsn instanceof RangeHandlingReferenceDataSource){
+                                    sequence = ((RangeHandlingReferenceDataSource)refDsn).getSequence(
+                                            segmentQuery.getSegmentId(),
+                                            segmentQuery.getStartCoordinate(),
+                                            segmentQuery.getStopCoordinate()
+                                    );
+                                } else {
+                                    sequence = refDsn.getSequence(segmentQuery.getSegmentId());
+                                }
+                            }
+                            if (logger.isDebugEnabled()){
+                                logger.debug("FEATURES NOT IN CACHE: " + sequence.getSegmentId());
+                            }
+                            // These putInCache calls include a group, being the dsn name to allow a DSN to
+                            // remove all cached data if it requires.
+                            CACHE_MANAGER.putInCache(cacheKey, sequence, dsnConfig.getCacheGroup());
+                            //If segment query start < sequence start or  query stop > sequence stop an ERRORSEGMENT should be reported (since 1.6.1)
+                            if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
+                                boolean error = false;
+                                if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
+                                    if ((segmentQuery.getStartCoordinate() == 0) && (segmentQuery.getStopCoordinate() == 0)) {
+                                        //0,0 not allowed for sequences: ERROR
+                                        error = true;
+                                    } else if ( (segmentQuery.getStartCoordinate() < 0) || (segmentQuery.getStopCoordinate() < 0) ) {
+                                        //negative values in range are not allowed: ERROR
+                                        error = true;
+                                    } else if (segmentQuery.getStartCoordinate() > segmentQuery.getStopCoordinate()) {
+                                        //start cannot be greater that stop: ERROR
+                                        error = true;
+                                    } else if ( ( (sequence.getStartCoordinate() <= segmentQuery.getStartCoordinate()) &&
+                                                  (segmentQuery.getStartCoordinate() <= sequence.getStopCoordinate() ) )
+                                        &&  (sequence.getStartCoordinate() <= segmentQuery.getStopCoordinate())  ) {
+                                        //start is bounded (cannot be 0), stop is greater or equal to real init: OK
+                                        error = false;
+                                    } else {
+                                        error = true;
+                                    }
+                                }
+                                if (error) {
+                                    if (logger.isDebugEnabled()){
+                                        logger.debug("SEGMENT START & STOP OUT OF BOUNDS: " +
+                                            "query(" + segmentQuery.getStartCoordinate() + ", " + segmentQuery.getStopCoordinate() + ") " +
+                                            "vs bounds(" + sequence.getStartCoordinate() + ", " + sequence.getStopCoordinate() + ")");
+                                    }
+                                    throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "start and stop out of segment bounds", new IndexOutOfBoundsException("start and stop out of segment bounds"));
+                                }
+                            }
+                        } catch (BadReferenceObjectException broe) {
+                           CACHE_MANAGER.cancelUpdate(cacheKey);
+                            throw broe;
+                        } catch (DataSourceException dse) {
+                            CACHE_MANAGER.cancelUpdate(cacheKey);
+                            throw dse;
+                        } catch (CoordinateErrorException cee) {
+                            CACHE_MANAGER.cancelUpdate(cacheKey);
+                            throw cee;
+                        }
+                        if (logger.isDebugEnabled()){
+                            logger.debug("Sequence retrieved from DSN (not cached): " + sequence.getSegmentId());
+                        }
+                    }
 
-				try{
-					// flushCache checks with the data source if the cache needs emptying, and does so if required.
-					sequence = (DasSequence) CACHE_MANAGER.getFromCache(cacheKey);
-					if (logger.isDebugEnabled()){
-						logger.debug("SEQUENCE RETRIEVED FROM CACHE: " + sequence.getSegmentId());
-					}
-				} catch (NeedsRefreshException nre){
-					try{
-						if (segmentQuery.getStartCoordinate() != null){
-							// Getting a restricted sequenceString - and the data source will handle the restriction.
-							if (refDsn instanceof RangeHandlingReferenceDataSource){
-								sequence = ((RangeHandlingReferenceDataSource)refDsn).getSequence(
-										segmentQuery.getSegmentId(),
-										segmentQuery.getStartCoordinate(),
-										segmentQuery.getStopCoordinate()
-								);
-								// These putInCache calls include a group, being the dsn name to allow a DSN to
-								// remove all cached data if it requires.
-								CACHE_MANAGER.putInCache(cacheKey, sequence, dsnConfig.getCacheGroup());
-							}
-							else {
-								sequence = refDsn.getSequence(segmentQuery.getSegmentId());
-								CACHE_MANAGER.putInCache(cacheKey, sequence, dsnConfig.getCacheGroup());
-							}
-						}
-						else {
-							// Request for a complete sequenceString
-							sequence = refDsn.getSequence(segmentQuery.getSegmentId());
-							CACHE_MANAGER.putInCache(cacheKey, sequence, dsnConfig.getCacheGroup());
-						}
-					} catch (BadReferenceObjectException broe) {
-						CACHE_MANAGER.cancelUpdate(cacheKey);
-						throw broe;
-					} catch (DataSourceException dse) {
-						CACHE_MANAGER.cancelUpdate(cacheKey);
-						throw dse;
-					} catch (CoordinateErrorException cee) {
-						CACHE_MANAGER.cancelUpdate(cacheKey);
-						throw cee;
-					}
-					if (logger.isDebugEnabled()){
-						logger.debug("Sequence retrieved from DSN (not cached): " + sequence.getSegmentId());
-					}
-				}
-				// Belt and braces - the various getSequence methods throw BadReferenceObjectException -
-				// but just in case the dsn
-				// fails to throw this appropriately and instead return a null sequence object...
-				if (sequence == null) throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "Segment cannot be found.");
-				sequenceCollection.add (new SequenceReporter(sequence, segmentQuery));
-			}
+                    sequenceCollection.add (new FoundSequenceReporter(sequence, segmentQuery));
+                } catch (BadReferenceObjectException broe) {
+                    if (unknownSegmentsHandled){ //Sequences are handled only by reference servers, so report an ERRORSEGEMENT
+                        sequenceCollection.add(new ErrorSequenceReporter(segmentQuery));
+                    }
+                    else {
+                        throw broe;
+                    }
+                } catch (CoordinateErrorException cee) {
+                    if (unknownSegmentsHandled){  //Sequences are handled only by reference servers, so report an ERRORSEGEMENT
+                        sequenceCollection.add(new ErrorSequenceReporter(segmentQuery));
+                    }
+                    else {
+                        throw cee;
+                    }
+                } catch (DataSourceException dse) {
+                    throw dse;
+                }
+            }
 			// MyDas is being made less fussy about parameters that it does not recognise as new
 			// DAS features are added, e.g. to DAS 1.53E, hence any parameters that do not match are just ignored.
 		}
@@ -480,16 +569,16 @@ public class DasCommandManager {
 
 	private void typesCommandSpecificSegments(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, List<SegmentQuery> requestedSegments, List<String> typeFilter)
 	throws DataSourceException, BadReferenceObjectException, XmlPullParserException, IOException, CoordinateErrorException {
-		Map <SegmentReporter, Map<DasType, Integer>> typesReport =
+        Map <SegmentReporter, Map<DasType, Integer>> typesReport =
 			new HashMap<SegmentReporter, Map<DasType, Integer>>(requestedSegments.size());
 		// For each segment, populate the typesReport with 'all types' if necessary and then add types and counts.
-        // Always handle error/unknown segments
-		Collection<SegmentReporter> segmentReporters = this.getFeatureCollection(dsnConfig, requestedSegments, true,null);
+        // Always handle error/unknown segments: (since 1.6)
+		Collection<SegmentReporter> segmentReporters = this.getFeatureCollection(dsnConfig, requestedSegments, true, null);
 		for (SegmentReporter uncastReporter : segmentReporters){
 			// Try to get the features for this segment
 			if (uncastReporter instanceof FoundFeaturesReporter){
 				FoundFeaturesReporter segmentReporter = (FoundFeaturesReporter) uncastReporter;
-				Map<DasType, Integer> segmentTypes = new HashMap<DasType, Integer>();
+                Map<DasType, Integer> segmentTypes = new HashMap<DasType, Integer>();
 				// Add these objects to the typesReport.
 				typesReport.put(segmentReporter, segmentTypes);
 				/////////////////////////////////////////////////////////////////////////////////////////////
@@ -525,13 +614,18 @@ public class DasCommandManager {
                 Map<DasType, Integer> segmentTypes = new HashMap<DasType, Integer>();
 				// Add these objects to the typesReport.
 				typesReport.put(segmentReporter, segmentTypes);
+            }  else if (uncastReporter instanceof ErrorSegmentReporter) {
+                ErrorSegmentReporter segmentReporter = (ErrorSegmentReporter) uncastReporter;
+                Map<DasType, Integer> segmentTypes = new HashMap<DasType, Integer>();
+				// Add these objects to the typesReport.
+				typesReport.put(segmentReporter, segmentTypes);
             }
 			// Finished with actual features
 			/////////////////////////////////////////////////////////////////////////////////////////////
 		}
 
 		// OK, successfully built a Map of the types for all the requested segments, so iterate over this and report.
-		writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
+		writeHeader (request, response, XDasStatus.STATUS_200_OK, true, dsnConfig.getCapabilities());
 		// Build the XML.
 		XmlSerializer serializer;
 		serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -557,6 +651,8 @@ public class DasCommandManager {
                 if (segmentReporter instanceof UnknownSegmentReporter){
                     boolean referenceSource = dsnConfig.getDataSource() instanceof ReferenceDataSource;
 					((UnknownSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, referenceSource);
+                } else if (segmentReporter instanceof ErrorSegmentReporter){ //since 1.6.1
+					((ErrorSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer);
                 } else if (segmentReporter instanceof FoundFeaturesReporter){
                     FoundFeaturesReporter featureReporter = (FoundFeaturesReporter) segmentReporter;
                     serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
@@ -696,8 +792,7 @@ public class DasCommandManager {
 			Matcher segmentRangeMatcher = SEGMENT_RANGE_PATTERN.matcher(queryPart);
 			if (segmentRangeMatcher.find()){
 				requestedSegments.add (new SegmentQuery (segmentRangeMatcher));
-			}
-			else{
+			} else{
 				// Split the queryPart on "=" and see if the result is parsable.
 				String[] queryPartKeysValues = queryPart.split("=");
 				if (queryPartKeysValues.length != 2){
@@ -741,7 +836,6 @@ public class DasCommandManager {
 				// This is a change from version 1.01 - some 1.53E commands were causing
 				// service failure.
 			}
-
 		}
 
 		/************************************************************************\
@@ -764,7 +858,7 @@ public class DasCommandManager {
 					for (DasAnnotatedSegment segment : annotatedSegments){
 						if (segment instanceof DasUnknownFeatureSegment){
 							segmentReporterCollections.add (new UnknownFeatureSegmentReporter(segment.getSegmentId()));
-						}else
+						} else
 							segmentReporterCollections.add (new FoundFeaturesReporter(segment));
 					}
 				}
@@ -809,10 +903,15 @@ public class DasCommandManager {
 			for (SegmentReporter segmentReporter : segmentReporterCollections){
 				if (segmentReporter instanceof UnknownSegmentReporter){
 					((UnknownSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, referenceSource);
-				} else if (segmentReporter instanceof UnknownFeatureSegmentReporter){
+				} else if (segmentReporter instanceof ErrorSegmentReporter){ //since 1.6.1
+					((ErrorSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer);
+                } else if (segmentReporter instanceof UnknownFeatureSegmentReporter){
 					((UnknownFeatureSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer);
 				} else {
-					((FoundFeaturesReporter) segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, filter, categorize, dsnConfig.isFeaturesStrictlyEnclosed(), dsnConfig.isUseFeatureIdForFeatureLabel());
+                    //Overlaps are always allowed (since 1.6.1, according to DAS spec 1.6, draft 6)
+                    //featuresStrictlyEnclosed set to false means that overlaps are allowed
+                    ((FoundFeaturesReporter) segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, filter, categorize, false, dsnConfig.isUseFeatureIdForFeatureLabel());
+					//((FoundFeaturesReporter) segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, filter, categorize, dsnConfig.isFeaturesStrictlyEnclosed(), dsnConfig.isUseFeatureIdForFeatureLabel());
 				}
 			}
 			serializer.endTag(DAS_XML_NAMESPACE, "GFF");
@@ -916,14 +1015,16 @@ public class DasCommandManager {
 	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
 	 * @param requestedSegments being a List of SegmentQuery objects, which encapsulate the segment request (including
 	 * the segment id and optional start / stop coordinates)
-	 * @return a Collection of FeatureReporter objects that wrap the DasFeature objects returned from the data source
-	 * @throws DataSourceException to capture any error returned from the data source that cannot be handled in a more
-	 * elegant manner.
 	 * @param unknownSegmentsHandled to indicate if the calling method is able to report missing segments (i.e.
 	 * the feature command can return errorsegment / unknownsegment).
 	 * the segment id is not known to the DSN.
+     * @param maxbins
+	 * @return a Collection of FeatureReporter objects that wrap the DasFeature objects returned from the data source
+	 * @throws uk.ac.ebi.mydas.exceptions.DataSourceException to capture any error returned from the data source that cannot be handled in a more
+	 * elegant manner.
 	 * @throws uk.ac.ebi.mydas.exceptions.CoordinateErrorException thrown if unknownSegmentsHandled is false and
 	 * the segment coordinates are out of scope for the provided segment id.
+     * @throws uk.ac.ebi.mydas.exceptions.BadReferenceObjectException
 	 */
 	private Collection<SegmentReporter> getFeatureCollection(DataSourceConfiguration dsnConfig,
 			List <SegmentQuery> requestedSegments,
@@ -939,8 +1040,9 @@ public class DasCommandManager {
 				// Build the key name for the cache.
 				StringBuffer cacheKeyBuffer = new StringBuffer(dsnConfig.getId());
 				cacheKeyBuffer.append("_FEATURES_");
-				if (maxbins!=null)
+				if (maxbins!=null) {
 					cacheKeyBuffer.append("_MAXBEANS_"+maxbins+"_");
+                }
 				if (dataSource instanceof RangeHandlingAnnotationDataSource || dataSource instanceof RangeHandlingReferenceDataSource){
 					// May return DasSequence objects containing partial sequences, so include segment id, start and stop coordinates in the key:
 					cacheKeyBuffer.append(segmentQuery.toString());
@@ -952,14 +1054,46 @@ public class DasCommandManager {
 				String cacheKey = cacheKeyBuffer.toString();
 
 				try{
-					annotatedSegment = (DasAnnotatedSegment) CACHE_MANAGER.getFromCache(cacheKey);
+                    annotatedSegment = (DasAnnotatedSegment) CACHE_MANAGER.getFromCache(cacheKey);
 					if (logger.isDebugEnabled()){
 						logger.debug("FEATURES RETRIEVED FROM CACHE: " + annotatedSegment.getSegmentId());
 					}
 					if (annotatedSegment == null){
 						// This should not happen - segment requests that fail are not cached.
 						throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "Obtained an annotatedSegment from the cache for this segment.  It was null, so assume this is a bad segment id.");
-					}
+					} else {
+                        //Segment exist and was retrieved from cache
+                        //If segment query start and stop are completely out of limits an ERRORSEGMENT should be reported (since 1.6.1)
+                        boolean error = false;
+                        if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
+                            if ((segmentQuery.getStartCoordinate() == 0) && (segmentQuery.getStopCoordinate() == 0)) {
+                                //0,0 looks for non-positional features: OK
+                                error = false;
+                            } else if ( (segmentQuery.getStartCoordinate() < 0) || (segmentQuery.getStopCoordinate() < 0) ) {
+                                //negative values in range are not allowed: ERROR
+                                error = true;
+                            } else if (segmentQuery.getStartCoordinate() > segmentQuery.getStopCoordinate()) {
+                                //start cannot be greater that stop: ERROR
+                                error = true;
+                            } else if ( ( (segmentQuery.getStartCoordinate() == 0) ||
+                                          ( (annotatedSegment.getStartCoordinate() <= segmentQuery.getStartCoordinate()) &&
+                                            (segmentQuery.getStartCoordinate() <= annotatedSegment.getStopCoordinate()) ) )
+                                       && (annotatedSegment.getStartCoordinate() <= segmentQuery.getStopCoordinate()) )  {
+                                //start is bounded or 0, stop is greater or equal to real init: OK
+                                error = false;
+                            } else {
+                                error = true;
+                            }
+                        }
+                        if (error) {
+                            if (logger.isDebugEnabled()){
+                                logger.debug("SEGMENT START & STOP OUT OF BOUNDS: " +
+                                    "query(" + segmentQuery.getStartCoordinate() + ", " + segmentQuery.getStopCoordinate() + ") " +
+                                    "vs bounds(" + annotatedSegment.getStartCoordinate() + ", " + annotatedSegment.getStopCoordinate() + ")");
+                            }
+                            throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "start and stop out of segment bounds", new IndexOutOfBoundsException("start and stop out of segment bounds"));
+                        }
+                    }
 				}
 				catch (NeedsRefreshException nre){
 					try{
@@ -968,6 +1102,7 @@ public class DasCommandManager {
 							annotatedSegment = dataSource.getFeatures(segmentQuery.getSegmentId(),maxbins);
 						}
 						else {
+
 							// Restricted to coordinates.
 							if (dataSource instanceof RangeHandlingAnnotationDataSource){
 								annotatedSegment = ((RangeHandlingAnnotationDataSource)dataSource).getFeatures(
@@ -989,10 +1124,40 @@ public class DasCommandManager {
 										maxbins);
 							}
 						}
-						if (logger.isDebugEnabled()){
+                        if (logger.isDebugEnabled()){
 							logger.debug("FEATURES NOT IN CACHE: " + annotatedSegment.getSegmentId());
 						}
 						CACHE_MANAGER.putInCache(cacheKey, annotatedSegment, dsnConfig.getCacheGroup());
+                        //If segment query start and stop are completely out of limits an ERRORSEGMENT should be reported (since 1.6.1)
+                        boolean error = false;
+                        if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
+                            if ((segmentQuery.getStartCoordinate() == 0) && (segmentQuery.getStopCoordinate() == 0)) {
+                                //0,0 looks for non-positional features: OK
+                                error = false;
+                            } else if ( (segmentQuery.getStartCoordinate() < 0) || (segmentQuery.getStopCoordinate() < 0) ) {
+                                //negative values in range are not allowed: ERROR
+                                error = true;
+                            } else if (segmentQuery.getStartCoordinate() > segmentQuery.getStopCoordinate()) {
+                                //start cannot be greater that stop: ERROR
+                                error = true;
+                            } else if ( ( (segmentQuery.getStartCoordinate() == 0) ||
+                                          ( (annotatedSegment.getStartCoordinate() <= segmentQuery.getStartCoordinate()) &&
+                                            (segmentQuery.getStartCoordinate() <= annotatedSegment.getStopCoordinate()) ) )
+                                       && (annotatedSegment.getStartCoordinate() <= segmentQuery.getStopCoordinate()) )  {
+                                //start is bounded or 0, stop is greater or equal to real init: OK
+                                error = false;
+                            } else {
+                                error = true;
+                            }
+                        }
+                        if (error) {
+                            if (logger.isDebugEnabled()){
+                                logger.debug("SEGMENT START & STOP OUT OF BOUNDS: " +
+                                    "query(" + segmentQuery.getStartCoordinate() + ", " + segmentQuery.getStopCoordinate() + ") " +
+                                    "vs bounds(" + annotatedSegment.getStartCoordinate() + ", " + annotatedSegment.getStopCoordinate() + ")");
+                            }
+                            throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "start and stop out of segment bounds", new IndexOutOfBoundsException("start and stop out of segment bounds"));
+                        }
 					}
 					catch (BadReferenceObjectException broe) {
 						CACHE_MANAGER.cancelUpdate(cacheKey);
@@ -1006,7 +1171,11 @@ public class DasCommandManager {
 				segmentReporterLists.add(new FoundFeaturesReporter(annotatedSegment, segmentQuery));
 			} catch (BadReferenceObjectException broe) {
 				if (unknownSegmentsHandled){
-					segmentReporterLists.add(new UnknownSegmentReporter(segmentQuery));
+                    if (broe.getCause() != null) { //For both annotation and reference servers, limits out of bounds should report an ERRORSEGEMENT (since 1.6.1)
+                        segmentReporterLists.add(new ErrorSegmentReporter(segmentQuery));
+                    } else {
+                        segmentReporterLists.add(new UnknownSegmentReporter(segmentQuery));
+                    }
 				}
 				else {
 					throw broe;
@@ -1205,9 +1374,22 @@ public class DasCommandManager {
 	void entryPointsCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
 	throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException, BadCommandArgumentsException {
 
-		int start=-1;
-		int stop=-1;
+		Integer start = null;
+		Integer stop = null;
+        Integer expectedSize = null;
 		if (queryString != null && queryString.trim().length() > 0){
+            Matcher rowsRangeMatcher = ROWS_RANGE_PATTERN.matcher(queryString);
+			if (rowsRangeMatcher.find()){
+                start = new Integer(rowsRangeMatcher.group(1));
+                stop = new Integer(rowsRangeMatcher.group(3));
+			}  else {
+                throw new BadCommandArgumentsException("Unexpected arguments have been passed to the entry_points command.");
+            }
+            if ( (start <= 0) || (stop <= 0) || (stop < start) ) {
+                throw new BadCommandArgumentsException("Unexpected arguments(stop lower than start or negative values) have been passed to the entry_points command.");
+            }
+            expectedSize = stop - start + 1;
+            /*
 			String[] queryParts = queryString.split("=");
 			if (!queryParts[0].equals("rows"))
 				throw new BadCommandArgumentsException("Unexpected arguments have been passed to the entry_points command.");
@@ -1224,18 +1406,25 @@ public class DasCommandManager {
 			}
 			if (stop<start)
 				throw new BadCommandArgumentsException("Unexpected arguments(stop lower than start) have been passed to the entry_points command.");
+            */
 		}
 
 		if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
 			// Fine - process command.
 			ReferenceDataSource refDsn = (ReferenceDataSource) dsnConfig.getDataSource();
-			Collection<DasEntryPoint> entryPoints = refDsn.getEntryPoints();
+            //If a client requests an invalid range of rows (completely beyond the range offered by the server)
+            //the server responds with an X-DAS-Status of 402: BadCommandArgumentsException
+            if ( start > refDsn.getTotalEntryPoints() ) {
+                throw new BadCommandArgumentsException("Unexpected arguments(both start ans stop out of bounds) have been passed to the entry_points command.");
+            }
+            //Reference data sources return only valid entry points from start to stop (since 1.6.1)
+			Collection<DasEntryPoint> entryPoints = refDsn.getEntryPoints(start, stop);
 			// Check that an entry point version has been set.
 			if (refDsn.getEntryPointVersion() == null){
 				throw new DataSourceException("The dsn " + dsnConfig.getId() + "is returning null for the entry point version, which is invalid.");
 			}
 			// Looks like all is OK.
-			writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
+			writeHeader (request, response, XDasStatus.STATUS_200_OK, true, dsnConfig.getCapabilities());
 			//OK, got our entry points, so write out the XML.
 			XmlSerializer serializer;
 			serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -1259,34 +1448,60 @@ public class DasCommandManager {
 				serializer.attribute(DAS_XML_NAMESPACE, "href", buildRequestHref(request));
 				if (refDsn.getEntryPointVersion()!=null)
 					serializer.attribute(DAS_XML_NAMESPACE, "version", refDsn.getEntryPointVersion());
-				serializer.attribute(DAS_XML_NAMESPACE, "total", ""+entryPoints.size());
+				serializer.attribute(DAS_XML_NAMESPACE, "total", "" + refDsn.getTotalEntryPoints());
 
-				if (start>-1)
+				if (start != null) {
 					serializer.attribute(DAS_XML_NAMESPACE, "start", ""+start);
-				else
-					start=1;
-				if (stop>-1)
+                } else {
+					start = 1;
+                    serializer.attribute(DAS_XML_NAMESPACE, "start", ""+start);
+                }
+
+				if (stop != null) {
+                    if (expectedSize == entryPoints.size()) { //From start to stop was returned, check that it is in accordance to max_entry_points
+                        if (dsnConfig.getMaxEntryPoints() != null) {
+                            if (dsnConfig.getMaxEntryPoints() < entryPoints.size()) {
+                                stop = start + dsnConfig.getMaxEntryPoints() - 1;
+                            }
+                        }
+                    } else { //Less elements were returned, could be because less elements actually exist or because of max_entry_points
+                        if (dsnConfig.getMaxEntryPoints() != null) {
+                            if (dsnConfig.getMaxEntryPoints() < entryPoints.size()) {
+                                stop = start + dsnConfig.getMaxEntryPoints() - 1;
+                            } else if (entryPoints.size() == 0) {
+                                //Both start ans stop where out of limits, do not change the stop variable
+                            } else {
+                                stop = start + entryPoints.size() - 1;
+                            }
+                        } else {
+                            if (entryPoints.size() != 0) {
+                                stop = start + entryPoints.size() - 1;
+                            }
+                        }
+                    }
 					serializer.attribute(DAS_XML_NAMESPACE, "end", ""+stop);
-				else
-					stop=entryPoints.size();
+                } else {
+                    stop = dsnConfig.getMaxEntryPoints() == null ? entryPoints.size() : Math.min(dsnConfig.getMaxEntryPoints(), entryPoints.size());
+                    serializer.attribute(DAS_XML_NAMESPACE, "end", ""+stop);
+                }
 
 				Iterator<DasEntryPoint> iterator = entryPoints.iterator();
-				for (int i=0;i<start-1;i++)
-					iterator.next();
+				/*for (int i=1; i<start ;i++)
+					iterator.next();*/
 				//DasEntryPoint[] entryPointsA = (DasEntryPoint[]) entryPoints.toArray();
 				// Now for the individual segments.
-				for (int i=start-1;i<stop;i++){
-					//DasEntryPoint entryPoint=entryPointsA[i];
-					DasEntryPoint entryPoint=iterator.next();
+				for (int i = start; (i <= stop) && (iterator.hasNext()); i++){ 
+                    DasEntryPoint entryPoint=iterator.next();
 					if (entryPoint != null){
 						(new DasEntryPointE(entryPoint)).serialize(DAS_XML_NAMESPACE, serializer);
 					}
 				}
 				serializer.endTag(DAS_XML_NAMESPACE, "ENTRY_POINTS");
+				/* RelaxNG schema for entry_points does not include any QUERY element (since 1.6.1)
 				serializer.startTag(DAS_XML_NAMESPACE, "QUERY");
 				serializer.text(""+queryString);
 				serializer.endTag(DAS_XML_NAMESPACE, "QUERY");
-
+                 */
 				serializer.endTag(DAS_XML_NAMESPACE, "DASEP");
 
 				serializer.flush();
@@ -1326,7 +1541,8 @@ public class DasCommandManager {
 		// Is this a reference source?
 		if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
 			// Fine - process command.
-			Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString);
+            //Always handle unknown segments (since 1.6.1)
+			Collection<SequenceReporter> sequences = getSequences(dsnConfig, queryString, true);
 			// Got some sequences, so all is OK.
 			writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 			// Build the XML.
@@ -1343,12 +1559,17 @@ public class DasCommandManager {
 					serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getSequenceXSLT());
 					serializer.text("\n");
 				}
-//				serializer.docdecl(" DASSEQUENCE SYSTEM \"http://www.biodas.org/dtd/dassequence.dtd\"");
-//				serializer.text("\n");
+
 				// Now the body of the DASDNA xml.
 				serializer.startTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
 				for (SequenceReporter sequenceReporter : sequences){
-					sequenceReporter.serialize(DAS_XML_NAMESPACE,serializer);
+                    if (sequenceReporter instanceof FoundSequenceReporter) {
+                        FoundSequenceReporter foundSequenceReporter = (FoundSequenceReporter) sequenceReporter;
+                        foundSequenceReporter.serialize(DAS_XML_NAMESPACE,serializer);
+                    } else if (sequenceReporter instanceof ErrorSequenceReporter) {
+                        ErrorSequenceReporter errorSequenceReporter = (ErrorSequenceReporter) sequenceReporter;
+                        errorSequenceReporter.serialize(DAS_XML_NAMESPACE,serializer);
+                    }
 				}
 				serializer.endTag (DAS_XML_NAMESPACE, "DASSEQUENCE");
 			}

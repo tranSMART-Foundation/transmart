@@ -41,9 +41,10 @@ public class SegmentQuery {
     private final Integer stopCoordinate;
 
     public SegmentQuery(Matcher segmentRangePatternMatcher){
+        //Pattern: "^segment=([^:\\s]*)(:([-]?(\\d+)),([-]?(\\d+)))?$"  (since 1.6.1 start and stop can be negatives)
         segmentId = segmentRangePatternMatcher.group(1);
         String startString = segmentRangePatternMatcher.group(3);
-        String stopString = segmentRangePatternMatcher.group(4);
+        String stopString = segmentRangePatternMatcher.group(5);
         startCoordinate = (startString == null || startString.length() == 0)
                 ? null
                 : new Integer (startString);
