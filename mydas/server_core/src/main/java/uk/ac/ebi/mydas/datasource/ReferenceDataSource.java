@@ -65,12 +65,35 @@ public interface ReferenceDataSource extends AnnotationDataSource{
     public String getEntryPointVersion () throws DataSourceException;
 
     /**
-     * Returns a Collection of DasEntryPoint objects to implement the entry_point command.
+     * Returns an ordered Collection of DasEntryPoint objects to implement the entry_point command.
      * The DasEntryPoint object encapsulates information including the segment id, the
      * start coordinate, end coordinate, type, orientation and description of a segment.
+     * Reference servers should always return entry points in the same order,
+     * starting on position 1 (rather than 0). Reference servers are responsible to
+     * take care of start and stop positions, thus they should only return the collection corresponding to
+     * those positions (including both limits). If start is greater that the collection size,
+     * an empty collection should be returned, if the stop is greater than the collection size,
+     * the returned collection will include only those existing entry points from the specified start position.
+     * For some servers it is important to limit the number of
+     * entry points actually retrieved; in this case it is recommended to the server to declare the
+     * max_entry_points attribute in MydasServerConfig.xml. This max_entry_point should be
+     * considered when implementing this method; however, MyDas will double check that.
+     * @start Initial position within the complete entry points collection for this server
+     * @stop Final position within the complete entry points collection for this server
      * @return a Collection of DasEntryPoint objects
      * @throws DataSourceException to encapsulate any exceptions thrown by the datasource
      * and allow the MydasServlet to return a decent error header to the client.
      */
-    public Collection<DasEntryPoint> getEntryPoints() throws DataSourceException;
+    public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws DataSourceException;
+
+    /**
+     * Returns the value to be returned from the entry_points command, specifically
+     * the /DASEP/ENTRY_POINTS/@total attribute.
+     *
+     * This is a <b>mandatory</b> value so you must ensure that this method is implemented.
+     * @return an integer being the total number of entry points on this datasource.
+     * @throws DataSourceException to encapsulate any exceptions thrown by the datasource
+     * and allow the MydasServlet to return a decent error header to the client.
+     */
+    public int getTotalEntryPoints () throws DataSourceException;
 }

@@ -474,11 +474,15 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
      *          to encapsulate any exceptions thrown by the datasource
      *          and allow the {@link uk.ac.ebi.mydas.controller.MydasServlet} to return a decent error header to the client.
      */
-    public Collection<DasEntryPoint> getEntryPoints() throws DataSourceException {
+    public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws DataSourceException {
         List<DasEntryPoint> entryPoints = new ArrayList<DasEntryPoint>();
         entryPoints.add (new DasEntryPoint("one", 1, 34, "Protein","1", null, "Its a protein!", false));
         entryPoints.add (new DasEntryPoint("two", 1, 48, "DNA",null, DasEntryPointOrientation.POSITIVE_ORIENTATION, "Its a chromosome!", true));
         return entryPoints;
+    }
+
+    public int getTotalEntryPoints() throws DataSourceException {
+        return 2;
     }
 
     /**

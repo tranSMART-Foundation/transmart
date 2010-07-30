@@ -58,7 +58,7 @@ public class EnsemblTestManager {
 		} catch (ClassNotFoundException e) {
 			throw new DataSourceException("Problems loading the MySql driver",e);
 		} catch (SQLException e) {
-			throw new DataSourceException("Problems conecting to the ensembl database",e);
+			throw new DataSourceException("Problems connecting to the ensembl database",e);
 		}
 	}
 	public void close(){

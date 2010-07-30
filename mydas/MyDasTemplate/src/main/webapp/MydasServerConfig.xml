@@ -38,7 +38,7 @@
         <gzipped>false</gzipped>
 
         <!-- If set to true, then if the browser points to /das or /das/ then
-            the output of the dsn command should be displayed.  This is
+            the output of the sources command should be displayed.  This is
             useful for creating a home page based upon the data source
             details.-->
         <slash-das-points-to-dsn>true</slash-das-points-to-dsn>
@@ -50,8 +50,20 @@
         <!-- Gives the URI of an XSLT transformation that can be used by the browser
             to present the dsn command response in a human-readable format.
             Optional - the processing instruction will only be included if this
-            element is present. -->
-        <!--<dsn-xslt-url>/xslt/dsn.xsl</dsn-xslt-url>-->
+            element is present.
+            README: Please change images, styles and scripts paths in dsn.html and sortable.js -->
+        <!--dsn-xslt-url>/xslt/dsn.xsl</dsn-xslt-url-->
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+            to present the sources command response in a human-readable format.
+            Optional - the processing instruction will only be included if this
+            element is present.
+            Note: The XSL provided only works properly when there is only one
+            coordinate system per version of the data source.
+            It takes test-ranges as default values for sequence and features commands and
+            1-100 as default rows for entry_points command.
+            README: Please change images, styles and scripts paths in dsn.html and sortable.js -->
+        <!--sources-xslt-url>/xslt/sources.xsl</sources-xslt-url-->
 
         <!-- NOTE - THE XSLTs LISTED BELOW (COMMENTED OUT) ARE UNDER DEVELOPMENT, SO NOT
         CURRENTLY AVAILABLE.  You can of course substitute your own XSLT and provide a link
@@ -100,11 +112,15 @@
         title: The title (required) attribute is a short text label suitable for display.
         description: description (required) attribute is a longer text description.
         doc_href: The doc_href (optional) attribute is a URL location where more information about the data is available.
+        mapmaster: The mapmaster attribute is a URL location pointing to the 'reference source' for the coordinate system.
+        max_entry_points: The max_entry_points (optional) attribute is a integer defining the maximum number of entry points
+                          that a data source commits to retrieve when entry_points command is used
         -->
         <datasource uri="template"
                     title="template"
                     description="Template Annotation Data Source"
-                    doc_href="http://code.google.com/p/mydas/">
+                    doc_href="http://code.google.com/p/mydas/"
+                    mapmaster="http://mapmaster_template.com">
 			<!-- The maintainer tag identifies the contact person for the source.
 			Attributes:
 			email: The email (required) attribute is a properly formatted email address.
@@ -134,6 +150,11 @@
 								source="typeOfReference"
 								authority="organisationResponsible"
 								test_range="P00280">UniProt,Protein Sequence</coordinates>
+
+                <coordinates 	uri="http://uri2.com"
+								source="typeOfReference 2"
+								authority="organisation 2"
+								test_range="Other">Other</coordinates>
 				<!--
 				This tag describes the commands and other capabilities supported by the data source. Put as many of this tags as capabilities your source supports.
 				Attributes:
@@ -141,6 +162,11 @@
 				query_uri: The query_uri (optional) attribute is the actual DAS URL used to execute a command. It does not apply to capabilities that are not commands (e.g. "feature-by-id").
 				-->
 				<capability type="das1:capability_name"     query_uri="http://actualDASURLusedtoexecuteacommand.com" />
+                <!-- These properties are made available to the plugin class
+                through the DataSource interface, so the plugin author can
+                add arbitrary additional configuration to their data source.-->
+                <property key="templateexamplekey" value="templateexamplevalue" />
+                <property key="prop_key" value="value_key"/>
 			</version>
 
             <!-- The optional name of the DAS stylesheet to be used for this datasource.
@@ -154,7 +180,9 @@
             <dna-command-enabled>true</dna-command-enabled>
             <!-- If 'true' then when segment coordinates are included in the
             request, only features that are entirely enclosed within the coordinates are returned.
-            If 'false' then all features that overlap with the coordinates are returned.  Handles an
+            If 'false' then all <xsl:for-each select="">
+                
+            </xsl:for-each>atures that overlap with the coordinates are returned.  Handles an
             ambiguity in the DAS 1.53 specification - see section "Retrieve the Annotations Across a Segment". -->
             <features-strictly-enclosed>true</features-strictly-enclosed>
             <!-- If 'true' then if no feature label is provided by the data source, the feature id will
@@ -167,17 +195,14 @@
             If 'false', if the types command includes 'segment' arguments, only the feature types
             actually annotated on the requested segments will be listed.-->
             <include-types-with-zero-count>true</include-types-with-zero-count>
-			            <!-- These properties are made available to the plugin class
-            through the DataSource interface, so the plugin author can 
-            add arbitrary additional configuration to their data source.-->
-			<property key="templateexamplekey" value="templateexamplevalue" />
         </datasource>
 		
 		<!-- Configuration of the data source example. It loads the feature from a GFF2 file-->
         <datasource uri="examplegff"
                     title="fickett-tss"
                     description="GFF2 Example Annotation Data Source"
-                    doc_href="http://mydas.googlecode.com/svn/trunk/mydas/MyDasTemplate/src/main/resources/fickett-tss.gff">
+                    doc_href="http://mydas.googlecode.com/svn/trunk/mydas/MyDasTemplate/src/main/resources/fickett-tss.gff"
+                    mapmaster="http://mapmaster_examplegff.com">
 			<maintainer email="gsalazar@ebi.ac.uk" />
 
 			<version uri="examplegff" created="2010-03-19">
@@ -193,19 +218,20 @@
 				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplegff/features" />
 				<capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
 				<capability type="das1:unknown-feature"	/>
+                <property key="gff_file" value="fickett-tss.gff" visibility="false"/>
 			</version>
 
             <dna-command-enabled>true</dna-command-enabled>
             <features-strictly-enclosed>true</features-strictly-enclosed>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
-			<property key="gff_file" value="fickett-tss.gff" />
         </datasource>
 
         <datasource uri="examplepipes"
                     title="separatedByPipes"
                     description="Data source testing a new parser"
-                    doc_href="http://mydas.googlecode.com">
+                    doc_href="http://mydas.googlecode.com"
+                    mapmaster="http://mapmaster.example">
 			<maintainer email="gsalazar@ebi.ac.uk" />
 
 			<version uri="examplepipes" created="2010-03-19">
@@ -221,19 +247,20 @@
 				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplepipes/features" />
 				<capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
 				<capability type="das1:unknown-feature"	/>
+                <property key="pipes_file" value="testGenes.txt" visibility="true"/>
 			</version>
 
             <dna-command-enabled>true</dna-command-enabled>
             <features-strictly-enclosed>true</features-strictly-enclosed>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
-			<property key="pipes_file" value="testGenes.txt" />
         </datasource>
 		
         <datasource uri="ensemblTest"
                     title="Ensembl Test"
                     description="Data source test using the ensmbl database"
-                    doc_href="http://mydas.googlecode.com">
+                    doc_href="http://mydas.googlecode.com"
+                    mapmaster="http://mapmaster.esemblTest">
 			<maintainer email="gsalazar@ebi.ac.uk" />
 
 			<version uri="ensemblTest" created="2010-04-01">
@@ -257,6 +284,36 @@
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
 
+        <!-- Configuration of the data source example (reference server). It loads the feature from a GFF2 file-->
+        <datasource uri="referencegff"
+                    title="fickett-tss"
+                    description="GFF2 Example Annotation Data Source"
+                    doc_href="http://mydas.googlecode.com/svn/trunk/mydas/MyDasTemplate/src/main/resources/fickett-tss.gff"
+                    mapmaster="http://mapmaster_referencegff.com"
+                    max_entry_points="4">
+			<maintainer email="gsalazar@ebi.ac.uk" />
+
+			<version uri="referencegff" created="2010-03-19">
+	            <class>uk.ac.ebi.mydas.examples.GFFFileReferenceDataSource</class>
+				<coordinates 	uri="http://www.notARealCoordinateSystem.com"
+								source="-"
+								authority="unknown"
+								taxid="0000"
+								test_range="L47615.1">TEST INFO</coordinates>
+				<capability type="das1:sources"		 	query_uri="http://localhost:8080/das/examplegff" />
+				<capability type="das1:types"			query_uri="http://localhost:8080/das/examplegff/types" />
+				<capability type="das1:features"		query_uri="http://localhost:8080/das/examplegff/features" />
+				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplegff/features" />
+				<capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
+				<capability type="das1:unknown-feature"	/>
+                <property key="gff_file" value="fickett-tss.gff" visibility="false"/>
+			</version>
+
+            <dna-command-enabled>true</dna-command-enabled>
+            <features-strictly-enclosed>true</features-strictly-enclosed>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
     </datasources>
 </mydasserver>
 
