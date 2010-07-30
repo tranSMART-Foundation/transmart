@@ -115,8 +115,7 @@ public class DataSourceManager {
                 }
                 // Register the
             } catch (DataSourceException e) {
-                // This particular data source has failed to initalise.  Still try to do the rest and log this failure.
-                e.printStackTrace(); //borrame
+                // This particular data source has failed to initialise.  Still try to do the rest and log this failure.
                 logger.error("Data Source Failed to Load and Initialise: " + dsnConfig.toString());
             }
         }
