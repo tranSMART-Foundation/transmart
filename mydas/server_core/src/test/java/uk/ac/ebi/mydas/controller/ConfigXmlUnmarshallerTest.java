@@ -157,7 +157,7 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                             dsnProps.get("dsn1key2").isVisibility(),
                             true);
                     Assert.assertTrue("dna-command-enabled not as expected", dsnConfig.isDnaCommandEnabled());
-                    Assert.assertTrue("features-strictly-enclosed not as expected", dsnConfig.isFeaturesStrictlyEnclosed());
+                    //Assert.assertTrue("features-strictly-enclosed not as expected", dsnConfig.isFeaturesStrictlyEnclosed());
                     Assert.assertTrue("use-feature-id-for-feature-label", dsnConfig.isUseFeatureIdForFeatureLabel());
                     Assert.assertTrue("include-types-with-zero-count", dsnConfig.isIncludeTypesWithZeroCount());
                 }
@@ -184,7 +184,6 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                             0,
                             dsnConfig.getDataSourceProperties().size());
                     Assert.assertFalse("dna-command-enabled not as expected", dsnConfig.isDnaCommandEnabled());
-                    Assert.assertFalse("features-strictly-enclosed not as expected", dsnConfig.isFeaturesStrictlyEnclosed());
                     Assert.assertFalse("use-feature-id-for-feature-label", dsnConfig.isUseFeatureIdForFeatureLabel());
                     Assert.assertFalse("include-types-with-zero-count", dsnConfig.isIncludeTypesWithZeroCount());
                 }
