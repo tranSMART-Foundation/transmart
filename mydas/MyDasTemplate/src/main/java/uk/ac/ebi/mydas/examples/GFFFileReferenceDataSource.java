@@ -134,7 +134,7 @@ public class GFFFileReferenceDataSource implements ReferenceDataSource {
 	}
 
     public DasSequence getSequence(String segmentId) throws BadReferenceObjectException, DataSourceException {
-        throw new BadReferenceObjectException(segmentId, "This identifier is not a valid uniprot entry.");
+        return new DasSequence(segmentId, segmentId + "1234567890", 1, "" + new String(segmentId + "1234567890").hashCode(), "label " + segmentId);
     }
 
     public String getEntryPointVersion() throws DataSourceException {

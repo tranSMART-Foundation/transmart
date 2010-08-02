@@ -58,17 +58,23 @@ class FoundSequenceReporter implements SequenceReporter{
         this.sequence = sequence;
 
         if (restricted &&
-                (requestedStart <= 0 || requestedStop <= 0 || 
-                requestedStart < sequence.getStartCoordinate() ||
-                requestedStop > sequence.getStopCoordinate()) ){
+                (requestedStart <= 0 || requestedStop <= 0 ||
+                requestedStart > requestedStop ||
+                requestedStart < sequence.getStartCoordinate()) ) { //stop can be out of limits
             throw new CoordinateErrorException(sequence.getSegmentId(), requestedStart,  requestedStop);
         }
     }
 
     String getSequenceString() throws CoordinateErrorException {
-        return (restricted)
-            ? sequence.getRestrictedSequenceString(requestedStart, requestedStop)
-            : sequence.getSequenceString();
+        if (restricted) {
+            if (requestedStop > sequence.getStopCoordinate()) {
+                return sequence.getRestrictedSequenceString(requestedStart, sequence.getStopCoordinate());
+            } else {
+                return sequence.getRestrictedSequenceString(requestedStart, requestedStop);
+            }
+        } else {
+            return sequence.getSequenceString();
+        }
     }
 
     String getSegmentName(){
@@ -94,7 +100,7 @@ class FoundSequenceReporter implements SequenceReporter{
 
     public Integer getStop(){
         return (restricted)
-                ? requestedStop
+                ? (requestedStop > sequence.getStopCoordinate() ? sequence.getStopCoordinate() : requestedStop)
                 : sequence.getStopCoordinate();
     }
 

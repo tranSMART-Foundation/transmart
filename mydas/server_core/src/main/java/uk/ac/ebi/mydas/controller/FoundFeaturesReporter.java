@@ -82,7 +82,7 @@ public class FoundFeaturesReporter implements SegmentReporter {
 
 	public Integer getStop(){
 		return (restricted)
-		? requestedStop
+		? (requestedStop > annotatedSegment.getStopCoordinate() ? annotatedSegment.getStopCoordinate() : requestedStop)
 				: annotatedSegment.getStopCoordinate();
 	}
 
