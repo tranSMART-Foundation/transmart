@@ -338,21 +338,6 @@
 												</xs:simpleContent>
 											</xs:complexType>
 										</xs:element>
-										<xs:element name="features-strictly-enclosed" minOccurs="1" maxOccurs="1" nillable="false">
-											<xs:annotation>
-												<xs:documentation>
-													If 'true' then when segment coordinates are included in the request, only features that are entirely enclosed within the coordinates are returned. 
-													If 'false' then all features that overlap with the coordinates are returned. 
-													Handles an ambiguity in the DAS 1.53 specification - see section "Retrieve the Annotations Across a Segment".
-												</xs:documentation>
-											</xs:annotation>
-											<xs:complexType>
-												<xs:simpleContent>
-													<xs:extension base="xs:boolean">
-													</xs:extension>
-												</xs:simpleContent>
-											</xs:complexType>
-										</xs:element>
 										<xs:element name="use-feature-id-for-feature-label" minOccurs="1" maxOccurs="1" nillable="false">
 											<xs:annotation>
 												<xs:documentation>
@@ -430,7 +415,7 @@
 										</xs:annotation>
 									</xs:attribute>
                                     <!--since 1.6.1-->
-									<xs:attribute name="max_entry_points" type="xs:integer" use="optional">
+									<xs:attribute name="max_entry_points" type="xs:int" use="optional">
 										<xs:annotation>
 											<xs:documentation>
 												The max_entry_points (optional) attribute is a integer defining the maximum number of entry points

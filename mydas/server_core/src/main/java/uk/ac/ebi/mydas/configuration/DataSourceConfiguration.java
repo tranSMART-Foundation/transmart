@@ -29,6 +29,7 @@ import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -144,6 +145,15 @@ public class DataSourceConfiguration {
     }
 
     /**
+     * Returns the optional value for max_entry_points
+     * @return the optional value for max_entry_points
+     */
+    public Integer getMaxEntryPoints() {
+        //return config.getVersion().get(this.versionPosition).getCoordinates().get(0).getUri();
+        return config.getMaxEntryPoints();
+    }
+
+    /**
      * Returns the name of the stylesheet for the plugin
      * @return the name of the stylesheet for the plugin
      */
@@ -170,16 +180,6 @@ public class DataSourceConfiguration {
      */
     public boolean isDnaCommandEnabled() {
         return config.getDnaCommandEnabled().value;
-    }
-
-    /**
-     * Returns a flag to indicate if features should only be returned if they appear strictly
-     * within the coordinates given.
-     * @return a flag to indicate if features should only be returned if they appear strictly
-     * within the coordinates given.
-     */
-    public boolean isFeaturesStrictlyEnclosed() {
-        return config.getFeaturesStrictlyEnclosed().value;
     }
 
     /**
@@ -310,8 +310,8 @@ public class DataSourceConfiguration {
             .append ((this.getVersion() == null) ? "null" : this.getVersion())
             .append ("' description: '")
             .append ((this.getDescription() == null) ? "null" : this.getDescription())
-            .append ("' features strictly enclosed: '")
-            .append (this.isFeaturesStrictlyEnclosed())
+            //.append ("' features strictly enclosed: '")
+            //.append (this.isFeaturesStrictlyEnclosed())
             .append ("' dna command enabled :'")
             .append (this.isDnaCommandEnabled())
             .append ("' use feature id for feature label: '")

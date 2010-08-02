@@ -331,19 +331,16 @@ public class DasCommandManager {
                             if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
                                 boolean error = false;
                                 if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
-                                    if ((segmentQuery.getStartCoordinate() == 0) && (segmentQuery.getStopCoordinate() == 0)) {
-                                        //0,0 not allowed for sequences: ERROR
-                                        error = true;
-                                    } else if ( (segmentQuery.getStartCoordinate() < 0) || (segmentQuery.getStopCoordinate() < 0) ) {
-                                        //negative values in range are not allowed: ERROR
+                                    if ( (segmentQuery.getStartCoordinate() <= 0) || (segmentQuery.getStopCoordinate() <= 0) ) {
+                                        //0 or negative values in range are not allowed: ERROR
                                         error = true;
                                     } else if (segmentQuery.getStartCoordinate() > segmentQuery.getStopCoordinate()) {
                                         //start cannot be greater that stop: ERROR
                                         error = true;
                                     } else if ( ( (sequence.getStartCoordinate() <= segmentQuery.getStartCoordinate()) &&
-                                                  (segmentQuery.getStartCoordinate() <= sequence.getStopCoordinate() ) )
-                                        &&  (sequence.getStartCoordinate() <= segmentQuery.getStopCoordinate())  ) {
-                                        //start is bounded (cannot be 0), stop is greater or equal to real init: OK
+                                                  (segmentQuery.getStartCoordinate() <= sequence.getStopCoordinate()) )
+                                               && (sequence.getStartCoordinate() <= segmentQuery.getStopCoordinate()) )  {
+                                        //start is completely bounded, stop is greater or equal to real init: OK
                                         error = false;
                                     } else {
                                         error = true;
@@ -386,19 +383,16 @@ public class DasCommandManager {
                             if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
                                 boolean error = false;
                                 if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
-                                    if ((segmentQuery.getStartCoordinate() == 0) && (segmentQuery.getStopCoordinate() == 0)) {
-                                        //0,0 not allowed for sequences: ERROR
-                                        error = true;
-                                    } else if ( (segmentQuery.getStartCoordinate() < 0) || (segmentQuery.getStopCoordinate() < 0) ) {
-                                        //negative values in range are not allowed: ERROR
+                                    if ( (segmentQuery.getStartCoordinate() <= 0) || (segmentQuery.getStopCoordinate() <= 0) ) {
+                                        //0 or negative values in range are not allowed: ERROR
                                         error = true;
                                     } else if (segmentQuery.getStartCoordinate() > segmentQuery.getStopCoordinate()) {
                                         //start cannot be greater that stop: ERROR
                                         error = true;
                                     } else if ( ( (sequence.getStartCoordinate() <= segmentQuery.getStartCoordinate()) &&
-                                                  (segmentQuery.getStartCoordinate() <= sequence.getStopCoordinate() ) )
-                                        &&  (sequence.getStartCoordinate() <= segmentQuery.getStopCoordinate())  ) {
-                                        //start is bounded (cannot be 0), stop is greater or equal to real init: OK
+                                                  (segmentQuery.getStartCoordinate() <= sequence.getStopCoordinate()) )
+                                               && (sequence.getStartCoordinate() <= segmentQuery.getStopCoordinate()) )  {
+                                        //start is completely bounded, stop is greater or equal to real init: OK
                                         error = false;
                                     } else {
                                         error = true;
@@ -597,7 +591,8 @@ public class DasCommandManager {
 
 				/////////////////////////////////////////////////////////////////////////////////////////////
 				// Now iterate over the features of the segment and update the types report.
-				for (DasFeature feature : segmentReporter.getFeatures(dsnConfig.isFeaturesStrictlyEnclosed())){
+                //Since 1.6.1 overlapping features are always retrieved
+				for (DasFeature feature : segmentReporter.getFeatures()){
 					// (Filtering as requested for type ids)
 					if (typeFilter.size() == 0 || typeFilter.contains(feature.getType().getId())){
 						DasType featureType = feature.getType();
@@ -1066,20 +1061,16 @@ public class DasCommandManager {
                         //If segment query start and stop are completely out of limits an ERRORSEGMENT should be reported (since 1.6.1)
                         boolean error = false;
                         if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
-                            if ((segmentQuery.getStartCoordinate() == 0) && (segmentQuery.getStopCoordinate() == 0)) {
-                                //0,0 looks for non-positional features: OK
-                                error = false;
-                            } else if ( (segmentQuery.getStartCoordinate() < 0) || (segmentQuery.getStopCoordinate() < 0) ) {
-                                //negative values in range are not allowed: ERROR
+                            if ( (segmentQuery.getStartCoordinate() <= 0) || (segmentQuery.getStopCoordinate() <= 0) ) {
+                                //0 or negative values in range are not allowed: ERROR
                                 error = true;
                             } else if (segmentQuery.getStartCoordinate() > segmentQuery.getStopCoordinate()) {
                                 //start cannot be greater that stop: ERROR
                                 error = true;
-                            } else if ( ( (segmentQuery.getStartCoordinate() == 0) ||
-                                          ( (annotatedSegment.getStartCoordinate() <= segmentQuery.getStartCoordinate()) &&
-                                            (segmentQuery.getStartCoordinate() <= annotatedSegment.getStopCoordinate()) ) )
+                            } else if ( ( (annotatedSegment.getStartCoordinate() <= segmentQuery.getStartCoordinate()) &&
+                                          (segmentQuery.getStartCoordinate() <= annotatedSegment.getStopCoordinate()) )
                                        && (annotatedSegment.getStartCoordinate() <= segmentQuery.getStopCoordinate()) )  {
-                                //start is bounded or 0, stop is greater or equal to real init: OK
+                                //start is completely bounded, stop is greater or equal to real init: OK
                                 error = false;
                             } else {
                                 error = true;
@@ -1131,20 +1122,16 @@ public class DasCommandManager {
                         //If segment query start and stop are completely out of limits an ERRORSEGMENT should be reported (since 1.6.1)
                         boolean error = false;
                         if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
-                            if ((segmentQuery.getStartCoordinate() == 0) && (segmentQuery.getStopCoordinate() == 0)) {
-                                //0,0 looks for non-positional features: OK
-                                error = false;
-                            } else if ( (segmentQuery.getStartCoordinate() < 0) || (segmentQuery.getStopCoordinate() < 0) ) {
-                                //negative values in range are not allowed: ERROR
+                            if ( (segmentQuery.getStartCoordinate() <= 0) || (segmentQuery.getStopCoordinate() <= 0) ) {
+                                //0 or negative values in range are not allowed: ERROR
                                 error = true;
                             } else if (segmentQuery.getStartCoordinate() > segmentQuery.getStopCoordinate()) {
                                 //start cannot be greater that stop: ERROR
                                 error = true;
-                            } else if ( ( (segmentQuery.getStartCoordinate() == 0) ||
-                                          ( (annotatedSegment.getStartCoordinate() <= segmentQuery.getStartCoordinate()) &&
-                                            (segmentQuery.getStartCoordinate() <= annotatedSegment.getStopCoordinate()) ) )
+                            } else if ( ( (annotatedSegment.getStartCoordinate() <= segmentQuery.getStartCoordinate()) &&
+                                          (segmentQuery.getStartCoordinate() <= annotatedSegment.getStopCoordinate()) )
                                        && (annotatedSegment.getStartCoordinate() <= segmentQuery.getStopCoordinate()) )  {
-                                //start is bounded or 0, stop is greater or equal to real init: OK
+                                //start is completely bounded, stop is greater or equal to real init: OK
                                 error = false;
                             } else {
                                 error = true;

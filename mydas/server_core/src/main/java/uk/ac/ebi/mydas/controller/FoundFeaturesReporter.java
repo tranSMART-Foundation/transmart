@@ -68,9 +68,9 @@ public class FoundFeaturesReporter implements SegmentReporter {
 		this.annotatedSegment = annotatedSegment;
 	}
 
-	Collection<DasFeature> getFeatures(boolean strictlyEnclosed) {
+	Collection<DasFeature> getFeatures() {
 		return (restricted)
-		? annotatedSegment.getFeatures(requestedStart, requestedStop, strictlyEnclosed)
+		? annotatedSegment.getFeatures(requestedStart, requestedStop) //since 1.6.1 overlapping features are always returned
 				: annotatedSegment.getFeatures();
 	}
 
@@ -137,7 +137,7 @@ public class FoundFeaturesReporter implements SegmentReporter {
 		if (this.getSegmentLabel() != null && this.getSegmentLabel().length() > 0){
 			serializer.attribute(DAS_XML_NAMESPACE, "label", this.getSegmentLabel());
 		}
-		for (DasFeature feature : this.getFeatures(isFeaturesStrictlyEnclosed)){
+		for (DasFeature feature : this.getFeatures()){
             boolean hasSuperParts=false;
             boolean hasSubParts=false;
             if (feature instanceof DasComponentFeature){

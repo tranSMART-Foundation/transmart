@@ -178,13 +178,6 @@
             valid DNA, RNA or protein sequence is being served by the sequence command - this
             is the responsibility of the data source itself. -->
             <dna-command-enabled>true</dna-command-enabled>
-            <!-- If 'true' then when segment coordinates are included in the
-            request, only features that are entirely enclosed within the coordinates are returned.
-            If 'false' then all <xsl:for-each select="">
-                
-            </xsl:for-each>atures that overlap with the coordinates are returned.  Handles an
-            ambiguity in the DAS 1.53 specification - see section "Retrieve the Annotations Across a Segment". -->
-            <features-strictly-enclosed>true</features-strictly-enclosed>
             <!-- If 'true' then if no feature label is provided by the data source, the feature id will
             automatically be reported as the feature label.  (Of course, if a feature label is 
             provided, this will override the feature id.) -->
@@ -222,7 +215,6 @@
 			</version>
 
             <dna-command-enabled>true</dna-command-enabled>
-            <features-strictly-enclosed>true</features-strictly-enclosed>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
@@ -251,7 +243,6 @@
 			</version>
 
             <dna-command-enabled>true</dna-command-enabled>
-            <features-strictly-enclosed>true</features-strictly-enclosed>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
@@ -279,7 +270,6 @@
 			</version>
 
             <dna-command-enabled>true</dna-command-enabled>
-            <features-strictly-enclosed>true</features-strictly-enclosed>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
@@ -310,7 +300,6 @@
 			</version>
 
             <dna-command-enabled>true</dna-command-enabled>
-            <features-strictly-enclosed>true</features-strictly-enclosed>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
