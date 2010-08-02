@@ -149,19 +149,20 @@ public class DasAnnotatedSegment extends DasSegment implements Serializable {
      *
      * @param requestedStart being the start coordinate requested by the client.
      * @param requestedStop being the stop coordinate requested by the client.
-     * @param strictlyEnclosed a boolean to indicate if matching features must be strictly enclosed within the
-     * requestedStart and requestedStop.  if this value is false, then an overlap is sufficient for a match.
+     * Note: strictlyEnclosed a boolean to indicate if matching features must be strictly enclosed within the
+     * requestedStart and requestedStop.  if this value is false, then an overlap is sufficient for a match
+     * (since 1.6.1 it is always false so overlapping features are always returned -DAS specification 1.6, draft 6).
      * @return a Collection<DasFeature> of the DasFeature objects that match.
      */
-    public Collection<DasFeature> getFeatures(int requestedStart, int requestedStop, boolean strictlyEnclosed){
+    public Collection<DasFeature> getFeatures(int requestedStart, int requestedStop){
         if (logger.isDebugEnabled()){
-            logger.debug("DasAnnotatedSegment.getFeatures (start, stop, strictlyEnclosed) called.  StrictlyEnclosed = " + strictlyEnclosed);
+            logger.debug("DasAnnotatedSegment.getFeatures (start, stop) called.  StrictlyEnclosed = false");
         }
         Collection<DasFeature> allFeatures = this.getFeatures();
         Collection<DasFeature> restrictedFeatures = new ArrayList<DasFeature>(allFeatures.size());
         if (features != null){
             for (DasFeature feature : allFeatures){
-                if (strictlyEnclosed && requestedStart <= feature.getStartCoordinate() && requestedStop >= feature.getStopCoordinate()){
+                /*if (strictlyEnclosed && requestedStart <= feature.getStartCoordinate() && requestedStop >= feature.getStopCoordinate()){
 
                     if (logger.isDebugEnabled()){
                         logger.debug("Strictly enclosed.  Feature passed: Requested start: " + requestedStart + ". Requested stop: " +
@@ -169,17 +170,22 @@ public class DasAnnotatedSegment extends DasSegment implements Serializable {
                     }
                     
                     restrictedFeatures.add (feature);
-                }
-                else if ((! strictlyEnclosed) &&
-                          ((requestedStop >= feature.getStartCoordinate() && requestedStop <= feature.getStopCoordinate())
+                } else if ((! strictlyEnclosed) &&
+                */
+                 if ((requestedStop >= feature.getStartCoordinate() && requestedStop <= feature.getStopCoordinate())
                         || (requestedStart >= feature.getStartCoordinate() && requestedStart <= feature.getStopCoordinate())
-                        || (requestedStart <= feature.getStartCoordinate() && requestedStop >= feature.getStopCoordinate()))){
+                        || (requestedStart <= feature.getStartCoordinate() && requestedStop >= feature.getStopCoordinate())){
 
                     if (logger.isDebugEnabled()){
-                        logger.debug("Overlap only.  Feature passed: Requested start: " + requestedStart + ". Requested stop: " + 
+                        logger.debug("Overlap.  Feature passed: Requested start: " + requestedStart + ". Requested stop: " +
                         requestedStop + ". Feature start: " + feature.getStartCoordinate() + ". Feature stop: " + feature.getStopCoordinate());
                     }
-
+                    restrictedFeatures.add (feature);
+                }
+                if ( (feature.getStartCoordinate() == 0) && (feature.getStopCoordinate() == 0)) {
+                    /*if (logger.isDebugEnabled()){
+                        logger.debug("Non-positional always returned");
+                    } */
                     restrictedFeatures.add (feature);
                 }
             }
