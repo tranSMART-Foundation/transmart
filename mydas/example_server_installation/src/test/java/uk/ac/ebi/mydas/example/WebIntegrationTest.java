@@ -28,6 +28,8 @@ import net.sourceforge.jwebunit.junit.WebTestCase;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.webapp.WebAppContext;
 
+import java.io.File;
+
 /**
  * Created Using IntelliJ IDEA.
  * Date: 15-May-2007
@@ -48,7 +50,8 @@ public class WebIntegrationTest extends WebTestCase {
     protected void setUp() throws Exception {
         // Port 0 means "assign arbitrarily port number"
         server = new Server(0);
-        server.addHandler(new WebAppContext("./src/main/webapp", "/"));
+        server.addHandler(new WebAppContext("./example_server_installation/src/main/webapp", "/"));
+        //server.addHandler(new WebAppContext("./src/main/webapp", "/"));
         server.start();
 
         // getLocalPort returns the port that was actually assigned
@@ -79,7 +82,7 @@ public class WebIntegrationTest extends WebTestCase {
         beginAt("/test/entry_points");
         assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
         assertTextPresent("<DASEP>");
-        assertTextPresent("<ENTRY_POINTS href=\"http://localhost:8080/das/test/entry_points\" version=\"Version 1.1\" total=\"2\">");
+        assertTextPresent("<ENTRY_POINTS href=\"http://localhost:8080/das/test/entry_points\" version=\"Version 1.1\" total=\"2\" start=\"1\" end=\"2\">");
         assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"1\" type=\"Protein\" orientation=\"+\">Its a protein!</SEGMENT>");
         assertTextPresent("<SEGMENT id=\"two\" start=\"1\" stop=\"48\" type=\"DNA\" orientation=\"+\" subparts=\"yes\">Its a chromosome!</SEGMENT>");
         assertTextPresent("</ENTRY_POINTS>");

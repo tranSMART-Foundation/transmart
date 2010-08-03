@@ -476,8 +476,12 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
      */
     public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws DataSourceException {
         List<DasEntryPoint> entryPoints = new ArrayList<DasEntryPoint>();
-        entryPoints.add (new DasEntryPoint("one", 1, 34, "Protein","1", null, "Its a protein!", false));
-        entryPoints.add (new DasEntryPoint("two", 1, 48, "DNA",null, DasEntryPointOrientation.POSITIVE_ORIENTATION, "Its a chromosome!", true));
+        if (start == 1 && stop == this.getTotalEntryPoints()) { //Test with no rows
+            entryPoints.add (new DasEntryPoint("one", 1, 34, "Protein","1", null, "Its a protein!", false));
+            entryPoints.add (new DasEntryPoint("two", 1, 48, "DNA",null, DasEntryPointOrientation.POSITIVE_ORIENTATION, "Its a chromosome!", true));
+        } else if (start == 2 && stop == 2){ //test with rows=2-2
+            entryPoints.add (new DasEntryPoint("two", 1, 48, "DNA",null, DasEntryPointOrientation.POSITIVE_ORIENTATION, "Its a chromosome!", true));
+        }
         return entryPoints;
     }
 

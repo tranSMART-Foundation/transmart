@@ -277,11 +277,13 @@ public class DasCommandManager {
      *
 	 * @param dsnConfig holding configuration of the dsn and the data source object itself.
 	 * @param queryString to be parsed, which includes details of the requested segments
+     * @param unknownSegmentsHandled Indicates whether or not the unknown segment is handled
 	 * @return a Collection of SequenceReporter objects.  The SequenceReporter wraps the DasSequence object
 	 * to provide additional functionality that is hidden (for simplicity) from the dsn developer.
 	 * @throws CoordinateErrorException if the requested coordinates fall outside those of the requested segment id
 	 * @throws DataSourceException to capture any error returned from the data source.
 	 * @throws BadCommandArgumentsException if the arguments to the command are not recognised.
+     * @throws BadReferenceObjectException if the segments to the command are not recognised.
 	 */
 	private Collection<SequenceReporter> getSequences(DataSourceConfiguration dsnConfig, String queryString, boolean unknownSegmentsHandled) throws DataSourceException, BadCommandArgumentsException, BadReferenceObjectException, CoordinateErrorException {
 		ReferenceDataSource refDsn = (ReferenceDataSource) dsnConfig.getDataSource();
@@ -683,10 +685,10 @@ public class DasCommandManager {
 
 	/**
 	 * Given that this command just return a copy of a predefined stylesheet, there is nothing to modify for DAS1.6
-	 * @param request
-	 * @param response
-	 * @param dsnConfig
-	 * @param queryString
+	 * @param request HTTP request
+	 * @param response HTTP response
+	 * @param dsnConfig Datasource configuration
+	 * @param queryString Query string
 	 * @throws BadCommandArgumentsException
 	 * @throws IOException
 	 * @throws BadStylesheetException
@@ -1401,8 +1403,11 @@ public class DasCommandManager {
 			ReferenceDataSource refDsn = (ReferenceDataSource) dsnConfig.getDataSource();
             //If a client requests an invalid range of rows (completely beyond the range offered by the server)
             //the server responds with an X-DAS-Status of 402: BadCommandArgumentsException
+            start = start == null ? 1 : start;
+            stop = stop == null ? refDsn.getTotalEntryPoints() : stop;
+            expectedSize = stop - start + 1;
             if ( start > refDsn.getTotalEntryPoints() ) {
-                throw new BadCommandArgumentsException("Unexpected arguments(both start ans stop out of bounds) have been passed to the entry_points command.");
+                throw new BadCommandArgumentsException("Unexpected arguments (both start ans stop out of bounds) have been passed to the entry_points command.");
             }
             //Reference data sources return only valid entry points from start to stop (since 1.6.1)
 			Collection<DasEntryPoint> entryPoints = refDsn.getEntryPoints(start, stop);

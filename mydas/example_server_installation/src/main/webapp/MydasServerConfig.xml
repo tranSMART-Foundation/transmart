@@ -165,7 +165,7 @@
                     title="testSecond"
                     description="Second Test Data Source"
                     doc_href="http://thesecondtest.com"
-                    mapmaster="http://mapmaster_template.com">
+                    mapmaster="http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle">
             <!-- The fully qualified class name of the DataSource. -->
 			
 			<maintainer email="testsecond@ebi.ac.uk" />

@@ -74,12 +74,14 @@ public interface ReferenceDataSource extends AnnotationDataSource{
      * those positions (including both limits). If start is greater that the collection size,
      * an empty collection should be returned, if the stop is greater than the collection size,
      * the returned collection will include only those existing entry points from the specified start position.
+     * when the initial request does not specify any positions, DasCommandManager will send 
+     * (1, getTotalEntryPoints) as parameters.
      * For some servers it is important to limit the number of
      * entry points actually retrieved; in this case it is recommended to the server to declare the
      * max_entry_points attribute in MydasServerConfig.xml. This max_entry_point should be
      * considered when implementing this method; however, MyDas will double check that.
-     * @start Initial position within the complete entry points collection for this server
-     * @stop Final position within the complete entry points collection for this server
+     * @param start Initial row position on the entry points collection for this server
+     * @param stop Final row position ont the entry points collection for this server
      * @return a Collection of DasEntryPoint objects
      * @throws DataSourceException to encapsulate any exceptions thrown by the datasource
      * and allow the MydasServlet to return a decent error header to the client.
