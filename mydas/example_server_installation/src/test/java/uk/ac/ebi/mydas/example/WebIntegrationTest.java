@@ -50,8 +50,8 @@ public class WebIntegrationTest extends WebTestCase {
     protected void setUp() throws Exception {
         // Port 0 means "assign arbitrarily port number"
         server = new Server(0);
-        server.addHandler(new WebAppContext("./example_server_installation/src/main/webapp", "/"));
-        //server.addHandler(new WebAppContext("./src/main/webapp", "/"));
+        //server.addHandler(new WebAppContext("./example_server_installation/src/main/webapp", "/"));
+        server.addHandler(new WebAppContext("./src/main/webapp", "/"));
         server.start();
 
         // getLocalPort returns the port that was actually assigned
