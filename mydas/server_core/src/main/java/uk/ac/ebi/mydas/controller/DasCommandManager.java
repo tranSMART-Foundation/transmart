@@ -41,6 +41,7 @@ import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource;
 import uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource;
 import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
 import uk.ac.ebi.mydas.datasource.StructureDataSource;
+import uk.ac.ebi.mydas.datasource.WritebackDataSource;
 import uk.ac.ebi.mydas.exceptions.BadCommandArgumentsException;
 import uk.ac.ebi.mydas.exceptions.BadCommandException;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
@@ -48,6 +49,7 @@ import uk.ac.ebi.mydas.exceptions.BadStylesheetException;
 import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
+import uk.ac.ebi.mydas.exceptions.WritebackException;
 import uk.ac.ebi.mydas.extendedmodel.DasEntryPointE;
 import uk.ac.ebi.mydas.extendedmodel.DasTypeE;
 import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
@@ -58,6 +60,7 @@ import uk.ac.ebi.mydas.model.DasSequence;
 import uk.ac.ebi.mydas.model.DasType;
 import uk.ac.ebi.mydas.model.alignment.DasAlignment;
 import uk.ac.ebi.mydas.model.structure.DasStructure;
+import uk.ac.ebi.mydas.writeback.MyDasParser;
 
 public class DasCommandManager {
 	/**
@@ -1841,6 +1844,116 @@ public class DasCommandManager {
 			throw new BadCommandException("Data source impossible to recover for extended commands",e);
 		}
 
+	}
+	public void writebackCreate(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dataSourceConfig) throws WritebackException {
+		
+				MyDasParser parser= new MyDasParser(PULL_PARSER_FACTORY); 
+				DasAnnotatedSegment segment=parser.parse2MyDasModel(request.getParameter("_content"));
+				try {
+					DasAnnotatedSegment segmentRes=((WritebackDataSource)dataSourceConfig.getDataSource()).create(segment);
+					serialize(request,response,dataSourceConfig,segmentRes);
+				} catch (DataSourceException e) {
+					throw new WritebackException("ERROR creating the feature",e);
+				} catch (IllegalArgumentException e) {
+					throw new WritebackException("ERROR creating the XML response",e);
+				} catch (IllegalStateException e) {
+					throw new WritebackException("ERROR creating the XML response",e);
+				} catch (XmlPullParserException e) {
+					throw new WritebackException("ERROR creating the XML response",e);
+				} catch (IOException e) {
+					throw new WritebackException("ERROR creating the XML response",e);
+				}
+				
+	}
+	
+	private void serialize(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dataSourceConfig,DasAnnotatedSegment segment) throws IllegalArgumentException, IllegalStateException, DataSourceException, XmlPullParserException, IOException{
+			if (dataSourceConfig.getDataSource() instanceof WritebackDataSource){
+				if (PULL_PARSER_FACTORY == null) {
+					try {
+						PULL_PARSER_FACTORY = XmlPullParserFactory.newInstance(System.getProperty(XmlPullParserFactory.PROPERTY_NAME), null);
+						PULL_PARSER_FACTORY.setNamespaceAware(true);
+					} catch (XmlPullParserException xppe) {
+						logger.error("Fatal Exception thrown at initialisation.  Cannot initialise the PullParserFactory required to allow generation of the DAS XML.", xppe);
+						throw new IllegalStateException ("Fatal Exception thrown at initialisation.  Cannot initialise the PullParserFactory required to allow generation of the DAS XML.", xppe);
+					}
+				}
+				
+				List<SegmentReporter> segmentReporterLists = new ArrayList<SegmentReporter>();
+				segmentReporterLists.add(new FoundFeaturesReporter(segment));
+				
+				XmlSerializer serializer;
+				serializer = PULL_PARSER_FACTORY.newSerializer();
+				BufferedWriter out = null;
+				try {
+					out = getResponseWriter(request, response);
+					serializer.setOutput(out);
+					serializer.setProperty(INDENTATION_PROPERTY, INDENTATION_PROPERTY_VALUE);
+					serializer.startDocument(null, false);
+					serializer.text("\n");
+					if (DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getFeaturesXSLT() != null){
+						serializer.processingInstruction(DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getFeaturesXSLT());
+						serializer.text("\n");
+					}
+
+					// Rest of the XML.
+					serializer.startTag(DAS_XML_NAMESPACE, "DASGFF");
+					serializer.startTag(DAS_XML_NAMESPACE, "GFF");
+					serializer.attribute(DAS_XML_NAMESPACE, "href", buildRequestHref(request));
+					for (SegmentReporter segmentReporter : segmentReporterLists){
+						if (segmentReporter instanceof UnknownSegmentReporter){
+							((UnknownSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, false);
+						} else if (segmentReporter instanceof UnknownFeatureSegmentReporter){
+							((UnknownFeatureSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer);
+						} else {	
+							((FoundFeaturesReporter) segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, new DasFeatureRequestFilter (), true,true, dataSourceConfig.isUseFeatureIdForFeatureLabel());
+						}
+					}
+					serializer.endTag(DAS_XML_NAMESPACE, "GFF");
+					serializer.endTag(DAS_XML_NAMESPACE, "DASGFF");
+
+					serializer.flush();
+				}finally{
+					if (out != null){
+						out.close();
+					}
+				}
+
+			}
+	}
+	public void writebackDelete(HttpServletRequest request,
+			HttpServletResponse response) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void writebackupdate(HttpServletRequest request,	HttpServletResponse response, DataSourceConfiguration dataSourceConfig) throws WritebackException {
+		
+		MyDasParser parser= new MyDasParser(PULL_PARSER_FACTORY); 
+		BufferedReader reader;
+		String content="",temp="";
+		try {
+			reader = request.getReader();
+			while ((temp = reader.readLine()) != null) {
+				content+=temp;
+			}
+		} catch (IOException e) {
+			throw new WritebackException("ERROR reading the PUT content",e);
+		}
+		DasAnnotatedSegment segment=parser.parse2MyDasModel(content);
+		try {
+			DasAnnotatedSegment segmentRes=((WritebackDataSource)dataSourceConfig.getDataSource()).update(segment);
+			serialize(request,response,dataSourceConfig,segmentRes);
+		} catch (DataSourceException e) {
+			throw new WritebackException("ERROR updating the feature",e);
+		} catch (IllegalArgumentException e) {
+			throw new WritebackException("ERROR updating the XML response",e);
+		} catch (IllegalStateException e) {
+			throw new WritebackException("ERROR updating the XML response",e);
+		} catch (XmlPullParserException e) {
+			throw new WritebackException("ERROR updating the XML response",e);
+		} catch (IOException e) {
+			throw new WritebackException("ERROR updating the XML response",e);
+		}
+		
 	}
 
 

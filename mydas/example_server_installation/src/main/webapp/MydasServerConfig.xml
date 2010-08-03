@@ -184,6 +184,29 @@
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
+        <datasource uri="writeback"
+                    title="testWriteback"
+                    description="Writeback Test Data Source"
+                    doc_href="http://thewritebacktest.com"
+                    mapmaster="http://mapmaster_template.com">
+            <!-- The fully qualified class name of the DataSource. -->
+			
+			<maintainer email="testwriteback@ebi.ac.uk" />
+			<version uri="writeback" created="2010-08-03">
+	            <class>uk.ac.ebi.mydas.example.TestDataSourceWriteback</class>
+				<coordinates 	uri="http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle"
+								source="Protein Sequence"
+								authority="UniProt"
+								test_range="P00280">UniProt,Protein Sequence</coordinates>
+				<capability type="das1:features"		query_uri="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features" />
+		        <capability type="das1:writeback"		query_uri="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/writeback" />
+			</version>
+
+            <dna-command-enabled>true</dna-command-enabled>
+            <features-strictly-enclosed>true</features-strictly-enclosed>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
     </datasources>
 </mydasserver>
 

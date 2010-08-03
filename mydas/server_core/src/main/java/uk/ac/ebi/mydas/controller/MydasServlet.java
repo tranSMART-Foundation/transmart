@@ -254,7 +254,29 @@ public class MydasServlet extends HttpServlet {
 	 * @throws IOException as defined in the HTTPServlet interface.
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		parseAndHandleRequest(request, response);
+		DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get("writeback");
+		try {
+			dasCommands.writebackCreate(request,response,dataSourceConfig);
+		} catch (WritebackException e) {
+			logger.error("Writebackexception thrown", e);
+			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+			reportError(XDasStatus.STATUS_500_SERVER_ERROR, "Writeback error creating a feature.", request, response);
+		}
+	}
+
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		dasCommands.writebackDelete(request,response);
+	}
+
+	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get("writeback");
+		try {
+			dasCommands.writebackupdate(request,response,dataSourceConfig);
+		} catch (WritebackException e) {
+			logger.error("WritebackException thrown", e);
+			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+			reportError(XDasStatus.STATUS_500_SERVER_ERROR, "Writeback error creating a feature.", request, response);
+		}
 	}
 
 	/**
