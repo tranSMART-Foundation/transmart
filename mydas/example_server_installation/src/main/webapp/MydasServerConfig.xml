@@ -102,7 +102,8 @@
         <datasource uri="test"
                     title="test"
                     description="Test Data Source"
-                    doc_href="http://www.ebi.ac.uk/~pjones">
+                    doc_href="http://www.ebi.ac.uk/~pjones"
+                    mapmaster="http://mapmaster_template.com">
             <!-- The fully qualified class name of the DataSource. -->
 			
 			<maintainer email="test@ebi.ac.uk" />
@@ -163,7 +164,8 @@
         <datasource uri="testSecond"
                     title="testSecond"
                     description="Second Test Data Source"
-                    doc_href="http://thesecondtest.com">
+                    doc_href="http://thesecondtest.com"
+                    mapmaster="http://mapmaster_template.com">
             <!-- The fully qualified class name of the DataSource. -->
 			
 			<maintainer email="testsecond@ebi.ac.uk" />
