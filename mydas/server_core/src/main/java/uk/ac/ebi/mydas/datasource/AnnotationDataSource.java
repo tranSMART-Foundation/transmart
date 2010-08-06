@@ -109,6 +109,8 @@ public interface AnnotationDataSource {
      * of the segmentId passed in as argument.
      * @param segmentId being the reference of the segment requested in the DAS request (not including
      * start and stop coordinates)
+     * @param maxbins (optional) This argument allows a client to indicate to the server
+     * the available rendering space it has for drawing features (i.e. the number of "bins").
      *
      * If your datasource implements only this interface,
      * the MydasServlet will handle restricting the features returned to
@@ -130,7 +132,7 @@ public interface AnnotationDataSource {
      * a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
      * and read a record.</bold>
      */
-    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbeans) throws BadReferenceObjectException, DataSourceException;
+    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins) throws BadReferenceObjectException, DataSourceException;
 
 
     /**
@@ -178,6 +180,8 @@ public interface AnnotationDataSource {
      * @param featureIdCollection a Collection&lt;String&gt; of feature_id values included in the features command / request.
      * May be a <code>java.util.Collections.EMPTY_LIST</code> but will <b>not</b> be null.
      * May be a <code>java.util.Collections.EMPTY_LIST</code> but will <b>not</b> be null.
+     * @param maxbins (optional) This argument allows a client to indicate to the server 
+     * the available rendering space it has for drawing features (i.e. the number of "bins").
      * @return A Collection of {@link DasAnnotatedSegment} objects. These describe the segments that is annotated, limited
      * to the information required for the /DASGFF/GFF/SEGMENT element.  Each References a Collection of
      * DasFeature objects.   Note that this is a basic Collection - this gives you complete control over the details
@@ -287,6 +291,8 @@ public interface AnnotationDataSource {
      * @return a Collection of DasEntryPoint objects
      * @throws DataSourceException to encapsulate any exceptions thrown by the datasource
      * and allow the MydasServlet to return a decent error header to the client.
+     * @throws uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException  Throw this if you cannot
+     * provide a working implementation of this method.
      */
     public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws UnimplementedFeatureException, DataSourceException;
 
@@ -302,6 +308,8 @@ public interface AnnotationDataSource {
      * entry points / datasource.
      * @throws DataSourceException to encapsulate any exceptions thrown by the datasource
      * and allow the MydasServlet to return a decent error header to the client.
+     * @throws uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException  Throw this if you cannot
+     * provide a working implementation of this method.
      */
     public String getEntryPointVersion () throws UnimplementedFeatureException, DataSourceException;
 
@@ -314,6 +322,8 @@ public interface AnnotationDataSource {
      * @return an integer being the total number of entry points on this datasource.
      * @throws DataSourceException to encapsulate any exceptions thrown by the datasource
      * and allow the MydasServlet to return a decent error header to the client.
+     * @throws uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException  Throw this if you cannot
+     * provide a working implementation of this method.
      */
     public int getTotalEntryPoints () throws UnimplementedFeatureException, DataSourceException;
 }

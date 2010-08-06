@@ -115,6 +115,10 @@ public class DasEntryPoint implements Serializable {
      * DAS 1.53 specification.
      * For the entry_point command, provides the value for the
      * <code>/DASEP/ENTRY_POINTS/SEGMENT/@type</code> attribute.
+     * @param version The version attribute (optional) indicates the version of the reference
+     * object, used for coordinate systems which are not themselves versioned. For the entry_point
+     * command, provides the value for the
+     * <code>/DASEP/ENTRY_POINTS/SEGMENT/@version</code> attribute.
      * @param orientation <b>Mandatory</b>.  Should be set as one of <code>DasEntryPoint.POSITIVE_ORIENTATION</code>,
      * <code>DasEntryPoint.NEGATIVE_ORIENTATION</code> or <code>DasEntryPoint.NO_INTRINSIC_ORIENTATION</code>.  If null
      * is passed in, will default to <code>DasEntryPoint.NO_INTRINSIC_ORIENTATION</code>.
@@ -127,6 +131,8 @@ public class DasEntryPoint implements Serializable {
      * @param description <b>Optional</b> description of the entry point.
      * For the entry_point command, provides the value for the
      * <code>/DASEP/ENTRY_POINTS/SEGMENT</code> element.
+     * @throws DataSourceException should be thrown if there is any
+     * fatal problem with loading this data source.
      */
     public DasEntryPoint(String segmentId, Integer startCoordinate, Integer stopCoordinate, String type, String version, DasEntryPointOrientation orientation, String description, boolean hasSubparts)
             throws DataSourceException {

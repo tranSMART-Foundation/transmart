@@ -696,9 +696,9 @@ public class DasCommandManager {
 	 * @param response HTTP response
 	 * @param dsnConfig Datasource configuration
 	 * @param queryString Query string
-	 * @throws BadCommandArgumentsException
-	 * @throws IOException
-	 * @throws BadStylesheetException
+	 * @throws BadCommandArgumentsException Command arguments does not match
+	 * @throws IOException It is not possible to read the stylesheet file
+	 * @throws BadStylesheetException The stylesheet is not correct
 	 */
 	void stylesheetCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
 	throws BadCommandArgumentsException, IOException, BadStylesheetException {
@@ -771,6 +771,7 @@ public class DasCommandManager {
 	 * can throw this exception under some circumstances (but not when called by the featureCommand method!)
 	 * @throws CoordinateErrorException will not be thrown, but a helper method used by this method
 	 * can throw this exception under some circumstances (but not when called by the featureCommand method!)
+     * @throws BadReferenceObjectException The requested object does not exist
 	 */
 	@SuppressWarnings("unchecked")
 	void featuresCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
@@ -1022,13 +1023,14 @@ public class DasCommandManager {
 	 * @param unknownSegmentsHandled to indicate if the calling method is able to report missing segments (i.e.
 	 * the feature command can return errorsegment / unknownsegment).
 	 * the segment id is not known to the DSN.
-     * @param maxbins
+     * @param maxbins (optional) This argument allows a client to indicate to the server
+     * the available rendering space it has for drawing features (i.e. the number of "bins").
 	 * @return a Collection of FeatureReporter objects that wrap the DasFeature objects returned from the data source
 	 * @throws uk.ac.ebi.mydas.exceptions.DataSourceException to capture any error returned from the data source that cannot be handled in a more
 	 * elegant manner.
 	 * @throws uk.ac.ebi.mydas.exceptions.CoordinateErrorException thrown if unknownSegmentsHandled is false and
 	 * the segment coordinates are out of scope for the provided segment id.
-     * @throws uk.ac.ebi.mydas.exceptions.BadReferenceObjectException
+     * @throws uk.ac.ebi.mydas.exceptions.BadReferenceObjectException The requested object does not exist
 	 */
 	private Collection<SegmentReporter> getFeatureCollection(DataSourceConfiguration dsnConfig,
 			List <SegmentQuery> requestedSegments,
@@ -1233,7 +1235,8 @@ public class DasCommandManager {
 	 * @param request required to determine if the client will accept a compressed response
 	 * @param compressionAllowed to indicate if the specific response should be gzipped. (e.g. an error message with
 	 * no content should not set the compressed header.)
-	 * @throws IOException
+     * @param capabilities describes the parts of of the specification the server implements
+	 * @throws IOException An error occurred when writing the headers
 	 */
 	private void writeHeader (HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed,String capabilities) throws IOException{
 		this.mydasServlet.writeHeader(request, response, status, compressionAllowed,capabilities);
@@ -1248,6 +1251,7 @@ public class DasCommandManager {
 	 * @param request to allow writing of the HTTP header
 	 * @param response to which the HTTP header and DASDSN XML are written
 	 * @param queryString to check no spurious arguments have been passed to the command
+     * @param source to provide the datasource name
 	 * @throws XmlPullParserException in the event of an error being thrown when writing out the XML
 	 * @throws IOException in the event of an error being thrown when writing out the XML
 	 */
@@ -1542,6 +1546,7 @@ public class DasCommandManager {
 	 * @throws BadCommandArgumentsException if the arguments to the sequence command are not as specified in the
 	 * DAS 1.53 specification
 	 * @throws CoordinateErrorException if the requested coordinates are outside those of the segment id requested.
+     * @throws BadReferenceObjectException The requested object does not exist
 	 */
 	void sequenceCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
 			throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException, BadReferenceObjectException, BadCommandArgumentsException, CoordinateErrorException {
@@ -1656,7 +1661,7 @@ public class DasCommandManager {
 	 * @throws UnimplementedFeatureException if the dsn reports that it cannot return sequence.
 	 * @throws BadCommandArgumentsException if the arguments to the sequence command are not as specified in the
 	 * DAS 1.6 specification
-	 * @throws CoordinateErrorException if the requested coordinates are outside those of the segment id requested.
+     * @throws BadReferenceObjectException The requested object does not exist
 	 */
 	void structureCommand(HttpServletRequest request,
 			HttpServletResponse response,
@@ -1738,7 +1743,7 @@ public class DasCommandManager {
 	 * @throws UnimplementedFeatureException if the dsn reports that it cannot return sequence.
 	 * @throws BadCommandArgumentsException if the arguments to the sequence command are not as specified in the
 	 * DAS 1.6 specification
-	 * @throws CoordinateErrorException if the requested coordinates are outside those of the segment id requested.
+     * @throws BadReferenceObjectException The requested object does not exist
 	 */
 	void alignmentCommand(HttpServletRequest request,
 			HttpServletResponse response,
@@ -1837,6 +1842,7 @@ public class DasCommandManager {
 	 * @param request to allow the writing of the http header
 	 * @param response to which the http header and the XML are written.
 	 * @param dataSourceConfig holding configuration of the dsn and the data source object itself.
+     * @param command to specify the command name
 	 * @param queryString from which the requested structures are parsed.
 	 * @throws BadCommandException in the case the interface Command extender haven't beeen implemented or
 	 */

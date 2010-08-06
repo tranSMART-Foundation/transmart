@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.xmlpull.v1.XmlSerializer;
 
-import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.model.DasEntryPoint;
 import uk.ac.ebi.mydas.model.DasEntryPointOrientation;
@@ -28,7 +27,8 @@ public class DasEntryPointE extends DasEntryPoint {
 	/**
 	 * Constructor to create a copy from a DasEntryPoint
 	 * @param entryPoint Entry point with all its data loaded.
-	 * @throws DataSourceException
+	 * @throws DataSourceException should be thrown if there is any
+     * fatal problem with loading this data source.
 	 */
 	public DasEntryPointE(DasEntryPoint entryPoint) throws DataSourceException {
 		super(entryPoint.getSegmentId(), entryPoint.getStartCoordinate(), entryPoint.getStopCoordinate(), entryPoint.getType(),entryPoint.getVersion(), entryPoint.getOrientation(),entryPoint.getDescription(), entryPoint.hasSubparts());

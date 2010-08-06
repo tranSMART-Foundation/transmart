@@ -141,7 +141,7 @@ public class GFFFileDataSource implements AnnotationDataSource {
      * This method is provided just for testing purposes, it does not retrieve real data.
      * @param start Initial row position on the entry points collection for this server
      * @param stop Final row position ont the entry points collection for this server
-     * @return
+     * @return A sub ordered collection of entry points from the start row to the stop row 
      * @throws DataSourceException
      */
     public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws DataSourceException {
