@@ -135,7 +135,8 @@ public class DasCommandManager {
 	throws XmlPullParserException, IOException{
 		// Check the configuration has been loaded successfully
 		if (DATA_SOURCE_MANAGER.getServerConfiguration() == null){
-			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+            //No configuration, just report the default capabilities
+			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false, null);
 			logger.error("A request has been made to the das server, however initialisation failed - possibly the mydasserverconfig.xml file was not found.");
 			return;
 		}
@@ -146,11 +147,13 @@ public class DasCommandManager {
 			List<String> dsns = DATA_SOURCE_MANAGER.getServerConfiguration().getDsnNames();
 			// Check there is at least one dsn.  (Mandatory in the dsn XML output).
 			if (dsns == null || dsns.size() == 0){
-				writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+                //No dsn's, just report the default capabilities
+				writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false, null);
 				logger.error("The dsn command has been called, but no dsns have been initialised successfully.");
 			} else{
 				// At least one dsn is OK.
-				writeHeader (request, response, XDasStatus.STATUS_200_OK, true,null);
+                //DSN is a server command, just report the default capabilities
+				writeHeader (request, response, XDasStatus.STATUS_200_OK, true, null);
 				// Build the XML.
 				XmlSerializer serializer;
 				serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -212,7 +215,8 @@ public class DasCommandManager {
 		else {
 			// If fallen through to here, then the dsn command is not recognised
 			// as it has rubbish in the query string.
-			writeHeader (request, response, XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, true,null);
+            //DSN is a server command, just report the default capabilities
+			writeHeader (request, response, XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, true, null);
 		}
 	}
 	void dnaCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
@@ -1247,10 +1251,11 @@ public class DasCommandManager {
 	 * @throws XmlPullParserException in the event of an error being thrown when writing out the XML
 	 * @throws IOException in the event of an error being thrown when writing out the XML
 	 */
-	void sourceCommand(HttpServletRequest request, HttpServletResponse response, String queryString,String source)
+	void sourceCommand(HttpServletRequest request, HttpServletResponse response, String queryString, String source)
 	throws XmlPullParserException, IOException{
 		// Check the configuration has been loaded successfully
 		if (DATA_SOURCE_MANAGER.getServerConfiguration() == null){
+            //No configuration, just report the default capabilities
 			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
 			logger.error("A request has been made to the das server, however initialisation failed - possibly the mydasserverconfig.xml file was not found.");
 			return;
@@ -1260,11 +1265,19 @@ public class DasCommandManager {
 		List<String> dsns = DATA_SOURCE_MANAGER.getServerConfiguration().getDsnNames();
 		// Check there is at least one dsn.  (Mandatory in the dsn XML output).
 		if (dsns == null || dsns.size() == 0){
+            //No dsn's, just report the default capabilities
 			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
 			logger.error("The source command has been called, but no sources have been initialised successfully.");
 		} else{
 			// At least one dsn is OK.
-			writeHeader (request, response, XDasStatus.STATUS_200_OK, true,null);
+            if (source == null) {
+                //server sources command, just report the default capabilities
+                writeHeader (request, response, XDasStatus.STATUS_200_OK, true,null);
+            } else {
+                //datasource sources command, report capabilities
+                DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get(source);
+                writeHeader (request, response, XDasStatus.STATUS_200_OK, true, dataSourceConfig.getCapabilities());
+            }
 			// Build the XML.
 			XmlSerializer serializer;
 			serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -1323,17 +1336,17 @@ public class DasCommandManager {
 										serializer.attribute(DAS_XML_NAMESPACE, "query_uri", capability.getQueryUri());
 									serializer.endTag (DAS_XML_NAMESPACE, "CAPABILITY");
 								}
-								serializer.endTag (DAS_XML_NAMESPACE, "VERSION");
-							}
-							//1.6.1 Properties come from version and are not allowed in data sources
-                            //1.61. Only properties with visibility true will be reported in source command response
-							for(PropertyType pt:dsnConfig2.getVersion().get(0).getProperty()){
-                                if (pt.isVisibility()) {
-                                    serializer.startTag (DAS_XML_NAMESPACE, "PROPERTY");
-                                    serializer.attribute(DAS_XML_NAMESPACE, "name", pt.getKey());
-                                    serializer.attribute(DAS_XML_NAMESPACE, "value", pt.getValue());
-                                    serializer.endTag (DAS_XML_NAMESPACE, "PROPERTY");
+                                //1.6.1 Properties come from version and are not allowed in data sources (not out of the version anyway)
+                                //1.61. Only properties with visibility true will be reported in source command response
+                                for(PropertyType pt:version.getProperty()){
+                                    if (pt.isVisibility()) {
+                                        serializer.startTag (DAS_XML_NAMESPACE, "PROPERTY");
+                                        serializer.attribute(DAS_XML_NAMESPACE, "name", pt.getKey());
+                                        serializer.attribute(DAS_XML_NAMESPACE, "value", pt.getValue());
+                                        serializer.endTag (DAS_XML_NAMESPACE, "PROPERTY");
+                                    }
                                 }
+								serializer.endTag (DAS_XML_NAMESPACE, "VERSION");
 							}
 
 							serializer.endTag (DAS_XML_NAMESPACE, "SOURCE");
@@ -1401,9 +1414,9 @@ public class DasCommandManager {
             */
 		}
 
-		if (dsnConfig.getDataSource() instanceof ReferenceDataSource){
+		if (dsnConfig.getDataSource() instanceof AnnotationDataSource){
 			// Fine - process command.
-			ReferenceDataSource refDsn = (ReferenceDataSource) dsnConfig.getDataSource();
+			AnnotationDataSource refDsn = dsnConfig.getDataSource();
             //If a client requests an invalid range of rows (completely beyond the range offered by the server)
             //the server responds with an X-DAS-Status of 402: BadCommandArgumentsException
             start = start == null ? 1 : start;
@@ -1485,7 +1498,7 @@ public class DasCommandManager {
 					iterator.next();*/
 				//DasEntryPoint[] entryPointsA = (DasEntryPoint[]) entryPoints.toArray();
 				// Now for the individual segments.
-				for (int i = start; (i <= stop) && (iterator.hasNext()); i++){ 
+				for (int i = start; (i <= stop) && (iterator.hasNext()); i++){
                     DasEntryPoint entryPoint=iterator.next();
 					if (entryPoint != null){
 						(new DasEntryPointE(entryPoint)).serialize(DAS_XML_NAMESPACE, serializer);
@@ -1509,7 +1522,7 @@ public class DasCommandManager {
 		}
 		else {
 			// Not a reference source.
-			throw new UnimplementedFeatureException("An attempt to request entry_point information from an annotation server has been detected.");
+			throw new UnimplementedFeatureException("An attempt to request entry_point information from an non-annotation server has been detected.");
 		}
 	}
 
@@ -1846,8 +1859,8 @@ public class DasCommandManager {
 
 	}
 	public void writebackCreate(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dataSourceConfig) throws WritebackException {
-		
-				MyDasParser parser= new MyDasParser(PULL_PARSER_FACTORY); 
+
+				MyDasParser parser= new MyDasParser(PULL_PARSER_FACTORY);
 				DasAnnotatedSegment segment=parser.parse2MyDasModel(request.getParameter("_content"));
 				try {
 					DasAnnotatedSegment segmentRes=((WritebackDataSource)dataSourceConfig.getDataSource()).create(segment);
@@ -1863,9 +1876,9 @@ public class DasCommandManager {
 				} catch (IOException e) {
 					throw new WritebackException("ERROR creating the XML response",e);
 				}
-				
+
 	}
-	
+
 	private void serialize(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dataSourceConfig,DasAnnotatedSegment segment) throws IllegalArgumentException, IllegalStateException, DataSourceException, XmlPullParserException, IOException{
 			if (dataSourceConfig.getDataSource() instanceof WritebackDataSource){
 				if (PULL_PARSER_FACTORY == null) {
@@ -1877,10 +1890,10 @@ public class DasCommandManager {
 						throw new IllegalStateException ("Fatal Exception thrown at initialisation.  Cannot initialise the PullParserFactory required to allow generation of the DAS XML.", xppe);
 					}
 				}
-				
+
 				List<SegmentReporter> segmentReporterLists = new ArrayList<SegmentReporter>();
 				segmentReporterLists.add(new FoundFeaturesReporter(segment));
-				
+
 				XmlSerializer serializer;
 				serializer = PULL_PARSER_FACTORY.newSerializer();
 				BufferedWriter out = null;
@@ -1904,7 +1917,7 @@ public class DasCommandManager {
 							((UnknownSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, false);
 						} else if (segmentReporter instanceof UnknownFeatureSegmentReporter){
 							((UnknownFeatureSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer);
-						} else {	
+						} else {
 							((FoundFeaturesReporter) segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, new DasFeatureRequestFilter (), true,true, dataSourceConfig.isUseFeatureIdForFeatureLabel());
 						}
 					}
@@ -1923,11 +1936,11 @@ public class DasCommandManager {
 	public void writebackDelete(HttpServletRequest request,
 			HttpServletResponse response) {
 		// TODO Auto-generated method stub
-		
+
 	}
 	public void writebackupdate(HttpServletRequest request,	HttpServletResponse response, DataSourceConfiguration dataSourceConfig) throws WritebackException {
-		
-		MyDasParser parser= new MyDasParser(PULL_PARSER_FACTORY); 
+
+		MyDasParser parser= new MyDasParser(PULL_PARSER_FACTORY);
 		BufferedReader reader;
 		String content="",temp="";
 		try {
@@ -1953,7 +1966,7 @@ public class DasCommandManager {
 		} catch (IOException e) {
 			throw new WritebackException("ERROR updating the XML response",e);
 		}
-		
+
 	}
 
 

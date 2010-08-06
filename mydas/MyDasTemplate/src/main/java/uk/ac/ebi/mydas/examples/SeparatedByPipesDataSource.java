@@ -18,10 +18,7 @@ import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
-import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
-import uk.ac.ebi.mydas.model.DasComponentFeature;
-import uk.ac.ebi.mydas.model.DasFeature;
-import uk.ac.ebi.mydas.model.DasType;
+import uk.ac.ebi.mydas.model.*;
 
 public class SeparatedByPipesDataSource implements AnnotationDataSource {
 	CacheManager cacheManager = null;
@@ -110,6 +107,18 @@ public class SeparatedByPipesDataSource implements AnnotationDataSource {
 			throws UnimplementedFeatureException, DataSourceException {
 		throw new UnimplementedFeatureException("No implemented");
 	}
+    
+    public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
+
+    public String getEntryPointVersion() throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
+
+    public int getTotalEntryPoints() throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
 
 	public Integer getTotalCountForType(DasType type)
 			throws DataSourceException {
@@ -128,5 +137,4 @@ public class SeparatedByPipesDataSource implements AnnotationDataSource {
 	public void registerCacheManager(CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
 	}
-
 }

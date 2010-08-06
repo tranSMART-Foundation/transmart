@@ -138,9 +138,16 @@ public class GFFFileReferenceDataSource implements ReferenceDataSource {
     }
 
     public String getEntryPointVersion() throws DataSourceException {
-        return "1.0";  //To change body of implemented methods use File | Settings | File Templates.
+        return "1.0"; 
     }
 
+    /**
+     * This method is provided just for testing purposes, it does not retrieve real data.
+     * @param start Initial row position on the entry points collection for this server
+     * @param stop Final row position ont the entry points collection for this server
+     * @return
+     * @throws DataSourceException
+     */
     public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws DataSourceException {
         ArrayList<DasEntryPoint> entryPoints = new ArrayList<DasEntryPoint>();
         if ((start != null) && (stop != null)) {

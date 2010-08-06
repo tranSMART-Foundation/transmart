@@ -52,14 +52,14 @@ public class DasEntryPoint implements Serializable {
      * For the entry_point command, provides the value for the
      * <code>/DASEP/ENTRY_POINTS/SEGMENT/@start</code> attribute.
      */
-    private int startCoordinate;
+    private Integer startCoordinate;
 
     /**
      * The end coordinate of the entry point.
      * For the entry_point command, provides the value for the
      * <code>/DASEP/ENTRY_POINTS/SEGMENT/@stop</code> attribute.
      */
-    private int stopCoordinate;
+    private Integer stopCoordinate;
 
     /**
      * The type of the entry point
@@ -128,7 +128,7 @@ public class DasEntryPoint implements Serializable {
      * For the entry_point command, provides the value for the
      * <code>/DASEP/ENTRY_POINTS/SEGMENT</code> element.
      */
-    public DasEntryPoint(String segmentId, int startCoordinate, int stopCoordinate, String type, String version, DasEntryPointOrientation orientation, String description, boolean hasSubparts)
+    public DasEntryPoint(String segmentId, Integer startCoordinate, Integer stopCoordinate, String type, String version, DasEntryPointOrientation orientation, String description, boolean hasSubparts)
             throws DataSourceException {
         if (segmentId == null || segmentId.length() == 0){
             throw new DataSourceException("A new DasEntryPoint object must be initialised with a segmentId.");
@@ -162,7 +162,7 @@ public class DasEntryPoint implements Serializable {
      * <code>/DASEP/ENTRY_POINTS/SEGMENT/@start</code> attribute.
      * @return the start coordinate of the entry point.
      */
-    public int getStartCoordinate() {
+    public Integer getStartCoordinate() {
         return startCoordinate;
     }
 
@@ -172,7 +172,7 @@ public class DasEntryPoint implements Serializable {
      * <code>/DASEP/ENTRY_POINTS/SEGMENT/@stop</code> attribute.
      * @return the end coordinate of the entry point.
      */
-    public int getStopCoordinate() {
+    public Integer getStopCoordinate() {
         return stopCoordinate;
     }
 

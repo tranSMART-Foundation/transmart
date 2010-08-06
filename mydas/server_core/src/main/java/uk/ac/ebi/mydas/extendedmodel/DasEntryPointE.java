@@ -17,8 +17,8 @@ import uk.ac.ebi.mydas.model.DasEntryPointOrientation;
 public class DasEntryPointE extends DasEntryPoint {
 
 
-	public DasEntryPointE(String segmentId, int startCoordinate,
-			int stopCoordinate, String type,String version,
+	public DasEntryPointE(String segmentId, Integer startCoordinate,
+			Integer stopCoordinate, String type,String version,
 			DasEntryPointOrientation orientation, String description,
 			boolean hasSubparts) throws DataSourceException {
 		super(segmentId, startCoordinate, stopCoordinate, type,version, orientation,
@@ -45,8 +45,12 @@ public class DasEntryPointE extends DasEntryPoint {
     public void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
         serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
         serializer.attribute(DAS_XML_NAMESPACE, "id", this.getSegmentId());
-        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(this.getStartCoordinate()));
-        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(this.getStopCoordinate()));
+        if (this.getStartCoordinate() != null) {
+            serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(this.getStartCoordinate()));
+        }
+        if (this.getStopCoordinate() != null) {
+            serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(this.getStopCoordinate()));
+        }
         if (this.getVersion() != null && this.getVersion().length() > 0){
             serializer.attribute(DAS_XML_NAMESPACE, "version", this.getVersion());
         }

@@ -12,9 +12,7 @@ import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
-import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
-import uk.ac.ebi.mydas.model.DasFeature;
-import uk.ac.ebi.mydas.model.DasType;
+import uk.ac.ebi.mydas.model.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -135,5 +133,56 @@ public class GFFFileDataSource implements AnnotationDataSource {
 		throw new UnimplementedFeatureException("No implemented");
 	}
 
+    public String getEntryPointVersion() throws DataSourceException {
+        return "1.0";
+    }
 
+    /**
+     * This method is provided just for testing purposes, it does not retrieve real data.
+     * @param start Initial row position on the entry points collection for this server
+     * @param stop Final row position ont the entry points collection for this server
+     * @return
+     * @throws DataSourceException
+     */
+    public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws DataSourceException {
+        ArrayList<DasEntryPoint> entryPoints = new ArrayList<DasEntryPoint>();
+        if ((start != null) && (stop != null)) {
+            for (int i = 1; i <= 10; i++) {
+                if ( (start <= i) && (i <= stop) ) {
+                    if (i <= 5)
+                        entryPoints.add(
+                            new DasEntryPoint(
+                                "EP_" + i, null, null, null, "1.0",
+                                DasEntryPointOrientation.NO_INTRINSIC_ORIENTATION,
+                                "Scaffold Entry Point", true));
+                    else
+                        entryPoints.add(
+                            new DasEntryPoint(
+                                "EP_" + i, 1, 10, null, "1.0",
+                                DasEntryPointOrientation.NO_INTRINSIC_ORIENTATION,
+                                "Scaffold Entry Point", true));
+                }
+            }
+        } else {
+            for (int i = 1; i <= 10; i++) {
+                if (i <= 5)
+                        entryPoints.add(
+                            new DasEntryPoint(
+                                "EP_" + i, null, null, null, "1.0",
+                                DasEntryPointOrientation.NO_INTRINSIC_ORIENTATION,
+                                "Scaffold Entry Point", true));
+                    else
+                        entryPoints.add(
+                            new DasEntryPoint(
+                                "EP_" + i, 1, 10, null, "1.0",
+                                DasEntryPointOrientation.NO_INTRINSIC_ORIENTATION,
+                                "Scaffold Entry Point", true));
+            }
+        }
+        return entryPoints;
+    }
+
+    public int getTotalEntryPoints() throws DataSourceException {
+        return 10;
+    }
 }

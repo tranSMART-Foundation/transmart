@@ -35,6 +35,7 @@ import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
+import uk.ac.ebi.mydas.model.DasEntryPoint;
 import uk.ac.ebi.mydas.model.DasType;
 
 import java.net.URL;
@@ -286,6 +287,18 @@ public class TemplateAnnotationDataSource implements AnnotationDataSource {
 	public URL getLinkURL(String field, String id) throws UnimplementedFeatureException, DataSourceException {
 		return null;
 	}
+
+    public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
+
+    public String getEntryPointVersion() throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
+
+    public int getTotalEntryPoints() throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
 
 
 }

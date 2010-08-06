@@ -17,10 +17,7 @@ import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
-import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
-import uk.ac.ebi.mydas.model.DasComponentFeature;
-import uk.ac.ebi.mydas.model.DasFeature;
-import uk.ac.ebi.mydas.model.DasType;
+import uk.ac.ebi.mydas.model.*;
 
 public class EnsemblTestDataSource implements RangeHandlingAnnotationDataSource{
 	CacheManager cacheManager = null;
@@ -96,15 +93,24 @@ public class EnsemblTestDataSource implements RangeHandlingAnnotationDataSource{
 		throw new UnimplementedFeatureException("No implemented");
 	}
 
-	public Integer getTotalCountForType(DasType type)
+    public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
+
+    public String getEntryPointVersion() throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
+
+    public int getTotalEntryPoints() throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
+
+    public Integer getTotalCountForType(DasType type)
 			throws DataSourceException {
 		return ensembl.getTotalCountForType(type.getId());
 	}
 
-
 	public void registerCacheManager(CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
 	}
-
-
 }

@@ -210,6 +210,7 @@
 				<capability type="das1:features"		query_uri="http://localhost:8080/das/examplegff/features" />
 				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplegff/features" />
 				<capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
+                <capability type="das1:entry_points"		query_uri="http://localhost:8080/das/examplegff/entry_points" />
 				<capability type="das1:unknown-feature"	/>
                 <property key="gff_file" value="fickett-tss.gff" visibility="false"/>
 			</version>

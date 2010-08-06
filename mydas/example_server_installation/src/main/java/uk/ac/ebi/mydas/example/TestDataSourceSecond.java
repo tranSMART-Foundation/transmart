@@ -22,13 +22,7 @@ import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
-import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
-import uk.ac.ebi.mydas.model.DasFeature;
-import uk.ac.ebi.mydas.model.DasFeatureOrientation;
-import uk.ac.ebi.mydas.model.DasMethod;
-import uk.ac.ebi.mydas.model.DasPhase;
-import uk.ac.ebi.mydas.model.DasTarget;
-import uk.ac.ebi.mydas.model.DasType;
+import uk.ac.ebi.mydas.model.*;
 
 /**
  * @author 4ndr01d3
@@ -114,7 +108,19 @@ public class TestDataSourceSecond implements AnnotationDataSource, CommandExtend
 		throw new UnimplementedFeatureException("No implemented");
 	}
 
-	public Integer getTotalCountForType(DasType type)
+    public String getEntryPointVersion() throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
+
+    public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
+
+    public int getTotalEntryPoints() throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
+
+    public Integer getTotalCountForType(DasType type)
 	throws DataSourceException {
     	if (type.getId()=="oneFeatureTypeIdTwo")
     		return new Integer(1);
