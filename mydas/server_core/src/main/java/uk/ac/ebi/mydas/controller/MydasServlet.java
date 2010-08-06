@@ -121,6 +121,27 @@ public class MydasServlet extends HttpServlet {
 	private static final String HEADER_KEY_X_DAS_STATUS = "X-DAS-Status";
 	private static final String HEADER_KEY_X_DAS_SERVER = "X-DAS-Server";
 	private static final String HEADER_KEY_X_DAS_CAPABILITIES = "X-DAS-Capabilities";
+    private static final String HEADER_KEY_CORS = "Access-Control-Allow-Origin";
+    private static final String HEADER_KEY_CORS_EXPOSE = "Access-Control-Expose-Headers";
+    private static final String HEADER_KEY_CORS_METHODS = "Access-Control-Allow-Methods";
+    private static final String HEADER_KEY_CORS_HEADERS = "Access-Control-Allow-Headers";
+    private static final String HEADER_KEY_CORS_AGE = "Access-Control-Max-Age";
+
+    /*
+	Response Header line values
+	 */
+//	private static final String HEADER_VALUE_CAPABILITIES = "dsn/1.0; dna/1.0; types/1.0; stylesheet/1.0; features/1.0; entry_points/1.0; error-segment/1.0; unknown-segment/1.0; feature-by-id/1.0; group-by-id/1.0; component/1.0; supercomponent/1.0; sequenceString/1.0";
+	private static final String HEADER_VALUE_DAS_VERSION = "DAS/1.6";
+	private static final String HEADER_VALUE_DAS_SERVER = "MyDAS1.6";
+    private static final String HEADER_VALUE_X_DAS_DEFAULT_CAPABILITIES = "sources/1.0";
+    private static final String HEADER_VALUE_CORS = "*";
+    private static final String HEADER_VALUE_CORS_EXPOSE = HEADER_KEY_X_DAS_VERSION +
+        ", " + HEADER_KEY_X_DAS_STATUS +
+        ", " + HEADER_KEY_X_DAS_SERVER +
+        ", " + HEADER_KEY_X_DAS_CAPABILITIES;
+    private static final String HEADER_VALUE_CORS_METHODS = "GET, POST, OPTIONS";
+    private static final String HEADER_VALUE_CORS_HEADERS = "X-DAS-Version, X-DAS-Client";
+    private static final String HEADER_VALUE_CORS_AGE = "2592000";
 
 	/**
 	 * Private enum that is used by this class to match valid commands.
@@ -168,12 +189,6 @@ public class MydasServlet extends HttpServlet {
 	private static final String ENCODING_REQUEST_HEADER_KEY = "Accept-Encoding";
 	private static final String ENCODING_RESPONSE_HEADER_KEY = "Content-Encoding";
 	private static final String ENCODING_GZIPPED = "gzip";
-	/*
-	Response Header line values
-	 */
-//	private static final String HEADER_VALUE_CAPABILITIES = "dsn/1.0; dna/1.0; types/1.0; stylesheet/1.0; features/1.0; entry_points/1.0; error-segment/1.0; unknown-segment/1.0; feature-by-id/1.0; group-by-id/1.0; component/1.0; supercomponent/1.0; sequenceString/1.0";
-	private static final String HEADER_VALUE_DAS_VERSION = "DAS/1.6";
-	private static final String HEADER_VALUE_DAS_SERVER = "MyDAS1.6";
 
 	private static XmlPullParserFactory PULL_PARSER_FACTORY = null;
 
@@ -207,7 +222,7 @@ public class MydasServlet extends HttpServlet {
 				throw new IllegalStateException ("Fatal Exception thrown at initialisation.  None of the datasources will be usable.", e);
 			}
 		}
-		dasCommands= new DasCommandManager(DATA_SOURCE_MANAGER,CACHE_MANAGER,this);
+		dasCommands= new DasCommandManager(DATA_SOURCE_MANAGER, CACHE_MANAGER, this);
 
 		// Initialize XMLPullParserFactory for marshaller.
 		if (PULL_PARSER_FACTORY == null) {
@@ -307,6 +322,7 @@ public class MydasServlet extends HttpServlet {
 		}
 		Matcher match = REQUEST_URI_PATTERN.matcher(request.getRequestURI().replaceAll("/{2,}", "/"));
 
+        String capabilities = null; //capabilities will be reported even when there are errors.
 		try{
 			// Belt and braces to ensure that no null pointers are thrown later.
 			if (DATA_SOURCE_MANAGER == null ||
@@ -342,7 +358,7 @@ public class MydasServlet extends HttpServlet {
 						// Source command for an specific DSN 
 						// Attempt to retrieve the DataSource
 						if (null!=DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get(dsnName)){
-							dasCommands.sourceCommand (request, response, queryString,dsnName);
+							dasCommands.sourceCommand (request, response, queryString, dsnName);
 							return;
 						}
 					}
@@ -356,6 +372,8 @@ public class MydasServlet extends HttpServlet {
 					DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get(dsnName);
 					// Check if the datasource exists.
 					if (dataSourceConfig != null){
+                        //Get datasource capabilities so they will be display in the headers
+                        capabilities = dataSourceConfig.getCapabilities();
 						// Check the datasource is alive.
 						if (dataSourceConfig.isOK()){
 							if      (Commands.COMMAND_DNA.matches(command)){
@@ -394,6 +412,7 @@ public class MydasServlet extends HttpServlet {
 						}
 					}
 					else {
+                        capabilities = null;
 						throw new BadDataSourceException("The requested datasource does not exist.");
 					}
 				}
@@ -402,51 +421,51 @@ public class MydasServlet extends HttpServlet {
 					&& DAS_ONLY_URI_PATTERN.matcher(request.getRequestURI()).find()){
 				// Just /das or /das/ has been given as the URL.  This server is configured to point
 				// this to the sources command, so do so.
-                dasCommands.sourceCommand(request, response, queryString,null);
-				//dasCommands.dsnCommand (request, response, queryString); //since 1.6 sources is the default command
+                dasCommands.sourceCommand(request, response, queryString, null);
+				//dasCommands.dsnCommand (request, response, queryString); //since 1.6.1 sources is the default command
 			}
 			else {
 				throw new BadCommandException("The command is not recognised.");
 			}
 		} catch (BadCommandException bce) {
 			logger.error("BadCommandException thrown", bce);
-			writeHeader(request, response, XDasStatus.STATUS_400_BAD_COMMAND, false,null);
+			writeHeader(request, response, XDasStatus.STATUS_400_BAD_COMMAND, false, capabilities);
 			reportError(XDasStatus.STATUS_400_BAD_COMMAND, "Bad Command - Command not recognised as a valid DAS command.", request, response);
 		} catch (BadDataSourceException bdse) {
 			logger.error("BadDataSourceException thrown", bdse);
-			writeHeader(request, response, XDasStatus.STATUS_401_BAD_DATA_SOURCE, false,null);
+			writeHeader(request, response, XDasStatus.STATUS_401_BAD_DATA_SOURCE, false, capabilities);
 			reportError(XDasStatus.STATUS_401_BAD_DATA_SOURCE, "Bad Data Source", request, response);
 		} catch (BadCommandArgumentsException bcae) {
 			logger.error("BadCommandArgumentsException thrown", bcae);
-			writeHeader(request, response, XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, false,null);
+			writeHeader(request, response, XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, false, capabilities);
 			reportError(XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS, "Bad Command Arguments - Command not recognised as a valid DAS command.", request, response);
 		} catch (BadReferenceObjectException broe) {
 			logger.error("BadReferenceObjectException thrown", broe);
-			writeHeader(request, response, XDasStatus.STATUS_403_BAD_REFERENCE_OBJECT, false,null);
+			writeHeader(request, response, XDasStatus.STATUS_403_BAD_REFERENCE_OBJECT, false, capabilities);
 			reportError(XDasStatus.STATUS_403_BAD_REFERENCE_OBJECT, "Unrecognised reference object: the requested segment is not available from this server.", request, response);
 		} catch (BadStylesheetException bse) {
 			logger.error("BadStylesheetException thrown:", bse);
-			writeHeader(request, response, XDasStatus.STATUS_404_BAD_STYLESHEET, false,null);
+			writeHeader(request, response, XDasStatus.STATUS_404_BAD_STYLESHEET, false, capabilities);
 			reportError(XDasStatus.STATUS_404_BAD_STYLESHEET, "Bad Stylesheet.", request, response);
 		} catch (CoordinateErrorException cee) {
 			logger.error("CoordinateErrorException thrown", cee);
-			writeHeader(request, response, XDasStatus.STATUS_405_COORDINATE_ERROR, false,null);
+			writeHeader(request, response, XDasStatus.STATUS_405_COORDINATE_ERROR, false, capabilities);
 			reportError(XDasStatus.STATUS_405_COORDINATE_ERROR, "Coordinate error - the requested coordinates are outside the scope of the requested segment.", request, response);
 		} catch (XmlPullParserException xppe) {
 			logger.error("XmlPullParserException thrown when attempting to ouput XML.", xppe);
-			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false, capabilities);
 			reportError(XDasStatus.STATUS_500_SERVER_ERROR, "An error has occurred when attempting to output the DAS XML.", request, response);
 		} catch (DataSourceException dse){
 			logger.error("DataSourceException thrown by a data source.", dse);
-			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false, capabilities);
 			reportError(XDasStatus.STATUS_500_SERVER_ERROR, "The data source has thrown a 'DataSourceException' indicating a software error has occurred: " + dse.getMessage(), request, response);
 		} catch (ConfigurationException ce) {
 			logger.error("ConfigurationException thrown: This mydas installation was not correctly initialised.", ce);
-			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false, capabilities);
 			reportError(XDasStatus.STATUS_500_SERVER_ERROR, "This installation of MyDas is not correctly configured.", request, response);
 		} catch (UnimplementedFeatureException efe) {
 			logger.error("UnimplementedFeatureException thrown", efe);
-			writeHeader(request, response, XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE, false,null);
+			writeHeader(request, response, XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE, false, capabilities);
 			reportError(XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE, "Unimplemented feature: this DAS server cannot serve the request you have made.", request, response);
 		}
 
@@ -484,24 +503,37 @@ public class MydasServlet extends HttpServlet {
 	 * no content should not set the compressed header.)
 	 * @throws IOException 
 	 */
-	void writeHeader (HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed,String capabilities) throws IOException{
+	void writeHeader (HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed, String capabilities) throws IOException{
 		response.setHeader(HEADER_KEY_X_DAS_VERSION, HEADER_VALUE_DAS_VERSION);
-		if (capabilities!=null)
+		if (capabilities != null) {
+            String cap = "";
+            
 			response.setHeader(HEADER_KEY_X_DAS_CAPABILITIES, capabilities);
+        } else {
+            response.setHeader(HEADER_KEY_X_DAS_CAPABILITIES, HEADER_VALUE_X_DAS_DEFAULT_CAPABILITIES);
+        }
 		response.setHeader(HEADER_KEY_X_DAS_STATUS, status.toString());
 		response.setHeader(HEADER_KEY_X_DAS_SERVER,HEADER_VALUE_DAS_SERVER);
 		if (compressionAllowed && compressResponse (request)){
 			response.setHeader(ENCODING_RESPONSE_HEADER_KEY, ENCODING_GZIPPED);
 		}
-		if (	status==XDasStatus.STATUS_400_BAD_COMMAND || 
-				status==XDasStatus.STATUS_401_BAD_DATA_SOURCE ||
-				status==XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS){
-					response.sendError(400);
+        //CORS headers since 1.6.1
+        response.setHeader(HEADER_KEY_CORS, HEADER_VALUE_CORS);
+        response.setHeader(HEADER_KEY_CORS_EXPOSE, HEADER_VALUE_CORS_EXPOSE);
+        response.setHeader(HEADER_KEY_CORS_METHODS, HEADER_VALUE_CORS_METHODS);
+        response.setHeader(HEADER_KEY_CORS_HEADERS, HEADER_VALUE_CORS_HEADERS);
+        response.setHeader(HEADER_KEY_CORS_AGE, HEADER_VALUE_CORS_AGE);
+
+        /*
+        if ( status==XDasStatus.STATUS_400_BAD_COMMAND ||
+			status==XDasStatus.STATUS_401_BAD_DATA_SOURCE ||
+			status==XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS){
+			response.sendError(400);
 		} else if (status==XDasStatus.STATUS_404_BAD_STYLESHEET){
 			response.sendError(404);
 		} else if (status==XDasStatus.STATUS_500_SERVER_ERROR || status==XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE){
 			response.sendError(500);
-		}
+		}*/
 	}
 
 
@@ -517,9 +549,6 @@ public class MydasServlet extends HttpServlet {
 		&& clientEncodingAbility != null
 		&& clientEncodingAbility.contains(ENCODING_GZIPPED);
 	}
-
-
-
 
 	GeneralCacheAdministrator getCacheManager() {
 		return CACHE_MANAGER;

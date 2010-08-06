@@ -149,7 +149,6 @@ public class DataSourceConfiguration {
      * @return the optional value for max_entry_points
      */
     public Integer getMaxEntryPoints() {
-        //return config.getVersion().get(this.versionPosition).getCoordinates().get(0).getUri();
         return config.getMaxEntryPoints();
     }
 
@@ -168,7 +167,7 @@ public class DataSourceConfiguration {
      */
     public Map<String, PropertyType> getDataSourceProperties() {
     	Map<String, PropertyType> props = new HashMap<String, PropertyType>();
-    	for (PropertyType pt:config.getVersion().get(0).getProperty())
+    	for (PropertyType pt:config.getVersion().get(this.versionPosition).getProperty())
     		props.put(pt.key, pt);
         return props;
     }
@@ -333,10 +332,23 @@ public class DataSourceConfiguration {
 		return config;
 	}
 
+    /**
+     * Returns the capabilities of the datasource.
+     * Capabilities are reported according to DAS 1.6 spec:
+     * error-segment/1.0; unknown-segment/1.0; unknown-feature/1.0; ...
+     * @return
+     */
 	public String getCapabilities() {
-		String capabilities="";
-		for (Capability cap:config.getVersion().get(this.versionPosition).getCapability())
-			capabilities += " "+cap.getType()+";";
-		return capabilities;
+		String capabilities = "";
+		for (Capability cap:config.getVersion().get(this.versionPosition).getCapability()) {
+            try{
+                String[] caps = cap.getType().split(":");  //das1:sources
+			    capabilities += " " + caps[1] + "/1.0;";
+            } catch (Exception e)  {
+                //Just do not include that capability
+            }
+
+        }
+		return capabilities.substring(0, capabilities.length()-1);
 	}
 }
