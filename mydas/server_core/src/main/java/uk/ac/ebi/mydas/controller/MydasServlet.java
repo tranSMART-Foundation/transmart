@@ -506,9 +506,7 @@ public class MydasServlet extends HttpServlet {
 	void writeHeader (HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed, String capabilities) throws IOException{
 		response.setHeader(HEADER_KEY_X_DAS_VERSION, HEADER_VALUE_DAS_VERSION);
 		if (capabilities != null) {
-            String cap = "";
-            
-			response.setHeader(HEADER_KEY_X_DAS_CAPABILITIES, capabilities);
+            response.setHeader(HEADER_KEY_X_DAS_CAPABILITIES, capabilities);
         } else {
             response.setHeader(HEADER_KEY_X_DAS_CAPABILITIES, HEADER_VALUE_X_DAS_DEFAULT_CAPABILITIES);
         }
@@ -524,16 +522,19 @@ public class MydasServlet extends HttpServlet {
         response.setHeader(HEADER_KEY_CORS_HEADERS, HEADER_VALUE_CORS_HEADERS);
         response.setHeader(HEADER_KEY_CORS_AGE, HEADER_VALUE_CORS_AGE);
 
-        /*
+
         if ( status==XDasStatus.STATUS_400_BAD_COMMAND ||
 			status==XDasStatus.STATUS_401_BAD_DATA_SOURCE ||
 			status==XDasStatus.STATUS_402_BAD_COMMAND_ARGUMENTS){
-			response.sendError(400);
+			//response.sendError(400);
+            response.setStatus(400);
 		} else if (status==XDasStatus.STATUS_404_BAD_STYLESHEET){
-			response.sendError(404);
+			//response.sendError(404);
+            response.setStatus(404);
 		} else if (status==XDasStatus.STATUS_500_SERVER_ERROR || status==XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE){
-			response.sendError(500);
-		}*/
+			//response.sendError(500);
+            response.setStatus(500);
+		}
 	}
 
 
