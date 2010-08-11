@@ -28,10 +28,10 @@
     
     <groupId>uk.ac.ebi.mydas</groupId>
     <artifactId>mydas_master</artifactId>
-    <version>1.6.0</version>
+    <version>1.6.1</version>
 
     <packaging>pom</packaging>
-    <name>mydas_example Maven Webapp</name>
+    <name>mydas_master Maven Webapp</name>
     <url>http://code.google.com/p/mydas/</url>
 
 	<licenses>

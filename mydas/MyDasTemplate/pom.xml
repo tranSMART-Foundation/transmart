@@ -5,7 +5,7 @@
     <groupId>uk.ac.ebi.mydas.template</groupId>
     <artifactId>MyDasTemplate</artifactId>
     <packaging>war</packaging>
-    <version>1.6.0</version>
+    <version>1.6.1</version>
     <name>MyDasTemplate Maven Webapp</name>
     <url>http://maven.apache.org</url>
 
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>uk.ac.ebi.mydas</groupId>
             <artifactId>mydas</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1</version>
         </dependency>
 
         <dependency>
