@@ -15,8 +15,8 @@ public class DasTypeE extends DasType {
 	public DasTypeE(DasType type) {
 		super(type.getId(), type.getCategory(), type.getCvId(),type.getLabel());
 	}
-	public void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,Integer count) throws IllegalArgumentException, IllegalStateException, IOException{
-		this.serialize( DAS_XML_NAMESPACE, serializer, count,true,false,false,false);
+	public void serialize(String DAS_XML_NAMESPACE, XmlSerializer serializer, Integer count, boolean featuresCommand) throws IllegalArgumentException, IllegalStateException, IOException{
+		this.serialize( DAS_XML_NAMESPACE, serializer, count, true, false, false, false, featuresCommand);
 	}	
 
 	/**
@@ -28,11 +28,12 @@ public class DasTypeE extends DasType {
 	 * @param hasReferenceFeatures indicates if this type has any reference
 	 * @param hasSubParts indicates if this type has any sub part
 	 * @param hasSuperParts indicates if this type has any super part
+     * @param featuresCommand indicates whether this method was called from features command or not
 	 * @throws IOException If the XML writer have an error
 	 * @throws IllegalStateException a method has been invoked at an illegal or inappropriate time.
 	 * @throws IllegalArgumentException indicate that a method has been passed an illegal or inappropriate argument.
 	 */
-	public void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer,Integer count,boolean categorize,boolean hasReferenceFeatures,boolean hasSubParts,boolean hasSuperParts) 
+	public void serialize(String DAS_XML_NAMESPACE, XmlSerializer serializer, Integer count, boolean categorize, boolean hasReferenceFeatures, boolean hasSubParts, boolean hasSuperParts, boolean featuresCommand)
 			throws IllegalArgumentException, IllegalStateException, IOException{
 
 		serializer.startTag(DAS_XML_NAMESPACE, "TYPE");
@@ -49,17 +50,24 @@ public class DasTypeE extends DasType {
 		if (categorize){
 			if (this.getCategory() != null && this.getCategory().length() > 0){
 				serializer.attribute(DAS_XML_NAMESPACE, "category", this.getCategory());
-			}else {
+			} else {
 				// To prevent the DAS server from dying, if no category has been set, but
 				// a category is required, spit out the type ID again as the category.
 				serializer.attribute(DAS_XML_NAMESPACE, "category", this.getId());
 			}
 		}
-		if (count != null){
-			serializer.text(Integer.toString(count));
-		}else  if (this.getLabel() != null && this.getLabel().length() > 0){
-			serializer.text(this.getLabel());
-		}
+
+        if (featuresCommand) {
+            //Tag content should be the label
+            if (this.getLabel() != null && this.getLabel().length() > 0){
+			    serializer.text(this.getLabel());
+            }
+        } else {
+            //Tag content should be the count
+            if (count != null){
+                serializer.text(Integer.toString(count));
+            }
+        }
 		serializer.endTag(DAS_XML_NAMESPACE, "TYPE");
 
 	}

@@ -556,7 +556,7 @@ public class DasCommandManager {
 			serializer.attribute(DAS_XML_NAMESPACE, "label", "Complete datasource summary");
 			// Iterate over the allTypeReport for the TYPE elements.
 			for (DasType type : allTypesReport.keySet()){
-				(new DasTypeE (type)).serialize(DAS_XML_NAMESPACE, serializer, allTypesReport.get(type));
+				(new DasTypeE (type)).serialize(DAS_XML_NAMESPACE, serializer, allTypesReport.get(type), false);
 			}
 			serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
 			serializer.endTag (DAS_XML_NAMESPACE, "GFF");
@@ -663,9 +663,10 @@ public class DasCommandManager {
                     serializer.attribute(DAS_XML_NAMESPACE, "id", featureReporter.getSegmentId());
                     serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(featureReporter.getStart()));
                     serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(featureReporter.getStop()));
-                    if (featureReporter.getType() != null && featureReporter.getType().length() > 0){
+                    //type attribute is deprecated, it should not be reported (the RelaxNG does not support it)
+                    /*if (featureReporter.getType() != null && featureReporter.getType().length() > 0){
                         serializer.attribute(DAS_XML_NAMESPACE, "type", featureReporter.getType());
-                    }
+                    } */
                     serializer.attribute(DAS_XML_NAMESPACE, "version", featureReporter.getVersion());
                     if (featureReporter.getSegmentLabel() != null && featureReporter.getSegmentLabel().length() > 0){
                         serializer.attribute(DAS_XML_NAMESPACE, "label", featureReporter.getSegmentLabel());
@@ -673,7 +674,7 @@ public class DasCommandManager {
                     // Now for the types.
                     Map<DasType, Integer> typeMap = typesReport.get(featureReporter);
                     for (DasType type : typeMap.keySet()){
-                        (new DasTypeE (type)).serialize(DAS_XML_NAMESPACE, serializer, typeMap.get(type));
+                        (new DasTypeE (type)).serialize(DAS_XML_NAMESPACE, serializer, typeMap.get(type), false);
                     }
                     serializer.endTag(DAS_XML_NAMESPACE, "SEGMENT");
                 }
