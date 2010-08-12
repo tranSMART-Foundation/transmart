@@ -159,7 +159,8 @@ public class MydasServlet extends HttpServlet {
 		COMMAND_SEQUENCE ("sequence"),
 		COMMAND_ALIGNMENT ("alignment"),
 		COMMAND_STRUCTURE ("structure"),
-		COMMAND_SOURCES ("sources");
+		COMMAND_SOURCES ("sources"),
+		COMMAND_HISTORICAL ("historical");
 
 		private String commandString;
 
@@ -280,13 +281,20 @@ public class MydasServlet extends HttpServlet {
 	}
 
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		dasCommands.writebackDelete(request,response);
+		DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get("writeback");
+		try {
+			dasCommands.writebackDelete(request,response,dataSourceConfig);
+		} catch (WritebackException e) {
+			logger.error("WritebackException thrown", e);
+			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+			reportError(XDasStatus.STATUS_500_SERVER_ERROR, "Writeback error deleting a feature.", request, response);
+		}
 	}
 
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get("writeback");
 		try {
-			dasCommands.writebackupdate(request,response,dataSourceConfig);
+			dasCommands.writebackUpdate(request,response,dataSourceConfig);
 		} catch (WritebackException e) {
 			logger.error("WritebackException thrown", e);
 			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
@@ -403,6 +411,9 @@ public class MydasServlet extends HttpServlet {
 							else if (Commands.COMMAND_LINK.matches(command)){
 								dasCommands.linkCommand (response, dataSourceConfig, queryString);
 							}
+							else if (Commands.COMMAND_HISTORICAL.matches(command)){
+								dasCommands.writebackHistorical (request,response, dataSourceConfig);
+							}
 							else {
 								dasCommands.otherCommand(request, response,dataSourceConfig,command,queryString);
 							}
@@ -467,6 +478,10 @@ public class MydasServlet extends HttpServlet {
 			logger.error("UnimplementedFeatureException thrown", efe);
 			writeHeader(request, response, XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE, false, capabilities);
 			reportError(XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE, "Unimplemented feature: this DAS server cannot serve the request you have made.", request, response);
+		} catch (WritebackException e) {
+			logger.error("WritebackException thrown", e);
+			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+			reportError(XDasStatus.STATUS_500_SERVER_ERROR, "Writeback error creating a feature.", request, response);
 		}
 
 	}

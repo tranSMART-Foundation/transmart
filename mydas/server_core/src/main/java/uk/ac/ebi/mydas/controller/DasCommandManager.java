@@ -1940,12 +1940,36 @@ public class DasCommandManager {
 
 			}
 	}
-	public void writebackDelete(HttpServletRequest request,
-			HttpServletResponse response) {
-		// TODO Auto-generated method stub
+	@SuppressWarnings("unchecked")
+	public void writebackDelete(HttpServletRequest request,HttpServletResponse response, DataSourceConfiguration dataSourceConfig) throws WritebackException {
+		Map parameters=request.getParameterMap();
+		Map<String,String> parameters2 =new HashMap<String,String>();
+		String featureid=null,segmentid=null;
+		for (Object key:parameters.keySet()){
+			if (((String)key).equals("featureid"))
+				featureid=((String[])parameters.get(key))[0];
+			else if (((String)key).equals("segmentid"))
+				segmentid=((String[])parameters.get(key))[0];
+			else
+				parameters2.put((String)key, ((String[])parameters.get(key))[0]);
+		}
+		try {
+			DasAnnotatedSegment segmentRes=((WritebackDataSource)dataSourceConfig.getDataSource()).delete(segmentid,featureid,parameters2);
+			serialize(request,response,dataSourceConfig,segmentRes);
+		} catch (DataSourceException e) {
+			throw new WritebackException("ERROR deleting the feature",e);
+		} catch (IllegalArgumentException e) {
+			throw new WritebackException("ERROR creating the XML response for the deletion",e);
+		} catch (IllegalStateException e) {
+			throw new WritebackException("ERROR creating the XML response for the deletion",e);
+		} catch (XmlPullParserException e) {
+			throw new WritebackException("ERROR creating the XML response for the deletion",e);
+		} catch (IOException e) {
+			throw new WritebackException("ERROR creating the XML response for the deletion",e);
+		}
 
 	}
-	public void writebackupdate(HttpServletRequest request,	HttpServletResponse response, DataSourceConfiguration dataSourceConfig) throws WritebackException {
+	public void writebackUpdate(HttpServletRequest request,	HttpServletResponse response, DataSourceConfiguration dataSourceConfig) throws WritebackException {
 
 		MyDasParser parser= new MyDasParser(PULL_PARSER_FACTORY);
 		BufferedReader reader;
@@ -1965,15 +1989,33 @@ public class DasCommandManager {
 		} catch (DataSourceException e) {
 			throw new WritebackException("ERROR updating the feature",e);
 		} catch (IllegalArgumentException e) {
-			throw new WritebackException("ERROR updating the XML response",e);
+			throw new WritebackException("ERROR creating the XML response for the update",e);
 		} catch (IllegalStateException e) {
-			throw new WritebackException("ERROR updating the XML response",e);
+			throw new WritebackException("ERROR updating the XML response for the update",e);
 		} catch (XmlPullParserException e) {
-			throw new WritebackException("ERROR updating the XML response",e);
+			throw new WritebackException("ERROR updating the XML response for the update",e);
 		} catch (IOException e) {
-			throw new WritebackException("ERROR updating the XML response",e);
+			throw new WritebackException("ERROR updating the XML response for the update",e);
 		}
 
+	}
+	public void writebackHistorical(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dataSourceConfig) throws WritebackException {
+		String featureId=request.getParameter("feature");
+		try {
+			DasAnnotatedSegment segmentRes=((WritebackDataSource)dataSourceConfig.getDataSource()).history(featureId);
+			serialize(request,response,dataSourceConfig,segmentRes);
+		} catch (DataSourceException e) {
+			throw new WritebackException("ERROR updating the feature",e);
+		} catch (IllegalArgumentException e) {
+			throw new WritebackException("ERROR creating the XML response for the update",e);
+		} catch (IllegalStateException e) {
+			throw new WritebackException("ERROR updating the XML response for the update",e);
+		} catch (XmlPullParserException e) {
+			throw new WritebackException("ERROR updating the XML response for the update",e);
+		} catch (IOException e) {
+			throw new WritebackException("ERROR updating the XML response for the update",e);
+		}
+		
 	}
 
 

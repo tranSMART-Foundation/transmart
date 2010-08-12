@@ -540,6 +540,64 @@ public class WebIntegrationTest extends WebTestCase {
 		assertLocalContains(resp,"</DASGFF>");
 
 	}
+	
+	public void testWritebackDelete() throws Exception {
+		String segmentId="TheSegment";
+		String featureId="TheFeature";
+		String user="TheUser";
+
+	    List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+	    parameters.add(new NameValuePair("segmentid",segmentId));
+	    parameters.add(new NameValuePair("featureid",featureId));
+	    parameters.add(new NameValuePair("user",user));
+		WebRequestSettings webRequestSettings = new WebRequestSettings(new URL(this.baseURL+"/writeback"));
+		webRequestSettings.setHttpMethod(HttpMethod.DELETE);
+	    webRequestSettings.setRequestParameters(parameters);
+		WebClient webClient = new WebClient();
+		webClient.setThrowExceptionOnFailingStatusCode(false);
+		Page page = webClient.getPage(webRequestSettings);
+
+		assertEquals(HttpServletResponse.SC_OK, page.getWebResponse().getStatusCode());
+		String resp=page.getWebResponse().getContentAsString();
+		assertLocalContains(resp,"<DASGFF>");
+		assertLocalContains(resp,"<GFF");
+		assertLocalContains(resp,"<SEGMENT id=\""+segmentId+"\"");
+		assertLocalContains(resp,"<FEATURE id=\""+featureId+"\"");
+		assertLocalContains(resp,"<NOTE>USER="+user+"</NOTE>");
+		assertLocalContains(resp,"</FEATURE>");
+		assertLocalContains(resp,"</SEGMENT>");
+		assertLocalContains(resp,"</GFF>");
+		assertLocalContains(resp,"</DASGFF>");
+
+	}
+	public void testWritebackHistory() throws Exception {
+		String featureId="TheFeature";
+
+	    List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+	    parameters.add(new NameValuePair("feature",featureId));
+		WebRequestSettings webRequestSettings = new WebRequestSettings(new URL(this.baseURL+"/writeback/historical"));
+		webRequestSettings.setHttpMethod(HttpMethod.GET);
+	    webRequestSettings.setRequestParameters(parameters);
+		WebClient webClient = new WebClient();
+		webClient.setThrowExceptionOnFailingStatusCode(false);
+		Page page = webClient.getPage(webRequestSettings);
+
+		assertEquals(HttpServletResponse.SC_OK, page.getWebResponse().getStatusCode());
+		String resp=page.getWebResponse().getContentAsString();
+		assertLocalContains(resp,"<DASGFF>");
+		assertLocalContains(resp,"<GFF");
+		assertLocalContains(resp,"<SEGMENT id=\"one\"");
+		assertLocalContains(resp,"<FEATURE id=\""+featureId+"\"");
+		assertLocalContains(resp,"<NOTE>USER=TheUser</NOTE>");
+		assertLocalContains(resp,"<NOTE>VERSION=1</NOTE>");
+		assertLocalContains(resp,"<NOTE>VERSION=2</NOTE>");
+		assertLocalContains(resp,"</FEATURE>");
+		assertLocalContains(resp,"</SEGMENT>");
+		assertLocalContains(resp,"</GFF>");
+		assertLocalContains(resp,"</DASGFF>");
+
+	}
+	
 	private void assertLocalContains(String text,String subtext){
 		assertTrue("The text ["+subtext+"] was not found in ["+text+"]",text.contains(subtext));
 	}
