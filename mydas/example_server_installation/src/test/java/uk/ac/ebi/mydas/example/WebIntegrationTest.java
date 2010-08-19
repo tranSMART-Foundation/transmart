@@ -62,7 +62,8 @@ public class WebIntegrationTest extends WebTestCase {
 	protected void setUp() throws Exception {
 		// Port 0 means "assign arbitrarily port number"
 		server = new Server(0);
-		server.addHandler(new WebAppContext("./src/main/webapp", "/"));
+        //server.addHandler(new WebAppContext("./example_server_installation/src/main/webapp", "/"));
+        server.addHandler(new WebAppContext("./src/main/webapp", "/"));
 		server.start();
 
 		// getLocalPort returns the port that was actually assigned
@@ -163,8 +164,8 @@ public class WebIntegrationTest extends WebTestCase {
 		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">1</TYPE>");
 		assertTextPresent("<TYPE id=\"oneFeatureTypeIdTwo\" cvId=\"CV:00002\" category=\"oneFeatureCategoryTwo\">1</TYPE>");
 		assertTextPresent("<TYPE id=\"twoFeatureTypeIdOne\" cvId=\"CV:00003\" category=\"twoFeatureCategoryOne\">0</TYPE>");
-		assertTextPresent("<TYPE id=\"Chromosome\" category=\"Chromosome\">0</TYPE>");
-		assertTextPresent("<TYPE id=\"Contig\" category=\"Contig\">0</TYPE>");
+		assertTextPresent("<TYPE id=\"Chromosome\">0</TYPE>");
+		assertTextPresent("<TYPE id=\"Contig\">0</TYPE>");
 		assertTextPresent("</SEGMENT>");
 		assertTextPresent("</DASTYPES>");
 	}
@@ -176,8 +177,8 @@ public class WebIntegrationTest extends WebTestCase {
 		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">1</TYPE>");
 		assertTextPresent("<TYPE id=\"oneFeatureTypeIdTwo\" cvId=\"CV:00002\" category=\"oneFeatureCategoryTwo\">1</TYPE>");
 		assertTextPresent("<TYPE id=\"twoFeatureTypeIdOne\" cvId=\"CV:00003\" category=\"twoFeatureCategoryOne\">1</TYPE>");
-		assertTextPresent("<TYPE id=\"Chromosome\" category=\"Chromosome\">1</TYPE>");
-		assertTextPresent("<TYPE id=\"Contig\" category=\"Contig\">3</TYPE>");
+		assertTextPresent("<TYPE id=\"Chromosome\">1</TYPE>");
+		assertTextPresent("<TYPE id=\"Contig\">3</TYPE>");
 		assertTextPresent("</SEGMENT>");
 		assertTextPresent("</DASTYPES>");
 	}
