@@ -68,11 +68,35 @@
                 <th>Description</th>
                 <th>Reference</th>
                 <th>Capabilities</th>
-                <th>Coordinate System</th>
-                <th>Source</th>
-                <th>Authority</th>
-                <th>Taxon ID</th>
-                <th>Test Range</th>
+                <th class="unsortable">
+                    <!--Coordinate System <br/>
+                    <ul id="navlist">
+                        <li>URI</li>
+                        <li>Source</li>
+                        <li>Authority</li>
+                        <li>Test</li>
+                    </ul-->
+                    <!--table border="1" width="100%">
+                        <tr>
+                            <td colspan="5" align="center">Coordinate System</td>
+                        </tr>
+                        <tr>
+                            <td width="40%">URI</td>
+                            <td width="20%">Source</td>
+                            <td width="20%">Authority</td>
+                            <td width="10%">Test</td>
+                        </tr>
+                    </table-->
+                    Coordinate System <br/>
+                    <div id="container" style="border: 1px solid black;">
+                        <div id="row">
+                            <div class="oddColumn" style="width: 40%">URI</div>
+                            <div class="evenColumn" style="width: 20%">Source</div>
+                            <div class="oddColumn" style="width: 20%">Authority</div>
+                            <div class="evenColumn" style="width: 20%">Test</div>
+                        </div>
+                    </div>                    
+                </th>
                 <th>Contact</th>
             </tr>
             <!-- Row template -->
@@ -96,11 +120,17 @@
                         das1:features
                     </a>
                 </td>
-                <td class="coordinate">http://www.dasregistry.org/dasregistry/coordsys/CS_DS6</td> <!--coordinate system-->
-                <td class="coordinate-source">Protein sequence</td> <!--coordinate-source-->
-                <td class="authority">UniProt</td> <!--authority-->
-                <td class="taxon-id">12345</td> <!--taxon-->
-                <td class="test-range">12345</td> <!--taxon-->
+                <td class="coordinate">
+                    <table border="1">
+                        <tr>
+                            <td width="40%">http://www.dasregistry.org/dasregistry/coordsys/CS_DS6</td>
+                            <td width="20%">Protein sequence</td>
+                            <td width="20%">UniProt</td>
+                            <td width="10%">12345</td>
+                            <td width="10%">12345</td>
+                        </tr>
+                    </table>
+                </td> <!--coordinate system-->
                 <td class="maintainer">mail@mail.com</td> <!--maintainer-->
             </tr>
         </table>

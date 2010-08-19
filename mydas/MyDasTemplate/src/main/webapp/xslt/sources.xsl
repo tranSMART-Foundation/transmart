@@ -113,12 +113,12 @@
                     <xsl:apply-templates select="@*" mode="stylefree-layout"/>
                     <xsl:choose>
                         <xsl:when test="contains(@type,'sequence')">
-                            <a href="{@query_uri}?segment={$source/VERSION/COORDINATES/@test_range}">
+                            <a href="{@query_uri}?segment=">
                                 <xsl:value-of select="@type"/>
                             </a>
                         </xsl:when>
                         <xsl:when test="contains(@type,'features')">
-                            <a href="{@query_uri}?segment={$source/VERSION/COORDINATES/@test_range}">
+                            <a href="{@query_uri}?segment=">
                                 <xsl:value-of select="@type"/>
                             </a>
                         </xsl:when>
@@ -138,50 +138,34 @@
             </xsl:copy>
         </xsl:template>
 
-        <!-- coordinate (can be more than one but that is not covered here)-->
+        <!-- coordinate (can be more than one)-->
         <xsl:template match="node()[@class='coordinate']" mode="stylefree-layout">
             <xsl:param name="source"/>
             <xsl:copy>
-                <xsl:apply-templates select="@*" mode="stylefree-layout"/>
-                <a href="{$source/VERSION/COORDINATES/@uri}">
-                    <xsl:value-of select="$source/VERSION/COORDINATES/@uri"/>
-                </a>
-            </xsl:copy>
-        </xsl:template>
-
-        <!-- coordinate-source -->
-        <xsl:template match="node()[@class='coordinate-source']" mode="stylefree-layout">
-            <xsl:param name="source"/>
-            <xsl:copy>
-                <xsl:apply-templates select="@*" mode="stylefree-layout"/>
-                <xsl:value-of select="$source/VERSION/COORDINATES/@source"/>
-            </xsl:copy>
-        </xsl:template>
-
-        <!-- authority -->
-        <xsl:template match="node()[@class='authority']" mode="stylefree-layout">
-            <xsl:param name="source"/>
-            <xsl:copy>
-                <xsl:apply-templates select="@*" mode="stylefree-layout"/>
-                <xsl:value-of select="$source/VERSION/COORDINATES/@authority"/>
-            </xsl:copy>
-        </xsl:template>
-
-        <!-- taxon-id -->
-        <xsl:template match="node()[@class='taxon-id']" mode="stylefree-layout">
-            <xsl:param name="source"/>
-            <xsl:copy>
-                <xsl:apply-templates select="@*" mode="stylefree-layout"/>
-                <xsl:value-of select="$source/VERSION/COORDINATES/@taxid"/>
-            </xsl:copy>
-        </xsl:template>
-
-        <!-- test-range -->
-        <xsl:template match="node()[@class='test-range']" mode="stylefree-layout">
-            <xsl:param name="source"/>
-            <xsl:copy>
-                <xsl:apply-templates select="@*" mode="stylefree-layout"/>
-                <xsl:value-of select="$source/VERSION/COORDINATES/@test_range"/>
+                <xsl:for-each select="$source/VERSION/COORDINATES">
+                    <!--table border="1" class="notSorting">
+                        <tr>
+                            <td width="40%"><a href="{@uri}"><xsl:value-of select="@uri"/></a></td>
+                            <td width="20%"><xsl:value-of select="@source"/></td>
+                            <td width="20%"><xsl:value-of select="@authority"/></td>
+                            <td width="10%"><xsl:value-of select="@test_range"/></td>
+                        </tr>
+                    </table-->
+                    <!--ul id="navlist">
+                        <li><a href="{@uri}"><xsl:value-of select="@uri"/></a></li>
+                        <li><xsl:value-of select="@source"/></li>
+                        <li><xsl:value-of select="@authority"/></li>
+                        <li><xsl:value-of select="@test_range"/></li>
+                    </ul-->
+                    <div id="container">
+                        <div id="row">
+                            <div class="oddColumn" style="width: 40%"><a href="{@uri}"><xsl:value-of select="@uri"/></a></div>
+                            <div class="evenColumn" style="width: 20%"><xsl:value-of select="@source"/></div>
+                            <div class="oddColumn" style="width: 20%"><xsl:value-of select="@authority"/></div>
+                            <div class="evenColumn" style="width: 20%"><xsl:value-of select="@test_range"/></div>
+                        </div>
+                    </div>
+                </xsl:for-each>
             </xsl:copy>
         </xsl:template>
 

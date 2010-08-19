@@ -58,8 +58,8 @@
             to present the sources command response in a human-readable format.
             Optional - the processing instruction will only be included if this
             element is present.
-            Note: The XSL provided only works properly when there is only one
-            coordinate system per version of the data source.
+            Note: The XSL provided can display more than one coordinate system however
+            it does not look "nice" yet. 
             It takes test-ranges as default values for sequence and features commands and
             1-100 as default rows for entry_points command.
             README: Please change images, styles and scripts paths in dsn.html and sortable.js -->

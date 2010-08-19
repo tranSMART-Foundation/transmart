@@ -162,3 +162,36 @@ div.warning {
 .start, .end, .score, .sequence-length, .segment-version, .count    {
     text-align: right;
 }
+
+/* Horizontal list, taken http://css.maxdesign.com.au/listamatic/horizontal01.htm */
+#navlist li {
+    display: inline;
+    list-style-type: none;
+    padding-right: 10px;
+    width: 100%;
+}
+
+/* div as a table, taken from http://snook.ca/archives/html_and_css/getting_your_di */
+#container {
+    width: 100%;
+    margin: auto;
+    padding:0;
+    display: table;
+    border: 0px solid black;
+}
+
+#row  {
+    display: table-row;
+}
+
+div.oddColumn {
+    padding:1em;
+    display: table-cell;
+    background: none;
+}
+
+div.evenColumn {
+    padding:1em;
+    display: table-cell;
+    background: #e6e6fa;
+}
