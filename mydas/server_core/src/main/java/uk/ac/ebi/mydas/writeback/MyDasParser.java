@@ -26,6 +26,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 public class MyDasParser {
 	private XmlPullParserFactory XPP_FACTORY = null;
+	private String href=null;
 
 	public static final String ELEMENT_DASGFF		="DASGFF";
 	public static final String ELEMENT_GFF			="GFF";
@@ -103,7 +104,12 @@ public class MyDasParser {
 	}
 
 	private DasAnnotatedSegment parseGFF(XmlPullParser xpp) throws WritebackException {
-		DasAnnotatedSegment segment=null;		
+		DasAnnotatedSegment segment=null;
+		for (int i=0;i<xpp.getAttributeCount();i++){
+			final String attName = xpp.getAttributeName(i);
+			if (attName.equals(ATT_href))
+				href=xpp.getAttributeValue(i);
+		}
 		try {
 			while (! (xpp.next() == XmlPullParser.END_TAG && ELEMENT_GFF.equals(xpp.getName()))) {
 				if (xpp.getEventType() == XmlPullParser.START_TAG) {
@@ -168,7 +174,9 @@ public class MyDasParser {
 		String id=null,label=null;
 		DasType type=null;
 		DasMethod method=null;
-		List<String> notes= new ArrayList<String>();;
+		List<String> notes= new ArrayList<String>();
+		if (href!=null)
+			notes.add("HREF="+href);
 		Integer start=null, end=null;
 		Double score=null;
 		DasFeatureOrientation orientation=null;
