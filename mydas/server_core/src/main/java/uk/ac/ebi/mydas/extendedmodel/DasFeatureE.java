@@ -54,7 +54,7 @@ public class DasFeatureE extends DasFeature {
 	 * @param DAS_XML_NAMESPACE XML namespace to link with the elements to create
 	 * @param serializer Object where the XML is been written 
 	 * @param filter Set of the query specifications to accept/reject a feature that belongs to the segment 
-	 * @param categorize indicates if the categories will be included in the type of the feature
+	 * @param categorize (deprecated, it has no effect since 1.6.1) indicates if the categories will be included in the type of the feature
 	 * @param isUseFeatureIdForFeatureLabel indicates if a feature should use the Id as a label in case that a label is null
 	 * @throws IOException If the XML writer have an error
 	 * @throws IllegalStateException a method has been invoked at an illegal or inappropriate time.
@@ -75,7 +75,7 @@ public class DasFeatureE extends DasFeature {
             }
 
             // TYPE element
-        	(new DasTypeE (this.getType())).serialize(DAS_XML_NAMESPACE, serializer, null, categorize, hasReferences, hasSubParts, hasSuperParts, true);
+        	(new DasTypeE (this.getType())).serialize(DAS_XML_NAMESPACE, serializer, null, hasReferences, hasSubParts, hasSuperParts, true);
 
             // METHOD element
         	(new DasMethodE(this.getMethod())).serialize(DAS_XML_NAMESPACE, serializer);
