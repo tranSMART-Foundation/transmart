@@ -321,7 +321,9 @@ public class MydasServlet extends HttpServlet {
 		String queryString = request.getQueryString();
 		if (queryString != null){
 			// Get rid of any multiple slashes in the request.
-			queryString = queryString.replaceAll("/{2,}", "/");
+			// The feature_id can be a URL and require the double slashes  
+			if (!queryString.contains("feature_id"))
+				queryString = queryString.replaceAll("/{2,}", "/");
 		}
 
 		if (logger.isDebugEnabled()){
