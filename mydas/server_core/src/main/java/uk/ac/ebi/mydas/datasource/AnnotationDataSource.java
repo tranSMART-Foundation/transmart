@@ -277,15 +277,20 @@ public interface AnnotationDataSource {
      * Annotation/Reference servers should always return entry points in the same order,
      * starting on position 1 (rather than 0). Annotation/Reference servers are responsible to
      * take care of start and stop positions, thus they should only return the collection corresponding to
-     * those positions (including both limits). If start is greater that the collection size,
-     * an empty collection should be returned, if the stop is greater than the collection size,
-     * the returned collection will include only those existing entry points from the specified start position.
-     * when the initial request does not specify any positions, DasCommandManager will send
-     * (1, getTotalEntryPoints) as parameters.
+     * those positions (including both limits).
+     *
      * For some servers it is important to limit the number of
      * entry points actually retrieved; in this case it is recommended to the server to declare the
-     * max_entry_points attribute in MydasServerConfig.xml. This max_entry_point should be
-     * considered when implementing this method; however, MyDas will double check that.
+     * max_entry_points attribute in MydasServerConfig.xml.
+     *
+     * If start is greater that the collection size, the DasCommandManager will report an Exception,
+     * if the number of requested entry points is greater than max_entry_points attribute, DasCommandManager
+     * will modify the stop in order to complain to that restriction. When the initial request does not
+     * specify any positions, DasCommandManager will send (1, max_entry_points attribute) as parameters.
+     *
+     * If the stop is greater than the collection size,
+     * the returned collection must include only those existing entry points from the specified start position.
+     * 
      * @param start Initial row position on the entry points collection for this server
      * @param stop Final row position ont the entry points collection for this server
      * @return a Collection of DasEntryPoint objects

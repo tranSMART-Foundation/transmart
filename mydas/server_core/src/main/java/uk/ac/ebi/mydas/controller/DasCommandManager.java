@@ -1426,6 +1426,7 @@ public class DasCommandManager {
             //the server responds with an X-DAS-Status of 402: BadCommandArgumentsException
             start = start == null ? 1 : start;
             stop = stop == null ? refDsn.getTotalEntryPoints() : stop;
+            stop = dsnConfig.getMaxEntryPoints() != null ? Math.min(stop, start + dsnConfig.getMaxEntryPoints() - 1) : stop;
             expectedSize = stop - start + 1;
             if ( start > refDsn.getTotalEntryPoints() ) {
                 throw new BadCommandArgumentsException("Unexpected arguments (both start ans stop out of bounds) have been passed to the entry_points command.");
