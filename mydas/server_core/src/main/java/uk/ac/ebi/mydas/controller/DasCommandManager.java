@@ -661,12 +661,14 @@ public class DasCommandManager {
                     FoundFeaturesReporter featureReporter = (FoundFeaturesReporter) segmentReporter;
                     serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
                     serializer.attribute(DAS_XML_NAMESPACE, "id", featureReporter.getSegmentId());
-                    serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(featureReporter.getStart()));
-                    serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(featureReporter.getStop()));
-                    //type attribute is deprecated, it should not be reported (the RelaxNG does not support it)
-                    /*if (featureReporter.getType() != null && featureReporter.getType().length() > 0){
+                    //start and stop are an optional group
+                    if ((featureReporter.getStart() != null) && (featureReporter.getStop() != null)) {
+                        serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(featureReporter.getStart()));
+                        serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(featureReporter.getStop()));
+                    } 
+                    if (featureReporter.getType() != null && featureReporter.getType().length() > 0){
                         serializer.attribute(DAS_XML_NAMESPACE, "type", featureReporter.getType());
-                    } */
+                    }
                     serializer.attribute(DAS_XML_NAMESPACE, "version", featureReporter.getVersion());
                     if (featureReporter.getSegmentLabel() != null && featureReporter.getSegmentLabel().length() > 0){
                         serializer.attribute(DAS_XML_NAMESPACE, "label", featureReporter.getSegmentLabel());

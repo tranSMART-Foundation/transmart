@@ -81,7 +81,8 @@ public class DasFeatureE extends DasFeature {
         	(new DasMethodE(this.getMethod())).serialize(DAS_XML_NAMESPACE, serializer);
 
         	//DAS1.6 START and END are optional for the cases of non positional features
-        	if ((this.getStartCoordinate()!=0) || (this.getStopCoordinate()!=0)){
+            //start and stop are an optional group
+        	if ((this.getStartCoordinate() != 0) && (this.getStopCoordinate() != 0)){
 	            // START element
 	            serializer.startTag(DAS_XML_NAMESPACE, "START");
 	            serializer.text(Integer.toString(this.getStartCoordinate()));

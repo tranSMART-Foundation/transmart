@@ -45,10 +45,9 @@ public class DasEntryPointE extends DasEntryPoint {
     public void serialize(String DAS_XML_NAMESPACE,XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
         serializer.startTag(DAS_XML_NAMESPACE, "SEGMENT");
         serializer.attribute(DAS_XML_NAMESPACE, "id", this.getSegmentId());
-        if (this.getStartCoordinate() != null) {
+        //start and stop are an optional group
+        if ( (this.getStartCoordinate() != null) && (this.getStopCoordinate() != null) ) {
             serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(this.getStartCoordinate()));
-        }
-        if (this.getStopCoordinate() != null) {
             serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(this.getStopCoordinate()));
         }
         if (this.getVersion() != null && this.getVersion().length() > 0){
