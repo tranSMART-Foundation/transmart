@@ -1874,6 +1874,7 @@ public class DasCommandManager {
 				DasAnnotatedSegment segment=parser.parse2MyDasModel(request.getParameter("_content"));
 				try {
 					DasAnnotatedSegment segmentRes=((WritebackDataSource)dataSourceConfig.getDataSource()).create(segment);
+					writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dataSourceConfig.getCapabilities());
 					serialize(request,response,dataSourceConfig,segmentRes);
 				} catch (DataSourceException e) {
 					throw new WritebackException("ERROR creating the feature",e);
@@ -1958,6 +1959,7 @@ public class DasCommandManager {
 		}
 		try {
 			DasAnnotatedSegment segmentRes=((WritebackDataSource)dataSourceConfig.getDataSource()).delete(segmentid,featureid,parameters2);
+			writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dataSourceConfig.getCapabilities());
 			serialize(request,response,dataSourceConfig,segmentRes);
 		} catch (DataSourceException e) {
 			throw new WritebackException("ERROR deleting the feature",e);
@@ -1988,6 +1990,7 @@ public class DasCommandManager {
 		DasAnnotatedSegment segment=parser.parse2MyDasModel(content);
 		try {
 			DasAnnotatedSegment segmentRes=((WritebackDataSource)dataSourceConfig.getDataSource()).update(segment);
+			writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dataSourceConfig.getCapabilities());
 			serialize(request,response,dataSourceConfig,segmentRes);
 		} catch (DataSourceException e) {
 			throw new WritebackException("ERROR updating the feature",e);
@@ -2006,6 +2009,7 @@ public class DasCommandManager {
 		String featureId=request.getParameter("feature");
 		try {
 			DasAnnotatedSegment segmentRes=((WritebackDataSource)dataSourceConfig.getDataSource()).history(featureId);
+			writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dataSourceConfig.getCapabilities());
 			serialize(request,response,dataSourceConfig,segmentRes);
 		} catch (DataSourceException e) {
 			throw new WritebackException("ERROR updating the feature",e);
