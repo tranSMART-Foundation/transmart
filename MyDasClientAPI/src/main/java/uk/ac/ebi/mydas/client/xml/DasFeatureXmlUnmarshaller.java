@@ -15,10 +15,12 @@ import uk.ac.ebi.mydas.model.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
-
  * <p/>
  * Unmarshaller for DAS 1.53 Feature XML.
  * Unmarshalls the XML into the MyDas feature class structure.
@@ -48,9 +50,10 @@ import java.util.*;
  * </SEGMENT>
  * </GFF>
  * </DASGFF>
+ *
  * @author Phil Jones
- * Date: 19-May-2008
- * Time: 15:51:42
+ *         Date: 19-May-2008
+ *         Time: 15:51:42
  */
 public class DasFeatureXmlUnmarshaller extends AbstractXmlUnmarshaller {
     /**
@@ -186,7 +189,7 @@ public class DasFeatureXmlUnmarshaller extends AbstractXmlUnmarshaller {
 
     private QueryAwareDasAnnotatedSegment processSegment(XmlPullParser xpp) throws XmlPullParserException, IOException, DataSourceException {
         String segmentId = failIfEmptyTrimmedString(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_ID), xpp.getLineNumber(), "/DASGFF/GFF/SEGMENT/@id");
-        Integer startCoordinate = parseStringToInt(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_START), true, null, xpp.getLineNumber(), "/DASGFF/GFF/SEGMENT/@start");
+        Integer startCoordinate = parseStringToInt(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_START), false, null, xpp.getLineNumber(), "/DASGFF/GFF/SEGMENT/@start");
         Integer stopCoordinate = parseStringToInt(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_STOP), false, null, xpp.getLineNumber(), "/DASGFF/GFF/SEGMENT/@stop");
         String version = failIfEmptyTrimmedString(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_VERSION), xpp.getLineNumber(), "/DASGFF/GFF/SEGMENT/@version");
         String segmentLabel = trimmedStringOrNull(xpp.getAttributeValue(NAMESPACE, ATTRIBUTE_LABEL));
@@ -298,7 +301,7 @@ public class DasFeatureXmlUnmarshaller extends AbstractXmlUnmarshaller {
                     }
                 } else if (ELEMENT_NOTE.equals(elemName)) {
                     final String noteText = getElementText(xpp, ELEMENT_NOTE);
-                    if (noteText != null){
+                    if (noteText != null) {
                         notes.add(noteText);
                     }
                 } else if (ELEMENT_LINK.equals(elemName)) {
@@ -355,5 +358,5 @@ public class DasFeatureXmlUnmarshaller extends AbstractXmlUnmarshaller {
         int start = parseStringToInt(startString, true, 0, xpp.getLineNumber(), "../TARGET/@start");
         int stop = parseStringToInt(stopString, true, 0, xpp.getLineNumber(), "../TARGET/@stop");
         targets.add(new DasTarget(id, start, stop, targetName));
-	}
+    }
 }
