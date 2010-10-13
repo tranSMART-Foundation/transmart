@@ -55,7 +55,7 @@ public class ServerConfiguration {
     }
 
     public Map<String, DataSourceConfiguration> getDataSourceConfigMap() {
-        return (dataSourceConfigMap == null) ? Collections.EMPTY_MAP : dataSourceConfigMap;
+        return (dataSourceConfigMap == null) ? Collections.<String, DataSourceConfiguration>emptyMap() : dataSourceConfigMap;
     }
 
     /**
