@@ -32,6 +32,7 @@ import uk.ac.ebi.mydas.client.QueryAwareDasAnnotatedSegment;
 import uk.ac.ebi.mydas.client.RegexPatterns;
 import uk.ac.ebi.mydas.client.xml.DasFeatureXmlUnmarshaller;
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
+import uk.ac.ebi.mydas.configuration.PropertyType;
 import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
@@ -89,7 +90,7 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
 
     CacheManager cacheManager = null;
     ServletContext svCon;
-    Map<String, String> globalParameters;
+    Map<String, PropertyType> globalParameters;
     DataSourceConfiguration config;
 
     // Create an instance of HttpClient.
@@ -146,7 +147,7 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
      *          a DataSourceException if it fails, e.g. to attempt to get a Connection to a database
      *          and read a record.</bold>
      */
-    public void init(ServletContext servletContext, Map<String, String> globalParameters, DataSourceConfiguration dataSourceConfig) throws DataSourceException {
+    public void init(ServletContext servletContext, Map<String, PropertyType> globalParameters, DataSourceConfiguration dataSourceConfig) throws DataSourceException {
         this.svCon = servletContext;
         this.globalParameters = globalParameters;
         this.config = dataSourceConfig;
@@ -154,13 +155,13 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
         // Configure a proxy server, if set in the global parameters.
         // Modify system properties
         Properties sysProperties = System.getProperties();
-        Map<String, String> dataSourceProps = dataSourceConfig.getDataSourceProperties();
+        Map<String, PropertyType> dataSourceProps = dataSourceConfig.getDataSourceProperties();
         // TODO Check that these proxy settings are used correctly by HttpClient.
         // Check if a proxy is required.
-        if (dataSourceProps.containsKey(HTTP_PROXY_SET) && "true".equalsIgnoreCase(dataSourceProps.get(HTTP_PROXY_SET))) {
+        if (dataSourceProps.containsKey(HTTP_PROXY_SET) && "true".equalsIgnoreCase((dataSourceProps.get(HTTP_PROXY_SET)).getValue())) {
             sysProperties.put(HTTP_PROXY_SET, "true");
             // Check that the host is provided, otherwise throw an exception.
-            if (!(dataSourceProps.containsKey(HTTP_PROXY_HOST) && (dataSourceProps.get(HTTP_PROXY_HOST)).length() > 0)) {
+            if (!(dataSourceProps.containsKey(HTTP_PROXY_HOST) && ((dataSourceProps.get(HTTP_PROXY_HOST))).getValue().length() > 0)) {
                 throw new DataSourceException("MydasServerConfig.xml error: The 'http.proxySet' property has been set to 'true', but no 'http.proxyHost' value has been provided.");
             }
             sysProperties.put(HTTP_PROXY_HOST, dataSourceProps.get(HTTP_PROXY_HOST));
@@ -174,11 +175,14 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
 
         // Configure the HTTP request timeout (optional - defaults to 4 seconds).
         if (dataSourceProps.containsKey(HTTP_TIMEOUT)) {
-            String timeoutString = dataSourceProps.get(HTTP_TIMEOUT);
-            if (RegexPatterns.INTEGER_PATTERN.matcher(timeoutString).matches()) {
-                connectionTimeout = Integer.parseInt(timeoutString);
-            } else {
-                throw new DataSourceException("The " + HTTP_TIMEOUT + " parameter in the MydasServerConfig.xml file must be a valid integer.  It is currently set to '" + timeoutString + "'");
+            PropertyType timeoutStringProperty = dataSourceProps.get(HTTP_TIMEOUT);
+            if (timeoutStringProperty != null) {
+                String timeoutString = dataSourceProps.get(HTTP_TIMEOUT).getValue();
+                if (RegexPatterns.INTEGER_PATTERN.matcher(timeoutString).matches()) {
+                    connectionTimeout = Integer.parseInt(timeoutString);
+                } else {
+                    throw new DataSourceException("The " + HTTP_TIMEOUT + " parameter in the MydasServerConfig.xml file must be a valid integer.  It is currently set to '" + timeoutString + "'");
+                }
             }
         }
 
@@ -193,30 +197,33 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
         for (String key : keys) {
             if (key.startsWith("dasServer")) {
                 Integer serverIndex = new Integer(key.substring(9).trim());
-                String serverURLString = dataSourceProps.get(key);
-                // Check that the URL looks good.
-                try {
-                    // Just attempt to make a URL out of it (immediately discarded, but just to check the URL is well formed).
-                    new URL(serverURLString);
-                    // Check that the URL ends with /das/datasourcename
-                    Matcher match = PATTERN_VALID_DAS_SERVER_URL.matcher(serverURLString);
-                    if (match.find()) {
-                        if ("dsn".equals(match.group(1))) {
-                            LOGGER.error("For the AbstractProxyDataSource, a source DAS Server has been configured with a URL ending /das/dsn rather than ending with a specific data source name.");
-                        } else {
-                            // Remove any trailing slash.
-                            if (match.group(1).length() == 1) {
-                                serverURLString = serverURLString.substring(0, serverURLString.length() - 1);
-                                LOGGER.debug("Attempted to remove trailing space.  Ended up with: " + serverURLString);
+                PropertyType serverURLPropertyType = dataSourceProps.get(key);
+                if (serverURLPropertyType != null) {
+                    String serverURLString = serverURLPropertyType.getValue();
+                    // Check that the URL looks good.
+                    try {
+                        // Just attempt to make a URL out of it (immediately discarded, but just to check the URL is well formed).
+                        new URL(serverURLString);
+                        // Check that the URL ends with /das/datasourcename
+                        Matcher match = PATTERN_VALID_DAS_SERVER_URL.matcher(serverURLString);
+                        if (match.find()) {
+                            if ("dsn".equals(match.group(1))) {
+                                LOGGER.error("For the AbstractProxyDataSource, a source DAS Server has been configured with a URL ending /das/dsn rather than ending with a specific data source name.");
+                            } else {
+                                // Remove any trailing slash.
+                                if (match.group(1).length() == 1) {
+                                    serverURLString = serverURLString.substring(0, serverURLString.length() - 1);
+                                    LOGGER.debug("Attempted to remove trailing space.  Ended up with: " + serverURLString);
+                                }
+                                // Now attempt to query the server, warn if it fails (but still add it?).
+                                //                            checkServerRunning(httpClient, serverURLString);
+                                //                            remoteDataSources.add(serverURLString);
+                                indexToURL.put(serverIndex, serverURLString);
                             }
-                            // Now attempt to query the server, warn if it fails (but still add it?).
-//                            checkServerRunning(httpClient, serverURLString);
-//                            remoteDataSources.add(serverURLString);
-                            indexToURL.put(serverIndex, serverURLString);
                         }
+                    } catch (MalformedURLException e) {
+                        LOGGER.error("For the AbstractProxyDataSource, a source DAS Server has been configured with a malformed URL.", e);
                     }
-                } catch (MalformedURLException e) {
-                    LOGGER.error("For the AbstractProxyDataSource, a source DAS Server has been configured with a malformed URL.", e);
                 }
             }
         }
@@ -232,8 +239,8 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
         }
     }
 
-    private void setSystemProperty(Properties sysProperties, Map<String, String> dataSourceProps, String propertyName) {
-        if (dataSourceProps.containsKey(propertyName) && (dataSourceProps.get(propertyName)).length() > 0) {
+    private void setSystemProperty(Properties sysProperties, Map<String, PropertyType> dataSourceProps, String propertyName) {
+        if (dataSourceProps.containsKey(propertyName) && ((dataSourceProps.get(propertyName)).getValue().length() > 0)) {
             sysProperties.put(propertyName, dataSourceProps.get(propertyName));
         }
     }

@@ -106,12 +106,12 @@
         <datasource uri="s4proxy"
                     title="S4ProxyDataSource"
                     description="ProxyDataSource"
-                    description-href="http://www.ebi.ac.uk"
-                    doc_href="http://code.google.com/p/mydas/">
+                    doc_href="http://code.google.com/p/mydas/"
+                    mapmaster="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot">
 
             <maintainer email="pjones@ebi.ac.uk"/>
 
-            <version uri="s4proxy" created="2010-05-14">
+            <version uri="testProxy" created="2010-05-14">
                 <class>uk.ac.ebi.mydas.proxy.ReportAllProxyDasServer</class>
 
                 <coordinates uri="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot"
@@ -120,8 +120,49 @@
                              test_range="P00280">UniProt,Protein Sequence
                 </coordinates>
 
-                <capability type="das1:features" query_uri="http://localhost:8080/das/s4proxy/features"/>
+                <capability type="das1:features" query_uri="http://localhost:8080/das/testProxy/features"/>
+                <!-- CONSENSUS SERVER-SPECIFIC SETTINGS -->
 
+                <!-- If your Consensus Server needs to use a proxy server
+             to access the DAS servers that it provides the proxy for,
+             configure the proxyHost and proxyPort properties and set the
+             proxySet property = "true".  (Just set this property to "false"
+             if you are not using a proxy - the proxyHost and proxyPort settings
+             will be ignored.) -->
+                <property key="http.proxySet" value="false"/>
+                <property key="http.proxyHost" value="www-proxy.ebi.ac.uk"/>
+                <property key="http.proxyPort" value="3128"/>
+
+                <!-- If your proxy does not require a username / password, Delete
+                or comment out the following two lines.-->
+                <property key="http.proxyUser" value="username"/>
+                <property key="http.proxyPassword" value="password"/>
+
+
+                <!-- List any hosts that should be connected too DIRECTLY and not through
+               the proxy server. The value can be a list of hosts, each seperated by a |,
+               and in addition a wildcard character (*) can be used for matching.
+
+               For example: <property key="http.nonProxyHosts" value="*.foo.com|localhost"/>
+
+                If you do not need this setting, delete or comment out the following line.-->
+                <property key="http.nonProxyHosts" value="localhost"/>
+
+
+                <!-- Add any number of source DAS servers below.  All of these servers will
+                be queried with the request sent to this proxy server.
+
+                The URLS should be absolute and include the data source name.
+
+                The property keys should be of the form "dasServer1", "dasServer2", "dasServer3", ... "dasServer10" etc.
+
+                Must be indexed starting from 1, with no gaps.
+                -->
+                <property key="dasServer1" value="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot"/>
+                <property key="dasServer2" value="http://www.ebi.ac.uk/das-srv/interpro/das/InterPro"/>
+
+                <!-- The HTTP request timeout in milliseconds for DAS server requests -->
+                <property key="http.timeout" value="2000"/>
 
             </version>
 
@@ -136,12 +177,6 @@
             is the responsibility of the data source itself. -->
             <dna-command-enabled>true</dna-command-enabled>
 
-            <!-- If 'true' then when segment coordinates are included in the
-            request, only features that are entirely enclosed within the coordinates are returned.
-            If 'false' then all features that overlap with the coordinates are returned.  Handles an
-            ambiguity in the DAS 1.53 specification - see section "Retrieve the Annotations Across a Segment". -->
-            <features-strictly-enclosed>true</features-strictly-enclosed>
-
             <!-- If 'true' then if no feature label is provided by the data source, the feature id will
             automatically be reported as the feature label.  (Of course, if a feature label is
             provided, this will override the feature id.) -->
@@ -153,49 +188,6 @@
             If 'false', if the types command includes 'segment' arguments, only the feature types
             actually annotated on the requested segments will be listed.-->
             <include-types-with-zero-count>true</include-types-with-zero-count>
-
-            <!-- CONSENSUS SERVER-SPECIFIC SETTINGS -->
-
-            <!-- If your Consensus Server needs to use a proxy server
-               to access the DAS servers that it provides the proxy for,
-               configure the proxyHost and proxyPort properties and set the
-               proxySet property = "true".  (Just set this property to "false"
-               if you are not using a proxy - the proxyHost and proxyPort settings
-               will be ignored.) -->
-            <property key="http.proxySet" value="false"/>
-            <property key="http.proxyHost" value="www-proxy.ebi.ac.uk"/>
-            <property key="http.proxyPort" value="3128"/>
-
-            <!-- If your proxy does not require a username / password, Delete
-               or comment out the following two lines.-->
-            <property key="http.proxyUser" value="username"/>
-            <property key="http.proxyPassword" value="password"/>
-
-
-            <!-- List any hosts that should be connected too DIRECTLY and not through
-                   the proxy server. The value can be a list of hosts, each seperated by a |,
-                   and in addition a wildcard character (*) can be used for matching.
-
-                   For example: <property key="http.nonProxyHosts" value="*.foo.com|localhost"/>
-
-               If you do not need this setting, delete or comment out the following line.-->
-            <property key="http.nonProxyHosts" value="localhost"/>
-
-
-            <!-- Add any number of source DAS servers below.  All of these servers will
-               be queried with the request sent to this proxy server.
-
-               The URLS should be absolute and include the data source name.
-
-               The property keys should be of the form "dasServer1", "dasServer2", "dasServer3", ... "dasServer10" etc.
-
-               Must be indexed starting from 1, with no gaps.
-               -->
-           <property key="dasServer1" value="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot"/>
-           <property key="dasServer2" value="http://www.ebi.ac.uk/das-srv/interpro/das/InterPro"/>
-
-            <!-- The HTTP request timeout in milliseconds for DAS server requests -->
-            <property key="http.timeout" value="2000"/>
 
         </datasource>
     </datasources>
