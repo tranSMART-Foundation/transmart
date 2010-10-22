@@ -222,7 +222,7 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
         }
 
         // Build the list of remote data sources in the correct order.
-        for (int i = 1; indexToURL.keySet().contains(i); i++){
+        for (int i = 1; indexToURL.keySet().contains(i); i++) {
             remoteDataSources.add(indexToURL.get(i));
         }
         // Check that at least one remote data source has been initialised.
@@ -369,15 +369,15 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
                     annotatedSegments.addAll(segments);
                 }
                 catch (IOException e) {
-                    // Don't barfe out here - the other proxy data sources may work.
-                    LOGGER.error("An IOException was thrown when attempting to xml the XML from " + runner.getUrlQueryString());
+                    // Don't barf out here - the other proxy data sources may work.
+                    LOGGER.error("An IOException was thrown when attempting to xml the XML from " + runner.getUrlQueryString(), e);
                 } finally {
                     if (reader != null) {
                         try {
                             reader.close();
                         } catch (IOException e) {
-                            // Don't barfe out here - the other proxy data sources may work.
-                            LOGGER.error("An IOException was thrown when attempting to close the StringReader for the response from " + runner.getUrlQueryString());
+                            // Don't barf out here - the other proxy data sources may work.
+                            LOGGER.error("An IOException was thrown when attempting to close the StringReader for the response from " + runner.getUrlQueryString(), e);
                         }
                     }
                 }
