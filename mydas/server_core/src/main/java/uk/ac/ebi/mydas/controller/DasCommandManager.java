@@ -48,6 +48,7 @@ import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.BadStylesheetException;
 import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
+import uk.ac.ebi.mydas.exceptions.SearcherException;
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.exceptions.WritebackException;
 import uk.ac.ebi.mydas.extendedmodel.DasEntryPointE;
@@ -60,6 +61,8 @@ import uk.ac.ebi.mydas.model.DasSequence;
 import uk.ac.ebi.mydas.model.DasType;
 import uk.ac.ebi.mydas.model.alignment.DasAlignment;
 import uk.ac.ebi.mydas.model.structure.DasStructure;
+import uk.ac.ebi.mydas.search.Indexer;
+import uk.ac.ebi.mydas.search.Searcher;
 import uk.ac.ebi.mydas.writeback.MyDasParser;
 
 public class DasCommandManager {
@@ -576,7 +579,7 @@ public class DasCommandManager {
 			new HashMap<SegmentReporter, Map<DasType, Integer>>(requestedSegments.size());
 		// For each segment, populate the typesReport with 'all types' if necessary and then add types and counts.
         // Always handle error/unknown segments: (since 1.6)
-		Collection<SegmentReporter> segmentReporters = this.getFeatureCollection(dsnConfig, requestedSegments, true, null);
+		Collection<SegmentReporter> segmentReporters = this.getFeatureCollection(dsnConfig, requestedSegments, true, null,null);
 		for (SegmentReporter uncastReporter : segmentReporters){
 			// Try to get the features for this segment
 			if (uncastReporter instanceof FoundFeaturesReporter){
@@ -793,6 +796,7 @@ public class DasCommandManager {
 		// Split on the ; (delineates the separate parts of the query)
 		String[] queryParts = queryString.split(";");
 		DasFeatureRequestFilter filter = new DasFeatureRequestFilter ();
+		String query=null;
 		boolean categorize = true;
 		Integer maxbins=null;
 		for (String queryPart : queryParts){
@@ -827,6 +831,10 @@ public class DasCommandManager {
 				else if ("feature_id".equals (key)){
 					filter.addFeatureId(value);
 				}
+				// else check for advanced search query
+				else if ("query".equals (key)){
+					query=value;
+				}
 				// else check for maxbean restriction
 				else if ("maxbins".equals (key)){
 					try{
@@ -850,11 +858,41 @@ public class DasCommandManager {
 		 * Query the DataSource                                                 *
 		 ************************************************************************/
 
+		//if the query attribute has been included in the request a search is launched
+		//the query, segment and feature_id are executed as a logic AND when used together
+		String[] fids=null;
+		if (query!=null){
+			Map<String, PropertyType> properties = DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getGlobalParameters();
+			Searcher searcher=new Searcher(properties.get("indexerpath").getValue(),dsnConfig.getName());
+			try {
+				fids=searcher.search(query);
+			} catch (SearcherException e) {
+				logger.error("Searching/indexing thrown", e);
+				fids=null;
+
+			}
+			if (filter.getFeatureIds()==null || filter.getFeatureIds().isEmpty()){
+				if (fids!=null)
+					for(String fid:fids)
+						filter.addFeatureId(fid);
+			}else if (fids!=null){
+				Collection<String> toRemove=new ArrayList<String>();
+				for (String filterFid:filter.getFeatureIds()){
+					boolean isInFilter=false;
+					for(String fid:fids)
+						if (filterFid.equals(fid))
+							isInFilter=true;
+					if (!isInFilter)
+						toRemove.add(filterFid);
+				}
+				filter.getFeatureIds().removeAll(toRemove);
+			}
+		}
+		Collection<SegmentReporter> segmentReporterCollections;
 		// if segments have been included in the request, use the getFeatureCollection method to retrieve them
 		// from the data source.  (getFeatureCollection method shared with the 'types' command.)
-		Collection<SegmentReporter> segmentReporterCollections;
 		if (requestedSegments.size() > 0){
-			segmentReporterCollections = getFeatureCollection(dsnConfig, requestedSegments, true, maxbins);
+			segmentReporterCollections = getFeatureCollection(dsnConfig, requestedSegments, true, maxbins, fids);
 		} else {
 			// No segments have been requested, so instead check for either feature_id or group_id filters.
 			// (If neither of these are present, then throw a BadCommandArgumentsException)
@@ -1037,7 +1075,7 @@ public class DasCommandManager {
 	 */
 	private Collection<SegmentReporter> getFeatureCollection(DataSourceConfiguration dsnConfig,
 			List <SegmentQuery> requestedSegments,
-			boolean unknownSegmentsHandled,Integer maxbins
+			boolean unknownSegmentsHandled,Integer maxbins,String[] featureIds
 	)
 	throws DataSourceException, BadReferenceObjectException, CoordinateErrorException {
 		List<SegmentReporter> segmentReporterLists = new ArrayList<SegmentReporter>(requestedSegments.size());
@@ -1133,6 +1171,21 @@ public class DasCommandManager {
 							logger.debug("FEATURES NOT IN CACHE: " + annotatedSegment.getSegmentId());
 						}
 						CACHE_MANAGER.putInCache(cacheKey, annotatedSegment, dsnConfig.getCacheGroup());
+						
+						//just the features which ids are in the list of feature ids are returned, the rest are removed 
+						if (featureIds!=null && featureIds.length>0){
+							Collection<DasFeature> features2remove =new ArrayList<DasFeature>();
+							for (DasFeature feature:annotatedSegment.getFeatures()){
+								boolean isInList=false;
+								for (String featureId:featureIds)
+									if(featureId.equals(feature.getFeatureId()))
+										isInList=true;
+								if (!isInList)
+									features2remove.add(feature);
+							}
+							for (DasFeature feature:features2remove)
+								annotatedSegment.getFeatures().remove(feature);
+						}
                         //If segment query start and stop are completely out of limits an ERRORSEGMENT should be reported (since 1.6.1)
                         boolean error = false;
                         if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
@@ -1468,10 +1521,11 @@ public class DasCommandManager {
 
 				if (start != null) {
 					serializer.attribute(DAS_XML_NAMESPACE, "start", ""+start);
-                } else {
-					start = 1;
-                    serializer.attribute(DAS_XML_NAMESPACE, "start", ""+start);
-                }
+                } 
+//				else {
+//					start = 1;
+//                    serializer.attribute(DAS_XML_NAMESPACE, "start", ""+start);
+//                }
 
 				if (stop != null) {
                     if (expectedSize == entryPoints.size()) { //From start to stop was returned, check that it is in accordance to max_entry_points
@@ -1496,10 +1550,11 @@ public class DasCommandManager {
                         }
                     }
 					serializer.attribute(DAS_XML_NAMESPACE, "end", ""+stop);
-                } else {
-                    stop = dsnConfig.getMaxEntryPoints() == null ? entryPoints.size() : Math.min(dsnConfig.getMaxEntryPoints(), entryPoints.size());
-                    serializer.attribute(DAS_XML_NAMESPACE, "end", ""+stop);
-                }
+                } 
+//				else {
+//                    stop = dsnConfig.getMaxEntryPoints() == null ? entryPoints.size() : Math.min(dsnConfig.getMaxEntryPoints(), entryPoints.size());
+//                    serializer.attribute(DAS_XML_NAMESPACE, "end", ""+stop);
+//                }
 
 				Iterator<DasEntryPoint> iterator = entryPoints.iterator();
 				/*for (int i=1; i<start ;i++)
@@ -1946,7 +2001,7 @@ public class DasCommandManager {
 	}
 	@SuppressWarnings("unchecked")
 	public void writebackDelete(HttpServletRequest request,HttpServletResponse response, DataSourceConfiguration dataSourceConfig) throws WritebackException {
-		Map parameters=request.getParameterMap();
+		Map<Object,String[]> parameters=request.getParameterMap();
 		Map<String,String> parameters2 =new HashMap<String,String>();
 		String featureid=null,segmentid=null;
 		for (Object key:parameters.keySet()){
@@ -2027,5 +2082,43 @@ public class DasCommandManager {
 
 
 
-
+	/**
+	 * Implements the source command.  Only reports sources that have initialized successfully.
+	 * @param request to allow writing of the HTTP header
+	 * @param response to which the HTTP header and DASDSN XML are written
+	 * @param queryString to check no spurious arguments have been passed to the command
+     * @param source to provide the datasource name
+	 * @throws XmlPullParserException in the event of an error being thrown when writing out the XML
+	 * @throws IOException in the event of an error being thrown when writing out the XML
+	 * @throws SearcherException in case the indexes are not crated
+	 */
+	void indexerCommand(HttpServletRequest request, HttpServletResponse response) throws IOException, SearcherException{
+		// Check the configuration has been loaded successfully
+		if (DATA_SOURCE_MANAGER.getServerConfiguration() == null){
+            //No configuration, just report the default capabilities
+			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+			logger.error("A request has been made to the das server, however initialisation failed - possibly the mydasserverconfig.xml file was not found.");
+			return;
+		}
+		Map<String, PropertyType> properties = DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getGlobalParameters();
+		if(properties.get("keyphrase")==null){
+			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+			logger.error("The indexer keyphrase is empty in the config file");
+			return;				
+		}
+		if(properties.get("indexerpath")==null || properties.get("indexerpath").getValue().trim().equals("")){
+			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+			logger.error("The indexer path is empty in the config file");
+			return;				
+		}
+		String keyphrase=request.getParameter("keyphrase");
+		if (properties.get("keyphrase").getValue().equals(keyphrase)){
+			Indexer indexer=new Indexer(properties.get("indexerpath").getValue(),DATA_SOURCE_MANAGER.getServerConfiguration());
+			indexer.generateIndexes();
+		}else{
+			writeHeader (request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+			logger.error("The indexer keyphrase does not match with the one in the Config file");
+			return;			
+		}
+	}
 }

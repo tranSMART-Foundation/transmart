@@ -105,6 +105,13 @@
           <artifactId>slf4j-nop</artifactId>
           <version>1.5.6</version>
         </dependency>
+
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>3.0.2</version>
+		</dependency>
+
     </dependencies>
 
     <!-- Passing in configuration to javac to indicate that this is a Java 5 source & target build.-->

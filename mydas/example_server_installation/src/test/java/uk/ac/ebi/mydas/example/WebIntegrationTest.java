@@ -599,6 +599,89 @@ public class WebIntegrationTest extends WebTestCase {
 
 	}
 	
+	public void testIndexerWrongKeyPhrase() throws Exception {
+	    List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+	    parameters.add(new NameValuePair("keyphrase","wrongconfirmation"));
+		WebRequestSettings webRequestSettings = new WebRequestSettings(new URL(this.baseURL+"/indexer"));
+		webRequestSettings.setHttpMethod(HttpMethod.GET);
+	    webRequestSettings.setRequestParameters(parameters);
+		WebClient webClient = new WebClient();
+		webClient.setThrowExceptionOnFailingStatusCode(false);
+		Page page = webClient.getPage(webRequestSettings);
+		assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, page.getWebResponse().getStatusCode());
+	}
+	
+	public void testIndexer() throws Exception {
+	    List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+	    parameters.add(new NameValuePair("keyphrase","confirmation"));
+		WebRequestSettings webRequestSettings = new WebRequestSettings(new URL(this.baseURL+"/indexer"));
+		webRequestSettings.setHttpMethod(HttpMethod.GET);
+	    webRequestSettings.setRequestParameters(parameters);
+		WebClient webClient = new WebClient();
+		webClient.setThrowExceptionOnFailingStatusCode(false);
+		Page page = webClient.getPage(webRequestSettings);
+		assertEquals(HttpServletResponse.SC_OK, page.getWebResponse().getStatusCode());
+	}
+	public void test_advanced_search_without_segment_whitout_feature_id(){
+		beginAt("/test/features?query=(typeCvId:CV\\:00001 AND featureLabel:\"one Feature\") OR typeId:twoFeatureTypeIdOne");
+		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
+		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
+		assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
+		assertTextPresent("START>5</START>");
+		assertTextPresent("<END>10</END>");
+		assertTextPresent("<SCORE>123.45</SCORE>");
+		assertTextNotPresent("<ORIENTATION>0</ORIENTATION>");
+		assertTextNotPresent("<PHASE>-</PHASE>");
+		assertTextPresent("<NOTE>This is a note relating to feature one of segment one.</NOTE>");
+		assertTextPresent("<LINK href=\"http://code.google.com/p/mydas/\">mydas project home page.</LINK>");
+		assertTextPresent("<TARGET id=\"oneTargetId\" start=\"20\" stop=\"30\">oneTargetName</TARGET>");
+		assertTextPresent("</FEATURE>");
+		assertTextNotPresent("<FEATURE id=\"oneFeatureIdTwo\" label=\"one Feature Label Two\">");
+		assertTextPresent("<FEATURE id=\"twoFeatureIdOne\" ");
+		assertTextPresent("</SEGMENT>");
+	}
+	public void test_advanced_search_with_segment(){
+		beginAt("/test/features?segment=one;query=(typeCvId:CV\\:00001 AND featureLabel:\"one Feature\") OR typeId:twoFeatureTypeIdOne");
+		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
+		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
+		assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
+		assertTextPresent("START>5</START>");
+		assertTextPresent("<END>10</END>");
+		assertTextPresent("<SCORE>123.45</SCORE>");
+		assertTextNotPresent("<ORIENTATION>0</ORIENTATION>");
+		assertTextNotPresent("<PHASE>-</PHASE>");
+		assertTextPresent("<NOTE>This is a note relating to feature one of segment one.</NOTE>");
+		assertTextPresent("<LINK href=\"http://code.google.com/p/mydas/\">mydas project home page.</LINK>");
+		assertTextPresent("<TARGET id=\"oneTargetId\" start=\"20\" stop=\"30\">oneTargetName</TARGET>");
+		assertTextPresent("</FEATURE>");
+		assertTextNotPresent("<FEATURE id=\"oneFeatureIdTwo\" label=\"one Feature Label Two\">");
+		assertTextPresent("</SEGMENT>");
+	}
+	public void test_advanced_search_with_feature_ids(){
+		beginAt("/test/features?feature_id=oneFeatureIdOne;feature_id=oneFeatureIdTwo;query=(typeCvId:CV\\:00001 AND featureLabel:\"one Feature\") OR typeId:twoFeatureTypeIdOne");
+		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
+		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
+		assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
+		assertTextPresent("START>5</START>");
+		assertTextPresent("<END>10</END>");
+		assertTextPresent("<SCORE>123.45</SCORE>");
+		assertTextNotPresent("<ORIENTATION>0</ORIENTATION>");
+		assertTextNotPresent("<PHASE>-</PHASE>");
+		assertTextPresent("<NOTE>This is a note relating to feature one of segment one.</NOTE>");
+		assertTextPresent("<LINK href=\"http://code.google.com/p/mydas/\">mydas project home page.</LINK>");
+		assertTextPresent("<TARGET id=\"oneTargetId\" start=\"20\" stop=\"30\">oneTargetName</TARGET>");
+		assertTextPresent("</FEATURE>");
+		assertTextNotPresent("<FEATURE id=\"oneFeatureIdTwo\" label=\"one Feature Label Two\">");
+		assertTextNotPresent("<FEATURE id=\"twoFeatureIdOne\" ");
+		assertTextPresent("</SEGMENT>");
+	}
+
 	private void assertLocalContains(String text,String subtext){
 		assertTrue("The text ["+subtext+"] was not found in ["+text+"]",text.contains(subtext));
 	}

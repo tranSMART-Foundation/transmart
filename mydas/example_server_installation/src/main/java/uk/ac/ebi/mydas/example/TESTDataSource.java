@@ -347,9 +347,9 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
     public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins) throws UnimplementedFeatureException, DataSourceException {
     	Collection<DasAnnotatedSegment> segments = new ArrayList<DasAnnotatedSegment>(featureIdCollection.size());
     	for (String featureId: featureIdCollection){
+            Collection<DasFeature> oneFeatures = new ArrayList<DasFeature>();
+            DasTarget target = new DasTarget("oneTargetId", 20, 30, "oneTargetName");
     		if (featureId.equals("oneFeatureIdOne")){
-                Collection<DasFeature> oneFeatures = new ArrayList<DasFeature>(1);
-                DasTarget target = new DasTarget("oneTargetId", 20, 30, "oneTargetName");
                 try {
 					oneFeatures.add(new DasFeature(
 					        "oneFeatureIdOne",
@@ -369,7 +369,52 @@ public class TESTDataSource implements ReferenceDataSource,StructureDataSource,A
 					));
 				} catch (MalformedURLException e) {}
                 segments.add(new DasAnnotatedSegment("one", 1, 34, "Up-to-date", "one_label", oneFeatures));
-    		} else {
+    		}
+    		if (featureId.equals("oneFeatureIdTwo")){
+                try {
+                	oneFeatures.add(new DasFeature(
+                        "oneFeatureIdTwo",
+                        "one Feature Label Two",
+                        new DasType("oneFeatureTypeIdTwo", "oneFeatureCategoryTwo", "CV:00002","one Feature DasType Label Two"),
+                        new DasMethod("oneFeatureMethodIdTwo","one Feature Method Label Two",null),
+                        18,
+                        25,
+                        96.3,
+                        DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
+                        DasPhase.PHASE_NOT_APPLICABLE,
+                        Collections.singleton("This is a note relating to feature two of segment one."),
+                        Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
+
+                        null,
+                        null,
+                        null
+                	));
+				} catch (MalformedURLException e) {}
+                segments.add(new DasAnnotatedSegment("one", 1, 34, "Up-to-date", "one_label", oneFeatures));
+    		}
+    		if (featureId.equals("twoFeatureIdOne")){
+                try {
+                	oneFeatures.add(new DasFeature(
+                        "twoFeatureIdOne",
+                        "two Feature Label One",
+                        new DasType("twoFeatureTypeIdOne", "twoFeatureCategoryOne", "CV:00001","two Feature DasType Label One"),
+                        new DasMethod("twoFeatureMethodIdTwo","two Featur eMethod Label One",null),
+                        9,
+                        33,
+                        1000.01,
+                        DasFeatureOrientation.ORIENTATION_SENSE_STRAND,
+                        DasPhase.PHASE_READING_FRAME_0,
+                        Collections.singleton("This is a note relating to feature one of segment two."),
+                        Collections.singletonMap(new URL("http://code.google.com/p/mydas/"), "mydas project home page."),
+                        null,
+                        null,
+                        null
+                	));
+                } catch (MalformedURLException e) {}
+                segments.add(new DasAnnotatedSegment("two", 1, 1000, "Up-to-date", "two_label", oneFeatures));
+    			
+    		}
+    		if (oneFeatures.isEmpty()){
     			segments.add(new DasUnknownFeatureSegment(featureId));
     		}
     	}

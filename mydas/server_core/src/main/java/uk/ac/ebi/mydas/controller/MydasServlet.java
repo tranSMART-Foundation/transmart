@@ -160,7 +160,8 @@ public class MydasServlet extends HttpServlet {
 		COMMAND_ALIGNMENT ("alignment"),
 		COMMAND_STRUCTURE ("structure"),
 		COMMAND_SOURCES ("sources"),
-		COMMAND_HISTORICAL ("historical");
+		COMMAND_HISTORICAL ("historical"),
+		COMMAND_INDEXER ("indexer");
 
 		private String commandString;
 
@@ -359,6 +360,10 @@ public class MydasServlet extends HttpServlet {
 				} else if (Commands.COMMAND_SOURCES.matches(match.group(1))){
 					// Handle source command, in contrast with dsn, source can have extra info 
 					dasCommands.sourceCommand (request, response, queryString, null);
+					// Check for the source command (similar command to dsn).
+				} else if (Commands.COMMAND_INDEXER.matches(match.group(1))){
+					// Handle indexer command, in contrast with dsn, indexer can have extra info 
+					dasCommands.indexerCommand (request, response);
 				}
 
 				// Not the dsn the source command either the source(explicit), so handle other commands (which are datasource specific)
@@ -484,6 +489,10 @@ public class MydasServlet extends HttpServlet {
 			logger.error("WritebackException thrown", e);
 			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
 			reportError(XDasStatus.STATUS_500_SERVER_ERROR, "Writeback error creating a feature.", request, response);
+		} catch (SearcherException e) {
+			logger.error("Searching/indexing thrown", e);
+			writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false,null);
+			reportError(XDasStatus.STATUS_500_SERVER_ERROR, "Problem executing one of the Searching functions.", request, response);
 		}
 
 	}
