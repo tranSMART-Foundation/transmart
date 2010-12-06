@@ -861,31 +861,33 @@ public class DasCommandManager {
 		//if the query attribute has been included in the request a search is launched
 		//the query, segment and feature_id are executed as a logic AND when used together
 		String[] fids=null;
-		if (query!=null){
-			Map<String, PropertyType> properties = DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getGlobalParameters();
-			Searcher searcher=new Searcher(properties.get("indexerpath").getValue(),dsnConfig.getName());
-			try {
-				fids=searcher.search(query);
-			} catch (SearcherException e) {
-				logger.error("Searching/indexing thrown", e);
-				fids=null;
-
-			}
-			if (filter.getFeatureIds()==null || filter.getFeatureIds().isEmpty()){
-				if (fids!=null)
-					for(String fid:fids)
-						filter.addFeatureId(fid);
-			}else if (fids!=null){
-				Collection<String> toRemove=new ArrayList<String>();
-				for (String filterFid:filter.getFeatureIds()){
-					boolean isInFilter=false;
-					for(String fid:fids)
-						if (filterFid.equals(fid))
-							isInFilter=true;
-					if (!isInFilter)
-						toRemove.add(filterFid);
+		if (dsnConfig.getCapabilities().contains("feature-by-id")){
+			if (query!=null){
+				Map<String, PropertyType> properties = DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getGlobalParameters();
+				Searcher searcher=new Searcher(properties.get("indexerpath").getValue(),dsnConfig.getName());
+				try {
+					fids=searcher.search(query);
+				} catch (SearcherException e) {
+					logger.error("Searching/indexing thrown", e);
+					fids=null;
+	
 				}
-				filter.getFeatureIds().removeAll(toRemove);
+				if (filter.getFeatureIds()==null || filter.getFeatureIds().isEmpty()){
+					if (fids!=null)
+						for(String fid:fids)
+							filter.addFeatureId(fid);
+				}else if (fids!=null){
+					Collection<String> toRemove=new ArrayList<String>();
+					for (String filterFid:filter.getFeatureIds()){
+						boolean isInFilter=false;
+						for(String fid:fids)
+							if (filterFid.equals(fid))
+								isInFilter=true;
+						if (!isInFilter)
+							toRemove.add(filterFid);
+					}
+					filter.getFeatureIds().removeAll(toRemove);
+				}
 			}
 		}
 		Collection<SegmentReporter> segmentReporterCollections;

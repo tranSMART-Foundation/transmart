@@ -118,6 +118,8 @@
 								test_range="P00280">UniProt,Protein Sequence</coordinates>
 				<capability type="das1:features"     query_uri="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features" />
 				<capability type="das1:advanced-search"   />
+				<capability type="das1:entry_points"   />
+				<capability type="das1:feature-by-id"   />
 
 				
 			</version>
