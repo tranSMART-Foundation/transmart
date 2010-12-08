@@ -56,7 +56,9 @@ public class DasEntryPointE extends DasEntryPoint {
         if (this.getType() != null && this.getType().length() > 0){
             serializer.attribute(DAS_XML_NAMESPACE, "type", this.getType());
         }
-        serializer.attribute(DAS_XML_NAMESPACE, "orientation", this.getOrientation().toString());
+        if (!this.getOrientation().equals(DasEntryPointOrientation.NO_INTRINSIC_ORIENTATION)) {
+            serializer.attribute(DAS_XML_NAMESPACE, "orientation", this.getOrientation().toString());
+        }
         if (this.hasSubparts()){
             serializer.attribute(DAS_XML_NAMESPACE, "subparts", "yes");
         }

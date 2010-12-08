@@ -165,7 +165,7 @@ public class GFFFileReferenceDataSource implements ReferenceDataSource {
                 entryPoints.add(
                         new DasEntryPoint(
                                 "EP_" + i, 1, 1, null, "1.0",
-                                DasEntryPointOrientation.NO_INTRINSIC_ORIENTATION,
+                                null,
                                 "Scaffold Entry Point", true));
             }
         }
@@ -173,6 +173,6 @@ public class GFFFileReferenceDataSource implements ReferenceDataSource {
     }
 
     public int getTotalEntryPoints() throws DataSourceException {
-        return 10;
+        return 8;
     }
 }

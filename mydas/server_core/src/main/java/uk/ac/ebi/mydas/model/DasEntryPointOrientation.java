@@ -48,7 +48,7 @@ import java.io.Serializable;
          * Object used to define that the sequenceString has no intrinsic orientation.
          * This is the default value of the DasEntryPoint.
          */
-        NO_INTRINSIC_ORIENTATION ("+");
+        NO_INTRINSIC_ORIENTATION ("0");
 
         private final String displayString;
 
