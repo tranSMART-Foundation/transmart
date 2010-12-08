@@ -96,7 +96,7 @@ public class WebIntegrationTest extends WebTestCase {
 		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
 		assertTextPresent("<DASEP>");
 		assertTextPresent("<ENTRY_POINTS href=\"http://localhost:8080/das/test/entry_points\" version=\"Version 1.1\" total=\"2\" start=\"1\" end=\"2\">");
-		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"1\" type=\"Protein\" orientation=\"+\">Its a protein!</SEGMENT>");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"1\" type=\"Protein\">Its a protein!</SEGMENT>");
 		assertTextPresent("<SEGMENT id=\"two\" start=\"1\" stop=\"48\" type=\"DNA\" orientation=\"+\" subparts=\"yes\">Its a chromosome!</SEGMENT>");
 		assertTextPresent("</ENTRY_POINTS>");
 		assertTextPresent("</DASEP>");
