@@ -1482,7 +1482,7 @@ public class DasCommandManager {
             //If a client requests an invalid range of rows (completely beyond the range offered by the server)
             //the server responds with an X-DAS-Status of 402: BadCommandArgumentsException
             start = start == null ? 1 : start;
-            stop = stop == null ? refDsn.getTotalEntryPoints() : stop;
+            stop = stop == null ? refDsn.getTotalEntryPoints() : Math.min(stop, refDsn.getTotalEntryPoints());
             stop = dsnConfig.getMaxEntryPoints() != null ? Math.min(stop, start + dsnConfig.getMaxEntryPoints() - 1) : stop;
             expectedSize = stop - start + 1;
             if ( start > refDsn.getTotalEntryPoints() ) {
@@ -2088,8 +2088,6 @@ public class DasCommandManager {
 	 * Implements the source command.  Only reports sources that have initialized successfully.
 	 * @param request to allow writing of the HTTP header
 	 * @param response to which the HTTP header and DASDSN XML are written
-	 * @param queryString to check no spurious arguments have been passed to the command
-     * @param source to provide the datasource name
 	 * @throws XmlPullParserException in the event of an error being thrown when writing out the XML
 	 * @throws IOException in the event of an error being thrown when writing out the XML
 	 * @throws SearcherException in case the indexes are not crated
