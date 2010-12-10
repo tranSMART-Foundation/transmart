@@ -77,6 +77,7 @@ public class GFFFileReferenceDataSource implements ReferenceDataSource {
 	 * return the already built list of types.
 	 */
 	public Collection<DasType> getTypes() throws DataSourceException {
+        types.add(new DasType("myId", null, null, "label")); //junk type just to check types report cache
 		return types;
 	}
 

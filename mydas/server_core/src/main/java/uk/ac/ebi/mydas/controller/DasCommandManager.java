@@ -499,38 +499,61 @@ public class DasCommandManager {
 		// a count is retrieved.
 		Map<DasType, Integer> allTypesReport;
 		Collection<DasType> allTypes = getAllTypes (dsnConfig);
+
 		allTypesReport = new HashMap<DasType, Integer>(allTypes.size());
-		for (DasType type : allTypes){
-			if (type != null){
-				// Check if the type_ids have been filtered in the request.
-				if (typeFilter.size() == 0 || typeFilter.contains(type.getId())){
-					// Attempt to get a count of the types from the dsn. (May not be implemented.)
-					Integer typeCount;
-					StringBuffer keyBuf = new StringBuffer(dsnConfig.getId());
-					keyBuf  .append("_TYPECOUNT_ID_")
-					.append (type.getId())
-					.append ("_CAT_")
-					.append ((type.getCategory() == null) ? "null" : type.getCategory())
-					.append ("_CVID_")
-					.append ((type.getCvId() == null ) ? "null" : type.getCvId());
-					String cacheKey = keyBuf.toString();
+        boolean reportInCache = false;
+        String cacheKeyReport = dsnConfig.getId() + "_ALL_TYPES_COUNT_REPORT";
+        //try to retrieve all types and counts report from cache (no type filter)
+        if (typeFilter.size() == 0) {
+            try{
+                allTypesReport = (HashMap<DasType, Integer>) CACHE_MANAGER.getFromCache(cacheKeyReport);
+                reportInCache = true;
+                if (logger.isDebugEnabled()){
+                    logger.debug("ALL TYPES AND COUNTS REPORT RETRIEVED FROM CACHE.");
+                }
+            } catch (NeedsRefreshException nre) {
+                //continue getting a count of the types from the dsn.
+                reportInCache = false;
+            }
+        }
+        //We need to build the report collection if: (i) there is a type filter, (ii) the whole collection was not cached
+        if (!reportInCache || (typeFilter.size() != 0)) {
+            for (DasType type : allTypes){
+                //Type filter is present, we need to build the count collection
+                if (type != null){
+                    // Check if the type_ids have been filtered in the request.
+                    if (typeFilter.size() == 0 || typeFilter.contains(type.getId())){
+                        // Attempt to get a count of the types from the dsn. (May not be implemented.)
+                        Integer typeCount;
+                        StringBuffer keyBuf = new StringBuffer(dsnConfig.getId());
+                        keyBuf  .append("_TYPECOUNT_ID_")
+                        .append (type.getId())
+                        .append ("_CAT_")
+                        .append ((type.getCategory() == null) ? "null" : type.getCategory())
+                        .append ("_CVID_")
+                        .append ((type.getCvId() == null ) ? "null" : type.getCvId());
+                        String cacheKey = keyBuf.toString();
 
-					try{
-						typeCount = (Integer) CACHE_MANAGER.getFromCache(cacheKey);
-					} catch (NeedsRefreshException nre) {
-						try{
-							typeCount = dsnConfig.getDataSource().getTotalCountForType (type);
-							CACHE_MANAGER.putInCache(cacheKey, typeCount, dsnConfig.getCacheGroup());
-						} catch (DataSourceException dse){
-							CACHE_MANAGER.cancelUpdate(cacheKey);
-							throw dse;
-						}
-					}
-					allTypesReport.put (type, typeCount);
-				}
-			}
-		}
-
+                        try{
+                            typeCount = (Integer) CACHE_MANAGER.getFromCache(cacheKey);
+                        } catch (NeedsRefreshException nre) {
+                            try{
+                                typeCount = dsnConfig.getDataSource().getTotalCountForType (type);
+                                CACHE_MANAGER.putInCache(cacheKey, typeCount, dsnConfig.getCacheGroup());
+                            } catch (DataSourceException dse){
+                                CACHE_MANAGER.cancelUpdate(cacheKey);
+                                throw dse;
+                            }
+                        }
+                        allTypesReport.put (type, typeCount);
+                    }
+                }
+            }
+        }
+        //We will cache the collection with all types and counts (no type filter and collection not previously cached)
+        if (!reportInCache && (typeFilter.size() == 0)) {
+            CACHE_MANAGER.putInCache(cacheKeyReport, allTypesReport, dsnConfig.getCacheGroup());
+        }
 		writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 		// Build the XML.
 		XmlSerializer serializer;
