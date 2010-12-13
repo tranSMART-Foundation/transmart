@@ -681,6 +681,27 @@ public class WebIntegrationTest extends WebTestCase {
 		assertTextNotPresent("<FEATURE id=\"twoFeatureIdOne\" ");
 		assertTextPresent("</SEGMENT>");
 	}
+	public void test_advanced_search_empty(){
+		String query="typeCvId:kdnjklfndskjnfk";
+		beginAt("/test/features?query="+query);
+		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+		assertTextPresent("<UNKNOWNFEATURE id=\""+query+"\" /");
+
+	}
+	public void test_advanced_search_wildcards(){
+		String query="featureId:oneFeatureId*";
+		beginAt("/test/features?query="+query);
+		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
+		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
+		assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
+		assertTextPresent("START>5</START>");
+		assertTextPresent("<END>10</END>");
+		assertTextPresent("<SCORE>123.45</SCORE>");
+		assertTextNotPresent("<ORIENTATION>0</ORIENTATION>");
+		assertTextPresent("<FEATURE id=\"oneFeatureIdTwo\" label=\"one Feature Label Two\">");
+	}
 
 	private void assertLocalContains(String text,String subtext){
 		assertTrue("The text ["+subtext+"] was not found in ["+text+"]",text.contains(subtext));

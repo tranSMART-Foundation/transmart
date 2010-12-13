@@ -108,77 +108,112 @@ public class Indexer {
 			segment = refDsn.getFeatures(entryPoint.getSegmentId(), null);
 		for (DasFeature feature:segment.getFeatures()){
 			Document doc = new Document();
-			String type="",method="",notes="",links="",targets="",parents="",parts="";
-			doc.add(new Field("featureId", feature.getFeatureId(),																Field.Store.YES,	Field.Index.ANALYZED));
-			if (feature.getFeatureLabel()!=null) doc.add(new Field("featureLabel", feature.getFeatureLabel(),					Field.Store.NO,		Field.Index.ANALYZED));
+			String type="",method="",notes="",links="",targets="",parents="",parts="",segmentS="";
+
+			doc.add(new Field("segmentId", segment.getSegmentId(),																Field.Store.YES,	Field.Index.ANALYZED));
+			segmentS +=segment.getSegmentId();
+			if (segment.getSegmentLabel()!=null) {
+				doc.add(new Field("segmentLabel", segment.getSegmentLabel(),																Field.Store.YES,	Field.Index.ANALYZED));
+				segmentS += " "+segment.getSegmentLabel();
+			}
+			if (segment.getVersion()!=null) {
+				doc.add(new Field("segmentVersion", segment.getVersion(),																Field.Store.YES,	Field.Index.ANALYZED));
+				segmentS += " "+segment.getVersion();
+			}
+			if (segment.getStartCoordinate()!=null) {
+				doc.add(new Field("segmentStart", ""+segment.getStartCoordinate(),																Field.Store.YES,	Field.Index.ANALYZED));
+				segmentS += " "+segment.getStartCoordinate();
+			}
+			if (segment.getStopCoordinate()!=null) {
+				doc.add(new Field("segmentStop", ""+segment.getStopCoordinate(),																Field.Store.YES,	Field.Index.ANALYZED));
+				segmentS += " "+segment.getStopCoordinate();
+			}
+
+			
+			doc.add(new Field("featureId", feature.getFeatureId(),		Field.Store.YES,	Field.Index.ANALYZED));
+			if (feature.getFeatureLabel()!=null) doc.add(new Field("featureLabel", feature.getFeatureLabel(), Field.Store.YES, Field.Index.ANALYZED));
 			if (feature.getType()!=null){
 				if (feature.getType().getId()!=null){ 
-					doc.add(new Field("typeId", feature.getType().getId(), Field.Store.NO, Field.Index.ANALYZED));
+					doc.add(new Field("typeId", feature.getType().getId(), Field.Store.YES, Field.Index.ANALYZED));
 					type +=feature.getType().getId()+" ";
 				}
 				if (feature.getType().getCvId()!=null){
-					doc.add(new Field("typeCvId", feature.getType().getCvId(), Field.Store.NO, Field.Index.ANALYZED));
+					doc.add(new Field("typeCvId", feature.getType().getCvId(), Field.Store.YES, Field.Index.ANALYZED));
 					type +=feature.getType().getCvId()+" ";
 				}
 				if (feature.getType().getLabel()!=null){ 
-					doc.add(new Field("typeLabel", feature.getType().getLabel(), Field.Store.NO, Field.Index.ANALYZED));
+					doc.add(new Field("typeLabel", feature.getType().getLabel(), Field.Store.YES, Field.Index.ANALYZED));
 					type +=feature.getType().getLabel()+" ";
 				}
 				if (feature.getType().getCategory()!=null){
-					doc.add(new Field("typeCategory", feature.getType().getCategory(), Field.Store.NO, Field.Index.ANALYZED));
+					doc.add(new Field("typeCategory", feature.getType().getCategory(), Field.Store.YES, Field.Index.ANALYZED));
 					type +=feature.getType().getCategory()+" ";
 				}
 				doc.add(new Field("type",type, Field.Store.NO, Field.Index.ANALYZED));
 			}
 			if (feature.getMethod()!=null){
 				method+=feature.getMethod().getId()+" ";
-				doc.add(new Field("methodId", feature.getMethod().getId(), Field.Store.NO, Field.Index.ANALYZED));
+				doc.add(new Field("methodId", feature.getMethod().getId(), Field.Store.YES, Field.Index.ANALYZED));
 				if (feature.getMethod().getCvId()!=null){
 					method+=feature.getMethod().getCvId()+" ";
-					doc.add(new Field("methodCvId", feature.getMethod().getCvId(), Field.Store.NO, Field.Index.ANALYZED));
+					doc.add(new Field("methodCvId", feature.getMethod().getCvId(), Field.Store.YES, Field.Index.ANALYZED));
 				}
 				if (feature.getMethod().getLabel()!=null){
 					method+=feature.getMethod().getLabel()+" ";
-					doc.add(new Field("methodLabel", feature.getMethod().getLabel(), Field.Store.NO, Field.Index.ANALYZED));
+					doc.add(new Field("methodLabel", feature.getMethod().getLabel(), Field.Store.YES, Field.Index.ANALYZED));
 				}
 				doc.add(new Field("method",method, Field.Store.NO, Field.Index.ANALYZED));
 			}
-			doc.add(new Field("start",""+feature.getStartCoordinate(), Field.Store.NO, Field.Index.ANALYZED));
-			doc.add(new Field("stop",""+feature.getStopCoordinate(), Field.Store.NO, Field.Index.ANALYZED));
+			doc.add(new Field("start",""+feature.getStartCoordinate(), Field.Store.YES, Field.Index.ANALYZED));
+			doc.add(new Field("stop",""+feature.getStopCoordinate(), Field.Store.YES, Field.Index.ANALYZED));
 
-			if (feature.getScore()!=null) doc.add(new Field("score",""+feature.getScore(), Field.Store.NO, Field.Index.ANALYZED));
-			if (feature.getOrientation()!=null) doc.add(new Field("orientation",""+feature.getOrientation(), Field.Store.NO, Field.Index.ANALYZED));
-			if (feature.getPhase()!=null) doc.add(new Field("phase",""+feature.getPhase(), Field.Store.NO, Field.Index.ANALYZED));
+			if (feature.getScore()!=null) doc.add(new Field("score",""+feature.getScore(), Field.Store.YES, Field.Index.ANALYZED));
+			if (feature.getOrientation()!=null) doc.add(new Field("orientation",""+feature.getOrientation(), Field.Store.YES, Field.Index.ANALYZED));
+			if (feature.getPhase()!=null) doc.add(new Field("phase",""+feature.getPhase(), Field.Store.YES, Field.Index.ANALYZED));
 			if (feature.getNotes()!=null) {
-				for (String note:feature.getNotes())
-					notes+=note+" ";
-				doc.add(new Field("note",notes, Field.Store.NO, Field.Index.ANALYZED));
+				String sep ="";
+				for (String note:feature.getNotes()){
+					notes+=sep+note;
+					sep =" ==NOTE== ";
+				}
+				doc.add(new Field("notes",notes, Field.Store.YES, Field.Index.ANALYZED));
 			}
 			if (feature.getLinks()!=null) {
-				for (URL key:feature.getLinks().keySet())
-					links+=feature.getLinks().get(key) +" "+ key+" ";
-				doc.add(new Field("link",links, Field.Store.NO, Field.Index.ANALYZED));
+				String sep ="";
+				for (URL key:feature.getLinks().keySet()){
+					links+=sep+feature.getLinks().get(key) +" _-_ "+ key;
+					sep =" ==LINK== ";
+				}
+				doc.add(new Field("links",links, Field.Store.YES, Field.Index.ANALYZED));
 			}
 			if (feature.getTargets()!=null) {
+				String sep="";
 				for (DasTarget target:feature.getTargets()){
-					targets += target.getTargetId();
-					targets += " "+target.getStartCoordinate();
-					targets += " "+target.getStopCoordinate();
-					if (target.getTargetName()!=null )targets += " "+target.getTargetName();
+					targets += sep+target.getTargetId();
+					targets += " _-_ "+target.getStartCoordinate();
+					targets += " _-_ "+target.getStopCoordinate();
+					if (target.getTargetName()!=null )targets += " _-_ "+target.getTargetName();
+					sep=" ==TARGET== ";
 				}
-				doc.add(new Field("target",targets, Field.Store.NO, Field.Index.ANALYZED));
+				doc.add(new Field("targets",targets, Field.Store.YES, Field.Index.ANALYZED));
 			}
 			if (feature.getParents()!=null) {
-				for(String parent:feature.getParents())
-					parents+=parent+" ";
-				doc.add(new Field("parent",parents, Field.Store.NO, Field.Index.ANALYZED));
+				String sep="";
+				for(String parent:feature.getParents()){
+					parents+=sep+parent;
+					sep=" ==PARENT== ";
+				}
+				doc.add(new Field("parents",parents, Field.Store.YES, Field.Index.ANALYZED));
 			}
 			if (feature.getParts()!=null) {
-				for(String part:feature.getParts())
-					parts+=part+" ";
-				doc.add(new Field("part",parts, Field.Store.NO, Field.Index.ANALYZED));
+				String sep="";
+				for(String part:feature.getParts()){
+					parts+=sep+part;
+					sep=" ==PART== ";
+				}
+				doc.add(new Field("parts",parts, Field.Store.YES, Field.Index.ANALYZED));
 			}
-			doc.add(new Field("all",feature.getFeatureId()+" "+type+" "+method+" "+notes+" "+links+" "+targets+" "+parents+" "+parts, Field.Store.NO, Field.Index.ANALYZED));
+			doc.add(new Field("all",segmentS+" "+feature.getFeatureId()+" "+type+" "+method+" "+notes+" "+links+" "+targets+" "+parents+" "+parts, Field.Store.NO, Field.Index.ANALYZED));
 			writer.addDocument(doc);
 		}		
 	}

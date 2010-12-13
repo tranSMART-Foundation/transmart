@@ -57,8 +57,10 @@ import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 import uk.ac.ebi.mydas.model.DasEntryPoint;
 import uk.ac.ebi.mydas.model.DasFeature;
+import uk.ac.ebi.mydas.model.DasSegment;
 import uk.ac.ebi.mydas.model.DasSequence;
 import uk.ac.ebi.mydas.model.DasType;
+import uk.ac.ebi.mydas.model.ErrorSegment;
 import uk.ac.ebi.mydas.model.alignment.DasAlignment;
 import uk.ac.ebi.mydas.model.structure.DasStructure;
 import uk.ac.ebi.mydas.search.Indexer;
@@ -84,6 +86,8 @@ public class DasCommandManager {
 	private static final String INDENTATION_PROPERTY = "http://xmlpull.org/v1/doc/properties.html#serializer-indentation";
 	private static final String INDENTATION_PROPERTY_VALUE = "  ";
 
+	public static final int MERGE_TYPE_AND=1;
+	public static final int MERGE_TYPE_OR=2;
 	/**
 	 * Pattern used to parse a segment range, as used for the dna and sequenceString commands.
 	 * This can be used based on the assumption that the segments have already been split
@@ -602,7 +606,7 @@ public class DasCommandManager {
 			new HashMap<SegmentReporter, Map<DasType, Integer>>(requestedSegments.size());
 		// For each segment, populate the typesReport with 'all types' if necessary and then add types and counts.
         // Always handle error/unknown segments: (since 1.6)
-		Collection<SegmentReporter> segmentReporters = this.getFeatureCollection(dsnConfig, requestedSegments, true, null,null);
+		Collection<SegmentReporter> segmentReporters = this.features2reporters(getFeatureCollection(dsnConfig, requestedSegments, true, null),requestedSegments);
 		for (SegmentReporter uncastReporter : segmentReporters){
 			// Try to get the features for this segment
 			if (uncastReporter instanceof FoundFeaturesReporter){
@@ -802,7 +806,6 @@ public class DasCommandManager {
 	 * can throw this exception under some circumstances (but not when called by the featureCommand method!)
      * @throws BadReferenceObjectException The requested object does not exist
 	 */
-	@SuppressWarnings("unchecked")
 	void featuresCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
 	throws XmlPullParserException, IOException, DataSourceException, BadCommandArgumentsException,
 	UnimplementedFeatureException, BadReferenceObjectException, CoordinateErrorException {
@@ -883,66 +886,91 @@ public class DasCommandManager {
 
 		//if the query attribute has been included in the request a search is launched
 		//the query, segment and feature_id are executed as a logic AND when used together
-		String[] fids=null;
+		
+		Collection<DasAnnotatedSegment> segmentsByQuery=null,segmentsByFeatureId =null, segmentsBySegmentId=null;
 		if (dsnConfig.getCapabilities().contains("feature-by-id")){
 			if (query!=null){
 				Map<String, PropertyType> properties = DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getGlobalParameters();
 				Searcher searcher=new Searcher(properties.get("indexerpath").getValue(),dsnConfig.getName());
 				try {
-					fids=searcher.search(query);
+					segmentsByQuery=searcher.search(query);
 				} catch (SearcherException e) {
 					logger.error("Searching/indexing thrown", e);
-					fids=null;
-	
 				}
-				if (filter.getFeatureIds()==null || filter.getFeatureIds().isEmpty()){
-					if (fids!=null)
-						for(String fid:fids)
-							filter.addFeatureId(fid);
-				}else if (fids!=null){
-					Collection<String> toRemove=new ArrayList<String>();
-					for (String filterFid:filter.getFeatureIds()){
-						boolean isInFilter=false;
-						for(String fid:fids)
-							if (filterFid.equals(fid))
-								isInFilter=true;
-						if (!isInFilter)
-							toRemove.add(filterFid);
-					}
-					filter.getFeatureIds().removeAll(toRemove);
-				}
+//				if (filter.getFeatureIds()==null || filter.getFeatureIds().isEmpty()){
+//					if (fids!=null)
+//						for(String fid:fids)
+//							filter.addFeatureId(fid);
+//				}else if (fids!=null){
+//					Collection<String> toRemove=new ArrayList<String>();
+//					for (String filterFid:filter.getFeatureIds()){
+//						boolean isInFilter=false;
+//						for(String fid:fids)
+//							if (filterFid.equals(fid))
+//								isInFilter=true;
+//						if (!isInFilter)
+//							toRemove.add(filterFid);
+//					}
+//					filter.getFeatureIds().removeAll(toRemove);
+//				}
 			}
 		}
-		Collection<SegmentReporter> segmentReporterCollections;
+		Collection<SegmentReporter> segmentReporterCollections=null;
 		// if segments have been included in the request, use the getFeatureCollection method to retrieve them
 		// from the data source.  (getFeatureCollection method shared with the 'types' command.)
 		if (requestedSegments.size() > 0){
-			segmentReporterCollections = getFeatureCollection(dsnConfig, requestedSegments, true, maxbins, fids);
-		} else {
+			segmentsBySegmentId = getFeatureCollection(dsnConfig, requestedSegments, true, maxbins);
+		} //else {
 			// No segments have been requested, so instead check for either feature_id or group_id filters.
 			// (If neither of these are present, then throw a BadCommandArgumentsException)
-			if (filter.containsFeatureIds() ){
-				Collection<DasAnnotatedSegment> annotatedSegments =
-					dsnConfig.getDataSource().getFeatures(filter.getFeatureIds(),maxbins);
-				if (annotatedSegments != null){
-					segmentReporterCollections = new ArrayList<SegmentReporter>(annotatedSegments.size());
-					for (DasAnnotatedSegment segment : annotatedSegments){
-						if (segment instanceof DasUnknownFeatureSegment){
-							segmentReporterCollections.add (new UnknownFeatureSegmentReporter(segment.getSegmentId()));
-						} else
-							segmentReporterCollections.add (new FoundFeaturesReporter(segment));
-					}
-				}
-				else {
-					// Nothing returned from the datasource.
-					segmentReporterCollections = Collections.EMPTY_LIST;
-				}
-			}
-			else {
-				throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
-			}
-		}
+
+		if (filter.containsFeatureIds() ){
+			segmentsByFeatureId = dsnConfig.getDataSource().getFeatures(filter.getFeatureIds(),maxbins);
+//				if (segmentsByFeatureId != null){
+//					segmentReporterCollections = new ArrayList<SegmentReporter>(segmentsByFeatureId.size());
+//					for (DasAnnotatedSegment segment : segmentsByFeatureId){
+//						if (segment instanceof DasUnknownFeatureSegment){
+//							segmentReporterCollections.add (new UnknownFeatureSegmentReporter(segment.getSegmentId()));
+//						} else
+//							segmentReporterCollections.add (new FoundFeaturesReporter(segment));
+//					}
+//				}
+//				else {
+//					// Nothing returned from the datasource.
+//					segmentReporterCollections = Collections.EMPTY_LIST;
+//				}
+			} 
+//		else if(query!=null){
+//				segmentReporterCollections = new ArrayList<SegmentReporter>(1);
+//				segmentReporterCollections.add (new UnknownFeatureSegmentReporter("Empty ResultSet"));
+//			}else{
+//				throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
+//			}
+//		}
 		// OK - got a Collection of FoundFeaturesReporter objects, so get on with marshalling them out.
+		
+		Collection<DasAnnotatedSegment> merged=null;
+		if(segmentsBySegmentId!=null){
+			if(segmentsByFeatureId!=null){
+				merged=merge(segmentsBySegmentId,segmentsByFeatureId,MERGE_TYPE_AND);
+				if(segmentsByQuery!=null)
+					merged=merge(merged,segmentsByQuery,MERGE_TYPE_AND);
+			}else if(segmentsByQuery!=null)
+				merged=merge(segmentsBySegmentId,segmentsByQuery,MERGE_TYPE_AND);
+			else
+				merged=segmentsBySegmentId;
+		}else if(segmentsByFeatureId!=null){
+			if(segmentsByQuery!=null)
+				merged=merge(segmentsByFeatureId,segmentsByQuery,MERGE_TYPE_AND);
+			else
+				merged=segmentsByFeatureId;
+		}else if(segmentsByQuery!=null)
+			merged=segmentsByQuery;
+		else
+			throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
+
+		segmentReporterCollections=this.features2reporters(merged, requestedSegments);
+
 		writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 
 		/************************************************************************\
@@ -1098,9 +1126,206 @@ public class DasCommandManager {
 	 * the segment coordinates are out of scope for the provided segment id.
      * @throws uk.ac.ebi.mydas.exceptions.BadReferenceObjectException The requested object does not exist
 	 */
-	private Collection<SegmentReporter> getFeatureCollection(DataSourceConfiguration dsnConfig,
+	private Collection<DasAnnotatedSegment> getFeatureCollection(DataSourceConfiguration dsnConfig,
 			List <SegmentQuery> requestedSegments,
-			boolean unknownSegmentsHandled,Integer maxbins,String[] featureIds
+			boolean unknownSegmentsHandled,Integer maxbins//,String[] featureIds
+	)
+	throws DataSourceException, BadReferenceObjectException, CoordinateErrorException {
+		List<DasAnnotatedSegment> segments =new ArrayList<DasAnnotatedSegment>(requestedSegments.size());
+		AnnotationDataSource dataSource = dsnConfig.getDataSource();
+		for (SegmentQuery segmentQuery : requestedSegments){
+			try{
+				DasAnnotatedSegment annotatedSegment;
+
+				// Build the key name for the cache.
+				StringBuffer cacheKeyBuffer = new StringBuffer(dsnConfig.getId());
+				cacheKeyBuffer.append("_FEATURES_");
+				if (maxbins!=null) {
+					cacheKeyBuffer.append("_MAXBEANS_"+maxbins+"_");
+                }
+				if (dataSource instanceof RangeHandlingAnnotationDataSource || dataSource instanceof RangeHandlingReferenceDataSource){
+					// May return DasSequence objects containing partial sequences, so include segment id, start and stop coordinates in the key:
+					cacheKeyBuffer.append(segmentQuery.toString());
+				}
+				else {
+					// Otherwise will only return complete sequences, so store on segment id only:
+					cacheKeyBuffer.append(segmentQuery.getSegmentId());
+				}
+				String cacheKey = cacheKeyBuffer.toString();
+
+				try{
+                    annotatedSegment = (DasAnnotatedSegment) CACHE_MANAGER.getFromCache(cacheKey);
+					if (logger.isDebugEnabled()){
+						logger.debug("FEATURES RETRIEVED FROM CACHE: " + annotatedSegment.getSegmentId());
+					}
+					if (annotatedSegment == null){
+						// This should not happen - segment requests that fail are not cached.
+						throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "Obtained an annotatedSegment from the cache for this segment.  It was null, so assume this is a bad segment id.");
+					} else {
+                        //Segment exist and was retrieved from cache
+                        //If segment query start and stop are completely out of limits an ERRORSEGMENT should be reported (since 1.6.1)
+                        boolean error = false;
+                        if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
+                            if ( (segmentQuery.getStartCoordinate() <= 0) || (segmentQuery.getStopCoordinate() <= 0) ) {
+                                //0 or negative values in range are not allowed: ERROR
+                                error = true;
+                            } else if (segmentQuery.getStartCoordinate() > segmentQuery.getStopCoordinate()) {
+                                //start cannot be greater that stop: ERROR
+                                error = true;
+                            } else if ( ( (annotatedSegment.getStartCoordinate() <= segmentQuery.getStartCoordinate()) &&
+                                          (segmentQuery.getStartCoordinate() <= annotatedSegment.getStopCoordinate()) )
+                                       && (annotatedSegment.getStartCoordinate() <= segmentQuery.getStopCoordinate()) )  {
+                                //start is completely bounded, stop is greater or equal to real init: OK
+                                error = false;
+                            } else {
+                                error = true;
+                            }
+                        }
+                        if (error) {
+                            if (logger.isDebugEnabled()){
+                                logger.debug("SEGMENT START & STOP OUT OF BOUNDS: " +
+                                    "query(" + segmentQuery.getStartCoordinate() + ", " + segmentQuery.getStopCoordinate() + ") " +
+                                    "vs bounds(" + annotatedSegment.getStartCoordinate() + ", " + annotatedSegment.getStopCoordinate() + ")");
+                            }
+                            throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "start and stop out of segment bounds", new IndexOutOfBoundsException("start and stop out of segment bounds"));
+                        }
+                    }
+				}
+				catch (NeedsRefreshException nre){
+					try{
+						if (segmentQuery.getStartCoordinate() == null){
+							// Easy request - just want all the features on the segment.
+							annotatedSegment = dataSource.getFeatures(segmentQuery.getSegmentId(),maxbins);
+						}
+						else {
+
+							// Restricted to coordinates.
+							if (dataSource instanceof RangeHandlingAnnotationDataSource){
+								annotatedSegment = ((RangeHandlingAnnotationDataSource)dataSource).getFeatures(
+										segmentQuery.getSegmentId(),
+										segmentQuery.getStartCoordinate(),
+										segmentQuery.getStopCoordinate(),
+										maxbins);
+							}
+							else if (dataSource instanceof RangeHandlingReferenceDataSource){
+								annotatedSegment = ((RangeHandlingReferenceDataSource)dataSource).getFeatures(
+										segmentQuery.getSegmentId(),
+										segmentQuery.getStartCoordinate(),
+										segmentQuery.getStopCoordinate(),
+										maxbins);
+							}
+							else {
+								annotatedSegment = dataSource.getFeatures(
+										segmentQuery.getSegmentId(),
+										maxbins);
+							}
+						}
+                        if (logger.isDebugEnabled()){
+							logger.debug("FEATURES NOT IN CACHE: " + annotatedSegment.getSegmentId());
+						}
+						CACHE_MANAGER.putInCache(cacheKey, annotatedSegment, dsnConfig.getCacheGroup());
+						
+                        //If segment query start and stop are completely out of limits an ERRORSEGMENT should be reported (since 1.6.1)
+                        boolean error = false;
+                        if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
+                            if ( (segmentQuery.getStartCoordinate() <= 0) || (segmentQuery.getStopCoordinate() <= 0) ) {
+                                //0 or negative values in range are not allowed: ERROR
+                                error = true;
+                            } else if (segmentQuery.getStartCoordinate() > segmentQuery.getStopCoordinate()) {
+                                //start cannot be greater that stop: ERROR
+                                error = true;
+                            } else if ( ( (annotatedSegment.getStartCoordinate() <= segmentQuery.getStartCoordinate()) &&
+                                          (segmentQuery.getStartCoordinate() <= annotatedSegment.getStopCoordinate()) )
+                                       && (annotatedSegment.getStartCoordinate() <= segmentQuery.getStopCoordinate()) )  {
+                                //start is completely bounded, stop is greater or equal to real init: OK
+                                error = false;
+                            } else {
+                                error = true;
+                            }
+                        }
+                        if (error) {
+                            if (logger.isDebugEnabled()){
+                                logger.debug("SEGMENT START & STOP OUT OF BOUNDS: " +
+                                    "query(" + segmentQuery.getStartCoordinate() + ", " + segmentQuery.getStopCoordinate() + ") " +
+                                    "vs bounds(" + annotatedSegment.getStartCoordinate() + ", " + annotatedSegment.getStopCoordinate() + ")");
+                            }
+                            throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "start and stop out of segment bounds", new IndexOutOfBoundsException("start and stop out of segment bounds"));
+                        }
+					}
+					catch (BadReferenceObjectException broe) {
+						CACHE_MANAGER.cancelUpdate(cacheKey);
+						throw broe;
+					}
+					catch (CoordinateErrorException cee) {
+						CACHE_MANAGER.cancelUpdate(cacheKey);
+						throw cee;
+					}
+				}
+				segments.add(annotatedSegment);
+//				segmentReporterLists.add(new FoundFeaturesReporter(annotatedSegment, segmentQuery));
+			}
+			catch (BadReferenceObjectException broe) {
+				if (unknownSegmentsHandled){
+                    if (broe.getCause() != null) { //For both annotation and reference servers, limits out of bounds should report an ERRORSEGEMENT (since 1.6.1)
+                        segments.add(new ErrorSegment(segmentQuery));
+                    } else {
+                        segments.add(new DasUnknownFeatureSegment(segmentQuery));
+                    }
+				}
+				else {
+					throw broe;
+				}
+			} catch (CoordinateErrorException cee) {
+				if (unknownSegmentsHandled){
+					segments.add(new DasUnknownFeatureSegment(segmentQuery));
+				}
+				else {
+					throw cee;
+				}
+			}
+		}
+		return segments;
+	}
+	
+	private Collection<SegmentReporter> features2reporters(Collection<DasAnnotatedSegment> segments,Collection<SegmentQuery> segmentQueries){
+		List <SegmentReporter> segmentReporterLists =new ArrayList<SegmentReporter>(segments.size());
+		
+		for (DasSegment segment:segments){
+			SegmentQuery segmentQuery = getSegmentQueryById(segmentQueries,segment.getSegmentId());
+			segmentReporterLists.add(segment2SegmentReporter(segment, segmentQuery));
+		}
+		return segmentReporterLists;
+	}
+	private SegmentReporter segment2SegmentReporter(DasSegment segment,SegmentQuery segmentQuery){
+		if (segment instanceof DasUnknownFeatureSegment){
+			DasUnknownFeatureSegment unknownSegment = (DasUnknownFeatureSegment)segment;
+			if (unknownSegment.getSegmentQuery()!=null)
+				return new UnknownSegmentReporter(unknownSegment.getSegmentQuery());
+			else
+				return new UnknownFeatureSegmentReporter(unknownSegment.getSegmentId());
+		}else if (segment instanceof ErrorSegment){
+			ErrorSegment errorSegment = (ErrorSegment)segment;
+			return new ErrorSegmentReporter(errorSegment.getSegmentQuery());
+		}else if (segment instanceof DasAnnotatedSegment){
+			DasAnnotatedSegment annotatedSegment=(DasAnnotatedSegment)segment;
+			if (segmentQuery!=null)
+				return new FoundFeaturesReporter(annotatedSegment, segmentQuery);
+			else
+				return new FoundFeaturesReporter(annotatedSegment);
+		}
+		return null;
+		
+	}
+	private SegmentQuery getSegmentQueryById(Collection<SegmentQuery> segmentQueries,String segmentId){
+		if (segmentQueries!=null)
+			for (SegmentQuery segment:segmentQueries)
+				if (segment.getSegmentId().equals(segmentId))
+					return segment;
+		return null;
+	}
+	protected Collection<SegmentReporter> getFeatureCollectionOld(DataSourceConfiguration dsnConfig,
+			List <SegmentQuery> requestedSegments,
+			boolean unknownSegmentsHandled,Integer maxbins
 	)
 	throws DataSourceException, BadReferenceObjectException, CoordinateErrorException {
 		List<SegmentReporter> segmentReporterLists = new ArrayList<SegmentReporter>(requestedSegments.size());
@@ -1198,19 +1423,19 @@ public class DasCommandManager {
 						CACHE_MANAGER.putInCache(cacheKey, annotatedSegment, dsnConfig.getCacheGroup());
 						
 						//just the features which ids are in the list of feature ids are returned, the rest are removed 
-						if (featureIds!=null && featureIds.length>0){
-							Collection<DasFeature> features2remove =new ArrayList<DasFeature>();
-							for (DasFeature feature:annotatedSegment.getFeatures()){
-								boolean isInList=false;
-								for (String featureId:featureIds)
-									if(featureId.equals(feature.getFeatureId()))
-										isInList=true;
-								if (!isInList)
-									features2remove.add(feature);
-							}
-							for (DasFeature feature:features2remove)
-								annotatedSegment.getFeatures().remove(feature);
-						}
+//						if (featureIds!=null && featureIds.length>0){
+//							Collection<DasFeature> features2remove =new ArrayList<DasFeature>();
+//							for (DasFeature feature:annotatedSegment.getFeatures()){
+//								boolean isInList=false;
+//								for (String featureId:featureIds)
+//									if(featureId.equals(feature.getFeatureId()))
+//										isInList=true;
+//								if (!isInList)
+//									features2remove.add(feature);
+//							}
+//							for (DasFeature feature:features2remove)
+//								annotatedSegment.getFeatures().remove(feature);
+//						}
                         //If segment query start and stop are completely out of limits an ERRORSEGMENT should be reported (since 1.6.1)
                         boolean error = false;
                         if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
@@ -1270,7 +1495,6 @@ public class DasCommandManager {
 		}
 		return segmentReporterLists;
 	}
-
 	/**
 	 * Helper method that re-constructs the URL that was used to query the service.
 	 * @param request to retrieve elements of the URL
@@ -2143,5 +2367,70 @@ public class DasCommandManager {
 			logger.error("The indexer keyphrase does not match with the one in the Config file");
 			return;			
 		}
+	}
+	private Collection<DasAnnotatedSegment> merge(Collection<DasAnnotatedSegment> a, Collection<DasAnnotatedSegment> b, int type) throws DataSourceException{
+		Collection<DasAnnotatedSegment> merged= new ArrayList<DasAnnotatedSegment>();
+		switch(type){
+			case MERGE_TYPE_AND:
+				for (DasAnnotatedSegment segA:a)
+					for (DasAnnotatedSegment segB:b)
+						if (segA.getSegmentId().equals(segB.getSegmentId()))
+							merged.add(merge(segA,segB,type));
+				break;
+			case MERGE_TYPE_OR:
+				Collection<String> idsAdded= new ArrayList<String>();
+				for (DasAnnotatedSegment segA:a){
+					boolean added=false;
+					for (DasAnnotatedSegment segB:b)
+						if (segA.getSegmentId().equals(segB.getSegmentId())){
+							merged.add(merge(segA,segB,type));
+							idsAdded.add(segA.getSegmentId());
+							added=true;
+						}
+					if (!added)
+						merged.add(segA);
+				}
+				for (DasAnnotatedSegment segB:b)
+					if (!idsAdded.contains(segB.getSegmentId()))
+						merged.add(segB);
+				break;
+		}
+		return merged;
+	}
+
+	private DasAnnotatedSegment merge(DasAnnotatedSegment a, DasAnnotatedSegment b, int type) throws DataSourceException{
+		if(!a.getSegmentId().equals(b.getSegmentId()))
+			throw new DataSourceException("trying to merge two segments with different id");
+		DasAnnotatedSegment merged;
+		if (a.getStartCoordinate()!=null && b.getStartCoordinate()!=null && a.getStopCoordinate()!=null && b.getStopCoordinate()!=null){
+			int start=a.getStartCoordinate();
+			int stop=a.getStopCoordinate();
+			if (start>b.getStartCoordinate()) start = b.getStartCoordinate();
+			if (stop<b.getStopCoordinate()) stop = b.getStopCoordinate();
+			merged=new DasAnnotatedSegment(a.getSegmentId(), start, stop, a.getVersion(), a.getSegmentLabel(), new ArrayList<DasFeature>());
+		}else
+			merged=new DasAnnotatedSegment(a.getSegmentId(), null, null, a.getVersion(), a.getSegmentLabel(), new ArrayList<DasFeature>());
+		switch(type){
+			case MERGE_TYPE_AND:
+				for (DasFeature fa:a.getFeatures())
+					for (DasFeature fb:b.getFeatures())
+						if (fa.getFeatureId().equals(fb.getFeatureId()))
+							merged.getFeatures().add(fa);
+				break;
+			case MERGE_TYPE_OR:
+				for (DasFeature fa:a.getFeatures())
+					merged.getFeatures().add(fa);
+				for (DasFeature fb:b.getFeatures())
+					if(!containsFeature(a.getFeatures(),fb))
+						merged.getFeatures().add(fb);
+				break;
+		}
+		return merged;
+	}
+	private boolean containsFeature(Collection<DasFeature> features, DasFeature feature){
+		for (DasFeature f:features)
+			if (f.getFeatureId().equals(feature.getFeatureId()))
+				return true;
+		return false;
 	}
 }
