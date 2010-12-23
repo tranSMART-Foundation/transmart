@@ -538,12 +538,14 @@ public class DasCommandManager {
                         .append ((type.getCvId() == null ) ? "null" : type.getCvId());
                         String cacheKey = keyBuf.toString();
 
-                        try{
+                        try {
                             typeCount = (Integer) CACHE_MANAGER.getFromCache(cacheKey);
                         } catch (NeedsRefreshException nre) {
                             try{
                                 typeCount = dsnConfig.getDataSource().getTotalCountForType (type);
-                                CACHE_MANAGER.putInCache(cacheKey, typeCount, dsnConfig.getCacheGroup());
+                                if (typeFilter.size() != 0) {
+                                    CACHE_MANAGER.putInCache(cacheKey, typeCount, dsnConfig.getCacheGroup());
+                                }
                             } catch (DataSourceException dse){
                                 CACHE_MANAGER.cancelUpdate(cacheKey);
                                 throw dse;
