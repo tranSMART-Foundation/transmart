@@ -50,6 +50,9 @@ public class GFFFileReferenceDataSource implements ReferenceDataSource {
 			GFF2Parser parser = new GFF2Parser(new FileInputStream(servletContext.getRealPath(path)));
 			segments = parser.parse();
 			types = parser.getTypes();
+            for (int i = 0; i < 10; i++) { //junk type just to check types report cache
+                types.add(new DasType("myId" + i, null, null, "label" + i));
+            }
 		} catch (FileNotFoundException e) {
 			throw new DataSourceException("The data source cannot be loaded. The file couldn't be oppened",e);
 		} catch (Exception e) {
@@ -77,7 +80,6 @@ public class GFFFileReferenceDataSource implements ReferenceDataSource {
 	 * return the already built list of types.
 	 */
 	public Collection<DasType> getTypes() throws DataSourceException {
-        types.add(new DasType("myId", null, null, "label")); //junk type just to check types report cache
 		return types;
 	}
 

@@ -538,20 +538,22 @@ public class DasCommandManager {
                         .append ((type.getCvId() == null ) ? "null" : type.getCvId());
                         String cacheKey = keyBuf.toString();
 
-                        try {
-                            typeCount = (Integer) CACHE_MANAGER.getFromCache(cacheKey);
-                        } catch (NeedsRefreshException nre) {
-                            try{
-                                typeCount = dsnConfig.getDataSource().getTotalCountForType (type);
-                                if (typeFilter.size() != 0) {
-                                    //Request asks for the whole types collection 
-                                    // thus we cache the collection rather than each element
+                        if (typeFilter.size() != 0) {
+                            try {
+                                typeCount = (Integer) CACHE_MANAGER.getFromCache(cacheKey);
+                            } catch (NeedsRefreshException nre) {
+                                try{
+                                    typeCount = dsnConfig.getDataSource().getTotalCountForType (type);
                                     CACHE_MANAGER.putInCache(cacheKey, typeCount, dsnConfig.getCacheGroup());
+                                } catch (DataSourceException dse){
+                                    CACHE_MANAGER.cancelUpdate(cacheKey);
+                                    throw dse;
                                 }
-                            } catch (DataSourceException dse){
-                                CACHE_MANAGER.cancelUpdate(cacheKey);
-                                throw dse;
                             }
+                        } else {
+                            //Request asks for the whole types collection
+                            // thus we cache the collection rather than each element
+                            typeCount = dsnConfig.getDataSource().getTotalCountForType (type);
                         }
                         allTypesReport.put (type, typeCount);
                     }
