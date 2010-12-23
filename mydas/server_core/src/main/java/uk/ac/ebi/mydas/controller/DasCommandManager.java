@@ -544,6 +544,8 @@ public class DasCommandManager {
                             try{
                                 typeCount = dsnConfig.getDataSource().getTotalCountForType (type);
                                 if (typeFilter.size() != 0) {
+                                    //Request asks for the whole types collection 
+                                    // thus we cache the collection rather than each element
                                     CACHE_MANAGER.putInCache(cacheKey, typeCount, dsnConfig.getCacheGroup());
                                 }
                             } catch (DataSourceException dse){
