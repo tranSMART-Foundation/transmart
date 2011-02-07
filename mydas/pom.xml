@@ -1,54 +1,43 @@
-<!--
-  ~ Copyright 2007 Philip Jones, EMBL-European Bioinformatics Institute
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~ http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  ~
-  ~
-  ~ For further details of the mydas project, including source code,
-  ~ downloads and documentation, please see:
-  ~
-  ~ http://code.google.com/p/mydas/
-  ~
-  -->
+<!-- ~ Copyright 2007 Philip Jones, EMBL-European Bioinformatics Institute 
+	~ ~ Licensed under the Apache License, Version 2.0 (the "License"); ~ you 
+	may not use this file except in compliance with the License. ~ You may obtain 
+	a copy of the License at ~ ~ http://www.apache.org/licenses/LICENSE-2.0 ~ 
+	~ Unless required by applicable law or agreed to in writing, software ~ distributed 
+	under the License is distributed on an "AS IS" BASIS, ~ WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. ~ See the License for 
+	the specific language governing permissions and ~ limitations under the License. 
+	~ ~ ~ For further details of the mydas project, including source code, ~ 
+	downloads and documentation, please see: ~ ~ http://code.google.com/p/mydas/ 
+	~ -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-    
-    <groupId>uk.ac.ebi.mydas</groupId>
-    <artifactId>mydas_master</artifactId>
-    <version>1.6.3beta</version>
+	<modelVersion>4.0.0</modelVersion>
 
-    <packaging>pom</packaging>
-    <name>mydas_master Maven Webapp</name>
-    <url>http://code.google.com/p/mydas/</url>
+	<groupId>uk.ac.ebi.mydas</groupId>
+	<artifactId>mydas_master</artifactId>
+	<version>1.6.4-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+	<name>mydas_master Maven Webapp</name>
+	<url>http://code.google.com/p/mydas/</url>
 
 	<licenses>
-        <license>
-            <name>The Apache Software License 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+		<license>
+			<name>The Apache Software License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
-    <repositories>
-        <repository>
-            <id>google-code-mydas</id>
-            <name>google-code-mydas</name>
-            <layout>default</layout>
-            <url>http://mydas.googlecode.com/svn/repository/</url>
-        </repository>
+	<repositories>
+		<repository>
+			<id>google-code-mydas</id>
+			<name>google-code-mydas</name>
+			<layout>default</layout>
+			<url>http://mydas.googlecode.com/svn/repository/</url>
+		</repository>
 		<repository>
 			<id>maven2-repository.dev.java.net</id>
 			<name>Java.net Maven 2 Repository</name>
@@ -58,11 +47,11 @@
 			<id>maven-repository.dev.java.net</id>
 			<name>Java.net Maven 1 Repository (legacy)</name>
 			<url>http://download.java.net/maven/1</url>
-			<layout>legacy</layout>
+			<!--<layout>legacy</layout>-->
 		</repository>
-    </repositories>
+	</repositories>
 
-    <pluginRepositories>
+	<pluginRepositories>
 		<pluginRepository>
 			<id>maven2-repository.dev.java.net</id>
 			<name>Java.net Maven 2 Repository</name>
@@ -72,10 +61,10 @@
 			<id>maven-repository.dev.java.net</id>
 			<name>Java.net Maven 1 Repository (legacy)</name>
 			<url>http://download.java.net/maven/1</url>
-			<layout>legacy</layout>
+			<!--<layout>legacy</layout>-->
 		</pluginRepository>
 	</pluginRepositories>
-    <description>
+	<description>
         This project aims to offer an easy-to-extend Java DAS server framework.
         It offers several advantages:
 
@@ -105,54 +94,67 @@
         http://biodas.org/documents/spec.html
     </description>
 
-    <scm>
-        <url>http://mydas.googlecode.com/svn/</url>
-        <connection>http://mydas.googlecode.com/svn/</connection>
-    </scm>
+	<scm>
+		<url>http://mydas.googlecode.com/svn/</url>
+		<connection>http://mydas.googlecode.com/svn/</connection>
+	</scm>
 
 	<modules>
-        <module>server_core</module>
-        <module>example_server_installation</module>
-    </modules>
+		<module>server_core</module>
+		<module>example_server_installation</module>
+	</modules>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <!-- Maven can be used to build javadocs from the source. (The source has been
-            carefully documented, so this should be useful).
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<!-- Maven can be used to build javadocs from the source. (The source 
+				has been carefully documented, so this should be useful). To generate the 
+				javadocs, use mvn javadoc:javadoc To package the javadocs, use mvn javadoc:jar -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<overview />
+				</configuration>
+			</plugin>
 
-            To generate the javadocs, use mvn javadoc:javadoc
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
-            To package the javadocs, use mvn javadoc:jar
-            -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <overview/>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-        </plugins>
-    </build>
-
+		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-webdav</artifactId>
+				<version>1.0-beta-2</version>
+			</extension>
+		</extensions>
+	</build>
+	<distributionManagement>
+		<repository>
+			<id>googlecode.mydas.repo</id>
+			<url>dav:https://mydas.googlecode.com/svn/repository/</url>
+		</repository>
+		<snapshotRepository>
+			<id>googlecode.mydas.snapshotrepo</id>
+			<url>dav:https://mydas.googlecode.com/svn/snapshot-repository/</url>
+			<uniqueVersion>false</uniqueVersion>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
