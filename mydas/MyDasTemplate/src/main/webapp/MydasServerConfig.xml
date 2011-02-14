@@ -268,6 +268,8 @@
 				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/ensemblTest/features" />
 				<capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/ensemblTest/stylesheet" />
 				<capability type="das1:unknown-feature"	/>
+				<capability     type="das1:maxbins"     />
+				<capability     type="das1:entry_points"        />
 			</version>
 
             <dna-command-enabled>true</dna-command-enabled>
@@ -280,8 +282,7 @@
                     title="fickett-tss"
                     description="GFF2 Example Annotation Data Source"
                     doc_href="http://mydas.googlecode.com/svn/trunk/mydas/MyDasTemplate/src/main/resources/fickett-tss.gff"
-                    mapmaster="http://mapmaster_referencegff.com"
-                    max_entry_points="4">
+                    mapmaster="http://mapmaster_referencegff.com">
 			<maintainer email="gsalazar@ebi.ac.uk" />
 
 			<version uri="referencegff" created="2010-03-19">
@@ -296,14 +297,21 @@
 				<capability type="das1:features"		query_uri="http://localhost:8080/das/examplegff/features" />
 				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplegff/features" />
 				<capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
+				<capability type="das1:sequence"		query_uri="http://localhost:8080/das/examplegff/sequence" />
 				<capability type="das1:unknown-feature"	/>
-                <property key="gff_file" value="fickett-tss.gff" visibility="false"/>
+				<capability     type="das1:entry_points"        />
+				<property key="gff_file" value="fickett-tss.gff" visibility="false"/>
+				<property key="fasta_file" value="fickett.fasta" visibility="false"/>
 			</version>
 
             <dna-command-enabled>true</dna-command-enabled>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
+        
+        
+
+        
     </datasources>
 </mydasserver>
 

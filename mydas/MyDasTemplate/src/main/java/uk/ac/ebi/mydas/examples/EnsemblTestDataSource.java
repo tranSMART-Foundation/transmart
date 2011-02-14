@@ -42,11 +42,15 @@ public class EnsemblTestDataSource implements RangeHandlingAnnotationDataSource{
 
 	public DasAnnotatedSegment getFeatures(String segmentId, int start, int stop, Integer maxbins) 
 			throws BadReferenceObjectException, CoordinateErrorException, DataSourceException {
-		return ensembl.getSubmodelBySegmentId(segmentId, start, stop);
+		if (maxbins==null)
+			maxbins=-1;
+		return ensembl.getSubmodelBySegmentId(segmentId, start, stop,maxbins);
 	}
 	public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins) 
 			throws BadReferenceObjectException, DataSourceException {
-		return ensembl.getSubmodelBySegmentId(segmentId, -1, -1);
+		if (maxbins==null)
+			maxbins=-1;
+		return ensembl.getSubmodelBySegmentId(segmentId, -1, -1,maxbins);
 	}
 
 	public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins)
@@ -93,16 +97,16 @@ public class EnsemblTestDataSource implements RangeHandlingAnnotationDataSource{
 		throw new UnimplementedFeatureException("No implemented");
 	}
 
-    public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws UnimplementedFeatureException, DataSourceException {
-        throw new UnimplementedFeatureException("No implemented");
-    }
+	public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws UnimplementedFeatureException, DataSourceException {
+		return ensembl.getEntryPoints(start,stop);
+	}
 
     public String getEntryPointVersion() throws UnimplementedFeatureException, DataSourceException {
-        throw new UnimplementedFeatureException("No implemented");
+        return ensembl.getDatabase();
     }
 
     public int getTotalEntryPoints() throws UnimplementedFeatureException, DataSourceException {
-        throw new UnimplementedFeatureException("No implemented");
+    	return ensembl.getEntryPoints(null,null).size();
     }
 
     public Integer getTotalCountForType(DasType type)

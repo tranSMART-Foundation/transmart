@@ -32,9 +32,10 @@ public class GFFFileReferenceDataSource implements ReferenceDataSource {
 	ServletContext svCon;
 	Map<String, PropertyType> globalParameters;
 	DataSourceConfiguration config;
-	String path;
+	String path,path2;
 	private Collection<DasAnnotatedSegment> segments;
 	private Collection<DasType> types;
+	private Map<String,DasSequence> sequences;
 
 
 	/**
@@ -46,17 +47,23 @@ public class GFFFileReferenceDataSource implements ReferenceDataSource {
 		this.globalParameters = globalParameters;
 		this.config = dataSourceConfig;
 		path = config.getDataSourceProperties().get("gff_file").getValue();
+		path2 = config.getDataSourceProperties().get("fasta_file").getValue();
 		try {
 			GFF2Parser parser = new GFF2Parser(new FileInputStream(servletContext.getRealPath(path)));
 			segments = parser.parse();
 			types = parser.getTypes();
-            for (int i = 0; i < 10; i++) { //junk type just to check types report cache
-                types.add(new DasType("myId" + i, null, null, "label" + i));
-            }
 		} catch (FileNotFoundException e) {
 			throw new DataSourceException("The data source cannot be loaded. The file couldn't be oppened",e);
 		} catch (Exception e) {
 			throw new DataSourceException("The data source cannot be loaded because of parsing problems",e);
+		}
+		try {
+			FastaParser parser2 = new FastaParser(new FileInputStream(servletContext.getRealPath(path2)),path2);
+			sequences = parser2.parse();
+		} catch (FileNotFoundException e) {
+			throw new DataSourceException("The reference data source cannot be loaded. The fasta file couldn't be oppened",e);
+		} catch (Exception e) {
+			throw new DataSourceException("The reference data source cannot be loaded because of parsing problems with the fasta file",e);
 		}
 	}
 
@@ -136,13 +143,16 @@ public class GFFFileReferenceDataSource implements ReferenceDataSource {
 		throw new UnimplementedFeatureException("No implemented");
 	}
 
-    public DasSequence getSequence(String segmentId) throws BadReferenceObjectException, DataSourceException {
-        return new DasSequence(segmentId, segmentId + "1234567890", 1, "" + new String(segmentId + "1234567890").hashCode(), "label " + segmentId);
-    }
+	public DasSequence getSequence(String segmentId) throws BadReferenceObjectException, DataSourceException {
+		DasSequence seq=sequences.get(segmentId);
+		if (seq==null)
+			throw new BadReferenceObjectException("",segmentId);
+		return seq;
+	}
 
-    public String getEntryPointVersion() throws DataSourceException {
-        return "1.0"; 
-    }
+	public String getEntryPointVersion() throws DataSourceException {
+		return "1.0"; 
+	}
 
     /**
      * This method is provided just for testing purposes, it does not retrieve real data.
@@ -151,31 +161,23 @@ public class GFFFileReferenceDataSource implements ReferenceDataSource {
      * @return A sub ordered collection of entry points from the start row to the stop row 
      * @throws DataSourceException
      */
-    public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws DataSourceException {
-        ArrayList<DasEntryPoint> entryPoints = new ArrayList<DasEntryPoint>();
-        if ((start != null) && (stop != null)) {
-            for (int i = 1; i <= 10; i++) {
-                if ( (start <= i) && (i <= stop) ) {
-                    entryPoints.add(
-                        new DasEntryPoint(
-                                "EP_" + i, 1, 1, null, "1.0",
-                                DasEntryPointOrientation.NO_INTRINSIC_ORIENTATION,
-                                "Scaffold Entry Point", true));
-                }
-            }
-        } else {
-            for (int i = 1; i <= 10; i++) {
-                entryPoints.add(
-                        new DasEntryPoint(
-                                "EP_" + i, 1, 1, null, "1.0",
-                                null,
-                                "Scaffold Entry Point", true));
-            }
-        }
-        return entryPoints;
-    }
+	public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws DataSourceException {
+		ArrayList<DasEntryPoint> entryPoints = new ArrayList<DasEntryPoint>();
+		for (String id:sequences.keySet()) {
+			DasSequence seq= sequences.get(id);
+			entryPoints.add(
+					new DasEntryPoint(
+							id, seq.getStopCoordinate(), seq.getStartCoordinate(), "DNA", "1.0",
+							null,
+							seq.getLabel(), false));
+		}
+		if ((start != null) && (stop != null)) 
+			return entryPoints.subList(start, stop);
 
-    public int getTotalEntryPoints() throws DataSourceException {
-        return 8;
-    }
+		return entryPoints;
+	}
+
+	public int getTotalEntryPoints() throws DataSourceException {
+		return sequences.size();
+	}
 }

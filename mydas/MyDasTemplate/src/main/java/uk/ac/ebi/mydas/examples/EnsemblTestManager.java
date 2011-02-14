@@ -12,8 +12,11 @@ import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 import uk.ac.ebi.mydas.model.DasComponentFeature;
+import uk.ac.ebi.mydas.model.DasEntryPoint;
+import uk.ac.ebi.mydas.model.DasEntryPointOrientation;
 import uk.ac.ebi.mydas.model.DasFeature;
 import uk.ac.ebi.mydas.model.DasMethod;
+import uk.ac.ebi.mydas.model.DasSequence;
 import uk.ac.ebi.mydas.model.DasType;
 
 public class EnsemblTestManager {
@@ -31,6 +34,9 @@ public class EnsemblTestManager {
 	private DasMethod method;
 
 	private Connection connection;
+	
+	private String database = "homo_sapiens_core_56_37a";
+	private Collection<DasEntryPoint> entryPoints=null;
 
 	public EnsemblTestManager() throws DataSourceException{
 		//Initialize types
@@ -47,7 +53,8 @@ public class EnsemblTestManager {
 		connection = null;
 		String userName = "anonymous";
 		String password = "";
-		String url = "jdbc:mysql://ensembldb.ensembl.org:5306/homo_sapiens_core_56_37a";
+		
+		String url = "jdbc:mysql://ensembldb.ensembl.org:5306/"+database;
 		try {
 			Class.forName ("com.mysql.jdbc.Driver").newInstance ();
 			connection = DriverManager.getConnection (url, userName, password);
@@ -67,28 +74,34 @@ public class EnsemblTestManager {
 		} catch (Exception e) { /* ignore close errors */ }
 
 	}
-	public Collection<DasAnnotatedSegment> getSubmodelBySQL(String sql) throws DataSourceException{
+	public Collection<DasAnnotatedSegment> getSubmodelBySQL(String sql,int maxbins) throws DataSourceException{
 		Collection<DasAnnotatedSegment> segments=null;
-			try {
-				Statement s = connection.createStatement ();
-				s.executeQuery (sql);
-				ResultSet rs = s.getResultSet ();
-				while (rs.next ()) {
-					if (segments==null)
-						segments= new ArrayList<DasAnnotatedSegment>();
-					DasAnnotatedSegment segment = this.getSegment(segments,rs.getString ("chr"));
-					DasComponentFeature gene= this.getGene(rs.getString ("gene_id"),rs.getInt("gene_start"),rs.getInt("gene_end"),segment);
-					DasComponentFeature transcript= this.getTranscript(rs.getString ("trascript_id"),rs.getInt("transcript_start"),rs.getInt("transcript_end"),gene);
-					this.getExon(rs.getString ("exon_id"),rs.getInt("exon_start"),rs.getInt("exon_end"),transcript);
+		try {
+			Statement s = connection.createStatement ();
+			s.executeQuery (sql);
+			ResultSet rs = s.getResultSet ();
+			DasComponentFeature previousGene=null;
+			while (rs.next () && maxbins!=0) {
+				if (segments==null)
+					segments= new ArrayList<DasAnnotatedSegment>();
+				DasAnnotatedSegment segment = this.getSegment(segments,rs.getString ("chr"));
+				DasComponentFeature gene= this.getGene(rs.getString ("gene_id"),rs.getInt("gene_start"),rs.getInt("gene_end"),segment);
+				if (previousGene!=gene){
+					maxbins--;
+					previousGene = gene;
 				}
-				rs.close ();
-				s.close ();
-			} catch (SQLException e) {
-				throw new DataSourceException("Problems executing the sql query",e);
+
+				DasComponentFeature transcript= this.getTranscript(rs.getString ("trascript_id"),rs.getInt("transcript_start"),rs.getInt("transcript_end"),gene);
+				this.getExon(rs.getString ("exon_id"),rs.getInt("exon_start"),rs.getInt("exon_end"),transcript);
 			}
+			rs.close ();
+			s.close ();
+		} catch (SQLException e) {
+			throw new DataSourceException("Problems executing the sql query",e);
+		}
 		return segments;
 	}
-	
+
 	public Collection<DasAnnotatedSegment> getSubmodelByFeatureId(Collection<String> featureIdCollection) throws DataSourceException{
 		String sql="SELECT " +
 		" sr.name AS chr, " +
@@ -125,10 +138,13 @@ public class EnsemblTestManager {
 			or ="or";
 		}
 		sql += ")";
-		return getSubmodelBySQL(sql);
+		return getSubmodelBySQL(sql,-1);
 	}
-	
+
 	public DasAnnotatedSegment getSubmodelBySegmentId(String segmentId, int start, int stop) throws DataSourceException, BadReferenceObjectException{
+		return getSubmodelBySegmentId(segmentId, start, stop,-1);
+	}
+	public DasAnnotatedSegment getSubmodelBySegmentId(String segmentId, int start, int stop, int maxbins) throws DataSourceException, BadReferenceObjectException{
 		String sql="SELECT " +
 		" sr.name AS chr, " +
 		" gsi.stable_id AS gene_id, " +
@@ -139,7 +155,8 @@ public class EnsemblTestManager {
 		" t.seq_region_end AS transcript_end, " +
 		" esi.stable_id AS exon_id, " +
 		" e.seq_region_start AS exon_start, " +
-		" e.seq_region_end AS exon_end " +
+		" e.seq_region_end AS exon_end, " +
+		"(g.seq_region_end-g.seq_region_start) AS size " +
 		"FROM  " +
 		" seq_region sr, " +
 		" gene_stable_id gsi, " +
@@ -161,7 +178,8 @@ public class EnsemblTestManager {
 		" sr.name ='"+segmentId+"' ";
 		if (start!=-1 && stop!=-1)
 			sql += " and g.seq_region_start>"+start+" and g.seq_region_end<"+stop;
-		Collection<DasAnnotatedSegment>segments= getSubmodelBySQL(sql);
+		sql += " ORDER BY size DESC";
+		Collection<DasAnnotatedSegment>segments= getSubmodelBySQL(sql,maxbins);
 		if (segments!=null && segments.size()>0)
 			return segments.iterator().next();
 		else
@@ -194,15 +212,29 @@ public class EnsemblTestManager {
 		for (DasAnnotatedSegment segment:segments)
 			if (segment.getSegmentId().equals(segmentId))
 				return segment;
-		DasAnnotatedSegment newSegment = new DasAnnotatedSegment(segmentId,1,1,"FROM_DATABASE",segmentId, new ArrayList<DasFeature>());
+		Integer length = this.getSegmentLength(segmentId);
+		DasAnnotatedSegment newSegment = new DasAnnotatedSegment(segmentId,1,length,"FROM_DATABASE",segmentId, new ArrayList<DasFeature>());
 		segments.add(newSegment);
 		return newSegment;
+	}
+	private Integer getSegmentLength(String segmentId){
+		String sql="SELECT length FROM seq_region WHERE name='"+segmentId+"' and coord_system_id=2";
+		try{
+			Statement s = connection.createStatement ();
+			s.executeQuery (sql);
+			ResultSet rs = s.getResultSet ();
+			while (rs.next ()) 
+				return rs.getInt ("length");
+		} catch (SQLException e) {
+			return 1;
+		}
+		return 1;
 	}
 	public ArrayList<DasType> getTypes() {
 		return types;
 	}
 	public Integer getTotalCountForType(String typeId)
-			throws DataSourceException {
+	throws DataSourceException {
 		String sql="";
 		Integer count =0;
 		if (typeId.equalsIgnoreCase("Gene"))
@@ -224,6 +256,55 @@ public class EnsemblTestManager {
 			throw new DataSourceException("Problems executing the sql query",e);
 		}
 		return count;
+	}
+	public DasSequence getSequence(String segmentId) throws DataSourceException, BadReferenceObjectException {
+		DasSequence seq=null;
+		String sql="";
+		sql="SELECT * FROM chromosome WHERE name="+segmentId;
+		try {
+			Statement s = connection.createStatement ();
+			s.executeQuery (sql);
+			ResultSet rs = s.getResultSet ();
+			if (rs.next ()) {
+				seq= new DasSequence(segmentId,rs.getString("SEQUENCE"),1,"homo_sapiens_core_56_37a", "Chromosome "+segmentId);
+			}else{
+				throw new BadReferenceObjectException("The segment ["+segmentId+"] was not found in this reference server", segmentId);
+			}
+			rs.close ();
+			s.close ();
+		} catch (SQLException e) {
+			throw new DataSourceException("Problems executing the sql query",e);
+		}
+		return seq;
+	}
+	public String getDatabase(){
+		return database;
+	}
+	public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws DataSourceException{
+		if (entryPoints!=null){
+			if ((start != null) && (stop != null)) 
+				return ((ArrayList<DasEntryPoint>)entryPoints).subList(start, stop);
+			return entryPoints;
+		}
+		String sql="";
+		sql="SELECT * FROM seq_region WHERE seq_region.coord_system_id =2;";
+		try {
+			Statement s = connection.createStatement ();
+			s.executeQuery (sql);
+			ResultSet rs = s.getResultSet ();
+			entryPoints = new ArrayList<DasEntryPoint>();
+			while (rs.next ()) {
+				entryPoints.add(new DasEntryPoint(rs.getString("name"), 1, rs.getInt("length"), "Chromosome", getDatabase(), DasEntryPointOrientation.POSITIVE_ORIENTATION, "Chromosome", true));
+			}
+			rs.close ();
+			s.close ();
+		} catch (SQLException e) {
+			throw new DataSourceException("Problems executing the sql query",e);
+		}
+		if ((start != null) && (stop != null)) 
+			return ((ArrayList<DasEntryPoint>)entryPoints).subList(start, stop);
+
+		return entryPoints;
 	}
 
 }
