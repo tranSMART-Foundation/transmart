@@ -79,7 +79,7 @@ public class Searcher {
 			throw new SearcherException("Error parsing the query.",e);
 		}
 
-		int hitsPerPage = 100;
+		int hitsPerPage = 1000;
 		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
 		try {
 			searcher.search(q, collector);

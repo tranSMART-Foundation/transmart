@@ -11,7 +11,7 @@ public class ErrorSegment extends DasAnnotatedSegment {
 		super(segmentId, startCoordinate, stopCoordinate, version, label, null);
 	}
 	public ErrorSegment(SegmentQuery segmentQuery) throws DataSourceException{
-		this(segmentQuery.getSegmentId(),segmentQuery.getStartCoordinate(), segmentQuery.getStopCoordinate(), "error", "error");
+		this(segmentQuery.isEmpty()?"EMPTY":segmentQuery.getSegmentId(),segmentQuery.getStartCoordinate(), segmentQuery.getStopCoordinate(), "error", "error");
 		this.segmentQuery=segmentQuery;
 	}
 	public SegmentQuery getSegmentQuery(){

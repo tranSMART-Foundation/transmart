@@ -39,10 +39,14 @@ public class SegmentQuery {
     private final Integer startCoordinate;
 
     private final Integer stopCoordinate;
+    
+    private boolean empty=false;
 
     public SegmentQuery(Matcher segmentRangePatternMatcher){
         //Pattern: "^segment=([^:\\s]*)(:([-]?(\\d+)),([-]?(\\d+)))?$"  (since 1.6.1 start and stop can be negatives)
         segmentId = segmentRangePatternMatcher.group(1);
+        if (segmentId.trim().equals(""))
+        	empty=true;
         String startString = segmentRangePatternMatcher.group(3);
         String stopString = segmentRangePatternMatcher.group(5);
         startCoordinate = (startString == null || startString.length() == 0)
@@ -76,4 +80,9 @@ public class SegmentQuery {
         }
         return buf.toString();
     }
+
+
+	public boolean isEmpty() {
+		return empty;
+	}
 }

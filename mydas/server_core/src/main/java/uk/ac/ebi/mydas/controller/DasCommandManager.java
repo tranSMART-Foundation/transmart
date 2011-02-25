@@ -1272,7 +1272,7 @@ public class DasCommandManager {
 			}
 			catch (BadReferenceObjectException broe) {
 				if (unknownSegmentsHandled){
-                    if (broe.getCause() != null) { //For both annotation and reference servers, limits out of bounds should report an ERRORSEGEMENT (since 1.6.1)
+                    if ((broe.getCause() != null)||(segmentQuery.isEmpty())) { //For both annotation and reference servers, limits out of bounds should report an ERRORSEGEMENT (since 1.6.1)
                         segments.add(new ErrorSegment(segmentQuery));
                     } else {
                         segments.add(new DasUnknownFeatureSegment(segmentQuery));
