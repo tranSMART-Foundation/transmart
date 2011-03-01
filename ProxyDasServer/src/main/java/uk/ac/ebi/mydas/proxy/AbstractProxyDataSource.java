@@ -273,8 +273,7 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
             LOGGER.error("Could not form a valid URL from " + urlString, e);
         } catch (IOException e) {
             LOGGER.error("IOException thrown when requesting URL " + urlString, e);
-        }
-        finally {
+        } finally {
             if (method != null) {
                 method.releaseConnection();
             }
@@ -320,6 +319,9 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
      */
     @Override
     public DasAnnotatedSegment getFeatures(String segmentId, Integer maxBins) throws BadReferenceObjectException, DataSourceException {
+        if (segmentId == null || "".equals(segmentId.trim())) {
+            throw new BadReferenceObjectException(segmentId, "The query has provided an empty segmentId");
+        }
         Collection<QueryAwareDasAnnotatedSegment> annotatedSegments = new ArrayList<QueryAwareDasAnnotatedSegment>();
         LOGGER.debug("Data sources: " + remoteDataSources);
         List<DasQueryRunnerThread> proxies = new ArrayList<DasQueryRunnerThread>(remoteDataSources.size());
@@ -374,8 +376,7 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
                         segment.setQueryURL(runner.getUrlQueryString());
                     }
                     annotatedSegments.addAll(segments);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     // Don't barf out here - the other proxy data sources may work.
                     LOGGER.error("An IOException was thrown when attempting to xml the XML from " + runner.getUrlQueryString(), e);
                 } finally {
