@@ -187,6 +187,11 @@ public class WebIntegrationTest extends WebTestCase {
 		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
 		assertTextPresent("<ERRORSEGMENT id=\"unknown\" />");
 	}
+	public void test_features_command_empty_segment(){
+		beginAt("/test/features?segment=");
+		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+		assertTextPresent("<ERRORSEGMENT id=\"\" />");
+	}
 	public void test_features_command_one(){
 		beginAt("/test/features?segment=one");
 		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
