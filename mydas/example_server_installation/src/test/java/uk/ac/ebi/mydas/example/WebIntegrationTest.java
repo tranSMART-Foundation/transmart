@@ -195,7 +195,7 @@ public class WebIntegrationTest extends WebTestCase {
 	public void test_features_command_one(){
 		beginAt("/test/features?segment=one");
 		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" total=\"2\" version=\"Up-to-date\" label=\"one_label\">");
 		assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
 		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
 		assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
@@ -214,7 +214,7 @@ public class WebIntegrationTest extends WebTestCase {
 	public void test_features_command_featureids(){
 		beginAt("/test/features?feature_id=oneFeatureIdOne;feature_id=unknown");
 		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" total=\"1\" version=\"Up-to-date\" label=\"one_label\">");
 		assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
 		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
 		assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
@@ -233,7 +233,7 @@ public class WebIntegrationTest extends WebTestCase {
 	public void test_features_command_one_maxbins(){
 		beginAt("/test/features?segment=one;maxbins=1");
 		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" total=\"1\" version=\"Up-to-date\" label=\"one_label\">");
 		assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
 		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
 		assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
@@ -252,7 +252,7 @@ public class WebIntegrationTest extends WebTestCase {
 	public void test_features_command_two_parts(){
 		beginAt("/test/features?segment=two;category=component");
 		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-		assertTextPresent("<SEGMENT id=\"two\" start=\"1\" stop=\"1000\" version=\"Up-to-date\" label=\"two_label\">");
+		assertTextPresent("<SEGMENT id=\"two\" start=\"1\" stop=\"1000\" total=\"1\" version=\"Up-to-date\" label=\"two_label\">");
 		assertTextPresent("<FEATURE id=\"two\" label=\"two\">");
 		assertTextPresent("<TYPE id=\"ThisSegment\" reference=\"yes\" superparts=\"yes\" subparts=\"yes\" category=\"component\" />");
 		assertTextPresent("<METHOD id=\"assembly\" />");
@@ -475,7 +475,7 @@ public class WebIntegrationTest extends WebTestCase {
 		String resp=page.getWebResponse().getContentAsString();
 		assertLocalContains(resp,"<DASGFF>");
 		assertLocalContains(resp,"<GFF");
-		assertLocalContains(resp,"<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertLocalContains(resp,"<SEGMENT id=\"one\" start=\"1\" stop=\"34\" total=\"1\" version=\"Up-to-date\" label=\"one_label\">");
 		assertLocalContains(resp,"<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
 		assertLocalContains(resp,"<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
 		assertLocalContains(resp,"<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
@@ -528,7 +528,7 @@ public class WebIntegrationTest extends WebTestCase {
 		String resp=page.getWebResponse().getContentAsString();
 		assertLocalContains(resp,"<DASGFF>");
 		assertLocalContains(resp,"<GFF");
-		assertLocalContains(resp,"<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertLocalContains(resp,"<SEGMENT id=\"one\" start=\"1\" stop=\"34\" total=\"1\" version=\"Up-to-date\" label=\"one_label\">");
 		assertLocalContains(resp,"<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
 		assertLocalContains(resp,"<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
 		assertLocalContains(resp,"<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
@@ -630,7 +630,7 @@ public class WebIntegrationTest extends WebTestCase {
 	public void test_advanced_search_without_segment_whitout_feature_id(){
 		beginAt("/test/features?query=(typeCvId:CV\\:00001 AND featureLabel:\"one Feature\") OR typeId:twoFeatureTypeIdOne");
 		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" total=\"1\" version=\"Up-to-date\" label=\"one_label\">");
 		assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
 		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
 		assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
@@ -650,7 +650,7 @@ public class WebIntegrationTest extends WebTestCase {
 	public void test_advanced_search_with_segment(){
 		beginAt("/test/features?segment=one;query=(typeCvId:CV\\:00001 AND featureLabel:\"one Feature\") OR typeId:twoFeatureTypeIdOne");
 		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" total=\"1\" version=\"Up-to-date\" label=\"one_label\">");
 		assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
 		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
 		assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
@@ -669,7 +669,7 @@ public class WebIntegrationTest extends WebTestCase {
 	public void test_advanced_search_with_feature_ids(){
 		beginAt("/test/features?feature_id=oneFeatureIdOne;feature_id=oneFeatureIdTwo;query=(typeCvId:CV\\:00001 AND featureLabel:\"one Feature\") OR typeId:twoFeatureTypeIdOne");
 		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" total=\"1\" version=\"Up-to-date\" label=\"one_label\">");
 		assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
 		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
 		assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
@@ -697,7 +697,7 @@ public class WebIntegrationTest extends WebTestCase {
 		String query="featureId:oneFeatureId*";
 		beginAt("/test/features?query="+query);
 		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
-		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" version=\"Up-to-date\" label=\"one_label\">");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" total=\"2\" version=\"Up-to-date\" label=\"one_label\">");
 		assertTextPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
 		assertTextPresent("<TYPE id=\"oneFeatureTypeIdOne\" cvId=\"CV:00001\" category=\"oneFeatureCategoryOne\">one Feature DasType Label One</TYPE>");
 		assertTextPresent("<METHOD id=\"oneFeatureMethodIdOne\" cvId=\"ECO:12345\">one Feature Method Label One</METHOD>");
@@ -711,4 +711,16 @@ public class WebIntegrationTest extends WebTestCase {
 	private void assertLocalContains(String text,String subtext){
 		assertTrue("The text ["+subtext+"] was not found in ["+text+"]",text.contains(subtext));
 	}
+	
+	public void test_features_with_rows(){
+		beginAt("/test/features?segment=one;rows=2-2");
+		assertTextPresent("<?xml version=\"1.0\" standalone=\"no\"?>");
+		assertTextPresent(" <GFF href=\"http://localhost:8080/das/test/features?segment=one;rows=2-2\" total=\"2\">");
+		assertTextPresent("<SEGMENT id=\"one\" start=\"1\" stop=\"34\" total=\"2\" version=\"Up-to-date\" label=\"one_label\">");
+		assertTextNotPresent("<FEATURE id=\"oneFeatureIdOne\" label=\"one Feature Label One\">");
+		assertTextPresent("<FEATURE id=\"oneFeatureIdTwo\" label=\"one Feature Label Two\">");
+		assertTextPresent("</FEATURE>");
+		assertTextPresent("</SEGMENT>");
+	}
+	
 }

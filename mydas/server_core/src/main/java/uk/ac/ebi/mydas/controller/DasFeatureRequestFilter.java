@@ -24,10 +24,12 @@
 package uk.ac.ebi.mydas.controller;
 
 import uk.ac.ebi.mydas.model.DasFeature;
+import uk.ac.ebi.mydas.model.Range;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -43,9 +45,9 @@ public class DasFeatureRequestFilter {
 
     private Collection<String> typeIds = null;
 
-    private Collection<String> categoryIds = null;
+	private Collection<String> categoryIds = null;
 
-    private Collection<String> featureIds = null;
+	private Collection<String> featureIds = null;
 
     /**
      * @deprecated
@@ -53,7 +55,72 @@ public class DasFeatureRequestFilter {
     private Collection<String> groupIds = null;
 
 
-    DasFeatureRequestFilter() {
+    private Integer maxbins=null;
+    
+    private Range rows=null;
+    
+	private String advanceQuery=null;
+    
+    private List<SegmentQuery> requestedSegments;
+    
+    private boolean paginated=false;
+    
+    private Integer totalFeatures;
+    
+    public Integer getTotalFeatures() {
+		return totalFeatures;
+	}
+	public void setTotalFeatures(Integer totalFeatures) {
+		this.totalFeatures = totalFeatures;
+	}
+	public boolean isPaginated(){
+    	return paginated;
+    }
+    public void setPaginated(boolean paginated){
+    	this.paginated=paginated;
+    }
+    public Range getRows() {
+		return rows;
+	}
+
+	public void setRows(Range rows) {
+		this.rows = rows;
+	}
+    
+    public Collection<String> getTypeIds() {
+		return typeIds;
+	}
+
+    public Collection<String> getCategoryIds() {
+		return categoryIds;
+	}
+
+    public List<SegmentQuery> getRequestedSegments() {
+		return requestedSegments;
+	}
+
+	public void setRequestedSegments(List<SegmentQuery> requestedSegments) {
+		this.requestedSegments = requestedSegments;
+	}
+
+	public String getAdvanceQuery() {
+		return advanceQuery;
+	}
+
+	public void setAdvanceQuery(String advanceQuery) {
+		this.advanceQuery = advanceQuery;
+	}
+
+	public Integer getMaxbins() {
+		return maxbins;
+	}
+
+	public void setMaxbins(Integer maxbins) {
+		this.maxbins = maxbins;
+	}
+
+
+	DasFeatureRequestFilter() {
         // Does nothing - Collections are lazy instantiated and populated by add methods.
     }
 
@@ -99,7 +166,7 @@ public class DasFeatureRequestFilter {
         return groupIds != null && groupIds.size() > 0;
     }
 
-    Collection<String> getFeatureIds(){
+    public Collection<String> getFeatureIds(){
         if (featureIds == null)
 			return Collections.emptyList();
 		else

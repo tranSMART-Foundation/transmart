@@ -140,5 +140,18 @@ public class TestDataSourceOld implements AnnotationDataSource {
 	public void registerCacheManager(CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
 	}
+	@Override
+	public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins,
+			Range rows) throws BadReferenceObjectException,
+			DataSourceException, UnimplementedFeatureException {
+		throw new UnimplementedFeatureException("The rows-for-feature capability has not been implemented");
+	}
+
+	@Override
+	public Collection<DasAnnotatedSegment> getFeatures(
+			Collection<String> featureIdCollection, Integer maxbins, Range rows)
+			throws UnimplementedFeatureException, DataSourceException {
+		throw new UnimplementedFeatureException("The rows-for-feature capability has not been implemented");
+	}
 
 }

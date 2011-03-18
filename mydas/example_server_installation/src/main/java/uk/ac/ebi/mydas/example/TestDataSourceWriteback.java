@@ -24,6 +24,7 @@ import uk.ac.ebi.mydas.model.DasMethod;
 import uk.ac.ebi.mydas.model.DasPhase;
 import uk.ac.ebi.mydas.model.DasTarget;
 import uk.ac.ebi.mydas.model.DasType;
+import uk.ac.ebi.mydas.model.Range;
 
 public class TestDataSourceWriteback implements WritebackDataSource, AnnotationDataSource {
 
@@ -164,6 +165,19 @@ public class TestDataSourceWriteback implements WritebackDataSource, AnnotationD
 	public void registerCacheManager(CacheManager cacheManager) {
 		// TODO Auto-generated method stub
 
+	}
+	@Override
+	public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins,
+			Range rows) throws BadReferenceObjectException,
+			DataSourceException, UnimplementedFeatureException {
+		throw new UnimplementedFeatureException("The rows-for-feature capability has not been implemented");
+	}
+
+	@Override
+	public Collection<DasAnnotatedSegment> getFeatures(
+			Collection<String> featureIdCollection, Integer maxbins, Range rows)
+			throws UnimplementedFeatureException, DataSourceException {
+		throw new UnimplementedFeatureException("The rows-for-feature capability has not been implemented");
 	}
 
 }

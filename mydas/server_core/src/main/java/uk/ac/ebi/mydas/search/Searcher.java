@@ -26,6 +26,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
+import uk.ac.ebi.mydas.controller.DasFeatureRequestFilter;
+import uk.ac.ebi.mydas.controller.SegmentQuery;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.exceptions.SearcherException;
 import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
@@ -41,13 +43,21 @@ import uk.ac.ebi.mydas.model.DasType;
 public class Searcher {
 	private static final Logger logger = Logger.getLogger(Searcher.class);
 	private String dirPath, dataSourceName;
+	private DasFeatureRequestFilter filter=null;
 	
 	public Searcher(String dirPath, String dataSourceName){
 		this.dirPath = dirPath;
 		this.dataSourceName = dataSourceName;
 	}
 	
-	public Collection<DasAnnotatedSegment> search(String query) throws SearcherException{
+	public Collection<DasAnnotatedSegment> search(DasFeatureRequestFilter filter) throws SearcherException{
+		this.filter=filter;
+		String query = this.getMergedQuery(filter);
+		if (filter.getRows()==null)
+			return this.search(query, null,null);
+		return this.search(query, filter.getRows().getFrom(), filter.getRows().getTo());
+	}
+	public Collection<DasAnnotatedSegment> search(String query, Integer from, Integer to) throws SearcherException{
 		try {
 			query = URLDecoder.decode(query,"UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -79,14 +89,20 @@ public class Searcher {
 			throw new SearcherException("Error parsing the query.",e);
 		}
 
-		int hitsPerPage = 1000;
-		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
+		int hitsPerPage = 100000;
+		MyDasCollector collector = MyDasCollector.create(hitsPerPage, true,searcher);
 		try {
 			searcher.search(q, collector);
 		} catch (IOException e) {
 			throw new SearcherException("Error in I/O operations while searching.",e);
 		}
-		ScoreDoc[] hits = collector.topDocs().scoreDocs;
+		ScoreDoc[] hits;
+//		if (from==null)
+			hits= collector.topDocs().scoreDocs;
+//		else
+//			hits= collector.topDocs(from,to-from).scoreDocs;
+		filter.setPaginated(true);
+		filter.setTotalFeatures(collector.getTotalHits());
 		Collection<DasAnnotatedSegment> segments= new ArrayList<DasAnnotatedSegment>();
 		if (hits.length==0)
 			try {
@@ -94,11 +110,17 @@ public class Searcher {
 			} catch (DataSourceException e1) {
 				throw new SearcherException("The resultset was empty but was impossible to generete the XML",e1);
 			}
+			
 
-		for(int i=0;i<hits.length;++i) {
-			int docId = hits[i].doc;
+		if ((to==null)||(to>hits.length)) 
+			to=hits.length;
+		if ((from==null)||(from<1))  
+			from=1;
+		for(int i=from;i<=to;++i) {
+			int docId = hits[i-1].doc;
 			try {
 				DasAnnotatedSegment segment = getSegmentFromDoc(searcher.doc(docId));
+				segment.setTotalFeatures(collector.getSizePerSegment(searcher.doc(docId).get("segmentId")));
 				addSegment2Collection(segments,segment);
 			} catch (CorruptIndexException e) {
 				throw new SearcherException("Error recovering one of the result docs.",e);
@@ -271,5 +293,61 @@ public class Searcher {
 			return partsF;
 		}
 		return null;
+	}
+	
+	public String getMergedQuery(DasFeatureRequestFilter filter){
+		String query=filter.getAdvanceQuery();
+		
+		//getting the query for all the segments
+		String querySegment="";
+		String connector="";
+		if (filter.getRequestedSegments()!=null){
+			for (SegmentQuery segmentQuery:filter.getRequestedSegments()){
+				querySegment = connector + "(segmentId:"+segmentQuery.getSegmentId();
+				if (segmentQuery.getStartCoordinate()!=null && segmentQuery.getStopCoordinate()!=null){
+					querySegment +=" AND segmentStart:["+segmentQuery.getStartCoordinate()+" TO *]";
+					querySegment +=" AND segmentStop:[* TO "+segmentQuery.getStopCoordinate()+"]";
+				}
+				querySegment +=")";
+				connector=" OR ";
+			}
+			query=mergeAND(query,querySegment);
+		}
+		
+		String queryFeatureIds="";
+		connector="";
+		if (filter.getFeatureIds()!=null){
+			for (String featureId:filter.getFeatureIds()){
+				queryFeatureIds += connector + "featureId:"+featureId;
+				connector=" OR ";
+			}
+			query=mergeAND(query,queryFeatureIds);
+		}
+		
+		String queryCategories="";
+		connector="";
+		if (filter.getCategoryIds()!=null){
+			for (String category:filter.getCategoryIds()){
+				queryCategories += connector + "typeCategory:"+category;
+				connector=" OR ";
+			}
+			query=mergeAND(query,queryCategories);
+		}
+		
+		String queryTypes="";
+		connector="";
+		if (filter.getTypeIds()!=null){
+			for (String typeId:filter.getTypeIds()){
+				queryTypes += connector + "typeId:"+typeId;
+				connector=" OR ";
+			}
+			query=mergeAND(query,queryTypes);
+		}
+		return query;
+	}
+	private String mergeAND(String q1,String q2){
+		if (q1==null || q1.trim().equals("")) return q2;
+		if (q2==null || q2.trim().equals("")) return q1;
+		return "("+ q1 + ") AND (" + q2 +")";
 	}
 }

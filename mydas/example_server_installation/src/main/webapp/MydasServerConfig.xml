@@ -120,6 +120,7 @@
 				<capability type="das1:advanced-search"   />
 				<capability type="das1:entry_points"   />
 				<capability type="das1:feature-by-id"   />
+				<capability type="das1:rows-for-feature"   />
 
 				
 			</version>

@@ -83,6 +83,7 @@ public class DasAnnotatedSegment extends DasSegment implements Serializable {
      */
     String type;
 
+    Integer totalFeatures;
     /**
      * Constructor for a DasAnnotatedSegment object that ensures that the object is valid.
      * See the documentation of the various getters to find out where in DAS XML these fields may be used.
@@ -100,11 +101,17 @@ public class DasAnnotatedSegment extends DasSegment implements Serializable {
      * @throws DataSourceException to allow you to handle problems with the data source, such as SQLExceptions,
      * parsing errors etc.
      */
+    
     public DasAnnotatedSegment(String segmentId, Integer startCoordinate, Integer stopCoordinate, String version, String segmentLabel, Collection<DasFeature> features)
             throws DataSourceException {
         super(startCoordinate, stopCoordinate, segmentId, version);
         this.features = features;
         this.segmentLabel = segmentLabel;
+    }
+    public DasAnnotatedSegment(String segmentId, Integer startCoordinate, Integer stopCoordinate, String version, String segmentLabel, Collection<DasFeature> features,Integer total)
+    	throws DataSourceException {
+    	this( segmentId,  startCoordinate,  stopCoordinate,  version,  segmentLabel, features);
+    	this.totalFeatures=total;
     }
 
     /**
@@ -248,5 +255,16 @@ public class DasAnnotatedSegment extends DasSegment implements Serializable {
             selfComponent = new DasComponentFeature(this);
         }
         return selfComponent;
+    }
+    
+    
+    public Integer getTotalFeatures(){
+    	if (this.totalFeatures==null)
+    		this.totalFeatures = features.size(); 
+    	return this.totalFeatures;
+    		
+    }
+    public void setTotalFeatures(Integer total){
+    	totalFeatures=total;
     }
 }

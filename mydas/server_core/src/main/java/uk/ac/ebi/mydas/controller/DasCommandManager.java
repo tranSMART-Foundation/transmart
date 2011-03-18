@@ -61,6 +61,7 @@ import uk.ac.ebi.mydas.model.DasSegment;
 import uk.ac.ebi.mydas.model.DasSequence;
 import uk.ac.ebi.mydas.model.DasType;
 import uk.ac.ebi.mydas.model.ErrorSegment;
+import uk.ac.ebi.mydas.model.Range;
 import uk.ac.ebi.mydas.model.alignment.DasAlignment;
 import uk.ac.ebi.mydas.model.structure.DasStructure;
 import uk.ac.ebi.mydas.search.Indexer;
@@ -828,9 +829,7 @@ public class DasCommandManager {
 		// Split on the ; (delineates the separate parts of the query)
 		String[] queryParts = queryString.split(";");
 		DasFeatureRequestFilter filter = new DasFeatureRequestFilter ();
-		String query=null;
 		boolean categorize = true;
-		Integer maxbins=null;
 		for (String queryPart : queryParts){
 			// Now determine what each part is, and construct the query.
 			Matcher segmentRangeMatcher = SEGMENT_RANGE_PATTERN.matcher(queryPart);
@@ -865,14 +864,25 @@ public class DasCommandManager {
 				}
 				// else check for advanced search query
 				else if ("query".equals (key)){
-					query=value;
+					filter.setAdvanceQuery(value);
 				}
 				// else check for maxbean restriction
 				else if ("maxbins".equals (key)){
 					try{
-						maxbins = new Integer(value);
+						filter.setMaxbins(new Integer(value));
 					}catch(NumberFormatException nfe){
 						throw new BadCommandArgumentsException("Bad command arguments to the features command. the maxbeans attribute should be Numeric: " + queryString);
+					}
+				}
+				// extension for pagination
+				else if ("rows".equals (key)){
+					try{
+						String[] limits=value.split("-");
+						if (limits.length!=2)
+							throw new BadCommandArgumentsException("Bad command arguments to the features command. the rows attribute should be of the form [START]-[END]: " + queryString);							
+						filter.setRows(new Range(new Integer(limits[0]),new Integer(limits[1])));
+					}catch(NumberFormatException nfe){
+						throw new BadCommandArgumentsException("Bad command arguments to the features command. the rows attribute should of the form [START]-[END] here START and END have to be integers: " + queryString);
 					}
 				}
 				// DAS1.6: The groups have been eliminated, and with it the filter by group
@@ -883,8 +893,11 @@ public class DasCommandManager {
 				// Any command parameters that are not recognised should be ignored
 				// This is a change from version 1.01 - some 1.53E commands were causing
 				// service failure.
+				
+				//rows is an extension propose in DAS 2011 to provide a pagination mechanism to the features command
 			}
 		}
+		filter.setRequestedSegments(requestedSegments);
 
 		/************************************************************************\
 		 * Query the DataSource                                                 *
@@ -892,96 +905,83 @@ public class DasCommandManager {
 
 		//if the query attribute has been included in the request a search is launched
 		//the query, segment and feature_id are executed as a logic AND when used together
+		 
 		
-		Collection<DasAnnotatedSegment> segmentsByQuery=null,segmentsByFeatureId =null, segmentsBySegmentId=null;
-		if (dsnConfig.getCapabilities().contains("feature-by-id")){
-			if (query!=null){
-				Map<String, PropertyType> properties = DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getGlobalParameters();
-				Searcher searcher=new Searcher(properties.get("indexerpath").getValue(),dsnConfig.getName());
-				try {
-					segmentsByQuery=searcher.search(query);
-				} catch (SearcherException e) {
-					logger.error("Searching/indexing thrown", e);
-				}
-//				if (filter.getFeatureIds()==null || filter.getFeatureIds().isEmpty()){
-//					if (fids!=null)
-//						for(String fid:fids)
-//							filter.addFeatureId(fid);
-//				}else if (fids!=null){
-//					Collection<String> toRemove=new ArrayList<String>();
-//					for (String filterFid:filter.getFeatureIds()){
-//						boolean isInFilter=false;
-//						for(String fid:fids)
-//							if (filterFid.equals(fid))
-//								isInFilter=true;
-//						if (!isInFilter)
-//							toRemove.add(filterFid);
-//					}
-//					filter.getFeatureIds().removeAll(toRemove);
-//				}
-			}
-		}
+		Collection<DasAnnotatedSegment> segmentsByFeatureId =null, segmentsBySegmentId=null;
 		Collection<SegmentReporter> segmentReporterCollections=null;
-		// if segments have been included in the request, use the getFeatureCollection method to retrieve them
-		// from the data source.  (getFeatureCollection method shared with the 'types' command.)
-		if (requestedSegments.size() > 0){
-			segmentsBySegmentId = getFeatureCollection(dsnConfig, requestedSegments, true, maxbins);
-		} //else {
-			// No segments have been requested, so instead check for either feature_id or group_id filters.
-			// (If neither of these are present, then throw a BadCommandArgumentsException)
-
-		if (filter.containsFeatureIds() ){
-			segmentsByFeatureId = dsnConfig.getDataSource().getFeatures(filter.getFeatureIds(),maxbins);
-//				if (segmentsByFeatureId != null){
-//					segmentReporterCollections = new ArrayList<SegmentReporter>(segmentsByFeatureId.size());
-//					for (DasAnnotatedSegment segment : segmentsByFeatureId){
-//						if (segment instanceof DasUnknownFeatureSegment){
-//							segmentReporterCollections.add (new UnknownFeatureSegmentReporter(segment.getSegmentId()));
-//						} else
-//							segmentReporterCollections.add (new FoundFeaturesReporter(segment));
-//					}
-//				}
-//				else {
-//					// Nothing returned from the datasource.
-//					segmentReporterCollections = Collections.EMPTY_LIST;
-//				}
-			} 
-//		else if(query!=null){
-//				segmentReporterCollections = new ArrayList<SegmentReporter>(1);
-//				segmentReporterCollections.add (new UnknownFeatureSegmentReporter("Empty ResultSet"));
-//			}else{
-//				throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
-//			}
-//		}
-		// OK - got a Collection of FoundFeaturesReporter objects, so get on with marshalling them out.
 		
 		Collection<DasAnnotatedSegment> merged=null;
-		if(segmentsBySegmentId!=null){
-			if(segmentsByFeatureId!=null){
-				merged=merge(segmentsBySegmentId,segmentsByFeatureId,MERGE_TYPE_AND);
-				if(segmentsByQuery!=null)
-					merged=merge(merged,segmentsByQuery,MERGE_TYPE_AND);
-			}else if(segmentsByQuery!=null)
-				merged=merge(segmentsBySegmentId,segmentsByQuery,MERGE_TYPE_AND);
-			else
-				merged=segmentsBySegmentId;
-		}else if(segmentsByFeatureId!=null){
-			if(segmentsByQuery!=null)
-				merged=merge(segmentsByFeatureId,segmentsByQuery,MERGE_TYPE_AND);
-			else
-				merged=segmentsByFeatureId;
-		}else if(segmentsByQuery!=null)
-			merged=segmentsByQuery;
-		else
-			throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
 
+		//If the advanced search is supported and the query attribute is included then the request will be done using it
+		//TODO: Verify that the indexing has been done
+		if (dsnConfig.getCapabilities().contains("advanced-search") && filter.getAdvanceQuery()!=null){
+			
+			Map<String, PropertyType> properties = DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getGlobalParameters();
+			Searcher searcher=new Searcher(properties.get("indexerpath").getValue(),dsnConfig.getName());
+			try {
+				merged=searcher.search(filter);
+			} catch (SearcherException e) {
+				logger.error("Searching/indexing thrown", e);
+			}
+		} else {
+			// if segments have been included in the request, use the getFeatureCollection method to retrieve them
+			// from the data source.  (getFeatureCollection method shared with the 'types' command.)
+			if (requestedSegments.size() > 0){
+				segmentsBySegmentId = getFeatureCollection(dsnConfig, requestedSegments, true, filter);
+			} //else {
+				// No segments have been requested, so instead check for either feature_id or group_id filters.
+				// (If neither of these are present, then throw a BadCommandArgumentsException)
+	
+			if (dsnConfig.getCapabilities().contains("feature-by-id") && filter.containsFeatureIds() ){
+				try{
+					if (dsnConfig.getCapabilities().contains("rows-for-feature")){
+						segmentsByFeatureId = dsnConfig.getDataSource().getFeatures(filter.getFeatureIds(), filter.getMaxbins(),filter.getRows());
+						filter.setPaginated(true);
+					}else throw new UnimplementedFeatureException("rows-for-feature capability no declared");
+				}catch(UnimplementedFeatureException ufe){
+					segmentsByFeatureId = dsnConfig.getDataSource().getFeatures(filter.getFeatureIds(), filter.getMaxbins());
+				}
+			} 
+			
+			if(segmentsBySegmentId!=null){
+				if(segmentsByFeatureId!=null){
+					merged=merge(segmentsBySegmentId,segmentsByFeatureId,MERGE_TYPE_AND);
+				}else
+					merged=segmentsBySegmentId;
+			}else if(segmentsByFeatureId!=null){
+					merged=segmentsByFeatureId;
+			}
+			else
+				throw new BadCommandArgumentsException("Bad command arguments to the features command: " + queryString);
+			Integer totalFeatures=null;
+			if (!filter.isPaginated() && filter.getRows()!=null && dsnConfig.getCapabilities().contains("rows-for-feature")){
+				totalFeatures=0;
+				Integer included=0;
+				Collection<DasAnnotatedSegment> paged = new ArrayList<DasAnnotatedSegment> ();
+				for (DasAnnotatedSegment segmentAux:merged){
+					totalFeatures += segmentAux.getFeatures().size();
+					if (filter.getRows().getFrom()<=totalFeatures)
+						if (filter.getRows().getTo()>totalFeatures){
+							paged.add(segmentAux);
+							included += segmentAux.getFeatures().size();
+						}else{
+							Collection<DasFeature> featuresAux=((ArrayList<DasFeature>)segmentAux.getFeatures()).subList(filter.getRows().getFrom()-1-included, filter.getRows().getTo()-included);
+							paged.add(new DasAnnotatedSegment(segmentAux.getSegmentId(), segmentAux.getStartCoordinate(), segmentAux.getStopCoordinate(),segmentAux.getVersion(), segmentAux.getSegmentLabel(), featuresAux,segmentAux.getFeatures().size()));
+						}
+				}
+				filter.setPaginated(true);
+				filter.setTotalFeatures(totalFeatures);
+				merged=paged;
+			}
+		}
+		// OK - got a Collection of FoundFeaturesReporter objects, so get on with marshalling them out.
 		segmentReporterCollections=this.features2reporters(merged, requestedSegments);
 
 		writeHeader (request, response, XDasStatus.STATUS_200_OK, true,dsnConfig.getCapabilities());
 
 		/************************************************************************\
 		 * Build the XML                                                        *
-		 ************************************************************************/
+		\************************************************************************/
 
 		XmlSerializer serializer;
 		serializer = PULL_PARSER_FACTORY.newSerializer();
@@ -1005,6 +1005,8 @@ public class DasCommandManager {
 			serializer.startTag(DAS_XML_NAMESPACE, "GFF");
 			//the version has been deprecated from
 			serializer.attribute(DAS_XML_NAMESPACE, "href", buildRequestHref(request));
+			if(filter.isPaginated() && filter.getTotalFeatures()!=null) serializer.attribute(DAS_XML_NAMESPACE, "total", ""+filter.getTotalFeatures());
+			
 			for (SegmentReporter segmentReporter : segmentReporterCollections){
 				if (segmentReporter instanceof UnknownSegmentReporter){
 					((UnknownSegmentReporter)segmentReporter).serialize(DAS_XML_NAMESPACE, serializer, referenceSource);
@@ -1134,15 +1136,19 @@ public class DasCommandManager {
 	 */
 	private Collection<DasAnnotatedSegment> getFeatureCollection(DataSourceConfiguration dsnConfig,
 			List <SegmentQuery> requestedSegments,
-			boolean unknownSegmentsHandled,Integer maxbins//,String[] featureIds
-	)
-	throws DataSourceException, BadReferenceObjectException, CoordinateErrorException {
+			boolean unknownSegmentsHandled,DasFeatureRequestFilter filter//,String[] featureIds
+	) throws DataSourceException, BadReferenceObjectException, CoordinateErrorException {
+		
 		List<DasAnnotatedSegment> segments =new ArrayList<DasAnnotatedSegment>(requestedSegments.size());
 		AnnotationDataSource dataSource = dsnConfig.getDataSource();
+		Integer maxbins= null;
+		if (filter!=null)
+			maxbins=filter.getMaxbins();
+		Integer current=0;
 		for (SegmentQuery segmentQuery : requestedSegments){
 			try{
 				DasAnnotatedSegment annotatedSegment;
-
+				
 				// Build the key name for the cache.
 				StringBuffer cacheKeyBuffer = new StringBuffer(dsnConfig.getId());
 				cacheKeyBuffer.append("_FEATURES_");
@@ -1160,6 +1166,10 @@ public class DasCommandManager {
 				String cacheKey = cacheKeyBuffer.toString();
 
 				try{
+					//Pagination won't be cached
+					if (filter!=null && filter.getRows()!=null && dsnConfig.getCapabilities().contains("rows-for-feature"))
+						throw new NeedsRefreshException("Pagination is not cached");
+
                     annotatedSegment = (DasAnnotatedSegment) CACHE_MANAGER.getFromCache(cacheKey);
 					if (logger.isDebugEnabled()){
 						logger.debug("FEATURES RETRIEVED FROM CACHE: " + annotatedSegment.getSegmentId());
@@ -1196,40 +1206,78 @@ public class DasCommandManager {
                             throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "start and stop out of segment bounds", new IndexOutOfBoundsException("start and stop out of segment bounds"));
                         }
                     }
-				}
-				catch (NeedsRefreshException nre){
+				} catch (NeedsRefreshException nre){
+					Range currentFeatureRange=null;
+					if (filter!=null && dsnConfig.getCapabilities().contains("rows-for-feature") && filter.getRows()!=null){
+						currentFeatureRange=new Range(filter.getRows().getFrom()-current,filter.getRows().getTo()-current);
+					}
 					try{
 						if (segmentQuery.getStartCoordinate() == null){
 							// Easy request - just want all the features on the segment.
-							annotatedSegment = dataSource.getFeatures(segmentQuery.getSegmentId(),maxbins);
-						}
-						else {
+							try{
+								if (currentFeatureRange==null) throw new UnimplementedFeatureException("if is null is because there is not necesity for pagination");
+								//trying to use the user implementation of its pagination.
+								annotatedSegment = dataSource.getFeatures(segmentQuery.getSegmentId(),maxbins,currentFeatureRange);
+								filter.setPaginated(true);
+							}catch(UnimplementedFeatureException ufe){
+								annotatedSegment = dataSource.getFeatures(segmentQuery.getSegmentId(),maxbins);
+							}
+						} else {
 
 							// Restricted to coordinates.
 							if (dataSource instanceof RangeHandlingAnnotationDataSource){
-								annotatedSegment = ((RangeHandlingAnnotationDataSource)dataSource).getFeatures(
-										segmentQuery.getSegmentId(),
-										segmentQuery.getStartCoordinate(),
-										segmentQuery.getStopCoordinate(),
-										maxbins);
+								try{
+									if (currentFeatureRange==null) throw new UnimplementedFeatureException("if is null is because there is not necesity for pagination");
+									//trying to use the user implementation of its pagination.
+									annotatedSegment = ((RangeHandlingAnnotationDataSource)dataSource).getFeatures(
+											segmentQuery.getSegmentId(),
+											segmentQuery.getStartCoordinate(),
+											segmentQuery.getStopCoordinate(),
+											maxbins,currentFeatureRange);
+									filter.setPaginated(true);
+								}catch(UnimplementedFeatureException ufe){
+									annotatedSegment = ((RangeHandlingAnnotationDataSource)dataSource).getFeatures(
+											segmentQuery.getSegmentId(),
+											segmentQuery.getStartCoordinate(),
+											segmentQuery.getStopCoordinate(),
+											maxbins);
+								}
 							}
 							else if (dataSource instanceof RangeHandlingReferenceDataSource){
-								annotatedSegment = ((RangeHandlingReferenceDataSource)dataSource).getFeatures(
-										segmentQuery.getSegmentId(),
-										segmentQuery.getStartCoordinate(),
-										segmentQuery.getStopCoordinate(),
-										maxbins);
+								try{
+									if (currentFeatureRange==null) throw new UnimplementedFeatureException("if is null is because there is not necesity for pagination");
+									//trying to use the user implementation of its pagination.
+									annotatedSegment = ((RangeHandlingReferenceDataSource)dataSource).getFeatures(
+											segmentQuery.getSegmentId(),
+											segmentQuery.getStartCoordinate(),
+											segmentQuery.getStopCoordinate(),
+											maxbins,currentFeatureRange);
+									filter.setPaginated(true);
+								}catch(UnimplementedFeatureException ufe){
+									annotatedSegment = ((RangeHandlingReferenceDataSource)dataSource).getFeatures(
+											segmentQuery.getSegmentId(),
+											segmentQuery.getStartCoordinate(),
+											segmentQuery.getStopCoordinate(),
+											maxbins);
+								}
 							}
 							else {
-								annotatedSegment = dataSource.getFeatures(
-										segmentQuery.getSegmentId(),
-										maxbins);
+								try{
+									if (currentFeatureRange==null) throw new UnimplementedFeatureException("if is null is because there is not necesity for pagination");
+									//trying to use the user implementation of its pagination.
+									annotatedSegment = dataSource.getFeatures(segmentQuery.getSegmentId(),maxbins,currentFeatureRange);
+									filter.setPaginated(true);
+								}catch(UnimplementedFeatureException ufe){
+									annotatedSegment = dataSource.getFeatures(segmentQuery.getSegmentId(),maxbins);
+								}
 							}
 						}
                         if (logger.isDebugEnabled()){
 							logger.debug("FEATURES NOT IN CACHE: " + annotatedSegment.getSegmentId());
 						}
-						CACHE_MANAGER.putInCache(cacheKey, annotatedSegment, dsnConfig.getCacheGroup());
+                        
+    					if (!(filter!=null && filter.getRows()!=null && dsnConfig.getCapabilities().contains("rows-for-feature")))
+    						CACHE_MANAGER.putInCache(cacheKey, annotatedSegment, dsnConfig.getCacheGroup());
 						
                         //If segment query start and stop are completely out of limits an ERRORSEGMENT should be reported (since 1.6.1)
                         boolean error = false;
@@ -1268,6 +1316,7 @@ public class DasCommandManager {
 					}
 				}
 				segments.add(annotatedSegment);
+				current += annotatedSegment.getTotalFeatures();
 //				segmentReporterLists.add(new FoundFeaturesReporter(annotatedSegment, segmentQuery));
 			}
 			catch (BadReferenceObjectException broe) {

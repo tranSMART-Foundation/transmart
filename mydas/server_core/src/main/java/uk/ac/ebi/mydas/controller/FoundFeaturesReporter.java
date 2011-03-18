@@ -102,6 +102,9 @@ public class FoundFeaturesReporter implements SegmentReporter {
 		return annotatedSegment.getVersion();
 	}
 
+	public Integer getTotalFeatures(){
+		return annotatedSegment.getTotalFeatures();
+	}
 	/**
 	 * Generates the piece of XML into the XML serializer object to describe a Segment including the found features for it 
 	 * @param DAS_XML_NAMESPACE XML namespace to link with the elements to create
@@ -125,11 +128,12 @@ public class FoundFeaturesReporter implements SegmentReporter {
             serializer.attribute(DAS_XML_NAMESPACE, "start", Integer.toString(this.getStart()));
             serializer.attribute(DAS_XML_NAMESPACE, "stop", Integer.toString(this.getStop()));
         }
+        if (this.getTotalFeatures()!=null)	serializer.attribute(DAS_XML_NAMESPACE, "total", Integer.toString(this.getTotalFeatures()));
 		
 		if (this.getType() != null && this.getType().length() > 0){
 			serializer.attribute(DAS_XML_NAMESPACE, "type", this.getType());
 		}
-		//version is ptional in DAS 1.6
+		//version is optional in DAS 1.6
 		if (this.getVersion()!=null)
 			serializer.attribute(DAS_XML_NAMESPACE, "version", this.getVersion());
 		
