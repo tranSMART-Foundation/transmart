@@ -28,12 +28,12 @@
     
     <groupId>uk.ac.ebi.mydas</groupId>
     <artifactId>mydas</artifactId>
-    <version>1.6.5-SNAPSHOT</version>
+    <version>1.6.5</version>
 
     <parent>
         <groupId>uk.ac.ebi.mydas</groupId>
         <artifactId>mydas_master</artifactId>
-        <version>1.6.5-SNAPSHOT</version>
+        <version>1.6.5</version>
     </parent>
 
     <packaging>jar</packaging>
