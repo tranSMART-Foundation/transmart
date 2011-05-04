@@ -185,4 +185,14 @@ public class GFFFileDataSource implements AnnotationDataSource {
     public int getTotalEntryPoints() throws DataSourceException {
         return 10;
     }
+
+    @Override
+    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins, Range rows) throws BadReferenceObjectException, DataSourceException, UnimplementedFeatureException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins, Range rows) throws UnimplementedFeatureException, DataSourceException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

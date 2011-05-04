@@ -46,7 +46,13 @@ public class EnsemblTestDataSource implements RangeHandlingAnnotationDataSource{
 			maxbins=-1;
 		return ensembl.getSubmodelBySegmentId(segmentId, start, stop,maxbins);
 	}
-	public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins) 
+
+    @Override
+    public DasAnnotatedSegment getFeatures(String segmentId, int start, int stop, Integer maxbins, Range rows) throws BadReferenceObjectException, CoordinateErrorException, DataSourceException, UnimplementedFeatureException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins)
 			throws BadReferenceObjectException, DataSourceException {
 		if (maxbins==null)
 			maxbins=-1;
@@ -107,6 +113,16 @@ public class EnsemblTestDataSource implements RangeHandlingAnnotationDataSource{
 
     public int getTotalEntryPoints() throws UnimplementedFeatureException, DataSourceException {
     	return ensembl.getEntryPoints(null,null).size();
+    }
+
+    @Override
+    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins, Range rows) throws BadReferenceObjectException, DataSourceException, UnimplementedFeatureException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins, Range rows) throws UnimplementedFeatureException, DataSourceException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public Integer getTotalCountForType(DasType type)

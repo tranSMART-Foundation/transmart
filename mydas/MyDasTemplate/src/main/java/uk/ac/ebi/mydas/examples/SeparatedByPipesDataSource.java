@@ -120,7 +120,17 @@ public class SeparatedByPipesDataSource implements AnnotationDataSource {
         throw new UnimplementedFeatureException("No implemented");
     }
 
-	public Integer getTotalCountForType(DasType type)
+    @Override
+    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins, Range rows) throws BadReferenceObjectException, DataSourceException, UnimplementedFeatureException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins, Range rows) throws UnimplementedFeatureException, DataSourceException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Integer getTotalCountForType(DasType type)
 			throws DataSourceException {
 		int count=0;
 		for (DasAnnotatedSegment segment:segments)
