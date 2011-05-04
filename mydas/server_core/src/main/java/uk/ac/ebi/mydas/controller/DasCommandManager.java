@@ -1125,7 +1125,6 @@ public class DasCommandManager {
 	 * @param unknownSegmentsHandled to indicate if the calling method is able to report missing segments (i.e.
 	 * the feature command can return errorsegment / unknownsegment).
 	 * the segment id is not known to the DSN.
-     * @param maxbins (optional) This argument allows a client to indicate to the server
      * the available rendering space it has for drawing features (i.e. the number of "bins").
 	 * @return a Collection of FeatureReporter objects that wrap the DasFeature objects returned from the data source
 	 * @throws uk.ac.ebi.mydas.exceptions.DataSourceException to capture any error returned from the data source that cannot be handled in a more
@@ -1136,7 +1135,7 @@ public class DasCommandManager {
 	 */
 	private Collection<DasAnnotatedSegment> getFeatureCollection(DataSourceConfiguration dsnConfig,
 			List <SegmentQuery> requestedSegments,
-			boolean unknownSegmentsHandled,DasFeatureRequestFilter filter//,String[] featureIds
+			boolean unknownSegmentsHandled, DasFeatureRequestFilter filter//,String[] featureIds
 	) throws DataSourceException, BadReferenceObjectException, CoordinateErrorException {
 		
 		List<DasAnnotatedSegment> segments =new ArrayList<DasAnnotatedSegment>(requestedSegments.size());
@@ -1178,8 +1177,8 @@ public class DasCommandManager {
 						// This should not happen - segment requests that fail are not cached.
 						throw new BadReferenceObjectException(segmentQuery.getSegmentId(), "Obtained an annotatedSegment from the cache for this segment.  It was null, so assume this is a bad segment id.");
 					} else {
-                        //Segment exist and was retrieved from cache
-                        //If segment query start and stop are completely out of limits an ERRORSEGMENT should be reported (since 1.6.1)
+                        //Segment exists and was retrieved from cache
+                        //If segment query start and stop are completely out of limits an UNKNOWN/ERROR SEGMENT should be reported (since 1.6.1)
                         boolean error = false;
                         if ((segmentQuery.getStartCoordinate() != null) && (segmentQuery.getStopCoordinate() != null)) {
                             if ( (segmentQuery.getStartCoordinate() <= 0) || (segmentQuery.getStopCoordinate() <= 0) ) {
@@ -1215,7 +1214,7 @@ public class DasCommandManager {
 						if (segmentQuery.getStartCoordinate() == null){
 							// Easy request - just want all the features on the segment.
 							try{
-								if (currentFeatureRange==null) throw new UnimplementedFeatureException("if is null is because there is not necesity for pagination");
+								if (currentFeatureRange==null) throw new UnimplementedFeatureException("if is null is because there is not necessity for pagination");
 								//trying to use the user implementation of its pagination.
 								annotatedSegment = dataSource.getFeatures(segmentQuery.getSegmentId(),maxbins,currentFeatureRange);
 								filter.setPaginated(true);
@@ -1318,18 +1317,16 @@ public class DasCommandManager {
 				segments.add(annotatedSegment);
 				current += annotatedSegment.getTotalFeatures();
 //				segmentReporterLists.add(new FoundFeaturesReporter(annotatedSegment, segmentQuery));
-			}
-			catch (BadReferenceObjectException broe) {
-				if (unknownSegmentsHandled){
-                    if ((broe.getCause() != null)||(segmentQuery.isEmpty())) { //For both annotation and reference servers, limits out of bounds should report an ERRORSEGEMENT (since 1.6.1)
+			} catch (BadReferenceObjectException broe) {
+				if (unknownSegmentsHandled){ //For annotation limits out of bounds should report an UNKNOWNSEGMENT and for reference servers it should be ERRORSEGEMENT (since 1.6.1)
+                    if (dataSource instanceof ReferenceDataSource) { //reference servers are also annotation ones, ask for reference first
                         segments.add(new ErrorSegment(segmentQuery));
                     } else {
                         segments.add(new DasUnknownFeatureSegment(segmentQuery));
                     }
-				}
-				else {
-					throw broe;
-				}
+                } else {
+                    throw broe;
+                }
 			} catch (CoordinateErrorException cee) {
 				if (unknownSegmentsHandled){
 					segments.add(new DasUnknownFeatureSegment(segmentQuery));
@@ -1342,7 +1339,7 @@ public class DasCommandManager {
 		return segments;
 	}
 	
-	private Collection<SegmentReporter> features2reporters(Collection<DasAnnotatedSegment> segments,Collection<SegmentQuery> segmentQueries){
+	private Collection<SegmentReporter> features2reporters(Collection<DasAnnotatedSegment> segments, Collection<SegmentQuery> segmentQueries){
 		List <SegmentReporter> segmentReporterLists =new ArrayList<SegmentReporter>(segments.size());
 		
 		for (DasSegment segment:segments){
@@ -1351,6 +1348,7 @@ public class DasCommandManager {
 		}
 		return segmentReporterLists;
 	}
+
 	private SegmentReporter segment2SegmentReporter(DasSegment segment,SegmentQuery segmentQuery){
 		if (segment instanceof DasUnknownFeatureSegment){
 			DasUnknownFeatureSegment unknownSegment = (DasUnknownFeatureSegment)segment;

@@ -16,19 +16,19 @@ public class DasUnknownFeatureSegment extends DasAnnotatedSegment {
 			Collection<DasFeature> features) throws DataSourceException {
 		super(segmentId, startCoordinate, stopCoordinate, version,
 				segmentLabel, features);
-		// TODO Auto-generated constructor stub
 	}
 
 	public DasUnknownFeatureSegment(DasSequence sequence, String segmentLabel,
 			Collection<DasFeature> features) throws DataSourceException {
 		super(sequence, segmentLabel, features);
-		// TODO Auto-generated constructor stub
 	}
 	public DasUnknownFeatureSegment(String segmentId) throws DataSourceException{
-		super(segmentId, 0, 0, "_",null, null);
+		super(segmentId, 0, 0, "_", null, null);
 	}
 	public DasUnknownFeatureSegment(SegmentQuery segmentQuery) throws DataSourceException{
-		super(segmentQuery.getSegmentId(),segmentQuery.getStartCoordinate(), segmentQuery.getStopCoordinate(), "error",null,null);
+        this(segmentQuery.isEmpty()?
+                "EMPTY":
+                segmentQuery.getSegmentId(),segmentQuery.getStartCoordinate(), segmentQuery.getStopCoordinate(), "error", "error", null);
 		this.segmentQuery=segmentQuery;
 	}
 	public SegmentQuery getSegmentQuery(){
