@@ -54,5 +54,44 @@ public class DasMethod implements Serializable{
 		return cvId;
 	}
     
-	
+	    /**
+     * Implementation of equals method.
+     * @param o object to compare with.
+     * @return boolean indicating equality
+     */
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DasMethod dasMethod = (DasMethod) o;
+
+        if (!id.equals(dasMethod.id)) return false;
+        if (cvId != null ? !cvId.equals(dasMethod.cvId) : dasMethod.cvId != null) return false;
+
+        return true;
+    }
+
+    /**
+     * Implementation of hashcode method.
+     * @return unique integer for each (distinct, by equals method) instance.
+     */
+    public int hashCode() {
+        int result;
+        result = id.hashCode();
+        result = 31 * result + (cvId != null ? cvId.hashCode() : 0);
+        return result;
+    }
+
+    /**
+     * To string simple representation of this object.
+     * @return simple representation of this object.
+     */
+    public String toString(){
+        StringBuffer buf = new StringBuffer("DasMethod.  id: '");
+        buf .append (id)
+            .append ("' method: '")
+            .append ((cvId == null) ? "null" : cvId)
+            .append ("'");
+        return buf.toString();
+    }
 }
