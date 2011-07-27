@@ -1341,7 +1341,7 @@ public class DasCommandManager {
 	
 	private Collection<SegmentReporter> features2reporters(Collection<DasAnnotatedSegment> segments, Collection<SegmentQuery> segmentQueries){
 		List <SegmentReporter> segmentReporterLists =new ArrayList<SegmentReporter>(segments.size());
-		
+
 		for (DasSegment segment:segments){
 			SegmentQuery segmentQuery = getSegmentQueryById(segmentQueries,segment.getSegmentId());
 			segmentReporterLists.add(segment2SegmentReporter(segment, segmentQuery));
@@ -1372,7 +1372,7 @@ public class DasCommandManager {
 	private SegmentQuery getSegmentQueryById(Collection<SegmentQuery> segmentQueries,String segmentId){
 		if (segmentQueries!=null)
 			for (SegmentQuery segment:segmentQueries)
-				if (segment.getSegmentId().equals(segmentId))
+				if (segment.getSegmentId().equalsIgnoreCase(segmentId))
 					return segment;
 		return null;
 	}
