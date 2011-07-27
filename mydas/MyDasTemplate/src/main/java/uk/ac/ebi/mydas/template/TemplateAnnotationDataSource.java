@@ -37,6 +37,7 @@ import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 import uk.ac.ebi.mydas.model.DasEntryPoint;
 import uk.ac.ebi.mydas.model.DasType;
+import uk.ac.ebi.mydas.model.Range;
 
 import java.net.URL;
 import java.util.Collection;
@@ -297,6 +298,14 @@ public class TemplateAnnotationDataSource implements AnnotationDataSource {
     }
 
     public int getTotalEntryPoints() throws UnimplementedFeatureException, DataSourceException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
+
+    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins, Range rows) throws BadReferenceObjectException, DataSourceException, UnimplementedFeatureException {
+        throw new UnimplementedFeatureException("No implemented");
+    }
+
+    public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins, Range rows) throws UnimplementedFeatureException, DataSourceException {
         throw new UnimplementedFeatureException("No implemented");
     }
 
