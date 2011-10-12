@@ -120,17 +120,7 @@ public class SeparatedByPipesDataSource implements AnnotationDataSource {
         throw new UnimplementedFeatureException("No implemented");
     }
 
-    @Override
-    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins, Range rows) throws BadReferenceObjectException, DataSourceException, UnimplementedFeatureException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins, Range rows) throws UnimplementedFeatureException, DataSourceException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public Integer getTotalCountForType(DasType type)
+	public Integer getTotalCountForType(DasType type)
 			throws DataSourceException {
 		int count=0;
 		for (DasAnnotatedSegment segment:segments)
@@ -146,5 +136,21 @@ public class SeparatedByPipesDataSource implements AnnotationDataSource {
 
 	public void registerCacheManager(CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
+	}
+
+	@Override
+	public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins,
+			Range rows) throws BadReferenceObjectException,
+			DataSourceException, UnimplementedFeatureException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<DasAnnotatedSegment> getFeatures(
+			Collection<String> featureIdCollection, Integer maxbins, Range rows)
+			throws UnimplementedFeatureException, DataSourceException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

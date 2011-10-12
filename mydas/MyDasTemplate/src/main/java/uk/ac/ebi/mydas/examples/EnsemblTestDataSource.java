@@ -46,13 +46,7 @@ public class EnsemblTestDataSource implements RangeHandlingAnnotationDataSource{
 			maxbins=-1;
 		return ensembl.getSubmodelBySegmentId(segmentId, start, stop,maxbins);
 	}
-
-    @Override
-    public DasAnnotatedSegment getFeatures(String segmentId, int start, int stop, Integer maxbins, Range rows) throws BadReferenceObjectException, CoordinateErrorException, DataSourceException, UnimplementedFeatureException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins)
+	public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins) 
 			throws BadReferenceObjectException, DataSourceException {
 		if (maxbins==null)
 			maxbins=-1;
@@ -115,16 +109,6 @@ public class EnsemblTestDataSource implements RangeHandlingAnnotationDataSource{
     	return ensembl.getEntryPoints(null,null).size();
     }
 
-    @Override
-    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins, Range rows) throws BadReferenceObjectException, DataSourceException, UnimplementedFeatureException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins, Range rows) throws UnimplementedFeatureException, DataSourceException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
     public Integer getTotalCountForType(DasType type)
 			throws DataSourceException {
 		return ensembl.getTotalCountForType(type.getId());
@@ -132,5 +116,30 @@ public class EnsemblTestDataSource implements RangeHandlingAnnotationDataSource{
 
 	public void registerCacheManager(CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
+	}
+
+	@Override
+	public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins,
+			Range rows) throws BadReferenceObjectException,
+			DataSourceException, UnimplementedFeatureException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<DasAnnotatedSegment> getFeatures(
+			Collection<String> featureIdCollection, Integer maxbins, Range rows)
+			throws UnimplementedFeatureException, DataSourceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DasAnnotatedSegment getFeatures(String segmentId, int start,
+			int stop, Integer maxbins, Range rows)
+			throws BadReferenceObjectException, CoordinateErrorException,
+			DataSourceException, UnimplementedFeatureException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

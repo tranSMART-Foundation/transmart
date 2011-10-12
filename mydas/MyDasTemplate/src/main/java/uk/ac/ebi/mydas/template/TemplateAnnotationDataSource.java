@@ -301,13 +301,21 @@ public class TemplateAnnotationDataSource implements AnnotationDataSource {
         throw new UnimplementedFeatureException("No implemented");
     }
 
-    public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins, Range rows) throws BadReferenceObjectException, DataSourceException, UnimplementedFeatureException {
-        throw new UnimplementedFeatureException("No implemented");
-    }
+	@Override
+	public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins,
+			Range rows) throws BadReferenceObjectException,
+			DataSourceException, UnimplementedFeatureException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins, Range rows) throws UnimplementedFeatureException, DataSourceException {
-        throw new UnimplementedFeatureException("No implemented");
-    }
+	@Override
+	public Collection<DasAnnotatedSegment> getFeatures(
+			Collection<String> featureIdCollection, Integer maxbins, Range rows)
+			throws UnimplementedFeatureException, DataSourceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 }
