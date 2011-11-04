@@ -1,7 +1,7 @@
 package uk.ac.ebi.mydas.model;
-import java.io.Serializable;
-
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
+
+import java.io.Serializable;
 
 @SuppressWarnings("serial")
 public class DasMethod implements Serializable{
@@ -52,6 +52,10 @@ public class DasMethod implements Serializable{
 
 	public String getCvId() {
 		return cvId;
+	}
+
+    public void setCvId(String cvId) {
+		this.cvId = cvId;
 	}
     
 	    /**

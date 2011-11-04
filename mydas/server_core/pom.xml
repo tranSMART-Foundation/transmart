@@ -28,7 +28,7 @@
     
     <groupId>uk.ac.ebi.mydas</groupId>
     <artifactId>mydas</artifactId>
-    <version>1.6.7-SNAPSHOT</version>
+    <version>1.6.9-SNAPSHOT</version>
 
     <parent>
         <groupId>uk.ac.ebi.mydas</groupId>

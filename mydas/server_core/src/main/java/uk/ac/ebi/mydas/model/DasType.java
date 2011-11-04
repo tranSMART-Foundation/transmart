@@ -157,4 +157,20 @@ public class DasType implements Serializable {
 	public String getLabel() {
 		return label;
 	}
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setCvId(String cvId) {
+        this.cvId = cvId;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
 }

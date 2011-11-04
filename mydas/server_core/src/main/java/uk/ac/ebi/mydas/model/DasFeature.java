@@ -524,7 +524,7 @@ public class DasFeature implements Serializable {
         String result="";
         result = result + (featureLabel != null ? " LABEL: "+featureLabel : "");
         result = result + " TYPE: "+type.toString();
-        result = result + (method != null ? "METHOD "+method.toString() : "");
+        result = result + (method != null ? " METHOD "+method.toString() : "");
         result = result + " START: "+startCoordinate;
         result = result + " STOP: "+endCoordinate;
         result = result + " SCORE: "+score;
