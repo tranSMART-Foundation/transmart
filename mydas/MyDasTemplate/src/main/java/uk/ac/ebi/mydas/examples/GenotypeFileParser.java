@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Scanner;
 
-import org.apache.jasper.logging.Logger;
-
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 import uk.ac.ebi.mydas.model.DasComponentFeature;
