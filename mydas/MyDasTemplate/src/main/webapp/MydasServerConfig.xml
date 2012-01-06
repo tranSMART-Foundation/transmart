@@ -308,9 +308,32 @@
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
-        
-        
+       
+ <datasource uri="person1"
+                    title="person1"
+                    description="Data source for genotype file format"
+                    doc_href="http://mydas.googlecode.com"
+                    mapmaster="http://mapmaster.example">
+			<maintainer email="jw12@sanger.ac.uk" />
 
+			<version uri="person1" created="2012-01-05">
+	            <class>uk.ac.ebi.mydas.examples.GenotypeFileDataSource</class>
+								<coordinates version="36" taxid="9606" authority="NCBI" source="Chromosome" uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS40" test_range="1:742429,758311">NCBI_36,Chromosome,Homo sapiens</coordinates>
+				<capability type="das1:sources"		 	query_uri="http://localhost:8080/das/examplepipes" />
+				<capability type="das1:types"			query_uri="http://localhost:8080/das/examplepipes/types" />
+				<capability type="das1:features"		query_uri="http://localhost:8080/das/examplepipes/features" />
+				<capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplepipes/features" />
+				<capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
+				<capability type="das1:unknown-feature"	/>
+                <property key="genotype_file" value="person1.txt" visibility="false"/>
+                <property key="entrypoints_file" value="NCBI_36_entry_points" visibility="false"/>
+                
+			</version>
+
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
         
     </datasources>
 </mydasserver>
