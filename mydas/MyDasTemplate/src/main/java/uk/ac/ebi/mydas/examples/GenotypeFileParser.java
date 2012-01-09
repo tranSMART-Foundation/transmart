@@ -48,8 +48,7 @@ public class GenotypeFileParser {
 		segments= new ArrayList<DasAnnotatedSegment>();
 		this.processSegments(fileInputStream);
 		types= new ArrayList<DasType>();
-		snpType= new DasType("AA", "", "SO:0000694", "");
-		method = new DasMethod("not_recorded","not_recorded","ECO:0000037");
+		method = new DasMethod("experimental genomic evidence","experimental genomic evidence","ECO:0000073");
 	}
 	
 	/**
@@ -117,7 +116,7 @@ public class GenotypeFileParser {
 		if (parts.length<4)
 			throw new Exception("Parsing Error: A line doesn't have the right number of fields ["+aLine+"]");
 		DasAnnotatedSegment segment = this.getSegment(parts[1],parts[2],parts[3]);
-		snpType= new DasType(parts[3], "", "SO:0000694", "");
+		snpType= new DasType(parts[3], "SNP", "SO:0000694", "SNP");
 		types.add(snpType);
 		DasFeature feature=new DasFeature(parts[0],parts[0],snpType, method, Integer.parseInt(parts[2]),Integer.parseInt(parts[2]), null,null,null,null, null, null, null, null);
 		segment.getFeatures().add(feature);
@@ -142,7 +141,7 @@ public class GenotypeFileParser {
 		for (DasAnnotatedSegment segment:segments)
 			if (segment.getSegmentId().equals(segmentId))
 				return segment;
-		DasAnnotatedSegment newSegment = new DasAnnotatedSegment(segmentId,Integer.parseInt(start),Integer.parseInt(stop),"FROM_PIPE_FILE",segmentId, new ArrayList<DasFeature>());
+		DasAnnotatedSegment newSegment = new DasAnnotatedSegment(segmentId,Integer.parseInt(start),Integer.parseInt(stop),"1.0",segmentId, new ArrayList<DasFeature>());
 		//System.out.println("adding new seg="+newSegment.getSegmentId());
 		segments.add(newSegment);
 		return newSegment;
