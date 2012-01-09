@@ -141,7 +141,7 @@ public class SeparatedByPipesParser {
 		for (DasAnnotatedSegment segment:segments)
 			if (segment.getSegmentId().equals(segmentId))
 				return segment;
-		DasAnnotatedSegment newSegment = new DasAnnotatedSegment(segmentId,1,1,"FROM_PIPE_FILE",segmentId, new ArrayList<DasFeature>());
+		DasAnnotatedSegment newSegment = new DasAnnotatedSegment(segmentId,1,1,"1.0",segmentId, new ArrayList<DasFeature>());
 		segments.add(newSegment);
 		return newSegment;
 	}
