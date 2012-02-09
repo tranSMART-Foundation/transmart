@@ -141,10 +141,10 @@ public class GFF2Parser {
 			GFF2Parser parser = new GFF2Parser((new FileInputStream("/Users/4ndr01d3/Documents/EBI/MyDasTemplate/src/main/webapp/CHROMOSOME_MtDNA.gff")));
 			parser.parse();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			//  Auto-generated catch block
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			//  Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

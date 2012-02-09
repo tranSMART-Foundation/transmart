@@ -203,7 +203,7 @@ public class TemplateAnnotationDataSource implements AnnotationDataSource {
 	 */
 	public Collection<DasAnnotatedSegment> getFeatures(Collection<String> featureIdCollection, Integer maxbins)
 	throws UnimplementedFeatureException, DataSourceException {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return null;
 	}
 
@@ -305,7 +305,7 @@ public class TemplateAnnotationDataSource implements AnnotationDataSource {
 	public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins,
 			Range rows) throws BadReferenceObjectException,
 			DataSourceException, UnimplementedFeatureException {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return null;
 	}
 
@@ -313,7 +313,7 @@ public class TemplateAnnotationDataSource implements AnnotationDataSource {
 	public Collection<DasAnnotatedSegment> getFeatures(
 			Collection<String> featureIdCollection, Integer maxbins, Range rows)
 			throws UnimplementedFeatureException, DataSourceException {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return null;
 	}
 

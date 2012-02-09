@@ -116,7 +116,7 @@ public class GenotypeDataSource implements RangeHandlingAnnotationDataSource{
 	public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins,
 			Range rows) throws BadReferenceObjectException,
 			DataSourceException, UnimplementedFeatureException {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return null;
 	}
 
@@ -124,7 +124,7 @@ public class GenotypeDataSource implements RangeHandlingAnnotationDataSource{
 	public Collection<DasAnnotatedSegment> getFeatures(
 			Collection<String> featureIdCollection, Integer maxbins, Range rows)
 			throws UnimplementedFeatureException, DataSourceException {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return null;
 	}
 
@@ -133,7 +133,7 @@ public class GenotypeDataSource implements RangeHandlingAnnotationDataSource{
 			int stop, Integer maxbins, Range rows)
 			throws BadReferenceObjectException, CoordinateErrorException,
 			DataSourceException, UnimplementedFeatureException {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return null;
 	}
 
@@ -141,21 +141,21 @@ public class GenotypeDataSource implements RangeHandlingAnnotationDataSource{
 	public Collection<DasAnnotatedSegment> getFeatures(
 			Collection<String> featureIdCollection, Integer maxbins)
 			throws UnimplementedFeatureException, DataSourceException {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop)
 			throws UnimplementedFeatureException, DataSourceException {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public int getTotalEntryPoints() throws UnimplementedFeatureException,
 			DataSourceException {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return 0;
 	}
 }

@@ -50,6 +50,7 @@ public class GFFFileDataSource implements AnnotationDataSource {
 			GFF2Parser parser = new GFF2Parser(new FileInputStream(servletContext.getRealPath(path)));
 			segments = parser.parse();
 			types = parser.getTypes();
+                        System.out.println("Finished initialisation============================");
 		} catch (FileNotFoundException e) {
 			throw new DataSourceException("The data source cannot be loaded. The file couldn't be oppened",e);
 		} catch (Exception e) {
@@ -190,7 +191,7 @@ public class GFFFileDataSource implements AnnotationDataSource {
 	public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins,
 			Range rows) throws BadReferenceObjectException,
 			DataSourceException, UnimplementedFeatureException {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return null;
 	}
 
@@ -198,7 +199,7 @@ public class GFFFileDataSource implements AnnotationDataSource {
 	public Collection<DasAnnotatedSegment> getFeatures(
 			Collection<String> featureIdCollection, Integer maxbins, Range rows)
 			throws UnimplementedFeatureException, DataSourceException {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return null;
 	}
 }

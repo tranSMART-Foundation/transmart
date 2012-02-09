@@ -102,7 +102,7 @@ public class GenotypeManager {
 		try {
 			segment = new DasAnnotatedSegment(segmentId,new Integer(start),new Integer(stop),"1.0", segmentId, features);
 		} catch (DataSourceException e) {
-			// TODO Auto-generated catch block
+			//  Auto-generated catch block
 			e.printStackTrace();
 		}
 		return segment;
@@ -127,7 +127,7 @@ public class GenotypeManager {
 				try {
 					method = new DasMethod("23AndMe", "microarray", "");
 				} catch (DataSourceException e1) {
-					// TODO Auto-generated catch block
+					//  Auto-generated catch block
 					e1.printStackTrace();
 				}
 				
@@ -135,7 +135,7 @@ public class GenotypeManager {
 				try {
 					feature = new DasFeature(id,id,type, method,position, position,new Double(1),DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE, DasPhase.PHASE_NOT_APPLICABLE,null, null, null, null, null  );
 				} catch (DataSourceException e) {
-					// TODO Auto-generated catch block
+					//  Auto-generated catch block
 					e.printStackTrace();
 				}
 				features.add(feature);
@@ -146,7 +146,7 @@ public class GenotypeManager {
 			try {
 				throw new DataSourceException("Problems executing the sql query", e);
 			} catch (DataSourceException e1) {
-				// TODO Auto-generated catch block
+				//  Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}

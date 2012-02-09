@@ -150,10 +150,10 @@ public class SeparatedByPipesParser {
 			SeparatedByPipesParser parser = new SeparatedByPipesParser((new FileInputStream("/Users/4ndr01d3/Downloads/test16genes.txt")));
 			parser.parse();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			//  Auto-generated catch block
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			//  Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
