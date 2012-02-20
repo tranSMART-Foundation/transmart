@@ -41,6 +41,10 @@ import org.biodas.jdas.schema.features.DASGFF;
 import org.biodas.jdas.schema.features.ERRORSEGMENT;
 import org.biodas.jdas.schema.features.UNKNOWNFEATURE;
 import org.biodas.jdas.schema.features.UNKNOWNSEGMENT;
+import org.biodas.jdas.schema.formats.COMMAND;
+import org.biodas.jdas.schema.formats.DASFORMATS;
+import org.biodas.jdas.schema.formats.FORMAT;
+import org.biodas.jdas.schema.formats.ObjectFactory;
 import org.biodas.jdas.schema.sources.SOURCES;
 import org.biodas.jdas.schema.types.DASTYPES;
 import org.biodas.jdas.servlet.utils.DASQueryStringTranslator;
@@ -2722,5 +2726,59 @@ public class DasCommandManager {
             return "das-json";
         }
         return accept;
+    }
+
+    /**
+     * Respond to the formats command which lists the capabilities that each data source has and gives what formats and query_uri for each e.g. das-xml, das-json
+     * @param request
+     * @param response
+     * @param dataSourceConfig 
+     */
+    void formats(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dataSourceConfig) throws IOException {
+        logger.warn("calling sources command");
+        // Check the configuration has been loaded successfully
+        if (DATA_SOURCE_MANAGER.getServerConfiguration() == null) {
+            //No configuration, just report the default capabilities
+            writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false, null);
+            logger.error("A request has been made to the das server, however initialisation failed - possibly the mydasserverconfig.xml file was not found.");
+            return;
+        }else{
+            //write ok headers
+            writeHeader(request, response, XDasStatus.STATUS_200_OK, true, dataSourceConfig.getCapabilities());
+            BufferedWriter out = this.getResponseWriter(request, response);
+            String capabilities = dataSourceConfig.getCapabilities();
+            //out.write(caps);
+            String href=this.buildRequestHref(request);
+            href=href.substring(0, href.lastIndexOf("/"));
+           
+            ObjectFactory factory=new ObjectFactory();
+            DASFORMATS dasFormat = factory.createDASFORMATS();
+            String [] caps=capabilities.split(";");
+            //TODO need to exclude some commands and handle href when sources as don't need command on the end for that href.
+            for(String cap:caps){
+                if(!cap.contains("stylesheet")){
+                COMMAND command = factory.createCOMMAND();
+                cap=cap.substring(0, cap.lastIndexOf("/")).trim();
+                command.setName("das1:"+cap);
+                FORMAT format = factory.createFORMAT();
+                format.setName("das-xml");
+                format.setMimetype("application/xml");
+                format.setUrl(href+"/"+cap);
+                FORMAT format2 = factory.createFORMAT();
+                format2.setName("das-json");
+                format2.setMimetype("application/json");
+                format2.setUrl(href+"/"+cap);
+                command.getFORMAT().add(format);
+                command.getFORMAT().add(format2);
+                dasFormat.getCOMMAND().add(command);
+                }
+            }
+            try {
+                writer.writeXmlToBufferedWriter(dasFormat, "org.biodas.jdas.schema.formats", out);
+            } catch (DASClientException ex) {
+                java.util.logging.Logger.getLogger(DasCommandManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            out.close();      
+        }
     }
 }
