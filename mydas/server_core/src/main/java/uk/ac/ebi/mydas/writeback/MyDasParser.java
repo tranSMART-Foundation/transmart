@@ -285,7 +285,7 @@ public class MyDasParser {
 		}
 		label=xpp.getText();
 		type= new DasType(id, category, cvId, label);
-		//TODO: How to manage the parts in the writeback?
+		//: How to manage the parts in the writeback?
 		return type;
 	}
 	private DasMethod parseMethod(XmlPullParser xpp) throws WritebackException {
