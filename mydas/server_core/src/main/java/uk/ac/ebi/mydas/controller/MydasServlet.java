@@ -161,7 +161,8 @@ public class MydasServlet extends HttpServlet {
 		COMMAND_STRUCTURE ("structure"),
 		COMMAND_SOURCES ("sources"),
 		COMMAND_HISTORICAL ("historical"),
-		COMMAND_INDEXER ("indexer");
+		COMMAND_INDEXER ("indexer"),
+                COMMAND_FORMATS("formats");
 
 		private String commandString;
 
@@ -420,6 +421,9 @@ public class MydasServlet extends HttpServlet {
 							}
 							else if (Commands.COMMAND_HISTORICAL.matches(command)){
 								dasCommands.writebackHistorical (request,response, dataSourceConfig);
+							}
+                                                        else if (Commands.COMMAND_FORMATS.matches(command)){
+								dasCommands.formats(request,response, dataSourceConfig);
 							}
 							else {
 								dasCommands.otherCommand(request, response,dataSourceConfig,command,queryString);
