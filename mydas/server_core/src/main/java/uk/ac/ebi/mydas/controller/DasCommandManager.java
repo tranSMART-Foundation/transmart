@@ -1,46 +1,12 @@
 package uk.ac.ebi.mydas.controller;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPOutputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-import org.xmlpull.v1.XmlSerializer;
-
 import com.opensymphony.oscache.base.NeedsRefreshException;
 import com.opensymphony.oscache.general.GeneralCacheAdministrator;
-import java.io.*;
-import java.math.BigInteger;
-import java.util.logging.Level;
-import org.biodas.jdas.client.FeaturesClient;
-import org.biodas.jdas.client.SourcesClient;
-import org.biodas.jdas.client.adapters.features.DasGFFAdapter;
+import org.apache.log4j.Logger;
 import org.biodas.jdas.creators.writers.DasWriter;
 import org.biodas.jdas.exceptions.DASClientException;
-import org.biodas.jdas.exceptions.ValidationException;
 import org.biodas.jdas.schema.entryPoints.DASEP;
 import org.biodas.jdas.schema.features.DASGFF;
-import org.biodas.jdas.schema.features.ERRORSEGMENT;
-import org.biodas.jdas.schema.features.UNKNOWNFEATURE;
-import org.biodas.jdas.schema.features.UNKNOWNSEGMENT;
 import org.biodas.jdas.schema.formats.COMMAND;
 import org.biodas.jdas.schema.formats.DASFORMATS;
 import org.biodas.jdas.schema.formats.FORMAT;
@@ -48,46 +14,37 @@ import org.biodas.jdas.schema.formats.ObjectFactory;
 import org.biodas.jdas.schema.sources.SOURCES;
 import org.biodas.jdas.schema.types.DASTYPES;
 import org.biodas.jdas.servlet.utils.DASQueryStringTranslator;
-
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+import org.xmlpull.v1.XmlSerializer;
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
-import uk.ac.ebi.mydas.configuration.PropertyType;
 import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource;
 import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version;
-import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.Coordinates;
 import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.Capability;
-import uk.ac.ebi.mydas.datasource.AlignmentDataSource;
-import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
-import uk.ac.ebi.mydas.datasource.CommandExtender;
-import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource;
-import uk.ac.ebi.mydas.datasource.RangeHandlingReferenceDataSource;
-import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
-import uk.ac.ebi.mydas.datasource.StructureDataSource;
-import uk.ac.ebi.mydas.datasource.WritebackDataSource;
-import uk.ac.ebi.mydas.exceptions.BadCommandArgumentsException;
-import uk.ac.ebi.mydas.exceptions.BadCommandException;
-import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
-import uk.ac.ebi.mydas.exceptions.BadStylesheetException;
-import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
-import uk.ac.ebi.mydas.exceptions.DataSourceException;
-import uk.ac.ebi.mydas.exceptions.SearcherException;
-import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
-import uk.ac.ebi.mydas.exceptions.WritebackException;
+import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.Coordinates;
+import uk.ac.ebi.mydas.configuration.PropertyType;
+import uk.ac.ebi.mydas.datasource.*;
+import uk.ac.ebi.mydas.exceptions.*;
 import uk.ac.ebi.mydas.extendedmodel.DasEntryPointE;
 import uk.ac.ebi.mydas.extendedmodel.DasTypeE;
 import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
-import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
-import uk.ac.ebi.mydas.model.DasEntryPoint;
-import uk.ac.ebi.mydas.model.DasFeature;
-import uk.ac.ebi.mydas.model.DasSegment;
-import uk.ac.ebi.mydas.model.DasSequence;
-import uk.ac.ebi.mydas.model.DasType;
-import uk.ac.ebi.mydas.model.ErrorSegment;
-import uk.ac.ebi.mydas.model.Range;
+import uk.ac.ebi.mydas.model.*;
 import uk.ac.ebi.mydas.model.alignment.DasAlignment;
 import uk.ac.ebi.mydas.model.structure.DasStructure;
 import uk.ac.ebi.mydas.search.Indexer;
 import uk.ac.ebi.mydas.search.Searcher;
 import uk.ac.ebi.mydas.writeback.MyDasParser;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPOutputStream;
 
 public class DasCommandManager {
 
@@ -97,6 +54,7 @@ public class DasCommandManager {
      */
     private static final Logger logger = Logger.getLogger(DasCommandManager.class);
     DasWriter writer = new DasWriter();
+    public final static String ENCODE = "UTF-8";
     private MydasServlet mydasServlet = null;
     private static DataSourceManager DATA_SOURCE_MANAGER = null;
     private static XmlPullParserFactory PULL_PARSER_FACTORY = null;
@@ -904,10 +862,10 @@ public class DasCommandManager {
                 String value = queryPartKeysValues[1];
                 // Check for typeId restriction
                 if ("type".equals(key)) {
-                    filter.addTypeId(value);
+                    filter.addTypeId(URLDecoder.decode(value, DasCommandManager.ENCODE));
                 } // else check for categoryId restriction
                 else if ("category".equals(key)) {
-                    filter.addCategoryId(value);
+                    filter.addCategoryId(URLDecoder.decode(value, DasCommandManager.ENCODE));
                 } // else check for categorize restriction
                 else if ("categorize".equals(key)) {
                     if ("no".equals(value)) {
@@ -915,7 +873,7 @@ public class DasCommandManager {
                     }
                 } // else check for featureId restriction
                 else if ("feature_id".equals(key)) {
-                    filter.addFeatureId(value);
+                    filter.addFeatureId(URLDecoder.decode(value, DasCommandManager.ENCODE));
                 } // else check for advanced search query
                 else if ("query".equals(key)) {
                     filter.setAdvanceQuery(value);
@@ -1886,7 +1844,6 @@ public class DasCommandManager {
      */
     void entryPointsCommand(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dsnConfig, String queryString)
             throws XmlPullParserException, IOException, DataSourceException, UnimplementedFeatureException, BadCommandArgumentsException {
-        System.out.println("entry_points request recieved 2");
         Integer start = null;
         Integer stop = null;
         Integer expectedSize = null;
@@ -2156,7 +2113,7 @@ public class DasCommandManager {
                     String value = queryPartKeysValues[1];
                     // Check for typeId restriction
                     if ("type".equals(key)) {
-                        typeFilter.add(value);
+                        typeFilter.add(URLDecoder.decode(value, DasCommandManager.ENCODE));
                     }
                 }
                 // Previously a check was included here for unparsable parameters.  This has now
@@ -2706,11 +2663,11 @@ public class DasCommandManager {
     private String processRequestAccepts(HttpServletRequest request){
         DASQueryStringTranslator req=new DASQueryStringTranslator(request);
         String accept=request.getHeader("accept");
-        System.out.println("accept="+accept);
+        //System.out.println("accept="+accept);
         //currently we only accept application/xml and json where everything defaults to xml unless json is in headers or params
         String format=req.getParameter("format");
         if(format!=null && format.equals("das-json")){
-            System.out.println("das-json param found");
+            //System.out.println("das-json param found");
             return "das-json";
         }//parameter overrides accept header
         if(accept!=null){

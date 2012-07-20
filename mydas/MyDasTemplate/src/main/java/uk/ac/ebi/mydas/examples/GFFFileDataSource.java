@@ -2,8 +2,6 @@ package uk.ac.ebi.mydas.examples;
 
 
 
-import javax.servlet.ServletContext;
-
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
 import uk.ac.ebi.mydas.configuration.PropertyType;
 import uk.ac.ebi.mydas.controller.CacheManager;
@@ -14,13 +12,11 @@ import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException;
 import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
 import uk.ac.ebi.mydas.model.*;
 
+import javax.servlet.ServletContext;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Data Source that reads a GFF 2 file which path has been specified in the 
@@ -49,7 +45,13 @@ public class GFFFileDataSource implements AnnotationDataSource {
 		try {
 			GFF2Parser parser = new GFF2Parser(new FileInputStream(servletContext.getRealPath(path)));
 			segments = parser.parse();
+            List<DasFeature> lstFeatures = new ArrayList<DasFeature>();
+            DasType dasType = new DasType("RNAi reagent", "RNAi reagent cat", null, "RNAi reagent label");
+            DasMethod dasMethod = new DasMethod("method id", "method label", "method cvid");
+            lstFeatures.add(new DasFeature("feature id", "features lable", dasType, dasMethod, 1, 1, 0.0, DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE, DasPhase.PHASE_NOT_APPLICABLE, null, null, null, null, null));
+            segments.add(new DasAnnotatedSegment("my_segment_1", 1, 1, "version 1", "my segment label", lstFeatures, 1));
 			types = parser.getTypes();
+            types.add(dasType);
                         System.out.println("Finished initialisation============================");
 		} catch (FileNotFoundException e) {
 			throw new DataSourceException("The data source cannot be loaded. The file couldn't be oppened",e);
