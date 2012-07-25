@@ -104,37 +104,37 @@ If unpivoted, a single data frame is returned. If pivoted, a list of data frames
 }
 \examples{
 	#Getting SNP Data for two studies, only probes in one gene, not pivoting the data.
-	unpivotSNP <- transmart.getSNPData(study.list = c('ONCOTEST_001','ONCOTEST_002'),
+	unpivotSNP <- transmart.getSNPData(study.list = c('GSE1234','GSE12345'),
 											gene.list=c('BRCA2'),data.pivot = FALSE)
 	
 	#Getting SNP Data by a list of genes for one study.
-	byGeneSNP <- transmart.getSNPData(study.list = c('ONCOTEST_001'),
+	byGeneSNP <- transmart.getSNPData(study.list = c('GSE1234'),
 											gene.list=c('BRCA2','BRCA1'))
 	
 	#Getting SNP data by a signature for one study.
-	bySigSNP <- transmart.getSNPData(study.list = c('ONCOTEST_001'),
-											signature='u133p2.gene.names')
+	bySigSNP <- transmart.getSNPData(study.list = c('GSE1234'),
+											signature='some.gene.names')
 	
 	#Getting SNP Data by a signature for multiples studies, forcing the pivot 
 	#to use our internal ID.
-	bySigSNP <- transmart.getSNPData(study.list = c('ONCOTEST_001','ONCOTEST_002'),
-						signature='u133p2.gene.names',
+	bySigSNP <- transmart.getSNPData(study.list = c('GSE1234','GSE12345'),
+						signature='some.gene.names',
 						data.pivot.patient_id = TRUE)
 	
 	#Getting SNP data by a pathway.
-	byPath <- transmart.getSNPData(study.list = c('ONCOTEST_001'),pathway='synapsis')
+	byPath <- transmart.getSNPData(study.list = c('GSE12345'),pathway='metabolism')
 	
 	#Getting SNP data by a list of probes.
-	byProbe <- transmart.getSNPData(study.list = c('ONCOTEST_001'),
+	byProbe <- transmart.getSNPData(study.list = c('GSE1234'),
 						probe.list=c('SNP_A-1827941','SNP_A-4203012','SNP_A-1869849'))
 	
 	#Getting SNP data by probes, using our internal ID.
-	byProbePatient <- transmart.getSNPData(study.list = c('ONCOTEST_001'),
+	byProbePatient <- transmart.getSNPData(study.list = c('GSE1234'),
 						probe.list=c('SNP_A-1827941','SNP_A-4203012','SNP_A-1869849'),
 						data.pivot.patient_id = TRUE)
 	
 	#Getting SNP data with a gene column.
-	bySigSNPFullParameters <- transmart.getSNPData(study.list = c('ONCOTEST_001'),
+	bySigSNPFullParameters <- transmart.getSNPData(study.list = c('GSE1234'),
 						signature='u133p2.gene.names',show.genes = TRUE)
 	
 	#Example of pulling two data frames from list.
