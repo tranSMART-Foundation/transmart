@@ -46,8 +46,8 @@ A data frame is returned with PATIENT_ID (Internal Identifier), SUBJECT_ID (Iden
 \examples{
 
 	mutData <- transmart.getClinicalMutationData(
-								study.list = c('VELCADE024','VELCADE025'),
-								gene.list=c('NRAS','BRAF','MET'),
+								study.list = c('GSE1234','GSE12345'),
+								gene.list=c('GENE1','GENE2','GENE3'),
 								trimLength = 4)
 
 }
