@@ -832,6 +832,7 @@ public class DasCommandManager {
             throws XmlPullParserException, IOException, DataSourceException, BadCommandArgumentsException,
             UnimplementedFeatureException, BadReferenceObjectException, CoordinateErrorException {
         // Parse the queryString to retrieve the individual parts of the query.
+        //logger.debug("1.6.10-TEST-SNAPSHOT: " + this.getClass().getPackage().getImplementationVersion());
         if (queryString == null || queryString.length() == 0) {
             throw new BadCommandArgumentsException("Expecting at least one reference in the query string, but found nothing.");
         }
@@ -862,6 +863,7 @@ public class DasCommandManager {
                 String value = queryPartKeysValues[1];
                 // Check for typeId restriction
                 if ("type".equals(key)) {
+                    //logger.debug("type processed: " + value + " and decoded: " + URLDecoder.decode(value, DasCommandManager.ENCODE));
                     filter.addTypeId(URLDecoder.decode(value, DasCommandManager.ENCODE));
                 } // else check for categoryId restriction
                 else if ("category".equals(key)) {
