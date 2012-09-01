@@ -1722,6 +1722,7 @@ public class DasCommandManager {
             BufferedWriter out = null;
             //jdas object creation and then writing here if request is for json
                 String accepts=processRequestAccepts(request);
+                logger.debug("accepts========"+accepts);
                  if (accepts != null && accepts.contains("json")) {
                     MyDasToJdasSourcesConverter converter=new MyDasToJdasSourcesConverter();
                     SOURCES jdasSources=converter.convertMyDasToJdasSources(DATA_SOURCE_MANAGER, request, response, queryString, source);
@@ -1907,7 +1908,6 @@ public class DasCommandManager {
             try {
                 out = getResponseWriter(request, response);
                 String accepts=processRequestAccepts(request);
-
                 if (accepts != null && accepts.contains("json")) {
                     MyDasToJdasEntryPointsConverter jdasConverter = new MyDasToJdasEntryPointsConverter();
                     DASEP jdasEntryPoints = jdasConverter.entryPointsCommand(href, refDsn, start, stop, request, response, dsnConfig, queryString);
@@ -2663,28 +2663,29 @@ public class DasCommandManager {
     }
     
     private String processRequestAccepts(HttpServletRequest request){
-        DASQueryStringTranslator req=new DASQueryStringTranslator(request);
-        String accept=request.getHeader("accept");
-        //System.out.println("accept="+accept);
-        //currently we only accept application/xml and json where everything defaults to xml unless json is in headers or params
-        String format=req.getParameter("format");
-        if(format!=null && format.equals("das-json")){
-            //System.out.println("das-json param found");
-            return "das-json";
-        }//parameter overrides accept header
-        if(accept!=null){
-            //accept headers are split by commas
-            String accepts[]=accept.split(",");
-            //accept headers are given in order of priority so we have to respect these if specified and no overriding format parameter
-            for(String type:accepts){
-                //return xml if specified first
-                if(type.contains("application/xml"))return "application/xml";
-                //if xml not specified but json is then we return json
-                if(type.contains("application/json"))return "das-json";
-            }
-            return "das-json";
-        }
-        return accept;
+//        DASQueryStringTranslator req=new DASQueryStringTranslator(request);
+//        String accept=request.getHeader("accept");
+//        logger.debug("accept in procesRequestAccepts="+accept);
+//        //currently we only accept application/xml and json where everything defaults to xml unless json is in headers or params
+//        String format=req.getParameter("format");
+//        if(format!=null && format.equals("das-json")){
+//            //System.out.println("das-json param found");
+//            return "das-json";
+//        }//parameter overrides accept header
+//        if(accept!=null){
+//            //accept headers are split by commas
+//            String accepts[]=accept.split(",");
+//            //accept headers are given in order of priority so we have to respect these if specified and no overriding format parameter
+//            for(String type:accepts){
+//                //return xml if specified first
+//                if(type.contains("application/xml"))return "application/xml";
+//                //if xml not specified but json is then we return json
+//                if(type.contains("application/json"))return "das-json";
+//            }
+//            return "application/xml";
+//        }
+       // return accept;
+        return "application/xml";
     }
 
     /**
@@ -2694,7 +2695,7 @@ public class DasCommandManager {
      * @param dataSourceConfig 
      */
     void formats(HttpServletRequest request, HttpServletResponse response, DataSourceConfiguration dataSourceConfig) throws IOException {
-        logger.warn("calling sources command");
+        logger.warn("calling sources command blah");
         // Check the configuration has been loaded successfully
         if (DATA_SOURCE_MANAGER.getServerConfiguration() == null) {
             //No configuration, just report the default capabilities
@@ -2723,12 +2724,12 @@ public class DasCommandManager {
                 format.setName("das-xml");
                 format.setMimetype("application/xml");
                 format.setUrl(href+"/"+cap);
-                FORMAT format2 = factory.createFORMAT();
-                format2.setName("das-json");
-                format2.setMimetype("application/json");
-                format2.setUrl(href+"/"+cap);
+//                FORMAT format2 = factory.createFORMAT();
+//                format2.setName("das-json");
+//                format2.setMimetype("application/json");
+//                format2.setUrl(href+"/"+cap);
                 command.getFORMAT().add(format);
-                command.getFORMAT().add(format2);
+                //command.getFORMAT().add(format2);
                 dasFormat.getCOMMAND().add(command);
                 }
             }
