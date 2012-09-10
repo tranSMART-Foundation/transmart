@@ -161,8 +161,7 @@ public class MydasServlet extends HttpServlet {
 		COMMAND_STRUCTURE ("structure"),
 		COMMAND_SOURCES ("sources"),
 		COMMAND_HISTORICAL ("historical"),
-		COMMAND_INDEXER ("indexer"),
-                COMMAND_FORMATS("formats");
+		COMMAND_INDEXER ("indexer");
 
 		private String commandString;
 
@@ -323,7 +322,7 @@ public class MydasServlet extends HttpServlet {
 		String queryString = request.getQueryString();
 		if (queryString != null){
 			// Get rid of any multiple slashes in the request.
-			// The feature_id can be a URL and require the double slashes  
+			// The feature_id can be a URL and require the double slashes
 			if (!queryString.contains("feature_id"))
 				queryString = queryString.replaceAll("/{2,}", "/");
 		}
@@ -359,11 +358,11 @@ public class MydasServlet extends HttpServlet {
 					}
 					// Check for the source command (similar command to dsn).
 				} else if (Commands.COMMAND_SOURCES.matches(match.group(1))){
-					// Handle source command, in contrast with dsn, source can have extra info 
+					// Handle source command, in contrast with dsn, source can have extra info
 					dasCommands.sourceCommand (request, response, queryString, null);
 					// Check for the source command (similar command to dsn).
 				} else if (Commands.COMMAND_INDEXER.matches(match.group(1))){
-					// Handle indexer command, in contrast with dsn, indexer can have extra info 
+					// Handle indexer command, in contrast with dsn, indexer can have extra info
 					dasCommands.indexerCommand (request, response);
 				}
 
@@ -371,7 +370,7 @@ public class MydasServlet extends HttpServlet {
 				else {
 					String dsnName = match.group(1);
 					if (match.group(2) == null || match.group(2).length() == 0){
-						// Source command for an specific DSN 
+						// Source command for an specific DSN
 						// Attempt to retrieve the DataSource
 						if (null!=DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get(dsnName)){
 							dasCommands.sourceCommand (request, response, queryString, dsnName);
@@ -422,9 +421,6 @@ public class MydasServlet extends HttpServlet {
 							else if (Commands.COMMAND_HISTORICAL.matches(command)){
 								dasCommands.writebackHistorical (request,response, dataSourceConfig);
 							}
-                                                        //else if (Commands.COMMAND_FORMATS.matches(command)){
-							//	dasCommands.formats(request,response, dataSourceConfig);
-							//}
 							else {
 								dasCommands.otherCommand(request, response,dataSourceConfig,command,queryString);
 							}
@@ -531,7 +527,7 @@ public class MydasServlet extends HttpServlet {
 	 * @param request required to determine if the client will accept a compressed response
 	 * @param compressionAllowed to indicate if the specific response should be gzipped. (e.g. an error message with
 	 * no content should not set the compressed header.)
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	void writeHeader (HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed, String capabilities) throws IOException{
 		response.setHeader(HEADER_KEY_X_DAS_VERSION, HEADER_VALUE_DAS_VERSION);
