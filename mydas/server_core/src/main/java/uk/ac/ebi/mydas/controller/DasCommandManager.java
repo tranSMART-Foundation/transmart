@@ -2264,7 +2264,7 @@ public class DasCommandManager {
 	}
 	@SuppressWarnings("unchecked")
 	public void writebackDelete(HttpServletRequest request,HttpServletResponse response, DataSourceConfiguration dataSourceConfig) throws WritebackException {
-		Map<Object,String[]> parameters=request.getParameterMap();
+		Map<String,String[]> parameters=request.getParameterMap();
 		Map<String,String> parameters2 =new HashMap<String,String>();
 		String featureid=null,segmentid=null;
 		for (Object key:parameters.keySet()){
