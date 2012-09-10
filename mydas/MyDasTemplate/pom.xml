@@ -29,7 +29,7 @@
         <dependency>
             <groupId>uk.ac.ebi.mydas</groupId>
             <artifactId>mydas</artifactId>
-            <version>1.6.10-SNAPSHOT</version>
+            <version>1.6.11-SNAPSHOT</version>
         </dependency>
 
         <dependency>
