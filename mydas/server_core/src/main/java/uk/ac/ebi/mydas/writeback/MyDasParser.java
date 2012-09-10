@@ -1,5 +1,12 @@
 package uk.ac.ebi.mydas.writeback;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+import uk.ac.ebi.mydas.exceptions.DataSourceException;
+import uk.ac.ebi.mydas.exceptions.WritebackException;
+import uk.ac.ebi.mydas.model.*;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -8,20 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import uk.ac.ebi.mydas.exceptions.DataSourceException;
-import uk.ac.ebi.mydas.exceptions.WritebackException;
-import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
-import uk.ac.ebi.mydas.model.DasFeature;
-import uk.ac.ebi.mydas.model.DasFeatureOrientation;
-import uk.ac.ebi.mydas.model.DasMethod;
-import uk.ac.ebi.mydas.model.DasPhase;
-import uk.ac.ebi.mydas.model.DasTarget;
-import uk.ac.ebi.mydas.model.DasType;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 
 public class MyDasParser {
@@ -285,7 +278,7 @@ public class MyDasParser {
 		}
 		label=xpp.getText();
 		type= new DasType(id, category, cvId, label);
-		//: How to manage the parts in the writeback?
+		//TODO: How to manage the parts in the writeback?
 		return type;
 	}
 	private DasMethod parseMethod(XmlPullParser xpp) throws WritebackException {

@@ -875,7 +875,6 @@ public class DasCommandManager {
 		Collection<DasAnnotatedSegment> merged=null;
 
 		//If the advanced search is supported and the query attribute is included then the request will be done using it
-		//TODO: Verify that the indexing has been done
 		if (dsnConfig.getCapabilities().contains("advanced-search") && filter.getAdvanceQuery()!=null){
 
 			Map<String, PropertyType> properties = DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration().getGlobalParameters();
