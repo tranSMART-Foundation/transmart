@@ -132,7 +132,7 @@ public class MydasServlet extends HttpServlet {
 	 */
 //	private static final String HEADER_VALUE_CAPABILITIES = "dsn/1.0; dna/1.0; types/1.0; stylesheet/1.0; features/1.0; entry_points/1.0; error-segment/1.0; unknown-segment/1.0; feature-by-id/1.0; group-by-id/1.0; component/1.0; supercomponent/1.0; sequenceString/1.0";
     private static final String HEADER_VALUE_DAS_VERSION = "DAS/1.6";
-    private static final String HEADER_VALUE_DAS_SERVER = "MyDAS1.6";
+    private static final String HEADER_VALUE_DAS_SERVER = "MyDAS1.6.7";
     private static final String HEADER_VALUE_X_DAS_DEFAULT_CAPABILITIES = "sources/1.0";
     private static final String HEADER_VALUE_CORS = "*";
     private static final String HEADER_VALUE_CORS_EXPOSE = HEADER_KEY_X_DAS_VERSION +
@@ -513,6 +513,7 @@ public class MydasServlet extends HttpServlet {
      * @throws IOException
      */
     void writeHeader(HttpServletRequest request, HttpServletResponse response, XDasStatus status, boolean compressionAllowed, String capabilities) throws IOException {
+
         response.setHeader(HEADER_KEY_X_DAS_VERSION, HEADER_VALUE_DAS_VERSION);
         if (capabilities != null) {
             response.setHeader(HEADER_KEY_X_DAS_CAPABILITIES, capabilities);
@@ -543,6 +544,9 @@ public class MydasServlet extends HttpServlet {
         } else if (status == XDasStatus.STATUS_500_SERVER_ERROR || status == XDasStatus.STATUS_501_UNIMPLEMENTED_FEATURE) {
             //response.sendError(500);
             response.setStatus(500);
+        }
+        if (status == XDasStatus.STATUS_200_OK) {
+            response.setContentType("application/xml;charset=UTF-8");
         }
     }
 
