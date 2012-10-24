@@ -23,17 +23,22 @@
 
 package uk.ac.ebi.mydas.proxy;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.SystemDefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.mydas.client.QueryAwareDasAnnotatedSegment;
 import uk.ac.ebi.mydas.client.RegexPatterns;
 import uk.ac.ebi.mydas.client.xml.DasFeatureXmlUnmarshaller;
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
 import uk.ac.ebi.mydas.configuration.PropertyType;
-import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
@@ -88,7 +93,6 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
      */
     private static final Executor EXEC = Executors.newCachedThreadPool();
 
-    CacheManager cacheManager = null;
     ServletContext svCon;
     Map<String, PropertyType> globalParameters;
     DataSourceConfiguration config;
@@ -106,6 +110,7 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
     private static final String HTTP_PROXY_USER = "http.proxyUser";
     private static final String HTTP_PROXY_PASSWORD = "http.proxyPassword";
     private static final String HTTP_NON_PROXY_HOSTS = "http.nonProxyHosts";
+    private static final String HTTP_MAX_CONNECTIONS = "http.maxConnections";
 
     /**
      * This pattern is used to test that a URL String ends with /das/datasourcename
@@ -169,9 +174,11 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
             setSystemProperty(sysProperties, dataSourceProps, HTTP_PROXY_USER);
             setSystemProperty(sysProperties, dataSourceProps, HTTP_PROXY_PASSWORD);
             setSystemProperty(sysProperties, dataSourceProps, HTTP_NON_PROXY_HOSTS);
+
         } else {
             sysProperties.put(HTTP_PROXY_SET, "false");
         }
+        sysProperties.put(HTTP_MAX_CONNECTIONS, "100");
 
         // Configure the HTTP request timeout (optional - defaults to 4 seconds).
         if (dataSourceProps.containsKey(HTTP_TIMEOUT)) {
@@ -185,11 +192,19 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
                 }
             }
         }
+        sysProperties.put(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
+        sysProperties.put(CoreConnectionPNames.SO_TIMEOUT, connectionTimeout);
+        sysProperties.put("http.keepAlive", "true");
 
-        // Create the HttpClient for this Data Source instance.
-        MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
-        connectionManager.getParams().setConnectionTimeout(connectionTimeout);
-        httpClient = new HttpClient(connectionManager);
+        System.setProperties(sysProperties);
+
+        HttpParams httpParams = new BasicHttpParams();
+
+        httpParams.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
+        httpParams.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, connectionTimeout);
+
+
+        httpClient = new SystemDefaultHttpClient(httpParams);
 
         // Get the list of source DAS Servers and store.
         Set<String> keys = dataSourceProps.keySet();
@@ -197,7 +212,7 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
         for (String key : keys) {
             if (key.startsWith("dasServer")) {
                 Integer serverIndex = new Integer(key.substring(9).trim());
-                PropertyType serverURLPropertyType = dataSourceProps.get(key);
+                final PropertyType serverURLPropertyType = dataSourceProps.get(key);
                 if (serverURLPropertyType != null) {
                     String serverURLString = serverURLPropertyType.getValue();
                     // Check that the URL looks good.
@@ -246,22 +261,23 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
     }
 
     private void checkServerRunning(HttpClient client, String urlString) {
-        GetMethod method = null;
+        HttpGet method = null;
         // Query the types command
         urlString = urlString + "/types";
         try {
             LOGGER.debug("connecting to " + urlString);
             URL url = new URL(urlString);
             // Create a method instance.
-            method = new GetMethod(url.toString());
+            method = new HttpGet(url.toString());
             // Execute the method.
-            int statusCode = client.executeMethod(method);
+            HttpResponse response = client.execute(method);
 
-            if (statusCode != HttpStatus.SC_OK) {
-                LOGGER.warn("Remote DAS Service at '" + url + "' failed: Returned HTTP status code :" + statusCode + " with status :" + method.getStatusLine());
+            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                LOGGER.warn("Remote DAS Service at '" + url + "' failed: Returned HTTP status code :" + response.getStatusLine().getStatusCode() + " with status :" + response.getStatusLine().getReasonPhrase());
             } else {
                 // Read the response body.
-                String responseString = new String(method.getResponseBody());
+                HttpEntity httpEntity = response.getEntity();
+                String responseString = EntityUtils.toString(httpEntity);
                 // Check for a valid </DASTYPES> element.
                 if (responseString.contains("</DASTYPES>")) {
                     LOGGER.info("The types request\n\n" + urlString + "\n\nwas successful and returned the XML:\n\n" + responseString);
@@ -275,7 +291,7 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
             LOGGER.error("IOException thrown when requesting URL " + urlString, e);
         } finally {
             if (method != null) {
-                method.releaseConnection();
+                method.reset();
             }
         }
     }
@@ -285,7 +301,9 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
      * to clean up resources such as database connections as required.
      */
     public void destroy() {
-        // Nothing to do - no resources tied up.
+        if (httpClient != null && httpClient.getConnectionManager() != null) {
+            httpClient.getConnectionManager().shutdown();
+        }
     }
 
 
@@ -542,21 +560,6 @@ public abstract class AbstractProxyDataSource implements AnnotationDataSource {
      */
     public Integer getTotalCountForType(DasType type) throws DataSourceException {
         return null;
-    }
-
-    /**
-     * The mydas DAS server implements caching within the server.  This method passes your datasource a reference
-     * to a {@link uk.ac.ebi.mydas.controller.CacheManager} object.  To implement this method, you should simply retain a reference to this object.
-     * In your code you can then make use of this object to manipulate caching in the mydas servlet.
-     * <p/>
-     * At present the {@link uk.ac.ebi.mydas.controller.CacheManager} class provides you with a single method public void emptyCache() that
-     * you can call if (for example) the underlying data source has changed.
-     *
-     * @param cacheManager a reference to a {@link uk.ac.ebi.mydas.controller.CacheManager} object that the data source can use to empty
-     *                     the cache for this data source.
-     */
-    public void registerCacheManager(CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
     }
 
     /**

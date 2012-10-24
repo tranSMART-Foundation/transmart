@@ -5,7 +5,7 @@
 
     <groupId>uk.ac.ebi.mydas.proxy</groupId>
     <artifactId>ProxyDasServer</artifactId>
-    <version>1.6.2</version>
+    <version>1.6.7</version>
 
     <packaging>jar</packaging>
 
@@ -47,13 +47,19 @@
         <dependency>
             <groupId>uk.ac.ebi.mydas.client</groupId>
             <artifactId>MyDasClient</artifactId>
-            <version>1.6.2</version>
+            <version>1.6.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-httpclient</groupId>
+                    <artifactId>commons-httpclient</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.0.1</version>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.2.1</version>
         </dependency>
 
     </dependencies>
