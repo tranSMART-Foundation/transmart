@@ -545,9 +545,7 @@ public class MydasServlet extends HttpServlet {
             //response.sendError(500);
             response.setStatus(500);
         }
-        if (status == XDasStatus.STATUS_200_OK) {
-            response.setContentType("application/xml;charset=UTF-8");
-        }
+        response.setContentType("application/xml;charset=UTF-8");
     }
 
 
