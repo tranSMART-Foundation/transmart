@@ -8,23 +8,16 @@
 
 package uk.ac.ebi.mydas.configuration;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
 
 
 /**
  * <p>Java class for anonymous complex type.
- *
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- *
+ * <p/>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -176,13 +169,11 @@ import javax.xml.bind.annotation.XmlValue;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- *
- *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "global",
-    "datasources"
+        "global",
+        "datasources"
 })
 @XmlRootElement(name = "mydasserver")
 public class Mydasserver {
@@ -195,10 +186,8 @@ public class Mydasserver {
     /**
      * Gets the value of the global property.
      *
-     * @return
-     *     possible object is
-     *     {@link Mydasserver.Global }
-     *
+     * @return possible object is
+     *         {@link Mydasserver.Global }
      */
     public Mydasserver.Global getGlobal() {
         return global;
@@ -207,10 +196,8 @@ public class Mydasserver {
     /**
      * Sets the value of the global property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link Mydasserver.Global }
-     *
+     * @param value allowed object is
+     *              {@link Mydasserver.Global }
      */
     public void setGlobal(Mydasserver.Global value) {
         this.global = value;
@@ -219,10 +206,8 @@ public class Mydasserver {
     /**
      * Gets the value of the datasources property.
      *
-     * @return
-     *     possible object is
-     *     {@link Mydasserver.Datasources }
-     *
+     * @return possible object is
+     *         {@link Mydasserver.Datasources }
      */
     public Mydasserver.Datasources getDatasources() {
         return datasources;
@@ -231,10 +216,8 @@ public class Mydasserver {
     /**
      * Sets the value of the datasources property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link Mydasserver.Datasources }
-     *
+     * @param value allowed object is
+     *              {@link Mydasserver.Datasources }
      */
     public void setDatasources(Mydasserver.Datasources value) {
         this.datasources = value;
@@ -243,9 +226,9 @@ public class Mydasserver {
 
     /**
      * <p>Java class for anonymous complex type.
-     *
+     * <p/>
      * <p>The following schema fragment specifies the expected content contained within this class.
-     *
+     * <p/>
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
@@ -344,12 +327,10 @@ public class Mydasserver {
      *   &lt;/complexContent>
      * &lt;/complexType>
      * </pre>
-     *
-     *
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "datasource"
+            "datasource"
     })
     public static class Datasources {
 
@@ -358,25 +339,23 @@ public class Mydasserver {
 
         /**
          * Gets the value of the datasource property.
-         *
-         * <p>
+         * <p/>
+         * <p/>
          * This accessor method returns a reference to the live list,
          * not a snapshot. Therefore any modification you make to the
          * returned list will be present inside the JAXB object.
          * This is why there is not a <CODE>set</CODE> method for the datasource property.
-         *
-         * <p>
+         * <p/>
+         * <p/>
          * For example, to add a new item, do as follows:
          * <pre>
          *    getDatasource().add(newItem);
          * </pre>
-         *
-         *
-         * <p>
+         * <p/>
+         * <p/>
+         * <p/>
          * Objects of the following type(s) are allowed in the list
          * {@link Mydasserver.Datasources.Datasource }
-         *
-         *
          */
         public List<Mydasserver.Datasources.Datasource> getDatasource() {
             if (datasource == null) {
@@ -388,9 +367,9 @@ public class Mydasserver {
 
         /**
          * <p>Java class for anonymous complex type.
-         *
+         * <p/>
          * <p>The following schema fragment specifies the expected content contained within this class.
-         *
+         * <p/>
          * <pre>
          * &lt;complexType>
          *   &lt;complexContent>
@@ -479,17 +458,15 @@ public class Mydasserver {
          *   &lt;/complexContent>
          * &lt;/complexType>
          * </pre>
-         *
-         *
          */
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
-            "maintainer",
-            "version",
-            "stylesheet",
-            "dnaCommandEnabled",
-            "useFeatureIdForFeatureLabel",
-            "includeTypesWithZeroCount"
+                "maintainer",
+                "version",
+                "stylesheet",
+                "dnaCommandEnabled",
+                "useFeatureIdForFeatureLabel",
+                "includeTypesWithZeroCount"
         })
         public static class Datasource {
 
@@ -497,6 +474,7 @@ public class Mydasserver {
             protected Mydasserver.Datasources.Datasource.Maintainer maintainer;
             @XmlElement(required = true)
             protected List<Mydasserver.Datasources.Datasource.Version> version;
+            @XmlElement(required = false)
             protected String stylesheet;
             @XmlElement(name = "dna-command-enabled", required = true)
             protected Mydasserver.Datasources.Datasource.DnaCommandEnabled dnaCommandEnabled;
@@ -523,10 +501,8 @@ public class Mydasserver {
             /**
              * Gets the value of the maintainer property.
              *
-             * @return
-             *     possible object is
-             *     {@link Mydasserver.Datasources.Datasource.Maintainer }
-             *
+             * @return possible object is
+             *         {@link Mydasserver.Datasources.Datasource.Maintainer }
              */
             public Mydasserver.Datasources.Datasource.Maintainer getMaintainer() {
                 return maintainer;
@@ -535,10 +511,8 @@ public class Mydasserver {
             /**
              * Sets the value of the maintainer property.
              *
-             * @param value
-             *     allowed object is
-             *     {@link Mydasserver.Datasources.Datasource.Maintainer }
-             *
+             * @param value allowed object is
+             *              {@link Mydasserver.Datasources.Datasource.Maintainer }
              */
             public void setMaintainer(Mydasserver.Datasources.Datasource.Maintainer value) {
                 this.maintainer = value;
@@ -546,25 +520,23 @@ public class Mydasserver {
 
             /**
              * Gets the value of the version property.
-             *
-             * <p>
+             * <p/>
+             * <p/>
              * This accessor method returns a reference to the live list,
              * not a snapshot. Therefore any modification you make to the
              * returned list will be present inside the JAXB object.
              * This is why there is not a <CODE>set</CODE> method for the version property.
-             *
-             * <p>
+             * <p/>
+             * <p/>
              * For example, to add a new item, do as follows:
              * <pre>
              *    getVersion().add(newItem);
              * </pre>
-             *
-             *
-             * <p>
+             * <p/>
+             * <p/>
+             * <p/>
              * Objects of the following type(s) are allowed in the list
              * {@link Mydasserver.Datasources.Datasource.Version }
-             *
-             *
              */
             public List<Mydasserver.Datasources.Datasource.Version> getVersion() {
                 if (version == null) {
@@ -576,10 +548,8 @@ public class Mydasserver {
             /**
              * Gets the value of the stylesheet property.
              *
-             * @return
-             *     possible object is
-             *     {@link String }
-             *
+             * @return possible object is
+             *         {@link String }
              */
             public String getStylesheet() {
                 return stylesheet;
@@ -588,10 +558,8 @@ public class Mydasserver {
             /**
              * Sets the value of the stylesheet property.
              *
-             * @param value
-             *     allowed object is
-             *     {@link String }
-             *
+             * @param value allowed object is
+             *              {@link String }
              */
             public void setStylesheet(String value) {
                 this.stylesheet = value;
@@ -600,10 +568,8 @@ public class Mydasserver {
             /**
              * Gets the value of the dnaCommandEnabled property.
              *
-             * @return
-             *     possible object is
-             *     {@link Mydasserver.Datasources.Datasource.DnaCommandEnabled }
-             *
+             * @return possible object is
+             *         {@link Mydasserver.Datasources.Datasource.DnaCommandEnabled }
              */
             public Mydasserver.Datasources.Datasource.DnaCommandEnabled getDnaCommandEnabled() {
                 return dnaCommandEnabled;
@@ -612,10 +578,8 @@ public class Mydasserver {
             /**
              * Sets the value of the dnaCommandEnabled property.
              *
-             * @param value
-             *     allowed object is
-             *     {@link Mydasserver.Datasources.Datasource.DnaCommandEnabled }
-             *
+             * @param value allowed object is
+             *              {@link Mydasserver.Datasources.Datasource.DnaCommandEnabled }
              */
             public void setDnaCommandEnabled(Mydasserver.Datasources.Datasource.DnaCommandEnabled value) {
                 this.dnaCommandEnabled = value;
@@ -624,10 +588,8 @@ public class Mydasserver {
             /**
              * Gets the value of the useFeatureIdForFeatureLabel property.
              *
-             * @return
-             *     possible object is
-             *     {@link Mydasserver.Datasources.Datasource.UseFeatureIdForFeatureLabel }
-             *
+             * @return possible object is
+             *         {@link Mydasserver.Datasources.Datasource.UseFeatureIdForFeatureLabel }
              */
             public Mydasserver.Datasources.Datasource.UseFeatureIdForFeatureLabel getUseFeatureIdForFeatureLabel() {
                 return useFeatureIdForFeatureLabel;
@@ -636,10 +598,8 @@ public class Mydasserver {
             /**
              * Sets the value of the useFeatureIdForFeatureLabel property.
              *
-             * @param value
-             *     allowed object is
-             *     {@link Mydasserver.Datasources.Datasource.UseFeatureIdForFeatureLabel }
-             *
+             * @param value allowed object is
+             *              {@link Mydasserver.Datasources.Datasource.UseFeatureIdForFeatureLabel }
              */
             public void setUseFeatureIdForFeatureLabel(Mydasserver.Datasources.Datasource.UseFeatureIdForFeatureLabel value) {
                 this.useFeatureIdForFeatureLabel = value;
@@ -648,10 +608,8 @@ public class Mydasserver {
             /**
              * Gets the value of the includeTypesWithZeroCount property.
              *
-             * @return
-             *     possible object is
-             *     {@link Mydasserver.Datasources.Datasource.IncludeTypesWithZeroCount }
-             *
+             * @return possible object is
+             *         {@link Mydasserver.Datasources.Datasource.IncludeTypesWithZeroCount }
              */
             public Mydasserver.Datasources.Datasource.IncludeTypesWithZeroCount getIncludeTypesWithZeroCount() {
                 return includeTypesWithZeroCount;
@@ -660,10 +618,8 @@ public class Mydasserver {
             /**
              * Sets the value of the includeTypesWithZeroCount property.
              *
-             * @param value
-             *     allowed object is
-             *     {@link Mydasserver.Datasources.Datasource.IncludeTypesWithZeroCount }
-             *
+             * @param value allowed object is
+             *              {@link Mydasserver.Datasources.Datasource.IncludeTypesWithZeroCount }
              */
             public void setIncludeTypesWithZeroCount(Mydasserver.Datasources.Datasource.IncludeTypesWithZeroCount value) {
                 this.includeTypesWithZeroCount = value;
@@ -672,10 +628,8 @@ public class Mydasserver {
             /**
              * Gets the value of the uri property.
              *
-             * @return
-             *     possible object is
-             *     {@link String }
-             *
+             * @return possible object is
+             *         {@link String }
              */
             public String getUri() {
                 return uri;
@@ -684,10 +638,8 @@ public class Mydasserver {
             /**
              * Sets the value of the uri property.
              *
-             * @param value
-             *     allowed object is
-             *     {@link String }
-             *
+             * @param value allowed object is
+             *              {@link String }
              */
             public void setUri(String value) {
                 this.uri = value;
@@ -696,10 +648,8 @@ public class Mydasserver {
             /**
              * Gets the value of the title property.
              *
-             * @return
-             *     possible object is
-             *     {@link String }
-             *
+             * @return possible object is
+             *         {@link String }
              */
             public String getTitle() {
                 return title;
@@ -708,10 +658,8 @@ public class Mydasserver {
             /**
              * Sets the value of the title property.
              *
-             * @param value
-             *     allowed object is
-             *     {@link String }
-             *
+             * @param value allowed object is
+             *              {@link String }
              */
             public void setTitle(String value) {
                 this.title = value;
@@ -720,10 +668,8 @@ public class Mydasserver {
             /**
              * Gets the value of the description property.
              *
-             * @return
-             *     possible object is
-             *     {@link String }
-             *
+             * @return possible object is
+             *         {@link String }
              */
             public String getDescription() {
                 return description;
@@ -732,10 +678,8 @@ public class Mydasserver {
             /**
              * Sets the value of the description property.
              *
-             * @param value
-             *     allowed object is
-             *     {@link String }
-             *
+             * @param value allowed object is
+             *              {@link String }
              */
             public void setDescription(String value) {
                 this.description = value;
@@ -744,10 +688,8 @@ public class Mydasserver {
             /**
              * Gets the value of the docHref property.
              *
-             * @return
-             *     possible object is
-             *     {@link String }
-             *
+             * @return possible object is
+             *         {@link String }
              */
             public String getDocHref() {
                 return docHref;
@@ -756,10 +698,8 @@ public class Mydasserver {
             /**
              * Sets the value of the docHref property.
              *
-             * @param value
-             *     allowed object is
-             *     {@link String }
-             *
+             * @param value allowed object is
+             *              {@link String }
              */
             public void setDocHref(String value) {
                 this.docHref = value;
@@ -768,10 +708,8 @@ public class Mydasserver {
             /**
              * Gets the value of the mapmaster property.
              *
-             * @return
-             *     possible object is
-             *     {@link String }
-             *
+             * @return possible object is
+             *         {@link String }
              */
             public String getMapmaster() {
                 return mapmaster;
@@ -780,10 +718,8 @@ public class Mydasserver {
             /**
              * Sets the value of the mapmaster property.
              *
-             * @param value
-             *     allowed object is
-             *     {@link String }
-             *
+             * @param value allowed object is
+             *              {@link String }
              */
             public void setMapmaster(String value) {
                 this.mapmaster = value;
@@ -792,10 +728,8 @@ public class Mydasserver {
             /**
              * Gets the value of the maxEntryPoints property.
              *
-             * @return
-             *     possible object is
-             *     {@link Integer }
-             *
+             * @return possible object is
+             *         {@link Integer }
              */
             public Integer getMaxEntryPoints() {
                 return maxEntryPoints;
@@ -804,10 +738,8 @@ public class Mydasserver {
             /**
              * Sets the value of the maxEntryPoints property.
              *
-             * @param value
-             *     allowed object is
-             *     {@link Integer }
-             *
+             * @param value allowed object is
+             *              {@link Integer }
              */
             public void setMaxEntryPoints(Integer value) {
                 this.maxEntryPoints = value;
@@ -816,9 +748,9 @@ public class Mydasserver {
 
             /**
              * <p>Java class for anonymous complex type.
-             *
+             * <p/>
              * <p>The following schema fragment specifies the expected content contained within this class.
-             *
+             * <p/>
              * <pre>
              * &lt;complexType>
              *   &lt;simpleContent>
@@ -827,12 +759,10 @@ public class Mydasserver {
              *   &lt;/simpleContent>
              * &lt;/complexType>
              * </pre>
-             *
-             *
              */
             @XmlAccessorType(XmlAccessType.FIELD)
             @XmlType(name = "", propOrder = {
-                "value"
+                    "value"
             })
             public static class DnaCommandEnabled {
 
@@ -841,7 +771,6 @@ public class Mydasserver {
 
                 /**
                  * Gets the value of the value property.
-                 *
                  */
                 public boolean isValue() {
                     return value;
@@ -849,7 +778,6 @@ public class Mydasserver {
 
                 /**
                  * Sets the value of the value property.
-                 *
                  */
                 public void setValue(boolean value) {
                     this.value = value;
@@ -860,9 +788,9 @@ public class Mydasserver {
 
             /**
              * <p>Java class for anonymous complex type.
-             *
+             * <p/>
              * <p>The following schema fragment specifies the expected content contained within this class.
-             *
+             * <p/>
              * <pre>
              * &lt;complexType>
              *   &lt;simpleContent>
@@ -871,12 +799,10 @@ public class Mydasserver {
              *   &lt;/simpleContent>
              * &lt;/complexType>
              * </pre>
-             *
-             *
              */
             @XmlAccessorType(XmlAccessType.FIELD)
             @XmlType(name = "", propOrder = {
-                "value"
+                    "value"
             })
             public static class IncludeTypesWithZeroCount {
 
@@ -885,7 +811,6 @@ public class Mydasserver {
 
                 /**
                  * Gets the value of the value property.
-                 *
                  */
                 public boolean isValue() {
                     return value;
@@ -893,7 +818,6 @@ public class Mydasserver {
 
                 /**
                  * Sets the value of the value property.
-                 *
                  */
                 public void setValue(boolean value) {
                     this.value = value;
@@ -904,9 +828,9 @@ public class Mydasserver {
 
             /**
              * <p>Java class for anonymous complex type.
-             *
+             * <p/>
              * <p>The following schema fragment specifies the expected content contained within this class.
-             *
+             * <p/>
              * <pre>
              * &lt;complexType>
              *   &lt;complexContent>
@@ -916,8 +840,6 @@ public class Mydasserver {
              *   &lt;/complexContent>
              * &lt;/complexType>
              * </pre>
-             *
-             *
              */
             @XmlAccessorType(XmlAccessType.FIELD)
             @XmlType(name = "")
@@ -929,10 +851,8 @@ public class Mydasserver {
                 /**
                  * Gets the value of the email property.
                  *
-                 * @return
-                 *     possible object is
-                 *     {@link String }
-                 *
+                 * @return possible object is
+                 *         {@link String }
                  */
                 public String getEmail() {
                     return email;
@@ -941,10 +861,8 @@ public class Mydasserver {
                 /**
                  * Sets the value of the email property.
                  *
-                 * @param value
-                 *     allowed object is
-                 *     {@link String }
-                 *
+                 * @param value allowed object is
+                 *              {@link String }
                  */
                 public void setEmail(String value) {
                     this.email = value;
@@ -955,9 +873,9 @@ public class Mydasserver {
 
             /**
              * <p>Java class for anonymous complex type.
-             *
+             * <p/>
              * <p>The following schema fragment specifies the expected content contained within this class.
-             *
+             * <p/>
              * <pre>
              * &lt;complexType>
              *   &lt;simpleContent>
@@ -966,12 +884,10 @@ public class Mydasserver {
              *   &lt;/simpleContent>
              * &lt;/complexType>
              * </pre>
-             *
-             *
              */
             @XmlAccessorType(XmlAccessType.FIELD)
             @XmlType(name = "", propOrder = {
-                "value"
+                    "value"
             })
             public static class UseFeatureIdForFeatureLabel {
 
@@ -980,7 +896,6 @@ public class Mydasserver {
 
                 /**
                  * Gets the value of the value property.
-                 *
                  */
                 public boolean isValue() {
                     return value;
@@ -988,7 +903,6 @@ public class Mydasserver {
 
                 /**
                  * Sets the value of the value property.
-                 *
                  */
                 public void setValue(boolean value) {
                     this.value = value;
@@ -999,9 +913,9 @@ public class Mydasserver {
 
             /**
              * <p>Java class for anonymous complex type.
-             *
+             * <p/>
              * <p>The following schema fragment specifies the expected content contained within this class.
-             *
+             * <p/>
              * <pre>
              * &lt;complexType>
              *   &lt;complexContent>
@@ -1040,15 +954,13 @@ public class Mydasserver {
              *   &lt;/complexContent>
              * &lt;/complexType>
              * </pre>
-             *
-             *
              */
             @XmlAccessorType(XmlAccessType.FIELD)
             @XmlType(name = "", propOrder = {
-                "clazz",
-                "coordinates",
-                "capability",
-                "property"
+                    "clazz",
+                    "coordinates",
+                    "capability",
+                    "property"
             })
             public static class Version {
 
@@ -1068,10 +980,8 @@ public class Mydasserver {
                 /**
                  * Gets the value of the clazz property.
                  *
-                 * @return
-                 *     possible object is
-                 *     {@link String }
-                 *
+                 * @return possible object is
+                 *         {@link String }
                  */
                 public String getClazz() {
                     return clazz;
@@ -1080,10 +990,8 @@ public class Mydasserver {
                 /**
                  * Sets the value of the clazz property.
                  *
-                 * @param value
-                 *     allowed object is
-                 *     {@link String }
-                 *
+                 * @param value allowed object is
+                 *              {@link String }
                  */
                 public void setClazz(String value) {
                     this.clazz = value;
@@ -1091,25 +999,23 @@ public class Mydasserver {
 
                 /**
                  * Gets the value of the coordinates property.
-                 *
-                 * <p>
+                 * <p/>
+                 * <p/>
                  * This accessor method returns a reference to the live list,
                  * not a snapshot. Therefore any modification you make to the
                  * returned list will be present inside the JAXB object.
                  * This is why there is not a <CODE>set</CODE> method for the coordinates property.
-                 *
-                 * <p>
+                 * <p/>
+                 * <p/>
                  * For example, to add a new item, do as follows:
                  * <pre>
                  *    getCoordinates().add(newItem);
                  * </pre>
-                 *
-                 *
-                 * <p>
+                 * <p/>
+                 * <p/>
+                 * <p/>
                  * Objects of the following type(s) are allowed in the list
                  * {@link Mydasserver.Datasources.Datasource.Version.Coordinates }
-                 *
-                 *
                  */
                 public List<Mydasserver.Datasources.Datasource.Version.Coordinates> getCoordinates() {
                     if (coordinates == null) {
@@ -1120,25 +1026,23 @@ public class Mydasserver {
 
                 /**
                  * Gets the value of the capability property.
-                 *
-                 * <p>
+                 * <p/>
+                 * <p/>
                  * This accessor method returns a reference to the live list,
                  * not a snapshot. Therefore any modification you make to the
                  * returned list will be present inside the JAXB object.
                  * This is why there is not a <CODE>set</CODE> method for the capability property.
-                 *
-                 * <p>
+                 * <p/>
+                 * <p/>
                  * For example, to add a new item, do as follows:
                  * <pre>
                  *    getCapability().add(newItem);
                  * </pre>
-                 *
-                 *
-                 * <p>
+                 * <p/>
+                 * <p/>
+                 * <p/>
                  * Objects of the following type(s) are allowed in the list
                  * {@link Mydasserver.Datasources.Datasource.Version.Capability }
-                 *
-                 *
                  */
                 public List<Mydasserver.Datasources.Datasource.Version.Capability> getCapability() {
                     if (capability == null) {
@@ -1149,25 +1053,23 @@ public class Mydasserver {
 
                 /**
                  * Gets the value of the property property.
-                 *
-                 * <p>
+                 * <p/>
+                 * <p/>
                  * This accessor method returns a reference to the live list,
                  * not a snapshot. Therefore any modification you make to the
                  * returned list will be present inside the JAXB object.
                  * This is why there is not a <CODE>set</CODE> method for the property property.
-                 *
-                 * <p>
+                 * <p/>
+                 * <p/>
                  * For example, to add a new item, do as follows:
                  * <pre>
                  *    getProperty().add(newItem);
                  * </pre>
-                 *
-                 *
-                 * <p>
+                 * <p/>
+                 * <p/>
+                 * <p/>
                  * Objects of the following type(s) are allowed in the list
                  * {@link PropertyType }
-                 *
-                 *
                  */
                 public List<PropertyType> getProperty() {
                     if (property == null) {
@@ -1179,10 +1081,8 @@ public class Mydasserver {
                 /**
                  * Gets the value of the uri property.
                  *
-                 * @return
-                 *     possible object is
-                 *     {@link String }
-                 *
+                 * @return possible object is
+                 *         {@link String }
                  */
                 public String getUri() {
                     return uri;
@@ -1191,10 +1091,8 @@ public class Mydasserver {
                 /**
                  * Sets the value of the uri property.
                  *
-                 * @param value
-                 *     allowed object is
-                 *     {@link String }
-                 *
+                 * @param value allowed object is
+                 *              {@link String }
                  */
                 public void setUri(String value) {
                     this.uri = value;
@@ -1203,10 +1101,8 @@ public class Mydasserver {
                 /**
                  * Gets the value of the created property.
                  *
-                 * @return
-                 *     possible object is
-                 *     {@link String }
-                 *
+                 * @return possible object is
+                 *         {@link String }
                  */
                 public String getCreated() {
                     return created;
@@ -1215,10 +1111,8 @@ public class Mydasserver {
                 /**
                  * Sets the value of the created property.
                  *
-                 * @param value
-                 *     allowed object is
-                 *     {@link String }
-                 *
+                 * @param value allowed object is
+                 *              {@link String }
                  */
                 public void setCreated(String value) {
                     this.created = value;
@@ -1227,9 +1121,9 @@ public class Mydasserver {
 
                 /**
                  * <p>Java class for anonymous complex type.
-                 *
+                 * <p/>
                  * <p>The following schema fragment specifies the expected content contained within this class.
-                 *
+                 * <p/>
                  * <pre>
                  * &lt;complexType>
                  *   &lt;simpleContent>
@@ -1240,12 +1134,10 @@ public class Mydasserver {
                  *   &lt;/simpleContent>
                  * &lt;/complexType>
                  * </pre>
-                 *
-                 *
                  */
                 @XmlAccessorType(XmlAccessType.FIELD)
                 @XmlType(name = "", propOrder = {
-                    "value"
+                        "value"
                 })
                 public static class Capability {
 
@@ -1260,10 +1152,8 @@ public class Mydasserver {
                     /**
                      * Gets the value of the value property.
                      *
-                     * @return
-                     *     possible object is
-                     *     {@link String }
-                     *
+                     * @return possible object is
+                     *         {@link String }
                      */
                     public String getValue() {
                         return value;
@@ -1272,10 +1162,8 @@ public class Mydasserver {
                     /**
                      * Sets the value of the value property.
                      *
-                     * @param value
-                     *     allowed object is
-                     *     {@link String }
-                     *
+                     * @param value allowed object is
+                     *              {@link String }
                      */
                     public void setValue(String value) {
                         this.value = value;
@@ -1284,10 +1172,8 @@ public class Mydasserver {
                     /**
                      * Gets the value of the type property.
                      *
-                     * @return
-                     *     possible object is
-                     *     {@link String }
-                     *
+                     * @return possible object is
+                     *         {@link String }
                      */
                     public String getType() {
                         return type;
@@ -1296,10 +1182,8 @@ public class Mydasserver {
                     /**
                      * Sets the value of the type property.
                      *
-                     * @param value
-                     *     allowed object is
-                     *     {@link String }
-                     *
+                     * @param value allowed object is
+                     *              {@link String }
                      */
                     public void setType(String value) {
                         this.type = value;
@@ -1308,10 +1192,8 @@ public class Mydasserver {
                     /**
                      * Gets the value of the queryUri property.
                      *
-                     * @return
-                     *     possible object is
-                     *     {@link String }
-                     *
+                     * @return possible object is
+                     *         {@link String }
                      */
                     public String getQueryUri() {
                         return queryUri;
@@ -1320,10 +1202,8 @@ public class Mydasserver {
                     /**
                      * Sets the value of the queryUri property.
                      *
-                     * @param value
-                     *     allowed object is
-                     *     {@link String }
-                     *
+                     * @param value allowed object is
+                     *              {@link String }
                      */
                     public void setQueryUri(String value) {
                         this.queryUri = value;
@@ -1334,9 +1214,9 @@ public class Mydasserver {
 
                 /**
                  * <p>Java class for anonymous complex type.
-                 *
+                 * <p/>
                  * <p>The following schema fragment specifies the expected content contained within this class.
-                 *
+                 * <p/>
                  * <pre>
                  * &lt;complexType>
                  *   &lt;simpleContent>
@@ -1351,12 +1231,10 @@ public class Mydasserver {
                  *   &lt;/simpleContent>
                  * &lt;/complexType>
                  * </pre>
-                 *
-                 *
                  */
                 @XmlAccessorType(XmlAccessType.FIELD)
                 @XmlType(name = "", propOrder = {
-                    "value"
+                        "value"
                 })
                 public static class Coordinates {
 
@@ -1379,10 +1257,8 @@ public class Mydasserver {
                     /**
                      * Gets the value of the value property.
                      *
-                     * @return
-                     *     possible object is
-                     *     {@link String }
-                     *
+                     * @return possible object is
+                     *         {@link String }
                      */
                     public String getValue() {
                         return value;
@@ -1391,10 +1267,8 @@ public class Mydasserver {
                     /**
                      * Sets the value of the value property.
                      *
-                     * @param value
-                     *     allowed object is
-                     *     {@link String }
-                     *
+                     * @param value allowed object is
+                     *              {@link String }
                      */
                     public void setValue(String value) {
                         this.value = value;
@@ -1403,10 +1277,8 @@ public class Mydasserver {
                     /**
                      * Gets the value of the uri property.
                      *
-                     * @return
-                     *     possible object is
-                     *     {@link String }
-                     *
+                     * @return possible object is
+                     *         {@link String }
                      */
                     public String getUri() {
                         return uri;
@@ -1415,10 +1287,8 @@ public class Mydasserver {
                     /**
                      * Sets the value of the uri property.
                      *
-                     * @param value
-                     *     allowed object is
-                     *     {@link String }
-                     *
+                     * @param value allowed object is
+                     *              {@link String }
                      */
                     public void setUri(String value) {
                         this.uri = value;
@@ -1427,10 +1297,8 @@ public class Mydasserver {
                     /**
                      * Gets the value of the source property.
                      *
-                     * @return
-                     *     possible object is
-                     *     {@link String }
-                     *
+                     * @return possible object is
+                     *         {@link String }
                      */
                     public String getSource() {
                         return source;
@@ -1439,10 +1307,8 @@ public class Mydasserver {
                     /**
                      * Sets the value of the source property.
                      *
-                     * @param value
-                     *     allowed object is
-                     *     {@link String }
-                     *
+                     * @param value allowed object is
+                     *              {@link String }
                      */
                     public void setSource(String value) {
                         this.source = value;
@@ -1451,10 +1317,8 @@ public class Mydasserver {
                     /**
                      * Gets the value of the authority property.
                      *
-                     * @return
-                     *     possible object is
-                     *     {@link String }
-                     *
+                     * @return possible object is
+                     *         {@link String }
                      */
                     public String getAuthority() {
                         return authority;
@@ -1463,10 +1327,8 @@ public class Mydasserver {
                     /**
                      * Sets the value of the authority property.
                      *
-                     * @param value
-                     *     allowed object is
-                     *     {@link String }
-                     *
+                     * @param value allowed object is
+                     *              {@link String }
                      */
                     public void setAuthority(String value) {
                         this.authority = value;
@@ -1475,10 +1337,8 @@ public class Mydasserver {
                     /**
                      * Gets the value of the taxid property.
                      *
-                     * @return
-                     *     possible object is
-                     *     {@link String }
-                     *
+                     * @return possible object is
+                     *         {@link String }
                      */
                     public String getTaxid() {
                         return taxid;
@@ -1487,10 +1347,8 @@ public class Mydasserver {
                     /**
                      * Sets the value of the taxid property.
                      *
-                     * @param value
-                     *     allowed object is
-                     *     {@link String }
-                     *
+                     * @param value allowed object is
+                     *              {@link String }
                      */
                     public void setTaxid(String value) {
                         this.taxid = value;
@@ -1499,10 +1357,8 @@ public class Mydasserver {
                     /**
                      * Gets the value of the version property.
                      *
-                     * @return
-                     *     possible object is
-                     *     {@link String }
-                     *
+                     * @return possible object is
+                     *         {@link String }
                      */
                     public String getVersion() {
                         return version;
@@ -1511,10 +1367,8 @@ public class Mydasserver {
                     /**
                      * Sets the value of the version property.
                      *
-                     * @param value
-                     *     allowed object is
-                     *     {@link String }
-                     *
+                     * @param value allowed object is
+                     *              {@link String }
                      */
                     public void setVersion(String value) {
                         this.version = value;
@@ -1523,10 +1377,8 @@ public class Mydasserver {
                     /**
                      * Gets the value of the testRange property.
                      *
-                     * @return
-                     *     possible object is
-                     *     {@link String }
-                     *
+                     * @return possible object is
+                     *         {@link String }
                      */
                     public String getTestRange() {
                         return testRange;
@@ -1535,10 +1387,8 @@ public class Mydasserver {
                     /**
                      * Sets the value of the testRange property.
                      *
-                     * @param value
-                     *     allowed object is
-                     *     {@link String }
-                     *
+                     * @param value allowed object is
+                     *              {@link String }
                      */
                     public void setTestRange(String value) {
                         this.testRange = value;
@@ -1555,9 +1405,9 @@ public class Mydasserver {
 
     /**
      * <p>Java class for anonymous complex type.
-     *
+     * <p/>
      * <p>The following schema fragment specifies the expected content contained within this class.
-     *
+     * <p/>
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
@@ -1601,23 +1451,21 @@ public class Mydasserver {
      *   &lt;/complexContent>
      * &lt;/complexType>
      * </pre>
-     *
-     *
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "baseurl",
-        "gzipped",
-        "slashDasPointsToDsn",
-        "defaultStylesheet",
-        "dsnXsltUrl",
-        "sourcesXsltUrl",
-        "dnaXsltUrl",
-        "entryPointsXsltUrl",
-        "sequenceXsltUrl",
-        "featuresXsltUrl",
-        "typesXsltUrl",
-        "property"
+            "baseurl",
+            "gzipped",
+            "slashDasPointsToDsn",
+            "defaultStylesheet",
+            "dsnXsltUrl",
+            "sourcesXsltUrl",
+            "dnaXsltUrl",
+            "entryPointsXsltUrl",
+            "sequenceXsltUrl",
+            "featuresXsltUrl",
+            "typesXsltUrl",
+            "property"
     })
     public static class Global {
 
@@ -1655,10 +1503,8 @@ public class Mydasserver {
         /**
          * Gets the value of the baseurl property.
          *
-         * @return
-         *     possible object is
-         *     {@link Mydasserver.Global.Baseurl }
-         *
+         * @return possible object is
+         *         {@link Mydasserver.Global.Baseurl }
          */
         public Mydasserver.Global.Baseurl getBaseurl() {
             return baseurl;
@@ -1667,10 +1513,8 @@ public class Mydasserver {
         /**
          * Sets the value of the baseurl property.
          *
-         * @param value
-         *     allowed object is
-         *     {@link Mydasserver.Global.Baseurl }
-         *
+         * @param value allowed object is
+         *              {@link Mydasserver.Global.Baseurl }
          */
         public void setBaseurl(Mydasserver.Global.Baseurl value) {
             this.baseurl = value;
@@ -1679,10 +1523,8 @@ public class Mydasserver {
         /**
          * Gets the value of the gzipped property.
          *
-         * @return
-         *     possible object is
-         *     {@link Mydasserver.Global.Gzipped }
-         *
+         * @return possible object is
+         *         {@link Mydasserver.Global.Gzipped }
          */
         public Mydasserver.Global.Gzipped getGzipped() {
             return gzipped;
@@ -1691,10 +1533,8 @@ public class Mydasserver {
         /**
          * Sets the value of the gzipped property.
          *
-         * @param value
-         *     allowed object is
-         *     {@link Mydasserver.Global.Gzipped }
-         *
+         * @param value allowed object is
+         *              {@link Mydasserver.Global.Gzipped }
          */
         public void setGzipped(Mydasserver.Global.Gzipped value) {
             this.gzipped = value;
@@ -1703,10 +1543,8 @@ public class Mydasserver {
         /**
          * Gets the value of the slashDasPointsToDsn property.
          *
-         * @return
-         *     possible object is
-         *     {@link Mydasserver.Global.SlashDasPointsToDsn }
-         *
+         * @return possible object is
+         *         {@link Mydasserver.Global.SlashDasPointsToDsn }
          */
         public Mydasserver.Global.SlashDasPointsToDsn getSlashDasPointsToDsn() {
             return slashDasPointsToDsn;
@@ -1715,10 +1553,8 @@ public class Mydasserver {
         /**
          * Sets the value of the slashDasPointsToDsn property.
          *
-         * @param value
-         *     allowed object is
-         *     {@link Mydasserver.Global.SlashDasPointsToDsn }
-         *
+         * @param value allowed object is
+         *              {@link Mydasserver.Global.SlashDasPointsToDsn }
          */
         public void setSlashDasPointsToDsn(Mydasserver.Global.SlashDasPointsToDsn value) {
             this.slashDasPointsToDsn = value;
@@ -1727,10 +1563,8 @@ public class Mydasserver {
         /**
          * Gets the value of the defaultStylesheet property.
          *
-         * @return
-         *     possible object is
-         *     {@link String }
-         *
+         * @return possible object is
+         *         {@link String }
          */
         public String getDefaultStylesheet() {
             return defaultStylesheet;
@@ -1739,10 +1573,8 @@ public class Mydasserver {
         /**
          * Sets the value of the defaultStylesheet property.
          *
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setDefaultStylesheet(String value) {
             this.defaultStylesheet = value;
@@ -1751,10 +1583,8 @@ public class Mydasserver {
         /**
          * Gets the value of the dsnXsltUrl property.
          *
-         * @return
-         *     possible object is
-         *     {@link String }
-         *
+         * @return possible object is
+         *         {@link String }
          */
         public String getDsnXsltUrl() {
             return dsnXsltUrl;
@@ -1763,10 +1593,8 @@ public class Mydasserver {
         /**
          * Sets the value of the dsnXsltUrl property.
          *
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setDsnXsltUrl(String value) {
             this.dsnXsltUrl = value;
@@ -1775,10 +1603,8 @@ public class Mydasserver {
         /**
          * Gets the value of the sourcesXsltUrl property.
          *
-         * @return
-         *     possible object is
-         *     {@link String }
-         *
+         * @return possible object is
+         *         {@link String }
          */
         public String getSourcesXsltUrl() {
             return sourcesXsltUrl;
@@ -1787,10 +1613,8 @@ public class Mydasserver {
         /**
          * Sets the value of the sourcesXsltUrl property.
          *
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setSourcesXsltUrl(String value) {
             this.sourcesXsltUrl = value;
@@ -1799,10 +1623,8 @@ public class Mydasserver {
         /**
          * Gets the value of the dnaXsltUrl property.
          *
-         * @return
-         *     possible object is
-         *     {@link String }
-         *
+         * @return possible object is
+         *         {@link String }
          */
         public String getDnaXsltUrl() {
             return dnaXsltUrl;
@@ -1811,10 +1633,8 @@ public class Mydasserver {
         /**
          * Sets the value of the dnaXsltUrl property.
          *
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setDnaXsltUrl(String value) {
             this.dnaXsltUrl = value;
@@ -1823,10 +1643,8 @@ public class Mydasserver {
         /**
          * Gets the value of the entryPointsXsltUrl property.
          *
-         * @return
-         *     possible object is
-         *     {@link String }
-         *
+         * @return possible object is
+         *         {@link String }
          */
         public String getEntryPointsXsltUrl() {
             return entryPointsXsltUrl;
@@ -1835,10 +1653,8 @@ public class Mydasserver {
         /**
          * Sets the value of the entryPointsXsltUrl property.
          *
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setEntryPointsXsltUrl(String value) {
             this.entryPointsXsltUrl = value;
@@ -1847,10 +1663,8 @@ public class Mydasserver {
         /**
          * Gets the value of the sequenceXsltUrl property.
          *
-         * @return
-         *     possible object is
-         *     {@link String }
-         *
+         * @return possible object is
+         *         {@link String }
          */
         public String getSequenceXsltUrl() {
             return sequenceXsltUrl;
@@ -1859,10 +1673,8 @@ public class Mydasserver {
         /**
          * Sets the value of the sequenceXsltUrl property.
          *
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setSequenceXsltUrl(String value) {
             this.sequenceXsltUrl = value;
@@ -1871,10 +1683,8 @@ public class Mydasserver {
         /**
          * Gets the value of the featuresXsltUrl property.
          *
-         * @return
-         *     possible object is
-         *     {@link String }
-         *
+         * @return possible object is
+         *         {@link String }
          */
         public String getFeaturesXsltUrl() {
             return featuresXsltUrl;
@@ -1883,10 +1693,8 @@ public class Mydasserver {
         /**
          * Sets the value of the featuresXsltUrl property.
          *
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setFeaturesXsltUrl(String value) {
             this.featuresXsltUrl = value;
@@ -1895,10 +1703,8 @@ public class Mydasserver {
         /**
          * Gets the value of the typesXsltUrl property.
          *
-         * @return
-         *     possible object is
-         *     {@link String }
-         *
+         * @return possible object is
+         *         {@link String }
          */
         public String getTypesXsltUrl() {
             return typesXsltUrl;
@@ -1907,10 +1713,8 @@ public class Mydasserver {
         /**
          * Sets the value of the typesXsltUrl property.
          *
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setTypesXsltUrl(String value) {
             this.typesXsltUrl = value;
@@ -1918,25 +1722,23 @@ public class Mydasserver {
 
         /**
          * Gets the value of the property property.
-         *
-         * <p>
+         * <p/>
+         * <p/>
          * This accessor method returns a reference to the live list,
          * not a snapshot. Therefore any modification you make to the
          * returned list will be present inside the JAXB object.
          * This is why there is not a <CODE>set</CODE> method for the property property.
-         *
-         * <p>
+         * <p/>
+         * <p/>
          * For example, to add a new item, do as follows:
          * <pre>
          *    getProperty().add(newItem);
          * </pre>
-         *
-         *
-         * <p>
+         * <p/>
+         * <p/>
+         * <p/>
          * Objects of the following type(s) are allowed in the list
          * {@link PropertyType }
-         *
-         *
          */
         public List<PropertyType> getProperty() {
             if (property == null) {
@@ -1948,9 +1750,9 @@ public class Mydasserver {
 
         /**
          * <p>Java class for anonymous complex type.
-         *
+         * <p/>
          * <p>The following schema fragment specifies the expected content contained within this class.
-         *
+         * <p/>
          * <pre>
          * &lt;complexType>
          *   &lt;simpleContent>
@@ -1959,12 +1761,10 @@ public class Mydasserver {
          *   &lt;/simpleContent>
          * &lt;/complexType>
          * </pre>
-         *
-         *
          */
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
-            "value"
+                "value"
         })
         public static class Baseurl {
 
@@ -1975,10 +1775,8 @@ public class Mydasserver {
             /**
              * Gets the value of the value property.
              *
-             * @return
-             *     possible object is
-             *     {@link String }
-             *
+             * @return possible object is
+             *         {@link String }
              */
             public String getValue() {
                 return value;
@@ -1987,10 +1785,8 @@ public class Mydasserver {
             /**
              * Sets the value of the value property.
              *
-             * @param value
-             *     allowed object is
-             *     {@link String }
-             *
+             * @param value allowed object is
+             *              {@link String }
              */
             public void setValue(String value) {
                 this.value = value;
@@ -2001,9 +1797,9 @@ public class Mydasserver {
 
         /**
          * <p>Java class for anonymous complex type.
-         *
+         * <p/>
          * <p>The following schema fragment specifies the expected content contained within this class.
-         *
+         * <p/>
          * <pre>
          * &lt;complexType>
          *   &lt;simpleContent>
@@ -2012,12 +1808,10 @@ public class Mydasserver {
          *   &lt;/simpleContent>
          * &lt;/complexType>
          * </pre>
-         *
-         *
          */
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
-            "value"
+                "value"
         })
         public static class Gzipped {
 
@@ -2026,7 +1820,6 @@ public class Mydasserver {
 
             /**
              * Gets the value of the value property.
-             *
              */
             public boolean isValue() {
                 return value;
@@ -2034,7 +1827,6 @@ public class Mydasserver {
 
             /**
              * Sets the value of the value property.
-             *
              */
             public void setValue(boolean value) {
                 this.value = value;
@@ -2045,9 +1837,9 @@ public class Mydasserver {
 
         /**
          * <p>Java class for anonymous complex type.
-         *
+         * <p/>
          * <p>The following schema fragment specifies the expected content contained within this class.
-         *
+         * <p/>
          * <pre>
          * &lt;complexType>
          *   &lt;simpleContent>
@@ -2056,12 +1848,10 @@ public class Mydasserver {
          *   &lt;/simpleContent>
          * &lt;/complexType>
          * </pre>
-         *
-         *
          */
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
-            "value"
+                "value"
         })
         public static class SlashDasPointsToDsn {
 
@@ -2070,7 +1860,6 @@ public class Mydasserver {
 
             /**
              * Gets the value of the value property.
-             *
              */
             public boolean isValue() {
                 return value;
@@ -2078,7 +1867,6 @@ public class Mydasserver {
 
             /**
              * Sets the value of the value property.
-             *
              */
             public void setValue(boolean value) {
                 this.value = value;

@@ -28,12 +28,12 @@
 
     <groupId>uk.ac.ebi.mydas</groupId>
     <artifactId>mydas</artifactId>
-    <version>1.6.1_j5</version>
+    <version>1.6.7_j5</version>
 
     <parent>
         <groupId>uk.ac.ebi.mydas</groupId>
         <artifactId>mydas_master</artifactId>
-        <version>1.6.1_j5</version>
+        <version>1.6.7_j5</version>
     </parent>
 
     <packaging>jar</packaging>
@@ -83,16 +83,11 @@
         </dependency>
 
         <dependency>
-            <groupId>opensymphony</groupId>
-            <artifactId>oscache</artifactId>
-            <version>2.4</version>
-        </dependency>
-
-        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.1.1</version>
         </dependency>
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>

@@ -10,7 +10,6 @@ import javax.servlet.ServletContext;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
 import uk.ac.ebi.mydas.configuration.PropertyType;
-import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.CoordinateErrorException;
@@ -20,7 +19,6 @@ import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
 import uk.ac.ebi.mydas.model.*;
 
 public class EnsemblTestDataSource implements RangeHandlingAnnotationDataSource{
-	CacheManager cacheManager = null;
 	ServletContext svCon;
 	Map<String, PropertyType> globalParameters;
 	DataSourceConfiguration config;
@@ -112,10 +110,6 @@ public class EnsemblTestDataSource implements RangeHandlingAnnotationDataSource{
     public Integer getTotalCountForType(DasType type)
 			throws DataSourceException {
 		return ensembl.getTotalCountForType(type.getId());
-	}
-
-	public void registerCacheManager(CacheManager cacheManager) {
-		this.cacheManager = cacheManager;
 	}
 
 	@Override

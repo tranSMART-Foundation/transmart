@@ -12,7 +12,6 @@ import javax.servlet.ServletContext;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
 import uk.ac.ebi.mydas.configuration.PropertyType;
-import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
@@ -21,7 +20,6 @@ import uk.ac.ebi.mydas.extendedmodel.DasUnknownFeatureSegment;
 import uk.ac.ebi.mydas.model.*;
 
 public class GenotypeFileDataSource implements AnnotationDataSource {
-	CacheManager cacheManager = null;
 	ServletContext svCon;
 	Map<String, PropertyType> globalParameters;
 	DataSourceConfiguration config;
@@ -57,7 +55,6 @@ public class GenotypeFileDataSource implements AnnotationDataSource {
 		this.path=null;
 		this.segments=null;
 		this.types=null;
-		this.cacheManager = null;
 	}
 
 	public DasAnnotatedSegment getFeatures(String segmentId, Integer maxbeans)
@@ -134,10 +131,6 @@ public class GenotypeFileDataSource implements AnnotationDataSource {
 
 	public Collection<DasType> getTypes() throws DataSourceException {
 		return types;
-	}
-
-	public void registerCacheManager(CacheManager cacheManager) {
-		this.cacheManager = cacheManager;
 	}
 
 	@Override

@@ -3,7 +3,6 @@ package uk.ac.ebi.mydas.examples;
 
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration;
 import uk.ac.ebi.mydas.configuration.PropertyType;
-import uk.ac.ebi.mydas.controller.CacheManager;
 import uk.ac.ebi.mydas.datasource.ReferenceDataSource;
 import uk.ac.ebi.mydas.exceptions.BadReferenceObjectException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
@@ -28,7 +27,6 @@ import java.util.Map;
  */
 public class GFFFileReferenceDataSource implements ReferenceDataSource {
 
-	CacheManager cacheManager = null;
 	ServletContext svCon;
 	Map<String, PropertyType> globalParameters;
 	DataSourceConfiguration config;
@@ -120,21 +118,6 @@ public class GFFFileReferenceDataSource implements ReferenceDataSource {
 				if(type.getId().equals(feature.getType().getId()))
 					count++;
 		return count;
-	}
-
-	/**
-	 * The mydas DAS server implements caching within the server.  This method passes your datasource a reference
-	 * to a {@link uk.ac.ebi.mydas.controller.CacheManager} object.  To implement this method, you should simply retain a reference to this object.
-	 * In your code you can then make use of this object to manipulate caching in the mydas servlet.
-	 * <p/>
-	 * At present the {@link uk.ac.ebi.mydas.controller.CacheManager} class provides you with a single method public void emptyCache() that
-	 * you can call if (for example) the underlying data source has changed.
-	 *
-	 * @param cacheManager a reference to a {@link uk.ac.ebi.mydas.controller.CacheManager} object that the data source can use to empty
-	 *                     the cache for this data source.
-	 */
-	public void registerCacheManager(CacheManager cacheManager) {
-		this.cacheManager = cacheManager;
 	}
 
 	/**

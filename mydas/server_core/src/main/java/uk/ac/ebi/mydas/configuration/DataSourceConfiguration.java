@@ -24,12 +24,10 @@
 package uk.ac.ebi.mydas.configuration;
 
 import org.apache.log4j.Logger;
-
 import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.Capability;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -39,15 +37,15 @@ import java.util.Map;
  * Created Using IntelliJ IDEA.
  * Date: 04-May-2007
  * Time: 13:21:06
- *
+ * <p/>
  * This class holds details of the datasource, limited to those set in the ServerConfig.xml
  * file.  An instance of this class is passed to implementations of AnnotationDataSource when the init() method
  * is called, allowing the AnnotationDataSource access to its configuration in a transparent manner.
- *
+ * <p/>
  * <b>Note that no action is required on the part of the datasource plugin regarding the standard
  * configuration available from this class</b> - this is handled by the MydasServlet class and is
  * for information only.
- *
+ * <p/>
  * You can of course use the properties Map to pass in arbitrary / data source specific configuration.
  *
  * @author Phil Jones, EMBL-EBI, pjones@ebi.ac.uk
@@ -74,24 +72,19 @@ public class DataSourceConfiguration {
 
     private final Mydasserver.Datasources.Datasource config;
     private int versionPosition;
-    public DataSourceConfiguration(Mydasserver.Datasources.Datasource config, int versionPosition){
-    	this.config=config;
-    	this.versionPosition=versionPosition;
-    	this.cacheGroup[0] = config.getUri();
 
-        if (logger.isDebugEnabled()){
+    public DataSourceConfiguration(Mydasserver.Datasources.Datasource config, int versionPosition) {
+        this.config = config;
+        this.versionPosition = versionPosition;
+        if (logger.isDebugEnabled()) {
             logger.debug("New DataSourceConfiguration instantiated: \n" + this.toString());
         }
     }
 
-    /**
-     * Stores the cache group for caching purposes.
-     */
-    private final String[] cacheGroup = new String[1];
-
 
     /**
      * Returns the mandatory value for /DASDSN/DSN/SOURCE/@id
+     *
      * @return the mandatory value for /DASDSN/DSN/SOURCE/@id
      */
     public String getId() {
@@ -100,6 +93,7 @@ public class DataSourceConfiguration {
 
     /**
      * Returns the optional value for /DASDSN/DSN/SOURCE
+     *
      * @return the optional value for /DASDSN/DSN/SOURCE
      */
     public String getName() {
@@ -108,7 +102,7 @@ public class DataSourceConfiguration {
 
     /**
      * Returns the optional value for /DASDSN/DSN/SOURCE/@version
-     * 
+     *
      * @return the optional value for /DASDSN/DSN/SOURCE/@version
      */
     public String getVersion() {
@@ -117,6 +111,7 @@ public class DataSourceConfiguration {
 
     /**
      * Returns the optional value for /DASDSN/DSN/MAPMASTER
+     *
      * @return the optional value for /DASDSN/DSN/MAPMASTER
      */
     public String getMapmaster() {
@@ -126,6 +121,7 @@ public class DataSourceConfiguration {
 
     /**
      * Returns the optional value for /DASDSN/DSN/DESCRIPTION
+     *
      * @return the optional value for /DASDSN/DSN/DESCRIPTION
      */
     public String getDescription() {
@@ -134,18 +130,20 @@ public class DataSourceConfiguration {
 
     /**
      * Returns the optional value for /DASDSN/DSN/DESCRIPTION/@href
+     *
      * @return the optional value for /DASDSN/DSN/DESCRIPTION/@href
      */
     public URL getDescriptionHref() {
         try {
-			return new URL(config.getDocHref());
-		} catch (MalformedURLException e) {
-			return null;
-		}
+            return new URL(config.getDocHref());
+        } catch (MalformedURLException e) {
+            return null;
+        }
     }
 
     /**
      * Returns the optional value for max_entry_points
+     *
      * @return the optional value for max_entry_points
      */
     public Integer getMaxEntryPoints() {
@@ -154,6 +152,7 @@ public class DataSourceConfiguration {
 
     /**
      * Returns the name of the stylesheet for the plugin
+     *
      * @return the name of the stylesheet for the plugin
      */
     public String getStyleSheet() {
@@ -163,18 +162,20 @@ public class DataSourceConfiguration {
     /**
      * Returns a Map of key value pairs defined by the plugin developer.
      * Properties for data sources come from the version element and are not allowed out of it (since 1.6.1).
+     *
      * @return a Map of key value pairs defined by the plugin developer.
      */
     public Map<String, PropertyType> getDataSourceProperties() {
-    	Map<String, PropertyType> props = new HashMap<String, PropertyType>();
-    	for (PropertyType pt:config.getVersion().get(this.versionPosition).getProperty())
-    		props.put(pt.key, pt);
+        Map<String, PropertyType> props = new HashMap<String, PropertyType>();
+        for (PropertyType pt : config.getVersion().get(this.versionPosition).getProperty())
+            props.put(pt.key, pt);
         return props;
     }
 
 
     /**
      * returns a flag to indicate if the dna command is enabled.
+     *
      * @return a flag to indicate if the dna command is enabled.
      */
     public boolean isDnaCommandEnabled() {
@@ -184,8 +185,9 @@ public class DataSourceConfiguration {
     /**
      * Returns a flag to indicate if the feature id should be used for the label
      * if no label is set by the data source.
+     *
      * @return a flag to indicate if the feature id should be used for the label
-     * if no label is set by the data source.
+     *         if no label is set by the data source.
      */
     public boolean isUseFeatureIdForFeatureLabel() {
         return config.getUseFeatureIdForFeatureLabel().value;
@@ -195,59 +197,60 @@ public class DataSourceConfiguration {
     /**
      * Returns flag indicating if types with a count of zero should be included in the
      * output of the types command.
+     *
      * @return flag indicating if types with a count of zero should be included in the
-     * output of the types command.
+     *         output of the types command.
      */
     public boolean isIncludeTypesWithZeroCount() {
         return config.getIncludeTypesWithZeroCount().value;
     }
 
 
-
     /**
      * This method is called by the DataSourceManager to load
      * the datasource.
-     * 
+     *
      * @return a boolean indicating if the load was successful or not.
-     * (This value is also stored in the datasourceOK flag, for later retrieval.)
+     *         (This value is also stored in the datasourceOK flag, for later retrieval.)
      * @throws uk.ac.ebi.mydas.exceptions.DataSourceException
-     * if a problem occurs when attempting to instantiate the DataSource class.
+     *          if a problem occurs when attempting to instantiate the DataSource class.
      */
-    public boolean loadDataSource() throws DataSourceException{
+    public boolean loadDataSource() throws DataSourceException {
         datasourceOK = false;    // Pessimistic start.
-        String className=config.getVersion().get(this.versionPosition).getClazz();
-        try{
+        String className = config.getVersion().get(this.versionPosition).getClazz();
+        try {
             ClassLoader classLoader = this.getClass().getClassLoader();
             dataSource = (AnnotationDataSource) (classLoader.loadClass(className)).newInstance();
-            if (dataSource != null){
+            if (dataSource != null) {
                 datasourceOK = true;
             }
         } catch (ClassNotFoundException e) {
             datasourceOK = false;
             logger.error("ClassNotFoundException thrown when attempting to load data source " + className, e);
-            throw new DataSourceException ("ClassNotFoundException thrown when attempting to instantiate a '" + className + "'.  Please check that the configuration XML file and the classpath are correct.", e);
+            throw new DataSourceException("ClassNotFoundException thrown when attempting to instantiate a '" + className + "'.  Please check that the configuration XML file and the classpath are correct.", e);
         } catch (IllegalAccessException e) {
             datasourceOK = false;
             logger.error("IllegalAccessException thrown when attempting to load data source " + className, e);
-            throw new DataSourceException ("IllegalAccessException thrown when attempting to instantiate a '" + className + "'.", e);
+            throw new DataSourceException("IllegalAccessException thrown when attempting to instantiate a '" + className + "'.", e);
         } catch (InstantiationException e) {
             datasourceOK = false;
             logger.error("InstantiationException thrown when attempting to load data source " + className, e);
-            throw new DataSourceException ("InstantiationException thrown when attempting to instantiate a '" + className + "'.", e);
+            throw new DataSourceException("InstantiationException thrown when attempting to instantiate a '" + className + "'.", e);
         }
         return datasourceOK;
     }
 
     /**
      * Gives the DataSourceManager access to the DataSource.
+     *
      * @return A successfully initialised data source.
      * @throws DataSourceException in the event that the DataSourceManager code
-     * attempts to access a DataSource that has not loaded successfully without
-     * checking first! (That would be a bug, by the way).
+     *                             attempts to access a DataSource that has not loaded successfully without
+     *                             checking first! (That would be a bug, by the way).
      */
     public AnnotationDataSource getDataSource() throws DataSourceException {
-        if (! datasourceOK){
-            throw new DataSourceException ("An attempt has been made to access an AnnotationDataSource that has not been successfully loaded.");
+        if (!datasourceOK) {
+            throw new DataSourceException("An attempt has been made to access an AnnotationDataSource that has not been successfully loaded.");
         }
         return dataSource;
     }
@@ -258,7 +261,7 @@ public class DataSourceConfiguration {
         if (o == null || getClass() != o.getClass()) return false;
 
         DataSourceConfiguration that = (DataSourceConfiguration) o;
-        
+
         return (that.getConfig().equals(this.getConfig()));
 //
 //        if (dataSourceProperties != null ? !dataSourceProperties.equals(that.dataSourceProperties) : that.dataSourceProperties != null)
@@ -290,65 +293,60 @@ public class DataSourceConfiguration {
 
     /**
      * Flags up if the DataSource is OK.
+     *
      * @return false if things have gone wrong, true if all is good.
      */
     public boolean isOK() {
         return datasourceOK;
     }
 
-     /**
+    /**
      * toString method used (so far) to report failed DSNs.
+     *
      * @return a meaningful string representation of the datasource.
      */
-    public String toString(){
+    public String toString() {
         StringBuffer buf = new StringBuffer("DataSourceConfiguration: id: '");
-        buf .append ((this.getId() == null) ? "null" : this.getId())
-            .append ("' name: '")
-            .append ((this.getName() == null) ? "null" : this.getName())
-            .append ("' version: '")
-            .append ((this.getVersion() == null) ? "null" : this.getVersion())
-            .append ("' description: '")
-            .append ((this.getDescription() == null) ? "null" : this.getDescription())
-            //.append ("' features strictly enclosed: '")
-            //.append (this.isFeaturesStrictlyEnclosed())
-            .append ("' dna command enabled :'")
-            .append (this.isDnaCommandEnabled())
-            .append ("' use feature id for feature label: '")
-            .append (this.isUseFeatureIdForFeatureLabel())
-            .append ("' include types with zero count: '")
-            .append (this.isIncludeTypesWithZeroCount());
+        buf.append((this.getId() == null) ? "null" : this.getId())
+                .append("' name: '")
+                .append((this.getName() == null) ? "null" : this.getName())
+                .append("' version: '")
+                .append((this.getVersion() == null) ? "null" : this.getVersion())
+                .append("' description: '")
+                .append((this.getDescription() == null) ? "null" : this.getDescription())
+                        //.append ("' features strictly enclosed: '")
+                        //.append (this.isFeaturesStrictlyEnclosed())
+                .append("' dna command enabled :'")
+                .append(this.isDnaCommandEnabled())
+                .append("' use feature id for feature label: '")
+                .append(this.isUseFeatureIdForFeatureLabel())
+                .append("' include types with zero count: '")
+                .append(this.isIncludeTypesWithZeroCount());
         return buf.toString();
     }
 
-    /**
-     * Returns the cache group for use with OSCache.
-     * @return the cache group for use with OSCache.
-     */
-    public String[] getCacheGroup(){
-        return cacheGroup;
+    public Mydasserver.Datasources.Datasource getConfig() {
+        return config;
     }
-
-	public Mydasserver.Datasources.Datasource getConfig() {
-		return config;
-	}
 
     /**
      * Returns the capabilities of the datasource.
      * Capabilities are reported according to DAS 1.6 spec:
      * error-segment/1.0; unknown-segment/1.0; unknown-feature/1.0; ...
+     *
      * @return
      */
-	public String getCapabilities() {
-		String capabilities = "";
-		for (Capability cap:config.getVersion().get(this.versionPosition).getCapability()) {
-            try{
+    public String getCapabilities() {
+        String capabilities = "";
+        for (Capability cap : config.getVersion().get(this.versionPosition).getCapability()) {
+            try {
                 String[] caps = cap.getType().split(":");  //das1:sources
-			    capabilities += " " + caps[1] + "/1.0;";
-            } catch (Exception e)  {
+                capabilities += " " + caps[1] + "/1.0;";
+            } catch (Exception e) {
                 //Just do not include that capability
             }
 
         }
-		return capabilities.substring(0, capabilities.length()-1);
-	}
+        return capabilities.substring(0, capabilities.length() - 1);
+    }
 }

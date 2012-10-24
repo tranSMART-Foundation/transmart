@@ -5,11 +5,11 @@
     <groupId>uk.ac.ebi.mydas.template</groupId>
     <artifactId>MyDasTemplate</artifactId>
     <packaging>war</packaging>
-    <version>1.6.5</version>
+    <version>1.6.7</version>
     <name>MyDasTemplate Maven Webapp</name>
     <url>http://maven.apache.org</url>
 
-	<repositories>
+    <repositories>
         <repository>
             <id>google-code-mydas</id>
             <name>google-code-mydas</name>
@@ -18,7 +18,7 @@
         </repository>
     </repositories>
 
-	<dependencies>
+    <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>uk.ac.ebi.mydas</groupId>
             <artifactId>mydas</artifactId>
-            <version>1.6.11-SNAPSHOT</version>
+            <version>1.6.7</version>
         </dependency>
 
         <dependency>
@@ -44,13 +44,13 @@
             <version>2.2</version>
         </dependency>
 
-		<dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.4</version>
-		</dependency>
+        </dependency>
 
-		<dependency>
+        <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty</artifactId>
             <version>6.1.0</version>
@@ -77,11 +77,11 @@
             <version>2.5-6.0.0beta6</version>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.12</version>
-		</dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.12</version>
+        </dependency>
 
     </dependencies>
 
