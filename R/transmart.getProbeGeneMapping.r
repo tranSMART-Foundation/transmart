@@ -41,7 +41,7 @@ transmart.getProbeGeneMapping <- function(probeIds = NA,geneIds = NA)
 	{
 		filterQuery <- " PROBE_ID IN (?) "
 		
-		probeIds <- paste("LOWER('",probeIds,"')",sep="",collapse=",")
+		probeIds <- paste("'",probeIds,"'",sep="",collapse=",")
 		
 		filterQuery <- gsub("\\?",probeIds,filterQuery)
 	}

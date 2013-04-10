@@ -55,9 +55,3 @@ tranSMART.DB.establishConnection <- function()
 tranSMART.DB.username <- NA
 tranSMART.DB.password <- NA
 tranSMART.DB.dbname <- NA
-
-
-
-
-
-

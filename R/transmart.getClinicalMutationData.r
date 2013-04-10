@@ -30,12 +30,9 @@ transmart.getClinicalMutationData <- function(study.list,gene.list,trimLength = 
   {
     
     geneDataFrame <- getClinicalMutationDataPerGene(gene,study.list,trimLength)
-    
     patientList <- merge(patientList,geneDataFrame[,c('PATIENT_ID',gene)],by=c('PATIENT_ID'),all.x = TRUE)
-	
-	geneAlleleDataFrame <- getClinicalAlleleFrequencyPerGene(gene,study.list,trimLength)
-	
-	patientList <- merge(patientList,geneAlleleDataFrame[,c('PATIENT_ID',paste(gene,"_Allele_Frequency",sep=""))],by=c('PATIENT_ID'),all.x = TRUE)
+	  geneAlleleDataFrame <- getClinicalAlleleFrequencyPerGene(gene,study.list,trimLength)
+	  patientList <- merge(patientList,geneAlleleDataFrame[,c('PATIENT_ID',paste(gene,"_Allele_Frequency",sep=""))],by=c('PATIENT_ID'),all.x = TRUE)
   }  
   
   
@@ -70,14 +67,13 @@ getClinicalAlleleFrequencyPerGene <- function(gene,study.list,trimLength)
   
   #Get the MUTTYPE concept codes.
   mutationConcepts <- transmart.getDistinctConcepts(studyList = study.list,pathMatchList = parameterList)
-  
   #Pull the mutation data without pivoting it.  
   mutationDataUnPivot <- transmart.getClinicalData(mutationConcepts$CONCEPT_CD,data.pivot = FALSE)
   
   mutationDataUnPivot$CONCEPT_PATH <- unlist(lapply(strsplit(mutationDataUnPivot$CONCEPT_PATH,split="\\\\"),tailFunction,trimLength))
   
   colnames(mutationDataUnPivot)[1] <- 'PATIENT_ID'
-  colnames(mutationDataUnPivot)[7] <- paste(gene,"_Allele_Frequency",sep="")
+  colnames(mutationDataUnPivot)[6] <- paste(gene,"_Allele_Frequency",sep="")
   
   return(mutationDataUnPivot)
   

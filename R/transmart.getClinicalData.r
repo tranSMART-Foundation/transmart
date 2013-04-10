@@ -97,11 +97,20 @@ transmart.getClinicalData <- function(concepts.codelist,data.pivot = TRUE,concep
 			}
 
 		}
-
+  
 		#Do the pivot.
-		dataToReturn <- dcast(dataToReturn, PATIENT_NUM + SUBJECT_ID + TRIAL_NAME ~ CONCEPT_PATH, value.var = 'VALUE') 	
-		
-	}
+		dataToReturn <- tryCatch({
+      dcast(dataToReturn, PATIENT_NUM + SUBJECT_ID + TRIAL_NAME ~ CONCEPT_PATH, value.var = 'VALUE') 	
+		}, message = function(m) { m })
+
+		#Slightly crude way of catching when we have clashing columns...
+    if (inherits(dataToReturn, 'message')) {
+      if (dataToReturn['message'] == 'Aggregation function missing: defaulting to length\n') {
+        stop(paste("||FRIENDLY|| Could not aggregate columns: there is more than one folder with the same name", sep=""))
+      }
+    }
+
+	}	
   
 	dataToReturn	
 }
