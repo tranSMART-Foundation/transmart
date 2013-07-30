@@ -219,7 +219,7 @@ public class DataSourceConfiguration {
         datasourceOK = false;    // Pessimistic start.
         String className = config.getVersion().get(this.versionPosition).getClazz();
         try {
-            ClassLoader classLoader = this.getClass().getClassLoader();
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             dataSource = (AnnotationDataSource) (classLoader.loadClass(className)).newInstance();
             if (dataSource != null) {
                 datasourceOK = true;

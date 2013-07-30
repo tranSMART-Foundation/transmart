@@ -171,13 +171,12 @@
     </build>
     <distributionManagement>
         <repository>
-            <id>googlecode.mydas.repo</id>
-            <url>dav:https://mydas.googlecode.com/svn/repository/</url>
+            <id>repo.thehyve.nl-releases</id>
+            <url>http://repo.thehyve.nl/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
-            <id>googlecode.mydas.snapshotrepo</id>
-            <url>dav:https://mydas.googlecode.com/svn/snapshot-repository/</url>
-            <uniqueVersion>false</uniqueVersion>
+            <id>repo.thehyve.nl-snapshots</id>
+            <url>http://repo.thehyve.nl/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>

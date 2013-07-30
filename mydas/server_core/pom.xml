@@ -28,7 +28,7 @@
 
     <groupId>uk.ac.ebi.mydas</groupId>
     <artifactId>mydas</artifactId>
-    <version>1.6.7</version>
+    <version>1.6.8-hyve-SNAPSHOT</version>
 
     <parent>
         <groupId>uk.ac.ebi.mydas</groupId>
