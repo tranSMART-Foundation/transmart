@@ -142,7 +142,9 @@ class DasService {
     private def countAcghCopyNumberStatesForRow(RegionRow row, Collection<Assay> assays, Collection<CopyNumberState> states) {
         //TODO Use countBy
         states.collectEntries {
-            [(it): assays.count { assay -> it == row.getRegionDataForAssay(assay).copyNumberState }]
+            [(it): assays.count { assay ->
+                it == row.getRegionDataForAssay(assay).copyNumberState
+            }]
         }
     }
 
