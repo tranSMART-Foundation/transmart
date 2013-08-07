@@ -5,3 +5,4 @@
 *.sw[op]
 /out
 .project
+/plugin.xml
