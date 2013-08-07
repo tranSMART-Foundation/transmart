@@ -25,14 +25,13 @@ class AcghDS implements RangeHandlingAnnotationDataSource {
 
     DasService dasService
     Long resultInstanceId
-    List<DasEntryPoint> entryPoints
+    List<DasEntryPoint> entryPoints = null
 
     @Override
     void init(ServletContext servletContext, Map<String, PropertyType> stringPropertyTypeMap, DataSourceConfiguration dataSourceConfiguration) throws DataSourceException {
         resultInstanceId = dataSourceConfiguration.getDataSourceProperties().get("resultInstanceId").getValue().toLong();
         def ctx = servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
         this.dasService = ctx.dasService
-        this.entryPoints = dasService.getAcghEntryPoints(resultInstanceId)
     }
 
     @Override
@@ -83,6 +82,9 @@ class AcghDS implements RangeHandlingAnnotationDataSource {
 
     @Override
     Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws UnimplementedFeatureException, DataSourceException {
+        if(entryPoints == null) {
+            entryPoints = dasService.getAcghEntryPoints(resultInstanceId)
+        }
         entryPoints
     }
 
