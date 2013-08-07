@@ -33,6 +33,7 @@ import uk.ac.ebi.mydas.exceptions.DataSourceException;
 import javax.servlet.ServletContext;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -76,8 +77,14 @@ public class DataSourceManager {
     private void loadConfiguration(String fileName) throws IOException, ConfigurationException {
         configManager = new ConfigurationManager();
         try {
-            //Changing the reader of the configuration file for a JaxB based component
-            configManager.unmarshal(svCon.getResourceAsStream(fileName));
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+            InputStream stream = cl.getResourceAsStream(fileName);
+            try {
+                configManager.unmarshal(stream);
+            } finally {
+                stream.close();
+            }
             serverConfiguration = configManager.getServerConfiguration();
         } catch (JAXBException e) {
             throw new IllegalStateException("JAXBException thrown when attempting to unmarshall the DAS source configuration.", e);
@@ -100,20 +107,37 @@ public class DataSourceManager {
             throw new ConfigurationException("An attempt to initialise the data sources has been made, but the Global Configuration has not been loaded.");
         }
         // Iterate over the DSN configs and attempt to initialise each in turn.
-        for (DataSourceConfiguration dsnConfig : serverConfiguration.getDataSourceConfigMap().values()) {
-            try {
-                // Load and initialise the DSN.
-                if (dsnConfig.loadDataSource()) {
-                    dsnConfig.getDataSource().init(svCon, serverConfiguration.getGlobalConfiguration().getGlobalParameters(), dsnConfig);
-                }
-                if (!dsnConfig.isOK()) {
-                    LOGGER.error("Data Source Failed to Load and Initialise: " + dsnConfig.toString());
-                }
-                // Register the
-            } catch (DataSourceException e) {
-                // This particular data source has failed to initialise.  Still try to do the rest and log this failure.
+        for (DataSourceConfiguration dsnConfig : serverConfiguration.getDataSourceConfigs()) {
+            initializeDataSource(dsnConfig);
+        }
+    }
+
+    public void initializeDataSource(DataSourceConfiguration dsnConfig) throws ConfigurationException {
+        try {
+            // Load and initialise the DSN.
+            if (dsnConfig.loadDataSource()) {
+                dsnConfig.getDataSource().init(svCon, serverConfiguration.getGlobalConfiguration().getGlobalParameters(), dsnConfig);
+            }
+            if (!dsnConfig.isOK()) {
                 LOGGER.error("Data Source Failed to Load and Initialise: " + dsnConfig.toString());
             }
+            // Register the
+        } catch (DataSourceException e) {
+            // This particular data source has failed to initialise.  Still try to do the rest and log this failure.
+            LOGGER.error("Data Source Failed to Load and Initialise: " + dsnConfig.toString());
+        }
+    }
+
+    public void destroyDataSource(DataSourceConfiguration dataSourceConfiguration) {
+        try {
+            if (dataSourceConfiguration.isOK()) {
+                dataSourceConfiguration.getDataSource().destroy();
+            }
+        } catch (Exception e) {
+            // Don't want to barfe out here - this datasource may have
+            // failed, but should continue on to try and destroy any / all
+            // other data sources.
+            LOGGER.error("Exception thrown by dataSourceConfiguration " + dataSourceConfiguration.getName(), e);
         }
     }
 
@@ -125,17 +149,8 @@ public class DataSourceManager {
      * on to the rest.
      */
     public void destroy() {
-        for (DataSourceConfiguration dataSourceConfiguration : serverConfiguration.getDataSourceConfigMap().values()) {
-            try {
-                if (dataSourceConfiguration.isOK()) {
-                    dataSourceConfiguration.getDataSource().destroy();
-                }
-            } catch (Exception e) {
-                // Don't want to barfe out here - this datasource may have
-                // failed, but should continue on to try and destroy any / all
-                // other data sources.
-                LOGGER.error("Exception thrown by dataSourceConfiguration " + dataSourceConfiguration.getName(), e);
-            }
+        for (DataSourceConfiguration dataSourceConfiguration : serverConfiguration.getDataSourceConfigs()) {
+            destroyDataSource(dataSourceConfiguration);
         }
     }
 

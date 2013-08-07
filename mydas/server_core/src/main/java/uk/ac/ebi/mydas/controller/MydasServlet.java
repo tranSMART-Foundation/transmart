@@ -110,7 +110,7 @@ public class MydasServlet extends HttpServlet {
 
     private static DataSourceManager DATA_SOURCE_MANAGER = null;
 
-    static final String RESOURCE_FOLDER = "/";
+    static final String RESOURCE_FOLDER = "";
 //	private static final String RESOURCE_FOLDER = "/WEB-INF/classes/";
 
     private static final String CONFIGURATION_FILE_NAME = RESOURCE_FOLDER + "MydasServerConfig.xml";
@@ -183,6 +183,10 @@ public class MydasServlet extends HttpServlet {
         boolean matches(String command) {
             return this.commandString.equals(command);
         }
+    }
+
+    public static DataSourceManager getDataSourceManager() {
+        return DATA_SOURCE_MANAGER;
     }
 
 
@@ -267,35 +271,41 @@ public class MydasServlet extends HttpServlet {
      * @throws IOException      as defined in the HTTPServlet interface.
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get("writeback");
+        DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfig("writeback");
         try {
             dasCommands.writebackCreate(request, response, dataSourceConfig);
         } catch (WritebackException e) {
             logger.error("Writebackexception thrown", e);
             writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false, null);
             reportError(XDasStatus.STATUS_500_SERVER_ERROR, "Writeback error creating a feature.", request, response);
+        } finally {
+            dataSourceConfig.destroy();
         }
     }
 
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get("writeback");
+        DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfig("writeback");
         try {
             dasCommands.writebackDelete(request, response, dataSourceConfig);
         } catch (WritebackException e) {
             logger.error("WritebackException thrown", e);
             writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false, null);
             reportError(XDasStatus.STATUS_500_SERVER_ERROR, "Writeback error deleting a feature.", request, response);
+        } finally {
+            dataSourceConfig.destroy();
         }
     }
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get("writeback");
+        DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfig("writeback");
         try {
             dasCommands.writebackUpdate(request, response, dataSourceConfig);
         } catch (WritebackException e) {
             logger.error("WritebackException thrown", e);
             writeHeader(request, response, XDasStatus.STATUS_500_SERVER_ERROR, false, null);
             reportError(XDasStatus.STATUS_500_SERVER_ERROR, "Writeback error creating a feature.", request, response);
+        } finally {
+            dataSourceConfig.destroy();
         }
     }
 
@@ -335,8 +345,7 @@ public class MydasServlet extends HttpServlet {
             // Belt and braces to ensure that no null pointers are thrown later.
             if (DATA_SOURCE_MANAGER == null ||
                     DATA_SOURCE_MANAGER.getServerConfiguration() == null ||
-                    DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration() == null ||
-                    DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap() == null) {
+                    DATA_SOURCE_MANAGER.getServerConfiguration().getGlobalConfiguration() == null) {
 
                 throw new ConfigurationException("The datasources were not initialized successfully.");
             }
@@ -368,7 +377,7 @@ public class MydasServlet extends HttpServlet {
                     if (match.group(2) == null || match.group(2).length() == 0) {
                         // Source command for an specific DSN
                         // Attempt to retrieve the DataSource
-                        if (null != DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get(dsnName)) {
+                        if (null != DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfig(dsnName)) {
                             dasCommands.sourceCommand(request, response, queryString, dsnName);
                             return;
                         }
@@ -380,38 +389,43 @@ public class MydasServlet extends HttpServlet {
                     }
 
                     // Attempt to retrieve the DataSource
-                    DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfigMap().get(dsnName);
+                    DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.
+                            getServerConfiguration().getDataSourceConfig(dsnName);
                     // Check if the datasource exists.
                     if (dataSourceConfig != null) {
-                        //Get datasource capabilities so they will be display in the headers
-                        capabilities = dataSourceConfig.getCapabilities();
-                        // Check the datasource is alive.
-                        if (dataSourceConfig.isOK()) {
-                            if (Commands.COMMAND_DNA.matches(command)) {
-                                dasCommands.dnaCommand(request, response, dataSourceConfig, queryString);
-                            } else if (Commands.COMMAND_TYPES.matches(command)) {
-                                dasCommands.typesCommand(request, response, dataSourceConfig, queryString);
-                            } else if (Commands.COMMAND_STYLESHEET.matches(command)) {
-                                dasCommands.stylesheetCommand(request, response, dataSourceConfig, queryString);
-                            } else if (Commands.COMMAND_FEATURES.matches(command)) {
-                                dasCommands.featuresCommand(request, response, dataSourceConfig, queryString);
-                            } else if (Commands.COMMAND_ENTRY_POINTS.matches(command)) {
-                                dasCommands.entryPointsCommand(request, response, dataSourceConfig, queryString);
-                            } else if (Commands.COMMAND_SEQUENCE.matches(command)) {
-                                dasCommands.sequenceCommand(request, response, dataSourceConfig, queryString);
-                            } else if (Commands.COMMAND_STRUCTURE.matches(command)) { //for the command structure DAS1.6
-                                dasCommands.structureCommand(request, response, dataSourceConfig, queryString);
-                            } else if (Commands.COMMAND_ALIGNMENT.matches(command)) { //for the command alignment DAS1.6
-                                dasCommands.alignmentCommand(request, response, dataSourceConfig, queryString);
-                            } else if (Commands.COMMAND_LINK.matches(command)) {
-                                dasCommands.linkCommand(response, dataSourceConfig, queryString);
-                            } else if (Commands.COMMAND_HISTORICAL.matches(command)) {
-                                dasCommands.writebackHistorical(request, response, dataSourceConfig);
+                        try {
+                            //Get datasource capabilities so they will be display in the headers
+                            capabilities = dataSourceConfig.getCapabilities();
+                            // Check the datasource is alive.
+                            if (dataSourceConfig.isOK()) {
+                                if (Commands.COMMAND_DNA.matches(command)) {
+                                    dasCommands.dnaCommand(request, response, dataSourceConfig, queryString);
+                                } else if (Commands.COMMAND_TYPES.matches(command)) {
+                                    dasCommands.typesCommand(request, response, dataSourceConfig, queryString);
+                                } else if (Commands.COMMAND_STYLESHEET.matches(command)) {
+                                    dasCommands.stylesheetCommand(request, response, dataSourceConfig, queryString);
+                                } else if (Commands.COMMAND_FEATURES.matches(command)) {
+                                    dasCommands.featuresCommand(request, response, dataSourceConfig, queryString);
+                                } else if (Commands.COMMAND_ENTRY_POINTS.matches(command)) {
+                                    dasCommands.entryPointsCommand(request, response, dataSourceConfig, queryString);
+                                } else if (Commands.COMMAND_SEQUENCE.matches(command)) {
+                                    dasCommands.sequenceCommand(request, response, dataSourceConfig, queryString);
+                                } else if (Commands.COMMAND_STRUCTURE.matches(command)) { //for the command structure DAS1.6
+                                    dasCommands.structureCommand(request, response, dataSourceConfig, queryString);
+                                } else if (Commands.COMMAND_ALIGNMENT.matches(command)) { //for the command alignment DAS1.6
+                                    dasCommands.alignmentCommand(request, response, dataSourceConfig, queryString);
+                                } else if (Commands.COMMAND_LINK.matches(command)) {
+                                    dasCommands.linkCommand(response, dataSourceConfig, queryString);
+                                } else if (Commands.COMMAND_HISTORICAL.matches(command)) {
+                                    dasCommands.writebackHistorical(request, response, dataSourceConfig);
+                                } else {
+                                    dasCommands.otherCommand(request, response, dataSourceConfig, command, queryString);
+                                }
                             } else {
-                                dasCommands.otherCommand(request, response, dataSourceConfig, command, queryString);
+                                throw new BadDataSourceException("The datasource was not correctly initialised.");
                             }
-                        } else {
-                            throw new BadDataSourceException("The datasource was not correctly initialised.");
+                        } finally {
+                            dataSourceConfig.destroy();
                         }
                     } else {
                         capabilities = null;

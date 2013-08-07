@@ -186,6 +186,15 @@
 												</xs:attribute>
 											</xs:complexType>
 										</xs:element>
+                                        <xs:element name="pattern" minOccurs="0" maxOccurs="1" nillable="false" type="xs:string">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    A data source name pattern. Requests to data sources not otherwise
+                                                    defined will matched against this pattern. If there is a match,
+                                                    a new instance of this data source will be created.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
 										<xs:element name="version" maxOccurs="unbounded" minOccurs="1">
 											<xs:annotation>
 												<xs:documentation>

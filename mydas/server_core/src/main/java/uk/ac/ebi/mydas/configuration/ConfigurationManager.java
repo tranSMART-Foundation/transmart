@@ -5,6 +5,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.log4j.Logger;
 
@@ -100,6 +102,7 @@ public class ConfigurationManager {
             String name = datasource.getTitle();
             String mapmaster = datasource.getMapmaster(); //it was datasource.getVersion().get(0).getCoordinates().get(0).uri; (changed since 1.6.1)
             String hrefString = datasource.getDocHref();
+            String pattern = datasource.getPattern();
             try{
                 new URL(hrefString);
             }
@@ -130,6 +133,16 @@ public class ConfigurationManager {
             if (mapmaster == null){
                 throw new ConfigurationException("Please check your XML configuration file.  No value has been given for one of the mandatory /mydasserver/datasources/datasource/@mapmaster attributes.");
             }
+
+            if (pattern != null) {
+                try {
+                    Pattern.compile(pattern);
+                } catch (PatternSyntaxException pse) {
+                    throw new ConfigurationException("Please check your XML configuration file. Invalid pattern " +
+                            "given for data source " + id);
+                }
+            }
+
             for (int i=0;i<datasource.getVersion().size();i++){
 	            DataSourceConfiguration dsnConfig=new DataSourceConfiguration(datasource,i);
 	            dataSourceConfigList.put(dsnConfig.getId(), dsnConfig);

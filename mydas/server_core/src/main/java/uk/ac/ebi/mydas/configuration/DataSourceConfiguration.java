@@ -25,13 +25,16 @@ package uk.ac.ebi.mydas.configuration;
 
 import org.apache.log4j.Logger;
 import uk.ac.ebi.mydas.configuration.Mydasserver.Datasources.Datasource.Version.Capability;
+import uk.ac.ebi.mydas.controller.MydasServlet;
 import uk.ac.ebi.mydas.datasource.AnnotationDataSource;
+import uk.ac.ebi.mydas.exceptions.ConfigurationException;
 import uk.ac.ebi.mydas.exceptions.DataSourceException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -67,18 +70,34 @@ public class DataSourceConfiguration {
 
     /**
      * A boolean flag to indicate if the datasource failed on initialisation.
+     * For dynamic data sources, this value can also be null, meaning we never
+     * tried to instantiate the annotation data source.
      */
-    private boolean datasourceOK;
+    private Boolean datasourceOK;
 
     private final Mydasserver.Datasources.Datasource config;
     private int versionPosition;
 
+    /**
+     * For dynamic data sources, the data source configuration will be copied
+     * on each request and this field will be populated with the matcher of the
+     * data source pattern against the actual dsn given by the user
+     */
+    private Matcher matcherAgainstDsn;
+
     public DataSourceConfiguration(Mydasserver.Datasources.Datasource config, int versionPosition) {
+        this.datasourceOK = false;
         this.config = config;
         this.versionPosition = versionPosition;
         if (logger.isDebugEnabled()) {
             logger.debug("New DataSourceConfiguration instantiated: \n" + this.toString());
         }
+    }
+
+    public DataSourceConfiguration(DataSourceConfiguration original, Matcher actualDsn) {
+        this.config = original.config;
+        this.versionPosition = original.versionPosition;
+        this.matcherAgainstDsn = actualDsn;
     }
 
 
@@ -216,6 +235,18 @@ public class DataSourceConfiguration {
      *          if a problem occurs when attempting to instantiate the DataSource class.
      */
     public boolean loadDataSource() throws DataSourceException {
+        /* because we return dynamic data sources together with the non-dynamic ones
+         * on ServerConfiguration::getDataSourceConfigs() and these go on to be
+         * initialized on startup, this method will eventually be called for dynamic
+         * data sources without any contextual information (the matcherAgainstDsn property).
+         * For those instances, make do not try instantiating the actual data source.
+         */
+        if (this.isUnmatchedDynamic()) {
+            /* this combo is actually OK: */
+            datasourceOK = true;
+            return false;
+        }
+
         datasourceOK = false;    // Pessimistic start.
         String className = config.getVersion().get(this.versionPosition).getClazz();
         try {
@@ -249,12 +280,52 @@ public class DataSourceConfiguration {
      *                             checking first! (That would be a bug, by the way).
      */
     public AnnotationDataSource getDataSource() throws DataSourceException {
-        if (!datasourceOK) {
+        if (Boolean.FALSE.equals(this.datasourceOK)) {
             throw new DataSourceException("An attempt has been made to access an AnnotationDataSource that has not been successfully loaded.");
+        }
+        if (this.datasourceOK == null) {
+            /* dynamic data source */
+            loadDataSource();
+            try {
+                MydasServlet.getDataSourceManager().initializeDataSource(this);
+            } catch (ConfigurationException e) {
+                DataSourceException dataSourceException =
+                        new DataSourceException("Could not initialize dynamic data source", e);
+                throw dataSourceException;
+            }
         }
         return dataSource;
     }
 
+    /**
+     * The matcher obtained from the pattern configured for the (dynamic) data
+     * source matched against the actual dsn name provided by the user.
+     * @return the matcher
+     */
+    public Matcher getMatcherAgainstDsn() {
+        return matcherAgainstDsn;
+    }
+
+    /**
+     * An unmatched dynamic data source configuration is the first, general
+     * instance of a dynamic data source configuration,
+     * not bound to any user provided dsn. If this is true, this is an
+     * instance returned by {@link uk.ac.ebi.mydas.configuration.ServerConfiguration#getDataSourceConfigs()}.
+     * @return true iif this object is an unmatched dynamic
+     */
+    public boolean isUnmatchedDynamic() {
+        return this.config.getPattern() != null && this.matcherAgainstDsn == null;
+    }
+
+    /**
+     * If true, this is a dynamic source configuration copied from its
+     * unmatched version. It is bound a specific user provided dsn.
+     * This is the instance returned by {@link ServerConfiguration#getDataSourceConfig(String)}.
+     * @return
+     */
+    public boolean isMatchedDynamic() {
+        return this.config.getPattern() != null && this.matcherAgainstDsn != null;
+    }
 
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -297,7 +368,7 @@ public class DataSourceConfiguration {
      * @return false if things have gone wrong, true if all is good.
      */
     public boolean isOK() {
-        return datasourceOK;
+        return Boolean.TRUE.equals(datasourceOK);
     }
 
     /**
@@ -348,5 +419,16 @@ public class DataSourceConfiguration {
 
         }
         return capabilities.substring(0, capabilities.length() - 1);
+    }
+
+    /**
+     * Destroy the dynamic data source instantiated by this object,
+     * if applicable. This object should not be used after a call to
+     * this method.
+     */
+    public void destroy() {
+        if (isMatchedDynamic() && isOK()) {
+            MydasServlet.getDataSourceManager().destroyDataSource(this);
+        }
     }
 }

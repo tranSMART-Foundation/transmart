@@ -46,7 +46,10 @@ public class Indexer {
 		} else{
 			// At least one dsn is OK.
 			for (String dsn : dsns){
-				DataSourceConfiguration dsnConfig = config.getDataSourceConfigMap().get(dsn);
+				DataSourceConfiguration dsnConfig = config.getDataSourceConfig(dsn);
+                if (dsnConfig.isMatchedDynamic()) {
+                    continue;
+                }
 				String capabilities =dsnConfig.getCapabilities();
 				if(capabilities.contains("advanced-search")){
 					if(capabilities.contains("entry_points") && capabilities.contains("feature-by-id")){

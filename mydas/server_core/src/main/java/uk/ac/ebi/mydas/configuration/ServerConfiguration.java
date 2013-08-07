@@ -23,10 +23,9 @@
 
 package uk.ac.ebi.mydas.configuration;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Collections;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created Using IntelliJ IDEA.
@@ -43,10 +42,22 @@ public class ServerConfiguration {
 
     private final Map<String, DataSourceConfiguration> dataSourceConfigMap;
 
+    private final Map<Pattern, DataSourceConfiguration> dynamicDataSourcesConfigMap;
+
 
     public ServerConfiguration(GlobalConfiguration globalConfiguration, Map<String, DataSourceConfiguration> dataSourceConfigList) {
         this.globalConfiguration = globalConfiguration;
         this.dataSourceConfigMap = dataSourceConfigList;
+        this.dynamicDataSourcesConfigMap = new LinkedHashMap<Pattern, DataSourceConfiguration>();
+        for (Map.Entry<String, DataSourceConfiguration> entry : dataSourceConfigList.entrySet()) {
+            String pattern = entry.getValue().getConfig().getPattern();
+            if (pattern == null) {
+                continue;
+            }
+
+            this.dynamicDataSourcesConfigMap.put(Pattern.compile(pattern),
+                    entry.getValue());
+        }
     }
 
 
@@ -54,8 +65,17 @@ public class ServerConfiguration {
         return globalConfiguration;
     }
 
-    public Map<String, DataSourceConfiguration> getDataSourceConfigMap() {
-        return (dataSourceConfigMap == null) ? Collections.<String, DataSourceConfiguration>emptyMap() : dataSourceConfigMap;
+    /**
+     * Return all the configured data sources.
+     *
+     * @return collection of configured data sources
+     */
+    public Collection<DataSourceConfiguration> getDataSourceConfigs() {
+        if (this.dataSourceConfigMap == null) {
+            return Collections.emptyList();
+        }
+
+        return this.dataSourceConfigMap.values();
     }
 
     /**
@@ -63,8 +83,20 @@ public class ServerConfiguration {
      * @param dsnName being the id of the datasource.
      * @return a DataSourceConfiguration object.
      */
-    public DataSourceConfiguration getDataSourceConfig (String dsnName) {
-        return dataSourceConfigMap.get(dsnName);
+    public DataSourceConfiguration getDataSourceConfig(String dsnName) {
+        DataSourceConfiguration config = dataSourceConfigMap.get(dsnName);
+
+        if (config == null) {
+            for (Map.Entry<Pattern, DataSourceConfiguration> entry:
+                    this.dynamicDataSourcesConfigMap.entrySet()) {
+                Matcher matcher = entry.getKey().matcher(dsnName);
+                if (matcher.matches()) {
+                    return new DataSourceConfiguration(entry.getValue(), matcher);
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
