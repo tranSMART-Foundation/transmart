@@ -114,9 +114,9 @@ public class ConfigXmlUnmarshallerTest extends TestCase {
                     true);
             Assert.assertEquals("The number of dsns is not as expected",
                     2,
-                    serverConfig.getDataSourceConfigMap().size());
+                    serverConfig.getDataSourceConfigs().size());
             //DSN collection
-            Collection<DataSourceConfiguration> dsnCollection = serverConfig.getDataSourceConfigMap().values();
+            Collection<DataSourceConfiguration> dsnCollection = serverConfig.getDataSourceConfigs();
             boolean found1 = false;
             boolean found2 = false;
             for (DataSourceConfiguration dsnConfig : dsnCollection){
