@@ -33,14 +33,9 @@
 
     <repositories>
         <repository>
-            <id>repo.thehyve.nl-releases</id>
-            <name>The Hyve Maven Releases Repository</name>
-            <url>http://repo.thehyve.nl/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>repo.thehyve.nl-snapshots</id>
-            <name>The Hyve Maven Releases Repository</name>
-            <url>http://repo.thehyve.nl/content/repositories/snapshots/</url>
+            <id>repo.thehyve.nl-public</id>
+            <name>The Hyve Maven Public Group</name>
+            <url>http://repo.thehyve.nl/content/groups/public/</url>
         </repository>
     </repositories>
 
