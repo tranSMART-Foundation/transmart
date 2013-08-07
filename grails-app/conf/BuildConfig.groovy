@@ -12,15 +12,14 @@ grails.project.dependency.resolution = {
     legacyResolve false // whether to do a secondary resolve on plugin installation, not advised and here for backwards compatibility
     repositories {
         grailsCentral()
+        mavenLocal()
         mavenCentral()
         mavenRepo "http://repo.thehyve.nl/content/groups/public/"
         mavenRepo "http://mydas.googlecode.com/svn/repository/"
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        compile('uk.ac.ebi.mydas:mydas:1.6.8-hyve-SNAPSHOT') {
-            excludes "slf4j-nop"
-        }
+        compile 'uk.ac.ebi.mydas:mydas:1.7.0.hyve-SNAPSHOT'
         compile 'net.sf.opencsv:opencsv:2.3'
         compile 'org.transmartproject:transmart-core-api:1.0-SNAPSHOT'
     }
