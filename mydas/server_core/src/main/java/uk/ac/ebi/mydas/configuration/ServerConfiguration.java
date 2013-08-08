@@ -96,7 +96,7 @@ public class ServerConfiguration {
             }
         }
 
-        return null;
+        return config;
     }
 
     /**

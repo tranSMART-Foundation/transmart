@@ -368,7 +368,7 @@ public class DataSourceConfiguration {
      * @return false if things have gone wrong, true if all is good.
      */
     public boolean isOK() {
-        return Boolean.TRUE.equals(datasourceOK);
+        return this.datasourceOK == null || Boolean.TRUE.equals(datasourceOK);
     }
 
     /**
