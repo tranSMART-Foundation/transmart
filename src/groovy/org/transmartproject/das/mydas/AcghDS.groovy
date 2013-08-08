@@ -29,7 +29,7 @@ class AcghDS implements RangeHandlingAnnotationDataSource {
 
     @Override
     void init(ServletContext servletContext, Map<String, PropertyType> stringPropertyTypeMap, DataSourceConfiguration dataSourceConfiguration) throws DataSourceException {
-        resultInstanceId = dataSourceConfiguration.getDataSourceProperties().get("resultInstanceId").getValue().toLong();
+        resultInstanceId = dataSourceConfiguration.getMatcherAgainstDsn().group(1).toLong();
         def ctx = servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
         this.dasService = ctx.dasService
     }
