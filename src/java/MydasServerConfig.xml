@@ -123,7 +123,7 @@
                     mapmaster="http://acgh.thehyve.net">
 
             <maintainer email="office@thehyve.nl" />
-
+            <pattern>acgh-(\d+)</pattern>
             <version uri="acgh" created="2013-08-31">
                 <class>org.transmartproject.das.mydas.AcghDS</class>
                 <!--TODO: Specify appropriate coordinates-->
@@ -137,7 +137,6 @@
                 <capability type="das1:features"		query_uri="http://localhost:8080/das/acgh/features" />
                 <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/acgh/stylesheet" />
                 <capability type="das1:rows-for-feature"	/>
-                <property key="resultInstanceId" value="10" visibility="true"/>
             </version>
 
             <stylesheet>acgh.style</stylesheet>
