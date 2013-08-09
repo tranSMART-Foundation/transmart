@@ -68,18 +68,40 @@ class DasServiceTests {
             }
 
             List<ChromosomalSegment> getChromosomalSegments(ACGHRegionQuery acghRegionQuery) {
-                [new ChromosomalSegment(chromosome: '20', start: 1, end: 10)]
+                [
+                        new ChromosomalSegment(chromosome: '1', start: 100, end: 400),
+                        new ChromosomalSegment(chromosome: '2', start: 200, end: 500)
+                ]
             }
         }
     }
 
     @Test
     void testGetAcghFeatures() {
-        def segments = service.getAcghFeatures(10, ['2'], null, null, [service.copyNumberStateToDasTypeMapping[CopyNumberState.GAIN]])
+        def segments = service.getAcghFeatures(10, ['2'], null, null)
+        assertNotNull segments
+        assertEquals 1, segments.size()
+        assertEquals '2', segments[0].getSegmentId()
+        assertNotNull segments[0].getFeatures()
+        assertEquals service.getAcghDasTypes().size(), segments[0].getFeatures().size()
+    }
+
+    @Test
+    void testGetAcghFeaturesForLoss() {
+        def segments = service.getAcghFeatures(10, ['2'], null, null, [service.copyNumberStateToDasTypeMapping[CopyNumberState.LOSS]])
         assertNotNull segments
         assertEquals 1, segments.size()
         assertEquals '2', segments[0].getSegmentId()
         assertNotNull segments[0].getFeatures()
         assertEquals 1, segments[0].getFeatures().size()
+        assertEquals new Double(0.5), segments[0].getFeatures()[0].getScore()
     }
+
+    @Test
+    void testGetAcghEntryPoints() {
+        def entryPoints = service.getAcghEntryPoints(10)
+        assertNotNull entryPoints
+        assertEquals 2, entryPoints.size()
+    }
+
 }

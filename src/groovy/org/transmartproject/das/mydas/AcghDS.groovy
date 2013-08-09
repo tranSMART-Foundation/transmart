@@ -25,7 +25,8 @@ class AcghDS implements RangeHandlingAnnotationDataSource {
 
     DasService dasService
     Long resultInstanceId
-    List<DasEntryPoint> entryPoints = null
+
+    List<DasEntryPoint> entryPoints
 
     @Override
     void init(ServletContext servletContext, Map<String, PropertyType> stringPropertyTypeMap, DataSourceConfiguration dataSourceConfiguration) throws DataSourceException {
@@ -82,10 +83,7 @@ class AcghDS implements RangeHandlingAnnotationDataSource {
 
     @Override
     Collection<DasEntryPoint> getEntryPoints(Integer start, Integer stop) throws UnimplementedFeatureException, DataSourceException {
-        if(entryPoints == null) {
-            entryPoints = dasService.getAcghEntryPoints(resultInstanceId)
-        }
-        entryPoints
+        getEntryPoints()
     }
 
     @Override
@@ -95,7 +93,14 @@ class AcghDS implements RangeHandlingAnnotationDataSource {
 
     @Override
     int getTotalEntryPoints() throws UnimplementedFeatureException, DataSourceException {
-        entryPoints.size()
+        getEntryPoints().size()
+    }
+
+    List<DasEntryPoint> getEntryPoints() {
+        if(entryPoints == null) {
+            entryPoints = dasService.getAcghEntryPoints(resultInstanceId)
+        }
+        entryPoints
     }
 
 }
