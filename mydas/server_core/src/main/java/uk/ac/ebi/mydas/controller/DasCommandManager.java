@@ -1297,73 +1297,30 @@ public class DasCommandManager {
                     serializer.text("\n");
                 }
                 serializer.startTag(DAS_XML_NAMESPACE, "SOURCES");
-                List<String> versionsadded = new ArrayList<String>();
 
-                for (String dsn : dsns) {
-                    if (source == null || source.equals(dsn)) {
+                if(source == null) {
+                    List<String> versionsadded = new ArrayList<String>();
+                    for (String dsn : dsns) {
                         if (!versionsadded.contains(dsn)) {
-                            DataSourceConfiguration dataSourceConfig = DATA_SOURCE_MANAGER.
-                                    getServerConfiguration().getDataSourceConfig(dsn);
+                            DataSourceConfiguration dataSourceConfig = null;
                             try {
-                                Datasource dsnConfig2 = dataSourceConfig.getConfig();
-
-                                serializer.startTag(DAS_XML_NAMESPACE, "SOURCE");
-                                serializer.attribute(DAS_XML_NAMESPACE, "uri", dsnConfig2.getUri());
-                                if (dsnConfig2.getDocHref() != null && dsnConfig2.getDocHref().length() > 0) {
-                                    serializer.attribute(DAS_XML_NAMESPACE, "doc_href", dsnConfig2.getDocHref());
-                                }
-                                serializer.attribute(DAS_XML_NAMESPACE, "title", dsnConfig2.getTitle());
-                                serializer.attribute(DAS_XML_NAMESPACE, "description", dsnConfig2.getDescription());
-
-                                serializer.startTag(DAS_XML_NAMESPACE, "MAINTAINER");
-                                serializer.attribute(DAS_XML_NAMESPACE, "email", dsnConfig2.getMaintainer().getEmail());
-                                serializer.endTag(DAS_XML_NAMESPACE, "MAINTAINER");
-
-                                for (Version version : dsnConfig2.getVersion()) {
-                                    versionsadded.add(version.getUri());
-                                    serializer.startTag(DAS_XML_NAMESPACE, "VERSION");
-                                    serializer.attribute(DAS_XML_NAMESPACE, "uri", version.getUri());
-                                    serializer.attribute(DAS_XML_NAMESPACE, "created", version.getCreated().toString());
-                                    for (Coordinates coordinates : version.getCoordinates()) {
-                                        serializer.startTag(DAS_XML_NAMESPACE, "COORDINATES");
-                                        serializer.attribute(DAS_XML_NAMESPACE, "uri", coordinates.getUri());
-                                        serializer.attribute(DAS_XML_NAMESPACE, "source", coordinates.getSource());
-                                        serializer.attribute(DAS_XML_NAMESPACE, "authority", coordinates.getAuthority());
-                                        if ((coordinates.getTaxid() != null) && (coordinates.getTaxid().length() > 0))
-                                            serializer.attribute(DAS_XML_NAMESPACE, "taxid", coordinates.getTaxid());
-                                        if ((coordinates.getVersion() != null) && (coordinates.getVersion().length() > 0))
-                                            serializer.attribute(DAS_XML_NAMESPACE, "version", coordinates.getVersion());
-                                        serializer.attribute(DAS_XML_NAMESPACE, "test_range", coordinates.getTestRange());
-                                        serializer.text(coordinates.getValue());
-                                        serializer.endTag(DAS_XML_NAMESPACE, "COORDINATES");
-                                    }
-                                    for (Capability capability : version.getCapability()) {
-                                        serializer.startTag(DAS_XML_NAMESPACE, "CAPABILITY");
-                                        serializer.attribute(DAS_XML_NAMESPACE, "type", capability.getType());
-                                        if ((capability.getQueryUri() != null) && (capability.getQueryUri().length() > 0))
-                                            serializer.attribute(DAS_XML_NAMESPACE, "query_uri", capability.getQueryUri());
-                                        serializer.endTag(DAS_XML_NAMESPACE, "CAPABILITY");
-                                    }
-                                    //1.6.1 Properties come from version and are not allowed in data sources (not out of the version anyway)
-                                    //1.61. Only properties with visibility true will be reported in source command response
-                                    for (PropertyType pt : version.getProperty()) {
-                                        if (pt.isVisibility()) {
-                                            serializer.startTag(DAS_XML_NAMESPACE, "PROPERTY");
-                                            serializer.attribute(DAS_XML_NAMESPACE, "name", pt.getKey());
-                                            serializer.attribute(DAS_XML_NAMESPACE, "value", pt.getValue());
-                                            serializer.endTag(DAS_XML_NAMESPACE, "PROPERTY");
-                                        }
-                                    }
-                                    serializer.endTag(DAS_XML_NAMESPACE, "VERSION");
-                                }
-
-                                serializer.endTag(DAS_XML_NAMESPACE, "SOURCE");
+                                dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfig(dsn);
+                                versionsadded.addAll(serializeSources(serializer, dataSourceConfig));
                             } finally {
-                                dataSourceConfig.destroy();
+                                if(dataSourceConfig != null) dataSourceConfig.destroy();
                             }
                         }
                     }
+                } else {
+                    DataSourceConfiguration dataSourceConfig = null;
+                    try {
+                        dataSourceConfig = DATA_SOURCE_MANAGER.getServerConfiguration().getDataSourceConfig(source);
+                        serializeSources(serializer, dataSourceConfig);
+                    } finally {
+                        if(dataSourceConfig != null) dataSourceConfig.destroy();
+                    }
                 }
+
                 serializer.endTag(DAS_XML_NAMESPACE, "SOURCES");
                 serializer.flush();
             } finally {
@@ -1372,6 +1329,72 @@ public class DasCommandManager {
                 }
             }
         }
+    }
+
+    private List<String> serializeSources(XmlSerializer serializer, DataSourceConfiguration dataSourceConfig) throws XmlPullParserException, IOException {
+        if(dataSourceConfig == null) return new ArrayList<String>(0);
+
+        Datasource dsnConfig2 = dataSourceConfig.getConfig();
+
+        serializer.startTag(DAS_XML_NAMESPACE, "SOURCE");
+        serializer.attribute(DAS_XML_NAMESPACE, "uri", dsnConfig2.getUri());
+        if (dsnConfig2.getDocHref() != null && dsnConfig2.getDocHref().length() > 0) {
+            serializer.attribute(DAS_XML_NAMESPACE, "doc_href", dsnConfig2.getDocHref());
+        }
+        serializer.attribute(DAS_XML_NAMESPACE, "title", dsnConfig2.getTitle());
+        serializer.attribute(DAS_XML_NAMESPACE, "description", dsnConfig2.getDescription());
+
+        serializer.startTag(DAS_XML_NAMESPACE, "MAINTAINER");
+        serializer.attribute(DAS_XML_NAMESPACE, "email", dsnConfig2.getMaintainer().getEmail());
+        serializer.endTag(DAS_XML_NAMESPACE, "MAINTAINER");
+
+        if(dsnConfig2.getPattern() != null) {
+            serializer.startTag(DAS_XML_NAMESPACE, "PATTERN");
+            serializer.text(dsnConfig2.getPattern());
+            serializer.endTag(DAS_XML_NAMESPACE, "PATTERN");
+        }
+
+        List<String> versionsadded = new ArrayList<String>();
+        for (Version version : dsnConfig2.getVersion()) {
+            versionsadded.add(version.getUri());
+            serializer.startTag(DAS_XML_NAMESPACE, "VERSION");
+            serializer.attribute(DAS_XML_NAMESPACE, "uri", version.getUri());
+            serializer.attribute(DAS_XML_NAMESPACE, "created", version.getCreated().toString());
+            for (Coordinates coordinates : version.getCoordinates()) {
+                serializer.startTag(DAS_XML_NAMESPACE, "COORDINATES");
+                serializer.attribute(DAS_XML_NAMESPACE, "uri", coordinates.getUri());
+                serializer.attribute(DAS_XML_NAMESPACE, "source", coordinates.getSource());
+                serializer.attribute(DAS_XML_NAMESPACE, "authority", coordinates.getAuthority());
+                if ((coordinates.getTaxid() != null) && (coordinates.getTaxid().length() > 0))
+                    serializer.attribute(DAS_XML_NAMESPACE, "taxid", coordinates.getTaxid());
+                if ((coordinates.getVersion() != null) && (coordinates.getVersion().length() > 0))
+                    serializer.attribute(DAS_XML_NAMESPACE, "version", coordinates.getVersion());
+                serializer.attribute(DAS_XML_NAMESPACE, "test_range", coordinates.getTestRange());
+                serializer.text(coordinates.getValue());
+                serializer.endTag(DAS_XML_NAMESPACE, "COORDINATES");
+            }
+            for (Capability capability : version.getCapability()) {
+                serializer.startTag(DAS_XML_NAMESPACE, "CAPABILITY");
+                serializer.attribute(DAS_XML_NAMESPACE, "type", capability.getType());
+                if ((capability.getQueryUri() != null) && (capability.getQueryUri().length() > 0))
+                    serializer.attribute(DAS_XML_NAMESPACE, "query_uri", capability.getQueryUri());
+                serializer.endTag(DAS_XML_NAMESPACE, "CAPABILITY");
+            }
+            //1.6.1 Properties come from version and are not allowed in data sources (not out of the version anyway)
+            //1.61. Only properties with visibility true will be reported in source command response
+            for (PropertyType pt : version.getProperty()) {
+                if (pt.isVisibility()) {
+                    serializer.startTag(DAS_XML_NAMESPACE, "PROPERTY");
+                    serializer.attribute(DAS_XML_NAMESPACE, "name", pt.getKey());
+                    serializer.attribute(DAS_XML_NAMESPACE, "value", pt.getValue());
+                    serializer.endTag(DAS_XML_NAMESPACE, "PROPERTY");
+                }
+            }
+            serializer.endTag(DAS_XML_NAMESPACE, "VERSION");
+        }
+
+        serializer.endTag(DAS_XML_NAMESPACE, "SOURCE");
+        return versionsadded;
     }
 
     /**
