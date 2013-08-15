@@ -118,7 +118,7 @@
         -->
         <datasource uri="acgh"
                     title="acgh"
-                    description="ACGH description"
+                    description="aCGH copy number"
                     doc_href="http://acgh.thehyve.net"
                     mapmaster="http://acgh.thehyve.net">
 
