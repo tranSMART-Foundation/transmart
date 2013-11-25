@@ -1,33 +1,37 @@
 package transmart.mydas
 
-import org.transmartproject.core.dataquery.DataQueryResource
-import org.transmartproject.core.dataquery.acgh.ChromosomalSegment
-import org.transmartproject.core.dataquery.acgh.CopyNumberState
-import org.transmartproject.core.dataquery.acgh.RegionResult
-import org.transmartproject.core.dataquery.acgh.RegionRow
-import org.transmartproject.core.dataquery.acgh.Region
+import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.assay.Assay
-import org.transmartproject.core.dataquery.constraints.ACGHRegionQuery
-import org.transmartproject.core.dataquery.constraints.CommonHighDimensionalQueryConstraints
+import org.transmartproject.core.dataquery.highdim.AssayColumn
+import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
+import org.transmartproject.core.dataquery.highdim.HighDimensionResource
+import org.transmartproject.core.dataquery.highdim.acgh.AcghValues
+import org.transmartproject.core.dataquery.highdim.acgh.CopyNumberState
+import org.transmartproject.core.dataquery.highdim.acgh.RegionRow
+import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
+import org.transmartproject.core.dataquery.highdim.dataconstraints.DataConstraint
+import org.transmartproject.core.dataquery.highdim.projections.Projection
 import org.transmartproject.core.querytool.QueriesResource
 import uk.ac.ebi.mydas.exceptions.DataSourceException
 import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException
 import uk.ac.ebi.mydas.extendedmodel.DasMethodE
 import uk.ac.ebi.mydas.extendedmodel.DasTypeE
-import uk.ac.ebi.mydas.model.DasAnnotatedSegment
-import uk.ac.ebi.mydas.model.DasEntryPoint
-import uk.ac.ebi.mydas.model.DasEntryPointOrientation
-import uk.ac.ebi.mydas.model.DasFeature
-import uk.ac.ebi.mydas.model.DasFeatureOrientation
-import uk.ac.ebi.mydas.model.DasPhase
-import uk.ac.ebi.mydas.model.DasType
+import uk.ac.ebi.mydas.model.*
+
+import javax.annotation.PostConstruct
 
 class DasService {
 
     static transactional = true
 
-    DataQueryResource dataQueryResourceNoGormService
+    HighDimensionResource highDimensionResourceService
+    HighDimensionDataTypeResource acghResource
     QueriesResource queriesResourceService
+
+    @PostConstruct
+    void init() {
+        acghResource = highDimensionResourceService.getSubResourceForType 'acgh'
+    }
 
     String acghVersion = '1.0'
     String acghEntryPointVersion = '1.0'
@@ -53,15 +57,14 @@ class DasService {
                                               uk.ac.ebi.mydas.model.Range range = null,
                                               Collection<DasType> dasTypes = acghDasTypes) throws UnimplementedFeatureException, DataSourceException {
         def query = getACGHRegionQuery(resultInstanceId, segmentIds, range)
-        RegionResult regionResult = dataQueryResourceNoGormService.runACGHRegionQuery(query, null)
+        TabularResult<AssayColumn, RegionRow> regionResult = acghResource.retrieveData(*query)
         def assays = regionResult.indicesList
         Map<String, List<DasFeature>> featuresPerSegment = [:]
         try {
-            for (RegionRow row: regionResult.rows) {
-                def region = row.region
+            for (RegionRow region : regionResult.rows) {
 
                 if(!featuresPerSegment[region.chromosome]) featuresPerSegment[region.chromosome] = []
-                def countPerDasType = countAcghDasTypesForRow(row, assays, dasTypes)
+                def countPerDasType = countAcghDasTypesForRow(region, assays, dasTypes)
                 countPerDasType.each { typeCountEntry ->
                     def freq = typeCountEntry.value / (double) assays.size()
 
@@ -108,8 +111,8 @@ class DasService {
 
     List<DasEntryPoint> getAcghEntryPoints(Long resultInstanceId) {
         def query = getACGHRegionQuery(resultInstanceId)
-        List<ChromosomalSegment> regions = dataQueryResourceNoGormService.getChromosomalSegments(query)
-        regions.collect {
+        TabularResult<AssayColumn, RegionRow> regions = acghResource.retrieveData(*query)
+        regions.rows.collect {
             new DasEntryPoint(
                     //segmentId
                     it.chromosome,
@@ -135,21 +138,18 @@ class DasService {
         dasTypes.collect{ dasTypeToCopyNumberStateMapping[it] }
     }
 
-    private List<CopyNumberState> convertToDasType(Collection<CopyNumberState> states) {
-        states.collect{ dasTypeToCopyNumberStateMapping[it] }
-    }
-
-    private def countAcghCopyNumberStatesForRow(RegionRow row, Collection<Assay> assays, Collection<CopyNumberState> states) {
+    private def countAcghCopyNumberStatesForRow(RegionRow<AcghValues> row, Collection<Assay> assays, Collection<CopyNumberState> states) {
         //TODO Use countBy
         states.collectEntries {
-            [(it): assays.count { assay ->
-                it == row.getRegionDataForAssay(assay).copyNumberState
+            [(it): assays.count { Assay assay ->
+                it == row.getAt(assay).copyNumberState
             }]
         }
     }
 
     private def countAcghDasTypesForRow(RegionRow row, Collection<Assay> assays, Collection<DasType> dasTypes) {
-        Map<CopyNumberState, Integer> acghCopyNumberStatesForRowMap = countAcghCopyNumberStatesForRow(row, assays, convertToCopyNumberState(dasTypes))
+        Map<CopyNumberState, Integer> acghCopyNumberStatesForRowMap =
+            countAcghCopyNumberStatesForRow(row, assays, convertToCopyNumberState(dasTypes))
         acghCopyNumberStatesForRowMap.collectEntries {
             [(copyNumberStateToDasTypeMapping[it.key]): it.value]
         }
@@ -162,22 +162,33 @@ class DasService {
         } else segments
     }
 
-    private ACGHRegionQuery getACGHRegionQuery(Long resultInstanceId, Collection<String> segmentIds = [], uk.ac.ebi.mydas.model.Range range = null) {
-        def segments = segmentIds.collect {
-            def chromosomeSegment = new ChromosomalSegment(chromosome: it)
-            if(range) {
-                chromosomeSegment.start = range.from
-                chromosomeSegment.end = range.to
-            }
-            chromosomeSegment
-        }
+    private List getACGHRegionQuery(Long resultInstanceId,
+                                    Collection<String> segmentIds = [],
+                                    uk.ac.ebi.mydas.model.Range range = null) {
 
-        new ACGHRegionQuery(
-                common: new CommonHighDimensionalQueryConstraints(
-                        patientQueryResult: queriesResourceService.getQueryResultFromId(resultInstanceId)
-                ),
-                segments: segments
-        )
+        List assayConstraints = [
+                acghResource.createAssayConstraint(AssayConstraint.PATIENT_SET_CONSTRAINT,
+                                                   result_instance_id: resultInstanceId)]
+
+        List dataConstraints = [
+                acghResource.createDataConstraint(
+                        DataConstraint.DISJUNCTION_CONSTRAINT,
+                        subconstraints: [
+                                (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): segmentIds.collect {
+                                    def ret = [ chromosome: it ]
+                                    if (range) {
+                                        ret.start = range.from
+                                        ret.end = range.to
+                                    }
+                                    ret
+                                }
+                        ]
+                )
+        ]
+
+        Projection projection = acghResource.createProjection [:], 'acgh_values'
+
+        [ assayConstraints, dataConstraints, projection ]
     }
 
 }
