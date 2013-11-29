@@ -8,7 +8,7 @@ import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
 import org.transmartproject.core.dataquery.highdim.acgh.AcghValues
 import org.transmartproject.core.dataquery.highdim.acgh.CopyNumberState
-import org.transmartproject.core.dataquery.highdim.acgh.RegionRow
+import org.transmartproject.core.dataquery.highdim.chromoregion.RegionRow
 import org.transmartproject.core.querytool.QueriesResource
 
 /**
