@@ -28,7 +28,7 @@ if (!actualFolder.exists()) {
 
 def outputFilename = 'outputFile'
 File expectedOutputFile = new File(expectedFolder, outputFilename)
-File actualOutputFile = new File(expectedFolder, outputFilename)
+File actualOutputFile = new File(actualFolder, outputFilename)
 
 if (!expectedOutputFile.exists()) {
     err "expected file $expectedOutputFile does not exist"
@@ -43,8 +43,8 @@ if (!actualOutputFile.exists()) {
 println "Comparing $outputFilename..."
 if (compareCSVFiles(expectedOutputFile, actualOutputFile, System.err)) {
     System.exit(1)
-
 }
+println "$outputFilename matches"
 
 def boolean compareCSVFiles(File file1, File file2, PrintStream out = System.out) {
     CSVReader reader1 = new CSVReader(file1.newReader())
@@ -59,7 +59,7 @@ def boolean compareCSVFiles(File file1, File file2, PrintStream out = System.out
         actual = reader2.readNext()
 
         if (expected != actual) {
-            out "Found difference in line $idx: Expected $expected Actual $actual"
+            out.println "Found difference in line $idx: Expected $expected Actual $actual"
             return false
         }
         idx++
