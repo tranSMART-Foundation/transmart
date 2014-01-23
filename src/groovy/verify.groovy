@@ -41,14 +41,48 @@ if (!actualOutputFile.exists()) {
 }
 
 println "Comparing $outputFilename..."
-if (compareCSVFiles(expectedOutputFile, actualOutputFile, System.err)) {
+if (!compareCSVFiles(expectedOutputFile, actualOutputFile, System.err)) {
     System.exit(1)
 }
 println "$outputFilename matches"
 
+
+
+
+// ************** DEFS *************
+
+def boolean equalsIgnoresQuotes(String[] array1, String[] array2) {
+    if (array1.length != array2.length) {
+        return false
+    }
+    def it1 = array1.iterator()
+    def it2 = array2.iterator()
+    while (it1.hasNext()) {
+        def v1 = unquoted(it1.next())
+        def v2 = unquoted(it2.next())
+        if (v1 != v2) {
+            return false
+        }
+    }
+    true
+}
+
+def String unquoted(String str) {
+
+    if (str == null || str == '') {
+        return str
+    }
+    str = str.trim()
+    if (str.startsWith('"') && str.endsWith('"')) {
+        str.substring(1, str.length() - 2)
+    } else {
+        str
+    }
+}
+
 def boolean compareCSVFiles(File file1, File file2, PrintStream out = System.out) {
-    CSVReader reader1 = new CSVReader(file1.newReader())
-    CSVReader reader2 = new CSVReader(file2.newReader())
+    CSVReader reader1 = new CSVReader(file1.newReader(), '\t' as char)
+    CSVReader reader2 = new CSVReader(file2.newReader(), '\t' as char)
     def expected  = null
     def actual  = null
     boolean done = false
@@ -58,8 +92,10 @@ def boolean compareCSVFiles(File file1, File file2, PrintStream out = System.out
         expected = reader1.readNext()
         actual = reader2.readNext()
 
-        if (expected != actual) {
-            out.println "Found difference in line $idx: Expected $expected Actual $actual"
+        if (expected != null && !equalsIgnoresQuotes(expected, actual)) {
+            out.println "Found difference in line $idx:"
+            out.println "Expected $expected"
+            out.println "Actual $actual"
             return false
         }
         idx++

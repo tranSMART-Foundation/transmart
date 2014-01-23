@@ -47,7 +47,7 @@ if (cookieStore.cookies[0].name != 'JSESSIONID') {
 def slurper = new groovy.json.JsonSlurper()
 def config = slurper.parseText(new File(args[0]).text)
 
-println config
+//println config
 
 def jobType = config['jobType']
 
