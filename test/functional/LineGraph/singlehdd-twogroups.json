@@ -4,7 +4,7 @@
     "dependentVariable": "\\Public Studies\\GSE8581-samples\\MRNA\\Biomarker Data\\Affymetrix Human Genome U133A 2.0 Array\\Lung\\",
     "result_instance_id1": "24259",
     "result_instance_id2": "",
-    "variablesConceptPaths": "\\Public Studies\\GSE8581-samples\\Subjects\\Age (year)\\|\\Public Studies\\GSE8581-samples\\Subjects\\Height (inch)\\|\\Public Studies\\GSE8581-samples\\Subjects\\Ethnicity\\Afro American\\|\\Public Studies\\GSE8581-samples\\Subjects\\Ethnicity\\Caucasian\\",
+    "variablesConceptPaths": "\\Public Studies\\GSE8581-samples\\MRNA\\Biomarker Data\\Affymetrix Human Genome U133A 2.0 Array\\Lung\\",
     "groupByVariable": "\\Public Studies\\GSE8581-samples\\Endpoints\\Diagnosis\\carcinoid\\|\\Public Studies\\GSE8581-samples\\Endpoints\\Diagnosis\\emphysema\\",
     "graphType": "MERR",
     "action": "scheduleJob",
