@@ -1,10 +1,15 @@
 #!/usr/bin/groovy
 
+/*
 import groovy.lang.Grapes
 @Grapes([
   @Grab(group='net.sf.opencsv', module='opencsv', version='2.3'),
 ])
 import au.com.bytecode.opencsv.CSVReader
+*/
+
+def scriptDir = new File(getClass().protectionDomain.codeSource.location.path).parentFile
+evaluate(new File(scriptDir, "util.groovy"))
 
 def err = System.err.&println
 
@@ -41,7 +46,8 @@ if (!actualOutputFile.exists()) {
 }
 
 println "Comparing $outputFilename..."
-if (!compareCSVFiles(expectedOutputFile, actualOutputFile, System.err)) {
+//if (!compareCSVFiles(expectedOutputFile, actualOutputFile, System.err)) {
+if (!compareCSVFilesIgnoresOrder(expectedOutputFile, actualOutputFile, System.err)) {
     System.exit(1)
 }
 println "$outputFilename matches"
@@ -80,27 +86,77 @@ def String unquoted(String str) {
     }
 }
 
+def String canonicalOf(String[] array) {
+    unquoted(array).join(' ')
+}
+
+def List<String> unquoted(String[] array) {
+    array.collect{ it -> unquoted(it)}
+}
+
+
 def boolean compareCSVFiles(File file1, File file2, PrintStream out = System.out) {
     CSVReader reader1 = new CSVReader(file1.newReader(), '\t' as char)
     CSVReader reader2 = new CSVReader(file2.newReader(), '\t' as char)
-    def expected  = null
-    def actual  = null
-    boolean done = false
-    int idx = 0
 
-    while (!done) {
-        expected = reader1.readNext()
-        actual = reader2.readNext()
+    try {
+        def expected  = null
+        def actual  = null
+        boolean done = false
+        int idx = 0
 
-        if (expected != null && !equalsIgnoresQuotes(expected, actual)) {
-            out.println "Found difference in line $idx:"
-            out.println "Expected $expected"
-            out.println "Actual $actual"
+        while (!done) {
+            expected = reader1.readNext()
+            actual = reader2.readNext()
+
+            if (expected != null && !equalsIgnoresQuotes(expected, actual)) {
+                out.println "Found difference in line $idx:"
+                out.println "Expected $expected"
+                out.println "Actual $actual"
+                return false
+            }
+            idx++
+
+            done = (expected == null)
+        }
+        return true
+    } finally {
+        reader1.close()
+        reader2.close()
+    }
+}
+
+def boolean compareCSVFilesIgnoresOrder(File file1, File file2, PrintStream out = System.out) {
+    CSVReader reader1 = new CSVReader(file1.newReader(), '\t' as char)
+    CSVReader reader2 = new CSVReader(file2.newReader(), '\t' as char)
+
+    def List<String[]> expectedLines
+    def List<String[]> actualLines
+    try {
+        expectedLines = reader1.readAll()
+        actualLines = reader2.readAll()
+
+        if (expectedLines.size() != actualLines.size()) {
+            out.println "line count mismatch:"
+            out.println "Expected ${expectedLines.size()}"
+            out.println "Actual ${actualLines.size()}"
             return false
         }
-        idx++
 
-        done = (expected == null)
+        Set<String> expectedSet = new HashSet<String>(expectedLines.collect{ it -> canonicalOf(it)})
+        Set<String> actualSet = new HashSet<String>(actualLines.collect{ it -> canonicalOf(it)})
+
+        //@todo improve this, using intersect
+        actualSet.removeAll(expectedSet)
+        boolean result = actualSet.size() == 0
+        if (!result) {
+            out.println "Files don't match. ${actualSet.size()} extra lines"
+        }
+        return result
+
+    } finally {
+        reader1.close()
+        reader2.close()
     }
-    return true
 }
+
