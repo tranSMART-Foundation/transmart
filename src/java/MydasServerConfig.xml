@@ -123,7 +123,7 @@
                     mapmaster="http://acgh.thehyve.net">
 
             <maintainer email="office@thehyve.nl" />
-            <pattern>acgh-(\d+)</pattern>
+            <pattern>acgh-(\d+)(?:-(\S+))?</pattern>
             <version uri="acgh" created="2013-08-31">
                 <class>org.transmartproject.das.mydas.AcghDS</class>
                 <!--TODO: Specify appropriate coordinates-->
@@ -140,6 +140,127 @@
             </version>
 
             <stylesheet>acgh.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+
+        <!-- VCF Datasource -->
+        <datasource uri="vcf"
+                    title="Cohort MAF"
+                    description="Minor Allele Frequency (MAF) of selected cohort"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>vcf-(\d+)(?:-(\S+))?</pattern>
+            <version uri="vcf" created="2013-09-27">
+                <class>org.transmartproject.das.mydas.CohortMAFDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/vcf" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/vcf/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/vcf/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/vcf/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>vcf.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <!-- Summary Level MAF Datasource -->
+        <datasource uri="http://thehyve.nl"
+                    title="Summary MAF"
+                    description="Minor Allele Frequency (MAF) whole study level"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>smaf-(\d+)(?:-(\S+))?</pattern>
+            <version uri="smaf" created="2013-09-30">
+                <class>org.transmartproject.das.mydas.SummaryMAFDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/smaf" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/smaf/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/smaf/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/smaf/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>vcf.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <!-- Quality of Depth Datasource -->
+        <datasource uri="http://thehyve.nl"
+                    title=" Quality of Depth"
+                    description="Quality of Depth (QD) whole study level"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>qd-(\d+)(?:-(\S+))?</pattern>
+            <version uri="qd" created="2013-10-02">
+                <class>org.transmartproject.das.mydas.QualityByDepthDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/qd" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/qd/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/qd/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/qd/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>vcf.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <!-- Genomic Variants Datasource -->
+        <datasource uri="http://thehyve.nl"
+                    title="Genomic Variants"
+                    description="Genomic Variants of selected cohort"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>gv-(\d+)(?:-(\S+))?</pattern>
+            <version uri="gv" created="2013-10-02">
+                <class>org.transmartproject.das.mydas.GenomicVariantsDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/gv" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/gv/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/gv/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/gv/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>variants.style</stylesheet>
             <dna-command-enabled>true</dna-command-enabled>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
