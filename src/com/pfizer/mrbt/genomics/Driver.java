@@ -2,11 +2,14 @@ package com.pfizer.mrbt.genomics;
 
 import com.pfizer.mrbt.genomics.thumbnail.ThumbnailPanel;
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+import com.pfizer.mrbt.genomics.TransmartClient.TransmartWebServices;
 import com.pfizer.mrbt.genomics.data.DataModel;
-import com.pfizer.mrbt.genomics.heatmap.HeatmapPanel;
 import com.pfizer.mrbt.genomics.modelselection.ModelSelectionPanel;
-import com.pfizer.mrbt.genomics.state.State;
+import com.pfizer.mrbt.genomics.query.QueryPanel;
 import com.pfizer.mrbt.genomics.state.StateListener;
+import com.pfizer.mrbt.genomics.webservices.DataRetrievalInterface;
+import com.pfizer.mrbt.genomics.webservices.Environment;
+import com.pfizer.mrbt.genomics.webservices.RetrievalException;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.WindowEvent;
@@ -40,42 +43,36 @@ public class Driver implements Runnable {
 	private JFrame thumbnailFrame;
 
 	private JFrame geneModelFrame;
-	private JFrame heatmapFrame;
-	public final static String VERSION = "1.1.4";
-	private String[] args;
-	private Image image;
+	public final static String VERSION = "2.0c";
+    public final String GUAVA_16_ICON = "/images/guava_16.jpg";
+	private final String[] args;
 	private ThumbnailPanel thumbnailPanel;
-	private HeatmapPanel heatmapPanel;
 	private ModelSelectionPanel modelSelectionPanel;
 
+    /**
+     * The args should contain -services=<data_retrieval_service> in args[0] that will be
+     * translated into a data retrieval service engine
+     * @param args 
+     */
 	public Driver(String[] args) {
 		this.args = args;
 
 		StateController stateController = new StateController();
 
-		if (args.length > 0) {
-			/*
-			 * This is the standard call for the TranSMART query returning
-			 * results. Note that the args become a class variable and are
-			 * initialized later
-			 */
-			if (args[0].equalsIgnoreCase("-services=transmart")) {
-				Singleton.getState().setDataMode(State.TRANSMART_SERVICES_MODE);
-			} else if (args[0].equalsIgnoreCase("-services=transmartdev")) {
-				Singleton.getState().setDataMode(
-						State.TRANSMART_DEV_SERVICES_MODE);
-			} else {
-				// default to bioservice
-				Singleton.getState().setDataMode(State.BIOSERVICES_MODE);
-			}
+        if (args.length > 0 && args[0].equalsIgnoreCase("-services=transmart")) {
+            //Singleton.getState().setDataMode(State.TRANSMART_SERVICES_MODE);
+            DataRetrievalInterface webServices = new TransmartWebServices(Environment.STAGE);
+            Singleton.getDataModel().setWebServices(webServices);
+        } else if (args.length > 0 && args[0].equalsIgnoreCase("-services=transmartdev")) {
+				/*Singleton.getState().setDataMode(
+						State.TRANSMART_DEV_SERVICES_MODE);*/
+                DataRetrievalInterface webServices = new TransmartWebServices(Environment.DEV);
+                Singleton.getDataModel().setWebServices(webServices);
 		} else {
-			/*
-			 * If you don't provide any parameters, it launches BIOSERVICES_MODE
-			 * that is mostly defunct
-			 */
-			Singleton.getState().setDataMode(State.BIOSERVICES_MODE);
-		}
-		System.out.println("Driver mode is " + Singleton.getState().getDataServicesModeName());
+            System.err.println("Driver does not have -services=<data_retrieval_interface> in args[0]");
+            System.exit(1);
+    	}
+		//System.out.println("Driver mode is " + Singleton.getState().getDataServicesModeName());
 		Singleton.getState().addListener(stateController);
 	}
 
@@ -94,64 +91,92 @@ public class Driver implements Runnable {
 			createMainFrame();
 			createGeneModelFrame();
 			createThumbnailFrame();
+            runInitialData();
 		} catch (Exception ex) {
 			System.out.println("Caught exception in main run loop");
 			ex.printStackTrace();
 		}
 	}
+    
+    protected void runInitialData() {
+		/**
+		 * This is a key call to initialize the data and run a search from the
+		 * tranSMART query.  12/19/2013 moved until after frame initialized
+		 */
+        String[] argsWithoutServices = removeServicesCallArg0(args);
+        if(argsWithoutServices.length > 0) {
+            try {
+                Singleton.getDataModel().initializeData(argsWithoutServices);
+                QueryPanel queryPanel = (QueryPanel) Singleton.getMainPanel().getQueryPanel();
+            } catch(RetrievalException rex) {
+                System.out.println("Retrieval exception " + rex.getMessage());
+            }
+        }
+    }
 
-	/**
+	/**g
 	 * Creates a frame for the main window. Note that the args are used here as
 	 * a class variable to specify the results for the tranSMART-based query
 	 * 
 	 * @throws Exception
 	 */
 	protected void createMainFrame() throws Exception {
-		String dataSrc = " using tranSMART";
+		/*String dataSrc = " using tranSMART";
 		if (Singleton.getState().getDataMode() == State.BIOSERVICES_MODE) {
 			dataSrc = " using AQG";
 		} else if (Singleton.getState().getDataMode() == State.TRANSMART_DEV_SERVICES_MODE) {
 			dataSrc = " using tranSMART Dev Instance";
 		} else if (Singleton.getState().getDataMode() == State.TRANSMART_SERVICES_MODE) {
 			dataSrc = " using tranSMART Stage Instance";
-		}
-		frame = new JFrame("GWAVA: Genome-Wide Association Visual Analyzer "
-				+ VERSION + dataSrc);
+		}*/
+        String dataRetrievalSource = Singleton.getDataModel().getWebServices().getSourceName();
+        frame = Singleton.getMainFrame();
+        frame.setTitle("GWAVA: Genome-Wide Association Visual Analyzer "
+				+ VERSION + " using " + dataRetrievalSource);
 		/*
 		 * UserPreferences userPref = Singleton.getUserPreferences();
 		 * userPref.loadUserPreferences();
 		 */
 		DataModel dataModel = Singleton.getDataModel();
 
-		/**
-		 * This is a key call to initialize the data and run a search from the
-		 * tranSMART query
-		 */
-        String[] argsWithoutServices = removeServicesCallArg0(args);
-		dataModel.initializeData(argsWithoutServices);
-
-		String filename = "";
-		if (filename == null) {
-			System.exit(0);
-		}
-
-		MainPanel mainPanel = new MainPanel();
+		//MainPanel mainPanel = new MainPanel();
+        MainPanel mainPanel = Singleton.getMainPanel();
 
 		frame.setContentPane(mainPanel);
 		frame.setJMenuBar(new MenuBar(mainPanel));
-		try {
-			java.net.URL imgURL = this.getClass().getResource(
-					"/images/guava_16.jpg");
-			frame.setIconImage(new ImageIcon(imgURL).getImage());
-		} catch (NullPointerException npe) {
-			System.out.println("Failed to load in the icon.");
+        Image img = loadImageIconResource();
+        if(img != null) {
+            frame.setIconImage(img);
 		}
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.addWindowListener(new WindowCloseController());
 		frame.pack();
+        if(Singleton.getUserPreferences().getMainFrameLocation() != null) {
+            frame.setLocation(Singleton.getUserPreferences().getMainFrameLocation());
+        }
+        if(Singleton.getUserPreferences().getMainFrameSize() != null) {
+            frame.setSize(Singleton.getUserPreferences().getMainFrameSize());
+        }
 		frame.setVisible(true);
+        
 	}
+    
+    /**
+     * Attempts to load the GUAVA_16_ICON resource image.  It returns the
+     * image if successful, else returns null.
+     * @return 
+     */
+    private Image loadImageIconResource() {
+		try {
+			java.net.URL imgURL = this.getClass().getResource(GUAVA_16_ICON);
+            ImageIcon imageIcon = new ImageIcon(imgURL);
+            return imageIcon.getImage();
+		} catch (NullPointerException npe) {
+			System.err.println("Failed to load in the icon [" + GUAVA_16_ICON + "]");
+		}
+        return null;
+    }
     
     /**
      * Args might come in with a -services=something call at args[0].  
@@ -176,20 +201,23 @@ public class Driver implements Runnable {
     }
 
 	protected void createGeneModelFrame() throws Exception {
-		geneModelFrame = new JFrame("GWAVA Gene Model Selection");
+        geneModelFrame = Singleton.getGeneModelFrame();
+        geneModelFrame.setTitle("GWAVA Gene Model Selection");
 		geneModelFrame.setContentPane(getModelSelectionPanel());
-		try {
-			java.net.URL imgURL = this.getClass().getResource(
-					"/images/guava_16.jpg");
-			geneModelFrame.setIconImage(new ImageIcon(imgURL).getImage());
-		} catch (NullPointerException npe) {
-			System.out.println("Failed to load in the icon.");
-		}
-
+        Image img = loadImageIconResource();
+        if(img != null) {
+            geneModelFrame.setIconImage(img);
+        }
 		geneModelFrame.pack();
 		geneModelFrame.setLocation(frame.getLocation().x + frame.getWidth(),
 				frame.getY());
 		geneModelFrame.setSize(new Dimension(250, frame.getHeight()));
+        if(Singleton.getUserPreferences().getGeneModelFrameLocation() != null) {
+            geneModelFrame.setLocation(Singleton.getUserPreferences().getGeneModelFrameLocation());
+        }
+        if(Singleton.getUserPreferences().getGeneModelFrameSize() != null) {
+            geneModelFrame.setSize(Singleton.getUserPreferences().getGeneModelFrameSize());
+        }
 		geneModelFrame.setVisible(true);
 
 	}
@@ -200,7 +228,7 @@ public class Driver implements Runnable {
 		}
 		return modelSelectionPanel;
 	}
-
+    
 	/**
 	 * Creates an invisible JFrame with the thumbnail data
 	 * 
@@ -211,13 +239,10 @@ public class Driver implements Runnable {
 		thumbnailPanel = new ThumbnailPanel();
 		thumbnailFrame.setContentPane(thumbnailPanel);
 		thumbnailFrame.setPreferredSize(new Dimension(515, 500));
-		try {
-			java.net.URL imgURL = this.getClass().getResource(
-					"/images/guava_16.jpg");
-			thumbnailFrame.setIconImage(new ImageIcon(imgURL).getImage());
-		} catch (NullPointerException npe) {
-			System.out.println("Failed to load in the icon.");
-		}
+        Image img = loadImageIconResource();
+        if(img != null) {
+            thumbnailFrame.setIconImage(img);
+}
 		thumbnailFrame.setLocation(500, 250);
 		thumbnailFrame.pack();
 		thumbnailFrame.setVisible(false);
@@ -227,11 +252,11 @@ public class Driver implements Runnable {
 		/**
 		 * Handles the windoColosing event by verifying that they want to save
 		 * changes if there have been any.
-		 * 
-		 * @param we
-		 *            WindowEvent
+		 * @param we   WindowEvent
 		 */
+        @Override
 		public void windowClosing(WindowEvent we) {
+            Singleton.getUserPreferences().setWindowPositions(frame, geneModelFrame);
 			Singleton.getUserPreferences().saveUserPreferences();
 		}
 
@@ -255,6 +280,7 @@ public class Driver implements Runnable {
 		}
 	}
 
+    
 	public class StateController implements StateListener {
 		@Override
 		public void mainPlotChanged(ChangeEvent ce) {
@@ -270,8 +296,7 @@ public class Driver implements Runnable {
 				try {
 					createThumbnailFrame();
 				} catch (Exception ex) {
-					System.out
-							.println("Caught exception in createThumnbnailFrame");
+					System.out.println("Caught exception in createThumnbnailFrame");
 					ex.printStackTrace();
 				}
 			}
@@ -299,6 +324,10 @@ public class Driver implements Runnable {
 		}
 	}
 
+    /**
+     * Main call for the GWAVA program to initialize the GUI and full program
+     * @param args 
+     */
 	public static void main(String args[]) {
 		SwingUtilities.invokeLater(new Driver(args));
 	}

@@ -7,12 +7,15 @@ package com.pfizer.mrbt.genomics.userpref;
 import com.pfizer.mrbt.genomics.Singleton;
 import com.pfizer.mrbt.genomics.heatmap.HeatmapParameters;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.JFrame;
 import javax.swing.event.ChangeEvent;
 
 /**
@@ -61,6 +64,7 @@ public class UserPreferences {
     private Color selectedAnnotationColor = ORANGE4;
     private Color closestAnnotationColor    = Color.MAGENTA;
     private Color interiorAnnotationColor   = Color.RED;
+    private Color intronAnnotationColor   = Color.GREEN;
 
     private Color thumbnailColor        = Color.WHITE;
     private Color thumbnailTextColor    = Color.BLACK;
@@ -77,6 +81,10 @@ public class UserPreferences {
     private int heatmapFunction  = DEFAULT_HEAT_MAP_FUNCTION;
     private int heatmapTopNindex = DEFAULT_HEAT_MAP_TOP_N_INDEX;
     private int basePairSearchRadius = DEFAULT_BASE_PAIR_RADIUS;
+    private Point mainFrameLocation = null;
+    private Point geneModelFrameLocation = null;
+    private Dimension mainFrameSize = null;
+    private Dimension geneModelFrameSize = null;
     
     public UserPreferences() {
         loadUserPreferences();
@@ -92,6 +100,13 @@ public class UserPreferences {
         this.filePath = filePath;
     }
 
+    public void setWindowPositions(JFrame mainFrame, JFrame geneModelFrame) {
+        this.mainFrameLocation = mainFrame.getLocation();
+        this.geneModelFrameLocation = geneModelFrame.getLocation();
+        this.mainFrameSize = mainFrame.getSize();
+        this.geneModelFrameSize = geneModelFrame.getSize();
+    }
+    
     public void saveUserPreferences() {
         String fileSep = System.getProperty("file.separator");
         String filename = System.getProperty("user.home") + fileSep + ".gwava.ini";
@@ -123,6 +138,7 @@ public class UserPreferences {
             bw.write("selectedAnnotationColor"  + "\t" + selectedAnnotationColor.getRGB() + "\n");
             bw.write("closestAnnotationColor"  + "\t" + closestAnnotationColor.getRGB() + "\n");
             bw.write("interiorAnnotationColor"  + "\t" + interiorAnnotationColor.getRGB() + "\n");
+            bw.write("intronAnnotationColor"  + "\t" + intronAnnotationColor.getRGB() + "\n");
             
             bw.write("thumbnailColor"  + "\t" + thumbnailColor.getRGB() + "\n");
             bw.write("thumbnailTextColor"  + "\t" + thumbnailTextColor.getRGB() + "\n");
@@ -138,6 +154,11 @@ public class UserPreferences {
             
             bw.write("minTopNegLogPvalAxis" + "\t" + minTopNegLogPvalAxis + "\n");
             bw.write("minTopRecombinationRateAxis" + "\t" + minTopRecombinationRateAxis + "\n");
+            
+            bw.write("mainFrameLocation" + "\t" + toInt(mainFrameLocation.getX()) + "\t" + toInt(mainFrameLocation.getY()) + "\n");
+            bw.write("geneModelFrameLocation" + "\t" + toInt(geneModelFrameLocation.getX()) + "\t" + toInt(geneModelFrameLocation.getY()) + "\n");
+            bw.write("mainFrameDimension" + "\t" + toInt(mainFrameSize.getWidth())+ "\t" + toInt(mainFrameSize.getHeight()) + "\n");
+            bw.write("geneModelFrameDimension" + "\t" + toInt(geneModelFrameSize.getWidth())+ "\t" + toInt(geneModelFrameSize.getHeight()) + "\n");
 
         } catch (java.io.IOException ex) {
             System.out.println("write exception in saveUserPreferences to file " + filename);
@@ -153,6 +174,11 @@ public class UserPreferences {
                 System.out.println("Write exception in saveUserPreferences to file " + filename);
             }
         }
+    }
+    
+    private int toInt(double value) {
+        int output = (int) Math.round(value);
+        return output;
     }
 
     public void loadUserPreferences() {
@@ -292,6 +318,12 @@ public class UserPreferences {
                        } catch(NumberFormatException nfe) {
                            System.out.println("Invalid interiorAnnotationColor" + "\t" + line);
                        }
+                    } else if(splits[0].equalsIgnoreCase("intronAnnotationColor")) {
+                       try {
+                           intronAnnotationColor = new Color(new Integer(splits[1]));
+                       } catch(NumberFormatException nfe) {
+                           System.out.println("Invalid intronAnnotationColor" + "\t" + line);
+                       }
                     } else if(splits[0].equalsIgnoreCase("thumbnailColor")) {
                        try {
                            thumbnailColor = new Color(new Integer(splits[1]));
@@ -363,6 +395,30 @@ public class UserPreferences {
                            basePairSearchRadius = Integer.parseInt(splits[1]);
                        } catch(NumberFormatException nfe) {
                            System.out.println("Invalid basePairSearchRadius" + "\t" + line);
+                       }
+                    } else if(splits[0].equalsIgnoreCase("mainFrameLocation") && splits.length > 2) {
+                       try {
+                           mainFrameLocation = new Point(Integer.parseInt(splits[1]), Integer.parseInt(splits[2]));
+                       } catch(NumberFormatException nfe) {
+                           System.out.println("Invalid mainFrameLocation" + "\t" + line);
+                       }
+                    } else if(splits[0].equalsIgnoreCase("geneModelFrameLocation") && splits.length > 2) {
+                       try {
+                           geneModelFrameLocation = new Point(Integer.parseInt(splits[1]), Integer.parseInt(splits[2]));
+                       } catch(NumberFormatException nfe) {
+                           System.out.println("Invalid geneModelFrameLocation" + "\t" + line);
+                       }
+                    } else if(splits[0].equalsIgnoreCase("mainFrameDimension") && splits.length > 2) {
+                       try {
+                           mainFrameSize = new Dimension(Integer.parseInt(splits[1]), Integer.parseInt(splits[2]));
+                       } catch(NumberFormatException nfe) {
+                           System.out.println("Invalid mainFrameDimension" + "\t" + line);
+                       }
+                    } else if(splits[0].equalsIgnoreCase("geneModelFrameDimension") && splits.length > 2) {
+                       try {
+                           geneModelFrameSize = new Dimension(Integer.parseInt(splits[1]), Integer.parseInt(splits[2]));
+                       } catch(NumberFormatException nfe) {
+                           System.out.println("Invalid geneModelFrameDimension" + "\t" + line);
                        }
                     }
                 }
@@ -517,6 +573,17 @@ public class UserPreferences {
         }
     }
 
+    public Color getIntronAnnotationColor() {
+        return intronAnnotationColor;
+    }
+
+    public void setIntronAnnotationColor(Color intronAnnotationColor) {
+        if(this.intronAnnotationColor != intronAnnotationColor) {
+            this.intronAnnotationColor = intronAnnotationColor;
+            fireColorChanged();
+        }
+    }
+    
     public Color getRecombinationColor() {
         return recombinationColor;
     }
@@ -722,4 +789,22 @@ public class UserPreferences {
     public void setBasePairSearchRadius(int searchRadius) {
         this.basePairSearchRadius = searchRadius;
     }
+
+    public Point getMainFrameLocation() {
+        return mainFrameLocation;
+    }
+
+    public Point getGeneModelFrameLocation() {
+        return geneModelFrameLocation;
+    }
+
+    public Dimension getMainFrameSize() {
+        return mainFrameSize;
+    }
+
+    public Dimension getGeneModelFrameSize() {
+        return geneModelFrameSize;
+    }
+    
+    
 }

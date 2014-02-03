@@ -66,7 +66,7 @@ public class ResultsTablePanel extends JComponent {
         gbc.gridx = 20;
         gbc.gridy = 10;
         gbc.weighty = 0.1;
-        gbc.weightx = 0.1;
+        gbc.weightx = 0.0;
         add(getControlPanel(), gbc);
 
     }
@@ -140,29 +140,40 @@ public class ResultsTablePanel extends JComponent {
 
             gbc.gridx = 10;
             gbc.gridy = 20;
+            gbc.gridwidth = 19;
             modifyControlPanel.add(getKeepSelectedRowsButton(), gbc);
             
             gbc.gridx = 10;
             gbc.gridy = 30;
-            gbc.anchor = GridBagConstraints.SOUTH;
-            modifyControlPanel.add(getRemoveBelowThresholdButton(), gbc);
+            gbc.gridwidth = 19;
+            gbc.insets = new Insets(5,5,0,5);
+            modifyControlPanel.add(new JLabel("Filter on -10log(P-val)"), gbc);
             
             gbc.gridx = 10;
             gbc.gridy = 40;
             gbc.gridwidth = 1;
-            gbc.anchor = GridBagConstraints.NORTHEAST;
-            modifyControlPanel.add(new JLabel("-10log(P-value) Thresh:"), gbc);
+            gbc.anchor = GridBagConstraints.EAST;
+            gbc.insets = new Insets(1,5,0,1);
+            modifyControlPanel.add(new JLabel("Thresh:"), gbc);
             
             gbc.gridx = 20;
             gbc.gridy = 40;
-            gbc.anchor = GridBagConstraints.NORTHWEST;
+            gbc.insets = new Insets(1,1,0,5);
+            //gbc.anchor = GridBagConstraints.SOUTHWEST;
             pvalThresholdTextField = new JTextField(5);
             pvalThresholdTextField.setHorizontalAlignment(JTextField.CENTER);
             pvalThresholdTextField.setText("0.0");
-            
             modifyControlPanel.add(pvalThresholdTextField, gbc);
+            
+            gbc.gridx = 10;
+            gbc.gridy = 50;
+            gbc.gridwidth = 19;
+            gbc.insets = new Insets(1,5,5,5);
+            gbc.anchor = GridBagConstraints.NORTH;
+            modifyControlPanel.add(getRemoveBelowThresholdButton(), gbc);
+            
 
-            modifyControlPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED), "Data Modification"));
+            modifyControlPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED), "Row Modification"));
 }
         return modifyControlPanel;
     }
@@ -204,7 +215,6 @@ public class ResultsTablePanel extends JComponent {
             exportButton.setToolTipText("Saves the table to a tab-delimited file");
             exportButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
-                    TxtFileFilter txtFileFilter = new TxtFileFilter();
                     File file = getFilename();
                     if (file != null) {
                         exportData(file);
@@ -223,13 +233,12 @@ public class ResultsTablePanel extends JComponent {
      */
     protected AbstractButton getExportSelectionButton() {
         if (exportSelectionButton == null) {
-            exportSelectionButton = new JButton("Export Selected Rows");
+            exportSelectionButton = new JButton("Export Selected");
             exportSelectionButton.setToolTipText("Export selected rows to tab-delimited file");
             exportSelectionButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     int[] selectedRows = resultsTable.getSelectedRows();
                     if (selectedRows.length > 0) {
-                        TxtFileFilter txtFileFilter = new TxtFileFilter();
                         File file = getFilename();
                         if (file != null) {
                             exportSelectedData(file);
@@ -496,6 +505,7 @@ public class ResultsTablePanel extends JComponent {
         String model = (String) table.getValueAt(row, ModelSelectionTableModel.MODEL_COL);
         DataSet dataSet = Singleton.getDataModel().getDataSet(gene);
         for (Model oneModel : dataSet.getModels()) {
+            //String shorterOneModel = oneModel.toString().replaceAll("\\(-log10 P-Value\\)", "");
             String shorterOneModel = oneModel.toString().replaceAll("\\(-log10 P-Value\\)", "");
             System.out.println("shorterOneModel: [" + shorterOneModel + "] vs [" + model + "]");
             if (shorterOneModel.equals(model)) {
@@ -506,7 +516,7 @@ public class ResultsTablePanel extends JComponent {
 
     protected AbstractButton getRemoveSelectedRowsButton() {
         if (removeSelectedRowsButton == null) {
-            removeSelectedRowsButton = new JButton("Remove Selected Rows");
+            removeSelectedRowsButton = new JButton("Remove Selected");
             removeSelectedRowsButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     ((ResultsTableModel) resultsTableModel).removeSelectedRows(resultsTable.getSelectedRows());
@@ -518,7 +528,7 @@ public class ResultsTablePanel extends JComponent {
     
     protected AbstractButton getRemoveBelowThresholdButton() {
         if(removeBelowThresholdButton == null) {
-            removeBelowThresholdButton = new JButton("Remove Rows > -10log(P-value)");
+            removeBelowThresholdButton = new JButton("Remove < Thresh");
             removeBelowThresholdButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     try {
@@ -540,7 +550,7 @@ public class ResultsTablePanel extends JComponent {
 
     protected AbstractButton getKeepSelectedRowsButton() {
         if (keepSelectedRowsButton == null) {
-            keepSelectedRowsButton = new JButton("Keep Selected Rows");
+            keepSelectedRowsButton = new JButton("Keep Selected");
             keepSelectedRowsButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     ((ResultsTableModel) resultsTableModel).keepSelectedRows(resultsTable.getSelectedRows());
@@ -568,6 +578,15 @@ public class ResultsTablePanel extends JComponent {
             resultsTable.getColumnModel().getColumn(ResultsTableModel.MODEL_COL).setMaxWidth(550);
             resultsTable.getColumnModel().getColumn(ResultsTableModel.MODEL_COL).setCellRenderer(new MyRenderer());        
 
+            resultsTable.getColumnModel().getColumn(ResultsTableModel.SNP_GENE_COL).setMaxWidth(70);
+            resultsTable.getColumnModel().getColumn(ResultsTableModel.SNP_GENE_COL).setCellRenderer(new MyRenderer());        
+
+            resultsTable.getColumnModel().getColumn(ResultsTableModel.REGULOME_COL).setMaxWidth(70);
+            resultsTable.getColumnModel().getColumn(ResultsTableModel.REGULOME_COL).setCellRenderer(new MyRenderer());        
+
+            resultsTable.getColumnModel().getColumn(ResultsTableModel.INTRON_EXON_COL).setMaxWidth(30);
+            resultsTable.getColumnModel().getColumn(ResultsTableModel.INTRON_EXON_COL).setCellRenderer(new MyRenderer());        
+
             resultsTable.getColumnModel().getColumn(ResultsTableModel.CHR_COL).setMaxWidth(30);
             resultsTable.getColumnModel().getColumn(ResultsTableModel.CHR_COL).setCellRenderer(new MyRenderer());        
 
@@ -578,6 +597,7 @@ public class ResultsTablePanel extends JComponent {
             resultsTable.getColumnModel().getColumn(ResultsTableModel.LOC_COL).setMinWidth(70);
             resultsTable.getColumnModel().getColumn(ResultsTableModel.LOC_COL).setMaxWidth(100);
             //resultsTable.getColumnModel().getColumn(ResultsTableModel.PVAL_COL).setPreferredWidth(45);
+            
             resultsTable.getColumnModel().getColumn(ResultsTableModel.PVAL_COL).setMinWidth(70);
            resultsTable.getColumnModel().getColumn(ResultsTableModel.PVAL_COL).setMaxWidth(120);
 

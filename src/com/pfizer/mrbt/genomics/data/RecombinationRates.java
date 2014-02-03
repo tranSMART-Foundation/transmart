@@ -4,7 +4,7 @@
  */
 package com.pfizer.mrbt.genomics.data;
 
-import com.pfizer.mrbt.genomics.bioservices.RecombinationRateService;
+//import com.pfizer.mrbt.genomics.bioservices.RecombinationRateService;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -75,11 +75,12 @@ public class RecombinationRates {
         }
     }
     
+    /* pvh removed 12/6/2013
     public void fetchRecombinationRates(String gene, int radius, int geneSourceId) {
         RecombinationRateService recombinationRateService = new RecombinationRateService();
         snpRecombRates = recombinationRateService.fetchRecombinationRateData(gene, radius, geneSourceId);
         maxRecombinationRate = recombinationRateService.getMaxRecombinationRate();
-    }
+    }*/
     
     /**
      * Returns the sorted list of snp-recombRates

@@ -2,6 +2,7 @@ package com.pfizer.mrbt.genomics.TransmartClient;
 
 import com.pfizer.mrbt.genomics.Singleton;
 import com.pfizer.mrbt.genomics.state.State;
+import com.pfizer.mrbt.genomics.webservices.Environment;
 import java.util.Map;
 
 /*
@@ -58,19 +59,47 @@ public class TransmartServicesParameters {
     public final static int GENE_SOURCE_FETCH_DATE_COL = 3;
     public final static int GENE_SOURCE_FETCH_UML_COL  = 4;
 
-    public final static String SNP_SEARCH_METHOD = "resultDataForFilteredByModelIdGeneAndRangeRev";
-    public final static int SNP_SEARCH_SERVICE_ID = 779;
+    public final static String GENE_SEARCH_METHOD = "resultDataForFilteredByModelIdGeneAndRangeRev";
+    public final static int GENE_SEARCH_SERVICE_ID = 779;
+    public final static int GENE_SEARCH_RSID_COL = 0;
+    public final static int GENE_SEARCH_RESULT_ID_COL = 1;
+    public final static int GENE_SEARCH_MODEL_COL = 2;
+    public final static int GENE_SEARCH_PVAL_COL = 3;
+    public final static int GENE_SEARCH_LOG_PVAL_COL = 4;
+    public final static int GENE_SEARCH_STUDY_COL=  5;
+    public final static int GENE_SEARCH_STUDY_SET_MODEL_NAME_COL = 6;
+    public final static int GENE_SEARCH_SET_COL = 6;
+    public final static int GENE_SEARCH_DATA_TYPE_COL = 7;
+    public final static int GENE_SEARCH_START_COL = 8;
+    public final static int GENE_SEARCH_CHROMOSOME_COL = 9;
+    public final static int GENE_SEARCH_SNP_GENE_COL = 10; // gene associated with SNP
+    public final static int GENE_SEARCH_INTRON_COL = 11;
+    public final static int GENE_SEARCH_RECOMBINATION_RATE_COL = 12;
+    public final static int GENE_SEARCH_REGULOME_COL = 13;
+    public final static int GENE_SEARCH_NUM_FIELDS = 14;
+    
+    public final static String SNP_SEARCH_METHOD = "snpSearch";
     public final static int SNP_SEARCH_RSID_COL = 0;
-    public final static int SNP_SEARCH_RESULT_ID_COL = 1;
-    public final static int SNP_SEARCH_MODEL_COL = 2;
-    public final static int SNP_SEARCH_PVAL_COL = 3;
-    public final static int SNP_SEARCH_LOG_PVAL_COL = 4;
-    public final static int SNP_SEARCH_STUDY_COL = 5;
-    public final static int SNP_SEARCH_STUDY_SET_MODEL_NAME_COL = 6;
-    public final static int SNP_SEARCH_SET_COL = 6;
-    public final static int SNP_SEARCH_DATA_TYPE_COL = 7;
-    public final static int SNP_SEARCH_START_COL = 8;
-    public final static int SNP_SEARCH_CHROMOSOME_COL = 9;
+    public final static int SNP_SEARCH_CHROMOSOME_COL = 1;
+    //public final static int GENE_SEARCH_RESULT_ID_COL = 1;
+    //public final static int GENE_SEARCH_MODEL_COL = 2;
+    //public final static int GENE_SEARCH_PVAL_COL = 3;
+    public final static int SNP_SEARCH_POSITION_COL = 2;
+    public final static int SNP_SEARCH_LOG_PVAL_COL = 3;
+    //public final static int GENE_SEARCH_STUDY_COL=  5;
+    public final static int SNP_SEARCH_STUDY_SET_MODEL_NAME_COL = 4;
+    public final static int SNP_SEARCH_SNP_GENE_COL = 5; // gene associated with SNP
+    public final static int SNP_SEARCH_INTRON_COL = 6;
+    public final static int SNP_SEARCH_RECOMBINATION_RATE_COL = 7;
+    public final static int SNP_SEARCH_REGULOME_COL = 8;
+    public final static int SNP_SEARCH_NUM_FIELDS = 9;
+    //public final static int SNP_SEARCH_STUDY_SET_MODEL_NAME_COL = 7;
+    //public final static int SNP_SEARCH_STUDY_SET_MODEL_NAME_COL = 8;
+    //public final static int GENE_SEARCH_SET_COL = 6;
+    //public final static int GENE_SEARCH_DATA_TYPE_COL = 7;
+    //public final static int GENE_SEARCH_INTRON_COL = 10;
+    //public final static int GENE_SEARCH_RECOMBINATION_RATE_COL = 11;
+    //public final static int GENE_SEARCH_REGULOME_COL = 12;
     
     public final static int OLD_SNP_SEARCH_SERVICE_ID = 744;
     public final static int OLD_SNP_SEARCH_STUDY_COL = 0;
@@ -95,14 +124,24 @@ public class TransmartServicesParameters {
     //public final static int GENE_ANNOTATION_ENSEMBL_ID = 8;
     public final static int GENE_ANNOTATION_ENTREZGENE_ID_COL = 9;
     
-    public final static int RECOMBINATION_RATE_SERVICE_ID = 769;
-    public final static int RECOMBINATION_RATE_POSITION_COL = 0;
-    public final static int RECOMBINATION_RATE_COL = 1;
+    //public final static int RECOMBINATION_RATE_SERVICE_ID = 769;
+    //public final static int RECOMBINATION_RATE_POSITION_COL = 0;
+    //public final static int RECOMBINATION_GENE_RATE_COL = 1;
 
     public final static String GENE_LOCATION_METHOD    = "computeGeneBounds";
     public final static int GENE_LOCATION_START_COL      = 0;
     public final static int GENE_LOCATION_STOP_COL       = 1;
     public final static int GENE_LOCATION_CHROMOSOME_COL = 2;
+
+    public final static String RECOMBINATION_RATE_GENE_METHOD    = "getRecombinationRatesForGene";
+    public final static int RECOMBINATION_GENE_POSITION_COL      = 0;
+    public final static int RECOMBINATION_GENE_RATE_COL          = 1;
+
+    public final static String RECOMBINATION_RATE_SNP_METHOD    = "recombinationRateBySnp";
+    public final static int RECOMBINATION_SNP_CHROMOSOME_COL    = 0;
+    public final static int RECOMBINATION_SNP_POSITION_COL      = 1;
+    public final static int RECOMBINATION_SNP_RATE_COL          = 2;
+    public final static int RECOMBINATION_SNP_MAP_COL           = 3;
 
     
     /**
@@ -131,18 +170,19 @@ public class TransmartServicesParameters {
     }
     
     /**
-     * Returns the SERVER_URL that will either be the dev or the production
-     * based on the State.getDataMode() that will have the value of either
-     * State.TRANSMART_SERVICES_MODE or State.TRANSMART_DEV_SERVICES_MODE.
+     * Returns the server URL that will either be the dev or the production
+     * based on the passed environment variable
+     * @param Environment environment
      * @return 
      */
-    public static String getServerURL() {
-        if(Singleton.getState().getDataMode() == State.TRANSMART_SERVICES_MODE) {
-            //System.out.println("ServerURL: " + STAGE_URL);
-            return STAGE_URL;
-        } else {
-            //System.out.println("ServerURL: " + DEV_URL);
-            return DEV_URL;
+    public static String getServerURL(Environment environment) {
+        switch(environment) {
+            case STAGE:
+                return STAGE_URL;
+            case DEV:
+                return DEV_URL;
+            default:
+                return "Unknown server URL for " + environment.getDisplayStr();
         }
     }
 }

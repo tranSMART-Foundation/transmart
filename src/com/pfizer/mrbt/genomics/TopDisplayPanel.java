@@ -37,6 +37,11 @@ public class TopDisplayPanel extends JComponent {
     private JTextField rsIdField;
     private JTextField snpLocationField;
     private JTextField pValueField;
+    
+    private JTextField snpGeneField;
+    private JTextField regulomeField;
+    private JTextField intronExonField;
+    
     private View view;
     private DecimalFormat myFormatter = new DecimalFormat("##.##");
     private String decimalFormat = "###.###";
@@ -51,46 +56,72 @@ public class TopDisplayPanel extends JComponent {
         gbc.gridx = 10;
         gbc.gridy = 10;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5,5,5,5);
+        gbc.gridheight = 20;
         add(getLeftButton(), gbc);
 
         gbc.gridx = 20;
-        gbc.insets = new Insets(5, 0, 5, 0);
         gbc.weightx = 0.0;
-        add(new JLabel("Model:"), gbc);
-
+        gbc.gridheight = 1;
+        gbc.insets = new Insets(0,3,0,3);
+        add(new JLabel("Model"), gbc);
+        
         gbc.gridx = 30;
-        gbc.weightx = 1.0;
+        add(new JLabel("RsID"), gbc);
+        
+        gbc.gridx = 40;
+        add(new JLabel("SNP Location"), gbc);
+        
+        gbc.gridx = 50;
+        add(new JLabel("In/Exon"), gbc);
+        
+        gbc.gridx = 60;
+        add(new JLabel("Regulome"), gbc);
+        
+        gbc.gridx = 70;
+        add(new JLabel("Gene"), gbc);
+
+        gbc.gridx = 80;
+        gbc.weightx = 0.3;
+        add(new JLabel("-log p-Val"), gbc);
+
+        
+        gbc.gridy = 20;
+        gbc.gridx = 20;
+        gbc.weightx = 2.0;
         add(getModelValueField(), gbc);
 
-        gbc.gridx = 33;
-        gbc.weightx = 0.0;
-        add(new JLabel("RsId:"), gbc);
-
-        gbc.gridx = 35;
-        gbc.weightx = 1.0;
+        gbc.gridx = 30;
+        gbc.weightx = 0.2;
         add(getRsIdField(), gbc);
 
         gbc.gridx = 40;
         gbc.weightx = 0.0;
-        add(new JLabel("SNP Loc:"), gbc);
+        add(getSNPLocationField(), gbc);
 
         gbc.gridx = 50;
-        gbc.weightx = 1.0;
-        add(getSNPLocationField(), gbc);
+        gbc.weightx = 0.0;
+        add(getIntronExonField(), gbc);
 
         gbc.gridx = 60;
         gbc.weightx = 0.0;
-        add(new JLabel("-log P-Value:"), gbc);
+        add(getRegulomeField(), gbc);
 
         gbc.gridx = 70;
-        gbc.weightx = 1.0;
-        add(getPValueField(), gbc);
+        gbc.weightx = 0.5;
+        add(getSnpGeneField(), gbc);
 
         gbc.gridx = 80;
-        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.weightx = 0.0;
+        add(getPValueField(), gbc);
+
+        gbc.gridy = 10;
+        gbc.gridx = 100;
+        gbc.weightx = 0.0;
+        gbc.insets = new Insets(5,5,5,5);
+        gbc.gridheight = 20;
         add(getRightButton(), gbc);
+
 
         setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
@@ -191,7 +222,7 @@ public class TopDisplayPanel extends JComponent {
      */
     protected JTextField getSNPLocationField() {
         if( snpLocationField == null) {
-            snpLocationField = new JTextField(13);
+            snpLocationField = new JTextField(9);
             snpLocationField.setText("");
             snpLocationField.setBackground(Color.WHITE);
             snpLocationField.setHorizontalAlignment(JTextField.CENTER);
@@ -206,13 +237,61 @@ public class TopDisplayPanel extends JComponent {
      */
     protected JTextField getPValueField() {
         if( pValueField == null) {
-            pValueField = new JTextField(5);
+            pValueField = new JTextField(1);
             pValueField.setText("");
             pValueField.setBackground(Color.WHITE);
             pValueField.setHorizontalAlignment(JTextField.CENTER);
             pValueField.setEditable(false);
         }
         return pValueField;
+    }
+    
+
+    /**
+     * Defines the intron/exon field
+     * @return 
+     */
+    protected JTextField getIntronExonField() {
+        if( intronExonField == null) {
+            intronExonField = new JTextField(3);
+            intronExonField.setText("");
+            intronExonField.setBackground(Color.WHITE);
+            intronExonField.setHorizontalAlignment(JTextField.CENTER);
+            intronExonField.setEditable(false);
+        }
+        return intronExonField;
+    }
+    
+
+    /**
+     * Defines the y-axis -logPvalue
+     * @return 
+     */
+    protected JTextField getRegulomeField() {
+        if( regulomeField == null) {
+            regulomeField = new JTextField(4);
+            regulomeField.setText("");
+            regulomeField.setBackground(Color.WHITE);
+            regulomeField.setHorizontalAlignment(JTextField.CENTER);
+            regulomeField.setEditable(false);
+        }
+        return regulomeField;
+    }
+    
+
+    /**
+     * Defines the y-axis -logPvalue
+     * @return 
+     */
+    protected JTextField getSnpGeneField() {
+        if( snpGeneField == null) {
+            snpGeneField = new JTextField(11);
+            snpGeneField.setText("");
+            snpGeneField.setBackground(Color.WHITE);
+            snpGeneField.setHorizontalAlignment(JTextField.CENTER);
+            snpGeneField.setEditable(false);
+        }
+        return snpGeneField;
     }
     
 
@@ -226,6 +305,9 @@ public class TopDisplayPanel extends JComponent {
                 snpLocationField.setText("--");
                 pValueField.setText("--");
                 rsIdField.setText("--");
+                intronExonField.setText("--");
+                regulomeField.setText("--");
+                snpGeneField.setText("--");
             } else {
                 //System.out.println("currentChanged: " + currentEntry);
                 SNP snp             = currentEntry.getSnp();
@@ -238,7 +320,10 @@ public class TopDisplayPanel extends JComponent {
                 snpLocationField.setText(formatter.format(snp.getLoc()));
                 String outputStr = myFormatter.format(negLogPValue);
                 pValueField.setText(outputStr);
-                rsIdField.setText(snp.getRsId() + "");
+                rsIdField.setText("rs" + snp.getRsId());
+                intronExonField.setText(snp.getIntronExon().toString());
+                regulomeField.setText(snp.getRegulome());
+                snpGeneField.setText(snp.getAssociatedGene());
             }
         }
         @Override

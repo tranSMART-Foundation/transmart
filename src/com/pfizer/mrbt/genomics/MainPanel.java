@@ -63,6 +63,7 @@ public class MainPanel extends JComponent {
             tabbedPanel.addTab("Query", null, getQueryPanel(), "Provides queries into the database");
             tabbedPanel.addTab("Results", null, getDisplayPlotControlPanel(), "Shows the Manhattan Plot results");
             tabbedPanel.addTab("Table", null, getResultsTablePanel(), "Shows all the loaded results");
+            tabbedPanel.setFocusable(false); // removes box around the names
             tabbedPanel.setSelectedIndex(0);
             tabbedPanel.setForegroundAt(tabbedPanel.getSelectedIndex(), Color.RED);
             tabbedPanel.setBackgroundAt(tabbedPanel.getSelectedIndex(), Color.WHITE);

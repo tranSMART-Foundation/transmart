@@ -4,6 +4,7 @@ import com.pfizer.mrbt.genomics.userpref.UserPreferences;
 import com.pfizer.mrbt.genomics.data.DataModel;
 import com.pfizer.mrbt.genomics.modelselection.ModelSelectionPanel;
 import com.pfizer.mrbt.genomics.state.State;
+import javax.swing.JFrame;
 
 /*
  * To change this template, choose Tools | Templates
@@ -20,6 +21,8 @@ public class Singleton {
     private static UserPreferences userPref;
     private static MainPanel mainPanel;
     private static ModelSelectionPanel modelSelectionPanel;
+    private static JFrame geneModelFrame;
+    private static JFrame mainFrame;
     
     public static State getState() {
         if(state == null) {
@@ -65,6 +68,20 @@ public class Singleton {
             modelSelectionPanel = new ModelSelectionPanel();
         }
         return modelSelectionPanel;
+    }
+    
+    public static JFrame getGeneModelFrame() {
+        if(geneModelFrame == null) {
+            geneModelFrame = new JFrame();
+        }
+        return geneModelFrame;
+    }
+    
+    public static JFrame getMainFrame() {
+        if(mainFrame == null) {
+            mainFrame = new JFrame();
+        }
+        return mainFrame;
     }
     
 }

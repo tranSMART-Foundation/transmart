@@ -5,21 +5,21 @@
 package com.pfizer.mrbt.genomics.query;
 
 import com.pfizer.mrbt.genomics.Singleton;
-import com.pfizer.mrbt.genomics.TransmartClient.TransmartDataLoaderWithThreads;
-import com.pfizer.mrbt.genomics.TransmartClient.TransmartQueryParameterFetch;
-import com.pfizer.mrbt.genomics.bioservices.DataLoaderWithThreads;
-import com.pfizer.mrbt.genomics.bioservices.DbSnpSourceOption;
-import com.pfizer.mrbt.genomics.bioservices.GeneSourceOption;
-import com.pfizer.mrbt.genomics.bioservices.ModelOption;
-import com.pfizer.mrbt.genomics.bioservices.QueryParameterFetch;
-import com.pfizer.mrbt.genomics.bioservices.SNPDataFetchByGene;
-import com.pfizer.mrbt.genomics.state.State;
+import com.pfizer.mrbt.genomics.state.History;
+//import com.pfizer.mrbt.genomics.TransmartClient.TransmartDataLoaderWithThreads;
+//import com.pfizer.mrbt.genomics.bioservices.DataLoaderWithThreads;
+import com.pfizer.mrbt.genomics.webservices.DbSnpSourceOption;
+import com.pfizer.mrbt.genomics.webservices.GeneSourceOption;
+import com.pfizer.mrbt.genomics.webservices.ModelOption;
+import com.pfizer.mrbt.genomics.webservices.RetrievalException;
 import java.awt.Color;
-import java.awt.Dimension;
+//import com.pfizer.mrbt.genomics.bioservices.SNPDataFetchByGene;
+//import com.pfizer.mrbt.genomics.state.State;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -28,8 +28,6 @@ import java.util.Collection;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
 /**
@@ -38,18 +36,19 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class QueryPanel extends JComponent {
 
-    private JTextArea entrezIdTextArea;
+    private JTextArea geneSnpTextArea;
 
     private AbstractButton retrieveButton;
     private Collection availableModelsList;
     private Collection selectedModelsList;
-    private DefaultListModel entrezIdListModel = new DefaultListModel();
+    private DefaultListModel geneSnpQueryListModel = new DefaultListModel();
     private PingPongBufferPane modelPanel;
     private JComponent geneSearchPanel;
-    private JTabbedPane middlePanel;
+    private JComponent newGeneSearchPanel;
     private JComponent searchHistoryPanel;
     private JComponent historyButtonPanel;
     private JComponent buttonPanel;
+    private JPanel queryPanel;
     
     private JComponent filePanel;
     private JTextField fileNameField;
@@ -61,74 +60,118 @@ public class QueryPanel extends JComponent {
     private AbstractButton clearHistoryButton;
     private AbstractButton updateHistoryButton;
     
+    public final static int GENE_SEARCH_TAB = 0;
+    public final static int SEARCH_HISTORY_TAB = 1;
+    
     private JComboBox snpAnnotationComboBox;
     private JComboBox geneAnnotationComboBox;
-    private JList entrezIdList;
+    private JList geneSnpQueryIdList;
     private JTextField basePairRadiusField;
     private List<ModelOption> modelOptions = new ArrayList<ModelOption>();
-    private List<DbSnpSourceOption> dbSnpOptions = new ArrayList<DbSnpSourceOption>();
-    private List<GeneSourceOption> geneSourceOptions = new ArrayList<GeneSourceOption>();
     private JTable historyTable;
+    
+    public final static boolean VERBOSE = false;
     
     public QueryPanel() {
         super();
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         gbc.gridx = 10;
         gbc.gridy = 10;
-        gbc.insets = new Insets(10, 10, 2, 10);
-        //gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.weightx = 1.0;
-        add(getModelPanel(), gbc);
-        //getModelPanel();
-
-        gbc.gridy = 20;
-        gbc.weighty = 0.2;
-        add(getMiddlePanel(), gbc);
-        //getMiddlePanel();
-
-        gbc.gridy = 30;
-        //add(getFilePanel(), gbc);
-
-        gbc.insets = new Insets(2, 10, 2, 10);
-        gbc.weighty = 0.0;
+        add(getQueryPanel(), gbc);
+        
         gbc.gridy = 40;
-        add(getButtonPanel(), gbc);
+        gbc.weighty = 4.0;
+        add(getSearchHistoryPanel(), gbc);
+
+    }
+    
+    protected JPanel getQueryPanel() {
+        if (queryPanel == null) {
+            queryPanel = new JPanel();
+            queryPanel.setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.gridx = 10;
+            gbc.gridy = 10;
+            gbc.weighty = 1.0;
+            gbc.weightx = 0.50;
+            queryPanel.add(getModelPanel(), gbc);
+
+            gbc.gridy = 20;
+            gbc.weightx = 1.0;
+            gbc.weighty = 0.25;
+            //gbc.insets = new Insets(5, 10, 2, 5);
+            queryPanel.add(getGeneSearchPanel(), gbc);
+
+            //gbc.insets = new Insets(2, 10, 2, 10);
+            gbc.weighty = 0.0;
+            gbc.gridy = 30;
+            queryPanel.add(getButtonPanel(), gbc);
+            queryPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        }
+        return queryPanel;
     }
 
     protected PingPongBufferPane getModelPanel() {
+
         if (modelPanel == null) {
-            availableModelsList = getAvailableModelsList();
-            selectedModelsList = new ArrayList();
+            Object[] models;
+            try {
+                availableModelsList = getAvailableModelsList();
+                selectedModelsList = new ArrayList();
+
+                models = availableModelsList.toArray();
+            } catch (RetrievalException rex) {
+                showLoadInitializationFailure(rex);
+                System.exit(1);
+                models = new Object[0];
+            }
             String dialogName = "dialogName";
             String leftToRightStr = "Include";
             String rightToLeftStr = "Exclude";
-
-            Object[] models = availableModelsList.toArray();
-            /*for(int i = 2; i >= 0; i--) {
-                availableModelsList.add(models[i]);
-                selectedModelsList.add(models[i]);
-                availableModelsList.remove(models[i]);
-            }*/
-            modelPanel = new PingPongBufferPane(selectedModelsList, availableModelsList, dialogName, leftToRightStr, rightToLeftStr);
-            modelPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+            String leftToRightAllStr = "Include All";
+            String rightToLeftAllStr = "Exclude All";
+            modelPanel = new PingPongBufferPane(selectedModelsList, availableModelsList, dialogName, leftToRightStr, rightToLeftStr, leftToRightAllStr, rightToLeftAllStr);
+            //modelPanel.setBorder(BorderFactory.createLineBorder(Color.yellow));
         }
 
         return modelPanel;
     }
 
     /**
+     * Shows an error message and prints out the reason to stderr
+     * @param rex 
+     */
+    protected void showLoadInitializationFailure(RetrievalException rex) {
+        JOptionPane.showMessageDialog(
+            (JFrame) SwingUtilities.getWindowAncestor(QueryPanel.this),
+            rex.getMessage(),
+            "Initialization failed: " + rex.getRetrievalMethod().toString(),
+            JOptionPane.ERROR_MESSAGE);
+        System.err.println("Initialization failed");
+        System.err.println(rex.toString());
+    }
+
+
+    /**
      * If dataMode == DEMO_MODE then it fills and returns availableModelsList.
      * If dataMode == BIOSERVICES_MODE, it pulls the list from bioservices
      * and keeps the list in modelOptions list class vairable
+     * @throws RetrievalException if service fails to return result
      * @return 
      */
-    protected Collection getAvailableModelsList() {
+    protected Collection getAvailableModelsList() throws RetrievalException {
         if (availableModelsList == null) {
             availableModelsList = new ArrayList();
-            int dataMode = Singleton.getState().getDataMode();
+            modelOptions = Singleton.getDataModel().getWebServices().fetchModelOptions();
+            for(ModelOption modelOption : modelOptions) {
+                availableModelsList.add(modelOption.toString());
+            } 
+            /*int dataMode = Singleton.getState().getDataMode();
             if(dataMode == State.DEMO_MODE) {
                 availableModelsList.add("DGI/BROAD_LODL/Additive");
                 availableModelsList.add("DGI/Broad_Trig/Additive");
@@ -140,7 +183,9 @@ public class QueryPanel extends JComponent {
                 TransmartQueryParameterFetch tqpf = new TransmartQueryParameterFetch();
                 modelOptions = tqpf.fetchModelOptions();
                 for(ModelOption modelOption : modelOptions) {
-                    System.out.println("Loaded model option " + modelOption.toVerboseString());
+                    if(VERBOSE) {
+                        System.out.println("Loaded model option " + modelOption.toVerboseString());
+                    }
                     availableModelsList.add(modelOption.toString());
                 }
             } else if(dataMode == State.BIOSERVICES_MODE) {
@@ -149,40 +194,64 @@ public class QueryPanel extends JComponent {
                 for(ModelOption modelOption : modelOptions) {
                     availableModelsList.add(modelOption.toString());
                 }
-            }
+            }*/
         }
         return availableModelsList;
     }
 
-    protected JTabbedPane getMiddlePanel() {
-        if(middlePanel == null) {
-            middlePanel = new JTabbedPane();
-            Font currFont = middlePanel.getFont();
-            middlePanel.setFont(new Font(currFont.getName(), Font.BOLD, currFont.getSize()+4));
-            middlePanel.add("Gene Search", getGeneSearchPanel());
-            middlePanel.add("Search History", getSearchHistoryPanel());
-            middlePanel.setForegroundAt(middlePanel.getSelectedIndex(), Color.RED);
-            middlePanel.setBackgroundAt(middlePanel.getSelectedIndex(), Color.WHITE);
-            middlePanel.addChangeListener(new ChangeListener() {
+    /*protected JComponent getNewGeneSearchPanel() {
+        if(newGeneSearchPanel == null) {
+            newGeneSearchPanel = new JPanel();
+            Font currFont = newGeneSearchPanel.getFont();
+            newGeneSearchPanel.setFont(new Font(currFont.getName(), Font.BOLD, currFont.getSize()+4));
+            newGeneSearchPanel.add("Gene Search", getGeneSearchPanel());
+            newGeneSearchPanel.add("Search History", getSearchHistoryPanel());
+            newGeneSearchPanel.setForegroundAt(newGeneSearchPanel.getSelectedIndex(), Color.RED);
+            newGeneSearchPanel.setBackgroundAt(newGeneSearchPanel.getSelectedIndex(), Color.WHITE);
+            newGeneSearchPanel.addChangeListener(new ChangeListener() {
                 @Override
                public void stateChanged(ChangeEvent ce) {
-                   middlePanel.setForegroundAt(0, Color.BLACK);
-                   middlePanel.setForegroundAt(1, Color.BLACK);
-                   middlePanel.setBackgroundAt(0, Color.LIGHT_GRAY);
-                   middlePanel.setBackgroundAt(1, Color.LIGHT_GRAY);
-                   middlePanel.setForegroundAt(middlePanel.getSelectedIndex(), Color.RED);
-                   middlePanel.setBackgroundAt(middlePanel.getSelectedIndex(), Color.WHITE);
+                   newGeneSearchPanel.setForegroundAt(0, Color.BLACK);
+                   newGeneSearchPanel.setForegroundAt(1, Color.BLACK);
+                   newGeneSearchPanel.setBackgroundAt(0, Color.LIGHT_GRAY);
+                   newGeneSearchPanel.setBackgroundAt(1, Color.LIGHT_GRAY);
+                   newGeneSearchPanel.setForegroundAt(newGeneSearchPanel.getSelectedIndex(), Color.RED);
+                   newGeneSearchPanel.setBackgroundAt(newGeneSearchPanel.getSelectedIndex(), Color.WHITE);
                }
             });
         }
-        return middlePanel;
+        return newGeneSearchPanel;
     }
+
+    protected JComponent getOldGeneSearchPanel() {
+        if(newGeneSearchPanel == null) {
+            newGeneSearchPanel = new JPanel();
+            Font currFont = newGeneSearchPanel.getFont();
+            newGeneSearchPanel.setFont(new Font(currFont.getName(), Font.BOLD, currFont.getSize()+4));
+            newGeneSearchPanel.add("Gene Search", getGeneSearchPanel());
+            newGeneSearchPanel.add("Search History", getSearchHistoryPanel());
+            newGeneSearchPanel.setForegroundAt(newGeneSearchPanel.getSelectedIndex(), Color.RED);
+            newGeneSearchPanel.setBackgroundAt(newGeneSearchPanel.getSelectedIndex(), Color.WHITE);
+            newGeneSearchPanel.addChangeListener(new ChangeListener() {
+                @Override
+               public void stateChanged(ChangeEvent ce) {
+                   newGeneSearchPanel.setForegroundAt(0, Color.BLACK);
+                   newGeneSearchPanel.setForegroundAt(1, Color.BLACK);
+                   newGeneSearchPanel.setBackgroundAt(0, Color.LIGHT_GRAY);
+                   newGeneSearchPanel.setBackgroundAt(1, Color.LIGHT_GRAY);
+                   newGeneSearchPanel.setForegroundAt(newGeneSearchPanel.getSelectedIndex(), Color.RED);
+                   newGeneSearchPanel.setBackgroundAt(newGeneSearchPanel.getSelectedIndex(), Color.WHITE);
+               }
+            });
+        }
+        return newGeneSearchPanel;
+    }*/
 
     /**
      * Panel that contains the snp/gene annotation sources, gene requests, and radius
      * @return 
      */
-    protected JComponent getGeneSearchPanel() {
+    protected JComponent getOldRealGeneSearchPanel() {
         if (geneSearchPanel == null) {
             geneSearchPanel = new JPanel();
             geneSearchPanel.setLayout(new GridBagLayout());
@@ -201,14 +270,6 @@ public class QueryPanel extends JComponent {
             
             Font currFont = titleLabel.getFont();
             Font labelFont = new Font(currFont.getName(), Font.PLAIN, 13);
-            /*gbc.gridx = 10;
-            gbc.gridy = 20;
-            gbc.anchor = GridBagConstraints.NORTHEAST;
-            JLabel entrezLabel = new JLabel("Gene names:");
-            Font currFont = entrezLabel.getFont();
-            Font labelFont = new Font(currFont.getName(), Font.PLAIN, 13);
-            entrezLabel.setFont(labelFont);
-            geneSearchPanel.add(entrezLabel, gbc);*/
             
             gbc.gridx = 20;
             gbc.gridy = 20;
@@ -217,17 +278,16 @@ public class QueryPanel extends JComponent {
             gbc.anchor = GridBagConstraints.LINE_START;
             gbc.fill = GridBagConstraints.BOTH;
             gbc.insets = new Insets(2,0,0,30);
-            entrezIdTextArea = new JTextArea(11, 30);
-            entrezIdTextArea.setText("");
-            //entrezIdTextArea.setToolTipText("Type or copy a delimited list of gene names such as: TNF IL6");
-            entrezIdTextArea.setToolTipText("<html>Type or copy a delimited list of gene names such as: TNF IL6<br/>Genes with lower case (C10orf11) should be enclosed in double quotes</html>.");
+            geneSnpTextArea = new JTextArea(11, 30);
+            geneSnpTextArea.setText("");
+            geneSnpTextArea.setToolTipText("<html>Type or copy a delimited list of gene names such as: TNF IL6<br/>Genes with lower case (C10orf11) should be enclosed in double quotes</html>.");
             
-            gbc.weightx = 1.0;
+            gbc.weightx = 10.0;
             gbc.weighty = 1.0;
-            entrezIdTextArea.setText("A2M TNF il6");
-            entrezIdTextArea.setText("");
-            entrezIdTextArea.setWrapStyleWord(true);
-            geneSearchPanel.add(new JScrollPane(entrezIdTextArea), gbc);
+            geneSnpTextArea.setText("A2M TNF il6");
+            geneSnpTextArea.setText("");
+            geneSnpTextArea.setWrapStyleWord(true);
+            geneSearchPanel.add(new JScrollPane(geneSnpTextArea), gbc);
 
 
             
@@ -248,7 +308,7 @@ public class QueryPanel extends JComponent {
             gbc.gridx = 50;
             gbc.gridy = 20;
             gbc.anchor = GridBagConstraints.NORTHWEST;
-            geneSearchPanel.add(getSnpAnnotationComboBox(), gbc);
+            //geneSearchPanel.add(getSnpAnnotationComboBox(), gbc);
 
             gbc.gridx = 40;
             gbc.gridy = 30;
@@ -261,28 +321,106 @@ public class QueryPanel extends JComponent {
             gbc.gridx = 50;
             gbc.gridy = 30;
             gbc.anchor = GridBagConstraints.NORTHWEST;
-            geneSearchPanel.add(getGeneAnnotationComboBox(), gbc);
+            //geneSearchPanel.add(getGeneAnnotationComboBox(), gbc);
 
             gbc.gridx = 40;
             gbc.gridy = 40;
+            gbc.anchor = GridBagConstraints.EAST;
+            JLabel basePairRadiusLabel = new JLabel("<html><p align=right>Up-/Downstream<br/>(+/- base-pairs):</p></html>");
+            basePairRadiusLabel.setFont(labelFont);
+            geneSearchPanel.add(basePairRadiusLabel, gbc);
+
+            gbc.gridx = 50;
+            gbc.gridy = 40;
+            gbc.weightx = 1.0;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            geneSearchPanel.add(getBasePairRadiusField(), gbc);
+            
+            gbc.gridx = 40;
+            gbc.gridy = 50;
+            gbc.weighty = 0.0;
+            gbc.anchor = GridBagConstraints.LINE_START;
+            geneSearchPanel.add(getClearGenesButton(), gbc);
+
+
+            //geneSearchPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        }
+        return geneSearchPanel;
+    }
+    
+    /**
+     * Panel that contains the snp/gene annotation sources, gene requests, and radius
+     * @return 
+     */
+    protected JComponent getGeneSearchPanel() {
+        if (geneSearchPanel == null) {
+            geneSearchPanel = new JPanel();
+            geneSearchPanel.setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.gridx = 10;
+            gbc.gridy = 10;
+            JLabel titleLabel = new JLabel("Gene/SNP:");
+            titleLabel.setToolTipText("<html>Type or copy a delimited list of gene names such as: TNF IL6<br/>Genes with lower case (C10orf11) should be enclosed in double quotes.</html>");
+            Font currFont2 = titleLabel.getFont();
+            Font labelFont2 = new Font(currFont2.getName(), Font.BOLD, currFont2.getSize()+4);
+            titleLabel.setFont(labelFont2);
+            titleLabel.setHorizontalAlignment(JLabel.CENTER);
+            gbc.anchor = GridBagConstraints.CENTER;
+            geneSearchPanel.add(titleLabel, gbc);
+            
+            Font currFont = titleLabel.getFont();
+            Font labelFont = new Font(currFont.getName(), Font.PLAIN, 13);
+
+            gbc.gridx = 10;
+            gbc.gridy = 20;
+            gbc.weightx = 0.0;
+            gbc.weighty = 0.0;
+            gbc.anchor = GridBagConstraints.LINE_START;
+            geneSearchPanel.add(getClearGenesButton(), gbc);
+
+            // gene or snp search field
+            gbc.gridx = 20;
+            gbc.gridy = 10;
+            gbc.gridheight = 20;
+            gbc.anchor = GridBagConstraints.LINE_START;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.insets = new Insets(4,0,0,0);
+            geneSnpTextArea = new JTextArea(1, 25);
+            Font textAreaFont = geneSnpTextArea.getFont();
+            geneSnpTextArea.setFont(textAreaFont.deriveFont(12f));
+            geneSnpTextArea.setText("");
+            geneSnpTextArea.setToolTipText("<html>Type or copy a delimited list of gene names such as: TNF IL6<br/>Genes with lower case (C10orf11) should be enclosed in double quotes</html>.");
+            gbc.weightx = 1.0;
+            gbc.weighty = 0.0;
+            geneSnpTextArea.setWrapStyleWord(true);
+            geneSearchPanel.add(new JScrollPane(geneSnpTextArea), gbc);
+
+
+            gbc.insets = new Insets(5, 2, 5, 2);
+            gbc.gridx = 40;
+            gbc.gridy = 20;
+            gbc.gridheight = 1;
+            gbc.gridwidth = 1;            
+            gbc.weightx = 0.0;
+            gbc.weighty = 0.0;
+            gbc.anchor = GridBagConstraints.LINE_END;
+
+            gbc.gridx = 30;
+            gbc.gridy = 10;
             gbc.anchor = GridBagConstraints.EAST;
             JLabel basePairRadiusLabel = new JLabel("<html><p align=right>Up-/Downstream<br/>(+/- base-pairs):</p></html>");
             //basePairRadiusLabel.setHorizontalAlignment(JLabel.RIGHT);
             basePairRadiusLabel.setFont(labelFont);
             geneSearchPanel.add(basePairRadiusLabel, gbc);
 
-            gbc.gridx = 50;
-            gbc.gridy = 40;
+            gbc.gridx = 40;
+            gbc.gridy = 10;
             gbc.anchor = GridBagConstraints.NORTHWEST;
             geneSearchPanel.add(getBasePairRadiusField(), gbc);
             
-            gbc.gridx = 40;
-            gbc.gridy = 50;
-            gbc.anchor = GridBagConstraints.LINE_END;
-            geneSearchPanel.add(getClearGenesButton(), gbc);
 
-
-            geneSearchPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+            //geneSearchPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
         }
         return geneSearchPanel;
     }
@@ -316,7 +454,7 @@ public class QueryPanel extends JComponent {
             gbc.weightx = 0.0;
             gbc.weighty = 0.0;
             gbc.fill = GridBagConstraints.HORIZONTAL;
-            searchHistoryPanel.add(getHistoryButtonPanel(), gbc);
+            //searchHistoryPanel.add(getHistoryButtonPanel(), gbc);
         }
         return searchHistoryPanel;
     }
@@ -354,7 +492,19 @@ public class QueryPanel extends JComponent {
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 10;
             gbc.gridy = 10;
+            gbc.ipadx = 7;
             buttonPanel.add(getRetrieveButton(), gbc);
+            
+            gbc.gridx = 20;
+            gbc.gridy = 10;
+            gbc.insets = new Insets(0,50,0,0);
+            buttonPanel.add(getUpdateHistoryButton(), gbc);
+            
+            gbc.gridx = 30;
+            gbc.gridy = 10;
+            gbc.insets = new Insets(0,10,0,0);
+            buttonPanel.add(getClearHistoryButton(), gbc);
+            //buttonPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
         }
         return buttonPanel;
     }
@@ -448,70 +598,22 @@ public class QueryPanel extends JComponent {
         return saveByStudyModelCheckBox;
     }
 
-    protected JComboBox getSnpAnnotationComboBox() {
-        if (snpAnnotationComboBox == null) {
-            snpAnnotationComboBox = new JComboBox();
-            int dataMode = Singleton.getState().getDataMode();
-            if(dataMode == State.DEMO_MODE) {
-                snpAnnotationComboBox.addItem("dbSNP from UCSC Golden Path hg19 (snp135)");
-                snpAnnotationComboBox.addItem("dbSNP from UCSC Golden Path hg18 (snp130)");
-                snpAnnotationComboBox.addItem("dbSNP from UCSC Golden Path hg18 (snp129)");
-            } else if(dataMode == State.TRANSMART_SERVICES_MODE ||
-                      dataMode == State.TRANSMART_DEV_SERVICES_MODE) {
-                TransmartQueryParameterFetch tqpf = new TransmartQueryParameterFetch();
-                dbSnpOptions = tqpf.getDbSnpSources();
-                for(DbSnpSourceOption dbSnpOption : dbSnpOptions) {
-                    snpAnnotationComboBox.addItem(dbSnpOption.toString());
-                }
-            } else if(dataMode == State.BIOSERVICES_MODE) {
-                QueryParameterFetch qpf = new QueryParameterFetch();
-                dbSnpOptions = qpf.getDbSnpSources();
-                for(DbSnpSourceOption dbSnpOption : dbSnpOptions) {
-                    snpAnnotationComboBox.addItem(dbSnpOption.toString());
-                }
-            }
-        }
-        return snpAnnotationComboBox;
-    }
-
-    protected JComboBox getGeneAnnotationComboBox() {
-        if (geneAnnotationComboBox == null) {
-            geneAnnotationComboBox = new JComboBox();
-            int dataMode = Singleton.getState().getDataMode();
-            if(dataMode == State.DEMO_MODE) {
-                geneAnnotationComboBox.addItem("Human Gene data from NCBI (GRCh37) (2012-03)");
-            } else if(dataMode == State.TRANSMART_SERVICES_MODE ||
-                      dataMode == State.TRANSMART_DEV_SERVICES_MODE) {
-                TransmartQueryParameterFetch tqpf = new TransmartQueryParameterFetch();
-                geneSourceOptions = tqpf.getGeneSources();
-                for(GeneSourceOption geneSourceOption : geneSourceOptions) {
-                    geneAnnotationComboBox.addItem(geneSourceOption.toString());
-                }
-            } else if(dataMode == State.BIOSERVICES_MODE) {
-                QueryParameterFetch qpf = new QueryParameterFetch();
-                geneSourceOptions = qpf.getGeneSources();
-                for(GeneSourceOption geneSourceOption : geneSourceOptions) {
-                    geneAnnotationComboBox.addItem(geneSourceOption.toString());
-                }
-            }
-        }
-        return geneAnnotationComboBox;
-    }
-
     protected JTextField getBasePairRadiusField() {
         if (basePairRadiusField == null) {
             basePairRadiusField = new JTextField(11);
+            Font currFont = basePairRadiusField.getFont();
+            basePairRadiusField.setFont(currFont.deriveFont(12f));
             int searchRadius = Singleton.getUserPreferences().getBasePairSearchRadius();
             basePairRadiusField.setText(searchRadius + "");
         }
         return basePairRadiusField;
     }
 
-    protected JList getEntrezIdList() {
-        if (entrezIdList == null) {
-            entrezIdList = new JList(entrezIdListModel);
+    protected JList getGeneSnpQueryIdList() {
+        if (geneSnpQueryIdList == null) {
+            geneSnpQueryIdList = new JList(geneSnpQueryListModel);
         }
-        return entrezIdList;
+        return geneSnpQueryIdList;
     }
 
     protected AbstractButton getRetrieveButton() {
@@ -519,15 +621,17 @@ public class QueryPanel extends JComponent {
             retrieveButton = new JButton("Retrieve Data");
             Font currFont = retrieveButton.getFont();
             retrieveButton.setFont(new Font(currFont.getName(), Font.BOLD, currFont.getSize()+4));
-            retrieveButton.setPreferredSize(new Dimension(150, 50));
+            retrieveButton.setBackground(new Color(176, 196, 222));
+            retrieveButton.setForeground(Color.RED);
+            //retrieveButton.setPreferredSize(new Dimension(150, 50));
             retrieveButton.addActionListener(new ActionListener() {
-
+                @Override
                 public void actionPerformed(ActionEvent ae) {
-                    SNPDataFetchByGene snpDataFetch = new SNPDataFetchByGene();
-                    DbSnpSourceOption selectedDbSnpOption = dbSnpOptions.get(snpAnnotationComboBox.getSelectedIndex());
-                    GeneSourceOption geneSourceOption = geneSourceOptions.get(geneAnnotationComboBox.getSelectedIndex());
+                    //SNPDataFetchByGene snpDataFetch = new SNPDataFetchByGene();  12/6/2013 removed pvh
+                    DbSnpSourceOption selectedDbSnpOption = getSelectedDbSnpOption();
+                    GeneSourceOption geneSourceOption = getSelectedGeneSourceOption();
                     List<ModelOption> selectedModels = getSelectedModelOptions();
-                    List<String> selectedGenes = parseGeneTextArea(entrezIdTextArea.getText().trim());
+                    List<String> selectedGenes = parseGeneTextArea(geneSnpTextArea.getText().trim());
                     int radius = 0;
                     try {
                         radius = Integer.parseInt(basePairRadiusField.getText());
@@ -553,29 +657,25 @@ public class QueryPanel extends JComponent {
                             "Include at least one study/set/model for the query.",
                             "Query error",
                             JOptionPane.ERROR_MESSAGE);
-                    } else if(Singleton.getState().getDataMode() == State.BIOSERVICES_MODE) {
-                        DataLoaderWithThreads dlwt = new DataLoaderWithThreads(selectedModels,
-                                selectedDbSnpOption, geneSourceOption,
-                                selectedGenes, radius);
-                        System.out.println("finished creating dataloader with threads");
-                        dlwt.fetchGeneData();
-                        middlePanel.setSelectedIndex(1);  /* show search history tab */
-                    } else if(Singleton.getState().getDataMode() == State.TRANSMART_SERVICES_MODE ||
-                              Singleton.getState().getDataMode() == State.TRANSMART_DEV_SERVICES_MODE) {
-                        TransmartDataLoaderWithThreads tdlwt = new TransmartDataLoaderWithThreads(selectedModels,
-                                selectedDbSnpOption, geneSourceOption,
-                                selectedGenes, radius);
-                        System.out.println("finished creating dataloader with threads");
-                        tdlwt.fetchGeneData();
-                        middlePanel.setSelectedIndex(1);  /* show search history tab */
+                    } else {
+                        Singleton.getDataModel().fetchModelSnpData(selectedModels, selectedDbSnpOption, geneSourceOption, selectedGenes, radius);
+                        //newGeneSearchPanel.setSelectedIndex(1);  /* show search history tab */
                     }
-                    //System.out.println("Finished fetchGeneData");
                 }
             });
 
         }
         return retrieveButton;
     }
+    
+    private DbSnpSourceOption getSelectedDbSnpOption() {
+        return this.getModelPanel().getSelectedDbSnpOption();
+    }
+    
+    private GeneSourceOption getSelectedGeneSourceOption() {
+        return this.getModelPanel().getSelectedGeneSourceOption();
+    }
+    
 
     /**
      * Takes the rightmost selection list of the modelPanel with the pingpong buffer
@@ -636,11 +736,11 @@ public class QueryPanel extends JComponent {
     
     protected AbstractButton getClearGenesButton() {
         if(clearGenesButton == null) {
-            clearGenesButton = new JButton("Clear Genes");
+            clearGenesButton = new JButton("Clear");
             clearGenesButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent ae) {
-                    entrezIdTextArea.setText("");
+                    geneSnpTextArea.setText("");
                 }
             });
         }
@@ -661,18 +761,62 @@ public class QueryPanel extends JComponent {
         return updateHistoryButton;
     }
     
+    /**
+     * Initializes History table as JTable and sets up the column justification
+     * and column widths
+     * @return 
+     */
     protected JTable getRetrievalHistoryTable() {
         if(historyTable==null) {
             historyTable      = new JTable(Singleton.getState().getHistoryTableModel());
             // center all the columns
+            DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+            leftRenderer.setHorizontalAlignment( JLabel.LEFT );
+            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+            centerRenderer.setHorizontalAlignment( JLabel.CENTER);
             for(int coli = 0; coli < historyTable.getColumnCount(); coli++) {
-                DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-                centerRenderer.setHorizontalAlignment( JLabel.CENTER);
-                historyTable.getColumnModel().getColumn(coli).setCellRenderer( centerRenderer);
+                if(coli == History.MODELS_COL) {
+                    historyTable.getColumnModel().getColumn(coli).setCellRenderer( leftRenderer );
+                } else {
+                    historyTable.getColumnModel().getColumn(coli).setCellRenderer( centerRenderer);
+                }
             }
+            historyTable.getColumnModel().getColumn(History.GENE_COL).setPreferredWidth(72);
+            historyTable.getColumnModel().getColumn(History.GENE_COL).setMaxWidth(72);
+            historyTable.getColumnModel().getColumn(History.GENE_COL).setMinWidth(50);
+            
+            historyTable.getColumnModel().getColumn(History.RANGE_COL).setPreferredWidth(60);
+            historyTable.getColumnModel().getColumn(History.RANGE_COL).setMaxWidth(70);
+            historyTable.getColumnModel().getColumn(History.RANGE_COL).setMinWidth(60);
+            
+            historyTable.getColumnModel().getColumn(History.NUM_SNP_COL).setPreferredWidth(82);
+            historyTable.getColumnModel().getColumn(History.NUM_SNP_COL).setMaxWidth(82);
+            historyTable.getColumnModel().getColumn(History.NUM_SNP_COL).setMinWidth(62);
+            
+            historyTable.getColumnModel().getColumn(History.SECONDS_COL).setPreferredWidth(62);
+            historyTable.getColumnModel().getColumn(History.SECONDS_COL).setPreferredWidth(62);
+            historyTable.getColumnModel().getColumn(History.SECONDS_COL).setMaxWidth(62);
+            
+            historyTable.getColumnModel().getColumn(History.STATUS_COL).setPreferredWidth(52);
+            historyTable.getColumnModel().getColumn(History.STATUS_COL).setMaxWidth(52);
+            historyTable.getColumnModel().getColumn(History.STATUS_COL).setMinWidth(52);
+            
+            historyTable.getColumnModel().getColumn(History.MODEL_COUNT_COL).setPreferredWidth(52);
+            historyTable.getColumnModel().getColumn(History.MODEL_COUNT_COL).setMaxWidth(52);
+            historyTable.getColumnModel().getColumn(History.MODEL_COUNT_COL).setMinWidth(52);
+            
+            historyTable.getColumnModel().getColumn(History.MODELS_COL).setPreferredWidth(500);
+            //historyTable.getColumnModel().getColumn(History.MODELS_COL).setMaxWidth(200);
+            historyTable.getColumnModel().getColumn(History.MODELS_COL).setMaxWidth(1000);
             historyTable.setPreferredScrollableViewportSize(historyTable.getPreferredSize());
-            //historyTable.setPreferredSize(new Dimension(200,200));
+
+            //historyTable.setPreferredSize(new Dimension(900,200));
+            //historyTable.setPreferredScrollableViewportSize(historyTable.getSize());
+            historyTable.setPreferredScrollableViewportSize(Toolkit.getDefaultToolkit().getScreenSize());
+            //historyTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+            historyTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         }
         return historyTable;
     }
+    
 }

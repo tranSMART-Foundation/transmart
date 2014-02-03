@@ -12,6 +12,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.*;
 import javax.swing.AbstractAction;
+import static javax.swing.Action.ACCELERATOR_KEY;
+import static javax.swing.Action.MNEMONIC_KEY;
+import static javax.swing.Action.SHORT_DESCRIPTION;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -32,6 +35,7 @@ public class MenuBar extends JMenuBar {
     private JMenu myHelpMenu;
     private JMenu captureMenu;
     private JMenu preferencesMenu;
+    private JMenu toolsMenu;
     protected AbstractAction fileLoadRawDataAction, fileSaveConfigAction, fileExitAction;
     protected AbstractAction fileLoadConfigAction, fileExportRawDataAction;
     protected AbstractAction fileOpenMultiPlateTableAction,
@@ -48,7 +52,7 @@ public class MenuBar extends JMenuBar {
     private AbstractAction foundSnpColorAction;
     private AbstractAction annotationColorAction, annotationTextColorAction;
     private AbstractAction currentAnnotationColorAction, selectedAnnotationColorAction;
-    private AbstractAction closestAnnotationColorAction, interiorAnnotationColorAction;
+    private AbstractAction closestAnnotationColorAction, interiorAnnotationColorAction, intronAnnotationColorAction;
     private AbstractAction recombinationColorAction;
     private AbstractAction thumbnailColorAction, thumbnailTextColorAction, thumbnailPointColorAction;
     private AbstractAction thumbnailSelectionBandColorAction, thumbnailSelectionColorAction;
@@ -62,6 +66,7 @@ public class MenuBar extends JMenuBar {
     private AbstractAction capturePlotAction;
     private AbstractAction savePlotAction;
     private AbstractAction captureAllAction;
+    private AbstractAction laptopSizeAction, largeScreenAction;
     public final static int BACKGROUND_COLOR = 1001;
     public final static int POINT_COLOR = 1002;
     public final static int SELECTION_COLOR = 1003;
@@ -78,6 +83,7 @@ public class MenuBar extends JMenuBar {
     public final static int SELECTED_ANNOTATION_COLOR = 1104;
     public final static int CLOSEST_ANNOTATION_COLOR = 1105;
     public final static int INTERIOR_ANNOTATION_COLOR = 1106;
+    public final static int INTRON_ANNOTATION_COLOR = 1107;
     public final static int THUMBNAIL_COLOR = 1201;
     public final static int THUMBNAIL_TEXT_COLOR = 1202;
     public final static int THUMBNAIL_POINT_COLOR = 1203;
@@ -99,6 +105,9 @@ public class MenuBar extends JMenuBar {
 
         preferencesMenu = getPreferencesMenu();
         add(preferencesMenu);
+
+        toolsMenu = getToolsMenu();
+        add(toolsMenu);
 
         myHelpMenu = getMyHelpMenu();
         add(myHelpMenu);
@@ -127,8 +136,8 @@ public class MenuBar extends JMenuBar {
             
             KeyStroke saveKey = KeyStroke.getKeyStroke(KeyEvent.VK_S,
                     Event.CTRL_MASK);
-            fileSaveAction = new FileSaveAction("Save Data", saveKey,
-                    new Integer(KeyEvent.VK_S),
+            fileSaveAction = new FileSaveAction("Save Data", saveKey, KeyEvent.VK_S,
+                    //new Integer(KeyEvent.VK_S),
                     "Exports the loaded data to a file");
             fileMenu.add(new JMenuItem(fileSaveAction));
 
@@ -136,7 +145,8 @@ public class MenuBar extends JMenuBar {
             KeyStroke exitKey = KeyStroke.getKeyStroke(KeyEvent.VK_X,
                     Event.CTRL_MASK);
             fileExitAction = new FileExitAction("Exit", exitKey,
-                    new Integer(KeyEvent.VK_X),
+                    //new Integer(KeyEvent.VK_X),
+                    KeyEvent.VK_X,
                     "Exit application");
             fileMenu.add(new JMenuItem(fileExitAction));
 
@@ -525,6 +535,26 @@ public class MenuBar extends JMenuBar {
         return captureMenu;
     }
 
+    private JMenu getToolsMenu() {
+        if (toolsMenu == null) {
+
+            toolsMenu = new JMenu("Tools");
+            toolsMenu.getAccessibleContext().setAccessibleDescription(
+                    "Miscellanous functions.");
+            laptopSizeAction = new LaptopSizeAction("Laptop size", null,
+                    -1,
+                    "Resizes the two main screens for laptop viewing");
+            toolsMenu.add(new JMenuItem(laptopSizeAction));
+
+            largeScreenAction = new LargeScreenAction("Large screen", null,
+                    -1,
+                    "Resizes the two main screens for a large montior");
+            toolsMenu.add(new JMenuItem(largeScreenAction));
+
+        }
+        return toolsMenu;
+    }
+
     /**
      *
      * <p>Title: HTS Analysis: UserGuideAction</p> <p>Description: </p>
@@ -550,7 +580,8 @@ public class MenuBar extends JMenuBar {
             super(menuName);
             putValue(SHORT_DESCRIPTION, toolTip);
             if (menuName.equals("Quick Start Guide")) {
-                putValue(MNEMONIC_KEY, new Integer(KeyEvent.VK_H));
+                //putValue(MNEMONIC_KEY, new Integer(KeyEvent.VK_H));
+                putValue(MNEMONIC_KEY, KeyEvent.VK_H);
                 putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_H,
                         InputEvent.CTRL_MASK));
             }
@@ -779,10 +810,15 @@ public class MenuBar extends JMenuBar {
             preferencesMenu.add(new JMenuItem(closestAnnotationColorAction));
 
 
-            interiorAnnotationColorAction = new PreferencesAction("Interior gene annotation Color", null,
+            interiorAnnotationColorAction = new PreferencesAction("Interior gene annotation color", null,
                     "Color of annotation when selected SNP is inside this gene",
                     INTERIOR_ANNOTATION_COLOR);
             preferencesMenu.add(new JMenuItem(interiorAnnotationColorAction));
+
+            /*intronAnnotationColorAction = new PreferencesAction("Intron SNP annotation color", null,
+                    "Color of annotation when selected SNP is an intron",
+                    INTRON_ANNOTATION_COLOR);
+            preferencesMenu.add(new JMenuItem(intronAnnotationColorAction));*/
 
 
             preferencesMenu.addSeparator();
@@ -931,6 +967,10 @@ public class MenuBar extends JMenuBar {
                     break;
                 case INTERIOR_ANNOTATION_COLOR:
                     putValue(SMALL_ICON, getColorIcon(Singleton.getUserPreferences().getInteriorAnnotationColor()));
+                    break;
+
+                case INTRON_ANNOTATION_COLOR:
+                    putValue(SMALL_ICON, getColorIcon(Singleton.getUserPreferences().getIntronAnnotationColor()));
                     break;
 
 
@@ -1127,6 +1167,16 @@ public class MenuBar extends JMenuBar {
                     }
                     interiorAnnotationColorAction.putValue(SMALL_ICON, getColorIcon(resultColor));
                     break;
+                case INTRON_ANNOTATION_COLOR:
+                    initialColor = Singleton.getUserPreferences().getIntronAnnotationColor();
+                    resultColor = requestColor(initialColor, prefName);
+                    if (resultColor != null) {
+                        Singleton.getUserPreferences().setIntronAnnotationColor(resultColor);
+                    } else {
+                        resultColor = Singleton.getUserPreferences().getIntronAnnotationColor();
+                    }
+                    intronAnnotationColorAction.putValue(SMALL_ICON, getColorIcon(resultColor));
+                    break;
                 case THUMBNAIL_COLOR:
                     initialColor = Singleton.getUserPreferences().getThumbnailColor();
                     resultColor = requestColor(initialColor, prefName);
@@ -1261,6 +1311,79 @@ public class MenuBar extends JMenuBar {
             ((MainPanel) MenuBar.this.mainPanel).capturePlotPanelToClipboard();
         }
     }
+    public class LaptopSizeAction extends AbstractAction {
+
+        /**
+         * Action item for the copying the bland altman plot to the clipboard.
+         *
+         * @param itemName String
+         * @param keystroke KeyStroke
+         * @param mneumonic Integer
+         * @param tooltip String
+         */
+        public LaptopSizeAction(String itemName, KeyStroke keystroke,
+                Integer mneumonic, String tooltip) {
+            super(itemName);
+            if (keystroke != null) {
+                putValue(ACCELERATOR_KEY, keystroke);
+            }
+            if (mneumonic != null) {
+                putValue(MNEMONIC_KEY, mneumonic);
+            }
+            if (tooltip != null) {
+                putValue(SHORT_DESCRIPTION, tooltip);
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Singleton.getMainPanel().setLocation(20,20);
+            Singleton.getMainPanel().setSize(new Dimension(800,500));
+            Singleton.getGeneModelFrame().setLocation(880,20);
+            Singleton.getGeneModelFrame().setSize(new Dimension(800,250));
+            
+            Singleton.getMainFrame().setLocation(30,17);
+            Singleton.getMainFrame().setSize(new Dimension(800,700));
+            Singleton.getGeneModelFrame().setLocation(830,17);
+            Singleton.getGeneModelFrame().setSize(new Dimension(200,700));
+
+        }
+    }
+
+
+    public class LargeScreenAction extends AbstractAction {
+
+        /**
+         * Action item for the copying the bland altman plot to the clipboard.
+         *
+         * @param itemName String
+         * @param keystroke KeyStroke
+         * @param mneumonic Integer
+         * @param tooltip String
+         */
+        public LargeScreenAction(String itemName, KeyStroke keystroke,
+                Integer mneumonic, String tooltip) {
+            super(itemName);
+            if (keystroke != null) {
+                putValue(ACCELERATOR_KEY, keystroke);
+            }
+            if (mneumonic != null) {
+                putValue(MNEMONIC_KEY, mneumonic);
+            }
+            if (tooltip != null) {
+                putValue(SHORT_DESCRIPTION, tooltip);
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Singleton.getMainFrame().setLocation(30,17);
+            Singleton.getMainFrame().setSize(new Dimension(1000,700));
+            Singleton.getGeneModelFrame().setLocation(1030,17);
+            Singleton.getGeneModelFrame().setSize(new Dimension(250,700));
+        }
+    }
+
 
     public class LeftMaxVerticalAxisAction extends AbstractAction {
 

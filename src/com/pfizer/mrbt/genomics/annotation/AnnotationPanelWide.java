@@ -11,7 +11,6 @@ import com.pfizer.mrbt.genomics.axisregion.AxisRegionYLeft;
 import com.pfizer.mrbt.genomics.state.View;
 import com.pfizer.mrbt.genomics.state.ViewListener;
 import com.pfizer.mrbt.genomics.state.StateListener;
-import com.pfizer.mrbt.genomics.data.DataModel;
 import com.pfizer.mrbt.genomics.data.DataPointEntry;
 import com.pfizer.mrbt.genomics.data.DataSet;
 import com.pfizer.mrbt.genomics.data.GeneAnnotation;
@@ -120,16 +119,8 @@ public class AnnotationPanelWide extends JComponent {
     }
 
     protected void render() {
-        //offscreenG2.setColor(Singleton.getUserPreferences().getAnnotationColor());
-        //offscreenG2.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
-         // draw top and bottom line
-        //offscreenG2.setColor(Singleton.getUserPreferences().getBorderColor());
-        //offscreenG2.drawRect(0, 0, bufferedImage.getWidth()-1, bufferedImage.getHeight()-1);*/
-
-        //computeBestFontSizes();
-        
         preferredWidth = Math.max(1, plotPanel.getWidth() - 24);
-        System.out.println("PlotPanelWidth " + plotPanel.getWidth() + "\t" + getWidth());
+        //System.out.println("PlotPanelWidth " + plotPanel.getWidth() + "\t" + getWidth());
         computeMaxHeight();
         preferredHeight = yLocSpacing * (maximumY+1);
     }
@@ -195,7 +186,7 @@ public class AnnotationPanelWide extends JComponent {
         snpRangeYList.clear();
         displayedAnnotations.clear();
         maximumY = 1; // avoid /0 errors
-        String maximumYgene = "";
+        //String maximumYgene = "";
         fontSize--; // start with MAX_FONT_SIZE
         int scrollerWidth = plotPanel.getAnnotationPanelWideScrollWidth();
         
@@ -213,23 +204,20 @@ public class AnnotationPanelWide extends JComponent {
                 /*if(geneEntry.getGene().equals("CLEC2D") || geneEntry.getGene().equals("CLECL1")) {
                     System.out.println("Gene " + geneEntry.getGene() + "\t[" + start + "\t" + end + "]\tImg[" + imageStartx + "\t" + textWidth + "\t" + rightLocation + "]");
                 }*/
-                int yLoc = computeYLoc(imageStartx, rightLocation);
+                //int yLoc = computeYLoc(imageStartx, rightLocation);
+                // Says it will not overlap the left or max of the right side of arrow or where a long text extends
+                int yLoc = computeYLoc(imageStartx, Math.max(imageEndx, rightLocation));
                 /*if(geneEntry.getGene().equals("CLEC2D") || geneEntry.getGene().equals("CLECL1")) {
                     System.out.println("Gene " + geneEntry.getGene() + "\t[" + start + "\t" + end + "]\tImg[" + imageStartx + "\t" + textWidth + "\t" + rightLocation + "] --> y=" + yLoc);
                 }*/
                 //System.out.println("\tGene " + geneEntry.getGene() + "\tStart " + imageStartx + "\trightLoc " + rightLocation + "\ttextWidth " + textWidth + "\tYloc=" + yLoc);
                 if(yLoc > maximumY) {
                     maximumY = yLoc;
-                    maximumYgene = geneEntry.getGene();
+                    //maximumYgene = geneEntry.getGene();
                 }
                 gene2yloc.put(geneEntry.getGene(), yLoc);
                 snpRangeYList.add(new SnpRangeY(imageStartx, imageEndx + textWidth + PADDING, yLoc));
             }
-      
-            /*textLineSpace = DEFAULT_TEXT_LINE_SPACE;
-            arrowHeight   = DEFAULT_ARROW_HEIGHT;
-            pixPerRow = Math.min(MAX_FONT_SIZE + DEFAULT_TEXT_LINE_SPACE + DEFAULT_ARROW_HEIGHT, pixPerRow);
-            fontSize = pixPerRow - 5;*/
         }
         yLocSpacing = MAX_FONT_SIZE + DEFAULT_TEXT_LINE_SPACE + DEFAULT_ARROW_HEIGHT;
         //System.out.println("fontSize " + fontSize + "\ttextLineSpace " + textLineSpace + "\tarrowHeight " + arrowHeight + "\tylocspacing " + yLocSpacing + "\tMaxHeight " + maximumY + "\t" + maximumYgene);
@@ -537,8 +525,8 @@ public class AnnotationPanelWide extends JComponent {
         FontRenderContext frc = g2.getFontRenderContext();
         Font font = new Font("Arial", Font.BOLD, fontSize);
         TextLayout tl = new TextLayout(str, font, frc);
-        int txtWidth = (int) Math.round(tl.getBounds().getWidth());
 
+        //int txtWidth = (int) Math.round(tl.getBounds().getWidth());
         //int y = yAxis.getRawPixelFromValue(Singleton.getState().getYmin(), this) + TICK_LENGTH + 1;
         //int y = yline + TICK_LENGTH + 2 + (int) Math.round(tl.getBounds().getHeight());
         //int y = (int) Math.round(getHeight() - state.getVScale() * state.getBottomPadding() + TICK_LENGTH + 1);
@@ -546,12 +534,12 @@ public class AnnotationPanelWide extends JComponent {
     }
 
 
-    /**
+    /*
      * Draws the position numbers of the ticks across the horizontal axis
      *
      * @param g2 Graphics2D
      * @param xCenter int
-     */
+     *
     protected void drawTitleInformation(Graphics2D g2) {
         //int xloc = leftDisplay + (rightDisplay - leftDisplay)*xCenter/getWidth();
         FontRenderContext frc = g2.getFontRenderContext();
@@ -566,7 +554,7 @@ public class AnnotationPanelWide extends JComponent {
             int y = getHeight() - 4;
             tl.draw(g2, x, y);
         }
-    }
+    }*/
     
     public View getView() {
         return view;

@@ -121,6 +121,8 @@ public class VerticalLabelUI extends BasicLabelUI {
    /**
     * Transforms the Graphics for vertical rendering and invokes the
     * super method.
+    * @param g
+    * @param c
     */
    @Override
    public void paint(Graphics g, JComponent c) {

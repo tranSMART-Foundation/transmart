@@ -55,7 +55,8 @@ public class ModelSelectionTableModel extends AbstractTableModel {
             int modelIndex = 0;
             for(Model model : dataSet.getModels()) {
                 geneNames.add(dataSet.getGeneRange().getName());
-                //modelNames.add(model.toResultsString());
+                ////modelNames.add(model.toResultsString());
+                //modelNames.add(model.toString());
                 modelNames.add(model.toString());
                 
                 ArrayList<SNP> snps = dataSet.getSnps();

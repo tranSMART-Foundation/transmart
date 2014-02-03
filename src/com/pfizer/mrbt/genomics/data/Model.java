@@ -1,6 +1,6 @@
 /*
- * Contains the information about a single study which is the study, type of
- * model, endpoint, and the modelID
+ * Contains the information about a single study which is the study, model of
+ * model, set, and the modelID
  */
 package com.pfizer.mrbt.genomics.data;
 
@@ -11,27 +11,27 @@ package com.pfizer.mrbt.genomics.data;
 public class Model {
     private static int numModels = 0;
     private String study;
-    private String type;
-    private String endpoint;
+    private String model;
+    private String set;
     private NumericRange yRange = null;
     private int id;
     
     
-    public Model(String study, String endpoint, String type) {
+    public Model(String study, String set, String model) {
         this.study = study;
-        this.type  = type;
-        this.endpoint  = endpoint;
+        this.model  = model;
+        this.set  = set;
         id = numModels;
         numModels++;
-        //System.out.println("Created new model " + endpoint + "\t" + id);
+        //System.out.println("Created new model " + set + "\t" + id);
     }
     
-    public String getEndpoint() {
-        return endpoint;
+    public String getSet() {
+        return set;
     }
 
-    public void setEndpoint(String data) {
-        this.endpoint = data;
+    public void setSet(String set) {
+        this.set = set;
     }
 
     public int getId() {
@@ -50,24 +50,33 @@ public class Model {
         this.study = study;
     }
 
-    public String getType() {
-        return type;
+    public String getModel() {
+        return model;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setModel(String model) {
+        this.model = model;
     }
     
     @Override
     public String toString() {
-        //return study + "/" + endpoint + "/" + type;
-        //return endpoint + " - " + study;
-        return study + " - " + endpoint;
+        //return study + "/" + set + "/" + model;
+        //return set + " - " + study;
+        return study + " - " + set;
     }
     
     /*public String toResultsString() {
-        return study + " - " + endpoint;
+        return study + " - " + set;
     }*/
+    
+    /**
+     * This is a kluge since the results table is not returning a unique set of
+     * values 1/8/2013 PVH.
+     * @return 
+     */
+    public String toResultsTableString() {
+        return study + " - " + model;
+    }
     
     public void setYRange(NumericRange yRange) {
         this.yRange = yRange;

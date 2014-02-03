@@ -11,7 +11,9 @@ package com.pfizer.mrbt.genomics.data;
 public class SNP implements Comparable {
     private int rsId;
     private int loc;
-    
+    private String associatedGene;
+    private IntronExon intronExon = IntronExon.OTHER;
+    private String regulome = "";
     public SNP() {
         
     }
@@ -35,6 +37,34 @@ public class SNP implements Comparable {
 
     public void setRsId(int rsId) {
         this.rsId = rsId;
+    }
+
+    public IntronExon getIntronExon() {
+        return intronExon;
+    }
+
+    public void setIntronExon(IntronExon intronExon) {
+        this.intronExon = intronExon;
+    }
+
+    public String getRegulome() {
+        return regulome;
+    }
+
+    public void setRegulome(String regulome) {
+        this.regulome = regulome;
+    }
+    
+    public String getAssociatedGene() {
+        if(associatedGene == null) {
+            return "";
+        } else {
+            return associatedGene;
+        }
+    }
+    
+    public void setAssociatedGene(String associatedGene) {
+        this.associatedGene = associatedGene;
     }
     
     @Override

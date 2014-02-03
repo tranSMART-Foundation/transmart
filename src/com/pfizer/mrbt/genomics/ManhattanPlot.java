@@ -72,9 +72,9 @@ public class ManhattanPlot extends JComponent {
             this.dataSet = view.getDataSet();
         } else {
             /* This populates the view, viewdata and dataset with some dummy empty data */
-            this.dataSet = DataSet.createDummyDataset();
+            /*this.dataSet = DataSet.createDummyDataset();
             ViewData viewData = new ViewData(dataSet);
-            view = new View(viewData);
+            view = new View(viewData);  pvh 12/6/2013 */
         }
         this.view = view;
 
@@ -107,7 +107,6 @@ public class ManhattanPlot extends JComponent {
     
     protected void render() {
         if(view != null) {
-        System.out.print("Render ");
         updateScales();
         offscreenG2.setColor(Singleton.getUserPreferences().getBackgroundColor());
         offscreenG2.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
@@ -161,6 +160,8 @@ public class ManhattanPlot extends JComponent {
 
         ArrayList<SNP> snps = dataSet.getSnps();
         int modelIndex = 0;
+        
+        DataPointEntry currDataPointEntry = Singleton.getState().getCurrenDataEntry();
         for (Model model : view.getModels()) {
             Color modelColor;
             if(view.getModels().size()==1) {
@@ -192,6 +193,14 @@ public class ManhattanPlot extends JComponent {
                     }
                     break;
                 case CONNECTING:
+                    boolean turnOffWideLine = false;
+                    Stroke prevStroke = null;
+                    // if connecting lines, it will highlight the line with the 'current' SNP
+                    if(currDataPointEntry != null && currDataPointEntry.getModel().equals(model)) {
+                        turnOffWideLine = true;
+                         prevStroke = offscreenG2.getStroke();
+                        offscreenG2.setStroke(new BasicStroke(3));
+                    }
                     ConnectingLines connectingLines = new ConnectingLines(dataSet, model, snps, xAxis, yAxis, bufferedImage);
                     ArrayList<XYPoint> xyPoints = connectingLines.computeConnectingLines();
                     XYPoint prevPoint = null;
@@ -200,6 +209,10 @@ public class ManhattanPlot extends JComponent {
                             offscreenG2.drawLine(prevPoint.getX(), prevPoint.getY(), point.getX(), point.getY());
                         }
                         prevPoint = point;
+                    }
+                    if(turnOffWideLine) {
+                        // changing strokes seems to take CPU so only do if necessary
+                        offscreenG2.setStroke(prevStroke);
                     }
                     break;
             }
@@ -442,7 +455,7 @@ public class ManhattanPlot extends JComponent {
             //g2.drawLine(0, yPixLoc, xPixLoc + CURR_LENGTH, yPixLoc);
         }
     }
-
+    
     protected void drawHorizontalLines(Graphics2D offscreenG2) {
         String gene = view.getDataSet().getGeneRange().getName();
         ArrayList<Model> models = view.getViewData().getModels();
@@ -646,6 +659,10 @@ public class ManhattanPlot extends JComponent {
             SNP closestSNP = null;
             double closestDist = Double.POSITIVE_INFINITY;
 
+            if(Singleton.getState().getSnpLineChoice() == SnpLineChoice.CONNECTING) {
+                render();
+                repaint();
+            }
 
             ArrayList<SNP> snps = dataSet.getSnps();
             ArrayList<Model> models = view.getModels();

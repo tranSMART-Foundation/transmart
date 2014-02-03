@@ -21,17 +21,17 @@ import javax.swing.JSplitPane;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 
-import com.pfizer.mrbt.genomics.annotation.AnnotationPanel;
+//import com.pfizer.mrbt.genomics.annotation.AnnotationPanel;
 import com.pfizer.mrbt.genomics.annotation.AnnotationPanelWide;
-import com.pfizer.mrbt.genomics.annotation.LeftAnnotationCorner;
-import com.pfizer.mrbt.genomics.annotation.RightAnnotationCorner;
+//import com.pfizer.mrbt.genomics.annotation.LeftAnnotationCorner;
+//import com.pfizer.mrbt.genomics.annotation.RightAnnotationCorner;
 import com.pfizer.mrbt.genomics.axisregion.AxisRegion;
 import com.pfizer.mrbt.genomics.axisregion.AxisRegionX;
 import com.pfizer.mrbt.genomics.axisregion.AxisRegionYLeft;
 import com.pfizer.mrbt.genomics.axisregion.AxisRegionYRight;
 import com.pfizer.mrbt.genomics.axisregion.LeftCornerSquare;
 import com.pfizer.mrbt.genomics.axisregion.RightCornerSquare;
-import com.pfizer.mrbt.genomics.data.DataSet;
+///import com.pfizer.mrbt.genomics.data.DataSet;
 import com.pfizer.mrbt.genomics.state.StateListener;
 import com.pfizer.mrbt.genomics.state.View;
 
@@ -42,31 +42,30 @@ import com.pfizer.mrbt.genomics.state.View;
 public class PlotPanel extends JSplitPane {
     //private View view;
 
-    private DataSet dataSet;
+    //private DataSet dataSet;
     private TopDisplayPanel displayPanel;
     private ManhattanPlot manhattanPlot;
-    private AnnotationPanel annotationPanel;
+    //private AnnotationPanel annotationPanel;
     private AnnotationPanelWide annotationPanelWide;
     private JComponent xAxisRegion;
     private JComponent yAxisRegion;
     private JComponent yAxisRegionRight;
     private JComponent leftCornerRegion;
     private JComponent rightCornerRegion;
-    private LeftAnnotationCorner leftAnnotationCorner;
-    private RightAnnotationCorner rightAnnotationCorner;
+    //private LeftAnnotationCorner leftAnnotationCorner;
+    //private RightAnnotationCorner rightAnnotationCorner;
     private JComponent topPane;
-    private JComponent bottomPane;
-    private JScrollPane lowerPaneScrollPane;
-    private JSplitPane lowerSplitPane;
+    //private JComponent bottomPane;
+    //private JScrollPane lowerPaneScrollPane;
     private JScrollPane annotationPanelWideScrollPane;
 
     public PlotPanel() {
         super(JSplitPane.VERTICAL_SPLIT);
         setTopComponent(getTopPane());
         
-        lowerPaneScrollPane = new JScrollPane(getBottomPane());
-        lowerPaneScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        lowerPaneScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        //lowerPaneScrollPane = new JScrollPane(getBottomPane());
+        //lowerPaneScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        //lowerPaneScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         annotationPanelWideScrollPane = new JScrollPane(getAnnotationPanelWide());
         annotationPanelWideScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -189,7 +188,7 @@ public class PlotPanel extends JSplitPane {
         return topPane;
     }
 
-    protected JComponent getBottomPane() {
+    /*protected JComponent getBottomPane() {
         if (bottomPane == null) {
             bottomPane = new JPanel();
             bottomPane.setLayout(new GridBagLayout());
@@ -214,92 +213,7 @@ public class PlotPanel extends JSplitPane {
             bottomPane.add(getRightAnnotationCorner(), gbc);
         }
         return bottomPane;
-    }
-
-    public void oldPlotPanel() {
-        //super();
-
-
-        /* removed block from startup
-         * dataSet = Singleton.getDataModel().getDataSet(dataSetName);
-         ViewData viewData = new ViewData(dataSet);
-         Singleton.getState().addViewData(viewData);
-         viewData.addModel(dataSet.getModel(0)); //todo get rid of the view using this model here
-         Singleton.getState().setMainView(viewData);
-         //view.addModel(dataSet.getModel(1)); //todo get rid of the view using this model here
-         */
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        gbc.gridx = 20;
-        gbc.gridy = 10;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        add(getManhattanPlot(), gbc);
-
-        gbc.gridx = 10;
-        gbc.gridy = 10;
-        gbc.weightx = 0.0;
-        gbc.weighty = 1.0;
-        add(getYAxisRegion(), gbc); // call after getManhattanPlot call
-
-        gbc.gridx = 20;
-        gbc.gridy = 20;
-        gbc.weightx = 0.0;
-        gbc.weighty = 0.0;
-        add(getXAxisRegion(), gbc);
-
-        gbc.gridx = 30;
-        gbc.gridy = 10;
-        gbc.weightx = 0.0;
-        gbc.weighty = 1.0;
-        gbc.insets = new Insets(0, 0, 0, 0);
-        add(getSecondYAxisRegion(), gbc);
-
-        gbc.gridx = 10;
-        gbc.gridy = 20;
-        gbc.weightx = 0.0;
-        gbc.weighty = 0.0;
-        add(getLeftCornerRegion(), gbc);
-
-        gbc.gridx = 30;
-        gbc.gridy = 20;
-        gbc.weightx = 0.0;
-        gbc.weighty = 0.0;
-        add(getRightCornerRegion(), gbc);
-
-        gbc.gridx = 20;
-        gbc.gridy = 30;
-        gbc.weightx = 1.0;
-        gbc.weighty = 0.0;
-        add(getAnnotationPanel(), gbc);
-
-        gbc.gridx = 10;
-        gbc.gridy = 30;
-        gbc.weightx = 0.0;
-        gbc.weighty = 0.0;
-        add(getLeftAnnotationCorner(), gbc);
-
-        gbc.gridx = 30;
-        gbc.gridy = 30;
-        gbc.weightx = 0.0;
-        gbc.weighty = 0.0;
-        add(getRightAnnotationCorner(), gbc);
-
-        setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-
-        StateController stateController = new StateController();
-        Singleton.getState().addListener(stateController);
-
-    }
-
-    protected JComponent createManhattanPlot() {
-        if (manhattanPlot == null) {
-            manhattanPlot = new ManhattanPlot(Singleton.getState().getMainView());
-        }
-        return manhattanPlot;
-    }
+    }*/
 
     public ManhattanPlot getManhattanPlot() {
         //return manhattanPlot;
@@ -342,12 +256,12 @@ public class PlotPanel extends JSplitPane {
         return displayPanel;
     }
 
-    protected AnnotationPanel getAnnotationPanel() {
+    /*protected AnnotationPanel getAnnotationPanel() {
         if (annotationPanel == null) {
             annotationPanel = new AnnotationPanel(Singleton.getState().getMainView());
         }
         return annotationPanel;
-    }
+    }*/
 
     protected AnnotationPanelWide getAnnotationPanelWide() {
         if (annotationPanelWide == null) {
@@ -370,7 +284,7 @@ public class PlotPanel extends JSplitPane {
         return rightCornerRegion;
     }
 
-    protected JComponent getLeftAnnotationCorner() {
+    /*protected JComponent getLeftAnnotationCorner() {
         if (leftAnnotationCorner == null) {
             leftAnnotationCorner = new LeftAnnotationCorner();
             leftAnnotationCorner.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
@@ -384,7 +298,7 @@ public class PlotPanel extends JSplitPane {
             rightAnnotationCorner.setBorder(BorderFactory.createLineBorder(Color.PINK));
         }
         return rightAnnotationCorner;
-    }
+    }*/
     
     /**
      * If you search for a particular gene, it may not be visible in the annotation
@@ -405,16 +319,15 @@ public class PlotPanel extends JSplitPane {
         @Override
         public void mainPlotChanged(ChangeEvent ce) {
             View mainView = Singleton.getState().getMainView();
-            annotationPanel.processMainPlotChanged();
+            /*annotationPanel.processMainPlotChanged();
             annotationPanel.setPreferredSize(annotationPanel.getWidth(), annotationPanel.getPreferredHeight());
             annotationPanel.setMaximumSize(new Dimension(annotationPanel.getWidth(), annotationPanel.getPreferredHeight()-AxisRegionX.PREFERRED_HEIGHT/2));
-            annotationPanel.setMinimumSize(new Dimension(annotationPanel.getWidth(), annotationPanel.getPreferredHeight()));
+            annotationPanel.setMinimumSize(new Dimension(annotationPanel.getWidth(), annotationPanel.getPreferredHeight()));*/
             //annotationPanel.repaint();
             
             annotationPanelWide.processMainPlotChanged();
             annotationPanelWideScrollPane.revalidate();
-            int width = lowerPaneScrollPane.getVerticalScrollBar().getWidth();
-            System.out.println("Main Data Changed in plotPanel width " + width);
+            //int width = lowerPaneScrollPane.getVerticalScrollBar().getWidth();
             
             revalidate();
             manhattanPlot.setView(mainView);

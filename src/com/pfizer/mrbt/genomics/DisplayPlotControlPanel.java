@@ -30,28 +30,13 @@ import javax.swing.event.ChangeEvent;
 public class DisplayPlotControlPanel extends JComponent {
     //private View view;
 
-    private DataSet dataSet;
     private TopDisplayPanel topDisplayPanel;
-    private JComponent xAxisRegion;
     private JComponent controlsPanel;
 
     private JComponent plotPanel;
-    private String dataSetName;
 
     public DisplayPlotControlPanel() {
         super();
-        /*this.dataSetName = dataSetName;
-        this.dataSetName = "";
-        dataSet = Singleton.getDataModel().getDataSet(dataSetName);
-        ViewData viewData = new ViewData(dataSet);
-        Singleton.getState().addViewData(viewData);
-        if(dataSet.getModels().size() > 0) {
-            viewData.addModel(dataSet.getModel(0)); 
-        }
-        Singleton.getState().setMainView(viewData);
-        //view.addModel(dataSet.getModel(1)); //todo get rid of the view using this model here
-         * 
-         */
 
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();

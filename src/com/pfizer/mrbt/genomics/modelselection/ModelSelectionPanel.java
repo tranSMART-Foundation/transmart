@@ -401,7 +401,7 @@ public class ModelSelectionPanel extends JPanel {
                         DataSet dataSet = Singleton.getDataModel().getDataSet(currGeneName);
                         ViewData viewData = new ViewData(dataSet);
                         Singleton.getState().addViewData(viewData);
-                        System.out.println("Data set in getModelSelectionButton has " + dataSet.getModels().size() + " models");
+                        //System.out.println("Data set in getModelSelectionButton has " + dataSet.getModels().size() + " models");
                         for(int rowi = 0; rowi < selectedRows.length; rowi++) {
                             int row = selectedRows[rowi];
                             String dataSetName = (String) modelSelectionTable.getValueAt(row, ModelSelectionTableModel.GENE_COL);
@@ -409,6 +409,7 @@ public class ModelSelectionPanel extends JPanel {
                                 String combinedModelName   = (String) modelSelectionTable.getValueAt(row, ModelSelectionTableModel.MODEL_COL);
                                 for(Model model : dataSet.getModels()) {
                                     if(model.toString().startsWith(combinedModelName)) {
+                                    //if(model.toString().startsWith(combinedModelName)) {  1/10/2013 kluge
                                         viewData.addModel(model);
                                     }
                                 }

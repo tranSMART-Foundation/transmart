@@ -127,7 +127,7 @@ public class GeneAnnotations {
      * most value greater than searchVal for the indicies [min max].
      * @param min
      * @param max
-     * @param startLoc
+     * @param searchVal
      * @param fullSet
      * @return 
      */

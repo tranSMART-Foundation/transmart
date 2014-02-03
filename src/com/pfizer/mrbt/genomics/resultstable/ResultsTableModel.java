@@ -24,15 +24,18 @@ public class ResultsTableModel extends AbstractTableModel {
     public final static int GENE_COL = 1;
     public final static int MODEL_COL = 2;
     public final static int RSID_COL = 3;
-    public final static int CHR_COL = 4;
-    public final static int LOC_COL = 5;
-    public final static int PVAL_COL = 6;
+    public final static int SNP_GENE_COL = 4;
+    public final static int INTRON_EXON_COL = 5;
+    public final static int REGULOME_COL = 6;
+    public final static int CHR_COL = 7;
+    public final static int LOC_COL = 8;
+    public final static int PVAL_COL = 9;
     /*private ArrayList<String> genes = new ArrayList<String>();
     private HashMap<String, ArrayList<ModelSnp>> gene2modelSnpList = new HashMap<String, ArrayList<ModelSnp>>();
     private HashMap<String, Integer> gene2len = new HashMap<String, Integer>();*/
     private ArrayList<GeneModelSnp> geneModelSnps = new ArrayList<GeneModelSnp>();
-    private DecimalFormat decimalFormat = new DecimalFormat("0.00");
-    private String[] headers = {"Index", "Gene", "Model", "RsID", "Chr", "SNP Loc", "-Log10(P-Value)"};
+    private DecimalFormat decimalFormat = new DecimalFormat("0.000");
+    private String[] headers = {"Index", "Search", "Model", "RsID", "Gene","In/Ex", "Regulome", "Chr", "SNP Loc", "-Log10(P-Value)"};
 
     @Override
     public Object getValueAt(int row, int col) {
@@ -53,7 +56,12 @@ public class ResultsTableModel extends AbstractTableModel {
                 return model;
             case RSID_COL:
                 return geneModelSnp.getSnp(offset).getRsId();
-                //return Singleton.getDataModel().getDataSet(gene).getSnps().get(offset).getRsId();
+            case SNP_GENE_COL:
+                return geneModelSnp.getSnp(offset).getAssociatedGene();
+            case INTRON_EXON_COL:
+                return geneModelSnp.getSnp(offset).getIntronExon().getTwoLetterString();
+            case REGULOME_COL:
+                return geneModelSnp.getSnp(offset).getRegulome();
             case CHR_COL:
                 //return Singleton.getDataModel().getDataSet(gene).getSnps().get(offset).getLoc();
                 int chromosomeNumber = Singleton.getDataModel().getDataSet(geneModelSnp.getGene()).getChromosome();
@@ -125,6 +133,10 @@ public class ResultsTableModel extends AbstractTableModel {
                 return String.class;
             case RSID_COL:
                 return Integer.class;
+            case INTRON_EXON_COL:
+                return String.class;
+            case REGULOME_COL:
+                return String.class;
             case CHR_COL:
                 return String.class;
             case LOC_COL:
@@ -313,8 +325,8 @@ public class ResultsTableModel extends AbstractTableModel {
 
     protected class ModelSnp {
 
-        private Model model;
-        private SNP snp;
+        private final Model model;
+        private final SNP snp;
 
         public ModelSnp(Model model, SNP snp) {
             this.model = model;

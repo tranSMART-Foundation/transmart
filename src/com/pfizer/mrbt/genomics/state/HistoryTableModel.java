@@ -12,7 +12,7 @@ import javax.swing.table.AbstractTableModel;
  * @author henstockpv
  */
 public class HistoryTableModel extends AbstractTableModel {
-    private ArrayList<History> history = new ArrayList<History>();
+    private ArrayList<History> historyList = new ArrayList<History>();
     
     public HistoryTableModel() {
         
@@ -21,17 +21,19 @@ public class HistoryTableModel extends AbstractTableModel {
     public Object getValueAt(int row, int col) {
         switch(col) {
                 case History.GENE_COL:
-                    return history.get(row).getGene();
+                    return historyList.get(row).getGene();
+                case History.MODEL_COUNT_COL:
+                    return historyList.get(row).getNumModels();
                 case History.MODELS_COL:
-                    return history.get(row).getNumModels();
+                    return historyList.get(row).getModelOptionsString();
                 case History.NUM_SNP_COL:
-                    return history.get(row).getNumSnp();
+                    return historyList.get(row).getNumSnp();
                 case History.RANGE_COL:
-                    return history.get(row).getRange();
+                    return historyList.get(row).getRange();
                 case History.SECONDS_COL:
-                    return history.get(row).getElapsedTime();
+                    return historyList.get(row).getElapsedTime();
                 case History.STATUS_COL:
-                    return history.get(row).getStatusStr();
+                    return historyList.get(row).getSearchStatusStr();
                 default:
                     return "Unknown";
         }
@@ -39,16 +41,16 @@ public class HistoryTableModel extends AbstractTableModel {
     
     @Override
     public int getColumnCount() {
-        return 6;
+        return 7;
     }
     
     @Override
     public int getRowCount() {
-        return history.size();
+        return historyList.size();
     }
     
     public void clear() {
-        history.clear();
+        historyList.clear();
         this.fireTableDataChanged();        
     }
     
@@ -56,15 +58,17 @@ public class HistoryTableModel extends AbstractTableModel {
     public String getColumnName(int column) {
         switch(column) {
                 case History.GENE_COL:
-                    return "Gene Requested";
+                    return "Gene/SNP";
                 case History.MODELS_COL:
-                    return "#Models Requested";
+                    return "Models Requested";
+                case History.MODEL_COUNT_COL:
+                    return "#Models";
                 case History.NUM_SNP_COL:
-                    return "#SNP Returned";
+                    return "#SNPs";
                 case History.RANGE_COL:
-                    return "Search Range";
+                    return "Range";
                 case History.SECONDS_COL:
-                    return "Elapsed Sec.";
+                    return "Sec.";
                 case History.STATUS_COL:
                     return "Status";
                 default:
@@ -90,30 +94,47 @@ public class HistoryTableModel extends AbstractTableModel {
     }
     
     public void addHistory(History historyElement) {
-        this.history.add(historyElement);
+        this.historyList.add(historyElement);
         fireTableDataChanged();
     }
     
     public void setHistory(int index, History historyElement) {
-        this.history.set(index, historyElement);
+        this.historyList.set(index, historyElement);
         this.fireTableDataChanged();
     }
     
     public History getHistory(int index) {
-        return history.get(index);
+        return historyList.get(index);
     }
     
     /**
      * Returns the first index into history where the gene matches and the
      * status is WORKING. If none are found it returns -1
-     * @param gene
+     * @param gene is the gene name that you're seeking
+     * @param seekSearchStatus is the search status that you're seeking
      * @return 
      */
-    public int findFirstWorking(String gene) {
+    public int findFirstInTable(String gene, SearchStatus seekSearchStatus) {
         int index = 0;
-        for(History oneHistory : history) {
-            if( oneHistory.getGene().equals(gene) &&
-               oneHistory.getStatus() == History.WORKING) {
+        for(History oneHistory : historyList) {
+            if( oneHistory.getGene().equalsIgnoreCase(gene) &&
+               oneHistory.getSearchStatus() == seekSearchStatus) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the row index that corresponds to history queryId
+     * @param queryId
+     * @return 
+     */
+    public int findRowByQueryId(int queryId) {
+        int index = 0;
+        for(History oneHistory : historyList) {
+            if( oneHistory.getQueryId() == queryId) {
                 return index;
             }
             index++;

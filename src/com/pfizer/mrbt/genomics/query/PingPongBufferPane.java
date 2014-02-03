@@ -1,5 +1,9 @@
 package com.pfizer.mrbt.genomics.query;
 
+import com.pfizer.mrbt.genomics.Singleton;
+import com.pfizer.mrbt.genomics.webservices.DbSnpSourceOption;
+import com.pfizer.mrbt.genomics.webservices.GeneSourceOption;
+import com.pfizer.mrbt.genomics.webservices.RetrievalException;
 import java.util.*;
 
 import java.awt.*;
@@ -29,17 +33,26 @@ public class PingPongBufferPane extends JComponent {
     private Collection leftListInput;
     private String left2rightStr;
     private String right2leftStr;
+    private String left2rightAllStr;
+    private String right2leftAllStr;
     private String dialogName;
     private AbstractButton filterButton;
     private AbstractButton showAllButton;
     private JTextField filterField;
     private ArrayList<String> allData = new ArrayList<String>();
+    private JComponent geneSnpOptionPane;
+    private java.util.List<DbSnpSourceOption> dbSnpOptions = new ArrayList<DbSnpSourceOption>();
+    private java.util.List<GeneSourceOption> geneSourceOptions = new ArrayList<GeneSourceOption>();
+    public final static String PROTOTYPE_VALUE = "23MeNeuro - Attention deficit-hyperactivity disorder (ADHD)";
+    
     public final static int LIST_WIDTHS = 13;
     public final static int OK_RETURNED = JOptionPane.OK_OPTION;
     public final static int CANCEL_RETURNED = JOptionPane.CANCEL_OPTION;
     private final static int STUDY_WIDTH = 500;
     private final static int STUDY_HEIGHT = 200;
 
+    private JComboBox snpAnnotationComboBox;
+    private JComboBox geneAnnotationComboBox;
 
     
     /**
@@ -53,10 +66,13 @@ public class PingPongBufferPane extends JComponent {
      * @param _dialogName String
      * @param _leftToRightString String
      * @param _rightToLeftString String
+     * @param _leftToRightAllString String
+     * @param _rightToLeftAllString String
      */
     public PingPongBufferPane(Collection _rightListInput, Collection _leftListInput,
                               String _dialogName,
-                              String _leftToRightString, String _rightToLeftString) {
+                              String _leftToRightString, String _rightToLeftString,
+                              String _leftToRightAllString, String _rightToLeftAllString) {
         super();
         setLayout(new GridBagLayout());
         rightListInput = _rightListInput;
@@ -64,10 +80,13 @@ public class PingPongBufferPane extends JComponent {
         dialogName     = _dialogName;
         left2rightStr  = _leftToRightString;
         right2leftStr  = _rightToLeftString;
+        left2rightAllStr  = _leftToRightAllString;
+        right2leftAllStr  = _rightToLeftAllString;
 
         initializeAllData(_leftListInput, _rightListInput);
         computeLeftRightLists();
         leftList = new JList(leftModel);
+        leftList.setPrototypeCellValue(PROTOTYPE_VALUE);
         leftList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent me) { 
@@ -77,9 +96,8 @@ public class PingPongBufferPane extends JComponent {
             }
         });
         
-        //leftList.setMinimumSize(new Dimension(170, 40));
-        //leftList.setPreferredSize(new Dimension(300, 200));
         rightList = new JList(rightModel);
+        rightList.setPrototypeCellValue(PROTOTYPE_VALUE);
         rightList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent me) { 
                 if(me.getClickCount()==2 && rightList.getSelectedIndices().length==1) {
@@ -87,9 +105,6 @@ public class PingPongBufferPane extends JComponent {
                 }
             }
         });
-        //rightList.setMinimumSize(new Dimension(170, 40));
-        ////rightList.setMaximumSize(new Dimension(300,200));
-        //rightList.setPreferredSize(new Dimension(300, 80));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 10;
@@ -98,7 +113,6 @@ public class PingPongBufferPane extends JComponent {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         add(getPane("Rows", leftModel, leftList, rightModel, rightList), gbc);
-        //setBorder(BorderFactory.createLineBorder(Color.RED));
     }
 
     /**
@@ -132,7 +146,7 @@ public class PingPongBufferPane extends JComponent {
         gbc.gridy = 2;
         gbc.gridwidth = 9;
         gbc.fill = GridBagConstraints.BOTH;
-        JLabel hiddenLabel = new JLabel(right2leftStr);
+        JLabel hiddenLabel = new JLabel("Available Models");
         Font font = hiddenLabel.getFont();
         hiddenLabel.setFont(new Font(font.getFontName(), Font.BOLD, font.getSize() + 2));
         hiddenLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -143,7 +157,7 @@ public class PingPongBufferPane extends JComponent {
         gbc.gridx = 30;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
-        JLabel rightLabel = new JLabel(left2rightStr);
+        JLabel rightLabel = new JLabel("Included Models for Query");
         rightLabel.setFont(new Font(font.getFontName(), Font.BOLD, font.getSize() + 2));
         rightLabel.setHorizontalAlignment(JLabel.CENTER);
         panel.add(rightLabel, gbc);
@@ -155,8 +169,7 @@ public class PingPongBufferPane extends JComponent {
         gbc.weightx = 1.0;
         gbc.gridwidth = 9;
         JScrollPane leftPane = new JScrollPane(leftList);
-        leftPane.setPreferredSize(new Dimension(STUDY_WIDTH,STUDY_HEIGHT));
-        
+        //leftPane.setPreferredSize(new Dimension(STUDY_WIDTH,STUDY_HEIGHT));
         panel.add(leftPane, gbc);
 
         gbc.gridx = 30;
@@ -164,55 +177,63 @@ public class PingPongBufferPane extends JComponent {
         gbc.gridheight = 5;
         gbc.gridwidth = 1;
         JScrollPane rightPane = new JScrollPane(rightList);
-        rightPane.setPreferredSize(new Dimension(STUDY_WIDTH,STUDY_HEIGHT));
+        //rightPane.setPreferredSize(new Dimension(STUDY_WIDTH,STUDY_HEIGHT));
         panel.add(rightPane, gbc);
 
         gbc.gridx = 10;
         gbc.gridy = 9;
         gbc.weightx = 1.0;
-        gbc.insets = new Insets(1,5,1,0);
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(5,5,1,0);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(getFilterField(), gbc);
         
         gbc.gridx = 15;
         gbc.gridy = 9;
         gbc.weightx = 0.0;
-        gbc.insets = new Insets(1,1,1,10);
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5,1,1,0);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         panel.add(getFilterButton(), gbc);
+        
+        
+        gbc.gridx = 30;
+        gbc.gridy = 9;
+        gbc.anchor = GridBagConstraints.NORTH;
+        panel.add(getGeneSnpOptionPane(), gbc);
         
         gbc.gridx = 17;
         gbc.gridy = 9;
         gbc.weightx = 0.0;
-        gbc.insets = new Insets(1,1,1,10);
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5,1,1,0);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         panel.add(getShowAllButton(), gbc);
         
         
         gbc.gridx = 20;
-        gbc.gridy = 6;
+        gbc.gridy = 4;
         gbc.gridheight = 1;
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(4,1,0,1);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weighty = 0.0;
         gbc.weightx = 0.0;
         panel.add(getRightArrow(), gbc);
 
         gbc.gridx = 20;
-        gbc.gridy = 8;
+        gbc.gridy = 5;
         gbc.gridheight = 1;
         panel.add(getLeftArrow(), gbc);
 
-        gbc.gridx = 30;
-        gbc.gridy = 9;
+        gbc.gridx = 20;
+        gbc.gridy = 6;
         gbc.gridheight = 1;
-        gbc.anchor = GridBagConstraints.WEST;
+        //gbc.anchor = GridBagConstraints.WEST;
         panel.add(getRightAllArrow(), gbc);
 
-        gbc.gridx = 18;
-        gbc.gridy = 9;
+        gbc.gridx = 20;
+        gbc.gridy = 7;
         gbc.gridheight = 1;
-        gbc.anchor = GridBagConstraints.EAST;
+        //gbc.anchor = GridBagConstraints.EAST;
         panel.add(getLeftAllArrow(), gbc);
         
         gbc.gridx = 40;
@@ -220,117 +241,18 @@ public class PingPongBufferPane extends JComponent {
         gbc.gridheight = 1;
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.CENTER;
-        panel.add(getUpArrow(), gbc);
+        //panel.add(getUpArrow(), gbc);
 
         gbc.gridx = 40;
         gbc.gridy = 8;
         gbc.gridheight = 1;
-        panel.add(getDownArrow(), gbc);
+        //panel.add(getDownArrow(), gbc);
 
-        adjustPanelWidths(rightPane, leftPane, rightModel, leftModel);
-        //panel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+        //adjustPanelWidths(rightPane, leftPane, rightModel, leftModel);
+        //panel.setBorder(BorderFactory.createLineBorder(Color.RED));
         return panel;
     }
 
-        /**
-     * Reused portion for the row and column panels that containt he
-     * structure.
-     *
-     * @param title String is the displayed title of the pane
-     * @param gbc GridBagConstraints are the constraints for the layout
-     * @param leftModel DefaultListModel contains the model behind the
-     * left
-     * @param leftList JList contains the left entries
-     * @param rightModel DefaultListModel contains model behidn the right
-     * @param rightList JList contains the right entries
-     * @return JComponent
-     */
-    private JComponent getPaneOrig(String title,
-                               DefaultListModel leftModel, JList leftList,
-                               DefaultListModel rightModel, JList rightList) {
-        //JLabel titleLabel  = new JLabel(right2leftStr + "/" + left2rightStr + title);
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        //gbc.gridx = 2;
-        //gbc.gridy = 1;
-        gbc.weighty = 0.2;
-        //panel.add(titleLabel, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.fill = GridBagConstraints.VERTICAL;
-        JLabel hiddenLabel = new JLabel(right2leftStr);
-        Font font = hiddenLabel.getFont();
-        hiddenLabel.setFont(new Font(font.getFontName(), Font.BOLD, font.getSize() + 2));
-        hiddenLabel.setHorizontalAlignment(JLabel.CENTER);
-        panel.add(hiddenLabel, gbc);
-
-        gbc.gridx = 3;
-        gbc.gridy = 2;
-        JLabel rightLabel = new JLabel(left2rightStr);
-        rightLabel.setFont(new Font(font.getFontName(), Font.BOLD, font.getSize() + 2));
-        rightLabel.setHorizontalAlignment(JLabel.CENTER);
-        panel.add(rightLabel, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        gbc.gridheight = 5;
-        gbc.weighty = 1.0;
-        gbc.weightx = 1.0;
-        
-        JScrollPane leftPane = new JScrollPane(leftList);
-        panel.add(leftPane, gbc);
-
-        gbc.gridx = 3;
-        gbc.gridy = 4;
-        gbc.gridheight = 5;
-        JScrollPane rightPane = new JScrollPane(rightList);
-        panel.add(rightPane, gbc);
-
-        gbc.gridx = 2;
-        gbc.gridy = 6;
-        gbc.gridheight = 1;
-        gbc.weighty = 0.0;
-        gbc.fill = GridBagConstraints.NONE;
-        panel.add(getRightArrow(), gbc);
-
-        gbc.gridx = 2;
-        gbc.gridy = 8;
-        gbc.gridheight = 1;
-        gbc.weighty = 0.0;
-        panel.add(getLeftArrow(), gbc);
-
-        gbc.gridx = 3;
-        gbc.gridy = 9;
-        gbc.gridheight = 1;
-        gbc.fill = GridBagConstraints.NONE;
-        panel.add(getRightAllArrow(), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 9;
-        gbc.gridheight = 1;
-        panel.add(getLeftAllArrow(), gbc);
-
-        gbc.gridx = 4;
-        gbc.gridy = 6;
-        gbc.gridheight = 1;
-        gbc.weighty = 1.0;
-        panel.add(getUpArrow(), gbc);
-
-        gbc.gridx = 4;
-        gbc.gridy = 8;
-        gbc.gridheight = 1;
-        panel.add(getDownArrow(), gbc);
-
-        adjustPanelWidths(rightPane, leftPane, rightModel, leftModel);
-        //panel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-        return panel;
-    }
-    
-    
     /**
      * Sets the rightPane and leftPane widths to be identical based on the
      * amount of data present and the maximum width
@@ -660,4 +582,106 @@ public class PingPongBufferPane extends JComponent {
         }
         return myList;
     }
+    
+    protected JComponent getGeneSnpOptionPane() {
+        if(geneSnpOptionPane == null) {
+            geneSnpOptionPane = new JPanel();
+            geneSnpOptionPane.setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.NONE;
+
+            gbc.gridx = 10;
+            gbc.gridy = 10;
+            gbc.weightx = 0.0;
+            gbc.weighty = 0.0;
+            gbc.anchor = GridBagConstraints.LINE_END;
+            //JLabel snpLabel = new JLabel("<html><p align=right>SNP Annotation<br/>Source:</p></html>");
+            JLabel snpLabel = new JLabel("SNP Src:");
+            snpLabel.setHorizontalAlignment(JLabel.RIGHT);
+            Font currFont = snpLabel.getFont();
+            Font labelFont = new Font(currFont.getName(), Font.PLAIN, 13);
+            snpLabel.setFont(labelFont);
+            geneSnpOptionPane.add(snpLabel, gbc);
+
+            gbc.gridx = 20;
+            gbc.gridy = 10;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            geneSnpOptionPane.add(getSnpAnnotationComboBox(), gbc);
+
+            gbc.gridx = 30;
+            gbc.gridy = 10;
+            gbc.insets = new Insets(0,10,0,0);
+            gbc.anchor = GridBagConstraints.EAST;
+            //JLabel geneLabel = new JLabel("<html><p align=right>Gene Annotation<br/>Source:</p></html>");
+            JLabel geneLabel = new JLabel("Gene Src:");
+            geneLabel.setHorizontalAlignment(JLabel.RIGHT);
+            geneLabel.setFont(labelFont);
+            geneSnpOptionPane.add(geneLabel, gbc);
+
+            gbc.gridx = 40;
+            gbc.gridy = 10;
+            gbc.insets = new Insets(0,0,0,0);
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            geneSnpOptionPane.add(getGeneAnnotationComboBox(), gbc);
+        }
+        return geneSnpOptionPane;
+    }
+        
+     protected JComboBox getSnpAnnotationComboBox() {
+        if (snpAnnotationComboBox == null) {
+            snpAnnotationComboBox = new JComboBox();
+            try {
+                dbSnpOptions = Singleton.getDataModel().getWebServices().getDbSnpSources();
+            } catch(RetrievalException rex) {
+                showLoadInitializationFailure(rex);
+                System.exit(1);
+            }
+            for(DbSnpSourceOption dbSnpOption : dbSnpOptions) {
+                snpAnnotationComboBox.addItem(dbSnpOption.toString());
+            }
+        }
+        return snpAnnotationComboBox;
+    }
+
+    protected JComboBox getGeneAnnotationComboBox() {
+        if (geneAnnotationComboBox == null) {
+            geneAnnotationComboBox = new JComboBox();
+            try {
+                geneSourceOptions = Singleton.getDataModel().getWebServices().getGeneSources();
+            } catch(RetrievalException rex) {
+                showLoadInitializationFailure(rex);
+                System.exit(1);
+            }
+            
+            for(GeneSourceOption geneSourceOption : geneSourceOptions) {
+                geneAnnotationComboBox.addItem(geneSourceOption.toString());
+            }
+        }
+        return geneAnnotationComboBox;
+    }
+
+    public DbSnpSourceOption getSelectedDbSnpOption() {
+        return dbSnpOptions.get(snpAnnotationComboBox.getSelectedIndex());
+    }
+    
+    public GeneSourceOption getSelectedGeneSourceOption() {
+        return geneSourceOptions.get(geneAnnotationComboBox.getSelectedIndex());
+    }
+    
+    /**
+     * Shows an error message and prints out the reason to stderr
+     * @param rex 
+     */
+    protected void showLoadInitializationFailure(RetrievalException rex) {
+        JOptionPane.showMessageDialog(
+                this.getTopLevelAncestor(),
+            //(JFrame) SwingUtilities.getWindowAncestor(QueryPanel.this),
+            rex.getMessage(),
+            "Initialization failed: " + rex.getRetrievalMethod().toString(),
+            JOptionPane.ERROR_MESSAGE);
+        System.err.println("Initialization failed");
+        System.err.println(rex.toString());
+    }
+
+
 }

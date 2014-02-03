@@ -3,7 +3,7 @@
  */
 package com.pfizer.mrbt.genomics;
 
-import com.pfizer.mrbt.genomics.annotation.AnnotationPanel;
+//import com.pfizer.mrbt.genomics.annotation.AnnotationPanel;
 import com.pfizer.mrbt.genomics.hline.LineCreationPane;
 import com.pfizer.mrbt.genomics.data.DataPointEntry;
 import com.pfizer.mrbt.genomics.data.DataSet;
@@ -14,6 +14,7 @@ import com.pfizer.mrbt.genomics.hline.HLine;
 import com.pfizer.mrbt.genomics.hline.LineModificationPane;
 import com.pfizer.mrbt.genomics.legend.LegendPanel;
 import com.pfizer.mrbt.genomics.state.SelectedGeneAnnotation;
+import com.pfizer.mrbt.genomics.state.StateListener;
 import com.pfizer.mrbt.genomics.state.View;
 import com.pfizerm.mrbt.axis.AxisScale;
 import java.awt.Dimension;
@@ -102,6 +103,9 @@ public class ControlsPanel extends JComponent {
         gbc.gridy = 10;
         add(getImageOptionsPanel(), gbc);
         //add(getAdjustImageButton(), gbc);
+        
+        StateController stateController = new StateController();
+        Singleton.getState().addListener(stateController);
 
         setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
     }
@@ -115,6 +119,8 @@ public class ControlsPanel extends JComponent {
     protected JTextField getGeneSearchField() {
         if (geneSearchField == null) {
             geneSearchField = new JTextField(10);
+            Dimension preferredSize = geneSearchField.getPreferredSize();
+            geneSearchField.setMinimumSize(preferredSize);
             geneSearchField.addKeyListener(new KeyAdapter() {
 
                 @Override
@@ -134,10 +140,12 @@ public class ControlsPanel extends JComponent {
             geneSearchButton = new JButton("Search");
             geneSearchButton.setToolTipText("Searches for gene in current view");
             geneSearchButton.addActionListener(new ActionListener() {
-
+                @Override
                 public void actionPerformed(ActionEvent ae) {
                     String searchTerm = geneSearchField.getText().trim();
-                    if (isGeneSearch(searchTerm)) {
+                    if(searchTerm.trim().isEmpty()) {
+                        clearSnpSearch();
+                    } else if(isGeneSearch(searchTerm)) {
                         GeneAnnotation foundGene = findSearchTerm(geneSearchField.getText().trim());
                         if(foundGene != null) {
                             ControlsPanel.this.plotPanel.ensureGeneAnnotationIsVisible(foundGene.getGene());
@@ -220,6 +228,11 @@ public class ControlsPanel extends JComponent {
         } else {
             Singleton.getState().setRsIdSearchResults(foundRsIdEntries);
         }
+    }
+    
+    protected void clearSnpSearch() {
+        ArrayList<DataPointEntry> emptyList = new ArrayList<DataPointEntry>();
+        Singleton.getState().setRsIdSearchResults(emptyList);
     }
 
     /**
@@ -371,9 +384,9 @@ public class ControlsPanel extends JComponent {
 
     protected JSlider getAveragingSlider() {
         if (averagingSlider == null) {
-            averagingSlider = new JSlider(0, 300000);
-            averagingSlider.setMajorTickSpacing(100000);
-            averagingSlider.setMinorTickSpacing(25000);
+            averagingSlider = new JSlider(0, 30000);
+            averagingSlider.setMajorTickSpacing(10000);
+            averagingSlider.setMinorTickSpacing(2500);
             averagingSlider.setPaintTicks(true);
             // averagingSlider.setPaintLabels(true);
             averagingSlider.setValue(Singleton.getState().getAveragingWindowWidth());
@@ -479,7 +492,7 @@ public class ControlsPanel extends JComponent {
 
                 @Override
                 public void actionPerformed(ActionEvent ae) {
-                    AnnotationPanel annotationPanel = ControlsPanel.this.plotPanel.getAnnotationPanel();
+                    //AnnotationPanel annotationPanel = ControlsPanel.this.plotPanel.getAnnotationPanel();  1/10/14
                     //annotationPanel.setHeight(annotationPanel.getPreferredHeight());
                     //annotationPanel.setSize(annotationPanel.getWidth(), annotationPanel.getPreferredHeight());
                     //annotationPanel.setMaximumSize(new Dimension(annotationPanel.getWidth(), annotationPanel.getPreferredHeight()));
@@ -623,4 +636,45 @@ public class ControlsPanel extends JComponent {
         }
         return buildLegendButton;
     }
+    
+    public class StateController implements StateListener {
+
+        @Override
+        public void currentChanged(ChangeEvent ce) {        }
+
+        @Override
+        public void mainPlotChanged(ChangeEvent ce) { 
+            String selectedGeneSnp = Singleton.getState().getMainView().getDataSet().getGeneRange().getName();
+            if(selectedGeneSnp.startsWith("rs")) {
+                geneSearchField.setText(selectedGeneSnp);
+                geneSearchButton.doClick();
+            }
+        }
+
+        @Override
+        public void thumbnailsChanged(ChangeEvent ce) {
+        }
+
+        @Override
+        public void currentAnnotationChanged(ChangeEvent ce) {
+        }
+
+        @Override
+        public void selectedAnnotationChanged(ChangeEvent ce) {
+        }
+
+        @Override
+        public void averagingWindowChanged(ChangeEvent ce) {
+        }
+
+        @Override
+        public void legendSelectedRowChanged(ChangeEvent ce) {
+        }
+
+        @Override
+        public void heatmapChanged(ChangeEvent ce) {
+        }
+
+    }
+
 }

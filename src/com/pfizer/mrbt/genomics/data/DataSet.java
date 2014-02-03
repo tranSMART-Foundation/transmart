@@ -4,11 +4,10 @@
  */
 package com.pfizer.mrbt.genomics.data;
 
-import com.pfizer.mrbt.genomics.Singleton;
-import com.pfizer.mrbt.genomics.bioservices.DbSnpSourceOption;
-import com.pfizer.mrbt.genomics.bioservices.GeneSourceOption;
-import com.pfizer.mrbt.genomics.bioservices.QueryParameterFetch;
-import com.pfizer.mrbt.genomics.state.State;
+import com.pfizer.mrbt.genomics.webservices.DbSnpSourceOption;
+import com.pfizer.mrbt.genomics.webservices.GeneSourceOption;
+//import com.pfizer.mrbt.genomics.bioservices.QueryParameterFetch;
+import com.pfizer.mrbt.genomics.webservices.ModelOption;
 import java.util.ArrayList;
 
 /**
@@ -19,7 +18,6 @@ public class DataSet {
     public final static double NO_VALUE = -999.0;
     public final static int UNKNOWN = -1;
       private ArrayList<Integer> snpLoc = new ArrayList<Integer>();
-      //private ArrayList<StudySetModel> studySetModels = new ArrayList<StudySetModel>();
       private ArrayList<Model> models = new ArrayList<Model>();
       private ArrayList<SNP> snps = new ArrayList<SNP>();
       private GeneRange geneRange;
@@ -208,6 +206,7 @@ public class DataSet {
      */
     public ArrayList<SnpRecombRate> getSnpRecombRates() {
         if (snpRecombRates == null) {
+            /* removed 12/6/2013 pvh since should be loaded with main data and never null
             RecombinationRates recombinationRates = new RecombinationRates();
 
             if (LOAD_RECOMB_FROM_FILE) {
@@ -224,12 +223,12 @@ public class DataSet {
                 String recombFilename = path + geneRange.getName() + ".txt";
                 recombinationRates.loadRecombinationRates(recombFilename);
                 
-            } else { /* must be bioservices */
+            } else { // must be bioservices 
                 recombinationRates.fetchRecombinationRates(geneRange.getName(), geneRange.getRadius(), geneSourceOption.getId());
             }
             snpRecombRates = recombinationRates.getSnpRecombRates();
             maxRecombinationRate = recombinationRates.getMaxRecombinationRate();
-            
+            */
         }
         return snpRecombRates;
     }
@@ -258,20 +257,20 @@ public class DataSet {
        * Returns the model with the same study/endpoint/type in models else
        * creates a new one and adds it to models
        * @param study
-       * @param endpoint
-       * @param type
+       * @param set
+       * @param modelStr
        * @return 
        */
-      public Model checkAddModel(String study, String endpoint, String type) {
+      public Model checkAddModel(String study, String set, String modelStr) {
           //System.out.println("ModelAdding " + study + "\t" + endpoint + "\t" + type);
           for(Model model : models) {
               if(model.getStudy().equals(study) &&
-                 model.getEndpoint().equals(endpoint) &&
-                 model.getType().equals(type)) {
+                 model.getSet().equals(set) &&
+                 model.getModel().equals(modelStr)) {
                   return model;
               }
           }
-          Model model = new Model(study, endpoint, type);
+          Model model = new Model(study, set, modelStr);
           models.add(model);
           return model;
       }
@@ -280,15 +279,15 @@ public class DataSet {
        * Returns model corresponding to study/endpoint/type else returns null
        * if not found
        * @param study
-       * @param endpoint
-       * @param type
+       * set endpoint
+       * @param modelStr
        * @return 
        */
-      public Model getModelElseNull(String study, String endpoint, String type) {
+      public Model getModelElseNull(String study, String set, String modelStr) {
           for(Model model : models) {
               if(model.getStudy().equals(study) &&
-                 model.getEndpoint().equals(endpoint) &&
-                 model.getType().equals(type)) {
+                 model.getSet().equals(set) &&
+                 model.getModel().equals(modelStr)) {
                   return model;
               }
           }
@@ -296,17 +295,17 @@ public class DataSet {
       }
       
       /**
-       * Returns true if the model already exists
+       * Returns true if the modelStr already exists
        * @param study
-       * @param endpoint
-       * @param type
+       * @param set
+       * @param modelStr
        * @return 
        */
-      public boolean modelExists(String study, String endpoint, String type) {
+      public boolean modelExists(String study, String set, String modelStr) {
           for(Model model : models) {
               if(model.getStudy().equals(study) &&
-                 model.getEndpoint().equals(endpoint) &&
-                 model.getType().equals(type)) {
+                 model.getSet().equals(set) &&
+                 model.getModel().equals(modelStr)) {
                   return true;
               }
           }
@@ -345,6 +344,7 @@ public class DataSet {
      * This is a solution for initialization issues where we are trying to display
      * an empty dataset.  This populates the data structures with empty values and
      * semi-real ranges
+     * 12/6/2013 pvh modified to remove the source options and bioservice dependence
      * @return 
      */
     public static DataSet createDummyDataset() {
@@ -352,12 +352,17 @@ public class DataSet {
         int chromosome = 1;
         dummyDataSet.setChromosome(chromosome);
         dummyDataSet.setGeneRange(new GeneRange("", chromosome, 100, 200));
-        QueryParameterFetch queryParameterFetch = new QueryParameterFetch();
-        GeneSourceOption defaultGeneSourceOption = queryParameterFetch.getGeneSources().get(0);
-        DbSnpSourceOption defaultDbSnpSource = queryParameterFetch.getDbSnpSources().get(0);
+        ArrayList<GeneAnnotation> geneAnnotations = new ArrayList<GeneAnnotation>();
+        dummyDataSet.setGeneAnnotations(geneAnnotations);
+        dummyDataSet.setModels(new ArrayList<Model>());
+        dummyDataSet.setSNPs(new ArrayList<SNP>());
+        dummyDataSet.setRecombinationRate(new ArrayList<SnpRecombRate>(), 8f);
+        //QueryParameterFetch queryParameterFetch = new QueryParameterFetch();
+        //GeneSourceOption defaultGeneSourceOption = queryParameterFetch.getGeneSources().get(0);
+        //DbSnpSourceOption defaultDbSnpSource = queryParameterFetch.getDbSnpSources().get(0);
         dummyDataSet.setXAxisRange(new NumericRange(0.0, 1000.0));
-        dummyDataSet.setGeneSourceOption(defaultGeneSourceOption);
-        dummyDataSet.setDbSnpOption(defaultDbSnpSource);
+        //dummyDataSet.setGeneSourceOption(defaultGeneSourceOption);
+        //dummyDataSet.setDbSnpOption(defaultDbSnpSource);
         return dummyDataSet;
     }
 
@@ -415,7 +420,7 @@ public class DataSet {
      */
     public void addAllSnpWithModels(DataSet dataSet) {
         for(Model currModel : dataSet.getModels()) {
-            Model newModel = this.checkAddModel(currModel.getStudy(), currModel.getEndpoint(), currModel.getType());
+            Model newModel = this.checkAddModel(currModel.getStudy(), currModel.getSet(), currModel.getModel());
             for(SNP snp : dataSet.getSnps()) {
                 Double pval = dataSet.getPvalFromSnpModel(snp, currModel);
                 if(pval != null) {

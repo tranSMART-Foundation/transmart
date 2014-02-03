@@ -13,9 +13,11 @@ import com.pfizer.mrbt.genomics.data.Model;
 import com.pfizer.mrbt.genomics.heatmap.HeatmapParameters;
 import com.pfizer.mrbt.genomics.hline.HLine;
 import com.pfizer.mrbt.genomics.thumbnail.ThumbnailRenderer;
+import com.pfizer.mrbt.genomics.webservices.ModelOption;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.swing.event.ChangeEvent;
 
 /**
@@ -37,11 +39,13 @@ public class State {
     private int thumbnailTopPadding = DEFAULT_THUMBNAIL_TOP_PADDING;
     public static int UNSELECTED_ROW = -1;
     
-    public final static int DEMO_MODE = 101;
+    /*public final static int DEMO_MODE = 101;
     public final static int BIOSERVICES_MODE = 102; 
     public final static int TRANSMART_SERVICES_MODE = 103;
     public final static int TRANSMART_DEV_SERVICES_MODE = 104;
-    private int dataMode = TRANSMART_SERVICES_MODE; // source of initial data
+    private int dataMode = TRANSMART_SERVICES_MODE; // source of initial data*/
+    
+    public final static int FAILED_SEARCH = -5;
     //private final int dataMode = DEMO_MODE; // source of initial data
     
     private double hscale, vscale;
@@ -745,9 +749,9 @@ public class State {
      * Returns whether the program is running demo mode or bioservices mode
      * @return 
      */
-    public int getDataMode() {
+    /*public int getDataMode() {
         return dataMode;
-    }
+    }*/
     
     /*******************************************************************
      * Sets the dataMode to be dataModel where dataMode shouldbe one of
@@ -757,9 +761,9 @@ public class State {
      * initialization, etc.
      * @param dataMode 
      */
-    public void setDataMode(int dataMode) {
+    /*public void setDataMode(int dataMode) {
         this.dataMode = dataMode;
-    }
+    }*/
     
     public HistoryTableModel getHistoryTableModel() {
         return historyTableModel;
@@ -769,23 +773,40 @@ public class State {
      * Updates the searchHistory table with the following information of the
      * search.  Fires an update to the historyTableModel
      */
-    public void retrievalStarted(String gene, int numModels, int range) {
-        History historyElement = new History(gene, numModels, range);
+    public void retrievalInitialized(String gene, List<ModelOption> modelOptions, int range, int queryId) {
+        History historyElement = new History(gene, modelOptions, range, SearchStatus.WAITING, queryId);
         historyTableModel.addHistory(historyElement);
-        System.out.println("Adding search started for gene " + gene);
+        System.out.println("Adding search initialized for gene " + gene + " query# " + queryId);
     }
     
     /**
-     * 
+     * Updates the searchHistory table with the following information of the
+     * search.  Fires an update to the historyTableModel
+     */
+    public void retrievalStarted(String gene, int numModels, int range, int queryId) {
+        //int index = historyTableModel.findFirstInTable(gene, SearchStatus.WAITING);
+        int index = historyTableModel.findRowByQueryId(queryId);
+        History oneHistory = historyTableModel.getHistory(index);
+        oneHistory.update(SearchStatus.WORKING, 0);
+        historyTableModel.setHistory(index, oneHistory);
+        System.out.println("Adding search started for gene " + gene + " queryId " + queryId);
+    }
+    
+    /**
+     * Updates the historyTableModel.  If it failed, then numSnp = FAILED_SEARCH
      * @param gene
      * @param numSnp 
+     * @param searchStatus is the modified result of the search
      */
-    public void retrievalCompleted(String gene, int numSnp) {
-        int index = historyTableModel.findFirstWorking(gene);
+    public void retrievalCompleted(String gene, int numSnp, SearchStatus searchStatus, int queryId) {
+        //int index = historyTableModel.findFirstInTable(gene, SearchStatus.WORKING);
+        int index = historyTableModel.findRowByQueryId(queryId);
+        System.out.println("History index " + index);
         History oneHistory = historyTableModel.getHistory(index);
-        oneHistory.update(History.DONE, numSnp);
+        oneHistory.update( searchStatus, numSnp );
         historyTableModel.setHistory(index, oneHistory);
-        System.out.println("Adding search completed for gene " + gene + " with SNP=" + numSnp);
+        //historyTableModel.setHistory(index, oneHistory, searchStatus);
+        System.out.println("Adding search completed for gene " + gene + " with SNP=" + numSnp + " query " + queryId);
     }
 
     /**
@@ -810,7 +831,7 @@ public class State {
      * Returns friendly string describing the current mode (dev/stage/demo, etc.)
      * @return 
      */
-    public String getDataServicesModeName() {
+    /*public String getDataServicesModeName() {
         switch(dataMode) {
             case DEMO_MODE: 
                 return "DEMO_MODE = " + DEMO_MODE;
@@ -823,5 +844,5 @@ public class State {
             default: 
                 return "Unknown model " + dataMode;
         }
-    }    
+    } */   
 }

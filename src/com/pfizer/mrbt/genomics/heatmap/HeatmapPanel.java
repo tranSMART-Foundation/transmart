@@ -8,7 +8,6 @@ import com.pfizer.mrbt.genomics.Singleton;
 import com.pfizer.mrbt.genomics.data.DataSet;
 import com.pfizer.mrbt.genomics.data.Model;
 import com.pfizer.mrbt.genomics.resultstable.TxtFileFilter;
-import com.pfizer.mrbt.genomics.state.StateListener;
 import com.pfizer.mrbt.genomics.state.ViewData;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -334,14 +333,14 @@ public class HeatmapPanel extends JComponent {
             String geneName = viewData.getDataSet().getGeneRange().getName();
             if(geneName.equals(selectedGeneName)) {
                 for(Model model : viewData.getDataSet().getModels()) {
-                    System.out.print("Gene " + geneName + "\tComparing models " + model.toString());
+                    //System.out.print("Gene " + geneName + "\tComparing models " + model.toString());
                     if(model.toString().equals(selectedModelName)) {
                         newViewData.addModel(model);
                         Singleton.getState().setMainView(newViewData);
-                        System.out.println("Matched " + selectedModelName);
+                        //System.out.println("Matched " + selectedModelName);
                         return;
                     } else {
-                        System.out.println("nope");
+                        //System.out.println("nope");
                     }
                 }
             }
@@ -352,7 +351,7 @@ public class HeatmapPanel extends JComponent {
         public void mouseClicked(MouseEvent me) {
             int row = heatmapTable.rowAtPoint(me.getPoint());
             int col = heatmapTable.columnAtPoint(me.getPoint());
-            System.out.println("Mouse selected cell " + row + "\t" + col);
+            //System.out.println("Mouse selected cell " + row + "\t" + col);
             if(me.getClickCount()> 1 && col > 0 && 
                (Double) heatmapTable.getValueAt(row, col) >= 0.0) {
                 selectPlotForDisplay(row, col);
@@ -365,7 +364,7 @@ public class HeatmapPanel extends JComponent {
             
         }
         public void mousePressed(MouseEvent me) {
-            System.out.println("Mouse released");
+            //System.out.println("Mouse released");
         }
         public void mouseReleased(MouseEvent me) {
             
