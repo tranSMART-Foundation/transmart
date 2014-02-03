@@ -1,0 +1,156 @@
+<html>
+<head>
+  <title>GWAVA Frequently Asked Questions</title>
+</head>
+<body>
+  <h1> GWAVA Frequently Asked Questions</h1>
+  
+
+<h3>How do I change the colors?</h3>
+Under the preferences menu, almost all the colors in the display can
+be modified.  When you close the main window, the colors will be saved
+until next time.
+
+<h3>Can I save the main plot?</h3>
+Under the Capture menu, "Capture main plot to clipboard" will copy the
+image and you can then paste it into word or powerpoint as an image.
+Youc an also save the image to a file using the other menu item.
+
+<h3>How do I export the data?</h3>
+Using the Table panel on the main window, all the results (genes and
+models) that have been retrieved can be used to create tables of the
+results.  These can be exported as text files that can be loaded in
+Excel.  There is additionally a model x gene table available through
+the Heat Map panel (see that question).
+
+<h3> What does the heat map do?</h3>
+If you are trying to understand 50 genes and 50 models, that is a lot
+of data.  You can use the heat map to identify trends across models or
+genes, or simply for selection.  A color scheme shows the darker
+colors as higher -log p-values.  Double-clicking on a particular cell
+will display the plot in the main window.  The number in the heat maps
+corresponds to the function shown at the bottom of the window.  There
+are four functions: max, min, mean, and median.  Each operates on the
+TopN subset of the SNPs that are within the specified radius of the
+gene or SNP.  The maximum value within 100K of the gene would be
+Maximum-<any of the TopN>, radius=100000.  To look at the 3rd highest
+  value within 50K of the gene: Minimum, Top-3, 50000.  To create a
+  table of SNP values across all models: any function, top-1,
+  radius=0.  These tables can be exported.
+
+
+<h3> How to create a table of SNP values across all models?</h3>
+The heat map provides this functionality.  Please refer to that
+section.
+
+<h3> How to create heatmap or thumbnails on just a subset of
+  data?</h3>
+Highlight the particular subset in the Gene Model Selection table and
+  then click the corresponding button below.  The default is to
+  include all the data.
+
+<h3>How to zoom in on a particular gene?</h3>
+Right-clicking on the axis will bring up a zoom menu.  The easiest
+approach is to left-click and drag a region on the axis.  Note that if
+you zoom out, there is no additional data.  The only data available is
+what you searched for initially.  
+
+<h3>If I searched for a gene-model with 10000 radius and then search
+  with a different radius, what happens?</h3>
+The original data for any gene-model will be wiped out and replaced
+  with the new data regardless of the radius.
+
+<h3>Why bother using a radius at all in the search?</h3>
+The scientists have requested this feature to identify general hills
+of p-values rather than isolated points.  This provides a stronger set
+of evidence than numeric value alone.
+
+<h3>What's this averaging filter width?</h3>
+If you display multiple models for a single gene in the plot, the dots
+become somewhat unmanageable.  The idea was to provide a smoothing
+curve to show the values. The wider the width, the smoother the data.
+Be sure that the "Show average lines" box is checked.
+
+<h3>Can I add a horizontal line as a guide?</h3>
+Yes, click ont he "Add Line" button on the lower panel of the main
+Results table.  The line can be assigned a color and style and will
+occur in the current plot, all plots, or other subsets.  The lines can
+also be edited depending on the context.
+
+<h3>If I resize the window, the dots look weird.</h3>
+Yes, click on the Adjust Img button.
+
+<h3>The dots are too small to print.  Can I change them?</h3>
+To show the hundreds of SNPs in a single screen and have it be
+interactive, we have kept fairly small dots.  However, for printing
+you can use the "Print Ready" button that will turn them into circles
+very similar to the non-interactive LocusZoom program.
+
+<h3>Can you link this to the UCSC browser</h3>
+If you right click on any of the genes in the annotation panel below
+the main plot, it will take you to this web page.
+
+<h3>I only care about -log P-values > 5.  How can I throw out the
+  rest?</h3>
+For the plot, you can highlight the desired range on the left Y-axis
+  and zoon to that range.  For the tables, there is a filter function
+  that will remove the data for exporting.
+
+<h3>What is the Bands Interval on the Thumbnails?</h3>
+All the thumbnails are on the same scale, but due to space
+constraints, we have not included a Y-axis.  The bands intervals
+provides a measure of scale so that every 1,2,4,5, or 8 -log10 p-value
+units, the color of the background will switch colors, depending on
+the Preferences colors.
+
+<h3>How does the Y-axis scale work?</h3>
+
+For the standard selection from the Gene Model Selection table, the
+intent is to show the zoomed scale so it modifies the scale to show
+the full range of the data as clearly as possible.  In contrast, the
+thumbnail plots are all on the same scale since the intent is to
+compare the models or genes.  Some users have requested that the
+vertical scale be fixed as much as possible.  The Preferences Menu has
+an "Ideal Max -logPval" setting.  If the range is less than this
+specified value, the Y-value will go from 0 to the ideal max.  If the
+range extends beyond this, the full range will be shown.  
+
+<h3>How do I find which dot is my SNP?</h3>
+On the Results panel, there is a search button that will find SNPs or
+genes (that may be hidden).  The "rs" prefix is optional.  A circle
+will be placed around the SNP, or the gene will be highlighted.
+
+<h3>I requested 100000 radius but the X-axis shows a larger scale.
+  Why?</h3>
+If a gene goes from 111111 to 112222 the radius is added to each side
+  for the purpose of search.  A 10K radius would give 121111 to
+  122222.  For display purposes, we round the data out to the nearest
+  meaningful units although there will not be any data for that padded
+  region.  If you go further out through a zoom-out we have grayed out
+  regions that clearly show the limits.  However, to make a pretty
+  picture, we have not made such a distinction of the end of the data
+  range for purely aesthetic reasons.
+
+<h3>Why is there no legend</h3>
+For reasons of space, we have not included a legend.  The colors are
+displayed models are in the Gene Model Selection table.  Users can
+create a legend for printing purposes that has colored boxes and
+editable names.  This feature is available in the "Capture" menu.
+
+<h3>How do I know if my query is still running?</h3>
+The Search History tab in the lower half of the Query tab on the main
+panel shows the status of queries.  Essentially, the program goes out
+to web service and requests data.  The seconds are counting but will
+not be displayed unless you press "Update History".  The status will
+shift from Working to Done when they are complete.  Unfortunately,
+that is all the information we have.  
+
+<h3>What does GWAVA mean?</h3>
+Genome-Wide Association Visual Analyzer.
+
+<h3>Did you know it should be spelled GUAVA?</h3>
+We used the fruit icon liberally despite the unaccepted spelling.
+
+</body>
+
+</html>
