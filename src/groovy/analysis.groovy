@@ -43,8 +43,8 @@ if (cookieStore.cookies[0].name != 'JSESSIONID') {
     System.exit 1
 }
 
-//def config = Eval.me(new File(args[0]).text)
 def slurper = new groovy.json.JsonSlurper()
+//load as JSON a file with saved request params from a previous job
 def config = slurper.parseText(new File(args[0]).text)
 
 //println config
@@ -68,15 +68,15 @@ http.request(Method.POST, ContentType.JSON) {
     }
 }
 
+//jobName: the only param we actually need to override
 config['jobName'] = jobName
-config['analysis'] = jobType[0].toLowerCase() + jobType.substring(1)
 
 http.request(Method.POST, ContentType.JSON) {
     uri.path = "$ctx/RModules/scheduleJob"
     uri.query = config
 
     response.success = { resp ->
-        println 'All done for job ' + jobName
+        println 'Scheduled job ' + jobName
     }
 
     response.failure = { HttpResponse resp ->
@@ -84,5 +84,40 @@ http.request(Method.POST, ContentType.JSON) {
         err resp.statusLine
         err resp.entity.content.text
         System.exit 1
+    }
+}
+
+boolean finished = false
+
+print 'waiting...'
+
+while (!finished) {
+
+    Thread.sleep(1000)
+    http.request(Method.POST, ContentType.JSON) {
+        uri.path = "$ctx/asyncJob/checkJobStatus"
+        uri.query = [ 'jobName': jobName ]
+
+        response.success = { resp, json ->
+            jobStatus = json.jobStatus
+
+            if ('Completed' == jobStatus) {
+                println 'job finished with success'
+                finished = true
+            } else if ('Error' == jobStatus) {
+                println 'job failed with some error. Please check the logs'
+                finished = true
+                System.exit 1
+            } else {
+                print '.'
+            }
+        }
+
+        response.failure = { HttpResponse resp ->
+            err "failure checking job status. Is the server running?"
+            err resp.statusLine
+            err resp.entity.content.text
+            System.exit 1
+        }
     }
 }
