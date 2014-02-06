@@ -13,7 +13,6 @@ import com.pfizer.mrbt.genomics.webservices.ModelOption;
 import com.pfizer.mrbt.genomics.state.State;
 import com.pfizer.mrbt.genomics.webservices.DataRetrievalInterface;
 import com.pfizer.mrbt.genomics.webservices.RetrievalException;
-import com.pfizer.tnb.api.server.util.QueryResult;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -250,15 +249,6 @@ public class DataModel {
         fireDataChanged();
     }
     
-    /**
-     * Method not used...
-     * @param gene
-     * @param modelOptions
-     * @param queryResults
-     */
-    public void addBioservicesData(String gene, List<ModelOption> modelOptions, QueryResult queryResults) {
-        fireDataChanged();
-    }
 
     public void addListener(DataListener listener) {
         if (!listeners.contains(listener)) {

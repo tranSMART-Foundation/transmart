@@ -27,7 +27,7 @@ public class TransmartQueryParameterFetch {
 
     //public final static int MAX_STUDY_NAME_LENGTH = 26;
     public final static int MAX_STUDY_NAME_LENGTH = 70;
-    protected static Logger log = Logger.getLogger(com.pfizer.mrbt.genomics.TransmartClient.AmiDemo.class.getName());
+    protected static Logger log = Logger.getLogger(TransmartQueryParameterFetch.class.getName());
     private Environment environment;
 
     /**
