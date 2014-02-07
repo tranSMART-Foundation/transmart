@@ -68,8 +68,13 @@ http.request(Method.POST, ContentType.JSON) {
     }
 }
 
-//jobName: the only param we actually need to override
+//jobName: the only param we actually should override
 config['jobName'] = jobName
+
+//workaround for some analysis that don't have this param (and should). example: boxplot
+if (!config['analysis']) {
+    config['analysis'] = jobType[0].toLowerCase() + jobType.substring(1)
+}
 
 http.request(Method.POST, ContentType.JSON) {
     uri.path = "$ctx/RModules/scheduleJob"

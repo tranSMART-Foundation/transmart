@@ -1,0 +1,23 @@
+{
+    "action": "scheduleJob",
+    "analysis": "lineGraph",
+    "binningGroupBy": "FALSE",
+    "controller": "RModules",
+    "dependentVariable": "\\Public Studies\\GSE8581-samples\\MRNA\\Biomarker Data\\Affymetrix Human Genome U133A 2.0 Array\\Brain\\",
+    "dependentVariableCategorical": "false",
+    "divDependentVariablePathway": "1837633",
+    "divDependentVariableType": "mrna",
+    "divGroupByVariablePathway": "",
+    "divGroupByVariableType": "CLINICAL",
+    "flipImage": "FALSE",
+    "graphType": "MERR",
+    "groupByVariable": "\\Public Studies\\GSE8581-samples\\Subjects\\Sex\\female\\|\\Public Studies\\GSE8581-samples\\Subjects\\Sex\\male\\",
+    "jobName": "guest-LineGraph-16930",
+    "jobType": "LineGraph",
+    "manualBinningGroupBy": "FALSE",
+    "plotEvenlySpaced": "true",
+    "plotIndividuals": "true",
+    "projections": "rawIntensity",
+    "result_instance_id1": "25487",
+    "result_instance_id2": ""
+}
