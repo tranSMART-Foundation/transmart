@@ -1,13 +1,10 @@
 package pages.analyses
 
-import com.google.common.collect.ForwardingMap
-import com.google.common.collect.ForwardingTable
-import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableMap
-import com.google.common.collect.ImmutableTable
-import com.google.common.collect.Table
+import com.google.common.collect.*
 import geb.navigator.Navigator
 import pages.DatasetExplorerPage
+import pages.modules.BinningModule
+import pages.modules.HighDimensionPopupModule
 
 class SurvivalAnalysisPage extends DatasetExplorerPage {
 
@@ -20,6 +17,9 @@ class SurvivalAnalysisPage extends DatasetExplorerPage {
         parentContent.delegate = delegate
         parentContent.call()
 
+        highDimPopup { module HighDimensionPopupModule }
+        binning      { module BinningModule }
+
         analysisWidgetHeader {
             $('div#analysisWidget h2')
         }
@@ -31,6 +31,12 @@ class SurvivalAnalysisPage extends DatasetExplorerPage {
         runButton    { $('input.runAnalysisBtn') }
 
         resultOutput { $('#analysisOutput form') }
+
+        categoryHighDimButton {
+            $('div.highDimContainer div.highDimBtns button').find {
+                it.text() == 'High Dimensional Data'
+            }
+        }
 
         analysisHeaders { text ->
             $('span.AnalysisHeader').findAll {

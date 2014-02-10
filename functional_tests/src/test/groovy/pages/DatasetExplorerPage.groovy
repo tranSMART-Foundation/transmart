@@ -30,7 +30,7 @@ class DatasetExplorerPage extends Page {
                 it.parent().jquery.attr('ext:tree-node-id') == contextKey
             }[0]
         }
-        subsetBox { int subset, int box ->
+        subsetBox(wait: true) { int subset, int box ->
             $("div#queryCriteriaDiv${subset}_${box}")
         }
         boxConcepts { box ->
