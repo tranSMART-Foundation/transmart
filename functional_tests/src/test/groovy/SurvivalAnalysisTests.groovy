@@ -37,18 +37,11 @@ class SurvivalAnalysisTests extends GebReportingTest{
         }
     }
 
-    @Test
-    void testClinicalVariable() {
-        String gse8581Key = '\\\\Public Studies\\Public Studies\\GSE8581\\'
-        String ageKey     = "${gse8581Key}Subjects\\Age (year)\\"
-        String sexKey     = "${gse8581Key}Subjects\\Sex\\"
-        String maleKey    = "${sexKey}male\\"
-        String femaleKey  = "${sexKey}female\\"
 
-        /* run the analysis */
+    private void runAnalysis(Map params) {
         goToPageMaybeLogin DatasetExplorerPage
 
-        dragNodeToSubset gse8581Key, 1, 1
+        dragNodeToSubset params.subsetNode, 1, 1
 
         selectAnalysis 'Survival Analysis'
         page SurvivalAnalysisPage
@@ -56,12 +49,26 @@ class SurvivalAnalysisTests extends GebReportingTest{
 
         waitFor { analysisWidgetHeader }
 
-        dragNodeToBox ageKey, timeBox
-        dragNodeToBox sexKey, categoryBox,
-                containsInAnyOrder(is(maleKey), is(femaleKey))
+        dragNodeToBox params.timeVariable, timeBox
+        dragNodeToBox params.categoryVariableDragged, categoryBox,
+                containsInAnyOrder(params.categoryVariables.collect { is it as String })
 
         runButton.click()
         waitFor(8) { resultOutput } // wait up to 8 seconds for result
+    }
+
+    @Test
+    void testClinicalVariable() {
+        String gse8581Key = '\\\\Public Studies\\Public Studies\\GSE8581\\'
+        String sexKey     = "${gse8581Key}Subjects\\Sex\\"
+        def params = [
+                subsetNode:              gse8581Key,
+                timeVariable:            "${gse8581Key}Subjects\\Age (year)\\",
+                categoryVariableDragged: sexKey,
+                categoryVariables:       ["${sexKey}male\\", "${sexKey}female\\"]
+        ]
+
+        runAnalysis params
 
         /* check cox regression result */
         def allCoxRegressionResults = coxRegressionResults
