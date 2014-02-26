@@ -21,7 +21,6 @@ getObservations(studyName, subjectID = NULL, as.data.frame = FALSE)
   A list is returned containing all the observations for the study 
   (and for the specific subject if requested)
 }
-}
 \references{}
 \author{Tim Dorscheidt, tim@thehyve.nl}
 \note{}

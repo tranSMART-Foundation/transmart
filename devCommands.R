@@ -9,8 +9,8 @@ setwd("~/Projects/transmart-rclient")
 load_all("transmartRClient")
 
 # Example steps to authenticate with, connect to, and retrieve data from tranSMART
-AuthenticateWithTransmart("http://test-build.thehyve.net")
-ConnectToTransmart("http://test-build.thehyve.net")
+AuthenticateWithTransmart("test-build.thehyve.net")
+ConnectToTransmart("test-build.thehyve.net")
 studies <- getStudies(as.data.frame = T)
 subjects <- getSubjects(studies$name[1], as.data.frame = T)
 observations <- getObservations(studies$name[1], subjects$id[1], as.data.frame = T)
