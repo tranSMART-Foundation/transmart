@@ -1,86 +1,83 @@
-AuthenticateClientSession <- function(oauthDomain = "localhost:8080",  transmartDomain = "localhost:8080", prefetched.verifier = NULL) {
+AuthenticateWithTransmart <- function(oauthDomain = "localhost:8080", prefetched.request.token = NULL) {
+    require(RCurl)
+    require(RJSONIO)
+
+    if (exists("transmartClientEnv") && exists(transmartClientEnv$access_token)) {
+        cat("Previous authentication will be cleared. Do you wish to continue? Y/N\n")
+        choice <- readline()
+        if (length(grep("^y|^Y",choice))==0) return("Cancelled. Previous authentication will remain in effect.")
+    }
+
+    if (!exists("transmartClientEnv")) assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
+    transmartClientEnv$oauthDomain <- oauthDomain
+    transmartClientEnv$client_id <- "myId"
+    transmartClientEnv$client_secret <- "mySecret"
+
+    oauth.request.token.url <- paste(sep = "",
+            "http://", transmartClientEnv$oauthDomain,
+            "/transmart-rest-api/oauth/authorize?response_type=code&client_id=", 
+            transmartClientEnv$client_id,
+            "&client_secret=", transmartClientEnv$client_secret,
+            "&redirect_uri=http://", transmartClientEnv$oauthDomain,
+            "/transmart-rest-api/oauth/verify")
+
+    if (is.null(prefetched.request.token)) {
+        cat("Please go to the following url to authorize this RClient:\n")
+        cat(oauth.request.token.url)
+        cat("\nAnd paste the verifier here:")
+        request.token <- readline() 
+    } else request.token <- prefetched.request.token
+
+    oauth.exchange.token.url <- paste(sep = "",
+            "http://", transmartClientEnv$oauthDomain,
+            "/transmart-rest-api/oauth/token?grant_type=authorization_code&client_id=",
+            transmartClientEnv$client_id,
+            "&client_secret=", transmartClientEnv$client_secret,
+            "&code=", request.token,
+            "&redirect_uri=http://", transmartClientEnv$oauthDomain,
+            "/transmart-rest-api/oauth/verify")
+    
+    oauthResponse <- getURL(oauth.exchange.token.url,
+            verbose = FALSE,
+            httpheader = c(Host = oauthDomain))
+
+    list2env(fromJSON(oauthResponse), envir = transmartClientEnv)
+}
+
+
+
+ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
+    require(RCurl)
+    require(RJSONIO)
+
+    if (exists("transmartClientEnv")) {
+        cat("Previous authentication will be cleared. Do you wish to continue? Y/N\n")
+        choice <- readline()
+        if (length(grep("^y|^Y",choice))==0) return("Cancelled. Previous authentication will remain in effect.")
+    } else { assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv) }
+
+    transmartClientEnv$transmartDomain <- transmartDomain
+    
+    transmartClientEnv$db_access_url <- paste(sep = "", 
+      "http://", transmartClientEnv$transmartDomain, "/transmart-rest-api"
+    )
+
+    transmartClientEnv$serverGetRequest <- function(apiCall) {
+        httpHeaderFields <- c(Host = transmartDomain)
+        if (exists("transmartClientEnv$access_token")) {
+            append(httpHeaderFields, Authorization = paste("Bearer ", access_token, sep=""))
+        }
+        result <- getURL(paste(sep="", db_access_url, apiCall),
+          httpheader = httpHeaderFields,
+          verbose = FALSE
+        )
+        fromJSON(result)
+    }; environment(transmartClientEnv$serverGetRequest) <- transmartClientEnv 
+}
+
+.checkTransmartConnection <- function() {
   require(RCurl)
   require(RJSONIO)
-  
-  if (exists("RClientEnv")) {
-    cat("Previous connection settings will be cleared. Do you wish to continue? Y/N\n")
-    choice <- readline()
-    if (length(grep("^y|^Y",choice))==0) return("Cancelled. Previous settings remain in effect.")
-  }
-  
-  .initConnectionSettings(oauthDomain, transmartDomain)
-  
-  if (is.null(prefetched.verifier)) {
-    cat("Please go to the following url to authorize this RClient:\n")
-    cat(RClientEnv$oauth_url)
-    cat("\nAnd paste the verifier here:")
-    temp_verifier <- readline() 
-  } else temp_verifier <- prefetched.verifier
-  
-  response <- getURL(RClientEnv$getTokenExchangeURI(temp_verifier), verbose = FALSE, curl = RClientEnv$curlHandle, httpheader = c(Host = RClientEnv$oauthDomain))
-  jsonList <- fromJSON(response)
-  list2env(jsonList, envir = RClientEnv)
-  print("Validation accepted. You now have access to the database.")
+  if (!exists("transmartClientEnv", envir = .GlobalEnv)) stop("Client has not been initialized yet.")
+  #ping <- transmartClientEnv$serverGetRequest("")
 }
-
-
-
-.initConnectionSettings <- function(oauthDomain, transmartDomain) {
-  assign("RClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
-  
-  require(RCurl)
-  RClientEnv$curlHandle <- getCurlHandle()
-  
-  RClientEnv$oauthDomain <- oauthDomain
-  RClientEnv$transmartDomain <- transmartDomain
-  
-  RClientEnv$client_id <- "myId"
-  RClientEnv$client_secret <- "mySecret"
-  
-  RClientEnv$oauth_url <- paste(sep = "",
-    "http://", RClientEnv$oauthDomain,
-    "/transmart-rest-api/oauth/authorize?response_type=code&client_id=", RClientEnv$client_id,
-    "&client_secret=", RClientEnv$client_secret,
-    "&redirect_uri=http://", RClientEnv$oauthDomain,
-    "/transmart-rest-api/oauth/verify"
-  )
-  
-  RClientEnv$db_access_url <- paste(sep = "", 
-    "http://", RClientEnv$transmartDomain, "/transmart-rest-api"
-  )
-  
-  RClientEnv$getTokenExchangeURI <- function(verification_code) {
-    paste(sep = "",
-      oauthDomain,
-      "/transmart-rest-api/oauth/token?grant_type=authorization_code&client_id=", client_id,
-      "&client_secret=", client_secret,
-      "&code=", verification_code,
-      "&redirect_uri=http://", oauthDomain,
-      "/transmart-rest-api/oauth/verify"
-    )
-  }; environment(RClientEnv$getTokenExchangeURI) <- RClientEnv 
-  
-  RClientEnv$serverGetRequest <- function(url) {
-    result <- getURL(
-      paste(sep="",
-          RClientEnv$db_access_url, url 
-      ),
-      httpheader = c(
-        Host = "localhost:8080",
-        Authorization = paste("Bearer ", RClientEnv$access_token, sep="")
-      ),
-      #verbose = TRUE,
-      curl = RClientEnv$curlHandle
-    )
-    fromJSON(result)
-  }; environment(RClientEnv$serverGetRequest) <- RClientEnv 
-}
-
-
-
-.checkRClientEnvironment <- function() {
-  require(RCurl)
-  require(RJSONIO)
-  if (!exists("RClientEnv", envir = .GlobalEnv)) stop("Client has not been initialized yet.")
-}
-

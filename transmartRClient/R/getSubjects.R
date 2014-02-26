@@ -1,7 +1,7 @@
 getSubjects <- function(study) {
-    .checkRClientEnvironment()
+    .checkTransmartConnection()
     studyName <- study[["name"]]
-    listOfSubjects <- RClientEnv$serverGetRequest(
+    listOfSubjects <- transmartClientEnv$serverGetRequest(
             paste("/studies/",studyName,"/subjects",sep="")
     )
     subjectIDs <- sapply(listOfSubjects, FUN = function(x) { x[["id"]] })
