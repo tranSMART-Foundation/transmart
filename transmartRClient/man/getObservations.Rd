@@ -1,8 +1,7 @@
 \name{getObservations}
 \alias{getObservations}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+  Obtain a list of observations for a certain study
 }
 \description{
   This function will retrieve a list of all observations for a certain
@@ -11,7 +10,6 @@
 \usage{
 getObservations(studyName, subjectID = NULL, as.data.frame = FALSE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{study}{The name of the study}
   \item{subjectID}{The ID of the subject}
@@ -29,12 +27,6 @@ getObservations(studyName, subjectID = NULL, as.data.frame = FALSE)
 \note{}
 \seealso{}
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (studyName, subjectID = NULL, as.data.frame = FALSE) 
   # The following will retrieve a list with observations for the study "foo"
   getObservations("foo")
 }
