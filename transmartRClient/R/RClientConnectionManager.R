@@ -66,11 +66,11 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
     transmartClientEnv$serverGetRequest <- function(apiCall) {
         httpHeaderFields <- c(Host = transmartDomain)
         if (exists("transmartClientEnv$access_token")) {
-            append(httpHeaderFields, Authorization = paste("Bearer ", access_token, sep=""))
+            httpHeaderFields <- c(httpHeaderFields, Authorization = paste("Bearer ", access_token, sep=""))
         }
         result <- getURL(paste(sep="", db_access_url, apiCall),
-          httpheader = httpHeaderFields,
-          verbose = FALSE
+            httpheader = httpHeaderFields,
+            verbose = FALSE
         )
         fromJSON(result)
     }; environment(transmartClientEnv$serverGetRequest) <- transmartClientEnv 
