@@ -18,11 +18,11 @@ AuthenticateWithTransmart <- function(oauthDomain = "localhost:8080", prefetched
 
     oauth.request.token.url <- paste(sep = "",
             "http://", transmartClientEnv$oauthDomain,
-            "/transmart-rest-api/oauth/authorize?response_type=code&client_id=", 
+            "/transmart/oauth/authorize?response_type=code&client_id=", 
             transmartClientEnv$client_id,
             "&client_secret=", transmartClientEnv$client_secret,
             "&redirect_uri=http://", transmartClientEnv$oauthDomain,
-            "/transmart-rest-api/oauth/verify")
+            "/transmart/oauth/verify")
 
     if (is.null(prefetched.request.token)) {
         cat("Please go to the following url to authorize this RClient:\n")
@@ -33,12 +33,12 @@ AuthenticateWithTransmart <- function(oauthDomain = "localhost:8080", prefetched
 
     oauth.exchange.token.url <- paste(sep = "",
             "http://", transmartClientEnv$oauthDomain,
-            "/transmart-rest-api/oauth/token?grant_type=authorization_code&client_id=",
+            "/transmart/oauth/token?grant_type=authorization_code&client_id=",
             transmartClientEnv$client_id,
             "&client_secret=", transmartClientEnv$client_secret,
             "&code=", request.token,
             "&redirect_uri=http://", transmartClientEnv$oauthDomain,
-            "/transmart-rest-api/oauth/verify")
+            "/transmart/oauth/verify")
     
     oauthResponse <- getURL(oauth.exchange.token.url,
             verbose = FALSE,
@@ -62,7 +62,7 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
     transmartClientEnv$transmartDomain <- transmartDomain
     
     transmartClientEnv$db_access_url <- paste(sep = "", 
-      "http://", transmartClientEnv$transmartDomain, "/transmart-rest-api"
+      "http://", transmartClientEnv$transmartDomain, "/transmart"
     )
 
     transmartClientEnv$serverGetRequest <- function(apiCall) {
