@@ -1,3 +1,6 @@
+# Copyright (c) 2014 The Hyve B.V.
+# This code is licensed under the GNU General Public License, version 3
+
 getObservations <- function(studyName, subjectID = NULL, as.data.frame = FALSE) {
     .checkTransmartConnection()
     

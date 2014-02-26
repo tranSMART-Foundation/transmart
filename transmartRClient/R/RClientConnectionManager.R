@@ -1,3 +1,6 @@
+# Copyright (c) 2014 The Hyve B.V.
+# This code is licensed under the GNU General Public License, version 3
+
 AuthenticateWithTransmart <- function(oauthDomain = "localhost:8080", prefetched.request.token = NULL) {
     require(RCurl)
     require(RJSONIO)
@@ -45,7 +48,6 @@ AuthenticateWithTransmart <- function(oauthDomain = "localhost:8080", prefetched
 }
 
 
-
 ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
     require(RCurl)
     require(RJSONIO)
@@ -76,12 +78,14 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
     }; environment(transmartClientEnv$serverGetRequest) <- transmartClientEnv 
 }
 
+
 .checkTransmartConnection <- function() {
   require(RCurl)
   require(RJSONIO)
   if (!exists("transmartClientEnv", envir = .GlobalEnv)) stop("Client has not been initialized yet.")
   #ping <- transmartClientEnv$serverGetRequest("")
 }
+
 
 # this function is needed for .listToDataFrame to recursively replace NULL
 # values with NA, otherwise, unlist() will exclude those values in the next step
@@ -96,6 +100,7 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
     list
 }
 
+
 .listToDataFrame <- function(list) {
     # replace NULL values with NA values in list
     list <- .recursiveReplaceNullWithNa(list)
@@ -109,4 +114,3 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
     # convert matrix to data.frame
     as.data.frame(df, stringsAsFactors = FALSE)
 }
-
