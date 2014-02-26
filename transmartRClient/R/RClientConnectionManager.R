@@ -67,7 +67,7 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
 
     transmartClientEnv$serverGetRequest <- function(apiCall) {
         httpHeaderFields <- c(Host = transmartDomain)
-        if (exists("transmartClientEnv$access_token")) {
+        if (exists("access_token", envir = transmartClientEnv)) {
             httpHeaderFields <- c(httpHeaderFields, Authorization = paste("Bearer ", access_token, sep=""))
         }
         result <- getURL(paste(sep="", db_access_url, apiCall),
