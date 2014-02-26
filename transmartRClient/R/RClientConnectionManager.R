@@ -82,3 +82,31 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
   if (!exists("transmartClientEnv", envir = .GlobalEnv)) stop("Client has not been initialized yet.")
   #ping <- transmartClientEnv$serverGetRequest("")
 }
+
+# this function is needed for .listToDataFrame to recursively replace NULL
+# values with NA, otherwise, unlist() will exclude those values in the next step
+.recursiveReplaceNullWithNa <- function(list) {
+    for (i in 1:length(list)) {
+        if (is.list(list[[i]])) {
+            list[[i]] <- .recursiveReplaceNullWithNa(list[[i]])
+        } else {
+            if (is.null(list[[i]])) list[[i]] <- NA
+        }
+    }
+    list
+}
+
+.listToDataFrame <- function(list) {
+    # replace NULL values with NA values in list
+    list <- .recursiveReplaceNullWithNa(list)
+    
+    # add each list-element as a new row to a matrix
+    df <- c()
+    for (el in list) df <- rbind(df, unlist(el))
+    if (is.null(names(list))) { 
+      rownames(df) <- NULL
+    } else { rownames(df) <- names(list) }
+    # convert matrix to data.frame
+    as.data.frame(df, stringsAsFactors = FALSE)
+}
+
