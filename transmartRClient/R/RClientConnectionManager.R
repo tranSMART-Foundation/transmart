@@ -51,9 +51,10 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
     require(RJSONIO)
 
     if (exists("transmartClientEnv")) {
-        cat("Previous authentication will be cleared. Do you wish to continue? Y/N\n")
+        cat("Previous connection settings will be cleared (authentication will remain intact).
+                \nDo you wish to continue? Y/N\n")
         choice <- readline()
-        if (length(grep("^y|^Y",choice))==0) return("Cancelled. Previous authentication will remain in effect.")
+        if (length(grep("^y|^Y",choice))==0) return("Cancelled. Previous connection settings will remain in effect.")
     } else { assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv) }
 
     transmartClientEnv$transmartDomain <- transmartDomain
