@@ -74,16 +74,19 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
             httpheader = httpHeaderFields,
             verbose = FALSE
         )
-        fromJSON(result)
-    }; environment(transmartClientEnv$serverGetRequest) <- transmartClientEnv 
+        if (is.null(result) || result == "null") {return(NULL)}
+        tryCatch(fromJSON(result, asText = TRUE), 
+                error = function(e) {
+                    print("Error converting result from tranSMART. Please check the details of your request.")
+                }
+        )
+    }; environment(transmartClientEnv$serverGetRequest) <- transmartClientEnv
 }
 
 
 .checkTransmartConnection <- function() {
-  require(RCurl)
-  require(RJSONIO)
   if (!exists("transmartClientEnv", envir = .GlobalEnv)) stop("Client has not been initialized yet.")
-  #ping <- transmartClientEnv$serverGetRequest("")
+  ping <- transmartClientEnv$serverGetRequest("/oauth/verify")
 }
 
 
