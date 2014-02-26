@@ -87,6 +87,9 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
 .checkTransmartConnection <- function() {
   if (!exists("transmartClientEnv", envir = .GlobalEnv)) stop("Client has not been initialized yet.")
   ping <- transmartClientEnv$serverGetRequest("/oauth/verify")
+  if (!is.null(ping)) stop("Cannot connect to tranSMART database.\n
+Please check your internet connection, and perhaps rerun\n
+AuthenticateWithTransmart() and/or ConnectToTransmart()")
 }
 
 
