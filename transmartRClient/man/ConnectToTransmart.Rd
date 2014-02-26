@@ -1,0 +1,37 @@
+\name{ConnectToTransmart}
+\alias{ConnectToTransmart}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{
+  Initializes a new connection to the tranSMART database via the RESTful API
+}
+\description{
+  This function initializes the necessary connection settings to access the
+  tranSMART database.
+}
+\usage{
+ConnectToTransmart(transmartDomain = "localhost:8080")
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{transmartDomain}{The domain of the tranSMART server}
+}
+\details{
+  Note: this function does not authenticate the user.
+  Please also use \code{AuthenticateWithTransmart()} if you need to authenticate.
+}
+\value{
+  This function will set up the necessary connection settings inside the \emph{transmartClientEnv}
+  environment (if non-existent, this environment is created), which will enable this client to
+  access the tranSMART database through the available get methods (eg. \code{getStudies()}).
+}
+\references{}
+\author{Tim Dorscheidt, tim@thehyve.nl}
+\note{}
+\seealso{}
+\examples{
+  # Set the function's argument to the location of the tranSMART database 
+  ConnectToTransmart(transmartDomain = "localhost:8080")
+}
+\keyword{ environment }
+\keyword{ connection }
+\keyword{ database }
