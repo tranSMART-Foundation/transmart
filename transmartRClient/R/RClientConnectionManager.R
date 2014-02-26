@@ -5,7 +5,7 @@ AuthenticateWithTransmart <- function(oauthDomain = "localhost:8080", prefetched
     require(RCurl)
     require(RJSONIO)
 
-    if (exists("transmartClientEnv") && exists(transmartClientEnv$access_token)) {
+    if (exists("transmartClientEnv") && exists("transmartClientEnv$access_token")) {
         cat("Previous authentication will be cleared. Do you wish to continue? Y/N\n")
         choice <- readline()
         if (length(grep("^y|^Y",choice))==0) return("Cancelled. Previous authentication will remain in effect.")
