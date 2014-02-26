@@ -13,8 +13,8 @@ AuthenticateWithTransmart <- function(oauthDomain = "localhost:8080", prefetched
 
     if (!exists("transmartClientEnv")) assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
     transmartClientEnv$oauthDomain <- oauthDomain
-    transmartClientEnv$client_id <- "myId"
-    transmartClientEnv$client_secret <- "mySecret"
+    transmartClientEnv$client_id <- "api-client"
+    transmartClientEnv$client_secret <- "api-client"
 
     oauth.request.token.url <- paste(sep = "",
             "http://", transmartClientEnv$oauthDomain,
