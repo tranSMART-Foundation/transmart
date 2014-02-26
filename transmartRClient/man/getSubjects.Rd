@@ -8,11 +8,13 @@
   study, including the clinical information available per subject.
 }
 \usage{
-getSubjects(study)
+getSubjects(study, as.data.frame = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{study}{The name of the study}
+  \item{as.data.frame}{Set to TRUE if you wish the function to attempt conversion of
+  the result to a data frame}
 }
 \details{}
 \value{

@@ -9,10 +9,12 @@
   optional.
 }
 \usage{
-getStudies(nameMatch = "")
+getStudies(nameMatch = "", as.data.frame = FALSE)
 }
 \arguments{
   \item{nameMatch}{A string or regular expression by which the results are filtered}
+  \item{as.data.frame}{Set to TRUE if you wish the function to attempt conversion of
+  the result to a data frame}
 }
 \details{
   Depending on your connection characteristics, this make take some time.
