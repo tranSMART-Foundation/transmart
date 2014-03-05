@@ -1,7 +1,7 @@
 package org.transmartproject.das.mydas
 
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
-import transmart.mydas.VcfService
+import transmart.mydas.VcfServiceAbstract
 import uk.ac.ebi.mydas.configuration.DataSourceConfiguration
 import uk.ac.ebi.mydas.configuration.PropertyType
 import uk.ac.ebi.mydas.datasource.RangeHandlingAnnotationDataSource
@@ -20,7 +20,7 @@ import javax.servlet.ServletContext
  */
 class SummaryMAFDS implements RangeHandlingAnnotationDataSource {
 
-    VcfService vcfService
+    VcfServiceAbstract vcfService
     List<DasEntryPoint> entryPoints
     long resultInstanceId
     String conceptKey
@@ -28,7 +28,7 @@ class SummaryMAFDS implements RangeHandlingAnnotationDataSource {
     @Override
     void init(ServletContext servletContext, Map<String, PropertyType> stringPropertyTypeMap, DataSourceConfiguration dataSourceConfiguration) throws DataSourceException {
         def ctx = servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
-        this.vcfService = ctx.vcfService
+        this.vcfService = ctx.cohortMAFService
         resultInstanceId = dataSourceConfiguration.getMatcherAgainstDsn().group(1).toLong()
         def ckEncoded = dataSourceConfiguration.getMatcherAgainstDsn().group(2)
         if(ckEncoded) {
