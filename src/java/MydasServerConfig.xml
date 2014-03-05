@@ -176,35 +176,35 @@
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
 
-        <!--&lt;!&ndash; Summary Level MAF Datasource &ndash;&gt;-->
-        <!--<datasource uri="http://thehyve.nl"-->
-                    <!--title="Summary MAF"-->
-                    <!--description="Minor Allele Frequency (MAF) whole study level"-->
-                    <!--doc_href="http://www.transmartproject.org/"-->
-                    <!--mapmaster="http://www.transmartproject.org/">-->
+         <!--Summary Level MAF Datasource-->
+        <datasource uri="http://thehyve.nl"
+                    title="Summary MAF"
+                    description="Minor Allele Frequency (MAF) whole study level"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
 
-            <!--<maintainer email="office@thehyve.nl" />-->
-            <!--<pattern>smaf-(\d+)(?:-(\S+))?</pattern>-->
-            <!--<version uri="smaf" created="2013-09-30">-->
-                <!--<class>org.transmartproject.das.mydas.SummaryMAFDS</class>-->
-                <!--&lt;!&ndash;TODO: Specify appropriate coordinates&ndash;&gt;-->
-                <!--<coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"-->
-                                <!--source="Gene_ID"-->
-                                <!--authority="Ensembl"-->
-                                <!--taxid="9606"-->
-                                <!--test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>-->
-                <!--<capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/smaf" />-->
-                <!--<capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/smaf/types" />-->
-                <!--<capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/smaf/features" />-->
-                <!--<capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/smaf/stylesheet" />-->
-                <!--<capability type="das1:rows-for-feature"	/>-->
-            <!--</version>-->
+            <maintainer email="office@thehyve.nl" />
+            <pattern>smaf-(\d+)(?:-(\S+))?</pattern>
+            <version uri="smaf" created="2013-09-30">
+                <class>org.transmartproject.das.mydas.SummaryMAFDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/smaf" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/smaf/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/smaf/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/smaf/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
 
-            <!--<stylesheet>vcf.style</stylesheet>-->
-            <!--<dna-command-enabled>true</dna-command-enabled>-->
-            <!--<use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>-->
-            <!--<include-types-with-zero-count>true</include-types-with-zero-count>-->
-        <!--</datasource>-->
+            <stylesheet>vcf.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
 
         <!--&lt;!&ndash; Quality of Depth Datasource &ndash;&gt;-->
         <!--<datasource uri="http://thehyve.nl"-->

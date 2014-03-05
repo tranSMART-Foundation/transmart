@@ -1,25 +1,18 @@
 package transmart.mydas
 
-import org.transmartproject.core.dataquery.TabularResult
-import org.transmartproject.core.dataquery.highdim.AssayColumn
-import org.transmartproject.core.dataquery.highdim.vcf.VcfValues
 import org.transmartproject.core.dataquery.highdim.chromoregion.RegionRow
-import uk.ac.ebi.mydas.exceptions.DataSourceException
-import uk.ac.ebi.mydas.exceptions.UnimplementedFeatureException
-import uk.ac.ebi.mydas.extendedmodel.DasMethodE
-import uk.ac.ebi.mydas.model.DasAnnotatedSegment
+import org.transmartproject.core.dataquery.highdim.vcf.VcfValues
 import uk.ac.ebi.mydas.model.DasFeature
 import uk.ac.ebi.mydas.model.DasFeatureOrientation
 import uk.ac.ebi.mydas.model.DasPhase
 import uk.ac.ebi.mydas.model.DasType
-import org.transmartproject.db.dataquery.highdim.vcf.*
 
 import javax.annotation.PostConstruct
 
 /**
- * Created by j.hudecek on 3-2-14.
+ * Created by j.hudecek on 5-3-14.
  */
-class CohortMAFService  extends  VcfServiceAbstract {
+class SummaryMAFService extends  VcfServiceAbstract {
 
     @PostConstruct
     void init() {
@@ -32,10 +25,10 @@ class CohortMAFService  extends  VcfServiceAbstract {
 
     @Override
     protected void getSpecificFeatures(RegionRow region, Object assays, Collection<DasType> dasTypes, Map<String, List<DasFeature>> featuresPerSegment) {
-       constructSegmentFeaturesMap([region], getCohortMafFeature, featuresPerSegment)
+        constructSegmentFeaturesMap([region], getSummaryMafFeature, featuresPerSegment)
     }
 
-    private def getCohortMafFeature = { VcfValues val ->
+    private def getSummaryMafFeature = { VcfValues val ->
         if (!val.maf || val.maf <= 0) {
             return []
         }
@@ -45,11 +38,11 @@ class CohortMAFService  extends  VcfServiceAbstract {
 
         [new DasFeature(
                 // feature id - any unique id that represent this feature
-                "maf-${val.rsId}",
+                "smaf-${val.rsId}",
                 // feature label
-                'Cohort Minor Allele Frequency',
+                'Minor Allele Frequency',
                 // das type
-                new DasType('maf', "", "", ""),
+                new DasType('smaf', "", "", ""),
                 // das method TODO: pls find out what is actually means
                 dasMethod,
                 // start pos
@@ -57,17 +50,19 @@ class CohortMAFService  extends  VcfServiceAbstract {
                 // end pos
                 val.position.toInteger(),
                 // value - this is where Minor Allele Freq (MAF) value is placed
-                val.maf,
+                (val.additionalInfo['AF'] ?: '0') as double,
                 DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
                 DasPhase.PHASE_NOT_APPLICABLE,
                 //notes
                 ["RefSNP=${val.rsId}",
                         "REF=${val.referenceAllele}",
                         "ALT=${val.alternativeAlleles.join(',')}",
-                        "MafAllele=${val.mafAllele}",
                         "AlleleCount=${val.additionalInfo['AC'] ?: NA}",
-                        "AlleleFrequency=${val.maf}",
+                        "AlleleFrequency=${val.additionalInfo['AF'] ?: NA}",
                         "TotalAllele=${val.additionalInfo['AN'] ?: NA}",
+                        "BaseQRankSum=${val.additionalInfo['BaseQRankSum'] ?: NA}",
+                        "MQRankSum=${val.additionalInfo['MQRankSum'] ?: NA}",
+                        "dbSNPMembership=${val.additionalInfo['DB'] ?: 'No'}",
                         "VariantClassification=${val.additionalInfo['VC'] ?: NA}",
                         "QualityOfDepth=${val.qualityOfDepth ?: NA}",
                         "GenomicVariantTypes=${val.genomicVariantTypes.join(',')}"]*.toString(),
@@ -81,5 +76,4 @@ class CohortMAFService  extends  VcfServiceAbstract {
                 []
         )]
     }
-
 }
