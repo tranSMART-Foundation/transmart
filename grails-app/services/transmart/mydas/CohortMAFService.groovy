@@ -24,9 +24,6 @@ class CohortMAFService  extends  VcfServiceAbstract {
     @PostConstruct
     void init() {
         super.init()
-        resource = highDimensionResourceService.getSubResourceForType 'cohortMAF'
-        //TODO Choose correct cvId(3-d parameter) from http://www.ebi.ac.uk/ontology-lookup/browse.do?ontName=SO
-        projectionName = 'cohortMAF_values'
         dasTypes = [projectionName];
     }
 
