@@ -85,11 +85,21 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
 
 
 .checkTransmartConnection <- function() {
-  if (!exists("transmartClientEnv", envir = .GlobalEnv)) stop("Client has not been initialized yet.")
-  ping <- transmartClientEnv$serverGetRequest("/oauth/verify")
-  if (!is.null(ping)) stop("Cannot connect to tranSMART database.\n
-Please check your internet connection, and perhaps rerun\n
-AuthenticateWithTransmart() and/or ConnectToTransmart()")
+    require(RCurl)
+    require(RJSONIO)
+    if (!exists("transmartClientEnv", envir = .GlobalEnv)) {
+        stop("Client has not been initialized yet. Please use ConnectToTransmart()")
+    }
+    ping <- transmartClientEnv$serverGetRequest("/oauth/verify")
+    if (!is.null(ping)) {
+        cat(paste(sep=" \n", 
+                  "Cannot connect to tranSMART database.",
+                  "Check your connection, and possible use AuthenticateWithTransmart() to",
+                  "refresh your authentication, or use ConnectToTransmart() to reset your",
+                  "connection settings. Technical details:"))
+        stop(ping)
+    }
+    return("Connection has been succesfully established")
 }
 
 
