@@ -5,7 +5,7 @@ AuthenticateWithTransmart <- function(oauthDomain = "localhost:8080", prefetched
     require(RCurl)
     require(RJSONIO)
 
-    if (exists("transmartClientEnv") && exists("transmartClientEnv$access_token")) {
+    if (exists("transmartClientEnv") && exists("access_token", envir = transmartClientEnv)) {
         cat("Previous authentication will be cleared. Do you wish to continue? Y/N\n")
         choice <- readline()
         if (length(grep("^y|^Y",choice))==0) return("Cancelled. Previous authentication will remain in effect.")
@@ -49,16 +49,14 @@ AuthenticateWithTransmart <- function(oauthDomain = "localhost:8080", prefetched
 
 
 ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
-    require(RCurl)
-    require(RJSONIO)
-
-    if (exists("transmartClientEnv")) {
+    if (exists("transmartClientEnv") && exists("transmartDomain", envir = transmartClientEnv)) {
         cat("Previous connection settings will be cleared (authentication will remain intact).
                 \nDo you wish to continue? Y/N\n")
         choice <- readline()
         if (length(grep("^y|^Y",choice))==0) return("Cancelled. Previous connection settings will remain in effect.")
-    } else { assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv) }
-
+    } 
+    
+    if (!exists("transmartClientEnv")) assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
     transmartClientEnv$transmartDomain <- transmartDomain
     
     transmartClientEnv$db_access_url <- paste(sep = "", 
