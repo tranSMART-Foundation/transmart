@@ -79,6 +79,7 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
                 }
         )
     }; environment(transmartClientEnv$serverGetRequest) <- transmartClientEnv
+    .checkTransmartConnection()
 }
 
 
