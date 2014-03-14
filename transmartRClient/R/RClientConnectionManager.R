@@ -62,26 +62,28 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
     transmartClientEnv$db_access_url <- paste(sep = "", 
       "http://", transmartClientEnv$transmartDomain, "/transmart"
     )
-
-    transmartClientEnv$serverGetRequest <- function(apiCall) {
-        httpHeaderFields <- c(Host = transmartDomain)
-        if (exists("access_token", envir = transmartClientEnv)) {
-            httpHeaderFields <- c(httpHeaderFields, Authorization = paste("Bearer ", access_token, sep=""))
-        }
-        result <- getURL(paste(sep="", db_access_url, apiCall),
-            httpheader = httpHeaderFields,
-            verbose = FALSE
-        )
-        if (is.null(result) || result == "null") {return(NULL)}
-        tryCatch(fromJSON(result, asText = TRUE), 
-                error = function(e) {
-                    print("Error converting result from tranSMART. Please check the details of your request.")
-                }
-        )
-    }; environment(transmartClientEnv$serverGetRequest) <- transmartClientEnv
     .checkTransmartConnection()
 }
 
+.transmartServerGetRequest <- function(apiCall, use.HAL) {
+  httpHeaderFields <- c(Host = transmartClientEnv$transmartDomain)
+  if (use.HAL) { httpHeaderFields <- c(httpHeaderFields, accept = "application/hal+json") }
+  if (exists("access_token", envir = transmartClientEnv)) {
+    httpHeaderFields <- c(httpHeaderFields, Authorization = paste("Bearer ", transmartClientEnv$access_token, sep=""))
+  }
+  result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
+                   httpheader = httpHeaderFields,
+                   verbose = FALSE
+  )
+  if (is.null(result) || result == "null") {return(NULL)}
+  tryCatch(result <- fromJSON(result, asText = TRUE), 
+           error = function(e) {
+             stop("Error converting result from tranSMART. Please check the details of your request.")
+           }
+  )
+  if (use.HAL) { return( .simplifyHalList(result) ) }
+  result
+}
 
 .checkTransmartConnection <- function() {
     require(RCurl)
