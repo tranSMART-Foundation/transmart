@@ -91,7 +91,7 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
     if (!exists("transmartClientEnv", envir = .GlobalEnv)) {
         stop("Client has not been initialized yet. Please use ConnectToTransmart()")
     }
-    ping <- transmartClientEnv$serverGetRequest("/oauth/verify")
+    ping <- .transmartServerGetRequest("/oauth/verify", use.HAL = FALSE)
     if (!is.null(ping)) {
         cat(paste(sep=" \n", 
                   "Cannot connect to tranSMART database.",
@@ -105,8 +105,9 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
 
 
 # this function is needed for .listToDataFrame to recursively replace NULL
-# values with NA, otherwise, unlist() will exclude those values in the next step
+# values with NA, otherwise, unlist() will exclude those values.
 .recursiveReplaceNullWithNa <- function(list) {
+    if (length(list) == 0) return(list())
     for (i in 1:length(list)) {
         if (is.list(list[[i]])) {
             list[[i]] <- .recursiveReplaceNullWithNa(list[[i]])
@@ -131,3 +132,24 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
     # convert matrix to data.frame
     as.data.frame(df, stringsAsFactors = FALSE)
 }
+
+.simplifyHalList <- function(halList) {
+  # rename _links element to api.link
+  names(halList)[which(names(halList) == "_links")] <- "api.link"
+  # remove embedded intermediate element and add its sub-elements to this level
+  if ("_embedded" %in% names(halList)) {
+    halList <- as.list(c(halList, halList[["_embedded"]]))
+    halList[["_embedded"]] <- NULL
+  }
+  # recursion: apply this function to list-elements of current list
+  if (length(halList) > 0) {
+    for (elementIndex in 1:length(halList)) {
+      if (is.list(halList[[elementIndex]])) {
+        halList[[elementIndex]] <- .simplifyHalList(halList[[elementIndex]])
+      }
+    }
+  }
+  return(halList)
+}
+
+
