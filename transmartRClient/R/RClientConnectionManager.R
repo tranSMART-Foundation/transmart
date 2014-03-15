@@ -1,14 +1,31 @@
 # Copyright (c) 2014 The Hyve B.V.
 # This code is licensed under the GNU General Public License, version 3
 
-AuthenticateWithTransmart <- function(oauthDomain = "localhost:8080", prefetched.request.token = NULL) {
-    require(RCurl)
-    require(RJSONIO)
+ConnectToTransmart <- 
+function (transmartDomain, authenticate = TRUE, ...) {
+  if (!exists("transmartClientEnv")) assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
+  
+  transmartClientEnv$transmartDomain <- transmartDomain
+  transmartClientEnv$db_access_url <- paste(sep = "", 
+                                            "http://", transmartClientEnv$transmartDomain, "/transmart"
+  )
+  
+  if (authenticate) { 
+      cat(AuthenticateWithTransmart(...), "\n")
+  }
+  
+  .checkTransmartConnection()
+}
 
+AuthenticateWithTransmart <- 
+function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.token = NULL) {
+    require(RCurl)
+    require(RJSONIO)  
+  
     if (exists("transmartClientEnv") && exists("access_token", envir = transmartClientEnv)) {
-        cat("Previous authentication will be cleared. Do you wish to continue? Y/N\n")
-        choice <- readline()
-        if (length(grep("^y|^Y",choice))==0) return("Cancelled. Previous authentication will remain in effect.")
+        cat("Would you like to re-authenticate? (Previous authentication will be cleared).\n",
+            "Do you wish to continue? Y/N\n")
+        if (!grepl("^y|^Y", readline())) return("Cancelled re-authentication.")
     }
 
     if (!exists("transmartClientEnv")) assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
@@ -25,9 +42,9 @@ AuthenticateWithTransmart <- function(oauthDomain = "localhost:8080", prefetched
             "/transmart/oauth/verify")
 
     if (is.null(prefetched.request.token)) {
-        cat("Please go to the following url to authorize this RClient:\n")
-        cat(oauth.request.token.url)
-        cat("\nAnd paste the verifier here:")
+        cat("Please go to the following url to authorize this RClient:\n\n",
+            oauth.request.token.url, "\n\n",
+            "And paste the verifier here:\n")
         request.token <- readline() 
     } else request.token <- prefetched.request.token
 
@@ -40,29 +57,18 @@ AuthenticateWithTransmart <- function(oauthDomain = "localhost:8080", prefetched
             "&redirect_uri=http://", transmartClientEnv$oauthDomain,
             "/transmart/oauth/verify")
     
-    oauthResponse <- getURL(oauth.exchange.token.url,
+    tryCatch(
+        oauthResponse <- getURL(oauth.exchange.token.url,
             verbose = FALSE,
-            httpheader = c(Host = oauthDomain))
-
-    list2env(fromJSON(oauthResponse), envir = transmartClientEnv)
-}
-
-
-ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
-    if (exists("transmartClientEnv") && exists("transmartDomain", envir = transmartClientEnv)) {
-        cat("Previous connection settings will be cleared (authentication will remain intact).
-                \nDo you wish to continue? Y/N\n")
-        choice <- readline()
-        if (length(grep("^y|^Y",choice))==0) return("Cancelled. Previous connection settings will remain in effect.")
-    } 
-    
-    if (!exists("transmartClientEnv")) assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
-    transmartClientEnv$transmartDomain <- transmartDomain
-    
-    transmartClientEnv$db_access_url <- paste(sep = "", 
-      "http://", transmartClientEnv$transmartDomain, "/transmart"
+            httpheader = c(Host = transmartClientEnv$oauthDomain)), 
+        error = function(e) { stop("Error with connecting to verification server.") }
     )
-    .checkTransmartConnection()
+    
+    if (grepl("access_token", oauthResponse)) {
+      list2env(fromJSON(oauthResponse), envir = transmartClientEnv) 
+      return("Authentication completed")
+    }
+    stop("Authentication failed.")
 }
 
 .transmartServerGetRequest <- function(apiCall, use.HAL) {
@@ -78,7 +84,7 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
   if (is.null(result) || result == "null") {return(NULL)}
   tryCatch(result <- fromJSON(result, asText = TRUE), 
            error = function(e) {
-             stop("Error converting result from tranSMART. Please check the details of your request.")
+             stop("Error in parsing response from tranSMART server. Please check the details of your request.")
            }
   )
   if (use.HAL) { return( .simplifyHalList(result) ) }
@@ -93,14 +99,16 @@ ConnectToTransmart <- function(transmartDomain = "localhost:8080") {
     }
     ping <- .transmartServerGetRequest("/oauth/verify", use.HAL = FALSE)
     if (!is.null(ping)) {
-        cat(paste(sep=" \n", 
-                  "Cannot connect to tranSMART database.",
-                  "Check your connection, and possible use AuthenticateWithTransmart() to",
-                  "refresh your authentication, or use ConnectToTransmart() to reset your",
-                  "connection settings. Technical details:"))
-        stop(ping)
-    }
-    return("Connection has been succesfully established")
+        if (grepl("^invalid_token", ping["error"])) {
+          cat("Authentication token not accepted. Details:\n",
+              paste(ping, collapse = ": "),"\n")
+              AuthenticateWithTransmart(oauthDomain = transmartClientEnv$oauthDomain)
+        } else {
+          cat("Cannot connect to tranSMART database.\n",
+              "Technical details:\n")
+          stop(paste(ping, collapse = ": "))
+        }
+    } else { return("Connection has been succesfully established") }
 }
 
 
