@@ -1,28 +1,32 @@
-# This file contains some potentially useful development commands for 
-# re-installing the package, running some demo calls, and R-document creation
-
-# Unload+uninstall previous version, and install+load transmartRClient package from source
-detach("package:transmartRClient")
-remove.packages("transmartRClient")
-# Despite unloading and uninstalling the R client, you should restart your R session
-# to ensure removal of the individually loaded functions at this point
-pathOfPackageSource <- "~/Projects/transmart-rclient/transmartRClient"
-install.packages(pathOfPackageSource, repos = NULL, type = "source")
-require("transmartRClient")
+# This file contains some pointers for running a small demo, package refreshing, and skeleton package creation
 
 # Example steps to authenticate with, connect to, and retrieve data from tranSMART
-AuthenticateWithTransmart("test-api.thehyve.net")
-ConnectToTransmart("test-api.thehyve.net")
+require("transmartRClient")
+ConnectToTransmart("test-build.thehyve.net")
 studies <- getStudies()
 subjects <- getSubjects(studies$name[2])
-observations <- getObservations(studies$name[2], subjects$id[1], as.data.frame = T)
+observations <- getObservations(studies$name[1], subjects$id[1], as.data.frame = T)
 observations <- getObservations(studies$name[2], as.data.frame = T)
 
-# create skeleton package to generate the Rd files per function
-setwd("~/Projects/transmart-rclient/transmartRClient/R/")
-sapply(list.files(), source)
-functionsToInclude <- c("AuthenticateWithTransmart", "ConnectToTransmart",
-                         "getStudies", "getSubjects", "getObservations")
-package.skeleton(list = functionsToDocument, name = "transmartRClient", 
-                 path = "~/Projects/transmart-rclient/skeleton/")
+# Clean install of transmartRClient: unload and uninstall, clean environment, and then re-install package from source
+detach("package:transmartRClient")
+remove.packages("transmartRClient")
+# Remove manually declared functions
+rm(list = lsf.str())
+# Also, I have noticed the puzzling result that R sometimes sources old file versions (cache problem?)
+# Recommended to restart your R console at this point
+pathOfPackageSource <- "~/Projects/transmart-rclient/transmartRClient"
+install.packages(pathOfPackageSource, clean = TRUE, repos = NULL, type = "source")
 
+# create skeleton package: automises documentation and package base structure
+sourcePath <- ("~/Projects/transmart-rclient/transmartRClient/R")
+skeletonPath <- ("~/Projects/transmart-rclient/skeleton")
+sourceFiles <- list.files(sourcePath, pattern = "[.][Rr]$", full.names = TRUE)
+# optional, tidy up source files
+require("formatR")
+for (inputFile in sourceFiles) {
+    outputFile = sub("[.][Rr]$", "_tidy.R", inputFile)
+    tidy.source(source = inputFile, file = outputFile, width.cutoff = 120)
+}
+# create sekeleton
+package.skeleton(code_files = sourceFiles, name = "transmartRClient", path = skeletonPath)
