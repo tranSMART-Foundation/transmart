@@ -3,15 +3,15 @@
 
 getObservations <- function(studyName, subjectID = NULL, as.data.frame = FALSE) {
     .checkTransmartConnection()
-    
+
     if (is.null(subjectID)) {
-        listOfObservations <- transmartClientEnv$serverGetRequest(
-            paste("/studies/", studyName, "/observations", sep="")
-        )
+        listOfObservations <- .transmartServerGetRequest(
+            paste("/studies/", studyName, "/observations", sep=""),
+            use.HAL = TRUE)
     } else {
-        listOfObservations <- transmartClientEnv$serverGetRequest(
-            paste("/studies/", studyName, "/subjects/", subjectID, "/observations", sep="")
-        )
+        listOfObservations <- .transmartServerGetRequest(
+            paste("/studies/", studyName, "/subjects/", subjectID, "/observations", sep=""),
+            use.HAL = TRUE)
     }
 
     if (as.data.frame) return(.listToDataFrame(listOfObservations))
