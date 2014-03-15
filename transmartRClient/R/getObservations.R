@@ -6,12 +6,12 @@ getObservations <- function(studyName, subjectID = NULL, as.data.frame = FALSE) 
 
     if (is.null(subjectID)) {
         listOfObservations <- .transmartServerGetRequest(
-            paste("/studies/", studyName, "/observations", sep="")
-        )
+            paste("/studies/", studyName, "/observations", sep=""),
+            use.HAL = TRUE)
     } else {
         listOfObservations <- .transmartServerGetRequest(
-            paste("/studies/", studyName, "/subjects/", subjectID, "/observations", sep="")
-        )
+            paste("/studies/", studyName, "/subjects/", subjectID, "/observations", sep=""),
+            use.HAL = TRUE)
     }
 
     if (as.data.frame) return(.listToDataFrame(listOfObservations))
