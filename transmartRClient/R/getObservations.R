@@ -5,15 +5,16 @@ getObservations <- function(studyName, subjectID = NULL, as.data.frame = FALSE) 
     .checkTransmartConnection()
 
     if (is.null(subjectID)) {
-        listOfObservations <- .transmartServerGetRequest(
+        serverResult <- .transmartServerGetRequest(
             paste("/studies/", studyName, "/observations", sep=""),
             use.HAL = TRUE)
     } else {
-        listOfObservations <- .transmartServerGetRequest(
+        serverResult <- .transmartServerGetRequest(
             paste("/studies/", studyName, "/subjects/", subjectID, "/observations", sep=""),
-            use.HAL = TRUE)
+            use.HAL = TRUE) 
     }
-
+    listOfObservations <- serverResult$observations
+    
     if (as.data.frame) return(.listToDataFrame(listOfObservations))
     listOfObservations
 }
