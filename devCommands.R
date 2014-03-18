@@ -2,11 +2,13 @@
 
 # Example steps to authenticate with, connect to, and retrieve data from tranSMART
 require("transmartRClient")
-ConnectToTransmart("test-build.thehyve.net")
+options(verbose = FALSE)
+connectToTransmart("test-api.thehyve.net", use.authentication = TRUE)
 studies <- getStudies()
-subjects <- getSubjects(studies$name[2])
-observations <- getObservations(studies$name[1], subjects$id[1], as.data.frame = T)
-observations <- getObservations(studies$name[2], as.data.frame = T)
+subjects <- getSubjects(studies$name[3])
+observations <- getObservations(studies$name[3], subjects$id[1], as.data.frame = T)
+observations <- getObservations(studies$name[1], as.data.frame = T)
+
 
 # Clean install of transmartRClient: unload and uninstall, clean environment, and then re-install package from source
 detach("package:transmartRClient")
@@ -14,9 +16,10 @@ remove.packages("transmartRClient")
 # Remove manually declared functions
 rm(list = lsf.str())
 # Also, I have noticed the puzzling result that R sometimes sources old file versions (cache problem?)
-# Recommended to restart your R console at this point
+# Recommended to restart your R console at this point. Please let me know if you know how to handle this more elegantly.
 pathOfPackageSource <- "~/Projects/transmart-rclient/transmartRClient"
 install.packages(pathOfPackageSource, clean = TRUE, repos = NULL, type = "source")
+
 
 # create skeleton package: automises documentation and package base structure
 sourcePath <- ("~/Projects/transmart-rclient/transmartRClient/R")
