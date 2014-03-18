@@ -1,17 +1,18 @@
 package transmart.mydas
 
 import org.transmartproject.core.dataquery.highdim.chromoregion.RegionRow
-import uk.ac.ebi.mydas.model.DasFeature
-import uk.ac.ebi.mydas.model.DasType
 import org.transmartproject.core.dataquery.highdim.vcf.VcfValues
+import uk.ac.ebi.mydas.model.DasFeature
 import uk.ac.ebi.mydas.model.DasFeatureOrientation
 import uk.ac.ebi.mydas.model.DasPhase
+import uk.ac.ebi.mydas.model.DasType
+
 import javax.annotation.PostConstruct
 
 /**
- * Created by j.hudecek on 5-3-14.
+ * Created by j.hudecek on 18-3-14.
  */
-class QoDService  extends  VcfServiceAbstract {
+class VcfInfoService  extends  VcfServiceAbstract {
 
     @PostConstruct
     void init() {
@@ -21,29 +22,38 @@ class QoDService  extends  VcfServiceAbstract {
 
     @Override
     protected void getSpecificFeatures(RegionRow region, Object assays,  Map<String, String> params, Collection<DasType> dasTypes, Map<String, List<DasFeature>> featuresPerSegment) {
-        constructSegmentFeaturesMap([region], getQDFeature, featuresPerSegment)
+        if (!featuresPerSegment[region.chromosome]) {
+            featuresPerSegment[region.chromosome] = []
+        }
+
+        featuresPerSegment[region.chromosome].addAll(getInfoAndFeature(region, params['infoField']))
     }
 
-    private def getQDFeature = { VcfValues val ->
+    private def getInfoAndFeature = { VcfValues val, String infoField ->
+        if (!val.maf || val.maf <= 0) {
+            return []
+        }
 
         def linkMap = val.rsId == '.' ? [:]
                 : [(new URL("http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=${val.rsId}")): 'NCBI SNP Ref']
+        if (null == val.additionalInfo[infoField])
+            return []
 
         [new DasFeature(
                 // feature id - any unique id that represent this feature
-                "qd-${val.rsId}",
+                "smaf-${val.position}",
                 // feature label
-                'Quality of Depth',
+                'Minor Allele Frequency',
                 // das type
-                new DasType('qd', "", "", ""),
+                new DasType('vcfInfo', "", "", ""),
                 // das method TODO: pls find out what is actually means
                 dasMethod,
                 // start pos
                 val.position.toInteger(),
                 // end pos
                 val.position.toInteger(),
-                // value - this is where Minor Allele Freq (MAF) value is placed
-                val.qualityOfDepth,
+                // value - this is where we place the value from the info field
+                (val.additionalInfo[infoField]?:0) as double,
                 DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
                 DasPhase.PHASE_NOT_APPLICABLE,
                 //notes
@@ -57,7 +67,7 @@ class QoDService  extends  VcfServiceAbstract {
                         "MQRankSum=${val.additionalInfo['MQRankSum'] ?: NA}",
                         "dbSNPMembership=${val.additionalInfo['DB'] ?: 'No'}",
                         "VariantClassification=${val.additionalInfo['VC'] ?: NA}",
-                        "MAF=${val.maf ? String.format('%.2f', val.maf) : NA}",
+                        "QualityOfDepth=${val.qualityOfDepth ?: NA}",
                         "GenomicVariantTypes=${val.genomicVariantTypes.join(',')}"]*.toString(),
                 //links
                 linkMap,

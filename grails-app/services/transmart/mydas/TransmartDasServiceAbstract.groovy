@@ -16,7 +16,7 @@ import org.transmartproject.core.dataquery.highdim.dataconstraints.DataConstrain
 
 abstract class TransmartDasServiceAbstract {
 
-    abstract protected void getSpecificFeatures(RegionRow region, assays, Collection<DasType> dasTypes, Map<String, List<DasFeature>> featuresPerSegment);
+    abstract protected void getSpecificFeatures(RegionRow region, assays, Map<String, String> params, Collection<DasType> dasTypes, Map<String, List<DasFeature>> featuresPerSegment);
 
 
     HighDimensionResource highDimensionResourceService
@@ -60,6 +60,7 @@ abstract class TransmartDasServiceAbstract {
                                           Collection<String> segmentIds = [],
                                           Integer maxbins = null,
                                           uk.ac.ebi.mydas.model.Range range = null,
+                                          Map<String, String> params = null,
                                           Collection<DasType> dasTypes = dasTypes) throws UnimplementedFeatureException, DataSourceException {
         def query = getRegionQuery(resultInstanceId, segmentIds, range)
         TabularResult<AssayColumn, RegionRow> regionResult = resource.retrieveData(*query)
@@ -69,7 +70,7 @@ abstract class TransmartDasServiceAbstract {
             for (RegionRow region : regionResult.rows) {
 
                 if(!featuresPerSegment[region.chromosome]) featuresPerSegment[region.chromosome] = []
-                getSpecificFeatures(region, assays, dasTypes, featuresPerSegment)
+                getSpecificFeatures(region, assays, params, dasTypes, featuresPerSegment)
             }
         }  finally {
             regionResult.close()

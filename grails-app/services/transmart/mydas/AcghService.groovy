@@ -40,7 +40,7 @@ class AcghService extends TransmartDasServiceAbstract {
 
 
     @Override
-    protected void getSpecificFeatures(RegionRow region, assays, Collection<DasType> dasTypes, Map<String, List<DasFeature>> featuresPerSegment) {
+    protected void getSpecificFeatures(RegionRow region, assays,  Map<String, String> params, Collection<DasType> dasTypes, Map<String, List<DasFeature>> featuresPerSegment) {
         def countPerDasType = countAcghDasTypesForRow(region, assays, dasTypes)
         countPerDasType.each { typeCountEntry ->
             def freq = typeCountEntry.value / (double) assays.size()

@@ -266,6 +266,36 @@
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
 
+        <!--Genomic Variants Datasource-->
+        <datasource uri="vcfInfo"
+                    title="VCF INFO"
+                    description="Custom INFO field of selected cohort"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>vcfInfo-([^\-]+)-(\d+)(?:-(\S+))?</pattern>
+            <version uri="vcfInfo" created="2013-10-02">
+                <class>org.transmartproject.das.mydas.VcfInfoDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/vcf" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/vcf/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/vcf/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/vcf/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>vcf.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
 
     </datasources>
 </mydasserver>

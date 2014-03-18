@@ -34,6 +34,13 @@
                     </HISTOGRAM>
                 </GLYPH>
             </TYPE>
+            <TYPE id="vcfInfo">
+                <GLYPH>
+                    <HISTOGRAM>
+                      <COLOR1>green</COLOR1>
+                    </HISTOGRAM>
+                </GLYPH>
+            </TYPE>
         </CATEGORY>
     </STYLESHEET>
 </DASSTYLE>

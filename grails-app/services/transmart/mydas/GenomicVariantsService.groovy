@@ -21,7 +21,7 @@ class GenomicVariantsService  extends  VcfServiceAbstract {
     }
 
     @Override
-    protected void getSpecificFeatures(RegionRow region, Object assays, Collection<DasType> dasTypes, Map<String, List<DasFeature>> featuresPerSegment) {
+    protected void getSpecificFeatures(RegionRow region, Object assays,  Map<String, String> params, Collection<DasType> dasTypes, Map<String, List<DasFeature>> featuresPerSegment) {
         constructSegmentFeaturesMap([region], getGenomicTypeFeature, featuresPerSegment)
     }
 
