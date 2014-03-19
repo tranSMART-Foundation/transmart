@@ -1,7 +1,7 @@
-This is a simple example project for using Geb with Maven.
+To run the tests:
 
-Just check it out and run…
-
-    mvn test
-
-Please see the `src/test/resources/GebConfig.groovy` file for how to run the tests with different browsers.
+- On Firefox, do: `mvn test -Pfirefox`
+- On Chrome, set the environment variable `CHROME_DRIVER` to the location of the
+  chromedriver executable and then run `mvn test -Pchrome`. The driver will have
+  to be
+  [downloaded first](http://chromedriver.storage.googleapis.com/index.html).
