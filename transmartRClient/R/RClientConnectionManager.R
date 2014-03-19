@@ -3,7 +3,7 @@
 
 connectToTransmart <- 
 function (transmartDomain, use.authentication = TRUE, ...) {
-    assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
+    if (!exists("transmartClientEnv")) assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
     
     transmartClientEnv$transmartDomain <- transmartDomain
     transmartClientEnv$db_access_url <- paste(sep = "", 
@@ -12,7 +12,7 @@ function (transmartDomain, use.authentication = TRUE, ...) {
     
     if (use.authentication && !exists("access_token", envir = transmartClientEnv)) {
         authenticateWithTransmart(...)
-    } else { if (exists("access_token", envir = transmartClientEnv)) {
+    } else { if (!use.authentication && exists("access_token", envir = transmartClientEnv)) {
             remove("access_token", envir = transmartClientEnv)
         }
     }
