@@ -10,7 +10,7 @@
 
     <properties>
         <gebVersion>0.9.2</gebVersion>
-        <seleniumVersion>2.36.0</seleniumVersion>
+        <seleniumVersion>2.40.0</seleniumVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <browser.name>unknown</browser.name><!-- replaced in profiles -->
