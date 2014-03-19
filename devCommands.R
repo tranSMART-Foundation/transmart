@@ -2,12 +2,13 @@
 
 # Example steps to authenticate with, connect to, and retrieve data from tranSMART
 require("transmartRClient")
-options(verbose = FALSE)
-connectToTransmart("test-api.thehyve.net", use.authentication = TRUE)
+options(verbose = FALSE) # set to true for printing http message exchange
+connectToTransmart("test-api.thehyve.net")
 studies <- getStudies()
-subjects <- getSubjects(studies$name[3])
-observations <- getObservations(studies$name[3], subjects$id[1], as.data.frame = T)
-observations <- getObservations(studies$name[1], as.data.frame = T)
+subjects <- getSubjects(studies$name[1])
+concepts <- getConcepts(studies$name[1])
+observations <- getObservations(studies$name[3], as.data.frame = T)
+observations <- getObservations(studies$name[3], concept.match = "Study", as.data.frame = T)
 
 
 # Clean install of transmartRClient: unload and uninstall, clean environment, and then re-install package from source
@@ -17,8 +18,13 @@ remove.packages("transmartRClient")
 rm(list = lsf.str())
 # Also, I have noticed the puzzling result that R sometimes sources old file versions (cache problem?)
 # Recommended to restart your R console at this point. Please let me know if you know how to handle this more elegantly.
+
+# Notes for first time installers: 
+# The package transmartRClient depends on two packages: RCurl and RJSONIO.
+# One nasty issue encountered in MacOSX is that R installed via homebrew runs into a libl library error: please use R
+#       installed via the CRAN installer for the easiest way to solve this
 pathOfPackageSource <- "~/Projects/transmart-rclient/transmartRClient"
-install.packages(pathOfPackageSource, clean = TRUE, repos = NULL, type = "source")
+install.packages(pathOfPackageSource, repos = NULL, type = "source")
 
 
 # create skeleton package: automises documentation and package base structure
