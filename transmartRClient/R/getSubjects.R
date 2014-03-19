@@ -1,10 +1,10 @@
 # Copyright (c) 2014 The Hyve B.V.
 # This code is licensed under the GNU General Public License, version 3
 
-getSubjects <- function(studyName, as.data.frame = TRUE) {
+getSubjects <- function(study.name, as.data.frame = TRUE) {
     .checkTransmartConnection()
 
-    serverResult <- .transmartServerGetRequest( paste("/studies/",studyName,"/subjects", sep=""), use.HAL = TRUE )
+    serverResult <- .transmartServerGetRequest( paste("/studies/", study.name,"/subjects", sep=""), use.HAL = TRUE )
     listOfSubjects <- serverResult$subjects
     
     subjectIDs <- sapply(listOfSubjects, FUN = function(x) { x[["id"]] })
