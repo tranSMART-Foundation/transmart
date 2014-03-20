@@ -9,23 +9,33 @@ class LoginTests extends GebReportingTest {
 
     @Test
     void testFailedLogin() {
-        to LoginPage
-
-        usernameField.value Constants.BAD_USERNAME
-        passwordField.value Constants.BAD_PASSWORD
-        loginButton.click()
-
-        assert at(LoginFailedPage)
+		if (Constants.TEST_LOGIN) {
+	        to LoginPage
+	
+	        usernameField.value Constants.BAD_USERNAME
+	        passwordField.value Constants.BAD_PASSWORD
+	        loginButton.click()
+	
+	        assert at(LoginFailedPage)
+		} else {
+	        println "no login test - testFailedLogin; login not enabled"
+	        assert true;
+		}
     }
 
     @Test
     void testSuccessfulLogin() {
-        to LoginPage
-
-        usernameField.value Constants.GOOD_USERNAME
-        passwordField.value Constants.GOOD_PASSWORD
-        loginButton.click()
-
-        assert at(SearchPage)
+		if (Constants.TEST_LOGIN) {
+	        to LoginPage
+	
+	        usernameField.value Constants.GOOD_USERNAME
+	        passwordField.value Constants.GOOD_PASSWORD
+	        loginButton.click()
+	
+	        assert at(SearchPage)
+		} else {
+	        println "no login test - testSuccessfulLogin; login not enabled"
+	        assert true;
+		}
     }
 }
