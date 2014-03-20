@@ -32,7 +32,7 @@ class LoginTests extends GebReportingTest {
 	        passwordField.value Constants.GOOD_PASSWORD
 	        loginButton.click()
 	
-	        assert at(SearchPage)
+	        assert at(Constants.landingPage)
 		} else {
 	        println "no login test - testSuccessfulLogin; login not enabled"
 	        assert true;
