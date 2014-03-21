@@ -6,7 +6,7 @@ import org.openqa.selenium.Dimension
  * See: http://www.gebish.org/manual/current/configuration.html
  */
 
-baseUrl = 'http://ts-master-ci.thehyve.net/transmart/'
+baseUrl = 'http://localhost:8080/transmart/'
 
 def instantiateDriver(String className) {
     def driverInstance = Class.forName(className).newInstance()
