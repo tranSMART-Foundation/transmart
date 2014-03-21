@@ -33,8 +33,8 @@ class SurvivalAnalysisTests extends GebReportingTest{
         if (isAt(page)) {
             return
         } else if (isAt(LoginPage)) {
-            login(DatasetExplorerPage)
-        } else if (isAt(SearchPage)) {
+            login(page)
+        } else if (isAt(Constants.LandingPage)) {
             if (!firstCall) {
                 throw new AssertionFailedError('Redirection loop')
             }
@@ -42,14 +42,14 @@ class SurvivalAnalysisTests extends GebReportingTest{
             goToPageMaybeLogin(page, false)
         } else {
             throw new AssertionFailedError(
-                    "Expected to be at either the LoginPage, SearchPage or $page")
+                    "Expected to be at either the LoginPage, $Constants.LandingPage or $page")
         }
     }
 
 
     private void runAnalysis(Map params) {
         goToPageMaybeLogin DatasetExplorerPage
-
+				
         dragNodeToSubset params.subsetNode, 1, 1
 
         selectAnalysis 'Survival Analysis'

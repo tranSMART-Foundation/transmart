@@ -1,5 +1,7 @@
 package pages
 
+import geb.Page
+
 /**
  * Created by glopes on 06-02-2014.
  */
@@ -10,4 +12,6 @@ class Constants {
     public static final String GOOD_USERNAME = 'admin'
     public static final String GOOD_PASSWORD = 'admin'
 
+	public static final boolean AUTO_LOGIN_ENABLED = true
+	public static final Page LandingPage = new DatasetExplorerPage()
 }
