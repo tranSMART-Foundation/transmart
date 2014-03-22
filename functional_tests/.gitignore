@@ -2,3 +2,6 @@ target
 *.log
 .idea
 *.iml
+.project
+.classpath
+.settings
