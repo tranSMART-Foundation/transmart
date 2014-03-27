@@ -7,35 +7,13 @@ import pages.DatasetExplorerPage
 import pages.LoginPage
 import pages.SearchPage
 
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.*
+
 class SearchPageTests extends GebReportingTest {
-	
-	void login(Class<? extends Page> redirectionPage) {
-		usernameField.value Constants.GOOD_USERNAME
-		passwordField.value Constants.GOOD_PASSWORD
 
-		loginButtonNoTo.click()
-
-		at(redirectionPage)
-	}
-	
-	void goToPageMaybeLogin(Class<? extends Page> page, boolean firstCall = true) {
-		via page
-
-		if (isAt(page)) {
-			return
-		} else if (isAt(LoginPage)) {
-			login(page)
-		} else if (isAt(Constants.LandingPage)) {
-			if (!firstCall) {
-				throw new AssertionFailedError('Redirection loop')
-			}
-			/* if auto-login is on, we're unfortunately forwarded here */
-			goToPageMaybeLogin(page, false)
-		} else {
-			throw new AssertionFailedError(
-					"Expected to be at either the LoginPage, $Constants.LandingPage or $page")
-		}
-	}
+	//Note: for now, these tests assume auto-login
+	//TODO: these test need to be made robust in the face of a possible login requirement 	
 
 	@Test
 	void landingOnSearchTest() {
