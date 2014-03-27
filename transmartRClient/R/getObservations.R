@@ -1,5 +1,6 @@
 # Copyright (c) 2014 The Hyve B.V.
-# This code is licensed under the GNU General Public License, version 3
+# This code is licensed under the GNU General Public License,
+# version 3, or (at your option) any later version.
 
 getObservations <- function(study.name, concept.match = NULL, concept.links = NULL, as.data.frame = TRUE) {
     .checkTransmartConnection()
