@@ -17,7 +17,7 @@ class SearchPageTests extends GebReportingTest {
 	void clickOnDiseaseSelectsDisease(){
 		// The first hit in the session always lands on the landingPage
 		via (SearchPage)
-		assert at(Constants.LandingPage.class)
+		assert at(Constants.LANDING_PAGE.class)
 		
 		// after that, we can go to search page
 		to (SearchPage)

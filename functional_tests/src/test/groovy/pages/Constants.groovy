@@ -13,5 +13,5 @@ class Constants {
     public static final String GOOD_PASSWORD = 'admin'
 
 	public static final boolean AUTO_LOGIN_ENABLED = true
-	public static final Page LandingPage = new DatasetExplorerPage()
+	public static final Page LANDING_PAGE = new DatasetExplorerPage()
 }
