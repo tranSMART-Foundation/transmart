@@ -3,7 +3,7 @@ library(RProtoBuf)
 
 # assume we are running from within this file's directory
 # if not:
-setwd('~/devel/RInterface')
+#setwd('~/devel/RInterface')
 
 # Only currently used for assayId, we want to preserve those accurately
 options("RProtoBuf.int64AsString" = TRUE)
@@ -21,8 +21,10 @@ reset <- function() {
 
 run <- function() {
   reset()
+  parseProtoBuf(ff)
+}
 
-parseProtoBuf <- function(conn)
+parseProtoBuf <- function(conn){
 	hdr <- readHeader(conn)
 	capacity <- 100
 	count <- 0
@@ -39,7 +41,8 @@ parseProtoBuf <- function(conn)
 		rows[count] <- hdrow
   }
   messages <- list(header=hdr, rows=rows)
-	toDataFrame(messages)
+	#toDataFrame(messages)
+  messages
 }
 
 readHeader <- function(connection) {
