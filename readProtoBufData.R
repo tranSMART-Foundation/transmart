@@ -55,7 +55,7 @@ readHeader <- function(connection) {
 
 	assays <- hdr$assay
 
-	fieldnames = c(
+	fieldnames <- c(
 		'assayId', 'patientId', 'sampleTypeName', 'timepointName',
 		'tissueTypeName', 'sampleCode')
 
