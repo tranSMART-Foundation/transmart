@@ -4,12 +4,12 @@
 
 connectToTransmart <- 
 function (transmartDomain, use.authentication = TRUE, ...) {
-    if (!exists("transmartClientEnv")) assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
+    if (!exists("transmartClientEnv") || transmartClientEnv$transmartDomain != transmartDomain) { 
+        assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
+    }
     
     transmartClientEnv$transmartDomain <- transmartDomain
-    transmartClientEnv$db_access_url <- paste(sep = "", 
-                                              "http://", transmartClientEnv$transmartDomain, "/transmart"
-    )
+    transmartClientEnv$db_access_url <- transmartClientEnv$transmartDomain
     
     if (use.authentication && !exists("access_token", envir = transmartClientEnv)) {
         authenticateWithTransmart(...)
@@ -37,12 +37,12 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     transmartClientEnv$client_secret <- "api-client"
     
     oauth.request.token.url <- paste(sep = "",
-                                     "http://", transmartClientEnv$oauthDomain,
-                                     "/transmart/oauth/authorize?response_type=code&client_id=", 
+                                     transmartClientEnv$oauthDomain,
+                                     "/oauth/authorize?response_type=code&client_id=", 
                                      transmartClientEnv$client_id,
                                      "&client_secret=", transmartClientEnv$client_secret,
-                                     "&redirect_uri=http://", transmartClientEnv$oauthDomain,
-                                     "/transmart/oauth/verify")
+                                     "&redirect_uri=", transmartClientEnv$oauthDomain,
+                                     "/oauth/verify")
     
     if (is.null(prefetched.request.token)) {
       cat("Please visit the following url to authenticate this RClient (enter nothing to cancel):\n\n",
@@ -57,13 +57,13 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     }
     
     oauth.exchange.token.url <- paste(sep = "",
-                                      "http://", transmartClientEnv$oauthDomain,
-                                      "/transmart/oauth/token?grant_type=authorization_code&client_id=",
+                                      transmartClientEnv$oauthDomain,
+                                      "/oauth/token?grant_type=authorization_code&client_id=",
                                       transmartClientEnv$client_id,
                                       "&client_secret=", transmartClientEnv$client_secret,
                                       "&code=", request.token,
-                                      "&redirect_uri=http://", transmartClientEnv$oauthDomain,
-                                      "/transmart/oauth/verify")
+                                      "&redirect_uri=", transmartClientEnv$oauthDomain,
+                                      "/oauth/verify")
     
     tryCatch(
             oauthResponse <- getURL(oauth.exchange.token.url,
