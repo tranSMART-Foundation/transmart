@@ -93,7 +93,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
       return(TRUE)
   }
   
-  ping <- .transmartServerGetRequest("/oauth/verify", use.HAL = FALSE)
+  ping <- .transmartServerGetRequest("/oauth/verify", accept.type = "default")
   if (getOption("verbose")) { cat(paste(ping, collapse = ": "), "\n") }
   
   if (!is.null(ping)) {
@@ -125,23 +125,29 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
   result
 }
 
-.serverMessageExchange <- function(apiCall, httpHeaderFields, use.HAL = FALSE) {
-  require(RCurl)
-  require(RJSONIO)
-  
-  if (use.HAL) { httpHeaderFields <- c(httpHeaderFields, accept = "application/hal+json") }
-  
-  result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
-          verbose = getOption("verbose"),
-          httpheader = httpHeaderFields)
-  if (getOption("verbose")) { cat("Server response:\n\n", result, "\n\n") }
-  
-  if (is.null(result) || result == "null") { return(NULL) }
-  
-  result <- fromJSON(result, asText = TRUE, nullValue = NA)
-  if (use.HAL) { result <- .simplifyHalList(result) }
-  
-  result
+.serverMessageExchange <- function(apiCall, httpHeaderFields, accept.type = "default") {
+    require(RCurl)
+    require(RJSONIO)
+
+    if (any(accept.type == c("default", "hal"))) {
+        if (accept.type == "hal") { httpHeaderFields <- c(httpHeaderFields, accept = "application/hal+json") }
+        result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
+                verbose = getOption("verbose"),
+                httpheader = httpHeaderFields)
+        if (getOption("verbose")) { cat("Server response:\n\n", result, "\n\n") }
+        if (is.null(result) || result == "null") { return(NULL) }
+        result <- fromJSON(result, asText = TRUE, nullValue = NA)
+        if (accept.type == "hal") { return(.simplifyHalList(result)) }
+        return(result)
+    } else if (accept.type == "binary") {
+        result <- list()
+        h <- basicTextGatherer()
+        result$content <- getBinaryURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
+                .opts = list(headerfunction = h$update))
+        result$header <- parseHTTPHeader(h$value())
+        return(result)
+    }
+    return(NULL)
 }
 
 
