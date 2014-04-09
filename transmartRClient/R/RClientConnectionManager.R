@@ -141,8 +141,10 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         result <- list()
         h <- basicTextGatherer()
         result$content <- getBinaryURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
-                .opts = list(headerfunction = h$update))
+                .opts = list(headerfunction = h$update),
+                httpheader = httpHeaderFields)
         result$header <- parseHTTPHeader(h$value())
+        if (getOption("verbose")) { cat("Server binary response header:\n"); print(data.frame(result$header)) }
         return(result)
     }
     return(NULL)
