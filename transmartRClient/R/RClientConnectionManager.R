@@ -67,8 +67,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     
     tryCatch(
             oauthResponse <- getURL(oauth.exchange.token.url,
-                    verbose = getOption("verbose"),
-                    httpheader = c(Host = transmartClientEnv$oauthDomain)), 
+                    verbose = getOption("verbose")), 
             error = function(e) {
                 if (getOption("verbose")) { cat(e, "\n", oauthresponse) }
                 stop("Error with connection to verification server.") 
@@ -109,10 +108,9 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 }
 
 .transmartServerGetRequest <- function(apiCall, ...)  {
-  httpHeaderFields <- c(Host = transmartClientEnv$transmartDomain)
   if (exists("access_token", envir = transmartClientEnv)) {
-      httpHeaderFields <- c(httpHeaderFields, Authorization = paste("Bearer ", transmartClientEnv$access_token, sep=""))
-  }
+      httpHeaderFields <- c(Authorization = paste("Bearer ", transmartClientEnv$access_token, sep=""))
+  } else { httpHeaderFields <- "" }
   
   tryCatch(result <- .serverMessageExchange(apiCall, httpHeaderFields, ...), 
           error = function(e) {
