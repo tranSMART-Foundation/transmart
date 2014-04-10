@@ -39,7 +39,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         cat(paste(listOfHighdimDataTypes$supportedProjections,"\n"))
         return(listOfHighdimDataTypes$supportedProjections)
     }
-    
+    cat("Retrieving data from server.", as.character(Sys.time()), "\n")
     serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary")
     if (length(serverResult$content) == 0) {
         warning("Error in retrieving high dim data.")
@@ -80,14 +80,14 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     }
     
     assayHeaders <- as.data.frame(assayHeaders)
+    noAssays <- dim(assayHeaders)[1]
+    cat(paste("Received data for",noAssays,"assays. Unpacking data and converting to data.frame.",as.character(Sys.time()),"\n"))
     
-    assayData <- c()
+    assayData <- list()
     while (!is.null(message <- .getChunk(connection))) {
         row <- read(highdim.Row, message)
         if(typeName=="DOUBLE") {
-            rowData <- list(row$doubleValue) #for double values
-            names(rowData) <- row$label
-            assayData <- c(assayData, rowData)
+            assayData[[row$label]] <- row$doubleValue #for double values
         }
         if(typeName=="GENERAL") {
             rowValues <- row$mapValue
@@ -97,12 +97,14 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
                 names(rowEntry) <- paste(row$label, mapColumn, sep=".")
                 rowData <- rbind(rowData, rowEntry)
             }
-            assayData <- cbind(assayData, rowData)
+            rownames(rowData) <- NULL
+            for (colIndex in 1:ncol(rowData)) assayData[[colnames(rowData)[colIndex]]] <- rowData[ , colIndex,drop=FALSE]
         }
     }
     
     assayData <- as.data.frame(assayData)
     rownames(assayData) <- NULL
+    cat(as.character(Sys.time()))
     cbind(assayHeaders, assayData)
 }
 
