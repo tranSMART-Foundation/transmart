@@ -2,8 +2,18 @@
 # This code is licensed under the GNU General Public License,
 # version 3, or (at your option) any later version.
 
-getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL) {
-    .checkTransmartConnection()
+getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL, binary.file = NULL) {
+  require("RProtoBuf")
+  
+  if(!is.null(binary.file))
+  {
+    contentConnection <<- file(binary.file, open='r+b')
+    class(contentConnection) <- "connection"
+    connection <- ConnectionInputStream(contentConnection)
+    return(.parseHighdimData(connection))
+  }
+  
+  .checkTransmartConnection()
     
     if (is.null(concept.link) && !is.null(concept.match)) {
         studyConcepts <- getConcepts(study.name)
@@ -45,26 +55,24 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         warning("Error in retrieving high dim data.")
         return(NULL)
     }
-    return(.parseHighdimData(serverResult))
-}
-
-.parseHighdimData <- function(serverResult) {    
-    require("RProtoBuf")
-    
-    protoFileLocation <- system.file("extdata", "highdim.proto", package="transmartRClient")
-    readProtoFiles(protoFileLocation)
-    
     contentConnection <- rawConnection(serverResult$content, open = "r+b")
     class(contentConnection) <- "connection"
     connection <- ConnectionInputStream(contentConnection)
+  
+  
+    return(.parseHighdimData(connection))
+}
+
+.parseHighdimData <- function(connection) {    
+   
+    protoFileLocation <- system.file("extdata", "highdim.proto", package="transmartRClient")
+    readProtoFiles(protoFileLocation)
+    
     
     message <- .getChunk(connection)
     header <- read(highdim.HighDimHeader, message)
-    typeName <- name(highdim.HighDimHeader$RowType$value(header$rowsType))
-    mapColumn <- header$mapColumn
+    columnSpec <- header$columnSpec
     assays <- header$assay
-    
-    if(all(typeName != c("DOUBLE", "GENERAL"))) stop("HighDim data not of type DOUBLE or GENERAL")
     
     assayLabels <- .DollarNames(assays[[1]])[1:length(assays[[1]])]
     assayHeaders <- list()
@@ -79,33 +87,56 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         assayHeaders <- c(assayHeaders, row)
     }
     
-    assayHeaders <- as.data.frame(assayHeaders)
+    assayHeaders <- as.data.frame(assayHeaders, stringsAsFactors = FALSE)
     noAssays <- dim(assayHeaders)[1]
     cat(paste("Received data for",noAssays,"assays. Unpacking data and converting to data.frame.",as.character(Sys.time()),"\n"))
     
     assayData <- list()
+    labelToBioMarker<- c() #biomarker info is optional, but should not be omitted, as it is also part of the data
     while (!is.null(message <- .getChunk(connection))) {
-        row <- read(highdim.Row, message)
-        if(typeName=="DOUBLE") {
-            assayData[[row$label]] <- row$doubleValue #for double values
-        }
-        if(typeName=="GENERAL") {
-            rowValues <- row$mapValue
-            rowData <- c()
-            for(singleType in rowValues) {
-                rowEntry <- singleType$value
-                names(rowEntry) <- paste(row$label, mapColumn, sep=".")
-                rowData <- rbind(rowData, rowEntry)
+            row <- read(highdim.Row, message)
+            rowlabel<-row$label
+              
+            labelToBioMarker[[rowlabel]]<-row$bioMarker
+            rowValues <- row$value
+        
+            for(i in 1:length(rowValues)) 
+            {
+                dataType<-name(highdim.ColumnSpec$ColumnType$value(columnSpec[[i]]$type))
+                entryName <- paste(rowlabel, columnSpec[[i]]$name, sep=".")
+                if(dataType == "STRING")
+                {
+                  assayData [[entryName]] <- rowValues[[i]]$stringValue #add the values of one column value to a list. The name of this vector is the rowlabel concatenated to the column specification 
+                }
+                if(dataType == "DOUBLE")
+                {
+                  assayData [[entryName]] <- rowValues[[i]]$doubleValue #add the values of one column value to a list. The name of this vector is the rowlabel concatenated to the column specification 
+                }
             }
-            rownames(rowData) <- NULL
-            for (colIndex in 1:ncol(rowData)) assayData[[colnames(rowData)[colIndex]]] <- rowData[ , colIndex,drop=FALSE]
-        }
+     
+        
     }
     
-    assayData <- as.data.frame(assayData)
-    rownames(assayData) <- NULL
-    cat(as.character(Sys.time()))
-    cbind(assayHeaders, assayData)
+    assayData <- as.data.frame(assayData, stringsAsFactors=FALSE)
+    data<-cbind(assayHeaders, assayData)
+    
+    
+    labelToBioMarker<-as.data.frame(labelToBioMarker)
+    colnames(labelToBioMarker)<-"bioMarker"
+    labelToBioMarker[,"label"]<-rownames(labelToBioMarker)
+    labelToBioMarker<-labelToBioMarker[,c("label","bioMarker")]
+    rownames(labelToBioMarker)<-NULL
+    
+    cat("Data unpacked.", as.character(Sys.time()),"\n")
+    
+    
+    if(all(labelToBioMarker[,"bioMarker"]==""))
+    {
+      labelToBioMarker<-"No biomarker information is available for this dataset"
+      return(data)
+    }
+    cat("Additional biomarker information is available. Returning a list, containing the high dimensional data and a table describing which (column) labels refer to which bioMarker\n")
+    return(list(highdimData=data, labelToBioMarkerMap = labelToBioMarker))
 }
 
 .getChunk <- function(connection) {
