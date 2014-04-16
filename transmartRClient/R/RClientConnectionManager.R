@@ -4,12 +4,12 @@
 
 connectToTransmart <- 
 function (transmartDomain, use.authentication = TRUE, ...) {
-    if (!exists("transmartClientEnv")) assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
+    if (!exists("transmartClientEnv") || transmartClientEnv$transmartDomain != transmartDomain) { 
+        assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
+    }
     
     transmartClientEnv$transmartDomain <- transmartDomain
-    transmartClientEnv$db_access_url <- paste(sep = "", 
-                                              "http://", transmartClientEnv$transmartDomain, "/transmart"
-    )
+    transmartClientEnv$db_access_url <- transmartClientEnv$transmartDomain
     
     if (use.authentication && !exists("access_token", envir = transmartClientEnv)) {
         authenticateWithTransmart(...)
@@ -37,12 +37,12 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     transmartClientEnv$client_secret <- "api-client"
     
     oauth.request.token.url <- paste(sep = "",
-                                     "http://", transmartClientEnv$oauthDomain,
-                                     "/transmart/oauth/authorize?response_type=code&client_id=", 
+                                     transmartClientEnv$oauthDomain,
+                                     "/oauth/authorize?response_type=code&client_id=", 
                                      transmartClientEnv$client_id,
                                      "&client_secret=", transmartClientEnv$client_secret,
-                                     "&redirect_uri=http://", transmartClientEnv$oauthDomain,
-                                     "/transmart/oauth/verify")
+                                     "&redirect_uri=", transmartClientEnv$oauthDomain,
+                                     "/oauth/verify")
     
     if (is.null(prefetched.request.token)) {
       cat("Please visit the following url to authenticate this RClient (enter nothing to cancel):\n\n",
@@ -57,18 +57,17 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     }
     
     oauth.exchange.token.url <- paste(sep = "",
-                                      "http://", transmartClientEnv$oauthDomain,
-                                      "/transmart/oauth/token?grant_type=authorization_code&client_id=",
+                                      transmartClientEnv$oauthDomain,
+                                      "/oauth/token?grant_type=authorization_code&client_id=",
                                       transmartClientEnv$client_id,
                                       "&client_secret=", transmartClientEnv$client_secret,
                                       "&code=", request.token,
-                                      "&redirect_uri=http://", transmartClientEnv$oauthDomain,
-                                      "/transmart/oauth/verify")
+                                      "&redirect_uri=", transmartClientEnv$oauthDomain,
+                                      "/oauth/verify")
     
     tryCatch(
             oauthResponse <- getURL(oauth.exchange.token.url,
-                    verbose = getOption("verbose"),
-                    httpheader = c(Host = transmartClientEnv$oauthDomain)), 
+                    verbose = getOption("verbose")), 
             error = function(e) {
                 if (getOption("verbose")) { cat(e, "\n", oauthresponse) }
                 stop("Error with connection to verification server.") 
@@ -93,7 +92,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
       return(TRUE)
   }
   
-  ping <- .transmartServerGetRequest("/oauth/verify", use.HAL = FALSE)
+  ping <- .transmartServerGetRequest("/oauth/verify", accept.type = "default")
   if (getOption("verbose")) { cat(paste(ping, collapse = ": "), "\n") }
   
   if (!is.null(ping)) {
@@ -109,10 +108,9 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 }
 
 .transmartServerGetRequest <- function(apiCall, ...)  {
-  httpHeaderFields <- c(Host = transmartClientEnv$transmartDomain)
   if (exists("access_token", envir = transmartClientEnv)) {
-      httpHeaderFields <- c(httpHeaderFields, Authorization = paste("Bearer ", transmartClientEnv$access_token, sep=""))
-  }
+      httpHeaderFields <- c(Authorization = paste("Bearer ", transmartClientEnv$access_token, sep=""))
+  } else { httpHeaderFields <- "" }
   
   tryCatch(result <- .serverMessageExchange(apiCall, httpHeaderFields, ...), 
           error = function(e) {
@@ -125,23 +123,31 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
   result
 }
 
-.serverMessageExchange <- function(apiCall, httpHeaderFields, use.HAL = FALSE) {
-  require(RCurl)
-  require(RJSONIO)
-  
-  if (use.HAL) { httpHeaderFields <- c(httpHeaderFields, accept = "application/hal+json") }
-  
-  result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
-          verbose = getOption("verbose"),
-          httpheader = httpHeaderFields)
-  if (getOption("verbose")) { cat("Server response:\n\n", result, "\n\n") }
-  
-  if (is.null(result) || result == "null") { return(NULL) }
-  
-  result <- fromJSON(result, asText = TRUE, nullValue = NA)
-  if (use.HAL) { result <- .simplifyHalList(result) }
-  
-  result
+.serverMessageExchange <- function(apiCall, httpHeaderFields, accept.type = "default") {
+    require(RCurl)
+    require(RJSONIO)
+
+    if (any(accept.type == c("default", "hal"))) {
+        if (accept.type == "hal") { httpHeaderFields <- c(httpHeaderFields, accept = "application/hal+json") }
+        result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
+                verbose = getOption("verbose"),
+                httpheader = httpHeaderFields)
+        if (getOption("verbose")) { cat("Server response:\n\n", result, "\n\n") }
+        if (is.null(result) || result == "null") { return(NULL) }
+        result <- fromJSON(result, asText = TRUE, nullValue = NA)
+        if (accept.type == "hal") { return(.simplifyHalList(result)) }
+        return(result)
+    } else if (accept.type == "binary") {
+        result <- list()
+        h <- basicTextGatherer()
+        result$content <- getBinaryURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
+                .opts = list(headerfunction = h$update),
+                httpheader = httpHeaderFields)
+        result$header <- parseHTTPHeader(h$value())
+        if (getOption("verbose")) { cat("Server binary response header:\n"); print(data.frame(result$header)) }
+        return(result)
+    }
+    return(NULL)
 }
 
 

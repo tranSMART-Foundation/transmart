@@ -1,6 +1,10 @@
 The subdirectory transmartRClient contains the R package which allows access to
-the tranSMART database via its RESTful API. You can install this package as follows:
-install.packages("transmartRClient", repos = NULL, type = "source")
+the tranSMART database via its RESTful API. 
 
-The devCommand.R file contains some basic development tools, and an example of how
-to authenticate and connect to tranSMART, and some subsequent example calls.
+You can install this package by following the instructions in installCommands.R
+
+The demoCommands.R file contains a short demo of how to connect to tranSMART and how
+to retrieve data from it.
+
+The devCommands.R file contains some pointers that might be useful to anyone interested
+in developing this package further.

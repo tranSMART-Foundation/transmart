@@ -30,7 +30,7 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
     for (oneLink in concept.links) {
         serverResult <- .transmartServerGetRequest(
                 paste(oneLink, "/observations", sep=""),
-                use.HAL = TRUE) 
+                accept.type = "hal") 
         listOfObservations <- c(listOfObservations, serverResult$observations)
     }
 
