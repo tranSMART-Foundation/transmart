@@ -48,10 +48,11 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     return(.parseHighdimData(serverResult$content))
 }
 
-.parseHighdimData <- function(rawVector) {
+.parseHighdimData <- function(rawVector, .fast.data.frame=TRUE) {
     require('hash')
 
     protoFileLocation <- system.file("extdata", "highdim.proto", package="transmartRClient")
+    protoFileLocation <- "/home/jan/devel/RInterface/highdim.proto"
     readProtoFiles(protoFileLocation)
 
     dataChopper <- .messageChopper(rawVector)
@@ -111,7 +112,12 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     close(pb) 
 
     cat("Data unpacked. Converting to data.frame.", as.character(Sys.time()),"\n")
-    data <- as.data.frame(columns$as.list(), stringsAsFactors=FALSE)
+    
+    if(.fast.data.frame) {
+        data <- .as.data.frame.fast(columns$as.list(), length(assayLabels))
+    } else {
+        data <- as.data.frame(columns$as.list(), stringsAsFactors=FALSE)
+    }
 
     if(all(is.na(values(labelToBioMarker)))) {
         cat("No biomarker information available.")
@@ -185,3 +191,16 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     methods
 }
 
+
+.as.data.frame.fast <- function(data, assayLabel.length) {
+    # Add Xes to column names that start with numbers or other strange characters
+    colnames <- names(data)
+    rowDataIndexes <- -grep('^([a-zA-Z]|\\.[^0-9])', colnames)
+    colnames[rowDataIndexes] <- paste('X', colnames[rowDataIndexes], sep='')
+    
+    names(data) <- colnames
+    attr(data, 'row.names') <- 1:length(data[[1]])
+    class(data) <- 'data.frame'
+    
+    data
+}
