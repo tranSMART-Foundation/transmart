@@ -2,16 +2,8 @@
 # This code is licensed under the GNU General Public License,
 # version 3, or (at your option) any later version.
 
-getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL, binary.file = NULL) {
+getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL, binary.file = NULL, binary.save.filename = NULL) {
   require("RProtoBuf")
-  
-  if(!is.null(binary.file))
-  {
-    contentConnection <<- file(binary.file, open='r+b')
-    class(contentConnection) <- "connection"
-    connection <- ConnectionInputStream(contentConnection)
-    return(.parseHighdimData(connection))
-  }
   
   .checkTransmartConnection()
     
@@ -55,21 +47,17 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         warning("Error in retrieving high dim data.")
         return(NULL)
     }
-    contentConnection <- rawConnection(serverResult$content, open = "r+b")
-    class(contentConnection) <- "connection"
-    connection <- ConnectionInputStream(contentConnection)
-  
-  
-    return(.parseHighdimData(connection))
+
+    return(.parseHighdimData(serverResult$content))
 }
 
-.parseHighdimData <- function(connection) {    
-   
+.parseHighdimData <- function(rawVector) {    
+    dataChopper <- .messageChopper(rawVector)
+    
     protoFileLocation <- system.file("extdata", "highdim.proto", package="transmartRClient")
     readProtoFiles(protoFileLocation)
     
-    
-    message <- .getChunk(connection)
+    message <- dataChopper$getNextMessage()
     header <- read(highdim.HighDimHeader, message)
     columnSpec <- header$columnSpec
     assays <- header$assay
@@ -91,9 +79,10 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     noAssays <- dim(assayHeaders)[1]
     cat(paste("Received data for",noAssays,"assays. Unpacking data and converting to data.frame.",as.character(Sys.time()),"\n"))
     
+    dataChopper$startProgressBar()
     assayData <- list()
     labelToBioMarker<- c() #biomarker info is optional, but should not be omitted, as it is also part of the data
-    while (!is.null(message <- .getChunk(connection))) {
+    while (!is.null(message <- dataChopper$getNextMessage())) {
             row <- read(highdim.Row, message)
             rowlabel<-row$label
               
@@ -113,9 +102,10 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
                   assayData [[entryName]] <- rowValues[[i]]$doubleValue #add the values of one column value to a list. The name of this vector is the rowlabel concatenated to the column specification 
                 }
             }
-     
+        dataChopper$updateProgressBar()
         
     }
+    dataChopper$stopProgressBar()
     
     assayData <- as.data.frame(assayData, stringsAsFactors=FALSE)
     data<-cbind(assayHeaders, assayData)
@@ -139,8 +129,30 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     return(list(highdimData=data, labelToBioMarkerMap = labelToBioMarker))
 }
 
-.getChunk <- function(connection) {
-    size <- tryCatch(ReadVarint32(connection), error= function(e) NULL)
-    if (is.null(size)) return(NULL)
-    ReadRaw(connection, size = size)
+.messageChopper <- function(rawVector, endOfLastMessage = 0) {
+    msbSetToOne <- as.raw(128)
+    progressTotal <- length(rawVector)
+    
+    getNextMessage <- function() {
+        if (endOfLastMessage >= length(rawVector)) {return(NULL)}
+        varint32Size <- max(which((msbSetToOne & rawVector[(endOfLastMessage+1):(endOfLastMessage+5)]) > 0)) + 1
+        varint32Connection <- rawConnection(rawVector[(endOfLastMessage+1):(endOfLastMessage+varint32Size)], open = "r+b")
+        class(varint32Connection) <- "connection"
+        connection <- ConnectionInputStream(varint32Connection)
+        close(varint32Connection)
+        messageSize <- tryCatch(ReadVarint32(connection), error= function(e) NULL)
+        if (is.null(messageSize)) return(NULL)
+        endOfThisMessage <- endOfLastMessage + varint32Size + messageSize
+        message <- rawVector[(endOfLastMessage+1+varint32Size):endOfThisMessage]
+        endOfLastMessage <<- endOfThisMessage
+        return(message)
+    }
+    
+    startProgressBar <- function() { pb <<- txtProgressBar(min = 0, max = progressTotal, style = 3) }
+    updateProgressBar <- function() { setTxtProgressBar(pb, endOfLastMessage) }
+    stopProgressBar <- function() { close(pb) }
+    
+    return(list(getNextMessage = getNextMessage, startProgressBar = startProgressBar,
+            updateProgressBar = updateProgressBar, stopProgressBar = stopProgressBar))
 }
+
