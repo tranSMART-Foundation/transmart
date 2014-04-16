@@ -146,14 +146,12 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 
 
 .listToDataFrame <- function(list) {
-    # replace NULL values with NA values in list
-    # TODO: .serverExchangeMessage now has argument in fromJSON which should make function in next line obsolete
-    #list <- .recursiveReplaceNullWithNa(list)
-
+    require(plyr)
     # add each list-element as a new row to a matrix
-    df <- c()
-    for (el in list) df <- rbind(df, unlist(el))
-        if (is.null(names(list)) || is.na(names(list)) || length(names) != length(list)) { 
+    df <- matrix(nrow = 0, ncol = 0)
+    for (el in list) df <- rbind.fill.matrix(df, t(unlist(el)))
+    
+    if (is.null(names(list)) || is.na(names(list)) || length(names(list)) != length(list)) { 
         rownames(df) <- NULL
     } else { rownames(df) <- names(list) }
     # convert matrix to data.frame
