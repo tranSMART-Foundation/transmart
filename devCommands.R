@@ -18,8 +18,8 @@ install.packages(pathOfPackageSource, repos = NULL, type = "source")
 
 
 # create skeleton package: automises documentation and package base directory structure
-sourcePath <- ("~/Projects/transmart-rclient/transmartRClient/R")
-skeletonPath <- ("~/Projects/transmart-rclient/skeleton")
+sourcePath <- paste(pathOfPackageSource, "/R", sep='')
+skeletonPath <- paste(pathOfPackageSource, "/skeleton", sep='')
 sourceFiles <- list.files(sourcePath, pattern = "[.][Rr]$", full.names = TRUE)
 # optional, tidy up source files
 require("formatR")
