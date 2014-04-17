@@ -50,11 +50,6 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 
 .parseHighdimData <- function(rawVector, .fast.data.frame=TRUE) {
     require('hash')
-
-    protoFileLocation <- system.file("extdata", "highdim.proto", package="transmartRClient")
-    protoFileLocation <- "/home/jan/devel/RInterface/highdim.proto"
-    readProtoFiles(protoFileLocation)
-
     dataChopper <- .messageChopper(rawVector)
 
     message <- dataChopper$getNextMessage()
