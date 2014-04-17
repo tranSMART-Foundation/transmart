@@ -129,7 +129,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 
     getNextMessage <- function() {
         if (endOfLastMessage >= length(rawVector)) { return(NULL) }
-        varint32Size <- max(which((msbSetToOne & rawVector[(endOfLastMessage+1):(endOfLastMessage+5)]) > 0)) + 1
+        varint32Size <- min(which((msbSetToOne & rawVector[(endOfLastMessage+1):(endOfLastMessage+5)]) == as.raw(0)))
         varint32Connection <- rawConnection(rawVector[(endOfLastMessage+1):(endOfLastMessage+varint32Size)], open = "r+b")
         class(varint32Connection) <- "connection"
         connection <- ConnectionInputStream(varint32Connection)
