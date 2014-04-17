@@ -1,5 +1,5 @@
-\name{ConnectToTransmart}
-\alias{ConnectToTransmart}
+\name{connectToTransmart}
+\alias{connectToTransmart}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
   Initializes a new connection to the tranSMART database via the RESTful API
@@ -9,15 +9,17 @@
   tranSMART database.
 }
 \usage{
-ConnectToTransmart(transmartDomain = "localhost:8080")
+connectToTransmart("http://localhost:8080/transmart", use.authentication = TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{transmartDomain}{The domain of the tranSMART server}
+  \item{use.authentication}{Whether this tranSMART server requires OAuth authentication}
+  \item{\dots}{Passed on to authenticateWithTransmart}
 }
 \details{
-  Note: this function does not authenticate the user.
-  Please also use \code{AuthenticateWithTransmart()} if you need to authenticate.
+  This function initialises the connection settings to a tranSMART server.
+  If not disabled, it will also guide the user through the authentication process.
 }
 \value{
   This function will set up the necessary connection settings inside the \emph{transmartClientEnv}
@@ -30,7 +32,9 @@ ConnectToTransmart(transmartDomain = "localhost:8080")
 \seealso{}
 \examples{
   # Set the function's argument to the location of the tranSMART database 
-  ConnectToTransmart(transmartDomain = "localhost:8080")
+  localTransmartDomain <- "http://localhost:8080/transmart"
+  connectToTransmart(localTransmartDomain)
+  # Follow the instructions for authentication.
 }
 \keyword{ environment }
 \keyword{ connection }

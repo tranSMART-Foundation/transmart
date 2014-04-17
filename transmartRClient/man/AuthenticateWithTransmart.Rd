@@ -1,5 +1,5 @@
-\name{AuthenticateWithTransmart}
-\alias{AuthenticateWithTransmart}
+\name{authenticateWithTransmart}
+\alias{authenticateWithTransmart}
 \title{
   Authenticate the R client to gain access to tranSMART database
 }
@@ -8,7 +8,7 @@
   acquire a token that grants the client (semi-)permanent access to tranSMART.
 }
 \usage{
-AuthenticateWithTransmart(oauthDomain = "localhost:8080", prefetched.request.token = NULL)
+authenticateWithTransmart(oauthDomain = "http://localhost:8080/transmart", prefetched.request.token = NULL)
 }
 \arguments{
   \item{oauthDomain}{The domain of the OAuth server}
@@ -29,7 +29,8 @@ AuthenticateWithTransmart(oauthDomain = "localhost:8080", prefetched.request.tok
 \examples{
   # Set the function's argument to the location of your OAuth 
   # and tranSMART servers, and follow the instructions
-  AuthenticateWithTransmart(oauthDomain = "localhost:8080") 
+  localOAuthDomain <- "http://localhost:8080/transmart"
+  AuthenticateWithTransmart(localOAuthDomain) 
 }
 \keyword{ environment }
 \keyword{ connection }

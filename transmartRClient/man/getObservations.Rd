@@ -8,11 +8,12 @@
   study, and optionally for a specific subject within that study
 }
 \usage{
-getObservations(studyName, subjectID = NULL, as.data.frame = FALSE)
+getObservations(study.name, concept.match = NULL, concept.links = NULL, as.data.frame = TRUE)
 }
 \arguments{
-  \item{study}{The name of the study}
-  \item{subjectID}{The ID of the subject}
+  \item{study.name}{The name of the study}
+  \item{concept.match}{This argument will search for the first concept that matches the value within the requested study. It uses the name column of the result from \code{getConcepts(study.name)} to perform the matching.}
+  \item{concept.links}{Candidate values for this argument can be found in the api.link column of the \code{getConcepts(study.name)} results. It is the most exact way to refer to a concept, and it overwrites the concept.match argument.}
   \item{as.data.frame}{Set to TRUE if you wish the function to attempt conversion of
   the result to a data frame}
 }

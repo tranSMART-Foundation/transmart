@@ -8,17 +8,16 @@
   study, including the clinical information available per subject.
 }
 \usage{
-getSubjects(study, as.data.frame = FALSE)
+getSubjects(study, as.data.frame = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{study}{The name of the study}
-  \item{as.data.frame}{Set to TRUE if you wish the function to attempt conversion of
-  the result to a data frame}
+  \item{as.data.frame}{Set to FALSE if you wish the function to return the result as a list}
 }
 \details{}
 \value{
-  A list is returned, whereby each element contains the information partaining to
+  A data.frame is returned, whereby each row contains the information partaining to
   one subject.
 }
 \references{}
@@ -26,7 +25,7 @@ getSubjects(study, as.data.frame = FALSE)
 \note{}
 \seealso{}
 \examples{
-  # The following will retrieve a list with subject-information for the study "foo"
+  # The following will retrieve a data.frame with subject-information for the study "foo"
   getSubjects("foo")
 }
 

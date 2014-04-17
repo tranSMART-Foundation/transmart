@@ -9,19 +9,19 @@
   optional.
 }
 \usage{
-getStudies(nameMatch = "", as.data.frame = FALSE)
+getStudies(name.match = "", as.data.frame = TRUE, cull.columns = TRUE)
 }
 \arguments{
-  \item{nameMatch}{A string or regular expression by which the results are filtered}
+  \item{name.match}{A string or regular expression by which the results are filtered}
   \item{as.data.frame}{Set to TRUE if you wish the function to attempt conversion of
   the result to a data frame}
+  \item{cull.columns}{Several non-essential columns are excluded by default.}
 }
 \details{
   Depending on your connection characteristics, this make take some time.
 }
 \value{
-  A list is returned, whereby each element contains the information partaining to
-  a single study present in the tranSMART database.
+  A data.frame is returned, whereby each row corresponds to a study in the tranSMART database.
 }
 \references{}
 \author{Tim Dorscheidt, tim@thehyve.nl}
@@ -29,7 +29,7 @@ getStudies(nameMatch = "", as.data.frame = FALSE)
 \seealso{}
 \examples{
   # Simply calling the function without an argument will retrieve
-  # a list of all studies
+  # a data.frame with information on all studies
   getStudies()
 
   # Supplying a string will act as a filter on the study names,
