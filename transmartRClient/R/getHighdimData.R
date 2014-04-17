@@ -3,7 +3,6 @@
 # version 3, or (at your option) any later version.
 
 getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL) {
-    require("RProtoBuf")
     .checkTransmartConnection()
 
     if (is.null(concept.link) && !is.null(concept.match)) {
@@ -49,7 +48,6 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 }
 
 .parseHighdimData <- function(rawVector, .fast.data.frame=TRUE) {
-    require('hash')
     dataChopper <- .messageChopper(rawVector)
 
     message <- dataChopper$getNextMessage()

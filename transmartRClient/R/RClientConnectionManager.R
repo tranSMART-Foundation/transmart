@@ -27,8 +27,6 @@ function (transmartDomain, use.authentication = TRUE, ...) {
 
 authenticateWithTransmart <- 
 function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.token = NULL) {
-    require(RCurl)
-    require(RJSONIO)
     
     if (!exists("transmartClientEnv")) assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
     
@@ -124,9 +122,6 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 }
 
 .serverMessageExchange <- function(apiCall, httpHeaderFields, accept.type = "default") {
-    require(RCurl)
-    require(RJSONIO)
-
     if (any(accept.type == c("default", "hal"))) {
         if (accept.type == "hal") { httpHeaderFields <- c(httpHeaderFields, accept = "application/hal+json") }
         result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
@@ -150,9 +145,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     return(NULL)
 }
 
-
 .listToDataFrame <- function(list) {
-    require(plyr)
     # add each list-element as a new row to a matrix
     df <- matrix(nrow = 0, ncol = 0)
     for (el in list) df <- rbind.fill.matrix(df, t(unlist(el)))
