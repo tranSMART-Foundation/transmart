@@ -18,7 +18,7 @@ getStudies(name.match = "", as.data.frame = TRUE, cull.columns = TRUE)
   \item{cull.columns}{Several non-essential columns are excluded by default.}
 }
 \details{
-  Depending on your connection characteristics, this make take some time.
+  Depending on your connection characteristics, this may take some time.
 }
 \value{
   A data.frame is returned, whereby each row corresponds to a study in the tranSMART database.

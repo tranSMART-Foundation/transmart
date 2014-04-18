@@ -1,117 +1,50 @@
 \name{getHighdimData}
 \alias{getHighdimData}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-%%  ~~function to do ... ~~
+Obtain high dimensional data for a certain study
 }
 \description{
+This function will retrieve a highdimensional dataset for a specific concept of a certain study.   
+
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
+
 \usage{
 getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection = NULL)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{study.name}{
-%%     ~~Describe \code{study.name} here~~
-}
-  \item{concept.match}{
-%%     ~~Describe \code{concept.match} here~~
-}
-  \item{concept.link}{
-%%     ~~Describe \code{concept.link} here~~
-}
+  \item{study.name}{A character string containing the name of the study}
+  \item{concept.match}{This argument will search for the first concept that matches the value within the requested study. It uses the name column of the result from \code{getConcepts(study.name)} to perform the matching.}
+  \item{concept.link}{A string containing the link pointing to the location of the data on the server. Candidate values for this argument can be found in the api.link column of the \code{getConcepts(study.name)} results. It is the most exact way to refer to a concept, and it overwrites the concept.match argument.}
   \item{projection}{
-%%     ~~Describe \code{projection} here~~
+  A character string specifying what part of the dataset should be returned; should all data be returned or only a certain type of data, for example only the Log Values for an mRNA data set (the types of data present may differ between studies)? 
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+  Retrieving and parsing the data may take some time, depending on the size of the data requested and on your connection characteristics.
+  
+  A dataframe containing the high dimensional data will only be returned if a projection is specified.
+  
+  To discover what projections are possible call getHighDimData(study.name, concept.match) or getHighDimData(study.name, concept.link). 
+  
+    
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+ If a projection is specified, this function returns a list containing the highdimensional data. The first element of the list, called "data", is a dataframe containing the high dimensional data. If biomarker data is available for this particular dataset, the list also contains a hash (called "labelToBioMarkerMap") which describes which (column) labels refer to which bioMarker.
+ 
+ If no projection is specified this function returns a list of the projections available for this study. No highdimensional data is returned.
+ 
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
+\references{}
+\author{Tim Dorscheidt, tim@thehyve.nl}
+\note{}
+\seealso{ \code{\link{hash}}.}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
-\examples{
+\examples{%% STILL NEED FILL THIS IN!!
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (study.name, concept.match = NULL, concept.link = NULL, 
-    projection = NULL) 
-{
-    .checkTransmartConnection()
-    if (is.null(concept.link) && !is.null(concept.match)) {
-        studyConcepts <- getConcepts(study.name)
-        conceptFound <- grep(concept.match, studyConcepts$name)[1]
-        if (is.na(conceptFound)) {
-            warning(paste("No match found for:", concept.match))
-        }
-        else {
-            concept.link <- studyConcepts$api.link.self.href[conceptFound]
-        }
-    }
-    if (length(concept.link) == 0L) {
-        warning("No concepts selected or found to match your arguments.")
-        return(NULL)
-    }
-    serverResult <- .transmartServerGetRequest(paste(concept.link, 
-        "/highdim", sep = ""), accept.type = "hal")
-    if (length(serverResult$dataTypes) == 0) {
-        warning("This high dimensional concept contains no data.")
-        return(NULL)
-    }
-    listOfHighdimDataTypes <- serverResult$dataTypes[[1]]
-    if (!is.null(projection)) {
-        matchingProjectionIndex <- which(names(listOfHighdimDataTypes$api.link) == 
-            projection)
-        if (length(matchingProjectionIndex) > 0) {
-            projectionLink <- listOfHighdimDataTypes$api.link[[matchingProjectionIndex]]
-        }
-        else {
-            projection <- NULL
-        }
-    }
-    else {
-        projection <- NULL
-    }
-    if (is.null(projection)) {
-        cat("No valid projection selected.\nSet the projection argument to one of the following options:\n ")
-        cat(paste(listOfHighdimDataTypes$supportedProjections, 
-            "\n"))
-        return(listOfHighdimDataTypes$supportedProjections)
-    }
-    cat("Retrieving data from server.", as.character(Sys.time()), 
-        "\n")
-    serverResult <- .transmartServerGetRequest(projectionLink, 
-        accept.type = "binary")
-    if (length(serverResult$content) == 0) {
-        warning("Error in retrieving high dim data.")
-        return(NULL)
-    }
-    return(.parseHighdimData(serverResult$content))
-  }
-}
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
+\keyword{database}

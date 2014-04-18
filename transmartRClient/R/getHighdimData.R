@@ -117,7 +117,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         labelToBioMarker <- "No biomarker information is available for this dataset"
         return(list(data = data))
     } else {
-        cat("Additional biomarker information is available.\nThe result will be a list containing the high dimensional data and a hash describing which (column) labels refer to which bioMarker\n")
+        cat("Additional biomarker information is available.\nThis function will return a list containing a dataframe containing the high dimensional data and a hash describing which (column) labels refer to which bioMarker\n")
         return(list(data = data, labelToBioMarkerMap = labelToBioMarker))
     }
 }
