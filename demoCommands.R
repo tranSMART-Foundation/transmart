@@ -19,3 +19,6 @@ observations <- getObservations(studies$name[1], concept.links = concepts$api.li
 getHighdimData(study.name = "GSE8581", concept.match = "Lung")
 # you will be told that one of the listed projections needs to be selected. The following will return the actual data.
 data <- getHighdimData(study.name = "GSE8581", concept.match = "Lung", projection = "zscore")
+names(data)
+data[["data"]][1:10,1:10]
+data[[2]]["214503_x_at"]
