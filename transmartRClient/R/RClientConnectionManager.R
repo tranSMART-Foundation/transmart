@@ -137,7 +137,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         result$content <- getBinaryURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
                 .opts = list(headerfunction = h$update),
                 noprogress = FALSE,
-                progressfunction = function(down,up) {cat(paste("\r", down, " bytes downloaded."))},
+                progressfunction = function(down,up) {cat(paste("\r", format(down / (1024*1024), digits=3, nsmall=3), "MiB downloaded."))},
                 httpheader = httpHeaderFields)
         cat("\nDownload complete.\n")
         result$header <- parseHTTPHeader(h$value())

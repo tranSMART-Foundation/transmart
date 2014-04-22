@@ -37,7 +37,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         cat(paste(listOfHighdimDataTypes$supportedProjections, "\n"))
         return(listOfHighdimDataTypes$supportedProjections)
     }
-    cat("Retrieving data from server.", as.character(Sys.time()), "\n")
+    cat("Retrieving data from server. This can take some time, depending on your network connection speed.", as.character(Sys.time()), "\n")
     serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary")
     if (length(serverResult$content) == 0) {
         warning("Error in retrieving high dim data.")
@@ -47,7 +47,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     return(.parseHighdimData(serverResult$content))
 }
 
-.parseHighdimData <- function(rawVector, .fast.data.frame=TRUE) {
+.parseHighdimData <- function(rawVector, .to.data.frame.converter=.as.data.frame.fast) {
     dataChopper <- .messageChopper(rawVector)
 
     message <- dataChopper$getNextMessage()
@@ -64,6 +64,24 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     assayLabels <- .DollarNames(assays[[1]])[1:length(assays[[1]])]
 
     for (label in assayLabels) {
+        # RProtoBuf does not support int64 on all platforms that we need to 
+        # support. Specifically, binaries from CRAN don't support it, which 
+        # means Windows platforms and the default OSX R distribution. Linux and 
+        # OSX with Homebrew download source packages from CRAN and compile 
+        # locally, so they don't have problems with int64.
+        #
+        # The problem actually is in Rcpp. CRAN does not allow use of 'long 
+        # long' types as it is considered non portable. Rcpp works around this 
+        # by conditionally including 64 bit int support if it is compiled 
+        # somewhere other than CRAN.
+        #
+        # The serialization format uses an int64 field for 
+        # highdim.Assay.assayId. Reading that field on platforms that do not 
+        # have int64 support results in an error. As a workaround we parse the 
+        # assayId field from the string representation of the assay. (This works
+        # because the as.character() conversion calls a DebugString method in 
+        # the C++ protobuf library, so the RProtoBuf C++ code that CRAN sees 
+        # never touches the 64 bit integers directly.)
         if (label == "assayId") {
             columns$add(label, sapply(assays,
                     function(a) sub("assayId: ", "", grep(label, strsplit(as.character(a), split = "\n")[[1]], value = TRUE))))
@@ -106,11 +124,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 
     cat("Data unpacked. Converting to data.frame.", as.character(Sys.time()),"\n")
     
-    if(.fast.data.frame) {
-        data <- .as.data.frame.fast(columns$as.list(), length(assayLabels))
-    } else {
-        data <- as.data.frame(columns$as.list(), stringsAsFactors=FALSE)
-    }
+    data <- .to.data.frame.converter(columns$as.list(), stringsAsFactors=FALSE)
 
     if(all(is.na(values(labelToBioMarker)))) {
         cat("No biomarker information available.")
@@ -128,7 +142,13 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     pb <- c()
 
     getNextMessage <- function() {
+        # The protobuf messages are written using writeDelimited in the Java
+        # protobuf library. Unfortunately the C++ and R versions don't support
+        # that function natively. We manually read a varint32 from the
+        # connection that indicates the size of the next message.
+
         if (endOfLastMessage >= length(rawVector)) { return(NULL) }
+        # The last byte of the varint32 has its most significant bit set to one.
         varint32Size <- min(which((msbSetToOne & rawVector[(endOfLastMessage+1):(endOfLastMessage+5)]) == as.raw(0)))
         varint32Connection <- rawConnection(rawVector[(endOfLastMessage+1):(endOfLastMessage+varint32Size)], open = "r+b")
         class(varint32Connection) <- "connection"
@@ -185,8 +205,8 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 }
 
 
-.as.data.frame.fast <- function(data, assayLabel.length) {
-    # Add Xes to column names that start with numbers or other strange characters
+.as.data.frame.fast <- function(data, ...) {
+    # Add X'es to column names that start with numbers or other strange characters
     colnames <- names(data)
     rowDataIndexes <- -grep('^([a-zA-Z]|\\.[^0-9])', colnames)
     colnames[rowDataIndexes] <- paste('X', colnames[rowDataIndexes], sep='')
