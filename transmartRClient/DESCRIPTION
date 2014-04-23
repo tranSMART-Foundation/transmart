@@ -7,4 +7,5 @@ Depends: RCurl, RJSONIO, plyr, RProtoBuf, hash
 Author: Tim Dorscheidt, Jan Kanis, Rianne Jansen
 Maintainer: <support@thehyve.nl>
 Description: This package enables limited access to tranSMART's database via a set of functions that map to tranSMART's RESTful API. If enabled, the client can be authorized with tranSMART's OAuth server to access the data accessible by the resource-owner (end-user).
-License: GPL-3
+License: GPL (>= 3.0)
+ByteCompile: True
