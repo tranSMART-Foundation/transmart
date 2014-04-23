@@ -21,10 +21,8 @@ and high dimensional data (to which the user has access).
   }
 }
 
-\author{
-  The Hyve
-  Maintainer: tim@thehyve.nl
-}
+\author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
+Contact: development@thehyve.nl}
 \references{
 }
 \keyword{ package }

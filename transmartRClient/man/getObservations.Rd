@@ -23,7 +23,8 @@ getObservations(study.name, concept.match = NULL, concept.links = NULL, as.data.
   (and for the specific subject if requested)
 }
 \references{}
-\author{Tim Dorscheidt, tim@thehyve.nl}
+\author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
+Contact: development@thehyve.nl}
 \note{}
 \seealso{}
 \examples{

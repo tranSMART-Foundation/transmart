@@ -27,7 +27,8 @@ connectToTransmart("http://localhost:8080/transmart", use.authentication = TRUE,
   access the tranSMART database through the available get methods (eg. \code{getStudies()}).
 }
 \references{}
-\author{Tim Dorscheidt, tim@thehyve.nl}
+\author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
+Contact: development@thehyve.nl}
 \note{}
 \seealso{}
 \examples{

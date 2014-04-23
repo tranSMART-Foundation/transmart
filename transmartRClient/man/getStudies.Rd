@@ -13,9 +13,8 @@ getStudies(name.match = "", as.data.frame = TRUE, cull.columns = TRUE)
 }
 \arguments{
   \item{name.match}{A string or regular expression by which the results are filtered}
-  \item{as.data.frame}{Set to TRUE if you wish the function to attempt conversion of
-  the result to a data frame}
-  \item{cull.columns}{Several non-essential columns are excluded by default.}
+  \item{as.data.frame}{logical. If TRUE (default setting) the subject information is coerced to a data.frame. If set to FALSE the function returns the information as a list}
+  \item{cull.columns}{logical. If TRUE (default setting) several non-essential columns are excluded.}
 }
 \details{
   Depending on your connection characteristics, this may take some time.
@@ -24,7 +23,8 @@ getStudies(name.match = "", as.data.frame = TRUE, cull.columns = TRUE)
   A data.frame is returned, whereby each row corresponds to a study in the tranSMART database.
 }
 \references{}
-\author{Tim Dorscheidt, tim@thehyve.nl}
+\author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
+Contact: development@thehyve.nl}
 \note{}
 \seealso{}
 \examples{

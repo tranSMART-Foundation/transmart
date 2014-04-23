@@ -14,10 +14,10 @@ getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection
 }
 \arguments{
   \item{study.name}{A character string containing the name of the study}
-  \item{concept.match}{This argument will search for the first concept that matches the value within the requested study. It uses the name column of the result from \code{getConcepts(study.name)} to perform the matching.}
-  \item{concept.link}{A string containing the link pointing to the location of the data on the server. Candidate values for this argument can be found in the api.link column of the \code{getConcepts(study.name)} results. It is the most exact way to refer to a concept, and it overwrites the concept.match argument.}
+  \item{concept.match}{ A character string containing the concept name that should be matched. The \code{getHighdimData} function will search within the requested study for the first concept which name matches the given string value. It uses the name column of the result from \code{getConcepts(study.name)} to perform the matching.}
+  \item{concept.link}{A character string containing the link pointing to the location of the data on the server. Candidate values for this argument can be found in the api.link column of the \code{getConcepts(study.name)} results. It is the most exact way to refer to a concept, and it overwrites the concept.match argument.}
   \item{projection}{
-  A character string specifying what part of the dataset should be returned; should all data be returned or only a certain type of data, for example only the Log Values for an mRNA data set (the types of data present may differ between studies)? 
+  A character string specifying what part of the dataset should be returned: should all data be returned or only a certain type of data, for example only the Log Values for an mRNA data set? (note: the types of data present may differ between studies) 
 }
 }
 \details{
@@ -25,7 +25,7 @@ getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection
   
   A dataframe containing the high dimensional data will only be returned if a projection is specified.
   
-  To discover what projections are possible call getHighDimData, while only providing a study name and concept, i.e. getHighdimData(study.name, concept.match) or getHighDimData(study.name, concept.link). 
+  To discover what projections are possible call \code{getHighDimData}, while only providing a study name and concept, i.e. \code{getHighdimData(study.name, concept.match)} or \code{getHighDimData(study.name, concept.link)}. 
   
     
 }
@@ -38,17 +38,28 @@ getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection
  
 }
 \references{}
-\author{Tim Dorscheidt, tim@thehyve.nl}
+\author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
+Contact: development@thehyve.nl}
 \note{}
-\seealso{ \code{\link{hash}}.}
+\seealso{ \code{\link{hash}}}.}
 
 \examples{
+##not run##
 
+  # if a concept contains high dimensional data, use the following command to       obtain this data:
+  getHighdimData(study.name = "GSE8581", concept.match = "Lung")
 
-%% STILL NEED FILL THIS IN!!
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+  # you will be told that one of the listed projections needs to be selected: 
+  "No valid projection selected.
+  Set the projection argument to one of the following options:
+    default_real_projection 
+    zscore 
+    log_intensity 
+    all_data"
+ 
+  # the following will return the actual data:
+  data <- getHighdimData(study.name = "GSE8581", concept.match = "Lung", projection = "zscore")
+}
 
 
 \keyword{database}
