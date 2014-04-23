@@ -112,10 +112,13 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 
         for(i in 1:length(rowValues)) {
             entryName <- paste(rowlabel, columnSpec[[i]]$name, sep=".")
-            if(columnSpec[[i]]$type == STRING) {
+            type <- columnSpec[[i]]$type
+            if(type == STRING) {
                 columns$add(entryName, rowValues[[i]]$stringValue) #add the values of one column value. The name of this vector is the rowlabel concatenated to the column specification
-            } else if(columnSpec[[i]]$type == DOUBLE) {
+            } else if(type == DOUBLE) {
                 columns$add(entryName, rowValues[[i]]$doubleValue) #add the values of one column value. The name of this vector is the rowlabel concatenated to the column specification
+            } else {
+                warning("Unknown row type: ", type)
             }
         }
         

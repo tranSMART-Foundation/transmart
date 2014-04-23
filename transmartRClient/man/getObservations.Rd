@@ -5,7 +5,7 @@
 }
 \description{
   This function will retrieve a list of all observations for a certain
-  study, and optionally for a specific subject within that study
+  study.
 }
 \usage{
 getObservations(study.name, concept.match = NULL, concept.links = NULL, as.data.frame = TRUE)

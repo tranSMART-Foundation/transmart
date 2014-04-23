@@ -1,32 +1,30 @@
 \name{getConcepts}
 \alias{getConcepts}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-Obtain a list of all concepts for a certain study %%  ~~function to do ... ~~
+Obtain a list of all concepts for a certain study
 }
 \description{
- 
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+This function will a retrieve a list of all the concepts for a certain study. This list contains for each concept the name and full name of the concept and the link to the location of this concept on the server.
+
+Concepts are used in tranSMART to organise the stored study data. They are the folders and nodes on the left-hand side in tranSMART's data explorer.
+There can be clinical concepts such as age, diagnosis, blood pressure, and high dimensional concepts such as mRNA expression values or copy number variation.
+
 }
 \usage{
 getConcepts(study.name, as.data.frame = TRUE, cull.columns = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
-  \item{study.name}{
-%%     ~~Describe \code{study.name} here~~
-}
-  \item{as.data.frame}{
-%%     ~~Describe \code{as.data.frame} here~~
-}
-  \item{cull.columns}{
-%%     ~~Describe \code{cull.columns} here~~
-}
+  \item{study.name}{A character string giving the name of the study}
+  \item{as.data.frame}{logical: should the list containing the concept information be converted to a dataframe?}
+  \item{cull.columns}{logical. If TRUE several non-essential columns are excluded.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
+If  high dimensional data is available an extra column with ... is available... hoe kan je dat herkennen?
 %%  ~Describe the value returned
 %%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}

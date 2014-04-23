@@ -6,8 +6,7 @@ Obtain high dimensional data for a certain study
 }
 \description{
 This function will retrieve a highdimensional dataset for a specific concept of a certain study.   
-
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+It retrieves the data from the server and parses it, converting the high dimensional data to a data.frame.
 }
 
 \usage{
@@ -26,14 +25,16 @@ getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection
   
   A dataframe containing the high dimensional data will only be returned if a projection is specified.
   
-  To discover what projections are possible call getHighDimData(study.name, concept.match) or getHighDimData(study.name, concept.link). 
+  To discover what projections are possible call getHighDimData, while only providing a study name and concept, i.e. getHighdimData(study.name, concept.match) or getHighDimData(study.name, concept.link). 
   
     
 }
 \value{
- If a projection is specified, this function returns a list containing the highdimensional data. The first element of the list, called "data", is a dataframe containing the high dimensional data. If biomarker data is available for this particular dataset, the list also contains a hash (called "labelToBioMarkerMap") which describes which (column) labels refer to which bioMarker.
+ If a projection is specified, this function returns a list containing the highdimensional data, with the following components: 
+ \item{data}{a dataframe containing the high dimensional data.}
+ \item{labelToBioMarkerMap}{a hash describing which (column) labels refer to which bioMarker. This component will only be present if biomarker data is available for this particular dataset.}
  
- If no projection is specified this function returns a list of the projections available for this study. No highdimensional data is returned.
+ If no projection is specified this function returns a list of the projections available for this study. No highdimensional data is returned. It will also print the instruction to set the projection argument and a list of the projections that are available.
  
 }
 \references{}
@@ -41,7 +42,10 @@ getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection
 \note{}
 \seealso{ \code{\link{hash}}.}
 
-\examples{%% STILL NEED FILL THIS IN!!
+\examples{
+
+
+%% STILL NEED FILL THIS IN!!
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
