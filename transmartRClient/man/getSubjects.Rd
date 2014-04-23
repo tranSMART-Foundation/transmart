@@ -5,7 +5,7 @@
 }
 \description{
   This function will retrieve a list of all subjects for a certain
-  study, including the clinical information available per subject.
+  study, including the personal information available per subject.
 }
 \usage{
 getSubjects(study, as.data.frame = TRUE)
