@@ -1,8 +1,8 @@
 # Notes for first time installers: 
 
-# The package transmartRClient depends on five packages: RCurl, RJSONIO, RProtoBuf, plyr and hash.
+# The package transmartRClient depends on five packages: RCurl, RJSONIO, RProtoBuf, plyr, hash, and reshape.
 # You can install them as follows:
-install.packages(pkgs=c("RCurl", "RJSONIO", "RProtoBuf", "plyr", "hash"))
+install.packages(pkgs=c("RCurl", "RJSONIO", "RProtoBuf", "plyr", "hash", "reshape"))
 
 # One nasty issue encountered in MacOSX is that the R version installed via homebrew runs into a libl library error:
 #   please use the default R installed via the CRAN installer, which does not have this issue

@@ -2,7 +2,7 @@
 # This code is licensed under the GNU General Public License,
 # version 3, or (at your option) any later version.
 
-getObservations <- function(study.name, concept.match = NULL, concept.links = NULL, as.data.frame = TRUE, cull.columns = TRUE) {
+getObservations <- function(study.name, concept.match = NULL, concept.links = NULL, as.data.frame = TRUE) {
     .checkTransmartConnection()
 
     if (!is.null(concept.match) && is.null(concept.links)) {
@@ -33,22 +33,30 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
                 accept.type = "hal") 
         listOfObservations <- c(listOfObservations, serverResult$observations)
     }
-    
-    
 
     if (as.data.frame) {
         dataFrameObservations <- .listToDataFrame(listOfObservations)
-        if (cull.columns) {
-            columnsToCull <- match(c("concept.conceptCode", "concept.conceptPath", "subject.api.link.self.href"), names(dataFrameObservations))
-            if (any(is.na(columnsToCull))) {
-                warning("There was a problem culling columns. You can try again with cull.columns = FALSE.")
-                cat("Sorry. You've encountered a bug.\n",
-                    "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
-                    "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.\n")
-            }
-            return(dataFrameObservations[, -columnsToCull])
+        
+        conceptNames <- as.factor(dataFrameObservations$concept.label)
+        labelComponents <- matrix(nrow = 0, ncol = 0)
+        for (level in strsplit(levels(conceptNames), split = "\\\\")) {
+            labelComponents <- rbind.fill.matrix(labelComponents, t(level))
         }
-        return(dataFrameObservations)
+        labelComponents <- labelComponents[ , -which(apply(labelComponents, 2, function(x) length(unique(x)))==1)]
+        levels(conceptNames) <- apply(labelComponents, 1, function(x) paste(x[!is.na(x)], collapse = "\\"))
+        conceptColumns <- grep("concept\\.", colnames(dataFrameObservations))
+        
+        conceptInfo <- unique(cbind(conceptNames, dataFrameObservations[ , conceptColumns, drop = FALSE]))
+        dataFrameObservations <- dataFrameObservations[ , -conceptColumns, drop = FALSE]
+        dataFrameObservations <- cbind(dataFrameObservations, conceptNames)
+        
+        subjectIdColumn <- grep("subject.id", colnames(dataFrameObservations))
+        subjectColumns <- setdiff(grep("subject\\.", colnames(dataFrameObservations)), subjectIdColumn)
+        
+        subjectInfo <- unique(cbind(dataFrameObservations[ , subjectIdColumn, drop = FALSE], dataFrameObservations[ , subjectColumns, drop = FALSE]))
+        dataFrameObservations <- dataFrameObservations[ , -subjectColumns, drop = FALSE]                                      
+        
+        return(list(observations = cast(dataFrameObservations, subject.id ~ conceptNames), subjectInfo = subjectInfo, conceptInfo = conceptInfo))
     }
     listOfObservations
 }
