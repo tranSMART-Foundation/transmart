@@ -2,7 +2,7 @@
 # This code is licensed under the GNU General Public License,
 # version 3, or (at your option) any later version.
 
-getObservations <- function(study.name, concept.match = NULL, concept.links = NULL, as.data.frame = TRUE) {
+getObservations <- function(study.name, concept.match = NULL, concept.links = NULL, as.data.frame = TRUE, cull.columns = TRUE) {
     .checkTransmartConnection()
 
     if (!is.null(concept.match) && is.null(concept.links)) {
@@ -33,7 +33,22 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
                 accept.type = "hal") 
         listOfObservations <- c(listOfObservations, serverResult$observations)
     }
+    
+    
 
-    if (as.data.frame) return(.listToDataFrame(listOfObservations))
+    if (as.data.frame) {
+        dataFrameObservations <- .listToDataFrame(listOfObservations)
+        if (cull.columns) {
+            columnsToCull <- match(c("concept.conceptCode", "concept.conceptPath", "subject.api.link.self.href"), names(dataFrameObservations))
+            if (any(is.na(columnsToCull))) {
+                warning("There was a problem culling columns. You can try again with cull.columns = FALSE.")
+                cat("Sorry. You've encountered a bug.\n",
+                    "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
+                    "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.\n")
+            }
+            return(dataFrameObservations[, -columnsToCull])
+        }
+        return(dataFrameObservations)
+    }
     listOfObservations
 }
