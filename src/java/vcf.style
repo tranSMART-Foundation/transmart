@@ -1,0 +1,46 @@
+<DASSTYLE>
+    <STYLESHEET version="1.1">
+        <CATEGORY id="default">
+            <TYPE id="maf">
+                <GLYPH>
+                    <HISTOGRAM>
+                      <MIN>0</MIN>
+                      <MAX>1</MAX>
+                      <HEIGHT>20</HEIGHT>
+                      <STEPS>20</STEPS>
+                      <COLOR1>red</COLOR1>
+                    </HISTOGRAM>
+                </GLYPH>
+            </TYPE>
+            <TYPE id="smaf">
+                <GLYPH>
+                    <HISTOGRAM>
+                      <MIN>0</MIN>
+                      <MAX>1</MAX>
+                      <HEIGHT>20</HEIGHT>
+                      <STEPS>20</STEPS>
+                      <COLOR1>blue</COLOR1>
+                    </HISTOGRAM>
+                </GLYPH>
+            </TYPE>
+            <TYPE id="qd">
+                <GLYPH>
+                    <HISTOGRAM>
+                      <MIN>0</MIN>
+                      <MAX>100</MAX>
+                      <HEIGHT>20</HEIGHT>
+                      <STEPS>20</STEPS>
+                      <COLOR1>green</COLOR1>
+                    </HISTOGRAM>
+                </GLYPH>
+            </TYPE>
+            <TYPE id="vcfInfo">
+                <GLYPH>
+                    <HISTOGRAM>
+                      <COLOR1>green</COLOR1>
+                    </HISTOGRAM>
+                </GLYPH>
+            </TYPE>
+        </CATEGORY>
+    </STYLESHEET>
+</DASSTYLE>

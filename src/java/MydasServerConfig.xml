@@ -123,7 +123,7 @@
                     mapmaster="http://acgh.thehyve.net">
 
             <maintainer email="office@thehyve.nl" />
-            <pattern>acgh-(\d+)</pattern>
+            <pattern>acgh-(\d+)(?:-(\S+))?</pattern>
             <version uri="acgh" created="2013-08-31">
                 <class>org.transmartproject.das.mydas.AcghDS</class>
                 <!--TODO: Specify appropriate coordinates-->
@@ -145,195 +145,157 @@
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
 
-        <datasource uri="template"
-                    title="template"
-                    description="Template Annotation Data Source"
-                    doc_href="http://code.google.com/p/mydas/"
-                    mapmaster="http://mapmaster_template.com">
-            <!-- The maintainer tag identifies the contact person for the source.
-            Attributes:
-            email: The email (required) attribute is a properly formatted email address.
-            -->
-            <maintainer email="template@template.com" />
-            <!--
-            This tag represents one independent version of a data source. Usually there is only one VERSION per SOURCE but there may be more where, for example, the data is annotated onto a different version of an assembly.
-            This mechanism exist to allow servers to signal to clients that there is a later version of a set of data without affecting those reliant on the old set.
-            Attributes:
-            uri: The uri (required) attribute is a global unique identifier for this version of the data source. This is the DSN (data source name) that is referred inside MyDas
-            created: The created (required) attribute is the publish date.
-            -->
-            <version uri="template" created="2010-03-17">
-                <!-- The fully qualified class name of the DataSource. -->
-                <class>uk.ac.ebi.mydas.template.TemplateAnnotationDataSource</class>
-                <!--
-                This tag identifies a reference coordinate system  supported by the source. Could be more than one.
-                Attributes:
-                uri: The uri (required) attribute is a globally unique identifier for the coordinate system. It should be a fully resolvable URL providing more information about the coordinate system.
-                source: The source (required) attribute is the type of reference object (e.g. "Chromosome" or "Protein Sequence").
-                authority: The authority (required) attribute is the project or organisation responsible for defining the coordinate system (e.g. NCBI or UniProt).
-                taxid: The taxid (optional) attribute is the NCBI taxonomy ID for the species, where a coordinate system is restricted to only one species.
-                version: The version (optional) attribute is used to indicate the version of a coordinate system as a whole. It is used to differentiate between coordinate systems that change infrequently but are fundamentally incompatible between releases. Typically these are genomic.
-                test_range:  The test_range (required) attribute is an example segment that may be used to test the source's capabilities. It should be a segment for which the source has data.
-                -->
-                <coordinates 	uri="http://uritocoordinatesystem.com"
-                                source="typeOfReference"
-                                authority="organisationResponsible"
-                                test_range="P00280">UniProt,Protein Sequence</coordinates>
 
-                <coordinates 	uri="http://uri2.com"
-                                source="typeOfReference 2"
-                                authority="organisation 2"
-                                test_range="Other">Other</coordinates>
-                <!--
-                This tag describes the commands and other capabilities supported by the data source. Put as many of this tags as capabilities your source supports.
-                Attributes:
-                type: The type (required) attribute is a formatted string of the format: das1:capability_name For example: "das1:entry_points" or "das1:feature-by-id".
-                query_uri: The query_uri (optional) attribute is the actual DAS URL used to execute a command. It does not apply to capabilities that are not commands (e.g. "feature-by-id").
-                -->
-                <capability type="das1:capability_name"     query_uri="http://actualDASURLusedtoexecuteacommand.com" />
-                <!-- These properties are made available to the plugin class
-                through the DataSource interface, so the plugin author can
-                add arbitrary additional configuration to their data source.-->
-                <property key="templateexamplekey" value="templateexamplevalue" />
-                <property key="prop_key" value="value_key"/>
-            </version>
+        <!-- VCF Datasource -->
+        <datasource uri="vcf"
+                    title="Cohort MAF"
+                    description="Minor Allele Frequency (MAF) of selected cohort"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
 
-            <!-- The optional name of the DAS stylesheet to be used for this datasource.
-            This will override the default stylesheet defined in the global settings section. -->
-            <stylesheet>TEST.style</stylesheet>
-            <!-- This setting indicates if the dna command is enabled or not for this data source.
-            Clearly this may be set to false for servers that serve only protein sequence and
-            annotation.  Note that the mydas DAS server makes no attempt to check that a
-            valid DNA, RNA or protein sequence is being served by the sequence command - this
-            is the responsibility of the data source itself. -->
-            <dna-command-enabled>true</dna-command-enabled>
-            <!-- If 'true' then if no feature label is provided by the data source, the feature id will
-            automatically be reported as the feature label.  (Of course, if a feature label is 
-            provided, this will override the feature id.) -->
-            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
-            <!--
-            If include-types-with-zero-count='true' then all of the types present in the data source
-            will be listed by the types command even if they do not appear for the requested segment.
-            If 'false', if the types command includes 'segment' arguments, only the feature types
-            actually annotated on the requested segments will be listed.-->
-            <include-types-with-zero-count>true</include-types-with-zero-count>
-        </datasource>
-
-        <!-- Configuration of the data source example. It loads the feature from a GFF2 file-->
-        <datasource uri="examplegff"
-                    title="fickett-tss"
-                    description="GFF2 Example Annotation Data Source"
-                    doc_href="http://mydas.googlecode.com/svn/trunk/mydas/MyDasTemplate/src/main/resources/fickett-tss.gff"
-                    mapmaster="http://mapmaster_examplegff.com">
-            <maintainer email="gsalazar@ebi.ac.uk" />
-
-            <version uri="examplegff" created="2010-03-19">
-                <class>uk.ac.ebi.mydas.examples.GFFFileDataSource</class>
-                <coordinates 	uri="http://www.notARealCoordinateSystem.com"
-                                source="-"
-                                authority="unknown"
-                                taxid="0000"
-                                test_range="L47615.1">TEST INFO</coordinates>
-                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/examplegff" />
-                <capability type="das1:types"			query_uri="http://localhost:8080/das/examplegff/types" />
-                <capability type="das1:features"		query_uri="http://localhost:8080/das/examplegff/features" />
-                <capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplegff/features" />
-                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
-                <capability type="das1:entry_points"		query_uri="http://localhost:8080/das/examplegff/entry_points" />
-                <capability type="das1:unknown-feature"	/>
-                <property key="gff_file" value="fickett-tss.gff" visibility="false"/>
-            </version>
-
-            <dna-command-enabled>true</dna-command-enabled>
-            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
-            <include-types-with-zero-count>true</include-types-with-zero-count>
-        </datasource>
-
-        <datasource uri="examplepipes"
-                    title="separatedByPipes"
-                    description="Data source testing a new parser"
-                    doc_href="http://mydas.googlecode.com"
-                    mapmaster="http://mapmaster.example">
-            <maintainer email="gsalazar@ebi.ac.uk" />
-
-            <version uri="examplepipes" created="2010-03-19">
-                <class>uk.ac.ebi.mydas.examples.SeparatedByPipesDataSource</class>
+            <maintainer email="office@thehyve.nl" />
+            <pattern>vcf-(\d+)(?:-(\S+))?</pattern>
+            <version uri="vcf" created="2013-09-27">
+                <class>org.transmartproject.das.mydas.CohortMAFDS</class>
+                <!--TODO: Specify appropriate coordinates-->
                 <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
                                 source="Gene_ID"
                                 authority="Ensembl"
                                 taxid="9606"
                                 test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
-                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/examplepipes" />
-                <capability type="das1:types"			query_uri="http://localhost:8080/das/examplepipes/types" />
-                <capability type="das1:features"		query_uri="http://localhost:8080/das/examplepipes/features" />
-                <capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplepipes/features" />
-                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
-                <capability type="das1:unknown-feature"	/>
-                <property key="pipes_file" value="testGenes.txt" visibility="true"/>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/vcf" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/vcf/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/vcf/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/vcf/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
             </version>
 
+            <stylesheet>vcf.style</stylesheet>
             <dna-command-enabled>true</dna-command-enabled>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
 
-        <!-- Configuration of the data source example (reference server). It loads the feature from a GFF2 file-->
-        <datasource uri="referencegff"
-                    title="fickett-tss"
-                    description="GFF2 Example Annotation Data Source"
-                    doc_href="http://mydas.googlecode.com/svn/trunk/mydas/MyDasTemplate/src/main/resources/fickett-tss.gff"
-                    mapmaster="http://mapmaster_referencegff.com">
-            <maintainer email="gsalazar@ebi.ac.uk" />
+         <!--Summary Level MAF Datasource-->
+        <datasource uri="http://thehyve.nl"
+                    title="Summary MAF"
+                    description="Minor Allele Frequency (MAF) whole study level"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
 
-            <version uri="referencegff" created="2010-03-19">
-                <class>uk.ac.ebi.mydas.examples.GFFFileReferenceDataSource</class>
-                <coordinates 	uri="http://www.notARealCoordinateSystem.com"
-                                source="-"
-                                authority="unknown"
-                                taxid="0000"
-                                test_range="L47615.1">TEST INFO</coordinates>
-                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/examplegff" />
-                <capability type="das1:types"			query_uri="http://localhost:8080/das/examplegff/types" />
-                <capability type="das1:features"		query_uri="http://localhost:8080/das/examplegff/features" />
-                <capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplegff/features" />
-                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
-                <capability type="das1:sequence"		query_uri="http://localhost:8080/das/examplegff/sequence" />
-                <capability type="das1:unknown-feature"	/>
-                <capability     type="das1:entry_points"        />
-                <property key="gff_file" value="fickett-tss.gff" visibility="false"/>
-                <property key="fasta_file" value="fickett.fasta" visibility="false"/>
+            <maintainer email="office@thehyve.nl" />
+            <pattern>smaf-(\d+)(?:-(\S+))?</pattern>
+            <version uri="smaf" created="2013-09-30">
+                <class>org.transmartproject.das.mydas.SummaryMAFDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/smaf" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/smaf/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/smaf/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/smaf/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
             </version>
 
+            <stylesheet>vcf.style</stylesheet>
             <dna-command-enabled>true</dna-command-enabled>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
 
-        <datasource uri="person1"
-                    title="person1"
-                    description="Data source for genotype file format"
-                    doc_href="http://mydas.googlecode.com"
-                    mapmaster="http://mapmaster.example">
-            <maintainer email="jw12@sanger.ac.uk" />
+         <!--Quality of Depth Datasource--> 
+        <datasource uri="http://thehyve.nl"
+                    title=" Quality of Depth"
+                    description="Quality of Depth (QD) whole study level"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
 
-            <version uri="person1" created="2012-01-05">
-                <class>uk.ac.ebi.mydas.examples.GenotypeFileDataSource</class>
-                <coordinates version="36" taxid="9606" authority="NCBI" source="Chromosome" uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS40" test_range="1:742429,758311">NCBI_36,Chromosome,Homo sapiens</coordinates>
-                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/examplepipes" />
-                <capability type="das1:types"			query_uri="http://localhost:8080/das/examplepipes/types" />
-                <capability type="das1:features"		query_uri="http://localhost:8080/das/examplepipes/features" />
-                <capability type="das1:feature-by-id"	query_uri="http://localhost:8080/das/examplepipes/features" />
-                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/examplegff/stylesheet" />
-                <capability type="das1:unknown-feature"	/>
-                <property key="genotype_file" value="person1.txt" visibility="false"/>
-                <property key="entrypoints_file" value="NCBI_36_entry_points" visibility="false"/>
-
+            <maintainer email="office@thehyve.nl" />
+            <pattern>qd-(\d+)(?:-(\S+))?</pattern>
+            <version uri="qd" created="2013-10-02">
+                <class>org.transmartproject.das.mydas.QualityByDepthDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/qd" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/qd/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/qd/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/qd/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
             </version>
 
+            <stylesheet>vcf.style</stylesheet>
             <dna-command-enabled>true</dna-command-enabled>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
+
+         <!--Genomic Variants Datasource--> 
+        <datasource uri="gv"
+                    title="Genomic Variants"
+                    description="Genomic Variants of selected cohort"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>gv-(\d+)(?:-(\S+))?</pattern>
+            <version uri="gv" created="2013-10-02">
+                <class>org.transmartproject.das.mydas.GenomicVariantsDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/gv" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/gv/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/gv/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/gv/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>variants.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <!--Genomic Variants Datasource-->
+        <datasource uri="vcfInfo"
+                    title="VCF INFO"
+                    description="Custom INFO field of selected cohort"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>vcfInfo-([^\-]+)-(\d+)(?:-(\S+))?</pattern>
+            <version uri="vcfInfo" created="2013-10-02">
+                <class>org.transmartproject.das.mydas.VcfInfoDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/vcf" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/vcf/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/vcf/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/vcf/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>vcf.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
 
     </datasources>
 </mydasserver>
