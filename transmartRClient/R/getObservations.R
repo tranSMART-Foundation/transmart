@@ -14,11 +14,11 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
                 if (is.na(conceptMatch)) {
                     warning(paste("No match found for:", toMatch))
                 } else {
-                    concept.links <- c(concept.links, paste(studyConcepts$api.link.self.href[conceptMatch], "/observations", sep = ""))
+                    concept.links <- c(concept.links, studyConcepts$api.link.self.href[conceptMatch])
                 }
             }
         } else {
-            concept.links <- paste("/studies/", study.name, "/observations", sep = "")
+            concept.links <- paste("/studies/", study.name, sep = "")
         }
     }
 
@@ -31,7 +31,7 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
 
     for (oneLink in concept.links) {
         serverResult <- .transmartServerGetRequest(
-                oneLink,
+                paste(oneLink, "/observations", sep = ""),
                 accept.type = "hal") 
         listOfObservations <- c(listOfObservations, serverResult$observations)
     }
