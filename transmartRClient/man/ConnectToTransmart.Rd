@@ -31,7 +31,9 @@ connectToTransmart("http://some.transmart.server/transmart", use.authentication 
 \author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
 Contact: development@thehyve.nl}
 \note{}
-\seealso{}
+\seealso{\code{\link{getStudies}}.
+
+For more information about the transmart RClient package and what it can be used for: \link{transmartRClient-package}}
 \examples{
 \dontrun{
   
@@ -45,3 +47,4 @@ Contact: development@thehyve.nl}
 \keyword{ environment }
 \keyword{ connection }
 \keyword{ database }
+\keyword{ transmart }

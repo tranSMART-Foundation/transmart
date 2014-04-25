@@ -16,7 +16,7 @@ getConcepts(study.name, as.data.frame = TRUE, cull.columns = TRUE)
 }
 
 \arguments{
-  \item{study.name}{a character string giving the name of the study}
+  \item{study.name}{a character string giving the name of a study}
   \item{as.data.frame}{logical: should the list containing the concept information be converted to a dataframe?}
   \item{cull.columns}{logical. If TRUE (default setting) several non-essential columns are excluded.}
 }
@@ -37,10 +37,14 @@ The following components may be present, depending on the server definitions, da
 
 }
 \references{}
+
 \author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
 Contact: development@thehyve.nl}
+
 \note{To be able to access a transmart database, you need to be connected to the server the database is on. If you haven't connected to the server yet, establish a connection using the \code{\link{connectToTransmart}} function.}
+
 \seealso{\code{\link{getStudies}}}
+
 \examples{
 \dontrun{
   # obtain a list of all studies in the database 
@@ -55,4 +59,5 @@ Contact: development@thehyve.nl}
 
 }
 
-\keyword{database}
+\keyword{ database }
+\keyword{ transmart }

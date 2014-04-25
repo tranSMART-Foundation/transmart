@@ -3,7 +3,7 @@
 \title{
   Obtain a list of all subjects in a certain study.
 }
-\description{http://127.0.0.1:44980/rstudio/clear.cache.gif
+\description{
   This function will retrieve a list of all subjects and their personal information for a certain
   study.
 }
@@ -12,7 +12,7 @@ getSubjects(study, as.data.frame = TRUE)
 }
 
 \arguments{
-  \item{study}{a character string giving the name of the study}
+  \item{study}{a character string giving the name of a study}
   \item{as.data.frame}{logical. If TRUE (default setting) the subject information is returned as a data.frame. If set to FALSE the function returns the information as a list.}
 }
 \details{ The function will return for each subject the subjectID and their personal information, such as for example sex, age and ethnicity.
@@ -36,3 +36,4 @@ Contact: development@thehyve.nl}
 }
 
 \keyword{ database }
+\keyword{ transmart }

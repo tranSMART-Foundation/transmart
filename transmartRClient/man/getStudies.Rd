@@ -26,7 +26,7 @@ getStudies(name.match = "", as.data.frame = TRUE, cull.columns = TRUE)
 \author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
 Contact: development@thehyve.nl}
 \note{To be able to access a transmart database, you need to be connected to the server the database is on. If you haven't connected to the server yet, establish a connection using the \code{\link{connectToTransmart}} function.}
-\seealso{\code{\link{getConcepts},\link{getSubjects},\link{getObservations}, \link{getHighdimData}}}
+\seealso{\code{\link{getConcepts},\link{getSubjects},\link{getObservations}, \link{getHighdimData}}.}
 \examples{
   \dontrun{
   # Simply calling the function without an argument will retrieve
@@ -42,3 +42,4 @@ Contact: development@thehyve.nl}
 }
 
 \keyword{ database }
+\keyword{ transmart }

@@ -19,6 +19,18 @@ and high dimensional data (to which the user is the authorized to access).
     Date: \tab 2014-02-25\cr
     License: \tab GPL-3 and higher \cr
   }
+  
+  \cr
+  
+  The following functions are available in the package:
+  \tabular{l}{
+  \code{\link{connectToTransmart}}\cr
+  \code{\link{getStudies}}\cr
+  \code{\link{getSubjects}}\cr
+  \code{\link{getConcepts}}\cr
+  \code{\link{getObservations}}\cr
+  \code{\link{getHigdimData}}\cr
+}
 }
 
 \author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
@@ -26,3 +38,5 @@ Contact: development@thehyve.nl}
 \references{
 }
 \keyword{ package }
+\keyword{ transmart }
+\keyword{ RClient }
