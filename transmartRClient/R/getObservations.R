@@ -5,19 +5,21 @@
 getObservations <- function(study.name, concept.match = NULL, concept.links = NULL, as.data.frame = TRUE) {
     .checkTransmartConnection()
 
-    if (!is.null(concept.match) && is.null(concept.links)) {
-        concept.links <- c()
-        studyConcepts <- getConcepts(study.name)
-        for (toMatch in concept.match) {
-            conceptMatch <- grep(toMatch, studyConcepts$name)[1] # TODO: this might result in the same concept being included multiple times
-            if (is.na(conceptMatch)) {
-                warning(paste("No match found for:", toMatch))
-            } else {
-                concept.links <- c(concept.links, studyConcepts$api.link.self.href[conceptMatch])
+    if (is.null(concept.links)) {
+        if (!is.null(concept.match)) {
+            concept.links <- c()
+            studyConcepts <- getConcepts(study.name)
+            for (toMatch in concept.match) {
+                conceptMatch <- grep(toMatch, studyConcepts$name)[1] # TODO: this might result in the same concept being included multiple times
+                if (is.na(conceptMatch)) {
+                    warning(paste("No match found for:", toMatch))
+                } else {
+                    concept.links <- c(concept.links, paste(studyConcepts$api.link.self.href[conceptMatch], "/observations", sep = ""))
+                }
             }
+        } else {
+            concept.links <- paste("/studies/", study.name, "/observations", sep = "")
         }
-    } else {
-        concept.links <- paste("/studies/", study.name, sep = "")
     }
 
     if (length(concept.links) == 0L) {
@@ -29,7 +31,7 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
 
     for (oneLink in concept.links) {
         serverResult <- .transmartServerGetRequest(
-                paste(oneLink, "/observations", sep=""),
+                oneLink,
                 accept.type = "hal") 
         listOfObservations <- c(listOfObservations, serverResult$observations)
     }
