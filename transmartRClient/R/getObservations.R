@@ -37,14 +37,14 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
     if (as.data.frame) {
         dataFrameObservations <- .listToDataFrame(listOfObservations)
         
-        conceptNames <- as.factor(dataFrameObservations$concept.label)
+        conceptNames <- as.factor(dataFrameObservations$label)
         labelComponents <- matrix(nrow = 0, ncol = 0)
         for (level in strsplit(levels(conceptNames), split = "\\\\")) {
             labelComponents <- rbind.fill.matrix(labelComponents, t(level))
         }
-        labelComponents <- labelComponents[ , -which(apply(labelComponents, 2, function(x) length(unique(x)))==1)]
-        levels(conceptNames) <- apply(labelComponents, 1, function(x) paste(x[!is.na(x)], collapse = "\\"))
-        conceptColumns <- grep("concept\\.", colnames(dataFrameObservations))
+        if (length(levels(conceptNames)) > 1) labelComponents <- labelComponents[ , -which(apply(labelComponents, 2, function(x) length(unique(x)))==1)]
+        levels(conceptNames) <- apply(labelComponents, 1, function(x) paste(x[!is.na(x)&x!=""], collapse = "_"))
+        conceptColumns <- grep("concept\\.|label", colnames(dataFrameObservations))
         
         conceptInfo <- unique(cbind(conceptNames, dataFrameObservations[ , conceptColumns, drop = FALSE]))
         dataFrameObservations <- dataFrameObservations[ , -conceptColumns, drop = FALSE]
@@ -55,8 +55,13 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
         
         subjectInfo <- unique(cbind(dataFrameObservations[ , subjectIdColumn, drop = FALSE], dataFrameObservations[ , subjectColumns, drop = FALSE]))
         dataFrameObservations <- dataFrameObservations[ , -subjectColumns, drop = FALSE]                                      
-        
-        return(list(observations = cast(dataFrameObservations, subject.id ~ conceptNames), subjectInfo = subjectInfo, conceptInfo = conceptInfo))
+        castedObservations <- cast(dataFrameObservations, subject.id ~ conceptNames)
+        factorizedColumns <- which(unlist(lapply(castedObservations, is.factor)))
+        for (factorizedColumn in factorizedColumns) {
+            castedObservations[ , factorizedColumn] <- levels(castedObservations[ , factorizedColumn])[castedObservations[ , factorizedColumn]]
+        }
+
+        return(list(observations = castedObservations, subjectInfo = subjectInfo, conceptInfo = conceptInfo))
     }
     listOfObservations
 }
