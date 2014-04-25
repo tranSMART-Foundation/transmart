@@ -14,7 +14,7 @@ import org.transmartproject.core.querytool.QueriesResource
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-@TestFor(DasService)
+@TestFor(AcghService)
 class DasServiceTests {
 
     @Before
@@ -75,6 +75,11 @@ class DasServiceTests {
                         String getColumnsDimensionLabel() {}
                         String getRowsDimensionLabel() {}
                         void close() throws IOException {}
+
+                        @Override
+                        Iterator iterator() {
+                            return null
+                        }
                     }
                 },
                 createAssayConstraint: { params, name -> },
