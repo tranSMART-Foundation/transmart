@@ -1,6 +1,6 @@
 \name{connectToTransmart}
 \alias{connectToTransmart}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
   Initializes a new connection to the tranSMART database via the RESTful API
 }
@@ -9,33 +9,38 @@
   tranSMART database.
 }
 \usage{
-connectToTransmart("http://localhost:8080/transmart", use.authentication = TRUE, ...)
+connectToTransmart("http://some.transmart.server/transmart", use.authentication = TRUE, ...)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
-  \item{transmartDomain}{The domain of the tranSMART server}
-  \item{use.authentication}{Whether this tranSMART server requires OAuth authentication}
-  \item{\dots}{Passed on to authenticateWithTransmart}
+  \item{transmartDomain}{a character string naming the domain of the tranSMART server to connect to.}
+  \item{use.authentication}{logical indicating whether or not to use OAuth authentication. Must be TRUE if the tranSMART server requires OAuth authentication}
+  \item{\dots}{additional arguments to be passed on to authenticateWithTransmart}
 }
 \details{
-  This function initialises the connection settings to a tranSMART server.
-  If not disabled, it will also guide the user through the authentication process.
+  This function initialises the connection settings to a tranSMART server. 
+  It will set up the connection settings inside the \emph{transmartClientEnv}
+  environment (if non-existent, this environment is created), which will enable this R client to
+  access the tranSMART database through the available get methods (eg. \code{\link{getStudies}}).
+  
+  If \code{use.authentication} is not disabled, it will also guide the user through the authentication process.
+  
 }
-\value{
-  This function will set up the necessary connection settings inside the \emph{transmartClientEnv}
-  environment (if non-existent, this environment is created), which will enable this client to
-  access the tranSMART database through the available get methods (eg. \code{getStudies()}).
-}
+\value{}
 \references{}
 \author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
 Contact: development@thehyve.nl}
 \note{}
 \seealso{}
 \examples{
-  # Set the function's argument to the location of the tranSMART database 
-  localTransmartDomain <- "http://localhost:8080/transmart"
+\dontrun{
+  
+  # Set the function's \code{transmartDomain} argument to the location of the tranSMART database: 
+  localTransmartDomain <- "http://some.transmart.server/transmart"
   connectToTransmart(localTransmartDomain)
+  
   # Follow the instructions for authentication.
+  }
 }
 \keyword{ environment }
 \keyword{ connection }

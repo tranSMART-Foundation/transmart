@@ -2,7 +2,7 @@
 \alias{getHighdimData}
 
 \title{
-Obtain high dimensional data for a certain study
+Obtain a high dimensional dataset for a certain study
 }
 \description{
 This function will retrieve a highdimensional dataset for a specific concept of a certain study.   
@@ -14,8 +14,8 @@ getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection
 }
 \arguments{
   \item{study.name}{A character string containing the name of the study}
-  \item{concept.match}{ A character string containing the concept name that should be matched. The \code{getHighdimData} function will search within the requested study for the first concept which name matches the given string value. It uses the name column of the result from \code{getConcepts(study.name)} to perform the matching.}
-  \item{concept.link}{A character string containing the link pointing to the location of the data on the server. Candidate values for this argument can be found in the api.link column of the \code{getConcepts(study.name)} results. It is the most exact way to refer to a concept, and it overwrites the concept.match argument.}
+  \item{concept.match}{ A character string containing the concept name that should be matched. The \code{getHighdimData} function will search within the requested study for the first concept which name matches the given string value. It uses the name column of the result from \code{\link{getConcepts}(study.name)} to perform the matching.}
+  \item{concept.link}{A character string containing the link pointing to the location of the data on the server. Candidate values for this argument can be found in \code{the api.link} column of the \code{\link{getConcepts}(study.name)} results. It is the most exact way to refer to a concept, and it overwrites the \code{concept.match} argument.}
   \item{projection}{
   A character string specifying what part of the dataset should be returned: should all data be returned or only a certain type of data, for example only the Log Values for an mRNA data set? (note: the types of data present may differ between studies) 
 }
@@ -32,19 +32,19 @@ getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection
 \value{
  If a projection is specified, this function returns a list containing the highdimensional data, with the following components: 
  \item{data}{a dataframe containing the high dimensional data.}
- \item{labelToBioMarkerMap}{a hash describing which (column) labels refer to which bioMarker. This component will only be present if biomarker data is available for this particular dataset.}
+ \item{labelToBioMarkerMap}{a hash describing which (column) labels refer to which bioMarker. This component will only be present if biomarker data is available for this particular dataset. See \code{\link{hash}} for more details about how to use hashes.}
  
- If no projection is specified this function returns a list of the projections available for this study. No highdimensional data is returned. It will also print the instruction to set the projection argument and a list of the projections that are available.
+If no projection is specified this function returns a list of the projections available for the requested study. No highdimensional data is returned. It will also print the instruction to set the projection argument and a list of the projections that are available.
  
 }
 \references{}
 \author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
 Contact: development@thehyve.nl}
-\note{}
+\note{To be able to access a transmart database, you need to be connected to the server the database is on. If you haven't connected to the server yet, establish a connection using the \code{\link{connectToTransmart}} function.}
 \seealso{ \code{\link{hash}}}.}
 
 \examples{
-##not run##
+\dontrun{
 
   # if a concept contains high dimensional data, use the following command to       obtain this data:
   getHighdimData(study.name = "GSE8581", concept.match = "Lung")
@@ -59,6 +59,7 @@ Contact: development@thehyve.nl}
  
   # the following will return the actual data:
   data <- getHighdimData(study.name = "GSE8581", concept.match = "Lung", projection = "zscore")
+  }
 }
 
 

@@ -85,7 +85,6 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     }
 
     if (!exists("access_token", envir = transmartClientEnv)) {
-        cat("TODO: Cannot test connection without authentication.\n")
         return(TRUE)
     }
 
@@ -111,7 +110,8 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 
     tryCatch(result <- .serverMessageExchange(apiCall, httpHeaderFields, ...), 
             error = function(e) {
-                cat("Sorry. You've encountered a bug.\n",
+                cat("Sorry, the R client was unable to carry out your request. Please make sure that the transmart server is still running. \n\n",
+                    "If the server is not down, you've encountered a bug.\n",
                         "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
                         "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.\n")
                 stop(e)

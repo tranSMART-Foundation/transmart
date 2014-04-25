@@ -7,9 +7,9 @@ R Client for accessing the tranSMART RESTful API
 }
 \description{
 Contains functions that enable a user to authenticate and access
-a tranSMART database via get-functions which access tranSMART's
-RESTful API. It currently allows a user to retrieve both clinical
-and high dimensional data (to which the user has access).
+a tranSMART database. Data can be retrieved via get-functions, which access tranSMART's
+RESTful API. The R client currently allows a user to retrieve both clinical
+and high dimensional data (to which the user is the authorized to access).
 }
 \details{
   \tabular{ll}{
