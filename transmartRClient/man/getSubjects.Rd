@@ -4,8 +4,7 @@
   Obtain a list of all subjects in a certain study.
 }
 \description{
-  This function will retrieve a list of all subjects and their personal information for a certain
-  study.
+  This function will retrieve a list of all subjects and their personal information for a certain study.
 }
 \usage{
 getSubjects(study.name, as.data.frame = TRUE)

@@ -14,14 +14,12 @@ connectToTransmart(transmartDomain, use.authentication = TRUE, ...)
 
 \arguments{
   \item{transmartDomain}{a character string naming the domain of the tranSMART server to connect to.}
-  \item{use.authentication}{logical indicating whether or not to use OAuth authentication. Must be TRUE if the tranSMART server requires OAuth authentication}
+  \item{use.authentication}{logical indicating whether or not to use OAuth authentication. Must be TRUE (default setting) if the tranSMART server requires OAuth authentication}
   \item{\dots}{additional arguments to be passed on to \code{\link{authenticateWithTransmart}}}
 }
 \details{
   This function initialises the connection settings to a tranSMART server. 
-  It will set up the connection settings inside the \emph{transmartClientEnv}
-  environment (if non-existent, this environment is created), which will enable this R client to
-  access the tranSMART database through the available get methods (eg. \code{\link{getStudies}}).
+  It will set up the connection settings inside the \emph{transmartClientEnv} environment (if non-existent, this environment is created), which will enable this R client to access the tranSMART database through the available get methods (eg. \code{\link{getStudies}}).
   
   If \code{use.authentication} is not disabled, it will also guide the user through the authentication process.
   

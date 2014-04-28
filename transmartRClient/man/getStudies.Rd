@@ -4,9 +4,7 @@
   Obtain a list of studies present in the tranSMART database
 }
 \description{
-  This function will retrieve a list of all studies contained within
-  the currently accessed tranSMART database. A study-name filter is
-  optional.
+  This function will retrieve a list of all studies contained within the currently accessed tranSMART database. A study-name filter is optional.
 }
 \usage{
 getStudies(name.match = "", as.data.frame = TRUE, cull.columns = TRUE)

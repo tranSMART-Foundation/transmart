@@ -15,11 +15,9 @@ authenticateWithTransmart(oauthDomain, prefetched.request.token = NULL)
   \item{prefetched.request.token}{a character string containing a prefetched token. If a request token has already been obtained, it can be entered here}
 }
 \details{
-  If authentication was succesful, a security token is added to the \emph{transmartClientEnv}
-  environment (if this environment does not exist, it will be created), which will authorize this R client to
-  access the tranSMART database through the available get methods (eg. \code{\link{getStudies}}).
+  If authentication was succesful, a security token is added to the \emph{transmartClientEnv} environment (if this environment does not exist, it will be created), which will authorize this R client to access the tranSMART database through the available get methods (eg. \code{\link{getStudies}}).
   
-  If a previous authentication exists, the user will be asked whether it should be overwritten.
+  This function is automatically invoked when using \code{\link{connectToTransmart}}, and then only when the current authentication is non-existent or no longer accepted. Using this function directly will always overwrite your current authentication without asking.
 }
 \value{}
 \references{}

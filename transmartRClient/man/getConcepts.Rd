@@ -17,14 +17,14 @@ getConcepts(study.name, as.data.frame = TRUE, cull.columns = TRUE)
 
 \arguments{
   \item{study.name}{a character string giving the name of a study}
-  \item{as.data.frame}{logical (default setting is TRUE): should the list containing the concept information be converted to a dataframe?}
+  \item{as.data.frame}{logical (default setting is TRUE): should the list containing the concept information be converted to a data.frame?}
   \item{cull.columns}{logical. If TRUE (default setting) several non-essential columns are excluded.}
 }
 \details{ The \code{"link.highdim.href"} column can  be used to find out if high dimensional data is available for a certain study, and if it is available: which high dimensional datasets are available for this study. For details, see the next section ("Value"). 
 }
 
 \value{
-A dataframe or list with information about all the concepts in a certain study.
+A data.frame or list with information about all the concepts in a certain study.
 The following components may be present, depending on the server definitions, the data and the cull.columns settings:
 
 \item{name}{a character string containing the name of the concept}
