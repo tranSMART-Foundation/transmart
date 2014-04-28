@@ -8,11 +8,11 @@
   study.
 }
 \usage{
-getSubjects(study, as.data.frame = TRUE)
+getSubjects(study.name, as.data.frame = TRUE)
 }
 
 \arguments{
-  \item{study}{a character string giving the name of a study}
+  \item{study.name}{a character string giving the name of a study}
   \item{as.data.frame}{logical. If TRUE (default setting) the subject information is returned as a data.frame. If set to FALSE the function returns the information as a list.}
 }
 \details{ The function will return for each subject the subjectID and their personal information, such as for example sex, age and ethnicity.

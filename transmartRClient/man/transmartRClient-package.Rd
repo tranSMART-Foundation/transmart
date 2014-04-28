@@ -6,17 +6,17 @@
 R Client for accessing the tranSMART RESTful API
 }
 \description{
-Contains functions that enable a user to authenticate and access
-a tranSMART database. Data can be retrieved via get-functions, which access tranSMART's
+This package contains functions that enable a user to authenticate and access
+a tranSMART database. Data can be retrieved from this database via get-functions, which access tranSMART's
 RESTful API. The R client currently allows a user to retrieve both clinical
-and high dimensional data (to which the user is the authorized to access).
+and high dimensional data (to which the user is authorized to access).
 }
 \details{
   \tabular{ll}{
     Package: \tab transmartRClient\cr
     Type: \tab Package\cr
     Version: \tab 0.2\cr
-    Date: \tab 2014-02-25\cr
+    Date: \tab 2014-02-26\cr
     License: \tab GPL-3 and higher \cr
   }
   

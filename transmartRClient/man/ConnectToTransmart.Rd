@@ -9,13 +9,13 @@
   tranSMART database.
 }
 \usage{
-connectToTransmart("http://some.transmart.server/transmart", use.authentication = TRUE, ...)
+connectToTransmart(transmartDomain, use.authentication = TRUE, ...)
 }
 
 \arguments{
   \item{transmartDomain}{a character string naming the domain of the tranSMART server to connect to.}
   \item{use.authentication}{logical indicating whether or not to use OAuth authentication. Must be TRUE if the tranSMART server requires OAuth authentication}
-  \item{\dots}{additional arguments to be passed on to authenticateWithTransmart}
+  \item{\dots}{additional arguments to be passed on to \code{\link{authenticateWithTransmart}}}
 }
 \details{
   This function initialises the connection settings to a tranSMART server. 

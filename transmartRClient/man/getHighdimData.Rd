@@ -13,11 +13,11 @@ It retrieves the data from the server and parses it, converting the high dimensi
 getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection = NULL)
 }
 \arguments{
-  \item{study.name}{a character string giving the name of a study}
-  \item{concept.match}{ A character string containing the concept name that should be matched. The \code{getHighdimData} function will search within the requested study for the first concept which name matches the given string value. It uses the name column of the result from \code{\link{getConcepts}(study.name)} to perform the matching.}
-  \item{concept.link}{A character string containing the link pointing to the location of the data on the server. Candidate values for this argument can be found in \code{api.link.self.href} column of the \code{\link{getConcepts}(study.name)} results. It is the most exact way to refer to a concept, and it overwrites the \code{concept.match} argument.}
+  \item{study.name}{a character string giving the name of a study.}
+  \item{concept.match}{ a character string containing the concept name that should be matched. The \code{getHighdimData} function will search within the requested study for the first concept which name matches the given string value. It uses the name column of the result from \code{\link{getConcepts}} to perform the matching.}
+  \item{concept.link}{a character string containing the link pointing to the location of the data on the server. Candidate values for this argument can be found in \code{api.link.self.href} column of the \code{\link{getConcepts}} results. It is the most exact way to refer to a concept, and it overwrites the \code{concept.match} argument.}
   \item{projection}{
-  A character string specifying what part of the dataset should be returned: should all data be returned or only a certain type of data, for example only the Log Values for an mRNA data set? (note: the types of data present may differ between studies) 
+  a character string specifying what part of the dataset should be returned: should all data be returned or only a certain type of data, for example only the Log Values for an mRNA data set? (note: the types of data present may differ between studies) 
 }
 }
 \details{
@@ -46,7 +46,7 @@ Contact: development@thehyve.nl}
 \examples{
 \dontrun{
 
-  # if a concept contains high dimensional data, use the following command to       obtain this data:
+  # if a concept contains high dimensional data, use the following command to obtain this data:
   getHighdimData(study.name = "GSE8581", concept.match = "Lung")
 
   # you will be told that one of the listed projections needs to be selected: 

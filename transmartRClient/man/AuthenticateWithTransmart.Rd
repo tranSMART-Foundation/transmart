@@ -8,11 +8,11 @@
   acquire a token that grants the client (semi-)permanent access to tranSMART.
 }
 \usage{
-authenticateWithTransmart(oauthDomain = "http://some.transmart.server/transmart", prefetched.request.token = NULL)
+authenticateWithTransmart(oauthDomain, prefetched.request.token = NULL)
 }
 \arguments{
   \item{oauthDomain}{a character string naming the domain of the OAuth server}
-  \item{prefetched.request.token}{a character string. If a request token has already been obtained, it can be entered here}
+  \item{prefetched.request.token}{a character string containing a prefetched token. If a request token has already been obtained, it can be entered here}
 }
 \details{
   If authentication was succesful, a security token is added to the \emph{transmartClientEnv}
@@ -26,7 +26,7 @@ authenticateWithTransmart(oauthDomain = "http://some.transmart.server/transmart"
 \author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
 Contact: development@thehyve.nl}
 \note{}
-\seealso{\code{\link{connectToTransmart}}
+\seealso{\code{\link{connectToTransmart}}}
 \examples{
 \dontrun{  
 

@@ -17,7 +17,7 @@ getConcepts(study.name, as.data.frame = TRUE, cull.columns = TRUE)
 
 \arguments{
   \item{study.name}{a character string giving the name of a study}
-  \item{as.data.frame}{logical: should the list containing the concept information be converted to a dataframe?}
+  \item{as.data.frame}{logical (default setting is TRUE): should the list containing the concept information be converted to a dataframe?}
   \item{cull.columns}{logical. If TRUE (default setting) several non-essential columns are excluded.}
 }
 \details{ The \code{"link.highdim.href"} column can  be used to find out if high dimensional data is available for a certain study, and if it is available: which high dimensional datasets are available for this study. For details, see the next section ("Value"). 
@@ -25,10 +25,10 @@ getConcepts(study.name, as.data.frame = TRUE, cull.columns = TRUE)
 
 \value{
 A dataframe or list with information about all the concepts in a certain study.
-The following components may be present, depending on the server definitions, data and the cull.columns settings:
+The following components may be present, depending on the server definitions, the data and the cull.columns settings:
 
 \item{name}{a character string containing the name of the concept}
-\item{key}{a character string. Similar to \code{fullName} column.. Not present if cull.columns is set to TRUE}
+\item{key}{a character string. Similar to \code{fullName} column. Not present if cull.columns is set to TRUE}
 \item{fullName}{a character string containing the full (path) name of the concept }
 \item{api.link.self.href}{a character string containing the link ("\code{concept.link}") pointing to the location of the data of this concept on the server. }
 \item{api.link.observations.href}{a character string or empty value. If  clinical observation data is available for this study, then this data.frame column or list element is present. For the concepts that contain clinical observation data, the field in the "\code{api.link.observations.href}" column contains a string representation of the link to the location of the data on the server. If a concept does not contain clinical observation data, this field will be empty.The "\code{api.link.observations.href}" column can therefore be used to find out which clinical datasets are available for a certain study.}
