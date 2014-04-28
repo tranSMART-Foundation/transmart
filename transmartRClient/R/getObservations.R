@@ -61,8 +61,8 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
         
         subjectInfo <- unique(cbind(dataFrameObservations[ , subjectIdColumn, drop = FALSE], dataFrameObservations[ , subjectColumns, drop = FALSE]))
         dataFrameObservations <- dataFrameObservations[ , -subjectColumns, drop = FALSE]                                      
-        castedObservations <- cast(dataFrameObservations, subject.id ~ conceptNames, fun.aggregate=function(x) {x[1]})
-        castedObservations <- castedObservations[ , as.character(unique(conceptNames)), drop = FALSE]
+        castedObservations <- cast(dataFrameObservations, subject.id ~ conceptNames, fun.aggregate = function(x) {x[1]})
+        castedObservations <- castedObservations[ , c("subject.id", as.character(unique(conceptNames))), drop = FALSE]
         
         factorizedColumns <- which(unlist(lapply(castedObservations, is.factor)))
         for (factorizedColumn in factorizedColumns) {
