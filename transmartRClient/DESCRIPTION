@@ -1,7 +1,7 @@
 Package: transmartRClient
 Type: Package
 Title: R Client for accessing the tranSMART RESTful API
-Version: 0.1
+Version: 0.2
 Date: 2014-02-26
 Depends: RCurl, RJSONIO, plyr, RProtoBuf, hash, reshape
 Author: Tim Dorscheidt, Jan Kanis, Rianne Jansen
