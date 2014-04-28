@@ -38,6 +38,10 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
 
     if (as.data.frame) {
         dataFrameObservations <- .listToDataFrame(listOfObservations)
+        subjectConceptPairs <- table(dataFrameObservations[ , match(c("label", "subject.id"), colnames(dataFrameObservations))])
+        if(any(subjectConceptPairs>1)) {
+            warning("Your results contain multiple values per subject-concept pair. One of the input concepts is probably a child concept of another. Only the first occurence will be included.")
+        }
         
         conceptNames <- as.factor(dataFrameObservations$label)
         labelComponents <- matrix(nrow = 0, ncol = 0)
@@ -57,8 +61,8 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
         
         subjectInfo <- unique(cbind(dataFrameObservations[ , subjectIdColumn, drop = FALSE], dataFrameObservations[ , subjectColumns, drop = FALSE]))
         dataFrameObservations <- dataFrameObservations[ , -subjectColumns, drop = FALSE]                                      
-        castedObservations <- cast(dataFrameObservations, subject.id ~ conceptNames)
-        castedObservations <- castedObservations[ , as.character(unique(conceptNames))]
+        castedObservations <- cast(dataFrameObservations, subject.id ~ conceptNames, fun.aggregate=function(x) {x[1]})
+        castedObservations <- castedObservations[ , as.character(unique(conceptNames)), drop = FALSE]
         
         factorizedColumns <- which(unlist(lapply(castedObservations, is.factor)))
         for (factorizedColumn in factorizedColumns) {
