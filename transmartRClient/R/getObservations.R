@@ -44,7 +44,7 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
         for (level in strsplit(levels(conceptNames), split = "\\\\")) {
             labelComponents <- rbind.fill.matrix(labelComponents, t(level))
         }
-        if (length(levels(conceptNames)) > 1) labelComponents <- labelComponents[ , -which(apply(labelComponents, 2, function(x) length(unique(x)))==1)]
+        if (length(levels(conceptNames)) > 1) labelComponents <- labelComponents[ , -which(apply(labelComponents, 2, function(x) length(unique(x)))==1), drop = FALSE]
         levels(conceptNames) <- apply(labelComponents, 1, function(x) paste(x[!is.na(x)&x!=""], collapse = "_"))
         conceptColumns <- grep("concept\\.|label", colnames(dataFrameObservations))
         
@@ -58,6 +58,8 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
         subjectInfo <- unique(cbind(dataFrameObservations[ , subjectIdColumn, drop = FALSE], dataFrameObservations[ , subjectColumns, drop = FALSE]))
         dataFrameObservations <- dataFrameObservations[ , -subjectColumns, drop = FALSE]                                      
         castedObservations <- cast(dataFrameObservations, subject.id ~ conceptNames)
+        castedObservations <- castedObservations[ , as.character(unique(conceptNames))]
+        
         factorizedColumns <- which(unlist(lapply(castedObservations, is.factor)))
         for (factorizedColumn in factorizedColumns) {
             castedObservations[ , factorizedColumn] <- levels(castedObservations[ , factorizedColumn])[castedObservations[ , factorizedColumn]]
