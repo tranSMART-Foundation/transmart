@@ -33,9 +33,9 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     } else { projection <- NULL }
 
     if (is.null(projection)) {
-        cat("No valid projection selected.\nSet the projection argument to one of the following options:\n ")
-        cat(paste(listOfHighdimDataTypes$supportedProjections, "\n"))
-        return(listOfHighdimDataTypes$supportedProjections)
+        stop("No valid projection selected.\nSet the projection argument to one of the following options:\n",
+             paste(listOfHighdimDataTypes$supportedProjections, "\n"))
+        return(NULL)
     }
     cat("Retrieving data from server. This can take some time, depending on your network connection speed.", as.character(Sys.time()), "\n")
     serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary")
