@@ -20,9 +20,10 @@ abstract class VcfServiceAbstract extends TransmartDasServiceAbstract {
         //TODO Choose correct cvId(3-d parameter) from http://www.ebi.ac.uk/ontology-lookup/browse.do?ontName=SO
         dasMethod = new DasMethodE('vcf', 'vcf', 'vcf-cv-id')
         version = '0.1'
-        resource = highDimensionResourceService.getSubResourceForType 'cohortMAF'
+        resource = highDimensionResourceService.getSubResourceForType 'vcf'
+        
         //TODO Choose correct cvId(3-d parameter) from http://www.ebi.ac.uk/ontology-lookup/browse.do?ontName=SO
-        projectionName = 'cohortMAF_values'
+        projectionName = 'cohort'
     }
 
     @Override
