@@ -2,6 +2,27 @@
 # This code is licensed under the GNU General Public License,
 # version 3, or (at your option) any later version.
 
+
+# Performance notes
+# 
+# Downloading and parsing large data sets of high dimensional data can take a 
+# significant amount of time (minutes for several 100 mb). We have attempted to 
+# optimize the process a reasonable amount.
+# 
+# The current RCurl wrapper doesn't expose functionality to download a binary 
+# url and process the chunks asynchronously as they come in (that is only 
+# supported for text urls). Doing the downloading and parsing at the same time 
+# should give a significant improvement, but that would require changes in RCurl
+# or a different way of downloading the data.
+# 
+# The parser has also been optimized up to the level that the R code itself only
+# takes a minority of the runtime. The most time consuming operations are the 
+# foreign function calls to retrieve the fields from messages and to construct 
+# objects to parse the varint32 preceding each message. Significant further 
+# optimization of the parser would probably require dropping to C or another 
+# lower level language.
+
+
 getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL) {
     .checkTransmartConnection()
 
@@ -64,6 +85,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     assayLabels <- .DollarNames(assays[[1]])[1:length(assays[[1]])]
 
     for (label in assayLabels) {
+        
         # RProtoBuf does not support int64 on all platforms that we need to 
         # support. Specifically, binaries from CRAN don't support it, which 
         # means Windows platforms and the default OSX R distribution. Linux and 
@@ -82,6 +104,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         # because the as.character() conversion calls a DebugString method in 
         # the C++ protobuf library, so the RProtoBuf C++ code that CRAN sees 
         # never touches the 64 bit integers directly.)
+        
         if (label == "assayId") {
             columns$add(label, sapply(assays,
                     function(a) sub("assayId: ", "", grep(label, strsplit(as.character(a), split = "\n")[[1]], value = TRUE))))
@@ -105,18 +128,19 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         setTxtProgressBar(pb, dataChopper$getRawVectorIndex())
         
         if(length(rowValues) == 1) {
-            # if only one value, don't paste the columnSpec name.
+            # if only one value, don't add the columnSpec name to the rowlabel.
             columns$add(rowlabel, rowValues[[1]]$doubleValue)
             next
         }
 
+        # Multiple columns, add the columnSpec name to the labels to differentiate them.
         for(i in 1:length(rowValues)) {
             entryName <- paste(rowlabel, columnSpec[[i]]$name, sep=".")
             type <- columnSpec[[i]]$type
             if(type == STRING) {
-                columns$add(entryName, rowValues[[i]]$stringValue) #add the values of one column value. The name of this vector is the rowlabel concatenated to the column specification
+                columns$add(entryName, rowValues[[i]]$stringValue)
             } else if(type == DOUBLE) {
-                columns$add(entryName, rowValues[[i]]$doubleValue) #add the values of one column value. The name of this vector is the rowlabel concatenated to the column specification
+                columns$add(entryName, rowValues[[i]]$doubleValue)
             } else {
                 warning("Unknown row type: ", type)
             }
@@ -134,7 +158,8 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         labelToBioMarker <- "No biomarker information is available for this dataset"
         return(list(data = data))
     } else {
-        cat("Additional biomarker information is available.\nThis function will return a list containing a dataframe containing the high dimensional data and a hash describing which (column) labels refer to which bioMarker\n")
+        cat("Additional biomarker information is available.\nThis function will return a list containing a dataframe",
+            "containing the high dimensional data and a hash describing which (column) labels refer to which bioMarker\n")
         return(list(data = data, labelToBioMarkerMap = labelToBioMarker))
     }
 }

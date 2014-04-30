@@ -4,8 +4,10 @@
 # You can install them as follows:
 install.packages(pkgs=c("RCurl", "RJSONIO", "RProtoBuf", "plyr", "hash", "reshape"))
 
-# One nasty issue encountered in MacOSX is that the R version installed via homebrew runs into a libl library error:
-#   please use the default R installed via the CRAN installer, which does not have this issue
+# One nasty issue encountered in some MacOSX versions (at least in 10.9) is that
+# the R version installed via homebrew runs into a libl library error. Please
+# use the default R installed via the CRAN installer, which does not have this
+# issue
 
 # Now you can install the transmartRClient. First, point the following path to the location of your "transmartRClient"
 # directory, which is a sub-directory of where this installCommands.R file is located

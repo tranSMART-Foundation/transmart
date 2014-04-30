@@ -148,7 +148,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 }
 
 .listToDataFrame <- function(list) {
-    # add each list-element as a new row to a matrix
+    # add each list-element as a new row to a matrix so we can use the rbind.fill.matrix functionality
     df <- matrix(nrow = 0, ncol = 0)
     for (el in list) df <- rbind.fill.matrix(df, t(unlist(el)))
 
