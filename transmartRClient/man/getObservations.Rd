@@ -29,8 +29,7 @@ getObservations(study.name, concept.match = NULL, concept.links = NULL, as.data.
   If as.data.frame is set to FALSE, a list is contained with a structure very similar to how it is received from the server.
 }
 \references{}
-\author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
-Contact: development@thehyve.nl}
+\author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. Contact: development@thehyve.nl}
 \note{To be able to access a transmart database, you need to be connected to the server the database is on. If you haven't connected to the server yet, establish a connection using the \code{\link{connectToTransmart}} function.}
 \seealso{\code{\link{getStudies}, \link{getConcepts}}}
 \examples{
@@ -41,4 +40,4 @@ Contact: development@thehyve.nl}
 }
 
 \keyword{ database }
-\keyword { transmart }
+\keyword{ transmart }
