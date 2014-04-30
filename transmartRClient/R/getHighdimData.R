@@ -58,7 +58,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
              paste(listOfHighdimDataTypes$supportedProjections, "\n"))
         return(NULL)
     }
-    cat("Retrieving data from server. This can take some time, depending on your network connection speed.", as.character(Sys.time()), "\n")
+    message("Retrieving data from server. This can take some time, depending on your network connection speed. ", as.character(Sys.time()))
     serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary")
     if (length(serverResult$content) == 0) {
         warning("Error in retrieving high dim data.")
@@ -113,7 +113,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         }
     }
     
-    cat(paste("Received data for", noAssays, "assays. Unpacking data.", as.character(Sys.time()), "\n"))
+    message("Received data for ", noAssays, " assays. Unpacking data. ", as.character(Sys.time()))
 
     pb <- txtProgressBar(min = 0, max = length(rawVector), style = 3)
     labelToBioMarker <- hash() #biomarker info is optional, but should not be omitted, as it is also part of the data
@@ -149,17 +149,17 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     }
     close(pb) 
 
-    cat("Data unpacked. Converting to data.frame.", as.character(Sys.time()),"\n")
+    message("Data unpacked. Converting to data.frame. ", as.character(Sys.time()))
     
     data <- .to.data.frame.converter(columns$as.list(), stringsAsFactors=FALSE)
 
     if(all(is.na(values(labelToBioMarker)))) {
-        cat("No biomarker information available.")
+        message("No biomarker information available.")
         labelToBioMarker <- "No biomarker information is available for this dataset"
         return(list(data = data))
     } else {
-        cat("Additional biomarker information is available.\nThis function will return a list containing a dataframe",
-            "containing the high dimensional data and a hash describing which (column) labels refer to which bioMarker\n")
+        message("Additional biomarker information is available.\nThis function will return a list containing a dataframe ",
+                "containing the high dimensional data and a hash describing which (column) labels refer to which bioMarker")
         return(list(data = data, labelToBioMarkerMap = labelToBioMarker))
     }
 }

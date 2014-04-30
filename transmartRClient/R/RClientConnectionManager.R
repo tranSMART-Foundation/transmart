@@ -19,9 +19,9 @@ function (transmartDomain, use.authentication = TRUE, ...) {
     }
 
     if(!.checkTransmartConnection()) {
-      cat("Connection unsuccessful. Type: ?connectToTransmart for help.\n")
+      stop("Connection unsuccessful. Type: ?connectToTransmart for help.")
     } else {
-      cat("Connection successful.\n")
+      message("Connection successful.")
     }
 }
 
@@ -66,7 +66,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             oauthResponse <- getURL(oauth.exchange.token.url,
                     verbose = getOption("verbose")), 
             error = function(e) {
-                if (getOption("verbose")) { cat(e, "\n", oauthresponse) }
+                if (getOption("verbose")) { message(e, "\n", oauthresponse) }
                 stop("Error with connection to verification server.") 
             })
 
@@ -89,15 +89,15 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     }
 
     ping <- .transmartServerGetRequest("/oauth/verify", accept.type = "default")
-    if (getOption("verbose")) { cat(paste(ping, collapse = ": "), "\n") }
+    if (getOption("verbose")) { message(paste(ping, collapse = ": ")) }
 
     if (!is.null(ping)) {
         if (reauthentice.if.invalid.token && grepl("^invalid_token", ping["error"])) {
-            cat("Authentication token not accepted.\n")
+            message("Authentication token not accepted.")
             authenticateWithTransmart(oauthDomain = transmartClientEnv$oauthDomain)
             return(.checkTransmartConnection(reauthentice.if.invalid.token = FALSE))
         }
-        cat("Cannot connect to tranSMART database.\n")
+        message("Cannot connect to tranSMART database.")
         return(FALSE)
     }
     return(TRUE)
@@ -110,10 +110,10 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 
     tryCatch(result <- .serverMessageExchange(apiCall, httpHeaderFields, ...), 
             error = function(e) {
-                cat("Sorry, the R client was unable to carry out your request. Please make sure that the transmart server is still running. \n\n",
-                    "If the server is not down, you've encountered a bug.\n",
+                message("Sorry, the R client was unable to carry out your request. Please make sure that the transmart server is still running. \n\n",
+                        "If the server is not down, you've encountered a bug.\n",
                         "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
-                        "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.\n")
+                        "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.")
                 stop(e)
             })
     result
@@ -125,13 +125,13 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
                 verbose = getOption("verbose"),
                 httpheader = httpHeaderFields)
-        if (getOption("verbose")) { cat("Server response:\n\n", result, "\n\n") }
+        if (getOption("verbose")) { message("Server response:\n\n", result, "\n") }
         if (is.null(result) || result == "null") { return(NULL) }
         result <- fromJSON(result, asText = TRUE, nullValue = NA)
         if (accept.type == "hal") { return(.simplifyHalList(result)) }
         return(result)
     } else if (accept.type == "binary") {
-        cat("Retrieving data: ")
+        message("Retrieving data: ")
         result <- list()
         h <- basicTextGatherer()
         result$content <- getBinaryURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
@@ -139,9 +139,9 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
                 noprogress = FALSE,
                 progressfunction = function(down,up) {cat(paste("\r", format(down / (1024*1024), digits=3, nsmall=3), "MiB downloaded."))},
                 httpheader = httpHeaderFields)
-        cat("\nDownload complete.\n")
+        message("Download complete.")
         result$header <- parseHTTPHeader(h$value())
-        if (getOption("verbose")) { cat("Server binary response header:\n"); print(data.frame(result$header)) }
+        if (getOption("verbose")) { message(paste("Server binary response header:", as.character(data.frame(result$header)), "", sep="\n")) }
         return(result)
     }
     return(NULL)

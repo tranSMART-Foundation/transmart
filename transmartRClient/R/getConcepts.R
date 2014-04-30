@@ -14,9 +14,9 @@ getConcepts <- function(study.name, as.data.frame = TRUE, cull.columns = TRUE) {
             columnsToCull <- match(c("key"), names(dataFrameConcepts))
             if (any(is.na(columnsToCull))) {
                 warning("There was a problem culling columns. You can try again with cull.columns = FALSE.")
-                cat("Sorry. You've encountered a bug.\n",
-                    "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
-                    "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.\n")
+                message("Sorry. You've encountered a bug.\n",
+                        "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n",
+                        "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.")
             }
             return(dataFrameConcepts[, -columnsToCull])
         }
