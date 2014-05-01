@@ -1,0 +1,11 @@
+Package: transmartRClient
+Type: Package
+Title: R Client for accessing the tranSMART RESTful API
+Version: 0.2
+Date: 2014-02-26
+Depends: RCurl, RJSONIO, plyr, RProtoBuf, hash, reshape
+Author: Tim Dorscheidt, Jan Kanis, Rianne Jansen
+Maintainer: <support@thehyve.nl>
+Description: This package exposes tranSMART's RESTful API as a set of R functions. It uses tranSMART's OAuth authentication to access the data for which the user is authorized, and allows exploring and downloading the data.
+License: GPL (>= 3.0)
+ByteCompile: True

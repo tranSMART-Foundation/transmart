@@ -1,0 +1,27 @@
+# Copyright (c) 2014 The Hyve B.V.
+# This code is licensed under the GNU General Public License,
+# version 3, or (at your option) any later version.
+
+getConcepts <- function(study.name, as.data.frame = TRUE, cull.columns = TRUE) {
+    .checkTransmartConnection()
+    
+    serverResult <- .transmartServerGetRequest(paste("/studies/", study.name, "/concepts", sep = ""), accept.type = "hal")
+    listOfConcepts <- serverResult$ontology_terms
+    
+    if (as.data.frame) {
+        dataFrameConcepts <- .listToDataFrame(listOfConcepts)
+        if (cull.columns) {
+            columnsToCull <- match(c("key"), names(dataFrameConcepts))
+            if (any(is.na(columnsToCull))) {
+                warning("There was a problem culling columns. You can try again with cull.columns = FALSE.")
+                message("Sorry. You've encountered a bug.\n",
+                        "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n",
+                        "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.")
+            }
+            return(dataFrameConcepts[, -columnsToCull])
+        }
+        return(dataFrameConcepts)
+    }
+    
+    listOfConcepts
+} 
