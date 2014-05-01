@@ -23,7 +23,11 @@
 # lower level language.
 
 
-getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL) {
+getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL,
+                           progress.download = .make.progresscallback.download(),
+                           progress.parse = .make.progresscallback.parse()
+                           ) {
+    
     .checkTransmartConnection()
 
     if (is.null(concept.link) && !is.null(concept.match)) {
@@ -59,16 +63,16 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         return(NULL)
     }
     message("Retrieving data from server. This can take some time, depending on your network connection speed. ", as.character(Sys.time()))
-    serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary")
+    serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary", progress = progress.download)
     if (length(serverResult$content) == 0) {
         warning("Error in retrieving high dim data.")
         return(NULL)
     }
 
-    return(.parseHighdimData(serverResult$content))
+    return(.parseHighdimData(serverResult$content, progress = progress.parse))
 }
 
-.parseHighdimData <- function(rawVector, .to.data.frame.converter=.as.data.frame.fast) {
+.parseHighdimData <- function(rawVector, .to.data.frame.converter=.as.data.frame.fast, progress=.make.progresscallback.parse()) {
     dataChopper <- .messageChopper(rawVector)
 
     message <- dataChopper$getNextMessage()
@@ -115,7 +119,10 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     
     message("Received data for ", noAssays, " assays. Unpacking data. ", as.character(Sys.time()))
 
-    pb <- txtProgressBar(min = 0, max = length(rawVector), style = 3)
+    totalsize <- length(rawVector)
+    progress$start(totalsize)
+    callback <- progress$update
+    
     labelToBioMarker <- hash() #biomarker info is optional, but should not be omitted, as it is also part of the data
 
     while (!is.null(message <- dataChopper$getNextMessage())) {
@@ -125,7 +132,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         labelToBioMarker[[rowlabel]] <- (if(is.null(row$bioMarker)) NA_character_ else row$bioMarker)
         rowValues <- row$value
         
-        setTxtProgressBar(pb, dataChopper$getRawVectorIndex())
+        callback(dataChopper$getRawVectorIndex(), totalsize)
         
         if(length(rowValues) == 1) {
             # if only one value, don't add the columnSpec name to the rowlabel.
@@ -147,8 +154,8 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         }
         
     }
-    close(pb) 
-
+    progress$end()
+    
     message("Data unpacked. Converting to data.frame. ", as.character(Sys.time()))
     
     data <- .to.data.frame.converter(columns$as.list(), stringsAsFactors=FALSE)
@@ -162,6 +169,23 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
                 "containing the high dimensional data and a hash describing which (column) labels refer to which bioMarker")
         return(list(data = data, labelToBioMarkerMap = labelToBioMarker))
     }
+}
+
+
+.make.progresscallback.parse <- function() {
+    pb <- NULL
+    lst <- list()
+    lst$start <- function(total) {
+        pb <<- txtProgressBar(min = 0, max = total, style = 3)
+    }
+    lst$update <- function(current, .total) {
+        setTxtProgressBar(pb, current)
+    }
+    lst$end <- function() {
+        close(pb)
+    }
+
+    lst
 }
 
 .messageChopper <- function(rawVector, endOfLastMessage = 0) {
@@ -197,13 +221,13 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 
 
 # We need to repeatedly add an element to a list. With normal list concatenation
-# or element setting this would lead to a quadratic number of memory copies and 
-# thus a quadratic runtime. To prevent that, this function implements a bare
-# bones expanding array, in which list additions are (amortized) constant time.
+# or element setting this would lead to a large number of memory copies and a
+# quadratic runtime. To prevent that, this function implements a bare bones
+# expanding array, in which list appends are (amortized) constant time.
 .expandingList <- function(capacity = 10) {
     buffer <- vector('list', capacity)
     names <- character(capacity)
-    count <- 0
+    length <- 0
 
     methods <- list()
 
@@ -214,18 +238,18 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     }
 
     methods$add <- function(name, val) {
-        if(count == capacity) {
+        if(length == capacity) {
             methods$double.size()
         }
 
-        count <<- count + 1
-        buffer[[count]] <<- val
-        names[count] <<- name
+        length <<- length + 1
+        buffer[[length]] <<- val
+        names[length] <<- name
     }
 
     methods$as.list <- function() {
-        b <- buffer[0:count]
-        names(b) <- names[0:count]
+        b <- buffer[0:length]
+        names(b) <- names[0:length]
         return(b)
     }
 

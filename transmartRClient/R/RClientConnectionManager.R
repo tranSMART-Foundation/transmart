@@ -119,7 +119,8 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     result
 }
 
-.serverMessageExchange <- function(apiCall, httpHeaderFields, accept.type = "default") {
+.serverMessageExchange <- function(apiCall, httpHeaderFields, accept.type = "default", 
+                                   progress = .make.progresscallback.download()) {
     if (any(accept.type == c("default", "hal"))) {
         if (accept.type == "hal") { httpHeaderFields <- c(httpHeaderFields, accept = "application/hal+json") }
         result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
@@ -131,21 +132,33 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         if (accept.type == "hal") { return(.simplifyHalList(result)) }
         return(result)
     } else if (accept.type == "binary") {
-        message("Retrieving data: ")
+        progress$start(NA_integer_)
         result <- list()
         h <- basicTextGatherer()
         result$content <- getBinaryURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
                 .opts = list(headerfunction = h$update),
                 noprogress = FALSE,
-                progressfunction = function(down,up) {cat(paste("\r", format(down / (1024*1024), digits=3, nsmall=3), "MiB downloaded."))},
+                progressfunction = function(down, up) {up[which(up == 0)] <- NA; progress$update(down, up) },
                 httpheader = httpHeaderFields)
-        message("Download complete.")
+        progress$end()
         result$header <- parseHTTPHeader(h$value())
         if (getOption("verbose")) { message(paste("Server binary response header:", as.character(data.frame(result$header)), "", sep="\n")) }
         return(result)
     }
     return(NULL)
 }
+
+.make.progresscallback.download <- function() {
+    lst <- list()
+    lst$start <- function(.total) cat("Retrieving data: \n")
+    lst$update <- function(current, .total) {
+        # This trick unfortunately doesn't work in RStudio if we write to stderr.
+        cat(paste("\r", format(current / (1024*1024), digits=3, nsmall=3), "MiB downloaded."))
+    }
+    lst$end <- function() cat("\nDownload complete.\n")
+    return(lst)
+}
+
 
 .listToDataFrame <- function(list) {
     # add each list-element as a new row to a matrix so we can use the rbind.fill.matrix functionality

@@ -10,7 +10,9 @@ It retrieves the data from the server and parses it, converting the high dimensi
 }
 
 \usage{
-getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection = NULL)
+getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection = NULL,
+                progress.download = .make.progresscallback.download(),
+                progress.parse = .make.progresscallback.parse())
 }
 \arguments{
   \item{study.name}{a character string giving the name of a study.}
@@ -19,6 +21,21 @@ getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection
   \item{projection}{
   a character string specifying what part of the dataset should be returned: should all data be returned or only a certain type of data, for example only the log values for an mRNA data set. Candidate values can be obtained, see details section on how. (note: the types of data present may differ between studies).
 }
+  \item{progress.download}{(The default should be fine for most users) A list of functions that will be called during the download, this allows displaying download progress to the user. The list must contain three items of the following signature: 
+  
+  \code{%
+    progress.download$start <- function(total) {\ldots}\cr
+    progress.download$update <- function(current, total) {\ldots}\cr
+    progress.download$end <- function() {\ldots}
+  }
+  
+  \describe{
+    \item{\code{start}}{is called before the download starts, with \code{total} set to the total number of bytes to be processed. \code{total} may be \code{NA} if this information is not available.}
+    \item{\code{update}}{is called during the download, with \code{total} as the total number of bytes to be processed and \code{current} the current number of bytes that have been processed. \code{total} will generally be the same value as in the call to \code{start()}.}
+    \item{\code{close}}{will be called once the download has finished.}
+  }
+  }
+  \item{progress.parse}{(The default should be fine for most users) This argument functions identical to \code{progress.download} but the functions will be called before, during and after the parsing of the downloaded data. }
 }
 \details{
   Retrieving and parsing the data may take some time, depending on the size of the data requested and on your connection characteristics.
