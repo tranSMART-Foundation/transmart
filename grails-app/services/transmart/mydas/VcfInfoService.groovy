@@ -53,22 +53,11 @@ class VcfInfoService  extends  VcfServiceAbstract {
                 // end pos
                 val.position.toInteger(),
                 // value - this is where we place the value from the info field
-                (val.additionalInfo[infoField]?:0) as double,
+                (val.infoFields[infoField]?:0) as double,
                 DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
                 DasPhase.PHASE_NOT_APPLICABLE,
                 //notes
-                ["RefSNP=${val.rsId}",
-                        "REF=${val.referenceAllele}",
-                        "ALT=${val.alternativeAlleles.join(',')}",
-                        "AlleleCount=${val.additionalInfo['AC'] ?: NA}",
-                        "AlleleFrequency=${val.additionalInfo['AF'] ?: NA}",
-                        "TotalAllele=${val.additionalInfo['AN'] ?: NA}",
-                        "BaseQRankSum=${val.additionalInfo['BaseQRankSum'] ?: NA}",
-                        "MQRankSum=${val.additionalInfo['MQRankSum'] ?: NA}",
-                        "dbSNPMembership=${val.additionalInfo['DB'] ?: 'No'}",
-                        "VariantClassification=${val.additionalInfo['VC'] ?: NA}",
-                        "QualityOfDepth=${val.qualityOfDepth ?: NA}",
-                        "GenomicVariantTypes=${val.genomicVariantTypes.join(',')}"]*.toString(),
+                getCommonNotes(val),
                 //links
                 linkMap,
                 //targets

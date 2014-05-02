@@ -31,7 +31,10 @@ class GenomicVariantsService  extends  VcfServiceAbstract {
                 : [(new URL("http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=${val.rsId}")): 'NCBI SNP Ref']
 
         def results = []
-        val.genomicVariantTypes.eachWithIndex { genomicVariantType, indx ->
+        val.cohortInfo.genomicVariantTypes.eachWithIndex { genomicVariantType, indx ->
+            if( !genomicVariantType )
+                return
+                
             results << new DasFeature(
                     // feature id - any unique id that represent this feature
                     "gv-${val.rsId}-$genomicVariantType",
@@ -50,16 +53,11 @@ class GenomicVariantsService  extends  VcfServiceAbstract {
                     DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
                     DasPhase.PHASE_NOT_APPLICABLE,
                     //notes
-                    ["RefSNP=${val.rsId}",
-                            "REF=${val.referenceAllele}",
-                            "ALT=${val.alternativeAlleles.join(',')}",
-                            "CurrentALT=${val.alternativeAlleles[indx]}",
-                            "AlleleCount=${val.additionalInfo['AC'] ?: NA}",
-                            "AlleleFrequency=${val.additionalInfo['AF'] ?: NA}",
-                            "TotalAllele=${val.additionalInfo['AN'] ?: NA}",
-                            "VariantClassification=${val.additionalInfo['VC'] ?: NA}",
-                            "MAF=${val.maf ? String.format('%.2f', val.maf) : NA}",
-                            "QualityOfDepth=${val.qualityOfDepth ?: NA}"]*.toString(),
+                    getCommonNotes(val) + 
+                    [
+                        "CurrentALT=" + val.cohortInfo.alleles[ indx ],
+                        "Type=" + genomicVariantType,
+                    ],
                     //links
                     linkMap,
                     //targets
