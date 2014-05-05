@@ -47,18 +47,7 @@ class QoDService  extends  VcfServiceAbstract {
                 DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
                 DasPhase.PHASE_NOT_APPLICABLE,
                 //notes
-                ["RefSNP=${val.rsId}",
-                        "REF=${val.referenceAllele}",
-                        "ALT=${val.alternativeAlleles.join(',')}",
-                        "AlleleCount=${val.additionalInfo['AC'] ?: NA}",
-                        "AlleleFrequency=${val.additionalInfo['AF'] ?: NA}",
-                        "TotalAllele=${val.additionalInfo['AN'] ?: NA}",
-                        "BaseQRankSum=${val.additionalInfo['BaseQRankSum'] ?: NA}",
-                        "MQRankSum=${val.additionalInfo['MQRankSum'] ?: NA}",
-                        "dbSNPMembership=${val.additionalInfo['DB'] ?: 'No'}",
-                        "VariantClassification=${val.additionalInfo['VC'] ?: NA}",
-                        "MAF=${val.maf ? String.format('%.2f', val.maf) : NA}",
-                        "GenomicVariantTypes=${val.genomicVariantTypes.join(',')}"]*.toString(),
+                getCommonNotes(val),
                 //links
                 linkMap,
                 //targets

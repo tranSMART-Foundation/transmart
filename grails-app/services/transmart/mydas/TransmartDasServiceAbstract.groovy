@@ -18,7 +18,6 @@ abstract class TransmartDasServiceAbstract {
 
     abstract protected void getSpecificFeatures(RegionRow region, assays, Map<String, String> params, Collection<DasType> dasTypes, Map<String, List<DasFeature>> featuresPerSegment);
 
-
     HighDimensionResource highDimensionResourceService
     HighDimensionDataTypeResource resource
 

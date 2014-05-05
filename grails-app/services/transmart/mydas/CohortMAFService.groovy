@@ -33,7 +33,8 @@ class CohortMAFService  extends  VcfServiceAbstract {
     }
 
     private def getCohortMafFeature = { VcfValues val ->
-        if (!val.maf || val.maf <= 0) {
+        def maf = val?.cohortInfo?.minorAlleleFrequency
+        if (!maf || maf <= 0) {
             return []
         }
 
@@ -54,20 +55,11 @@ class CohortMAFService  extends  VcfServiceAbstract {
                 // end pos
                 val.position.toInteger(),
                 // value - this is where Minor Allele Freq (MAF) value is placed
-                val.maf,
+                val.cohortInfo.minorAlleleFrequency,
                 DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
                 DasPhase.PHASE_NOT_APPLICABLE,
                 //notes
-                ["RefSNP=${val.rsId}",
-                        "REF=${val.referenceAllele}",
-                        "ALT=${val.alternativeAlleles.join(',')}",
-                        "MafAllele=${val.mafAllele}",
-                        "AlleleCount=${val.additionalInfo['AC'] ?: NA}",
-                        "AlleleFrequency=${val.maf}",
-                        "TotalAllele=${val.additionalInfo['AN'] ?: NA}",
-                        "VariantClassification=${val.additionalInfo['VC'] ?: NA}",
-                        "QualityOfDepth=${val.qualityOfDepth ?: NA}",
-                        "GenomicVariantTypes=${val.genomicVariantTypes.join(',')}"]*.toString(),
+                getCommonNotes(val),
                 //links
                 linkMap,
                 //targets
