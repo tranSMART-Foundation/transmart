@@ -48,7 +48,7 @@ class SummaryMAFService extends  VcfServiceAbstract {
                 // end pos
                 val.position.toInteger(),
                 // value - this is where Minor Allele Freq (MAF) value is placed
-                (val.infoFields['AF'] ?: '0') as double,
+                maf,
                 DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
                 DasPhase.PHASE_NOT_APPLICABLE,
                 //notes
