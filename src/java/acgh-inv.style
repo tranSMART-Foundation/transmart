@@ -1,0 +1,19 @@
+<DASSTYLE>
+    <STYLESHEET version="1.1">
+        <CATEGORY id="default">
+            <TYPE id="acgh-inv-frequency">
+                <GLYPH>
+                    <HISTOGRAM>
+                        <MIN>0.0</MIN>
+                        <MAX>1.0</MAX>
+                        <HEIGHT>35</HEIGHT>
+                        <STEPS>50</STEPS>
+                        <COLOR1>#000000</COLOR1>
+                        <COLOR2>#808080</COLOR2>
+                        <COLOR3>#D3D3D3</COLOR3>
+                    </HISTOGRAM>
+                </GLYPH>
+            </TYPE>
+        </CATEGORY>
+    </STYLESHEET>
+</DASSTYLE>

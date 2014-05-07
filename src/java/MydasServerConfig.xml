@@ -116,15 +116,44 @@
         max_entry_points: The max_entry_points (optional) attribute is a integer defining the maximum number of entry points
                           that a data source commits to retrieve when entry_points command is used
         -->
-        <datasource uri="acgh"
-                    title="acgh"
-                    description="aCGH copy number"
+        <datasource uri="acgh-gain"
+                    title="acgh-gain"
+                    description="Frequency of gains in selected cohort"
                     doc_href="http://acgh.thehyve.net"
                     mapmaster="http://acgh.thehyve.net">
 
             <maintainer email="office@thehyve.nl" />
-            <pattern>acgh-(\d+)(?:-(\S+))?</pattern>
-            <version uri="acgh" created="2013-08-31">
+            <pattern>acgh-gain-(\d+)(?:-(\S+))?</pattern>
+            <version uri="acgh-gain" created="2013-08-31">
+                <class>org.transmartproject.das.mydas.AcghDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/acgh-gain" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/das/acgh-gain/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/das/acgh-gain/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/acgh-gain/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>acgh-gain.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <datasource uri="acgh-loss"
+                    title="acgh-loss"
+                    description="Frequency of losses in selected cohort"
+                    doc_href="http://acgh.thehyve.net"
+                    mapmaster="http://acgh.thehyve.net">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>acgh-loss-(\d+)(?:-(\S+))?</pattern>
+            <version uri="acgh-loss" created="2013-08-31">
                 <class>org.transmartproject.das.mydas.AcghDS</class>
                 <!--TODO: Specify appropriate coordinates-->
                 <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
@@ -139,17 +168,103 @@
                 <capability type="das1:rows-for-feature"	/>
             </version>
 
-            <stylesheet>acgh.style</stylesheet>
+            <stylesheet>acgh-loss.style</stylesheet>
             <dna-command-enabled>true</dna-command-enabled>
             <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
             <include-types-with-zero-count>true</include-types-with-zero-count>
         </datasource>
 
+        <datasource uri="acgh-normal"
+                    title="acgh-normal"
+                    description="Frequency of normals in selected cohort"
+                    doc_href="http://acgh.thehyve.net"
+                    mapmaster="http://acgh.thehyve.net">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>acgh-normal-(\d+)(?:-(\S+))?</pattern>
+            <version uri="acgh-normal" created="2013-08-31">
+                <class>org.transmartproject.das.mydas.AcghDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/acgh" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/das/acgh/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/das/acgh/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/acgh/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>acgh-normal.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <datasource uri="acgh-amp"
+                    title="acgh-amp"
+                    description="Frequency of amplifications in selected cohort"
+                    doc_href="http://acgh.thehyve.net"
+                    mapmaster="http://acgh.thehyve.net">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>acgh-amp-(\d+)(?:-(\S+))?</pattern>
+            <version uri="acgh-amp" created="2013-08-31">
+                <class>org.transmartproject.das.mydas.AcghDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/acgh" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/das/acgh/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/das/acgh/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/acgh/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>acgh-amp.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <datasource uri="acgh-inv"
+                    title="acgh-inv"
+                    description="Frequency of invalids in selected cohort"
+                    doc_href="http://acgh.thehyve.net"
+                    mapmaster="http://acgh.thehyve.net">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>acgh-inv-(\d+)(?:-(\S+))?</pattern>
+            <version uri="acgh-inv" created="2013-08-31">
+                <class>org.transmartproject.das.mydas.AcghDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/acgh" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/das/acgh/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/das/acgh/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/acgh/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>acgh-inv.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
 
         <!-- VCF Datasource -->
         <datasource uri="vcf"
-                    title="Cohort MAF"
-                    description="Minor Allele Frequency (MAF) of selected cohort"
+                    title="minor allele freq"
+                    description="Minor Allele Frequency of selected cohort"
                     doc_href="http://www.transmartproject.org/"
                     mapmaster="http://www.transmartproject.org/">
 
@@ -178,7 +293,7 @@
 
          <!--Summary Level MAF Datasource-->
         <datasource uri="http://thehyve.nl"
-                    title="Summary MAF"
+                    title="summary of minor allele freq"
                     description="Minor Allele Frequency (MAF) whole study level"
                     doc_href="http://www.transmartproject.org/"
                     mapmaster="http://www.transmartproject.org/">
@@ -208,8 +323,8 @@
 
          <!--Quality of Depth Datasource--> 
         <datasource uri="http://thehyve.nl"
-                    title=" Quality of Depth"
-                    description="Quality of Depth (QD) whole study level"
+                    title="quality of depth"
+                    description="Quality of Depth of whole study level"
                     doc_href="http://www.transmartproject.org/"
                     mapmaster="http://www.transmartproject.org/">
 
@@ -238,7 +353,7 @@
 
          <!--Genomic Variants Datasource--> 
         <datasource uri="gv"
-                    title="Genomic Variants"
+                    title="variants"
                     description="Genomic Variants of selected cohort"
                     doc_href="http://www.transmartproject.org/"
                     mapmaster="http://www.transmartproject.org/">
