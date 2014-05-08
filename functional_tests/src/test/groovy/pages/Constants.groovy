@@ -14,4 +14,7 @@ class Constants {
 
 	public static final boolean AUTO_LOGIN_ENABLED = true
 	public static final Page LANDING_PAGE = new DatasetExplorerPage()
+	
+	public static final String GSE8581_KEY = '\\\\Public Studies\\Public Studies\\GSE8581\\'
+	
 }
