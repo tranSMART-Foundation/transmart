@@ -17,8 +17,6 @@ import static org.hamcrest.Matchers.*
 
 class SurvivalAnalysisTests extends GebReportingTest{
 
-    public static final String GSE8581_KEY = '\\\\Public Studies\\Public Studies\\GSE8581\\'
-
     void login(Class<? extends Page> redirectionPage) {
         usernameField.value Constants.GOOD_USERNAME
         passwordField.value Constants.GOOD_PASSWORD
@@ -119,10 +117,10 @@ class SurvivalAnalysisTests extends GebReportingTest{
 
 	@Test
 	void testClinicalVariable() {
-		String sexKey     = "${GSE8581_KEY}Subjects\\Sex\\"
+		String sexKey     = "${Constants.GSE8581_KEY}Subjects\\Sex\\"
 		def params = [
-			subsetNode:              GSE8581_KEY,
-			timeVariable:            "${GSE8581_KEY}Subjects\\Age\\",
+			subsetNode:              Constants.GSE8581_KEY,
+			timeVariable:            "${Constants.GSE8581_KEY}Subjects\\Age\\",
 			categoryVariableDragged: sexKey,
 			categoryVariables:       [
 				"${sexKey}male\\",
@@ -161,7 +159,7 @@ class SurvivalAnalysisTests extends GebReportingTest{
 
 	@Test
 	void testMrnaCategoryEvenlySpaced() {
-		String sexKey     = "${GSE8581_KEY}Subjects\\Sex\\"
+		String sexKey     = "${Constants.GSE8581_KEY}Subjects\\Sex\\"
 
 		def highDimExpectations = [
 			expectedMarkerType: 'Gene Expression',
@@ -176,9 +174,9 @@ class SurvivalAnalysisTests extends GebReportingTest{
 		]
 
 		def params = [
-			subsetNode:              GSE8581_KEY,
-			timeVariable:            "${GSE8581_KEY}Subjects\\Age\\",
-			categoryVariableDragged: "${GSE8581_KEY}MRNA\\Biomarker Data\\Affymetrix Human Genome U133A 2.0 Array\\Lung\\",
+			subsetNode:              Constants.GSE8581_KEY,
+			timeVariable:            "${Constants.GSE8581_KEY}Subjects\\Age\\",
+			categoryVariableDragged: "${Constants.GSE8581_KEY}MRNA\\Biomarker Data\\Affymetrix Human Genome U133A 2.0 Array\\Lung\\",
 			searchKeyword:           'TP53',
 			*:                       highDimExpectations,
 			binningParams:           binningParams,
