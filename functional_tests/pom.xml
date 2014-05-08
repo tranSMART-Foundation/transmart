@@ -177,8 +177,8 @@
 				<version>2.9</version>
 				<configuration>
 					<includes>
-						<include>*Spec.*</include>
-						<include>*Tests.*</include>
+						<include>**/*Spec.*</include>
+						<include>**/*Tests.*</include>
 					</includes>
 					<systemPropertyVariables>
 						<geb.build.reportsDir>target/test-reports/geb-${browser.name}</geb.build.reportsDir>
