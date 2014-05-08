@@ -33,7 +33,7 @@ class DatasetExplorerPage extends Page {
         subsetBox(wait: true) { int subset, int box ->
             $("div#queryCriteriaDiv${subset}_${box}")
         }
-        boxConcepts { box ->
+        boxConcepts (wait: true) { box ->
             box.children('div').collect {
                 it.attr('conceptid')
             }
