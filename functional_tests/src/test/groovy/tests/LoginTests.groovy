@@ -1,3 +1,4 @@
+package tests
 import geb.junit4.GebReportingTest
 import org.junit.Test
 import pages.Constants
