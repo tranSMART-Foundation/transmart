@@ -121,7 +121,7 @@ class SurvivalAnalysisTests extends GebReportingTest{
 		String sexKey     = "${GSE8581_KEY}Subjects\\Sex\\"
 		def params = [
 			subsetNode:              GSE8581_KEY,
-			timeVariable:            "${GSE8581_KEY}Subjects\\Age (year)\\",
+			timeVariable:            "${GSE8581_KEY}Subjects\\Age\\",
 			categoryVariableDragged: sexKey,
 			categoryVariables:       [
 				"${sexKey}male\\",
@@ -176,7 +176,7 @@ class SurvivalAnalysisTests extends GebReportingTest{
 
 		def params = [
 			subsetNode:              GSE8581_KEY,
-			timeVariable:            "${GSE8581_KEY}Subjects\\Age (year)\\",
+			timeVariable:            "${GSE8581_KEY}Subjects\\Age\\",
 			categoryVariableDragged: "${GSE8581_KEY}MRNA\\Biomarker Data\\Affymetrix Human Genome U133A 2.0 Array\\Lung\\",
 			searchKeyword:           'TP53',
 			*:                       highDimExpectations,

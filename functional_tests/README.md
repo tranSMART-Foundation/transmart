@@ -5,3 +5,6 @@ To run the tests:
   chromedriver executable and then run `mvn test -Pchrome`. The driver will have
   to be
   [downloaded first](http://chromedriver.storage.googleapis.com/index.html).
+
+To run "headless" one can use the non-graphics x-windows 'displays'. 
+For example see runtest.sh in this directory.
