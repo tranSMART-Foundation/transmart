@@ -18,7 +18,7 @@ class LoginTests extends GebReportingTest {
 	
 	        assert at(LoginFailedPage)
 		} else {
-			println("Auto login enabled: no test - testFailedLogin")
+			println("Auto login enabled: test skipped with assert true - testFailedLogin")
 			assert true
 		}
     }
@@ -34,7 +34,7 @@ class LoginTests extends GebReportingTest {
 	
 	        assert at(Constants.LandingPage)
 		} else {
-			println("Auto login enabled: no test - testSuccessfulLogin")
+			println("Auto login enabled: test skipped with assert true - testSuccessfulLogin")
 			assert true
 		}
     }
