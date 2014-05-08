@@ -1,0 +1,3 @@
+# not sure why these are needed - they are in my global ignore file
+.DS_Store
+**/.DS_Store
