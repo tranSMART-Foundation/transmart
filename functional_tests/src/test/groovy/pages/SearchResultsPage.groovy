@@ -2,14 +2,15 @@ package pages
 
 import geb.Page
 
-class SearchResultsPage extends Page {
+class SearchResultsPage extends SearchPage {
 	static url = 'search/doSearch'
 
 	static at = {
-		summary?.value()?.contains("found")
+		summaryCount?.text()?.contains("found")
 	}
 
 	static content = {
-		summary {$("#summarycount-span")}
+		summaryCountDiv {$("#summarycount-div")}
+		summaryCount {$("#summarycount-span")}
 	}
 }
