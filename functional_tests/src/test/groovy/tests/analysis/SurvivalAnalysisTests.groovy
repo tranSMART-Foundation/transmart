@@ -112,7 +112,7 @@ class SurvivalAnalysisTests extends GebReportingTest{
 		}
 
         runButton.click()
-        waitFor(8) { resultOutput } // wait up to 8 seconds for result
+        waitFor(8, message: "SurvivalAnalysis RunButton.click() - timed out") { resultOutput } // wait up to 8 seconds for result
     }
 
 	@Test
