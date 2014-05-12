@@ -126,6 +126,8 @@
 						<configuration>
 							<systemPropertyVariables>
 								<geb.env>firefox</geb.env>
+								<webdriver.log.file>javascript-console.log</webdriver.log.file>
+								<webdriver.firefox.logfile>firefox-output.log</webdriver.firefox.logfile>
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>
