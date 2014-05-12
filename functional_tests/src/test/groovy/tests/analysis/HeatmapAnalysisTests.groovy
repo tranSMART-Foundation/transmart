@@ -92,7 +92,16 @@ public class HeatmapAnalysisTests extends GebReportingTest{
 
 	private void runHighDimPopup() {
 		highDimPopup.applyButton.click()
-	}	
+	}
+	
+	private void confirmHighDimPageSettings() {
+		assert at(HeatmapAnalysisPage.class)
+		assert highDimDisplay.text().contains("Sample:");
+		assert highDimDisplay.text().contains("Human");
+		assert highDimDisplay.text().contains("Tissue:");
+		assert highDimDisplay.text().contains("Lung");		
+	}
+	
     private void runAnalysis() {
         runButton.click()
         waitFor(60 * 6) { resultOutput } // may need to wait up to 6 min for result!
@@ -118,22 +127,12 @@ public class HeatmapAnalysisTests extends GebReportingTest{
 	}
 
 	@Test
-	void testHighDimPopup() {
-		setUpAnalysis()
-		getHighDimPopup()
-		confirmHighDimPopup()
-		runHighDimPopup()
-	}	
-	
-	@Ignore
-	@Test
 	void testClinicalVariable() {
 		setUpAnalysis()
 		getHighDimPopup()
 		confirmHighDimPopup()
 		runHighDimPopup()
-		/* TODO: final assertions missing! */
-		// confirm page settings
+		confirmHighDimPageSettings()
 	}
 
 	@Ignore

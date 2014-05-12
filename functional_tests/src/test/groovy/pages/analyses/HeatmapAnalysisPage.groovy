@@ -24,7 +24,9 @@ class HeatmapAnalysisPage extends DatasetExplorerPage {
         }
 
         highDimBox      { $('div#divIndependentVariable') }
-
+		
+		highDimDisplay  { $('div#displaydivIndependentVariable') }
+		
         runButton    { $('input.runAnalysisBtn') }
 
         resultOutput { $('#analysisOutput form') }
