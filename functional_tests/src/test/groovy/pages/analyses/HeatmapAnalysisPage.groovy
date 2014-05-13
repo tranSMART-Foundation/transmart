@@ -29,7 +29,9 @@ class HeatmapAnalysisPage extends DatasetExplorerPage {
 		
         runButton    { $('input.runAnalysisBtn') }
 
-        resultOutput { $('#analysisOutput form') }
+		resultOutputHeader { $('#analysisOutput').find('h2') }
+		
+		resultsImageUrl { $('#analysisOutput img').@src }
 
         categoryHighDimButton {
             $('div.highDimContainer div.highDimBtns button').find {
