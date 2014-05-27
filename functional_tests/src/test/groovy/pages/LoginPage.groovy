@@ -5,7 +5,7 @@ import pages.modules.NavigationBarModule
 
 class LoginPage extends Page {
 
-    static url = 'login/auth'
+    static url = 'login/forceAuth'
 
     static at = {
         topMessage == 'Please login...'
@@ -14,7 +14,7 @@ class LoginPage extends Page {
     static content = {
         topMessage { $('h3')?.text()?.trim() }
         loginButtonNoTo { $('input#loginButton') }
-        loginButton(to: [SearchPage, LoginFailedPage]) { $('input#loginButton') }
+        loginButton(to: [BrowsePage, LoginFailedPage]) { $('input#loginButton') }
         usernameField { $('input#j_username') }
         passwordField { $('input#j_password') }
         errorMessage  { $('div.login_message').text() }

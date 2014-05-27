@@ -1,10 +1,12 @@
 package tests
 import geb.junit4.GebReportingTest
+
+import org.junit.Ignore
 import org.junit.Test
+
 import pages.Constants
 import pages.LoginFailedPage
 import pages.LoginPage
-import pages.SearchPage
 
 class LoginTests extends GebReportingTest {
 
@@ -28,12 +30,13 @@ class LoginTests extends GebReportingTest {
     void testSuccessfulLogin() {
 		if (!Constants.AUTO_LOGIN_ENABLED) {
 	        to LoginPage
-	
+			println("Page = " + page);
+			
 	        usernameField.value Constants.GOOD_USERNAME
 	        passwordField.value Constants.GOOD_PASSWORD
 	        loginButton.click()
-	
-	        assert at(Constants.LandingPage)
+			
+	        assert at(Constants.LANDING_PAGE.class)
 		} else {
 			println("Auto login enabled: test skipped with assert true - testSuccessfulLogin")
 			assert true

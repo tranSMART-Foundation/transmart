@@ -6,7 +6,7 @@ class HomePage {
 	static url = 'login/auth'
 	
 	static at = {
-		at(Constants.LandingPage)
+		at(Constants.LANDING_PAGE)
 	}
 
 }
