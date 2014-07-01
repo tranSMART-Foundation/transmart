@@ -32,11 +32,11 @@ print(studies)
 
 allObservations <- getObservations(studies$name[1], as.data.frame = T)
 
-concepts <- getConcepts(studies$name[1])
+concepts <- getConcepts(studies$id[1])
 # retrieve observations for study 1 for the first concept containing "e"
-observations <- getObservations(studies$name[1], concept.match = "e")
+observations <- getObservations(studies$id[1], concept.match = "e", as.data.frame = T)
 # retrieve observations belonging to the first two concepts by using the api.links contained in the getConcepts-result
-observations <- getObservations(studies$name[1], concept.links = concepts$api.link.self.href[c(1,2)])
+observations <- getObservations(studies$id[1], concept.links = concepts$api.link.self.href[c(1,2)])
 
 # if a concept contains high dimensional data, use the following command to obtain this data
 getHighdimData(study.name = "GSE8581", concept.match = "Lung")

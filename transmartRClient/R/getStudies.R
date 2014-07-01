@@ -27,14 +27,14 @@ getStudies <- function(name.match = "", as.data.frame = TRUE, cull.columns = TRU
     serverResult <- .transmartServerGetRequest("/studies", accept.type = "hal")
     listOfStudies <- serverResult$studies
     
-    studyNames <- sapply(listOfStudies, FUN = function(x) { x[["name"]] })
+    studyNames <- sapply(listOfStudies, FUN = function(x) { x[["id"]] })
     names(listOfStudies) <- studyNames
     listOfStudies <- listOfStudies[ grep(name.match, studyNames) ]
 
     if (as.data.frame) {
         dataFrameStudies <- .listToDataFrame(listOfStudies)
         if (cull.columns) {
-            columnsToKeep <- match(c("name", "api.link.self.href", "ontologyTerm.fullName"), names(dataFrameStudies))
+            columnsToKeep <- match(c("id", "api.link.self.href", "ontologyTerm.fullName"), names(dataFrameStudies))
             if (any(is.na(columnsToKeep))) {
                 warning("There was a problem culling columns. You can try again with cull.columns = FALSE.")
                 message("Sorry. You've encountered a bug.\n",
