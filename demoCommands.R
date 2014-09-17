@@ -45,3 +45,4 @@ data <- getHighdimData(study.name = "GSE8581", concept.match = "Lung", projectio
 names(data)
 data[["data"]][1:10,1:10]
 data[[2]]["214503_x_at"]
+#make a heatmap
