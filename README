@@ -2,7 +2,7 @@ The subdirectory transmartRClient contains the R package which allows access to
 the tranSMART database via its RESTful API. 
 
 First install Protobuf 2.5 on your machine: https://code.google.com/p/protobuf/downloads/list
-You might need to install Curl on your machine as well.
+You might need to install Curl on your machine as well (http://curl.haxx.se).
 
 You can install this package by following the instructions in installCommands.R.
 
