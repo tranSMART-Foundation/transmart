@@ -29,7 +29,8 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
             concept.links <- c()
             studyConcepts <- getConcepts(study.name)
             for (toMatch in concept.match) {
-                conceptMatch <- grep(toMatch, studyConcepts$name)[1] # TODO: this might result in the same concept being included multiple times
+                # TODO: this might result in the same concept being included multiple times
+                conceptMatch <- grep(toMatch, studyConcepts$name)[1]
                 if (is.na(conceptMatch)) {
                     warning(paste("No match found for:", toMatch))
                 } else {
@@ -57,32 +58,37 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
 
     if (as.data.frame) {
         dataFrameObservations <- .listToDataFrame(listOfObservations)
-        subjectConceptPairs <- table(dataFrameObservations[ , match(c("label", "subject.id"), colnames(dataFrameObservations))])
+        subjectConceptPairs <- table(dataFrameObservations[ , match(c("label", "subject.id"),
+                colnames(dataFrameObservations))])
         if(any(subjectConceptPairs>1)) {
             warning("Your results contain multiple values per subject-concept pair. One of the input concepts is probably a child concept of another. Only the first occurence will be included.")
         }
-        
+
         conceptNames <- as.factor(dataFrameObservations$label)
         labelComponents <- matrix(nrow = 0, ncol = 0)
         for (level in strsplit(levels(conceptNames), split = "\\\\")) {
             labelComponents <- rbind.fill.matrix(labelComponents, t(level))
         }
-        if (length(levels(conceptNames)) > 1) labelComponents <- labelComponents[ , -which(apply(labelComponents, 2, function(x) length(unique(x)))==1), drop = FALSE]
+        if (length(levels(conceptNames)) > 1) {
+            labelComponents <-
+                    labelComponents[ , -which(apply(labelComponents, 2, function(x) length(unique(x)))==1), drop = FALSE]
+        }
         levels(conceptNames) <- apply(labelComponents, 1, function(x) paste(x[!is.na(x)&x!=""], collapse = "_"))
         conceptColumns <- grep("concept\\.|label", colnames(dataFrameObservations))
-        
+
         conceptInfo <- unique(cbind(conceptNames, dataFrameObservations[ , conceptColumns, drop = FALSE]))
         dataFrameObservations <- dataFrameObservations[ , -conceptColumns, drop = FALSE]
         dataFrameObservations <- cbind(dataFrameObservations, conceptNames)
-        
+
         subjectIdColumn <- grep("subject.id", colnames(dataFrameObservations))
         subjectColumns <- setdiff(grep("subject\\.", colnames(dataFrameObservations)), subjectIdColumn)
-        
-        subjectInfo <- unique(cbind(dataFrameObservations[ , subjectIdColumn, drop = FALSE], dataFrameObservations[ , subjectColumns, drop = FALSE]))
-        dataFrameObservations <- dataFrameObservations[ , -subjectColumns, drop = FALSE]                                      
+
+        subjectInfo <- unique(cbind(dataFrameObservations[ , subjectIdColumn, drop = FALSE],
+                dataFrameObservations[ , subjectColumns, drop = FALSE]))
+        dataFrameObservations <- dataFrameObservations[ , -subjectColumns, drop = FALSE]
         castedObservations <- cast(dataFrameObservations, subject.id ~ conceptNames, fun.aggregate = function(x) {x[1]})
         castedObservations <- castedObservations[ , c("subject.id", as.character(unique(conceptNames))), drop = FALSE]
-        
+
         factorizedColumns <- which(unlist(lapply(castedObservations, is.factor)))
         for (factorizedColumn in factorizedColumns) {
             castedObservations[ , factorizedColumn] <- levels(castedObservations[ , factorizedColumn])[castedObservations[ , factorizedColumn]]

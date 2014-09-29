@@ -43,10 +43,9 @@
 
 
 getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL,
-                           progress.download = .make.progresscallback.download(),
-                           progress.parse = .make.progresscallback.parse()
-                           ) {
-    
+        progress.download = .make.progresscallback.download(),
+        progress.parse = .make.progresscallback.parse()) {
+
     .checkTransmartConnection()
 
     if (is.null(concept.link) && !is.null(concept.match)) {
@@ -78,10 +77,11 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 
     if (is.null(projection)) {
         stop("No valid projection selected.\nSet the projection argument to one of the following options:\n",
-             paste(listOfHighdimDataTypes$supportedProjections, "\n"))
+                paste(listOfHighdimDataTypes$supportedProjections, "\n"))
         return(NULL)
     }
-    message("Retrieving data from server. This can take some time, depending on your network connection speed. ", as.character(Sys.time()))
+    message("Retrieving data from server. This can take some time, depending on your network connection speed. ",
+            as.character(Sys.time()))
     serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary", progress = progress.download)
     if (length(serverResult$content) == 0) {
         warning("Error in retrieving high dim data.")
@@ -91,7 +91,8 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     return(.parseHighdimData(serverResult$content, progress = progress.parse))
 }
 
-.parseHighdimData <- function(rawVector, .to.data.frame.converter=.as.data.frame.fast, progress=.make.progresscallback.parse()) {
+.parseHighdimData <- 
+function(rawVector, .to.data.frame.converter=.as.data.frame.fast, progress=.make.progresscallback.parse()) {
     dataChopper <- .messageChopper(rawVector)
 
     message <- dataChopper$getNextMessage()
@@ -127,32 +128,32 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         # because the as.character() conversion calls a DebugString method in 
         # the C++ protobuf library, so the RProtoBuf C++ code that CRAN sees 
         # never touches the 64 bit integers directly.)
-        
+
         if (label == "assayId") {
-            columns$add(label, sapply(assays,
-                    function(a) sub("assayId: ", "", grep(label, strsplit(as.character(a), split = "\n")[[1]], value = TRUE))))
+            columns$add(label, sapply(assays, function(a) sub("assayId: ", "", grep(label, strsplit(as.character(a),
+                    split = "\n")[[1]], value = TRUE))))
         } else {
             columns$add(label, sapply(assays, function(a) a[[label]]))
         }
     }
-    
+
     message("Received data for ", noAssays, " assays. Unpacking data. ", as.character(Sys.time()))
 
     totalsize <- length(rawVector)
     progress$start(totalsize)
     callback <- progress$update
-    
+
     labelToBioMarker <- hash() #biomarker info is optional, but should not be omitted, as it is also part of the data
 
     while (!is.null(message <- dataChopper$getNextMessage())) {
         row <- read(highdim.Row, message)
         rowlabel <- row$label
-        
+
         labelToBioMarker[[rowlabel]] <- (if(is.null(row$bioMarker)) NA_character_ else row$bioMarker)
         rowValues <- row$value
-        
+
         callback(dataChopper$getRawVectorIndex(), totalsize)
-        
+
         if(length(rowValues) == 1) {
             # if only one value, don't add the columnSpec name to the rowlabel.
             columns$add(rowlabel, rowValues[[1]]$doubleValue)
@@ -171,12 +172,12 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
                 warning("Unknown row type: ", type)
             }
         }
-        
+
     }
     progress$end()
-    
+
     message("Data unpacked. Converting to data.frame. ", as.character(Sys.time()))
-    
+
     data <- .to.data.frame.converter(columns$as.list(), stringsAsFactors=FALSE)
 
     if(all(is.na(values(labelToBioMarker)))) {
@@ -221,7 +222,8 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         if (endOfLastMessage >= length(rawVector)) { return(NULL) }
         # The last byte of the varint32 has its most significant bit set to one.
         varint32Size <- min(which((msbSetToOne & rawVector[(endOfLastMessage+1):(endOfLastMessage+5)]) == as.raw(0)))
-        varint32Connection <- rawConnection(rawVector[(endOfLastMessage+1):(endOfLastMessage+varint32Size)], open = "r+b")
+        varint32Connection <- rawConnection(rawVector[(endOfLastMessage+1):(endOfLastMessage+varint32Size)],
+                open = "r+b")
         class(varint32Connection) <- "connection"
         connection <- ConnectionInputStream(varint32Connection)
         close(varint32Connection)
@@ -281,10 +283,10 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     colnames <- names(data)
     rowDataIndexes <- -grep('^([a-zA-Z]|\\.[^0-9])', colnames)
     colnames[rowDataIndexes] <- paste('X', colnames[rowDataIndexes], sep='')
-    
+
     names(data) <- colnames
     attr(data, 'row.names') <- 1:length(data[[1]])
     class(data) <- 'data.frame'
-    
+
     data
 }

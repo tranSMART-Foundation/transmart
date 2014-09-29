@@ -38,9 +38,9 @@ function (transmartDomain, use.authentication = TRUE, ...) {
     }
 
     if(!.checkTransmartConnection()) {
-      stop("Connection unsuccessful. Type: ?connectToTransmart for help.")
+        stop("Connection unsuccessful. Type: ?connectToTransmart for help.")
     } else {
-      message("Connection successful.")
+        message("Connection successful.")
     }
 }
 
@@ -53,37 +53,35 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     transmartClientEnv$client_secret <- "api-client"
 
     oauth.request.token.url <- paste(sep = "",
-                                     transmartClientEnv$oauthDomain,
-                                     "/oauth/authorize?response_type=code&client_id=", 
-                                     transmartClientEnv$client_id,
-                                     "&client_secret=", transmartClientEnv$client_secret,
-                                     "&redirect_uri=", transmartClientEnv$oauthDomain,
-                                     "/oauth/verify")
+            transmartClientEnv$oauthDomain,
+            "/oauth/authorize?response_type=code&client_id=", 
+            transmartClientEnv$client_id,
+            "&client_secret=", transmartClientEnv$client_secret,
+            "&redirect_uri=", transmartClientEnv$oauthDomain,
+            "/oauth/verify")
 
     if (is.null(prefetched.request.token)) {
-      cat("Please visit the following url to authenticate this RClient (enter nothing to cancel):\n\n",
-          oauth.request.token.url, "\n\n",
-          "And paste the verifier token here:\n")
-      request.token <- readline() 
+        cat("Please visit the following url to authenticate this RClient (enter nothing to cancel):\n\n",
+                oauth.request.token.url, "\n\n",
+                "And paste the verifier token here:\n")
+        request.token <- readline() 
     } else request.token <- prefetched.request.token
 
     if (request.token == "") { 
-      cat("Authentication cancelled.\n")
-      return()
+        cat("Authentication cancelled.\n")
+        return()
     }
 
     oauth.exchange.token.url <- paste(sep = "",
-                                      transmartClientEnv$oauthDomain,
-                                      "/oauth/token?grant_type=authorization_code&client_id=",
-                                      transmartClientEnv$client_id,
-                                      "&client_secret=", transmartClientEnv$client_secret,
-                                      "&code=", request.token,
-                                      "&redirect_uri=", transmartClientEnv$oauthDomain,
-                                      "/oauth/verify")
+            transmartClientEnv$oauthDomain,
+            "/oauth/token?grant_type=authorization_code&client_id=",
+            transmartClientEnv$client_id,
+            "&client_secret=", transmartClientEnv$client_secret,
+            "&code=", request.token,
+            "&redirect_uri=", transmartClientEnv$oauthDomain,
+            "/oauth/verify")
 
-    tryCatch(
-            oauthResponse <- getURL(oauth.exchange.token.url,
-                    verbose = getOption("verbose")), 
+    tryCatch(oauthResponse <- getURL(oauth.exchange.token.url, verbose = getOption("verbose")), 
             error = function(e) {
                 if (getOption("verbose")) { message(e, "\n", oauthresponse) }
                 stop("Error with connection to verification server.") 
@@ -129,7 +127,8 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 
     tryCatch(result <- .serverMessageExchange(apiCall, httpHeaderFields, ...), 
             error = function(e) {
-                message("Sorry, the R client was unable to carry out your request. Please make sure that the transmart server is still running. \n\n",
+                message("Sorry, the R client was unable to carry out your request.",
+                        "Please make sure that the transmart server is still running. \n\n",
                         "If the server is not down, you've encountered a bug.\n",
                         "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
                         "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.")
@@ -138,8 +137,8 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     result
 }
 
-.serverMessageExchange <- function(apiCall, httpHeaderFields, accept.type = "default", 
-                                   progress = .make.progresscallback.download()) {
+.serverMessageExchange <- 
+function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.progresscallback.download()) {
     if (any(accept.type == c("default", "hal"))) {
         if (accept.type == "hal") { httpHeaderFields <- c(httpHeaderFields, accept = "application/hal+json") }
         result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
@@ -161,7 +160,9 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
                 httpheader = httpHeaderFields)
         progress$end()
         result$header <- parseHTTPHeader(h$value())
-        if (getOption("verbose")) { message(paste("Server binary response header:", as.character(data.frame(result$header)), "", sep="\n")) }
+        if (getOption("verbose")) {
+            message(paste("Server binary response header:", as.character(data.frame(result$header)), "", sep="\n"))
+        }
         return(result)
     }
     return(NULL)
