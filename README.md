@@ -1,4 +1,6 @@
-Use amibuild.xml 'tranmsartwar' in order to create the war file needed for Transmart Gwava.
+Run 'ant transmartwar' to generate gwava war file.
 
-** Be sure to add your server IP to "webstart.root" so webstart can start properly on
-Java 7.
+Also:
+  ** Line 45: Should contain the URL of where the Gwava part will be deployed. It is already configured for the test instances and so is the war file.
+  ** Line 88: Keystore details go at line.
+
