@@ -1,0 +1,84 @@
+package com.pfizer.mrbt.genomics.data;
+
+
+import java.util.ArrayList;
+
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ *
+ * @author henstockpv
+ */
+public class StudySetModel {
+    private static int numStudySetModels = 0;;
+    private int modelId;
+    private String study;
+    private String set;
+    private String model;
+    //private ArrayList<Double> logpvalues;
+    private NumericRange logpRange;
+    public StudySetModel(String study, String set, String model) {
+        this.study = study;
+        this.set = set;
+        this.model = model;
+        this.modelId = numStudySetModels++;
+    }
+    
+    /**
+     * Constructor of form study/set/model
+     */
+    public StudySetModel(String fullSlashName) {
+        String[] tokens = fullSlashName.split("\\/");
+        if(tokens.length != 3) {
+            System.out.println("Failed to parse study/set/model name " + fullSlashName);
+        } else {
+            study = tokens[0];
+            set   = tokens[1];
+            model = tokens[2];
+            this.modelId = numStudySetModels++;
+        }
+    }
+    
+    /*public void setPValueList(ArrayList<Double> logpvalues) {
+        this.logpvalues = logpvalues;
+        logpRange = computeLogPValueRange();
+    }*/
+    
+    /*private NumericRange computeLogPValueRange() {
+        double maxVal = Double.NEGATIVE_INFINITY;
+        double minVal = Double.POSITIVE_INFINITY;
+        for(double logpvalue : logpvalues) {
+            if(logpvalue > maxVal) {
+                maxVal = logpvalue;
+            }
+            if(logpvalue < minVal && logpvalue > (DataSet.NO_VALUE+1.0)) {
+                minVal = logpvalue;
+            }
+        }
+        return new NumericRange(minVal, maxVal);
+    }*/
+    
+    /*public NumericRange getLogPValueRange() {
+        return logpRange;
+    }
+    
+    public ArrayList<Double> getLogPValues() {
+        return logpvalues;
+    }*/
+    
+    /**
+     * Returns the concatenated study - set - model
+     * @return 
+     */
+    public String getName() {
+        return this.study + " - " + this.set + " - " + this.model;
+        //return this.set + " - " + this.study;
+    }
+    
+    public int getModelId() {
+        return modelId;
+    }
+}

@@ -1,0 +1,298 @@
+<?xml version="1.0"?>
+
+<project name="ManhattanViz" default="run" basedir=".">
+	<description>
+        Build file for solutions gwava
+
+        Notes:
+            This is a build file for use with the Jakarta Ant build tool version 1.6.5 or higher.
+
+        Prerequisites:
+                jdk-1.6.0					from http://java.sun.com/javase/downloads/
+          		ant-1.6.5					from http://ant.apache.org/
+
+        Build Instructions:
+           To build, run
+
+            ant "target"
+
+            on the directory where this file is located with the target you want.
+
+        Most useful targets:
+                usage
+                compile-gwava
+                test
+                inst-plugins
+                test-inst-plugins
+                webstart
+                compile-test
+                junit
+
+        Author:
+			Ami Khandeshi
+    </description>
+
+	<!-- locads tomcat.home and axis.home from this external properties file -->
+	<property file="build.properties"/>
+	<property name="project.title"              value="GWAVA" />
+	<property name="project.rep"                value="ManhattanViz"/>
+	<property name="project.name"               value="ManhattanViz" />
+	<property name="project.display.version"    value="1.0.8" />
+	<property name="webstart.name"              value="pfizerWebstart"/>
+
+	<!-- project modules   -->
+	<property name="gwava.module"              value="gwava"/>
+
+	<!-- module  directories -->
+	<property name="gwava.dir"                 value="${basedir}"/>
+
+	<!-- cy.jnlp file	  -->
+	<property name="jnlpfile"                   value="${gwava.dir}/scripts/gwava.jnlp"/>
+	<property name="jnlp1file"                  value="${gwava.dir}/scripts/resource.jnlp"/>
+	<property name="keystore"                   value="${gwava.dir}/pfizer.ks"/>
+	<property name="aliasName" value="pfizer123"/>
+	<property name="password" value="pfizer123"/>
+	<property name="webinfdir"                  value="${gwava.dir}/scripts/WEB-INF"/>
+
+	<!-- module  src directories -->
+	<property name="gwava.src.dir"             value="${basedir}/src"/>
+	<!--<property name="gwava.test.dir"            value="${gwava.dir}/test"/>-->
+	<property name="gwava.lib.dir"             value="${basedir}/lib"/>
+	<property name="gwava.image.dir"             value="${basedir}/images"/>
+	<!-- module  classes  directories -->
+	<property name="gwava.docs.dir"            value="${gwava.dir}/docs" />
+	<property name="gwava.docs.api.dir"        value="${gwava.docs.dir}/api" />
+	<property name="gwava.dist.dir"            value="${gwava.dir}/dist"/>
+	<property name="gwava.build.dir"           value="${gwava.dir}/builds"/>
+	<property name="gwava.build.classes.dir"   value="${gwava.build.dir}/classes"/>
+	<property name="gwava.build.image.dir"     value="${gwava.build.classes.dir}/images"/>
+	<property name="gwava.build.dist.dir"      value="${gwava.build.dir}/dist"/>
+	<property name="gwava.build.dist.lib.dir"  value="${gwava.build.dist.dir}/lib"/>
+	
+
+	<!-- test reports -->
+	<property name="gwava.test.report"         value="${gwava.build.dir}/reports"/>
+
+	<!-- compilation options -->
+	<property name="compile.debug"              value="on"/>
+	<property name="compile.optimize"           value="off"/>
+	<property name="compile.deprecation"        value="on"/>
+	<property name="compile.verbose"            value="off"/>
+
+	<!--===================================================================-->
+	<!--====== Compilation classpath - add all JARs in lib directory ======-->
+	<!--===================================================================-->
+	<path id="gwava.classpath">
+		<fileset dir="${gwava.lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${basedir}/lib/ant-contrib/ant-contrib-1.0b3.jar"/>
+		</classpath>
+	</taskdef>
+
+
+	<!--unsing Macro	-->
+	<macrodef name="unsignjar">
+
+		<attribute name="jar"/>
+
+		<sequential>
+			<!-- Remove any existing signatures from a JAR file. -->
+			<tempfile prefix="usignjar-" destdir="${java.io.tmpdir}" property="temp.file"/>
+			<echo message="Removing signatures from JAR: @{jar}"/>
+			<mkdir dir="${temp.file}"/>
+
+			<unjar src="@{jar}" dest="${temp.file}">
+				<patternset>
+					<include name="**"/>
+					<exclude name="META-INF/*.SF"/>
+					<exclude name="META-INF/*.DSA"/>
+					<exclude name="META-INF/*.RSA"/>
+				</patternset>
+			</unjar>
+
+			<delete file="@{jar}" failonerror="true"/>
+
+			<!-- Touch it in case the file didn't have a manifest.
+                 Otherwise the JAR task below will fail if the manifest
+                 file doesn't exist. -->
+			<mkdir dir="${temp.file}/META-INF"/>
+			<touch file="${temp.file}/META-INF/MANIFEST.MF"/>
+
+			<jar destfile="@{jar}"
+		            basedir="${temp.file}" 
+		            includes="**" 
+		            manifest="${temp.file}/META-INF/MANIFEST.MF"/>
+
+			<delete dir="${temp.file}" failonerror="true"/>
+		</sequential>
+	</macrodef>
+
+	<!--============================================================================-->
+	<!--============================  Help on usage ================================-->
+	<!--============================================================================-->
+	<target name="usage" description="list down all available targets">
+		<echo message=""/>
+		<echo message="${project.name} Build file"/>
+		<echo message="-------------------------------------------------------------"/>
+		<echo message=" available targets are:"/>
+		<echo message=" 	usage/help/?		-> displays this message"/>
+		<echo message=" 	compile-gwava		-> compiles all java files in src and create a ${project.name}-${gwava.module}-${project.display.version}.jar in dist directory"/>
+		<echo message="		build-plugins		-> create a build/plugins folder and copies ${project.name}-${gwava.module}-${project.display.version}.jar and other dependant jars into this folder"/>
+		<echo message="		test			-> executes particular test cases"/>
+		<echo message="		clean			-> cleans up the build directories"/>
+		<echo message="		all			-> it runs cleanup first then it runs inst-plugins and webstart"/>
+		<echo message="-------------------------------------------------------------"/>
+		<echo message=""/>
+	</target>
+
+	<target name="help" depends="usage"/>
+	<target name="?" depends="usage"/>
+
+	<target name="init" depends="clean">
+		<!-- Create the time stamp -->
+		<tstamp/>
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${gwava.build.dir}"/>
+		<mkdir dir="${gwava.build.classes.dir}"/>
+		<mkdir dir="${gwava.build.dist.dir}"/>
+		<mkdir dir="${gwava.build.dist.lib.dir}"/>
+		<mkdir dir="${gwava.dist.dir}"/>
+
+
+		<echo message="--------- ${project.title} ${project.display.version} ---------"/>
+		<echo message="java.home   = ${java.home}"/>
+		<echo message="proj.dir    = ${basedir}"/>
+	</target>
+
+	<!--=====================================================================-->
+	<!--======================== compile solutions gwava =====================-->
+	<!--=====================================================================-->
+	<target name="compile-gwava" depends="init" description="compile the gwava source">
+		<!-- Compile the java code from ${gwava.src.dir} into ${gwava.build.classes.dir} -->
+		<javac srcdir="${gwava.src.dir}"
+	               destdir="${gwava.build.classes.dir}"
+	               debug="${compile.debug}"
+	               optimize="${compile.optimize}"
+	               verbose="${compile.verbose}"
+	               deprecation="${compile.deprecation}">
+			<classpath>
+				<path refid="gwava.classpath"/>
+			</classpath>
+
+		</javac>
+		<copy todir="${gwava.build.image.dir}">
+			<fileset dir="${gwava.image.dir}" includes="*.*" />
+		</copy>
+		<!-- Put everything in ${gwava.build.classes.dir} into the ${gwava.dist.dir} /solutions-gwava-1.0.jar  file -->
+		<jar jarfile="${gwava.build.dist.dir}/${project.name}.jar" basedir="${gwava.build.classes.dir}">
+			<manifest>
+				<attribute name="Specification-Title" value="Solutions gwava Library"/>
+				<attribute name="Specification-Version" value="${project.version}"/>
+				<attribute name="Specification-Vendor" value="Pfizer MRBT"/>
+			</manifest>
+		</jar>
+	
+		<copy todir="${gwava.build.dist.lib.dir}">
+			<fileset dir="${gwava.lib.dir}" includes="*.jar" />
+		</copy>
+			</target>
+	
+
+
+
+	<!--==================================================================-->
+	<!--=============== Run GWAVA ====================-->
+	<!--==================================================================-->
+	<target name="run"  depends="compile-gwava" description="run GWAVA application" >
+		<java jar="${gwava.dist.dir}/${project.name}.jar"  fork="true" spawn="false" maxmemory="512m" >
+			<arg value="-services=transmart"/>
+		</java>
+	</target>
+	<target name="keytool">
+	  <delete file="${keystore}" failonerror="false" />
+	   <genkey alias="${aliasName}" storepass="${password}" keystore="${keystore}">
+	      <dname>
+	      <param name="CN" value="Pfizer RBT"/>
+	      <param name="OU" value="MRBT"/>
+	      <param name="O"  value="Translational Bioinformatics"/>
+	      <param name="L"  value="Cambridge"/>
+	      <param name="ST"  value="MA"/>
+	      <param name="C"  value="US"/>   
+	      </dname>
+	   </genkey>
+	</target>
+<target name="signJar">
+	<signjar alias="${aliasName}" keystore="${keystore}" storepass="pfizer123" keypass="pfizer123">
+		<path>
+			<fileset dir="${gwava.build.dist.dir}" includes="${project.name}.jar" />
+			<fileset dir="${gwava.build.dist.lib.dir}" includes="*.jar" />
+		</path>
+	</signjar>
+</target>
+<target name="justwar">
+	<jar jarfile="${gwava.dist.dir}/${webstart.name}.war" basedir="${gwava.build.dir}" />
+</target>
+
+
+<!--==================================================================-->
+<!--===================== cleans build directory ==========================-->
+<!--==================================================================-->
+<target name="clean" description="clean up" >
+	<delete dir="${gwava.build.dir}"/>
+
+</target>
+
+<target name="unsignjar" description="call macro to unsign jar">
+	<for param="file">
+		<path>
+			<fileset dir="${gwava.build.dist.lib.dir}" includes="**/*.jar"/>
+		</path>
+		<sequential>
+			<unsignjar jar="@{file}"/>
+		</sequential>
+	</for>
+	<unsignjar jar="${gwava.build.dist.dir}/${project.name}.jar"/>
+</target>
+	<!--unsing Macro	-->
+	<macrodef name="unsignjar">
+
+		<attribute name="jar"/>
+
+		<sequential>
+			<!-- Remove any existing signatures from a JAR file. -->
+			<tempfile prefix="usignjar-" destdir="${java.io.tmpdir}" property="temp.file"/>
+			<echo message="Removing signatures from JAR: @{jar}"/>
+			<mkdir dir="${temp.file}"/>
+
+			<unjar src="@{jar}" dest="${temp.file}">
+				<patternset>
+					<include name="**"/>
+					<exclude name="META-INF/*.SF"/>
+					<exclude name="META-INF/*.DSA"/>
+					<exclude name="META-INF/*.RSA"/>
+				</patternset>
+			</unjar>
+
+			<delete file="@{jar}" failonerror="true"/>
+
+			<!-- Touch it in case the file didn't have a manifest.
+                 Otherwise the JAR task below will fail if the manifest
+                 file doesn't exist. -->
+			<mkdir dir="${temp.file}/META-INF"/>
+			<touch file="${temp.file}/META-INF/MANIFEST.MF"/>
+
+			<jar destfile="@{jar}"
+		            basedir="${temp.file}" 
+		            includes="**" 
+		            manifest="${temp.file}/META-INF/MANIFEST.MF"/>
+
+			<delete dir="${temp.file}" failonerror="true"/>
+		</sequential>
+		</macrodef>
+</project>
