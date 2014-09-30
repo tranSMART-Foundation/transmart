@@ -75,4 +75,15 @@ public class SNP implements Comparable {
             return 1;
         } else return 0;
     }
+    
+    @Override
+    public boolean equals(Object other) {
+        return (loc == ((SNP) other).getLoc());
+    }
+    
+    @Override
+    public int hashCode() {
+        int hashVal = new Integer(loc).hashCode();
+        return hashVal;
+    }
 }

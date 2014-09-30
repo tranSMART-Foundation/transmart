@@ -19,7 +19,7 @@ import com.pfizer.mrbt.genomics.state.AxisChangeEvent;
 import com.pfizer.mrbt.genomics.state.SelectedGeneAnnotation;
 import com.pfizer.mrbt.genomics.state.ViewData;
 import com.pfizer.mrbt.genomics.userpref.UserPrefListener;
-import com.pfizerm.mrbt.axis.AxisScale;
+import com.pfizer.mrbt.axis.AxisScale;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -35,6 +35,7 @@ import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
 
@@ -158,7 +159,7 @@ public class ManhattanPlot extends JComponent {
             drawRecombinationRate(offscreenG2);
         }
 
-        ArrayList<SNP> snps = dataSet.getSnps();
+        CopyOnWriteArrayList<SNP> snps = dataSet.getSnps();
         int modelIndex = 0;
         
         DataPointEntry currDataPointEntry = Singleton.getState().getCurrenDataEntry();
@@ -571,6 +572,8 @@ public class ManhattanPlot extends JComponent {
         this.view = view;
         this.dataSet = view.getDataSet();
         setupAxes();
+        setPreferredSize(this.getWidth(), this.getHeight());
+        reStartGraphics();
         render();
         repaint();
     }
@@ -664,7 +667,7 @@ public class ManhattanPlot extends JComponent {
                 repaint();
             }
 
-            ArrayList<SNP> snps = dataSet.getSnps();
+            CopyOnWriteArrayList<SNP> snps = dataSet.getSnps();
             ArrayList<Model> models = view.getModels();
             for (Model model : models) {
                 for (SNP snp : snps) {

@@ -151,5 +151,8 @@ public abstract class TransmartSNPDataFetch {
             return set;
         }
         
+        public String getKey() {
+            return study + "_" + set + "_" + model;
+        }
     }
 }

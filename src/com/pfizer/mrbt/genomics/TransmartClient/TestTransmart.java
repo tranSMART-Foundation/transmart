@@ -12,7 +12,8 @@ public class TestTransmart {
     private static String GET_GENE_SOURCE = "getGeneSources";
     private static String GET_GENE_BY_POSITION = "getGeneByPosition";
     private static String GET_GENE_BOUNDS = "computeGeneBounds";
-    private static String GET_MODEL_INFO_BY_DATA_TYPE = "getModelInfoByDataType";
+    //private static String GET_MODEL_INFO_BY_DATA_TYPE = "getModelInfoByDataType";
+    private static String GET_MODEL_INFO_BY_DATA_TYPE = "getSecureModelInfoByDataType";
     private static String GET_DATA_FOR_FILERED_BY_MODEL_ID_GENE_AND_RANGE = "resultDataForFilteredByModelIdGeneAndRangeRev";
 
     public TestTransmart() {

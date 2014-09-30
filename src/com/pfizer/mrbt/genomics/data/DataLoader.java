@@ -37,7 +37,7 @@ public class DataLoader {
      *
      * @param filename
      */
-    public void loadDataSets(String filename) {
+   /* public void loadDataSets(String filename) {
         loadResults.clear();
         ArrayList<ArrayList<String>> matrix = loadMatrix(filename);
         int snpCol = findColName(matrix, SNP_START);
@@ -55,7 +55,7 @@ public class DataLoader {
         DataSet dataSet = null;
         ArrayList<Model> models = null;
         ArrayList<SNP> snps = null;
-        SnpModel2PvalMap snpModel2Pval = null;
+        //SnpModel2PvalMap snpModel2Pval = null;
                     
         int numCols = matrix.get(0).size();
         String prevGeneName = "";
@@ -129,7 +129,7 @@ public class DataLoader {
             loadResults.put(prevGeneName, dataSet);
         }
         
-    }
+    }*/
     
     /**
      * Returns the integer chromosome or the DataModel.X or DataModel.Y.  If

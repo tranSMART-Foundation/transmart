@@ -6,9 +6,8 @@ package com.pfizer.mrbt.genomics.data;
 
 import com.pfizer.mrbt.genomics.webservices.DbSnpSourceOption;
 import com.pfizer.mrbt.genomics.webservices.GeneSourceOption;
-//import com.pfizer.mrbt.genomics.bioservices.QueryParameterFetch;
-import com.pfizer.mrbt.genomics.webservices.ModelOption;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -17,19 +16,14 @@ import java.util.ArrayList;
 public class DataSet {
     public final static double NO_VALUE = -999.0;
     public final static int UNKNOWN = -1;
-      private ArrayList<Integer> snpLoc = new ArrayList<Integer>();
-      private ArrayList<Model> models = new ArrayList<Model>();
-      private ArrayList<SNP> snps = new ArrayList<SNP>();
-      private GeneRange geneRange;
+      private CopyOnWriteArrayList<Model> models = new CopyOnWriteArrayList<Model>();
+      private CopyOnWriteArrayList<SNP> snps = new CopyOnWriteArrayList<SNP>();
+      private GeneRange geneAnnotationRange;
       private NumericRange xAxisRange = null;
-      private int geneSourceId = UNKNOWN;
       private DbSnpSourceOption dbSnpOption = null;
       private GeneSourceOption geneSourceOption = null;
-      //private NumericRange yAxisRange = null;
-      private int chromosome;
-      private SnpModel2PvalMap snpModel2Pval = new SnpModel2PvalMap();
-      private String filename;
-      public static int idNumber = -1;
+      private int chromosome = UNKNOWN;
+      //private SnpModel2PvalMap snpModel2Pval = new SnpModel2PvalMap();
       private int id;
       private ArrayList<SnpRecombRate> snpRecombRates = null;
       private float maxRecombinationRate = 0f;  // max value for plot scaling
@@ -42,7 +36,6 @@ public class DataSet {
 
 
       public DataSet() {
-          this.id = id;
       }
       
       /**
@@ -57,30 +50,63 @@ public class DataSet {
        * @return 
        */
     public GeneRange getGeneRange() {
-        return geneRange;
+        return geneAnnotationRange;
     }
 
     public void setGeneRange(GeneRange geneRange) {
-        this.geneRange = geneRange;
+        this.geneAnnotationRange = geneRange;
+    }
+    
+    /**
+     * The xRange is the displayed range of values.  The geneAnnotationRange is
+     * that retrieved for the range of annotations fetched. If the xRange exceeds
+     * that of the geneAnnotationRange it returns true else returns false
+     * @return 
+     */
+    public boolean xRangeExceedsGeneAnnotationRange() {
+        if(xAxisRange.getMin() < geneAnnotationRange.getStart() ||
+           xAxisRange.getMax() > geneAnnotationRange.getEnd()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Updates the geneAnnotationRange with the max entent of the geneAnnotationRange and newGeneRange
+     * @param newGeneRange
+     * @return true if the gene range has been changed
+     */
+    public boolean updateGeneRange(GeneRange newGeneRange) {
+        boolean updated = false;
+        if(newGeneRange.getStart() < this.geneAnnotationRange.getStart() ||
+           newGeneRange.getEnd() > this.geneAnnotationRange.getEnd()) {
+            geneAnnotationRange.setStart( Math.min(newGeneRange.getStart(), this.geneAnnotationRange.getStart()));
+            geneAnnotationRange.setEnd( Math.max(newGeneRange.getEnd(), this.geneAnnotationRange.getEnd()));
+            updated = true;
+        }
+        return updated;
     }
       
       /**
        * Assigns a set of models to the internal storage.
        * @param models 
        */
-      public void setModels(ArrayList<Model> models) {
+      public void setModels(CopyOnWriteArrayList<Model> models) {
           this.models = models;
       }
       
-      public ArrayList<Model> getModels() {
+      public CopyOnWriteArrayList<Model> getModels() {
           return models;
       }
       
       /**
        * Returns the model of this dataset associated with Id.  If none
        * found with that id, it returns null
+       * @param id
+       * @return Model corresponding to id
        */
-      public Model getModel(int id) {
+      public Model getModel(final int id) {
           for(Model model : models) {
               if(model.getId()==id) {
                   return model;
@@ -99,23 +125,48 @@ public class DataSet {
       
       /**
        * Assigns a set of SNP to the dataset
-       * @param models 
+       * @param snps 
        */
-      public void setSNPs(ArrayList<SNP> snps) {
+      public void setSNPs(CopyOnWriteArrayList<SNP> snps) {
           this.snps = snps;
       }
       
-      public ArrayList<SNP> getSnps() {
+      public CopyOnWriteArrayList<SNP> getSnps() {
           return snps;
+      }
+      
+      public synchronized void updateSnps(CopyOnWriteArrayList<SNP> updatingSnps) {
+          for(SNP updatingSnp : updatingSnps) {
+              if(! snps.contains(updatingSnp)) {
+                  snps.add(updatingSnp);
+              }
+          }
       }
       
       public void setXAxisRange(NumericRange xAxisRange) {
           this.xAxisRange = xAxisRange;
       }
       
-      public void setSnpModel2PvalMap(SnpModel2PvalMap snpModel2Pval) {
-          this.snpModel2Pval = snpModel2Pval;
+      /**
+       * Expands xAxisRange if necessary to include the new XAxisRange.
+       * @return Returns true if updated
+       * @param newXAxisRange 
+       */
+      public boolean updateXAxisRange(NumericRange newXAxisRange) {
+          boolean updated = false;
+          if(newXAxisRange.getMin() < xAxisRange.getMin() ||
+             newXAxisRange.getMax() > xAxisRange.getMax()) {
+              double xMin = Math.min(xAxisRange.getMin(), newXAxisRange.getMin());
+              double xMax = Math.max(xAxisRange.getMax(), newXAxisRange.getMax());
+              xAxisRange = new NumericRange(xMin, xMax);
+              updated = true;
+          }
+          return updated;
       }
+      
+      /*public void setSnpModel2PvalMap(SnpModel2PvalMap snpModel2Pval) {
+          this.snpModel2Pval = snpModel2Pval;
+      }*/
       
       /**
        * Returns the value of a snp-model combination as a log-pvalue
@@ -124,31 +175,19 @@ public class DataSet {
        * @return 
        */
       public Double getPvalFromSnpModel(SNP snp, Model model) {
-          return snpModel2Pval.get(snp, model);
+          //return snpModel2Pval.get(snp, model);
+          if(model == null) {
+              System.err.println("Null model");
+          }
+          if(snp == null) {
+              System.err.println("Null snp");
+          }
+          return model.getPval(snp);
       }
-
 
       /**
-       * Determines the range of x-values from the loaded data in snpLoc;
-       * @deprecated
+       * @return the xAxisRange
        */
-      public NumericRange oldGetXRange() {
-            if (xAxisRange == null) {
-                  int minLoc = Integer.MAX_VALUE;
-                  int maxLoc = Integer.MIN_VALUE;
-                  for (int loc : snpLoc) {
-                        if (loc < minLoc && loc >= 0) {
-                              minLoc = loc;
-                        }
-                        if (loc > maxLoc && loc >= 0) {
-                              maxLoc = loc;
-                        }
-                  }
-                  xAxisRange = new NumericRange(minLoc, maxLoc);
-            }
-            return xAxisRange;
-      }
-      
       public NumericRange getXRange() {
           return xAxisRange;
       }
@@ -159,7 +198,8 @@ public class DataSet {
         NumericRange yRange = model.getYRange();
         if (yRange == null) {
             for (SNP snp : snps) {
-                Double pval = snpModel2Pval.get(snp, model);
+                //Double pval = snpModel2Pval.get(snp, model);
+                Double pval = model.getPval(snp);
                 if (pval != null) {
                     if (pval > maxy) {
                         maxy = pval;
@@ -188,15 +228,6 @@ public class DataSet {
             return snpLoc;
       }*/
 
-      /**
-       * Returns the filename associated with this data set
-       *
-       * @return
-       */
-      public String getFilename() {
-            return filename;
-      }
-      
     /**
      * Returns the x-y coordinates for recombination rate. It loads them
      * from the file associated with this gene name if necessary.  The
@@ -205,31 +236,6 @@ public class DataSet {
      * @return 
      */
     public ArrayList<SnpRecombRate> getSnpRecombRates() {
-        if (snpRecombRates == null) {
-            /* removed 12/6/2013 pvh since should be loaded with main data and never null
-            RecombinationRates recombinationRates = new RecombinationRates();
-
-            if (LOAD_RECOMB_FROM_FILE) {
-                String fileSep = System.getProperty("file.separator");
-                String path = System.getProperty("user.home") + fileSep + "My Documents" + fileSep + "gwava_data" + fileSep + "recombRate" + fileSep;
-                String recombFilename = path + geneRange.getName() + ".txt";
-                recombinationRates.loadRecombinationRates(recombFilename);
-            } else if (Singleton.getState().getDataMode() == State.BIOSERVICES_MODE &&
-                       (geneRange.getName().equalsIgnoreCase("A1BG")
-                           || geneRange.getName().equalsIgnoreCase("HYST2477")
-                           || geneRange.getName().equalsIgnoreCase("A2M"))) {
-                String fileSep = System.getProperty("file.separator");
-                String path = System.getProperty("user.home") + fileSep + "My Documents" + fileSep + "gwava_data" + fileSep + "recombRate" + fileSep;
-                String recombFilename = path + geneRange.getName() + ".txt";
-                recombinationRates.loadRecombinationRates(recombFilename);
-                
-            } else { // must be bioservices 
-                recombinationRates.fetchRecombinationRates(geneRange.getName(), geneRange.getRadius(), geneSourceOption.getId());
-            }
-            snpRecombRates = recombinationRates.getSnpRecombRates();
-            maxRecombinationRate = recombinationRates.getMaxRecombinationRate();
-            */
-        }
         return snpRecombRates;
     }
     
@@ -273,6 +279,10 @@ public class DataSet {
           Model model = new Model(study, set, modelStr);
           models.add(model);
           return model;
+      }
+      
+      public void addModel(Model model) {
+          models.add(model);
       }
       
       /**
@@ -336,9 +346,9 @@ public class DataSet {
        * @param currModel
        * @param logPval 
        */
-      public void addSnpModel2Pval(SNP currSnp, Model currModel, double logPval) {
+      /*public void addSnpModel2Pval(SNP currSnp, Model currModel, double logPval) {
           snpModel2Pval.put(currSnp, currModel, logPval);
-      }
+      }*/
 
     /**
      * This is a solution for initialization issues where we are trying to display
@@ -354,8 +364,8 @@ public class DataSet {
         dummyDataSet.setGeneRange(new GeneRange("", chromosome, 100, 200));
         ArrayList<GeneAnnotation> geneAnnotations = new ArrayList<GeneAnnotation>();
         dummyDataSet.setGeneAnnotations(geneAnnotations);
-        dummyDataSet.setModels(new ArrayList<Model>());
-        dummyDataSet.setSNPs(new ArrayList<SNP>());
+        dummyDataSet.setModels(new CopyOnWriteArrayList<Model>());
+        dummyDataSet.setSNPs(new CopyOnWriteArrayList<SNP>());
         dummyDataSet.setRecombinationRate(new ArrayList<SnpRecombRate>(), 8f);
         //QueryParameterFetch queryParameterFetch = new QueryParameterFetch();
         //GeneSourceOption defaultGeneSourceOption = queryParameterFetch.getGeneSources().get(0);
@@ -410,7 +420,8 @@ public class DataSet {
      * @param model 
      */
     public void removeAllSnpWithModel(Model model) {
-        snpModel2Pval.removeAllSnpWithModel(model);
+        //snpModel2Pval.removeAllSnpWithModel(model);
+        model.clearAllSnp();
     }
     
     /**
@@ -418,7 +429,7 @@ public class DataSet {
      * @param dataSet 
      * 
      */
-    public void addAllSnpWithModels(DataSet dataSet) {
+    /*public void addAllSnpWithModels(DataSet dataSet) {
         for(Model currModel : dataSet.getModels()) {
             Model newModel = this.checkAddModel(currModel.getStudy(), currModel.getSet(), currModel.getModel());
             for(SNP snp : dataSet.getSnps()) {
@@ -428,5 +439,44 @@ public class DataSet {
                 }
             }
         }
+    }*/
+    
+    /**
+     * Adds the set of models with associated SNP to the dataSet
+     * @param models 
+     */
+    public void addDataSetModels(CopyOnWriteArrayList<Model> models) {
+        for(Model model : models) {
+            if(! alreadyContainsModel(model)) {
+                this.addModel(model);
+            }
+        }
+    }
+    
+    protected boolean alreadyContainsModel(Model modelToAdd) {
+        for(Model model : this.getModels()) {
+            if(model.getModel().equals(modelToAdd.getModel()) &&
+               model.getSet().equals(modelToAdd.getSet())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Returns true if the otherDataSet has the same same radius, DbSnp and GeneSource
+     * @param otherDataSet
+     * @return 
+     */
+    public boolean hasSameRadiusDbSnpGeneSource(DataSet otherDataSet) {
+        return (this.geneAnnotationRange.getRadius()    == otherDataSet.getGeneRange().getRadius() &&
+                this.dbSnpOption.getId()      == otherDataSet.getDbSnpOption().getId() &&
+                this.geneSourceOption.getId() == otherDataSet.getGeneSourceOption().getId());
+    }
+    
+    public boolean hasSameRadiusDbSnpGenesource(int basePairRadius, DbSnpSourceOption dbSnpSourceOption, GeneSourceOption geneSourceOption) {
+        return (this.geneAnnotationRange.getRadius()    == basePairRadius &&
+                this.dbSnpOption.getId()      == dbSnpSourceOption.getId() &&
+                this.geneSourceOption.getId() == geneSourceOption.getId());
     }
 }

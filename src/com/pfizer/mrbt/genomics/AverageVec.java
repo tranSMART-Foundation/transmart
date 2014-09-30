@@ -9,19 +9,20 @@ package com.pfizer.mrbt.genomics;
 import com.pfizer.mrbt.genomics.data.DataSet;
 import com.pfizer.mrbt.genomics.data.Model;
 import com.pfizer.mrbt.genomics.data.SNP;
-import com.pfizerm.mrbt.axis.AxisScale;
+import com.pfizer.mrbt.axis.AxisScale;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
  * @author henstockpv
- */
+ */ 
 public class AverageVec {
     private DataSet dataSet;
     private Model model;
-    private ArrayList<SNP> snps;
+    private CopyOnWriteArrayList<SNP> snps;
     private AxisScale xAxis;
     private AxisScale yAxis;
     private BufferedImage bufferedImage;
@@ -30,7 +31,7 @@ public class AverageVec {
     private int[] avgVec;
     private int[] cntVec;
     private ArrayList<Point2D> line = new ArrayList<Point2D>();
-    public AverageVec(DataSet dataSet, Model model, ArrayList<SNP> snps, AxisScale xAxis, AxisScale yAxis, BufferedImage bufferedImage) {
+    public AverageVec(DataSet dataSet, Model model, CopyOnWriteArrayList<SNP> snps, AxisScale xAxis, AxisScale yAxis, BufferedImage bufferedImage) {
         this.model = model;
         this.snps = snps;
         this.xAxis = xAxis;

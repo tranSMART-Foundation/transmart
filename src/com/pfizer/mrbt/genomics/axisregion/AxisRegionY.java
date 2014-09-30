@@ -5,7 +5,7 @@
 package com.pfizer.mrbt.genomics.axisregion;
 
 import com.pfizer.mrbt.genomics.state.View;
-import com.pfizerm.mrbt.axis.AxisScale;
+import com.pfizer.mrbt.axis.AxisScale;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;

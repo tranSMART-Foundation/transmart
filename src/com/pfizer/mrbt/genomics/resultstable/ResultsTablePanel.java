@@ -40,6 +40,7 @@ public class ResultsTablePanel extends JComponent {
     private AbstractButton includeAllGeneModelsButton;
     private AbstractButton includeUnselectedGeneModelsButton;
     private AbstractButton removeSelectedRowsButton;
+    private AbstractButton removeAllButton;
     private AbstractButton keepSelectedRowsButton;
     private AbstractTableModel resultsTableModel;
     private JComponent dataImportControlPanel;
@@ -138,6 +139,11 @@ public class ResultsTablePanel extends JComponent {
             gbc.gridwidth = 19;
             modifyControlPanel.add(getRemoveSelectedRowsButton(), gbc);
 
+            gbc.gridx = 10;
+            gbc.gridy = 15;
+            gbc.gridwidth = 19;
+            modifyControlPanel.add(getRemoveAllButton(), gbc);
+            
             gbc.gridx = 10;
             gbc.gridy = 20;
             gbc.gridwidth = 19;
@@ -546,6 +552,18 @@ public class ResultsTablePanel extends JComponent {
             });
         }
         return removeBelowThresholdButton;
+    }
+
+    protected AbstractButton getRemoveAllButton() {
+        if(removeAllButton == null) {
+            removeAllButton = new JButton("Remove All");
+            removeAllButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                   ((ResultsTableModel) resultsTableModel).removeAll();
+                }
+            });
+        }
+        return removeAllButton;
     }
 
     protected AbstractButton getKeepSelectedRowsButton() {

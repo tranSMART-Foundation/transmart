@@ -8,12 +8,13 @@ import com.pfizer.mrbt.genomics.Singleton;
 import com.pfizer.mrbt.genomics.data.DataModel;
 import com.pfizer.mrbt.genomics.thumbnail.ThumbnailPanel;
 import com.pfizer.mrbt.genomics.data.DataSet;
+import com.pfizer.mrbt.genomics.data.GeneModelScore;
 import com.pfizer.mrbt.genomics.data.Model;
 import com.pfizer.mrbt.genomics.heatmap.HeatmapPanel;
 import com.pfizer.mrbt.genomics.heatmap.HeatmapTableModel;
 import com.pfizer.mrbt.genomics.state.StateListener;
 import com.pfizer.mrbt.genomics.state.ViewData;
-import com.pfizerm.mrbt.axis.AxisScale;
+import com.pfizer.mrbt.axis.AxisScale;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -51,7 +52,7 @@ import javax.swing.table.AbstractTableModel;
 public class ModelSelectionPanel extends JPanel {
     private JTable modelSelectionTable;
     private AbstractTableModel modelSelectionTableModel;
-    private AbstractButton modelSelectionButton;
+    private AbstractButton coloredPlotButton;
     private AbstractButton showThumbnailsButton;
     private AbstractButton showHeatmapButton;
     private AbstractButton removeSelectionButton;
@@ -100,7 +101,7 @@ public class ModelSelectionPanel extends JPanel {
         gbc.weighty = 0.0;
         gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.VERTICAL;
-        add(getModelSelectionButton(), gbc);*/
+        add(getColoredPlotButton(), gbc);*/
         
         gbc.gridx = 10;
         gbc.gridy = 30;
@@ -183,8 +184,9 @@ public class ModelSelectionPanel extends JPanel {
             gbc.weighty = 0.0;
             gbc.gridwidth = 1;
             gbc.gridwidth = 9;
+            gbc.anchor = GridBagConstraints.EAST;
             gbc.fill = GridBagConstraints.HORIZONTAL;
-            JLabel geneModelLabel = new JLabel("Gene/Model");
+            JLabel geneModelLabel = new JLabel("Gene/Model:");
             filterPanel.add(geneModelLabel, gbc);
             
             gbc.gridx = 20;
@@ -210,6 +212,7 @@ public class ModelSelectionPanel extends JPanel {
             gbc.gridy = 10;
             gbc.gridwidth = 1;
             gbc.gridheight = 19;
+            gbc.anchor = GridBagConstraints.CENTER;
             gbc.fill = GridBagConstraints.BOTH;
             gbc.weighty = 1.0;
             gbc.weightx = 0.1;;
@@ -218,12 +221,14 @@ public class ModelSelectionPanel extends JPanel {
             gbc.gridx = 10;
             gbc.gridy = 20;
             gbc.gridheight = 1;
+            gbc.anchor = GridBagConstraints.EAST;
             gbc.fill = GridBagConstraints.HORIZONTAL;
             filterPanel.add(new JLabel("Min -logPval:"), gbc);
             
             gbc.gridx = 20;
             gbc.gridy = 20;
             gbc.weightx = 1.0;
+            gbc.anchor = GridBagConstraints.CENTER;
             gbc.fill = GridBagConstraints.HORIZONTAL;
             logPThreshField = new JTextField(6);
             logPThreshField.addKeyListener(new KeyAdapter() {
@@ -317,7 +322,7 @@ public class ModelSelectionPanel extends JPanel {
             gbc.gridwidth = 1;
             gbc.fill = GridBagConstraints.VERTICAL;
             gbc.insets = new Insets(5, 2, 5, 2);
-            bottomPanel.add(getModelSelectionButton(), gbc);
+            bottomPanel.add(getColoredPlotButton(), gbc);
 
             gbc.gridx = 20;
             gbc.gridy = 10;
@@ -330,7 +335,7 @@ public class ModelSelectionPanel extends JPanel {
             bottomPanel.add(getShowHeatmapButton(), gbc);
             
             //showThumbnailsButton.setPreferredSize(showThumbnailsButton.getPreferredSize());
-            showHeatmapButton.setPreferredSize(modelSelectionButton.getPreferredSize());
+            showHeatmapButton.setPreferredSize(coloredPlotButton.getPreferredSize());
 
             bottomPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
@@ -354,7 +359,7 @@ public class ModelSelectionPanel extends JPanel {
             gbc.gridwidth = 1;
             gbc.fill = GridBagConstraints.VERTICAL;
             gbc.insets = new Insets(5, 5, 5, 5);
-            bottomPanel.add(getModelSelectionButton(), gbc);
+            bottomPanel.add(getColoredPlotButton(), gbc);
 
             gbc.gridx = 10;
             gbc.gridy = 50;
@@ -366,8 +371,8 @@ public class ModelSelectionPanel extends JPanel {
             gbc.fill = GridBagConstraints.VERTICAL;
             bottomPanel.add(getShowHeatmapButton(), gbc);
             
-            showThumbnailsButton.setPreferredSize(modelSelectionButton.getPreferredSize());
-            showHeatmapButton.setPreferredSize(modelSelectionButton.getPreferredSize());
+            showThumbnailsButton.setPreferredSize(coloredPlotButton.getPreferredSize());
+            showHeatmapButton.setPreferredSize(coloredPlotButton.getPreferredSize());
 
             bottomPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
@@ -382,14 +387,14 @@ public class ModelSelectionPanel extends JPanel {
         return new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT);
     }
     
-    public AbstractButton getModelSelectionButton() {
-        if(modelSelectionButton==null) {
+    public AbstractButton getColoredPlotButton() {
+        if(coloredPlotButton==null) {
             //modelSelectionButton = new JButton("(Multi)-Colored Plot");
-            modelSelectionButton = new JButton("<html><center>Colored<br/>Plot</center></html>");
-            modelSelectionButton.setToolTipText("Uses colors to show 1+ models for a the selected gene");
-            Font currFont = modelSelectionButton.getFont();
-            modelSelectionButton.setFont(new Font(currFont.getName(), Font.BOLD, currFont.getSize()+2));
-            modelSelectionButton.addActionListener(new ActionListener() {
+            coloredPlotButton = new JButton("<html><center>Colored<br/>Plot</center></html>");
+            coloredPlotButton.setToolTipText("Uses colors to show 1+ models for a the selected gene");
+            Font currFont = coloredPlotButton.getFont();
+            coloredPlotButton.setFont(new Font(currFont.getName(), Font.BOLD, currFont.getSize()+2));
+            coloredPlotButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent ae) {
                     int[] selectedRows = modelSelectionTable.getSelectedRows();
@@ -397,11 +402,9 @@ public class ModelSelectionPanel extends JPanel {
                     for(int selectedRow = numSelectedRows-1; selectedRow >= 0; selectedRow--) {
                         String currGeneName = (String) modelSelectionTable.getValueAt(selectedRows[0], ModelSelectionTableModel.GENE_COL);
                         boolean multipleDataSetsAdded = false;
-                        DataModel dataModel = Singleton.getDataModel();
                         DataSet dataSet = Singleton.getDataModel().getDataSet(currGeneName);
                         ViewData viewData = new ViewData(dataSet);
                         Singleton.getState().addViewData(viewData);
-                        //System.out.println("Data set in getModelSelectionButton has " + dataSet.getModels().size() + " models");
                         for(int rowi = 0; rowi < selectedRows.length; rowi++) {
                             int row = selectedRows[rowi];
                             String dataSetName = (String) modelSelectionTable.getValueAt(row, ModelSelectionTableModel.GENE_COL);
@@ -409,7 +412,6 @@ public class ModelSelectionPanel extends JPanel {
                                 String combinedModelName   = (String) modelSelectionTable.getValueAt(row, ModelSelectionTableModel.MODEL_COL);
                                 for(Model model : dataSet.getModels()) {
                                     if(model.toString().startsWith(combinedModelName)) {
-                                    //if(model.toString().startsWith(combinedModelName)) {  1/10/2013 kluge
                                         viewData.addModel(model);
                                     }
                                 }
@@ -419,7 +421,7 @@ public class ModelSelectionPanel extends JPanel {
                         }
                         if(multipleDataSetsAdded) {
                             JOptionPane.showMessageDialog(
-                                (JFrame) SwingUtilities.getWindowAncestor(modelSelectionButton),
+                                (JFrame) SwingUtilities.getWindowAncestor(coloredPlotButton),
                                 "Models from only one gene can be viewed at one time.  We are using the first gene and ignoring the rest.",
                                 "Invliad options",
                                     JOptionPane.WARNING_MESSAGE);
@@ -429,7 +431,7 @@ public class ModelSelectionPanel extends JPanel {
                 }
             });
         }
-        return modelSelectionButton;
+        return coloredPlotButton;
     }
 
     /**
@@ -621,14 +623,7 @@ public class ModelSelectionPanel extends JPanel {
             modelSelectionTableModel = new ModelSelectionTableModel();
             modelSelectionTable = new JTable(modelSelectionTableModel);
             modelSelectionTable.setAutoCreateRowSorter(true);
-            //modelSelectionTable.setPreferredSize(new Dimension(800,1000));
-            //modelSelectionTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.SCORE_COL).setMaxWidth(35);
-            modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.COLOR_COL).setCellRenderer(new ColorSquareRenderer());
-            modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.COLOR_COL).setMaxWidth(20);
-            modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.GENE_COL).setMinWidth(60);
-            modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.GENE_COL).setMaxWidth(90);
-            modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.MODEL_COL).setMinWidth(100);
+            updateColumnWidths();
             
             //modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.MODEL_COL).setMaxWidth(1000);
             //modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.MODEL_COL).setPreferredWidth(200);
@@ -638,12 +633,23 @@ public class ModelSelectionPanel extends JPanel {
                 @Override
                 public void mouseClicked(MouseEvent me) {
                     if (me.getClickCount() == 2) {
-                        getModelSelectionButton().doClick();
+                        getColoredPlotButton().doClick();
                     }
                 }
             });
         }
         return modelSelectionTable;
+    }
+    
+    protected void updateColumnWidths() {
+        modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.SCORE_COL).setMaxWidth(35);
+        modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.COLOR_COL).setCellRenderer(new ColorSquareRenderer());
+        modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.COLOR_COL).setMaxWidth(20);
+        modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.GENE_COL).setMinWidth(60);
+        modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.GENE_COL).setMaxWidth(90);
+        modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.MODEL_COL).setMinWidth(100);
+        modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.INDEX_COL).setMinWidth(30);
+        modelSelectionTable.getColumnModel().getColumn(ModelSelectionTableModel.INDEX_COL).setMaxWidth(40);
     }
 
     /**
@@ -655,7 +661,7 @@ public class ModelSelectionPanel extends JPanel {
             removeSelectionButton = new JButton("Remove Selected");
             removeSelectionButton.setToolTipText("Permanently removes the selected study/set/models from the list");
             removeSelectionButton.addActionListener(new ActionListener() {
-
+                @Override
                 public void actionPerformed(ActionEvent ae) {
                     int[] selectedRows = modelSelectionTable.getSelectedRows();
                     for (int rowi = selectedRows.length-1; rowi >= 0; rowi--) {
@@ -665,7 +671,6 @@ public class ModelSelectionPanel extends JPanel {
                         String dataSetName = (String) modelSelectionTable.getValueAt(row, ModelSelectionTableModel.GENE_COL);
                         System.out.println("DataSetName " + dataSetName + "\tRow " + row);
                         String combinedModelName = (String) modelSelectionTable.getValueAt(row, ModelSelectionTableModel.MODEL_COL);
-                        boolean removeAllModels = true;
                         ArrayList<Model> modelsToRemove = new ArrayList<Model>();
                         for (Model model : dataSet.getModels()) {
                             if (model.toString().startsWith(combinedModelName)) {
@@ -675,12 +680,16 @@ public class ModelSelectionPanel extends JPanel {
                         for(Model model : modelsToRemove) {
                             dataSet.removeModel(model);
                         }
-                        if(dataSet.getModels().size() == 0) {
+                        
+                        GeneModelScore candidateGeneModelScore = new GeneModelScore(dataSetName, combinedModelName, 0);
+                        Singleton.getDataModel().removeGeneModelScore(candidateGeneModelScore);
+                        
+                        if(dataSet.getModels().isEmpty()) {
                             Singleton.getDataModel().removeDataSet(currGeneName);
                         }
                     }
                     if(selectedRows.length > 0) {
-                        modelSelectionTableModel.fireTableDataChanged();                        
+                        //modelSelectionTableModel.fireTableDataChanged();                        
                         Singleton.getDataModel().fireDataChanged();
                     }
                 }
@@ -719,7 +728,8 @@ public class ModelSelectionPanel extends JPanel {
                         Singleton.getDataModel().removeDataSet(geneName);
                     }
                     if(geneNames.size() > 0) {
-                        modelSelectionTableModel.fireTableDataChanged();
+                        Singleton.getDataModel().clearGeneModelScoreList();
+                        //((ModelSelectionTableModel) modelSelectionTableModel).removeAll();
                         Singleton.getDataModel().fireDataChanged();
                     }
                 }
@@ -820,6 +830,7 @@ public class ModelSelectionPanel extends JPanel {
         @Override
         public void resultsUpdated(ChangeEvent ce) {
             updateFilterLabel();
+            updateColumnWidths();
         }
     }
 

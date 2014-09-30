@@ -4,6 +4,8 @@
  */
 package com.pfizer.mrbt.genomics.data;
 
+import java.util.HashMap;
+
 /**
  *
  * @author henstockpv
@@ -14,6 +16,8 @@ public class Model {
     private String model;
     private String set;
     private NumericRange yRange = null;
+    private Double maxSnpLog10Pval = 0.0;
+    private HashMap<Integer, Double> snpId2pval = new HashMap<Integer, Double>();
     private int id;
     
     
@@ -86,4 +90,43 @@ public class Model {
         return yRange;
     }
     
+    public Double getPval(int snpId) {
+        return snpId2pval.get(snpId);
+    }
+    
+    public Double getPval(SNP snp) {
+        return snpId2pval.get(snp.getRsId());
+    }
+    
+    /**
+     * Stores the modelSnpId2pval and updates maxSnpLog10Pval;
+     * @param modelSnpId2pval 
+     */
+    public void setSnpMap(HashMap<Integer, Double> modelSnpId2pval) {
+        this.snpId2pval = modelSnpId2pval;
+        for(Double value : modelSnpId2pval.values()) {
+            if(value > maxSnpLog10Pval) {
+                maxSnpLog10Pval = value;
+            }
+        }
+    }
+    
+    public void addSnpPval(SNP currSnp, double logPval) {
+        this.snpId2pval.put(currSnp.getRsId(), logPval);
+        if(logPval > maxSnpLog10Pval) {
+            maxSnpLog10Pval = logPval;
+        }
+    }
+    
+    /**
+     * Removes all the snp2pval mapping and sets maxSnpLog10Pval to 0.0
+     */
+    public void clearAllSnp() {
+        this.snpId2pval.clear();
+        maxSnpLog10Pval = 0.0;
+    }
+    
+    public double getMaxSnpLog10Pval() {
+        return maxSnpLog10Pval;
+    }
 }

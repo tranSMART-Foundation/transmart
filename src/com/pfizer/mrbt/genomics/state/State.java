@@ -508,8 +508,17 @@ public class State {
         int lineScope = hLine.getLineScope();
         switch(lineScope) {
             case HLine.SCOPE_THIS_PLOT:
-                mainView.getViewData().addHLine(hLine);
-                //use2lineIndex.put(getGeneModelKey(gene, model), hLine);
+                //mainView.getViewData().addHLine(hLine);
+                ArrayList<HLine> hlineList = null;
+                String modelIdsStr = modelIds2String(models);
+                String geneModelKey = getGeneModelKey(geneName, modelIdsStr);
+                if(use2lineIndex.get(geneModelKey) != null) {
+                    hlineList = use2lineIndex.get(geneModelKey);
+                } else {
+                    hlineList = new ArrayList<HLine>();
+                }
+                hlineList.add(hLine);
+                use2lineIndex.put(geneModelKey, hlineList); 
                 break;
             case HLine.SCOPE_SAME_GENE:
                 ArrayList<HLine> geneHLines = use2lineIndex.get(geneName);
@@ -540,6 +549,23 @@ public class State {
                 System.out.println("unknown scope entered in state.addLine");
         }
         fireMainPlotChanged();
+    }
+    
+    /**
+     * Converts models to a list of + delimited modelIds
+     * @param models
+     * @return 
+     */
+    private String modelIds2String(ArrayList<Model> models) {
+        StringBuilder modelSb = new StringBuilder();
+        int modelIndex = 0;
+        for (Model model : models) {
+            if (modelIndex > 0) {
+                modelSb.append("+");
+            }
+            modelSb.append(model.getId());
+        }
+        return modelSb.toString();
     }
     
     public void replaceHorizontalLine(int index, HLine line) {
@@ -581,7 +607,7 @@ public class State {
         ArrayList<Model> models = view.getViewData().getModels();
         for(Model model : models) {
             ArrayList<HLine> modelLines = use2lineIndex.get(model.getId() + "");
-            if(modelLines != null) { 
+            if(modelLines == null) { 
             } else if(relativeIndex < modelLines.size()) {
                 modelLines.set(relativeIndex, line);
                 use2lineIndex.put(model.getId() + "", modelLines);
@@ -591,6 +617,16 @@ public class State {
                 relativeIndex -= modelLines.size();
             }
         }
+
+        // replaces the gene::model1+model2...Modeln) --> ArrayList<HLine>
+        String modelIdsStr = modelIds2String(models);
+        ArrayList<HLine> foundLines = use2lineIndex.get(currGene + "::" + modelIdsStr);
+        if(relativeIndex < foundLines.size()) {
+            foundLines.set(relativeIndex, line);
+            fireMainPlotChanged();
+        }
+
+    
     }
     
     public void removeHorizontalLine(int index) {
@@ -632,13 +668,21 @@ public class State {
         ArrayList<Model> models = view.getViewData().getModels();
         for(Model model : models) {
             ArrayList<HLine> modelLines = use2lineIndex.get(model.getId() + "");
-            if(modelLines != null) { 
+            if(modelLines == null) { 
             } else if(relativeIndex < modelLines.size()) {
                 modelLines.remove(relativeIndex);
                 use2lineIndex.put(model.getId() + "", modelLines);
             } else {
                 relativeIndex -= modelLines.size();
             }
+        }
+        
+        // remove the gene::model1+model2...Modeln) --> ArrayList<HLine>
+        String modelIdsStr = modelIds2String(models);
+        ArrayList<HLine> foundLines = use2lineIndex.get(currGene + "::" + modelIdsStr);
+        if(relativeIndex < foundLines.size()) {
+            foundLines.remove(relativeIndex);
+            fireMainPlotChanged();
         }
     }
     
@@ -677,6 +721,16 @@ public class State {
                 for(HLine hLine : modelLines) {
                     hLines.add(hLine);
                 }
+            }
+        }
+        
+        // find if exact match of gene::model+model+...+model
+        String modelIdStr = modelIds2String(models);
+        
+        ArrayList<HLine> foundHLines = use2lineIndex.get(gene + "::" + modelIdStr);
+        if(foundHLines != null) {
+            for(HLine foundHLine : foundHLines) {
+                hLines.add(foundHLine);
             }
         }
         
@@ -776,7 +830,7 @@ public class State {
     public void retrievalInitialized(String gene, List<ModelOption> modelOptions, int range, int queryId) {
         History historyElement = new History(gene, modelOptions, range, SearchStatus.WAITING, queryId);
         historyTableModel.addHistory(historyElement);
-        System.out.println("Adding search initialized for gene " + gene + " query# " + queryId);
+        //System.out.println("Adding search initialized for gene " + gene + " query# " + queryId);
     }
     
     /**
@@ -786,10 +840,12 @@ public class State {
     public void retrievalStarted(String gene, int numModels, int range, int queryId) {
         //int index = historyTableModel.findFirstInTable(gene, SearchStatus.WAITING);
         int index = historyTableModel.findRowByQueryId(queryId);
-        History oneHistory = historyTableModel.getHistory(index);
-        oneHistory.update(SearchStatus.WORKING, 0);
-        historyTableModel.setHistory(index, oneHistory);
-        System.out.println("Adding search started for gene " + gene + " queryId " + queryId);
+        if(index >= 0) { // could have cleared history before starts retrieval
+            History oneHistory = historyTableModel.getHistory(index);
+            oneHistory.update(SearchStatus.WORKING, 0);
+            historyTableModel.setHistory(index, oneHistory);
+        }
+        //System.out.println("Adding search started for gene " + gene + " queryId " + queryId);
     }
     
     /**
@@ -797,16 +853,16 @@ public class State {
      * @param gene
      * @param numSnp 
      * @param searchStatus is the modified result of the search
+     * @param queryId
      */
     public void retrievalCompleted(String gene, int numSnp, SearchStatus searchStatus, int queryId) {
         //int index = historyTableModel.findFirstInTable(gene, SearchStatus.WORKING);
         int index = historyTableModel.findRowByQueryId(queryId);
-        System.out.println("History index " + index);
-        History oneHistory = historyTableModel.getHistory(index);
-        oneHistory.update( searchStatus, numSnp );
-        historyTableModel.setHistory(index, oneHistory);
-        //historyTableModel.setHistory(index, oneHistory, searchStatus);
-        System.out.println("Adding search completed for gene " + gene + " with SNP=" + numSnp + " query " + queryId);
+        if(index >= 0) { // could have cleared the history before data comes back
+            History oneHistory = historyTableModel.getHistory(index);
+            oneHistory.update( searchStatus, numSnp );
+            historyTableModel.setHistory(index, oneHistory);
+        }
     }
 
     /**

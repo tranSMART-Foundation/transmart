@@ -18,18 +18,26 @@ public class RetrievalException extends Exception {
     private HashMap<String,String> callParameterMap;
     public RetrievalException(String message, HashMap<String,String> callParameterMap) {
         super(message);
-        this.printStackTrace();
-        this.callParameterMap = callParameterMap;
+        //this.printStackTrace();
+        this.callParameterMap = copyParams(callParameterMap);
     }
     
     public RetrievalException(String message, RetrievalMethod retrievalMethod, HashMap<String,String> callParameterMap) {
         super(message);
         this.retrievalMethod = retrievalMethod;
-        this.callParameterMap = callParameterMap;
+        this.callParameterMap = copyParams(callParameterMap);
     }
     
     public Set<String> getCallParameters() {
         return this.callParameterMap.keySet();
+    }
+    
+    protected HashMap<String,String> copyParams(HashMap<String,String> inputMap) {
+        HashMap<String,String> outMap = new HashMap<String,String>();
+        for(String key : inputMap.keySet()) {
+            outMap.put(key, inputMap.get(key));
+        }
+        return outMap;
     }
     
     public String getCallParameterValue(String parameter) {

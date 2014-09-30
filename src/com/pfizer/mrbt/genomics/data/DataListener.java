@@ -11,5 +11,15 @@ import javax.swing.event.ChangeEvent;
  * @author henstockpv
  */
 public interface DataListener {
+    /**
+     * Modified existing data by replacing values
+     * @param ce 
+     */
     public void dataChanged(ChangeEvent ce);
+    
+    /**
+     * Added existing data only--old data unmodified.
+     * @param ce 
+     */
+    public void dataAdded(ChangeEvent ce);
 }

@@ -4,13 +4,9 @@
  */
 package com.pfizer.mrbt.genomics.data;
 
-import com.pfizer.mrbt.genomics.Singleton;
-//import com.pfizer.mrbt.genomics.TransmartClient.TransmartDataLoaderWithThreads;
-//import com.pfizer.mrbt.genomics.TransmartClient.TransmartQueryParameterFetch;
 import com.pfizer.mrbt.genomics.webservices.DbSnpSourceOption;
 import com.pfizer.mrbt.genomics.webservices.GeneSourceOption;
 import com.pfizer.mrbt.genomics.webservices.ModelOption;
-import com.pfizer.mrbt.genomics.state.State;
 import com.pfizer.mrbt.genomics.webservices.DataRetrievalInterface;
 import com.pfizer.mrbt.genomics.webservices.RetrievalException;
 import java.util.ArrayList;
@@ -30,32 +26,12 @@ public class DataModel {
     public final static Integer Y = 25;
     private DataRetrievalInterface webServices;
     private HashMap<String, DataSet> name2dataset = new HashMap<String,DataSet>();
-    //public static String FILENAME = "data\\1336590111384gene_snp_gwa_results.txt";
     public static String FILENAME = "1336590392598gene_snp_gwa_results.txt";
-    //public static String ANNOTATIONS = "c:\\Data\\Manhattan\\ManhattanPlot\\ManhattanViz\\data\\annotatedGenes";
-    //public static String ANNOTATIONS = "W:\\Work\\Manhattan\\ManhattanViz\\data\\annotatedGenes";
-    //public static String RECOMB_RATE_PATH = "c:\\Data\\Manhattan\\ManhattanPlot\\ManhattanViz\\data\\recombRate";
-    //public static String RECOMB_RATE_PATH = "W:\\Work\\Manhattan\\ManhattanViz\\data\\recombRate";
-    //private GeneAnnotations geneAnnotations;
-    //private RecombinationRates recombRates;
     private ArrayList<DataListener> listeners = new ArrayList<DataListener>();
     private DataRetrievalWithThreadPool dataRetrievalWithThreadPool;
+    private ArrayList<GeneModelScore> geneModelScoreList = new ArrayList<GeneModelScore>();
     
     public DataModel() {
-        /*String fileSep = System.getProperty("file.separator");
-        String filename = System.getProperty("user.home") + fileSep + "My Documents" + fileSep + "gwava_data" + fileSep + FILENAME;
-        System.out.println("Loading gwas data [" + filename + "]");
-        if(Singleton.getState().getDataMode() == State.DEMO_MODE) {
-        if(true || Singleton.getState().getDataMode() == State.DEMO_MODE) {
-        loadDataSets(filename);
-        //} else if(Singleton.getState().getDataMode() == State.TRANSMART_SERVICES_MODE) {
-            
-        }*/
-        //System.out.println("Loaded DataSets:");
-        /*for(String dataSetName : name2dataset.keySet()) {
-            DataSet dataSet = name2dataset.get(dataSetName);
-            System.out.println("\t" + dataSetName + "\t" + dataSet.getChromosome());
-        }*/
     }
     
     /**
@@ -91,8 +67,6 @@ public class DataModel {
             
             // get dbSnpSource options and choose the option corresponding to dbSnpSourceId
             List<DbSnpSourceOption> dbSnpSrcOptions = webServices.getDbSnpSources();
-            //TransmartQueryParameterFetch transmartQueryParameterFetch = new TransmartQueryParameterFetch(env);
-            //List<DbSnpSourceOption> dbSnpSrcOptions = transmartQueryParameterFetch.getDbSnpSources();
             DbSnpSourceOption dbSnpSourceOption = null;
             for(DbSnpSourceOption option : dbSnpSrcOptions) {
                 if(option.getId() == dbSnpSourceId) {
@@ -156,55 +130,21 @@ public class DataModel {
      * file that comes back as the AQG format
      * @param filename 
      */
-    public void loadDataSets(String filename) {
+    /*public void loadDataSets(String filename) {
         DataLoader loader = new DataLoader();
         loader.loadDataSets(filename);
         HashMap<String, DataSet> loadResults = loader.getLoadResults();
-        /*for(String key : loadResults.keySet()) {
-            DataSet value = loadResults.get(key);
-            name2dataset.put(key, value);
-        }*/ // pvh 12/9/2013
+
         for(Map.Entry<String, DataSet> entry : loadResults.entrySet()) {
             name2dataset.put(entry.getKey(), entry.getValue());
         }
         fireDataChanged();
-    }
+    }*/
     
     public void exportDataSets(String filename) {
         DataExporter exporter = new DataExporter();
         exporter.exportAllData(filename);
     }
-    
-    /**
-     * This records checks that the gene sources have the same geneSourceId as
-     * the one passed in.  If not they are removed and the list returned.
-     * @param genes
-     * @param geneSourceOption 
-     */
-    /*public ArrayList<String> removeMismatchedGeneSourceData(List<String> genes, GeneSourceOption geneSourceOption) {
-        ArrayList<String> wrongSourceGenes = new ArrayList<String>();
-        for(String gene : genes) {
-            DataSet dataSet = name2dataset.get(gene);
-            if(dataSet.getGeneSourceId() != geneSourceOption.getId()) {
-                name2dataset.remove(gene);
-                wrongSourceGenes.add(gene);
-            }
-        }
-        return wrongSourceGenes;
-    }*/
-    
-    /**
-     * This records the gene sources for each of the genes in the list. 
-     * @param genes
-     * @param geneSourceOption 
-     */
-    /*public void addGeneSourceTags(List<String> genes, GeneSourceOption geneSourceOption) {
-        for(String gene : genes) {
-            DataSet dataSet = name2dataset.get(gene);
-            dataSet.setGeneSourceId(geneSourceOption.getId());
-        }
-        
-    }*/
     
     /**
      * Parses the chromosomeStr into an integer.  This includes X and Y as 
@@ -245,11 +185,69 @@ public class DataModel {
      * @param dataSet 
      */
     public void addDataSet(String name, DataSet dataSet) {
-        name2dataset.put(name, dataSet);
-        fireDataChanged();
+        synchronized(this) {
+            name2dataset.put(name, dataSet);
+            boolean modifiedExisting = false;
+            boolean addedData = false;
+            // update geneModelScoreList
+            System.out.println("Adding data set with " + dataSet.getModels().size());
+            for(Model model : dataSet.getModels()) {
+                System.out.println("AddingDataSet " + model.toString());
+                GeneModelScore candidateGeneModelScore = new GeneModelScore(name, model.toString(), model.getMaxSnpLog10Pval());
+                int indexOfExisting = geneModelScoreList.indexOf(candidateGeneModelScore);
+                System.out.println("Add: Index of existing " + indexOfExisting + "\t" + candidateGeneModelScore.getModelName());
+                if(indexOfExisting >= 0) {
+                    geneModelScoreList.get(indexOfExisting).setScore(model.getMaxSnpLog10Pval());
+                    modifiedExisting = true;
+                } else {
+                    geneModelScoreList.add(candidateGeneModelScore);
+                    addedData = true;
+                }
+            }
+            System.out.println("Adding data set " + modifiedExisting + "\t" + addedData);
+            if(modifiedExisting) {
+                fireDataChanged();
+            } else if(addedData) {
+                fireDataAdded();
+            }
+        }
     }
     
-
+    /**
+     * Over-writes the dataSet if same name but adds the name->dataSet to the
+     * map of datasets
+     * @param name
+     * @param existingDataSet has had the dataSet models added to it
+     * @param addedDataSet is the retrieved data that either updates existing GeneModelScore or adds new ones
+     */
+    public void updateDataSet(String name, DataSet existingDataSet, DataSet addedDataSet) {
+        synchronized(this) {
+            name2dataset.put(name, existingDataSet);
+            boolean modifiedExisting = false;
+            boolean addedData = false;
+            // update geneModelScoreList
+            System.out.println("Updating data set with " + addedDataSet.getModels().size());
+            for(Model model : addedDataSet.getModels()) {
+                GeneModelScore candidateGeneModelScore = new GeneModelScore(name, model.toString(), model.getMaxSnpLog10Pval());
+                int indexOfExisting = geneModelScoreList.indexOf(candidateGeneModelScore);
+                System.out.println("Update: Index of existing " + indexOfExisting + "\t" + candidateGeneModelScore.getModelName());
+                if(indexOfExisting >= 0) {
+                    geneModelScoreList.get(indexOfExisting).setScore(model.getMaxSnpLog10Pval());
+                    modifiedExisting = true;
+                } else {
+                    geneModelScoreList.add(candidateGeneModelScore);
+                    addedData = true;
+                }
+            }
+            System.out.println("Updating data set " + modifiedExisting + "\t" + addedData);
+            if(modifiedExisting) {
+                fireDataChanged();
+            } else if(addedData) {
+                fireDataAdded();
+            }
+        }
+    }
+    
     public void addListener(DataListener listener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener);
@@ -266,6 +264,13 @@ public class DataModel {
         ChangeEvent ce = new ChangeEvent(this);
         for (DataListener listener : listeners) {
             listener.dataChanged(ce);
+        }
+    }
+
+    public void fireDataAdded() {
+        ChangeEvent ce = new ChangeEvent(this);
+        for (DataListener listener : listeners) {
+            listener.dataAdded(ce);
         }
     }
 
@@ -303,21 +308,12 @@ public class DataModel {
                                   GeneSourceOption geneSourceOption,
                                   List<String> geneRequestList,
                                   int basePairRadius) {
-        /*DataRetrievalWithThreads dataRetrievalWithThreads
-         = new DataRetrievalWithThreads(this.webServices,
-         selectedModels,
-         selectedDbSnpOption,
-         geneSourceOption,
-         geneRequestList,
-         basePairRadius);
-         dataRetrievalWithThreads.retrieveData();*/
         getDataRetrievalWithThreadPool().retrieveData(
                                                  selectedModels,
                                                  selectedDbSnpOption,
                                                  geneSourceOption,
                                                  geneRequestList,
                                                  basePairRadius);
-        //dataRetrievalWithThreadPool.retrieveData();
     }
     
     /**
@@ -330,5 +326,35 @@ public class DataModel {
             dataRetrievalWithThreadPool = new DataRetrievalWithThreadPool(webServices);
         }
         return dataRetrievalWithThreadPool;
+    }
+    
+
+    /**
+     * Returns the number of entries in the list
+     * @return 
+     */
+    public int getGeneModelScoreListSize() {
+        return geneModelScoreList.size();
+    }
+    
+    /**
+     * Returns the GeneModelScore of the current index
+     * @param index
+     * @return 
+     */
+    public GeneModelScore getGeneModelScore(int index) {
+        return geneModelScoreList.get(index);
+    }
+    
+    public void removeGeneModelScore(GeneModelScore candidateGeneModelScore) {
+        int index = geneModelScoreList.indexOf(candidateGeneModelScore);
+        System.out.println("Removing index genemodelScore " + index);
+        if(index >= 0) {
+            geneModelScoreList.remove(index);
+        }
+    }
+    
+    public void clearGeneModelScoreList() {
+        geneModelScoreList.clear();
     }
 }

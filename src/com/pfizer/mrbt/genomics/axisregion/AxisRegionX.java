@@ -10,7 +10,7 @@ import com.pfizer.mrbt.genomics.state.View;
 import com.pfizer.mrbt.genomics.state.ViewListener;
 import com.pfizer.mrbt.genomics.data.DataModel;
 import com.pfizer.mrbt.genomics.state.AxisChangeEvent;
-import com.pfizerm.mrbt.axis.AxisScale;
+import com.pfizer.mrbt.axis.AxisScale;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;

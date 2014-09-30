@@ -12,6 +12,7 @@ import com.pfizer.mrbt.genomics.data.Model;
 import com.pfizer.mrbt.genomics.data.SNP;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -169,7 +170,7 @@ public class ResultsTableModel extends AbstractTableModel {
     public void addIfNotPresent(String gene, Model model) {
         int incomingModelId = model.getId();
         boolean found = false;
-        ArrayList<SNP> incomingSnps = Singleton.getDataModel().getDataSet(gene).getSnps();
+        CopyOnWriteArrayList<SNP> incomingSnps = Singleton.getDataModel().getDataSet(gene).getSnps();
         DataSet dataSet = Singleton.getDataModel().getDataSet(gene);
         for(GeneModelSnp geneModelSnp : geneModelSnps) {
             if(geneModelSnp.getModel().getId() == incomingModelId &&
@@ -232,6 +233,11 @@ public class ResultsTableModel extends AbstractTableModel {
                 geneModelSnps.remove(geneModelSnp);
             }
         }
+        fireTableDataChanged();
+    }
+    
+    public void removeAll() {
+        geneModelSnps.clear();
         fireTableDataChanged();
     }
     

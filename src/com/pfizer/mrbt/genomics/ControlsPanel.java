@@ -16,7 +16,7 @@ import com.pfizer.mrbt.genomics.legend.LegendPanel;
 import com.pfizer.mrbt.genomics.state.SelectedGeneAnnotation;
 import com.pfizer.mrbt.genomics.state.StateListener;
 import com.pfizer.mrbt.genomics.state.View;
-import com.pfizerm.mrbt.axis.AxisScale;
+import com.pfizer.mrbt.axis.AxisScale;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -27,6 +27,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
@@ -56,6 +57,7 @@ public class ControlsPanel extends JComponent {
     private AbstractButton editLinesButton;
     private JCheckBox printReadyCheckBox;
     private JComponent imageOptionsPanel;
+    private boolean snpSearchRequest = true; // if search for SNP using search button, true else false
 
     private String[] SNP_LINES_CHOICES = {"No Lines", "Average Lines", "Connecting Lines"};
 
@@ -201,7 +203,7 @@ public class ControlsPanel extends JComponent {
         ArrayList<DataPointEntry> foundRsIdEntries = new ArrayList<DataPointEntry>();
         View view = Singleton.getState().getMainView();
         DataSet dataSet = view.getDataSet();
-        ArrayList<SNP> snps = dataSet.getSnps();
+        CopyOnWriteArrayList<SNP> snps = dataSet.getSnps();
         ArrayList<Model> models = view.getModels();
         for (SNP snp : snps) {
             int oneRsId = snp.getRsId();
@@ -217,7 +219,7 @@ public class ControlsPanel extends JComponent {
                 }
             }
         }
-        if (foundRsIdEntries.isEmpty()) {
+        if (foundRsIdEntries.isEmpty() && snpSearchRequest) {
             System.out.println("No rsId entries found");
             Singleton.getState().clearRsIdSearchResults();
             JOptionPane.showMessageDialog(
@@ -492,23 +494,9 @@ public class ControlsPanel extends JComponent {
 
                 @Override
                 public void actionPerformed(ActionEvent ae) {
-                    //AnnotationPanel annotationPanel = ControlsPanel.this.plotPanel.getAnnotationPanel();  1/10/14
-                    //annotationPanel.setHeight(annotationPanel.getPreferredHeight());
-                    //annotationPanel.setSize(annotationPanel.getWidth(), annotationPanel.getPreferredHeight());
-                    //annotationPanel.setMaximumSize(new Dimension(annotationPanel.getWidth(), annotationPanel.getPreferredHeight()));
-                    //annotationPanel.setMinimumSize(new Dimension(annotationPanel.getWidth(), annotationPanel.getPreferredHeight()));
-                    //System.out.println("Annotation Pref height: " + annotationPanel.getHeight() + " vs. desired " + annotationPanel.getPreferredHeight());
                     ControlsPanel.this.plotPanel.getManhattanPlot().adjustImage();
                     ControlsPanel.this.plotPanel.revalidate();
-                    //ControlsPanel.this.plotPanel.adjustAnnotationScrollPane();
-                    //ControlsPanel.this.plotPanel.getYAxisRegion().repaint();
                     ControlsPanel.this.plotPanel.getYAxisRegion().repaint();
-                    //ControlsPanel.this.plotPanel.getSecondYAxisRegion().repaint();
-                    //Dimension currDimension = ControlsPanel.this.plotPanel.getSize();
-                    //Dimension tempSize      = new Dimension(currDimension.width, currDimension.height+1);
-                    //ControlsPanel.this.plotPanel.setSize(tempSize);
-                    //ControlsPanel.this.plotPanel.setSize(currDimension);
-                    //System.out.println("Adjust vscale: " + Singleton.getState().getMainView().getVscale());
                 }
             });
         }
@@ -585,11 +573,17 @@ public class ControlsPanel extends JComponent {
                     java.net.URL imgURL = this.getClass().getResource("/images/guava_48.jpg");
                     //Image icon = new ImageIcon(imgURL).getImage();
 
-                    int optionPaneReturn = JOptionPane.showConfirmDialog(
+                    /*int optionPaneReturn = JOptionPane.showConfirmDialog(
                             (JFrame) SwingUtilities.getWindowAncestor(ControlsPanel.this),
                             lineModificationPane, "Edit lines",
                             JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE,
+                            new ImageIcon(imgURL));*/
+                    JOptionPane.showMessageDialog(
+                            ControlsPanel.this.getTopLevelAncestor(),
+                            lineModificationPane, "Edit lines",
+                            JOptionPane.PLAIN_MESSAGE,
                             new ImageIcon(imgURL));
+                            
                 }
             });
         }
@@ -646,8 +640,10 @@ public class ControlsPanel extends JComponent {
         public void mainPlotChanged(ChangeEvent ce) { 
             String selectedGeneSnp = Singleton.getState().getMainView().getDataSet().getGeneRange().getName();
             if(selectedGeneSnp.startsWith("rs")) {
+                snpSearchRequest = false;
                 geneSearchField.setText(selectedGeneSnp);
                 geneSearchButton.doClick();
+                snpSearchRequest = true;
             }
         }
 

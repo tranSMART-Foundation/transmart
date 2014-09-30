@@ -9,8 +9,8 @@ import com.pfizer.mrbt.genomics.data.DataSet;
 import com.pfizer.mrbt.genomics.data.Model;
 import com.pfizer.mrbt.genomics.data.NumericRange;
 import com.pfizer.mrbt.genomics.hline.HLine;
-import com.pfizerm.mrbt.axis.AxisScale;
-import com.pfizerm.mrbt.axis.LinearAxisScale;
+import com.pfizer.mrbt.axis.AxisScale;
+import com.pfizer.mrbt.axis.LinearAxisScale;
 import java.util.ArrayList;
 
 /**

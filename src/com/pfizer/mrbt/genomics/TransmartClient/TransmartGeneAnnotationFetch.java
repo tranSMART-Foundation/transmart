@@ -26,30 +26,6 @@ public class TransmartGeneAnnotationFetch {
     }
 
     /**
-     * Main routine for loading and populating the GeneAnnotations model. It takes in
-     * a single gene from the geneSourceId with the start, stop and chromosome and
-     * returns a list of the genes that map into this range based on the bioservices
-     * query 
-     */
-    /*public ArrayList<GeneAnnotation> fetchData(int geneSourceId, int start, int stop, int chromosome) {
-        int service_id = BioservicesParameters.GENE_ANNOTATION_SERVICE_ID;
-        String queryStr = BioservicesParameters.SERVER_URL + "service=" + service_id + "&SERVICE_RENDERID=7";
-
-        // fill param map with generalities
-        HashMap<String, String> paramMap = new HashMap<String, String>();
-        paramMap.put("GENESRCID", geneSourceId + "");
-        paramMap.put("START", start + "");
-        paramMap.put("STOP", stop + "");
-        paramMap.put("CHR", chromosome + "");
-
-
-        String queryStrWithParams = BioservicesParameters.addParametersToUrl(queryStr, paramMap);
-        QueryResult queryResults = getData(queryStrWithParams, service_id, -1, -1, true);
-        ArrayList<GeneAnnotation> geneAnnotations = parseQueryResultsIntoGeneAnnotations(queryResults);
-        return geneAnnotations;
-    }*/
-    
-    /**
      * Fetches the gene annotation data from Transmart into an xml string
      * it returns.  
      * @param geneSourceOption

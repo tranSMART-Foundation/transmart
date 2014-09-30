@@ -2,6 +2,7 @@ package com.pfizer.mrbt.genomics;
 
 import com.pfizer.mrbt.genomics.thumbnail.ThumbnailPanel;
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+import com.pfizer.mrbt.genomics.TransmartClient.TransmartServicesParameters;
 import com.pfizer.mrbt.genomics.TransmartClient.TransmartWebServices;
 import com.pfizer.mrbt.genomics.data.DataModel;
 import com.pfizer.mrbt.genomics.modelselection.ModelSelectionPanel;
@@ -43,7 +44,7 @@ public class Driver implements Runnable {
 	private JFrame thumbnailFrame;
 
 	private JFrame geneModelFrame;
-	public final static String VERSION = "2.0c";
+	public final static String VERSION = "2.1g";
     public final String GUAVA_16_ICON = "/images/guava_16.jpg";
 	private final String[] args;
 	private ThumbnailPanel thumbnailPanel;
@@ -61,9 +62,20 @@ public class Driver implements Runnable {
 
         if (args.length > 0 && args[0].equalsIgnoreCase("-services=transmart")) {
             //Singleton.getState().setDataMode(State.TRANSMART_SERVICES_MODE);
+            DataRetrievalInterface webServices = new TransmartWebServices(Environment.PRODUCTION);
+            Singleton.getDataModel().setWebServices(webServices);
+        } 
+        else if (args.length > 0 && args[0].equalsIgnoreCase("-services=transmartstg")) {
+			/*Singleton.getState().setDataMode(
+					State.TRANSMART_DEV_SERVICES_MODE);*/
             DataRetrievalInterface webServices = new TransmartWebServices(Environment.STAGE);
             Singleton.getDataModel().setWebServices(webServices);
-        } else if (args.length > 0 && args[0].equalsIgnoreCase("-services=transmartdev")) {
+	} else if (args.length > 0 && args[0].equalsIgnoreCase("-services=transmarttst")) {
+			/*Singleton.getState().setDataMode(
+					State.TRANSMART_DEV_SERVICES_MODE);*/
+            DataRetrievalInterface webServices = new TransmartWebServices(Environment.TEST);
+            Singleton.getDataModel().setWebServices(webServices);
+	} else if (args.length > 0 && args[0].equalsIgnoreCase("-services=transmartdev")) {
 				/*Singleton.getState().setDataMode(
 						State.TRANSMART_DEV_SERVICES_MODE);*/
                 DataRetrievalInterface webServices = new TransmartWebServices(Environment.DEV);
@@ -72,10 +84,41 @@ public class Driver implements Runnable {
             System.err.println("Driver does not have -services=<data_retrieval_interface> in args[0]");
             System.exit(1);
     	}
+        
+        // if URL parameter is passed then use it.
+        if (args.length >= 7)
+        	updateTransmartUrlFromJNLP(args[6]);
+
+        // if user session id then use it as it will be used by Transmart to determine the user id
+        if (args.length >= 8)
+        	updateTransmartUserSession(args[7]);
+        
 		//System.out.println("Driver mode is " + Singleton.getState().getDataServicesModeName());
 		Singleton.getState().addListener(stateController);
 	}
 
+	/**
+	 * 
+	 * Updating transmart user name.
+	 * 
+	 * @param sessionId
+	 */
+	private void updateTransmartUserSession(String sessionId) {
+		TransmartServicesParameters.SESSION_ID = sessionId;
+	}
+
+	/**
+	 * 
+	 * Transmart URL used for WebServices access. This way it is not hardcoded but instead passed through the JNLP at creation time by Transmart.
+	 * 
+	 * @param host
+	 */
+	private void updateTransmartUrlFromJNLP(String host) {
+        
+        TransmartServicesParameters.updateUrlAndHosts(host);
+        
+	}
+	
 	/**
 	 * Main thread that instantiates the frame and menubar
 	 */

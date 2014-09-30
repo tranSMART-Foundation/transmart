@@ -31,9 +31,9 @@ import java.util.concurrent.Executors;
  */
 public class DataRetrievalWithThreadPool {
     private final DataRetrievalInterface dataRetrievalInterface;
-    public static final int DEFAULT_MAX_POOL_SIZE = 3; // thread pool maximum threads
+    public static final int DEFAULT_MAX_POOL_SIZE = 10; // thread pool maximum threads
     private int maxThreadPoolSize = DEFAULT_MAX_POOL_SIZE;
-    public final static int DEFAULT_MAX_NUM_MODELS = 3;
+    public final static int DEFAULT_MAX_NUM_MODELS = 1;
     private int maxNumModels = DEFAULT_MAX_NUM_MODELS;
     
     private final ExecutorService threadPool = Executors.newFixedThreadPool(maxThreadPoolSize);
@@ -73,7 +73,7 @@ public class DataRetrievalWithThreadPool {
         for(final String geneRequest : geneRequestList) {
             final String geneRequestFormatted = formatGeneSnpRequest(geneRequest);
             for(int modelOptionIndex = 0; modelOptionIndex < numModelOptions; modelOptionIndex += maxNumModels) {
-                System.out.println("Submitting retrieval task for " + geneRequestFormatted + " " + queryNumber);
+                //System.out.println("Submitting retrieval task for " + geneRequestFormatted + " " + queryNumber);
                 List<ModelOption> modelOptionsSubset = subsetModelOptions(modelOptions, 
                                                                           modelOptionIndex, 
                                                                           Math.min(modelOptionIndex + maxNumModels, numModelOptions));
@@ -84,7 +84,7 @@ public class DataRetrievalWithThreadPool {
         for(final String geneRequest : geneRequestList) {
             final String geneRequestFormatted = formatGeneSnpRequest(geneRequest);
             for(int modelOptionIndex = 0; modelOptionIndex < numModelOptions; modelOptionIndex += maxNumModels) {
-                System.out.println("Submitting retrieval task for " + geneRequestFormatted + " " + startQueryIndex);
+                //System.out.println("Submitting retrieval task for " + geneRequestFormatted + " " + startQueryIndex);
                 List<ModelOption> modelOptionsSubset = subsetModelOptions(modelOptions, 
                                                                           modelOptionIndex, 
                                                                           Math.min(modelOptionIndex + maxNumModels, numModelOptions));
@@ -138,21 +138,41 @@ public class DataRetrievalWithThreadPool {
                                        dbSnpSourceOption,
                                        geneSourceOption,
                                        basePairRadius);
+                DataSet existingDataSet = Singleton.getDataModel().getDataSet(geneRequestFormatted);
+                System.out.println("Model " + modelOptions.get(0).toString());
+                if (existingDataSet == null || ! existingDataSet.hasSameRadiusDbSnpGenesource(basePairRadius, dbSnpSourceOption, geneSourceOption)) {
+                    assert (dataSet.getChromosome() != 0) : "First data set chromosome 0 " + modelOptions.get(0).toString();
+                    ArrayList<GeneAnnotation> geneAnnotations = retrieveAnnotation(dataSet, geneSourceOption);
+                    dataSet.setGeneAnnotations(geneAnnotations);
 
-                ArrayList<GeneAnnotation> geneAnnotations = retrieveAnnotation(dataSet, geneSourceOption);
-                dataSet.setGeneAnnotations(geneAnnotations);
-
-                ArrayList<SnpRecombRate> recombRate = retrieveRecombinationRates(geneRequestFormatted, basePairRadius, geneSourceOption, dbSnpSourceOption);
-                float maxRecombRate = computeMaxRecombinationRate(recombRate);
-                dataSet.setRecombinationRate(recombRate, maxRecombRate);
+                    ArrayList<SnpRecombRate> recombRate = retrieveRecombinationRates(geneRequestFormatted, basePairRadius, geneSourceOption, dbSnpSourceOption);
+                    float maxRecombRate = computeMaxRecombinationRate(recombRate);
+                    dataSet.setRecombinationRate(recombRate, maxRecombRate);
+                } else if(exceedsPreviousAnnotationBounds(dataSet, existingDataSet)) {
+                }
                 
                 postProcessDataSet(dataSet, queryNumber, geneRequestFormatted);
                 
             } catch (RetrievalException rex) {
                 System.err.println("Retrieval exception\n" + rex.toString());
-                rex.printStackTrace();
+                //rex.printStackTrace();
                 Singleton.getState().retrievalCompleted(geneRequestFormatted, 0, SearchStatus.FAILED, queryNumber);
             }
+        }
+    }
+    
+    /**
+     * Returns true if the dataSet xrange is wider than the existingDataSet xrange
+     * @param dataSet
+     * @param existingDataSet
+     * @return 
+     */
+    private boolean exceedsPreviousAnnotationBounds(DataSet dataSet, DataSet existingDataSet) {
+        if(dataSet.getXRange().getMin() < existingDataSet.getXRange().getMin() ||
+           dataSet.getXRange().getMax() > existingDataSet.getXRange().getMax()) {
+            return true;
+        } else {
+            return false;
         }
     }
     
@@ -164,37 +184,50 @@ public class DataRetrievalWithThreadPool {
      * @param queryId
      * @param geneName
      */
-    protected void postProcessDataSet(DataSet dataSet, int queryId, String geneName) {
+    protected void postProcessDataSet(DataSet dataSet, int queryId, String geneName) throws RetrievalException {
         if(dataSet==null) {
             Singleton.getState().retrievalCompleted(geneName, 0, SearchStatus.FAILED, queryId);
             return;
         }
+        
+        //Singleton.getDataModel().updateDataSets(dataSet, geneName);
         //String geneName = dataSet.getGeneRange().getName();
+        System.out.println("\nPostprocessing new data set " + geneName + "\t" + dataSet.getSnps().size());
         DataSet existingDataSet = Singleton.getDataModel().getDataSet(geneName);
+        /*if(existingDataSet != null) {
+            System.out.println("Postprocessing existing data set " + geneName + "\t" + existingDataSet.getSnps().size());
+            //existingDataSet.updateXAxisRange(dataSet.getXRange());
+        }*/
         if (existingDataSet == null) {  // new gene
             Singleton.getDataModel().addDataSet(geneName, dataSet);
+            System.out.println("Postprocessing adding " + geneName + "\t" + Singleton.getDataModel().getDataSet(geneName).getSnps().size());
 
-        } else if (sameRadiusDbSnpGeneSource(dataSet, existingDataSet)) {
-            /* allows new models for same gene to be added if same radius/dbSnp/GeneSource */
-            removeDataSetModelSnpFromExistingDataSet(dataSet, existingDataSet);
-            for (Model addingModel : dataSet.getModels()) {
-                Model existingModel = existingDataSet.getModelElseNull(addingModel.getStudy(),
-                                                                       addingModel.getSet(),
-                                                                       addingModel.getModel());
-                if (existingModel != null) {
-                    existingDataSet.removeAllSnpWithModel(existingModel);
-                }
+        } else if (existingDataSet.hasSameRadiusDbSnpGeneSource(dataSet)) {
+            existingDataSet.addDataSetModels(dataSet.getModels());
+            existingDataSet.updateSnps(dataSet.getSnps());
+            Singleton.getDataModel().updateDataSet(geneName, existingDataSet, dataSet);
+            System.out.println("Existing data range [" + existingDataSet.getXRange().getMin() + "\t" + existingDataSet.getXRange().getMax() + "]");
+            System.out.println("Incoming data range [" + dataSet.getXRange().getMin() + "\t" + dataSet.getXRange().getMax() + "]");
+            boolean updatedXRange = existingDataSet.updateXAxisRange(dataSet.getXRange());
+            System.out.println("Existing data range [" + existingDataSet.getXRange().getMin() + "\t" + existingDataSet.getXRange().getMax() + "]");
+            //System.err.println("Updated XRange for " + dataSet.getModels().get(0).toString() + "\t" + updatedXRange);
+            if(existingDataSet.xRangeExceedsGeneAnnotationRange()) {
+                assert (existingDataSet.getChromosome()!= 0) : " xRange changed chromosome 0";
+                ArrayList<GeneAnnotation> geneAnnotations = retrieveAnnotation(existingDataSet, existingDataSet.getGeneSourceOption());
+                System.out.println("Fetched gene annotations");
+                existingDataSet.setGeneAnnotations(geneAnnotations);
+                System.out.println("Assigned gene annotations to existing");
+                //existingDataSet.setGeneRange(new GeneRange());
             }
-            existingDataSet.addAllSnpWithModels(dataSet);
-            Singleton.getDataModel().addDataSet(geneName, existingDataSet);
+            System.out.println("Postprocessing merging " + geneName + "\t" + existingDataSet.getSnps().size());
 
         } else {// blow away existing data set w/o informing user as replacing it
             Singleton.getDataModel().addDataSet(geneName, dataSet);
+            System.out.println("Postprocessing blowAway  " + geneName + "\t" + existingDataSet.getSnps().size());
         }
-        System.out.println("Retrieval completed for " + queryId + "\tgene " + geneName);
         Singleton.getState().retrievalCompleted(geneName, dataSet.getSnps().size(), SearchStatus.SUCCESS, queryId);
     }
-
+    
     
     /**
      * Retrieves a dataSet containing the SNP for requestedGeneOrSnp
@@ -231,6 +264,9 @@ public class DataRetrievalWithThreadPool {
 
     /**
      * Returns a list of GeneAnnotation for the range of data retrieved in the dataSet
+     * It also updates the dataSet.geneRange if the retrieval was successful.  The
+     * search is the xRange for the dataSet plus a 10% window to avoid very similar
+     * genes requiring separate searches
      * @param dataSet
      * @param geneSourceOption
      * @throws RetrievalException if gene annotation fetch fails
@@ -238,9 +274,17 @@ public class DataRetrievalWithThreadPool {
      */
     protected ArrayList<GeneAnnotation> retrieveAnnotation(DataSet dataSet, GeneSourceOption geneSourceOption) throws RetrievalException {
         int chromosome = dataSet.getChromosome();
-        int start      = dataSet.getGeneRange().getStart();
-        int end        = dataSet.getGeneRange().getEnd();
-        ArrayList<GeneAnnotation> geneAnnotations = dataRetrievalInterface.fetchGeneAnnotations(geneSourceOption, chromosome, start, end);
+        assert (chromosome != 0) : "Chromosome = 0 from retrieveAnnotation";
+        /*int start      = dataSet.getGeneRange().getStart();
+        int end        = dataSet.getGeneRange().getEnd();*/
+        double start = dataSet.getXRange().getMin();
+        double end   = dataSet.getXRange().getMax();
+        double range = Math.min(1000, end-start);
+        int minX = (int) Math.floor(start - range/10);
+        int maxX = (int) Math.ceil(end + range/10);
+        ArrayList<GeneAnnotation> geneAnnotations = dataRetrievalInterface.fetchGeneAnnotations(geneSourceOption, chromosome, minX, maxX);
+        dataSet.getGeneRange().setStart(minX);
+        dataSet.getGeneRange().setEnd(maxX);
         return geneAnnotations;
     }
     

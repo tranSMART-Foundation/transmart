@@ -476,7 +476,7 @@ public class MenuBar extends JMenuBar {
         pane.add(getHorizCenteredBox("Anna Silberberg"));
         pane.add(getHorizCenteredBox("David Klatte"));
 
-        pane.add(getHorizCenteredBox("\u00A9 Copyright 2012, 2013  Pfizer Inc."));
+        pane.add(getHorizCenteredBox("\u00A9 Copyright 2012, 2013, 2014  Pfizer Inc."));
         pane.add(Box.createRigidArea(new Dimension(0, 10)));
         pane.setBorder(BorderFactory.createRaisedBevelBorder());
         pane.setBorder(BorderFactory.createCompoundBorder(
@@ -1345,7 +1345,7 @@ public class MenuBar extends JMenuBar {
             Singleton.getMainFrame().setLocation(30,17);
             Singleton.getMainFrame().setSize(new Dimension(800,700));
             Singleton.getGeneModelFrame().setLocation(830,17);
-            Singleton.getGeneModelFrame().setSize(new Dimension(200,700));
+            Singleton.getGeneModelFrame().setSize(new Dimension(226,700));
 
         }
     }

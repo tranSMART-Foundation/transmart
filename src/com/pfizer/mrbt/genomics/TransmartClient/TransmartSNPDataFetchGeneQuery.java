@@ -126,6 +126,7 @@ public class TransmartSNPDataFetchGeneQuery extends TransmartSNPDataFetch {
         int minLoc = Integer.MAX_VALUE;
         int maxLoc = Integer.MIN_VALUE;
         int chromosome = -1;
+        HashMap<String,Model> studySetModel2model = new HashMap<String,Model>();
         ArrayList<ArrayList<String>> queryResults;
         try {
             queryResults = TransmartUtil.parseXml(xmlResult);
@@ -133,9 +134,16 @@ public class TransmartSNPDataFetchGeneQuery extends TransmartSNPDataFetch {
             throw new RetrievalException("Failed to parse gene search " + ex.getMessage(), RetrievalMethod.GENE_SEARCH, params);
         }
         
+        if(queryResults.isEmpty()) {
+            for(String param : params.keySet()) {
+                System.out.println("Param " + param + "-->" + params.get(param));
+            }
+            throw new RetrievalException("No rows returned", params);
+        }
         for(List<String> row : queryResults) {
             if(rowIndex == 0) {
                 chromosome = DataModel.parseChromosomeStr(row.get(TransmartServicesParameters.GENE_SEARCH_CHROMOSOME_COL));
+                assert (chromosome != 0) : "Chromosome is 0 " + row + "\t[" + row.get(TransmartServicesParameters.GENE_SEARCH_CHROMOSOME_COL) + "]";
                 dataSet.setChromosome(chromosome);
             }
             ParsedStudySetModel studySetModel = parseOutStudySetModel(row);
@@ -170,18 +178,25 @@ public class TransmartSNPDataFetchGeneQuery extends TransmartSNPDataFetch {
                 currSnp.setRegulome(regulomeStr);
             }
             currSnp.setLoc(loc);
-            Model currModel = dataSet.checkAddModel(studySetModel.getStudy(), studySetModel.getSet(), studySetModel.getModel());
-            dataSet.addSnpModel2Pval(currSnp, currModel, logPval);
+            String key = studySetModel.getKey();
+            if(! studySetModel2model.containsKey(key)) {
+                studySetModel2model.put(key, new Model(studySetModel.getStudy(), studySetModel.getSet(), studySetModel.getModel()));
+            } 
+            studySetModel2model.get(key).addSnpPval(currSnp, logPval);
+            //Model currModel = dataSet.checkAddModel(studySetModel.getStudy(), studySetModel.getSet(), studySetModel.getModel());
+            //currModel.addSnpPval(currSnp, logPval);
+            //dataSet.addSnpModel2Pval(currSnp, currModel, logPval);
             rowIndex++;
         }
-        // kluge todo
-        //System.out.println("MaxLoc " + maxLoc + "\tminLoc " + minLoc + "\tAvg " + avg + "\tradius " + radius);
         dataSet.setXAxisRange(new NumericRange(minLoc, maxLoc));
         GeneRange geneRange = new GeneRange(searchGene, chromosome, minLoc, maxLoc);
         geneRange.setRadius(radius);
         dataSet.setGeneRange(geneRange);
         dataSet.setDbSnpOption(dbSnpOption);
         dataSet.setGeneSourceOption(geneSourceOption);
+        for(Model model : studySetModel2model.values()) {
+            dataSet.addModel(model);
+        }
         return dataSet;
     }
     

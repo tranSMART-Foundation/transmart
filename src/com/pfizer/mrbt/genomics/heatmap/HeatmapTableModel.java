@@ -236,6 +236,11 @@ public class HeatmapTableModel extends AbstractTableModel {
             updateData();
             fireTableDataChanged();
         }
+        @Override
+        public void dataAdded(ChangeEvent ce) {
+            updateData();
+            fireTableDataChanged();
+        }
     }
     
     public void setTable(JTable tbl) {

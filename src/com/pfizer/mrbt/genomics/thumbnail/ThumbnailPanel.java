@@ -11,7 +11,7 @@ import com.pfizer.mrbt.genomics.state.View;
 import com.pfizer.mrbt.genomics.state.ViewData;
 import com.pfizer.mrbt.genomics.state.ViewListener;
 import com.pfizer.mrbt.genomics.userpref.UserPrefListener;
-import com.pfizerm.mrbt.axis.AxisScale;
+import com.pfizer.mrbt.axis.AxisScale;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;

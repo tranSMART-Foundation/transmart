@@ -9,7 +9,7 @@ package com.pfizer.mrbt.genomics.state;
 
 import com.pfizer.mrbt.genomics.data.DataSet;
 import com.pfizer.mrbt.genomics.data.Model;
-import com.pfizerm.mrbt.axis.AxisScale;
+import com.pfizer.mrbt.axis.AxisScale;
 import java.util.ArrayList;
 
 /**

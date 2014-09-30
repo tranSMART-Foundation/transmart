@@ -13,7 +13,7 @@ import com.pfizer.mrbt.genomics.state.SelectedGeneAnnotation;
 import com.pfizer.mrbt.genomics.state.State;
 import com.pfizer.mrbt.genomics.state.ViewData;
 
-import com.pfizerm.mrbt.axis.AxisScale;
+import com.pfizer.mrbt.axis.AxisScale;
 import java.awt.Color;
 import java.awt.Component;
 
@@ -24,6 +24,7 @@ import java.awt.Graphics2D;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -152,7 +153,7 @@ public class ThumbnailRenderer extends JComponent implements TableCellRenderer {
         
         //drawRecombinationRate(g2);
         
-        ArrayList<SNP> snps = dataSet.getSnps();
+        CopyOnWriteArrayList<SNP> snps = dataSet.getSnps();
         int modelIndex = 0;
         int dotSize = Singleton.getState().getThumbnailDotSize();
         for (Model model : viewData.getModels()) {

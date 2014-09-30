@@ -25,9 +25,9 @@ import javax.swing.event.ChangeEvent;
 public class UserPreferences {
 
     private String filePath = "";
-    private boolean useArithmeticMean = true;
+    /*private boolean useArithmeticMean = true;
     private boolean useRatios = true;
-    private boolean useLogXScale = true;
+    private boolean useLogXScale = true;*/
     private float minTopNegLogPvalAxis = 0f;
     private float minTopRecombinationRateAxis = 0f;
     private double splitPaneFraction = 0.8;
@@ -60,7 +60,7 @@ public class UserPreferences {
     
     private Color annotationColor   = PALE_BLUE;
     private Color annotationTextColor = PURPLE3;
-    private Color currentAnnotationColor = PALE_BLUE;
+    private Color currentAnnotationColor = Color.BLUE;
     private Color selectedAnnotationColor = ORANGE4;
     private Color closestAnnotationColor    = Color.MAGENTA;
     private Color interiorAnnotationColor   = Color.RED;
@@ -73,24 +73,25 @@ public class UserPreferences {
     private Color thumbnailSelectionColor = Color.GRAY;
     private Color thumbnailHorizontalBandColor = Color.LIGHT_GRAY;
     
-    private int DEFAULT_HEAT_MAP_RADIUS = 10000000;
-    private int DEFAULT_HEAT_MAP_FUNCTION = HeatmapParameters.FUNCTION_MAXIMUM;
-    private int DEFAULT_HEAT_MAP_TOP_N_INDEX   = 0;
+    private final int DEFAULT_HEAT_MAP_RADIUS = 10000000;
+    private final int DEFAULT_HEAT_MAP_FUNCTION = HeatmapParameters.FUNCTION_MAXIMUM;
+    private final int DEFAULT_HEAT_MAP_TOP_N_INDEX   = 0;
 
     private int heatmapRadius    = DEFAULT_HEAT_MAP_RADIUS;
     private int heatmapFunction  = DEFAULT_HEAT_MAP_FUNCTION;
     private int heatmapTopNindex = DEFAULT_HEAT_MAP_TOP_N_INDEX;
     private int basePairSearchRadius = DEFAULT_BASE_PAIR_RADIUS;
-    private Point mainFrameLocation = null;
-    private Point geneModelFrameLocation = null;
-    private Dimension mainFrameSize = null;
-    private Dimension geneModelFrameSize = null;
+    private Point mainFrameLocation = new Point(30, 17);
+    private Point geneModelFrameLocation = new Point(830,17);
+    private Dimension mainFrameSize = new Dimension(800,700);
+    private Dimension geneModelFrameSize = new Dimension(226, 700);
+    private Dimension bufferedPlotSize = null;
     
     public UserPreferences() {
         loadUserPreferences();
     }
 
-    private ArrayList<UserPrefListener> listeners = new ArrayList<UserPrefListener>();
+    private final ArrayList<UserPrefListener> listeners = new ArrayList<UserPrefListener>();
     
     public String getFilePath() {
         return filePath;
@@ -159,6 +160,7 @@ public class UserPreferences {
             bw.write("geneModelFrameLocation" + "\t" + toInt(geneModelFrameLocation.getX()) + "\t" + toInt(geneModelFrameLocation.getY()) + "\n");
             bw.write("mainFrameDimension" + "\t" + toInt(mainFrameSize.getWidth())+ "\t" + toInt(mainFrameSize.getHeight()) + "\n");
             bw.write("geneModelFrameDimension" + "\t" + toInt(geneModelFrameSize.getWidth())+ "\t" + toInt(geneModelFrameSize.getHeight()) + "\n");
+            //bw.write("bufferedPlotSize" + "\t" + toInt(bufferedPlotSize.getWidth())+ "\t" + toInt(bufferedPlotSize.getHeight()) + "\n");
 
         } catch (java.io.IOException ex) {
             System.out.println("write exception in saveUserPreferences to file " + filename);
@@ -419,6 +421,12 @@ public class UserPreferences {
                            geneModelFrameSize = new Dimension(Integer.parseInt(splits[1]), Integer.parseInt(splits[2]));
                        } catch(NumberFormatException nfe) {
                            System.out.println("Invalid geneModelFrameDimension" + "\t" + line);
+                       }
+                    } else if(splits[0].equalsIgnoreCase("bufferedPlotSize") && splits.length > 2) {
+                       try {
+                           bufferedPlotSize = new Dimension(Integer.parseInt(splits[1]), Integer.parseInt(splits[2]));
+                       } catch(NumberFormatException nfe) {
+                           System.out.println("Invalid bufferedPlotsize" + "\t" + line);
                        }
                     }
                 }
@@ -804,6 +812,10 @@ public class UserPreferences {
 
     public Dimension getGeneModelFrameSize() {
         return geneModelFrameSize;
+    }
+    
+    public Dimension getBufferedPlotsize() {
+        return bufferedPlotSize;
     }
     
     

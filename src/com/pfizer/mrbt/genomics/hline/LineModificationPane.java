@@ -148,7 +148,7 @@ public class LineModificationPane extends JComponent {
         if (deleteButton == null) {
             deleteButton = new JButton("Delete Selected");
             deleteButton.addActionListener(new ActionListener() {
-
+                @Override
                 public void actionPerformed(ActionEvent ae) {
                     int index = lineTable.getSelectedRow();
                     if (index >= 0) {
@@ -167,16 +167,6 @@ public class LineModificationPane extends JComponent {
         return deleteButton;
     }
 
-    /*public class StateController implements StateChangeListener {
-        public void axisChanged(ChangeEvent ce) {}
-        public void currentLocationChanged(ChangeEvent ce) {}
-        public void dragChanged(ChangeEvent ce) {}
-        public void linesChanged(ChangeEvent ce) {
-            lineModificationTableModel.fireTableDataChanged();
-        }
-        public void ceffRangeRecorded(ChangeEvent ce) {}
-        public void namesChanged(ChangeEvent ce) {}
-    }*/
 
     public class ColorCellRenderer extends JLabel implements TableCellRenderer {
       public Component getTableCellRendererComponent(JTable table, Object value,

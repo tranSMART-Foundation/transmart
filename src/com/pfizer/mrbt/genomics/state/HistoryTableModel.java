@@ -19,6 +19,7 @@ public class HistoryTableModel extends AbstractTableModel {
     }
     
     public Object getValueAt(int row, int col) {
+        try {
         switch(col) {
                 case History.GENE_COL:
                     return historyList.get(row).getGene();
@@ -36,6 +37,10 @@ public class HistoryTableModel extends AbstractTableModel {
                     return historyList.get(row).getSearchStatusStr();
                 default:
                     return "Unknown";
+        }
+        } catch(Exception ex) {
+            System.err.println("History table exception " + row + "\t" + col);
+            return null;
         }
     }
     
@@ -99,8 +104,12 @@ public class HistoryTableModel extends AbstractTableModel {
     }
     
     public void setHistory(int index, History historyElement) {
-        this.historyList.set(index, historyElement);
+        setHistoryList(index, historyElement);
         this.fireTableDataChanged();
+    }
+    
+    public synchronized void setHistoryList(int index, History historyElement) {
+        this.historyList.set(index, historyElement);
     }
     
     public History getHistory(int index) {

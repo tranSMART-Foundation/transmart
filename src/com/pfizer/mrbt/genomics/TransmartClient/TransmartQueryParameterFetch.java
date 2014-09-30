@@ -27,7 +27,7 @@ public class TransmartQueryParameterFetch {
 
     //public final static int MAX_STUDY_NAME_LENGTH = 26;
     public final static int MAX_STUDY_NAME_LENGTH = 70;
-    protected static Logger log = Logger.getLogger(TransmartQueryParameterFetch.class.getName());
+    protected static Logger log = Logger.getLogger(com.pfizer.mrbt.genomics.TransmartClient.TransmartQueryParameterFetch.class.getName());
     private Environment environment;
 
     /**
@@ -50,6 +50,9 @@ public class TransmartQueryParameterFetch {
     public List<ModelOption> fetchModelOptions() throws RetrievalException {
         String queryStr = TransmartServicesParameters.getServerURL(environment) + TransmartServicesParameters.MODEL_FETCH_METHOD;
         HashMap<String, String> paramMap = new HashMap<String, String>();
+        if(TransmartServicesParameters.MODEL_FETCH_METHOD.startsWith("getSecure")) {
+            paramMap.put("user", getUserName()); //kluge for security
+        }
         paramMap.put("dataType", TransmartServicesParameters.MODEL_FETCH_GWAS_DATA_TYPE + "");
         String queryStrWtihParams = TransmartUtil.addParametersToUrl(queryStr, paramMap);
         System.out.println("Fetch Model options query:" + queryStrWtihParams);
@@ -202,6 +205,30 @@ public class TransmartQueryParameterFetch {
             throw new RetrievalException(ex.getMessage(), RetrievalMethod.GENE_SOURCES_SEARCH, paramMap);
         }
         return geneSourceOptions;
+    }
+    
+    /**
+     * Try to retrieve user name using different techniques.  
+     * 
+     * @return 
+     */
+    protected String getUserName() {
+    	
+    	// if session id is provided then this will be used for communicating with transmart
+    	if (TransmartServicesParameters.SESSION_ID != null && TransmartServicesParameters.SESSION_ID.length() > 0)
+    		return TransmartServicesParameters.SESSION_ID;
+    	
+    	
+        String userName = new com.sun.security.auth.module.NTSystem().getName();
+        if(userName != null && ! userName.isEmpty()) {
+            return userName;
+        }
+        
+        userName = System.getProperty("user.name");
+        if(userName != null && ! userName.isEmpty()) {
+            return userName;
+        }
+        return "";
     }
 
 }

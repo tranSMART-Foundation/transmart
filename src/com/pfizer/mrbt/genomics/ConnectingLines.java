@@ -8,10 +8,11 @@ import com.pfizer.mrbt.genomics.data.DataSet;
 import com.pfizer.mrbt.genomics.data.Model;
 import com.pfizer.mrbt.genomics.data.SNP;
 import com.pfizer.mrbt.genomics.data.XYPoint;
-import com.pfizerm.mrbt.axis.AxisScale;
+import com.pfizer.mrbt.axis.AxisScale;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -21,12 +22,12 @@ public class ConnectingLines {
 
     private DataSet dataSet;
     private Model model;
-    private ArrayList<SNP> snps;
+    private CopyOnWriteArrayList<SNP> snps;
     private AxisScale xAxis;
     private AxisScale yAxis;
     private BufferedImage bufferedImage;
 
-    public ConnectingLines(DataSet dataSet, Model model, ArrayList<SNP> snps, AxisScale xAxis, AxisScale yAxis, BufferedImage bufferedImage) {
+    public ConnectingLines(DataSet dataSet, Model model, CopyOnWriteArrayList<SNP> snps, AxisScale xAxis, AxisScale yAxis, BufferedImage bufferedImage) {
         this.model = model;
         this.snps = snps;
         this.xAxis = xAxis;

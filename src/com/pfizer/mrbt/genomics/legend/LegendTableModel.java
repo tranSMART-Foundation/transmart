@@ -17,7 +17,8 @@ public class LegendTableModel extends AbstractTableModel {
     public final static int COLOR_COL = 0;
     public final static int ORIG_COL  = 1;
     public final static int DISPLAY_COL = 2;
-    private String[] headers = {"Clr", "Original Name", "Display Name"};
+    public final static int INDEX_COL = 3;
+    private String[] headers = {"Clr", "Original Name", "Display Name","Idx"};
     
     @Override
     public Object getValueAt(int row, int col) {
@@ -29,6 +30,8 @@ public class LegendTableModel extends AbstractTableModel {
             case DISPLAY_COL:
                 Model model = Singleton.getState().getMainView().getModel(row);
                return Singleton.getState().getLegendFromModel(model);
+            case INDEX_COL:
+                return (row+1);
             default:
                 return "Unknown";
         }
@@ -41,7 +44,7 @@ public class LegendTableModel extends AbstractTableModel {
     
     @Override
     public int getColumnCount() {
-        return 3;
+        return headers.length;
     }
     
     @Override
@@ -53,6 +56,8 @@ public class LegendTableModel extends AbstractTableModel {
                 return String.class;
             case DISPLAY_COL:
                return String.class;
+            case INDEX_COL:
+               return Integer.class;
             default:
                 return String.class;
         }
