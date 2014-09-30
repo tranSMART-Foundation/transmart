@@ -159,16 +159,7 @@
             <unjar src="@{jar}" dest="${temp.file}">
             </unjar>
 
-            <jar jarfile="${terminatorAb.build.dist.lib.dir}.jar"  basedir="${temp.file}">
-                <manifest>
-                    <attribute name="Permissions" value="all-permissions"/>
-                    <attribute name="Application-Name" value="${project.title}"/>
-                    <attribute name="Codebase"  value="${webstart.root}"/>
-                </manifest>
-            </jar>
-
-
-            <delete file="@{jar}" failonerror="true"/>
+       		<delete file="@{jar}" failonerror="true"/>
 
             <!-- Touch it in case the file didn't have a manifest.
             Otherwise the JAR task below will fail if the manifest
