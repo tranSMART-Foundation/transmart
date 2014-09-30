@@ -27,6 +27,7 @@
         webstart
         compile-test
         junit
+        transmartwar
 
         Author:
         Ami Khandeshi
@@ -206,6 +207,7 @@
         <echo message="		test			-> executes particular test cases"/>
         <echo message="		clean			-> cleans up the build directories"/>
         <echo message="		all			-> it runs cleanup first then it runs inst-plugins and webstart"/>
+        <echo message="     transmartwar -> creates signed jar files and packages for javastart-delivery war" />
         <echo message="-------------------------------------------------------------"/>
         <echo message=""/>
     </target>
