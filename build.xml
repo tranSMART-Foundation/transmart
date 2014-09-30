@@ -54,9 +54,6 @@
     <!-- cy.jnlp file	  -->
     <property name="jnlpfile"                   value="${gwava.dir}/scripts/gwava.jnlp"/>
     <property name="jnlp1file"                  value="${gwava.dir}/scripts/resource.jnlp"/>
-    <!--<property name="keystore"                   value="${gwava.dir}/pfizer.ks"/>-->
-    <property name="aliasName" value="pfizer123"/>
-    <property name="password" value="pfizer123"/>
     <property name="webinfdir"                  value="${gwava.dir}/scripts/WEB-INF"/>
 
     <!-- module  src directories -->
@@ -65,6 +62,7 @@
     <property name="gwava.lib.dir"             value="${basedir}/lib"/>
     <property name="gwava.image.dir"             value="${basedir}/images"/>
     <property name="gwava.help.dir"             value="${basedir}/help"/>
+    <property name="" value="" />
     <!-- module  classes  directories -->
     <property name="gwava.docs.dir"            value="${gwava.dir}/docs" />
     <property name="gwava.docs.api.dir"        value="${gwava.docs.dir}/api" />
@@ -75,6 +73,7 @@
     <property name="gwava.build.help.dir"     value="${gwava.build.classes.dir}/help"/>
     <property name="gwava.build.dist.dir"      value="${gwava.build.dir}/dist"/>
     <property name="gwava.build.dist.lib.dir"  value="${gwava.build.dist.dir}/lib"/>
+    <property name="gwava.keystore.dir"        value="${gwava.build.dir}/keystore" />
 	
 
     <!-- test reports -->
@@ -86,11 +85,10 @@
     <property name="compile.deprecation"        value="on"/>
     <property name="compile.verbose"            value="off"/>
     
-    <property name="keystore" location="//amrndhw3605.amer.pfizer.com/JarSigningPublic/Keystore/.keystore"/>
-    <property name="keystore.alias" value="MyKeyStore"/>
-    <property name="keystore.password" value="hicarrie"/>
+    <property name="keystore" location="${gwava.keystore.dir}"/>
+    <property name="keystore.alias" value="transmartKeyStore"/>
+    <property name="keystore.password" value="transmartKey"/>
 
-    
 
     <!--===================================================================-->
     <!--====== Compilation classpath - add all JARs in lib directory ======-->
@@ -281,7 +279,7 @@
     </target>
     <target name="keytool">
         <delete file="${keystore}" failonerror="false" />
-        <genkey alias="${aliasName}" storepass="${password}" keystore="${keystore}" validity="123456">
+        <genkey alias="${keystore.alias}" storepass="${keystore.password}" keystore="${keystore}" validity="123456">
             <dname>
                 <param name="CN" value="Pfizer RBT"/>
                 <param name="OU" value="MRBT"/>
@@ -293,7 +291,7 @@
         </genkey>
     </target>
     
-    <target name="signJar" depends="addManifestToLib">
+    <target name="signJar" depends="addManifestToLib, keytool" >
         <signjar keystore="${keystore}" alias="${keystore.alias}" storepass="${keystore.password}" lazy="true" verbose="false">    <!-- from tianhong -->
             <path>
                 <fileset dir="${gwava.build.dist.dir}" includes="${project.name}${project.version}.jar" />
@@ -313,7 +311,6 @@
     <!--==================================================================-->
     <target name="clean" description="clean up" >
         <delete dir="${gwava.build.dir}"/>
-
     </target>
 
     <target name="unsignjar" description="call macro to unsign jar">
