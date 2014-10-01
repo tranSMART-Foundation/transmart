@@ -35,59 +35,59 @@
 
     <!-- locads tomcat.home and axis.home from this external properties file -->
     <property file="build.properties"/>
-    <property name="project.title"              value="GWAVA" />
-    <property name="project.rep"                value="ManhattanViz"/>
-    <property name="project.name"               value="ManhattanViz" />
-    <property name="project.display.version"    value="2.1g" />
-    <property name="project.version"            value="2.1g" />
-    <property name="webstart.name"              value="gwava"/>
+    <property name="project.title"             value="GWAVA" />
+    <property name="project.rep"               value="ManhattanViz"/>
+    <property name="project.name"              value="ManhattanViz" />
+    <property name="project.display.version"   value="2.1g" />
+    <property name="project.version"           value="2.1g" />
+    <property name="webstart.name"             value="gwava"/>
 
-    <property name="webstart.root"              value="http://75.124.74.46:5080/gwava http://75.124.74.46:5880/gwava http://amrl2lp3fwfd58:10080/ http://75.124.74.46 http://AMRL2LP3FWFD58:10080/gwava http://clinux22.pfizer.com http://amre1al336.pcld.pfizer.com:8080/pfizerWebstart http://amrndhl693.pfizer.com http://amrndhl1040.pfizer.com:10080/pfizerWebstart http://amrndhl1038.pfizer.com:8000/gwava http://amrndhl1040.pfizer.com:8000/gwava /"/>
+    <property name="webstart.root"             value="http://75.124.74.46:5080/gwava http://75.124.74.46:5880/gwava http://amrl2lp3fwfd58:10080/ http://75.124.74.46 http://AMRL2LP3FWFD58:10080/gwava http://clinux22.pfizer.com http://amre1al336.pcld.pfizer.com:8080/pfizerWebstart http://amrndhl693.pfizer.com http://amrndhl1040.pfizer.com:10080/pfizerWebstart http://amrndhl1038.pfizer.com:8000/gwava http://amrndhl1040.pfizer.com:8000/gwava /"/>
 
 
     <!-- project modules   -->
     <property name="gwava.module"              value="gwava"/>
 
     <!-- module  directories -->
-    <property name="gwava.dir"                 value="${basedir}"/>
+    <property name="gwava.dir"                 location="${basedir}"/>
 
     <!-- cy.jnlp file	  -->
-    <property name="jnlpfile"                   value="${gwava.dir}/scripts/gwava.jnlp"/>
-    <property name="jnlp1file"                  value="${gwava.dir}/scripts/resource.jnlp"/>
-    <property name="webinfdir"                  value="${gwava.dir}/scripts/WEB-INF"/>
+    <property name="jnlpfile"                  location="${gwava.dir}/scripts/gwava.jnlp"/>
+    <property name="jnlp1file"                 location="${gwava.dir}/scripts/resource.jnlp"/>
+    <property name="webinfdir"                 location="${gwava.dir}/scripts/WEB-INF"/>
 
     <!-- module  src directories -->
-    <property name="gwava.src.dir"             value="${basedir}/src"/>
-    <!--<property name="gwava.test.dir"            value="${gwava.dir}/test"/>-->
-    <property name="gwava.lib.dir"             value="${basedir}/lib"/>
-    <property name="gwava.image.dir"             value="${basedir}/images"/>
-    <property name="gwava.help.dir"             value="${basedir}/help"/>
-    <property name="" value="" />
+    <property name="gwava.src.dir"             location="${gwava.dir}/src"/>
+    <!--<property name="gwava.test.dir"            location="${gwava.dir}/test"/>-->
+    <property name="gwava.lib.dir"             location="${gwava.dir}/lib"/>
+    <property name="gwava.image.dir"           location="${gwava.dir}/images"/>
+    <property name="gwava.help.dir"            location="${gwava.dir}/help"/>
+    <property name="gwava.web-app.dir"         location="${gwava.dir}/web-app" />
     <!-- module  classes  directories -->
-    <property name="gwava.docs.dir"            value="${gwava.dir}/docs" />
-    <property name="gwava.docs.api.dir"        value="${gwava.docs.dir}/api" />
-    <property name="gwava.dist.dir"            value="${gwava.dir}/dist"/>
-    <property name="gwava.build.dir"           value="${gwava.dir}/builds"/>
-    <property name="gwava.build.classes.dir"   value="${gwava.build.dir}/classes"/>
-    <property name="gwava.build.image.dir"     value="${gwava.build.classes.dir}/images"/>
-    <property name="gwava.build.help.dir"     value="${gwava.build.classes.dir}/help"/>
-    <property name="gwava.build.dist.dir"      value="${gwava.build.dir}/dist"/>
-    <property name="gwava.build.dist.lib.dir"  value="${gwava.build.dist.dir}/lib"/>
-    <property name="gwava.keystore.dir"        value="${gwava.build.dir}/keystore" />
+    <property name="gwava.docs.dir"            location="${gwava.dir}/docs" />
+    <property name="gwava.docs.api.dir"        location="${gwava.docs.dir}/api" />
+    <property name="gwava.dist.dir"            location="${gwava.dir}/dist"/>
+    <property name="gwava.build.dir"           location="${gwava.dir}/builds"/>
+    <property name="gwava.build.classes.dir"   location="${gwava.build.dir}/classes"/>
+    <property name="gwava.build.image.dir"     location="${gwava.build.classes.dir}/images"/>
+    <property name="gwava.build.help.dir"      location="${gwava.build.classes.dir}/help"/>
+    <property name="gwava.build.dist.dir"      location="${gwava.build.dir}/dist"/>
+    <property name="gwava.build.dist.lib.dir"  location="${gwava.build.dist.dir}/lib"/>
+    <property name="gwava.keystore.dir"        location="${gwava.build.dir}/keystore" />
 	
 
     <!-- test reports -->
-    <property name="gwava.test.report"         value="${gwava.build.dir}/reports"/>
+    <property name="gwava.test.report"         location="${gwava.build.dir}/reports"/>
 
     <!-- compilation options -->
-    <property name="compile.debug"              value="on"/>
-    <property name="compile.optimize"           value="off"/>
-    <property name="compile.deprecation"        value="on"/>
-    <property name="compile.verbose"            value="off"/>
+    <property name="compile.debug"             value="on"/>
+    <property name="compile.optimize"          value="off"/>
+    <property name="compile.deprecation"       value="on"/>
+    <property name="compile.verbose"           value="off"/>
     
-    <property name="keystore" location="${gwava.keystore.dir}"/>
-    <property name="keystore.alias" value="transmartKeyStore"/>
-    <property name="keystore.password" value="transmartKey"/>
+    <property name="keystore"                  location="${gwava.keystore.dir}"/>
+    <property name="keystore.alias"            value="transmartKeyStore"/>
+    <property name="keystore.password"         value="transmartKey"/>
 
 
     <!--===================================================================-->
@@ -102,7 +102,7 @@
 
     <taskdef resource="net/sf/antcontrib/antlib.xml">
         <classpath>
-            <pathelement location="${basedir}/lib/ant-contrib/ant-contrib-1.0b3.jar"/>
+            <pathelement location="${gwava.lib.dir}/ant-contrib/ant-contrib-1.0b3.jar"/>
         </classpath>
     </taskdef>
 
@@ -223,7 +223,7 @@
     </target>
 
     <!--=====================================================================-->
-    <!--======================== compile solutions gwava =====================-->
+    <!--======================== compile solutions gwava ====================-->
     <!--=====================================================================-->
     <target name="compile-gwava" depends="init" description="compile the gwava source">
         <!-- Compile the java code from ${gwava.src.dir} into ${gwava.build.classes.dir} -->
@@ -265,18 +265,16 @@
             <fileset dir="${gwava.lib.dir}" includes="*.jar" />
         </copy>
     </target>
-	
-
-
 
     <!--==================================================================-->
-    <!--=============== Run GWAVA ====================-->
+    <!--=============== Run GWAVA ========================================-->
     <!--==================================================================-->
     <target name="run"  depends="compile-gwava" description="run GWAVA application" >
         <java jar="${gwava.build.dist.dir}/${project.name}${project.version}.jar"  fork="true" spawn="false" maxmemory="512m" >
             <arg value="-services=transmart"/>
         </java>
     </target>
+
     <target name="keytool">
         <delete file="${keystore}" failonerror="false" />
         <genkey alias="${keystore.alias}" storepass="${keystore.password}" keystore="${keystore}" validity="123456">
@@ -299,15 +297,28 @@
             </path>
         </signjar>
     </target>
-    <target name="justwar" depends="signJar">
+    
+    
+    <!--==================================================================-->
+    <!--===================== create war file ============================-->
+    <!--==================================================================-->
+    <target name="copyAdditionalWarContent" depends="init">
+        <copy todir="${gwava.build.dir}/dist/help">
+            <fileset dir="${gwava.help.dir}" />
+        </copy>
+         <copy file="${gwava.web-app.dir}/index.html" todir="${gwava.build.dir}/dist"/>
+    </target>
+    
+    <target name="justwar" depends="signJar,copyAdditionalWarContent">
         <jar jarfile="${gwava.dist.dir}/${webstart.name}.war" basedir="${gwava.build.dir}" />
     </target>
-    <target name="transmartwar" depends="signJar">
+    
+    <target name="transmartwar" depends="signJar,copyAdditionalWarContent">
         <jar jarfile="${gwava.dist.dir}/${webstart.name}.war" basedir="${gwava.build.dir}/dist" />
     </target>
 
     <!--==================================================================-->
-    <!--===================== cleans build directory ==========================-->
+    <!--===================== cleans build directory =====================-->
     <!--==================================================================-->
     <target name="clean" description="clean up" >
         <delete dir="${gwava.build.dir}"/>
