@@ -1,0 +1,4 @@
+This is version: 1.2.3-SNAPSHOT.
+(The version number is also annotated in
+web/app/index.html and in comments in build.xml)
+ 
