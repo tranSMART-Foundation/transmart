@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 
+<!-- This is version 1.2.3-SNAPSHOT -->
+
 <project name="ManhattanViz" default="run" basedir=".">
     <description>
         Build file for solutions gwava
