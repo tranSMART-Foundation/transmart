@@ -181,10 +181,23 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
 
 
 .listToDataFrame <- function(list) {
-    # add each list-element as a new row to a matrix so we can use the rbind.fill.matrix functionality
-    df <- matrix(nrow = 0, ncol = 0)
-    for (el in list) df <- rbind.fill.matrix(df, t(unlist(el)))
+    # TODO: (timdo) dependency on 'plyr' package removed; figure out whether dependency is present elsewhere, or remove dependency
+    # add each list-element as a new row to a matrix, in two passes
+    # first pass: go through each list element, unlist it and remember future column names
+    columnNames <- c()
+    for (i in 1:(length(list))) {
+        list[[i]] <- unlist(list[[i]])
+        columnNames <- union(columnNames, names(list[[i]]))
+    }
+    
+    # second pass: go through each list element and add its elements to correct column
+    df <- matrix(nrow = length(list), ncol = length(columnNames))
+    for (i in 1:(length(list))) {
+        df[i, match(names(list[[i]]), columnNames)] <- list[[i]]
+    }
+    colnames(df) <- columnNames
 
+    # check whether list contains valid row names, and if true; use them
     if (is.null(names(list)) || is.na(names(list)) || length(names(list)) != length(list)) { 
         rownames(df) <- NULL
     } else { rownames(df) <- names(list) }
