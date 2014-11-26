@@ -24,14 +24,19 @@ class AcghDS implements RangeHandlingAnnotationDataSource {
 
     AcghService acghService
     Long resultInstanceId
+    String conceptKey
 
     List<DasEntryPoint> entryPoints
 
     @Override
     void init(ServletContext servletContext, Map<String, PropertyType> stringPropertyTypeMap, DataSourceConfiguration dataSourceConfiguration) throws DataSourceException {
-        resultInstanceId = dataSourceConfiguration.getMatcherAgainstDsn().group(1).toLong();
+        resultInstanceId = dataSourceConfiguration.getMatcherAgainstDsn().group(1).toLong()
+        def ckEncoded = dataSourceConfiguration.getMatcherAgainstDsn().group(2)
+        if (ckEncoded) {
+            conceptKey = new String(ckEncoded.decodeBase64())
+        }
         def ctx = servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT)
-        acghService = ctx.acghService;
+        acghService = ctx.acghService
     }
 
     @Override
@@ -39,32 +44,32 @@ class AcghDS implements RangeHandlingAnnotationDataSource {
 
     @Override
     DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins) throws BadReferenceObjectException, DataSourceException {
-        acghService.getFeatures(resultInstanceId, [segmentId], maxbins).first()
+        acghService.getFeatures(resultInstanceId, conceptKey, [segmentId], maxbins).first()
     }
 
     @Override
     Collection<DasAnnotatedSegment> getFeatures(Collection<String> segmentIds, Integer maxbins) throws UnimplementedFeatureException, DataSourceException {
-        acghService.getFeatures(resultInstanceId, segmentIds, maxbins)
+        acghService.getFeatures(resultInstanceId, conceptKey, segmentIds, maxbins)
     }
 
     @Override
     DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins, uk.ac.ebi.mydas.model.Range range) throws BadReferenceObjectException, DataSourceException, UnimplementedFeatureException {
-        acghService.getFeatures(resultInstanceId, [segmentId], maxbins, range).first()
+        acghService.getFeatures(resultInstanceId, conceptKey, [segmentId], maxbins, range).first()
     }
 
     @Override
     Collection<DasAnnotatedSegment> getFeatures(Collection<String> segmentIds, Integer maxbins, uk.ac.ebi.mydas.model.Range range) throws UnimplementedFeatureException, DataSourceException {
-        acghService.getFeatures(resultInstanceId, segmentIds, maxbins, range)
+        acghService.getFeatures(resultInstanceId, conceptKey, segmentIds, maxbins, range)
     }
 
     @Override
     DasAnnotatedSegment getFeatures(String segmentId, int start, int stop, Integer maxbins) throws BadReferenceObjectException, CoordinateErrorException, DataSourceException {
-        return acghService.getFeatures(resultInstanceId, [segmentId], maxbins, new uk.ac.ebi.mydas.model.Range(start, stop)).first()
+        return acghService.getFeatures(resultInstanceId, conceptKey, [segmentId], maxbins, new uk.ac.ebi.mydas.model.Range(start, stop)).first()
     }
 
     @Override
     DasAnnotatedSegment getFeatures(String segmentId, int start, int stop, Integer maxbins, Range rows) throws BadReferenceObjectException, CoordinateErrorException, DataSourceException, UnimplementedFeatureException {
-        return acghService.getFeatures(resultInstanceId, [segmentId], maxbins, rows).first()
+        return acghService.getFeatures(resultInstanceId, conceptKey, [segmentId], maxbins, rows).first()
     }
 
     @Override

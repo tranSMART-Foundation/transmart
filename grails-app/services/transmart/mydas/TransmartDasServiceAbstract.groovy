@@ -56,12 +56,13 @@ abstract class TransmartDasServiceAbstract {
     }
 
     List<DasAnnotatedSegment> getFeatures(Long resultInstanceId,
+                                          String conceptKey,
                                           Collection<String> segmentIds = [],
                                           Integer maxbins = null,
                                           uk.ac.ebi.mydas.model.Range range = null,
                                           Map<String, String> params = null,
                                           Collection<DasType> dasTypes = dasTypes) throws UnimplementedFeatureException, DataSourceException {
-        def query = getRegionQuery(resultInstanceId, segmentIds, range)
+        def query = getRegionQuery(resultInstanceId, conceptKey, segmentIds, range)
         TabularResult<AssayColumn, RegionRow> regionResult = resource.retrieveData(*query)
         def assays = regionResult.indicesList
         Map<String, List<DasFeature>> featuresPerSegment = [:]
@@ -83,12 +84,19 @@ abstract class TransmartDasServiceAbstract {
 
 
     protected List getRegionQuery(Long resultInstanceId,
+                                String conceptKey,
                                 Collection<String> segmentIds = [],
                                 uk.ac.ebi.mydas.model.Range range = null) {
 
         List assayConstraints = [
                 resource.createAssayConstraint(AssayConstraint.PATIENT_SET_CONSTRAINT,
                         result_instance_id: resultInstanceId)]
+
+        if (conceptKey) {
+            assayConstraints.add(resource.createAssayConstraint(
+                    AssayConstraint.ONTOLOGY_TERM_CONSTRAINT,
+                    concept_key: conceptKey))
+        }
 
         List dataConstraints = [
                 resource.createDataConstraint(
