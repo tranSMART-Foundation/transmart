@@ -22,6 +22,7 @@ class VcfInfoDS implements RangeHandlingAnnotationDataSource {
     String infoField
     VcfServiceAbstract vcfService
     Long resultInstanceId
+    String conceptKey
 
     List<DasEntryPoint> entryPoints
 
@@ -31,9 +32,7 @@ class VcfInfoDS implements RangeHandlingAnnotationDataSource {
         resultInstanceId = dataSourceConfiguration.getMatcherAgainstDsn().group(2).toLong()
         def ckEncoded = dataSourceConfiguration.getMatcherAgainstDsn().group(3)
         if (ckEncoded) {
-            //TODO Double encoding/decoding because we have problem with single
-            // encoded concept key (400 Bad Request) in earlier stages (possibly mydas)
-            ckEncoded = URLDecoder.decode(ckEncoded, 'UTF-8')
+            conceptKey = new String(ckEncoded.decodeBase64())
         }
         vcfService = servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT).vcfInfoService;
     }
@@ -45,34 +44,34 @@ class VcfInfoDS implements RangeHandlingAnnotationDataSource {
 
     @Override
     DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins) throws BadReferenceObjectException, DataSourceException {
-        vcfService.getFeatures(resultInstanceId, [segmentId], maxbins, null, ['infoField':infoField]).first()
+        vcfService.getFeatures(resultInstanceId, conceptKey, [segmentId], maxbins, null, ['infoField':infoField]).first()
     }
 
     @Override
     DasAnnotatedSegment getFeatures(String segmentId, int start, int stop, Integer maxbins) throws BadReferenceObjectException, CoordinateErrorException, DataSourceException {
-        vcfService.getFeatures(resultInstanceId, [segmentId], maxbins, new uk.ac.ebi.mydas.model.Range(start, stop), ['infoField':infoField]).first()
+        vcfService.getFeatures(resultInstanceId, conceptKey, [segmentId], maxbins, new uk.ac.ebi.mydas.model.Range(start, stop), ['infoField':infoField]).first()
     }
 
     @Override
     DasAnnotatedSegment getFeatures(String segmentId, int start, int stop, Integer maxbins, uk.ac.ebi.mydas.model.Range range) throws BadReferenceObjectException, CoordinateErrorException, DataSourceException, UnimplementedFeatureException {
-        vcfService.getFeatures(resultInstanceId, [segmentId], maxbins, range, ['infoField':infoField]).first()
+        vcfService.getFeatures(resultInstanceId, conceptKey, [segmentId], maxbins, range, ['infoField':infoField]).first()
     }
 
 
 
     @Override
     DasAnnotatedSegment getFeatures(String segmentId, Integer maxbins, uk.ac.ebi.mydas.model.Range range) throws BadReferenceObjectException, DataSourceException, UnimplementedFeatureException {
-        vcfService.getFeatures(resultInstanceId, [segmentId], maxbins, range, ['infoField':infoField]).first()
+        vcfService.getFeatures(resultInstanceId, conceptKey, [segmentId], maxbins, range, ['infoField':infoField]).first()
     }
 
     @Override
     Collection<DasAnnotatedSegment> getFeatures(Collection<String> segmentIds, Integer maxbins, uk.ac.ebi.mydas.model.Range range) throws UnimplementedFeatureException, DataSourceException {
-        vcfService.getFeatures(resultInstanceId, segmentIds, maxbins, range, ['infoField':infoField])
+        vcfService.getFeatures(resultInstanceId, conceptKey, segmentIds, maxbins, range, ['infoField':infoField])
     }
 
     @Override
     Collection<DasAnnotatedSegment> getFeatures(Collection<String> segmentIds, Integer maxbins) throws UnimplementedFeatureException, DataSourceException {
-        vcfService.getFeatures(resultInstanceId, segmentIds, maxbins, null, ['infoField':infoField])
+        vcfService.getFeatures(resultInstanceId, conceptKey, segmentIds, maxbins, null, ['infoField':infoField])
     }
 
     @Override
