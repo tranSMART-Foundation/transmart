@@ -7,7 +7,7 @@
 	
 	<body>
 		<div class="body">
-			<h1>Show Import XNAT Configuration44</h1>
+			<h1>Show Import XNAT Configuration</h1>
 			<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 			</g:if>

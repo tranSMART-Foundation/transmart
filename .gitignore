@@ -11,6 +11,9 @@ bin/
 *.iws
 *.log
 *.sw[op]
+*.zip
+*.sha1
 .DS_Store
+plugin.xml
 System.out
 /tomcat.8080/

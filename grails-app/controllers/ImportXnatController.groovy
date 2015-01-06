@@ -174,13 +174,6 @@ class ImportXnatController {
 			def node = importXnatConfiguration.node
 			def kettledir = (getTransmartDataLocation() + "/env/data-integration/")
 			def datadir = getScriptsLocation() + "/xnattotransmartlink/"
-			print url
-			print username
-			print password
-			print project
-			print node
-			print kettledir
-			print datadir
 
 			def process = ("python " + getScriptsLocation() + "/xnattotransmartlink/downloadscript.py ${url} ${username} ${password} ${project} ${node} ${kettledir} ${datadir}").execute(null, new File(getScriptsLocation() + "/xnattotransmartlink"))
 			process.waitFor()
@@ -245,10 +238,8 @@ class ImportXnatController {
 	def getScriptsLocation = {
 		def dir = grailsApplication.config.org.transmart.importxnatplugin.location
 		if (dir.isEmpty()) {
-			dir = grailsAttributes.getApplicationContext().getResource("/").getFile().getParentFile().getParentFile().toString() + "/transmart-xnat-importer/scripts"
+			dir = grailsAttributes.getApplicationContext().getResource("/").getFile().getParentFile().getParentFile().toString() + "/transmart-xnat-importer-plugin/scripts"
 		}
-		print "REACHED"
-		print dir
 		return dir
 	}
 }
