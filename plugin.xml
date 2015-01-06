@@ -1,0 +1,14 @@
+<plugin name='transmart-xnat-importer' version='0.1' grailsVersion='2.3 &gt; *'>
+  <author>Erwin Vast</author>
+  <authorEmail>e.vast@erasmusmc.nl</authorEmail>
+  <title>Transmart Xnat Importer Plugin</title>
+  <description>Admin panel to configure and import image derived clinical data from XNAT to TranSMART.
+</description>
+  <documentation>http://grails.org/plugin/transmart-xnat-importer</documentation>
+  <type>TransmartXnatImporterGrailsPlugin</type>
+  <resources>
+    <resource>ImportXnatController</resource>
+    <resource>org.transmart.searchapp.ImportXnatConfiguration</resource>
+    <resource>org.transmart.searchapp.ImportXnatVariable</resource>
+  </resources>
+</plugin>
