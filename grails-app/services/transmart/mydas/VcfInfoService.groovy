@@ -39,9 +39,6 @@ class VcfInfoService  extends  VcfServiceAbstract {
         if (null == infoFieldValue) {
             return []
         }
-        if (!infoFieldValue.isDouble()) {
-            return []
-        }
 
         def linkMap = val.rsId == '.' ? [:]
                 : [(new URL("http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=${val.rsId}")): 'NCBI SNP Ref']
