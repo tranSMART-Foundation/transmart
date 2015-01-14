@@ -30,6 +30,10 @@ class VcfInfoService  extends  VcfServiceAbstract {
     }
 
     private def getInfoAndFeature = { VcfValues val, String infoField ->
+        def maf = val?.cohortInfo?.minorAlleleFrequency
+        if (!maf || maf <= 0) {
+            return []
+        }
 
         def infoFieldValue = val.infoFields[infoField]
         if (null == infoFieldValue) {
