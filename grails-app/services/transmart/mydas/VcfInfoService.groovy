@@ -30,11 +30,6 @@ class VcfInfoService  extends  VcfServiceAbstract {
     }
 
     private def getInfoAndFeature = { VcfValues val, String infoField ->
-        def maf = val?.cohortInfo?.minorAlleleFrequency
-        if (!maf || maf <= 0) {
-            return []
-        }
-
         def infoFieldValue = val.infoFields[infoField]
         if (null == infoFieldValue) {
             return []
@@ -45,9 +40,9 @@ class VcfInfoService  extends  VcfServiceAbstract {
 
         [new DasFeature(
                 // feature id - any unique id that represent this feature
-                "smaf-${val.position}",
+                "vcfInfo-${val.position}",
                 // feature label
-                'Minor Allele Frequency',
+                'VCF Info Field',
                 // das type
                 new DasType('vcfInfo', "", "", ""),
                 // das method TODO: pls find out what is actually means
