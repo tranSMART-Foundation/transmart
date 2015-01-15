@@ -30,20 +30,19 @@ class VcfInfoService  extends  VcfServiceAbstract {
     }
 
     private def getInfoAndFeature = { VcfValues val, String infoField ->
-        if (!val.maf || val.maf <= 0) {
+        def infoFieldValue = val.infoFields[infoField]
+        if (null == infoFieldValue) {
             return []
         }
 
         def linkMap = val.rsId == '.' ? [:]
                 : [(new URL("http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=${val.rsId}")): 'NCBI SNP Ref']
-        if (null == val.additionalInfo[infoField])
-            return []
 
         [new DasFeature(
                 // feature id - any unique id that represent this feature
-                "smaf-${val.position}",
+                "vcfInfo-${val.position}",
                 // feature label
-                'Minor Allele Frequency',
+                'VCF Info Field',
                 // das type
                 new DasType('vcfInfo', "", "", ""),
                 // das method TODO: pls find out what is actually means
@@ -53,7 +52,11 @@ class VcfInfoService  extends  VcfServiceAbstract {
                 // end pos
                 val.position.toInteger(),
                 // value - this is where we place the value from the info field
-                (val.infoFields[infoField]?:0) as double,
+                // This purposely fails if the value cannot be converted to double,
+                // in which case an error 500 will be returned.
+                //TODO: in dalliance-plugin, check if an infofield is supported
+                // before adding it based on meta info from vcf
+                infoFieldValue as double,
                 DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
                 DasPhase.PHASE_NOT_APPLICABLE,
                 //notes
