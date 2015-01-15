@@ -52,6 +52,10 @@ class VcfInfoService  extends  VcfServiceAbstract {
                 // end pos
                 val.position.toInteger(),
                 // value - this is where we place the value from the info field
+                // This purposely fails if the value cannot be converted to double,
+                // in which case an error 500 will be returned.
+                //TODO: in dalliance-plugin, check if an infofield is supported
+                // before adding it based on meta info from vcf
                 infoFieldValue as double,
                 DasFeatureOrientation.ORIENTATION_NOT_APPLICABLE,
                 DasPhase.PHASE_NOT_APPLICABLE,
