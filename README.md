@@ -11,32 +11,28 @@ functionality for obtaining an authentication token.
 
 The `protobuf` and its accompanying c implementation package need to be installed on the machine. 
 The Protocol Buffers must be at version 2.2.0 or newer and can be installed either via the distribution
-package manager,
+package manager.
 
 Ubuntu:
-```
-# apt-get install libprotobuf-dev protobuf-c-compiler
-```
 
-Redhat
-```
-# yum install protobuf-compiler protobuf protobuf-devel
-```
+    # apt-get install libprotobuf-dev protobuf-c-compiler
 
-Or install it from source with one of the packages available at https://code.google.com/p/protobuf/downloads/list
+Redhat:
+
+    # yum install protobuf-compiler protobuf protobuf-devel
+    
+Or install it from source with one of the packages available at [https://code.google.com/p/protobuf/downloads/list](https://code.google.com/p/protobuf/downloads/list).
 
 ### CUrl
 
-Windows users might need to install the `curl` package from http://curl.haxx.se.
+Windows users might need to install the `curl` package from [http://curl.haxx.se](http://curl.haxx.se).
 
 ## Installing transmartRClient
 
 The package can be installed directly from github using the `devtools` package:
 
-```{r}
-require(devtools)
-install_github('thehyve/RInterface')
-```
+    require(devtools)
+    install_github('thehyve/RInterface')
 
 or by following the instructions in `bin/installCommands.R`
 
@@ -49,6 +45,6 @@ to retrieve data from it.
 The `bin/devCommands.R` file contains some pointers that might be useful to anyone interested
 in developing on this package.
 
-In order to contribute a patch, follow the instructions given in https://guides.github.com/activities/contributing-to-open-source/#contributing
+In order to contribute a patch, follow the instructions given in [https://guides.github.com/activities/contributing-to-open-source/#contributing](https://guides.github.com/activities/contributing-to-open-source/#contributing)
 
 And: thanks for considering contributing!
