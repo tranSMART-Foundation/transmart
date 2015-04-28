@@ -52,7 +52,7 @@ print(observations$observations)
 
 # retrieve observations belonging to the first two concepts by using the api.links contained in the getConcepts-result
 observations <- getObservations(study, concept.links = concepts$api.link.self.href[c(1,2)])
-observations$observations[1:10,]
+observations$observations[1:10,] 
 
 
 # if a concept contains high dimensional data, use the following command to obtain this data. 
