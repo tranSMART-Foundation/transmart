@@ -55,10 +55,13 @@ observations <- getObservations(study, concept.links = concepts$api.link.self.hr
 observations$observations[1:10,]
 
 
-# if a concept contains high dimensional data, use the following command to obtain this data
+# if a concept contains high dimensional data, use the following command to obtain this data. 
+# NB: you will be told that one of the listed projections needs to be selected. For the full command, 
+# see next line below. 
 getHighdimData(study.name = study, concept.match = "Lung")
 
-# you will be told that one of the listed projections needs to be selected. The following will return the actual data.
+# As noted above, you will be told that one of the listed projections needs to be selected. 
+# The following will return the actual data, log transformed.
 dataDownloaded <- getHighdimData(study.name = "GSE8581", concept.match = "Lung", projection = "log_intensity")
 
 # getHighDimData returns a list containing two objects: 
