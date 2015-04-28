@@ -30,7 +30,7 @@ connectToTransmart("http://75.124.74.46:5880/transmart")
 studies <- getStudies()
 print(studies)
 
-study<-"GSE8581"
+study<-studies$id[1]
 
 # Retrieve Clinical Data
 allObservations <- getObservations(study, as.data.frame = T)
