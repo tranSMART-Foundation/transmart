@@ -33,7 +33,7 @@ install.packages(pkgs=c("RCurl", "RJSONIO", "RProtoBuf", "plyr", "hash", "reshap
 # issue
 
 # Now you can install the transmartRClient. First, point the following path to the location of your "transmartRClient"
-# directory, which is a sub-directory of where this installCommands.R file is located
+# directory, which is the parent directory of the directory where this installCommands.R file is located
 pathOfPackageSource <- "somePath/repository-location/RInterface"
 # The following command will install the package from its source files into your standard library
 install.packages(pathOfPackageSource, repos = NULL, type = "source")
