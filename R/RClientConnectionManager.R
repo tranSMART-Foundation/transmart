@@ -81,9 +81,10 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             "&redirect_uri=", transmartClientEnv$oauthDomain,
             "/oauth/verify")
 
+    oauthResponse <- NULL
     tryCatch(oauthResponse <- getURL(oauth.exchange.token.url, verbose = getOption("verbose")), 
             error = function(e) {
-                if (getOption("verbose")) { message(e, "\n", oauthresponse) }
+                if (getOption("verbose")) { message(e, "\n", oauthResponse) }
                 stop("Error with connection to verification server.") 
             })
 
