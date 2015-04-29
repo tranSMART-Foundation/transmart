@@ -29,7 +29,7 @@ and high dimensional data (to which the user is authorized to access).
   \code{\link{getSubjects}}\cr
   \code{\link{getConcepts}}\cr
   \code{\link{getObservations}}\cr
-  \code{\link{getHigdimData}}\cr
+  \code{\link{getHighdimData}}\cr
 }
 }
 
