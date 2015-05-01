@@ -2,16 +2,16 @@ package tests
 import geb.junit4.GebReportingTest
 
 import org.junit.Test
-
 import pages.Constants
+import pages.LoginPage
 import pages.DatasetExplorerPage
 
-class DatasetExplorerPageTests extends GebReportingTest {
+class DatasetExplorerPageTests extends CheckLoginPageAbstract {
 
 	@Test
-	void simpleLandingTest() {
-		// The first hit in the session always lands on the landingPage
-		via (DatasetExplorerPage)
-		assert at(Constants.LANDING_PAGE.class)
+	void datasetExplorerTargetTest() {
+        goToPageMaybeLogin(DatasetExplorerPage)
+		assert at(DatasetExplorerPage)
 	}
+
 }

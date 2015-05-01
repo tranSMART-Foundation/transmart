@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.contains
 
 class DatasetExplorerPage extends Page {
 
-    public static final String NAV_TAB_NAME = 'Dataset Explorer'
+    public static final String NAV_TAB_NAME = 'Analyze'
 
     static url = 'datasetExplorer/index'
 

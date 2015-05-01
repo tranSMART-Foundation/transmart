@@ -8,39 +8,9 @@ import geb.junit4.GebReportingTest
 import junit.framework.AssertionFailedError
 import pages.Constants
 import pages.LoginPage
+import tests.CheckLoginPageAbstract
 
-abstract class HeatmapSupportAbstract extends GebReportingTest {
-	
-	def params = []
-	
-	void login(Class<? extends Page> redirectionPage) {
-		usernameField.value Constants.GOOD_USERNAME
-		passwordField.value Constants.GOOD_PASSWORD
-
-		loginButtonNoTo.click()
-
-		at(redirectionPage)
-	}
-
-	void goToPageMaybeLogin(Class<? extends Page> page, boolean firstCall = true) {
-		via page
-
-		if (isAt(page)) {
-			return
-		} else if (isAt(LoginPage)) {
-			login(page)
-		} else if (isAt(Constants.LANDING_PAGE.class)) {
-			if (!firstCall) {
-				throw new AssertionFailedError('Redirection loop')
-			}
-			/* if auto-login is on, we're unfortunately forwarded here */
-			println "Autologin: landing page = " + Constants.LANDING_PAGE
-			goToPageMaybeLogin(page, false)
-		} else {
-			throw new AssertionFailedError(
-					"Expected to be at either the LoginPage, $Constants.LANDING_PAGE or $page")
-		}
-	}
+abstract class HeatmapSupportAbstract extends CheckLoginPageAbstract {
 
 	private void setUpAnalysis(Map in_params) {
 		params = in_params

@@ -4,9 +4,9 @@ import geb.Page
 import pages.modules.NavigationBarModule
 
 class SearchPage extends Page {
-    public static final String SEARCH_NAV_TAB_NAME = 'Search'
+    public static final String SEARCH_NAV_TAB_NAME = 'Browse'
 
-    static url = 'search/index'
+    static url = 'datasetExplorer'
 
     static at = {
 		navigationBarSearch.currentNavTab == SEARCH_NAV_TAB_NAME

@@ -7,10 +7,10 @@ import org.openqa.selenium.Dimension
  */
 
 // The tranSMART Foundation CI testing site
-baseUrl = 'http://75.124.74.46/transmart/'
+// baseUrl = 'http://75.124.74.46/transmart/'
 
 // for local testing
-// baseUrl = 'http://localhost:8080/transmart/'
+baseUrl = 'http://localhost:8080/transmart/'
 
 def instantiateDriver(String className) {
     def driverInstance = Class.forName(className).newInstance()

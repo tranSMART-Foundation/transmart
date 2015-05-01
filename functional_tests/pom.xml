@@ -10,8 +10,8 @@
 	<url>https://github.com/thehyve/transmart-test</url>
 
 	<properties>
-		<gebVersion>0.9.2</gebVersion>
-		<seleniumVersion>2.40.0</seleniumVersion>
+		<gebVersion>0.10.0</gebVersion>
+		<seleniumVersion>2.45.0</seleniumVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<browser.name>unknown</browser.name><!-- replaced in profiles -->
@@ -21,7 +21,7 @@
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
-			<version>2.2.1</version>
+			<version>2.4.3</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
