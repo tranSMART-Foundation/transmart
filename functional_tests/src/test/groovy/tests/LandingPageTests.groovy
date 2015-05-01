@@ -6,15 +6,14 @@ import geb.junit4.GebReportingTest
 import org.junit.Test
 
 import pages.Constants
-import pages.SearchPage
+import pages.BrowsePage
 
-class LandingPageTests extends GebReportingTest {
+class LandingPageTests extends CheckLoginPageAbstract {
 	
 	@Test
 	void simpleLandingTest()
 	{
-		// The first hit in the session always lands on the landingPage
-		via (SearchPage)
+		goToPageMaybeLogin(BrowsePage)
 		assert at(Constants.LANDING_PAGE.class)
 	}
 
