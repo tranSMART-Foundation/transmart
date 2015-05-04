@@ -1,6 +1,6 @@
 # TranSMART R client package
 
-This package enables R programmers to access to a tranSMART installation via its RESTful API. 
+This package enables R programmers to access to a tranSMART installation via its [RESTful API](https://github.com/thehyve/transmart-rest-api).
 Usually this involves authentication with the tranSMART installation. The package has built-in
 functionality for obtaining an authentication token.
 # Installation
