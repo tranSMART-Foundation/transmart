@@ -270,6 +270,8 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+    <!-- use 'mvn surefire-report:report -Pfirefox' to generate report below (as html)
+         must be preceded (only once for new target dir) 'mvn site' -->
     <reporting>
         <plugins>
             <plugin>
