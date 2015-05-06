@@ -90,7 +90,6 @@ class SurvivalAnalysisTests extends CheckLoginPageAbstract{
     }
 
 	// this one is failing and needs to be fixed
-	@Ignore
 	@Test
 	void testClinicalVariable() {
 		String sexKey     = "${Constants.GSE8581_KEY}Subjects\\Sex\\"
