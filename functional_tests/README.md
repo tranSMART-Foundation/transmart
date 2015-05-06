@@ -8,3 +8,11 @@ To run the tests:
 
 To run "headless" one can use the non-graphics x-windows 'displays'. 
 For example see runtest.sh in this directory.
+
+For basic tests:  mvn test -Pfirefox
+To run one test, for example:  mvn test -Pfirefox -Dtest=SurvivalAnalysisTests
+To run tests and put results in (html) web site:
+  prelim (only once for new target folder): mvn site
+  then: mvn surefire-report:report -Pfirefox
+  or, for one test: mvn surefire-report:report -Pfirefox -Dtest=SurvivalAnalysisTests
+
