@@ -5,8 +5,8 @@ import org.junit.Ignore
 import org.junit.Test
 
 import pages.Constants
-import pages.LoginFailedPage
 import pages.LoginPage
+import pages.LoginFailedPage
 
 class LoginTests extends GebReportingTest {
 

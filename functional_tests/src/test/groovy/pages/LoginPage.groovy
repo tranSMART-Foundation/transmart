@@ -1,7 +1,6 @@
 package pages
 
 import geb.Page
-import pages.modules.NavigationBarModule
 
 class LoginPage extends Page {
 
@@ -21,10 +20,4 @@ class LoginPage extends Page {
     }
 }
 
-class LoginFailedPage extends LoginPage {
-    static at = {
-        topMessage == 'Please login...' &&
-                errorMessage.contains('Login has failed')
-    }
-}
 
