@@ -7,9 +7,9 @@ To run the tests:
   [downloaded first](http://chromedriver.storage.googleapis.com/index.html).
 - To run one test, for example:  mvn test -Pfirefox -Dtest=SurvivalAnalysisTests
 - To run tests and put results (as html) into a local web site:
-- - prelim (only once for new target folder): mvn site
-- - then: mvn surefire-report:report -Pfirefox
-- - or, for one test: mvn surefire-report:report -Pfirefox -Dtest=SurvivalAnalysisTests
+  - prelim (only once for new target folder): mvn site
+  - then: mvn surefire-report:report -Pfirefox
+  - or, for one test: mvn surefire-report:report -Pfirefox -Dtest=SurvivalAnalysisTests
 
 To run "headless" one can use the non-graphics x-windows 'displays'. 
 For example see runtest.sh in this directory.
