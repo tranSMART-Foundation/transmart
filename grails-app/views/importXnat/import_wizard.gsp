@@ -10,7 +10,7 @@
 			$(document).ready(function() {
 			  $("#import_wizard_form").submit(function(event) {
 			    $(".message").remove();
-			    $("#import_info").html("<br /><img src=\"/transmart/static/images/ajax-loader.gif\" />&nbsp;&nbsp;<p style=\"background-color:#FEC0C0; font-size:15px; display:inline; border-style:solid; border-color:FD4F4F; border-width:2px;\">The data is now imported in XNAT. This can take a few seconds to minutes, depending on the size of the dataset. Please wait until this message is updated.</p><br />");
+			    $("#import_info").html("<br /><img src=\"/transmart/static/images/ajax-loader.gif\" />&nbsp;&nbsp;<p style=\"background-color:#FEC0C0; font-size:15px; display:inline; border-style:solid; border-color:FD4F4F; border-width:2px;\">The data is now imported from XNAT. This can take a few seconds to minutes, depending on the size of the dataset. Please wait until this message is updated.</p><br />");
 			  })
 			});
 		</script>
