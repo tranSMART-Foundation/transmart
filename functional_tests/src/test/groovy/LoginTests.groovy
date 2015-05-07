@@ -40,9 +40,15 @@ class LoginTests extends GebReportingTest {
         usernameField.value Constants.BAD_USERNAME+(Math.abs(new Random().nextInt() % 9999) + 1)
         passwordField.value Constants.BAD_PASSWORD
 
-        loginButton.click()
+        loginButtonFailed.click()
 
         assert at(LoginFailedPage)
+
+        assert topMessage == 'Please login...' : "unexpected login prompt"
+        assert errorMessage.contains('Login has failed') ||
+               errorMessage.contains('Your account has been locked') :
+                       "unexpected login error message"
+        
     }
 
     @Test
@@ -63,7 +69,7 @@ class LoginTests extends GebReportingTest {
 
         usernameField.value Constants.GOOD_USERNAME
         passwordField.value Constants.GOOD_PASSWORD
-        loginButton.click()
+        loginButtonLanding.click()
 
         assert at(Constants.LANDING_PAGE.class)
     }
