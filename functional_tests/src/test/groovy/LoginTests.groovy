@@ -40,7 +40,7 @@ class LoginTests extends GebReportingTest {
         usernameField.value Constants.BAD_USERNAME+(Math.abs(new Random().nextInt() % 9999) + 1)
         passwordField.value Constants.BAD_PASSWORD
 
-        loginButton.click()
+        loginButtonFailed.click()
 
         assert at(LoginFailedPage)
     }
@@ -63,7 +63,7 @@ class LoginTests extends GebReportingTest {
 
         usernameField.value Constants.GOOD_USERNAME
         passwordField.value Constants.GOOD_PASSWORD
-        loginButton.click()
+        loginButtonLanding.click()
 
         assert at(Constants.LANDING_PAGE.class)
     }
