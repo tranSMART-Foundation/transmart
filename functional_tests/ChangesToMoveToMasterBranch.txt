@@ -1,0 +1,4 @@
+Move 'class Constants' from stand-alone location (pages/Constants.groovy) 
+  to (insert into) test/resources/GebConfig.groovy - tested, works
+Remove pages/SearchPgeOld
+Move src/test/groovy/*Tests to src/test/groovy/tests/
