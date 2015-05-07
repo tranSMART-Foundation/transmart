@@ -42,30 +42,11 @@ class SurvivalAnalysisTests extends CheckLoginPageAbstract{
 		}
 
 		if (params.searchKeyword) {
-			categoryHighDimButton.click()
-
-			waitFor { highDimPopup.dialog }
-
-			//filling the form fields is not instantaneous:
-			waitFor(1) { highDimPopup.tissue }
-
-			if (params.expectedMarkerType) {
-				assertThat highDimPopup.markerType, is(params.expectedMarkerType)
-			}
-			if (params.expectedPlatform) {
-				assertThat highDimPopup.gplPlatform, is(params.expectedPlatform)
-			}
-			if (params.expectedSample) {
-				assertThat highDimPopup.sample, is(params.expectedSample)
-			}
-			if (params.expectedTissue) {
-				assertThat highDimPopup.tissue, is(params.expectedTissue)
-			}
-
-			highDimPopup.searchBox.value params.searchKeyword
-			highDimPopup.selectSearchItem params.searchKeyword
-			highDimPopup.applyButton.click()
-		}
+            // there are some problems with timing, so wait
+            // at least long enough for 2 tries
+            waitFor (15, message: "SurvivalAnalysis - HighDimensional case - pathway/gene selection timed out")
+                    {setSearchTarget(params)}
+        }
 
 		if (params.binningParams) {
 			binning.enableBinning()
@@ -89,9 +70,44 @@ class SurvivalAnalysisTests extends CheckLoginPageAbstract{
         waitFor(8, message: "SurvivalAnalysis RunButton.click() - timed out") { resultOutput } // wait up to 8 seconds for result
     }
 
-    //TODO: tests with Ignore need to be fixed
+    def setSearchTarget(params) {
+        categoryHighDimButton.click()
 
-    @Ignore
+        waitFor { highDimPopup.dialog }
+
+        //filling the form fields is not instantaneous:
+        waitFor(1) { highDimPopup.tissue }
+
+        if (params.expectedMarkerType) {
+            assertThat highDimPopup.markerType, is(params.expectedMarkerType)
+        }
+        if (params.expectedPlatform) {
+            assertThat highDimPopup.gplPlatform, is(params.expectedPlatform)
+        }
+        if (params.expectedSample) {
+            assertThat highDimPopup.sample, is(params.expectedSample)
+        }
+        if (params.expectedTissue) {
+            assertThat highDimPopup.tissue, is(params.expectedTissue)
+        }
+
+        def searchTarget = params.searchKeyword
+
+        highDimPopup.searchBox << searchTarget
+
+        // preload
+        waitFor(10) { highDimPopup.anySearchItem }
+
+        highDimPopup.selectSearchItem searchTarget
+        highDimPopup.applyButton.click()
+
+        def probe = $('div#displaydivCategoryVariable').text()
+        println("contains: " + probe.contains(searchTarget))
+
+        probe.contains(searchTarget)
+
+    }
+
     @Test
 	void testClinicalVariable() {
 		String sexKey     = "${Constants.GSE8581_KEY}Subjects\\Sex\\"
@@ -134,7 +150,6 @@ class SurvivalAnalysisTests extends CheckLoginPageAbstract{
 				fittingSummaryData))
 	}
 
-    @Ignore
     @Test
 	void testMrnaCategoryEvenlySpaced() {
 		String sexKey     = "${Constants.GSE8581_KEY}Subjects\\Sex\\"
@@ -154,7 +169,7 @@ class SurvivalAnalysisTests extends CheckLoginPageAbstract{
 		def params = [
 			subsetNode:              Constants.GSE8581_KEY,
 			timeVariable:            "${Constants.GSE8581_KEY}Subjects\\Age\\",
-			categoryVariableDragged: "${Constants.GSE8581_KEY}MRNA\\Biomarker Data\\Affymetrix Human Genome U133A 2.0 Array\\Lung\\",
+            categoryVariableDragged: "${Constants.GSE8581_KEY}MRNA\\Biomarker Data\\GPL570\\Lung\\",
 			searchKeyword:           'TP53',
 			*:                       highDimExpectations,
 			binningParams:           binningParams,
