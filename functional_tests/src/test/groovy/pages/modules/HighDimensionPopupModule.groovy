@@ -22,6 +22,8 @@ class HighDimensionPopupModule extends Module {
 
         applyButton { $('#dataAssociationApplyButton button') }
 
+        anySearchItem { $('div.search-item') }
+
         searchKeywords(wait: true) {
             // elements are not removed from the DOM after the search is closed ??
             // create list of visible elements (x == 0 -> not visible)??
