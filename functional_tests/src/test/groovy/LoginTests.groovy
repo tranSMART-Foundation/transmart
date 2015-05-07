@@ -35,9 +35,11 @@ class LoginTests extends GebReportingTest {
         }
         
         /* Trying login page with bad credentials */
+        /* add a random number to avoid being locked out by repeated failures */
 
-        usernameField.value Constants.BAD_USERNAME
+        usernameField.value Constants.BAD_USERNAME+(Math.abs(new Random().nextInt() % 9999) + 1)
         passwordField.value Constants.BAD_PASSWORD
+
         loginButton.click()
 
         assert at(LoginFailedPage)
