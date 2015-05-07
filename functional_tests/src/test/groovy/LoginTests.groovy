@@ -43,6 +43,12 @@ class LoginTests extends GebReportingTest {
         loginButtonFailed.click()
 
         assert at(LoginFailedPage)
+
+        assert topMessage == 'Please login...' : "unexpected login prompt"
+        assert errorMessage.contains('Login has failed') ||
+               errorMessage.contains('Your account has been locked') :
+                       "unexpected login error message"
+        
     }
 
     @Test
