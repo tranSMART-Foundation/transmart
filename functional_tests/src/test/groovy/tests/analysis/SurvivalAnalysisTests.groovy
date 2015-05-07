@@ -89,8 +89,10 @@ class SurvivalAnalysisTests extends CheckLoginPageAbstract{
         waitFor(8, message: "SurvivalAnalysis RunButton.click() - timed out") { resultOutput } // wait up to 8 seconds for result
     }
 
-	// this one appears to be working (although I made no changes)
-	@Test
+    //TODO: tests with Ignore need to be fixed
+
+    @Ignore
+    @Test
 	void testClinicalVariable() {
 		String sexKey     = "${Constants.GSE8581_KEY}Subjects\\Sex\\"
 		def params = [
@@ -132,7 +134,6 @@ class SurvivalAnalysisTests extends CheckLoginPageAbstract{
 				fittingSummaryData))
 	}
 
-    // this one is still failing and needs to be fixed; timing problems, I believe
     @Ignore
     @Test
 	void testMrnaCategoryEvenlySpaced() {
