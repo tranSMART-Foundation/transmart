@@ -13,7 +13,7 @@ import pages.modules.CommonHeaderModule
 
 class LoginTests extends GebReportingTest {
 
-    def util = new LandingPageLogin()
+    def util = new Utilities()
 
     @Test
     void testFailedLogin() {
