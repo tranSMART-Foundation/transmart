@@ -1,9 +1,13 @@
 package tests
 
 import org.junit.Test
+import org.openqa.selenium.WebElement
 import pages.Constants
 import pages.DatasetExplorerPage
 import pages.analyses.SurvivalAnalysisPage
+
+import java.util.regex.Pattern
+import java.util.regex.Matcher
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.MatcherAssert.assertThat
@@ -58,10 +62,10 @@ class ScrapTests extends CheckLoginPageAbstract {
 
         dragNodeToBox params.categoryVariableDragged, categoryBox
 
-        waitFor(30) {setTP53()}
+        waitFor (15) {setGeneTarget(params.searchKeyword)}
     }
 
-    def setTP53() {
+    def setGeneTarget(geneTarget) {
         categoryHighDimButton.click()
 
         waitFor { highDimPopup.dialog }
@@ -82,13 +86,16 @@ class ScrapTests extends CheckLoginPageAbstract {
             assertThat highDimPopup.tissue, is(params.expectedTissue)
         }
 
-        highDimPopup.searchBox.value 'TP53'
-        highDimPopup.selectSearchItem 'TP53'
+        highDimPopup.searchBox << geneTarget
+        // preload
+        waitFor(10) { highDimPopup.anySearchItem }
+        highDimPopup.selectSearchItem geneTarget
         highDimPopup.applyButton.click()
 
-        println($('div#displaydivCategoryVariable.independentVariables').$('b',text: 'Pathway:'))
+        def probe = $('div#displaydivCategoryVariable').text()
+        println("contains: " + probe.contains(geneTarget))
 
-        assertThat " TP53", is($('div.displaydivCategoryVariable').$('b',text: 'Pathway:').next())
+        probe.contains(geneTarget)
 
     }
 }
