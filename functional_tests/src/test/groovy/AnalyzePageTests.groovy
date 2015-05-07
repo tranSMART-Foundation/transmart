@@ -16,13 +16,13 @@ import pages.AnalyzeResultsPage
 
 
 class AnalyzePageTests extends GebReportingTest {
-	
-    Utilities util
+
+    def util = new Utilities()
 
     @Test
     void AnalyzeTab() {
 
-        lpl.goToPageMaybeLogin(AnalyzePage)
+        util.goToPageMaybeLogin(AnalyzePage)
 
         assert at(AnalyzePage)
     }
@@ -30,7 +30,7 @@ class AnalyzePageTests extends GebReportingTest {
     @Test
     void AnalyzeTabActiveFiltersPanel() {
 
-        lpl.goToPageMaybeLogin(AnalyzePage)
+        util.goToPageMaybeLogin(AnalyzePage)
 
         assert at(AnalyzePage)        
     }

@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.*
 import geb.junit4.GebReportingTest
 
 import org.junit.Test
+import org.junit.Ignore
 
 import pages.modules.CommonHeaderModule
 
@@ -16,6 +17,8 @@ import pages.BrowseResultsPage
 
 class BrowsePageTests extends GebReportingTest {
 
+    //TODO: tests with Ignore need to be fixed
+
     def util = new Utilities()
 
     @Test
@@ -27,6 +30,8 @@ class BrowsePageTests extends GebReportingTest {
 
     }
 
+    // perhaps this test should be moved to a new Test file: UtilityTabTests ??
+    @Ignore
     @Test
     void BrowseTabUtilities() {
 
