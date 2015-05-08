@@ -7,7 +7,7 @@ public class BoxPlotWithANOVATests extends CheckLoginPageAbstract{
 
     @Test
     void dummyTest() {
-        assert(true);
+        assert(false);
     }
 
 }
