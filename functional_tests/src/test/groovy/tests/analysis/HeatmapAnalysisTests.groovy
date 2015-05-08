@@ -1,4 +1,4 @@
-package tests.analysis;
+package tests.analysis
 
 import static matchers.TableMatcher.table
 import static org.hamcrest.MatcherAssert.assertThat
@@ -9,6 +9,7 @@ import junit.framework.AssertionFailedError
 
 import org.junit.Ignore
 import org.junit.Test
+import org.junit.Before
 
 import pages.Constants
 import pages.DatasetExplorerPage
@@ -35,10 +36,10 @@ public class HeatmapAnalysisTests extends HeatmapSupportAbstract {
 		*:                       highDimExpectations
 	]
 
+
     //TODO: tests with Ignore need to be fixed
 
-    @Ignore
-	@Test
+    @Before
 	void testSetup() {
 		super.setUpAnalysis(params)
 		super.confirmLandingPage()
@@ -48,7 +49,6 @@ public class HeatmapAnalysisTests extends HeatmapSupportAbstract {
 	@Ignore
 	@Test
 	void testClinicalVariable() {
-		super.setUpAnalysis(params)
 		super.getHighDimPopup()
 		super.confirmHighDimPopup()
 		super.runHighDimPopup()
@@ -67,9 +67,16 @@ public class HeatmapAnalysisTests extends HeatmapSupportAbstract {
 		super.getHighDimPopup()
 		super.runHighDimPopup()
 
-		println("Starting analysis run. . .")
+
+		println("Heatmap: Starting analysis run. . .")
+		def startTime = System.currentTimeMillis()
 		super.runAnalysis()
-		println("After analysis run: confirm results")
+		def endTime = System.currentTimeMillis()
+		def deltaTime = endTime - startTime
+		def minutes = Math.floor(deltaTime/(1000 * 60))
+		def seconds = Math.round((deltaTime - (minutes * 1000 *60))/1000)
+		ptintln("Heatmap: analysis ran for " + minutes + " minutes and " + seconds + " seconds")
+		println("Heatmap: After analysis run: confirm results")
 		super.confirmAnalysisResults()
 	}
 	
