@@ -8,7 +8,7 @@ import junit.framework.AssertionFailedError
 import org.junit.Test
 import org.junit.Ignore
 
-import pages.Constants
+import functions.Utilities
 import pages.DatasetExplorerPage
 import pages.analyses.CoxRegressionResult
 import pages.analyses.SurvivalAnalysisPage
