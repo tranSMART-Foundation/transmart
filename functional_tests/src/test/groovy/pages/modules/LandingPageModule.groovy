@@ -3,7 +3,8 @@ package pages.modules
 import geb.Module
 import geb.Page
 
-import pages.Constants
+import functions.Constants
+
 import pages.LoginPage
 
 /**

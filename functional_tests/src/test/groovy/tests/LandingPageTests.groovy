@@ -8,8 +8,8 @@ import org.junit.Test
 import pages.modules.CommonHeaderModule
 
 import functions.Utilities
+import functions.Constants
 
-import pages.Constants
 import pages.LoginPage
 import pages.BrowsePage
 import pages.AnalyzePage

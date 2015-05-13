@@ -6,13 +6,11 @@ import junit.framework.AssertionFailedError
 import geb.Module
 import geb.Page
 
+import functions.Constants
 
-import pages.Constants
 import pages.LoginPage
 
 import pages.modules.CommonHeaderModule
-
-import pages.LoginPage
 
 /**
  * Created by price on 19-12-2014.

@@ -2,7 +2,9 @@ package tests
 
 import org.junit.Test
 import org.openqa.selenium.WebElement
-import pages.Constants
+
+import functions.Constants
+
 import pages.DatasetExplorerPage
 import pages.analyses.SurvivalAnalysisPage
 

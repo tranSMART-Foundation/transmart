@@ -4,7 +4,8 @@ import org.junit.Test
 
 import functions.Utilities
 
-import pages.Constants
+import functions.Constants
+
 import pages.LoginFailedPage
 import pages.LoginPage
 import pages.BrowsePage

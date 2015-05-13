@@ -2,6 +2,8 @@ package pages
 
 import geb.Page
 
+import functions.Constants
+
 class LoginPage extends Page {
 
     static url = 'login/forceAuth'

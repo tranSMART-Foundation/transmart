@@ -2,6 +2,7 @@ package pages
 
 import geb.Page
 import geb.waiting.WaitTimeoutException
+
 import pages.modules.NavigationBarModule
 
 import static org.hamcrest.MatcherAssert.assertThat

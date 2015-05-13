@@ -10,7 +10,8 @@ import pages.modules.CommonHeaderModule
 
 import functions.Utilities
 
-import pages.Constants
+import functions.Constants
+
 import pages.LoginPage
 import pages.BrowsePage
 import pages.BrowseResultsPage
