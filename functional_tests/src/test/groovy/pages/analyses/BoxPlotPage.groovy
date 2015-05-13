@@ -18,7 +18,7 @@ class BoxPlotPage extends DatasetExplorerPage {
         }
 
         independentVariableBox { $('div#divIndependentVariable') }
-        dependentVariableBox { $('div#divDependentVariable') }
+        categoryBox { $('div#divDependentVariable') }  // dependentVariableBox
 
         runButton { $('input.runAnalysisBtn') }
 
