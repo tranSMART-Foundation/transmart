@@ -11,7 +11,8 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.Before
 
-import pages.Constants
+import functions.Constants
+
 import pages.DatasetExplorerPage
 import pages.LoginPage
 import pages.analyses.HeatmapAnalysisPage

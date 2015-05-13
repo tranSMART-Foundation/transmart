@@ -5,8 +5,11 @@ import static org.hamcrest.Matchers.*
 
 import geb.Page
 import geb.junit4.GebReportingTest
+
 import junit.framework.AssertionFailedError
-import pages.Constants
+
+import functions.Constants
+
 import pages.LoginPage
 import tests.CheckLoginPageAbstract
 

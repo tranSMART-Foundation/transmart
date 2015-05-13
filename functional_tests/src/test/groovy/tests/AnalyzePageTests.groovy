@@ -9,11 +9,11 @@ import pages.modules.CommonHeaderModule
 
 import functions.Utilities
 
-import pages.Constants
+import functions.Constants
+
 import pages.LoginPage
 import pages.AnalyzePage
 import pages.AnalyzeResultsPage
-
 
 class AnalyzePageTests extends GebReportingTest {
 

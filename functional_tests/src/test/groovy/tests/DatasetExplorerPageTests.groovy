@@ -2,7 +2,9 @@ package tests
 import geb.junit4.GebReportingTest
 
 import org.junit.Test
-import pages.Constants
+
+import functions.Constants
+
 import pages.LoginPage
 import pages.DatasetExplorerPage
 
