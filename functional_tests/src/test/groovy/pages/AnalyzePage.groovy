@@ -23,8 +23,49 @@ class AnalyzePage extends Page {
 
     static content = {
         analyze(wait: true) { $() }
+
+        navigationBar { module NavigationBarModule }
+        nodePlus(wait: true) { contextKey ->
+            /* couldn't get it to work without jquery */
+            $("div[ext\\:tree-node-id]").find {
+                it.jquery.attr('ext:tree-node-id') == contextKey
+            }.children('img')[0]
+        }
+        nodeText(wait: true) { contextKey ->
+            $("div[ext\\:tree-node-id] a").find {
+                it.parent().jquery.attr('ext:tree-node-id') == contextKey
+            }[0]
+        }
+        subsetBox(wait: true) { int subset, int box ->
+            $("div#queryCriteriaDiv${subset}_${box}")
+        }
+        boxConcepts (wait: true) { box ->
+            box.children('div').collect {
+                it.attr('conceptid')
+            }
+        }
+        tabSeparator { String text ->
+            $('span.x-tab-strip-text').find {
+                it.text() == text
+            }
+        }
+        extButton { String text ->
+            $('button.x-btn-text').find {
+                it.text() == text
+            }
+        }
+        menuItem { String text ->
+            $('a.x-menu-item').find {
+                it.text().trim() == text
+            }
+        }
+        selectedAnalysis {
+            $('span#selectedAnalysis')?.text()
+        }
+        analysisImages {
+            $('#analysisOutput img')
+        }
     }
-    
 
     Navigator currentHeaderTab () { currentHeader().find('th', class: 'menuVisited') }
     Navigator headerTab () { currentHeader().find('table#menuLinks') }

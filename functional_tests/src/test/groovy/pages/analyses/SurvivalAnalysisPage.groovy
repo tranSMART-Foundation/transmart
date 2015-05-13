@@ -2,18 +2,18 @@ package pages.analyses
 
 import com.google.common.collect.*
 import geb.navigator.Navigator
-import pages.DatasetExplorerPage
+import pages.AnalyzePage
 import pages.modules.BinningModule
 import pages.modules.HighDimensionPopupModule
 
-class SurvivalAnalysisPage extends DatasetExplorerPage {
+class SurvivalAnalysisPage extends AnalyzePage {
 
     static at = {
         selectedAnalysis == 'Survival Analysis'
     }
 
     static content = {
-        def parentContent = DatasetExplorerPage.content
+        def parentContent = AnalyzePage.content
         parentContent.delegate = delegate
         parentContent.call()
 

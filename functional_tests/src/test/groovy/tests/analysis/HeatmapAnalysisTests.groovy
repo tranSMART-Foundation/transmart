@@ -13,7 +13,7 @@ import org.junit.Before
 
 import functions.Constants
 
-import pages.DatasetExplorerPage
+import pages.AnalyzePage
 import pages.LoginPage
 import pages.analyses.HeatmapAnalysisPage
 
@@ -27,7 +27,7 @@ public class HeatmapAnalysisTests extends HeatmapSupportAbstract {
 	]
 	
 	def params = [
-		basePageClass:       DatasetExplorerPage.class,
+		basePageClass:       AnalyzePage.class,
 		modelPageClass:      HeatmapAnalysisPage.class,
 		subsetNode:          Constants.GSE8581_KEY,
 		biomarkerNode:       "${Constants.GSE8581_KEY}MRNA\\Biomarker Data\\Affymetrix Human Genome U133A 2.0 Array\\Lung\\",
