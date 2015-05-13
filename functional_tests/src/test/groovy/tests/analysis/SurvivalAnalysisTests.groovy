@@ -10,7 +10,7 @@ import org.junit.Ignore
 
 import functions.Constants
 
-import pages.DatasetExplorerPage
+import pages.AnalyzePage
 import pages.analyses.CoxRegressionResult
 import pages.analyses.SurvivalAnalysisPage
 import pages.analyses.SurvivalAnalysisSummary
@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.*
 class SurvivalAnalysisTests extends CheckLoginPageAbstract{
 
     private void runAnalysis(Map params) {
-        goToPageMaybeLogin DatasetExplorerPage
+        goToPageMaybeLogin AnalyzePage
 
         dragNodeToSubset params.subsetNode, 1, 1
 

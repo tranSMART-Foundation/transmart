@@ -5,7 +5,7 @@ import org.openqa.selenium.WebElement
 
 import functions.Constants
 
-import pages.DatasetExplorerPage
+import pages.AnalyzePage
 import pages.analyses.SurvivalAnalysisPage
 
 import java.util.regex.Pattern
@@ -50,7 +50,7 @@ class ScrapTests extends CheckLoginPageAbstract {
         ]
 
 
-        goToPageMaybeLogin DatasetExplorerPage
+        goToPageMaybeLogin AnalyzePage
 
         dragNodeToSubset params.subsetNode, 1, 1
 

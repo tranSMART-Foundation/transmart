@@ -2,18 +2,18 @@ package pages.analyses
 
 import com.google.common.collect.*
 import geb.navigator.Navigator
-import pages.DatasetExplorerPage
+import pages.AnalyzePage
 import pages.modules.BinningModule
 import pages.modules.HighDimensionPopupModule
 
-class HeatmapAnalysisPage extends DatasetExplorerPage {
+class HeatmapAnalysisPage extends AnalyzePage {
 	
     static at = {
         selectedAnalysis == 'Heatmap'
     }
 
     static content = {
-        def parentContent = DatasetExplorerPage.content
+        def parentContent = AnalyzePage.content
         parentContent.delegate = delegate
         parentContent.call()
 
