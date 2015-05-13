@@ -4,7 +4,7 @@ import org.junit.Test
 
 import functions.Constants
 
-import pages.DatasetExplorerPage
+import pages.AnalyzePage
 import pages.analyses.BoxPlotPage
 
 import tests.CheckLoginPageAbstract
@@ -27,7 +27,11 @@ public class BoxPlotWithANOVATests extends CheckLoginPageAbstract{
     }
 
     private void verifyPage() {
-        assert(true)
+        def resultHeaders = ["Box Plot", "ANOVA Result", "Pairwise t-Test p-Values"]
+        resultHeaders.each {
+            assert analysisHeaders(it)
+        }
+
     }
 
     private void runAnalysis(Map params) {
@@ -42,7 +46,7 @@ public class BoxPlotWithANOVATests extends CheckLoginPageAbstract{
     }
 
     private setUpAnalysisSubPage(String analysisHeader, Map params) {
-        goToPageMaybeLogin DatasetExplorerPage
+        goToPageMaybeLogin AnalyzePage
 
         dragNodeToSubset params.subsetNode, 1, 1
 

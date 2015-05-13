@@ -1,15 +1,15 @@
 package pages.analyses
 
-import pages.DatasetExplorerPage
+import pages.AnalyzePage
 
-class BoxPlotPage extends DatasetExplorerPage {
+class BoxPlotPage extends AnalyzePage {
 
     static at = {
         selectedAnalysis == 'Box Plot with ANOVA'
     }
 
     static content = {
-        def parentContent = DatasetExplorerPage.content
+        def parentContent = AnalyzePage.content
         parentContent.delegate = delegate
         parentContent.call()
 
@@ -25,7 +25,7 @@ class BoxPlotPage extends DatasetExplorerPage {
         resultOutput { $('#analysisOutput form') }
 
         analysisHeaders { text ->
-            $('span.AnalysisHeader').findAll {
+            $('span.AnalysisHeader').any {
                 it.text() == text
             }
         }
