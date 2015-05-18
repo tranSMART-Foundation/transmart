@@ -62,7 +62,7 @@ allObservations <- getObservations(study, as.data.frame = T)
 summary(allObservations)
 print(allObservations[[1]][1:12,1:7]) #hint: if you are using RStudio you can also use the function "View" to see the data in a more user-friendly table, e.g.: View(allObservations[[1]])
 print(allObservations[[2]][1:12,])
-print(allObservations[[3]][1:12,])
+print(allObservations[[3]][1:10,])
 
 # retrieve information about the concepts that are present for this study
 concepts <- getConcepts(study)
@@ -119,8 +119,13 @@ probeNames<- paste("X", probeNames, sep = "") #note: R automatically prepends "X
 
 # select only the cases and controls (excluding the patients for which the lung disease is not specified). Note: in the observation table the database IDs 
 # are used to identify the patients and not the patient IDs that are used in the gene expression dataset
-cases <- allObservations$observations$subject.id[!is.na(allObservations$observations$'Subjects_Lung Disease_chronic obstructive pulmonary disease')]
-controls <- allObservations$observations$subject.id[!is.na(allObservations$observations$'Subjects_Lung Disease_control')]
+cases <- allObservations$observations$subject.id[ allObservations$observations$'Subjects_Lung Disease' == "chronic obstructive pulmonary disease"]
+controls <- allObservations$observations$subject.id[allObservations$observations$'Subjects_Lung Disease' == "control"]
+
+# if you are using the Transmart Foundation's instance, you might need to run the following instead:
+  #cases <- allObservations$observations$subject.id[!is.na(allObservations$observations$'Subjects_Lung Disease_chronic obstructive pulmonary disease')]
+  #controls <- allObservations$observations$subject.id[!is.na(allObservations$observations$'Subjects_Lung Disease_control')]
+
 
 # now we have the database IDs for the patients, but we need to get the patient IDs. These can be retrieved from the subjectInfo table: 
 subjectInfo <- allObservations$subjectInfo
