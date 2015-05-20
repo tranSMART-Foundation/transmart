@@ -125,6 +125,17 @@ class CommonHeaderModule extends Module {
         true
     }
      
+    private int utilitiesMenuSize() {
+
+        int ret = 0
+
+        utilitiesMenu.find('li a').each { li ->
+            ret++;
+        }
+
+        ret
+    }
+    
     private Navigator utilitiesMenuFind(String util) {
 
         Navigator ret = null
