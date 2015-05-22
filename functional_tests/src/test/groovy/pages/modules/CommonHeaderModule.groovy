@@ -110,6 +110,15 @@ class CommonHeaderModule extends Module {
         true
     }
      
+    private Boolean utilitiesBug() {
+        def util = utilitiesMenuFind('Report a Bug')
+        assert util : "'Report a Bug' not found in utility menu"
+
+        String utilHref = util.getAttribute('href')
+        assert utilHref.startsWith('http://')
+        true
+    }
+     
     private void utilitiesDoLogout() {
         def util = utilitiesMenuFind('Log Out')
         assert util  : "'Log Out' not found in utility menu"
