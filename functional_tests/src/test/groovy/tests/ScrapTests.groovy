@@ -1,5 +1,6 @@
 package tests
 
+import org.junit.Ignore
 import org.junit.Test
 import org.openqa.selenium.WebElement
 
@@ -18,7 +19,7 @@ import static org.hamcrest.Matchers.is
 class ScrapTests extends CheckLoginPageAbstract {
 
     // I'm just using this test as a convenient way to make specific tests of matching operators
-
+    @Ignore
     @Test
     void highDimensionalPanelTests() {
         def highDimExpectations = [
