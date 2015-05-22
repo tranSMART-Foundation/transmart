@@ -2,8 +2,6 @@ import geb.junit4.GebReportingTest
 import geb.navigator.Navigator
 import org.junit.Test
 
-import functions.Utilities
-
 import functions.Constants
 
 import pages.LoginFailedPage
@@ -12,13 +10,17 @@ import pages.BrowsePage
 
 import pages.modules.CommonHeaderModule
 
-class LoginTests extends GebReportingTest {
+import geb.spock.GebSpec
+import geb.spock.GebReportingSpec
+import spock.lang.Stepwise
 
-    def util = new Utilities()
+@Stepwise
+class LoginSpec extends GebReportingSpec {
 
-    @Test
-    void testFailedLogin() {
+    def "go to login screen"() {
 
+        when:
+        
         if (Constants.AUTO_LOGIN_ENABLED) {
 
             /* Auto login enabled: we have to logout first */
@@ -27,22 +29,29 @@ class LoginTests extends GebReportingTest {
             //Utility menu, logout
             selectLogout()
 
-            assert at(LoginPage)
         }
         else {
     
             to LoginPage
 
         }
+
+        then:
         
+        assert at(LoginPage)
+    }
+    
+    def "login with bad credentials"() {
         /* Trying login page with bad credentials */
         /* add a random number to avoid being locked out by repeated failures */
 
+        when:
         usernameField.value Constants.BAD_USERNAME+(Math.abs(new Random().nextInt() % 9999) + 1)
         passwordField.value Constants.BAD_PASSWORD
 
         loginButtonFailed.click()
 
+        then:
         assert at(LoginFailedPage)
 
         assert topMessage == 'Please login...' : "unexpected login prompt"
@@ -52,36 +61,27 @@ class LoginTests extends GebReportingTest {
         
     }
 
-    @Test
-    void testSuccessfulLogin() {
+    def "login with good credentials"()
+    {
 
-        if (Constants.AUTO_LOGIN_ENABLED) {
-            /* Auto login enabled: we have to logout first */
-            to Constants.LANDING_PAGE.class
-
-            //Utility menu, logout
-            selectLogout()
-
-            assert at(LoginPage)
-        }
-        else {
-            to LoginPage
-	}
-
+        when:
         usernameField.value Constants.GOOD_USERNAME
         passwordField.value Constants.GOOD_PASSWORD
         loginButtonLanding.click()
 
+        then:
         assert at(Constants.LANDING_PAGE.class)
     }
 
-    void selectLogout ()
+   void selectLogout ()
     {
+        
         commonHeader { module CommonHeaderModule }
 
         commonHeader.tableMenuUtilities.click()
 
         commonHeader.utilitiesDoLogout()
+        assert at(LoginPage)
     }
 
 }

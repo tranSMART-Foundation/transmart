@@ -9,7 +9,7 @@ import pages.modules.CommonHeaderModule
 
 import functions.Utilities
 
-//import functions.Constants
+import functions.Constants
 
 import pages.LoginPage
 import pages.BrowsePage
@@ -23,11 +23,11 @@ import spock.lang.Stepwise
 class UtilityTabSpec extends GebReportingSpec {
 
     def "start on the Browse tab"() {
-        def util = new Utilities();
+
+        def util = new Utilities()
 
         when:
         util.goToPageMaybeLogin(BrowsePage)
-
 
         then:
         assert at(BrowsePage)
@@ -42,10 +42,15 @@ class UtilityTabSpec extends GebReportingSpec {
 
         then:
         commonHeader.utilitiesMenuSize() == 5
+        and:
         commonHeader.utilitiesHelp()
+        and:
         commonHeader.utilitiesContact()
+        and:
         commonHeader.utilitiesLogout()
+        and:
         commonHeader.utilitiesPassword()
+        and:
         commonHeader.utilitiesAbout()
     }
 

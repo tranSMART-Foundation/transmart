@@ -13,16 +13,26 @@ import pages.LoginPage
 import pages.BrowsePage
 import pages.BrowseResultsPage
 
-class BrowsePageTests extends GebReportingTest {
+import functions.Utilities
+
+import geb.spock.GebSpec
+import geb.spock.GebReportingSpec
+import spock.lang.Stepwise
+
+@Stepwise
+class BrowsePageSpec extends GebReportingSpec {
 
     // Assume a standard set of browse tab metadata has been loaded
     // using transmart-data and supplied sql loading scripts
 
-    @Test
-    void BrowseTab() {
+    def util = new Utilities()
 
+    def "start on the browse tab"() {
+
+        when:
         util.goToPageMaybeLogin(BrowsePage)
 
+        then:
         assert at(BrowsePage)
 
     }
