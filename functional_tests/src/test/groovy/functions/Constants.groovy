@@ -12,8 +12,8 @@ class Constants {
     public static final String ADMIN_USERNAME = 'admin'
     public static final String ADMIN_PASSWORD = 'admin'
 
-    public static final boolean AUTO_LOGIN_ENABLED = false
-    public static final Page LANDING_PAGE = new BrowsePage()
+    public static final boolean AUTO_LOGIN_ENABLED = true // locally set to true
+    public static final Page LANDING_PAGE = new BrowsePage() // local configuration
 
     public static final String GSE8581_KEY = '\\\\Public Studies\\Public Studies\\GSE8581\\'
 }
