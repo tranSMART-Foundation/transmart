@@ -15,7 +15,7 @@ class SampleExplorerPage extends Page {
 
     public static final String HEADER_TAB_NAME = 'Sample Explorer'
 
-    static url = 'transmart/sampleExplorer/list'
+    static url = 'sampleExplorer/list'
 
     static at = {
         commonHeader.headerTab()?.text() == HEADER_TAB_NAME

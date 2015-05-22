@@ -15,10 +15,10 @@ class UploadDataPage extends Page {
 
     public static final String HEADER_TAB_NAME = 'Upload Data'
 
-    static url = 'transmart/uploadData/index'
+    static url = 'uploadData/index'
 
     static at = {
-        currentHeaderTab()?.text() == HEADER_TAB_NAME
+        commonHeader.headerTab()?.text() == HEADER_TAB_NAME
     }
 
     static content = {

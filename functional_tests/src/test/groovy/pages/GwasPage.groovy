@@ -15,10 +15,10 @@ class GwasPage extends Page {
 
     public static final String HEADER_TAB_NAME = 'GWAS'
 
-    static url = 'transmart/GWAS/index'
+    static url = 'GWAS/index'
 
     static at = {
-        currentHeaderTab()?.text() == HEADER_TAB_NAME
+        commonHeader.headerTab()?.text() == HEADER_TAB_NAME
     }
 
     static content = {

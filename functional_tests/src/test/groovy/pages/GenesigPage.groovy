@@ -15,7 +15,7 @@ class GenesigPage extends Page {
 
     public static final String HEADER_TAB_NAME = 'Gene Signature/Lists'
 
-    static url = 'transmart/geneSignature/list'
+    static url = 'geneSignature/list'
 
     static at = {
         commonHeader.headerTab()?.text() == HEADER_TAB_NAME
