@@ -39,11 +39,18 @@ class UtilityTabSpec extends GebReportingSpec {
 
         when:
         commonHeader.tableMenuUtilities.click()
+        int menuSize = commonHeader.utilitiesMenuSize()
+
+// Report a Bug displayed if bugreportURL is configured
+// With 5 items, check all the others
+// With 6 items, also check for 'report a Bug'
 
         then:
-        commonHeader.utilitiesMenuSize() == 5
+        menuSize == 5 || menuSize == 6
         and:
         commonHeader.utilitiesHelp()
+        and:
+        menuSize == 5 || commonHeader.utilitiesBug()
         and:
         commonHeader.utilitiesContact()
         and:
