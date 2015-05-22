@@ -47,11 +47,11 @@ class UtilityTabSpec extends GebReportingSpec {
         and:
         commonHeader.utilitiesContact()
         and:
-        commonHeader.utilitiesLogout()
+        commonHeader.utilitiesAbout()
         and:
         commonHeader.utilitiesPassword()
         and:
-        commonHeader.utilitiesAbout()
+        commonHeader.utilitiesLogout()
     }
 
     def "logout gives login page"() {
