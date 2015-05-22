@@ -70,10 +70,12 @@ class CommonHeaderModule extends Module {
 
     private utilitiesAbout() {
         def util = utilitiesMenuFind('About')
-        assert util
+        assert util : "'About' not found in utility menu"
 
         String utilText = withAlert(wait:true) {util.click()}
-        assert utilText.startsWith('tranSMART v1.2.rev2-eTI (PostgreSQL)')
+        assert utilText.startsWith('tranSMART v1.2')
+//      assert utilText.startsWith('tranSMART v1.2.rev2-eTI (PostgreSQL)')
+
 // clicking has hidden the utilities menu
 // although the alert has been faked
 // we need to get it back to able to continue
@@ -82,7 +84,7 @@ class CommonHeaderModule extends Module {
      
     private Boolean utilitiesContact() {
         def util = utilitiesMenuFind('Contact Us')
-        assert util
+        assert util : "'Contact Us' not found in utility menu"
 
         String utilHref = util.getAttribute('href')
         assert utilHref.startsWith('mailto:')
@@ -92,7 +94,7 @@ class CommonHeaderModule extends Module {
      
     private Boolean utilitiesPassword() {
         def util = utilitiesMenuFind('Change My Password')
-        assert util
+        assert util  : "'Change My Password' not found in utility menu"
 
         String utilHref = util.getAttribute('href')
         assert utilHref.startsWith('http://')
@@ -101,7 +103,7 @@ class CommonHeaderModule extends Module {
      
     private Boolean utilitiesHelp() {
         def util = utilitiesMenuFind('Help')
-        assert util
+        assert util : "'Help' not found in utility menu"
 
         String utilHref = util.getAttribute('href')
         assert utilHref.startsWith('http://')
@@ -110,14 +112,14 @@ class CommonHeaderModule extends Module {
      
     private void utilitiesDoLogout() {
         def util = utilitiesMenuFind('Log Out')
-        assert util
+        assert util  : "'Log Out' not found in utility menu"
 
         util.click()
     }
      
     private Boolean utilitiesLogout() {
         def util = utilitiesMenuFind('Log Out')
-        assert util
+        assert util  : "'Log Out' not found in utility menu"
 
         String utilHref = util.getAttribute('href')
         assert utilHref.startsWith('http://')
