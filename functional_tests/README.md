@@ -12,9 +12,9 @@ To run the tests:
   - prelim (only once for new target folder): mvn site
   - then: mvn surefire-report:report -Pfirefox
   - or, for one test: mvn surefire-report:report -Pfirefox -Dtest=LoginTests
--When tests fail, check target/surefire-reports/(testname).txt
+- When tests fail, check target/surefire-reports/(testname).txt
   - this file has the detailed message from the failed test
--To run against a particular server
+- To run against a particular server
   - mvn -Dgeb.env=firefoxoracle
   - options defined in GebConfig.groovy: browser and baseUrl for specific environment
   - may also need to modify AUTOLOGIN_ENABLED in Constants.groovy
