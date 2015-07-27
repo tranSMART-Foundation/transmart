@@ -15,7 +15,6 @@
 	<classpathentry kind="lib" path="lib/kettle-db.jar"/>
 	<classpathentry kind="lib" path="lib/kettle-dbdialog.jar"/>
 	<classpathentry kind="lib" path="lib/kettle-engine.jar"/>
-	<classpathentry kind="lib" path="lib/kettle-test.jar"/>
 	<classpathentry kind="lib" path="lib/ldapjdk.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar"/>
 	<classpathentry kind="lib" path="lib/xbean.jar"/>
@@ -34,29 +33,6 @@
 	<classpathentry kind="lib" path="lib/commons/commons-net-1.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons/commons-pool-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/commons/commons-validator-1.3.1.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/asjava.zip"/>
-	<classpathentry kind="lib" path="lib/JDBC/db2jcc_license_cu.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/db2jcc.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/derby.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/derbyclient.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/h2.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/hive-jdbc-0.7.0-pentaho-1.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/ifxjdbc.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/iijdbc.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/infobright-core-3.4.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/interclient.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/jaybird-full-2.1.0.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/jt400.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/jtds-1.2.5.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/kingbasejdbc.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/LucidDbClient-minimal.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/monetdb-1.7-jdbc.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/ojdbc14.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/orai18n.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/rdbthin.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/sapdbc.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/unijdbc.jar"/>
-	<classpathentry kind="lib" path="lib/JDBC/xdbjdbc.jar"/>
 	<classpathentry kind="lib" path="lib/pentaho/hbase-0.90.1.jar"/>
 	<classpathentry kind="lib" path="lib/pentaho/jets3t-0.7.4.jar"/>
 	<classpathentry kind="lib" path="lib/pentaho/kettle-vfs-20100924.jar"/>
@@ -79,10 +55,8 @@
 	<classpathentry kind="lib" path="lib/javassist.jar"/>
 	<classpathentry kind="lib" path="lib/js.jar"/>
 	<classpathentry kind="lib" path="lib/jsch-0.1.49.jar"/>
-	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/opencsv-2.3.jar"/>
 	<classpathentry kind="lib" path="lib/org.springframework.security.core-3.0.4.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/oro-2.0.8.jar"/>
 	<classpathentry kind="lib" path="lib/proxy-vole_20120920.jar"/>
 	<classpathentry kind="lib" path="lib/scannotation-1.0.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
