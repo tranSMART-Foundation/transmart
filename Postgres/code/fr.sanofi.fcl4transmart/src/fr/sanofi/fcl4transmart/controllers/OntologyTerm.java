@@ -17,14 +17,14 @@ public class OntologyTerm {
 	private String code;
 	private String ontology;
 	private String ontologyVersion;
-	private String synonyme;
+	private String synonym;
 	private String obsolete;
-	public OntologyTerm(String term, String code, String ontology, String ontologyVersion, String synonyme, String obsolete){
+	public OntologyTerm(String term, String code, String ontology, String ontologyVersion, String synonym, String obsolete){
 		this.term=term;
 		this.code=code;
 		this.ontology=ontology;
 		this.ontologyVersion=ontologyVersion;
-		this.synonyme=synonyme;
+		this.synonym=synonym;
 		this.obsolete=obsolete;
 	}
 	public String getTerm(){
@@ -39,8 +39,8 @@ public class OntologyTerm {
 	public String getOntologyVersion(){
 		return this.ontologyVersion;
 	}
-	public String getSynonyme(){
-		return this.synonyme;
+	public String getSynonym(){
+		return this.synonym;
 	}
 	public String getObsolete(){
 		return this.obsolete;

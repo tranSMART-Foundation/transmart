@@ -34,6 +34,7 @@ import fr.sanofi.fcl4transmart.controllers.StudySelectionController;
 /**
  *This class controls the window to see database and workspace free disk space, called from menu
  */	
+@SuppressWarnings("restriction")
 public class SpaceHandler {
 	private boolean isSearching;
 	private File workspace;
@@ -74,8 +75,8 @@ public class SpaceHandler {
 				testMeta=RetrieveData.testMetadataConnection();
 				if(testMeta){
 					try{
-						Class.forName("org.postgresql.Driver");
-						Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd());
+						Class.forName(RetrieveData.getDriverString());
+						Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
 						Statement stmt=con.createStatement();
 						ResultSet rs=stmt.executeQuery("SELECT df.tablespace_name TABLESPACE, df.total_space TOTAL_SPACE, "+
 										"fs.free_space FREE_SPACE, df.total_space_mb TOTAL_SPACE_MB, "+
@@ -230,7 +231,6 @@ public class SpaceHandler {
 			}
 			
 		}
-		
 		shell.open();
 	}
 }

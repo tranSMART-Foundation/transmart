@@ -68,7 +68,7 @@ public class MonitoringUI implements WorkItf{
 			return composite;
 		}
 		
-		Label label=new Label(scrolledComposite, SWT.WRAP);
+		Label label=new Label(scrolledComposite, SWT.NONE);
 		label.setText(this.createLabelText()+"\n\nYou are connected to database '"+PreferencesHandler.getDb()+"'");
 		
 		scrolledComposite.setSize(scrolledComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -136,17 +136,14 @@ public class MonitoringUI implements WorkItf{
 	}
 	@Override
 	public Vector<Vector<String>> copy() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public void paste(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 }

@@ -90,11 +90,8 @@ public class SetUnitsUI implements WorkItf{
 		gd.verticalSpacing=5;
 		this.body.setLayout(gd);
 		GridData grid=new GridData(SWT.FILL);
-		//grid.heightHint=100;
 		this.body.setLayoutData(grid);
 		
-		
-		//get headers to display in combos
 		this.columnsFromCmf=new Vector<String>();
 		this.columnsFromRaw=new Vector<String>();
 		columnsFromCmf.add("");
@@ -198,8 +195,7 @@ public class SetUnitsUI implements WorkItf{
 					}
 					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {
-						// TODO Auto-generated method stub
-						
+						// nothing to do
 					}
 				});
 			}
@@ -295,8 +291,7 @@ public class SetUnitsUI implements WorkItf{
 					}
 					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {
-						// TODO Auto-generated method stub
-						
+						// nothing to do
 					}
 				});
 				body.setSize(body.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -307,8 +302,7 @@ public class SetUnitsUI implements WorkItf{
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
-				
+				// nothing to do
 			}
 			
 		});
@@ -334,7 +328,7 @@ public class SetUnitsUI implements WorkItf{
 								this.columns.add(vector_line.get(0)+" - "+FileHandler.getColumnByNumber(rawFile, Integer.parseInt(vector_line.get(2))));
 							}
 							catch(Exception e){
-								System.out.println("column number is not an integer");
+
 							}
 						}
 					}
@@ -369,17 +363,14 @@ public class SetUnitsUI implements WorkItf{
 	}
 	@Override
 	public Vector<Vector<String>> copy() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public void paste(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 }

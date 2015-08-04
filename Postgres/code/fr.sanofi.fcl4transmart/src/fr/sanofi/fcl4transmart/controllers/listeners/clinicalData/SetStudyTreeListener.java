@@ -16,11 +16,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
-import org.apache.commons.io.FileUtils;
+
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import fr.sanofi.fcl4transmart.controllers.FileHandler;
+import fr.sanofi.fcl4transmart.controllers.Utils;
 import fr.sanofi.fcl4transmart.model.classes.TreeNode;
 import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.classes.workUI.clinicalData.SetStudyTreeUI;
@@ -55,19 +58,17 @@ public class SetStudyTreeListener implements Listener{
 					BufferedReader br = new BufferedReader(new FileReader(((ClinicalData)this.dataType).getCMF()));
 					String line=br.readLine();
 					while ((line=br.readLine())!=null){
-						if(line.compareTo("")!=0){
-							if(line.split("\t", -1)[3].compareTo("SUBJ_ID")==0 || line.split("\t", -1)[3].compareTo("VISIT_NAME")==0 || line.split("\t", -1)[3].compareTo("SITE_ID")==0){
-								out.write(line+"\n");
-							}
-							else if(line.split("\t", -1)[3].compareTo("UNITS")==0){
-								out.write(line+"\n");
-								File rawFile=new File(this.dataType.getPath()+File.separator+line.split("\t", -1)[0]);
-								this.labels.put(rawFile.getName()+"-"+FileHandler.getColumnByNumber(rawFile, Integer.parseInt(line.split("\t", -1)[2])), line.split("\t", -1)[3]);
-							}
-							else if(line.split("\t", -1)[3].compareTo("OMIT")!=0 && line.split("\t", -1)[3].compareTo("\\")!=0 && line.split("\t", -1)[3].compareTo("DATA_LABEL")!=0){
-								File rawFile=new File(this.dataType.getPath()+File.separator+line.split("\t", -1)[0]);
-								this.labels.put(rawFile.getName()+"-"+FileHandler.getColumnByNumber(rawFile, Integer.parseInt(line.split("\t", -1)[2])), line.split("\t", -1)[3]);
-							}
+						if(line.split("\t", -1)[3].compareTo("SUBJ_ID")==0 || line.split("\t", -1)[3].compareTo("VISIT_NAME")==0 || line.split("\t", -1)[3].compareTo("SITE_ID")==0|| line.split("\t", -1)[3].compareTo("ENROLL_DATE")==0|| line.split("\t", -1)[3].compareTo("VISIT_DATE")==0){
+							out.write(line+"\n");
+						}
+						else if(line.split("\t", -1)[3].compareTo("UNITS")==0){
+							out.write(line+"\n");
+							File rawFile=new File(this.dataType.getPath()+File.separator+line.split("\t", -1)[0]);
+							this.labels.put(rawFile.getName()+"-"+FileHandler.getColumnByNumber(rawFile, Integer.parseInt(line.split("\t", -1)[2])), line.split("\t", -1)[3]);
+						}
+						else if(line.split("\t", -1)[3].compareTo("OMIT")!=0 && line.split("\t", -1)[3].compareTo("\\")!=0 && line.split("\t", -1)[3].compareTo("DATA_LABEL")!=0 && line.split("\t", -1)[3].compareTo("MEAN")!=0 && line.split("\t", -1)[3].compareTo("MIN")!=0 && line.split("\t", -1)[3].compareTo("MAX")!=0){
+							File rawFile=new File(this.dataType.getPath()+File.separator+line.split("\t", -1)[0]);
+							this.labels.put(rawFile.getName()+"-"+FileHandler.getColumnByNumber(rawFile, Integer.parseInt(line.split("\t", -1)[2])), line.split("\t", -1)[3]);
 						}
 					}
 					br.close();
@@ -83,9 +84,9 @@ public class SetStudyTreeListener implements Listener{
 				out.close();
 				try{
 					String fileName=((ClinicalData)this.dataType).getCMF().getName();
-					((ClinicalData)this.dataType).getCMF().delete();
 					File fileDest=new File(this.dataType.getPath()+File.separator+fileName);
-					FileUtils.moveFile(file, fileDest);
+					Utils.copyFile(file, fileDest);
+					file.delete();
 					((ClinicalData)this.dataType).setCMF(fileDest);
 				}
 				catch(IOException ioe){
@@ -105,58 +106,84 @@ public class SetStudyTreeListener implements Listener{
 	 */	
 	public void writeLine(TreeNode node, BufferedWriter out, String path){
 		for(TreeNode child: node.getChildren()){
-			String newPath=path;
-			if(child.isLabel()){
-				if(child.getParent().isLabel()){//has a data label source
-					String fullname=child.toString();
-					String rawFileName=fullname.split(" - ", -1)[0];
-					String header=fullname.split(" - ", -1)[1];
-					File rawFile=new File(((ClinicalData)this.dataType).getPath()+File.separator+rawFileName);
-					try {
-						String dataLabel=this.labels.get(rawFile.getName()+"-"+header);
-						if(dataLabel==null){
-							dataLabel=header;
-						}
-						int columnNumber=FileHandler.getHeaderNumber(rawFile, header);
-						out.write(rawFileName+"\t"+path.replace(' ', '_')+"\t"+columnNumber+"\t"+"\\"+"\t"+FileHandler.getHeaderNumber(rawFile, child.getParent().toString().split(" - ", -1)[1])+"\t\n");
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						this.setStudyTreeUI.displayMessage("File error: "+e.getLocalizedMessage());
-						e.printStackTrace();
+			if(child.isOperation()){
+				String op=child.toString().split(": ", 2)[0];
+				String[] str = (child.toString().split(": ",2)[1]).split(" - ", 2);
+				String rawFileName = StringUtils.join(Arrays.asList(str).subList(0, str.length-1), " - ");
+				String property = str[str.length-1];
+				File rawFile=new File(((ClinicalData)this.dataType).getPath()+File.separator+rawFileName);
+
+				try {
+					String dataLabel=this.labels.get(rawFile.getName()+"-"+property);
+					if(dataLabel==null){
+						dataLabel=property;
 					}
-				}else{
-					String fullname=child.toString();
-					String rawFileName=fullname.split(" - ", 2)[0];
-					String header=fullname.split(" - ", 2)[1];
-					File rawFile=new File(((ClinicalData)this.dataType).getPath()+File.separator+rawFileName);
-					try {
-						String dataLabel=this.labels.get(rawFile.getName()+"-"+header);
-						if(dataLabel==null){
-							dataLabel=header;
+					int columnNumber=FileHandler.getHeaderNumber(rawFile, property);
+					
+					out.write(rawFileName+"\t"+path.replace(' ', '_')+"\t"+columnNumber+"\t"+dataLabel+"\t"+op+"\t\n");
+				} catch (IOException e) {
+					this.setStudyTreeUI.displayMessage("File error: "+e.getLocalizedMessage());
+					e.printStackTrace();
+				}
+				
+			}else{
+				String newPath=path;
+				if(child.isLabel()){
+					if(child.getParent().isLabel()){//has a data label source
+						String fullname=child.toString();
+						String[] str = fullname.split(" - ", -1);
+						String rawFileName=StringUtils.join(Arrays.asList(str).subList(0, str.length-1), " - ");
+						String header=str[str.length-1];
+						System.out.println(rawFileName);
+
+						File rawFile=new File(((ClinicalData)this.dataType).getPath()+File.separator+rawFileName);
+						try {
+							String dataLabel=this.labels.get(rawFile.getName()+"-"+header);
+							if(dataLabel==null){
+								dataLabel=header;
+							}
+							int columnNumber=FileHandler.getHeaderNumber(rawFile, header);
+							out.write(rawFileName+"\t"+path.replace(' ', '_')+"\t"+columnNumber+"\t"+"\\"+"\t"+FileHandler.getHeaderNumber(rawFile, child.getParent().toString().split(" - ", -1)[1])+"B\t\n");
+						} catch (IOException e) {
+							this.setStudyTreeUI.displayMessage("File error: "+e.getLocalizedMessage());
+							e.printStackTrace();
 						}
-						int columnNumber=FileHandler.getHeaderNumber(rawFile, header);
+					}else{
+						String fullname=child.toString();
+						String[] str = fullname.split(" - ", -1);
+						String rawFileName=StringUtils.join(Arrays.asList(str).subList(0, str.length-1), " - ");
+						String header=str[str.length-1];
+						System.out.println(rawFileName);
 						
-						if(child.hasChildren()){	
-							out.write(rawFileName+"\t"+path.replace(' ', '_')+"\t"+columnNumber+"\t"+"DATA_LABEL"+"\t\t\n");
+						File rawFile=new File(((ClinicalData)this.dataType).getPath()+File.separator+rawFileName);
+						try {
+							String dataLabel=this.labels.get(rawFile.getName()+"-"+header);
+							if(dataLabel==null){
+								dataLabel=header;
+							}
+							int columnNumber=FileHandler.getHeaderNumber(rawFile, header);
+							
+							if(child.hasChildren()){	
+								out.write(rawFileName+"\t"+path.replace(' ', '_')+"\t"+columnNumber+"\t"+"DATA_LABEL"+"\t\t\n");
+							}
+							else{
+								out.write(rawFileName+"\t"+path.replace(' ', '_')+"\t"+columnNumber+"\t"+dataLabel+"\t\t\n");
+							}
+						} catch (IOException e) {
+							this.setStudyTreeUI.displayMessage("File error: "+e.getLocalizedMessage());
+							e.printStackTrace();
 						}
-						else{
-							out.write(rawFileName+"\t"+path.replace(' ', '_')+"\t"+columnNumber+"\t"+dataLabel+"\t\t\n");
-						}
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						this.setStudyTreeUI.displayMessage("File error: "+e.getLocalizedMessage());
-						e.printStackTrace();
 					}
 				}
-			}
-			else{
-				if(path.compareTo("")!=0){
-					newPath=path+"+";
+				else{
+					if(path.compareTo("")!=0){
+						newPath=path+"+";
+					}
+					newPath+=child.toString().replace(' ', '_');
 				}
-				newPath+=child.toString().replace(' ', '_');
-			}
-			if(child.hasChildren()){
-				writeLine(child, out, newPath);
+				if(child.hasChildren()){
+					writeLine(child, out, newPath);
+				}
 			}
 		}
 	}

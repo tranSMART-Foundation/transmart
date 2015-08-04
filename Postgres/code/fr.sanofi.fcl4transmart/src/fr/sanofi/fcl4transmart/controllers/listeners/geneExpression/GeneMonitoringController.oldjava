@@ -68,7 +68,7 @@ public class GeneMonitoringController {
 		return false;
 	}
 	/**
-	 *Check in the database if the called stored procedure succeed, if not returns the oracle error code
+	 *Check in the database if the called stored procedure succeed, if not returns the postgres error code
 	 */	
 	public String proceduresError(){
 		String procedureErrors="";

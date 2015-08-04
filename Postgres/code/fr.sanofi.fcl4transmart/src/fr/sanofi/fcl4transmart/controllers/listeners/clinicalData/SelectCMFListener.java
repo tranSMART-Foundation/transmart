@@ -17,13 +17,13 @@ import java.io.IOException;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import fr.sanofi.fcl4transmart.controllers.Utils;
 import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.classes.workUI.clinicalData.SelectCMFUI;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 import fr.sanofi.fcl4transmart.ui.parts.UsedFilesPart;
 import fr.sanofi.fcl4transmart.ui.parts.WorkPart;
 
-import org.apache.commons.io.FileUtils;
 /**
  *This class controls a column mapping file selection
  */	
@@ -36,7 +36,6 @@ public class SelectCMFListener implements Listener{
 	}
 	@Override
 	public void handleEvent(Event event) {
-		// TODO Auto-generated method stub
 		String path=this.selectCMFUI.getPath();
 		if(path==null) return;
 		if(path.contains("%")){
@@ -57,15 +56,15 @@ public class SelectCMFListener implements Listener{
 
 				File copiedFile=new File(newPath);
 				try {
-					FileUtils.copyFile(file, copiedFile);
+					Utils.copyFile(file, copiedFile);
 					((ClinicalData)this.dataType).setCMF(copiedFile);
 					
 					this.selectCMFUI.displayMessage("File has been added");
 					WorkPart.updateSteps();
-					//to do: update files list
+					WorkPart.updateFiles();
 					UsedFilesPart.sendFilesChanged(dataType);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					if(copiedFile.exists()) copiedFile.delete();
 					this.selectCMFUI.displayMessage("File error: "+e.getLocalizedMessage());
 					e.printStackTrace();
 				}
@@ -126,7 +125,7 @@ public class SelectCMFListener implements Listener{
 						return false;
 					}
 					//check that category code is set, except for reserved words
-					if(!(fields[3].compareTo("SUBJ_ID")==0 || fields[3].compareTo("OMIT")==0 || fields[3].compareTo("SITE_ID")==0 || fields[3].compareTo("VISIT_NAME")==0) && fields[1].compareTo("")==0){
+					if(!(fields[3].compareTo("SUBJ_ID")==0 || fields[3].compareTo("OMIT")==0 || fields[3].compareTo("SITE_ID")==0 || fields[3].compareTo("VISIT_NAME")==0 || fields[3].compareTo("UNITS")==0 || fields[3].compareTo("ENROLL_DATE")==0 || fields[3].compareTo("VISIT_DATE")==0) && fields[1].compareTo("")==0){
 						this.selectCMFUI.displayMessage("Error:\nCategory codes have to be set");
 						br.close();
 						return false;

@@ -30,7 +30,6 @@ public class ChangeNameListener implements Listener{
 	}
 	@Override
 	public void handleEvent(Event event) {
-		// TODO Auto-generated method stub
 		String newName=this.changeNameUI.getName();
 		File oldPath=this.study.getPath();
 		File newPath=new File(oldPath.getParentFile().getAbsoluteFile()+File.separator+newName);

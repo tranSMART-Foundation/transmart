@@ -41,11 +41,13 @@ import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 /**
  *This class controls the database and workspace preferences
  */
+@SuppressWarnings("restriction")
 public class PreferencesHandler {
-	private Preferences preferences;
-	private Preferences databasesPref;
-	private Preferences generalPref;
+	private Preferences preferences;   //root node
+	private Preferences databasesPref; //general node
+	private Preferences generalPref;   //node for the database
 	private Text saveNameField;
+	private Text dbTypeField;
 	private Text dbNameField;
 	private Text dbServerField;
 	private Text dbPortField;
@@ -61,6 +63,8 @@ public class PreferencesHandler {
 	private Text demodataPwdField;
 	private Text biomartUserField;
 	private Text biomartPwdField;
+	private Text fmappUserField;
+	private Text fmappPwdField;
 	private Shell shell;
 	private Vector<String> databases;
 	@Inject  private IEventBroker eventBroker;
@@ -79,7 +83,6 @@ public class PreferencesHandler {
 		try {
 			subPref=this.preferences.childrenNames();
 		} catch (BackingStoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
@@ -105,7 +108,7 @@ public class PreferencesHandler {
 	public void execute(Display display) {
 			
 	    this.shell=new Shell(SWT.TITLE|SWT.SYSTEM_MODAL| SWT.CLOSE | SWT.MAX);
-	    this.shell.setSize(500,600);
+	    this.shell.setSize(600,700);
 	    this.shell.setText("Database preferences");
 	    GridLayout gridLayout=new GridLayout();
 		gridLayout.numColumns=2;
@@ -124,12 +127,12 @@ public class PreferencesHandler {
 				return v.toArray();
 			}
 			public void dispose() {
-				// TODO Auto-generated method stub
+				// nothing to do
 			}
 
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
-				// TODO Auto-generated method stub
+				// nothing to do
 			}
 		});	
 	   this.viewer.setInput(this.databases);
@@ -160,13 +163,14 @@ public class PreferencesHandler {
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
+				// nothing to do
 			}
 		});
-		GridData gridData=new GridData();
+		GridData gridData=new GridData(GridData.FILL_BOTH);
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.widthHint=125;
+		gridData.grabExcessVerticalSpace=true;
 		this.viewer.getControl().setLayoutData(gridData);
 	   
 		this.preferencesPart=this.changePrefPart();
@@ -300,6 +304,22 @@ public class PreferencesHandler {
 	public static String getBiomartPwd(){
 		try{
 			return PreferencesHandler.staticDbPref.get("biomart_pwd", "");
+		}
+		catch(NullPointerException e){
+			return "";
+		}
+	}
+	public static String getFmappUser(){
+		try{
+			return PreferencesHandler.staticDbPref.get("fmapp_user", "");
+		}
+		catch(NullPointerException e){
+			return "";
+		}
+	}
+	public static String getFmappPwd(){
+		try{
+			return PreferencesHandler.staticDbPref.get("fmapp_pwd", "");
 		}
 		catch(NullPointerException e){
 			return "";
@@ -555,6 +575,36 @@ public class PreferencesHandler {
 		gridData.grabExcessHorizontalSpace = true;
 		this.biomartPwdField.setLayoutData(gridData);
 	    
+		Label fmappUserLabel=new Label(prefPart, SWT.NONE);
+		fmappUserLabel.setText("FMAPP user: ");
+                gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		fmappUserLabel.setLayoutData(gridData);
+	    this.fmappUserField=new Text(prefPart, SWT.BORDER);
+	    if(this.databasesPref!=null){
+	    	this.fmappUserField.setText(databasesPref.get("fmapp_user", ""));
+	    }
+	    gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		this.fmappUserField.setLayoutData(gridData);
+
+	    Label fmappPwdLabel=new Label(prefPart, SWT.NONE);
+	    fmappPwdLabel.setText("FMAPP pasword: ");
+	    gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		fmappPwdLabel.setLayoutData(gridData);
+	    this.fmappPwdField=new Text(prefPart, SWT.BORDER | SWT.PASSWORD);
+	    if(this.databasesPref!=null){
+	    	this.fmappPwdField.setText(databasesPref.get("fmapp_pwd", ""));
+	    }
+	    gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		this.fmappPwdField.setLayoutData(gridData);
+	    
 		Composite buttonPart=new Composite(prefPart, SWT.NONE);
 		gd=new GridLayout();
 		gd.numColumns=3;
@@ -576,33 +626,31 @@ public class PreferencesHandler {
 			@Override
 			public void handleEvent(Event event) {
 				if(!RetrieveData.testDemodataConnection(dbServerField.getText(), dbNameField.getText(), dbPortField.getText(), demodataUserField.getText(), demodataPwdField.getText())){
-					System.out.println("demodata");
-					displayMessage("Connection is not possible");
+					displayMessage("i2b2demodata connection is not possible");
 					return;
 				}
 				if(!RetrieveData.testMetadataConnection(dbServerField.getText(), dbNameField.getText(), dbPortField.getText(), metadataUserField.getText(), metadataPwdField.getText())){
-					displayMessage("Connection is not possible");
-					System.out.println("metadata");
+					displayMessage("i2b2metadata connection is not possible");
 					return;
 				}
 				if(!RetrieveData.testDeappConnection(dbServerField.getText(), dbNameField.getText(), dbPortField.getText(), deappUserField.getText(), deappPwdField.getText())){
-					displayMessage("Connection is not possible");
-					System.out.println("deapp");
+					displayMessage("deapp connection is not possible");
 					return;
 				}
 				if(!RetrieveData.testTm_czConnection(dbServerField.getText(), dbNameField.getText(), dbPortField.getText(), tm_czUserField.getText(), tm_czPwdField.getText())){
-					displayMessage("Connection is not possible");
-					System.out.println("tm_cz");
+					displayMessage("tm_cz connection is not possible");
 					return;
 				}
 				if(!RetrieveData.testTm_lzConnection(dbServerField.getText(), dbNameField.getText(), dbPortField.getText(), tm_lzUserField.getText(), tm_lzPwdField.getText())){
-					displayMessage("Connection is not possible");
-					System.out.println("tm_lz");
+					displayMessage("tm_lz connection is not possible");
 					return;
 				}
 				if(!RetrieveData.testBiomartConnection(dbServerField.getText(), dbNameField.getText(), dbPortField.getText(), biomartUserField.getText(), biomartPwdField.getText())){
-					displayMessage("Connection is not possible");
-					System.out.println("biomart");
+					displayMessage("biomart connection is not possible");
+					return;
+				}
+				if(!RetrieveData.testFmappConnection(dbServerField.getText(), dbNameField.getText(), dbPortField.getText(), fmappUserField.getText(), fmappPwdField.getText())){
+					displayMessage("fmapp connection is not possible");
 					return;
 				}
 				displayMessage("Connection OK");
@@ -618,7 +666,6 @@ public class PreferencesHandler {
 	    ok.addListener(SWT.Selection, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
-				// TODO Auto-generated method stub
 				if(saveNameField.getText().compareTo("")==0){
 				    int style = SWT.ICON_WARNING | SWT.OK;
 				    MessageBox messageBox = new MessageBox(new Shell(), style);
@@ -633,6 +680,17 @@ public class PreferencesHandler {
 				viewer.getList().setSelection(databases.indexOf(saveNameField.getText()));
 				databasesPref=preferences.node(saveNameField.getText());
 		
+				String selected=(String)viewer.getElementAt(viewer.getList().getSelectionIndex());
+				generalPref.put("selectedDb", selected);
+				databasesPref=preferences.node(selected);
+				staticDbPref=databasesPref;				
+				try {
+					preferences.flush();
+					}
+				catch (BackingStoreException bse) {
+						bse.printStackTrace();
+				}
+
 				databasesPref.put("db_server", dbServerField.getText());
 				staticDbPref=databasesPref;	
 				
@@ -754,7 +812,23 @@ public class PreferencesHandler {
 				catch (BackingStoreException e) {
 						e.printStackTrace();
 				}
+				databasesPref.put("fmapp_user", fmappUserField.getText());
+				try {
+					preferences.flush();
+					}
+				catch (BackingStoreException e) {
+						e.printStackTrace();
+				}
+				
+				databasesPref.put("fmapp_pwd", fmappPwdField.getText());
+				try {
+					preferences.flush();
+					}
+				catch (BackingStoreException e) {
+						e.printStackTrace();
+				}
 				viewer.getList().setSelection(viewer.getList().indexOf(saveNameField.getText()));
+                                displayMessage("Preferences saved OK");
 			}
 	    });
 	    
@@ -767,7 +841,6 @@ public class PreferencesHandler {
 	    load.addListener(SWT.Selection, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
-				// TODO Auto-generated method stub
 				shell.dispose();
 			}
 	    	

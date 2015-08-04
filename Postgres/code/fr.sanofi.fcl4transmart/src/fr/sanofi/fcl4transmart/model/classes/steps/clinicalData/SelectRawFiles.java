@@ -30,7 +30,7 @@ public class SelectRawFiles implements StepItf{
 		return "Select raw files";
 	}
 	public String getDescription(){
-		return "This step allows adding one or several raw files, by indicating the paths, separated with a ';' character, or by choosing them with the 'browse' button.\n"+
+		return "This step allows adding one or several raw files, by indicating the paths, separated with a '?' character, or by choosing them with the 'browse' button.\n"+
 				"The format of the file, tab delimited or soft(GEO), has to be indicated in the 'Format' dropdown.\n"+
 				"When the button 'Add files' is clicked, the format of the files is checked, and then the files are:\n"+
 				"-For a tab delimited file: copied in the workspace\n"+

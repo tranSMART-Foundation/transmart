@@ -33,8 +33,8 @@ public class LoadDescription implements StepItf{
 	}
 	public String getDescription(){
 		return "This step allows loading a study description in the database.\n The study node has to be defined in the last step to display description into tranSMART.\n"+
-				"Study description is loaded as pairs of key/value. A pair can be added by clicking on the button 'Add a tag'. A pair can be removed by clicking on the button 'Remove tag' corresponding to the wanted line.\n"+
-				"When this step is chosen, if the description has already been loaded into the database, data is retrieved to be displayed. If they are modified and loaded again, data will be replaced.\n"+
+				"For now, organisms can only be added if they have an entry in the database. Organisms in the database are presented in a dropdown.\n"+
+				"When this step is chosen, if the description has already been loaded into the database, data are retrieved to be displayed. If they are modified and loaded again, data will be replaced.\n"+
 				"A database connection is needed for this step.";
 	}
 	public boolean isAvailable(){

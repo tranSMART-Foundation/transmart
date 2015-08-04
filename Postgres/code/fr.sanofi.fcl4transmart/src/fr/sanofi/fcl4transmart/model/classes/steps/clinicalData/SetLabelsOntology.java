@@ -34,8 +34,8 @@ public class SetLabelsOntology implements StepItf{
 		return "Set labels ontology";
 	}
 	public String getDescription(){
-		return "This step allows choosing labels for the study parameters, and optionaly mapping these labels with a controlled vocabulary code.\n"+
-				"These controlled vocabulary codes can be find with bioontology portal:\n http://bioportal.bioontology.org/\n"+
+		return "This step allows choosing labels for the study parameters, and optionally mapping these labels with a controlled vocabulary code.\n"+
+				"These controlled vocabulary codes can be found with the bioontology portal:\n http://bioportal.bioontology.org/\n"+
 				"Only labels which have been put in the data tree are presented.";
 	}
 	public boolean isAvailable(){

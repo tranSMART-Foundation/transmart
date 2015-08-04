@@ -12,6 +12,7 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import fr.sanofi.fcl4transmart.model.interfaces.StepItf;
 import fr.sanofi.fcl4transmart.model.interfaces.WorkItf;
 
+@SuppressWarnings("restriction")
 public class PasteHandler {
 	private WorkItf workItf;
 	@Execute

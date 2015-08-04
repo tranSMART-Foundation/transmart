@@ -126,7 +126,6 @@ public class ChangeNameUI implements WorkItf{
 		this.nameField.addModifyListener(new ModifyListener(){
 			@Override
 			public void modifyText(ModifyEvent e) {
-				// TODO Auto-generated method stub
 				name=nameField.getText();
 			}
 		});
@@ -171,17 +170,14 @@ public class ChangeNameUI implements WorkItf{
 	}
 	@Override
 	public Vector<Vector<String>> copy() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public void paste(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 }

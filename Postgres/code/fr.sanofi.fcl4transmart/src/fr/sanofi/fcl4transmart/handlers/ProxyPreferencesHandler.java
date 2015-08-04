@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+@SuppressWarnings("restriction")
 public class ProxyPreferencesHandler {
 	private Shell shell;
 	private Combo combo;
@@ -57,7 +58,7 @@ public class ProxyPreferencesHandler {
 	@Execute
 	public void execute(Display display) {		
 		this.shell=new Shell(SWT.TITLE|SWT.SYSTEM_MODAL| SWT.CLOSE | SWT.MAX);
-	    this.shell.setSize(320,380);
+	    this.shell.setSize(300,320);
 	    this.shell.setText("Proxy preferences");
 	    GridLayout gridLayout=new GridLayout();
 		gridLayout.numColumns=1;
@@ -179,7 +180,6 @@ public class ProxyPreferencesHandler {
 					try {
 						node.put("method", "No proxy", false);
 					} catch (StorageException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					staticMethod="No proxy";
@@ -187,7 +187,6 @@ public class ProxyPreferencesHandler {
 					try {
 						node.put("method", "Native", false);
 					} catch (StorageException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					staticMethod="Native";
@@ -213,7 +212,6 @@ public class ProxyPreferencesHandler {
 					try {
 						node.put("method", "Manual", false);
 					} catch (StorageException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					staticMethod="Manual";
@@ -270,7 +268,6 @@ public class ProxyPreferencesHandler {
 		Composite spacer=new Composite(this.shell, SWT.NONE);
 		spacer.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		//shell.setSize(shell.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		this.shell.open();
 		while(!shell.isDisposed()){
 	    	if (!display.readAndDispatch()) {
@@ -285,7 +282,6 @@ public class ProxyPreferencesHandler {
 		gl.horizontalSpacing=0;
 		gl.verticalSpacing=0;
 		manualPart.setLayout(gl);
-		//manualPart.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		Composite serverPart=new Composite(manualPart, SWT.NONE);
 		gl=new GridLayout();
@@ -322,7 +318,7 @@ public class ProxyPreferencesHandler {
 		}
 		
 		this.authRequired=new Button(manualPart, SWT.CHECK);
-		this.authRequired.setText("Authentification required");
+		this.authRequired.setText("Authentication required");
 		this.authRequired.addListener(SWT.Selection, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
@@ -398,4 +394,3 @@ public class ProxyPreferencesHandler {
 	    messageBox.open();
 	}
 }
-

@@ -12,9 +12,7 @@ package fr.sanofi.fcl4transmart.model.classes.dataType;
 
 import java.io.File;
 import java.util.Vector;
-import fr.sanofi.fcl4transmart.model.classes.steps.studyDescription.ChangeName;
-import fr.sanofi.fcl4transmart.model.classes.steps.studyDescription.LoadDescription;
-import fr.sanofi.fcl4transmart.model.classes.steps.studyDescription.SetTopNode;
+import fr.sanofi.fcl4transmart.model.classes.steps.studyDescription.StudyPath;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 import fr.sanofi.fcl4transmart.model.interfaces.StepItf;
 import fr.sanofi.fcl4transmart.model.interfaces.StudyItf;
@@ -31,16 +29,14 @@ public class StudyDescription implements DataTypeItf{
 		this.steps=new Vector<StepItf>();
 		
 		//add the different steps here
-		this.steps.add(new ChangeName(study));
-		this.steps.add(new SetTopNode(this));
-		this.steps.add(new LoadDescription(study));
+		this.steps.add(new StudyPath(this.study));
 	}
 	@Override
 	public Vector<StepItf> getSteps() {
 		return this.steps;
 	}
 	public String toString(){
-		return "Study description";
+		return "Study location";
 	}
 	public void setFiles(File path){
 		this.path=path;

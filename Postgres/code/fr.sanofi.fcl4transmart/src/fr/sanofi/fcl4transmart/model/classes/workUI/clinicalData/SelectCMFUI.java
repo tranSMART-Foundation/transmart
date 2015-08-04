@@ -39,8 +39,6 @@ public class SelectCMFUI implements WorkItf{
 	}
 	@Override
 	public Composite createUI(Composite parent){
-
-		
 		Composite composite=new Composite(parent, SWT.NONE);
 		GridLayout gd=new GridLayout();
 		gd.numColumns=1;
@@ -118,17 +116,14 @@ public class SelectCMFUI implements WorkItf{
 	}
 	@Override
 	public Vector<Vector<String>> copy() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public void paste(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 }

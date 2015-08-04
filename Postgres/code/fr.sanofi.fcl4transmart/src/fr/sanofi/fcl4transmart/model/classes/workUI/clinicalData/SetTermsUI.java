@@ -104,12 +104,6 @@ public class SetTermsUI implements WorkItf{
 	    		event.doit = false; 
 	    	} 
     	}); 
-	    /*this.columnsField.addListener(SWT.Selection, new Listener(){ 
-	    	public void handleEvent(Event event) { 
-	    		replaceBody(createBody(columnsField.getText()));
-	    		
-	    	} 
-    	});*/ 
 	    numerical=new Button(columnPart, SWT.CHECK);
 	    numerical.setText("Numerical");
 	    
@@ -184,6 +178,18 @@ public class SetTermsUI implements WorkItf{
 		
 		Label name=new Label(body, SWT.NONE);
 		name.setText("Property: "+fullName);
+		boolean found=false;
+		for(String header: this.oldTerms.keySet()){
+			if(header.compareTo(fullName)==0){
+				if(this.oldTerms.get(header).size()>0){
+					found=true;
+					break;
+				}
+			}
+		}
+		if(!found){
+			this.addHeader(fullName);
+		}
 		
 		Composite grid=new Composite(body, SWT.NONE);
 		gd=new GridLayout();
@@ -256,7 +262,7 @@ public class SetTermsUI implements WorkItf{
 				}
 			}
 		}
-		if(allNumerical){
+		if(this.numerical.getSelection() && allNumerical){
 			Label label=new Label(body, SWT.NONE);
 			label.setText("Contains only numerical values.");
 		}
@@ -278,6 +284,23 @@ public class SetTermsUI implements WorkItf{
 		this.scrolledComposite.getParent().layout(true, true);
 		this.scrolledComposite.setSize(this.scrolledComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
+	public void addHeader(String fullName){
+		this.terms.put(fullName, new Vector<String>());
+		this.oldTerms.put(fullName, new Vector<String>());
+		File rawFile=null;
+		for(File file: ((ClinicalData)this.dataType).getRawFiles()){
+			if(file.getName().compareTo(fullName.split(" - ", -1)[0])==0){
+				rawFile=file;
+			}
+		}
+		if(rawFile==null) return;
+		for(String oldData: FileHandler.getTerms(rawFile, fullName.split(" - ", -1)[1])){
+			if(oldData.compareTo("")!=0){
+				this.oldTerms.get(fullName).add(oldData);
+				this.terms.get(fullName).add("");
+			}
+		}
+	}
 	public void initiate(){
 		this.terms=new HashMap<String, Vector<String>>();
 		this.oldTerms=new HashMap<String, Vector<String>>();
@@ -285,27 +308,32 @@ public class SetTermsUI implements WorkItf{
 		File cmf=((ClinicalData)this.dataType).getCMF();
 		if(wmf!=null){
 			if(cmf!=null){
+				Vector<String> wmfHeaders=FileHandler.getHeadersFromWmf(((ClinicalData)this.dataType).getRawFiles(), wmf);
 				for(File rawFile: ((ClinicalData)this.dataType).getRawFiles()){
 					for(String s: FileHandler.getHeaders(rawFile)){
 						String fullName=rawFile.getName()+" - "+s;
-						this.terms.put(fullName, new Vector<String>());
-						this.oldTerms.put(fullName, new Vector<String>());
-						for(String oldData: FileHandler.getTerms(rawFile, s)){
-							if(oldData.compareTo("")!=0){
-								this.oldTerms.get(fullName).add(oldData);
-								String newTerm=FileHandler.getNewDataValue(wmf, rawFile, s, oldData);
-								if(newTerm!=null){
-									this.terms.get(fullName).add(newTerm);
+						for(String wmfHeader: wmfHeaders){
+							if(wmfHeader.compareTo(fullName)==0){
+								this.terms.put(fullName, new Vector<String>());
+								this.oldTerms.put(fullName, new Vector<String>());
+								for(String oldData: FileHandler.getTerms(rawFile, s)){
+									if(oldData.compareTo("")!=0){
+										this.oldTerms.get(fullName).add(oldData);
+										String newTerm=FileHandler.getNewDataValue(wmf, rawFile, s, oldData);
+										if(newTerm!=null){
+											this.terms.get(fullName).add(newTerm);
+										}
+										else{
+											this.terms.get(fullName).add("");
+                                                                                }
+									}
 								}
-								else{
-									this.terms.get(fullName).add("");
-								}
+								break;
 							}
 						}
 					}
 				}
 			}
-
 		}
 		else{
 			if(cmf!=null){
@@ -314,12 +342,6 @@ public class SetTermsUI implements WorkItf{
 						String fullName=rawFile.getName()+" - "+s;
 						this.terms.put(fullName, new Vector<String>());
 						this.oldTerms.put(fullName, new Vector<String>());
-						for(String oldData: FileHandler.getTerms(rawFile, s)){
-							if(oldData.compareTo("")!=0){
-								this.terms.get(fullName).add("");
-								this.oldTerms.get(fullName).add(oldData);
-							}
-						}
 					}
 				}
 			}

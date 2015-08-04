@@ -14,10 +14,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import org.apache.commons.io.FileUtils;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import fr.sanofi.fcl4transmart.controllers.Utils;
 import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.classes.workUI.clinicalData.SelectWMFUI;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
@@ -35,7 +35,6 @@ public class SelectWMFListener implements Listener{
 	}
 	@Override
 	public void handleEvent(Event event) {
-		// TODO Auto-generated method stub
 		String path=this.selectWMFUI.getPath();
 		if(path==null) return;
 		if(path.contains("%")){
@@ -57,15 +56,14 @@ public class SelectWMFListener implements Listener{
 
 				File copiedFile=new File(newPath);
 				try {
-					FileUtils.copyFile(file, copiedFile);
+					Utils.copyFile(file, copiedFile);
 					((ClinicalData)this.dataType).setWMF(copiedFile);
 					
 					this.selectWMFUI.displayMessage("File has been added");
 					WorkPart.updateSteps();
-					//to do: update files list
 					UsedFilesPart.sendFilesChanged(dataType);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					if(copiedFile.exists()) copiedFile.delete();
 					this.selectWMFUI.displayMessage("Error: "+e.getLocalizedMessage());
 					e.printStackTrace();
 				}

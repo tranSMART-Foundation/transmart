@@ -43,6 +43,7 @@ public class SetOtherIdsUI implements WorkItf{
 	private Vector<String> visitNames;
 	private Vector<Combo> siteFields;
 	private Vector<Combo> visitFields;
+	private Vector<String> obsNames;
 	public SetOtherIdsUI(DataTypeItf dataType){
 		this.dataType=dataType;
 	}
@@ -166,6 +167,7 @@ public class SetOtherIdsUI implements WorkItf{
 	private void initiate(){
 		this.siteIds=new Vector<String>();
 		this.visitNames=new Vector<String>();
+		this.obsNames=new Vector<String>();
 		File cmf=((ClinicalData)this.dataType).getCMF();
 		if(cmf!=null){
 			for(File file: ((ClinicalData)this.dataType).getRawFiles()){
@@ -183,6 +185,13 @@ public class SetOtherIdsUI implements WorkItf{
 				else{
 					this.visitNames.add("");
 				}
+				columnNumber=FileHandler.getNumberForLabel(cmf,  "VISIT_NAME_2", file);
+				if(columnNumber!=-1){
+					this.obsNames.add(FileHandler.getColumnByNumber(file, columnNumber));
+				}
+				else{
+					this.obsNames.add("");
+				}
 			}
 		}
 		else{
@@ -197,6 +206,9 @@ public class SetOtherIdsUI implements WorkItf{
 	}
 	public Vector<String> getVisitNames(){
 		return this.visitNames;
+	}
+	public Vector<String> getObsNames(){
+		return this.obsNames;
 	}
 	public void displayMessage(String message){
 	    int style = SWT.ICON_INFORMATION | SWT.OK;
@@ -214,17 +226,14 @@ public class SetOtherIdsUI implements WorkItf{
 	}
 	@Override
 	public Vector<Vector<String>> copy() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public void paste(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 }

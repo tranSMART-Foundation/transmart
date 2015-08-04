@@ -13,7 +13,6 @@ package fr.sanofi.fcl4transmart.model.classes.workUI.geneExpression;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Vector;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.GridData;
@@ -24,6 +23,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -53,6 +53,10 @@ public class QualityControlUI implements WorkItf{
 	private Vector<String> c2;
 	private Vector<String> c3;
 	private Vector<String> c4;
+	private boolean testDeapp;
+	private Shell shellComplete;
+	private boolean isSearchingComplete;
+	private boolean completeWorked;
 	public QualityControlUI(DataTypeItf dataType){
 		this.dataType=dataType;
 	}
@@ -73,6 +77,7 @@ public class QualityControlUI implements WorkItf{
 		new Thread(){
 			public void run() {
 				number=String.valueOf(RetrieveData.getGeneProbeNumber(dataType.getStudy().toString()));
+				testDeapp=RetrieveData.testDeappConnection();
 				isSearching=false;
 			}
         }.start();
@@ -109,6 +114,52 @@ public class QualityControlUI implements WorkItf{
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.grabExcessHorizontalSpace = true;
 		this.scrolledComposite.setLayoutData(gridData);
+		
+		//button to launch complete comparison
+		Button complete=new Button(scrolledComposite, SWT.PUSH);
+		complete.setText("Launch a comparison");
+		complete.addListener(SWT.Selection, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				if(testDeapp){
+					shellComplete=new Shell();
+					shellComplete.setSize(50, 100);
+					GridLayout gridLayout=new GridLayout();
+					gridLayout.numColumns=1;
+					shellComplete.setLayout(gridLayout);
+					ProgressBar pb = new ProgressBar(shellComplete, SWT.HORIZONTAL | SWT.INDETERMINATE);
+					pb.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+					Label searching=new Label(shellComplete, SWT.NONE);
+					searching.setText("Searching...");
+					shellComplete.open();
+					isSearchingComplete=false;
+					new Thread(){
+						public void run() {
+							completeWorked=(new GeneQCController(dataType).writeLog());
+							isSearchingComplete=true;
+						}
+			        }.start();
+			        Display display=WorkPart.display();
+			        while(!isSearchingComplete){
+			        	if (!display.readAndDispatch()) {
+			                display.sleep();
+			              }	
+			        }
+			        shellComplete.close();
+			        if(completeWorked){
+			        	displayMessage("Comparison is over. See file QClog.txt for results");
+			        }else{
+			        	displayMessage("Comparison Failed. Please check that database connection works and that workspace is accessible.");
+			        }
+					WorkPart.updateSteps();
+					WorkPart.updateFiles();
+				}else{
+					displayMessage("Connection to database is not possible");
+				}
+			}
+		});
+
 		
 		Label probeNumber=new Label(this.scrolledComposite, SWT.NONE);
 		probeNumber.setText("Probe number: "+this.number);
@@ -261,6 +312,7 @@ public class QualityControlUI implements WorkItf{
 		gridData.grabExcessHorizontalSpace = true;
 		column4.setLayoutData(gridData);
 		
+		boolean rawData=new GeneQCController(this.dataType).getIfRawData();
 		for(String key: fileValues.keySet()){
 			Label label=new Label(body, SWT.NONE);
 			label.setText(key);
@@ -294,11 +346,13 @@ public class QualityControlUI implements WorkItf{
 			
 			Label eqLabel=new Label(body, SWT.NONE);
 			if(dbValues.containsKey(key) && fileValues.containsKey(key)){
-				if((dbValues.get(key)-fileValues.get(key))<=0.001 && (dbValues.get(key)-fileValues.get(key))>=-0.001){
+				if(!rawData && (dbValues.get(key)-fileValues.get(key))<=0.001 && (dbValues.get(key)-fileValues.get(key))>=-0.001){
 					eqLabel.setText("OK");
 					this.c4.add("OK");
-				}
-				else{
+				}else if(rawData && (dbValues.get(key)-logb(fileValues.get(key), 2))<=0.001 && (dbValues.get(key)-logb(fileValues.get(key), 2))>=-0.001){
+					eqLabel.setText("OK");
+					this.c4.add("OK");
+				}else{
 					eqLabel.setText("FAIL");
 					this.c4.add("FAIL");
 				}
@@ -336,12 +390,20 @@ public class QualityControlUI implements WorkItf{
 	}
 	@Override
 	public void paste(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
+	}
+	public void displayMessage(String message){
+	    int style = SWT.ICON_INFORMATION | SWT.OK;
+	    MessageBox messageBox = new MessageBox(new Shell(), style);
+	    messageBox.setMessage(message);
+	    messageBox.open();
+	}
+	private double logb( double a, double b )
+	{
+	return Math.log(a) / Math.log(b);
 	}
 }

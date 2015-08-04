@@ -17,15 +17,18 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Vector;
-import org.apache.commons.io.FileUtils;
+
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+
 import fr.sanofi.fcl4transmart.controllers.FileHandler;
+import fr.sanofi.fcl4transmart.controllers.Utils;
 import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.classes.workUI.clinicalData.SetOtherIdsUI;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 import fr.sanofi.fcl4transmart.ui.parts.UsedFilesPart;
 import fr.sanofi.fcl4transmart.ui.parts.WorkPart;
+
 /**
  *This class controls the visit names and site identifiers selection step
  *Since version 1.2: also controls observation names 
@@ -42,8 +45,18 @@ public class SelectOtherIdentifiersListener implements Listener{
 		 Vector<File> rawFiles=((ClinicalData)this.dataType).getRawFiles();
 		 Vector<String> siteIds=this.setOtherIdsUI.getSiteIds();
 		 Vector<String> visitNames=this.setOtherIdsUI.getVisitNames();
-		 
-		//write in a new file
+		 Vector<String> obsNames=this.setOtherIdsUI.getObsNames();
+		//check that if sub-visit names are set, visit names are too. In the other case, warn the user and do not upload file
+		 for(int i=0; i<rawFiles.size(); i++){
+			 if(obsNames.elementAt(i).compareTo("")!=0){	
+				  if(visitNames.elementAt(i).compareTo("")==0){
+					this.setOtherIdsUI.displayMessage("Sub-visit names can only be set if visit names are set.");
+					return;
+				  }
+			 }
+		 }
+
+                 //write in a new file
 		File file=new File(this.dataType.getPath().toString()+File.separator+this.dataType.getStudy().toString()+".columns.tmp");
 		try{			  
 			  FileWriter fw = new FileWriter(file);
@@ -67,6 +80,13 @@ public class SelectOtherIdentifiersListener implements Listener{
 						  out.write(rawFiles.elementAt(i).getName()+"\t\t"+columnNumber+"\tVISIT_NAME\t\t\n");
 					  }
 				  }
+				  //observation names
+				  if(obsNames.elementAt(i).compareTo("")!=0){	
+					  int columnNumber=FileHandler.getHeaderNumber(rawFiles.elementAt(i), obsNames.elementAt(i));
+					  if(columnNumber!=-1){
+						  out.write(rawFiles.elementAt(i).getName()+"\t\t"+columnNumber+"\tVISIT_NAME_2\t\t\n");
+					  }
+				  }
 			  }
 			  //add lines from existing CMF
 				try{
@@ -74,7 +94,7 @@ public class SelectOtherIdentifiersListener implements Listener{
 					String line=br.readLine();
 					while ((line=br.readLine())!=null){
 						String[] s=line.split("\t", -1);
-						if(s[3].compareTo("SITE_ID")!=0 && s[3].compareTo("VISIT_NAME")!=0){
+						if(s[3].compareTo("SITE_ID")!=0 && s[3].compareTo("VISIT_NAME")!=0 && s[3].compareTo("VISIT_NAME_2")!=0){
 							out.write(line+"\n");
 						}
 					}
@@ -86,10 +106,10 @@ public class SelectOtherIdentifiersListener implements Listener{
 				}
 				out.close();
 				try{
-					String fileName=((ClinicalData)this.dataType).getCMF().getName();
 					((ClinicalData)this.dataType).getCMF().delete();
-					File fileDest=new File(this.dataType.getPath()+File.separator+fileName);
-					FileUtils.moveFile(file, fileDest);
+					File fileDest=new File(this.dataType.getPath()+File.separator+((ClinicalData)this.dataType).getCMF().getName());
+					Utils.copyFile(file, fileDest);
+					file.delete();
 					((ClinicalData)this.dataType).setCMF(fileDest);
 				}
 				catch(IOException ioe){

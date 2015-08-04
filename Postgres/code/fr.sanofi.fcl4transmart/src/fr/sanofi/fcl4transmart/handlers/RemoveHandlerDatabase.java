@@ -17,6 +17,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 /**
  *This class controls the menu item to remove a study from database
  */	
+@SuppressWarnings("restriction")
 public class RemoveHandlerDatabase {
 	@Inject private static IEventBroker eventBroker;
 	@Execute
