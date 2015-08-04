@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Framework Curation &amp; Loading For tranSMART" uid="fr.sanofi.fcl4transmart.product" id="fr.sanofi.fcl4transmart.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.4.3" useFeatures="false" includeLaunchers="true">
+<product name="Framework Curation &amp; Loading For tranSMART" uid="fr.sanofi.fcl4transmart.product" id="fr.sanofi.fcl4transmart.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.4.3" useFeatures="true" includeLaunchers="true">
 
    <configIni use="">
    </configIni>
