@@ -11,8 +11,9 @@
 package fr.sanofi.fcl4transmart.model.classes.workUI.clinicalData;
 
 import java.io.File;
-import org.eclipse.jface.dialogs.MessageDialog;
 import java.util.Vector;
+
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -44,6 +45,7 @@ import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 import fr.sanofi.fcl4transmart.model.interfaces.WorkItf;
 import fr.sanofi.fcl4transmart.ui.parts.WorkPart;
+
 /**
  *This class allows the creation of the composite to select clinical raw data files
  */
@@ -209,7 +211,6 @@ public class SelectRawFilesUI implements WorkItf{
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				// nothing to do
-				
 			}
 		});
 		gridData = new GridData();
@@ -252,12 +253,10 @@ public class SelectRawFilesUI implements WorkItf{
 			}
 			public void dispose() {
 				// nothing to do
-
 			}
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 				// nothing to do
-				
 			}
 		});	
 		this.viewer.setInput(((ClinicalData)this.dataType).getRawFiles());
@@ -489,11 +488,9 @@ public class SelectRawFilesUI implements WorkItf{
 	@Override
 	public void paste(Vector<Vector<String>> data) {
 		// nothing to do
-		
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
 		// nothing to do
-		
 	}
 }

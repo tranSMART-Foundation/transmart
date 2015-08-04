@@ -30,19 +30,19 @@ import org.eclipse.swt.widgets.Text;
 
 @SuppressWarnings("restriction")
 public class transmartPreferences {
-	private Text adress;
-	private static String staticAdress;
+	private Text address;
+	private static String staticAddress;
 	private ISecurePreferences preferences;
 	private ISecurePreferences transmartPreferences;
 	private Shell shell;
-	private Vector<String> adresses;
+	private Vector<String> addresses;
 	private static String staticSelectedName;
 	private ListViewer viewer;
 	private Composite preferencesPart;
 	@Inject  private IEventBroker eventBroker;
 	private Text saveNameField;
 	public transmartPreferences(){
-		staticAdress="";
+		staticAddress="";
 		try {
 			ISecurePreferences securePref= SecurePreferencesFactory.getDefault();
 	        preferences = securePref.node("transmart");
@@ -50,12 +50,12 @@ public class transmartPreferences {
 	        staticSelectedName=preferences.get("nameSelected", "");
 	        boolean found=false;
 	        String[] subPref;
-			this.adresses=new Vector<String>();
+			this.addresses=new Vector<String>();
 			subPref=this.preferences.childrenNames();
-			this.adresses.add("");
+			this.addresses.add("");
 			for(int i=0; i<subPref.length; i++){
 				if(subPref[i].compareTo("nameSelected")!=0){
-					this.adresses.add(subPref[i]);
+					this.addresses.add(subPref[i]);
 					if(subPref[i].compareTo(staticSelectedName)==0) found=true;
 				}
 			}
@@ -65,9 +65,9 @@ public class transmartPreferences {
 				transmartPreferences=preferences.node(staticSelectedName);
 			}
 			if(staticSelectedName.compareTo("")!=0){
-				staticAdress=transmartPreferences.get("adress", "");
+				staticAddress=transmartPreferences.get("adress", "");
 			}else{
-				staticAdress="";
+				staticAddress="";
 			}
         } catch (StorageException e1) {
         	e1.printStackTrace();
@@ -78,7 +78,7 @@ public class transmartPreferences {
 	public void execute(Display display) {		
 		this.shell=new Shell(SWT.TITLE|SWT.SYSTEM_MODAL| SWT.CLOSE | SWT.MAX | SWT.RESIZE);
 	    this.shell.setMinimumSize(250,250);
-	    this.shell.setText("tranSAMRT preferences");
+	    this.shell.setText("tranSMART preferences");
 	    GridLayout gridLayout=new GridLayout();
 		gridLayout.numColumns=2;
 		this.shell.setLayout(gridLayout);
@@ -103,9 +103,9 @@ public class transmartPreferences {
 				// nothing to do
 			}
 		});	
-	   this.viewer.setInput(this.adresses);
-		for(int i=0; i<this.adresses.size(); i++){
-			if(this.adresses.get(i).compareTo(staticSelectedName)==0){
+	   this.viewer.setInput(this.addresses);
+		for(int i=0; i<this.addresses.size(); i++){
+			if(this.addresses.get(i).compareTo(staticSelectedName)==0){
 				this.viewer.getList().setSelection(i);
 			}
 		}
@@ -161,7 +161,7 @@ public class transmartPreferences {
 	}
 	
 	/**
-	 *Change the preferences part of the shell if another transmart adress is selected
+	 *Change the preferences part of the shell if another transmart address is selected
 	 */
 	private Composite changePrefPart(){			
 		Composite prefPart=new Composite(shell, SWT.NONE);
@@ -197,28 +197,28 @@ public class transmartPreferences {
 		saveNameField.setLayoutData(gridData);
 		
 		Label lab6=new Label(body, SWT.WRAP);
-		lab6.setText("tranSMART application adress:");
+		lab6.setText("tranSMART application address:");
 		gridData=new GridData(GridData.FILL_HORIZONTAL);
 		gridData.widthHint=150;
 		gridData.grabExcessHorizontalSpace=false;
 		lab6.setLayoutData(gridData);
 		
-		this.adress=new Text(body, SWT.BORDER );
+		this.address=new Text(body, SWT.BORDER );
 		gridData=new GridData(GridData.FILL_HORIZONTAL);
 		gridData.widthHint=150;
 		gridData.grabExcessHorizontalSpace=true;
-		this.adress.setLayoutData(gridData);
+		this.address.setLayoutData(gridData);
 		if(staticSelectedName.compareTo("")==0){
-			this.adress.setText("");
+			this.address.setText("");
 		}else{
 			try {
 				if(transmartPreferences!=null){
-					staticAdress=transmartPreferences.get("adress", "");
+					staticAddress=transmartPreferences.get("address", "");
 				}
 			} catch (StorageException e2) {
 				e2.printStackTrace();
 			}
-			this.adress.setText(staticAdress);
+			this.address.setText(staticAddress);
 		}
 		
 		Composite buttonPart=new Composite(prefPart, SWT.NONE);
@@ -245,17 +245,17 @@ public class transmartPreferences {
 				    return;
 				}
 				boolean found=false;
-				for(String s: adresses){
+				for(String s: addresses){
 					if(s.compareTo(saveNameField.getText())==0){
 						found=true;
 					}
 				}
 				if(!found){
-					adresses.add(saveNameField.getText());
+					addresses.add(saveNameField.getText());
 				}
-				viewer.setInput(adresses);
-				for(int i=0; i<adresses.size(); i++){
-					if(adresses.get(i).compareTo(saveNameField.getText())==0){
+				viewer.setInput(addresses);
+				for(int i=0; i<addresses.size(); i++){
+					if(addresses.get(i).compareTo(saveNameField.getText())==0){
 						staticSelectedName=saveNameField.getText();
 						viewer.getList().setSelection(i);
 						transmartPreferences=preferences.node(staticSelectedName);
@@ -273,11 +273,11 @@ public class transmartPreferences {
 					}
 				}
             	try{
-		            transmartPreferences.put("adress", adress.getText(), true);
+		            transmartPreferences.put("address", address.getText(), true);
             	 } catch (StorageException e1) {
 			            e1.printStackTrace();
 			     }
-	            staticAdress=adress.getText(); 
+	            staticAddress=address.getText(); 
 			}
 		});
         

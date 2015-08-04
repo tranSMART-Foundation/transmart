@@ -31,6 +31,7 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
 import fr.sanofi.fcl4transmart.controllers.RetrieveFm;
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.handlers.etlPreferences;
 import fr.sanofi.fcl4transmart.model.classes.TreeNode;
@@ -200,10 +201,10 @@ public class LoadMetaListener implements Listener {
 					  String[] splited=topNode.split("\\\\");
 					  //check if top node exists, add it
 					  try{
-						Class.forName("oracle.jdbc.driver.OracleDriver");
-						String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
+						Class.forName(RetrieveData.getDriverString());
+						String connection=RetrieveData.getConnectionString();
 						
-						Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
+						Connection con = DriverManager.getConnection(connection, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
 						
 						Statement stmt = con.createStatement();
 						//insert program node if it does not exist
@@ -312,7 +313,7 @@ public class LoadMetaListener implements Listener {
 							URL jarUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/loader.jar");
 							jarUrl = FileLocator.toFileURL(jarUrl);  
 							String jarPath = jarUrl.getPath();
-							String[] cmd = { "java", "-classpath", jarPath, "com.recomdata.pipeline.loader.Loader", ((SnpData)dataType).getMetaTablesProps().getAbsolutePath(), ((SnpData)dataType).getLogProps().getAbsolutePath(), "jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName(), "oracle.jdbc.driver.OracleDriver", PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd(), PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd(), PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd()};
+							String[] cmd = { "java", "-classpath", jarPath, "com.recomdata.pipeline.loader.Loader", ((SnpData)dataType).getMetaTablesProps().getAbsolutePath(), ((SnpData)dataType).getLogProps().getAbsolutePath(), RetrieveData.getConnectionString(), RetrieveData.getDriverString(), PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd(), PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd(), PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd()};
 
 					        Process p = Runtime.getRuntime().exec(cmd);
 
@@ -424,7 +425,7 @@ public class LoadMetaListener implements Listener {
 								try{
 									channel=session.openChannel("exec");
 									dir=etlPreferences.getFilesDirectory()+"/"+dataType.getStudy().toString()+"/snp";
-									String command = "java -classpath "+dir+"/loader.jar com.recomdata.pipeline.loader.Loader "+dir+"/"+((SnpData)dataType).getMetaTablesProps().getName()+" "+dir+"/"+((SnpData)dataType).getLogProps().getName()+" "+"jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName()+" "+"oracle.jdbc.driver.OracleDriver"+" "+PreferencesHandler.getDeappUser()+" "+PreferencesHandler.getDeappPwd()+" "+PreferencesHandler.getMetadataUser()+" "+PreferencesHandler.getMetadataPwd()+" "+PreferencesHandler.getDemodataUser()+" "+PreferencesHandler.getDemodataPwd();
+									String command = "java -classpath "+dir+"/loader.jar com.recomdata.pipeline.loader.Loader "+dir+"/"+((SnpData)dataType).getMetaTablesProps().getName()+" "+dir+"/"+((SnpData)dataType).getLogProps().getName()+" "+RetrieveData.getConnectionString()+" "+RetrieveData.getDriverString()+" "+PreferencesHandler.getDeappUser()+" "+PreferencesHandler.getDeappPwd()+" "+PreferencesHandler.getMetadataUser()+" "+PreferencesHandler.getMetadataPwd()+" "+PreferencesHandler.getDemodataUser()+" "+PreferencesHandler.getDemodataPwd();
 									((ChannelExec)channel).setCommand(command);
 								 
 									 BufferedReader stdError = new BufferedReader(new 
@@ -501,10 +502,10 @@ public class LoadMetaListener implements Listener {
 					  }
 					  
 					  try{
-							Class.forName("oracle.jdbc.driver.OracleDriver");
-							String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
+							Class.forName(RetrieveData.getDriverString());
+							String connection=RetrieveData.getConnectionString();
 							
-							Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
+							Connection con = DriverManager.getConnection(connection, PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
 							
 							Statement stmt = con.createStatement();
 							

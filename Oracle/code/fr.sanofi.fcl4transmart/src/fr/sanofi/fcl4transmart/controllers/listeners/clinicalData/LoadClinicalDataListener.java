@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import fr.sanofi.fcl4transmart.controllers.RetrieveFm;
 import fr.sanofi.fcl4transmart.controllers.Utils;
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.handlers.etlPreferences;
 import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
@@ -59,6 +60,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+
 /**
  *This class controls the clinical data loading
  */	
@@ -163,8 +165,8 @@ public class LoadClinicalDataListener implements Listener{
 			out.write("db.username = '"+PreferencesHandler.getTm_czUser()+"'\n");
 			out.write("db.password = '"+PreferencesHandler.getTm_czPwd()+"'\n");
 			out.write("log.fileName = \""+(dataLocation+File.separator+"kettle.log").replace("\\", "\\\\")+"\"\n");
-			out.write("db.jdbcConnectionString = \"jdbc:oracle:thin:@${db.hostname}:${db.port}:${db.sid}\"\n");
-			out.write("db.jdbcDriver = 'oracle.jdbc.driver.OracleDriver'\n");
+			out.write("db.jdbcConnectionString = \""+RetrieveData.getConnectionString()+"\"\n");
+			out.write("db.jdbcDriver = '"+RetrieveData.getDriverString()+"'\n");
 			out.write("dataDir = '"+etlDir.getAbsolutePath().replace("\\", "\\\\")+"'");
 			out.close();
 			//copy clinical data files
@@ -304,8 +306,8 @@ public class LoadClinicalDataListener implements Listener{
 				out.write("db.username = '"+PreferencesHandler.getTm_czUser()+"'\n");
 				out.write("db.password = '"+PreferencesHandler.getTm_czPwd()+"'\n");
 				out.write("log.fileName = \""+(c.pwd()+"/"+splited[1]+"/"+splited[2]+"/"+"kettle.log").replace("\\", "\\\\")+"\"\n");
-				out.write("db.jdbcConnectionString = \"jdbc:oracle:thin:@${db.hostname}:${db.port}:${db.sid}\"\n");
-				out.write("db.jdbcDriver = 'oracle.jdbc.driver.OracleDriver'\n");
+				out.write("db.jdbcConnectionString = \""+RetrieveData.getConnectionString()+"\"\n");
+				out.write("db.jdbcDriver = '"+RetrieveData.getDriverString()+"'\n");
 				out.write("dataDir = '"+etlDir.replace("\\", "\\\\")+"'");
 				out.close();
 				try{
@@ -445,10 +447,10 @@ public class LoadClinicalDataListener implements Listener{
 	public void createTopNode(){
 		try{
 			String[] splited=loadDataUI.getTopNode().split("\\\\", -1);
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
+			Class.forName(RetrieveData.getDriverString());
+			String connection=RetrieveData.getConnectionString();
 			
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
 			Statement stmt = con.createStatement();
 			ResultSet rs=stmt.executeQuery("select * from table_access where c_name='"+splited[1].replace("_"," ")+"'");
 			if(!rs.next()){//have to add a top node

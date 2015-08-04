@@ -45,7 +45,7 @@ public class StudyTreeController {
 					name=s[4]+": "+name;
 					this.buildNode(this.root, s[1], name, "", true);
 				}
-				else if(s[3].compareTo("OMIT")!=0 && s[3].compareTo("SUBJ_ID")!=0 && s[3].compareTo("VISIT_NAME")!=0 && s[3].compareTo("VISIT_NAME_2")!=0 && s[3].compareTo("SITE_ID")!=0 && s[3].compareTo("UNITS")!=0&& s[3].compareTo("VISIT_DATE")!=0 && s[3].compareTo("ENROLL_DATE")!=0){
+				else if(s[3].compareTo("OMIT")!=0 && s[3].compareTo("SUBJ_ID")!=0 && s[3].compareTo("VISIT_NAME")!=0 && s[3].compareTo("VISIT_NAME_2")!=0 && s[3].compareTo("SITE_ID")!=0 && s[3].compareTo("UNITS")!=0 && s[3].compareTo("VISIT_DATE")!=0 && s[3].compareTo("ENROLL_DATE")!=0){
 					this.buildNode(this.root, s[1], name, "", false);
 				}
 			}

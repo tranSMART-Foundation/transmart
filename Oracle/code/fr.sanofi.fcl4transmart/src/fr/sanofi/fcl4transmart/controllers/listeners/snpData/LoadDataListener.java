@@ -23,6 +23,7 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
 import fr.sanofi.fcl4transmart.controllers.FileHandler;
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.handlers.etlPreferences;
 import fr.sanofi.fcl4transmart.model.classes.dataType.SnpData;
@@ -171,7 +172,7 @@ public class LoadDataListener implements Listener {
 							URL jarUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/loader.jar");
 							jarUrl = FileLocator.toFileURL(jarUrl);  
 							String jarPath = jarUrl.getPath();
-							String[] cmd = { "java", "-classpath", jarPath, "com.recomdata.pipeline.plink.PlinkLoader", ((SnpData)dataType).getDataProp().getAbsolutePath(), ((SnpData)dataType).getLogProps().getAbsolutePath(), "jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName(), "oracle.jdbc.driver.OracleDriver", PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd(), PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd()};
+							String[] cmd = { "java", "-classpath", jarPath, "com.recomdata.pipeline.plink.PlinkLoader", ((SnpData)dataType).getDataProp().getAbsolutePath(), ((SnpData)dataType).getLogProps().getAbsolutePath(), RetrieveData.getConnectionString(), RetrieveData.getDriverString(), PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd(), PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd()};
 
 					        Process p = Runtime.getRuntime().exec(cmd);
 					        BufferedReader stdInput = new BufferedReader(new 
@@ -293,7 +294,7 @@ public class LoadDataListener implements Listener {
 								try{
 									channel=session.openChannel("exec");
 									dir=etlPreferences.getFilesDirectory()+"/"+dataType.getStudy().toString()+"/snp";
-									String command = "java -classpath "+dir+"/loader.jar com.recomdata.pipeline.plink.PlinkLoader "+dir+"/"+((SnpData)dataType).getDataProp().getName()+" "+dir+"/"+((SnpData)dataType).getLogProps().getName()+" "+"jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName()+" "+"oracle.jdbc.driver.OracleDriver"+" "+PreferencesHandler.getDeappUser()+" "+PreferencesHandler.getDeappPwd()+" "+PreferencesHandler.getDemodataUser()+" "+PreferencesHandler.getDemodataPwd();
+									String command = "java -classpath "+dir+"/loader.jar com.recomdata.pipeline.plink.PlinkLoader "+dir+"/"+((SnpData)dataType).getDataProp().getName()+" "+dir+"/"+((SnpData)dataType).getLogProps().getName()+" "+RetrieveData.getConnectionString()+" "+RetrieveData.getDriverString()+" "+PreferencesHandler.getDeappUser()+" "+PreferencesHandler.getDeappPwd()+" "+PreferencesHandler.getDemodataUser()+" "+PreferencesHandler.getDemodataPwd();
 									((ChannelExec)channel).setCommand(command);
 								 
 									 BufferedReader stdError = new BufferedReader(new 

@@ -19,6 +19,7 @@ import java.sql.Statement;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.model.classes.workUI.miRnaSeqData.LoadAnnotationUI;
 
@@ -39,9 +40,9 @@ public class CheckAnnotationListener implements Listener{
 		new Thread(){
 			public void run() {
 				try{
-					Class.forName("oracle.jdbc.driver.OracleDriver");
-					String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-					Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
+					Class.forName(RetrieveData.getDriverString());
+					String connection=RetrieveData.getConnectionString();
+					Connection con = DriverManager.getConnection(connection, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
 					Statement stmt = con.createStatement();
 				    ResultSet rs = stmt.executeQuery("SELECT distinct platform from de_gpl_info where platform='"+platformId+"'");
 		

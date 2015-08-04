@@ -18,8 +18,10 @@ import java.sql.Statement;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.model.classes.workUI.description.LoadDescriptionUI;
+
 /**
  *This class controls the study description loading
  */	
@@ -84,9 +86,9 @@ public class LoadDescriptionListener implements Listener{
 			}
 		}
 		try{
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd());
+			Class.forName(RetrieveData.getDriverString());
+			String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd());
 			Statement stmt = con.createStatement();
 			
 			//remove rows for this study before adding new ones
@@ -216,7 +218,7 @@ public class LoadDescriptionListener implements Listener{
 		    	con.commit();
 		    	con.close();
 		    	//tag
-		    	con = DriverManager.getConnection(connectionString, PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
+		    	con = DriverManager.getConnection(connection, PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
 				stmt = con.createStatement();
 				
 				rs=stmt.executeQuery("delete from i2b2_tags where tag='"+this.loadDescriptionUI.getAccession().toUpperCase()+"'");

@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import fr.sanofi.fcl4transmart.controllers.FileHandler;
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.model.classes.dataType.GeneExpressionData;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
@@ -39,25 +40,25 @@ public class GeneQCController {
 		this.dataType=dataType;
 	}
 	/**
-	 *Returns a hash map with as key a prone and as value the intensity value, from the data files
+	 *Returns a hash map with as key a probe and as value the intensity value, from the data files
 	 */	
 	public HashMap<String, Double> getFileValues(String probeId){
 		HashMap<String, Double> filesValues=new HashMap<String, Double>();
 		Vector<File> rawFiles=((GeneExpressionData)this.dataType).getRawFiles();
 		for(File file: rawFiles){
-			filesValues.putAll(FileHandler.getIntensity(file, probeId));
+                	filesValues.putAll(FileHandler.getIntensity(file, probeId));
 		}
 		return filesValues;
 	}
 	/**
-	 *Returns a hash map with as key a prone and as value the intensity value, from the database
+	 *Returns a hash map with as key a probe and as value the intensity value, from the database
 	 */
 	public HashMap<String, Double> getDbValues(String probeId){
 		HashMap<String, Double> dbValues=new HashMap<String, Double>();
 		try{
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
+			Class.forName(RetrieveData.getDriverString());
+			String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
 			Statement stmt = con.createStatement();
 			ResultSet rs=stmt.executeQuery("select ssm.sample_cd, smd.log_intensity from de_subject_microarray_data smd, de_subject_sample_mapping ssm where probeset_id in (select probeset_id from de_mrna_annotation where probe_id='"+probeId+"') and ssm.trial_name='"+this.dataType.getStudy().toString().toUpperCase()+"' and ssm.assay_id=smd.assay_id");
 			while(rs.next()){
@@ -77,9 +78,9 @@ public class GeneQCController {
 	public HashMap<String, HashMap<String, Double>> getDbValuesAllProbes(){
 		HashMap<String, HashMap<String, Double>> dbValues=new HashMap<String, HashMap<String, Double>>();
 		try{
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
+			Class.forName(RetrieveData.getDriverString());
+			String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
 			Statement stmt = con.createStatement();
 			ResultSet rs=stmt.executeQuery("select ssm.sample_cd, smd.log_intensity, probe_id from de_subject_microarray_data smd, de_subject_sample_mapping ssm, de_mrna_annotation ma where smd.probeset_id=ma.probeset_id and ssm.trial_name='"+this.dataType.getStudy().toString().toUpperCase()+"' and ssm.assay_id=smd.assay_id");
 			while(rs.next()){

@@ -318,7 +318,7 @@ public class ProxyPreferencesHandler {
 		}
 		
 		this.authRequired=new Button(manualPart, SWT.CHECK);
-		this.authRequired.setText("Authentification required");
+		this.authRequired.setText("Authentication required");
 		this.authRequired.addListener(SWT.Selection, new Listener(){
 			@Override
 			public void handleEvent(Event event) {

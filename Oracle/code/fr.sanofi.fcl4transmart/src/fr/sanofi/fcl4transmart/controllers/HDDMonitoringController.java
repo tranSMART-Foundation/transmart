@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.model.classes.dataType.HDDData;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
@@ -41,12 +42,12 @@ public class HDDMonitoringController{
 		String procedureErrors="";
 		try{
 			try {
-				Class.forName("oracle.jdbc.driver.OracleDriver");
+				Class.forName(RetrieveData.getDriverString());
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
+			String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
 			Statement stmt = con.createStatement();
 
 			if(jobId==-1) return "";

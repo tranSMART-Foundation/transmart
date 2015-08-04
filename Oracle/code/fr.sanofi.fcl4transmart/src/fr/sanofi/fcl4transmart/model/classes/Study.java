@@ -28,7 +28,7 @@ import fr.sanofi.fcl4transmart.model.classes.dataType.StudyDescription;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 import fr.sanofi.fcl4transmart.model.interfaces.StudyItf;
 /**
- *This class represents a study, and implements the StudyItd interface
+ *This class represents a study, and implements the StudyItf interface
  */	
 public class Study implements StudyItf{
 	private String name;

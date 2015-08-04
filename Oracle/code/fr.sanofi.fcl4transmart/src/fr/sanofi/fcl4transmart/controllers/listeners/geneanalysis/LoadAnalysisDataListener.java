@@ -39,6 +39,7 @@ import org.pentaho.di.i18n.GlobalMessages;
 import org.pentaho.di.i18n.LanguageChoice;
 import org.pentaho.di.job.Job;
 import org.pentaho.di.job.JobMeta;
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.handlers.etlPreferences;
 import fr.sanofi.fcl4transmart.model.classes.dataType.GeneExpressionAnalysis;
@@ -171,8 +172,8 @@ public class LoadAnalysisDataListener implements Listener{
 						Pattern pattern=Pattern.compile(".*Finished job entry \\[run i2b2_load_omicsoft_data\\] \\(result=\\[true\\]\\).*", Pattern.DOTALL);
 						Matcher matcher=pattern.matcher(logText);
 						if(matcher.matches()){
-							String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-							Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
+                                                    String connection=RetrieveData.getConnectionString();
+							Connection con = DriverManager.getConnection(connection, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
 							Statement stmt = con.createStatement();
 							
 							//remove rows for study before adding new ones
@@ -350,8 +351,8 @@ public class LoadAnalysisDataListener implements Listener{
 					      Pattern pattern=Pattern.compile(".*Finished job entry \\[run i2b2_load_omicsoft_data\\] \\(result=\\[true\\]\\).*", Pattern.DOTALL);
 					      Matcher matcher=pattern.matcher(out);
 					      if(matcher.matches()){
-								String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-								Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
+                                                  String connection=RetrieveData.getConnectionString();
+								Connection con = DriverManager.getConnection(connection, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
 								Statement stmt = con.createStatement();
 								
 								//remove rows for study before adding new ones

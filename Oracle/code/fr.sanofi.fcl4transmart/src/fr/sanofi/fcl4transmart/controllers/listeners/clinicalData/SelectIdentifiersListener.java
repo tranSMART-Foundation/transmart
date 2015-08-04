@@ -110,8 +110,39 @@ public class SelectIdentifiersListener implements Listener {
 			e.printStackTrace();
 		}
 		this.setSubjectsIdUI.displayMessage("Column mapping file updated");
+                this.checkSubjects();
 		WorkPart.updateSteps();
 		WorkPart.updateFiles();
 		UsedFilesPart.sendFilesChanged(dataType);
+	}
+	private void checkSubjects(){
+		Vector<File> rawFiles=((ClinicalData)this.dataType).getRawFiles();
+		if(rawFiles.size()<2){
+			this.setSubjectsIdUI.displayMessage("Column mapping file updated");
+			return;
+		}
+		Vector<String> subjectIds=this.setSubjectsIdUI.getSubjectIds();
+		Vector<String> lastId=null;
+		Vector<String> id;
+		for(int i=0; i<rawFiles.size(); i++){
+			int columnNumber=FileHandler.getHeaderNumber(rawFiles.elementAt(i), subjectIds.elementAt(i));
+			if(columnNumber!=-1){
+				id=FileHandler.getTerms(rawFiles.get(i), subjectIds.elementAt(i));
+				if(lastId!=null){
+					if(id.size()!=lastId.size()){
+						this.setSubjectsIdUI.displayMessage("Column Mapping file updated\n\nWarning: Subject identifiers are not the same for all raw data files");
+						return;
+					}
+					for(String t: id){
+						if(!lastId.contains(t)){
+							this.setSubjectsIdUI.displayMessage("Column Mapping file updated\n\nWarning: Subject identifiers are not the same for all raw data files");
+							return;
+						}
+					}
+				}
+				lastId=id;
+			}
+		}
+		this.setSubjectsIdUI.displayMessage("Column mapping file updated");
 	}
 }

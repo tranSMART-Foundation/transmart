@@ -40,8 +40,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+
 /**
- *This class handles the clinical data loading. It contains the paths to the folder representing clinical data for a study, and paths to:
+ *This class handles the clinical data loading.
+ *It contains the paths to the folder representing clinical data for a study, and paths to:
  *-raw data files
  *-column mapping file
  *-word mapping file
@@ -106,7 +108,6 @@ public class ClinicalData implements DataTypeItf, IncrementalLoadingPossibleItf{
 		this.dimFile=null;
 		this.QCLog=null;
 		File[] children=this.path.listFiles();
-		this.rawFiles=new Vector<File>();
 		Pattern patternCMF=Pattern.compile(".*\\.columns");
 		Pattern patternWMF=Pattern.compile(".*\\.words");
 		Pattern patternMapping=Pattern.compile(".*_Sample_Mapping.txt");

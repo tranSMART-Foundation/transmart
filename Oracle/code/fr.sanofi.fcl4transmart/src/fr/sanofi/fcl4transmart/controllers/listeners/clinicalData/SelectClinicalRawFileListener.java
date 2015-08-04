@@ -66,7 +66,7 @@ public class SelectClinicalRawFileListener implements Listener{
 							}
 							Pattern patternTxt=Pattern.compile(".*\\.txt");
 							Pattern patternSoft=Pattern.compile(".*\\.soft");
-							Pattern patternCsv=Pattern.compile(".*\\.soft");							
+							Pattern patternCsv=Pattern.compile(".*\\.soft");
 									
 							String newPath=dataType.getPath().getAbsolutePath()+File.separator+rawFile.getName();
 							if(selectRawFilesUI.getFormat().compareTo("Tab delimited raw file")!=0 && selectRawFilesUI.getFormat().compareTo("SOFT")!=0 && selectRawFilesUI.getFormat().compareTo("Tab delimited raw file with filter")!=0 && selectRawFilesUI.getFormat().compareTo("CSV")!=0){

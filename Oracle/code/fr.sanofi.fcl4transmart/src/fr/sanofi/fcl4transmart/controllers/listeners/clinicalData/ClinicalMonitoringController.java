@@ -21,6 +21,7 @@ import java.sql.Statement;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
@@ -46,7 +47,7 @@ public class ClinicalMonitoringController {
 		
 	}
 	/**
-	 * Parses the log file to know if the Kettle job succeed
+	 * Parses the log file to know if the Kettle job succeeded
 	 */
 	public boolean kettleSucceed(){
 		if(this.logFile!=null){
@@ -69,18 +70,19 @@ public class ClinicalMonitoringController {
 		return false;
 	}
 	/**
-	 * Looks at the database to check if errors happened during stored procedure, returns the oracle error code if needed
+	 * Looks at the database to check if errors happened during stored procedure,
+         * returns the procedure error code if needed
 	 */
 	public String proceduresError(){
 		String procedureErrors="";
 		try{
 			try {
-				Class.forName("oracle.jdbc.driver.OracleDriver");
+				Class.forName(RetrieveData.getDriverString());
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
+			String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
 			Statement stmt = con.createStatement();
 
 			int jobId=-1;

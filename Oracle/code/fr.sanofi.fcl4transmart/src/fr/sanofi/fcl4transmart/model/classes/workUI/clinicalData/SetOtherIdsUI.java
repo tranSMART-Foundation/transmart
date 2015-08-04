@@ -231,11 +231,9 @@ public class SetOtherIdsUI implements WorkItf{
 	@Override
 	public void paste(Vector<Vector<String>> data) {
 		// nothing to do
-		
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
 		// nothing to do
-		
 	}
 }

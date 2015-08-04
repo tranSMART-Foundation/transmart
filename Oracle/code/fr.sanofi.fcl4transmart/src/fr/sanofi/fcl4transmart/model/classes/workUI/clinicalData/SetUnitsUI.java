@@ -292,7 +292,6 @@ public class SetUnitsUI implements WorkItf{
 					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {
 						// nothing to do
-						
 					}
 				});
 				body.setSize(body.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -304,7 +303,6 @@ public class SetUnitsUI implements WorkItf{
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				// nothing to do
-				
 			}
 			
 		});
@@ -370,11 +368,9 @@ public class SetUnitsUI implements WorkItf{
 	@Override
 	public void paste(Vector<Vector<String>> data) {
 		// nothing to do
-		
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
 		// nothing to do
-		
 	}
 }

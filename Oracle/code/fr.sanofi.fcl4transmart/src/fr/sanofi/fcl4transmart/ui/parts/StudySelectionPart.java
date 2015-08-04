@@ -356,7 +356,7 @@ public class StudySelectionPart {
 		Text text=new Text(licenceShell, SWT.BORDER|SWT.V_SCROLL|SWT.H_SCROLL|SWT.WRAP);
 		text.setEditable(false);
 		text.setLayoutData(new GridData(GridData.FILL_BOTH));
-		text.setText("Framework of Curation and Loading for tranSMART - Version 1.1\n"+  
+		text.setText("Framework of Curation and Loading for tranSMART - Version 1.4.3\n"+  
 					"Copyright (C) 2012 Sanofi-Aventis Recherche et Developpement\n\n"+
 					"This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n"+
 					"This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.\n\n"+

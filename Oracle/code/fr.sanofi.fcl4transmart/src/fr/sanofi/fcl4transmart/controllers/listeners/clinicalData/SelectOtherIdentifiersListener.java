@@ -17,8 +17,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Vector;
+
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+
 import fr.sanofi.fcl4transmart.controllers.FileHandler;
 import fr.sanofi.fcl4transmart.controllers.Utils;
 import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
@@ -26,6 +28,7 @@ import fr.sanofi.fcl4transmart.model.classes.workUI.clinicalData.SetOtherIdsUI;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 import fr.sanofi.fcl4transmart.ui.parts.UsedFilesPart;
 import fr.sanofi.fcl4transmart.ui.parts.WorkPart;
+
 /**
  *This class controls the visit names and site identifiers selection step
  *Since version 1.2: also controls observation names 
@@ -52,6 +55,7 @@ public class SelectOtherIdentifiersListener implements Listener{
 				  }
 			 }
 		 }
+
 		//write in a new file
 		File file=new File(this.dataType.getPath().toString()+File.separator+this.dataType.getStudy().toString()+".columns.tmp");
 		try{			  

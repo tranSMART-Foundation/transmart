@@ -14,6 +14,7 @@ import java.util.Vector;
 
 
 import fr.sanofi.fcl4transmart.controllers.FileHandler;
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.model.classes.dataType.RnaSeqData;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
@@ -34,9 +35,9 @@ public class RnaSeqQCListener {
 	public HashMap<String, Double> getDbValues(String transcriptId){
 		HashMap<String, Double> dbValues=new HashMap<String, Double>();
 		try{
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
+			Class.forName(RetrieveData.getDriverString());
+			String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
 			Statement stmt = con.createStatement();
 			ResultSet rs=stmt.executeQuery("select dm.sample_cd, srd.raw_intensity from deapp.de_subject_rna_data srd INNER JOIN de_subject_sample_mapping dm ON dm.assay_id= srd.assay_id where dm.trial_name='"+this.dataType.getStudy().toString().toUpperCase()+"' and srd.probeset_id='"+transcriptId+"'");
 			while(rs.next()){
@@ -56,9 +57,9 @@ public class RnaSeqQCListener {
 	public HashMap<String, HashMap<String, Double>> getDbValuesAllTranscripts(){
 		HashMap<String, HashMap<String, Double>> dbValues=new HashMap<String, HashMap<String, Double>>();
 		try{
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
+			Class.forName(RetrieveData.getDriverString());
+			String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
 			Statement stmt = con.createStatement();
 			ResultSet rs=stmt.executeQuery("select dm.sample_cd, srd.raw_intensity, srd.probeset_id from deapp.de_subject_rna_data srd INNER JOIN de_subject_sample_mapping dm ON dm.assay_id= srd.assay_id where dm.trial_name='"+this.dataType.getStudy().toString().toUpperCase()+"'");
 			while(rs.next()){

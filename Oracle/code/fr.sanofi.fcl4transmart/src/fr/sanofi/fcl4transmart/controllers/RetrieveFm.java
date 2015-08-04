@@ -18,9 +18,6 @@ public class RetrieveFm {
 		private static String programUid;
 		private static int studyId;
 		private static boolean foundId;
-		public static String getConnectionString(){
-			return "jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-		}
 		public static Vector<String> getPrograms(){
 			Vector<String> programs=new Vector<String>();
 			if(!RetrieveData.testFmappConnection()){
@@ -28,7 +25,7 @@ public class RetrieveFm {
 				return null;
 			}
 			try{
-				Class.forName("oracle.jdbc.driver.OracleDriver");
+				Class.forName(RetrieveData.getDriverString());
 				Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getFmappUser(), PreferencesHandler.getFmappPwd());
 				Statement stmt = con.createStatement();
 			    ResultSet rs = stmt.executeQuery("select folder_name from fm_folder where folder_type='PROGRAM'");
@@ -55,7 +52,7 @@ public class RetrieveFm {
 			}
 			try{
 				HashMap<Integer, FolderNode> nodes=new HashMap<Integer, FolderNode>();
-				Class.forName("oracle.jdbc.driver.OracleDriver");
+				Class.forName(RetrieveData.getDriverString());
 				Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getFmappUser(), PreferencesHandler.getFmappPwd());
 				Statement stmt = con.createStatement();
 				ResultSet rs = stmt.executeQuery("select folder_id, folder_name, folder_full_name, folder_type, folder_level, parent_id from fm_folder where active_ind=1 order by folder_level");
@@ -109,7 +106,7 @@ public class RetrieveFm {
 			HashMap<String, String> experiments=new HashMap<String, String>();
 			
 			try{
-				Class.forName("oracle.jdbc.driver.OracleDriver");
+				Class.forName(RetrieveData.getDriverString());
 				Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd());
 				Statement stmt = con.createStatement();
 			    ResultSet rs = stmt.executeQuery("select title, accession from bio_experiment where bio_experiment_id in(select bio_data_id from biomart.bio_data_uid where unique_id in (select object_uid from fmapp.fm_folder_association where object_type='bio.Experiment'))");
@@ -138,7 +135,7 @@ public class RetrieveFm {
 				return -1;
 			}
 			try{
-				Class.forName("oracle.jdbc.driver.OracleDriver");
+				Class.forName(RetrieveData.getDriverString());
 				Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd());
 				Statement stmt = con.createStatement();
 			    ResultSet rs = stmt.executeQuery("select folder_id from fmapp.fm_folder_association where object_uid in(select unique_id from biomart.bio_data_uid where bio_data_id in (select bio_experiment_id from BIOMART.bio_experiment where accession ='"+access+"'))");
@@ -228,7 +225,7 @@ public class RetrieveFm {
 			int studyId=getIdByAccession(access);
 			if(studyId==-1) return null;
 			try{
-				Class.forName("oracle.jdbc.driver.OracleDriver");
+				Class.forName(RetrieveData.getDriverString());
 				Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd());
 				Statement stmt = con.createStatement();
 			    ResultSet rs = stmt.executeQuery("select analysis_name, bio_assay_analysis_id  from BIOMART.bio_assay_analysis where bio_assay_analysis_id in (select bio_data_id from biomart.bio_data_uid where unique_id in(select object_uid from fmapp.fm_folder_association where folder_id in( select folder_id from fmapp.fm_folder where folder_full_name like'%"+studyId+"%' and folder_type='ANALYSIS' and active_ind=1)))");

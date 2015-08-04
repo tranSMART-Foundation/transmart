@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.model.classes.Study;
 import fr.sanofi.fcl4transmart.model.interfaces.StudyItf;
@@ -61,6 +62,7 @@ public class StudySelectionController {
 	public Vector<StudyItf> getStudies(){
 		return this.studies;
 	}
+
 	/**
 	 *Reads the workspace to create studies objects
 	 */	
@@ -90,6 +92,7 @@ public class StudySelectionController {
 			this.studySelectionPart.warningMessage(message);
 		}
 	}
+
 	/**
 	 *Creates a new study
 	 */	
@@ -107,7 +110,7 @@ public class StudySelectionController {
 		this.studySelectionPart.setList(studies);
 		this.studySelectionPart.selectLast();
 	}
-	
+
 	/**
 	 *Creates a new study with accession number
 	 */	
@@ -131,8 +134,9 @@ public class StudySelectionController {
 		this.studySelectionPart.setList(studies);
 		this.studySelectionPart.selectLast();
 	}
+
 	/**
-	 *Checks a new workspace availability and calls the readDirectory(� method
+	 *Checks a new workspace availability and calls the readDirectory method
 	 */	
 	public void workspaceChanged(){
 		this.studies=new Vector<StudyItf>();
@@ -246,10 +250,10 @@ public class StudySelectionController {
 			new Thread(){
 				public void run() {
 		  		try{
-					Class.forName("oracle.jdbc.driver.OracleDriver");
-					String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
+					Class.forName(RetrieveData.getDriverString());
+					String connection=RetrieveData.getConnectionString();
 					
-					Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
+					Connection con = DriverManager.getConnection(connection, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
 					Statement stmt = con.createStatement();
 					@SuppressWarnings("unused")
 					ResultSet rs=stmt.executeQuery("delete from de_subject_microarray_data where trial_name='"+studyIdentifier.toUpperCase()+"'");
@@ -258,7 +262,7 @@ public class StudySelectionController {
 					rs=stmt.executeQuery("delete from de_subject_sample_mapping where trial_name='"+studyIdentifier.toUpperCase()+"'");
 					con.close();
 					
-					con = DriverManager.getConnection(connectionString, PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
+					con = DriverManager.getConnection(connection, PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
 					stmt = con.createStatement();
 					rs=stmt.executeQuery("delete from concept_counts where concept_path in(select concept_path from concept_dimension where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"')");
 					rs=stmt.executeQuery("delete from concept_dimension where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"'");
@@ -267,7 +271,7 @@ public class StudySelectionController {
 					rs=stmt.executeQuery("delete from observation_fact where modifier_cd='"+studyIdentifier.toUpperCase()+"'");
 					con.close();
 					
-					con = DriverManager.getConnection(connectionString, PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
+					con = DriverManager.getConnection(connection, PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
 					stmt = con.createStatement();
 					rs=stmt.executeQuery("delete from i2b2_tags where tag='"+studyIdentifier.toUpperCase()+"'");
 					rs=stmt.executeQuery("delete from i2b2 where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"'");

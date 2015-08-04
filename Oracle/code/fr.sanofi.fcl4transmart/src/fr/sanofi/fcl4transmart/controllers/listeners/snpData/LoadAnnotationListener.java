@@ -22,6 +22,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.handlers.etlPreferences;
 import fr.sanofi.fcl4transmart.model.classes.dataType.SnpData;
@@ -188,7 +189,7 @@ public class LoadAnnotationListener implements Listener {
 							URL jarUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/loader.jar");
 							jarUrl = FileLocator.toFileURL(jarUrl);  
 							String jarPath = jarUrl.getPath();
-							String[] cmd = { "java", "-classpath", jarPath, "com.recomdata.pipeline.annotation.AnnotationLoader", ((SnpData)dataType).getAnnotationProps().getAbsolutePath(), ((SnpData)dataType).getLogProps().getAbsolutePath(), "jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName(), "oracle.jdbc.driver.OracleDriver", PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd(), PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd()};
+							String[] cmd = { "java", "-classpath", jarPath, "com.recomdata.pipeline.annotation.AnnotationLoader", ((SnpData)dataType).getAnnotationProps().getAbsolutePath(), ((SnpData)dataType).getLogProps().getAbsolutePath(), RetrieveData.getConnectionString(), RetrieveData.getDriverString(), PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd(), PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd()};
 
 					        Process p = Runtime.getRuntime().exec(cmd);
 					        BufferedReader stdInput = new BufferedReader(new 
@@ -310,7 +311,7 @@ public class LoadAnnotationListener implements Listener {
 								try{
 									channel=session.openChannel("exec");
 									dir=etlPreferences.getFilesDirectory()+"/"+dataType.getStudy().toString()+"/snp";
-									String command = "java -classpath "+dir+"/loader.jar com.recomdata.pipeline.annotation.AnnotationLoader "+dir+"/"+((SnpData)dataType).getAnnotationProps().getName()+" "+dir+"/"+((SnpData)dataType).getLogProps().getName()+" "+"jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName()+" "+"oracle.jdbc.driver.OracleDriver"+" "+PreferencesHandler.getDeappUser()+" "+PreferencesHandler.getDeappPwd()+" "+PreferencesHandler.getBiomartUser()+" "+PreferencesHandler.getBiomartPwd();
+									String command = "java -classpath "+dir+"/loader.jar com.recomdata.pipeline.annotation.AnnotationLoader "+dir+"/"+((SnpData)dataType).getAnnotationProps().getName()+" "+dir+"/"+((SnpData)dataType).getLogProps().getName()+" "+RetrieveData.getConnectionString()+" "+RetrieveData.getDriverString()+" "+PreferencesHandler.getDeappUser()+" "+PreferencesHandler.getDeappPwd()+" "+PreferencesHandler.getBiomartUser()+" "+PreferencesHandler.getBiomartPwd();
 									((ChannelExec)channel).setCommand(command);
 								 
 									 BufferedReader stdError = new BufferedReader(new 

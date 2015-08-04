@@ -24,7 +24,9 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import fr.sanofi.fcl4transmart.controllers.FileHandler;
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
@@ -60,9 +62,9 @@ public class ClinicalQCController {
 	public HashMap<String, Vector<String>> getDbValues(String subject){
 		HashMap<String, Vector<String>> dbValues=new HashMap<String, Vector<String>>();
 		try{
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
+			Class.forName(RetrieveData.getDriverString());
+			String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
 			Statement stmt = con.createStatement();
 			String topNode=((ClinicalData)this.dataType).getStudy().getTopNode();
 			
@@ -202,9 +204,9 @@ public class ClinicalQCController {
 	public HashMap<String, HashMap<String, Vector<String>>> getDbValuesAllSubjects(Set<String> subjects){
 		HashMap<String, HashMap<String, Vector<String>>> dbValues=new HashMap<String, HashMap<String, Vector<String>>>();
 		try{
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
+			Class.forName(RetrieveData.getDriverString());
+			String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
 			Statement stmt = con.createStatement();
 			String topNode=((ClinicalData)this.dataType).getStudy().getTopNode();
 			ResultSet rs=stmt.executeQuery("select CONCEPT_DIMENSION.CONCEPT_PATH, NVAL_NUM, patient_dimension.sourcesystem_cd from CONCEPT_DIMENSION, OBSERVATION_FACT, patient_dimension where OBSERVATION_FACT.VALTYPE_CD='N' and OBSERVATION_FACT.patient_num=patient_dimension.patient_num and OBSERVATION_FACT.CONCEPT_CD=CONCEPT_DIMENSION.CONCEPT_CD and concept_dimension.sourcesystem_cd='"+this.dataType.getStudy().toString().toUpperCase()+"'");	
@@ -272,20 +274,20 @@ public class ClinicalQCController {
 		}
 		value=value.replaceAll("\\|$", "").replaceAll("^\\|", "");
 		value=value.replaceAll("\\|", "-");
-		value=value.replaceAll("%", "PCT");
+		value=value.replaceAll("%", "Pct");
 		value=value.replaceAll("&", " and ");
 		value=value.trim();
 		value=value.replaceAll("  ", " ");
 		value=value.replaceAll(" ,", ",");
-		value=value.replaceAll("\"", "");
+		value=value.replaceAll("\\+", " and");
+		value=value.replaceAll("\\\"", "");
 		
 		return value;
 	}
 	public String replaceLabel(String label){
 		if(label!=null){
-			label=label.replaceAll("\\(%", "\\( PCT");
-			label=label.replaceAll("%", "PCT");
-
+			label=label.replaceAll("\\(%", "\\( Pct");
+			label=label.replaceAll("%", "Pct");
 			label=label.replaceAll("&", " and ");
 			label=label.replaceAll("\\|", ",");
 			label=label.trim();
@@ -293,8 +295,8 @@ public class ClinicalQCController {
 			label=label.replaceAll(" ,", ",");
 			label=label.replaceAll("_", " ");
 		}
+
 		return label;
-		
 	}
 	
 	public Vector<String> sort(Vector<String> sort) {

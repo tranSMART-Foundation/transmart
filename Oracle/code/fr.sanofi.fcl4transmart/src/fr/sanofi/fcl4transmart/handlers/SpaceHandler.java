@@ -75,7 +75,7 @@ public class SpaceHandler {
 				testMeta=RetrieveData.testMetadataConnection();
 				if(testMeta){
 					try{
-						Class.forName("oracle.jdbc.driver.OracleDriver");
+                                        	Class.forName(RetrieveData.getDriverString());
 						Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
 						Statement stmt=con.createStatement();
 						ResultSet rs=stmt.executeQuery("SELECT df.tablespace_name TABLESPACE, df.total_space TOTAL_SPACE, "+
