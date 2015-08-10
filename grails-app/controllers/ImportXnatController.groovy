@@ -172,8 +172,9 @@ class ImportXnatController {
 			def username = importXnatConfiguration.username
 			def project = importXnatConfiguration.project
 			def node = importXnatConfiguration.node
-			def kettledir = (getTransmartDataLocation() + "/env/data-integration/")
-			def datadir = getScriptsLocation() + "/xnattotransmartlink/"
+			//def kettledir = (getTransmartDataLocation() + "/env/data-integration/")
+			def kettledir = (getScriptsLocation() + "/xnattotransmartlink/")
+			def datadir = (getScriptsLocation() + "/xnattotransmartlink/")
 
 			def process = ("python " + getScriptsLocation() + "/xnattotransmartlink/downloadscript.py ${url} ${username} ${password} ${project} ${node} ${kettledir} ${datadir}").execute(null, new File(getScriptsLocation() + "/xnattotransmartlink"))
 			process.waitFor()
