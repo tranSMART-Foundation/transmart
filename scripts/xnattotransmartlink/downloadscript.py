@@ -128,7 +128,6 @@ def createMappingFile(mappingList, visits):
     return
 
 def runKettleJob(node, kettledir, datadir):
-    print datadir
     process = subprocess.Popen(["./command.sh", node, datadir], cwd=kettledir)
     process.wait()
     return
