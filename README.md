@@ -3,7 +3,7 @@ This TranSMART-XNAT-Importer plugin can import clinical image-derived data from 
 ![alt tag](https://raw.github.com/evast/transmart-xnat-importer-plugin/master/docs/navigator.png)  
 XNAT Data hierarchy shown in TranSMART ontology. 
 
-Background
+TranSMART-XNAT Coupling
 ----------
 
 TranSMART  (http://transmartfoundation.org) is a data integration and browsing platform for central statistical analysis in translational research.
