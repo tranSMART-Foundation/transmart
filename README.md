@@ -1,4 +1,4 @@
-This TranSMART-XNAT-Importer plugin can import clinical image-derived data from XNAT and store them in TranSMART.
+The TranSMART-XNAT-Importer plugin can import clinical image-derived data from XNAT and store them in TranSMART.
 
 ![alt tag](https://raw.github.com/evast/transmart-xnat-importer-plugin/master/docs/navigator.png)  
 XNAT Data hierarchy shown in TranSMART ontology. 
