@@ -15,4 +15,4 @@ To correlate the image-derived results with other medical data, such as demograp
 Documentation and Installation
 ------------------------------
 
-More information about the plugin and installation instructions, can be found in [TranSMART-XNAT-Importer-plugin-manual.pdf](https://github.com/evast/transmart-xnat-importer-plugin/blob/master/docs/TranSMART-XNAT-Importer-plugin-manual.pdf?raw=true) in the directory docs. A user-guide to import data with step-by-step instructions and screenshots can be found in the same document.
+More information about the plugin and installation instructions can be found in [TranSMART-XNAT-Importer-plugin-manual.pdf](https://github.com/evast/transmart-xnat-importer-plugin/blob/master/docs/TranSMART-XNAT-Importer-plugin-manual.pdf?raw=true) in the directory docs. A user-guide to import data with step-by-step instructions and screenshots can be found in the same document.
