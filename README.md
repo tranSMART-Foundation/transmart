@@ -15,4 +15,4 @@ To correlate the image-derived results with other medical data, such as demograp
 Documentation and Installation
 ------------------------------
 
-Full background of the plugin and installation instructions, can be found in documention.docx in the GitHub directory docs. A user-guide to import data with step-by-step instructions and screenshot can be found in the same document
+More information about the plugin and installation instructions, can be found in [documention.docx](https://github.com/evast/transmart-xnat-importer-plugin/blob/master/docs/documentation.docx?raw=true) in the GitHub directory docs. A user-guide to import data with step-by-step instructions and screenshots can be found in the same document.
