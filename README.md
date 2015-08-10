@@ -12,7 +12,7 @@ XNAT (www.xnat.org) is a framework to store, share and manage medical imaging da
 
 To correlate the image-derived results with other medical data, such as demographic or genetic data, it would be useful to import the XNAT results in TranSMART. To this end, we developed the TranSMART-XNAT-Importer plugin. To configure which XNAT image-derived data is imported in TranSMART, an administrator can create a coupling configuration in the online administration panel and start the import process. The plugin uses the default ETL Importer for clinical data to import the XNAT results in TranSMART. 
 
-Installation
-------------
+Documentation and Installation
+------------------------------
 
-Full background of the plugin, installation instructions and a user-guide to import data, can be found in documention.docx in the directory docs.
+Full background of the plugin and installation instructions, can be found in documention.docx in the GitHub directory docs. A user-guide to import data with step-by-step instructions and screenshot can be found in the same document
