@@ -1,0 +1,167 @@
+if (! suppressMessages(require(reshape2))) {
+    stop("SmartR requires the R package 'jsonlite'")
+}
+
+### PREPARE SETTINGS ###
+
+significanceMeassure <- settings$significanceMeassure
+discardNullGenes <- strtoi(settings$discardNullGenes)
+maxRows <- ifelse(is.null(settings$maxRows), 100, as.integer(settings$maxRows))
+
+### COMPUTE RESULTS ###
+
+highDimData <- highDimData_cohort1[c('PATIENT ID', 'VALUE', 'PROBE', 'GENE ID', 'GENE SYMBOL')]
+colnames(highDimData) <- c('PATIENTID', 'VALUE', 'PROBE', 'GENEID', 'GENESYMBOL')
+highDimData <- melt(highDimData, id=c('PATIENTID', 'PROBE', 'GENEID', 'GENESYMBOL'))
+highDimData <- data.frame(dcast(highDimData, PROBE + GENEID + GENESYMBOL ~ PATIENTID), stringsAsFactors=FALSE)
+
+highDimData <- na.omit(highDimData)
+
+if (discardNullGenes) {
+    highDimData <- highDimData[highDimData$GENESYMBOL != 'null', ]
+}
+
+valueMatrix <- highDimData[, -(1:3)]
+zScoreMatrix <- t(apply(valueMatrix, 1, scale))
+
+if (significanceMeassure == 'variance') {
+    significanceValues <- apply(valueMatrix, 1, var)
+} else if (significanceMeassure == 'zScoreRange') {
+    significanceValues <- apply(zScoreMatrix, 1, function(zScores) { 
+            bxp <- boxplot.stats(zScores)
+            zScores.withoutOutliers <- zScores[zScores >= bxp$stats[2] & zScores <= bxp$stats[4]]
+            max(zScores.withoutOutliers) - min(zScores.withoutOutliers)
+        })
+} else {
+    stop('Unknown significance measure!')
+} 
+
+highDimData$SIGNIFICANCE <- significanceValues
+highDimData.value <- highDimData
+highDimData.zScore <- cbind(highDimData[, 1:3], zScoreMatrix)
+
+highDimData.value <- highDimData.value[order(significanceValues, decreasing=TRUE), ]
+highDimData.zScore <- highDimData.zScore[order(significanceValues, decreasing=TRUE), ]
+
+highDimData.value <- highDimData.value[1:maxRows, ]
+highDimData.zScore <- highDimData.zScore[1:maxRows, ]
+
+probes <- highDimData.value$PROBE
+geneIDs <- highDimData.value$GENEID
+geneSymbols <- highDimData.value$GENESYMBOL
+
+
+fields.value <- melt(highDimData.value, id=c('PROBE', 'GENEID', 'GENESYMBOL', 'SIGNIFICANCE'))
+fields.zScore <- melt(highDimData.zScore, id=c('PROBE', 'GENEID', 'GENESYMBOL'))
+
+fields <- fields.value
+fields <- cbind(fields, fields.zScore[, 5])
+
+names(fields) <- c('PROBE', 'GENEID', 'GENESYMBOL', 'SIGNIFICANCE', 'PATIENTID', 'VALUE', 'ZSCORE')
+fields$PATIENTID <- as.numeric(sub("^X", "", levels(fields$PATIENTID)))[fields$PATIENTID]
+fields <- fields[order(fields$PROBE, fields$PATIENTID, decreasing=FALSE), ]
+fields <- fields[order(fields$SIGNIFICANCE, decreasing=TRUE), ]
+
+patientIDs <- unique(fields$PATIENTID)
+
+sorted.zScoreMatrix <- head(highDimData.zScore[, -(1:3)])
+colDendrogramEuclideanComplete <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='euclidean'), method='complete'))
+colDendrogramEuclideanSingle <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='euclidean'), method='single'))
+colDendrogramEuclideanAverage <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='euclidean'), method='average'))
+rowDendrogramEuclideanComplete <- as.dendrogram(hclust(dist(sorted.zScoreMatrix, method='euclidean'), method='complete'))
+rowDendrogramEuclideanSingle <- as.dendrogram(hclust(dist(sorted.zScoreMatrix, method='euclidean'), method='single'))
+rowDendrogramEuclideanAverage <- as.dendrogram(hclust(dist(sorted.zScoreMatrix, method='euclidean'), method='average'))
+
+colDendrogramManhattanComplete <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='manhattan'), method='complete'))
+colDendrogramManhattanSingle <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='manhattan'), method='single'))
+colDendrogramManhattanAverage <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='manhattan'), method='average'))
+rowDendrogramManhattanComplete <- as.dendrogram(hclust(dist(sorted.zScoreMatrix, method='manhattan'), method='complete'))
+rowDendrogramManhattanSingle <- as.dendrogram(hclust(dist(sorted.zScoreMatrix, method='manhattan'), method='single'))
+rowDendrogramManhattanAverage <- as.dendrogram(hclust(dist(sorted.zScoreMatrix, method='manhattan'), method='average'))
+
+dendrogramToJSON <- function(d) {
+    totalMembers <- attributes(d)$members
+    add_json <- function(x, start, left) {
+        members <- attributes(x)$members
+        height <- attributes(x)$height
+        index <- (start - 1):(start + members - 2)
+        index <- paste(index, collapse=' ')
+        jsonString <<- paste(jsonString, sprintf('{"height":"%s", "index":"%s", "children":[', height, index))
+        if (is.leaf(x)){
+            jsonString <<- paste(jsonString, ']}')
+        } else {
+            add_json(x[[1]], start, TRUE)
+            jsonString <<- paste(jsonString, ",")
+            leftMembers <- attributes(x[[1]])$members
+            add_json(x[[2]], start + leftMembers, FALSE)
+            jsonString <<- paste(jsonString, "]}")
+        }
+    }
+    jsonString <- ""
+    add_json(d, TRUE)
+    return(jsonString)
+}
+
+numerical.lowDimData <- lowDimData$additionalFeatures_numerical
+concepts <- unique(numerical.lowDimData$concept)
+additionalFields <- list()
+for (concept in concepts) {
+    featureName <- sapply(strsplit(concept, '\\\\'), function(s) tail(s, n=1))
+    conceptData <- numerical.lowDimData[numerical.lowDimData$concept == concept, ]
+    additionalFeature <- data.frame(
+        PROBE=rep(featureName, nrow(conceptData)),
+        GENEID=rep(NA, nrow(conceptData)),
+        GENESYMBOL=rep(NA, nrow(conceptData)),
+        SIGNIFICANCE=rep(NaN, nrow(conceptData)),
+        PATIENTID=patientIDs,  # conceptData$patientID, # FIXME: This is the wrong mapping (just for testing!)
+        VALUE=conceptData$value,
+        ZSCORE=scale(conceptData$value),
+        stringsAsFactors=FALSE) 
+    fields <- rbind(additionalFeature, fields)
+    probes <- c(featureName, probes)
+    geneIDs <- c(NA, geneIDs)
+    geneSymbols <- c(NA, geneSymbols)
+}
+
+### WRITE OUTPUT ###
+output$fields <- fields
+output$patientIDs <- patientIDs
+output$probes <- probes
+output$geneIDs <- geneIDs
+output$geneSymbols <- geneSymbols
+
+output$hclustEuclideanComplete <- list(
+    order.dendrogram(colDendrogramEuclideanComplete) - 1,
+    order.dendrogram(rowDendrogramEuclideanComplete) - 1,
+    dendrogramToJSON(colDendrogramEuclideanComplete),
+    dendrogramToJSON(rowDendrogramEuclideanComplete))
+
+output$hclustEuclideanSingle <- list(
+    order.dendrogram(colDendrogramEuclideanSingle) - 1,
+    order.dendrogram(rowDendrogramEuclideanSingle) - 1,
+    dendrogramToJSON(colDendrogramEuclideanSingle),
+    dendrogramToJSON(rowDendrogramEuclideanSingle))
+
+output$hclustEuclideanAverage <- list(
+    order.dendrogram(colDendrogramEuclideanAverage) - 1,
+    order.dendrogram(rowDendrogramEuclideanAverage) - 1,
+    dendrogramToJSON(colDendrogramEuclideanAverage),
+    dendrogramToJSON(rowDendrogramEuclideanAverage))
+
+output$hclustManhattanComplete <- list(
+    order.dendrogram(colDendrogramManhattanComplete) - 1,
+    order.dendrogram(rowDendrogramManhattanComplete) - 1,
+    dendrogramToJSON(colDendrogramManhattanComplete),
+    dendrogramToJSON(rowDendrogramManhattanComplete))
+
+output$hclustManhattanSingle <- list(
+    order.dendrogram(colDendrogramManhattanSingle) - 1,
+    order.dendrogram(rowDendrogramManhattanSingle) - 1,
+    dendrogramToJSON(colDendrogramManhattanSingle),
+    dendrogramToJSON(rowDendrogramManhattanSingle))
+
+output$hclustManhattanAverage <- list(
+    order.dendrogram(colDendrogramManhattanAverage) - 1,
+    order.dendrogram(rowDendrogramManhattanAverage) - 1,
+    dendrogramToJSON(colDendrogramManhattanAverage),
+    dendrogramToJSON(rowDendrogramManhattanAverage))
