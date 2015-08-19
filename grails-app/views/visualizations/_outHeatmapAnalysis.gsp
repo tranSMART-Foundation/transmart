@@ -294,8 +294,12 @@
         .append("rect")
         .attr('class', function(d) {
             var static = d.SIGNIFICANCE === undefined ? ' static' : '';
-            return 'square' + ' ' + d.PATIENTID + ' ' + d.PROBE + static;
+            return 'square patientID-' + d.PATIENTID + ' probe-' + d.PROBE + static;
         })
+        .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
+        .attr("y", function(d) { return probes.indexOf(d.PROBE) * gridFieldHeight; })
+        .attr("width", gridFieldWidth)
+        .attr("height", gridFieldHeight)
         .attr("rx", 0)
         .attr("ry", 0)
         .style("fill", 'white')
@@ -315,38 +319,39 @@
         });
 
         square
+        .transition()
+        .duration(animationDuration)
         .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
         .attr("y", function(d) { return probes.indexOf(d.PROBE) * gridFieldHeight; })
         .attr("width", gridFieldWidth)
         .attr("height", gridFieldHeight);
 
         var colSortText = colSortItems.selectAll('.colSortText')
-        .data(patientIDs, function(d) { return d; });
-
-        colSortText
+        .data(patientIDs, function(d) { return d; })
         .enter()
         .append('text')
         .attr('class', 'text colSortText')
+        .attr('x', function(d, i) { return i * gridFieldWidth + 0.5 * gridFieldWidth; })
+        .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight)
         .attr('dy', '0.35em')
         .attr("text-anchor", "middle")
         .text('↑↓');
 
-        colSortText
-        .attr('x', function(d, i) { return i * gridFieldWidth + 0.5 * gridFieldWidth; })
-        .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight);
-
         var colSortBox = colSortItems.selectAll('.colSortBox')
-        .data(patientIDs, function(d) { return d; });
-
-        colSortBox
+        .data(patientIDs, function(d) { return d; })
         .enter()
         .append('rect')
         .attr('class', 'box colSortBox')
-        .on("click", function(patientID) {
+        .attr('x', function(d, i) { return i * gridFieldWidth; })
+        .attr('y', -2 - gridFieldHeight)
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight)
+        .on("click", function(d, boxIdx) {
+            var patientID = patientIDs[boxIdx];
             var rowValues = [];
             for(var i = 0; i < probes.length; i++) {
                 var probe = probes[i];
-                var square = d3.select('.square' + '.' + patientID + '.' + probe);
+                var square = d3.select('.square' + '.patientID-' + patientID + '.probe-' + probe);
                 rowValues.push([i, square.property('__data__').ZSCORE]);
             }
             if (isSorted(rowValues)) {
@@ -361,45 +366,37 @@
             updateRowOrder(sortValues);
         });
 
-        colSortBox
-        .attr('x', function(d, i) { return i * gridFieldWidth; })
-        .attr('y', -2 - gridFieldHeight)
-        .attr('width', gridFieldWidth)
-        .attr('height', gridFieldHeight);
-
         var rowSortText = rowSortItems.selectAll('.rowSortText')
-        .data(probes, function(d) { return d; });
-
-        rowSortText
+        .data(probes, function(d) { return d; })
         .enter()
         .append('text')
         .attr('class', 'text rowSortText')
+        .attr("transform", function(d, i) { return "translate(" + (width + 2 + 0.5 * gridFieldWidth) + ",0)" + "translate(0," + (i * gridFieldHeight + 0.5 * gridFieldHeight) + ")rotate(-90)";})
         .attr('dy', '0.35em')
         .attr("text-anchor", "middle")
         .text('↑↓');
 
-        rowSortText
-        .attr("transform", function(d, i) { return "translate(" + (width + 2 + 0.5 * gridFieldWidth) + ",0)" + "translate(0," + (i * gridFieldHeight + 0.5 * gridFieldHeight) + ")rotate(-90)";});
-
         var rowSortBox = rowSortItems.selectAll('.rowSortBox')
-        .data(probes, function(d) { return d; });
-
-        rowSortBox
+        .data(probes, function(d) { return d; })
         .enter()
         .append('rect')
         .attr('class', 'box rowSortBox')
-        .on("click", function(probe) {
+        .attr('x', width + 2)
+        .attr('y', function(d, i) { return i * gridFieldHeight; })
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight)
+        .on("click", function(d, boxIdx) {
+            var probe = probes[boxIdx];
             var colValues = [];
             for(var i = 0; i < patientIDs.length; i++) {
                 var patientID = patientIDs[i];
-                alert('.square' + '.' + patientID + '.' + probe)
-                var square = d3.select('.square' + '.' + patientID + '.' + probe);
+                var square = d3.select('.square' + '.patientID-' + patientID + '.probe-' + probe);
                 colValues.push([i, square.property('__data__').ZSCORE]);
             }
             if (isSorted(colValues)) {
-               colValues.sort(function(x, y) { return x[1] - y[1]; });
+               colValues.sort(function(a, b) { return a[1] - b[1]; });
             } else {
-               colValues.sort(function(x, y) { return y[1] - x[1]; });
+               colValues.sort(function(a, b) { return b[1] - a[1]; });
             }
             var sortValues = [];
             for (i = 0; i < colValues.length; i++) {
@@ -408,43 +405,29 @@
             updateColOrder(sortValues);
         });
 
-        rowSortBox
-        .attr('x', width + 2)
-        .attr('y', function(d, i) { return i * gridFieldHeight; })
-        .attr('width', gridFieldWidth)
-        .attr('height', gridFieldHeight);
-
         var selectText = heatmap.selectAll('.selectText')
-        .data(patientIDs, function(d) { return d; });
-
-        selectText
+        .data(patientIDs, function(d) { return d; })
         .enter()
         .append('text')
         .attr('class', 'text selectText')
+        .attr('x', function(d, i) { return i * gridFieldWidth + 0.5 * gridFieldWidth; })
+        .attr('y', -2 - gridFieldHeight * 2 + 0.5 * gridFieldHeight)
         .attr('dy', '0.35em')
         .attr("text-anchor", "middle")
         .text('□');
 
-        selectText
-        .attr('x', function(d, i) { return i * gridFieldWidth + 0.5 * gridFieldWidth; })
-        .attr('y', -2 - gridFieldHeight * 2 + 0.5 * gridFieldHeight);
-
         var selectBox = heatmap.selectAll('.selectBox')
-        .data(patientIDs, function(d) { return d; });
-
-        selectBox
+        .data(patientIDs, function(d) { return d; })
         .enter()
         .append('rect')
         .attr('class', 'box selectBox')
-        .on("click", function(patientID) {
-            selectCol(patientIDs.indexOf(patientID));
-        });
-
-        selectBox
         .attr('x', function(d, i) { return i * gridFieldWidth; })
         .attr('y', -2 - gridFieldHeight * 2)
         .attr('width', gridFieldWidth)
-        .attr('height', gridFieldHeight);
+        .attr('height', gridFieldHeight)
+        .on("click", function(patientID) {
+            selectCol(patientIDs.indexOf(patientID));
+        });
 
         var patientID = patientIDItems.selectAll('.patientID')
         .data(patientIDs, function(d) { return d; });
@@ -453,10 +436,16 @@
         .enter()
         .append("text")
         .attr('class', 'patientID')
+        .attr("transform", function(d) {
+            return "translate(" + (patientIDs.indexOf(d) * gridFieldWidth) + ",0)" +
+                "translate(" + (gridFieldWidth / 2) + "," + (-4 - gridFieldHeight * 2) + ")rotate(-45)";
+        })
         .style("text-anchor", "start")
         .text(function(d) { return d; });
 
         patientID
+        .transition()
+        .duration(animationDuration)
         .attr("transform", function(d) {
             return "translate(" + (patientIDs.indexOf(d) * gridFieldWidth) + ",0)" +
                 "translate(" + (gridFieldWidth / 2) + "," + (-4 - gridFieldHeight * 2) + ")rotate(-45)";
@@ -468,12 +457,16 @@
         probe
         .enter()
         .append("text")
-        .attr('class', function(d, i) { return 'label text';})
+        .attr('class', function(d, i) { return 'probe text';})
+        .attr('x', width + gridFieldWidth + 7)
+        .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; })
         .attr('dy', '0.35em')
         .style("text-anchor", "start")
         .text(function(d) { return d; });
 
         probe
+        .transition()
+        .duration(animationDuration)
         .attr('x', width + gridFieldWidth + 7)
         .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
     }
@@ -689,6 +682,7 @@
         }
         probes = sortedProbes;
         hideRowDendrogram();
+        updateHeatmap();
     }
 
     function transformClusterOrderWRTInitialOrder(clusterOrder, initialOrder) {
