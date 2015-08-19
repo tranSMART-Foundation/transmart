@@ -137,11 +137,11 @@
         fill-opacity: 0.2;
     }
 
-    .label {
+    .probe {
         font-size: 9pt;
     }
 
-    .selectBoxLabel {
+    .selectText {
         font-size: 16pt;
     }
 
@@ -290,7 +290,7 @@
 
     function updateHeatmap() {
         var square = squareItems.selectAll('.square')
-        .data(fields, function(d) { return d.PATIENTID + d.PROBE; });
+        .data(fields, function(d) { return 'patientID-' + d.PATIENTID + '-probe-' + d.PROBE; });
 
         square
         .enter()
@@ -307,6 +307,9 @@
         .attr("ry", 0)
         .style("fill", 'white')
         .on("mouseover", function(d) {
+            d3.select('.patientID.patientID-' +  d.PATIENTID).classed("highlight", true);
+            d3.select('.probe.probe-' +  d.PROBE).classed("highlight", true);
+
             var html = '';
             for(var key in d) {
                 html += key + ': ' + d[key] + '<br/>';
@@ -318,6 +321,9 @@
             .style("top", mouseY() + "px");
         })
         .on("mouseout", function(d) {
+            d3.selectAll(".patientID").classed("highlight", false);
+            d3.selectAll(".probe").classed("highlight", false);
+
             tooltip.style("visibility", "hidden");
         });
 
@@ -447,7 +453,7 @@
         selectText
         .enter()
         .append('text')
-        .attr('class', 'text selectText')
+        .attr('class', function(d) { return 'text selectText patientID-' + d; })
         .attr('x', function(d, i) { return i * gridFieldWidth + 0.5 * gridFieldWidth; })
         .attr('y', -2 - gridFieldHeight * 2 + 0.5 * gridFieldHeight)
         .attr('dy', '0.35em')
@@ -489,7 +495,7 @@
         patientID
         .enter()
         .append("text")
-        .attr('class', 'patientID')
+        .attr('class', function(d) { return 'patientID patientID-' + d; })
         .attr("transform", function(d) {
             return "translate(" + (patientIDs.indexOf(d) * gridFieldWidth) + ",0)" +
                 "translate(" + (gridFieldWidth / 2) + "," + (-4 - gridFieldHeight * 2) + ")rotate(-45)";
@@ -511,12 +517,15 @@
         probe
         .enter()
         .append("text")
-        .attr('class', function(d, i) { return 'probe text';})
+        .attr('class', function(d) { return 'probe text probe-' + d;})
         .attr('x', width + gridFieldWidth + 7)
         .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; })
         .attr('dy', '0.35em')
         .style("text-anchor", "start")
-        .text(function(d) { return d; });
+        .text(function(d) { 
+            var i = probes.indexOf(d);
+            return d + '  //  ' + geneIDs[i] + '  //  ' + geneSymbols[i]; 
+        });
 
         probe
         .transition()
@@ -559,13 +568,16 @@
         if (colSquares.classed('selected')) {
             var index = selectedPatientIDs.indexOf(patientID);
             selectedPatientIDs.splice(index, 1);
-
             colSquares
             .classed('selected', false);
+            d3.select('.selectText.patientID-' + patientID)
+            .text('□');
         } else {
             selectedPatientIDs.push(patientID);
             colSquares
             .classed('selected', true);
+            d3.select('.selectText.patientID-' + patientID)
+            .text('■');
         }
         if (selectedPatientIDs.length !== 0) {
             d3.selectAll('.square:not(.selected)')
@@ -598,6 +610,7 @@
     var colDendrogramVisible = false;
     function createColDendrogram() {
         var w = 200;
+        var spacing = gridFieldWidth * 2 + getMaxWidth(d3.selectAll('.patientID')) + 20;
 
         var cluster = d3.layout.cluster()
         .size([width, w])
@@ -607,7 +620,7 @@
 
         var diagonal = d3.svg.diagonal()
         .projection(function (d) {
-            return [d.x, d.y - margin.top + 20];
+            return [d.x, - spacing - w + d.y];
         });
 
         var colDendrogramNodes = cluster.nodes(colDendrogram);
@@ -625,13 +638,14 @@
         .attr("class", "colDendrogram node")
         .attr('r', 4.5)
         .attr("transform", function (d) {
-            return "translate(" + d.x + "," + (d.y - margin.top + 20) + ")";
+            return "translate(" + d.x + "," + (- spacing - w + d.y) + ")";
         }).on('click', function(d) {
             var previousSelection = selectedPatientIDs.slice();
             unselectAll();
             var leafs = d.index.split(' ');
             for (var i = 0; i < leafs.length; i++) {
-                selectCol(leafs[i]);
+                var patientID = patientIDs[leafs[i]];
+                selectCol(patientID);
             }
             if (arrEqual(previousSelection, selectedPatientIDs)) {
                 unselectAll();
@@ -653,6 +667,7 @@
     var rowDendrogramVisible = false;
     function createRowDendrogram() {
         var h = 280;
+        var spacing = gridFieldWidth + getMaxWidth(d3.selectAll('.probe')) + 20;
 
         var cluster = d3.layout.cluster()
         .size([height, h])
@@ -662,7 +677,7 @@
 
         var diagonal = d3.svg.diagonal()
         .projection(function (d) {
-            return [width + margin.right - 20 - d.y, d.x];
+            return [width + spacing + h - d.y, d.x];
         });
 
         var rowDendrogramNodes = cluster.nodes(rowDendrogram);
@@ -680,7 +695,7 @@
         .attr("class", "rowDendrogram node")
         .attr('r', 4.5)
         .attr("transform", function (d) {
-            return "translate(" + (width + margin.right - 20 - d.y) + "," + d.x + ")";
+            return "translate(" + (width + spacing + h - d.y) + "," + d.x + ")";
         }).on('click', function(d) {
             alert('Feature selection is currently not possible.');
         })
@@ -720,10 +735,16 @@
 
     function updateRowOrder(sortValues) {
         var sortedProbes = [];
+        var sortedGeneIDs = [];
+        var sortedGeneSymbols = [];
         for (var i = 0; i < sortValues.length; i++) {
             sortedProbes.push(probes[sortValues[i]]);
+            sortedGeneIDs.push(geneIDs[sortValues[i]]);
+            sortedGeneSymbols.push(geneSymbols[sortValues[i]]);
         }
         probes = sortedProbes;
+        geneIDs = sortedGeneIDs;
+        geneSymbols = sortedGeneSymbols;
         removeRowDendrogram();
         updateHeatmap();
     }
