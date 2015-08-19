@@ -1,9 +1,13 @@
-SmartR is NOT STABLE yet. You might find missing features, unreadable insanely complicated code or stuff which is simply wrong and does not work.
+SmartR is still under heavy development!
 
-What will happen in the next days:
+To deploy your own visualization you need to add three files:
+1. An input views to specify the input
+2. An analysis script to compute statistical information
+3. An output view to visualize the final data
 
-- Readme will be expanded
+A very simplistic example can be found here:
 
-- Refactorings will be completed to have a runnable version while developements will happen on a seperate branch (the initial commit came from a private repository where no one cared about broken code)
+grails-app/views/_inSample.gsp
+web-app/Scripts/Sample.R
+grails-app/views/_outSample.gsp
 
-- Documentation and sample files will be added where most needed

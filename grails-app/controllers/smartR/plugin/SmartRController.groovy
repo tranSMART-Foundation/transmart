@@ -15,7 +15,7 @@ class SmartRController {
     */
     def index = {
         def dir = smartRService.getScriptDir()
-        def scriptList = new File(dir).list().findAll { it != 'Wrapper.R' }
+        def scriptList = new File(dir).list().findAll { it != 'Wrapper.R' && it != 'Sample.R' }
         [scriptList: scriptList]
     }
 
