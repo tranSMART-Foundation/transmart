@@ -238,6 +238,9 @@
     var geneIDs = data.geneIDs;
     var geneSymbols = data.geneSymbols;
 
+    var originalPatientIDs = patientIDs.slice();
+    var originalProbes = probes.slice();
+
     function ownColorSheme() {
         var colorSet = [];
         var i = 100;
@@ -327,7 +330,9 @@
         .attr("height", gridFieldHeight);
 
         var colSortText = colSortItems.selectAll('.colSortText')
-        .data(patientIDs, function(d) { return d; })
+        .data(patientIDs, function(d) { return d; });
+
+        colSortText
         .enter()
         .append('text')
         .attr('class', 'text colSortText')
@@ -337,8 +342,16 @@
         .attr("text-anchor", "middle")
         .text('↑↓');
 
+        colSortText
+        .transition()
+        .duration(animationDuration)
+        .attr('x', function(d, i) { return i * gridFieldWidth + 0.5 * gridFieldWidth; })
+        .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight);
+
         var colSortBox = colSortItems.selectAll('.colSortBox')
-        .data(patientIDs, function(d) { return d; })
+        .data(patientIDs, function(d) { return d; });
+
+        colSortBox
         .enter()
         .append('rect')
         .attr('class', 'box colSortBox')
@@ -346,8 +359,7 @@
         .attr('y', -2 - gridFieldHeight)
         .attr('width', gridFieldWidth)
         .attr('height', gridFieldHeight)
-        .on("click", function(d, boxIdx) {
-            var patientID = patientIDs[boxIdx];
+        .on("click", function(patientID) {
             var rowValues = [];
             for(var i = 0; i < probes.length; i++) {
                 var probe = probes[i];
@@ -366,8 +378,18 @@
             updateRowOrder(sortValues);
         });
 
+        colSortBox
+        .transition()
+        .duration(animationDuration)
+        .attr('x', function(d, i) { return i * gridFieldWidth; })
+        .attr('y', -2 - gridFieldHeight)
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight);
+
         var rowSortText = rowSortItems.selectAll('.rowSortText')
-        .data(probes, function(d) { return d; })
+        .data(probes, function(d) { return d; });
+
+        rowSortText
         .enter()
         .append('text')
         .attr('class', 'text rowSortText')
@@ -376,8 +398,15 @@
         .attr("text-anchor", "middle")
         .text('↑↓');
 
+        rowSortText
+        .transition()
+        .duration(animationDuration)
+        .attr("transform", function(d, i) { return "translate(" + (width + 2 + 0.5 * gridFieldWidth) + ",0)" + "translate(0," + (i * gridFieldHeight + 0.5 * gridFieldHeight) + ")rotate(-90)";});
+
         var rowSortBox = rowSortItems.selectAll('.rowSortBox')
-        .data(probes, function(d) { return d; })
+        .data(probes, function(d) { return d; });
+
+        rowSortBox
         .enter()
         .append('rect')
         .attr('class', 'box rowSortBox')
@@ -385,8 +414,7 @@
         .attr('y', function(d, i) { return i * gridFieldHeight; })
         .attr('width', gridFieldWidth)
         .attr('height', gridFieldHeight)
-        .on("click", function(d, boxIdx) {
-            var probe = probes[boxIdx];
+        .on("click", function(probe) {
             var colValues = [];
             for(var i = 0; i < patientIDs.length; i++) {
                 var patientID = patientIDs[i];
@@ -405,8 +433,18 @@
             updateColOrder(sortValues);
         });
 
+        rowSortBox
+        .transition()
+        .duration(animationDuration)
+        .attr('x', width + 2)
+        .attr('y', function(d, i) { return i * gridFieldHeight; })
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight);
+
         var selectText = heatmap.selectAll('.selectText')
-        .data(patientIDs, function(d) { return d; })
+        .data(patientIDs, function(d) { return d; });
+
+        selectText
         .enter()
         .append('text')
         .attr('class', 'text selectText')
@@ -416,8 +454,16 @@
         .attr("text-anchor", "middle")
         .text('□');
 
+        selectText
+        .transition()
+        .duration(animationDuration)
+        .attr('x', function(d, i) { return i * gridFieldWidth + 0.5 * gridFieldWidth; })
+        .attr('y', -2 - gridFieldHeight * 2 + 0.5 * gridFieldHeight);
+
         var selectBox = heatmap.selectAll('.selectBox')
-        .data(patientIDs, function(d) { return d; })
+        .data(patientIDs, function(d) { return d; });
+
+        selectBox
         .enter()
         .append('rect')
         .attr('class', 'box selectBox')
@@ -426,8 +472,16 @@
         .attr('width', gridFieldWidth)
         .attr('height', gridFieldHeight)
         .on("click", function(patientID) {
-            selectCol(patientIDs.indexOf(patientID));
+            selectCol(patientID);
         });
+
+        selectBox
+        .transition()
+        .duration(animationDuration)
+        .attr('x', function(d, i) { return i * gridFieldWidth; })
+        .attr('y', -2 - gridFieldHeight * 2)
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight);
 
         var patientID = patientIDItems.selectAll('.patientID')
         .data(patientIDs, function(d) { return d; });
@@ -482,35 +536,36 @@
         heatmap
         .attr('width', width + margin.left + margin.right)
         .attr('height', width + margin.top + margin.bottom);
+        var temp = animationDuration;
+        animationDuration = 0;
         updateHeatmap();
         reloadDendrograms();
+        animationDuration = temp;
     }
 
     function reloadDendrograms() {
         if (colDendrogramVisible) {
-            hideColDendrogram();
-            showColDendrogram();
+            removeColDendrogram();
+            createColDendrogram();
         }
         if (rowDendrogramVisible) {
-            hideRowDendrogram();
-            showRowDendrogram();
+            removeRowDendrogram();
+            createRowDendrogram();
         }
     }
 
-    function selectCol(col) {
-        if (d3.select('.square.col-' + col).classed('selected')) {
-            var index = selectedPatientIDs.indexOf(patientIDs[col]);
+    function selectCol(patientID) {
+        var colSquares = d3.selectAll('.square.patientID-' + patientID);
+        if (colSquares.classed('selected')) {
+            var index = selectedPatientIDs.indexOf(patientID);
             selectedPatientIDs.splice(index, 1);
-            d3.selectAll('.square.col-' + col)
+
+            colSquares
             .classed('selected', false);
-            d3.select('#selectBoxLabel-' + col)
-            .text('□');
         } else {
-            selectedPatientIDs.push(parseInt(d3.select('.patientID.col-' + col).text())); // Ugly hack
-            d3.selectAll('.square.col-' + col)
+            selectedPatientIDs.push(patientID);
+            colSquares
             .classed('selected', true);
-            d3.select('#selectBoxLabel-' + col)
-            .text('■');
         }
         if (selectedPatientIDs.length !== 0) {
             d3.selectAll('.square:not(.selected)')
@@ -525,17 +580,15 @@
         colorScale = d3.scale.quantile()
         .domain([0, 1])
         .range(colorSets[colorIdx]);
-        squareItems.selectAll('.square')
+        d3.selectAll('.square')
         .transition()
         .duration(animationDuration)
         .style("fill", function(d) { return colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE))); });
     }
 
     function unselectAll() {
-        for (var i = 0, len = patientIDs.length; i < len; i++) {
-            d3.select('#selectBoxLabel-' + i)
-            .text('□');
-        }
+        d3.selectAll('.selectText')
+        .text('□');
         d3.selectAll('.square')
         .classed('selected', false)
         .attr('opacity', 1);
@@ -543,7 +596,7 @@
     }
 
     var colDendrogramVisible = false;
-    function showColDendrogram() {
+    function createColDendrogram() {
         var w = 200;
 
         var cluster = d3.layout.cluster()
@@ -577,8 +630,7 @@
             var previousSelection = selectedPatientIDs.slice();
             unselectAll();
             var leafs = d.index.split(' ');
-            var i = leafs.length;
-            while (i--) {
+            for (var i = 0; i < leafs.length; i++) {
                 selectCol(leafs[i]);
             }
             if (arrEqual(previousSelection, selectedPatientIDs)) {
@@ -599,7 +651,7 @@
     }
 
     var rowDendrogramVisible = false;
-    function showRowDendrogram() {
+    function createRowDendrogram() {
         var h = 280;
 
         var cluster = d3.layout.cluster()
@@ -645,23 +697,14 @@
         rowDendrogramVisible = true;
     }
 
-    function hideColDendrogram() {
+    function removeColDendrogram() {
         heatmap.selectAll(".colDendrogram").remove();
         colDendrogramVisible = false;
     }
 
-    function hideRowDendrogram() {
+    function removeRowDendrogram() {
         heatmap.selectAll(".rowDendrogram").remove();
         rowDendrogramVisible = false;
-    }
-
-    var initialColOrder = d3.range(patientIDs.length);
-    var initialRowOrder = d3.range(probes.length);
-    function updateInitialOrder(order, sortValues) {
-        var oldOrder = order.slice();
-        for (var i = 0; i < sortValues.length; i++) {
-            order[i] = oldOrder[sortValues[i]];
-        }
     }
 
     function updateColOrder(sortValues) {
@@ -671,7 +714,7 @@
         }
         patientIDs = sortedPatientIDs;
         unselectAll();
-        hideColDendrogram();
+        removeColDendrogram();
         updateHeatmap();
     }
 
@@ -681,7 +724,7 @@
             sortedProbes.push(probes[sortValues[i]]);
         }
         probes = sortedProbes;
-        hideRowDendrogram();
+        removeRowDendrogram();
         updateHeatmap();
     }
 
@@ -693,19 +736,37 @@
         return newOrder;
     }
 
+    function getInitialRowOrder() {
+        initialRowOrder = [];
+        for (var i = 0; i < probes.length; i++) {
+            var probe = probes[i];
+            initialRowOrder.push(originalProbes.indexOf(probe));
+        }
+        return initialRowOrder;
+    }
+
+    function getInitialColOrder() {
+        initialColOrder = [];
+        for (var i = 0; i < patientIDs.length; i++) {
+            var patientID = patientIDs[i];
+            initialColOrder.push(originalPatientIDs.indexOf(patientID));
+        }
+        return initialColOrder;
+    }
+
     function cluster(clustering) {
         var clusterData = data[clustering];
         colDendrogram = JSON.parse(clusterData[2]);
         rowDendrogram = JSON.parse(clusterData[3]);
-        updateRowOrder(transformClusterOrderWRTInitialOrder(clusterData[1], initialRowOrder));
+        updateRowOrder(transformClusterOrderWRTInitialOrder(clusterData[1], getInitialRowOrder()));
         setTimeout(function() {
-            updateColOrder(transformClusterOrderWRTInitialOrder(clusterData[0], initialColOrder));
+            updateColOrder(transformClusterOrderWRTInitialOrder(clusterData[0], getInitialColOrder()));
         }, animationDuration);
         setTimeout(function() {
-            showColDendrogram();
+            createColDendrogram();
         }, animationDuration * 2);
         setTimeout(function() {
-            showRowDendrogram(JSON.parse(clusterData[3]));
+            createRowDendrogram(JSON.parse(clusterData[3]));
         }, animationDuration * 2 + 200);
     }
 

@@ -64,7 +64,7 @@ fields <- fields[order(fields$SIGNIFICANCE, decreasing=TRUE), ]
 
 patientIDs <- unique(fields$PATIENTID)
 
-sorted.zScoreMatrix <- head(highDimData.zScore[, -(1:3)])
+sorted.zScoreMatrix <- highDimData.zScore[, -(1:3)]
 colDendrogramEuclideanComplete <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='euclidean'), method='complete'))
 colDendrogramEuclideanSingle <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='euclidean'), method='single'))
 colDendrogramEuclideanAverage <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='euclidean'), method='average'))
