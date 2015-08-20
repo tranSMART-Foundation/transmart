@@ -235,7 +235,7 @@ var conceptBoxes = [];
 var sanityCheckErrors = [];
 function registerConceptBox(name, cohort, type, min, max) {
     var concepts = getConcepts(name);
-    var check1 = containsOnly(name, type);
+    var check1 = type === undefined || containsOnly(name, type);
     var check2 = min === undefined || concepts.length >= min;
     var check3 = max === undefined || concepts.length <= max;
     var check4 = concepts.length === 0 || !isSubsetEmpty(cohort);

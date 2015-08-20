@@ -102,28 +102,57 @@ dendrogramToJSON <- function(d) {
     return(jsonString)
 }
 
+# FIXME make sure to check for missing fields
+
 numerical.lowDimData <- lowDimData$additionalFeatures_numerical
 concepts <- unique(numerical.lowDimData$concept)
-additionalFields <- list()
+extraFields <- c()
+features <- c()
 for (concept in concepts) {
-    featureName <- sapply(strsplit(concept, '\\\\'), function(s) tail(s, n=1))
+    featureName <- tail(strsplit(concept, '\\\\')[[1]], n=1)
+    featureName <- gsub(' |\\(|\\)', '_', featureName)
     conceptData <- numerical.lowDimData[numerical.lowDimData$concept == concept, ]
-    additionalFeature <- data.frame(
-        PROBE=rep(featureName, nrow(conceptData)),
-        GENEID=rep(NA, nrow(conceptData)),
-        GENESYMBOL=rep(NA, nrow(conceptData)),
-        SIGNIFICANCE=rep(NaN, nrow(conceptData)),
+    binary = length(unique(conceptData$value)) == 2
+    newFields <- data.frame(
+        FEATURE=rep(featureName, nrow(conceptData)),
         PATIENTID=patientIDs,  # conceptData$patientID, # FIXME: This is the wrong mapping (just for testing!)
+        TYPE=rep(ifelse(binary, 'binary', 'numerical'), nrow(conceptData)),
         VALUE=conceptData$value,
-        ZSCORE=scale(conceptData$value),
-        stringsAsFactors=FALSE) 
-    fields <- rbind(additionalFeature, fields)
-    probes <- c(featureName, probes)
-    geneIDs <- c(NA, geneIDs)
-    geneSymbols <- c(NA, geneSymbols)
+        ZSCORE=scale(conceptData$value))
+    extraFields <- rbind(extraFields, newFields)
+    features <- c(features, featureName)
 }
 
+conceptStrToFolderStr <- function(s) {
+    splitString <- strsplit(s, "")[[1]]
+    backslashs <- which(splitString == "\\")
+    substr(s, 0, tail(backslashs, 2)[1])
+}
+
+alphabetical.lowDimData <- lowDimData$additionalFeatures_alphabetical
+folders <- as.vector(sapply(alphabetical.lowDimData$concept, conceptStrToFolderStr))
+unique.folders <- unique(folders)
+for (folder in unique.folders) {
+    folderData <- alphabetical.lowDimData[folder == folders, ]
+    featureName <- tail(strsplit(folder, '\\\\')[[1]], n=1)
+    featureName <- gsub(' |\\(|\\)', '_', featureName)
+    binary = length(unique(conceptData$value)) == 2
+    newFields <- data.frame(
+        FEATURE=rep(featureName, nrow(folderData)),
+        PATIENTID=patientIDs,  # conceptData$patientID, # FIXME: This is the wrong mapping (just for testing!)
+        TYPE=rep('alphabetical', nrow(folderData)),
+        VALUE=folderData$value,
+        ZSCORE=rep(NA, nrow(folderData)))
+    extraFields <- rbind(extraFields, newFields)
+    features <- c(features, featureName)
+}
+
+fields$PROBE <- gsub("[[:space:]]", "_", fields$PROBE)
+probes <- gsub("[[:space:]]", "_", probes)
+
 ### WRITE OUTPUT ###
+output$extraFields <- extraFields
+output$features <- features
 output$fields <- fields
 output$patientIDs <- patientIDs
 output$probes <- probes
