@@ -176,16 +176,6 @@ var genomeBrowserPanel = new Ext.Panel(
                             }
                         }
                     },
-/*                    {name: 'CpG',
-                        desc: 'CpG observed/expected ratio',
-                        uri: 'http://www.derkholm.net:8080/das/hg19comp/',
-                        // stylesheet_uri: 'http://www.derkholm.net/dalliance-test/stylesheets/cpg.xml'
-                        quantLeapThreshold: 0.8,
-                        forceReduction: -1,
-                        style:                [{type: 'cpgoe',
-                            style: {glyph: 'LINEPLOT',
-                                FGCOLOR: 'green', HEIGHT: '50', MIN: 0, MAX: 1.2}}]
-                    },*/
                     {name:                 'BWG test',
                         bwgURI:               '//www.biodalliance.org/datasets/spermMethylation.bw',
                         stylesheet_uri:       '//www.ebi.ac.uk/das-srv/genomicdas/das/batman_seq_SP/stylesheet',
@@ -212,10 +202,6 @@ var genomeBrowserPanel = new Ext.Panel(
                 '//ftp.ebi.ac.uk/pub/databases/ensembl/encode/integration_data_jan2011/hub.txt'
             ];
 
-            this.genomeBrowser.addFeatureInfoPlugin(function(f, info) {
-                info.add('Testing', 'This is a test!');
-            });
-
             this.genomeBrowser.addViewListener(function(chr, min, max) {
                 var link = document.getElementById('enslink');
                 link.href = 'http://www.ensembl.org/Homo_sapiens/Location/View?r=' + chr + ':' + min + '-' + max;
@@ -223,28 +209,6 @@ var genomeBrowserPanel = new Ext.Panel(
 
             // Override the max view width so that user has ability to zoom out more
             this.genomeBrowser.maxViewWidth = 40000000;
-
-            /*
-             var geneDescriptions;
-             connectBigTab(new URLFetchable('http://www.biodalliance.org/datasets/ensg-to-desc.bt'), function(bt) {
-             geneDescriptions = bt;
-             });
-
-             b.addFeatureInfoPlugin(function(f, info) {
-             if (f.geneId) {
-             var desc = makeElement('div', 'Loading...');
-             info.add('Description', desc);
-             geneDescriptions.index.lookup(f.geneId, function(res, err) {
-             if (err) {
-             console.log(err);
-             } else {
-             desc.textContent = res;
-             }
-             });
-             }
-             }); */
-
-
         }
     }
 );
