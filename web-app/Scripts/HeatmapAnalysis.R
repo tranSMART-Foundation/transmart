@@ -115,10 +115,11 @@ for (concept in concepts) {
     binary = length(unique(conceptData$value)) == 2
     newFields <- data.frame(
         FEATURE=rep(featureName, nrow(conceptData)),
-        PATIENTID=patientIDs,  # conceptData$patientID, # FIXME: This is the wrong mapping (just for testing!)
+        PATIENTID=conceptData$patientID,
         TYPE=rep(ifelse(binary, 'binary', 'numerical'), nrow(conceptData)),
         VALUE=conceptData$value,
         ZSCORE=scale(conceptData$value))
+    newFields <- newFields[order(newFields$PATIENTID, decreasing=FALSE), ]
     extraFields <- rbind(extraFields, newFields)
     features <- c(features, featureName)
 }
@@ -139,10 +140,11 @@ for (folder in unique.folders) {
     binary = length(unique(conceptData$value)) == 2
     newFields <- data.frame(
         FEATURE=rep(featureName, nrow(folderData)),
-        PATIENTID=patientIDs,  # conceptData$patientID, # FIXME: This is the wrong mapping (just for testing!)
+        PATIENTID=folderData$patientID,
         TYPE=rep('alphabetical', nrow(folderData)),
         VALUE=folderData$value,
         ZSCORE=rep(NA, nrow(folderData)))
+    newFields <- newFields[order(newFields$PATIENTID, decreasing=FALSE), ]
     extraFields <- rbind(extraFields, newFields)
     features <- c(features, featureName)
 }

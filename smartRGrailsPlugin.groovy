@@ -49,6 +49,7 @@ class smartRGrailsPlugin {
             clinicalDataResourceService = ref('clinicalDataResourceService')
             highDimensionResourceService = ref('highDimensionResourceService')
             highDimExporterRegistry = ref('highDimExporterRegistry')
+            dataSource = ref('dataSource')
         }
     }
 

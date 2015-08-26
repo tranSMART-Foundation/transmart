@@ -9,7 +9,8 @@ import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
 import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
 import org.transmartproject.core.dataquery.highdim.projections.Projection
-
+import groovy.sql.Sql
+import groovy.json.JsonBuilder
 
 class DataQueryService {
 
@@ -18,6 +19,7 @@ class DataQueryService {
     def clinicalDataResourceService
     def highDimensionResourceService
     def highDimExporterRegistry
+    def dataSource
 
     /**
     *   This method can be considered the main method of this class
@@ -44,6 +46,7 @@ class DataQueryService {
             def values = wrappedObservations
                 .findAll { it.subject.id in patientIDs }
                 .collect { it.value }
+
             def ids = concept.patients
                 .findAll { it.id in patientIDs }
                 .collect { it.id }
@@ -57,9 +60,11 @@ class DataQueryService {
         return data
     }
 
-    def exportHighDimData(conceptKeys, resultInstanceId, studyDir, format, dataType) {
+    def exportHighDimData(conceptKeys, resultInstanceId, studyDir, format, dataType, mappingFile) {
         def fileNames = []
         conceptKeys.eachWithIndex { conceptKey, idx ->
+            def mapping = getSubjectIDPatientIDMapping(conceptKey)
+            mappingFile.write(new JsonBuilder(mapping).toPrettyString())
             def file = exportForSingleNode(
                     conceptKey,
                     resultInstanceId,
@@ -74,6 +79,22 @@ class DataQueryService {
         }
 
         return fileNames
+    }
+
+    def getSubjectIDPatientIDMapping(conceptKey) {
+        def concept = conceptsResourceService.getByKey(conceptKey)
+        def trialName = concept.studyId
+        def results = new Sql(dataSource).rows("""
+            SELECT 
+                subject_id, patient_id 
+            FROM  
+                deapp.de_subject_sample_mapping 
+            WHERE
+                trial_name = ?
+        """, trialName)
+
+        def map = results.collectEntries { [it[0], it[1]] }
+        return map
     }
 
     private File exportForSingleNode(String conceptKey, Long resultInstanceId, File studyDir, String format, String dataType, Integer index) {
