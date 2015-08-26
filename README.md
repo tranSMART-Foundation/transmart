@@ -1,13 +1,9 @@
 DO NOT TRY TO ADD SmartR TO YOUR tranSMART INSTALLATION!<br/>
 The source code is only here for people to look at it.<br/>
-<br/>
 This page will be updated with instructions as soon as SmartR reaches a certain state.
 
 <br/>
 <br/>
-
-
-
 
 
 To deploy your own visualization you need to add three files:
