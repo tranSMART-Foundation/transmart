@@ -686,28 +686,24 @@
         .duration(animationDuration)
         .style("fill", function(d) { return colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE))); });
 
-        d3.selectAll('.extraSquare')
-        .transition()
-        .duration(animationDuration)
-        .style("fill", function(d) {
-            if (d.TYPE === 'binary') {
-                return featureColorSetBinary[d.VALUE];
-            } else if (d.TYPE === 'numerical') {
-                colorScale
-                .range(featureColorSetSequential);
-                return colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE))); 
-            } else if (d.TYPE === 'alphabetical') {
-                var domain = extraFields.map(function(field) {
-                    if (field.FEATURE === d.FEATURE) {
-                        return d.VALUE;
-                    }
-                });
-                var categoricalColorScale = d3.scale.category10()
-                .domain(domain);
-            } else {
-                alert('This feature type does not exist!');
-            }
-        });
+        for (var i = 0; i < features.length; i++) {
+            var feature = features[i];
+            var categoricalColorScale = d3.scale.category10();
+            d3.selectAll('.extraSquare.feature-' + feature)
+            .style("fill", function(d) {
+                if (d.TYPE === 'binary') {
+                    return featureColorSetBinary[d.VALUE];
+                } else if (d.TYPE === 'numerical') {
+                    colorScale
+                    .range(featureColorSetSequential);
+                    return colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE))); 
+                } else if (d.TYPE === 'alphabetical') {
+                    return categoricalColorScale(d.VALUE);            
+                } else {
+                    alert('Field type does not exist: ' + d.TYPE);
+                }
+            });
+        }
     }
 
     function unselectAll() {
