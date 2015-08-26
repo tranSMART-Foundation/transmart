@@ -71,17 +71,14 @@ class SmartRService {
             if (type == 'valueicon' || type == 'alphaicon') {
                 data[name] = dataQueryService.getAllData(concepts, patientIDs)
             } else if (type == 'hleaficon') {
-                dataQueryService.getHighDimData(
+                def tsvFiles = dataQueryService.exportHighDimData(
                         concepts,
                         rIID as Long,
                         new File(jobDataMap['workingDir']),
                         'TSV',
-                        'mrna',
-                        '')
-                def tsvFiles = new FileNameFinder().getFileNames(jobDataMap['workingDir'], '**/*.tsv')
+                        'mrna')
                 assert tsvFiles.size() == 1
-                def tsvFile = new File(tsvFiles[0])
-                assert tsvFile.renameTo(new File(highDimFile))
+                assert new File(tsvFiles[0]).renameTo(new File(highDimFile))
             } else if (type == 'null') {
                 data[name] = [:]
             }
