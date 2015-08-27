@@ -39,10 +39,10 @@ tryCatch(
 		if (file.exists(idMappingPath)) {
 			idMapping <- fromJSON(readChar(idMappingPath, file.info(idMappingPath)$size))
 			if (file.exists(highDimPath_cohort1)) {
-				highDimData_cohort1$'PATIENT ID' <- sapply(highDimData_cohort1$'PATIENT ID', function(id) idMapping[[id]])
+				highDimData_cohort1$'PATIENT ID' <- sapply(highDimData_cohort1$'PATIENT ID', function(id) idMapping[[toString(id)]])
 			}
 			if (file.exists(highDimPath_cohort2)) {
-				highDimData_cohort2$'PATIENT ID' <- sapply(highDimData_cohort2$'PATIENT ID', function(id) idMapping[[id]])
+				highDimData_cohort2$'PATIENT ID' <- sapply(highDimData_cohort2$'PATIENT ID', function(id) idMapping[[toString(id)]])
 			}
 		}
 
