@@ -119,6 +119,7 @@ for (concept in concepts) {
         TYPE=rep(ifelse(binary, 'binary', 'numerical'), nrow(conceptData)),
         VALUE=conceptData$value,
         ZSCORE=scale(conceptData$value))
+    newFields <- newFields[newFields$PATIENTID %in% patientIDs, ]
     newFields <- newFields[order(newFields$PATIENTID, decreasing=FALSE), ]
     extraFields <- rbind(extraFields, newFields)
     features <- c(features, featureName)
@@ -144,6 +145,7 @@ for (folder in unique.folders) {
         TYPE=rep('alphabetical', nrow(folderData)),
         VALUE=folderData$value,
         ZSCORE=rep(NA, nrow(folderData)))
+    newFields <- newFields[newFields$PATIENTID %in% patientIDs, ]
     newFields <- newFields[order(newFields$PATIENTID, decreasing=FALSE), ]
     extraFields <- rbind(extraFields, newFields)
     features <- c(features, featureName)
