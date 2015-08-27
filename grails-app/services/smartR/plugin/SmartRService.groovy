@@ -156,12 +156,10 @@ class SmartRService {
         if (jobDataMap['init'] && highDimFile2.exists()) {
             highDimFile2.delete()
         }
-
         def mappingFile = new File(jobDataMap['sIDpIDMapping'])
         if (jobDataMap['init'] && mappingFile.exists()) {
             mappingFile.delete()
         }
-
         def outputFile = new File(jobDataMap['outputFile'])
         if (outputFile.exists()) {
             outputFile.delete()

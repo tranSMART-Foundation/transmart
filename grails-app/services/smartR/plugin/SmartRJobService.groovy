@@ -28,7 +28,7 @@ class SmartRJobService implements InterruptableJob {
             jobDataMap['lowDimFile'],
             jobDataMap['highDimFile_cohort1'],
             jobDataMap['highDimFile_cohort2'],
-            jobDataMap['pIDsIDMapping'],
+            jobDataMap['sIDpIDMapping'],
             jobDataMap['settingsFile'],
             jobDataMap['outputFile'],
             jobDataMap['errorFile'])
@@ -66,7 +66,7 @@ class SmartRJobService implements InterruptableJob {
                 log.info('Job successfully executed!')
             }
         } catch (Exception e) {
-            log.error('An unexpected exception occured!')
+            log.error('Failed to launch job!')
             throw new JobExecutionException(e)
         }
 	}
