@@ -1,18 +1,25 @@
-DO NOT TRY TO ADD SmartR TO YOUR tranSMART INSTALLATION!<br/>
-The source code is only here for people to look at it.<br/>
-This page will be updated with instructions as soon as SmartR reaches a certain state.
+DO NOT TRY TO ADD SmartR TO YOUR tranSMART INSTALLATION IN ITS CURRENT STATE!<br/>
 
 <br/>
 <br/>
 
+How to add SmartR to my tranSMART installation:
+- coming soon
 
-To deploy your own visualization you need to add three files:
-- An input views to specify the input
-- An analysis script to compute statistical information
-- An output view to visualize the final data
+Knows Issues:
+- none
+
+Supported Browsers:
+- Firefox (fully supported)
+- Chrome (fully supported)
+- Internet Explorer (mostly supported)
+ 
+How to deploy your own visualization:
+- Add an input view to specify the input data
+- Add an analysis script to prepare/order/filter the data and to compute statistical information
+- Add an output view to visualize the processed data
 
 A very simplistic example can be found here:
-
 - grails-app/views/_inSample.gsp
 - web-app/Scripts/Sample.R
 - grails-app/views/_outSample.gsp
