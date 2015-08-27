@@ -71,17 +71,15 @@ class SmartRService {
             if (type == 'valueicon' || type == 'alphaicon') {
                 data[name] = dataQueryService.getAllData(concepts, patientIDs)
             } else if (type == 'hleaficon') {
-                dataQueryService.getHighDimData(
+                def tsvFiles = dataQueryService.exportHighDimData(
                         concepts,
                         rIID as Long,
                         new File(jobDataMap['workingDir']),
                         'TSV',
                         'mrna',
-                        '')
-                def tsvFiles = new FileNameFinder().getFileNames(jobDataMap['workingDir'], '**/*.tsv')
+                        new File(jobDataMap['sIDpIDMapping']))
                 assert tsvFiles.size() == 1
-                def tsvFile = new File(tsvFiles[0])
-                assert tsvFile.renameTo(new File(highDimFile))
+                assert new File(tsvFiles[0]).renameTo(new File(highDimFile))
             } else if (type == 'null') {
                 data[name] = [:]
             }
@@ -134,6 +132,7 @@ class SmartRService {
         jobDataMap.put('lowDimFile', workingDir + 'data.json') // both cohorts are saved in the same file, unlike highdim
         jobDataMap.put('highDimFile_cohort1', workingDir + 'highdim_cohort1.tsv')
         jobDataMap.put('highDimFile_cohort2', workingDir + 'highdim_cohort2.tsv')
+        jobDataMap.put('sIDpIDMapping', workingDir + 'mapping.json')
         jobDataMap.put('outputFile', workingDir + 'results.json')
         jobDataMap.put('settingsFile', workingDir + 'settings.json')
         jobDataMap.put('errorFile', workingDir + 'error.log')
@@ -157,6 +156,10 @@ class SmartRService {
         if (jobDataMap['init'] && highDimFile2.exists()) {
             highDimFile2.delete()
         }
+        def mappingFile = new File(jobDataMap['sIDpIDMapping'])
+        if (jobDataMap['init'] && mappingFile.exists()) {
+            mappingFile.delete()
+        }
         def outputFile = new File(jobDataMap['outputFile'])
         if (outputFile.exists()) {
             outputFile.delete()
@@ -172,6 +175,7 @@ class SmartRService {
         assert !jobDataMap['init'] || !lowDimFile.exists()
         assert !jobDataMap['init'] || !highDimFile1.exists()
         assert !jobDataMap['init'] || !highDimFile2.exists()
+        assert !jobDataMap['init'] || !mappingFile.exists()
         assert !outputFile.exists()
         assert !settingsFile.exists()
         assert !errorFile.exists() || errorFile.text == ''

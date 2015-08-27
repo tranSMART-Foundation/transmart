@@ -57,7 +57,7 @@
             height: 0px;
         }
         to {
-            height: 275px;
+            height: 290px;
         }
     }
 
@@ -116,7 +116,15 @@
     .square {
         stroke: white;
         stroke-width: 0px;
-        /*shape-rendering: crispEdges;*/
+    }
+
+    .extraSquare {
+        stroke: white;
+        stroke-width: 0px;
+    }
+
+    .feature {
+        font-size: 10px;
     }
 
     .selected {
@@ -124,6 +132,10 @@
     }
 
     .square:hover {
+        opacity: 0.4;
+    }
+
+    .extraSquare:hover {
         opacity: 0.4;
     }
 
@@ -232,6 +244,8 @@
     });
 
     var data = ${raw(results)};
+    var extraFields = data.extraFields;
+    var features = data.features;
     var fields = data.fields;
     var patientIDs = data.patientIDs;
     var probes = data.probes;
@@ -260,10 +274,18 @@
         ['rgb(255,247,236)','rgb(254,232,200)','rgb(253,212,158)','rgb(253,187,132)','rgb(252,141,89)','rgb(239,101,72)','rgb(215,48,31)','rgb(179,0,0)','rgb(127,0,0)']
     ];
 
+    var featureColorSetBinary = ['rgb(0, 0, 0)', 'rgb(13, 13, 191)'];
+    var featureColorSetSequential = ['rgb(247,252,253)','rgb(224,236,244)','rgb(191,211,230)','rgb(158,188,218)','rgb(140,150,198)','rgb(140,107,177)','rgb(136,65,157)','rgb(129,15,124)','rgb(77,0,75)'];
+
     var gridFieldWidth = 40;
     var gridFieldHeight = 40;
 
-    var margin = { top: gridFieldHeight * 2 + 300, right: gridFieldWidth + 300 + 300, bottom: 10, left: 10 };
+    var dendrogramHeight = 300;
+
+    var margin = { top: gridFieldHeight * 2 + features.length * gridFieldHeight / 2 + dendrogramHeight, 
+            right: gridFieldWidth + 300 + dendrogramHeight, 
+            bottom: 10, 
+            left: 10 };
 
     var width = gridFieldWidth * patientIDs.length;
     var height = gridFieldHeight * probes.length;
@@ -281,6 +303,7 @@
     .attr("class", "tooltip text")
     .style("visibility", "hidden");
 
+    var extraSquareItems = heatmap.append('g');
     var squareItems = heatmap.append('g');
     var colSortItems = heatmap.append('g');
     var selectItems = heatmap.append('g');
@@ -296,8 +319,7 @@
         .enter()
         .append("rect")
         .attr('class', function(d) {
-            var static = d.SIGNIFICANCE === undefined ? ' static' : '';
-            return 'square patientID-' + d.PATIENTID + ' probe-' + d.PROBE + static;
+            return 'square patientID-' + d.PATIENTID + ' probe-' + d.PROBE;
         })
         .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
         .attr("y", function(d) { return probes.indexOf(d.PROBE) * gridFieldHeight; })
@@ -325,6 +347,10 @@
             d3.selectAll(".probe").classed("highlight", false);
 
             tooltip.style("visibility", "hidden");
+        })
+        .on('click', function(d) {
+            var url = 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + d.GENESYMBOL;
+            window.open(url);
         });
 
         square
@@ -532,6 +558,72 @@
         .duration(animationDuration)
         .attr('x', width + gridFieldWidth + 7)
         .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
+
+        var featurePosY =  features !== undefined ? - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20 : 0;
+
+        var extraSquare = extraSquareItems.selectAll('.extraSquare')
+        .data(extraFields, function(d) { return 'patientID-' + d.PATIENTID + '-feature-' + d.FEATURE; });
+
+        extraSquare
+        .enter()
+        .append("rect")
+        .attr('class', function(d) {
+            return 'extraSquare patientID-' + d.PATIENTID + ' feature-' + d.FEATURE;
+        })
+        .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
+        .attr('y', function(d) { return featurePosY + features.indexOf(d.FEATURE) * gridFieldHeight / 2; })
+        .attr("width", gridFieldWidth)
+        .attr("height", gridFieldHeight / 2)
+        .attr("rx", 0)
+        .attr("ry", 0)
+        .style("fill", 'white')
+        .on("mouseover", function(d) {
+            d3.select('.patientID.patientID-' +  d.PATIENTID).classed("highlight", true);
+            d3.select('.feature.feature-' +  d.FEATURE).classed("highlight", true);
+
+            var html = '';
+            for(var key in d) {
+                html += key + ': ' + d[key] + '<br/>';
+            }
+            tooltip
+            .style("visibility", "visible")
+            .html(html)
+            .style("left", mouseX() + "px")
+            .style("top", mouseY() + "px");
+        })
+        .on("mouseout", function(d) {
+            d3.selectAll(".patientID").classed("highlight", false);
+            d3.selectAll(".feature").classed("highlight", false);
+
+            tooltip.style("visibility", "hidden");
+        });
+
+        extraSquare
+        .transition()
+        .duration(animationDuration)
+        .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
+        .attr('y', function(d) { return featurePosY + features.indexOf(d.FEATURE) * gridFieldHeight / 2; })
+        .attr("width", gridFieldWidth)
+        .attr("height", gridFieldHeight / 2);
+
+        var feature = labelItems.selectAll('.feature')
+        .data(features, function(d) { return d; });
+
+        feature
+        .enter()
+        .append("text")
+        .attr('class', function(d) { return 'feature text feature-' + d;})
+        .attr('x', width + gridFieldWidth + 7)
+        .attr('y', function(d) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4; })
+        .attr('dy', '0.35em')
+        .style("text-anchor", "start")
+        .text(function(d) { return d; });
+
+        feature
+        .transition()
+        .duration(animationDuration)
+        .attr('x', width + gridFieldWidth + 7)
+        .attr('y', function(d) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4; });
     }
 
     function zoom() {
@@ -589,13 +681,33 @@
     }
 
     function updateColors(colorIdx) {
-        colorScale = d3.scale.quantile()
+        var colorScale = d3.scale.quantile()
         .domain([0, 1])
         .range(colorSets[colorIdx]);
+        
         d3.selectAll('.square')
         .transition()
         .duration(animationDuration)
         .style("fill", function(d) { return colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE))); });
+
+        for (var i = 0; i < features.length; i++) {
+            var feature = features[i];
+            var categoricalColorScale = d3.scale.category10();
+            d3.selectAll('.extraSquare.feature-' + feature)
+            .style("fill", function(d) {
+                if (d.TYPE === 'binary') {
+                    return featureColorSetBinary[d.VALUE];
+                } else if (d.TYPE === 'numerical') {
+                    colorScale
+                    .range(featureColorSetSequential);
+                    return colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE))); 
+                } else if (d.TYPE === 'alphabetical') {
+                    return categoricalColorScale(d.VALUE);            
+                } else {
+                    alert('Field type does not exist: ' + d.TYPE);
+                }
+            });
+        }
     }
 
     function unselectAll() {
@@ -610,7 +722,7 @@
     var colDendrogramVisible = false;
     function createColDendrogram() {
         var w = 200;
-        var spacing = gridFieldWidth * 2 + getMaxWidth(d3.selectAll('.patientID')) + 20;
+        var spacing = gridFieldWidth * 2 + getMaxWidth(d3.selectAll('.patientID')) + features.length * gridFieldHeight / 2 + 40;
 
         var cluster = d3.layout.cluster()
         .size([width, w])
@@ -792,7 +904,7 @@
     }
 
     function updateCohorts() {
-        alert('This feature will be available as soon as tranSMART supports high dimensional patient selection.');
+        alert('This feature will be available in tranSMART 1.3.');
         return;
         var CONCEPT = '';
         var patientDIVs = [];

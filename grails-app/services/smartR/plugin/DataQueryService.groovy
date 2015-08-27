@@ -4,14 +4,22 @@ import org.transmartproject.rest.marshallers.ObservationWrapper
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.dataquery.clinical.*
 import org.transmartproject.core.dataquery.TabularResult
-
+import org.transmartproject.core.dataquery.DataRow
+import org.transmartproject.core.dataquery.highdim.AssayColumn
+import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
+import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
+import org.transmartproject.core.dataquery.highdim.projections.Projection
+import groovy.sql.Sql
+import groovy.json.JsonBuilder
 
 class DataQueryService {
 
     def studiesResourceService
     def conceptsResourceService
     def clinicalDataResourceService
-    def highDimExportService
+    def highDimensionResourceService
+    def highDimExporterRegistry
+    def dataSource
 
     /**
     *   This method can be considered the main method of this class
@@ -38,6 +46,7 @@ class DataQueryService {
             def values = wrappedObservations
                 .findAll { it.subject.id in patientIDs }
                 .collect { it.value }
+
             def ids = concept.patients
                 .findAll { it.id in patientIDs }
                 .collect { it.id }
@@ -51,15 +60,87 @@ class DataQueryService {
         return data
     }
 
-    def getHighDimData(conceptPaths, resultInstanceId, studyDir, format, dataType, jobName) {
-        def map = [:]
-        map.conceptPaths = conceptPaths
-        map.resultInstanceId = resultInstanceId
-        map.studyDir = studyDir
-        map.format = format
-        map.dataType = dataType
-        map.jobName = jobName
-        highDimExportService.exportHighDimData(map)
+    def exportHighDimData(conceptKeys, resultInstanceId, studyDir, format, dataType, mappingFile) {
+        def fileNames = []
+        conceptKeys.eachWithIndex { conceptKey, idx ->
+            def mapping = getSubjectIDPatientIDMapping(conceptKey)
+            mappingFile.write(new JsonBuilder(mapping).toPrettyString())
+            def file = exportForSingleNode(
+                    conceptKey,
+                    resultInstanceId,
+                    studyDir,
+                    format,
+                    dataType,
+                    idx)
+
+            if (file) {
+                fileNames << file.absolutePath
+            }
+        }
+
+        return fileNames
+    }
+
+    def getSubjectIDPatientIDMapping(conceptKey) {
+        def concept = conceptsResourceService.getByKey(conceptKey)
+        def trialName = concept.studyId
+        def results = new Sql(dataSource).rows("""
+            SELECT 
+                subject_id, patient_id 
+            FROM  
+                deapp.de_subject_sample_mapping 
+            WHERE
+                trial_name = ?
+        """, trialName)
+
+        def map = results.collectEntries { [it[0], it[1]] }
+        return map
+    }
+
+    private File exportForSingleNode(String conceptKey, Long resultInstanceId, File studyDir, String format, String dataType, Integer index) {
+
+        HighDimensionDataTypeResource dataTypeResource = highDimensionResourceService.getSubResourceForType(dataType)
+
+        def assayConstraints = []
+
+        assayConstraints << dataTypeResource.createAssayConstraint(
+                AssayConstraint.PATIENT_SET_CONSTRAINT,
+                result_instance_id: resultInstanceId)
+
+        assayConstraints << dataTypeResource.createAssayConstraint(
+                AssayConstraint.ONTOLOGY_TERM_CONSTRAINT,
+                concept_key: conceptKey)
+
+        // Setup class to export the data
+        def exporter = highDimExporterRegistry.getExporterForFormat(format)
+        Projection projection = dataTypeResource.createProjection(exporter.projection)
+
+        // Retrieve the data itself
+        TabularResult<AssayColumn, DataRow<Map<String, String>>> tabularResult =
+                dataTypeResource.retrieveData(assayConstraints, [], projection)
+
+        File outputFile = new File(studyDir,
+                "${dataType}_${makeFileNameFromConceptPath(conceptKey)}_${index}.${format.toLowerCase()}")
+
+        try {
+            outputFile.withOutputStream { outputStream ->
+                exporter.export tabularResult, projection, outputStream, { false }
+            }
+        } catch (RuntimeException e) {
+            log.error('Data export to the file has thrown an exception', e)
+        } finally {
+            tabularResult.close()
+        }
+
+        outputFile
+    }
+
+    private String makeFileNameFromConceptPath(String conceptPath) {
+        conceptPath
+                .split('\\\\')
+                .reverse()[0..1]
+                .join('_')
+                .replaceAll('[\\W_]+', '_')
     }
 
     private ClinicalVariable createClinicalVariable(OntologyTerm term) {

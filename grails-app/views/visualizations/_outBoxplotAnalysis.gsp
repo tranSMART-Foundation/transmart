@@ -313,6 +313,8 @@
 <script>
 	var results = ${raw(results)};
 
+    results.cohort2 = results.cohort2 === undefined ? {concept: 'undefined', subsets: []} : results.cohort2;
+
 	var margin = {top: 10, right: 60, bottom: 200, left: 60};
     var width = jQuery("#smartRPanel").width() / 2 - 200 - margin.left - margin.right;
     var height = jQuery("#smartRPanel").height() * 0.65 - margin.top - margin.bottom;
