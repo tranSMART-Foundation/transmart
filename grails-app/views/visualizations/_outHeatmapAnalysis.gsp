@@ -57,7 +57,7 @@
             height: 0px;
         }
         to {
-            height: 275px;
+            height: 290px;
         }
     }
 
@@ -121,6 +121,10 @@
     .extraSquare {
         stroke: white;
         stroke-width: 0px;
+    }
+
+    .feature {
+        font-size: 10px;
     }
 
     .selected {
@@ -900,7 +904,7 @@
     }
 
     function updateCohorts() {
-        alert('This feature will be available as soon as tranSMART supports high dimensional patient selection.');
+        alert('This feature will be available in tranSMART 1.3.');
         return;
         var CONCEPT = '';
         var patientDIVs = [];
