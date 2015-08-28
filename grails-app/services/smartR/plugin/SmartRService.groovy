@@ -7,11 +7,12 @@ import org.quartz.Trigger
 import groovy.json.JsonSlurper
 import groovy.json.JsonBuilder
 import grails.util.Holders
-import groovy.util.FileNameFinder
+import grails.util.Environment
 
 
 class SmartRService {
 
+    def grailsApplication = Holders.grailsApplication
     def springSecurityService
     def quartzScheduler
     def i2b2HelperService
@@ -103,7 +104,11 @@ class SmartRService {
     *   @return {str}: path to the script folder
     */
     def getScriptDir() {
-        return org.codehaus.groovy.grails.plugins.GrailsPluginUtils.getPluginDirForName('smart-r').getFile().absolutePath + '/web-app/Scripts/'
+        if (Environment.current == Environment.DEVELOPMENT) {
+            return org.codehaus.groovy.grails.plugins.GrailsPluginUtils.getPluginDirForName('smart-r').getFile().absolutePath + '/web-app/Scripts/'
+        } else {
+            return grailsApplication.mainContext.servletContext.getRealPath('/plugins/') + '/smart-r-0.1/Scripts/'
+        }
     }
 
     /**
