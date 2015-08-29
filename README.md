@@ -19,7 +19,11 @@ Keep it mind that making use of this software is at your own risk!*
 1. Add this to your BuildConfig.groovy: <br/>
   `grails.plugin.location.smartR = '/path/to/smartR'`
 2. Add this to transmartApp/web-app/js/datasetExplorer/datasetExplorer.js: <br/>
-  `loadPlugin('smartR', "/SmartR/loadScripts", function () { resultsTabPanel.add(smartRPanel); })`
+  ```
+  loadPlugin('smartR', "/SmartR/loadScripts", function () { 
+    resultsTabPanel.add(smartRPanel); 
+  })
+  ```
 3. Run "grails war" to compile a WAR file containing SmartR
 
 ####Requirements:
