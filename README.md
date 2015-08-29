@@ -1,11 +1,17 @@
 ###SmartR is a [tranSMART](https://github.com/transmart/transmartApp) plugin seeking to improve the visual analytics by using recent web technologies such as [d3](http://d3js.org/).
 
+
 ---
 *SmartR is still under development and requires BETA testers in order to further improve.
 There is no warranty of any kind that it works as intended. 
 Keep it mind that making use of this software is at your own risk!*
 
+**Please report bugs and issues here: [Issues](https://github.com/sherzinger/SmartR/issues)**
+
+**If a problem is not listed then assume that the developers are not aware of it!**
+
 ---
+
 
 ####How to add SmartR to your own tranSMART installation:
 1. Add this to your BuildConfig.groovy: <br/>
@@ -22,8 +28,8 @@ Keep it mind that making use of this software is at your own risk!*
   - [zoo](https://cran.r-project.org/web/packages/zoo/index.html)
   - [TSclust](https://cran.r-project.org/web/packages/TSclust/index.html)
 
-####Known Issues:
-- none
+####Known Issues: 
+- https://github.com/sherzinger/SmartR/issues
 
 ####Supported Browsers:
 - Firefox (fully supported)
