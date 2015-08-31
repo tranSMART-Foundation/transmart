@@ -120,6 +120,10 @@ function createQueryCriteriaDIV(conceptid, normalunits, setvaluemode, setvalueop
 *   @param {boolean} reCompute: should the current visualization be recomputed after updating the cohorts? (for large db queries it is faster to just handle the update within the visualization itself)
 */
 function setCohorts(constrains, andConcat, negate, reCompute, subset) {
+    if (typeof appendItemFromConceptInto !== "function") { 
+        alert('This functionality is not available in the tranSMART version you use.');
+        return;
+    }
     if (! confirm("Attention! This action will have the following impact:\n1. Your cohort selection in the 'Comparison' tab will be modified.\n2. Your current analysis will be recomputed based on this selection.\n")) {
         return;
     }
