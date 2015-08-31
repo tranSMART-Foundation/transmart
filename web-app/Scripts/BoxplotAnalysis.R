@@ -35,7 +35,7 @@ calc_boxplot <- function(datapoints, subsets) {
 			subset.points <- cbind(subset.points, jitter)
 			names(subset.points) <- c('patientID', 'subset', 'value', 'jitter')
 			assignedPatientIDs <- c(assignedPatientIDs, subset.points$patientID)
-			bxp <- boxplot(subset.points$value)
+			bxp <- boxplot(subset.points$value, plot=FALSE)
 			data[[subset]] <- list()
 			data[[subset]]$lowerWhisker <- bxp$stats[1]
 			data[[subset]]$lowerHinge <- bxp$stats[2]
