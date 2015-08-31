@@ -4,7 +4,11 @@ DO NOT TRY TO ADD SmartR TO YOUR tranSMART INSTALLATION IN ITS CURRENT STATE!<br
 <br/>
 
 How to add SmartR to my tranSMART installation:
-- coming soon
+- Add this to your BuildConfig.groovy:  
+  grails.plugin.location.smartR = '/path/to/smartR' 
+- Add this to transmartApp/web-app/js/datasetExplorer/datasetExplorer.js:<br/>
+  loadPlugin('smartR', "/SmartR/loadScripts", function () { resultsTabPanel.add(smartRPanel); })
+- Run "grails war" to compile a WAR file containing SmartR
 
 Knows Issues:
 - none
