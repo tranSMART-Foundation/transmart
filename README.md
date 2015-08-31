@@ -14,19 +14,24 @@ Keep it mind that making use of this software is at your own risk!*
 
 ---
 
-
 ####How to add SmartR to your own tranSMART installation:
-1. Add this to your BuildConfig.groovy: <br/>
-  `grails.plugin.location.smartR = '/path/to/smartR'`
-2. Add this to transmartApp/web-app/js/datasetExplorer/datasetExplorer.js: <br/>
-  ```
-  loadPlugin('smartR', "/SmartR/loadScripts", function () { 
+1 - Add this to your BuildConfig.groovy:
+```javascript
+grails.plugin.location.smartR = '/path/to/smartR'
+```
+2 - Add this to transmartApp/web-app/js/datasetExplorer/datasetExplorer.js: 
+```javascript
+  loadPlugin('smartR', "/SmartR/loadScripts", function () {
     resultsTabPanel.add(smartRPanel); 
   })
-  ```
-3. Run "grails war" to compile a WAR file containing SmartR
+```
+3 - Run "grails war" to compile a WAR file containing SmartR
+
 
 ####Requirements:
+- tranSMART 1.2.4 & 1.2.5 (Feature "cohort updating" not available)
+- tranSMART 1.3 (full support)
+- tranSMART eTRIKS/research branch (full support)
 - R packages: 
   - [jsonlite](https://cran.r-project.org/web/packages/jsonlite/index.html)
   - [data.table](https://cran.r-project.org/web/packages/data.table/index.html)
