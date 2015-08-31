@@ -8,9 +8,7 @@
 There is no warranty of any kind that it works as intended. 
 Keep it mind that making use of this software is at your own risk!*
 
-**Please report bugs and issues here: [Issues](https://github.com/sherzinger/SmartR/issues)**
-
-**If a problem is not listed then assume that the developers are not aware of it!**
+**Please report bugs and issues here: [Issues](https://cc-usersupport.in2p3.fr/otrs/customer.pl)**
 
 ---
 
@@ -40,7 +38,7 @@ grails.plugin.location.smartR = '/path/to/smartR'
   - [TSclust](https://cran.r-project.org/web/packages/TSclust/index.html)
 
 ####Known Issues: 
-- https://github.com/sherzinger/SmartR/issues
+- none
 
 ####Supported Browsers:
 - Firefox (fully supported)
