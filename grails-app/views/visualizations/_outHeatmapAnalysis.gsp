@@ -146,6 +146,7 @@
     .bar {
         fill: steelblue;
         stroke: black;
+        shape-rendering: crispEdges;
     }
 
     .bar:hover {
@@ -257,8 +258,8 @@
     });
 
     var data = ${raw(results)};
-    var extraFields = data.extraFields;
-    var features = data.features;
+    var extraFields = data.extraFields === undefined ? [] : data.extraFields;
+    var features = data.features === undefined ? [] : data.features;
     var fields = data.fields;
     var significanceValues = data.significanceValues;
     var patientIDs = data.patientIDs;
@@ -622,7 +623,7 @@
             return histogramScale(significance); 
         });
 
-        var featurePosY =  features !== undefined ? - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20 : 0;
+        var featurePosY = - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20;
 
         var extraSquare = extraSquareItems.selectAll('.extraSquare')
         .data(extraFields, function(d) { return 'patientID-' + d.PATIENTID + '-feature-' + d.FEATURE; });
@@ -751,7 +752,6 @@
         .transition()
         .duration(animationDuration)
         .style("fill", function(d) { return colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE))); });
-
         for (var i = 0; i < features.length; i++) {
             var feature = features[i];
             var categoricalColorScale = d3.scale.category10();
