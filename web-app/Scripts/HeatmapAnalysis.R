@@ -139,7 +139,7 @@ for (folder in unique.folders) {
     folderData <- alphabetical.lowDimData[folder == folders, ]
     featureName <- tail(strsplit(folder, '\\\\')[[1]], n=1)
     featureName <- gsub(' |\\(|\\)', '_', featureName)
-    binary = length(unique(conceptData$value)) == 2
+    binary = length(unique(folderData$value)) == 2
     newFields <- data.frame(
         FEATURE=rep(featureName, nrow(folderData)),
         PATIENTID=folderData$patientID,
