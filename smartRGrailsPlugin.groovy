@@ -47,9 +47,8 @@ class smartRGrailsPlugin {
             studiesResourceService = ref('studiesResourceService')
             conceptsResourceService = ref('conceptsResourceService')
             clinicalDataResourceService = ref('clinicalDataResourceService')
-            highDimensionResourceService = ref('highDimensionResourceService')
-            highDimExporterRegistry = ref('highDimExporterRegistry')
             dataSource = ref('dataSource')
+            i2b2HelperService = ref('i2b2HelperService')
         }
     }
 
