@@ -5,10 +5,9 @@ tryCatch(
 		lowDimPath <- args[2]
 		highDimPath_cohort1 <- args[3]
 		highDimPath_cohort2 <- args[4]
-		idMappingPath <- args[5]
-		settingsPath <- args[6]
-		outputPath <- args[7]
-		errorPath <- args[8]
+		settingsPath <- args[5]
+		outputPath <- args[6]
+		errorPath <- args[7]
 
 		if (! suppressMessages(require(jsonlite))) {
 			stop("SmartR requires the R package 'jsonlite'")
@@ -23,8 +22,13 @@ tryCatch(
 				stop("SmartR requires the R package 'data.table'")
 			}
 			suppressWarnings(
-				highDimData_cohort1 <- as.data.frame(fread(highDimPath_cohort1, header=TRUE, sep='\t', showProgress=FALSE), stringsAsFactors=FALSE)
+				highDimData_cohort1 <- as.data.frame(fread(
+							highDimPath_cohort1, 
+							header=TRUE,
+							sep='\t',
+							showProgress=FALSE), stringsAsFactors=FALSE)
 			)
+			highDimData_cohort1 <- transform(highDimData_cohort1, VALUE=as.numeric(VALUE))
 		}
 
 		if (file.exists(highDimPath_cohort2)) {
@@ -32,20 +36,14 @@ tryCatch(
 				stop("SmartR requires the R package 'data.table'")
 			}
 			suppressWarnings(
-				highDimData_cohort2 <- as.data.frame(fread(highDimPath_cohort2, header=TRUE, sep='\t', showProgress=FALSE), stringsAsFactors=FALSE)
+				highDimData_cohort2 <- as.data.frame(fread(
+							highDimPath_cohort2, 
+							header=TRUE,
+							sep='\t',
+							showProgress=FALSE), stringsAsFactors=FALSE)
 			)
+			highDimData_cohort2 <- transform(highDimData_cohort2, VALUE=as.numeric(VALUE))
 		}
-
-		if (file.exists(idMappingPath)) {
-			idMapping <- fromJSON(readChar(idMappingPath, file.info(idMappingPath)$size))
-			if (file.exists(highDimPath_cohort1)) {
-				highDimData_cohort1$'PATIENT ID' <- sapply(highDimData_cohort1$'PATIENT ID', function(id) idMapping[[toString(id)]])
-			}
-			if (file.exists(highDimPath_cohort2)) {
-				highDimData_cohort2$'PATIENT ID' <- sapply(highDimData_cohort2$'PATIENT ID', function(id) idMapping[[toString(id)]])
-			}
-		}
-
 
 		settings <- fromJSON(readChar(settingsPath, file.info(settingsPath)$size))
 

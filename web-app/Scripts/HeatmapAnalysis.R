@@ -10,15 +10,14 @@ maxRows <- ifelse(is.null(settings$maxRows), 100, as.integer(settings$maxRows))
 
 ### COMPUTE RESULTS ###
 
-highDimData <- highDimData_cohort1[c('PATIENT ID', 'VALUE', 'PROBE', 'GENE ID', 'GENE SYMBOL')]
-colnames(highDimData) <- c('PATIENTID', 'VALUE', 'PROBE', 'GENEID', 'GENESYMBOL')
+highDimData <- highDimData_cohort1
 highDimData <- melt(highDimData, id=c('PATIENTID', 'PROBE', 'GENEID', 'GENESYMBOL'))
 highDimData <- data.frame(dcast(highDimData, PROBE + GENEID + GENESYMBOL ~ PATIENTID), stringsAsFactors=FALSE)
 
 highDimData <- na.omit(highDimData)
 
 if (discardNullGenes) {
-    highDimData <- highDimData[highDimData$GENESYMBOL != 'null', ]
+    highDimData <- highDimData[highDimData$GENESYMBOL != '', ]
 }
 
 valueMatrix <- highDimData[, -(1:3)]
@@ -45,6 +44,8 @@ highDimData.zScore <- highDimData.zScore[order(significanceValues, decreasing=TR
 
 highDimData.value <- highDimData.value[1:maxRows, ]
 highDimData.zScore <- highDimData.zScore[1:maxRows, ]
+
+significanceValues <- highDimData.value$SIGNIFICANCE
 
 probes <- highDimData.value$PROBE
 geneIDs <- highDimData.value$GENEID
@@ -158,6 +159,7 @@ probes <- gsub("[[:space:]]", "_", probes)
 output$extraFields <- extraFields
 output$features <- features
 output$fields <- fields
+output$significanceValues <- significanceValues
 output$patientIDs <- patientIDs
 output$probes <- probes
 output$geneIDs <- geneIDs

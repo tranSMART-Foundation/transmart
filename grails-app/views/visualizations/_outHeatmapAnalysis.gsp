@@ -135,7 +135,21 @@
         opacity: 0.4;
     }
 
+    .squareHighlighted {
+        opacity: 0.4;
+    }
+
     .extraSquare:hover {
+        opacity: 0.4;
+    }
+
+    .bar {
+        fill: steelblue;
+        stroke: black;
+        shape-rendering: crispEdges;
+    }
+
+    .bar:hover {
         opacity: 0.4;
     }
 
@@ -244,9 +258,10 @@
     });
 
     var data = ${raw(results)};
-    var extraFields = data.extraFields;
-    var features = data.features;
+    var extraFields = data.extraFields === undefined ? [] : data.extraFields;
+    var features = data.features === undefined ? [] : data.features;
     var fields = data.fields;
+    var significanceValues = data.significanceValues;
     var patientIDs = data.patientIDs;
     var probes = data.probes;
     var geneIDs = data.geneIDs;
@@ -279,19 +294,23 @@
 
     var gridFieldWidth = 40;
     var gridFieldHeight = 40;
-
     var dendrogramHeight = 300;
+    var histogramHeight = 200;
 
     var margin = { top: gridFieldHeight * 2 + features.length * gridFieldHeight / 2 + dendrogramHeight, 
             right: gridFieldWidth + 300 + dendrogramHeight, 
             bottom: 10, 
-            left: 10 };
+            left: histogramHeight };
 
     var width = gridFieldWidth * patientIDs.length;
     var height = gridFieldHeight * probes.length;
 
     var selectedPatientIDs = [];
     var animationDuration = 1500;
+
+    var histogramScale = d3.scale.linear()
+    .domain(d3.extent(significanceValues))
+    .range([0, histogramHeight]);
 
     var heatmap = d3.select("#heatmap").append("svg")
     .attr("width", (width + margin.left + margin.right) * 4)
@@ -310,6 +329,7 @@
     var patientIDItems = heatmap.append('g');
     var rowSortItems = heatmap.append('g');
     var labelItems = heatmap.append('g');
+    var barItems = heatmap.append('g');
 
     function updateHeatmap() {
         var square = squareItems.selectAll('.square')
@@ -559,7 +579,51 @@
         .attr('x', width + gridFieldWidth + 7)
         .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
 
-        var featurePosY =  features !== undefined ? - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20 : 0;
+        var bar = barItems.selectAll('.bar')
+        .data(probes, function(d) { return d; });
+
+        bar
+        .enter()
+        .append('rect')
+        .attr('class', 'bar')
+        .attr("width", function(d) { 
+            var significance = d3.select('.square.probe-' + d).property('__data__').SIGNIFICANCE;
+            return histogramScale(significance); 
+        })
+        .attr("height", gridFieldHeight)
+        .attr("x", function(d) { 
+            var significance = d3.select('.square.probe-' + d).property('__data__').SIGNIFICANCE;
+            return - histogramScale(significance) - 10; 
+        })
+        .attr("y", function(d) { return gridFieldHeight * probes.indexOf(d); })
+        .on("mouseover", function(d) {
+            var significance = d3.select('.square.probe-' + d).property('__data__').SIGNIFICANCE;
+            var html = 'FEATURE SIGNIFICANCE: ' + significance;
+            tooltip
+            .style("visibility", "visible")
+            .html(html)
+            .style("left", mouseX() + "px")
+            .style("top", mouseY() + "px");
+            d3.selectAll('.square.probe-' +  d).classed("squareHighlighted", true);
+            d3.select('.probe.probe-' +  d).classed("highlight", true);
+        })
+        .on("mouseout", function(d) {
+            tooltip.style("visibility", "hidden");
+            d3.selectAll(".square").classed("squareHighlighted", false);
+            d3.selectAll(".probe").classed("highlight", false);
+        });
+
+        bar 
+        .transition()
+        .duration(animationDuration)
+        .attr("height", gridFieldHeight)
+        .attr("y", function(d) { return gridFieldHeight * probes.indexOf(d); })
+        .attr("width", function(d) { 
+            var significance = d3.select('.square.probe-' + d).property('__data__').SIGNIFICANCE;
+            return histogramScale(significance); 
+        });
+
+        var featurePosY = - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20;
 
         var extraSquare = extraSquareItems.selectAll('.extraSquare')
         .data(extraFields, function(d) { return 'patientID-' + d.PATIENTID + '-feature-' + d.FEATURE; });
@@ -594,7 +658,6 @@
         .on("mouseout", function(d) {
             d3.selectAll(".patientID").classed("highlight", false);
             d3.selectAll(".feature").classed("highlight", false);
-
             tooltip.style("visibility", "hidden");
         });
 
@@ -689,7 +752,6 @@
         .transition()
         .duration(animationDuration)
         .style("fill", function(d) { return colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE))); });
-
         for (var i = 0; i < features.length; i++) {
             var feature = features[i];
             var categoricalColorScale = d3.scale.category10();
@@ -849,14 +911,17 @@
         var sortedProbes = [];
         var sortedGeneIDs = [];
         var sortedGeneSymbols = [];
+        var sortedSignificanceValues = [];
         for (var i = 0; i < sortValues.length; i++) {
             sortedProbes.push(probes[sortValues[i]]);
             sortedGeneIDs.push(geneIDs[sortValues[i]]);
             sortedGeneSymbols.push(geneSymbols[sortValues[i]]);
+            sortedSignificanceValues.push(significanceValues[sortValues[i]]);
         }
         probes = sortedProbes;
         geneIDs = sortedGeneIDs;
         geneSymbols = sortedGeneSymbols;
+        significanceValues = sortedSignificanceValues;
         removeRowDendrogram();
         updateHeatmap();
     }

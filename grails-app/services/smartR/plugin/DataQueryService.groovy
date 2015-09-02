@@ -4,22 +4,18 @@ import org.transmartproject.rest.marshallers.ObservationWrapper
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.dataquery.clinical.*
 import org.transmartproject.core.dataquery.TabularResult
-import org.transmartproject.core.dataquery.DataRow
-import org.transmartproject.core.dataquery.highdim.AssayColumn
-import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
-import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
-import org.transmartproject.core.dataquery.highdim.projections.Projection
 import groovy.sql.Sql
 import groovy.json.JsonBuilder
+import au.com.bytecode.opencsv.CSVWriter
+
 
 class DataQueryService {
 
     def studiesResourceService
     def conceptsResourceService
     def clinicalDataResourceService
-    def highDimensionResourceService
-    def highDimExporterRegistry
     def dataSource
+    def i2b2HelperService
 
     /**
     *   This method can be considered the main method of this class
@@ -60,87 +56,57 @@ class DataQueryService {
         return data
     }
 
-    def exportHighDimData(conceptKeys, resultInstanceId, studyDir, format, dataType, mappingFile) {
-        def fileNames = []
-        conceptKeys.eachWithIndex { conceptKey, idx ->
-            def mapping = getSubjectIDPatientIDMapping(conceptKey)
-            mappingFile.write(new JsonBuilder(mapping).toPrettyString())
-            def file = exportForSingleNode(
-                    conceptKey,
-                    resultInstanceId,
-                    studyDir,
-                    format,
-                    dataType,
-                    idx)
-
-            if (file) {
-                fileNames << file.absolutePath
-            }
-        }
-
-        return fileNames
-    }
-
-    def getSubjectIDPatientIDMapping(conceptKey) {
-        def concept = conceptsResourceService.getByKey(conceptKey)
-        def trialName = concept.studyId
-        def results = new Sql(dataSource).rows("""
-            SELECT 
-                subject_id, patient_id 
-            FROM  
-                deapp.de_subject_sample_mapping 
-            WHERE
-                trial_name = ?
-        """, trialName)
-
-        def map = results.collectEntries { [it[0], it[1]] }
-        return map
-    }
-
-    private File exportForSingleNode(String conceptKey, Long resultInstanceId, File studyDir, String format, String dataType, Integer index) {
-
-        HighDimensionDataTypeResource dataTypeResource = highDimensionResourceService.getSubResourceForType(dataType)
-
-        def assayConstraints = []
-
-        assayConstraints << dataTypeResource.createAssayConstraint(
-                AssayConstraint.PATIENT_SET_CONSTRAINT,
-                result_instance_id: resultInstanceId)
-
-        assayConstraints << dataTypeResource.createAssayConstraint(
-                AssayConstraint.ONTOLOGY_TERM_CONSTRAINT,
-                concept_key: conceptKey)
-
-        // Setup class to export the data
-        def exporter = highDimExporterRegistry.getExporterForFormat(format)
-        Projection projection = dataTypeResource.createProjection(exporter.projection)
-
-        // Retrieve the data itself
-        TabularResult<AssayColumn, DataRow<Map<String, String>>> tabularResult =
-                dataTypeResource.retrieveData(assayConstraints, [], projection)
-
-        File outputFile = new File(studyDir,
-                "${dataType}_${makeFileNameFromConceptPath(conceptKey)}_${index}.${format.toLowerCase()}")
-
-        try {
-            outputFile.withOutputStream { outputStream ->
-                exporter.export tabularResult, projection, outputStream, { false }
-            }
-        } catch (RuntimeException e) {
-            log.error('Data export to the file has thrown an exception', e)
-        } finally {
-            tabularResult.close()
-        }
-
-        outputFile
-    }
-
-    private String makeFileNameFromConceptPath(String conceptPath) {
-        conceptPath
-                .split('\\\\')
-                .reverse()[0..1]
-                .join('_')
-                .replaceAll('[\\W_]+', '_')
+    def exportHighDimData(conceptKeys, patientIDs, resultInstanceId, outputFilePath) {
+        List<String> HEADER = ['PATIENTID', 'VALUE', 'PROBE', 'GENEID', 'GENESYMBOL']
+        char COLUMN_SEPERATOR = '\t'
+        def query = 
+        """
+        SELECT
+            ssm.patient_id,
+            ma.probe_id,
+            ma.gene_symbol,
+            ma.gene_id,
+            smd.raw_intensity
+        FROM
+            deapp.de_subject_microarray_data smd
+            INNER JOIN
+                deapp.de_subject_sample_mapping ssm
+            ON
+                smd.assay_id = ssm.assay_id
+            AND
+                ssm.patient_id in (${patientIDs.collect { '?' }.join(',')})
+            INNER JOIN
+                deapp.de_mrna_annotation ma
+            ON 
+                smd.probeset_id = ma.probeset_id
+            INNER JOIN
+                deapp.de_gpl_info gi
+            ON
+                ssm.gpl_id = gi.platform
+        WHERE
+            ssm.concept_code = ?
+        AND
+            gi.marker_type = 'Gene Expression'
+        """
+        assert conceptKeys.size() == 1 // for now we support only one HDD node per concept 
+        def conceptCode = i2b2HelperService.getConceptCodeFromKey(conceptKeys[0])
+        def params = patientIDs
+        params << conceptCode
+        def outputFile = new File(outputFilePath)
+        outputFile.withWriter { Writer writer ->
+            CSVWriter csvWriter = new CSVWriter(writer, COLUMN_SEPERATOR)
+            csvWriter.writeNext(HEADER as String[])
+            new Sql(dataSource).eachRow(query, params, { row ->
+                def line = [
+                    row.patient_id,
+                    row.raw_intensity,
+                    row.probe_id,
+                    row.gene_id,
+                    row.gene_symbol
+                ]
+                csvWriter.writeNext(line as String[])
+            })
+        } 
     }
 
     private ClinicalVariable createClinicalVariable(OntologyTerm term) {
