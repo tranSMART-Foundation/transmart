@@ -580,32 +580,25 @@
         .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
 
         var bar = barItems.selectAll('.bar')
-        .data(probes, function(d) { return d; });
+        .data(significanceValues.map(function(d, i) { return {significance: d, idx: i}; }), function(d) { return d.idx; });
 
         bar
         .enter()
         .append('rect')
         .attr('class', 'bar')
-        .attr("width", function(d) { 
-            var significance = d3.select('.square.probe-' + d).property('__data__').SIGNIFICANCE;
-            return histogramScale(significance); 
-        })
+        .attr("width", function(d) { return histogramScale(d.significance); })
         .attr("height", gridFieldHeight)
-        .attr("x", function(d) { 
-            var significance = d3.select('.square.probe-' + d).property('__data__').SIGNIFICANCE;
-            return - histogramScale(significance) - 10; 
-        })
-        .attr("y", function(d) { return gridFieldHeight * probes.indexOf(d); })
+        .attr("x", function(d) { return - histogramScale(d.significance) - 10; })
+        .attr("y", function(d) { return gridFieldHeight * d.idx; })
         .on("mouseover", function(d) {
-            var significance = d3.select('.square.probe-' + d).property('__data__').SIGNIFICANCE;
-            var html = 'FEATURE SIGNIFICANCE: ' + significance;
+            var html = 'FEATURE SIGNIFICANCE: ' + d.significance;
             tooltip
             .style("visibility", "visible")
             .html(html)
             .style("left", mouseX() + "px")
             .style("top", mouseY() + "px");
-            d3.selectAll('.square.probe-' +  d).classed("squareHighlighted", true);
-            d3.select('.probe.probe-' +  d).classed("highlight", true);
+            d3.selectAll('.square.probe-' +  probes[d.idx]).classed("squareHighlighted", true);
+            d3.select('.probe.probe-' +  probes[d.idx]).classed("highlight", true);
         })
         .on("mouseout", function(d) {
             tooltip.style("visibility", "hidden");
@@ -617,11 +610,9 @@
         .transition()
         .duration(animationDuration)
         .attr("height", gridFieldHeight)
-        .attr("y", function(d) { return gridFieldHeight * probes.indexOf(d); })
-        .attr("width", function(d) { 
-            var significance = d3.select('.square.probe-' + d).property('__data__').SIGNIFICANCE;
-            return histogramScale(significance); 
-        });
+        .attr("width", function(d) { return histogramScale(d.significance); })
+        .attr("x", function(d) { return - histogramScale(d.significance) - 10; })
+        .attr("y", function(d) { return gridFieldHeight * d.idx; });
 
         var featurePosY = - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20;
 
