@@ -50,16 +50,11 @@ class SmartRService {
         def cohorts = [cohort1, cohort2]
 
         jobDataMap['conceptBoxes'].each { conceptBox ->
-            def name = conceptBox.name
-            def cohort = conceptBox.cohort
-            def type = conceptBox.type
-            def concepts = conceptBox.concepts
-
             def rIID
             def highDimFile
             def patientIDs
 
-            if (cohort == 1) {
+            if (conceptBox.cohort == 1) {
                 rIID = rIID1
                 patientIDs = cohorts[0]
                 highDimFile = jobDataMap['highDimFile_cohort1']
@@ -69,18 +64,17 @@ class SmartRService {
                 highDimFile = jobDataMap['highDimFile_cohort2']
             }
 
-            if (type == 'valueicon' || type == 'alphaicon') {
-                data[name] = dataQueryService.getAllData(concepts, patientIDs)
-            } else if (type == 'hleaficon') {
+            if (conceptBox.concepts.size() == 0) {
+                data[conceptBox.name] = [:]
+            } else if (conceptBox.type == 'valueicon' || conceptBox.type == 'alphaicon') {
+                data[conceptBox.name] = dataQueryService.getAllData(conceptBox.concepts, patientIDs)
+            } else if (conceptBox.type == 'hleaficon') {
                 dataQueryService.exportHighDimData(
-                        concepts,
+                        conceptBox.concepts,
                         patientIDs,
                         rIID as Long,
                         highDimFile)
-            } else if (type == 'null') {
-                data[name] = [:]
-            }
-            else {
+            } else {
                 throw new IllegalArgumentException()
             }
         }
