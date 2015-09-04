@@ -31,6 +31,7 @@
 <select id="significanceMeassure" class='txt'>
 	<option value="zScoreRange">ZScore Range (Default)</option>
 	<option value="variance">Variance</option>
+	<option value="markerSelection">Marker Selection</option>
 </select><br/>
 <br/>
 <input type="checkbox" id="discardNullGenes" checked> Discard features/genes with no identifier/name<br/>

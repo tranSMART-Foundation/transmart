@@ -1,5 +1,5 @@
 if (! suppressMessages(require(reshape2))) {
-    stop("SmartR requires the R package 'jsonlite'")
+    stop("SmartR requires the R package 'reshape2'")
 }
 
 ### PREPARE SETTINGS ###
@@ -11,16 +11,16 @@ maxRows <- ifelse(is.null(settings$maxRows), 100, as.integer(settings$maxRows))
 ### COMPUTE RESULTS ###
 
 getHDDMatrix <- function(raw.data) {
-    HDD.matrix <- melt(raw.data, id=c('PATIENTID', 'PROBE', 'GENEID', 'GENESYMBOL'))
+    HDD.matrix <- melt(raw.data, id=c('PATIENTID', 'PROBE', 'GENEID', 'GENESYMBOL'), na.rm=TRUE)
     HDD.matrix <- data.frame(dcast(HDD.matrix, PROBE + GENEID + GENESYMBOL ~ PATIENTID), stringsAsFactors=FALSE)
-    HDD.matrix <- na.omit(HDD.matrix)
     if (discardNullGenes) {
         HDD.matrix <- HDD.matrix[HDD.matrix$GENESYMBOL != '', ]
     }
+    HDD.matrix <- HDD.matrix[order(HDD.matrix$PROBE), ]
     HDD.matrix
 }
 
-getValueMatrix <- function(HDD.matrix) {
+extractMatrixValues <- function(HDD.matrix) {
     valueMatrix <- HDD.matrix[, -(1:3)]
     valueMatrix
 }
@@ -38,10 +38,37 @@ getSignificanceValues <- function(valueMatrix, zScoreMatrix) {
                 bxp <- boxplot.stats(zScores)
                 zScores.withoutOutliers <- zScores[zScores >= bxp$stats[2] & zScores <= bxp$stats[4]]
                 max(zScores.withoutOutliers) - min(zScores.withoutOutliers)
-            })
-    } else {
+        })
+    } else if (significanceMeassure == 'markerSelection') {
+        if (! suppressMessages(require(limma))) {
+            stop("SmartR requires the R package 'limma'")
+        }
+
+        #FIXME
+        classVectorS1 <- c(rep(1, ncol(valueMatrix)), rep(2, ncol(valueMatrix.cohort2)))
+        classVectorS2 <- rev(classVectorS1)
+
+
+        design <- cbind(S1=classVectorS1, S2=classVectorS2)
+        contrast.matrix = makeContrasts(S1-S2, levels=design)
+        fit <- lmFit(valueMatrix, design)
+        fit <- contrasts.fit(fit, contrast.matrix)
+        fit <- eBayes(fit)
+        contr = 1
+        top.fit = data.frame(
+                ID=rownames(fit$coefficients),
+                logFC=fit$coefficients[, contr],
+                t=fit$t[, contr],
+                P.Value=fit$p.value[, contr],
+                adj.P.val=p.adjust(p=fit$p.value[, contr], method='BH'),
+                B=fit$lods[, contr]
+        )
+        significanceValues <- top.fit$B
+    }
+    else {
         stop('Unknown significance measure!')
     }
+    significanceValues
 }
 
 sortAndCutHDDMatrix <- function(HDD.matrix, significanceValues) {
@@ -102,21 +129,36 @@ dendrogramToJSON <- function(d) {
 }
 
 HDD.value.matrix.cohort1 <- getHDDMatrix(highDimData_cohort1)
-valueMatrix.cohort1 <- getValueMatrix(HDD.value.matrix.cohort1)
-zScoreMatrix.cohort1 <- getZScoreMatrix(valueMatrix.cohort1)
-HDD.zScore.matrix.cohort1 <- cbind(HDD.value.matrix.cohort1[, 1:3], zScoreMatrix.cohort1)
-significanceValues <- getSignificanceValues(valueMatrix.cohort1, zScoreMatrix.cohort1)
+valueMatrix <- extractMatrixValues(HDD.value.matrix.cohort1)
+HDD.value.matrix <- HDD.value.matrix.cohort1
 
-FINAL.HDD.value.matrix.cohort1 <- sortAndCutHDDMatrix(HDD.value.matrix.cohort1, significanceValues)
-FINAL.HDD.zScore.matrix.cohort1 <- sortAndCutHDDMatrix(HDD.zScore.matrix.cohort1, significanceValues)
+if (exists('highDimData_cohort2')) {
+    HDD.value.matrix.cohort2 <- getHDDMatrix(highDimData_cohort2)
 
-significanceValues.sorted <- FINAL.HDD.value.matrix.cohort1$SIGNIFICANCE
-zScoreMatrix.sorted <- FINAL.HDD.zScore.matrix.cohort1[, -(1:3)]
+    HDD.value.matrix.cohort1 <- HDD.value.matrix.cohort1[HDD.value.matrix.cohort1$PROBE %in% HDD.value.matrix.cohort2$PROBE, ]
+    HDD.value.matrix.cohort2 <- HDD.value.matrix.cohort2[HDD.value.matrix.cohort2$PROBE %in% HDD.value.matrix.cohort1$PROBE, ]
 
-fields <- buildFields(FINAL.HDD.value.matrix.cohort1, FINAL.HDD.zScore.matrix.cohort1)
-probes <- fixString(FINAL.HDD.value.matrix.cohort1$PROBE)
-geneIDs <- FINAL.HDD.value.matrix.cohort1$GENEID
-geneSymbols <- FINAL.HDD.value.matrix.cohort1$GENESYMBOL
+    valueMatrix.cohort1 <- extractMatrixValues(HDD.value.matrix.cohort1)
+    valueMatrix.cohort2 <- extractMatrixValues(HDD.value.matrix.cohort2)
+
+    valueMatrix <- cbind(valueMatrix.cohort1, valueMatrix.cohort2)
+    HDD.value.matrix <- cbind(HDD.value.matrix[, 1:3], valueMatrix)
+}
+
+zScoreMatrix <- getZScoreMatrix(valueMatrix)
+HDD.zScore.matrix <- cbind(HDD.value.matrix[, 1:3], zScoreMatrix)
+
+significanceValues <- getSignificanceValues(valueMatrix, zScoreMatrix)
+FINAL.HDD.value.matrix <- sortAndCutHDDMatrix(HDD.value.matrix, significanceValues)
+FINAL.HDD.zScore.matrix <- sortAndCutHDDMatrix(HDD.zScore.matrix, significanceValues)
+
+significanceValues.sorted <- FINAL.HDD.value.matrix$SIGNIFICANCE
+zScoreMatrix.sorted <- FINAL.HDD.zScore.matrix[, -(1:3)]
+
+fields <- buildFields(FINAL.HDD.value.matrix, FINAL.HDD.zScore.matrix)
+probes <- fixString(FINAL.HDD.value.matrix$PROBE)
+geneIDs <- FINAL.HDD.value.matrix$GENEID
+geneSymbols <- FINAL.HDD.value.matrix$GENESYMBOL
 patientIDs <- unique(fields$PATIENTID)
 
 colDendrogramEuclideanComplete <- computeDendrogram(t(zScoreMatrix.sorted), 'euclidean', 'complete')
