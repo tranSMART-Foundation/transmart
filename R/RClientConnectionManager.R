@@ -29,16 +29,29 @@ function (transmartDomain, use.authentication = TRUE, ...) {
 
     transmartClientEnv$transmartDomain <- transmartDomain
     transmartClientEnv$db_access_url <- transmartClientEnv$transmartDomain
-
+  
+    authenticated <- TRUE
+    
     if (use.authentication && !exists("access_token", envir = transmartClientEnv)) {
-        authenticateWithTransmart(...)
+        authenticated <- authenticateWithTransmart(...)
     } else { if (!use.authentication && exists("access_token", envir = transmartClientEnv)) {
             remove("access_token", envir = transmartClientEnv)
         }
     }
 
     if(!.checkTransmartConnection()) {
-        stop("Connection unsuccessful. Type: ?connectToTransmart for help.")
+        if (use.authentication && authenticated && !exists("access_token", envir = transmartClientEnv)) {
+            # The access token has been removed: this must mean the applying the refresh token
+            # (in .checkTransmartConnection) has failed.
+            #
+            # Trying to reauthenticate...
+            #
+            # (Note: might cause an infinite loop if authentication succeeds, but checking the connection
+            # fails and triggers refreshing the authentication, which fails and removes the access token.)
+            connectToTransmart(transmartDomain, use.authentication, ...)
+        } else {
+            stop("Connection unsuccessful. Type: ?connectToTransmart for help.")
+        }
     } else {
         message("Connection successful.")
     }
@@ -92,8 +105,43 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         list2env(fromJSON(oauthResponse), envir = transmartClientEnv)
         transmartClientEnv$access_token.timestamp <- Sys.time()
         cat("Authentication completed.\n")
+        return(TRUE)
     } else {
         cat("Authentication failed.\n")
+        return(FALSE)
+    }
+}
+
+refreshToken <- function(oauthDomain = transmartClientEnv$transmartDomain) {
+    transmartClientEnv$oauthDomain <- oauthDomain
+    transmartClientEnv$client_id <- "api-client"
+    transmartClientEnv$client_secret <- "api-client"
+    message("Trying to reauthenticate using the refresh token: ", transmartClientEnv$refresh_token, "...")
+    refreshUrl <- paste(sep = "",
+                        transmartClientEnv$oauthDomain,
+                        "/oauth/token?grant_type=refresh_token",
+                        "&client_id=", transmartClientEnv$client_id,
+                        "&client_secret=", transmartClientEnv$client_secret,
+                        "&refresh_token=", transmartClientEnv$refresh_token,
+                        "&redirect_uri=", transmartClientEnv$oauthDomain,
+                        "/oauth/verify",
+                        "")
+    
+    oauthResponse <- NULL
+    tryCatch(oauthResponse <- getURL(refreshUrl, verbose = getOption("verbose")),
+             error = function(e) {
+               if (getOption("verbose")) { message(e, "\n", oauthResponse) }
+               stop("Error with connection to verification server.")
+             })
+    if (getOption("verbose")) { message("Server response:\n\n", oauthResponse, "\n") }
+    if (grepl("access_token", oauthResponse)) {
+        list2env(fromJSON(oauthResponse), envir = transmartClientEnv)
+        transmartClientEnv$access_token.timestamp <- Sys.time()
+        cat("Authentication completed.\n")
+        return(TRUE)
+    } else {
+        cat("Authentication failed.\n")
+        return(FALSE)
     }
 }
 
@@ -110,15 +158,26 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     if (getOption("verbose")) { message(paste(ping, collapse = ": ")) }
 
     if (!is.null(ping)) {
-        if (reauthentice.if.invalid.token && grepl("^invalid_token", ping["error"])) {
-            message("Authentication token not accepted.")
-            authenticateWithTransmart(oauthDomain = transmartClientEnv$oauthDomain)
-            return(.checkTransmartConnection(reauthentice.if.invalid.token = FALSE))
+        if ("error" %in% names(ping)) {
+            message("Error ", ping["error"],  ": ", ping["error_description"])
+            if (ping["error"] == "invalid_token") {
+                # try to refresh authentication
+                if (refreshToken()) {
+                    message("Access token refreshed.")
+                    return(.checkTransmartConnection(reauthentice.if.invalid.token))
+                } else {
+                    message("Removing access token from the environment.")
+                    remove("access_token", envir = transmartClientEnv)
+                    return(FALSE)
+                }
+            }
+            return(FALSE)
         }
-        message("Cannot connect to tranSMART database.")
-        return(FALSE)
+        # perhaps check or update information about tokens and principal.
+        return(TRUE)
     }
-    return(TRUE)
+    # if check fails, use refresh token to update (or ask for it).
+    return(FALSE)
 }
 
 .transmartServerGetRequest <- function(apiCall, ...)  {
