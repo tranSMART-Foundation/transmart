@@ -34,6 +34,7 @@ grails.plugin.location.smartR = '/path/to/smartR'
   - [jsonlite](https://cran.r-project.org/web/packages/jsonlite/index.html)
   - [data.table](https://cran.r-project.org/web/packages/data.table/index.html)
   - [reshape2](https://cran.r-project.org/web/packages/reshape2/index.html)
+  - [limma](http://bioconductor.org/packages/release/bioc/html/limma.html)
   - [zoo](https://cran.r-project.org/web/packages/zoo/index.html)
   - [TSclust](https://cran.r-project.org/web/packages/TSclust/index.html)
 
