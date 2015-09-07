@@ -186,20 +186,25 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
     # add each list-element as a new row to a matrix, in two passes
     # first pass: go through each list element, unlist it and remember future column names
     columnNames <- c()
-    for (i in 1:(length(list))) {
-        list[[i]] <- unlist(list[[i]])
-        columnNames <- union(columnNames, names(list[[i]]))
+    if (length(list) > 0) {
+        for (i in 1:(length(list))) {
+            cat('i: ', i, '\n')
+            list[[i]] <- unlist(list[[i]])
+            columnNames <- union(columnNames, names(list[[i]]))
+        }
     }
     
     # second pass: go through each list element and add its elements to correct column
     df <- matrix(nrow = length(list), ncol = length(columnNames))
-    for (i in 1:(length(list))) {
-        df[i, match(names(list[[i]]), columnNames)] <- list[[i]]
+    if (length(list) > 0) {
+        for (i in 1:(length(list))) {
+            df[i, match(names(list[[i]]), columnNames)] <- list[[i]]
+        }
     }
     colnames(df) <- columnNames
 
     # check whether list contains valid row names, and if true; use them
-    if (is.null(names(list)) || is.na(names(list)) || length(names(list)) != length(list)) { 
+    if (length(list) < 1 || is.null(names(list)) || is.na(names(list)) || length(names(list)) != length(list)) { 
         rownames(df) <- NULL
     } else { rownames(df) <- names(list) }
     # convert matrix to data.frame
