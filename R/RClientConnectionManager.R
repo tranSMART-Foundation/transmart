@@ -106,7 +106,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         return(TRUE)
     }
 
-    ping <- .transmartServerGetRequest("/oauth/verify", accept.type = "default")
+    ping <- .transmartServerGetRequest("/oauth/inspectToken", accept.type = "default")
     if (getOption("verbose")) { message(paste(ping, collapse = ": ")) }
 
     if (!is.null(ping)) {
