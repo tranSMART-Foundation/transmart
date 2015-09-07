@@ -773,7 +773,7 @@
     }
 
     var colDendrogramVisible = false;
-    function createColDendrogram() {
+    function createColDendrogram(colDendrogram) {
         var w = 200;
         var spacing = gridFieldWidth * 2 + getMaxWidth(d3.selectAll('.patientID')) + features.length * gridFieldHeight / 2 + 40;
 
@@ -830,7 +830,7 @@
     }
 
     var rowDendrogramVisible = false;
-    function createRowDendrogram() {
+    function createRowDendrogram(rowDendrogram) {
         var h = 280;
         var spacing = gridFieldWidth + getMaxWidth(d3.selectAll('.probe')) + 20;
 
@@ -948,15 +948,9 @@
         colDendrogram = JSON.parse(clusterData[2]);
         rowDendrogram = JSON.parse(clusterData[3]);
         updateRowOrder(transformClusterOrderWRTInitialOrder(clusterData[1], getInitialRowOrder()));
-        setTimeout(function() {
-            updateColOrder(transformClusterOrderWRTInitialOrder(clusterData[0], getInitialColOrder()));
-        }, animationDuration);
-        setTimeout(function() {
-            createColDendrogram();
-        }, animationDuration * 2);
-        setTimeout(function() {
-            createRowDendrogram(JSON.parse(clusterData[3]));
-        }, animationDuration * 2 + 200);
+        updateColOrder(transformClusterOrderWRTInitialOrder(clusterData[0], getInitialColOrder()));
+        createColDendrogram(colDendrogram);
+        createRowDendrogram(rowDendrogram);
     }
 
     function updateCohorts() {

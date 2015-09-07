@@ -16,6 +16,7 @@ getHDDMatrix <- function(raw.data) {
     if (discardNullGenes) {
         HDD.matrix <- HDD.matrix[HDD.matrix$GENESYMBOL != '', ]
     }
+    HDD.matrix <- na.omit(HDD.matrix)
     HDD.matrix <- HDD.matrix[order(HDD.matrix$PROBE), ]
     HDD.matrix
 }
@@ -30,7 +31,7 @@ getZScoreMatrix <- function(valueMatrix) {
     zScoreMatrix
 }
 
-getSignificanceValues <- function(valueMatrix, zScoreMatrix) {
+getSignificanceValues <- function(valueMatrix, zScoreMatrix, colNum) {
     if (significanceMeassure == 'variance') {
         significanceValues <- apply(valueMatrix, 1, var)
     } else if (significanceMeassure == 'zScoreRange') {
@@ -39,16 +40,12 @@ getSignificanceValues <- function(valueMatrix, zScoreMatrix) {
                 zScores.withoutOutliers <- zScores[zScores >= bxp$stats[2] & zScores <= bxp$stats[4]]
                 max(zScores.withoutOutliers) - min(zScores.withoutOutliers)
         })
-    } else if (significanceMeassure == 'markerSelection') {
+    } else {
         if (! suppressMessages(require(limma))) {
             stop("SmartR requires the R package 'limma'")
         }
-
-        #FIXME
-        classVectorS1 <- c(rep(1, ncol(valueMatrix)), rep(2, ncol(valueMatrix.cohort2)))
+        classVectorS1 <- c(rep(1, colNum), rep(2, ncol(valueMatrix) - colNum))
         classVectorS2 <- rev(classVectorS1)
-
-
         design <- cbind(S1=classVectorS1, S2=classVectorS2)
         contrast.matrix = makeContrasts(S1-S2, levels=design)
         fit <- lmFit(valueMatrix, design)
@@ -63,10 +60,7 @@ getSignificanceValues <- function(valueMatrix, zScoreMatrix) {
                 adj.P.val=p.adjust(p=fit$p.value[, contr], method='BH'),
                 B=fit$lods[, contr]
         )
-        significanceValues <- top.fit$B
-    }
-    else {
-        stop('Unknown significance measure!')
+        significanceValues <- top.fit[[significanceMeassure]]
     }
     significanceValues
 }
@@ -129,9 +123,7 @@ dendrogramToJSON <- function(d) {
 }
 
 HDD.value.matrix.cohort1 <- getHDDMatrix(highDimData_cohort1)
-valueMatrix <- extractMatrixValues(HDD.value.matrix.cohort1)
-HDD.value.matrix <- HDD.value.matrix.cohort1
-
+colNum <- ncol(HDD.value.matrix.cohort1) - 3
 if (exists('highDimData_cohort2')) {
     HDD.value.matrix.cohort2 <- getHDDMatrix(highDimData_cohort2)
 
@@ -142,18 +134,21 @@ if (exists('highDimData_cohort2')) {
     valueMatrix.cohort2 <- extractMatrixValues(HDD.value.matrix.cohort2)
 
     valueMatrix <- cbind(valueMatrix.cohort1, valueMatrix.cohort2)
-    HDD.value.matrix <- cbind(HDD.value.matrix[, 1:3], valueMatrix)
+    HDD.value.matrix <- cbind(HDD.value.matrix.cohort1[, 1:3], valueMatrix)
+} else {
+    valueMatrix <- extractMatrixValues(HDD.value.matrix.cohort1)
+    HDD.value.matrix <- HDD.value.matrix.cohort1
 }
 
 zScoreMatrix <- getZScoreMatrix(valueMatrix)
 HDD.zScore.matrix <- cbind(HDD.value.matrix[, 1:3], zScoreMatrix)
 
-significanceValues <- getSignificanceValues(valueMatrix, zScoreMatrix)
+significanceValues <- getSignificanceValues(valueMatrix, zScoreMatrix, colNum)
 FINAL.HDD.value.matrix <- sortAndCutHDDMatrix(HDD.value.matrix, significanceValues)
 FINAL.HDD.zScore.matrix <- sortAndCutHDDMatrix(HDD.zScore.matrix, significanceValues)
 
 significanceValues.sorted <- FINAL.HDD.value.matrix$SIGNIFICANCE
-zScoreMatrix.sorted <- FINAL.HDD.zScore.matrix[, -(1:3)]
+zScoreMatrix.sorted <- FINAL.HDD.zScore.matrix[, -c(1:3, ncol(FINAL.HDD.zScore.matrix))]
 
 fields <- buildFields(FINAL.HDD.value.matrix, FINAL.HDD.zScore.matrix)
 probes <- fixString(FINAL.HDD.value.matrix$PROBE)
@@ -201,6 +196,13 @@ buildLowDimFields <- function(featureName, local.patientIDs, global.patientIDs, 
 
 extraFields <- c()
 features <- c()
+
+if (exists('highDimData_cohort2')) {
+    featureName <- 'Cohort'
+    values <- c(rep(1, colNum), rep(2, ncol(valueMatrix) - colNum))
+    extraFields <- buildLowDimFields(featureName, patientIDs, patientIDs, 'binary', values, FALSE)
+    features <- featureName
+}
 
 numerical.lowDimData <- lowDimData$additionalFeatures_numerical
 concepts <- unique(numerical.lowDimData$concept)
