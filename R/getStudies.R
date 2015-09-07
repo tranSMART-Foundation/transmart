@@ -24,8 +24,8 @@
 getStudies <- function(name.match = "", as.data.frame = TRUE, cull.columns = TRUE) {
     .checkTransmartConnection()
 
-    serverResult <- .transmartServerGetRequest("/studies", accept.type = "hal")
-    listOfStudies <- serverResult$studies
+    serverResult <- .transmartServerGetRequest("/studies", accept.type = "default")
+    listOfStudies <- serverResult #$studies
     
     studyNames <- sapply(listOfStudies, FUN = function(x) { x[["id"]] })
     names(listOfStudies) <- studyNames
