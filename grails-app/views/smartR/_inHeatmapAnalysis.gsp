@@ -14,7 +14,6 @@
 <select id="significanceMeassure_singleCohort" class='txt'>
 	<option value="zScoreRange">ZScore Range (Default)</option>
 	<option value="variance">Variance</option>
-	<option value="markerSelection">Marker Selection</option>
 </select>
 <select id="significanceMeassure_pairCohort" class='txt'>
 	<option value="B">B-Value/log odds ratio (Default)</option>
