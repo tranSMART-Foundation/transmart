@@ -16,7 +16,7 @@ class LoginPage extends Page {
         topMessage { $('h3')?.text()?.trim() }
         loginButtonNoTo { $('input#loginButton') }
         loginButton(to: [Constants.LANDING_PAGE.class, LoginFailedPage]) { $('input#loginButton') }
-        loginButtonLanding(to: Constants.LANDING_PAGE.class) { $('input#loginButton') }
+        loginButtonLanding(to: [Constants.LANDING_PAGE.class, ChangeMyPasswordPage]) { $('input#loginButton') }
         loginButtonFailed(to: LoginFailedPage) { $('input#loginButton') }
         usernameField { $('input#j_username') }
         passwordField { $('input#j_password') }

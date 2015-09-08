@@ -44,4 +44,16 @@ abstract class CheckLoginPageAbstract extends GebReportingTest {
         }
     }
 
+    void loginAs(String username, String password) {
+        to LoginPage
+        usernameField.value username
+        passwordField.value password
+        loginButtonNoTo.click()
+    }
+
+    void logout() {
+        commonHeader.tableMenuUtilities.click()
+        commonHeader.utilitiesDoLogout()
+    }
+
 }
