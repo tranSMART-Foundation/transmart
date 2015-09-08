@@ -1,4 +1,4 @@
-package pages
+package pages.admin
 
 import geb.Page
 import geb.waiting.WaitTimeoutException
@@ -15,7 +15,7 @@ class AdminPage extends Page {
 
     public static final String HEADER_TAB_NAME = 'Admin'
 
-    static url = 'transmart/accessLog/index'
+    static url = '/transmart/accessLog/index'
 
     static at = {
         currentHeaderTab()?.text() == HEADER_TAB_NAME
@@ -26,6 +26,5 @@ class AdminPage extends Page {
 
         commonHeader { module CommonHeaderModule }
     }
-    
 }
 

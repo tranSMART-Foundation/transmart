@@ -1,6 +1,3 @@
-import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.*
-
 import geb.junit4.GebReportingTest
 
 import org.junit.Test
@@ -9,15 +6,12 @@ import pages.modules.CommonHeaderModule
 
 import functions.Utilities
 import functions.Constants
-
-import pages.LoginPage
-import pages.BrowsePage
 import pages.AnalyzePage
 import pages.SampleExplorerPage
 import pages.GenesigPage
 import pages.GwasPage
 import pages.UploadDataPage
-import pages.AdminPage
+import pages.admin.AdminPage
 
 class LandingPageTests extends GebReportingTest {
 
