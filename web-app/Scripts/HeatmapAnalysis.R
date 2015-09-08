@@ -1,5 +1,5 @@
 if (! suppressMessages(require(reshape2))) {
-    stop("SmartR requires the R package 'jsonlite'")
+    stop("SmartR requires the R package 'reshape2'")
 }
 
 ### PREPARE SETTINGS ###
@@ -10,75 +10,96 @@ maxRows <- ifelse(is.null(settings$maxRows), 100, as.integer(settings$maxRows))
 
 ### COMPUTE RESULTS ###
 
-highDimData <- highDimData_cohort1
-highDimData <- melt(highDimData, id=c('PATIENTID', 'PROBE', 'GENEID', 'GENESYMBOL'))
-highDimData <- data.frame(dcast(highDimData, PROBE + GENEID + GENESYMBOL ~ PATIENTID), stringsAsFactors=FALSE)
-
-highDimData <- na.omit(highDimData)
-
-if (discardNullGenes) {
-    highDimData <- highDimData[highDimData$GENESYMBOL != '', ]
+getHDDMatrix <- function(raw.data) {
+    HDD.matrix <- melt(raw.data, id=c('PATIENTID', 'PROBE', 'GENEID', 'GENESYMBOL'), na.rm=TRUE)
+    HDD.matrix <- data.frame(dcast(HDD.matrix, PROBE + GENEID + GENESYMBOL ~ PATIENTID), stringsAsFactors=FALSE)
+    if (discardNullGenes) {
+        HDD.matrix <- HDD.matrix[HDD.matrix$GENESYMBOL != '', ]
+    }
+    HDD.matrix <- na.omit(HDD.matrix)
+    HDD.matrix <- HDD.matrix[order(HDD.matrix$PROBE), ]
+    HDD.matrix
 }
 
-valueMatrix <- highDimData[, -(1:3)]
-zScoreMatrix <- t(apply(valueMatrix, 1, scale))
+extractMatrixValues <- function(HDD.matrix) {
+    valueMatrix <- HDD.matrix[, -(1:3)]
+    valueMatrix
+}
 
-if (significanceMeassure == 'variance') {
-    significanceValues <- apply(valueMatrix, 1, var)
-} else if (significanceMeassure == 'zScoreRange') {
-    significanceValues <- apply(zScoreMatrix, 1, function(zScores) { 
-            bxp <- boxplot.stats(zScores)
-            zScores.withoutOutliers <- zScores[zScores >= bxp$stats[2] & zScores <= bxp$stats[4]]
-            max(zScores.withoutOutliers) - min(zScores.withoutOutliers)
+getZScoreMatrix <- function(valueMatrix) {
+    colNames <- colnames(valueMatrix)
+    zScoreMatrix <- t(apply(valueMatrix, 1, scale))
+    colnames(zScoreMatrix) <- colNames
+    zScoreMatrix
+}
+
+getSignificanceValues <- function(valueMatrix, zScoreMatrix, colNum) {
+    if (significanceMeassure == 'variance') {
+        significanceValues <- apply(valueMatrix, 1, var)
+    } else if (significanceMeassure == 'zScoreRange') {
+        significanceValues <- apply(zScoreMatrix, 1, function(zScores) { 
+                bxp <- boxplot.stats(zScores)
+                zScores.withoutOutliers <- zScores[zScores >= bxp$stats[2] & zScores <= bxp$stats[4]]
+                max(zScores.withoutOutliers) - min(zScores.withoutOutliers)
         })
-} else {
-    stop('Unknown significance measure!')
-} 
+    } else {
+        if (! suppressMessages(require(limma))) {
+            stop("SmartR requires the R package 'limma'")
+        }
+        classVectorS1 <- c(rep(1, colNum), rep(2, ncol(valueMatrix) - colNum))
+        classVectorS2 <- rev(classVectorS1)
+        design <- cbind(S1=classVectorS1, S2=classVectorS2)
+        contrast.matrix = makeContrasts(S1-S2, levels=design)
+        fit <- lmFit(valueMatrix, design)
+        fit <- contrasts.fit(fit, contrast.matrix)
+        fit <- eBayes(fit)
+        contr = 1
+        top.fit = data.frame(
+                ID=rownames(fit$coefficients),
+                logFC=fit$coefficients[, contr],
+                t=fit$t[, contr],
+                P.Value=fit$p.value[, contr],
+                adj.P.val=p.adjust(p=fit$p.value[, contr], method='BH'),
+                B=fit$lods[, contr]
+        )
+        significanceValues <- top.fit[[significanceMeassure]]
+    }
+    significanceValues
+}
 
-highDimData$SIGNIFICANCE <- significanceValues
-highDimData.value <- highDimData
-highDimData.zScore <- cbind(highDimData[, 1:3], zScoreMatrix)
+sortAndCutHDDMatrix <- function(HDD.matrix, significanceValues) {
+    HDD.matrix$SIGNIFICANCE <- significanceValues
+    HDD.matrix <- HDD.matrix[order(significanceValues, decreasing=TRUE), ]
+    HDD.matrix <- HDD.matrix[1:maxRows, ]
+    HDD.matrix
+}
 
-highDimData.value <- highDimData.value[order(significanceValues, decreasing=TRUE), ]
-highDimData.zScore <- highDimData.zScore[order(significanceValues, decreasing=TRUE), ]
+fixString <- function(str) {
+    str <- gsub("[[:punct:]]", "_", str)
+    str <- gsub(" ", "_", str)
+    str
+}
 
-highDimData.value <- highDimData.value[1:maxRows, ]
-highDimData.zScore <- highDimData.zScore[1:maxRows, ]
+buildFields <- function(HDD.value.matrix, HDD.zscore.matrix) {
+    fields.value <- melt(HDD.value.matrix, id=c('PROBE', 'GENEID', 'GENESYMBOL', 'SIGNIFICANCE'))
+    fields.zScore <- melt(HDD.zscore.matrix, id=c('PROBE', 'GENEID', 'GENESYMBOL', 'SIGNIFICANCE'))
+    
+    fields <- fields.value
+    fields <- cbind(fields, fields.zScore$value)
+    
+    names(fields) <- c('PROBE', 'GENEID', 'GENESYMBOL', 'SIGNIFICANCE', 'PATIENTID', 'VALUE', 'ZSCORE')
+    fields$PATIENTID <- as.numeric(sub("^X", "", levels(fields$PATIENTID)))[fields$PATIENTID]
+    fields <- fields[order(fields$PROBE, fields$PATIENTID, decreasing=FALSE), ]
+    fields <- fields[order(fields$SIGNIFICANCE, decreasing=TRUE), ]
 
-significanceValues <- highDimData.value$SIGNIFICANCE
+    fields$PROBE <- fixString(fields$PROBE)
 
-probes <- highDimData.value$PROBE
-geneIDs <- highDimData.value$GENEID
-geneSymbols <- highDimData.value$GENESYMBOL
+    fields
+}
 
-
-fields.value <- melt(highDimData.value, id=c('PROBE', 'GENEID', 'GENESYMBOL', 'SIGNIFICANCE'))
-fields.zScore <- melt(highDimData.zScore, id=c('PROBE', 'GENEID', 'GENESYMBOL'))
-
-fields <- fields.value
-fields <- cbind(fields, fields.zScore[, 5])
-
-names(fields) <- c('PROBE', 'GENEID', 'GENESYMBOL', 'SIGNIFICANCE', 'PATIENTID', 'VALUE', 'ZSCORE')
-fields$PATIENTID <- as.numeric(sub("^X", "", levels(fields$PATIENTID)))[fields$PATIENTID]
-fields <- fields[order(fields$PROBE, fields$PATIENTID, decreasing=FALSE), ]
-fields <- fields[order(fields$SIGNIFICANCE, decreasing=TRUE), ]
-
-patientIDs <- unique(fields$PATIENTID)
-
-sorted.zScoreMatrix <- highDimData.zScore[, -(1:3)]
-colDendrogramEuclideanComplete <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='euclidean'), method='complete'))
-colDendrogramEuclideanSingle <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='euclidean'), method='single'))
-colDendrogramEuclideanAverage <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='euclidean'), method='average'))
-rowDendrogramEuclideanComplete <- as.dendrogram(hclust(dist(sorted.zScoreMatrix, method='euclidean'), method='complete'))
-rowDendrogramEuclideanSingle <- as.dendrogram(hclust(dist(sorted.zScoreMatrix, method='euclidean'), method='single'))
-rowDendrogramEuclideanAverage <- as.dendrogram(hclust(dist(sorted.zScoreMatrix, method='euclidean'), method='average'))
-
-colDendrogramManhattanComplete <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='manhattan'), method='complete'))
-colDendrogramManhattanSingle <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='manhattan'), method='single'))
-colDendrogramManhattanAverage <- as.dendrogram(hclust(dist(t(sorted.zScoreMatrix), method='manhattan'), method='average'))
-rowDendrogramManhattanComplete <- as.dendrogram(hclust(dist(sorted.zScoreMatrix, method='manhattan'), method='complete'))
-rowDendrogramManhattanSingle <- as.dendrogram(hclust(dist(sorted.zScoreMatrix, method='manhattan'), method='single'))
-rowDendrogramManhattanAverage <- as.dendrogram(hclust(dist(sorted.zScoreMatrix, method='manhattan'), method='average'))
+computeDendrogram <- function(zScoreMatrix, distanceMeassure, linkageMethod) {
+    as.dendrogram(hclust(dist(zScoreMatrix, method=distanceMeassure), method=linkageMethod))
+}
 
 dendrogramToJSON <- function(d) {
     totalMembers <- attributes(d)$members
@@ -103,27 +124,60 @@ dendrogramToJSON <- function(d) {
     return(jsonString)
 }
 
-# FIXME make sure to check for missing fields
+HDD.value.matrix.cohort1 <- getHDDMatrix(highDimData_cohort1)
+patientIDs.cohort1 <- as.numeric(sub("^X", "", colnames(HDD.value.matrix.cohort1))[-(1:3)])
+colNum <- ncol(HDD.value.matrix.cohort1) - 3
+if (length(highDimData_cohort2) > 0) {
+    HDD.value.matrix.cohort2 <- getHDDMatrix(highDimData_cohort2)
+    patientIDs.cohort2 <- as.numeric(sub("^X", "", colnames(HDD.value.matrix.cohort2))[-(1:3)])
 
-numerical.lowDimData <- lowDimData$additionalFeatures_numerical
-concepts <- unique(numerical.lowDimData$concept)
-extraFields <- c()
-features <- c()
-for (concept in concepts) {
+    HDD.value.matrix.cohort1 <- HDD.value.matrix.cohort1[HDD.value.matrix.cohort1$PROBE %in% HDD.value.matrix.cohort2$PROBE, ]
+    HDD.value.matrix.cohort2 <- HDD.value.matrix.cohort2[HDD.value.matrix.cohort2$PROBE %in% HDD.value.matrix.cohort1$PROBE, ]
+
+    valueMatrix.cohort1 <- extractMatrixValues(HDD.value.matrix.cohort1)
+    valueMatrix.cohort2 <- extractMatrixValues(HDD.value.matrix.cohort2)
+
+    valueMatrix <- cbind(valueMatrix.cohort1, valueMatrix.cohort2)
+    HDD.value.matrix <- cbind(HDD.value.matrix.cohort1[, 1:3], valueMatrix)
+} else {
+    valueMatrix <- extractMatrixValues(HDD.value.matrix.cohort1)
+    HDD.value.matrix <- HDD.value.matrix.cohort1
+}
+
+patientIDs <- as.numeric(sub("^X", "", colnames(valueMatrix)))
+zScoreMatrix <- getZScoreMatrix(valueMatrix)
+HDD.zScore.matrix <- cbind(HDD.value.matrix[, 1:3], zScoreMatrix)
+
+significanceValues <- getSignificanceValues(valueMatrix, zScoreMatrix, colNum)
+FINAL.HDD.value.matrix <- sortAndCutHDDMatrix(HDD.value.matrix, significanceValues)
+FINAL.HDD.zScore.matrix <- sortAndCutHDDMatrix(HDD.zScore.matrix, significanceValues)
+
+significanceValues.sorted <- FINAL.HDD.value.matrix$SIGNIFICANCE
+zScoreMatrix.sorted <- FINAL.HDD.zScore.matrix[, -c(1:3, ncol(FINAL.HDD.zScore.matrix))]
+
+fields <- buildFields(FINAL.HDD.value.matrix, FINAL.HDD.zScore.matrix)
+probes <- fixString(FINAL.HDD.value.matrix$PROBE)
+geneIDs <- FINAL.HDD.value.matrix$GENEID
+geneSymbols <- FINAL.HDD.value.matrix$GENESYMBOL
+
+colDendrogramEuclideanComplete <- computeDendrogram(t(zScoreMatrix.sorted), 'euclidean', 'complete')
+colDendrogramEuclideanSingle <- computeDendrogram(t(zScoreMatrix.sorted), 'euclidean', 'single')
+colDendrogramEuclideanAverage <- computeDendrogram(t(zScoreMatrix.sorted), 'euclidean', 'average')
+rowDendrogramEuclideanComplete <- computeDendrogram(zScoreMatrix.sorted, 'euclidean', 'complete')
+rowDendrogramEuclideanSingle <- computeDendrogram(zScoreMatrix.sorted, 'euclidean', 'single')
+rowDendrogramEuclideanAverage <- computeDendrogram(zScoreMatrix.sorted, 'euclidean', 'average')
+
+colDendrogramManhattanComplete <- computeDendrogram(t(zScoreMatrix.sorted), 'manhattan', 'complete')
+colDendrogramManhattanSingle <- computeDendrogram(t(zScoreMatrix.sorted), 'manhattan', 'single')
+colDendrogramManhattanAverage <- computeDendrogram(t(zScoreMatrix.sorted), 'manhattan', 'average')
+rowDendrogramManhattanComplete <- computeDendrogram(zScoreMatrix.sorted, 'manhattan', 'complete')
+rowDendrogramManhattanSingle <- computeDendrogram(zScoreMatrix.sorted, 'manhattan', 'single')
+rowDendrogramManhattanAverage <- computeDendrogram(zScoreMatrix.sorted, 'manhattan', 'average')
+
+getFeatureName <- function(concept) {
     featureName <- tail(strsplit(concept, '\\\\')[[1]], n=1)
-    featureName <- gsub(' |\\(|\\)', '_', featureName)
-    conceptData <- numerical.lowDimData[numerical.lowDimData$concept == concept, ]
-    binary = length(unique(conceptData$value)) == 2
-    newFields <- data.frame(
-        FEATURE=rep(featureName, nrow(conceptData)),
-        PATIENTID=conceptData$patientID,
-        TYPE=rep(ifelse(binary, 'binary', 'numerical'), nrow(conceptData)),
-        VALUE=conceptData$value,
-        ZSCORE=scale(conceptData$value))
-    newFields <- newFields[newFields$PATIENTID %in% patientIDs, ]
-    newFields <- newFields[order(newFields$PATIENTID, decreasing=FALSE), ]
-    extraFields <- rbind(extraFields, newFields)
-    features <- c(features, featureName)
+    featureName <- fixString(featureName)
+    featureName
 }
 
 conceptStrToFolderStr <- function(s) {
@@ -132,34 +186,60 @@ conceptStrToFolderStr <- function(s) {
     substr(s, 0, tail(backslashs, 2)[1])
 }
 
-alphabetical.lowDimData <- lowDimData$additionalFeatures_alphabetical
-folders <- as.vector(sapply(alphabetical.lowDimData$concept, conceptStrToFolderStr))
-unique.folders <- unique(folders)
-for (folder in unique.folders) {
-    folderData <- alphabetical.lowDimData[folder == folders, ]
-    featureName <- tail(strsplit(folder, '\\\\')[[1]], n=1)
-    featureName <- gsub(' |\\(|\\)', '_', featureName)
-    binary = length(unique(conceptData$value)) == 2
-    newFields <- data.frame(
-        FEATURE=rep(featureName, nrow(folderData)),
-        PATIENTID=folderData$patientID,
-        TYPE=rep('alphabetical', nrow(folderData)),
-        VALUE=folderData$value,
-        ZSCORE=rep(NA, nrow(folderData)))
-    newFields <- newFields[newFields$PATIENTID %in% patientIDs, ]
-    newFields <- newFields[order(newFields$PATIENTID, decreasing=FALSE), ]
+buildLowDimFields <- function(featureName, local.patientIDs, global.patientIDs, type, values, zScores) {
+    lowDimFields <- data.frame(
+            FEATURE=rep(featureName, length(local.patientIDs)),
+            PATIENTID=local.patientIDs,
+            TYPE=rep(type, length(local.patientIDs)),
+            VALUE=values,
+            ZSCORE=if(zScores) scale(values) else rep(NA, length(local.patientIDs)))
+    lowDimFields <- lowDimFields[lowDimFields$PATIENTID %in% global.patientIDs, ]
+    lowDimFields <- lowDimFields[order(lowDimFields$PATIENTID, decreasing=FALSE), ]
+    lowDimFields
+}
+
+extraFields <- c()
+features <- c()
+
+if (length(highDimData_cohort2) > 0) {
+    featureName <- 'Cohort'
+    values <- sapply(patientIDs, FUN=function(id) ifelse(id %in% patientIDs.cohort1, 1, 2))
+    extraFields <- buildLowDimFields(featureName, patientIDs, patientIDs, 'binary', values, FALSE)
+    features <- featureName
+}
+
+numerical.lowDimData.cohort1 <- lowDimData_cohort1$additionalFeatures_numerical
+numerical.lowDimData.cohort2 <- lowDimData_cohort2$additionalFeatures_numerical
+numerical.lowDimData <- rbind(numerical.lowDimData.cohort1, numerical.lowDimData.cohort2)
+concepts <- unique(numerical.lowDimData$concept)
+for (concept in concepts) {
+    featureName <- getFeatureName(concept)
+    conceptData <- numerical.lowDimData[numerical.lowDimData$concept == concept, ]
+    type = ifelse(length(unique(conceptData$value)) == 2, 'binary', 'numerical')
+    newFields <- buildLowDimFields(featureName, conceptData$patientID, patientIDs, type, conceptData$value, TRUE)
     extraFields <- rbind(extraFields, newFields)
     features <- c(features, featureName)
 }
 
-fields$PROBE <- gsub("[[:space:]]", "_", fields$PROBE)
-probes <- gsub("[[:space:]]", "_", probes)
+alphabetical.lowDimData.cohort1 <- lowDimData_cohort1$additionalFeatures_alphabetical
+alphabetical.lowDimData.cohort2 <- lowDimData_cohort2$additionalFeatures_alphabetical
+alphabetical.lowDimData <- rbind(alphabetical.lowDimData.cohort1, alphabetical.lowDimData.cohort2)
+folders <- as.vector(sapply(alphabetical.lowDimData$concept, conceptStrToFolderStr))
+unique.folders <- unique(folders)
+for (folder in unique.folders) {
+    folderData <- alphabetical.lowDimData[folder == folders, ]
+    featureName <- getFeatureName(folder)
+    newFields <- buildLowDimFields(featureName, folderData$patientID, patientIDs, 'alphabetical', folderData$value, FALSE)
+    extraFields <- rbind(extraFields, newFields)
+    features <- c(features, featureName)
+}
 
 ### WRITE OUTPUT ###
+
 output$extraFields <- extraFields
 output$features <- features
 output$fields <- fields
-output$significanceValues <- significanceValues
+output$significanceValues <- significanceValues.sorted
 output$patientIDs <- patientIDs
 output$probes <- probes
 output$geneIDs <- geneIDs

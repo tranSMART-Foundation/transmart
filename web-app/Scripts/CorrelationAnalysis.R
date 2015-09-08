@@ -15,7 +15,7 @@ if (! is.null(settings$xLow)) {
 
 ### COMPUTE RESULTS ###
 
-points <- lowDimData$datapoints
+points <- lowDimData_cohort1$datapoints
 patientIDs <- unique(points$patientID)
 concepts <- unique(points$concept)
 if (length(concepts) != 2) {
@@ -34,7 +34,7 @@ xArr <- xArr[selection]
 yArr <- yArr[selection]
 patientIDs <- patientIDs[selection]
 
-annotations <- lowDimData$annotations
+annotations <- lowDimData_cohort1$annotations
 tags <- list()
 if (length(annotations) > 0) {
 	annotations <- annotations[annotations$patientID %in% patientIDs, ]

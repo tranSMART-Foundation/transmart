@@ -9,7 +9,7 @@
 	activateDragAndDrop('datapoints');
 
 	function register() {
-		registerConceptBox('datapoints', 1, 'valueicon', 2, undefined);
+		registerConceptBox('datapoints', [1], 'valueicon', 2, undefined);
 	}
 
 	function getSettings() {

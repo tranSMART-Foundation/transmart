@@ -184,6 +184,15 @@ var smartRPanel = new Ext.Panel({
         url: pageInfo.basePath + '/smartR/index',
         method: 'POST',
         evalScripts: false
+    },
+    listeners: {
+        render: function(panel) {
+            panel.body.on('click', function() {
+                if (typeof updateOnView === "function") {
+                    updateOnView();  
+                } 
+            });
+        }
     }
 });
 
@@ -237,18 +246,16 @@ function addSettingsToData(data, settings) {
 
 var conceptBoxes = [];
 var sanityCheckErrors = [];
-function registerConceptBox(name, cohort, type, min, max) {
+function registerConceptBox(name, cohorts, type, min, max) {
     var concepts = getConcepts(name);
     var check1 = type === undefined || containsOnly(name, type);
     var check2 = min === undefined || concepts.length >= min;
     var check3 = max === undefined || concepts.length <= max;
-    var check4 = concepts.length === 0 || !isSubsetEmpty(cohort);
     sanityCheckErrors.push( 
         !check1 ? 'Concept box (' + name + ') contains concepts with invalid type! Valid type: ' + type :
         !check2 ? 'Concept box (' + name + ') contains too few concepts! Valid range: ' + min + ' - ' + max :
-        !check3 ? 'Concept box (' + name + ') contains too many concepts! Valid range: ' + min + ' - ' + max :
-        !check4 ? 'Concept box (' + name + ') contains concepts but you have not specified any cohort for it!' : '');
-    conceptBoxes.push({name: name, cohort: cohort, type: type, concepts: concepts});
+        !check3 ? 'Concept box (' + name + ') contains too many concepts! Valid range: ' + min + ' - ' + max : '');
+    conceptBoxes.push({name: name, cohorts: cohorts, type: type, concepts: concepts});
 }
 
 /**

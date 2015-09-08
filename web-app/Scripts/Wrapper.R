@@ -2,50 +2,51 @@ tryCatch(
 	{
 		args <- commandArgs(trailingOnly = TRUE)
 		scriptPath <- args[1]
-		lowDimPath <- args[2]
-		highDimPath_cohort1 <- args[3]
-		highDimPath_cohort2 <- args[4]
-		settingsPath <- args[5]
-		outputPath <- args[6]
-		errorPath <- args[7]
-
+		lowDimPath_cohort1 <- args[2]
+		lowDimPath_cohort2 <- args[3]
+		highDimPath_cohort1 <- args[4]
+		highDimPath_cohort2 <- args[5]
+		settingsPath <- args[6]
+		outputPath <- args[7]
+		errorPath <- args[8]
+		
 		if (! suppressMessages(require(jsonlite))) {
 			stop("SmartR requires the R package 'jsonlite'")
 		}
-
-		if (file.exists(lowDimPath)) {
-			lowDimData <- fromJSON(readChar(lowDimPath, file.info(lowDimPath)$size))
+		if (! suppressMessages(require(data.table))) {
+			stop("SmartR requires the R package 'data.table'")
 		}
-
-		if (file.exists(highDimPath_cohort1)) {
-			if (! suppressMessages(require(data.table))) {
-				stop("SmartR requires the R package 'data.table'")
+		
+		readJSONFile <- function(path) {
+			data <- data.frame()
+			if (file.exists(path)) {
+				data <- fromJSON(readChar(path, file.info(path)$size))								
 			}
-			suppressWarnings(
-				highDimData_cohort1 <- as.data.frame(fread(
-							highDimPath_cohort1, 
-							header=TRUE,
-							sep='\t',
-							showProgress=FALSE), stringsAsFactors=FALSE)
-			)
-			highDimData_cohort1 <- transform(highDimData_cohort1, VALUE=as.numeric(VALUE))
+			data
 		}
-
-		if (file.exists(highDimPath_cohort2)) {
-			if (! suppressMessages(require(data.table))) {
-				stop("SmartR requires the R package 'data.table'")
+		
+		readHighDimFile <- function(path) {
+			data <- data.frame()
+			if (file.exists(path)) {		
+				suppressWarnings(
+					data <- as.data.frame(fread(
+								path, 
+								header=TRUE,
+								sep='\t',
+								showProgress=FALSE), stringsAsFactors=FALSE)
+				)
+				data <- transform(data, VALUE=as.numeric(VALUE))
 			}
-			suppressWarnings(
-				highDimData_cohort2 <- as.data.frame(fread(
-							highDimPath_cohort2, 
-							header=TRUE,
-							sep='\t',
-							showProgress=FALSE), stringsAsFactors=FALSE)
-			)
-			highDimData_cohort2 <- transform(highDimData_cohort2, VALUE=as.numeric(VALUE))
+			data
 		}
 
-		settings <- fromJSON(readChar(settingsPath, file.info(settingsPath)$size))
+		lowDimData_cohort1 <- readJSONFile(lowDimPath_cohort1)		
+		lowDimData_cohort2 <- readJSONFile(lowDimPath_cohort2)
+		
+		highDimData_cohort1 <- readHighDimFile(highDimPath_cohort1)
+		highDimData_cohort2 <- readHighDimFile(highDimPath_cohort2)
+
+		settings <- readJSONFile(settingsPath)
 
 		output <- list()
 
