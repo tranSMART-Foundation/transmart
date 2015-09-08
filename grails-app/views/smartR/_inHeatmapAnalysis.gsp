@@ -30,15 +30,18 @@
 
 <script>
 	var selection = '';
-	if (isSubsetEmpty(2)) {
-		jQuery('#significanceMeassure_singleCohort').show();
-		jQuery('#significanceMeassure_pairCohort').hide();
-		selection = '#significanceMeassure_singleCohort';
-	} else {
-		jQuery('#significanceMeassure_singleCohort').hide();
-		jQuery('#significanceMeassure_pairCohort').show();
-		selection = '#significanceMeassure_pairCohort';
+	function updateOnView() {
+		if (isSubsetEmpty(2)) {
+			jQuery('#significanceMeassure_singleCohort').show();
+			jQuery('#significanceMeassure_pairCohort').hide();
+			selection = '#significanceMeassure_singleCohort';
+		} else {
+			jQuery('#significanceMeassure_singleCohort').hide();
+			jQuery('#significanceMeassure_pairCohort').show();
+			selection = '#significanceMeassure_pairCohort';
+		}
 	}
+	updateOnView();
 	
 	activateDragAndDrop('mRNAData');
 	activateDragAndDrop('additionalFeatures_numerical');

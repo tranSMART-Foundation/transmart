@@ -184,6 +184,15 @@ var smartRPanel = new Ext.Panel({
         url: pageInfo.basePath + '/smartR/index',
         method: 'POST',
         evalScripts: false
+    },
+    listeners: {
+        render: function(panel) {
+            panel.body.on('click', function() {
+                if (typeof updateOnView === "function") {
+                    updateOnView();  
+                } 
+            });
+        }
     }
 });
 
