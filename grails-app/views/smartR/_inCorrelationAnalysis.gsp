@@ -21,8 +21,8 @@
 	activateDragAndDrop('annotations');
 
 	function register() {
-		registerConceptBox('datapoints', 1, 'valueicon', 2, 2);
-		registerConceptBox('annotations', 1, 'alphaicon', 0, undefined);
+		registerConceptBox('datapoints', [1], 'valueicon', 2, 2);
+		registerConceptBox('annotations', [1], 'alphaicon', 0, undefined);
 	}
 
 	function getSettings() {

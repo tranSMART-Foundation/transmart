@@ -1,7 +1,7 @@
-datapoints.cohort1 <- lowDimData$concept_cohort1
-datapoints.cohort2 <- lowDimData$concept_cohort2
-subsets.cohort1 <- lowDimData$subsets_cohort1
-subsets.cohort2 <- lowDimData$subsets_cohort2
+datapoints.cohort1 <- lowDimData_cohort1$concept1
+datapoints.cohort2 <- lowDimData_cohort2$concept2
+subsets.cohort1 <- lowDimData_cohort1$subsets1
+subsets.cohort2 <- lowDimData_cohort2$subsets2
 excludedPatientIDs <- settings$excludedPatientIDs
 
 calc_boxplot <- function(datapoints, subsets) {

@@ -297,7 +297,7 @@
     var dendrogramHeight = 300;
     var histogramHeight = 200;
 
-    var margin = { top: gridFieldHeight * 2 + features.length * gridFieldHeight / 2 + dendrogramHeight, 
+    var margin = { top: gridFieldHeight * 2 + 100 + features.length * gridFieldHeight / 2 + dendrogramHeight, 
             right: gridFieldWidth + 300 + dendrogramHeight, 
             bottom: 10, 
             left: histogramHeight };
@@ -773,7 +773,8 @@
     }
 
     var colDendrogramVisible = false;
-    function createColDendrogram(colDendrogram) {
+    var colDendrogram;
+    function createColDendrogram() {
         var w = 200;
         var spacing = gridFieldWidth * 2 + getMaxWidth(d3.selectAll('.patientID')) + features.length * gridFieldHeight / 2 + 40;
 
@@ -830,7 +831,8 @@
     }
 
     var rowDendrogramVisible = false;
-    function createRowDendrogram(rowDendrogram) {
+    var rowDendrogram;
+    function createRowDendrogram() {
         var h = 280;
         var spacing = gridFieldWidth + getMaxWidth(d3.selectAll('.probe')) + 20;
 

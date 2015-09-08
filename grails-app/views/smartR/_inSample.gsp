@@ -12,7 +12,7 @@
 		// and make sure that the concepts within are downloaded
 		// parameters are conceptBoxName, cohort (1 or 2), type of containing
 		// concepts, minimum and maximum number of concepts to choose
-		registerConceptBox('data', 1, 'valueicon', 1, undefined);
+		registerConceptBox('data', [1], 'valueicon', 1, undefined);
 	}
 
 	// MUST be implemented
