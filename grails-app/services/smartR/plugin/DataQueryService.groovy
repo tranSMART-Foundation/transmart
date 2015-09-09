@@ -56,7 +56,7 @@ class DataQueryService {
         return data
     }
 
-    def exportHighDimData(conceptKeys, patientIDs, resultInstanceId, outputFilePath) {
+    def exportHighDimData(conceptKeys, patientIDs, resultInstanceId) {
         List<String> HEADER = ['PATIENTID', 'VALUE', 'PROBE', 'GENEID', 'GENESYMBOL']
         char COLUMN_SEPERATOR = '\t'
         def query = 
@@ -92,21 +92,15 @@ class DataQueryService {
         def conceptCode = i2b2HelperService.getConceptCodeFromKey(conceptKeys[0])
         def params = patientIDs
         params << conceptCode
-        def outputFile = new File(outputFilePath)
-        outputFile.withWriter { Writer writer ->
-            CSVWriter csvWriter = new CSVWriter(writer, COLUMN_SEPERATOR)
-            csvWriter.writeNext(HEADER as String[])
-            new Sql(dataSource).eachRow(query, params, { row ->
-                def line = [
-                    row.patient_id,
-                    row.raw_intensity,
-                    row.probe_id,
-                    row.gene_id,
-                    row.gene_symbol
-                ]
-                csvWriter.writeNext(line as String[])
-            })
-        } 
+        def data = [PATIENTID: [], VALUE: [], PROBE: [], GENEID: [], GENESYMBOL: []]
+        new Sql(dataSource).eachRow(query, params, { row ->
+            data.PATIENTID << row.patient_id
+            data.VALUE << row.raw_intensity
+            data.PROBE << row.probe_id
+            data.GENEID << row.gene_id
+            data.GENESYMBOL << row.gene_symbol
+        })
+        return data
     }
 
     private ClinicalVariable createClinicalVariable(OntologyTerm term) {

@@ -20,23 +20,30 @@ class ScriptExecutorService {
             c = new RConnection(Holders.config.RModules.host, Holders.config.RModules.port)
             this.rServeConnection = c
             this.rServePid = c.eval("Sys.getpid()").asInteger()
+            c.stringEncoding = 'utf8'
         }
-        c.stringEncoding = 'utf8'
-        c.assign("scriptPath", parameterMap['scriptDir'] + parameterMap['script'])
-        c.assign("lowDimPath_cohort1", parameterMap['lowDimFile_cohort1'])
-        c.assign("lowDimPath_cohort2", parameterMap['lowDimFile_cohort2'])
-        c.assign("highDimPath_cohort1", parameterMap['highDimFile_cohort1'])
-        c.assign("highDimPath_cohort2", parameterMap['highDimFile_cohort2'])
+
+        c.assign("data_cohort1", parameterMap['data_cohort1'])
+        c.assign("data_cohort2", parameterMap['data_cohort2'])
         c.assign("settings", parameterMap['settings'])
 
-        def scriptCommand = "source('${parameterMap['scriptDir']}Wrapper.R')".replace("\\", "/")
-        def r = c.parseAndEval("try(${scriptCommand}, silent=TRUE)");
+        c.eval("""
+            require(jsonlite)
+            data.cohort1 <- fromJSON(data_cohort1)
+            data.cohort2 <- fromJSON(data_cohort2)
+            settings <- fromJSON(settings)
+            output <- list()
+        """)
+
+        def scriptCommand = "source('${parameterMap['scriptDir'] + parameterMap['script']}')".replace("\\", "/")
+        def r = c.parseAndEval("try(${scriptCommand}, silent=TRUE)")
 
         if (r.inherits("try-error")) {
             return [false, r.asString()]
         }
 
-        return [true, JSON.parse(r.asList()[0].asString())]
+        def results = c.eval("toString(toJSON(output))").asString()
+        return [true, results]
     }
 
     def interrupt() {

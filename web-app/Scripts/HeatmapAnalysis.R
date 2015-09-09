@@ -124,11 +124,11 @@ dendrogramToJSON <- function(d) {
     return(jsonString)
 }
 
-HDD.value.matrix.cohort1 <- getHDDMatrix(highDimData_cohort1)
+HDD.value.matrix.cohort1 <- getHDDMatrix(data.cohort1$mRNAData)
 patientIDs.cohort1 <- as.numeric(sub("^X", "", colnames(HDD.value.matrix.cohort1))[-(1:3)])
 colNum <- ncol(HDD.value.matrix.cohort1) - 3
-if (length(highDimData_cohort2) > 0) {
-    HDD.value.matrix.cohort2 <- getHDDMatrix(highDimData_cohort2)
+if (length(data.cohort2$mRNAData) > 0) {
+    HDD.value.matrix.cohort2 <- getHDDMatrix(data.cohort2$mRNAData)
     patientIDs.cohort2 <- as.numeric(sub("^X", "", colnames(HDD.value.matrix.cohort2))[-(1:3)])
 
     HDD.value.matrix.cohort1 <- HDD.value.matrix.cohort1[HDD.value.matrix.cohort1$PROBE %in% HDD.value.matrix.cohort2$PROBE, ]
@@ -201,15 +201,15 @@ buildLowDimFields <- function(featureName, local.patientIDs, global.patientIDs, 
 extraFields <- c()
 features <- c()
 
-if (length(highDimData_cohort2) > 0) {
+if (length(data.cohort2$mRNAData) > 0) {
     featureName <- 'Cohort'
     values <- sapply(patientIDs, FUN=function(id) ifelse(id %in% patientIDs.cohort1, 1, 2))
     extraFields <- buildLowDimFields(featureName, patientIDs, patientIDs, 'binary', values, FALSE)
     features <- featureName
 }
 
-numerical.lowDimData.cohort1 <- lowDimData_cohort1$additionalFeatures_numerical
-numerical.lowDimData.cohort2 <- lowDimData_cohort2$additionalFeatures_numerical
+numerical.lowDimData.cohort1 <- data.cohort1$additionalFeatures_numerical
+numerical.lowDimData.cohort2 <- data.cohort2$additionalFeatures_numerical
 numerical.lowDimData <- rbind(numerical.lowDimData.cohort1, numerical.lowDimData.cohort2)
 concepts <- unique(numerical.lowDimData$concept)
 for (concept in concepts) {
@@ -221,8 +221,8 @@ for (concept in concepts) {
     features <- c(features, featureName)
 }
 
-alphabetical.lowDimData.cohort1 <- lowDimData_cohort1$additionalFeatures_alphabetical
-alphabetical.lowDimData.cohort2 <- lowDimData_cohort2$additionalFeatures_alphabetical
+alphabetical.lowDimData.cohort1 <- data.cohort1$additionalFeatures_alphabetical
+alphabetical.lowDimData.cohort2 <- data.cohort2$additionalFeatures_alphabetical
 alphabetical.lowDimData <- rbind(alphabetical.lowDimData.cohort1, alphabetical.lowDimData.cohort2)
 folders <- as.vector(sapply(alphabetical.lowDimData$concept, conceptStrToFolderStr))
 unique.folders <- unique(folders)

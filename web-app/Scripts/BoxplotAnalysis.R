@@ -1,7 +1,3 @@
-datapoints.cohort1 <- lowDimData_cohort1$concept1
-datapoints.cohort2 <- lowDimData_cohort2$concept2
-subsets.cohort1 <- lowDimData_cohort1$subsets1
-subsets.cohort2 <- lowDimData_cohort2$subsets2
 excludedPatientIDs <- settings$excludedPatientIDs
 
 calc_boxplot <- function(datapoints, subsets) {
@@ -51,10 +47,10 @@ calc_boxplot <- function(datapoints, subsets) {
 	data
 }
 
-if (length(datapoints.cohort1) > 0) {
-	output$cohort1 <- calc_boxplot(datapoints.cohort1, subsets.cohort1)
+if (length(data.cohort1$concept1) > 0) {
+	output$cohort1 <- calc_boxplot(data.cohort1$concept1, data.cohort1$subset1)
 }
 
-if (length(datapoints.cohort2) > 0) {
-	output$cohort2 <- calc_boxplot(datapoints.cohort2, subsets.cohort2)
+if (length(data.cohort2$concept2) > 0) {
+	output$cohort2 <- calc_boxplot(data.cohort2$concept2, data.cohort2$subset2)
 }

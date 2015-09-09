@@ -8,7 +8,7 @@ interpolateNAs <- strtoi(settings$interpolateNAs)
 
 ### COMPUTE RESULTS ###
 
-points <- lowDimData_cohort1$datapoints
+points <- data.cohort1$datapoints
 
 if (! is.null(acfPatientID)) {
 	points <- points[points$patientID == acfPatientID, ]
