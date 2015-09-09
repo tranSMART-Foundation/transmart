@@ -1,11 +1,7 @@
 package smartR.plugin
 
-import org.quartz.JobDataMap
-import org.quartz.JobDetail
-import org.quartz.SimpleTrigger
-import org.quartz.Trigger
-import groovy.json.JsonSlurper
 import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
 import grails.util.Holders
 import grails.util.Environment
 
@@ -17,8 +13,9 @@ class SmartRService {
     def quartzScheduler
     def i2b2HelperService
     def dataQueryService
+    def scriptExecutorService
 
-    def jobDataMap = [:]
+    def parameterMap = [:]
 
     /**
     *   Get the working directory for the current user and create it if it doesn't exist
@@ -32,7 +29,7 @@ class SmartRService {
         if (! tempDir.endsWith('/')) {
             tempDir += '/'
         }
-        def workingDir = tempDir + 'SmartR/' + user + '/'
+        def workingDir = "${tempDir}SmartR/${user}/"
         new File(workingDir).mkdirs()
         return workingDir
     }
@@ -45,13 +42,13 @@ class SmartRService {
         def lowDimData_cohort1 = [:]
         def lowDimData_cohort2 = [:]
         
-        def rIID1 = jobDataMap['result_instance_id1']
-        def rIID2 = jobDataMap['result_instance_id2']
+        def rIID1 = parameterMap['result_instance_id1']
+        def rIID2 = parameterMap['result_instance_id2']
         
         def patientIDs_cohort1 = rIID1 ? i2b2HelperService.getSubjectsAsList(rIID1).collect { it.toLong() } : []
         def patientIDs_cohort2 = rIID2 ? i2b2HelperService.getSubjectsAsList(rIID2).collect { it.toLong() } : []
 
-        jobDataMap['conceptBoxes'].each { conceptBox ->
+        parameterMap['conceptBoxes'].each { conceptBox ->
             conceptBox.cohorts.each { cohort ->
                 def rIID
                 def data
@@ -62,12 +59,12 @@ class SmartRService {
                     rIID = rIID1
                     patientIDs = patientIDs_cohort1
                     data = lowDimData_cohort1
-                    highDimFile = jobDataMap['highDimFile_cohort1']
+                    highDimFile = parameterMap['highDimFile_cohort1']
                 } else {
                     rIID = rIID2
                     patientIDs = patientIDs_cohort2
                     data = lowDimData_cohort2
-                    highDimFile = jobDataMap['highDimFile_cohort2']
+                    highDimFile = parameterMap['highDimFile_cohort2']
                 }
                 
                 if (! rIID || ! patientIDs) {
@@ -89,15 +86,10 @@ class SmartRService {
                 }
             }
         }
-        new File(jobDataMap['lowDimFile_cohort1']).write(new JsonBuilder(lowDimData_cohort1).toPrettyString())
-        new File(jobDataMap['lowDimFile_cohort2']).write(new JsonBuilder(lowDimData_cohort2).toPrettyString())
-    }
-
-    /**
-    *   Parses JSON string containing the script settings and writes them to the filesystem
-    */
-    def writeSettings() {
-        new File(jobDataMap['settingsFile']).write(new JsonBuilder(jobDataMap['settings']).toPrettyString())
+        new File(parameterMap['lowDimFile_cohort1'])
+            .write(new JsonBuilder(lowDimData_cohort1).toPrettyString())
+        new File(parameterMap['lowDimFile_cohort2'])
+            .write(new JsonBuilder(lowDimData_cohort2).toPrettyString())
     }
 
     /**
@@ -107,128 +99,72 @@ class SmartRService {
     */
     def getScriptDir() {
         if (Environment.current == Environment.DEVELOPMENT) {
-            return org.codehaus.groovy.grails.plugins.GrailsPluginUtils.getPluginDirForName('smart-r').getFile().absolutePath + '/web-app/Scripts/'
+            return org.codehaus.groovy.grails.plugins.GrailsPluginUtils
+                .getPluginDirForName('smart-r')
+                .getFile()
+                .absolutePath + '/web-app/Scripts/'
         } else {
-            return grailsApplication.mainContext.servletContext.getRealPath('/plugins/') + '/smart-r-0.1/Scripts/'
+            return grailsApplication
+                .mainContext
+                .servletContext
+                .getRealPath('/plugins/') + '/smart-r-0.1/Scripts/'
         }
     }
 
-    /**
-    *   Sets the job data map, a map containing all necessary parameters to run the job
-    *
-    *   @param {str} user: username of the account starting the job
-    *   @param {str} jobName: name of the job (usually containing username and timestamp)
-    *   @param params: several settings from the currently visible .gsp file
-    */
-    def initJobDataMap(user, jobName, params) {
-        def jobDataMap = new JobDataMap()
+    def initParameterMap(params) {
+        def parameterMap = [:]
+        def user = springSecurityService.getPrincipal().username
         def workingDir = getWorkingDir(user)
-        def settings = new JsonSlurper().parseText(params.settings)
         def conceptBoxes = new JsonSlurper().parseText(params.conceptBoxes)
-
-        jobDataMap.put('user', user)
-        jobDataMap.put('jobName', jobName)
-        jobDataMap.put('result_instance_id1', params.result_instance_id1)
-        jobDataMap.put('result_instance_id2', params.result_instance_id2)
-        jobDataMap.put('script', params.script)
-        jobDataMap.put('scriptDir', getScriptDir())
-        jobDataMap.put('init', params.init.toBoolean())
-        jobDataMap.put('settings', settings)
-        jobDataMap.put('workingDir', workingDir)
-        jobDataMap.put('conceptBoxes', conceptBoxes)
-        jobDataMap.put('lowDimFile_cohort1', workingDir + 'lowDimData_cohort1.json')
-        jobDataMap.put('lowDimFile_cohort2', workingDir + 'lowDimData_cohort2.json')
-        jobDataMap.put('highDimFile_cohort1', workingDir + 'highDimData_cohort1.tsv')
-        jobDataMap.put('highDimFile_cohort2', workingDir + 'highDimData_cohort2.tsv')
-        jobDataMap.put('outputFile', workingDir + 'results.json')
-        jobDataMap.put('settingsFile', workingDir + 'settings.json')
-        jobDataMap.put('errorFile', workingDir + 'error.log')
-        this.jobDataMap = jobDataMap
+        parameterMap.put('user', user)
+        parameterMap.put('result_instance_id1', params.result_instance_id1)
+        parameterMap.put('result_instance_id2', params.result_instance_id2)
+        parameterMap.put('script', params.script)
+        parameterMap.put('scriptDir', getScriptDir())
+        parameterMap.put('init', params.init.toBoolean())
+        parameterMap.put('settings', params.settings)
+        parameterMap.put('workingDir', workingDir)
+        parameterMap.put('conceptBoxes', conceptBoxes)
+        parameterMap.put('lowDimFile_cohort1', workingDir + 'lowDimData_cohort1.json')
+        parameterMap.put('lowDimFile_cohort2', workingDir + 'lowDimData_cohort2.json')
+        parameterMap.put('highDimFile_cohort1', workingDir + 'highDimData_cohort1.tsv')
+        parameterMap.put('highDimFile_cohort2', workingDir + 'highDimData_cohort2.tsv')
+        this.parameterMap = parameterMap
     }
 
-    /**
-    *   Removes files that were possibly created on a previous job run.
-    *   It's not entirely necessary to do this, but helps a lot with debugging.
-    */
     def cleanUp() {
-        def lowDimFile_cohort1 = new File(jobDataMap['lowDimFile_cohort1'])
-        if (jobDataMap['init'] && lowDimFile_cohort1.exists()) {
+        def lowDimFile_cohort1 = new File(parameterMap['lowDimFile_cohort1'])
+        if (parameterMap['init'] && lowDimFile_cohort1.exists()) {
             lowDimFile_cohort1.delete()
         }
-        def lowDimFile_cohort2 = new File(jobDataMap['lowDimFile_cohort2'])
-        if (jobDataMap['init'] && lowDimFile_cohort2.exists()) {
+        def lowDimFile_cohort2 = new File(parameterMap['lowDimFile_cohort2'])
+        if (parameterMap['init'] && lowDimFile_cohort2.exists()) {
             lowDimFile_cohort2.delete()
         }
-        def highDimFile1 = new File(jobDataMap['highDimFile_cohort1'])
-        if (jobDataMap['init'] && highDimFile1.exists()) {
-            highDimFile1.delete()
+        def highDimFile_cohort1 = new File(parameterMap['highDimFile_cohort1'])
+        if (parameterMap['init'] && highDimFile_cohort1.exists()) {
+            highDimFile_cohort1.delete()
         }
-        def highDimFile2 = new File(jobDataMap['highDimFile_cohort2'])
-        if (jobDataMap['init'] && highDimFile2.exists()) {
-            highDimFile2.delete()
+        def highDimFile_cohort2 = new File(parameterMap['highDimFile_cohort2'])
+        if (parameterMap['init'] && highDimFile_cohort2.exists()) {
+            highDimFile_cohort2.delete()
         }
-        def outputFile = new File(jobDataMap['outputFile'])
-        if (outputFile.exists()) {
-            outputFile.delete()
-        }
-        def settingsFile = new File(jobDataMap['settingsFile'])
-        if (settingsFile.exists()) {
-            settingsFile.delete()
-        }
-        def errorFile = new File(jobDataMap['errorFile'])
-        if (errorFile.exists()) {
-            errorFile.delete()
-        }
-        assert !jobDataMap['init'] || !lowDimFile_cohort1.exists()
-        assert !jobDataMap['init'] || !lowDimFile_cohort2.exists()
-        assert !jobDataMap['init'] || !highDimFile1.exists()
-        assert !jobDataMap['init'] || !highDimFile2.exists()
-        assert !outputFile.exists()
-        assert !settingsFile.exists()
-        assert !errorFile.exists() || errorFile.text == ''
+        assert !parameterMap['init'] || !lowDimFile_cohort1.exists()
+        assert !parameterMap['init'] || !lowDimFile_cohort2.exists()
+        assert !parameterMap['init'] || !highDimFile_cohort1.exists()
+        assert !parameterMap['init'] || !highDimFile_cohort2.exists()
     }
 
-    /**
-    *
-    *   This method prepares a job for the execution of the analysis scripts and launches it.
-    *   When done it will redirect all necessary data to the controller such that they will be send to the browser.
-    *
-    *   @param params: several settings from the currently visible .gsp file
-    *   @return: all data we want to send to the browser such as success state, results and processed db data
-    */
-    def runJob(params) {
-        def user = springSecurityService.getPrincipal().username
-        def time = Calendar.instance.time.time
-        def jobName = user + '-' + params.script + '-' + time
-        initJobDataMap(user, jobName, params)
 
-        // TODO: It'd be nice to have these calls in the job too, but REST API and QUARTZ don't like each other
+    def runScript(params) {
+        initParameterMap(params)
+
         cleanUp()
-        writeSettings()
-        if (jobDataMap['init']) {
+
+        if (parameterMap['init']) {
             getData()
         }
 
-        def jobDetail = new JobDetail(jobName, 'SmartR', SmartRJobService.class)
-        jobDetail.setJobDataMap(jobDataMap)
-
-        def trigger = new SimpleTrigger('triggerNow' + time, 'SmartR', new Date(), null, 0, 0L)
-        quartzScheduler.scheduleJob(jobDetail, trigger)
-
-        while (quartzScheduler.getTriggerState('triggerNow' + time, 'SmartR') == Trigger.STATE_NORMAL) {
-            sleep(50)
-        }
-
-        def errorLog = new File(jobDataMap['errorFile'])
-        if (errorLog.exists() && errorLog.text) {
-            return [false, 'ERROR: ' + errorLog.text]
-        }
-
-        if (! new File(jobDataMap['outputFile']).exists()) {
-            return [false, "ERROR: The script didn't generate any output!"]
-        }
-
-        def results = new JsonSlurper().parseText(new File(jobDataMap['outputFile']).text)
-        return [true, results]
+        return scriptExecutorService.run(parameterMap)
     }
 }
