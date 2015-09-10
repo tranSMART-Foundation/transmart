@@ -240,32 +240,31 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
 }
 
 
-.listToDataFrame <- function(list) {
+.listToDataFrame <- function(l) {
     # TODO: (timdo) dependency on 'plyr' package removed; figure out whether dependency is present elsewhere, or remove dependency
     # add each list-element as a new row to a matrix, in two passes
     # first pass: go through each list element, unlist it and remember future column names
     columnNames <- c()
-    if (length(list) > 0) {
-        for (i in 1:(length(list))) {
-            cat('i: ', i, '\n')
-            list[[i]] <- unlist(list[[i]])
-            columnNames <- union(columnNames, names(list[[i]]))
+    if (length(l) > 0) {
+        for (i in 1:(length(l))) {
+            l[[i]] <- unlist(l[[i]])
+            columnNames <- union(columnNames, names(l[[i]]))
         }
     }
     
     # second pass: go through each list element and add its elements to correct column
-    df <- matrix(nrow = length(list), ncol = length(columnNames))
-    if (length(list) > 0) {
-        for (i in 1:(length(list))) {
-            df[i, match(names(list[[i]]), columnNames)] <- list[[i]]
+    df <- matrix(nrow = length(l), ncol = length(columnNames))
+    if (length(l) > 0) {
+        for (i in 1:(length(l))) {
+            df[i, match(names(l[[i]]), columnNames)] <- l[[i]]
         }
     }
     colnames(df) <- columnNames
 
     # check whether list contains valid row names, and if true; use them
-    if (length(list) < 1 || is.null(names(list)) || is.na(names(list)) || length(names(list)) != length(list)) { 
+    if (length(l) < 1 || is.null(names(l)) || is.na(names(l)) || length(names(l)) != length(l)) { 
         rownames(df) <- NULL
-    } else { rownames(df) <- names(list) }
+    } else { rownames(df) <- names(l) }
     # convert matrix to data.frame
     as.data.frame(df, stringsAsFactors = FALSE)
 }
