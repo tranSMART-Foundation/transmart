@@ -17,17 +17,6 @@ class SmartRService {
 
     def parameterMap = [:]
 
-    def getWorkingDir(user) {
-        def tempDir = Holders.config.RModules.tempFolderDirectory
-        tempDir = tempDir.replace('\\', '/')
-        if (! tempDir.endsWith('/')) {
-            tempDir += '/'
-        }
-        def workingDir = "${tempDir}SmartR/${user}/"
-        new File(workingDir).mkdirs()
-        return workingDir
-    }
-
     def queryData() {
         def data_cohort1 = [:]
         def data_cohort2 = [:]
@@ -74,8 +63,8 @@ class SmartRService {
             }
         }
 
-        new File(parameterMap['data_cohort1']).write(new JsonBuilder(data_cohort1).toString())
-        new File(parameterMap['data_cohort2']).write(new JsonBuilder(data_cohort2).toString())
+        parameterMap['data_cohort1'] = new JsonBuilder(data_cohort1).toString()
+        parameterMap['data_cohort2'] = new JsonBuilder(data_cohort2).toString()
     }
 
     /**
@@ -97,28 +86,14 @@ class SmartRService {
         }
     }
 
-    def cleanUp() {
-        def data_cohort1 = new File(parameterMap['data_cohort1'])
-        if (data_cohort1.exists()) {
-            data_cohort1.delete()
-        }
-        def data_cohort2 = new File(parameterMap['data_cohort2'])
-        if (data_cohort2.exists()) {
-            data_cohort2.delete()
-        }
-    }
-
     def initParameterMap(params) {
         def init = params.init.toBoolean()
         def user = springSecurityService.getPrincipal().username
-        def workingDir = getWorkingDir(user)
         def conceptBoxes = new JsonSlurper().parseText(params.conceptBoxes)
         parameterMap['init'] = init
         parameterMap['user'] = user
         parameterMap['script'] = params.script
         parameterMap['scriptDir'] = getScriptDir()
-        parameterMap['data_cohort1'] = workingDir + 'data_cohort1.json'
-        parameterMap['data_cohort2'] = workingDir + 'data_cohort2.json' 
         parameterMap['result_instance_id1'] = params.result_instance_id1
         parameterMap['result_instance_id2'] = params.result_instance_id2
         parameterMap['settings'] = params.settings
@@ -129,7 +104,6 @@ class SmartRService {
         initParameterMap(params)
 
         if (parameterMap['init']) {
-            cleanUp()
             queryData()
         }
 

@@ -979,11 +979,6 @@
             timeout: '600000',
             data: data
         }).done(function(serverAnswer) {
-            serveranswer = JSON.parse(serverAnswer)
-            if (serverAnswer.error) {
-                alert(serverAnswer.error);
-                return;
-            }
             jQuery("#outputDIV").html(serverAnswer);
             jQuery("#loadMoreButton").attr("disabled", false);
             jQuery("#loadMoreButton").val('Load 100 additional rows');

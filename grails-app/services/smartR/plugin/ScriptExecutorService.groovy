@@ -27,11 +27,34 @@ class ScriptExecutorService {
     }
 
     def buildEnvironment(parameterMap) {
+        // This should be the size for a string of 10MB
+        def STRING_PART_SIZE = 10 * 1024 * 1024 / 2
+
+        def dataString1 = parameterMap['data_cohort1'].toString()
+        def dataString2 = parameterMap['data_cohort2'].toString()
+
+        def dataPackages1 = dataString1.split("(?<=\\G.{${STRING_PART_SIZE}})")
+        def dataPackages2 = dataString2.split("(?<=\\G.{${STRING_PART_SIZE}})")
+
+        this.rServeConnection.assign("data_cohort1", '')
+        this.rServeConnection.assign("data_cohort2", '')
+
+        dataPackages1.each { chunk ->
+            this.rServeConnection.assign("chunk", chunk)
+            this.rServeConnection.eval("data_cohort1 <- paste(data_cohort1, chunk, sep='')")
+        }
+
+        dataPackages2.each { chunk ->
+            this.rServeConnection.assign("chunk", chunk)
+            this.rServeConnection.eval("data_cohort2 <- paste(data_cohort2, chunk, sep='')")
+        }
+
         this.rServeConnection.assign("settings", parameterMap['settings'])
+
         this.rServeConnection.eval("""
             require(jsonlite)
-            data.cohort1 <- fromJSON('${parameterMap['data_cohort1']}')
-            data.cohort2 <- fromJSON('${parameterMap['data_cohort2']}')
+            data.cohort1 <- fromJSON(data_cohort1)
+            data.cohort2 <- fromJSON(data_cohort2)
             settings <- fromJSON(settings)
             output <- list()
         """)
