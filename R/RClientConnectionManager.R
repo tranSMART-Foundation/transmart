@@ -70,8 +70,8 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             "/oauth/authorize?response_type=code&client_id=", 
             transmartClientEnv$client_id,
             "&client_secret=", transmartClientEnv$client_secret,
-            "&redirect_uri=", transmartClientEnv$oauthDomain,
-            "/oauth/verify")
+            "&redirect_uri=", URLencode(transmartClientEnv$oauthDomain, TRUE),
+            URLencode("/oauth/verify", TRUE))
 
     if (is.null(prefetched.request.token)) {
         cat("Please visit the following url to authenticate this RClient (enter nothing to cancel):\n\n",
@@ -90,9 +90,9 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             "/oauth/token?grant_type=authorization_code&client_id=",
             transmartClientEnv$client_id,
             "&client_secret=", transmartClientEnv$client_secret,
-            "&code=", request.token,
-            "&redirect_uri=", transmartClientEnv$oauthDomain,
-            "/oauth/verify")
+            "&code=", URLencode(request.token, TRUE),
+            "&redirect_uri=", URLencode(transmartClientEnv$oauthDomain, TRUE),
+            URLencode("/oauth/verify", TRUE))
 
     oauthResponse <- NULL
     tryCatch(oauthResponse <- getURL(oauth.exchange.token.url, verbose = getOption("verbose")), 
@@ -122,9 +122,9 @@ refreshToken <- function(oauthDomain = transmartClientEnv$transmartDomain) {
                         "/oauth/token?grant_type=refresh_token",
                         "&client_id=", transmartClientEnv$client_id,
                         "&client_secret=", transmartClientEnv$client_secret,
-                        "&refresh_token=", transmartClientEnv$refresh_token,
-                        "&redirect_uri=", transmartClientEnv$oauthDomain,
-                        "/oauth/verify",
+                        "&refresh_token=", URLencode(transmartClientEnv$refresh_token, TRUE),
+                        "&redirect_uri=", URLencode(transmartClientEnv$oauthDomain, TRUE),
+                        URLencode("/oauth/verify", TRUE),
                         "")
     
     oauthResponse <- NULL
