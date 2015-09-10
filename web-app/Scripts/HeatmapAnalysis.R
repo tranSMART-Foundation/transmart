@@ -11,7 +11,13 @@ maxRows <- ifelse(is.null(settings$maxRows), 100, as.integer(settings$maxRows))
 ### COMPUTE RESULTS ###
 
 getHDDMatrix <- function(raw.data) {
-    HDD.matrix <- melt(raw.data, id=c('PATIENTID', 'PROBE', 'GENEID', 'GENESYMBOL'), na.rm=TRUE)
+    HDD.matrix <- data.frame(
+        PATIENTID=raw.data$PATIENTID,
+        PROBE=raw.data$PROBE,
+        GENEID=raw.data$GENEID,
+        GENESYMBOL=raw.data$GENESYMBOL,
+        VALUE=raw.data$VALUE)
+    HDD.matrix <- melt(HDD.matrix, id=c('PATIENTID', 'PROBE', 'GENEID', 'GENESYMBOL'), na.rm=TRUE)
     HDD.matrix <- data.frame(dcast(HDD.matrix, PROBE + GENEID + GENESYMBOL ~ PATIENTID), stringsAsFactors=FALSE)
     if (discardNullGenes) {
         HDD.matrix <- HDD.matrix[HDD.matrix$GENESYMBOL != '', ]

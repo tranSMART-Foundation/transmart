@@ -17,11 +17,6 @@ class DataQueryService {
     def dataSource
     def i2b2HelperService
 
-    /**
-    *   This method can be considered the main method of this class
-    *   It will collect all possible low dimensional data for every given concept.
-    *   Also it does a filtering based on the given patient ids.
-    */
     def getAllData(conceptKeys, patientIDs) {
         def data = []
         conceptKeys.each { conceptKey ->

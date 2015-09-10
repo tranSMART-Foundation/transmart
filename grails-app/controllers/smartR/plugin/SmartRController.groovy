@@ -37,7 +37,7 @@ class SmartRController {
         params.init = false
         def (success, results) = smartRService.runScript(params)
         def answer = success ? results : [error: [results]]
-        render answer as JSON
+        render answer
     }
 
     def recomputeOutputDIV = {

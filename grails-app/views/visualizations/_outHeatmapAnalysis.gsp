@@ -979,6 +979,7 @@
             timeout: '600000',
             data: data
         }).done(function(serverAnswer) {
+            serveranswer = JSON.parse(serverAnswer)
             if (serverAnswer.error) {
                 alert(serverAnswer.error);
                 return;
