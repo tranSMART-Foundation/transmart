@@ -200,7 +200,7 @@ refreshToken <- function(oauthDomain = transmartClientEnv$transmartDomain) {
 .serverMessageExchange <- 
 function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.progresscallback.download()) {
     if (any(accept.type == c("default", "hal"))) {
-        if (accept.type == "hal") { httpHeaderFields <- c(httpHeaderFields, accept = "application/hal+json") }
+        if (accept.type == "hal") { httpHeaderFields <- c(httpHeaderFields, Accept = "application/hal+json;charset=UTF-8") }
         result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
                 verbose = getOption("verbose"),
                 httpheader = httpHeaderFields)
