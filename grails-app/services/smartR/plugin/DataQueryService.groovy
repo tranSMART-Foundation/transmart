@@ -52,7 +52,6 @@ class DataQueryService {
     }
 
     def exportHighDimData(conceptKeys, patientIDs, resultInstanceId) {
-        List<String> HEADER = ['PATIENTID', 'VALUE', 'PROBE', 'GENEID', 'GENESYMBOL']
         char COLUMN_SEPERATOR = '\t'
         def query = 
         """
@@ -60,7 +59,6 @@ class DataQueryService {
             ssm.patient_id,
             ma.probe_id,
             ma.gene_symbol,
-            ma.gene_id,
             smd.raw_intensity
         FROM
             deapp.de_subject_microarray_data smd
@@ -87,12 +85,11 @@ class DataQueryService {
         def conceptCode = i2b2HelperService.getConceptCodeFromKey(conceptKeys[0])
         def params = patientIDs
         params << conceptCode
-        def data = [PATIENTID: [], VALUE: [], PROBE: [], GENEID: [], GENESYMBOL: []]
+        def data = [PATIENTID: [], VALUE: [], PROBE: [], GENESYMBOL: []]
         new Sql(dataSource).eachRow(query, params, { row ->
             data.PATIENTID << row.patient_id
             data.VALUE << row.raw_intensity
             data.PROBE << row.probe_id
-            data.GENEID << row.gene_id
             data.GENESYMBOL << row.gene_symbol
         })
         return data

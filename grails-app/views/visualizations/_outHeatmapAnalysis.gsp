@@ -264,7 +264,6 @@
     var significanceValues = data.significanceValues;
     var patientIDs = data.patientIDs;
     var probes = data.probes;
-    var geneIDs = data.geneIDs;
     var geneSymbols = data.geneSymbols;
 
     var originalPatientIDs = patientIDs.slice();
@@ -570,7 +569,7 @@
         .style("text-anchor", "start")
         .text(function(d) { 
             var i = probes.indexOf(d);
-            return d + '  //  ' + geneIDs[i] + '  //  ' + geneSymbols[i]; 
+            return d + '  //  ' + geneSymbols[i]; 
         });
 
         probe
@@ -579,8 +578,12 @@
         .attr('x', width + gridFieldWidth + 7)
         .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
 
+        var significanceIndexMap = jQuery.map(significanceValues, function(d, i) {
+            return {significance: d, idx: i}; 
+        });
+        
         var bar = barItems.selectAll('.bar')
-        .data(significanceValues.map(function(d, i) { return {significance: d, idx: i}; }), function(d) { return d.idx; });
+        .data(significanceIndexMap, function(d) { return d.idx; });
 
         bar
         .enter()
@@ -597,8 +600,10 @@
             .html(html)
             .style("left", mouseX() + "px")
             .style("top", mouseY() + "px");
-            d3.selectAll('.square.probe-' +  probes[d.idx]).classed("squareHighlighted", true);
-            d3.select('.probe.probe-' +  probes[d.idx]).classed("highlight", true);
+            d3.selectAll('.square.probe-' +  probes[d.idx])
+            .classed("squareHighlighted", true);
+            d3.select('.probe.probe-' +  probes[d.idx])
+            .classed("highlight", true);
         })
         .on("mouseout", function(d) {
             tooltip.style("visibility", "hidden");
@@ -902,17 +907,14 @@
 
     function updateRowOrder(sortValues) {
         var sortedProbes = [];
-        var sortedGeneIDs = [];
         var sortedGeneSymbols = [];
         var sortedSignificanceValues = [];
         for (var i = 0; i < sortValues.length; i++) {
             sortedProbes.push(probes[sortValues[i]]);
-            sortedGeneIDs.push(geneIDs[sortValues[i]]);
             sortedGeneSymbols.push(geneSymbols[sortValues[i]]);
             sortedSignificanceValues.push(significanceValues[sortValues[i]]);
         }
         probes = sortedProbes;
-        geneIDs = sortedGeneIDs;
         geneSymbols = sortedGeneSymbols;
         significanceValues = sortedSignificanceValues;
         removeRowDendrogram();

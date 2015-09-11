@@ -10,7 +10,6 @@ class SmartRService {
 
     def grailsApplication = Holders.grailsApplication
     def springSecurityService
-    def quartzScheduler
     def i2b2HelperService
     def dataQueryService
     def scriptExecutorService

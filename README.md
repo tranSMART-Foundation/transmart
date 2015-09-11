@@ -8,7 +8,7 @@
 There is no warranty of any kind that it works as intended. 
 Keep it mind that making use of this software is at your own risk!*
 
-**Please report bugs and issues here: [Issues](https://cc-usersupport.in2p3.fr/otrs/customer.pl)**
+**Please report bugs and issues here: [Issues](http://usersupport.etriks.org)**
 
 ---
 
@@ -32,7 +32,6 @@ grails.plugin.location.smartR = '/path/to/smartR'
 - tranSMART eTRIKS/research branch (full support)
 - R packages: 
   - [jsonlite](https://cran.r-project.org/web/packages/jsonlite/index.html)
-  - [data.table](https://cran.r-project.org/web/packages/data.table/index.html)
   - [reshape2](https://cran.r-project.org/web/packages/reshape2/index.html)
   - [limma](http://bioconductor.org/packages/release/bioc/html/limma.html)
   - [zoo](https://cran.r-project.org/web/packages/zoo/index.html)

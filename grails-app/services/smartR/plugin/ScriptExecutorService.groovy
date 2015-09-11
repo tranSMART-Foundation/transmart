@@ -1,7 +1,6 @@
 package smartR.plugin
 
 import grails.util.Holders
-import grails.converters.JSON
 import org.rosuda.REngine.Rserve.RConnection
 
 
@@ -12,21 +11,27 @@ class ScriptExecutorService {
     def rServeConnection = null
 
     def initConnection() {
-        // make sure that a _working_ connection exists
         try {
+            // make sure that a _working_ connection is established
             this.rServeConnection.assign('test', 123)
-        } catch (Exception e) {
+            return true
+        } catch (all) { }
+        
+        try {
             this.rServeConnection = new RConnection(Holders.config.RModules.host, Holders.config.RModules.port)
             this.rServePid = this.rServeConnection.eval("Sys.getpid()").asInteger()
             this.rServeConnection.stringEncoding = 'utf8'
-        }
+            return true
+        } catch (all) { }
+
+        return false
     }
 
     def clearSession() {
         this.rServeConnection.eval("rm(list=ls(all=TRUE))")
     }
 
-    def buildEnvironment(parameterMap) {
+    def transferData(parameterMap) {
         // This should be the size for a string of 10MB
         def STRING_PART_SIZE = 10 * 1024 * 1024 / 2
 
@@ -49,12 +54,17 @@ class ScriptExecutorService {
             this.rServeConnection.eval("data_cohort2 <- paste(data_cohort2, chunk, sep='')")
         }
 
-        this.rServeConnection.assign("settings", parameterMap['settings'])
-
         this.rServeConnection.eval("""
             require(jsonlite)
             data.cohort1 <- fromJSON(data_cohort1)
             data.cohort2 <- fromJSON(data_cohort2)
+        """)
+    }
+
+    def buildSettings(parameterMap) {
+        this.rServeConnection.assign("settings", parameterMap['settings'])
+        this.rServeConnection.eval("""
+            require(jsonlite)
             settings <- fromJSON(settings)
             output <- list()
         """)
@@ -72,13 +82,28 @@ class ScriptExecutorService {
     }
 
     def run(parameterMap) {
-        initConnection()
-        clearSession()
-        buildEnvironment(parameterMap)
+        // initialize Rserve connection
+        if (! initConnection()) {
+            print '================'
+            return [false, 'Rserve refused the connection! Is it running?']
+        }
+
+        // start with a clear environment and send all data to R
+        if (parameterMap['init']) {
+            clearSession()
+            transferData(parameterMap)
+        }
+        
+        // update settings
+        buildSettings(parameterMap)
+
+        // evaluate analysis script
         def ret = evaluateScript(parameterMap)
         if (ret.inherits("try-error")) {
             return [false, ret.asString()]
         }
+
+        // get the results of the previous evaluation
         def results = computeResults()
         return [true, results]
     }
@@ -93,4 +118,3 @@ class ScriptExecutorService {
         killConnection.eval("tools::pskill(${this.rServePid}, tools::SIGKILL)")
     }
 }
-
