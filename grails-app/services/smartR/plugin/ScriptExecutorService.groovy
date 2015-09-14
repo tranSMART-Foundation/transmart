@@ -2,36 +2,45 @@ package smartR.plugin
 
 import grails.util.Holders
 import org.rosuda.REngine.Rserve.RConnection
+import org.apache.log4j.Logger
 
 
 class ScriptExecutorService {
 
-    def interrupted = false
-    def rServePid = -1
-    def rServeConnection = null
+    def log = Logger
 
-    def initConnection() {
+    def rServeConnections = [:]
+
+    def getConnection(parameterMap) {
+        def cookieID = parameterMap['cookieID']
         try {
-            // make sure that a _working_ connection is established
-            this.rServeConnection.assign('test', 123)
-            return true
-        } catch (all) { }
+            def connection = this.rServeConnections[cookieID]
+            this.rServeConnections[cookieID].assign("test", "123") // make sure that this is a _working_ connection
+            return connection
+        } catch (all) { 
+            // if we actually established a connection but it failed the assign test then it must be broken
+            if (this.rServeConnections[cookieID]) {
+                closeConnection(cookieID)
+            }
+        }
         
         try {
-            this.rServeConnection = new RConnection(Holders.config.RModules.host, Holders.config.RModules.port)
-            this.rServePid = this.rServeConnection.eval("Sys.getpid()").asInteger()
-            this.rServeConnection.stringEncoding = 'utf8'
-            return true
+            def rServeHost = Holders.config.RModules.host
+            def rServePort = Holders.config.RModules.port
+            def connection = new RConnection(rServeHost, rServePort)
+            this.rServeConnections[cookieID] = connection
+            connection.stringEncoding = 'utf8'
+            return connection
         } catch (all) { }
 
-        return false
+        return null
     }
 
-    def clearSession() {
-        this.rServeConnection.eval("rm(list=ls(all=TRUE))")
+    def clearSession(connection) {
+        connection.eval("rm(list=ls(all=TRUE))")
     }
 
-    def transferData(parameterMap) {
+    def transferData(parameterMap, connection) {
         // This should be the size for a string of 10MB
         def STRING_PART_SIZE = 10 * 1024 * 1024 / 2
 
@@ -41,80 +50,94 @@ class ScriptExecutorService {
         def dataPackages1 = dataString1.split("(?<=\\G.{${STRING_PART_SIZE}})")
         def dataPackages2 = dataString2.split("(?<=\\G.{${STRING_PART_SIZE}})")
 
-        this.rServeConnection.assign("data_cohort1", '')
-        this.rServeConnection.assign("data_cohort2", '')
+        connection.assign("data_cohort1", '')
+        connection.assign("data_cohort2", '')
 
         dataPackages1.each { chunk ->
-            this.rServeConnection.assign("chunk", chunk)
-            this.rServeConnection.eval("data_cohort1 <- paste(data_cohort1, chunk, sep='')")
+            connection.assign("chunk", chunk)
+            connection.eval("data_cohort1 <- paste(data_cohort1, chunk, sep='')")
         }
 
         dataPackages2.each { chunk ->
-            this.rServeConnection.assign("chunk", chunk)
-            this.rServeConnection.eval("data_cohort2 <- paste(data_cohort2, chunk, sep='')")
+            connection.assign("chunk", chunk)
+            connection.eval("data_cohort2 <- paste(data_cohort2, chunk, sep='')")
         }
 
-        this.rServeConnection.eval("""
+        connection.eval("""
             require(jsonlite)
             data.cohort1 <- fromJSON(data_cohort1)
             data.cohort2 <- fromJSON(data_cohort2)
         """)
     }
 
-    def buildSettings(parameterMap) {
-        this.rServeConnection.assign("settings", parameterMap['settings'])
-        this.rServeConnection.eval("""
+    def buildSettings(parameterMap, connection) {
+        connection.assign("settings", parameterMap['settings'].toString())
+        connection.eval("""
             require(jsonlite)
             settings <- fromJSON(settings)
             output <- list()
         """)
     }
 
-    def evaluateScript(parameterMap) {
+    def evaluateScript(parameterMap, connection) {
         def scriptCommand = "source('${parameterMap['scriptDir'] + parameterMap['script']}')".replace("\\", "/")
-        def ret = this.rServeConnection.parseAndEval("try(${scriptCommand}, silent=TRUE)")
+        def ret = connection.parseAndEval("try(${scriptCommand}, silent=TRUE)")
         return ret
     }
 
-    def computeResults() {
-        def results = this.rServeConnection.eval("toString(toJSON(output))").asString()
+    def computeResults(connection) {
+        def results = connection.eval("toString(toJSON(output))").asString()
         return results
     }
 
     def run(parameterMap) {
+        print '==========================='
+        print rServeConnections
+        print '==========================='
         // initialize Rserve connection
-        if (! initConnection()) {
-            print '================'
+        def connection = getConnection(parameterMap)
+        if (! connection) {
             return [false, 'Rserve refused the connection! Is it running?']
         }
 
-        // start with a clear environment and send all data to R
+        // if first run start with a clear environment and send all data to our connection
         if (parameterMap['init']) {
-            clearSession()
-            transferData(parameterMap)
+            clearSession(connection)
+            transferData(parameterMap, connection)
         }
         
-        // update settings
-        buildSettings(parameterMap)
+        // send settings to our connection
+        buildSettings(parameterMap, connection)
 
         // evaluate analysis script
-        def ret = evaluateScript(parameterMap)
+        def ret = evaluateScript(parameterMap, connection)
         if (ret.inherits("try-error")) {
             return [false, ret.asString()]
         }
 
-        // get the results of the previous evaluation
-        def results = computeResults()
+        // get the results of our connection
+        def results = computeResults(connection)
         return [true, results]
     }
 
-    def interrupt() {
-        this.interrupted = true // check against this in run() or the Rscript itself for natural termination
+    def closeConnection(id) {
+        clearSession(this.rServeConnections[id])
+        this.rServeConnections[id].close()
+        this.rServeConnections.remove(id)
     }
 
-    def forceKill() {
+    def closeAllConnection() {
+        this.rServeConnections.each { id, connection ->
+            closeConnection(id)
+        }
+        assert this.rServeConnections.size() == 0
+    }
+
+    def forceKill(connection) {
+        def pid = connection.eval("Sys.getpid()").asInteger()
         def killConnection = new RConnection()
-        killConnection.eval("tools::pskill(${this.rServePid})")
-        killConnection.eval("tools::pskill(${this.rServePid}, tools::SIGKILL)")
+        killConnection.eval("tools::pskill(${pid})")
+        killConnection.eval("tools::pskill(${pid}, tools::SIGKILL)")
+        killConnection.close()
     }
 }

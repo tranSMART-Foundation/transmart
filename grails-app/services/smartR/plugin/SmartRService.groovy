@@ -105,6 +105,7 @@ class SmartRService {
         parameterMap['result_instance_id2'] = params.result_instance_id2
         parameterMap['settings'] = params.settings
         parameterMap['conceptBoxes'] = conceptBoxes
+        parameterMap['cookieID'] = params.cookieID
     }
 
     def runScript(params) {
