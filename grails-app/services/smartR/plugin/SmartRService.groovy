@@ -8,6 +8,9 @@ import grails.util.Environment
 
 class SmartRService {
 
+    def DEBUG = false
+    def DEBUG_TMP_DIR = 'C:/Temp/'
+
     def grailsApplication = Holders.grailsApplication
     def springSecurityService
     def i2b2HelperService
@@ -20,8 +23,8 @@ class SmartRService {
         def data_cohort1 = [:]
         def data_cohort2 = [:]
         
-        def rIID1 = parameterMap['result_instance_id1']
-        def rIID2 = parameterMap['result_instance_id2']
+        def rIID1 = parameterMap['result_instance_id1'].toString()
+        def rIID2 = parameterMap['result_instance_id2'].toString()
         
         def patientIDs_cohort1 = rIID1 ? i2b2HelperService.getSubjectsAsList(rIID1).collect { it.toLong() } : []
         def patientIDs_cohort2 = rIID2 ? i2b2HelperService.getSubjectsAsList(rIID2).collect { it.toLong() } : []
@@ -64,6 +67,11 @@ class SmartRService {
 
         parameterMap['data_cohort1'] = new JsonBuilder(data_cohort1).toString()
         parameterMap['data_cohort2'] = new JsonBuilder(data_cohort2).toString()
+
+        if (DEBUG) {
+            new File(DEBUG_TMP_DIR + 'data1.json').write(parameterMap['data_cohort1'])
+            new File(DEBUG_TMP_DIR + 'data2.json').write(parameterMap['data_cohort2'])
+        }
     }
 
     /**
