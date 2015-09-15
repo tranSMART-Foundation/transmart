@@ -131,7 +131,7 @@
     var width = jQuery("#smartRPanel").width() / 2 - 10 - margin.left - margin.right;
     var height = jQuery("#smartRPanel").height() / 2 - 10 - margin.top - margin.bottom;
 
-    var results = ${raw(results)};
+    var results = ${results};
     var xLabel = results.xArrLabel;
     var yLabel = results.yArrLabel;
     var xArr = results.xArr;
@@ -525,6 +525,7 @@
             timeout: '600000',
             data: data
         }).done(function(serverAnswer) {
+            serverAnswer = JSON.parse(serverAnswer)
             if (serverAnswer.error) {
                 alert(serverAnswer.error);
                 return;

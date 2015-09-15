@@ -24,20 +24,20 @@ class SmartRController {
     */
     def renderOutputDIV = {
         params.init = params.init == null ? true : params.init // defaults to true
-        def (success, results) = smartRService.runJob(params)
+        def (success, results) = smartRService.runScript(params)
         if (! success) {
             render results
         } else {
-            render template: '/visualizations/' + 'out' + FilenameUtils.getBaseName(params.script),
-                    model: [results: results as JSON]
+            render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
+                    model: [results: results]
         }
     }
 
     def updateOutputDIV = {
         params.init = false
-        def (success, results) = smartRService.runJob(params)
+        def (success, results) = smartRService.runScript(params)
         def answer = success ? results : [error: [results]]
-        render answer as JSON
+        render answer
     }
 
     def recomputeOutputDIV = {
@@ -54,7 +54,7 @@ class SmartRController {
         if (! params.script) {
             render 'Please select a script to execute.'
         } else {
-            render template: '/smartR/' + 'in' + FilenameUtils.getBaseName(params.script)
+            render template: "/smartR/in${FilenameUtils.getBaseName(params.script)}"
         }
     }
 

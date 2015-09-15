@@ -270,6 +270,7 @@ function prepareFormData() {
     data.push({name: 'result_instance_id2', value: GLOBAL.CurrentSubsetIDs[2]});
     data.push({name: 'script', value: jQuery('#scriptSelect').val()});
     data.push({name: 'settings', value: JSON.stringify(getSettings())});
+    data.push({name: 'cookieID', value: setSmartRCookie()});
     return data;
 }
 
@@ -316,6 +317,22 @@ function sane() { // FIXME: somehow check for subset2 to be non empty iff two co
     return customSanityCheck(); // method MUST be implemented by _inFoobarAnalysis.gsp
 }
 
+function setSmartRCookie() {
+    // first check if a cookie exists
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i];
+        var crumbs = cookie.split('=');
+        if (crumbs[0] === 'SmartR') {
+            return crumbs[1];
+        }
+    }
+    // create one if not
+    var id = new Date().getTime();
+    document.cookie = 'SmartR=' + id;
+    return id;
+}
+
 /**
 *   Initial method for the whole process of computing a visualization
 */
@@ -343,7 +360,7 @@ function runRScript() {
     }).done(function(serverAnswer) {
         jQuery("#outputDIV").html(serverAnswer);
     }).fail(function() {
-        jQuery("#outputDIV").html("AJAX CALL FAILED!");
+        jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
     });
 }
 
@@ -361,6 +378,6 @@ function changeInputDIV() {
     }).done(function(serverAnswer) {
         jQuery("#inputDIV").html(serverAnswer);
     }).fail(function() {
-        jQuery("#inputDIV").html("AJAX CALL FAILED!");
+        jQuery("#inputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
     });
 }

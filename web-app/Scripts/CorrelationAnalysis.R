@@ -15,17 +15,29 @@ if (! is.null(settings$xLow)) {
 
 ### COMPUTE RESULTS ###
 
-points <- lowDimData_cohort1$datapoints
-patientIDs <- unique(points$patientID)
+points <- data.cohort1$datapoints
 concepts <- unique(points$concept)
 if (length(concepts) != 2) {
 	stop('Please specify exactly two variables to compare with each other!')
 }
-xArr <- points[points$concept == concepts[1], ]$value
-yArr <- points[points$concept == concepts[2], ]$value
+xArr <- points[points$concept == concepts[1], ]
+yArr <- points[points$concept == concepts[2], ]
+
+xArr <- xArr[xArr$patientID %in% yArr$patientID, ]
+yArr <- yArr[yArr$patientID %in% xArr$patientID, ]
+
+xArr <- xArr[order(xArr$patientID), ]
+yArr <- yArr[order(yArr$patientID), ]
+
+patientIDs <- xArr$patientID
+
+xArr <- xArr$value
+yArr <- yArr$value
+
 if (length(xArr) != length(yArr)) {
-	stop('Both variables must have the same number of patients!')
+	stop(paste('Both variables must have the same number of patients!', length(xArr), length(yArr)))
 }
+
 selection <- (xArr >= xLow
 			& xArr <= xHigh
 			& yArr >= yLow
@@ -34,7 +46,7 @@ xArr <- xArr[selection]
 yArr <- yArr[selection]
 patientIDs <- patientIDs[selection]
 
-annotations <- lowDimData_cohort1$annotations
+annotations <- data.cohort1$annotations
 tags <- list()
 if (length(annotations) > 0) {
 	annotations <- annotations[annotations$patientID %in% patientIDs, ]

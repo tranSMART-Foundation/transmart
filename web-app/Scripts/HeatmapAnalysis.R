@@ -11,8 +11,13 @@ maxRows <- ifelse(is.null(settings$maxRows), 100, as.integer(settings$maxRows))
 ### COMPUTE RESULTS ###
 
 getHDDMatrix <- function(raw.data) {
-    HDD.matrix <- melt(raw.data, id=c('PATIENTID', 'PROBE', 'GENEID', 'GENESYMBOL'), na.rm=TRUE)
-    HDD.matrix <- data.frame(dcast(HDD.matrix, PROBE + GENEID + GENESYMBOL ~ PATIENTID), stringsAsFactors=FALSE)
+    HDD.matrix <- data.frame(
+        PATIENTID=raw.data$PATIENTID,
+        PROBE=raw.data$PROBE,
+        GENESYMBOL=raw.data$GENESYMBOL,
+        VALUE=raw.data$VALUE)
+    HDD.matrix <- melt(HDD.matrix, id=c('PATIENTID', 'PROBE', 'GENESYMBOL'), na.rm=TRUE)
+    HDD.matrix <- data.frame(dcast(HDD.matrix, PROBE + GENESYMBOL ~ PATIENTID), stringsAsFactors=FALSE)
     if (discardNullGenes) {
         HDD.matrix <- HDD.matrix[HDD.matrix$GENESYMBOL != '', ]
     }
@@ -22,7 +27,7 @@ getHDDMatrix <- function(raw.data) {
 }
 
 extractMatrixValues <- function(HDD.matrix) {
-    valueMatrix <- HDD.matrix[, -(1:3)]
+    valueMatrix <- HDD.matrix[, -(1:2)]
     valueMatrix
 }
 
@@ -81,13 +86,13 @@ fixString <- function(str) {
 }
 
 buildFields <- function(HDD.value.matrix, HDD.zscore.matrix) {
-    fields.value <- melt(HDD.value.matrix, id=c('PROBE', 'GENEID', 'GENESYMBOL', 'SIGNIFICANCE'))
-    fields.zScore <- melt(HDD.zscore.matrix, id=c('PROBE', 'GENEID', 'GENESYMBOL', 'SIGNIFICANCE'))
+    fields.value <- melt(HDD.value.matrix, id=c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE'))
+    fields.zScore <- melt(HDD.zscore.matrix, id=c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE'))
     
     fields <- fields.value
     fields <- cbind(fields, fields.zScore$value)
     
-    names(fields) <- c('PROBE', 'GENEID', 'GENESYMBOL', 'SIGNIFICANCE', 'PATIENTID', 'VALUE', 'ZSCORE')
+    names(fields) <- c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE', 'PATIENTID', 'VALUE', 'ZSCORE')
     fields$PATIENTID <- as.numeric(sub("^X", "", levels(fields$PATIENTID)))[fields$PATIENTID]
     fields <- fields[order(fields$PROBE, fields$PATIENTID, decreasing=FALSE), ]
     fields <- fields[order(fields$SIGNIFICANCE, decreasing=TRUE), ]
@@ -124,12 +129,12 @@ dendrogramToJSON <- function(d) {
     return(jsonString)
 }
 
-HDD.value.matrix.cohort1 <- getHDDMatrix(highDimData_cohort1)
-patientIDs.cohort1 <- as.numeric(sub("^X", "", colnames(HDD.value.matrix.cohort1))[-(1:3)])
-colNum <- ncol(HDD.value.matrix.cohort1) - 3
-if (length(highDimData_cohort2) > 0) {
-    HDD.value.matrix.cohort2 <- getHDDMatrix(highDimData_cohort2)
-    patientIDs.cohort2 <- as.numeric(sub("^X", "", colnames(HDD.value.matrix.cohort2))[-(1:3)])
+HDD.value.matrix.cohort1 <- getHDDMatrix(data.cohort1$mRNAData)
+patientIDs.cohort1 <- as.numeric(sub("^X", "", colnames(HDD.value.matrix.cohort1))[-(1:2)])
+colNum <- ncol(HDD.value.matrix.cohort1) - 2
+if (length(data.cohort2$mRNAData) > 0) {
+    HDD.value.matrix.cohort2 <- getHDDMatrix(data.cohort2$mRNAData)
+    patientIDs.cohort2 <- as.numeric(sub("^X", "", colnames(HDD.value.matrix.cohort2))[-(1:2)])
 
     HDD.value.matrix.cohort1 <- HDD.value.matrix.cohort1[HDD.value.matrix.cohort1$PROBE %in% HDD.value.matrix.cohort2$PROBE, ]
     HDD.value.matrix.cohort2 <- HDD.value.matrix.cohort2[HDD.value.matrix.cohort2$PROBE %in% HDD.value.matrix.cohort1$PROBE, ]
@@ -138,7 +143,7 @@ if (length(highDimData_cohort2) > 0) {
     valueMatrix.cohort2 <- extractMatrixValues(HDD.value.matrix.cohort2)
 
     valueMatrix <- cbind(valueMatrix.cohort1, valueMatrix.cohort2)
-    HDD.value.matrix <- cbind(HDD.value.matrix.cohort1[, 1:3], valueMatrix)
+    HDD.value.matrix <- cbind(HDD.value.matrix.cohort1[, 1:2], valueMatrix)
 } else {
     valueMatrix <- extractMatrixValues(HDD.value.matrix.cohort1)
     HDD.value.matrix <- HDD.value.matrix.cohort1
@@ -146,18 +151,17 @@ if (length(highDimData_cohort2) > 0) {
 
 patientIDs <- as.numeric(sub("^X", "", colnames(valueMatrix)))
 zScoreMatrix <- getZScoreMatrix(valueMatrix)
-HDD.zScore.matrix <- cbind(HDD.value.matrix[, 1:3], zScoreMatrix)
+HDD.zScore.matrix <- cbind(HDD.value.matrix[, 1:2], zScoreMatrix)
 
 significanceValues <- getSignificanceValues(valueMatrix, zScoreMatrix, colNum)
 FINAL.HDD.value.matrix <- sortAndCutHDDMatrix(HDD.value.matrix, significanceValues)
 FINAL.HDD.zScore.matrix <- sortAndCutHDDMatrix(HDD.zScore.matrix, significanceValues)
 
 significanceValues.sorted <- FINAL.HDD.value.matrix$SIGNIFICANCE
-zScoreMatrix.sorted <- FINAL.HDD.zScore.matrix[, -c(1:3, ncol(FINAL.HDD.zScore.matrix))]
+zScoreMatrix.sorted <- FINAL.HDD.zScore.matrix[, -c(1:2, ncol(FINAL.HDD.zScore.matrix))]
 
 fields <- buildFields(FINAL.HDD.value.matrix, FINAL.HDD.zScore.matrix)
 probes <- fixString(FINAL.HDD.value.matrix$PROBE)
-geneIDs <- FINAL.HDD.value.matrix$GENEID
 geneSymbols <- FINAL.HDD.value.matrix$GENESYMBOL
 
 colDendrogramEuclideanComplete <- computeDendrogram(t(zScoreMatrix.sorted), 'euclidean', 'complete')
@@ -201,15 +205,15 @@ buildLowDimFields <- function(featureName, local.patientIDs, global.patientIDs, 
 extraFields <- c()
 features <- c()
 
-if (length(highDimData_cohort2) > 0) {
+if (length(data.cohort2$mRNAData) > 0) {
     featureName <- 'Cohort'
     values <- sapply(patientIDs, FUN=function(id) ifelse(id %in% patientIDs.cohort1, 1, 2))
     extraFields <- buildLowDimFields(featureName, patientIDs, patientIDs, 'binary', values, FALSE)
     features <- featureName
 }
 
-numerical.lowDimData.cohort1 <- lowDimData_cohort1$additionalFeatures_numerical
-numerical.lowDimData.cohort2 <- lowDimData_cohort2$additionalFeatures_numerical
+numerical.lowDimData.cohort1 <- data.cohort1$additionalFeatures_numerical
+numerical.lowDimData.cohort2 <- data.cohort2$additionalFeatures_numerical
 numerical.lowDimData <- rbind(numerical.lowDimData.cohort1, numerical.lowDimData.cohort2)
 concepts <- unique(numerical.lowDimData$concept)
 for (concept in concepts) {
@@ -221,8 +225,8 @@ for (concept in concepts) {
     features <- c(features, featureName)
 }
 
-alphabetical.lowDimData.cohort1 <- lowDimData_cohort1$additionalFeatures_alphabetical
-alphabetical.lowDimData.cohort2 <- lowDimData_cohort2$additionalFeatures_alphabetical
+alphabetical.lowDimData.cohort1 <- data.cohort1$additionalFeatures_alphabetical
+alphabetical.lowDimData.cohort2 <- data.cohort2$additionalFeatures_alphabetical
 alphabetical.lowDimData <- rbind(alphabetical.lowDimData.cohort1, alphabetical.lowDimData.cohort2)
 folders <- as.vector(sapply(alphabetical.lowDimData$concept, conceptStrToFolderStr))
 unique.folders <- unique(folders)
@@ -242,7 +246,6 @@ output$fields <- fields
 output$significanceValues <- significanceValues.sorted
 output$patientIDs <- patientIDs
 output$probes <- probes
-output$geneIDs <- geneIDs
 output$geneSymbols <- geneSymbols
 
 output$hclustEuclideanComplete <- list(
