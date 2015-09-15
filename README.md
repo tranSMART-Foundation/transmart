@@ -12,6 +12,9 @@ Keep it mind that making use of this software is at your own risk!*
 
 ---
 
+####What is SmartR?
+Please have a look at these [Youtube videos](https://www.youtube.com/channel/UCKUbu0z3CQfi6RcFermONSw).
+
 ####How to add SmartR to your own tranSMART installation:
 1 - Add this to your BuildConfig.groovy:
 ```javascript
@@ -24,7 +27,6 @@ grails.plugin.location.smartR = '/path/to/smartR'
   })
 ```
 3 - Run "grails war" to compile a WAR file containing SmartR
-
 
 ####Requirements:
 - tranSMART 1.2.4 & 1.2.5 (Feature "cohort updating" not available)
