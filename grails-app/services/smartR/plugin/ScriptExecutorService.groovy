@@ -2,12 +2,9 @@ package smartR.plugin
 
 import grails.util.Holders
 import org.rosuda.REngine.Rserve.RConnection
-import org.apache.log4j.Logger
 
 
 class ScriptExecutorService {
-
-    def log = Logger
 
     def rServeConnections = [:]
 
@@ -28,8 +25,8 @@ class ScriptExecutorService {
             def rServeHost = Holders.config.RModules.host
             def rServePort = Holders.config.RModules.port
             def connection = new RConnection(rServeHost, rServePort)
-            this.rServeConnections[cookieID] = connection
             connection.stringEncoding = 'utf8'
+            this.rServeConnections[cookieID] = connection
             return connection
         } catch (all) { }
 
@@ -91,9 +88,6 @@ class ScriptExecutorService {
     }
 
     def run(parameterMap) {
-        print '==========================='
-        print rServeConnections
-        print '==========================='
         // initialize Rserve connection
         def connection = getConnection(parameterMap)
         if (! connection) {
