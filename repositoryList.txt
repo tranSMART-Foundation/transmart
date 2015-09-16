@@ -1,5 +1,8 @@
-Rinterface
+GWAVA
+MapCommand.sh
+RInterface
 Rmodules
+Scripts
 blend4j-plugin
 folder-management-plugin
 tranSMART-ETL
@@ -8,6 +11,7 @@ transmart-batch
 transmart-core-api
 transmart-core-db
 transmart-data
+transmart-docker
 transmart-extensions
 transmart-gwas-plugin
 transmart-legacy-db
@@ -15,6 +19,3 @@ transmart-metacore-plugin
 transmart-rest-api
 transmart-test
 transmartApp
-GWAVA
-transmart-docker
-Scripts
