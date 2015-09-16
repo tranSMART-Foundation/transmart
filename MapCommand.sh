@@ -12,7 +12,7 @@ transmart-extensions \
 transmart-gwas-plugin \
 blend4j-plugin \
 transmart-metacore-plugin \
-# transmartApp \
+transmartApp \
 transmart-data \
 tranSMART-ETL \
 transmart-batch \
