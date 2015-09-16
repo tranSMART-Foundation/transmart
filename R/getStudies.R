@@ -27,15 +27,19 @@ getStudies <- function(name.match = "", as.data.frame = TRUE, cull.columns = TRU
     serverResult <- .transmartServerGetRequest("/studies", accept.type = "hal")
     listOfStudies <- serverResult$studies
     
+    n <- length(listOfStudies)
+    if (n == 0) {
+        message("Empty list of studies received.")
+    }
+    
     studyNames <- sapply(listOfStudies, FUN = function(x) { x[["id"]] })
     names(listOfStudies) <- studyNames
     listOfStudies <- listOfStudies[ grep(name.match, studyNames) ]
-
     if (as.data.frame) {
         dataFrameStudies <- .listToDataFrame(listOfStudies)
         if (cull.columns) {
             columnsToKeep <- match(c("id", "api.link.self.href", "ontologyTerm.fullName"), names(dataFrameStudies))
-            if (any(is.na(columnsToKeep))) {
+            if (n > 0 && any(is.na(columnsToKeep))) {
                 warning("There was a problem culling columns. You can try again with cull.columns = FALSE.")
                 message("Sorry. You've encountered a bug.\n",
                         "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
