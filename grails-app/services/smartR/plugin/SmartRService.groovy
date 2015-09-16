@@ -17,9 +17,7 @@ class SmartRService {
     def dataQueryService
     def scriptExecutorService
 
-    def parameterMap = [:]
-
-    def queryData() {
+    def queryData(parameterMap) {
         def data_cohort1 = [:]
         def data_cohort2 = [:]
         
@@ -72,6 +70,8 @@ class SmartRService {
             new File(DEBUG_TMP_DIR + 'data1.json').write(parameterMap['data_cohort1'])
             new File(DEBUG_TMP_DIR + 'data2.json').write(parameterMap['data_cohort2'])
         }
+
+        return parameterMap
     }
 
     /**
@@ -93,26 +93,25 @@ class SmartRService {
         }
     }
 
-    def initParameterMap(params) {
-        def init = params.init.toBoolean()
-        def user = springSecurityService.getPrincipal().username
-        def conceptBoxes = new JsonSlurper().parseText(params.conceptBoxes)
-        parameterMap['init'] = init
-        parameterMap['user'] = user
+    def createParameterMap(params) {
+        def parameterMap = [:]
+        parameterMap['init'] = params.init.toBoolean()
         parameterMap['script'] = params.script
         parameterMap['scriptDir'] = getScriptDir()
         parameterMap['result_instance_id1'] = params.result_instance_id1
         parameterMap['result_instance_id2'] = params.result_instance_id2
         parameterMap['settings'] = params.settings
-        parameterMap['conceptBoxes'] = conceptBoxes
+        parameterMap['conceptBoxes'] = new JsonSlurper().parseText(params.conceptBoxes)
         parameterMap['cookieID'] = params.cookieID
+        parameterMap['DEBUG'] = DEBUG
+        return parameterMap
     }
 
     def runScript(params) {
-        initParameterMap(params)
+        def parameterMap = createParameterMap(params)
 
         if (parameterMap['init']) {
-            queryData()
+            parameterMap = queryData(parameterMap)
         }
 
         return scriptExecutorService.run(parameterMap)
