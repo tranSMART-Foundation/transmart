@@ -29,16 +29,29 @@ function (transmartDomain, use.authentication = TRUE, ...) {
 
     transmartClientEnv$transmartDomain <- transmartDomain
     transmartClientEnv$db_access_url <- transmartClientEnv$transmartDomain
-
+  
+    authenticated <- TRUE
+    
     if (use.authentication && !exists("access_token", envir = transmartClientEnv)) {
-        authenticateWithTransmart(...)
+        authenticated <- authenticateWithTransmart(...)
     } else { if (!use.authentication && exists("access_token", envir = transmartClientEnv)) {
             remove("access_token", envir = transmartClientEnv)
         }
     }
 
     if(!.checkTransmartConnection()) {
-        stop("Connection unsuccessful. Type: ?connectToTransmart for help.")
+        if (use.authentication && authenticated && !exists("access_token", envir = transmartClientEnv)) {
+            # The access token has been removed: this must mean the applying the refresh token
+            # (in .checkTransmartConnection) has failed.
+            #
+            # Trying to reauthenticate...
+            #
+            # (Note: might cause an infinite loop if authentication succeeds, but checking the connection
+            # fails and triggers refreshing the authentication, which fails and removes the access token.)
+            connectToTransmart(transmartDomain, use.authentication, ...)
+        } else {
+            stop("Connection unsuccessful. Type: ?connectToTransmart for help.")
+        }
     } else {
         message("Connection successful.")
     }
@@ -57,8 +70,8 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             "/oauth/authorize?response_type=code&client_id=", 
             transmartClientEnv$client_id,
             "&client_secret=", transmartClientEnv$client_secret,
-            "&redirect_uri=", transmartClientEnv$oauthDomain,
-            "/oauth/verify")
+            "&redirect_uri=", URLencode(transmartClientEnv$oauthDomain, TRUE),
+            URLencode("/oauth/verify", TRUE))
 
     if (is.null(prefetched.request.token)) {
         cat("Please visit the following url to authenticate this RClient (enter nothing to cancel):\n\n",
@@ -77,9 +90,9 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             "/oauth/token?grant_type=authorization_code&client_id=",
             transmartClientEnv$client_id,
             "&client_secret=", transmartClientEnv$client_secret,
-            "&code=", request.token,
-            "&redirect_uri=", transmartClientEnv$oauthDomain,
-            "/oauth/verify")
+            "&code=", URLencode(request.token, TRUE),
+            "&redirect_uri=", URLencode(transmartClientEnv$oauthDomain, TRUE),
+            URLencode("/oauth/verify", TRUE))
 
     oauthResponse <- NULL
     tryCatch(oauthResponse <- getURL(oauth.exchange.token.url, verbose = getOption("verbose")), 
@@ -92,8 +105,43 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         list2env(fromJSON(oauthResponse), envir = transmartClientEnv)
         transmartClientEnv$access_token.timestamp <- Sys.time()
         cat("Authentication completed.\n")
+        return(TRUE)
     } else {
         cat("Authentication failed.\n")
+        return(FALSE)
+    }
+}
+
+refreshToken <- function(oauthDomain = transmartClientEnv$transmartDomain) {
+    transmartClientEnv$oauthDomain <- oauthDomain
+    transmartClientEnv$client_id <- "api-client"
+    transmartClientEnv$client_secret <- "api-client"
+    message("Trying to reauthenticate using the refresh token: ", transmartClientEnv$refresh_token, "...")
+    refreshUrl <- paste(sep = "",
+                        transmartClientEnv$oauthDomain,
+                        "/oauth/token?grant_type=refresh_token",
+                        "&client_id=", transmartClientEnv$client_id,
+                        "&client_secret=", transmartClientEnv$client_secret,
+                        "&refresh_token=", URLencode(transmartClientEnv$refresh_token, TRUE),
+                        "&redirect_uri=", URLencode(transmartClientEnv$oauthDomain, TRUE),
+                        URLencode("/oauth/verify", TRUE),
+                        "")
+    
+    oauthResponse <- NULL
+    tryCatch(oauthResponse <- getURL(refreshUrl, verbose = getOption("verbose")),
+             error = function(e) {
+               if (getOption("verbose")) { message(e, "\n", oauthResponse) }
+               stop("Error with connection to verification server.")
+             })
+    if (getOption("verbose")) { message("Server response:\n\n", oauthResponse, "\n") }
+    if (grepl("access_token", oauthResponse)) {
+        list2env(fromJSON(oauthResponse), envir = transmartClientEnv)
+        transmartClientEnv$access_token.timestamp <- Sys.time()
+        cat("Authentication completed.\n")
+        return(TRUE)
+    } else {
+        cat("Authentication failed.\n")
+        return(FALSE)
     }
 }
 
@@ -106,19 +154,30 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         return(TRUE)
     }
 
-    ping <- .transmartServerGetRequest("/oauth/verify", accept.type = "default")
+    ping <- .transmartServerGetRequest("/oauth/inspectToken", accept.type = "default")
     if (getOption("verbose")) { message(paste(ping, collapse = ": ")) }
 
     if (!is.null(ping)) {
-        if (reauthentice.if.invalid.token && grepl("^invalid_token", ping["error"])) {
-            message("Authentication token not accepted.")
-            authenticateWithTransmart(oauthDomain = transmartClientEnv$oauthDomain)
-            return(.checkTransmartConnection(reauthentice.if.invalid.token = FALSE))
+        if ("error" %in% names(ping)) {
+            message("Error ", ping["error"],  ": ", ping["error_description"])
+            if (ping["error"] == "invalid_token") {
+                # try to refresh authentication
+                if (refreshToken()) {
+                    message("Access token refreshed.")
+                    return(.checkTransmartConnection(reauthentice.if.invalid.token))
+                } else {
+                    message("Removing access token from the environment.")
+                    remove("access_token", envir = transmartClientEnv)
+                    return(FALSE)
+                }
+            }
+            return(FALSE)
         }
-        message("Cannot connect to tranSMART database.")
-        return(FALSE)
+        # perhaps check or update information about tokens and principal.
+        return(TRUE)
     }
-    return(TRUE)
+    # if check fails, use refresh token to update (or ask for it).
+    return(FALSE)
 }
 
 .transmartServerGetRequest <- function(apiCall, ...)  {
@@ -141,7 +200,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 .serverMessageExchange <- 
 function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.progresscallback.download()) {
     if (any(accept.type == c("default", "hal"))) {
-        if (accept.type == "hal") { httpHeaderFields <- c(httpHeaderFields, accept = "application/hal+json") }
+        if (accept.type == "hal") { httpHeaderFields <- c(httpHeaderFields, Accept = "application/hal+json;charset=UTF-8") }
         result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
                 verbose = getOption("verbose"),
                 httpheader = httpHeaderFields)
@@ -181,27 +240,31 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
 }
 
 
-.listToDataFrame <- function(list) {
+.listToDataFrame <- function(l) {
     # TODO: (timdo) dependency on 'plyr' package removed; figure out whether dependency is present elsewhere, or remove dependency
     # add each list-element as a new row to a matrix, in two passes
     # first pass: go through each list element, unlist it and remember future column names
     columnNames <- c()
-    for (i in 1:(length(list))) {
-        list[[i]] <- unlist(list[[i]])
-        columnNames <- union(columnNames, names(list[[i]]))
+    if (length(l) > 0) {
+        for (i in 1:(length(l))) {
+            l[[i]] <- unlist(l[[i]])
+            columnNames <- union(columnNames, names(l[[i]]))
+        }
     }
     
     # second pass: go through each list element and add its elements to correct column
-    df <- matrix(nrow = length(list), ncol = length(columnNames))
-    for (i in 1:(length(list))) {
-        df[i, match(names(list[[i]]), columnNames)] <- list[[i]]
+    df <- matrix(nrow = length(l), ncol = length(columnNames))
+    if (length(l) > 0) {
+        for (i in 1:(length(l))) {
+            df[i, match(names(l[[i]]), columnNames)] <- l[[i]]
+        }
     }
     colnames(df) <- columnNames
 
     # check whether list contains valid row names, and if true; use them
-    if (is.null(names(list)) || is.na(names(list)) || length(names(list)) != length(list)) { 
+    if (length(l) < 1 || is.null(names(l)) || is.na(names(l)) || length(names(l)) != length(l)) { 
         rownames(df) <- NULL
-    } else { rownames(df) <- names(list) }
+    } else { rownames(df) <- names(l) }
     # convert matrix to data.frame
     as.data.frame(df, stringsAsFactors = FALSE)
 }
