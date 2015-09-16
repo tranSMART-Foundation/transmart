@@ -15,7 +15,7 @@ class ScriptExecutorService {
             this.rServeConnections[cookieID].assign("test", "123") // make sure that this is a _working_ connection
             return connection
         } catch (all) { 
-            // if we actually established a connection but it failed the assign test then it must be broken
+            // if we actually have a connection but it failed the assign test then it must be broken
             if (this.rServeConnections[cookieID]) {
                 closeConnection(cookieID)
             }
@@ -24,6 +24,10 @@ class ScriptExecutorService {
         try {
             def rServeHost = Holders.config.RModules.host
             def rServePort = Holders.config.RModules.port
+            if (parameterMap['DEBUG']) {
+                // Rserve has a different behaviour when used with MS Windows. This is for dev. only
+                rServePort.toInteger() + rServeConnections.size()
+            }
             def connection = new RConnection(rServeHost, rServePort)
             connection.stringEncoding = 'utf8'
             this.rServeConnections[cookieID] = connection
@@ -128,8 +132,14 @@ class ScriptExecutorService {
     }
 
     def forceKill(connection) {
+        def rServeHost = Holders.config.RModules.host
+        def rServePort = Holders.config.RModules.port
+        if (parameterMap['DEBUG']) {
+            // Rserve has a different behaviour when used with MS Windows. This is for dev. only
+            rServePort.toInteger() + rServeConnections.size()
+        }
+        def killConnection = new RConnection(rServeHost, rServePort)
         def pid = connection.eval("Sys.getpid()").asInteger()
-        def killConnection = new RConnection()
         killConnection.eval("tools::pskill(${pid})")
         killConnection.eval("tools::pskill(${pid}, tools::SIGKILL)")
         killConnection.close()

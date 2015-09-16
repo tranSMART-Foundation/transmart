@@ -48,9 +48,9 @@ calc_boxplot <- function(datapoints, subsets) {
 }
 
 if (length(data.cohort1$concept1) > 0) {
-	output$cohort1 <- calc_boxplot(data.cohort1$concept1, data.cohort1$subset1)
+	output$cohort1 <- calc_boxplot(data.cohort1$concept1, data.cohort1$subsets1)
 }
 
 if (length(data.cohort2$concept2) > 0) {
-	output$cohort2 <- calc_boxplot(data.cohort2$concept2, data.cohort2$subset2)
+	output$cohort2 <- calc_boxplot(data.cohort2$concept2, data.cohort2$subsets2)
 }
