@@ -7,7 +7,7 @@ import groovy.time.*
 
 class ScriptExecutorService {
 
-    def CONNECTION_LIFETIME = 30 * 1000 // 60 minutes
+    def CONNECTION_LIFETIME = 120 * 1000 * 60 // milliseconds
     def MAX_CONNECTIONS = 5
 
     def rServeConnections = [:]
@@ -104,9 +104,9 @@ class ScriptExecutorService {
     }
 
     def run(parameterMap) {
-        removeExpiredConnections()
         // initialize Rserve connection
         def connection = getConnection(parameterMap)
+        removeExpiredConnections()
         if (! connection) {
             return [false, 'Rserve refused the connection! Is it running?']
         }
