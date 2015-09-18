@@ -210,7 +210,6 @@
 <g:javascript src="resource/d3.js"/>
 
 <div id='visualization' class='text'>
-    <p><font size="2" color="red" class='text'>ATTENTION! Handling mRNA data within a browser is very difficult due to the extremly limited recources. Any action (such as sorting) might take up to several minutes!</font></p><br/>
     <div style='float: left; padding-right: 10px'>
         <ul class='dropdown text' id='colorSelection'>
              <li id="top">Choose Heatmap Coloring

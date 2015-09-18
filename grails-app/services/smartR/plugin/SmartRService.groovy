@@ -8,7 +8,7 @@ import grails.util.Environment
 
 class SmartRService {
 
-    def DEBUG = false
+    def DEBUG = Environment.current == Environment.DEVELOPMENT
     def DEBUG_TMP_DIR = 'C:/Temp/'
 
     def grailsApplication = Holders.grailsApplication
@@ -23,7 +23,7 @@ class SmartRService {
         
         def rIID1 = parameterMap['result_instance_id1'].toString()
         def rIID2 = parameterMap['result_instance_id2'].toString()
-        
+
         def patientIDs_cohort1 = rIID1 ? i2b2HelperService.getSubjectsAsList(rIID1).collect { it.toLong() } : []
         def patientIDs_cohort2 = rIID2 ? i2b2HelperService.getSubjectsAsList(rIID2).collect { it.toLong() } : []
 

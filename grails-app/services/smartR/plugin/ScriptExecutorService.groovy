@@ -2,36 +2,48 @@ package smartR.plugin
 
 import grails.util.Holders
 import org.rosuda.REngine.Rserve.RConnection
+import groovy.time.*
 
 
 class ScriptExecutorService {
+
+    def CONNECTION_LIFETIME = 30 * 1000 // 60 minutes
+    def MAX_CONNECTIONS = 5
 
     def rServeConnections = [:]
 
     def getConnection(parameterMap) {
         def cookieID = parameterMap['cookieID']
         try {
-            def connection = this.rServeConnections[cookieID]
-            this.rServeConnections[cookieID].assign("test", "123") // make sure that this is a _working_ connection
-            return connection
+            // make sure that this is a _working_ connection
+            rServeConnections[cookieID].connection.assign("test1", "123")
+            rServeConnections[cookieID].connection.eval("test2 <- test1")
+            // renew lifetime
+            rServeConnections[cookieID].expiration = System.currentTimeMillis() + CONNECTION_LIFETIME
+            return rServeConnections[cookieID].connection
         } catch (all) { 
-            // if we actually have a connection but it failed the assign test then it must be broken
-            if (this.rServeConnections[cookieID]) {
+            // if we have a connection but it failed the assign test then it must be broken
+            if (rServeConnections[cookieID]) {
                 closeConnection(cookieID)
             }
         }
         
         try {
+            if (rServeConnections.size() == MAX_CONNECTIONS) {
+                closeOldesConnection()
+                assert rServeConnections.size() < MAX_CONNECTIONS
+            }
             def rServeHost = Holders.config.RModules.host
             def rServePort = Holders.config.RModules.port
             if (parameterMap['DEBUG']) {
                 // Rserve has a different behaviour when used with MS Windows. This is for dev. only
                 rServePort.toInteger() + rServeConnections.size()
             }
-            def connection = new RConnection(rServeHost, rServePort)
-            connection.stringEncoding = 'utf8'
-            this.rServeConnections[cookieID] = connection
-            return connection
+            rServeConnections[cookieID] = [:]
+            rServeConnections[cookieID].connection = new RConnection(rServeHost, rServePort)
+            rServeConnections[cookieID].connection.stringEncoding = 'utf8'
+            rServeConnections[cookieID].expiration = System.currentTimeMillis() + CONNECTION_LIFETIME
+            return rServeConnections[cookieID].connection
         } catch (all) { }
 
         return null
@@ -92,6 +104,7 @@ class ScriptExecutorService {
     }
 
     def run(parameterMap) {
+        removeExpiredConnections()
         // initialize Rserve connection
         def connection = getConnection(parameterMap)
         if (! connection) {
@@ -119,16 +132,39 @@ class ScriptExecutorService {
     }
 
     def closeConnection(id) {
-        clearSession(this.rServeConnections[id])
-        this.rServeConnections[id].close()
-        this.rServeConnections.remove(id)
+        if (rServeConnections[id]) {
+            clearSession(rServeConnections[id].connection)
+            rServeConnections[id].connection.close()
+            rServeConnections.remove(id)    
+        }
     }
 
     def closeAllConnection() {
-        this.rServeConnections.each { id, connection ->
+        rServeConnections.each { id, connection ->
             closeConnection(id)
         }
-        assert this.rServeConnections.size() == 0
+        assert rServeConnections.size() == 0
+    }
+
+    def closeOldestConnection() {
+        def oldestConnectionID
+        def oldestExpirationTime = Integer.MAX_VALUE
+        rServeConnections.each { id, connection ->
+            if (connection.expiration < oldestExpirationTime) {
+                oldestExpirationTime = connection.expiration 
+                oldestConnectionID = id
+            }
+        }
+        closeConnection(id)
+    }
+
+    def removeExpiredConnections() {
+        def now = System.currentTimeMillis()
+        rServeConnections.each { id, connection ->
+            if (connection.expiration < now) {
+                closeConnection(id)
+            }
+        }
     }
 
     def forceKill(connection) {
