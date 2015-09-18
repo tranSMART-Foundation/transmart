@@ -8,7 +8,7 @@ import groovy.time.*
 class ScriptExecutorService {
 
     def CONNECTION_LIFETIME = 120 * 1000 * 60 // milliseconds
-    def MAX_CONNECTIONS = 5
+    def MAX_CONNECTIONS = 10
 
     def rServeConnections = [:]
 
