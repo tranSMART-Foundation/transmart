@@ -352,6 +352,7 @@ function runRScript() {
     }
 
     jQuery("#outputDIV").html("Fetching data from database. This might last up to several minutes...");
+    jQuery('#submitButton').prop('disabled', true);
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderOutputDIV',
         type: "POST",
@@ -359,8 +360,10 @@ function runRScript() {
         data: prepareFormData()
     }).done(function(serverAnswer) {
         jQuery("#outputDIV").html(serverAnswer);
+        jQuery('#submitButton').prop('disabled', false);
     }).fail(function() {
         jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
+        jQuery('#submitButton').prop('disabled', false);
     });
 }
 
