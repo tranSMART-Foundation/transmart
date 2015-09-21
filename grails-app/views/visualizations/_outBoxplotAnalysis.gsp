@@ -305,12 +305,36 @@
                 </div>
             </td>
         </tr>
+        <tr>
+            <td style='padding-bottom: 0.5em'>
+                <div>
+                    <div style='float: left; padding-right: 20px'>
+                        <label class="ios7-switch" style="font-size: 16px">
+                            Disable Animations
+                            <input onclick='switchAnimation()' type="checkbox">
+                            <span></span>
+                        </label>
+                    </div>
+                </div>
+            </td>
+        </tr>
     </table>
     <div id="boxplot1" style='float: left; padding-right: 10px'></div>
     <div id="boxplot2" style='float: left; padding-right: 10px; border-left: 1px solid black'></div>
 </div>
 
 <script>
+    var animationDuration = 1000;
+    var tmpAnimationDuration = animationDuration;
+    function switchAnimation() {
+        if (animationDuration) {
+            tmpAnimationDuration = animationDuration;
+            animationDuration = 0;
+        } else {
+            animationDuration = tmpAnimationDuration;
+        }
+    }
+
 	var results = ${raw(results)};
 
     results.cohort2 = results.cohort2 === undefined ? {concept: 'undefined', subsets: []} : results.cohort2;
@@ -569,13 +593,13 @@
             for (var i = 0; i < results.cohort1.subsets.length; i++) {
                 d3.selectAll('.point.cohort1.' + shortenNodeLabel(results.cohort1.subsets[i]))
                 .transition()
-                .duration(1000)
+                .duration(animationDuration)
                 .attr("cx", x1(results.cohort1.subsets[i]));
             }
             for (i = 0; i < results.cohort2.subsets.length; i++) {
                 d3.selectAll('.point.cohort2.' + shortenNodeLabel(results.cohort2.subsets[i]))
                 .transition()
-                .duration(1000)
+                .duration(animationDuration)
                 .attr("cx", x2(results.cohort2.subsets[i]));
             }
             jitterChecked = false;
@@ -583,13 +607,13 @@
             for (var j = 0; j < results.cohort1.subsets.length; j++) {
                 d3.selectAll('.point.cohort1.' + shortenNodeLabel(results.cohort1.subsets[j]))
                 .transition()
-                .duration(1000)
+                .duration(animationDuration)
                 .attr("cx", function(d) { return x1(results.cohort1.subsets[j]) + boxplotWidth * jitterWidth * d.jitter; });
             }
             for (j = 0; j < results.cohort2.subsets.length; j++) {
                 d3.selectAll('.point.cohort2.' + shortenNodeLabel(results.cohort2.subsets[j]))
                 .transition()
-                .duration(1000)
+                .duration(animationDuration)
                 .attr("cx", function(d) { return x2(results.cohort2.subsets[j]) + boxplotWidth * jitterWidth * d.jitter; });
             }
             jitterChecked = true;
@@ -601,45 +625,45 @@
         if (! backgroundCheckChecked) {
             d3.selectAll('#boxplot1,#boxplot2')
             .transition()
-            .duration(1500)
+            .duration(animationDuration)
             .style('background-color', 'black');
             d3.selectAll('.whisker, .hinge, .connection, .line, .axis path, .axis line')
             .transition()
-            .duration(1500)
+            .duration(animationDuration)
             .style('stroke', 'white');
             d3.selectAll('.text')
             .transition()
-            .duration(1500)
+            .duration(animationDuration)
             .style('fill', 'white');
             d3.selectAll('.box')
             .transition()
-            .duration(1500)
+            .duration(animationDuration)
             .style('fill', 'white');
             d3.selectAll('.brush, .extent')
             .transition()
-            .duration(1500)
+            .duration(animationDuration)
             .style('fill', 'white');
             backgroundCheckChecked = true;
         } else {
             d3.selectAll('#boxplot1,#boxplot2')
             .transition()
-            .duration(1500)
+            .duration(animationDuration)
             .style('background-color', 'white');
             d3.selectAll('.whisker, .hinge, .connection, .line, .axis path, .axis line')
             .transition()
-            .duration(1500)
+            .duration(animationDuration)
             .style('stroke', 'black');
             d3.selectAll('.text')
             .transition()
-            .duration(1500)
+            .duration(animationDuration)
             .style('fill', 'black');
             d3.selectAll('.box')
             .transition()
-            .duration(1500)
+            .duration(animationDuration)
             .style('fill', '#008BFF');
             d3.selectAll('.brush, .extent')
             .transition()
-            .duration(1500)
+            .duration(animationDuration)
             .style('fill', 'blue');
             backgroundCheckChecked = false;
         }
@@ -671,7 +695,7 @@
 
         whisker
         .transition()
-        .duration(1000)
+        .duration(animationDuration)
     	.attr('x1', x(subset) - whiskerLength / 2)
     	.attr('y1', function(d) { return y(d); })
     	.attr('x2', x(subset) + whiskerLength / 2)
@@ -687,7 +711,7 @@
 
         whiskerLabel
         .transition()
-        .duration(1000)
+        .duration(animationDuration)
         .attr('x', x(subset) + whiskerLength / 2)
         .attr('y', function(d) { return y(d); })
         .attr("dx", ".35em")
@@ -705,7 +729,7 @@
 
         hinge
         .transition()
-        .duration(1000)
+        .duration(animationDuration)
     	.attr('x1', x(subset) - hingeLength / 2)
     	.attr('y1', function(d) { return y(d); })
     	.attr('x2', x(subset) + hingeLength / 2)
@@ -720,7 +744,7 @@
 
         hingeLabel
         .transition()
-        .duration(1000)
+        .duration(animationDuration)
         .attr('x', x(subset) - hingeLength / 2)
         .attr('y', function(d) { return y(d); })
         .attr("dx", "-.35em")
@@ -739,7 +763,7 @@
 
         connection
         .transition()
-        .duration(1000)
+        .duration(animationDuration)
     	.attr('x1', x(subset))
     	.attr('y1', function(d) { return y(d[0]); })
     	.attr('x2', x(subset))
@@ -754,7 +778,7 @@
 
         upperBox
         .transition()
-        .duration(1000)
+        .duration(animationDuration)
     	.attr('x', x(subset) - hingeLength / 2)
     	.attr('y', y(params.upperHinge))
     	.attr('height', Math.abs(y(params.upperHinge) - y(params.median)))
@@ -769,7 +793,7 @@
 
         lowerBox
         .transition()
-        .duration(1000)
+        .duration(animationDuration)
     	.attr('x', x(subset) - hingeLength / 2)
     	.attr('y', y(params.median))
     	.attr('height', Math.abs(y(params.median) - y(params.lowerHinge)))
@@ -784,7 +808,7 @@
 
         medianLabel
         .transition()
-        .duration(1000)
+        .duration(animationDuration)
         .attr('x', x(subset) + hingeLength / 2)
         .attr('y', function(d) { return y(params.median); })
         .attr("dx", ".35em")
@@ -819,14 +843,14 @@
             return 'point patientID-' + d.patientID + (d.outlier ? ' outlier ' : ' ') + cohort + ' ' + shortenedSubset;
         }) // This is here and not in the .enter() because points might become outlier on removal of other points
         .transition()
-        .duration(1000)
+        .duration(animationDuration)
         .attr("cy", function(d) { return y(d.value); })
         .attr("r", 3);
 
         point
         .exit()
         .transition()
-        .duration(1000)
+        .duration(animationDuration)
         .attr("r", 0)
         .remove();
 
@@ -857,7 +881,7 @@
         line
         .datum(estFun)
         .transition()
-        .duration(1000)
+        .duration(animationDuration)
         .attr("d", lineGen);
 
         var label = boxplots[cohort][subset].selectAll('.label')

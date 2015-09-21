@@ -21,19 +21,9 @@
         <div id="inputDIV" class='txt' style="text-align: left">Please select a script to execute.</div>
 
         <hr class="myhr"/>
-        <g:select
-            name="scriptSelect"
-            class='txt'
-            from="${scriptList}"
-            noSelection="['':'Choose an algorithm']"
-            onchange="changeInputDIV()"/>
+        <g:select name="scriptSelect" class='txt' from="${scriptList}" noSelection="['':'Choose an algorithm']" onchange="changeInputDIV()"/>
         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        <input
-            id="submitButton"
-            class='txt'
-            type="button"
-            value="(Re-)Run Analysis"
-            onclick="runRScript()"/>
+        <input id="submitButton" class='txt' type="button" value="(Re-)Run Analysis" onclick="runRScript()"/>
         <hr class="myhr"/>
     </div>
 
