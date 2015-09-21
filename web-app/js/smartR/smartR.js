@@ -372,7 +372,6 @@ function runRScript() {
 */
 function changeInputDIV() {
     jQuery("#outputDIV").html("");
-
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderInputDIV',
         type: "POST",
