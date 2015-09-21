@@ -5,7 +5,7 @@
 			NOTE: This window maps to the first cohort!<br/>
 			(Example: Age, Pulse, Blood Pressure)<br/>
 			<div id='concept1' class="queryGroupIncludeSmall"></div>
-			<input type="button" class='txt' onclick="clearVarSelection('concept_cohort1')" value="Clear Window">
+			<input type="button" class='txt' onclick="clearVarSelection('concept1')" value="Clear Window">
 		</td>
 		<td style='padding-right: 2em; padding-bottom: 1em'>
 			<mark>Step 2 (optional):</mark> Drop any number of concepts subsetting the choice made on the left into this window.<br/>
