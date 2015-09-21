@@ -913,22 +913,42 @@
     function updateCohorts(bySelection) {
         var cohort1MinMax;
         var cohort2MinMax;
+        var cohort1Points = [];
+        var cohort2Points = [];
+        
         if (bySelection) {
-            cohort1MinMax = d3.extent(currentSelection.map(function(d) {
-                return d3.select('.cohort1.patientID-' + d).property('__data__').value;
-            }));
-            cohort2MinMax = d3.extent(currentSelection.map(function(d) {
-                return d3.select('.cohort2.patientID-' + d).property('__data__').value;
-            }));
-        } else {
-            cohort1MinMax = d3.extent(d3.selectAll('.point.cohort1').map(function(d) { return d.value; }));
-            cohort2MinMax = d3.extent(d3.selectAll('.point.cohort2').map(function(d) { return d.value; }));
+            for (var i = 0; i < currentSelection.length; i++) {
+                var patientID = currentSelection[i];
+                var node = d3.select('.patientID-' + patientID);
+                if (node.classed('cohort1')) {
+                    cohort1Points.push(node.property('__data__').value);
+                } else {
+                    cohort2Points.push(node.property('__data__').value);
+                }
+            }
+        } 
+
+        if (! bySelection || cohort1Points.length < 2 || cohort2Points.length < 2) {
+            if (cohort1Points.length < 2) {
+                d3.selectAll('.point.cohort1').each(function(d) { cohort1Points.push(d.value); });
+            }
+            if (cohort2Points.length < 2) {
+                d3.selectAll('.point.cohort2').each(function(d) { cohort2Points.push(d.value); });
+            }
         }
 
-        var div1 = createQueryCriteriaDIV(results.cohort1.concept, 'ratio', 'numeric', 'BETWEEN', cohort1MinMax[0], cohort1MinMax[1], 'ratio', 'Y', 'valueicon');
-        var div2 = createQueryCriteriaDIV(results.cohort2.concept, 'ratio', 'numeric', 'BETWEEN', cohort2MinMax[0], cohort2MinMax[1], 'ratio', 'Y', 'valueicon');
-        setCohorts(div1, false, false, false, 1);
-        setCohorts(div2, false, false, true, 2);
+        cohort1MinMax = d3.extent(cohort1Points);
+        cohort2MinMax = d3.extent(cohort2Points);
+
+        var div1 = createQueryCriteriaDIV(results.cohort1.concept[0], 'ratio', 'numeric', 'BETWEEN', cohort1MinMax[0], cohort1MinMax[1], 'ratio', 'Y', 'valueicon');
+        var div2 = createQueryCriteriaDIV(results.cohort2.concept[0], 'ratio', 'numeric', 'BETWEEN', cohort2MinMax[0], cohort2MinMax[1], 'ratio', 'Y', 'valueicon');
+
+        if (cohort2Points.length >= 2) {
+            setCohorts([div1], true, false, false, 1);
+            setCohorts([div2], true, false, true, 2);
+        } else {
+            setCohorts([div1], true, false, true, 1);
+        }
     }
 
     init();
