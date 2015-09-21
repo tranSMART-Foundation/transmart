@@ -3,6 +3,7 @@ package smartR.plugin
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.json.JSONArray
+import groovy.json.JsonBuilder
 import org.apache.commons.io.FilenameUtils
 
 
@@ -14,7 +15,7 @@ class SmartRController {
     *   Renders the default view
     */
     def index = {
-        def dir = smartRService.getScriptDir()
+        def dir = smartRService.getWebAppFolder() + '/Scripts/'
         def scriptList = new File(dir).list().findAll { it != 'Wrapper.R' && it != 'Sample.R' }
         [scriptList: scriptList]
     }
@@ -36,8 +37,11 @@ class SmartRController {
     def updateOutputDIV = {
         params.init = false
         def (success, results) = smartRService.runScript(params)
-        def answer = success ? results : [error: [results]]
-        render answer
+        if (! success) {
+            render new JsonBuilder([error: results]).toString()
+        } else {
+            render results
+        }
     }
 
     def recomputeOutputDIV = {

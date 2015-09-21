@@ -79,17 +79,17 @@ class SmartRService {
     *
     *   @return {str}: path to the script folder
     */
-    def getScriptDir() {
+    def getWebAppFolder() {
         if (Environment.current == Environment.DEVELOPMENT) {
             return org.codehaus.groovy.grails.plugins.GrailsPluginUtils
                 .getPluginDirForName('smart-r')
                 .getFile()
-                .absolutePath + '/web-app/Scripts/'
+                .absolutePath + '/web-app/'
         } else {
             return grailsApplication
                 .mainContext
                 .servletContext
-                .getRealPath('/plugins/') + '/smart-r-0.1/Scripts/'
+                .getRealPath('/plugins/') + '/smart-r-0.1/'
         }
     }
 
@@ -97,7 +97,7 @@ class SmartRService {
         def parameterMap = [:]
         parameterMap['init'] = params.init.toBoolean()
         parameterMap['script'] = params.script
-        parameterMap['scriptDir'] = getScriptDir()
+        parameterMap['scriptDir'] = getWebAppFolder() + '/Scripts/'
         parameterMap['result_instance_id1'] = params.result_instance_id1
         parameterMap['result_instance_id2'] = params.result_instance_id2
         parameterMap['settings'] = params.settings
