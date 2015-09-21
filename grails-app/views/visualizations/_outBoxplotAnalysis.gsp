@@ -497,7 +497,7 @@
             timeout: '600000',
             data: data
         }).done(function(serverAnswer) {
-            serverAnswer = JSON.parse(serverAnswer)
+            serverAnswer = JSON.parse(serverAnswer);
             if (serverAnswer.error) {
                 alert(serverAnswer.error);
                 return;
@@ -520,7 +520,10 @@
     });
 
     function removeOutliers() {
-        currentSelection = d3.selectAll('.outlier').map(function(d) { return d.patientID; });
+        currentSelection = [];
+        d3.selectAll('.outlier').each(function(d) { 
+            currentSelection.push(d.patientID);
+        });
         if (currentSelection.length !== 0) {
             excludeSelection();
         }
