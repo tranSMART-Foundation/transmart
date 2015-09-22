@@ -5,7 +5,7 @@
 */
 function mouseX() {
     var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX;
-    return mouseXPos - jQuery("#westPanel").width() + 20;
+    return mouseXPos - jQuery('#smartRPanel').offset().left + jQuery('#outputDIV').parent().scrollLeft();
 }
 
 /**
@@ -15,7 +15,7 @@ function mouseX() {
 */
 function mouseY() {
     var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY;
-    return mouseYPos + jQuery("#index").parent().scrollTop() - 50;
+    return mouseYPos + jQuery("#index").parent().scrollTop() - jQuery('#smartRPanel').offset().top;
 }
 
 /**
@@ -356,7 +356,6 @@ function runRScript() {
         jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
     });
 
-    jQuery("#outputDIV").html("Fetching data from database. This might last up to several minutes...");
     jQuery('#submitButton').prop('disabled', true);
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderOutputDIV',

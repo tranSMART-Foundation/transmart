@@ -1185,7 +1185,7 @@
             jQuery("#loadMoreButton").attr("disabled", false);
             jQuery("#loadMoreButton").val('Load 100 additional rows');
         }).fail(function() {
-            jQuery("#outputDIV").html("AJAX CALL FAILED!");
+            jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
             jQuery("#loadMoreButton").attr("disabled", false);
             jQuery("#loadMoreButton").val('Load 100 additional rows');
         });
