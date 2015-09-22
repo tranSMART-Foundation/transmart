@@ -321,7 +321,7 @@
     Disable Animations
     <input onclick='switchAnimation()' type="checkbox">
     <span></span>
-</label>
+</label><br/><br/>
 <div id='visualization' class='text'>
     <div style='float: left; padding-right: 10px'>
         <ul class='dropdown text' id='colorSelection'>
@@ -356,8 +356,8 @@
         <input id='cohortButton' class='text niceButton' type='button' value='Update Cohorts by Selection' onclick='updateCohorts()'/>
     </div>
     <div style='float: left; padding-right: 10px'>
-        <input id='loadMoreButton' class='text niceButton' type='button' value='Load 100 additional rows' onclick='loadRows()'/><div id='loadMessage'></div><br/><br/><br/><br/>
-    </div><br/>
+        <input id='loadMoreButton' class='text niceButton' type='button' value='Load 100 additional rows' onclick='loadRows()'/><div id='loadMessage'></div>
+    </div>
     <div style='float: left; padding-right: 10px'>
         <input type='range' min='0' max='300' value='100' id='zoomSlider' class='text' step='5' onchange="zoom()">
         <output for='zoomSlider' id='zoomLevel'>100% Zoom</output>

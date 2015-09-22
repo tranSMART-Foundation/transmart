@@ -62,6 +62,10 @@ class SmartRController {
         }
     }
 
+    def renderLoadingScreen = {
+        render template: "/visualizations/outLoading"
+    }
+
     /**
     *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
     */

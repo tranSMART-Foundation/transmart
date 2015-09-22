@@ -346,6 +346,16 @@ function runRScript() {
         return false;
     }
 
+    jQuery.ajax({
+        url: pageInfo.basePath + '/SmartR/renderLoadingScreen',
+        type: "POST",
+        timeout: '600000'
+    }).done(function(serverAnswer) {
+        jQuery("#outputDIV").html(serverAnswer);
+    }).fail(function() {
+        jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
+    });
+
     jQuery("#outputDIV").html("Fetching data from database. This might last up to several minutes...");
     jQuery('#submitButton').prop('disabled', true);
     jQuery.ajax({
