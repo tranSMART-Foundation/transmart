@@ -17,8 +17,8 @@ if (! is.null(settings$xLow)) {
 
 points <- data.cohort1$datapoints
 concepts <- unique(points$concept)
-if (length(concepts) != 2) {
-	stop('Please specify exactly two variables to compare with each other!')
+if (! length(points)) {
+	stop('Your selection does not match any patient in the defined cohort!')
 }
 xArr <- points[points$concept == concepts[1], ]
 yArr <- points[points$concept == concepts[2], ]
