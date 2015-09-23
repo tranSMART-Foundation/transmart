@@ -1287,7 +1287,7 @@
             var div = createQueryCriteriaDIV(concept, 'ratio', 'numeric', 'EQ', value, '', 'ratio', 'Y', 'valueicon');
             divs.push(div);
         }
-        setCohorts(divs, false, false, false);
+        setCohorts(divs, false, false, false, 1);
     }
 
     function removeDendrograms() {
