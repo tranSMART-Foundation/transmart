@@ -47,9 +47,10 @@ calc_boxplot <- function(datapoints, subsets) {
 	data
 }
 
-if (length(data.cohort1$concept1) > 0) {
-	output$cohort1 <- calc_boxplot(data.cohort1$concept1, data.cohort1$subsets1)
+if (! length(data.cohort1$concept1)) {
+	stop('Your selection does not match any patient in the defined cohort!')
 }
+output$cohort1 <- calc_boxplot(data.cohort1$concept1, data.cohort1$subsets1)
 
 if (length(data.cohort2$concept2) > 0) {
 	output$cohort2 <- calc_boxplot(data.cohort2$concept2, data.cohort2$subsets2)

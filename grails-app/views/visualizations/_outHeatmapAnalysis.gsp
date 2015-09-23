@@ -75,7 +75,7 @@
             height: 0px;
         }
         to {
-            height: 150px;
+            height: 190px;
         }
     }
 
@@ -153,6 +153,14 @@
         opacity: 0.4;
     }
 
+    .barHighlighted {
+        opacity: 0.4;
+    }
+
+    .cuttoffHighlight {
+        opacity: 0.4;    
+    }
+
     .box {
         fill-opacity: 0;
         shape-rendering: crispEdges;
@@ -204,21 +212,127 @@
         background: white;
         pointer-events: none;
     }
+
+    .ios7-switch {
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        tap-highlight-color: transparent;
+    }
+
+    .ios7-switch input {
+        opacity: 0;
+        position: absolute;
+    }
+
+    .ios7-switch input + span {
+        position: relative;
+        display: inline-block;
+        width: 1.65em;
+        height: 1em;
+        background: white;
+        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
+        border-radius: 0.5em;
+        vertical-align: -0.15em;
+        transition: all 0.40s cubic-bezier(.17,.67,.43,.98);
+    }
+
+    .ios7-switch:active input + span,
+    .ios7-switch input + span:active {
+        box-shadow: inset 0 0 0 0.73em #e9e9e9;
+    }
+
+    .ios7-switch input + span:after {
+        position: absolute;
+        display: block;
+        content: '';
+        width: 0.875em;
+        height: 0.875em;
+        border-radius: 0.4375em;
+        top: 0.0625em;
+        left: 0.0625em;
+        background: white;
+        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
+                    0 0 0.05em rgba(0,0,0,0.05),
+                    0 0.1em 0.2em rgba(0,0,0,0.2);
+        transition: all 0.25s ease-out;
+    }
+
+    .ios7-switch:active input + span:after,
+    .ios7-switch input + span:active:after {
+        width: 1.15em;
+    }
+
+    .ios7-switch input:checked + span {
+        box-shadow: inset 0 0 0 0.73em #009ac9;
+    }
+
+    .ios7-switch input:checked + span:after {
+        left: 0.7125em;
+    }
+
+    .ios7-switch:active input:checked + span:after,
+    .ios7-switch input:checked + span:active:after {
+        left: 0.4375em;
+    }
+
+    /* accessibility styles */
+    .ios7-switch input:focus + span:after {
+        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.15),
+                    0 0 0.05em rgba(0,0,0,0.08),
+                    0 0.1em 0.2em rgba(0,0,0,0.3);
+        background: #fff;
+    }
+
+    .ios7-switch input:focus + span {
+        box-shadow: inset 0 0 0 0.0625em #dadada;
+    }
+
+    .ios7-switch input:focus:checked + span {
+        box-shadow: inset 0 0 0 0.73em #009ac9;
+    }
+
+    /* reset accessibility style on hover */
+    .ios7-switch:hover input:focus + span:after {
+        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
+                    0 0 0.05em rgba(0,0,0,0.05),
+                    0 0.1em 0.2em rgba(0,0,0,0.2);
+        background: #fff;
+    }
+
+    .ios7-switch:hover input:focus + span {
+        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
+    }
+
+    .ios7-switch:hover input:focus:checked + span {
+        box-shadow: inset 0 0 0 0.73em #009ac9;
+    }
 </style>
 
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 <g:javascript src="resource/d3.js"/>
 
+<label class="ios7-switch" style="font-size: 16px">
+    Disable Animations
+    <input onclick='switchAnimation()' type="checkbox">
+    <span></span>
+</label><br/><br/>
 <div id='visualization' class='text'>
     <div style='float: left; padding-right: 10px'>
         <ul class='dropdown text' id='colorSelection'>
              <li id="top">Choose Heatmap Coloring
                 <span></span>
                 <ul class="dropdown-box">
-                   <li  onclick=updateColors(0)>Divergent Color Sheme 1</li>
-                   <li  onclick=updateColors(1)>Divergent Color Sheme 2</li>
-                   <li  onclick=updateColors(2)>Sequential Color Sheme 1</li>
-                   <li  onclick=updateColors(3)>Sequential Color Sheme 2</li>
+                   <li  onclick=updateColors(0)>Red-Green Color Sheme</li>
+                   <li  onclick=updateColors(1)>Color Sheme 2</li>
+                   <li  onclick=updateColors(2)>Color Sheme 3</li>
+                   <li  onclick=updateColors(3)>Color Sheme 4</li>
+                   <li  onclick=updateColors(4)>Color Sheme 5</li>
                 </ul>
              </li>
           </ul>
@@ -242,19 +356,32 @@
         <input id='cohortButton' class='text niceButton' type='button' value='Update Cohorts by Selection' onclick='updateCohorts()'/>
     </div>
     <div style='float: left; padding-right: 10px'>
-        <input id='loadMoreButton' class='text niceButton' type='button' value='Load 100 additional rows' onclick='loadMore()'/><div id='loadMessage'></div><br/><br/><br/><br/>
-    </div><br/>
+        <input id='loadMoreButton' class='text niceButton' type='button' value='Load 100 additional rows' onclick='loadRows()'/><div id='loadMessage'></div>
+    </div>
     <div style='float: left; padding-right: 10px'>
         <input type='range' min='0' max='300' value='100' id='zoomSlider' class='text' step='5' onchange="zoom()">
         <output for='zoomSlider' id='zoomLevel'>100% Zoom</output>
+    </div>
+    <div style='float: left; padding-right: 10px'>
+        <input id='cutoffValue' type='number' class='text' onchange="animateCutoff()">
+    </div>
+    <div style='float: left; padding-right: 10px'>
+        <input id='cutoffButton' class='text niceButton' type='button' value='Apply cutoff' onclick='cutoff()'/>
     </div>
     <div id="heatmap" class='text'></div>
 </div>
 
 <script>
-    jQuery(function() {
-        jQuery("#zoomSlider").slider();
-    });
+    var animationDuration = 1500;
+    var tmpAnimationDuration = animationDuration;
+    function switchAnimation() {
+        if (animationDuration) {
+            tmpAnimationDuration = animationDuration;
+            animationDuration = 0;
+        } else {
+            animationDuration = tmpAnimationDuration;
+        }
+    }
 
     var data = ${raw(results)};
     var extraFields = data.extraFields === undefined ? [] : data.extraFields;
@@ -265,26 +392,59 @@
     var probes = data.probes;
     var geneSymbols = data.geneSymbols;
 
+    var maxRows = 100;
+
     var originalPatientIDs = patientIDs.slice();
     var originalProbes = probes.slice();
 
-    function ownColorSheme() {
+    function redGreen() {
         var colorSet = [];
-        var i = 100;
+        var NUM = 100; 
+        var i = NUM;
         while(i--) {
-            colorSet.push(d3.rgb((255 * i) / 100, 0, 0));
+            colorSet.push(d3.rgb((255 * i) / NUM, 0, 0));
         }
-        i = 100;
+        i = NUM;
         while(i--) {
-            colorSet.push(d3.rgb(0, (255 * (100 - i)) / 100, 0));
+            colorSet.push(d3.rgb(0, (255 * (NUM - i)) / NUM, 0));
         }
         return colorSet;
     }
 
-    var colorSets = [ownColorSheme(),
-        ['rgb(84,48,5)','rgb(140,81,10)','rgb(191,129,45)','rgb(223,194,125)','rgb(246,232,195)','rgb(245,245,245)','rgb(199,234,229)','rgb(128,205,193)','rgb(53,151,143)','rgb(1,102,94)','rgb(0,60,48)'],
-        ['rgb(255,255,217)','rgb(237,248,177)','rgb(199,233,180)','rgb(127,205,187)','rgb(65,182,196)','rgb(29,145,192)','rgb(34,94,168)','rgb(37,52,148)','rgb(8,29,88)'],
-        ['rgb(255,247,236)','rgb(254,232,200)','rgb(253,212,158)','rgb(253,187,132)','rgb(252,141,89)','rgb(239,101,72)','rgb(215,48,31)','rgb(179,0,0)','rgb(127,0,0)']
+    function redBlue() {
+        var colorSet = [];
+        var STEP = 1 / 200; 
+        var sR = 255, sG = 0, sB = 0;
+        var eR = 0, eG = 0, eB = 255;
+        for (var i = 0; i < 1; i += STEP) {
+            colorSet.push(d3.rgb((eR - sR) * i + sR, (eG - sG) * i + sG, (eB - sB) * i + sB));
+        }
+        return colorSet;
+    }
+
+    function odd(color) {
+        var colorSet = [];
+        var STEP = 1 / 200; 
+        var idx1, idx2, fractBetween;
+        for (var i = 0; i < 1; i += STEP) {
+            var value = i * (color.length - 1);
+            idx1 = Math.floor(value);
+            idx2 = idx1 + 1;
+            fractBetween = value - idx1;
+            var r = (color[idx2][0] - color[idx1][0]) * fractBetween + color[idx1][0];
+            var g = (color[idx2][1] - color[idx1][1]) * fractBetween + color[idx1][1];
+            var b = (color[idx2][2] - color[idx1][2]) * fractBetween + color[idx1][2];
+            colorSet.push(d3.rgb(255 * r, 255 * g, 255 * b));
+        }
+        return colorSet;
+    }
+
+    var colorSets = [
+        redGreen(), 
+        redBlue(), 
+        odd([[0, 0, 1], [0, 1, 1], [0, 1, 0], [1, 1, 0], [1, 0, 0]]), 
+        odd([[0, 0, 1], [0, 1, 0], [1, 0, 0]]),
+        odd([[0, 0, 1], [1, 1, 0], [1, 0, 0]])
     ];
 
     var featureColorSetBinary = ['rgb(0, 0, 0)', 'rgb(13, 13, 191)'];
@@ -304,7 +464,6 @@
     var height = gridFieldHeight * probes.length;
 
     var selectedPatientIDs = [];
-    var animationDuration = 1500;
 
     var histogramScale = d3.scale.linear()
     .domain(d3.extent(significanceValues))
@@ -319,6 +478,17 @@
     var tooltip = d3.select("#heatmap").append("div")
     .attr("class", "tooltip text")
     .style("visibility", "hidden");
+
+    // jQuery(function() {
+    //     jQuery("#zoomSlider").slider();
+    // });
+
+    
+    var cutoffInput = document.getElementById('cutoffValue');
+    cutoffValue.setAttribute('value', significanceValues[significanceValues.length - 1]);
+    cutoffValue.setAttribute('min', significanceValues[significanceValues.length - 1]);
+    cutoffValue.setAttribute('max', significanceValues[0]);
+    cutoffValue.setAttribute('step', (significanceValues[0] - significanceValues[significanceValues.length - 1]) / 50);
 
     var extraSquareItems = heatmap.append('g');
     var squareItems = heatmap.append('g');
@@ -587,7 +757,7 @@
         bar
         .enter()
         .append('rect')
-        .attr('class', 'bar')
+        .attr('class', function(d) { return 'bar idx-' + d.idx ; })
         .attr("width", function(d) { return histogramScale(d.significance); })
         .attr("height", gridFieldHeight)
         .attr("x", function(d) { return - histogramScale(d.significance) - 10; })
@@ -700,6 +870,36 @@
         updateHeatmap();
         reloadDendrograms();
         animationDuration = temp;
+    }
+
+    function animateCutoff() {
+        var cutoffLevel =  document.getElementById("cutoffValue").value;
+        for (var i = 0; i < significanceValues.length; i++) {
+            var significanceValue = significanceValues[i];
+            if (significanceValue < cutoffLevel) {
+                d3.selectAll('.square.probe-' +  probes[i])
+                .classed("cuttoffHighlight", true);
+                d3.select('.bar.idx-' +  i)
+                .classed("cuttoffHighlight", true);
+            } else {
+                d3.selectAll('.square.probe-' +  probes[i])
+                .classed("cuttoffHighlight", false);
+                d3.select('.bar.idx-' +  i)
+                .classed("cuttoffHighlight", false);
+            }
+        }
+    }
+
+    function cutoff() {
+        var cutoffLevel =  document.getElementById("cutoffValue").value;
+        var nrows = 0;
+        for (var i = 0; i < significanceValues.length; i++) {
+            var significanceValue = significanceValues[i];
+            if (significanceValue > cutoffLevel) {
+                nrows += 1;
+            }
+        }
+        loadRows(nrows);
     }
 
     function reloadDendrograms() {
@@ -918,6 +1118,7 @@
         significanceValues = sortedSignificanceValues;
         removeRowDendrogram();
         updateHeatmap();
+        animateCutoff();
     }
 
     function transformClusterOrderWRTInitialOrder(clusterOrder, initialOrder) {
@@ -968,9 +1169,9 @@
         setCohorts(patientDIVs, false, false, true);
     }
 
-    function loadMore() {
+    function loadRows(nrows) {
+        var maxRows = nrows === undefined ? probes.length + 100 : nrows;
         var data = prepareFormData();
-        var maxRows = probes.length + 100;
         data = addSettingsToData(data, { maxRows: maxRows });
         jQuery("#loadMoreButton").attr("disabled", true);
         jQuery("#loadMoreButton").val('This will last a moment...');
@@ -984,7 +1185,7 @@
             jQuery("#loadMoreButton").attr("disabled", false);
             jQuery("#loadMoreButton").val('Load 100 additional rows');
         }).fail(function() {
-            jQuery("#outputDIV").html("AJAX CALL FAILED!");
+            jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
             jQuery("#loadMoreButton").attr("disabled", false);
             jQuery("#loadMoreButton").val('Load 100 additional rows');
         });

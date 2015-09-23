@@ -5,7 +5,7 @@
 */
 function mouseX() {
     var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX;
-    return mouseXPos - jQuery("#westPanel").width() + 20;
+    return mouseXPos - jQuery('#smartRPanel').offset().left + jQuery('#outputDIV').parent().scrollLeft();
 }
 
 /**
@@ -15,7 +15,7 @@ function mouseX() {
 */
 function mouseY() {
     var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY;
-    return mouseYPos + jQuery("#index").parent().scrollTop() - 50;
+    return mouseYPos + jQuery("#index").parent().scrollTop() - jQuery('#smartRPanel').offset().top;
 }
 
 /**
@@ -129,13 +129,11 @@ function setCohorts(constrains, andConcat, negate, reCompute, subset) {
     }
 
     subset = subset === undefined ? 1 : subset;
-    var destination;
-    if (andConcat) {
-        destination = 1; // TODO; does this makes sense?
-    } else {
-        destination = jQuery(jQuery("#queryTable tr:last-of-type td")[subset - 1]).find('div[id^=panelBoxList]').last();
-    }
-    for(var i = 0, len = constrains.length; i < len; i++) {
+    var destination = jQuery(jQuery("#queryTable tr:last-of-type td")[subset - 1]).find('div[id^=panelBoxList]').last();
+    for (var i = 0, len = constrains.length; i < len; i++) {
+        if (andConcat) {
+            destination = jQuery(jQuery("#queryTable tr:last-of-type td")[subset - 1]).find('div[id^=panelBoxList]').last();
+        }
         appendItemFromConceptInto(destination, constrains[i], negate);
     }
     if (reCompute) {
@@ -351,7 +349,16 @@ function runRScript() {
         return false;
     }
 
-    jQuery("#outputDIV").html("Fetching data from database. This might last up to several minutes...");
+    jQuery.ajax({
+        url: pageInfo.basePath + '/SmartR/renderLoadingScreen',
+        type: "POST",
+        timeout: '600000'
+    }).done(function(serverAnswer) {
+        jQuery("#outputDIV").html(serverAnswer);
+    }).fail(function() {
+        jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
+    });
+
     jQuery('#submitButton').prop('disabled', true);
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderOutputDIV',
@@ -372,7 +379,6 @@ function runRScript() {
 */
 function changeInputDIV() {
     jQuery("#outputDIV").html("");
-
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderInputDIV',
         type: "POST",

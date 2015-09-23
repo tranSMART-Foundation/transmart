@@ -129,6 +129,10 @@ dendrogramToJSON <- function(d) {
     return(jsonString)
 }
 
+if (length(data.cohort1$mRNAData$PATIENTID) == 0) {
+    stop('Your selection does not match any patient in the defined cohort!')
+}
+
 HDD.value.matrix.cohort1 <- getHDDMatrix(data.cohort1$mRNAData)
 patientIDs.cohort1 <- as.numeric(sub("^X", "", colnames(HDD.value.matrix.cohort1))[-(1:2)])
 colNum <- ncol(HDD.value.matrix.cohort1) - 2

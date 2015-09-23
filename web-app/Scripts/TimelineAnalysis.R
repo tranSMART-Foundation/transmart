@@ -10,6 +10,10 @@ interpolateNAs <- strtoi(settings$interpolateNAs)
 
 points <- data.cohort1$datapoints
 
+if (length(points$patientID) == 0) {
+	stop('Your selection does not match any patient in the defined cohort!')
+}
+
 if (! is.null(acfPatientID)) {
 	points <- points[points$patientID == acfPatientID, ]
 }

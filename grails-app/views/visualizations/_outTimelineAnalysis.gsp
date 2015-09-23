@@ -395,6 +395,13 @@
             <span></span>
         </label>
     </div>
+<!--     <div style='float: left; padding-right: 20px'>
+        <label class="ios7-switch" style="font-size: 16px">
+            Disable Animations
+            <input onclick='switchAnimation()' type="checkbox">
+            <span></span>
+        </label>
+    </div> -->
 </div>
 
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
@@ -402,6 +409,17 @@
 <g:javascript src="resource/2D.js"/>
 
 <script type="text/javascript">
+    // var animationDuration = 500;
+    // var tmpAnimationDuration = animationDuration;
+    // function switchAnimation() {
+    //     if (animationDuration) {
+    //         tmpAnimationDuration = animationDuration;
+    //         animationDuration = 0;
+    //     } else {
+    //         animationDuration = tmpAnimationDuration;
+    //     }
+    // }
+
     d3.selection.prototype.moveToFront = function() {
       return this.each(function(){
           this.parentNode.appendChild(this);
@@ -1269,7 +1287,7 @@
             var div = createQueryCriteriaDIV(concept, 'ratio', 'numeric', 'EQ', value, '', 'ratio', 'Y', 'valueicon');
             divs.push(div);
         }
-        setCohorts(divs, false, false, false);
+        setCohorts(divs, false, false, false, 1);
     }
 
     function removeDendrograms() {

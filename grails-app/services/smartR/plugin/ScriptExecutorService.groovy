@@ -99,7 +99,7 @@ class ScriptExecutorService {
     }
 
     def computeResults(connection) {
-        def results = connection.eval("toString(toJSON(output))").asString()
+        def results = connection.eval("toString(toJSON(output, digits=5))").asString()
         return results
     }
 

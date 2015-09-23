@@ -21,80 +21,11 @@
         <div id="inputDIV" class='txt' style="text-align: left">Please select a script to execute.</div>
 
         <hr class="myhr"/>
-        <g:select
-            name="scriptSelect"
-            class='txt'
-            from="${scriptList}"
-            noSelection="['':'Choose an algorithm']"
-            onchange="changeInputDIV()"/>
+        <g:select name="scriptSelect" class='txt' from="${scriptList}" noSelection="['':'Choose an algorithm']" onchange="changeInputDIV()"/>
         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        <input
-            id="submitButton"
-            class='txt'
-            type="button"
-            value="(Re-)Run Analysis"
-            onclick="runRScript()"/>
+        <input id="submitButton" class='txt' type="button" value="(Re-)Run Analysis" onclick="runRScript()"/>
         <hr class="myhr"/>
     </div>
 
     <div id="outputDIV" class='txt'></div>
-    <!-- <div id="loaderImage"></div> -->
 </body>
-
-<script>
-// var cSpeed=6;
-//     var cWidth=95;
-//     var cHeight=95;
-//     var cTotalFrames=1;
-//     var cFrameWidth=95;
-//     var cImageSrc='/images/sprites.png';
-    
-//     var cImageTimeout=false;
-//     var cIndex=0;
-//     var cXpos=0;
-//     var SECONDS_BETWEEN_FRAMES=0;
-    
-//     function startAnimation(){
-        
-//         document.getElementById('loaderImage').style.backgroundImage='url('+cImageSrc+')';
-//         document.getElementById('loaderImage').style.width=cWidth+'px';
-//         document.getElementById('loaderImage').style.height=cHeight+'px';
-        
-//         //FPS = Math.round(100/(maxSpeed+2-speed));
-//         FPS = Math.round(100/cSpeed);
-//         SECONDS_BETWEEN_FRAMES = 1 / FPS;
-        
-//         setTimeout('continueAnimation()', SECONDS_BETWEEN_FRAMES/1000);
-        
-//     }
-    
-//     function continueAnimation(){
-        
-//         cXpos += cFrameWidth;
-//         //increase the index so we know which frame of our animation we are currently on
-//         cIndex += 1;
-         
-//         //if our cIndex is higher than our total number of frames, we're at the end and should restart
-//         if (cIndex >= cTotalFrames) {
-//             cXpos =0;
-//             cIndex=0;
-//         }
-        
-//         document.getElementById('loaderImage').style.backgroundPosition=(-cXpos)+'px 0';
-        
-//         setTimeout('continueAnimation()', SECONDS_BETWEEN_FRAMES*1000);
-//     }
-    
-//     function imageLoader(s, fun)//Pre-loads the sprites image
-//     {
-//         clearTimeout(cImageTimeout);
-//         cImageTimeout=0;
-//         genImage = new Image();
-//         genImage.onload=function (){cImageTimeout=setTimeout(fun, 0)};
-//         genImage.onerror=new Function('alert(\'Could not load the image\')');
-//         genImage.src=s;
-//     }
-    
-//     //The following code starts the animation
-//     new imageLoader(cImageSrc, 'startAnimation()');
-</script>

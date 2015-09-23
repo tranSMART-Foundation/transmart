@@ -115,11 +115,114 @@
         background: #326FCB;
     }
 
+    .ios7-switch {
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        tap-highlight-color: transparent;
+    }
+
+    .ios7-switch input {
+        opacity: 0;
+        position: absolute;
+    }
+
+    .ios7-switch input + span {
+        position: relative;
+        display: inline-block;
+        width: 1.65em;
+        height: 1em;
+        background: white;
+        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
+        border-radius: 0.5em;
+        vertical-align: -0.15em;
+        transition: all 0.40s cubic-bezier(.17,.67,.43,.98);
+    }
+
+    .ios7-switch:active input + span,
+    .ios7-switch input + span:active {
+        box-shadow: inset 0 0 0 0.73em #e9e9e9;
+    }
+
+    .ios7-switch input + span:after {
+        position: absolute;
+        display: block;
+        content: '';
+        width: 0.875em;
+        height: 0.875em;
+        border-radius: 0.4375em;
+        top: 0.0625em;
+        left: 0.0625em;
+        background: white;
+        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
+                    0 0 0.05em rgba(0,0,0,0.05),
+                    0 0.1em 0.2em rgba(0,0,0,0.2);
+        transition: all 0.25s ease-out;
+    }
+
+    .ios7-switch:active input + span:after,
+    .ios7-switch input + span:active:after {
+        width: 1.15em;
+    }
+
+    .ios7-switch input:checked + span {
+        box-shadow: inset 0 0 0 0.73em #009ac9;
+    }
+
+    .ios7-switch input:checked + span:after {
+        left: 0.7125em;
+    }
+
+    .ios7-switch:active input:checked + span:after,
+    .ios7-switch input:checked + span:active:after {
+        left: 0.4375em;
+    }
+
+    /* accessibility styles */
+    .ios7-switch input:focus + span:after {
+        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.15),
+                    0 0 0.05em rgba(0,0,0,0.08),
+                    0 0.1em 0.2em rgba(0,0,0,0.3);
+        background: #fff;
+    }
+
+    .ios7-switch input:focus + span {
+        box-shadow: inset 0 0 0 0.0625em #dadada;
+    }
+
+    .ios7-switch input:focus:checked + span {
+        box-shadow: inset 0 0 0 0.73em #009ac9;
+    }
+
+    /* reset accessibility style on hover */
+    .ios7-switch:hover input:focus + span:after {
+        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
+                    0 0 0.05em rgba(0,0,0,0.05),
+                    0 0.1em 0.2em rgba(0,0,0,0.2);
+        background: #fff;
+    }
+
+    .ios7-switch:hover input:focus + span {
+        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
+    }
+
+    .ios7-switch:hover input:focus:checked + span {
+        box-shadow: inset 0 0 0 0.73em #009ac9;
+    }
 </style>
 
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 <g:javascript src="resource/d3.js"/>
-
+<label class="ios7-switch" style="font-size: 16px">
+    Disable Animations
+    <input onclick='switchAnimation()' type="checkbox">
+    <span></span>
+</label>
 <div id="visualization">
     <div id="histogram1"></div>
     <div id="scatterplot"></div>
@@ -127,6 +230,17 @@
 </div>
 
 <script>
+    var animationDuration = 500;
+    var tmpAnimationDuration = animationDuration;
+    function switchAnimation() {
+        if (animationDuration) {
+            tmpAnimationDuration = animationDuration;
+            animationDuration = 0;
+        } else {
+            animationDuration = tmpAnimationDuration;
+        }
+    }
+
     var margin = {top: 20, right: 40, bottom: 5, left: 10};
     var width = jQuery("#smartRPanel").width() / 2 - 10 - margin.left - margin.right;
     var height = jQuery("#smartRPanel").height() / 2 - 10 - margin.top - margin.bottom;
@@ -377,7 +491,7 @@
         .attr("r", 5);
 
         point.exit()
-        .transition().duration(500)
+        .transition().duration(animationDuration)
         .attr("r", 0)
         .remove();
     }
@@ -395,17 +509,17 @@
         } else {
             regressionLine
             .transition()
-            .duration(250)
+            .duration(animationDuration)
             .attr("stroke-width", 10)
             .transition()
-            .duration(250)
+            .duration(animationDuration)
             .attr("stroke-width", 0);
             return;
         }
 
         regressionLine
         .transition()
-        .duration(500)
+        .duration(animationDuration)
         .attr("x1", minX)
         .attr("y1", y(parseFloat(results.regLineYIntercept) + parseFloat(results.regLineSlope) * x.invert(minX)))
         .attr("x2", maxX)
@@ -525,7 +639,7 @@
             timeout: '600000',
             data: data
         }).done(function(serverAnswer) {
-            serverAnswer = JSON.parse(serverAnswer)
+            serverAnswer = JSON.parse(serverAnswer);
             if (serverAnswer.error) {
                 alert(serverAnswer.error);
                 return;
@@ -614,7 +728,7 @@
         .attr("y", function(d, i) { return hist1Data[i].x; })
         .transition()
         .delay(function(d, i) { return i * 25; })
-        .duration(250)
+        .duration(animationDuration)
         .attr("x", function(d) { return width - hist1BarScale(d.y); })
         .attr("width", function(d) { return hist1BarScale(d.y); });
 
@@ -624,7 +738,7 @@
         .attr("y", function(d, i) { return hist1Data[i].x; })
         .transition()
         .delay(function(d, i) { return i * 25; })
-        .duration(250)
+        .duration(animationDuration)
         .attr("dy", ".35em")
         .attr("x", function(d) { return width - hist1BarScale(d.y) + 10; })
         .attr("y", function(d, i) { return hist1Data[i].x + hist1Data[i].dx / 2; })
@@ -642,7 +756,7 @@
         .attr("y", 0)
         .transition()
         .delay(function(d, i) { return i * 25; })
-        .duration(250)
+        .duration(animationDuration)
         .attr("height", function(d) { return hist2BarScale(d.y); });
 
         hist2Bar.append("text")
@@ -651,7 +765,7 @@
         .attr("y", 0)
         .transition()
         .delay(function(d, i) { return i * 25; })
-        .duration(250)
+        .duration(animationDuration)
         .attr("dx", "-.5em")
         .attr("x", function(d, i) { return hist2Data[i].x + hist2Data[i].dx / 2; })
         .attr("y", function(d) { return hist2BarScale(d.y) - 5; })
