@@ -129,8 +129,11 @@ function setCohorts(constrains, andConcat, negate, reCompute, subset) {
     }
 
     subset = subset === undefined ? 1 : subset;
+    var destination = jQuery(jQuery("#queryTable tr:last-of-type td")[subset - 1]).find('div[id^=panelBoxList]').last();
     for (var i = 0, len = constrains.length; i < len; i++) {
-        var destination = jQuery(jQuery("#queryTable tr:last-of-type td")[subset - 1]).find('div[id^=panelBoxList]').last();
+        if (andConcat) {
+            destination = jQuery(jQuery("#queryTable tr:last-of-type td")[subset - 1]).find('div[id^=panelBoxList]').last();
+        }
         appendItemFromConceptInto(destination, constrains[i], negate);
     }
     if (reCompute) {
