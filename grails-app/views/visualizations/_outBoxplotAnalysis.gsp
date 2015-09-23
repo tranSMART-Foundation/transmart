@@ -259,13 +259,13 @@
                 </div>
             </td>
         </tr>
-        <tr>
+<!--         <tr>
             <td style='padding-bottom: 2em'>
                 <div>
                     <input id='updateCohortsButton' class='text niceButton' type='button' value='Update Cohorts' onclick='updateCohorts()'/>
                 </div>
             </td>
-        </tr>
+        </tr> -->
         <tr>
             <td style='padding-bottom: 0.5em'>
                 <div>
@@ -463,7 +463,7 @@
     var contextMenu = d3.select("#visualization").append("div")
     .attr("class", "contextMenu text")
     .style("visibility", "hidden")
-    .html("<input id='excludeButton' class='mybutton text' type='button' value='Exclude' onclick='excludeSelection()'/><input id='resetButton' class='mybutton text' type='button' value='Reset' onclick='reset()'/><input id='cohortButton' class='mybutton text' type='button' value='Update Cohorts' onclick='updateCohorts(true)'/>")
+    .html("<input id='excludeButton' class='mybutton text' type='button' value='Exclude' onclick='excludeSelection()'/><input id='resetButton' class='mybutton text' type='button' value='Reset' onclick='reset()'/><input id='cohortButton' class='mybutton text' type='button' value='Update Cohorts' onclick='updateCohorts()'/>")
     .on('click', function() {
         d3.select(this)
         .style('visibility', 'hidden')
@@ -581,9 +581,8 @@
     }
     
     function shortenNodeLabel(label) {
-        label = label.replace(/ /g, '');
-        label = label.replace(/,/g, '');
-        return label
+        label = label.replace(/\W+/g, '');
+        return label;
     }
     
     var jitterWidth = 1.0;
@@ -934,45 +933,38 @@
         excludeSelection(); // Abusing the method because I can
     }
 
-    function updateCohorts(bySelection) {
-        var cohort1MinMax;
-        var cohort2MinMax;
-        var cohort1Points = [];
-        var cohort2Points = [];
-        
-        if (bySelection) {
-            for (var i = 0; i < currentSelection.length; i++) {
-                var patientID = currentSelection[i];
-                var node = d3.select('.patientID-' + patientID);
-                if (node.classed('cohort1')) {
-                    cohort1Points.push(node.property('__data__').value);
-                } else {
-                    cohort2Points.push(node.property('__data__').value);
-                }
-            }
-        } 
+    function updateCohorts() {
+        alert('Under Construction.');
+        // var values = {};
+        // var cohort = d3.select('.patientID-' + currentSelection[0]).classed('cohort1') ? 1 : 2;
+        // var subsets = cohrt === 1 ? results.cohort1.subsets : results.cohort2.subsets;
+        // for (var i = 0; i < currentSelection.length; i++) {
+        //     var patientID = currentSelection[i];
+        //     var point = d3.select('.patientID-' + patientID);
+        //     for (var j = 0; j < subsets.length; j++) {
+        //         var subset = shortenNodeLabel(subsets[j]);
+        //         if (point.classed(subset)) {
+        //             values[subset] = point.property('__data__').value;
+        //         }
+        //     }
+        // }
 
-        if (! bySelection || cohort1Points.length < 2 || cohort2Points.length < 2) {
-            if (cohort1Points.length < 2) {
-                d3.selectAll('.point.cohort1').each(function(d) { cohort1Points.push(d.value); });
-            }
-            if (cohort2Points.length < 2) {
-                d3.selectAll('.point.cohort2').each(function(d) { cohort2Points.push(d.value); });
-            }
-        }
+        // for (var k = 0, keys = Object.keys(values); k < keys.length; k++) {
+        //     var key = keys[k];
+        //     var extent = d3.extent(values[key]);
+        //     var numConcept = 
+        //     var divs = [];
+        //     for (var l = 0; l < subsets.length; l++) {
+        //         subset = shortenNodeLabel(subsets[l]);
+        //         var subConcept = 
+        //         if (numConcept !== subConcept) {
 
-        cohort1MinMax = d3.extent(cohort1Points);
-        cohort2MinMax = d3.extent(cohort2Points);
+        //         }
+        //     }
+        //     divs.push(createQueryCriteriaDIV(numConcept, 'ratio', 'numeric', 'BETWEEN', extent[0], extent[1], 'ratio', 'Y', 'valueicon'));
 
-        var div1 = createQueryCriteriaDIV(results.cohort1.concept[0], 'ratio', 'numeric', 'BETWEEN', cohort1MinMax[0], cohort1MinMax[1], 'ratio', 'Y', 'valueicon');
-        var div2 = createQueryCriteriaDIV(results.cohort2.concept[0], 'ratio', 'numeric', 'BETWEEN', cohort2MinMax[0], cohort2MinMax[1], 'ratio', 'Y', 'valueicon');
-
-        if (cohort2Points.length >= 2) {
-            setCohorts([div1], true, false, false, 1);
-            setCohorts([div2], true, false, true, 2);
-        } else {
-            setCohorts([div1], true, false, true, 1);
-        }
+        //     setCohorts(divs, true, false, true, cohort);
+        // }
     }
 
     init();
