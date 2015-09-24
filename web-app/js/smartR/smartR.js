@@ -1,3 +1,248 @@
+function createD3Button(args) {
+    var button = args.location.append('g');
+
+    var box = button.append("rect")
+    .attr("x", args.x)
+    .attr("y", args.y)
+    .attr("rx", 3)
+    .attr("ry", 3)
+    .attr("width", args.width)
+    .attr("height", args.height)
+    .on('click', function() { args.callback(); });
+
+    var text = button.append('text')
+    .attr('x', args.x + args.width / 2)
+    .attr('y', args.y + args.height / 2)
+    .attr('dy', '0.35em')
+    .text(args.label);
+
+    box
+    .style('stroke-width', '1px')
+    .style('stroke', '#009ac9')
+    .style('fill', '#009ac9')
+    .style('cursor', 'pointer')
+    .on('mouseover', function() {
+        box
+        .transition()
+        .duration(300)
+        .style('fill', '#ffffff');
+
+        text
+        .transition()
+        .duration(300)
+        .style('fill', '#009ac9');
+    })
+    .on('mouseout', function() {
+        box
+        .transition()
+        .duration(300)
+        .style('fill', '#009ac9');
+
+        text
+        .transition()
+        .duration(300)
+        .style('fill', '#ffffff');
+    });
+
+    text
+    .style('pointer-events', 'none')
+    .style("text-anchor", "middle")
+    .style('fill', '#ffffff')
+    .style('font-size', '14px');
+}
+
+function createD3Switch(args) {
+    var switcher = args.location.append('g');
+
+    var checked = args.checked;
+    var color = checked ? 'green' : 'red';
+
+    var box = switcher.append("rect")
+    .attr("x", args.x)
+    .attr("y", args.y)
+    .attr("rx", 3)
+    .attr("ry", 3)
+    .attr("width", args.width)
+    .attr("height", args.height)
+    .on('click', function() {
+        if (color === 'green') {
+            box
+            .transition()
+            .duration(300)
+            .style('stroke', 'red')
+            .style('fill', 'red');
+            color = 'red';
+            checked = false;
+        } else {
+            box
+            .transition()
+            .duration(300)
+            .style('stroke', 'green')
+            .style('fill', 'green');
+            color = 'green';
+            checked = true;
+        }
+        args.callback(checked); 
+    });
+
+    var text = switcher.append('text')
+    .attr('x', args.x + args.width / 2)
+    .attr('y', args.y + args.height / 2)
+    .attr('dy', '0.35em')
+    .text(args.label);
+
+    box
+    .style('stroke-width', '1px')
+    .style('stroke', color)
+    .style('fill', color)
+    .style('cursor', 'pointer');
+
+    text
+    .style('pointer-events', 'none')
+    .style("text-anchor", "middle")
+    .style('fill', '#ffffff')
+    .style('font-size', '14px');
+}
+
+function createD3Dropdown(args) {
+    function shrink() {
+        dropdown.selectAll('.itemBox')
+        .attr('y', args.y + args.height)
+        .style('visibility', 'hidden');
+        dropdown.selectAll('.itemText')
+        .attr('y', args.y + args.height + args.height / 2)
+        .style('visibility', 'hidden');
+        itemHovered = false;
+        hovered = false;
+        itemHovered = false;
+    }
+    var dropdown = args.location.append('g');
+
+    var hovered = false;
+    var itemHovered = false;
+
+    var box = dropdown.append("rect")
+    .attr("x", args.x)
+    .attr("y", args.y)
+    .attr("rx", 3)
+    .attr("ry", 3)
+    .attr("width", args.width)
+    .attr("height", args.height);
+
+    var itemBox = dropdown.selectAll('.itemBox')
+    .data(args.items, function(item) { return item.label; });
+
+    itemBox
+    .enter()
+    .append('rect')
+    .attr('class', 'itemBox')
+    .attr("x", args.x)
+    .attr("y", args.y + args.height)
+    .attr("rx", 0)
+    .attr("ry", 0)
+    .attr("width", args.width)
+    .attr("height", args.height)
+    .style('cursor', 'pointer')
+    .style('stroke-width', '2px')
+    .style('stroke', '#ffffff')
+    .style('fill', '#E3E3E3')
+    .style('visibility', 'hidden')
+    .on('mouseover', function() {
+        itemHovered = true;
+        d3.select(this)
+        .style('fill', '#009ac9');
+    })
+    .on('mouseout', function() {
+        itemHovered = false;
+        d3.select(this)
+        .style('fill', '#E3E3E3');
+        setTimeout(function() {
+            if (! hovered && ! itemHovered) {
+                shrink();
+            }
+        }, 200);
+    })
+    .on('click', function(d) {
+        d.callback();
+    });
+
+    var itemText = dropdown.selectAll('.itemText')
+    .data(args.items, function(item) { return item.label; });
+
+    itemText
+    .enter()
+    .append('text')
+    .attr('class', 'itemText')
+    .attr('x', args.x + args.width / 2)
+    .attr('y', args.y + args.height + args.height / 2)
+    .attr('dy', '0.35em')
+    .style('pointer-events', 'none')
+    .style("text-anchor", "middle")
+    .style('fill', '#000000')
+    .style('font-size', '14px')
+    .style('visibility', 'hidden')
+    .text(function(d) { return d.label; });
+
+    var text = dropdown.append('text')
+    .attr('x', args.x + args.width / 2)
+    .attr('y', args.y + args.height / 2)
+    .attr('dy', '0.35em')
+    .text(args.label);
+
+    box
+    .style('stroke-width', '1px')
+    .style('stroke', '#009ac9')
+    .style('fill', '#009ac9')
+    .on('mouseover', function() {
+        if (hovered) {
+            return;
+        }
+        dropdown.selectAll('.itemBox')
+        .transition()
+        .duration(300)
+        .style('visibility', 'visible')
+        .attr('y', function(d) {
+            var pos;
+            for (var i = 0; i < args.items.length; i++) {
+                if (d.label === args.items[i].label) {
+                    pos = i;
+                }
+            }
+            return 2 + args.y + (pos + 1) * args.height;
+        });
+
+        dropdown.selectAll('.itemText')
+        .transition()
+        .duration(300)
+        .style('visibility', 'visible')
+        .attr('y', function(d) {
+            var pos;
+            for (var i = 0; i < args.items.length; i++) {
+                if (d.label === args.items[i].label) {
+                    pos = i;
+                }
+            }
+            return 2 + args.y + (pos + 1) * args.height + args.height / 2;
+        });
+
+        hovered = true;
+    })
+    .on('mouseout', function() {
+        hovered = false;
+        setTimeout(function() {
+            if (! hovered && ! itemHovered) {
+                shrink();  
+            }
+        }, 200);
+    });
+
+    text
+    .style('pointer-events', 'none')
+    .style("text-anchor", "middle")
+    .style('fill', '#ffffff')
+    .style('font-size', '14px');
+}
+
 /**
 *   Gets the x position of the mouse on the screen (TODO: this is not as precise as I want it to be)
 *
