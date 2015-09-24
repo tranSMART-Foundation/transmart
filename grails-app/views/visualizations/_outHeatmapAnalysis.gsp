@@ -496,6 +496,7 @@
     var selectItems = heatmap.append('g');
     var patientIDItems = heatmap.append('g');
     var rowSortItems = heatmap.append('g');
+    var significanceSortItems = heatmap.append('g');
     var labelItems = heatmap.append('g');
     var barItems = heatmap.append('g');
 
@@ -660,6 +661,63 @@
         .attr('y', function(d, i) { return i * gridFieldHeight; })
         .attr('width', gridFieldWidth)
         .attr('height', gridFieldHeight);
+
+        var significanceSortText = significanceSortItems.selectAll('.significanceSortText')
+        .data(['something'], function(d) { return d; });
+
+        significanceSortText
+        .enter()
+        .append('text')
+        .attr('class', 'text significanceSortText')
+        .attr('x', - gridFieldWidth - 10 + 0.5 * gridFieldWidth)
+        .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight)
+        .attr('dy', '0.35em')
+        .attr("text-anchor", "middle")
+        .text('↑↓');
+
+        significanceSortText
+        .transition()
+        .duration(animationDuration)
+        .attr('x', - gridFieldWidth - 10 + 0.5 * gridFieldWidth)
+        .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight);
+
+        var significanceSortBox = significanceSortItems.selectAll('.significanceSortBox')
+        .data(['something'], function(d) { return d; });
+
+        significanceSortBox
+        .enter()
+        .append('rect')
+        .attr('class', 'box significanceSortBox')
+        .attr('x', - gridFieldWidth - 10)
+        .attr('y', -2 - gridFieldHeight)
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight)
+        .on("click", function() {
+            var rowValues = [];
+            for(var i = 0; i < significanceValues.length; i++) {
+                var significanceValue = significanceValues[i];
+                rowValues.push([i, significanceValue]);
+            }
+            if (isSorted(rowValues)) {
+               rowValues.sort(function(a, b) { return a[1] - b[1]; });
+            } else {
+               rowValues.sort(function(a, b) { return b[1] - a[1]; });
+            }
+            var sortValues = [];
+            for (i = 0; i < rowValues.length; i++) {
+                sortValues.push(rowValues[i][0]);
+            }
+            updateRowOrder(sortValues);
+        });
+
+        significanceSortBox
+        .transition()
+        .duration(animationDuration)
+        .attr('x', - gridFieldWidth - 10)
+        .attr('y', -2 - gridFieldHeight)
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight);    
+
 
         var selectText = heatmap.selectAll('.selectText')
         .data(patientIDs, function(d) { return d; });
@@ -858,6 +916,22 @@
         var zoomLevel = jQuery("#zoomSlider").val();
         jQuery("#zoomLevel").html(zoomLevel + "% Zoom");
         zoomLevel /= 100;
+
+        d3.selectAll('.patientID')
+        .style('font-size', Math.ceil(14 * zoomLevel) + 'px');
+
+        d3.selectAll('.selectText')
+        .style('font-size', Math.ceil(16 * zoomLevel) + 'px');
+
+        d3.selectAll('.probe')
+        .style('font-size', Math.ceil(9 * zoomLevel) + 'px');
+
+        d3.selectAll('.feature')
+        .style('font-size', Math.ceil(10 * zoomLevel) + 'px');
+
+        d3.selectAll('.significanceSortText, .rowSortText, .colSortText')
+        .style('font-size', Math.ceil(14 * zoomLevel) + 'px');
+
         gridFieldWidth = 40 * zoomLevel;
         gridFieldHeight = 40 * zoomLevel;
         width = gridFieldWidth * patientIDs.length;
@@ -1068,7 +1142,33 @@
         .attr("transform", function (d) {
             return "translate(" + (width + spacing + h - d.y) + "," + d.x + ")";
         }).on('click', function(d) {
-            alert('Feature selection is currently not possible.');
+            alert('Under Construction.');
+            return;
+            var leafs = d.index.split(' ');
+            var genes = [];
+            for (var i = 0; i < leafs.length; i++) {
+                var gene = geneSymbols[leafs[i]];
+                genes.push(gene);
+            }
+            jQuery.ajax({
+                url: 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi',
+                type: "POST",
+                timeout: '600000',
+                data: { 
+                    section: 'upload_gene_lists',
+                    primary_org: 'Human',
+                    background: 'whole_genome',
+                    Category1: 'Human',
+                    gene_list_1: 'gene_list_1',
+                    SubCat1: 'ascii',
+                    attachment1: genes
+                }
+            }).done(function(serverAnswer) {
+                var newTab = window.open('', '');
+                newTab.document.write(serverAnswer);
+            }).fail(function() {
+                alert('fail');
+            });     
         })
         .on("mouseover", function(d) {
             tooltip
