@@ -201,7 +201,7 @@
     var margin = { top: gridFieldHeight * 2 + 100 + features.length * gridFieldHeight / 2 + dendrogramHeight, 
             right: gridFieldWidth + 300 + dendrogramHeight, 
             bottom: 10, 
-            left: histogramHeight };
+            left: histogramHeight + 220 };
 
     var width = gridFieldWidth * patientIDs.length;
     var height = gridFieldHeight * probes.length;
@@ -1032,13 +1032,82 @@
 
     var buttonWidth = 200;
     var buttonHeight = 40;
-    var padding = 5;
+    var padding = 20;
+
+    createD3Switch({
+        location: heatmap,
+        label: 'Enable Animation',
+        x: 2 - margin.left + padding * 0 + buttonWidth * 0,
+        y: 8 - margin.top + buttonHeight * 0 + padding * 0,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: switchAnimation,
+        checked: true
+    });
+
+    createD3Slider({
+        location: heatmap,
+        label: 'Zoom in %',
+        x: 2 - margin.left + padding * 1 + buttonWidth * 1,
+        y: 8 - margin.top + buttonHeight * 0 + padding * 0 - 10,
+        width: buttonWidth,
+        height: buttonHeight,
+        min: 1,
+        max: 200,
+        init: 100,
+        callback: zoom,
+        trigger: 'dragend'
+    });
+
+    createD3Button({
+        location: heatmap,
+        label: 'Update Cohorts',
+        x: 2 - margin.left + padding * 0 + buttonWidth * 0,
+        y: 8 - margin.top + buttonHeight * 1 + padding * 1,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: updateCohorts
+    });
+
+    createD3Button({
+        location: heatmap,
+        label: 'Load 100 add. feat.',
+        x: 2 - margin.left + padding * 1 + buttonWidth * 1,
+        y: 8 - margin.top + buttonHeight * 1 + padding * 1,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: loadRows
+    });
+
+    createD3Button({
+        location: heatmap,
+        label: 'Apply Cutoff',
+        x: 2 - margin.left + padding * 0 + buttonWidth * 0,
+        y: 8 - margin.top + buttonHeight * 2 + padding * 2,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: cutoff
+    });
+
+    createD3Slider({
+        location: heatmap,
+        label: 'Cutoff',
+        x: 2 - margin.left + padding * 1 + buttonWidth * 1,
+        y: 8 - margin.top + buttonHeight * 2 + padding * 2 - 10,
+        width: buttonWidth,
+        height: buttonHeight,
+        min: significanceValues[significanceValues.length - 1],
+        max: significanceValues[0],
+        init: significanceValues[significanceValues.length - 1],
+        callback: animateCutoff,
+        trigger: 'dragend'
+    });
 
     createD3Dropdown({
         location: heatmap,
         label: 'Heatmap Coloring',
-        x: 2 - margin.left,
-        y: 2 - margin.top,
+        x: 2 - margin.left + padding * 0 + buttonWidth * 0,
+        y: 8 - margin.top + buttonHeight * 3 + padding * 3,
         width: buttonWidth,
         height: buttonHeight,
         items: [
@@ -1068,104 +1137,35 @@
     createD3Dropdown({
         location: heatmap,
         label: 'Heatmap Clustering',
-        x: 2 - margin.left + padding + buttonWidth,
-        y: 2 - margin.top,
-        width: buttonWidth + 20,
+        x: 2 - margin.left + padding * 1 + buttonWidth * 1,
+        y: 8 - margin.top + buttonHeight * 3 + padding * 3,
+        width: buttonWidth,
         height: buttonHeight,
         items: [
             {
                 callback: function() { cluster('hclustEuclideanAverage'); }, 
-                label: 'Hierarchical-Euclidean-Average'
+                label: 'Hierarch.-Eucl.-Average'
             },
             {
                 callback: function() { cluster('hclustEuclideanComplete'); }, 
-                label: 'Hierarchical-Euclidean-Complete'
+                label: 'Hierarch.-Eucl.-Complete'
             },
             {
                 callback: function() { cluster('hclustEuclideanSingle'); }, 
-                label: 'Hierarchical-Euclidean-Single'
+                label: 'Hierarch.-Eucl.-Single'
             },
             {
                 callback: function() { cluster('hclustManhattanAverage'); }, 
-                label: 'Hierarchical-Manhattan-Average'
+                label: 'Hierarch.-Manhat.-Average'
             },
             {
                 callback: function() { cluster('hclustManhattanComplete'); }, 
-                label: 'Hierarchical-Manhattan-Complete'
+                label: 'Hierarch.-Manhat.-Complete'
             },
             {
                 callback: function() { cluster('hclustManhattanSingle'); }, 
-                label: 'Hierarchical-Manhattan-Single'
+                label: 'Hierarch.-Manhat.-Single'
             }
         ]
-    });
-
-    createD3Button({
-        location: heatmap,
-        label: 'Update Cohorts by Selection',
-        x: 2 - margin.left + padding * 2 + buttonWidth * 2 + 20,
-        y: 2 - margin.top,
-        width: buttonWidth,
-        height: buttonHeight,
-        callback: updateCohorts
-    });
-
-    createD3Button({
-        location: heatmap,
-        label: 'Load 100 additional features',
-        x: 2 - margin.left + padding * 3 + buttonWidth * 3 + 20,
-        y: 2 - margin.top,
-        width: buttonWidth,
-        height: buttonHeight,
-        callback: loadRows
-    });
-
-    createD3Button({
-        location: heatmap,
-        label: 'Apply Cutoff',
-        x: 2 - margin.left + padding * 4 + buttonWidth * 4 + 20,
-        y: 2 - margin.top,
-        width: buttonWidth,
-        height: buttonHeight,
-        callback: cutoff
-    });
-
-    createD3Switch({
-        location: heatmap,
-        label: 'Enable Animation',
-        x: 2 - margin.left + padding * 5 + buttonWidth * 5 + 20,
-        y: 2 - margin.top,
-        width: buttonWidth,
-        height: buttonHeight,
-        callback: switchAnimation,
-        checked: true
-    });
-
-    createD3Slider({
-        location: heatmap,
-        label: 'Cutoff',
-        x: 2 - margin.left + padding * 4 + buttonWidth * 4 + 20,
-        y: 2 - margin.top + buttonHeight + padding,
-        width: buttonWidth,
-        height: buttonHeight,
-        min: significanceValues[significanceValues.length - 1],
-        max: significanceValues[0],
-        init: significanceValues[significanceValues.length - 1],
-        callback: animateCutoff,
-        trigger: 'dragend'
-    });
-
-    createD3Slider({
-        location: heatmap,
-        label: 'Zoom in %',
-        x: 2 - margin.left + padding * 6 + buttonWidth * 6 + 20,
-        y: 2 - margin.top,
-        width: buttonWidth,
-        height: buttonHeight,
-        min: 1,
-        max: 300,
-        init: 100,
-        callback: zoom,
-        trigger: 'dragend'
     });
 </script>
