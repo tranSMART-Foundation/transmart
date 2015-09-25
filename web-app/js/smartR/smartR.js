@@ -82,6 +82,7 @@ function createD3Switch(args) {
             color = 'green';
             checked = true;
         }
+        text.text(checked ? args.onlabel : args.offlabel);
         args.callback(checked); 
     });
 
@@ -93,7 +94,7 @@ function createD3Switch(args) {
     .style("text-anchor", "middle")
     .style('fill', '#ffffff')
     .style('font-size', '14px')
-    .text(args.label);
+    .text(checked ? args.onlabel : args.offlabel);
 }
 
 function createD3Dropdown(args) {
@@ -317,13 +318,9 @@ function createD3Slider(args) {
         .text(currentValue);
     }
 
-    function executeCallback() {
-        args.callback(currentValue);
-    }
-
     var drag = d3.behavior.drag()
     .on("drag", move)
-    .on(args.trigger, executeCallback);
+    .on(args.trigger, function() { args.callback(currentValue); });
 
     var dragger = slider.append('rect')
     .attr('x', sliderScale(args.init) - 20)

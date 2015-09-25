@@ -1176,7 +1176,8 @@
 
     createD3Switch({
         location: svg,
-        label: 'Interpolate Missing Data',
+        onlabel: 'Interp. Miss. Data ON',
+        offlabel: 'Interp. Miss. Data OFF',
         x: 2 - margin.left + buffer * 2 + buttonWidth * 2,
         y: 2 - margin.top,
         width: buttonWidth,
@@ -1187,7 +1188,8 @@
 
     createD3Switch({
         location: svg,
-        label: 'Dark Background',
+        onlabel: 'Dark Background',
+        offlabel: 'Light Background',
         x: 2 - margin.left + buffer * 3 + buttonWidth * 3,
         y: 2 - margin.top,
         width: buttonWidth,
@@ -1198,7 +1200,8 @@
 
     createD3Switch({
         location: svg,
-        label: 'Smooth Data',
+        onlabel: 'Smooth Data ON',
+        offlabel: 'Smooth Data OFF',
         x: 2 - margin.left + buffer * 4 + buttonWidth * 4,
         y: 2 - margin.top,
         width: buttonWidth,
@@ -1209,7 +1212,8 @@
 
     createD3Switch({
         location: svg,
-        label: 'Show Correlogram',
+        onlabel: 'SHOW Correlogram',
+        offlabel: 'HIDE Correlogram',
         x: 2 - margin.left + buffer * 5 + buttonWidth * 5,
         y: 2 - margin.top,
         width: buttonWidth,

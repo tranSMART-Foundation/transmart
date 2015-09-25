@@ -118,7 +118,7 @@
     var animationDuration = 1500;
     var tmpAnimationDuration = animationDuration;
     function switchAnimation(checked) {
-        if (animationDuration) {
+        if (! checked) {
             tmpAnimationDuration = animationDuration;
             animationDuration = 0;
         } else {
@@ -1036,7 +1036,8 @@
 
     createD3Switch({
         location: heatmap,
-        label: 'Enable Animation',
+        onlabel: 'Animation ON',
+        offlabel: 'Animation OFF',
         x: 2 - margin.left + padding * 0 + buttonWidth * 0,
         y: 8 - margin.top + buttonHeight * 0 + padding * 0,
         width: buttonWidth,

@@ -789,7 +789,8 @@
 
     createD3Switch({
         location: controls,
-        label: 'Light Background',
+        onlabel: 'Light Background ON',
+        offlabel: 'Light Background OFF',
         x: 2,
         y: 2 + padding * 2 + buttonHeight * 2,
         width: buttonWidth,
@@ -800,7 +801,8 @@
 
     createD3Switch({
         location: controls,
-        label: 'Show Density Estimation',
+        onlabel: 'Density Estimation ON',
+        offlabel: 'Density Estimation OFF',
         x: 2,
         y: 2 + padding * 3 + buttonHeight * 3,
         width: buttonWidth,
@@ -811,7 +813,8 @@
 
     createD3Switch({
         location: controls,
-        label: 'Shuffle Datapoints',
+        onlabel: 'Jitter Datapoints ON',
+        offlabel: 'Jitter Datapoints OFF',
         x: 2,
         y: 2 + padding * 4 + buttonHeight * 4,
         width: buttonWidth,
@@ -822,7 +825,8 @@
 
     createD3Switch({
         location: controls,
-        label: 'Enable Animation',
+        onlabel: 'Animation ON',
+        offlabel: 'Animation OFF',
         x: 2,
         y: 2 + padding * 5 + buttonHeight * 5,
         width: buttonWidth,
