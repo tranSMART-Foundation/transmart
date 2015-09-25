@@ -181,7 +181,7 @@ function createD3Dropdown(args) {
         if (hovered) {
             return;
         }
-        dropdown.selectAll('.itemBox')
+        dropdown.selectAll('.itemBox')        
         .transition()
         .duration(300)
         .style('visibility', 'visible')
@@ -218,6 +218,11 @@ function createD3Dropdown(args) {
                 shrink();  
             }
         }, 50);
+        setTimeout(function() { // first check is not enough if animation interrupts it
+            if (! hovered && ! itemHovered) {
+                shrink();  
+            }
+        }, 350);
     });
 
     var text = dropdown.append('text')
