@@ -118,19 +118,6 @@
         color: white;
         background: #326FCB;
     }
-
-    .niceButton {
-        width: 200px;
-        height: 44px;
-        display: block;
-        background-color: #009ac9;
-        border: 1px solid transparent;
-        color: #ffffff;
-        border-radius: 3px;
-        -webkit-transition: all 0.3s ease-in-out;
-        -moz-transition: all 0.3s ease-in-out;
-        transition: all 0.3s ease-in-out;
-    }
 </style>
 
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
