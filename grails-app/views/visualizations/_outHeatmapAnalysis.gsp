@@ -1,113 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-    ul li {
-      list-style: none;
-    }
-
-    .dropdown {
-        border-radius: 3px;
-        color: #ffffff;
-        background-color: #009ac9;
-        padding: 13px 30px;
-        width: 200px;
-        vertical-align: middle;
-        margin: 0 auto;
-        text-align: center;
-        font-size: 13px;
-    }
-
-    .dropdown li ul li {
-        color: #000000;
-        background-color: #E3E3E3;
-        width: 200px;
-        padding: 13px 30px;
-        vertical-align: middle;
-        margin-left: -30px;
-        border-bottom: 0px solid #ffffff;
-    }
-
-    .dropdown li ul li:hover {
-        cursor: pointer;
-        color: #ffffff;
-        background-color: #009ac9;
-    }
-
-    .dropdown li ul li:first-child {
-        margin-top: -13px;
-    }
-
-    .dropdown li .dropdown-box {
-        height: 0;
-        overflow: hidden;
-        display: none;
-        width: 100%;
-        margin-left: -30px;
-        margin-bottom: -15px;
-        margin-top: 13px;
-        border-top: 1px solid #ffffff;
-        padding: 0;
-        padding: 13px 30px;
-        width: 200px;
-        vertical-align: middle;
-    }
-
-    @keyframes anim275 {
-        from {
-            height: 0px;
-        }
-        to {
-            height: 290px;
-        }
-    }
-
-    #clusterSelection li:hover .dropdown-box, #clusterSelection li:active .dropdown-box {
-        display: block;
-        animation-name: anim275;
-        animation-duration: 1s;
-        animation-timing-function: ease
-        animation-iteration-count: 1;
-        animation-fill-mode: forwards;
-    }
-
-    @keyframes anim150 {
-        from {
-            height: 0px;
-        }
-        to {
-            height: 190px;
-        }
-    }
-
-    #colorSelection li:hover .dropdown-box, #colorSelection li:active .dropdown-box {
-        display: block;
-        animation-name: anim150;
-        animation-duration: 1s;
-        animation-timing-function: ease
-        animation-iteration-count: 1;
-        animation-fill-mode: forwards;
-    }
-
-    .niceButton {
-        width: 200px;
-        height: 44px;
-        display: block;
-        background-color: #009ac9;
-        border: 1px solid transparent;
-        color: #ffffff;
-        border-radius: 3px;
-        -webkit-transition: all 0.3s ease-in-out;
-        -moz-transition: all 0.3s ease-in-out;
-        transition: all 0.3s ease-in-out;
-    }
-
-    .niceButton:hover {
-        cursor: pointer;
-        background-color: #ffffff;
-        color: #009ac9;
-        border-color: #009ac9;
-    }
-
     .text {
         font-family: 'Roboto', sans-serif;
         font-size: 14px;
@@ -212,169 +105,19 @@
         background: white;
         pointer-events: none;
     }
-
-    .ios7-switch {
-        display: inline-block;
-        position: relative;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-        tap-highlight-color: transparent;
-    }
-
-    .ios7-switch input {
-        opacity: 0;
-        position: absolute;
-    }
-
-    .ios7-switch input + span {
-        position: relative;
-        display: inline-block;
-        width: 1.65em;
-        height: 1em;
-        background: white;
-        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
-        border-radius: 0.5em;
-        vertical-align: -0.15em;
-        transition: all 0.40s cubic-bezier(.17,.67,.43,.98);
-    }
-
-    .ios7-switch:active input + span,
-    .ios7-switch input + span:active {
-        box-shadow: inset 0 0 0 0.73em #e9e9e9;
-    }
-
-    .ios7-switch input + span:after {
-        position: absolute;
-        display: block;
-        content: '';
-        width: 0.875em;
-        height: 0.875em;
-        border-radius: 0.4375em;
-        top: 0.0625em;
-        left: 0.0625em;
-        background: white;
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
-                    0 0 0.05em rgba(0,0,0,0.05),
-                    0 0.1em 0.2em rgba(0,0,0,0.2);
-        transition: all 0.25s ease-out;
-    }
-
-    .ios7-switch:active input + span:after,
-    .ios7-switch input + span:active:after {
-        width: 1.15em;
-    }
-
-    .ios7-switch input:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
-
-    .ios7-switch input:checked + span:after {
-        left: 0.7125em;
-    }
-
-    .ios7-switch:active input:checked + span:after,
-    .ios7-switch input:checked + span:active:after {
-        left: 0.4375em;
-    }
-
-    /* accessibility styles */
-    .ios7-switch input:focus + span:after {
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.15),
-                    0 0 0.05em rgba(0,0,0,0.08),
-                    0 0.1em 0.2em rgba(0,0,0,0.3);
-        background: #fff;
-    }
-
-    .ios7-switch input:focus + span {
-        box-shadow: inset 0 0 0 0.0625em #dadada;
-    }
-
-    .ios7-switch input:focus:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
-
-    /* reset accessibility style on hover */
-    .ios7-switch:hover input:focus + span:after {
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
-                    0 0 0.05em rgba(0,0,0,0.05),
-                    0 0.1em 0.2em rgba(0,0,0,0.2);
-        background: #fff;
-    }
-
-    .ios7-switch:hover input:focus + span {
-        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
-    }
-
-    .ios7-switch:hover input:focus:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
 </style>
 
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 <g:javascript src="resource/d3.js"/>
 
-<label class="ios7-switch" style="font-size: 16px">
-    Disable Animations
-    <input onclick='switchAnimation()' type="checkbox">
-    <span></span>
-</label><br/><br/>
 <div id='visualization' class='text'>
-    <div style='float: left; padding-right: 10px'>
-        <ul class='dropdown text' id='colorSelection'>
-             <li id="top">Choose Heatmap Coloring
-                <span></span>
-                <ul class="dropdown-box">
-                   <li  onclick=updateColors(0)>Red-Green Color Sheme</li>
-                   <li  onclick=updateColors(1)>Color Sheme 2</li>
-                   <li  onclick=updateColors(2)>Color Sheme 3</li>
-                   <li  onclick=updateColors(3)>Color Sheme 4</li>
-                   <li  onclick=updateColors(4)>Color Sheme 5</li>
-                </ul>
-             </li>
-          </ul>
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <ul class='dropdown text' id='clusterSelection'>
-             <li id="top">Choose Heatmap Clustering
-                <span></span>
-                <ul class="dropdown-box">
-                    <li  onclick=cluster('hclustEuclideanAverage')>Hierarchical-Euclidean-Average (Default)</li>
-                    <li  onclick=cluster('hclustEuclideanComplete')>Hierarchical-Euclidean-Complete</li>
-                    <li  onclick=cluster('hclustEuclideanSingle')>Hierarchical-Euclidean-Single</li>
-                    <li  onclick=cluster('hclustManhattanAverage')>Hierarchical-Manhattan-Average</li>                    
-                    <li  onclick=cluster('hclustManhattanComplete')>Hierarchical-Manhattan-Complete</li>
-                    <li  onclick=cluster('hclustManhattanSingle')>Hierarchical-Manhattan-Single</li>
-                </ul>
-             </li>
-          </ul>
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <input id='cohortButton' class='text niceButton' type='button' value='Update Cohorts by Selection' onclick='updateCohorts()'/>
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <input id='loadMoreButton' class='text niceButton' type='button' value='Load 100 additional rows' onclick='loadRows()'/><div id='loadMessage'></div>
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <input type='range' min='0' max='300' value='100' id='zoomSlider' class='text' step='5' onchange="zoom()">
-        <output for='zoomSlider' id='zoomLevel'>100% Zoom</output>
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <input id='cutoffValue' type='number' class='text' onchange="animateCutoff()">
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <input id='cutoffButton' class='text niceButton' type='button' value='Apply cutoff' onclick='cutoff()'/>
-    </div>
     <div id="heatmap" class='text'></div>
 </div>
 
 <script>
     var animationDuration = 1500;
     var tmpAnimationDuration = animationDuration;
-    function switchAnimation() {
+    function switchAnimation(checked) {
         if (animationDuration) {
             tmpAnimationDuration = animationDuration;
             animationDuration = 0;
@@ -478,17 +221,6 @@
     var tooltip = d3.select("#heatmap").append("div")
     .attr("class", "tooltip text")
     .style("visibility", "hidden");
-
-    // jQuery(function() {
-    //     jQuery("#zoomSlider").slider();
-    // });
-
-    
-    var cutoffInput = document.getElementById('cutoffValue');
-    cutoffValue.setAttribute('value', significanceValues[significanceValues.length - 1]);
-    cutoffValue.setAttribute('min', significanceValues[significanceValues.length - 1]);
-    cutoffValue.setAttribute('max', significanceValues[0]);
-    cutoffValue.setAttribute('step', (significanceValues[0] - significanceValues[significanceValues.length - 1]) / 50);
 
     var extraSquareItems = heatmap.append('g');
     var squareItems = heatmap.append('g');
@@ -912,9 +644,7 @@
         .attr('y', function(d) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4; });
     }
 
-    function zoom() {
-        var zoomLevel = jQuery("#zoomSlider").val();
-        jQuery("#zoomLevel").html(zoomLevel + "% Zoom");
+    function zoom(zoomLevel) {
         zoomLevel /= 100;
 
         d3.selectAll('.patientID')
@@ -946,11 +676,12 @@
         animationDuration = temp;
     }
 
-    function animateCutoff() {
-        var cutoffLevel =  document.getElementById("cutoffValue").value;
+    var cutoffLevel = significanceValues[significanceValues.length - 1];
+    function animateCutoff(cutoff) {
+        cutoffLevel = cutoff;
         for (var i = 0; i < significanceValues.length; i++) {
             var significanceValue = significanceValues[i];
-            if (significanceValue < cutoffLevel) {
+            if (significanceValue < cutoff) {
                 d3.selectAll('.square.probe-' +  probes[i])
                 .classed("cuttoffHighlight", true);
                 d3.select('.bar.idx-' +  i)
@@ -965,7 +696,7 @@
     }
 
     function cutoff() {
-        var cutoffLevel =  document.getElementById("cutoffValue").value;
+        console.log(cutoffLevel)
         var nrows = 0;
         for (var i = 0; i < significanceValues.length; i++) {
             var significanceValue = significanceValues[i];
@@ -1298,4 +1029,143 @@
     }
 
     init();
+
+    var buttonWidth = 200;
+    var buttonHeight = 40;
+    var padding = 5;
+
+    createD3Dropdown({
+        location: heatmap,
+        label: 'Heatmap Coloring',
+        x: 2 - margin.left,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        items: [
+            {
+                callback: function() { updateColors(0); }, 
+                label: 'Color Sheme 1'
+            },
+            {
+                callback: function() { updateColors(1); }, 
+                label: 'Color Sheme 2'
+            },
+            {
+                callback: function() { updateColors(2); }, 
+                label: 'Color Sheme 3'
+            },
+            {
+                callback: function() { updateColors(3); }, 
+                label: 'Color Sheme 4'
+            },
+            {
+                callback: function() { updateColors(4); }, 
+                label: 'Color Sheme 5'
+            }
+        ]
+    });
+
+    createD3Dropdown({
+        location: heatmap,
+        label: 'Heatmap Clustering',
+        x: 2 - margin.left + padding + buttonWidth,
+        y: 2 - margin.top,
+        width: buttonWidth + 20,
+        height: buttonHeight,
+        items: [
+            {
+                callback: function() { cluster('hclustEuclideanAverage'); }, 
+                label: 'Hierarchical-Euclidean-Average'
+            },
+            {
+                callback: function() { cluster('hclustEuclideanComplete'); }, 
+                label: 'Hierarchical-Euclidean-Complete'
+            },
+            {
+                callback: function() { cluster('hclustEuclideanSingle'); }, 
+                label: 'Hierarchical-Euclidean-Single'
+            },
+            {
+                callback: function() { cluster('hclustManhattanAverage'); }, 
+                label: 'Hierarchical-Manhattan-Average'
+            },
+            {
+                callback: function() { cluster('hclustManhattanComplete'); }, 
+                label: 'Hierarchical-Manhattan-Complete'
+            },
+            {
+                callback: function() { cluster('hclustManhattanSingle'); }, 
+                label: 'Hierarchical-Manhattan-Single'
+            }
+        ]
+    });
+
+    createD3Button({
+        location: heatmap,
+        label: 'Update Cohorts by Selection',
+        x: 2 - margin.left + padding * 2 + buttonWidth * 2 + 20,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: updateCohorts
+    });
+
+    createD3Button({
+        location: heatmap,
+        label: 'Load 100 additional features',
+        x: 2 - margin.left + padding * 3 + buttonWidth * 3 + 20,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: loadRows
+    });
+
+    createD3Button({
+        location: heatmap,
+        label: 'Apply Cutoff',
+        x: 2 - margin.left + padding * 4 + buttonWidth * 4 + 20,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: cutoff
+    });
+
+    createD3Switch({
+        location: heatmap,
+        label: 'Enable Animation',
+        x: 2 - margin.left + padding * 5 + buttonWidth * 5 + 20,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: switchAnimation,
+        checked: true
+    });
+
+    createD3Slider({
+        location: heatmap,
+        label: 'Cutoff',
+        x: 2 - margin.left + padding * 4 + buttonWidth * 4 + 20,
+        y: 2 - margin.top + buttonHeight + padding,
+        width: buttonWidth,
+        height: buttonHeight,
+        min: significanceValues[significanceValues.length - 1],
+        max: significanceValues[0],
+        init: significanceValues[significanceValues.length - 1],
+        callback: animateCutoff,
+        trigger: 'dragend'
+    });
+
+    createD3Slider({
+        location: heatmap,
+        label: 'Zoom in %',
+        x: 2 - margin.left + padding * 6 + buttonWidth * 6 + 20,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        min: 1,
+        max: 300,
+        init: 100,
+        callback: zoom,
+        trigger: 'dragend'
+    });
 </script>

@@ -131,194 +131,13 @@
         -moz-transition: all 0.3s ease-in-out;
         transition: all 0.3s ease-in-out;
     }
-
-    .niceButton:hover {
-        cursor: pointer;
-        background-color: #ffffff;
-        color: #009ac9;
-        border-color: #009ac9;
-    }
-
-    .ios7-switch {
-        display: inline-block;
-        position: relative;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-        tap-highlight-color: transparent;
-    }
-
-    .ios7-switch input {
-        opacity: 0;
-        position: absolute;
-    }
-
-    .ios7-switch input + span {
-        position: relative;
-        display: inline-block;
-        width: 1.65em;
-        height: 1em;
-        background: white;
-        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
-        border-radius: 0.5em;
-        vertical-align: -0.15em;
-        transition: all 0.40s cubic-bezier(.17,.67,.43,.98);
-    }
-
-    .ios7-switch:active input + span,
-    .ios7-switch input + span:active {
-        box-shadow: inset 0 0 0 0.73em #e9e9e9;
-    }
-
-    .ios7-switch input + span:after {
-        position: absolute;
-        display: block;
-        content: '';
-        width: 0.875em;
-        height: 0.875em;
-        border-radius: 0.4375em;
-        top: 0.0625em;
-        left: 0.0625em;
-        background: white;
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
-                    0 0 0.05em rgba(0,0,0,0.05),
-                    0 0.1em 0.2em rgba(0,0,0,0.2);
-        transition: all 0.25s ease-out;
-    }
-
-    .ios7-switch:active input + span:after,
-    .ios7-switch input + span:active:after {
-        width: 1.15em;
-    }
-
-    .ios7-switch input:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
-
-    .ios7-switch input:checked + span:after {
-        left: 0.7125em;
-    }
-
-    .ios7-switch:active input:checked + span:after,
-    .ios7-switch input:checked + span:active:after {
-        left: 0.4375em;
-    }
-
-    /* accessibility styles */
-    .ios7-switch input:focus + span:after {
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.15),
-                    0 0 0.05em rgba(0,0,0,0.08),
-                    0 0.1em 0.2em rgba(0,0,0,0.3);
-        background: #fff;
-    }
-
-    .ios7-switch input:focus + span {
-        box-shadow: inset 0 0 0 0.0625em #dadada;
-    }
-
-    .ios7-switch input:focus:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
-
-    /* reset accessibility style on hover */
-    .ios7-switch:hover input:focus + span:after {
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
-                    0 0 0.05em rgba(0,0,0,0.05),
-                    0 0.1em 0.2em rgba(0,0,0,0.2);
-        background: #fff;
-    }
-
-    .ios7-switch:hover input:focus + span {
-        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
-    }
-
-    .ios7-switch:hover input:focus:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
 </style>
 
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 <g:javascript src="resource/d3.js"/>
 
 <div id="visualization">
-    <table style='float: left; padding-right: 10px border-spacing:5em'>
-        <tr>
-            <td style='padding-bottom: 0.5em'>
-                <div>
-                    <input id='removeOutliersButton' class='text niceButton' type='button' value='Remove Outliers' onclick='removeOutliers()'/>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td style='padding-bottom: 0.5em'>
-                <div>
-                    <input id='resetButton' class='text niceButton' type='button' value='Reset' onclick='reset()'/>
-                </div>
-            </td>
-        </tr>
-<!--         <tr>
-            <td style='padding-bottom: 2em'>
-                <div>
-                    <input id='updateCohortsButton' class='text niceButton' type='button' value='Update Cohorts' onclick='updateCohorts()'/>
-                </div>
-            </td>
-        </tr> -->
-        <tr>
-            <td style='padding-bottom: 0.5em'>
-                <div>
-                    <div style='float: left; padding-right: 20px'>
-                        <label class="ios7-switch" style="font-size: 16px">
-                            Dark Background
-                            <input onclick='swapBackgroundColor()' type="checkbox">
-                            <span></span>
-                        </label>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td style='padding-bottom: 0.5em'>
-                <div>
-                    <div style='float: left; padding-right: 20px'>
-                        <label class="ios7-switch" style="font-size: 16px">
-                            Show Density Estimation
-                            <input onclick='swapKDE()' type="checkbox">
-                            <span></span>
-                        </label>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td style='padding-bottom: 0.5em'>
-                <div>
-                    <div style='float: left; padding-right: 20px'>
-                        <label class="ios7-switch" style="font-size: 16px">
-                            Shuffle Datapoints
-                            <input onclick='swapJitter()' type="checkbox">
-                            <span></span>
-                        </label>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td style='padding-bottom: 0.5em'>
-                <div>
-                    <div style='float: left; padding-right: 20px'>
-                        <label class="ios7-switch" style="font-size: 16px">
-                            Disable Animations
-                            <input onclick='switchAnimation()' type="checkbox">
-                            <span></span>
-                        </label>
-                    </div>
-                </div>
-            </td>
-        </tr>
-    </table>
+    <div id="controls" style='float: left; padding-right: 10px'></div>
     <div id="boxplot1" style='float: left; padding-right: 10px'></div>
     <div id="boxplot2" style='float: left; padding-right: 10px; border-left: 1px solid black'></div>
 </div>
@@ -326,8 +145,8 @@
 <script>
     var animationDuration = 1000;
     var tmpAnimationDuration = animationDuration;
-    function switchAnimation() {
-        if (animationDuration) {
+    function switchAnimation(checked) {
+        if (! checked) {
             tmpAnimationDuration = animationDuration;
             animationDuration = 0;
         } else {
@@ -342,6 +161,10 @@
 	var margin = {top: 10, right: 60, bottom: 200, left: 60};
     var width = jQuery("#smartRPanel").width() / 2 - 200 - margin.left - margin.right;
     var height = jQuery("#smartRPanel").height() * 0.65 - margin.top - margin.bottom;
+
+    var controls = d3.select('#controls').append('svg')
+    .attr('width', '220px')
+    .attr('height', height * 2);
 
     var boxplot1 = d3.select("#boxplot1").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -533,16 +356,6 @@
         });
     }
 
-    d3.select('#removeOutliersButton')
-    .on('mouseover', function() {
-        d3.selectAll('.outlier')
-        .attr('r', 5);
-    })
-    .on('mouseout', function() {
-        d3.selectAll('.outlier')
-        .attr('r', 3);
-    });
-
     function removeOutliers() {
         currentSelection = [];
         d3.selectAll('.outlier').each(function(d) { 
@@ -567,16 +380,13 @@
         };
     }
 
-    var kdeChecked = false;
-    function swapKDE() {
-        if (kdeChecked) {
+    function swapKDE(checked) {
+        if (! checked) {
             d3.selectAll('.line')
             .attr('visibility', 'hidden');
-            kdeChecked = false;
         } else {
             d3.selectAll('.line')
             .attr('visibility', 'visible');
-            kdeChecked = true;
         }
     }
     
@@ -587,8 +397,8 @@
     
     var jitterWidth = 1.0;
     var jitterChecked = false;
-    function swapJitter() {
-        if (jitterChecked) {
+    function swapJitter(checked) {
+        if (! checked) {
             for (var i = 0; i < results.cohort1.subsets.length; i++) {
                 d3.selectAll('.point.cohort1.' + shortenNodeLabel(results.cohort1.subsets[i]))
                 .transition()
@@ -619,9 +429,8 @@
         }
     }
 
-    var backgroundCheckChecked = false;
-    function swapBackgroundColor() {
-        if (! backgroundCheckChecked) {
+    function swapBackgroundColor(checked) {
+        if (! checked) {
             d3.selectAll('#boxplot1,#boxplot2')
             .transition()
             .duration(animationDuration)
@@ -642,7 +451,6 @@
             .transition()
             .duration(animationDuration)
             .style('fill', 'white');
-            backgroundCheckChecked = true;
         } else {
             d3.selectAll('#boxplot1,#boxplot2')
             .transition()
@@ -664,7 +472,6 @@
             .transition()
             .duration(animationDuration)
             .style('fill', 'blue');
-            backgroundCheckChecked = false;
         }
 
     }    
@@ -968,4 +775,73 @@
     }
 
     init();
+
+    var buttonWidth = 200;
+    var buttonHeight = 40;
+    var padding = 5;
+
+    createD3Button({
+        location: controls,
+        label: 'Remove Outliers',
+        x: 2,
+        y: 2,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: removeOutliers
+    });
+
+    createD3Button({
+        location: controls,
+        label: 'Reset',
+        x: 2,
+        y: 2 + padding + buttonHeight,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: reset
+    });
+
+    createD3Switch({
+        location: controls,
+        label: 'Light Background',
+        x: 2,
+        y: 2 + padding * 2 + buttonHeight * 2,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: swapBackgroundColor,
+        checked: true
+    });
+
+    createD3Switch({
+        location: controls,
+        label: 'Show Density Estimation',
+        x: 2,
+        y: 2 + padding * 3 + buttonHeight * 3,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: swapKDE,
+        checked: false
+    });
+
+    createD3Switch({
+        location: controls,
+        label: 'Shuffle Datapoints',
+        x: 2,
+        y: 2 + padding * 4 + buttonHeight * 4,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: swapJitter,
+        checked: false
+    });
+
+    createD3Switch({
+        location: controls,
+        label: 'Enable Animation',
+        x: 2,
+        y: 2 + padding * 5 + buttonHeight * 5,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: switchAnimation,
+        checked: true
+    });
+
 </script>

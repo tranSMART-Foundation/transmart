@@ -8,15 +8,6 @@ function createD3Button(args) {
     .attr("ry", 3)
     .attr("width", args.width)
     .attr("height", args.height)
-    .on('click', function() { args.callback(); });
-
-    var text = button.append('text')
-    .attr('x', args.x + args.width / 2)
-    .attr('y', args.y + args.height / 2)
-    .attr('dy', '0.35em')
-    .text(args.label);
-
-    box
     .style('stroke-width', '1px')
     .style('stroke', '#009ac9')
     .style('fill', '#009ac9')
@@ -42,13 +33,18 @@ function createD3Button(args) {
         .transition()
         .duration(300)
         .style('fill', '#ffffff');
-    });
+    })
+    .on('click', function() { args.callback(); }); 
 
-    text
+    var text = button.append('text')
+    .attr('x', args.x + args.width / 2)
+    .attr('y', args.y + args.height / 2)
+    .attr('dy', '0.35em')
     .style('pointer-events', 'none')
     .style("text-anchor", "middle")
     .style('fill', '#ffffff')
-    .style('font-size', '14px');
+    .style('font-size', '14px')
+    .text(args.label);
 }
 
 function createD3Switch(args) {
@@ -64,6 +60,10 @@ function createD3Switch(args) {
     .attr("ry", 3)
     .attr("width", args.width)
     .attr("height", args.height)
+    .style('stroke-width', '1px')
+    .style('stroke', color)
+    .style('fill', color)
+    .style('cursor', 'pointer')
     .on('click', function() {
         if (color === 'green') {
             box
@@ -89,19 +89,11 @@ function createD3Switch(args) {
     .attr('x', args.x + args.width / 2)
     .attr('y', args.y + args.height / 2)
     .attr('dy', '0.35em')
-    .text(args.label);
-
-    box
-    .style('stroke-width', '1px')
-    .style('stroke', color)
-    .style('fill', color)
-    .style('cursor', 'pointer');
-
-    text
     .style('pointer-events', 'none')
     .style("text-anchor", "middle")
     .style('fill', '#ffffff')
-    .style('font-size', '14px');
+    .style('font-size', '14px')
+    .text(args.label);
 }
 
 function createD3Dropdown(args) {
@@ -120,14 +112,6 @@ function createD3Dropdown(args) {
 
     var hovered = false;
     var itemHovered = false;
-
-    var box = dropdown.append("rect")
-    .attr("x", args.x)
-    .attr("y", args.y)
-    .attr("rx", 3)
-    .attr("ry", 3)
-    .attr("width", args.width)
-    .attr("height", args.height);
 
     var itemBox = dropdown.selectAll('.itemBox')
     .data(args.items, function(item) { return item.label; });
@@ -160,7 +144,7 @@ function createD3Dropdown(args) {
             if (! hovered && ! itemHovered) {
                 shrink();
             }
-        }, 200);
+        }, 50);
     })
     .on('click', function(d) {
         d.callback();
@@ -183,13 +167,13 @@ function createD3Dropdown(args) {
     .style('visibility', 'hidden')
     .text(function(d) { return d.label; });
 
-    var text = dropdown.append('text')
-    .attr('x', args.x + args.width / 2)
-    .attr('y', args.y + args.height / 2)
-    .attr('dy', '0.35em')
-    .text(args.label);
-
-    box
+    var box = dropdown.append("rect")
+    .attr("x", args.x)
+    .attr("y", args.y)
+    .attr("rx", 3)
+    .attr("ry", 3)
+    .attr("width", args.width)
+    .attr("height", args.height)
     .style('stroke-width', '1px')
     .style('stroke', '#009ac9')
     .style('fill', '#009ac9')
@@ -233,14 +217,155 @@ function createD3Dropdown(args) {
             if (! hovered && ! itemHovered) {
                 shrink();  
             }
-        }, 200);
+        }, 50);
     });
 
-    text
+    var text = dropdown.append('text')
+    .attr('x', args.x + args.width / 2)
+    .attr('y', args.y + args.height / 2)
+    .attr('dy', '0.35em')
     .style('pointer-events', 'none')
     .style("text-anchor", "middle")
     .style('fill', '#ffffff')
-    .style('font-size', '14px');
+    .style('font-size', '14px')
+    .text(args.label);
+}
+
+function createD3Slider(args) {
+    var slider = args.location.append('g');
+
+    var lineGen = d3.svg.line()
+    .x(function(d) { return d.x; })
+    .y(function(d) { return d.y; })
+    .interpolate("linear");
+
+    var lineData = [
+        {x: args.x, y: args.y + args.height},
+        {x: args.x, y: args.y + 0.75 * args.height},
+        {x: args.x + args.width, y: args.y + 0.75 * args.height},
+        {x: args.x + args.width, y: args.y + args.height}
+    ];
+
+    var sliderScale = d3.scale.linear()
+    .domain([args.min, args.max])
+    .range([args.x, args.x + args.width]);
+
+    slider.append('path')
+    .attr('d', lineGen(lineData))
+    .style('pointer-events', 'none')
+    .style('stroke', '#009ac9')
+    .style('stroke-width', '2px')
+    .style('shape-rendering', 'crispEdges')
+    .style('fill', 'none');
+
+    slider.append('text')
+    .attr('x', args.x)
+    .attr('y', args.y + args.height + 10)
+    .attr('dy', '0.35em')
+    .style('pointer-events', 'none')
+    .style("text-anchor", "middle")
+    .style('fill', '#000000')
+    .style('font-size', '9px')
+    .text(args.min);
+
+    slider.append('text')
+    .attr('x', args.x + args.width)
+    .attr('y', args.y + args.height + 10)
+    .attr('dy', '0.35em')
+    .style('pointer-events', 'none')
+    .style("text-anchor", "middle")
+    .style('fill', '#000000')
+    .style('font-size', '9px')
+    .text(args.max);
+
+    slider.append('text')
+    .attr('x', args.x + args.width / 2)
+    .attr('y', args.y + args.height)
+    .attr('dy', '0.35em')
+    .style('pointer-events', 'none')
+    .style("text-anchor", "middle")
+    .style('fill', '#000000')
+    .style('font-size', '14px')
+    .text(args.label);
+
+    var currentValue = args.init;
+
+    function move() {
+        var xPos = d3.event.x;
+        if (xPos < args.x) {
+            xPos = args.x;
+        } else if (xPos > args.x + args.width) {
+            xPos = args.x + args.width;
+        }
+
+        currentValue = Number(sliderScale.invert(xPos)).toFixed(5);
+
+        dragger
+        .attr('x', xPos - 20);
+        handle
+        .attr('cx', xPos);
+        pointer
+        .attr('x1', xPos)
+        .attr('x2', xPos);
+        value
+        .attr('x', xPos + 10)
+        .text(currentValue);
+    }
+
+    function executeCallback() {
+        args.callback(currentValue);
+    }
+
+    var drag = d3.behavior.drag()
+    .on("drag", move)
+    .on(args.trigger, executeCallback);
+
+    var dragger = slider.append('rect')
+    .attr('x', sliderScale(args.init) - 20)
+    .attr('y', args.y)
+    .attr('width', 40)
+    .attr('height', args.height)
+    .style('opacity', 0)
+    .style('cursor', 'pointer')
+    .on('mouseover', function() {
+        handle
+        .style('fill', '#009ac9');
+        pointer
+        .style('stroke', '#009ac9');
+    })
+    .on('mouseout', function() {
+        handle
+        .style('fill', '#000000');
+        pointer
+        .style('stroke', '#000000');
+    })
+    .call(drag);
+
+    var handle = slider.append('circle')
+    .attr("cx", sliderScale(args.init))
+    .attr("cy", args.y + 10)
+    .attr("r", 6)
+    .style('pointer-events', 'none')
+    .style('fill', '#000000');
+
+    var pointer = slider.append('line')
+    .attr('x1', sliderScale(args.init))
+    .attr('y1', args.y + 10)
+    .attr('x2', sliderScale(args.init))
+    .attr('y2', args.y + 0.75 * args.height)
+    .style('pointer-events', 'none')
+    .style('stroke', '#000000')
+    .style('stroke-width', '1px');
+
+    var value = slider.append('text')
+    .attr('x', sliderScale(args.init) + 10)
+    .attr('y', args.y + 10)
+    .attr('dy', '0.35em')
+    .style('pointer-events', 'none')
+    .style("text-anchor", "start")
+    .style('fill', '#000000')
+    .style('font-size', '10px')
+    .text(args.init);
 }
 
 /**
