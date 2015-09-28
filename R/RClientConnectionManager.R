@@ -37,6 +37,9 @@ function (transmartDomain, use.authentication = TRUE, token = NULL, ...) {
     
     if (use.authentication && !exists("access_token", envir = transmartClientEnv)) {
         authenticated <- authenticateWithTransmart(...)
+        if(is.null(authenticated)) {
+            return()
+        }
     } else { if (!use.authentication && exists("access_token", envir = transmartClientEnv)) {
             remove("access_token", envir = transmartClientEnv)
         }
@@ -154,13 +157,13 @@ refreshToken <- function(oauthDomain = transmartClientEnv$transmartDomain) {
     }
 
     if (!exists("access_token", envir = transmartClientEnv)) {
-        return(TRUE)
+        return(FALSE)
     }
 
     ping <- .transmartServerGetRequest("/oauth/inspectToken", accept.type = "default")
     if(is.null(ping)) {
         # Maybe we're talking to an older version of Transmart that uses the version 1 oauth plugin
-        ping <- .transmartServerGetRequest("/oauth/verify", accept.type = "default")
+        ping <- .transmartServerGetRequest("/oauth/verify", accept.type = "default", JSON = F)
     }
     if (getOption("verbose")) { message(paste(ping, collapse = ": ")) }
 
@@ -206,30 +209,36 @@ refreshToken <- function(oauthDomain = transmartClientEnv$transmartDomain) {
 }
 
 .serverMessageExchange <- 
-function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.progresscallback.download()) {
+function(apiCall, httpHeaderFields, JSON = TRUE, accept.type = "default", progress = .make.progresscallback.download()) {
     if (any(accept.type == c("default", "hal"))) {
         if (accept.type == "hal") { httpHeaderFields <- c(httpHeaderFields, Accept = "application/hal+json;charset=UTF-8") }
+        headers <- basicHeaderGatherer()
         result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
                 verbose = getOption("verbose"),
-                httpheader = httpHeaderFields)
+                httpheader = httpHeaderFields,
+                headerfunction = headers$update)
         if (getOption("verbose")) { message("Server response:\n\n", result, "\n") }
-        if (is.null(result) || result == "null" || result == "") { return(NULL) }
-        result <- fromJSON(result, asText = TRUE, nullValue = NA)
-        if (accept.type == "hal") { return(.simplifyHalList(result)) }
+        if (headers$value()['status'] != "200" || is.null(result) || result == "") {
+            return(NULL)
+        }
+        if(JSON) {
+            result <- fromJSON(result, asText = TRUE, nullValue = NA)
+            if (accept.type == "hal") { return(.simplifyHalList(result)) }
+        }
         return(result)
     } else if (accept.type == "binary") {
         progress$start(NA_integer_)
         result <- list()
-        h <- basicTextGatherer()
+        h <- basicHeaderGatherer()
         result$content <- getBinaryURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
-                .opts = list(headerfunction = h$update),
+                headerfunction = h$update,
                 noprogress = FALSE,
                 progressfunction = function(down, up) {up[which(up == 0)] <- NA; progress$update(down, up) },
                 httpheader = httpHeaderFields)
         progress$end()
-        result$header <- parseHTTPHeader(h$value())
+        result$header <- h$value()
         if (getOption("verbose")) {
-            message(paste("Server binary response header:", as.character(data.frame(result$header)), "", sep="\n"))
+            message(paste("Server binary response header:", paste(capture.output(print(data.frame(result$header))), collapse="\n"), "", sep="\n"))
         }
         return(result)
     }
