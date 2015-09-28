@@ -9,7 +9,7 @@ import grails.util.Environment
 class SmartRService {
 
     def DEBUG = Environment.current == Environment.DEVELOPMENT
-    def DEBUG_TMP_DIR = 'C:/Temp/'
+    def DEBUG_TMP_DIR = '/tmp/'
 
     def grailsApplication = Holders.grailsApplication
     def springSecurityService
