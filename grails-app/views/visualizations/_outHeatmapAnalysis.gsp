@@ -783,7 +783,7 @@
     }
 
     function cutoff() {
-        console.log(cutoffLevel)
+        cuttoffButton.select('text').text('Loading');
         var nrows = 0;
         for (var i = 0; i < significanceValues.length; i++) {
             var significanceValue = significanceValues[i];
@@ -1091,8 +1091,7 @@
         var maxRows = nrows === undefined ? probes.length + 100 : nrows;
         var data = prepareFormData();
         data = addSettingsToData(data, { maxRows: maxRows });
-        jQuery("#loadMoreButton").attr("disabled", true);
-        jQuery("#loadMoreButton").val('This will last a moment...');
+        loadFeatureButton.select('text').text('Loading...');
         jQuery.ajax({
             url: pageInfo.basePath + '/SmartR/recomputeOutputDIV',
             type: "POST",
@@ -1100,12 +1099,12 @@
             data: data
         }).done(function(serverAnswer) {
             jQuery("#outputDIV").html(serverAnswer);
-            jQuery("#loadMoreButton").attr("disabled", false);
-            jQuery("#loadMoreButton").val('Load 100 additional rows');
+            loadFeatureButton.select('text').text('Load 100 additional rows');
+            cuttoffButton.select('text').text('Apply Cutoff');
         }).fail(function() {
             jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
-            jQuery("#loadMoreButton").attr("disabled", false);
-            jQuery("#loadMoreButton").val('Load 100 additional rows');
+            loadFeatureButton.select('text').text('Load 100 additional rows');
+            cuttoffButton.select('text').text('Apply Cutoff');
         });
     }
 
@@ -1157,7 +1156,7 @@
         callback: updateCohorts
     });
 
-    createD3Button({
+    var loadFeatureButton = createD3Button({
         location: heatmap,
         label: 'Load 100 add. feat.',
         x: 2 - margin.left + padding * 1 + buttonWidth * 1,
@@ -1167,7 +1166,7 @@
         callback: loadRows
     });
 
-    createD3Button({
+    var cuttoffButton = createD3Button({
         location: heatmap,
         label: 'Apply Cutoff',
         x: 2 - margin.left + padding * 0 + buttonWidth * 0,
