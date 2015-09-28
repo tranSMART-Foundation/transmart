@@ -20,6 +20,10 @@
         font-size: 10px;
     }
 
+    .featureSortText {
+        font-size: 10px;
+    }
+
     .selected {
         opacity: 1;
     }
@@ -222,7 +226,7 @@
     .attr("class", "tooltip text")
     .style("visibility", "hidden");
 
-    var extraSquareItems = heatmap.append('g');
+    var featureItems = heatmap.append('g');
     var squareItems = heatmap.append('g');
     var colSortItems = heatmap.append('g');
     var selectItems = heatmap.append('g');
@@ -580,7 +584,7 @@
 
         var featurePosY = - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20;
 
-        var extraSquare = extraSquareItems.selectAll('.extraSquare')
+        var extraSquare = featureItems.selectAll('.extraSquare')
         .data(extraFields, function(d) { return 'patientID-' + d.PATIENTID + '-feature-' + d.FEATURE; });
 
         extraSquare
@@ -624,7 +628,7 @@
         .attr("width", gridFieldWidth)
         .attr("height", gridFieldHeight / 2);
 
-        var feature = labelItems.selectAll('.feature')
+        var feature = featureItems.selectAll('.feature')
         .data(features, function(d) { return d; });
 
         feature
@@ -642,6 +646,76 @@
         .duration(animationDuration)
         .attr('x', width + gridFieldWidth + 7)
         .attr('y', function(d) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4; });
+
+        var featureSortText = featureItems.selectAll('.featureSortText')
+        .data(features, function(d) { return d; });
+
+        featureSortText
+        .enter()
+        .append('text')
+        .attr('class', 'text featureSortText')
+        .attr("transform", function(d) { return "translate(" + (width + 2 + 0.5 * gridFieldWidth) + ",0)" + "translate(0," + (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) + ")rotate(-90)";})
+        .attr('dy', '0.35em')
+        .attr("text-anchor", "middle")
+        .text('↑↓')
+        .attr('visibility', function(d) { 
+            if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
+                return 'visible';
+            } else {
+                return 'hidden';
+            }
+        });
+
+        featureSortText
+        .transition()
+        .duration(animationDuration)
+        .attr("transform", function(d) { return "translate(" + (width + 2 + 0.5 * gridFieldWidth) + ",0)" + "translate(0," + (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) + ")rotate(-90)";});
+
+        var featureSortBox = featureItems.selectAll('.featureSortBox')
+        .data(features, function(d) { return d; });
+
+        featureSortBox
+        .enter()
+        .append('rect')
+        .attr('class', 'box featureSortBox')
+        .attr('x', width + 2)
+        .attr('y', function(d) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2; })
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight / 2)
+        .on("click", function(feature) {
+            var featureValue = [];
+            for(var i = 0; i < patientIDs.length; i++) {
+                var patientID = patientIDs[i];
+                var square = d3.select('.extraSquare' + '.patientID-' + patientID + '.feature-' + feature);
+                featureValue.push([i, square.property('__data__').ZSCORE]);
+            }
+            if (isSorted(featureValue)) {
+               featureValue.sort(function(a, b) { return a[1] - b[1]; });
+            } else {
+               featureValue.sort(function(a, b) { return b[1] - a[1]; });
+            }
+            var sortValues = [];
+            for (i = 0; i < featureValue.length; i++) {
+                sortValues.push(featureValue[i][0]);
+            }
+            updateColOrder(sortValues);
+        })
+        .attr('visibility', function(d) { 
+            if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
+                return 'visible';
+            } else {
+                return 'hidden';
+            }
+        });
+
+
+        featureSortBox
+        .transition()
+        .duration(animationDuration)
+        .attr('x', width + 2)
+        .attr('y', function(d, i) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2; })
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight / 2);
     }
 
     function zoom(zoomLevel) {
@@ -661,6 +735,9 @@
 
         d3.selectAll('.significanceSortText, .rowSortText, .colSortText')
         .style('font-size', Math.ceil(14 * zoomLevel) + 'px');
+
+        d3.selectAll('.featureSortText')
+        .style('font-size', Math.ceil(10 * zoomLevel) + 'px');
 
         gridFieldWidth = 40 * zoomLevel;
         gridFieldHeight = 40 * zoomLevel;
