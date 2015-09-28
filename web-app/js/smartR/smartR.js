@@ -45,6 +45,8 @@ function createD3Button(args) {
     .style('fill', '#ffffff')
     .style('font-size', '14px')
     .text(args.label);
+
+    return button;
 }
 
 function createD3Switch(args) {
@@ -95,6 +97,8 @@ function createD3Switch(args) {
     .style('fill', '#ffffff')
     .style('font-size', '14px')
     .text(checked ? args.onlabel : args.offlabel);
+
+    return switcher;
 }
 
 function createD3Dropdown(args) {
@@ -235,6 +239,8 @@ function createD3Dropdown(args) {
     .style('fill', '#ffffff')
     .style('font-size', '14px')
     .text(args.label);
+
+    return dropdown;
 }
 
 function createD3Slider(args) {
@@ -368,6 +374,8 @@ function createD3Slider(args) {
     .style('fill', '#000000')
     .style('font-size', '10px')
     .text(args.init);
+
+    return slider;
 }
 
 /**
