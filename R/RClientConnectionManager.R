@@ -155,6 +155,10 @@ refreshToken <- function(oauthDomain = transmartClientEnv$transmartDomain) {
     }
 
     ping <- .transmartServerGetRequest("/oauth/inspectToken", accept.type = "default")
+    if(is.null(ping)) {
+        # Maybe we're talking to an older version of Transmart that uses the version 1 oauth plugin
+        ping <- .transmartServerGetRequest("/oauth/verify", accept.type = "default")
+    }
     if (getOption("verbose")) { message(paste(ping, collapse = ": ")) }
 
     if (!is.null(ping)) {
@@ -180,21 +184,22 @@ refreshToken <- function(oauthDomain = transmartClientEnv$transmartDomain) {
     return(FALSE)
 }
 
-.transmartServerGetRequest <- function(apiCall, ...)  {
+.requestErrorHandler <- function(e) {
+    message("Sorry, the R client was unable to carry out your request.",
+            "Please make sure that the transmart server is still running. \n\n",
+            "If the server is not down, you've encountered a bug.\n",
+            "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
+            "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.")
+    stop(e)
+}
+
+.transmartServerGetRequest <- function(apiCall, errorHandler = .requestErrorHandler, ...)  {
     if (exists("access_token", envir = transmartClientEnv)) {
         httpHeaderFields <- c(Authorization = paste("Bearer ", transmartClientEnv$access_token, sep=""))
     } else { httpHeaderFields <- "" }
 
-    tryCatch(result <- .serverMessageExchange(apiCall, httpHeaderFields, ...), 
-            error = function(e) {
-                message("Sorry, the R client was unable to carry out your request.",
-                        "Please make sure that the transmart server is still running. \n\n",
-                        "If the server is not down, you've encountered a bug.\n",
-                        "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
-                        "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.")
-                stop(e)
-            })
-    result
+    tryCatch(result <- .serverMessageExchange(apiCall, httpHeaderFields, ...), error = errorHandler)
+    if(exists("result")) result else NULL
 }
 
 .serverMessageExchange <- 
@@ -205,7 +210,7 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
                 verbose = getOption("verbose"),
                 httpheader = httpHeaderFields)
         if (getOption("verbose")) { message("Server response:\n\n", result, "\n") }
-        if (is.null(result) || result == "null") { return(NULL) }
+        if (is.null(result) || result == "null" || result == "") { return(NULL) }
         result <- fromJSON(result, asText = TRUE, nullValue = NA)
         if (accept.type == "hal") { return(.simplifyHalList(result)) }
         return(result)
