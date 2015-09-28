@@ -205,7 +205,7 @@
     var margin = { top: gridFieldHeight * 2 + 100 + features.length * gridFieldHeight / 2 + dendrogramHeight, 
             right: gridFieldWidth + 300 + dendrogramHeight, 
             bottom: 10, 
-            left: histogramHeight + 220 };
+            left: histogramHeight + 250 };
 
     var width = gridFieldWidth * patientIDs.length;
     var height = gridFieldHeight * probes.length;
@@ -684,10 +684,17 @@
         .attr('height', gridFieldHeight / 2)
         .on("click", function(feature) {
             var featureValue = [];
+            var missingValues = false;
             for(var i = 0; i < patientIDs.length; i++) {
                 var patientID = patientIDs[i];
-                var square = d3.select('.extraSquare' + '.patientID-' + patientID + '.feature-' + feature);
-                featureValue.push([i, square.property('__data__').ZSCORE]);
+                var zScore = - Math.pow(2,32);
+                try {
+                    var square = d3.select('.extraSquare' + '.patientID-' + patientID + '.feature-' + feature);
+                    zScore = square.property('__data__').ZSCORE;
+                } catch (err) {
+                    missingValues = true;
+                }
+                featureValue.push([i, zScore]);
             }
             if (isSorted(featureValue)) {
                featureValue.sort(function(a, b) { return a[1] - b[1]; });
@@ -697,6 +704,9 @@
             var sortValues = [];
             for (i = 0; i < featureValue.length; i++) {
                 sortValues.push(featureValue[i][0]);
+            }
+            if (missingValues) {
+                alert('Feature is missing for one or more patients.\nEvery missing value will be set to lowest possible value for sorting;');
             }
             updateColOrder(sortValues);
         })
