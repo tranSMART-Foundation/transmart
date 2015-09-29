@@ -212,6 +212,8 @@
             legend
             .style("left", jQuery('#scatterplot').position().left + margin.left + "px")
             .style("top", jQuery('#scatterplot').position().top + margin.top + "px");
+            legendPosX = jQuery('#scatterplot').position().left + margin.left + "px";
+            legendPosY = jQuery('#scatterplot').position().top + margin.top + "px";
         } else {
             legend
             .style("left", legendPosX)
