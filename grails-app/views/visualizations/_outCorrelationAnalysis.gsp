@@ -682,6 +682,10 @@
         .call(hist2xAxis);
     }
 
+    var buttonWidth = 200;
+    var buttonHeight = 40;
+    var padding = 20;
+
     createD3Switch({
         location: controls,
         onlabel: 'Animation ON',
