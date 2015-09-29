@@ -14,8 +14,10 @@
 <body>
     <div id="index" style="text-align: center">
         <h1 class="txt"> SmartR - Dynamic data visualization and interaction.</h1>
-        <span style='color:red' class='txt'>SmartR is (UNSUPPORTED!) BETA software. This means it is being actively developed and not considered stable enough by the developer.</span><br/>
-        <span style='color:red' class='txt'>If you want to support the project please be so kind and provide some feedback to this address: <span style='color:blue' class='txt'>sascha.herzinger@uni.lu</span></span>
+        <span style='color:red' class='txt'>Please be aware that this software is currently in a TESTING phase and all results should be handled with care.</span><br/>
+        <span style='color:red' class='txt'>You can help improving SmartR by reporting bugs or providing the developer with (highly appreciated!) feedback.</span><br/>
+        <input id="contactButton" class='txt' type="button" value="Contact Developer" onclick="contact()"/>
+        <span style='color:red' class='txt'></span><br/>
         <hr class="myhr"/>
 
         <div id="inputDIV" class='txt' style="text-align: left">Please select a script to execute.</div>

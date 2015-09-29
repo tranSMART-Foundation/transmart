@@ -771,3 +771,12 @@ function changeInputDIV() {
         jQuery("#inputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
     });
 }
+
+function contact() {
+    var version = 0.1;
+    alert("Before reporting a bug...\n" + 
+        "... 1. Make sure you use the lastet SmartR version (installed version: " + version + ")\n" +
+        "... 2. Make sure that all requirements for using SmartR are met\n" + 
+        "All relevant information can be found on https://github.com/sherzinger/SmartR\n\n" +
+        "If you still want to report a bug you MUST include these information:\n\n>>>" + navigator.userAgent + " SmartR/" + version + "<<<\n\nBug reports -> http://usersupport.etriks.org/\nFeedback -> sascha.herzinger@uni.lu");
+}
