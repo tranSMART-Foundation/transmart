@@ -15,6 +15,10 @@ Keep it mind that making use of this software is at your own risk!*
 ####What is SmartR?
 Please have a look at these [Youtube videos](https://www.youtube.com/channel/UCKUbu0z3CQfi6RcFermONSw).
 
+####Version & Changelog
+**Current version: 0.1**
+![Changelog](https://github.com/sherzinger/SmartR/blob/master/CHANGELOG)
+
 ####How to add SmartR to your own tranSMART installation:
 1 - Add this to your BuildConfig.groovy:
 ```javascript
