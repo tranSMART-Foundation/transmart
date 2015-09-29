@@ -231,6 +231,7 @@ function createD3Dropdown(args) {
     });
 
     var text = dropdown.append('text')
+    .attr('class', 'buttonText')
     .attr('x', args.x + args.width / 2)
     .attr('y', args.y + args.height / 2)
     .attr('dy', '0.35em')

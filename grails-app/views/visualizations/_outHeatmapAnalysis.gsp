@@ -783,7 +783,7 @@
     }
 
     function cutoff() {
-        cuttoffButton.select('text').text('Loading');
+        cuttoffButton.select('text').text('Loading...');
         var nrows = 0;
         for (var i = 0; i < significanceValues.length; i++) {
             var significanceValue = significanceValues[i];

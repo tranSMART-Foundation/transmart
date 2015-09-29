@@ -263,11 +263,21 @@
     boxplot1.append("g")
     .attr('id', 'brush1')
     .attr("class", "brush")
+    .on("mousedown", function(){
+        if(d3.event.button === 2){
+            d3.event.stopImmediatePropagation();
+        }
+    })   
     .call(brush1);
     
     boxplot2.append("g")
     .attr('id', 'brush2')
     .attr("class", "brush")
+    .on("mousedown", function(){
+        if(d3.event.button === 2){
+            d3.event.stopImmediatePropagation();
+        }
+    })   
     .call(brush2);
     
     var contextMenu = d3.select("#visualization").append("div")

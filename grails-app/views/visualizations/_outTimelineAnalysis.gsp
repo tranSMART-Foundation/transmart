@@ -765,6 +765,11 @@
         .on('mousemove', function() {
             updateHoverLine(d3.mouse(this));
         })
+        .on("mousedown", function(){
+            if(d3.event.button === 2){
+                d3.event.stopImmediatePropagation();
+            }
+        })
         .call(timelineBrush);
 
         timelineBrushes.push(timelineBrush);
@@ -1113,12 +1118,14 @@
         data = addSettingsToData(data, { linkageMeasure: linkageMeasure });
         data = addSettingsToData(data, { interpolateNAs: interpolateNAs });
         data = addSettingsToData(data, { xAxisSortOrder: x.domain() });
+        clusteringDropdown.select('.buttonText').text('Loading...');
         jQuery.ajax({
                 url: pageInfo.basePath + '/SmartR/updateOutputDIV',
                 type: "POST",
                 timeout: '600000',
                 data: data
             }).done(function(serverAnswer) {
+                clusteringDropdown.select('.buttonText').text('Timeline Clustering');
                 serverAnswer = JSON.parse(serverAnswer);
                 if (serverAnswer.error) {
                     alert(serverAnswer.error);
@@ -1133,6 +1140,7 @@
                     drawDendrogram(dendrogram, ids, fromHeight, toHeight);
                 }
             }).fail(function() {
+                clusteringDropdown.select('.buttonText').text('Timeline Clustering');
                 alert('Clustering failed for unknown reasons!');
             });
     }
@@ -1141,7 +1149,7 @@
     var buttonHeight = 40;
     var buffer = 5;
 
-    createD3Dropdown({
+    var clusteringDropdown = createD3Dropdown({
         location: svg,
         label: 'Timeline Clustering',
         x: 2 - margin.left,
