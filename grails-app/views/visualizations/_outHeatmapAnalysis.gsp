@@ -1,113 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-    ul li {
-      list-style: none;
-    }
-
-    .dropdown {
-        border-radius: 3px;
-        color: #ffffff;
-        background-color: #009ac9;
-        padding: 13px 30px;
-        width: 200px;
-        vertical-align: middle;
-        margin: 0 auto;
-        text-align: center;
-        font-size: 13px;
-    }
-
-    .dropdown li ul li {
-        color: #000000;
-        background-color: #E3E3E3;
-        width: 200px;
-        padding: 13px 30px;
-        vertical-align: middle;
-        margin-left: -30px;
-        border-bottom: 0px solid #ffffff;
-    }
-
-    .dropdown li ul li:hover {
-        cursor: pointer;
-        color: #ffffff;
-        background-color: #009ac9;
-    }
-
-    .dropdown li ul li:first-child {
-        margin-top: -13px;
-    }
-
-    .dropdown li .dropdown-box {
-        height: 0;
-        overflow: hidden;
-        display: none;
-        width: 100%;
-        margin-left: -30px;
-        margin-bottom: -15px;
-        margin-top: 13px;
-        border-top: 1px solid #ffffff;
-        padding: 0;
-        padding: 13px 30px;
-        width: 200px;
-        vertical-align: middle;
-    }
-
-    @keyframes anim275 {
-        from {
-            height: 0px;
-        }
-        to {
-            height: 290px;
-        }
-    }
-
-    #clusterSelection li:hover .dropdown-box, #clusterSelection li:active .dropdown-box {
-        display: block;
-        animation-name: anim275;
-        animation-duration: 1s;
-        animation-timing-function: ease
-        animation-iteration-count: 1;
-        animation-fill-mode: forwards;
-    }
-
-    @keyframes anim150 {
-        from {
-            height: 0px;
-        }
-        to {
-            height: 190px;
-        }
-    }
-
-    #colorSelection li:hover .dropdown-box, #colorSelection li:active .dropdown-box {
-        display: block;
-        animation-name: anim150;
-        animation-duration: 1s;
-        animation-timing-function: ease
-        animation-iteration-count: 1;
-        animation-fill-mode: forwards;
-    }
-
-    .niceButton {
-        width: 200px;
-        height: 44px;
-        display: block;
-        background-color: #009ac9;
-        border: 1px solid transparent;
-        color: #ffffff;
-        border-radius: 3px;
-        -webkit-transition: all 0.3s ease-in-out;
-        -moz-transition: all 0.3s ease-in-out;
-        transition: all 0.3s ease-in-out;
-    }
-
-    .niceButton:hover {
-        cursor: pointer;
-        background-color: #ffffff;
-        color: #009ac9;
-        border-color: #009ac9;
-    }
-
     .text {
         font-family: 'Roboto', sans-serif;
         font-size: 14px;
@@ -115,15 +8,19 @@
 
     .square {
         stroke: white;
-        stroke-width: 0px;
+        stroke-width: 0;
     }
 
     .extraSquare {
         stroke: white;
-        stroke-width: 0px;
+        stroke-width: 0;
     }
 
     .feature {
+        font-size: 10px;
+    }
+
+    .featureSortText {
         font-size: 10px;
     }
 
@@ -205,177 +102,27 @@
         position: absolute;
         text-align: center;
         display: inline-block;
-        padding: 0px;
+        padding: 0;
         font-size: 12px;
         font-weight: bold;
         color: black;
         background: white;
         pointer-events: none;
     }
-
-    .ios7-switch {
-        display: inline-block;
-        position: relative;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-        tap-highlight-color: transparent;
-    }
-
-    .ios7-switch input {
-        opacity: 0;
-        position: absolute;
-    }
-
-    .ios7-switch input + span {
-        position: relative;
-        display: inline-block;
-        width: 1.65em;
-        height: 1em;
-        background: white;
-        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
-        border-radius: 0.5em;
-        vertical-align: -0.15em;
-        transition: all 0.40s cubic-bezier(.17,.67,.43,.98);
-    }
-
-    .ios7-switch:active input + span,
-    .ios7-switch input + span:active {
-        box-shadow: inset 0 0 0 0.73em #e9e9e9;
-    }
-
-    .ios7-switch input + span:after {
-        position: absolute;
-        display: block;
-        content: '';
-        width: 0.875em;
-        height: 0.875em;
-        border-radius: 0.4375em;
-        top: 0.0625em;
-        left: 0.0625em;
-        background: white;
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
-                    0 0 0.05em rgba(0,0,0,0.05),
-                    0 0.1em 0.2em rgba(0,0,0,0.2);
-        transition: all 0.25s ease-out;
-    }
-
-    .ios7-switch:active input + span:after,
-    .ios7-switch input + span:active:after {
-        width: 1.15em;
-    }
-
-    .ios7-switch input:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
-
-    .ios7-switch input:checked + span:after {
-        left: 0.7125em;
-    }
-
-    .ios7-switch:active input:checked + span:after,
-    .ios7-switch input:checked + span:active:after {
-        left: 0.4375em;
-    }
-
-    /* accessibility styles */
-    .ios7-switch input:focus + span:after {
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.15),
-                    0 0 0.05em rgba(0,0,0,0.08),
-                    0 0.1em 0.2em rgba(0,0,0,0.3);
-        background: #fff;
-    }
-
-    .ios7-switch input:focus + span {
-        box-shadow: inset 0 0 0 0.0625em #dadada;
-    }
-
-    .ios7-switch input:focus:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
-
-    /* reset accessibility style on hover */
-    .ios7-switch:hover input:focus + span:after {
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
-                    0 0 0.05em rgba(0,0,0,0.05),
-                    0 0.1em 0.2em rgba(0,0,0,0.2);
-        background: #fff;
-    }
-
-    .ios7-switch:hover input:focus + span {
-        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
-    }
-
-    .ios7-switch:hover input:focus:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
 </style>
 
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 <g:javascript src="resource/d3.js"/>
 
-<label class="ios7-switch" style="font-size: 16px">
-    Disable Animations
-    <input onclick='switchAnimation()' type="checkbox">
-    <span></span>
-</label><br/><br/>
 <div id='visualization' class='text'>
-    <div style='float: left; padding-right: 10px'>
-        <ul class='dropdown text' id='colorSelection'>
-             <li id="top">Choose Heatmap Coloring
-                <span></span>
-                <ul class="dropdown-box">
-                   <li  onclick=updateColors(0)>Red-Green Color Sheme</li>
-                   <li  onclick=updateColors(1)>Color Sheme 2</li>
-                   <li  onclick=updateColors(2)>Color Sheme 3</li>
-                   <li  onclick=updateColors(3)>Color Sheme 4</li>
-                   <li  onclick=updateColors(4)>Color Sheme 5</li>
-                </ul>
-             </li>
-          </ul>
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <ul class='dropdown text' id='clusterSelection'>
-             <li id="top">Choose Heatmap Clustering
-                <span></span>
-                <ul class="dropdown-box">
-                    <li  onclick=cluster('hclustEuclideanAverage')>Hierarchical-Euclidean-Average (Default)</li>
-                    <li  onclick=cluster('hclustEuclideanComplete')>Hierarchical-Euclidean-Complete</li>
-                    <li  onclick=cluster('hclustEuclideanSingle')>Hierarchical-Euclidean-Single</li>
-                    <li  onclick=cluster('hclustManhattanAverage')>Hierarchical-Manhattan-Average</li>                    
-                    <li  onclick=cluster('hclustManhattanComplete')>Hierarchical-Manhattan-Complete</li>
-                    <li  onclick=cluster('hclustManhattanSingle')>Hierarchical-Manhattan-Single</li>
-                </ul>
-             </li>
-          </ul>
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <input id='cohortButton' class='text niceButton' type='button' value='Update Cohorts by Selection' onclick='updateCohorts()'/>
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <input id='loadMoreButton' class='text niceButton' type='button' value='Load 100 additional rows' onclick='loadRows()'/><div id='loadMessage'></div>
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <input type='range' min='0' max='300' value='100' id='zoomSlider' class='text' step='5' onchange="zoom()">
-        <output for='zoomSlider' id='zoomLevel'>100% Zoom</output>
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <input id='cutoffValue' type='number' class='text' onchange="animateCutoff()">
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <input id='cutoffButton' class='text niceButton' type='button' value='Apply cutoff' onclick='cutoff()'/>
-    </div>
     <div id="heatmap" class='text'></div>
 </div>
 
 <script>
     var animationDuration = 1500;
     var tmpAnimationDuration = animationDuration;
-    function switchAnimation() {
-        if (animationDuration) {
+    function switchAnimation(checked) {
+        if (! checked) {
             tmpAnimationDuration = animationDuration;
             animationDuration = 0;
         } else {
@@ -458,7 +205,7 @@
     var margin = { top: gridFieldHeight * 2 + 100 + features.length * gridFieldHeight / 2 + dendrogramHeight, 
             right: gridFieldWidth + 300 + dendrogramHeight, 
             bottom: 10, 
-            left: histogramHeight };
+            left: histogramHeight + 250 };
 
     var width = gridFieldWidth * patientIDs.length;
     var height = gridFieldHeight * probes.length;
@@ -479,23 +226,13 @@
     .attr("class", "tooltip text")
     .style("visibility", "hidden");
 
-    // jQuery(function() {
-    //     jQuery("#zoomSlider").slider();
-    // });
-
-    
-    var cutoffInput = document.getElementById('cutoffValue');
-    cutoffValue.setAttribute('value', significanceValues[significanceValues.length - 1]);
-    cutoffValue.setAttribute('min', significanceValues[significanceValues.length - 1]);
-    cutoffValue.setAttribute('max', significanceValues[0]);
-    cutoffValue.setAttribute('step', (significanceValues[0] - significanceValues[significanceValues.length - 1]) / 50);
-
-    var extraSquareItems = heatmap.append('g');
+    var featureItems = heatmap.append('g');
     var squareItems = heatmap.append('g');
     var colSortItems = heatmap.append('g');
     var selectItems = heatmap.append('g');
     var patientIDItems = heatmap.append('g');
     var rowSortItems = heatmap.append('g');
+    var significanceSortItems = heatmap.append('g');
     var labelItems = heatmap.append('g');
     var barItems = heatmap.append('g');
 
@@ -661,6 +398,63 @@
         .attr('width', gridFieldWidth)
         .attr('height', gridFieldHeight);
 
+        var significanceSortText = significanceSortItems.selectAll('.significanceSortText')
+        .data(['something'], function(d) { return d; });
+
+        significanceSortText
+        .enter()
+        .append('text')
+        .attr('class', 'text significanceSortText')
+        .attr('x', - gridFieldWidth - 10 + 0.5 * gridFieldWidth)
+        .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight)
+        .attr('dy', '0.35em')
+        .attr("text-anchor", "middle")
+        .text('↑↓');
+
+        significanceSortText
+        .transition()
+        .duration(animationDuration)
+        .attr('x', - gridFieldWidth - 10 + 0.5 * gridFieldWidth)
+        .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight);
+
+        var significanceSortBox = significanceSortItems.selectAll('.significanceSortBox')
+        .data(['something'], function(d) { return d; });
+
+        significanceSortBox
+        .enter()
+        .append('rect')
+        .attr('class', 'box significanceSortBox')
+        .attr('x', - gridFieldWidth - 10)
+        .attr('y', -2 - gridFieldHeight)
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight)
+        .on("click", function() {
+            var rowValues = [];
+            for(var i = 0; i < significanceValues.length; i++) {
+                var significanceValue = significanceValues[i];
+                rowValues.push([i, significanceValue]);
+            }
+            if (isSorted(rowValues)) {
+               rowValues.sort(function(a, b) { return a[1] - b[1]; });
+            } else {
+               rowValues.sort(function(a, b) { return b[1] - a[1]; });
+            }
+            var sortValues = [];
+            for (i = 0; i < rowValues.length; i++) {
+                sortValues.push(rowValues[i][0]);
+            }
+            updateRowOrder(sortValues);
+        });
+
+        significanceSortBox
+        .transition()
+        .duration(animationDuration)
+        .attr('x', - gridFieldWidth - 10)
+        .attr('y', -2 - gridFieldHeight)
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight);    
+
+
         var selectText = heatmap.selectAll('.selectText')
         .data(patientIDs, function(d) { return d; });
 
@@ -790,7 +584,7 @@
 
         var featurePosY = - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20;
 
-        var extraSquare = extraSquareItems.selectAll('.extraSquare')
+        var extraSquare = featureItems.selectAll('.extraSquare')
         .data(extraFields, function(d) { return 'patientID-' + d.PATIENTID + '-feature-' + d.FEATURE; });
 
         extraSquare
@@ -834,7 +628,7 @@
         .attr("width", gridFieldWidth)
         .attr("height", gridFieldHeight / 2);
 
-        var feature = labelItems.selectAll('.feature')
+        var feature = featureItems.selectAll('.feature')
         .data(features, function(d) { return d; });
 
         feature
@@ -852,12 +646,109 @@
         .duration(animationDuration)
         .attr('x', width + gridFieldWidth + 7)
         .attr('y', function(d) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4; });
+
+        var featureSortText = featureItems.selectAll('.featureSortText')
+        .data(features, function(d) { return d; });
+
+        featureSortText
+        .enter()
+        .append('text')
+        .attr('class', 'text featureSortText')
+        .attr("transform", function(d) { return "translate(" + (width + 2 + 0.5 * gridFieldWidth) + ",0)" + "translate(0," + (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) + ")rotate(-90)";})
+        .attr('dy', '0.35em')
+        .attr("text-anchor", "middle")
+        .text('↑↓')
+        .attr('visibility', function(d) { 
+            if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
+                return 'visible';
+            } else {
+                return 'hidden';
+            }
+        });
+
+        featureSortText
+        .transition()
+        .duration(animationDuration)
+        .attr("transform", function(d) { return "translate(" + (width + 2 + 0.5 * gridFieldWidth) + ",0)" + "translate(0," + (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) + ")rotate(-90)";});
+
+        var featureSortBox = featureItems.selectAll('.featureSortBox')
+        .data(features, function(d) { return d; });
+
+        featureSortBox
+        .enter()
+        .append('rect')
+        .attr('class', 'box featureSortBox')
+        .attr('x', width + 2)
+        .attr('y', function(d) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2; })
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight / 2)
+        .on("click", function(feature) {
+            var featureValue = [];
+            var missingValues = false;
+            for(var i = 0; i < patientIDs.length; i++) {
+                var patientID = patientIDs[i];
+                var zScore = - Math.pow(2,32);
+                try {
+                    var square = d3.select('.extraSquare' + '.patientID-' + patientID + '.feature-' + feature);
+                    zScore = square.property('__data__').ZSCORE;
+                } catch (err) {
+                    missingValues = true;
+                }
+                featureValue.push([i, zScore]);
+            }
+            if (isSorted(featureValue)) {
+               featureValue.sort(function(a, b) { return a[1] - b[1]; });
+            } else {
+               featureValue.sort(function(a, b) { return b[1] - a[1]; });
+            }
+            var sortValues = [];
+            for (i = 0; i < featureValue.length; i++) {
+                sortValues.push(featureValue[i][0]);
+            }
+            if (missingValues) {
+                alert('Feature is missing for one or more patients.\nEvery missing value will be set to lowest possible value for sorting;');
+            }
+            updateColOrder(sortValues);
+        })
+        .attr('visibility', function(d) { 
+            if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
+                return 'visible';
+            } else {
+                return 'hidden';
+            }
+        });
+
+
+        featureSortBox
+        .transition()
+        .duration(animationDuration)
+        .attr('x', width + 2)
+        .attr('y', function(d, i) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2; })
+        .attr('width', gridFieldWidth)
+        .attr('height', gridFieldHeight / 2);
     }
 
-    function zoom() {
-        var zoomLevel = jQuery("#zoomSlider").val();
-        jQuery("#zoomLevel").html(zoomLevel + "% Zoom");
+    function zoom(zoomLevel) {
         zoomLevel /= 100;
+
+        d3.selectAll('.patientID')
+        .style('font-size', Math.ceil(14 * zoomLevel) + 'px');
+
+        d3.selectAll('.selectText')
+        .style('font-size', Math.ceil(16 * zoomLevel) + 'px');
+
+        d3.selectAll('.probe')
+        .style('font-size', Math.ceil(9 * zoomLevel) + 'px');
+
+        d3.selectAll('.feature')
+        .style('font-size', Math.ceil(10 * zoomLevel) + 'px');
+
+        d3.selectAll('.significanceSortText, .rowSortText, .colSortText')
+        .style('font-size', Math.ceil(14 * zoomLevel) + 'px');
+
+        d3.selectAll('.featureSortText')
+        .style('font-size', Math.ceil(10 * zoomLevel) + 'px');
+
         gridFieldWidth = 40 * zoomLevel;
         gridFieldHeight = 40 * zoomLevel;
         width = gridFieldWidth * patientIDs.length;
@@ -872,11 +763,12 @@
         animationDuration = temp;
     }
 
-    function animateCutoff() {
-        var cutoffLevel =  document.getElementById("cutoffValue").value;
+    var cutoffLevel = significanceValues[significanceValues.length - 1];
+    function animateCutoff(cutoff) {
+        cutoffLevel = cutoff;
         for (var i = 0; i < significanceValues.length; i++) {
             var significanceValue = significanceValues[i];
-            if (significanceValue < cutoffLevel) {
+            if (significanceValue < cutoff) {
                 d3.selectAll('.square.probe-' +  probes[i])
                 .classed("cuttoffHighlight", true);
                 d3.select('.bar.idx-' +  i)
@@ -891,7 +783,7 @@
     }
 
     function cutoff() {
-        var cutoffLevel =  document.getElementById("cutoffValue").value;
+        cuttoffButton.select('text').text('Loading...');
         var nrows = 0;
         for (var i = 0; i < significanceValues.length; i++) {
             var significanceValue = significanceValues[i];
@@ -1068,7 +960,33 @@
         .attr("transform", function (d) {
             return "translate(" + (width + spacing + h - d.y) + "," + d.x + ")";
         }).on('click', function(d) {
-            alert('Feature selection is currently not possible.');
+            alert('Under Construction.');
+            return;
+            var leafs = d.index.split(' ');
+            var genes = [];
+            for (var i = 0; i < leafs.length; i++) {
+                var gene = geneSymbols[leafs[i]];
+                genes.push(gene);
+            }
+            jQuery.ajax({
+                url: 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi',
+                type: "POST",
+                timeout: '600000',
+                data: { 
+                    section: 'upload_gene_lists',
+                    primary_org: 'Human',
+                    background: 'whole_genome',
+                    Category1: 'Human',
+                    gene_list_1: 'gene_list_1',
+                    SubCat1: 'ascii',
+                    attachment1: genes
+                }
+            }).done(function(serverAnswer) {
+                var newTab = window.open('', '');
+                newTab.document.write(serverAnswer);
+            }).fail(function() {
+                alert('fail');
+            });     
         })
         .on("mouseover", function(d) {
             tooltip
@@ -1173,8 +1091,7 @@
         var maxRows = nrows === undefined ? probes.length + 100 : nrows;
         var data = prepareFormData();
         data = addSettingsToData(data, { maxRows: maxRows });
-        jQuery("#loadMoreButton").attr("disabled", true);
-        jQuery("#loadMoreButton").val('This will last a moment...');
+        loadFeatureButton.select('text').text('Loading...');
         jQuery.ajax({
             url: pageInfo.basePath + '/SmartR/recomputeOutputDIV',
             type: "POST",
@@ -1182,12 +1099,12 @@
             data: data
         }).done(function(serverAnswer) {
             jQuery("#outputDIV").html(serverAnswer);
-            jQuery("#loadMoreButton").attr("disabled", false);
-            jQuery("#loadMoreButton").val('Load 100 additional rows');
+            loadFeatureButton.select('text').text('Load 100 additional rows');
+            cuttoffButton.select('text').text('Apply Cutoff');
         }).fail(function() {
             jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
-            jQuery("#loadMoreButton").attr("disabled", false);
-            jQuery("#loadMoreButton").val('Load 100 additional rows');
+            loadFeatureButton.select('text').text('Load 100 additional rows');
+            cuttoffButton.select('text').text('Apply Cutoff');
         });
     }
 
@@ -1198,4 +1115,144 @@
     }
 
     init();
+
+    var buttonWidth = 200;
+    var buttonHeight = 40;
+    var padding = 20;
+
+    createD3Switch({
+        location: heatmap,
+        onlabel: 'Animation ON',
+        offlabel: 'Animation OFF',
+        x: 2 - margin.left + padding * 0 + buttonWidth * 0,
+        y: 8 - margin.top + buttonHeight * 0 + padding * 0,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: switchAnimation,
+        checked: true
+    });
+
+    createD3Slider({
+        location: heatmap,
+        label: 'Zoom in %',
+        x: 2 - margin.left + padding * 1 + buttonWidth * 1,
+        y: 8 - margin.top + buttonHeight * 0 + padding * 0 - 10,
+        width: buttonWidth,
+        height: buttonHeight,
+        min: 1,
+        max: 200,
+        init: 100,
+        callback: zoom,
+        trigger: 'dragend'
+    });
+
+    createD3Button({
+        location: heatmap,
+        label: 'Update Cohorts',
+        x: 2 - margin.left + padding * 0 + buttonWidth * 0,
+        y: 8 - margin.top + buttonHeight * 1 + padding * 1,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: updateCohorts
+    });
+
+    var loadFeatureButton = createD3Button({
+        location: heatmap,
+        label: 'Load 100 add. feat.',
+        x: 2 - margin.left + padding * 1 + buttonWidth * 1,
+        y: 8 - margin.top + buttonHeight * 1 + padding * 1,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: loadRows
+    });
+
+    var cuttoffButton = createD3Button({
+        location: heatmap,
+        label: 'Apply Cutoff',
+        x: 2 - margin.left + padding * 0 + buttonWidth * 0,
+        y: 8 - margin.top + buttonHeight * 2 + padding * 2,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: cutoff
+    });
+
+    createD3Slider({
+        location: heatmap,
+        label: 'Cutoff',
+        x: 2 - margin.left + padding * 1 + buttonWidth * 1,
+        y: 8 - margin.top + buttonHeight * 2 + padding * 2 - 10,
+        width: buttonWidth,
+        height: buttonHeight,
+        min: significanceValues[significanceValues.length - 1],
+        max: significanceValues[0],
+        init: significanceValues[significanceValues.length - 1],
+        callback: animateCutoff,
+        trigger: 'dragend'
+    });
+
+    createD3Dropdown({
+        location: heatmap,
+        label: 'Heatmap Coloring',
+        x: 2 - margin.left + padding * 0 + buttonWidth * 0,
+        y: 8 - margin.top + buttonHeight * 3 + padding * 3,
+        width: buttonWidth,
+        height: buttonHeight,
+        items: [
+            {
+                callback: function() { updateColors(0); }, 
+                label: 'Color Sheme 1'
+            },
+            {
+                callback: function() { updateColors(1); }, 
+                label: 'Color Sheme 2'
+            },
+            {
+                callback: function() { updateColors(2); }, 
+                label: 'Color Sheme 3'
+            },
+            {
+                callback: function() { updateColors(3); }, 
+                label: 'Color Sheme 4'
+            },
+            {
+                callback: function() { updateColors(4); }, 
+                label: 'Color Sheme 5'
+            }
+        ]
+    });
+
+    createD3Dropdown({
+        location: heatmap,
+        label: 'Heatmap Clustering',
+        x: 2 - margin.left + padding * 1 + buttonWidth * 1,
+        y: 8 - margin.top + buttonHeight * 3 + padding * 3,
+        width: buttonWidth,
+        height: buttonHeight,
+        items: [
+            {
+                callback: function() { cluster('hclustEuclideanAverage'); }, 
+                label: 'Hierarch.-Eucl.-Average'
+            },
+            {
+                callback: function() { cluster('hclustEuclideanComplete'); }, 
+                label: 'Hierarch.-Eucl.-Complete'
+            },
+            {
+                callback: function() { cluster('hclustEuclideanSingle'); }, 
+                label: 'Hierarch.-Eucl.-Single'
+            },
+            {
+                callback: function() { cluster('hclustManhattanAverage'); }, 
+                label: 'Hierarch.-Manhat.-Average'
+            },
+            {
+                callback: function() { cluster('hclustManhattanComplete'); }, 
+                label: 'Hierarch.-Manhat.-Complete'
+            },
+            {
+                callback: function() { cluster('hclustManhattanSingle'); }, 
+                label: 'Hierarch.-Manhat.-Single'
+            }
+        ]
+    });
 </script>

@@ -35,10 +35,6 @@ class ScriptExecutorService {
             }
             def rServeHost = Holders.config.RModules.host
             def rServePort = Holders.config.RModules.port
-            if (parameterMap['DEBUG']) {
-                // Rserve has a different behaviour when used with MS Windows. This is for dev. only
-                rServePort.toInteger() + rServeConnections.size()
-            }
             rServeConnections[cookieID] = [:]
             rServeConnections[cookieID].connection = new RConnection(rServeHost, rServePort)
             rServeConnections[cookieID].connection.stringEncoding = 'utf8'

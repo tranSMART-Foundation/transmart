@@ -4,173 +4,6 @@
         font-family: 'Roboto', sans-serif;
     }
 
-    .ios7-switch {
-        display: inline-block;
-        position: relative;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-        tap-highlight-color: transparent;
-    }
-
-    .ios7-switch input {
-        opacity: 0;
-        position: absolute;
-    }
-
-    .ios7-switch input + span {
-        position: relative;
-        display: inline-block;
-        width: 1.65em;
-        height: 1em;
-        background: white;
-        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
-        border-radius: 0.5em;
-        vertical-align: -0.15em;
-        transition: all 0.40s cubic-bezier(.17,.67,.43,.98);
-    }
-
-    .ios7-switch:active input + span,
-    .ios7-switch input + span:active {
-        box-shadow: inset 0 0 0 0.73em #e9e9e9;
-    }
-
-    .ios7-switch input + span:after {
-        position: absolute;
-        display: block;
-        content: '';
-        width: 0.875em;
-        height: 0.875em;
-        border-radius: 0.4375em;
-        top: 0.0625em;
-        left: 0.0625em;
-        background: white;
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
-                    0 0 0.05em rgba(0,0,0,0.05),
-                    0 0.1em 0.2em rgba(0,0,0,0.2);
-        transition: all 0.25s ease-out;
-    }
-
-    .ios7-switch:active input + span:after,
-    .ios7-switch input + span:active:after {
-        width: 1.15em;
-    }
-
-    .ios7-switch input:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
-
-    .ios7-switch input:checked + span:after {
-        left: 0.7125em;
-    }
-
-    .ios7-switch:active input:checked + span:after,
-    .ios7-switch input:checked + span:active:after {
-        left: 0.4375em;
-    }
-
-    /* accessibility styles */
-    .ios7-switch input:focus + span:after {
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.15),
-                    0 0 0.05em rgba(0,0,0,0.08),
-                    0 0.1em 0.2em rgba(0,0,0,0.3);
-        background: #fff;
-    }
-
-    .ios7-switch input:focus + span {
-        box-shadow: inset 0 0 0 0.0625em #dadada;
-    }
-
-    .ios7-switch input:focus:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
-
-    /* reset accessibility style on hover */
-    .ios7-switch:hover input:focus + span:after {
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
-                    0 0 0.05em rgba(0,0,0,0.05),
-                    0 0.1em 0.2em rgba(0,0,0,0.2);
-        background: #fff;
-    }
-
-    .ios7-switch:hover input:focus + span {
-        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
-    }
-
-    .ios7-switch:hover input:focus:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
-
-    ul li {
-      list-style: none;
-    }
-
-    .dropdown {
-        border-radius: 3px;
-        color: #ffffff;
-        background-color: #009ac9;
-        padding: 13px 30px;
-        width: 200px;
-        vertical-align: middle;
-        margin: 0 auto;
-        text-align: center;
-        font-size: 13px;
-    }
-
-    .dropdown li ul li {
-        color: #000000;
-        background-color: #E3E3E3;
-        width: 200px;
-        padding: 13px 30px;
-        vertical-align: middle;
-        margin-left: -30px;
-        border-bottom: 0px solid #ffffff;
-    }
-
-    .dropdown li ul li:hover {
-        cursor: pointer;
-        color: #ffffff;
-        background-color: #009ac9;
-    }
-
-    .dropdown li ul li:first-child {
-        margin-top: -13px;
-    }
-
-    .dropdown li .dropdown-box {
-        height: 0;
-        overflow: hidden;
-        display: none;
-        width: 100%;
-        margin-left: -30px;
-        margin-bottom: -15px;
-        margin-top: 13px;
-        border-top: 1px solid #ffffff;
-        padding: 0;
-        padding: 13px 30px;
-        width: 200px;
-        vertical-align: middle;
-    }
-
-    #clusterSelection li:hover .dropdown-box, #clusterSelection li:active .dropdown-box {
-        display: block;
-        animation: anim275 1s ease;
-        animation-iteration-count: 1;
-        animation-fill-mode: forwards;
-    }
-
-    @keyframes anim275 {
-        from {
-            height: 0px;
-        }
-        to {
-            height: 135px;
-        }
-    }
-
 	.timeBox {
 		stroke: white;
 		stroke-width: 1px;
@@ -329,79 +162,9 @@
         stroke-width: 1px;
         shape-rendering: crispEdges;
     }
-
-    .niceButton {
-        width: 200px;
-        height: 44px;
-        display: block;
-        background-color: #009ac9;
-        border: 1px solid transparent;
-        color: #ffffff;
-        border-radius: 3px;
-        -webkit-transition: all 0.3s ease-in-out;
-        -moz-transition: all 0.3s ease-in-out;
-        transition: all 0.3s ease-in-out;
-    }
-
-    .niceButton:hover {
-        cursor: pointer;
-        background-color: #ffffff;
-        color: #009ac9;
-        border-color: #009ac9;
-    }
 </style>
 
 <div id="visualization">
-    <div style='float: left; padding-right: 10px'>
-        <ul class='dropdown text' id='clusterSelection'>
-             <li id="top">Choose Timeline Clustering
-                <span></span>
-                <ul class="dropdown-box">
-                    <li  onclick=cluster('COR,average')>Hierarchical-Correlation-Average (Default)</li>
-                   <li  onclick=cluster('EUCL,average')>Hierarchical-Euclidean-Average</li>
-                   <li  onclick=cluster('ACF,average')>Hierarchical-Autocorrelation-Average</li>
-                </ul>
-             </li>
-          </ul>
-    </div>
-    <div style='float: left; padding-right: 10px'>
-        <input id='resetColorsButton' class='text niceButton' type='button' value='Reset Colors' onclick='resetLineColors()'/>
-    </div>
-    <div style='float: left; padding-right: 20px'>
-        <label class="ios7-switch" style="font-size: 16px">
-            Interpolate Missing Data
-            <input onclick='swapInterpolateBoolean()' type="checkbox" checked>
-            <span></span>
-        </label>
-    </div>
-    <div style='float: left; padding-right: 20px'>
-        <label class="ios7-switch" style="font-size: 16px">
-            Dark Background
-            <input onclick='swapBackgroundColor()' type="checkbox" checked>
-            <span></span>
-        </label>
-    </div>
-    <div style='float: left; padding-right: 20px'>
-        <label class="ios7-switch" style="font-size: 16px">
-            Smooth Data
-            <input onclick='smoothData()' type="checkbox" unchecked>
-            <span></span>
-        </label>
-    </div>
-    <div style='float: left; padding-right: 20px'>
-        <label class="ios7-switch" style="font-size: 16px">
-            Show Correlogram
-            <input onclick='swapCorrelogramBoolean()' type="checkbox" checked>
-            <span></span>
-        </label>
-    </div>
-<!--     <div style='float: left; padding-right: 20px'>
-        <label class="ios7-switch" style="font-size: 16px">
-            Disable Animations
-            <input onclick='switchAnimation()' type="checkbox">
-            <span></span>
-        </label>
-    </div> -->
 </div>
 
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
@@ -409,21 +172,10 @@
 <g:javascript src="resource/2D.js"/>
 
 <script type="text/javascript">
-    // var animationDuration = 500;
-    // var tmpAnimationDuration = animationDuration;
-    // function switchAnimation() {
-    //     if (animationDuration) {
-    //         tmpAnimationDuration = animationDuration;
-    //         animationDuration = 0;
-    //     } else {
-    //         animationDuration = tmpAnimationDuration;
-    //     }
-    // }
-
     d3.selection.prototype.moveToFront = function() {
-      return this.each(function(){
-          this.parentNode.appendChild(this);
-      });
+        return this.each(function(){
+            this.parentNode.appendChild(this);
+        });
     };
 
 	var results = ${raw(results)};
@@ -438,11 +190,7 @@
     var height = timelineHeight * concepts.length;
     var globalXAxisDist = 100;
     var localXAxisDist = 0;
-    var margin = {top: 50, right: 300 + 30, bottom: globalXAxisDist + 100, left: 200};
-
-    // colors = d3.scale.quantile()
-    // .domain(patientIDs)
-    // .range(['rgb(27,158,119)','rgb(217,95,2)','rgb(117,112,179)','rgb(231,41,138)','rgb(102,166,30)','rgb(230,171,2)','rgb(166,118,29)','rgb(102,102,102)']);
+    var margin = {top: 50, right: 300 + 30, bottom: globalXAxisDist + 100, left: 240};
 
     var colors = d3.scale.category10()
     .domain(patientIDs);
@@ -452,8 +200,8 @@
 	.rangePoints([0, timelineWidth]);
 
     var backgroundCheckChecked = false;
-    function swapBackgroundColor() {
-        if (! backgroundCheckChecked) {
+    function swapBackgroundColor(checked) {
+        if (! checked) {
             d3.selectAll('.timeBox')
             .transition()
             .duration(1500)
@@ -653,14 +401,11 @@
     .attr('width', timelineWidth / timepoints.length)
     .attr('height', maxTextWidth + 4);
 
-    var smoothDataCheckChecked = false;
-    function smoothData() {
-        if (! smoothDataCheckChecked) {
+    function smoothData(checked) {
+        if (checked) {
             lineGen.interpolate('basis');
-            smoothDataCheckChecked = true;
         } else {
             lineGen.interpolate('linear');
-            smoothDataCheckChecked = false;
         }
         updateTimelines();
     }
@@ -1020,6 +765,11 @@
         .on('mousemove', function() {
             updateHoverLine(d3.mouse(this));
         })
+        .on("mousedown", function(){
+            if(d3.event.button === 2){
+                d3.event.stopImmediatePropagation();
+            }
+        })
         .call(timelineBrush);
 
         timelineBrushes.push(timelineBrush);
@@ -1128,12 +878,8 @@
     }
 
     var showCorrelogram = true;
-    function swapCorrelogramBoolean() {
-        if (showCorrelogram) {
-            showCorrelogram = false;
-        } else {
-            showCorrelogram = true;
-        }
+    function swapCorrelogramBoolean(checked) {
+        showCorrelogram = checked;
     }
 
     var computingIDs = [];
@@ -1354,8 +1100,8 @@
     }
 
     var interpolateNAs = 1;
-    function swapInterpolateBoolean() {
-        if (interpolateNAs) {
+    function swapInterpolateBoolean(checked) {
+        if (! checked) {
             alert('Missing timepoints are no longer interpolated.\nThis can massively influence the analysis algorithms (i.e. clustering)\n\nDEACTIVATE ONLY IF YOU KNOW WHAT YOU DO!');
             interpolateNAs = 0;
         } else {
@@ -1363,22 +1109,23 @@
         }
     }
 
-    function cluster(settings) {
+    function cluster(dist, link) {
         removeDendrograms();
-        settings = settings.split(',');
-        var similarityMeasure = settings[0];
-        var linkageMeasure = settings[1];
+        var similarityMeasure = dist;
+        var linkageMeasure = link;
         var data = prepareFormData();
         data = addSettingsToData(data, { similarityMeasure: similarityMeasure });
         data = addSettingsToData(data, { linkageMeasure: linkageMeasure });
         data = addSettingsToData(data, { interpolateNAs: interpolateNAs });
         data = addSettingsToData(data, { xAxisSortOrder: x.domain() });
+        clusteringDropdown.select('.buttonText').text('Loading...');
         jQuery.ajax({
                 url: pageInfo.basePath + '/SmartR/updateOutputDIV',
                 type: "POST",
                 timeout: '600000',
                 data: data
             }).done(function(serverAnswer) {
+                clusteringDropdown.select('.buttonText').text('Timeline Clustering');
                 serverAnswer = JSON.parse(serverAnswer);
                 if (serverAnswer.error) {
                     alert(serverAnswer.error);
@@ -1393,7 +1140,93 @@
                     drawDendrogram(dendrogram, ids, fromHeight, toHeight);
                 }
             }).fail(function() {
+                clusteringDropdown.select('.buttonText').text('Timeline Clustering');
                 alert('Clustering failed for unknown reasons!');
             });
     }
+
+    var buttonWidth = 200;
+    var buttonHeight = 40;
+    var buffer = 5;
+
+    var clusteringDropdown = createD3Dropdown({
+        location: svg,
+        label: 'Timeline Clustering',
+        x: 2 - margin.left,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        items: [
+            {
+                callback: function() { cluster('COR', 'average'); }, 
+                label: 'Hierarch.-Corr.-Avg.'
+            },
+            {
+                callback: function() { cluster('EUCL', 'average'); }, 
+                label: 'Hierarch.-Eucl.-Avg.'
+            },
+            {
+                callback: function() { cluster('ACF', 'average'); }, 
+                label: 'Hierarch.-Autocorr.-Avg.'
+            }
+        ]
+    });
+
+    createD3Button({
+        location: svg,
+        label: 'Reset Colors',
+        x: 2 - margin.left + buffer + buttonWidth,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: resetLineColors
+    });
+
+    createD3Switch({
+        location: svg,
+        onlabel: 'Interp. Miss. Data ON',
+        offlabel: 'Interp. Miss. Data OFF',
+        x: 2 - margin.left + buffer * 2 + buttonWidth * 2,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: swapInterpolateBoolean,
+        checked: true
+    });
+
+    createD3Switch({
+        location: svg,
+        onlabel: 'Dark Background',
+        offlabel: 'Light Background',
+        x: 2 - margin.left + buffer * 3 + buttonWidth * 3,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: swapBackgroundColor,
+        checked: true
+    });
+
+    createD3Switch({
+        location: svg,
+        onlabel: 'Smooth Data ON',
+        offlabel: 'Smooth Data OFF',
+        x: 2 - margin.left + buffer * 4 + buttonWidth * 4,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: smoothData,
+        checked: false
+    });
+
+    createD3Switch({
+        location: svg,
+        onlabel: 'SHOW Correlogram',
+        offlabel: 'HIDE Correlogram',
+        x: 2 - margin.left + buffer * 5 + buttonWidth * 5,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: swapCorrelogramBoolean,
+        checked: true
+    });
 </script>

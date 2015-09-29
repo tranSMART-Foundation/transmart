@@ -114,115 +114,11 @@
         color: white;
         background: #326FCB;
     }
-
-    .ios7-switch {
-        display: inline-block;
-        position: relative;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-        tap-highlight-color: transparent;
-    }
-
-    .ios7-switch input {
-        opacity: 0;
-        position: absolute;
-    }
-
-    .ios7-switch input + span {
-        position: relative;
-        display: inline-block;
-        width: 1.65em;
-        height: 1em;
-        background: white;
-        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
-        border-radius: 0.5em;
-        vertical-align: -0.15em;
-        transition: all 0.40s cubic-bezier(.17,.67,.43,.98);
-    }
-
-    .ios7-switch:active input + span,
-    .ios7-switch input + span:active {
-        box-shadow: inset 0 0 0 0.73em #e9e9e9;
-    }
-
-    .ios7-switch input + span:after {
-        position: absolute;
-        display: block;
-        content: '';
-        width: 0.875em;
-        height: 0.875em;
-        border-radius: 0.4375em;
-        top: 0.0625em;
-        left: 0.0625em;
-        background: white;
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
-                    0 0 0.05em rgba(0,0,0,0.05),
-                    0 0.1em 0.2em rgba(0,0,0,0.2);
-        transition: all 0.25s ease-out;
-    }
-
-    .ios7-switch:active input + span:after,
-    .ios7-switch input + span:active:after {
-        width: 1.15em;
-    }
-
-    .ios7-switch input:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
-
-    .ios7-switch input:checked + span:after {
-        left: 0.7125em;
-    }
-
-    .ios7-switch:active input:checked + span:after,
-    .ios7-switch input:checked + span:active:after {
-        left: 0.4375em;
-    }
-
-    /* accessibility styles */
-    .ios7-switch input:focus + span:after {
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.15),
-                    0 0 0.05em rgba(0,0,0,0.08),
-                    0 0.1em 0.2em rgba(0,0,0,0.3);
-        background: #fff;
-    }
-
-    .ios7-switch input:focus + span {
-        box-shadow: inset 0 0 0 0.0625em #dadada;
-    }
-
-    .ios7-switch input:focus:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
-
-    /* reset accessibility style on hover */
-    .ios7-switch:hover input:focus + span:after {
-        box-shadow: inset 0 0 0 0.03em rgba(0,0,0,0.1),
-                    0 0 0.05em rgba(0,0,0,0.05),
-                    0 0.1em 0.2em rgba(0,0,0,0.2);
-        background: #fff;
-    }
-
-    .ios7-switch:hover input:focus + span {
-        box-shadow: inset 0 0 0 0.0625em #e9e9e9;
-    }
-
-    .ios7-switch:hover input:focus:checked + span {
-        box-shadow: inset 0 0 0 0.73em #009ac9;
-    }
 </style>
 
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 <g:javascript src="resource/d3.js"/>
-<label class="ios7-switch" style="font-size: 16px">
-    Disable Animations
-    <input onclick='switchAnimation()' type="checkbox">
-    <span></span>
-</label>
+<div id='controls'></div>
 <div id="visualization">
     <div id="histogram1"></div>
     <div id="scatterplot"></div>
@@ -232,14 +128,18 @@
 <script>
     var animationDuration = 500;
     var tmpAnimationDuration = animationDuration;
-    function switchAnimation() {
-        if (animationDuration) {
+    function switchAnimation(checked) {
+        if (! checked) {
             tmpAnimationDuration = animationDuration;
             animationDuration = 0;
         } else {
             animationDuration = tmpAnimationDuration;
         }
     }
+
+    var controls = d3.select('#controls').append('svg')
+    .attr('width', jQuery("#smartRPanel").width())
+    .attr('height', 45);
 
     var margin = {top: 20, right: 40, bottom: 5, left: 10};
     var width = jQuery("#smartRPanel").width() / 2 - 10 - margin.left - margin.right;
@@ -312,6 +212,8 @@
             legend
             .style("left", jQuery('#scatterplot').position().left + margin.left + "px")
             .style("top", jQuery('#scatterplot').position().top + margin.top + "px");
+            legendPosX = jQuery('#scatterplot').position().left + margin.left + "px";
+            legendPosY = jQuery('#scatterplot').position().top + margin.top + "px";
         } else {
             legend
             .style("left", legendPosX)
@@ -367,6 +269,11 @@
 
         scatterplot.append("g")
         .attr("class", "brush")
+        .on("mousedown", function(){
+            if(d3.event.button === 2){
+                d3.event.stopImmediatePropagation();
+            }
+        })        
         .call(brush);
 
         detectedTags = [];
@@ -776,4 +683,20 @@
         .attr("transform", "translate(" + 0 + "," + 0 + ")")
         .call(hist2xAxis);
     }
+
+    var buttonWidth = 200;
+    var buttonHeight = 40;
+    var padding = 20;
+
+    createD3Switch({
+        location: controls,
+        onlabel: 'Animation ON',
+        offlabel: 'Animation OFF',
+        x: 2,
+        y: 2,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: switchAnimation,
+        checked: true
+    });
 </script>
