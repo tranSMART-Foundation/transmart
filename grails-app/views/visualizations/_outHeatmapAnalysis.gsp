@@ -8,12 +8,12 @@
 
     .square {
         stroke: white;
-        stroke-width: 0px;
+        stroke-width: 0;
     }
 
     .extraSquare {
         stroke: white;
-        stroke-width: 0px;
+        stroke-width: 0;
     }
 
     .feature {
@@ -102,7 +102,7 @@
         position: absolute;
         text-align: center;
         display: inline-block;
-        padding: 0px;
+        padding: 0;
         font-size: 12px;
         font-weight: bold;
         color: black;

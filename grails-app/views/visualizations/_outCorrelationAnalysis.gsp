@@ -267,6 +267,11 @@
 
         scatterplot.append("g")
         .attr("class", "brush")
+        .on("mousedown", function(){
+            if(d3.event.button === 2){
+                d3.event.stopImmediatePropagation();
+            }
+        })        
         .call(brush);
 
         detectedTags = [];
