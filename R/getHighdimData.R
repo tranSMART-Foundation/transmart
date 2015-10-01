@@ -83,12 +83,12 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     message("Retrieving data from server. This can take some time, depending on your network connection speed. ",
             as.character(Sys.time()))
     serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary", progress = progress.download)
-    if (length(serverResult$content) == 0) {
+    if (length(serverResult) == 0) {
         warning("No data could be found. The server yielded an empty dataset. Returning NULL.")
         return(NULL)
     }
 
-    return(.parseHighdimData(serverResult$content, progress = progress.parse))
+    return(.parseHighdimData(serverResult, progress = progress.parse))
 }
 
 .parseHighdimData <- 

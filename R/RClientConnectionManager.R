@@ -156,38 +156,37 @@ refreshToken <- function(oauthDomain = transmartClientEnv$transmartDomain) {
         stop("No connection to tranSMART has been set up. For details, type: ?connectToTransmart")
     }
 
-    if (!exists("access_token", envir = transmartClientEnv)) {
+    if (exists("access_token", envir = transmartClientEnv)) {
+        ping <- .transmartServerGetRequest("/oauth/inspectToken", accept.type = "default", onlyContent = F)
+        if(ping$status == 404) {
+            # Maybe we're talking to an older version of Transmart that uses the version 1 oauth plugin
+            ping <- .transmartServerGetRequest("/oauth/verify", accept.type = "default", onlyContent = F)
+        }
+        if (getOption("verbose")) { message(paste(ping$content, collapse = ": ")) }
+
+        if(ping$status == 200) { return(TRUE) }
+
+        if(!'error' %in% names(ping$content)) {
+            message("Error: HTTP ", ping$status, ": ", ping$statusMessage)
+            return(FALSE)
+        }
+        if(ping$status != 401 || ping$content$error != "invalid_token") {
+            message("Error: HTTP ", ping$status, ": ", ping$statusMessage, "\n", ping$content$error,  ": ", ping$content$error_description)
+            return(FALSE)
+        }
+    } else if (!exists("refresh_token", envir = transmartClientEnv)) {
         return(FALSE)
     }
 
-    ping <- .transmartServerGetRequest("/oauth/inspectToken", accept.type = "default")
-    if(is.null(ping)) {
-        # Maybe we're talking to an older version of Transmart that uses the version 1 oauth plugin
-        ping <- .transmartServerGetRequest("/oauth/verify", accept.type = "default", JSON = F)
+    # try to refresh authentication
+    if (refreshToken()) {
+        message("Access token refreshed.")
+        return(.checkTransmartConnection(reauthentice.if.invalid.token))
+    } else {
+        message("Removing access token from the environment.")
+        remove("access_token", envir = transmartClientEnv)
+        return(FALSE)
     }
-    if (getOption("verbose")) { message(paste(ping, collapse = ": ")) }
-
-    if (!is.null(ping)) {
-        if ("error" %in% names(ping)) {
-            message("Error ", ping["error"],  ": ", ping["error_description"])
-            if (ping["error"] == "invalid_token") {
-                # try to refresh authentication
-                if (refreshToken()) {
-                    message("Access token refreshed.")
-                    return(.checkTransmartConnection(reauthentice.if.invalid.token))
-                } else {
-                    message("Removing access token from the environment.")
-                    remove("access_token", envir = transmartClientEnv)
-                    return(FALSE)
-                }
-            }
-            return(FALSE)
-        }
-        # perhaps check or update information about tokens and principal.
-        return(TRUE)
-    }
-    # if check fails, use refresh token to update (or ask for it).
-    return(FALSE)
 }
 
 .requestErrorHandler <- function(e) {
@@ -199,44 +198,53 @@ refreshToken <- function(oauthDomain = transmartClientEnv$transmartDomain) {
     stop(e)
 }
 
-.transmartServerGetRequest <- function(apiCall, errorHandler = .requestErrorHandler, ...)  {
+.transmartServerGetRequest <- function(apiCall, errorHandler = .requestErrorHandler, onlyContent = c(200), ...)  {
     if (exists("access_token", envir = transmartClientEnv)) {
         httpHeaderFields <- c(Authorization = paste("Bearer ", transmartClientEnv$access_token, sep=""))
     } else { httpHeaderFields <- "" }
 
     tryCatch(result <- .serverMessageExchange(apiCall, httpHeaderFields, ...), error = errorHandler)
-    if(exists("result")) result else NULL
+    if(!exists("result")) { return(NULL) }
+    if(is.numeric(onlyContent)) {
+        if(result$status %in% onlyContent) { return(result$content) }
+        errorHandler(paste("HTTP return code", result$status, "not in c(", toString(onlyContent), ")"))
+        return(NULL)
+    }
+    result
 }
 
 .serverMessageExchange <- 
-function(apiCall, httpHeaderFields, JSON = TRUE, accept.type = "default", progress = .make.progresscallback.download()) {
+function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.progresscallback.download()) {
     if (any(accept.type == c("default", "hal"))) {
         if (accept.type == "hal") { httpHeaderFields <- c(httpHeaderFields, Accept = "application/hal+json;charset=UTF-8") }
         headers <- basicHeaderGatherer()
-        result <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
+        result <- list()
+        result$content <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
                 verbose = getOption("verbose"),
                 httpheader = httpHeaderFields,
                 headerfunction = headers$update)
         if (getOption("verbose")) { message("Server response:\n\n", result, "\n") }
-        if (headers$value()['status'] != "200" || is.null(result) || result == "") {
-            return(NULL)
+        if(is.null(result)) { return(NULL) }
+        result$status <- as.integer(headers$value()['status'])
+        result$headers <- headers$value()
+        if(grepl("^application/json(;|\\W|$)", result$headers['Content-Type'])) {
+            result$content <- fromJSON(result$content, asText = TRUE, nullValue = NA)
         }
-        if(JSON) {
-            result <- fromJSON(result, asText = TRUE, nullValue = NA)
-            if (accept.type == "hal") { return(.simplifyHalList(result)) }
+        if(grepl("^application/hal\\+json(;|\\W|$)", result$headers['Content-Type'])) {
+            result$content <- .simplifyHalList(fromJSON(result$content, asText = TRUE, nullValue = NA))
         }
         return(result)
     } else if (accept.type == "binary") {
         progress$start(NA_integer_)
         result <- list()
-        h <- basicHeaderGatherer()
+        headers <- basicHeaderGatherer()
         result$content <- getBinaryURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
                 headerfunction = h$update,
                 noprogress = FALSE,
                 progressfunction = function(down, up) {up[which(up == 0)] <- NA; progress$update(down, up) },
                 httpheader = httpHeaderFields)
         progress$end()
-        result$header <- h$value()
+        result$header <- headers$value()
         if (getOption("verbose")) {
             message(paste("Server binary response header:", paste(capture.output(print(data.frame(result$header))), collapse="\n"), "", sep="\n"))
         }
