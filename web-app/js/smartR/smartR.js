@@ -1,53 +1,4 @@
-function createD3Button(args) {
-    var button = args.location.append('g');
 
-    var box = button.append("rect")
-    .attr("x", args.x)
-    .attr("y", args.y)
-    .attr("rx", 3)
-    .attr("ry", 3)
-    .attr("width", args.width)
-    .attr("height", args.height)
-    .style('stroke-width', '1px')
-    .style('stroke', '#009ac9')
-    .style('fill', '#009ac9')
-    .style('cursor', 'pointer')
-    .on('mouseover', function() {
-        box
-        .transition()
-        .duration(300)
-        .style('fill', '#ffffff');
-
-        text
-        .transition()
-        .duration(300)
-        .style('fill', '#009ac9');
-    })
-    .on('mouseout', function() {
-        box
-        .transition()
-        .duration(300)
-        .style('fill', '#009ac9');
-
-        text
-        .transition()
-        .duration(300)
-        .style('fill', '#ffffff');
-    })
-    .on('click', function() { args.callback(); }); 
-
-    var text = button.append('text')
-    .attr('x', args.x + args.width / 2)
-    .attr('y', args.y + args.height / 2)
-    .attr('dy', '0.35em')
-    .style('pointer-events', 'none')
-    .style("text-anchor", "middle")
-    .style('fill', '#ffffff')
-    .style('font-size', '14px')
-    .text(args.label);
-
-    return button;
-}
 
 function createD3Switch(args) {
     var switcher = args.location.append('g');
@@ -547,7 +498,7 @@ function activateDragAndDrop(divName) {
 // Panel item for the SmartR plugin
 var smartRPanel = new Ext.Panel({
     id: 'smartRPanel',
-    title: 'SmartR',
+    title: 'Heim',
     region: 'center',
     split: true,
     height: 90,
