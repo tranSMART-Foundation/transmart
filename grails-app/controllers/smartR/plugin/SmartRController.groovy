@@ -15,7 +15,7 @@ class SmartRController {
     *   Renders the default view
     */
     def index = {
-        def dir = smartRService.getWebAppFolder() + '/Scripts/'
+        def dir = smartRService.getScriptsFolder()
         def scriptList = new File(dir).list().findAll { it != 'Wrapper.R' && it != 'Sample.R' }
         [scriptList: scriptList]
     }

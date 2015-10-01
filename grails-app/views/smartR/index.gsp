@@ -13,10 +13,7 @@
 
 <body>
     <div id="index" style="text-align: center">
-        <h1 class="txt"> SmartR - Dynamic data visualization and interaction.</h1>
-        <span style='color:red' class='txt'>Please be aware that this software is currently in a TESTING phase and all results should be handled with care.</span><br/>
-        <span style='color:red' class='txt'>You can help improving SmartR by reporting bugs or providing the developer with (highly appreciated!) feedback.</span><br/>
-        <input id="contactButton" class='txt' type="button" value="Contact Developer" onclick="contact()"/>
+        <h1 class="txt"> Heim - Modular R Workflows in TranSMART.</h1>
         <span style='color:red' class='txt'></span><br/>
         <hr class="myhr"/>
 

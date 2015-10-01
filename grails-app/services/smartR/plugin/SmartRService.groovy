@@ -94,10 +94,11 @@ class SmartRService {
     }
 
     def createParameterMap(params) {
+        def scriptFolder = getScriptsFolder()
         def parameterMap = [:]
         parameterMap['init'] = params.init.toBoolean()
         parameterMap['script'] = params.script
-        parameterMap['scriptDir'] = getWebAppFolder() + '/Scripts/'
+        parameterMap['scriptDir'] =  scriptFolder
         parameterMap['result_instance_id1'] = params.result_instance_id1
         parameterMap['result_instance_id2'] = params.result_instance_id2
         parameterMap['settings'] = params.settings
@@ -115,5 +116,11 @@ class SmartRService {
         }
 
         return scriptExecutorService.run(parameterMap)
+    }
+
+
+    String getScriptsFolder(){
+        def scriptsFolderName = "HeimScripts"
+        return "${webAppFolder}/${scriptsFolderName}/"
     }
 }
