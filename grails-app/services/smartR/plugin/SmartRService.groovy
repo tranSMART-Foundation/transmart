@@ -119,9 +119,8 @@ class SmartRService {
     }
 
 
-    def getScriptsFolder(){
+    String getScriptsFolder(){
         def scriptsFolderName = "HeimScripts"
-        def scriptFolder = "/${scriptsFolderName}/".toString() //In order to pass Java String instead of GString
-        return getWebAppFolder() +scriptFolder
+        return "${webAppFolder}/${scriptsFolderName}/"
     }
 }
