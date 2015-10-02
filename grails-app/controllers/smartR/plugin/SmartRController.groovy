@@ -29,7 +29,7 @@ class SmartRController {
         if (! success) {
             render results
         } else {
-            render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
+            render template: "/heimVisualizations/out${FilenameUtils.getBaseName(params.script)}",
                     model: [results: results]
         }
     }
@@ -58,7 +58,7 @@ class SmartRController {
         if (! params.script) {
             render 'Please select a script to execute.'
         } else {
-            render template: "/smartR/in${FilenameUtils.getBaseName(params.script)}"
+            render template: "/heim/in${FilenameUtils.getBaseName(params.script)}"
         }
     }
 
