@@ -34,6 +34,7 @@ function (transmartDomain, use.authentication = TRUE, token = NULL, ...) {
     }
 
     if(.checkTransmartConnection()) {
+        message("Connection active")
         return(TRUE)
     }
 
@@ -45,35 +46,25 @@ function (transmartDomain, use.authentication = TRUE, token = NULL, ...) {
     }
 
     if(!.checkTransmartConnection()) {
-        if (use.authentication && authenticated && !exists("access_token", envir = transmartClientEnv)) {
-            # The access token has been removed: this must mean the applying the refresh token
-            # (in .checkTransmartConnection) has failed.
-            #
-            # Trying to reauthenticate...
-            #
-            # (Note: might cause an infinite loop if authentication succeeds, but checking the connection
-            # fails and triggers refreshing the authentication, which fails and removes the access token.)
-            connectToTransmart(transmartDomain, use.authentication, token, ...)
-        } else {
-            stop("Connection unsuccessful. Type: ?connectToTransmart for help.")
-        }
+        stop("Connection unsuccessful. Type: ?connectToTransmart for help.")
     } else {
         message("Connection successful.")
+        return(TRUE)
     }
 }
 
 getTransmartConnectionToken <- function() {
-    if(exists(transmartClientEnv)) return(transmartClientEnv$refresh_token)
+    if(exists("transmartClientEnv")) return(transmartClientEnv$refresh_token)
 }
 
 authenticateWithTransmart <- 
 function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.token = NULL,
-          client_id.= "api-client", client.secret = "api-client") {
+          client.id = "api-client", client.secret = "api-client") {
     if (!exists("transmartClientEnv")) assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
 
     transmartClientEnv$oauthDomain <- oauthDomain
-    transmartClientEnv$client_id <- api.client
-    transmartClientEnv$client_secret <- api.client
+    transmartClientEnv$client_id <- client.id
+    transmartClientEnv$client_secret <- client.secret
 
     oauth.request.token.url <- paste(sep = "",
             transmartClientEnv$oauthDomain,
@@ -128,7 +119,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     transmartClientEnv$oauthDomain <- oauthDomain
     transmartClientEnv$client_id <- "api-client"
     transmartClientEnv$client_secret <- "api-client"
-    message("Trying to reauthenticate using the refresh token: ", transmartClientEnv$refresh_token, "...")
+    message("Trying to reauthenticate using the refresh token...")
     refreshUrl <- paste(sep = "",
                         transmartClientEnv$oauthDomain,
                         "/oauth/token?grant_type=refresh_token",
