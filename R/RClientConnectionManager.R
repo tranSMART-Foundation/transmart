@@ -22,15 +22,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 connectToTransmart <- 
-function (transmartDomain, use.authentication = TRUE, token = NULL, ...) {
+function (transmartDomain, use.authentication = TRUE, access.token = NULL, refresh.token = NULL, ...) {
     if (!exists("transmartClientEnv") || transmartClientEnv$transmartDomain != transmartDomain) { 
         assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
     }
 
     transmartClientEnv$transmartDomain <- transmartDomain
     transmartClientEnv$db_access_url <- transmartClientEnv$transmartDomain
-    if (!is.null(token)) {
-        transmartClientEnv$refresh_token <- token
+    if (!is.null(refresh.token)) {
+        transmartClientEnv$refresh_token <- refresh.token
+    }
+    if (!is.null(access.token)) {
+        transmartClientEnv$access_token <- access.token
     }
 
     if(.checkTransmartConnection()) {
@@ -53,7 +56,11 @@ function (transmartDomain, use.authentication = TRUE, token = NULL, ...) {
     }
 }
 
-getTransmartConnectionToken <- function() {
+getRefreshToken <- function() {
+    if(exists("transmartClientEnv")) return(transmartClientEnv$refresh_token)
+}
+
+getAccessToken <- function() {
     if(exists("transmartClientEnv")) return(transmartClientEnv$refresh_token)
 }
 
