@@ -46,7 +46,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         progress.download = .make.progresscallback.download(),
         progress.parse = .make.progresscallback.parse()) {
 
-    .checkTransmartConnection()
+    .ensureTransmartConnection()
 
     if (is.null(concept.link) && !is.null(concept.match)) {
         studyConcepts <- getConcepts(study.name)

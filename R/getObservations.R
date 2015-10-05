@@ -22,7 +22,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 getObservations <- function(study.name, concept.match = NULL, concept.links = NULL, as.data.frame = TRUE) {
-    .checkTransmartConnection()
+    .ensureTransmartConnection()
 
     if (is.null(concept.links)) {
         if (!is.null(concept.match)) {

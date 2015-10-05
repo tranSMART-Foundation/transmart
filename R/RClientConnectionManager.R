@@ -148,9 +148,17 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     }
 }
 
-.checkTransmartConnection <- function(reauthentice.if.invalid.token = TRUE) {
+.ensureTransmartConnection <- function() {return(.checkTransmartConnection(stop.on.error = TRUE))}
+
+.checkTransmartConnection <- function(stop.on.error = FALSE) {
+    if(stop.on.error) {
+        stopfn <- function(e) {stop(e)}
+    } else {
+        stopfn <- function(e) {message("Error:", e); return(FALSE)}
+    }
+
     if (!exists("transmartClientEnv", envir = .GlobalEnv)) {
-        stop("No connection to tranSMART has been set up. For details, type: ?connectToTransmart")
+        return(stopfn("No connection to tranSMART has been set up. For details, type: ?connectToTransmart"))
     }
 
     if (exists("access_token", envir = transmartClientEnv)) {
@@ -164,25 +172,23 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         if(ping$status == 200) { return(TRUE) }
 
         if(!'error' %in% names(ping$content)) {
-            message("Error: HTTP ", ping$status, ": ", ping$statusMessage)
-            return(FALSE)
+            return(stopfn("HTTP ", ping$status, ": ", ping$statusMessage))
         }
-        if(ping$status != 401 || ping$content$error != "invalid_token") {
-            message("Error: HTTP ", ping$status, ": ", ping$statusMessage, "\n", ping$content$error,  ": ", ping$content$error_description)
-            return(FALSE)
+        if(ping$status != 401 || ping$content['error'] != "invalid_token") {
+            return(stopfn("HTTP ", ping$status, ": ", ping$statusMessage, "\n", ping$content['error'],  ": ", ping$content['error_description']))
         }
     } else if (!exists("refresh_token", envir = transmartClientEnv)) {
-        return(FALSE)
+        return(stopfn("Unable to refresh authentication: no refresh token"))
     }
 
     # try to refresh authentication
     if (.refreshToken()) {
         message("Access token refreshed.")
-        return(.checkTransmartConnection(reauthentice.if.invalid.token))
+        return(TRUE)
     } else {
         message("Removing access token from the environment.")
-        remove("access_token", envir = transmartClientEnv)
-        return(FALSE)
+        try(remove("access_token", envir = transmartClientEnv))
+        return(stopfn("Refreshing access failed"))
     }
 }
 

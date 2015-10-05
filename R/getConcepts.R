@@ -22,7 +22,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 getConcepts <- function(study.name, as.data.frame = TRUE, cull.columns = TRUE) {
-    .checkTransmartConnection()
+    .ensureTransmartConnection()
     
     serverResult <- .transmartServerGetRequest(
             paste("/studies/", study.name, "/concepts", sep = ""), accept.type = "hal")
