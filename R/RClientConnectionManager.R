@@ -42,7 +42,7 @@ function (transmartDomain, use.authentication = TRUE, token = NULL, ...) {
         authenticated <- authenticateWithTransmart(...)
         if(is.null(authenticated)) return()
     } else if (!use.authentication && exists("access_token", envir = transmartClientEnv)) {
-        try(remove("access_token", envir = transmartClientEnv))
+        remove("access_token", envir = transmartClientEnv)
     }
 
     if(!.checkTransmartConnection()) {
@@ -97,15 +97,8 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             "&redirect_uri=", URLencode(transmartClientEnv$oauthDomain, TRUE),
             URLencode("/oauth/verify", TRUE))
 
-    oauthResponse <- .transmartServerGetRequest(oauth.exchange.token.path, onlyContent=F)
-    if (!oauthResponse$JSON) {
-        message("Authentication error, could not parse response of type", oauthResponse$headers['Content-Type'], "\n")
-        return(FALSE)
-    }
-    if ('error' %in% names(oauthResponse$content)) {
-        cat("Authentication failed:", oauthResponse$content['error_description'], "\n")
-        return(FALSE)
-    }
+    oauthResponse <- .transmartServerGetOauthRequest(oauth.exchange.token.path, "Authentication")
+    if (is.null(oauthResponse)) return(FALSE)
 
     list2env(oauthResponse$content, envir = transmartClientEnv)
     transmartClientEnv$access_token.timestamp <- Sys.time()
@@ -127,24 +120,35 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
                         URLencode("/oauth/verify", TRUE),
                         "")
     
-    oauthResponse <- .transmartServerGetRequest(refreshPath, onlyContent=F)
-    if (!oauthResponse$JSON) {
-        cat("Refreshing access failed, could not parse server response of type", oauthResponse$headers['Content-Type'], "\n")
-        return(FALSE)
-    }
-    if ('error' %in% names(oauthResponse$content)) {
-        cat("Refreshing access failed, removing refresh_token:", oauthResponse$content['error_description'], "\n")
-        rm(refresh_token, envir=transmartClientEnv)
-        return(FALSE)
-    }
+    oauthResponse <- .transmartServerGetOauthRequest(refreshPath, "Refreshing access")
+    if (is.null(oauthResponse)) return(FALSE)
     if (!'access_token' %in% names(oauthResponse$content)) {
-        cat("Refreshing access failed, server response did not contain access_token\n")
+        cat("Refreshing access failed, server response did not contain access_token. HTTP", statusString, "\n")
         return(FALSE)
     }
     list2env(oauthResponse$content, envir = transmartClientEnv)
     transmartClientEnv$access_token.timestamp <- Sys.time()
     cat("Authentication completed\n")
     return(TRUE)
+}
+
+.transmartServerGetOauthRequest <- function(path, action) {
+    oauthResponse <- .transmartServerGetRequest(path, onlyContent=F)
+    statusString <- paste("status code ", oauthResponse$status, ": ", oauthResponse$headers['statusMessage'], sep='')
+    if (!oauthResponse$JSON) {
+        cat(action, " failed, could not parse server response of type ", oauthResponse$headers['Content-Type'], ", ", statusString, "\n")
+        return(NULL)
+    }
+    if ('error' %in% names(oauthResponse$content)) {
+        cat(action, " failed, removing refresh_token:", oauthResponse$content['error_description'], "\n")
+        rm(refresh_token, envir=transmartClientEnv)
+        return(NULL)
+    }
+    if (!oauthResponse$status == 200) {
+        cat(action, " error: HTTP ", statusString, "\n")
+        return(NULL)
+    }
+    return(oauthResponse)
 }
 
 .ensureTransmartConnection <- function() {return(.checkTransmartConnection(stop.on.error = TRUE))}
@@ -186,7 +190,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         return(TRUE)
     } else {
         message("Removing access token from the environment.")
-        try(remove("access_token", envir = transmartClientEnv))
+        remove("access_token", envir = transmartClientEnv)
         return(stopfn("Refreshing access failed"))
     }
 }
