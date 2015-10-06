@@ -49,4 +49,14 @@ class ScriptManagerSpec extends Specification {
         then:
         result == '[{"variableName":"expression","variableType":"High-Dimension"},{"variableName":"patients","variableType":"Patient-Set"}]'
     }
+
+    void "test listing workflows"(){
+        given:"Only Heatmapworkflow is present"
+
+        when:"listing studies"
+            def result =  ScriptManager.listWorkflows()
+        then:"Only heatmap workflow is returned in a list"
+            result.size() == 1
+            result[0] == 'heatmap'
+    }
 }
