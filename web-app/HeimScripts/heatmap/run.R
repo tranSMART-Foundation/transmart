@@ -6,4 +6,4 @@ colnames(testData) <- c("Probe1","Probe2","Probe3","Probe4","Probe5","Probe6","P
 png(filename="/tmp/last_heatmap.png")
 heatmap(testData)
 dev.off()
-output$data <- testData
+
