@@ -29,7 +29,7 @@ class ScriptManager {
         executeRScript(workflowName,"run.r")
     }
 
-    private static String executeRScript(String workflowName, String scriptName){
+    public static String executeRScript(String workflowName, String scriptName){
         def rServePort = 6311 //TODO:Piotr Fetch it from the config
         def rServeHost = "localhost"
         def connection = new RConnection(rServeHost, rServePort)

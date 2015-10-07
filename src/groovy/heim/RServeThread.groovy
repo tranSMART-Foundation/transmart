@@ -5,11 +5,15 @@ import java.util.UUID;
 public class RServeThread implements Runnable
 {
     private UUID uuid;
-    private String name; //this will be the path name of the R file to run
+    private String workflow
+    private String scriptName
+    private String name  //this will be the path name of the R file to run
 
-    public RServeThread(String name) {
+    public RServeThread(String workflow,String scriptName) {
         this.uuid = UUID.randomUUID();
-        this.name = name;
+        this.workflow = workflow
+        this.scriptName = scriptName
+        this.name = workflow+'/'+scriptName
     }
 
     public UUID getUuid() {
@@ -23,8 +27,7 @@ public class RServeThread implements Runnable
     @Override
     public void run() {
         try {
-
-            Thread.sleep(1500);
+            ScriptManager.executeRScript(workflow,scriptName)
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
