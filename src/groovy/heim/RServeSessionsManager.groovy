@@ -1,10 +1,12 @@
 package heim
 
-class RServeSessionsManager extends HashMap<UUID, RServeSessionExecutor> {
+import java.util.concurrent.ConcurrentHashMap
 
-    public UUID createNewSession() {
-        UUID uuid = UUID.randomUUID();
-        this.put( uuid, new RServeSessionExecutor() );
-        return uuid;
+class RServeSessionsManager extends ConcurrentHashMap<String, RServeSessionExecutor> {
+
+    public String createNewSession() {
+        String uuid = UUID.randomUUID().toString()
+        this.put(uuid, new RServeSessionExecutor())
+        uuid
     }
 }
