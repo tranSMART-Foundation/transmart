@@ -1,3 +1,22 @@
+def forkSettingsRun = [
+        minMemory: 1536,
+        maxMemory: 4096,
+        maxPerm  : 384,
+        debug    : false,
+]
+def forkSettingsOther = [
+        minMemory: 256,
+        maxMemory: 1024,
+        maxPerm  : 384,
+        debug    : false,
+]
+
+grails.project.fork = [
+        test   : forkSettingsOther,
+        run    : forkSettingsRun,
+        war    : false,
+        console: forkSettingsOther]
+
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
