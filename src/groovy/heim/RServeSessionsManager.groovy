@@ -1,4 +1,4 @@
-package smartR.plugin
+package heim
 
 class RServeSessionsManager extends HashMap<UUID, RServeSessionExecutor> {
 
