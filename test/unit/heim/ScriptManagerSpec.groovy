@@ -1,5 +1,6 @@
 package heim
 
+import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
@@ -8,6 +9,7 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestMixin(GrailsUnitTestMixin)
+@TestFor(ScriptManagerService)
 class ScriptManagerSpec extends Specification {
 
     def setup() {
@@ -26,7 +28,7 @@ class ScriptManagerSpec extends Specification {
         def workflowName = "heatmap"
         def scriptName = "init.r"
         when: "Trying to read in the init.r script."
-        def result = ScriptManagerService.readScript(workflowName, scriptName)
+        def result = service.readScript(workflowName, scriptName)
         then: "Resulting string is not null and consists of 8 lines"
         result
         result.split("\n").size() == 8
@@ -36,7 +38,7 @@ class ScriptManagerSpec extends Specification {
         given:"Heatmap workflow"
         def  workflowName = "heatmap"
         when: "Initializing the workflow with the ScriptManager"
-        ScriptManagerService.runWorkflow(workflowName)
+        service.runWorkflow(workflowName)
         then:
             new File("/tmp/last_heatmap.png").exists()
     }
@@ -45,7 +47,7 @@ class ScriptManagerSpec extends Specification {
         given:"Heatmap workflow"
         def  workflowName = "heatmap"
         when: "Initializing the workflow with the ScriptManager"
-        def result = ScriptManagerService.initializeWorkflow(workflowName)
+        def result = service.initializeWorkflow(workflowName)
         then:
         result == '[{"variableName":"expression","variableType":"High-Dimension"},{"variableName":"patients","variableType":"Patient-Set"}]'
     }
@@ -54,7 +56,7 @@ class ScriptManagerSpec extends Specification {
         given:"Only Heatmapworkflow is present"
 
         when:"listing studies"
-            def result =  ScriptManagerService.listWorkflows()
+            def result =  service.listWorkflows()
         then:"Only heatmap workflow is returned in a list"
             result.size() == 1
             result[0] == 'heatmap'

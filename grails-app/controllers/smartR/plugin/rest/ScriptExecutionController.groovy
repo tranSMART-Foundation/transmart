@@ -20,4 +20,12 @@ class ScriptExecutionController {
         }
     }
 
+    def run(){
+        def json = request.JSON
+        String scriptExecutionId = RServeSessionService.run(json)
+        render(contentType: 'text/json') {
+            [scriptExecutionId: scriptExecutionId]
+        }
+    }
+
 }
