@@ -22,7 +22,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 getSubjects <- function(study.name, as.data.frame = TRUE) {
-    .checkTransmartConnection()
+    .ensureTransmartConnection()
 
     serverResult <- .transmartServerGetRequest( paste("/studies/", study.name,"/subjects", sep=""), accept.type = "hal")
     listOfSubjects <- serverResult$subjects
