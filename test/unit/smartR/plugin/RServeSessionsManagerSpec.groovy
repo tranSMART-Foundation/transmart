@@ -2,6 +2,8 @@ package smartR.plugin
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import heim.RServeSessionExecutor
+import heim.RServeSessionsManager
 import spock.lang.Specification
 
 /**
