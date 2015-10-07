@@ -1,4 +1,4 @@
-package smartr
+package heim
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
