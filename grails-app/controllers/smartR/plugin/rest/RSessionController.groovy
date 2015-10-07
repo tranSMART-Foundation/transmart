@@ -1,5 +1,6 @@
 package smartR.plugin.rest
 
+import org.springframework.web.context.support.WebApplicationContextUtils
 import smartR.plugin.RServeSessionService
 
 /**
@@ -11,14 +12,13 @@ class RSessionController {
     //TODO Return correct HTTP statuses.
     //TODO Add url mappings
 
-    RServeSessionService rServeSessionService
+    def RServeSessionService
 
     /**
      * Creates a new R session
      */
     def create() {
-
-        def sessionId = rServeSessionService.manager.createNewSession()
+        def sessionId = RServeSessionService.manager.createNewSession()
 
         render(contentType: 'text/json') {
             [sessionId: sessionId]

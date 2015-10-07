@@ -4,7 +4,7 @@ import smartR.plugin.RServeSessionService
 
 class ScriptExecutionController {
 
-    RServeSessionService rServeSessionService
+    def RServeSessionService
 
     /**
      *
@@ -13,7 +13,7 @@ class ScriptExecutionController {
      */
     def init() {
         def json = request.JSON
-        String scriptExecutionId = rServeSessionService.init(json)
+        String scriptExecutionId = RServeSessionService.init(json)
 
         render(contentType: 'text/json') {
             [scriptExecutionId: scriptExecutionId]

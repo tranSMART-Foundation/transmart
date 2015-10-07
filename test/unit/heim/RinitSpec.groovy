@@ -4,7 +4,6 @@ import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import org.rosuda.REngine.Rserve.RConnection
-import smartR.plugin.SmartRService
 import spock.lang.Specification
 
 /**
@@ -25,7 +24,7 @@ class RinitSpec extends Specification {
         def rServePort = 6311
         def rServeHost = "localhost"
         def connection = new RConnection(rServeHost, rServePort)
-        def script = ScriptManager.readScript("heatmap", "init.r")
+        def script = ScriptManagerService.readScript("heatmap", "init.r")
 
 
         when:

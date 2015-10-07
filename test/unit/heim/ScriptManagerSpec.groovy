@@ -26,7 +26,7 @@ class ScriptManagerSpec extends Specification {
         def workflowName = "heatmap"
         def scriptName = "init.r"
         when: "Trying to read in the init.r script."
-        def result = ScriptManager.readScript(workflowName, scriptName)
+        def result = ScriptManagerService.readScript(workflowName, scriptName)
         then: "Resulting string is not null and consists of 8 lines"
         result
         result.split("\n").size() == 8
@@ -36,7 +36,7 @@ class ScriptManagerSpec extends Specification {
         given:"Heatmap workflow"
         def  workflowName = "heatmap"
         when: "Initializing the workflow with the ScriptManager"
-        ScriptManager.runWorkflow(workflowName)
+        ScriptManagerService.runWorkflow(workflowName)
         then:
             new File("/tmp/last_heatmap.png").exists()
     }
@@ -45,7 +45,7 @@ class ScriptManagerSpec extends Specification {
         given:"Heatmap workflow"
         def  workflowName = "heatmap"
         when: "Initializing the workflow with the ScriptManager"
-        def result = ScriptManager.initializeWorkflow(workflowName)
+        def result = ScriptManagerService.initializeWorkflow(workflowName)
         then:
         result == '[{"variableName":"expression","variableType":"High-Dimension"},{"variableName":"patients","variableType":"Patient-Set"}]'
     }
@@ -54,7 +54,7 @@ class ScriptManagerSpec extends Specification {
         given:"Only Heatmapworkflow is present"
 
         when:"listing studies"
-            def result =  ScriptManager.listWorkflows()
+            def result =  ScriptManagerService.listWorkflows()
         then:"Only heatmap workflow is returned in a list"
             result.size() == 1
             result[0] == 'heatmap'

@@ -1,7 +1,5 @@
 package heim
 
-import java.util.UUID;
-
 public class RServeThread implements Runnable
 {
     private UUID uuid;
@@ -9,11 +7,14 @@ public class RServeThread implements Runnable
     private String scriptName
     private String name  //this will be the path name of the R file to run
 
-    public RServeThread(String workflow,String scriptName) {
+
+    ScriptManagerService scriptManagerService
+    public RServeThread(String workflow,String scriptName,ScriptManagerService service) {
         this.uuid = UUID.randomUUID();
         this.workflow = workflow
         this.scriptName = scriptName
         this.name = workflow+'/'+scriptName
+        this.scriptManagerService =  service
     }
 
     public UUID getUuid() {
@@ -27,7 +28,8 @@ public class RServeThread implements Runnable
     @Override
     public void run() {
         try {
-            ScriptManager.executeRScript(workflow,scriptName)
+            scriptManagerService.executeRScript(workflow,scriptName)
+            //TODO: Handle R output
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
