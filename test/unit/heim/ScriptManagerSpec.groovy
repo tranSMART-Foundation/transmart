@@ -17,7 +17,7 @@ class ScriptManagerSpec extends Specification {
 
     def cleanup() {
         def heatmap = new File("/tmp/last_heatmap.png")
-        if (heatmap.exists() ){
+        if (heatmap.exists()) {
             heatmap.delete()
         }
 
@@ -34,31 +34,13 @@ class ScriptManagerSpec extends Specification {
         result.split("\n").size() == 8
     }
 
-    void "test running the workflow"(){
-        given:"Heatmap workflow"
-        def  workflowName = "heatmap"
-        when: "Initializing the workflow with the ScriptManager"
-        service.runWorkflow(workflowName)
-        then:
-            new File("/tmp/last_heatmap.png").exists()
-    }
+    void "test listing workflows"() {
+        given: "Only Heatmapworkflow is present"
 
-    void "test initializing the workflow"(){
-        given:"Heatmap workflow"
-        def  workflowName = "heatmap"
-        when: "Initializing the workflow with the ScriptManager"
-        def result = service.initializeWorkflow(workflowName)
-        then:
-        result == '[{"variableName":"expression","variableType":"High-Dimension"},{"variableName":"patients","variableType":"Patient-Set"}]'
-    }
-
-    void "test listing workflows"(){
-        given:"Only Heatmapworkflow is present"
-
-        when:"listing studies"
-            def result =  service.listWorkflows()
-        then:"Only heatmap workflow is returned in a list"
-            result.size() == 1
-            result[0] == 'heatmap'
+        when: "listing studies"
+        def result = service.listWorkflows()
+        then: "Only heatmap workflow is returned in a list"
+        result.size() == 1
+        result[0] == 'heatmap'
     }
 }

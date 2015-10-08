@@ -1,27 +1,60 @@
 package smartR.plugin
 
-import heim.RServeSessionExecutor
-import heim.RServeSessionsManager
-import heim.RServeThread
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import heim.RScriptExecutionDefinition
+import heim.RServeSession
+
+import java.util.concurrent.TimeUnit
 
 class RServeSessionService {
 
     def scriptManagerService
-    def manager = new RServeSessionsManager()
 
-    def init(json) {
-        _executeRScript(json,'init.r')
+    private Cache<String, RServeSession> sessions = CacheBuilder.newBuilder()
+            .concurrencyLevel(5)
+            //.weakKeys()
+            .maximumSize(100)
+            .expireAfterAccess(60, TimeUnit.MINUTES)
+            .build()
+
+    String createNewSession() {
+        def session = new RServeSession()
+        sessions.put(session.sessionId, session)
+        session.sessionId
     }
 
-    def run(json){
-        _executeRScript(json,'run.r')
+    def closeSession(String sessionId) {
+        RServeSession executor = sessions.getIfPresent(sessionId)
+        sessions.invalidate(sessionId)
+        executor.closeSession()
     }
 
-
-    def _executeRScript(json,script){
-        RServeSessionExecutor executor = manager[json.sessionId]
-        def initThread = new RServeThread(json.workflow, script ,scriptManagerService)
-        executor.execute(initThread)
-        initThread.uuid
+    def executeInitScript(String sessionId, String workflow) {
+        executeScript(sessionId, workflow, 'init.r')
     }
+
+    def executeRunScript(String sessionId, String workflow) {
+        executeScript(sessionId, workflow, 'run.r')
+    }
+
+    def executeScript(String sessionId, String workflow, String script) {
+        RServeSession executor = sessions.getIfPresent(sessionId)
+        //TODO Clarify contract between current class and scriptManagerService
+        def definition = new RScriptExecutionDefinition(
+                code: scriptManagerService.readScript(workflow, script)
+        )
+        executor.execute(definition)
+    }
+
+    def getScriptExecutionStatus(String sessionId, String scriptExecutionId) {
+        sessions.getIfPresent(sessionId)
+            .getScriptExecutionStatus(scriptExecutionId)
+    }
+
+    def getScriptExecutionResult(String sessionId, String scriptExecutionId) {
+        sessions.getIfPresent(sessionId)
+            .getScriptExecutionResult(scriptExecutionId)
+    }
+
 }

@@ -1,31 +1,47 @@
 package smartR.plugin.rest
 
-import smartR.plugin.RServeSessionService
-
 class ScriptExecutionController {
 
     def RServeSessionService
 
     /**
      *
-     *{'sessionId': '',
-     'workflow': '',}* Init a new script instance and adds it for execution
+     *{
+     *  'sessionId': '',
+     *  'workflow': 'heatmap'
+     * }
      */
     def init() {
         def json = request.JSON
-        String scriptExecutionId = RServeSessionService.init(json)
+        String scriptExecutionId = RServeSessionService.executeInitScript(json.sessionId, json.workflow)
 
         render(contentType: 'text/json') {
             [scriptExecutionId: scriptExecutionId]
         }
     }
 
-    def run(){
+    def run() {
         def json = request.JSON
-        String scriptExecutionId = RServeSessionService.run(json)
+        String scriptExecutionId = RServeSessionService.executeRunScript(json.sessionId, json.workflow)
+
         render(contentType: 'text/json') {
             [scriptExecutionId: scriptExecutionId]
         }
     }
 
+    def status() {
+        def status = RServeSessionService.getScriptExecutionStatus(params.sessionId, params.scriptExecutionId)
+
+        render(contentType: 'text/json') {
+            [status: status]
+        }
+    }
+
+    def result() {
+        def result = RServeSessionService.getScriptExecutionResult(params.sessionId, params.scriptExecutionId)
+
+        render(contentType: 'text/json') {
+            [result: result]
+        }
+    }
 }
