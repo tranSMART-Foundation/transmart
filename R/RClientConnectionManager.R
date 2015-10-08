@@ -107,6 +107,10 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 }
 
 .refreshToken <- function(oauthDomain = transmartClientEnv$transmartDomain) {
+    if (!exists("refresh_token", envir=transmartClientEnv)) {
+        message("Unable to refresh the connection, no refresh token found")
+        return(FALSE)
+    }
     transmartClientEnv$oauthDomain <- oauthDomain
     transmartClientEnv$client_id <- "api-client"
     transmartClientEnv$client_secret <- "api-client"
@@ -155,7 +159,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 
 .checkTransmartConnection <- function(stop.on.error = FALSE) {
     if(stop.on.error) {
-        stopfn <- function(e) {stop(e)}
+        stopfn <- stop
     } else {
         stopfn <- function(e) {message("Error: ", e); return(FALSE)}
     }
