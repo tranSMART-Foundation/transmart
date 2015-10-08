@@ -26,5 +26,6 @@ grails.project.dependency.resolution = {
     }
     plugins {
         runtime ':transmart-rest-api:1.2.2-SNAPSHOT'
+        runtime ':resources:1.2.1'
     }
 }
