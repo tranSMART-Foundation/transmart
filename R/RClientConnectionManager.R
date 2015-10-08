@@ -157,7 +157,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     if(stop.on.error) {
         stopfn <- function(e) {stop(e)}
     } else {
-        stopfn <- function(e) {message("Error:", e); return(FALSE)}
+        stopfn <- function(e) {message("Error: ", e); return(FALSE)}
     }
 
     if (!exists("transmartClientEnv", envir = .GlobalEnv)) {

@@ -4,7 +4,7 @@
   Retrieve the authentication token that can be used to connect to Transmart
 }
 \description{
-  This function returns a token that can be used to authenticate to Transmart. In OAuth parlance, it is the refresh token. It is possible to store this token in an R script so that script can connect to Transmart without requiring interactive authentication. See \link{\code{connectToTransmart}} for details. Note that Transmart only issues refresh tokens since version 1.2.5.
+  This function returns a token that can be used to authenticate to Transmart. In OAuth parlance, it is the refresh token. It is possible to store this token in an R script so that script can connect to Transmart without requiring interactive authentication. See \code{\link{connectToTransmart}} for details. Note that Transmart only issues refresh tokens since version 1.2.5.
 }
 \usage{
 getTransmartToken()
