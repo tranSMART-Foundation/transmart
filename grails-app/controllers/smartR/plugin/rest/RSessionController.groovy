@@ -1,12 +1,5 @@
 package smartR.plugin.rest
 
-import org.springframework.web.context.support.WebApplicationContextUtils
-import smartR.plugin.RServeSessionService
-
-/**
- * R session. Rserve binds a session to a connection tightly.
- * That's why you could see that both are used interchangeably here.
- */
 class RSessionController {
 
     //TODO Return correct HTTP statuses.
@@ -18,10 +11,22 @@ class RSessionController {
      * Creates a new R session
      */
     def create() {
-        def sessionId = RServeSessionService.manager.createNewSession()
+        def sessionId = RServeSessionService.createNewSession()
 
         render(contentType: 'text/json') {
             [sessionId: sessionId]
+        }
+    }
+
+    /**
+     * Deletes an R session
+     */
+    def delete() {
+        def json = request.JSON
+        RServeSessionService.closeSession(json.sessionId)
+
+        render(contentType: 'text/json') {
+            [status: 'OK']
         }
     }
 
