@@ -70,12 +70,35 @@ class SmartRController {
     *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
     */
     def loadScripts = {
+        JSONArray files = new JSONArray()
         JSONObject result = new JSONObject()
-        JSONObject script = new JSONObject()
-        script.put("path", "${servletContext.contextPath}${pluginContextPath}/js/smartR/smartR.js" as String)
-        script.put("type", "script")
+        JSONObject script1 = new JSONObject()
+        JSONObject script2 = new JSONObject()
+        JSONObject script3 = new JSONObject()
+        JSONObject script4 = new JSONObject()
+
+
+
+        script1.put("path", "${servletContext.contextPath}${pluginContextPath}/js/resource/HighDimensionalData.js" as String)
+        script1.put("type", "script")
+        files << script1
+
+        script2.put("path", "${servletContext.contextPath}${pluginContextPath}/js/resource/RmodulesView.js" as String)
+        script2.put("type", "script")
+        files << script2
+
+        script3.put("path", "${servletContext.contextPath}${pluginContextPath}/js/resource/dataAssociation.js" as String)
+        script3.put("type", "script")
+        files << script3
+
+        script4.put("path", "${servletContext.contextPath}${pluginContextPath}/js/smartR/smartR.js" as String)
+        script4.put("type", "script")
+        files << script4
+
         result.put("success", true)
-        result.put("files", new JSONArray() << script)
+        //result.put("files", new JSONArray() << script)
+        result.put("files", files)
+
         render result as JSON;
     }
 }
