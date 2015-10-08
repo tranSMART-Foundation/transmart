@@ -61,7 +61,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         return(NULL)
     }
 
-    serverResult <- .transmartServerGetRequest(paste(concept.link, "/highdim", sep=""), accept.type = "hal")
+    serverResult <- .transmartGetJSON(paste(concept.link, "/highdim", sep=""))
     if (length(serverResult$dataTypes) == 0) {
         warning("This high dimensional concept contains no data.")
         return(NULL)

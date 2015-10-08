@@ -127,12 +127,11 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     oauthResponse <- .transmartServerGetOauthRequest(refreshPath, "Refreshing access")
     if (is.null(oauthResponse)) return(FALSE)
     if (!'access_token' %in% names(oauthResponse$content)) {
-        cat("Refreshing access failed, server response did not contain access_token. HTTP", statusString, "\n")
+        message("Refreshing access failed, server response did not contain access_token. HTTP", statusString)
         return(FALSE)
     }
     list2env(oauthResponse$content, envir = transmartClientEnv)
     transmartClientEnv$access_token.timestamp <- Sys.time()
-    cat("Authentication completed\n")
     return(TRUE)
 }
 
@@ -208,7 +207,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     stop(e)
 }
 
-.transmartGetJSON <- function(...) { return(.transmartServerGetRequest(ensureJSON = TRUE)) }
+.transmartGetJSON <- function(...) { return(.transmartServerGetRequest(ensureJSON = TRUE, accept.type = "hal", ...)) }
 
 .transmartServerGetRequest <- function(apiCall, errorHandler = .requestErrorHandler, onlyContent = c(200),
         ensureJSON = FALSE, ...)  {
