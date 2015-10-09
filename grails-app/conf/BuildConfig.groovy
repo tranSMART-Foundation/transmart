@@ -11,27 +11,41 @@ def forkSettingsOther = [
         debug    : false,
 ]
 
-/*grails.project.fork = [
+grails.project.fork = [
         test   : forkSettingsOther,
         run    : forkSettingsRun,
         war    : false,
         console: forkSettingsOther]
-*/
+
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
+
+def dm, dmClass
+try {
+    dmClass = new GroovyClassLoader().parseClass(
+            new File('../transmart-dev/DependencyManagement.groovy'))
+} catch (Exception e) {
+}
+if (dmClass) {
+    dm = dmClass.newInstance()
+}
 
 grails.project.dependency.resolver = 'maven'
 grails.project.dependency.resolution = {
     log "warn"
     legacyResolve false
     inherits('global') {}
-    repositories {
-        grailsCentral()
-        mavenLocal()
-        mavenCentral()
-        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
-        mavenRepo 'https://repo.thehyve.nl/content/repositories/public/'
+    if (!dm) {
+        repositories {
+            grailsCentral()
+            mavenLocal()
+            mavenCentral()
+            mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+            mavenRepo 'https://repo.thehyve.nl/content/repositories/public/'
+        }
+    } else {
+        dm.configureRepositories delegate
     }
     dependencies {
         // compile 'org.apache.ant:ant:1.9.6'
@@ -42,8 +56,33 @@ grails.project.dependency.resolution = {
         /* serializable ImmutableMap only on guava 16 */
         compile group: 'com.google.guava', name: 'guava', version: '16.0-dev-20140115-68c8348'
         compile 'org.transmartproject:transmart-core-api:1.2.2-SNAPSHOT'
+        //test 'com.jayway.restassured:rest-assured:2.4.1'
     }
     plugins {
-        runtime ':transmart-rest-api:1.2.2-SNAPSHOT'
+        build ':tomcat:7.0.47', {
+            export = false
+        }
+        test ':functional-test:2.0.0'
+
+        // core-db doesn't export hibernate as dep as it was builtin in 2.2.4
+        //runtime ':hibernate:3.6.10.16'
+
+        if (!dm) {
+            runtime ':transmart-core:1.2.2-SNAPSHOT'
+
+            test ':transmart-core:1.2.2-SNAPSHOT'
+            test ':transmart-core-db-tests:1.2.2-SNAPSHOT'
+        } else {
+            dm.internalDependencies delegate
+        }
+
     }
 }
+
+dm?.with {
+    configureInternalPlugin 'runtime', 'transmart-core'
+    configureInternalPlugin 'test', 'transmart-core'
+    configureInternalPlugin 'test', 'transmart-core-db-tests'
+}
+
+dm?.inlineInternalDependencies grails, grailsSettings

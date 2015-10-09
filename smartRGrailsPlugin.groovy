@@ -43,13 +43,6 @@ class smartRGrailsPlugin {
     }
 
     def doWithSpring = {
-        dataQueryService(smartR.plugin.DataQueryService) {
-            studiesResourceService = ref('studiesResourceService')
-            conceptsResourceService = ref('conceptsResourceService')
-            clinicalDataResourceService = ref('clinicalDataResourceService')
-            dataSource = ref('dataSource')
-            i2b2HelperService = ref('i2b2HelperService')
-        }
     }
 
     def doWithDynamicMethods = { ctx ->
