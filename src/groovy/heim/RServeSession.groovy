@@ -14,8 +14,8 @@ class RServeSession {
 
     String sessionId = UUID.randomUUID().toString()
 
-    String rServeHost = Holders.config.RModules.host
-    Integer rServePort = Holders.config.RModules.port
+    String rServeHost = Holders.config.RModules.host ?: '127.0.0.1'
+    Integer rServePort = Holders.config.RModules.port ?: 6311
     String scriptFolder = Holders.config.SmartR.scriptFolder
 
     private ThreadPoolExecutor executor
