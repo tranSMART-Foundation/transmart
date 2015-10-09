@@ -44,4 +44,22 @@ class ScriptExecutionController {
             [result: result]
         }
     }
+
+    /**
+    *
+    *{
+    *  'sessionId': '',
+     *  'executionId':'',
+    *  'name': ''
+    * }
+    */
+    def output(){
+        def sessionId = params.JSON.sessionId
+        def executionId = params.JSON.executionId
+        def fileName = params.JSON.name
+
+        def selectedFile = RServeSessionService.getScriptExecutionOutput(sessionId,executionId,fileName)
+        render selectedFile
+
+    }
 }

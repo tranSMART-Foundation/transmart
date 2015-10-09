@@ -48,7 +48,11 @@ class RServeSession {
         scriptsExecutionsCache.getIfPresent(scriptExecutionId).status
     }
 
-    boolean closeSession() {
+    def getScriptExecutionOutput(String scriptExecutionId) {
+        scriptsExecutionsCache.getIfPresent(scriptExecutionId).output
+    }
+
+        boolean closeSession() {
         executor.shutdown()
         if (rConnection) {
             rConnection.close()
@@ -84,7 +88,7 @@ class RServeSession {
 
         def status = 'Waiting'
         def result
-        def outputFiles
+        def output
 
         @Override
         void run() {
@@ -96,7 +100,7 @@ class RServeSession {
                 log.debug("Executing script with id: ${scriptExecutionId}")
                 result = connection.eval(definition.code).asNativeJavaObject()
                 def outputMngr = new RScriptOutputManager(connection,sessionId,scriptExecutionId)
-                outputFiles = outputMngr.getScriptOutput()
+                output = outputMngr.getScriptOutput()
                 status = 'Done'
             } catch (Exception e) {
                 log.error(e)

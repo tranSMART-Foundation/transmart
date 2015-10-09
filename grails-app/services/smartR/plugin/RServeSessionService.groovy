@@ -57,4 +57,12 @@ class RServeSessionService {
             .getScriptExecutionResult(scriptExecutionId)
     }
 
+    def getScriptExecutionOutput(String sessionId, String scriptExecutionId,String fileName){
+        sessions.getIfPresent(sessionId)
+                .getScriptExecutionOutput(scriptExecutionId).find {
+            file ->
+                file.name == fileName
+        }
+    }
+
 }
