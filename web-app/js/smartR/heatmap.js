@@ -3,6 +3,8 @@
  * - Register drag and drop.
  * - Clear out all gobal variables and reset them to blank.
  */
+
+
 function loadHeatmapView(){
     heatMapView.clear_high_dimensional_input('divIndependentVariable');
     heatMapView.register_drag_drop();
@@ -131,5 +133,7 @@ HeatMapView.prototype.get_inputs = function (form_params) {
 
 // init heat map view instance
 var heatMapView = new HeatMapView();
+loadHeatmapView();
+$j( "#tabs" ).tabs();
 
 
