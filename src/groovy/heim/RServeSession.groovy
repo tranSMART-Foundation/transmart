@@ -84,6 +84,7 @@ class RServeSession {
 
         def status = 'Waiting'
         def result
+        def outputFiles
 
         @Override
         void run() {
@@ -94,7 +95,8 @@ class RServeSession {
                 def connection = getRConnection()
                 log.debug("Executing script with id: ${scriptExecutionId}")
                 result = connection.eval(definition.code).asNativeJavaObject()
-                //TODO Download output files from the working directory
+                def outputMngr = new RScriptOutputManager(connection,sessionId,scriptExecutionId)
+                outputFiles = outputMngr.getScriptOutput()
                 status = 'Done'
             } catch (Exception e) {
                 log.error(e)
