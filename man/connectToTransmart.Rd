@@ -31,7 +31,7 @@ connectToTransmart(transmartDomain, use.authentication = TRUE, token = NULL, ...
 \author{Tim Dorscheidt, Jan Kanis, Rianne Jansen. 
 Contact: development@thehyve.nl}
 \note{}
-\seealso{\link{\code{getStudies}}, \link{\code{connectToTransmart}}, \link{\code{getTransmartToken}}.
+\seealso{\code{\link{getStudies}}, \code{\link{connectToTransmart}}, \code{\link{getTransmartToken}}.
 
   For more information about the transmart RClient package and what it can be used for: \link{transmartRClient-package}
 }
