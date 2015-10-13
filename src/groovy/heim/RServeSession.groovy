@@ -94,8 +94,6 @@ class RServeSession {
         void run() {
             try {
                 status = 'Running'
-                //TODO We might want to create subdirectory for each script execution
-                //TODO Upload data to an environment?
                 def connection = getRConnection()
                 log.debug("Executing script with id: ${scriptExecutionId}")
                 result = connection.eval(definition.code).asNativeJavaObject()
