@@ -1,18 +1,15 @@
 package heim
 
-import com.grailsrocks.functionaltest.APITestCase
-
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.equalToIgnoringCase
 import static org.hamcrest.Matchers.hasEntry
-import static org.hamcrest.Matchers.hasItem
 import static org.hamcrest.Matchers.notNullValue
 
 /**
  * Created by piotrzakrzewski on 13/10/15.
  */
-class ScriptExecutionControllerTests extends APITestCase{
+class ScriptExecutionControllerTests extends BaseAPITestCase {
 
 
     void testRun(){

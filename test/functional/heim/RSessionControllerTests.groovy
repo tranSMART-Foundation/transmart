@@ -1,13 +1,11 @@
 package heim
 
-import com.grailsrocks.functionaltest.APITestCase
-
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.notNullValue
 
-class RSessionControllerTests extends APITestCase {
+class RSessionControllerTests extends BaseAPITestCase {
 
     void testCreate() {
         post("${baseURL}RSession/create")
