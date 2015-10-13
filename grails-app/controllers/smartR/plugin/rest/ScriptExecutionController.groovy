@@ -20,7 +20,13 @@ class ScriptExecutionController {
             [scriptExecutionId: scriptExecutionId]
         }
     }
-
+    /**
+     *
+     *{
+     *  'sessionId': '',
+     *  'workflow': 'heatmap'
+     * }
+     */
     def run() {
         def json = request.JSON
         String scriptExecutionId = RServeSessionService.executeRunScript(json.sessionId, json.workflow)
@@ -55,9 +61,9 @@ class ScriptExecutionController {
     * }
     */
     def output(){
-        def sessionId = params.JSON.sessionId
-        def executionId = params.JSON.executionId
-        def fileName = params.JSON.name
+        def sessionId = request.JSON.sessionId
+        def executionId = request.JSON.executionId
+        def fileName = request.JSON.name
 
         def selectedFile = RServeSessionService.getScriptExecutionOutput(sessionId,executionId,fileName)
         if (!selectedFile) {
@@ -81,8 +87,8 @@ class ScriptExecutionController {
      * }
      */
     def files(){
-        def sessionId = params.JSON.sessionId
-        def executionId = params.JSON.executionId
+        def sessionId = request.JSON.sessionId
+        def executionId = request.JSON.executionId
 
         def result = RServeSessionService.getScriptExecutionFiles(sessionId,executionId)
         render(contentType: 'text/json') {
