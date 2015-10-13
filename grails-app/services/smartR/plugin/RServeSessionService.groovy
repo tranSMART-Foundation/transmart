@@ -65,4 +65,10 @@ class RServeSessionService {
         }
     }
 
+    def getScriptExecutionFiles(String sessionId, String scriptExecutionId){
+        def output = sessions.getIfPresent(sessionId)
+                .getScriptExecutionOutput(scriptExecutionId)
+        return output*.name
+    }
+
 }
