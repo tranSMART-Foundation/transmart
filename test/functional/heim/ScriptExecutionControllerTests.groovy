@@ -38,7 +38,7 @@ class ScriptExecutionControllerTests extends APITestCase{
             json(runParams)
         }
         String executionId = JSON['scriptExecutionId']
-        sleep(5000)
+        //sleep(5000)
         post "${baseURL}ScriptExecution/files", {
 
             def runParams = [sessionId:sessionId,executionId:executionId]
