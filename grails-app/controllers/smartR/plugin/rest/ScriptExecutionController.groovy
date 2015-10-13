@@ -90,9 +90,9 @@ class ScriptExecutionController {
         def sessionId = request.JSON.sessionId
         def executionId = request.JSON.executionId
 
-        def result = RServeSessionService.getScriptExecutionFiles(sessionId,executionId)
+        def files = RServeSessionService.getScriptExecutionFiles(sessionId,executionId)
         render(contentType: 'text/json') {
-            [result: result]
+            [files: files]
         }
     }
 }

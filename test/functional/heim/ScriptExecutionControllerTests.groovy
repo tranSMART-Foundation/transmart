@@ -38,13 +38,13 @@ class ScriptExecutionControllerTests extends APITestCase{
             json(runParams)
         }
         String executionId = JSON['scriptExecutionId']
-        sleep(2000)
+        sleep(5000)
         post "${baseURL}ScriptExecution/files", {
 
             def runParams = [sessionId:sessionId,executionId:executionId]
             json(runParams)
         }
         assertStatus(200)
-        assertThat JSON, hasItem(equalToIgnoringCase('plot.png'))
+        assertThat JSON, hasEntry(equalToIgnoringCase('files'),notNullValue())
     }
 }
