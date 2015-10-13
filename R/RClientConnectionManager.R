@@ -258,7 +258,7 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
         result <- list(JSON = FALSE)
         headers <- basicHeaderGatherer()
         result$content <- getBinaryURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
-                headerfunction = h$update,
+                headerfunction = headers$update,
                 noprogress = FALSE,
                 progressfunction = function(down, up) {up[which(up == 0)] <- NA; progress$update(down, up) },
                 httpheader = httpHeaderFields)
