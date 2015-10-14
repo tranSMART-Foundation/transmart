@@ -263,6 +263,7 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
                 progressfunction = function(down, up) {up[which(up == 0)] <- NA; progress$update(down, up) },
                 httpheader = httpHeaderFields)
         progress$end()
+        result$status <- as.integer(headers$value()['status'])
         result$header <- headers$value()
         if (getOption("verbose")) {
             message(paste("Server binary response header:", paste(capture.output(print(data.frame(result$header))), collapse="\n"), "", sep="\n"))
