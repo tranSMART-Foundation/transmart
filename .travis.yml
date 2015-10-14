@@ -7,6 +7,10 @@ addons:
       - clang-3.8
       - gfortran
       - libcairo2-dev
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/rserve
 
 jdk:
   - oraclejdk7
