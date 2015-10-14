@@ -1,8 +1,7 @@
 package smartR.plugin
 
-import grails.converters.JSON
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.codehaus.groovy.grails.web.json.JSONArray
+import org.json.JSONArray
+import org.json.JSONObject
 import groovy.json.JsonBuilder
 import org.apache.commons.io.FilenameUtils
 
@@ -68,12 +67,37 @@ class SmartRController {
     *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
     */
     def loadScripts = {
+
+        // list of required javascripts
+        def scripts = [servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js']
+
+        // list of required css
+        def styles = [servletContext.contextPath+pluginContextPath+'/css/smartR.css']
+
         JSONObject result = new JSONObject()
-        JSONObject script = new JSONObject()
-        script.put("path", "${servletContext.contextPath}${pluginContextPath}/js/smartR/smartR.js" as String)
-        script.put("type", "script")
+        JSONArray rows = new JSONArray()
+
+        // for all js files
+        for (file in scripts) {
+            def m = [:]
+            m["path"] = file.toString()
+            m["type"] = "script"
+            rows.put(m);
+        }
+
+        // for all css files
+        for (file in styles) {
+            def n = [:]
+            n["path"] = file.toString()
+            n["type"] = "css"
+            rows.put(n);
+        }
+
         result.put("success", true)
-        result.put("files", new JSONArray() << script)
-        render result as JSON;
+        result.put("totalCount", scripts.size())
+        result.put("files", rows)
+
+        response.setContentType("text/json")
+        response.outputStream << result.toString()
     }
 }
