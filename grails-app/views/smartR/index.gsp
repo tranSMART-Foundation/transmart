@@ -7,6 +7,7 @@
 <head>
     <g:javascript library='jquery' />
     <g:javascript src='smartR/smartR.js' />
+    <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'smartR.css')}">
     <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
     <r:layoutResources/>
 </head>
