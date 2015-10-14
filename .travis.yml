@@ -1,5 +1,7 @@
-language: groovy
+language: php # to have .travis installing the php version we indicate
 sudo: false
+php:
+  - 5.6
 addons:
   apt:
     packages:
