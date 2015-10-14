@@ -4,7 +4,7 @@ addons:
   apt:
     packages:
       - libreadline-dev
-      - clang-3.8
+      - clang
       - gfortran
       - libcairo2-dev
 cache:
@@ -26,6 +26,7 @@ before_install:
 install:
   - maybe_build_maven_dep $(travis_get_owner)/transmart-core-api core-api
   - maybe_make_inline_grails_dep $(travis_get_owner)/transmart-core-db core-db . transmart-core-db-tests
+  - make -C ~/transmart-data/env ../vars
   - install_rserve ~/transmart-data
 
 before_script:
