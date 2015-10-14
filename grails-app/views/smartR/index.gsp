@@ -1,36 +1,36 @@
 <style>
     .txt {
-        font-family: 'Roboto', sans-serif;
+        font-famFily: 'Roboto', sans-serif;
     }
 </style>
 
 <head>
     <g:javascript library='jquery' />
     <g:javascript src='smartR/smartR.js' />
+    <g:javascript src='smartR/heim-ui.js' />
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'smartR.css')}">
-    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
     <r:layoutResources/>
+
 </head>
 
 <body>
-    <div id="index" style="text-align: center">
+    <div id="index" style="padding: 10px;">
+
         <h1 class="txt"> Heim - Modular R Workflows in TranSMART.</h1>
-        <span style='color:red' class='txt'></span><br/>
+        <br>
+        <g:select name="scriptSelect" id="scriptSelect" class='txt' from="${scriptList}"
+                  noSelection="['':'Choose an algorithm']"
+                  onchange="changeInputDIV()" />
 
-        <hr class="myhr"/>
 
-        <div id="inputDIV" class='txt' style="text-align: left">Please select a script to execute.</div>
 
-        <hr class="myhr"/>
-
-        <g:select name="scriptSelect" class='txt' from="${scriptList}" noSelection="['':'Choose an algorithm']"
-                  onchange="changeInputDIV()"/>
-
-        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-
-        <input id="submitButton" class='txt' type="button" value="(Re-)Run Analysis" onclick="runRScript()"/>
-        <hr class="myhr"/>
+        %{--Input placeholder--}%
+        <div id="inputDIV" style="margin-top: 20px;"></div>
     </div>
 
-    <div id="outputDIV" class='txt'></div>
+    %{--Output placeholder--}%
+    <div id="outputDIV" style="margin-top: 20px;"></div>
+
 </body>
