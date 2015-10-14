@@ -16,6 +16,10 @@
             <li><a href="#fragment-run"><span>Run</span></a></li>
         </ul>
 
+
+        %{--========================================================================================================--}%
+        %{--Load Data--}%
+        %{--========================================================================================================--}%
         <div id="fragment-load">
             <form>
                 %{--High dimension dropzone--}%
@@ -47,20 +51,23 @@
             </form>
         </div>
 
+        %{--========================================================================================================--}%
+        %{--Preprocess--}%
+        %{--========================================================================================================--}%
         <div id="fragment-preprocess">
             <form>
                 %{--Calculate z-score--}%
-                <div>
+                <div class="heim-input-field ">
                     <input type="checkbox" id="chkCalculateZscore" name="chkCalculateZscore">
                     <span>Calculate z-score on the fly</span>
                 </div>
 
                 %{--Calculate log fold--}%
-                <div>
+                <div class="heim-input-field ">
                     <input type="checkbox" id="chkLogFoldChange" name="chkLogFoldChange">
                     <span>Calculate log-fold change based on two data nodes</span>
                 </div>
-                <div>
+                <div class="heim-input-field ">
                     <select id="logFoldInput1">
                         <option>dummy 1</option>
                         <option>dummy 2</option>
@@ -83,7 +90,76 @@
             </form>
         </div>
 
+        %{--========================================================================================================--}%
+        %{--Load Data--}%
+        %{--========================================================================================================--}%
         <div id="fragment-run">
+
+            %{--Aggregate Probes--}%
+            <div class="heim-input-field">
+                <input type="checkbox" id="chkAggregateProbes" name="chkAggregateProbes">
+                <span>Aggregate probes</span>
+            </div>
+
+            %{--Number of max row to display--}%
+            <div class="heim-input-field heim-input-number">
+                <label>Number of max row to display</label>
+                <input type="text" id="txtMaxRow" value="50">
+            </div>
+
+            %{--Group Subject--}%
+            <div class="heim-input-field">
+                <input type="checkbox" id="chkGroupSubject" name="chkGroupSubject">
+                <span>Group by subject instead of node (only applicable when multiple nodes are selected).</span>
+            </div>
+
+            %{--Apply statistical methods--}%
+            <div class="heim-input-field heim-input-number">
+                <label>Apply statistical methods</label>
+                <select>
+                    <option value="none">None</option>
+                    <option value="hierarchical-clustering">Hierarchical Clustering</option>
+                    <option value="k-means-clustering">K-Means Clustering</option>
+                    <option value="marker-selection">Marker Selection</option>
+                </select>
+            </div>
+
+            <hr style="margin-top: 20px;">
+
+            %{--Options--}%
+            <div>
+
+                %{--Number of clusters--}%
+                <div class="heim-input-field heim-input-number">
+                    <label>Number of clusters</label>
+                    <input type="text" id="txtNoOfClusters" name="txtNoOfClusters" value="2">
+                </div>
+
+                %{--Number of markers--}%
+                <div class="heim-input-field heim-input-number">
+                    <label>Number of markers</label>
+                    <input type="text" id="txtNoOfMarkers" name="txtNoOfMarkers">
+                </div>
+
+                %{--apply row clustering--}%
+                <div class="heim-input-field">
+                    <input type="checkbox" id="chkApplyRowClustering" name="chkApplyRowClustering">
+                    <span>Apply clustering for row.</span>
+                </div>
+
+                %{--apply column clustering --}%
+                <div class="heim-input-field">
+                    <input type="checkbox" id="chkApplyColumnClustering" name="chkApplyColumnClustering">
+                    <span>Apply clustering for column.</span>
+                </div>
+
+            </div>
+
+            %{--tool buttons--}%
+            <div style="margin-top: 10px; text-align: right;">
+                <button>Get Heatmap</button>
+            </div>
+
 
         </div>
     </div>

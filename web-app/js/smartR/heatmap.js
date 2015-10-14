@@ -55,11 +55,11 @@ $j(function() {
 
     };
 
+    runHeatmap = function () {
+        console.log('run heatmap ...');
+    };
+
     // where everything starts
     init();
 
 });
-
-
-
-
