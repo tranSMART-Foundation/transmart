@@ -2,7 +2,7 @@
 <r:require modules="heatmap"/>
 <r:layoutResources disposition="defer"/>
 
-<div id="analysisWidget" style="width: 98%">
+<div style="width: 98%">
 
     <h2>
         Variable Selection
@@ -11,38 +11,57 @@
         </a>
     </h2>
 
-    <div id="tabs" >
+    <div id="tabs">
+
         <ul>
             <li><a href="#fragment-1"><span>Load</span></a></li>
             <li><a href="#fragment-2"><span>Preprocess</span></a></li>
             <li><a href="#fragment-3"><span>Run</span></a></li>
         </ul>
+
         <div id="fragment-1">
-            <form id="analysisForm">
-                <fieldset class="inputFields">
-
+            <form>
+                <div class="heim-input-field heim-dropzone">
                     %{--High dimensional input--}%
-                    <div class="highDimContainer">
-                        <span>Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into
-                        the box. The nodes needs to be from the same platform.</span>
-                        <div id='divIndependentVariable' class="queryGroupIncludeSmall highDimBox"></div>
-                        <div class="highDimBtns">
-                            %{--<button type="button" onclick="highDimensionalData.gather_high_dimensional_data('divIndependentVariable')">High Dimensional Data</button>--}%
-                            <button type="button" onclick="heatMapView.clear_high_dimensional_input('divIndependentVariable')">Clear</button>
-                        </div>
+                    <label>Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into
+                    the box. The nodes needs to be from the same platform.</label> 
+                    <div id='divIndependentVariable' class="heim-dropzone" style="border:1px solid #666; height: 100px"></div>
+                    <div style="margin-top: 10px;">
+                        <button type="button" onclick="alert('Clear');">Clear</button>
                     </div>
+                </div>
 
-                    %{--Display independent variable--}%
-                    <div id="displaydivIndependentVariable" class="independentVars"></div>
+                %{--Select projections--}%
+                <div class="heim-input-field heim-radio-group">
+                    <label>Select values to use:</label> 
+                    <div >
+                        <input type="radio" name="valueToUse" value="" > Untransformed (intensity values, counts, etc.)<br>
+                        <input type="radio" name="valueToUse" value="" > Log2 Transformed<br>
+                        <input type="radio" name="valueToUse" value="" checked> Calculate z-score on the fly<br>
+                        <input type="radio" name="valueToUse" value="" > Global z-score<br>
+                    </div>
+                </div>
 
-                    <label for="txtMaxDrawNumber">Max rows to display:</label>
-                    <input type="text" id="txtMaxDrawNumber"  value="50"/>
+                %{--Display independent variable--}%
+                <div id="displaydivIndependentVariable" class="independentVars"></div>
 
-                </fieldset>
+                %{--Select identifier--}%
+                <div class="heim-input-field heim-autocomplete">
+                    <label>Select a Gene/Pathway/mirID/UniProtID:</label> 
+                    <input id="tags">
+                </div>
+
+                %{--tool buttons--}%
+                <div style="margin-top: 10px; text-align: right;">
+                    <button>Apply Changes</button>
+                    <button>Status</button>
+                </div>
 
             </form>
         </div>
+
         <div id="fragment-2">
+
             <fieldset class="toolFields">
                 <div>
                     <input type="checkbox" id="chkGroupBySubject" name="doGroupBySubject">
@@ -57,6 +76,7 @@
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
         </div>
+
         <div id="fragment-3">
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
