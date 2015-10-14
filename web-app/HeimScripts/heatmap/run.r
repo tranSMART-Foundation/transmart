@@ -2,14 +2,12 @@ library(gplots)
 
 dataset <- loaded_variables[[1]] #dataframe with columns: Row.Label, Bio.marker, ASSAY_0001 ASSAY_0002 ...
 
-measurements  <- subset(dataset,select=-c(Row.Label,Bio.marker)) # this will select all columns other than Probe and Biomarker columns
+measurements  <- subset(dataset,select=-c(Row.Label,Bio.marker)) # this will select all columns other than Row.Label,Bio.marker columns
 measurements  <- data.matrix(measurements)
 
 measurements <- log(measurements,2)
 
 rownames(measurements) <- df$Row.Label
-
-
 
 png(filename="heatmap.png",width = 800,height=800)
 heatmap.2(measurements,
