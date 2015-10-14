@@ -35,10 +35,10 @@
                 <div class="heim-input-field heim-radio-group">
                     <label>Select values to use:</label> 
                     <div >
-                        <input type="radio" name="valueToUse" value="" > Untransformed (intensity values, counts, etc.)<br>
-                        <input type="radio" name="valueToUse" value="" > Log2 Transformed<br>
+                        <input type="radio" name="valueToUse" value=""> Untransformed (intensity values, counts, etc.)<br>
+                        <input type="radio" name="valueToUse" value=""> Log2 Transformed<br>
                         <input type="radio" name="valueToUse" value="" checked> Calculate z-score on the fly<br>
-                        <input type="radio" name="valueToUse" value="" > Global z-score<br>
+                        <input type="radio" name="valueToUse" value=""> Global z-score<br>
                     </div>
                 </div>
 
