@@ -240,10 +240,10 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
                 verbose = getOption("verbose"),
                 httpheader = httpHeaderFields,
                 headerfunction = headers$update)
-        if (getOption("verbose")) { message("Server response:\n\n", result, "\n") }
+        if (getOption("verbose")) { message("Server response:\n", result$content, "\n") }
         if(is.null(result)) { return(NULL) }
-        result$status <- as.integer(headers$value()['status'])
         result$headers <- headers$value()
+        result$status <- as.integer(result$headers['status'])
         if(grepl("^application/json(;|\\W|$)", result$headers['Content-Type'])) {
             result$content <- fromJSON(result$content, asText = TRUE, nullValue = NA)
             result$JSON <- TRUE
@@ -258,16 +258,14 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
         result <- list(JSON = FALSE)
         headers <- basicHeaderGatherer()
         result$content <- getBinaryURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
+                verbose = getOption("verbose"),
                 headerfunction = headers$update,
                 noprogress = FALSE,
                 progressfunction = function(down, up) {up[which(up == 0)] <- NA; progress$update(down, up) },
                 httpheader = httpHeaderFields)
         progress$end()
-        result$status <- as.integer(headers$value()['status'])
-        result$header <- headers$value()
-        if (getOption("verbose")) {
-            message(paste("Server binary response header:", paste(capture.output(print(data.frame(result$header))), collapse="\n"), "", sep="\n"))
-        }
+        result$headers <- headers$value()
+        result$status <- as.integer(result$headers['status'])
         return(result)
     }
     return(NULL)
