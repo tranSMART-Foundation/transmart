@@ -59,7 +59,6 @@ grails.project.dependency.resolution = {
         //test 'com.jayway.restassured:rest-assured:2.4.1'
     }
     plugins {
-        runtime ':transmart-rest-api:1.2.2-SNAPSHOT'
         runtime ':resources:1.2.1'
 
         compile ":sendfile:0.2"
