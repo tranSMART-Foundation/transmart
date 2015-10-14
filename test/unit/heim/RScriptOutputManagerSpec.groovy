@@ -2,6 +2,7 @@ package heim
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import heim.rserve.RScriptOutputManager
 import org.rosuda.REngine.Rserve.RConnection
 import spock.lang.Specification
 
@@ -25,16 +26,16 @@ class RScriptOutputManagerSpec extends Specification {
         conn.eval('png("plot.png")')
         conn.eval('plot(c(0,1),c(1,1))')
         conn.eval('dev.off()')
-        def outputFolderName = "bogusfolder"
-        def scripExecId = "init"
-        def mngr = new RScriptOutputManager(conn, outputFolderName,scripExecId)
+        def sessionId = UUID.randomUUID()
+        def taskId = UUID.randomUUID()
+        def mngr = new RScriptOutputManager(conn, sessionId, taskId)
 
         when: ""
-            def result = mngr.getScriptOutput()
+            def result = mngr.downloadFiles()
         then: "Result is a list containing plot.png and only that one file."
             result
             result.size() == 1
             result[0] instanceof File
-            result[0].getAbsolutePath() == '/tmp/heim/bogusfolder/init/plot.png'
+            result[0].getAbsolutePath() == "/tmp/heim/$sessionId/$taskId/plot.png"
     }
 }
