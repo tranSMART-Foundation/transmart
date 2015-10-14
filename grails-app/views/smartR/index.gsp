@@ -1,9 +1,3 @@
-<style>
-    .txt {
-        font-famFily: 'Roboto', sans-serif;
-    }
-</style>
-
 <head>
     <g:javascript library='jquery' />
     <g:javascript src='smartR/smartR.js' />
