@@ -23,6 +23,7 @@
                     %{--High dimensional input--}%
                     <label>Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into
                     the box. The nodes needs to be from the same platform.</label>
+                    <br><br>
                     <div id='divIndependentVariable' class="heim-dropzone" style="border:1px solid #666; height: 100px"></div>
                     <div style="margin-top: 10px;">
                         <button type="button" onclick="alert('Clear');">Clear</button>
