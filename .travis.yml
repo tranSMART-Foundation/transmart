@@ -19,7 +19,7 @@ jdk:
 
 before_install:
   - git clone --depth 1 git://github.com/thehyve/transmart-travis.git ~/ts-travis
-  - git clone --depth 1 git://github.com/transmart/transmart-data.git ~/transmart-data
+  - git clone --depth 100 git://github.com/transmart/transmart-data.git ~/transmart-data
   - source ~/ts-travis/init.sh
   - source ~/ts-travis/grails_inline.sh
   - source ~/ts-travis/maven_dep.sh
