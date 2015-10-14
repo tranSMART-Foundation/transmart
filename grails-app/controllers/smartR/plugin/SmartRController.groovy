@@ -70,17 +70,12 @@ class SmartRController {
     *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
     */
     def loadScripts = {
-        JSONArray files = new JSONArray()
         JSONObject result = new JSONObject()
         JSONObject script = new JSONObject()
-
         script.put("path", "${servletContext.contextPath}${pluginContextPath}/js/smartR/smartR.js" as String)
         script.put("type", "script")
-        files << script
-
         result.put("success", true)
-        result.put("files", files)
-
+        result.put("files", new JSONArray() << script)
         render result as JSON;
     }
 }
