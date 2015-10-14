@@ -1,5 +1,7 @@
 $j(function() {
 
+    // Nothing happens yet. just dummy scripts for testing
+    // ==================================================
     $j( "#tabs" ).tabs();
 
     var availableTags = [
@@ -30,6 +32,7 @@ $j(function() {
     $j( "#tags" ).autocomplete({
         source: availableTags
     });
+    // ==================================================
 
 });
 

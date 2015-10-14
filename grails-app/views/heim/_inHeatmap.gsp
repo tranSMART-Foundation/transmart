@@ -14,12 +14,12 @@
     <div id="tabs">
 
         <ul>
-            <li><a href="#fragment-1"><span>Load</span></a></li>
-            <li><a href="#fragment-2"><span>Preprocess</span></a></li>
-            <li><a href="#fragment-3"><span>Run</span></a></li>
+            <li><a href="#fragment-load"><span>Load</span></a></li>
+            <li><a href="#fragment-preprocess"><span>Preprocess</span></a></li>
+            <li><a href="#fragment-run"><span>Run</span></a></li>
         </ul>
 
-        <div id="fragment-1">
+        <div id="fragment-load">
             <form>
                 <div class="heim-input-field heim-dropzone">
                     %{--High dimensional input--}%
@@ -60,7 +60,7 @@
             </form>
         </div>
 
-        <div id="fragment-2">
+        <div id="fragment-preprocess">
 
             <fieldset class="toolFields">
                 <div>
@@ -73,11 +73,10 @@
                 </div>
             </fieldset>
 
-            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
-            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
         </div>
 
-        <div id="fragment-3">
+        <div id="fragment-run">
+            %{--TODO--}%
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
