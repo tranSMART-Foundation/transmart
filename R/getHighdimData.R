@@ -43,30 +43,15 @@
 
 
 getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL,
+        data.constraints = NULL, assay.constraints = NULL, highdim.type = 1,
         progress.download = .make.progresscallback.download(),
-        progress.parse = .make.progresscallback.parse()) {
+        progress.parse = .make.progresscallback.parse(),
+        ...) {
 
     .ensureTransmartConnection()
+    concept.link <- .getConceptLink(study.name, concept.match, concept.link)
 
-    if (is.null(concept.link) && !is.null(concept.match)) {
-        studyConcepts <- getConcepts(study.name)
-        conceptFound <- grep(concept.match, studyConcepts$name)[1]
-        if (is.na(conceptFound)) {
-            warning(paste("No match found for:", concept.match))
-        } else { concept.link <- studyConcepts$api.link.self.href[conceptFound] }
-    }
-
-    if (length(concept.link) == 0L) {
-        warning("No concepts selected or found to match your arguments.")
-        return(NULL)
-    }
-
-    serverResult <- .transmartGetJSON(paste(concept.link, "/highdim", sep=""))
-    if (length(serverResult$dataTypes) == 0) {
-        warning("This high dimensional concept contains no data.")
-        return(NULL)
-    }
-    listOfHighdimDataTypes <- serverResult$dataTypes[[1]]
+    listOfHighdimDataTypes <- highdimInfo(concept.link = concept.link)[[highdim.type]]
 
     if (!is.null(projection)) {
         matchingProjectionIndex <- which(names(listOfHighdimDataTypes$api.link) == projection)
@@ -89,6 +74,43 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     }
 
     return(.parseHighdimData(serverResult, progress = progress.parse))
+}
+
+highdimInfo <- function(study.name = NULL, concept.match = NULL, concept.link = NULL) {
+    .ensureTransmartConnection()
+    concept.link <- .getConceptLink(study.name, concept.match, concept.link)
+
+    serverResult <- .transmartGetJSON(paste(concept.link, "/highdim", sep=""))
+    if (length(serverResult$dataTypes) == 0) {
+        stop("This high dimensional concept contains no data.")
+    }
+    
+    info <- serverResult$dataTypes
+    
+    names(info) <- sapply(info, function(e) {e$name})
+    info
+}
+
+.getConceptLink <- function(study.name, concept.match, concept.link) {
+    if(is.null(concept.link) && (is.null(study.name) || is.null(concept.match))) {
+        stop("You must provide either concept.link or study.name and concept.match")
+    }
+    
+    if (is.null(concept.link) && !is.null(concept.match)) {
+        studyConcepts <- getConcepts(study.name)
+        conceptFound <- grep(concept.match, studyConcepts$name)[1]
+        if (is.na(conceptFound)) {
+            stop(paste("No concepts found that matches", concept.match))
+        } else {
+            concept.link <- studyConcepts$api.link.self.href[conceptFound]
+        }
+    }
+    
+    if (length(concept.link) == 0L) {
+        stop("No concepts selected or found.")
+    }
+    
+    concept.link
 }
 
 .parseHighdimData <- 

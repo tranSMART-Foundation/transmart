@@ -22,7 +22,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 connectToTransmart <- 
-function (transmartDomain, use.authentication = TRUE, token = NULL, ...) {
+function (transmartDomain, use.authentication = TRUE, token = NULL, .access.token = NULL, ...) {
     if (!exists("transmartClientEnv") || transmartClientEnv$transmartDomain != transmartDomain) { 
         assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
     }
@@ -31,6 +31,9 @@ function (transmartDomain, use.authentication = TRUE, token = NULL, ...) {
     transmartClientEnv$db_access_url <- transmartClientEnv$transmartDomain
     if (!is.null(token)) {
         transmartClientEnv$refresh_token <- token
+    }
+    if (!is.null(.access.token)) {
+        transmartClientEnv$access_token <- .access.token
     }
 
     if(.checkTransmartConnection()) {
@@ -207,8 +210,10 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     stop(e)
 }
 
-.transmartGetJSON <- function(...) { return(.transmartServerGetRequest(ensureJSON = TRUE, accept.type = "hal", ...)) }
+.transmartGetJSON <- function(apiCall, ...) { .transmartServerGetRequest(apiCall, ensureJSON = TRUE, accept.type = "hal", ...) }
 
+# If you just want a result, use the default parameters. If you want to do your own error handling, call with
+# onlyContent = NULL, this will return a list with data, headers and status code.
 .transmartServerGetRequest <- function(apiCall, errorHandler = .requestErrorHandler, onlyContent = c(200),
         ensureJSON = FALSE, ...)  {
     if (exists("access_token", envir = transmartClientEnv)) {
