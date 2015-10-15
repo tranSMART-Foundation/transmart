@@ -6,6 +6,7 @@ dataset2color <- "chartreuse3"
 labelColumns <- c("Row.Label","Bio.marker")
 
 #Input expected 1 or 2 dataframes with columns: Row.Label, Bio.marker, ASSAY_0001 ASSAY_0002 ...
+# In the prorotype we do not use biomarker yet
 main <- function(){
   datasets <- parseInput(loaded_variables) #this will just make sure we have either 1 or 2 dataframes in a list 
   measurements <- extractMeasurements(datasets) #extract the numeric part - as a numeric matrix is needed for the heatmap.2 function
@@ -17,15 +18,8 @@ main <- function(){
 }
 
 parseInput <- function(variables){
-  datasets <- list()
-  varLength <- length(variables)
-  if(varLength > 1){
-    datasets <- list(dataset1 = variables[[1]], dataset2 = variables[[2]])  
-  }
-  else if(varLength == 1){
-    datasets <- list(dataset1 = variables[[1]])
-  }
-  return(datasets)
+  onlyTwo <- variables[1:2]
+  onlyTwo <- onlyTwo[!sapply(onlyTwo, is.null)]
 }
 
 extractGrouping <- function(datasets){
