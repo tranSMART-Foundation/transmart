@@ -59,6 +59,8 @@ grails.project.dependency.resolution = {
         //test 'com.jayway.restassured:rest-assured:2.4.1'
     }
     plugins {
+        runtime ':resources:1.2.1'
+
         compile ":sendfile:0.2"
         build ':tomcat:7.0.47', {
             export = false
