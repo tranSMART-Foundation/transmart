@@ -1,9 +1,9 @@
 package smartR.plugin
 
-import org.json.JSONArray
-import org.json.JSONObject
 import groovy.json.JsonBuilder
 import org.apache.commons.io.FilenameUtils
+import org.codehaus.groovy.grails.web.json.JSONArray
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 
 class SmartRController {
