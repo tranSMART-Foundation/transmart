@@ -8,7 +8,7 @@
         Start Heatmap analysis with load, preprocess options and then run analysis.
     </p>
 
-    <div id="tabs" style="margin-top: 25px;">
+    <div id="heim-tabs" style="margin-top: 25px;">
 
         <ul>
             <li><a href="#fragment-load"><span>Load</span></a></li>
@@ -16,12 +16,10 @@
             <li><a href="#fragment-run"><span>Run</span></a></li>
         </ul>
 
-
         %{--========================================================================================================--}%
         %{--Load Data--}%
         %{--========================================================================================================--}%
         <div id="fragment-load">
-            <form>
                 %{--High dimension dropzone--}%
                 <div class="heim-input-field heim-dropzone">
                     %{--High dimensional input--}%
@@ -40,15 +38,17 @@
                 %{--Select identifier--}%
                 <div class="heim-input-field heim-autocomplete">
                     <label>Select a Gene/Pathway/mirID/UniProtID:</label> 
-                    <input id="tags">
+                    <input id="heim-input-txt-identifiers">
                 </div>
 
                 %{--tool buttons--}%
                 <div style="margin-top: 10px; text-align: right;">
-                    <button>Load Data</button>
+                    <button id="heim-btn-fetch-data">Fetch Data</button>
                 </div>
 
-            </form>
+                <div id="heim-fetch-data-output">
+                    ---- output place holder ----
+                </div>
         </div>
 
         %{--========================================================================================================--}%
@@ -69,6 +69,7 @@
                 </div>
                 <div class="heim-input-field ">
                     <select id="logFoldInput1">
+                        %{--TODO--}%
                         <option>dummy 1</option>
                         <option>dummy 2</option>
                         <option>dummy 3</option>
@@ -76,6 +77,7 @@
                     </select>
                     relative to
                     <select id="logFoldInput2">
+                        %{--TODO--}%
                         <option>dummy 1</option>
                         <option>dummy 2</option>
                         <option>dummy 3</option>
@@ -85,13 +87,13 @@
 
                 %{--tool buttons--}%
                 <div style="margin-top: 10px; text-align: right;">
-                    <button>Preprocess</button>
+                    <button id="heim-btn-preprocess-heatmap">Preprocess</button>
                 </div>
             </form>
         </div>
 
         %{--========================================================================================================--}%
-        %{--Load Data--}%
+        %{--Run Analysis--}%
         %{--========================================================================================================--}%
         <div id="fragment-run">
 
@@ -128,7 +130,6 @@
 
             %{--Options--}%
             <div>
-
                 %{--Number of clusters--}%
                 <div class="heim-input-field heim-input-number">
                     <label>Number of clusters</label>
@@ -138,7 +139,7 @@
                 %{--Number of markers--}%
                 <div class="heim-input-field heim-input-number">
                     <label>Number of markers</label>
-                    <input type="text" id="txtNoOfMarkers" name="txtNoOfMarkers">
+                    <input type="text" id="txtNoOfMarkers" name="txtNoOfMarkeers">
                 </div>
 
                 %{--apply row clustering--}%
@@ -157,7 +158,7 @@
 
             %{--tool buttons--}%
             <div style="margin-top: 10px; text-align: right;">
-                <button>Get Heatmap</button>
+                <button id="heim-btn-run-heatmap">Get Heatmap</button>
             </div>
 
 
