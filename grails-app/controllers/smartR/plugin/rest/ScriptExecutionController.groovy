@@ -53,7 +53,7 @@ class ScriptExecutionController {
     }
 
     /**
-    * Returns a file by name. File must exists within given R session and for given execution ID.
+    * GET request. Returns a file by name. File must exists within given R session and for given execution ID.
     *{
     *  'sessionId': '',
      *  'executionId':'',
@@ -61,9 +61,9 @@ class ScriptExecutionController {
     * }
     */
     def output(){
-        def sessionId = request.JSON.sessionId
-        def executionId = request.JSON.executionId
-        def fileName = request.JSON.name
+        def sessionId = params.sessionId
+        def executionId = params.executionId
+        def fileName = params.name
 
         def selectedFile = RServeSessionService.getScriptExecutionOutput(sessionId,executionId,fileName)
         if (!selectedFile) {
