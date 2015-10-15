@@ -1,5 +1,7 @@
 library(gplots)
 
+
+main <- function(){
 dataset <- loaded_variables[[1]] #dataframe with columns: Row.Label, Bio.marker, ASSAY_0001 ASSAY_0002 ...
 
 measurements  <- subset(dataset,select=-c(Row.Label,Bio.marker)) # this will select all columns other than Row.Label,Bio.marker columns
@@ -23,3 +25,5 @@ heatmap.2(measurements,
           #adjCol=c("left","top")
 )
 dev.off()
+}
+
