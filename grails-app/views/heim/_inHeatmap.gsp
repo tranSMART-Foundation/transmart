@@ -139,7 +139,7 @@
                 %{--Number of markers--}%
                 <div class="heim-input-field heim-input-number">
                     <label>Number of markers</label>
-                    <input type="text" id="txtNoOfMarkers" name="txtNoOfMarkeers">
+                    <input type="text" id="txtNoOfMarkers" name="txtNoOfMarkers">
                 </div>
 
                 %{--apply row clustering--}%
