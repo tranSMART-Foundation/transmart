@@ -5,7 +5,7 @@ dataset1color <- "coral3"
 dataset2color <- "chartreuse3"
 labelColumns <- c("Row.Label","Bio.marker")
 
-#Input expected 1 or 2 dataframes ofwith columns: Row.Label, Bio.marker, ASSAY_0001 ASSAY_0002 ...
+#Input expected 1 or 2 dataframes with columns: Row.Label, Bio.marker, ASSAY_0001 ASSAY_0002 ...
 main <- function(){
   datasets <- parseInput(loaded_variables) #this will just make sure we have either 1 or 2 dataframes in a list 
   measurements <- extractMeasurements(datasets) #extract the numeric part - as a numeric matrix is needed for the heatmap.2 function
@@ -73,7 +73,6 @@ transform <- function(measurements){
 }
 
 makeHeatmap <- function(measurements,grouping){
-  print(measurements)
   png(filename="heatmap.png",width = 800,height=800)
   heatmap.2(measurements,
             scale = "none",
