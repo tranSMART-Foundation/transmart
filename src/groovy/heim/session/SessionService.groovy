@@ -36,8 +36,10 @@ class SessionService {
     @Autowired
     private SessionFiles sessionFiles
 
-    private ConcurrentMap<UUID, SessionContext> currentSessions =
+    private final ConcurrentMap<UUID, SessionContext> currentSessions =
             new ConcurrentHashMap<>()
+
+    private final Set<UUID> sessionsShuttingDown = ([] as Set).asSynchronized()
 
     List<String> availableWorkflows() {
         File dir = Holders.config.smartR.pluginScriptDirectory
@@ -64,7 +66,7 @@ class SessionService {
                     "No such operational session: $sessionId")
         }
 
-        sessionContext.shuttingDown = true
+        sessionsShuttingDown << sessionId
 
         smartRExecutorService.submit({
             SmartRSessionSpringScope.withActiveSession(sessionContext) {
@@ -74,6 +76,7 @@ class SessionService {
                 log.debug("Finished running destruction " +
                         "callbacks for session $sessionId")
                 currentSessions.remove(sessionId)
+                sessionsShuttingDown.remove(sessionId)
             }
         } as Callable<Void>)
 
@@ -142,7 +145,7 @@ class SessionService {
 
     public boolean isSessionActive(UUID sessionId) {
         currentSessions.containsKey(sessionId) &&
-                !currentSessions.get(sessionId)?.shuttingDown
+                !(sessionId in sessionsShuttingDown)
     }
 
     private SessionContext fetchOperationalSessionContext(UUID sessionId) {
@@ -150,7 +153,7 @@ class SessionService {
         if (sessionContext == null) {
             return null
         }
-        if (sessionContext.shuttingDown) {
+        if (sessionId in sessionsShuttingDown) {
             log.warn("Session is shutting down: $sessionId")
             return null
         }

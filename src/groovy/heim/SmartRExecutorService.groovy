@@ -1,7 +1,6 @@
 package heim
 
 import com.google.common.util.concurrent.ListeningExecutorService
-import com.google.common.util.concurrent.ListeningScheduledExecutorService
 import com.google.common.util.concurrent.MoreExecutors
 import groovy.transform.TypeChecked
 import org.springframework.beans.factory.DisposableBean

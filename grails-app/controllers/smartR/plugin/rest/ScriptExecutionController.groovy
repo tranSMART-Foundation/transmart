@@ -1,6 +1,5 @@
 package smartR.plugin.rest
 
-import grails.converters.JSON
 import grails.validation.Validateable
 import heim.session.SessionService
 import heim.tasks.TaskResult

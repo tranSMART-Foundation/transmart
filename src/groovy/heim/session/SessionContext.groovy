@@ -4,7 +4,6 @@ import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
 import groovy.util.logging.Log4j
-import heim.jobs.JobInstance
 import org.springframework.aop.scope.ScopedProxyUtils
 import org.transmartproject.core.users.User
 
@@ -16,9 +15,6 @@ class SessionContext {
 
     public final static String SMART_R_USER_BEAN = 'smartRBean'
 
-    private static String JOB_INSTANCE_BEAN =
-            ScopedProxyUtils.getTargetBeanName('jobInstance')
-
     final UUID sessionId
 
     final String workflowType
@@ -27,8 +23,6 @@ class SessionContext {
 
     private Multimap<String, Runnable> destructionCallbacks =
             Multimaps.synchronizedMultimap(HashMultimap.create())
-
-    boolean shuttingDown
 
     SessionContext(User user, String workflowType) {
         sessionId = UUID.randomUUID()

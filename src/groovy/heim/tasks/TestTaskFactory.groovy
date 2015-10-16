@@ -1,5 +1,9 @@
 package heim.tasks
 
+import heim.tasks.AbstractTask
+import heim.tasks.Task
+import heim.tasks.TaskFactory
+import heim.tasks.TaskResult
 import org.springframework.core.Ordered
 
 import java.util.concurrent.atomic.AtomicBoolean

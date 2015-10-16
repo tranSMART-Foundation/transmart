@@ -1,7 +1,6 @@
 package heim.tasks
 
 import com.google.common.collect.ImmutableMap
-import groovy.transform.Immutable
 import groovy.transform.ToString
 
 /**

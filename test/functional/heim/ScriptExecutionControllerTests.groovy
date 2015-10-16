@@ -1,11 +1,9 @@
 package heim
 
 import heim.tasks.TaskState
-import net.sf.json.JSONObject
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
-import static org.junit.Assume.assumeThat
 
 /**
  * Created by piotrzakrzewski on 13/10/15.
@@ -15,17 +13,6 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
 
     private static final String SAMPLE_DATA_TO_PASS = 'sample data to pass'
     private static final String SAMPLE_DATA_TO_WRITE = 'sample data to write'
-
-    private String /* session id */ createSession() {
-        post('/RSession/create') {
-            body json: [
-                    workflow: 'func_test'
-            ]
-        }
-        assumeThat client.responseStatus, is(201)
-        JSON.sessionId
-    }
-
 
     private Map runSampleR() {
         String sessionId = createSession()
@@ -72,7 +59,6 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
         assert artifacts['a'] == (1 as Double)
         assert artifacts['b'] == 'foobar'
         assert artifacts['passed'] == SAMPLE_DATA_TO_PASS
-
     }
 
     void testRetrieveFile() {

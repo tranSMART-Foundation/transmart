@@ -1,6 +1,5 @@
 package heim.jobs
 
-import heim.session.SmartRSessionScope
 import heim.session.SmartRSessionScopeInterfaced
 import heim.tasks.Task
 import heim.tasks.TaskFactory

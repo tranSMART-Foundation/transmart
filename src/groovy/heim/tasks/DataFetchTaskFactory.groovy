@@ -19,6 +19,8 @@ class DataFetchTaskFactory implements TaskFactory, ApplicationContextAware {
     public static final String DATA_CONSTRAINTS_PARAMETER_NAME = 'dataConstraints'
     public static final String PROJECTION_PARAMETER_NAME = 'projection'
     public static final String RESULT_INSTANCE_ID_PARAMETER_NAME = 'resultInstanceId'
+    public static final String DATA_TYPE_PARAMETER_NAME = 'dataType'
+    public static final String LABEL_PARAMETER_NAME = 'label'
 
     ApplicationContext applicationContext
 
@@ -43,26 +45,32 @@ class DataFetchTaskFactory implements TaskFactory, ApplicationContextAware {
         def conceptKeyString = arguments[CONCEPT_KEY_PARAMETER_NAME]
         def resultInstanceIdString =
                 arguments[RESULT_INSTANCE_ID_PARAMETER_NAME] as String
+        def labelArgument = arguments[LABEL_PARAMETER_NAME]
 
         if (!conceptKeyString || !(conceptKeyString instanceof String)) {
             throw new InvalidArgumentsException(
                     "Argument $CONCEPT_KEY_PARAMETER_NAME must be given and " +
                             "be a string")
         }
-        if (!resultInstanceIdString || !resultInstanceIdString.isLong()) {
+        if (resultInstanceIdString && !resultInstanceIdString.isLong()) {
             throw new InvalidArgumentsException(
                     "Argument $RESULT_INSTANCE_ID_PARAMETER_NAME must be " +
-                            "given and be a long")
+                            "a long")
+        }
+        if (!labelArgument || !(labelArgument instanceof String)) {
+            throw new InvalidArgumentsException("Argument " +
+                    "$LABEL_PARAMETER_NAME must be given and must be a string")
         }
 
         applicationContext.getBean(DataFetchTask).with {
             conceptKey =  new ConceptKey(conceptKeyString)
+            label = labelArgument
             resultInstanceId = resultInstanceIdString as Long
 
-            // can be null:
             assayConstraints = arguments[ASSAY_CONSTRAINTS_PARAMETER_NAME]
             dataConstraints = arguments[DATA_CONSTRAINTS_PARAMETER_NAME]
             projection = arguments[PROJECTION_PARAMETER_NAME]
+            dataType = arguments[DATA_TYPE_PARAMETER_NAME]
 
             if (!constraintsOK(assayConstraints)) {
                 throw new InvalidArgumentsException(

@@ -1,24 +1,14 @@
 package heim.session
 
 import groovy.util.logging.Log4j
-import org.springframework.aop.scope.ScopedProxyUtils
 import org.springframework.beans.BeansException
 import org.springframework.beans.factory.ObjectFactory
-import org.springframework.beans.factory.config.BeanDefinition
-import org.springframework.beans.factory.config.BeanDefinitionHolder
-import org.springframework.beans.factory.config.BeanDefinitionVisitor
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.config.Scope
-import org.springframework.beans.factory.support.BeanDefinitionReaderUtils
-import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.core.NamedThreadLocal
 import org.springframework.core.Ordered
 import org.springframework.stereotype.Component
-import org.springframework.util.Assert
-import org.springframework.util.StringValueResolver
-import org.transmartproject.core.exceptions.InvalidArgumentsException
-import org.transmartproject.core.exceptions.NoSuchResourceException
 
 /**
  * Managed the @SessionScope scope. Object storage is the session itself.
