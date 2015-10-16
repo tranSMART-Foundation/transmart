@@ -131,13 +131,13 @@
             %{--Options--}%
             <div id="clusteringOptionsDiv" hidden>
                 %{--Number of clusters--}%
-                <div class="heim-input-field heim-input-number">
+                <div class="heim-input-field heim-input-number" id="noOfClustersDiv">
                     <label>Number of clusters</label>
                     <input type="text" id="txtNoOfClusters" name="txtNoOfClusters" value="2">
                 </div>
 
                 %{--Number of markers--}%
-                <div class="heim-input-field heim-input-number">
+                <div class="heim-input-field heim-input-number" id="noOfMarkersDiv">
                     <label>Number of markers</label>
                     <input type="text" id="txtNoOfMarkers" name="txtNoOfMarkers">
                 </div>
