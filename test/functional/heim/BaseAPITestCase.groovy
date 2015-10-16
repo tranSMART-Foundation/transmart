@@ -2,6 +2,9 @@ package heim
 
 import com.grailsrocks.functionaltest.APITestCase
 
+import static org.hamcrest.Matchers.is
+import static org.junit.Assume.assumeThat
+
 abstract class BaseAPITestCase extends APITestCase {
 
     protected void setUp() {
@@ -18,5 +21,15 @@ abstract class BaseAPITestCase extends APITestCase {
         map.collect { k, v ->
             "$k=${URLEncoder.encode(v.toString(), 'UTF-8')}"
         }.join('&')
+    }
+
+    protected String /* session id */ createSession() {
+        post('/RSession/create') {
+            body json: [
+                    workflow: 'func_test'
+            ]
+        }
+        assumeThat client.responseStatus, is(201)
+        JSON.sessionId
     }
 }

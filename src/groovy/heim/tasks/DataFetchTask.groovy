@@ -2,12 +2,16 @@ package heim.tasks
 
 import au.com.bytecode.opencsv.CSVWriter
 import com.google.common.base.Charsets
+import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Iterators
 import heim.rserve.RServeSession
 import heim.rserve.RUtil
+import org.codehaus.groovy.grails.support.PersistenceContextInterceptor
+import org.rosuda.REngine.REXP
 import org.rosuda.REngine.Rserve.RConnection
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Scope
+import org.springframework.stereotype.Component
 import org.transmartproject.core.concept.ConceptKey
 import org.transmartproject.core.dataquery.DataColumn
 import org.transmartproject.core.dataquery.DataRow
@@ -27,6 +31,7 @@ import org.transmartproject.core.querytool.QueriesResource
 import static org.transmartproject.core.dataquery.highdim.projections.Projection.DEFAULT_REAL_PROJECTION
 import static org.transmartproject.core.ontology.OntologyTerm.VisualAttributes.HIGH_DIMENSIONAL
 
+@Component
 @Scope('prototype')
 class DataFetchTask extends AbstractTask {
 
@@ -61,10 +66,24 @@ class DataFetchTask extends AbstractTask {
     @Autowired
     private RServeSession rServeSession // session scoped
 
+    @Autowired
+    private PersistenceContextInterceptor interceptor
+
     private TabularResult<?, ?> tabularResult
 
     @Override
     TaskResult call() throws Exception {
+        interceptor.init()
+        try {
+            def ret = doCall()
+            interceptor.flush()
+            ret
+        } finally {
+            interceptor.destroy()
+        }
+    }
+
+    private TaskResult doCall() throws Exception {
         def concept = conceptsResource.getByKey(conceptKey.toString())
 
         if (HIGH_DIMENSIONAL in concept.visualAttributes) {
@@ -74,7 +93,11 @@ class DataFetchTask extends AbstractTask {
         }
 
         String fileName = writeTabularResult()
-        loadFile(fileName)
+        List<String> currentLabels = loadFile(fileName)
+        new TaskResult(
+                successful: true,
+                artifacts: ImmutableMap.of('currentLabels', currentLabels),
+        )
     }
 
     private String /* filename */ writeTabularResult() {
@@ -90,38 +113,41 @@ class DataFetchTask extends AbstractTask {
                         Iterators.peekingIterator(tabularResult.iterator())
                 boolean isBioMarker = it.peek().hasProperty('bioMarker')
                 writeHeader(csvWriter, isBioMarker, tabularResult.indicesList)
-                for (DataRow row: tabularResult) {
+                it.each { DataRow row ->
                     if (Thread.interrupted()) {
                         throw new InterruptedException(
                                 'Thread was interrupted while dumping the ' +
                                         'TabularResult into a file')
                     }
-                    writeLine writer, isBioMarker, row
+                    writeLine csvWriter, isBioMarker, row
                 }
             } finally {
                 csvWriter.close()
             }
         }
+
+        filename
     }
 
-    private void loadFile(String filename) {
+    private List<String> /* current labels */ loadFile(String filename) {
         def escapedFilename = RUtil.escapeRStringContent(filename)
         def escapedLabel = RUtil.escapeRStringContent(label)
 
         List<String> commands = [
                 "if (!exists('loaded_variables')) { loaded_variables <- list() }",
-                """
+                """(function() {
                     loaded_variables <- c(
                             loaded_variables,
                             list('$escapedLabel' = read.csv(
-                                    '$escapedFilename', sep = "\t", header = TRUE)))
-                """,
+                                    '$escapedFilename', sep = "\t", header = TRUE)));
+                    names(loaded_variables)
+                })()""",
         ]
-        rServeSession.doWithRConnection { RConnection conn ->
-            commands.each {
-                RUtil.runRCommand conn, it
-            }
+        REXP rexp = rServeSession.doWithRConnection { RConnection conn ->
+            RUtil.runRCommand conn, commands[0]
+            RUtil.runRCommand conn, commands[1] /* return value */
         }
+        rexp.asNativeJavaObject() as List
     }
 
     private static void writeHeader(CSVWriter writer,
@@ -161,10 +187,12 @@ class DataFetchTask extends AbstractTask {
                 subResource.createAssayConstraint(
                         AssayConstraint.ONTOLOGY_TERM_CONSTRAINT,
                         concept_key: conceptKey.toString()),
-                subResource.createAssayConstraint(
-                        AssayConstraint.PATIENT_SET_CONSTRAINT,
-                        result_instance_id: resultInstanceId)
         ]
+        if (resultInstanceId) {
+            builtAssayConstraints << subResource.createAssayConstraint(
+                    AssayConstraint.PATIENT_SET_CONSTRAINT,
+                    result_instance_id: resultInstanceId)
+        }
         if (assayConstraints) {
             builtAssayConstraints +=
                     assayConstraints.collect { k, v ->

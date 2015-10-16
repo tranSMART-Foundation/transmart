@@ -1,9 +1,7 @@
 package heim.session
 
 import com.google.common.collect.HashBasedTable
-import com.google.common.collect.Sets
 import com.google.common.collect.Table
-import com.google.common.collect.Tables
 import org.springframework.stereotype.Component
 import org.transmartproject.core.exceptions.NoSuchResourceException
 

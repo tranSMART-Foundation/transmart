@@ -4,7 +4,6 @@ import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
 import groovy.util.logging.Log4j
-import heim.jobs.JobInstance
 import org.springframework.aop.scope.ScopedProxyUtils
 import org.transmartproject.core.users.User
 
