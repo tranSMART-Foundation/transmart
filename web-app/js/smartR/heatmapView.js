@@ -79,12 +79,12 @@ HeatmapView = (function(){
         jQuery.get("/transmart/search/loadSearchPathways", {
             query: request.term
         }, function (data) {
-            data = data.substring(5, data.length - 1);
-            data = JSON.parse(data);
-            data = data['rows'];
+            data = data.substring(5, data.length - 1);// loadSearchPathways returns String with null(JSON). This strips it off
+            data = JSON.parse(data);// String rep of JSON to actual JSON
+            data = data['rows'];// Response is encapsulated in rows
             var suggestions = [];
             for (i = 0; i < data.length;i++){
-                var geneName = data[i]['keyword'];
+                var geneName = data[i]['keyword']; //I assume we use keywords, not synonyms or IDs
                 suggestions.push(geneName);
             }
             response(suggestions);
