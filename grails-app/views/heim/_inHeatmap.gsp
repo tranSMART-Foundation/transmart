@@ -118,7 +118,7 @@
             %{--Apply statistical methods--}%
             <div class="heim-input-field heim-input-number">
                 <label>Apply statistical methods</label>
-                <select>
+                <select id="methodSelect">
                     <option value="none">None</option>
                     <option value="hierarchical-clustering">Hierarchical Clustering</option>
                     <option value="k-means-clustering">K-Means Clustering</option>
@@ -129,7 +129,7 @@
             <hr style="margin-top: 20px;">
 
             %{--Options--}%
-            <div>
+            <div id="clusteringOptionsDiv" hidden>
                 %{--Number of clusters--}%
                 <div class="heim-input-field heim-input-number">
                     <label>Number of clusters</label>
