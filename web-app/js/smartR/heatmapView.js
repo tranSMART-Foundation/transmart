@@ -76,10 +76,18 @@ HeatmapView = (function(){
 
     var _geneAutocomplete = function(request,response){
         console.log('in geneAutocomplete');
-        jQuery.get("transmart/search/loadSearchPathways", {
+        jQuery.get("/transmart/search/loadSearchPathways", {
             query: request.term
         }, function (data) {
-            response(data);
+            data = data.substring(5, data.length - 1);
+            data = JSON.parse(data);
+            data = data['rows'];
+            var suggestions = [];
+            for (i = 0; i < data.length;i++){
+                var geneName = data[i]['keyword'];
+                suggestions.push(geneName);
+            }
+            response(suggestions);
         });
     };
     return view;
