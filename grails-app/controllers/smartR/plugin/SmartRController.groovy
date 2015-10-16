@@ -1,54 +1,22 @@
 package smartR.plugin
 
 import grails.converters.JSON
-import groovy.json.JsonBuilder
+import heim.session.SessionService
 import org.apache.commons.io.FilenameUtils
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
-
 class SmartRController {
 
-    def smartRService
+    SessionService sessionService
 
     /**
     *   Renders the default view
     */
     def index = {
-        [scriptList: smartRService.getScriptList()]
+        [scriptList: sessionService.availableWorkflows()]
     }
 
-    /**
-    *   Renders the actual visualization based on the chosen script and the results computed
-    */
-    def renderOutputDIV = {
-        params.init = params.init == null ? true : params.init // defaults to true
-        def (success, results) = smartRService.runScript(params)
-        if (! success) {
-            render results
-        } else {
-            render template: "/heimVisualizations/out${FilenameUtils.getBaseName(params.script)}",
-                    model: [results: results]
-        }
-    }
-
-    def updateOutputDIV = {
-        params.init = false
-        def (success, results) = smartRService.runScript(params)
-        if (! success) {
-            render new JsonBuilder([error: results]).toString()
-        } else {
-            render results
-        }
-    }
-
-    def recomputeOutputDIV = {
-        params.init = false
-        redirect controller: 'SmartR',
-                 action: 'renderOutputDIV', 
-                 params: params
-    }
-    
     /**
     *   Renders the input form for initial script parameters
     */
@@ -58,10 +26,6 @@ class SmartRController {
         } else {
             render template: "/heim/in${FilenameUtils.getBaseName(params.script)}"
         }
-    }
-
-    def renderLoadingScreen = {
-        render template: "/visualizations/outLoading"
     }
 
     /**

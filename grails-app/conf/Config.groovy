@@ -12,6 +12,8 @@ log4j = {
            'org.springframework',
            'org.hibernate',
            'net.sf.ehcache.hibernate'
+    info   'org.transmartproject'
+    debug  'heim'
 }
 
 grails.views.default.codec="none" // none, html, base64

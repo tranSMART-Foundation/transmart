@@ -1,3 +1,6 @@
+import org.codehaus.groovy.grails.plugins.GrailsPluginUtils
+import org.springframework.stereotype.Component
+
 class smartRGrailsPlugin {
     // the plugin version
     def version = "0.1"
@@ -43,28 +46,35 @@ class smartRGrailsPlugin {
     }
 
     def doWithSpring = {
-    }
+        xmlns context:"http://www.springframework.org/schema/context"
 
-    def doWithDynamicMethods = { ctx ->
-        // TODO Implement registering dynamic methods to classes (optional)
+        context.'component-scan'('base-package': 'heim') {
+            context.'include-filter'(
+                    type:       'annotation',
+                    expression: Component.canonicalName)
+        }
     }
 
     def doWithApplicationContext = { ctx ->
-        // TODO Implement post initialization spring config (optional)
-    }
+        def config = application.config
 
-    def onChange = { event ->
-        // TODO Implement code that is executed when any artefact that this plugin is
-        // watching is modified and reloaded. The event contains: event.source,
-        // event.application, event.manager, event.ctx, and event.plugin.
-    }
+        File smartRDir = GrailsPluginUtils.getPluginDirForName('smart-r')?.file
+        if (!smartRDir) {
+            String version = ctx.pluginManager.allPlugins.find {
+                it.name == 'smart-r'
+            }.version
+            smartRDir = new File(
+                    ctx.servletContext.getRealPath('/plugins/'),
+                    "smart-r-${version}")
+        } else {
+            smartRDir = new File(smartRDir, 'web-app')
+        }
+        if (!smartRDir) {
+            throw new RuntimeException('Could not determine directory for ' +
+                    'smart-r plugin')
+        }
 
-    def onConfigChange = { event ->
-        // TODO Implement code that is executed when the project configuration changes.
-        // The event is the same as for 'onChange'.
-    }
-
-    def onShutdown = { event ->
-        // TODO Implement code that is executed when the application shuts down (optional)
+        config.smartR.pluginScriptDirectory =
+                new File(smartRDir.canonicalPath, 'HeimScripts')
     }
 }
