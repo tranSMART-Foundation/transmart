@@ -301,7 +301,6 @@ function(rawVector, .to.data.frame.converter=.as.data.frame.fast, progress=.make
 .messageChopper <- function(rawVector, endOfLastMessage = 0) {
     msbSetToOne <- as.raw(128)
     progressTotal <- length(rawVector)
-    pb <- c()
 
     getNextMessage <- function() {
         # The protobuf messages are written using writeDelimited in the Java
