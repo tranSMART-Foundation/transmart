@@ -249,11 +249,11 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
         result$headers <- headers$value()
         result$status <- as.integer(result$headers['status'])
         if(grepl("^application/json(;|\\W|$)", result$headers['Content-Type'])) {
-            result$content <- fromJSON(result$content, asText = TRUE, nullValue = NA)
+            result$content <- fromJSON(result$content)
             result$JSON <- TRUE
         }
         if(grepl("^application/hal\\+json(;|\\W|$)", result$headers['Content-Type'])) {
-            result$content <- .simplifyHalList(fromJSON(result$content, asText = TRUE, nullValue = NA))
+            result$content <- .simplifyHalList(fromJSON(result$content))
             result$JSON <- TRUE
         }
         return(result)

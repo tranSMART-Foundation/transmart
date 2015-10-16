@@ -29,7 +29,7 @@
 install.packages(pkgs=c("RCurl", "RJSONIO", "RProtoBuf", "plyr", "hash", "reshape"))
 
 # RProtoBuf depends on the system protobuf headers. For Ubuntu you will need to
-# install the libprotoc-dev package.
+# install the libprotoc-dev and libprotobuf-dev packages.
 
 # One nasty issue encountered in some MacOSX versions (at least in 10.9) is that
 # the R version installed via homebrew runs into a libl library error. Please

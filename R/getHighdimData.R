@@ -42,8 +42,8 @@
 # lower level language.
 
 
-getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL, constraints = NULL,
-        data.constraints = NULL, assay.constraints = NULL, highdim.type = 1,
+getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL,
+        data.constraints = list(), assay.constraints = list(), highdim.type = 1,
         progress.download = .make.progresscallback.download(),
         progress.parse = .make.progresscallback.parse(),
         ...) {
@@ -51,44 +51,38 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     .ensureTransmartConnection()
     concept.link <- .getConceptLink(study.name, concept.match, concept.link)
 
-    listOfHighdimDataTypes <- highdimInfo(concept.link = concept.link)[[highdim.type]]
+    message("retrieving highdim info...")
+    typeInfo <- highdimInfo(concept.link = concept.link)[[highdim.type]]
 
     if (!is.null(projection)) {
-        matchingProjectionIndex <- which(names(listOfHighdimDataTypes$api.link) == projection)
+        matchingProjectionIndex <- which(names(typeInfo$api.link) == projection)
         if (length(matchingProjectionIndex) > 0) {
-            projectionLink <- listOfHighdimDataTypes$api.link[[matchingProjectionIndex]]
+            projectionLink <- typeInfo$api.link[[matchingProjectionIndex]]
         } else { projection <- NULL }
-    } else { projection <- NULL }
-
+    }
     if (is.null(projection)) {
         stop("No valid projection selected.\nSet the projection argument to one of the following options:\n",
-                paste(listOfHighdimDataTypes$supportedProjections, "\n"))
+                paste(typeInfo$supportedProjections, "\n"))
         return(NULL)
     }
+    
+    cons <- .makeConstraints(assay.constraints, data.constraints, typeInfo, ...)
+    assay.constraints <- cons$assay
+    data.constraints <- cons$data
+    
+    for (con in list(list(con=assay.constraints, param="assayConstraints", known=typeInfo$supportedAssayConstraints, name="assay"),
+                     list(con=data.constraints,  param="dataConstraints",  known=typeInfo$supportedDataConstraints,  name="data"))) {
+        if (!length(con$con)) next
+        invalid <- names(con$con)[!names(con$con) %in% con$known]
+        if (length(invalid)) {
+            warning("Invalid ", con$name, " constraints found: ", paste(invalid, collapse=' '))
+        }
+        sep <- if (grepl('?', projectionLink)) '&' else '?'
+        projectionLink <- paste(projectionLink, sep, con$param, "=", URLencode(toJSON(con$con), reserved=TRUE), sep='')
+    }
+    
     message("Retrieving data from server. This can take some time, depending on your network connection speed. ",
             as.character(Sys.time()))
-
-    if (is.list(constraints)){
-      selectedConstraints <- names(constraints)
-      possibleConstraints <- c(listOfHighdimDataTypes$supportedDataConstraints, listOfHighdimDataTypes$supportedAssayConstraints)
-      if (any(duplicated(selectedConstraints))){
-        stop("Multiple uses of the same constraint detected.\nEach constraint can be used only once.")
-      }
-      if (!(length(intersect(selectedConstraints, possibleConstraints)) == length(selectedConstraints))){
-        invalidConstraints <- setdiff(selectedConstraints, possibleConstraints)
-        possibleConstraints <- paste(possibleConstraints, collapse="\n")
-        errorMessage1 <- paste("invalid constraints defined: ", invalidConstraints)
-        errorMessage2 <- paste("\nPossible constraints are:\n", possibleConstraints)
-        stop(paste(errorMessage1, errorMessage2, collapse = "\n"))
-      } else {
-        # Converts the constraints list argument to JSON format and subsequently to an encoded URL for REST API interpretation 
-        jsonConstraints <- .convertToJson(constraints, listOfHighdimDataTypes)
-        print(paste(projectionLink, jsonConstraints[1], jsonConstraints[2], sep=""))
-        projectionLink <- paste(projectionLink, URLencode(jsonConstraints[1]), URLencode(jsonConstraints[2]), sep="")
-      }
-    } else if (!(is.null(constraints))) {
-      stop("Unable to read constraints. Constraints must be in list format, containing constraint, name and values.\nE.g. list('genes' = list('names' = c('AURKA', 'TP53')))")
-    }
 
     serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary", progress = progress.download)
     if (length(serverResult) == 0) {
@@ -97,6 +91,56 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     }
 
     return(.parseHighdimData(serverResult, progress = progress.parse))
+}
+
+# The argument is a single named list
+.expandConstraints <- function(constraints) {
+    # some deep functional/lazy magic
+    mapply(function(val, con) switch(con,
+            # Add an entry here for every constraint for which we provide a friendly interface
+            'snps' = {
+                arg <- if (length(val) > 1) val else list(val)
+                list(names=arg)
+            },
+            'assay.or' = {
+                ret <- lapply(val, .expandConstraints)
+                names(ret)[names(ret) %in% c('assay.or', 'data.or')] <- 'disjunction'
+                ret
+            },
+            'data.or' = {
+                ret <- lapply(val, .expandConstraints)
+                names(ret)[names(ret) %in% c('assay.or', 'data.or')] <- 'disjunction'
+                ret
+            },
+            stop("Unknown constraint type: ", con, "\n",
+                 "Valid constraints are: snps, assay.or and data.or\n",
+                 "Or use the assay.constraints and data.constraints parameters to specify raw constraints.",
+                 call.=FALSE)
+        ), constraints, names(constraints), SIMPLIFY=FALSE)
+}
+
+.makeConstraints <- function(assay.constraints=list(), data.constraints=list(), typeInfo=NULL, ...) {
+    rest <- .expandConstraints(list(...))
+    
+    valid.assay.constraints <- typeInfo$supportedAssayConstraints
+    valid.assay.constraints <- c(valid.assay.constraints[valid.assay.constraints != 'disjunction'], 'assay.or')
+    
+    valid.data.constraints <- typeInfo$supportedDataConstraints
+    valid.data.constraints <- c(valid.data.constraints[valid.data.constraints != 'disjunction'], 'data.or')
+    
+    invalid <- names(rest)[!names(rest) %in% c(valid.assay.constraints, valid.data.constraints)]
+    if (length(invalid)) {
+        stop(paste(invalid, collapse=' '), " is/are not recognized constraints for this data type. ",
+             "(Use 'assay.or' or 'data.or' instead of 'disjunction')")
+    }
+    
+    assay.constraints <- c(rest[names(rest) %in% valid.assay.constraints], assay.constraints)
+    names(assay.constraints)[names(assay.constraints) == 'assay.or'] <- 'disjunction'
+
+    data.constraints <- c(rest[names(rest) %in% valid.data.constraints], data.constraints)
+    names(data.constraints)[names(data.constraints) == 'data.or'] <- 'disjunction'
+    
+    list(assay=assay.constraints, data=data.constraints)
 }
 
 highdimInfo <- function(study.name = NULL, concept.match = NULL, concept.link = NULL) {
@@ -120,6 +164,7 @@ highdimInfo <- function(study.name = NULL, concept.match = NULL, concept.link = 
     }
     
     if (is.null(concept.link) && !is.null(concept.match)) {
+        message("retrieving concepts...")
         studyConcepts <- getConcepts(study.name)
         conceptFound <- grep(concept.match, studyConcepts$name)[1]
         if (is.na(conceptFound)) {
@@ -136,33 +181,10 @@ highdimInfo <- function(study.name = NULL, concept.match = NULL, concept.link = 
     concept.link
 }
 
-.convertToJson <- function(constraints, listOfHighdimDataTypes){
-  assayConstraintsJson <- "&assayConstraints="
-  dataConstraintsJson <- "&dataConstraints="
-  assayConstraintsList <- NULL
-  dataConstraintsList <- NULL
-  for (constraint in names(constraints)){
-    if (constraint %in% listOfHighdimDataTypes$supportedDataConstraints){
-      dataConstraintsList <- c(constraints[constraint] ,dataConstraintsList)
-    } else {
-      assayConstraintsList <- c(constraints[constraint] ,assayConstraintsList)
-    }
-  }
-  
-  constraintsList <- list(assayConstraintsList, dataConstraintsList)
-  constraintsList <- sapply(constraintsList[!sapply(constraintsList, is.null)], FUN = function(x) toJSON(x, collapse = ""), simplify = TRUE)
-  constraintsList <- sapply(constraintsList[!sapply(constraintsList, is.null)], FUN = function(x)  gsub("\n", "", x), simplify = TRUE)
-
-  assayConstraintsJson <- ifelse(is.na(constraintsList[1]), paste(assayConstraintsJson, "{}", sep=""), paste(assayConstraintsJson, constraintsList[1], sep = "", collapse = "")) 
-  dataConstraintsJson <- ifelse(is.na(constraintsList[2]), paste(dataConstraintsJson, "{}", sep=""), paste(dataConstraintsJson, constraintsList[2], sep = "", collapse = "")) 
-
-  return(c(assayConstraintsJson, dataConstraintsJson))
-}
-
 .parseHighdimData <- 
 function(rawVector, .to.data.frame.converter=.as.data.frame.fast, progress=.make.progresscallback.parse()) {
     dataChopper <- .messageChopper(rawVector)
-    #print(highdim)####
+
     message <- dataChopper$getNextMessage()
     header <- read(highdim.HighDimHeader, message)
     columnSpec <- header$columnSpec
