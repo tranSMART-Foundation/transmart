@@ -55,6 +55,13 @@ HeatmapView = (function(){
         view.fetchDataView.getResultBtn.click(
             heatmapService.getOutput
         );
+
+
+        view.fetchDataView.identifiersInput.autocomplete({
+            source: _geneAutocomplete,
+            minLength: 3
+        });
+
     };
 
     view.init = function (service) {
@@ -66,6 +73,15 @@ HeatmapView = (function(){
         heatmapService.initialize();
     };
 
+
+    var _geneAutocomplete = function(request,response){
+        console.log('in geneAutocomplete');
+        jQuery.get("transmart/search/loadSearchPathways", {
+            query: request.term
+        }, function (data) {
+            response(data);
+        });
+    };
     return view;
 })();
 
