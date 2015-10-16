@@ -116,7 +116,7 @@ class SessionService {
 
             [
                     state: state,
-                    result: result,
+                    result: result, // null if the task has not finished
             ]
         }
     }
