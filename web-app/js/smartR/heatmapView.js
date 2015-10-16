@@ -17,7 +17,8 @@ HeatmapView = (function(){
 
         },
         runHeatmapView : {
-
+            clusteringOptionsDiv : $j('#clusteringOptionsDiv'),
+            methodSelect : $j('#methodSelect')
         }
     };
 
@@ -32,6 +33,16 @@ HeatmapView = (function(){
             view.fetchDataView,
             heatmapService.fetchData
         );
+        view.runHeatmapView.methodSelect.on('change', function() {
+            //alert(this.value);
+            if( !(this.value == 'none') ){
+                view.runHeatmapView.clusteringOptionsDiv.show();
+            }
+            else {
+                view.runHeatmapView.clusteringOptionsDiv.hide();
+            }
+        });
+
     };
 
     view.init = function (service) {
