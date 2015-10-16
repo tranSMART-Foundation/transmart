@@ -44,7 +44,11 @@ HeatmapService = (function(){
         $j.ajax({
             url: pageInfo.basePath + '/RSession/create',
             type: 'POST',
-            timeout: '600000'
+            timeout: '600000',
+            contentType: "application/json",
+            data : JSON.stringify( {
+                workflow : 'heatmap'
+            })
         }).done(function(response) {
             result = response;
             GLOBAL.HeimAnalyses = {
