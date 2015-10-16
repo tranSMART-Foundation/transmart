@@ -59,6 +59,11 @@ grails.project.dependency.resolution = {
         //test 'com.jayway.restassured:rest-assured:2.4.1'
 
         runtime 'org.javassist:javassist:3.16.1-GA'
+
+        test('org.gmock:gmock:0.9.0-r435-hyve2') {
+            transitive = false /* don't bring groovy-all */
+            export     = false
+        }
     }
     plugins {
         runtime ':resources:1.2.1'
