@@ -1,5 +1,6 @@
 package smartR.plugin
 
+import grails.converters.JSON
 import groovy.json.JsonBuilder
 import org.apache.commons.io.FilenameUtils
 import org.codehaus.groovy.grails.web.json.JSONArray
@@ -97,7 +98,6 @@ class SmartRController {
         result.put("totalCount", scripts.size())
         result.put("files", rows)
 
-        response.setContentType("text/json")
-        response.outputStream << result.toString()
+        render result as JSON;
     }
 }
