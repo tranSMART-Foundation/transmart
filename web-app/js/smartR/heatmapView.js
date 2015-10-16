@@ -11,6 +11,7 @@ HeatmapView = (function(){
             conceptPathsInput : $j('#displaydivIndependentVariable'),
             identifiersInput : $j('#heim-input-txt-identifiers'),
             actionBtn : $j('#heim-btn-fetch-data'),
+            getResultBtn : $j('#heim-btn-get-output'),
             outputArea : $j('#heim-fetch-data-output')
         },
         preprocessView : {
@@ -42,7 +43,9 @@ HeatmapView = (function(){
                 view.runHeatmapView.clusteringOptionsDiv.hide();
             }
         });
-
+        view.fetchDataView.getResultBtn.click(
+            heatmapService.getOutput
+        );
     };
 
     view.init = function (service) {

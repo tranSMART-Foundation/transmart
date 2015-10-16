@@ -44,6 +44,7 @@
                 %{--tool buttons--}%
                 <div style="margin-top: 10px; text-align: right;">
                     <button id="heim-btn-fetch-data">Fetch Data</button>
+                    <button id="heim-btn-get-output">Get output</button>
                 </div>
 
                 <div id="heim-fetch-data-output">

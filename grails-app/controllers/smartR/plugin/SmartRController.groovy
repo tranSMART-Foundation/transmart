@@ -33,10 +33,10 @@ class SmartRController {
     */
     def loadScripts = {
 
-        // list of required javascripts
+        // list of required javascript files
         def scripts = [servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js']
 
-        // list of required css
+        // list of required css files
         def styles = [servletContext.contextPath+pluginContextPath+'/css/smartR.css']
 
         JSONObject result = new JSONObject()
