@@ -40,8 +40,8 @@ class SessionService {
             new ConcurrentHashMap<>()
 
     List<String> availableWorkflows() {
-        File dir = Holders.config.get('smartR.pluginScriptDirectory')
-        dir.listFiles { File f -> f.isDirectory() }*.name
+        File dir = Holders.config.smartR.pluginScriptDirectory
+        dir.listFiles({ File f -> f.isDirectory() } as FileFilter)*.name
     }
 
     UUID createSession(User user, String workflowType) {
