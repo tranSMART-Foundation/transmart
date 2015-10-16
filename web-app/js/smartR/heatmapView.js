@@ -19,7 +19,9 @@ HeatmapView = (function(){
         },
         runHeatmapView : {
             clusteringOptionsDiv : $j('#clusteringOptionsDiv'),
-            methodSelect : $j('#methodSelect')
+            methodSelect : $j('#methodSelect'),
+            noClustersDiv : $j('#noOfClustersDiv'),
+            noMarkersDiv : $j('#noOfMarkersDiv')
         }
     };
 
@@ -35,9 +37,16 @@ HeatmapView = (function(){
             heatmapService.fetchData
         );
         view.runHeatmapView.methodSelect.on('change', function() {
-            //alert(this.value);
             if( !(this.value == 'none') ){
                 view.runHeatmapView.clusteringOptionsDiv.show();
+                view.runHeatmapView.noMarkersDiv.hide();
+                view.runHeatmapView.noClustersDiv.hide();
+                if(this.value == 'marker-selection'){
+                    view.runHeatmapView.noMarkersDiv.show();
+                }
+                else if(this.value == 'k-means-clustering'){
+                    view.runHeatmapView.noClustersDiv.show();
+                }
             }
             else {
                 view.runHeatmapView.clusteringOptionsDiv.hide();
