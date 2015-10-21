@@ -53,7 +53,16 @@ HeatmapView = (function(){
                 view.runHeatmapView.clusteringOptionsDiv.hide();
             }
         });
-        view.fetchDataView.getResultBtn.click( heatmapService.checkStatus);
+        view.fetchDataView.getResultBtn.click(
+            heatmapService.getOutput
+        );
+
+
+        view.fetchDataView.identifiersInput.autocomplete({
+            source: _geneAutocomplete,
+            minLength: 3
+        });
+
     };
 
     view.init = function (service, helper) {
@@ -68,6 +77,23 @@ HeatmapView = (function(){
         heatmapService.initialize();
     };
 
+
+    var _geneAutocomplete = function(request,response){
+        console.log('in geneAutocomplete');
+        jQuery.get("/transmart/search/loadSearchPathways", {
+            query: request.term
+        }, function (data) {
+            data = data.substring(5, data.length - 1);// loadSearchPathways returns String with null(JSON). This strips it off
+            data = JSON.parse(data);// String rep of JSON to actual JSON
+            data = data['rows'];// Response is encapsulated in rows
+            var suggestions = [];
+            for (var i = 0; i < data.length;i++){
+                var geneName = data[i]['keyword']; //I assume we use keywords, not synonyms or IDs
+                suggestions.push(geneName);
+            }
+            response(suggestions);
+        });
+    };
     return view;
 })();
 
