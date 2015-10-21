@@ -37,20 +37,24 @@ class ScriptExecutionController {
                 statusCommand.waitForCompletion)
 
         TaskResult res = status.result
-        String exceptionMessage
-        if (res.exception) {
-            exceptionMessage = res.exception.getClass().toString() +
-                    ': ' + res.exception.message
+        def resultValue = null
+        if (res != null) {
+            String exceptionMessage
+            if (res.exception) {
+                exceptionMessage = res.exception.getClass().toString() +
+                        ': ' + res.exception.message
+            }
+            resultValue = [
+                    successful: res.successful,
+                    exception: exceptionMessage,
+                    artifacts: res.artifacts,
+            ]
         }
 
         render(contentType: 'text/json') {
             [
                     state : status.state.toString(),
-                    result: [
-                            successful: res.successful,
-                            exception: exceptionMessage,
-                            artifacts: res.artifacts,
-                    ]
+                    result: resultValue
             ]
         }
     }
