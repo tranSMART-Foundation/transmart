@@ -31,7 +31,7 @@ HeimExtJSHelper = (function(){
         dtgI.notifyDrop = helper.dropOntoNodeSelection;
     };
 
-    helper.fetchConceptPath = function () {
+    var _fetchConceptPath = function (el) {
         var conceptId = el.getAttribute('conceptId').trim();
         var conceptIdPattern = /^\\\\[^\\]+(\\.*)$/;
         var match = conceptIdPattern.exec(conceptId);
@@ -41,6 +41,25 @@ HeimExtJSHelper = (function(){
         } else {
             return undefined;
         }
+    };
+
+    helper.readConceptVariables = function (elId) {
+        var variableConceptPath = '';
+        var variableEle = Ext.get(elId);
+
+        //If the variable element has children, we need to parse them and concatenate their values.
+        if (variableEle && variableEle.dom.childNodes[0]) {
+            //Loop through the variables and add them to a comma separated list.
+            for (var nodeIndex = 0; nodeIndex < variableEle.dom.childNodes.length; nodeIndex++) {
+                //If we already have a value, add the separator.
+                if (variableConceptPath != '') {
+                    variableConceptPath += '|';
+                }
+                //Add the concept path to the string.
+                variableConceptPath += _fetchConceptPath(variableEle.dom.childNodes[nodeIndex]);
+            }
+        }
+        return variableConceptPath;
     };
 
     return helper;

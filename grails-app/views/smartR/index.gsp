@@ -1,7 +1,6 @@
 <head>
     <g:javascript library='jquery' />
     <g:javascript src='smartR/smartR.js' />
-    <g:javascript src='smartR/heim-ui.js' />
     <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'smartR.css')}">
     <r:layoutResources/>
 
