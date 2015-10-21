@@ -1,6 +1,6 @@
 class ExportedUrlMappings {
 
-	static mappings = {
+    static mappings = {
         "/$controller/$action?/$id?(.${format})?"{
             constraints {
                 // apply constraints here
@@ -9,5 +9,5 @@ class ExportedUrlMappings {
 
         "/"(view:"/index")
         "500"(view:'/error')
-	}
+    }
 }
