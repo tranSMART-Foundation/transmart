@@ -83,7 +83,7 @@ class RUtil {
 
     public static REXP runRCommand(RConnection conn, String finalCommand)
             throws REXPMismatchException, REngineException {
-        String wrappedCommand = "try(" + finalCommand + ", silent=FALSE)";
+        String wrappedCommand = "try((function() {" + finalCommand + "})(), silent=FALSE)";
         if (LOG.isDebugEnabled()) {
             LOG.debug("About to run: " + wrappedCommand);
         }
