@@ -162,7 +162,9 @@
             <div style="margin-top: 10px; text-align: right;">
                 <button id="heim-btn-run-heatmap">Get Heatmap</button>
             </div>
-
+            <div style="margin-top: 10px; text-align: right;">
+                <button id="heim-btn-download-file">View</button>
+            </div>
 
         </div>
     </div>

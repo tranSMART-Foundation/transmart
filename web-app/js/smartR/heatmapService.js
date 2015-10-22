@@ -133,10 +133,11 @@ HeatmapService = (function(){
     service.getResultFiles = function (eventObj) {
         $j.ajax({
             type : 'GET',
-            url : pageInfo.basePath + '/ScriptExecution/files',
+            url : pageInfo.basePath + '/ScriptExecution/downloadFile',
             data: {
                 sessionId : GLOBAL.HeimAnalyses.sessionId,
-                executionId : GLOBAL.HeimAnalyses.executionId
+                executionId : GLOBAL.HeimAnalyses.executionId,
+                filename : 'heatmap.png'
             },
             contentType: 'application/json',
             complete: function(data) {

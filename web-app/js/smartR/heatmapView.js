@@ -22,7 +22,8 @@ HeatmapView = (function(){
             methodSelect : $j('#methodSelect'),
             noClustersDiv : $j('#noOfClustersDiv'),
             noMarkersDiv : $j('#noOfMarkersDiv'),
-            runAnalysisBtn : $j('#heim-btn-run-heatmap')
+            runAnalysisBtn : $j('#heim-btn-run-heatmap'),
+            downloadFileBtn : $j('#heim-btn-download-file')
         }
     };
 
@@ -97,6 +98,7 @@ HeatmapView = (function(){
 
         // TODO Run Analysis
         view.runHeatmapView.runAnalysisBtn.click (heatmapService.runAnalysis);
+        view.runHeatmapView.downloadFileBtn.click (heatmapService.getResultFiles);
     };
 
     /**
