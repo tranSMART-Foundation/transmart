@@ -38,7 +38,7 @@ class RScriptExecutionTask extends AbstractTask {
     }
 
     private REXP callR(RConnection conn) {
-        runRCommand(conn, 'library("jsonlite")')
+        runRCommand(conn, 'library(jsonlite)')
         runRCommand(conn, codeToLoad)
 
         def namedArguments = arguments.collect { RFunctionArg arg ->
