@@ -134,9 +134,9 @@ class DataFetchTask extends AbstractTask {
         def escapedLabel = RUtil.escapeRStringContent(label)
 
         List<String> commands = [
-                "if (!exists('loaded_variables')) { loaded_variables <- list() }",
+                "if (!exists('loaded_variables')) { loaded_variables <<- list() }",
                 """
-                loaded_variables <- c(
+                loaded_variables <<- c(
                         loaded_variables,
                         list('$escapedLabel' = read.csv(
                                '$escapedFilename', sep = "\t", header = TRUE)));

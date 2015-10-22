@@ -65,7 +65,7 @@ class RScriptExecutionTask extends AbstractTask {
     private ImmutableMap<String, Object> massage(REXP result) {
         def asNative = result.asNativeJavaObject()
         if (!(asNative instanceof Map)) {
-            asNative = [value: asNative]
+            asNative = [(asNative): 'value']
         }
 
         /* list(a=1, b='a') results in a map where the keys (!) are arrays

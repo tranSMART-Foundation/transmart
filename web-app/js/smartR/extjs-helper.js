@@ -32,15 +32,16 @@ HeimExtJSHelper = (function(){
     };
 
     var _fetchConceptPath = function (el) {
-        var conceptId = el.getAttribute('conceptId').trim();
-        var conceptIdPattern = /^\\\\[^\\]+(\\.*)$/;
-        var match = conceptIdPattern.exec(conceptId);
-
-        if (match != null) {
-            return match[1];
-        } else {
-            return undefined;
-        }
+        //var conceptId = el.getAttribute('conceptId').trim();
+        //var conceptIdPattern = /^\\\\[^\\]+(\\.*)$/;
+        //var match = conceptIdPattern.exec(conceptId);
+        //
+        //if (match != null) {
+        //    return match[1];
+        //} else {
+        //    return undefined;
+        //}
+        return el.getAttribute('conceptId').trim();
     };
 
     helper.readConceptVariables = function (elId) {

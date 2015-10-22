@@ -16,7 +16,7 @@ labelColumns <- c("Row.Label","Bio.marker")
 #Input expected 1 or 2 dataframes with columns: Row.Label, Bio.marker, ASSAY_0001 ASSAY_0002 ...
 # In the prorotype we do not use biomarker yet
 main <- function(){
-  datasets <- parseInput(loaded_variables) #this will just make sure we have either 1 or 2 dataframes in a list 
+  datasets <- parseInput(loaded_variables) #this will just make sure we have either 1 or 2 dataframes in a list
   measurements <- extractMeasurements(datasets) #extract the numeric part - as a numeric matrix is needed for the heatmap.2 function
   humanReadableNames <-extractNames(datasets)
   measurements <- assignNames(measurements,humanReadableNames) #combine label with Biomarker(if present) and assign as a name to be displayed on the heatmap
@@ -61,10 +61,10 @@ assignNames <- function(measurements, humanReadableRowNames){
 }
 
 extractNames <- function(datasets){
-  humanReadableNames <- datasets[[1]]$Row.Label  
+  humanReadableNames <- datasets[[1]]$Row.Label
 #  if(length(datasets) > 1){
-#    namesSecondDs <- datasets[[2]]$Row.Label 
-#    humanReadableNames <- c(humanReadableNames, namesSecondDs)  
+#    namesSecondDs <- datasets[[2]]$Row.Label
+#    humanReadableNames <- c(humanReadableNames, namesSecondDs)
 #  }
   return(humanReadableNames)
 }
@@ -75,20 +75,18 @@ transform <- function(measurements){
 }
 
 makeHeatmap <- function(measurements,grouping){
-  png(filename="heatmap.png",width = 800,height=800)
-  heatmap.2(measurements,
-            scale = "none",
-            dendrogram = "none",
-            Rowv = NA,
-            Colv = NA,
-            density.info = "none", # histogram", # density.info=c("histogram","density","none")
-            trace = "none",
-            col=redgreen(75),
-            margins=c(12,12),
-            ColSideColors= as.character(grouping)
-            #adjCol=c("left","top")
-  )
-  dev.off()
+#  png(filename="heatmap.png", width = 800, height = 800)
+#  heatmap.2(measurements,
+#            scale = "none",
+#            dendrogram = "none",
+#            Rowv = NA,
+#            Colv = NA,
+#            density.info = "none",
+#            trace = "none",
+#            col=redgreen(75),
+#            margins=c(12,12),
+#            ColSideColors= as.character(grouping)
+#  )
+#  dev.off()
+42
 }
-
-main()

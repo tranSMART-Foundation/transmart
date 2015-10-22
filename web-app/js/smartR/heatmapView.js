@@ -1,10 +1,8 @@
 /**
  * Heatmap View
  */
-
 HeatmapView = (function(){
     var heatmapService, extJSHelper;
-
 
     var view = {
         container : $j('#heim-tabs'),
@@ -28,37 +26,36 @@ HeatmapView = (function(){
         }
     };
 
-    var _geneAutocomplete = function(request, response){
-        jQuery.get("/transmart/search/loadSearchPathways", {
-            query: request.term
-        }, function (data) {
-            data = data.substring(5, data.length - 1);// loadSearchPathways returns String with null(JSON). This strips it off
-            data = JSON.parse(data);// String rep of JSON to actual JSON
-            data = data['rows'];// Response is encapsulated in rows
-            var suggestions = [];
-            for (var i = 0; i < data.length;i++){
-                var geneName = data[i]['keyword']; //I assume we use keywords, not synonyms or IDs
-                suggestions.push(geneName);
-            }
-            response(suggestions);
-        });
-    };
-
+    /**
+     *
+     * @param v
+     * @returns {{conceptPath: *, identifier: *, resultInstanceId: *}}
+     * @private
+     */
     var _getFetchDataViewValues = function (v) {
+        var _conceptPath = extJSHelper.readConceptVariables(v.conceptPathsInput.attr('id'));
+        console.log(v.identifiersInput.val());
         return {
-            conceptPath : extJSHelper.readConceptVariables(v.conceptPathsInput.attr('id')),
-            identifier : v.identifiersInput.val(), // TODO convert to array
+            conceptPath : _conceptPath,
+            //identifier : v.identifiersInput.val(), // TODO convert to array
+            identifier : 'TP53', // TODO convert to array
             resultInstanceId : GLOBAL.CurrentSubsetIDs[1]
         };
     };
 
+    /**
+     * Fetch data
+     * @param eventObj
+     * @private
+     */
     var _fetchDataAction = function (eventObj) {
         var _fetchDataParams =  _getFetchDataViewValues(view.fetchDataView);
         heatmapService.fetchData(_fetchDataParams);
     };
 
     /**
-     * Register event handlers for DOM elements
+     * Register event handlers
+     * @private
      */
     var _registerEventHandlers = function () {
 
@@ -102,6 +99,11 @@ HeatmapView = (function(){
         view.runHeatmapView.runAnalysisBtn.click (heatmapService.runAnalysis);
     };
 
+    /**
+     * Initialize helper
+     * @param service
+     * @param helper
+     */
     view.init = function (service, helper) {
         // injects dependencies
         heatmapService = service;

@@ -9,20 +9,25 @@ HeatmapService = (function(){
     var _createAnalysisConstraints = function (params) {
 
         var _retval = {
-            conceptKey : '\\' +  params.conceptPath,
+            conceptKey : params.conceptPath,
             dataType: 'mrna',
             resultInstanceId: params.resultInstanceId,
             projection: 'zscore',
             label: '_TEST_LABEL_'
+            //dataConstraints: {
+            //    search_keyword_ids: {
+            //        keyword_ids: [1837633]
+            //    }
+            //}
         };
 
-        if (params.identifier.length>1) {
-           _retval.dataContstraints = {
-                genes : {
-                    names : [params.identifiers]
-                }
-            };
-        }
+        //if (params.identifier.length>1) {
+        //   _retval.dataContstraints = {
+        //        genes : {
+        //            names : [params.identifiers]
+        //        }
+        //    };
+        //}
 
         return  _retval;
     };
@@ -63,8 +68,6 @@ HeatmapService = (function(){
      * @param eventObj
      */
     service.fetchData = function (params) {
-
-
         var _args = _createAnalysisConstraints(params);
         console.log('Analysis Constraints', _args);
 
@@ -91,7 +94,8 @@ HeatmapService = (function(){
         jQuery.get("/transmart/search/loadSearchPathways", {
             query: request.term
         }, function (data) {
-            data = data.substring(5, data.length - 1);// loadSearchPathways returns String with null(JSON). This strips it off
+            data = data.substring(5, data.length - 1);  // loadSearchPathways returns String with null (JSON).
+                                                        // This strips it off
             data = JSON.parse(data);// String rep of JSON to actual JSON
             data = data['rows'];// Response is encapsulated in rows
             var suggestions = [];
@@ -142,17 +146,15 @@ HeatmapService = (function(){
     };
 
     service.runAnalysis = function (eventObj) {
-        var _args = _createAnalysisConstraints();
 
         $j.ajax({
             type: 'POST',
             url: pageInfo.basePath + '/ScriptExecution/run',
             data: JSON.stringify({
                 sessionId : GLOBAL.HeimAnalyses.sessionId,
-                arguments : _args,
-                taskType : 'main',
-                workflow : 'heatmap'
-            }),
+                arguments : {},
+                taskType : 'run'}
+            ),
             contentType: 'application/json',
             complete: function(data) {
                 var scriptExecObj = JSON.parse(data.responseText);
