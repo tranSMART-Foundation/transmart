@@ -7,12 +7,14 @@ import com.google.common.util.concurrent.SettableFuture
 import groovy.transform.ToString
 import groovy.util.logging.Log4j
 import heim.SmartRExecutorService
+import heim.session.SessionContext
 import heim.session.SessionService
 import heim.session.SmartRSessionScope
 import org.springframework.beans.factory.DisposableBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import org.transmartproject.core.exceptions.NoSuchResourceException
 
 import java.lang.reflect.UndeclaredThrowableException
 import java.util.concurrent.Callable
@@ -57,6 +59,11 @@ class JobTasksService implements DisposableBean {
     private final Map<UUID, SettableFuture<TaskResult>> publicFutures =
             new ConcurrentHashMap<>()
 
+
+    List<TaskAndState> getTaskAndState(UUID sessionId) {
+        tasks[sessionId]
+    }
+
     void submitTask(Task task) {
         if (shuttingDown) {
             throw new IllegalStateException('Shutting down already')
@@ -96,6 +103,7 @@ class JobTasksService implements DisposableBean {
                         'Task must return TaskResult or throw'
 
                 log.debug "Task $task terminated without throwing"
+                sessionService.touchSession(sessionId)
                 tasks[task.uuid] = new TaskAndState(
                         task: task,
                         state: TaskState.FINISHED,
@@ -106,7 +114,7 @@ class JobTasksService implements DisposableBean {
                 if (thrown instanceof UndeclaredThrowableException) {
                     thrown = thrown.undeclaredThrowable
                 }
-
+                sessionService.touchSession(sessionId)
                 if (thrown instanceof CancellationException) {
                     log.debug("Task $task was cancelled")
                 } else {

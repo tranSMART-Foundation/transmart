@@ -14,6 +14,7 @@ import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.exceptions.NoSuchResourceException
 import org.transmartproject.core.users.User
 
+import javax.annotation.PostConstruct
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
@@ -24,6 +25,21 @@ import java.util.concurrent.ConcurrentMap
 @Component
 @Log4j
 class SessionService {
+
+    private static final int COLLECTION_INTERVAL = 5 * 60 * 1000 // 5 min
+    private static final int SESSION_LIFESPAN = 10 * 60 * 1000 // 10 min
+
+    private final ConcurrentMap<UUID, SessionContext> currentSessions =
+            new ConcurrentHashMap<>()
+
+    private final Set<UUID> sessionsShuttingDown = ([] as Set).asSynchronized()
+
+    @PostConstruct
+    private startCollecting() {
+        new Timer().schedule({
+            garbageCollection()
+        } as TimerTask, COLLECTION_INTERVAL, COLLECTION_INTERVAL)
+    }
 
     @Autowired
     SmartRRuntimeConstants constants
@@ -39,11 +55,6 @@ class SessionService {
 
     @Autowired
     private SessionFiles sessionFiles
-
-    private final ConcurrentMap<UUID, SessionContext> currentSessions =
-            new ConcurrentHashMap<>()
-
-    private final Set<UUID> sessionsShuttingDown = ([] as Set).asSynchronized()
 
     List<String> availableWorkflows() {
         File dir = constants.pluginScriptDirectory
@@ -101,6 +112,7 @@ class SessionService {
             jobTasksService.submitTask(task)
             task.uuid
         }
+
     }
 
     Map<String, Object> getTaskData(UUID sessionUUID,
@@ -125,7 +137,7 @@ class SessionService {
             }
 
             [
-                    state: state,
+                    state : state,
                     result: result, // null if the task has not finished
             ]
         }
@@ -137,7 +149,7 @@ class SessionService {
             throw new NoSuchResourceException(
                     "No such operational session: $sessionUUID")
         }
-
+        context.updateLastModified()
         SmartRSessionSpringScope.withActiveSession(
                 context, closure)
     }
@@ -153,9 +165,18 @@ class SessionService {
         res
     }
 
-    public boolean isSessionActive(UUID sessionId) {
+    boolean isSessionActive(UUID sessionId) {
         currentSessions.containsKey(sessionId) &&
                 !(sessionId in sessionsShuttingDown)
+    }
+
+    void touchSession(sessionId) {
+        try {
+            doWithSession(sessionId) {}
+        }
+        catch (NoSuchResourceException e) {
+            log.warn("Attempted to touch non-existent session: $sessionId")
+        }
     }
 
     private SessionContext fetchOperationalSessionContext(UUID sessionId) {
@@ -177,6 +198,39 @@ class SessionService {
             return null
         }
         sessionContext
+    }
+
+
+    void garbageCollection() {
+        currentSessions.each {
+            sessionId, sessionContext ->
+                def lastActivity = sessionContext.lastActive
+                if (isStale(sessionId, lastActivity)) {
+                    destroySession(sessionId)
+                    log.info("Terminated session: ${sessionId} due to inactivity.")
+                }
+        }
+    }
+
+    private boolean isStale(UUID sessionId, Date lastTouched) {
+        Date now = new Date()
+        def delta = now.time() - lastTouched.time()
+        delta > SESSION_LIFESPAN && noActiveTasks(sessionId)
+    }
+
+    private boolean noActiveTasks(UUID sessionId) {
+        def tasks = jobTasksService.getTaskAndState(sessionId)
+        boolean noActiveTasks = true
+        tasks.each { taskAndState ->
+            if (isActive(taskAndState.state)) {
+                noActiveTasks = false
+            }
+        }
+        return noActiveTasks
+    }
+
+    private static boolean isActive(TaskState state) {
+        !(state.name() == TaskState.FINISHED || state.name() == TaskState.FAILED)
     }
 
 }
