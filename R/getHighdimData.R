@@ -95,13 +95,65 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 
 # The argument is a single named list
 .expandConstraints <- function(constraints) {
+    # The JSON encoder encodes single item vectors as scalars. We need those to be lists as well.
+    j <- function(val) if (length(val) == 0) list(val) else val
+    assert <- function(expr) {
+        
+    }
+    
     # some deep functional/lazy magic
     mapply(function(val, con) switch(con,
-            # Add an entry here for every constraint for which we provide a friendly interface
-            'snps' = {
-                arg <- if (length(val) > 1) val else list(val)
-                list(names=arg)
+        # Add an entry here for every constraint for which we provide a friendly interface
+        
+        # Assay constraints
+            'trial_name' = {
+                stopifnot(length(val) == 1)
+                list(name = j(as.character(val)))
             },
+            'patient_set' = {
+                stopifnot(is.integer(val))
+                stopifnot(length(val) == 1)
+                list(result_instance_id = j(val))
+            },
+            'ontology_term' = {
+                stopifnot(length(val) == 1)
+                list(concept_key = j(as.character(val)))
+            },
+            'assay_ids' = {
+                stopifnot(is.integer(val))
+                list(ids = j(val))
+            },
+
+        # Data constraints
+            'search_keywords' = {
+                stopifnot(is.integer(val))
+                list(keyword_ids = j(val))
+            },
+            'chromosome_segment' = {
+                if(is.character(val)) {
+                    stopifnot(length(val) == 1)
+                    list(chromosome = j(val))
+                } else {
+                    stopifnot(setequal(names(val), c("chromosome", "start", "end")))
+                    stopifnot(is.character(val$chromosome))
+                    stopifnot(is.integer(val$start))
+                    stopifnot(length(val$start) == 1)
+                    stopifnot(is.integer(val$end))
+                    stopifnot(length(val$end) == 1)
+                    val
+                }
+            },
+        
+            # Todo: 
+            #'genes' = {},
+            #'proteins' = {},
+            #'pathways' = {},
+            #'gene_signatures' = {},
+            'snps' = {
+                list(names = j(as.character(arg))
+            },
+            
+        # other constraints
             'assay.or' = {
                 ret <- lapply(val, .expandConstraints)
                 names(ret)[names(ret) %in% c('assay.or', 'data.or')] <- 'disjunction'
