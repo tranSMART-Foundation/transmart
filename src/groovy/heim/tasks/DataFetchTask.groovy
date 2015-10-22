@@ -135,13 +135,12 @@ class DataFetchTask extends AbstractTask {
 
         List<String> commands = [
                 "if (!exists('loaded_variables')) { loaded_variables <- list() }",
-                """(function() {
-                    loaded_variables <- c(
-                            loaded_variables,
-                            list('$escapedLabel' = read.csv(
-                                    '$escapedFilename', sep = "\t", header = TRUE)));
-                    names(loaded_variables)
-                })()""",
+                """
+                loaded_variables <- c(
+                        loaded_variables,
+                        list('$escapedLabel' = read.csv(
+                               '$escapedFilename', sep = "\t", header = TRUE)));
+                names(loaded_variables)""",
         ]
         REXP rexp = rServeSession.doWithRConnection { RConnection conn ->
             RUtil.runRCommand conn, commands[0]
