@@ -74,6 +74,8 @@ transform <- function(measurements){
 
 makeHeatmap <- function(measurements,grouping){
   png(filename="heatmap.png", width = 800, height = 800)
+  breakpoints <- seq(from= -2,to = 10,length.out=75) # this will clamp all values below 0.1
+  breakpoints <- c(-10,colors) # number of breaks must equal number of colors +1
   heatmap.2(measurements,
             scale = "none",
             dendrogram = "none",
@@ -83,7 +85,8 @@ makeHeatmap <- function(measurements,grouping){
             trace = "none",
             col=redgreen(75),
             margins=c(12,12),
-            ColSideColors= as.character(grouping)
+            ColSideColors= as.character(grouping),
+            breaks = breakpoints
   )
   dev.off()
 }
