@@ -4,6 +4,7 @@ library(gplots)
 dataset1color <- "coral3"
 dataset2color <- "chartreuse3"
 labelColumns <- c("Row.Label","Bio.marker")
+MAX_ROWS <- 50 # this will be made into an argument after the prototype
 
 #Input expected 1 or 2 dataframes with columns: Row.Label, Bio.marker, ASSAY_0001 ASSAY_0002 ...
 # In the prorotype we do not use biomarker yet
@@ -19,10 +20,10 @@ main <- function(){
 
 parseInput <- function(variables){
   onlyTwo <- variables[1:2]
-  onlyTwo[[1]] <- variables[[1]][1:50,]
+  onlyTwo[[1]] <- variables[[1]][1:MAX_ROWS,]
   onlyTwo <- onlyTwo[!sapply(onlyTwo, is.null)]
   if(length(onlyTwo) == 2){
-    onlyTwo[[2]] <- variables[[2]][1:50,]
+    onlyTwo[[2]] <- variables[[2]][1:MAX_ROWS,]
   }
   return(onlyTwo)
 }
