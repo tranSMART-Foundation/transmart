@@ -149,6 +149,11 @@ HeatmapService = (function(){
                 console.log(textStatus);
                 console.log(errorThrown);
                 clearInterval(service.statusInterval);
+                if (task === 'fetchData') {
+                    $j('#heim-fetch-data-output').html('<span style="color: red";>'+errorThrown+'</span>');
+                } else if (task === 'runHeatmap') {
+                    $j('#heim-run-output').html('<span style="color: red";>'+errorThrown+'</spanp>');
+                }
         })
         .always(function () {
             console.log('checked!');
