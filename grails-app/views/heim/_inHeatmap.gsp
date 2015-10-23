@@ -26,14 +26,15 @@
                     <label>Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into
                     the box. The nodes needs to be from the same platform.</label>
                     <br><br>
-                    <div id='divIndependentVariable' class="heim-dropzone" style="border:1px solid #666; height: 100px"></div>
+                    <div id='divIndependentVariable' class="heim-dropzone" 
+                         style="border:1px solid #666; height: 100px; padding: 10px;"></div>
                     <div style="margin-top: 10px;">
-                        <button type="button" onclick="alert('Clear');">Clear</button>
+                        <button type="button" id="heim-btn-clear">Clear</button>
                     </div>
                 </div>
 
                 %{--Display independent variable--}%
-                <div id="displaydivIndependentVariable" class="independentVars"></div>
+                <div id="displaydivIndependentVariable" class="independentVars" ></div>
 
                 %{--Select identifier--}%
                 <div class="heim-input-field heim-autocomplete">
@@ -44,13 +45,12 @@
                 %{--tool buttons--}%
                 <div style="margin-top: 10px; text-align: right;">
                     <button id="heim-btn-fetch-data">Fetch Data</button>
-                    <button id="heim-btn-check">Check Status</button>
-                    <button id="heim-btn-get-output">Get output</button>
+                    %{--<button id="heim-btn-check">Check Status</button>--}%
+                    %{--<button id="heim-btn-get-output">Get output</button>--}%
                 </div>
 
-                <div id="heim-fetch-data-output">
-                    ---- output place holder ----
-                </div>
+                <div id="heim-fetch-data-output"></div>
+
         </div>
 
         %{--========================================================================================================--}%
@@ -163,9 +163,17 @@
                 <button id="heim-btn-run-heatmap">Get Heatmap</button>
             </div>
 
+            %{--FOR DEBUGGING--}%
+            %{--<div style="margin-top: 10px; text-align: right;">--}%
+                %{--<button id="heim-btn-download-file">View</button>--}%
+            %{--</div>--}%
+
+            %{--result--}%
+
+            <div id="heim-run-output"></div>
+            <img id="heim-img-result">
 
         </div>
+        
     </div>
-
-
 </div>

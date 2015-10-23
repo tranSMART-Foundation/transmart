@@ -4,7 +4,9 @@
 
 HeatmapService = (function(){
 
-    var service = {};
+    var service = {
+        statusInterval : 0
+    };
 
     var _createAnalysisConstraints = function (params) {
 
@@ -12,22 +14,11 @@ HeatmapService = (function(){
             conceptKey : params.conceptPath,
             dataType: 'mrna',
             resultInstanceId: params.resultInstanceId,
-            projection: 'zscore',
+            projection: 'default_real_projection',
             label: '_TEST_LABEL_'
-            //dataConstraints: {
-            //    search_keyword_ids: {
-            //        keyword_ids: [1837633]
-            //    }
-            //}
         };
 
-        //if (params.identifier.length>1) {
-        //   _retval.dataContstraints = {
-        //        genes : {
-        //            names : [params.identifiers]
-        //        }
-        //    };
-        //}
+        // TODO to include data constraints
 
         return  _retval;
     };
@@ -85,7 +76,9 @@ HeatmapService = (function(){
                 var scriptExecObj = JSON.parse(data.responseText);
                 GLOBAL.HeimAnalyses.executionId = scriptExecObj.executionId;
                 console.log(GLOBAL.HeimAnalyses);
-                //$j('#heim-fetch-data-output').html(data.responseText);
+                service.statusInterval =  setInterval(function () {
+                    service.checkStatus('fetchData');
+                }, 1000);
             }
         });
     };
@@ -108,7 +101,13 @@ HeatmapService = (function(){
 
     };
 
-    service.checkStatus = function (eventObj) {
+    service.checkStatus = function (task) {
+        if (task === 'fetchData') {
+            $j('#heim-fetch-data-output').html('<p>Fetching data, please wait ..</p>');
+        } else if (task === 'runHeatmap') {
+            $j('#heim-run-output').html('<p>Calculating, please wait ..</p>');
+        }
+
         $j.ajax({
             type : 'GET',
             url : pageInfo.basePath + '/ScriptExecution/status',
@@ -118,7 +117,25 @@ HeatmapService = (function(){
             }
         })
         .done(function (d) {
-            console.log('I am done with checking status', d);
+                console.log('I am gonna check again', d);
+                if (d.state === 'FINISHED') {
+                    clearInterval(service.statusInterval);
+                    console.log('I am done with checking status', d);
+                    if (task === 'fetchData') {
+                        $j('#heim-fetch-data-output')
+                            .html('<p class="heim-fectch-success">Data is successfully fetched. Proceed with Run Heatmap</p>');
+                    } else if (task === 'runHeatmap') {
+                        $j('#heim-run-output').hide();
+                        $j('#heim-img-result')
+                            .attr('src', pageInfo.basePath
+                            + '/ScriptExecution/downloadFile?sessionId='
+                            + GLOBAL.HeimAnalyses.sessionId
+                            + '&executionId='
+                            + GLOBAL.HeimAnalyses.executionId
+                            + '&filename=heatmap.png');
+                    }
+                }
+                $j('#heim-run-output')
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             console.log(jqXHR);
@@ -126,27 +143,15 @@ HeatmapService = (function(){
             console.log(errorThrown);
         })
         .always(function () {
-            console.log('Finished!');
+            console.log('checked!');
         });
     };
 
     service.getResultFiles = function (eventObj) {
-        $j.ajax({
-            type : 'GET',
-            url : pageInfo.basePath + '/ScriptExecution/files',
-            data: {
-                sessionId : GLOBAL.HeimAnalyses.sessionId,
-                executionId : GLOBAL.HeimAnalyses.executionId
-            },
-            contentType: 'application/json',
-            complete: function(data) {
-                console.log('data', data);
-            }
-        });
+
     };
 
     service.runAnalysis = function (eventObj) {
-
         $j.ajax({
             type: 'POST',
             url: pageInfo.basePath + '/ScriptExecution/run',
@@ -160,6 +165,9 @@ HeatmapService = (function(){
                 var scriptExecObj = JSON.parse(data.responseText);
                 GLOBAL.HeimAnalyses.executionId = scriptExecObj.executionId;
                 console.log(GLOBAL.HeimAnalyses);
+                service.statusInterval =  setInterval(function () {
+                    service.checkStatus('runHeatmap');
+                }, 1000);
             }
         });
     };

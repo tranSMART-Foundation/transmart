@@ -67,11 +67,6 @@ class ScriptExecutionController {
     def downloadFile(DownloadCommand downloadCommand) {
         throwIfInvalid downloadCommand
 
-        sessionService.getFile(
-                downloadCommand.sessionId,
-                downloadCommand.executionId,
-                downloadCommand.filename)
-
         File selectedFile = sessionService.getFile(
                 downloadCommand.sessionId,
                 downloadCommand.executionId,
