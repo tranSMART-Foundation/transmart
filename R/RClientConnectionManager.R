@@ -223,8 +223,22 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     tryCatch(result <- .serverMessageExchange(apiCall, httpHeaderFields, ...), error = errorHandler)
     if(!exists("result")) { return(NULL) }
     if(is.numeric(onlyContent)) {
+        errmsg <- ''
+        if(result$JSON && 'error' %in% names(result$content)) {
+            errmsg <- paste(":", result$content['error'])
+            if('error_description' %in% names(result$content)) {
+                errmsg <- paste(errmsg, ": ", result$content['error_description'], sep='')
+            }
+        }
         if(!result$status %in% onlyContent) {
-            return(errorHandler(paste("HTTP return code", result$status, "not in c(", toString(onlyContent), ")")))
+            errmsg <- paste("HTTP return code", result$status, "not in c(", toString(onlyContent), ")")
+            if(result$JSON && 'error' %in% names(result$content)) {
+                errmsg <- paste(errmsg, ": ", result$content['error'], sep='')
+                if('error_description' %in% names(result$content)) {
+                    errmsg <- paste(errmsg, ": ", result$content['error_description'], sep='')
+                }
+            }
+            return(errorHandler(errmsg))
         }
         if(ensureJSON && !result$JSON) {
             return(errorHandler(paste("No JSON returned but", result$headers['Content-Type'])))

@@ -96,10 +96,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 # The argument is a single named list
 .expandConstraints <- function(constraints) {
     # The JSON encoder encodes single item vectors as scalars. We need those to be lists as well.
-    j <- function(val) if (length(val) == 0) list(val) else val
-    assert <- function(expr) {
-        
-    }
+    j <- function(val) if (length(val) == 1) list(val) else val
     
     # some deep functional/lazy magic
     mapply(function(val, con) switch(con,
@@ -108,16 +105,16 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         # Assay constraints
             'trial_name' = {
                 stopifnot(length(val) == 1)
-                list(name = j(as.character(val)))
+                list(name = as.character(val))
             },
             'patient_set' = {
                 stopifnot(is.integer(val))
                 stopifnot(length(val) == 1)
-                list(result_instance_id = j(val))
+                list(result_instance_id = val)
             },
             'ontology_term' = {
                 stopifnot(length(val) == 1)
-                list(concept_key = j(as.character(val)))
+                list(concept_key = as.character(val))
             },
             'assay_ids' = {
                 stopifnot(is.integer(val))
@@ -132,25 +129,31 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
             'chromosome_segment' = {
                 if(is.character(val)) {
                     stopifnot(length(val) == 1)
-                    list(chromosome = j(val))
+                    list(chromosome = val)
                 } else {
                     stopifnot(setequal(names(val), c("chromosome", "start", "end")))
                     stopifnot(is.character(val$chromosome))
-                    stopifnot(is.integer(val$start))
+                    stopifnot(is.numeric(val$start))
                     stopifnot(length(val$start) == 1)
-                    stopifnot(is.integer(val$end))
+                    stopifnot(is.numeric(val$end))
                     stopifnot(length(val$end) == 1)
-                    val
+                    list(chromosome = val$chromosome, start = as.integer(val$start), end = as.integer(val$end))
                 }
             },
-        
-            # Todo: 
-            #'genes' = {},
-            #'proteins' = {},
-            #'pathways' = {},
-            #'gene_signatures' = {},
+            'genes' = {
+                list(names = j(val))
+            },
+            'proteins' = {
+                list(names = j(val))
+            },
+            'pathways' = {
+                list(names = j(val))
+            },
+            'gene_signatures' = {
+                list(names = j(val))
+            },
             'snps' = {
-                list(names = j(as.character(arg))
+                list(names = j(as.character(val)))
             },
             
         # other constraints
@@ -182,8 +185,8 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     
     invalid <- names(rest)[!names(rest) %in% c(valid.assay.constraints, valid.data.constraints)]
     if (length(invalid)) {
-        stop(paste(invalid, collapse=' '), " is/are not recognized constraints for this data type. ",
-             "(Use 'assay.or' or 'data.or' instead of 'disjunction')")
+        stop(paste(invalid, collapse=' '), " is/are not recognized constraints for this data type. Valid constraints: ",
+             paste(unique(c(valid.assay.constraints, valid.data.constraints)), collapse=', '))
     }
     
     assay.constraints <- c(rest[names(rest) %in% valid.assay.constraints], assay.constraints)
