@@ -60,14 +60,11 @@ class smartRGrailsPlugin {
 
         File smartRDir = GrailsPluginUtils.getPluginDirForName('smart-r')?.file
         if (!smartRDir) {
-            String version = ctx.pluginManager.allPlugins.find {
-                it.name == 'smart-r'
-            }.version
-            smartRDir = new File(
-                    ctx.servletContext.getRealPath('/plugins/'),
-                    "smart-r-${version}")
-        } else {
-            smartRDir = new File(smartRDir, 'web-app')
+            String pluginPath = ctx.pluginManager.allPlugins.find {
+                it.name == 'smartR'
+            }.pluginPath
+
+            smartRDir = ctx.getResource(pluginPath).file
         }
         if (!smartRDir) {
             throw new RuntimeException('Could not determine directory for ' +
@@ -76,5 +73,6 @@ class smartRGrailsPlugin {
 
         config.smartR.pluginScriptDirectory =
                 new File(smartRDir.canonicalPath, 'HeimScripts')
+        log.info("Directory for heim scripts is ${config.smartR.pluginScriptDirectory}")
     }
 }
