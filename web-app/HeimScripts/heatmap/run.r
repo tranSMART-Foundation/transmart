@@ -1,11 +1,3 @@
-# mock data
-# ========
-df  <- data.frame(Row.Label= as.character(1:5) , Bio.marker=as.character(2:6), z=11:15, u=26:30)
-df2 <- data.frame(Row.Label= as.character(1:5) , Bio.marker=as.character(2:6), z=11:15, u=26:30)
-loaded_variables <- list("first one"=df, "second" = df2)
-# mock data
-# ========
-
 library(gplots)
 
 
@@ -16,7 +8,7 @@ labelColumns <- c("Row.Label","Bio.marker")
 #Input expected 1 or 2 dataframes with columns: Row.Label, Bio.marker, ASSAY_0001 ASSAY_0002 ...
 # In the prorotype we do not use biomarker yet
 main <- function(){
-  datasets <- parseInput(loaded_variables) #this will just make sure we have either 1 or 2 dataframes in a list
+  datasets <- parseInput(loaded_variables) #Hardcoded input parsing - only for the prototype
   measurements <- extractMeasurements(datasets) #extract the numeric part - as a numeric matrix is needed for the heatmap.2 function
   humanReadableNames <-extractNames(datasets)
   measurements <- assignNames(measurements,humanReadableNames) #combine label with Biomarker(if present) and assign as a name to be displayed on the heatmap
@@ -27,7 +19,12 @@ main <- function(){
 
 parseInput <- function(variables){
   onlyTwo <- variables[1:2]
+  onlyTwo[[1]] <- variables[[1]][1:50,]
   onlyTwo <- onlyTwo[!sapply(onlyTwo, is.null)]
+  if(length(onlyTwo) == 2){
+    onlyTwo[[2]] <- variables[[2]][1:50,]
+  }
+  return(onlyTwo)
 }
 
 extractGrouping <- function(datasets){
