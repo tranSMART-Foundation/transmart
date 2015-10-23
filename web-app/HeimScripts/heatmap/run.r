@@ -13,7 +13,7 @@ main <- function(){
   measurements <- extractMeasurements(datasets) #extract the numeric part - as a numeric matrix is needed for the heatmap.2 function
   humanReadableNames <-extractNames(datasets)
   measurements <- assignNames(measurements,humanReadableNames) #combine label with Biomarker(if present) and assign as a name to be displayed on the heatmap
-  measurements <- transform(measurements) #log2 transform the numerical matrix with measurements
+#  measurements <- transform(measurements) #log2 transform the numerical matrix with measurements
   grouping <- extractGrouping(datasets) #Grouping determines coloring of the samples - one color for dataset1 and a different one for dataset2
   makeHeatmap(measurements,grouping) # plot the heatmap and save it in the working directory as a .png file
 }

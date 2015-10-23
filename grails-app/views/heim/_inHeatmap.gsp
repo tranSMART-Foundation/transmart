@@ -5,13 +5,14 @@
 <div style="width: 98%">
 
     <p>
-        Start Heatmap analysis with load, preprocess options and then run analysis.
+        Start Heatmap analysis with load, preprocess options and then run analysis. Make sure that you run Summary
+        Statistic prior running the Heatmap.
     </p>
 
     <div id="heim-tabs" style="margin-top: 25px;">
 
         <ul>
-            <li><a href="#fragment-load"><span>Load</span></a></li>
+            <li><a href="#fragment-load"><span>Fetch</span></a></li>
             <li><a href="#fragment-preprocess"><span>Preprocess</span></a></li>
             <li><a href="#fragment-run"><span>Run</span></a></li>
         </ul>

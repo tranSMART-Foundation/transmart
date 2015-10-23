@@ -14,7 +14,7 @@ HeatmapService = (function(){
             conceptKey : params.conceptPath,
             dataType: 'mrna',
             resultInstanceId: params.resultInstanceId,
-            projection: 'default_real_projection',
+            projection: 'log_intensity',
             label: '_TEST_LABEL_'
         };
 
@@ -63,24 +63,31 @@ HeatmapService = (function(){
         console.log('Analysis Constraints', _args);
 
         $j.ajax({
-            type: 'POST',
             url: pageInfo.basePath + '/ScriptExecution/run',
+            type: 'POST',
+            timeout: '600000',
+            contentType: 'application/json',
             data: JSON.stringify({
                 sessionId : GLOBAL.HeimAnalyses.sessionId,
                 arguments : _args,
                 taskType : 'fetchData',
                 workflow : 'heatmap'
-            }),
-            contentType: 'application/json',
-            complete: function(data) {
-                var scriptExecObj = JSON.parse(data.responseText);
-                GLOBAL.HeimAnalyses.executionId = scriptExecObj.executionId;
-                console.log(GLOBAL.HeimAnalyses);
-                service.statusInterval =  setInterval(function () {
-                    service.checkStatus('fetchData');
-                }, 1000);
-            }
-        });
+            })
+        }).done(function (d) {
+            console.log(d);
+            //var scriptExecObj = JSON.parse(d.responseText);
+            GLOBAL.HeimAnalyses.executionId = d.executionId;
+            console.log(GLOBAL.HeimAnalyses);
+            service.statusInterval =  setInterval(function () {
+                service.checkStatus('fetchData');
+            }, 1000);
+        })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                console.log(textStatus);
+                console.log(errorThrown);
+                $j('#heim-fetch-data-output').html('<span style="color: red";>Error:'+ errorThrown +'</span>');
+            });
     };
 
     service.getIndentifierSuggestions = function (request, response) {
@@ -123,7 +130,8 @@ HeatmapService = (function(){
                     console.log('I am done with checking status', d);
                     if (task === 'fetchData') {
                         $j('#heim-fetch-data-output')
-                            .html('<p class="heim-fectch-success">Data is successfully fetched. Proceed with Run Heatmap</p>');
+                            .html('<p class="heim-fectch-success" style="color: green";> ' +
+                            'Data is successfully fetched. Proceed with Run Heatmap</p>');
                     } else if (task === 'runHeatmap') {
                         $j('#heim-run-output').hide();
                         $j('#heim-img-result')
@@ -135,12 +143,12 @@ HeatmapService = (function(){
                             + '&filename=heatmap.png');
                     }
                 }
-                $j('#heim-run-output')
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
-            console.log(textStatus);
-            console.log(errorThrown);
+                console.log(jqXHR);
+                console.log(textStatus);
+                console.log(errorThrown);
+                clearInterval(service.statusInterval);
         })
         .always(function () {
             console.log('checked!');
@@ -148,7 +156,7 @@ HeatmapService = (function(){
     };
 
     service.getResultFiles = function (eventObj) {
-
+        // NOTHING
     };
 
     service.runAnalysis = function (eventObj) {
