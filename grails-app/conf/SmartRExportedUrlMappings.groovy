@@ -1,4 +1,4 @@
-class ExportedUrlMappings {
+class SmartRExportedUrlMappings {
 
     static mappings = {
         "/$controller/$action?/$id?(.${format})?"{

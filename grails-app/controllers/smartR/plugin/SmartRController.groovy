@@ -24,7 +24,7 @@ class SmartRController {
         if (! params.script) {
             render 'Please select a script to execute.'
         } else {
-            render template: "/heim/in${FilenameUtils.getBaseName(params.script)}"
+            render template: "/heim/in${FilenameUtils.getBaseName(params.script).capitalize()}"
         }
     }
 

@@ -72,4 +72,13 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
 
         assertThat content, containsString(SAMPLE_DATA_TO_WRITE)
     }
+
+    void testRetrieveFileBadArguments() {
+        runSampleR()
+
+        // don't give any arguments
+        get '/ScriptExecution/downloadFile'
+
+        assertStatus 400
+    }
 }
