@@ -75,18 +75,17 @@ transform <- function(measurements){
 }
 
 makeHeatmap <- function(measurements,grouping){
-#  png(filename="heatmap.png", width = 800, height = 800)
-#  heatmap.2(measurements,
-#            scale = "none",
-#            dendrogram = "none",
-#            Rowv = NA,
-#            Colv = NA,
-#            density.info = "none",
-#            trace = "none",
-#            col=redgreen(75),
-#            margins=c(12,12),
-#            ColSideColors= as.character(grouping)
-#  )
-#  dev.off()
-42
+  png(filename="heatmap.png", width = 800, height = 800)
+  heatmap.2(measurements,
+            scale = "none",
+            dendrogram = "none",
+            Rowv = NA,
+            Colv = NA,
+            density.info = "none",
+            trace = "none",
+            col=redgreen(75),
+            margins=c(12,12),
+            ColSideColors= as.character(grouping)
+  )
+  dev.off()
 }
