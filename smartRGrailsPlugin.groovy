@@ -65,6 +65,8 @@ class smartRGrailsPlugin {
             }.pluginPath
 
             smartRDir = ctx.getResource(pluginPath).file
+        } else {
+            smartRDir = new File(smartRDir, 'web-app')
         }
         if (!smartRDir) {
             throw new RuntimeException('Could not determine directory for ' +
