@@ -31,16 +31,17 @@ HeimExtJSHelper = (function(){
         dtgI.notifyDrop = helper.dropOntoNodeSelection;
     };
 
+    helper.clear = function (el) {
+        var div = Ext.get(el.attr('id'));
+        //Clear the drag and drop div.
+        var qc = Ext.get(div);
+        for (var i = qc.dom.childNodes.length - 1; i >= 0; i--) {
+            var child = qc.dom.childNodes[i];
+            qc.dom.removeChild(child);
+        }
+    };
+
     var _fetchConceptPath = function (el) {
-        //var conceptId = el.getAttribute('conceptId').trim();
-        //var conceptIdPattern = /^\\\\[^\\]+(\\.*)$/;
-        //var match = conceptIdPattern.exec(conceptId);
-        //
-        //if (match != null) {
-        //    return match[1];
-        //} else {
-        //    return undefined;
-        //}
         return el.getAttribute('conceptId').trim();
     };
 

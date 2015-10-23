@@ -10,6 +10,7 @@ HeatmapView = (function(){
             conceptPathsInput : $j('#divIndependentVariable'),
             identifiersInput : $j('#heim-input-txt-identifiers'),
             actionBtn : $j('#heim-btn-fetch-data'),
+            clearBtn : $j('#heim-btn-clear'),
             checkStatusBtn : $j('#heim-btn-check'),
             getResultBtn : $j('#heim-btn-get-output'),
             outputArea : $j('#heim-fetch-data-output')
@@ -91,14 +92,17 @@ HeatmapView = (function(){
             source: heatmapService.getIndentifierSuggestions,
             minLength: 2
         });
-
+        view.fetchDataView.clearBtn.click(view.clearConceptPathInput);
+        //
         view.fetchDataView.checkStatusBtn.click(heatmapService.checkStatus);
-
-        view.fetchDataView.getResultBtn.click(heatmapService.getResultFiles);
-
         // TODO Run Analysis
         view.runHeatmapView.runAnalysisBtn.click (heatmapService.runAnalysis);
-        view.runHeatmapView.downloadFileBtn.click (heatmapService.getResultFiles);
+        view.runHeatmapView.downloadFileBtn.click (heatmapService.checkStatus);
+    };
+
+    view.clearConceptPathInput = function (eventObj) {
+        console.log('   clear ..')
+        extJSHelper.clear(view.fetchDataView.conceptPathsInput);
     };
 
     /**
