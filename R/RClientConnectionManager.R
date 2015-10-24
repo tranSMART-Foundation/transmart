@@ -207,7 +207,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             "If the server is not down, you've encountered a bug.\n",
             "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
             "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.")
-    stop(e)
+    stop(e, call.=FALSE)
 }
 
 .transmartGetJSON <- function(apiCall, ...) { .transmartServerGetRequest(apiCall, ensureJSON = TRUE, accept.type = "hal", ...) }

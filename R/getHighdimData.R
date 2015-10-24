@@ -95,7 +95,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 
 # The argument is a single named list
 .expandConstraints <- function(constraints) {
-    # The JSON encoder encodes single item vectors as scalars. We need those to be lists as well.
+    # The JSON encoder encodes single item vectors as scalars. We need those to be lists as well sometimes.
     j <- function(val) if (length(val) == 1) list(val) else val
     
     # some deep functional/lazy magic
@@ -133,6 +133,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
                 } else {
                     stopifnot(setequal(names(val), c("chromosome", "start", "end")))
                     stopifnot(is.character(val$chromosome))
+                    stopifnot(length(val$chromosome) == 1)
                     stopifnot(is.numeric(val$start))
                     stopifnot(length(val$start) == 1)
                     stopifnot(is.numeric(val$end))
