@@ -161,12 +161,12 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
             'assay.or' = {
                 ret <- .expandConstraints(val)
                 names(ret)[names(ret) %in% c('assay.or', 'data.or')] <- 'disjunction'
-                ret
+                list(subconstraints = ret)
             },
             'data.or' = {
                 ret <- .expandConstraints(val)
                 names(ret)[names(ret) %in% c('assay.or', 'data.or')] <- 'disjunction'
-                ret
+                list(subconstraints = ret)
             },
             stop("Unknown constraint type: ", con, "\n",
                  "Valid constraints are: snps, assay.or and data.or\n",
