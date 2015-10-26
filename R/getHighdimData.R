@@ -138,7 +138,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
                     stopifnot(length(val$start) == 1)
                     stopifnot(is.numeric(val$end))
                     stopifnot(length(val$end) == 1)
-                    list(chromosome = val$chromosome, start = as.integer(val$start), end = as.integer(val$end))
+                    val
                 }
             },
             'genes' = {
