@@ -42,7 +42,7 @@ getSignificanceValues <- function(valueMatrix, zScoreMatrix, colNum) {
     if (significanceMeassure == 'variance') {
         significanceValues <- apply(valueMatrix, 1, var)
     } else if (significanceMeassure == 'zScoreRange') {
-        significanceValues <- apply(zScoreMatrix, 1, function(zScores) { 
+        significanceValues <- apply(zScoreMatrix, 1, function(zScores) {
                 bxp <- boxplot.stats(zScores)
                 zScores.withoutOutliers <- zScores[zScores >= bxp$stats[2] & zScores <= bxp$stats[4]]
                 max(zScores.withoutOutliers) - min(zScores.withoutOutliers)
@@ -55,7 +55,7 @@ getSignificanceValues <- function(valueMatrix, zScoreMatrix, colNum) {
         classVectorS2 <- rev(classVectorS1)
         design <- cbind(S1=classVectorS1, S2=classVectorS2)
         contrast.matrix = makeContrasts(S1-S2, levels=design)
-        fit <- lmFit(valueMatrix, design)
+        fit <- lmFit(log2(valueMatrix), design)
         fit <- contrasts.fit(fit, contrast.matrix)
         fit <- eBayes(fit)
         contr = 1
@@ -88,10 +88,10 @@ fixString <- function(str) {
 buildFields <- function(HDD.value.matrix, HDD.zscore.matrix) {
     fields.value <- melt(HDD.value.matrix, id=c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE'))
     fields.zScore <- melt(HDD.zscore.matrix, id=c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE'))
-    
+
     fields <- fields.value
     fields <- cbind(fields, fields.zScore$value)
-    
+
     names(fields) <- c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE', 'PATIENTID', 'VALUE', 'ZSCORE')
     fields$PATIENTID <- as.numeric(sub("^X", "", levels(fields$PATIENTID)))[fields$PATIENTID]
     fields <- fields[order(fields$PROBE, fields$PATIENTID, decreasing=FALSE), ]
