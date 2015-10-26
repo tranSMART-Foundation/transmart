@@ -159,12 +159,12 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
             
         # other constraints
             'assay.or' = {
-                ret <- lapply(val, .expandConstraints)
+                ret <- .expandConstraints(val)
                 names(ret)[names(ret) %in% c('assay.or', 'data.or')] <- 'disjunction'
                 ret
             },
             'data.or' = {
-                ret <- lapply(val, .expandConstraints)
+                ret <- .expandConstraints(val)
                 names(ret)[names(ret) %in% c('assay.or', 'data.or')] <- 'disjunction'
                 ret
             },
