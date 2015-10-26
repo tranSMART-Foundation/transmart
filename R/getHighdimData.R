@@ -126,7 +126,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
                 stopifnot(is.integer(val))
                 list(keyword_ids = j(val))
             },
-            'chromosome_segment' = {
+            'chromosome' = {
                 if(is.character(val)) {
                     stopifnot(length(val) == 1)
                     list(chromosome = val)
@@ -166,35 +166,39 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
             'data.or' = {
                 ret <- .expandConstraints(val)
                 names(ret)[names(ret) %in% c('assay.or', 'data.or')] <- 'disjunction'
+                names(ret)[names(ret) == 'chromosome'] <- 'chromosome_segment'
                 list(subconstraints = ret)
             },
             stop("Unknown constraint type: ", con, "\n",
-                 "Valid constraints are: snps, assay.or and data.or\n",
-                 "Or use the assay.constraints and data.constraints parameters to specify raw constraints.",
                  call.=FALSE)
         ), constraints, names(constraints), SIMPLIFY=FALSE)
 }
 
 .makeConstraints <- function(assay.constraints=list(), data.constraints=list(), typeInfo=NULL, ...) {
-    rest <- .expandConstraints(list(...))
+    constraints = list(...)
     
     valid.assay.constraints <- typeInfo$supportedAssayConstraints
     valid.assay.constraints <- c(valid.assay.constraints[valid.assay.constraints != 'disjunction'], 'assay.or')
     
     valid.data.constraints <- typeInfo$supportedDataConstraints
     valid.data.constraints <- c(valid.data.constraints[valid.data.constraints != 'disjunction'], 'data.or')
+    valid.data.constraints[valid.data.constraints == 'chromosome_segment'] <- 'chromosome'
     
-    invalid <- names(rest)[!names(rest) %in% c(valid.assay.constraints, valid.data.constraints)]
+    invalid <- names(constraints)[!names(constraints) %in% c(valid.assay.constraints, valid.data.constraints)]
     if (length(invalid)) {
         stop(paste(invalid, collapse=' '), " is/are not recognized constraints for this data type. Valid constraints: ",
-             paste(unique(c(valid.assay.constraints, valid.data.constraints)), collapse=', '))
+             paste(unique(c(valid.assay.constraints, valid.data.constraints)), collapse=', '),
+             call. = FALSE)
     }
+
+    rest <- .expandConstraints(constraints)
     
     assay.constraints <- c(rest[names(rest) %in% valid.assay.constraints], assay.constraints)
     names(assay.constraints)[names(assay.constraints) == 'assay.or'] <- 'disjunction'
 
     data.constraints <- c(rest[names(rest) %in% valid.data.constraints], data.constraints)
     names(data.constraints)[names(data.constraints) == 'data.or'] <- 'disjunction'
+    names(data.constraints)[names(data.constraints) == 'chromosome'] <- 'chromosome_segmen'
     
     list(assay=assay.constraints, data=data.constraints)
 }
