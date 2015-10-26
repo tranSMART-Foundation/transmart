@@ -9,39 +9,67 @@ class ScriptExecutorService {
 
     def CONNECTION_LIFETIME = 120 * 1000 * 60 // milliseconds
     def MAX_CONNECTIONS = 10
+    def CONNECTION_ATTEMPTS = 3
 
     def rServeConnections = [:]
 
-    def getConnection(parameterMap) {
-        def cookieID = parameterMap['cookieID']
+    def testConnection(connection) {
         try {
-            // make sure that this is a _working_ connection
-            rServeConnections[cookieID].connection.assign("test1", "123")
-            rServeConnections[cookieID].connection.eval("test2 <- test1")
-            // renew lifetime
-            rServeConnections[cookieID].expiration = System.currentTimeMillis() + CONNECTION_LIFETIME
-            return rServeConnections[cookieID].connection
-        } catch (all) { 
-            // if we have a connection but it failed the assign test then it must be broken
-            if (rServeConnections[cookieID]) {
-                closeConnection(cookieID)
-            }
+            connection.assign("test1", "123")
+            connection.eval("test2 <- test1")
+            return true
+        } catch (all) {
+            return false
         }
-        
+    }
+
+    def openConnection(cookieID) {
+        def rServeHost = Holders.config.RModules.host
+        def rServePort = Holders.config.RModules.port
         try {
-            if (rServeConnections.size() == MAX_CONNECTIONS) {
-                closeOldesConnection()
-                assert rServeConnections.size() < MAX_CONNECTIONS
-            }
-            def rServeHost = Holders.config.RModules.host
-            def rServePort = Holders.config.RModules.port
             rServeConnections[cookieID] = [:]
             rServeConnections[cookieID].connection = new RConnection(rServeHost, rServePort)
             rServeConnections[cookieID].connection.stringEncoding = 'utf8'
             rServeConnections[cookieID].expiration = System.currentTimeMillis() + CONNECTION_LIFETIME
-            return rServeConnections[cookieID].connection
-        } catch (all) { }
+        } catch (all) {
+            return false
+        }
+        return true
+    }
 
+    def getConnection(parameterMap) {
+        def cookieID = parameterMap['cookieID']
+
+        if (rServeConnections[cookieID]) {
+            if (testConnection(rServeConnections[cookieID].connection)) {
+                // renew lifetime
+                rServeConnections[cookieID].expiration = System.currentTimeMillis() + CONNECTION_LIFETIME
+                return rServeConnections[cookieID].connection
+            }
+            // if we have a connection but it failed the assign test then it must be broken
+            closeConnection(cookieID)
+        }
+
+        def valid = false
+        // attempt to establish a working connection
+        for (def i = 0; i < CONNECTION_ATTEMPTS; i++) {
+            openConnection(cookieID)
+            if (testConnection(rServeConnections[cookieID].connection)) {
+                valid = true
+                break
+            }
+            closeConnection(cookieID)
+            sleep(5000)
+        }
+
+        while (rServeConnections.size() > MAX_CONNECTIONS) {
+            closeOldesConnection()
+        }
+        assert rServeConnections.size() <= MAX_CONNECTIONS
+
+        if (valid) {
+            return rServeConnections[cookieID].connection
+        }
         return null
     }
 
@@ -95,6 +123,7 @@ class ScriptExecutorService {
     }
 
     def computeResults(connection) {
+        // strsplit(gsub("([[:alnum:]]{5})", "\\1 ", s), " ")[[1]]
         def results = connection.eval("toString(toJSON(output, digits=5))").asString()
         return results
     }
@@ -107,17 +136,29 @@ class ScriptExecutorService {
             return [false, 'Rserve refused the connection! Is it running?']
         }
 
+        // this is a critical package as it is necessary to pipe errors back to the client
+        def ret = connection.parseAndEval("""
+            try(
+                if (! suppressMessages(require(jsonlite))) {
+                    stop('R Package jsonlite is missing. Please go to https://github.com/sherzinger/SmartR and read the installation instructions.')
+                }
+            , silent=TRUE)
+        """)
+        if (ret.inherits("try-error")) {
+            return [false, ret.asString()]
+        }
+
         // if first run start with a clear environment and send all data to our connection
         if (parameterMap['init']) {
             clearSession(connection)
             transferData(parameterMap, connection)
         }
-        
+
         // send settings to our connection
         buildSettings(parameterMap, connection)
 
         // evaluate analysis script
-        def ret = evaluateScript(parameterMap, connection)
+        ret = evaluateScript(parameterMap, connection)
         if (ret.inherits("try-error")) {
             return [false, ret.asString()]
         }
@@ -131,7 +172,7 @@ class ScriptExecutorService {
         if (rServeConnections[id]) {
             clearSession(rServeConnections[id].connection)
             rServeConnections[id].connection.close()
-            rServeConnections.remove(id)    
+            rServeConnections.remove(id)
         }
     }
 
@@ -147,7 +188,7 @@ class ScriptExecutorService {
         def oldestExpirationTime = Integer.MAX_VALUE
         rServeConnections.each { id, connection ->
             if (connection.expiration < oldestExpirationTime) {
-                oldestExpirationTime = connection.expiration 
+                oldestExpirationTime = connection.expiration
                 oldestConnectionID = id
             }
         }
