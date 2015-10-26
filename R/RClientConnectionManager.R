@@ -202,7 +202,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 }
 
 .requestErrorHandler <- function(e) {
-    message("Sorry, the R client was unable to carry out your request.",
+    message("Sorry, the R client was unable to carry out your request. ",
             "Please make sure that the transmart server is still running. \n\n",
             "If the server is not down, you've encountered a bug.\n",
             "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
@@ -231,7 +231,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             }
         }
         if(!result$status %in% onlyContent) {
-            errmsg <- paste("HTTP return code", result$status, "not in c(", toString(onlyContent), ")")
+            errmsg <- paste("HTTP", result$status, result$statusMessage, "(acceptable result codes:", toString(onlyContent), ")")
             if(result$JSON && 'error' %in% names(result$content)) {
                 errmsg <- paste(errmsg, ": ", result$content['error'], sep='')
                 if('error_description' %in% names(result$content)) {
@@ -262,6 +262,7 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
         if(is.null(result)) { return(NULL) }
         result$headers <- headers$value()
         result$status <- as.integer(result$headers['status'])
+        result$statusMessage <- result$headers['statusMessage']
         if(grepl("^application/json(;|\\W|$)", result$headers['Content-Type'])) {
             result$content <- fromJSON(result$content)
             result$JSON <- TRUE
@@ -284,6 +285,7 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
         progress$end()
         result$headers <- headers$value()
         result$status <- as.integer(result$headers['status'])
+        result$statusMessage <- result$headers['statusMessage']
         return(result)
     }
     return(NULL)
