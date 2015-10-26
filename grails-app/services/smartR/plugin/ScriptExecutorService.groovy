@@ -74,33 +74,31 @@ class ScriptExecutorService {
     }
 
     def clearSession(connection) {
-        connection.eval("rm(list=ls(all=TRUE))")
+        connection.voidEval("rm(list=ls(all=TRUE))")
     }
 
     def transferData(parameterMap, connection) {
-        // This should be the size for a string of 10MB
-        def STRING_PART_SIZE = 10 * 1024 * 1024 / 2
-
+        def GROOVY_CHUNK_SIZE = 10 * 1024 * 1024 / 2 // should be the size for a string of 10MB
         def dataString1 = parameterMap['data_cohort1'].toString()
         def dataString2 = parameterMap['data_cohort2'].toString()
 
-        def dataPackages1 = dataString1.split("(?<=\\G.{${STRING_PART_SIZE}})")
-        def dataPackages2 = dataString2.split("(?<=\\G.{${STRING_PART_SIZE}})")
+        def dataPackages1 = dataString1.split("(?<=\\G.{${GROOVY_CHUNK_SIZE}})")
+        def dataPackages2 = dataString2.split("(?<=\\G.{${GROOVY_CHUNK_SIZE}})")
 
         connection.assign("data_cohort1", '')
         connection.assign("data_cohort2", '')
 
         dataPackages1.each { chunk ->
             connection.assign("chunk", chunk)
-            connection.eval("data_cohort1 <- paste(data_cohort1, chunk, sep='')")
+            connection.voidEval("data_cohort1 <- paste(data_cohort1, chunk, sep='')")
         }
 
         dataPackages2.each { chunk ->
             connection.assign("chunk", chunk)
-            connection.eval("data_cohort2 <- paste(data_cohort2, chunk, sep='')")
+            connection.voidEval("data_cohort2 <- paste(data_cohort2, chunk, sep='')")
         }
 
-        connection.eval("""
+        connection.voidEval("""
             require(jsonlite)
             data.cohort1 <- fromJSON(data_cohort1)
             data.cohort2 <- fromJSON(data_cohort2)
@@ -109,7 +107,7 @@ class ScriptExecutorService {
 
     def buildSettings(parameterMap, connection) {
         connection.assign("settings", parameterMap['settings'].toString())
-        connection.eval("""
+        connection.voidEval("""
             require(jsonlite)
             settings <- fromJSON(settings)
             output <- list()
@@ -123,9 +121,23 @@ class ScriptExecutorService {
     }
 
     def computeResults(connection) {
-        // strsplit(gsub("([[:alnum:]]{5})", "\\1 ", s), " ")[[1]]
-        def results = connection.eval("toString(toJSON(output, digits=5))").asString()
-        return results
+        def R_CHUNK_SIZE = 200 // should be the size for a string of about 10MB
+        connection.voidEval("""
+            json <- toString(toJSON(output, digits=5))
+            start <- 1
+            stop <- ${R_CHUNK_SIZE}
+        """)
+        def json = ''
+        def chunk = ''
+        while(chunk = connection.eval("""
+            chunk <- substr(json, start, stop)
+            start <- stop + 1
+            stop <- stop + ${R_CHUNK_SIZE}
+            chunk
+        """).asString()) {
+            json += chunk
+        }
+        return json
     }
 
     def run(parameterMap) {
@@ -213,8 +225,8 @@ class ScriptExecutorService {
         }
         def killConnection = new RConnection(rServeHost, rServePort)
         def pid = connection.eval("Sys.getpid()").asInteger()
-        killConnection.eval("tools::pskill(${pid})")
-        killConnection.eval("tools::pskill(${pid}, tools::SIGKILL)")
+        killConnection.voidEval("tools::pskill(${pid})")
+        killConnection.voidEval("tools::pskill(${pid}, tools::SIGKILL)")
         killConnection.close()
     }
 }
