@@ -231,7 +231,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             }
         }
         if(!result$status %in% onlyContent) {
-            errmsg <- paste("HTTP", result$status, result$statusMessage, "(acceptable result codes:", toString(onlyContent), ")")
+            errmsg <- paste("HTTP", result$status, result$statusMessage, "(expected result code(s):", toString(onlyContent), ")")
             if(result$JSON && 'error' %in% names(result$content)) {
                 errmsg <- paste(errmsg, ": ", result$content['error'], sep='')
                 if('error_description' %in% names(result$content)) {

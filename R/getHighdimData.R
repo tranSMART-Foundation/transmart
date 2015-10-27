@@ -93,6 +93,28 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     return(.parseHighdimData(serverResult, progress = progress.parse))
 }
 
+# The mapping from nams we use to names the rest api uses
+.constraints.map <- list(
+    trial.name = 'trial_name',
+    patient.set = 'patient_set',
+    ontology.term = 'ontology_term',
+    assay.ids = 'assay_ids',
+    search.keyword = 'search_keyword',
+    chromosome = 'chromosome_segment',
+    genes = 'genes',
+    proteins = 'proteins',
+    pathways = 'pathways',
+    gene.signatures = 'gene_signatures',
+    snps = 'snps',
+    assay.or = 'disjunction',
+    data.or = 'disjunction'
+)
+
+.translateConstraintNames <- function(constraints) {
+    names(constraints) = sapply(names(constraints), function(name) .constraints.map[[name]])
+    constraints
+}
+
 # The argument is a single named list
 .expandConstraints <- function(constraints) {
     # The JSON encoder encodes single item vectors as scalars. We need those to be lists as well sometimes.
@@ -103,27 +125,27 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         # Add an entry here for every constraint for which we provide a friendly interface
         
         # Assay constraints
-            'trial_name' = {
+            'trial.name' = {
                 stopifnot(length(val) == 1)
                 list(name = as.character(val))
             },
-            'patient_set' = {
-                stopifnot(is.integer(val))
+            'patient.set' = {
+                stopifnot(is.numeric(val))
                 stopifnot(length(val) == 1)
                 list(result_instance_id = val)
             },
-            'ontology_term' = {
+            'ontology.term' = {
                 stopifnot(length(val) == 1)
                 list(concept_key = as.character(val))
             },
-            'assay_ids' = {
-                stopifnot(is.integer(val))
+            'assay.ids' = {
+                stopifnot(is.numeric(val))
                 list(ids = j(val))
             },
 
         # Data constraints
-            'search_keywords' = {
-                stopifnot(is.integer(val))
+            'search.keywords' = {
+                stopifnot(is.numeric(val))
                 list(keyword_ids = j(val))
             },
             'chromosome' = {
@@ -142,16 +164,16 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
                 }
             },
             'genes' = {
-                list(names = j(val))
+                list(names = j(as.character(val)))
             },
             'proteins' = {
-                list(names = j(val))
+                list(names = j(as.character(val)))
             },
             'pathways' = {
-                list(names = j(val))
+                list(names = j(as.character(val)))
             },
-            'gene_signatures' = {
-                list(names = j(val))
+            'gene.signatures' = {
+                list(names = j(as.character(val)))
             },
             'snps' = {
                 list(names = j(as.character(val)))
@@ -159,15 +181,10 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
             
         # other constraints
             'assay.or' = {
-                ret <- .expandConstraints(val)
-                names(ret)[names(ret) %in% c('assay.or', 'data.or')] <- 'disjunction'
-                list(subconstraints = ret)
+                list(subconstraints = .translateConstraintNames(.expandConstraints(val)))
             },
             'data.or' = {
-                ret <- .expandConstraints(val)
-                names(ret)[names(ret) %in% c('assay.or', 'data.or')] <- 'disjunction'
-                names(ret)[names(ret) == 'chromosome'] <- 'chromosome_segment'
-                list(subconstraints = ret)
+                list(subconstraints = .translateConstraintNames(.expandConstraints(val)))
             },
             stop("Unknown constraint type: ", con, "\n",
                  call.=FALSE)
@@ -177,28 +194,23 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 .makeConstraints <- function(assay.constraints=list(), data.constraints=list(), typeInfo=NULL, ...) {
     constraints = list(...)
     
-    valid.assay.constraints <- typeInfo$supportedAssayConstraints
-    valid.assay.constraints <- c(valid.assay.constraints[valid.assay.constraints != 'disjunction'], 'assay.or')
+    valid.assay.constraints <- names(.constraints.map[.constraints.map %in% typeInfo$supportedAssayConstraints])
+    valid.assay.constraints <- valid.assay.constraints[valid.assay.constraints != 'data.or']
     
-    valid.data.constraints <- typeInfo$supportedDataConstraints
-    valid.data.constraints <- c(valid.data.constraints[valid.data.constraints != 'disjunction'], 'data.or')
-    valid.data.constraints[valid.data.constraints == 'chromosome_segment'] <- 'chromosome'
+    valid.data.constraints <- names(.constraints.map[.constraints.map %in% typeInfo$supportedDataConstraints])
+    valid.data.constraints <- valid.data.constraints[valid.data.constraints != 'assay.or']
     
     invalid <- names(constraints)[!names(constraints) %in% c(valid.assay.constraints, valid.data.constraints)]
     if (length(invalid)) {
         stop(paste(invalid, collapse=' '), " is/are not recognized constraints for this data type. Valid constraints: ",
-             paste(unique(c(valid.assay.constraints, valid.data.constraints)), collapse=', '),
+             paste(unique(c(valid.data.constraints, valid.assay.constraints)), collapse=', '),
              call. = FALSE)
     }
 
     rest <- .expandConstraints(constraints)
     
-    assay.constraints <- c(rest[names(rest) %in% valid.assay.constraints], assay.constraints)
-    names(assay.constraints)[names(assay.constraints) == 'assay.or'] <- 'disjunction'
-
-    data.constraints <- c(rest[names(rest) %in% valid.data.constraints], data.constraints)
-    names(data.constraints)[names(data.constraints) == 'data.or'] <- 'disjunction'
-    names(data.constraints)[names(data.constraints) == 'chromosome'] <- 'chromosome_segmen'
+    assay.constraints <- c(.translateConstraintNames(rest[names(rest) %in% valid.assay.constraints]), assay.constraints)
+    data.constraints <- c(.translateConstraintNames(rest[names(rest) %in% valid.data.constraints]), data.constraints)
     
     list(assay=assay.constraints, data=data.constraints)
 }
