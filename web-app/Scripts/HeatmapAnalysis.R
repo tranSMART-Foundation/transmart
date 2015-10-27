@@ -40,7 +40,7 @@ getZScoreMatrix <- function(valueMatrix) {
 
 getSignificanceValues <- function(valueMatrix, zScoreMatrix, colNum) {
     if (significanceMeassure == 'variance') {
-        significanceValues <- apply(valueMatrix, 1, var)
+        significanceValues <- apply(log2(valueMatrix), 1, var)
     } else if (significanceMeassure == 'zScoreRange') {
         significanceValues <- apply(zScoreMatrix, 1, function(zScores) {
                 bxp <- boxplot.stats(zScores)
