@@ -293,7 +293,7 @@ function(rawVector, .to.data.frame.converter=.as.data.frame.fast, progress=.make
     progress$start(totalsize)
     callback <- progress$update
 
-    labelToBioMarker <- hash() #biomarker info is optional, but should not be omitted, as it is also part of the data
+    labelToBioMarker <- hash()  # biomarker info is optional, but should not be omitted, as it is also part of the data
 
     while (!is.null(message <- dataChopper$getNextMessage())) {
         row <- read(highdim.Row, message)
@@ -344,18 +344,17 @@ function(rawVector, .to.data.frame.converter=.as.data.frame.fast, progress=.make
 
 .make.progresscallback.parse <- function() {
     pb <- NULL
-    lst <- list()
-    lst$start <- function(total) {
+    start <- function(total) {
         pb <<- txtProgressBar(min = 0, max = total, style = 3)
     }
-    lst$update <- function(current, .total) {
+    update <- function(current, .total) {
         setTxtProgressBar(pb, current)
     }
-    lst$end <- function() {
+    end <- function() {
         close(pb)
     }
 
-    lst
+    environment()
 }
 
 .messageChopper <- function(rawVector, endOfLastMessage = 0) {
@@ -386,7 +385,7 @@ function(rawVector, .to.data.frame.converter=.as.data.frame.fast, progress=.make
 
     getRawVectorIndex <- function() { return(endOfLastMessage) }
 
-    return(list(getNextMessage = getNextMessage, getRawVectorIndex = getRawVectorIndex))
+    environment()
 }
 
 
@@ -399,17 +398,15 @@ function(rawVector, .to.data.frame.converter=.as.data.frame.fast, progress=.make
     names <- character(capacity)
     length <- 0
 
-    methods <- list()
-
-    methods$double.size <- function() {
+    double.size <- function() {
         buffer <<- c(buffer, vector('list', capacity))
         names <<- c(names, character(capacity))
         capacity <<- capacity * 2
     }
 
-    methods$add <- function(name, val) {
+    add <- function(name, val) {
         if(length == capacity) {
-            methods$double.size()
+            double.size()
         }
 
         length <<- length + 1
@@ -417,13 +414,13 @@ function(rawVector, .to.data.frame.converter=.as.data.frame.fast, progress=.make
         names[length] <<- name
     }
 
-    methods$as.list <- function() {
+    as.list <- function() {
         b <- buffer[0:length]
         names(b) <- names[0:length]
         return(b)
     }
 
-    methods
+    environment()
 }
 
 

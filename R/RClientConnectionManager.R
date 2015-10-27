@@ -38,7 +38,7 @@ function (transmartDomain, use.authentication = TRUE, token = NULL, .access.toke
 
     if(.checkTransmartConnection()) {
         message("Connection active")
-        return(TRUE)
+        return(invisible(TRUE))
     }
 
     if (use.authentication && !exists("access_token", envir = transmartClientEnv)) {
@@ -52,7 +52,7 @@ function (transmartDomain, use.authentication = TRUE, token = NULL, .access.toke
         stop("Connection unsuccessful. Type: ?connectToTransmart for help.")
     } else {
         message("Connection successful.")
-        return(TRUE)
+        return(invisible(TRUE))
     }
 }
 
@@ -292,14 +292,13 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
 }
 
 .make.progresscallback.download <- function() {
-    lst <- list()
-    lst$start <- function(.total) cat("Retrieving data: \n")
-    lst$update <- function(current, .total) {
+    start <- function(.total) cat("Retrieving data: \n")
+    update <- function(current, .total) {
         # This trick unfortunately doesn't work in RStudio if we write to stderr.
-        cat(paste("\r", format(current / (1024*1024), digits=3, nsmall=3), "MiB downloaded."))
+        cat(paste("\r", format(current / 1000000, digits=3, nsmall=3), "MB downloaded."))
     }
-    lst$end <- function() cat("\nDownload complete.\n")
-    return(lst)
+    end <- function() cat("\nDownload complete.\n")
+    environment()
 }
 
 
