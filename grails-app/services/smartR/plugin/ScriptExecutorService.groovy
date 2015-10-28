@@ -121,7 +121,7 @@ class ScriptExecutorService {
     }
 
     def computeResults(connection) {
-        def R_CHUNK_SIZE = 200 // should be the size for a string of about 10MB
+        def R_CHUNK_SIZE = 10 * 1024 * 1024 // should be the size for a string of about 10MB
         connection.voidEval("""
             json <- toString(toJSON(output, digits=5))
             start <- 1
