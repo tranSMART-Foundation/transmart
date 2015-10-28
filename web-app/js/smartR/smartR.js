@@ -34,7 +34,7 @@ function createD3Button(args) {
         .duration(300)
         .style('fill', '#ffffff');
     })
-    .on('click', function() { args.callback(); }); 
+    .on('click', function() { args.callback(); });
 
     var text = button.append('text')
     .attr('x', args.x + args.width / 2)
@@ -85,7 +85,7 @@ function createD3Switch(args) {
             checked = true;
         }
         text.text(checked ? args.onlabel : args.offlabel);
-        args.callback(checked); 
+        args.callback(checked);
     });
 
     var text = switcher.append('text')
@@ -186,7 +186,7 @@ function createD3Dropdown(args) {
         if (hovered) {
             return;
         }
-        dropdown.selectAll('.itemBox')        
+        dropdown.selectAll('.itemBox')
         .transition()
         .duration(300)
         .style('visibility', 'visible')
@@ -220,12 +220,12 @@ function createD3Dropdown(args) {
         hovered = false;
         setTimeout(function() {
             if (! hovered && ! itemHovered) {
-                shrink();  
+                shrink();
             }
         }, 50);
         setTimeout(function() { // first check is not enough if animation interrupts it
             if (! hovered && ! itemHovered) {
-                shrink();  
+                shrink();
             }
         }, 350);
     });
@@ -501,7 +501,7 @@ function createQueryCriteriaDIV(conceptid, normalunits, setvaluemode, setvalueop
 *   @param {boolean} reCompute: should the current visualization be recomputed after updating the cohorts? (for large db queries it is faster to just handle the update within the visualization itself)
 */
 function setCohorts(constrains, andConcat, negate, reCompute, subset) {
-    if (typeof appendItemFromConceptInto !== "function") { 
+    if (typeof appendItemFromConceptInto !== "function") {
         alert('This functionality is not available in the tranSMART version you use.');
         return;
     }
@@ -568,8 +568,8 @@ var smartRPanel = new Ext.Panel({
         render: function(panel) {
             panel.body.on('click', function() {
                 if (typeof updateOnView === "function") {
-                    updateOnView();  
-                } 
+                    updateOnView();
+                }
             });
         }
     }
@@ -630,7 +630,7 @@ function registerConceptBox(name, cohorts, type, min, max) {
     var check1 = type === undefined || containsOnly(name, type);
     var check2 = min === undefined || concepts.length >= min;
     var check3 = max === undefined || concepts.length <= max;
-    sanityCheckErrors.push( 
+    sanityCheckErrors.push(
         !check1 ? 'Concept box (' + name + ') contains concepts with invalid type! Valid type: ' + type :
         !check2 ? 'Concept box (' + name + ') contains too few concepts! Valid range: ' + min + ' - ' + max :
         !check3 ? 'Concept box (' + name + ') contains too many concepts! Valid range: ' + min + ' - ' + max : '');
@@ -723,7 +723,7 @@ function runRScript() {
     if (! sane()) {
         return;
     }
-    
+
     // if no subset IDs exist compute them
     if(!(isSubsetEmpty(1) || GLOBAL.CurrentSubsetIDs[1]) || !( isSubsetEmpty(2) || GLOBAL.CurrentSubsetIDs[2])) {
         runAllQueries(runRScript);
@@ -773,10 +773,10 @@ function changeInputDIV() {
 }
 
 function contact() {
-    var version = 0.1;
-    alert("Before reporting a bug...\n" + 
+    var version = 0.2;
+    alert("Before reporting a bug...\n" +
         "... 1. Make sure you use the lastet SmartR version (installed version: " + version + ")\n" +
-        "... 2. Make sure that all requirements for using SmartR are met\n" + 
+        "... 2. Make sure that all requirements for using SmartR are met\n" +
         "All relevant information can be found on https://github.com/sherzinger/SmartR\n\n" +
         "If you still want to report a bug you MUST include these information:\n\n>>>" + navigator.userAgent + " SmartR/" + version + "<<<\n\nBug reports -> http://usersupport.etriks.org/\nFeedback -> sascha.herzinger@uni.lu");
 }
