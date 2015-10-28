@@ -194,7 +194,7 @@
         odd([[0, 0, 1], [1, 1, 0], [1, 0, 0]])
     ];
 
-    var featureColorSetBinary = ['rgb(0, 0, 0)', 'rgb(13, 13, 191)'];
+    var featureColorSetBinary = ['#FFFF00', '#FF8000'];
     var featureColorSetSequential = ['rgb(247,252,253)','rgb(224,236,244)','rgb(191,211,230)','rgb(158,188,218)','rgb(140,150,198)','rgb(140,107,177)','rgb(136,65,157)','rgb(129,15,124)','rgb(77,0,75)'];
 
     var gridFieldWidth = 40;
@@ -845,7 +845,7 @@
             d3.selectAll('.extraSquare.feature-' + feature)
             .style("fill", function(d) {
                 if (d.TYPE === 'binary') {
-                    return featureColorSetBinary[d.VALUE];
+                    return featureColorSetBinary[d.VALUE - 1];
                 } else if (d.TYPE === 'numerical') {
                     colorScale
                     .range(featureColorSetSequential);
