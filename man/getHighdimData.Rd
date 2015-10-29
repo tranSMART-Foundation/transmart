@@ -21,9 +21,13 @@ getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection
                 search.keywords = NULL,
                 chromosome = NULL,
                 genes = NULL,
+                gene.ids = NULL,
                 proteins = NULL,
+                protein.ids = NULL,
                 pathways = NULL,
+                pathway.ids = NULL,
                 gene.signatures = NULL,
+                gene.signature.ids = NULL,
                 snps = NULL,
                 assay.or = NULL,
                 data.or = NULL)
@@ -66,10 +70,14 @@ Assay constraints:
 Data constraints:
 
   \item{chromosome}{Either the name of a chromosome, or a named list containing names \code{chromosome}, \code{start} and \code{end}. \code{chromosome} should be a single character vector with the chromosome name, \code{start} and \code{end} are single numbers indicating the region of the chromosome you want to select.}
-  \item{genes}{A character vector of gene identifiers.}
-  \item{proteins}{A character vector of proteine identifiers.}
-  \item{pathways}{A character vector of pathway identifiers.}
-  \item{gene.signatures}{A character vector of gene signatures.}
+  \item{genes}{A character vector of gene names.}
+  \item{gene.ids}{A character vector of NCBI gene accessions.}
+  \item{proteins}{A character vector of protein names.}
+  \item{protein.ids}{A character vector of UniProt ids.}
+  \item{pathways}{A character vector of pathway names.}
+  \item{pathway.ids}{A character vector of pathway names in the form \code{<database>:<db specific id>}.}
+  \item{gene.signatures}{A character vector of gene signature names.}
+  \item{gene.signature.ids}{A character vector of gene signature ids.}
   \item{snps}{A character vector of SNPs to select.}
   \item{data.or}{Similar to \code{assay.or}. A named list containing multiple of the above data constraints. The returned data will match at least one of those constraints.}
 
