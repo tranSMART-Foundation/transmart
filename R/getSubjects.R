@@ -24,7 +24,7 @@
 getSubjects <- function(study.name, as.data.frame = TRUE) {
     .ensureTransmartConnection()
 
-    serverResult <- .transmartServerGetRequest( paste("/studies/", study.name,"/subjects", sep=""), accept.type = "hal")
+    serverResult <- .transmartGetJSON(paste("/studies/", study.name,"/subjects", sep=""))
     listOfSubjects <- serverResult$subjects
 
     subjectIDs <- sapply(listOfSubjects, FUN = function(x) { x[["id"]] })

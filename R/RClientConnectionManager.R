@@ -22,7 +22,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 connectToTransmart <- 
-function (transmartDomain, use.authentication = TRUE, token = NULL, ...) {
+function (transmartDomain, use.authentication = TRUE, token = NULL, .access.token = NULL, ...) {
     if (!exists("transmartClientEnv") || transmartClientEnv$transmartDomain != transmartDomain) { 
         assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
     }
@@ -32,10 +32,13 @@ function (transmartDomain, use.authentication = TRUE, token = NULL, ...) {
     if (!is.null(token)) {
         transmartClientEnv$refresh_token <- token
     }
+    if (!is.null(.access.token)) {
+        transmartClientEnv$access_token <- .access.token
+    }
 
     if(.checkTransmartConnection()) {
         message("Connection active")
-        return(TRUE)
+        return(invisible(TRUE))
     }
 
     if (use.authentication && !exists("access_token", envir = transmartClientEnv)) {
@@ -49,7 +52,7 @@ function (transmartDomain, use.authentication = TRUE, token = NULL, ...) {
         stop("Connection unsuccessful. Type: ?connectToTransmart for help.")
     } else {
         message("Connection successful.")
-        return(TRUE)
+        return(invisible(TRUE))
     }
 }
 
@@ -127,12 +130,11 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     oauthResponse <- .transmartServerGetOauthRequest(refreshPath, "Refreshing access")
     if (is.null(oauthResponse)) return(FALSE)
     if (!'access_token' %in% names(oauthResponse$content)) {
-        cat("Refreshing access failed, server response did not contain access_token. HTTP", statusString, "\n")
+        message("Refreshing access failed, server response did not contain access_token. HTTP", statusString)
         return(FALSE)
     }
     list2env(oauthResponse$content, envir = transmartClientEnv)
     transmartClientEnv$access_token.timestamp <- Sys.time()
-    cat("Authentication completed\n")
     return(TRUE)
 }
 
@@ -199,17 +201,19 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     }
 }
 
-.requestErrorHandler <- function(e) {
-    message("Sorry, the R client was unable to carry out your request.",
+.requestErrorHandler <- function(e, result=NULL) {
+    message("Sorry, the R client was unable to carry out your request. ",
             "Please make sure that the transmart server is still running. \n\n",
             "If the server is not down, you've encountered a bug.\n",
             "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
             "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.")
-    stop(e)
+    stop(e, call.=FALSE)
 }
 
-.transmartGetJSON <- function(...) { return(.transmartServerGetRequest(ensureJSON = TRUE)) }
+.transmartGetJSON <- function(apiCall, ...) { .transmartServerGetRequest(apiCall, ensureJSON = TRUE, accept.type = "hal", ...) }
 
+# If you just want a result, use the default parameters. If you want to do your own error handling, call with
+# onlyContent = NULL, this will return a list with data, headers and status code.
 .transmartServerGetRequest <- function(apiCall, errorHandler = .requestErrorHandler, onlyContent = c(200),
         ensureJSON = FALSE, ...)  {
     if (exists("access_token", envir = transmartClientEnv)) {
@@ -219,15 +223,42 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     tryCatch(result <- .serverMessageExchange(apiCall, httpHeaderFields, ...), error = errorHandler)
     if(!exists("result")) { return(NULL) }
     if(is.numeric(onlyContent)) {
+        errmsg <- ''
+        if(result$JSON && 'error' %in% names(result$content)) {
+            errmsg <- paste(":", result$content['error'])
+            if('error_description' %in% names(result$content)) {
+                errmsg <- paste(errmsg, ": ", result$content['error_description'], sep='')
+            }
+        }
         if(!result$status %in% onlyContent) {
-            return(errorHandler(paste("HTTP return code", result$status, "not in c(", toString(onlyContent), ")")))
+            errmsg <- paste("HTTP", result$status, result$statusMessage, "(expected result code(s):", toString(onlyContent), ")")
+            if(result$JSON && 'error' %in% names(result$content)) {
+                errmsg <- paste(errmsg, ": ", result$content['error'], sep='')
+                if('error_description' %in% names(result$content)) {
+                    errmsg <- paste(errmsg, ": ", result$content['error_description'], sep='')
+                }
+            }
+            return(errorHandler(errmsg, result))
         }
         if(ensureJSON && !result$JSON) {
-            return(errorHandler(paste("No JSON returned but", result$headers['Content-Type'])))
+            return(errorHandler(paste("No JSON returned but", result$headers['Content-Type']), result))
         }
         return(result$content)
     }
     result
+}
+
+.contentType <- function(header) {
+    if(grepl("^application/json(;|\\W|$)", header)) {
+        return('json')
+    }
+    if(grepl("^application/hal\\+json(;|\\W|$)", header)) {
+        return('hal')
+    }
+    if(grepl("^text/html(;|\\W|$)", header)) {
+        return('html')
+    }
+    return('unknown')
 }
 
 .serverMessageExchange <- 
@@ -244,14 +275,16 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
         if(is.null(result)) { return(NULL) }
         result$headers <- headers$value()
         result$status <- as.integer(result$headers['status'])
-        if(grepl("^application/json(;|\\W|$)", result$headers['Content-Type'])) {
-            result$content <- fromJSON(result$content, asText = TRUE, nullValue = NA)
-            result$JSON <- TRUE
-        }
-        if(grepl("^application/hal\\+json(;|\\W|$)", result$headers['Content-Type'])) {
-            result$content <- .simplifyHalList(fromJSON(result$content, asText = TRUE, nullValue = NA))
-            result$JSON <- TRUE
-        }
+        result$statusMessage <- result$headers['statusMessage']
+        switch(.contentType(result$headers['Content-Type']),
+               json = {
+                   result$content <- fromJSON(result$content)
+                   result$JSON <- TRUE
+               },
+               hal = {
+                   result$content <- .simplifyHalList(fromJSON(result$content))
+                   result$JSON <- TRUE
+               })
         return(result)
     } else if (accept.type == "binary") {
         progress$start(NA_integer_)
@@ -266,20 +299,23 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
         progress$end()
         result$headers <- headers$value()
         result$status <- as.integer(result$headers['status'])
+        result$statusMessage <- result$headers['statusMessage']
+        if (getOption("verbose") && .contentType(result$headers['Content-Type']) %in% c('json', 'hal', 'html')) {
+            message("Server response:\n", result$content, "\n")
+        }
         return(result)
     }
     return(NULL)
 }
 
 .make.progresscallback.download <- function() {
-    lst <- list()
-    lst$start <- function(.total) cat("Retrieving data: \n")
-    lst$update <- function(current, .total) {
+    start <- function(.total) cat("Retrieving data: \n")
+    update <- function(current, .total) {
         # This trick unfortunately doesn't work in RStudio if we write to stderr.
-        cat(paste("\r", format(current / (1024*1024), digits=3, nsmall=3), "MiB downloaded."))
+        cat(paste("\r", format(current / 1000000, digits=3, nsmall=3), "MB downloaded."))
     }
-    lst$end <- function() cat("\nDownload complete.\n")
-    return(lst)
+    end <- function() cat("\nDownload complete.\n")
+    environment()
 }
 
 

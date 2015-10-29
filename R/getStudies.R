@@ -24,7 +24,7 @@
 getStudies <- function(name.match = "", as.data.frame = TRUE, cull.columns = TRUE) {
     .ensureTransmartConnection()
 
-    serverResult <- .transmartServerGetRequest("/studies", accept.type = "hal")
+    serverResult <- .transmartGetJSON("/studies")
     listOfStudies <- serverResult$studies
     
     n <- length(listOfStudies)
