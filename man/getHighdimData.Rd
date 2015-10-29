@@ -70,7 +70,7 @@ Assay constraints:
 Data constraints:
 
   \item{chromosome}{Either the name of a chromosome, or a named list containing names \code{chromosome}, \code{start} and \code{end}. \code{chromosome} should be a single character vector with the chromosome name, \code{start} and \code{end} are single numbers indicating the region of the chromosome you want to select.}
-  \item{genes}{A character vector of gene names.}
+  \item{genes}{A character vector of gene symbols.}
   \item{gene.ids}{A character vector of NCBI gene accessions.}
   \item{proteins}{A character vector of protein names.}
   \item{protein.ids}{A character vector of UniProt ids.}
