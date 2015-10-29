@@ -74,7 +74,9 @@ class ScriptExecutorService {
     }
 
     def clearSession(connection) {
-        connection.voidEval("rm(list=ls(all=TRUE))")
+        try {
+            connection.voidEval("rm(list=ls(all=TRUE))")
+        } catch (all) { }
     }
 
     def transferData(parameterMap, connection) {
@@ -219,10 +221,6 @@ class ScriptExecutorService {
     def forceKill(connection) {
         def rServeHost = Holders.config.RModules.host
         def rServePort = Holders.config.RModules.port
-        if (parameterMap['DEBUG']) {
-            // Rserve has a different behaviour when used with MS Windows. This is for dev. only
-            rServePort.toInteger() + rServeConnections.size()
-        }
         def killConnection = new RConnection(rServeHost, rServePort)
         def pid = connection.eval("Sys.getpid()").asInteger()
         killConnection.voidEval("tools::pskill(${pid})")
