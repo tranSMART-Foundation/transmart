@@ -1,4 +1,11 @@
 CHANGELOG
 
+Version 0.2
+- Fix: Session management should be more stable now
+- Fix: Large datasets should not cause SmartR to crash anymore
+- Fix: Heatmap - switched red and green color
+- Fix: Heatmap - use log2 values instead of raw values for ranking
+- Fix: Heatmap - improved contrast
+
 Version 0.1
 - Introduced versioning. No changelog available behind this point.

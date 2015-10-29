@@ -5,7 +5,7 @@
 
 ---
 *SmartR is still under development and requires BETA testers in order to further improve.
-There is no warranty of any kind that it works as intended. 
+There is no warranty of any kind that it works as intended.
 Keep it mind that making use of this software is at your own risk!*
 
 **Please report bugs and issues here: [Issues](http://usersupport.etriks.org)**
@@ -16,7 +16,7 @@ Keep it mind that making use of this software is at your own risk!*
 Please have a look at these [Youtube videos](https://www.youtube.com/channel/UCKUbu0z3CQfi6RcFermONSw).
 
 ####Version & Changelog
-Current version: 0.1
+Current version: 0.2
 
 ![Changelog](https://github.com/sherzinger/SmartR/blob/master/CHANGELOG)
 
@@ -25,10 +25,10 @@ Current version: 0.1
 ```javascript
 grails.plugin.location.smartR = '/path/to/smartR'
 ```
-2 - Add this to transmartApp/web-app/js/datasetExplorer/datasetExplorer.js: 
+2 - Add this to transmartApp/web-app/js/datasetExplorer/datasetExplorer.js:
 ```javascript
   loadPlugin('smartR', "/SmartR/loadScripts", function () {
-    resultsTabPanel.add(smartRPanel); 
+    resultsTabPanel.add(smartRPanel);
   })
 ```
 3 - Run "grails war" to compile a WAR file containing SmartR
@@ -37,14 +37,14 @@ grails.plugin.location.smartR = '/path/to/smartR'
 - tranSMART 1.2.4 & 1.2.5 (Feature "cohort updating" not available)
 - tranSMART 1.3 (full support)
 - tranSMART eTRIKS/research branch (full support)
-- R packages: 
+- R packages:
   - [jsonlite](https://cran.r-project.org/web/packages/jsonlite/index.html)
   - [reshape2](https://cran.r-project.org/web/packages/reshape2/index.html)
   - [limma](http://bioconductor.org/packages/release/bioc/html/limma.html)
   - [zoo](https://cran.r-project.org/web/packages/zoo/index.html)
   - [TSclust](https://cran.r-project.org/web/packages/TSclust/index.html)
 
-####Known Issues: 
+####Known Issues:
 - none
 
 ####Supported Browsers:
@@ -52,7 +52,7 @@ grails.plugin.location.smartR = '/path/to/smartR'
 - Chrome (fully supported)
 - Internet Explorer (mostly supported)
 - Safari (unsupported at this moment)
- 
+
 ####How to deploy your own visualization:
 1. [Add an input view to specify the input data](https://github.com/sherzinger/SmartR/blob/master/grails-app/views/smartR/_inSample.gsp)
 2. [Add an analysis script to prepare/order/filter the data and to compute statistical information](https://github.com/sherzinger/SmartR/blob/master/web-app/Scripts/Sample.R)

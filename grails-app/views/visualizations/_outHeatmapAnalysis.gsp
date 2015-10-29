@@ -55,7 +55,7 @@
     }
 
     .cuttoffHighlight {
-        opacity: 0.4;    
+        opacity: 0.4;
     }
 
     .box {
@@ -146,7 +146,7 @@
 
     function redGreen() {
         var colorSet = [];
-        var NUM = 100; 
+        var NUM = 100;
         var i = NUM;
         while(i--) {
             colorSet.push(d3.rgb((255 * i) / NUM, 0, 0));
@@ -155,12 +155,12 @@
         while(i--) {
             colorSet.push(d3.rgb(0, (255 * (NUM - i)) / NUM, 0));
         }
-        return colorSet;
+        return colorSet.reverse();
     }
 
     function redBlue() {
         var colorSet = [];
-        var STEP = 1 / 200; 
+        var STEP = 1 / 200;
         var sR = 255, sG = 0, sB = 0;
         var eR = 0, eG = 0, eB = 255;
         for (var i = 0; i < 1; i += STEP) {
@@ -171,7 +171,7 @@
 
     function odd(color) {
         var colorSet = [];
-        var STEP = 1 / 200; 
+        var STEP = 1 / 200;
         var idx1, idx2, fractBetween;
         for (var i = 0; i < 1; i += STEP) {
             var value = i * (color.length - 1);
@@ -187,14 +187,14 @@
     }
 
     var colorSets = [
-        redGreen(), 
-        redBlue(), 
-        odd([[0, 0, 1], [0, 1, 1], [0, 1, 0], [1, 1, 0], [1, 0, 0]]), 
+        redGreen(),
+        redBlue(),
+        odd([[0, 0, 1], [0, 1, 1], [0, 1, 0], [1, 1, 0], [1, 0, 0]]),
         odd([[0, 0, 1], [0, 1, 0], [1, 0, 0]]),
         odd([[0, 0, 1], [1, 1, 0], [1, 0, 0]])
     ];
 
-    var featureColorSetBinary = ['rgb(0, 0, 0)', 'rgb(13, 13, 191)'];
+    var featureColorSetBinary = ['#FFFF00', '#FF8000'];
     var featureColorSetSequential = ['rgb(247,252,253)','rgb(224,236,244)','rgb(191,211,230)','rgb(158,188,218)','rgb(140,150,198)','rgb(140,107,177)','rgb(136,65,157)','rgb(129,15,124)','rgb(77,0,75)'];
 
     var gridFieldWidth = 40;
@@ -202,9 +202,9 @@
     var dendrogramHeight = 300;
     var histogramHeight = 200;
 
-    var margin = { top: gridFieldHeight * 2 + 100 + features.length * gridFieldHeight / 2 + dendrogramHeight, 
-            right: gridFieldWidth + 300 + dendrogramHeight, 
-            bottom: 10, 
+    var margin = { top: gridFieldHeight * 2 + 100 + features.length * gridFieldHeight / 2 + dendrogramHeight,
+            right: gridFieldWidth + 300 + dendrogramHeight,
+            bottom: 10,
             left: histogramHeight + 250 };
 
     var width = gridFieldWidth * patientIDs.length;
@@ -452,7 +452,7 @@
         .attr('x', - gridFieldWidth - 10)
         .attr('y', -2 - gridFieldHeight)
         .attr('width', gridFieldWidth)
-        .attr('height', gridFieldHeight);    
+        .attr('height', gridFieldHeight);
 
 
         var selectText = heatmap.selectAll('.selectText')
@@ -530,9 +530,9 @@
         .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; })
         .attr('dy', '0.35em')
         .style("text-anchor", "start")
-        .text(function(d) { 
+        .text(function(d) {
             var i = probes.indexOf(d);
-            return d + '  //  ' + geneSymbols[i]; 
+            return d + '  //  ' + geneSymbols[i];
         });
 
         probe
@@ -542,9 +542,9 @@
         .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
 
         var significanceIndexMap = jQuery.map(significanceValues, function(d, i) {
-            return {significance: d, idx: i}; 
+            return {significance: d, idx: i};
         });
-        
+
         var bar = barItems.selectAll('.bar')
         .data(significanceIndexMap, function(d) { return d.idx; });
 
@@ -574,7 +574,7 @@
             d3.selectAll(".probe").classed("highlight", false);
         });
 
-        bar 
+        bar
         .transition()
         .duration(animationDuration)
         .attr("height", gridFieldHeight)
@@ -658,7 +658,7 @@
         .attr('dy', '0.35em')
         .attr("text-anchor", "middle")
         .text('↑↓')
-        .attr('visibility', function(d) { 
+        .attr('visibility', function(d) {
             if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
                 return 'visible';
             } else {
@@ -710,7 +710,7 @@
             }
             updateColOrder(sortValues);
         })
-        .attr('visibility', function(d) { 
+        .attr('visibility', function(d) {
             if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
                 return 'visible';
             } else {
@@ -834,7 +834,7 @@
         var colorScale = d3.scale.quantile()
         .domain([0, 1])
         .range(colorSets[colorIdx]);
-        
+
         d3.selectAll('.square')
         .transition()
         .duration(animationDuration)
@@ -845,13 +845,13 @@
             d3.selectAll('.extraSquare.feature-' + feature)
             .style("fill", function(d) {
                 if (d.TYPE === 'binary') {
-                    return featureColorSetBinary[d.VALUE];
+                    return featureColorSetBinary[d.VALUE - 1];
                 } else if (d.TYPE === 'numerical') {
                     colorScale
                     .range(featureColorSetSequential);
-                    return colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE))); 
+                    return colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE)));
                 } else if (d.TYPE === 'alphabetical') {
-                    return categoricalColorScale(d.VALUE);            
+                    return categoricalColorScale(d.VALUE);
                 } else {
                     alert('Field type does not exist: ' + d.TYPE);
                 }
@@ -972,7 +972,7 @@
                 url: 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi',
                 type: "POST",
                 timeout: '600000',
-                data: { 
+                data: {
                     section: 'upload_gene_lists',
                     primary_org: 'Human',
                     background: 'whole_genome',
@@ -986,7 +986,7 @@
                 newTab.document.write(serverAnswer);
             }).fail(function() {
                 alert('fail');
-            });     
+            });
         })
         .on("mouseover", function(d) {
             tooltip
@@ -1199,23 +1199,23 @@
         height: buttonHeight,
         items: [
             {
-                callback: function() { updateColors(0); }, 
+                callback: function() { updateColors(0); },
                 label: 'Color Sheme 1'
             },
             {
-                callback: function() { updateColors(1); }, 
+                callback: function() { updateColors(1); },
                 label: 'Color Sheme 2'
             },
             {
-                callback: function() { updateColors(2); }, 
+                callback: function() { updateColors(2); },
                 label: 'Color Sheme 3'
             },
             {
-                callback: function() { updateColors(3); }, 
+                callback: function() { updateColors(3); },
                 label: 'Color Sheme 4'
             },
             {
-                callback: function() { updateColors(4); }, 
+                callback: function() { updateColors(4); },
                 label: 'Color Sheme 5'
             }
         ]
@@ -1230,27 +1230,27 @@
         height: buttonHeight,
         items: [
             {
-                callback: function() { cluster('hclustEuclideanAverage'); }, 
+                callback: function() { cluster('hclustEuclideanAverage'); },
                 label: 'Hierarch.-Eucl.-Average'
             },
             {
-                callback: function() { cluster('hclustEuclideanComplete'); }, 
+                callback: function() { cluster('hclustEuclideanComplete'); },
                 label: 'Hierarch.-Eucl.-Complete'
             },
             {
-                callback: function() { cluster('hclustEuclideanSingle'); }, 
+                callback: function() { cluster('hclustEuclideanSingle'); },
                 label: 'Hierarch.-Eucl.-Single'
             },
             {
-                callback: function() { cluster('hclustManhattanAverage'); }, 
+                callback: function() { cluster('hclustManhattanAverage'); },
                 label: 'Hierarch.-Manhat.-Average'
             },
             {
-                callback: function() { cluster('hclustManhattanComplete'); }, 
+                callback: function() { cluster('hclustManhattanComplete'); },
                 label: 'Hierarch.-Manhat.-Complete'
             },
             {
-                callback: function() { cluster('hclustManhattanSingle'); }, 
+                callback: function() { cluster('hclustManhattanSingle'); },
                 label: 'Hierarch.-Manhat.-Single'
             }
         ]

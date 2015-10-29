@@ -20,7 +20,7 @@ class SmartRService {
     def queryData(parameterMap) {
         def data_cohort1 = [:]
         def data_cohort2 = [:]
-        
+
         def rIID1 = parameterMap['result_instance_id1'].toString()
         def rIID2 = parameterMap['result_instance_id2'].toString()
 
@@ -32,7 +32,7 @@ class SmartRService {
                 def rIID
                 def data
                 def patientIDs
-    
+
                 if (cohort == 1) {
                     rIID = rIID1
                     patientIDs = patientIDs_cohort1
@@ -42,11 +42,11 @@ class SmartRService {
                     patientIDs = patientIDs_cohort2
                     data = data_cohort2
                 }
-                
+
                 if (! rIID || ! patientIDs) {
                     return
                 }
-    
+
                 if (conceptBox.concepts.size() == 0) {
                     data[conceptBox.name] = [:]
                 } else if (conceptBox.type == 'valueicon' || conceptBox.type == 'alphaicon') {
@@ -89,7 +89,7 @@ class SmartRService {
             return grailsApplication
                 .mainContext
                 .servletContext
-                .getRealPath('/plugins/') + '/smart-r-0.1/'
+                .getRealPath('/plugins/') + '/smart-r-0.2/'
         }
     }
 
