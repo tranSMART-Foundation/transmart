@@ -248,6 +248,19 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     result
 }
 
+.contentType <- function(header) {
+    if(grepl("^application/json(;|\\W|$)", header)) {
+        return('json')
+    }
+    if(grepl("^application/hal\\+json(;|\\W|$)", header)) {
+        return('hal')
+    }
+    if(grepl("^text/html(;|\\W|$)", header)) {
+        return('html')
+    }
+    return('unknown')
+}
+
 .serverMessageExchange <- 
 function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.progresscallback.download()) {
     if (any(accept.type == c("default", "hal"))) {
@@ -263,14 +276,15 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
         result$headers <- headers$value()
         result$status <- as.integer(result$headers['status'])
         result$statusMessage <- result$headers['statusMessage']
-        if(grepl("^application/json(;|\\W|$)", result$headers['Content-Type'])) {
-            result$content <- fromJSON(result$content)
-            result$JSON <- TRUE
-        }
-        if(grepl("^application/hal\\+json(;|\\W|$)", result$headers['Content-Type'])) {
-            result$content <- .simplifyHalList(fromJSON(result$content))
-            result$JSON <- TRUE
-        }
+        switch(.contentType(result$headers['Content-Type']),
+               json = {
+                   result$content <- fromJSON(result$content)
+                   result$JSON <- TRUE
+               },
+               hal = {
+                   result$content <- .simplifyHalList(fromJSON(result$content))
+                   result$JSON <- TRUE
+               })
         return(result)
     } else if (accept.type == "binary") {
         progress$start(NA_integer_)
@@ -286,6 +300,9 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
         result$headers <- headers$value()
         result$status <- as.integer(result$headers['status'])
         result$statusMessage <- result$headers['statusMessage']
+        if (getOption("verbose") && .contentType(result$headers['Content-Type']) %in% c('json', 'hal', 'html')) {
+            message("Server response:\n", result$content, "\n")
+        }
         return(result)
     }
     return(NULL)

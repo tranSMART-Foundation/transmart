@@ -119,6 +119,19 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     constraints
 }
 
+# If there are multiple constraints of the same name, combine them the way the server expects
+.combineConstraints <- function(constraints) {
+    uniqueNames <- unique(names(constraints))
+    names(uniqueNames) <- uniqueNames
+    lapply(uniqueNames, function(name) {
+        con <- constraints[names(constraints) == name]
+        names(con) <- NULL
+        con
+    })
+}
+
+.toServerFormat <- function(constraints) .combineConstraints(.translateConstraintNames(.expandConstraints(constraints)))
+
 # The argument is a single named list
 .expandConstraints <- function(constraints) {
     # The JSON encoder encodes single item vectors as scalars. We need those to be lists as well sometimes.
@@ -197,10 +210,10 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
             
         # other constraints
             'assay.or' = {
-                list(subconstraints = .translateConstraintNames(.expandConstraints(val)))
+                list(subconstraints = .toServerFormat(val))
             },
             'data.or' = {
-                list(subconstraints = .translateConstraintNames(.expandConstraints(val)))
+                list(subconstraints = .toServerFormat(val))
             },
             stop("Unknown constraint type: ", con, "\n",
                  call.=FALSE)
@@ -225,9 +238,9 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 
     rest <- .expandConstraints(constraints)
     
-    assay.constraints <- c(.translateConstraintNames(rest[names(rest) %in% valid.assay.constraints]), assay.constraints)
-    data.constraints <- c(.translateConstraintNames(rest[names(rest) %in% valid.data.constraints]), data.constraints)
-    
+    assay.constraints <- .combineConstraints(c(assay.constraints, .translateConstraintNames(rest[names(rest) %in% valid.assay.constraints])))
+    data.constraints <- .combineConstraints(c(data.constraints, .translateConstraintNames(rest[names(rest) %in% valid.data.constraints])))
+
     list(assay=assay.constraints, data=data.constraints)
 }
 
