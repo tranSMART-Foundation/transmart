@@ -65,11 +65,11 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
                 paste(typeInfo$supportedProjections, "\n"))
         return(NULL)
     }
-    
+
     cons <- .makeConstraints(assay.constraints, data.constraints, typeInfo, ...)
     assay.constraints <- cons$assay
     data.constraints <- cons$data
-    
+
     for (con in list(list(con=assay.constraints, param="assayConstraints", known=typeInfo$supportedAssayConstraints, name="assay"),
                      list(con=data.constraints,  param="dataConstraints",  known=typeInfo$supportedDataConstraints,  name="data"))) {
         if (!length(con$con)) next
@@ -80,11 +80,19 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         sep <- if (grepl('?', projectionLink)) '&' else '?'
         projectionLink <- paste(projectionLink, sep, con$param, "=", URLencode(toJSON(con$con), reserved=TRUE), sep='')
     }
-    
+
     message("Retrieving data from server. This can take some time, depending on your network connection speed. ",
             as.character(Sys.time()))
 
-    serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary", progress = progress.download)
+    errorHandler <- function(errmsg, result=NULL) {
+        if(!is.null(result) && result$status == 404) {
+            stop("The server did not return any data (HTTP 404). Maybe no records met the specified constraints?", call.=FALSE)
+        } else {
+            .requestErrorHandler(errmsg, result)
+        }
+    }
+
+    serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary", errorHandler = errorHandler, progress = progress.download)
     if (length(serverResult) == 0) {
         warning("No data could be found. The server yielded an empty dataset. Returning NULL.")
         return(NULL)

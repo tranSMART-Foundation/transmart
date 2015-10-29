@@ -201,7 +201,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     }
 }
 
-.requestErrorHandler <- function(e) {
+.requestErrorHandler <- function(e, result=NULL) {
     message("Sorry, the R client was unable to carry out your request. ",
             "Please make sure that the transmart server is still running. \n\n",
             "If the server is not down, you've encountered a bug.\n",
@@ -238,10 +238,10 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
                     errmsg <- paste(errmsg, ": ", result$content['error_description'], sep='')
                 }
             }
-            return(errorHandler(errmsg))
+            return(errorHandler(errmsg, result))
         }
         if(ensureJSON && !result$JSON) {
-            return(errorHandler(paste("No JSON returned but", result$headers['Content-Type'])))
+            return(errorHandler(paste("No JSON returned but", result$headers['Content-Type']), result))
         }
         return(result$content)
     }
