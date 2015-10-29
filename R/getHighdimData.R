@@ -102,9 +102,13 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     search.keyword = 'search_keyword',
     chromosome = 'chromosome_segment',
     genes = 'genes',
+    gene.ids = 'genes',
     proteins = 'proteins',
+    protein.ids = 'proteins',
     pathways = 'pathways',
+    pathway.ids = 'pathways',
     gene.signatures = 'gene_signatures',
+    gene.signature.ids = 'gene_signatures',
     snps = 'snps',
     assay.or = 'disjunction',
     data.or = 'disjunction'
@@ -174,6 +178,18 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
             },
             'gene.signatures' = {
                 list(names = j(as.character(val)))
+            },
+            'gene.ids' = {
+                list(ids = j(as.character(val)))
+            },
+            'protein.ids' = {
+                list(ids = j(as.character(val)))
+            },
+            'pathway.ids' = {
+                list(ids = j(as.character(val)))
+            },
+            'gene.signature.ids' = {
+                list(ids = j(as.character(val)))
             },
             'snps' = {
                 list(names = j(as.character(val)))
