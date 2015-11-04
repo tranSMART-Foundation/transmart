@@ -62,7 +62,7 @@
     }
 
     #histogram1 {
-        float: left;
+        float: right;
     }
 
     #histogram2 {
@@ -120,8 +120,8 @@
 <g:javascript src="resource/d3.js"/>
 <div id='controls'></div>
 <div id="visualization">
-    <div id="histogram1"></div>
     <div id="scatterplot"></div>
+    <div id="histogram1"></div>
     <div id="histogram2"></div>
 </div>
 
