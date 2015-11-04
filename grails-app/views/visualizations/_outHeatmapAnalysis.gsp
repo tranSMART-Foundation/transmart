@@ -571,6 +571,7 @@
         .attr("height", gridFieldHeight)
         .attr("x", function(d) { return - computeBarSize(d.significance) - 10; })
         .attr("y", function(d) { return gridFieldHeight * d.idx; })
+        .style('fill', function(d) { return d.significance > 0 ? 'steelblue' : '#990000';})
         .on("mouseover", function(d) {
             var html = significanceMeassure + ': ' + d.significance;
             tooltip
