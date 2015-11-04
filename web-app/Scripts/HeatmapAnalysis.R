@@ -10,12 +10,12 @@ maxRows <- ifelse(is.null(settings$maxRows), 100, as.integer(settings$maxRows))
 
 ### COMPUTE RESULTS ###
 
-getHDDMatrix <- function(raw.data) {
+makeMatrix <- function(raw.data) {
     HDD.matrix <- data.frame(
-        PATIENTID=raw.data$PATIENTID,
-        PROBE=raw.data$PROBE,
-        GENESYMBOL=raw.data$GENESYMBOL,
-        VALUE=raw.data$VALUE)
+            PATIENTID=raw.data$PATIENTID,
+            PROBE=raw.data$PROBE,
+            GENESYMBOL=raw.data$GENESYMBOL,
+            VALUE=raw.data$VALUE)
     HDD.matrix <- melt(HDD.matrix, id=c('PATIENTID', 'PROBE', 'GENESYMBOL'), na.rm=TRUE)
     HDD.matrix <- data.frame(dcast(HDD.matrix, PROBE + GENESYMBOL ~ PATIENTID), stringsAsFactors=FALSE)
     if (discardNullGenes) {
@@ -26,80 +26,10 @@ getHDDMatrix <- function(raw.data) {
     HDD.matrix
 }
 
-extractMatrixValues <- function(HDD.matrix) {
-    valueMatrix <- HDD.matrix[, -(1:2)]
-    valueMatrix
-}
-
-getZScoreMatrix <- function(valueMatrix) {
-    colNames <- colnames(valueMatrix)
-    zScoreMatrix <- t(apply(valueMatrix, 1, scale))
-    colnames(zScoreMatrix) <- colNames
-    zScoreMatrix
-}
-
-getSignificanceValues <- function(valueMatrix, zScoreMatrix, colNum) {
-    if (significanceMeassure == 'variance') {
-        significanceValues <- apply(log2(valueMatrix), 1, var)
-    } else if (significanceMeassure == 'zScoreRange') {
-        significanceValues <- apply(zScoreMatrix, 1, function(zScores) {
-                bxp <- boxplot.stats(zScores)
-                zScores.withoutOutliers <- zScores[zScores >= bxp$stats[2] & zScores <= bxp$stats[4]]
-                max(zScores.withoutOutliers) - min(zScores.withoutOutliers)
-        })
-    } else {
-        if (! suppressMessages(require(limma))) {
-            stop("SmartR requires the R package 'limma'")
-        }
-        classVectorS1 <- c(rep(1, colNum), rep(2, ncol(valueMatrix) - colNum))
-        classVectorS2 <- rev(classVectorS1)
-        design <- cbind(S1=classVectorS1, S2=classVectorS2)
-        contrast.matrix = makeContrasts(S1-S2, levels=design)
-        fit <- lmFit(log2(valueMatrix), design)
-        fit <- contrasts.fit(fit, contrast.matrix)
-        fit <- eBayes(fit)
-        contr = 1
-        top.fit = data.frame(
-                ID=rownames(fit$coefficients),
-                logFC=fit$coefficients[, contr],
-                t=fit$t[, contr],
-                P.Value=fit$p.value[, contr],
-                adj.P.val=p.adjust(p=fit$p.value[, contr], method='BH'),
-                B=fit$lods[, contr]
-        )
-        significanceValues <- top.fit[[significanceMeassure]]
-    }
-    significanceValues
-}
-
-sortAndCutHDDMatrix <- function(HDD.matrix, significanceValues) {
-    HDD.matrix$SIGNIFICANCE <- significanceValues
-    HDD.matrix <- HDD.matrix[order(significanceValues, decreasing=TRUE), ]
-    HDD.matrix <- HDD.matrix[1:maxRows, ]
-    HDD.matrix
-}
-
 fixString <- function(str) {
     str <- gsub("[[:punct:]]", "_", str)
     str <- gsub(" ", "_", str)
     str
-}
-
-buildFields <- function(HDD.value.matrix, HDD.zscore.matrix) {
-    fields.value <- melt(HDD.value.matrix, id=c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE'))
-    fields.zScore <- melt(HDD.zscore.matrix, id=c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE'))
-
-    fields <- fields.value
-    fields <- cbind(fields, fields.zScore$value)
-
-    names(fields) <- c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE', 'PATIENTID', 'VALUE', 'ZSCORE')
-    fields$PATIENTID <- as.numeric(sub("^X", "", levels(fields$PATIENTID)))[fields$PATIENTID]
-    fields <- fields[order(fields$PROBE, fields$PATIENTID, decreasing=FALSE), ]
-    fields <- fields[order(fields$SIGNIFICANCE, decreasing=TRUE), ]
-
-    fields$PROBE <- fixString(fields$PROBE)
-
-    fields
 }
 
 computeDendrogram <- function(zScoreMatrix, distanceMeassure, linkageMethod) {
@@ -133,54 +63,91 @@ if (length(data.cohort1$mRNAData$PATIENTID) == 0) {
     stop('Your selection does not match any patient in the defined cohort!')
 }
 
-HDD.value.matrix.cohort1 <- getHDDMatrix(data.cohort1$mRNAData)
-patientIDs.cohort1 <- as.numeric(sub("^X", "", colnames(HDD.value.matrix.cohort1))[-(1:2)])
-colNum <- ncol(HDD.value.matrix.cohort1) - 2
-if (length(data.cohort2$mRNAData) > 0) {
-    HDD.value.matrix.cohort2 <- getHDDMatrix(data.cohort2$mRNAData)
-    patientIDs.cohort2 <- as.numeric(sub("^X", "", colnames(HDD.value.matrix.cohort2))[-(1:2)])
+valueMatrix.cohort1 <- makeMatrix(data.cohort1$mRNAData)
+colnames(valueMatrix.cohort1) <- sub("^X", "", colnames(valueMatrix.cohort1))
+patientIDs.cohort1 <- colnames(valueMatrix.cohort1)
 
-    HDD.value.matrix.cohort1 <- HDD.value.matrix.cohort1[HDD.value.matrix.cohort1$PROBE %in% HDD.value.matrix.cohort2$PROBE, ]
-    HDD.value.matrix.cohort2 <- HDD.value.matrix.cohort2[HDD.value.matrix.cohort2$PROBE %in% HDD.value.matrix.cohort1$PROBE, ]
-
-    valueMatrix.cohort1 <- extractMatrixValues(HDD.value.matrix.cohort1)
-    valueMatrix.cohort2 <- extractMatrixValues(HDD.value.matrix.cohort2)
-
-    valueMatrix <- cbind(valueMatrix.cohort1, valueMatrix.cohort2)
-    HDD.value.matrix <- cbind(HDD.value.matrix.cohort1[, 1:2], valueMatrix)
+if (length(data.cohort2$mRNAData$PATIENTID) > 0) {
+    valueMatrix.cohort2 <- makeMatrix(data.cohort2$mRNAData)
+    colnames(valueMatrix.cohort2) <- sub("^X", "", colnames(valueMatrix.cohort2))
+    valueMatrix <- merge(valueMatrix.cohort1, valueMatrix.cohort2, by=c("PROBE", "GENESYMBOL"), all=FALSE)
 } else {
-    valueMatrix <- extractMatrixValues(HDD.value.matrix.cohort1)
-    HDD.value.matrix <- HDD.value.matrix.cohort1
+    valueMatrix <- valueMatrix.cohort1
 }
 
-patientIDs <- as.numeric(sub("^X", "", colnames(valueMatrix)))
-zScoreMatrix <- getZScoreMatrix(valueMatrix)
-HDD.zScore.matrix <- cbind(HDD.value.matrix[, 1:2], zScoreMatrix)
+patientIDs <- colnames(valueMatrix[, -c(1,2)])
 
-significanceValues <- getSignificanceValues(valueMatrix, zScoreMatrix, colNum)
-FINAL.HDD.value.matrix <- sortAndCutHDDMatrix(HDD.value.matrix, significanceValues)
-FINAL.HDD.zScore.matrix <- sortAndCutHDDMatrix(HDD.zScore.matrix, significanceValues)
+log2Matrix <- cbind(PROBE=valueMatrix$PROBE, cbind(GENESYMBOL=valueMatrix$GENESYMBOL, log2(valueMatrix[, -c(1:2)])))
+zScoreMatrix <- as.data.frame(t(apply(valueMatrix[, -c(1,2)], 1, scale)))
+colnames(zScoreMatrix) <- patientIDs
+zScoreMatrix <- cbind(PROBE=valueMatrix$PROBE, cbind(GENESYMBOL=valueMatrix$GENESYMBOL, zScoreMatrix))
 
-significanceValues.sorted <- FINAL.HDD.value.matrix$SIGNIFICANCE
-zScoreMatrix.sorted <- FINAL.HDD.zScore.matrix[, -c(1:2, ncol(FINAL.HDD.zScore.matrix))]
+if (significanceMeassure == 'variance') {
+    significanceValues <- apply(log2Matrix[, -c(1,2)], 1, var)
+} else if (significanceMeassure == 'zScoreRange') {
+    significanceValues <- apply(zScoreMatrix[, -c(1,2)], 1, function(zScores) {
+            bxp <- boxplot.stats(zScores)
+            zScores.withoutOutliers <- zScores[zScores >= bxp$stats[2] & zScores <= bxp$stats[4]]
+            max(zScores.withoutOutliers) - min(zScores.withoutOutliers)})
+} else {
+    if (! suppressMessages(require(limma))) {
+        stop("SmartR requires the R package 'limma'")
+    }
+    classVectorS1 <- c(rep(1, ncol(valueMatrix.cohort1[, -c(1,2)])), rep(2, ncol(valueMatrix[, -c(1,2)]) - ncol(valueMatrix.cohort1[, -c(1,2)])))
+    classVectorS2 <- rev(classVectorS1)
+    design <- cbind(S1=classVectorS1, S2=classVectorS2)
+    contrast.matrix = makeContrasts(S1-S2, levels=design)
+    fit <- lmFit(log2Matrix[, -c(1,2)], design)
+    fit <- contrasts.fit(fit, contrast.matrix)
+    fit <- eBayes(fit)
+    contr = 1
+    top.fit = data.frame(
+            logFC=fit$coefficients[, contr],
+            t=fit$t[, contr],
+            P.Value=fit$p.value[, contr],
+            adj.P.val=p.adjust(p=fit$p.value[, contr], method='fdr'),
+            B=fit$lods[, contr]
+    )
+    significanceValues <- top.fit[[significanceMeassure]]
+}
 
-fields <- buildFields(FINAL.HDD.value.matrix, FINAL.HDD.zScore.matrix)
-probes <- fixString(FINAL.HDD.value.matrix$PROBE)
-geneSymbols <- FINAL.HDD.value.matrix$GENESYMBOL
+valueMatrix$SIGNIFICANCE <- significanceValues
 
-colDendrogramEuclideanComplete <- computeDendrogram(t(zScoreMatrix.sorted), 'euclidean', 'complete')
-colDendrogramEuclideanSingle <- computeDendrogram(t(zScoreMatrix.sorted), 'euclidean', 'single')
-colDendrogramEuclideanAverage <- computeDendrogram(t(zScoreMatrix.sorted), 'euclidean', 'average')
-rowDendrogramEuclideanComplete <- computeDendrogram(zScoreMatrix.sorted, 'euclidean', 'complete')
-rowDendrogramEuclideanSingle <- computeDendrogram(zScoreMatrix.sorted, 'euclidean', 'single')
-rowDendrogramEuclideanAverage <- computeDendrogram(zScoreMatrix.sorted, 'euclidean', 'average')
+if (significanceMeassure == "P.Value" | significanceMeassure == "adj.P.val") {
+    valueMatrix <- valueMatrix[order(significanceValues, decreasing=FALSE), ]
+} else if (significanceMeassure == "logFC" | significanceMeassure == "t") {
+    valueMatrix <- valueMatrix[order(abs(significanceValues), decreasing=TRUE), ]
+} else {
+    valueMatrix <- valueMatrix[order(significanceValues, decreasing=TRUE), ]
+}
 
-colDendrogramManhattanComplete <- computeDendrogram(t(zScoreMatrix.sorted), 'manhattan', 'complete')
-colDendrogramManhattanSingle <- computeDendrogram(t(zScoreMatrix.sorted), 'manhattan', 'single')
-colDendrogramManhattanAverage <- computeDendrogram(t(zScoreMatrix.sorted), 'manhattan', 'average')
-rowDendrogramManhattanComplete <- computeDendrogram(zScoreMatrix.sorted, 'manhattan', 'complete')
-rowDendrogramManhattanSingle <- computeDendrogram(zScoreMatrix.sorted, 'manhattan', 'single')
-rowDendrogramManhattanAverage <- computeDendrogram(zScoreMatrix.sorted, 'manhattan', 'average')
+valueMatrix <- valueMatrix[1:maxRows, ]
+log2Matrix <- log2Matrix[match(valueMatrix$PROBE, log2Matrix$PROBE), ]
+zScoreMatrix <- zScoreMatrix[match(valueMatrix$PROBE, zScoreMatrix$PROBE), ]
+significanceValues <- valueMatrix$SIGNIFICANCE
+probes <- fixString(valueMatrix$PROBE)
+geneSymbols <- valueMatrix$GENESYMBOL
+
+fields.value <- melt(valueMatrix, id=c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE'))
+fields.log2 <- melt(log2Matrix, id=c('PROBE', 'GENESYMBOL'))
+fields.zScore <- melt(zScoreMatrix, id=c('PROBE', 'GENESYMBOL'))
+fields <- cbind(fields.value, fields.log2$value, fields.zScore$value)
+names(fields) <- c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE', 'PATIENTID', 'VALUE', 'LOG2', 'ZSCORE')
+fields$PROBE <- fixString(fields$PROBE)
+
+colDendrogramEuclideanComplete <- computeDendrogram(t(zScoreMatrix[, -c(1,2)]), 'euclidean', 'complete')
+colDendrogramEuclideanSingle <- computeDendrogram(t(zScoreMatrix[, -c(1,2)]), 'euclidean', 'single')
+colDendrogramEuclideanAverage <- computeDendrogram(t(zScoreMatrix[, -c(1,2)]), 'euclidean', 'average')
+rowDendrogramEuclideanComplete <- computeDendrogram(zScoreMatrix[, -c(1,2)], 'euclidean', 'complete')
+rowDendrogramEuclideanSingle <- computeDendrogram(zScoreMatrix[, -c(1,2)], 'euclidean', 'single')
+rowDendrogramEuclideanAverage <- computeDendrogram(zScoreMatrix[, -c(1,2)], 'euclidean', 'average')
+
+colDendrogramManhattanComplete <- computeDendrogram(t(zScoreMatrix[, -c(1,2)]), 'manhattan', 'complete')
+colDendrogramManhattanSingle <- computeDendrogram(t(zScoreMatrix[, -c(1,2)]), 'manhattan', 'single')
+colDendrogramManhattanAverage <- computeDendrogram(t(zScoreMatrix[, -c(1,2)]), 'manhattan', 'average')
+rowDendrogramManhattanComplete <- computeDendrogram(zScoreMatrix[, -c(1,2)], 'manhattan', 'complete')
+rowDendrogramManhattanSingle <- computeDendrogram(zScoreMatrix[, -c(1,2)], 'manhattan', 'single')
+rowDendrogramManhattanAverage <- computeDendrogram(zScoreMatrix[, -c(1,2)], 'manhattan', 'average')
 
 getFeatureName <- function(concept) {
     featureName <- tail(strsplit(concept, '\\\\')[[1]], n=1)
@@ -209,7 +176,7 @@ buildLowDimFields <- function(featureName, local.patientIDs, global.patientIDs, 
 extraFields <- c()
 features <- c()
 
-if (length(data.cohort2$mRNAData) > 0) {
+if (length(data.cohort2$mRNAData$PATIENTID) > 0) {
     featureName <- 'Cohort'
     values <- sapply(patientIDs, FUN=function(id) ifelse(id %in% patientIDs.cohort1, 1, 2))
     extraFields <- buildLowDimFields(featureName, patientIDs, patientIDs, 'binary', values, FALSE)
@@ -247,10 +214,11 @@ for (folder in unique.folders) {
 output$extraFields <- extraFields
 output$features <- features
 output$fields <- fields
-output$significanceValues <- significanceValues.sorted
+output$significanceValues <- significanceValues
 output$patientIDs <- patientIDs
 output$probes <- probes
 output$geneSymbols <- geneSymbols
+output$significanceMeassure <- significanceMeassure
 
 output$hclustEuclideanComplete <- list(
     order.dendrogram(colDendrogramEuclideanComplete) - 1,
