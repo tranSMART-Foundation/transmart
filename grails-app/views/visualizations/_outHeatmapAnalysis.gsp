@@ -213,17 +213,15 @@
 
     var selectedPatientIDs = [];
 
-    var histogramDomain = [0, 0];
-
-    if (significanceMeassure === 'logFC' || significanceMeassure === 't') {
-        histogramDomain = d3.extent(significanceValues, function(d) { return Math.abs(d); });
-    } else {
-        histogramDomain = d3.extent(significanceValues);
-    }
-
     var histogramScale = d3.scale.linear()
-    .domain(histogramDomain)
-    .range([0, histogramHeight]);
+    .domain(d3.extent(significanceValues, function(d) { 
+        if (significanceMeassure === "B") {
+            return d;
+        } else {
+            return Math.abs(d);            
+        }
+    }))
+    .range(significanceMeassure === "P.Value" || significanceMeassure === "adj.P.val" ? [histogramHeight, 0] : [0, histogramHeight]);
 
     var heatmap = d3.select("#heatmap").append("svg")
     .attr("width", (width + margin.left + margin.right) * 4)
@@ -780,35 +778,24 @@
         animationDuration = temp;
     }
 
-    var cutoffLevel = significanceValues[significanceValues.length - 1];
+    var cutoffLevel = 0;
     function animateCutoff(cutoff) {
         cutoffLevel = cutoff;
-        for (var i = 0; i < significanceValues.length; i++) {
-            var significanceValue = significanceValues[i];
-            if (significanceValue < cutoff) {
-                d3.selectAll('.square.probe-' +  probes[i])
-                .classed("cuttoffHighlight", true);
-                d3.select('.bar.idx-' +  i)
-                .classed("cuttoffHighlight", true);
-            } else {
-                d3.selectAll('.square.probe-' +  probes[i])
-                .classed("cuttoffHighlight", false);
-                d3.select('.bar.idx-' +  i)
-                .classed("cuttoffHighlight", false);
-            }
+        d3.selectAll('.square')
+        .classed("cuttoffHighlight", false);
+        d3.selectAll('.bar')
+        .classed("cuttoffHighlight", false);
+        for (var i = maxRows - 1; i >= maxRows - cutoff; i--) {
+            d3.selectAll('.square.probe-' +  probes[i])
+            .classed("cuttoffHighlight", true);
+            d3.select('.bar.idx-' +  i)
+            .classed("cuttoffHighlight", true);
         }
     }
 
     function cutoff() {
         cuttoffButton.select('text').text('Loading...');
-        var nrows = 0;
-        for (var i = 0; i < significanceValues.length; i++) {
-            var significanceValue = significanceValues[i];
-            if (significanceValue > cutoffLevel) {
-                nrows += 1;
-            }
-        }
-        loadRows(nrows);
+        loadRows(maxRows - cutoffLevel + 1);
     }
 
     function reloadDendrograms() {
@@ -1200,9 +1187,9 @@
         y: 8 - margin.top + buttonHeight * 2 + padding * 2 - 10,
         width: buttonWidth,
         height: buttonHeight,
-        min: significanceValues[significanceValues.length - 1],
-        max: significanceValues[0],
-        init: significanceValues[significanceValues.length - 1],
+        min: 0,
+        max: maxRows - 2,
+        init: 0,
         callback: animateCutoff,
         trigger: 'dragend'
     });

@@ -1,5 +1,10 @@
 CHANGELOG
 
+Version 0.3
+- Fix: Feature ranking works correctly now
+- Fix: Added log2 to Heatmap tooltip
+- Slightly improved Heatmap script performance
+
 Version 0.2
 - Fix: Session management should be more stable now
 - Fix: Large datasets should not cause SmartR to crash anymore

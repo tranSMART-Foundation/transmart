@@ -773,7 +773,7 @@ function changeInputDIV() {
 }
 
 function contact() {
-    var version = 0.2;
+    var version = 0.3;
     alert("Before reporting a bug...\n" +
         "... 1. Make sure you use the lastet SmartR version (installed version: " + version + ")\n" +
         "... 2. Make sure that all requirements for using SmartR are met\n" +
