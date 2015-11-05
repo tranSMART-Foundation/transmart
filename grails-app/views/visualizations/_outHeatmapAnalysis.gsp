@@ -130,7 +130,7 @@
         }
     }
 
-    var data = ${raw(results)};
+    var data = ${results};
     var extraFields = data.extraFields === undefined ? [] : data.extraFields;
     var features = data.features === undefined ? [] : data.features;
     var fields = data.fields;
@@ -536,10 +536,7 @@
         .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; })
         .attr('dy', '0.35em')
         .style("text-anchor", "start")
-        .text(function(d) {
-            var i = probes.indexOf(d);
-            return d + '  //  ' + geneSymbols[i];
-        });
+        .text(function(d) { return d; });
 
         probe
         .transition()

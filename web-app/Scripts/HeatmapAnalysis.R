@@ -11,23 +11,33 @@ maxRows <- ifelse(is.null(settings$maxRows), 100, as.integer(settings$maxRows))
 ### COMPUTE RESULTS ###
 
 makeMatrix <- function(raw.data) {
-    HDD.matrix <- data.frame(
+    matrix <- data.frame(
             PATIENTID=raw.data$PATIENTID,
-            PROBE=raw.data$PROBE,
+            UID=raw.data$PROBE,
             GENESYMBOL=raw.data$GENESYMBOL,
-            VALUE=raw.data$VALUE)
-    HDD.matrix <- melt(HDD.matrix, id=c('PATIENTID', 'PROBE', 'GENESYMBOL'), na.rm=TRUE)
-    HDD.matrix <- data.frame(dcast(HDD.matrix, PROBE + GENESYMBOL ~ PATIENTID), stringsAsFactors=FALSE)
+            VALUE=raw.data$VALUE, stringsAsFactors=FALSE)
+    matrix <- melt(matrix, id=c('PATIENTID', 'UID', 'GENESYMBOL'), na.rm=TRUE)
+    matrix <- data.frame(dcast(matrix, UID + GENESYMBOL ~ PATIENTID), stringsAsFactors=FALSE)
     if (discardNullGenes) {
-        HDD.matrix <- HDD.matrix[HDD.matrix$GENESYMBOL != '', ]
+        matrix <- matrix[matrix$GENESYMBOL != '', ]
     }
-    HDD.matrix <- na.omit(HDD.matrix)
-    HDD.matrix <- HDD.matrix[order(HDD.matrix$PROBE), ]
-    HDD.matrix
+    matrix <- na.omit(matrix)
+
+    duplicates.where <- duplicated(matrix$UID)
+    duplicates.rows <- matrix[duplicates.where, ]
+    matrix <- matrix[! duplicates.where, ]
+
+    for (i in seq_along(matrix$UID)) {
+        probeID <- paste(c(matrix$UID[i], matrix$GENESYMBOL[i], duplicates.rows$GENESYMBOL[duplicates.rows$UID == matrix$UID[i]]), collapse=' // ')
+        levels(matrix$UID) <- c(levels(matrix$UID), probeID)
+        matrix$UID[i] <- probeID
+    }
+
+    matrix
 }
 
 fixString <- function(str) {
-    str <- gsub("[[:punct:]]", "_", str)
+    str <- gsub("(?!/)[[:punct:]]", "_", str)
     str <- gsub(" ", "_", str)
     str
 }
@@ -70,17 +80,17 @@ patientIDs.cohort1 <- colnames(valueMatrix.cohort1)
 if (length(data.cohort2$mRNAData$PATIENTID) > 0) {
     valueMatrix.cohort2 <- makeMatrix(data.cohort2$mRNAData)
     colnames(valueMatrix.cohort2) <- sub("^X", "", colnames(valueMatrix.cohort2))
-    valueMatrix <- merge(valueMatrix.cohort1, valueMatrix.cohort2, by=c("PROBE", "GENESYMBOL"), all=FALSE)
+    valueMatrix <- merge(valueMatrix.cohort1, valueMatrix.cohort2, by=c("UID", "GENESYMBOL"), all=FALSE)
 } else {
     valueMatrix <- valueMatrix.cohort1
 }
 
 patientIDs <- colnames(valueMatrix[, -c(1,2)])
 
-log2Matrix <- cbind(PROBE=valueMatrix$PROBE, cbind(GENESYMBOL=valueMatrix$GENESYMBOL, log2(valueMatrix[, -c(1:2)])))
+log2Matrix <- cbind(UID=valueMatrix$UID, cbind(GENESYMBOL=valueMatrix$GENESYMBOL, log2(valueMatrix[, -c(1:2)])))
 zScoreMatrix <- as.data.frame(t(apply(valueMatrix[, -c(1,2)], 1, scale)))
 colnames(zScoreMatrix) <- patientIDs
-zScoreMatrix <- cbind(PROBE=valueMatrix$PROBE, cbind(GENESYMBOL=valueMatrix$GENESYMBOL, zScoreMatrix))
+zScoreMatrix <- cbind(UID=valueMatrix$UID, cbind(GENESYMBOL=valueMatrix$GENESYMBOL, zScoreMatrix))
 
 if (significanceMeassure == 'variance') {
     significanceValues <- apply(log2Matrix[, -c(1,2)], 1, var)
@@ -122,18 +132,18 @@ if (significanceMeassure == "P.Value" | significanceMeassure == "adj.P.val") {
 }
 
 valueMatrix <- valueMatrix[1:maxRows, ]
-log2Matrix <- log2Matrix[match(valueMatrix$PROBE, log2Matrix$PROBE), ]
-zScoreMatrix <- zScoreMatrix[match(valueMatrix$PROBE, zScoreMatrix$PROBE), ]
+log2Matrix <- log2Matrix[match(valueMatrix$UID, log2Matrix$UID), ]
+zScoreMatrix <- zScoreMatrix[match(valueMatrix$UID, zScoreMatrix$UID), ]
 significanceValues <- valueMatrix$SIGNIFICANCE
-probes <- fixString(valueMatrix$PROBE)
+uids <- fixString(valueMatrix$UID)
 geneSymbols <- valueMatrix$GENESYMBOL
 
-fields.value <- melt(valueMatrix, id=c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE'))
-fields.log2 <- melt(log2Matrix, id=c('PROBE', 'GENESYMBOL'))
-fields.zScore <- melt(zScoreMatrix, id=c('PROBE', 'GENESYMBOL'))
+fields.value <- melt(valueMatrix, id=c('UID', 'GENESYMBOL', 'SIGNIFICANCE'))
+fields.log2 <- melt(log2Matrix, id=c('UID', 'GENESYMBOL'))
+fields.zScore <- melt(zScoreMatrix, id=c('UID', 'GENESYMBOL'))
 fields <- cbind(fields.value, fields.log2$value, fields.zScore$value)
-names(fields) <- c('PROBE', 'GENESYMBOL', 'SIGNIFICANCE', 'PATIENTID', 'VALUE', 'LOG2', 'ZSCORE')
-fields$PROBE <- fixString(fields$PROBE)
+names(fields) <- c('UID', 'GENESYMBOL', 'SIGNIFICANCE', 'PATIENTID', 'VALUE', 'LOG2', 'ZSCORE')
+fields$UID <- fixString(fields$UID)
 
 colDendrogramEuclideanComplete <- computeDendrogram(t(zScoreMatrix[, -c(1,2)]), 'euclidean', 'complete')
 colDendrogramEuclideanSingle <- computeDendrogram(t(zScoreMatrix[, -c(1,2)]), 'euclidean', 'single')
@@ -216,7 +226,7 @@ output$features <- features
 output$fields <- fields
 output$significanceValues <- significanceValues
 output$patientIDs <- patientIDs
-output$probes <- probes
+output$probes <- uids
 output$geneSymbols <- geneSymbols
 output$significanceMeassure <- significanceMeassure
 
