@@ -596,7 +596,8 @@
         .attr("height", gridFieldHeight)
         .attr("width", function(d) { return computeBarSize(d.significance); })
         .attr("x", function(d) { return - computeBarSize(d.significance) - 10; })
-        .attr("y", function(d) { return gridFieldHeight * d.idx; });
+        .attr("y", function(d) { return gridFieldHeight * d.idx; })
+        .style('fill', function(d) { return d.significance > 0 ? 'steelblue' : '#990000';});
 
         var featurePosY = - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20;
 
