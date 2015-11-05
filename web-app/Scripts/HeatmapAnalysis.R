@@ -28,7 +28,7 @@ makeMatrix <- function(raw.data) {
     matrix <- matrix[! duplicates.where, ]
 
     for (i in seq_along(matrix$UID)) {
-        probeID <- paste(c(matrix$UID[i], matrix$GENESYMBOL[i], duplicates.rows$GENESYMBOL[duplicates.rows$UID == matrix$UID[i]]), collapse=' // ')
+        probeID <- paste(c(matrix$UID[i], matrix$GENESYMBOL[i], duplicates.rows$GENESYMBOL[duplicates.rows$UID == matrix$UID[i]]), collapse='//')
         levels(matrix$UID) <- c(levels(matrix$UID), probeID)
         matrix$UID[i] <- probeID
     }
@@ -37,7 +37,7 @@ makeMatrix <- function(raw.data) {
 }
 
 fixString <- function(str) {
-    str <- gsub("(?!/)[[:punct:]]", "_", str)
+    str <- gsub("^/([^/]+)/?(.*)$", "_", str)
     str <- gsub(" ", "_", str)
     str
 }

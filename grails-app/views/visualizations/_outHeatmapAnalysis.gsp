@@ -137,6 +137,7 @@
     var significanceValues = data.significanceValues;
     var patientIDs = data.patientIDs;
     var probes = data.probes;
+    console.log(fields[0])
     var geneSymbols = data.geneSymbols;
     var significanceMeassure = data.significanceMeassure[0];
 
@@ -245,15 +246,15 @@
 
     function updateHeatmap() {
         var square = squareItems.selectAll('.square')
-        .data(fields, function(d) { return 'patientID-' + d.PATIENTID + '-probe-' + d.PROBE; });
+        .data(fields, function(d) { return 'patientID-' + d.PATIENTID + '-probe-' + d.UID; });
         square
         .enter()
         .append("rect")
         .attr('class', function(d) {
-            return 'square patientID-' + d.PATIENTID + ' probe-' + d.PROBE;
+            return 'square patientID-' + d.PATIENTID + ' probe-' + d.UID;
         })
         .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
-        .attr("y", function(d) { return probes.indexOf(d.PROBE) * gridFieldHeight; })
+        .attr("y", function(d) { return probes.indexOf(d.UID) * gridFieldHeight; })
         .attr("width", gridFieldWidth)
         .attr("height", gridFieldHeight)
         .attr("rx", 0)
@@ -261,7 +262,7 @@
         .style("fill", 'white')
         .on("mouseover", function(d) {
             d3.select('.patientID.patientID-' +  d.PATIENTID).classed("highlight", true);
-            d3.select('.probe.probe-' +  d.PROBE).classed("highlight", true);
+            d3.select('.probe.probe-' +  d.UID).classed("highlight", true);
 
             var html = '';
             for(var key in d) {
@@ -288,7 +289,7 @@
         .transition()
         .duration(animationDuration)
         .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
-        .attr("y", function(d) { return probes.indexOf(d.PROBE) * gridFieldHeight; })
+        .attr("y", function(d) { return probes.indexOf(d.UID) * gridFieldHeight; })
         .attr("width", gridFieldWidth)
         .attr("height", gridFieldHeight);
 
