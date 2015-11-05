@@ -16,7 +16,7 @@ Keep it mind that making use of this software is at your own risk!*
 Please have a look at these [Youtube videos](https://www.youtube.com/channel/UCKUbu0z3CQfi6RcFermONSw).
 
 ####Version & Changelog
-Current version: 0.2
+Current version: 0.3
 
 ![Changelog](https://github.com/sherzinger/SmartR/blob/master/CHANGELOG)
 
@@ -27,10 +27,10 @@ grails.plugin.location.smartR = '/path/to/smartR'
 ```
 2 - Add this to transmartApp/web-app/js/datasetExplorer/datasetExplorer.js:
 ```javascript
-  loadPlugin('smartR', "/SmartR/loadScripts", function () {
-    resultsTabPanel.add(smartRPanel);
-  })
+  loadPlugin('smartR', "/SmartR/loadScripts", function () { resultsTabPanel.insert(4, smartRPanel); });
 ```
+Attention: Make sure that the above code is within the scope of where loadPlugin() is available.
+You could for example search for DALLIANCE and add it in the same area.
 3 - Run "grails war" to compile a WAR file containing SmartR
 
 ####Requirements:
@@ -41,8 +41,8 @@ grails.plugin.location.smartR = '/path/to/smartR'
   - [jsonlite](https://cran.r-project.org/web/packages/jsonlite/index.html)
   - [reshape2](https://cran.r-project.org/web/packages/reshape2/index.html)
   - [limma](http://bioconductor.org/packages/release/bioc/html/limma.html)
-  - [zoo](https://cran.r-project.org/web/packages/zoo/index.html)
-  - [TSclust](https://cran.r-project.org/web/packages/TSclust/index.html)
+  - [zoo](https://cran.r-project.org/web/packages/zoo/index.html) (only for Timeline Analysis)
+  - [TSclust](https://cran.r-project.org/web/packages/TSclust/index.html) (only for Timeline Analysis)
 
 ####Known Issues:
 - none

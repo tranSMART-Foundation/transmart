@@ -3,7 +3,10 @@ CHANGELOG
 Version 0.3
 - Fix: Feature ranking works correctly now
 - Fix: Added log2 to Heatmap tooltip
+- Fix: Cutoff in Heatmap will not work anymore with 2 rows or less
+- Fix: Heatmap can handle datasets containing duplicated probeset ids
 - Slightly improved Heatmap script performance
+- Fix: Correlation visualization behaves correctly now when resizing
 
 Version 0.2
 - Fix: Session management should be more stable now
