@@ -8,16 +8,14 @@ import groovy.time.*
 class ScriptExecutorService {
 
     def CONNECTION_LIFETIME = 120 * 1000 * 60 // milliseconds
-    def MAX_CONNECTIONS = 10
-    def CONNECTION_ATTEMPTS = 3
 
     def rServeConnections = [:]
 
     def testConnection(connection) {
         try {
             connection.assign("test1", "123")
-            connection.eval("test2 <- test1")
-            return true
+            connection.voidEval("test2 <- test1")
+            return connection.eval("test2").asString() == "123"
         } catch (all) {
             return false
         }
@@ -38,6 +36,8 @@ class ScriptExecutorService {
     }
 
     def getConnection(parameterMap) {
+        def CONNECTION_ATTEMPTS = 3
+        def MAX_CONNECTIONS = 10
         def cookieID = parameterMap['cookieID']
 
         if (rServeConnections[cookieID]) {
@@ -87,8 +87,8 @@ class ScriptExecutorService {
         def dataPackages1 = dataString1.split("(?<=\\G.{${GROOVY_CHUNK_SIZE}})")
         def dataPackages2 = dataString2.split("(?<=\\G.{${GROOVY_CHUNK_SIZE}})")
 
-        connection.assign("data_cohort1", '')
-        connection.assign("data_cohort2", '')
+        connection.eval("data_cohort1 <- ''")
+        connection.eval("data_cohort2 <- ''")
 
         dataPackages1.each { chunk ->
             connection.assign("chunk", chunk)

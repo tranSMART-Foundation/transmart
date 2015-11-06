@@ -733,7 +733,7 @@ function runRScript() {
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderLoadingScreen',
         type: "POST",
-        timeout: '600000'
+        timeout: 0
     }).done(function(serverAnswer) {
         jQuery("#outputDIV").html(serverAnswer);
     }).fail(function() {
@@ -744,7 +744,7 @@ function runRScript() {
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderOutputDIV',
         type: "POST",
-        timeout: '600000',
+        timeout: 0,
         data: prepareFormData()
     }).done(function(serverAnswer) {
         jQuery("#outputDIV").html(serverAnswer);
@@ -763,7 +763,7 @@ function changeInputDIV() {
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderInputDIV',
         type: "POST",
-        timeout: '600000',
+        timeout: 0,
         data: {'script': jQuery('#scriptSelect').val()}
     }).done(function(serverAnswer) {
         jQuery("#inputDIV").html(serverAnswer);
