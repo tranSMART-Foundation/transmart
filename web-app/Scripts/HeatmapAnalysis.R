@@ -24,7 +24,7 @@ makeMatrix <- function(raw.data) {
                 | ! is.na(matrix$GENESYMBOL) 
                 | ! is.null(matrix$GENESYMBOL), ]
     } else {
-        matrix <- matrix[matrix$GENESYMBOL == '' 
+        matrix[matrix$GENESYMBOL == '' 
                 | is.na(matrix$GENESYMBOL) 
                 | is.null(matrix$GENESYMBOL), ]$GENESYMBOL <- "NA"
     }
