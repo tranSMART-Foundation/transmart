@@ -68,7 +68,7 @@
         fill-opacity: 0.2;
     }
 
-    .probe {
+    .uid {
         font-size: 9pt;
     }
 
@@ -136,15 +136,13 @@
     var fields = data.fields;
     var significanceValues = data.significanceValues;
     var patientIDs = data.patientIDs;
-    var probes = data.probes;
-    console.log(fields[0])
-    var geneSymbols = data.geneSymbols;
+    var uids = data.uids;
     var significanceMeassure = data.significanceMeassure[0];
 
-    var maxRows = 100;
+    var maxRows = uids.length;
 
     var originalPatientIDs = patientIDs.slice();
-    var originalProbes = probes.slice();
+    var originalUIDs = uids.slice();
 
     function redGreen() {
         var colorSet = [];
@@ -210,7 +208,7 @@
             left: histogramHeight + 250 };
 
     var width = gridFieldWidth * patientIDs.length;
-    var height = gridFieldHeight * probes.length;
+    var height = gridFieldHeight * uids.length;
 
     var selectedPatientIDs = [];
 
@@ -246,15 +244,15 @@
 
     function updateHeatmap() {
         var square = squareItems.selectAll('.square')
-        .data(fields, function(d) { return 'patientID-' + d.PATIENTID + '-probe-' + d.UID; });
+        .data(fields, function(d) { return 'patientID-' + d.PATIENTID + '-uid-' + d.UID; });
         square
         .enter()
         .append("rect")
         .attr('class', function(d) {
-            return 'square patientID-' + d.PATIENTID + ' probe-' + d.UID;
+            return 'square patientID-' + d.PATIENTID + ' uid-' + d.UID;
         })
         .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
-        .attr("y", function(d) { return probes.indexOf(d.UID) * gridFieldHeight; })
+        .attr("y", function(d) { return uids.indexOf(d.UID) * gridFieldHeight; })
         .attr("width", gridFieldWidth)
         .attr("height", gridFieldHeight)
         .attr("rx", 0)
@@ -262,7 +260,7 @@
         .style("fill", 'white')
         .on("mouseover", function(d) {
             d3.select('.patientID.patientID-' +  d.PATIENTID).classed("highlight", true);
-            d3.select('.probe.probe-' +  d.UID).classed("highlight", true);
+            d3.select('.uid.uid-' +  d.UID).classed("highlight", true);
 
             var html = '';
             for(var key in d) {
@@ -276,20 +274,24 @@
         })
         .on("mouseout", function(d) {
             d3.selectAll(".patientID").classed("highlight", false);
-            d3.selectAll(".probe").classed("highlight", false);
+            d3.selectAll(".uid").classed("highlight", false);
 
             tooltip.style("visibility", "hidden");
         })
         .on('click', function(d) {
-            var url = 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + d.GENESYMBOL;
-            window.open(url);
+            var genes = d.UID.split("--");
+            for (var i = 1; i < genes.length; i++) {
+                var gene = genes[i];
+                var url = 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + gene;
+                window.open(url);
+            }
         });
 
         square
         .transition()
         .duration(animationDuration)
         .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
-        .attr("y", function(d) { return probes.indexOf(d.UID) * gridFieldHeight; })
+        .attr("y", function(d) { return uids.indexOf(d.UID) * gridFieldHeight; })
         .attr("width", gridFieldWidth)
         .attr("height", gridFieldHeight);
 
@@ -325,9 +327,9 @@
         .attr('height', gridFieldHeight)
         .on("click", function(patientID) {
             var rowValues = [];
-            for(var i = 0; i < probes.length; i++) {
-                var probe = probes[i];
-                var square = d3.select('.square' + '.patientID-' + patientID + '.probe-' + probe);
+            for(var i = 0; i < uids.length; i++) {
+                var uid = uids[i];
+                var square = d3.select('.square' + '.patientID-' + patientID + '.uid-' + uid);
                 rowValues.push([i, square.property('__data__').ZSCORE]);
             }
             if (isSorted(rowValues)) {
@@ -351,7 +353,7 @@
         .attr('height', gridFieldHeight);
 
         var rowSortText = rowSortItems.selectAll('.rowSortText')
-        .data(probes, function(d) { return d; });
+        .data(uids, function(d) { return d; });
 
         rowSortText
         .enter()
@@ -368,7 +370,7 @@
         .attr("transform", function(d, i) { return "translate(" + (width + 2 + 0.5 * gridFieldWidth) + ",0)" + "translate(0," + (i * gridFieldHeight + 0.5 * gridFieldHeight) + ")rotate(-90)";});
 
         var rowSortBox = rowSortItems.selectAll('.rowSortBox')
-        .data(probes, function(d) { return d; });
+        .data(uids, function(d) { return d; });
 
         rowSortBox
         .enter()
@@ -378,11 +380,11 @@
         .attr('y', function(d, i) { return i * gridFieldHeight; })
         .attr('width', gridFieldWidth)
         .attr('height', gridFieldHeight)
-        .on("click", function(probe) {
+        .on("click", function(uid) {
             var colValues = [];
             for(var i = 0; i < patientIDs.length; i++) {
                 var patientID = patientIDs[i];
-                var square = d3.select('.square' + '.patientID-' + patientID + '.probe-' + probe);
+                var square = d3.select('.square' + '.patientID-' + patientID + '.uid-' + uid);
                 colValues.push([i, square.property('__data__').ZSCORE]);
             }
             if (isSorted(colValues)) {
@@ -526,24 +528,24 @@
                 "translate(" + (gridFieldWidth / 2) + "," + (-4 - gridFieldHeight * 2) + ")rotate(-45)";
         });
 
-        var probe = labelItems.selectAll('.probe')
-        .data(probes, function(d) { return d; });
+        var uid = labelItems.selectAll('.uid')
+        .data(uids, function(d) { return d; });
 
-        probe
+        uid
         .enter()
         .append("text")
-        .attr('class', function(d) { return 'probe text probe-' + d;})
+        .attr('class', function(d) { return 'uid text uid-' + d;})
         .attr('x', width + gridFieldWidth + 7)
-        .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; })
+        .attr('y', function(d) { return uids.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; })
         .attr('dy', '0.35em')
         .style("text-anchor", "start")
         .text(function(d) { return d; });
 
-        probe
+        uid
         .transition()
         .duration(animationDuration)
         .attr('x', width + gridFieldWidth + 7)
-        .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
+        .attr('y', function(d) { return uids.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
 
         var significanceIndexMap = jQuery.map(significanceValues, function(d, i) {
             return {significance: d, idx: i};
@@ -577,15 +579,15 @@
             .html(html)
             .style("left", mouseX() + "px")
             .style("top", mouseY() + "px");
-            d3.selectAll('.square.probe-' +  probes[d.idx])
+            d3.selectAll('.square.uid-' +  uids[d.idx])
             .classed("squareHighlighted", true);
-            d3.select('.probe.probe-' +  probes[d.idx])
+            d3.select('.uid.uid-' +  uids[d.idx])
             .classed("highlight", true);
         })
         .on("mouseout", function(d) {
             tooltip.style("visibility", "hidden");
             d3.selectAll(".square").classed("squareHighlighted", false);
-            d3.selectAll(".probe").classed("highlight", false);
+            d3.selectAll(".uid").classed("highlight", false);
         });
 
         bar
@@ -752,7 +754,7 @@
         d3.selectAll('.selectText')
         .style('font-size', Math.ceil(16 * zoomLevel) + 'px');
 
-        d3.selectAll('.probe')
+        d3.selectAll('.uid')
         .style('font-size', Math.ceil(9 * zoomLevel) + 'px');
 
         d3.selectAll('.feature')
@@ -767,7 +769,7 @@
         gridFieldWidth = 40 * zoomLevel;
         gridFieldHeight = 40 * zoomLevel;
         width = gridFieldWidth * patientIDs.length;
-        height = gridFieldHeight * probes.length;
+        height = gridFieldHeight * uids.length;
         heatmap
         .attr('width', width + margin.left + margin.right)
         .attr('height', width + margin.top + margin.bottom);
@@ -786,7 +788,7 @@
         d3.selectAll('.bar')
         .classed("cuttoffHighlight", false);
         for (var i = maxRows - 1; i >= maxRows - cutoff; i--) {
-            d3.selectAll('.square.probe-' +  probes[i])
+            d3.selectAll('.square.uid-' +  uids[i])
             .classed("cuttoffHighlight", true);
             d3.select('.bar.idx-' +  i)
             .classed("cuttoffHighlight", true);
@@ -934,7 +936,7 @@
     var rowDendrogram;
     function createRowDendrogram() {
         var h = 280;
-        var spacing = gridFieldWidth + getMaxWidth(d3.selectAll('.probe')) + 20;
+        var spacing = gridFieldWidth + getMaxWidth(d3.selectAll('.uid')) + 20;
 
         var cluster = d3.layout.cluster()
         .size([height, h])
@@ -1027,16 +1029,13 @@
     }
 
     function updateRowOrder(sortValues) {
-        var sortedProbes = [];
-        var sortedGeneSymbols = [];
+        var sortedUIDs = [];
         var sortedSignificanceValues = [];
         for (var i = 0; i < sortValues.length; i++) {
-            sortedProbes.push(probes[sortValues[i]]);
-            sortedGeneSymbols.push(geneSymbols[sortValues[i]]);
+            sortedUIDs.push(uids[sortValues[i]]);
             sortedSignificanceValues.push(significanceValues[sortValues[i]]);
         }
-        probes = sortedProbes;
-        geneSymbols = sortedGeneSymbols;
+        uids = sortedUIDs;
         significanceValues = sortedSignificanceValues;
         removeRowDendrogram();
         updateHeatmap();
@@ -1053,9 +1052,9 @@
 
     function getInitialRowOrder() {
         initialRowOrder = [];
-        for (var i = 0; i < probes.length; i++) {
-            var probe = probes[i];
-            initialRowOrder.push(originalProbes.indexOf(probe));
+        for (var i = 0; i < uids.length; i++) {
+            var uid = uids[i];
+            initialRowOrder.push(originalUIDs.indexOf(uid));
         }
         return initialRowOrder;
     }
@@ -1092,7 +1091,7 @@
     }
 
     function loadRows(nrows) {
-        var maxRows = nrows === undefined ? probes.length + 100 : nrows;
+        var maxRows = nrows === undefined ? uids.length + 100 : nrows;
         var data = prepareFormData();
         data = addSettingsToData(data, { maxRows: maxRows });
         loadFeatureButton.select('text').text('Loading...');
