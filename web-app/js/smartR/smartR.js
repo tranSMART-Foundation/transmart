@@ -744,6 +744,7 @@ function renderResults(callback, data) {
             if (serverAnswer.error === 'RUNNING') {
                 setTimeout(renderResults(callback, data), 5000);
             } else {
+                jQuery('#submitButton').prop('disabled', false);
                 alert(serverAnswer.error);
             }
         } else {
