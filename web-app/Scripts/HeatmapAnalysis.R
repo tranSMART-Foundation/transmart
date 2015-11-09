@@ -93,7 +93,7 @@ if (length(data.cohort2$mRNAData$PATIENTID) > 0) {
 patientIDs <- colnames(valueMatrix[, -1])
 
 log2Matrix <- cbind(UID=valueMatrix$UID, log2(valueMatrix[, -1]))
-zScoreMatrix <- as.data.frame(t(apply(valueMatrix[, -1], 1, scale)))
+zScoreMatrix <- as.data.frame(t(apply(log2Matrix[, -1], 1, scale)))
 colnames(zScoreMatrix) <- patientIDs
 zScoreMatrix <- cbind(UID=valueMatrix$UID, zScoreMatrix)
 

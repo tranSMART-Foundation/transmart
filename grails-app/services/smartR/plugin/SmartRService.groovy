@@ -114,8 +114,6 @@ class SmartRService {
             parameterMap = queryData(parameterMap)
         }
 
-        def (success, results) = scriptExecutorService.run(parameterMap)
-
-        return [success, results]
+        scriptExecutorService.run(parameterMap)
     }
 }

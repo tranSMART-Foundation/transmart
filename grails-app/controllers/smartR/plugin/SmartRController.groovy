@@ -10,33 +10,31 @@ import org.apache.commons.io.FilenameUtils
 class SmartRController {
 
     def smartRService
+    def scriptExecutorService
 
-    /**
-    *   Renders the default view
-    */
     def index = {
         def dir = smartRService.getWebAppFolder() + '/Scripts/'
         def scriptList = new File(dir).list().findAll { it != 'Wrapper.R' && it != 'Sample.R' }
         [scriptList: scriptList]
     }
 
-    /**
-    *   Renders the actual visualization based on the chosen script and the results computed
-    */
-    def renderOutputDIV = {
+    def computeResults = {
         params.init = params.init == null ? true : params.init // defaults to true
-        def (success, results) = smartRService.runScript(params)
-        if (! success) {
-            render results
-        } else {
-            render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
-                    model: [results: results]
-        }
+        smartRService.runScript(params)
+        render ''
     }
 
-    def updateOutputDIV = {
+    def reComputeResults = {
         params.init = false
-        def (success, results) = smartRService.runScript(params)
+        redirect controller: 'SmartR',
+                 action: 'computeResults', 
+                 params: params
+    }
+
+    // For handling results yourself
+    def renderResults = {
+        params.init = false
+        def (success, results) = scriptExecutorService.getResults(params.cookieID)
         if (! success) {
             render new JsonBuilder([error: results]).toString()
         } else {
@@ -44,11 +42,15 @@ class SmartRController {
         }
     }
 
-    def recomputeOutputDIV = {
-        params.init = false
-        redirect controller: 'SmartR',
-                 action: 'renderOutputDIV', 
-                 params: params
+    // For (re)drawing the whole visualization
+    def renderResultsInTemplate = {
+        def (success, results) = scriptExecutorService.getResults(params.cookieID)
+        if (! success) {
+            render results
+        } else {
+            render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
+                    model: [results: results]
+        }       
     }
     
     /**
@@ -65,6 +67,7 @@ class SmartRController {
     def renderLoadingScreen = {
         render template: "/visualizations/outLoading"
     }
+
 
     /**
     *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer

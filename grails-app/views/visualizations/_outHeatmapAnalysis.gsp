@@ -1092,23 +1092,16 @@
 
     function loadRows(nrows) {
         var maxRows = nrows === undefined ? uids.length + 100 : nrows;
+        loadFeatureButton.select('text').text('Loading...');
         var data = prepareFormData();
         data = addSettingsToData(data, { maxRows: maxRows });
-        loadFeatureButton.select('text').text('Loading...');
-        jQuery.ajax({
-            url: pageInfo.basePath + '/SmartR/recomputeOutputDIV',
-            type: "POST",
-            timeout: '600000',
-            data: data
-        }).done(function(serverAnswer) {
-            jQuery("#outputDIV").html(serverAnswer);
+
+        var doOnResponse = function() {
             loadFeatureButton.select('text').text('Load 100 additional rows');
             cuttoffButton.select('text').text('Apply Cutoff');
-        }).fail(function() {
-            jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
-            loadFeatureButton.select('text').text('Load 100 additional rows');
-            cuttoffButton.select('text').text('Apply Cutoff');
-        });
+        };
+
+        updateStatistics(doOnResponse, data, true);
     }
 
     function init() {
