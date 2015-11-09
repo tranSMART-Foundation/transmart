@@ -29,7 +29,7 @@ class ScriptExecutorService {
         sessions[id] = [:]
         sessions[id].expiration = System.currentTimeMillis() + SESSION_LIFETIME
         sessions[id].success = false
-        sessions[id].results = ""
+        sessions[id].results = ''
 
         try {
             sessions[id].connection = new RConnection(Holders.config.RModules.host, Holders.config.RModules.port)
@@ -181,10 +181,10 @@ class ScriptExecutorService {
     }
 
     def getResults(id) {
-        if (sessions[id]) {
+        if (sessions[id] && sessions[id].results) {
             return [sessions[id].success, sessions[id].results]
         }
-        return [false, "No results found for client ID. This is most likely a bug in the code."]   
+        return [false, 'RUNNING']   
     }
 
     def clearSession(id) {

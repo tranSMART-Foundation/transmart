@@ -711,16 +711,48 @@ function setSmartRCookie() {
     return id;
 }
 
-function renderResultsInTemplate() {
+function renderResultsInTemplate(callback, data) {
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderResultsInTemplate',
         type: "POST",
         timeout: 1.8e+6,
-        data: prepareFormData()
+        data: data
     }).done(function(serverAnswer) {
-        jQuery("#outputDIV").html(serverAnswer);
+        if (serverAnswer === 'RUNNING') {
+            setTimeout(renderResultsInTemplate(callback, data), 5000);
+        } else {
+            jQuery('#submitButton').prop('disabled', false);
+            callback();
+            jQuery("#outputDIV").html(serverAnswer);
+        }
     }).fail(function() {
+        jQuery('#submitButton').prop('disabled', false);
+        callback();
         jQuery("#outputDIV").html("Could not render results. Please contact your administrator.");
+    });
+}
+
+function renderResults(callback, data) {
+    jQuery.ajax({
+        url: pageInfo.basePath + '/SmartR/renderResults',
+        type: "POST",
+        timeout: 1.8e+6,
+        data: data
+    }).done(function(serverAnswer) {
+        serverAnswer = JSON.parse(serverAnswer);
+        if (serverAnswer.error) {
+            if (serverAnswer.error === 'RUNNING') {
+                setTimeout(renderResults(callback, data), 5000);
+            } else {
+                alert(serverAnswer.error);
+            }
+        } else {
+            jQuery('#submitButton').prop('disabled', false);
+            callback(serverAnswer);
+        }
+    }).fail(function() {
+        jQuery('#submitButton').prop('disabled', false);
+        alert("Server does not respond. Network connection lost?");
     });
 }
 
@@ -732,32 +764,15 @@ function updateStatistics(callback, data, redraw) {
         timeout: 1.8e+6,
         data: data
     }).always(function() {
-        jQuery('#submitButton').prop('disabled', false);
-            jQuery.ajax({
-            url: pageInfo.basePath + '/SmartR/renderResults',
-            type: "POST",
-            timeout: 1.8e+6,
-            data: data
-        }).done(function(serverAnswer) {
-            if (redraw) {
-                callback();
-                renderResultsInTemplate();
-            } else {
-                serverAnswer = JSON.parse(serverAnswer);
-                if (serverAnswer.error) {
-                    alert(serverAnswer.error);
-                    return;
-                }
-                callback(serverAnswer);
-            }
-        }).fail(function() {
-            alert("Server does not respond. Network connection lost?");
-        });
+        if (redraw) {
+            renderResultsInTemplate(callback, data);
+        } else {
+           renderResults(callback, data); 
+        }
     });
 }
 
-function computeResults(init) {
-    init = init === undefined ? true : init;
+function computeResults() {
     conceptBoxes = [];
     sanityCheckErrors = [];
     register(); // method MUST be implemented by _inFoobarAnalysis.gsp
@@ -772,6 +787,7 @@ function computeResults(init) {
         return false;
     }
 
+    jQuery('#submitButton').prop('disabled', true);
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderLoadingScreen',
         type: "POST",
@@ -782,15 +798,14 @@ function computeResults(init) {
         jQuery("#outputDIV").html("Loading screen could not be initialized. Probably you lost network connection.");
     });
 
-    jQuery('#submitButton').prop('disabled', true);
+    var data = prepareFormData();
     jQuery.ajax({
-        url: pageInfo.basePath + '/SmartR/' + (init ? 'computeResults' : 'reComputeResults'),
+        url: pageInfo.basePath + '/SmartR/computeResults',
         type: "POST",
         timeout: 1.8e+6,
-        data: prepareFormData()
+        data: data
     }).always(function() {
-        jQuery('#submitButton').prop('disabled', false);
-        renderResultsInTemplate();
+        renderResultsInTemplate(function() {}, data);
     });
 }
 
