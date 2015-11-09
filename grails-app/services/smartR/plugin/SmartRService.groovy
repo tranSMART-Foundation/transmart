@@ -24,8 +24,8 @@ class SmartRService {
         def rIID1 = parameterMap['result_instance_id1'].toString()
         def rIID2 = parameterMap['result_instance_id2'].toString()
 
-        def patientIDs_cohort1 = rIID1 ? i2b2HelperService.getSubjectsAsList(rIID1).collect { it.toLong() } : []
-        def patientIDs_cohort2 = rIID2 ? i2b2HelperService.getSubjectsAsList(rIID2).collect { it.toLong() } : []
+        def patientIDs_cohort1 = rIID1 && rIID1 != 'null' ? i2b2HelperService.getSubjectsAsList(rIID1).collect { it.toLong() } : []
+        def patientIDs_cohort2 = rIID2 && rIID2 != 'null' ? i2b2HelperService.getSubjectsAsList(rIID2).collect { it.toLong() } : []
 
         parameterMap['conceptBoxes'].each { conceptBox ->
             conceptBox.cohorts.each { cohort ->
@@ -89,7 +89,7 @@ class SmartRService {
             return grailsApplication
                 .mainContext
                 .servletContext
-                .getRealPath('/plugins/') + '/smart-r-0.2/'
+                .getRealPath('/plugins/') + '/smart-r-0.3/'
         }
     }
 
@@ -114,6 +114,6 @@ class SmartRService {
             parameterMap = queryData(parameterMap)
         }
 
-        return scriptExecutorService.run(parameterMap)
+        scriptExecutorService.run(parameterMap)
     }
 }

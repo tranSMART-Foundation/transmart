@@ -52,7 +52,7 @@ class DataQueryService {
     }
 
     def exportHighDimData(conceptKeys, patientIDs, resultInstanceId) {
-        char COLUMN_SEPERATOR = '\t'
+        def data = [PATIENTID: [], VALUE: [], PROBE: [], GENESYMBOL: []]
         def query = 
         """
         SELECT
@@ -85,13 +85,18 @@ class DataQueryService {
         def conceptCode = i2b2HelperService.getConceptCodeFromKey(conceptKeys[0])
         def params = patientIDs
         params << conceptCode
-        def data = [PATIENTID: [], VALUE: [], PROBE: [], GENESYMBOL: []]
-        new Sql(dataSource).eachRow(query, params, { row ->
-            data.PATIENTID << row.patient_id
-            data.VALUE << row.raw_intensity
-            data.PROBE << row.probe_id
-            data.GENESYMBOL << row.gene_symbol
-        })
+        
+        def sql = new Sql(dataSource.connection)
+        try {
+            sql.eachRow(query, params, { row ->
+                data.PATIENTID << row.patient_id
+                data.VALUE << row.raw_intensity
+                data.PROBE << row.probe_id
+                data.GENESYMBOL << row.gene_symbol
+            })
+        } finally {
+            sql.close()
+        }
         return data
     }
 

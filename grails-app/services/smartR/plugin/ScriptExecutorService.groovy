@@ -7,88 +7,80 @@ import groovy.time.*
 
 class ScriptExecutorService {
 
-    def CONNECTION_LIFETIME = 120 * 1000 * 60 // milliseconds
-    def MAX_CONNECTIONS = 10
-    def CONNECTION_ATTEMPTS = 3
+    def SESSION_LIFETIME = 120 * 1000 * 60 // milliseconds
+    def CONNECT_ATTEMPTS = 3
+    def MAX_SESSIONS = 10
+    def GROOVY_CHUNK_SIZE = 10 * 1024 * 1024 / 2 // should be the size for a string of 10MB
+    def R_CHUNK_SIZE = 10 * 1024 * 1024 // should be the size for a string of about 10MB
 
-    def rServeConnections = [:]
+    def sessions = [:]
 
     def testConnection(connection) {
         try {
             connection.assign("test1", "123")
-            connection.eval("test2 <- test1")
-            return true
+            connection.voidEval("test2 <- test1")
+            return connection.eval("test2").asString() == "123"
         } catch (all) {
             return false
         }
     }
 
-    def openConnection(cookieID) {
-        def rServeHost = Holders.config.RModules.host
-        def rServePort = Holders.config.RModules.port
+    def createSession(id) {
+        sessions[id] = [:]
+        sessions[id].expiration = System.currentTimeMillis() + SESSION_LIFETIME
+        sessions[id].success = false
+        sessions[id].results = ''
+
         try {
-            rServeConnections[cookieID] = [:]
-            rServeConnections[cookieID].connection = new RConnection(rServeHost, rServePort)
-            rServeConnections[cookieID].connection.stringEncoding = 'utf8'
-            rServeConnections[cookieID].expiration = System.currentTimeMillis() + CONNECTION_LIFETIME
+            sessions[id].connection = new RConnection(Holders.config.RModules.host, Holders.config.RModules.port)
+            sessions[id].connection.stringEncoding = 'utf8'
         } catch (all) {
             return false
         }
+
         return true
     }
 
     def getConnection(parameterMap) {
-        def cookieID = parameterMap['cookieID']
+        def id = parameterMap['cookieID']
 
-        if (rServeConnections[cookieID]) {
-            if (testConnection(rServeConnections[cookieID].connection)) {
+        if (sessions[id]) {
+            if (testConnection(sessions[id].connection)) {
                 // renew lifetime
-                rServeConnections[cookieID].expiration = System.currentTimeMillis() + CONNECTION_LIFETIME
-                return rServeConnections[cookieID].connection
+                sessions[id].expiration = System.currentTimeMillis() + SESSION_LIFETIME
+                return sessions[id].connection
             }
-            // if we have a connection but it failed the assign test then it must be broken
-            closeConnection(cookieID)
+            // if we have a session but it failed the test then it must be broken
+            closeSession(id)
         }
 
-        def valid = false
+        removeExpiredSessions()
+        // the -1 is because we are going to create a new session after this
+        while (sessions.size() > MAX_SESSIONS - 1) {
+            closeOldestSession()
+        }
+
         // attempt to establish a working connection
-        for (def i = 0; i < CONNECTION_ATTEMPTS; i++) {
-            openConnection(cookieID)
-            if (testConnection(rServeConnections[cookieID].connection)) {
-                valid = true
-                break
+        for (def i = 0; i < CONNECT_ATTEMPTS; i++) {
+            if (createSession(id) && testConnection(sessions[id].connection)) {
+                assert sessions.size() <= MAX_SESSIONS
+                return sessions[id].connection
             }
-            closeConnection(cookieID)
             sleep(5000)
         }
 
-        while (rServeConnections.size() > MAX_CONNECTIONS) {
-            closeOldesConnection()
-        }
-        assert rServeConnections.size() <= MAX_CONNECTIONS
-
-        if (valid) {
-            return rServeConnections[cookieID].connection
-        }
         return null
     }
 
-    def clearSession(connection) {
-        try {
-            connection.voidEval("rm(list=ls(all=TRUE))")
-        } catch (all) { }
-    }
-
     def transferData(parameterMap, connection) {
-        def GROOVY_CHUNK_SIZE = 10 * 1024 * 1024 / 2 // should be the size for a string of 10MB
         def dataString1 = parameterMap['data_cohort1'].toString()
         def dataString2 = parameterMap['data_cohort2'].toString()
 
         def dataPackages1 = dataString1.split("(?<=\\G.{${GROOVY_CHUNK_SIZE}})")
         def dataPackages2 = dataString2.split("(?<=\\G.{${GROOVY_CHUNK_SIZE}})")
 
-        connection.assign("data_cohort1", '')
-        connection.assign("data_cohort2", '')
+        connection.eval("data_cohort1 <- ''")
+        connection.eval("data_cohort2 <- ''")
 
         dataPackages1.each { chunk ->
             connection.assign("chunk", chunk)
@@ -123,7 +115,6 @@ class ScriptExecutorService {
     }
 
     def computeResults(connection) {
-        def R_CHUNK_SIZE = 10 * 1024 * 1024 // should be the size for a string of about 10MB
         connection.voidEval("""
             json <- toString(toJSON(output, digits=5))
             start <- 1
@@ -144,10 +135,13 @@ class ScriptExecutorService {
 
     def run(parameterMap) {
         // initialize Rserve connection
+        def id = parameterMap['cookieID']
         def connection = getConnection(parameterMap)
-        removeExpiredConnections()
         if (! connection) {
-            return [false, 'Rserve refused the connection! Is it running?']
+            sessions[id].success = false
+            sessions[id].results = 'Rserve refused the connection! Is it running?'
+            print sessions
+            return
         }
 
         // this is a critical package as it is necessary to pipe errors back to the client
@@ -159,12 +153,14 @@ class ScriptExecutorService {
             , silent=TRUE)
         """)
         if (ret.inherits("try-error")) {
-            return [false, ret.asString()]
+            sessions[id].success = false
+            sessions[id].results = ret.asString()
+            return
         }
 
         // if first run start with a clear environment and send all data to our connection
         if (parameterMap['init']) {
-            clearSession(connection)
+            clearSession(id)
             transferData(parameterMap, connection)
         }
 
@@ -174,50 +170,61 @@ class ScriptExecutorService {
         // evaluate analysis script
         ret = evaluateScript(parameterMap, connection)
         if (ret.inherits("try-error")) {
-            return [false, ret.asString()]
+            sessions[id].success = false
+            sessions[id].results = ret.asString()
+            return
         }
 
         // get the results of our connection
-        def results = computeResults(connection)
-        return [true, results]
+        sessions[id].success = true
+        sessions[id].results = computeResults(connection)
     }
 
-    def closeConnection(id) {
-        if (rServeConnections[id]) {
-            clearSession(rServeConnections[id].connection)
-            rServeConnections[id].connection.close()
-            rServeConnections.remove(id)
+    def getResults(id) {
+        if (sessions[id] && sessions[id].results) {
+            return [sessions[id].success, sessions[id].results]
+        }
+        return [false, 'RUNNING']   
+    }
+
+    def clearSession(id) {
+        if (sessions[id] && testConnection(sessions[id].connection)) {
+            sessions[id].connection.voidEval("rm(list=ls(all=TRUE))")
+            sessions[id].success = false
+            sessions[id].results = ""
         }
     }
 
-    def closeAllConnection() {
-        rServeConnections.each { id, connection ->
-            closeConnection(id)
+    def closeSession(id) {
+        if (sessions[id] && testConnection(sessions[id].connection)) {
+            clearSession(id)
+            sessions[id].connection.close()
         }
-        assert rServeConnections.size() == 0
+        sessions.remove(id)
     }
 
-    def closeOldestConnection() {
-        def oldestConnectionID
+    def closeOldestSession() {
+        def oldestSessionID
         def oldestExpirationTime = Integer.MAX_VALUE
-        rServeConnections.each { id, connection ->
-            if (connection.expiration < oldestExpirationTime) {
-                oldestExpirationTime = connection.expiration
-                oldestConnectionID = id
+        sessions.each { id, session ->
+            if (session.expiration < oldestExpirationTime) {
+                oldestExpirationTime = session.expiration
+                oldestSessionID = id
             }
         }
-        closeConnection(id)
+        closeSession(id)
     }
 
-    def removeExpiredConnections() {
+    def removeExpiredSessions() {
         def now = System.currentTimeMillis()
-        rServeConnections.each { id, connection ->
-            if (connection.expiration < now) {
-                closeConnection(id)
+        sessions.each { id, session ->
+            if (session.expiration < now) {
+                closeSession(id)
             }
         }
     }
 
+    // FIXME: UNTESTED
     def forceKill(connection) {
         def rServeHost = Holders.config.RModules.host
         def rServePort = Holders.config.RModules.port
