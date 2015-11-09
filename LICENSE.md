@@ -13,7 +13,7 @@ apply:
 | ---------- | -------- | -----------------------------------------------------------
 | Protobuf   | BSD      | <http://grails.org/License>
 | RCurl      | BSD      | <http://cran.r-project.org/web/packages/RCurl/index.html>
-| RJSONIO    | BSD      | <http://cran.r-project.org/web/packages/RJSONIO/index.html>
+| rjson      | GPL2     | <http://cran.r-project.org/web/packages/rjson/index.html>
 | RProtoBuf  | GPL2     | <http://cran.r-project.org/web/packages/RProtoBuf/index.html>
 | plyr       | MIT      | <http://cran.r-project.org/web/packages/plyr/index.html>
 | hash       | GPL3     | <http://cran.r-project.org/web/packages/hash/index.html>
