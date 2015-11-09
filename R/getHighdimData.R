@@ -355,7 +355,15 @@ function(rawVector, .to.data.frame.converter=.as.data.frame.fast, progress=.make
 
         if(length(rowValues) == 1) {
             # if only one value, don't add the columnSpec name to the rowlabel.
-            columns$add(rowlabel, rowValues[[1]]$doubleValue)
+            type <- columnSpec[[1]]$type
+            if(type == STRING) {
+                columns$add(rowlabel, rowValues[[1]]$stringValue)
+            } else if(type == DOUBLE) {
+                columns$add(rowlabel, rowValues[[1]]$doubleValue)
+            } else {
+                warning("Unknown row type: ", type)
+            }
+
             next
         }
 
