@@ -213,11 +213,11 @@
     var selectedPatientIDs = [];
 
     var histogramScale = d3.scale.linear()
-    .domain(d3.extent(significanceValues, function(d) { 
+    .domain(d3.extent(significanceValues, function(d) {
         if (significanceMeassure === "B") {
             return d;
         } else {
-            return Math.abs(d);            
+            return Math.abs(d);
         }
     }))
     .range(significanceMeassure === "P.Value" || significanceMeassure === "adj.P.val" ? [histogramHeight, 0] : [0, histogramHeight]);
@@ -782,6 +782,7 @@
 
     var cutoffLevel = 0;
     function animateCutoff(cutoff) {
+        cutoff = Math.floor(cutoff);
         cutoffLevel = cutoff;
         d3.selectAll('.square')
         .classed("cuttoffHighlight", false);
@@ -797,7 +798,7 @@
 
     function cutoff() {
         cuttoffButton.select('text').text('Loading...');
-        loadRows(maxRows - cutoffLevel + 1);
+        loadRows(maxRows - cutoffLevel);
     }
 
     function reloadDendrograms() {
