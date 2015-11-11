@@ -3,7 +3,7 @@ from datetime import datetime
 import pyxnat
 import subprocess
 import sys
-from elementtree.ElementTree import parse
+from xml.etree.ElementTree import parse
 
 CONFIG_PATH = './'
 CONFIG_EXTENSION = ".xml"
