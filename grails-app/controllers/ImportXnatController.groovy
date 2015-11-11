@@ -178,11 +178,13 @@ class ImportXnatController {
 
 			def process = ("python " + getScriptsLocation() + "/xnattotransmartlink/downloadscript.py ${url} ${username} ${password} ${project} ${node} ${kettledir} ${datadir}").execute(null, new File(getScriptsLocation() + "/xnattotransmartlink"))
 			process.waitFor()
-			if (process.err.text == "") {
-				flash.message = "${process.in.text}"
+			def inText = process.in.text
+			def errText = process.err.text
+			if (errText) {
+				flash.message = "${errText}</br>${inText}"
 			} else {
-				flash.message = "${process.err.text}</br>${process.in.text}"
-			}				
+				flash.message = inText
+			}
 			redirect action: import_wizard, id: importXnatConfiguration.id
 		}
 
