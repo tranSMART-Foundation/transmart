@@ -1,4 +1,3 @@
-import org.springframework.util.StringUtils
 import org.transmart.searchapp.ImportXnatConfiguration;
 import org.transmart.searchapp.ImportXnatVariable;
 import groovy.xml.MarkupBuilder
@@ -8,7 +7,6 @@ import groovy.xml.MarkupBuilder
  */
 class ImportXnatController {
 
-	def springSecurityService
 	def grailsApplication
 
 	// the delete, save and update actions only accept POST requests
@@ -176,13 +174,20 @@ class ImportXnatController {
 			def kettledir = (getScriptsLocation() + "/xnattotransmartlink/")
 			def datadir = (getScriptsLocation() + "/xnattotransmartlink/")
 
-			def process = ("python " + getScriptsLocation() + "/xnattotransmartlink/downloadscript.py ${url} ${username} ${password} ${project} ${node} ${kettledir} ${datadir}").execute(null, new File(getScriptsLocation() + "/xnattotransmartlink"))
+			def cmd = "python " +
+					getScriptsLocation() +
+					"/xnattotransmartlink/downloadscript.py" +
+					" ${url} ${username} ${password} ${project} ${node} ${kettledir} ${datadir}"
+			log.debug(cmd)
+			def process = (cmd).execute(null, new File(getScriptsLocation() + "/xnattotransmartlink"))
 			process.waitFor()
 			def inText = process.in.text
 			def errText = process.err.text
 			if (errText) {
+				log.error(errText)
 				flash.message = "${errText}</br>${inText}"
 			} else {
+				log.info(inText)
 				flash.message = inText
 			}
 			redirect action: import_wizard, id: importXnatConfiguration.id
