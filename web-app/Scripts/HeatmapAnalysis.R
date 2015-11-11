@@ -20,12 +20,12 @@ makeMatrix <- function(raw.data) {
     matrix <- data.frame(dcast(matrix, PROBE + GENESYMBOL ~ PATIENTID), stringsAsFactors=FALSE)
 
     if (discardNullGenes) {
-        matrix <- matrix[matrix$GENESYMBOL != '' 
-                | ! is.na(matrix$GENESYMBOL) 
+        matrix <- matrix[matrix$GENESYMBOL != ''
+                | ! is.na(matrix$GENESYMBOL)
                 | ! is.null(matrix$GENESYMBOL), ]
     } else {
-        matrix[matrix$GENESYMBOL == '' 
-                | is.na(matrix$GENESYMBOL) 
+        matrix[matrix$GENESYMBOL == ''
+                | is.na(matrix$GENESYMBOL)
                 | is.null(matrix$GENESYMBOL), ]$GENESYMBOL <- "NA"
     }
 
@@ -178,7 +178,7 @@ conceptStrToFolderStr <- function(s) {
 buildLowDimFields <- function(featureName, local.patientIDs, global.patientIDs, type, values, zScores) {
     lowDimFields <- data.frame(
             FEATURE=rep(featureName, length(local.patientIDs)),
-            PATIENTID=local.patientIDs,
+            PATIENTID=as.factor(local.patientIDs),
             TYPE=rep(type, length(local.patientIDs)),
             VALUE=values,
             ZSCORE=if(zScores) scale(values) else rep(NA, length(local.patientIDs)))
