@@ -140,18 +140,18 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 
 .transmartServerGetOauthRequest <- function(path, action) {
     oauthResponse <- .transmartServerGetRequest(path, onlyContent=F)
-    statusString <- paste("status code ", oauthResponse$status, ": ", oauthResponse$headers['statusMessage'], sep='')
+    statusString <- paste("status code ", oauthResponse$status, ": ", oauthResponse$headers[['statusMessage']], sep='')
     if (!oauthResponse$JSON) {
-        cat(action, " failed, could not parse server response of type ", oauthResponse$headers['Content-Type'], ", ", statusString, "\n")
+        cat(action, " failed, could not parse server response of type ", oauthResponse$headers[['Content-Type']], ". ", statusString, "\n", sep='')
         return(NULL)
     }
     if ('error' %in% names(oauthResponse$content)) {
-        cat(action, " failed, removing refresh_token:", oauthResponse$content['error_description'], "\n")
+        cat(action, " failed, removing refresh_token:", oauthResponse$content[['error_description']], "\n", sep='')
         rm(refresh_token, envir=transmartClientEnv)
         return(NULL)
     }
     if (!oauthResponse$status == 200) {
-        cat(action, " error: HTTP ", statusString, "\n")
+        cat(action, "error: HTTP", statusString, "\n")
         return(NULL)
     }
     return(oauthResponse)
@@ -183,8 +183,8 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         if(!'error' %in% names(ping$content)) {
             return(stopfn("HTTP ", ping$status, ": ", ping$statusMessage))
         }
-        if(ping$status != 401 || ping$content['error'] != "invalid_token") {
-            return(stopfn("HTTP ", ping$status, ": ", ping$statusMessage, "\n", ping$content['error'],  ": ", ping$content['error_description']))
+        if(ping$status != 401 || ping$content[['error']] != "invalid_token") {
+            return(stopfn("HTTP ", ping$status, ": ", ping$statusMessage, "\n", ping$content[['error']],  ": ", ping$content[['error_description']]))
         }
     } else if (!exists("refresh_token", envir = transmartClientEnv)) {
         return(stopfn("Unable to refresh authentication: no refresh token"))
@@ -225,23 +225,23 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     if(is.numeric(onlyContent)) {
         errmsg <- ''
         if(result$JSON && 'error' %in% names(result$content)) {
-            errmsg <- paste(":", result$content['error'])
+            errmsg <- paste(":", result$content[['error']])
             if('error_description' %in% names(result$content)) {
-                errmsg <- paste(errmsg, ": ", result$content['error_description'], sep='')
+                errmsg <- paste(errmsg, ": ", result$content[['error_description']], sep='')
             }
         }
         if(!result$status %in% onlyContent) {
             errmsg <- paste("HTTP", result$status, result$statusMessage, "(expected result code(s):", toString(onlyContent), ")")
             if(result$JSON && 'error' %in% names(result$content)) {
-                errmsg <- paste(errmsg, ": ", result$content['error'], sep='')
+                errmsg <- paste(errmsg, ": ", result$content[['error']], sep='')
                 if('error_description' %in% names(result$content)) {
-                    errmsg <- paste(errmsg, ": ", result$content['error_description'], sep='')
+                    errmsg <- paste(errmsg, ": ", result$content[['error_description']], sep='')
                 }
             }
             return(errorHandler(errmsg, result))
         }
         if(ensureJSON && !result$JSON) {
-            return(errorHandler(paste("No JSON returned but", result$headers['Content-Type']), result))
+            return(errorHandler(paste("No JSON returned but", result$headers[['Content-Type']]), result))
         }
         return(result$content)
     }
@@ -274,9 +274,9 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
         if (getOption("verbose")) { message("Server response:\n", result$content, "\n") }
         if(is.null(result)) { return(NULL) }
         result$headers <- headers$value()
-        result$status <- as.integer(result$headers['status'])
-        result$statusMessage <- result$headers['statusMessage']
-        switch(.contentType(result$headers['Content-Type']),
+        result$status <- as.integer(result$headers[['status']])
+        result$statusMessage <- result$headers[['statusMessage']]
+        switch(.contentType(result$headers[['Content-Type']]),
                json = {
                    result$content <- fromJSON(result$content)
                    result$JSON <- TRUE
@@ -298,9 +298,9 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
                 httpheader = httpHeaderFields)
         progress$end()
         result$headers <- headers$value()
-        result$status <- as.integer(result$headers['status'])
-        result$statusMessage <- result$headers['statusMessage']
-        if (getOption("verbose") && .contentType(result$headers['Content-Type']) %in% c('json', 'hal', 'html')) {
+        result$status <- as.integer(result$headers[['status']])
+        result$statusMessage <- result$headers[['statusMessage']]
+        if (getOption("verbose") && .contentType(result$headers[['Content-Type']]) %in% c('json', 'hal', 'html')) {
             message("Server response:\n", result$content, "\n")
         }
         return(result)
