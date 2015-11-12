@@ -29,5 +29,6 @@
 # "temporary" build files
 /target
 
+.DS_Store
 .idea
 /production
