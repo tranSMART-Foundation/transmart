@@ -75,6 +75,8 @@ class smartRGrailsPlugin {
 
         config.smartR.pluginScriptDirectory =
                 new File(smartRDir.canonicalPath, 'HeimScripts')
+        config.smartR.legacyPluginScriptDirectory =
+                new File(smartRDir.canonicalPath, 'Scripts')
         log.info("Directory for heim scripts is ${config.smartR.pluginScriptDirectory}")
     }
 }

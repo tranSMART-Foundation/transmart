@@ -827,6 +827,23 @@ function changeInputDIV() {
     });
 }
 
+/**
+*   Renders the input form for entering the parameters for a visualization/script
+*/
+function changeInput() {
+    jQuery("#outputDIV").html("");
+    jQuery.ajax({
+        url: pageInfo.basePath + '/SmartR/renderInput',
+        type: "POST",
+        timeout: 1.8e+6,
+        data: {'script': jQuery('#scriptSelect').val()}
+    }).done(function(serverAnswer) {
+        jQuery("#inputDIV").html(serverAnswer);
+    }).fail(function() {
+        jQuery("#inputDIV").html("Coult not render input form. Probably you lost network connection.");
+    });
+}
+
 function contact() {
     var version = 0.3;
     alert("Before reporting a bug...\n" +

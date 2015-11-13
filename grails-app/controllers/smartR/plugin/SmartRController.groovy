@@ -13,8 +13,11 @@ class SmartRController {
     def smartRService
     def scriptExecutorService
 
-    def index = {
-        [scriptList: sessionService.availableWorkflows()]
+    def index() {
+        [
+                scriptList: sessionService.availableWorkflows(),
+                legacyScriptList: sessionService.legacyWorkflows(),
+        ]
     }
 
     def computeResults = {
@@ -60,6 +63,17 @@ class SmartRController {
             render 'Please select a script to execute.'
         } else {
             render template: "/heim/in${FilenameUtils.getBaseName(params.script).capitalize()}"
+        }
+    }
+
+    /**
+     *   Renders the input form for initial script parameters
+     */
+    def renderInput = {
+        if (! params.script) {
+            render 'Please select a script to execute.'
+        } else {
+            render template: "/smartR/in${FilenameUtils.getBaseName(params.script).capitalize()}"
         }
     }
 
