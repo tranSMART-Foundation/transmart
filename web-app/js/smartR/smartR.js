@@ -34,7 +34,7 @@ function createD3Button(args) {
         .duration(300)
         .style('fill', '#ffffff');
     })
-    .on('click', function() { args.callback(); }); 
+    .on('click', function() { args.callback(); });
 
     var text = button.append('text')
     .attr('x', args.x + args.width / 2)
@@ -85,7 +85,7 @@ function createD3Switch(args) {
             checked = true;
         }
         text.text(checked ? args.onlabel : args.offlabel);
-        args.callback(checked); 
+        args.callback(checked);
     });
 
     var text = switcher.append('text')
@@ -186,7 +186,7 @@ function createD3Dropdown(args) {
         if (hovered) {
             return;
         }
-        dropdown.selectAll('.itemBox')        
+        dropdown.selectAll('.itemBox')
         .transition()
         .duration(300)
         .style('visibility', 'visible')
@@ -220,12 +220,12 @@ function createD3Dropdown(args) {
         hovered = false;
         setTimeout(function() {
             if (! hovered && ! itemHovered) {
-                shrink();  
+                shrink();
             }
         }, 50);
         setTimeout(function() { // first check is not enough if animation interrupts it
             if (! hovered && ! itemHovered) {
-                shrink();  
+                shrink();
             }
         }, 350);
     });
@@ -501,7 +501,7 @@ function createQueryCriteriaDIV(conceptid, normalunits, setvaluemode, setvalueop
 *   @param {boolean} reCompute: should the current visualization be recomputed after updating the cohorts? (for large db queries it is faster to just handle the update within the visualization itself)
 */
 function setCohorts(constrains, andConcat, negate, reCompute, subset) {
-    if (typeof appendItemFromConceptInto !== "function") { 
+    if (typeof appendItemFromConceptInto !== "function") {
         alert('This functionality is not available in the tranSMART version you use.');
         return;
     }
@@ -518,7 +518,7 @@ function setCohorts(constrains, andConcat, negate, reCompute, subset) {
         appendItemFromConceptInto(destination, constrains[i], negate);
     }
     if (reCompute) {
-        runAllQueries(runRScript);
+        runAllQueries(computeResults);
     }
 }
 
@@ -568,8 +568,8 @@ var smartRPanel = new Ext.Panel({
         render: function(panel) {
             panel.body.on('click', function() {
                 if (typeof updateOnView === "function") {
-                    updateOnView();  
-                } 
+                    updateOnView();
+                }
             });
         }
     }
@@ -630,7 +630,7 @@ function registerConceptBox(name, cohorts, type, min, max) {
     var check1 = type === undefined || containsOnly(name, type);
     var check2 = min === undefined || concepts.length >= min;
     var check3 = max === undefined || concepts.length <= max;
-    sanityCheckErrors.push( 
+    sanityCheckErrors.push(
         !check1 ? 'Concept box (' + name + ') contains concepts with invalid type! Valid type: ' + type :
         !check2 ? 'Concept box (' + name + ') contains too few concepts! Valid range: ' + min + ' - ' + max :
         !check3 ? 'Concept box (' + name + ') contains too many concepts! Valid range: ' + min + ' - ' + max : '');
@@ -697,7 +697,6 @@ function sane() { // FIXME: somehow check for subset2 to be non empty iff two co
 }
 
 function setSmartRCookie() {
-    // first check if a cookie exists
     var cookies = document.cookie.split(';');
     for (var i = 0; i < cookies.length; i++) {
         var cookie = cookies[i];
@@ -706,16 +705,75 @@ function setSmartRCookie() {
             return crumbs[1];
         }
     }
-    // create one if not
-    var id = new Date().getTime();
+
+    var id = new Date().getTime() + Math.floor((Math.random() * 9999999999) + 1000000000);
     document.cookie = 'SmartR=' + id;
     return id;
 }
 
-/**
-*   Initial method for the whole process of computing a visualization
-*/
-function runRScript() {
+function renderResultsInTemplate(callback, data) {
+    jQuery.ajax({
+        url: pageInfo.basePath + '/SmartR/renderResultsInTemplate',
+        type: "POST",
+        timeout: 1.8e+6,
+        data: data
+    }).done(function(serverAnswer) {
+        if (serverAnswer === 'RUNNING') {
+            setTimeout(renderResultsInTemplate(callback, data), 5000);
+        } else {
+            jQuery('#submitButton').prop('disabled', false);
+            callback();
+            jQuery("#outputDIV").html(serverAnswer);
+        }
+    }).fail(function() {
+        jQuery('#submitButton').prop('disabled', false);
+        callback();
+        jQuery("#outputDIV").html("Could not render results. Please contact your administrator.");
+    });
+}
+
+function renderResults(callback, data) {
+    jQuery.ajax({
+        url: pageInfo.basePath + '/SmartR/renderResults',
+        type: "POST",
+        timeout: 1.8e+6,
+        data: data
+    }).done(function(serverAnswer) {
+        serverAnswer = JSON.parse(serverAnswer);
+        if (serverAnswer.error) {
+            if (serverAnswer.error === 'RUNNING') {
+                setTimeout(renderResults(callback, data), 5000);
+            } else {
+                jQuery('#submitButton').prop('disabled', false);
+                alert(serverAnswer.error);
+            }
+        } else {
+            jQuery('#submitButton').prop('disabled', false);
+            callback(serverAnswer);
+        }
+    }).fail(function() {
+        jQuery('#submitButton').prop('disabled', false);
+        alert("Server does not respond. Network connection lost?");
+    });
+}
+
+function updateStatistics(callback, data, redraw) {
+    jQuery('#submitButton').prop('disabled', true);
+    jQuery.ajax({
+        url: pageInfo.basePath + '/SmartR/reComputeResults',
+        type: "POST",
+        timeout: 1.8e+6,
+        data: data
+    }).always(function() {
+        if (redraw) {
+            renderResultsInTemplate(callback, data);
+        } else {
+           renderResults(callback, data); 
+        }
+    });
+}
+
+function computeResults() {
     conceptBoxes = [];
     sanityCheckErrors = [];
     register(); // method MUST be implemented by _inFoobarAnalysis.gsp
@@ -723,35 +781,32 @@ function runRScript() {
     if (! sane()) {
         return;
     }
-    
+
     // if no subset IDs exist compute them
     if(!(isSubsetEmpty(1) || GLOBAL.CurrentSubsetIDs[1]) || !( isSubsetEmpty(2) || GLOBAL.CurrentSubsetIDs[2])) {
-        runAllQueries(runRScript);
+        runAllQueries(computeResults);
         return false;
     }
 
+    jQuery('#submitButton').prop('disabled', true);
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderLoadingScreen',
         type: "POST",
-        timeout: '600000'
+        timeout: 1.8e+6
     }).done(function(serverAnswer) {
         jQuery("#outputDIV").html(serverAnswer);
     }).fail(function() {
-        jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
+        jQuery("#outputDIV").html("Loading screen could not be initialized. Probably you lost network connection.");
     });
 
-    jQuery('#submitButton').prop('disabled', true);
+    var data = prepareFormData();
     jQuery.ajax({
-        url: pageInfo.basePath + '/SmartR/renderOutputDIV',
+        url: pageInfo.basePath + '/SmartR/computeResults',
         type: "POST",
-        timeout: '600000',
-        data: prepareFormData()
-    }).done(function(serverAnswer) {
-        jQuery("#outputDIV").html(serverAnswer);
-        jQuery('#submitButton').prop('disabled', false);
-    }).fail(function() {
-        jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
-        jQuery('#submitButton').prop('disabled', false);
+        timeout: 1.8e+6,
+        data: data
+    }).always(function() {
+        renderResultsInTemplate(function() {}, data);
     });
 }
 
@@ -763,20 +818,20 @@ function changeInputDIV() {
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderInputDIV',
         type: "POST",
-        timeout: '600000',
+        timeout: 1.8e+6,
         data: {'script': jQuery('#scriptSelect').val()}
     }).done(function(serverAnswer) {
         jQuery("#inputDIV").html(serverAnswer);
     }).fail(function() {
-        jQuery("#inputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
+        jQuery("#inputDIV").html("Coult not render input form. Probably you lost network connection.");
     });
 }
 
 function contact() {
-    var version = 0.1;
-    alert("Before reporting a bug...\n" + 
+    var version = 0.3;
+    alert("Before reporting a bug...\n" +
         "... 1. Make sure you use the lastet SmartR version (installed version: " + version + ")\n" +
-        "... 2. Make sure that all requirements for using SmartR are met\n" + 
+        "... 2. Make sure that all requirements for using SmartR are met\n" +
         "All relevant information can be found on https://github.com/sherzinger/SmartR\n\n" +
         "If you still want to report a bug you MUST include these information:\n\n>>>" + navigator.userAgent + " SmartR/" + version + "<<<\n\nBug reports -> http://usersupport.etriks.org/\nFeedback -> sascha.herzinger@uni.lu");
 }

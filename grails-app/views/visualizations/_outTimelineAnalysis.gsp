@@ -1119,30 +1119,20 @@
         data = addSettingsToData(data, { interpolateNAs: interpolateNAs });
         data = addSettingsToData(data, { xAxisSortOrder: x.domain() });
         clusteringDropdown.select('.buttonText').text('Loading...');
-        jQuery.ajax({
-                url: pageInfo.basePath + '/SmartR/updateOutputDIV',
-                type: "POST",
-                timeout: '600000',
-                data: data
-            }).done(function(serverAnswer) {
-                clusteringDropdown.select('.buttonText').text('Timeline Clustering');
-                serverAnswer = JSON.parse(serverAnswer);
-                if (serverAnswer.error) {
-                    alert(serverAnswer.error);
-                    return;
-                }
-                for (var i = 0; i < concepts.length; i++) {
-                    var concept = concepts[i];
-                    var dendrogram = JSON.parse(serverAnswer.clusterings[concept].dendrogram);
-                    var fromHeight = timelineHeight * i + padding(i);
-                    var toHeight = timelineHeight * (i + 1) + padding(i);
-                    var ids = serverAnswer.clusterings[concept].patientIDs;
-                    drawDendrogram(dendrogram, ids, fromHeight, toHeight);
-                }
-            }).fail(function() {
-                clusteringDropdown.select('.buttonText').text('Timeline Clustering');
-                alert('Clustering failed for unknown reasons!');
-            });
+
+        var doOnResponse = function(reponse) {
+            clusteringDropdown.select('.buttonText').text('Timeline Clustering');
+            for (var i = 0; i < concepts.length; i++) {
+                var concept = concepts[i];
+                var dendrogram = JSON.parse(response.clusterings[concept].dendrogram);
+                var fromHeight = timelineHeight * i + padding(i);
+                var toHeight = timelineHeight * (i + 1) + padding(i);
+                var ids = response.clusterings[concept].patientIDs;
+                drawDendrogram(dendrogram, ids, fromHeight, toHeight);
+            }
+        };
+
+        updateStatistics(doOnResponse, data, false);
     }
 
     var buttonWidth = 200;
@@ -1218,15 +1208,15 @@
         checked: false
     });
 
-    createD3Switch({
-        location: svg,
-        onlabel: 'SHOW Correlogram',
-        offlabel: 'HIDE Correlogram',
-        x: 2 - margin.left + buffer * 5 + buttonWidth * 5,
-        y: 2 - margin.top,
-        width: buttonWidth,
-        height: buttonHeight,
-        callback: swapCorrelogramBoolean,
-        checked: true
-    });
+    // createD3Switch({
+    //     location: svg,
+    //     onlabel: 'SHOW Correlogram',
+    //     offlabel: 'HIDE Correlogram',
+    //     x: 2 - margin.left + buffer * 5 + buttonWidth * 5,
+    //     y: 2 - margin.top,
+    //     width: buttonWidth,
+    //     height: buttonHeight,
+    //     callback: swapCorrelogramBoolean,
+    //     checked: true
+    // });
 </script>

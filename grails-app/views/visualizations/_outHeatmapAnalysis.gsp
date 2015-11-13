@@ -55,7 +55,7 @@
     }
 
     .cuttoffHighlight {
-        opacity: 0.4;    
+        opacity: 0.4;
     }
 
     .box {
@@ -68,7 +68,7 @@
         fill-opacity: 0.2;
     }
 
-    .probe {
+    .uid {
         font-size: 9pt;
     }
 
@@ -130,23 +130,23 @@
         }
     }
 
-    var data = ${raw(results)};
+    var data = ${results};
     var extraFields = data.extraFields === undefined ? [] : data.extraFields;
     var features = data.features === undefined ? [] : data.features;
     var fields = data.fields;
     var significanceValues = data.significanceValues;
     var patientIDs = data.patientIDs;
-    var probes = data.probes;
-    var geneSymbols = data.geneSymbols;
+    var uids = data.uids;
+    var significanceMeassure = data.significanceMeassure[0];
 
-    var maxRows = 100;
+    var maxRows = uids.length;
 
     var originalPatientIDs = patientIDs.slice();
-    var originalProbes = probes.slice();
+    var originalUIDs = uids.slice();
 
     function redGreen() {
         var colorSet = [];
-        var NUM = 100; 
+        var NUM = 100;
         var i = NUM;
         while(i--) {
             colorSet.push(d3.rgb((255 * i) / NUM, 0, 0));
@@ -155,12 +155,12 @@
         while(i--) {
             colorSet.push(d3.rgb(0, (255 * (NUM - i)) / NUM, 0));
         }
-        return colorSet;
+        return colorSet.reverse();
     }
 
     function redBlue() {
         var colorSet = [];
-        var STEP = 1 / 200; 
+        var STEP = 1 / 200;
         var sR = 255, sG = 0, sB = 0;
         var eR = 0, eG = 0, eB = 255;
         for (var i = 0; i < 1; i += STEP) {
@@ -171,7 +171,7 @@
 
     function odd(color) {
         var colorSet = [];
-        var STEP = 1 / 200; 
+        var STEP = 1 / 200;
         var idx1, idx2, fractBetween;
         for (var i = 0; i < 1; i += STEP) {
             var value = i * (color.length - 1);
@@ -187,14 +187,14 @@
     }
 
     var colorSets = [
-        redGreen(), 
-        redBlue(), 
-        odd([[0, 0, 1], [0, 1, 1], [0, 1, 0], [1, 1, 0], [1, 0, 0]]), 
+        redGreen(),
+        redBlue(),
+        odd([[0, 0, 1], [0, 1, 1], [0, 1, 0], [1, 1, 0], [1, 0, 0]]),
         odd([[0, 0, 1], [0, 1, 0], [1, 0, 0]]),
         odd([[0, 0, 1], [1, 1, 0], [1, 0, 0]])
     ];
 
-    var featureColorSetBinary = ['rgb(0, 0, 0)', 'rgb(13, 13, 191)'];
+    var featureColorSetBinary = ['#FFFF00', '#FF8000'];
     var featureColorSetSequential = ['rgb(247,252,253)','rgb(224,236,244)','rgb(191,211,230)','rgb(158,188,218)','rgb(140,150,198)','rgb(140,107,177)','rgb(136,65,157)','rgb(129,15,124)','rgb(77,0,75)'];
 
     var gridFieldWidth = 40;
@@ -202,19 +202,25 @@
     var dendrogramHeight = 300;
     var histogramHeight = 200;
 
-    var margin = { top: gridFieldHeight * 2 + 100 + features.length * gridFieldHeight / 2 + dendrogramHeight, 
-            right: gridFieldWidth + 300 + dendrogramHeight, 
-            bottom: 10, 
+    var margin = { top: gridFieldHeight * 2 + 100 + features.length * gridFieldHeight / 2 + dendrogramHeight,
+            right: gridFieldWidth + 300 + dendrogramHeight,
+            bottom: 10,
             left: histogramHeight + 250 };
 
     var width = gridFieldWidth * patientIDs.length;
-    var height = gridFieldHeight * probes.length;
+    var height = gridFieldHeight * uids.length;
 
     var selectedPatientIDs = [];
 
     var histogramScale = d3.scale.linear()
-    .domain(d3.extent(significanceValues))
-    .range([0, histogramHeight]);
+    .domain(d3.extent(significanceValues, function(d) {
+        if (significanceMeassure === "B") {
+            return d;
+        } else {
+            return Math.abs(d);
+        }
+    }))
+    .range(significanceMeassure === "P.Value" || significanceMeassure === "adj.P.val" ? [histogramHeight, 0] : [0, histogramHeight]);
 
     var heatmap = d3.select("#heatmap").append("svg")
     .attr("width", (width + margin.left + margin.right) * 4)
@@ -238,16 +244,15 @@
 
     function updateHeatmap() {
         var square = squareItems.selectAll('.square')
-        .data(fields, function(d) { return 'patientID-' + d.PATIENTID + '-probe-' + d.PROBE; });
-
+        .data(fields, function(d) { return 'patientID-' + d.PATIENTID + '-uid-' + d.UID; });
         square
         .enter()
         .append("rect")
         .attr('class', function(d) {
-            return 'square patientID-' + d.PATIENTID + ' probe-' + d.PROBE;
+            return 'square patientID-' + d.PATIENTID + ' uid-' + d.UID;
         })
         .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
-        .attr("y", function(d) { return probes.indexOf(d.PROBE) * gridFieldHeight; })
+        .attr("y", function(d) { return uids.indexOf(d.UID) * gridFieldHeight; })
         .attr("width", gridFieldWidth)
         .attr("height", gridFieldHeight)
         .attr("rx", 0)
@@ -255,7 +260,7 @@
         .style("fill", 'white')
         .on("mouseover", function(d) {
             d3.select('.patientID.patientID-' +  d.PATIENTID).classed("highlight", true);
-            d3.select('.probe.probe-' +  d.PROBE).classed("highlight", true);
+            d3.select('.uid.uid-' +  d.UID).classed("highlight", true);
 
             var html = '';
             for(var key in d) {
@@ -269,20 +274,24 @@
         })
         .on("mouseout", function(d) {
             d3.selectAll(".patientID").classed("highlight", false);
-            d3.selectAll(".probe").classed("highlight", false);
+            d3.selectAll(".uid").classed("highlight", false);
 
             tooltip.style("visibility", "hidden");
         })
         .on('click', function(d) {
-            var url = 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + d.GENESYMBOL;
-            window.open(url);
+            var genes = d.UID.split("--");
+            for (var i = 1; i < genes.length; i++) {
+                var gene = genes[i];
+                var url = 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + gene;
+                window.open(url);
+            }
         });
 
         square
         .transition()
         .duration(animationDuration)
         .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
-        .attr("y", function(d) { return probes.indexOf(d.PROBE) * gridFieldHeight; })
+        .attr("y", function(d) { return uids.indexOf(d.UID) * gridFieldHeight; })
         .attr("width", gridFieldWidth)
         .attr("height", gridFieldHeight);
 
@@ -318,9 +327,9 @@
         .attr('height', gridFieldHeight)
         .on("click", function(patientID) {
             var rowValues = [];
-            for(var i = 0; i < probes.length; i++) {
-                var probe = probes[i];
-                var square = d3.select('.square' + '.patientID-' + patientID + '.probe-' + probe);
+            for(var i = 0; i < uids.length; i++) {
+                var uid = uids[i];
+                var square = d3.select('.square' + '.patientID-' + patientID + '.uid-' + uid);
                 rowValues.push([i, square.property('__data__').ZSCORE]);
             }
             if (isSorted(rowValues)) {
@@ -344,7 +353,7 @@
         .attr('height', gridFieldHeight);
 
         var rowSortText = rowSortItems.selectAll('.rowSortText')
-        .data(probes, function(d) { return d; });
+        .data(uids, function(d) { return d; });
 
         rowSortText
         .enter()
@@ -361,7 +370,7 @@
         .attr("transform", function(d, i) { return "translate(" + (width + 2 + 0.5 * gridFieldWidth) + ",0)" + "translate(0," + (i * gridFieldHeight + 0.5 * gridFieldHeight) + ")rotate(-90)";});
 
         var rowSortBox = rowSortItems.selectAll('.rowSortBox')
-        .data(probes, function(d) { return d; });
+        .data(uids, function(d) { return d; });
 
         rowSortBox
         .enter()
@@ -371,11 +380,11 @@
         .attr('y', function(d, i) { return i * gridFieldHeight; })
         .attr('width', gridFieldWidth)
         .attr('height', gridFieldHeight)
-        .on("click", function(probe) {
+        .on("click", function(uid) {
             var colValues = [];
             for(var i = 0; i < patientIDs.length; i++) {
                 var patientID = patientIDs[i];
-                var square = d3.select('.square' + '.patientID-' + patientID + '.probe-' + probe);
+                var square = d3.select('.square' + '.patientID-' + patientID + '.uid-' + uid);
                 colValues.push([i, square.property('__data__').ZSCORE]);
             }
             if (isSorted(colValues)) {
@@ -432,7 +441,7 @@
             var rowValues = [];
             for(var i = 0; i < significanceValues.length; i++) {
                 var significanceValue = significanceValues[i];
-                rowValues.push([i, significanceValue]);
+                rowValues.push([i, Math.abs(significanceValue)]);
             }
             if (isSorted(rowValues)) {
                rowValues.sort(function(a, b) { return a[1] - b[1]; });
@@ -452,7 +461,7 @@
         .attr('x', - gridFieldWidth - 10)
         .attr('y', -2 - gridFieldHeight)
         .attr('width', gridFieldWidth)
-        .attr('height', gridFieldHeight);    
+        .attr('height', gridFieldHeight);
 
 
         var selectText = heatmap.selectAll('.selectText')
@@ -519,32 +528,38 @@
                 "translate(" + (gridFieldWidth / 2) + "," + (-4 - gridFieldHeight * 2) + ")rotate(-45)";
         });
 
-        var probe = labelItems.selectAll('.probe')
-        .data(probes, function(d) { return d; });
+        var uid = labelItems.selectAll('.uid')
+        .data(uids, function(d) { return d; });
 
-        probe
+        uid
         .enter()
         .append("text")
-        .attr('class', function(d) { return 'probe text probe-' + d;})
+        .attr('class', function(d) { return 'uid text uid-' + d;})
         .attr('x', width + gridFieldWidth + 7)
-        .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; })
+        .attr('y', function(d) { return uids.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; })
         .attr('dy', '0.35em')
         .style("text-anchor", "start")
-        .text(function(d) { 
-            var i = probes.indexOf(d);
-            return d + '  //  ' + geneSymbols[i]; 
-        });
+        .text(function(d) { return d; });
 
-        probe
+        uid
         .transition()
         .duration(animationDuration)
         .attr('x', width + gridFieldWidth + 7)
-        .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
+        .attr('y', function(d) { return uids.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
 
         var significanceIndexMap = jQuery.map(significanceValues, function(d, i) {
-            return {significance: d, idx: i}; 
+            return {significance: d, idx: i};
         });
-        
+
+        var computeBarSize = function(significance) {
+            if (significanceMeassure === 'P.Value' || significanceMeassure === 'adj.P.val') {
+                return histogramHeight - histogramScale(significance);
+            } else if (significanceMeassure === 'logFC' || significanceMeassure === 't') {
+                return histogramScale(Math.abs(significance));
+            }
+            return histogramScale(significance);
+        };
+
         var bar = barItems.selectAll('.bar')
         .data(significanceIndexMap, function(d) { return d.idx; });
 
@@ -552,35 +567,37 @@
         .enter()
         .append('rect')
         .attr('class', function(d) { return 'bar idx-' + d.idx ; })
-        .attr("width", function(d) { return histogramScale(d.significance); })
+        .attr("width", function(d) { return computeBarSize(d.significance); })
         .attr("height", gridFieldHeight)
-        .attr("x", function(d) { return - histogramScale(d.significance) - 10; })
+        .attr("x", function(d) { return - computeBarSize(d.significance) - 10; })
         .attr("y", function(d) { return gridFieldHeight * d.idx; })
+        .style('fill', function(d) { return d.significance > 0 ? 'steelblue' : '#990000';})
         .on("mouseover", function(d) {
-            var html = 'FEATURE SIGNIFICANCE: ' + d.significance;
+            var html = significanceMeassure + ': ' + d.significance;
             tooltip
             .style("visibility", "visible")
             .html(html)
             .style("left", mouseX() + "px")
             .style("top", mouseY() + "px");
-            d3.selectAll('.square.probe-' +  probes[d.idx])
+            d3.selectAll('.square.uid-' +  uids[d.idx])
             .classed("squareHighlighted", true);
-            d3.select('.probe.probe-' +  probes[d.idx])
+            d3.select('.uid.uid-' +  uids[d.idx])
             .classed("highlight", true);
         })
         .on("mouseout", function(d) {
             tooltip.style("visibility", "hidden");
             d3.selectAll(".square").classed("squareHighlighted", false);
-            d3.selectAll(".probe").classed("highlight", false);
+            d3.selectAll(".uid").classed("highlight", false);
         });
 
-        bar 
+        bar
         .transition()
         .duration(animationDuration)
         .attr("height", gridFieldHeight)
-        .attr("width", function(d) { return histogramScale(d.significance); })
-        .attr("x", function(d) { return - histogramScale(d.significance) - 10; })
-        .attr("y", function(d) { return gridFieldHeight * d.idx; });
+        .attr("width", function(d) { return computeBarSize(d.significance); })
+        .attr("x", function(d) { return - computeBarSize(d.significance) - 10; })
+        .attr("y", function(d) { return gridFieldHeight * d.idx; })
+        .style('fill', function(d) { return d.significance > 0 ? 'steelblue' : '#990000';});
 
         var featurePosY = - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20;
 
@@ -658,7 +675,7 @@
         .attr('dy', '0.35em')
         .attr("text-anchor", "middle")
         .text('↑↓')
-        .attr('visibility', function(d) { 
+        .attr('visibility', function(d) {
             if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
                 return 'visible';
             } else {
@@ -710,7 +727,7 @@
             }
             updateColOrder(sortValues);
         })
-        .attr('visibility', function(d) { 
+        .attr('visibility', function(d) {
             if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
                 return 'visible';
             } else {
@@ -737,7 +754,7 @@
         d3.selectAll('.selectText')
         .style('font-size', Math.ceil(16 * zoomLevel) + 'px');
 
-        d3.selectAll('.probe')
+        d3.selectAll('.uid')
         .style('font-size', Math.ceil(9 * zoomLevel) + 'px');
 
         d3.selectAll('.feature')
@@ -752,7 +769,7 @@
         gridFieldWidth = 40 * zoomLevel;
         gridFieldHeight = 40 * zoomLevel;
         width = gridFieldWidth * patientIDs.length;
-        height = gridFieldHeight * probes.length;
+        height = gridFieldHeight * uids.length;
         heatmap
         .attr('width', width + margin.left + margin.right)
         .attr('height', width + margin.top + margin.bottom);
@@ -763,35 +780,25 @@
         animationDuration = temp;
     }
 
-    var cutoffLevel = significanceValues[significanceValues.length - 1];
+    var cutoffLevel = 0;
     function animateCutoff(cutoff) {
+        cutoff = Math.floor(cutoff);
         cutoffLevel = cutoff;
-        for (var i = 0; i < significanceValues.length; i++) {
-            var significanceValue = significanceValues[i];
-            if (significanceValue < cutoff) {
-                d3.selectAll('.square.probe-' +  probes[i])
-                .classed("cuttoffHighlight", true);
-                d3.select('.bar.idx-' +  i)
-                .classed("cuttoffHighlight", true);
-            } else {
-                d3.selectAll('.square.probe-' +  probes[i])
-                .classed("cuttoffHighlight", false);
-                d3.select('.bar.idx-' +  i)
-                .classed("cuttoffHighlight", false);
-            }
+        d3.selectAll('.square')
+        .classed("cuttoffHighlight", false);
+        d3.selectAll('.bar')
+        .classed("cuttoffHighlight", false);
+        for (var i = maxRows - 1; i >= maxRows - cutoff; i--) {
+            d3.selectAll('.square.uid-' +  uids[i])
+            .classed("cuttoffHighlight", true);
+            d3.select('.bar.idx-' +  i)
+            .classed("cuttoffHighlight", true);
         }
     }
 
     function cutoff() {
         cuttoffButton.select('text').text('Loading...');
-        var nrows = 0;
-        for (var i = 0; i < significanceValues.length; i++) {
-            var significanceValue = significanceValues[i];
-            if (significanceValue > cutoffLevel) {
-                nrows += 1;
-            }
-        }
-        loadRows(nrows);
+        loadRows(maxRows - cutoffLevel);
     }
 
     function reloadDendrograms() {
@@ -834,7 +841,7 @@
         var colorScale = d3.scale.quantile()
         .domain([0, 1])
         .range(colorSets[colorIdx]);
-        
+
         d3.selectAll('.square')
         .transition()
         .duration(animationDuration)
@@ -845,13 +852,13 @@
             d3.selectAll('.extraSquare.feature-' + feature)
             .style("fill", function(d) {
                 if (d.TYPE === 'binary') {
-                    return featureColorSetBinary[d.VALUE];
+                    return featureColorSetBinary[d.VALUE - 1];
                 } else if (d.TYPE === 'numerical') {
                     colorScale
                     .range(featureColorSetSequential);
-                    return colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE))); 
+                    return colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE)));
                 } else if (d.TYPE === 'alphabetical') {
-                    return categoricalColorScale(d.VALUE);            
+                    return categoricalColorScale(d.VALUE);
                 } else {
                     alert('Field type does not exist: ' + d.TYPE);
                 }
@@ -930,7 +937,7 @@
     var rowDendrogram;
     function createRowDendrogram() {
         var h = 280;
-        var spacing = gridFieldWidth + getMaxWidth(d3.selectAll('.probe')) + 20;
+        var spacing = gridFieldWidth + getMaxWidth(d3.selectAll('.uid')) + 20;
 
         var cluster = d3.layout.cluster()
         .size([height, h])
@@ -972,7 +979,7 @@
                 url: 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi',
                 type: "POST",
                 timeout: '600000',
-                data: { 
+                data: {
                     section: 'upload_gene_lists',
                     primary_org: 'Human',
                     background: 'whole_genome',
@@ -986,7 +993,7 @@
                 newTab.document.write(serverAnswer);
             }).fail(function() {
                 alert('fail');
-            });     
+            });
         })
         .on("mouseover", function(d) {
             tooltip
@@ -1023,16 +1030,13 @@
     }
 
     function updateRowOrder(sortValues) {
-        var sortedProbes = [];
-        var sortedGeneSymbols = [];
+        var sortedUIDs = [];
         var sortedSignificanceValues = [];
         for (var i = 0; i < sortValues.length; i++) {
-            sortedProbes.push(probes[sortValues[i]]);
-            sortedGeneSymbols.push(geneSymbols[sortValues[i]]);
+            sortedUIDs.push(uids[sortValues[i]]);
             sortedSignificanceValues.push(significanceValues[sortValues[i]]);
         }
-        probes = sortedProbes;
-        geneSymbols = sortedGeneSymbols;
+        uids = sortedUIDs;
         significanceValues = sortedSignificanceValues;
         removeRowDendrogram();
         updateHeatmap();
@@ -1049,9 +1053,9 @@
 
     function getInitialRowOrder() {
         initialRowOrder = [];
-        for (var i = 0; i < probes.length; i++) {
-            var probe = probes[i];
-            initialRowOrder.push(originalProbes.indexOf(probe));
+        for (var i = 0; i < uids.length; i++) {
+            var uid = uids[i];
+            initialRowOrder.push(originalUIDs.indexOf(uid));
         }
         return initialRowOrder;
     }
@@ -1088,24 +1092,17 @@
     }
 
     function loadRows(nrows) {
-        var maxRows = nrows === undefined ? probes.length + 100 : nrows;
+        var maxRows = nrows === undefined ? uids.length + 100 : nrows;
+        loadFeatureButton.select('text').text('Loading...');
         var data = prepareFormData();
         data = addSettingsToData(data, { maxRows: maxRows });
-        loadFeatureButton.select('text').text('Loading...');
-        jQuery.ajax({
-            url: pageInfo.basePath + '/SmartR/recomputeOutputDIV',
-            type: "POST",
-            timeout: '600000',
-            data: data
-        }).done(function(serverAnswer) {
-            jQuery("#outputDIV").html(serverAnswer);
+
+        var doOnResponse = function() {
             loadFeatureButton.select('text').text('Load 100 additional rows');
             cuttoffButton.select('text').text('Apply Cutoff');
-        }).fail(function() {
-            jQuery("#outputDIV").html("An unexpected error occurred. This should never happen. Ask your administrator for help.");
-            loadFeatureButton.select('text').text('Load 100 additional rows');
-            cuttoffButton.select('text').text('Apply Cutoff');
-        });
+        };
+
+        updateStatistics(doOnResponse, data, true);
     }
 
     function init() {
@@ -1183,9 +1180,9 @@
         y: 8 - margin.top + buttonHeight * 2 + padding * 2 - 10,
         width: buttonWidth,
         height: buttonHeight,
-        min: significanceValues[significanceValues.length - 1],
-        max: significanceValues[0],
-        init: significanceValues[significanceValues.length - 1],
+        min: 0,
+        max: maxRows - 2,
+        init: 0,
         callback: animateCutoff,
         trigger: 'dragend'
     });
@@ -1199,23 +1196,23 @@
         height: buttonHeight,
         items: [
             {
-                callback: function() { updateColors(0); }, 
+                callback: function() { updateColors(0); },
                 label: 'Color Sheme 1'
             },
             {
-                callback: function() { updateColors(1); }, 
+                callback: function() { updateColors(1); },
                 label: 'Color Sheme 2'
             },
             {
-                callback: function() { updateColors(2); }, 
+                callback: function() { updateColors(2); },
                 label: 'Color Sheme 3'
             },
             {
-                callback: function() { updateColors(3); }, 
+                callback: function() { updateColors(3); },
                 label: 'Color Sheme 4'
             },
             {
-                callback: function() { updateColors(4); }, 
+                callback: function() { updateColors(4); },
                 label: 'Color Sheme 5'
             }
         ]
@@ -1230,27 +1227,27 @@
         height: buttonHeight,
         items: [
             {
-                callback: function() { cluster('hclustEuclideanAverage'); }, 
+                callback: function() { cluster('hclustEuclideanAverage'); },
                 label: 'Hierarch.-Eucl.-Average'
             },
             {
-                callback: function() { cluster('hclustEuclideanComplete'); }, 
+                callback: function() { cluster('hclustEuclideanComplete'); },
                 label: 'Hierarch.-Eucl.-Complete'
             },
             {
-                callback: function() { cluster('hclustEuclideanSingle'); }, 
+                callback: function() { cluster('hclustEuclideanSingle'); },
                 label: 'Hierarch.-Eucl.-Single'
             },
             {
-                callback: function() { cluster('hclustManhattanAverage'); }, 
+                callback: function() { cluster('hclustManhattanAverage'); },
                 label: 'Hierarch.-Manhat.-Average'
             },
             {
-                callback: function() { cluster('hclustManhattanComplete'); }, 
+                callback: function() { cluster('hclustManhattanComplete'); },
                 label: 'Hierarch.-Manhat.-Complete'
             },
             {
-                callback: function() { cluster('hclustManhattanSingle'); }, 
+                callback: function() { cluster('hclustManhattanSingle'); },
                 label: 'Hierarch.-Manhat.-Single'
             }
         ]

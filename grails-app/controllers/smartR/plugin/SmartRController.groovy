@@ -1,6 +1,7 @@
 package smartR.plugin
 
 import grails.converters.JSON
+import groovy.json.JsonBuilder
 import heim.session.SessionService
 import org.apache.commons.io.FilenameUtils
 import org.codehaus.groovy.grails.web.json.JSONArray
@@ -9,14 +10,48 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 class SmartRController {
 
     SessionService sessionService
+    def smartRService
+    def scriptExecutorService
 
-    /**
-    *   Renders the default view
-    */
     def index = {
         [scriptList: sessionService.availableWorkflows()]
     }
 
+    def computeResults = {
+        params.init = params.init == null ? true : params.init // defaults to true
+        smartRService.runScript(params)
+        render ''
+    }
+
+    def reComputeResults = {
+        params.init = false
+        redirect controller: 'SmartR',
+                 action: 'computeResults', 
+                 params: params
+    }
+
+    // For handling results yourself
+    def renderResults = {
+        params.init = false
+        def (success, results) = scriptExecutorService.getResults(params.cookieID)
+        if (! success) {
+            render new JsonBuilder([error: results]).toString()
+        } else {
+            render results
+        }
+    }
+
+    // For (re)drawing the whole visualization
+    def renderResultsInTemplate = {
+        def (success, results) = scriptExecutorService.getResults(params.cookieID)
+        if (! success) {
+            render results
+        } else {
+            render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
+                    model: [results: results]
+        }       
+    }
+    
     /**
     *   Renders the input form for initial script parameters
     */
@@ -26,6 +61,10 @@ class SmartRController {
         } else {
             render template: "/heim/in${FilenameUtils.getBaseName(params.script).capitalize()}"
         }
+    }
+
+    def renderLoadingScreen = {
+        render template: "/visualizations/outLoading"
     }
 
     /**
