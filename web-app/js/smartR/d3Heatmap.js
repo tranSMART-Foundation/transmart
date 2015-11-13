@@ -1,3 +1,5 @@
+//TODO: Refactor this to avoid globals and to have more pattern
+
 var animationDuration = 1500;
 var tmpAnimationDuration = animationDuration;
 
