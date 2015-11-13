@@ -1,13 +1,9 @@
 package smartR.plugin
 
-import org.transmartproject.rest.marshallers.ObservationWrapper
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.dataquery.clinical.*
 import org.transmartproject.core.dataquery.TabularResult
 import groovy.sql.Sql
-import groovy.json.JsonBuilder
-import au.com.bytecode.opencsv.CSVWriter
-
 
 class DataQueryService {
 
@@ -106,9 +102,9 @@ class DataQueryService {
                 concept_path: term.fullName)
     }
 
-    private static List<ObservationWrapper> wrapObservations(
+    private static List<Map> wrapObservations(
         TabularResult<ClinicalVariable, PatientRow> tabularResult) {
-        List<ObservationWrapper> observations = []
+        List<Map> observations = []
         def variableColumns = tabularResult.getIndicesList()
         tabularResult.getRows().each { row ->
             variableColumns.each { ClinicalVariableColumn topVar ->
@@ -116,16 +112,18 @@ class DataQueryService {
 
                 if (value instanceof Map) {
                     value.each { ClinicalVariableColumn var, Object obj ->
-                        observations << new ObservationWrapper(
+                        observations << [
                                 subject: row.patient,
                                 label: var.label,
-                                value: obj)
+                                value: obj
+                                ]
                     }
                 } else {
-                    observations << new ObservationWrapper(
+                    observations << [
                             subject: row.patient,
                             label: topVar.label,
-                            value: value)
+                            value: value
+                    ]
                 }
             }
         }
