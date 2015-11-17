@@ -1,4 +1,3 @@
-%{--include js lib for heatmap dynamically--}%
 <r:require modules="heatmap"/>
 <r:layoutResources disposition="defer"/>
 
@@ -174,7 +173,14 @@
             <div id="heim-run-output"></div>
             <img id="heim-img-result">
 
-        </div>
+
+            %{--d3 js heatmap placeholder--}%
+            <div id='visualization' class='text'>
+                <div id="heatmap" class='text'></div>
+            </div>
+
+
+    </div>
         
     </div>
 </div>
