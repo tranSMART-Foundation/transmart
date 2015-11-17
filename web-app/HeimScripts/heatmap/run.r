@@ -2,9 +2,9 @@ library(jsonlite)
 library(reshape2)
 
 main <- function(){
-   df <- loaded_variables[[1]]
+   df <- loaded_variables[[1]] # SmartR does not support multiple HDD nodes yet
    fields <- buildFields(df)
-   geneSymbols <- unique(fields["GENESYMBOL"])[,1]
+   geneSymbols <- unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector, otherwise we get a dataframe
    patientIDs <-unique(fields["PATIENTID"])[,1]
    probes <- unique(fields["PROBE"])[,1]
    significanceValues <- unique(fields["SIGNIFICANCE"])[,1]
@@ -13,7 +13,7 @@ main <- function(){
                "probes"=probes,
                "significanceValues"=significanceValues ),
           pretty = TRUE)
-   write(jsn,file = "heatmap.json")
+   write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
 }
 
 
