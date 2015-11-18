@@ -162,7 +162,4 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
         assertStatus 400
     }
 
-    void testJsonRetrieval() {
-
-    }
 }
