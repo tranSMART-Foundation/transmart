@@ -13,8 +13,8 @@ main <- function(){
                "probes"=probes,
                "significanceValues"=significanceValues ),
           pretty = TRUE)
-   list(heatmapJson = jsn)
-   #write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
+   #list(heatmapJson = jsn)
+   write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
 }
 
 
