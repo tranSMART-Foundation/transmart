@@ -115,7 +115,7 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
                 )))
 
         Map artifacts = JSON.result.artifacts
-        assertThat artifacts['files'], contains('test_file')
+        assertThat artifacts['files'], hasItem('heatmap.json')
 
     }
 
