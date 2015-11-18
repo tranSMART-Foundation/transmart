@@ -23,10 +23,10 @@ abstract class BaseAPITestCase extends APITestCase {
         }.join('&')
     }
 
-    protected String /* session id */ createSession() {
+    protected String /* session id */ createSession(String workflowName) {
         post('/RSession/create') {
             body json: [
-                    workflow: 'func_test'
+                    workflow: workflowName
             ]
         }
         assumeThat client.responseStatus, is(201)

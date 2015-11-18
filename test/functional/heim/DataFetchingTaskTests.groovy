@@ -17,7 +17,7 @@ class DataFetchingTaskTests extends BaseAPITestCase {
     void testMrnaDataFetching() {
 
         def test_label = 'test_label'
-        String sessionId = createSession()
+        String sessionId = createSession('func_test')
 
         post '/ScriptExecution/run', {
             body json: [
