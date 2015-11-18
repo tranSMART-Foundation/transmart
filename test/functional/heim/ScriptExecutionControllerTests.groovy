@@ -115,9 +115,7 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
                 )))
 
         Map artifacts = JSON.result.artifacts
-        assertThat  artifacts , allOf(
-                hasEntry(is('heatmapJson'),isA(String))
-        )
+        assertThat artifacts['files'], hasItem('heatmap.json')
 
     }
 
@@ -162,7 +160,4 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
         assertStatus 400
     }
 
-    void testJsonRetrieval() {
-
-    }
 }
