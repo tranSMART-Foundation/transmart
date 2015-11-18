@@ -8,12 +8,13 @@ main <- function(){
    patientIDs <-unique(fields["PATIENTID"])[,1]
    probes <- unique(fields["PROBE"])[,1]
    significanceValues <- unique(fields["SIGNIFICANCE"])[,1]
-   jsn <- toJSON(list("fields"=fields, "geneSymbols"=geneSymbols, 
+   jsn <- toJSON(list("fields"=fields, "geneSymbols"=geneSymbols,
                "patientIDs"=patientIDs,
                "probes"=probes,
                "significanceValues"=significanceValues ),
           pretty = TRUE)
-   write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
+   list(heatmapJson = jsn)
+   #write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
 }
 
 
