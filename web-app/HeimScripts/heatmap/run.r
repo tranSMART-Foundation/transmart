@@ -2,7 +2,7 @@ library(jsonlite)
 library(reshape2)
 
 
-main <- function(max_rows){
+main <- function(max_rows=50){
   df <- loaded_variables[[1]] # SmartR does not support multiple HDD nodes yet
   if(ncol(df) > 3){
     variances <- apply(df[,3:ncol(df)],1,var) # Calculating variance per probe
@@ -24,8 +24,6 @@ main <- function(max_rows){
   write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
   list(filename="heatmap.json") # main function in every R script has to return a list (so a data.frame will also do)
 }
-
-
 
 buildFields <- function(df){
   df <- melt(df,id=names(df)[1:2])
