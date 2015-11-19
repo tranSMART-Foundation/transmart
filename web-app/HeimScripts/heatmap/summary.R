@@ -10,7 +10,6 @@
 #         (RIGHT NOW THE UNDERSCORE IS USED FOR SPLITTING THE TWO, SO IF UNDERSCORES ARE USED IN THE NODE IDENTIFIER ,THIS SHOULD BE CHANGED)
 #   The data.frames (coming from high dimensional nodes) have columns: Row.Label, Bio.marker (optional), ASSAY_0001, ASSAY_0002 ...  
 #     ** right now this is only implemented for high dimensional data nodes, later the functionality might be extended for clinical data. In that case it is possible to recognize if it is high or low dim data based on the column names of the data.frame (assuming low dim data will also be passed on in the form of data.frames)
-# * a named (labeled) vector with the definitions of the selected subset(s) (used for labeling the subsets in the boxplot) (e.g.: (s1 = "F", s2 = "M" )). Passed on as argument to main() 
 #
 # Output: 
 # * 1 boxplot image per data node, png format. Name: Box_plot_Node_<Node Identifier>.png. 
@@ -23,11 +22,11 @@
 library(jsonlite)
 library(gplots)
 
-main <- function(subset_definitions)
+main <- function()
 {
   data_measurements <- extract_measurements(loaded_variables)
   produce_summary_stats(data_measurements)
-  produce_boxplot(data_measurements, subset_definitions)
+  produce_boxplot(data_measurements)
 }
 
 
@@ -119,13 +118,13 @@ produce_summary_stats <- function(measurement_tables)
   {
     partial_table <- result_table[which(result_table$node == node), ,drop = F]
     summary_stats_JSON <- toJSON(partial_table, dataframe = "rows", pretty = T)
-    fileName <- paste("Summary_stats-Node_", node, ".json", sep = "")
+    fileName <- paste("summary_stats_node_", node, ".json", sep = "")
     write(summary_stats_JSON, fileName)
   }
 }
 
 # Function that outputs one box plot image per data node
-produce_boxplot <- function(measurement_tables, subset_def)
+produce_boxplot <- function(measurement_tables)
 {
   #get node and subset identifiers
   nodes <- gsub("_.*","",names(measurement_tables))
@@ -153,14 +152,8 @@ produce_boxplot <- function(measurement_tables, subset_def)
     #make sure the subsets are always ordered s1, s2, ...
     single_node_data <- single_node_data[order(names(single_node_data))] 
     
-    #replace subset identifiers by subset definition if the subset definition is given and matches the subset identifiers
-    if(all(names(single_node_data) %in% names(subset_def))) 
-    {
-      names(single_node_data) <- subset_def[names(single_node_data)]
-    }
-    
     ## create box plot, output to PNG file
-    fileName <- paste("Box_plot-Node_", node, ".png", sep = "")    
+    fileName <- paste("box_plot_node_", node, ".png", sep = "")    
     png(filename = fileName)
     
     # in case there is data present: create box plot
@@ -181,12 +174,3 @@ produce_boxplot <- function(measurement_tables, subset_def)
     dev.off()
   }
 }
-
-
-
-
-
-
-
-
-
