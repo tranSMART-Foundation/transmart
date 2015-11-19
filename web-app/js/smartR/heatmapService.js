@@ -169,13 +169,13 @@ HeatmapService = (function(smartRHeatmap){
         // NOTHING
     };
 
-    service.runAnalysis = function (eventObj) {
+    service.runAnalysis = function (params) {
         $j.ajax({
             type: 'POST',
             url: pageInfo.basePath + '/ScriptExecution/run',
             data: JSON.stringify({
                 sessionId : GLOBAL.HeimAnalyses.sessionId,
-                arguments : {},
+                arguments : params,
                 taskType : 'run'}
             ),
             contentType: 'application/json',

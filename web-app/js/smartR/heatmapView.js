@@ -19,6 +19,7 @@ HeatmapView = (function(){
             // TODO
         },
         runHeatmapView : {
+            maxRowInput : $j('#txtMaxRow'),
             clusteringOptionsDiv : $j('#clusteringOptionsDiv'),
             methodSelect : $j('#methodSelect'),
             noClustersDiv : $j('#noOfClustersDiv'),
@@ -45,6 +46,15 @@ HeatmapView = (function(){
         };
     };
 
+    var _getRunHeatmapViewValues = function (v) {
+        // get max_row
+        var _maxRow = v.maxRowInput.val();
+        console.log(_maxRow);
+        return {
+            max_row : _maxRow
+        }
+    };
+
     /**
      * Fetch data
      * @param eventObj
@@ -53,6 +63,12 @@ HeatmapView = (function(){
     var _fetchDataAction = function (eventObj) {
         var _fetchDataParams =  _getFetchDataViewValues(view.fetchDataView);
         heatmapService.fetchData(_fetchDataParams);
+    };
+
+    var _runHeatmapAction = function (eventObj) {
+        var _runHeatmapInputArgs =  _getRunHeatmapViewValues(view.runHeatmapView);
+        console.log(_runHeatmapAction, _runHeatmapInputArgs);
+        heatmapService.runAnalysis(_runHeatmapInputArgs);
     };
 
     /**
@@ -96,7 +112,10 @@ HeatmapView = (function(){
         //
         view.fetchDataView.checkStatusBtn.click(heatmapService.checkStatus);
         // TODO Run Analysis
-        view.runHeatmapView.runAnalysisBtn.click (heatmapService.runAnalysis);
+        view.runHeatmapView.runAnalysisBtn.click (
+            view.runHeatmapView,
+            _runHeatmapAction
+        );
         view.runHeatmapView.downloadFileBtn.click (heatmapService.checkStatus);
     };
 
