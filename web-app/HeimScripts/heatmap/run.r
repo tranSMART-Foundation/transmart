@@ -4,11 +4,13 @@ library(reshape2)
 
 main <- function(max_rows){
   df <- loaded_variables[[1]] # SmartR does not support multiple HDD nodes yet
-  variances <- apply(df[,3:ncol(df)],1,var) # Calculating variance per probe
-  df["variance"] <- variances
-  df <- df[with(df, order(-variance)), ]
+  if(ncol(df) > 3){
+    variances <- apply(df[,3:ncol(df)],1,var) # Calculating variance per probe
+    df["variance"] <- variances
+    df <- df[with(df, order(-variance)), ]
+    df["variance"] <- NULL # we do not need variance in the end result
+  }
   df <- df[1:max_rows,]
-  df["variance"] <- NULL # we do not need variance in the end result
   fields <- buildFields(df)
   geneSymbols <- unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector, otherwise we get a dataframe
   patientIDs <-unique(fields["PATIENTID"])[,1]
