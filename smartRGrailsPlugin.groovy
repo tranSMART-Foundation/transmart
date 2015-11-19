@@ -3,7 +3,7 @@ import org.springframework.stereotype.Component
 
 class smartRGrailsPlugin {
     // the plugin version
-    def version = "0.1"
+    def version = "0.3"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.3 > *"
     // resources that are excluded from plugin packaging
@@ -75,6 +75,8 @@ class smartRGrailsPlugin {
 
         config.smartR.pluginScriptDirectory =
                 new File(smartRDir.canonicalPath, 'HeimScripts')
+        config.smartR.legacyPluginScriptDirectory =
+                new File(smartRDir.canonicalPath, 'Scripts')
         log.info("Directory for heim scripts is ${config.smartR.pluginScriptDirectory}")
     }
 }

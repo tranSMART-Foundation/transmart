@@ -62,7 +62,7 @@
     }
 
     #histogram1 {
-        float: left;
+        float: right;
     }
 
     #histogram2 {
@@ -120,8 +120,8 @@
 <g:javascript src="resource/d3.js"/>
 <div id='controls'></div>
 <div id="visualization">
-    <div id="histogram1"></div>
     <div id="scatterplot"></div>
+    <div id="histogram1"></div>
     <div id="histogram2"></div>
 </div>
 
@@ -533,30 +533,22 @@
             return;
         }
         updateLegend('Updating...');
-        var data = prepareFormData();
         var xLowHigh = d3.extent(selectedData, function(d) { return getOriginalPointWithUID(d.uid).x; });
         var yLowHigh = d3.extent(selectedData, function(d) { return getOriginalPointWithUID(d.uid).y; });
+
+        var data = prepareFormData();
         data = addSettingsToData(data, { xLow: xLowHigh[0] });
         data = addSettingsToData(data, { xHigh: xLowHigh[1] });
         data = addSettingsToData(data, { yLow: yLowHigh[0] });
         data = addSettingsToData(data, { yHigh: yLowHigh[1] });
-        jQuery.ajax({
-            url: pageInfo.basePath + '/SmartR/updateOutputDIV',
-            type: "POST",
-            timeout: '600000',
-            data: data
-        }).done(function(serverAnswer) {
-            serverAnswer = JSON.parse(serverAnswer);
-            if (serverAnswer.error) {
-                alert(serverAnswer.error);
-                return;
-            }
-            results = serverAnswer;
+
+        var doOnResponse = function(reponse) {
+            results = reponse;
             updateRegressionLine();
             updateLegend();
-        }).fail(function() {
-            updateLegend("AJAX CALL FAILED");
-        });
+        };
+
+        updateStatistics(doOnResponse, data, false);
     }
 
     function updateCohorts() {

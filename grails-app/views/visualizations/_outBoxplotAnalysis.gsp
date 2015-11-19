@@ -335,22 +335,14 @@
         excludedPatientIDs = excludedPatientIDs.concat(currentSelection);
         var data = prepareFormData();
         data = addSettingsToData(data, { excludedPatientIDs: excludedPatientIDs });
-        jQuery.ajax({
-            url: pageInfo.basePath + '/SmartR/updateOutputDIV',
-            type: "POST",
-            timeout: '600000',
-            data: data
-        }).done(function(serverAnswer) {
-            serverAnswer = JSON.parse(serverAnswer);
-            if (serverAnswer.error) {
-                alert(serverAnswer.error);
-                return;
-            }
-            results = serverAnswer;
+
+
+        var doOnResponse = function(response) {
+            results = response;
             init();
-        }).fail(function() {
-            alert('AJAX call failed!');
-        });
+        };
+
+        updateStatistics(doOnResponse, data, false);
     }
 
     function removeOutliers() {

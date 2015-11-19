@@ -46,6 +46,12 @@ class SessionService {
         dir.listFiles({ File f -> f.isDirectory() } as FileFilter)*.name
     }
 
+    @Deprecated
+    List<String> legacyWorkflows() {
+        File dir = Holders.config.smartR.legacyPluginScriptDirectory
+        dir.listFiles()*.name
+    }
+
     UUID createSession(User user, String workflowType) {
         SessionContext newSession = new SessionContext(user, workflowType)
         log.debug("Created session with id ${newSession.sessionId} and " +

@@ -2,7 +2,7 @@
  * Heatmap Service
  */
 
-HeatmapService = (function(){
+HeatmapService = (function(smartRHeatmap){
 
     var service = {
         statusInterval : 0
@@ -124,23 +124,28 @@ HeatmapService = (function(){
             }
         })
         .done(function (d) {
-                console.log('I am gonna check again', d);
+                console.log('Done checking', d);
                 if (d.state === 'FINISHED') {
                     clearInterval(service.statusInterval);
-                    console.log('I am done with checking status', d);
+                    console.log('Okay, I am finished checking now ..', d);
                     if (task === 'fetchData') {
                         $j('#heim-fetch-data-output')
                             .html('<p class="heim-fectch-success" style="color: green";> ' +
                             'Data is successfully fetched. Proceed with Run Heatmap</p>');
                     } else if (task === 'runHeatmap') {
                         $j('#heim-run-output').hide();
-                        $j('#heim-img-result')
-                            .attr('src', pageInfo.basePath
-                            + '/ScriptExecution/downloadFile?sessionId='
-                            + GLOBAL.HeimAnalyses.sessionId
-                            + '&executionId='
-                            + GLOBAL.HeimAnalyses.executionId
-                            + '&filename=heatmap.png');
+                        $j.get(
+                            pageInfo.basePath
+                                + '/ScriptExecution/downloadFile?sessionId='
+                                + GLOBAL.HeimAnalyses.sessionId
+                                + '&executionId='
+                                + GLOBAL.HeimAnalyses.executionId
+                                + '&filename=heatmap.json' // TODO get filename from run analysis result
+                        )
+                            .done(function (d) {
+                                var _d = (JSON.parse(d));
+                                smartRHeatmap.create(_d);
+                            });
                     }
                 }
         })
@@ -186,4 +191,4 @@ HeatmapService = (function(){
     };
 
     return service;
-})();
+})(SmartRHeatmap);
