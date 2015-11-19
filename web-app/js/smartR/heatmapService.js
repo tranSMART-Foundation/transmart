@@ -30,7 +30,7 @@ HeatmapService = (function(smartRHeatmap){
     service.initialize = function () {
 
         // ajax call to session creation
-        $j.ajax({
+        jQuery.ajax({
             url: pageInfo.basePath + '/RSession/create',
             type: 'POST',
             timeout: '600000',
@@ -62,7 +62,7 @@ HeatmapService = (function(smartRHeatmap){
         var _args = _createAnalysisConstraints(params);
         console.log('Analysis Constraints', _args);
 
-        $j.ajax({
+        jQuery.ajax({
             url: pageInfo.basePath + '/ScriptExecution/run',
             type: 'POST',
             timeout: '600000',
@@ -86,7 +86,7 @@ HeatmapService = (function(smartRHeatmap){
                 console.log(jqXHR);
                 console.log(textStatus);
                 console.log(errorThrown);
-                $j('#heim-fetch-data-output').html('<span style="color: red";>Error:'+ errorThrown +'</span>');
+                jQuery('#heim-fetch-data-output').html('<span style="color: red";>Error:'+ errorThrown +'</span>');
             });
     };
 
@@ -110,12 +110,12 @@ HeatmapService = (function(smartRHeatmap){
 
     service.checkStatus = function (task) {
         if (task === 'fetchData') {
-            $j('#heim-fetch-data-output').html('<p>Fetching data, please wait ..</p>');
+            jQuery('#heim-fetch-data-output').html('<p>Fetching data, please wait ..</p>');
         } else if (task === 'runHeatmap') {
-            $j('#heim-run-output').html('<p>Calculating, please wait ..</p>');
+            jQuery('#heim-run-output').html('<p>Calculating, please wait ..</p>');
         }
 
-        $j.ajax({
+        jQuery.ajax({
             type : 'GET',
             url : pageInfo.basePath + '/ScriptExecution/status',
             data : {
@@ -129,12 +129,12 @@ HeatmapService = (function(smartRHeatmap){
                     clearInterval(service.statusInterval);
                     console.log('Okay, I am finished checking now ..', d);
                     if (task === 'fetchData') {
-                        $j('#heim-fetch-data-output')
+                        jQuery('#heim-fetch-data-output')
                             .html('<p class="heim-fectch-success" style="color: green";> ' +
                             'Data is successfully fetched. Proceed with Run Heatmap</p>');
                     } else if (task === 'runHeatmap') {
-                        $j('#heim-run-output').hide();
-                        $j.get(
+                        jQuery('#heim-run-output').hide();
+                        jQuery.get(
                             pageInfo.basePath
                                 + '/ScriptExecution/downloadFile?sessionId='
                                 + GLOBAL.HeimAnalyses.sessionId
@@ -155,9 +155,9 @@ HeatmapService = (function(smartRHeatmap){
                 console.log(errorThrown);
                 clearInterval(service.statusInterval);
                 if (task === 'fetchData') {
-                    $j('#heim-fetch-data-output').html('<span style="color: red";>'+errorThrown+'</span>');
+                    jQuery('#heim-fetch-data-output').html('<span style="color: red";>'+errorThrown+'</span>');
                 } else if (task === 'runHeatmap') {
-                    $j('#heim-run-output').html('<span style="color: red";>'+errorThrown+'</spanp>');
+                    jQuery('#heim-run-output').html('<span style="color: red";>'+errorThrown+'</spanp>');
                 }
         })
         .always(function () {
@@ -169,13 +169,13 @@ HeatmapService = (function(smartRHeatmap){
         // NOTHING
     };
 
-    service.runAnalysis = function (eventObj) {
-        $j.ajax({
+    service.runAnalysis = function (params) {
+        jQuery.ajax({
             type: 'POST',
             url: pageInfo.basePath + '/ScriptExecution/run',
             data: JSON.stringify({
                 sessionId : GLOBAL.HeimAnalyses.sessionId,
-                arguments : {},
+                arguments : params,
                 taskType : 'run'}
             ),
             contentType: 'application/json',

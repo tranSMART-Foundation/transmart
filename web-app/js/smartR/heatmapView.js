@@ -5,26 +5,27 @@ HeatmapView = (function(){
     var heatmapService, extJSHelper;
 
     var view = {
-        container : $j('#heim-tabs'),
+        container : jQuery('#heim-tabs'),
         fetchDataView : {
-            conceptPathsInput : $j('#divIndependentVariable'),
-            identifiersInput : $j('#heim-input-txt-identifiers'),
-            actionBtn : $j('#heim-btn-fetch-data'),
-            clearBtn : $j('#heim-btn-clear'),
-            checkStatusBtn : $j('#heim-btn-check'),
-            getResultBtn : $j('#heim-btn-get-output'),
-            outputArea : $j('#heim-fetch-data-output')
+            conceptPathsInput : jQuery('#divIndependentVariable'),
+            identifiersInput : jQuery('#heim-input-txt-identifiers'),
+            actionBtn : jQuery('#heim-btn-fetch-data'),
+            clearBtn : jQuery('#heim-btn-clear'),
+            checkStatusBtn : jQuery('#heim-btn-check'),
+            getResultBtn : jQuery('#heim-btn-get-output'),
+            outputArea : jQuery('#heim-fetch-data-output')
         },
         preprocessView : {
             // TODO
         },
         runHeatmapView : {
-            clusteringOptionsDiv : $j('#clusteringOptionsDiv'),
-            methodSelect : $j('#methodSelect'),
-            noClustersDiv : $j('#noOfClustersDiv'),
-            noMarkersDiv : $j('#noOfMarkersDiv'),
-            runAnalysisBtn : $j('#heim-btn-run-heatmap'),
-            downloadFileBtn : $j('#heim-btn-download-file')
+            maxRowInput : jQuery('#txtMaxRow'),
+            clusteringOptionsDiv : jQuery('#clusteringOptionsDiv'),
+            methodSelect : jQuery('#methodSelect'),
+            noClustersDiv : jQuery('#noOfClustersDiv'),
+            noMarkersDiv : jQuery('#noOfMarkersDiv'),
+            runAnalysisBtn : jQuery('#heim-btn-run-heatmap'),
+            downloadFileBtn : jQuery('#heim-btn-download-file')
         }
     };
 
@@ -45,6 +46,15 @@ HeatmapView = (function(){
         };
     };
 
+    var _getRunHeatmapViewValues = function (v) {
+        // get max_row
+        var _maxRow = v.maxRowInput.val();
+        console.log(_maxRow);
+        return {
+            max_row : _maxRow
+        }
+    };
+
     /**
      * Fetch data
      * @param eventObj
@@ -53,6 +63,12 @@ HeatmapView = (function(){
     var _fetchDataAction = function (eventObj) {
         var _fetchDataParams =  _getFetchDataViewValues(view.fetchDataView);
         heatmapService.fetchData(_fetchDataParams);
+    };
+
+    var _runHeatmapAction = function (eventObj) {
+        var _runHeatmapInputArgs =  _getRunHeatmapViewValues(view.runHeatmapView);
+        console.log(_runHeatmapAction, _runHeatmapInputArgs);
+        heatmapService.runAnalysis(_runHeatmapInputArgs);
     };
 
     /**
@@ -96,7 +112,10 @@ HeatmapView = (function(){
         //
         view.fetchDataView.checkStatusBtn.click(heatmapService.checkStatus);
         // TODO Run Analysis
-        view.runHeatmapView.runAnalysisBtn.click (heatmapService.runAnalysis);
+        view.runHeatmapView.runAnalysisBtn.click (
+            view.runHeatmapView,
+            _runHeatmapAction
+        );
         view.runHeatmapView.downloadFileBtn.click (heatmapService.checkStatus);
     };
 
