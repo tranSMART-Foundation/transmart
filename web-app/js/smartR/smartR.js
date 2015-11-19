@@ -547,7 +547,7 @@ function activateDragAndDrop(divName) {
 // Panel item for the SmartR plugin
 var smartRPanel = new Ext.Panel({
     id: 'smartRPanel',
-    title: 'Heim',
+    title: 'SmartR',
     region: 'center',
     split: true,
     height: 90,
