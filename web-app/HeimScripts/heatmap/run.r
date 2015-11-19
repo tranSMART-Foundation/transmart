@@ -6,9 +6,11 @@ main <- function(max_rows=50){
   df <- loaded_variables[[1]] # SmartR does not support multiple HDD nodes yet
   if(ncol(df) > 3){
     variances <- apply(df[,3:ncol(df)],1,var) # Calculating variance per probe
-    df["variance"] <- variances
-    df <- df[with(df, order(-variance)), ]
-    df["variance"] <- NULL # we do not need variance in the end result
+    df["SIGNIFICANCE"] <- variances
+    df <- df[with(df, order(-SIGNIFICANCE)), ]
+  }
+  else{
+    df["SIGNIFICANCE"] <- rep(1.0, nrow(df))
   }
   df <- df[1:max_rows,]
   fields <- buildFields(df)
@@ -26,13 +28,10 @@ main <- function(max_rows=50){
 }
 
 buildFields <- function(df){
-  df <- melt(df,id=names(df)[1:2])
-  SIGNIFICANCE <- rep(1.0, nrow(df))
+  df <- melt(df,id=c("Row.Label","Bio.marker","SIGNIFICANCE"))
   raw <- df[,ncol(df)]
   ZSCORE <- (raw - mean(raw))/ sd(raw)
-  names(df) <- c("PROBE","GENESYMBOL","PATIENTID","VALUE")
+  names(df) <- c("PROBE","GENESYMBOL","SIGNIFICANCE","PATIENTID","VALUE")
   df["ZSCORE"] <- ZSCORE
-  df["SIGNIFICANCE"] <- SIGNIFICANCE
   return(df)
 }
-
