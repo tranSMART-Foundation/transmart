@@ -2,26 +2,30 @@
 ## R-script to produce summary statistics (mean, median, etc.,) and static boxplot image for the data loading and data preprocessing tab
 #
 # Expected input: 
-# * variable "data_tables" - a list of data.frames, containing one or more data.frames. Data for multiple high dimensional nodes can be provided. 
+# * variable "loaded_variables" - a list of data.frames, containing one or more data.frames. Present in the environment.
+#   Data for multiple high dimensional nodes can be provided. 
 #   Per high dimensional node 1 or 2 dataframes are to be passed on, depending on whether 1 or 2 patient subsets are created. 
 #   Descriptive names (labels) are given to the data.frames so that it can be recognized which data.frame was derived from which data node
 #   PROPOSED FORMAT: some unique identifier for the node (numerical identifier appended behind the letter "n") followed by _s1 or _s2 depending on subset, e.g. n0_s1, n0_s2, n1_s1, n1_s2. 
 #         (RIGHT NOW THE UNDERSCORE IS USED FOR SPLITTING THE TWO, SO IF UNDERSCORES ARE USED IN THE NODE IDENTIFIER ,THIS SHOULD BE CHANGED)
 #   The data.frames (coming from high dimensional nodes) have columns: Row.Label, Bio.marker (optional), ASSAY_0001, ASSAY_0002 ...  
 #     ** right now this is only implemented for high dimensional data nodes, later the functionality might be extended for clinical data. In that case it is possible to recognize if it is high or low dim data based on the column names of the data.frame (assuming low dim data will also be passed on in the form of data.frames)
-# * a named (labeled) vector with the definitions of the selected subset(s) (used for labeling the subsets in the boxplot) (e.g.: (s1 = "F", s2 = "M" ))
+# * a named (labeled) vector with the definitions of the selected subset(s) (used for labeling the subsets in the boxplot) (e.g.: (s1 = "F", s2 = "M" )). Passed on as argument to main() 
 #
 # Output: 
 # * 1 boxplot image per data node, png format. Name: Box_plot_Node_<Node Identifier>.png. 
-# * 1 textfile per node with the summary statistics per subset, in json format. Name: Summary_stats-Node_<Node Identifier>.json.
+# * 1 textfile per node with the summary statistics per subset, in json format. Name: Summary_stats-Node_<Node Identifier>.json. \
+# Note: If the data node is not high dimensional or the dataset is empty, no boxplot will be returned - only an image with the text "No data points to plot", 
+#   also no mean, median etc will be returned in the summary statistics: only variableLabel, node name and subset name are returned 
+#   and totalNumberOfValues = 1 and numberOfMissingValues = 1.
 ###########
 
 library(jsonlite)
-library(gplot)
+library(gplots)
 
-main <- function()
+main <- function(subset_definitions)
 {
-  data_measurements <- extract_measurements(data_tables)
+  data_measurements <- extract_measurements(loaded_variables)
   produce_summary_stats(data_measurements)
   produce_boxplot(data_measurements, subset_definitions)
 }
@@ -71,49 +75,50 @@ extract_measurements <- function(datasets)
 produce_summary_stats <- function(measurement_tables)
 {
   # construct data.frame to store the results from the summary statistics in
-  result_table <- as.data.frame(matrix(NA, length(measurement_tables),11, 
+  result_table <- as.data.frame(matrix(NA, length(measurement_tables),12, 
                                        dimnames = list(names(measurement_tables), 
-                                                       c("Node","Subset","Total # of values (incl. missing)", "# of missing values", "Min","Max","Mean", "Standard deviation", "Q1","Median","Q3"))))
+                                                       c("variableLabel","node","subset","totalNumberOfValuesIncludingMissing", "numberOfMissingValues", "min","max","mean", "standardDeviation", "q1","median","q3"))))
   # add information about node and subset identifiers
-  result_table$Subset <- gsub(".*_","", rownames(result_table))
-  result_table$Node <- gsub("_.*","", rownames(result_table))
+  result_table$subset <- gsub(".*_","", rownames(result_table))
+  result_table$node <- gsub("_.*","", rownames(result_table))
   
   # calculate summary stats per data.frame
   for(i in 1:length(measurement_tables))
   {
     # get the name of the data.frame, identifying the node and subset 
     identifier <- names(measurement_tables)[i]
+    result_table[identifier, "variableLabel"] <- identifier
     
     # convert data.frame to a vector containing all values of that data.frame, a vector remains a vector
-    measurement_table <- unlist(measurement_tables[[i]])
+    measurements <- unlist(measurement_tables[[i]])
     
     # determine total number of values and number of missing values
     is.missing <- is.na(measurements)
-    result_table[identifier, "Total # of values (incl. missing)"] <- length(measurements)
-    result_table[identifier, "# of missing values"] <- length(which(is.missing))
+    result_table[identifier, "totalNumberOfValuesIncludingMissing"] <- length(measurements)
+    result_table[identifier, "numberOfMissingValues"] <- length(which(is.missing))
     
     # calculate descriptive statistics, only for numerical data. 
     # the 50% quantile is the median. 0 and 100% quartiles are min and max respectively
-    result_table[identifier, "Mean"] <- mean(measurements, na.rm=T)
-    result_table[identifier, "Standard deviation"] <- sd(measurements, na.rm=T)
+    result_table[identifier, "mean"] <- mean(measurements, na.rm=T)
+    result_table[identifier, "standardDeviation"] <- sd(measurements, na.rm=T)
     
     quartiles <- quantile(measurements, na.rm=T) 
-    result_table[identifier, "Min"] <- quartiles["0%"]
-    result_table[identifier, "Max"] <- quartiles["100%"]
-    result_table[identifier, "Q1"] <- quartiles["25%"]
-    result_table[identifier, "Median"] <- quartiles["50%"]
-    result_table[identifier, "Q3"] <- quartiles["75%"]    
+    result_table[identifier, "min"] <- quartiles["0%"]
+    result_table[identifier, "max"] <- quartiles["100%"]
+    result_table[identifier, "q1"] <- quartiles["25%"]
+    result_table[identifier, "median"] <- quartiles["50%"]
+    result_table[identifier, "q3"] <- quartiles["75%"]    
   }
   
   # remove rownames so that rownames are not included in the JSON output.
   rownames(result_table) <- 1:nrow(result_table)
   
   # write the summary statistics for each node to a separate file, in JSON format
-  unique_nodes <- unique(result_table$Node)
+  unique_nodes <- unique(result_table$node)
   for(node in unique_nodes)
   {
-    partial_table <- result_table[which(result_table$Node == node), ,drop = F]
-    summary_stats_JSON <- toJSON(partial_table, dataframe = "rows")
+    partial_table <- result_table[which(result_table$node == node), ,drop = F]
+    summary_stats_JSON <- toJSON(partial_table, dataframe = "rows", pretty = T)
     fileName <- paste("Summary_stats-Node_", node, ".json", sep = "")
     write(summary_stats_JSON, fileName)
   }
