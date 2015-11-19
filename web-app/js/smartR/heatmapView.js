@@ -5,27 +5,27 @@ HeatmapView = (function(){
     var heatmapService, extJSHelper;
 
     var view = {
-        container : $j('#heim-tabs'),
+        container : jQuery('#heim-tabs'),
         fetchDataView : {
-            conceptPathsInput : $j('#divIndependentVariable'),
-            identifiersInput : $j('#heim-input-txt-identifiers'),
-            actionBtn : $j('#heim-btn-fetch-data'),
-            clearBtn : $j('#heim-btn-clear'),
-            checkStatusBtn : $j('#heim-btn-check'),
-            getResultBtn : $j('#heim-btn-get-output'),
-            outputArea : $j('#heim-fetch-data-output')
+            conceptPathsInput : jQuery('#divIndependentVariable'),
+            identifiersInput : jQuery('#heim-input-txt-identifiers'),
+            actionBtn : jQuery('#heim-btn-fetch-data'),
+            clearBtn : jQuery('#heim-btn-clear'),
+            checkStatusBtn : jQuery('#heim-btn-check'),
+            getResultBtn : jQuery('#heim-btn-get-output'),
+            outputArea : jQuery('#heim-fetch-data-output')
         },
         preprocessView : {
             // TODO
         },
         runHeatmapView : {
-            maxRowInput : $j('#txtMaxRow'),
-            clusteringOptionsDiv : $j('#clusteringOptionsDiv'),
-            methodSelect : $j('#methodSelect'),
-            noClustersDiv : $j('#noOfClustersDiv'),
-            noMarkersDiv : $j('#noOfMarkersDiv'),
-            runAnalysisBtn : $j('#heim-btn-run-heatmap'),
-            downloadFileBtn : $j('#heim-btn-download-file')
+            maxRowInput : jQuery('#txtMaxRow'),
+            clusteringOptionsDiv : jQuery('#clusteringOptionsDiv'),
+            methodSelect : jQuery('#methodSelect'),
+            noClustersDiv : jQuery('#noOfClustersDiv'),
+            noMarkersDiv : jQuery('#noOfMarkersDiv'),
+            runAnalysisBtn : jQuery('#heim-btn-run-heatmap'),
+            downloadFileBtn : jQuery('#heim-btn-download-file')
         }
     };
 
