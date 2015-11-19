@@ -134,17 +134,18 @@ HeatmapService = (function(smartRHeatmap){
                             'Data is successfully fetched. Proceed with Run Heatmap</p>');
                     } else if (task === 'runHeatmap') {
                         jQuery('#heim-run-output').hide();
-                        jQuery.get(
-                            pageInfo.basePath
-                                + '/ScriptExecution/downloadFile?sessionId='
-                                + GLOBAL.HeimAnalyses.sessionId
-                                + '&executionId='
-                                + GLOBAL.HeimAnalyses.executionId
-                                + '&filename=heatmap.json' // TODO get filename from run analysis result
-                        )
-                            .done(function (d) {
-                                var _d = (JSON.parse(d));
-                                smartRHeatmap.create(_d);
+                        jQuery.ajax({
+                            url : pageInfo.basePath
+                            + '/ScriptExecution/downloadFile?sessionId='
+                            + GLOBAL.HeimAnalyses.sessionId
+                            + '&executionId='
+                            + GLOBAL.HeimAnalyses.executionId
+                            + '&filename=heatmap.json',
+                            dataType : 'json'
+                        })
+                            .done(function (d, status, jqXHR) {
+                                console.log(d)
+                                smartRHeatmap.create(d);
                             });
                     }
                 }

@@ -47,11 +47,11 @@ HeatmapView = (function(){
     };
 
     var _getRunHeatmapViewValues = function (v) {
-        // get max_row
-        var _maxRow = v.maxRowInput.val();
-        console.log(_maxRow);
+        // get max_rows
+        var _maxRows = v.maxRowInput.val();
+        console.log(_maxRows);
         return {
-            max_row : _maxRow
+            max_rows : _maxRows
         }
     };
 
