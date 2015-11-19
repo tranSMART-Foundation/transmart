@@ -82,8 +82,8 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
             body json: [
                     sessionId: sessionId,
                     taskType: 'run',
-                    arguments: [max_rows:1,
-                                genes:['BOGUSRQCD1']
+                    arguments: [max_rows:1
+
                     ]
             ]
         }

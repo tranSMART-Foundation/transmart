@@ -2,9 +2,8 @@ library(jsonlite)
 library(reshape2)
 
 
-main <- function(max_rows, genes){
+main <- function(max_rows){
   df <- loaded_variables[[1]] # SmartR does not support multiple HDD nodes yet
-  df <- df[df$Bio.marker %in% genes,]
   variances <- apply(df[,3:ncol(df)],1,var) # Calculating variance per probe
   df["variance"] <- variances
   df <- df[with(df, order(-variance)), ]
