@@ -34,6 +34,7 @@ main <- function(phase)
   data_measurements <- extract_measurements(loaded_variables)
   produce_summary_stats(data_measurements, phase)
   produce_boxplot(data_measurements, phase)
+  return(list(summary_stats = "Finished")) #right now a non-empty list is expected as a return.
 }
 
 
