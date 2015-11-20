@@ -7,6 +7,8 @@ main <- function(max_rows=50){
   if(ncol(df) > 3){
     variances <- apply(df[,3:ncol(df)],1,var) # Calculating variance per probe
     df["SIGNIFICANCE"] <- variances
+    df["MEAN"] <- apply(df[,3:ncol(df)],1,mean, na.rm = T)
+    df["SD"] <- apply(df[,3:ncol(df)],1,sd, na.rm = T)
     df <- df[with(df, order(-SIGNIFICANCE)), ]
   }
   else{
@@ -27,11 +29,14 @@ main <- function(max_rows=50){
   list(filename="heatmap.json") # main function in every R script has to return a list (so a data.frame will also do)
 }
 
+
 buildFields <- function(df){
-  df <- melt(df,id=c("Row.Label","Bio.marker","SIGNIFICANCE"))
-  raw <- df[,ncol(df)]
-  ZSCORE <- (raw - mean(raw))/ sd(raw)
+  df <- melt(df,id=c("Row.Label","Bio.marker","SIGNIFICANCE","MEAN","SD"))
+  ZSCORE <- (df$value - df$MEAN)/df$SD
+  df["MEAN"] <- NULL
+  df["SD"]   <-NULL
   names(df) <- c("PROBE","GENESYMBOL","SIGNIFICANCE","PATIENTID","VALUE")
   df["ZSCORE"] <- ZSCORE
   return(df)
 }
+
