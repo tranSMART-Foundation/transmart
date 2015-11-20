@@ -8,6 +8,12 @@ HeatmapService = (function(smartRHeatmap){
         statusInterval : 0
     };
 
+    /**
+     * Create analysis constraints
+     * @param params
+     * @returns {{conceptKey: _conceptPath, dataType: string, resultInstanceId: *, projection: string, label: string}}
+     * @private
+     */
     var _createAnalysisConstraints = function (params) {
 
         var _retval = {
@@ -18,9 +24,13 @@ HeatmapService = (function(smartRHeatmap){
             label: '_TEST_LABEL_'
         };
 
-        // TODO to include data constraints
-
         return  _retval;
+    };
+
+    var _blinkMe = function (elId) {
+        setInterval(function() {
+            jQuery(elId).append(jQuery(elId).text() === '|' ? '/' : '|' );
+        }, 50);
     };
 
     /**
@@ -44,7 +54,9 @@ HeatmapService = (function(smartRHeatmap){
                 type : 'heatmap',
                 sessionId :response.sessionId
             };
+
             console.log(GLOBAL.HeimAnalyses);
+
             return GLOBAL.HeimAnalyses;
         }).fail(function() {
             // TODO: error displayed in a placeholder somewhere in main heim-analysis page
@@ -55,7 +67,44 @@ HeatmapService = (function(smartRHeatmap){
     };
 
     /**
-     * fetch data
+     * To get summary loaded data (at the moment for fetched data)
+     * @param params
+     * @returns {*}
+     */
+    service.getSummary = function (params) {
+        var retval;
+
+        console.log('About to get load data summary');
+
+        jQuery.ajax({
+            type: 'POST',
+            url: pageInfo.basePath + '/ScriptExecution/run',
+            data: JSON.stringify({
+                sessionId : GLOBAL.HeimAnalyses.sessionId,
+                arguments : {},
+                taskType : 'summary'}
+            ),
+            contentType: 'application/json'
+        })
+            .done(function (data) {
+                console.log(data);
+                //var scriptExecObj = JSON.parse(data.responseText);
+                GLOBAL.HeimAnalyses.executionId = data.executionId;
+                console.log(GLOBAL.HeimAnalyses);
+                service.statusInterval =  setInterval(function () {
+                    service.checkStatus('getSummary');
+                }, 1000);
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                console.log(textStatus);
+                console.log(errorThrown);
+            });
+        return retval;
+    };
+
+    /**
+     * Fetch data
      * @param eventObj
      */
     service.fetchData = function (params) {
@@ -90,6 +139,11 @@ HeatmapService = (function(smartRHeatmap){
             });
     };
 
+    /**
+     *
+     * @param request
+     * @param response
+     */
     service.getIndentifierSuggestions = function (request, response) {
         jQuery.get("/transmart/search/loadSearchPathways", {
             query: request.term
@@ -108,11 +162,19 @@ HeatmapService = (function(smartRHeatmap){
 
     };
 
+    /**
+     * Check status of a task
+     * TODO: Refactor
+     * @param task
+     */
     service.checkStatus = function (task) {
         if (task === 'fetchData') {
-            jQuery('#heim-fetch-data-output').html('<p>Fetching data, please wait ..</p>');
+            jQuery('#heim-fetch-data-output').html('<p><span id="blinking">_</span>Fetching data, please wait ..</p>');
+            _blinkMe('blinking');
         } else if (task === 'runHeatmap') {
             jQuery('#heim-run-output').html('<p>Calculating, please wait ..</p>');
+        } else if (task === 'getSummary') {
+            jQuery('#heim-fetch-data-output').html('<p>Getting summary, please wait ..</p>');
         }
 
         jQuery.ajax({
@@ -130,8 +192,11 @@ HeatmapService = (function(smartRHeatmap){
                     console.log('Okay, I am finished checking now ..', d);
                     if (task === 'fetchData') {
                         jQuery('#heim-fetch-data-output')
-                            .html('<p class="heim-fectch-success" style="color: green";> ' +
+                            .html('<p class="heim-fetch-success" style="color: green";> ' +
                             'Data is successfully fetched. Proceed with Run Heatmap</p>');
+
+                        // render summary stat
+                        service.getSummary();
                     } else if (task === 'runHeatmap') {
                         jQuery('#heim-run-output').hide();
                         jQuery.ajax({
@@ -144,10 +209,64 @@ HeatmapService = (function(smartRHeatmap){
                             dataType : 'json'
                         })
                             .done(function (d, status, jqXHR) {
-                                console.log(d)
+                                console.log(d);
                                 smartRHeatmap.create(d);
                             });
+                    } else if (task === 'getSummary') {
+
+                        console.log('getSummary');
+
+                        jQuery('#heim-run-output').hide();
+                        jQuery.ajax({
+                            url : pageInfo.basePath
+                            + '/ScriptExecution/downloadFile?sessionId='
+                            + GLOBAL.HeimAnalyses.sessionId                            + '&executionId='
+                            + GLOBAL.HeimAnalyses.executionId
+                            + '&filename=summary_stats_node.json',
+                            dataType : 'json'
+                        })
+                            .done(function (d, status, jqXHR) {
+
+                                console.log(d);
+
+                                var table = jQuery('<table style="padding: 5px;"></table>').addClass('foo');
+                                table.append('<tr style="background-color: #ddd"><th>Loaded</th><th>Values</th></tr>');
+
+                                for (var i = 0; i < d.length; i++) {
+                                    table.append('<tr><td>Max</td><td>' + d[i].max + '</td></tr>')   ;
+                                    table.append('<tr><td>Mean</td><td>' + d[i].mean + '</td></tr>')   ;
+                                    table.append('<tr><td>Median</td><td>' + d[i].median + '</td></tr>')   ;
+                                    table.append('<tr><td>No. of missing values</td><td>' + d[i].numberOfMissingValues + '</td></tr>')   ;
+                                    table.append('<tr><td>Q1</td><td>' + d[i].q1 + '</td></tr>')   ;
+                                    table.append('<tr><td>Q3</td><td>' + d[i].q3 + '</td></tr>')   ;
+                                    table.append('<tr><td>Standard Deviation</td><td>' + d[i].standardDeviation + '</td></tr>')   ;
+                                    table.append('<tr><td>Standard total no. of values Including Missing</td><td>' + d[i].standardtotalNumberOfValuesIncludingMissing + '</td></tr>')   ;
+                                    table.append('<tr><td>Variable Label</td><td>' + d[i].variableLabel + '</td></tr>')   ;
+                                }
+
+                                var _plot = jQuery('<img>')
+                                    .attr('src', pageInfo.basePath
+                                    + '/ScriptExecution/downloadFile?sessionId='
+                                    + GLOBAL.HeimAnalyses.sessionId
+                                    + '&executionId='
+                                    + GLOBAL.HeimAnalyses.executionId
+                                    + '&filename=box_plot_node.png');
+
+                                console.log(_plot);
+
+                                jQuery('#heim-fetch-data-output')
+                                    .empty()
+                                    .append(_plot)
+                                    .append(table);
+
+                            });
                     }
+                } else if (d.state === 'FAILED') {
+                    clearInterval(service.statusInterval);
+                    jQuery('#heim-fetch-data-output')
+                        .html('<p class="heim-fetch-success" style="color: red";> ' +
+                        d.result.exception + '</p>');
+                    console.error('FAILED', d.result);
                 }
         })
         .fail(function (jqXHR, textStatus, errorThrown) {

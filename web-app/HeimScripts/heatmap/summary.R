@@ -27,6 +27,7 @@ main <- function()
   data_measurements <- extract_measurements(loaded_variables)
   produce_summary_stats(data_measurements)
   produce_boxplot(data_measurements)
+  return(list(summary_stats = "Finished")) #right now a non-empty list is expected as a return.
 }
 
 
@@ -118,7 +119,7 @@ produce_summary_stats <- function(measurement_tables)
   {
     partial_table <- result_table[which(result_table$node == node), ,drop = F]
     summary_stats_JSON <- toJSON(partial_table, dataframe = "rows", pretty = T)
-    fileName <- paste("summary_stats_node_", node, ".json", sep = "")
+    fileName <- paste("summary_stats_node", node, ".json", sep = "")
     write(summary_stats_JSON, fileName)
   }
 }
@@ -153,7 +154,7 @@ produce_boxplot <- function(measurement_tables)
     single_node_data <- single_node_data[order(names(single_node_data))] 
     
     ## create box plot, output to PNG file
-    fileName <- paste("box_plot_node_", node, ".png", sep = "")    
+    fileName <- paste("box_plot_node", node, ".png", sep = "")
     png(filename = fileName)
     
     # in case there is data present: create box plot
