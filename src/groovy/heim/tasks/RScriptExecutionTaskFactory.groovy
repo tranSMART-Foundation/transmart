@@ -43,7 +43,7 @@ class RScriptExecutionTaskFactory implements TaskFactory {
         File dir = Holders.config.smartR.pluginScriptDirectory
         assert dir != null
         File workflowDir = new File(dir, jobInstance.workflow)
-        def file = new File(workflowDir, taskType + '.r')
+        def file = new File(workflowDir, taskType + '.R')
         if (file.parentFile != workflowDir) {
             throw new InvalidArgumentsException(
                     'Invalid task type name (probably contains /)')
