@@ -5,7 +5,7 @@ library(reshape2)
 main <- function(max_rows=50){
   df <- loaded_variables[[1]] # SmartR does not support multiple HDD nodes yet
   if(ncol(df) > 3){
-    variances <- apply(df[,3:ncol(df)],1,var) # Calculating variance per probe
+    variances <- apply(df[,3:ncol(df)],1,var, na.rm = T) # Calculating variance per probe
     df["SIGNIFICANCE"] <- variances
     df["MEAN"] <- rowMeans(df[,3:ncol(df)], na.rm = T)
     df["SD"] <- apply(df[,3:ncol(df)],1,sd, na.rm = T)
