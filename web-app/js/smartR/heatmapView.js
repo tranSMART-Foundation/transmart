@@ -68,6 +68,7 @@ HeatmapView = (function(){
     var _runHeatmapAction = function (eventObj) {
         var _runHeatmapInputArgs =  _getRunHeatmapViewValues(view.runHeatmapView);
         console.log(_runHeatmapAction, _runHeatmapInputArgs);
+        jQuery('#heatmap').empty();
         heatmapService.runAnalysis(_runHeatmapInputArgs);
     };
 
