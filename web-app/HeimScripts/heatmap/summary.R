@@ -10,6 +10,9 @@
 #         (RIGHT NOW THE UNDERSCORE IS USED FOR SPLITTING THE TWO, SO IF UNDERSCORES ARE USED IN THE NODE IDENTIFIER ,THIS SHOULD BE CHANGED)
 #   The data.frames (coming from high dimensional nodes) have columns: Row.Label, Bio.marker (optional), ASSAY_0001, ASSAY_0002 ...  
 #     ** right now this is only implemented for high dimensional data nodes, later the functionality might be extended for clinical data. In that case it is possible to recognize if it is high or low dim data based on the column names of the data.frame (assuming low dim data will also be passed on in the form of data.frames)
+# * phase parameter. This parameter specifies whether the script is run for the 'fetch data' or 'preprocess data' tab, 
+#     and it is used to give the output files of this script a different name (so that the output files for the 'fetch data' tab
+#     are not overwritten if the script is run for the 'preprocess data' tab)
 #
 # Output: 
 # * 1 boxplot image per data node, png format. Name: Box_plot_Node_<Node Identifier>.png. 
