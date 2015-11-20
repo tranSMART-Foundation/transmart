@@ -21,7 +21,6 @@ SmartRHeatmap = (function(){
      * @param data
      */
     service.create = function (data) {
-
         var extraFields = data.extraFields === undefined ? [] : data.extraFields;
         var features = data.features === undefined ? [] : data.features;
         var fields = data.fields;
