@@ -17,16 +17,20 @@
 # Note: If the data node is not high dimensional or the dataset is empty, no boxplot will be returned - only an image with the text "No data points to plot", 
 #   also no mean, median etc will be returned in the summary statistics: only variableLabel, node name and subset name are returned 
 #   and totalNumberOfValues = 1 and numberOfMissingValues = 1.
+
+
+## NOTE:  the script is now assuming that the first column of high dim nodes is called "Row.Label", and that data coming from low dim nodes NEVER have a first column named "Row.Label"". 
+
 ###########
 
 library(jsonlite)
 library(gplots)
 
-main <- function()
+main <- function(phase)
 {
   data_measurements <- extract_measurements(loaded_variables)
-  produce_summary_stats(data_measurements)
-  produce_boxplot(data_measurements)
+  produce_summary_stats(data_measurements, phase)
+  produce_boxplot(data_measurements, phase)
 }
 
 
@@ -71,7 +75,7 @@ extract_measurements <- function(datasets)
 #         * extend this method to recognize low dim data and split up the data.frame or apply this method to each data column separately to calculate the statistics per clinical variable separately (ie. supply the clinical data as a list containing a separate data.frame/vector for each clinical variable)
 #         * build in  a test to determine if a variable is numeric or categorical and only calculate the statistics if numeric. 
 #         * If a variable is categorical: are missing values in that case NA or  "" (empty string? )
-produce_summary_stats <- function(measurement_tables)
+produce_summary_stats <- function(measurement_tables, phase)
 {
   # construct data.frame to store the results from the summary statistics in
   result_table <- as.data.frame(matrix(NA, length(measurement_tables),12, 
@@ -118,13 +122,13 @@ produce_summary_stats <- function(measurement_tables)
   {
     partial_table <- result_table[which(result_table$node == node), ,drop = F]
     summary_stats_JSON <- toJSON(partial_table, dataframe = "rows", pretty = T)
-    fileName <- paste("summary_stats_node_", node, ".json", sep = "")
+    fileName <- paste(phase,"_summary_stats_node_", node, ".json", sep = "")
     write(summary_stats_JSON, fileName)
   }
 }
 
 # Function that outputs one box plot image per data node
-produce_boxplot <- function(measurement_tables)
+produce_boxplot <- function(measurement_tables, phase)
 {
   #get node and subset identifiers
   nodes <- gsub("_.*","",names(measurement_tables))
@@ -153,13 +157,13 @@ produce_boxplot <- function(measurement_tables)
     single_node_data <- single_node_data[order(names(single_node_data))] 
     
     ## create box plot, output to PNG file
-    fileName <- paste("box_plot_node_", node, ".png", sep = "")    
+    fileName <- paste(phase, "box_plot_node_", node, ".png", sep = "")    
     png(filename = fileName)
     
     # in case there is data present: create box plot
     if(!all(is.na(single_node_data)))
     {
-      boxplot(single_node_data, col = "grey", ylab = "Value") # REMOVE THIS AFTER DISCUSSION: with col and border you can also define color of the box plots... should it be white, grey, or for example two different colors in case of two subsets?
+      boxplot(single_node_data, col = "grey", ylab = "Value")
     }
 
     # if there are no data values: create image with text "No data points to plot"
