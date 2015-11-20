@@ -1,4 +1,4 @@
-<r:require modules="heatmap"/>
+<r:require modules="smartR_heatmap"/>
 <r:layoutResources disposition="defer"/>
 
 <div style="width: 98%">
