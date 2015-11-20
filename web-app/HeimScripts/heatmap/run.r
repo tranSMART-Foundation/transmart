@@ -7,7 +7,7 @@ main <- function(max_rows=50){
   if(ncol(df) > 3){
     variances <- apply(df[,3:ncol(df)],1,var) # Calculating variance per probe
     df["SIGNIFICANCE"] <- variances
-    df["MEAN"] <- apply(df[,3:ncol(df)],1,mean, na.rm = T)
+    df["MEAN"] <- rowMeans(df[,3:ncol(df)], na.rm = T)
     df["SD"] <- apply(df[,3:ncol(df)],1,sd, na.rm = T)
     df <- df[with(df, order(-SIGNIFICANCE)), ]
   }
