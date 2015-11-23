@@ -828,7 +828,6 @@ public class PreferencesHandler {
 						e.printStackTrace();
 				}
 				viewer.getList().setSelection(viewer.getList().indexOf(saveNameField.getText()));
-                                displayMessage("Preferences saved OK");
 			}
 	    });
 	    
