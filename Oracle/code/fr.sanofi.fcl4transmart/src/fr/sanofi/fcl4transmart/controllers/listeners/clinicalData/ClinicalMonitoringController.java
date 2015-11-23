@@ -126,7 +126,7 @@ public class ClinicalMonitoringController {
 			if(rs.next()){
 				procedureErrors=rs.getString("ERROR_MESSAGE");
 			}
-			if(procedureErrors.compareTo("User-Defined Exception")==0){
+			if(procedureErrors.compareTo("User-Defined Exception")==0 || procedureErrors.compareTo("Application raised error")==0){
 				rs=stmt.executeQuery("select STEP_DESC from CZ_JOB_AUDIT where JOB_ID="+String.valueOf(jobId)+" and SEQ_ID in(select max(SEQ_ID)-1 from CZ_JOB_AUDIT where JOB_ID="+String.valueOf(jobId)+")");
 				if(rs.next()){
 					procedureErrors=rs.getString("STEP_DESC");
