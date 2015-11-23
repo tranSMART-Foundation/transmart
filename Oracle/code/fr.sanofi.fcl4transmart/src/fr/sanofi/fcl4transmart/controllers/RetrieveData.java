@@ -30,6 +30,12 @@ public class RetrieveData {
 	public static String getDriverString(){
 		return "oracle.jdbc.driver.OracleDriver";
 	}
+	public static boolean isPostgres(){
+		return false;   // not Postgres
+	}
+	public static boolean isOracle(){
+		return true;    // is Oracle
+	}
 	/**
 	 *Returns a vector with organism names
 	 */
@@ -446,6 +452,7 @@ public class RetrieveData {
 			con.close();
 		}
 		catch(SQLException e){
+			e.printStackTrace();
 			return false;
 		} catch (ClassNotFoundException e2) {
 			return false;
@@ -475,7 +482,7 @@ public class RetrieveData {
 			con.close();
 		}
 		catch(SQLException e){
-			
+			e.printStackTrace();
 			return false;
 		} catch (ClassNotFoundException e2) {
 			return false;
@@ -522,6 +529,7 @@ public class RetrieveData {
 			con.close();
 		}
 		catch(SQLException e){
+			e.printStackTrace();
 			return false;
 		} catch (ClassNotFoundException e2) {
 			return false;
@@ -536,6 +544,7 @@ public class RetrieveData {
 			con.close();
 		}
 		catch(SQLException e){
+			e.printStackTrace();
 			return false;
 		} catch (ClassNotFoundException e2) {
 			return false;
@@ -552,6 +561,7 @@ public class RetrieveData {
 			con.close();
 		}
 		catch(SQLException e){
+			e.printStackTrace();
 			return false;
 		} catch (ClassNotFoundException e2) {
 			return false;
@@ -565,6 +575,7 @@ public class RetrieveData {
 			con.close();
 		}
 		catch(SQLException e){
+			e.printStackTrace();
 			return false;
 		} catch (ClassNotFoundException e2) {
 			return false;
@@ -578,7 +589,7 @@ public class RetrieveData {
 			con.close();
 		}
 		catch(SQLException e){
-			
+			e.printStackTrace();
 			return false;
 		} catch (ClassNotFoundException e2) {
 			return false;
@@ -592,6 +603,7 @@ public class RetrieveData {
 			con.close();
 		}
 		catch(SQLException e){
+			e.printStackTrace();
 			return false;
 		} catch (ClassNotFoundException e2) {
 			return false;
@@ -621,6 +633,7 @@ public class RetrieveData {
 			con.close();
 		}
 		catch(SQLException e){
+			e.printStackTrace();
 			return false;
 		} catch (ClassNotFoundException e2) {
 			return false;
@@ -634,6 +647,7 @@ public class RetrieveData {
 			con.close();
 		}
 		catch(SQLException e){
+			e.printStackTrace();
 			return false;
 		} catch (ClassNotFoundException e2) {
 			return false;
