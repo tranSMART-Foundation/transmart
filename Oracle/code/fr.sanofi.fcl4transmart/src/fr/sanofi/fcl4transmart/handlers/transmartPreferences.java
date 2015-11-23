@@ -65,7 +65,7 @@ public class transmartPreferences {
 				transmartPreferences=preferences.node(staticSelectedName);
 			}
 			if(staticSelectedName.compareTo("")!=0){
-				staticAddress=transmartPreferences.get("adress", "");
+				staticAddress=transmartPreferences.get("address", "");
 			}else{
 				staticAddress="";
 			}
