@@ -3,6 +3,7 @@ package heim.session
 import grails.util.Holders
 import groovy.util.logging.Log4j
 import heim.SmartRExecutorService
+import heim.SmartRRuntimeConstants
 import heim.jobs.JobInstance
 import heim.tasks.JobTasksService
 import heim.tasks.TaskResult
@@ -25,6 +26,9 @@ import java.util.concurrent.ConcurrentMap
 class SessionService {
 
     @Autowired
+    SmartRRuntimeConstants constants
+
+    @Autowired
     SmartRExecutorService smartRExecutorService
 
     @Autowired
@@ -42,8 +46,8 @@ class SessionService {
     private final Set<UUID> sessionsShuttingDown = ([] as Set).asSynchronized()
 
     List<String> availableWorkflows() {
-        File dir = Holders.config.smartR.pluginScriptDirectory
-        dir.listFiles({ File f -> f.isDirectory() } as FileFilter)*.name
+        File dir = constants.pluginScriptDirectory
+        dir.listFiles({ File f -> f.isDirectory() && !f.name.startsWith('_') } as FileFilter)*.name
     }
 
     @Deprecated

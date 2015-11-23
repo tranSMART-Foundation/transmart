@@ -21,7 +21,7 @@ class RServeSession implements DisposableBean {
     String sessionId
 
     @Autowired
-    GrailsApplication grailsApplication
+    RConnectionProvider rConnectionProvider
 
     private volatile Thread rConnectionHoldingThread
     private volatile boolean shuttingDown
@@ -29,9 +29,7 @@ class RServeSession implements DisposableBean {
 
     @Lazy
     private RConnection rConnection = {
-        new RConnection(
-                grailsApplication.config.RModules.host ?: '127.0.0.1',
-                grailsApplication.config.RModules.rServePort ?: 6311)
+        rConnectionProvider.get()
     }()
 
     /*
