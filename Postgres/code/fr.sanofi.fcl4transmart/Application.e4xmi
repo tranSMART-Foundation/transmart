@@ -41,11 +41,11 @@
         <children xsi:type="menu:HandledMenuItem" xmi:id="_s65awLrpEeGalOhrQ6t71w" elementId="fr.sanofi.fcl4transmart.handledMenuItem.newStudy" label="Add a study from tranSMART" command="_jPmaILrpEeGalOhrQ6t71w"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_2JWWAMy-EeGtoNe9DONO4Q" elementId="fr.sanofi.fcl4transmart.handledMenuItem.removeFile" label="Remove a study folder" command="_nHVvYMy-EeGtoNe9DONO4Q"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_mMdtcMy8EeGtoNe9DONO4Q" elementId="fr.sanofi.fcl4transmart.handledMenuItem.removeDb" label="Remove a study in database" command="_doQQsMy8EeGtoNe9DONO4Q"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_wlD44EUhEeKFcs8Eme6R-g" elementId="fr.sanofi.fcl4transmart.handledMenuItem.programs" label="Programs manager"/>
         <children xsi:type="menu:MenuSeparator" xmi:id="_lmw_YMy8EeGtoNe9DONO4Q"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_PVDNgL-aEeGz24hf7xi09w" elementId="fr.sanofi.fcl4transmart.handledMenuItem.workspace" label="Change workspace" command="_XLBEML-aEeGz24hf7xi09w"/>
         <children xsi:type="menu:MenuSeparator" xmi:id="_0toV8L7IEeGz24hf7xi09w" elementId=""/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_BLgecKrqEeGojKSHMvr5yA" elementId="fr.sanofi.fcl4transmart.handledMenuItem.quit" label="Quit" command="_Aa01oLrTEeGalOhrQ6t71w"/>
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_wlD44EUhEeKFcs8Eme6R-g" elementId="fr.sanofi.fcl4transmart.handledMenuItem.programs" label="Programs manager"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_XWid4B60EeKZhq_83drCjg" elementId="fr.sanofi.fcl4transmart.edit" label="Edit">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_ZrKy8B60EeKZhq_83drCjg" elementId="fr.sanofi.fcl4transmart.handledMenuItem.copy" label="Copy columns" command="_SSH-QB6zEeKZhq_83drCjg"/>
