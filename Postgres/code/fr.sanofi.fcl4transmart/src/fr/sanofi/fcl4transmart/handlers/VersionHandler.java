@@ -25,7 +25,7 @@ public class VersionHandler {
     @Execute
     public void execute(Display display) {
         Shell shell=new Shell(SWT.TITLE|SWT.SYSTEM_MODAL| SWT.CLOSE | SWT.MAX);
-        shell.setSize(500,470);
+        shell.setSize(900,650);
         shell.setText("Version");
         GridLayout gridLayout=new GridLayout();
         gridLayout.numColumns=1;
@@ -34,18 +34,18 @@ public class VersionHandler {
         Label label=new Label(shell, SWT.CENTER);
         label.setText("Framework Curation and Loading For tranSMART\n");
         GridData gridData = new GridData();
-        gridData.widthHint=480;
+        gridData.widthHint=880;
         gridData.grabExcessHorizontalSpace = true;
         label.setLayoutData(gridData);
 
         Label label2=new Label(shell, SWT.WRAP);
         gridData = new GridData();
-        gridData.widthHint=480;
+        gridData.widthHint=880;
         gridData.grabExcessHorizontalSpace = true;
         label2.setLayoutData(gridData);
         label2.setText("Version 1.4.3\n"+
                        "\n"+
-                       "This version has been tested with tranSMART version 1.2, with Java Runtime Environment 1.6 and 1.7.\n"+
+                       "This version has been tested with tranSMART version 1.2.5, with Java Runtime Environment 1.7.\n"+
                        "\n"+
                        "This application has been developed by Sanofi-Aventis Recherche et Developpement, and is distributed under GNU General Public License version 3."+
                        "\n\n"+
