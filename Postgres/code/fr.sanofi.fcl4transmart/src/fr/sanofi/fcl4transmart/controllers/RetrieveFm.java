@@ -109,7 +109,7 @@ public class RetrieveFm {
 				Class.forName(RetrieveData.getDriverString());
 				Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd());
 				Statement stmt = con.createStatement();
-			    ResultSet rs = stmt.executeQuery("select title, accession from bio_experiment where bio_experiment_id in(select bio_data_id from biomart.bio_data_uid where unique_id in (select object_uid from fmapp.fm_folder_association where object_type='bio.Experiment'))");
+			    ResultSet rs = stmt.executeQuery("select title, accession from bio_experiment where bio_experiment_id in(select bio_data_id from biomart.bio_data_uid where unique_id in (select object_uid from fmapp.fm_folder_association where object_type in ('bio.Experiment','org.transmart.biomart.Experiment')))");
 
 			    while(rs.next()){
 			    	experiments.put(rs.getString("title"), rs.getString("accession"));
@@ -179,7 +179,7 @@ public class RetrieveFm {
 			}
 			return path;
 		}
-		//function to recursively search top node (called by teh function searchTopNode)
+		//function to recursively search top node (called by the function searchTopNode)
 		private static String searchTopNodeR(FolderNode node, int id, String path){
 			String parentPath="";
 			if(path.compareTo("")==0){
@@ -214,7 +214,7 @@ public class RetrieveFm {
 			return studyId;
 		}
 		
-		//search for assays of a given study accession number, return an hashmap with as key the assay title and as value the assay id 
+		//search for assays of a given study accession number, return a hashmap with as key the assay title and as value the assay id 
 		public static HashMap<String, String> getAssays(String access){
 			
 			if(!RetrieveData.testBiomartConnection()){
