@@ -55,7 +55,6 @@ buildFields <- function(df){
 }
 
 fixString <- function(str) {
-  str <- gsub("[^a-zA-Z0-9-]","",str , perl=TRUE)
-  str <- gsub(" ", "", str)
-  str
+  str <- gsub("[^a-zA-Z0-9-]", "", str, perl=TRUE)
+  return(str)
 }
