@@ -55,13 +55,12 @@ class JobTasksService implements DisposableBean {
 
     private final Map<UUID, TaskAndState> tasks = new ConcurrentHashMap<>()
     private final Map<UUID, ListenableFuture<TaskResult>> futures =
-            new ConcurrentHashMap<>()
+            new ConcurrentHashMap<>() // future removed when task finishes/fails
     private final Map<UUID, SettableFuture<TaskResult>> publicFutures =
             new ConcurrentHashMap<>()
 
-
-    List<TaskAndState> getTaskAndState(UUID sessionId) {
-        tasks[sessionId]
+    boolean hasActiveTasks() {
+        !futures.isEmpty()
     }
 
     void submitTask(Task task) {

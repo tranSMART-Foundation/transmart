@@ -213,24 +213,10 @@ class SessionService {
     }
 
     private boolean isStale(UUID sessionId, Date lastTouched) {
-        Date now = new Date()
-        def delta = now.time() - lastTouched.time()
-        delta > SESSION_LIFESPAN && noActiveTasks(sessionId)
-    }
-
-    private boolean noActiveTasks(UUID sessionId) {
-        def tasks = jobTasksService.getTaskAndState(sessionId)
-        boolean noActiveTasks = true
-        tasks.each { taskAndState ->
-            if (isActive(taskAndState.state)) {
-                noActiveTasks = false
-            }
+        doWithSession(sessionId) {
+            Date now = new Date()
+            def delta = now.time() - lastTouched.time()
+            delta > SESSION_LIFESPAN && jobTasksService.hasActiveTasks()
         }
-        return noActiveTasks
     }
-
-    private static boolean isActive(TaskState state) {
-        !(state.name() == TaskState.FINISHED || state.name() == TaskState.FAILED)
-    }
-
 }
