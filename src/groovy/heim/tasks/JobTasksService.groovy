@@ -100,9 +100,7 @@ class JobTasksService implements DisposableBean {
             void onSuccess(TaskResult taskResult1) {
                 assert taskResult1 != null :
                         'Task must return TaskResult or throw'
-
                 log.debug "Task $task terminated without throwing"
-                sessionService.touchSession(sessionId)
                 tasks[task.uuid] = new TaskAndState(
                         task: task,
                         state: TaskState.FINISHED,
@@ -113,7 +111,6 @@ class JobTasksService implements DisposableBean {
                 if (thrown instanceof UndeclaredThrowableException) {
                     thrown = thrown.undeclaredThrowable
                 }
-                sessionService.touchSession(sessionId)
                 if (thrown instanceof CancellationException) {
                     log.debug("Task $task was cancelled")
                 } else {
@@ -134,6 +131,7 @@ class JobTasksService implements DisposableBean {
                 futures.remove(task.uuid)
                 task.close()
                 publicFuture.set(result.taskResult)
+                sessionService.touchSession(sessionId) // should not throw
                 log.info "Task $task finished. Final result: $result"
             }
         }) // run on the same thread
