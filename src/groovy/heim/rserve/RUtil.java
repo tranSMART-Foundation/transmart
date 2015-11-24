@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Originally in RModules.
  */
-class RUtil {
+public class RUtil {
 
     private static final Logger LOG = Logger.getLogger(RUtil.class);
 
