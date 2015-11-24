@@ -7,12 +7,14 @@ import com.google.common.util.concurrent.SettableFuture
 import groovy.transform.ToString
 import groovy.util.logging.Log4j
 import heim.SmartRExecutorService
+import heim.session.SessionContext
 import heim.session.SessionService
 import heim.session.SmartRSessionScope
 import org.springframework.beans.factory.DisposableBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import org.transmartproject.core.exceptions.NoSuchResourceException
 
 import java.lang.reflect.UndeclaredThrowableException
 import java.util.concurrent.Callable
@@ -53,9 +55,13 @@ class JobTasksService implements DisposableBean {
 
     private final Map<UUID, TaskAndState> tasks = new ConcurrentHashMap<>()
     private final Map<UUID, ListenableFuture<TaskResult>> futures =
-            new ConcurrentHashMap<>()
+            new ConcurrentHashMap<>() // future removed when task finishes/fails
     private final Map<UUID, SettableFuture<TaskResult>> publicFutures =
             new ConcurrentHashMap<>()
+
+    boolean hasActiveTasks() {
+        !futures.isEmpty()
+    }
 
     void submitTask(Task task) {
         if (shuttingDown) {
@@ -94,7 +100,6 @@ class JobTasksService implements DisposableBean {
             void onSuccess(TaskResult taskResult1) {
                 assert taskResult1 != null :
                         'Task must return TaskResult or throw'
-
                 log.debug "Task $task terminated without throwing"
                 tasks[task.uuid] = new TaskAndState(
                         task: task,
@@ -106,7 +111,6 @@ class JobTasksService implements DisposableBean {
                 if (thrown instanceof UndeclaredThrowableException) {
                     thrown = thrown.undeclaredThrowable
                 }
-
                 if (thrown instanceof CancellationException) {
                     log.debug("Task $task was cancelled")
                 } else {
@@ -127,6 +131,7 @@ class JobTasksService implements DisposableBean {
                 futures.remove(task.uuid)
                 task.close()
                 publicFuture.set(result.taskResult)
+                sessionService.touchSession(sessionId) // should not throw
                 log.info "Task $task finished. Final result: $result"
             }
         }) // run on the same thread

@@ -8,22 +8,35 @@ import heim.jobs.JobInstance
 import heim.tasks.JobTasksService
 import heim.tasks.TaskResult
 import heim.tasks.TaskState
+import org.springframework.beans.factory.DisposableBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.exceptions.NoSuchResourceException
 import org.transmartproject.core.users.User
 
+import javax.annotation.PostConstruct
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Public service with the controller is to communicate.
  */
 @Component
 @Log4j
-class SessionService {
+class SessionService implements DisposableBean {
+
+    private static final int COLLECTION_INTERVAL = 5 * 60 * 1000 // 5 min
+    private static final int SESSION_LIFESPAN = 10 * 60 * 1000 // 10 min
+
+    private final ConcurrentMap<UUID, SessionContext> currentSessions =
+            new ConcurrentHashMap<>()
+
+    private final Set<UUID> sessionsShuttingDown = ([] as Set).asSynchronized()
+
+    private final AtomicReference<Timer> gcTimer = new AtomicReference()
 
     @Autowired
     SmartRRuntimeConstants constants
@@ -40,10 +53,13 @@ class SessionService {
     @Autowired
     private SessionFiles sessionFiles
 
-    private final ConcurrentMap<UUID, SessionContext> currentSessions =
-            new ConcurrentHashMap<>()
-
-    private final Set<UUID> sessionsShuttingDown = ([] as Set).asSynchronized()
+    @PostConstruct
+    private startCollecting() {
+        gcTimer.set(
+                new Timer('SmartR-Session-GC', true).schedule(
+                        this.&garbageCollection as TimerTask,
+                        COLLECTION_INTERVAL, COLLECTION_INTERVAL))
+    }
 
     List<String> availableWorkflows() {
         File dir = constants.pluginScriptDirectory
@@ -101,6 +117,7 @@ class SessionService {
             jobTasksService.submitTask(task)
             task.uuid
         }
+
     }
 
     Map<String, Object> getTaskData(UUID sessionUUID,
@@ -125,7 +142,7 @@ class SessionService {
             }
 
             [
-                    state: state,
+                    state : state,
                     result: result, // null if the task has not finished
             ]
         }
@@ -137,7 +154,7 @@ class SessionService {
             throw new NoSuchResourceException(
                     "No such operational session: $sessionUUID")
         }
-
+        context.updateLastModified()
         SmartRSessionSpringScope.withActiveSession(
                 context, closure)
     }
@@ -153,9 +170,18 @@ class SessionService {
         res
     }
 
-    public boolean isSessionActive(UUID sessionId) {
+    boolean isSessionActive(UUID sessionId) {
         currentSessions.containsKey(sessionId) &&
                 !(sessionId in sessionsShuttingDown)
+    }
+
+    void touchSession(sessionId) {
+        try {
+            doWithSession(sessionId) {}
+        }
+        catch (NoSuchResourceException e) {
+            log.warn("Attempted to touch non-existent session: $sessionId")
+        }
     }
 
     private SessionContext fetchOperationalSessionContext(UUID sessionId) {
@@ -179,4 +205,50 @@ class SessionService {
         sessionContext
     }
 
+
+    void garbageCollection() {
+        log.debug('Started session garbage collecting')
+        currentSessions.each {
+            sessionId, sessionContext ->
+                def lastActivity = sessionContext.lastActive
+                if (isStale(sessionId, lastActivity)) {
+                    destroySession(sessionId)
+                    log.info("Terminated session: ${sessionId} due to inactivity.")
+                }
+        }
+        log.debug('Finished session garbage collecting')
+    }
+
+    private boolean isStale(UUID sessionId, Date lastTouched) {
+        SessionContext context = fetchOperationalSessionContext(sessionId)
+        if (context == null) {
+            log.debug("Session $sessionId shut down between call to " +
+                    "getCurrentSessions() and fetchOperationalSessionContext()?")
+            return false
+        }
+
+        SmartRSessionSpringScope.withActiveSession(context) {
+            Date now = new Date()
+
+            def delta = now.time - lastTouched.time
+            boolean deltaPassed = delta > SESSION_LIFESPAN
+            boolean hasActiveTasks = jobTasksService.hasActiveTasks()
+
+            boolean res = deltaPassed && !hasActiveTasks
+            if (res && log.debugEnabled) {
+                log.debug("Session $sessionId deemed stale " +
+                        "($delta > $SESSION_LIFESPAN and no active tasks)")
+            } else if (!res && log.debugEnabled) {
+                log.debug("Session $sessionId deemed active " +
+                        "($delta <= $SESSION_LIFESPAN) or (active tasks: $hasActiveTasks)")
+            }
+
+            res
+        }
+    }
+
+    @Override
+    void destroy() throws Exception {
+        gcTimer.get().cancel()
+    }
 }
