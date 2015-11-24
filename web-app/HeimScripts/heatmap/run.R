@@ -7,6 +7,7 @@ library(reshape2)
 main <- function(max_rows=100){
   df <- loaded_variables[[length(loaded_variables)]] # SmartR does not support multiple HDD nodes yet
   # We take the last df to alleviate bug with new HDDs dropped being ignored - later on we will use label name explicitly.
+  df["Row.Label"] <- lapply(df["Row.Label"],fixString) # remove illegal characters from probe names. This will prevent problems with CSS selectors on the frontend.
   if(ncol(df) > 3){
   #this is the case for more than 1 sample
     variances <- apply(df[,3:ncol(df)],1,var, na.rm = T) # Calculating variance per probe (per row)
@@ -53,3 +54,7 @@ buildFields <- function(df){
   return(df)
 }
 
+fixString <- function(str) {
+  str <- gsub("[^a-zA-Z0-9-]", "", str, perl=TRUE)
+  return(str)
+}
