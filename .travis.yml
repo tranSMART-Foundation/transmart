@@ -37,6 +37,7 @@ before_script:
 script:
   - grails refresh-dependencies --non-interactive
   - grails test-app --non-interactive --stacktrace
+  - "\"$RSERVE_LOCATION\"/bin/Rscript test/runit/run_tests.R"
 
 notifications:
   hipchat:
