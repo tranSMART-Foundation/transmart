@@ -5,7 +5,8 @@
 HeatmapService = (function(smartRHeatmap){
 
     var service = {
-        statusInterval : 0
+        statusInterval : 0,
+        jobs : []
     };
 
     /**
@@ -27,12 +28,6 @@ HeatmapService = (function(smartRHeatmap){
         return  _retval;
     };
 
-    var _blinkMe = function (elId) {
-        setInterval(function() {
-            jQuery(elId).append(jQuery(elId).text() === '|' ? '/' : '|' );
-        }, 50);
-    };
-
     /**
      * Create r-session id
      * @returns {*}
@@ -49,13 +44,10 @@ HeatmapService = (function(smartRHeatmap){
                 workflow : 'heatmap'
             })
         }).done(function(response) {
-            result = response;
             GLOBAL.HeimAnalyses = {
                 type : 'heatmap',
                 sessionId :response.sessionId
             };
-
-            console.log(GLOBAL.HeimAnalyses);
 
             return GLOBAL.HeimAnalyses;
         }).fail(function() {
@@ -132,10 +124,12 @@ HeatmapService = (function(smartRHeatmap){
             }, 1000);
         })
             .fail(function (jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR);
-                console.log(textStatus);
-                console.log(errorThrown);
-                jQuery('#heim-fetch-data-output').html('<span style="color: red";>Error:'+ errorThrown +'</span>');
+                var _err = JSON.parse(jqXHR.responseText);
+                console.error(jqXHR);
+                console.error(textStatus);
+                console.error(errorThrown);
+                jQuery('#heim-fetch-data-output')
+                    .html('<p style="color: red";><b>Error:'+ errorThrown +'</b> <br> ' + _err.message + '</p>');
             });
     };
 
@@ -169,13 +163,12 @@ HeatmapService = (function(smartRHeatmap){
      */
     service.checkStatus = function (task) {
         if (task === 'fetchData') {
-            jQuery('#heim-fetch-data-output').html('<p><span id="blinking">_</span>Fetching data, please wait ..</p>');
-            _blinkMe('blinking');
+            jQuery('#heim-fetch-data-output').html('<p class="sr-log-text"><span class="blink_me">_</span>Fetching data, please wait ..</p>');
         } else if (task === 'runHeatmap') {
             jQuery('#heim-run-output').show();
             jQuery('#heim-run-output').html('<p>Calculating, please wait ..</p>');
         } else if (task === 'getSummary') {
-            jQuery('#heim-fetch-data-output').html('<p>Getting summary, please wait ..</p>');
+            jQuery('#heim-fetch-data-output').html('<p><p><span class="blink_me">_</span>Getting summary, please wait ..</p>');
         }
 
         jQuery.ajax({
@@ -187,14 +180,16 @@ HeatmapService = (function(smartRHeatmap){
             }
         })
         .done(function (d) {
+
                 console.log('Done checking', d);
+
                 if (d.state === 'FINISHED') {
                     clearInterval(service.statusInterval);
                     console.log('Okay, I am finished checking now ..', d);
                     if (task === 'fetchData') {
                         jQuery('#heim-fetch-data-output')
                             .html('<p class="heim-fetch-success" style="color: green";> ' +
-                            'Data is successfully fetched. Proceed with Run Heatmap</p>');
+                            'Data is successfully fetched in . Proceed with Run Heatmap</p>');
 
                         // render summary stat
                         service.getSummary();
@@ -221,44 +216,23 @@ HeatmapService = (function(smartRHeatmap){
                         jQuery.ajax({
                             url : pageInfo.basePath
                             + '/ScriptExecution/downloadFile?sessionId='
-                            + GLOBAL.HeimAnalyses.sessionId                            + '&executionId='
+                            + GLOBAL.HeimAnalyses.sessionId
+                            + '&executionId='
                             + GLOBAL.HeimAnalyses.executionId
                             + '&filename=summary_stats_node.json',
                             dataType : 'json'
                         })
                             .done(function (d, status, jqXHR) {
-
                                 console.log(d);
-
-                                var table = jQuery('<table style="padding: 5px;"></table>').addClass('foo');
-                                table.append('<tr style="background-color: #ddd"><th>Loaded</th><th>Values</th></tr>');
-
-                                for (var i = 0; i < d.length; i++) {
-                                    table.append('<tr><td>Max</td><td>' + d[i].max + '</td></tr>')   ;
-                                    table.append('<tr><td>Mean</td><td>' + d[i].mean + '</td></tr>')   ;
-                                    table.append('<tr><td>Median</td><td>' + d[i].median + '</td></tr>')   ;
-                                    table.append('<tr><td>No. of missing values</td><td>' + d[i].numberOfMissingValues + '</td></tr>')   ;
-                                    table.append('<tr><td>Q1</td><td>' + d[i].q1 + '</td></tr>')   ;
-                                    table.append('<tr><td>Q3</td><td>' + d[i].q3 + '</td></tr>')   ;
-                                    table.append('<tr><td>Standard Deviation</td><td>' + d[i].standardDeviation + '</td></tr>')   ;
-                                    table.append('<tr><td>Standard total no. of values Including Missing</td><td>' + d[i].standardtotalNumberOfValuesIncludingMissing + '</td></tr>')   ;
-                                    table.append('<tr><td>Variable Label</td><td>' + d[i].variableLabel + '</td></tr>')   ;
-                                }
-
-                                var _plot = jQuery('<img>')
-                                    .attr('src', pageInfo.basePath
-                                    + '/ScriptExecution/downloadFile?sessionId='
-                                    + GLOBAL.HeimAnalyses.sessionId
-                                    + '&executionId='
-                                    + GLOBAL.HeimAnalyses.executionId
-                                    + '&filename=box_plot_node.png');
-
-                                console.log(_plot);
-
+                                console.log(status);
+                                console.log( jqXHR);
+                                var _summaryObj = service.displaySummaryStats(d);
+                                console.log(_summaryObj.table);
+                                console.log(_summaryObj.plot);
                                 jQuery('#heim-fetch-data-output')
                                     .empty()
-                                    .append(_plot)
-                                    .append(table);
+                                    .append(_summaryObj.plot)
+                                    .append(_summaryObj.table);
 
                             });
                     }
@@ -286,8 +260,38 @@ HeatmapService = (function(smartRHeatmap){
         });
     };
 
-    service.getResultFiles = function (eventObj) {
-        // NOTHING
+    /**
+     * Display Plot
+     * @param data
+     * @returns {{table: *, plot: *}}
+     */
+    service.displaySummaryStats = function (data) {
+
+        var _table = jQuery('<table></table>').addClass('sr-summary-table');
+        _table.append('<tr><th>Loaded</th><th>Values</th></tr>');
+
+        jQuery.each(data,  function (idx, item) {
+            _table.append('<tr><td>Max</td><td>' + item.max + '</td></tr>');
+            _table.append('<tr><td>Mean</td><td>' + item.mean + '</td></tr>');
+            _table.append('<tr><td>Median</td><td>' + item.median + '</td></tr>');
+            _table.append('<tr><td>No. of missing values</td><td>' + item.numberOfMissingValues + '</td></tr>');
+            _table.append('<tr><td>Q1</td><td>' + item.q1 + '</td></tr>');
+            _table.append('<tr><td>Q3</td><td>' + item.q3 + '</td></tr>');
+            _table.append('<tr><td>Standard Deviation</td><td>' + item.standardDeviation + '</td></tr>');
+            _table.append('<tr><td>Total no. of values (incl. missing)</td><td>' +
+                item.totalNumberOfValuesIncludingMissing + '</td></tr>');
+            _table.append('<tr><td>Variable Label</td><td>' + item.variableLabel + '</td></tr>');
+        });
+
+        var _plot = jQuery('<img>')
+            .attr('src', pageInfo.basePath
+            + '/ScriptExecution/downloadFile?sessionId='
+            + GLOBAL.HeimAnalyses.sessionId
+            + '&executionId='
+            + GLOBAL.HeimAnalyses.executionId
+            + '&filename=box_plot_node.png');
+
+        return {table:_table,  plot:_plot};
     };
 
     service.runAnalysis = function (params) {
