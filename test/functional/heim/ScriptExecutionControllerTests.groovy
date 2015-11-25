@@ -46,8 +46,6 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
     }
 
     private void fetchTestMRNA(sessionId){
-        def test_label = 'test_label'
-
         post '/ScriptExecution/run', {
             body json: [
                     sessionId: sessionId,
@@ -63,7 +61,7 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
                                     genes: [ names: ['BOGUSRQCD1'] ]
                             ],
                             projection: 'zscore',
-                            label: test_label,
+                            label: 'test_label',
                     ]
             ]
         }
@@ -73,25 +71,23 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
                 executionId:       taskId,
                 waitForCompletion: true,
         )
+
+        assertStatus(200)
     }
 
-    private Map runHeatmap(){
+    private Map runHeatmap() {
         String sessionId = createSession('heatmap')
         fetchTestMRNA(sessionId)
         post '/ScriptExecution/run', {
             body json: [
                     sessionId: sessionId,
                     taskType: 'run',
-                    arguments: [max_rows:1
-
-                    ]
+                    arguments: [max_rows:1]
             ]
         }
 
         assertStatus 200
-        assertThat JSON, hasEntry(
-                equalTo('executionId'),
-                isA(String))
+        assertThat JSON, hasEntry(is('executionId'), isA(String))
 
         String taskId = JSON.executionId
         get '/ScriptExecution/status?' + buildQueryParameters(
@@ -99,15 +95,13 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
                 executionId:       taskId,
                 waitForCompletion: true,
         )
-
-        [sessionId: sessionId, taskId: taskId]
     }
 
-    void testHeatmap(){
-
+    void testHeatmap() {
         runHeatmap()
 
         assertStatus 200
+
         assertThat JSON, allOf(
                 hasEntry(is('state'), is(TaskState.FINISHED.toString())),
                 hasEntry(is('result'), allOf(
@@ -118,7 +112,6 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
 
         Map artifacts = JSON.result.artifacts
         assertThat artifacts['files'], hasItem('heatmap.json')
-
     }
 
 

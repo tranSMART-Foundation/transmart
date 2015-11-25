@@ -7,6 +7,7 @@ import groovy.util.logging.Log4j
 import heim.rserve.RFunctionArg
 import heim.rserve.RScriptOutputManager
 import heim.rserve.RServeSession
+import heim.rserve.RUtil
 import heim.session.SessionFiles
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.Rserve.RConnection
@@ -21,7 +22,7 @@ class RScriptExecutionTask extends AbstractTask {
     UUID sessionId
     RServeSession rServeSession
     SessionFiles sessionFiles
-    String codeToLoad
+    File fileToLoad // absolute
     String function = 'main'
     List<RFunctionArg> arguments
 
@@ -39,7 +40,8 @@ class RScriptExecutionTask extends AbstractTask {
 
     private REXP callR(RConnection conn) {
         runRCommand(conn, 'library(jsonlite)')
-        runRCommand(conn, codeToLoad)
+        runRCommand(conn, "source('" +
+                "${RUtil.escapeRStringContent(fileToLoad.toString())}')")
 
         def namedArguments = arguments.collect { RFunctionArg arg ->
             "${arg.name}=${arg.asRExpression()}"

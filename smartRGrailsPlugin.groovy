@@ -1,7 +1,12 @@
+import heim.rserve.RScriptsSynchronizer
 import org.codehaus.groovy.grails.plugins.GrailsPluginUtils
 import org.springframework.stereotype.Component
+import heim.SmartRRuntimeConstants
 
 class smartRGrailsPlugin {
+
+    public static final String DEFAULT_REMOTE_RSCRIPTS_DIRECTORY = '/tmp/smart_r_scripts'
+
     // the plugin version
     def version = "0.3"
     // the version or versions of Grails the plugin is designed for
@@ -57,6 +62,7 @@ class smartRGrailsPlugin {
 
     def doWithApplicationContext = { ctx ->
         def config = application.config
+        SmartRRuntimeConstants constants = ctx.getBean(SmartRRuntimeConstants)
 
         File smartRDir = GrailsPluginUtils.getPluginDirForName('smart-r')?.file
         if (!smartRDir) {
@@ -73,10 +79,19 @@ class smartRGrailsPlugin {
                     'smart-r plugin')
         }
 
-        config.smartR.pluginScriptDirectory =
-                new File(smartRDir.canonicalPath, 'HeimScripts')
-        config.smartR.legacyPluginScriptDirectory =
-                new File(smartRDir.canonicalPath, 'Scripts')
-        log.info("Directory for heim scripts is ${config.smartR.pluginScriptDirectory}")
+        constants.pluginScriptDirectory = new File(smartRDir.canonicalPath, 'HeimScripts')
+        log.info("Directory for heim scripts is ${constants.pluginScriptDirectory}")
+
+        constants.legacyScriptDirectory = new File(smartRDir.canonicalPath, 'Scripts')
+        log.info("Directory for legacy scripts is ${constants.legacyScriptDirectory}")
+
+        def remoteScriptDirectory =  config.smartR.remoteScriptDirectory
+        if (!remoteScriptDirectory) {
+            remoteScriptDirectory = DEFAULT_REMOTE_RSCRIPTS_DIRECTORY
+        }
+        constants.remoteScriptDirectoryDir = remoteScriptDirectory
+        log.info("Location for R scripts in the Rserve server is ${constants.remoteScriptDirectoryDir}")
+
+        ctx.getBean(RScriptsSynchronizer).start()
     }
 }

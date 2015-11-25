@@ -10,6 +10,9 @@
 #         (RIGHT NOW THE UNDERSCORE IS USED FOR SPLITTING THE TWO, SO IF UNDERSCORES ARE USED IN THE NODE IDENTIFIER ,THIS SHOULD BE CHANGED)
 #   The data.frames (coming from high dimensional nodes) have columns: Row.Label, Bio.marker (optional), ASSAY_0001, ASSAY_0002 ...  
 #     ** right now this is only implemented for high dimensional data nodes, later the functionality might be extended for clinical data. In that case it is possible to recognize if it is high or low dim data based on the column names of the data.frame (assuming low dim data will also be passed on in the form of data.frames)
+# * phase parameter. This parameter specifies whether the script is run for the 'fetch data' or 'preprocess data' tab,
+#     and it is used to give the output files of this script a different name (so that the output files for the 'fetch data' tab
+#     are not overwritten if the script is run for the 'preprocess data' tab)
 #
 # Output: 
 # * 1 boxplot image per data node, png format. Name: Box_plot_Node_<Node Identifier>.png. 
@@ -17,16 +20,20 @@
 # Note: If the data node is not high dimensional or the dataset is empty, no boxplot will be returned - only an image with the text "No data points to plot", 
 #   also no mean, median etc will be returned in the summary statistics: only variableLabel, node name and subset name are returned 
 #   and totalNumberOfValues = 1 and numberOfMissingValues = 1.
+
+
+## NOTE:  the script is now assuming that the first column of high dim nodes is called "Row.Label", and that data coming from low dim nodes NEVER have a first column named "Row.Label"". 
+
 ###########
 
 library(jsonlite)
 library(gplots)
 
-main <- function()
+main <- function(phase)
 {
   data_measurements <- extract_measurements(loaded_variables)
-  produce_summary_stats(data_measurements)
-  produce_boxplot(data_measurements)
+  produce_summary_stats(data_measurements, phase)
+  produce_boxplot(data_measurements, phase)
   return(list(summary_stats = "Finished")) #right now a non-empty list is expected as a return.
 }
 
@@ -72,7 +79,7 @@ extract_measurements <- function(datasets)
 #         * extend this method to recognize low dim data and split up the data.frame or apply this method to each data column separately to calculate the statistics per clinical variable separately (ie. supply the clinical data as a list containing a separate data.frame/vector for each clinical variable)
 #         * build in  a test to determine if a variable is numeric or categorical and only calculate the statistics if numeric. 
 #         * If a variable is categorical: are missing values in that case NA or  "" (empty string? )
-produce_summary_stats <- function(measurement_tables)
+produce_summary_stats <- function(measurement_tables, phase)
 {
   # construct data.frame to store the results from the summary statistics in
   result_table <- as.data.frame(matrix(NA, length(measurement_tables),12, 
@@ -125,7 +132,7 @@ produce_summary_stats <- function(measurement_tables)
 }
 
 # Function that outputs one box plot image per data node
-produce_boxplot <- function(measurement_tables)
+produce_boxplot <- function(measurement_tables, phase)
 {
   #get node and subset identifiers
   nodes <- gsub("_.*","",names(measurement_tables))
@@ -160,7 +167,7 @@ produce_boxplot <- function(measurement_tables)
     # in case there is data present: create box plot
     if(!all(is.na(single_node_data)))
     {
-      boxplot(single_node_data, col = "grey", ylab = "Value") # REMOVE THIS AFTER DISCUSSION: with col and border you can also define color of the box plots... should it be white, grey, or for example two different colors in case of two subsets?
+      boxplot(single_node_data, col = "grey", ylab = "Value")
     }
 
     # if there are no data values: create image with text "No data points to plot"

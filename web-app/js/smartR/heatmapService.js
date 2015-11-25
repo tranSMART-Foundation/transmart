@@ -172,6 +172,7 @@ HeatmapService = (function(smartRHeatmap){
             jQuery('#heim-fetch-data-output').html('<p><span id="blinking">_</span>Fetching data, please wait ..</p>');
             _blinkMe('blinking');
         } else if (task === 'runHeatmap') {
+            jQuery('#heim-run-output').show();
             jQuery('#heim-run-output').html('<p>Calculating, please wait ..</p>');
         } else if (task === 'getSummary') {
             jQuery('#heim-fetch-data-output').html('<p>Getting summary, please wait ..</p>');

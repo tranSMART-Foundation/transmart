@@ -108,7 +108,7 @@
             %{--Number of max row to display--}%
             <div class="heim-input-field heim-input-number">
                 <label>Number of max row to display</label>
-                <input type="text" id="txtMaxRow" value="50">
+                <input type="text" id="txtMaxRow" value="100">
             </div>
 
             %{--Group Subject--}%

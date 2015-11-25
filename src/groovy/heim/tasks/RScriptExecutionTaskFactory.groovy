@@ -1,9 +1,10 @@
 package heim.tasks
 
-import grails.util.Holders
+import heim.SmartRRuntimeConstants
 import heim.jobs.JobInstance
 import heim.rserve.GenericJavaObjectAsJsonRFunctionArg
 import heim.rserve.RFunctionArg
+import heim.rserve.RScriptsSynchronizer
 import heim.rserve.RServeSession
 import heim.session.SessionFiles
 import heim.session.SmartRSessionScope
@@ -27,7 +28,13 @@ class RScriptExecutionTaskFactory implements TaskFactory {
     private JobInstance jobInstance
 
     @Autowired
+    private RScriptsSynchronizer rScriptsSynchronizer
+
+    @Autowired
     private SessionFiles sessionFiles
+
+    @Autowired
+    private SmartRRuntimeConstants constants
 
     @Value('#{sessionId}')
     private UUID sessionId
@@ -39,29 +46,27 @@ class RScriptExecutionTaskFactory implements TaskFactory {
         true // fallback factory, since it has the lowest precedence
     }
 
-    private String readScript(String taskType) {
-        File dir = Holders.config.smartR.pluginScriptDirectory
+    private File calculateRemoteScriptPath(String taskType) {
+        File dir = constants.remoteScriptDirectoryDir
         assert dir != null
         File workflowDir = new File(dir, jobInstance.workflow)
-        def file = new File(workflowDir, taskType + '.r')
-        if (file.parentFile != workflowDir) {
-            throw new InvalidArgumentsException(
-                    'Invalid task type name (probably contains /)')
-        }
-
-        file.text
+        new File(workflowDir, taskType + '.R')
     }
 
     @Override
     Task createTask(String taskName, Map<String, Object> arguments) {
+        if (!rScriptsSynchronizer.wasCopySuccessful()) {
+            throw new IllegalStateException(
+                    "Cannot continue because R scripts were not successfully copied")
+        }
         try {
-            String codeToLoad = readScript(taskName)
+            File fileToLoad = calculateRemoteScriptPath(taskName)
 
             new RScriptExecutionTask(
                     sessionFiles:  sessionFiles,
                     sessionId:     sessionId,
                     rServeSession: rServeSession,
-                    codeToLoad:    codeToLoad,
+                    fileToLoad:    fileToLoad,
                     arguments:     convertArguments(arguments),
             )
         } catch (IOException ioe) {
