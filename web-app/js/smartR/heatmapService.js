@@ -5,8 +5,7 @@
 HeatmapService = (function(smartRHeatmap){
 
     var service = {
-        statusInterval : 0,
-        jobs : []
+        statusInterval : 0
     };
 
     /**
@@ -16,7 +15,7 @@ HeatmapService = (function(smartRHeatmap){
      * @private
      */
     var _createAnalysisConstraints = function (params) {
-
+        console.log(params);
         var _retval = {
             conceptKey : params.conceptPath,
             dataType: 'mrna',
@@ -166,9 +165,9 @@ HeatmapService = (function(smartRHeatmap){
             jQuery('#heim-fetch-data-output').html('<p class="sr-log-text"><span class="blink_me">_</span>Fetching data, please wait ..</p>');
         } else if (task === 'runHeatmap') {
             jQuery('#heim-run-output').show();
-            jQuery('#heim-run-output').html('<p>Calculating, please wait ..</p>');
+            jQuery('#heim-run-output').html('<p class="sr-log-text">Calculating, please wait ..</p>');
         } else if (task === 'getSummary') {
-            jQuery('#heim-fetch-data-output').html('<p><p><span class="blink_me">_</span>Getting summary, please wait ..</p>');
+            jQuery('#heim-fetch-data-output').html('<p class="sr-log-text"><span class="blink_me">_</span>Getting summary, please wait ..</p>');
         }
 
         jQuery.ajax({
@@ -237,18 +236,23 @@ HeatmapService = (function(smartRHeatmap){
                             });
                     }
                 } else if (d.state === 'FAILED') {
-                    clearInterval(service.statusInterval);
-                    jQuery('#heim-fetch-data-output')
-                        .html('<p class="heim-fetch-success" style="color: red";> ' +
-                        d.result.exception + '</p>');
+
+                    clearInterval(service.statusInterval); // stop checking backend
+
+                    if (task === 'runHeatmap') {
+                        jQuery('#heim-run-output').html('<span style="color: red";>' + d.result.exception +'</span>');
+                    }
                     console.error('FAILED', d.result);
                 }
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
+
                 console.log(jqXHR);
                 console.log(textStatus);
                 console.log(errorThrown);
-                clearInterval(service.statusInterval);
+
+                clearInterval(service.statusInterval); // stop checking backend
+
                 if (task === 'fetchData') {
                     jQuery('#heim-fetch-data-output').html('<span style="color: red";>'+errorThrown+'</span>');
                 } else if (task === 'runHeatmap') {
