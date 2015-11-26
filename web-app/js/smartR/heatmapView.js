@@ -16,7 +16,8 @@ HeatmapView = (function(){
             outputArea : jQuery('#heim-fetch-data-output')
         },
         preprocessView : {
-            // TODO
+            aggregateProbesChk : jQuery('#chkAggregateProbes'),
+            preprocessBtn : jQuery('#heim-btn-preprocess-heatmap')
         },
         runHeatmapView : {
             maxRowInput : jQuery('#txtMaxRow'),
@@ -55,6 +56,14 @@ HeatmapView = (function(){
         }
     };
 
+    var _getPreprocessViewValues = function (v) {
+        // get max_rows
+        var _aggregate = v.aggregateProbesChk.is(":checked");
+        return {
+            aggregate : _aggregate
+        }
+    };
+
     /**
      * Fetch data
      * @param eventObj
@@ -67,10 +76,16 @@ HeatmapView = (function(){
 
     var _runHeatmapAction = function (eventObj) {
         var _runHeatmapInputArgs =  _getRunHeatmapViewValues(view.runHeatmapView);
-        console.log(_runHeatmapAction, _runHeatmapInputArgs);
+        console.log('_runHeatmapAction', _runHeatmapInputArgs);
         jQuery('#heatmap').empty();
         heatmapService.runAnalysis(_runHeatmapInputArgs);
     };
+
+    var _preprocessAction = function (eventObj) {
+        var _preprocessInputArgs =  _getPreprocessViewValues(view.preprocessView);
+        console.log('_preprocessAction', _preprocessInputArgs);
+        heatmapService.preprocess(_preprocessInputArgs);
+    }
 
     /**
      * Register event handlers
@@ -87,7 +102,13 @@ HeatmapView = (function(){
             _fetchDataAction
         );
 
-        // auto completion
+        // register preprocess btn action
+        view.preprocessView.preprocessBtn.click(
+            view.preprocessView,
+            _preprocessAction
+        );
+
+        // on change handler
         view.runHeatmapView.methodSelect.on('change', function() {
             if( !(this.value === 'none') ){
                 view.runHeatmapView.clusteringOptionsDiv.show();
@@ -110,9 +131,10 @@ HeatmapView = (function(){
             minLength: 2
         });
         view.fetchDataView.clearBtn.click(view.clearConceptPathInput);
-        //
+
+        // TODO Remove this, it's unused
         view.fetchDataView.checkStatusBtn.click(heatmapService.checkStatus);
-        // TODO Run Analysis
+
         view.runHeatmapView.runAnalysisBtn.click (
             view.runHeatmapView,
             _runHeatmapAction
@@ -121,7 +143,7 @@ HeatmapView = (function(){
     };
 
     view.clearConceptPathInput = function (eventObj) {
-        console.log('   clear ..')
+        //console.log('   clear ..')
         extJSHelper.clear(view.fetchDataView.conceptPathsInput);
     };
 

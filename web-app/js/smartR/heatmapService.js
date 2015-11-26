@@ -18,12 +18,11 @@ HeatmapService = (function(smartRHeatmap){
         console.log(params);
         var _retval = {
             conceptKey : params.conceptPath,
-            dataType: 'mrna',
+            dataType: 'mrna', // TODO : Get high dimensional data type
             resultInstanceId: params.resultInstanceId,
             projection: 'log_intensity',
             label: '_TEST_LABEL_'
         };
-
         return  _retval;
     };
 
@@ -32,7 +31,6 @@ HeatmapService = (function(smartRHeatmap){
      * @returns {*}
      */
     service.initialize = function () {
-
         // ajax call to session creation
         jQuery.ajax({
             url: pageInfo.basePath + '/RSession/create',
@@ -47,14 +45,12 @@ HeatmapService = (function(smartRHeatmap){
                 type : 'heatmap',
                 sessionId :response.sessionId
             };
-
             return GLOBAL.HeimAnalyses;
         }).fail(function() {
             // TODO: error displayed in a placeholder somewhere in main heim-analysis page
             console.error('Cannot create r-session');
             return null;
         });
-
     };
 
     /**
@@ -133,6 +129,43 @@ HeatmapService = (function(smartRHeatmap){
     };
 
     /**
+     * Preprocess service
+     * @param params
+     */
+    service.preprocess = function (params) {
+
+        console.log('service.preprocess', params);
+
+        jQuery.ajax({
+            type: 'POST',
+            url: pageInfo.basePath + '/ScriptExecution/run',
+            data: JSON.stringify({
+                    sessionId : GLOBAL.HeimAnalyses.sessionId,
+                    arguments : params,
+                    taskType : 'preprocess'}
+            ),
+            contentType: 'application/json'
+        })
+            .done(function (d) {
+                console.log(d);
+                GLOBAL.HeimAnalyses.executionId = d.executionId;
+                console.log(GLOBAL.HeimAnalyses);
+                service.statusInterval =  setInterval(function () {
+                    service.checkStatus('preprocess');
+                }, 1000);
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                var _err = JSON.parse(jqXHR.responseText);
+                console.error(jqXHR);
+                console.error(textStatus);
+                console.error(errorThrown);
+                jQuery('#heim-preprocess-output')
+                    .html('<p style="color: red";><b>Error:'+ errorThrown +'</b> <br> ' + _err.message + '</p>');
+            });
+
+    };
+
+    /**
      *
      * @param request
      * @param response
@@ -146,7 +179,7 @@ HeatmapService = (function(smartRHeatmap){
             data = JSON.parse(data);// String rep of JSON to actual JSON
             data = data['rows'];// Response is encapsulated in rows
             var suggestions = [];
-            for (var i = 0; i < data.length;i++){
+            for (var i = 0; i < data.length;i++) {
                 var geneName = data[i]['keyword']; //I assume we use keywords, not synonyms or IDs
                 suggestions.push(geneName);
             }
@@ -163,9 +196,12 @@ HeatmapService = (function(smartRHeatmap){
     service.checkStatus = function (task) {
         if (task === 'fetchData') {
             jQuery('#heim-fetch-data-output').html('<p class="sr-log-text"><span class="blink_me">_</span>Fetching data, please wait ..</p>');
+        } else if (task === 'preprocess') {
+            jQuery('#heim-preprocess-output').show();
+            jQuery('#heim-preprocess-output').html('<p class="sr-log-text"><span class="blink_me">_</span>Preprocessing, please wait ..</p>');
         } else if (task === 'runHeatmap') {
             jQuery('#heim-run-output').show();
-            jQuery('#heim-run-output').html('<p class="sr-log-text">Calculating, please wait ..</p>');
+            jQuery('#heim-run-output').html('<p class="sr-log-text"><span class="blink_me">_</span>Calculating, please wait ..</p>');
         } else if (task === 'getSummary') {
             jQuery('#heim-fetch-data-output').html('<p class="sr-log-text"><span class="blink_me">_</span>Getting summary, please wait ..</p>');
         }
@@ -192,6 +228,14 @@ HeatmapService = (function(smartRHeatmap){
 
                         // render summary stat
                         service.getSummary();
+                    } else if (task === 'preprocess') {
+                        jQuery('#heim-fetch-data-output')
+                            .html('<p class="heim-fetch-success" style="color: green";> ' +
+                            'Preprocessed completed successfully.</p>');
+
+                        // TODO Render summary stat
+                        //service.getSummary();
+
                     } else if (task === 'runHeatmap') {
                         jQuery('#heim-run-output').hide();
                         jQuery.ajax({
@@ -238,10 +282,16 @@ HeatmapService = (function(smartRHeatmap){
                 } else if (d.state === 'FAILED') {
 
                     clearInterval(service.statusInterval); // stop checking backend
+                    var _errHTML = '<span style="color: red";>' + d.result.exception +'</span>',
+                        _elId;
 
                     if (task === 'runHeatmap') {
-                        jQuery('#heim-run-output').html('<span style="color: red";>' + d.result.exception +'</span>');
+                        _elId = '#heim-run-output';
+                    } else if (task === 'preprocess') {
+                        _elId = '#heim-preprocess-output';
                     }
+
+                    jQuery(_elId).html(_errHTML);
                     console.error('FAILED', d.result);
                 }
         })
@@ -255,6 +305,8 @@ HeatmapService = (function(smartRHeatmap){
 
                 if (task === 'fetchData') {
                     jQuery('#heim-fetch-data-output').html('<span style="color: red";>'+errorThrown+'</span>');
+                } else if (task === 'preprocess') {
+                    jQuery('#heim-preprocess-output').html('<span style="color: red";>'+errorThrown+'</spanp>');
                 } else if (task === 'runHeatmap') {
                     jQuery('#heim-run-output').html('<span style="color: red";>'+errorThrown+'</spanp>');
                 }
