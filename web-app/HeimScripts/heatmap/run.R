@@ -21,7 +21,7 @@ main <- function(max_rows=100){
   else{
   #one sample
     variance <- 1.0 # We cannot get any significance measure for just one sample
-    mean <- mean(ex_df[,3], na.rm = T) #For just one sample we take mean over all genes (whole column), not per gene
+    mean <- mean(df[,3], na.rm = T) #For just one sample we take mean over all genes (whole column), not per gene
     sds <- sd(df[,3],na.rm = T) #For just one sample we take mean over all genes (whole column), not per gene
     df["MEAN"] <- rep(mean,nrow(df))
     df["SD"] <- rep(sds,nrow(df))
