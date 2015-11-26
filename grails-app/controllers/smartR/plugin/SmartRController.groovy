@@ -16,7 +16,7 @@ class SmartRController {
     def index() {
         [
                 scriptList: sessionService.availableWorkflows(),
-                legacyScriptList: sessionService.legacyWorkflows(),
+                //legacyScriptList: sessionService.legacyWorkflows(), FIXME display rest original scripts
         ]
     }
 

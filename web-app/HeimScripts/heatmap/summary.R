@@ -10,7 +10,7 @@
 #         (RIGHT NOW THE UNDERSCORE IS USED FOR SPLITTING THE TWO, SO IF UNDERSCORES ARE USED IN THE NODE IDENTIFIER ,THIS SHOULD BE CHANGED)
 #   The data.frames (coming from high dimensional nodes) have columns: Row.Label, Bio.marker (optional), ASSAY_0001, ASSAY_0002 ...  
 #     ** right now this is only implemented for high dimensional data nodes, later the functionality might be extended for clinical data. In that case it is possible to recognize if it is high or low dim data based on the column names of the data.frame (assuming low dim data will also be passed on in the form of data.frames)
-# * phase parameter. This parameter specifies whether the script is run for the 'fetch data' or 'preprocess data' tab, 
+# * phase parameter. This parameter specifies whether the script is run for the 'fetch data' or 'preprocess data' tab,
 #     and it is used to give the output files of this script a different name (so that the output files for the 'fetch data' tab
 #     are not overwritten if the script is run for the 'preprocess data' tab)
 #
@@ -126,7 +126,7 @@ produce_summary_stats <- function(measurement_tables, phase)
   {
     partial_table <- result_table[which(result_table$node == node), ,drop = F]
     summary_stats_JSON <- toJSON(partial_table, dataframe = "rows", pretty = T)
-    fileName <- paste(phase,"_summary_stats_node_", node, ".json", sep = "")
+    fileName <- paste("summary_stats_node", node, ".json", sep = "")
     write(summary_stats_JSON, fileName)
   }
 }
@@ -161,7 +161,7 @@ produce_boxplot <- function(measurement_tables, phase)
     single_node_data <- single_node_data[order(names(single_node_data))] 
     
     ## create box plot, output to PNG file
-    fileName <- paste(phase, "box_plot_node_", node, ".png", sep = "")    
+    fileName <- paste("box_plot_node", node, ".png", sep = "")
     png(filename = fileName)
     
     # in case there is data present: create box plot

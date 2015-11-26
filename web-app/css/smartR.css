@@ -161,3 +161,48 @@
     pointer-events: none;
 }
 
+/** **/
+.blink_me {
+	-webkit-animation-name: blinker;
+	-webkit-animation-duration: .1s;
+	-webkit-animation-timing-function: linear;
+	-webkit-animation-iteration-count: infinite;
+
+	-moz-animation-name: blinker;
+	-moz-animation-duration: .1s;
+	-moz-animation-timing-function: linear;
+	-moz-animation-iteration-count: infinite;
+
+	animation-name: blinker;
+	animation-duration: .1s;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+}
+@-moz-keyframes blinker {
+	0% { opacity: 1.0; }
+	50% { opacity: 0.0; }
+	100% { opacity: 1.0; }
+}
+@-webkit-keyframes blinker {
+	0% { opacity: 1.0; }
+	50% { opacity: 0.0; }
+	100% { opacity: 1.0; }
+}
+@keyframes blinker {
+	0% { opacity: 1.0; }
+	50% { opacity: 0.0; }
+	100% { opacity: 1.0; }
+}
+
+.heim-dropzone {float: left; margin-right: 5px;}
+.sr-hd-input {  width: 40%}
+.sr-low-input {  width: 27%}
+.sr-log-text {color: darkorange}
+
+.sr-summary-table {border: 1px solid #999;}
+.sr-summary-table th {font-weight: bold; background-color: #DDD;}
+.sr-summary-table th, .sr-summary-table td  {
+    padding: 5px;
+}
+.ui-icon-info {display: inline-block; }
+.sr-ui-tooltip {font-size: .85em; background: lightyellow !important;}

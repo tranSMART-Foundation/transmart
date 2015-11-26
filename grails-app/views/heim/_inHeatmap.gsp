@@ -4,7 +4,7 @@
 <div style="width: 98%">
 
     <p>
-        Start Heatmap analysis with load, preprocess options and then run analysis. Make sure that you run Summary
+        Start analysis with <b>Fetch</b>, <b>Preprocess</b>  and then <b>Run Analysis</b>. Make sure that you run Summary
         Statistic prior running the Heatmap.
     </p>
 
@@ -20,36 +20,76 @@
         %{--Load Data--}%
         %{--========================================================================================================--}%
         <div id="fragment-load">
+
+
+            <div class="sr-input-area">
+
                 %{--High dimension dropzone--}%
-                <div class="heim-input-field heim-dropzone">
+                <div class="heim-input-field heim-dropzone sr-hd-input">
                     %{--High dimensional input--}%
-                    <label>Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into
-                    the box. The nodes needs to be from the same platform.</label>
+                    <label>High dimensional <i class="ui-icon ui-icon-info" title="Select high dimensional data node(s) from the Data
+                        Set Explorer Tree and drag it into the box. The nodes needs to be from the same platform.">
+                    </i></label>
+
                     <br><br>
-                    <div id='divIndependentVariable' class="heim-dropzone" 
+                    <div id='divIndependentVariable'
                          style="border:1px solid #666; height: 100px; padding: 10px;"></div>
-                    <div style="margin-top: 10px;">
+                    <div style="margin-top: 10px; text-align: right;">
                         <button type="button" id="heim-btn-clear">Clear</button>
                     </div>
                 </div>
 
-                %{--Display independent variable--}%
-                <div id="displaydivIndependentVariable" class="independentVars" ></div>
+                %{--TODO: Support numerical nodes--}%
+                %{--Low dimension dropzone (numerical)--}%
+                <div class="heim-input-field heim-dropzone sr-low-input">
+                    %{--Numerical node input--}%
+                    <label>Numerical (optional) <i class="ui-icon ui-icon-info" title="Select numerical data node from the Data
+                            Set Explorer Tree and drag it into the box.">
+                    </i></label>
+                    <br><br>
+                    <div id='divNumVariable'
+                         style="border:1px solid #CCC; height: 100px; padding: 10px;"></div>
+                    <div style="margin-top: 10px; text-align: right;">
+                        <button type="button" id="heim-btn-clear-2" disabled>Clear</button>
+                    </div>
+                </div>
 
+                %{--TODO: Support categorical  nodes--}%
+                %{--Low dimension dropzone (categorical)--}%
+                <div class="heim-input-field heim-dropzone sr-low-input">
+                    %{--High dimensional input--}%
+                    <label>Categorical (optional) <i class="ui-icon ui-icon-info" title="Select categorical data node from the Data
+                                Set Explorer Tree and drag it into the box.">
+                    </i></label>
+                    <br><br>
+                    <div id='divCategoricalVariable'
+                         style="border:1px solid #CCC; height: 100px; padding: 10px;"></div>
+                    <div style="margin-top: 10px; text-align: right;">
+                        <button type="button" id="heim-btn-clear-3" disabled>Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            %{--Display independent variable--}%
+            %{--<div id="displaydivIndependentVariable" class="independentVars" ></div>--}%
+
+            %{--TODO: Support gene filtering--}%
+            <div class="sr-fetch-params-area">
                 %{--Select identifier--}%
-                <div class="heim-input-field heim-autocomplete">
-                    <label>Select a Gene/Pathway/mirID/UniProtID:</label> 
-                    <input id="heim-input-txt-identifiers">
+                <div class="heim-input-field heim-autocomplete" style="clear: both">
+                    <label>Select a Gene/Pathway/mirID/UniProtID:</label>
+                    <input id="heim-input-txt-identifiers" disabled>
                 </div>
+            </div>
 
-                %{--tool buttons--}%
-                <div style="margin-top: 10px; text-align: right;">
-                    <button id="heim-btn-fetch-data">Fetch Data</button>
-                    %{--<button id="heim-btn-check">Check Status</button>--}%
-                    %{--<button id="heim-btn-get-output">Get output</button>--}%
-                </div>
+            %{--tool buttons--}%
+            <div style="margin-top: 10px; text-align: right;">
+                <button id="heim-btn-fetch-data">Fetch Data</button>
+                %{--<button id="heim-btn-check">Check Status</button>--}%
+                %{--<button id="heim-btn-get-output">Get output</button>--}%
+            </div>
 
-                <div id="heim-fetch-data-output"></div>
+            <div id="heim-fetch-data-output"></div>
 
         </div>
 
@@ -178,8 +218,6 @@
             <div id='visualization' class='text'>
                 <div id="heatmap" class='text'></div>
             </div>
-
-
     </div>
         
     </div>

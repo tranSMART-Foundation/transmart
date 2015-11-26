@@ -131,6 +131,8 @@ HeatmapView = (function(){
      * @param helper
      */
     view.init = function (service, helper) {
+        // instantiate tooltips
+        jQuery( "[title]" ).tooltip({track: true, tooltipClass:"sr-ui-tooltip"});
         // injects dependencies
         heatmapService = service;
         extJSHelper = helper;
