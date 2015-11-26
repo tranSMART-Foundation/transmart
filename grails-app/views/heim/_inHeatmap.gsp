@@ -124,6 +124,9 @@
                 <input type="text" id="txtMaxRow" value="100">
             </div>
 
+
+            %{--TODO :Not relevant for now. Might be in future sprint--}%
+
             %{--Group Subject--}%
             %{--<div class="heim-input-field">--}%
             %{--<input type="checkbox" id="chkGroupSubject" name="chkGroupSubject">--}%
@@ -175,11 +178,6 @@
             <div style="margin-top: 10px; text-align: right;">
                 <button id="heim-btn-run-heatmap">Get Heatmap</button>
             </div>
-
-            %{--FOR DEBUGGING--}%
-            %{--<div style="margin-top: 10px; text-align: right;">--}%
-            %{--<button id="heim-btn-download-file">View</button>--}%
-            %{--</div>--}%
 
             %{--result--}%
 
