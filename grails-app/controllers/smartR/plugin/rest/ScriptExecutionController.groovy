@@ -92,8 +92,8 @@ class StatusCommand {
     boolean waitForCompletion
 
     static constraints = {
-        sessionId   blank: false
-        executionId blank: false
+        sessionId   nullable: false
+        executionId nullable: false
     }
 }
 
@@ -104,7 +104,7 @@ class RunCommand {
     String taskType
 
     static constraints = {
-        sessionId blank: false
+        sessionId nullable: false
         taskType  blank: false
     }
 }
@@ -116,8 +116,8 @@ class DownloadCommand {
     String filename
 
     static constraints = {
-        sessionId   blank: false
-        executionId blank: false
+        sessionId   nullable: false
+        executionId nullable: false
         filename    blank: false
     }
 }

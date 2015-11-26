@@ -1,3 +1,5 @@
+//# sourceURL=heatmapService.js
+
 /**
  * Heatmap Service
  */
@@ -17,11 +19,13 @@ HeatmapService = (function(smartRHeatmap){
     var _createAnalysisConstraints = function (params) {
         console.log(params);
         var _retval = {
-            conceptKey : params.conceptPath,
+            conceptKeys : {
+                // TODO: support more than one concept path
+                '_TEST_LABEL_': params.conceptPaths
+            },
             dataType: 'mrna', // TODO : Get high dimensional data type
-            resultInstanceId: params.resultInstanceId,
+            resultInstanceIds: params.resultInstanceIds,
             projection: 'log_intensity',
-            label: '_TEST_LABEL_'
         };
         return  _retval;
     };
@@ -179,7 +183,7 @@ HeatmapService = (function(smartRHeatmap){
             data = JSON.parse(data);// String rep of JSON to actual JSON
             data = data['rows'];// Response is encapsulated in rows
             var suggestions = [];
-            for (var i = 0; i < data.length;i++) {
+            for (var i = 0; i < data.length;i++){
                 var geneName = data[i]['keyword']; //I assume we use keywords, not synonyms or IDs
                 suggestions.push(geneName);
             }

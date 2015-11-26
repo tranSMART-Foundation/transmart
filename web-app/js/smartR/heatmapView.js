@@ -1,3 +1,5 @@
+//# sourceURL=heatmapView.js
+
 /**
  * Heatmap View
  */
@@ -40,10 +42,8 @@ HeatmapView = (function(){
         var _conceptPath = extJSHelper.readConceptVariables(v.conceptPathsInput.attr('id'));
         console.log(v.identifiersInput.val());
         return {
-            conceptPath : _conceptPath,
-            //identifier : v.identifiersInput.val(), // TODO convert to array
-            identifier : 'TP53', // TODO convert to array
-            resultInstanceId : GLOBAL.CurrentSubsetIDs[1]
+            conceptPaths: _conceptPath,
+            resultInstanceIds : GLOBAL.CurrentSubsetIDs.filter(function (v) { return v !== undefined; })
         };
     };
 
@@ -66,10 +66,10 @@ HeatmapView = (function(){
 
     /**
      * Fetch data
-     * @param eventObj
+     * @param rid
      * @private
      */
-    var _fetchDataAction = function (eventObj) {
+    var _fetchDataAction = function () {
         var _fetchDataParams =  _getFetchDataViewValues(view.fetchDataView);
         heatmapService.fetchData(_fetchDataParams);
     };
@@ -99,7 +99,16 @@ HeatmapView = (function(){
         // fetch data btn
         view.fetchDataView.actionBtn.click(
             view.fetchDataView,
-            _fetchDataAction
+            function () {
+                for (var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
+                    if (!isSubsetEmpty(i) && !GLOBAL.CurrentSubsetIDs[i]) {
+                        runAllQueries(_fetchDataAction);
+                        return;
+                    }
+                }
+
+                _fetchDataAction();
+            }
         );
 
         // register preprocess btn action

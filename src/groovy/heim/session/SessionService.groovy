@@ -68,7 +68,7 @@ class SessionService implements DisposableBean {
 
     @Deprecated
     List<String> legacyWorkflows() {
-        File dir = Holders.config.smartR.legacyPluginScriptDirectory
+        File dir = constants.legacyScriptDirectory
         dir.listFiles()*.name
     }
 
