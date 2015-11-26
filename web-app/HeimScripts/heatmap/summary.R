@@ -15,8 +15,8 @@
 #     are not overwritten if the script is run for the 'preprocess data' tab)
 #
 # Output: 
-# * 1 boxplot image per data node, png format. Name: Box_plot_Node_<Node Identifier>.png. 
-# * 1 textfile per node with the summary statistics per subset, in json format. Name: Summary_stats-Node_<Node Identifier>.json. \
+# * 1 boxplot image per data node, png format. Name: <phase>_box_plot_Node_<Node Identifier>.png. 
+# * 1 textfile per node with the summary statistics per subset, in json format. Name: <phase>_summary_stats-Node_<Node Identifier>.json. 
 # Note: If the data node is not high dimensional or the dataset is empty, no boxplot will be returned - only an image with the text "No data points to plot", 
 #   also no mean, median etc will be returned in the summary statistics: only variableLabel, node name and subset name are returned 
 #   and totalNumberOfValues = 1 and numberOfMissingValues = 1.
@@ -177,13 +177,13 @@ produce_boxplot <- function(measurement_tables, phase)
     single_node_data <- single_node_data[order(names(single_node_data))] 
     
     ## create box plot, output to PNG file
-    fileName <- paste(phase, "box_plot_node_", node, ".png", sep = "")    
+    fileName <- paste(phase, "_box_plot_node_", node, ".png", sep = "")    
     png(filename = fileName)
     
     # in case there is data present: create box plot
     if(!all(is.na(single_node_data)))
     {
-      boxplot_result <- boxplot(single_node_data, col = "grey", ylab = "Value")
+      boxplot_result <- boxplot(single_node_data, col = "grey", ylab = "Value", outline = F, pch = 20, cex=0.2)
     }
 
     # if there are no data values: create image with text "No data points to plot"
