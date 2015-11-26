@@ -1,6 +1,5 @@
 package heim.session
 
-import grails.util.Holders
 import groovy.util.logging.Log4j
 import heim.SmartRExecutorService
 import heim.SmartRRuntimeConstants
@@ -17,9 +16,10 @@ import org.transmartproject.core.users.User
 
 import javax.annotation.PostConstruct
 import java.util.concurrent.Callable
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReadWriteLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Public service with the controller is to communicate.
@@ -31,10 +31,9 @@ class SessionService implements DisposableBean {
     private static final int COLLECTION_INTERVAL = 5 * 60 * 1000 // 5 min
     private static final int SESSION_LIFESPAN = 10 * 60 * 1000 // 10 min
 
-    private final ConcurrentMap<UUID, SessionContext> currentSessions =
-            new ConcurrentHashMap<>()
-
-    private final Set<UUID> sessionsShuttingDown = ([] as Set).asSynchronized()
+    private final ReadWriteLock sessionBookKeepingLock = new ReentrantReadWriteLock()
+    private final Map<UUID, SessionContext> currentSessions = new HashMap<>()
+    private final Set<UUID> sessionsShuttingDown = [] as Set
 
     private final AtomicReference<Timer> gcTimer = new AtomicReference()
 
@@ -61,6 +60,21 @@ class SessionService implements DisposableBean {
                         COLLECTION_INTERVAL, COLLECTION_INTERVAL))
     }
 
+    private <T> T withSessionBookKeepingLock(boolean write, Closure<T> closure) {
+        Lock lock
+        if (write) {
+            lock = sessionBookKeepingLock.writeLock()
+        } else {
+            lock = sessionBookKeepingLock.readLock()
+        }
+        lock.lock()
+        try {
+            closure.call()
+        } finally {
+            lock.unlock()
+        }
+    }
+
     List<String> availableWorkflows() {
         File dir = constants.pluginScriptDirectory
         dir.listFiles({ File f -> f.isDirectory() && !f.name.startsWith('_') } as FileFilter)*.name
@@ -77,7 +91,9 @@ class SessionService implements DisposableBean {
         log.debug("Created session with id ${newSession.sessionId} and " +
                 "workflow type $workflowType")
 
-        currentSessions[newSession.sessionId] = newSession
+        withSessionBookKeepingLock(true) {
+            currentSessions[newSession.sessionId] = newSession
+        }
 
         newSession.sessionId
     }
@@ -86,23 +102,31 @@ class SessionService implements DisposableBean {
         if (sessionId == null) {
             throw new NullPointerException("sessionId must be given")
         }
-        SessionContext sessionContext = fetchOperationalSessionContext(sessionId)
-        if (!sessionContext) {
-            throw new InvalidArgumentsException(
-                    "No such operational session: $sessionId")
+
+        SessionContext sessionContext
+        withSessionBookKeepingLock(true) {
+            sessionContext = fetchOperationalSessionContext(sessionId)
+            if (!sessionContext) {
+                throw new InvalidArgumentsException(
+                        "No such operational session: $sessionId")
+            }
+
+            sessionsShuttingDown << sessionId
         }
 
-        sessionsShuttingDown << sessionId
-
         smartRExecutorService.submit({
+            log.debug("Started callable for destroying session $sessionId")
             SmartRSessionSpringScope.withActiveSession(sessionContext) {
                 log.debug(
                         "Running destruction callbacks for session $sessionId")
                 sessionContext.destroy()
                 log.debug("Finished running destruction " +
                         "callbacks for session $sessionId")
-                currentSessions.remove(sessionId)
-                sessionsShuttingDown.remove(sessionId)
+
+                withSessionBookKeepingLock(true) {
+                    currentSessions.remove(sessionId)
+                    sessionsShuttingDown.remove(sessionId)
+                }
             }
         } as Callable<Void>)
 
@@ -171,8 +195,10 @@ class SessionService implements DisposableBean {
     }
 
     boolean isSessionActive(UUID sessionId) {
-        currentSessions.containsKey(sessionId) &&
-                !(sessionId in sessionsShuttingDown)
+        withSessionBookKeepingLock(false) {
+            currentSessions.containsKey(sessionId) &&
+                    !(sessionId in sessionsShuttingDown)
+        }
     }
 
     void touchSession(sessionId) {
@@ -180,22 +206,27 @@ class SessionService implements DisposableBean {
             doWithSession(sessionId) {}
         }
         catch (NoSuchResourceException e) {
-            log.warn("Attempted to touch non-existent session: $sessionId")
+            log.warn("Attempted to touch non-existent or shutting down " +
+                    "session: $sessionId. This is normal if the session was " +
+                    "destroyed with tasks running.")
         }
     }
 
     private SessionContext fetchOperationalSessionContext(UUID sessionId) {
-        SessionContext sessionContext = fetchSessionContext(sessionId)
-        if (sessionContext == null) {
-            return null
+        withSessionBookKeepingLock(false) {
+            SessionContext sessionContext = fetchSessionContext(sessionId)
+            if (sessionContext == null) {
+                return null
+            }
+            if (sessionId in sessionsShuttingDown) {
+                log.warn("Session is shutting down: $sessionId")
+                return null
+            }
+            sessionContext
         }
-        if (sessionId in sessionsShuttingDown) {
-            log.warn("Session is shutting down: $sessionId")
-            return null
-        }
-        sessionContext
     }
 
+    // no locking, but only called from fetchOperationalSessionContext
     private SessionContext fetchSessionContext(UUID sessionId) {
         SessionContext sessionContext = currentSessions[sessionId]
         if (!sessionContext) {
@@ -208,13 +239,25 @@ class SessionService implements DisposableBean {
 
     void garbageCollection() {
         log.debug('Started session garbage collecting')
-        currentSessions.each {
-            sessionId, sessionContext ->
-                def lastActivity = sessionContext.lastActive
-                if (isStale(sessionId, lastActivity)) {
-                    destroySession(sessionId)
-                    log.info("Terminated session: ${sessionId} due to inactivity.")
-                }
+
+        // because we're holding the lock, no actual destruction will start
+        // until this method returns (this function only schedules destruction
+        // in other threads)
+        withSessionBookKeepingLock(true) {
+            currentSessions.each {
+                sessionId, sessionContext ->
+                    def lastActivity = sessionContext.lastActive
+                    if (isStale(sessionId, lastActivity)) {
+                        if (sessionsShuttingDown.contains(sessionId)) {
+                            destroySession(sessionId)
+                            log.info("Terminated session: ${sessionId} " +
+                                    "due to inactivity.")
+                        } else {
+                            log.info("Session $sessionId is stale, but " +
+                                    "it's already shutting down")
+                        }
+                    }
+            }
         }
         log.debug('Finished session garbage collecting')
     }
