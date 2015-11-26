@@ -32,7 +32,8 @@ library(gplots)
 main <- function(phase)
 {
   data_measurements <- extract_measurements(loaded_variables)
-  produce_summary_stats(data_measurements, phase)
+  summary_stats_json <- produce_summary_stats(data_measurements, phase)
+  write_summary_stats(summary_stats_json)
   produce_boxplot(data_measurements, phase)
   return(list(summary_stats = "Finished")) #right now a non-empty list is expected as a return.
 }
@@ -121,15 +122,30 @@ produce_summary_stats <- function(measurement_tables, phase)
   rownames(result_table) <- 1:nrow(result_table)
   
   # write the summary statistics for each node to a separate file, in JSON format
+  summary_stats_all_nodes <- list()
+  
   unique_nodes <- unique(result_table$node)
   for(node in unique_nodes)
   {
     partial_table <- result_table[which(result_table$node == node), ,drop = F]
     summary_stats_JSON <- toJSON(partial_table, dataframe = "rows", pretty = T)
     fileName <- paste(phase,"_summary_stats_node_", node, ".json", sep = "")
-    write(summary_stats_JSON, fileName)
+    summary_stats_all_nodes[[fileName]] <- summary_stats_JSON
+  }
+  return(summary_stats_all_nodes)
+}
+
+
+write_summary_stats <- function(summary_stats_JSON)
+{
+  for (i in 1:length(summary_stats_JSON))
+  {
+    fileName <- names(summary_stats_JSON)[[i]]
+    write(summary_stats_JSON[[i]], fileName)
   }
 }
+
+
 
 # Function that outputs one box plot image per data node
 produce_boxplot <- function(measurement_tables, phase)
@@ -167,7 +183,7 @@ produce_boxplot <- function(measurement_tables, phase)
     # in case there is data present: create box plot
     if(!all(is.na(single_node_data)))
     {
-      boxplot(single_node_data, col = "grey", ylab = "Value")
+      boxplot_result <- boxplot(single_node_data, col = "grey", ylab = "Value")
     }
 
     # if there are no data values: create image with text "No data points to plot"
@@ -177,8 +193,10 @@ produce_boxplot <- function(measurement_tables, phase)
       write("No data points\n\   to plot","")
       sinkplot("plot")
       box("outer", lwd= 2)
+      boxplot_result <- "No data points to plot"
     }
     
     dev.off()
   }
+  return(boxplot_result)
 }
