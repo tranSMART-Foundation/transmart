@@ -204,7 +204,8 @@ class DataFetchTask extends AbstractTask {
     private String /* filename */ writeTabularResult(TabularResult<?, ?> tabularResult) {
         String filename = UUID.randomUUID().toString()
         rServeSession.doWithRConnection { RConnection conn ->
-            OutputStream os = conn.createFile(filename)
+            OutputStream os = new BufferedOutputStream(
+                    conn.createFile(filename), 81920)
 
             log.info("Will start writing tabular result in file $filename")
             final Stopwatch stopwatch = Stopwatch.createStarted()
