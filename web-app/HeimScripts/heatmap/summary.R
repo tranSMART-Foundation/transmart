@@ -6,7 +6,7 @@
 #   Data for multiple high dimensional nodes can be provided. 
 #   Per high dimensional node 1 or 2 dataframes are to be passed on, depending on whether 1 or 2 patient subsets are created. 
 #   Descriptive names (labels) are given to the data.frames so that it can be recognized which data.frame was derived from which data node
-#   PROPOSED FORMAT: some unique identifier for the node (numerical identifier appended behind the letter "n") followed by _s1 or _s2 depending on subset, e.g. n0_s1, n0_s2, n1_s1, n1_s2. 
+#   PROPOSED FORMAT: some unique identifier for the node (numerical identifier appended behind the letter "n") followed by _s1 or _s2 depending on subset, e.g. n0_s1, n0_s2, n1_s1, n1_s2. (actually, subset number can be anything, as long as it is numerical)
 #         (RIGHT NOW THE UNDERSCORE IS USED FOR SPLITTING THE TWO, SO IF UNDERSCORES ARE USED IN THE NODE IDENTIFIER ,THIS SHOULD BE CHANGED)
 #   The data.frames (coming from high dimensional nodes) have columns: Row.Label, Bio.marker (optional), ASSAY_0001, ASSAY_0002 ...  
 #     ** right now this is only implemented for high dimensional data nodes, later the functionality might be extended for clinical data. In that case it is possible to recognize if it is high or low dim data based on the column names of the data.frame (assuming low dim data will also be passed on in the form of data.frames)
@@ -29,13 +29,41 @@
 library(jsonlite)
 library(gplots)
 
-main <- function(phase)
+main <- function(phase = NULL)
 {
+  check_input(loaded_variables, phase)
   data_measurements <- extract_measurements(loaded_variables)
   summary_stats_json <- produce_summary_stats(data_measurements, phase)
   write_summary_stats(summary_stats_json)
   produce_boxplot(data_measurements, phase)
   return(list(summary_stats = "Finished")) #right now a non-empty list is expected as a return.
+}
+
+#check if provided variables and phase info are in line with expected input as described at top of this script
+check_input <- function(datasets, phase_info)
+{
+  #expected input: list of data.frames
+  items_list <- sapply(datasets, class)
+  if(class(datasets) != "list" | !all(items_list == "data.frame")) #for a data.frame is.list() also returns TRUE. Class returns "data.frame" in that case
+  { 
+    stop("Unexpected input. Expected input: a list, containing one or more data.frames")
+  }
+   
+  # all items in the list are expected to have some unique identifier for the node (numerical identifier appended behind the letter "n") 
+  # followed an underscore and a subset identifier s1 or s2 depending on subset, e.g. n0_s1, n0_s2, n1_s1, n1_s2. 
+  dataset_names <- names(datasets)
+  expected_format_names <- "^n[[:digit:]]+_s[[:digit:]]+$"
+  names_in_correct_format <- grepl(expected_format_names, dataset_names)
+  if(any(!names_in_correct_format))
+  {
+    stop(paste("One or more labels of the datasets do not have the expected format.", 
+               "\nExpected format: an unique numerical identifier for the node appended behind the letter \"n\",\nfollowed by an underscore and an unique numerical identifier for the subset appended behind an \"s\",",
+               "\ne.g. n0_s1, n0_s2, n1_s1, n1_s2. "))
+  }
+  if(is.null(phase_info))
+  {
+    stop("supply phase parameter to function \'main()\'")
+  }
 }
 
 
@@ -47,6 +75,7 @@ extract_measurements <- function(datasets)
   for(i in 1:length(datasets))
   {
     dataset <- datasets[[i]]
+    dataset_id <- names(datasets)[[i]]
     colNames <- colnames(dataset)
     
     # test if the data.frame contains data from a high dimensional data node
@@ -64,7 +93,12 @@ extract_measurements <- function(datasets)
     if(is_highDim)
     {
       non_measurement_columns <- which(colNames %in% c("Row.Label","Bio.marker"))
-      datasets[[i]] <- dataset[ ,-non_measurement_columns]
+      datasets[[i]] <- dataset[ ,-non_measurement_columns, drop = F]
+      if(!all(sapply(dataset[ ,-non_measurement_columns, drop = F], FUN= class) == "numeric"))
+      {
+        stop(paste("Correct extraction of data columns was not possible for dataset ",dataset_id, 
+                   ". It seems that, aside from the Row.Label and Bio.marker column, there are one or more non numeric data columns in the data.frame.", sep = ""))
+      }
     }
   }
   
@@ -128,20 +162,20 @@ produce_summary_stats <- function(measurement_tables, phase)
   for(node in unique_nodes)
   {
     partial_table <- result_table[which(result_table$node == node), ,drop = F]
-    summary_stats_JSON <- toJSON(partial_table, dataframe = "rows", pretty = T)
     fileName <- paste(phase,"_summary_stats_node_", node, ".json", sep = "")
-    summary_stats_all_nodes[[fileName]] <- summary_stats_JSON
+    summary_stats_all_nodes[[fileName]] <- partial_table
   }
   return(summary_stats_all_nodes)
 }
 
 
-write_summary_stats <- function(summary_stats_JSON)
+write_summary_stats <- function(summary_stats)
 {
-  for (i in 1:length(summary_stats_JSON))
+  for (i in 1:length(summary_stats))
   {
-    fileName <- names(summary_stats_JSON)[[i]]
-    write(summary_stats_JSON[[i]], fileName)
+    summary_stats_JSON <- toJSON(summary_stats[[i]], dataframe = "rows", pretty = T)
+    fileName <- names(summary_stats)[[i]]
+    write(summary_stats_JSON, fileName)
   }
 }
 
