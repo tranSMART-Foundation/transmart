@@ -2,8 +2,13 @@ package heim.tasks
 
 import au.com.bytecode.opencsv.CSVWriter
 import com.google.common.base.Charsets
+import com.google.common.base.Stopwatch
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Iterators
+import com.google.common.collect.PeekingIterator
+import com.google.common.io.Closer
+import groovy.transform.ToString
+import groovy.util.logging.Log4j
 import heim.rserve.RServeSession
 import heim.rserve.RUtil
 import org.codehaus.groovy.grails.support.PersistenceContextInterceptor
@@ -12,7 +17,6 @@ import org.rosuda.REngine.Rserve.RConnection
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
-import org.transmartproject.core.concept.ConceptKey
 import org.transmartproject.core.dataquery.DataColumn
 import org.transmartproject.core.dataquery.DataRow
 import org.transmartproject.core.dataquery.TabularResult
@@ -25,19 +29,31 @@ import org.transmartproject.core.dataquery.highdim.BioMarkerDataRow
 import org.transmartproject.core.dataquery.highdim.HighDimensionResource
 import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
 import org.transmartproject.core.exceptions.InvalidArgumentsException
-import org.transmartproject.core.ontology.ConceptsResource
+import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.querytool.QueriesResource
+
+import java.util.concurrent.*
+import java.util.concurrent.atomic.AtomicLong
 
 import static org.transmartproject.core.dataquery.highdim.projections.Projection.DEFAULT_REAL_PROJECTION
 import static org.transmartproject.core.ontology.OntologyTerm.VisualAttributes.HIGH_DIMENSIONAL
 
 @Component
+@Log4j
 @Scope('prototype')
+@ToString(includes = 'ontologyTerms,resultInstanceIds,dataType')
 class DataFetchTask extends AbstractTask {
 
     private static final char SEPARATOR = "\t" as char
 
-    ConceptKey conceptKey
+    private static final int MAX_SIMULTANEOUS_QUERYING = 4
+    private static final int MAX_MINUTES_TO_WAIT_FOR_TABRES_FETCH = 2
+
+    private static final AtomicLong THREAD_ID = new AtomicLong()
+
+    Map<String /* label prefix */, OntologyTerm> ontologyTerms
+
+    List<Long> resultInstanceIds
 
     String dataType
 
@@ -46,13 +62,6 @@ class DataFetchTask extends AbstractTask {
     Map<String, Map> dataConstraints
 
     String projection
-
-    String label
-
-    Long resultInstanceId
-
-    @Autowired
-    private ConceptsResource conceptsResource
 
     @Autowired
     private HighDimensionResource highDimensionResource
@@ -69,47 +78,144 @@ class DataFetchTask extends AbstractTask {
     @Autowired
     private PersistenceContextInterceptor interceptor
 
-    private TabularResult<?, ?> tabularResult
+    private final BlockingQueue queryResultsQueue = new LinkedBlockingQueue()
 
-    @Override
-    TaskResult call() throws Exception {
-        interceptor.init()
-        try {
-            def ret = doCall()
-            interceptor.flush()
-            ret
-        } finally {
-            interceptor.destroy()
+    private ExecutorService queriesExecutor
+
+    private class GetTabularResultRunnable implements Runnable {
+
+        String label
+
+        Long resultInstanceId
+
+        OntologyTerm ontologyTerm
+
+        @Override
+        void run() {
+            try {
+                if (log.debugEnabled) {
+                    log.debug("Will now fetch data with label '$label' for " +
+                            "ontology term $ontologyTerm, result instance id " +
+                            "$resultInstanceId")
+                }
+
+                TabularResult<?, ?> tabularResult = runWithInterceptor this.&doRun
+
+                log.debug("Finished opening tabular result for data set $label")
+                queryResultsQueue.put([(label): tabularResult])
+            } catch (Exception e) {
+                log.error("Fetching of data set $label failed: ${e.message}", e)
+                queryResultsQueue.put(e)
+            }
+        }
+
+        private TabularResult<?, ?> doRun() {
+            final Stopwatch stopwatch = Stopwatch.createStarted()
+
+            def res
+            if (HIGH_DIMENSIONAL in ontologyTerm.visualAttributes) {
+                res = createHighDimensionalResult ontologyTerm, resultInstanceId
+            } else {
+                res = createClinicalDataResult ontologyTerm, resultInstanceId
+            }
+
+            log.info("Fetch for $ontologyTerm (rid $resultInstanceId) " +
+                    "finished in $stopwatch")
+            res
+        }
+
+        private <T> T runWithInterceptor(Closure<T> closure) throws Exception {
+            interceptor.init()
+            try {
+                T ret = closure.call()
+                interceptor.flush()
+                ret
+            } finally {
+                interceptor.destroy()
+            }
         }
     }
 
-    private TaskResult doCall() throws Exception {
-        def concept = conceptsResource.getByKey(conceptKey.toString())
+    TaskResult call() throws Exception {
+        List<Map> allDatasets = [ontologyTerms.entrySet(), resultInstanceIds]
+                .combinations()
 
-        if (HIGH_DIMENSIONAL in concept.visualAttributes) {
-            tabularResult = createHighDimensionalResult()
-        } else {
-            tabularResult = createClinicalDataResult()
+        queriesExecutor = Executors.newFixedThreadPool(
+                Math.min(MAX_SIMULTANEOUS_QUERYING, allDatasets.size()),
+                { Runnable r ->
+                    new Thread(r).with {
+                        daemon = true
+                        name = "DataFetchQuery-" + THREAD_ID.incrementAndGet()
+                        it
+                    }
+                } as ThreadFactory)
+
+        allDatasets.each {
+            Map.Entry<String, OntologyTerm> ontologyTermEntry = it[0]
+            Long resultInstanceId = it[1]
+
+            String label = ontologyTermEntry.key + '_s' +
+                    (resultInstanceIds.indexOf(resultInstanceId) + 1)
+            def runnable = new GetTabularResultRunnable(
+                    label: label,
+                    resultInstanceId: resultInstanceId,
+                    ontologyTerm: ontologyTermEntry.value)
+
+            queriesExecutor.submit(runnable)
         }
 
-        String fileName = writeTabularResult()
-        List<String> currentLabels = loadFile(fileName)
+        List<String> currentLabels
+        int taken = 0
+        while (!Thread.currentThread().isInterrupted()
+                && taken < allDatasets.size()) {
+            def fetchResult = queryResultsQueue.take() // will block
+            taken++
+
+            log.debug("Took from queryResultsQueye: $fetchResult")
+
+            if (fetchResult instanceof Exception) {
+                log.warn('Error fetching one of the datasets, ' +
+                        'aborting writing in the R session (some datasets ' +
+                        'may have been written): ' +
+                        fetchResult.message, fetchResult)
+                return new TaskResult(
+                        successful: false,
+                        exception: fetchResult)
+            }
+
+            assert fetchResult instanceof Map<String, TabularResult>
+            try {
+                String fileName = writeTabularResult(fetchResult.values().first())
+                currentLabels = loadFile(fileName, fetchResult.keySet().first())
+            } finally {
+                fetchResult.values().first().close()
+            }
+        }
+
+        if (Thread.interrupted()) {
+            throw new InterruptedException("Task was interrupted")
+        }
+
         new TaskResult(
                 successful: true,
-                artifacts: ImmutableMap.of('currentLabels', currentLabels),
-        )
+                artifacts: ImmutableMap.of('currentLabels', currentLabels),)
     }
 
-    private String /* filename */ writeTabularResult() {
+    private String /* filename */ writeTabularResult(TabularResult<?, ?> tabularResult) {
         String filename = UUID.randomUUID().toString()
         rServeSession.doWithRConnection { RConnection conn ->
-            OutputStream os = conn.createFile(filename)
+            OutputStream os = new BufferedOutputStream(
+                    conn.createFile(filename), 81920)
+
+            log.info("Will start writing tabular result in file $filename")
+            final Stopwatch stopwatch = Stopwatch.createStarted()
+
             Writer writer = new OutputStreamWriter(os, Charsets.UTF_8)
 
             def csvWriter = new CSVWriter(writer, SEPARATOR)
 
             try {
-                Iterator<? extends DataRow> it =
+                PeekingIterator<? extends DataRow> it =
                         Iterators.peekingIterator(tabularResult.iterator())
                 boolean isBioMarker = it.peek().hasProperty('bioMarker')
                 writeHeader(csvWriter, isBioMarker, tabularResult.indicesList)
@@ -124,12 +230,15 @@ class DataFetchTask extends AbstractTask {
             } finally {
                 csvWriter.close()
             }
+
+
+            log.info("Finished writing file $filename in $stopwatch")
         }
 
         filename
     }
 
-    private List<String> /* current labels */ loadFile(String filename) {
+    private List<String> /* current labels */ loadFile(String filename, String label) {
         def escapedFilename = RUtil.escapeRStringContent(filename)
         def escapedLabel = RUtil.escapeRStringContent(label)
 
@@ -171,7 +280,10 @@ class DataFetchTask extends AbstractTask {
         writer.writeNext(line as String[])
     }
 
-    private TabularResult<AssayColumn, ?> createHighDimensionalResult() {
+    private TabularResult<AssayColumn, ?> createHighDimensionalResult(
+            OntologyTerm ontologyTerm,
+            Long resultInstanceId
+    ) {
         if (!dataType) {
             throw new InvalidArgumentsException("High dimensional node, " +
                     "data type should have been given")
@@ -183,7 +295,7 @@ class DataFetchTask extends AbstractTask {
         def builtAssayConstraints = [
                 subResource.createAssayConstraint(
                         AssayConstraint.ONTOLOGY_TERM_CONSTRAINT,
-                        concept_key: conceptKey.toString()),
+                        concept_key: ontologyTerm.key),
         ]
         if (resultInstanceId) {
             builtAssayConstraints << subResource.createAssayConstraint(
@@ -215,16 +327,22 @@ class DataFetchTask extends AbstractTask {
                 builtProjection)
     }
 
-    private TabularResult<ClinicalVariableColumn, PatientRow> createClinicalDataResult() {
+    private TabularResult<ClinicalVariableColumn, PatientRow> createClinicalDataResult(
+            OntologyTerm ontologyTerm,
+            Long resultInstanceId
+    ) {
         if (dataType) {
             throw new InvalidArgumentsException("Provided data type $dataType" +
-                    ", but the concept key $conceptKey doesn't point ot a " +
+                    ", but the term $ontologyTerm doesn't point ot a " +
                     "high dimensional node")
         }
 
+        throw new InvalidArgumentsException(
+                'A result instance id should have been given')
+
         def clinicalVariable = clinicalDataResource.createClinicalVariable(
                 ClinicalVariable.NORMALIZED_LEAFS_VARIABLE,
-                concept_path: conceptKey.conceptFullName.toString())
+                concept_path: ontologyTerm.fullName)
 
 
         def queryResult = queriesResource.getQueryResultFromId(resultInstanceId)
@@ -235,6 +353,36 @@ class DataFetchTask extends AbstractTask {
 
     @Override
     void close() throws Exception {
-        tabularResult?.close()
+        // retrieveData() may not work well with interruptions,
+        // try to call just shutdown() before shutdownNow()
+        try {
+            log.debug("Shutting down query executor in $this")
+            queriesExecutor.shutdown()
+            try {
+                def terminated = queriesExecutor.awaitTermination(
+                        MAX_MINUTES_TO_WAIT_FOR_TABRES_FETCH, TimeUnit.MINUTES)
+                log.debug("Finished waiting for termination in $this. " +
+                        "Terminated? $terminated")
+                if (!terminated) {
+                    log.warn("Tabular result fetching threads did not finish " +
+                            "in $MAX_MINUTES_TO_WAIT_FOR_TABRES_FETCH " +
+                            "minutes. Will attempt to interrupt them.")
+                    queriesExecutor.shutdownNow()
+                }
+            } catch (InterruptedException ie) {
+                log.warn("Interrupted while awaiting for termination of " +
+                        "TabularResult fetch in $this")
+            }
+        } finally {
+            Closer closer = Closer.create()
+            while (!queryResultsQueue.empty) {
+                def o = queryResultsQueue.poll()
+                if (o instanceof Map) {
+                    TabularResult<?, ?> res = o.values().first()
+                    closer.register res
+                }
+            }
+            closer.close()
+        }
     }
 }

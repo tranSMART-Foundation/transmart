@@ -15,18 +15,23 @@ class DataFetchingTaskTests extends BaseAPITestCase {
     private static final String DATA_FETCH_TASK_TYPE = DataFetchTaskFactory.FETCH_DATA_TASK_NAME
 
     public static final LinkedHashMap<String, Serializable> TEST_ARGUMENTS = [
-            conceptKey      : '\\\\i2b2 main\\foo\\study1\\bar\\',
-            dataType        : 'mrna',
-            //resultInstanceId: 1, TODO: the test data has no result set for the mrna patients
-            assayConstraints: [
+            conceptKeys      : [
+                    test_label: '\\\\i2b2 main\\foo\\study1\\bar\\',
+            ],
+            dataType         : 'mrna',
+            resultInstanceIds: [], //TODO: the test data has no result set for the mrna patients
+            assayConstraints : [
                     trial_name: [name: MrnaTestData.TRIAL_NAME],
             ],
-            dataConstraints : [
+            dataConstraints  : [
                     genes: [names: ['BOGUSRQCD1']]
             ],
-            projection      : 'zscore',
-            label           : 'test_label',
+            projection       : 'zscore',
     ]
+
+    private String getLabel() {
+        TEST_ARGUMENTS.conceptKeys.keySet().first() + '_s1'
+    }
 
     void testMrnaDataFetching() {
         String sessionId = createSession('func_test')
@@ -50,7 +55,7 @@ class DataFetchingTaskTests extends BaseAPITestCase {
 
         assertStatus 200
         assertThat JSON, hasEntry(is('state'), is(TaskState.FINISHED.toString()))
-        assertThat JSON.result.artifacts.currentLabels, contains(TEST_ARGUMENTS.label)
+        assertThat JSON.result.artifacts.currentLabels, contains(label)
     }
 
     void testRefetchingReplacesDataset() {
@@ -78,7 +83,7 @@ class DataFetchingTaskTests extends BaseAPITestCase {
 
             assertStatus 200
             assertThat JSON, hasEntry(is('state'), is(TaskState.FINISHED.toString()))
-            assertThat JSON.result.artifacts.currentLabels, contains(TEST_ARGUMENTS.label)
+            assertThat JSON.result.artifacts.currentLabels, contains(label)
         }
     }
 }

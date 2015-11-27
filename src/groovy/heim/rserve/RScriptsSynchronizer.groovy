@@ -3,7 +3,7 @@ package heim.rserve
 import com.google.common.base.Charsets
 import com.google.common.util.concurrent.SettableFuture
 import groovy.transform.TypeChecked
-import groovy.util.logging.Slf4j
+import groovy.util.logging.Log4j
 import heim.SmartRRuntimeConstants
 import org.rosuda.REngine.Rserve.RConnection
 import org.rosuda.REngine.Rserve.RFileOutputStream
@@ -24,7 +24,7 @@ import java.util.zip.ZipOutputStream
  */
 @Component
 @TypeChecked
-@Slf4j
+@Log4j
 class RScriptsSynchronizer {
 
     @Autowired

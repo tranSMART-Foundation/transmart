@@ -1,10 +1,14 @@
 package heim.tasks
 
+import com.google.common.collect.Lists
+import grails.util.Environment
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.stereotype.Component
-import org.transmartproject.core.concept.ConceptKey
 import org.transmartproject.core.exceptions.InvalidArgumentsException
+import org.transmartproject.core.exceptions.NoSuchResourceException
+import org.transmartproject.core.ontology.ConceptsResource
 
 /**
  * Created by glopes on 09-10-2015.
@@ -14,15 +18,19 @@ class DataFetchTaskFactory implements TaskFactory, ApplicationContextAware {
 
     public static final String FETCH_DATA_TASK_NAME = 'fetchData'
 
-    public static final String CONCEPT_KEY_PARAMETER_NAME = 'conceptKey'
+    public static final String CONCEPT_KEYS_PARAMETER_NAME = 'conceptKeys'
     public static final String ASSAY_CONSTRAINTS_PARAMETER_NAME = 'assayConstraints'
     public static final String DATA_CONSTRAINTS_PARAMETER_NAME = 'dataConstraints'
     public static final String PROJECTION_PARAMETER_NAME = 'projection'
-    public static final String RESULT_INSTANCE_ID_PARAMETER_NAME = 'resultInstanceId'
+    public static final String RESULT_INSTANCE_IDS_PARAMETER_NAME = 'resultInstanceIds'
     public static final String DATA_TYPE_PARAMETER_NAME = 'dataType'
-    public static final String LABEL_PARAMETER_NAME = 'label'
 
     ApplicationContext applicationContext
+
+    final int order = 0
+
+    @Autowired
+    private ConceptsResource conceptsResource
 
     @Override
     boolean handles(String taskName, Map<String, Object> argument) {
@@ -42,30 +50,60 @@ class DataFetchTaskFactory implements TaskFactory, ApplicationContextAware {
     @Override
     Task createTask(String name,
                     Map<String, Object> arguments) {
-        def conceptKeyString = arguments[CONCEPT_KEY_PARAMETER_NAME]
-        def resultInstanceIdString =
-                arguments[RESULT_INSTANCE_ID_PARAMETER_NAME] as String
-        def labelArgument = arguments[LABEL_PARAMETER_NAME]
+        def conceptKeysArg = arguments[CONCEPT_KEYS_PARAMETER_NAME]
+        def ridsArg =
+                arguments[RESULT_INSTANCE_IDS_PARAMETER_NAME]
 
-        if (!conceptKeyString || !(conceptKeyString instanceof String)) {
+        if (!conceptKeysArg) {
             throw new InvalidArgumentsException(
-                    "Argument $CONCEPT_KEY_PARAMETER_NAME must be given and " +
-                            "be a string")
+                    "Parameter $CONCEPT_KEYS_PARAMETER_NAME not passed")
         }
-        if (resultInstanceIdString && !resultInstanceIdString.isLong()) {
+        if (!(conceptKeysArg instanceof Map)) {
             throw new InvalidArgumentsException(
-                    "Argument $RESULT_INSTANCE_ID_PARAMETER_NAME must be " +
-                            "a long")
+                    "Expected $CONCEPT_KEYS_PARAMETER_NAME to be a map")
         }
-        if (!labelArgument || !(labelArgument instanceof String)) {
-            throw new InvalidArgumentsException("Argument " +
-                    "$LABEL_PARAMETER_NAME must be given and must be a string")
+        // normalize keys and values to strings
+        conceptKeysArg = conceptKeysArg.collectEntries() { k, v ->
+            try {
+                [k as String, conceptsResource.getByKey(v as String)]
+            } catch (IllegalArgumentException | NoSuchResourceException ex) {
+                throw new InvalidArgumentsException("The string '$v' " +
+                        "(with label prefix '$k') is not a valid concept " +
+                        "key: $ex.message", ex)
+            }
+        } /* is Map<String, OntologyTerm> after this */
+
+        if (ridsArg == null) {
+            throw new InvalidArgumentsException(
+                    "Parameter $RESULT_INSTANCE_IDS_PARAMETER_NAME not passed")
+        }
+        if (!(ridsArg instanceof List)) {
+            throw new InvalidArgumentsException("Parameter " +
+                    "$RESULT_INSTANCE_IDS_PARAMETER_NAME must be a list")
+        }
+        if (ridsArg.any { !(it as String)?.isLong() }) {
+            throw new InvalidArgumentsException(
+                    "Parameter $RESULT_INSTANCE_IDS_PARAMETER_NAME can only " +
+                            "have integer values, got: " +
+                            ridsArg.find { !(it as String)?.isLong() })
+        }
+        if (Lists.newArrayList(ridsArg).unique().size() < ridsArg.size()) {
+            "Parameter $RESULT_INSTANCE_IDS_PARAMETER_NAME has " +
+                    "duplicate values"
+        }
+        if (ridsArg.size() == 0) {
+            if (Environment.current != Environment.TEST) {
+                throw new InvalidArgumentsException(
+                        "Parameter $ridsArg cannot be an empty list")
+            } else { // is test environment
+                ridsArg = [null]
+            }
         }
 
         applicationContext.getBean(DataFetchTask).with {
-            conceptKey =  new ConceptKey(conceptKeyString)
-            label = labelArgument
-            resultInstanceId = resultInstanceIdString as Long
+            ontologyTerms = conceptKeysArg
+
+            resultInstanceIds = ridsArg.collect { it as Long }
 
             assayConstraints = arguments[ASSAY_CONSTRAINTS_PARAMETER_NAME]
             dataConstraints = arguments[DATA_CONSTRAINTS_PARAMETER_NAME]
@@ -84,6 +122,4 @@ class DataFetchTaskFactory implements TaskFactory, ApplicationContextAware {
             it
         }
     }
-
-    final int order = 0
 }

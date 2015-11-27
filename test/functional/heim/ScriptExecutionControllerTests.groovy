@@ -51,9 +51,9 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
                     sessionId: sessionId,
                     taskType: DATA_FETCH_TASK_TYPE,
                     arguments: [
-                            conceptKey: '\\\\i2b2 main\\foo\\study1\\bar\\',
+                            conceptKeys: [test_label: '\\\\i2b2 main\\foo\\study1\\bar\\'],
                             dataType: 'mrna',
-                            //resultInstanceId: 1, TODO: the test data has no result set for the mrna patients
+                            resultInstanceIds: [], //TODO: the test data has no result set for the mrna patients
                             assayConstraints: [
                                     trial_name: [name: MrnaTestData.TRIAL_NAME],
                             ],
@@ -61,7 +61,6 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
                                     genes: [ names: ['BOGUSRQCD1'] ]
                             ],
                             projection: 'zscore',
-                            label: 'test_label',
                     ]
             ]
         }

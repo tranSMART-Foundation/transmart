@@ -129,7 +129,11 @@ class JobTasksService implements DisposableBean {
 
             private void common(TaskAndState result) {
                 futures.remove(task.uuid)
-                task.close()
+                try {
+                    task.close()
+                } catch (Exception e) {
+                    log.error("Failed calling close() on task $task", e)
+                }
                 publicFuture.set(result.taskResult)
                 sessionService.touchSession(sessionId) // should not throw
                 log.info "Task $task finished. Final result: $result"
