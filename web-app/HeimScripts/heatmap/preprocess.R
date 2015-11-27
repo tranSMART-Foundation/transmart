@@ -6,6 +6,7 @@ main <- function(aggregate=FALSE){
   df <- loaded_variables[[length(loaded_variables)]]
   good.input <- ncol(df) > 3
   if(aggregate && good.input){
+    df <- dropEmptyGene(df)
     aggr  <- aggregate.probes(df)
     assign("preprocessed", aggr, envir = .GlobalEnv)
     Discarded.rows <- nrow(df) - nrow(aggr)
@@ -35,4 +36,12 @@ aggregate.probes <- function(df){
   df["Row.Label"] <- Row.Label
   row.names(df) <- NULL # WGCNA adds row.names. We do not need them to be set
   df[,c(lastColIndex, lastbutOne , 1:(lastbutOne-1))]
+}
+
+dropEmptyGene <- function(d){
+  d[!(d$Bio.marker == ""|
+        is.null(d$Bio.marker) |
+        is.na(d$Bio.marker) |
+        is.nan(d$Bio.marker)
+      ),]
 }
