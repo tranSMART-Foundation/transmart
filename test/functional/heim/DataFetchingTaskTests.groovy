@@ -1,5 +1,6 @@
 package heim
 
+import com.google.common.collect.Maps
 import heim.tasks.DataFetchTaskFactory
 import heim.tasks.TaskState
 import org.transmartproject.db.dataquery.highdim.mrna.MrnaTestData
@@ -29,8 +30,12 @@ class DataFetchingTaskTests extends BaseAPITestCase {
             projection       : 'zscore',
     ]
 
-    private String getLabel() {
+    private String getLabelSubset1() {
         TEST_ARGUMENTS.conceptKeys.keySet().first() + '_s1'
+    }
+
+    private String getLabelSubset2() {
+        TEST_ARGUMENTS.conceptKeys.keySet().first() + '_s2'
     }
 
     void testMrnaDataFetching() {
@@ -55,12 +60,11 @@ class DataFetchingTaskTests extends BaseAPITestCase {
 
         assertStatus 200
         assertThat JSON, hasEntry(is('state'), is(TaskState.FINISHED.toString()))
-        assertThat JSON.result.artifacts.currentLabels, contains(label)
+        assertThat JSON.result.artifacts.currentLabels, contains(labelSubset1)
     }
 
     void testRefetchingReplacesDataset() {
         // instead of adding a new one
-        def test_label = 'test_label'
         String sessionId = createSession('func_test')
 
         2.times {
@@ -83,7 +87,39 @@ class DataFetchingTaskTests extends BaseAPITestCase {
 
             assertStatus 200
             assertThat JSON, hasEntry(is('state'), is(TaskState.FINISHED.toString()))
-            assertThat JSON.result.artifacts.currentLabels, contains(label)
+            assertThat JSON.result.artifacts.currentLabels, contains(labelSubset1)
         }
+    }
+
+    void testFetchingMultipleSubsets() {
+        String sessionId = createSession('func_test')
+
+        get '/smartRTest/resultInstanceIds'
+        assertStatus 200
+
+        def args = Maps.newHashMap(TEST_ARGUMENTS)
+        args.resultInstanceIds = JSON.values
+
+
+        post '/ScriptExecution/run', {
+            body json: [
+                    sessionId: sessionId,
+                    taskType : DATA_FETCH_TASK_TYPE,
+                    arguments: args,
+            ]
+        }
+
+        assertStatus 200
+
+        String taskId = JSON.executionId
+        get '/ScriptExecution/status?' + buildQueryParameters(
+                sessionId: sessionId,
+                executionId: taskId,
+                waitForCompletion: true,
+        )
+
+        assertStatus 200
+        assertThat JSON, hasEntry(is('state'), is(TaskState.FINISHED.toString()))
+        assertThat JSON.result.artifacts.currentLabels, containsInAnyOrder(labelSubset1, labelSubset2)
     }
 }

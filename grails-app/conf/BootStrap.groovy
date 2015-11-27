@@ -23,7 +23,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.google.common.collect.ImmutableList
 import grails.util.Environment
+import grails.util.Holders
 import groovy.util.logging.Log4j
 
 @Log4j
@@ -41,8 +43,24 @@ class BootStrap {
             def testData = createTestData()
             log.info 'About to save test data'
             testData.saveAll()
-        }
+            log.info 'Saved test data'
 
+            def queryResults = testData.mrnaData.patients.collect { patient ->
+                Class.forName('org.transmartproject.db.querytool.QueryResultData')
+                        .getMethod('createQueryResult', List)
+                        .invoke(null, [patient])
+            }
+
+            // hibernate is not saving QtQueryMaster before QtQueryInstance if
+            // the id of QtQueryMaster is explicitly assigned, hence we add
+            // an endpoint to retrieve these result instance ids
+            // (see SmartRTestController)
+
+            Holders.applicationContext.registerSingleton('mrnaPatientSetIds', ArrayList)
+            Holders.applicationContext.getBean('mrnaPatientSetIds').addAll(
+                    ImmutableList.copyOf(queryResults*.save()*.id))
+            log.info 'Created extra patient sets for testing'
+        }
     }
 
     def createTestData() {
