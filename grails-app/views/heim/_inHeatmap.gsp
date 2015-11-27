@@ -5,7 +5,7 @@
 
     <p>
         Start analysis with <b>Fetch</b>, <b>Preprocess</b>  and then <b>Run Analysis</b>. Make sure that you run Summary
-        Statistic prior running the Heatmap.
+    Statistic prior running the Heatmap.
     </p>
 
     <div id="heim-tabs" style="margin-top: 25px;">
@@ -21,7 +21,6 @@
         %{--========================================================================================================--}%
         <div id="fragment-load">
 
-
             <div class="sr-input-area">
 
                 %{--High dimension dropzone--}%
@@ -32,8 +31,10 @@
                     </i></label>
 
                     <br><br>
+
                     <div id='divIndependentVariable'
                          style="border:1px solid #666; height: 100px; padding: 10px;"></div>
+
                     <div style="margin-top: 10px; text-align: right;">
                         <button type="button" id="heim-btn-clear">Clear</button>
                     </div>
@@ -47,8 +48,10 @@
                             Set Explorer Tree and drag it into the box.">
                     </i></label>
                     <br><br>
+
                     <div id='divNumVariable'
                          style="border:1px solid #CCC; height: 100px; padding: 10px;"></div>
+
                     <div style="margin-top: 10px; text-align: right;">
                         <button type="button" id="heim-btn-clear-2" disabled>Clear</button>
                     </div>
@@ -62,16 +65,15 @@
                                 Set Explorer Tree and drag it into the box.">
                     </i></label>
                     <br><br>
+
                     <div id='divCategoricalVariable'
                          style="border:1px solid #CCC; height: 100px; padding: 10px;"></div>
+
                     <div style="margin-top: 10px; text-align: right;">
                         <button type="button" id="heim-btn-clear-3" disabled>Clear</button>
                     </div>
                 </div>
             </div>
-
-            %{--Display independent variable--}%
-            %{--<div id="displaydivIndependentVariable" class="independentVars" ></div>--}%
 
             %{--TODO: Support gene filtering--}%
             <div class="sr-fetch-params-area">
@@ -85,8 +87,6 @@
             %{--tool buttons--}%
             <div style="margin-top: 10px; text-align: right;">
                 <button id="heim-btn-fetch-data">Fetch Data</button>
-                %{--<button id="heim-btn-check">Check Status</button>--}%
-                %{--<button id="heim-btn-get-output">Get output</button>--}%
             </div>
 
             <div id="heim-fetch-data-output"></div>
@@ -97,47 +97,6 @@
         %{--Preprocess--}%
         %{--========================================================================================================--}%
         <div id="fragment-preprocess">
-            <form>
-                %{--Calculate z-score--}%
-                <div class="heim-input-field ">
-                    <input type="checkbox" id="chkCalculateZscore" name="chkCalculateZscore">
-                    <span>Calculate z-score on the fly</span>
-                </div>
-
-                %{--Calculate log fold--}%
-                <div class="heim-input-field ">
-                    <input type="checkbox" id="chkLogFoldChange" name="chkLogFoldChange">
-                    <span>Calculate log-fold change based on two data nodes</span>
-                </div>
-                <div class="heim-input-field ">
-                    <select id="logFoldInput1">
-                        %{--TODO--}%
-                        <option>dummy 1</option>
-                        <option>dummy 2</option>
-                        <option>dummy 3</option>
-                        <option>dummy 4</option>
-                    </select>
-                    relative to
-                    <select id="logFoldInput2">
-                        %{--TODO--}%
-                        <option>dummy 1</option>
-                        <option>dummy 2</option>
-                        <option>dummy 3</option>
-                        <option>dummy 4</option>
-                    </select>
-                </div>
-
-                %{--tool buttons--}%
-                <div style="margin-top: 10px; text-align: right;">
-                    <button id="heim-btn-preprocess-heatmap">Preprocess</button>
-                </div>
-            </form>
-        </div>
-
-        %{--========================================================================================================--}%
-        %{--Run Analysis--}%
-        %{--========================================================================================================--}%
-        <div id="fragment-run">
 
             %{--Aggregate Probes--}%
             <div class="heim-input-field">
@@ -145,28 +104,45 @@
                 <span>Aggregate probes</span>
             </div>
 
+            %{--tool buttons--}%
+            <div style="margin-top: 10px; text-align: right;">
+                <button id="heim-btn-preprocess-heatmap">Preprocess</button>
+            </div>
+
+            %{--Preprocess Output--}%
+            <div id="heim-preprocess-output"></div>
+        </div>
+
+        %{--========================================================================================================--}%
+        %{--Run Analysis--}%
+        %{--========================================================================================================--}%
+        <div id="fragment-run">
+
             %{--Number of max row to display--}%
             <div class="heim-input-field heim-input-number">
                 <label>Number of max row to display</label>
                 <input type="text" id="txtMaxRow" value="100">
             </div>
 
+
+            %{--TODO :Not relevant for now. Might be in future sprint--}%
+
             %{--Group Subject--}%
-            <div class="heim-input-field">
-                <input type="checkbox" id="chkGroupSubject" name="chkGroupSubject">
-                <span>Group by subject instead of node (only applicable when multiple nodes are selected).</span>
-            </div>
+            %{--<div class="heim-input-field">--}%
+            %{--<input type="checkbox" id="chkGroupSubject" name="chkGroupSubject">--}%
+            %{--<span>Group by subject instead of node (only applicable when multiple nodes are selected).</span>--}%
+            %{--</div>--}%
 
             %{--Apply statistical methods--}%
-            <div class="heim-input-field heim-input-number">
-                <label>Apply statistical methods</label>
-                <select id="methodSelect">
-                    <option value="none">None</option>
-                    <option value="hierarchical-clustering">Hierarchical Clustering</option>
-                    <option value="k-means-clustering">K-Means Clustering</option>
-                    <option value="marker-selection">Marker Selection</option>
-                </select>
-            </div>
+            %{--<div class="heim-input-field heim-input-number">--}%
+            %{--<label>Apply statistical methods</label>--}%
+            %{--<select id="methodSelect">--}%
+            %{--<option value="none">None</option>--}%
+            %{--<option value="hierarchical-clustering">Hierarchical Clustering</option>--}%
+            %{--<option value="k-means-clustering">K-Means Clustering</option>--}%
+            %{--<option value="marker-selection">Marker Selection</option>--}%
+            %{--</select>--}%
+            %{--</div>--}%
 
             <hr style="margin-top: 20px;">
 
@@ -203,22 +179,16 @@
                 <button id="heim-btn-run-heatmap">Get Heatmap</button>
             </div>
 
-            %{--FOR DEBUGGING--}%
-            %{--<div style="margin-top: 10px; text-align: right;">--}%
-                %{--<button id="heim-btn-download-file">View</button>--}%
-            %{--</div>--}%
-
             %{--result--}%
 
             <div id="heim-run-output"></div>
             <img id="heim-img-result">
 
-
             %{--d3 js heatmap placeholder--}%
             <div id='visualization' class='text'>
                 <div id="heatmap" class='text'></div>
             </div>
-    </div>
-        
+        </div>
+
     </div>
 </div>
