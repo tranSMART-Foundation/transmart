@@ -182,7 +182,6 @@
             %{--result--}%
 
             <div id="heim-run-output"></div>
-            <img id="heim-img-result">
 
             %{--d3 js heatmap placeholder--}%
             <div id='visualization' class='text'>

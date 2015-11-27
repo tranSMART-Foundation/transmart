@@ -34,15 +34,15 @@ HeatmapView = (function(){
 
     /**
      *
-     * @param v
+     * @param fetchDataView
      * @returns {{conceptPath: *, identifier: *, resultInstanceId: *}}
      * @private
      */
-    var _getFetchDataViewValues = function (v) {
-        var _conceptPath = extJSHelper.readConceptVariables(v.conceptPathsInput.attr('id'));
-        console.log(v.identifiersInput.val());
+    var _getFetchDataViewValues = function (fetchDataView) {
+        //var _conceptPath = extJSHelper.readConceptVariables(v.conceptPathsInput.attr('id'));
+        var _conceptPaths = heatmapService.readConceptVariables(fetchDataView.conceptPathsInput);
         return {
-            conceptPaths: _conceptPath,
+            conceptPaths: _conceptPaths,
             resultInstanceIds : GLOBAL.CurrentSubsetIDs.filter(function (v) { return v !== undefined; })
         };
     };

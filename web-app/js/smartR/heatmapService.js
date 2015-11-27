@@ -10,24 +10,53 @@ HeatmapService = (function(smartRHeatmap){
         statusInterval : 0
     };
 
+
     /**
-     * Create analysis constraints
-     * @param params
-     * @returns {{conceptKey: _conceptPath, dataType: string, resultInstanceId: *, projection: string, label: string}}
+     *
+     * @param files
+     * @returns {{}}
      * @private
      */
+    var _getSummaryFiles = function (files) {
+        var retv = {}, types = ['png', 'json'];
+
+        types.forEach(function (type) {
+            retv[type] = files.filter(function (file) {
+                console.log('type',type);
+                console.log('file',file);
+                console.log('file.indexOf(type)',file.indexOf(type));
+                return file.indexOf(type) < 0  ? null : file;
+            });
+        });
+
+        return retv;
+    };
+
+    var _fetchConceptPath = function (el) {
+        return el.getAttribute('conceptId').trim();
+    };
+
+    /**
+     *
+     * @param elId
+     * @returns {string}
+     */
+    service.readConceptVariables = function (el) {
+        var retval = {}, elDOM = el[0];
+        for (var i=0; i<elDOM.children.length; i++) {
+            console.log(elDOM.children[i].getAttribute('conceptid'));
+            retval['n' + i] = elDOM.children[i].getAttribute('conceptid');
+        }
+        return retval;
+    };
+
     var _createAnalysisConstraints = function (params) {
-        console.log(params);
-        var _retval = {
-            conceptKeys : {
-                // TODO: support more than one concept path
-                '_TEST_LABEL_': params.conceptPaths
-            },
+       return {
+            conceptKeys : params.conceptPaths,
             dataType: 'mrna', // TODO : Get high dimensional data type
             resultInstanceIds: params.resultInstanceIds,
-            projection: 'log_intensity',
+            projection: 'log_intensity'
         };
-        return  _retval;
     };
 
     /**
@@ -223,8 +252,10 @@ HeatmapService = (function(smartRHeatmap){
                 console.log('Done checking', d);
 
                 if (d.state === 'FINISHED') {
+
                     clearInterval(service.statusInterval);
                     console.log('Okay, I am finished checking now ..', d);
+
                     if (task === 'fetchData') {
                         jQuery('#heim-fetch-data-output')
                             .html('<p class="heim-fetch-success" style="color: green";> ' +
@@ -233,7 +264,7 @@ HeatmapService = (function(smartRHeatmap){
                         // render summary stat
                         service.getSummary();
                     } else if (task === 'preprocess') {
-                        jQuery('#heim-fetch-data-output')
+                        jQuery('#heim-preprocess-output')
                             .html('<p class="heim-fetch-success" style="color: green";> ' +
                             'Preprocessed completed successfully.</p>');
 
@@ -260,6 +291,9 @@ HeatmapService = (function(smartRHeatmap){
                         console.log('getSummary');
 
                         jQuery('#heim-run-output').hide();
+                        var _files = _getSummaryFiles(d.result.artifacts.files);
+
+                        jQuery('#heim-fetch-data-output').hide();
                         jQuery.ajax({
                             url : pageInfo.basePath
                             + '/ScriptExecution/downloadFile?sessionId='
@@ -325,12 +359,18 @@ HeatmapService = (function(smartRHeatmap){
      * @param data
      * @returns {{table: *, plot: *}}
      */
-    service.displaySummaryStats = function (data) {
+    service.displaySummaryStats = function (data, imgFile) {
+
+        var tmpl = jQuery.templates("Name: {{:name}}");
+
+        console.log('displaySummaryStats', tmpl);
+        console.log('displaySummaryStats', data);
 
         var _table = jQuery('<table></table>').addClass('sr-summary-table');
         _table.append('<tr><th>Loaded</th><th>Values</th></tr>');
 
         jQuery.each(data,  function (idx, item) {
+            _table.append('<tr><td>Variable Label</td><td>' + item.variableLabel + '</td></tr>');
             _table.append('<tr><td>Max</td><td>' + item.max + '</td></tr>');
             _table.append('<tr><td>Mean</td><td>' + item.mean + '</td></tr>');
             _table.append('<tr><td>Median</td><td>' + item.median + '</td></tr>');
@@ -340,7 +380,6 @@ HeatmapService = (function(smartRHeatmap){
             _table.append('<tr><td>Standard Deviation</td><td>' + item.standardDeviation + '</td></tr>');
             _table.append('<tr><td>Total no. of values (incl. missing)</td><td>' +
                 item.totalNumberOfValuesIncludingMissing + '</td></tr>');
-            _table.append('<tr><td>Variable Label</td><td>' + item.variableLabel + '</td></tr>');
         });
 
         var _plot = jQuery('<img>')
@@ -349,7 +388,7 @@ HeatmapService = (function(smartRHeatmap){
             + GLOBAL.HeimAnalyses.sessionId
             + '&executionId='
             + GLOBAL.HeimAnalyses.executionId
-            + '&filename=box_plot_node.png');
+            + '&filename=' + imgFile);
 
         return {table:_table,  plot:_plot};
     };
