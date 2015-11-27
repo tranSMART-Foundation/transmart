@@ -14,6 +14,10 @@ log4j = {
            'net.sf.ehcache.hibernate'
     info   'org.transmartproject'
     debug  'heim'
+
+    // uncomment to debug queries
+    //trace 'org.hibernate.type'
+    //debug 'org.hibernate.SQL'
 }
 
 grails.views.default.codec="none" // none, html, base64
