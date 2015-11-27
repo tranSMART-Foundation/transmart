@@ -20,15 +20,18 @@ import org.springframework.stereotype.Component
 import org.transmartproject.core.dataquery.DataColumn
 import org.transmartproject.core.dataquery.DataRow
 import org.transmartproject.core.dataquery.TabularResult
+import org.transmartproject.core.dataquery.assay.Assay
 import org.transmartproject.core.dataquery.clinical.ClinicalDataResource
 import org.transmartproject.core.dataquery.clinical.ClinicalVariable
 import org.transmartproject.core.dataquery.clinical.ClinicalVariableColumn
 import org.transmartproject.core.dataquery.clinical.PatientRow
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.core.dataquery.highdim.BioMarkerDataRow
+import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
 import org.transmartproject.core.dataquery.highdim.HighDimensionResource
 import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
 import org.transmartproject.core.exceptions.InvalidArgumentsException
+import org.transmartproject.core.exceptions.UnexpectedResultException
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.querytool.QueriesResource
 
@@ -54,8 +57,6 @@ class DataFetchTask extends AbstractTask {
     Map<String /* label prefix */, OntologyTerm> ontologyTerms
 
     List<Long> resultInstanceIds
-
-    String dataType
 
     Map<String, Map> assayConstraints
 
@@ -284,13 +285,7 @@ class DataFetchTask extends AbstractTask {
             OntologyTerm ontologyTerm,
             Long resultInstanceId
     ) {
-        if (!dataType) {
-            throw new InvalidArgumentsException("High dimensional node, " +
-                    "data type should have been given")
-        }
-
-        def subResource =
-                highDimensionResource.getSubResourceForType(dataType)
+        def subResource = determineSubResource(ontologyTerm)
 
         def builtAssayConstraints = [
                 subResource.createAssayConstraint(
@@ -327,15 +322,28 @@ class DataFetchTask extends AbstractTask {
                 builtProjection)
     }
 
+    private HighDimensionDataTypeResource determineSubResource(OntologyTerm term) {
+        Map<HighDimensionDataTypeResource, Collection<Assay>> res =
+            highDimensionResource.getSubResourcesAssayMultiMap([
+                    highDimensionResource.createAssayConstraint(
+                            AssayConstraint.ONTOLOGY_TERM_CONSTRAINT,
+                            concept_key: term.key)])
+
+        if (res.keySet().size() > 1) {
+            throw new UnexpectedResultException("Found multiple possible " +
+                    "data types for ontology term $term: ${res.keySet()}")
+        } else if (res.keySet().size() == 0) {
+            throw new UnexpectedResultException("No data type found " +
+                    "associated with ontology term ${term}.")
+        }
+
+        res.keySet().first()
+    }
+
     private TabularResult<ClinicalVariableColumn, PatientRow> createClinicalDataResult(
             OntologyTerm ontologyTerm,
             Long resultInstanceId
     ) {
-        if (dataType) {
-            throw new InvalidArgumentsException("Provided data type $dataType" +
-                    ", but the term $ontologyTerm doesn't point ot a " +
-                    "high dimensional node")
-        }
 
         throw new InvalidArgumentsException(
                 'A result instance id should have been given')

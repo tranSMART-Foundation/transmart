@@ -108,7 +108,6 @@ class DataFetchTaskFactory implements TaskFactory, ApplicationContextAware {
             assayConstraints = arguments[ASSAY_CONSTRAINTS_PARAMETER_NAME]
             dataConstraints = arguments[DATA_CONSTRAINTS_PARAMETER_NAME]
             projection = arguments[PROJECTION_PARAMETER_NAME]
-            dataType = arguments[DATA_TYPE_PARAMETER_NAME]
 
             if (!constraintsOK(assayConstraints)) {
                 throw new InvalidArgumentsException(
