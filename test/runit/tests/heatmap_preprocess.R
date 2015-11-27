@@ -2,16 +2,9 @@ source("web-app/HeimScripts/heatmap/preprocess.R")
 
 test_data <- data.frame(Row.Label=c("a1","a2","b1","b2") , Bio.marker= c("a","a","b","b"), Assay1 = 1:4, Assay2 = 4:1  )
 
-# When aggregate is FALSE do not alter dataframe in any way
-#test.main.donotaggregate <- function()
-#{
-#  main(aggregate=FALSE)
-#  result <- loaded_variables["label"]
-#  expected <- test_data
-#  checkEquals(result,expected)
-#}
 
-#Dashes are allowed in probe_ids
+
+#Simple case
 test.aggregate <- function()
 {
   result <- aggregate.probes(test_data)
