@@ -7,9 +7,9 @@ main <- function(aggregate=FALSE){
   good.input <- ncol(df) > 3
   if(aggregate && good.input){
     aggr  <- aggregate.probes(df)
-    loaded_variables[[length(loaded_variables)]] <- aggr
+    assign("preprocessed", aggr, envir = .GlobalEnv)
     Discarded.rows <- nrow(df) - nrow(aggr)
-    msgs <- c( paste("Discarded rows:",Discarded.rows))
+    msgs <- c( paste("Total discarded rows:",Discarded.rows))
   }
   else{
     msgs <- c("Incorrect subset - in order to perform probe aggregation more than one samples are needed.")

@@ -2,10 +2,11 @@ library(jsonlite)
 library(reshape2)
 
 
-
-
 main <- function(max_rows=100){
   df <- loaded_variables[[length(loaded_variables)]] # SmartR does not support multiple HDD nodes yet
+  if(exists("preprocessed")){
+    df <- preprocessed
+  }
   # We take the last df to alleviate bug with new HDDs dropped being ignored - later on we will use label name explicitly.
   df["Row.Label"] <- lapply(df["Row.Label"],fixString) # remove illegal characters from probe names. This will prevent problems with CSS selectors on the frontend.
   if(ncol(df) > 3){
