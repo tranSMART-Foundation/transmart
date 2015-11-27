@@ -246,7 +246,7 @@ class DataFetchTask extends AbstractTask {
                 "if (!exists('loaded_variables')) { loaded_variables <- list() }",
                 """
                 loaded_variables[['$escapedLabel']] <- read.csv(
-                               '$escapedFilename', sep = "\t", header = TRUE);
+                               '$escapedFilename', sep = "\t", header = TRUE, stringsAsFactors = FALSE);
                 names(loaded_variables)""",
         ]
         REXP rexp = rServeSession.doWithRConnection { RConnection conn ->
