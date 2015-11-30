@@ -1,4 +1,6 @@
 #!/bin/bash
+# this code cribbed from web: http://stackoverflow.com/questions/4023830/bash-how-compare-two-strings-in-version-format
+# copied on 30 Nov 2015
 vercomp () {
     if [[ $1 == $2 ]]
     then
