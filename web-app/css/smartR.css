@@ -206,3 +206,24 @@
 }
 .ui-icon-info {display: inline-block; }
 .sr-ui-tooltip {font-size: .85em; background: lightyellow !important;}
+
+#heim-input-list-identifiers ul {
+    margin-top: .8em;
+    display: table;
+}
+#heim-input-list-identifiers li {
+    display: table-row;
+}
+#heim-input-list-identifiers div, #heim-input-list-identifiers button {
+    display: table-cell;
+}
+#heim-input-list-identifiers div {
+    padding-right: 1em;
+}
+#heim-input-list-identifiers .identifier-name {
+    font-weight: bold;
+}
+#heim-input-list-identifiers .identifier-synonyms {
+    font-size: .9em;
+    color: gray;
+}

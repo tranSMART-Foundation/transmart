@@ -10,7 +10,8 @@ HeatmapView = (function(){
         container : jQuery('#heim-tabs'),
         fetchDataView : {
             conceptPathsInput : jQuery('#divIndependentVariable'),
-            identifiersInput : jQuery('#heim-input-txt-identifiers'),
+            identifierInput : jQuery('#heim-input-txt-identifier'),
+            listIdentifiers : jQuery('#heim-input-list-identifiers'),
             actionBtn : jQuery('#heim-btn-fetch-data'),
             clearBtn : jQuery('#heim-btn-clear'),
             checkStatusBtn : jQuery('#heim-btn-check'),
@@ -32,6 +33,37 @@ HeatmapView = (function(){
         }
     };
 
+    var _renderBiomarkersList = (function() {
+        var tpl = new Ext.XTemplate(
+            '<tpl if="Object.getOwnPropertyNames(items).length &gt; 0">',
+                '<ul>',
+                    '<tpl for="items">',
+                        '<li>',
+                            '<div>',
+                                '<span class="identifier-type">{type}</span> ',
+                                '<span class="identifier-name">{name}</span> ',
+                                '<span class="identifier-synonyms">{synonyms}</span>',
+                            '</div>',
+                            '<button class="identifier-delete" value="{id}">\u2716</button> ',
+                        '</li>',
+                    '</tpl>',
+                '</ul>',
+            '</tpl>'
+        );
+
+        return function _renderBiomarkersList() {
+            tpl.overwrite(view.fetchDataView.listIdentifiers[0], {
+                items: this.getBioMarkers()
+            });
+        };
+    })()
+
+    var bioMarkersModel = new BioMarkersModel();
+    bioMarkersModel.on('biomarkers', _renderBiomarkersList);
+    view.fetchDataView.listIdentifiers.on('click', 'button', function(ev) {
+        bioMarkersModel.removeBioMarker(jQuery(this).val());
+    });
+
     /**
      *
      * @param v
@@ -40,10 +72,10 @@ HeatmapView = (function(){
      */
     var _getFetchDataViewValues = function (v) {
         var _conceptPath = extJSHelper.readConceptVariables(v.conceptPathsInput.attr('id'));
-        console.log(v.identifiersInput.val());
         return {
             conceptPaths: _conceptPath,
-            resultInstanceIds : GLOBAL.CurrentSubsetIDs.filter(function (v) { return v !== undefined; })
+            resultInstanceIds : GLOBAL.CurrentSubsetIDs.filter(function (v) { return v !== undefined; }),
+            searchKeywordIds: Object.getOwnPropertyNames(bioMarkersModel.selectedBioMarkers),
         };
     };
 
@@ -134,11 +166,63 @@ HeatmapView = (function(){
             }
         });
 
+
         // identifiers autocomplete
-        view.fetchDataView.identifiersInput.autocomplete({
-            source: heatmapService.getIndentifierSuggestions,
+        var _identifierItemTemplate = new Ext.XTemplate(
+            '<li class="ui-menu-item" role="presentation">',
+                '<a class="ui-corner-all">',
+                    '<span class="category-gene">{display}&gt;</span>&nbsp;',
+                    '<b>{keyword}</b>&nbsp;{synonyms}',
+                '</a>',
+            '</li>'
+        );
+        view.fetchDataView.identifierInput.autocomplete({
+            source: function(request, response) {
+                var term = request.term
+                if (term.length < 2) {
+                    return function() {
+                        return response({rows: []});
+                    };
+                }
+                return heatmapService.getIdentifierSuggestions(
+                    bioMarkersModel,
+                    term,
+                    function(grailsResponse) {
+                        // convert Grails response to what jqueryui expects
+                        // grails response looks like this:
+                        // { "id": 1842083, "source": "", "keyword": "TPO", "synonyms":
+                        // "(TDH2A, MSA, TPX)", "category": "GENE", "display": "Gene" }
+                        var r = grailsResponse.rows.map(function(v) {
+                            return {
+                                label: v.keyword,
+                                value: v
+                            }
+                        })
+                        return response(r);
+                    });
+            },
+
             minLength: 2
         });
+        view.fetchDataView.identifierInput.data('autocomplete')._renderItem = function(ul, item) {
+            return jQuery(_identifierItemTemplate.append(ul[0], item.value));
+        };
+        view.fetchDataView.identifierInput.on('autocompleteselect',
+            function(event, ui) {
+                var v = ui.item.value;
+                bioMarkersModel.addBioMarker(v.id, v.display, v.keyword, v.synonyms);
+                this.value = '';
+                return false;
+            });
+        view.fetchDataView.identifierInput.on('autocompletefocus',
+            function(event, ui) {
+                var v = ui.item.value;
+                this.value = v.display + ' ' + v.keyword;
+                return false;
+            });
+        view.fetchDataView.identifierInput.on('autocompleteclose',
+            function() { this.value = ''; });
+
         view.fetchDataView.clearBtn.click(view.clearConceptPathInput);
 
         // TODO Remove this, it's unused
