@@ -69,7 +69,7 @@ test.extract_measurements.1probe <- function(){
 }
 
 #1 probe, 1 sample
-test.extract_measurements.1sample <- function(){
+test.extract_measurements.1sample1probe <- function(){
   test_data_one_probe_sample <- list("n0_s1" = test_set[1,c("Row.Label", "Bio.marker", "GSM210004")])
   checkEquals(list("n0_s1" = test_set[1,c("GSM210004"), drop = F]), extract_measurements(test_data_one_probe_sample))
 }
