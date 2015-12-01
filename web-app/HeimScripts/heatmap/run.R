@@ -90,7 +90,6 @@ add.subset.label <- function(df,label){
   for(sample.name in sample.names){
     new.name <- paste(sample.name,label,sep="_")
     colnames(df)[colnames(df)==sample.name] <- new.name
-    print(new.name)
   }
   return(df)
 }

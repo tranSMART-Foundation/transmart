@@ -16,7 +16,5 @@ test.drop.empty <- function()
 {
   result <- dropEmptyGene(test_data_drop_empty)
   expected <- test_data_drop_empty[2,]
-  print(result)
-  print(expected)
   checkEquals(result, expected)
 }
