@@ -93,8 +93,8 @@ extract_measurements <- function(datasets)
     if(is_highDim)
     {
       non_measurement_columns <- which(colNames %in% c("Row.Label","Bio.marker"))
-      datasets[[i]] <- dataset[ ,-non_measurement_columns, drop = F]
-      if(!all(sapply(dataset[ ,-non_measurement_columns, drop = F], FUN= class) == "numeric"))
+      datasets[[i]] <- dataset[ , -non_measurement_columns, drop = F]
+      if(!all(sapply(dataset[ ,-non_measurement_columns, drop = F], FUN = class) == "numeric"))
       {
         stop(paste("Correct extraction of data columns was not possible for dataset ",dataset_id, 
                    ". It seems that, aside from the Row.Label and Bio.marker column, there are one or more non numeric data columns in the data.frame.", sep = ""))
@@ -162,6 +162,7 @@ produce_summary_stats <- function(measurement_tables, phase)
   for(node in unique_nodes)
   {
     partial_table <- result_table[which(result_table$node == node), ,drop = F]
+    rownames(partial_table) <- 1:nrow(partial_table) #does not influence json result, however is needed for unit testing (matching rownumbers).
     fileName <- paste(phase,"_summary_stats_node_", node, ".json", sep = "")
     summary_stats_all_nodes[[fileName]] <- partial_table
   }
@@ -197,6 +198,9 @@ produce_boxplot <- function(measurement_tables, phase)
     measurement_vectors[[i]] <- unlist(measurement_vectors[[i]]) 
   }
   
+  boxplot_results_all_nodes <- list()
+  
+  
   #make a separate boxplot for each node and write to a PNG file.
   for(node in nodes)
   {
@@ -217,7 +221,7 @@ produce_boxplot <- function(measurement_tables, phase)
     # in case there is data present: create box plot
     if(!all(is.na(single_node_data)))
     {
-      boxplot_result <- boxplot(single_node_data, col = "grey", ylab = "Value", outline = F, pch = 20, cex=0.2)
+      boxplot_results_all_nodes[[fileName]] <- boxplot(single_node_data, col = "grey", ylab = "Value", outline = F, pch = 20, cex=0.2)
     }
 
     # if there are no data values: create image with text "No data points to plot"
@@ -227,10 +231,10 @@ produce_boxplot <- function(measurement_tables, phase)
       write("No data points\n\   to plot","")
       sinkplot("plot")
       box("outer", lwd= 2)
-      boxplot_result <- "No data points to plot"
+      boxplot_results_all_nodes[[fileName]] <- "No data points to plot"
     }
     
     dev.off()
   }
-  return(boxplot_result)
+  return(boxplot_results_all_nodes)
 }
