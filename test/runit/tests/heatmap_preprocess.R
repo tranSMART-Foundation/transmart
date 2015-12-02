@@ -18,3 +18,4 @@ test.drop.empty <- function()
   expected <- test_data_drop_empty[2,]
   checkEquals(result, expected)
 }
+

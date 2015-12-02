@@ -33,14 +33,19 @@ main <- function(max_rows=100){
 
   df <- df[1:max_rows,]
   fields <- buildFields(df)
+  extraFields <- buildExtraFields(fields)
   geneSymbols <- unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector, otherwise we get a dataframe
   patientIDs <-unique(fields["PATIENTID"])[,1]
   probes <- unique(fields["PROBE"])[,1]
   significanceValues <- unique(fields["SIGNIFICANCE"])[,1]
+  features <- unique(extraFields["FEATURE"])[,1]
   jsn <- toJSON(list("fields"=fields, "geneSymbols"=geneSymbols,
                      "patientIDs"=patientIDs,
                      "probes"=probes,
-                     "significanceValues"=significanceValues ),
+                     "significanceValues"=significanceValues,
+                     "features"=features,
+                     "extraFields"=extraFields
+                      ),
                 pretty = TRUE)
   write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
   msgs <- c("Finished successfuly")
@@ -52,7 +57,7 @@ main <- function(max_rows=100){
 
 
 buildFields <- function(df){
-  df <- melt(df,id=c("Row.Label","Bio.marker","SIGNIFICANCE","MEAN","SD"))
+  df <- melt(df,id=c("Row.Label","Bio.marker","SIGNIFICANCE","MEAN","SD")) # melt implicitly casts characters to factors to make your like more exciting, in order to encourage more adventures it does not have characters.as.factors=F param.
   ZSCORE <- (df$value - df$MEAN)/df$SD
   df["MEAN"] <- NULL
   df["SD"]   <-NULL
@@ -92,4 +97,35 @@ add.subset.label <- function(df,label){
     colnames(df)[colnames(df)==sample.name] <- new.name
   }
   return(df)
+}
+
+buildExtraFields <- function(df){
+  FEATURE <- rep("Cohort", nrow(df) )
+  PATIENTID <- as.character(df$PATIENTID)
+  TYPE <- rep("binary",nrow(df))
+  VALUE <- getSubset(PATIENTID)
+  extraFields <- data.frame(FEATURE, PATIENTID, TYPE, VALUE)
+}
+
+getSubset <- function(patientIDs){
+  splittedIds <- strsplit(patientIDs,"_s") # During merge, which is always run we append subset id, either _s1 or _s2 to PATIENTID.
+  SUBSETS <- lapply(splittedIds, FUN=last_elem) # In proper patienid subset will always be  at the end. This select last element after _s
+  SUBSETS <- sapply(SUBSETS, FUN=formatSubset)
+}
+
+#R has a function tail which is supposed to return last element of collection. But like everything in R it works in some unexpected way.
+last_elem <- function(vect){
+     vect[length(vect)]
+}
+
+#frontend expects 0 or 1 instead of 1 or 2 as subset number.
+formatSubset <- function(subsetNumber){
+  if(subsetNumber == "1"){
+    return(0)
+  }else if(subsetNumber == "2"){
+    return(1)
+  }
+  else {
+  stop(paste("Incorrect Assay ID: unexpected subset number: ",subsetNumber))
+  }
 }

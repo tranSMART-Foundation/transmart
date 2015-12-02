@@ -36,3 +36,11 @@ test.mergeFetchedData.twodfs <- function()
   checkTrue(all(colnames(merged) == c("Row.Label","Bio.marker","Assay1_d1","Assay2_d1","Assay3_d2","Assay4_d2")))
   checkTrue(nrow(merged) == 4)
 }
+
+test.get.subset <- function()
+{
+  test_patient_ids <- c("Assay1_blabla_s1","Assay2_bleblee_s2")
+  result <- getSubset(test_patient_ids)
+  expected <- c(0,1)
+  checkEquals(result, expected)
+}
