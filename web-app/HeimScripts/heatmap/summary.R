@@ -28,6 +28,7 @@
 
 library(jsonlite)
 library(gplots)
+library(stringr)
 
 main <- function(phase = NA)
 {
@@ -46,11 +47,11 @@ main <- function(phase = NA)
     summary_stats_json <- produce_summary_stats(data_measurements, phase)
     write_summary_stats(summary_stats_json)
     
-    produce_boxplot(data_measurements, phase)
+  produce_boxplot(data_measurements, phase)
     
     if(length(msgs) == 0) { msgs <- "Finished successfuly"} 
-  }  
-  
+}
+
   return(list(messages = msgs))
 }
 
@@ -65,7 +66,7 @@ check_input <- function(datasets, phase_info)
   { 
     messages <- c(messages, "Unexpected input. Expected input: a list, containing one or more data.frames")
   }
-   
+
   # all items in the list are expected to have some unique identifier for the node (numerical identifier appended behind the letter "n") 
   # followed an underscore and a subset identifier s1 or s2 depending on subset, e.g. n0_s1, n0_s2, n1_s1, n1_s2. 
   dataset_names <- names(datasets)
@@ -212,7 +213,9 @@ write_summary_stats <- function(summary_stats)
   }
 }
 
-
+quote_regex_meta <- function(string) {
+  str_replace_all(string, "(\\W)", "\\\\\\1")
+}
 
 # Function that outputs one box plot image per data node
 produce_boxplot <- function(measurement_tables, phase)
@@ -237,7 +240,9 @@ produce_boxplot <- function(measurement_tables, phase)
   for(node in nodes)
   {
     # grab the data.frames corresponding to the selected node
-    identifiers_single_node <- grep(paste("^",node, sep = ""), names(measurement_vectors), value = T )
+    identifiers_single_node <- grep(
+        paste("^", quote_regex_meta(node), sep = ""),
+        names(measurement_vectors), value = T, perl = TRUE)
     single_node_data <- measurement_vectors[identifiers_single_node]
     
     #remove node prefix from the names (labels) of the data.frame 
