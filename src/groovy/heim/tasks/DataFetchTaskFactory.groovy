@@ -7,7 +7,6 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.stereotype.Component
 import org.transmartproject.core.exceptions.InvalidArgumentsException
-import org.transmartproject.core.exceptions.NoSuchResourceException
 import org.transmartproject.core.ontology.ConceptsResource
 
 /**
@@ -23,7 +22,6 @@ class DataFetchTaskFactory implements TaskFactory, ApplicationContextAware {
     public static final String DATA_CONSTRAINTS_PARAMETER_NAME = 'dataConstraints'
     public static final String PROJECTION_PARAMETER_NAME = 'projection'
     public static final String RESULT_INSTANCE_IDS_PARAMETER_NAME = 'resultInstanceIds'
-    public static final String DATA_TYPE_PARAMETER_NAME = 'dataType'
 
     ApplicationContext applicationContext
 
@@ -66,7 +64,9 @@ class DataFetchTaskFactory implements TaskFactory, ApplicationContextAware {
         conceptKeysArg = conceptKeysArg.collectEntries() { k, v ->
             try {
                 [k as String, conceptsResource.getByKey(v as String)]
-            } catch (IllegalArgumentException | NoSuchResourceException ex) {
+            } catch (Exception ex) {
+                // should be IllegalArgumentException | NoSuchResourceException
+                // but that's broken in the version of Groovy used
                 throw new InvalidArgumentsException("The string '$v' " +
                         "(with label prefix '$k') is not a valid concept " +
                         "key: $ex.message", ex)
