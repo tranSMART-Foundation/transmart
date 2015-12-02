@@ -5,6 +5,10 @@
 # for the tranSAMRT install and data loading
 # ********************************************************************************
 
+echo "-------------------------------------"
+echo "Checking for required files and folders"
+echo "-------------------------------------"
+
 base="$HOME/transmart/transmart-data"
 
 returnValue=0
@@ -36,6 +40,10 @@ if [ ! -e "$filepath" ]; then
 	echo "  is required and does not exist; this should have been created"
 	echo "  in the 'buildR' step of the install; check the log and repeat that step"
 	returnValue=1
+fi
+
+if [ 0 = $returnValue ] ; then
+	echo "All required files and folders are present"
 fi
 
 exit $returnValue
