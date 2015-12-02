@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ********************************************************************************
-# This script checks for and reports missen items in the list of basic
+# This script checks for and reports missing items in the list of basic
 # linux command lines that are needed for the tranSAMRT install and data loading
 # ********************************************************************************
 
