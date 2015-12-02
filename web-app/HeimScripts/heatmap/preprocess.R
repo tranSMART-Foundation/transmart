@@ -9,11 +9,13 @@ main <- function(aggregate=FALSE){
     df <- dropEmptyGene(df)
     aggr  <- aggregate.probes(df)
     assign("preprocessed", aggr, envir = .GlobalEnv)
-    Discarded.rows <- nrow(df) - nrow(aggr)
-    msgs <- c( paste("Total discarded rows:",Discarded.rows))
+    discarded.rows <- nrow(df) - nrow(aggr)
+    msgs <- paste("Total discarded rows:",discarded.rows)
   }
-  else{
+  else if(aggregate && !good.input){
     msgs <- c("Incorrect subset - in order to perform probe aggregation more than one samples are needed.")
+  }else{
+    msgs <- c("No preprocessing option selected.")
   }
   list(finished=T,messages=msgs)
 }
@@ -22,9 +24,9 @@ aggregate.probes <- function(df){
   measurements <- df[,3:ncol(df)]
   row.names(measurements) <- df[,1]
   collapsed <- collapseRows(measurements, df[,2], df[,1], "MaxMean",
-                            connectivityBasedCollapsing = TRUE,
-                            methodFunction = NULL,
-                            connectivityPower = 1,
+                            connectivityBasedCollapsing = FALSE, #in Rmodules = TRUE. In our spec, not required
+                            methodFunction = NULL, # It only needs to be specified if method="function"
+                            #connectivityPower = 1, # ignored when connectivityBasedCollapsing = FALSE
                             selectFewestMissing = TRUE)
   collapsedMeasurements <- collapsed$datETcollapsed
   Bio.marker <- collapsed$group2row[,1] # first column of this matrix always contains gene
