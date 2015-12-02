@@ -7,31 +7,28 @@
 . ./versionCompare.sh
 
 # check java version, 1.7 or higher
-
+desiredjavaVersion="1.7"
 javaVersion=$(java -version 2>&1 | awk -F '"' '{print $2}')
-javaVersionProbe=$(echo $javaVersion | tr '_' '.')
-$(vercomp "1.7" $javaVersionProbe)
-versionTest=$?
-if [ "$versionTest" -gt 0 ]; then
-    echo "Java version, $javaVersion, is good!"
-else 
-    echo "Expected java verison 1.7 or higher; currently $javaVersion; needs to be upgraded"
-fi
+reportCheckOrHigher "java" $desiredjavaVersion $javaVersion
 
 # check php version, 5.4 or higher
+desiredPhpVersion="5.4"
 phpVersion=$(php --version | awk -F '^PHP ' '{print $2}' | awk -F 'ubuntu' '{print $1}')
-phpVersionProbe=$(echo $phpVersion | tr "-" ".")
-$(vercomp "5.4" $phpVersionProbe)
-versionTest=$?
-if [ "$versionTest" -gt 0 ]; then
-    echo "Php version, $phpVersion, is good!"
-else
-    echo "Expected php verison 5.4 or higher; currently $phpVersion; needs to be upgraded"
-fi
+reportCheckOrHigher "php" $desiredPhpVersion $phpVersion
 
-# check R version, 3.1.2
+# check R version, exactly 3.1.2
+desiredRVersion="3.1.2"
+RVersion=$(R --version | awk -F '^R version ' '{print $2}')
+reportCheckExact "R" $desiredRVersion $RVersion
 
 # check psql version, 9.2 or higher
+desiredPsqlVersion="9.2"
+version=$(psql --version)
+psqlVersion=$( echo "$version" | awk -F '^psql .PostgreSQL. ' '{print $2}')
+reportCheckOrHigher "psql" $desiredPsqlVersion $psqlVersion
 
 # check groovy version, 2.1 or higher
+desiredGroovyVersion="2.1"
+groovyVersion=$(groovy --version | awk -F '^Groovy Version: ' '{print $2}')
+reportCheckOrHigher "groovy" $desiredGroovyVersion $groovyVersion
 
