@@ -6,17 +6,17 @@
 #   Data for multiple high dimensional nodes can be provided. 
 #   Per high dimensional node 1 or 2 dataframes are to be passed on, depending on whether 1 or 2 patient subsets are created. 
 #   Descriptive names (labels) are given to the data.frames so that it can be recognized which data.frame was derived from which data node
-#   PROPOSED FORMAT: some unique identifier for the node (numerical identifier appended behind the letter "n") followed by _s1 or _s2 depending on subset, e.g. n0_s1, n0_s2, n1_s1, n1_s2. 
+#   PROPOSED FORMAT: some unique identifier for the node (numerical identifier appended behind the letter "n") followed by _s1 or _s2 depending on subset, e.g. n0_s1, n0_s2, n1_s1, n1_s2. (actually, subset number can be anything, as long as it is numerical)
 #         (RIGHT NOW THE UNDERSCORE IS USED FOR SPLITTING THE TWO, SO IF UNDERSCORES ARE USED IN THE NODE IDENTIFIER ,THIS SHOULD BE CHANGED)
 #   The data.frames (coming from high dimensional nodes) have columns: Row.Label, Bio.marker (optional), ASSAY_0001, ASSAY_0002 ...  
 #     ** right now this is only implemented for high dimensional data nodes, later the functionality might be extended for clinical data. In that case it is possible to recognize if it is high or low dim data based on the column names of the data.frame (assuming low dim data will also be passed on in the form of data.frames)
 # * phase parameter. This parameter specifies whether the script is run for the 'fetch data' or 'preprocess data' tab,
 #     and it is used to give the output files of this script a different name (so that the output files for the 'fetch data' tab
-#     are not overwritten if the script is run for the 'preprocess data' tab)
+#     are not overwritten if the script is run for the 'preprocess data' tab). Expected argument: "fetch" or "preprocess"
 #
 # Output: 
-# * 1 boxplot image per data node, png format. Name: Box_plot_Node_<Node Identifier>.png. 
-# * 1 textfile per node with the summary statistics per subset, in json format. Name: Summary_stats-Node_<Node Identifier>.json. \
+# * 1 boxplot image per data node, png format. Name: <phase>_box_plot_Node_<Node Identifier>.png. 
+# * 1 textfile per node with the summary statistics per subset, in json format. Name: <phase>_summary_stats-Node_<Node Identifier>.json. 
 # Note: If the data node is not high dimensional or the dataset is empty, no boxplot will be returned - only an image with the text "No data points to plot", 
 #   also no mean, median etc will be returned in the summary statistics: only variableLabel, node name and subset name are returned 
 #   and totalNumberOfValues = 1 and numberOfMissingValues = 1.
@@ -29,12 +29,67 @@
 library(jsonlite)
 library(gplots)
 
-main <- function(phase)
+main <- function(phase = NA)
 {
-  data_measurements <- extract_measurements(loaded_variables)
-  produce_summary_stats(data_measurements, phase)
-  produce_boxplot(data_measurements, phase)
-  return(list(summary_stats = "Finished")) #right now a non-empty list is expected as a return.
+  msgs <- c()
+  
+  check_input_result <- check_input(loaded_variables, phase)
+  msgs <- c(msgs, check_input_result$msgs) 
+  correct_input <- check_input_result$correctInput
+  
+  if(correct_input)
+  {
+    extract_measurements_result <- extract_measurements(loaded_variables)
+    data_measurements <- extract_measurements_result$datasets
+    msgs <- c(msgs, extract_measurements_result$msgs)
+    
+    summary_stats_json <- produce_summary_stats(data_measurements, phase)
+    write_summary_stats(summary_stats_json)
+    
+    produce_boxplot(data_measurements, phase)
+    
+    if(length(msgs) == 0) { msgs <- "Finished successfuly"} 
+  }  
+  
+  return(list(messages = msgs))
+}
+
+#check if provided variables and phase info are in line with expected input as described at top of this script
+check_input <- function(datasets, phase_info)
+{
+  messages <- c()
+  
+  #expected input: list of data.frames
+  items_list <- sapply(datasets, class)
+  if(class(datasets) != "list" | !all(items_list == "data.frame")) #for a data.frame is.list() also returns TRUE. Class returns "data.frame" in that case
+  { 
+    messages <- c(messages, "Unexpected input. Expected input: a list, containing one or more data.frames")
+  }
+   
+  # all items in the list are expected to have some unique identifier for the node (numerical identifier appended behind the letter "n") 
+  # followed an underscore and a subset identifier s1 or s2 depending on subset, e.g. n0_s1, n0_s2, n1_s1, n1_s2. 
+  dataset_names <- names(datasets)
+  expected_format_names <- "^n[[:digit:]]+_s[[:digit:]]+$"
+  names_in_correct_format <- grepl(expected_format_names, dataset_names)
+  if(any(!names_in_correct_format))
+  {
+    messages <- c(messages, (paste("One or more labels of the datasets do not have the expected format.", 
+               "Expected format: an unique numerical identifier for the node appended behind the letter \'n\',followed by an underscore and an unique numerical identifier for the subset appended behind an \'s\',",
+               "e.g. n0_s1, n0_s2, n1_s1, n1_s2.")))
+  }
+  if(is.na(phase_info))
+  {
+    messages <- c(messages, "Supply phase parameter to function \'main()\'")
+  }
+  if(phase_info != "fetch" & phase_info != "preprocess" & !is.na(phase_info))
+  {
+    messages <- c(messages, "Incorrect value for phase parameter - expected input: either \'fetch\' or \'preprocess\'")
+  }
+  if(length(messages) > 0)
+  {
+    correctInput = F
+  }
+  return(list(correctInput = correctInput, msgs = messages))
 }
 
 
@@ -43,9 +98,11 @@ main <- function(phase)
 #  All columns except Row.Label and Bio.marker contain the measurement values.
 extract_measurements <- function(datasets)
 {  
+  messages <- c()
   for(i in 1:length(datasets))
   {
     dataset <- datasets[[i]]
+    dataset_id <- names(datasets)[[i]]
     colNames <- colnames(dataset)
     
     # test if the data.frame contains data from a high dimensional data node
@@ -63,11 +120,21 @@ extract_measurements <- function(datasets)
     if(is_highDim)
     {
       non_measurement_columns <- which(colNames %in% c("Row.Label","Bio.marker"))
-      datasets[[i]] <- dataset[ ,-non_measurement_columns]
+      datasets[[i]] <- dataset[ , -non_measurement_columns, drop = F]
+      if(!all(sapply(dataset[ ,-non_measurement_columns, drop = F], FUN = class) == "numeric"))
+      {
+        messages <- c(messages, paste("Correct extraction of data columns was not possible for dataset ",dataset_id, 
+                   ". It seems that, aside from the Row.Label and Bio.marker column, there are one or more non numeric data columns in the data.frame.", sep = ""))
+        datasets[[i]] <- "Remove"
+      }
     }
   }
+  if(any(datasets == "Remove")) #remove datasets only here, as counter is used in for loop and removal of items from the list during the for loop results in mismatches
+  {
+    datasets[which(datasets == "Remove")] <- NULL
+  }
   
-  return(datasets) 
+  return(list(datasets = datasets, msgs = messages))  
 }
 
 
@@ -121,15 +188,31 @@ produce_summary_stats <- function(measurement_tables, phase)
   rownames(result_table) <- 1:nrow(result_table)
   
   # write the summary statistics for each node to a separate file, in JSON format
+  summary_stats_all_nodes <- list()
+  
   unique_nodes <- unique(result_table$node)
   for(node in unique_nodes)
   {
     partial_table <- result_table[which(result_table$node == node), ,drop = F]
-    summary_stats_JSON <- toJSON(partial_table, dataframe = "rows", pretty = T)
-    fileName <- paste("summary_stats_node", node, ".json", sep = "")
+    rownames(partial_table) <- 1:nrow(partial_table) #does not influence json result, however is needed for unit testing (matching rownumbers).
+    fileName <- paste(phase,"_summary_stats_node_", node, ".json", sep = "")
+    summary_stats_all_nodes[[fileName]] <- partial_table
+  }
+  return(summary_stats_all_nodes)
+}
+
+
+write_summary_stats <- function(summary_stats)
+{
+  for (i in 1:length(summary_stats))
+  {
+    summary_stats_JSON <- toJSON(summary_stats[[i]], dataframe = "rows", pretty = T)
+    fileName <- names(summary_stats)[[i]]
     write(summary_stats_JSON, fileName)
   }
 }
+
+
 
 # Function that outputs one box plot image per data node
 produce_boxplot <- function(measurement_tables, phase)
@@ -147,6 +230,9 @@ produce_boxplot <- function(measurement_tables, phase)
     measurement_vectors[[i]] <- unlist(measurement_vectors[[i]]) 
   }
   
+  boxplot_results_all_nodes <- list()
+  
+  
   #make a separate boxplot for each node and write to a PNG file.
   for(node in nodes)
   {
@@ -161,13 +247,13 @@ produce_boxplot <- function(measurement_tables, phase)
     single_node_data <- single_node_data[order(names(single_node_data))] 
     
     ## create box plot, output to PNG file
-    fileName <- paste("box_plot_node", node, ".png", sep = "")
+    fileName <- paste(phase, "_box_plot_node_", node, ".png", sep = "")    
     png(filename = fileName)
     
     # in case there is data present: create box plot
     if(!all(is.na(single_node_data)))
     {
-      boxplot(single_node_data, col = "grey", ylab = "Value")
+      boxplot_results_all_nodes[[fileName]] <- boxplot(single_node_data, col = "grey", ylab = "Value", outline = F, pch = 20, cex=0.2)
     }
 
     # if there are no data values: create image with text "No data points to plot"
@@ -177,8 +263,10 @@ produce_boxplot <- function(measurement_tables, phase)
       write("No data points\n\   to plot","")
       sinkplot("plot")
       box("outer", lwd= 2)
+      boxplot_results_all_nodes[[fileName]] <- "No data points to plot"
     }
     
     dev.off()
   }
+  return(boxplot_results_all_nodes)
 }
