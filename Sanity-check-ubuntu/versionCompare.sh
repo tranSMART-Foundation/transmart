@@ -1,5 +1,11 @@
 #!/bin/bash
-# this code cribbed from web: http://stackoverflow.com/questions/4023830/bash-how-compare-two-strings-in-version-format
+
+#*************************************************************************************
+# Helper functions for checkVersion.sh
+#*************************************************************************************
+
+# the code for vercomp() was cribbed from 
+# web: http://stackoverflow.com/questions/4023830/bash-how-compare-two-strings-in-version-format
 # copied on 30 Nov 2015
 function vercomp () {
     if [[ $1 == $2 ]]
