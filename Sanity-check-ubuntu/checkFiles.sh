@@ -29,7 +29,7 @@ baseR="$base/R"
 filepath="$baseR/root/bin"
 if [ ! -e "$filepath" ]; then
 	echo "The file at $filepath"
-	echo "  1s required and does not exist; this should have been created"
+	echo "  is required and does not exist; this should have been created"
 	echo "  in the 'buildR' step of the install; check the log and repeat that step"
 fi
 
