@@ -1,6 +1,12 @@
 modules = {
-    smartR_heatmap {
+    smartR_base {
+        // we get the definitions from transmartApp
+        // dependsOn 'jquery'
+        resource url: [plugin: 'smart-r', dir: 'css', file: 'smartR.css']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'smartR.js']
+    }
 
+    smartR_heatmap {
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'd3.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'd3Heatmap.js']
 
