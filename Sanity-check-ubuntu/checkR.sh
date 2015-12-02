@@ -19,15 +19,14 @@ if ! checkForCommandLineTool "R"; then
     exit 1
 fi
 
-R --vanilla --slave < probeRserve.R > probeRserve.log
-results=$(cat probeRserve.log)
+R --vanilla --slave < probeRserve.R > /dev/null
+results=$?
 
-echo $results
+if (( ! $results )); then
+    echo "OK; Rserve and the other packages required appear to be available"
+else
+    echo "One or more required package is missing from R;"
+    echo "  see probeRserve.R for a method of checking."
+fi 
 
-if [[ $results == *"ok"* ]]; then
-    echo "Rserve and the other packages required appear to be available"
-    exit 0
-fi
-
-echo "One or more required package is missing from R; see probeRserve.log"
 exit 1
