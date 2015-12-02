@@ -10,7 +10,6 @@ HeatmapService = (function(smartRHeatmap){
         statusInterval : 0
     };
 
-
     /**
      *
      * @param files
@@ -51,12 +50,23 @@ HeatmapService = (function(smartRHeatmap){
     };
 
     var _createAnalysisConstraints = function (params) {
-       return {
-            conceptKeys : params.conceptPaths,
-            dataType: 'mrna', // TODO : Get high dimensional data type
+        console.log(params);
+        var _retval = {
+            conceptKeys : {
+                // TODO: support more than one concept path
+                '_TEST_LABEL_': params.conceptPaths
+            },
             resultInstanceIds: params.resultInstanceIds,
             projection: 'log_intensity'
         };
+        if (params['searchKeywordIds'].length > 0) {
+            _retval.dataConstraints = {
+                search_keyword_ids: {
+                    keyword_ids: params['searchKeywordIds']
+                }
+            }
+        }
+        return  _retval;
     };
 
     /**
@@ -203,23 +213,32 @@ HeatmapService = (function(smartRHeatmap){
      * @param request
      * @param response
      */
-    service.getIndentifierSuggestions = function (request, response) {
-        jQuery.get("/transmart/search/loadSearchPathways", {
-            query: request.term
-        }, function (data) {
-            data = data.substring(5, data.length - 1);  // loadSearchPathways returns String with null (JSON).
-                                                        // This strips it off
-            data = JSON.parse(data);// String rep of JSON to actual JSON
-            data = data['rows'];// Response is encapsulated in rows
-            var suggestions = [];
-            for (var i = 0; i < data.length;i++){
-                var geneName = data[i]['keyword']; //I assume we use keywords, not synonyms or IDs
-                suggestions.push(geneName);
-            }
-            response(suggestions);
-        });
+    service.getIdentifierSuggestions = (function() {
+        var curXHR = null;
 
-    };
+        return function(model, term, response) {
+            if (curXHR && curXHR.state() === 'pending') {
+                console.log('Cancelling pending request')
+                curXHR.abort();
+            }
+
+            curXHR = jQuery.get("/transmart/search/loadSearchPathways", {
+                query: term
+            })
+
+            curXHR.always(function() { curXHR = null; })
+            return curXHR.then(
+                function(data) {
+                    data = data.substring(5, data.length - 1);  // loadSearchPathways returns String with null (JSON).
+                                                                // This strips it off
+                    response(JSON.parse(data));
+                },
+                function() {
+                    response({rows: []}); // response must be called even on failure
+                }
+            );
+        };
+    })();
 
     /**
      * Check status of a task

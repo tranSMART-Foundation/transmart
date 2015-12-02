@@ -75,12 +75,12 @@
                 </div>
             </div>
 
-            %{--TODO: Support gene filtering--}%
             <div class="sr-fetch-params-area">
                 %{--Select identifier--}%
                 <div class="heim-input-field heim-autocomplete" style="clear: both">
-                    <label>Select a Gene/Pathway/mirID/UniProtID:</label>
-                    <input id="heim-input-txt-identifiers" disabled>
+                    <label for="heim-input-txt-identifier">Select a Gene/Pathway/mirID/UniProtID:</label>
+                    <input id="heim-input-txt-identifier">
+                    <div id="heim-input-list-identifiers"></div>
                 </div>
             </div>
 

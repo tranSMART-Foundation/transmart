@@ -13,6 +13,8 @@ class SmartRController {
     def smartRService
     def scriptExecutorService
 
+    static layout = 'smartR'
+
     def index() {
         [
                 scriptList: sessionService.availableWorkflows(),
@@ -90,7 +92,7 @@ class SmartRController {
         def scripts = [servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js']
 
         // list of required css files
-        def styles = [servletContext.contextPath+pluginContextPath+'/css/smartR.css']
+        def styles = []
 
         JSONObject result = new JSONObject()
         JSONArray rows = new JSONArray()
