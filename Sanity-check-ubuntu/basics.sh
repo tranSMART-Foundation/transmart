@@ -1,8 +1,9 @@
 #!/bin/bash
-# ["$0" = "$BASH_SOURCE" ] && v="standAlone" || v="sourced"
-# echo "$v - $0 - $BASH_SOURCE"
-# -- This script checks for and reports missen items (or non-expected version numbers) of basic 
+
+# ********************************************************************************
+# This script checks for and reports missen items in the list of basic
 # linux command lines that are needed for the tranSAMRT install and data loading
+# ********************************************************************************
 
 # # ------------------ helper function -------------------
 

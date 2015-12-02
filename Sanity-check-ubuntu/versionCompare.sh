@@ -43,30 +43,32 @@ function reportCheckOrHigher () {
     type=$1
     desiredVersion=$2
     givenVersion=$3
-#    echo "$type wants $desiredVersion is $givenVersion"
 	check $desiredVersion $givenVersion
     versionTest=$?
-#    echo $versionTest
+	okFlag=0
     if [ "$versionTest" -eq 2 ] || [ "$versionTest" -eq 0 ]; then
         echo "The $type version, $givenVersion, is good!"
     else 
         echo "Expected $type version $desiredVersion or higher; currently $givenVersion; needs to be upgraded."
+        okFlag=1
     fi
+    return $okFlag
 }
 
 function reportCheckExact () {
     type=$1
     desiredVersion=$2
     givenVersion=$3
-#    echo "$type wants $desiredVersion is $givenVersion"
 	check $desiredVersion $givenVersion
     versionTest=$?
-#    echo $versionTest
+	okFlag=0
     if [ "$versionTest" -eq 0 ]; then
         echo "The $type version, $givenVersion, is good!"
     elif [ "$versionTest" -eq 2 ]; then
         echo "Expected $type version $desiredVersion exactly; currently $givenVersion; needs to be downgraded."
+		okFlag=1
     else
         echo "Expected $type version $desiredVersion exactly; currently $givenVersion; needs to be upgraded."
     fi
+    return $okFlag
 }
