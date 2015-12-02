@@ -7,11 +7,14 @@
 
 base="$HOME/transmart/transmart-data"
 
+returnValue=0
+
 filepath="$base/vars"
 if [ ! -e "$filepath" ]; then
 	echo "The file at $filepath"
 	echo "  1s required and does not exist; this should have been created"
 	echo "  in the 'basics' step of the install; check the log and repeat that step"
+	returnValue=1
 fi
 
 baseEnv="$base/env"
@@ -22,6 +25,7 @@ do
 		echo "The directory/folder at $filepath"
 		echo "  is required and does not exist; this should have been created"
 		echo "  in the 'buildEnv' step of the install; check the log and repeat that step"
+		returnValue=1
 	fi
 done
 
@@ -31,5 +35,7 @@ if [ ! -e "$filepath" ]; then
 	echo "The file at $filepath"
 	echo "  is required and does not exist; this should have been created"
 	echo "  in the 'buildR' step of the install; check the log and repeat that step"
+	returnValue=1
 fi
 
+exit $returnValue
