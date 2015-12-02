@@ -23,7 +23,6 @@ HeatmapService = (function(smartRHeatmap){
                 // TODO: support more than one concept path
                 '_TEST_LABEL_': params.conceptPaths
             },
-            dataType: 'mrna', // TODO : Get high dimensional data type
             resultInstanceIds: params.resultInstanceIds,
             projection: 'log_intensity',
         };
