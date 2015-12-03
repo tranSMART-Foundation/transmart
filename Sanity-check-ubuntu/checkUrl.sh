@@ -7,15 +7,16 @@
 
 function checkURL {
     curl -s -o "/dev/null" $1
-    if [ $? -ne 0 ] ; then
+    results=$?
+    if [ $results -ne 0 ] ; then
         echo "Error occurred getting URL $1:"
-        if [ $? -eq 6 ]; then
+        if [ $results -eq 6 ]; then
             echo "  Unable to resolve host"
         fi
-        if [$? -eq 7 ]; then
+        if [ $results -eq 7 ]; then
             echo "  Unable to connect to host"
         fi
         return 1
     fi
-    return 0;	
+    return 0	
 }
