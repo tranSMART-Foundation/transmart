@@ -5,7 +5,7 @@
  */
 
 HeatmapService = (function(smartRHeatmap){
-    var CHECK_DELAY = 1000
+    var CHECK_DELAY = 1000;
     var NOOP_ABORT = function() {};
 
     var service = {
@@ -19,47 +19,11 @@ HeatmapService = (function(smartRHeatmap){
             clearTimeout(timeout);
             service.currentRequestAbort = NOOP_ABORT;
         }
-    }
+    };
 
     /* generate unique labels for the concept paths. It recursively resolves
      * clashes. */
     var _generateLabels = (function() {
-        function extractLastComponents(key, keepN) {
-            return key.replace(/\\$/, '') // replace away optional trailing /
-                .split(/\\/)
-                .slice(2) // remove start of concept key
-                .reverse()
-                .slice(0, keepN)
-                .reverse()
-                .join('\\');
-        }
-        function p(o) {
-            var unfinishedKeys = Object.keys(o)
-                .filter(function(k) { return o[k].elements.length > 1; });
-
-            if (unfinishedKeys.length === 0) {
-                return true;
-            }
-
-            unfinishedKeys.forEach(function(k) {
-                var entry = o[k];
-                var keepN = entry.keep + 1;
-                delete o[k];
-                entry.elements.forEach(function (el) {
-                    var newKey = extractLastComponents(el, keepN);
-                    if (o[newKey]) {
-                        o[newKey].elements.push(el);
-                    } else {
-                        o[newKey] = {
-                            keep: keepN,
-                            elements: [el]
-                        };
-                    }
-                });
-            })
-
-            return p(o);
-        }
         function throwIfDuplicates(arr) {
             var repeated =  arr.filter(function(el, index) {
                 return arr.indexOf(el) !== index;
@@ -73,18 +37,13 @@ HeatmapService = (function(smartRHeatmap){
 
         return function _generateLabels(arr) {
             throwIfDuplicates(arr);
-            var o = ({
-                '': {
-                    keep: 0,
-                    elements: arr,
-                }
-            });
-            p(o);
-            Object.keys(o).forEach(function(key) {
-                o[key] = o[key].elements[0];
-            });
-            return o;
-        }
+
+            var n = 0;
+            return arr.reduce(function(result, currentItem) {
+                result['n' + n++] = currentItem;
+                return result;
+            }, {});
+        };
     })();
 
     var _createAnalysisConstraints = function (params) {
@@ -287,7 +246,6 @@ HeatmapService = (function(smartRHeatmap){
             phase: 'run',
             progressMessage: 'Calculating',
             successMessage: undefined,
-
         });
 
         jQuery.ajax({
