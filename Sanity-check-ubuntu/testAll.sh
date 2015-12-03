@@ -44,6 +44,13 @@ if (( $returnValue )); then
 	echo "************"
 fi
 
+./checkTools.sh
+if (( $returnValue )); then
+	echo "************"
+	echo "Some problem with the required tool processes"
+	echo "************"
+fi
+
 ./checkWeb.sh
 returnValue=$?
 if (( $returnValue )); then
