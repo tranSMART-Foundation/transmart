@@ -8,7 +8,7 @@
 returnValue=$?
 if (( $returnValue )); then
 	echo "************"
-	echo "Some problem with the bascis tools check"
+	echo "** Some problem with the bascis tools check"
 	echo "************"
 fi
 
@@ -16,7 +16,7 @@ fi
 returnValue=$?
 if (( $returnValue )); then
 	echo "************"
-	echo "Some problem with the versions check"
+	echo "** Some problem with the versions check"
 	echo "************"
 fi
 
@@ -24,7 +24,7 @@ fi
 returnValue=$?
 if (( $returnValue )); then
 	echo "************"
-	echo "Some problem with the checks for R"
+	echo "** Some problem with the checks for R"
 	echo "************"
 fi
 
@@ -32,7 +32,7 @@ fi
 returnValue=$?
 if (( $returnValue )); then
 	echo "************"
-	echo "Some problem with PostgreSQL, psql, or the transmartApp database"
+	echo "** Some problem with PostgreSQL, psql, or the transmartApp database"
 	echo "************"
 fi
 
@@ -40,14 +40,14 @@ fi
 returnValue=$?
 if (( $returnValue )); then
 	echo "************"
-	echo "Some problem with the required files and folders check"
+	echo "** Some problem with the required files and folders check"
 	echo "************"
 fi
 
 ./checkTools.sh
 if (( $returnValue )); then
 	echo "************"
-	echo "Some problem with the required tool processes"
+	echo "** Some problem with the required tool processes"
 	echo "************"
 fi
 
@@ -55,6 +55,6 @@ fi
 returnValue=$?
 if (( $returnValue )); then
 	echo "************"
-	echo "Some problem with the required web sites"
+	echo "** Some problem with the required web sites"
 	echo "************"
 fi

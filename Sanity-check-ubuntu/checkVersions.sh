@@ -13,9 +13,9 @@
 # ---------------------------
 
 echo "-------------------------------------"
-echo "Checking for incompatible version of basic command-line tools;"
-echo "If any problems are reported, then recheck the instructions, "
-echo "and install or re-installing the missing items"
+echo "|  Checking for incompatible version of basic command-line tools;"
+echo "|  If any problems are reported, then recheck the instructions, "
+echo "|  and install or re-installing the missing items"
 echo "-------------------------------------"
 
 returnFlag=0

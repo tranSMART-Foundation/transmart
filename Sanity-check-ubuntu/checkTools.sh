@@ -6,8 +6,8 @@
 # ********************************************************************************
 
 echo "-------------------------------------"
-echo "Checking that the required tool processes are running:"
-echo "SOLR, tomcat, Rserve"
+echo "|  Checking that the required tool processes are running:"
+echo "|  SOLR, tomcat, Rserve"
 echo "-------------------------------------"
 
 solrRunning=$(ps aux | grep "start.jar" | grep "java")

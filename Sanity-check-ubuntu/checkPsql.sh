@@ -11,9 +11,9 @@
 . ./basicsHelper.sh
 
 echo "-------------------------------------"
-echo "Checking for PostgreSQL basics: "
-echo "  are PostgreSQL and psql installed; "
-echo "  is PostgreSQL running."
+echo "|  Checking for PostgreSQL basics: "
+echo "|    are PostgreSQL and psql installed; "
+echo "|   is PostgreSQL running."
 echo "-------------------------------------"
 
 echo "checking to see if PostgreSQL has been installed"
@@ -34,10 +34,10 @@ fi
 echo "PostgreSQL appears to be running"
 
 echo "-------------------------------------"
-echo "Checking for transmart database access: "
-echo "  does 'biomart' use exist "
-echo "  are the transmart users set up: admin and guest  "
-echo "  in the demo dataset GSE8581 loaded  "
+echo "|  Checking for transmart database access: "
+echo "|    does 'biomart' use exist "
+echo "|    are the transmart users set up: admin and guest  "
+echo "|    in the demo dataset GSE8581 loaded  "
 echo "-------------------------------------"
 
 echo "Checking SUDO authentication"

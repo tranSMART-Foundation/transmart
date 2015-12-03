@@ -6,7 +6,7 @@
 # ********************************************************************************
 
 echo "-------------------------------------"
-echo "Checking for required end point files and folders"
+echo "|  Checking for required end point files and folders"
 echo "-------------------------------------"
 
 base="$HOME/transmart/transmart-data"

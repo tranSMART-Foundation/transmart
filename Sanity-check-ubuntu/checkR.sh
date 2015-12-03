@@ -8,9 +8,9 @@
 . ./basicsHelper.sh
 
 echo "-------------------------------------"
-echo "Checking for basics and packages required by R;"
-echo "  if anything is reproted as missing, then recheck:"
-echo "  the instructions to installing the missing items"
+echo "|  Checking for basics and packages required by R;"
+echo "|    if anything is reproted as missing, then recheck"
+echo "|    the detailed instructions to installing the missing items"
 echo "-------------------------------------"
 
 echo "checking for R itself"

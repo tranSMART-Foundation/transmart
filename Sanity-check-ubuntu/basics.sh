@@ -9,8 +9,8 @@
 . ./basicsHelper.sh
 
 echo "-------------------------------------"
-echo "Checking for basic command-line tools; if any of the following does not exist,"
-echo "then recheck the instructions for installing the missing items"
+echo "|  Checking for basic command-line tools; if any of the following does not exist,"
+echo "|  then recheck the instructions for installing the missing items"
 echo "-------------------------------------"
 probe=0
 for command in git make java ant mvn tar rsync php g++ gfortran R psql groovy
