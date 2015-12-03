@@ -1,6 +1,26 @@
 <r:require modules="smartR_heatmap"/>
 <r:layoutResources disposition="defer"/>
 
+ %{--Template for summary statistic--}%
+<script id="summary-row-tmp" type="text/x-jsrender">
+    <table class="sr-summary-table">
+        <tbody>
+        <tr>
+            <th>Loaded</th>
+            <th>Subset 1</th>
+            <th>Subset 2</th>
+        </tr>
+        {{for summaryStat}}
+        <tr>
+            <td>{{:key}}</td>
+            <td>{{:val1}}</td>
+            <td>{{:val2}}</td>
+        </tr>
+        {{/for}}
+        </tbody>
+    </table>
+</script>
+
 <div style="width: 98%">
 
     <p>
@@ -89,7 +109,7 @@
                 <button id="heim-btn-fetch-data">Fetch Data</button>
             </div>
 
-            <div id="heim-fetch-data-output"></div>
+            <div id="heim-fetch-output"></div>
 
         </div>
 
@@ -182,7 +202,6 @@
             %{--result--}%
 
             <div id="heim-run-output"></div>
-            <img id="heim-img-result">
 
             %{--d3 js heatmap placeholder--}%
             <div id='visualization' class='text'>

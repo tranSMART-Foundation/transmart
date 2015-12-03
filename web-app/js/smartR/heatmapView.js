@@ -66,7 +66,7 @@ HeatmapView = (function(){
 
     /**
      *
-     * @param v
+     * @param fetchDataView
      * @returns {{conceptPath: *, identifier: *, resultInstanceId: *}}
      * @private
      */
