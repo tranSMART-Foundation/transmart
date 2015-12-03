@@ -20,14 +20,6 @@ if (( $returnValue )); then
 	echo "************"
 fi
 
-./checkFiles.sh
-returnValue=$?
-if (( $returnValue )); then
-	echo "************"
-	echo "Some problem with the required files and folders check"
-	echo "************"
-fi
-
 ./checkR.sh
 returnValue=$?
 if (( $returnValue )); then
@@ -43,3 +35,12 @@ if (( $returnValue )); then
 	echo "Some problem with PostgreSQL, psql, or the transmartApp database"
 	echo "************"
 fi
+
+./checkFiles.sh
+returnValue=$?
+if (( $returnValue )); then
+	echo "************"
+	echo "Some problem with the required files and folders check"
+	echo "************"
+fi
+

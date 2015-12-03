@@ -14,7 +14,7 @@ baseEnv="$base/env"
 baseR="$base/R"
 baseConfig="/usr/share/tomcat7/.grails/transmartConfig/"
 baseWebapps="/var/lib/tomcat7/webapps/"
-baseLogs="cd /var/lib/tomcat7/logs"
+baseLogs="/var/lib/tomcat7/logs"
 
 returnValue=0
 
