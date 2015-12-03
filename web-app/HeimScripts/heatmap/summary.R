@@ -36,8 +36,6 @@ library(gplots)
 
 main <- function(phase = NA, projection = NA)
 {
-  
-  
   if(exists("preprocessed"))
   {
     input_data <- list("preprocessed" = preprocessed)
@@ -53,6 +51,7 @@ main <- function(phase = NA, projection = NA)
   produce_boxplot(data_measurements, phase, projection)
   return(list(messages = "Finished successfully")) 
 }  
+
   
 #check if provided variables and phase info are in line with expected input as described at top of this script
 check_input <- function(datasets, phase_info, projection)
@@ -100,6 +99,7 @@ check_input <- function(datasets, phase_info, projection)
   
   
 }
+
 
 
 
