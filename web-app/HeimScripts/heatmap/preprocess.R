@@ -3,7 +3,7 @@ library("WGCNA")
 
 main <- function(aggregate=FALSE){
   msgs = c("")
-  df <- loaded_variables[[length(loaded_variables)]]
+  df <- mergeFetchedData(loaded_variables)
   good.input <- ncol(df) > 3
   if(aggregate && good.input){
     df <- dropEmptyGene(df)
@@ -46,4 +46,36 @@ dropEmptyGene <- function(d){
         is.na(d$Bio.marker) |
         is.nan(d$Bio.marker)
       ),]
+}
+
+
+### duplicated code from utils - when we get sourcing to work it will be moved
+
+
+mergeFetchedData <- function(listOfHdd){
+  df <- listOfHdd[[1]]
+  expected.rowlen <- nrow(df)
+  labels <- names(listOfHdd)
+  df <- add.subset.label(df,labels[1])
+  if(length(listOfHdd) > 1){
+    for(i in 2:length(listOfHdd)){
+      df2 <- listOfHdd[[i]]
+      label <- labels[i]
+      df2 <- add.subset.label(df2,label)
+      df <- merge(df, df2 ,by=c("Row.Label","Bio.marker"))
+      if(nrow(df) != expected.rowlen){
+        assign("errors", "Mismatched probe_ids - different platform used?", envir = .GlobalEnv)
+      }
+    }
+  }
+  return(df)
+}
+
+add.subset.label <- function(df,label){
+  sample.names <- colnames(df[,3:ncol(df)])
+  for(sample.name in sample.names){
+    new.name <- paste(sample.name,label,sep="_")
+    colnames(df)[colnames(df)==sample.name] <- new.name
+  }
+  return(df)
 }
