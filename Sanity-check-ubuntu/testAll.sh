@@ -27,3 +27,12 @@ if (( $returnValue )); then
 	echo "Some problem with the required files and folders check"
 	echo "************"
 fi
+
+./checkR.sh
+returnValue=$?
+if (( $returnValue )); then
+	echo "************"
+	echo "Some problem with the checks for R"
+	echo "************"
+fi
+
