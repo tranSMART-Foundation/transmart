@@ -1,6 +1,6 @@
 -------------------------------------
-Checking for basic command-line tools; if any of the following does not exist,
-then recheck the instructions for installing the missing items
+|  Checking for basic command-line tools; if any of the following does not exist,
+|  then recheck the instructions for installing the missing items
 -------------------------------------
 git ok
 make ok
@@ -16,9 +16,9 @@ R ok
 psql ok
 groovy ok
 -------------------------------------
-Checking for incompatible version of basic command-line tools;
-If any problems are reported, then recheck the instructions, 
-and install or re-installing the missing items
+|  Checking for incompatible version of basic command-line tools;
+|  If any problems are reported, then recheck the instructions, 
+|  and install or re-installing the missing items
 -------------------------------------
 The java version, 1.7.0_85, is good!
 The php version, 5.5.9-1, is good!
@@ -26,17 +26,17 @@ The R version, 3.1.2, is good!
 The psql version, 9.3.10, is good!
 The groovy version, 2.4.5, is good!
 -------------------------------------
-Checking for basics and packages required by R;
-  if anything is reproted as missing, then recheck:
-  the instructions to installing the missing items
+|  Checking for basics and packages required by R;
+|    if anything is reproted as missing, then recheck
+|    the detailed instructions to installing the missing items
 -------------------------------------
 checking for R itself
 R ok
 OK; Rserve and the other packages required appear to be available
 -------------------------------------
-Checking for PostgreSQL basics: 
-  are PostgreSQL and psql installed; 
-  is PostgreSQL running.
+|  Checking for PostgreSQL basics: 
+|    are PostgreSQL and psql installed; 
+|   is PostgreSQL running.
 -------------------------------------
 checking to see if PostgreSQL has been installed
 psql ok
@@ -44,10 +44,10 @@ PostgreSQL appears to be installed
 checking to see if PostgreSQL is running
 PostgreSQL appears to be running
 -------------------------------------
-Checking for transmart database access: 
-  does 'biomart' use exist 
-  are the transmart users set up: admin and guest  
-  in the demo dataset GSE8581 loaded  
+|  Checking for transmart database access: 
+|    does 'biomart' use exist 
+|    are the transmart users set up: admin and guest  
+|    in the demo dataset GSE8581 loaded  
 -------------------------------------
 Checking SUDO authentication
 Established SUDO authentication
@@ -57,18 +57,18 @@ The transmartApp user 'guest' exists.
 The transmartApp demo dataset GSE8581 is loaded.
 Done checking the PostgreSQL transmart database
 -------------------------------------
-Checking for required end point files and folders
+|  Checking for required end point files and folders
 -------------------------------------
 All required end point files and folders are present
 -------------------------------------
-Checking that the required tool processes are running:
-SOLR, tomcat, Rserve
+|  Checking that the required tool processes are running:
+|  SOLR, tomcat, Rserve
 -------------------------------------
 The SOLR process is running
 The tomcat7 process is running
 The Rserve process is running
 -------------------------------------
-Check to see that the expected web sites are running
+|  Check to see that the expected web sites are running
 -------------------------------------
 SOLR (http://localhost:8983/solr/#/) is running
 The GWAVA web site (http://localhost:8080/gwava/) is running
