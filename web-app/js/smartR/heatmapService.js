@@ -31,10 +31,6 @@ HeatmapService = (function(smartRHeatmap){
         return retv;
     };
 
-    var _fetchConceptPath = function (el) {
-        return el.getAttribute('conceptId').trim();
-    };
-
     /**
      *
      * @param elId
@@ -47,26 +43,6 @@ HeatmapService = (function(smartRHeatmap){
             retval['n' + i] = elDOM.children[i].getAttribute('conceptid');
         }
         return retval;
-    };
-
-    var _createAnalysisConstraints = function (params) {
-        console.log(params);
-        var _retval = {
-            conceptKeys : {
-                // TODO: support more than one concept path
-                '_TEST_LABEL_': params.conceptPaths
-            },
-            resultInstanceIds: params.resultInstanceIds,
-            projection: 'log_intensity'
-        };
-        if (params['searchKeywordIds'].length > 0) {
-            _retval.dataConstraints = {
-                search_keyword_ids: {
-                    keyword_ids: params['searchKeywordIds']
-                }
-            }
-        }
-        return  _retval;
     };
 
     /**
@@ -102,16 +78,12 @@ HeatmapService = (function(smartRHeatmap){
      * @returns {*}
      */
     service.getSummary = function (params) {
-        var retval;
-
-        console.log('About to get load data summary');
-
         jQuery.ajax({
             type: 'POST',
             url: pageInfo.basePath + '/ScriptExecution/run',
             data: JSON.stringify({
                 sessionId : GLOBAL.HeimAnalyses.sessionId,
-                arguments : {},
+                arguments : params, // todo add params
                 taskType : 'summary'}
             ),
             contentType: 'application/json'
@@ -122,7 +94,7 @@ HeatmapService = (function(smartRHeatmap){
                 GLOBAL.HeimAnalyses.executionId = data.executionId;
                 console.log(GLOBAL.HeimAnalyses);
                 service.statusInterval =  setInterval(function () {
-                    service.checkStatus('getSummary');
+                    service.checkStatus('summary', params.phase);
                 }, 1000);
             })
             .fail(function (jqXHR, textStatus, errorThrown) {
@@ -130,7 +102,6 @@ HeatmapService = (function(smartRHeatmap){
                 console.log(textStatus);
                 console.log(errorThrown);
             });
-        return retval;
     };
 
     /**
@@ -138,8 +109,33 @@ HeatmapService = (function(smartRHeatmap){
      * @param eventObj
      */
     service.fetchData = function (params) {
-        var _args = _createAnalysisConstraints(params);
-        console.log('Analysis Constraints', _args);
+
+        /**
+         * Create fetch data constraints
+         * @param params
+         * @returns
+         * {{conceptKeys: {_TEST_LABEL_: _conceptPath}, dataType: string, resultInstanceIds: *, projection: string}}
+         * @private
+         */
+        var _createAnalysisConstraints = function (params) {
+            var _retval = {
+                conceptKeys : {
+                    // TODO: support more than one concept path
+                    '_TEST_LABEL_': params.conceptPaths
+                },
+                resultInstanceIds: params.resultInstanceIds,
+                projection: 'log_intensity'
+            };
+
+            if (params['searchKeywordIds'].length > 0) {
+                _retval.dataConstraints = {
+                    search_keyword_ids: {
+                        keyword_ids: params['searchKeywordIds']
+                    }
+                }
+            }
+            return  _retval;
+        };
 
         jQuery.ajax({
             url: pageInfo.basePath + '/ScriptExecution/run',
@@ -148,17 +144,18 @@ HeatmapService = (function(smartRHeatmap){
             contentType: 'application/json',
             data: JSON.stringify({
                 sessionId : GLOBAL.HeimAnalyses.sessionId,
-                arguments : _args,
+                arguments : _createAnalysisConstraints(params),
                 taskType : 'fetchData',
                 workflow : 'heatmap'
             })
         }).done(function (d) {
-            console.log(d);
-            //var scriptExecObj = JSON.parse(d.responseText);
+            // when it's done :
+            // -  store execution id in global
             GLOBAL.HeimAnalyses.executionId = d.executionId;
             console.log(GLOBAL.HeimAnalyses);
+            // - check fetching data status
             service.statusInterval =  setInterval(function () {
-                service.checkStatus('fetchData');
+                service.checkStatus('fetchData', 'fetch');
             }, 1000);
         })
             .fail(function (jqXHR, textStatus, errorThrown) {
@@ -166,7 +163,7 @@ HeatmapService = (function(smartRHeatmap){
                 console.error(jqXHR);
                 console.error(textStatus);
                 console.error(errorThrown);
-                jQuery('#heim-fetch-data-output')
+                jQuery('#heim-fetch-output')
                     .html('<p style="color: red";><b>Error:'+ errorThrown +'</b> <br> ' + _err.message + '</p>');
             });
     };
@@ -194,7 +191,7 @@ HeatmapService = (function(smartRHeatmap){
                 GLOBAL.HeimAnalyses.executionId = d.executionId;
                 console.log(GLOBAL.HeimAnalyses);
                 service.statusInterval =  setInterval(function () {
-                    service.checkStatus('preprocess');
+                    service.checkStatus('preprocess', 'preprocess');
                 }, 1000);
             })
             .fail(function (jqXHR, textStatus, errorThrown) {
@@ -218,13 +215,13 @@ HeatmapService = (function(smartRHeatmap){
 
         return function(model, term, response) {
             if (curXHR && curXHR.state() === 'pending') {
-                console.log('Cancelling pending request')
+                console.log('Cancelling pending request');
                 curXHR.abort();
             }
 
             curXHR = jQuery.get("/transmart/search/loadSearchPathways", {
                 query: term
-            })
+            });
 
             curXHR.always(function() { curXHR = null; })
             return curXHR.then(
@@ -240,23 +237,92 @@ HeatmapService = (function(smartRHeatmap){
         };
     })();
 
+    service.displaySummary = function (files, task, phase) {
+
+        // empty output area
+        var _outputArea =  jQuery('#heim-'+phase+'-output');
+        _outputArea.empty();
+
+        // display plots
+        files.png.forEach(function (filename) {
+            var _plot = jQuery('<img>')
+                .attr('src', pageInfo.basePath
+                + '/ScriptExecution/downloadFile?sessionId='
+                + GLOBAL.HeimAnalyses.sessionId
+                + '&executionId='
+                + GLOBAL.HeimAnalyses.executionId
+                + '&filename=' + filename);
+            _outputArea.append(_plot);
+        });
+
+        // display summary
+        files.json.forEach(function (filename) {
+            jQuery.ajax({
+                url : pageInfo.basePath
+                + '/ScriptExecution/downloadFile?sessionId='
+                + GLOBAL.HeimAnalyses.sessionId
+                + '&executionId='
+                + GLOBAL.HeimAnalyses.executionId
+                + '&filename='
+                + filename,
+                dataType : 'json'
+            })
+                .done(function (d, status, jqXHR) {
+                    console.log(d);
+                    console.log(status);
+                    console.log( jqXHR);
+                    var _summaryObj = service.generateSummaryTable(d,  task, phase);
+                    _outputArea
+                        .append(_summaryObj);
+
+                });
+        });
+    };
+
+    service.downloadHeatmapJSON = function (task, phase) {
+        var _retval = {};
+        return new Promise (function(resolve, reject) {
+            jQuery.ajax({
+                url : pageInfo.basePath
+                + '/ScriptExecution/downloadFile?sessionId='
+                + GLOBAL.HeimAnalyses.sessionId
+                + '&executionId='
+                + GLOBAL.HeimAnalyses.executionId
+                + '&filename=heatmap.json',
+                dataType : 'json'
+            })
+                .done(function (d, status, jqXHR) {
+                    console.log(d);
+                    resolve(d);
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    reject(errorThrown)
+                });
+            return _retval;
+        });
+
+    };
+
     /**
      * Check status of a task
      * TODO: Refactor
      * @param task
      */
-    service.checkStatus = function (task) {
-        if (task === 'fetchData') {
-            jQuery('#heim-fetch-data-output').html('<p class="sr-log-text"><span class="blink_me">_</span>Fetching data, please wait ..</p>');
-        } else if (task === 'preprocess') {
-            jQuery('#heim-preprocess-output').show();
-            jQuery('#heim-preprocess-output').html('<p class="sr-log-text"><span class="blink_me">_</span>Preprocessing, please wait ..</p>');
-        } else if (task === 'runHeatmap') {
-            jQuery('#heim-run-output').show();
-            jQuery('#heim-run-output').html('<p class="sr-log-text"><span class="blink_me">_</span>Calculating, please wait ..</p>');
-        } else if (task === 'getSummary') {
-            jQuery('#heim-fetch-data-output').html('<p class="sr-log-text"><span class="blink_me">_</span>Getting summary, please wait ..</p>');
-        }
+    service.checkStatus = function (task, phase) {
+
+        var _displayLoading = function (task, phase) {
+            jQuery('#heim-' + phase + '-output')
+                .html('<p class="sr-log-text">Executing ' + task
+                + ' job, please wait <span class="blink_me">_</span></p>');
+        };
+
+        var _displayError = function (task, phase, d) {
+            console.log('err', {t:task,  p:phase,  d:d});
+            var _errTxt = d.hasOwnProperty('result') ? d.result.exception : d;
+            jQuery('#heim-' + phase + '-output').html('<span style="color: red";>' + _errTxt +'</span>');
+        };
+
+        _displayLoading(task, phase);
 
         jQuery.ajax({
             type : 'GET',
@@ -267,149 +333,72 @@ HeatmapService = (function(smartRHeatmap){
             }
         })
         .done(function (d) {
-
                 console.log('Done checking', d);
-
                 if (d.state === 'FINISHED') {
-
                     clearInterval(service.statusInterval);
                     console.log('Okay, I am finished checking now ..', d);
 
-                    if (task === 'fetchData') {
-                        jQuery('#heim-fetch-data-output')
-                            .html('<p class="heim-fetch-success" style="color: green";> ' +
-                            'Data is successfully fetched in . Proceed with Run Heatmap</p>');
-
-                        // render summary stat
-                        service.getSummary();
-                    } else if (task === 'preprocess') {
-                        jQuery('#heim-preprocess-output')
-                            .html('<p class="heim-fetch-success" style="color: green";> ' +
-                            'Preprocessed completed successfully.</p>');
-
-                        // TODO Render summary stat
-                        //service.getSummary();
-
+                    if (task === 'fetchData' || task === 'preprocess') {
+                        // get summary
+                        service.getSummary({phase:phase});
                     } else if (task === 'runHeatmap') {
-                        jQuery('#heim-run-output').hide();
-                        jQuery.ajax({
-                            url : pageInfo.basePath
-                            + '/ScriptExecution/downloadFile?sessionId='
-                            + GLOBAL.HeimAnalyses.sessionId
-                            + '&executionId='
-                            + GLOBAL.HeimAnalyses.executionId
-                            + '&filename=heatmap.json',
-                            dataType : 'json'
-                        })
-                            .done(function (d, status, jqXHR) {
-                                console.log(d);
+                        // load JSON result to create  d3 heatmap
+                        service.downloadHeatmapJSON(task, phase)
+                            .then(function (d) {
+                                jQuery('#heim-'+phase+'-output').hide();
                                 smartRHeatmap.create(d);
+                            })
+                            .catch(function (err) {
+                                _displayError(task, phase,  err);
                             });
-                    } else if (task === 'getSummary') {
-
-                        console.log('getSummary');
-
-                        jQuery('#heim-run-output').hide();
+                    } else if (task === 'summary') {
+                        console.log('summary');
                         var _files = _getSummaryFiles(d.result.artifacts.files);
-
-                        jQuery('#heim-fetch-data-output').hide();
-                        jQuery.ajax({
-                            url : pageInfo.basePath
-                            + '/ScriptExecution/downloadFile?sessionId='
-                            + GLOBAL.HeimAnalyses.sessionId
-                            + '&executionId='
-                            + GLOBAL.HeimAnalyses.executionId
-                            + '&filename=summary_stats_node.json',
-                            dataType : 'json'
-                        })
-                            .done(function (d, status, jqXHR) {
-                                console.log(d);
-                                console.log(status);
-                                console.log( jqXHR);
-                                var _summaryObj = service.displaySummaryStats(d);
-                                console.log(_summaryObj.table);
-                                console.log(_summaryObj.plot);
-                                jQuery('#heim-fetch-data-output')
-                                    .empty()
-                                    .append(_summaryObj.plot)
-                                    .append(_summaryObj.table);
-
-                            });
+                        console.log(_files);
+                        service.displaySummary(_files, task, phase);
                     }
                 } else if (d.state === 'FAILED') {
-
-                    clearInterval(service.statusInterval); // stop checking backend
-                    var _errHTML = '<span style="color: red";>' + d.result.exception +'</span>',
-                        _elId;
-
-                    if (task === 'runHeatmap') {
-                        _elId = '#heim-run-output';
-                    } else if (task === 'preprocess') {
-                        _elId = '#heim-preprocess-output';
-                    }
-
-                    jQuery(_elId).html(_errHTML);
                     console.error('FAILED', d.result);
+                    clearInterval(service.statusInterval); // stop checking backend
+                    _displayError(task, phase, d);
                 }
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
-
                 console.log(jqXHR);
                 console.log(textStatus);
                 console.log(errorThrown);
-
                 clearInterval(service.statusInterval); // stop checking backend
-
-                if (task === 'fetchData') {
-                    jQuery('#heim-fetch-data-output').html('<span style="color: red";>'+errorThrown+'</span>');
-                } else if (task === 'preprocess') {
-                    jQuery('#heim-preprocess-output').html('<span style="color: red";>'+errorThrown+'</spanp>');
-                } else if (task === 'runHeatmap') {
-                    jQuery('#heim-run-output').html('<span style="color: red";>'+errorThrown+'</spanp>');
-                }
+                _displayError(task, phase, d);
         })
         .always(function () {
             console.log('checked!');
         });
     };
 
-    /**
-     * Display Plot
-     * @param data
-     * @returns {{table: *, plot: *}}
-     */
-    service.displaySummaryStats = function (data, imgFile) {
+    service.generateSummaryTable = function (data, task, phase) {
+        // get template
+        var rowTemplate = jQuery.templates('#summary-row-tmp');
 
-        var tmpl = jQuery.templates("Name: {{:name}}");
+        // initiate summary obj
+        var _summaryObj = {summaryStat : []};
 
-        console.log('displaySummaryStats', tmpl);
-        console.log('displaySummaryStats', data);
+        // return null when there's no data from both subsets defined
+        if (typeof data[0] === 'undefined' && typeof data[0] === 'undefined')
+            return null;
+        // use any available data
+        var _data = typeof data[0] === 'undefined' ? data[1] : data[0];
 
-        var _table = jQuery('<table></table>').addClass('sr-summary-table');
-        _table.append('<tr><th>Loaded</th><th>Values</th></tr>');
-
-        jQuery.each(data,  function (idx, item) {
-            _table.append('<tr><td>Variable Label</td><td>' + item.variableLabel + '</td></tr>');
-            _table.append('<tr><td>Max</td><td>' + item.max + '</td></tr>');
-            _table.append('<tr><td>Mean</td><td>' + item.mean + '</td></tr>');
-            _table.append('<tr><td>Median</td><td>' + item.median + '</td></tr>');
-            _table.append('<tr><td>No. of missing values</td><td>' + item.numberOfMissingValues + '</td></tr>');
-            _table.append('<tr><td>Q1</td><td>' + item.q1 + '</td></tr>');
-            _table.append('<tr><td>Q3</td><td>' + item.q3 + '</td></tr>');
-            _table.append('<tr><td>Standard Deviation</td><td>' + item.standardDeviation + '</td></tr>');
-            _table.append('<tr><td>Total no. of values (incl. missing)</td><td>' +
-                item.totalNumberOfValuesIncludingMissing + '</td></tr>');
-        });
-
-        var _plot = jQuery('<img>')
-            .attr('src', pageInfo.basePath
-            + '/ScriptExecution/downloadFile?sessionId='
-            + GLOBAL.HeimAnalyses.sessionId
-            + '&executionId='
-            + GLOBAL.HeimAnalyses.executionId
-            + '&filename=' + imgFile);
-
-        return {table:_table,  plot:_plot};
+        for (var key in _data) {
+            if (_data.hasOwnProperty(key)) {
+                _summaryObj.summaryStat.push({
+                    key:key,
+                    val1:(typeof data[0] === 'undefined') ? '-' : data[0][key],
+                    val2:(typeof data[1] === 'undefined') ? '-' : data[1][key]
+                });
+            }
+        }
+        // return and render
+        return rowTemplate.render(_summaryObj);
     };
 
     service.runAnalysis = function (params) {
@@ -427,7 +416,7 @@ HeatmapService = (function(smartRHeatmap){
                 GLOBAL.HeimAnalyses.executionId = scriptExecObj.executionId;
                 console.log(GLOBAL.HeimAnalyses);
                 service.statusInterval =  setInterval(function () {
-                    service.checkStatus('runHeatmap');
+                    service.checkStatus('runHeatmap', 'run');
                 }, 1000);
             }
         });
