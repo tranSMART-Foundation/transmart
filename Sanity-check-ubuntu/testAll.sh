@@ -36,3 +36,10 @@ if (( $returnValue )); then
 	echo "************"
 fi
 
+./checkPsql.sh
+returnValue=$?
+if (( $returnValue )); then
+	echo "************"
+	echo "Some problem with PostgreSQL, psql, or the transmartApp database"
+	echo "************"
+fi
