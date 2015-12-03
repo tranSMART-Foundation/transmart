@@ -26,7 +26,7 @@ if (( ! $results )); then
     echo "OK; Rserve and the other packages required appear to be available"
 else
     echo "One or more required package is missing from R;"
-    echo "  see probeRserve.R for a method of checking."
+    echo "  see probeRserve.R for a method of checking the details."
 fi 
 
-exit 1
+exit $results
