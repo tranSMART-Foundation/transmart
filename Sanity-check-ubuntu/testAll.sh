@@ -44,3 +44,10 @@ if (( $returnValue )); then
 	echo "************"
 fi
 
+./checkWeb.sh
+returnValue=$?
+if (( $returnValue )); then
+	echo "************"
+	echo "Some problem with the required web sites"
+	echo "************"
+fi

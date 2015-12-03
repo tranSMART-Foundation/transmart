@@ -9,11 +9,11 @@
 . ./checkUrl.sh
 
 # ---------------------------
-# Check to see that the expected we sites are running
+# Check to see that the expected web sites are running
 # ---------------------------
 
 echo "-------------------------------------"
-echo "Check to see that the expected we sites are running"
+echo "Check to see that the expected web sites are running"
 echo "-------------------------------------"
 
 solrUrl="http://localhost:8983/solr/#/"
