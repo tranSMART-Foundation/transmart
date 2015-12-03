@@ -45,10 +45,10 @@ else
 fi
 
 if [ $transmartResults -ne 0 ]; then
-	echo "The tranSMART web site (expected at $transmartaUrl) is not running; see detailed instructions to start it"
+	echo "The tranSMART web site (expected at $transmartUrl) is not running; see detailed instructions to start it"
 	exitResults=1
 else
-	echo "The tranSMART web site ($transmartaUrl) is running"
+	echo "The tranSMART web site ($transmartUrl) is running"
 fi
 
 exit $exitResults
