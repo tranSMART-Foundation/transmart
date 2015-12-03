@@ -16,6 +16,7 @@
 #     and it is used to give the output files of this script a different name (so that the output files for the 'fetch data' tab
 #     are not overwritten if the script is run for the 'preprocess data' tab)
 # * projection of the data: default_real_projection (= intensity values/ counts) or log_intensity (log2 of intensity values/counts). 
+
 #
 # Output: 
 # * 1 boxplot image per data node, png format. Name: <phase>_box_plot_Node_<Node Identifier>.png. 
@@ -51,7 +52,7 @@ main <- function(phase = NA, projection = NA)
   write_summary_stats(summary_stats_json)
   produce_boxplot(data_measurements, phase, projection)
   return(list(messages = "Finished successfully")) 
-  }  
+}  
   
 #check if provided variables and phase info are in line with expected input as described at top of this script
 check_input <- function(datasets, phase_info, projection)
@@ -99,6 +100,7 @@ check_input <- function(datasets, phase_info, projection)
   
   
 }
+
 
 
 # Extract the measurement values from the data.frames.
