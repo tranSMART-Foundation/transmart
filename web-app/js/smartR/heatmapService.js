@@ -170,21 +170,22 @@ HeatmapService = (function(smartRHeatmap){
         startScriptExecution({
             taskType: 'fetchData',
             arguments: _args,
-            onUltimateSuccess: function (data) { service.getSummary(); },
+            onUltimateSuccess: function (data) { service.getSummary('fetch'); },
             phase: 'fetch',
             progressMessage: 'Fetching data',
             successMessage: 'Data is successfully fetched in . Proceed with Run Heatmap',
         });
     };
 
-    service.getSummary = function () {
+    service.getSummary = function (phase) {
         console.log('About to get load data summary');
 
         function getSummary_onUltimateSuccess(data) {
             var div = _divForPhase(this.phase);
             div.empty();
             service.lastFetchedLabels.forEach(function(label) {
-                var filename = urlForFile(this.executionId, 'box_plot_node' + label + '.png');
+                var filename = urlForFile(this.executionId,
+                    this.phase + '_box_plot_node_' + label + '.png');
                 var plot = jQuery('<img>').attr('src', filename);
                 div.append(plot);
             }.bind(this));
@@ -193,10 +194,17 @@ HeatmapService = (function(smartRHeatmap){
                 service.lastFetchedLabels.map(function (label) {
                     return downloadJsonFile(
                         this.executionId,
-                        'summary_stats_node' + label + '.json');
+                        this.phase + '_summary_stats_node_' + label + '.json');
                 }.bind(this))
             ).done(function() {
-                Array.prototype.forEach.call(arguments, function(ajaxCbArgs) {
+                var _args = arguments;
+                // if there is only one request, each element of arguments will be
+                // not a 3-element array (where the data is the 1st), but each
+                // of the items of the (single) 3-element array.
+                if (_args[1] === 'success') {
+                    _args = [_args];
+                }
+                Array.prototype.forEach.call(_args, function(ajaxCbArgs) {
                     var data = ajaxCbArgs[0];
                     var _summaryObj = service.generateSummaryTable(data);
                     div.append(_summaryObj);
@@ -207,9 +215,9 @@ HeatmapService = (function(smartRHeatmap){
 
         startScriptExecution({
             taskType: 'summary',
-            arguments: {},
+            arguments: { phase: phase },
             onUltimateSuccess: getSummary_onUltimateSuccess,
-            phase: 'fetch',
+            phase: phase,
             progressMessage: 'Getting summary',
             successMessage: undefined,
         });
@@ -225,7 +233,7 @@ HeatmapService = (function(smartRHeatmap){
         startScriptExecution({
             taskType: 'preprocess',
             arguments: params,
-            onUltimateSuccess: function (data, taskData) { service.getSummary(); },
+            onUltimateSuccess: function (data, taskData) { service.getSummary('preprocess'); },
             phase: 'preprocess',
             progressMessage: 'Preprocessing'
         });
@@ -234,32 +242,18 @@ HeatmapService = (function(smartRHeatmap){
     service.runAnalysis = function (params) {
         console.log('service.runAnalysis', params);
 
-        function showD3HeatMap(data, taskData) {
-            downloadJsonFile(taskData.executionId, 'heatmap.json')
-                    .then(smartRHeatmap.create(d));
+        function showD3HeatMap(data) {
+            downloadJsonFile(this.executionId, 'heatmap.json')
+                    .then(function(d) { smartRHeatmap.create(d); });
         }
 
         startScriptExecution({
-            taskType: 'runHeatmap',
+            taskType: 'run',
             arguments: params,
             onUltimateSuccess: showD3HeatMap,
             phase: 'run',
             progressMessage: 'Calculating',
             successMessage: undefined,
-        });
-
-        jQuery.ajax({
-            type: 'POST',
-            url: pageInfo.basePath + '/ScriptExecution/run',
-            data: JSON.stringify({
-                    sessionId : GLOBAL.HeimAnalyses.sessionId,
-                    arguments : params,
-                    taskType : 'run'}
-            ),
-            contentType: 'application/json',
-            complete: function(data) {
-                GLOBAL.HeimAnalyses.executionId = scriptExecObj.executionId;
-            }
         });
     };
 

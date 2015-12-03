@@ -86,9 +86,11 @@ check_input <- function(datasets, phase_info)
   {
     messages <- c(messages, "Incorrect value for phase parameter - expected input: either \'fetch\' or \'preprocess\'")
   }
+
+  correctInput <- T
   if(length(messages) > 0)
   {
-    correctInput = F
+    correctInput <- F
   }
   return(list(correctInput = correctInput, msgs = messages))
 }
