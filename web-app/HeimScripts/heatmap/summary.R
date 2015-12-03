@@ -4,13 +4,15 @@
 # Expected input: 
 # * variable "loaded_variables" - a list of data.frames, containing one or more data.frames. Present in the environment.
 #   Data for multiple high dimensional nodes can be provided. 
+        # or variable "preprocessed" - a list containing one single data.frame with the preprocessed data. It contains all the preprocessd data from the different nodes merged into a single data.frame
+
 #   Per high dimensional node 1 or 2 dataframes are to be passed on, depending on whether 1 or 2 patient subsets are created. 
 #   Descriptive names (labels) are given to the data.frames so that it can be recognized which data.frame was derived from which data node
 #   PROPOSED FORMAT: some unique identifier for the node (numerical identifier appended behind the letter "n") followed by _s1 or _s2 depending on subset, e.g. n0_s1, n0_s2, n1_s1, n1_s2. (actually, subset number can be anything, as long as it is numerical)
 #         (RIGHT NOW THE UNDERSCORE IS USED FOR SPLITTING THE TWO, SO IF UNDERSCORES ARE USED IN THE NODE IDENTIFIER ,THIS SHOULD BE CHANGED)
 #   The data.frames (coming from high dimensional nodes) have columns: Row.Label, Bio.marker (optional), ASSAY_0001, ASSAY_0002 ...  
 #     ** right now this is only implemented for high dimensional data nodes, later the functionality might be extended for clinical data. In that case it is possible to recognize if it is high or low dim data based on the column names of the data.frame (assuming low dim data will also be passed on in the form of data.frames)
-# * phase parameter. This parameter specifies whether the script is run for the 'fetch data' or 'preprocess data' tab,
+# * phase parameter. Expected argument: "fetch" or "preprocess".  This parameter specifies whether the script is run for the 'fetch data' or 'preprocess data' tab,
 #     and it is used to give the output files of this script a different name (so that the output files for the 'fetch data' tab
 #     are not overwritten if the script is run for the 'preprocess data' tab)
 #
@@ -29,14 +31,25 @@
 library(jsonlite)
 library(gplots)
 
-main <- function(phase = NULL)
+
+main <- function(phase = NA)
 {
-  check_input(loaded_variables, phase)
-  data_measurements <- extract_measurements(loaded_variables)
-    summary_stats_json <- produce_summary_stats(data_measurements, phase)
-    write_summary_stats(summary_stats_json)
-    produce_boxplot(data_measurements, phase)
-  return(list(summary_stats = "Finished")) #right now a non-empty list is expected as a return.
+  
+  
+  if(exists("preprocessed"))
+  {
+    input_data <- list("preprocessed" = preprocessed)
+  }else
+  {
+    input_data <- loaded_variables
+  }
+  
+  check_input(input_data, phase)
+  data_measurements <- extract_measurements(input_data)
+  summary_stats_json <- produce_summary_stats(data_measurements, phase)
+  write_summary_stats(summary_stats_json)
+  produce_boxplot(data_measurements, phase)
+  return(list(messages = "Finished successfully")) 
   }  
   
 #check if provided variables and phase info are in line with expected input as described at top of this script
@@ -54,15 +67,23 @@ check_input <- function(datasets, phase_info)
   dataset_names <- names(datasets)
   expected_format_names <- "^n[[:digit:]]+_s[[:digit:]]+$"
   names_in_correct_format <- grepl(expected_format_names, dataset_names)
-  if(any(!names_in_correct_format))
+  if(any(!names_in_correct_format & dataset_names !=  "preprocessed"))
   {
     stop(paste("One or more labels of the datasets do not have the expected format.", 
-               "\nExpected format: an unique numerical identifier for the node appended behind the letter \"n\",\nfollowed by an underscore and an unique numerical identifier for the subset appended behind an \"s\",",
+               "\nExpected format: either the label should be \'preprocessed\' or it should be an unique numerical identifier for the node appended behind the letter \n\',",
+               "\nfollowed by an underscore and an unique numerical identifier for the subset appended behind an \'s\',",
                "\ne.g. n0_s1, n0_s2, n1_s1, n1_s2. "))
   }
-  if(is.null(phase_info))
+  
+  
+  if(is.na(phase_info))
   {
     stop("supply phase parameter to function \'main()\'")
+  }
+  
+  if(phase_info != "fetch" & phase_info != "preprocess" & !is.na(phase_info))
+  {
+    stop("Incorrect value for phase parameter - expected input: either \'fetch\' or \'preprocess\'")
   }
 }
 
