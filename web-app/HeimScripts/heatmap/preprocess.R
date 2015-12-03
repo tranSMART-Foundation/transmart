@@ -15,7 +15,10 @@ main <- function(aggregate=FALSE){
   else if(aggregate && !good.input){
     msgs <- c("Incorrect subset - in order to perform probe aggregation more than one samples are needed.")
   }else{
-    msgs <- c("No preprocessing option selected.")
+    msgs <- c("No preprocessing applied.")
+    if(exists("preprocessed")){
+      remove(preprocessed)
+    }
   }
   list(finished=T,messages=msgs)
 }
