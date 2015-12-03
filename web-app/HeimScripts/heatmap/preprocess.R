@@ -13,7 +13,7 @@ main <- function(aggregate=FALSE){
     msgs <- paste("Total discarded rows:",discarded.rows)
   }
   else if(aggregate && !good.input){
-    msgs <- c("Incorrect subset - in order to perform probe aggregation more than one samples are needed.")
+    stop("Incorrect subset - in order to perform probe aggregation more than one samples are needed.")
   }else{
     msgs <- c("No preprocessing applied.")
     if(exists("preprocessed")){
