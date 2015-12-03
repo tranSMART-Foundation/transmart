@@ -17,7 +17,7 @@ main <- function(aggregate=FALSE){
   }else{
     msgs <- c("No preprocessing applied.")
     if(exists("preprocessed")){
-      remove(preprocessed)
+      remove(preprocessed, pos = ".GlobalEnv")
     }
   }
   list(finished=T,messages=msgs)
