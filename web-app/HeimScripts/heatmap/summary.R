@@ -12,7 +12,7 @@
 #     ** right now this is only implemented for high dimensional data nodes, later the functionality might be extended for clinical data. In that case it is possible to recognize if it is high or low dim data based on the column names of the data.frame (assuming low dim data will also be passed on in the form of data.frames)
 # * phase parameter. This parameter specifies whether the script is run for the 'fetch data' or 'preprocess data' tab,
 #     and it is used to give the output files of this script a different name (so that the output files for the 'fetch data' tab
-#     are not overwritten if the script is run for the 'preprocess data' tab). Expected argument: "fetch" or "preprocess"
+#     are not overwritten if the script is run for the 'preprocess data' tab)
 #
 # Output: 
 # * 1 boxplot image per data node, png format. Name: <phase>_box_plot_Node_<Node Identifier>.png. 
@@ -29,43 +29,26 @@
 library(jsonlite)
 library(gplots)
 
-main <- function(phase = NA)
+main <- function(phase = NULL)
 {
-  msgs <- c()
-  
-  check_input_result <- check_input(loaded_variables, phase)
-  msgs <- c(msgs, check_input_result$msgs) 
-  correct_input <- check_input_result$correctInput
-  
-  if(correct_input)
-  {
-    extract_measurements_result <- extract_measurements(loaded_variables)
-    data_measurements <- extract_measurements_result$datasets
-    msgs <- c(msgs, extract_measurements_result$msgs)
-    
+  check_input(loaded_variables, phase)
+  data_measurements <- extract_measurements(loaded_variables)
     summary_stats_json <- produce_summary_stats(data_measurements, phase)
     write_summary_stats(summary_stats_json)
-    
-  produce_boxplot(data_measurements, phase)
-    
-    if(length(msgs) == 0) { msgs <- "Finished successfuly"} 
-}
-
-  return(list(messages = msgs))
-}
-
+    produce_boxplot(data_measurements, phase)
+  return(list(summary_stats = "Finished")) #right now a non-empty list is expected as a return.
+  }  
+  
 #check if provided variables and phase info are in line with expected input as described at top of this script
 check_input <- function(datasets, phase_info)
 {
-  messages <- c()
-  
   #expected input: list of data.frames
   items_list <- sapply(datasets, class)
   if(class(datasets) != "list" | !all(items_list == "data.frame")) #for a data.frame is.list() also returns TRUE. Class returns "data.frame" in that case
   { 
-    messages <- c(messages, "Unexpected input. Expected input: a list, containing one or more data.frames")
+    stop("Unexpected input. Expected input: a list, containing one or more data.frames")
   }
-
+   
   # all items in the list are expected to have some unique identifier for the node (numerical identifier appended behind the letter "n") 
   # followed an underscore and a subset identifier s1 or s2 depending on subset, e.g. n0_s1, n0_s2, n1_s1, n1_s2. 
   dataset_names <- names(datasets)
@@ -73,25 +56,14 @@ check_input <- function(datasets, phase_info)
   names_in_correct_format <- grepl(expected_format_names, dataset_names)
   if(any(!names_in_correct_format))
   {
-    messages <- c(messages, (paste("One or more labels of the datasets do not have the expected format.", 
-               "Expected format: an unique numerical identifier for the node appended behind the letter \'n\',followed by an underscore and an unique numerical identifier for the subset appended behind an \'s\',",
-               "e.g. n0_s1, n0_s2, n1_s1, n1_s2.")))
+    stop(paste("One or more labels of the datasets do not have the expected format.", 
+               "\nExpected format: an unique numerical identifier for the node appended behind the letter \"n\",\nfollowed by an underscore and an unique numerical identifier for the subset appended behind an \"s\",",
+               "\ne.g. n0_s1, n0_s2, n1_s1, n1_s2. "))
   }
-  if(is.na(phase_info))
+  if(is.null(phase_info))
   {
-    messages <- c(messages, "Supply phase parameter to function \'main()\'")
+    stop("supply phase parameter to function \'main()\'")
   }
-  if(phase_info != "fetch" & phase_info != "preprocess" & !is.na(phase_info))
-  {
-    messages <- c(messages, "Incorrect value for phase parameter - expected input: either \'fetch\' or \'preprocess\'")
-  }
-
-  correctInput <- T
-  if(length(messages) > 0)
-  {
-    correctInput <- F
-  }
-  return(list(correctInput = correctInput, msgs = messages))
 }
 
 
@@ -100,7 +72,6 @@ check_input <- function(datasets, phase_info)
 #  All columns except Row.Label and Bio.marker contain the measurement values.
 extract_measurements <- function(datasets)
 {  
-  messages <- c()
   for(i in 1:length(datasets))
   {
     dataset <- datasets[[i]]
@@ -125,18 +96,13 @@ extract_measurements <- function(datasets)
       datasets[[i]] <- dataset[ , -non_measurement_columns, drop = F]
       if(!all(sapply(dataset[ ,-non_measurement_columns, drop = F], FUN = class) == "numeric"))
       {
-        messages <- c(messages, paste("Correct extraction of data columns was not possible for dataset ",dataset_id, 
+        stop(paste("Correct extraction of data columns was not possible for dataset ",dataset_id, 
                    ". It seems that, aside from the Row.Label and Bio.marker column, there are one or more non numeric data columns in the data.frame.", sep = ""))
-        datasets[[i]] <- "Remove"
       }
     }
   }
-  if(any(datasets == "Remove")) #remove datasets only here, as counter is used in for loop and removal of items from the list during the for loop results in mismatches
-  {
-    datasets[which(datasets == "Remove")] <- NULL
-  }
   
-  return(list(datasets = datasets, msgs = messages))  
+  return(datasets) 
 }
 
 

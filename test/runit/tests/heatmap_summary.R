@@ -19,63 +19,59 @@ test_data_measurements <- list("n0_s1" = test_set_measurements)
 
 #test if function works if data has a "Row.Label" and a "Bio.marker" column
 test.extract_measurements.simplecase1 <- function(){  
-  checkEquals(list(datasets = test_data_measurements, msgs = c()), extract_measurements(test_data))
+  checkEquals(test_data_measurements, extract_measurements(test_data))
 }
 
 #test if it works if data has "Row.Label" column but no "Bio.marker" column
 test.extract_measurements.simplecase2 <- function(){  
   test_data_tmp <- list("n0_s1" = test_set[ , c("Row.Label", "GSM210004", "GSM210005", "GSM210006", "GSM210007")])
-  checkEquals(list(datasets = test_data_measurements, msgs = c()), extract_measurements(test_data_tmp))
+  checkEquals(test_data_measurements, extract_measurements(test_data_tmp))
 }
 
 #should return a list with a missing value if the data has no "Row.Label" column
 test.extract_measurements.no.Row.Label <- function(){   
   tmp <- test_data
   colnames(tmp[[1]])[1] <- "No.Row.Label"
-  checkEquals(list(datasets = list("n0_s1"= NA), msgs = c()), extract_measurements(tmp))
+  checkEquals(list("n0_s1"= NA), extract_measurements(tmp))
 }
 
 
-# function should return a message indicating something went wrong if the dataframe has non-numeric columns in addition to "Row.Label" and "Bio.marker",
-# and for this specific dataset no data.frame should be returned (the data.frame and label are completely removed from the list, so that this will also not be used by produce_summary_stats, and produce_boxplot)
+# function should return error if the dataframe has non-numeric columns in addition to "Row.Label" and "Bio.marker"
 test.extract_measurements.nonNumeric <- function(){
-  tmp <- list("n0_s1" = cbind(test_set, nonNumericCol = letters[1:5], stringsAsFactors = F), "n0_s2" = test_set)
-  result <- extract_measurements(tmp)
-  
-  checkTrue(result$msgs == "Correct extraction of data columns was not possible for dataset n0_s1. It seems that, aside from the Row.Label and Bio.marker column, there are one or more non numeric data columns in the data.frame.")
-  checkEquals(list("n0_s2" = test_set_measurements), result$datasets)
+  tmp <- list("n0_s1" = cbind(test_set, nonNumericCol = letters[1:5], stringsAsFactors = F))
+  checkException(extract_measurements(tmp))
 }
 
 #should work if data for multiple nodes is provided
 test.extract_measurements.multiplenodes <- function(){
   test_data_multiple_nodes <- list("n0_s1" = test_set, "n1_s1" = test_set2, "n2_s1"= test_set)
   test_data_measurements_multiple_nodes <- list("n0_s1" = test_set_measurements,"n1_s1" = test_set2_measurements, "n2_s1" = test_set_measurements )
-  checkEquals(list(datasets = test_data_measurements_multiple_nodes, msgs = c()), extract_measurements(test_data_multiple_nodes))
+  checkEquals(test_data_measurements_multiple_nodes, extract_measurements(test_data_multiple_nodes))
 }
 
 #should work if data for multiple subsets is provided
 test.extract_measurements.multiplesubsets <- function(){
   test_data_multiple_subsets <- list("n0_s1" = test_set2, "n0_s2" = test_set, "n1_s1"= test_set)
   test_data_measurements_multiple_subsets <- list("n0_s1" = test_set2_measurements,"n0_s2" = test_set_measurements, "n1_s1" = test_set_measurements )
-  checkEquals(list(datasets = test_data_measurements_multiple_subsets, msgs = c()), extract_measurements(test_data_multiple_subsets))
+  checkEquals(test_data_measurements_multiple_subsets, extract_measurements(test_data_multiple_subsets))
 }
 
 
 #what if number of samples = 1 or number of genes = 1?
 test.extract_measurements.1sample <- function(){
   test_data_one_sample <- list("n0_s1" = test_set[,c("Row.Label", "Bio.marker", "GSM210004")])
-  checkEquals(list(datasets = list("n0_s1" = test_set[,c("GSM210004"), drop = F]), msgs = c()), extract_measurements(test_data_one_sample))
+  checkEquals(list("n0_s1" = test_set[,c("GSM210004"), drop = F]), extract_measurements(test_data_one_sample))
 }
 
 test.extract_measurements.1probe <- function(){
   test_data_one_probe <- list("n0_s1" = test_set[1,])
-  checkEquals(list(datasets = list("n0_s1" = test_set[1,c("GSM210004", "GSM210005", "GSM210006", "GSM210007")]), msgs = c()), extract_measurements(test_data_one_probe))
+  checkEquals(list("n0_s1" = test_set[1,c("GSM210004", "GSM210005", "GSM210006", "GSM210007")]), extract_measurements(test_data_one_probe))
 }
 
 #1 probe, 1 sample
 test.extract_measurements.1sample1probe <- function(){
   test_data_one_probe_sample <- list("n0_s1" = test_set[1,c("Row.Label", "Bio.marker", "GSM210004")])
-  checkEquals(list(datasets = list("n0_s1" = test_set[1,c("GSM210004"), drop = F]), msgs = c()), extract_measurements(test_data_one_probe_sample))
+  checkEquals(list("n0_s1" = test_set[1,c("GSM210004"), drop = F]), extract_measurements(test_data_one_probe_sample))
 }
 
 ### unit tests for function produce_summary_stats ###
