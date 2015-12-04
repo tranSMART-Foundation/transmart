@@ -6,6 +6,7 @@
 
 HeatmapService = (function(smartRHeatmap){
     var CHECK_DELAY = 1000;
+    var PROJECTION = 'log_intensity';
     var NOOP_ABORT = function() {};
 
     var service = {
@@ -52,7 +53,7 @@ HeatmapService = (function(smartRHeatmap){
         var _retval = {
             conceptKeys : _generateLabels(params.conceptPaths.split(/\|/)),
             resultInstanceIds: params.resultInstanceIds,
-            projection: 'log_intensity'
+            projection: PROJECTION
         };
         if (params['searchKeywordIds'].length > 0) {
             _retval.dataConstraints = {
@@ -102,8 +103,6 @@ HeatmapService = (function(smartRHeatmap){
      *   successMessage: (string)
      * }
      */
-
-    var _currentTaskData;
 
     var _divForPhase = function(phase) {
         return jQuery('#heim-' + phase + '-output');
@@ -213,9 +212,14 @@ HeatmapService = (function(smartRHeatmap){
             });
         }
 
+        var args = {
+            phase: phase,
+            projection: PROJECTION
+        };
+
         startScriptExecution({
             taskType: 'summary',
-            arguments: { phase: phase },
+            arguments: args,
             onUltimateSuccess: getSummary_onUltimateSuccess,
             phase: phase,
             progressMessage: 'Getting summary',
