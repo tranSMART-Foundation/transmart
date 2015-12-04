@@ -64,7 +64,8 @@
                 %{--Low dimension dropzone (numerical)--}%
                 <div class="heim-input-field heim-dropzone sr-low-input">
                     %{--Numerical node input--}%
-                    <label>Numerical (optional) <i class="ui-icon ui-icon-info" title="Select numerical data node from the Data
+                    <label>Numerical (optional) <i class="ui-icon ui-icon-info"
+                                                   title="Select numerical data node from the Data
                             Set Explorer Tree and drag it into the box.">
                     </i></label>
                     <br><br>
@@ -140,8 +141,8 @@
 
             %{--Number of max row to display--}%
             <div class="heim-input-field heim-input-number">
-                <label>Number of max row to display</label>
-                <input type="text" id="txtMaxRow" value="100">
+                <label>Max row to display</label>
+                <input type="text" id="txtMaxRow" value="100"> rows (< 1000 is preferable).
             </div>
 
 
