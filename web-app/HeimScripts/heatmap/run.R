@@ -34,9 +34,9 @@ main <- function(max_rows=100){
   df <- df[1:min(max_rows,nrow(df)),]
   fields <- buildFields(df)
   extraFields <- buildExtraFields(fields)
-  geneSymbols <- unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector, otherwise we get a dataframe
+  geneSymbols <- df[,2]#unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector, otherwise we get a dataframe
   patientIDs <-unique(fields["PATIENTID"])[,1]
-  probes <- unique(fields["PROBE"])[,1]
+  probes <- df[,1]#unique(fields["PROBE"])[,1]
   significanceValues <- unique(fields["SIGNIFICANCE"])[,1]
   features <- unique(extraFields["FEATURE"])[,1]
   jsn <- toJSON(list("fields"=fields, "geneSymbols"=geneSymbols,
