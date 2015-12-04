@@ -126,7 +126,13 @@ mergeFetchedData <- function(listOfHdd){
 }
 
 add.subset.label <- function(df,label){
-  sample.names <- colnames(df[,3:ncol(df)])
+  sample.names <- c("")
+  if(ncol(df) == 3 ){
+    sample.names <- colnames(df)[3] # R returns NA instead of column name for colnames(df[,3:ncol(df)])
+  }else{
+  measurements <- df[,3:ncol(df)]
+  sample.names <- colnames(measurements)
+  }
   for(sample.name in sample.names){
     new.name <- paste(sample.name,label,sep="_")
     colnames(df)[colnames(df)==sample.name] <- new.name
