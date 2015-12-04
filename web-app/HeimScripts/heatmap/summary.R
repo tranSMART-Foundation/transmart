@@ -28,7 +28,6 @@
 
 library(jsonlite)
 library(gplots)
-library(stringr)
 
 main <- function(phase = NA)
 {
@@ -215,9 +214,6 @@ write_summary_stats <- function(summary_stats)
   }
 }
 
-quote_regex_meta <- function(string) {
-  str_replace_all(string, "(\\W)", "\\\\\\1")
-}
 
 # Function that outputs one box plot image per data node
 produce_boxplot <- function(measurement_tables, phase)
@@ -242,9 +238,7 @@ produce_boxplot <- function(measurement_tables, phase)
   for(node in nodes)
   {
     # grab the data.frames corresponding to the selected node
-    identifiers_single_node <- grep(
-        paste("^", quote_regex_meta(node), sep = ""),
-        names(measurement_vectors), value = T, perl = TRUE)
+    identifiers_single_node <- grep(paste("^",node, sep = ""), names(measurement_vectors), value = T )
     single_node_data <- measurement_vectors[identifiers_single_node]
     
     #remove node prefix from the names (labels) of the data.frame 
