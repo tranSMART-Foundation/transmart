@@ -191,4 +191,24 @@ class SessionServiceTests {
             assertThat interrupted.get(), is(true)
         }
     }
+
+    @Test
+    void testUnsuccessfulNotThrowingTaskIsMarkedFailed() {
+        User user = mock(User)
+
+        play {
+            def sessionUUID = testee.createSession(user, TEST_JOB_TYPE)
+            def taskUUID = testee.createTask(sessionUUID, TEST_JOB_TYPE, closure: {
+                new TaskResult(
+                        successful: false,
+                        artifacts: ImmutableMap.of(),)
+            }, monitor: new Object())
+
+            assertThat taskUUID, isA(UUID)
+
+            def taskData = testee.getTaskData(sessionUUID, taskUUID, true)
+            assertThat taskData, allOf(
+                    hasEntry(is('state'), is(TaskState.FAILED)))
+        }
+    }
 }
