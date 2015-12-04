@@ -179,10 +179,18 @@ HeatmapService = (function(smartRHeatmap){
     service.getSummary = function (phase) {
         console.log('About to get load data summary');
 
+        var fileSuffixes;
+
+        if (phase === 'preprocess') {
+            fileSuffixes = ['preprocessed'];
+        } else {
+            fileSuffixes = service.lastFetchedLabels;
+        }
+
         function getSummary_onUltimateSuccess(data) {
             var div = _divForPhase(this.phase);
             div.empty();
-            service.lastFetchedLabels.forEach(function(label) {
+            fileSuffixes.forEach(function(label) {
                 var filename = urlForFile(this.executionId,
                     this.phase + '_box_plot_node_' + label + '.png');
                 var plot = jQuery('<img>').attr('src', filename);
@@ -190,7 +198,7 @@ HeatmapService = (function(smartRHeatmap){
             }.bind(this));
         
             jQuery.when.apply(jQuery,
-                service.lastFetchedLabels.map(function (label) {
+                fileSuffixes.map(function (label) {
                     return downloadJsonFile(
                         this.executionId,
                         this.phase + '_summary_stats_node_' + label + '.json');
