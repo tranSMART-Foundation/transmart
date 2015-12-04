@@ -4,15 +4,18 @@
 # Expected input: 
 # * variable "loaded_variables" - a list of data.frames, containing one or more data.frames. Present in the environment.
 #   Data for multiple high dimensional nodes can be provided. 
+        # or variable "preprocessed" - a list containing one single data.frame with the preprocessed data. It contains all the preprocessd data from the different nodes merged into a single data.frame
+
 #   Per high dimensional node 1 or 2 dataframes are to be passed on, depending on whether 1 or 2 patient subsets are created. 
 #   Descriptive names (labels) are given to the data.frames so that it can be recognized which data.frame was derived from which data node
 #   PROPOSED FORMAT: some unique identifier for the node (numerical identifier appended behind the letter "n") followed by _s1 or _s2 depending on subset, e.g. n0_s1, n0_s2, n1_s1, n1_s2. (actually, subset number can be anything, as long as it is numerical)
 #         (RIGHT NOW THE UNDERSCORE IS USED FOR SPLITTING THE TWO, SO IF UNDERSCORES ARE USED IN THE NODE IDENTIFIER ,THIS SHOULD BE CHANGED)
 #   The data.frames (coming from high dimensional nodes) have columns: Row.Label, Bio.marker (optional), ASSAY_0001, ASSAY_0002 ...  
 #     ** right now this is only implemented for high dimensional data nodes, later the functionality might be extended for clinical data. In that case it is possible to recognize if it is high or low dim data based on the column names of the data.frame (assuming low dim data will also be passed on in the form of data.frames)
-# * phase parameter. This parameter specifies whether the script is run for the 'fetch data' or 'preprocess data' tab,
+# * phase parameter. Expected argument: "fetch" or "preprocess".  This parameter specifies whether the script is run for the 'fetch data' or 'preprocess data' tab,
 #     and it is used to give the output files of this script a different name (so that the output files for the 'fetch data' tab
-#     are not overwritten if the script is run for the 'preprocess data' tab). Expected argument: "fetch" or "preprocess"
+#     are not overwritten if the script is run for the 'preprocess data' tab)
+# * projection of the data: default_real_projection (= intensity values/ counts) or log_intensity (log2 of intensity values/counts). 
 #
 # Output: 
 # * 1 boxplot image per data node, png format. Name: <phase>_box_plot_Node_<Node Identifier>.png. 
@@ -28,71 +31,73 @@
 
 library(jsonlite)
 library(gplots)
-library(stringr)
 
-main <- function(phase = NA)
+
+main <- function(phase = NA, projection = NA)
 {
-  msgs <- c()
   
-  check_input_result <- check_input(loaded_variables, phase)
-  msgs <- c(msgs, check_input_result$msgs) 
-  correct_input <- check_input_result$correctInput
   
-  if(correct_input)
+  if(exists("preprocessed"))
   {
-    extract_measurements_result <- extract_measurements(loaded_variables)
-    data_measurements <- extract_measurements_result$datasets
-    msgs <- c(msgs, extract_measurements_result$msgs)
-    
-    summary_stats_json <- produce_summary_stats(data_measurements, phase)
-    write_summary_stats(summary_stats_json)
-    
-  produce_boxplot(data_measurements, phase)
-    
-    if(length(msgs) == 0) { msgs <- "Finished successfuly"} 
-}
-
-  return(list(messages = msgs))
-}
-
-#check if provided variables and phase info are in line with expected input as described at top of this script
-check_input <- function(datasets, phase_info)
-{
-  messages <- c()
+    input_data <- list("preprocessed" = preprocessed)
+  }else
+  {
+    input_data <- loaded_variables
+  }
   
+  check_input(input_data, phase, projection)
+  data_measurements <- extract_measurements(input_data)
+  summary_stats_json <- produce_summary_stats(data_measurements, phase)
+  write_summary_stats(summary_stats_json)
+  produce_boxplot(data_measurements, phase, projection)
+  return(list(messages = "Finished successfully")) 
+  }  
+  
+#check if provided variables and phase info are in line with expected input as described at top of this script
+check_input <- function(datasets, phase_info, projection)
+{
   #expected input: list of data.frames
   items_list <- sapply(datasets, class)
   if(class(datasets) != "list" | !all(items_list == "data.frame")) #for a data.frame is.list() also returns TRUE. Class returns "data.frame" in that case
   { 
-    messages <- c(messages, "Unexpected input. Expected input: a list, containing one or more data.frames")
+    stop("Unexpected input. Expected input: a list, containing one or more data.frames")
   }
-
+   
   # all items in the list are expected to have some unique identifier for the node (numerical identifier appended behind the letter "n") 
   # followed an underscore and a subset identifier s1 or s2 depending on subset, e.g. n0_s1, n0_s2, n1_s1, n1_s2. 
   dataset_names <- names(datasets)
   expected_format_names <- "^n[[:digit:]]+_s[[:digit:]]+$"
   names_in_correct_format <- grepl(expected_format_names, dataset_names)
-  if(any(!names_in_correct_format))
+  if(any(!names_in_correct_format & dataset_names !=  "preprocessed"))
   {
-    messages <- c(messages, (paste("One or more labels of the datasets do not have the expected format.", 
-               "Expected format: an unique numerical identifier for the node appended behind the letter \'n\',followed by an underscore and an unique numerical identifier for the subset appended behind an \'s\',",
-               "e.g. n0_s1, n0_s2, n1_s1, n1_s2.")))
+    stop(paste("One or more labels of the datasets do not have the expected format.", 
+               "\nExpected format: either the label should be \'preprocessed\' or it should be an unique numerical identifier for the node appended behind the letter \n\',",
+               "\nfollowed by an underscore and an unique numerical identifier for the subset appended behind an \'s\',",
+               "\ne.g. n0_s1, n0_s2, n1_s1, n1_s2. "))
   }
+  
+  
   if(is.na(phase_info))
   {
-    messages <- c(messages, "Supply phase parameter to function \'main()\'")
+    stop("Supply phase parameter to function \'main()\'. Expected input: \'fetch\' or \'preprocess\'")
   }
+  
   if(phase_info != "fetch" & phase_info != "preprocess" & !is.na(phase_info))
   {
-    messages <- c(messages, "Incorrect value for phase parameter - expected input: either \'fetch\' or \'preprocess\'")
+    stop("Incorrect value for phase parameter - expected input: either \'fetch\' or \'preprocess\'")
   }
-
-  correctInput <- T
-  if(length(messages) > 0)
+ 
+  if(is.na(projection))
   {
-    correctInput <- F
+    stop("Supply projection parameter to function \'main()\'. Expected input:  \'default_real_projection\' or \'log_intensity\'")
   }
-  return(list(correctInput = correctInput, msgs = messages))
+  
+  if(!is.na(projection) & projection != "default_real_projection" & projection != "log_intensity")
+  {
+    stop("Incorrect value for projection parameter - expected input:  \'default_real_projection\' or \'log_intensity\'")
+  }
+  
+  
 }
 
 
@@ -101,7 +106,6 @@ check_input <- function(datasets, phase_info)
 #  All columns except Row.Label and Bio.marker contain the measurement values.
 extract_measurements <- function(datasets)
 {  
-  messages <- c()
   for(i in 1:length(datasets))
   {
     dataset <- datasets[[i]]
@@ -126,18 +130,13 @@ extract_measurements <- function(datasets)
       datasets[[i]] <- dataset[ , -non_measurement_columns, drop = F]
       if(!all(sapply(dataset[ ,-non_measurement_columns, drop = F], FUN = class) == "numeric"))
       {
-        messages <- c(messages, paste("Correct extraction of data columns was not possible for dataset ",dataset_id, 
+        stop(paste("Correct extraction of data columns was not possible for dataset ",dataset_id, 
                    ". It seems that, aside from the Row.Label and Bio.marker column, there are one or more non numeric data columns in the data.frame.", sep = ""))
-        datasets[[i]] <- "Remove"
       }
     }
   }
-  if(any(datasets == "Remove")) #remove datasets only here, as counter is used in for loop and removal of items from the list during the for loop results in mismatches
-  {
-    datasets[which(datasets == "Remove")] <- NULL
-  }
   
-  return(list(datasets = datasets, msgs = messages))  
+  return(datasets) 
 }
 
 
@@ -215,17 +214,16 @@ write_summary_stats <- function(summary_stats)
   }
 }
 
-quote_regex_meta <- function(string) {
-  str_replace_all(string, "(\\W)", "\\\\\\1")
-}
 
 # Function that outputs one box plot image per data node
-produce_boxplot <- function(measurement_tables, phase)
+produce_boxplot <- function(measurement_tables, phase, projection)
 {
   #get node and subset identifiers
   nodes <- gsub("_.*","",names(measurement_tables))
   subsets <- gsub(".*_","", names(measurement_tables))
   
+  if(projection == "default_real_projection"){ projection <- "intensity"}
+  if(projection == "log_intensity"){ projection <- "log2(intensity)"}
   
   # convert the tables to vectors for use with the boxplot function
   # this converts a data.frame to a vector containing all values from the data.frame, a vector remains a vector 
@@ -242,9 +240,7 @@ produce_boxplot <- function(measurement_tables, phase)
   for(node in nodes)
   {
     # grab the data.frames corresponding to the selected node
-    identifiers_single_node <- grep(
-        paste("^", quote_regex_meta(node), sep = ""),
-        names(measurement_vectors), value = T, perl = TRUE)
+    identifiers_single_node <- grep(paste("^",node, sep = ""), names(measurement_vectors), value = T )
     single_node_data <- measurement_vectors[identifiers_single_node]
     
     #remove node prefix from the names (labels) of the data.frame 
@@ -260,7 +256,9 @@ produce_boxplot <- function(measurement_tables, phase)
     # in case there is data present: create box plot
     if(!all(is.na(single_node_data)))
     {
-      boxplot_results_all_nodes[[fileName]] <- boxplot(single_node_data, col = "grey", ylab = "Value", outline = F, pch = 20, cex=0.2)
+      plot_title <- paste("Box plot node", node)
+      boxplot_results_all_nodes[[fileName]] <- boxplot(single_node_data, col = "grey", show.names = T, ylab = projection, 
+                                                       main = plot_title, outline = F, pch = 20, cex=0.2)
     }
 
     # if there are no data values: create image with text "No data points to plot"
