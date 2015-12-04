@@ -6,14 +6,14 @@ mkdir $HOME/transmart
 cd $HOME/transmart
 
 echo "++++++++++++++++++++++++++++"
-echo "+  Running the install of basic tools
+echo "+  Running the install of basic tools"
 echo "++++++++++++++++++++++++++++"
 
 . ./install01_Basics.sh
-. ./install02_TransmartData.sh
+. ./install02_TransmartDataBasics.sh
 
 echo "++++++++++++++++++++++++++++"
-echo "+  Checking the install of basic tools
+echo "+  Checking the install of basic tools"
 echo "++++++++++++++++++++++++++++"
 
 cd $checkBase
