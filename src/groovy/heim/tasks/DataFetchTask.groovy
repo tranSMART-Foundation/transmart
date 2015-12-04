@@ -254,6 +254,10 @@ class DataFetchTask extends AbstractTask {
             RUtil.runRCommand conn, commands[0]
             RUtil.runRCommand conn, commands[1] /* return value */
         }
+        String invalidatePreprocessing = "if (exists('preprocessed')) { remove(preprocessed, pos = '.GlobalEnv')}"
+        rServeSession.doWithRConnection {RConnection conn ->
+            RUtil.runRCommand(conn, invalidatePreprocessing)
+        }
         rexp.asNativeJavaObject() as List
     }
 
