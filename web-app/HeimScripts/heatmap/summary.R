@@ -17,6 +17,7 @@
 #     are not overwritten if the script is run for the 'preprocess data' tab)
 # * projection of the data: default_real_projection (= intensity values/ counts) or log_intensity (log2 of intensity values/counts). 
 
+
 #
 # Output: 
 # * 1 boxplot image per data node, png format. Name: <phase>_box_plot_Node_<Node Identifier>.png. 
@@ -95,6 +96,7 @@ check_input <- function(datasets, phase_info, projection)
   if(!is.na(projection) & projection != "default_real_projection" & projection != "log_intensity")
   {
     stop("Incorrect value for projection parameter - expected input:  \'default_real_projection\' or \'log_intensity\'")
+
   }
   
   
@@ -226,6 +228,7 @@ produce_boxplot <- function(measurement_tables, phase, projection)
   
   if(projection == "default_real_projection"){ projection <- "intensity"}
   if(projection == "log_intensity"){ projection <- "log2(intensity)"}
+
   
   # convert the tables to vectors for use with the boxplot function
   # this converts a data.frame to a vector containing all values from the data.frame, a vector remains a vector 
