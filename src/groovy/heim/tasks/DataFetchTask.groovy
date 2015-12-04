@@ -151,6 +151,8 @@ class DataFetchTask extends AbstractTask {
                     }
                 } as ThreadFactory)
 
+        clearPreviousLoadedVariables()
+
         allDatasets.each {
             Map.Entry<String, OntologyTerm> ontologyTermEntry = it[0]
             Long resultInstanceId = it[1]
@@ -200,6 +202,13 @@ class DataFetchTask extends AbstractTask {
         new TaskResult(
                 successful: true,
                 artifacts: ImmutableMap.of('currentLabels', currentLabels),)
+    }
+
+    private clearPreviousLoadedVariables() {
+        String removeStatement = "if (exists('loaded_variables')) { remove(loaded_variables, pos = '.GlobalEnv')}"
+        rServeSession.doWithRConnection { RConnection conn ->
+            RUtil.runRCommand conn, removeStatement
+        }
     }
 
     private String /* filename */ writeTabularResult(TabularResult<?, ?> tabularResult) {
