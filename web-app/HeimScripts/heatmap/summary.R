@@ -15,6 +15,7 @@
 # * phase parameter. Expected argument: "fetch" or "preprocess".  This parameter specifies whether the script is run for the 'fetch data' or 'preprocess data' tab,
 #     and it is used to give the output files of this script a different name (so that the output files for the 'fetch data' tab
 #     are not overwritten if the script is run for the 'preprocess data' tab)
+# * projection of the data: raw (= intensity values/ counts) or log2 (log2 of intensity values/counts). 
 #
 # Output: 
 # * 1 boxplot image per data node, png format. Name: <phase>_box_plot_Node_<Node Identifier>.png. 
@@ -32,7 +33,7 @@ library(jsonlite)
 library(gplots)
 
 
-main <- function(phase = NA)
+main <- function(phase = NA, projection = NA)
 {
   
   
@@ -44,16 +45,16 @@ main <- function(phase = NA)
     input_data <- loaded_variables
   }
   
-  check_input(input_data, phase)
+  check_input(input_data, phase, projection)
   data_measurements <- extract_measurements(input_data)
   summary_stats_json <- produce_summary_stats(data_measurements, phase)
   write_summary_stats(summary_stats_json)
-  produce_boxplot(data_measurements, phase)
+  produce_boxplot(data_measurements, phase, projection)
   return(list(messages = "Finished successfully")) 
   }  
   
 #check if provided variables and phase info are in line with expected input as described at top of this script
-check_input <- function(datasets, phase_info)
+check_input <- function(datasets, phase_info, projection)
 {
   #expected input: list of data.frames
   items_list <- sapply(datasets, class)
@@ -78,13 +79,25 @@ check_input <- function(datasets, phase_info)
   
   if(is.na(phase_info))
   {
-    stop("supply phase parameter to function \'main()\'")
+    stop("Supply phase parameter to function \'main()\'. Expected input: \'fetch\' or \'preprocess\'")
   }
   
   if(phase_info != "fetch" & phase_info != "preprocess" & !is.na(phase_info))
   {
     stop("Incorrect value for phase parameter - expected input: either \'fetch\' or \'preprocess\'")
   }
+ 
+  if(is.na(projection))
+  {
+    stop("Supply projection parameter to function \'main()\'. Expected input:  \'raw\' or \'log2\'")
+  }
+  
+  if(!is.na(projection) & projection != "raw" & projection != "log2")
+  {
+    stop("Incorrect value for projection parameter - expected input:  \'raw\' or \'log2\'")
+  }
+  
+  
 }
 
 
@@ -203,12 +216,14 @@ write_summary_stats <- function(summary_stats)
 
 
 # Function that outputs one box plot image per data node
-produce_boxplot <- function(measurement_tables, phase)
+produce_boxplot <- function(measurement_tables, phase, projection)
 {
   #get node and subset identifiers
   nodes <- gsub("_.*","",names(measurement_tables))
   subsets <- gsub(".*_","", names(measurement_tables))
   
+  if(projection == "raw"){ projection <- "intensity"}
+  if(projection == "log2"){ projection <- "log2(intensity)"}
   
   # convert the tables to vectors for use with the boxplot function
   # this converts a data.frame to a vector containing all values from the data.frame, a vector remains a vector 
@@ -241,7 +256,9 @@ produce_boxplot <- function(measurement_tables, phase)
     # in case there is data present: create box plot
     if(!all(is.na(single_node_data)))
     {
-      boxplot_results_all_nodes[[fileName]] <- boxplot(single_node_data, col = "grey", ylab = "Value", outline = F, pch = 20, cex=0.2)
+      plot_title <- paste("Box plot node", node)
+      boxplot_results_all_nodes[[fileName]] <- boxplot(single_node_data, col = "grey", show.names = T, ylab = projection, 
+                                                       main = plot_title, outline = F, pch = 20, cex=0.2)
     }
 
     # if there are no data values: create image with text "No data points to plot"

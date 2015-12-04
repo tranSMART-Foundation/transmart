@@ -77,7 +77,7 @@ test.extract_measurements.1sample1probe <- function(){
 ### unit tests for function produce_summary_stats ###
 # input is numeric, as output extract_measurements is numeric
 
-phase <- "test"
+phase <- "fetch"
 
 #summary stats corresponding to test_set
 summary_stats_table <- data.frame(
@@ -103,7 +103,7 @@ summary_stats_table2[ ,c("min", "max", "mean", "q1", "median", "q3")] <- summary
 
 # 1 node, 1 subset
 test.produce_summary_stats.simplecase <- function(){  
-  checkEquals(list("test_summary_stats_node_n0.json" = summary_stats_table), produce_summary_stats(test_data_measurements, phase))
+  checkEquals(list("fetch_summary_stats_node_n0.json" = summary_stats_table), produce_summary_stats(test_data_measurements, phase))
 }
 
 #multiple nodes, multiple subsets
@@ -117,7 +117,7 @@ test.produce_summary_stats.multiplenodesandsubsets <- function(){
   expected_result_n1[1 , c("variableLabel", "node","subset")] <-  c("n1_s1", "n1", "s1")
   expected_result_n1[2 , c("variableLabel", "node","subset")] <-  c("n1_s2", "n1", "s2")
   
-  checkEquals(list("test_summary_stats_node_n0.json" = expected_result_n0, "test_summary_stats_node_n1.json" = expected_result_n1), produce_summary_stats(test_data_measurements_multiple_nodes_subsets, phase))
+  checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result_n0, "fetch_summary_stats_node_n1.json" = expected_result_n1), produce_summary_stats(test_data_measurements_multiple_nodes_subsets, phase))
 }
 
 
@@ -129,7 +129,7 @@ test.produce_summary_stats.itemNA <- function(){
   expected_result[,c("totalNumberOfValuesIncludingMissing", "numberOfMissingValues")] <- c(1,1)
   expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- as.numeric(NA)
   
-  checkEquals(list("test_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_NA_set, phase))
+  checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_NA_set, phase))
 }
 
 # what if number of samples = 1 , or number of genes = 1?
@@ -139,7 +139,7 @@ test.produce_summary_stats.1sample<- function(){
   expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues")] <- c(5, 0)
   expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- c(1, 5, 3, 1.58113883, 2, 3, 4)
   
-  checkEquals(list("test_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_sample, phase))
+  checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_sample, phase))
 }
 
 test.produce_summary_stats.1probe <- function(){
@@ -150,7 +150,7 @@ test.produce_summary_stats.1probe <- function(){
   expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues")] <- c(5, 0)
   expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- c(1, 5, 3, 1.58113883, 2, 3, 4)
   
-  checkEquals(list("test_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_probe, phase))
+  checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_probe, phase))
 }
 
 #1 probe, 1 sample
@@ -160,7 +160,7 @@ test.produce_summary_stats.1probe1sample <- function(){
   expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues")] <- c(1, 0)
   expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- c(1, 1, 1, as.numeric(NA), 1, 1, 1)
   
-  checkEquals(list("test_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_probe_sample, phase))
+  checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_probe_sample, phase))
 }
 
 
@@ -205,7 +205,7 @@ boxplot_table_2subsets2 <- list(
 
 # 1 node, 1 subset
 test.produce_boxplot.simplecase <- function(){  
-  checkEquals(list("test_box_plot_node_n0.png" = boxplot_table), produce_boxplot(test_data_measurements, phase))
+  checkEquals(list("fetch_box_plot_node_n0.png" = boxplot_table), produce_boxplot(test_data_measurements, phase, "log2"))
 }
 
 
@@ -213,7 +213,7 @@ test.produce_boxplot.simplecase <- function(){
 #multiple nodes, multiple subsets
 test.produce_boxplot.multiplenodesandsubsets <- function(){  
   test_data_measurements_multiple_nodes_subsets <- list("n0_s1" = test_set_measurements,"n0_s2" = test_set2_measurements,"n1_s1" = test_set_measurements, "n1_s2" = test_set_measurements)
-  checkEquals(list("test_box_plot_node_n0.png" = boxplot_table_2subsets2, "test_box_plot_node_n1.png" = boxplot_table_2subsets), produce_boxplot(test_data_measurements_multiple_nodes_subsets, phase))
+  checkEquals(list("fetch_box_plot_node_n0.png" = boxplot_table_2subsets2, "fetch_box_plot_node_n1.png" = boxplot_table_2subsets), produce_boxplot(test_data_measurements_multiple_nodes_subsets, phase, "log2"))
 }
 
 
@@ -221,7 +221,7 @@ test.produce_boxplot.multiplenodesandsubsets <- function(){
 test.produce_boxplot.itemNA <- function(){  
   test_NA_set <- list("n0_s1" = NA)
   expected_result <- "No data points to plot"
-  checkEquals(list("test_box_plot_node_n0.png" = expected_result), produce_boxplot(test_NA_set, phase))
+  checkEquals(list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_NA_set, phase,"log2"))
 }
 
 # what if number of samples = 1 , or number of genes = 1?
@@ -229,7 +229,7 @@ test.produce_boxplot.1sample <- function(){
   test_data_one_sample <- list("n0_s1" = data.frame(sample = unlist(test_data_measurements) )) #make a data.frame with only one column that contains all the measurements of the test_set, but now in one column. statistics then remain the same
   expected_result <- boxplot_table
   names(expected_result$out) <- "sample16"
-  checkEquals(list("test_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_sample, phase))
+  checkEquals(list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_sample, phase, "log2"))
 }
 
 test.produce_boxplot.1probe <- function(){            
@@ -238,7 +238,7 @@ test.produce_boxplot.1probe <- function(){
     )) #make a data.frame with only one row that contains all the measurements of the test_set, but now in one row. statistics then remain the same
   expected_result <- boxplot_table
   names(expected_result$out) <- "p"
-  checkEquals(list("test_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_probe, phase))
+  checkEquals(list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_probe, phase, "log2"))
 }
 
 #1 probe, 1 sample
@@ -251,5 +251,5 @@ test.produce_boxplot.1probe1sample <- function(){
     out = as.numeric(NULL),
     group = as.numeric(NULL),
     names = "s1")
-  checkEquals(list("test_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_probe_sample, phase))
+  checkEquals(list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_probe_sample, phase, "log2"))
 }
