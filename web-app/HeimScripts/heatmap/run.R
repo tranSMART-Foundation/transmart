@@ -31,7 +31,7 @@ main <- function(max_rows=100){
     df["SIGNIFICANCE"] <- rep(variance, nrow(df))
   }
 
-  df <- df[1:max_rows,]
+  df <- df[1:min(max_rows,nrow(df)),]
   fields <- buildFields(df)
   extraFields <- buildExtraFields(fields)
   geneSymbols <- unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector, otherwise we get a dataframe
@@ -57,7 +57,7 @@ main <- function(max_rows=100){
 
 
 buildFields <- function(df){
-  df <- melt(df,id=c("Row.Label","Bio.marker","SIGNIFICANCE","MEAN","SD")) # melt implicitly casts characters to factors to make your like more exciting, in order to encourage more adventures it does not have characters.as.factors=F param.
+  df <- melt(df, na.rm = T, id=c("Row.Label","Bio.marker","SIGNIFICANCE","MEAN","SD")) # melt implicitly casts characters to factors to make your like more exciting, in order to encourage more adventures it does not have characters.as.factors=F param.
   ZSCORE <- (df$value - df$MEAN)/df$SD
   df["MEAN"] <- NULL
   df["SD"]   <-NULL
