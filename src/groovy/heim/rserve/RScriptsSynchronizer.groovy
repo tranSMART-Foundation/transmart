@@ -32,6 +32,9 @@ class RScriptsSynchronizer {
 
     public static final String BUNDLE_FIX = 'smartR_bundle.zip'
 
+    private static final int MAX_NUMBER_OF_RETRIES = 10
+    private static final int RETRY_INTERVAL = 60L // seconds
+
     @Autowired
     private RConnectionProvider rConnectionProvider
 
@@ -39,16 +42,32 @@ class RScriptsSynchronizer {
 
     void start() {
         Thread.start('r-scripts-synchronizer') {
-            try {
-                copyFilesOver()
-                copyResult.set(Boolean.TRUE)
-                log.info('Finished copying over the smartR scripts to ' +
-                        'the Rserve machine')
-            } catch (Throwable t) {
-                log.error('Synchronization of R scripts has failed', t)
-                copyResult.set(Boolean.FALSE)
+            int totalTries = MAX_NUMBER_OF_RETRIES + 1
+            while (totalTries-- > 0) {
+                try {
+                    copyFilesOver()
+                    copyResult.set(Boolean.TRUE)
+                    log.info('Finished copying over the smartR scripts to ' +
+                            'the Rserve machine')
+                    return
+                } catch (Throwable t) {
+                    if (t instanceof InterruptedException) {
+                        log.warn('R scripts synchronization interrupted')
+                        return
+                    }
+                    log.warn('Synchronization of R scripts has failed. ' +
+                            'Retries left: ' + totalTries, t)
+                    Thread.sleep(RETRY_INTERVAL * 1000L)
+                }
             }
+
+            log.error('Synchronization of R scripts has failed. No more retries')
+            copyResult.set(Boolean.FALSE)
         }
+    }
+
+    void skip() {
+        copyResult.set(Boolean.TRUE)
     }
 
     boolean wasCopySuccessful() {
