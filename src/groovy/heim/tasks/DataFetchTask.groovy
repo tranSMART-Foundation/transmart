@@ -245,6 +245,7 @@ class DataFetchTask extends AbstractTask {
 
         List<String> commands = [
                 "if (!exists('loaded_variables')) { loaded_variables <- list() }",
+                "if (exists('preprocessed')) { remove(preprocessed, pos = '.GlobalEnv')}",
                 """
                 loaded_variables[['$escapedLabel']] <- read.csv(
                                '$escapedFilename', sep = "\t", header = TRUE, stringsAsFactors = FALSE);
@@ -252,11 +253,8 @@ class DataFetchTask extends AbstractTask {
         ]
         REXP rexp = rServeSession.doWithRConnection { RConnection conn ->
             RUtil.runRCommand conn, commands[0]
-            RUtil.runRCommand conn, commands[1] /* return value */
-        }
-        String invalidatePreprocessing = "if (exists('preprocessed')) { remove(preprocessed, pos = '.GlobalEnv')}"
-        rServeSession.doWithRConnection {RConnection conn ->
-            RUtil.runRCommand(conn, invalidatePreprocessing)
+            RUtil.runRCommand conn, commands[1]
+            RUtil.runRCommand conn, commands[2] /* return value */
         }
         rexp.asNativeJavaObject() as List
     }
