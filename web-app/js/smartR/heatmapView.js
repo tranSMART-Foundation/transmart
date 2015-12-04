@@ -74,7 +74,7 @@ HeatmapView = (function(){
         var _conceptPath = extJSHelper.readConceptVariables(v.conceptPathsInput.attr('id'));
         return {
             conceptPaths: _conceptPath,
-            resultInstanceIds : GLOBAL.CurrentSubsetIDs.filter(function (v) { return v !== undefined; }),
+            resultInstanceIds : GLOBAL.CurrentSubsetIDs.map(function (v) { return v || null; }),
             searchKeywordIds: Object.getOwnPropertyNames(bioMarkersModel.selectedBioMarkers),
         };
     };

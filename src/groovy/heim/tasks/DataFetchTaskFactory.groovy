@@ -73,6 +73,7 @@ class DataFetchTaskFactory implements TaskFactory, ApplicationContextAware {
             }
         } /* is Map<String, OntologyTerm> after this */
 
+        // one null is allowed (either s1 or s2 empty)
         if (ridsArg == null) {
             throw new InvalidArgumentsException(
                     "Parameter $RESULT_INSTANCE_IDS_PARAMETER_NAME not passed")
@@ -81,20 +82,20 @@ class DataFetchTaskFactory implements TaskFactory, ApplicationContextAware {
             throw new InvalidArgumentsException("Parameter " +
                     "$RESULT_INSTANCE_IDS_PARAMETER_NAME must be a list")
         }
-        if (ridsArg.any { !(it as String)?.isLong() }) {
+        if (ridsArg.any { it && !(it as String).isLong() }) {
             throw new InvalidArgumentsException(
                     "Parameter $RESULT_INSTANCE_IDS_PARAMETER_NAME can only " +
-                            "have integer values, got: " +
-                            ridsArg.find { !(it as String)?.isLong() })
+                            "have integer or null values, got: " +
+                            ridsArg.find { it && !(it as String).isLong() })
         }
         if (Lists.newArrayList(ridsArg).unique().size() < ridsArg.size()) {
             "Parameter $RESULT_INSTANCE_IDS_PARAMETER_NAME has " +
                     "duplicate values"
         }
-        if (ridsArg.size() == 0) {
+        if (ridsArg.findAll().size() == 0) {
             if (Environment.current != Environment.TEST) {
-                throw new InvalidArgumentsException(
-                        "Parameter $ridsArg cannot be an empty list")
+                throw new InvalidArgumentsException("Parameter $ridsArg " +
+                        "cannot be an empty list or have only nulls")
             } else { // is test environment
                 ridsArg = [null]
             }

@@ -56,7 +56,7 @@ class DataFetchTask extends AbstractTask {
 
     Map<String /* label prefix */, OntologyTerm> ontologyTerms
 
-    List<Long> resultInstanceIds
+    List<Long> resultInstanceIds /* can have nulls */
 
     Map<String, Map> assayConstraints
 
@@ -138,7 +138,14 @@ class DataFetchTask extends AbstractTask {
     }
 
     TaskResult call() throws Exception {
-        List<Map> allDatasets = [ontologyTerms.entrySet(), resultInstanceIds]
+        assert resultInstanceIds.size() > 0 && resultInstanceIds.size() <= 2
+
+        /* actualResultInstanceIds removes nulls, but leaves one element with
+         * null if the array would be empty otherwise (note that only in dev
+         * is it allowed for resultInstanceIds to be == [null]). */
+        def actualResultInstanceIds = resultInstanceIds.findAll() ?: [null]
+        List<Map> allDatasets =
+                [ontologyTerms.entrySet(), actualResultInstanceIds]
                 .combinations()
 
         queriesExecutor = Executors.newFixedThreadPool(

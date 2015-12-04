@@ -122,4 +122,36 @@ class DataFetchingTaskTests extends BaseAPITestCase {
         assertThat JSON, hasEntry(is('state'), is(TaskState.FINISHED.toString()))
         assertThat JSON.result.artifacts.currentLabels, containsInAnyOrder(labelSubset1, labelSubset2)
     }
+
+    void testOnlySubset2() {
+        String sessionId = createSession('func_test')
+
+        get '/smartRTest/resultInstanceIds'
+        assertStatus 200
+
+        def args = Maps.newHashMap(TEST_ARGUMENTS)
+        args.resultInstanceIds = [null, JSON.values[1]]
+
+
+        post '/ScriptExecution/run', {
+            body json: [
+                    sessionId: sessionId,
+                    taskType : DATA_FETCH_TASK_TYPE,
+                    arguments: args,
+            ]
+        }
+
+        assertStatus 200
+
+        String taskId = JSON.executionId
+        get '/ScriptExecution/status?' + buildQueryParameters(
+                sessionId: sessionId,
+                executionId: taskId,
+                waitForCompletion: true,
+        )
+
+        assertStatus 200
+        assertThat JSON, hasEntry(is('state'), is(TaskState.FINISHED.toString()))
+        assertThat JSON.result.artifacts.currentLabels, containsInAnyOrder(labelSubset2)
+    }
 }
