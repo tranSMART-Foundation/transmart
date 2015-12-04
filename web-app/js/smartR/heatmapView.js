@@ -74,6 +74,7 @@ HeatmapView = (function(){
         var _conceptPath = extJSHelper.readConceptVariables(v.conceptPathsInput.attr('id'));
         return {
             conceptPaths: _conceptPath,
+            // CurrentSubsetIDs can contain undefined and null. Pass only nulls forward
             resultInstanceIds : GLOBAL.CurrentSubsetIDs.map(function (v) { return v || null; }),
             searchKeywordIds: Object.getOwnPropertyNames(bioMarkersModel.selectedBioMarkers),
         };
