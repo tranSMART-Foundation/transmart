@@ -6,8 +6,8 @@ checkBase="$scriptBase/checks"
 
 pushd $HOME
 if [ ! -e "$HOME/transmart" ]; then
-	#mkdir $HOME/transmart
-	echo "Would create $HOME/transmart"
+	mkdir $HOME/transmart
+	echo "Created tranSMART base directory at $HOME/transmart"
 fi
 
 echo "HOME is $HOME"
