@@ -7,9 +7,14 @@
 # set up with 
 #   sudo apt-get update
 #   sudo apt-get install -y git
-#   git https://github.com/tranSMART-Foundation/Scripts.git
+#   git clone https://github.com/tranSMART-Foundation/Scripts.git
 #   cd Scripts
 #   ./install-ubuntu/NewInstallTransmart.sh
+#
+# to run the checking script
+#   cd Scripts
+#   cd install-ubuntu/checks
+#   ./testAll.sh
 
 echo "++++++++++++++++++++++++++++"
 echo "+  set up working dir (transmart) "
@@ -51,7 +56,7 @@ echo "++++++++++++++++++++++++++++"
 sudo apt-get install -y tomcat7 
 sudo service tomcat7 stop
 sudo cp /etc/default/tomcat7 /etc/default/tomcat7-backup
-# need to edit /etc/default/tomcat7 with JAVA_OPTS="-Djava.awt.headless=true -Xms512m -Xmx2g -XX:+UseConcMarkSweepGC"
+# edit /etc/default/tomcat7 with JAVA_OPTS="-Djava.awt.headless=true -Xms512m -Xmx2g -XX:+UseConcMarkSweepGC"
 sudo python -c "with open('/etc/default/tomcat7','r+') as f: f.write(f.read().replace('-Xmx128m','-Xms512m -Xmx2g'))"
 
 echo "++++++++++++++++++++++++++++"
@@ -62,7 +67,7 @@ cd $HOME/transmart/transmart-data
 source ./vars
 make -C R install_packages
 cd $HOME
-echo "export PATH=${HOME}/transmart/transmart-data/R/root/bin:$PATH" > Rpath.sh
+echo "export PATH=${HOME}/transmart/transmart-data/R/root/bin:\$PATH" > Rpath.sh
 sudo mv Rpath.sh /etc/profile.d/
 source /etc/profile.d/Rpath.sh
 
@@ -120,4 +125,8 @@ echo "+  start Tomcat"
 echo "++++++++++++++++++++++++++++"
 
 sudo service tomcat7 restart
+
+echo "++++++++++++++++++++++++++++"
+echo "+  run checking script!"
+echo "++++++++++++++++++++++++++++"
 
