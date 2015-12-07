@@ -196,6 +196,7 @@
 
 .sr-input-area {max-width: 1024px;  display: table; table-layout: fixed;}
 .heim-dropzone {display: table-cell; width: 400px; min-width: 200px;}
+.sr-drop-input { height: 100px; border: 1px solid #aaaaaa; margin-right: 5px; padding: 2px;border-radius: 5px;}
 .heim-action-button {padding: 5px;}
 .sr-output-container {padding-top: 20px; padding-bottom: 20px;}
 .sr-fetch-params-area {clear: both; margin-top: 20px;margin-bottom: 20px;}
@@ -245,3 +246,4 @@
 .heim-tab.ui-state-default a {
     color: black; font-weight: normal;
 }
+.sr-divider {border-top: 1px dotted #8c8b8b; margin-bottom: 20px; margin-top: 20px;}
