@@ -23,6 +23,7 @@ echo "++++++++++++++++++++++++++++"
 
 cd $HOME/transmart
 sudo apt-get install -y curl
+sudo apt-get install -y unzip
 curl https://codeload.github.com/tranSMART-Foundation/transmart-data/zip/release-1.2.4 -o transmart-data-release-1.2.4.zip
 unzip transmart-data-release-1.2.4.zip
 mv transmart-data-release-1.2.4 transmart-data
