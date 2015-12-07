@@ -205,7 +205,7 @@
     padding: 5px;
 }
 .ui-icon-info {display: inline-block; }
-.sr-ui-tooltip {font-size: .85em; background: lightyellow !important;}
+.sr-ui-tooltip {font-size: .85em; background: lightgoldenrodyellow !important;}
 
 #heim-input-list-identifiers ul {
     margin-top: .8em;
@@ -226,4 +226,21 @@
 #heim-input-list-identifiers .identifier-synonyms {
     font-size: .9em;
     color: gray;
+}
+
+/** jquery ui overrides **/
+.heim-tab.ui-state-default.ui-state-active {
+     background: white;
+ }
+.heim-tab.ui-state-default.ui-state-active a {
+   color: black;  font-weight: bold;
+}
+.heim-tab.ui-state-default a:hover  {
+    color: #515BA2;
+}
+.heim-tab.ui-state-default {
+    background: #CCC;
+}
+.heim-tab.ui-state-default a {
+    color: black; font-weight: normal;
 }
