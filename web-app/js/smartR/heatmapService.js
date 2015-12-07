@@ -174,7 +174,7 @@ var HeatmapService = (function(smartRHeatmap){
             onUltimateSuccess: function (data) { service.getSummary('fetch'); },
             phase: 'fetch',
             progressMessage: 'Fetching data',
-            successMessage: 'Data is successfully fetched in . Proceed with Run Heatmap',
+            successMessage: 'Data is successfully fetched in . Proceed with Run Heatmap'
         });
     };
 
@@ -334,10 +334,12 @@ var HeatmapService = (function(smartRHeatmap){
      * @param task
      */
     service.checkStatus = function(taskData, delay) {
-        var div = _divForPhase(taskData.phase)
+
+        var div = _divForPhase(taskData.phase);
+
         div.show();
         div.html('<p class="sr-log-text"><span class="blink_me">_</span>' +
-            taskData.progressMessage + ', please wait\u2026</p>')
+            taskData.progressMessage + ', please wait\u2026</p>');
 
         service.currentRequestAbort();
 

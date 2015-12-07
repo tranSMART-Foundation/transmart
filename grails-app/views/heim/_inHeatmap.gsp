@@ -21,12 +21,7 @@
     </table>
 </script>
 
-<div style= "display: table; width: 100%" >
-
-    <p>
-        Start analysis with <b>Fetch</b>, <b>Preprocess</b>  and then <b>Run Analysis</b>. Make sure that you run Summary
-    Statistic prior running the Heatmap.
-    </p>
+<div class="heim-analysis-container">
 
     <div id="heim-tabs" style="margin-top: 25px;">
 
@@ -98,7 +93,7 @@
 
             <div class="sr-fetch-params-area">
                 %{--Select identifier--}%
-                <div class="heim-input-field heim-autocomplete" style="clear: both">
+                <div class="heim-input-field heim-autocomplete">
                     <label for="heim-input-txt-identifier">Select a Gene/Pathway/mirID/UniProtID:</label>
                     <input id="heim-input-txt-identifier">
                     <div id="heim-input-list-identifiers"></div>
@@ -106,11 +101,11 @@
             </div>
 
             %{--tool buttons--}%
-            <div style="margin-top: 10px; text-align: right;">
-                <button id="heim-btn-fetch-data">Fetch Data</button>
+            <div style="margin-top: 10px; text-align: left;">
+                <button id="heim-btn-fetch-data" class="heim-action-button">Fetch Data</button>
             </div>
 
-            <div id="heim-fetch-output"></div>
+            <div id="heim-fetch-output" class="sr-output-container"></div>
 
         </div>
 
@@ -126,8 +121,8 @@
             </div>
 
             %{--tool buttons--}%
-            <div style="margin-top: 10px; text-align: right;">
-                <button id="heim-btn-preprocess-heatmap">Preprocess</button>
+            <div style="margin-top: 10px;">
+                <button id="heim-btn-preprocess-heatmap" class="heim-action-button">Preprocess</button>
             </div>
 
             %{--Preprocess Output--}%
@@ -196,8 +191,8 @@
             </div>
 
             %{--tool buttons--}%
-            <div style="margin-top: 10px; text-align: right;">
-                <button id="heim-btn-run-heatmap">Get Heatmap</button>
+            <div style="margin-top: 10px;">
+                <button id="heim-btn-run-heatmap" class="heim-action-button">Get Heatmap</button>
             </div>
 
             %{--result--}%

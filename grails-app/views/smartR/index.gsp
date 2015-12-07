@@ -2,7 +2,7 @@
 
 <div id="index" style="padding: 10px;">
 
-    <h1 class="txt"> SmartR - Dynamic data visualization and interaction</h1>
+    <h1 class="txt"> SmartR - Dynamic Data Visualization and Interaction</h1>
     <br>
     <g:select name="scriptSelect" id="scriptSelect" class='txt' from="${scriptList}"
               noSelection="['':'Choose an algorithm']"
