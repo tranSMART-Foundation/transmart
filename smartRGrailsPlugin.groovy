@@ -1,3 +1,4 @@
+import grails.util.Environment
 import heim.rserve.RScriptsSynchronizer
 import org.codehaus.groovy.grails.plugins.GrailsPluginUtils
 import org.springframework.stereotype.Component
@@ -85,13 +86,25 @@ class smartRGrailsPlugin {
         constants.legacyScriptDirectory = new File(smartRDir.canonicalPath, 'Scripts')
         log.info("Directory for legacy scripts is ${constants.legacyScriptDirectory}")
 
-        def remoteScriptDirectory =  config.smartR.remoteScriptDirectory
-        if (!remoteScriptDirectory) {
-            remoteScriptDirectory = DEFAULT_REMOTE_RSCRIPTS_DIRECTORY
-        }
-        constants.remoteScriptDirectoryDir = remoteScriptDirectory
-        log.info("Location for R scripts in the Rserve server is ${constants.remoteScriptDirectoryDir}")
+        if (!skipRScriptsTransfer(config)) {
+            def remoteScriptDirectory =  config.smartR.remoteScriptDirectory
+            if (!remoteScriptDirectory) {
+                remoteScriptDirectory = DEFAULT_REMOTE_RSCRIPTS_DIRECTORY
+            }
+            constants.remoteScriptDirectoryDir = remoteScriptDirectory
+            log.info("Location for R scripts in the Rserve server is ${constants.remoteScriptDirectoryDir}")
 
-        ctx.getBean(RScriptsSynchronizer).start()
+            ctx.getBean(RScriptsSynchronizer).start()
+        } else {
+            log.info('Skipping copying of R script in development mode with local Rserve')
+            constants.remoteScriptDirectoryDir = constants.pluginScriptDirectory.absoluteFile
+            ctx.getBean(RScriptsSynchronizer).skip()
+        }
+    }
+
+    private boolean skipRScriptsTransfer(config) {
+        (!config.RModules.host ||
+                config.RModules.host in ['127.0.0.1', '::1', 'localhost']) &&
+                Environment.currentEnvironment == Environment.DEVELOPMENT
     }
 }
