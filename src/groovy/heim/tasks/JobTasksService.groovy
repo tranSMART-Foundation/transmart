@@ -100,10 +100,13 @@ class JobTasksService implements DisposableBean {
             void onSuccess(TaskResult taskResult1) {
                 assert taskResult1 != null :
                         'Task must return TaskResult or throw'
-                log.debug "Task $task terminated without throwing"
+                log.debug("Task $task terminated without throwing. " +
+                        "Successful? $taskResult1.successful")
                 tasks[task.uuid] = new TaskAndState(
                         task: task,
-                        state: TaskState.FINISHED,
+                        state: taskResult1.successful ?
+                                TaskState.FINISHED :
+                                TaskState.FAILED,
                         taskResult: taskResult1)
                 common(tasks[task.uuid])
             }
