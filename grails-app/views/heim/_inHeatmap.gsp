@@ -21,7 +21,7 @@
     </table>
 </script>
 
-<div style="width: 98%">
+<div style= "display: table; width: 100%" >
 
     <p>
         Start analysis with <b>Fetch</b>, <b>Preprocess</b>  and then <b>Run Analysis</b>. Make sure that you run Summary
@@ -31,9 +31,9 @@
     <div id="heim-tabs" style="margin-top: 25px;">
 
         <ul>
-            <li><a href="#fragment-load"><span>Fetch</span></a></li>
-            <li><a href="#fragment-preprocess"><span>Preprocess</span></a></li>
-            <li><a href="#fragment-run"><span>Run</span></a></li>
+            <li class="heim-tab"><a href="#fragment-load"><span>Fetch</span></a></li>
+            <li class="heim-tab"><a href="#fragment-preprocess"><span>Preprocess</span></a></li>
+            <li class="heim-tab"><a href="#fragment-run"><span>Run</span></a></li>
         </ul>
 
         %{--========================================================================================================--}%
