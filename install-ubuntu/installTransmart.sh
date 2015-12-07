@@ -22,6 +22,12 @@ source $scriptBase/install01_Basics.sh
 source $scriptBase/install02_TransmartDataBasics.sh
 
 echo "++++++++++++++++++++++++++++"
+echo "+  Running the install of R and R packages
+echo "++++++++++++++++++++++++++++"
+
+source $scriptBase/install03_RAndRserve.sh
+
+echo "++++++++++++++++++++++++++++"
 echo "+  Checking the install of basic tools"
 echo "++++++++++++++++++++++++++++"
 
@@ -40,6 +46,19 @@ returnValue=$?
 if (( $returnValue )); then
 	echo "************"
 	echo "** Some problem with the versions check"
+	echo "************"
+fi
+
+echo "++++++++++++++++++++++++++++"
+echo "+  Checking the install of R and R packages
+echo "++++++++++++++++++++++++++++"
+
+cd $checkBase
+./checkR.sh
+returnValue=$?
+if (( $returnValue )); then
+	echo "************"
+	echo "** Some problem with the checks for R"
 	echo "************"
 fi
 
