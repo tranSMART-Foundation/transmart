@@ -1,37 +1,46 @@
-scriptBase=dirname $0
-checkBase=$scriptBase/checks
+#!/bin/bash
+
+scriptPath="$(readlink -f $0)"
+scriptBase="$(dirname $scriptPath)"
+checkBase="$scriptBase/checks"
 
 pushd $HOME
-mkdir $HOME/transmart
-cd $HOME/transmart
+#mkdir $HOME/transmart
+
+echo "HOME is $HOME"
+echo "scriptBase is $scriptBase"
+echo "checkBase is $checkBase"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Running the install of basic tools"
 echo "++++++++++++++++++++++++++++"
 
-. ./install01_Basics.sh
-. ./install02_TransmartDataBasics.sh
+#. $scriptBase/install01_Basics.sh
+#. $scriptBase/install02_TransmartDataBasics.sh
+
+echo "$scriptBase/install01_Basics.sh"
+echo "$scriptBase/install02_TransmartDataBasics.sh"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Checking the install of basic tools"
 echo "++++++++++++++++++++++++++++"
 
-cd $checkBase
-./basics.sh
-returnValue=$?
-if (( $returnValue )); then
-	echo "************"
-	echo "** Some problem with the bascis tools check"
-	echo "************"
-fi
+#cd $checkBase
+#./basics.sh
+#returnValue=$?
+#if (( $returnValue )); then
+#	echo "************"
+#	echo "** Some problem with the bascis tools check"
+#	echo "************"
+#fi
 
-cd $checkBase
-./checkVersions.sh
-returnValue=$?
-if (( $returnValue )); then
-	echo "************"
-	echo "** Some problem with the versions check"
-	echo "************"
-fi
-
+#cd $checkBase
+#./checkVersions.sh
+#returnValue=$?
+#if (( $returnValue )); then
+#	echo "************"
+#	echo "** Some problem with the versions check"
+#	echo "************"
+#fi
+#
 popd
