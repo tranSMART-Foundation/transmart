@@ -3,6 +3,7 @@ library(reshape2)
 
 
 main <- function(max_rows=100){
+  max_rows <- as.numeric(max_rows)
   if(exists("preprocessed")){
     df <- preprocessed
   }
@@ -30,7 +31,6 @@ main <- function(max_rows=100){
     df["SD"] <- rep(sds,nrow(df))
     df["SIGNIFICANCE"] <- rep(variance, nrow(df))
   }
-
   df <- df[1:min(max_rows,nrow(df)),]
   fields <- buildFields(df)
   extraFields <- buildExtraFields(fields)
