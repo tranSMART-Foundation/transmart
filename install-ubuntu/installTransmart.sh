@@ -18,7 +18,7 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Running the install of basic tools"
 echo "++++++++++++++++++++++++++++"
 
-#. $scriptBase/install01_Basics.sh
+source $scriptBase/install01_Basics.sh
 #. $scriptBase/install02_TransmartDataBasics.sh
 
 echo "$scriptBase/install01_Basics.sh"
