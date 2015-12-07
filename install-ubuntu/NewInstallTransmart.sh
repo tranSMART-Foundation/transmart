@@ -52,6 +52,7 @@ sudo apt-get install -y tomcat7
 sudo service tomcat7 stop
 sudo cp /etc/default/tomcat7 /etc/default/tomcat7-backup
 # need to edit /etc/default/tomcat7 with JAVA_OPTS="-Djava.awt.headless=true -Xms512m -Xmx2g -XX:+UseConcMarkSweepGC"
+sudo python -c "with open('/etc/default/tomcat7','r+') as f: f.write(f.read().replace('-Xmx128m','-Xms512m -Xmx2g'))"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install R, Rserve and other packages"
