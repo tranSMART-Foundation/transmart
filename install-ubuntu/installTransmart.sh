@@ -5,7 +5,10 @@ scriptBase="$(dirname $scriptPath)"
 checkBase="$scriptBase/checks"
 
 pushd $HOME
-#mkdir $HOME/transmart
+if [ ! -e "$HOME/transmart" ]; then
+	#mkdir $HOME/transmart
+	echo "Would create $HOME/transmart"
+fi
 
 echo "HOME is $HOME"
 echo "scriptBase is $scriptBase"
