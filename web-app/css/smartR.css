@@ -236,7 +236,7 @@
    color: black;  font-weight: bold;
 }
 .heim-tab.ui-state-default a:hover  {
-    color: red;
+    color: #515BA2;
 }
 .heim-tab.ui-state-default {
     background: #CCC;
