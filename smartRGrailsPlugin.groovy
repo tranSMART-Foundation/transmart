@@ -105,6 +105,7 @@ class smartRGrailsPlugin {
     private boolean skipRScriptsTransfer(config) {
         (!config.RModules.host ||
                 config.RModules.host in ['127.0.0.1', '::1', 'localhost']) &&
-                Environment.currentEnvironment == Environment.DEVELOPMENT
+                Environment.currentEnvironment == Environment.DEVELOPMENT &&
+                !config.smartR.alwaysCopyScripts
     }
 }
