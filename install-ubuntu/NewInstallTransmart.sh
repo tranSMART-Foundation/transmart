@@ -1,3 +1,16 @@
+#!/bin/bash
+
+#**********************************************************************************
+#  Script to load all that is need to run an example/demo version of tranSMART 1.2.4
+#**********************************************************************************
+
+# set up with 
+#   sudo apt-get update
+#   sudo apt-get install -y git
+#   git https://github.com/tranSMART-Foundation/Scripts.git
+#   cd Scripts
+#   ./install-ubuntu/NewInstallTransmart.sh
+
 echo "++++++++++++++++++++++++++++"
 echo "+  set up working dir (transmart) "
 echo "++++++++++++++++++++++++++++"
@@ -5,7 +18,7 @@ echo "++++++++++++++++++++++++++++"
 mkdir $HOME/transmart
 
 echo "++++++++++++++++++++++++++++"
-echo "+  set up transmart-date "
+echo "+  set up the transmart-date folder"
 echo "++++++++++++++++++++++++++++"
 
 cd $HOME/transmart
