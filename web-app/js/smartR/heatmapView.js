@@ -1,9 +1,11 @@
 //# sourceURL=heatmapView.js
 
+'use strict';
+
 /**
  * Heatmap View
  */
-HeatmapView = (function(){
+var HeatmapView = (function(){
     var heatmapService, extJSHelper;
 
     var view = {
@@ -56,7 +58,7 @@ HeatmapView = (function(){
                 items: this.getBioMarkers()
             });
         };
-    })()
+    })();
 
     var bioMarkersModel = new BioMarkersModel();
     bioMarkersModel.on('biomarkers', _renderBiomarkersList);

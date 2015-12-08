@@ -21,12 +21,7 @@
     </table>
 </script>
 
-<div style= "display: table; width: 100%" >
-
-    <p>
-        Start analysis with <b>Fetch</b>, <b>Preprocess</b>  and then <b>Run Analysis</b>. Make sure that you run Summary
-    Statistic prior running the Heatmap.
-    </p>
+<div class="heim-analysis-container">
 
     <div id="heim-tabs" style="margin-top: 25px;">
 
@@ -52,8 +47,7 @@
 
                     <br><br>
 
-                    <div id='divIndependentVariable'
-                         style="border:1px solid #666; height: 100px; padding: 10px;"></div>
+                    <div id='divIndependentVariable'  class="sr-drop-input"></div>
 
                     <div style="margin-top: 10px; text-align: right;">
                         <button type="button" id="heim-btn-clear">Clear</button>
@@ -70,8 +64,7 @@
                     </i></label>
                     <br><br>
 
-                    <div id='divNumVariable'
-                         style="border:1px solid #CCC; height: 100px; padding: 10px;"></div>
+                    <div id='divNumVariable' class="sr-drop-input"></div>
 
                     <div style="margin-top: 10px; text-align: right;">
                         <button type="button" id="heim-btn-clear-2" disabled>Clear</button>
@@ -87,8 +80,7 @@
                     </i></label>
                     <br><br>
 
-                    <div id='divCategoricalVariable'
-                         style="border:1px solid #CCC; height: 100px; padding: 10px;"></div>
+                    <div id='divCategoricalVariable' class="sr-drop-input"></div>
 
                     <div style="margin-top: 10px; text-align: right;">
                         <button type="button" id="heim-btn-clear-3" disabled>Clear</button>
@@ -98,19 +90,21 @@
 
             <div class="sr-fetch-params-area">
                 %{--Select identifier--}%
-                <div class="heim-input-field heim-autocomplete" style="clear: both">
+                <div class="heim-input-field heim-autocomplete">
                     <label for="heim-input-txt-identifier">Select a Gene/Pathway/mirID/UniProtID:</label>
                     <input id="heim-input-txt-identifier">
                     <div id="heim-input-list-identifiers"></div>
                 </div>
             </div>
 
+            <hr class="sr-divider">
+
             %{--tool buttons--}%
-            <div style="margin-top: 10px; text-align: right;">
-                <button id="heim-btn-fetch-data">Fetch Data</button>
+            <div>
+                <button id="heim-btn-fetch-data" class="heim-action-button">Fetch Data</button>
             </div>
 
-            <div id="heim-fetch-output"></div>
+            <div id="heim-fetch-output" class="sr-output-container"></div>
 
         </div>
 
@@ -125,13 +119,16 @@
                 <span>Aggregate probes</span>
             </div>
 
+            <hr class="sr-divider">
+
             %{--tool buttons--}%
-            <div style="margin-top: 10px; text-align: right;">
-                <button id="heim-btn-preprocess-heatmap">Preprocess</button>
+            <div style="margin-top: 10px;">
+                <button id="heim-btn-preprocess-heatmap" class="heim-action-button">Preprocess</button>
             </div>
 
+
             %{--Preprocess Output--}%
-            <div id="heim-preprocess-output"></div>
+            <div id="heim-preprocess-output" class="sr-output-container"></div>
         </div>
 
         %{--========================================================================================================--}%
@@ -165,8 +162,6 @@
             %{--</select>--}%
             %{--</div>--}%
 
-            <hr style="margin-top: 20px;">
-
             %{--Options--}%
             <div id="clusteringOptionsDiv" hidden>
                 %{--Number of clusters--}%
@@ -195,17 +190,19 @@
 
             </div>
 
+            <hr class="sr-divider">
+
             %{--tool buttons--}%
-            <div style="margin-top: 10px; text-align: right;">
-                <button id="heim-btn-run-heatmap">Get Heatmap</button>
+            <div ">
+                <button id="heim-btn-run-heatmap" class="heim-action-button">Get Heatmap</button>
             </div>
 
             %{--result--}%
 
-            <div id="heim-run-output"></div>
+            <div id="heim-run-output" class="sr-output-container"></div>
 
             %{--d3 js heatmap placeholder--}%
-            <div id='visualization' class='text'>
+            <div id='visualization' class='text sr-output-container'>
                 <div id="heatmap" class='text'></div>
             </div>
         </div>

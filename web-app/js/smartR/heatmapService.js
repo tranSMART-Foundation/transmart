@@ -1,17 +1,18 @@
 //# sourceURL=heatmapService.js
+'use strict';
 
 /**
  * Heatmap Service
  */
 
-HeatmapService = (function(smartRHeatmap){
+var HeatmapService = (function(smartRHeatmap){
     var CHECK_DELAY = 1000;
     var PROJECTION = 'log_intensity';
     var NOOP_ABORT = function() {};
 
     var service = {
         currentRequestAbort: NOOP_ABORT,
-        lastFetchedLabels: [],
+        lastFetchedLabels: []
     };
 
     var _setStatusRequestTimeout = function() {
@@ -106,7 +107,7 @@ HeatmapService = (function(smartRHeatmap){
 
     var _divForPhase = function(phase) {
         return jQuery('#heim-' + phase + '-output');
-    }
+    };
 
     var startScriptExecution = function(taskData) {
         service.currentRequestAbort();
@@ -148,7 +149,8 @@ HeatmapService = (function(smartRHeatmap){
             executionId +
             '&filename=' +
             filename;
-    }
+    };
+
     var downloadJsonFile = function(executionId, filename) {
         return jQuery.ajax({
             url: urlForFile(executionId, filename),
@@ -172,7 +174,7 @@ HeatmapService = (function(smartRHeatmap){
             onUltimateSuccess: function (data) { service.getSummary('fetch'); },
             phase: 'fetch',
             progressMessage: 'Fetching data',
-            successMessage: 'Data is successfully fetched in . Proceed with Run Heatmap',
+            successMessage: 'Data is successfully fetched in . Proceed with Run Heatmap'
         });
     };
 
@@ -332,10 +334,12 @@ HeatmapService = (function(smartRHeatmap){
      * @param task
      */
     service.checkStatus = function(taskData, delay) {
-        var div = _divForPhase(taskData.phase)
+
+        var div = _divForPhase(taskData.phase);
+
         div.show();
         div.html('<p class="sr-log-text"><span class="blink_me">_</span>' +
-            taskData.progressMessage + ', please wait\u2026</p>')
+            taskData.progressMessage + ', please wait\u2026</p>');
 
         service.currentRequestAbort();
 
