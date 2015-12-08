@@ -33,13 +33,6 @@ reportCheckOrHigher "php" $desiredPhpVersion $phpVersion
 
 let "returnFlag=$returnFlag + $?"
 
-# check R version, exactly 3.1.2
-desiredRVersion="3.1.2"
-RVersion=$(R --version | awk -F '^R version ' '{print $2}')
-reportCheckExact "R" $desiredRVersion $RVersion
-
-let "returnFlag=$returnFlag + $?"
-
 # check psql version, 9.2 or higher
 desiredPsqlVersion="9.2"
 version=$(psql --version)
