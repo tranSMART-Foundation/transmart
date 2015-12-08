@@ -18,6 +18,10 @@ echo "|  If any problems are reported, then recheck the instructions, "
 echo "|  and install or re-installing the missing items"
 echo "-------------------------------------"
 
+# Just in case this is run after the load, without a new login 
+# sets up grails and groovy; normally in profile for login
+source $HOME/.sdkman/bin/sdkman-init.sh
+
 returnFlag=0
 # check java version, 1.7 or higher
 desiredjavaVersion="1.7"
