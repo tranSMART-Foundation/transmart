@@ -5,7 +5,7 @@
  * Heatmap Service
  */
 
-var HeatmapService = (function(smartRHeatmap){
+window.HeatmapService = (function(smartRHeatmap){
     var CHECK_DELAY = 1000;
     var PROJECTION = 'log_intensity';
     var NOOP_ABORT = function() {};
