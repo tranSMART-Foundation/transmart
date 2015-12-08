@@ -75,6 +75,7 @@ function reportCheckExact () {
 		okFlag=1
     else
         echo "Expected $type version $desiredVersion exactly; currently $givenVersion; needs to be upgraded."
+        okFlag=1
     fi
     return $okFlag
 }
