@@ -59,7 +59,7 @@ main <- function(max_rows=100, sorting="nodes"){
 
 verifyInput <- function(max_rows, sorting){
   if(max_rows <= 0 ){
-    stop("Max rows argument needs to be positive")
+    stop("Max rows argument needs to be higher than zero.")
   }
   if(!(sorting == "nodes" || sorting == "subjects")){
     stop("Unsupported sorting type. Only nodes and subjects allowed")
@@ -71,17 +71,13 @@ applySorting <- function(df,sorting){
   colNames <- names(measurements)
 
   subsets <- getSubset(colNames)
-  print(subsets)
   nodes <- getNode(colNames)
-  print(nodes)
   subjects <- getSubject(colNames)
-  print(subjects)
   if(sorting == "nodes"){
     colNames <- paste(subsets, nodes, subjects, sep="")
   }else{
     colNames <- paste(subsets, subjects, nodes, sep="")
   }
-  print(colNames)
   inds <- sort(colNames, index.return=TRUE )$ix
 
   measurements <- measurements[,inds]
