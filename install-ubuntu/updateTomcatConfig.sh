@@ -1,6 +1,5 @@
 # edit /etc/default/tomcat7 replace with '-Xmx128m' with '-Xms512m -Xmx2g'
-# in JAVA_OPTS="-Djava.awt.headless=true -Xms512m -Xmx2g -XX:+UseConcMarkSweepGC
-"
+# in JAVA_OPTS="-Djava.awt.headless=true -Xmx128m -XX:+UseConcMarkSweepGC"
 # unless it is already there
 if ! (grep "mx2g" /etc/default/tomcat7); then
     sudo cp /etc/default/tomcat7 /etc/default/tomcat7-backup-$(date +%s)
