@@ -5,7 +5,7 @@
 # ********************************************************************************
 
 echo "-------------------------------------"
-echo "|  Checking for tomcat install and modes to tomcat configuration
+echo "|  Checking for tomcat install and modes to tomcat configuration"
 echo "-------------------------------------"
 
 if ! -e /etc/default/tomcat7 ; then
