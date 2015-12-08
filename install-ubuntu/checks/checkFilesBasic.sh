@@ -6,7 +6,7 @@
 # ********************************************************************************
 
 echo "-------------------------------------"
-echo "|  Checking for required files from basic set up"
+echo "|  Checking for required files and folders from basic set up"
 echo "-------------------------------------"
 
 base="$HOME/transmart/transmart-data"
@@ -38,7 +38,8 @@ do
 done
 
 if [ 0 = $returnValue ] ; then
-	echo "Checking for required files from basic set up are present"
+	echo "|  ALL Required files and folders from basic set up are present"
+	echo "-------------------------------------"
 fi
 
 exit $returnValue
