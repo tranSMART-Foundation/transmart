@@ -1,9 +1,9 @@
-library(jsonlite)
 library(reshape2)
 
 
-main <- function(max_rows=100){
+main <- function(max_rows=100, sorting="nodes"){
   max_rows <- as.numeric(max_rows)
+  verifyInput(max_rows, sorting)
   if(exists("preprocessed")){
     df <- preprocessed
   }
@@ -14,6 +14,7 @@ main <- function(max_rows=100){
   df["Row.Label"] <- lapply(df["Row.Label"],fixString) # remove illegal characters from probe names. This will prevent problems with CSS selectors on the frontend.
   if(ncol(df) > 3){
     #this is the case for more than 1 sample
+    df <- applySorting(df,sorting) # no need for sorting in one sample case
     variances <- apply(df[,3:ncol(df)],1,var, na.rm = T) # Calculating variance per probe (per row)
     means <- rowMeans(df[,3:ncol(df)], na.rm = T) # this is just an auxiliary column - it will not be used for JSON.
     sdses <- apply(df[,3:ncol(df)],1,sd, na.rm = T) # this is just an auxiliary column - it will not be used for JSON.
@@ -56,6 +57,46 @@ main <- function(max_rows=100){
   list(messages=msgs) # main function in every R script has to return a list (so a data.frame will also do)
 }
 
+verifyInput <- function(max_rows, sorting){
+  if(max_rows <= 0 ){
+    stop("Max rows argument needs to be positive")
+  }
+  if(!(sorting == "nodes" || sorting == "subjects")){
+    stop("Unsupported sorting type. Only nodes and subjects allowed")
+  }
+}
+
+applySorting <- function(df,sorting){
+  measurements <- df[,3:ncol(df)]
+  colNames <- names(measurements)
+
+  subsets <- getSubset(colNames)
+  print(subsets)
+  nodes <- getNode(colNames)
+  print(nodes)
+  subjects <- getSubject(colNames)
+  print(subjects)
+  if(sorting == "nodes"){
+    colNames <- paste(subsets, nodes, subjects, sep="")
+  }else{
+    colNames <- paste(subsets, subjects, nodes, sep="")
+  }
+  print(colNames)
+  inds <- sort(colNames, index.return=TRUE )$ix
+
+  measurements <- measurements[,inds]
+  cbind(df[,c(1,2)], measurements)
+}
+
+getNode <- function(patientIDs){
+  splittedIds <- strsplit(patientIDs,"_") # During merge, which is always run we append subset id, either _s1 or _s2 to PATIENTID.
+  sapply(splittedIds, FUN=tail_elem,n= 2) # In proper patienid subset will always be  at the end. This select last but one elemnt - the node
+}
+
+getSubject <- function(patientIDs){
+  splittedIds <- strsplit(patientIDs,"_")
+  sapply(splittedIds, FUN=tail_elem,n= 3)
+}
 
 buildFields <- function(df){
   df <- melt(df, na.rm = T, id=c("Row.Label","Bio.marker","SIGNIFICANCE","MEAN","SD")) # melt implicitly casts characters to factors to make your like more exciting, in order to encourage more adventures it does not have characters.as.factors=F param.
@@ -82,13 +123,12 @@ buildExtraFields <- function(df){
 
 getSubset <- function(patientIDs){
   splittedIds <- strsplit(patientIDs,"_s") # During merge, which is always run we append subset id, either _s1 or _s2 to PATIENTID.
-  SUBSETS <- lapply(splittedIds, FUN=last_elem) # In proper patienid subset will always be  at the end. This select last element after _s
+  SUBSETS <- lapply(splittedIds, FUN=tail_elem) # In proper patienid subset will always be  at the end. This select last element after _s
   SUBSETS <- sapply(SUBSETS, FUN=formatSubset)
 }
 
-#R has a function tail which is supposed to return last element of collection. But like everything in R it works in some unexpected way.
-last_elem <- function(vect){
-     vect[length(vect)]
+tail_elem <- function(vect, n = 1){
+     vect[length(vect) -n + 1 ]
 }
 
 #frontend expects 0 or 1 instead of 1 or 2 as subset number.
