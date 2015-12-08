@@ -8,8 +8,10 @@
 #   sudo apt-get update
 #   sudo apt-get install -y git
 #   git clone https://github.com/tranSMART-Foundation/Scripts.git
-#   cd Scripts
-#   ./install-ubuntu/NewInstallTransmart.sh
+#
+# to run the install scripts
+#   cd ~/Scripts/install-ubuntu
+#   ./NewInstallTransmart.sh
 #
 # to run the checking script
 #   cd Scripts
@@ -129,4 +131,7 @@ sudo service tomcat7 restart
 echo "++++++++++++++++++++++++++++"
 echo "+  run checking script!"
 echo "++++++++++++++++++++++++++++"
+cd $HOME/Scripts/install-ubuntu/checks
+pwd
+
 
