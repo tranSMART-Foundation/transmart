@@ -51,6 +51,10 @@ source $HOME/.sdkman/bin/sdkman-init.sh
 sdk install grails 2.3.11 < AnswerYes.txt
 sdk install groovy 2.4.5 < AnswerYes.txt
 
+# check - basics.sh
+# check - checkVersions.sh
+# check - checkFilesBasic.sh
+
 echo "++++++++++++++++++++++++++++"
 echo "+  Install Tomcat 7"
 echo "++++++++++++++++++++++++++++"
@@ -58,6 +62,8 @@ echo "++++++++++++++++++++++++++++"
 sudo apt-get install -y tomcat7 
 sudo service tomcat7 stop
 ./updateTomcatConfig.sh
+
+# check - checkTomcatInstall.sh
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install R, Rserve and other packages"
