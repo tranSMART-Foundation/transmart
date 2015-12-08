@@ -142,7 +142,14 @@
                 <input type="text" id="txtMaxRow" value="100"> rows (< 1000 is preferable).
             </div>
 
-
+            %{--Type of sorting to apply--}%
+            <div class="heim-input-field" >
+                <label>Sort on:</label>
+               <select id="sortingSelect" value="nodes">
+                   <option value="nodes">Nodes</option>
+                   <option value="subjects">subject (patient ID)</option>
+               </select>
+            </div>
             %{--TODO :Not relevant for now. Might be in future sprint--}%
 
             %{--Group Subject--}%

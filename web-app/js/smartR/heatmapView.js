@@ -31,7 +31,8 @@ var HeatmapView = (function(){
             noClustersDiv : jQuery('#noOfClustersDiv'),
             noMarkersDiv : jQuery('#noOfMarkersDiv'),
             runAnalysisBtn : jQuery('#heim-btn-run-heatmap'),
-            downloadFileBtn : jQuery('#heim-btn-download-file')
+            downloadFileBtn : jQuery('#heim-btn-download-file'),
+            sortingSelect: jQuery('#sortingSelect')
         }
     };
 
@@ -85,9 +86,11 @@ var HeatmapView = (function(){
     var _getRunHeatmapViewValues = function (v) {
         // get max_rows
         var _maxRows = v.maxRowInput.val();
+        var _sortingType = v.sortingSelect.val();
         console.log(_maxRows);
         return {
-            max_rows : _maxRows
+            max_rows : _maxRows,
+            sorting: _sortingType
         }
     };
 
