@@ -31,4 +31,7 @@ if ! [ $results ] ; then
     exit 1
 fi
 
+echo "|  tomcat install and configuration is ok"
+echo "-------------------------------------"
+
 exit 0
