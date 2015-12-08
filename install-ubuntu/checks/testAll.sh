@@ -20,6 +20,16 @@ if (( $returnValue )); then
 	echo "************"
 fi
 
+./checkFilesBasic.sh
+returnValue=$?
+if (( $returnValue )); then
+	echo "************"
+	echo "** Some problem with the files or folders for basic setup"
+	echo "************"
+fi
+
+# finished to here . . .
+
 ./checkR.sh
 returnValue=$?
 if (( $returnValue )); then
