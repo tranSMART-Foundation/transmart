@@ -7,7 +7,7 @@
 
 function checkForPostgresTablespaceFolder {
     name=$1
-    checkPath=$TABLESPACES/$name
+    checkPath=$TABLESPACES$name
     if ! [ -x "$checkPath" ] ; then
     	echo "Can not find postgres tablespace folder: $checkPath"
     	return 1
