@@ -14,7 +14,7 @@ function checkForPostgresTablespaceFolder {
     fi
     
     x=$(ls -la $TABLESPACES | grep "$name" | grep "postgres")
-    if [ -z $x ] ; then
+    if [ -z "$x" ] ; then
     	echo "the folder at $checkPath"
     	echo "  is not owned by 'postgres' as required"
     	return 1
