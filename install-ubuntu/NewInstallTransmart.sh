@@ -85,7 +85,7 @@ echo "+  Load study GSE8581 in database"
 echo "++++++++++++++++++++++++++++"
 
 # check - checkPsqlInstall.sh 
-# check - checkFilePsql.sh
+# check - checkFilesPsql.sh
 # (should probably move these to earlier in the script)
 # move to just after checkVersions.sh ?
 
@@ -96,6 +96,8 @@ make update_datasets
 make -C samples/postgres load_clinical_GSE8581
 make -C samples/postgres load_ref_annotation_GSE8581
 make -C samples/postgres load_expression_GSE8581
+
+# check - checkPsqlDataload.sh
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Set up configuration files"

@@ -58,7 +58,7 @@ echo "The transmartApp user 'guest' exists."
 results=$(sudo -u postgres psql transmart --command="select concept_path from i2b2demodata.concept_dimension where concept_path like '%GSE8581\\\\'" | grep "GSE8581")
 if [ -z "$results" ]; then
 	echo "The transmartApp demo dataset GSE8581 has not been loaded"
-	echo "  it is likely load this dataset in the trasnamrt database."
+	echo "  it is likely that you did not load this dataset into the trasnamrt database."
 	echo "  See install instructions to do so."
 	exit 1
 fi 
