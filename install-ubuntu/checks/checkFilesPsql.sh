@@ -31,6 +31,9 @@ function checkForPostgresTablespaceFolder {
     	echo "  correct with sudo chmod"
     	return 1
     fi
+    
+    echo "OK - the folder at $checkPath"
+    
 	return 0
 }
 
