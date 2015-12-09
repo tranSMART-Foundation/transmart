@@ -4,11 +4,43 @@
 # This script checks for and reports missing files and directories that are required
 # for the tranSAMRT install and data loading
 # ********************************************************************************
-. ./postgresCheckHelper.sh
+
+function checkForPostgresTablespaceFolder {
+    name=$1
+    checkPath=$TABLESPACES/$name
+    if ! [ -x "$checkPath" ] ; then
+    	echo "Can not find postgres tablespace folder: $checkPath"
+    	return 1
+    fi
+    
+    x=$(la -la $TABLESPACES | grep "$name" | grep "postgres")
+    if [ -z $x ] ; then
+    	echo "the folder at $checkPath"
+    	echo "  is not owned by 'postgres' as required"
+    	return 1
+    fi
+
+	return 0
+}
 
 echo "-------------------------------------"
 echo "|  Checking for postgres support folders"
 echo "-------------------------------------"
+
+varsFile=$HOME/transmart-data/transmart/vars
+
+if [ -x "$varsFile" ] ; then
+    source $HOME/transmart-data/transmart/vars
+fi
+
+echo "checking for \$TABLESPACE env variable"
+if [ -z "$TABLESPACE" ] ; then
+	echo "  The \$TABLESPACE end variable is not set"
+	echo "  Cannot continue"
+	exit 1
+else
+	echo "  it is set to: $TABLESPACE "
+fi
 
 returnValue=0
 

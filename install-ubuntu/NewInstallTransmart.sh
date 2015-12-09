@@ -85,7 +85,7 @@ echo "+  Load study GSE8581 in database"
 echo "++++++++++++++++++++++++++++"
 
 # check - checkPsqlInstall.sh 
-# check - 
+# check - checkFilePsql.sh
 # (should probably move these to earlier in the script)
 # move to just after checkVersions.sh ?
 
