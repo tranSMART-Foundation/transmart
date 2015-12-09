@@ -50,7 +50,9 @@ main <- function(max_rows=100, sorting="nodes"){
                               "extraFields"=extraFields
                                )
   measurements <- df[,3:ncol(df)]
-  jsn <- addClusteringOutput(jsn, measurements)
+  if(nrow(measurements) > 1 && ncol(measurements) > 1 ){# cannot cluster matrix which is less than 2x2
+    jsn <- addClusteringOutput(jsn, measurements) #
+  }
   jsn <- toJSON(jsn,
                 pretty = TRUE)
   write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
