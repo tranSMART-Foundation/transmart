@@ -4,67 +4,54 @@
 # This script runs all of the scripts for checking code sanity; reports return values
 # ********************************************************************************
 
+function checkReturnError {
+	returnValue=$?
+	errorMessage=$1
+	if (( $returnValue )); then
+		echo "************"
+		echo "** $errorMessage"
+		echo "************"
+	fi
+}
+
 ./basics.sh
-returnValue=$?
-if (( $returnValue )); then
-	echo "************"
-	echo "** Some problem with the bascis tools check"
-	echo "************"
-fi
+checkReturnError "Some problem with the loading of basic command line tools and initial configuration"
 
 ./checkVersions.sh
-returnValue=$?
-if (( $returnValue )); then
-	echo "************"
-	echo "** Some problem with the versions check"
-	echo "************"
-fi
+checkReturnError "Some problem with the versions check"
 
 ./checkFilesBasic.sh
-returnValue=$?
-if (( $returnValue )); then
-	echo "************"
-	echo "** Some problem with the files or folders for basic setup"
-	echo "************"
-fi
+checkReturnError "Some problem with the files or folders for basic setup"
 
-# finished to here . . .
+./checkTomcatInstall.sh
+checkReturnError "Some problem with the tomcat install"
+
+./checkFilesR.sh
+checkReturnError "Some problem with the configuration of R files and folders"
 
 ./checkR.sh
-returnValue=$?
-if (( $returnValue )); then
-	echo "************"
-	echo "** Some problem with the checks for R"
-	echo "************"
-fi
+checkReturnError "Some problem with the instillation of R and/or R packages"
 
-./checkPsql.sh
-returnValue=$?
-if (( $returnValue )); then
-	echo "************"
-	echo "** Some problem with PostgreSQL, psql, or the transmartApp database"
-	echo "************"
-fi
+./checkPsqlInstall.sh 
+checkReturnError "Some problem with the instillation of RostgreSQL"
 
-./checkFiles.sh
-returnValue=$?
-if (( $returnValue )); then
-	echo "************"
-	echo "** Some problem with the required files and folders check"
-	echo "************"
-fi
+./checkFilesPsql.sh
+checkReturnError "Some problem with the transmart/PostgreSQL folder"
+
+./checkPsqlDataload.sh
+checkReturnError "Some problem setting up the database or loading data"
+
+./checkFilesConfig.sh
+checkReturnError "Some problem with the configuration files"
+
+./checkFilesToncatWar.sh
+checkReturnError "Some problem installing the tramsmart war file in tomcat"
+
+./checkFilesTomcat.sh
+checkReturnError "Some tomcat files or folders are missing"
 
 ./checkTools.sh
-if (( $returnValue )); then
-	echo "************"
-	echo "** Some problem with the required tool processes"
-	echo "************"
-fi
+checkReturnError "One or more of the required tools are not running"
 
 ./checkWeb.sh
-returnValue=$?
-if (( $returnValue )); then
-	echo "************"
-	echo "** Some problem with the required web sites"
-	echo "************"
-fi
+checkReturnError "One or more of the required web sites are failing"
