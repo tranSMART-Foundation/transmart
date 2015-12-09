@@ -31,8 +31,8 @@ var HeatmapView = (function(){
             noClustersDiv : jQuery('#noOfClustersDiv'),
             noMarkersDiv : jQuery('#noOfMarkersDiv'),
             runAnalysisBtn : jQuery('#heim-btn-run-heatmap'),
-            downloadFileBtn : jQuery('#heim-btn-download-file'),
-            sortingSelect: jQuery('#sortingSelect')
+            snapshotImageBtn : jQuery('#heim-btn-snapshot-image'),
+            downloadFileBtn : jQuery('#heim-btn-download-file')
         }
     };
 
@@ -116,7 +116,11 @@ var HeatmapView = (function(){
         var _runHeatmapInputArgs =  _getRunHeatmapViewValues(view.runHeatmapView);
         console.log('_runHeatmapAction', _runHeatmapInputArgs);
         jQuery('#heatmap').empty();
-        heatmapService.runAnalysis(_runHeatmapInputArgs);
+        view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
+        heatmapService.runAnalysis(_runHeatmapInputArgs)
+            .then(function() {
+                view.runHeatmapView.snapshotImageBtn.removeAttr('disabled');
+            });
     };
 
     var _preprocessAction = function (eventObj) {
@@ -238,7 +242,12 @@ var HeatmapView = (function(){
             view.runHeatmapView,
             _runHeatmapAction
         );
-        view.runHeatmapView.downloadFileBtn.click (heatmapService.checkStatus);
+
+        view.runHeatmapView.snapshotImageBtn.click(
+            function() {
+                return jQuery('#visualization svg')[0];
+            },
+            heatmapService.downloadSVG);
     };
 
     view.clearConceptPathInput = function (eventObj) {

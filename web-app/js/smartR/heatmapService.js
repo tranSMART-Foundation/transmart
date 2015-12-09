@@ -5,7 +5,7 @@
  * Heatmap Service
  */
 
-var HeatmapService = (function(smartRHeatmap){
+window.HeatmapService = (function(smartRHeatmap){
     var CHECK_DELAY = 1000;
     var PROJECTION = 'log_intensity';
     var NOOP_ABORT = function() {};
@@ -255,10 +255,12 @@ var HeatmapService = (function(smartRHeatmap){
 
     service.runAnalysis = function (params) {
         console.log('service.runAnalysis', params);
+        var defer = jQuery.Deferred();
 
         function showD3HeatMap(data) {
             downloadJsonFile(this.executionId, 'heatmap.json')
-                    .then(function(d) { smartRHeatmap.create(d); });
+                    .then(function(d) { smartRHeatmap.create(d); })
+                    .then(function() { defer.resolve(); });
         }
 
         startScriptExecution({
@@ -269,6 +271,10 @@ var HeatmapService = (function(smartRHeatmap){
             progressMessage: 'Calculating',
             successMessage: undefined,
         });
+
+        // having a "ultimateSuccess" event on the return of
+        // startScriptExecution would be better
+        return defer.promise();
     };
 
     service.generateSummaryTable = function (data) {
@@ -382,6 +388,21 @@ var HeatmapService = (function(smartRHeatmap){
             console.log(errorThrown);
             div.html(_html);
         });
+    };
+
+    service.downloadSVG = function(event) {
+        var serializer = new XMLSerializer();
+        var xmlString = serializer.serializeToString(event.data());
+        var blob = new Blob([xmlString], { type: 'image/svg+xml' });
+        var svgBlobUrl = URL.createObjectURL(blob);
+        var link = jQuery('<a/>')
+            .attr('href', svgBlobUrl)
+            .attr('download', 'heatmap.svg')
+            .css('display', 'none');
+        jQuery('body').append(link);
+        link[0].click();
+        link.remove();
+        URL.revokeObjectURL(svgBlobUrl);
     };
 
     return service;

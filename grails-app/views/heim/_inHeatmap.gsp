@@ -200,8 +200,10 @@
             <hr class="sr-divider">
 
             %{--tool buttons--}%
-            <div ">
-                <button id="heim-btn-run-heatmap" class="heim-action-button">Get Heatmap</button>
+            <div>
+                <button id="heim-btn-run-heatmap" class="heim-action-button">Generate Heatmap</button>
+                <button id="heim-btn-snapshot-image" class="heim-action-button" disabled>Capture Heatmap</button>
+                <button id="heim-btn-download-file" class="heim-action-button" disabled>Download Data</button>
             </div>
 
             %{--result--}%
