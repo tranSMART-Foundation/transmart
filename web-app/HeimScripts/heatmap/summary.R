@@ -36,16 +36,30 @@ library(gplots)
 main <- function(phase = NA, projection = NA)
 {
 
-  if(exists("preprocessed"))
+  
+  
+  if(phase == "preprocess")
   {
+    if(!exists("preprocessed"))
+    { 
+      stop("Summary stats is run for phase \'preprocess\', but variable \'preprocessed\' does not exist.")
+    }
     input_data <- list("preprocessed" = preprocessed)
-  }else
+  }
+  
+  if(phase == "fetch")
   {
     input_data <- loaded_variables
   }
   
   check_input(input_data, phase, projection)
   data_measurements <- extract_measurements(input_data)
+  
+  if(phase == "preprocess")
+  {
+    data_measurements <- split_on_subsets(data_measurements)
+  }
+  
   summary_stats_json <- produce_summary_stats(data_measurements, phase)
   write_summary_stats(summary_stats_json)
   produce_boxplot(data_measurements, phase, projection)
@@ -106,6 +120,53 @@ check_input <- function(datasets, phase_info, projection)
 }
 
 
+#preprocessed data contains one big data.frame. Summary stats and boxplot should be made per subset, so the dataset gets split on subsets
+split_on_subsets <- function(preprocessed_measurements)
+{
+  preprocessed_measurements <- preprocessed_measurements$preprocessed
+  
+  split_measurements <- list()
+  used_columns <- c()
+  
+  
+  # get possible subset identifiers. Format of column names for sample columns is <sample_name>_n<numerical node id>_s<numerical subset id>, eg. sample234_n1_s1
+  column_names <- colnames(preprocessed_measurements)
+
+  subsets_match_indices <- regexpr("s[[:digit:]]+$", column_names)
+  subsets_matches <- regmatches(x = column_names, m = subsets_match_indices)
+  subset_names <- unique (subsets_matches)
+  
+  if(length(subset_names) == 0)
+  {
+    stop("Something went wrong with splitting the preprocessed dataset into separate datasets per cohort (subset). 
+        Check the format of the column names of variable \'preprocessed\'.
+        Expected format for column labels (of sample columns) of data.frame \'preprocessed\' is:  
+           <sample_name>_n<numerical identifier for the node>_s<numerical identifier for the subset>
+        for example sample23341_n1_s1")
+    
+  }
+  
+  #extract for each subset the corresponding data
+  for(subset_name in subset_names)
+  {
+    subset_columns <- grep(paste(subset_name, "$", sep = ""), column_names) #strict matching to avoid accidental matching (e.g. if sample name contains "s1" as well)
+    
+    item_name <- paste("preprocessed_", subset_name, sep = "")
+    
+    split_measurements[[item_name]] <- preprocessed_measurements[, subset_columns]
+    used_columns <- c(used_columns, subset_columns)
+  }
+  
+  # each column should only be present in one of the two split datasets, and all columns should be present in one or the other split dataset
+  if(any(duplicated(used_columns)) | !all(1:ncol(preprocessed_measurements) %in% used_columns))
+  {
+    stop("Something went wrong with splitting the preprocessed dataset into separate datasets per cohort (subset). 
+        Maybe the column names of variable \'preprocessed\' are not of the correct format?
+        Expected format for column labels of data.frame \'preprocessed\' is <sample_name>_n<numerical identifier for the node>_s<numerical identifier for the subset>, e.g. sample1_n1_s1")
+  }
+  return(split_measurements)
+}
+
 
 
 # Extract the measurement values from the data.frames.
@@ -135,11 +196,12 @@ extract_measurements <- function(datasets)
     {
       non_measurement_columns <- which(colNames %in% c("Row.Label","Bio.marker"))
       datasets[[i]] <- dataset[ , -non_measurement_columns, drop = F]
-      if(!all(sapply(dataset[ ,-non_measurement_columns, drop = F], FUN = class) == "numeric"))
+      if(!all(sapply(dataset[ ,-non_measurement_columns, drop = F], FUN = is.numeric)))
       {
         stop(paste("Correct extraction of data columns was not possible for dataset ",dataset_id, 
                    ". It seems that, aside from the Row.Label and Bio.marker column, there are one or more non numeric data columns in the data.frame.", sep = ""))
       }
+      
     }
   }
   
@@ -161,9 +223,12 @@ produce_summary_stats <- function(measurement_tables, phase)
   result_table <- as.data.frame(matrix(NA, length(measurement_tables),12, 
                                        dimnames = list(names(measurement_tables), 
                                                        c("variableLabel","node","subset","totalNumberOfValuesIncludingMissing", "numberOfMissingValues", "min","max","mean", "standardDeviation", "q1","median","q3"))))
+  
   # add information about node and subset identifiers
   result_table$subset <- gsub(".*_","", rownames(result_table))
   result_table$node <- gsub("_.*","", rownames(result_table))
+  
+  
   
   # calculate summary stats per data.frame
   for(i in 1:length(measurement_tables))
