@@ -8,11 +8,22 @@
 . ./basicsHelper.sh
 . ./versionCompare.sh
 
+pathForRBin=$HOME/transmart/transmart-data/R/root/bin
+
 echo "-------------------------------------"
 echo "|  Checking for basics and packages required by R;"
 echo "|    if anything is reproted as missing, then recheck"
 echo "|    the detailed instructions to installing the missing items"
 echo "-------------------------------------"
+
+echo "Checking for R bin on path"
+if [ -p $pathForRBin ] ; then
+	echo "WARNING - the bin file for the correct version of R is not on your path"
+	echo "After reboot and login, check for this element on your path:"
+	echo "$pathForRBin"
+	echo "If not there, the make sure that it is added in your bash profile"
+	export PATH=$pathForRBin:$PATH
+fi
 
 echo "checking for R itself"
 if ! checkForCommandLineTool "R"; then
