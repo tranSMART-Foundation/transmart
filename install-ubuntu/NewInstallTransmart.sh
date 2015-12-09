@@ -84,6 +84,11 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Load study GSE8581 in database"
 echo "++++++++++++++++++++++++++++"
 
+# check - checkPsqlInstall.sh 
+# check - 
+# (should probably move these to earlier in the script)
+# move to just after checkVersions.sh ?
+
 cd $HOME/transmart/transmart-data
 source ./vars
 make -j4 postgres
