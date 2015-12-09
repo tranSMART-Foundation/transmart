@@ -92,6 +92,12 @@ check_input <- function(datasets, phase_info, projection)
                "\ne.g. n0_s1, n0_s2, n1_s1, n1_s2. "))
   }
   
+  #all labels of the data.frames should be unique
+  dataset_names <- names(datasets)
+  if(any(duplicated(dataset_names)))
+  {
+    stop(paste("Not all data.frame labels are unique; one or more labels in the \'loaded_variables\' or \'preprocessed\' variable are duplicated"))
+  }
   
   if(is.na(phase_info))
   {
@@ -220,9 +226,9 @@ extract_measurements <- function(datasets)
 produce_summary_stats <- function(measurement_tables, phase)
 {
   # construct data.frame to store the results from the summary statistics in
-  result_table <- as.data.frame(matrix(NA, length(measurement_tables),12, 
+  result_table <- as.data.frame(matrix(NA, length(measurement_tables),13, 
                                        dimnames = list(names(measurement_tables), 
-                                                       c("variableLabel","node","subset","totalNumberOfValuesIncludingMissing", "numberOfMissingValues", "min","max","mean", "standardDeviation", "q1","median","q3"))))
+                                                       c("variableLabel","node","subset","totalNumberOfValuesIncludingMissing", "numberOfMissingValues", "numberOfSamples","min","max","mean", "standardDeviation", "q1","median","q3"))))
   
   # add information about node and subset identifiers
   result_table$subset <- gsub(".*_","", rownames(result_table))
@@ -237,6 +243,11 @@ produce_summary_stats <- function(measurement_tables, phase)
     identifier <- names(measurement_tables)[i]
     result_table[identifier, "variableLabel"] <- identifier
     
+    if(!is.na(measurement_tables[i]))
+    {
+      result_table[identifier, "numberOfSamples"]  <- ncol(measurement_tables[[i]])
+    }    
+    
     # convert data.frame to a vector containing all values of that data.frame, a vector remains a vector
     measurements <- unlist(measurement_tables[[i]])
     
@@ -247,6 +258,7 @@ produce_summary_stats <- function(measurement_tables, phase)
     
     # calculate descriptive statistics, only for numerical data. 
     # the 50% quantile is the median. 0 and 100% quartiles are min and max respectively
+   
     result_table[identifier, "mean"] <- mean(measurements, na.rm=T)
     result_table[identifier, "standardDeviation"] <- sd(measurements, na.rm=T)
     

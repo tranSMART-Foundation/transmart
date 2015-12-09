@@ -86,6 +86,7 @@ summary_stats_table <- data.frame(
   "subset" = "s1",
   "totalNumberOfValuesIncludingMissing" = 20,
   "numberOfMissingValues" = 1,
+  "numberOfSamples" = 4,
   "min" = -23.0234,
   "max" = 367.436,
   "mean" = 75.242316,
@@ -127,7 +128,8 @@ test.produce_summary_stats.itemNA <- function(){
   
   expected_result <- summary_stats_table
   expected_result[,c("totalNumberOfValuesIncludingMissing", "numberOfMissingValues")] <- c(1,1)
-  expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- as.numeric(NA)
+  expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- as.numeric(NA) #numeric
+  expected_result[,"numberOfSamples"] <- NA #logical
   
   checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_NA_set, phase))
 }
@@ -136,7 +138,7 @@ test.produce_summary_stats.itemNA <- function(){
 test.produce_summary_stats.1sample<- function(){  
   test_data_one_sample <- list("n0_s1" = data.frame(sample = 1:5 ))
   expected_result <- summary_stats_table
-  expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues")] <- c(5, 0)
+  expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues","numberOfSamples")] <- c(5, 0, 1)
   expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- c(1, 5, 3, 1.58113883, 2, 3, 4)
   
   checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_sample, phase))
@@ -147,7 +149,7 @@ test.produce_summary_stats.1probe <- function(){
   test_data_one_probe <- list("n0_s1" = test_data_one_probe)
   
   expected_result <- summary_stats_table
-  expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues")] <- c(5, 0)
+  expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues","numberOfSamples")] <- c(5, 0, 5)
   expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- c(1, 5, 3, 1.58113883, 2, 3, 4)
   
   checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_probe, phase))
@@ -157,7 +159,7 @@ test.produce_summary_stats.1probe <- function(){
 test.produce_summary_stats.1probe1sample <- function(){
   test_data_one_probe_sample <- list("n0_s1" = data.frame(sample = 1))
   expected_result <- summary_stats_table
-  expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues")] <- c(1, 0)
+  expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues","numberOfSamples")] <- c(1, 0, 1)
   expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- c(1, 1, 1, as.numeric(NA), 1, 1, 1)
   
   checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_probe_sample, phase))
