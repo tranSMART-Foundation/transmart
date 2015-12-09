@@ -34,6 +34,7 @@ main <- function(max_rows=100, sorting="nodes"){
   }
   df <- df[1:min(max_rows,nrow(df)),]
   fields <- buildFields(df)
+  df <- cleanUp(df) # temporary stats like SD and MEAN need to be removed for clustering to work
   extraFields <- buildExtraFields(fields)
   probes <- na.omit(df[,1])
   geneSymbols <- df[,2][1:length(probes)]#unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector, otherwise we get a dataframe
@@ -41,13 +42,16 @@ main <- function(max_rows=100, sorting="nodes"){
 
   significanceValues <- unique(fields["SIGNIFICANCE"])[,1]
   features <- unique(extraFields["FEATURE"])[,1]
-  jsn <- toJSON(list("fields"=fields, "geneSymbols"=geneSymbols,
-                     "patientIDs"=patientIDs,
-                     "probes"=probes,
-                     "significanceValues"=significanceValues,
-                     "features"=features,
-                     "extraFields"=extraFields
-                      ),
+  jsn <- list("fields"=fields, "geneSymbols"=geneSymbols,
+                              "patientIDs"=patientIDs,
+                              "probes"=probes,
+                              "significanceValues"=significanceValues,
+                              "features"=features,
+                              "extraFields"=extraFields
+                               )
+  measurements <- df[,3:ncol(df)]
+  jsn <- addClusteringOutput(jsn, measurements)
+  jsn <- toJSON(jsn,
                 pretty = TRUE)
   write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
   writeDataForZip(df, patientIDs) # for later zip generation
@@ -57,6 +61,13 @@ main <- function(max_rows=100, sorting="nodes"){
     msgs <- errors
   }
   list(messages=msgs) # main function in every R script has to return a list (so a data.frame will also do)
+}
+
+cleanUp <- function(df){
+  df["MEAN"] <- NULL
+  df["SD" ]  <- NULL
+  df["SIGNIFICANCE"] <- NULL
+  df
 }
 
 verifyInput <- function(max_rows, sorting){
@@ -201,4 +212,86 @@ add.subset.label <- function(df,label){
     colnames(df)[colnames(df)==sample.name] <- new.name
   }
   return(df)
+}
+
+computeDendrogram <- function(zScoreMatrix, distanceMeassure, linkageMethod) {
+    as.dendrogram(hclust(dist(zScoreMatrix, method=distanceMeassure), method=linkageMethod))
+}
+
+dendrogramToJSON <- function(d) {
+    totalMembers <- attributes(d)$members
+    add_json <- function(x, start, left) {
+        members <- attributes(x)$members
+        height <- attributes(x)$height
+        index <- (start - 1):(start + members - 2)
+        index <- paste(index, collapse=' ')
+        jsonString <<- paste(jsonString, sprintf('{"height":"%s", "index":"%s", "children":[', height, index))
+        if (is.leaf(x)){
+            jsonString <<- paste(jsonString, ']}')
+        } else {
+            add_json(x[[1]], start, TRUE)
+            jsonString <<- paste(jsonString, ",")
+            leftMembers <- attributes(x[[1]])$members
+            add_json(x[[2]], start + leftMembers, FALSE)
+            jsonString <<- paste(jsonString, "]}")
+        }
+    }
+    jsonString <- ""
+    add_json(d, TRUE)
+    return(jsonString)
+}
+
+
+addClusteringOutput <- function(jsn, measurements){
+
+  colDendrogramEuclideanComplete <- computeDendrogram(t(measurements), 'euclidean', 'complete')
+  colDendrogramEuclideanSingle <- computeDendrogram(t(measurements), 'euclidean', 'single')
+  colDendrogramEuclideanAverage <- computeDendrogram(t(measurements), 'euclidean', 'average')
+  rowDendrogramEuclideanComplete <- computeDendrogram(measurements, 'euclidean', 'complete')
+  rowDendrogramEuclideanSingle <- computeDendrogram(measurements, 'euclidean', 'single')
+  rowDendrogramEuclideanAverage <- computeDendrogram(measurements, 'euclidean', 'average')
+
+  colDendrogramManhattanComplete <- computeDendrogram(t(measurements), 'manhattan', 'complete')
+  colDendrogramManhattanSingle <- computeDendrogram(t(measurements), 'manhattan', 'single')
+  colDendrogramManhattanAverage <- computeDendrogram(t(measurements), 'manhattan', 'average')
+  rowDendrogramManhattanComplete <- computeDendrogram(measurements, 'manhattan', 'complete')
+  rowDendrogramManhattanSingle <- computeDendrogram(measurements, 'manhattan', 'single')
+  rowDendrogramManhattanAverage <- computeDendrogram(measurements, 'manhattan', 'average')
+
+  jsn$hclustEuclideanComplete <- list(
+      order.dendrogram(colDendrogramEuclideanComplete) -1,
+      order.dendrogram(rowDendrogramEuclideanComplete) -1,
+      dendrogramToJSON(colDendrogramEuclideanComplete),
+      dendrogramToJSON(rowDendrogramEuclideanComplete))
+
+  jsn$hclustEuclideanSingle <- list(
+      order.dendrogram(colDendrogramEuclideanSingle)  -1,
+      order.dendrogram(rowDendrogramEuclideanSingle) - 1,
+      dendrogramToJSON(colDendrogramEuclideanSingle),
+      dendrogramToJSON(rowDendrogramEuclideanSingle))
+
+  jsn$hclustEuclideanAverage <- list(
+      order.dendrogram(colDendrogramEuclideanAverage) - 1,
+      order.dendrogram(rowDendrogramEuclideanAverage) - 1,
+      dendrogramToJSON(colDendrogramEuclideanAverage),
+      dendrogramToJSON(rowDendrogramEuclideanAverage))
+
+  jsn$hclustManhattanComplete <- list(
+      order.dendrogram(colDendrogramManhattanComplete) - 1,
+      order.dendrogram(rowDendrogramManhattanComplete) - 1,
+      dendrogramToJSON(colDendrogramManhattanComplete),
+      dendrogramToJSON(rowDendrogramManhattanComplete))
+
+  jsn$hclustManhattanSingle <- list(
+      order.dendrogram(colDendrogramManhattanSingle) - 1,
+      order.dendrogram(rowDendrogramManhattanSingle) - 1,
+      dendrogramToJSON(colDendrogramManhattanSingle),
+      dendrogramToJSON(rowDendrogramManhattanSingle))
+
+  jsn$hclustManhattanAverage <- list(
+      order.dendrogram(colDendrogramManhattanAverage) - 1,
+      order.dendrogram(rowDendrogramManhattanAverage) - 1,
+      dendrogramToJSON(colDendrogramManhattanAverage),
+      dendrogramToJSON(rowDendrogramManhattanAverage))
+     return(jsn)
 }

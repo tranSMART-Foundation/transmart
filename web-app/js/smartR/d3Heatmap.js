@@ -136,7 +136,8 @@ SmartRHeatmap = (function(){
                 .attr('class', function(d) {
                     return 'square patientID-' + d.PATIENTID + ' probe-' + d.PROBE;
                 })
-                .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
+                .attr("x", function(d) {
+                    return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
                 .attr("y", function(d) { return probes.indexOf(d.PROBE) * gridFieldHeight; })
                 .attr("width", gridFieldWidth)
                 .attr("height", gridFieldHeight)
@@ -171,7 +172,8 @@ SmartRHeatmap = (function(){
             square
                 .transition()
                 .duration(animationDuration)
-                .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
+                .attr("x", function(d) {
+                    return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
                 .attr("y", function(d) { return probes.indexOf(d.PROBE) * gridFieldHeight; })
                 .attr("width", gridFieldWidth)
                 .attr("height", gridFieldHeight);
@@ -483,7 +485,7 @@ SmartRHeatmap = (function(){
                 .attr('class', function(d) {
                     return 'extraSquare patientID-' + d.PATIENTID + ' feature-' + d.FEATURE;
                 })
-                .attr("x", function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
+                .attr("x", function(d) {return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
                 .attr('y', function(d) { return featurePosY + features.indexOf(d.FEATURE) * gridFieldHeight / 2; })
                 .attr("width", gridFieldWidth)
                 .attr("height", gridFieldHeight / 2)
@@ -903,11 +905,14 @@ SmartRHeatmap = (function(){
         }
 
         function updateColOrder(sortValues) {
+            console.log(sortValues);
             var sortedPatientIDs = [];
             for (var i = 0; i < sortValues.length; i++) {
                 sortedPatientIDs.push(patientIDs[sortValues[i]]);
             }
+            console.log(patientIDs);
             patientIDs = sortedPatientIDs;
+            console.log(patientIDs);
             unselectAll();
             removeColDendrogram();
             updateHeatmap();
