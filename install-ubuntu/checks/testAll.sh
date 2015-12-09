@@ -38,7 +38,7 @@ checkReturnError "Some problem with the instillation of RostgreSQL"
 ./checkFilesPsql.sh
 checkReturnError "Some problem with the transmart/PostgreSQL folder"
 
-./checkPsqlDataload.sh
+./checkPsqlDataLoad.sh
 checkReturnError "Some problem setting up the database or loading data"
 
 ./checkFilesConfig.sh
