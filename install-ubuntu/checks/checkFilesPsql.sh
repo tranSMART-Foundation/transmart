@@ -33,13 +33,13 @@ if [ -x "$varsFile" ] ; then
     source $HOME/transmart-data/transmart/vars
 fi
 
-echo "checking for \$TABLESPACE env variable"
-if [ -z "$TABLESPACE" ] ; then
-	echo "  The \$TABLESPACE end variable is not set"
+echo "checking for \$TABLESPACES env variable"
+if [ -z "$TABLESPACES" ] ; then
+	echo "  The \$TABLESPACES end variable is not set"
 	echo "  Cannot continue"
 	exit 1
 else
-	echo "  it is set to: $TABLESPACE "
+	echo "  it is set to: $TABLESPACES "
 fi
 
 returnValue=0
