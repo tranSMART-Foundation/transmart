@@ -5,7 +5,6 @@
 # ******************************************************************************
 
 # # ------------------ helper function -------------------
-. ./basicsHelper.sh
 . ./versionCompare.sh
 
 pathForRBin=$HOME/transmart/transmart-data/R/root/bin
@@ -18,18 +17,21 @@ echo "-------------------------------------"
 
 echo "Checking for R bin on path"
 pathToExecutable=$(which R)
-if [ -x "$path_to_executable" ] ; then
-    echo "It's here: $path_to_executable"
+if [ -x "$pathToExecutable" ] ; then
+    echo "It's here: $pathToExecutable"
 else
-	echo "Warning: R not on path; setting PATH temporarily to perform checks."
-	echo "Add to PATH: $pathForRBin"
- 	export PATH=$pathForRBin:$PATH
-fi
-
-echo "checking for R itself"
-if ! checkForCommandLineTool "R"; then
-    echo "R itself is missing; nothing further can be checked"
-    exit 1
+    echo "Warning: R not on path; setting PATH temporarily to perform checks."
+    echo "Add to PATH: $pathForRBin"
+    export PATH=$pathForRBin:$PATH
+    pathToExecutable=$(which R)
+    if [ -x "$pathToExecutable" ] ; then
+        echo "It's here: $pathToExecutable"
+    else
+        echo "The R command is not reachable"
+        echo "Check details of install step for installing R"
+        echo "Checking can not continue."
+        echo 1
+    fi
 fi
 
 # check R version, exactly 3.1.2
@@ -38,8 +40,8 @@ RVersion=$(R --version | awk -F '^R version ' '{print $2}')
 reportCheckExact "R" $desiredRVersion $RVersion
 returnFlag=$?
 if [ returnFlag = 1 ]; then
-	echo "R version problems; aborting check of R and Rpackages"
-	exit 1
+    echo "R version problems; aborting check of R and Rpackages"
+    exit 1
 fi
 
 R --vanilla --slave < probeRserve.R > /dev/null
