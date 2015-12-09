@@ -30,6 +30,7 @@ var HeatmapView = (function(){
             methodSelect : jQuery('#methodSelect'),
             noClustersDiv : jQuery('#noOfClustersDiv'),
             noMarkersDiv : jQuery('#noOfMarkersDiv'),
+            sortingSelect : jQuery('#sortingSelect'),
             runAnalysisBtn : jQuery('#heim-btn-run-heatmap'),
             snapshotImageBtn : jQuery('#heim-btn-snapshot-image'),
             downloadFileBtn : jQuery('#heim-btn-download-file')
