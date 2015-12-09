@@ -27,7 +27,7 @@ echo "-------------------------------------"
 echo "|  Checking for postgres support folders"
 echo "-------------------------------------"
 
-varsFile=$HOME/transmart-data/transmart/vars
+varsFile=$HOME/transmart/transmart-data/vars
 
 if [ -x "$varsFile" ] ; then
     source $HOME/transmart-data/transmart/vars
