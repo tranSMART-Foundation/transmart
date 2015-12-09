@@ -8,8 +8,11 @@
 function checkForPostgresTablespaceFolder {
     name=$1
     checkPath=$TABLESPACES$name
-    if ! [ -x "$checkPath" ] ; then
-    	echo "Can not find postgres tablespace folder: $checkPath"
+    
+    x=$(ls -la $TABLESPACES | grep "$name")
+    if [ -z "$x" ] ; then
+    	echo "the folder at $checkPath"
+    	echo "  was not found"
     	return 1
     fi
     
@@ -17,9 +20,17 @@ function checkForPostgresTablespaceFolder {
     if [ -z "$x" ] ; then
     	echo "the folder at $checkPath"
     	echo "  is not owned by 'postgres' as required"
+    	echo "  correct with sudo chown"
     	return 1
     fi
 
+    x=$(ls -la $TABLESPACES | grep "$name" | grep "drwx------")
+    if [ -z "$x" ] ; then
+    	echo "the folder at $checkPath"
+    	echo "  is not set to permit flags 'drwx------' as required"
+    	echo "  correct with sudo chmod"
+    	return 1
+    fi
 	return 0
 }
 
@@ -42,14 +53,12 @@ else
 	echo "  it is set to: $TABLESPACES "
 fi
 
+echo "checking for the individual tablespace folders"
 returnValue=0
-
 for folderName in biomart deapp indx search_app transmart
 do
 	if ! checkForPostgresTablespaceFolder $folderName; then
-		echo "The required postgres tablespace folder $folderName"
-		echo "  is missing; this should have been created as part of the basics"
-		echo "  stage in the install process; recheck that step"
+		echo "  Something is wrong with the postgres tablespace folder $folderName"
 		returnValue=1
 	fi
 done
