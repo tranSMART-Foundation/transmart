@@ -21,7 +21,7 @@ pathToExecutable=$(which R)
 if [ -x "$path_to_executable" ] ; then
     echo "It's here: $path_to_executable"
 else
-	echo "Warning: R not on path; setting PATH temporary to perform checks."
+	echo "Warning: R not on path; setting PATH temporarily to perform checks."
 	echo "Add to PATH: $pathForRBin"
  	export PATH=$pathForRBin:$PATH
 fi
