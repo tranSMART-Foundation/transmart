@@ -8,30 +8,6 @@
 # ******************************************************************************
 
 # # ------------------ helper function -------------------
-. ./basicsHelper.sh
-
-echo "-------------------------------------"
-echo "|  Checking for PostgreSQL basics: "
-echo "|    are PostgreSQL and psql installed; "
-echo "|   is PostgreSQL running."
-echo "-------------------------------------"
-
-echo "checking to see if PostgreSQL has been installed"
-if ! checkForCommandLineTool "psql"; then
-    echo "it would appear that PostgreSQL has not been installed"
-    echo "check loading instructions for how to test further"
-    exit 1
-fi
-echo "PostgreSQL appears to be installed"
-
-echo "checking to see if PostgreSQL is running"
-postgresRunning=$(ps aux | grep postgres | grep -v "grep" | grep "stats collector process")
-if [ -z "$postgresRunning" ]; then 
-	echo "PostgreSQL does not appear to be running; start it"
-	echo  "  with the command: sudo /etc/init.d/postgresql restart"  
-	exit 1
-fi
-echo "PostgreSQL appears to be running"
 
 echo "-------------------------------------"
 echo "|  Checking for transmart database access: "
@@ -42,6 +18,15 @@ echo "-------------------------------------"
 
 echo "Checking SUDO authentication"
 sudo echo "Established SUDO authentication"
+
+echo "checking to see if PostgreSQL is running"
+postgresRunning=$(ps aux | grep postgres | grep -v "grep" | grep "stats collector process")
+if [ -z "$postgresRunning" ]; then 
+	echo "PostgreSQL does not appear to be running; start it"
+	echo  "  with the command: sudo /etc/init.d/postgresql restart"  
+	exit 1
+fi
+echo "PostgreSQL appears to be running"
 
 results=$(sudo -u postgres psql postgres --command="\du biomart" | grep biomart)
 if [ -z "$results" ]; then

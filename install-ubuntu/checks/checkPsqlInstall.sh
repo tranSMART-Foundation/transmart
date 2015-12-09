@@ -33,53 +33,7 @@ if [ -z "$postgresRunning" ]; then
 fi
 echo "PostgreSQL appears to be running"
 
-echo "-------------------------------------"
-echo "|  Checking for transmart database access: "
-echo "|    does 'biomart' use exist "
-echo "|    are the transmart users set up: admin and guest  "
-echo "|    in the demo dataset GSE8581 loaded  "
-echo "-------------------------------------"
-
-echo "Checking SUDO authentication"
-sudo echo "Established SUDO authentication"
-
-results=$(sudo -u postgres psql postgres --command="\du biomart" | grep biomart)
-if [ -z "$results" ]; then
-	echo "The transmart database user 'biomart' does not exist;"
-	echo "  it is likely that you did not initialisze the trasnamrt database."
-	echo "  See install instructions to do so."
-	exit 1
-fi 
-echo "The transmart database user 'biomart' exists."
-
-results=$(sudo -u postgres psql transmart --command="select username from searchapp.search_auth_user where username='admin'" | grep admin)
-if [ -z "$results" ]; then
-	echo "The transmartApp user 'admin' does not exist;"
-	echo "  it is likely that you did not initialisze the trasnamrt database."
-	echo "  See install instructions to do so."
-	exit 1
-fi 
-echo "The transmartApp user 'admin' exists."
-
-results=$(sudo -u postgres psql transmart --command="select username from searchapp.search_auth_user where username='guest'" | grep guest)
-if [ -z "$results" ]; then
-	echo "The transmartApp user 'guest' does not exist;"
-	echo "  it is likely that you did not initialisze the trasnamrt database."
-	echo "  See install instructions to do so."
-	exit 1
-fi 
-echo "The transmartApp user 'guest' exists."
-
-results=$(sudo -u postgres psql transmart --command="select concept_path from i2b2demodata.concept_dimension where concept_path like '%GSE8581\\\\'" | grep "GSE8581")
-if [ -z "$results" ]; then
-	echo "The transmartApp demo dataset GSE8581 has not been loaded"
-	echo "  it is likely load this dataset in the trasnamrt database."
-	echo "  See install instructions to do so."
-	exit 1
-fi 
-echo "The transmartApp demo dataset GSE8581 is loaded."
-
-echo "Done checking the PostgreSQL transmart database"
+echo "Done checking the PostgreSQL basics"
 
 exit 0
 
