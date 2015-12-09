@@ -243,7 +243,7 @@ produce_summary_stats <- function(measurement_tables, phase)
     identifier <- names(measurement_tables)[i]
     result_table[identifier, "variableLabel"] <- identifier
     
-    if(!is.na(measurement_tables[i]))
+    if(!is.na(measurement_tables[[i]]))
     {
       result_table[identifier, "numberOfSamples"]  <- ncol(measurement_tables[[i]])
     }    
