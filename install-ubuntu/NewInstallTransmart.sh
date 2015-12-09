@@ -122,6 +122,8 @@ curl http://75.124.74.64/wars/transmart.V1.2.4.war --output transmart.war
 curl http://75.124.74.64/wars/gwava.V1.2.4.war --output gwava.war
 sudo cp *.war /var/lib/tomcat7/webapps/
 
+#check - checkFilesToncatWar.sh
+
 echo "++++++++++++++++++++++++++++"
 echo "+  Load, configure and start SOLR"
 echo "++++++++++++++++++++++++++++"
@@ -145,9 +147,16 @@ echo "++++++++++++++++++++++++++++"
 sudo service tomcat7 restart
 
 echo "++++++++++++++++++++++++++++"
-echo "+  run checking script!"
+echo "+  wait 10 min for all to settle"
 echo "++++++++++++++++++++++++++++"
-cd $HOME/Scripts/install-ubuntu/checks
-pwd
 
+sleep 600
+
+echo "++++++++++++++++++++++++++++"
+echo "+  run final checking scripts"
+echo "++++++++++++++++++++++++++++"
+
+#check - checkFilesTomcat.sh
+#check - checkTools.sh
+#check - checkWeb.sh
 

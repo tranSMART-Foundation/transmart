@@ -5,8 +5,21 @@
 # linux command lines that are needed for the tranSAMRT install and data loading
 # ********************************************************************************
 
-# # ------------------ source helper function -------------------
-. ./checkUrl.sh
+function checkURL {
+    curl -s -o "/dev/null" $1
+    results=$?
+    if [ $results -ne 0 ] ; then
+        echo "Error occurred getting URL $1:"
+        if [ $results -eq 6 ]; then
+            echo "  Unable to resolve host"
+        fi
+        if [ $results -eq 7 ]; then
+            echo "  Unable to connect to host"
+        fi
+        return 1
+    fi
+    return 0	
+}
 
 # ---------------------------
 # Check to see that the expected web sites are running
