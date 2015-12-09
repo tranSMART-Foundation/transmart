@@ -44,7 +44,7 @@ checkReturnError "Some problem setting up the database or loading data"
 ./checkFilesConfig.sh
 checkReturnError "Some problem with the configuration files"
 
-./checkFilesToncatWar.sh
+./checkFilesTomcatWar.sh
 checkReturnError "Some problem installing the tramsmart war file in tomcat"
 
 ./checkFilesTomcat.sh
