@@ -17,12 +17,11 @@ echo "|    the detailed instructions to installing the missing items"
 echo "-------------------------------------"
 
 echo "Checking for R bin on path"
-if [ -p $pathForRBin ] ; then
-	echo "WARNING - the bin file for the correct version of R is not on your path"
-	echo "After reboot and login, check for this element on your path:"
-	echo "$pathForRBin"
-	echo "If not there, the make sure that it is added in your bash profile"
-	export PATH=$pathForRBin:$PATH
+pathToExecutable=$(which R)
+if [ -x "$path_to_executable" ] ; then
+    echo "It's here: $path_to_executable"
+else 
+ 	export PATH=$pathForRBin:$PATH
 fi
 
 echo "checking for R itself"
@@ -36,8 +35,8 @@ desiredRVersion="3.1.2"
 RVersion=$(R --version | awk -F '^R version ' '{print $2}')
 reportCheckExact "R" $desiredRVersion $RVersion
 returnFlag=$?
-if [ returnFlag = 1 ] then;
-	echo "R version problems; aborting check of R and Rpackages
+if [ returnFlag = 1 ]; then
+	echo "R version problems; aborting check of R and Rpackages"
 	exit 1
 fi
 
