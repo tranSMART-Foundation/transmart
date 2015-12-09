@@ -77,6 +77,9 @@ echo "export PATH=${HOME}/transmart/transmart-data/R/root/bin:\$PATH" > Rpath.sh
 sudo mv Rpath.sh /etc/profile.d/
 source /etc/profile.d/Rpath.sh
 
+# check - checkFilesR.sh
+# check - checkR.sh
+
 echo "++++++++++++++++++++++++++++"
 echo "+  Load study GSE8581 in database"
 echo "++++++++++++++++++++++++++++"
@@ -98,6 +101,8 @@ source ./vars
 make -C config install
 sudo mkdir -p /usr/share/tomcat7/.grails/transmartConfig/
 sudo cp /home/transmart/.grails/transmartConfig/*.groovy /usr/share/tomcat7/.grails/transmartConfig/
+
+# check - checkFilesConfig.sh
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install war files"
