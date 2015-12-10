@@ -5,6 +5,4 @@ information (such as missing elements) is reported with suggested fixes.
 In any case, for clairification, see the install instructions on the tranSMART wiki: 
 https://wiki.transmartfoundation.org/display/transmartwiki/Install+the+current+official+release 
 
-The script testAll.sh runs all the checks in the recommended order.
-The file testAllResults.txt contains the results of running all the 
-checks on a working system.
+The script checkAll.sh runs all the checks in the recommended order.
