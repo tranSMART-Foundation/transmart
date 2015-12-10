@@ -91,6 +91,7 @@ cd $HOME/transmart/transmart-data
 sudo -v
 source ./vars
 make -C R install_packages
+sudo -v
 cd $HOME
 echo "export PATH=${HOME}/transmart/transmart-data/R/root/bin:\$PATH" > Rpath.sh
 sudo mv Rpath.sh /etc/profile.d/
@@ -113,6 +114,7 @@ sudo -v
 source ./vars
 make -j4 postgres
 make update_datasets
+sudo -v
 make -C samples/postgres load_clinical_GSE8581
 make -C samples/postgres load_ref_annotation_GSE8581
 make -C samples/postgres load_expression_GSE8581
@@ -151,6 +153,7 @@ echo "+  Load, configure and start SOLR"
 echo "++++++++++++++++++++++++++++"
 
 cd $HOME/transmart/transmart-data
+sudo -v
 source ./vars
 make -C solr start > ~/transmart/transmart-data/solr.log 2>&1 & 
 sleep 60
