@@ -10,13 +10,14 @@
 #   git clone https://github.com/tranSMART-Foundation/Scripts.git
 #
 # to run the install scripts
-#   cd ~/Scripts/install-ubuntu
-#   ./NewInstallTransmart.sh
+#   cd ~
+#   /Scripts/install-ubuntu/InstallTransmart.sh
 #
 # to run the checking script
-#   cd Scripts
-#   cd install-ubuntu/checks
-#   ./testAll.sh
+#   Scripts/install-ubuntu/checks/testAll.sh
+
+# set up sudo early
+sudo -v
 
 echo "++++++++++++++++++++++++++++"
 echo "+  set up working dir (transmart) "
@@ -29,6 +30,7 @@ echo "+  set up the transmart-date folder"
 echo "++++++++++++++++++++++++++++"
 
 cd $HOME/transmart
+sudo -v
 sudo apt-get install -y curl
 sudo apt-get install -y unzip
 curl https://codeload.github.com/tranSMART-Foundation/transmart-data/zip/release-1.2.4 -o transmart-data-release-1.2.4.zip
@@ -40,6 +42,7 @@ echo "+  Install of basic tools"
 echo "++++++++++++++++++++++++++++"
 
 cd $HOME/transmart/transmart-data
+sudo -v
 sudo make -C env ubuntu_deps_root
 make -C env ubuntu_deps_regular
 sudo apt-get install -y ant
@@ -59,9 +62,11 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Install Tomcat 7"
 echo "++++++++++++++++++++++++++++"
 
+cd $HOME
+sudo -v 
 sudo apt-get install -y tomcat7 
 sudo service tomcat7 stop
-./updateTomcatConfig.sh
+$HOME/Scripts/install-ubuntu/updateTomcatConfig.sh
 
 # check - checkTomcatInstall.sh
 
@@ -70,6 +75,7 @@ echo "+  Install R, Rserve and other packages"
 echo "++++++++++++++++++++++++++++"
 
 cd $HOME/transmart/transmart-data
+sudo -v
 source ./vars
 make -C R install_packages
 cd $HOME
@@ -90,6 +96,7 @@ echo "++++++++++++++++++++++++++++"
 # move to just after checkVersions.sh ?
 
 cd $HOME/transmart/transmart-data
+sudo -v
 source ./vars
 make -j4 postgres
 make update_datasets
@@ -104,6 +111,7 @@ echo "+  Set up configuration files"
 echo "++++++++++++++++++++++++++++"
 
 cd $HOME/transmart/transmart-data
+sudo -v
 source ./vars
 make -C config install
 sudo mkdir -p /usr/share/tomcat7/.grails/transmartConfig/
@@ -116,6 +124,7 @@ echo "+  Install war files"
 echo "++++++++++++++++++++++++++++"
 
 cd $HOME/transmart
+sudo -v
 mkdir war-files
 cd war-files
 curl http://75.124.74.64/wars/transmart.V1.2.4.war --output transmart.war
@@ -139,6 +148,7 @@ echo "+  start Rserve"
 echo "++++++++++++++++++++++++++++"
 
 cd $HOME/transmart/transmart-data
+sudo -v
 sudo -u tomcat7 bash -c 'source vars && source /etc/profile.d/Rpath.sh && make -C R start_Rserve' 
 
 echo "++++++++++++++++++++++++++++"

@@ -7,4 +7,4 @@ Scripts/install-ubuntu/InstallTransmart.sh
 
 sudo apt-get install -y git
 git clone https://github.com/tranSMART-Foundation/Scripts.git
-Scripts/InstallTransmart.sh
+Scripts/install-ubuntu/InstallTransmart.sh
