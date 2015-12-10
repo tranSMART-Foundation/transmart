@@ -34,7 +34,6 @@ main <- function(max_rows=100, sorting="nodes"){
   }
   df <- df[1:min(max_rows,nrow(df)),]
   fields <- buildFields(df)
-  df <- cleanUp(df) # temporary stats like SD and MEAN need to be removed for clustering to work
   extraFields <- buildExtraFields(fields)
   probes <- na.omit(df[,1])
   geneSymbols <- df[,2][1:length(probes)]#unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector, otherwise we get a dataframe
@@ -49,6 +48,9 @@ main <- function(max_rows=100, sorting="nodes"){
                               "features"=features,
                               "extraFields"=extraFields
                                )
+  writeDataForZip(df, patientIDs) # for later zip generation
+  writeRunParams(max_rows, sorting)
+  df <- cleanUp(df) # temporary stats like SD and MEAN need to be removed for clustering to work
   measurements <- df[,3:ncol(df)]
   if(nrow(measurements) > 1 && ncol(measurements) > 1 ){# cannot cluster matrix which is less than 2x2
     measurements <- toZscores(measurements)
@@ -57,8 +59,7 @@ main <- function(max_rows=100, sorting="nodes"){
   jsn <- toJSON(jsn,
                 pretty = TRUE)
   write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
-  writeDataForZip(df, patientIDs) # for later zip generation
-  writeRunParams(max_rows, sorting)
+
   msgs <- c("Finished successfuly")
   if(exists("errors")){
     msgs <- errors

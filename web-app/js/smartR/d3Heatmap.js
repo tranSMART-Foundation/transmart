@@ -2,7 +2,7 @@
 var animationDuration = 1500;
 var tmpAnimationDuration = animationDuration;
 
-function switchAnimation(checked) {
+function switchAnimation(checked) { // general purpose callback, this is why it is not inside SmartRHeatmap
     if (! checked) {
         tmpAnimationDuration = animationDuration;
         animationDuration = 0;
@@ -30,8 +30,8 @@ SmartRHeatmap = (function(){
         var geneSymbols = data.geneSymbols;
         var maxRows = 100;
 
-        var rowClustering = jQuery('#chkApplyRowClustering');
-        var colClustering = jQuery('#chkApplyColumnClustering');
+        var rowClustering = true;
+        var colClustering = true;
 
         var originalPatientIDs = patientIDs.slice();
         var originalProbes = probes.slice();
@@ -957,23 +957,26 @@ SmartRHeatmap = (function(){
             }
             return initialColOrder;
         }
+        var lastUsedClustering = 'hclustEuclideanAverage';
 
         function cluster(clustering) {
+            clustering = (typeof clustering === 'undefined') ? lastUsedClustering : clustering;
             var clusterData = data[clustering];
-            if(rowClustering.prop('checked')) {
+            if(rowClustering) {
                 rowDendrogram = JSON.parse(clusterData[3]);
                 updateRowOrder(transformClusterOrderWRTInitialOrder(clusterData[1], getInitialRowOrder()));
                 createRowDendrogram(rowDendrogram);
             }else{
                 removeRowDendrogram();
             }
-            if(colClustering.prop('checked')){
+            if(colClustering) {
                 colDendrogram = JSON.parse(clusterData[2]);
                 updateColOrder(transformClusterOrderWRTInitialOrder(clusterData[0], getInitialColOrder()));
                 createColDendrogram(colDendrogram);
             }else{
                 removeColDendrogram();
             }
+            lastUsedClustering = clustering;
         }
 
         function updateCohorts() {
@@ -1009,6 +1012,17 @@ SmartRHeatmap = (function(){
             });
         }
 
+
+        function switchRowClustering(){
+            rowClustering = !rowClustering;
+            cluster();
+        };
+
+        function switchColClustering(){
+            colClustering = !colClustering;
+            cluster();
+        };
+
         function init() {
             updateHeatmap();
             reloadDendrograms();
@@ -1030,6 +1044,30 @@ SmartRHeatmap = (function(){
             width: buttonWidth,
             height: buttonHeight,
             callback: switchAnimation,
+            checked: true
+        });
+
+        createD3Switch({
+            location: heatmap,
+            onlabel: 'Clustering rows ON',
+            offlabel: 'Clustering rows OFF',
+            x: 2 - margin.left + padding * 0 + buttonWidth * 0,
+            y: 8 - margin.top + buttonHeight * 5 + padding * 2,
+            width: buttonWidth,
+            height: buttonHeight,
+            callback: switchRowClustering,
+            checked: true
+        });
+
+        createD3Switch({
+            location: heatmap,
+            onlabel: 'Clustering columns ON',
+            offlabel: 'Clustering columns OFF',
+            x: 2 - margin.left + padding * 1 + buttonWidth * 1,
+            y: 8 - margin.top + buttonHeight * 5 + padding * 2,
+            width: buttonWidth,
+            height: buttonHeight,
+            callback: switchColClustering,
             checked: true
         });
 
