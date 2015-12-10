@@ -44,7 +44,9 @@ echo "++++++++++++++++++++++++++++"
 cd $HOME/transmart/transmart-data
 sudo -v
 sudo make -C env ubuntu_deps_root
+sudo -v
 make -C env ubuntu_deps_regular
+sudo -v
 sudo apt-get install -y ant
 sudo apt-get install -y maven
 rm $HOME/transmart/transmart-data/env/groovy
