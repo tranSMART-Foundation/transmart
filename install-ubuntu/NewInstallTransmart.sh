@@ -131,6 +131,7 @@ echo "++++++++++++++++++++++++++++"
 cd $HOME/transmart/transmart-data
 source ./vars
 make -C solr start > ~/transmart/transmart-data/solr.log 2>&1 & 
+sleep 60
 make -C solr rwg_full_import sample_full_import
 
 echo "++++++++++++++++++++++++++++"
@@ -138,19 +139,13 @@ echo "+  start Rserve"
 echo "++++++++++++++++++++++++++++"
 
 cd $HOME/transmart/transmart-data
-sudo -u tomcat7 bash -c 'source vars; make -C R start_Rserve' 
+sudo -u tomcat7 bash -c 'source vars && source /etc/profile.d/Rpath.sh && make -C R start_Rserve' 
 
 echo "++++++++++++++++++++++++++++"
 echo "+  start Tomcat"
 echo "++++++++++++++++++++++++++++"
 
 sudo service tomcat7 restart
-
-echo "++++++++++++++++++++++++++++"
-echo "+  wait 10 min for all to settle"
-echo "++++++++++++++++++++++++++++"
-
-sleep 600
 
 echo "++++++++++++++++++++++++++++"
 echo "+  run final checking scripts"
