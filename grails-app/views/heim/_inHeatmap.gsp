@@ -137,84 +137,139 @@
         <div id="fragment-run">
 
             %{--Number of max row to display--}%
-            <div class="heim-input-field heim-input-number">
+            <div class="heim-input-field heim-input-number sr-input-area">
                 <label>Max row to display</label>
                 <input type="text" id="txtMaxRow" value="100"> rows (< 1000 is preferable).
             </div>
 
             %{--Type of sorting to apply--}%
-            <div class="heim-input-field" >
-                <label>Sort on:</label>
-               <select id="sortingSelect" value="nodes">
-                   <option value="nodes">Nodes</option>
-                   <option value="subjects">subject (patient ID)</option>
-               </select>
-            </div>
-            %{--TODO :Not relevant for now. Might be in future sprint--}%
-
-            %{--Group Subject--}%
-            %{--<div class="heim-input-field">--}%
-            %{--<input type="checkbox" id="chkGroupSubject" name="chkGroupSubject">--}%
-            %{--<span>Group by subject instead of node (only applicable when multiple nodes are selected).</span>--}%
-            %{--</div>--}%
-
-            %{--Apply statistical methods--}%
-            %{--<div class="heim-input-field heim-input-number">--}%
-            %{--<label>Apply statistical methods</label>--}%
-            %{--<select id="methodSelect">--}%
-            %{--<option value="none">None</option>--}%
-            %{--<option value="hierarchical-clustering">Hierarchical Clustering</option>--}%
-            %{--<option value="k-means-clustering">K-Means Clustering</option>--}%
-            %{--<option value="marker-selection">Marker Selection</option>--}%
-            %{--</select>--}%
-            %{--</div>--}%
-
-            %{--Options--}%
-            <div id="clusteringOptionsDiv" hidden>
-                %{--Number of clusters--}%
-                <div class="heim-input-field heim-input-number" id="noOfClustersDiv">
-                    <label>Number of clusters</label>
-                    <input type="text" id="txtNoOfClusters" name="txtNoOfClusters" value="2">
-                </div>
-
-                %{--Number of markers--}%
-                <div class="heim-input-field heim-input-number" id="noOfMarkersDiv">
-                    <label>Number of markers</label>
-                    <input type="text" id="txtNoOfMarkers" name="txtNoOfMarkers">
-                </div>
-
-                %{--apply row clustering--}%
-                <div class="heim-input-field">
-                    <input type="checkbox" id="chkApplyRowClustering" name="chkApplyRowClustering">
-                    <span>Apply clustering for row.</span>
-                </div>
-
-                %{--apply column clustering --}%
-                <div class="heim-input-field">
-                    <input type="checkbox" id="chkApplyColumnClustering" name="chkApplyColumnClustering">
-                    <span>Apply clustering for column.</span>
-                </div>
-
+            <div class="heim-input-field sr-input-area">
+                <h2>Sort on:</h2>
+                <fieldset class="heim-radiogroup">
+                    <label>
+                        <input type="radio" name="sortingSelect" value="nodes" checked > Nodes
+                    </label>
+                    <label>
+                        <input type="radio" name="sortingSelect" value="subjects"> Subjects
+                    </label>
+                </fieldset>
             </div>
 
-            <hr class="sr-divider">
-
-            %{--tool buttons--}%
-            <div>
-                <button id="heim-btn-run-heatmap" class="heim-action-button">Generate Heatmap</button>
-                <button id="heim-btn-snapshot-image" class="heim-action-button" disabled>Capture Heatmap</button>
-                <button id="heim-btn-download-file" class="heim-action-button" disabled>Download Data</button>
+        %{--Type of sorting to apply--}%
+        <div class="heim-input-field  sr-input-area">
+            <h2>Ranking Criteria:</h2>
+            <div class="heim-input-field-sub">
+                <fieldset class="heim-radiogroup">
+                    <h3>Expression variability</h3>
+                    <div><label>
+                        <input type="radio" name="rankCriteria" value="coef" checked> Coefficient of variation
+                    </label></div>
+                    <div><label>
+                        <input type="radio" name="rankCriteria" value="variance" checked> Variance
+                    </label></div>
+                    <div><label>
+                        <input type="radio" name="rankCriteria" value="range" checked> Range between max and min after excluding outliers
+                    </label></div>
+                </fieldset>
+                <fieldset class="heim-radiogroup">
+                    <h3>Expression level</h3>
+                    <div><label>
+                        <input type="radio" name="rankCriteria" value="mean" checked> Mean
+                    </label></div>
+                    <div><label>
+                        <input type="radio" name="rankCriteria" value="median" checked> Median
+                    </label></div>
+                </fieldset>
             </div>
-
-            %{--result--}%
-
-            <div id="heim-run-output" class="sr-output-container"></div>
-
-            %{--d3 js heatmap placeholder--}%
-            <div id='visualization' class='text sr-output-container'>
-                <div id="heatmap" class='text'></div>
+            <div class="heim-input-field-sub">
+                <fieldset class="heim-radiogroup">
+                    <h3>Differential expression</h3>
+                    <div><label>
+                        <input type="radio" name="rankCriteria" value="coef" checked> B-value/log odds ratio
+                    </label></div>
+                    <div><label>
+                        <input type="radio" name="rankCriteria" value="variance" checked> p-value
+                    </label></div>
+                    <div><label>
+                        <input type="radio" name="rankCriteria" value="range" checked> Adjusted p-value (method “fdr”)
+                    </label></div>
+                    <div><label>
+                        <input type="radio" name="rankCriteria" value="coef" checked> log fold-change
+                    </label></div>
+                    <div><label>
+                        <input type="radio" name="rankCriteria" value="variance" checked> t-statistic
+                    </label></div>
+                </fieldset>
             </div>
         </div>
+
+
+        %{--TODO :Not relevant for now. Might be in future sprint--}%
+
+        %{--Group Subject--}%
+        %{--<div class="heim-input-field">--}%
+        %{--<input type="checkbox" id="chkGroupSubject" name="chkGroupSubject">--}%
+        %{--<span>Group by subject instead of node (only applicable when multiple nodes are selected).</span>--}%
+        %{--</div>--}%
+
+        %{--Apply statistical methods--}%
+        %{--<div class="heim-input-field heim-input-number">--}%
+        %{--<label>Apply statistical methods</label>--}%
+        %{--<select id="methodSelect">--}%
+        %{--<option value="none">None</option>--}%
+        %{--<option value="hierarchical-clustering">Hierarchical Clustering</option>--}%
+        %{--<option value="k-means-clustering">K-Means Clustering</option>--}%
+        %{--<option value="marker-selection">Marker Selection</option>--}%
+        %{--</select>--}%
+        %{--</div>--}%
+
+        %{--Options--}%
+        <div id="clusteringOptionsDiv" hidden>
+            %{--Number of clusters--}%
+            <div class="heim-input-field heim-input-number" id="noOfClustersDiv">
+                <label>Number of clusters</label>
+                <input type="text" id="txtNoOfClusters" name="txtNoOfClusters" value="2">
+            </div>
+
+            %{--Number of markers--}%
+            <div class="heim-input-field heim-input-number" id="noOfMarkersDiv">
+                <label>Number of markers</label>
+                <input type="text" id="txtNoOfMarkers" name="txtNoOfMarkers">
+            </div>
+
+            %{--apply row clustering--}%
+            <div class="heim-input-field">
+                <input type="checkbox" id="chkApplyRowClustering" name="chkApplyRowClustering">
+                <span>Apply clustering for row.</span>
+            </div>
+
+            %{--apply column clustering --}%
+            <div class="heim-input-field">
+                <input type="checkbox" id="chkApplyColumnClustering" name="chkApplyColumnClustering">
+                <span>Apply clustering for column.</span>
+            </div>
+        </div>
+
+        <hr class="sr-divider">
+
+        %{--tool buttons--}%
+        <div>
+            <button id="heim-btn-run-heatmap" class="heim-action-button">Generate Heatmap</button>
+            <button id="heim-btn-snapshot-image" class="heim-action-button" disabled>Capture Heatmap</button>
+            <button id="heim-btn-download-file" class="heim-action-button" disabled>Download Data</button>
+        </div>
+
+        %{--result--}%
+
+        <div id="heim-run-output" class="sr-output-container"></div>
+
+        %{--d3 js heatmap placeholder--}%
+        <div id='visualization' class='text sr-output-container'>
+            <div id="heatmap" class='text'></div>
+        </div>
+    </div>
+
+
 
     </div>
 </div>

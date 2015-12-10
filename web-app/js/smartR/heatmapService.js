@@ -156,7 +156,7 @@ window.HeatmapService = (function(smartRHeatmap){
             url: urlForFile(executionId, filename),
             dataType: 'json'
         });
-    }
+    };
 
     /**
      * Fetch dat
@@ -259,7 +259,10 @@ window.HeatmapService = (function(smartRHeatmap){
 
         function showD3HeatMap(data) {
             downloadJsonFile(this.executionId, 'heatmap.json')
-                    .then(function(d) { smartRHeatmap.create(d); })
+                    .then(function(d) {
+                    console.log(d);
+                    smartRHeatmap.create(d);
+                })
                     .then(function() { defer.resolve(); });
         }
 
