@@ -52,7 +52,7 @@ main <- function(max_rows=100, sorting="nodes"){
   writeRunParams(max_rows, sorting)
   df <- cleanUp(df) # temporary stats like SD and MEAN need to be removed for clustering to work
   measurements <- df[,3:ncol(df)]
-  if(nrow(measurements) > 1 && ncol(measurements) > 1 ){# cannot cluster matrix which is less than 2x2
+  if (nrow(measurements) > 1 && ncol(measurements) > 1 ){# cannot cluster matrix which is less than 2x2
     measurements <- toZscores(measurements)
     jsn <- addClusteringOutput(jsn, measurements) #
   }
@@ -61,7 +61,7 @@ main <- function(max_rows=100, sorting="nodes"){
   write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
 
   msgs <- c("Finished successfuly")
-  if(exists("errors")){
+  if (exists("errors")){
     msgs <- errors
   }
   list(messages=msgs) # main function in every R script has to return a list (so a data.frame will also do)

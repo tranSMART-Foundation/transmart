@@ -962,18 +962,18 @@ SmartRHeatmap = (function(){
         function cluster(clustering) {
             clustering = (typeof clustering === 'undefined') ? lastUsedClustering : clustering;
             var clusterData = data[clustering];
-            if(rowClustering) {
+            if (rowClustering) {
                 rowDendrogram = JSON.parse(clusterData[3]);
                 updateRowOrder(transformClusterOrderWRTInitialOrder(clusterData[1], getInitialRowOrder()));
                 createRowDendrogram(rowDendrogram);
-            }else{
+            } else {
                 removeRowDendrogram();
             }
-            if(colClustering) {
+            if (colClustering) {
                 colDendrogram = JSON.parse(clusterData[2]);
                 updateColOrder(transformClusterOrderWRTInitialOrder(clusterData[0], getInitialColOrder()));
                 createColDendrogram(colDendrogram);
-            }else{
+            } else {
                 removeColDendrogram();
             }
             lastUsedClustering = clustering;
@@ -1013,12 +1013,12 @@ SmartRHeatmap = (function(){
         }
 
 
-        function switchRowClustering(){
+        function switchRowClustering() {
             rowClustering = !rowClustering;
             cluster();
         };
 
-        function switchColClustering(){
+        function switchColClustering() {
             colClustering = !colClustering;
             cluster();
         };
