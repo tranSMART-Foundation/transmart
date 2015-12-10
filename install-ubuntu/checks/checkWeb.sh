@@ -64,4 +64,12 @@ else
 	echo "The tranSMART web site ($transmartUrl) is running"
 fi
 
+if ! $(curl $transmartUrl | grep "title" | grep "tranSMART") ; then
+	echo "The tranSMART web site (at $transmartUrl) is not delivering the login home page;"
+	echo "  see tomcat log file, transmart.log for possible errors "
+	exitResults=1
+else
+	echo "The transmart home page (login) appears to be loading"
+fi
+
 exit $exitResults
