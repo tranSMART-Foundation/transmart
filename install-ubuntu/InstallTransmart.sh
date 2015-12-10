@@ -27,7 +27,7 @@ if ! [ -e $HOME/Scripts ] ; then
 	echo "It does not appear to be there. Please fix that and restart this script."
 	exit 1
 else
-	echo "Script directory found: $HOME/Scripts
+	echo "Script directory found: $HOME/Scripts"
 fi
 
 echo "++++++++++++++++++++++++++++"
