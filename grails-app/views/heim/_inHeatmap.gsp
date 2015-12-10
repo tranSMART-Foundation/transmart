@@ -170,15 +170,15 @@
             %{--</div>--}%
 
             %{--Options--}%
-            <div id="clusteringOptionsDiv" hidden>
+            <div id="clusteringOptionsDiv" >
                 %{--Number of clusters--}%
-                <div class="heim-input-field heim-input-number" id="noOfClustersDiv">
+                <div class="heim-input-field heim-input-number" id="noOfClustersDiv" hidden>
                     <label>Number of clusters</label>
                     <input type="text" id="txtNoOfClusters" name="txtNoOfClusters" value="2">
                 </div>
 
                 %{--Number of markers--}%
-                <div class="heim-input-field heim-input-number" id="noOfMarkersDiv">
+                <div class="heim-input-field heim-input-number" id="noOfMarkersDiv" hidden>
                     <label>Number of markers</label>
                     <input type="text" id="txtNoOfMarkers" name="txtNoOfMarkers">
                 </div>
@@ -186,13 +186,13 @@
                 %{--apply row clustering--}%
                 <div class="heim-input-field">
                     <input type="checkbox" id="chkApplyRowClustering" name="chkApplyRowClustering">
-                    <span>Apply clustering for row.</span>
+                    <span>Apply clustering for rows.</span>
                 </div>
 
                 %{--apply column clustering --}%
                 <div class="heim-input-field">
                     <input type="checkbox" id="chkApplyColumnClustering" name="chkApplyColumnClustering">
-                    <span>Apply clustering for column.</span>
+                    <span>Apply clustering for columns.</span>
                 </div>
 
             </div>

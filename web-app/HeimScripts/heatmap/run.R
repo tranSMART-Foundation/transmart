@@ -51,6 +51,7 @@ main <- function(max_rows=100, sorting="nodes"){
                                )
   measurements <- df[,3:ncol(df)]
   if(nrow(measurements) > 1 && ncol(measurements) > 1 ){# cannot cluster matrix which is less than 2x2
+    measurements <- toZscores(measurements)
     jsn <- addClusteringOutput(jsn, measurements) #
   }
   jsn <- toJSON(jsn,
@@ -63,6 +64,11 @@ main <- function(max_rows=100, sorting="nodes"){
     msgs <- errors
   }
   list(messages=msgs) # main function in every R script has to return a list (so a data.frame will also do)
+}
+
+toZscores <- function(measurements){
+  measurements <- scale(t(measurements))
+  t(measurements)
 }
 
 cleanUp <- function(df){

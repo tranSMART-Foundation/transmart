@@ -28,8 +28,10 @@ SmartRHeatmap = (function(){
         var patientIDs = data.patientIDs;
         var probes = data.probes;
         var geneSymbols = data.geneSymbols;
-
         var maxRows = 100;
+
+        var rowClustering = jQuery('#chkApplyRowClustering');
+        var colClustering = jQuery('#chkApplyColumnClustering');
 
         var originalPatientIDs = patientIDs.slice();
         var originalProbes = probes.slice();
@@ -958,12 +960,20 @@ SmartRHeatmap = (function(){
 
         function cluster(clustering) {
             var clusterData = data[clustering];
-            colDendrogram = JSON.parse(clusterData[2]);
-            rowDendrogram = JSON.parse(clusterData[3]);
-            updateRowOrder(transformClusterOrderWRTInitialOrder(clusterData[1], getInitialRowOrder()));
-            updateColOrder(transformClusterOrderWRTInitialOrder(clusterData[0], getInitialColOrder()));
-            createColDendrogram(colDendrogram);
-            createRowDendrogram(rowDendrogram);
+            if(rowClustering.prop('checked')) {
+                rowDendrogram = JSON.parse(clusterData[3]);
+                updateRowOrder(transformClusterOrderWRTInitialOrder(clusterData[1], getInitialRowOrder()));
+                createRowDendrogram(rowDendrogram);
+            }else{
+                removeRowDendrogram();
+            }
+            if(colClustering.prop('checked')){
+                colDendrogram = JSON.parse(clusterData[2]);
+                updateColOrder(transformClusterOrderWRTInitialOrder(clusterData[0], getInitialColOrder()));
+                createColDendrogram(colDendrogram);
+            }else{
+                removeColDendrogram();
+            }
         }
 
         function updateCohorts() {
