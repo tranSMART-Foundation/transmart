@@ -7,6 +7,7 @@ import heim.jobs.JobInstance
 import heim.tasks.TaskResult
 import heim.tasks.TaskState
 import org.gmock.WithGMock
+import org.junit.Assert
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
@@ -209,6 +210,24 @@ class SessionServiceTests {
             def taskData = testee.getTaskData(sessionUUID, taskUUID, true)
             assertThat taskData, allOf(
                     hasEntry(is('state'), is(TaskState.FAILED)))
+        }
+    }
+
+    @Test
+    void testGarbageCollectionBasic() {
+        User user = mock(User)
+        play {
+            def sessionUUID = testee.createSession(user, TEST_JOB_TYPE)
+            testee.doWithSession(sessionUUID) {
+                SessionContext sc = SmartRSessionSpringScope.ACTIVE_SESSION.get()
+                sc.@lastActive.set(new Date(new Date().time - 20 * 60 * 1000 /* 20 min */))
+            }
+            testee.garbageCollection()
+
+            try {
+                testee.doWithSession(sessionUUID) {}
+                Assert.fail('Expected exception')
+            } catch(NoSuchResourceException nre) {}
         }
     }
 }

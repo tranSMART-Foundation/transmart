@@ -247,8 +247,8 @@ class SessionService implements DisposableBean {
             currentSessions.each {
                 sessionId, sessionContext ->
                     def lastActivity = sessionContext.lastActive
-                    if (!isStale(sessionId, lastActivity)) {
-                        if (sessionsShuttingDown.contains(sessionId)) {
+                    if (isStale(sessionId, lastActivity)) {
+                        if (!sessionsShuttingDown.contains(sessionId)) {
                             destroySession(sessionId)
                             log.info("Terminated session: ${sessionId} " +
                                     "due to inactivity.")
