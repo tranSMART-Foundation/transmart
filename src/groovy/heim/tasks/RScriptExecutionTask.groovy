@@ -76,6 +76,9 @@ class RScriptExecutionTask extends AbstractTask {
          */
         def builder = ImmutableMap.builder()
         asNative.each { k, v ->
+            if (k == []) {
+                return
+            }
             assert k.getClass().isArray() && ((Object[])k).length == 1
             assert v instanceof String
             builder.put(v,  ((Object[])k)[0])

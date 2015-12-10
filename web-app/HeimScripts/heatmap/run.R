@@ -50,6 +50,8 @@ main <- function(max_rows=100, sorting="nodes"){
                       ),
                 pretty = TRUE)
   write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
+  writeDataForZip(df, patientIDs) # for later zip generation
+  writeRunParams(max_rows, sorting)
   msgs <- c("Finished successfuly")
   if(exists("errors")){
     msgs <- errors
@@ -102,6 +104,30 @@ buildFields <- function(df){
   names(df) <- c("PROBE","GENESYMBOL","SIGNIFICANCE","PATIENTID","VALUE")
   df["ZSCORE"] <- ZSCORE
   return(df)
+}
+
+writeDataForZip <- function(df, patientIDs) {
+  pidCols    <- as.character(patientIDs)
+  t          <- df
+  t[pidCols] <- lapply(t[pidCols], function(v) { (v - df$MEAN) / df$SD })
+  allCols    <- c(c("Row.Label", "Bio.marker", "MEAN", "SD", "SIGNIFICANCE"), pidCols)
+  write.table(t[allCols], "heatmap_data.tsv", sep="\t", na="", row.names=F, col.names=T)
+
+  allCols <- c(c("Row.Label"), pidCols)
+  write.table(df[allCols], "heatmap_orig_values.tsv", sep="\t", na="", row.names=F, col.names=T)
+}
+
+writeRunParams <- function(max_rows, sorting) {
+  params <- list(
+    max_rows = max_rows,
+    sorting  = sorting
+  )
+
+  if (exists("preprocessed") && exists("preprocessing_params")) {
+    params <- c(params, preprocessing_params)
+  }
+
+  write(toJSON(params, pretty=TRUE), 'params.json')
 }
 
 fixString <- function(str) {
