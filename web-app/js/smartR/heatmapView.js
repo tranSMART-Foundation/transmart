@@ -118,9 +118,11 @@ var HeatmapView = (function(){
         console.log('_runHeatmapAction', _runHeatmapInputArgs);
         jQuery('#heatmap').empty();
         view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
+        view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
         heatmapService.runAnalysis(_runHeatmapInputArgs)
             .then(function() {
                 view.runHeatmapView.snapshotImageBtn.removeAttr('disabled');
+                view.runHeatmapView.downloadFileBtn.removeAttr('disabled');
             });
     };
 
@@ -176,6 +178,15 @@ var HeatmapView = (function(){
                 view.runHeatmapView.clusteringOptionsDiv.hide();
             }
         });
+
+
+        // download data button
+        view.runHeatmapView.downloadFileBtn.click(
+            function() {
+                view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
+                heatmapService.downloadData();
+            }
+        );
 
 
         // identifiers autocomplete

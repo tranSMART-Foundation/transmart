@@ -1,5 +1,8 @@
 library("WGCNA")
 
+# Pre-processing data saved in preprocessed
+# Pre-processing parameters saved in global preprocessing_params
+# They can be considered fresh if the variable preprocessed exists
 
 main <- function(aggregate=FALSE){
   msgs = c("")
@@ -18,6 +21,9 @@ main <- function(aggregate=FALSE){
     msgs <- c("No preprocessing applied.")
       assign("preprocessed", df, envir = .GlobalEnv)
   }
+
+  assign("preprocessing_params", list(aggregate=aggregate), envir = .GlobalEnv)
+
   list(finished=T,messages=msgs)
 }
 
