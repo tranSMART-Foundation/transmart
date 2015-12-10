@@ -20,12 +20,14 @@
 sudo -v
 
 echo "++++++++++++++++++++++++++++"
-echo "+  Checking locations of Script Directory
+echo "+  Checking locations of Script Directory"
 echo "++++++++++++++++++++++++++++"
 if ! [ -e $HOME/Scripts ] ; then
-	echo "This script assumes that the Scripts directory is installed at $HOME/Script"
+	echo "This script assumes that the Scripts directory is installed at $HOME/Scripts"
 	echo "It does not appear to be there. Please fix that and restart this script."
 	exit 1
+else
+	echo "Script directory found: $HOME/Scripts
 fi
 
 echo "++++++++++++++++++++++++++++"
