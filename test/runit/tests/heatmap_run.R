@@ -44,3 +44,11 @@ test.get.subset <- function()
   expected <- c(0,1)
   checkEquals(result, expected)
 }
+
+test.get.subject <- function()
+{
+  test_patient_ids <- c("wk26_16702_n0_s1", "wk26_16705_n1_s1", "wk26_16707_n0_s1", "wk52_16710_n0_s2")
+  result <- getSubject(test_patient_ids)
+  expected <- c("wk26_16702", "wk26_16705", "wk26_16707", "wk52_16710")
+  checkEquals(result, expected)
+}
