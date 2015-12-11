@@ -130,7 +130,7 @@ sudo -v
 source ./vars
 make -C config install
 sudo mkdir -p /usr/share/tomcat7/.grails/transmartConfig/
-sudo cp /home/transmart/.grails/transmartConfig/*.groovy /usr/share/tomcat7/.grails/transmartConfig/
+sudo cp $HOME/.grails/transmartConfig/*.groovy /usr/share/tomcat7/.grails/transmartConfig/
 
 # check - checkFilesConfig.sh
 
