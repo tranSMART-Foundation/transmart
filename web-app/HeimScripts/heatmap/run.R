@@ -1,3 +1,5 @@
+library(reshape2)
+
 main <- function(max_rows = 100, sorting = "nodes") {
   max_rows <- as.numeric(max_rows)
   verifyInput(max_rows, sorting)
@@ -7,6 +9,14 @@ main <- function(max_rows = 100, sorting = "nodes") {
                                        # characters from probe names. This will
                                        # prevent problems with CSS
                                        # selectors on the frontend.
+  write.table(
+      df,
+      "heatmap_orig_values.tsv",
+      sep = "\t",
+      na = "",
+      row.names = FALSE,
+      col.names = TRUE
+    )
   df <- addStats(df, sorting)
   df <- df[1:min(max_rows,nrow(df)),]  #  apply max_rows
   fields <- buildFields(df)
@@ -27,28 +37,26 @@ main <- function(max_rows = 100, sorting = "nodes") {
     "features" = features,
     "extraFields" = extraFields
   )
-  writeDataForZip(df, patientIDs)  # for later zip generation
   writeRunParams(max_rows, sorting)
-  df <- cleanUp(df)  # temporary stats like SD and MEAN need
+  measurements <- cleanUp(df)  # temporary stats like SD and MEAN need
                      # to be removed for clustering to work
-  measurements <- df[,3:ncol(df)]
+  measurements <- measurements[,3:ncol(measurements)]
+  measurements <- toZscores(measurements)
   if (nrow(measurements) > 1 &&
       ncol(measurements) > 1) {
     # cannot cluster
     # matrix which is less than 2x2
-    measurements <- toZscores(measurements)
     jsn <- addClusteringOutput(jsn, measurements) #
   }
   jsn <- toJSON(jsn,
                 pretty = TRUE)
+  writeDataForZip(df, measurements, patientIDs)  # for later zip generation
   write(jsn,file = "heatmap.json")   # json file be served the same way
                                      # like any other file would - get name via
                                      # /status call and then /download
   
   msgs <- c("Finished successfuly")
-  list(messages = msgs)   # main function in every R script has to
-                          # return a list (so a data.frame
-                          # will also do)
+  list(messages = msgs)
 }
 
 addStats <- function(df, sorting) {
@@ -181,31 +189,17 @@ buildFields <- function(df) {
   return(df)
 }
 
-writeDataForZip <- function(df, patientIDs) {
-  pidCols    <- as.character(patientIDs)
-  t          <- df
-  t[pidCols] <-
-    lapply(t[pidCols], function(v) {
-      (v - df$MEAN) / df$SD
-    })
-  allCols    <-
-    c(c("Row.Label", "Bio.marker", "MEAN", "SD", "SIGNIFICANCE"), pidCols)
+writeDataForZip <- function(df, zScores, patientIDs) {
+  pidCols <- as.character(patientIDs)
+  df      <- df[ , -which(names(df) %in% pidCols)]  # Drop patient columns
+  df      <- cbind(df,zScores)                      # Replace with zScores
   write.table(
-    t[allCols],
+    df,
     "heatmap_data.tsv",
     sep = "\t",
     na = "",
-    row.names = F,
-    col.names = T
-  )
-  allCols <- c(c("Row.Label"), pidCols)
-  write.table(
-    df[allCols],
-    "heatmap_orig_values.tsv",
-    sep = "\t",
-    na = "",
     row.names = FALSE,
-    col.names = T
+    col.names = TRUE
   )
 }
 
