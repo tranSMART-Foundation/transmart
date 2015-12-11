@@ -17,15 +17,15 @@ main <- function(max_rows = 100, sorting = "nodes") {
       row.names = FALSE,
       col.names = TRUE
     )
-  df <- addStats(df, sorting)
-  df <- df[1:min(max_rows,nrow(df)),]  #  apply max_rows
-  fields <- buildFields(df)
+  df          <- addStats(df, sorting)
+  df          <- df[1:min(max_rows,nrow(df)),]  #  apply max_rows
+  fields      <- buildFields(df)
   extraFields <- buildExtraFields(fields)
-  probes <- na.omit(df[,1])
-  geneSymbols <- df[,2][1:length(probes)]
+  probes      <- df[,1]
+  geneSymbols <- df[,2]
   #unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector,
   # otherwise we get a dataframe
-  patientIDs <- unique(fields["PATIENTID"])[,1]
+  patientIDs  <- unique(fields["PATIENTID"])[,1]
   
   significanceValues <- unique(fields["SIGNIFICANCE"])[,1]
   features <- unique(extraFields["FEATURE"])[,1]
