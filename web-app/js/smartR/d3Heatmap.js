@@ -1,3 +1,4 @@
+//# sourceURL=d3Heatmap.js
 
 var animationDuration = 1500;
 var tmpAnimationDuration = animationDuration;
@@ -107,10 +108,16 @@ SmartRHeatmap = (function(){
             .range([0, histogramHeight]);
 
         var heatmap = d3.select("#heatmap").append("svg")
-            .attr("width", (width + margin.left + margin.right) * 4)
-            .attr("height", (height + margin.top + margin.bottom) * 4)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        function adjustDimensions() {
+            // gridFieldWidth/gridFieldHeight are adjusted outside as the zoom changes
+            jQuery(heatmap[0]).closest('svg')
+                .attr("width", margin.left + margin.right + (gridFieldWidth * patientIDs.length))
+                .attr("height", margin.top + margin.bottom + (gridFieldHeight * probes.length));
+        }
+        adjustDimensions();
 
         var tooltip = d3.select("#heatmap").append("div")
             .attr("class", "tooltip text")
@@ -651,6 +658,7 @@ SmartRHeatmap = (function(){
             updateHeatmap();
             reloadDendrograms();
             animationDuration = temp;
+            adjustDimensions();
         }
 
         var cutoffLevel = significanceValues[significanceValues.length - 1];
