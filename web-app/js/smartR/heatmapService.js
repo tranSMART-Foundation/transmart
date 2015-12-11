@@ -134,7 +134,8 @@ window.HeatmapService = (function(){
             console.error(errorThrown);
             // FIXME: should not write to this place
             _divForPhase(taskData.phase)
-                .html('<p style="color: red";><b>Error:'+ errorThrown +'</b> <br> ' + _err.message + '</p>');
+                .html('<p style="color: red";><b>Error:'+ errorThrown +'</b> <br> ' + _err.message + '</p>')
+                .show();
         }).done(function(d) {
             taskData.executionId = d.executionId;
             service.checkStatus(taskData, CHECK_DELAY);
