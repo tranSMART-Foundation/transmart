@@ -118,9 +118,17 @@ var HeatmapView = (function(){
         view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
         view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
         heatmapService.runAnalysis(_runHeatmapInputArgs)
-            .then(function() {
+            .then(function(data) {
+                SmartRHeatmap.create(data.heatmapData);
+
                 view.runHeatmapView.snapshotImageBtn.removeAttr('disabled');
                 view.runHeatmapView.downloadFileBtn.removeAttr('disabled');
+
+                if (data.markerSelectionData) {
+                    view.appendSelectionTable({
+                        entries: data.markerSelectionData
+                    })
+                }
             });
     };
 
@@ -269,6 +277,13 @@ var HeatmapView = (function(){
     view.clearConceptPathInput = function (eventObj) {
         extJSHelper.clear(view.fetchDataView.conceptPathsInput);
     };
+
+    view.appendSelectionTable = function(data) {
+        var tmpl = jQuery.templates('#marker-selection-table-tmp');
+        var table = tmpl.render(data);
+        jQuery('#heatmap').append(table);
+        jQuery('#markerSelectionTable').tablesorter();
+    }
 
     /**
      * Initialize helper

@@ -5,9 +5,13 @@
  * Heatmap Service
  */
 
-window.HeatmapService = (function(smartRHeatmap){
+window.HeatmapService = (function(){
     var CHECK_DELAY = 1000;
     var PROJECTION = 'log_intensity';
+
+    var HEATMAP_DATA_FILE = 'heatmap.json';
+    var MARKER_SELECTION_TABLE_FILE = 'markerSelectionTable.json';
+
     var NOOP_ABORT = function() {};
 
     var service = {
@@ -198,7 +202,7 @@ window.HeatmapService = (function(smartRHeatmap){
                 var plot = jQuery('<img>').attr('src', filename);
                 div.append(plot);
             }.bind(this));
-        
+
             jQuery.when.apply(jQuery,
                 fileSuffixes.map(function (label) {
                     return downloadJsonFile(
@@ -257,19 +261,33 @@ window.HeatmapService = (function(smartRHeatmap){
         console.log('service.runAnalysis', params);
         var defer = jQuery.Deferred();
 
-        function showD3HeatMap(data) {
-            downloadJsonFile(this.executionId, 'heatmap.json')
-                    .then(function(d) {
-                    console.log(d);
-                    smartRHeatmap.create(d);
+        function runAnalysisSuccess(data) {
+            var ajaxCalls = [];
+            ajaxCalls.push(downloadJsonFile(this.executionId, HEATMAP_DATA_FILE));
+            if (data.result.artifacts.files.indexOf(MARKER_SELECTION_TABLE_FILE) != -1) {
+                ajaxCalls.push(
+                    downloadJsonFile(this.executionId, MARKER_SELECTION_TABLE_FILE));
+            }
+
+            jQuery.when.apply(jQuery, ajaxCalls)
+                .done(function() {
+                    var _args = arguments;
+                    // see comment in the other .when call
+                    if (_args[1] === 'success') {
+                        _args = [_args];
+                    }
+                    defer.resolve({
+                        heatmapData: _args[0][0], // ajax resolves with 3 args, 1st is data
+                        markerSelectionData: _args[1] ? _args[1][0] : null
+                    });
                 })
-                    .then(function() { defer.resolve(); });
+                .fail(function() { defer.reject.apply(defer, arguments); });
         }
 
         startScriptExecution({
             taskType: 'run',
             arguments: params,
-            onUltimateSuccess: showD3HeatMap,
+            onUltimateSuccess: runAnalysisSuccess,
             phase: 'run',
             progressMessage: 'Calculating',
             successMessage: undefined,
@@ -430,4 +448,4 @@ window.HeatmapService = (function(smartRHeatmap){
     }
 
     return service;
-})(SmartRHeatmap);
+})();
