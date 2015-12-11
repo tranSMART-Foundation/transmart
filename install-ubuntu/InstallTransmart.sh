@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version: Fri Dec 11 14:39:02 EST 2015
+# Version: Fri Dec 11 16:30:10 EST 2015
 
 #**********************************************************************************
 #  Script to load all that is needed to run an example/demo version of tranSMART 1.2.4
@@ -21,6 +21,7 @@
 # set up sudo early
 sudo -v
 
+echo "Starting at $(date)"
 echo "++++++++++++++++++++++++++++"
 echo "+  Checking locations of Script Directory"
 echo "++++++++++++++++++++++++++++"
@@ -31,6 +32,7 @@ if ! [ -e $HOME/Scripts ] ; then
 else
 	echo "Script directory found: $HOME/Scripts"
 fi
+echo "Finished checking locations of Script Directory at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  set up working dir (transmart) "
@@ -50,6 +52,8 @@ curl https://codeload.github.com/tranSMART-Foundation/transmart-data/zip/release
 unzip transmart-data-release-1.2.4.zip
 mv transmart-data-release-1.2.4 transmart-data
 
+echo "Finished setting up the transmart-date folder at $(date)"
+
 echo "++++++++++++++++++++++++++++"
 echo "+  Install of basic tools"
 echo "++++++++++++++++++++++++++++"
@@ -57,8 +61,10 @@ echo "++++++++++++++++++++++++++++"
 cd $HOME/transmart/transmart-data
 sudo -v
 sudo make -C env ubuntu_deps_root
+echo "Finished setting ubuntu dependencies (with root) at $(date)"
 sudo -v
 make -C env ubuntu_deps_regular
+echo "Finished setting ubuntu dependencies (without root) at $(date)"
 sudo -v
 sudo apt-get install -y ant
 sudo apt-get install -y maven
@@ -72,6 +78,7 @@ sdk install groovy 2.4.5 < AnswerYes.txt
 # check - basics.sh
 # check - checkVersions.sh
 # check - checkFilesBasic.sh
+echo "Finished installing basic tools at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install Tomcat 7"
@@ -82,8 +89,8 @@ sudo -v
 sudo apt-get install -y tomcat7 
 sudo service tomcat7 stop
 $HOME/Scripts/install-ubuntu/updateTomcatConfig.sh
-
 # check - checkTomcatInstall.sh
+echo "Finished installing tomcat at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install R, Rserve and other packages"
@@ -101,6 +108,7 @@ source /etc/profile.d/Rpath.sh
 
 # check - checkFilesR.sh
 # check - checkR.sh
+echo "Finished installing R and R packages at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Load study GSE8581 in database"
@@ -115,6 +123,7 @@ cd $HOME/transmart/transmart-data
 sudo -v
 source ./vars
 make -j4 postgres
+echo "Finished setting up the PostgreSQL database at $(date)"
 make update_datasets
 sudo -v
 make -C samples/postgres load_clinical_GSE8581
@@ -122,6 +131,8 @@ make -C samples/postgres load_ref_annotation_GSE8581
 make -C samples/postgres load_expression_GSE8581
 
 # check - checkPsqlDataload.sh
+
+echo "Finished loading data in the PostgreSQL database at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Set up configuration files"
@@ -135,6 +146,7 @@ sudo mkdir -p /usr/share/tomcat7/.grails/transmartConfig/
 sudo cp $HOME/.grails/transmartConfig/*.groovy /usr/share/tomcat7/.grails/transmartConfig/
 
 # check - checkFilesConfig.sh
+echo "Finished setting up the configuration files at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install war files"
@@ -149,6 +161,7 @@ curl http://75.124.74.64/wars/gwava.V1.2.4.war --output gwava.war
 sudo cp *.war /var/lib/tomcat7/webapps/
 
 #check - checkFilesToncatWar.sh
+echo "Finished installing war files at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Load, configure and start SOLR"
@@ -160,6 +173,7 @@ source ./vars
 make -C solr start > $HOME/transmart/transmart-data/solr.log 2>&1 & 
 sleep 60
 make -C solr rwg_full_import sample_full_import
+echo "Finished loading, configuring and starting SOLR at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  start Rserve"
@@ -168,12 +182,14 @@ echo "++++++++++++++++++++++++++++"
 cd $HOME/transmart/transmart-data
 sudo -v
 sudo -u tomcat7 bash -c 'source vars && source /etc/profile.d/Rpath.sh && make -C R start_Rserve' 
+echo "Finished starting RServe at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  start Tomcat"
 echo "++++++++++++++++++++++++++++"
 
 sudo service tomcat7 restart
+echo "Finished starting Tomcat7 at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+ Done"
@@ -182,4 +198,6 @@ echo "++++++++++++++++++++++++++++"
 #check - checkFilesTomcat.sh
 #check - checkTools.sh
 #check - checkWeb.sh
+
+echo "Finished at $(date)"
 
