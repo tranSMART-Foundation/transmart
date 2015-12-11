@@ -30,7 +30,7 @@ var HeatmapView = (function(){
             methodSelect : jQuery('#methodSelect'),
             noClustersDiv : jQuery('#noOfClustersDiv'),
             noMarkersDiv : jQuery('#noOfMarkersDiv'),
-            sortingSelect : jQuery('#sortingSelect'),
+            sortingSelect : jQuery('[name=sortingSelect]'),
             runAnalysisBtn : jQuery('#heim-btn-run-heatmap'),
             snapshotImageBtn : jQuery('#heim-btn-snapshot-image'),
             downloadFileBtn : jQuery('#heim-btn-download-file')
@@ -87,8 +87,7 @@ var HeatmapView = (function(){
     var _getRunHeatmapViewValues = function (v) {
         // get max_rows
         var _maxRows = v.maxRowInput.val();
-        var _sortingType = v.sortingSelect.val();
-        console.log(_maxRows);
+        var _sortingType = v.sortingSelect.filter(':checked').val();
         return {
             max_rows : _maxRows,
             sorting: _sortingType
@@ -115,7 +114,6 @@ var HeatmapView = (function(){
 
     var _runHeatmapAction = function (eventObj) {
         var _runHeatmapInputArgs =  _getRunHeatmapViewValues(view.runHeatmapView);
-        console.log('_runHeatmapAction', _runHeatmapInputArgs);
         jQuery('#heatmap').empty();
         view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
         view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
@@ -136,9 +134,8 @@ var HeatmapView = (function(){
 
     var _preprocessAction = function (eventObj) {
         var _preprocessInputArgs =  _getPreprocessViewValues(view.preprocessView);
-        console.log('_preprocessAction', _preprocessInputArgs);
         heatmapService.preprocess(_preprocessInputArgs);
-    }
+    };
 
     /**
      * Register event handlers
@@ -187,6 +184,13 @@ var HeatmapView = (function(){
             }
         });
 
+        // download data button
+        view.runHeatmapView.downloadFileBtn.click(
+            function() {
+                view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
+                heatmapService.downloadData();
+            }
+        );
 
         // download data button
         view.runHeatmapView.downloadFileBtn.click(
@@ -208,7 +212,7 @@ var HeatmapView = (function(){
         );
         view.fetchDataView.identifierInput.autocomplete({
             source: function(request, response) {
-                var term = request.term
+                var term = request.term;
                 if (term.length < 2) {
                     return function() {
                         return response({rows: []});
@@ -227,7 +231,7 @@ var HeatmapView = (function(){
                                 label: v.keyword,
                                 value: v
                             }
-                        })
+                        });
                         return response(r);
                     });
             },
@@ -271,7 +275,6 @@ var HeatmapView = (function(){
     };
 
     view.clearConceptPathInput = function (eventObj) {
-        //console.log('   clear ..')
         extJSHelper.clear(view.fetchDataView.conceptPathsInput);
     };
 

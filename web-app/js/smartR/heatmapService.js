@@ -160,7 +160,7 @@ window.HeatmapService = (function(){
             url: urlForFile(executionId, filename),
             dataType: 'json'
         });
-    }
+    };
 
     /**
      * Fetch dat
