@@ -158,8 +158,8 @@
         %{--Type of sorting to apply--}%
         <div class="heim-input-field  sr-input-area">
             <h2>Ranking Criteria:</h2>
-            <div class="heim-input-field-sub">
-                <fieldset class="heim-radiogroup">
+            <div class="heim-input-field-sub" id="sr-non-multi-subset">
+                <fieldset class="heim-radiogroup" id="sr-variability-group">
                     <h3>Expression variability</h3>
                     <div><label>
                         <input type="radio" name="rankCriteria" value="coef" checked> Coefficient of variation
@@ -171,7 +171,7 @@
                         <input type="radio" name="rankCriteria" value="range" checked> Range between max and min after excluding outliers
                     </label></div>
                 </fieldset>
-                <fieldset class="heim-radiogroup">
+                <fieldset class="heim-radiogroup" id="sr-expression-level-group">
                     <h3>Expression level</h3>
                     <div><label>
                         <input type="radio" name="rankCriteria" value="mean" checked> Mean
@@ -181,8 +181,8 @@
                     </label></div>
                 </fieldset>
             </div>
-            <div class="heim-input-field-sub">
-                <fieldset class="heim-radiogroup">
+            <div class="heim-input-field-sub" id="sr-multi-subset">
+                <fieldset class="heim-radiogroup" id="sr-differential-exp-group">
                     <h3>Differential expression</h3>
                     <div><label>
                         <input type="radio" name="rankCriteria" value="coef" checked> B-value/log odds ratio
