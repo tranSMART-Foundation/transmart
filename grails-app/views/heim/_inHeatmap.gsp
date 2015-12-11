@@ -186,13 +186,13 @@
                 %{--apply row clustering--}%
                 <div class="heim-input-field">
                     <input type="checkbox" id="chkApplyRowClustering" name="chkApplyRowClustering">
-                    <span>Apply clustering for row.</span>
+                    <span>Apply clustering for rows.</span>
                 </div>
 
                 %{--apply column clustering --}%
                 <div class="heim-input-field">
                     <input type="checkbox" id="chkApplyColumnClustering" name="chkApplyColumnClustering">
-                    <span>Apply clustering for column.</span>
+                    <span>Apply clustering for columns.</span>
                 </div>
 
             </div>
