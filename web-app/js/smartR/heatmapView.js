@@ -116,9 +116,11 @@ var HeatmapView = (function(){
         var _runHeatmapInputArgs =  _getRunHeatmapViewValues(view.runHeatmapView);
         jQuery('#heatmap').empty();
         view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
+        view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
         heatmapService.runAnalysis(_runHeatmapInputArgs)
             .then(function() {
                 view.runHeatmapView.snapshotImageBtn.removeAttr('disabled');
+                view.runHeatmapView.downloadFileBtn.removeAttr('disabled');
             });
     };
 
@@ -181,6 +183,15 @@ var HeatmapView = (function(){
                 heatmapService.downloadData();
             }
         );
+
+        // download data button
+        view.runHeatmapView.downloadFileBtn.click(
+            function() {
+                view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
+                heatmapService.downloadData();
+            }
+        );
+
 
         // identifiers autocomplete
         var _identifierItemTemplate = new Ext.XTemplate(

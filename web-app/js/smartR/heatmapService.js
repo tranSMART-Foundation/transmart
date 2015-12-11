@@ -408,5 +408,26 @@ window.HeatmapService = (function(smartRHeatmap){
         URL.revokeObjectURL(svgBlobUrl);
     };
 
+    service.downloadData = function() {
+        function downloadFile(data) {
+            var link = jQuery('<a/>')
+                .attr('href', urlForFile(this.executionId, 'analysis_data.zip'))
+                .attr('download', 'heatmap_data.zip')
+                .css('display', 'none');
+            jQuery('body').append(link);
+            link[0].click();
+            link.remove();
+        }
+
+        startScriptExecution({
+            taskType: 'downloadData',
+            arguments: {},
+            onUltimateSuccess: downloadFile,
+            phase: 'run',
+            progressMessage: 'Creating zip',
+            successMessage: undefined,
+        });
+    }
+
     return service;
 })(SmartRHeatmap);

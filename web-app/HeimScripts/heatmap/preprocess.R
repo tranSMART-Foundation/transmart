@@ -1,10 +1,13 @@
 library("WGCNA")
 
+# Pre-processing data saved in preprocessed
+# Pre-processing parameters saved in global preprocessing_params
+# They can be considered fresh if the variable preprocessed exists
 
 main <- function(aggregate=FALSE){
   msgs = c("")
   df <- mergeFetchedData(loaded_variables)
-  good.input <- ncol(df) > 3 && nrow(df) > 1
+  good.input <- ncol(df) > 3 && nrow(df) > 0 && sum(df$Bio.marker != "") > 0 # more than one sample, contains any rows, non empty Bio.marker column.
   if(aggregate && good.input){
     df <- dropEmptyGene(df)
     aggr  <- aggregate.probes(df)
@@ -16,10 +19,11 @@ main <- function(aggregate=FALSE){
     stop("Incorrect subset - in order to perform probe aggregation more than one samples are needed.")
   }else{
     msgs <- c("No preprocessing applied.")
-    if(exists("preprocessed")){
-      remove(preprocessed, pos = ".GlobalEnv")
-    }
+      assign("preprocessed", df, envir = .GlobalEnv)
   }
+
+  assign("preprocessing_params", list(aggregate=aggregate), envir = .GlobalEnv)
+
   list(finished=T,messages=msgs)
 }
 
@@ -88,3 +92,4 @@ add.subset.label <- function(df,label){
   }
   return(df)
 }
+
