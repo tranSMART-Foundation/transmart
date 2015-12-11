@@ -35,26 +35,14 @@ library(gplots)
 
 main <- function(phase = NA, projection = NA)
 {
-
+  input_data <- get_input_data(phase)
+  check_input(input_data, projection)
   
-  
-  if(phase == "preprocess")
-  {
-    if(!exists("preprocessed"))
-    { 
-      stop("Summary stats is run for phase \'preprocess\', but variable \'preprocessed\' does not exist.")
-    }
-    input_data <- list("preprocessed" = preprocessed)
-  }
-  
-  if(phase == "fetch")
-  {
-    input_data <- loaded_variables
-  }
-  
-  check_input(input_data, phase, projection)
   data_measurements <- extract_measurements(input_data)
   
+  # for preprocessed data the data from the two different subsets is merged
+  # the summary stats and boxplot functions expect one data.frame per subset per node.
+  # preprocessed data.frame therefore needs to be split
   if(phase == "preprocess")
   {
     data_measurements <- split_on_subsets(data_measurements)
@@ -63,15 +51,53 @@ main <- function(phase = NA, projection = NA)
   summary_stats_json <- produce_summary_stats(data_measurements, phase)
   write_summary_stats(summary_stats_json)
   produce_boxplot(data_measurements, phase, projection)
+  
   return(list(messages = "Finished successfully")) 
 }  
 
-
-
-  
-#check if provided variables and phase info are in line with expected input as described at top of this script
-check_input <- function(datasets, phase_info, projection)
+get_input_data <- function(phase)
 {
+  #check if the phase parameter 
+  if(is.na(phase))
+  {
+    stop("Supply phase parameter to function \'main()\'. Expected input: \'fetch\' or \'preprocess\'")
+  }
+  
+  if(phase != "fetch" & phase != "preprocess" & !is.na(phase))
+  {
+    error_msg <- paste("Incorrect value for phase parameter. Given input: \'", phase, "\'. Expected input: \'fetch\' or \'preprocess\'", sep = "")
+    stop(error_msg)
+  }
+  
+  # for fetch data tab the data from 'loaded_variables' should be used
+  if(phase == "fetch")
+  {
+    if(!exists("loaded_variables"))
+    {
+      stop("Summary stats is run for phase \'fetch\', but variable \'loaded_variables\' does not exist in the environment.")
+    }
+    input_data <- loaded_variables
+  }
+  
+  # for preprocess data tab the data from 'preprocessed' should be used
+  if(phase == "preprocess")
+  {
+    if(!exists("preprocessed"))
+    { 
+      stop("Summary stats is run for phase \'preprocess\', but variable \'preprocessed\' does not exist in the environment.")
+    }
+    input_data <- list("preprocessed" = preprocessed)
+  }
+ 
+  return(input_data)
+}
+  
+
+
+#check if provided variables and phase info are in line with expected input as described at top of this script
+check_input <- function(datasets, projection)
+{
+  
   #expected input: list of data.frames
   items_list <- sapply(datasets, class)
   if(class(datasets) != "list" | !all(items_list == "data.frame")) #for a data.frame is.list() also returns TRUE. Class returns "data.frame" in that case
@@ -99,16 +125,7 @@ check_input <- function(datasets, phase_info, projection)
     stop(paste("Not all data.frame labels are unique; one or more labels in the \'loaded_variables\' or \'preprocessed\' variable are duplicated"))
   }
   
-  if(is.na(phase_info))
-  {
-    stop("Supply phase parameter to function \'main()\'. Expected input: \'fetch\' or \'preprocess\'")
-  }
-  
-  if(phase_info != "fetch" & phase_info != "preprocess" & !is.na(phase_info))
-  {
-    stop("Incorrect value for phase parameter - expected input: either \'fetch\' or \'preprocess\'")
-  }
- 
+
   if(is.na(projection))
   {
     stop("Supply projection parameter to function \'main()\'. Expected input:  \'default_real_projection\' or \'log_intensity\'")
@@ -144,7 +161,7 @@ split_on_subsets <- function(preprocessed_measurements)
   
   if(length(subset_names) == 0)
   {
-    stop("Something went wrong with splitting the preprocessed dataset into separate datasets per cohort (subset). 
+    stop("Something went wrong when splitting the preprocessed dataset into separate datasets per cohort (subset). 
         Check the format of the column names of variable \'preprocessed\'.
         Expected format for column labels (of sample columns) of data.frame \'preprocessed\' is:  
            <sample_name>_n<numerical identifier for the node>_s<numerical identifier for the subset>
@@ -166,7 +183,7 @@ split_on_subsets <- function(preprocessed_measurements)
   # each column should only be present in one of the two split datasets, and all columns should be present in one or the other split dataset
   if(any(duplicated(used_columns)) | !all(1:ncol(preprocessed_measurements) %in% used_columns))
   {
-    stop("Something went wrong with splitting the preprocessed dataset into separate datasets per cohort (subset). 
+    stop("Something went wrong when splitting the preprocessed dataset into separate datasets per cohort (subset). 
         Maybe the column names of variable \'preprocessed\' are not of the correct format?
         Expected format for column labels of data.frame \'preprocessed\' is <sample_name>_n<numerical identifier for the node>_s<numerical identifier for the subset>, e.g. sample1_n1_s1")
   }
@@ -231,9 +248,11 @@ produce_summary_stats <- function(measurement_tables, phase)
                                                        c("variableLabel","node","subset","totalNumberOfValuesIncludingMissing", "numberOfMissingValues", "numberOfSamples","min","max","mean", "standardDeviation", "q1","median","q3"))))
   
   # add information about node and subset identifiers
-  result_table$subset <- gsub(".*_","", rownames(result_table))
-  result_table$node <- gsub("_.*","", rownames(result_table))
+  result_table$subset <- gsub(".*_","", rownames(result_table)) #take everything after _
+  result_table$node <- gsub("_.*","", rownames(result_table)) #take everything before _
   
+  nodes <-  result_table$node
+  result_table$node[nodes == "preprocessed"] <- "preprocessed_allNodes"
   
   
   # calculate summary stats per data.frame
@@ -281,7 +300,8 @@ produce_summary_stats <- function(measurement_tables, phase)
   {
     partial_table <- result_table[which(result_table$node == node), ,drop = F]
     rownames(partial_table) <- 1:nrow(partial_table) #does not influence json result, however is needed for unit testing (matching rownumbers).
-    fileName <- paste(phase,"_summary_stats_node_", node, ".json", sep = "")
+    if(node != "preprocessed_allNodes"){ fileName <- paste(phase,"_summary_stats_node_", node, ".json", sep = "")}
+    if(node == "preprocessed_allNodes"){ fileName <- paste(phase,"_summary_stats_node_all.json", sep = "")}
     summary_stats_all_nodes[[fileName]] <- partial_table
   }
   return(summary_stats_all_nodes)

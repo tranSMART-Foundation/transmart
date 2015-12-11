@@ -13,6 +13,43 @@ test_set2_measurements <- test_set2[ , c("GSM210004", "GSM210005", "GSM210006", 
 test_data <- list("n0_s1" = test_set)
 test_data_measurements <- list("n0_s1" = test_set_measurements)
 
+test_set_preprocessed  <- test_set
+colnames(test_set_preprocessed) <- c("Row.Label" , "Bio.marker","GSM210004_n0_s1", "GSM210005_n0_s2", "GSM210006_n1_s1", "GSM210007_n1_s2")
+### unit tests for function get_input_data ###
+
+loaded_variables <- test_data
+preprocessed  <- test_set_preprocessed
+
+
+## get_input_data should return value of loaded_variables if phase = "fetch"
+test.get_input_data.fetch <- function(){
+   checkEquals(loaded_variables, get_input_data("fetch"))
+
+## get_input_data should take variable preprocessed and return its contents as a named list if phase = "preprocess"
+test.get_input_data.preprocess <- function(){
+  checkEquals(list("preprocessed" = preprocessed), get_input_data("preprocess"))
+}
+
+## get_input_data should throw error if phase is NA or anything other than "fetch" and "preprocess
+test.get_input_data.phaseNA <- function(){
+  checkException(get_input_data(NA))
+}
+test.get_input_data.phaseIncorrect <- function(){
+  checkException(get_input_data("Incorrect_phase"))
+}
+
+## get_input_data should throw error if phase is fetch and loaded_variables does not exist
+rm(loaded_variables)
+test.get_input_data.no_loaded_variables <- function(){
+  checkException(get_input_data("fetch"))
+}
+## get_input_data should throw error if phase is preprocess and preprocessed does not exist
+loaded_variables <- test_data
+rm(preprocessed)
+
+test.get_input_data.noPreprocessed <- function(){
+  checkException(get_input_data("preprocess"))
+}
 
 
 ### unit tests for function extract_measurements ###
@@ -28,8 +65,14 @@ test.extract_measurements.simplecase2 <- function(){
   checkEquals(test_data_measurements, extract_measurements(test_data_tmp))
 }
 
+#test if it works for preprocessed data
+test.extract_measurements.preprocesseddata <- function(){  
+  checkEquals(list(preprocessed = test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210005_n0_s2", "GSM210006_n1_s1", "GSM210007_n1_s2")]), extract_measurements(list(preprocessed = test_set_preprocessed)))
+}
+
+
 #should return a list with a missing value if the data has no "Row.Label" column
-test.extract_measurements.no.Row.Label <- function(){   
+test.extract_measurements.noRowLabel <- function(){   
   tmp <- test_data
   colnames(tmp[[1]])[1] <- "No.Row.Label"
   checkEquals(list("n0_s1"= NA), extract_measurements(tmp))
@@ -73,6 +116,30 @@ test.extract_measurements.1sample1probe <- function(){
   test_data_one_probe_sample <- list("n0_s1" = test_set[1,c("Row.Label", "Bio.marker", "GSM210004")])
   checkEquals(list("n0_s1" = test_set[1,c("GSM210004"), drop = F]), extract_measurements(test_data_one_probe_sample))
 }
+
+### unit tests for function split_on_subsets ###
+
+#should return one data.frame if there is only one subset
+test.split_on_subsets.onesubset <- function(){
+  one_subset_data <- test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210005_n0_s2", "GSM210006_n1_s1", "GSM210007_n1_s2")]
+  colnames(one_subset_data) <- c("GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1")
+  
+  preprocessed_measurements <- list(preprocessed = one_subset_data)
+  split_preprocessed_measurements <- list(preprocessed_s1 = one_subset_data)
+  
+  checkEquals(split_preprocessed_measurements, split_on_subsets(preprocessed_measurements))
+}
+
+#should return two data.frames if there are two subsets 
+test.split_on_subsets.twosubsets <- function(){
+  preprocessed_measurements <- list(preprocessed = test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210005_n0_s2", "GSM210006_n1_s1", "GSM210007_n1_s2")])
+  split_preprocessed_measurements <- list(preprocessed_s1 = test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210006_n1_s1")],
+                                          preprocessed_s2 = test_set_preprocessed[,c("GSM210005_n0_s2", "GSM210007_n1_s2")])
+  checkEquals(split_preprocessed_measurements, split_on_subsets(preprocessed_measurements))
+}
+
+#HIER GEBLEVEN, 
+# + add a unit test for running produce_summary_stats on preprocessed data
 
 ### unit tests for function produce_summary_stats ###
 # input is numeric, as output extract_measurements is numeric
