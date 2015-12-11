@@ -1,7 +1,9 @@
 #!/bin/bash
 
+# Version: Fri Dec 11 11:14:31 EST 2015
+
 #**********************************************************************************
-#  Script to load all that is need to run an example/demo version of tranSMART 1.2.4
+#  Script to load all that is needed to run an example/demo version of tranSMART 1.2.4
 #**********************************************************************************
 
 # set up with 
@@ -14,7 +16,7 @@
 #   /Scripts/install-ubuntu/InstallTransmart.sh
 #
 # to run the checking script
-#   Scripts/install-ubuntu/checks/testAll.sh
+#   Scripts/install-ubuntu/checks/checkAll.sh
 
 # set up sudo early
 sudo -v
@@ -155,7 +157,7 @@ echo "++++++++++++++++++++++++++++"
 cd $HOME/transmart/transmart-data
 sudo -v
 source ./vars
-make -C solr start > ~/transmart/transmart-data/solr.log 2>&1 & 
+make -C solr start > $HOME/transmart/transmart-data/solr.log 2>&1 & 
 sleep 60
 make -C solr rwg_full_import sample_full_import
 
@@ -174,7 +176,7 @@ echo "++++++++++++++++++++++++++++"
 sudo service tomcat7 restart
 
 echo "++++++++++++++++++++++++++++"
-echo "+  run final checking scripts"
+echo "+ Done"
 echo "++++++++++++++++++++++++++++"
 
 #check - checkFilesTomcat.sh
