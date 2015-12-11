@@ -1,7 +1,7 @@
 library(reshape2)
 
 
-main <- function(max_rows=100, sorting="nodes"){
+main <- function(max_rows = 100, sorting = "nodes") {
   max_rows <- as.numeric(max_rows)
   verifyInput(max_rows, sorting)
   if(exists("preprocessed")){
@@ -10,14 +10,20 @@ main <- function(max_rows=100, sorting="nodes"){
   else{
     df <- mergeFetchedData(loaded_variables)
   }
-  # We take the last df to alleviate bug with new HDDs dropped being ignored - later on we will use label name explicitly.
-  df["Row.Label"] <- lapply(df["Row.Label"],fixString) # remove illegal characters from probe names. This will prevent problems with CSS selectors on the frontend.
+  # We take the last df to alleviate bug with new HDDs dropped being ignored -
+  # later on we will use label name explicitly.
+  df["Row.Label"] <- lapply(df["Row.Label"],fixString)  # remove illegal
+  # characters from probe names. This will
+  # prevent problems with CSS selectors on the frontend.
   if(ncol(df) > 3){
     #this is the case for more than 1 sample
-    df <- applySorting(df,sorting) # no need for sorting in one sample case
-    variances <- apply(df[,3:ncol(df)],1,var, na.rm = T) # Calculating variance per probe (per row)
-    means <- rowMeans(df[,3:ncol(df)], na.rm = T) # this is just an auxiliary column - it will not be used for JSON.
-    sdses <- apply(df[,3:ncol(df)],1,sd, na.rm = T) # this is just an auxiliary column - it will not be used for JSON.
+    df <- applySorting(df,sorting)  # no need for sorting in one sample case
+    variances <- apply(df[,3:ncol(df)],1,var, na.rm = T)  # Calculating
+    # variance per probe (per row)
+    means <- rowMeans(df[,3:ncol(df)], na.rm = T)  # this is just an
+    # auxiliary column - it will not be used for JSON.
+    sdses <- apply(df[,3:ncol(df)],1,sd, na.rm = T)  # this is just
+    # an auxiliary column - it will not be used for JSON.
     df["MEAN"] <- means
     df["SD"] <- sdses
     df["SIGNIFICANCE"] <- variances
@@ -25,9 +31,12 @@ main <- function(max_rows=100, sorting="nodes"){
   }
   else{
     #one sample
-    variance <- 1.0 # We cannot get any significance measure for just one sample
-    mean <- mean(df[,3], na.rm = T) #For just one sample we take mean over all genes (whole column), not per gene
-    sds <- sd(df[,3],na.rm = T) #For just one sample we take mean over all genes (whole column), not per gene
+    variance <- 1.0  # We cannot get any significance measure for just
+    # one sample
+    mean <- mean(df[,3], na.rm = T)  #For just one sample we take mean
+    # over all genes (whole column), not per gene
+    sds <- sd(df[,3],na.rm = T)  #For just one sample we take mean
+    # over all genes (whole column), not per gene
     df["MEAN"] <- rep(mean,nrow(df))
     df["SD"] <- rep(sds,nrow(df))
     df["SIGNIFICANCE"] <- rep(variance, nrow(df))
@@ -36,7 +45,9 @@ main <- function(max_rows=100, sorting="nodes"){
   fields <- buildFields(df)
   extraFields <- buildExtraFields(fields)
   probes <- na.omit(df[,1])
-  geneSymbols <- df[,2][1:length(probes)]#unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector, otherwise we get a dataframe
+  geneSymbols <- df[,2][1:length(probes)]
+  #unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector,
+  # otherwise we get a dataframe
   patientIDs <-unique(fields["PATIENTID"])[,1]
 
   significanceValues <- unique(fields["SIGNIFICANCE"])[,1]
@@ -48,23 +59,28 @@ main <- function(max_rows=100, sorting="nodes"){
                               "features"=features,
                               "extraFields"=extraFields
                                )
-  writeDataForZip(df, patientIDs) # for later zip generation
+  writeDataForZip(df, patientIDs)  # for later zip generation
   writeRunParams(max_rows, sorting)
-  df <- cleanUp(df) # temporary stats like SD and MEAN need to be removed for clustering to work
+  df <- cleanUp(df)  # temporary stats like SD and MEAN need
+  # to be removed for clustering to work
   measurements <- df[,3:ncol(df)]
-  if (nrow(measurements) > 1 && ncol(measurements) > 1 ){# cannot cluster matrix which is less than 2x2
+  if (nrow(measurements) > 1 && ncol(measurements) > 1 ){  # cannot cluster
+  # matrix which is less than 2x2
     measurements <- toZscores(measurements)
     jsn <- addClusteringOutput(jsn, measurements) #
   }
   jsn <- toJSON(jsn,
                 pretty = TRUE)
-  write(jsn,file = "heatmap.json") # json file be served the same way like any other file would - get name via /status call and then /download
+  write(jsn,file = "heatmap.json")   # json file be served the same way
+  # like any other file would - get name via
+  # /status call and then /download
 
   msgs <- c("Finished successfuly")
   if (exists("errors")){
     msgs <- errors
   }
-  list(messages=msgs) # main function in every R script has to return a list (so a data.frame will also do)
+  list(messages=msgs)   # main function in every R script has to return a list
+  # (so a data.frame will also do)
 }
 
 toZscores <- function(measurements){
@@ -107,8 +123,12 @@ applySorting <- function(df,sorting){
 }
 
 getNode <- function(patientIDs){
-  splittedIds <- strsplit(patientIDs,"_") # During merge, which is always run we append subset id, either _s1 or _s2 to PATIENTID.
-  sapply(splittedIds, FUN=tail_elem,n= 2) # In proper patienid subset will always be  at the end. This select last but one elemnt - the node
+  splittedIds <- strsplit(patientIDs,"_") # During merge, which is always
+  # run we append subset id, either
+  # _s1 or _s2 to PATIENTID.
+  sapply(splittedIds, FUN=tail_elem,n= 2) # In proper patienid subset will
+  # always be  at the end.
+  # This select last but one elemnt - the node
 }
 
 getSubject <- function(patientIDs){
@@ -117,7 +137,13 @@ getSubject <- function(patientIDs){
 }
 
 buildFields <- function(df){
-  df <- melt(df, na.rm = T, id=c("Row.Label","Bio.marker","SIGNIFICANCE","MEAN","SD")) # melt implicitly casts characters to factors to make your like more exciting, in order to encourage more adventures it does not have characters.as.factors=F param.
+  df <- melt(df, na.rm = T, id=c("Row.Label",
+    "Bio.marker",
+    "SIGNIFICANCE",
+    "MEAN",
+    "SD"))  # melt implicitly casts
+  # characters to factors to make your like more exciting, in order to encourage more adventures it does not
+  # have characters.as.factors=F param.
   ZSCORE <- (df$value - df$MEAN)/df$SD
   df["MEAN"] <- NULL
   df["SD"]   <-NULL
@@ -131,10 +157,19 @@ writeDataForZip <- function(df, patientIDs) {
   t          <- df
   t[pidCols] <- lapply(t[pidCols], function(v) { (v - df$MEAN) / df$SD })
   allCols    <- c(c("Row.Label", "Bio.marker", "MEAN", "SD", "SIGNIFICANCE"), pidCols)
-  write.table(t[allCols], "heatmap_data.tsv", sep="\t", na="", row.names=F, col.names=T)
-
+  write.table(t[allCols],
+     "heatmap_data.tsv",
+      sep="\t",
+      na="",
+      row.names=F,
+      col.names=T)
   allCols <- c(c("Row.Label"), pidCols)
-  write.table(df[allCols], "heatmap_orig_values.tsv", sep="\t", na="", row.names=F, col.names=T)
+  write.table(df[allCols],
+  "heatmap_orig_values.tsv",
+  sep="\t",
+  na="",
+  row.names=FALSE,
+  col.names=T)
 }
 
 writeRunParams <- function(max_rows, sorting) {
@@ -142,17 +177,14 @@ writeRunParams <- function(max_rows, sorting) {
     max_rows = max_rows,
     sorting  = sorting
   )
-
   if (exists("preprocessed") && exists("preprocessing_params")) {
     params <- c(params, preprocessing_params)
   }
-
   write(toJSON(params, pretty=TRUE), 'params.json')
 }
 
 fixString <- function(str) {
-  str <- gsub("[^a-zA-Z0-9-]", "", str, perl=TRUE)
-  return(str)
+  gsub("[^a-zA-Z0-9-]", "", str, perl=TRUE)
 }
 
 buildExtraFields <- function(df){
@@ -164,8 +196,12 @@ buildExtraFields <- function(df){
 }
 
 getSubset <- function(patientIDs){
-  splittedIds <- strsplit(patientIDs,"_s") # During merge, which is always run we append subset id, either _s1 or _s2 to PATIENTID.
-  SUBSETS <- lapply(splittedIds, FUN=tail_elem) # In proper patienid subset will always be  at the end. This select last element after _s
+  splittedIds <- strsplit(patientIDs,"_s") # During merge,
+  # which is always run we append subset id, either
+  # _s1 or _s2 to PATIENTID.
+  SUBSETS <- lapply(splittedIds, FUN=tail_elem) # In proper patienid
+  # subset will always be  at the end.
+  # This select last element after _s
   SUBSETS <- sapply(SUBSETS, FUN=formatSubset)
 }
 
@@ -211,7 +247,8 @@ mergeFetchedData <- function(listOfHdd){
 add.subset.label <- function(df,label){
   sample.names <- c("")
   if(ncol(df) == 3 ){
-    sample.names <- colnames(df)[3] # R returns NA instead of column name for colnames(df[,3:ncol(df)])
+    sample.names <- colnames(df)[3] # R returns NA instead of column name
+    # for colnames(df[,3:ncol(df)])
   }else{
   measurements <- df[,3:ncol(df)]
   sample.names <- colnames(measurements)
@@ -223,13 +260,13 @@ add.subset.label <- function(df,label){
   return(df)
 }
 
-computeDendrogram <- function(zScoreMatrix, distanceMeassure, linkageMethod) {
-    as.dendrogram(hclust(dist(zScoreMatrix, method=distanceMeassure), method=linkageMethod))
+computeDendrogram <- function(zScoreMatrix, distances, linkageMethod) {
+    as.dendrogram(hclust(distances, method=linkageMethod))
 }
 
 dendrogramToJSON <- function(d) {
     totalMembers <- attributes(d)$members
-    add_json <- function(x, start, left) {
+    add_json <- function(x, start) {
         members <- attributes(x)$members
         height <- attributes(x)$height
         index <- (start - 1):(start + members - 2)
@@ -238,34 +275,61 @@ dendrogramToJSON <- function(d) {
         if (is.leaf(x)){
             jsonString <<- paste(jsonString, ']}')
         } else {
-            add_json(x[[1]], start, TRUE)
+            add_json(x[[1]], start, 1)
             jsonString <<- paste(jsonString, ",")
             leftMembers <- attributes(x[[1]])$members
-            add_json(x[[2]], start + leftMembers, FALSE)
+            add_json(x[[2]], start + leftMembers, 0)
             jsonString <<- paste(jsonString, "]}")
         }
     }
     jsonString <- ""
-    add_json(d, TRUE)
+    add_json(d, 1)
     return(jsonString)
 }
 
 
 addClusteringOutput <- function(jsn, measurements){
 
-  colDendrogramEuclideanComplete <- computeDendrogram(t(measurements), 'euclidean', 'complete')
-  colDendrogramEuclideanSingle <- computeDendrogram(t(measurements), 'euclidean', 'single')
-  colDendrogramEuclideanAverage <- computeDendrogram(t(measurements), 'euclidean', 'average')
-  rowDendrogramEuclideanComplete <- computeDendrogram(measurements, 'euclidean', 'complete')
-  rowDendrogramEuclideanSingle <- computeDendrogram(measurements, 'euclidean', 'single')
-  rowDendrogramEuclideanAverage <- computeDendrogram(measurements, 'euclidean', 'average')
+  euclideanDistances <- dist(measurements, method="euclidean")
+  manhattanDistances <- dist(measurements, method="manhattan")
 
-  colDendrogramManhattanComplete <- computeDendrogram(t(measurements), 'manhattan', 'complete')
-  colDendrogramManhattanSingle <- computeDendrogram(t(measurements), 'manhattan', 'single')
-  colDendrogramManhattanAverage <- computeDendrogram(t(measurements), 'manhattan', 'average')
-  rowDendrogramManhattanComplete <- computeDendrogram(measurements, 'manhattan', 'complete')
-  rowDendrogramManhattanSingle <- computeDendrogram(measurements, 'manhattan', 'single')
-  rowDendrogramManhattanAverage <- computeDendrogram(measurements, 'manhattan', 'average')
+  colDendrogramEuclideanComplete <- computeDendrogram(
+    t(measurements), euclideanDistances, 'complete'
+  )
+  colDendrogramEuclideanSingle <- computeDendrogram(
+    t(measurements), euclideanDistances, 'single'
+  )
+  colDendrogramEuclideanAverage <- computeDendrogram(
+    t(measurements), euclideanDistances, 'average'
+  )
+  rowDendrogramEuclideanComplete <- computeDendrogram(
+    measurements, euclideanDistances, 'complete'
+  )
+  rowDendrogramEuclideanSingle <- computeDendrogram(
+    measurements, euclideanDistances, 'single'
+  )
+  rowDendrogramEuclideanAverage <- computeDendrogram(
+    measurements, euclideanDistances, 'average'
+  )
+
+  colDendrogramManhattanComplete <- computeDendrogram(
+    t(measurements), manhattanDistances, 'complete'
+  )
+  colDendrogramManhattanSingle <- computeDendrogram(
+    t(measurements), manhattanDistances, 'single'
+  )
+  colDendrogramManhattanAverage <- computeDendrogram(
+    t(measurements), manhattanDistances, 'average'
+  )
+  rowDendrogramManhattanComplete <- computeDendrogram(
+    measurements, manhattanDistances, 'complete'
+  )
+  rowDendrogramManhattanSingle <- computeDendrogram(
+    measurements, manhattanDistances, 'single'
+  )
+  rowDendrogramManhattanAverage <- computeDendrogram(
+    measurements, manhattanDistances, 'average'
+  )
 
   jsn$hclustEuclideanComplete <- list(
       order.dendrogram(colDendrogramEuclideanComplete) -1,
@@ -302,5 +366,5 @@ addClusteringOutput <- function(jsn, measurements){
       order.dendrogram(rowDendrogramManhattanAverage) - 1,
       dendrogramToJSON(colDendrogramManhattanAverage),
       dendrogramToJSON(rowDendrogramManhattanAverage))
-     return(jsn)
+   return(jsn)
 }
