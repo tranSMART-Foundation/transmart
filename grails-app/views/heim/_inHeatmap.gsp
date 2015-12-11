@@ -21,6 +21,37 @@
     </table>
 </script>
 
+%{--Template for --}%
+<script id="marker-selection-table-tmp" type="text/x-jsrender">
+    <table id="markerSelectionTable" class="tablesorterAnalysisResults">
+        <thead>
+            <tr>
+                <th class="header">Row label</th>
+                <th class="header">Entity</th>
+                <th class="header">Log2(fold change) S2 vs S1</th>
+                <th class="header">t</th>
+                <th class="header">p-value</th>
+                <th class="header">Adjusted p-value</th>
+                <th class="header">B</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{for entries}}
+            <tr>
+                <td>{{:rowLabel}}</td>
+                <td>{{:biomarker}}</td>
+                <td>{{:log2FoldChange}}</td>
+                <td>{{:t}}</td>
+                <td>{{:pValue}}</td>
+                <td>{{:adjustedPValue}}</td>
+                <td>{{:B}}</td>
+            </tr>
+            {{/for}}
+        </tbody>
+    </table>
+</script>
+
+
 <div class="heim-analysis-container">
 
     <div id="heim-tabs" style="margin-top: 25px;">
