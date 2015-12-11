@@ -215,6 +215,7 @@ SmartRHeatmap = (function(){
                 .attr('y', -2 - gridFieldHeight)
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
+                .attr('fill-opacity', 0) // also on CSS on .box, but needed here for the export
                 .on("click", function(patientID) {
                     var rowValues = [];
                     for(var i = 0; i < probes.length; i++) {
@@ -270,6 +271,7 @@ SmartRHeatmap = (function(){
                 .attr('y', function(d, i) { return i * gridFieldHeight; })
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
+                .attr('fill-opacity', 0) // also on CSS on .box, but needed here for the export
                 .on("click", function(probe) {
                     var colValues = [];
                     for(var i = 0; i < patientIDs.length; i++) {
@@ -327,6 +329,7 @@ SmartRHeatmap = (function(){
                 .attr('y', -2 - gridFieldHeight)
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
+                .attr('fill-opacity', 0) // also on CSS on .box, but needed here for the export
                 .on("click", function() {
                     var rowValues = [];
                     for(var i = 0; i < significanceValues.length; i++) {
@@ -384,6 +387,7 @@ SmartRHeatmap = (function(){
                 .attr('y', -2 - gridFieldHeight * 2)
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
+                .attr('fill-opacity', 0) // also on CSS on .box, but needed here for the export
                 .on("click", function(patientID) {
                     selectCol(patientID);
                 });
@@ -455,6 +459,10 @@ SmartRHeatmap = (function(){
                 .attr("height", gridFieldHeight)
                 .attr("x", function(d) { return - histogramScale(d.significance) - 10; })
                 .attr("y", function(d) { return gridFieldHeight * d.idx; })
+                // next three needed for export; already in .bar
+                .attr('fill', 'steelblue')
+                .attr('stroke', 'black')
+                .attr('shape-rendering', 'crispEdges')
                 .on("mouseover", function(d) {
                     var html = 'FEATURE SIGNIFICANCE: ' + d.significance;
                     tooltip
