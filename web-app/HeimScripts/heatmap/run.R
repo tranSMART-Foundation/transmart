@@ -106,7 +106,6 @@ parseInput <- function() {
 }
 
 toZscores <- function(measurements) {
-  print(colnames(measurements))
   measurements <- scale(t(measurements))
   t(measurements)
 }
@@ -180,17 +179,17 @@ buildFields <- function(df) {
      # characters to factors to make your like more exciting,
      # in order to encourage more adventures it does not
      # have characters.as.factors=F param.
-  ZSCORE <- (df$value - df$MEAN) / df$SD
-  df["MEAN"] <- NULL
-  df["SD"]   <- NULL
-  names(df) <-
+  df$variable <- as.character(df$variable)
+  ZSCORE      <- (df$value - df$MEAN) / df$SD
+  df["MEAN"]  <- NULL
+  df["SD"]    <- NULL
+  names(df)   <-
     c("PROBE","GENESYMBOL","SIGNIFICANCE","PATIENTID","VALUE")
   df["ZSCORE"] <- ZSCORE
   return(df)
 }
 
-writeDataForZip <- function(df, zScores, patientIDs) {
-  pidCols <- as.character(patientIDs)
+writeDataForZip <- function(df, zScores, pidCols) {
   df      <- df[ , -which(names(df) %in% pidCols)]  # Drop patient columns
   df      <- cbind(df,zScores)                      # Replace with zScores
   write.table(
@@ -221,7 +220,8 @@ buildExtraFields <- function(df) {
   PATIENTID <- as.character(df$PATIENTID)
   TYPE <- rep("binary",nrow(df))
   VALUE <- getSubset(PATIENTID)
-  extraFields <- data.frame(FEATURE, PATIENTID, TYPE, VALUE)
+  extraFields <- data.frame(FEATURE, PATIENTID, TYPE, VALUE,
+   stringsAsFactors = FALSE)
 }
 
 getSubset <- function(patientIDs) {
@@ -295,7 +295,7 @@ add.subset.label <- function(df,label) {
 ### end of duplicated code
 
 computeDendrogram <-
-  function(zScoreMatrix, distances, linkageMethod) {
+  function(distances, linkageMethod) {
     as.dendrogram(hclust(distances, method = linkageMethod))
   }
 
@@ -336,19 +336,19 @@ addClusteringOutput <- function(jsn, measurements) {
   euclideanDistancesCol <- dist(t(measurements), method = "euclidean")
   manhattanDistancesCol <- dist(t(measurements), method = "manhattan")
   
-  colDendrogramEuclideanComplete <- computeDendrogram(t(measurements), euclideanDistancesCol, 'complete')
-  colDendrogramEuclideanSingle <- computeDendrogram(t(measurements), euclideanDistancesCol, 'single')
-  colDendrogramEuclideanAverage <- computeDendrogram(t(measurements), euclideanDistancesCol, 'average')
-  rowDendrogramEuclideanComplete <- computeDendrogram(measurements, euclideanDistancesRow, 'complete')
-  rowDendrogramEuclideanSingle <- computeDendrogram(measurements, euclideanDistancesRow, 'single')
-  rowDendrogramEuclideanAverage <- computeDendrogram(measurements, euclideanDistancesRow, 'average')
+  colDendrogramEuclideanComplete <- computeDendrogram( euclideanDistancesCol, 'complete')
+  colDendrogramEuclideanSingle <- computeDendrogram( euclideanDistancesCol, 'single')
+  colDendrogramEuclideanAverage <- computeDendrogram( euclideanDistancesCol, 'average')
+  rowDendrogramEuclideanComplete <- computeDendrogram( euclideanDistancesRow, 'complete')
+  rowDendrogramEuclideanSingle <- computeDendrogram( euclideanDistancesRow, 'single')
+  rowDendrogramEuclideanAverage <- computeDendrogram( euclideanDistancesRow, 'average')
   
-  colDendrogramManhattanComplete <- computeDendrogram(t(measurements), manhattanDistancesCol, 'complete')
-  colDendrogramManhattanSingle <- computeDendrogram(t(measurements), manhattanDistancesCol, 'single')
-  colDendrogramManhattanAverage <- computeDendrogram(t(measurements), manhattanDistancesCol, 'average')
-  rowDendrogramManhattanComplete <- computeDendrogram(measurements, manhattanDistancesRow, 'complete')
-  rowDendrogramManhattanSingle <- computeDendrogram(measurements, manhattanDistancesRow, 'single')
-  rowDendrogramManhattanAverage <- computeDendrogram(measurements, manhattanDistancesRow, 'average')
+  colDendrogramManhattanComplete <- computeDendrogram( manhattanDistancesCol, 'complete')
+  colDendrogramManhattanSingle <- computeDendrogram( manhattanDistancesCol, 'single')
+  colDendrogramManhattanAverage <- computeDendrogram( manhattanDistancesCol, 'average')
+  rowDendrogramManhattanComplete <- computeDendrogram( manhattanDistancesRow, 'complete')
+  rowDendrogramManhattanSingle <- computeDendrogram( manhattanDistancesRow, 'single')
+  rowDendrogramManhattanAverage <- computeDendrogram( manhattanDistancesRow, 'average')
   
   jsn$hclustEuclideanComplete <- list(
     order.dendrogram(colDendrogramEuclideanComplete) - 1,
