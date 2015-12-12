@@ -87,7 +87,7 @@ source $HOME/.sdkman/bin/sdkman-init.sh
 sdk install grails 2.3.11 < AnswerYes.txt
 sdk install groovy 2.4.5 < AnswerYes.txt
 
-echo "+  Checks on basic load"
+echo "Checks on basic load"
 cd $HOME/Scripts/install-ubuntu/checks
 ./basics.sh
 if [ "$( checkInstallError "Some Basic Command-Line Tool is missing; redo install" )" ] ; then exit -1; fi
@@ -95,14 +95,21 @@ if [ "$( checkInstallError "Some Basic Command-Line Tool is missing; redo instal
 if [ "$( checkInstallError "There is a Command-Line with an unsupportable version; redo install" )" ] ; then exit -1; fi
 ./checkFilesBasic.sh
 if [ "$( checkInstallError "One of more basic files are missing; redo install" )" ] ; then exit -1; fi
+
+echo "Check on loading and setup of postgres"
+./checkPsqlInstall.sh 
+if [ "$( checkInstallError "PostgreSQL is not installed; redo install" )" ] ; then exit -1; fi
+./checkFilesPsql.sh
+if [ "$( checkInstallError "Database table folders needs by transmart not correct; fix as indicated; then redo install" )" ] ; then exit -1; fi
+
 echo "Finished installing basic tools at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install Tomcat 7"
 echo "++++++++++++++++++++++++++++"
 
-cd $HOME
 sudo -v 
+cd $HOME
 sudo apt-get install -y tomcat7 
 sudo service tomcat7 stop
 $HOME/Scripts/install-ubuntu/updateTomcatConfig.sh
@@ -111,48 +118,53 @@ echo "+  Checks on tomcat install"
 cd $HOME/Scripts/install-ubuntu/checks
 ./checkTomcatInstall.sh
 if [ "$( checkInstallError "Tomcat install failed; redo install" )" ] ; then exit -1; fi
+
 echo "Finished installing tomcat at $(date)"
-exit 0
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install R, Rserve and other packages"
 echo "++++++++++++++++++++++++++++"
 
-cd $HOME/transmart/transmart-data
-sudo -v
-source ./vars
-make -C R install_packages
+echo "+  is R already installed"
+cd $HOME/Scripts/install-ubuntu/checks
+./checkFilesR.sh
+if [ "$( checkInstallError "R is not installed; installing" )" ] ; then
+    sudo -v
+    cd $HOME/transmart/transmart-data
+    source ./vars
+    make -C R install_packages
+fi
 sudo -v
 cd $HOME
-echo "export PATH=${HOME}/transmart/transmart-data/R/root/bin:\$PATH" > Rpath.sh
-sudo mv Rpath.sh /etc/profile.d/
+if ! [ -e /etc/profile.d/Rpath.sh ] ; then
+    echo "export PATH=${HOME}/transmart/transmart-data/R/root/bin:\$PATH" > Rpath.sh
+    sudo mv Rpath.sh /etc/profile.d/
+fi
 source /etc/profile.d/Rpath.sh
 
-# check - checkFilesR.sh
-# check - checkR.sh
+cd $HOME/Scripts/install-ubuntu/checks
+./checkFilesR.sh
+if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1; fi
+./checkR.sh
+if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1; fi
 echo "Finished installing R and R packages at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Load study GSE8581 in database"
 echo "++++++++++++++++++++++++++++"
 
-# check - checkPsqlInstall.sh 
-# check - checkFilesPsql.sh
-# (should probably move these to earlier in the script)
-# move to just after checkVersions.sh ?
-
 cd $HOME/transmart/transmart-data
-sudo -v
 source ./vars
 make -j4 postgres
 echo "Finished setting up the PostgreSQL database at $(date)"
 make update_datasets
-sudo -v
 make -C samples/postgres load_clinical_GSE8581
 make -C samples/postgres load_ref_annotation_GSE8581
 make -C samples/postgres load_expression_GSE8581
 
-# check - checkPsqlDataload.sh
+cd $HOME/Scripts/install-ubuntu/checks
+./checkPsqlDataload.sh
+if [ "$( checkInstallError "Loading database failed; clear database and restart install" )" ] ; then exit -1; fi
 
 echo "Finished loading data in the PostgreSQL database at $(date)"
 
@@ -167,7 +179,10 @@ make -C config install
 sudo mkdir -p /usr/share/tomcat7/.grails/transmartConfig/
 sudo cp $HOME/.grails/transmartConfig/*.groovy /usr/share/tomcat7/.grails/transmartConfig/
 
-# check - checkFilesConfig.sh
+cd $HOME/Scripts/install-ubuntu/checks
+./checkFilesConfig.sh
+if [ "$( checkInstallError "configuration files not set up correctly, see install script and redo" )" ] ; then exit -1; fi
+
 echo "Finished setting up the configuration files at $(date)"
 
 echo "++++++++++++++++++++++++++++"
@@ -182,7 +197,11 @@ curl http://75.124.74.64/wars/transmart.V1.2.4.war --output transmart.war
 curl http://75.124.74.64/wars/gwava.V1.2.4.war --output gwava.war
 sudo cp *.war /var/lib/tomcat7/webapps/
 
-#check - checkFilesToncatWar.sh
+cd $HOME/Scripts/install-ubuntu/checks
+./checkFilesToncatWar.sh
+if [ "$( checkInstallError "transmart war file not set up correctly, see install script and redo" )" ] ; then exit -1; fi
+
+
 echo "Finished installing war files at $(date)"
 
 echo "++++++++++++++++++++++++++++"
@@ -214,12 +233,13 @@ sudo service tomcat7 restart
 echo "Finished starting Tomcat7 at $(date)"
 
 echo "++++++++++++++++++++++++++++"
-echo "+ Done"
+echo "+ Done with install - making final checks (may take a while)"
 echo "++++++++++++++++++++++++++++"
 
-#check - checkFilesTomcat.sh
-#check - checkTools.sh
-#check - checkWeb.sh
+cd $HOME/Scripts/install-ubuntu/checks
+./checkFilesTomcat.sh
+./checkTools.sh
+./checkWeb.sh
 
 echo "Finished at $(date)"
 
