@@ -47,6 +47,11 @@ fi
 echo "Finished checking locations of Script Directory at $(date)"
 
 echo "++++++++++++++++++++++++++++"
+echo "+  install make "
+echo "++++++++++++++++++++++++++++"
+sudo apt-get install -y make
+
+echo "++++++++++++++++++++++++++++"
 echo "+  set up working dir (transmart) "
 echo "++++++++++++++++++++++++++++"
 
@@ -202,7 +207,7 @@ curl http://75.124.74.64/wars/gwava.V1.2.4.war --output gwava.war
 sudo cp *.war /var/lib/tomcat7/webapps/
 
 cd $HOME/Scripts/install-ubuntu/checks
-./checkFilesToncatWar.sh
+./checkFilesTomcatWar.sh
 if [ "$( checkInstallError "transmart war file not set up correctly, see install script and redo" )" ] ; then exit -1; fi
 
 echo "Finished installing war files at $(date)"
