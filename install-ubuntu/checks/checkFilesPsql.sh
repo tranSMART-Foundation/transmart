@@ -43,7 +43,7 @@ echo "-------------------------------------"
 
 varsFile=$HOME/transmart/transmart-data/vars
 
-if [ -x "$varsFile" ] ; then
+if [ -e "$varsFile" ] ; then
     source $varsFile
 else
 	echo "vars file (at $varsFile) does not exist"
