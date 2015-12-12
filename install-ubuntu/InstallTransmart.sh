@@ -228,8 +228,8 @@ echo "++++++++++++++++++++++++++++"
 echo "+  start Rserve"
 echo "++++++++++++++++++++++++++++"
 
-cd $HOME/Scripts/install-ubuntu
 sudo -v
+cd $HOME/Scripts/install-ubuntu
 sudo -u tomcat7 bash ./runRServe.sh
 echo "Finished starting RServe at $(date)"
 
