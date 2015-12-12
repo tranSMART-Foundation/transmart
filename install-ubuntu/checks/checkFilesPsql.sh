@@ -45,11 +45,13 @@ varsFile=$HOME/transmart/transmart-data/vars
 
 if [ -x "$varsFile" ] ; then
     source $varsFile
+else
+	echo "vars file (at $varsFile) does not exist"
 fi
 
 echo "checking for \$TABLESPACES env variable"
 if [ -z "$TABLESPACES" ] ; then
-	echo "  The \$TABLESPACES end variable is not set"
+	echo "  The \$TABLESPACES env variable is not set"
 	echo "  Cannot continue"
 	exit 1
 else
