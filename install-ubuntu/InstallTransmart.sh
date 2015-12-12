@@ -228,9 +228,9 @@ echo "++++++++++++++++++++++++++++"
 echo "+  start Rserve"
 echo "++++++++++++++++++++++++++++"
 
-cd $HOME/transmart/transmart-data
+cd $HOME/Scripts/install-ubuntu
 sudo -v
-sudo -u tomcat7 bash -c 'source vars && source /etc/profile.d/Rpath.sh && make -C R start_Rserve' 
+sudo -u tomcat7 bash ./runRServe.sh
 echo "Finished starting RServe at $(date)"
 
 echo "++++++++++++++++++++++++++++"
@@ -248,6 +248,15 @@ cd $HOME/Scripts/install-ubuntu/checks
 ./checkFilesTomcat.sh
 ./checkTools.sh
 ./checkWeb.sh
+
+echo "++++++++++++++++++++++++++++"
+echo "+ To redo all checks"
+echo "cd ~/Scripts/install-ubuntu/checks/"
+echo "./checkAll.sh"
+echo "++++++++++++++++++++++++++++"
+echo "+ Done with final checks"
+echo "++++++++++++++++++++++++++++"
+
 
 echo "Finished at $(date)"
 
