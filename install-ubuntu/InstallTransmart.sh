@@ -90,13 +90,12 @@ sdk install groovy 2.4.5 < AnswerYes.txt
 echo "+  Checks on basic load"
 cd $HOME/Scripts/install-ubuntu/checks
 ./basics.sh
-if [ "$( checkInstallError "Some Basic Command-Line Tool is missing" )" ] ; then exit -1; fi
+if [ "$( checkInstallError "Some Basic Command-Line Tool is missing; redo install" )" ] ; then exit -1; fi
 ./checkVersions.sh
-if [ "$( checkInstallError "There is a Command-Line with an unsupportable version" )" ] ; then exit -1; fi
+if [ "$( checkInstallError "There is a Command-Line with an unsupportable version; redo install" )" ] ; then exit -1; fi
 ./checkFilesBasic.sh
-if [ "$( checkInstallError "One of more basic files are missing" )" ] ; then exit -1; fi
+if [ "$( checkInstallError "One of more basic files are missing; redo install" )" ] ; then exit -1; fi
 echo "Finished installing basic tools at $(date)"
-exit 0
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install Tomcat 7"
@@ -107,8 +106,12 @@ sudo -v
 sudo apt-get install -y tomcat7 
 sudo service tomcat7 stop
 $HOME/Scripts/install-ubuntu/updateTomcatConfig.sh
-# check - checkTomcatInstall.sh
+
+echo "+  Checks on tomcat install"
+cd $HOME/Scripts/install-ubuntu/checks
+if [ "$( checkInstallError "Tomcat install failed; redo install" )" ] ; then exit -1; fi
 echo "Finished installing tomcat at $(date)"
+exit 0
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install R, Rserve and other packages"
