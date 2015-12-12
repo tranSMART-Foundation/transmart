@@ -109,7 +109,7 @@ $HOME/Scripts/install-ubuntu/updateTomcatConfig.sh
 
 echo "+  Checks on tomcat install"
 cd $HOME/Scripts/install-ubuntu/checks
-./checkTomcatInstall
+./checkTomcatInstall.sh
 if [ "$( checkInstallError "Tomcat install failed; redo install" )" ] ; then exit -1; fi
 echo "Finished installing tomcat at $(date)"
 exit 0
