@@ -125,10 +125,14 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Install R, Rserve and other packages"
 echo "++++++++++++++++++++++++++++"
 
-echo "+  is R already installed"
-cd $HOME/Scripts/install-ubuntu/checks
-./checkFilesR.sh
-if [ "$( checkInstallError "R is not installed; installing" )" ] ; then
+
+base="$HOME/transmart/transmart-data"
+baseR="$base/R"
+filepath="$baseR/root/bin"
+if [ -e "$filepath" ]; then
+    echo "+  R is already installed"
+else
+	echo "+  installing R at $filepath"
     sudo -v
     cd $HOME/transmart/transmart-data
     source ./vars
@@ -200,7 +204,6 @@ sudo cp *.war /var/lib/tomcat7/webapps/
 cd $HOME/Scripts/install-ubuntu/checks
 ./checkFilesToncatWar.sh
 if [ "$( checkInstallError "transmart war file not set up correctly, see install script and redo" )" ] ; then exit -1; fi
-
 
 echo "Finished installing war files at $(date)"
 
