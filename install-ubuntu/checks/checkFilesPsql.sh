@@ -44,7 +44,7 @@ echo "-------------------------------------"
 varsFile=$HOME/transmart/transmart-data/vars
 
 if [ -x "$varsFile" ] ; then
-    source $HOME/transmart-data/transmart/vars
+    source $varsFile
 fi
 
 echo "checking for \$TABLESPACES env variable"
