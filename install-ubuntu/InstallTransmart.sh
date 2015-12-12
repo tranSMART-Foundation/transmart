@@ -167,7 +167,7 @@ make -C samples/postgres load_ref_annotation_GSE8581
 make -C samples/postgres load_expression_GSE8581
 
 cd $HOME/Scripts/install-ubuntu/checks
-./checkPsqlDataload.sh
+./checkPsqlDataLoad.sh
 if [ "$( checkInstallError "Loading database failed; clear database and restart install" )" ] ; then exit -1; fi
 
 echo "Finished loading data in the PostgreSQL database at $(date)"
