@@ -21,12 +21,11 @@ function checkInstallError {
 echo "+  Checks on basic load"
 cd $HOME/Scripts/install-ubuntu/checks
 ./basics.sh
-if [ "$( checkInstallError "Some Basic Command-Line Tool is missing" )" ] ; then
-    echo "ich"
-    exit -1
-fi
-# check - checkVersions.sh
-# check - checkFilesBasic.sh
+if [ "$( checkInstallError "Some Basic Command-Line Tool is missing" )" ] ; then exit -1; fi
+./checkVersions.sh
+if [ "$( checkInstallError "There is a Command-Line with an unsupportable version" )" ] ; then exit -1; fi
+./checkFilesBasic.sh
+if [ "$( checkInstallError "One of more basic files are missing" )" ] ; then exit -1; fi
 echo "Finished installing basic tools at $(date)"
 exit 0
 

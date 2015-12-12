@@ -87,12 +87,14 @@ source $HOME/.sdkman/bin/sdkman-init.sh
 sdk install grails 2.3.11 < AnswerYes.txt
 sdk install groovy 2.4.5 < AnswerYes.txt
 
-echo "+  Checks on basic load
-cd $HOME/Scripts/checks
-.basics.sh
-if ( checkInstallError "Some Basic Command-Line Tool is missing") ; then exit -1 ; fi
-# check - checkVersions.sh
-# check - checkFilesBasic.sh
+echo "+  Checks on basic load"
+cd $HOME/Scripts/install-ubuntu/checks
+./basics.sh
+if [ "$( checkInstallError "Some Basic Command-Line Tool is missing" )" ] ; then exit -1; fi
+./checkVersions.sh
+if [ "$( checkInstallError "There is a Command-Line with an unsupportable version" )" ] ; then exit -1; fi
+./checkFilesBasic.sh
+if [ "$( checkInstallError "One of more basic files are missing" )" ] ; then exit -1; fi
 echo "Finished installing basic tools at $(date)"
 exit 0
 
