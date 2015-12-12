@@ -18,10 +18,13 @@ function checkInstallError {
 	return $returnValue
 }
 
-echo "+  Checks on basic load
-cd $HOME/Scripts/checks
-.basics.sh
-if ( checkInstallError "Some Basic Command-Line Tool is missing") ; then exit -1 ; fi
+echo "+  Checks on basic load"
+cd $HOME/Scripts/install-ubuntu/checks
+./basics.sh
+if [ "$( checkInstallError "Some Basic Command-Line Tool is missing" )" ] ; then
+    echo "ich"
+    exit -1
+fi
 # check - checkVersions.sh
 # check - checkFilesBasic.sh
 echo "Finished installing basic tools at $(date)"
