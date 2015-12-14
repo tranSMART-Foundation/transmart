@@ -139,6 +139,15 @@ test.split_on_subsets.twosubsets <- function(){
   checkEquals(split_preprocessed_measurements, split_on_subsets(preprocessed_measurements))
 }
 
+# should also work in case sample name contains _ (summary stats uses the _ to recognize subset)
+test.split_on_subsets.preprocessed_samplename_underscore <- function(){  
+  preprocessed_measurements <- list(preprocessed = test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210005_n0_s2", "GSM210006_n1_s1", "GSM210007_n1_s2")])
+  colnames(preprocessed_measurements[[1]]) <- c("sample _ 1_n1_s1", "sample _ 2_n1_s1","sample _ 3_n1_s2","sample _ 4_n1_s2")
+  split_preprocessed_measurements <- list(preprocessed_s1 = preprocessed_measurements[[1]][,c("sample _ 1_n1_s1", "sample _ 2_n1_s1")],
+                                          preprocessed_s2 = preprocessed_measurements[[1]][,c("sample _ 3_n1_s2","sample _ 4_n1_s2")])
+  checkEquals(split_preprocessed_measurements, split_on_subsets(preprocessed_measurements))
+}
+
 
 ### unit tests for function produce_summary_stats ###
 # input is numeric, as output extract_measurements is numeric
@@ -197,6 +206,8 @@ test.produce_summary_stats.preprocessed <- function(){
   
   checkEquals(list("preprocess_summary_stats_node_all.json" = expected_result), produce_summary_stats(split_preprocessed_measurements, "preprocess"))
 }
+
+
 
 
 # what if list item = NA
