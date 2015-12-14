@@ -14,7 +14,10 @@ test_data <- list("n0_s1" = test_set)
 test_data_measurements <- list("n0_s1" = test_set_measurements)
 
 test_set_preprocessed  <- test_set
-colnames(test_set_preprocessed) <- c("Row.Label" , "Bio.marker","GSM210004_n0_s1", "GSM210005_n0_s2", "GSM210006_n1_s1", "GSM210007_n1_s2")
+colnames(test_set_preprocessed) <- c("Row.Label" , "Bio.marker","GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1")
+test_set_preprocessed <- cbind(test_set_preprocessed, test_set2_measurements, stringsAsFactors = F)
+colnames(test_set_preprocessed) <- c("Row.Label" , "Bio.marker","GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1",
+                                     "GSM210004_n0_s2", "GSM210005_n0_s2", "GSM210006_n1_s2", "GSM210007_n1_s2")
 ### unit tests for function get_input_data ###
 
 loaded_variables <- test_data
@@ -67,7 +70,7 @@ test.extract_measurements.simplecase2 <- function(){
 
 #test if it works for preprocessed data
 test.extract_measurements.preprocesseddata <- function(){  
-  checkEquals(list(preprocessed = test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210005_n0_s2", "GSM210006_n1_s1", "GSM210007_n1_s2")]), extract_measurements(list(preprocessed = test_set_preprocessed)))
+  checkEquals(list(preprocessed = test_set_preprocessed[,-c(1:2)]), extract_measurements(list(preprocessed = test_set_preprocessed)))
 }
 
 
@@ -121,9 +124,7 @@ test.extract_measurements.1sample1probe <- function(){
 
 #should return one data.frame if there is only one subset
 test.split_on_subsets.onesubset <- function(){
-  one_subset_data <- test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210005_n0_s2", "GSM210006_n1_s1", "GSM210007_n1_s2")]
-  colnames(one_subset_data) <- c("GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1")
-  
+  one_subset_data <- test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1")]  
   preprocessed_measurements <- list(preprocessed = one_subset_data)
   split_preprocessed_measurements <- list(preprocessed_s1 = one_subset_data)
   
@@ -138,8 +139,6 @@ test.split_on_subsets.twosubsets <- function(){
   checkEquals(split_preprocessed_measurements, split_on_subsets(preprocessed_measurements))
 }
 
-#HIER GEBLEVEN, 
-# + add a unit test for running produce_summary_stats on preprocessed data
 
 ### unit tests for function produce_summary_stats ###
 # input is numeric, as output extract_measurements is numeric
@@ -186,6 +185,17 @@ test.produce_summary_stats.multiplenodesandsubsets <- function(){
   expected_result_n1[2 , c("variableLabel", "node","subset")] <-  c("n1_s2", "n1", "s2")
   
   checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result_n0, "fetch_summary_stats_node_n1.json" = expected_result_n1), produce_summary_stats(test_data_measurements_multiple_nodes_subsets, phase))
+}
+
+# preprocessed data
+test.produce_summary_stats.preprocessed <- function(){  
+  split_preprocessed_measurements <- list(preprocessed_s1 = test_set_preprocessed[,c( "GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1")],
+                                          preprocessed_s2 = test_set_preprocessed[,c("GSM210004_n0_s2", "GSM210005_n0_s2", "GSM210006_n1_s2", "GSM210007_n1_s2")])
+  expected_result<-  rbind(summary_stats_table,summary_stats_table2 )
+  expected_result[1 , c("variableLabel","subset", "node")] <-  c("preprocessed_s1", "s1", "preprocessed_allNodes")
+  expected_result[2 , c("variableLabel","subset", "node")] <-  c("preprocessed_s2", "s2", "preprocessed_allNodes")
+  
+  checkEquals(list("preprocess_summary_stats_node_all.json" = expected_result), produce_summary_stats(split_preprocessed_measurements, "preprocess"))
 }
 
 

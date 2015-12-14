@@ -125,6 +125,21 @@ check_input <- function(datasets, projection)
     stop(paste("Not all data.frame labels are unique; one or more labels in the \'loaded_variables\' or \'preprocessed\' variable are duplicated"))
   }
   
+  #check if data.frame "preprocessed" has the right column names
+  # expected format of column names for sample columns is <sample_name>_n<numerical node id>_s<numerical subset id>, eg. sample234_n1_s1
+  if(dataset_names[1] == "preprocessed") #for preprocessed data there is only 1 data.frame
+  {
+    column_names <- colnames(datasets$preprocessed)
+    expected_format_names <- ".+_n[[:digit:]]+_s[[:digit:]]+$"
+    names_in_correct_format <- grepl(expected_format_names, column_names)
+    if(!all(names_in_correct_format | column_names == "Row.Label" | column_names == "Bio.marker"))
+    {
+      stop(paste("The column names of the sample columns of the data.frame \'preprocessed\' do not have the expected format.", 
+                "\nExpected column names for the feature columns (probes/genes/proteins/etc): \'Row.Label\' and (optional) \'Bio.marker\' ", 
+                "\nSample columns should adhere to the format: <sample_name>_n<numerical node id>_s<numerical subset id>, eg. sample234_n1_s1"))
+    }
+  }
+  
 
   if(is.na(projection))
   {
