@@ -93,7 +93,6 @@ get_input_data <- function(phase)
 }
   
 
-
 #check if provided variables and phase info are in line with expected input as described at top of this script
 check_input <- function(datasets, projection)
 {
@@ -267,7 +266,7 @@ produce_summary_stats <- function(measurement_tables, phase)
   result_table$node <- gsub("_.*","", rownames(result_table)) #take everything before _
   
   nodes <-  result_table$node
-  result_table$node[nodes == "preprocessed"] <- "preprocessed_allNodes"
+  result_table$node[nodes == "preprocessed"] <- "preprocessed_allNodesMerged"
   
   
   # calculate summary stats per data.frame
@@ -315,8 +314,8 @@ produce_summary_stats <- function(measurement_tables, phase)
   {
     partial_table <- result_table[which(result_table$node == node), ,drop = F]
     rownames(partial_table) <- 1:nrow(partial_table) #does not influence json result, however is needed for unit testing (matching rownumbers).
-    if(node != "preprocessed_allNodes"){ fileName <- paste(phase,"_summary_stats_node_", node, ".json", sep = "")}
-    if(node == "preprocessed_allNodes"){ fileName <- paste(phase,"_summary_stats_node_all.json", sep = "")}
+    if(node != "preprocessed_allNodesMerged"){ fileName <- paste(phase,"_summary_stats_node_", node, ".json", sep = "")}
+    if(node == "preprocessed_allNodesMerged"){ fileName <- paste(phase,"_summary_stats_node_all.json", sep = "")}
     summary_stats_all_nodes[[fileName]] <- partial_table
   }
   return(summary_stats_all_nodes)
@@ -337,9 +336,8 @@ write_summary_stats <- function(summary_stats)
 # Function that outputs one box plot image per data node
 produce_boxplot <- function(measurement_tables, phase, projection)
 {
-  #get node and subset identifiers
-  nodes <- gsub("_.*","",names(measurement_tables))
-  subsets <- gsub(".*_","", names(measurement_tables))
+  #get node identifiers
+  nodes <- unique(gsub("_.*","",names(measurement_tables)))
   
   if(projection == "default_real_projection"){ projection <- "intensity"}
   if(projection == "log_intensity"){ projection <- "log2(intensity)"}
@@ -369,13 +367,16 @@ produce_boxplot <- function(measurement_tables, phase, projection)
     single_node_data <- single_node_data[order(names(single_node_data))] 
     
     ## create box plot, output to PNG file
-    fileName <- paste(phase, "_box_plot_node_", node, ".png", sep = "")    
+    if(phase != "preprocess"){fileName <- paste(phase, "_box_plot_node_", node, ".png", sep = "")}   
+    if(phase == "preprocess"){fileName <- paste(phase, "_box_plot_node_all.png", sep = "")}
     png(filename = fileName)
     
     # in case there is data present: create box plot
     if(!all(is.na(single_node_data)))
     {
-      plot_title <- paste("Box plot node", node)
+      if(phase != "preprocess"){plot_title <- paste("Box plot node:", node)}   
+      if(phase == "preprocess"){plot_title <- "Box plot node: preprocessed - all nodes merged"}
+      
       boxplot_results_all_nodes[[fileName]] <- boxplot(single_node_data, col = "grey", show.names = T, ylab = projection, 
                                                        main = plot_title, outline = F, pch = 20, cex=0.2)
     }
