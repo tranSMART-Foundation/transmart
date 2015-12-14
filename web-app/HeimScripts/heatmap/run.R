@@ -1,6 +1,7 @@
 library(reshape2)
+library(limma)
 
-main <- function(max_rows = 100, sorting = "nodes") {
+main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   max_rows <- as.numeric(max_rows)
   verifyInput(max_rows, sorting)
   df <- parseInput()
@@ -17,7 +18,8 @@ main <- function(max_rows = 100, sorting = "nodes") {
       row.names = FALSE,
       col.names = TRUE
     )
-  df          <- addStats(df, sorting)
+  markerTable <- 
+  df          <- addStats(df, sorting, ranking)
   df          <- df[1:min(max_rows,nrow(df)),]  #  apply max_rows
   fields      <- buildFields(df)
   extraFields <- buildExtraFields(fields)
@@ -39,7 +41,7 @@ main <- function(max_rows = 100, sorting = "nodes") {
   )
   writeRunParams(max_rows, sorting)
   measurements <- cleanUp(df)  # temporary stats like SD and MEAN need
-                     # to be removed for clustering to work
+                               # to be removed for clustering to work
   measurements <- measurements[,3:ncol(measurements)]
   measurements <- toZscores(measurements)
   if (nrow(measurements) > 1 &&
@@ -59,24 +61,25 @@ main <- function(max_rows = 100, sorting = "nodes") {
   list(messages = msgs)
 }
 
-addStats <- function(df, sorting) {
+addStats <- function(df, sorting, ranking) {
+  rankingMethod <- getRankingMethod(ranking)
   if (ncol(df) > 3) {
     #this is the case for more than 1 sample
     df <-
       applySorting(df,sorting)  # no need for sorting in one sample case
-    variances <-
-      apply(df[,3:ncol(df)],1,var, na.rm = T)  # Calculating
-    # variance per probe (per row)
+    rankingScore <-
+      apply(df[,3:ncol(df)], 1, rankingMethod, na.rm = T)  # Calculating
+                                                          # ranking per probe (per row)
     means <- rowMeans(df[,3:ncol(df)], na.rm = T)  # this is just an
                                                    # auxiliary column - it will not be
                                                    # used for JSON.
-    sdses <- apply(df[,3:ncol(df)],1,sd, na.rm = T)  # this is just
+    sdses <- apply(df[,3:ncol(df)],1 ,sd , na.rm = T)  # this is just
                                                      # an auxiliary column -
                                                      # it will not be used for JSON.
-    df["MEAN"] <- means
-    df["SD"] <- sdses
-    df["SIGNIFICANCE"] <- variances
-    df <- df[with(df, order(-SIGNIFICANCE)),]
+    df["MEAN"]         <- means
+    df["SD"]           <- sdses
+    df["SIGNIFICANCE"] <- rankingScore
+    df                 <- df[with(df, order(-SIGNIFICANCE)),]
   }
   else{
     #one sample
@@ -93,6 +96,55 @@ addStats <- function(df, sorting) {
     df["SIGNIFICANCE"] <- rep(variance, nrow(df))
   }
   return(df)
+}
+
+# Coefficient of variation
+coVar     <- function(x) ( sd(x)/mean(x) )
+
+# Specific implementation of range.
+normRange <- function(x) {
+  x <- removeOutliers(x)
+  max(x) - min(x)
+}
+
+# We define outliers as measurements falling outside .25 or .75
+# quantiles by more than 1.5 of interquantile range.
+removeOutliers <- function(x) {
+  qnt <- quantile(x, probs=c(.25, .75), na.rm = TRUE)
+  H <- 1.5 * IQR(x, na.rm = TRUE)
+  result <- x[!(x < (qnt[1] - H))]  # Below .25 by more than 1.5 IQR
+  result[!(result > (qnt[2] + H))]  # Above .75 by more than 1.5 IQR
+}
+
+bval <- function(x) {
+
+}
+
+getRankingMethod <- function(rankingMethodName){
+  if (rankingMethodName == "variance") {
+       return(var)
+  } else if (rankingMethodName == "coef") {
+       return(coVar)
+  } else if (rankingMethodName == "range") {
+       return(normRange)
+  } else if (rankingMethodName == "mean") {
+       return(mean)
+  } else if (rankingMethodName == "median") {
+       return(median)
+  } else if (rankingMethodName == "bval") {
+       return(bval)
+  } else if (rankingMethodName == "pval") {
+       return(pval)
+  } else if (rankingMethodName == "adj_pval") {
+       return(adj_pval)
+  } else if (rankingMethodName == "logfold") {
+       return(logfold)
+  } else if (rankingMethodName == "t-test") {
+       return(t_test)
+  }
+  else {
+    stop(paste("Unsupported ranking method: ", rankingMethodName))
+  }
 }
 
 parseInput <- function() {
@@ -393,3 +445,27 @@ addClusteringOutput <- function(jsn, measurements) {
   )
   return(jsn)
 }
+
+### Limma part. It will be moved into a separate
+# module when we get R scripts sourcing to work here.
+
+getDEgenes <- function(subset1, subset2){
+
+}
+
+classVectorS1 <- c(rep(1, ncol(valueMatrix.cohort1[, -1])), rep(2, ncol(valueMatrix[, -1]) - ncol(valueMatrix.cohort1[, -1])))
+    classVectorS2 <- rev(classVectorS1)
+    design <- cbind(S1=classVectorS1, S2=classVectorS2)
+    contrast.matrix = makeContrasts(S1-S2, levels=design)
+    fit <- lmFit(log2Matrix[, -1], design)
+    fit <- contrasts.fit(fit, contrast.matrix)
+    fit <- eBayes(fit)
+    contr = 1
+    top.fit = data.frame(
+            logFC=fit$coefficients[, contr],
+            t=fit$t[, contr],
+            P.Value=fit$p.value[, contr],
+            adj.P.val=p.adjust(p=fit$p.value[, contr], method='fdr'),
+            B=fit$lods[, contr]
+    )
+    significanceValues <- top.fit[[significanceMeassure]]
