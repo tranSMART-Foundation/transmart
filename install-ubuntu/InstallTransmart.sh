@@ -92,6 +92,13 @@ source $HOME/.sdkman/bin/sdkman-init.sh
 sdk install grails 2.3.11 < AnswerYes.txt
 sdk install groovy 2.4.5 < AnswerYes.txt
 
+# fix files for postgres
+echo "Patch dir permits for TABLESPACES"
+sudo -v
+cd $HOME/transmart/transmart-data
+. ./vars
+sudo chmod 700 $TABLESPACES/*
+
 echo "Checks on basic load"
 cd $HOME/Scripts/install-ubuntu/checks
 ./basics.sh
@@ -129,7 +136,6 @@ echo "Finished installing tomcat at $(date)"
 echo "++++++++++++++++++++++++++++"
 echo "+  Install R, Rserve and other packages"
 echo "++++++++++++++++++++++++++++"
-
 
 base="$HOME/transmart/transmart-data"
 baseR="$base/R"
