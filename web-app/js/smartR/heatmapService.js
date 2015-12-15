@@ -189,7 +189,7 @@ window.HeatmapService = (function(){
         var fileSuffixes;
 
         if (phase === 'preprocess') {
-            fileSuffixes = ['preprocessed'];
+            fileSuffixes = ['all'];
         } else {
             fileSuffixes = service.lastFetchedLabels;
         }
