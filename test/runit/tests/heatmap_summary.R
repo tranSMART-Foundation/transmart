@@ -18,9 +18,24 @@ colnames(test_set_preprocessed) <- c("Row.Label" , "Bio.marker","GSM210004_n0_s1
 test_set_preprocessed <- cbind(test_set_preprocessed, test_set2_measurements, stringsAsFactors = F)
 colnames(test_set_preprocessed) <- c("Row.Label" , "Bio.marker","GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1",
                                      "GSM210004_n0_s2", "GSM210005_n0_s2", "GSM210006_n1_s2", "GSM210007_n1_s2")
-### unit tests for function get_input_data ###
-assign("loaded_variables", test_data, envir = .GlobalEnv)
-assign("preprocessed", test_set_preprocessed, envir = .GlobalEnv)
+.setUp <- function() {
+  # A .png file is created by produce_boxplot. Should be written to temporary directory
+  assign("origDirectory", getwd(), envir = .GlobalEnv)
+  dir <- tempdir()
+  dir.create(dir)
+  setwd(dir)
+  
+  assign("loaded_variables", test_data, envir = .GlobalEnv)
+  assign("preprocessed", test_set_preprocessed, envir = .GlobalEnv)
+}
+
+.tearDown <- function() {
+  dir <- getwd()
+  setwd(origDirectory)
+  unlink(dir, recursive = T, force = T)
+}
+
+
 
 ## get_input_data should return value of loaded_variables if phase = "fetch"
 test.get_input_data.fetch <- function(){
@@ -45,16 +60,13 @@ test.get_input_data.phaseIncorrect <- function(){
 ## get_input_data should throw error if phase is fetch and loaded_variables does not exist
 test.get_input_data.no_loaded_variables <- function(){
   rm(loaded_variables, envir = .GlobalEnv)
-  checkException(get_input_data("fetch"))
-  assign("loaded_variables", test_data, envir = .GlobalEnv)
-  
+  checkException(get_input_data("fetch"))  
 }
 
 ## get_input_data should throw error if phase is preprocess and preprocessed does not exist
-test.get_input_data.noPreprocessed <- function(){
+test.get_input_data.no_preprocessed <- function(){
   rm(preprocessed, envir = .GlobalEnv)
   checkException(get_input_data("preprocess"))
-  assign("preprocessed", test_data, envir = .GlobalEnv)
 }
 
 

@@ -257,9 +257,11 @@ extract_measurements <- function(datasets)
 produce_summary_stats <- function(measurement_tables, phase)
 {
   # construct data.frame to store the results from the summary statistics in
-  result_table <- as.data.frame(matrix(NA, length(measurement_tables),13, 
-                                       dimnames = list(names(measurement_tables), 
-                                                       c("variableLabel","node","subset","totalNumberOfValuesIncludingMissing", "numberOfMissingValues", "numberOfSamples","min","max","mean", "standardDeviation", "q1","median","q3"))))
+  table_columns <- c("variableLabel", "node", "subset", "totalNumberOfValuesIncludingMissing", "numberOfMissingValues", 
+                          "numberOfSamples", "min", "max", "mean", "standardDeviation", "q1", "median", "q3")
+  
+  result_table <- as.data.frame( matrix(NA, nrow = length(measurement_tables), ncol = length(table_columns), 
+                                       dimnames = list(names(measurement_tables), table_columns)) )
   
   # add information about node and subset identifiers
   result_table$subset <- gsub(".*_","", rownames(result_table)) #take everything after _
