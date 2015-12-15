@@ -1,6 +1,9 @@
 library(reshape2)
 library(limma)
 
+SUBSET1REGEX <- "_s1$"  # Regex identifying columns of subset 1.
+markerTableJson <- "markerSelectionTable.json" # Name of the json file with limma outputs
+
 main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   max_rows <- as.numeric(max_rows)
   verifyInput(max_rows, sorting)
@@ -11,38 +14,38 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
                                        # prevent problems with CSS
                                        # selectors on the frontend.
   write.table(
-      df,
-      "heatmap_orig_values.tsv",
-      sep = "\t",
-      na = "",
-      row.names = FALSE,
-      col.names = TRUE
-    )
-  markerTable <- 
-  df          <- addStats(df, sorting, ranking)
-  df          <- df[1:min(max_rows,nrow(df)),]  #  apply max_rows
+    df,
+    "heatmap_orig_values.tsv",
+    sep = "\t",
+    na = "",
+    row.names = FALSE,
+    col.names = TRUE
+  )
+  df          <- addStats(df, sorting, ranking, max_rows)
+  df          <- df[1:min(max_rows, nrow(df)), ]  #  apply max_rows
   fields      <- buildFields(df)
   extraFields <- buildExtraFields(fields)
-  probes      <- df[,1]
-  geneSymbols <- df[,2]
+  probes      <- df[, 1]
+  geneSymbols <- df[, 2]
   #unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector,
   # otherwise we get a dataframe
   patientIDs  <- unique(fields["PATIENTID"])[,1]
-  
+
   significanceValues <- unique(fields["SIGNIFICANCE"])[,1]
   features <- unique(extraFields["FEATURE"])[,1]
   jsn <- list(
-    "fields" = fields, "geneSymbols" = geneSymbols,
-    "patientIDs" = patientIDs,
-    "probes" = probes,
+    "fields"             = fields,
+    "geneSymbols"        = geneSymbols,
+    "patientIDs"         = patientIDs,
+    "probes"             = probes,
     "significanceValues" = significanceValues,
-    "features" = features,
-    "extraFields" = extraFields
+    "features"           = features,
+    "extraFields"        = extraFields
   )
   writeRunParams(max_rows, sorting)
   measurements <- cleanUp(df)  # temporary stats like SD and MEAN need
                                # to be removed for clustering to work
-  measurements <- measurements[,3:ncol(measurements)]
+  measurements <- getMeasurements(measurements)
   measurements <- toZscores(measurements)
   if (nrow(measurements) > 1 &&
       ncol(measurements) > 1) {
@@ -56,32 +59,99 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   write(jsn,file = "heatmap.json")   # json file be served the same way
                                      # like any other file would - get name via
                                      # /status call and then /download
-  
+
   msgs <- c("Finished successfuly")
   list(messages = msgs)
 }
 
-addStats <- function(df, sorting, ranking) {
+writeMarkerTable <- function(markerTable){
+  colnames(markerTable) <- c("rowLabel", "biomarker",
+                             "log2FoldChange", "t", "pValue", "adjustedPValue", "B")
+  jsn                   <- toJSON(markerTable, pretty = TRUE)
+  write(jsn, file = markerTableJson)
+}
+
+getMeasurements <- function(df) {
+  if (ncol(df) > 3){
+    return(df[, 3:ncol(df)])
+  }
+  else {
+    return( df[3] )
+  }
+}
+
+
+cleanUpLimmaOutput <- function() {
+  if (file.exists(markerTableJson)) {
+    file.remove(markerTableJson)
+  }
+}
+
+hasTwoSubsets <- function(measurements) {
+  getSubset1Length(measurements) < ncol(measurements)
+}
+
+applyRanking <- function (df, ranking, max_rows) {
+  if( ranking %in% c("ttest", "logfold") ){
+    df["SIGNIFICANCE_ABS"] <- abs(df["SIGNIFICANCE"])
+    df <- df[with(df, order(-SIGNIFICANCE_ABS)), ]
+    df["SIGNIFICANCE_ABS"] <- NULL
+    df <- df[1:min(max_rows, nrow(df)), ]
+    df <- df[with(df, order(-SIGNIFICANCE)), ]
+    df["SIGNIFICANCE"] <- abs(df["SIGNIFICANCE"])
+  } else {
+    df <- df[with(df, order(-SIGNIFICANCE)), ]
+  }
+  df
+}
+
+addStats <- function(df, sorting, ranking, max_rows) {
+  measurements  <- getMeasurements(df)
   rankingMethod <- getRankingMethod(ranking)
+  twoSubsets    <- hasTwoSubsets(measurements)
   if (ncol(df) > 3) {
     #this is the case for more than 1 sample
     df <-
-      applySorting(df,sorting)  # no need for sorting in one sample case
-    rankingScore <-
-      apply(df[,3:ncol(df)], 1, rankingMethod, na.rm = T)  # Calculating
-                                                          # ranking per probe (per row)
-    means <- rowMeans(df[,3:ncol(df)], na.rm = T)  # this is just an
-                                                   # auxiliary column - it will not be
-                                                   # used for JSON.
-    sdses <- apply(df[,3:ncol(df)],1 ,sd , na.rm = T)  # this is just
-                                                     # an auxiliary column -
-                                                     # it will not be used for JSON.
+      applySorting(df,sorting)  # no need for sorting in one sample case, we do it here only
+    if ( twoSubsets ){
+      markerTable  <- getDEgenes(df)  # relies on columns being sorted,
+    }                                 # with subset1 first, this is because of the way
+                                      # design matrix is being constructed
+
+
+    useLimma <- !is.function(rankingMethod)  # rankingMethod is either a function or a character "limma"
+    if (useLimma  && !twoSubsets) {  # cannot use any of the limma methods for single subset.
+      stop( paste("Illegal ranking method: ", ranking, " two subsets needed.") )
+    }
+    if (useLimma ) {
+      if (!ranking %in% colnames(markerTable) ) {
+          stop(paste("Illegal ranking method selected: ", ranking) )
+      }
+      rankingScore <- markerTable[ranking]
+
+    } else {
+      rankingScore <-
+        apply(measurements, 1, rankingMethod, na.rm = TRUE )  # Calculating
+    }                                          # ranking per probe (per row)
+    means <- rowMeans(measurements, na.rm = T)  # this is just an
+                                                # auxiliary column - it will not be
+                                                # used for JSON.
+    sdses <- apply(measurements,1 ,sd , na.rm = T)  # this is just
+                                                    # an auxiliary column -
+                                                    # it will not be used for JSON.
     df["MEAN"]         <- means
     df["SD"]           <- sdses
     df["SIGNIFICANCE"] <- rankingScore
-    df                 <- df[with(df, order(-SIGNIFICANCE)),]
+    df                 <- applyRanking(df, ranking, max_rows)
+    cleanUpLimmaOutput()  # In order to prevent displaying the table from previous run.
+    if (twoSubsets) {
+      markerTable["SIGNIFICANCE"] <- rankingScore
+      markerTable                 <- applyRanking(markerTable, ranking, max_rows)
+      markerTable["SIGNIFICANCE"] <- NULL
+      writeMarkerTable(markerTable)
+    }
   }
-  else{
+  else {
     #one sample
     variance <-
       1.0  # We cannot get any significance measure for just
@@ -99,10 +169,12 @@ addStats <- function(df, sorting, ranking) {
 }
 
 # Coefficient of variation
-coVar     <- function(x) ( sd(x)/mean(x) )
+coeffVar     <- function(x, na.rm = TRUE) ( sd(x, na.rm)/mean(x, na.rm) )
 
 # Specific implementation of range.
-normRange <- function(x) {
+normRange <- function(x, na.rm = TRUE) {
+  # NAs are already removed but we keep this parameter so that apply does not have to be called differently
+  # for normRange
   x <- removeOutliers(x)
   max(x) - min(x)
 }
@@ -110,40 +182,26 @@ normRange <- function(x) {
 # We define outliers as measurements falling outside .25 or .75
 # quantiles by more than 1.5 of interquantile range.
 removeOutliers <- function(x) {
-  qnt <- quantile(x, probs=c(.25, .75), na.rm = TRUE)
-  H <- 1.5 * IQR(x, na.rm = TRUE)
+  qnt    <- quantile(x, probs=c(.25, .75), na.rm = TRUE)
+  H      <- 1.5 * IQR(x, na.rm = TRUE)
   result <- x[!(x < (qnt[1] - H))]  # Below .25 by more than 1.5 IQR
-  result[!(result > (qnt[2] + H))]  # Above .75 by more than 1.5 IQR
+  result <- result[!(result > (qnt[2] + H))]  # Above .75 by more than 1.5 IQR
+  na.omit(result)
 }
 
-bval <- function(x) {
-
-}
-
-getRankingMethod <- function(rankingMethodName){
+getRankingMethod <- function(rankingMethodName) {
   if (rankingMethodName == "variance") {
-       return(var)
+    return(var)
   } else if (rankingMethodName == "coef") {
-       return(coVar)
+    return(coeffVar)
   } else if (rankingMethodName == "range") {
-       return(normRange)
+    return(normRange)
   } else if (rankingMethodName == "mean") {
-       return(mean)
+    return(mean)
   } else if (rankingMethodName == "median") {
-       return(median)
-  } else if (rankingMethodName == "bval") {
-       return(bval)
-  } else if (rankingMethodName == "pval") {
-       return(pval)
-  } else if (rankingMethodName == "adj_pval") {
-       return(adj_pval)
-  } else if (rankingMethodName == "logfold") {
-       return(logfold)
-  } else if (rankingMethodName == "t-test") {
-       return(t_test)
-  }
-  else {
-    stop(paste("Unsupported ranking method: ", rankingMethodName))
+    return(median)
+  } else {
+    return("Limma")
   }
 }
 
@@ -179,21 +237,19 @@ verifyInput <- function(max_rows, sorting) {
 }
 
 applySorting <- function(df,sorting) {
-  measurements <- df[,3:ncol(df)]
+  measurements <- getMeasurements(df)
   colNames <- names(measurements)
-  
   subsets <- getSubset(colNames)
   nodes <- getNode(colNames)
   subjects <- getSubject(colNames)
   if (sorting == "nodes") {
     colNames <- paste(subsets, nodes, subjects, sep = "")
-  }else{
+  } else {
     colNames <- paste(subsets, subjects, nodes, sep = "")
   }
   inds <- sort(colNames, index.return = TRUE)$ix
-  
-  measurements <- measurements[,inds]
-  cbind(df[,c(1,2)], measurements)
+  measurements <- measurements[, inds]
+  cbind(df[, c(1,2)], measurements)
 }
 
 getNode <- function(patientIDs) {
@@ -273,16 +329,16 @@ buildExtraFields <- function(df) {
   TYPE <- rep("binary",nrow(df))
   VALUE <- getSubset(PATIENTID)
   extraFields <- data.frame(FEATURE, PATIENTID, TYPE, VALUE,
-   stringsAsFactors = FALSE)
+                            stringsAsFactors = FALSE)
 }
 
 getSubset <- function(patientIDs) {
   splittedIds <- strsplit(patientIDs,"_s") # During merge,
-  # which is always run we append subset id, either
-  # _s1 or _s2 to PATIENTID.
+                                           # which is always run we append subset id, either
+                                           # _s1 or _s2 to PATIENTID.
   SUBSETS <- lapply(splittedIds, FUN = tail_elem) # In proper patienid
-  # subset will always be  at the end.
-  # This select last element after _s
+                                                  # subset will always be  at the end.
+                                                  # This select last element after _s
   SUBSETS <- sapply(SUBSETS, FUN = formatSubset)
 }
 
@@ -387,56 +443,56 @@ addClusteringOutput <- function(jsn, measurements) {
   manhattanDistancesRow <- dist(measurements, method = "manhattan")
   euclideanDistancesCol <- dist(t(measurements), method = "euclidean")
   manhattanDistancesCol <- dist(t(measurements), method = "manhattan")
-  
+
   colDendrogramEuclideanComplete <- computeDendrogram( euclideanDistancesCol, 'complete')
   colDendrogramEuclideanSingle <- computeDendrogram( euclideanDistancesCol, 'single')
   colDendrogramEuclideanAverage <- computeDendrogram( euclideanDistancesCol, 'average')
   rowDendrogramEuclideanComplete <- computeDendrogram( euclideanDistancesRow, 'complete')
   rowDendrogramEuclideanSingle <- computeDendrogram( euclideanDistancesRow, 'single')
   rowDendrogramEuclideanAverage <- computeDendrogram( euclideanDistancesRow, 'average')
-  
+
   colDendrogramManhattanComplete <- computeDendrogram( manhattanDistancesCol, 'complete')
   colDendrogramManhattanSingle <- computeDendrogram( manhattanDistancesCol, 'single')
   colDendrogramManhattanAverage <- computeDendrogram( manhattanDistancesCol, 'average')
   rowDendrogramManhattanComplete <- computeDendrogram( manhattanDistancesRow, 'complete')
   rowDendrogramManhattanSingle <- computeDendrogram( manhattanDistancesRow, 'single')
   rowDendrogramManhattanAverage <- computeDendrogram( manhattanDistancesRow, 'average')
-  
+
   jsn$hclustEuclideanComplete <- list(
     order.dendrogram(colDendrogramEuclideanComplete) - 1,
     order.dendrogram(rowDendrogramEuclideanComplete) - 1,
     dendrogramToJSON(colDendrogramEuclideanComplete),
     dendrogramToJSON(rowDendrogramEuclideanComplete)
   )
-  
+
   jsn$hclustEuclideanSingle <- list(
     order.dendrogram(colDendrogramEuclideanSingle)  - 1,
     order.dendrogram(rowDendrogramEuclideanSingle) - 1,
     dendrogramToJSON(colDendrogramEuclideanSingle),
     dendrogramToJSON(rowDendrogramEuclideanSingle)
   )
-  
+
   jsn$hclustEuclideanAverage <- list(
     order.dendrogram(colDendrogramEuclideanAverage) - 1,
     order.dendrogram(rowDendrogramEuclideanAverage) - 1,
     dendrogramToJSON(colDendrogramEuclideanAverage),
     dendrogramToJSON(rowDendrogramEuclideanAverage)
   )
-  
+
   jsn$hclustManhattanComplete <- list(
     order.dendrogram(colDendrogramManhattanComplete) - 1,
     order.dendrogram(rowDendrogramManhattanComplete) - 1,
     dendrogramToJSON(colDendrogramManhattanComplete),
     dendrogramToJSON(rowDendrogramManhattanComplete)
   )
-  
+
   jsn$hclustManhattanSingle <- list(
     order.dendrogram(colDendrogramManhattanSingle) - 1,
     order.dendrogram(rowDendrogramManhattanSingle) - 1,
     dendrogramToJSON(colDendrogramManhattanSingle),
     dendrogramToJSON(rowDendrogramManhattanSingle)
   )
-  
+
   jsn$hclustManhattanAverage <- list(
     order.dendrogram(colDendrogramManhattanAverage) - 1,
     order.dendrogram(rowDendrogramManhattanAverage) - 1,
@@ -449,23 +505,39 @@ addClusteringOutput <- function(jsn, measurements) {
 ### Limma part. It will be moved into a separate
 # module when we get R scripts sourcing to work here.
 
-getDEgenes <- function(subset1, subset2){
-
+getDEgenes <- function(df) {
+  measurements    <- getMeasurements(df)
+  enoughSamples   <- ncol(measurements) > 3 && ncol(measurements) - getSubset1Length(measurements) > 1
+  if (!enoughSamples){
+    stop("Not enough samples to find differentially expressed genes.")
+  }
+  design          <- getDesign(measurements)
+  contrast.matrix <- makeContrasts( S1-S2, levels = design )
+  fit             <- lmFit(measurements, design)
+  fit             <- contrasts.fit(fit, contrast.matrix)
+  fit             <- eBayes(fit)
+  contr           <- 1  #  We need a vector, not a df, so we'll do [, contr] on all stats
+  top.fit         <- data.frame (
+    logfold = fit$coefficients[, contr],
+    ttest   = fit$t[, contr],
+    pval    = fit$p.value[, contr],
+    adjpval = p.adjust(
+      p      = fit$p.value[, contr],
+      method ='fdr'),
+    bval    = fit$lods[, contr]
+  )
+  cbind(df[,1:2], top.fit)
 }
 
-classVectorS1 <- c(rep(1, ncol(valueMatrix.cohort1[, -1])), rep(2, ncol(valueMatrix[, -1]) - ncol(valueMatrix.cohort1[, -1])))
-    classVectorS2 <- rev(classVectorS1)
-    design <- cbind(S1=classVectorS1, S2=classVectorS2)
-    contrast.matrix = makeContrasts(S1-S2, levels=design)
-    fit <- lmFit(log2Matrix[, -1], design)
-    fit <- contrasts.fit(fit, contrast.matrix)
-    fit <- eBayes(fit)
-    contr = 1
-    top.fit = data.frame(
-            logFC=fit$coefficients[, contr],
-            t=fit$t[, contr],
-            P.Value=fit$p.value[, contr],
-            adj.P.val=p.adjust(p=fit$p.value[, contr], method='fdr'),
-            B=fit$lods[, contr]
-    )
-    significanceValues <- top.fit[[significanceMeassure]]
+getDesign <- function(measurements) {
+  subset1Length <- getSubset1Length(measurements)
+  classVectorS1 <- c(rep(1, subset1Length), rep(2, ncol(measurements) - subset1Length ))
+  classVectorS2 <- rev(classVectorS1)
+  cbind(S1=classVectorS1, S2=classVectorS2)
+}
+
+getSubset1Length <- function(measurements) {
+  sum(grepl(pattern = SUBSET1REGEX, x = colnames(measurements))) # returns number of column names satisfying regexp.
+}
+
+### End of limma part

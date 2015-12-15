@@ -216,19 +216,19 @@
                 <fieldset class="heim-radiogroup" id="sr-differential-exp-group">
                     <h3>Differential expression</h3>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="coef" checked> B-value/log odds ratio
+                        <input type="radio" name="rankCriteria" value="bval" checked> B-value/log odds ratio
                     </label></div>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="variance" checked> p-value
+                        <input type="radio" name="rankCriteria" value="pval" checked> p-value
                     </label></div>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="range" checked> Adjusted p-value (method “fdr”)
+                        <input type="radio" name="rankCriteria" value="adjpval" checked> Adjusted p-value (method “fdr”)
                     </label></div>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="coef" checked> log fold-change
+                        <input type="radio" name="rankCriteria" value="logfold" checked> log fold-change
                     </label></div>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="variance" checked> t-statistic
+                        <input type="radio" name="rankCriteria" value="ttest" checked> t-statistic
                     </label></div>
                 </fieldset>
             </div>
@@ -268,17 +268,6 @@
                 <input type="text" id="txtNoOfMarkers" name="txtNoOfMarkers">
             </div>
 
-            %{--apply row clustering--}%
-            <div class="heim-input-field">
-                <input type="checkbox" id="chkApplyRowClustering" name="chkApplyRowClustering">
-                <span>Apply clustering for rows.</span>
-            </div>
-
-            %{--apply column clustering --}%
-            <div class="heim-input-field">
-                <input type="checkbox" id="chkApplyColumnClustering" name="chkApplyColumnClustering">
-                <span>Apply clustering for columns.</span>
-            </div>
         </div>
 
         <hr class="sr-divider">
