@@ -396,7 +396,7 @@ add.subset.label <- function(df,label) {
       colnames(df)[3] # R returns NA instead of column name
                       # for colnames(df[,3:ncol(df)])
   }else{
-    measurements <- df[,3:ncol(df)]
+    measurements <- getMeasurements(df)
     sample.names <- colnames(measurements)
   }
   for (sample.name in sample.names) {
