@@ -156,11 +156,17 @@ addStats <- function(df, sorting, ranking, max_rows) {
     variance <-
       1.0  # We cannot get any significance measure for just
            # one sample
-    mean <-
-      mean(df[,3], na.rm = T)  # For just one sample we take mean
-                               # over all genes (whole column), not per gene
-    sds <- sd(df[,3],na.rm = T)  # For just one sample we take mean
-                                 # over all genes (whole column), not per gene
+    if ( nrow(measurements) > 1) {
+        mean <-
+          mean(df[,3], na.rm = T)  # For just one sample we take mean
+                                   # over all genes (whole column), not per gene
+        sds <- sd(df[,3],na.rm = T)  # For just one sample we take mean
+                                     # over all genes (whole column), not per gene
+    } else {
+       mean <- 1
+       sds  <- 1
+    }
+
     df["MEAN"] <- rep(mean,nrow(df))
     df["SD"] <- rep(sds,nrow(df))
     df["SIGNIFICANCE"] <- rep(variance, nrow(df))
