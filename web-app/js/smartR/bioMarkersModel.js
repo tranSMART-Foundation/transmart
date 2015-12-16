@@ -3,7 +3,7 @@
 window.BioMarkersModel = (function() {
     var Observable = function Observable() {
         this.jquery = jQuery(this);
-    }
+    };
     jQuery.extend(Observable.prototype, {
         on: function() {
             this.jquery.on.apply(this.jquery, arguments);

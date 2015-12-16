@@ -5,11 +5,6 @@ HeimExtJSHelper = (function(){
     helper.dropOntoNodeSelection = function (source, e, data) {
         var analysisConcept;
 
-        console.log(source);
-        console.log(e);
-        console.log(data);
-        console.log(this.el);
-
         var targetdiv = this.el;
 
         if (data.node.leaf === false && !data.node.isLoaded()) {
@@ -21,7 +16,6 @@ HeimExtJSHelper = (function(){
             analysisConcept = dropOntoCategorySelection2(source, e, data, targetdiv);
         }
 
-        console.log(analysisConcept);
         return true;
     };
 
