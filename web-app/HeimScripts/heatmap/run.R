@@ -132,7 +132,7 @@ addStats <- function(df, sorting, ranking, max_rows) {
     } else {
       rankingScore <-
         apply(measurements, 1, rankingMethod, na.rm = TRUE )  # Calculating
-    }                                          # ranking per probe (per row)
+    }                                                         # ranking per probe (per row)
     means <- rowMeans(measurements, na.rm = T)  # this is just an
                                                 # auxiliary column - it will not be
                                                 # used for JSON.
@@ -157,25 +157,25 @@ addStats <- function(df, sorting, ranking, max_rows) {
       1.0  # We cannot get any significance measure for just
            # one sample
     if ( nrow(measurements) > 1) {
-        mean <-
+        meanS <-
           mean(df[,3], na.rm = T)  # For just one sample we take mean
                                    # over all genes (whole column), not per gene
         sds <- sd(df[,3],na.rm = T)  # For just one sample we take mean
                                      # over all genes (whole column), not per gene
     } else {
-       mean <- 1
+       meanS <- 1
        sds  <- 1
     }
 
-    df["MEAN"] <- rep(mean,nrow(df))
-    df["SD"] <- rep(sds,nrow(df))
+    df["MEAN"] <- rep(meanS, nrow(df))
+    df["SD"] <- rep(sds, nrow(df))
     df["SIGNIFICANCE"] <- rep(variance, nrow(df))
   }
   return(df)
 }
 
 # Coefficient of variation
-coeffVar     <- function(x, na.rm = TRUE) ( sd(x, na.rm)/mean(x, na.rm) )
+coeffVar     <- function(x, na.rm = TRUE) ( sd(x, na.rm)/mean(x, na.rm = na.rm) )
 
 # Specific implementation of range.
 normRange <- function(x, na.rm = TRUE) {
