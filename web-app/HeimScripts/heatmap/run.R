@@ -175,7 +175,7 @@ addStats <- function(df, sorting, ranking, max_rows) {
 }
 
 # Coefficient of variation
-coeffVar     <- function(x, na.rm = TRUE) ( sd(x, na.rm)/mean(x, na.rm = na.rm) )
+coeffVar     <- function(x, na.rm = TRUE) ( sd(x, na.rm = na.rm)/mean(x, na.rm = na.rm) )
 
 # Specific implementation of range.
 normRange <- function(x, na.rm = TRUE) {
