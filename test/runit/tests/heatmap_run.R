@@ -52,3 +52,27 @@ test.get.subject <- function()
   expected <- c("wk26_16702", "wk26_16705", "wk26_16707", "wk52_16710")
   checkEquals(result, expected)
 }
+
+test.getSubset1Length <- function()
+{
+  testMeasurements <- data.frame("a_n0_s1" = 1:3,
+   "b_n0_s1" = 1:3, "a_n1_s1" = 1:3, "b_n1_s1" = 1:3,
+   "a_n0_s2" = 1:3, "b_n0_s2" = 1:3 )
+  expected <- 4
+  result   <- getSubset1Length(testMeasurements)
+  checkEquals(result,expected)
+}
+
+test.getDesign <- function()
+{
+  testMeasurements <- data.frame("a_n0_s1" = 1:3,
+     "b_n0_s1" = 1:3, "a_n1_s1" = 1:3, "b_n1_s1" = 1:3,
+     "a_n0_s2" = 1:3, "b_n0_s2" = 1:3 )
+  expected <- matrix(
+    c(1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1),
+    ncol = 2,
+   )
+  colnames(expected) <- c("S1", "S2")
+  result             <- getDesign(testMeasurements)
+  checkEquals(result,expected)
+}
