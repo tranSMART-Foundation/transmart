@@ -207,7 +207,6 @@ var HeatmapView = (function(){
         // download data button
         view.runHeatmapView.downloadFileBtn.click(
             function() {
-                view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
                 heatmapService.downloadData();
             }
         );
