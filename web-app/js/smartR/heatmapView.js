@@ -31,6 +31,8 @@ var HeatmapView = (function(){
             noClustersDiv        : jQuery('#noOfClustersDiv'),
             noMarkersDiv         : jQuery('#noOfMarkersDiv'),
             sortingSelect        : jQuery('[name=sortingSelect]'),
+            singleSubsetDiv      : jQuery('#sr-non-multi-subset'),
+            multiSubsetDiv       : jQuery('#sr-multi-subset'),
             runAnalysisBtn       : jQuery('#heim-btn-run-heatmap'),
             snapshotImageBtn     : jQuery('#heim-btn-snapshot-image'),
             downloadFileBtn      : jQuery('#heim-btn-download-file')
@@ -104,13 +106,29 @@ var HeatmapView = (function(){
         }
     };
 
+    var _toggleRunAnalysisView = function (noSubset) {
+        console.log(noSubset);
+        if (noSubset === 2) {
+            view.runHeatmapView.multiSubsetDiv.show();
+            view.runHeatmapView.methodSelect.filter('[value="bval"]').attr('checked', true);
+        } else if (noSubset === 1 ) {
+            view.runHeatmapView.multiSubsetDiv.hide();
+            view.runHeatmapView.methodSelect .filter('[value="coef"]').attr('checked', true);
+        }
+    };
+
     /**
      * Fetch data
      * @param rid
      * @private
      */
     var _fetchDataAction = function () {
-        var _fetchDataParams =  _getFetchDataViewValues(view.fetchDataView);
+        var subsetNo =
+            (typeof GLOBAL.CurrentSubsetIDs[1] === 'undefined' || !GLOBAL.CurrentSubsetIDs[1])   ||
+            (typeof GLOBAL.CurrentSubsetIDs[2] === 'undefined' || !GLOBAL.CurrentSubsetIDs[2])  ? 1 : 2,
+            _fetchDataParams =  _getFetchDataViewValues(view.fetchDataView);
+
+        _toggleRunAnalysisView(subsetNo);
         heatmapService.fetchData(_fetchDataParams);
     };
 
@@ -119,7 +137,6 @@ var HeatmapView = (function(){
         jQuery('#heatmap').empty();
         view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
         view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
-        console.log(_runHeatmapInputArgs);
         heatmapService.runAnalysis(_runHeatmapInputArgs)
             .then(function(data) {
                 SmartRHeatmap.create(data.heatmapData);
