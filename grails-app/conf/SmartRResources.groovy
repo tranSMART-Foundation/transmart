@@ -3,7 +3,6 @@ modules = {
         // we get the definitions from transmartApp
         // dependsOn 'jquery'
         resource url: [plugin: 'smart-r', dir: 'css', file: 'smartR.css']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'smartR.js']
     }
 
     smartR_heatmap {
