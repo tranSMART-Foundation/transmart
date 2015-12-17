@@ -158,25 +158,39 @@ window.HeatmapService = (function(){
     };
 
     /**
-     * Fetch dat
+     * Fetchs data. Returns the summary statistics data in the form of
+     * a promise.
      * @param eventObj
      */
     service.fetchData = function (params) {
         var _args = _createAnalysisConstraints(params);
+        var defer = jQuery.Deferred();
         service.lastFetchedLabels = Object.keys(_args.conceptKeys);
+
+        function fetchData_ultimateSuccess() {
+            // TODO: only resolved(), never rejected()
+            service.getSummary('fetch')
+                .then(function(data) {
+                    defer.resolve(data);
+                });
+        }
 
         startScriptExecution({
             taskType: 'fetchData',
             arguments: _args,
-            onUltimateSuccess: function (data) { service.getSummary('fetch'); },
+            onUltimateSuccess: fetchData_ultimateSuccess,
             phase: 'fetch',
             progressMessage: 'Fetching data',
             successMessage: 'Data is successfully fetched in . Proceed with Run Heatmap'
         });
+
+        return defer.promise();
     };
 
+    // returns promise with the data
     service.getSummary = function (phase) {
         var fileSuffixes;
+        var defer = jQuery.Deferred();
 
         if (phase === 'preprocess') {
             fileSuffixes = ['all'];
@@ -208,12 +222,17 @@ window.HeatmapService = (function(){
                 if (_args[1] === 'success') {
                     _args = [_args];
                 }
+                var allData = [];
                 Array.prototype.forEach.call(_args, function(ajaxCbArgs) {
                     var data = ajaxCbArgs[0];
                     var _summaryObj = service.generateSummaryTable(data);
                     div.append(_summaryObj);
+                    allData.push(data);
                 });
                 div.show();
+
+                // TODO: now we only resolve, never reject
+                defer.resolve(allData);
             });
         }
 
@@ -230,6 +249,8 @@ window.HeatmapService = (function(){
             progressMessage: 'Getting summary',
             successMessage: undefined
         });
+
+        return defer.promise();
     };
 
     /**

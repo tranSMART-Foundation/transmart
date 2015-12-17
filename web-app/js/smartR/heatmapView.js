@@ -32,6 +32,8 @@ var HeatmapView = (function(){
             noMarkersDiv         : jQuery('#noOfMarkersDiv'),
             sortingSelect        : jQuery('[name=sortingSelect]'),
             singleSubsetDiv      : jQuery('#sr-non-multi-subset'),
+            singleSubsetVarDiv   : jQuery('#sr-variability-group'),
+            singleSubsetLvlDiv   : jQuery('#sr-expression-level-group'),
             multiSubsetDiv       : jQuery('#sr-multi-subset'),
             runAnalysisBtn       : jQuery('#heim-btn-run-heatmap'),
             snapshotImageBtn     : jQuery('#heim-btn-snapshot-image'),
@@ -106,14 +108,36 @@ var HeatmapView = (function(){
         }
     };
 
-    var _toggleRunAnalysisView = function (noSubset) {
-        if (noSubset === 2) {
-            view.runHeatmapView.multiSubsetDiv.show();
-            view.runHeatmapView.methodSelect.filter('[value="bval"]').attr('checked', true);
-        } else if (noSubset === 1 ) {
+    /**
+     * Toggle Run Analysis View based on no of subsets & samples
+     * @param param
+     * @private
+     */
+    var _toggleRunAnalysisView = function (param) {
+        if (param.noOfSamples === 1) { // when only one sample is fetched
+            // show only expression level options
+            view.runHeatmapView.singleSubsetVarDiv.hide();
             view.runHeatmapView.multiSubsetDiv.hide();
-            view.runHeatmapView.methodSelect .filter('[value="coef"]').attr('checked', true);
+            view.runHeatmapView.methodSelect.filter('[value="mean"]').attr('checked', true);
+            // disable aggregate
+            view.preprocessView.aggregateProbesChk.attr("disabled", true);
+        } else if (param.noOfSamples > 1) { // > 1 samples
+            // enable aggregate
+            view.preprocessView.aggregateProbesChk.removeAttr("disabled");
+            // show
+            view.runHeatmapView.singleSubsetVarDiv.show();
+            // and depends on how many subsets
+            if (param.subsetNo === 2) { // displays all options
+                view.runHeatmapView.multiSubsetDiv.show();
+                view.runHeatmapView.methodSelect.filter('[value="bval"]').attr('checked', true);
+            } else if (param.subsetNo === 1 ) { // display only exp
+                view.runHeatmapView.multiSubsetDiv.hide();
+                view.runHeatmapView.methodSelect .filter('[value="coef"]').attr('checked', true);
+            }
+        } else {
+            console.error('Invalid no of samples.');
         }
+
     };
 
     /**
@@ -123,10 +147,19 @@ var HeatmapView = (function(){
      */
     var _fetchDataAction = function () {
         var subsetNo = !GLOBAL.CurrentSubsetIDs[1]  || !GLOBAL.CurrentSubsetIDs[2]  ? 1 : 2,
+            _noOfSamples = 0,
             _fetchDataParams =  _getFetchDataViewValues(view.fetchDataView);
 
-        _toggleRunAnalysisView(subsetNo);
-        heatmapService.fetchData(_fetchDataParams);
+        var promise = heatmapService.fetchData(_fetchDataParams);
+        promise.then(function(data) {
+            data[0].forEach(function (summaryJSON) {
+                _noOfSamples += summaryJSON['numberOfSamples'];
+            });
+            // toggle view
+            _toggleRunAnalysisView({subsetNo: subsetNo, noOfSamples : _noOfSamples});
+        });
+
+
     };
 
     var _runHeatmapAction = function (eventObj) {
