@@ -976,7 +976,7 @@ SmartRHeatmap = (function(){
         var lastUsedClustering = null;
 
         function cluster(clustering) {
-            if(!lastUsedClustering && typeof clustering === 'undefined'){
+            if (!lastUsedClustering && typeof clustering === 'undefined') {
                 return; // Nothing should be done if clustering switches are turned on without clustering type set.
             }
             clustering = (typeof clustering === 'undefined') ? lastUsedClustering : clustering;
