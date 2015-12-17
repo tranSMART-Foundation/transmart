@@ -43,7 +43,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
     "features"           = features,
     "extraFields"        = extraFields
   )
-  writeRunParams(max_rows, sorting)
+  writeRunParams(max_rows, sorting, ranking)
   measurements <- cleanUp(df)  # temporary stats like SD and MEAN need
                                # to be removed for clustering to work
   measurements <- getMeasurements(measurements)
@@ -317,9 +317,11 @@ writeDataForZip <- function(df, zScores, pidCols) {
   )
 }
 
-writeRunParams <- function(max_rows, sorting) {
+writeRunParams <- function(max_rows, sorting, ranking) {
   params <- list(max_rows = max_rows,
-                 sorting  = sorting)
+                 sorting  = sorting,
+                 ranking  = ranking)
+  params <- c(params, fetch_params)
   if (exists("preprocessed") && exists("preprocessing_params")) {
     params <- c(params, preprocessing_params)
   }
