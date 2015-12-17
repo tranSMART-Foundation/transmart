@@ -202,12 +202,7 @@ var HeatmapView = (function(){
         });
 
         // download data button
-        view.runHeatmapView.downloadFileBtn.click(
-            function() {
-                view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
-                heatmapService.downloadData();
-            }
-        );
+        view.runHeatmapView.downloadFileBtn.click(heatmapService.downloadData);
 
         // download data button
         view.runHeatmapView.downloadFileBtn.click(
