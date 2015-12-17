@@ -128,13 +128,8 @@ window.HeatmapService = (function(){
                 workflow : 'heatmap'
             })
         }).fail(function (jqXHR, textStatus, errorThrown) {
-            var _err = JSON.parse(jqXHR.responseText);
-            console.error(jqXHR);
-            console.error(textStatus);
-            console.error(errorThrown);
-            // FIXME: should not write to this place
             _divForPhase(taskData.phase)
-                .html('<p style="color: red";><b>Error:'+ errorThrown +'</b> <br> ' + _err.message + '</p>')
+                .html('<p style="color: red";><b>Error:'+ errorThrown +'</b>')
                 .show();
         }).done(function(d) {
             taskData.executionId = d.executionId;
