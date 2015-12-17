@@ -107,7 +107,6 @@ var HeatmapView = (function(){
     };
 
     var _toggleRunAnalysisView = function (noSubset) {
-        console.log(noSubset);
         if (noSubset === 2) {
             view.runHeatmapView.multiSubsetDiv.show();
             view.runHeatmapView.methodSelect.filter('[value="bval"]').attr('checked', true);
