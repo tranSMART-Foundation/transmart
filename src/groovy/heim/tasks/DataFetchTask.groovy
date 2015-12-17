@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Iterators
 import com.google.common.collect.PeekingIterator
 import com.google.common.io.Closer
+import grails.converters.JSON
 import groovy.transform.ToString
 import groovy.util.logging.Log4j
 import heim.rserve.RServeSession
@@ -206,6 +207,8 @@ class DataFetchTask extends AbstractTask {
             throw new InterruptedException("Task was interrupted")
         }
 
+        writeParameters()
+
         new TaskResult(
                 successful: true,
                 artifacts: ImmutableMap.of('currentLabels', currentLabels),)
@@ -215,6 +218,28 @@ class DataFetchTask extends AbstractTask {
         String removeStatement = "if (exists('loaded_variables')) { remove(loaded_variables, pos = '.GlobalEnv')}"
         rServeSession.doWithRConnection { RConnection conn ->
             RUtil.runRCommand conn, removeStatement
+        }
+    }
+
+    private Map<String, Object> packParameters() {
+        [
+                ontologyTerms: ontologyTerms,
+                resultInstanceIds: resultInstanceIds,
+                assayConstraints: assayConstraints,
+                dataConstraints: dataConstraints,
+                projection: projection,
+        ]
+    }
+
+    private void writeParameters() {
+        String loadJsonLite = 'library(jsonlite)'
+        def paramsJson = packParameters() as JSON
+        String assignParams = "fetch_params <- fromJSON('" +
+                RUtil.escapeRStringContent(paramsJson.toString(false)) + "')"
+
+        rServeSession.doWithRConnection { RConnection conn ->
+            RUtil.runRCommand conn, loadJsonLite
+            RUtil.runRCommand conn, assignParams
         }
     }
 
