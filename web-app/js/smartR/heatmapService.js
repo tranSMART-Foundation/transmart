@@ -399,7 +399,7 @@ window.HeatmapService = (function(){
     // aux for downloadSVG
    function copyWithCollapsedCSS(heatmapElement) {
         var relevantProperties = [
-            'fill-opacity', 'fill', 'stroke',
+            'fill-opacity', 'fill', 'stroke', 'font-size', 'font-family',
             'shape-rendering', 'stroke-width'
         ];
         var clonedSvg = jQuery(heatmapElement).clone().attr('display', 'none');
