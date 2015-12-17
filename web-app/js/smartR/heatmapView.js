@@ -152,8 +152,10 @@ var HeatmapView = (function(){
 
         var promise = heatmapService.fetchData(_fetchDataParams);
         promise.then(function(data) {
-            data[0].forEach(function (summaryJSON) {
-                _noOfSamples += summaryJSON['numberOfSamples'];
+            data.forEach(function (d) {
+                d.forEach(function (summaryJSON) {
+                    _noOfSamples += summaryJSON['numberOfSamples'];
+                });
             });
             // toggle view
             _toggleRunAnalysisView({subsetNo: subsetNo, noOfSamples : _noOfSamples});
