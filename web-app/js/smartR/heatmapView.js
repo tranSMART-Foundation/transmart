@@ -12,28 +12,28 @@ var HeatmapView = (function(){
         container : jQuery('#heim-tabs'),
         fetchDataView : {
             conceptPathsInput : jQuery('#divIndependentVariable'),
-            identifierInput : jQuery('#heim-input-txt-identifier'),
-            listIdentifiers : jQuery('#heim-input-list-identifiers'),
-            actionBtn : jQuery('#heim-btn-fetch-data'),
-            clearBtn : jQuery('#heim-btn-clear'),
-            checkStatusBtn : jQuery('#heim-btn-check'),
-            getResultBtn : jQuery('#heim-btn-get-output'),
-            outputArea : jQuery('#heim-fetch-data-output')
+            identifierInput   : jQuery('#heim-input-txt-identifier'),
+            listIdentifiers   : jQuery('#heim-input-list-identifiers'),
+            actionBtn         : jQuery('#heim-btn-fetch-data'),
+            clearBtn          : jQuery('#heim-btn-clear'),
+            checkStatusBtn    : jQuery('#heim-btn-check'),
+            getResultBtn      : jQuery('#heim-btn-get-output'),
+            outputArea        : jQuery('#heim-fetch-data-output')
         },
         preprocessView : {
             aggregateProbesChk : jQuery('#chkAggregateProbes'),
-            preprocessBtn : jQuery('#heim-btn-preprocess-heatmap')
+            preprocessBtn      : jQuery('#heim-btn-preprocess-heatmap')
         },
         runHeatmapView : {
-            maxRowInput : jQuery('#txtMaxRow'),
+            maxRowInput          : jQuery('#txtMaxRow'),
             clusteringOptionsDiv : jQuery('#clusteringOptionsDiv'),
-            methodSelect : jQuery('#methodSelect'),
-            noClustersDiv : jQuery('#noOfClustersDiv'),
-            noMarkersDiv : jQuery('#noOfMarkersDiv'),
-            sortingSelect : jQuery('[name=sortingSelect]'),
-            runAnalysisBtn : jQuery('#heim-btn-run-heatmap'),
-            snapshotImageBtn : jQuery('#heim-btn-snapshot-image'),
-            downloadFileBtn : jQuery('#heim-btn-download-file')
+            methodSelect         : jQuery('[name=rankCriteria]'),
+            noClustersDiv        : jQuery('#noOfClustersDiv'),
+            noMarkersDiv         : jQuery('#noOfMarkersDiv'),
+            sortingSelect        : jQuery('[name=sortingSelect]'),
+            runAnalysisBtn       : jQuery('#heim-btn-run-heatmap'),
+            snapshotImageBtn     : jQuery('#heim-btn-snapshot-image'),
+            downloadFileBtn      : jQuery('#heim-btn-download-file')
         }
     };
 
@@ -88,9 +88,11 @@ var HeatmapView = (function(){
         // get max_rows
         var _maxRows = v.maxRowInput.val();
         var _sortingType = v.sortingSelect.filter(':checked').val();
+        var _ranking = v.methodSelect.filter(':checked').val();
         return {
             max_rows : _maxRows,
-            sorting: _sortingType
+            sorting: _sortingType,
+            ranking: _ranking
         }
     };
 
@@ -117,6 +119,7 @@ var HeatmapView = (function(){
         jQuery('#heatmap').empty();
         view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
         view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
+        console.log(_runHeatmapInputArgs);
         heatmapService.runAnalysis(_runHeatmapInputArgs)
             .then(function(data) {
                 SmartRHeatmap.create(data.heatmapData);
