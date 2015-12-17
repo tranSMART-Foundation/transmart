@@ -127,13 +127,8 @@ window.HeatmapService = (function(){
                 workflow : 'heatmap'
             })
         }).fail(function (jqXHR, textStatus, errorThrown) {
-            var _err = JSON.parse(jqXHR.responseText);
-            console.error(jqXHR);
-            console.error(textStatus);
-            console.error(errorThrown);
-            // FIXME: should not write to this place
             _divForPhase(taskData.phase)
-                .html('<p style="color: red";><b>Error:'+ errorThrown +'</b> <br> ' + _err.message + '</p>')
+                .html('<p style="color: red";><b>Error:'+ errorThrown +'</b>')
                 .show();
         }).done(function(d) {
             taskData.executionId = d.executionId;
@@ -401,9 +396,54 @@ window.HeatmapService = (function(){
         });
     };
 
+    // aux for downloadSVG
+   function copyWithCollapsedCSS(heatmapElement) {
+        var relevantProperties = [
+            'fill-opacity', 'fill', 'stroke',
+            'shape-rendering', 'stroke-width'
+        ];
+        var clonedSvg = jQuery(heatmapElement).clone().attr('display', 'none');
+        clonedSvg.insertAfter(heatmapElement);
+
+        var cachedDefaults = {};
+        var scratchSvg = jQuery(document.createElement('svg'))
+            .attr('display', 'none')
+            .appendTo(jQuery('body'));
+
+        function getDefaultsForElement(jqElement) {
+            var nodeName = jqElement.prop('nodeName');
+            if (!cachedDefaults[nodeName]) {
+                var newElement = jQuery(document.createElement(nodeName))
+                    .appendTo(scratchSvg);
+
+                cachedDefaults[nodeName] = window.getComputedStyle(newElement[0]);
+            }
+            return cachedDefaults[nodeName];
+        }
+
+        clonedSvg.find('*').each(function(idx, element) { // for each element in <svg>
+            var computedStyle = window.getComputedStyle(element);
+
+            var jqElem = jQuery(element);
+            relevantProperties.forEach(function(property) { // for each property
+                var effectiveStyle = computedStyle.getPropertyValue(property);
+                var defaultStyle = getDefaultsForElement(jqElem).getPropertyValue(property);
+
+                if (effectiveStyle != defaultStyle) {
+                    jqElem.attr(property, effectiveStyle);
+                }
+            })
+        });
+
+        scratchSvg.remove();
+
+        return clonedSvg;
+    };
+
     service.downloadSVG = function(event) {
         var serializer = new XMLSerializer();
-        var xmlString = serializer.serializeToString(event.data());
+        var clonedSvg = copyWithCollapsedCSS(event.data());
+        var xmlString = serializer.serializeToString(clonedSvg[0]);
         var blob = new Blob([xmlString], { type: 'image/svg+xml' });
         var svgBlobUrl = URL.createObjectURL(blob);
         var link = jQuery('<a/>')
@@ -414,6 +454,7 @@ window.HeatmapService = (function(){
         link[0].click();
         link.remove();
         URL.revokeObjectURL(svgBlobUrl);
+        clonedSvg.remove();
     };
 
     service.downloadData = function() {
