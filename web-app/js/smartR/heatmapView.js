@@ -123,9 +123,7 @@ var HeatmapView = (function(){
      * @private
      */
     var _fetchDataAction = function () {
-        var subsetNo =
-            (typeof GLOBAL.CurrentSubsetIDs[1] === 'undefined' || !GLOBAL.CurrentSubsetIDs[1])   ||
-            (typeof GLOBAL.CurrentSubsetIDs[2] === 'undefined' || !GLOBAL.CurrentSubsetIDs[2])  ? 1 : 2,
+        var subsetNo = !GLOBAL.CurrentSubsetIDs[1]  || !GLOBAL.CurrentSubsetIDs[2]  ? 1 : 2,
             _fetchDataParams =  _getFetchDataViewValues(view.fetchDataView);
 
         _toggleRunAnalysisView(subsetNo);
