@@ -178,7 +178,7 @@
                 <h2>Sort on:</h2>
                 <fieldset class="heim-radiogroup">
                     <label>
-                        <input type="radio" name="sortingSelect" value="nodes" checked > Nodes
+                        <input type="radio" name="sortingSelect" value="nodes" checked> Nodes
                     </label>
                     <label>
                         <input type="radio" name="sortingSelect" value="subjects"> Subjects
@@ -193,22 +193,22 @@
                 <fieldset class="heim-radiogroup" id="sr-variability-group">
                     <h3>Expression variability</h3>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="coef" checked> Coefficient of variation
+                        <input type="radio" name="rankCriteria" value="coef"> Coefficient of variation
                     </label></div>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="variance" checked> Variance
+                        <input type="radio" name="rankCriteria" value="variance"> Variance
                     </label></div>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="range" checked> Range between max and min after excluding outliers
+                        <input type="radio" name="rankCriteria" value="range"> Range between max and min after excluding outliers
                     </label></div>
                 </fieldset>
                 <fieldset class="heim-radiogroup" id="sr-expression-level-group">
                     <h3>Expression level</h3>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="mean" checked> Mean
+                        <input type="radio" name="rankCriteria" value="mean"> Mean
                     </label></div>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="median" checked> Median
+                        <input type="radio" name="rankCriteria" value="median"> Median
                     </label></div>
                 </fieldset>
             </div>
@@ -216,19 +216,19 @@
                 <fieldset class="heim-radiogroup" id="sr-differential-exp-group">
                     <h3>Differential expression</h3>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="bval" checked> B-value/log odds ratio
+                        <input type="radio" name="rankCriteria" value="bval"> B-value/log odds ratio
                     </label></div>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="pval" checked> p-value
+                        <input type="radio" name="rankCriteria" value="pval"> p-value
                     </label></div>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="adjpval" checked> Adjusted p-value (method “fdr”)
+                        <input type="radio" name="rankCriteria" value="adjpval"> Adjusted p-value (method “fdr”)
                     </label></div>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="logfold" checked> log fold-change
+                        <input type="radio" name="rankCriteria" value="logfold"> log fold-change
                     </label></div>
                     <div><label>
-                        <input type="radio" name="rankCriteria" value="ttest" checked> t-statistic
+                        <input type="radio" name="rankCriteria" value="ttest"> t-statistic
                     </label></div>
                 </fieldset>
             </div>

@@ -20,7 +20,7 @@ window.HeatmapService = (function(){
     };
 
     var _setStatusRequestTimeout = function() {
-        var timeout = setTimeout.apply(undefined, arguments)
+        var timeout = setTimeout.apply(undefined, arguments);
         service.currentRequestAbort = function() {
             clearTimeout(timeout);
             service.currentRequestAbort = NOOP_ABORT;
@@ -53,7 +53,6 @@ window.HeatmapService = (function(){
     })();
 
     var _createAnalysisConstraints = function (params) {
-        console.log(params);
         // params.conceptPaths are actually keys...
         var _retval = {
             conceptKeys : _generateLabels(params.conceptPaths.split(/\|/)),
@@ -166,8 +165,6 @@ window.HeatmapService = (function(){
         var _args = _createAnalysisConstraints(params);
         service.lastFetchedLabels = Object.keys(_args.conceptKeys);
 
-        console.log('Analysis Constraints', _args);
-
         startScriptExecution({
             taskType: 'fetchData',
             arguments: _args,
@@ -179,8 +176,6 @@ window.HeatmapService = (function(){
     };
 
     service.getSummary = function (phase) {
-        console.log('About to get load data summary');
-
         var fileSuffixes;
 
         if (phase === 'preprocess') {
@@ -233,7 +228,7 @@ window.HeatmapService = (function(){
             onUltimateSuccess: getSummary_onUltimateSuccess,
             phase: phase,
             progressMessage: 'Getting summary',
-            successMessage: undefined,
+            successMessage: undefined
         });
     };
 
@@ -242,8 +237,6 @@ window.HeatmapService = (function(){
      * @param params
      */
     service.preprocess = function (params) {
-        console.log('service.preprocess', params);
-
         startScriptExecution({
             taskType: 'preprocess',
             arguments: params,
@@ -254,7 +247,6 @@ window.HeatmapService = (function(){
     };
 
     service.runAnalysis = function (params) {
-        console.log('service.runAnalysis', params);
         var defer = jQuery.Deferred();
 
         function runAnalysisSuccess(data) {
@@ -286,7 +278,7 @@ window.HeatmapService = (function(){
             onUltimateSuccess: runAnalysisSuccess,
             phase: 'run',
             progressMessage: 'Calculating',
-            successMessage: undefined,
+            successMessage: undefined
         });
 
         // having a "ultimateSuccess" event on the return of
@@ -330,13 +322,12 @@ window.HeatmapService = (function(){
 
         return function(model, term, response) {
             if (curXHR && curXHR.state() === 'pending') {
-                console.log('Cancelling pending request')
                 curXHR.abort();
             }
 
             curXHR = jQuery.get("/transmart/search/loadSearchPathways", {
                 query: term
-            })
+            });
 
             curXHR.always(function() { curXHR = null; })
             return curXHR.then(
@@ -361,8 +352,8 @@ window.HeatmapService = (function(){
         var div = _divForPhase(taskData.phase);
 
         div.show();
-        div.html('<p class="sr-log-text"><span class="blink_me">_</span>' +
-            taskData.progressMessage + ', please wait\u2026</p>');
+        div.html('<p class="sr-log-text">' +
+            taskData.progressMessage + ', please wait<span class="blink_me">_</span></p>');
 
         service.currentRequestAbort();
 
@@ -378,8 +369,6 @@ window.HeatmapService = (function(){
         service.currentRequestAbort = function() { ajax.abort(); };
 
         ajax.done(function (d) {
-            console.log('Done checking', d);
-
             if (d.state === 'FINISHED') {
                 if (taskData.successMessage) {
                     var _html = '<p class="heim-fetch-success" style="color: green";> ' +
@@ -400,9 +389,9 @@ window.HeatmapService = (function(){
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
             var _html = '<span style="color: red";>'+errorThrown+'</span>';
-            console.log(jqXHR);
-            console.log(textStatus);
-            console.log(errorThrown);
+            console.error(jqXHR);
+            console.error(textStatus);
+            console.error(errorThrown);
             div.html(_html);
         });
     };
@@ -485,9 +474,9 @@ window.HeatmapService = (function(){
             onUltimateSuccess: downloadFile,
             phase: 'run',
             progressMessage: 'Creating zip',
-            successMessage: undefined,
+            successMessage: undefined
         });
-    }
+    };
 
     return service;
 })();
