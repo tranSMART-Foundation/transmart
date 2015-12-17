@@ -31,8 +31,8 @@ SmartRHeatmap = (function(){
         var geneSymbols = data.geneSymbols;
         var maxRows = 100;
 
-        var rowClustering = true;
-        var colClustering = true;
+        var rowClustering = false;
+        var colClustering = false;
 
         var originalPatientIDs = patientIDs.slice();
         var originalProbes = probes.slice();
@@ -965,9 +965,12 @@ SmartRHeatmap = (function(){
             }
             return initialColOrder;
         }
-        var lastUsedClustering = 'hclustEuclideanAverage';
+        var lastUsedClustering = null;
 
         function cluster(clustering) {
+            if (!lastUsedClustering && typeof clustering === 'undefined') {
+                return; // Nothing should be done if clustering switches are turned on without clustering type set.
+            }
             clustering = (typeof clustering === 'undefined') ? lastUsedClustering : clustering;
             var clusterData = data[clustering];
             if (rowClustering) {
@@ -1064,7 +1067,7 @@ SmartRHeatmap = (function(){
             width: buttonWidth,
             height: buttonHeight,
             callback: switchRowClustering,
-            checked: true
+            checked: rowClustering
         });
 
         createD3Switch({
@@ -1076,7 +1079,7 @@ SmartRHeatmap = (function(){
             width: buttonWidth,
             height: buttonHeight,
             callback: switchColClustering,
-            checked: true
+            checked: colClustering
         });
 
         createD3Slider({

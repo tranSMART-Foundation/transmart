@@ -8,6 +8,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   max_rows <- as.numeric(max_rows)
   verifyInput(max_rows, sorting)
   df <- parseInput()
+  df[is.na(df)] <- 0  # All NAs to zero.
   df["Row.Label"] <-
     lapply(df["Row.Label"],fixString)  # remove illegal
                                        # characters from probe names. This will
@@ -382,7 +383,9 @@ mergeFetchedData <- function(listOfHdd) {
       df2 <- add.subset.label(df2,label)
       df <- merge(df, df2 ,by = c("Row.Label","Bio.marker"))
       if (nrow(df) != expected.rowlen) {
-        stop("Mismatched probe_ids - different platform used?")
+        # stop("Mismatched probe_ids - different platform used?")
+        # In order to make proteomics data work we temporarily turn this exception off.
+        # When retrieving information about platform is implemented this check will turned back on.
       }
     }
   }
