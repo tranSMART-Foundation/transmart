@@ -233,7 +233,7 @@ window.HeatmapService = (function(){
             onUltimateSuccess: getSummary_onUltimateSuccess,
             phase: phase,
             progressMessage: 'Getting summary',
-            successMessage: undefined,
+            successMessage: undefined
         });
     };
 
@@ -283,7 +283,7 @@ window.HeatmapService = (function(){
             onUltimateSuccess: runAnalysisSuccess,
             phase: 'run',
             progressMessage: 'Calculating',
-            successMessage: undefined,
+            successMessage: undefined
         });
 
         // having a "ultimateSuccess" event on the return of

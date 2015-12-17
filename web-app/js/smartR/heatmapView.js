@@ -262,9 +262,6 @@ var HeatmapView = (function(){
 
         view.fetchDataView.clearBtn.click(view.clearConceptPathInput);
 
-        // TODO Remove this, it's unused
-        view.fetchDataView.checkStatusBtn.click(heatmapService.checkStatus);
-
         view.runHeatmapView.runAnalysisBtn.click (
             view.runHeatmapView,
             _runHeatmapAction
