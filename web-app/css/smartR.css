@@ -201,11 +201,16 @@
 .sr-output-container {padding-top: 20px; padding-bottom: 20px;}
 .sr-fetch-params-area {clear: both; margin-top: 20px;margin-bottom: 20px;}
 .sr-log-text {color: darkgreen}
-.sr-summary-table {border: 1px solid #999;}
-.sr-summary-table th {font-weight: bold; background-color: #DDD;}
-.sr-summary-table th, .sr-summary-table td  {
-    padding: 5px;
-}
+.sr-output-container img {border: 1px solid #ddd; margin-right: 3px;}
+.sr-summary-table {border: 1px solid #ddd; display: inline-block; width: 480px;}
+.sr-summary-table th {font-weight: bold; background-color: #DDD; text-align: center}
+.sr-summary-table th, .sr-summary-table td  {padding: 5px;}
+.sr-summary-table body {width: 100%; }
+.sr-summary-table tr th:nth-child(1){width: 30%;}
+.sr-summary-table tr th:nth-child(2){width: 20%;}
+.sr-summary-table tr th:nth-child(3){width: 20%;}
+.sr-summary-table tr td:nth-child(2){text-align: right;}
+.sr-summary-table tr td:nth-child(3){text-align: right;}
 .ui-icon-info {display: inline-block; }
 .sr-ui-tooltip {font-size: .85em; background: lightgoldenrodyellow !important;}
 
@@ -232,10 +237,10 @@
 
 /** jquery ui overrides **/
 .heim-tab.ui-state-default.ui-state-active {
-     background: white;
- }
+    background: white;
+}
 .heim-tab.ui-state-default.ui-state-active a {
-   color: black;  font-weight: bold;
+    color: black;  font-weight: bold;
 }
 .heim-tab.ui-state-default a:hover  {
     color: #515BA2;

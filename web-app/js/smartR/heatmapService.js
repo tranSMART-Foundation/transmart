@@ -308,6 +308,13 @@ window.HeatmapService = (function(){
     };
 
     service.generateSummaryTable = function (data) {
+        // sort subset to mantain order
+        data.sort(function (a, b) {
+            a = a.subset;
+            b = b.subset;
+            return a.localeCompare(b);
+        });
+
         // get template
         var rowTemplate = jQuery.templates('#summary-row-tmp');
 
