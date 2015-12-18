@@ -52,6 +52,9 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
     # cannot cluster
     # matrix which is less than 2x2
     jsn <- addClusteringOutput(jsn, measurements) #
+  } else {
+    jsn$numberOfClusteredRows <- 0
+    jsn$numberOfClusteredColumns <- 0
   }
   jsn <- toJSON(jsn,
                 pretty = TRUE)
@@ -446,11 +449,19 @@ dendrogramToJSON <- function(d) {
 }
 
 
-addClusteringOutput <- function(jsn, measurements) {
-  euclideanDistancesRow <- dist(measurements, method = "euclidean")
-  manhattanDistancesRow <- dist(measurements, method = "manhattan")
-  euclideanDistancesCol <- dist(t(measurements), method = "euclidean")
-  manhattanDistancesCol <- dist(t(measurements), method = "manhattan")
+addClusteringOutput <- function(jsn, measurements_arg) {
+  # we need to discard rows and columns without at least two values
+  # determine rows without two non-NAs
+  logicalSelection <- apply(measurements_arg, 1, function(row) length(which(!is.na(row))) >= 2)
+  measurements_rows <- measurements_arg[logicalSelection, ]
+  # and for columns
+  logicalSelection <- apply(measurements_arg, 2, function(col) length(which(!is.na(col))) >= 2)
+  measurements_cols <- t(measurements_arg[ , logicalSelection])
+
+  euclideanDistancesRow <- dist(measurements_rows, method = "euclidean")
+  manhattanDistancesRow <- dist(measurements_rows, method = "manhattan")
+  euclideanDistancesCol <- dist(measurements_cols, method = "euclidean")
+  manhattanDistancesCol <- dist(measurements_cols, method = "manhattan")
 
   colDendrogramEuclideanComplete <- computeDendrogram( euclideanDistancesCol, 'complete')
   colDendrogramEuclideanSingle <- computeDendrogram( euclideanDistancesCol, 'single')
@@ -466,44 +477,65 @@ addClusteringOutput <- function(jsn, measurements) {
   rowDendrogramManhattanSingle <- computeDendrogram( manhattanDistancesRow, 'single')
   rowDendrogramManhattanAverage <- computeDendrogram( manhattanDistancesRow, 'average')
 
+  calculateOrderInTermsOfIndexes <- function(dendogram, originalOrderedLabels) {
+    clusterOrderedLabels  <- labels(dendogram)
+
+    allIndexes <- 1 : length(originalOrderedLabels)
+    orderOfClustered <- match(clusterOrderedLabels, originalOrderedLabels)
+
+    # put the elements that were not clustered at the end
+    notIncluded <- allIndexes[!is.element(allIndexes, orderOfClustered)]
+    c(orderOfClustered, notIncluded) - 1  # start at 0
+  }
+
+  columnOrder <- function(dendogram) {
+    calculateOrderInTermsOfIndexes(dendogram, colnames(measurements_arg))
+  }
+  rowOrder <- function(dendogram) {
+    calculateOrderInTermsOfIndexes(dendogram, rownames(measurements_arg))
+  }
+
+  jsn$numberOfClusteredRows <- nrow(measurements_rows)
+  jsn$numberOfClusteredColumns <- nrow(measurements_cols)  # still nrow (transposed)
+
   jsn$hclustEuclideanComplete <- list(
-    order.dendrogram(colDendrogramEuclideanComplete) - 1,
-    order.dendrogram(rowDendrogramEuclideanComplete) - 1,
+    columnOrder(colDendrogramEuclideanComplete),
+    rowOrder(rowDendrogramEuclideanComplete),
     dendrogramToJSON(colDendrogramEuclideanComplete),
     dendrogramToJSON(rowDendrogramEuclideanComplete)
   )
 
   jsn$hclustEuclideanSingle <- list(
-    order.dendrogram(colDendrogramEuclideanSingle)  - 1,
-    order.dendrogram(rowDendrogramEuclideanSingle) - 1,
+    columnOrder(colDendrogramEuclideanSingle),
+    rowOrder(rowDendrogramEuclideanSingle),
     dendrogramToJSON(colDendrogramEuclideanSingle),
     dendrogramToJSON(rowDendrogramEuclideanSingle)
   )
 
   jsn$hclustEuclideanAverage <- list(
-    order.dendrogram(colDendrogramEuclideanAverage) - 1,
-    order.dendrogram(rowDendrogramEuclideanAverage) - 1,
+    columnOrder(colDendrogramEuclideanAverage),
+    rowOrder(rowDendrogramEuclideanAverage),
     dendrogramToJSON(colDendrogramEuclideanAverage),
     dendrogramToJSON(rowDendrogramEuclideanAverage)
   )
 
   jsn$hclustManhattanComplete <- list(
-    order.dendrogram(colDendrogramManhattanComplete) - 1,
-    order.dendrogram(rowDendrogramManhattanComplete) - 1,
+    columnOrder(colDendrogramManhattanComplete),
+    rowOrder(rowDendrogramManhattanComplete),
     dendrogramToJSON(colDendrogramManhattanComplete),
     dendrogramToJSON(rowDendrogramManhattanComplete)
   )
 
   jsn$hclustManhattanSingle <- list(
-    order.dendrogram(colDendrogramManhattanSingle) - 1,
-    order.dendrogram(rowDendrogramManhattanSingle) - 1,
+    columnOrder(colDendrogramManhattanSingle),
+    rowOrder(rowDendrogramManhattanSingle),
     dendrogramToJSON(colDendrogramManhattanSingle),
     dendrogramToJSON(rowDendrogramManhattanSingle)
   )
 
   jsn$hclustManhattanAverage <- list(
-    order.dendrogram(colDendrogramManhattanAverage) - 1,
-    order.dendrogram(rowDendrogramManhattanAverage) - 1,
+    columnOrder(colDendrogramManhattanAverage),
+    rowOrder(rowDendrogramManhattanAverage),
     dendrogramToJSON(colDendrogramManhattanAverage),
     dendrogramToJSON(rowDendrogramManhattanAverage)
   )
