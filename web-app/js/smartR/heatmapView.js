@@ -11,7 +11,7 @@ var HeatmapView = (function(){
     var view = {
         container : jQuery('#heim-tabs'),
         fetchDataView : {
-            conceptPathsInput : jQuery('#divIndependentVariable'),
+            conceptPathsInput : jQuery('#heim-high-dim-var'),
             identifierInput   : jQuery('#heim-input-txt-identifier'),
             listIdentifiers   : jQuery('#heim-input-list-identifiers'),
             actionBtn         : jQuery('#heim-btn-fetch-data'),
