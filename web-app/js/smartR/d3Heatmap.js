@@ -29,6 +29,8 @@ SmartRHeatmap = (function(){
         var patientIDs = data.patientIDs;
         var probes = data.probes;
         var geneSymbols = data.geneSymbols;
+        var numberOfClusteredColumns = data.numberOfClusteredColumns[0];
+        var numberOfClusteredRows = data.numberOfClusteredRows[0];
         var maxRows = 100;
 
         var rowClustering = false;
@@ -207,6 +209,11 @@ SmartRHeatmap = (function(){
             var colSortBox = colSortItems.selectAll('.colSortBox')
                 .data(patientIDs, function(d) { return d; });
 
+            function getValueForSquareSorting(patientID, probe) {
+                var square = d3.select('.square' + '.patientID-' + patientID + '.probe-' + probe);
+                return square[0][0] != null ? square.property('__data__').ZSCORE : Number.NEGATIVE_INFINITY;
+            }
+
             colSortBox
                 .enter()
                 .append('rect')
@@ -219,8 +226,7 @@ SmartRHeatmap = (function(){
                     var rowValues = [];
                     for(var i = 0; i < probes.length; i++) {
                         var probe = probes[i];
-                        var square = d3.select('.square' + '.patientID-' + patientID + '.probe-' + probe);
-                        rowValues.push([i, square.property('__data__').ZSCORE]);
+                        rowValues.push([i, getValueForSquareSorting(patientID, probe)]);
                     }
                     if (isSorted(rowValues)) {
                         rowValues.sort(function(a, b) { return a[1] - b[1]; });
@@ -274,8 +280,7 @@ SmartRHeatmap = (function(){
                     var colValues = [];
                     for(var i = 0; i < patientIDs.length; i++) {
                         var patientID = patientIDs[i];
-                        var square = d3.select('.square' + '.patientID-' + patientID + '.probe-' + probe);
-                        colValues.push([i, square.property('__data__').ZSCORE]);
+                        colValues.push([i, getValueForSquareSorting(patientID, probe)]);
                     }
                     if (isSorted(colValues)) {
                         colValues.sort(function(a, b) { return a[1] - b[1]; });
@@ -773,10 +778,11 @@ SmartRHeatmap = (function(){
 
         function createColDendrogram() {
             var w = 200;
+            var colDendrogramWidth = gridFieldWidth * numberOfClusteredColumns;
             var spacing = gridFieldWidth * 2 + getMaxWidth(d3.selectAll('.patientID')) + features.length * gridFieldHeight / 2 + 40;
 
             var cluster = d3.layout.cluster()
-                .size([width, w])
+                .size([colDendrogramWidth, w])
                 .separation(function(a, b) {
                     return 1;
                 });
@@ -831,10 +837,11 @@ SmartRHeatmap = (function(){
         var rowDendrogram;
         function createRowDendrogram() {
             var h = 280;
+            var rowDendrogramHeight = gridFieldWidth * numberOfClusteredRows;
             var spacing = gridFieldWidth + getMaxWidth(d3.selectAll('.probe')) + 20;
 
             var cluster = d3.layout.cluster()
-                .size([height, h])
+                .size([rowDendrogramHeight, h])
                 .separation(function(a, b) {
                     return 1;
                 });
@@ -968,19 +975,19 @@ SmartRHeatmap = (function(){
         var lastUsedClustering = null;
 
         function cluster(clustering) {
-            if (!lastUsedClustering && typeof clustering === 'undefined') {
+            if(!lastUsedClustering && typeof clustering === 'undefined'){
                 return; // Nothing should be done if clustering switches are turned on without clustering type set.
             }
             clustering = (typeof clustering === 'undefined') ? lastUsedClustering : clustering;
             var clusterData = data[clustering];
-            if (rowClustering) {
+            if (rowClustering && numberOfClusteredRows > 0) {
                 rowDendrogram = JSON.parse(clusterData[3]);
                 updateRowOrder(transformClusterOrderWRTInitialOrder(clusterData[1], getInitialRowOrder()));
                 createRowDendrogram(rowDendrogram);
             } else {
                 removeRowDendrogram();
             }
-            if (colClustering) {
+            if (colClustering && numberOfClusteredColumns > 0) {
                 colDendrogram = JSON.parse(clusterData[2]);
                 updateColOrder(transformClusterOrderWRTInitialOrder(clusterData[0], getInitialColOrder()));
                 createColDendrogram(colDendrogram);
