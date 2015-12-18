@@ -95,15 +95,17 @@ hasTwoSubsets <- function(measurements) {
 }
 
 applyRanking <- function (df, ranking, max_rows) {
-  if( ranking %in% c("ttest", "logfold") ){
+  nrows = min(max_rows, nrow(df))
+  if (ranking %in% c("ttest", "logfold")) {
     df["SIGNIFICANCE_ABS"] <- abs(df["SIGNIFICANCE"])
     df <- df[with(df, order(-SIGNIFICANCE_ABS)), ]
     df["SIGNIFICANCE_ABS"] <- NULL
-    df <- df[1:min(max_rows, nrow(df)), ]
+    df <- df[1:nrows, ]
     df <- df[with(df, order(-SIGNIFICANCE)), ]
     df["SIGNIFICANCE"] <- abs(df["SIGNIFICANCE"])
   } else {
     df <- df[with(df, order(-SIGNIFICANCE)), ]
+    df <- df[1:nrows, ]
   }
   df
 }
