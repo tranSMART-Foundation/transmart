@@ -18,11 +18,13 @@ var HeatmapView = (function(){
             clearBtn          : jQuery('#heim-btn-clear'),
             checkStatusBtn    : jQuery('#heim-btn-check'),
             getResultBtn      : jQuery('#heim-btn-get-output'),
-            outputArea        : jQuery('#heim-fetch-data-output')
+            outputArea        : jQuery('#heim-fetch-data-output'),
+            fetchDialog       : jQuery('#sr-fetch-dialog')
         },
         preprocessView : {
             aggregateProbesChk : jQuery('#chkAggregateProbes'),
-            preprocessBtn      : jQuery('#heim-btn-preprocess-heatmap')
+            preprocessBtn      : jQuery('#heim-btn-preprocess-heatmap'),
+            outputArea         : jQuery('#heim-preprocess-output')
         },
         runHeatmapView : {
             maxRowInput          : jQuery('#txtMaxRow'),
@@ -37,7 +39,9 @@ var HeatmapView = (function(){
             multiSubsetDiv       : jQuery('#sr-multi-subset'),
             runAnalysisBtn       : jQuery('#heim-btn-run-heatmap'),
             snapshotImageBtn     : jQuery('#heim-btn-snapshot-image'),
-            downloadFileBtn      : jQuery('#heim-btn-download-file')
+            downloadFileBtn      : jQuery('#heim-btn-download-file'),
+            outputArea           : jQuery('#heim-run-output'),
+            d3Heatmap            : jQuery('#heatmap')
         }
     };
 
@@ -108,12 +112,21 @@ var HeatmapView = (function(){
         }
     };
 
+
+    var _emptyOutputs = function () {
+        view.fetchDataView.outputArea.empty();
+        view.preprocessView.outputArea.empty();
+        view.runHeatmapView.outputArea.empty();
+        view.runHeatmapView.d3Heatmap.empty();
+    };
+
     /**
      * Toggle Run Analysis View based on no of subsets & samples
      * @param param
      * @private
      */
-    var _toggleRunAnalysisView = function (param) {
+    var _toggleAnalysisView = function (param) {
+        // toggle widgets
         if (param.noOfSamples === 1) { // when only one sample is fetched
             // show only expression level options
             view.runHeatmapView.singleSubsetVarDiv.hide();
@@ -146,27 +159,57 @@ var HeatmapView = (function(){
      * @private
      */
     var _fetchDataAction = function () {
-        var subsetNo = !GLOBAL.CurrentSubsetIDs[1]  || !GLOBAL.CurrentSubsetIDs[2]  ? 1 : 2,
+        var subsetNo = !GLOBAL.CurrentSubsetIDs[1] || !GLOBAL.CurrentSubsetIDs[2] ? 1 : 2,
             _noOfSamples = 0,
-            _fetchDataParams =  _getFetchDataViewValues(view.fetchDataView);
+            _promise = null,
+            _fetchDataParams = _getFetchDataViewValues(view.fetchDataView);
 
-        var promise = heatmapService.fetchData(_fetchDataParams);
-        promise.then(function(data) {
-            data.forEach(function (d) {
-                d.forEach(function (summaryJSON) {
-                    _noOfSamples += summaryJSON['numberOfSamples'];
+        var _isEmptyEl = function (el) {
+            return !jQuery.trim(el.html());
+        };
+
+        var _fetch = function (promise) {
+            // fetch data
+            promise = heatmapService.fetchData(_fetchDataParams);
+            // return promise when fetching and calculating summary has finished
+            promise.then(function (data) {
+                data.forEach(function (d) {
+                    d.forEach(function (summaryJSON) {
+                        _noOfSamples += summaryJSON['numberOfSamples'];
+                    });
                 });
+                // empty outputs
+                _emptyOutputs();
+                // toggle view
+                _toggleAnalysisView({subsetNo: subsetNo, noOfSamples: _noOfSamples});
             });
-            // toggle view
-            _toggleRunAnalysisView({subsetNo: subsetNo, noOfSamples : _noOfSamples});
-        });
+        };
 
+        // Notify user when there're outputs from previous jobs
+        if (!_isEmptyEl(view.preprocessView.outputArea) || !_isEmptyEl(view.runHeatmapView.outputArea)) {
+            view.fetchDataView.fetchDialog.dialog({
+                resizable: false,
+                height: 140,
+                modal: true,
+                buttons: {
+                    "Proceed": function () {
+                        jQuery(this).dialog("close");
+                        _fetch(_promise);
+                    },
+                    Cancel: function () {
+                        jQuery(this).dialog("close");
+                    }
+                }
+            });
+        } else {
+            _fetch(_promise);
+        }
 
     };
 
     var _runHeatmapAction = function (eventObj) {
         var _runHeatmapInputArgs =  _getRunHeatmapViewValues(view.runHeatmapView);
-        jQuery('#heatmap').empty();
+        view.runHeatmapView.d3Heatmap.empty();
         view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
         view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
         heatmapService.runAnalysis(_runHeatmapInputArgs)
