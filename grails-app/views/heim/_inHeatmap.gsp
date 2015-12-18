@@ -53,7 +53,7 @@
 
 %{--Empty Result -Dialog--}%
 <div id="sr-fetch-dialog" title="Fetch Data" style="display: none">
-    <p>These action will clear previous results. Are you sure?</p>
+    <p>This action will replace all results from previous processes. Are you sure?</p>
 </div>
 
 
@@ -285,7 +285,6 @@
         </div>
 
         %{--result--}%
-
         <div id="heim-run-output" class="sr-output-container"></div>
 
         %{--d3 js heatmap placeholder--}%
