@@ -78,7 +78,7 @@
 
                     <br><br>
 
-                    <div id='divIndependentVariable'  class="sr-drop-input"></div>
+                    <div id='heim-high-dim-var' class="sr-drop-input"></div>
 
                     <div style="margin-top: 10px; text-align: right;">
                         <button type="button" id="heim-btn-clear">Clear</button>
@@ -95,7 +95,7 @@
                     </i></label>
                     <br><br>
 
-                    <div id='divNumVariable' class="sr-drop-input"></div>
+                    <div id='heim-num-var' class="sr-drop-input"></div>
 
                     <div style="margin-top: 10px; text-align: right;">
                         <button type="button" id="heim-btn-clear-2" disabled>Clear</button>
@@ -111,7 +111,7 @@
                     </i></label>
                     <br><br>
 
-                    <div id='divCategoricalVariable' class="sr-drop-input"></div>
+                    <div id='heim-categ-var' class="sr-drop-input"></div>
 
                     <div style="margin-top: 10px; text-align: right;">
                         <button type="button" id="heim-btn-clear-3" disabled>Clear</button>
