@@ -51,6 +51,11 @@
     </table>
 </script>
 
+%{--Empty Result -Dialog--}%
+<div id="sr-fetch-dialog" title="Fetch Data" style="display: none">
+    <p>These action will clear previous results. Are you sure?</p>
+</div>
+
 
 <div class="heim-analysis-container">
 
