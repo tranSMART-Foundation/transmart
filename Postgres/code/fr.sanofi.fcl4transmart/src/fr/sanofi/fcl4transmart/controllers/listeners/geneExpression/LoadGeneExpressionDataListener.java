@@ -75,6 +75,8 @@ public class LoadGeneExpressionDataListener extends LoadDataListener implements 
 		//find the other files needed for this job and put them in the cache
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/validate_gene_expression_params.ktr");
 		jobUrl = FileLocator.toFileURL(jobUrl); 
+		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/validate_gene_inc_expression_params.ktr");
+		jobUrl = FileLocator.toFileURL(jobUrl); 
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/validate_gene_expression_columns.ktr");
 		jobUrl = FileLocator.toFileURL(jobUrl); 
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/check_gene_expression_filenames.ktr");
@@ -95,8 +97,32 @@ public class LoadGeneExpressionDataListener extends LoadDataListener implements 
 		jobUrl = FileLocator.toFileURL(jobUrl); 
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/load_gene_expression_data_to_lz.ktr");
 		jobUrl = FileLocator.toFileURL(jobUrl); 
+
+		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/validate_gene_inc_expression_columns.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/check_gene_inc_expression_filenames.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/load_all_gene_inc_expression_files_for_study.kjb");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/run_i2b2_process_mrna_data_inc.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/load_inc_subject_sample_map_to_lt.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/get_list_of_gene_inc_expression_filenames.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/load_gene_inc_expression_one_study.kjb");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/set_gene_inc_expression_filename.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/validate_gene_inc_expression_columns.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/load_gene_inc_expression_data_to_lz.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/pivot_gene_file.ktr");
 		jobUrl = FileLocator.toFileURL(jobUrl); 
+		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/pivot_gene_inc_file.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/cz_end_audit.ktr");
 		jobUrl = FileLocator.toFileURL(jobUrl); 
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/cz_start_audit.ktr");
@@ -107,6 +133,8 @@ public class LoadGeneExpressionDataListener extends LoadDataListener implements 
 		jobUrl = FileLocator.toFileURL(jobUrl); 
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/write_gene_expression_audit.ktr");
 		jobUrl = FileLocator.toFileURL(jobUrl); 
+		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/write_gene_inc_expression_audit.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
 		
 		return jobPath;
 	}

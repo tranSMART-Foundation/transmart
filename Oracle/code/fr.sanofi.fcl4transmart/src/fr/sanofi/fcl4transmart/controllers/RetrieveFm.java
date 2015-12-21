@@ -106,10 +106,10 @@ public class RetrieveFm {
 			HashMap<String, String> experiments=new HashMap<String, String>();
 			
 			try{
-				Class.forName(RetrieveData.getDriverString());
-				Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd());
-				Statement stmt = con.createStatement();
-			    ResultSet rs = stmt.executeQuery("select title, accession from bio_experiment where bio_experiment_id in(select bio_data_id from biomart.bio_data_uid where unique_id in (select object_uid from fmapp.fm_folder_association where object_type in ('bio.Experiment','org.transmart.biomart.Experiment')))");
+                            Class.forName(RetrieveData.getDriverString());
+                            Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd());
+                            Statement stmt = con.createStatement();
+                            ResultSet rs = stmt.executeQuery("select title, accession from bio_experiment where bio_experiment_type is not null");
 
 			    while(rs.next()){
 			    	experiments.put(rs.getString("title"), rs.getString("accession"));

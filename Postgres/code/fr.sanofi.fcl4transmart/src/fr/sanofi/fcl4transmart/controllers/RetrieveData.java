@@ -417,21 +417,15 @@ public class RetrieveData {
 		String connection=RetrieveData.getConnectionString();
 		try{
 			Class.forName(RetrieveData.getDriverString());
-			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd());
 			Statement stmt = con.createStatement();
-		    ResultSet rs = stmt.executeQuery("SELECT * from i2b2_tags where tag='"+study.toUpperCase()+"'");
 
-		    if(rs.next()){
-		    	isLoaded=true;
-		    }
-		    else{
-		    	rs = stmt.executeQuery("SELECT * from i2b2 where sourcesystem_cd='"+study.toUpperCase()+"'");
+                        ResultSet rs = stmt.executeQuery("SELECT * from biomart.bio_experiment where accession='"+study.toUpperCase()+"'");
 		    	if(rs.next()){
 		    		isLoaded=true;
 		    	}
-		    }
 		    
-		    con.close();
+                        con.close();
 				
 		}catch(SQLException sqle){
 			return false;
