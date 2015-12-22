@@ -6,12 +6,12 @@
 # this is a preliminary check; see checkFilesPsql.sh for full check
 # ********************************************************************************
 
-#Setting TABLESPACES directly as vars file has not yet been set up
-setenv TABLESPACES=/var/lib/postgresql/tablespaces/
-
 function checkForPostgresTablespaceFolder {
+
+    TABLESPACES="/var/lib/postgresql/tablespaces"
+
     name=$1
-    checkPath=$TABLESPACES$name
+    checkPath="$TABLESPACES/$name"
     
     x=$(ls -la $TABLESPACES | grep "$name")
     if [ -z "$x" ] ; then
@@ -22,7 +22,7 @@ function checkForPostgresTablespaceFolder {
     
     echo "OK - the folder at $checkPath"
     
-	return 0
+    return 0
 }
 
 
@@ -41,3 +41,4 @@ if [ 0 = $returnValue ] ; then
 fi
 
 exit $returnValue
+
