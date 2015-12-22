@@ -109,6 +109,7 @@ sudo -v
 cd $HOME/transmart/transmart-data
 make -C env update_etl
 # verify ETL folder
+cd $HOME/Scripts/install-ubuntu/checks
 ./checkFilesETLFolder.sh
 if [ "$( checkInstallError "The directory transmart-data/tranSMART-ETL was not installed properly; redo install" )" ] ; then exit -1; fi
 echo "make -C env update_etl - finished at $(date)"
@@ -118,6 +119,7 @@ sudo -v
 cd $HOME/transmart/transmart-data
 make -C env data-integration 
 # verify data-integration folder
+cd $HOME/Scripts/install-ubuntu/checks
 ./checkFilesDataIntegrationFolder.sh
 if [ "$( checkInstallError "The directory transmart-data/data-integration was not installed properly; redo install" )" ] ; then exit -1; fi
 echo "make -C env data-integration - finished at $(date)"
@@ -126,6 +128,8 @@ echo "make -C env data-integration - finished at $(date)"
 sudo -v
 cd $HOME/transmart/transmart-data
 make -C env ../vars
+# verify setup of vars file
+cd $HOME/Scripts/install-ubuntu/checks
 ./checkFilesVars.sh
 if [ "$( checkInstallError "vars file (transmart-data/vars) not set up properly; redo install" )" ] ; then exit -1; fi
 echo "make -C env ../vars - finished at $(date)"
