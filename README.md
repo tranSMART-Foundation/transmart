@@ -60,6 +60,8 @@ You could for example search for DALLIANCE and add it in the same area.
   - [limma](http://bioconductor.org/packages/release/bioc/html/limma.html)
   - [zoo](https://cran.r-project.org/web/packages/zoo/index.html) (only for Timeline Analysis)
   - [TSclust](https://cran.r-project.org/web/packages/TSclust/index.html) (only for Timeline Analysis)
+- Tools and apps, make sure server instance has following tools installed:
+  - zip 
 
 ####How to deploy your own visualization:
 1. [Add an input view to specify the input data](https://github.com/sherzinger/SmartR/blob/master/grails-app/views/smartR/_inSample.gsp)
