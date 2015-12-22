@@ -18,7 +18,7 @@ echo "-------------------------------------"
 source $HOME/.sdkman/bin/sdkman-init.sh
 
 probe=0
-for groovy grails
+for command in groovy grails
 do
     if ! checkForCommandLineTool "$command"; then
         probe=1
