@@ -86,6 +86,7 @@ sudo make -C env install_ubuntu_packages
 cd $HOME/Scripts/install-ubuntu/checks
 ./checkMakefilePackages.sh
 if [ "$( checkInstallError "Some Basic Command-Line Tool from 'sudo make -C env install_ubuntu_packages' is missing; redo install" )" ] ; then exit -1; fi
+echo "sudo make -C env install_ubuntu_packages - finished at $(date)"
 
 # (2)
 sudo -v
@@ -95,6 +96,8 @@ sudo make -C env /var/lib/postgresql/tablespaces
 cd $HOME/Scripts/install-ubuntu/checks
 ./checkFilesTablespace.sh
 if [ "$( checkInstallError "TABLESPACE files (/var/lib/postgresql/tablespaces) not set up properly; redo install" )" ] ; then exit -1; fi
+echo "sudo make -C env /var/lib/postgresql/tablespaces - finished at $(date)"
+echo " "
 
 echo "Finished setting ubuntu dependencies (with root) at $(date)"
 
@@ -108,6 +111,7 @@ make -C env update_etl
 # verify ETL folder
 ./checkFilesETLFolder.sh
 if [ "$( checkInstallError "The directory transmart-data/tranSMART-ETL was not installed properly; redo install" )" ] ; then exit -1; fi
+echo "make -C env update_etl - finished at $(date)"
 
 # (2)
 sudo -v
@@ -116,6 +120,7 @@ make -C env data-integration
 # verify data-integration folder
 ./checkFilesDataIntegrationFolder.sh
 if [ "$( checkInstallError "The directory transmart-data/data-integration was not installed properly; redo install" )" ] ; then exit -1; fi
+echo "make -C env data-integration - finished at $(date)"
 
 # (3)
 sudo -v
@@ -123,14 +128,18 @@ cd $HOME/transmart/transmart-data
 make -C env ../vars
 ./checkFilesVars.sh
 if [ "$( checkInstallError "vars file (transmart-data/vars) not set up properly; redo install" )" ] ; then exit -1; fi
+echo "make -C env ../vars - finished at $(date)"
 
 # (4) -- this last step is replaced by the sdk calls below
 # make -C env groovy
+echo " "
 
 echo "Finished setting ubuntu dependencies (without root) at $(date)"
 sudo -v
 sudo apt-get install -y ant
 sudo apt-get install -y maven
+echo "Finished install of ant and maven at $(date)"
+
 rm $HOME/transmart/transmart-data/env/groovy
 curl -s get.sdkman.io | bash
 echo "Y" > AnswerYes.txt
@@ -140,6 +149,7 @@ sdk install groovy 2.4.5 < AnswerYes.txt
 cd $HOME/Scripts/install-ubuntu/checks
 ./checkSdkmanApps.sh
 if [ "$( checkInstallError "groovy and/or grails not installed correctly; redo install" )" ] ; then exit -1; fi
+echo "Finished install of groovy and grails at $(date)"
 
 # fix files for postgres
 echo "Patch dir permits for TABLESPACES"
