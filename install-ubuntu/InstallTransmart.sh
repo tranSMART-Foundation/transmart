@@ -75,12 +75,58 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Install of basic tools"
 echo "++++++++++++++++++++++++++++"
 
+# sudo make -C env ubuntu_deps_root
+#   In the makefile target, ubuntu_deps_root, causes a
+#   make of these two steps: 
+# (1)
+sudo -v
 cd $HOME/transmart/transmart-data
+sudo make -C env install_ubuntu_packages 
+# verify these packages
+cd $HOME/Scripts/install-ubuntu/checks
+./checkMakefilePackages.sh
+if [ "$( checkInstallError "Some Basic Command-Line Tool from 'sudo make -C env install_ubuntu_packages' is missing; redo install" )" ] ; then exit -1; fi
+
+# (2)
 sudo -v
-sudo make -C env ubuntu_deps_root
+cd $HOME/transmart/transmart-data
+sudo make -C env /var/lib/postgresql/tablespaces
+# verify tablespaces
+cd $HOME/Scripts/install-ubuntu/checks
+./checkFilesTablespace.sh
+if [ "$( checkInstallError "TABLESPACE files (/var/lib/postgresql/tablespaces) not set up properly; redo install" )" ] ; then exit -1; fi
+
 echo "Finished setting ubuntu dependencies (with root) at $(date)"
+
+# make -C env ubuntu_deps_regular
+#   In the makefile target, ubuntu_deps_regular, causes a
+#   make of these four steps: 
+# (1)
 sudo -v
-make -C env ubuntu_deps_regular
+cd $HOME/transmart/transmart-data
+make -C env update_etl
+# verify ETL folder
+./checkFilesETLFolder.sh
+if [ "$( checkInstallError "The directory transmart-data/tranSMART-ETL was not installed properly; redo install" )" ] ; then exit -1; fi
+
+# (2)
+sudo -v
+cd $HOME/transmart/transmart-data
+make -C env data-integration 
+# verify data-integration folder
+./checkFilesDataIntegrationFolder.sh
+if [ "$( checkInstallError "The directory transmart-data/data-integration was not installed properly; redo install" )" ] ; then exit -1; fi
+
+# (3)
+sudo -v
+cd $HOME/transmart/transmart-data
+make -C env ../vars
+./checkFilesVars.sh
+if [ "$( checkInstallError "vars file (transmart-data/vars) not set up properly; redo install" )" ] ; then exit -1; fi
+
+# (4) -- this last step is replaced by the sdk calls below
+# make -C env groovy
+
 echo "Finished setting ubuntu dependencies (without root) at $(date)"
 sudo -v
 sudo apt-get install -y ant
@@ -91,6 +137,9 @@ echo "Y" > AnswerYes.txt
 source $HOME/.sdkman/bin/sdkman-init.sh
 sdk install grails 2.3.11 < AnswerYes.txt
 sdk install groovy 2.4.5 < AnswerYes.txt
+cd $HOME/Scripts/install-ubuntu/checks
+./checkSdkmanApps.sh
+if [ "$( checkInstallError "groovy and/or grails not installed correctly; redo install" )" ] ; then exit -1; fi
 
 # fix files for postgres
 echo "Patch dir permits for TABLESPACES"

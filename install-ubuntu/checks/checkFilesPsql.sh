@@ -69,7 +69,7 @@ do
 done
 
 if [ 0 = $returnValue ] ; then
-	echo "All required postgres support folders are present"
+	echo "All required postgres support folders are present and in the right configuration"
 fi
 
 exit $returnValue
