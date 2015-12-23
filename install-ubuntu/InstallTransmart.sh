@@ -204,12 +204,12 @@ echo "+  Install R, Rserve and other packages"
 echo "++++++++++++++++++++++++++++"
 
 sudo -v
-sudo apt-get install -y 3.0.2-1ubuntu1
+sudo apt-get install -y r-base=3.0.2-1ubuntu1
 cd $HOME/transmart/transmart-data/R
-R_MIRROR="https://mirrors.nics.utk.edu/cran/"
+R_MIRROR="http://cran.utstat.utoronto.ca/"
 R_EXEC=$(which R)
-CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f cran_pkg.R
-CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f other_pkg.R
+sudo CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f cran_pkg.R
+sudo CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f other_pkg.R
 
 #base="$HOME/transmart/transmart-data"
 #baseR="$base/R"
