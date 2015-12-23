@@ -19,12 +19,11 @@
 #   Scripts/install-ubuntu/checks/checkAll.sh
 
 # on error; stop/exit
-set -e
+# set -e
 
 # Helper function: check and quit on error
 function checkInstallError {
 	returnValue=$?
-	echo "Debug: Return value in check is $returnValue"
 	errorMessage=$1
 	if (( $returnValue )); then
 		echo "************"
@@ -265,22 +264,18 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Load study GSE8581 in database"
 echo "++++++++++++++++++++++++++++"
 
+cd $HOME/transmart/transmart-data
+source ./vars
+make -j4 postgres
+echo "Finished setting up the PostgreSQL database at $(date)"
+make update_datasets
+make -C samples/postgres load_clinical_GSE8581
+make -C samples/postgres load_ref_annotation_GSE8581
+make -C samples/postgres load_expression_GSE8581
+
 cd $HOME/Scripts/install-ubuntu/checks
 ./checkPsqlDataLoad.sh
-if ! [ "$( checkInstallError "Database appears to be loaded; skipping database load" )" ] ; then
-	cd $HOME/transmart/transmart-data
-	source ./vars
-	make -j4 postgres
-	echo "Finished setting up the PostgreSQL database at $(date)"
-	make update_datasets
-	make -C samples/postgres load_clinical_GSE8581
-	make -C samples/postgres load_ref_annotation_GSE8581
-	make -C samples/postgres load_expression_GSE8581
-
-	cd $HOME/Scripts/install-ubuntu/checks
-	./checkPsqlDataLoad.sh
-	if [ "$( checkInstallError "Loading database failed; clear database and restart install" )" ] ; then exit -1; fi
-fi 
+if [ "$( checkInstallError "Loading database failed; clear database and restart install" )" ] ; then exit -1; fi
 
 echo "Finished loading data in the PostgreSQL database at $(date)"
 
