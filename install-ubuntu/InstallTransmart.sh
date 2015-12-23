@@ -203,33 +203,43 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Install R, Rserve and other packages"
 echo "++++++++++++++++++++++++++++"
 
-sudo -v
-sudo apt-get install -y r-base=3.0.2-1ubuntu1
-cd $HOME/transmart/transmart-data/R
-R_MIRROR="http://cran.utstat.utoronto.ca/"
-R_EXEC=$(which R)
-sudo CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f cran_pkg.R
-sudo CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f other_pkg.R
+# could be install from apt-get when version 3.1+ becomes available
+# as of Dec 23 2015 - current install is 3.0.2 - >=3.1.0 required
+# Specifically: https://cran.r-project.org/web/packages/plyr/plyr.pdf
 
-#base="$HOME/transmart/transmart-data"
-#baseR="$base/R"
-#filepath="$baseR/root/bin"
-#if [ -e "$filepath" ]; then
-#    echo "+  R is already installed"
-#else
-#	echo "+  installing R at $filepath"
-#    sudo -v
-#    cd $HOME/transmart/transmart-data
-#    source ./vars
-#    make -C R install_packages
-#fi
 #sudo -v
-#cd $HOME
-#if ! [ -e /etc/profile.d/Rpath.sh ] ; then
-#    echo "export PATH=${HOME}/transmart/transmart-data/R/root/bin:\$PATH" > Rpath.sh
-#    sudo mv Rpath.sh /etc/profile.d/
-#fi
-#source /etc/profile.d/Rpath.sh
+#sudo apt-get install -y r-base=3.0.2-1ubuntu1
+#cd $HOME/transmart/transmart-data/R
+#R_MIRROR="http://cran.utstat.utoronto.ca/"
+#R_EXEC=$(which R)
+#sudo CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f cran_pkg.R
+#sudo CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f other_pkg.R
+# also set up install_rserve_init (see below)
+
+base="$HOME/transmart/transmart-data"
+baseR="$base/R"
+filepath="$baseR/root/bin"
+if [ -e "$filepath" ]; then
+    echo "+  R is already installed"
+else
+	echo "+  installing R at $filepath"
+    sudo -v
+    cd $HOME/transmart/transmart-data
+    source ./vars
+    make -C R install_packages
+fi
+sudo -v
+cd $HOME
+if ! [ -e /etc/profile.d/Rpath.sh ] ; then
+    echo "export PATH=${HOME}/transmart/transmart-data/R/root/bin:\$PATH" > Rpath.sh
+    sudo mv Rpath.sh /etc/profile.d/
+fi
+source /etc/profile.d/Rpath.sh
+
+sudo -v
+source ./vars
+cd $HOME/transmart/transmart-data
+sudo TABLESPACES=$TABLESPACES TRANSMART_USER="tomcat7" make -C R install_rserve_init
 
 cd $HOME/Scripts/install-ubuntu/checks
 ./checkFilesR.sh
@@ -311,6 +321,7 @@ echo "++++++++++++++++++++++++++++"
 sudo -v
 cd $HOME/Scripts/install-ubuntu
 sudo -u tomcat7 bash ./runRServe.sh
+#sudo service rserve start - is not working - not sure why
 echo "Finished starting RServe at $(date)"
 
 echo "++++++++++++++++++++++++++++"
