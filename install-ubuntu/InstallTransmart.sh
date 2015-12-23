@@ -24,6 +24,7 @@ set -e
 # Helper function: check and quit on error
 function checkInstallError {
 	returnValue=$?
+	echo "Debug: Return value in check is $returnValue"
 	errorMessage=$1
 	if (( $returnValue )); then
 		echo "************"
