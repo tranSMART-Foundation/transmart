@@ -6,6 +6,9 @@
 #  Script to load all that is needed to run an example/demo version of tranSMART 1.2.4
 #**********************************************************************************
 
+# on error; stop/exit
+set -e
+
 # Helper function: check and quit on error
 function checkInstallError {
 	returnValue=$?
@@ -200,25 +203,33 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Install R, Rserve and other packages"
 echo "++++++++++++++++++++++++++++"
 
-base="$HOME/transmart/transmart-data"
-baseR="$base/R"
-filepath="$baseR/root/bin"
-if [ -e "$filepath" ]; then
-    echo "+  R is already installed"
-else
-	echo "+  installing R at $filepath"
-    sudo -v
-    cd $HOME/transmart/transmart-data
-    source ./vars
-    make -C R install_packages
-fi
 sudo -v
-cd $HOME
-if ! [ -e /etc/profile.d/Rpath.sh ] ; then
-    echo "export PATH=${HOME}/transmart/transmart-data/R/root/bin:\$PATH" > Rpath.sh
-    sudo mv Rpath.sh /etc/profile.d/
-fi
-source /etc/profile.d/Rpath.sh
+sudo apt-get install -y 3.0.2-1ubuntu1
+cd $HOME/transmart/transmart-data/R
+R_MIRROR="https://mirrors.nics.utk.edu/cran/"
+R_EXEC=$(which R)
+CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f cran_pkg.R
+CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f other_pkg.R
+
+#base="$HOME/transmart/transmart-data"
+#baseR="$base/R"
+#filepath="$baseR/root/bin"
+#if [ -e "$filepath" ]; then
+#    echo "+  R is already installed"
+#else
+#	echo "+  installing R at $filepath"
+#    sudo -v
+#    cd $HOME/transmart/transmart-data
+#    source ./vars
+#    make -C R install_packages
+#fi
+#sudo -v
+#cd $HOME
+#if ! [ -e /etc/profile.d/Rpath.sh ] ; then
+#    echo "export PATH=${HOME}/transmart/transmart-data/R/root/bin:\$PATH" > Rpath.sh
+#    sudo mv Rpath.sh /etc/profile.d/
+#fi
+#source /etc/profile.d/Rpath.sh
 
 cd $HOME/Scripts/install-ubuntu/checks
 ./checkFilesR.sh
