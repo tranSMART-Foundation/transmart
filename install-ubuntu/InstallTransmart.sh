@@ -241,8 +241,8 @@ fi
 source /etc/profile.d/Rpath.sh
 
 sudo -v
-source ./vars
 cd $HOME/transmart/transmart-data
+source ./vars
 sudo TABLESPACES=$TABLESPACES TRANSMART_USER="tomcat7" make -C R install_rserve_init
 
 cd $HOME/Scripts/install-ubuntu/checks
