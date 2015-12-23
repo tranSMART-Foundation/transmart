@@ -147,7 +147,9 @@ sudo apt-get install -y ant
 sudo apt-get install -y maven
 echo "Finished install of ant and maven at $(date)"
 
-rm $HOME/transmart/transmart-data/env/groovy
+# No longer to remove this as the make step that creates it is not skipped!
+# rm $HOME/transmart/transmart-data/env/groovy
+
 curl -s get.sdkman.io | bash
 echo "Y" > AnswerYes.txt
 source $HOME/.sdkman/bin/sdkman-init.sh
