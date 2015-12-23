@@ -1,10 +1,22 @@
 #!/bin/bash
 
-# Version: Fri Dec 11 16:30:10 EST 2015
-# add 3.0.2-1ubuntu1
+# Version: Wed Dec 23 13:53:52 EST 2015
+# 
 #**********************************************************************************
 #  Script to load all that is needed to run an example/demo version of tranSMART 1.2.4
 #**********************************************************************************
+
+# set up with 
+#   sudo apt-get update
+#   sudo apt-get install -y git
+#   git clone https://github.com/tranSMART-Foundation/Scripts.git
+#
+# to run the install scripts
+#   cd ~
+#   /Scripts/install-ubuntu/InstallTransmart.sh
+#
+# to run the checking script
+#   Scripts/install-ubuntu/checks/checkAll.sh
 
 # on error; stop/exit
 set -e
@@ -21,18 +33,6 @@ function checkInstallError {
 	return $returnValue
 }
 
-# set up with 
-#   sudo apt-get update
-#   sudo apt-get install -y git
-#   git clone https://github.com/tranSMART-Foundation/Scripts.git
-#
-# to run the install scripts
-#   cd ~
-#   /Scripts/install-ubuntu/InstallTransmart.sh
-#
-# to run the checking script
-#   Scripts/install-ubuntu/checks/checkAll.sh
-
 echo "Starting at $(date)"
 echo "++++++++++++++++++++++++++++"
 echo "+  Checking locations of Script Directory"
@@ -46,6 +46,7 @@ else
 fi
 echo "Finished checking locations of Script Directory at $(date)"
 
+cd $HOME/Scripts
 source welcome.sh
 
 # set up sudo early
