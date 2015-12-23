@@ -33,9 +33,6 @@ function checkInstallError {
 # to run the checking script
 #   Scripts/install-ubuntu/checks/checkAll.sh
 
-# set up sudo early
-sudo -v
-
 echo "Starting at $(date)"
 echo "++++++++++++++++++++++++++++"
 echo "+  Checking locations of Script Directory"
@@ -48,6 +45,11 @@ else
 	echo "Script directory found: $HOME/Scripts"
 fi
 echo "Finished checking locations of Script Directory at $(date)"
+
+source welcome.sh
+
+# set up sudo early
+sudo -v
 
 echo "++++++++++++++++++++++++++++"
 echo "+  install make "
