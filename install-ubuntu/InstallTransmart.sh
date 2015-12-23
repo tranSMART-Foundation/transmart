@@ -50,6 +50,7 @@ cd $HOME/Scripts
 source welcome.sh
 
 # set up sudo early
+sudo -k
 sudo -v
 
 echo "++++++++++++++++++++++++++++"
@@ -61,7 +62,9 @@ echo "++++++++++++++++++++++++++++"
 echo "+  set up working dir (transmart) "
 echo "++++++++++++++++++++++++++++"
 
-mkdir $HOME/transmart
+if ! [-e $HOME/transmart] ; then
+	mkdir $HOME/transmart
+fi
 
 echo "++++++++++++++++++++++++++++"
 echo "+  set up the transmart-date folder"
