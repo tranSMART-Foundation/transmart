@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Version: Fri Dec 11 16:30:10 EST 2015
-
+# add 3.0.2-1ubuntu1
 #**********************************************************************************
 #  Script to load all that is needed to run an example/demo version of tranSMART 1.2.4
 #**********************************************************************************
