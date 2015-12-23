@@ -46,7 +46,7 @@ else
 fi
 echo "Finished checking locations of Script Directory at $(date)"
 
-cd $HOME/Scripts
+cd $HOME/Scripts/install-ubuntu
 source welcome.sh
 
 # set up sudo early
