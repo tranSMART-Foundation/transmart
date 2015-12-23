@@ -62,7 +62,7 @@ echo "++++++++++++++++++++++++++++"
 echo "+  set up working dir (transmart) "
 echo "++++++++++++++++++++++++++++"
 
-if ! [-e $HOME/transmart] ; then
+if ! [ -e $HOME/transmart ] ; then
 	mkdir $HOME/transmart
 fi
 
