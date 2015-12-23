@@ -4,3 +4,5 @@ transmartApp and the accompanying projects.
 VERSION: 1.2.5-Beta-SNAPSHOT
 
 Install Scripts Version: Fri Dec 11 16:30:10 EST 2015
+
+sudo apt-get install -y r-base=3.0.2-1ubuntu1
