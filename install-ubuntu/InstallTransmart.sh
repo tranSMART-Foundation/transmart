@@ -53,7 +53,7 @@ fi
 echo "Finished checking locations of Script Directory at $(date)"
 
 echo "++++++++++++++++++++++++++++"
-echo "+  set up working dir (tranSMAPT install base) "
+echo "+  set up working dir (tranSMART install base) "
 echo "++++++++++++++++++++++++++++"
 
 if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
@@ -63,7 +63,7 @@ if ! [ -d $HOME/transmart ] ; then
 fi
 echo "tranSMART will be installed at this location: $INSTALL_BASE"
 
-cd $HOME/Scripts/install-ubuntu
+cd $SCRIPTS_BASE/Scripts/install-ubuntu
 source welcome.sh
 
 # set up sudo early
@@ -76,7 +76,7 @@ echo "++++++++++++++++++++++++++++"
 sudo apt-get install -y make
 
 echo "++++++++++++++++++++++++++++"
-echo "+  set up the transmart-date folder"
+echo "+  set up the transmart-data folder"
 echo "++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE
