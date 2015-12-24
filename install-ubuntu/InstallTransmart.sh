@@ -275,18 +275,26 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Load study GSE8581 in database"
 echo "++++++++++++++++++++++++++++"
 
-cd $INSTALL_BASE/transmart-data
-source ./vars
-make -j4 postgres
-echo "Finished setting up the PostgreSQL database at $(date)"
-make update_datasets
-make -C samples/postgres load_clinical_GSE8581
-make -C samples/postgres load_ref_annotation_GSE8581
-make -C samples/postgres load_expression_GSE8581
+cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+./checkPsqlDataLoad.sh
+returnCode=$?
+echo "./checkPsqlDataLoad.sh return code = $returnCode"
+
+if [ $returnCode -eq 1 ] ; then
+	echo "Setting up PostgreSQL database"
+	cd $INSTALL_BASE/transmart-data
+	source ./vars
+	make -j4 postgres
+	echo "Finished setting up the PostgreSQL database at $(date)"
+	echo "Loading sample dataset GSE8581"
+	make update_datasets
+	make -C samples/postgres load_clinical_GSE8581
+	make -C samples/postgres load_ref_annotation_GSE8581
+	make -C samples/postgres load_expression_GSE8581
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
 ./checkPsqlDataLoad.sh
-if [ "$( checkInstallError "Loading database failed; clear database and restart install" )" ] ; then exit -1; fi
+if [ "$( checkInstallError "Loading database failed; clear database and run install again" )" ] ; then exit -1; fi
 
 echo "Finished loading data in the PostgreSQL database at $(date)"
 
