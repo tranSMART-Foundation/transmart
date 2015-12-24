@@ -2,7 +2,10 @@
 sudo apt-get update
 sudo apt-get install -y git
 
+# The location of the install directories
 INSTALL_BASE="$HOME/transmart"
+
+# The location of the Scripts for installing and verifying 
 SCRIPTS_BASE="$INSTALL_BASE"
 
 export INSTALL_BASE SCRIPTS_BASE
