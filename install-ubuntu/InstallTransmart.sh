@@ -291,7 +291,7 @@ if [ $returnCode -eq 1 ] ; then
 	make -C samples/postgres load_clinical_GSE8581
 	make -C samples/postgres load_ref_annotation_GSE8581
 	make -C samples/postgres load_expression_GSE8581
-
+fi
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
 ./checkPsqlDataLoad.sh
 if [ "$( checkInstallError "Loading database failed; clear database and run install again" )" ] ; then exit -1; fi
