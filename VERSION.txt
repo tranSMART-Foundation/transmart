@@ -3,4 +3,4 @@ transmartApp and the accompanying projects.
 
 VERSION: 1.2.5-Beta-SNAPSHOT
 
-Install Scripts Version: Fri Dec 11 16:30:10 EST 2015
+Install Scripts Version: Thu Dec 24 11:06:04 EST 2015
