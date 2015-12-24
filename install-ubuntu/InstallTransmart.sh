@@ -275,12 +275,14 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Load study GSE8581 in database"
 echo "++++++++++++++++++++++++++++"
 
+# only load database if not already loaded
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
-./checkPsqlDataLoad.sh
+./checkPsqlDataLoad.sh quiet
 returnCode=$?
-echo "./checkPsqlDataLoad.sh return code = $returnCode"
 
-if [ $returnCode -eq 1 ] ; then
+if [ $returnCode -eq 0 ] ; then
+	echo "Database is already loaded
+else
 	echo "Setting up PostgreSQL database"
 	cd $INSTALL_BASE/transmart-data
 	source ./vars
