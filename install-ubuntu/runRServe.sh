@@ -1,6 +1,7 @@
 # INSTALL_BASE needs to be set; see InstallTransmart.sh
 if [ -z "$INSTALL_BASE" ] ; then
-	return;
+	echo "INSTALL_BASE is not set"
+	exit -1;
 fi
 
 cd $INSTALL_BASE/transmart-data
