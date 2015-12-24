@@ -20,7 +20,7 @@ if ($runWithEcho) ; then
 	echo "|    are the transmart users set up: admin and guest  "
 	echo "|    in the demo dataset GSE8581 loaded  "
 	echo "-------------------------------------"
-if
+fi
 
 sudo -v
 if ($runWithEcho) ; then
@@ -41,7 +41,7 @@ if [ -z "$postgresRunning" ]; then
 fi
 if ($runWithEcho) ; then
 	echo "PostgreSQL appears to be running"
-if
+fi
 
 results=$(sudo -u postgres psql postgres --command="\du biomart" | grep biomart)
 if [ -z "$results" ]; then
