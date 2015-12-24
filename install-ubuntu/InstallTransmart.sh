@@ -281,7 +281,7 @@ cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
 returnCode=$?
 
 if [ $returnCode -eq 0 ] ; then
-	echo "Database is already loaded
+	echo "Database is already loaded"
 else
 	echo "Setting up PostgreSQL database"
 	cd $INSTALL_BASE/transmart-data
