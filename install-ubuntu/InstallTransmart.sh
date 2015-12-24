@@ -19,7 +19,7 @@
 #   Scripts/install-ubuntu/checks/checkAll.sh
 
 # on error; stop/exit
-# set -e
+set -e
 
 # Helper function: check and quit on error
 function checkInstallError {
