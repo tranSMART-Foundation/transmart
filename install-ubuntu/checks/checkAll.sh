@@ -14,6 +14,9 @@ function checkReturnError {
 	fi
 }
 
+if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
+export $INSTALL_BASE
+
 ./basics.sh
 checkReturnError "Some problem with the loading of basic command line tools and initial configuration"
 

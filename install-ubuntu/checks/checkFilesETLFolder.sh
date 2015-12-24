@@ -5,7 +5,7 @@
 # for the tranSAMRT install and data loading
 # ********************************************************************************
 
-base="$HOME/transmart/transmart-data"
+base="$INSTALL_BASE/transmart-data"
 baseEnv="$base/env"
 filepath="$baseEnv/tranSMART-ETL"
 

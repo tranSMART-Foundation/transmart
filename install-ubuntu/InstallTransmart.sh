@@ -57,6 +57,7 @@ echo "+  set up working dir (tranSMART install base) "
 echo "++++++++++++++++++++++++++++"
 
 if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
+export $INSTALL_BASE
 
 if ! [ -d "$INSTALL_BASE" ] ; then
 	mkdir -p "$INSTALL_BASE"

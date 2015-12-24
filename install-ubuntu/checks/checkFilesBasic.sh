@@ -9,7 +9,7 @@ echo "-------------------------------------"
 echo "|  Checking for required files and folders from basic set up"
 echo "-------------------------------------"
 
-base="$HOME/transmart/transmart-data"
+base="$INSTALL_BASE/transmart-data"
 baseEnv="$base/env"
 baseR="$base/R"
 baseConfig="/usr/share/tomcat7/.grails/transmartConfig"
