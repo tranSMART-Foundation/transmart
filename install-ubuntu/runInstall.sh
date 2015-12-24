@@ -1,6 +1,6 @@
 #!/bin/bash
-sudo apt-get -qq update
-sudo apt-get -qq install -y git
+sudo apt-get -q update
+sudo apt-get -q install -y git
 
 # The location of the install directories
 INSTALL_BASE="$HOME/transmart"

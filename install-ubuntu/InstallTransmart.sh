@@ -75,7 +75,7 @@ sudo -v
 echo "++++++++++++++++++++++++++++"
 echo "+  install make "
 echo "++++++++++++++++++++++++++++"
-sudo apt-get -qq install -y make
+sudo apt-get -q install -y make
 
 echo "++++++++++++++++++++++++++++"
 echo "+  set up the transmart-data folder"
@@ -83,8 +83,8 @@ echo "++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE
 sudo -v
-sudo apt-get -qq install -y curl
-sudo apt-get -qq install -y unzip
+sudo apt-get -q install -y curl
+sudo apt-get -q install -y unzip
 if ! [ -e transmart-data-release-1.2.4.zip ] ; then
 	curl https://codeload.github.com/tranSMART-Foundation/transmart-data/zip/release-1.2.4 -o transmart-data-release-1.2.4.zip
 fi
@@ -164,8 +164,8 @@ echo " "
 
 echo "Finished setting ubuntu dependencies (without root) at $(date)"
 sudo -v
-sudo apt-get -qq install -y ant
-sudo apt-get -qq install -y maven
+sudo apt-get -q install -y ant
+sudo apt-get -q install -y maven
 echo "Finished install of ant and maven at $(date)"
 
 # No longer need to remove this as the make step that creates it is not skipped!
@@ -211,7 +211,7 @@ echo "++++++++++++++++++++++++++++"
 
 sudo -v 
 cd $HOME
-sudo apt-get -qq install -y tomcat7 
+sudo apt-get -q install -y tomcat7 
 sudo service tomcat7 stop
 $SCRIPTS_BASE/Scripts/install-ubuntu/updateTomcatConfig.sh
 
