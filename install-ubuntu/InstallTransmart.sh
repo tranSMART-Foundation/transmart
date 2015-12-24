@@ -58,11 +58,12 @@ echo "++++++++++++++++++++++++++++"
 
 if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
 
-if ! [ -d $HOME/transmart ] ; then
+if ! [ -d "$INSTALL_BASE" ] ; then
 	mkdir -p "$INSTALL_BASE"
 fi
 echo "tranSMART will be installed at this location: $INSTALL_BASE"
 
+# give user option to suppress sudo timeout (see welcome.sh)
 cd $SCRIPTS_BASE/Scripts/install-ubuntu
 source welcome.sh
 
