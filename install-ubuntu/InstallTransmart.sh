@@ -325,7 +325,7 @@ cd $INSTALL_BASE
 sudo -v
 if ! [ -d war-files ]; then
 	mkdir war-files
-if
+fi
 
 cd war-files
 if ! [ -e transmart.war]; then
