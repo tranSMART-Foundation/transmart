@@ -328,10 +328,10 @@ if ! [ -d war-files ]; then
 fi
 
 cd war-files
-if ! [ -e transmart.war]; then
+if ! [ -e transmart.war ]; then
 	curl http://75.124.74.64/wars/transmart.V1.2.4.war --output transmart.war
 fi
-if ! [ -e gwava.war]; then
+if ! [ -e gwava.war ]; then
 	curl http://75.124.74.64/wars/gwava.V1.2.4.war --output gwava.war
 fi
 sudo cp *.war /var/lib/tomcat7/webapps/
