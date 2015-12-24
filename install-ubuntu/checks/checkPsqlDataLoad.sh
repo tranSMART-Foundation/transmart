@@ -8,12 +8,12 @@
 # ******************************************************************************
 
 # special case with no echo (any argument will suppress echoes
-runWithEcho=0
+runWithEcho=1
 if [ -z $1 ] ; then 
-	runWithEcho=-1
+	runWithEcho=0
 fi
 
-if [ "$runWithEcho" -eq 0 ]  ; then
+if [ $runWithEcho -eq 0 ]  ; then
 	echo "-------------------------------------"
 	echo "|  Checking for transmart database access: "
 	echo "|    does 'biomart' use exist "
