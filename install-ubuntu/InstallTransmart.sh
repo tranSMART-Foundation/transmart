@@ -360,7 +360,7 @@ echo "++++++++++++++++++++++++++++"
 
 sudo -v
 cd $SCRIPTS_BASE/Scripts/install-ubuntu
-sudo -u tomcat7 bash ./runRServe.sh
+sudo -u tomcat7 bash -c "INSTALL_BASE=\"$INSTALL_BASE\" ./runRServe.sh"
 #sudo service rserve start - is not working - not sure why
 echo "Finished starting RServe at $(date)"
 
