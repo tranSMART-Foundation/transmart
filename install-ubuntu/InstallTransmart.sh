@@ -323,10 +323,17 @@ echo "++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE
 sudo -v
-mkdir war-files
+if ! [ -d war-files ]; then
+	mkdir war-files
+if
+
 cd war-files
-curl http://75.124.74.64/wars/transmart.V1.2.4.war --output transmart.war
-curl http://75.124.74.64/wars/gwava.V1.2.4.war --output gwava.war
+if ! [ -e transmart.war]; then
+	curl http://75.124.74.64/wars/transmart.V1.2.4.war --output transmart.war
+fi
+if ! [ -e gwava.war]; then
+	curl http://75.124.74.64/wars/gwava.V1.2.4.war --output gwava.war
+fi
 sudo cp *.war /var/lib/tomcat7/webapps/
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
