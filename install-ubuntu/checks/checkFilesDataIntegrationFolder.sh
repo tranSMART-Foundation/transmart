@@ -13,7 +13,6 @@ echo "-------------------------------------"
 echo "|  Checking for $filepath"
 echo "-------------------------------------"
 
-
 returnValue=0
 
 if [ ! -e "$filepath" ]; then
@@ -22,5 +21,6 @@ if [ ! -e "$filepath" ]; then
 	echo "  in the 'buildEnv' step of the install; repeat that step"
 	returnValue=1
 fi
+echo "data-integration folder found at: $filepath"
 
 exit $returnValue

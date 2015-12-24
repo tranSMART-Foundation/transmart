@@ -22,5 +22,6 @@ if [ ! -e "$filepath" ]; then
 	echo "  in the 'buildEnv' step of the install; repeat that step"
 	returnValue=1
 fi
+echo "tranSMART-ETL folder found at: $filepath"
 
 exit $returnValue
