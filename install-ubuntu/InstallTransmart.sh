@@ -358,6 +358,8 @@ echo "++++++++++++++++++++++++++++"
 echo "+  start Rserve"
 echo "++++++++++++++++++++++++++++"
 
+# the (commented out) service command is the correct way to do this
+# and unfortunately, this does not work either.
 sudo -v
 cd $SCRIPTS_BASE/Scripts/install-ubuntu
 sudo -u tomcat7 bash -c "INSTALL_BASE=\"$INSTALL_BASE\" ./runRServe.sh"
