@@ -375,11 +375,11 @@ echo "++++++++++++++++++++++++++++"
 
 sudo service tomcat7 restart
 echo "Finished starting Tomcat7 at $(date)"
-echo "Sleeping - waiting for tomcat/transmart to start (3 minutes)
+echo "Sleeping - waiting for tomcat/transmart to start (3 minutes)"
 sleep 3m
 
 echo "++++++++++++++++++++++++++++"
-echo "+ Done with install - making final checks (may take a while)"
+echo "+ Done with install - making final checks - (may take a while)"
 echo "++++++++++++++++++++++++++++"
 
 set e+
