@@ -12,6 +12,10 @@ package fr.sanofi.fcl4transmart.handlers;
 
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.FileStore;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -34,14 +38,18 @@ import fr.sanofi.fcl4transmart.controllers.StudySelectionController;
 /**
  *This class controls the window to see database and workspace free disk space, called from menu
  */	
+@SuppressWarnings("restriction")
 public class SpaceHandler {
 	private boolean isSearching;
+	private boolean isOracle;
 	private File workspace;
 	private String total;
 	private String free;
+	private String sqlMessage = "connection failed";
 	private double percent;
-	private boolean testMeta;
+	private boolean testCon;
 	private Vector<String> names;
+	private Vector<String> locPath;
 	private Vector<Double> totalDb;
 	private Vector<Double> freeDb;
 	private Vector<Double> percentDb;
@@ -61,9 +69,11 @@ public class SpaceHandler {
 		this.isSearching=true;
 		this.workspace=StudySelectionController.getWorkspace();
 		this.names=new Vector<String>();
+		this.locPath=new Vector<String>();
 		this.totalDb=new Vector<Double>();
 		this.freeDb=new Vector<Double>();
 		this.percentDb=new Vector<Double>();
+                isOracle = RetrieveData.isOracle();
 		new Thread(){
 			public void run() {
 				if(workspace!=null){
@@ -71,41 +81,76 @@ public class SpaceHandler {
 					free=String.valueOf(workspace.getFreeSpace()/1024/1024);
 					percent=100.0-((Double.longBitsToDouble(workspace.getFreeSpace())/Double.longBitsToDouble(workspace.getTotalSpace()))*100.0);
 				}
-				testMeta=RetrieveData.testMetadataConnection();
-				if(testMeta){
+				testCon=RetrieveData.testTm_czConnection();
+				if(testCon){
 					try{
-						Class.forName("org.postgresql.Driver");
-						Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getBiomartUser(), PreferencesHandler.getBiomartPwd());
+						Class.forName(RetrieveData.getDriverString());
+						Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
 						Statement stmt=con.createStatement();
-						ResultSet rs=stmt.executeQuery("SELECT df.tablespace_name TABLESPACE, df.total_space TOTAL_SPACE, "+
-										"fs.free_space FREE_SPACE, df.total_space_mb TOTAL_SPACE_MB, "+
-										"(df.total_space_mb - fs.free_space_mb) USED_SPACE_MB, "+
-										"fs.free_space_mb FREE_SPACE_MB, "+
-										"ROUND(100 * (fs.free_space / df.total_space),2) PCT_FREE "+
-										"FROM (SELECT tablespace_name, SUM(bytes) TOTAL_SPACE, "+
-										"ROUND(SUM(bytes) / 1048576) TOTAL_SPACE_MB "+
-										"FROM dba_data_files "+
-										"GROUP BY tablespace_name) df, "+
-										"(SELECT tablespace_name, SUM(bytes) FREE_SPACE, "+
-										"ROUND(SUM(bytes) / 1048576) FREE_SPACE_MB "+
-										"FROM dba_free_space "+
-										"GROUP BY tablespace_name) fs "+
-										"WHERE df.tablespace_name = fs.tablespace_name(+) "+
-										"AND (df.tablespace_name='BIOMART' OR df.tablespace_name='DEAPP' OR df.tablespace_name='I2B2_DATA' OR df.tablespace_name='TRANSMART') "+
-										"ORDER BY fs.tablespace_name");
-						while(rs.next()){
+                                                ResultSet rs;
 
-							names.add(rs.getString("TABLESPACE"));
-							totalDb.add(rs.getDouble("TOTAL_SPACE_MB"));
-							freeDb.add(rs.getDouble("FREE_SPACE_MB"));
-							percentDb.add((rs.getDouble("USED_SPACE_MB")/rs.getDouble("TOTAL_SPACE_MB"))*100);
+                                                // SQL is database-specific
+                                                // note TABLESPACE and LOCATION are reserved words in postgres
+                                                if(isOracle) {
+							rs=stmt.executeQuery("SELECT df.tablespace_name SPACENAME, df.total_space TOTAL1_SPACE, "+
+                                                                             "fs.free_space FREE_SPACE, df.total_space_mb TOTAL_SPACE_MB, "+
+                                                                             "(df.total_space_mb - fs.free_space_mb) USED_SPACE_MB, "+
+                                                                             "fs.free_space_mb FREE_SPACE_MB, "+
+                                                                             "ROUND(100 * (fs.free_space / df.total_space),2) PCT_FREE "+
+                                                                             "FROM (SELECT tablespace_name, SUM(bytes) TOTAL_SPACE, "+
+                                                                             "ROUND(SUM(bytes) / 1048576) TOTAL_SPACE_MB "+
+                                                                             "FROM dba_data_files "+
+                                                                             "GROUP BY tablespace_name) df, "+
+                                                                             "(SELECT tablespace_name, SUM(bytes) FREE_SPACE, "+
+                                                                             "ROUND(SUM(bytes) / 1048576) FREE_SPACE_MB "+
+                                                                             "FROM dba_free_space "+
+                                                                             "GROUP BY tablespace_name) fs "+
+                                                                             "WHERE df.tablespace_name = fs.tablespace_name(+) "+
+                                                                             "AND df.tablespace_name IN ('BIOMART', 'DEAPP', 'FMAPP', 'I2B2_DATA', 'INDX', 'TRANSMART') "+
+                                                                             "ORDER BY fs.tablespace_name");
+                                                }
+                                                else 
+                                                {
+							// Postgres tablespace is a directory on disks with symlinks
+							// so there is no meaningful and reliable free space measure
+							rs=stmt.executeQuery("SELECT ts.spcname SPACENAME, "+
+                                                                             "pg_tablespace_size(ts.spcname) TOTAL_SPACE, "+
+                                                                             "pg_tablespace_location(ts.oid) LOCPATH, "+
+                                                                             "ROUND(pg_tablespace_size(ts.spcname)/1048576) TOTAL_SPACE_MB "+
+                                                                             "from pg_tablespace ts "+
+                                                                             "WHERE ts.spcname IN ('biomart', 'deapp', 'fmapp', 'i2b2_data', 'indx', 'transmart') "+
+                                                                             "ORDER BY ts.spcname");
+                                                }
+
+						while(rs.next()){
+							names.add(rs.getString("SPACENAME"));
+							double totalSpace = rs.getDouble("TOTAL_SPACE_MB");
+                                                        totalDb.add(totalSpace);
+                                                        if(isOracle) {
+                                                            freeDb.add(rs.getDouble("FREE_SPACE_MB"));
+                                                            percentDb.add((rs.getDouble("USED_SPACE_MB")/rs.getDouble("TOTAL_SPACE_MB"))*100.0);
+                                                        } else {
+                                                            String locPathStr = rs.getString("LOCPATH");
+                                                            locPath.add(locPathStr);
+                                                            String pathStr = Paths.get(locPathStr).toString();
+                                                            FileStore fs = Files.getFileStore(Paths.get(locPathStr));
+                                                            long fsUsableSpace = fs.getUsableSpace()/1048576;
+                                                            long fsTotalSpace = fs.getTotalSpace()/1048576;
+                                                            freeDb.add((double)fsUsableSpace);
+                                                            percentDb.add(100*fsUsableSpace/(fsUsableSpace+totalSpace));
+                                                        }
+                                                        
 						}
 						
 						con.close();
 						
 					}
 					catch(SQLException e){
-						e.printStackTrace();
+						e.printStackTrace();                                          
+						sqlMessage = e.getLocalizedMessage();
+                                                testCon = false;
+					} catch (IOException e) {
+                                                e.printStackTrace();
 					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
 					}		
@@ -121,9 +166,9 @@ public class SpaceHandler {
         loadingShell.close();
         
 		Shell shell=new Shell(SWT.TITLE|SWT.SYSTEM_MODAL| SWT.CLOSE | SWT.MAX);
-	    shell.setSize(500,400);
-	    shell.setText("Free space");
-	    gridLayout=new GridLayout();
+                shell.setSize(500,400);
+                shell.setText("Free space");
+                gridLayout=new GridLayout();
 		gridLayout.numColumns=1;
 		shell.setLayout(gridLayout);
 		
@@ -186,9 +231,9 @@ public class SpaceHandler {
 		gridLayout.horizontalSpacing=5;
 		gridLayout.verticalSpacing=5;
 		dbPart.setLayout(gridLayout);
-		if(!this.testMeta){
+		if(!this.testCon){
 			Label warn=new Label(dbPart, SWT.NONE);
-			warn.setText("Connection to database is not possible");
+			warn.setText("Connection to database is not possible:\n"+sqlMessage);
 		}
 		else{
 			Label dbName=new Label(dbPart, SWT.NONE);
@@ -196,41 +241,45 @@ public class SpaceHandler {
 			Composite dbSpacePart=new Composite(dbPart, SWT.NONE);
 			dbSpacePart.setLayoutData(new GridData(GridData.FILL_BOTH));
 			gridLayout=new GridLayout();
-			gridLayout.numColumns=5;
-			gridLayout.horizontalSpacing=5;
-			gridLayout.verticalSpacing=5;
+                        if(isOracle) {
+                            gridLayout.numColumns=5;
+                        }
+                        else {
+                            gridLayout.numColumns=5;
+                        }
+                        gridLayout.horizontalSpacing=5;
+                        gridLayout.verticalSpacing=5;
 			dbSpacePart.setLayout(gridLayout);
 			
 			Label l1=new Label(dbSpacePart, SWT.NONE);
 			l1.setText("Tablespace");
 			Label l2=new Label(dbSpacePart, SWT.NONE);
 			l2.setText("Total space");
-			Label l3=new Label(dbSpacePart, SWT.NONE);
-			l3.setText("Free space");
-			Label l4=new Label(dbSpacePart, SWT.NONE);
-			l4.setText("Percent of free space");
-			Label l5=new Label(dbSpacePart, SWT.NONE);
-			l5.setText("");
-			
+                        Label l3=new Label(dbSpacePart, SWT.NONE);
+                        l3.setText("Free space");
+                        Label l4=new Label(dbSpacePart, SWT.NONE);
+                        l4.setText("Percent of free space");
+                        Label l5=new Label(dbSpacePart, SWT.NONE);
+                        l5.setText("");
+                        
 			for(int i=0; i<this.names.size(); i++){
 				Label name=new Label(dbSpacePart, SWT.NONE);
 				name.setText(this.names.get(i));
 				Label total=new Label(dbSpacePart, SWT.NONE);
 				total.setText(String.valueOf(this.totalDb.get(i))+" Mb");
-				Label free=new Label(dbSpacePart, SWT.NONE);
-				free.setText(String.valueOf(this.freeDb.get(i))+" Mb");
-				double percent=this.percentDb.get(i);
-				ProgressBar bar=new ProgressBar(dbSpacePart, SWT.SMOOTH);
-				bar.setMinimum(0);
-				bar.setMaximum(100);					
-				bar.setSelection((int)percent);
-				Label percentStr=new Label(dbSpacePart, SWT.NONE);
-				DecimalFormat format=new DecimalFormat("#.##");
-				percentStr.setText(format.format(percent)+"%");
+                                Label free=new Label(dbSpacePart, SWT.NONE);
+                                free.setText(String.valueOf(this.freeDb.get(i))+" Mb");
+                                double percent=this.percentDb.get(i);
+                                ProgressBar bar=new ProgressBar(dbSpacePart, SWT.SMOOTH);
+                                bar.setMinimum(0);
+                                bar.setMaximum(100);					
+                                bar.setSelection((int)percent);
+                                Label percentStr=new Label(dbSpacePart, SWT.NONE);
+                                DecimalFormat format=new DecimalFormat("#.##");
+                                percentStr.setText(format.format(percent)+"%");
 			}
-			
+
 		}
-		
 		shell.open();
 	}
 }

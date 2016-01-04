@@ -16,18 +16,21 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.swt.widgets.Listener;
 import org.pentaho.di.job.Job;
 
 import fr.sanofi.fcl4transmart.controllers.LoadDataListener;
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.handlers.etlPreferences;
 import fr.sanofi.fcl4transmart.model.classes.dataType.GeneExpressionData;
 import fr.sanofi.fcl4transmart.model.classes.dataType.HDDData;
 import fr.sanofi.fcl4transmart.model.classes.workUI.geneExpression.GeneExpressionLoadDataUI;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
+
 /**
  *This class controls the gene expression data loading step
  */	
@@ -38,7 +41,6 @@ public class LoadGeneExpressionDataListener extends LoadDataListener implements 
 	private boolean indexes;
 	public LoadGeneExpressionDataListener(GeneExpressionLoadDataUI loadDataUI, DataTypeItf dataType){
 		super(loadDataUI, dataType);
-
 	}
 	@Override
 	protected void setParameters() {
@@ -73,6 +75,8 @@ public class LoadGeneExpressionDataListener extends LoadDataListener implements 
 		//find the other files needed for this job and put them in the cache
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/validate_gene_expression_params.ktr");
 		jobUrl = FileLocator.toFileURL(jobUrl); 
+		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/validate_gene_inc_expression_params.ktr");
+		jobUrl = FileLocator.toFileURL(jobUrl); 
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/validate_gene_expression_columns.ktr");
 		jobUrl = FileLocator.toFileURL(jobUrl); 
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/check_gene_expression_filenames.ktr");
@@ -92,9 +96,33 @@ public class LoadGeneExpressionDataListener extends LoadDataListener implements 
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/validate_gene_expression_columns.ktr");
 		jobUrl = FileLocator.toFileURL(jobUrl); 
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/load_gene_expression_data_to_lz.ktr");
-		jobUrl = FileLocator.toFileURL(jobUrl); 
+                jobUrl = FileLocator.toFileURL(jobUrl); 
+
+		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/validate_gene_inc_expression_columns.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/check_gene_inc_expression_filenames.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/load_all_gene_inc_expression_files_for_study.kjb");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/run_i2b2_process_mrna_data_inc.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/load_inc_subject_sample_map_to_lt.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/get_list_of_gene_inc_expression_filenames.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/load_gene_inc_expression_one_study.kjb");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/set_gene_inc_expression_filename.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/validate_gene_inc_expression_columns.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+                jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/load_gene_inc_expression_data_to_lz.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
+
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/pivot_gene_file.ktr");
 		jobUrl = FileLocator.toFileURL(jobUrl); 
+		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/pivot_gene_inc_file.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/cz_end_audit.ktr");
 		jobUrl = FileLocator.toFileURL(jobUrl); 
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/cz_start_audit.ktr");
@@ -105,6 +133,8 @@ public class LoadGeneExpressionDataListener extends LoadDataListener implements 
 		jobUrl = FileLocator.toFileURL(jobUrl); 
 		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/write_gene_expression_audit.ktr");
 		jobUrl = FileLocator.toFileURL(jobUrl); 
+		jobUrl = new URL("platform:/plugin/fr.sanofi.fcl4transmart/jobs_kettle/write_gene_inc_expression_audit.ktr");
+                jobUrl = FileLocator.toFileURL(jobUrl);
 		
 		return jobPath;
 	}
@@ -164,8 +194,8 @@ public class LoadGeneExpressionDataListener extends LoadDataListener implements 
 	protected void preLoading() throws Exception{
 		if(indexes){
 			//drop indexes
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
+			String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
 			
 			String sql = "{call i2b2_mrna_index_maint(?)}";
 			CallableStatement call = con.prepareCall(sql);
@@ -181,8 +211,8 @@ public class LoadGeneExpressionDataListener extends LoadDataListener implements 
 
 		if(indexes){
 			//add indexes
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
+			String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
 			
 			String sql =  "begin i2b2_mrna_index_maint(?); end;" ; // stored proc
 			CallableStatement call = con.prepareCall(sql);

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
+
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -38,6 +39,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
 import fr.sanofi.fcl4transmart.controllers.FileHandler;
 import fr.sanofi.fcl4transmart.controllers.StudyTreeController;
 import fr.sanofi.fcl4transmart.controllers.listeners.clinicalData.SetStudyTreeListener;
@@ -48,6 +50,7 @@ import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 import fr.sanofi.fcl4transmart.model.interfaces.WorkItf;
 import fr.sanofi.fcl4transmart.ui.parts.WorkPart;
+
 /**
  *This class allows the creation of the composite to set study tree for clinical data
  */
@@ -281,7 +284,7 @@ public class SetStudyTreeUI implements WorkItf{
 			}
 		});	
 		this.listViewer.setInput(this.labels.get(this.chooseFile.getText()));
-		
+
 		Button addLabel=new Button(leftPart, SWT.PUSH);
 		gridData=new GridData();
 		gridData.widthHint=150;
@@ -483,14 +486,12 @@ public class SetStudyTreeUI implements WorkItf{
 	@Override
 	public void paste(Vector<Vector<String>> data) {
 		// nothing to do
-		
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
 		// nothing to do
-		
 	}
-	
+
 	public Vector<String> sort(Set<String> sort) {
         Vector<String> v = new Vector<String>();
         for(String s: sort) {

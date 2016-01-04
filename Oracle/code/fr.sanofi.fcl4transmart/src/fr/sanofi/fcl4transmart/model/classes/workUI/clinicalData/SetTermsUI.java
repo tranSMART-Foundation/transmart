@@ -331,7 +331,6 @@ public class SetTermsUI implements WorkItf{
 								break;
 							}
 						}
-				
 					}
 				}
 			}

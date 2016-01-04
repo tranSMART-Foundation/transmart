@@ -15,6 +15,7 @@ import org.eclipse.e4.ui.workbench.IWorkbench;
 /**
  *This class controls the exit menu item
  */	
+@SuppressWarnings("restriction")
 public class ExitHandler {
 	@Execute
 	public void execute(IWorkbench workbench) {

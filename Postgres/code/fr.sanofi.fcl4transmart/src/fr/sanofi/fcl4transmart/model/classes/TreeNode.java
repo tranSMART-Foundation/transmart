@@ -25,14 +25,14 @@ public class TreeNode {
 	TreeNode parent;
 	private boolean isLabel;
 	private boolean isStudyRoot;
-	//private boolean isOperation;
+	private boolean isOperation;
 	public TreeNode(String name, TreeNode parent, boolean isLabel){
 		this.name=name;
 		this.parent=parent;
 		this.children=new Vector<TreeNode>();
 		this.isLabel=isLabel;
 		this.isStudyRoot=false;
-		//this.isOperation=false;
+		this.isOperation=false;
 	}
 	public void addChild(TreeNode child){
 		this.children.add(child);
@@ -72,10 +72,10 @@ public class TreeNode {
 	public void setName(String name){
 		this.name=name;
 	}
-	/*public void setIsOperation(boolean bool){
+	public void setIsOperation(boolean bool){
 		this.isOperation=bool;
 	}
 	public boolean isOperation(){
 		return this.isOperation;
-	}*/
+	}
 }

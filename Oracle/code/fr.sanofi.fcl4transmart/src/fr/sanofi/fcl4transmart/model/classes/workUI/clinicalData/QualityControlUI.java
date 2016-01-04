@@ -13,7 +13,6 @@ package fr.sanofi.fcl4transmart.model.classes.workUI.clinicalData;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Vector;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.GridData;
@@ -416,7 +415,6 @@ public class QualityControlUI implements WorkItf{
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
 		// nothing to do
-		
 	}
 	
 	public Vector<String> sort(Vector<String> sort) {

@@ -175,7 +175,6 @@ public class SetTopNodeUI implements WorkItf{
 		addChild.addListener(SWT.Selection, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
-				// TODO Auto-generated method stub
 				IStructuredSelection selection=(IStructuredSelection)viewer.getSelection();
 				TreeNode node;
 				if(selection.iterator().hasNext()){
@@ -220,7 +219,6 @@ public class SetTopNodeUI implements WorkItf{
 		addLabel.addListener(SWT.Selection, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
-				// TODO Auto-generated method stub
 				IStructuredSelection selection=(IStructuredSelection)viewer.getSelection();
 				TreeNode node;
 				if(selection.iterator().hasNext()){
@@ -336,17 +334,14 @@ public class SetTopNodeUI implements WorkItf{
 	}
 	@Override
 	public Vector<Vector<String>> copy() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public void paste(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 }

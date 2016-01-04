@@ -27,6 +27,7 @@ import fr.sanofi.fcl4transmart.model.interfaces.StepItf;
 /**
  *This class handles the work part
  */
+@SuppressWarnings("restriction")
 public class WorkPart {
 	private WorkPartController workPartController;
 	@Inject private static IEventBroker eventBroker;
@@ -82,13 +83,14 @@ public class WorkPart {
 				}
 			}
 		}
-		
 		if(child!=null && !hasChild){
 			this.child=child;
 			GridData data = new GridData(GridData.FILL_BOTH);	    
 			data.horizontalSpan = 1;	    
 			this.child.setLayoutData(data);		    
 			this.parent.layout(true, true);
+		}else{
+			child.dispose();
 		}
 	}
 	/**
@@ -103,13 +105,13 @@ public class WorkPart {
 	public static void updateFiles(){
 		eventBroker.send("fileUpdated/syncEvent", "");
 	}
-	public static void addFiles(DataTypeItf selectedDataType){
-		eventBroker.send("filesChanged/syncEvent",selectedDataType);
-	}
 	public static void updateAll(){
 		eventBroker.send("preferencesChanged/syncEvent", "Preferences changed");
 	}
 	public static Display display(){
 		return display;
+	}
+	public static void filesChanged(DataTypeItf dataType){
+		eventBroker.send("filesChanged/syncEvent", dataType);
 	}
 }

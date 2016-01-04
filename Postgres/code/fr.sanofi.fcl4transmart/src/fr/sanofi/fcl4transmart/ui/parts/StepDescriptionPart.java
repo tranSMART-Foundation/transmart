@@ -24,6 +24,7 @@ import fr.sanofi.fcl4transmart.model.interfaces.StepItf;
 /**
  *This class handles the step description part
  */
+@SuppressWarnings("restriction")
 public class StepDescriptionPart {
 	private Text text;
 	private StepDescriptionController stepDescriptionController;

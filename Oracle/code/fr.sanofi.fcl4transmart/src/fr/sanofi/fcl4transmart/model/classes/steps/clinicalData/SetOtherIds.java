@@ -34,7 +34,7 @@ public class SetOtherIds implements StepItf{
 	}
 	public String getDescription(){
 		return "This optional step allows choosing the column corresponding to site and visit identifiers.\n"+
-				"If a column mapping file is already existing, the identifiers are retrieved in this file and given as parameters by default";
+				"If a column mapping file already exists, the identifiers are retrieved from this file and given as parameters by default";
 	}
 	public boolean isAvailable(){
 		try{

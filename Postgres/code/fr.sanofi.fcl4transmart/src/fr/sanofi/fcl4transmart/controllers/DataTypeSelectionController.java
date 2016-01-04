@@ -11,6 +11,8 @@
 package fr.sanofi.fcl4transmart.controllers;
 
 import java.util.Vector;
+
+import fr.sanofi.fcl4transmart.model.classes.dataType.FilesTransfer;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 import fr.sanofi.fcl4transmart.model.interfaces.StudyItf;
 import fr.sanofi.fcl4transmart.ui.parts.DataTypeSelectionPart;
@@ -25,6 +27,7 @@ public class DataTypeSelectionController {
 		this.otherDataTypes=new Vector<DataTypeItf>();
 		
 		//add data types not linked to studies
+		this.otherDataTypes.add(new FilesTransfer());
 		
 		this.dataTypeSelectionPart.setList(this.otherDataTypes);
 	}

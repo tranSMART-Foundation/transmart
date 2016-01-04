@@ -27,12 +27,14 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
 import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.controllers.listeners.description.LoadDescriptionListener;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.model.interfaces.StudyItf;
 import fr.sanofi.fcl4transmart.model.interfaces.WorkItf;
 import fr.sanofi.fcl4transmart.ui.parts.WorkPart;
+
 /**
  *This class allows the creation of the composite to load the study description
  */
@@ -404,11 +406,9 @@ public class LoadDescriptionUI implements WorkItf{
 	@Override
 	public void paste(Vector<Vector<String>> data) {
 		// nothing to do
-		
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
 		// nothing to do
-		
 	}
 }

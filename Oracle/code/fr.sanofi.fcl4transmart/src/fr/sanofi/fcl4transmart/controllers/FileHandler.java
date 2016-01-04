@@ -419,6 +419,9 @@ public class FileHandler {
 		return dataLabels;
 	}
 	
+	/**
+	 *Returns a vector with all data labels, and if there is a data label source a string with "DATA_LABEL:<data_label_source>"
+	 */	
 	public static Vector<String> getDataLabelsForQC(File cmf, File rawFile){
 		Vector<String> dataLabels=new Vector<String>();
 		HashMap<String, String> dataLabelSources=new HashMap<String, String>();
@@ -1036,6 +1039,7 @@ public class FileHandler {
 			return null;
 		}	
 	}
+
 	/**
 	 *Returns a hashmap with sample and intensity value for a given probe in a gene raw data file. Used for gene expression QC.
 	 */	

@@ -35,6 +35,7 @@ import org.eclipse.jface.viewers.TableViewer;
 /**
  *This class handles the step selection part
  */
+@SuppressWarnings("restriction")
 public class StepSelectionPart {
 	private TableViewer viewer;
 	private StepSelectionController stepSelectionController;
@@ -89,7 +90,7 @@ public class StepSelectionPart {
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
+				// nothing to do
 				
 			}
 		});

@@ -26,7 +26,9 @@ public class WorkPartController {
 	 *Changes the work part to fit to the selected step
 	 */	
 	public void selectionChanged(StepItf selectedStep, Composite parent){
+		if(selectedStep.getWorkUI()!=null){
 		  Composite composite=selectedStep.getWorkUI().createUI(parent);
-		  this.workPart.changeChild(composite);
+		  if(composite!=null)this.workPart.changeChild(composite);
+                }
 	}
 }

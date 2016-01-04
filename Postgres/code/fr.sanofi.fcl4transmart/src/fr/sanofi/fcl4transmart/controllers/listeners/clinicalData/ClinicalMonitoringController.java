@@ -21,6 +21,7 @@ import java.sql.Statement;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
@@ -46,13 +47,13 @@ public class ClinicalMonitoringController {
 		
 	}
 	/**
-	 * Parses the log file to know if the Kettle job succeed
+	 * Parses the log file to know if the Kettle job succeeded
 	 */
 	public boolean kettleSucceed(){
 		if(this.logFile!=null){
 			try{
 				BufferedReader br = new BufferedReader(new FileReader(this.logFile));
-				Pattern pattern=Pattern.compile(".*\\[run i2b2_load_clinical_data\\] \\(.*=\\[true\\]\\)");
+				Pattern pattern=Pattern.compile(".*\\[run i2b2_load_clinical(_inc)?_data\\] \\(.*=\\[true\\]\\)");
 				String line="";
 				while ((line=br.readLine())!=null){
 					Matcher matcher=pattern.matcher(line);
@@ -69,19 +70,19 @@ public class ClinicalMonitoringController {
 		return false;
 	}
 	/**
-	 * Looks at the database to check if errors happened during stored procedure, returns the oracle error code if needed
+	 * Looks at the database to check if errors happened during stored procedure,
+         * returns the procedure error code if needed
 	 */
 	public String proceduresError(){
 		String procedureErrors="";
 		try{
 			try {
-				Class.forName("org.postgresql.Driver");
+				Class.forName(RetrieveData.getDriverString());
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			String connectionString="jdbc:postgresql://"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+"/"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
+			String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
 			Statement stmt = con.createStatement();
 
 			int jobId=-1;
@@ -89,12 +90,15 @@ public class ClinicalMonitoringController {
 				try{
 					BufferedReader br = new BufferedReader(new FileReader(this.logFile));
 					String line;
+                                        //Need jobid pattern for postgres
 					while ((line=br.readLine())!=null){
-						if(line.compareTo("Oracle job id:")==0){
+						Pattern pattern = Pattern.compile(".*Job ID: (.*?)");
+						Matcher matcher = pattern.matcher(line);
+						if (matcher.find())
+						{
 							try{
-								jobId=Integer.parseInt(br.readLine());
-							}
-							catch(Exception e){
+								jobId=Integer.parseInt(matcher.group(1));
+							}catch(Exception e){
 								br.close();
 								return "";
 							}
@@ -116,8 +120,6 @@ public class ClinicalMonitoringController {
 					"(select STEP_DESC from CZ_JOB_AUDIT where STEP_STATUS='FAIL' and JOB_ID="+String.valueOf(jobId)+")");
 			if(rs.next()){
 				procedureErrors=rs.getString("STEP_DESC");
-				//con.close();
-				//return procedureErrors;
 			}
 	
 			rs=stmt.executeQuery("select ERROR_MESSAGE from CZ_JOB_ERROR where JOB_ID="+String.valueOf(jobId));

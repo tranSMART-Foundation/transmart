@@ -46,7 +46,7 @@ public class Monitoring implements StepItf{
 			if(((GeneExpressionData)this.dataType).getRawFiles()==null || ((GeneExpressionData)this.dataType).getRawFiles().size()==0){
 				return false;
 			}
-			File stsmf=((GeneExpressionData)this.dataType).getStsmf();
+			File stsmf=((GeneExpressionData)this.dataType).getMappingFile();
 			if(stsmf==null){
 				return false;
 			}

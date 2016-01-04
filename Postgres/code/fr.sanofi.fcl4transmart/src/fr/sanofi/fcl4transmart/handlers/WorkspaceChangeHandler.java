@@ -17,6 +17,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 /**
  *This class controls the menu item to change workspace
  */	
+@SuppressWarnings("restriction")
 public class WorkspaceChangeHandler {
 	@Inject private static IEventBroker eventBroker;
 	@Execute

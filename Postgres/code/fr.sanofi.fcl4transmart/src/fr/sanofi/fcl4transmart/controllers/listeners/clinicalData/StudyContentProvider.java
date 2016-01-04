@@ -22,19 +22,16 @@ public class StudyContentProvider implements ITreeContentProvider{
 	private StudyTree studyTree;
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		// TODO Auto-generated method stub
 		this.studyTree=(StudyTree)newInput;	
 	}
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		// TODO Auto-generated method stub
 		return this.studyTree.getRootToArray();
 	}
 
@@ -45,7 +42,6 @@ public class StudyContentProvider implements ITreeContentProvider{
 
 	@Override
 	public Object getParent(Object element) {
-		// TODO Auto-generated method stub
 		return ((TreeNode)element).getParent();
 	}
 

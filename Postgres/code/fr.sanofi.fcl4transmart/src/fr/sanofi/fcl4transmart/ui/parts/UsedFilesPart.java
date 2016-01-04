@@ -32,6 +32,7 @@ import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 /**
  *This class handles the file viewer list part
  */
+@SuppressWarnings("restriction")
 public class UsedFilesPart {
 	private ListViewer viewer;
 	private UsedFilesController usedFilesController;
@@ -58,13 +59,13 @@ public class UsedFilesPart {
 			}
 
 			public void dispose() {
-				// TODO Auto-generated method stub
+				// nothing to do
 				
 			}
 
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
-				// TODO Auto-generated method stub
+				// nothing to do
 				
 			}
 		});	
@@ -76,7 +77,7 @@ public class UsedFilesPart {
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
+				// nothing to do
 				
 			}
 		});

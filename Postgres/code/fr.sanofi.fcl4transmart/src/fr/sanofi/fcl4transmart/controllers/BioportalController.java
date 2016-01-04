@@ -49,7 +49,8 @@ import fr.sanofi.fcl4transmart.model.classes.Auth;
 import fr.sanofi.fcl4transmart.ui.parts.WorkPart;
 
 /**
- * This class allows opening a shell for Bioportal search, and get a set with term and code of an ontology item
+ * This class allows opening a shell for Bioportal search,
+ * and gets a set with term and code of an ontology item
  */
 public class BioportalController {
 	private static Shell shell;
@@ -62,8 +63,9 @@ public class BioportalController {
 	private static String[] toReturn;
 	private static boolean isSearching;
 	private static boolean test;
+
 	/**
-	 * Test if connexion to Bioportal webservice is available
+	 * Test if connection to Bioportal webservice is available
 	 */
 	public static boolean testBioportalConnection(){
 		Shell shell=new Shell();
@@ -114,7 +116,6 @@ public class BioportalController {
 					e.printStackTrace();
 					test=false;
 				}
-
 				isSearching=false;
 			}
 	    }.start();
@@ -127,8 +128,10 @@ public class BioportalController {
 	    shell.close();
 	    return test;
 	}
+
 	/**
-	 * Create the search shell, and return the term and code of a selected ontology item under the form of an array with two potentially null strings
+	 * Create the search shell, and return the term and code of a selected ontology item
+         * as an array with two potentially null strings
 	 */
 	public static String[] getTerms(){
 		toReturn=new String[2];
@@ -279,8 +282,10 @@ public class BioportalController {
 
 		return toReturn;
 	}
+
 	/**
-	 * Search all available ontologies in Bioportal and returns a HashMap with ontology name as key and ontology identifier as value
+	 * Search all available ontologies in Bioportal and return a HashMap
+         * with ontology name as key and ontology identifier as value
 	 */	
 	public static HashMap<String, String> getOntologies(){
 		HashMap<String, String> ontologies=new HashMap<String, String>();
@@ -317,17 +322,17 @@ public class BioportalController {
 				}
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
 		return ontologies;
 	}
+
 	/**
 	 * Create the columns of the table viewer
 	 */
 	private static void createColumns() {
-		String[] titles = { "Term", "Code", "Ontology", "Ontology version", "Synonyme", "Obsolete" };
+		String[] titles = { "Term", "Code", "Ontology", "Ontology version", "Synonym", "Obsolete" };
 		int[] bounds = { 100, 100, 100, 100, 100, 100 };
 
 		TableViewerColumn col = createTableViewerColumn(titles[0], bounds[0], 0);
@@ -370,7 +375,7 @@ public class BioportalController {
 			@Override
 			public String getText(Object element) {
 				OntologyTerm o = (OntologyTerm) element;
-				return o.getSynonyme();
+				return o.getSynonym();
 			}
 		});
 		
@@ -384,6 +389,7 @@ public class BioportalController {
 		});
 
 	}
+
 	/**
 	 * Create a column for the table viewer - called by the method createColumns()
 	 */
@@ -397,6 +403,7 @@ public class BioportalController {
 		column.setMoveable(true);
 		return viewerColumn;
 	}
+
 	/**
 	 * Search all terms for a given search, and fill a list with corresponding objects OntologyTerm
 	 */
@@ -427,7 +434,7 @@ public class BioportalController {
 				doc.getElementsByTagName("success");
 				NodeList listOfSearchResults = doc.getElementsByTagName("searchBean");
 				for(int s=0; s<listOfSearchResults.getLength(); s++) {
-					String term="", code="", ontology="", ontologyVersion="", synonyme="", obsolete="";
+					String term="", code="", ontology="", ontologyVersion="", synonym="", obsolete="";
 					Node searchBeanNode = listOfSearchResults.item(s);
 					if(searchBeanNode.getNodeType() == Node.ELEMENT_NODE){
 						Element ontologyBeanElements = (Element)searchBeanNode;
@@ -455,10 +462,10 @@ public class BioportalController {
 						ontologyElement = (Element)node.item(0);	
 						if (ontologyElement != null) {
 							if(ontologyElement.getTextContent().compareTo("apreferredname")==0){
-								synonyme="Preferred";
+								synonym="Preferred";
 							}
 							else{
-								synonyme="Synonyme";
+								synonym="Synonym";
 							}
 						}
 						node = ontologyBeanElements.getElementsByTagName("isObsolete");
@@ -472,7 +479,7 @@ public class BioportalController {
 							}
 						}
 					}
-					terms.add(new OntologyTerm(term, code, ontology, ontologyVersion, synonyme, obsolete));
+					terms.add(new OntologyTerm(term, code, ontology, ontologyVersion, synonym, obsolete));
 				}		
 			}catch(Exception e){
 				e.printStackTrace();

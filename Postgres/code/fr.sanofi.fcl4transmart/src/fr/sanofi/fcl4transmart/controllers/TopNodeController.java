@@ -78,7 +78,6 @@ public class TopNodeController {
 						child.setIsStudyTree(true);
 						node.addChild(child);
 						tree.setHasStudy(true);
-						this.dataType.getStudy().setTopNode(pathToAdd);
 					}
 				}
 				else{
@@ -161,14 +160,14 @@ public class TopNodeController {
 			catch(Exception e){
 				e.printStackTrace();
 			}
-			this.dataType.getStudy().setTopNode(topNode);
 		}
 	}
 	/**
 	 *Reads the study top node from a file
 	 */	
 	public static String readTopNode(File file){
-		String line;
+
+                String line;
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			line=br.readLine();

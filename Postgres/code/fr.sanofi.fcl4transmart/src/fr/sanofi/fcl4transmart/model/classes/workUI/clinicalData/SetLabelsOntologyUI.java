@@ -103,10 +103,6 @@ public class SetLabelsOntologyUI implements WorkItf{
 		
 		buttons=new Vector<Button>();
 		for(this.i=0; this.i<this.headers.size(); this.i++){	
-			/*Label title=new Label(part, SWT.NONE);
-			title.setText(this.headers.elementAt(this.i));
-			title.setLayoutData(new GridData(GridData.FILL_BOTH));*/
-			
 			Text title=new Text(part, SWT.BORDER);
 			title.setText(this.headers.elementAt(this.i));
 			title.setEditable(false);
@@ -172,8 +168,7 @@ public class SetLabelsOntologyUI implements WorkItf{
 
 				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
-					// TODO Auto-generated method stub
-					
+					// nothing to do
 				}
 			});
 			buttons.add(ont);

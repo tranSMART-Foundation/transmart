@@ -18,30 +18,34 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import fr.sanofi.fcl4transmart.controllers.FileHandler;
+import fr.sanofi.fcl4transmart.controllers.Utils;
 import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.classes.workUI.clinicalData.SetSubjectsIdUI;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 import fr.sanofi.fcl4transmart.ui.parts.UsedFilesPart;
 import fr.sanofi.fcl4transmart.ui.parts.WorkPart;
+
 /**
  *This class controls the subject identifier step
  */	
 public class SelectIdentifiersListener implements Listener{
 	private SetSubjectsIdUI setSubjectsIdUI;
 	private DataTypeItf dataType;
+    
 	public SelectIdentifiersListener(SetSubjectsIdUI setSubjectsIdUI, DataTypeItf dataType){
 		this.setSubjectsIdUI=setSubjectsIdUI;
 		this.dataType=dataType;
 	}
+
 	@Override
 	public void handleEvent(Event event) {
 		//write in a new file
-		File file=new File(this.dataType.getPath().toString()+File.separator+this.dataType.getStudy().toString()+".columns.tmp");
+		File file = new File(this.dataType.getPath().toString() + File.separator + this.dataType.getStudy().toString()
+                                     + ".columns.tmp");
 		try{
 			 Vector<String> subjectIds=this.setSubjectsIdUI.getSubjectIds();
 			 for(String s: subjectIds){
@@ -65,12 +69,13 @@ public class SelectIdentifiersListener implements Listener{
 			  }
 				if(((ClinicalData)this.dataType).getCMF()==null){
 					out.close();
-					File fileDest=new File(this.dataType.getPath().toString()+File.separator+this.dataType.getStudy().toString()+".columns");
-					FileUtils.moveFile(file, fileDest);
+					File fileDest=new File(this.dataType.getPath().toString() + File.separator
+                                                               + this.dataType.getStudy().toString() + ".columns");
+                                        Utils.copyFile(file, fileDest);
+                                        file.delete();
 					((ClinicalData)this.dataType).setCMF(fileDest);		
 					WorkPart.updateSteps();
-				}
-				else{
+				} else{
 					try{
 						BufferedReader br = new BufferedReader(new FileReader(((ClinicalData)this.dataType).getCMF()));
 						String line=br.readLine();
@@ -91,10 +96,10 @@ public class SelectIdentifiersListener implements Listener{
 						String fileName=((ClinicalData)this.dataType).getCMF().getName();
 						((ClinicalData)this.dataType).getCMF().delete();
 						File fileDest=new File(this.dataType.getPath()+File.separator+fileName);
-						FileUtils.moveFile(file, fileDest);
+                                                Utils.copyFile(file, fileDest);
+                                                file.delete();
 						((ClinicalData)this.dataType).setCMF(fileDest);
-					}
-					catch(IOException ioe){
+					} catch(IOException ioe){
 						this.setSubjectsIdUI.displayMessage("File error: "+ioe.getLocalizedMessage());
 						return;
 					}
@@ -104,7 +109,7 @@ public class SelectIdentifiersListener implements Listener{
 				  this.setSubjectsIdUI.displayMessage("Error: "+e.getLocalizedMessage());
 				  e.printStackTrace();
 			  }
-			//this.setSubjectsIdUI.displayMessage("Column mapping file updated");
+			this.setSubjectsIdUI.displayMessage("Column mapping file updated");
 			this.checkSubjects();
 			WorkPart.updateSteps();
 			WorkPart.updateFiles();

@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  *This class handles the file viewer part
  */
+@SuppressWarnings("restriction")
 public class FilesViewerPart {
 	private Text editor;
 	private File lastFile;

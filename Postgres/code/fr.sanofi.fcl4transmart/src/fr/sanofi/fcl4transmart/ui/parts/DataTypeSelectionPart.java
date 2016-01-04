@@ -35,6 +35,7 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 /**
  *This class handles the data type selection part
  */
+@SuppressWarnings("restriction")
 public class DataTypeSelectionPart {
 	private ListViewer viewer;
 	private DataTypeSelectionController dataTypeSelectionController;
@@ -59,24 +60,18 @@ public class DataTypeSelectionPart {
 				return v.toArray();
 			}
 			public void dispose() {
-				// TODO Auto-generated method stub
+				// nothing to do
 				
 			}
 
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
-				// TODO Auto-generated method stub
+				// nothing to do
 				
 			}
 		});	
 		viewer.setInput(new Vector<DataTypeItf>());
-		/*viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-				selectionService.setSelection(selection.getFirstElement());
-			}
-		});*/
+
 		this.viewer.getList().addSelectionListener(new SelectionListener(){
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -86,7 +81,7 @@ public class DataTypeSelectionPart {
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
+				// nothing to do
 				
 			}
 		});

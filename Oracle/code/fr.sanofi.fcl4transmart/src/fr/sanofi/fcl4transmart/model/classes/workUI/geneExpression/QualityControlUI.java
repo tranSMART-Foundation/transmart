@@ -346,7 +346,6 @@ public class QualityControlUI implements WorkItf{
 			
 			Label eqLabel=new Label(body, SWT.NONE);
 			if(dbValues.containsKey(key) && fileValues.containsKey(key)){
-				
 				if(!rawData && (dbValues.get(key)-fileValues.get(key))<=0.001 && (dbValues.get(key)-fileValues.get(key))>=-0.001){
 					eqLabel.setText("OK");
 					this.c4.add("OK");
@@ -392,7 +391,6 @@ public class QualityControlUI implements WorkItf{
 	@Override
 	public void paste(Vector<Vector<String>> data) {
 		// nothing to do
-		
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {

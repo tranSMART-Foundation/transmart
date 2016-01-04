@@ -169,7 +169,6 @@ public class SetLabelsOntologyUI implements WorkItf{
 				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 					// nothing to do
-					
 				}
 			});
 			buttons.add(ont);

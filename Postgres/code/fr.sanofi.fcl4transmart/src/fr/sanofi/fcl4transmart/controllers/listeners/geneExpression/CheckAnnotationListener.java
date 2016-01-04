@@ -19,29 +19,29 @@ import java.sql.Statement;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
-import fr.sanofi.fcl4transmart.model.classes.workUI.geneExpression.LoadAnnotationUI;
+import fr.sanofi.fcl4transmart.model.classes.workUI.geneExpression.GeneExpressionLoadAnnotationUI;
 /**
  *This class controls the platform annotation checking step
  */	
 public class CheckAnnotationListener implements Listener{
-	private LoadAnnotationUI loadAnnotationUI;
+	private GeneExpressionLoadAnnotationUI loadAnnotationUI;
 	private boolean isLoaded;
 	private String platformId;
-	public CheckAnnotationListener(LoadAnnotationUI loadAnnotationUI){
+	public CheckAnnotationListener(GeneExpressionLoadAnnotationUI loadAnnotationUI){
 		this.loadAnnotationUI=loadAnnotationUI;
 	}
 	@Override
 	public void handleEvent(Event event) {
-		// TODO Auto-generated method stub
 		this.platformId=this.loadAnnotationUI.getPlatformId();
 		this.loadAnnotationUI.openSearchingShell();
 		new Thread(){
 			public void run() {
 				try{
-					Class.forName("org.postgresql.Driver");
-					String connectionString="jdbc:postgresql://"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+"/"+PreferencesHandler.getDbName();
-					Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
+					Class.forName(RetrieveData.getDriverString());
+					String connection=RetrieveData.getConnectionString();
+					Connection con = DriverManager.getConnection(connection, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
 					Statement stmt = con.createStatement();
 				    ResultSet rs = stmt.executeQuery("SELECT distinct platform from de_gpl_info, de_mrna_annotation where platform='"+platformId+"' and gpl_id='"+platformId+"'");
 		

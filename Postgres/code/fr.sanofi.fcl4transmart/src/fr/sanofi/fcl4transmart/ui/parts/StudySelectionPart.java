@@ -45,6 +45,7 @@ import fr.sanofi.fcl4transmart.model.interfaces.StudyItf;
 /**
  *This class handles the study selection part
  */
+@SuppressWarnings("restriction")
 public class StudySelectionPart {
 	private StudySelectionController studySelectionController;
 	private ListViewer viewer;
@@ -78,13 +79,13 @@ public class StudySelectionPart {
 			}
 
 			public void dispose() {
-				// TODO Auto-generated method stub
+				// nothing to do
 				
 			}
 
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
-				// TODO Auto-generated method stub
+				// nothing to do
 				
 			}
 		});	
@@ -99,7 +100,7 @@ public class StudySelectionPart {
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
+				// nothing to do
 				
 			}
 		});
@@ -171,10 +172,8 @@ public class StudySelectionPart {
 	 */
 	@Inject
 	void eventReceived(@Optional @UIEventTopic("newStudy/*") String string) {
-		this.warningMessage("eventReceived '"+string+"'");
 		if(string!=null){
 			if (string.compareTo("new study")==0) {
-				this.warningMessage("calling studyAdded");
 				  this.studySelectionController.studyAdded();
 			  }
 			else if(string.compareTo("new workspace")==0){
@@ -186,6 +185,12 @@ public class StudySelectionPart {
 			else if(string.compareTo("remove study file")==0){
 				this.studySelectionController.removeStudyFile();
 			}
+		}
+	} 
+	@Inject
+	void addStudy(@Optional @UIEventTopic("addStudyFromTransmart/*") String string) {
+		if(string!=null){
+		  this.studySelectionController.addStudy(string);
 		}
 	} 
 	/**
@@ -231,7 +236,6 @@ public class StudySelectionPart {
 		ok.addListener(SWT.Selection, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
-				// TODO Auto-generated method stub
 				studyId=studyField.getText();
 				shell.close();
 			}
@@ -298,7 +302,6 @@ public class StudySelectionPart {
 		ok.addListener(SWT.Selection, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
-				// TODO Auto-generated method stub
 				studyId=studyField.getText();
 				shell.close();
 			}
@@ -327,10 +330,8 @@ public class StudySelectionPart {
 	 *Display the application license, and returns a boolean indicating if this license has been accepted or not 
 	 */
 	public boolean askLicence(){
-		this.warningMessage("askLicence");
 		Preferences preferences = ConfigurationScope.INSTANCE.getNode("fr.sanofi.fcl4transmart");
 		generalPref= preferences.node(".general");
-		this.warningMessage("license_accepted: '"+generalPref.get("license_accepted","")+"'");
 		
 		if(generalPref.get("license_accepted", "").compareTo("yes")==0){
 			return true;

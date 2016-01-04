@@ -38,9 +38,10 @@
     </children>
     <mainMenu xmi:id="_V5MlAKpnEeGM79d1bTx6eA" elementId="org.eclipse.ui.main.menu">
       <children xsi:type="menu:Menu" xmi:id="_yjp5sKroEeGojKSHMvr5yA" elementId="org.eclipse.ui.file.menu" label="File">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_s65awLrpEeGalOhrQ6t71w" elementId="fr.sanofi.fcl4transmart.handledMenuItem.newStudy" label="Add a new study" command="_jPmaILrpEeGalOhrQ6t71w"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_s65awLrpEeGalOhrQ6t71w" elementId="fr.sanofi.fcl4transmart.handledMenuItem.newStudy" label="Add a study from tranSMART" command="_jPmaILrpEeGalOhrQ6t71w"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_2JWWAMy-EeGtoNe9DONO4Q" elementId="fr.sanofi.fcl4transmart.handledMenuItem.removeFile" label="Remove a study folder" command="_nHVvYMy-EeGtoNe9DONO4Q"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_mMdtcMy8EeGtoNe9DONO4Q" elementId="fr.sanofi.fcl4transmart.handledMenuItem.removeDb" label="Remove a study in database" command="_doQQsMy8EeGtoNe9DONO4Q"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_wlD44EUhEeKFcs8Eme6R-g" elementId="fr.sanofi.fcl4transmart.handledMenuItem.programs" label="Programs manager"/>
         <children xsi:type="menu:MenuSeparator" xmi:id="_lmw_YMy8EeGtoNe9DONO4Q"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_PVDNgL-aEeGz24hf7xi09w" elementId="fr.sanofi.fcl4transmart.handledMenuItem.workspace" label="Change workspace" command="_XLBEML-aEeGz24hf7xi09w"/>
         <children xsi:type="menu:MenuSeparator" xmi:id="_0toV8L7IEeGz24hf7xi09w" elementId=""/>
@@ -54,9 +55,13 @@
       <children xsi:type="menu:Menu" xmi:id="_WHbGEC5wEeK50eyduxR06A" elementId="fr.sanofi.fcl4transmart.preferences" label="Preferences">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_0yrpkLudEeGv_N-RecU2tg" elementId="fr.sanofi.fcl4transmart.handledMenuItem.databasePreferences" label="Database preferences" command="_nJ7U4LudEeGv_N-RecU2tg"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_bfyR4C5wEeK50eyduxR06A" elementId="fr.sanofi.fcl4transmart.handledMenuItem.proxyPreferences" label="Proxy preferences" command="_JPHJEC8vEeK50eyduxR06A"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_HfQhIDlYEeKnkowAm-NPTg" elementId="fr.sanofi.fcl4transmart.handledMenuItem.ftp" label="FTP Preferences" command="_z9S9YDlXEeKnkowAm-NPTg"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_QHiCIHEJEeKoqtv9Wir0Ww" elementId="fr.sanofi.fcl4transmart.handledMenuItem.transmartPref" visible="false" label="tranSMART preferences" command="_qGGSYHEIEeKoqtv9Wir0Ww"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_VGwVMHEJEeKoqtv9Wir0Ww" elementId="fr.sanofi.fcl4transmart.handledMenuItem.etlPref" label="ETL server preferences" command="_uy28cHEIEeKoqtv9Wir0Ww"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_Zy9fsMz0EeGtoNe9DONO4Q" elementId="fr.sanofi.fcl4transmart.help" label="?">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_gzMBMMz0EeGtoNe9DONO4Q" elementId="fr.sanofi.fcl4transmart.handledMenuItem.help" label="Version" command="_S7-ZwMz0EeGtoNe9DONO4Q"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_mCO58OBxEeG_euEb78p9fw" elementId="fr.sanofi.fcl4transmart.handledMenuItem.space" label="Free space" command="_eWOQgOBxEeG_euEb78p9fw"/>
       </children>
     </mainMenu>
   </children>
@@ -72,6 +77,9 @@
   <handlers xmi:id="_NHN_oB6zEeKZhq_83drCjg" elementId="fr.sanofi.fcl4transmart.Handler.copy" contributionURI="bundleclass://fr.sanofi.fcl4transmart/fr.sanofi.fcl4transmart.handlers.CopyHandler" command="_SSH-QB6zEeKZhq_83drCjg"/>
   <handlers xmi:id="_XF7q8Cp5EeKFGpqkOMT5FA" elementId="fr.sanofi.fcl4transmart.Handler.map" contributionURI="bundleclass://fr.sanofi.fcl4transmart/fr.sanofi.fcl4transmart.handlers.MapFromClipboardHandler" command="_ScW3wCp5EeKFGpqkOMT5FA"/>
   <handlers xmi:id="_LaliIC8vEeK50eyduxR06A" elementId="fr.sanofi.fcl4transmart.Handler.proxy" contributionURI="bundleclass://fr.sanofi.fcl4transmart/fr.sanofi.fcl4transmart.handlers.ProxyPreferencesHandler" command="_JPHJEC8vEeK50eyduxR06A"/>
+  <handlers xmi:id="_2lypoDlXEeKnkowAm-NPTg" elementId="fr.sanofi.fcl4transmart.Handler.ftp" contributionURI="bundleclass://fr.sanofi.fcl4transmart/fr.sanofi.fcl4transmart.handlers.FTPPreferences" command="_z9S9YDlXEeKnkowAm-NPTg"/>
+  <handlers xmi:id="_4EnbsHEIEeKoqtv9Wir0Ww" elementId="fr.sanofi.fcl4transmart.Handler.transmart" contributionURI="bundleclass://fr.sanofi.fcl4transmart/fr.sanofi.fcl4transmart.handlers.transmartPreferences" command="_qGGSYHEIEeKoqtv9Wir0Ww"/>
+  <handlers xmi:id="_JAdRwHEJEeKoqtv9Wir0Ww" elementId="fr.sanofi.fcl4transmart.Handler.etlPref" contributionURI="bundleclass://fr.sanofi.fcl4transmart/fr.sanofi.fcl4transmart.handlers.etlPreferences" command="_uy28cHEIEeKoqtv9Wir0Ww"/>
   <commands xmi:id="_Aa01oLrTEeGalOhrQ6t71w" elementId="org.eclipse.ui.file.exit" commandName="Exit"/>
   <commands xmi:id="_jPmaILrpEeGalOhrQ6t71w" elementId="fr.sanofi.fcl4transmart.Command.newStudy" commandName="New Study"/>
   <commands xmi:id="_nJ7U4LudEeGv_N-RecU2tg" elementId="fr.sanofi.fcl4transmart.Command.preferences" commandName="Preferences"/>
@@ -84,6 +92,9 @@
   <commands xmi:id="_SSH-QB6zEeKZhq_83drCjg" elementId="fr.sanofi.fcl4transmart.Command.copy" commandName="Copy columns"/>
   <commands xmi:id="_ScW3wCp5EeKFGpqkOMT5FA" elementId="fr.sanofi.fcl4transmart.Command.map" commandName="Map from clipboard"/>
   <commands xmi:id="_JPHJEC8vEeK50eyduxR06A" elementId="fr.sanofi.fcl4transmart.Command.proxy" commandName="Proxy"/>
+  <commands xmi:id="_z9S9YDlXEeKnkowAm-NPTg" elementId="fr.sanofi.fcl4transmart.Command.ftp" commandName="FTP"/>
+  <commands xmi:id="_qGGSYHEIEeKoqtv9Wir0Ww" elementId="fr.sanofi.fcl4transmart.Command.transmart" commandName="transmartPref"/>
+  <commands xmi:id="_uy28cHEIEeKoqtv9Wir0Ww" elementId="fr.sanofi.fcl4transmart.Command.etlPref" commandName="etlPref"/>
   <addons xmi:id="_cafIwapcEeGM79d1bTx6eA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_cafIwqpcEeGM79d1bTx6eA" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_cafIw6pcEeGM79d1bTx6eA" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>

@@ -23,6 +23,7 @@ import fr.sanofi.fcl4transmart.model.classes.workUI.clinicalData.SelectCMFUI;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 import fr.sanofi.fcl4transmart.ui.parts.UsedFilesPart;
 import fr.sanofi.fcl4transmart.ui.parts.WorkPart;
+
 /**
  *This class controls a column mapping file selection
  */	
@@ -114,6 +115,12 @@ public class SelectCMFListener implements Listener{
 					}
 					catch(NumberFormatException e){
 						this.selectCMFUI.displayMessage("Error:\nColumns numbers have to be numbers");
+						br.close();
+						return false;
+					}
+					//check that datalabel is set
+					if(fields[3].compareTo("")==0){
+						this.selectCMFUI.displayMessage("Error:\nData labels have to be set");
 						br.close();
 						return false;
 					}

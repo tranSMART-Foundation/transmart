@@ -37,6 +37,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.handlers.etlPreferences;
 import fr.sanofi.fcl4transmart.model.classes.dataType.HDDData;
@@ -194,8 +195,8 @@ public abstract class LoadAnnotationListener implements Listener {
 		}
 		
 		if(!job.isFinished()){
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
+                    String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
 			Statement stmt = con.createStatement();
 			
 			ResultSet rs=stmt.executeQuery(queryStoredProcedureStarted);
@@ -330,8 +331,8 @@ public abstract class LoadAnnotationListener implements Listener {
 		Pattern pattern=Pattern.compile(storedProcedureLaunched, Pattern.DOTALL);
 		Matcher matcher=pattern.matcher(text);
 		if(matcher.matches()){
-			String connectionString="jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName();
-			Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
+                    String connection=RetrieveData.getConnectionString();
+			Connection con = DriverManager.getConnection(connection, PreferencesHandler.getTm_czUser(), PreferencesHandler.getTm_czPwd());
 			Statement stmt = con.createStatement();
 			
 			//remove rows for this study before adding new ones

@@ -33,9 +33,8 @@ public class SetOtherIds implements StepItf{
 		return "Set other identifiers (optional)";
 	}
 	public String getDescription(){
-		return "This optional step allows choosing the column corresponding to site, visit and sub-visit identifiers.\n"+
-				"A sub-visit name column can not be set if visit name column is not.\n"+
-				"If a column mapping file is already existing, the identifiers are retrieved in this file and given as parameters by default";
+		return "This optional step allows choosing the column corresponding to site and visit identifiers.\n"+
+				"If a column mapping file already exists, the identifiers are retrieved from this file and given as parameters by default";
 	}
 	public boolean isAvailable(){
 		try{

@@ -17,10 +17,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Vector;
-import org.apache.commons.io.FileUtils;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import fr.sanofi.fcl4transmart.controllers.FileHandler;
+import fr.sanofi.fcl4transmart.controllers.Utils;
 import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.classes.workUI.clinicalData.SetUnitsUI;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
@@ -101,11 +101,10 @@ public class SetUnitsListener implements Listener{
 				}
 				
 				out.close();
-				String fileName=((ClinicalData)this.dataType).getCMF().getName();
-				FileUtils.deleteQuietly(((ClinicalData)this.dataType).getCMF());
 				try{
-					File fileDest=new File(this.dataType.getPath()+File.separator+fileName);
-					FileUtils.moveFile(file, fileDest);
+					File fileDest=new File(this.dataType.getPath()+File.separator+((ClinicalData)this.dataType).getCMF().getName());
+					Utils.copyFile(file, fileDest);
+					file.delete();
 					((ClinicalData)this.dataType).setCMF(fileDest);
 				}
 				catch(Exception ioe){

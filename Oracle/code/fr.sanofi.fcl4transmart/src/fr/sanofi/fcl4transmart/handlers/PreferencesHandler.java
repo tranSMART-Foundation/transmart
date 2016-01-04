@@ -43,10 +43,11 @@ import fr.sanofi.fcl4transmart.controllers.RetrieveData;
  */
 @SuppressWarnings("restriction")
 public class PreferencesHandler {
-	private Preferences preferences;//root node
-	private Preferences databasesPref;//.general node
-	private Preferences generalPref;//node for the database
+	private Preferences preferences;   //root node
+	private Preferences databasesPref; //general node
+	private Preferences generalPref;   //node for the database
 	private Text saveNameField;
+	private Text dbTypeField;
 	private Text dbNameField;
 	private Text dbServerField;
 	private Text dbPortField;
@@ -72,7 +73,8 @@ public class PreferencesHandler {
 	private ListViewer viewer;
 	private Composite preferencesPart;
 	public PreferencesHandler(){
-		this.preferences = ConfigurationScope.INSTANCE.getNode("fr.sanofi.fcl4transmart");	
+		this.preferences = ConfigurationScope.INSTANCE.getNode("fr.sanofi.fcl4transmart");
+
 		PreferencesHandler.staticPreferences=this.preferences;
 		this.generalPref= preferences.node(".general");
 		
@@ -573,9 +575,9 @@ public class PreferencesHandler {
 		gridData.grabExcessHorizontalSpace = true;
 		this.biomartPwdField.setLayoutData(gridData);
 		
-		 Label fmappUserLabel=new Label(prefPart, SWT.NONE);
-		 fmappUserLabel.setText("FMAPP user: ");
-	    gridData = new GridData();
+		Label fmappUserLabel=new Label(prefPart, SWT.NONE);
+		fmappUserLabel.setText("FMAPP user: ");
+                gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.grabExcessHorizontalSpace = true;
 		fmappUserLabel.setLayoutData(gridData);
@@ -677,8 +679,7 @@ public class PreferencesHandler {
 				viewer.setInput(databases);
 				viewer.getList().setSelection(databases.indexOf(saveNameField.getText()));
 				databasesPref=preferences.node(saveNameField.getText());
-		
-				
+
 				String selected=(String)viewer.getElementAt(viewer.getList().getSelectionIndex());
 				generalPref.put("selectedDb", selected);
 				databasesPref=preferences.node(selected);

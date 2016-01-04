@@ -24,6 +24,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.handlers.etlPreferences;
 import fr.sanofi.fcl4transmart.model.classes.dataType.SnpData;
@@ -182,8 +183,8 @@ public class ConvertListener implements Listener {
 							jarPath = new File(jarPath).getPath();
 							String[] cmd = { "java", "-classpath", jarPath, "com.recomdata.pipeline.converter.IlluminaGenotypingFormatter", 
 									((SnpData)dataType).getConversionProps().getAbsolutePath(), ((SnpData)dataType).getLogProps().getAbsolutePath(), 
-									"jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName(),
-									"oracle.jdbc.driver.OracleDriver", PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd(), PreferencesHandler.getDemodataUser(),
+                                                                        RetrieveData.getConnectionString(),
+									RetrieveData.getDriverString(), PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd(), PreferencesHandler.getDemodataUser(),
 									PreferencesHandler.getDemodataPwd()};
 
 					        Process p = Runtime.getRuntime().exec(cmd);
@@ -310,7 +311,7 @@ public class ConvertListener implements Listener {
 								try{
 									channel=session.openChannel("exec");
 									dir=etlPreferences.getFilesDirectory()+"/"+dataType.getStudy().toString()+"/snp";
-									String command = "java -classpath "+dir+"/loader.jar com.recomdata.pipeline.converter.IlluminaGenotypingFormatter "+dir+"/"+((SnpData)dataType).getConversionProps().getName()+" "+dir+"/"+((SnpData)dataType).getLogProps().getName()+" "+ "jdbc:oracle:thin:@"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+":"+PreferencesHandler.getDbName()+" "+ "oracle.jdbc.driver.OracleDriver"+" "+ PreferencesHandler.getDeappUser()+" "+PreferencesHandler.getDeappPwd()+" "+PreferencesHandler.getDemodataUser()+" "+PreferencesHandler.getDemodataPwd();
+									String command = "java -classpath "+dir+"/loader.jar com.recomdata.pipeline.converter.IlluminaGenotypingFormatter "+dir+"/"+((SnpData)dataType).getConversionProps().getName()+" "+dir+"/"+((SnpData)dataType).getLogProps().getName()+" "+RetrieveData.getConnectionString()+" "+ RetrieveData.getDriverString()+" "+ PreferencesHandler.getDeappUser()+" "+PreferencesHandler.getDeappPwd()+" "+PreferencesHandler.getDemodataUser()+" "+PreferencesHandler.getDemodataPwd();
 									((ChannelExec)channel).setCommand(command);
 								 
 									 BufferedReader stdError = new BufferedReader(new 

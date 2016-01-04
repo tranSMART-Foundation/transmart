@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 
+import fr.sanofi.fcl4transmart.controllers.RetrieveData;
 import fr.sanofi.fcl4transmart.handlers.PreferencesHandler;
 import fr.sanofi.fcl4transmart.model.classes.Study;
 import fr.sanofi.fcl4transmart.model.interfaces.StudyItf;
@@ -45,11 +46,9 @@ public class StudySelectionController {
 	private String studyIdentifier;
 	public StudySelectionController(StudySelectionPart studySelectionPart){
 		this.studySelectionPart=studySelectionPart;
-		this.studySelectionPart.warningMessage("StudySelectionController: checking license");
 		if(!this.studySelectionPart.askLicence()) return;
 		this.studies=new Vector<StudyItf>();
 		String workspaceString=this.studySelectionPart.askWorkspace();
-		this.studySelectionPart.warningMessage("workspaceString: '"+workspaceString+"'");
 		if(workspaceString==null) return;
 		this.workspace=new File(workspaceString);
 		if(!workspace.exists()){
@@ -63,6 +62,7 @@ public class StudySelectionController {
 	public Vector<StudyItf> getStudies(){
 		return this.studies;
 	}
+
 	/**
 	 *Reads the workspace to create studies objects
 	 */	
@@ -92,12 +92,11 @@ public class StudySelectionController {
 			this.studySelectionPart.warningMessage(message);
 		}
 	}
+
 	/**
 	 *Creates a new study
 	 */	
 	public void studyAdded(){
-		this.studySelectionPart.warningMessage("Creating New_study");
-		this.studySelectionPart.warningMessage("Creating New_study in "+this.workspace.getAbsolutePath()+File.separator+"New_study");
 		File path=new File(this.workspace.getAbsolutePath()+File.separator+"New_study");
 		if(path.exists()){
 			this.studySelectionPart.warningMessage("A study named 'New_study' already exists.\nPlease modify its name before adding another study.");
@@ -105,12 +104,37 @@ public class StudySelectionController {
 		}
 		path.mkdir();
 		(new File(path.getAbsoluteFile()+File.separator+"clinical")).mkdir();
-		(new File(path.getAbsoluteFile()+File.separator+"description")).mkdir();
+		//(new File(path.getAbsoluteFile()+File.separator+"description")).mkdir();
 		(new File(path.getAbsoluteFile()+File.separator+"gene")).mkdir();
 		this.studies.add(new Study("New_study", path));
 		this.studySelectionPart.setList(studies);
 		this.studySelectionPart.selectLast();
 	}
+
+	/**
+	 *Creates a new study with accession number
+	 */	
+	public void addStudy(String accession){
+		File path=new File(this.workspace.getAbsolutePath()+File.separator+accession);
+		if(path.exists()){
+			this.studySelectionPart.warningMessage("This study is already present in your workspace");
+			return;
+		}
+		path.mkdir();
+		(new File(path.getAbsoluteFile()+File.separator+"clinical")).mkdir();
+		(new File(path.getAbsoluteFile()+File.separator+"gene")).mkdir();
+		(new File(path.getAbsoluteFile()+File.separator+"analysis")).mkdir();
+		(new File(path.getAbsoluteFile()+File.separator+"snp")).mkdir();
+		(new File(path.getAbsoluteFile()+File.separator+"rnaSeq")).mkdir();
+		(new File(path.getAbsoluteFile()+File.separator+"qPCR_MiRNA")).mkdir();
+		(new File(path.getAbsoluteFile()+File.separator+"miRNA_seq")).mkdir();
+		(new File(path.getAbsoluteFile()+File.separator+"proteomics")).mkdir();
+		(new File(path.getAbsoluteFile()+File.separator+"rbm")).mkdir();
+		this.studies.add(new Study(accession, path));
+		this.studySelectionPart.setList(studies);
+		this.studySelectionPart.selectLast();
+	}
+    
 	/**
 	 *Checks a new workspace availability and calls the readDirectory method
 	 */	
@@ -226,39 +250,38 @@ public class StudySelectionController {
 			new Thread(){
 				public void run() {
 		  		try{
-		  			Class.forName("org.postgresql.Driver");
-					String connectionString="jdbc:postgresql://"+PreferencesHandler.getDbServer()+":"+PreferencesHandler.getDbPort()+"/"+PreferencesHandler.getDbName();
+		  			Class.forName(RetrieveData.getDriverString());
+					String connection=RetrieveData.getConnectionString();
 					
-					Connection con = DriverManager.getConnection(connectionString, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
+					Connection con = DriverManager.getConnection(connection, PreferencesHandler.getDeappUser(), PreferencesHandler.getDeappPwd());
 					Statement stmt = con.createStatement();
 					@SuppressWarnings("unused")
-					boolean rs=stmt.execute("delete from de_subject_microarray_data where trial_name='"+studyIdentifier.toUpperCase()+"'");
-					rs=stmt.execute("delete from de_subject_microarray_logs where trial_name='"+studyIdentifier.toUpperCase()+"'");
-					rs=stmt.execute("delete from de_subject_microarray_med where trial_name='"+studyIdentifier.toUpperCase()+"'");
-					rs=stmt.execute("delete from de_subject_sample_mapping where trial_name='"+studyIdentifier.toUpperCase()+"'");
+					ResultSet rs=stmt.executeQuery("delete from de_subject_microarray_data where trial_name='"+studyIdentifier.toUpperCase()+"'");
+					rs=stmt.executeQuery("delete from de_subject_microarray_logs where trial_name='"+studyIdentifier.toUpperCase()+"'");
+					rs=stmt.executeQuery("delete from de_subject_microarray_med where trial_name='"+studyIdentifier.toUpperCase()+"'");
+					rs=stmt.executeQuery("delete from de_subject_sample_mapping where trial_name='"+studyIdentifier.toUpperCase()+"'");
 					con.close();
 					
-					con = DriverManager.getConnection(connectionString, PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
+					con = DriverManager.getConnection(connection, PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
 					stmt = con.createStatement();
-					rs=stmt.execute("delete from concept_counts where concept_path in(select concept_path from concept_dimension where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"')");
-					rs=stmt.execute("delete from concept_dimension where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"'");
-					rs=stmt.execute("delete from patient_dimension where patient_num in(select patient_num from patient_trial where trial='"+studyIdentifier.toUpperCase()+"')");
-					rs=stmt.execute("delete from patient_trial where trial='"+studyIdentifier.toUpperCase()+"'");
-					rs=stmt.execute("delete from observation_fact where modifier_cd='"+studyIdentifier.toUpperCase()+"'");
+					rs=stmt.executeQuery("delete from concept_counts where concept_path in(select concept_path from concept_dimension where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"')");
+					rs=stmt.executeQuery("delete from concept_dimension where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"'");
+					rs=stmt.executeQuery("delete from patient_dimension where patient_num in(select patient_num from patient_trial where trial='"+studyIdentifier.toUpperCase()+"')");
+					rs=stmt.executeQuery("delete from patient_trial where trial='"+studyIdentifier.toUpperCase()+"'");
+					rs=stmt.executeQuery("delete from observation_fact where modifier_cd='"+studyIdentifier.toUpperCase()+"'");
 					con.close();
 					
-					con = DriverManager.getConnection(connectionString, PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
+					con = DriverManager.getConnection(connection, PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
 					stmt = con.createStatement();
-					rs=stmt.execute("delete from i2b2_tags where tag='"+studyIdentifier.toUpperCase()+"'");
-					rs=stmt.execute("delete from i2b2 where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"'");
+					rs=stmt.executeQuery("delete from i2b2_tags where tag='"+studyIdentifier.toUpperCase()+"'");
+					rs=stmt.executeQuery("delete from i2b2 where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"'");
+					rs=stmt.executeQuery("delete from i2b2_secure where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"'");
 					con.close();
+
 			  		isStudyDeleted=true;
 				}catch(SQLException e){
-					e.printStackTrace();
 					isStudyDeleted=false;
 				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 					isStudyDeleted=false;
 				}
 		  		isSearching=false;

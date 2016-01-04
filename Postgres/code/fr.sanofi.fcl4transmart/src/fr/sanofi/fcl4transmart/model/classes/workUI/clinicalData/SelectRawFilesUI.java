@@ -11,8 +11,9 @@
 package fr.sanofi.fcl4transmart.model.classes.workUI.clinicalData;
 
 import java.io.File;
-import org.eclipse.jface.dialogs.MessageDialog;
 import java.util.Vector;
+
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -36,12 +37,15 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import fr.sanofi.fcl4transmart.controllers.FileHandler;
 import fr.sanofi.fcl4transmart.controllers.listeners.clinicalData.RemoveRawFileListener;
 import fr.sanofi.fcl4transmart.controllers.listeners.clinicalData.SelectClinicalRawFileListener;
 import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 import fr.sanofi.fcl4transmart.model.interfaces.WorkItf;
 import fr.sanofi.fcl4transmart.ui.parts.WorkPart;
+
 /**
  *This class allows the creation of the composite to select clinical raw data files
  */
@@ -56,6 +60,13 @@ public class SelectRawFilesUI implements WorkItf{
 	private Shell loadingShell;
 	private String format;
 	private String message="";
+	private Composite scrolledComposite;
+	private Composite filterPart;
+	private Vector<Combo> columnsCombo;
+	private Vector<String> columns;
+	private Composite subFilterPart;
+	private Vector<Button> buttons;
+	private Vector<String> filters;
 	public SelectRawFilesUI(DataTypeItf dataType){
 		this.dataType=dataType;
 		this.path="";
@@ -81,7 +92,7 @@ public class SelectRawFilesUI implements WorkItf{
 		gd.verticalSpacing=0;
 		scroller.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		Composite scrolledComposite=new Composite(scroller, SWT.NONE);
+		scrolledComposite=new Composite(scroller, SWT.NONE);
 		scroller.setContent(scrolledComposite); 
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 1;
@@ -104,7 +115,6 @@ public class SelectRawFilesUI implements WorkItf{
 		this.pathField.addModifyListener(new ModifyListener(){
 			@Override
 			public void modifyText(ModifyEvent e) {
-				// TODO Auto-generated method stub
 				path=pathField.getText();
 			}
 		});
@@ -134,10 +144,10 @@ public class SelectRawFilesUI implements WorkItf{
 					}
 					else{
 						if(filterPath!=null && filterPath.trim().length()>0){
-							path+=File.pathSeparator+filterPath+File.separator+filenames[i];
+							path+="?"+filterPath+File.separator+filenames[i];
 						}
 						else{
-							path+=File.pathSeparator+filenames[i];
+							path+="?"+filenames[i];
 						}
 					}
 				}
@@ -151,7 +161,7 @@ public class SelectRawFilesUI implements WorkItf{
 		
 		Composite fileTypePart=new Composite(scrolledComposite, SWT.NONE);
 		layout = new GridLayout();
-		layout.numColumns = 2;
+		layout.numColumns = 1;
 		fileTypePart.setLayout(layout);
 		Label fileTypeLabel=new Label(fileTypePart, SWT.NONE);
 		fileTypeLabel.setText("Format: ");
@@ -166,22 +176,41 @@ public class SelectRawFilesUI implements WorkItf{
 	    	} 
     	}); 
 		this.fileTypeField.add("Tab delimited raw file");
+		this.fileTypeField.add("Tab delimited raw file with filter");
 		this.fileTypeField.add("SOFT");
+		this.fileTypeField.add("CSV");
 		this.fileTypeField.addSelectionListener(new SelectionListener(){
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
 				if(fileTypeField.getSelectionIndex()==-1){
 					format="";
 				}
 				else{
 					format=fileTypeField.getItem(fileTypeField.getSelectionIndex());
+					if(format.compareTo("Tab delimited raw file with filter")==0){
+						if(filterPart!=null){
+							fillFilterPart();
+							filterPart.setVisible(true);
+							scrolledComposite.layout(true, true);	
+							scrolledComposite.getParent().layout(true, true);
+							scrolledComposite.setSize(scrolledComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+						}
+					}else{
+						if(filterPart!=null){
+							for(int i=0; i<filterPart.getChildren().length; i++){
+								filterPart.getChildren()[i].dispose();
+							}
+							filterPart.setVisible(false);
+							scrolledComposite.layout(true, true);	
+							scrolledComposite.getParent().layout(true, true);
+							scrolledComposite.setSize(scrolledComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+						}
+					}
 				}
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
-				
+				// nothing to do
 			}
 		});
 		gridData = new GridData();
@@ -189,6 +218,13 @@ public class SelectRawFilesUI implements WorkItf{
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.widthHint=120;
 		this.fileTypeField.setLayoutData(gridData);
+		
+		this.filterPart=new Composite(scrolledComposite, SWT.BORDER);
+		layout = new GridLayout();
+		layout.numColumns = 2;
+		filterPart.setLayout(layout);
+		filterPart.setLayoutData(new GridData(GridData.FILL_BOTH));
+		filterPart.setVisible(false);
 		
 		Button add=new Button(scrolledComposite, SWT.PUSH);
 		add.setText("Add files");
@@ -216,13 +252,11 @@ public class SelectRawFilesUI implements WorkItf{
 				return v.toArray();
 			}
 			public void dispose() {
-				// TODO Auto-generated method stub
-
+				// nothing to do
 			}
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
-				// TODO Auto-generated method stub
-				
+				// nothing to do
 			}
 		});	
 		this.viewer.setInput(((ClinicalData)this.dataType).getRawFiles());
@@ -244,6 +278,131 @@ public class SelectRawFilesUI implements WorkItf{
 
 		scrolledComposite.setSize(scrolledComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		return composite;
+	}
+	private void fillFilterPart(){
+		for(int i=0; i<filterPart.getChildren().length; i++){
+			filterPart.getChildren()[i].dispose();
+		}
+		
+		Composite composite=new Composite(filterPart, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 1;
+		composite.setLayout(layout);
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		composite.setLayoutData(gridData);
+		
+		this.subFilterPart=new Composite(composite, SWT.NONE);
+		layout = new GridLayout();
+		layout.numColumns = 2;
+		this.subFilterPart.setLayout(layout);
+		gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		this.subFilterPart.setLayoutData(gridData);
+		
+		columns=new Vector<String>();
+		String[] paths=this.path.split(String.valueOf(File.pathSeparatorChar), -1);
+		for(int i=0; i<paths.length; i++){
+			for(String s: FileHandler.getHeaders(new File(paths[i]))){
+				this.columns.add(s);
+			}
+		}
+		
+		if(columns.size()==0){
+			Label lab=new Label(subFilterPart, SWT.NONE);
+			lab.setText("There is no selected file");
+			return;
+		}
+		Label lab=new Label(subFilterPart, SWT.NONE);
+		lab.setText("Choose the columns you want to filter");
+		
+		@SuppressWarnings("unused")
+		Label space=new Label(subFilterPart, SWT.NONE);
+		
+		columnsCombo=new Vector<Combo>();
+		Combo combo=new Combo(subFilterPart, SWT.DROP_DOWN | SWT.BORDER );
+		gridData = new GridData();
+		gridData.widthHint=150;
+		gridData.grabExcessHorizontalSpace = true;
+		combo.setLayoutData(gridData);
+	    combo.addListener(SWT.KeyDown, new Listener(){ 
+	    	public void handleEvent(Event event) { 
+	    		event.doit = false; 
+	    	} 
+    	}); 
+	    combo.addListener(SWT.Selection, new Listener(){ 
+	    	public void handleEvent(Event event) { 
+	    		filters=new Vector<String>();
+	    		for(Combo c: columnsCombo){
+	    			filters.add(c.getText());
+	    		}
+	    	} 
+    	}); 
+
+	    for(String s: this.columns){
+	    	combo.add(s);
+	    }
+		columnsCombo.add(combo);
+		
+		@SuppressWarnings("unused")
+		Label space2=new Label(subFilterPart, SWT.NONE);
+		
+		this.buttons=new Vector<Button>();
+		Button addCombo=new Button(composite, SWT.PUSH);
+		addCombo.setText("Add a column to filter");
+		addCombo.addListener(SWT.Selection, new Listener(){ 
+	    	public void handleEvent(Event event) { 
+	    		Combo combo=new Combo(subFilterPart, SWT.DROP_DOWN | SWT.BORDER );
+	    		GridData gridData = new GridData();
+	    		gridData.widthHint=150;
+	    		gridData.grabExcessHorizontalSpace = true;
+	    		combo.setLayoutData(gridData);
+	    	    combo.addListener(SWT.KeyDown, new Listener(){ 
+	    	    	public void handleEvent(Event event) { 
+	    	    		event.doit = false; 
+	    	    	} 
+	        	}); 
+	    	    combo.addListener(SWT.Selection, new Listener(){ 
+	    	    	public void handleEvent(Event event) { 
+	    	    		filters=new Vector<String>();
+	    	    		for(Combo c: columnsCombo){
+	    	    			filters.add(c.getText());
+	    	    		}
+	    	    	} 
+	        	}); 
+	    	    for(String s: columns){
+	    	    	combo.add(s);
+	    	    }
+	    		columnsCombo.add(combo);   
+								
+	    		Button remove=new Button(subFilterPart, SWT.PUSH);
+				remove.setText("Remove filter");
+				buttons.add(remove);
+				remove.addSelectionListener(new SelectionListener(){
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						int n=buttons.indexOf((Button)e.getSource());
+						columnsCombo.get(n+1).dispose();
+						buttons.get(n).dispose();
+						scrolledComposite.layout(true, true);	
+						scrolledComposite.getParent().layout(true, true);
+						scrolledComposite.setSize(scrolledComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT)); 
+					}
+					@Override
+					public void widgetDefaultSelected(SelectionEvent e) {
+						// nothing to do
+						
+					}
+				});
+	    		
+	    		scrolledComposite.layout(true, true);	
+				scrolledComposite.getParent().layout(true, true);
+				scrolledComposite.setSize(scrolledComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT)); 
+	    	} 
+    	}); 
+
 	}
 	public String getPath(){
 		return this.path;
@@ -311,6 +470,9 @@ public class SelectRawFilesUI implements WorkItf{
 	public void setIsLoading(boolean bool){
 		this.isLoading=bool;
 	}
+	public Vector<String> getFilters(){
+		return filters;
+	}
 	@Override
 	public boolean canCopy() {
 		return false;
@@ -321,17 +483,14 @@ public class SelectRawFilesUI implements WorkItf{
 	}
 	@Override
 	public Vector<Vector<String>> copy() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public void paste(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 }

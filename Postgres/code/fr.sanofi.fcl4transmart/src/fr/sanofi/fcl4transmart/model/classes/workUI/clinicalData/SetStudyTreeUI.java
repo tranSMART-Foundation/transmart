@@ -11,8 +11,11 @@
 package fr.sanofi.fcl4transmart.model.classes.workUI.clinicalData;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
+
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -26,6 +29,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -35,6 +39,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
 import fr.sanofi.fcl4transmart.controllers.FileHandler;
 import fr.sanofi.fcl4transmart.controllers.StudyTreeController;
 import fr.sanofi.fcl4transmart.controllers.listeners.clinicalData.SetStudyTreeListener;
@@ -45,6 +50,7 @@ import fr.sanofi.fcl4transmart.model.classes.dataType.ClinicalData;
 import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
 import fr.sanofi.fcl4transmart.model.interfaces.WorkItf;
 import fr.sanofi.fcl4transmart.ui.parts.WorkPart;
+
 /**
  *This class allows the creation of the composite to set study tree for clinical data
  */
@@ -56,7 +62,10 @@ public class SetStudyTreeUI implements WorkItf{
 	private ListViewer listViewer;
 	private TreeNode root;
 	private boolean isSearching;
-	private Vector<String> labels;
+	private HashMap<String, Vector<String>> labels;
+	private ListViewer operationViewer;
+	private Combo chooseFile;
+	private Composite scrolledComposite;
 	public SetStudyTreeUI(DataTypeItf dataType){
 		this.dataType=dataType;
 		this.root=new TreeNode(this.dataType.getStudy().toString(), null, false);
@@ -108,7 +117,7 @@ public class SetStudyTreeUI implements WorkItf{
 		gd.horizontalSpacing=0;
 		gd.verticalSpacing=0;
 		
-		Composite scrolledComposite=new Composite(scroller, SWT.NONE);
+		scrolledComposite=new Composite(scroller, SWT.NONE);
 		scroller.setContent(scrolledComposite); 
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 1;
@@ -143,6 +152,9 @@ public class SetStudyTreeUI implements WorkItf{
 		    @Override
 		    public Color getBackground(Object element) {
 		    	if(((TreeNode)element).isLabel()){
+		    		return new Color(Display.getCurrent(), 212, 212, 212);
+		    	}
+		    	else if(((TreeNode)element).isOperation()){
 		    		return new Color(Display.getCurrent(), 212, 212, 212);
 		    	}
 		    	return null;
@@ -213,12 +225,50 @@ public class SetStudyTreeUI implements WorkItf{
 			}
 		});
 		
-		this.labels=new Vector<String>();
+		this.labels=new HashMap<String, Vector<String>>();
 		for(File file: ((ClinicalData)this.dataType).getRawFiles()){
+			Vector<String> v=new Vector<String>();
 			for(String s: FileHandler.getHeaders(file)){
-		    	labels.add(file.getName()+" - "+s);
+		    	v.add(s);
 		    }
+			this.labels.put(file.getName(), v);
 		}
+		
+		Label propertyLabel=new Label(leftPart, SWT.NONE);
+		propertyLabel.setText("Properties:");
+		
+		Composite filePart=new Composite(leftPart, SWT.NONE);
+		gd=new GridLayout();
+		gd.numColumns=2;
+		gd.horizontalSpacing=5;
+		gd.verticalSpacing=5;
+		filePart.setLayout(gd);
+		gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.verticalAlignment=SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.grabExcessVerticalSpace=true;
+		filePart.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		Label fileLabel=new Label(filePart, SWT.NONE);
+		fileLabel.setText("Choose a file");
+		
+		this.chooseFile=new Combo(filePart, SWT.DROP_DOWN | SWT.BORDER );
+	    this.chooseFile.addListener(SWT.KeyDown, new Listener(){ 
+	    	public void handleEvent(Event event) { 
+	    		event.doit = false; 
+			}
+		});
+	    this.chooseFile.addListener(SWT.Selection, new Listener(){ 
+	    	public void handleEvent(Event event) { 
+	    		updateFile();
+	    	} 
+    	}); 
+	    for(String s: this.sort(this.labels.keySet())){
+	    	this.chooseFile.add(s);
+	    }
+	    this.chooseFile.setText((String) this.labels.keySet().toArray()[0]);
+		
 		this.listViewer=new ListViewer(leftPart, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		this.listViewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
 		this.listViewer.setContentProvider(new IStructuredContentProvider(){
@@ -233,7 +283,7 @@ public class SetStudyTreeUI implements WorkItf{
 					Object newInput) {
 			}
 		});	
-		this.listViewer.setInput(labels);
+		this.listViewer.setInput(this.labels.get(this.chooseFile.getText()));
 		
 		Button addLabel=new Button(leftPart, SWT.PUSH);
 		gridData=new GridData();
@@ -266,20 +316,102 @@ public class SetStudyTreeUI implements WorkItf{
 					return;
 				}
 				for(int i=0; i<selected.length; i++){
-					if(node.getChild(selected[i])!=null){
-						displayMessage("The property '"+selected[i]+"' already exists");
+					if(node.getChild(chooseFile.getText()+" - "+selected[i])!=null){
+						displayMessage("The property '"+chooseFile.getText()+" - "+selected[i]+"' already exists");
 						return;
 					}
 				}
 				for(int i=0; i<selected.length; i++){
-					node.addChild(new TreeNode(selected[i], node, true));
+					node.addChild(new TreeNode(chooseFile.getText()+" - "+selected[i], node, true));
 				}
 				viewer.setExpandedState(node, true);
 				viewer.refresh();
 			}
 		});
+			
+		this.operationViewer=new ListViewer(leftPart, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+		this.operationViewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
+		this.operationViewer.setContentProvider(new IStructuredContentProvider(){
+			public Object[] getElements(Object inputElement) {
+				return (String[])inputElement;
+			}
+			public void dispose() {
+			}
+			public void inputChanged(Viewer viewer, Object oldInput,
+					Object newInput) {
+			}
+		});	
+		String[] operationsArray={"MEAN", "MIN", "MAX"};
+		this.operationViewer.setInput(operationsArray);
 		
-		
+		Button addOp=new Button(leftPart, SWT.PUSH);
+		addOp.setText("Add selected operation");
+		gridData=new GridData();
+		gridData.widthHint=150;
+		addOp.setLayoutData(gridData);
+		addOp.addListener(SWT.Selection, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				String[] selected=operationViewer.getList().getSelection();
+				String[] propertySelected=listViewer.getList().getSelection();
+				IStructuredSelection selection=(IStructuredSelection)viewer.getSelection();
+				TreeNode node;
+				if(selection.iterator().hasNext()){
+					node=(TreeNode)selection.iterator().next();
+				}
+				else{
+					displayMessage("Select a node first");
+					return;
+				}
+				if(selection.size()>1){
+					displayMessage("Several nodes selected");
+					return;
+				}
+				if(node.isLabel()){
+					displayMessage("An operation parent can not be a property");
+					return;
+				}
+				if(selected.length<1){
+					displayMessage("Choose at least an operation");
+					return;
+				}
+				if(propertySelected.length<1){
+					displayMessage("Choose at least one property");
+					return;
+				}
+				Vector<String> names=new Vector<String>();
+				for(int i=0; i<selected.length; i++){
+					for(int j=0; j<propertySelected.length; j++){
+						String rawFileName=chooseFile.getText();
+						String header=propertySelected[j];
+						File rawFile=new File(dataType.getPath()+File.separator+rawFileName);
+						int columnNumber=FileHandler.getHeaderNumber(rawFile, header);
+						if(columnNumber==-1){
+							displayMessage("This property does not exist");
+							return;
+						}
+						if(!FileHandler.isColumnNumerical(rawFile, ((ClinicalData)dataType).getWMF(), columnNumber)){
+							displayMessage("The property '"+propertySelected[j]+"' is not numerical.\nIf it should be, please check the 'Set terms' step.");
+							return;
+						}
+						String s=selected[i]+": "+chooseFile.getText()+" - "+propertySelected[j];
+						if(node.getChild(s)!=null){
+							displayMessage("The operation '"+selected[i]+"' for already exists for the property '"+propertySelected[j]+"'");
+							return;
+						}
+						names.add(s);
+					}
+				}
+				for(String s:names){
+					TreeNode child=new TreeNode(s, node, false);
+					child.setIsOperation(true);
+					node.addChild(child);
+				}
+				viewer.setExpandedState(node, true);
+				viewer.refresh();
+			}
+		});
+	
 		@SuppressWarnings("unused")
 		Label spacer=new Label(leftPart, SWT.NONE);
 		
@@ -324,6 +456,12 @@ public class SetStudyTreeUI implements WorkItf{
 		
 		return composite;
 	}
+	private void updateFile(){
+		this.listViewer.setInput(this.labels.get(this.chooseFile.getText()));
+		this.scrolledComposite.layout(true, true);	
+		this.scrolledComposite.getParent().layout(true, true);
+		this.scrolledComposite.setSize(this.scrolledComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	}
 	public void displayMessage(String message){
 	    int style = SWT.ICON_INFORMATION | SWT.OK;
 	    MessageBox messageBox = new MessageBox(new Shell(), style);
@@ -343,17 +481,34 @@ public class SetStudyTreeUI implements WorkItf{
 	}
 	@Override
 	public Vector<Vector<String>> copy() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public void paste(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
 	@Override
 	public void mapFromClipboard(Vector<Vector<String>> data) {
-		// TODO Auto-generated method stub
-		
+		// nothing to do
 	}
+
+	public Vector<String> sort(Set<String> sort) {
+        Vector<String> v = new Vector<String>();
+        for(String s: sort) {
+            int i = 0;
+            for (i = 0; i < v.size(); i++) {
+                int c = s.compareTo((String) v.elementAt(i));
+                if (c < 0) {
+                    v.insertElementAt(s, i);
+                    break;
+                } else if (c == 0) {
+                    break;
+                }
+            }
+            if (i >= v.size()) {
+                v.addElement(s);
+            }
+        }
+        return v;
+    }
 }
