@@ -117,7 +117,7 @@ public class StartupInfo {
     public static ArrayList<StartupInfo> parse(String[] argv) {
         ArrayList<StartupInfo> startupList = new ArrayList<StartupInfo>();
         final int KLUGE_TRANSMART_GENE_SRC_ID = 0;
-        if(argv.length == 5) {
+        if(argv.length >= 5) {
             String modelsStr = argv[0];
             String[] genesRadiusEntries = argv[1].split("\\;");
             //int geneSrcId       = Integer.parseInt(argv[2]);
