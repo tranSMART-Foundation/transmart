@@ -352,7 +352,8 @@ cd $INSTALL_BASE/transmart-data
 sudo -v
 source ./vars
 make -C solr start > $INSTALL_BASE/transmart-data/solr.log 2>&1 & 
-sleep 60
+echo "Sleeping - waiting for SOLR to start (50 seconds)"
+sleep 50
 make -C solr rwg_full_import sample_full_import
 echo "Finished loading, configuring and starting SOLR at $(date)"
 
@@ -374,6 +375,8 @@ echo "++++++++++++++++++++++++++++"
 
 sudo service tomcat7 restart
 echo "Finished starting Tomcat7 at $(date)"
+echo "Sleeping - waiting for tomcat/transmart to start (3 minutes)
+sleep 3m
 
 echo "++++++++++++++++++++++++++++"
 echo "+ Done with install - making final checks (may take a while)"
