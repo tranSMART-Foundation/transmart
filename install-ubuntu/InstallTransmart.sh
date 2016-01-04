@@ -276,9 +276,11 @@ echo "+  Load study GSE8581 in database"
 echo "++++++++++++++++++++++++++++"
 
 # only load database if not already loaded
+set +e
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
 ./checkPsqlDataLoad.sh quiet
 returnCode=$?
+set -e
 
 if [ $returnCode -eq 0 ] ; then
 	echo "Database is already loaded"
@@ -377,6 +379,7 @@ echo "++++++++++++++++++++++++++++"
 echo "+ Done with install - making final checks (may take a while)"
 echo "++++++++++++++++++++++++++++"
 
+set e+
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
 ./checkFilesTomcat.sh
 ./checkTools.sh
@@ -392,4 +395,5 @@ echo "++++++++++++++++++++++++++++"
 
 
 echo "Finished at $(date)"
+exit 0
 
