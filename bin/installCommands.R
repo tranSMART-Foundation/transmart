@@ -1,3 +1,4 @@
+# Copyright 2014, 2015 The Hyve B.V.
 # Copyright 2014 Janssen Research & Development, LLC.
 #
 # This file is part of tranSMART R Client: R package allowing access to
@@ -21,11 +22,15 @@
 # You should have received a copy of the GNU General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
 # Notes for first time installers:
 
-# The package transmartRClient depends on five packages: RCurl, RJSONIO, RProtoBuf, plyr, hash, and reshape.
+# The package transmartRClient depends on five packages: RCurl, rjson, RProtoBuf, plyr, hash, and reshape.
 # You can install them as follows:
-install.packages(pkgs=c("RCurl", "RJSONIO", "RProtoBuf", "plyr", "hash", "reshape"))
+install.packages(pkgs=c("RCurl", "rjson", "RProtoBuf", "plyr", "hash", "reshape"))
+
+# RProtoBuf depends on the system protobuf headers. For Ubuntu you will need to
+# install the libprotoc-dev and libprotobuf-dev packages.
 
 # One nasty issue encountered in some MacOSX versions (at least in 10.9) is that
 # the R version installed via homebrew runs into a libl library error. Please

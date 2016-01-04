@@ -1,6 +1,14 @@
 R Client: R package allowing access to tranSMART's data via its RESTful API.
 
-Copyright 2014 Janssen Research & Development, LLC.
+Copyright 2014, 2015 The Hyve B.V, copyright 2014 Janssen Research & Development, LLC.
+
+Code written before June 2014 (up to commit ad272a29f3f0166dc31ab64f37f34fda13d9cfbf)
+was written by The Hyve on behalf of Janssen, and the copyright was transferred to
+Janssen. Code written after June 2014 is copyright The Hyve B.V. See the Git
+version history for when what code was written. All code is available under the
+terms of the GNU General Public License version 3 or (at your option) any later
+version.
+
 
 This product includes software developed by or on behalf of Janssen Research &
 Development, LLC (“Janssen”).
@@ -13,7 +21,7 @@ apply:
 | ---------- | -------- | -----------------------------------------------------------
 | Protobuf   | BSD      | <http://grails.org/License>
 | RCurl      | BSD      | <http://cran.r-project.org/web/packages/RCurl/index.html>
-| RJSONIO    | BSD      | <http://cran.r-project.org/web/packages/RJSONIO/index.html>
+| rjson      | GPL2     | <http://cran.r-project.org/web/packages/rjson/index.html>
 | RProtoBuf  | GPL2     | <http://cran.r-project.org/web/packages/RProtoBuf/index.html>
 | plyr       | MIT      | <http://cran.r-project.org/web/packages/plyr/index.html>
 | hash       | GPL3     | <http://cran.r-project.org/web/packages/hash/index.html>

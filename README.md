@@ -23,7 +23,7 @@ Redhat:
     
 Or install it from source with one of the packages available at [https://code.google.com/p/protobuf/downloads/list](https://code.google.com/p/protobuf/downloads/list).
 
-### CUrl
+### Curl
 
 Windows users might need to install the `curl` package from [http://curl.haxx.se](http://curl.haxx.se).
 
@@ -32,7 +32,7 @@ Windows users might need to install the `curl` package from [http://curl.haxx.se
 The package can be installed directly from github using the `devtools` package:
 
     require(devtools)
-    install_github('thehyve/RInterface')
+    install_github('transmart/RInterface')
 
 or by following the instructions in `bin/installCommands.R`
 

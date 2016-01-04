@@ -1,3 +1,4 @@
+# Copyright 2014, 2015 The Hyve B.V.
 # Copyright 2014 Janssen Research & Development, LLC.
 #
 # This file is part of tranSMART R Client: R package allowing access to
@@ -22,10 +23,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 getConcepts <- function(study.name, as.data.frame = TRUE, cull.columns = TRUE) {
-    .checkTransmartConnection()
+    .ensureTransmartConnection()
     
-    serverResult <- .transmartServerGetRequest(
-            paste("/studies/", study.name, "/concepts", sep = ""), accept.type = "hal")
+    serverResult <- .transmartGetJSON(paste("/studies/", study.name, "/concepts", sep = ""))
     listOfConcepts <- serverResult$ontology_terms
     
     if (as.data.frame) {

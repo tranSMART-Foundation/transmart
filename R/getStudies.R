@@ -1,3 +1,4 @@
+# Copyright 2014, 2015 The Hyve B.V.
 # Copyright 2014 Janssen Research & Development, LLC.
 #
 # This file is part of tranSMART R Client: R package allowing access to
@@ -22,9 +23,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>..
 
 getStudies <- function(name.match = "", as.data.frame = TRUE, cull.columns = TRUE) {
-    .checkTransmartConnection()
+    .ensureTransmartConnection()
 
-    serverResult <- .transmartServerGetRequest("/studies", accept.type = "hal")
+    serverResult <- .transmartGetJSON("/studies")
     listOfStudies <- serverResult$studies
     
     n <- length(listOfStudies)

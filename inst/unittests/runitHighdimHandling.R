@@ -1,3 +1,4 @@
+# Copyright 2014, 2015 The Hyve B.V.
 # Copyright 2014 Janssen Research & Development, LLC.
 #
 # This file is part of tranSMART R Client: R package allowing access to
