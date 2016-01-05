@@ -1,0 +1,43 @@
+Given artifact example.txt . . .
+
+md5sum example.txt
+sha1sum example.txt
+
+gpg2 --sign example.txt
+(makes example.txt.gpg )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Setup.
+gpg2 --gen-key (generate a key pair)
+gpg2 --send-keys PUB_KEY_ID (send public key to key server)
+pgp2 --gen-revoke PUB_KEY_ID > revocert.asc (create and save a revocation cert)
+
+Signing a doc (generates document.ext.gpg - the signature)
+gpg2 --sign document.ext
+
+Verify a signed doc (with signature in same directory as document)
+gpg2 --import PUB_KEY_ID
+gpg2 --verify document.ext.gpg
+
+
+gpg: checking the trustdb
+gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+pub   2048R/147F62E0 2016-01-05
+      Key fingerprint = BE39 4EEE 1643 EEB9 25AB  97E9 CF51 37CB 147F 62E0
+uid       [ultimate] Terry Weymouth (tranSMART Foundation) <weymouth@transmartfoundation.org>
+sub   2048R/2BC5FA0B 2016-01-05
+
