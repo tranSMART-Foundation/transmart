@@ -352,8 +352,8 @@ cd $INSTALL_BASE/transmart-data
 sudo -v
 source ./vars
 make -C solr start > $INSTALL_BASE/transmart-data/solr.log 2>&1 & 
-echo "Sleeping - waiting for SOLR to start (50 seconds)"
-sleep 50
+echo "Sleeping - waiting for SOLR to start (2 minutes)"
+sleep 2m
 make -C solr rwg_full_import sample_full_import
 echo "Finished loading, configuring and starting SOLR at $(date)"
 
