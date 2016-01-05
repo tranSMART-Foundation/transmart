@@ -1,0 +1,6 @@
+list of non-web-application artifacts
+RInterface
+transmart-data
+transmart-batch
+transmart-ICE
+tranSMART-ETL
