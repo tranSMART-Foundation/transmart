@@ -18,7 +18,7 @@ var HeatmapView = (function(){
             clearBtn          : jQuery('#heim-btn-clear'),
             checkStatusBtn    : jQuery('#heim-btn-check'),
             getResultBtn      : jQuery('#heim-btn-get-output'),
-            outputArea        : jQuery('#heim-fetch-data-output'),
+            outputArea        : jQuery('#heim-fetch-output'),
             fetchDialog       : jQuery('#sr-fetch-dialog')
         },
         preprocessView : {
@@ -113,11 +113,15 @@ var HeatmapView = (function(){
     };
 
 
-    var _emptyOutputs = function () {
-        view.fetchDataView.outputArea.empty();
-        view.preprocessView.outputArea.empty();
-        view.runHeatmapView.outputArea.empty();
-        view.runHeatmapView.d3Heatmap.empty();
+    var _emptyOutputs = function (workflow) {
+        if (workflow === 'fetch') {
+            view.preprocessView.outputArea.empty();
+            view.runHeatmapView.outputArea.empty();
+            view.runHeatmapView.d3Heatmap.empty();
+        } else if (workflow === 'preprocess') {
+            view.runHeatmapView.outputArea.empty();
+            view.runHeatmapView.d3Heatmap.empty();
+        }
     };
 
     /**
@@ -150,7 +154,39 @@ var HeatmapView = (function(){
         } else {
             console.error('Invalid no of samples.');
         }
+    };
 
+    var _onFetchData = function () {
+        view.preprocessView.preprocessBtn.attr('disabled', 'disabled');
+        view.runHeatmapView.runAnalysisBtn.attr('disabled', 'disabled');
+        view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
+        view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
+    };
+
+    var _onPreprocess = function () {
+        view.fetchDataView.actionBtn.attr('disabled', 'disabled');
+        view.runHeatmapView.runAnalysisBtn.attr('disabled', 'disabled');
+        view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
+        view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
+    };
+
+    var _onRunAnalysis = function () {
+        view.fetchDataView.actionBtn.attr('disabled', 'disabled');
+        view.preprocessView.preprocessBtn.attr('disabled', 'disabled');
+        view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
+        view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
+    };
+
+    var _resetActionButtons = function () {
+        view.fetchDataView.actionBtn.removeAttr('disabled');
+        view.preprocessView.preprocessBtn.removeAttr('disabled');
+        view.runHeatmapView.runAnalysisBtn.removeAttr('disabled');
+        view.runHeatmapView.snapshotImageBtn.removeAttr('disabled');
+        view.runHeatmapView.downloadFileBtn.removeAttr('disabled');
+    };
+
+    var _isEmptyEl = function (el) {
+        return !jQuery.trim(el.html());
     };
 
     /**
@@ -164,11 +200,8 @@ var HeatmapView = (function(){
             _promise = null,
             _fetchDataParams = _getFetchDataViewValues(view.fetchDataView);
 
-        var _isEmptyEl = function (el) {
-            return !jQuery.trim(el.html());
-        };
-
         var _fetch = function (promise) {
+            _onFetchData();
             // fetch data
             promise = heatmapService.fetchData(_fetchDataParams);
             // return promise when fetching and calculating summary has finished
@@ -178,14 +211,15 @@ var HeatmapView = (function(){
                         _noOfSamples += summaryJSON['numberOfSamples'];
                     });
                 });
+                _resetActionButtons();
                 // empty outputs
-                _emptyOutputs();
+                _emptyOutputs('fetch');
                 // toggle view
                 _toggleAnalysisView({subsetNo: subsetNo, noOfSamples: _noOfSamples});
             });
         };
 
-        // Notify user when there're outputs from previous jobs
+        // Notify user when there are outputs from previous jobs
         if (!_isEmptyEl(view.preprocessView.outputArea) || !_isEmptyEl(view.runHeatmapView.outputArea)) {
             view.fetchDataView.fetchDialog.dialog({
                 resizable: false,
@@ -209,16 +243,12 @@ var HeatmapView = (function(){
 
     var _runHeatmapAction = function (eventObj) {
         var _runHeatmapInputArgs =  _getRunHeatmapViewValues(view.runHeatmapView);
+        _onRunAnalysis();
         view.runHeatmapView.d3Heatmap.empty();
-        view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
-        view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
         heatmapService.runAnalysis(_runHeatmapInputArgs)
             .then(function(data) {
                 SmartRHeatmap.create(data.heatmapData);
-
-                view.runHeatmapView.snapshotImageBtn.removeAttr('disabled');
-                view.runHeatmapView.downloadFileBtn.removeAttr('disabled');
-
+                _resetActionButtons();
                 if (data.markerSelectionData) {
                     view.appendSelectionTable({
                         entries: data.markerSelectionData
@@ -228,8 +258,37 @@ var HeatmapView = (function(){
     };
 
     var _preprocessAction = function (eventObj) {
+        _onPreprocess();
         var _preprocessInputArgs =  _getPreprocessViewValues(view.preprocessView);
-        heatmapService.preprocess(_preprocessInputArgs);
+
+        var _preprocess = function () {
+            heatmapService.preprocess(_preprocessInputArgs)
+                .then(function (data) {
+                    _resetActionButtons();
+                    // empty outputs
+                    _emptyOutputs('preprocess');
+                });
+        };
+
+        // Notify user when there are outputs from previous jobs
+        if (!_isEmptyEl(view.runHeatmapView.outputArea)) {
+            view.fetchDataView.fetchDialog.dialog({
+                resizable: false,
+                height: 140,
+                modal: true,
+                buttons: {
+                    "Proceed": function () {
+                        jQuery(this).dialog("close");
+                        _preprocess();
+                    },
+                    Cancel: function () {
+                        jQuery(this).dialog("close");
+                    }
+                }
+            });
+        } else {
+            _preprocess();
+        }
     };
 
     /**
@@ -251,7 +310,6 @@ var HeatmapView = (function(){
                         return;
                     }
                 }
-
                 _fetchDataAction();
             }
         );
@@ -299,6 +357,7 @@ var HeatmapView = (function(){
                 '</a>',
             '</li>'
         );
+
         view.fetchDataView.identifierInput.autocomplete({
             source: function(request, response) {
                 var term = request.term;
