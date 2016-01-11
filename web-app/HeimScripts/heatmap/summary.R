@@ -319,7 +319,13 @@ extract_measurements <- function(datasets)
         which(colNames %in% c("Row.Label","Bio.marker"))
       datasets[[i]] <-
         dataset[,-non_measurement_columns, drop = F]
-      if (!all(sapply(dataset[,-non_measurement_columns, drop = F], FUN = is.numeric)))
+      
+      #drop empty data columns for check if measurements are numeric.
+      tmp_measurements <- dataset[,-non_measurement_columns, drop = F]
+      empty_columns <- apply(tmp_measurements, allNA, MARGIN = 2)
+      tmp_measurements <- tmp_measurements[,!empty_columns, drop = F]
+      ##TEST IF GOES WELL IF ALL EMPTY
+      if (ncol(tmp_measurements) > 0 & !all(sapply(tmp_measurements, FUN = is.numeric)))
       {
         stop(
           paste(
@@ -336,6 +342,10 @@ extract_measurements <- function(datasets)
   return(datasets)
 }
 
+allNA <- function(v1)
+{
+  return(all(is.na(v1)))
+}
 
 # Function to produce one JSON file per data node containing the summary stats per subset for that node. 
 # Summary stats include: the number of values, number of missing values quartiles, min, max, mean, std deviation, median
@@ -440,6 +450,7 @@ produce_summary_stats <- function(measurement_tables, phase)
   }
   return(summary_stats_all_nodes)
 }
+
 
 
 write_summary_stats <- function(summary_stats)
