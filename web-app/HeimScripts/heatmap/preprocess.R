@@ -34,7 +34,7 @@ aggregate.probes <- function(df){
                             connectivityBasedCollapsing = FALSE, #in Rmodules = TRUE. In our spec, not required
                             methodFunction = NULL, # It only needs to be specified if method="function"
                             #connectivityPower = 1, # ignored when connectivityBasedCollapsing = FALSE
-                            selectFewestMissing = TRUE)
+                            selectFewestMissing = FALSE)
   collapsedMeasurements <- collapsed$datETcollapsed
   Bio.marker <- collapsed$group2row[,1] # first column of this matrix always contains gene
   Row.Label <- collapsed$group2row[,2]  # second column of this matrix always contains probe_id
