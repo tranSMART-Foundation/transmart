@@ -10,8 +10,6 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 class SmartRController {
 
     SessionService sessionService
-    def smartRService
-    def scriptExecutorService
 
     static layout = 'smartR'
 
@@ -31,10 +29,6 @@ class SmartRController {
         } else {
             render template: "/heim/in${FilenameUtils.getBaseName(params.script).capitalize()}"
         }
-    }
-
-    def renderLoadingScreen = {
-        render template: "/visualizations/outLoading"
     }
 
     /**

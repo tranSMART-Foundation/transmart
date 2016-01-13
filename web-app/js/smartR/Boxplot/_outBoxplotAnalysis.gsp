@@ -4,7 +4,7 @@
 	    font-family: 'Roboto', sans-serif;
         fill: black;
 	}
-    
+
     .boxplotValue {
         font-size: 9px;
     }
@@ -94,7 +94,7 @@
         fill: blue;
         opacity: .25;
         shape-rendering: crispEdges;
-        
+
     }
 
     .axis path, .axis line {
@@ -121,7 +121,7 @@
 </style>
 
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
-<g:javascript src="resource/d3.js"/>
+<g:javascript src="resource/d3.min.js"/>
 
 <div id="visualization">
     <div id="controls" style='float: left; padding-right: 10px'></div>
@@ -146,8 +146,8 @@
     results.cohort2 = results.cohort2 === undefined ? {concept: 'undefined', subsets: []} : results.cohort2;
 
 	var margin = {top: 10, right: 60, bottom: 200, left: 60};
-    var width = jQuery("#smartRPanel").width() / 2 - 200 - margin.left - margin.right;
-    var height = jQuery("#smartRPanel").height() * 0.65 - margin.top - margin.bottom;
+    var width = jQuery("#etrikspanel").width() / 2 - 200 - margin.left - margin.right;
+    var height = jQuery("#etrikspanel").height() * 0.65 - margin.top - margin.bottom;
 
     var controls = d3.select('#controls').append('svg')
     .attr('width', '220px')
@@ -225,7 +225,7 @@
     .attr("class", "y axis text")
     .attr("transform", "translate(" + width + "," + 0 + ")")
     .call(yAxis2);
-    
+
     var yAxisLabel1 = boxplot1.append("text")
     .attr("class", "text")
     .attr("transform", "translate(" + (-40) + "," + (height / 2) + ")rotate(-90)")
@@ -259,7 +259,7 @@
         .style("visibility", "hidden");
         updateSelection('cohort2');
     });
-    
+
     boxplot1.append("g")
     .attr('id', 'brush1')
     .attr("class", "brush")
@@ -267,9 +267,9 @@
         if(d3.event.button === 2){
             d3.event.stopImmediatePropagation();
         }
-    })   
+    })
     .call(brush1);
-    
+
     boxplot2.append("g")
     .attr('id', 'brush2')
     .attr("class", "brush")
@@ -277,13 +277,13 @@
         if(d3.event.button === 2){
             d3.event.stopImmediatePropagation();
         }
-    })   
+    })
     .call(brush2);
-    
+
     var contextMenu = d3.select("#visualization").append("div")
     .attr("class", "contextMenu text")
     .style("visibility", "hidden")
-    .html("<input id='excludeButton' class='mybutton text' type='button' value='Exclude' onclick='excludeSelection()'/><input id='resetButton' class='mybutton text' type='button' value='Reset' onclick='reset()'/><input id='cohortButton' class='mybutton text' type='button' value='Update Cohorts' onclick='updateCohorts()'/>")
+    .html("<input id='excludeButton' class='mybutton text' type='button' value='Exclude' onclick='excludeSelection()'/><input id='resetButton' class='mybutton text' type='button' value='Reset' onclick='reset()'/>")
     .on('click', function() {
         d3.select(this)
         .style('visibility', 'hidden')
@@ -333,21 +333,17 @@
     var excludedPatientIDs = [];
     function excludeSelection() {
         excludedPatientIDs = excludedPatientIDs.concat(currentSelection);
-        var data = prepareFormData();
-        data = addSettingsToData(data, { excludedPatientIDs: excludedPatientIDs });
-
-
-        var doOnResponse = function(response) {
+        var settings = { excludedPatientIDs: excludedPatientIDs };
+        var onResponse = function(response) {
             results = response;
             init();
         };
-
-        updateStatistics(doOnResponse, data, false);
+        startWorkflow(onResponse, settings, false, false);
     }
 
     function removeOutliers() {
         currentSelection = [];
-        d3.selectAll('.outlier').each(function(d) { 
+        d3.selectAll('.outlier').each(function(d) {
             currentSelection.push(d.patientID);
         });
         if (currentSelection.length !== 0) {
@@ -360,6 +356,12 @@
             return x.map(function(x) {
                 return [x, d3.mean(sample, function(v) { return kernel(x - v); })];
             });
+        };
+    }
+
+    function epanechnikovKernel(scale) {
+        return function(u) {
+            return Math.abs(u /= scale) <= 1 ? 0.75 * (1 - u * u) / scale : 0;
         };
     }
 
@@ -378,12 +380,12 @@
             .attr('visibility', 'visible');
         }
     }
-    
+
     function shortenNodeLabel(label) {
         label = label.replace(/\W+/g, '');
         return label;
     }
-    
+
     var jitterWidth = 1.0;
     var jitterChecked = false;
     function swapJitter(checked) {
@@ -463,7 +465,7 @@
             .style('fill', 'blue');
         }
 
-    }    
+    }
 
     var boxplots = {cohort1: {}, cohort2: {}};
     for (var i = 0; i < results.cohort1.subsets.length; i++) {
@@ -651,7 +653,7 @@
 
         yCopy = y.copy();
         yCopy.domain([params.lowerWhisker, params.upperWhisker]);
-        var kde = kernelDensityEstimator(gaussKernel(1), yCopy.ticks(1000));
+        var kde = kernelDensityEstimator(epanechnikovKernel(6), yCopy.ticks(100));
         var values = params.points.map(function(d) { return d.value; });
         var estFun = kde(values);
 
@@ -697,7 +699,7 @@
             this.parentNode.appendChild(this);
         });
     };
-    
+
     function removeBrushes() {
         d3.select('#brush1')
         .call(brush1.clear());
@@ -718,49 +720,15 @@
                 createBoxplot(results.cohort2[subset2], 'cohort2', subset2, x2, y2);
             }
         }
-    
+
         d3.selectAll('.text, .line, .point').moveToFront();
     }
-    
+
     function reset() {
         removeBrushes();
         excludedPatientIDs = [];
         currentSelection = [];
         excludeSelection(); // Abusing the method because I can
-    }
-
-    function updateCohorts() {
-        alert('Under Construction.');
-        // var values = {};
-        // var cohort = d3.select('.patientID-' + currentSelection[0]).classed('cohort1') ? 1 : 2;
-        // var subsets = cohrt === 1 ? results.cohort1.subsets : results.cohort2.subsets;
-        // for (var i = 0; i < currentSelection.length; i++) {
-        //     var patientID = currentSelection[i];
-        //     var point = d3.select('.patientID-' + patientID);
-        //     for (var j = 0; j < subsets.length; j++) {
-        //         var subset = shortenNodeLabel(subsets[j]);
-        //         if (point.classed(subset)) {
-        //             values[subset] = point.property('__data__').value;
-        //         }
-        //     }
-        // }
-
-        // for (var k = 0, keys = Object.keys(values); k < keys.length; k++) {
-        //     var key = keys[k];
-        //     var extent = d3.extent(values[key]);
-        //     var numConcept = 
-        //     var divs = [];
-        //     for (var l = 0; l < subsets.length; l++) {
-        //         subset = shortenNodeLabel(subsets[l]);
-        //         var subConcept = 
-        //         if (numConcept !== subConcept) {
-
-        //         }
-        //     }
-        //     divs.push(createQueryCriteriaDIV(numConcept, 'ratio', 'numeric', 'BETWEEN', extent[0], extent[1], 'ratio', 'Y', 'valueicon'));
-
-        //     setCohorts(divs, true, false, true, cohort);
-        // }
     }
 
     init();

@@ -11,11 +11,10 @@ modules = {
 
     smartR_heatmap {
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jsrender.js']
-
-        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'd3Heatmap-compiled.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'extjs-helper.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'bioMarkersModel.js']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'heatmapService.js']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'heatmapView.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'heatmapService.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'heatmapView.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'd3Heatmap-compiled.js']
     }
 }

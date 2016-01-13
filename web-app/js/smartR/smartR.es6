@@ -361,7 +361,7 @@ function createD3Slider(args) {
 
 function mouseX() {
     let mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX
-    return mouseXPos - $('#smartRPanel').offset().left + $('#index').parent().scrollLeft()
+    return mouseXPos + $('#index').parent().scrollLeft() - $('#smartRPanel').offset().left
 }
 
 function mouseY() {

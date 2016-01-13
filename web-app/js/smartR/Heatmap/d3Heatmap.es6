@@ -111,7 +111,7 @@ SmartRHeatmap = (() => {
                 .attr('rx', 0)
                 .attr('ry', 0)
                 .style('fill', 'white')
-                .on('mouseover', d => {
+                .on('mouseover', function(d) {
                     d3.select('.patientID.patientID-' + d.PATIENTID).classed('highlight', true)
                     d3.select('.probe.probe-' + d.PROBE).classed('highlight', true)
                     let html = ''
