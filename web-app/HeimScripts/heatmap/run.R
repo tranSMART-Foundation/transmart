@@ -583,26 +583,11 @@ getDEgenes <- function(df) {
 }
 
 getDesign <- function(measurements) {
-  subsetnames <- extractSubsets(colnames(measurements))
-  
-  classVectorS1 <- gsub("s1","1",subsetnames)
-  classVectorS1 <- gsub("s2","2",classVectorS1)
-  classVectorS1 <- as.numeric(classVectorS1) 
-  
-  classVectorS2 <- gsub("s1","2",subsetnames)
-  classVectorS2 <- gsub("s2","1",classVectorS2)
-  classVectorS2 <- as.numeric(classVectorS2)
-
+  subsets <- getSubset(colnames(measurements)) #s1 = 0, s2 = 1
+  classVectorS1 <- subsets + 1    #s1 = 1, s2 = 2
+  classVectorS2 <- - subsets + 2  #s1 = 2, s2 = 1
   cbind(S1=classVectorS1, S2=classVectorS2)
 }
-
-extractSubsets <- function(labels)
-{
-  subsetsMatchIndices <- regexpr("s[[:digit:]]+$", labels)
-  subsetsMatches <- regmatches(x = labels, m = subsetsMatchIndices)
-  return(subsetsMatches)
-}
-
 
 getSubset1Length <- function(measurements) {
   sum(grepl(pattern = SUBSET1REGEX, x = colnames(measurements))) # returns number of column names satisfying regexp.
