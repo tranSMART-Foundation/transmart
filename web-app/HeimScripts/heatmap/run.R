@@ -102,7 +102,6 @@ applyRanking <- function (df, ranking, max_rows) {
     df["SIGNIFICANCE_ABS"] <- NULL
     df <- df[1:nrows, ]
     df <- df[with(df, order(-SIGNIFICANCE)), ]
-    df["SIGNIFICANCE"] <- abs(df["SIGNIFICANCE"])
   } else {
     df <- df[with(df, order(-SIGNIFICANCE)), ]
     df <- df[1:nrows, ]

@@ -456,10 +456,11 @@ SmartRHeatmap = (function(){
                 .enter()
                 .append('rect')
                 .attr('class', function(d) { return 'bar idx-' + d.idx ; })
-                .attr("width", function(d) { return histogramScale(d.significance); })
+                .attr("width", function(d) { return histogramScale( Math.abs( d.significance) ); })
                 .attr("height", gridFieldHeight)
-                .attr("x", function(d) { return - histogramScale(d.significance) - 10; })
+                .attr("x", function(d) { return - histogramScale( Math.abs( d.significance)) - 10; })
                 .attr("y", function(d) { return gridFieldHeight * d.idx; })
+                .style('fill', function(d) { return d.significance > 0 ? 'steelblue' : '#990000';})
                 .on("mouseover", function(d) {
                     var html = 'FEATURE SIGNIFICANCE: ' + d.significance;
                     tooltip
@@ -482,8 +483,8 @@ SmartRHeatmap = (function(){
                 .transition()
                 .duration(animationDuration)
                 .attr("height", gridFieldHeight)
-                .attr("width", function(d) { return histogramScale(d.significance); })
-                .attr("x", function(d) { return - histogramScale(d.significance) - 10; })
+                .attr("width", function(d) { return histogramScale(Math.abs( d.significance) ); })
+                .attr("x", function(d) { return - histogramScale( Math.abs( d.significance) ) - 10; })
                 .attr("y", function(d) { return gridFieldHeight * d.idx; });
 
             var featurePosY = - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20;
