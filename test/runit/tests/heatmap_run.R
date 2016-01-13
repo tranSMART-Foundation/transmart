@@ -69,10 +69,36 @@ test.getDesign <- function()
      "b_n0_s1" = 1:3, "a_n1_s1" = 1:3, "b_n1_s1" = 1:3,
      "a_n0_s2" = 1:3, "b_n0_s2" = 1:3 )
   expected <- matrix(
-    c(1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1),
-    ncol = 2,
+    c(1, 1, 1, 1, 2, 2, 
+      2, 2, 2, 2, 1, 1),
+    ncol = 2
    )
   colnames(expected) <- c("S1", "S2")
   result             <- getDesign(testMeasurements)
   checkEquals(result,expected)
+}
+
+test.getDEgenes <- function()
+{
+  test_set<- data.frame( Row.Label = c("1007_s_at", "1053_at", "117_at"),
+                         Bio.marker = c("a", "b", "c"),
+                         GSM210004_n0_s1 = c(6.5, 4, 5),
+                         GSM210006_n1_s1 = c(8.1, 2, 4),
+                         GSM210007_n1_s1 = c(6.2, 3, 5),
+                         GSM210008_n1_s1 = c(8.34, 2, 5),
+                         GSM210006_n1_s2 = c(8.4, -2, 9),
+                         GSM210007_n1_s2 = c(6.4,2, 12),
+                         stringsAsFactors = F)
+  result <- getDEgenes(test_set)
+  result[,-c(1,2)]<-round(result[,-c(1,2)],4)
+  
+  expected <- data.frame( Row.Label = c("1007_s_at", "1053_at", "117_at"),
+                          Bio.marker = c("a", "b", "c"),
+                          logfold = c(0.115, -2.75, 5.75),
+                          ttest = c(0.089, -2.1275, 4.4485),
+                          pval = c(0.9306, 0.0548, 0.0008),
+                          adjpval = c(0.9306, 0.0822, 0.0024),
+                          bval = c(-5.7709, -3.7252, 3.1846),
+                          stringsAsFactors = F)
+  checkEquals(result, expected)
 }
