@@ -582,9 +582,9 @@ getDEgenes <- function(df) {
 }
 
 getDesign <- function(measurements) {
-  subset1Length <- getSubset1Length(measurements)
-  classVectorS1 <- c(rep(1, subset1Length), rep(2, ncol(measurements) - subset1Length ))
-  classVectorS2 <- rev(classVectorS1)
+  subsets <- getSubset(colnames(measurements)) #s1 = 0, s2 = 1
+  classVectorS1 <- subsets + 1    #s1 = 1, s2 = 2
+  classVectorS2 <- - subsets + 2  #s1 = 2, s2 = 1
   cbind(S1=classVectorS1, S2=classVectorS2)
 }
 
