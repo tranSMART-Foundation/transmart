@@ -9,39 +9,39 @@ var HeatmapView = (function(){
     var heatmapService, extJSHelper;
 
     var view = {
-        container : jQuery('#heim-tabs'),
+        container : $('#heim-tabs'),
         fetchDataView : {
-            conceptPathsInput : jQuery('#heim-high-dim-var'),
-            identifierInput   : jQuery('#heim-input-txt-identifier'),
-            listIdentifiers   : jQuery('#heim-input-list-identifiers'),
-            actionBtn         : jQuery('#heim-btn-fetch-data'),
-            clearBtn          : jQuery('#heim-btn-clear'),
-            checkStatusBtn    : jQuery('#heim-btn-check'),
-            getResultBtn      : jQuery('#heim-btn-get-output'),
-            outputArea        : jQuery('#heim-fetch-data-output'),
-            fetchDialog       : jQuery('#sr-fetch-dialog')
+            conceptPathsInput : $('#heim-high-dim-var'),
+            identifierInput   : $('#heim-input-txt-identifier'),
+            listIdentifiers   : $('#heim-input-list-identifiers'),
+            actionBtn         : $('#heim-btn-fetch-data'),
+            clearBtn          : $('#heim-btn-clear'),
+            checkStatusBtn    : $('#heim-btn-check'),
+            getResultBtn      : $('#heim-btn-get-output'),
+            outputArea        : $('#heim-fetch-data-output'),
+            fetchDialog       : $('#sr-fetch-dialog')
         },
         preprocessView : {
-            aggregateProbesChk : jQuery('#chkAggregateProbes'),
-            preprocessBtn      : jQuery('#heim-btn-preprocess-heatmap'),
-            outputArea         : jQuery('#heim-preprocess-output')
+            aggregateProbesChk : $('#chkAggregateProbes'),
+            preprocessBtn      : $('#heim-btn-preprocess-heatmap'),
+            outputArea         : $('#heim-preprocess-output')
         },
         runHeatmapView : {
-            maxRowInput          : jQuery('#txtMaxRow'),
-            clusteringOptionsDiv : jQuery('#clusteringOptionsDiv'),
-            methodSelect         : jQuery('[name=rankCriteria]'),
-            noClustersDiv        : jQuery('#noOfClustersDiv'),
-            noMarkersDiv         : jQuery('#noOfMarkersDiv'),
-            sortingSelect        : jQuery('[name=sortingSelect]'),
-            singleSubsetDiv      : jQuery('#sr-non-multi-subset'),
-            singleSubsetVarDiv   : jQuery('#sr-variability-group'),
-            singleSubsetLvlDiv   : jQuery('#sr-expression-level-group'),
-            multiSubsetDiv       : jQuery('#sr-multi-subset'),
-            runAnalysisBtn       : jQuery('#heim-btn-run-heatmap'),
-            snapshotImageBtn     : jQuery('#heim-btn-snapshot-image'),
-            downloadFileBtn      : jQuery('#heim-btn-download-file'),
-            outputArea           : jQuery('#heim-run-output'),
-            d3Heatmap            : jQuery('#heatmap')
+            maxRowInput          : $('#txtMaxRow'),
+            clusteringOptionsDiv : $('#clusteringOptionsDiv'),
+            methodSelect         : $('[name=rankCriteria]'),
+            noClustersDiv        : $('#noOfClustersDiv'),
+            noMarkersDiv         : $('#noOfMarkersDiv'),
+            sortingSelect        : $('[name=sortingSelect]'),
+            singleSubsetDiv      : $('#sr-non-multi-subset'),
+            singleSubsetVarDiv   : $('#sr-variability-group'),
+            singleSubsetLvlDiv   : $('#sr-expression-level-group'),
+            multiSubsetDiv       : $('#sr-multi-subset'),
+            runAnalysisBtn       : $('#heim-btn-run-heatmap'),
+            snapshotImageBtn     : $('#heim-btn-snapshot-image'),
+            downloadFileBtn      : $('#heim-btn-download-file'),
+            outputArea           : $('#heim-run-output'),
+            d3Heatmap            : $('#heatmap')
         }
     };
 
@@ -73,7 +73,7 @@ var HeatmapView = (function(){
     var bioMarkersModel = new BioMarkersModel();
     bioMarkersModel.on('biomarkers', _renderBiomarkersList);
     view.fetchDataView.listIdentifiers.on('click', 'button', function(ev) {
-        bioMarkersModel.removeBioMarker(jQuery(this).val());
+        bioMarkersModel.removeBioMarker($(this).val());
     });
 
     /**
@@ -165,7 +165,7 @@ var HeatmapView = (function(){
             _fetchDataParams = _getFetchDataViewValues(view.fetchDataView);
 
         var _isEmptyEl = function (el) {
-            return !jQuery.trim(el.html());
+            return !$.trim(el.html());
         };
 
         var _fetch = function (promise) {
@@ -193,11 +193,11 @@ var HeatmapView = (function(){
                 modal: true,
                 buttons: {
                     "Proceed": function () {
-                        jQuery(this).dialog("close");
+                        $(this).dialog("close");
                         _fetch(_promise);
                     },
                     Cancel: function () {
-                        jQuery(this).dialog("close");
+                        $(this).dialog("close");
                     }
                 }
             });
@@ -327,8 +327,8 @@ var HeatmapView = (function(){
 
             minLength: 2
         });
-        view.fetchDataView.identifierInput.data('autocomplete')._renderItem = function(ul, item) {
-            return jQuery(_identifierItemTemplate.append(ul[0], item.value));
+        view.fetchDataView.identifierInput.data('ui-autocomplete')._renderItem = function(ul, item) {
+            return $(_identifierItemTemplate.append(ul[0], item.value));
         };
         view.fetchDataView.identifierInput.on('autocompleteselect',
             function(event, ui) {
@@ -355,7 +355,7 @@ var HeatmapView = (function(){
 
         view.runHeatmapView.snapshotImageBtn.click(
             function() {
-                return jQuery('#visualization svg')[0];
+                return $('#visualization svg')[0];
             },
             heatmapService.downloadSVG);
     };
@@ -365,10 +365,10 @@ var HeatmapView = (function(){
     };
 
     view.appendSelectionTable = function(data) {
-        var tmpl = jQuery.templates('#marker-selection-table-tmp');
+        var tmpl = $.templates('#marker-selection-table-tmp');
         var table = tmpl.render(data);
-        jQuery('#heatmap').append(table);
-        jQuery('#markerSelectionTable').tablesorter();
+        $('#heatmap').append(table);
+        $('#markerSelectionTable').tablesorter();
     }
 
     /**
@@ -378,7 +378,7 @@ var HeatmapView = (function(){
      */
     view.init = function (service, helper) {
         // instantiate tooltips
-        jQuery( "[title]" ).tooltip({track: true, tooltipClass:"sr-ui-tooltip"});
+        $( "[title]" ).tooltip({track: true, tooltipClass:"sr-ui-tooltip"});
         // injects dependencies
         heatmapService = service;
         extJSHelper = helper;
