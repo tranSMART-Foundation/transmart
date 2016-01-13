@@ -177,12 +177,14 @@ var HeatmapView = (function(){
         view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
     };
 
-    var _resetActionButtons = function () {
+    var _resetActionButtons = function (workflow) {
         view.fetchDataView.actionBtn.removeAttr('disabled');
         view.preprocessView.preprocessBtn.removeAttr('disabled');
         view.runHeatmapView.runAnalysisBtn.removeAttr('disabled');
-        view.runHeatmapView.snapshotImageBtn.removeAttr('disabled');
-        view.runHeatmapView.downloadFileBtn.removeAttr('disabled');
+        if (workflow === 'runAnalysis') {
+            view.runHeatmapView.snapshotImageBtn.removeAttr('disabled');
+            view.runHeatmapView.downloadFileBtn.removeAttr('disabled');
+        }
     };
 
     var _isEmptyEl = function (el) {
@@ -248,7 +250,7 @@ var HeatmapView = (function(){
         heatmapService.runAnalysis(_runHeatmapInputArgs)
             .then(function(data) {
                 SmartRHeatmap.create(data.heatmapData);
-                _resetActionButtons();
+                _resetActionButtons('runAnalysis');
                 if (data.markerSelectionData) {
                     view.appendSelectionTable({
                         entries: data.markerSelectionData
