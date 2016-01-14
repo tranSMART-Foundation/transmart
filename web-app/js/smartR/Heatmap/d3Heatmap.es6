@@ -111,12 +111,12 @@ SmartRHeatmap = (() => {
                 .attr('rx', 0)
                 .attr('ry', 0)
                 .style('fill', 'white')
-                .on('mouseover', function(d) {
+                .on('mouseover', d => {
                     d3.select('.patientID.patientID-' + d.PATIENTID).classed('highlight', true)
                     d3.select('.probe.probe-' + d.PROBE).classed('highlight', true)
                     let html = ''
-                    for (let key in d) {
-                        html += key + ': ' + d[key] + '<br/>'
+                    for (let key of Object.keys(d)) {
+                        html += `${key}: ${d[key]}<br/>`
                     }
                     tooltip
                         .style('visibility', 'visible')
@@ -340,10 +340,11 @@ SmartRHeatmap = (() => {
             bar.enter()
                 .append('rect')
                 .attr('class', d => 'bar idx-' + d.idx)
-                .attr('width', d => histogramScale(d.significance))
-                .attr('height', gridFieldHeight)
-                .attr('x', d => - histogramScale(d.significance) - 10)
-                .attr('y', d => gridFieldHeight * d.idx)
+                .attr("width", d => histogramScale(Math.abs(d.significance)))
+                .attr("height", gridFieldHeight)
+                .attr("x", d => - histogramScale( Math.abs( d.significance)) - 10)
+                .attr("y", d => gridFieldHeight * d.idx)
+                .style('fill', d => d.significance > 0 ? 'steelblue' : '#990000')
                 .on('mouseover', d => {
                     let html = 'FEATURE SIGNIFICANCE: ' + d.significance
                     tooltip
@@ -363,8 +364,8 @@ SmartRHeatmap = (() => {
             bar.transition()
                 .duration(animationDuration)
                 .attr('height', gridFieldHeight)
-                .attr('width', d => histogramScale(d.significance))
-                .attr('x', d => - histogramScale(d.significance) - 10)
+                .attr("width", d => histogramScale(Math.abs( d.significance) ))
+                .attr("x", d => - histogramScale( Math.abs( d.significance) ) - 10)
                 .attr('y', d => gridFieldHeight * d.idx)
 
             let featurePosY = - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20

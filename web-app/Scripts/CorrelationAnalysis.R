@@ -1,77 +1,51 @@
-### PREPARE SETTINGS ###
+if (! suppressMessages(require(reshape2))) stop("SmartR requires the R package 'reshape2'")
 
-method <- settings$method
-if (! is.null(settings$xLow)) {
-	xLow <- as.integer(settings$xLow)
-	xHigh <- as.integer(settings$xHigh)
-	yLow <- as.integer(settings$yLow)
-	yHigh <- as.integer(settings$yHigh)
-} else {
-	xLow <- -Inf
-	xHigh <- Inf
-	yLow <- -Inf
-	yHigh <- Inf
+conceptStrToFolderStr <- function(s) {
+    splitString <- strsplit(s, "")[[1]]
+    backslashs <- which(splitString == "\\")
+    substr(s, 0, tail(backslashs, 2)[1])
 }
 
-### COMPUTE RESULTS ###
-
-points <- data.cohort1$datapoints
+points <- SmartR.data.cohort1$datapoints
 concepts <- unique(points$concept)
-if (! length(points)) {
-	stop('Your selection does not match any patient in the defined cohort!')
-}
-xArr <- points[points$concept == concepts[1], ]
-yArr <- points[points$concept == concepts[2], ]
-
-xArr <- xArr[xArr$patientID %in% yArr$patientID, ]
-yArr <- yArr[yArr$patientID %in% xArr$patientID, ]
-
-xArr <- xArr[order(xArr$patientID), ]
-yArr <- yArr[order(yArr$patientID), ]
-
-patientIDs <- xArr$patientID
-
-xArr <- xArr$value
-yArr <- yArr$value
-
-if (length(xArr) != length(yArr)) {
-	stop(paste('Both variables must have the same number of patients!', length(xArr), length(yArr)))
+if (! length(points)) stop('Your selection does not match any patient in the defined cohort!')
+df <- data.frame(dcast(points, patientID ~ concept))
+if(length(SmartR.settings$patientIDs)) df <- df[df$patientID %in% SmartR.settings$patientIDs, ]
+annotations <- SmartR.data.cohort1$annotations
+folders <- as.vector(sapply(annotations$concept, conceptStrToFolderStr))
+if (length(unique(folders)) > 1) {
+    stop("Sorry, but at this moment only one folder at a time is supported for annotation.")
+} else if (length(unique(folders)) == 1) {
+    annotations <- annotations[, c('patientID', 'value')]
+    df <- merge(df, annotations, by='patientID', all=T)
+    colnames(df) <- c('patientID', 'x', 'y', 'tag')
+    tags <- df$tag
+} else {
+    tags <- list()
+   colnames(df) <- c('patientID', 'x', 'y')
 }
 
-selection <- (xArr >= xLow
-			& xArr <= xHigh
-			& yArr >= yLow
-			& yArr <= yHigh)
-xArr <- xArr[selection]
-yArr <- yArr[selection]
-patientIDs <- patientIDs[selection]
+df <- df[!is.na(df[,2]) & !is.na(df[,3]), ]
 
-annotations <- data.cohort1$annotations
-tags <- list()
-if (length(annotations) > 0) {
-	annotations <- annotations[annotations$patientID %in% patientIDs, ]
-	tags <- annotations$value
-	if (length(tags) == 0) {
-		stop("The chosen annotations don't map to any patients")
-	}
-	sorting <- match(annotations$patientID, patientIDs)
-	tags <- tags[order(sorting)]
-}
+corTest <- tryCatch({
+	cor.test(df[,2], df[,3], method=SmartR.settings$method)
+}, error = function(e) {
+	ll <- list()
+	ll$estimate <- as.numeric(NA)
+	ll$p.value <- as.numeric(NA)
+	ll
+})
 
-corTest <- cor.test(xArr, yArr, method=method)
-regLineSlope <- corTest$estimate * (sd(yArr) / sd(xArr))
-regLineYIntercept <- mean(yArr) - regLineSlope * mean(xArr)
+regLineSlope <- corTest$estimate * (sd(df[,3]) / sd(df[,2]))
+regLineYIntercept <- mean(df[,3]) - regLineSlope * mean(df[,2])
 
-### WRITE OUTPUT ###
-
-output$correlation <- corTest$estimate
-output$pvalue <- corTest$p.value
-output$regLineSlope <- regLineSlope
-output$regLineYIntercept <- regLineYIntercept
-output$method <- settings$method
-output$xArrLabel <- concepts[1]
-output$yArrLabel <- concepts[2]
-output$xArr <- xArr
-output$yArr <- yArr
-output$patientIDs <- patientIDs
-output$tags <- tags
+SmartR.output$correlation <- corTest$estimate
+SmartR.output$pvalue <- corTest$p.value
+SmartR.output$regLineSlope <- regLineSlope
+SmartR.output$regLineYIntercept <- regLineYIntercept
+SmartR.output$method <- SmartR.settings$method
+SmartR.output$xArrLabel <- concepts[1]
+SmartR.output$yArrLabel <- concepts[2]
+SmartR.output$patientIDs <- df[,0]
+SmartR.output$tags <- unique(tags)
+SmartR.output$points <- df

@@ -258,13 +258,22 @@ window.HeatmapService = (function(){
      * @param params
      */
     service.preprocess = function (params) {
+        var defer = jQuery.Deferred();
+        var preprocess_ultimateSuccess = function (data, taskData) {
+            service.getSummary('preprocess').then(function (data) {
+                defer.resolve(data);
+            });
+        };
+
         startScriptExecution({
             taskType: 'preprocess',
             arguments: params,
-            onUltimateSuccess: function (data, taskData) { service.getSummary('preprocess'); },
+            onUltimateSuccess: preprocess_ultimateSuccess,
             phase: 'preprocess',
             progressMessage: 'Preprocessing'
         });
+
+        return defer.promise();
     };
 
     service.runAnalysis = function (params) {
@@ -408,7 +417,7 @@ window.HeatmapService = (function(){
 
                 taskData.onUltimateSuccess(d);
             } else if (d.state === 'FAILED') {
-                var _errHTML = '<span style="color: red";>' + d.result.exception +'</span>';
+                var _errHTML = '<span style="color: red">' + d.result.exception +'</span>';
                 div.html(_errHTML);
                 console.error('FAILED', d.result);
             } else {
@@ -416,7 +425,7 @@ window.HeatmapService = (function(){
             }
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
-            var _html = '<span style="color: red";>'+errorThrown+'</span>';
+            var _html = '<span style="color: red">'+errorThrown+'</span>';
             console.error(jqXHR);
             console.error(textStatus);
             console.error(errorThrown);

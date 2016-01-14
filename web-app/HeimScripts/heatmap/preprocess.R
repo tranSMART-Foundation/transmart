@@ -34,7 +34,7 @@ aggregate.probes <- function(df){
                             connectivityBasedCollapsing = FALSE, #in Rmodules = TRUE. In our spec, not required
                             methodFunction = NULL, # It only needs to be specified if method="function"
                             #connectivityPower = 1, # ignored when connectivityBasedCollapsing = FALSE
-                            selectFewestMissing = TRUE)
+                            selectFewestMissing = FALSE)
   collapsedMeasurements <- collapsed$datETcollapsed
   Bio.marker <- collapsed$group2row[,1] # first column of this matrix always contains gene
   Row.Label <- collapsed$group2row[,2]  # second column of this matrix always contains probe_id
@@ -61,15 +61,28 @@ dropEmptyGene <- function(d){
 
 mergeFetchedData <- function(listOfHdd){
   df <- listOfHdd[[1]]
+  
+  #test if the different data.frames all contain the exact same set of probe IDs/metabolites/etc (independent of 
+  # order of occurrence).
+  row.Labels<- df$Row.Label
+  
+  for(i in 1:length(listOfHdd)){
+    if(!all(listOfHdd[[i]]$Row.Label %in% row.Labels) | !all(row.Labels %in% listOfHdd[[i]]$Row.Label) ){
+      assign("errors", "Mismatched probe_ids - different platform used?", envir = .GlobalEnv)
+    }
+  }
+  
+  #merge data.frames
   expected.rowlen <- nrow(df)
   labels <- names(listOfHdd)
   df <- add.subset.label(df,labels[1])
+  
   if(length(listOfHdd) > 1){
     for(i in 2:length(listOfHdd)){
       df2 <- listOfHdd[[i]]
       label <- labels[i]
       df2 <- add.subset.label(df2,label)
-      df <- merge(df, df2 ,by=c("Row.Label","Bio.marker"))
+      df <- merge(df, df2 ,by = c("Row.Label","Bio.marker"), all = T)
       if(nrow(df) != expected.rowlen){
         assign("errors", "Mismatched probe_ids - different platform used?", envir = .GlobalEnv)
       }

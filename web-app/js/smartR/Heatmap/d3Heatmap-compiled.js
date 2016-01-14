@@ -109,9 +109,31 @@ SmartRHeatmap = (function () {
                 d3.select('.patientID.patientID-' + d.PATIENTID).classed('highlight', true);
                 d3.select('.probe.probe-' + d.PROBE).classed('highlight', true);
                 var html = '';
-                for (var key in d) {
-                    html += key + ': ' + d[key] + '<br/>';
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = Object.keys(d)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var key = _step.value;
+
+                        html += key + ': ' + d[key] + '<br/>';
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
                 }
+
                 tooltip.style('visibility', 'visible').html(html).style('left', mouseX() + 'px').style('top', mouseY() + 'px');
             }).on('mouseout', function () {
                 d3.selectAll('.patientID').classed('highlight', false);
@@ -305,12 +327,14 @@ SmartRHeatmap = (function () {
 
             bar.enter().append('rect').attr('class', function (d) {
                 return 'bar idx-' + d.idx;
-            }).attr('width', function (d) {
-                return histogramScale(d.significance);
-            }).attr('height', gridFieldHeight).attr('x', function (d) {
-                return -histogramScale(d.significance) - 10;
-            }).attr('y', function (d) {
+            }).attr("width", function (d) {
+                return histogramScale(Math.abs(d.significance));
+            }).attr("height", gridFieldHeight).attr("x", function (d) {
+                return -histogramScale(Math.abs(d.significance)) - 10;
+            }).attr("y", function (d) {
                 return gridFieldHeight * d.idx;
+            }).style('fill', function (d) {
+                return d.significance > 0 ? 'steelblue' : '#990000';
             }).on('mouseover', function (d) {
                 var html = 'FEATURE SIGNIFICANCE: ' + d.significance;
                 tooltip.style('visibility', 'visible').html(html).style('left', mouseX() + 'px').style('top', mouseY() + 'px');
@@ -322,10 +346,10 @@ SmartRHeatmap = (function () {
                 d3.selectAll('.probe').classed('highlight', false);
             });
 
-            bar.transition().duration(animationDuration).attr('height', gridFieldHeight).attr('width', function (d) {
-                return histogramScale(d.significance);
-            }).attr('x', function (d) {
-                return -histogramScale(d.significance) - 10;
+            bar.transition().duration(animationDuration).attr('height', gridFieldHeight).attr("width", function (d) {
+                return histogramScale(Math.abs(d.significance));
+            }).attr("x", function (d) {
+                return -histogramScale(Math.abs(d.significance)) - 10;
             }).attr('y', function (d) {
                 return gridFieldHeight * d.idx;
             });
@@ -346,27 +370,27 @@ SmartRHeatmap = (function () {
                 d3.select('.patientID.patientID-' + d.PATIENTID).classed('highlight', true);
                 d3.select('.feature.feature-' + d.FEATURE).classed('highlight', true);
                 var html = '';
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
 
                 try {
-                    for (var _iterator = Object.keys(d)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var key = _step.value;
+                    for (var _iterator2 = Object.keys(d)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                        var key = _step2.value;
 
                         html += key + ': ' + d[key] + '<br/>';
                     }
                 } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
+                    _didIteratorError2 = true;
+                    _iteratorError2 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
+                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                            _iterator2.return();
                         }
                     } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
+                        if (_didIteratorError2) {
+                            throw _iteratorError2;
                         }
                     }
                 }
@@ -521,13 +545,13 @@ SmartRHeatmap = (function () {
             d3.selectAll('.square').transition().duration(animationDuration).style('fill', function (d) {
                 return colorScale(1 / (1 + Math.pow(Math.E, -d.ZSCORE)));
             });
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
 
             try {
                 var _loop = function _loop() {
-                    var feature = _step2.value;
+                    var feature = _step3.value;
 
                     var categoricalColorScale = d3.scale.category10();
                     d3.selectAll('.extraSquare.feature-' + feature).style('fill', function (d) {
@@ -543,20 +567,20 @@ SmartRHeatmap = (function () {
                     });
                 };
 
-                for (var _iterator2 = features[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                for (var _iterator3 = features[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
                     _loop();
                 }
             } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                        _iterator2.return();
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
                     }
                 } finally {
-                    if (_didIteratorError2) {
-                        throw _iteratorError2;
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
                     }
                 }
             }

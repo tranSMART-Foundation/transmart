@@ -96,14 +96,17 @@ hasTwoSubsets <- function(measurements) {
 
 applyRanking <- function (df, ranking, max_rows) {
   nrows = min(max_rows, nrow(df))
+  
   if (ranking %in% c("ttest", "logfold")) {
     df["SIGNIFICANCE_ABS"] <- abs(df["SIGNIFICANCE"])
     df <- df[with(df, order(-SIGNIFICANCE_ABS)), ]
     df["SIGNIFICANCE_ABS"] <- NULL
     df <- df[1:nrows, ]
     df <- df[with(df, order(-SIGNIFICANCE)), ]
-    df["SIGNIFICANCE"] <- abs(df["SIGNIFICANCE"])
-  } else {
+  }else if(ranking %in% c("pval", "adjpval")){
+    df <- df[with(df, order(SIGNIFICANCE)), ]
+    df <- df[1:nrows, ]
+  }else{
     df <- df[with(df, order(-SIGNIFICANCE)), ]
     df <- df[1:nrows, ]
   }
@@ -376,20 +379,31 @@ formatSubset <- function(subsetNumber) {
 
 ### duplicated code from utils - when we get sourcing to work it will be moved
 
-
-mergeFetchedData <- function(listOfHdd) {
+mergeFetchedData <- function(listOfHdd){
   df <- listOfHdd[[1]]
+  
+  #test if the different data.frames all contain the exact same set of probe IDs/metabolites/etc, independent of order.
+  row.Labels<- df$Row.Label
+  
+  for(i in 1:length(listOfHdd)){
+    if(!all(listOfHdd[[i]]$Row.Label %in% row.Labels) | !all(row.Labels %in% listOfHdd[[i]]$Row.Label) ){
+      assign("errors", "Mismatched probe_ids - different platform used?", envir = .GlobalEnv)
+    }
+  }
+  
+  #merge data.frames
   expected.rowlen <- nrow(df)
   labels <- names(listOfHdd)
   df <- add.subset.label(df,labels[1])
-  if (length(listOfHdd) > 1) {
-    for (i in 2:length(listOfHdd)) {
+  
+  if(length(listOfHdd) > 1){
+    for(i in 2:length(listOfHdd)){
       df2 <- listOfHdd[[i]]
       label <- labels[i]
       df2 <- add.subset.label(df2,label)
-      df <- merge(df, df2 ,by = c("Row.Label","Bio.marker"))
-      if (nrow(df) != expected.rowlen) {
-        stop("Mismatched probe_ids - different platform used?")
+      df <- merge(df, df2 ,by = c("Row.Label","Bio.marker"), all = T)
+      if(nrow(df) != expected.rowlen){
+        assign("errors", "Mismatched probe_ids - different platform used?", envir = .GlobalEnv)
       }
     }
   }
@@ -572,9 +586,9 @@ getDEgenes <- function(df) {
 }
 
 getDesign <- function(measurements) {
-  subset1Length <- getSubset1Length(measurements)
-  classVectorS1 <- c(rep(1, subset1Length), rep(2, ncol(measurements) - subset1Length ))
-  classVectorS2 <- rev(classVectorS1)
+  subsets <- getSubset(colnames(measurements)) #s1 = 0, s2 = 1
+  classVectorS1 <- subsets + 1    #s1 = 1, s2 = 2
+  classVectorS2 <- - subsets + 2  #s1 = 2, s2 = 1
   cbind(S1=classVectorS1, S2=classVectorS2)
 }
 

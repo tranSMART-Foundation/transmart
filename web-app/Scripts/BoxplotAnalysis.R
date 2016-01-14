@@ -1,4 +1,4 @@
-excludedPatientIDs <- settings$excludedPatientIDs
+excludedPatientIDs <- SmartR.settings$excludedPatientIDs
 
 calc_boxplot <- function(datapoints, subsets) {
 	data <- list()
@@ -47,11 +47,11 @@ calc_boxplot <- function(datapoints, subsets) {
 	data
 }
 
-if (! length(data.cohort1$concept1)) {
+if (! length(SmartR.data.cohort1$concept1)) {
 	stop('Your selection does not match any patient in the defined cohort!')
 }
-output$cohort1 <- calc_boxplot(data.cohort1$concept1, data.cohort1$subsets1)
+SmartR.output$cohort1 <- calc_boxplot(SmartR.data.cohort1$concept1, SmartR.data.cohort1$subsets1)
 
-if (length(data.cohort2$concept2) > 0) {
-	output$cohort2 <- calc_boxplot(data.cohort2$concept2, data.cohort2$subsets2)
+if (length(SmartR.data.cohort2$concept2) > 0) {
+	SmartR.output$cohort2 <- calc_boxplot(SmartR.data.cohort2$concept2, SmartR.data.cohort2$subsets2)
 }

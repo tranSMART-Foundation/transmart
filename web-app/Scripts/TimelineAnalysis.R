@@ -1,14 +1,14 @@
 ### PREPARE SETTINGS ###
 
-acfPatientID <- settings$acfPatientID
-xAxisSortOrder <- as.vector(settings$xAxisSortOrder)
-similarityMeasure <- settings$similarityMeasure
-linkageMeasure <- settings$linkageMeasure
-interpolateNAs <- strtoi(settings$interpolateNAs)
+acfPatientID <- SmartR.settings$acfPatientID
+xAxisSortOrder <- as.vector(SmartR.settings$xAxisSortOrder)
+similarityMeasure <- SmartR.settings$similarityMeasure
+linkageMeasure <- SmartR.settings$linkageMeasure
+interpolateNAs <- strtoi(SmartR.settings$interpolateNAs)
 
 ### COMPUTE RESULTS ###
 
-points <- data.cohort1$datapoints
+points <- SmartR.data.cohort1$datapoints
 
 if (length(points$patientID) == 0) {
 	stop('Your selection does not match any patient in the defined cohort!')
@@ -131,9 +131,9 @@ if (! is.null(similarityMeasure) && ! is.null(linkageMeasure)) {
 
 ### WRITE OUTPUT ###
 
-output$data <- points
-output$concepts <- uniq.concepts
-output$patientIDs <- uniq.patientIDs
-output$timepoints <- uniq.timepoints
-output$acfEstimates <- acfEstimates
-output$clusterings <- clusterings
+SmartR.output$data <- points
+SmartR.output$concepts <- uniq.concepts
+SmartR.output$patientIDs <- uniq.patientIDs
+SmartR.output$timepoints <- uniq.timepoints
+SmartR.output$acfEstimates <- acfEstimates
+SmartR.output$clusterings <- clusterings
