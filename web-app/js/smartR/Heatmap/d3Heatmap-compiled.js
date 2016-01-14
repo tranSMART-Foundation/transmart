@@ -171,8 +171,10 @@ SmartRHeatmap = (function () {
             }
 
             function isSorted(arr) {
-                arr.every(function (d, i) {
-                    return i === arr.length - 1 || d[i][1] < d[i + 1][1];
+                return arr.every(function (d, i) {
+                    return i === arr.length - 1 || arr[i][1] <= arr[i + 1][1];
+                }) || arr.every(function (d, i) {
+                    return i === arr.length - 1 || arr[i][1] >= arr[i + 1][1];
                 });
             }
 

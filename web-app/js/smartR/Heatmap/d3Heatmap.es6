@@ -164,7 +164,8 @@ SmartRHeatmap = (() => {
             }
 
             function isSorted(arr) {
-                arr.every((d, i) => i === arr.length - 1 || d[i][1] < d[i+1][1])
+                return arr.every((d, i) => i === arr.length - 1 || arr[i][1] <= arr[i+1][1]) ||
+                        arr.every((d, i) => i === arr.length - 1 || arr[i][1] >= arr[i+1][1])
             }
 
             colSortBox.enter()
