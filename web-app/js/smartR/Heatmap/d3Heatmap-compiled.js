@@ -57,8 +57,8 @@ SmartRHeatmap = (function () {
         var featureColorSetBinary = ['rgb(0, 0, 0)', 'rgb(13, 13, 191)'];
         var featureColorSetSequential = ['rgb(247,252,253)', 'rgb(224,236,244)', 'rgb(191,211,230)', 'rgb(158,188,218)', 'rgb(140,150,198)', 'rgb(140,107,177)', 'rgb(136,65,157)', 'rgb(129,15,124)', 'rgb(77,0,75)'];
 
-        var gridFieldWidth = 40;
-        var gridFieldHeight = 40;
+        var gridFieldWidth = 20;
+        var gridFieldHeight = 20;
         var dendrogramHeight = 300;
         var histogramHeight = 200;
 
@@ -487,12 +487,12 @@ SmartRHeatmap = (function () {
             zoomLevel /= 100;
             d3.selectAll('.patientID').style('font-size', Math.ceil(14 * zoomLevel) + 'px');
             d3.selectAll('.selectText').style('font-size', Math.ceil(16 * zoomLevel) + 'px');
-            d3.selectAll('.probe').style('font-size', Math.ceil(9 * zoomLevel) + 'px');
+            d3.selectAll('.uid').style('font-size', Math.ceil(12 * zoomLevel) + 'px');
             d3.selectAll('.feature').style('font-size', Math.ceil(10 * zoomLevel) + 'px');
             d3.selectAll('.significanceSortText, .rowSortText, .colSortText').style('font-size', Math.ceil(14 * zoomLevel) + 'px');
             d3.selectAll('.featureSortText').style('font-size', Math.ceil(10 * zoomLevel) + 'px');
-            gridFieldWidth = 40 * zoomLevel;
-            gridFieldHeight = 40 * zoomLevel;
+            gridFieldWidth = 20 * zoomLevel;
+            gridFieldHeight = 20 * zoomLevel;
             width = gridFieldWidth * patientIDs.length;
             height = gridFieldHeight * probes.length;
             heatmap.attr('width', width + margin.left + margin.right).attr('height', width + margin.top + margin.bottom);
