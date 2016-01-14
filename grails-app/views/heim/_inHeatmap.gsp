@@ -288,6 +288,7 @@
         <div id="heim-run-output" class="sr-output-container"></div>
 
         %{--d3 js heatmap placeholder--}%
+        <div id="heim-heatmap-warnings" class="warning"> </div>
         <div id='visualization' class='text sr-output-container'>
             <div id="heatmap" class='text'></div>
         </div>

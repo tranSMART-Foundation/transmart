@@ -32,6 +32,7 @@ SmartRHeatmap = (function(){
         var numberOfClusteredColumns = data.numberOfClusteredColumns[0];
         var numberOfClusteredRows = data.numberOfClusteredRows[0];
         var maxRows = 100;
+        var warning = data.warnings === undefined ? '' : data.warnings;
 
         var rowClustering = false;
         var colClustering = false;
@@ -138,6 +139,8 @@ SmartRHeatmap = (function(){
         var significanceSortItems = heatmap.append('g');
         var labelItems = heatmap.append('g');
         var barItems = heatmap.append('g');
+        var warningDiv = jQuery('#heim-heatmap-warnings').append('strong')
+            .text(warning);
 
         function updateHeatmap() {
             var square = squareItems.selectAll('.square')

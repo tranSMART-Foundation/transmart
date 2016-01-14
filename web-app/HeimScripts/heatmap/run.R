@@ -468,11 +468,19 @@ dendrogramToJSON <- function(d) {
 addClusteringOutput <- function(jsn, measurements_arg) {
   # we need to discard rows and columns without at least two values
   # determine rows without two non-NAs
-  logicalSelection <- apply(measurements_arg, 1, function(row) length(which(!is.na(row))) >= 2)
+  thresholdRows <- ceiling(ncol(measurements_arg) / 2 ) + 1  #  Half of the lentgh +1 has to be filled otherwise
+  thresholdCols <- ceiling(nrow(measurements_arg) / 2 ) + 1  #  there might not be enough overlap for clustering
+  logicalSelection <- apply(measurements_arg, 1, function(row) length(which(!is.na(row))) >= thresholdRows)
   measurements_rows <- measurements_arg[logicalSelection, ]
   # and for columns
-  logicalSelection <- apply(measurements_arg, 2, function(col) length(which(!is.na(col))) >= 2)
+  logicalSelection <- apply(measurements_arg, 2, function(col) length(which(!is.na(col))) >= thresholdCols)
   measurements_cols <- t(measurements_arg[ , logicalSelection])
+  jsn$numberOfClusteredRows <- nrow(measurements_rows)
+  jsn$numberOfClusteredColumns <- nrow(measurements_cols)  # still nrow (transposed)
+  if (jsn$numberOfClusteredRows < 3 | jsn$numberOfClusteredColumns < 3 ) {  # Cannot cluster less than 2x2 matrix
+    jsn$warnings <- c("Clustering could not be done due to high amount of NAs in the data")
+    return(jsn)
+  }
 
   euclideanDistancesRow <- dist(measurements_rows, method = "euclidean")
   manhattanDistancesRow <- dist(measurements_rows, method = "manhattan")
@@ -511,8 +519,6 @@ addClusteringOutput <- function(jsn, measurements_arg) {
     calculateOrderInTermsOfIndexes(dendogram, rownames(measurements_arg))
   }
 
-  jsn$numberOfClusteredRows <- nrow(measurements_rows)
-  jsn$numberOfClusteredColumns <- nrow(measurements_cols)  # still nrow (transposed)
 
   jsn$hclustEuclideanComplete <- list(
     columnOrder(colDendrogramEuclideanComplete),
