@@ -49,8 +49,8 @@ SmartRHeatmap = (() => {
             redGreen()
         ]
 
-        let featureColorSetBinary = ['rgb(0, 0, 0)', 'rgb(13, 13, 191)']
-        let featureColorSetSequential = ['rgb(247,252,253)','rgb(224,236,244)','rgb(191,211,230)','rgb(158,188,218)','rgb(140,150,198)','rgb(140,107,177)','rgb(136,65,157)','rgb(129,15,124)','rgb(77,0,75)']
+        var featureColorSetBinary = ['#FF8000', '#FFFF00'];
+        var featureColorSetSequential = ['rgb(247,252,253)','rgb(224,236,244)','rgb(191,211,230)','rgb(158,188,218)','rgb(140,150,198)','rgb(140,107,177)','rgb(136,65,157)','rgb(129,15,124)','rgb(77,0,75)'];
 
         let gridFieldWidth = 20
         let gridFieldHeight = 20
@@ -269,7 +269,6 @@ SmartRHeatmap = (() => {
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
 
-
             let selectText = heatmap.selectAll('.selectText')
                 .data(patientIDs, d => d)
 
@@ -365,6 +364,7 @@ SmartRHeatmap = (() => {
                     d3.selectAll('.square').classed('squareHighlighted', false)
                     d3.selectAll('.probe').classed('highlight', false)
                 })
+                .style('visible', 'hidden') // FIXME: Hidden until fixed
 
             bar.transition()
                 .duration(animationDuration)
@@ -554,8 +554,8 @@ SmartRHeatmap = (() => {
             let colorScale = d3.scale.quantile()
                 .domain([0, 1])
                 .range(colorSets[colorIdx])
-
-            d3.selectAll('.square').transition()
+            d3.selectAll('.square')
+                .transition()
                 .duration(animationDuration)
                 .style('fill', d => colorScale(1 / (1 + Math.pow(Math.E, - d.ZSCORE))))
             for (let feature of features) {
@@ -564,7 +564,7 @@ SmartRHeatmap = (() => {
                     .style('fill', d => {
                         switch(d.TYPE) {
                             case d.TYPE === 'binary':
-                                return featureColorSetBinary[d.VALUE]
+                                return featureColorSetBinary[d.VALUE - 1]
                             case d.TYPE === 'alphabetical':
                                 return categoricalColorScale(d.VALUE)
                             default:

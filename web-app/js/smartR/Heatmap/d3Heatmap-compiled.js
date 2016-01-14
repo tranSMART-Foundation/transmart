@@ -54,7 +54,7 @@ SmartRHeatmap = (function () {
 
         var colorSets = [redGreen()];
 
-        var featureColorSetBinary = ['rgb(0, 0, 0)', 'rgb(13, 13, 191)'];
+        var featureColorSetBinary = ['#FF8000', '#FFFF00'];
         var featureColorSetSequential = ['rgb(247,252,253)', 'rgb(224,236,244)', 'rgb(191,211,230)', 'rgb(158,188,218)', 'rgb(140,150,198)', 'rgb(140,107,177)', 'rgb(136,65,157)', 'rgb(129,15,124)', 'rgb(77,0,75)'];
 
         var gridFieldWidth = 20;
@@ -352,7 +352,7 @@ SmartRHeatmap = (function () {
                 tooltip.style('visibility', 'hidden');
                 d3.selectAll('.square').classed('squareHighlighted', false);
                 d3.selectAll('.probe').classed('highlight', false);
-            });
+            }).style('visible', 'hidden'); // FIXME: Hidden until fixed
 
             bar.transition().duration(animationDuration).attr('height', gridFieldHeight).attr('width', function (d) {
                 return histogramScale(Math.abs(d.significance));
@@ -549,7 +549,6 @@ SmartRHeatmap = (function () {
 
         function updateColors(colorIdx) {
             var colorScale = d3.scale.quantile().domain([0, 1]).range(colorSets[colorIdx]);
-
             d3.selectAll('.square').transition().duration(animationDuration).style('fill', function (d) {
                 return colorScale(1 / (1 + Math.pow(Math.E, -d.ZSCORE)));
             });
@@ -565,7 +564,7 @@ SmartRHeatmap = (function () {
                     d3.selectAll('.extraSquare.feature-' + feature).style('fill', function (d) {
                         switch (d.TYPE) {
                             case d.TYPE === 'binary':
-                                return featureColorSetBinary[d.VALUE];
+                                return featureColorSetBinary[d.VALUE - 1];
                             case d.TYPE === 'alphabetical':
                                 return categoricalColorScale(d.VALUE);
                             default:
