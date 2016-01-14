@@ -50,7 +50,7 @@ SmartRHeatmap = (function(){
             while(i--) {
                 colorSet.push(d3.rgb(0, (255 * (NUM - i)) / NUM, 0));
             }
-            return colorSet;
+        return colorSet.reverse();
         }
 
         function redBlue() {
@@ -89,7 +89,7 @@ SmartRHeatmap = (function(){
             odd([[0, 0, 1], [1, 1, 0], [1, 0, 0]])
         ];
 
-        var featureColorSetBinary = ['rgb(0, 0, 0)', 'rgb(13, 13, 191)'];
+        var featureColorSetBinary = ['#FF8000', '#FFFF00'];
         var featureColorSetSequential = ['rgb(247,252,253)','rgb(224,236,244)','rgb(191,211,230)','rgb(158,188,218)','rgb(140,150,198)','rgb(140,107,177)','rgb(136,65,157)','rgb(129,15,124)','rgb(77,0,75)'];
 
         var gridFieldWidth = 40;
@@ -112,6 +112,8 @@ SmartRHeatmap = (function(){
             .range([0, histogramHeight]);
 
         var heatmap = d3.select("#heatmap").append("svg")
+            .attr("width", (width + margin.left + margin.right) * 4)
+            .attr("height", (height + margin.top + margin.bottom) * 4)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -336,7 +338,7 @@ SmartRHeatmap = (function(){
                     var rowValues = [];
                     for(var i = 0; i < significanceValues.length; i++) {
                         var significanceValue = significanceValues[i];
-                        rowValues.push([i, significanceValue]);
+                        rowValues.push([i, Math.abs(significanceValue)]);
                     }
                     if (isSorted(rowValues)) {
                         rowValues.sort(function(a, b) { return a[1] - b[1]; });
@@ -562,14 +564,7 @@ SmartRHeatmap = (function(){
                 .attr("transform", function(d) { return "translate(" + (width + 2 + 0.5 * gridFieldWidth) + ",0)" + "translate(0," + (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) + ")rotate(-90)";})
                 .attr('dy', '0.35em')
                 .attr("text-anchor", "middle")
-                .text('↑↓')
-                .attr('visibility', function(d) {
-                    if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
-                        return 'visible';
-                    } else {
-                        return 'hidden';
-                    }
-                });
+                .text('↑↓');
 
             featureSortText
                 .transition()
@@ -588,39 +583,38 @@ SmartRHeatmap = (function(){
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight / 2)
                 .on("click", function(feature) {
-                    var featureValue = [];
+                    var featureValues = [];
                     var missingValues = false;
                     for(var i = 0; i < patientIDs.length; i++) {
                         var patientID = patientIDs[i];
-                        var zScore = - Math.pow(2,32);
+                        var value = (- Math.pow(2,32)).toString();
                         try {
                             var square = d3.select('.extraSquare' + '.patientID-' + patientID + '.feature-' + feature);
-                            zScore = square.property('__data__').ZSCORE;
+                            value = square.property('__data__').VALUE;
                         } catch (err) {
                             missingValues = true;
                         }
-                        featureValue.push([i, zScore]);
+                        featureValues.push([i, value]);
                     }
-                    if (isSorted(featureValue)) {
-                        featureValue.sort(function(a, b) { return a[1] - b[1]; });
-                    } else {
-                        featureValue.sort(function(a, b) { return b[1] - a[1]; });
+                    if (isSorted(featureValues)) {
+                        featureValues.sort(function(a, b) {
+                            var diff = a[1] - b[1];
+                            return isNaN(diff) ? a[1].localeCompare(b[1]) : diff;
+                        });
+                            } else {
+                       featureValues.sort(function(a, b) {
+                            var diff = b[1] - a[1];
+                            return isNaN(diff) ? b[1].localeCompare(a[1]) : diff;
+                        });
                     }
                     var sortValues = [];
-                    for (i = 0; i < featureValue.length; i++) {
-                        sortValues.push(featureValue[i][0]);
+                    for (var i = 0; i < featureValues.length; i++) {
+                        sortValues.push(featureValues[i][0]);
                     }
                     if (missingValues) {
                         alert('Feature is missing for one or more patients.\nEvery missing value will be set to lowest possible value for sorting;');
                     }
                     updateColOrder(sortValues);
-                })
-                .attr('visibility', function(d) {
-                    if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
-                        return 'visible';
-                    } else {
-                        return 'hidden';
-                    }
                 });
 
 
@@ -669,35 +663,25 @@ SmartRHeatmap = (function(){
             adjustDimensions();
         }
 
-        var cutoffLevel = significanceValues[significanceValues.length - 1];
+    var cutoffLevel = 0;
         function animateCutoff(cutoff) {
+            cutoff = Math.floor(cutoff);
             cutoffLevel = cutoff;
-            for (var i = 0; i < significanceValues.length; i++) {
-                var significanceValue = significanceValues[i];
-                if (significanceValue < cutoff) {
-                    d3.selectAll('.square.probe-' +  probes[i])
+        d3.selectAll('.square')
+        .classed("cuttoffHighlight", false);
+        d3.selectAll('.bar')
+        .classed("cuttoffHighlight", false);
+        for (var i = maxRows - 1; i >= maxRows - cutoff; i--) {
+            d3.selectAll('.square.uid-' +  uids[i])
                         .classed("cuttoffHighlight", true);
                     d3.select('.bar.idx-' +  i)
                         .classed("cuttoffHighlight", true);
-                } else {
-                    d3.selectAll('.square.probe-' +  probes[i])
-                        .classed("cuttoffHighlight", false);
-                    d3.select('.bar.idx-' +  i)
-                        .classed("cuttoffHighlight", false);
                 }
             }
-        }
 
         function cutoff() {
             cuttoffButton.select('text').text('Loading...');
-            var nrows = 0;
-            for (var i = 0; i < significanceValues.length; i++) {
-                var significanceValue = significanceValues[i];
-                if (significanceValue > cutoffLevel) {
-                    nrows += 1;
-                }
-            }
-            loadRows(nrows);
+        loadRows(maxRows - cutoffLevel);
         }
 
         function reloadDendrograms() {
@@ -751,7 +735,7 @@ SmartRHeatmap = (function(){
                 d3.selectAll('.extraSquare.feature-' + feature)
                     .style("fill", function(d) {
                         if (d.TYPE === 'binary') {
-                            return featureColorSetBinary[d.VALUE];
+                    return featureColorSetBinary[d.VALUE - 1];
                         } else if (d.TYPE === 'numerical') {
                             colorScale
                                 .range(featureColorSetSequential);
@@ -868,43 +852,45 @@ SmartRHeatmap = (function(){
                 .attr('r', 4.5)
                 .attr("transform", function (d) {
                     return "translate(" + (width + spacing + h - d.y) + "," + d.x + ")";
-                }).on('click', function(d) {
-                    alert('Under Construction.');
-                    return;
+                }).on('click', function (d) {
                     var leafs = d.index.split(' ');
                     var genes = [];
                     for (var i = 0; i < leafs.length; i++) {
                         var gene = geneSymbols[leafs[i]];
                         genes.push(gene);
                     }
+
+                    var geneList = genes.join(" ");
                     jQuery.ajax({
                         url: 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi',
                         type: "POST",
-                        timeout: '600000',
+                        timeout: '10000',
+                        async: false,
                         data: {
-                            section: 'upload_gene_lists',
+                            section: 'upload_gene_lists_general',
                             primary_org: 'Human',
                             background: 'whole_genome',
                             Category1: 'Human',
                             gene_list_1: 'gene_list_1',
-                            SubCat1: 'ascii',
-                            attachment1: genes
+                            SubCat1: 'hgnc_symbol',
+                            attachment1: geneList
                         }
-                    }).done(function(serverAnswer) {
-                        var newTab = window.open('', '');
-                        newTab.document.write(serverAnswer);
-                    }).fail(function() {
-                        alert('fail');
+                    }).done(function (serverAnswer) {
+                        var sessionID = serverAnswer.match(/tmp_\d+/)[0];
+                        var url = "http://biocompendium.embl.de/cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=" + sessionID + "&list=gene_list_1__1&list_size=15&org=human";
+                        window.open(url);
+                    }).fail(function () {
+                        alert('An error occurred. Maybe the external resource is unavailable.');
                     });
                 })
-                .on("mouseover", function(d) {
+                .on("mouseover", function (d) {
                     tooltip
                         .style("visibility", "visible")
                         .html('Height: ' + d.height)
                         .style("left", mouseX() + "px")
                         .style("top", mouseY() + "px");
                 })
-                .on('mouseout', function() {
+                .on('mouseout', function () {
                     tooltip.style("visibility", "hidden");
                 });
             rowDendrogramVisible = true;
@@ -1141,9 +1127,9 @@ SmartRHeatmap = (function(){
             y: 8 - margin.top + buttonHeight * 2 + padding * 2 - 10,
             width: buttonWidth,
             height: buttonHeight,
-            min: significanceValues[significanceValues.length - 1],
-            max: significanceValues[0],
-            init: significanceValues[significanceValues.length - 1],
+            min: 0,
+            max: maxRows - 2,
+            init: 0,
             callback: animateCutoff,
             trigger: 'dragend'
         });
