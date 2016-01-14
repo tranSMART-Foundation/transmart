@@ -341,9 +341,9 @@ SmartRHeatmap = (function(){
                         rowValues.push([i, Math.abs(significanceValue)]);
                     }
                     if (isSorted(rowValues)) {
-                        rowValues.sort(function(a, b) { return Math.abs(a[1]) - Math.abs(b[1]); });
+                        rowValues.sort(function(a, b) { return a[1] - b[1]; });
                     } else {
-                        rowValues.sort(function(a, b) { return Math.abs(b[1]) - Math.abs(a[1]); });
+                        rowValues.sort(function(a, b) { return b[1] - a[1]; });
                     }
                     var sortValues = [];
                     for (i = 0; i < rowValues.length; i++) {
