@@ -341,9 +341,9 @@ SmartRHeatmap = (function(){
                         rowValues.push([i, Math.abs(significanceValue)]);
                     }
                     if (isSorted(rowValues)) {
-                        rowValues.sort(function(a, b) { return a[1] - b[1]; });
+                        rowValues.sort(function(a, b) { return Math.abs(a[1]) - Math.abs(b[1]); });
                     } else {
-                        rowValues.sort(function(a, b) { return b[1] - a[1]; });
+                        rowValues.sort(function(a, b) { return Math.abs(b[1]) - Math.abs(a[1]); });
                     }
                     var sortValues = [];
                     for (i = 0; i < rowValues.length; i++) {
@@ -487,7 +487,9 @@ SmartRHeatmap = (function(){
                 .attr("height", gridFieldHeight)
                 .attr("width", function(d) { return histogramScale(Math.abs( d.significance) ); })
                 .attr("x", function(d) { return - histogramScale( Math.abs( d.significance) ) - 10; })
-                .attr("y", function(d) { return gridFieldHeight * d.idx; });
+                .attr("y", function(d) { return gridFieldHeight * d.idx; })
+                .style('fill', function(d) {return d.significance > 0 ? 'steelblue' : '#990000';
+                });
 
             var featurePosY = - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20;
 
@@ -1206,9 +1208,3 @@ SmartRHeatmap = (function(){
     return service;
 
 })();
-
-
-
-
-
-
