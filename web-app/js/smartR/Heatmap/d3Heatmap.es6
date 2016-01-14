@@ -49,8 +49,8 @@ SmartRHeatmap = (() => {
             redGreen()
         ]
 
-        var featureColorSetBinary = ['#FF8000', '#FFFF00'];
-        var featureColorSetSequential = ['rgb(247,252,253)','rgb(224,236,244)','rgb(191,211,230)','rgb(158,188,218)','rgb(140,150,198)','rgb(140,107,177)','rgb(136,65,157)','rgb(129,15,124)','rgb(77,0,75)'];
+        const featureColorSetBinary = ['#FF8000', '#FFFF00']
+        const featureColorSetSequential = ['rgb(247,252,253)','rgb(224,236,244)','rgb(191,211,230)','rgb(158,188,218)','rgb(140,150,198)','rgb(140,107,177)','rgb(136,65,157)','rgb(129,15,124)','rgb(77,0,75)']
 
         let gridFieldWidth = 20
         let gridFieldHeight = 20
@@ -364,7 +364,6 @@ SmartRHeatmap = (() => {
                     d3.selectAll('.square').classed('squareHighlighted', false)
                     d3.selectAll('.probe').classed('highlight', false)
                 })
-                .style('visible', 'hidden') // FIXME: Hidden until fixed
 
             bar.transition()
                 .duration(animationDuration)
@@ -563,9 +562,9 @@ SmartRHeatmap = (() => {
                 d3.selectAll('.extraSquare.feature-' + feature)
                     .style('fill', d => {
                         switch(d.TYPE) {
-                            case d.TYPE === 'binary':
-                                return featureColorSetBinary[d.VALUE - 1]
-                            case d.TYPE === 'alphabetical':
+                            case 'binary':
+                                return featureColorSetBinary[d.VALUE]
+                            case 'alphabetical':
                                 return categoricalColorScale(d.VALUE)
                             default:
                                 colorScale.range(featureColorSetSequential)

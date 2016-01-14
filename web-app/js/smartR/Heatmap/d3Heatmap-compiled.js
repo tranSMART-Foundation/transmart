@@ -352,7 +352,7 @@ SmartRHeatmap = (function () {
                 tooltip.style('visibility', 'hidden');
                 d3.selectAll('.square').classed('squareHighlighted', false);
                 d3.selectAll('.probe').classed('highlight', false);
-            }).style('visible', 'hidden'); // FIXME: Hidden until fixed
+            });
 
             bar.transition().duration(animationDuration).attr('height', gridFieldHeight).attr('width', function (d) {
                 return histogramScale(Math.abs(d.significance));
@@ -563,9 +563,9 @@ SmartRHeatmap = (function () {
                     var categoricalColorScale = d3.scale.category10();
                     d3.selectAll('.extraSquare.feature-' + feature).style('fill', function (d) {
                         switch (d.TYPE) {
-                            case d.TYPE === 'binary':
-                                return featureColorSetBinary[d.VALUE - 1];
-                            case d.TYPE === 'alphabetical':
+                            case 'binary':
+                                return featureColorSetBinary[d.VALUE];
+                            case 'alphabetical':
                                 return categoricalColorScale(d.VALUE);
                             default:
                                 colorScale.range(featureColorSetSequential);
