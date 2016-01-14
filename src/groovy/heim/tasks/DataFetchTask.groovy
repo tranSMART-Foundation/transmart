@@ -307,7 +307,13 @@ class DataFetchTask extends AbstractTask {
         if (isBioMarker) {
             line += 'Bio marker'
         }
-        line += columns*.label
+        line += columns.collect {
+            if (it instanceof AssayColumn) {
+                it.patientInTrialId  // for high dim data, use patient id rather than row label as the CSV header
+            } else {
+                it.label
+            }
+        }
 
         writer.writeNext(line as String[])
     }
