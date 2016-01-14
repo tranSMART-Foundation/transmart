@@ -170,6 +170,12 @@ SmartRHeatmap = (function () {
                 return square[0][0] != null ? square.data()[0].ZSCORE : Number.NEGATIVE_INFINITY;
             }
 
+            function isSorted(arr) {
+                arr.every(function (d, i) {
+                    return i === arr.length - 1 || d[i][1] < d[i + 1][1];
+                });
+            }
+
             colSortBox.enter().append('rect').attr('class', 'box colSortBox').attr('x', function (d, i) {
                 return i * gridFieldWidth;
             }).attr('y', -2 - gridFieldHeight).attr('width', gridFieldWidth).attr('height', gridFieldHeight).on('click', function (patientID) {
@@ -327,11 +333,11 @@ SmartRHeatmap = (function () {
 
             bar.enter().append('rect').attr('class', function (d) {
                 return 'bar idx-' + d.idx;
-            }).attr("width", function (d) {
+            }).attr('width', function (d) {
                 return histogramScale(Math.abs(d.significance));
-            }).attr("height", gridFieldHeight).attr("x", function (d) {
+            }).attr('height', gridFieldHeight).attr('x', function (d) {
                 return -histogramScale(Math.abs(d.significance)) - 10;
-            }).attr("y", function (d) {
+            }).attr('y', function (d) {
                 return gridFieldHeight * d.idx;
             }).style('fill', function (d) {
                 return d.significance > 0 ? 'steelblue' : '#990000';
@@ -346,9 +352,9 @@ SmartRHeatmap = (function () {
                 d3.selectAll('.probe').classed('highlight', false);
             });
 
-            bar.transition().duration(animationDuration).attr('height', gridFieldHeight).attr("width", function (d) {
+            bar.transition().duration(animationDuration).attr('height', gridFieldHeight).attr('width', function (d) {
                 return histogramScale(Math.abs(d.significance));
-            }).attr("x", function (d) {
+            }).attr('x', function (d) {
                 return -histogramScale(Math.abs(d.significance)) - 10;
             }).attr('y', function (d) {
                 return gridFieldHeight * d.idx;

@@ -163,6 +163,10 @@ SmartRHeatmap = (() => {
                 return square[0][0] != null ? square.data()[0].ZSCORE : Number.NEGATIVE_INFINITY
             }
 
+            function isSorted(arr) {
+                arr.every((d, i) => i === arr.length - 1 || d[i][1] < d[i+1][1])
+            }
+
             colSortBox.enter()
                 .append('rect')
                 .attr('class', 'box colSortBox')
@@ -340,10 +344,10 @@ SmartRHeatmap = (() => {
             bar.enter()
                 .append('rect')
                 .attr('class', d => 'bar idx-' + d.idx)
-                .attr("width", d => histogramScale(Math.abs(d.significance)))
-                .attr("height", gridFieldHeight)
-                .attr("x", d => - histogramScale( Math.abs( d.significance)) - 10)
-                .attr("y", d => gridFieldHeight * d.idx)
+                .attr('width', d => histogramScale(Math.abs(d.significance)))
+                .attr('height', gridFieldHeight)
+                .attr('x', d => - histogramScale(Math.abs( d.significance)) - 10)
+                .attr('y', d => gridFieldHeight * d.idx)
                 .style('fill', d => d.significance > 0 ? 'steelblue' : '#990000')
                 .on('mouseover', d => {
                     let html = 'FEATURE SIGNIFICANCE: ' + d.significance
@@ -364,8 +368,8 @@ SmartRHeatmap = (() => {
             bar.transition()
                 .duration(animationDuration)
                 .attr('height', gridFieldHeight)
-                .attr("width", d => histogramScale(Math.abs( d.significance) ))
-                .attr("x", d => - histogramScale( Math.abs( d.significance) ) - 10)
+                .attr('width', d => histogramScale(Math.abs(d.significance)))
+                .attr('x', d => - histogramScale(Math.abs(d.significance)) - 10)
                 .attr('y', d => gridFieldHeight * d.idx)
 
             let featurePosY = - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20
