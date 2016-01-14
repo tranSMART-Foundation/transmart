@@ -50,6 +50,11 @@
     background: #326FCB;
 }
 
+.warning {
+    font-family: 'Roboto', sans-serif;
+    font-size: 18px;
+}
+
 
 /* Heatmap legacy css */
 .text {
