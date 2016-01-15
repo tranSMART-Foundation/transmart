@@ -457,13 +457,16 @@ SmartRHeatmap = (function(){
             var bar = barItems.selectAll('.bar')
                 .data(significanceIndexMap, function(d) { return d.idx; });
 
+            var _MINIMAL_WIDTH = 10;  // This value will be added to the scaled width. So that it is always >0 (visible)
+            var _BAR_OFFSET    = 20;  // Distance between significance bar and the heatmap.
+                                      // Visible offset will be effectively _BAR_OFFSET - _MINIMAL_WIDTH
             bar
                 .enter()
                 .append('rect')
                 .attr('class', function(d) { return 'bar idx-' + d.idx ; })
-                .attr("width", function(d) { return histogramScale( Math.abs( d.significance) ); })
+                .attr("width", function(d) { return histogramScale( Math.abs( d.significance) ) + _MINIMAL_WIDTH; })
                 .attr("height", gridFieldHeight)
-                .attr("x", function(d) { return - histogramScale( Math.abs( d.significance)) - 10; })
+                .attr("x", function(d) { return - histogramScale( Math.abs( d.significance)) - _BAR_OFFSET; })
                 .attr("y", function(d) { return gridFieldHeight * d.idx; })
                 .style('fill', function(d) { return d.significance > 0 ? 'steelblue' : '#990000';})
                 .on("mouseover", function(d) {
@@ -488,8 +491,8 @@ SmartRHeatmap = (function(){
                 .transition()
                 .duration(animationDuration)
                 .attr("height", gridFieldHeight)
-                .attr("width", function(d) { return histogramScale(Math.abs( d.significance) ); })
-                .attr("x", function(d) { return - histogramScale( Math.abs( d.significance) ) - 10; })
+                .attr("width", function(d) { return histogramScale(Math.abs( d.significance)) + _MINIMAL_WIDTH ; })
+                .attr("x", function(d) { return - histogramScale( Math.abs( d.significance) ) - _BAR_OFFSET; })
                 .attr("y", function(d) { return gridFieldHeight * d.idx; })
                 .style('fill', function(d) {return d.significance > 0 ? 'steelblue' : '#990000';
                 });

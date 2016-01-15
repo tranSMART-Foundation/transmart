@@ -31,7 +31,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   # otherwise we get a dataframe
   patientIDs  <- unique(fields["PATIENTID"])[,1]
 
-  significanceValues <- unique(fields["SIGNIFICANCE"])[,1]
+  significanceValues <- df["SIGNIFICANCE"][,1]
   features <- unique(extraFields["FEATURE"])[,1]
   jsn <- list(
     "fields"             = fields,
