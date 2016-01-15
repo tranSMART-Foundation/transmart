@@ -112,7 +112,6 @@ var HeatmapView = (function(){
         }
     };
 
-
     var _emptyOutputs = function (workflow) {
         if (workflow === 'fetch') {
             view.preprocessView.outputArea.empty();
@@ -181,9 +180,12 @@ var HeatmapView = (function(){
         view.fetchDataView.actionBtn.removeAttr('disabled');
         view.preprocessView.preprocessBtn.removeAttr('disabled');
         view.runHeatmapView.runAnalysisBtn.removeAttr('disabled');
-        if (workflow === 'runAnalysis') {
+        if (workflow === 'RUN_HEATMAP_SUCCESS') {
             view.runHeatmapView.snapshotImageBtn.removeAttr('disabled');
             view.runHeatmapView.downloadFileBtn.removeAttr('disabled');
+        } else if (workflow === 'RUN_HEATMAP_FAILED') {
+            view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
+            view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
         }
     };
 
@@ -248,14 +250,17 @@ var HeatmapView = (function(){
         _onRunAnalysis();
         view.runHeatmapView.d3Heatmap.empty();
         heatmapService.runAnalysis(_runHeatmapInputArgs)
-            .then(function(data) {
+            .done(function(data) {
                 SmartRHeatmap.create(data.heatmapData);
-                _resetActionButtons('runAnalysis');
+                _resetActionButtons('RUN_HEATMAP_SUCCESS');
                 if (data.markerSelectionData) {
                     view.appendSelectionTable({
                         entries: data.markerSelectionData
                     })
                 }
+            })
+            .fail(function(d) {
+                _resetActionButtons('RUN_HEATMAP_FAILED');
             });
     };
 
@@ -348,7 +353,6 @@ var HeatmapView = (function(){
                 heatmapService.downloadData();
             }
         );
-
 
         // identifiers autocomplete
         var _identifierItemTemplate = new Ext.XTemplate(
