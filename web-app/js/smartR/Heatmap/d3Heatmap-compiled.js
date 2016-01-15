@@ -617,9 +617,9 @@ SmartRHeatmap = (function () {
             var colDendrogramNodes = cluster.nodes(colDendrogram);
             var colDendrogramLinks = cluster.links(colDendrogramNodes);
 
-            colDendrogramLink = heatmap.selectAll('.colDendrogramLink').data(colDendrogramLinks).enter().append('path').attr('class', 'colDendrogram link').attr('d', diagonal);
+            heatmap.selectAll('.colDendrogramLink').data(colDendrogramLinks).enter().append('path').attr('class', 'colDendrogram link').attr('d', diagonal);
 
-            colDendrogramNode = heatmap.selectAll('.colDendrogramNode').data(colDendrogramNodes).enter().append('circle').attr('class', 'colDendrogram node').attr('r', 4.5).attr('transform', function (d) {
+            heatmap.selectAll('.colDendrogramNode').data(colDendrogramNodes).enter().append('circle').attr('class', 'colDendrogram node').attr('r', 4.5).attr('transform', function (d) {
                 return 'translate(' + d.x + ', ' + (-spacing - w + d.y) + ')';
             }).on('click', function (d) {
                 var previousSelection = selectedPatientIDs.slice();
@@ -655,9 +655,9 @@ SmartRHeatmap = (function () {
             var rowDendrogramNodes = cluster.nodes(rowDendrogram);
             var rowDendrogramLinks = cluster.links(rowDendrogramNodes);
 
-            rowDendrogramLink = heatmap.selectAll('.rowDendrogramLink').data(rowDendrogramLinks).enter().append('path').attr('class', 'rowDendrogram link').attr('d', diagonal);
+            heatmap.selectAll('.rowDendrogramLink').data(rowDendrogramLinks).enter().append('path').attr('class', 'rowDendrogram link').attr('d', diagonal);
 
-            rowDendrogramNode = heatmap.selectAll('.rowDendrogramNode').data(rowDendrogramNodes).enter().append('circle').attr('class', 'rowDendrogram node').attr('r', 4.5).attr('transform', function (d) {
+            heatmap.selectAll('.rowDendrogramNode').data(rowDendrogramNodes).enter().append('circle').attr('class', 'rowDendrogram node').attr('r', 4.5).attr('transform', function (d) {
                 return 'translate(' + (width + spacing + h - d.y) + ', ' + d.x + ')';
             }).on('click', function (d) {
                 alert('Under Construction.');

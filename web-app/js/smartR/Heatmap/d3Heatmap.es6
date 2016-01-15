@@ -149,7 +149,7 @@ SmartRHeatmap = (() => {
                 .attr('dy', '0.35em')
                 .attr('text-anchor', 'middle')
                 .text('↑↓')
-
+            
             colSortText.transition()
                 .duration(animationDuration)
                 .attr('x', (d, i) => i * gridFieldWidth + 0.5 * gridFieldWidth)
@@ -597,13 +597,13 @@ SmartRHeatmap = (() => {
             let colDendrogramNodes = cluster.nodes(colDendrogram)
             let colDendrogramLinks = cluster.links(colDendrogramNodes)
 
-            colDendrogramLink = heatmap.selectAll('.colDendrogramLink')
+            heatmap.selectAll('.colDendrogramLink')
                 .data(colDendrogramLinks).enter()
                 .append('path')
                 .attr('class', 'colDendrogram link')
                 .attr('d', diagonal)
 
-            colDendrogramNode = heatmap.selectAll('.colDendrogramNode')
+            heatmap.selectAll('.colDendrogramNode')
                 .data(colDendrogramNodes).enter()
                 .append('circle')
                 .attr('class', 'colDendrogram node')
@@ -644,12 +644,12 @@ SmartRHeatmap = (() => {
             let rowDendrogramNodes = cluster.nodes(rowDendrogram)
             let rowDendrogramLinks = cluster.links(rowDendrogramNodes)
 
-            rowDendrogramLink = heatmap.selectAll('.rowDendrogramLink')
+            heatmap.selectAll('.rowDendrogramLink')
                 .data(rowDendrogramLinks).enter().append('path')
                 .attr('class', 'rowDendrogram link')
                 .attr('d', diagonal)
 
-            rowDendrogramNode = heatmap.selectAll('.rowDendrogramNode')
+            heatmap.selectAll('.rowDendrogramNode')
                 .data(rowDendrogramNodes).enter().append('circle')
                 .attr('class', 'rowDendrogram node')
                 .attr('r', 4.5)
