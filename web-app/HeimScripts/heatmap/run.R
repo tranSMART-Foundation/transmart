@@ -468,8 +468,8 @@ dendrogramToJSON <- function(d) {
 addClusteringOutput <- function(jsn, measurements_arg) {
   # we need to discard rows and columns without at least two values
   # determine rows without two non-NAs
-  thresholdRows <- ceiling(ncol(measurements_arg) / 2 ) + 1  #  Half of the lentgh +1 has to be filled otherwise
-  thresholdCols <- ceiling(nrow(measurements_arg) / 2 ) + 1  #  there might not be enough overlap for clustering
+  thresholdRows <- floor(ncol(measurements_arg) / 2 ) + 1  #  Half of the lentgh +1 has to be filled otherwise
+  thresholdCols <- floor(nrow(measurements_arg) / 2 ) + 1  #  there might not be enough overlap for clustering
   logicalSelection <- apply(measurements_arg, 1, function(row) length(which(!is.na(row))) >= thresholdRows)
   measurements_rows <- measurements_arg[logicalSelection, ]
   # and for columns
