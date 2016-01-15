@@ -12,8 +12,6 @@ window.HeatmapService = (function(){
     var HEATMAP_DATA_FILE = 'heatmap.json';
     var MARKER_SELECTION_TABLE_FILE = 'markerSelectionTable.json';
 
-    var _heimDropzoneErrorDiv =  jQuery('#heim-dropzone-errors');
-    var _heimGeneralLoadingErrorDiv = jQuery('#heim-general-loading-errors');
 
     var NOOP_ABORT = function() {};
 
@@ -165,37 +163,9 @@ window.HeatmapService = (function(){
      * a promise.
      * @param eventObj
      */
-    var _validate = function(_args) {
-        _heimDropzoneErrorDiv.hide();  // clear messages
-        _heimGeneralLoadingErrorDiv.hide();
-        var valid = true;
-        var subsets = _args['resultInstanceIds'];
-        var concepts = _args['conceptKeys'];
-        if (subsets === undefined) {
-            _heimGeneralLoadingErrorDiv.text("Connection lost. Refresh page.").show();
-            valid = false;
-        }
-        var s1 = subsets[0];
-        var s2 = subsets[1];
-        var firstKey = Object.keys(concepts)[0];
-        var firstNode = concepts[firstKey];
-        if (s1 === null || s2 === null) {
-            _heimGeneralLoadingErrorDiv.text("No cohort selected. Select cohort in comparison tab.").show();
-            valid = false;
-        }
-        if (firstNode == '') {
-            _heimDropzoneErrorDiv.text('Slect nodes first by draging a high dimensional node (e.g. mRNA)' +
-                ' into the box above.').show();
-            valid = false;
-        }
-            return valid;
-    };
+
     service.fetchData = function (params) {
         var _args = _createAnalysisConstraints(params);
-        var valid = _validate(_args);
-        if (!valid) {
-            return null;
-        }
         var defer = jQuery.Deferred();
         service.lastFetchedLabels = Object.keys(_args.conceptKeys);
 

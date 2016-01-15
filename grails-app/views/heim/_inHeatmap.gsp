@@ -88,9 +88,6 @@
                     <div style="margin-top: 10px; text-align: right;">
                         <button type="button" id="heim-btn-clear">Clear</button>
                     </div>
-                    <div id="heim-dropzone-errors" class="warning">
-
-                    </div>
                 </div>
 
                 %{--TODO: Support numerical nodes--}%
@@ -142,9 +139,7 @@
             <div>
                 <button id="heim-btn-fetch-data" class="heim-action-button">Fetch Data</button>
             </div>
-            <div id="heim-general-loading-errors" class="warning">
 
-            </div>
 
             <div id="heim-fetch-output" class="sr-output-container"></div>
 
