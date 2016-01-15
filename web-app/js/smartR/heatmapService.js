@@ -162,8 +162,32 @@ window.HeatmapService = (function(){
      * a promise.
      * @param eventObj
      */
+    var _validate = function(_args) {
+        var subsets = _args['resultInstanceIds'];
+        var concepts = _args['conceptKeys'];
+        if (subsets === undefined) {
+            alert("Connection lost - refresh page.");
+            return false;
+        }
+        var s1 = subsets[0];
+        var s2 = subsets[1];
+        var firstKey = Object.keys(concepts)[0];
+        var firstNode = concepts[firstKey];
+        if (s1 === null || s2 === null) {
+            alert("Select cohort first.");
+            return false;
+        } else if (firstNode == '') {
+            alert("Empty nodes selection.");
+            return false;
+        }
+        else return true;
+    };
     service.fetchData = function (params) {
         var _args = _createAnalysisConstraints(params);
+        var valid = _validate(_args);
+        if (!valid) {
+            return null;
+        }
         var defer = jQuery.Deferred();
         service.lastFetchedLabels = Object.keys(_args.conceptKeys);
 
@@ -174,7 +198,7 @@ window.HeatmapService = (function(){
                     defer.resolve(data);
                 });
         }
-
+        
         startScriptExecution({
             taskType: 'fetchData',
             arguments: _args,

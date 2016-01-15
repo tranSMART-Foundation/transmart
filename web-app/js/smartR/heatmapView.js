@@ -79,7 +79,7 @@ var HeatmapView = (function(){
     /**
      *
      * @param fetchDataView
-     * @returns {{conceptPath: *, identifier: *, resultInstanceId: *}}
+     * @returns {{conceptKeys: *, identifier: *, resultInstanceIds: *}}
      * @private
      */
     var _getFetchDataViewValues = function (v) {
@@ -207,6 +207,7 @@ var HeatmapView = (function(){
             // fetch data
             promise = heatmapService.fetchData(_fetchDataParams);
             // return promise when fetching and calculating summary has finished
+            if (promise !== null)
             promise.then(function (data) {
                 data.forEach(function (d) {
                     d.forEach(function (summaryJSON) {
