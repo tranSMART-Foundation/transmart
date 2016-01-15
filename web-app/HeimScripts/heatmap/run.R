@@ -31,7 +31,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   # otherwise we get a dataframe
   patientIDs  <- unique(fields["PATIENTID"])[,1]
 
-  significanceValues <- unique(fields["SIGNIFICANCE"])[,1]
+  significanceValues <- df["SIGNIFICANCE"][,1]
   features <- unique(extraFields["FEATURE"])[,1]
   jsn <- list(
     "fields"             = fields,
@@ -468,8 +468,8 @@ dendrogramToJSON <- function(d) {
 addClusteringOutput <- function(jsn, measurements_arg) {
   # we need to discard rows and columns without at least two values
   # determine rows without two non-NAs
-  thresholdRows <- ceiling(ncol(measurements_arg) / 2 ) + 1  #  Half of the lentgh +1 has to be filled otherwise
-  thresholdCols <- ceiling(nrow(measurements_arg) / 2 ) + 1  #  there might not be enough overlap for clustering
+  thresholdRows <- floor(ncol(measurements_arg) / 2 ) + 1  #  Half of the lentgh +1 has to be filled otherwise
+  thresholdCols <- floor(nrow(measurements_arg) / 2 ) + 1  #  there might not be enough overlap for clustering
   logicalSelection <- apply(measurements_arg, 1, function(row) length(which(!is.na(row))) >= thresholdRows)
   measurements_rows <- measurements_arg[logicalSelection, ]
   # and for columns

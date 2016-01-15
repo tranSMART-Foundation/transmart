@@ -334,10 +334,15 @@ window.HeatmapService = (function(){
                 .fail(function() { defer.reject.apply(defer, arguments); });
         }
 
+        function runAnalysisFailed (d) {
+            defer.reject(d);
+        }
+
         startScriptExecution({
             taskType: 'run',
             arguments: params,
             onUltimateSuccess: runAnalysisSuccess,
+            onUltimateFailure: runAnalysisFailed,
             phase: 'run',
             progressMessage: 'Calculating',
             successMessage: undefined
@@ -451,17 +456,13 @@ window.HeatmapService = (function(){
             } else if (d.state === 'FAILED') {
                 var _errHTML = '<span style="color: red">' + d.result.exception +'</span>';
                 div.html(_errHTML);
-                console.error('FAILED', d.result);
+                taskData.onUltimateFailure(d.result.exception);
             } else {
                 _setStatusRequestTimeout(service.checkStatus, delay, taskData, delay);
             }
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
-            var _html = '<span style="color: red">'+errorThrown+'</span>';
-            console.error(jqXHR);
-            console.error(textStatus);
-            console.error(errorThrown);
-            div.html(_html);
+                taskData.onUltimateFailure(errorThrown);
         });
     };
 
