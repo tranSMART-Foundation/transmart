@@ -35,6 +35,8 @@ SmartRHeatmap = (function () {
         var geneSymbols = data.geneSymbols;
         var numberOfClusteredColumns = data.numberOfClusteredColumns[0];
         var numberOfClusteredRows = data.numberOfClusteredRows[0];
+        var maxRows = 100;
+        var warning = data.warnings === undefined ? '' : data.warnings;
 
         var rowClustering = false;
         var colClustering = false;
@@ -75,7 +77,7 @@ SmartRHeatmap = (function () {
 
         var histogramScale = d3.scale.linear().domain(d3.extent(significanceValues)).range([0, histogramHeight]);
 
-        var heatmap = d3.select('#heatmap').append('svg').append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        var heatmap = d3.select('#heatmap').append('svg').attr("width", (width + margin.left + margin.right) * 4).attr("height", (height + margin.top + margin.bottom) * 4).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
         function adjustDimensions() {
             // gridFieldWidth/gridFieldHeight are adjusted outside as the zoom changes
@@ -93,6 +95,7 @@ SmartRHeatmap = (function () {
         var significanceSortItems = heatmap.append('g');
         var labelItems = heatmap.append('g');
         var barItems = heatmap.append('g');
+        var warningDiv = $('#heim-heatmap-warnings').append('strong').text(warning);
 
         function updateHeatmap() {
             var square = squareItems.selectAll('.square').data(fields, function (d) {
@@ -250,7 +253,7 @@ SmartRHeatmap = (function () {
 
             significanceSortBox.enter().append('rect').attr('class', 'box significanceSortBox').attr('x', -gridFieldWidth - 10).attr('y', -2 - gridFieldHeight).attr('width', gridFieldWidth).attr('height', gridFieldHeight).on('click', function () {
                 var rowValues = significanceValues.map(function (significanceValue, idx) {
-                    return [idx, significanceValue];
+                    return [idx, Math.abs(significanceValue)];
                 });
                 isSorted(rowValues) ? rowValues.sort(function (a, b) {
                     return a[1] - b[1];
@@ -358,8 +361,10 @@ SmartRHeatmap = (function () {
                 return histogramScale(Math.abs(d.significance));
             }).attr('x', function (d) {
                 return -histogramScale(Math.abs(d.significance)) - 10;
-            }).attr('y', function (d) {
+            }).attr("y", function (d) {
                 return gridFieldHeight * d.idx;
+            }).style('fill', function (d) {
+                return d.significance > 0 ? 'steelblue' : '#990000';
             });
 
             var featurePosY = -gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20;
@@ -438,9 +443,7 @@ SmartRHeatmap = (function () {
 
             featureSortText.enter().append('text').attr('class', 'text featureSortText').attr('transform', function (d) {
                 return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ', 0)translate(0, ' + (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) + ')rotate(-90)';
-            }).attr('dy', '0.35em').attr('text-anchor', 'middle').text('↑↓').attr('visibility', function (d) {
-                return d3.select('.extraSquare.feature-' + d).data()[0].TYPE === 'numerical' ? 'visible' : 'hidden';
-            });
+            }).attr('dy', '0.35em').attr('text-anchor', 'middle').text('↑↓');
 
             featureSortText.transition().duration(animationDuration).attr('transform', function (d) {
                 return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ', 0)translate(0, ' + (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) + ')rotate(-90)';
@@ -455,27 +458,31 @@ SmartRHeatmap = (function () {
             }).attr('width', gridFieldWidth).attr('height', gridFieldHeight / 2).on('click', function (feature) {
                 var missingValues = false;
                 var featureValues = patientIDs.map(function (patientID) {
-                    var zScore = -Math.pow(2, 32);
+                    var value = (-Math.pow(2, 32)).toString();
                     try {
                         var _square = d3.select('.extraSquare.patientID-' + patientID + '.feature-' + feature);
-                        zScore = _square.data()[0].ZSCORE;
+                        value = _square.data()[0].VALUE;
                     } catch (err) {
                         missingValues = true;
                     }
-                    return [i, zScore];
+                    return [i, value];
                 });
-                isSorted(featureValues) ? featureValues.sort(function (a, b) {
-                    return a[1] - b[1];
-                }) : featureValues.sort(function (a, b) {
-                    return b[1] - a[1];
-                });
-                var sortValues = featureValue.map(function (d) {
+                if (isSorted(featureValues)) {
+                    featureValues.sort(function (a, b) {
+                        var diff = a[1] - b[1];
+                        return isNaN(diff) ? a[1].localeCompare(b[1]) : diff;
+                    });
+                } else {
+                    featureValues.sort(function (a, b) {
+                        var diff = b[1] - a[1];
+                        return isNaN(diff) ? b[1].localeCompare(a[1]) : diff;
+                    });
+                }
+                var sortValues = featureValues.map(function (d) {
                     return d[0];
                 });
                 if (missingValues) alert('Feature is missing for one or more patients.\nEvery missing value will be set to lowest possible value for sorting');
                 updateColOrder(sortValues);
-            }).attr('visibility', function (d) {
-                return d3.select('.extraSquare.feature-' + d).data()[0].TYPE === 'numerical' ? 'visible' : 'hidden';
             });
 
             featureSortBox.transition().duration(animationDuration).attr('x', width + 2).attr('y', function (d, i) {

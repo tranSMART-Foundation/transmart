@@ -30,6 +30,8 @@ SmartRHeatmap = (() => {
         let geneSymbols = data.geneSymbols
         let numberOfClusteredColumns = data.numberOfClusteredColumns[0]
         let numberOfClusteredRows = data.numberOfClusteredRows[0]
+        let maxRows = 100
+        let warning = data.warnings === undefined ? '' : data.warnings
 
         let rowClustering = false
         let colClustering = false
@@ -73,6 +75,8 @@ SmartRHeatmap = (() => {
             .range([0, histogramHeight])
 
         let heatmap = d3.select('#heatmap').append('svg')
+            .attr("width", (width + margin.left + margin.right) * 4)
+            .attr("height", (height + margin.top + margin.bottom) * 4)
             .append('g')
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
@@ -96,6 +100,7 @@ SmartRHeatmap = (() => {
         let significanceSortItems = heatmap.append('g')
         let labelItems = heatmap.append('g')
         let barItems = heatmap.append('g')
+        let warningDiv = $('#heim-heatmap-warnings').append('strong').text(warning)
 
         function updateHeatmap() {
             let square = squareItems.selectAll('.square')
@@ -256,7 +261,7 @@ SmartRHeatmap = (() => {
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
                 .on('click', () => {
-                    const rowValues = significanceValues.map((significanceValue, idx) => [idx, significanceValue])
+                    const rowValues = significanceValues.map((significanceValue, idx) => [idx, Math.abs(significanceValue)])
                     isSorted(rowValues) ? rowValues.sort((a, b) => a[1] - b[1]) : rowValues.sort((a, b) => b[1] - a[1])
                     const sortValues = rowValues.map(rowValue => rowValue[0])
                     updateRowOrder(sortValues)
@@ -370,7 +375,8 @@ SmartRHeatmap = (() => {
                 .attr('height', gridFieldHeight)
                 .attr('width', d => histogramScale(Math.abs(d.significance)))
                 .attr('x', d => - histogramScale(Math.abs(d.significance)) - 10)
-                .attr('y', d => gridFieldHeight * d.idx)
+                .attr("y", d => gridFieldHeight * d.idx)
+                .style('fill', d => d.significance > 0 ? 'steelblue' : '#990000')
 
             let featurePosY = - gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20
 
@@ -440,7 +446,6 @@ SmartRHeatmap = (() => {
                 .attr('dy', '0.35em')
                 .attr('text-anchor', 'middle')
                 .text('↑↓')
-                .attr('visibility', d => d3.select('.extraSquare.feature-' + d).data()[0].TYPE === 'numerical' ? 'visible' : 'hidden')
 
             featureSortText.transition()
                 .duration(animationDuration)
@@ -459,21 +464,30 @@ SmartRHeatmap = (() => {
                 .on('click', feature => {
                     let missingValues = false
                     let featureValues = patientIDs.map(patientID => {
-                        let zScore = - Math.pow(2,32)
+                        let value = (- Math.pow(2,32)).toString()
                         try {
                             let square = d3.select(`.extraSquare.patientID-${patientID}.feature-${feature}`)
-                            zScore = square.data()[0].ZSCORE
+                            value = square.data()[0].VALUE
                         } catch (err) {
                             missingValues = true
                         }
-                        return [i, zScore]
+                        return [i, value]
                     })
-                    isSorted(featureValues) ? featureValues.sort((a, b) => a[1] - b[1]) : featureValues.sort((a, b) => b[1] - a[1])
-                    let sortValues = featureValue.map(d => d[0])
+                    if (isSorted(featureValues)) {
+                        featureValues.sort((a, b) => {
+                            const diff = a[1] - b[1]
+                            return isNaN(diff) ? a[1].localeCompare(b[1]) : diff
+                        })
+                    } else {
+                        featureValues.sort((a, b) => {
+                            const diff = b[1] - a[1]
+                            return isNaN(diff) ? b[1].localeCompare(a[1]) : diff
+                        })
+                    }
+                    let sortValues = featureValues.map(d => d[0])
                     if (missingValues) alert('Feature is missing for one or more patients.\nEvery missing value will be set to lowest possible value for sorting')
                     updateColOrder(sortValues)
                 })
-                .attr('visibility', d => d3.select('.extraSquare.feature-' + d).data()[0].TYPE === 'numerical' ? 'visible' : 'hidden')
 
             featureSortBox.transition()
                 .duration(animationDuration)
@@ -932,9 +946,3 @@ SmartRHeatmap = (() => {
 
     return service
 })()
-
-
-
-
-
-

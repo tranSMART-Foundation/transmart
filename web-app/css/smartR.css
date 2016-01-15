@@ -12,20 +12,6 @@
 
 /* SmartR legacies */
 
-.mybutton {
-    width: 100%;
-    height: 30px;
-    color: black;
-    background-color: white;
-    font-size: 12px;
-    font-weight: bold;
-    border: none;
-}
-
-.mybutton:hover {
-    color: white;
-    background: #326FCB;
-}
 
 @font-face {
     font-family: 'Roboto';
@@ -34,10 +20,14 @@
     src: local('Roboto'), local('Roboto-Regular'), url(http://fonts.gstatic.com/s/roboto/v15/oMMgfZMQthOryQo9n22dcuvvDin1pK8aKteLpeZ5c0A.woff2) format('woff2');
 }
 
+.warning {
+    font-family: 'Roboto', sans-serif;
+    font-size: 18px;
+}
+
 #smartRPanel > * {
     font-family: 'Roboto', sans-serif; !important;
 }
-
 
 /** **/
 .blink_me {
