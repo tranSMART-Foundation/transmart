@@ -51,8 +51,9 @@ var HeatmapView = (function(){
         var biomarkerListTmp = jQuery.templates('#biomarker-list-tmp');
 
         return function _renderBiomarkersList() {
-            var _x = biomarkerListTmp.render({biomarkers : this.getBioMarkers()});
-            view.fetchDataView.listIdentifiers.append(_x);
+            var _biomarker = biomarkerListTmp.render({biomarkers : this.getBioMarkers()});
+            view.fetchDataView.listIdentifiers.empty();
+            view.fetchDataView.listIdentifiers.append(_biomarker);
         };
     })();
 
@@ -224,7 +225,7 @@ var HeatmapView = (function(){
             promise = heatmapService.fetchData(_fetchDataParams);
             // return promise when fetching and calculating summary has finished
             if (promise !== null)
-            promise.then(function (data) {
+            promise.done(function (data) {
                 data.forEach(function (d) {
                     d.forEach(function (summaryJSON) {
                         _noOfSamples += summaryJSON['numberOfSamples'];
@@ -233,7 +234,11 @@ var HeatmapView = (function(){
                 _resetActionButtons();
                 // toggle view
                 _toggleAnalysisView({subsetNo: subsetNo, noOfSamples: _noOfSamples});
-            });
+            })
+                .fail(function (d) {
+                    view.fetchDataView.outputArea.html('<p style="color: red";><b>'+ d +'</b>');
+                    _resetActionButtons();
+                });
         };
 
         // empty outputs
@@ -291,10 +296,13 @@ var HeatmapView = (function(){
 
         var _preprocess = function () {
             heatmapService.preprocess(_preprocessInputArgs)
-                .then(function (data) {
+                .done(function (data) {
                     _resetActionButtons();
                     // empty outputs
                     _emptyOutputs('preprocess');
+                })
+                .fail(function () {
+                    _resetActionButtons();
                 });
         };
 
