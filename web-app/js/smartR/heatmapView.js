@@ -51,8 +51,9 @@ var HeatmapView = (function(){
         var biomarkerListTmp = jQuery.templates('#biomarker-list-tmp');
 
         return function _renderBiomarkersList() {
-            var _x = biomarkerListTmp.render({biomarkers : this.getBioMarkers()});
-            view.fetchDataView.listIdentifiers.append(_x);
+            var _biomarker = biomarkerListTmp.render({biomarkers : this.getBioMarkers()});
+            view.fetchDataView.listIdentifiers.empty();
+            view.fetchDataView.listIdentifiers.append(_biomarker);
         };
     })();
 

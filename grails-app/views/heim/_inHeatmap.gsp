@@ -60,7 +60,7 @@
                     <span class="identifier-name">{{:name}}</span>
                     <span class="identifier-synonyms">{{:synonyms}}</span>
                 </div>
-                <button class="identifier-delete" value="{id}">&#x2716;</button>
+                <button class="identifier-delete" value="{{:id}}">&#x2716;</button>
             </li>
         {{/for}}
     </ul>
