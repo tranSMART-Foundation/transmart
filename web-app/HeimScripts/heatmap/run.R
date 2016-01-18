@@ -47,15 +47,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
                                # to be removed for clustering to work
   measurements <- getMeasurements(measurements)
   measurements <- toZscores(measurements)
-  if (nrow(measurements) > 1 &&
-      ncol(measurements) > 1) {
-    # cannot cluster
-    # matrix which is less than 2x2
-    jsn <- addClusteringOutput(jsn, measurements) #
-  } else {
-    jsn$numberOfClusteredRows <- 0
-    jsn$numberOfClusteredColumns <- 0
-  }
+  jsn <- addClusteringOutput(jsn, measurements) #
   jsn <- toJSON(jsn,
                 pretty = TRUE)
   writeDataForZip(df, measurements, patientIDs)  # for later zip generation
@@ -477,8 +469,10 @@ addClusteringOutput <- function(jsn, measurements_arg) {
   measurements_cols <- t(measurements_arg[ , logicalSelection])
   jsn$numberOfClusteredRows <- nrow(measurements_rows)
   jsn$numberOfClusteredColumns <- nrow(measurements_cols)  # still nrow (transposed)
-  if (jsn$numberOfClusteredRows < 3 | jsn$numberOfClusteredColumns < 3 ) {  # Cannot cluster less than 2x2 matrix
-    jsn$warnings <- c("Clustering could not be done due to high amount of NAs in the data")
+  if (is.null(jsn$numberOfClusteredRows)) jsn$numberOfClusteredRows <- 0
+  if (is.null(jsn$numberOfClusteredColumns)) jsn$numberOfClusteredColumns <- 0
+  if (jsn$numberOfClusteredRows < 2 | jsn$numberOfClusteredColumns < 2 ) {  # Cannot cluster less than 2x2 matrix
+    jsn$warnings <- c("Clustering could not be done due to insufficient data")
     return(jsn)
   }
 
