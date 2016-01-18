@@ -45,6 +45,33 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
         [sessionId: sessionId, taskId: taskId]
     }
 
+    private Map runSourcing() {
+        String sessionId = createSession('func_test')
+        post '/ScriptExecution/run', {
+            body json: [
+                    sessionId: sessionId,
+                    taskType: 'sourcing',
+                    arguments: [
+
+                    ]
+            ]
+        }
+
+        assertStatus 200
+        assertThat JSON, hasEntry(
+                equalTo('executionId'),
+                isA(String))
+
+        String taskId = JSON.executionId
+        get '/ScriptExecution/status?' + buildQueryParameters(
+                sessionId:         sessionId,
+                executionId:       taskId,
+                waitForCompletion: true,
+        )
+
+        [sessionId: sessionId, taskId: taskId]
+    }
+
     private void fetchTestMRNA(sessionId){
         post '/ScriptExecution/run', {
             body json: [
@@ -131,6 +158,13 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
         assert artifacts['a'] == (1 as Double)
         assert artifacts['b'] == 'foobar'
         assert artifacts['passed'] == SAMPLE_DATA_TO_PASS
+    }
+
+    void testSourcing() {
+        runSourcing()
+        assertStatus 200
+        Map artifacts = JSON.result.artifacts
+        assert artifacts['shouldBeTest'] == 'test'
     }
 
     void testRetrieveFile() {
