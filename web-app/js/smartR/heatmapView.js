@@ -46,27 +46,13 @@ var HeatmapView = (function(){
     };
 
     var _renderBiomarkersList = (function() {
-        var tpl = new Ext.XTemplate(
-            '<tpl if="Object.getOwnPropertyNames(items).length &gt; 0">',
-                '<ul>',
-                    '<tpl for="items">',
-                        '<li>',
-                            '<div>',
-                                '<span class="identifier-type">{type}</span> ',
-                                '<span class="identifier-name">{name}</span> ',
-                                '<span class="identifier-synonyms">{synonyms}</span>',
-                            '</div>',
-                            '<button class="identifier-delete" value="{id}">\u2716</button> ',
-                        '</li>',
-                    '</tpl>',
-                '</ul>',
-            '</tpl>'
-        );
+
+        // get template
+        var biomarkerListTmp = jQuery.templates('#biomarker-list-tmp');
 
         return function _renderBiomarkersList() {
-            tpl.overwrite(view.fetchDataView.listIdentifiers[0], {
-                items: this.getBioMarkers()
-            });
+            var _x = biomarkerListTmp.render({biomarkers : this.getBioMarkers()});
+            view.fetchDataView.listIdentifiers.append(_x);
         };
     })();
 
@@ -88,7 +74,7 @@ var HeatmapView = (function(){
             conceptPaths: _conceptPath,
             // CurrentSubsetIDs can contain undefined and null. Pass only nulls forward
             resultInstanceIds : GLOBAL.CurrentSubsetIDs.map(function (v) { return v || null; }),
-            searchKeywordIds: Object.getOwnPropertyNames(bioMarkersModel.selectedBioMarkers),
+            searchKeywordIds: Object.getOwnPropertyNames(bioMarkersModel.selectedBioMarkers)
         };
     };
 
@@ -389,15 +375,7 @@ var HeatmapView = (function(){
             }
         );
 
-        // identifiers autocomplete
-        var _identifierItemTemplate = new Ext.XTemplate(
-            '<li class="ui-menu-item" role="presentation">',
-                '<a class="ui-corner-all">',
-                    '<span class="category-gene">{display}&gt;</span>&nbsp;',
-                    '<b>{keyword}</b>&nbsp;{synonyms}',
-                '</a>',
-            '</li>'
-        );
+        var _identifierItemTemplate = jQuery.templates('#biomarker-autocompletion-list-tmp');
 
         view.fetchDataView.identifierInput.autocomplete({
             source: function(request, response) {
@@ -428,7 +406,8 @@ var HeatmapView = (function(){
             minLength: 2
         });
         view.fetchDataView.identifierInput.data('autocomplete')._renderItem = function(ul, item) {
-            return jQuery(_identifierItemTemplate.append(ul[0], item.value));
+            var _item = _identifierItemTemplate.render(item.value);
+            return jQuery(_item).appendTo(ul);
         };
         view.fetchDataView.identifierInput.on('autocompleteselect',
             function(event, ui) {

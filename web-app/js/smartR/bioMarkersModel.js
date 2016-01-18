@@ -20,20 +20,19 @@ window.BioMarkersModel = (function() {
     });
 
     var BioMarkersModel = function BioMarkersModel() {
-        Observable.call(this)
+        Observable.call(this);
         this.selectedBioMarkers = {};
     };
-    BioMarkersModel.prototype = Object.create(Observable.prototype)
+    BioMarkersModel.prototype = Object.create(Observable.prototype);
     jQuery.extend(BioMarkersModel.prototype, {
         addBioMarker: function BioMarkersModel_addBioMarker(id, type, name, synonyms) {
             if (this.selectedBioMarkers.hasOwnProperty(id)) {
                 return; // nothing to do
             }
-
             this.selectedBioMarkers[String(id)] = {
                 type:     type,
                 name:     name,
-                synonyms: synonyms,
+                synonyms: synonyms
             };
             this.trigger('biomarkers');
         },
@@ -46,7 +45,7 @@ window.BioMarkersModel = (function() {
         getBioMarkers: function BioMarkersModel_getBioMarkers() {
             return Object.getOwnPropertyNames(this.selectedBioMarkers).map(
                 function(id) {
-                    var v = this.selectedBioMarkers[id]
+                    var v = this.selectedBioMarkers[id];
                     return {
                         id: id,
                         type: v.type,
@@ -54,7 +53,7 @@ window.BioMarkersModel = (function() {
                         synonyms: v.synonyms
                     };
                 }.bind(this));
-        },
+        }
     });
     BioMarkersModel.prototype.constructor = BioMarkersModel;
 
