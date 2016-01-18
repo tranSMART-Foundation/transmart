@@ -50,9 +50,8 @@
     background: #326FCB;
 }
 
-.warning {
-    font-family: 'Roboto', sans-serif;
-    font-size: 18px;
+.heim-fetch-err{
+    color: red;
 }
 
 

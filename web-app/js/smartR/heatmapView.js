@@ -6,7 +6,7 @@
  * Heatmap View
  */
 var HeatmapView = (function(){
-    var heatmapService, extJSHelper;
+    var heatmapService, extJSHelper, inputValidator;
 
     var view = {
         container : jQuery('#heim-tabs'),
@@ -79,7 +79,7 @@ var HeatmapView = (function(){
     /**
      *
      * @param fetchDataView
-     * @returns {{conceptPath: *, identifier: *, resultInstanceId: *}}
+     * @returns {{conceptKeys: *, identifier: *, resultInstanceIds: *}}
      * @private
      */
     var _getFetchDataViewValues = function (v) {
@@ -204,11 +204,40 @@ var HeatmapView = (function(){
             _promise = null,
             _fetchDataParams = _getFetchDataViewValues(view.fetchDataView);
 
+        var _validateFetchInputs = function () {
+
+            var _retval = true,
+                _validations = [
+                inputValidator.isEmptySubset(_fetchDataParams.resultInstanceIds),
+                inputValidator.isEmptyHighDimensionalData(_fetchDataParams.conceptPaths)
+            ];
+
+            // clean first all error mesages
+            jQuery('.heim-fetch-err').remove();
+
+            if (_validations[0]) {
+                view.fetchDataView.outputArea.html('<p class="heim-fetch-err"><b>Error:'+ inputValidator.NO_SUBSET_ERR
+                    +'</b></p>');
+            }
+
+            if (_validations[1]) {
+                view.fetchDataView.conceptPathsInput.after('<p class="heim-fetch-err">'+ inputValidator.NO_HD_ERR
+                    +'</p>');
+            }
+
+            _validations.forEach(function(validateItem) {
+                _retval= _retval && (!validateItem);
+            });
+
+            return _retval;
+        };
+
         var _fetch = function (promise) {
             _onFetchData();
             // fetch data
             promise = heatmapService.fetchData(_fetchDataParams);
             // return promise when fetching and calculating summary has finished
+            if (promise !== null)
             promise.then(function (data) {
                 data.forEach(function (d) {
                     d.forEach(function (summaryJSON) {
@@ -216,12 +245,18 @@ var HeatmapView = (function(){
                     });
                 });
                 _resetActionButtons();
-                // empty outputs
-                _emptyOutputs('fetch');
                 // toggle view
                 _toggleAnalysisView({subsetNo: subsetNo, noOfSamples: _noOfSamples});
             });
         };
+
+        // empty outputs
+        _emptyOutputs('fetch');
+
+        // validate inputs
+        if (!_validateFetchInputs()) {
+            return;
+        }
 
         // Notify user when there are outputs from previous jobs
         if (!_isEmptyEl(view.preprocessView.outputArea) || !_isEmptyEl(view.runHeatmapView.outputArea)) {
@@ -441,12 +476,13 @@ var HeatmapView = (function(){
      * @param service
      * @param helper
      */
-    view.init = function (service, helper) {
+    view.init = function (service, helper, validator) {
         // instantiate tooltips
         jQuery( "[title]" ).tooltip({track: true, tooltipClass:"sr-ui-tooltip"});
         // injects dependencies
         heatmapService = service;
         extJSHelper = helper;
+        inputValidator = validator;
         // register dropzone
         extJSHelper.registerDropzone(view.fetchDataView.conceptPathsInput);
         // register event handles
@@ -458,4 +494,4 @@ var HeatmapView = (function(){
     return view;
 })();
 
-HeatmapView.init(HeatmapService, HeimExtJSHelper);
+HeatmapView.init(HeatmapService, HeimExtJSHelper, HeatmapValidator);

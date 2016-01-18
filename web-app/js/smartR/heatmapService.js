@@ -12,6 +12,7 @@ window.HeatmapService = (function(){
     var HEATMAP_DATA_FILE = 'heatmap.json';
     var MARKER_SELECTION_TABLE_FILE = 'markerSelectionTable.json';
 
+
     var NOOP_ABORT = function() {};
 
     var service = {
@@ -162,6 +163,7 @@ window.HeatmapService = (function(){
      * a promise.
      * @param eventObj
      */
+
     service.fetchData = function (params) {
         var _args = _createAnalysisConstraints(params);
         var defer = jQuery.Deferred();
