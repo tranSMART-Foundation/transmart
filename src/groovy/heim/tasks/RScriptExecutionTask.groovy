@@ -38,11 +38,17 @@ class RScriptExecutionTask extends AbstractTask {
         }
     }
 
+    private void injectScriptDir(RConnection conn) {
+        def remoteScriptDir = fileToLoad.getParentFile()
+        String path = RUtil.escapeRStringContent(remoteScriptDir.absolutePath)
+        runRCommand(conn, "remoteScriptDir <- \"$path\"")
+    }
+
     private REXP callR(RConnection conn) {
         runRCommand(conn, 'library(jsonlite)')
+        injectScriptDir(conn)
         runRCommand(conn, "source('" +
                 "${RUtil.escapeRStringContent(fileToLoad.toString())}')")
-
         def namedArguments = arguments.collect { RFunctionArg arg ->
             "${arg.name}=${arg.asRExpression()}"
         }

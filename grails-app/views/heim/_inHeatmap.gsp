@@ -21,7 +21,7 @@
     </table>
 </script>
 
-%{--Template for --}%
+%{--Template for marker selection--}%
 <script id="marker-selection-table-tmp" type="text/x-jsrender">
     <table id="markerSelectionTable" class="tablesorterAnalysisResults">
         <thead>
@@ -51,11 +51,34 @@
     </table>
 </script>
 
+<script id="biomarker-list-tmp"  type="text/x-jsrender">
+    <ul>
+        {{for biomarkers}}
+            <li>
+                <div>
+                    <span class="identifier-type">{{:type}}</span>
+                    <span class="identifier-name">{{:name}}</span>
+                    <span class="identifier-synonyms">{{:synonyms}}</span>
+                </div>
+                <button class="identifier-delete" value="{{:id}}">&#x2716;</button>
+            </li>
+        {{/for}}
+    </ul>
+</script>
+
+<script id="biomarker-autocompletion-list-tmp"  type="text/x-jsrender">
+    <li class="ui-menu-item" role="presentation">
+        <a class="ui-corner-all">
+            <span class="category-gene">{{:display}}&gt;</span>&nbsp;
+            <b>{{:keyword}}</b>&nbsp;{{:synonyms}}
+        </a>
+    </li>
+</script>
+
 %{--Empty Result -Dialog--}%
 <div id="sr-fetch-dialog" title="Fetch Data" style="display: none">
     <p>This action will replace all results from previous processes. Are you sure?</p>
 </div>
-
 
 <div class="heim-analysis-container">
 
@@ -127,8 +150,9 @@
             <div class="sr-fetch-params-area">
                 %{--Select identifier--}%
                 <div class="heim-input-field heim-autocomplete">
-                    <label for="heim-input-txt-identifier">Select a Gene/Pathway/mirID/UniProtID:</label>
+                    <label for="heim-input-txt-identifier">Select a biomarker:</label>
                     <input id="heim-input-txt-identifier">
+                    <span style="color: darkgrey"> Biomarker can be a gene, pathway, mirID or UniProtID.</span>
                     <div id="heim-input-list-identifiers"></div>
                 </div>
             </div>
