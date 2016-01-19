@@ -545,35 +545,40 @@ function activateDragAndDrop(divName) {
 }
 
 // Panel item for the SmartR plugin
-var smartRPanel = new Ext.Panel({
-    id: 'smartRPanel',
-    title: 'SmartR',
-    region: 'center',
-    split: true,
-    height: 90,
-    layout: 'fit',
-    collapsible: true,
-    autoScroll: true,
-    tbar: new Ext.Toolbar({
-        id: 'smartRToolbar',
-        title: 'R Scripts',
-        items: []
-    }),
-    autoLoad: {
-        url: pageInfo.basePath + '/smartR/index',
-        method: 'POST',
-        evalScripts: false
-    },
-    listeners: {
-        render: function(panel) {
-            panel.body.on('click', function() {
-                if (typeof updateOnView === "function") {
-                    updateOnView();
-                }
-            });
+window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
+    var smartRPanel = new Ext.Panel({
+        id: 'smartRPanel',
+        title: 'SmartR',
+        region: 'center',
+        split: true,
+        height: 90,
+        layout: 'fit',
+        collapsible: true,
+        autoScroll: true,
+        tbar: new Ext.Toolbar({
+            id: 'smartRToolbar',
+            title: 'R Scripts',
+            items: []
+        }),
+        autoLoad: {
+            url: pageInfo.basePath + '/smartR/index',
+            method: 'POST',
+            evalScripts: false
+        },
+        listeners: {
+            render: function (panel) {
+                panel.body.on('click', function () {
+                    if (typeof updateOnView === "function") {
+                        updateOnView();
+                    }
+                });
+            }
         }
-    }
-});
+    });
+
+    parentPanel.add(smartRPanel);
+};
+
 
 /**
 *   Clears drag & drop selections from the given div

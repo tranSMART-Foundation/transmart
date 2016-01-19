@@ -100,6 +100,10 @@ class smartRGrailsPlugin {
             constants.remoteScriptDirectoryDir = constants.pluginScriptDirectory.absoluteFile
             ctx.getBean(RScriptsSynchronizer).skip()
         }
+
+        ctx.getBean('transmartExtensionsRegistry')
+                .registerAnalysisTabExtension('smartR', '/SmartR/loadScripts', 'addSmartRPanel')
+
     }
 
     private boolean skipRScriptsTransfer(config) {
