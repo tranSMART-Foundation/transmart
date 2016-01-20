@@ -101,8 +101,8 @@ class smartRGrailsPlugin {
             ctx.getBean(RScriptsSynchronizer).skip()
         }
 
-        ctx.getBean('transmartExtensionsRegistry')
-                .registerAnalysisTabExtension('smartR', '/SmartR/loadScripts', 'addSmartRPanel')
+        ctx.getBean('transmartExtensionsRegistry')?.registerAnalysisTabExtension(
+                'smartR', '/SmartR/loadScripts', 'addSmartRPanel')
 
     }
 
