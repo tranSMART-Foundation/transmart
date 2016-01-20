@@ -10,10 +10,10 @@ function buildCorrelationAnalysis(results) {
     var leftHistHeight = margin.left
     var colors = ['#33FF33', '#3399FF', '#CC9900', '#CC99FF', '#FFFF00', 'blue']
     var x = d3.scale.linear()
-        .domain(d3.extent(results.points, d => d.x))
+        .domain(d3.extent(results.points, function(d) { return d.x }))
         .range([0, width])
     var y = d3.scale.linear()
-        .domain(d3.extent(results.points, d => d.y))
+        .domain(d3.extent(results.points, function(d) { return d.y }))
         .range([height, 0])
 
     var correlation, pvalue, regLineSlope, regLineYIntercept, patientIDs, tags, points, xArrLabel, yArrLabel, method, minX, maxX, minY, maxY
@@ -28,15 +28,19 @@ function buildCorrelationAnalysis(results) {
         patientIDs = data.patientIDs
         tags = data.tags.sort()
         points = data.points
-        ;[minX, maxX] = d3.extent(data.points, d => d.x)
-        ;[minY, maxY] = d3.extent(data.points, d => d.y)
+        minX = data.points.min(function(d) { return d.x })
+        maxX = data.points.max(function(d) { return d.x })
+        minY = data.points.min(function(d) { return d.y })
+        maxY = data.points.max(function(d) { return d.y })
     }
 
     setData(results)
 
-    function updateStatistics(patientIDs, scatterUpdate=false, init=false) {
-        var settings = {patientIDs}
-        var onResponse = response => {
+    function updateStatistics(patientIDs, scatterUpdate, init) {
+        scatterUpdate = scatterUpdate === undefined ? false : scatterUpdate
+        init = init === undefined ? false : init
+        var settings = { patientIDs: patientIDs }
+        var onResponse = function(response) {
             if (init) {
                 d3.selectAll('#scatterplot *').remove()
                 buildCorrelationAnalysis(response)
@@ -55,8 +59,8 @@ function buildCorrelationAnalysis(results) {
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
         .append('g')
-        .attr('transform', `translate(${margin.left}, ${margin.top})`)
-        .on('contextmenu', () => {
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+        .on('contextmenu', function() {
             d3.event.preventDefault()
             contextMenu
                 .style('visibility', 'visible')
@@ -95,12 +99,12 @@ function buildCorrelationAnalysis(results) {
 
     svg.append('text')
         .attr('class', 'axisLabels')
-        .attr('transform', `translate(${width / 2}, ${- margin.top / 2})`)
+        .attr('transform', 'translate(' + width / 2 + ',' + - margin.top / 2 + ')')
         .text(shortenConcept(xArrLabel))
 
     svg.append('g')
         .attr('class', 'y axis')
-        .attr('transform', `translate(${width}, ${0})`)
+        .attr('transform', 'translate(' + width + ',' + 0 + ')')
         .call(d3.svg.axis()
             .scale(y)
             .ticks(10)
@@ -110,29 +114,27 @@ function buildCorrelationAnalysis(results) {
 
     svg.append('text')
         .attr('class', 'axisLabels')
-        .attr('transform', `translate(${width + margin.right / 2}, ${height / 2})rotate(90)`)
+        .attr('transform', 'translate('  + (width + margin.right / 2) + ',' + height / 2 + ')rotate(90)')
         .text(shortenConcept(yArrLabel))
 
     svg.append('g')
         .attr('class', 'x axis')
-        .attr('transform', `translate(${0}, ${height})`)
+        .attr('transform', 'translate(' + 0 + ',' + height + ')')
         .call(d3.svg.axis()
             .scale(x)
             .orient('top'))
 
     svg.append('g')
         .attr('class', 'y axis')
-        .attr('transform', `translate(${0}, ${0})`)
+        .attr('transform', 'translate(' + 0 + ',' + 0 + ')')
         .call(d3.svg.axis()
             .scale(y)
             .orient('right'))
 
-    function updateCohorts() {
-        alert('This feature will be available in TranSMART 1.3')
-    }
-
     function excludeSelection() {
-        var remainingPatientIDs = d3.selectAll('.point:not(.selected)').map(d => d.patientID)
+        var remainingPatientIDs = d3.selectAll('.point:not(.selected)').map(function(d) {
+            return d.patientID
+        })
         updateStatistics(remainingPatientIDs, true)
     }
 
@@ -141,57 +143,79 @@ function buildCorrelationAnalysis(results) {
             alert('Please select at least two elements before zooming!')
             return
         }
-        var selectedPatientIDs = d3.selectAll('.point.selected').map(d => d.patientID)
+        var selectedPatientIDs = d3.selectAll('.point.selected').map(function(d) {
+            return d.patientID
+        })
         updateStatistics(selectedPatientIDs, false, true)
     }
 
-    var ctxHtml = `<input id='updateCohortsButton' class='mybutton' type='button' value='Update Cohorts'/><br/>
-<input id='zoomButton' class='mybutton' type='button' value='Zoom'/><br/>
-<input id='excludeButton' class='mybutton' type='button' value='Exclude'/><br/>
-<input id='resetButton' class='mybutton' type='button' value='Reset'/>`
+    var ctxHtml = "<input id='updateCohortsButton' class='mybutton' type='button' value='Update Cohorts'/><br/> \
+<input id='zoomButton' class='mybutton' type='button' value='Zoom'/><br/> \
+<input id='excludeButton' class='mybutton' type='button' value='Exclude'/><br/> \
+<input id='resetButton' class='mybutton' type='button' value='Reset'/>"
     var contextMenu = d3.select('#scatterplot').append('div')
         .attr('class', 'contextMenu')
         .style('visibility', 'hidden')
         .html(ctxHtml)
-    $('#updateCohortsButton').on('click', () => { contextMenu.style('visibility', 'hidden'); updateCohorts() })
-    $('#zoomButton').on('click', () => { contextMenu.style('visibility', 'hidden'); zoomSelection() })
-    $('#excludeButton').on('click', () => { contextMenu.style('visibility', 'hidden'); excludeSelection() })
-    $('#resetButton').on('click', () => { contextMenu.style('visibility', 'hidden'); reset() })
+    $('#updateCohortsButton').on('click', function() {
+        contextMenu.style('visibility', 'hidden')
+        updateCohorts()
+    })
+    $('#zoomButton').on('click', function() {
+        contextMenu.style('visibility', 'hidden')
+        zoomSelection()
+    })
+    $('#excludeButton').on('click', function() {
+        contextMenu.style('visibility', 'hidden')
+        excludeSelection()
+    })
+    $('#resetButton').on('click', function() {
+        contextMenu.style('visibility', 'hidden')
+        reset()
+    })
 
     function updateSelection() {
         var extent = brush.extent()
-        var [x0, x1] = [extent[0][0], extent[1][0]].map(d => x.invert(d))
-        var [y0, y1] = [extent[0][1], extent[1][1]].map(d => y.invert(d))
+        var x0 = extent[0][0].map(function(d) { return x.invert(d) })
+        var x1 = extent[1][0].map(function(d) { return x.invert(d) })
+        var y0 = extent[0][1].map(function(d) { return y.invert(d) })
+        var y1 = extent[1][1].map(function(d) { return y.invert(d) })
         svg.selectAll('.point')
             .classed('selected', false)
-            .style('fill', d => getColor(d.tag))
+            .style('fill', function(d) { return getColor(d.tag) })
             .style('stroke', 'white')
         if (brush.empty()) {
             d3.selectAll('.point').classed('selected', true)
         } else {
             svg.selectAll('.point')
-                .filter(d => x0 <= d.x && d.x <= x1 && y1 <= d.y && d.y <= y0)
+                .filter(function(d) {
+                    return x0 <= d.x && d.x <= x1 && y1 <= d.y && d.y <= y0
+                })
                 .classed('selected', true)
                 .style('fill', 'white')
-                .style('stroke', d => getColor(d.tag))
+                .style('stroke', function(d) { return getColor(d.tag) })
         }
     }
 
     var brush = d3.svg.brush()
         .x(d3.scale.identity().domain([0, width]))
         .y(d3.scale.identity().domain([0, height]))
-        .on('brushend', () => {
+        .on('brushend', function() {
             contextMenu
                 .style('visibility', 'hidden')
                 .style('top', -100 + 'px')
             updateSelection()
-            var selectedPatientIDs = d3.selectAll('.point.selected').map(d => d.patientID)
+            var selectedPatientIDs = d3.selectAll('.point.selected').map(function(d) {
+                return d.patientID
+            })
             updateStatistics(selectedPatientIDs)
         })
 
     svg.append('g')
         .attr('class', 'brush')
-        .on('mousedown', () => d3.event.button === 2 ? d3.event.stopImmediatePropagation() : null)
+        .on('mousedown', function() {
+            return d3.event.button === 2 ? d3.event.stopImmediatePropagation() : null
+        })
         .call(brush)
 
     function getColor(tag) {
@@ -200,25 +224,27 @@ function buildCorrelationAnalysis(results) {
 
     function updateScatterplot() {
         var point = svg.selectAll('.point')
-            .data(points, d => d.patientID)
+            .data(points, function(d) { return d.patientID
+            })
 
         point.enter()
             .append('circle')
             .attr('class', 'point')
-            .attr('cx', d => x(d.x))
-            .attr('cy', d => y(d.y))
+            .attr('cx', function(d) {
+                return x(d.x)
+            })
+            .attr('cy', function(d) {
+                return y(d.y)
+            })
             .attr('r', 5)
-            .style('fill', d => getColor(d.tag))
+            .style('fill', function(d) { return getColor(d.tag) })
             .on('mouseover', function(d) {
                 d3.select(this).style('fill', '#FF0000')
                 tooltip
                     .style('left', 10 + mouseX() + 'px')
                     .style('top', 10 + mouseY() + 'px')
                     .style('visibility', 'visible')
-                    .html(`${shortenConcept(xArrLabel)}: ${d.x}<br/>
-${shortenConcept(yArrLabel)}: ${d.y}<br/>
-Patient ID: ${d.patientID}<br/>
-${d.tag ? 'Tag: ' + d.tag : ''}`)
+                    .html(shortenConcept(xArrLabel) + ': ' + d.x + '<br/>' + shortenConcept(yArrLabel) + ': ' + d.y + '<br/>' + 'Patient ID: ' + d.patientID + '<br/>' + (d.tag ? 'Tag: ' + d.tag : ''))
             })
             .on('mouseout', function() {
                 var p = d3.select(this)
@@ -226,7 +252,7 @@ ${d.tag ? 'Tag: ' + d.tag : ''}`)
                     p.style('fill', '#FFFFFF')
                 }
                 else {
-                    p.style('fill', d => getColor(d.tag))
+                    p.style('fill', function(d) { return getColor(d.tag) })
                 }
                 tooltip.style('visibility', 'hidden')
             })
@@ -241,19 +267,19 @@ ${d.tag ? 'Tag: ' + d.tag : ''}`)
 
     function updateHistogram() {
         var bottomHistData = d3.layout.histogram()
-            .bins(bins)(points.map(d => d.x))
+            .bins(bins)(points.map(function(d) { return d.x }))
         var leftHistData = d3.layout.histogram()
-            .bins(bins)(points.map(d => d.y))
+            .bins(bins)(points.map(function(d) { return d.y }))
 
         var bottomHistHeightScale = d3.scale.linear()
-            .domain([0, bottomHistData.max(d => d.y)])
+            .domain([0, bottomHistData.max(function(d) { return d.y })])
             .range([1, bottomHistHeight])
         var leftHistHeightScale = d3.scale.linear()
-            .domain([0, leftHistData.max(d => d.y)])
+            .domain([0, leftHistData.max(function(d) { return d.y })])
             .range([2, leftHistHeight])
 
         var bottomHistGroup = svg.selectAll('.bar.bottom')
-            .data(Array(bins).fill().map((_, i) => i))
+            .data(Array(bins).fill().map(function(_, i) { return i }))
         var bottomHistGroupEnter = bottomHistGroup.enter()
             .append('g')
             .attr('class', 'bar bottom')
@@ -263,11 +289,11 @@ ${d.tag ? 'Tag: ' + d.tag : ''}`)
             .attr('y', height + 1)
         bottomHistGroup.selectAll('rect')
             .transition()
-            .delay(d => d * 25)
+            .delay(function(d) { return d * 25 })
             .duration(animationDuration)
-            .attr('x', d => x(bottomHistData[d].x))
-            .attr('width', () => (x(maxX) - x(minX)) / bins)
-            .attr('height', d => bottomHistHeightScale(bottomHistData[d].y) - 1)
+            .attr('x', function(d) { return x(bottomHistData[d].x) })
+            .attr('width', function() { return (x(maxX) - x(minX)) / bins })
+            .attr('height', function(d) { return bottomHistHeightScale(bottomHistData[d].y) - 1 })
         bottomHistGroupExit.selectAll('rect')
             .transition()
             .duration(animationDuration)
@@ -277,17 +303,17 @@ ${d.tag ? 'Tag: ' + d.tag : ''}`)
             .attr('dy', '.35em')
             .attr('text-anchor', 'middle')
         bottomHistGroup.selectAll('text')
-            .text(d => bottomHistData[d].y || '')
+            .text(function(d) { return bottomHistData[d].y || '' })
             .transition()
-            .delay(d => d * 25)
+            .delay(function(d) { return d * 25 })
             .duration(animationDuration)
-            .attr('x', d => x(bottomHistData[d].x) + (x(maxX) - x(minX)) / bins / 2)
-            .attr('y', d => height + bottomHistHeightScale(bottomHistData[d].y) - 10)
+            .attr('x', function(d) { return x(bottomHistData[d].x) + (x(maxX) - x(minX)) / bins / 2 })
+            .attr('y', function(d) { return height + bottomHistHeightScale(bottomHistData[d].y) - 10 })
         bottomHistGroupExit.selectAll('text')
             .text('')
 
         var leftHistGroup = svg.selectAll('.bar.left')
-            .data(Array(bins).fill().map((_, i) => i))
+            .data(Array(bins).fill().map(function(_, i) { return i }))
         var leftHistGroupEnter = leftHistGroup.enter()
             .append('g')
             .attr('class', 'bar left')
@@ -296,12 +322,12 @@ ${d.tag ? 'Tag: ' + d.tag : ''}`)
         leftHistGroupEnter.append('rect')
         leftHistGroup.selectAll('rect')
             .transition()
-            .delay(d => d * 25)
+            .delay(function(d) { return d * 25 })
             .duration(animationDuration)
-            .attr('x', d => - leftHistHeightScale(leftHistData[d].y) + 1)
-            .attr('y', d => y(leftHistData[d].x) - (y(minY) - y(maxY))/ bins)
-            .attr('width', d => leftHistHeightScale(leftHistData[d].y) - 2)
-            .attr('height', () => (y(minY) - y(maxY))/ bins)
+            .attr('x', function(d) { return - leftHistHeightScale(leftHistData[d].y) + 1 })
+            .attr('y', function(d) { return y(leftHistData[d].x) - (y(minY) - y(maxY))/ bins })
+            .attr('width', function(d) { return leftHistHeightScale(leftHistData[d].y) - 2 })
+            .attr('height', function() { return (y(minY) - y(maxY))/ bins })
         leftHistGroupExit.selectAll('rect')
             .transition()
             .duration(animationDuration)
@@ -311,32 +337,33 @@ ${d.tag ? 'Tag: ' + d.tag : ''}`)
             .attr('dy', '.35em')
             .attr('text-anchor', 'middle')
         leftHistGroup.selectAll('text')
-            .text(d => leftHistData[d].y || '')
+            .text(function(d) { return leftHistData[d].y || '' })
             .transition()
-            .delay(d => d * 25)
+            .delay(function(d) { return d * 25 })
             .duration(animationDuration)
-            .attr('x', d => - leftHistHeightScale(leftHistData[d].y) + 10)
-            .attr('y', d => y(leftHistData[d].x) - (y(minY) - y(maxY))/ bins / 2)
+            .attr('x', function(d) { return - leftHistHeightScale(leftHistData[d].y) + 10 })
+            .attr('y', function(d) { return y(leftHistData[d].x) - (y(minY) - y(maxY))/ bins / 2 })
         leftHistGroupExit.selectAll('text')
             .text('')
     }
 
     function updateLegend() {
-        var html = (`Correlation Coefficient: ${correlation}<br/>
-p-value: ${pvalue}<br/>
-Method: ${method}<br/><br/>
-Selected: ${d3.selectAll('.point.selected').size() || d3.selectAll('.point').size()}<br/>
-Displayed: ${d3.selectAll('.point').size()}<br/><br/>`)
-        html = html + `<p style='background:#000000; color:#FFFFFF'>Default</p>`
-        for (var tag of tags) {
-            if (tag) html += `<p style='background:${getColor(tag)}; color:#FFFFFF'>${tag}</p>`
+        var html = 'Correlation Coefficient: ${correlation}<br/>' +
+'p-value: ' + pvalue + '<br/>' +
+'Method:' + method + '<br/><br/>' +
+'Selected:' + d3.selectAll('.point.selected').size() || d3.selectAll('.point').size() + '<br/>' +
+'Displayed:' + d3.selectAll('.point').size() + '<br/><br/>'
+        html = html + '<p style="background: #000000; color:#FFFFFF">Default</p>'
+        for (var i = 0; i < tags.length; i++) {
+            var tag = tags[i]
+            if (tag) html += '<p style=background:' + getColor(tag) + '; color:#FFFFFF>' + tag + '</p>'
         }
         legend.html(html)
     }
 
     function updateRegressionLine() {
         var regressionLine = svg.selectAll('.regressionLine')
-            .data(regLineSlope === 'NA' ? [] : [0], d => d)
+            .data(regLineSlope === 'NA' ? [] : [0], function(d) { return d })
         regressionLine.enter()
             .append('line')
             .attr('class', 'regressionLine')
@@ -344,7 +371,7 @@ Displayed: ${d3.selectAll('.point').size()}<br/><br/>`)
                 d3.select(this).attr('stroke', 'red')
                 tooltip
                     .style('visibility', 'visible')
-                    .html(`slope: ${regLineSlope}<br/>intercept: ${regLineYIntercept}`)
+                    .html('slope: ' + regLineSlope + '<br/>intercept: ' + regLineYIntercept)
                     .style('left', mouseX() + 'px')
                     .style('top', mouseY() + 'px')
             })
