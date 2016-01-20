@@ -2,6 +2,6 @@
 
 "use strict";
 
-window.smartR.boxplot_model = function() {
+window.smartR.BoxplotModel = function() {
 
 };
