@@ -32,12 +32,12 @@ class SmartRController {
     }
 
     /**
-    *   Called to get the path to smartR.es6 such that the plugin can be loaded in the datasetExplorer
+    *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
     */
     def loadScripts = {
 
         // list of required javascript files
-        def scripts = [servletContext.contextPath + pluginContextPath + '/js/smartR/smartR-compiled.js']
+        def scripts = [servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js']
 
         // list of required css files
         def styles = []
