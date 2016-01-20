@@ -1,7 +1,7 @@
 function createD3Button(args) {
-    let button = args.location.append('g')
+    var button = args.location.append('g')
 
-    let box = button.append('rect')
+    var box = button.append('rect')
         .attr('x', args.x)
         .attr('y', args.y)
         .attr('rx', 3)
@@ -28,9 +28,9 @@ function createD3Button(args) {
                 .duration(300)
                 .style('fill', '#ffffff')
         })
-        .on('click', () => args.callback())
+        .on('click', function() { return args.callback() })
 
-    let text = button.append('text')
+    var text = button.append('text')
         .attr('x', args.x + args.width / 2)
         .attr('y', args.y + args.height / 2)
         .attr('dy', '0.35em')
@@ -44,12 +44,12 @@ function createD3Button(args) {
 }
 
 function createD3Switch(args) {
-    let switcher = args.location.append('g')
+    var switcher = args.location.append('g')
 
-    let checked = args.checked
-    let color = checked ? 'green' : 'red'
+    var checked = args.checked
+    var color = checked ? 'green' : 'red'
 
-    let box = switcher.append('rect')
+    var box = switcher.append('rect')
         .attr('x', args.x)
         .attr('y', args.y)
         .attr('rx', 3)
@@ -60,7 +60,7 @@ function createD3Switch(args) {
         .style('stroke', color)
         .style('fill', color)
         .style('cursor', 'pointer')
-        .on('click', () => {
+        .on('click', function() {
             if (color === 'green') {
                 box.transition()
                     .duration(300)
@@ -80,7 +80,7 @@ function createD3Switch(args) {
             args.callback(checked)
         })
 
-    let text = switcher.append('text')
+    var text = switcher.append('text')
         .attr('x', args.x + args.width / 2)
         .attr('y', args.y + args.height / 2)
         .attr('dy', '0.35em')
@@ -105,16 +105,15 @@ function createD3Dropdown(args) {
         hovered = false
         itemHovered = false
     }
-    let dropdown = args.location.append('g')
+    var dropdown = args.location.append('g')
 
-    let hovered = false
-    let itemHovered = false
+    var hovered = false
+    var itemHovered = false
 
-    let itemBox = dropdown.selectAll('.itemBox')
-        .data(args.items, item => item.label)
+    var itemBox = dropdown.selectAll('.itemBox')
+        .data(args.items, function(item) { return item.label })
 
-    itemBox
-        .enter()
+    itemBox.enter()
         .append('rect')
         .attr('class', 'itemBox')
         .attr('x', args.x)
@@ -137,16 +136,16 @@ function createD3Dropdown(args) {
             itemHovered = false
             d3.select(this)
                 .style('fill', '#E3E3E3')
-            setTimeout(() => {
+            setTimeout(function() {
                 if (! hovered && ! itemHovered) {
                     shrink()
                 }
             }, 50)
         })
-        .on('click', d => d.callback())
+        .on('click', function(d) { d.callback() })
 
-    let itemText = dropdown.selectAll('.itemText')
-        .data(args.items, item => item.label)
+    var itemText = dropdown.selectAll('.itemText')
+        .data(args.items, function(item) { return item.label })
 
     itemText
         .enter()
@@ -160,9 +159,9 @@ function createD3Dropdown(args) {
         .style('fill', '#000000')
         .style('font-size', '14px')
         .style('visibility', 'hidden')
-        .text(d => d.label)
+        .text(function(d) { return d.label })
 
-    let box = dropdown.append('rect')
+    var box = dropdown.append('rect')
         .attr('x', args.x)
         .attr('y', args.y)
         .attr('rx', 3)
@@ -180,8 +179,8 @@ function createD3Dropdown(args) {
                 .transition()
                 .duration(300)
                 .style('visibility', 'visible')
-                .attr('y', d => {
-                    let idx = args.items.findIndex(item => item.label === d.label)
+                .attr('y', function(d) {
+                    var idx = args.items.findIndex(function(item) { return item.label === d.label })
                     return 2 + args.y + (idx + 1) * args.height
                 })
 
@@ -190,7 +189,7 @@ function createD3Dropdown(args) {
                 .duration(300)
                 .style('visibility', 'visible')
                 .attr('y', function(d) {
-                    let idx = args.items.findIndex(item => item.label === d.label)
+                    var idx = args.items.findIndex(function(item) { return item.label === d.label })
                     return 2 + args.y + (idx + 1) * args.height + args.height / 2
                 })
 
@@ -198,19 +197,19 @@ function createD3Dropdown(args) {
         })
         .on('mouseout', function() {
             hovered = false
-            setTimeout(() => {
+            setTimeout(function() {
                 if (! hovered && ! itemHovered) {
                     shrink()
                 }
             }, 50)
-            setTimeout(() => { // first check is not enough if animation interrupts it
+            setTimeout(function() { // first check is not enough if animation interrupts it
                 if (! hovered && ! itemHovered) {
                     shrink()
                 }
             }, 350)
         })
 
-    let text = dropdown.append('text')
+    var text = dropdown.append('text')
         .attr('class', 'buttonText')
         .attr('x', args.x + args.width / 2)
         .attr('y', args.y + args.height / 2)
@@ -225,21 +224,21 @@ function createD3Dropdown(args) {
 }
 
 function createD3Slider(args) {
-    let slider = args.location.append('g')
+    var slider = args.location.append('g')
 
-    let lineGen = d3.svg.line()
-        .x(d => d.x)
-        .y(d => d.y)
+    var lineGen = d3.svg.line()
+        .x(function(d) { return d.x })
+        .y(function(d) { return d.y })
         .interpolate('linear')
 
-    let lineData = [
+    var lineData = [
         {x: args.x, y: args.y + args.height},
         {x: args.x, y: args.y + 0.75 * args.height},
         {x: args.x + args.width, y: args.y + 0.75 * args.height},
         {x: args.x + args.width, y: args.y + args.height}
     ]
 
-    let sliderScale = d3.scale.linear()
+    var sliderScale = d3.scale.linear()
         .domain([args.min, args.max])
         .range([args.x, args.x + args.width])
 
@@ -281,10 +280,10 @@ function createD3Slider(args) {
         .style('font-size', '14px')
         .text(args.label)
 
-    let currentValue = args.init
+    var currentValue = args.init
 
     function move() {
-        let xPos = d3.event.x
+        var xPos = d3.event.x
         if (xPos < args.x) {
             xPos = args.x
         } else if (xPos > args.x + args.width) {
@@ -305,11 +304,11 @@ function createD3Slider(args) {
             .text(currentValue)
     }
 
-    let drag = d3.behavior.drag()
+    var drag = d3.behavior.drag()
         .on('drag', move)
-        .on(args.trigger, () => { args.callback(currentValue) })
+        .on(args.trigger, function() { args.callback(currentValue) })
 
-    let dragger = slider.append('rect')
+    var dragger = slider.append('rect')
         .attr('x', sliderScale(args.init) - 20)
         .attr('y', args.y)
         .attr('width', 40)
@@ -330,14 +329,14 @@ function createD3Slider(args) {
         })
         .call(drag)
 
-    let handle = slider.append('circle')
+    var handle = slider.append('circle')
         .attr('cx', sliderScale(args.init))
         .attr('cy', args.y + 10)
         .attr('r', 6)
         .style('pointer-events', 'none')
         .style('fill', '#000000')
 
-    let pointer = slider.append('line')
+    var pointer = slider.append('line')
         .attr('x1', sliderScale(args.init))
         .attr('y1', args.y + 10)
         .attr('x2', sliderScale(args.init))
@@ -346,7 +345,7 @@ function createD3Slider(args) {
         .style('stroke', '#000000')
         .style('stroke-width', '1px')
 
-    let value = slider.append('text')
+    var value = slider.append('text')
         .attr('x', sliderScale(args.init) + 10)
         .attr('y', args.y + 10)
         .attr('dy', '0.35em')
@@ -360,12 +359,12 @@ function createD3Slider(args) {
 }
 
 function mouseX() {
-    let mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX
+    var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX
     return mouseXPos + $('#index').parent().scrollLeft() - $('#smartRPanel').offset().left
 }
 
 function mouseY() {
-    let mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY
+    var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY
     return mouseYPos + $('#index').parent().scrollTop() - $('#smartRPanel').offset().top
 }
 
@@ -374,12 +373,12 @@ function getMaxWidth(selection) {
 }
 
 function showCohortInfo() {
-    let cohortsSummary = ''
+    var cohortsSummary = ''
 
-    for(let i of Array(GLOBAL.NumOfSubsets).keys()) {
-        let currentQuery = getQuerySummary(i + 1)
+    for(var i = 1; i < GLOBAL.NumOfSubsets; i++) {
+        var currentQuery = getQuerySummary(i)
         if(currentQuery !== '') {
-            cohortsSummary += '<br/>Subset ' + (i + 1) + ': <br/>'
+            cohortsSummary += '<br/>Subset ' + (i) + ': <br/>'
             cohortsSummary += currentQuery
             cohortsSummary += '<br/>'
         }
@@ -395,18 +394,18 @@ function updateInputView() {
     if (typeof updateOnView === 'function') updateOnView()
 }
 
-let panelItem = $('#resultsTabPanel__smartRPanel')
+var panelItem = $('#resultsTabPanel__smartRPanel')
 panelItem.click(showCohortInfo)
 panelItem.click(updateInputView)
 
 function shortenConcept(concept) {
-    let splits = concept.split('\\')
+    var splits = concept.split('\\')
     return splits[splits.length - 3] + '/' + splits[splits.length - 2]
 }
 
 function activateDragAndDrop(divName) {
-    let div = Ext.get(divName)
-    let dtgI = new Ext.dd.DropTarget(div, {ddGroup: 'makeQuery'})
+    var div = Ext.get(divName)
+    var dtgI = new Ext.dd.DropTarget(div, {ddGroup: 'makeQuery'})
     dtgI.notifyDrop = dropOntoCategorySelection
 }
 
@@ -434,13 +433,13 @@ window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
             render: function (panel) {
                 panel.body.on('click', function () {
                     if (typeof updateOnView === "function") {
-                        updateOnView();
+                        updateOnView()
                     }
                 })
             }
         }
     })
-    parentPanel.add(smartRPanel);
+    parentPanel.add(smartRPanel)
 }
 
 function clearVarSelection(divName) {
@@ -448,17 +447,18 @@ function clearVarSelection(divName) {
 }
 
 function getConcepts(divName) {
-    return $('#' + divName).children().toArray().map(childNode => childNode.getAttribute('conceptid'))
+    return $('#' + divName).children().toArray().map(function(childNode) {
+        return childNode.getAttribute('conceptid') })
 }
 
 function changeInputDIV() {
     $('#outputDIV').empty()
-    const request = $.ajax({
+    var request = $.ajax({
         url: pageInfo.basePath + '/SmartR/renderInput',
         type: 'POST',
         timeout: 10000,
         data: {script: $('#scriptSelect').val()}
     })
-    request.done(response => $('#inputDIV').html(response))
-    request.fail(() => alert('Server does not respond. Network connection lost?'))
+    request.done(function(response) { $('#inputDIV').html(response) })
+    request.fail(function() { alert('Server does not respond. Network connection lost?') })
 }

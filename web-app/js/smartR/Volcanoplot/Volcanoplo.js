@@ -1,12 +1,12 @@
 function buildVolcanoAnalysis(results) {
-    const uids = results.uids
-    const pValues = results.pValues
-    const negativeLog10PValues = results.negativeLog10PValues
-    const logFCs = results.logFCs
-    const patientIDs = results.patientIDs
-    const zScoreMatrix = results.zScoreMatrix
+    var uids = results.uids
+    var pValues = results.pValues
+    var negativeLog10PValues = results.negativeLog10PValues
+    var logFCs = results.logFCs
+    var patientIDs = results.patientIDs
+    var zScoreMatrix = results.zScoreMatrix
 
-    let points = negativeLog10PValues.map((d, i) => {
+    var points = negativeLog10PValues.map(function(d, i) {
         return {
             uid: uids[i],
             pValue: pValues[i],
@@ -15,36 +15,36 @@ function buildVolcanoAnalysis(results) {
         }
     })
 
-    let currentLogFC = 0.5
-    let currentNegLog10P = -Math.log10(0.05)
+    var currentLogFC = 0.5
+    var currentNegLog10P = -Math.log10(0.05)
 
-    const margin = {top: 100, right: 100, bottom: 100, left: 100}
-    const width = 1200 - margin.left - margin.right
-    const height = 800 - margin.top - margin.bottom
+    var margin = {top: 100, right: 100, bottom: 100, left: 100}
+    var width = 1200 - margin.left - margin.right
+    var height = 800 - margin.top - margin.bottom
 
-    let volcanotable = d3.select('#volcanotable').append('table')
+    var volcanotable = d3.select('#volcanotable').append('table')
         .attr('width', width)
         .attr('height', height)
 
-    let volcanoplot = d3.select('#volcanoplot').append('svg')
+    var volcanoplot = d3.select('#volcanoplot').append('svg')
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
-    let x = d3.scale.linear()
+    var x = d3.scale.linear()
         .domain([-d3.max(logFCs), d3.max(logFCs)])
         .range([0, width])
 
-    let y = d3.scale.linear()
+    var y = d3.scale.linear()
         .domain(d3.extent(negativeLog10PValues))
         .range([height, 0])
 
-    let xAxis = d3.svg.axis()
+    var xAxis = d3.svg.axis()
         .scale(x)
         .orient('bottom')
 
-    let yAxis = d3.svg.axis()
+    var yAxis = d3.svg.axis()
         .scale(y)
         .orient('left')
 
@@ -69,7 +69,7 @@ function buildVolcanoAnalysis(results) {
 
     volcanoplot.append('g')
         .attr('class', 'y axis')
-        .attr('transform', `translate(${width}, ${0})`)
+        .attr('transform', 'translate(' + width + ','  + 0 + ')')
         .call(d3.svg.axis()
             .scale(y)
             .ticks(10)
@@ -90,12 +90,12 @@ function buildVolcanoAnalysis(results) {
         .attr('transform', 'translate(' + (-40) + ',' + (height / 2) + ')rotate(-90)')
         .text('- log10 p')
 
-    let tooltip = d3.select('#volcanoplot').append('div')
+    var tooltip = d3.select('#volcanoplot').append('div')
         .attr('class', 'tooltip text')
         .style('visibility', 'hidden')
 
     function pDragged() {
-        let yPos = d3.event.y
+        var yPos = d3.event.y
         if (yPos < 0) {
             yPos = 0
         }
@@ -117,12 +117,12 @@ function buildVolcanoAnalysis(results) {
         currentNegLog10P = y.invert(yPos)
 
         d3.selectAll('.point')
-            .style('fill', d => getColor(d))
+            .style('fill', function(d) { return getColor(d) })
 
         drawVolcanotable(getTopRankedPoints().data())
     }
 
-    let pDrag = d3.behavior.drag()
+    var pDrag = d3.behavior.drag()
         .on('drag', pDragged)
 
     volcanoplot.append('line')
@@ -150,7 +150,7 @@ function buildVolcanoAnalysis(results) {
         .style('fill', 'red')
 
     function lFCDragged() {
-        let xPos = d3.event.x
+        var xPos = d3.event.x
 
         if (xPos < 0) {
             xPos = 0
@@ -159,7 +159,7 @@ function buildVolcanoAnalysis(results) {
             xPos = width
         }
 
-        let logFC = x.invert(xPos)
+        var logFC = x.invert(xPos)
 
         d3.selectAll('.logFCLine.left')
             .attr('x1', x(-Math.abs(logFC)))
@@ -182,12 +182,12 @@ function buildVolcanoAnalysis(results) {
         currentLogFC = Math.abs(logFC)
 
         d3.selectAll('.point')
-            .style('fill', d => getColor(d))
+            .style('fill', function(d) { return getColor(d) })
 
         drawVolcanotable(getTopRankedPoints().data())
     }
 
-    let lFCDrag = d3.behavior.drag()
+    var lFCDrag = d3.behavior.drag()
         .on('drag', lFCDragged)
 
     volcanoplot.append('line')
@@ -239,7 +239,9 @@ function buildVolcanoAnalysis(results) {
         .style('fill', '#0000FF')
 
     function getTopRankedPoints() {
-        return d3.selectAll('.point').filter(d => d.negativeLog10PValues > currentNegLog10P && Math.abs(d.logFC) > currentLogFC)
+        return d3.selectAll('.point').filter(function(d) {
+            return d.negativeLog10PValues > currentNegLog10P && Math.abs(d.logFC) > currentLogFC
+        })
     }
 
     function getColor(point) {
@@ -264,12 +266,12 @@ function buildVolcanoAnalysis(results) {
         if (!points.length) {
             return
         }
-        let columns = ['uid', 'logFC', 'negativeLog10PValues', 'pValue']
-        let HEADER = ['ID', 'log2 FC', '- log10 p', 'p']
-        let table = d3.select('#volcanotable').append('table')
+        var columns = ['uid', 'logFC', 'negativeLog10PValues', 'pValue']
+        var HEADER = ['ID', 'log2 FC', '- log10 p', 'p']
+        var table = d3.select('#volcanotable').append('table')
             .attr('class', 'mytable')
-        let thead = table.append('thead')
-        let tbody = table.append('tbody')
+        var thead = table.append('thead')
+        var tbody = table.append('tbody')
 
         thead.append('tr')
             .attr('class', 'mytr')
@@ -278,28 +280,29 @@ function buildVolcanoAnalysis(results) {
             .enter()
             .append('th')
             .attr('class', 'myth')
-            .text(d => d)
+            .text(function(d) { return d })
 
-        let rows = tbody.selectAll('tr')
+        var rows = tbody.selectAll('tr')
             .data(points)
             .enter()
             .append('tr')
             .attr('class', 'mytr')
 
-        let cells = rows.selectAll('td')
-            .data(row => columns.map(column => {
-                    return {column, value: row[column]}
+        rows.selectAll('td')
+            .data(function(row) {
+                return columns.map(function (column) {
+                    return {column: column, value: row[column]}
                 })
-            )
+            })
             .enter()
             .append('td')
             .attr('class', 'text mytd')
-            .text(d => d.value)
+            .text(function(d) { return d.value })
     }
 
     function launchKEGGPWEA() {
-        let genes = getTopRankedPoints().data().map(d => {
-            let split = d.uid.split('--')
+        var genes = getTopRankedPoints().data().map(function(d) {
+            var split = d.uid.split('--')
             return split[split.length - 1]
         })
 
@@ -317,33 +320,33 @@ function buildVolcanoAnalysis(results) {
                 SubCat1: 'hgnc_symbol',
                 attachment1: genes.join(' ')
             }
-        }).done(response => {
-            let sessionID = response.match(/tmp_\d+/)[0]
-            let url = `http://biocompendium.embl.de/cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=${sessionID}&list=gene_list_1__1&list_size=15&org=human`
+        }).done(function(response) {
+            var sessionID = response.match(/tmp_\d+/)[0]
+            var url = 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=' + sessionID + '&list=gene_list_1__1&list_size=15&org=human'
             window.open(url)
-        }).fail(() => alert('An error occured. Maybe the external resource is unavailable.'))
+        }).fail(function() { alert('An error occured. Maybe the external resource is unavailable.') })
     }
 
     function updateVolcano() {
-        let point = volcanoplot.selectAll('.point')
-            .data(points, d => d.uid)
+        var point = volcanoplot.selectAll('.point')
+            .data(points, function(d) { return d.uid })
 
         point.enter()
             .append('rect')
-            .attr('class', d => `point uid-${d.uid}`)
-            .attr('x', d => x(d.logFC) - 2)
-            .attr('y', d => y(d.negativeLog10PValues) - 2)
+            .attr('class', 'point uid-' + d.uid)
+            .attr('x', function(d) { return x(d.logFC) - 2 })
+            .attr('y', function(d) { return y(d.negativeLog10PValues) - 2 })
             .attr('width', 4)
             .attr('height', 4)
-            .style('fill', d => getColor(d))
-            .on('mouseover', d => {
-                let html = `ID: ${d.uid}<br/>p-value: ${d.pValue}<br/>-log10 p: ${d.negativeLog10PValues}<br/>log2FC:${d.logFC}`
+            .style('fill', function(d) { return getColor(d) })
+            .on('mouseover', function(d) {
+                var html = 'ID: ' + d.uid + '<br/>p-value: ' + d.pValue + '<br/>-log10 p: ' + d.negativeLog10PValues + '<br/>log2FC: ' + d.logFC
                 tooltip.html(html)
                     .style('visibility', 'visible')
                     .style('left', mouseX() + 10 + 'px')
                     .style('top', mouseY() + 10 + 'px')
             })
-            .on('mouseout', () => {
+            .on('mouseout', function() {
                 tooltip.style('visibility', 'hidden')
             })
 
@@ -355,9 +358,9 @@ function buildVolcanoAnalysis(results) {
     updateVolcano()
     drawVolcanotable(getTopRankedPoints().data())
 
-    let buttonWidth = 200
-    let buttonHeight = 40
-    let keggButton = createD3Button({
+    var buttonWidth = 200
+    var buttonHeight = 40
+    var keggButton = createD3Button({
         location: volcanoplot,
         label: 'Find KEGG Pathway',
         x: 0,
@@ -368,6 +371,6 @@ function buildVolcanoAnalysis(results) {
     })
 
     keggButton
-        .on('mouseover', () => getTopRankedPoints().style('stroke', '#FF0000'))
-        .on('mouseout', () => getTopRankedPoints().style('stroke', null))
+        .on('mouseover', function() { getTopRankedPoints().style('stroke', '#FF0000') })
+        .on('mouseout', function() { getTopRankedPoints().style('stroke', null) })
 }
