@@ -31,7 +31,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   # otherwise we get a dataframe
   patientIDs  <- unique(fields["PATIENTID"])[,1]
 
-  significanceValues <- unique(fields["SIGNIFICANCE"])[,1]
+  significanceValues <- df["SIGNIFICANCE"][,1]
   features <- unique(extraFields["FEATURE"])[,1]
   jsn <- list(
     "fields"             = fields,
@@ -47,15 +47,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
                                # to be removed for clustering to work
   measurements <- getMeasurements(measurements)
   measurements <- toZscores(measurements)
-  if (nrow(measurements) > 1 &&
-      ncol(measurements) > 1) {
-    # cannot cluster
-    # matrix which is less than 2x2
-    jsn <- addClusteringOutput(jsn, measurements) #
-  } else {
-    jsn$numberOfClusteredRows <- 0
-    jsn$numberOfClusteredColumns <- 0
-  }
+  jsn <- addClusteringOutput(jsn, measurements) #
   jsn <- toJSON(jsn,
                 pretty = TRUE)
   writeDataForZip(df, measurements, patientIDs)  # for later zip generation
@@ -468,8 +460,8 @@ dendrogramToJSON <- function(d) {
 addClusteringOutput <- function(jsn, measurements_arg) {
   # we need to discard rows and columns without at least two values
   # determine rows without two non-NAs
-  thresholdRows <- ceiling(ncol(measurements_arg) / 2 ) + 1  #  Half of the lentgh +1 has to be filled otherwise
-  thresholdCols <- ceiling(nrow(measurements_arg) / 2 ) + 1  #  there might not be enough overlap for clustering
+  thresholdRows <- floor(ncol(measurements_arg) / 2 ) + 1  #  Half of the lentgh +1 has to be filled otherwise
+  thresholdCols <- floor(nrow(measurements_arg) / 2 ) + 1  #  there might not be enough overlap for clustering
   logicalSelection <- apply(measurements_arg, 1, function(row) length(which(!is.na(row))) >= thresholdRows)
   measurements_rows <- measurements_arg[logicalSelection, ]
   # and for columns
@@ -477,8 +469,10 @@ addClusteringOutput <- function(jsn, measurements_arg) {
   measurements_cols <- t(measurements_arg[ , logicalSelection])
   jsn$numberOfClusteredRows <- nrow(measurements_rows)
   jsn$numberOfClusteredColumns <- nrow(measurements_cols)  # still nrow (transposed)
-  if (jsn$numberOfClusteredRows < 3 | jsn$numberOfClusteredColumns < 3 ) {  # Cannot cluster less than 2x2 matrix
-    jsn$warnings <- c("Clustering could not be done due to high amount of NAs in the data")
+  if (is.null(jsn$numberOfClusteredRows)) jsn$numberOfClusteredRows <- 0
+  if (is.null(jsn$numberOfClusteredColumns)) jsn$numberOfClusteredColumns <- 0
+  if (jsn$numberOfClusteredRows < 2 | jsn$numberOfClusteredColumns < 2 ) {  # Cannot cluster less than 2x2 matrix
+    jsn$warnings <- c("Clustering could not be done due to insufficient data")
     return(jsn)
   }
 

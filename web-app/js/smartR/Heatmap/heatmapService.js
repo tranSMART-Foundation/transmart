@@ -12,6 +12,7 @@ window.HeatmapService = (function(){
     var HEATMAP_DATA_FILE = 'heatmap.json';
     var MARKER_SELECTION_TABLE_FILE = 'markerSelectionTable.json';
 
+
     var NOOP_ABORT = function() {};
 
     var service = {
@@ -53,12 +54,21 @@ window.HeatmapService = (function(){
     })();
 
     var _createAnalysisConstraints = function (params) {
+        var _conceptKeys = '';
+
+        try {
+            _conceptKeys = _generateLabels(params.conceptPaths.split(/\|/));
+        } catch (err) {
+            throw err;
+        }
+
         // params.conceptPaths are actually keys...
         var _retval = {
-            conceptKeys : _generateLabels(params.conceptPaths.split(/\|/)),
+            conceptKeys : _conceptKeys,
             resultInstanceIds: params.resultInstanceIds,
             projection: PROJECTION
         };
+
         if (params['searchKeywordIds'].length > 0) {
             _retval.dataConstraints = {
                 search_keyword_ids: {
@@ -162,29 +172,44 @@ window.HeatmapService = (function(){
      * a promise.
      * @param eventObj
      */
-    service.fetchData = function (params) {
-        var _args = _createAnalysisConstraints(params);
-        var defer = jQuery.Deferred();
-        service.lastFetchedLabels = Object.keys(_args.conceptKeys);
 
-        function fetchData_ultimateSuccess() {
+    service.fetchData = function (params) {
+        var _defer = jQuery.Deferred(), _args;
+
+        try {
+            var _args = _createAnalysisConstraints(params);
+        } catch (err) {
+            _defer.reject(err);
+            return _defer.promise();
+        }
+
+        if (_args) {
+            service.lastFetchedLabels = Object.keys(_args.conceptKeys);
+        }
+
+        var  fetchData_ultimateSuccess = function () {
             // TODO: only resolved(), never rejected()
             service.getSummary('fetch')
                 .then(function(data) {
-                    defer.resolve(data);
+                    _defer.resolve(data);
                 });
-        }
+        };
+
+        var  fetchData_ultimateFailure = function (d) {
+            _defer.reject(d);
+        };
 
         startScriptExecution({
             taskType: 'fetchData',
             arguments: _args,
             onUltimateSuccess: fetchData_ultimateSuccess,
+            onUltimateFailure: fetchData_ultimateFailure,
             phase: 'fetch',
             progressMessage: 'Fetching data',
             successMessage: 'Data is successfully fetched in . Proceed with Run Heatmap'
         });
 
-        return defer.promise();
+        return _defer.promise();
     };
 
     // returns promise with the data
@@ -264,11 +289,15 @@ window.HeatmapService = (function(){
                 defer.resolve(data);
             });
         };
+        var  preprocess_ultimateFailure = function (d) {
+            defer.reject(d);
+        };
 
         startScriptExecution({
             taskType: 'preprocess',
             arguments: params,
             onUltimateSuccess: preprocess_ultimateSuccess,
+            onUltimateFailure: preprocess_ultimateFailure,
             phase: 'preprocess',
             progressMessage: 'Preprocessing'
         });
@@ -302,10 +331,15 @@ window.HeatmapService = (function(){
                 .fail(function() { defer.reject.apply(defer, arguments); });
         }
 
+        function runAnalysisFailed (d) {
+            defer.reject(d);
+        }
+
         startScriptExecution({
             taskType: 'run',
             arguments: params,
             onUltimateSuccess: runAnalysisSuccess,
+            onUltimateFailure: runAnalysisFailed,
             phase: 'run',
             progressMessage: 'Calculating',
             successMessage: undefined
@@ -419,17 +453,13 @@ window.HeatmapService = (function(){
             } else if (d.state === 'FAILED') {
                 var _errHTML = '<span style="color: red">' + d.result.exception +'</span>';
                 div.html(_errHTML);
-                console.error('FAILED', d.result);
+                taskData.onUltimateFailure(d.result.exception);
             } else {
                 _setStatusRequestTimeout(service.checkStatus, delay, taskData, delay);
             }
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
-            var _html = '<span style="color: red">'+errorThrown+'</span>';
-            console.error(jqXHR);
-            console.error(textStatus);
-            console.error(errorThrown);
-            div.html(_html);
+                taskData.onUltimateFailure(errorThrown);
         });
     };
 

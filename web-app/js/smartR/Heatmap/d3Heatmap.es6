@@ -343,15 +343,19 @@ SmartRHeatmap = (() => {
 
             let significanceIndexMap = significanceValues.map((significance, idx) => { return {significance, idx}})
 
+            // Visible offset will be effectively _BAR_OFFSET - _MINIMAL_WIDTH
+            const _MINIMAL_WIDTH = 10  // This value will be added to the scaled width. So that it is always >0 (visible)
+            const _BAR_OFFSET    = 20  // Distance between significance bar and the heatmap.
+
             let bar = barItems.selectAll('.bar')
                 .data(significanceIndexMap, d => d.idx)
 
             bar.enter()
                 .append('rect')
                 .attr('class', d => 'bar idx-' + d.idx)
-                .attr('width', d => histogramScale(Math.abs(d.significance)))
+                .attr('width', d => histogramScale(Math.abs(d.significance)) + _MINIMAL_WIDTH)
                 .attr('height', gridFieldHeight)
-                .attr('x', d => - histogramScale(Math.abs( d.significance)) - 10)
+                .attr('x', d => - histogramScale(Math.abs( d.significance)) - _BAR_OFFSET)
                 .attr('y', d => gridFieldHeight * d.idx)
                 .style('fill', d => d.significance > 0 ? 'steelblue' : '#990000')
                 .on('mouseover', d => {
@@ -373,8 +377,8 @@ SmartRHeatmap = (() => {
             bar.transition()
                 .duration(animationDuration)
                 .attr('height', gridFieldHeight)
-                .attr('width', d => histogramScale(Math.abs(d.significance)))
-                .attr('x', d => - histogramScale(Math.abs(d.significance)) - 10)
+                .attr('width', d => histogramScale(Math.abs(d.significance)) + _MINIMAL_WIDTH)
+                .attr('x', d => - histogramScale(Math.abs(d.significance)) - _BAR_OFFSET)
                 .attr("y", d => gridFieldHeight * d.idx)
                 .style('fill', d => d.significance > 0 ? 'steelblue' : '#990000')
 

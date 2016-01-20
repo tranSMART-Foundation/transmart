@@ -332,6 +332,10 @@ SmartRHeatmap = (function () {
                 return { significance: significance, idx: idx };
             });
 
+            // Visible offset will be effectively _BAR_OFFSET - _MINIMAL_WIDTH
+            var _MINIMAL_WIDTH = 10; // This value will be added to the scaled width. So that it is always >0 (visible)
+            var _BAR_OFFSET = 20; // Distance between significance bar and the heatmap.
+
             var bar = barItems.selectAll('.bar').data(significanceIndexMap, function (d) {
                 return d.idx;
             });
@@ -339,9 +343,9 @@ SmartRHeatmap = (function () {
             bar.enter().append('rect').attr('class', function (d) {
                 return 'bar idx-' + d.idx;
             }).attr('width', function (d) {
-                return histogramScale(Math.abs(d.significance));
+                return histogramScale(Math.abs(d.significance)) + _MINIMAL_WIDTH;
             }).attr('height', gridFieldHeight).attr('x', function (d) {
-                return -histogramScale(Math.abs(d.significance)) - 10;
+                return -histogramScale(Math.abs(d.significance)) - _BAR_OFFSET;
             }).attr('y', function (d) {
                 return gridFieldHeight * d.idx;
             }).style('fill', function (d) {
@@ -358,9 +362,9 @@ SmartRHeatmap = (function () {
             });
 
             bar.transition().duration(animationDuration).attr('height', gridFieldHeight).attr('width', function (d) {
-                return histogramScale(Math.abs(d.significance));
+                return histogramScale(Math.abs(d.significance)) + _MINIMAL_WIDTH;
             }).attr('x', function (d) {
-                return -histogramScale(Math.abs(d.significance)) - 10;
+                return -histogramScale(Math.abs(d.significance)) - _BAR_OFFSET;
             }).attr("y", function (d) {
                 return gridFieldHeight * d.idx;
             }).style('fill', function (d) {

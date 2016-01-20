@@ -6,7 +6,7 @@
  * Heatmap View
  */
 var HeatmapView = (function(){
-    var heatmapService, extJSHelper;
+    var heatmapService, extJSHelper, inputValidator;
 
     var view = {
         container : $('#heim-tabs'),
@@ -46,27 +46,14 @@ var HeatmapView = (function(){
     };
 
     var _renderBiomarkersList = (function() {
-        var tpl = new Ext.XTemplate(
-            '<tpl if="Object.getOwnPropertyNames(items).length &gt; 0">',
-                '<ul>',
-                    '<tpl for="items">',
-                        '<li>',
-                            '<div>',
-                                '<span class="identifier-type">{type}</span> ',
-                                '<span class="identifier-name">{name}</span> ',
-                                '<span class="identifier-synonyms">{synonyms}</span>',
-                            '</div>',
-                            '<button class="identifier-delete" value="{id}">\u2716</button> ',
-                        '</li>',
-                    '</tpl>',
-                '</ul>',
-            '</tpl>'
-        );
+
+        // get template
+        var biomarkerListTmp = jQuery.templates('#biomarker-list-tmp');
 
         return function _renderBiomarkersList() {
-            tpl.overwrite(view.fetchDataView.listIdentifiers[0], {
-                items: this.getBioMarkers()
-            });
+            var _biomarker = biomarkerListTmp.render({biomarkers : this.getBioMarkers()});
+            view.fetchDataView.listIdentifiers.empty();
+            view.fetchDataView.listIdentifiers.append(_biomarker);
         };
     })();
 
@@ -79,7 +66,7 @@ var HeatmapView = (function(){
     /**
      *
      * @param fetchDataView
-     * @returns {{conceptPath: *, identifier: *, resultInstanceId: *}}
+     * @returns {{conceptKeys: *, identifier: *, resultInstanceIds: *}}
      * @private
      */
     var _getFetchDataViewValues = function (v) {
@@ -88,7 +75,7 @@ var HeatmapView = (function(){
             conceptPaths: _conceptPath,
             // CurrentSubsetIDs can contain undefined and null. Pass only nulls forward
             resultInstanceIds : GLOBAL.CurrentSubsetIDs.map(function (v) { return v || null; }),
-            searchKeywordIds: Object.getOwnPropertyNames(bioMarkersModel.selectedBioMarkers),
+            searchKeywordIds: Object.getOwnPropertyNames(bioMarkersModel.selectedBioMarkers)
         };
     };
 
@@ -111,7 +98,6 @@ var HeatmapView = (function(){
             aggregate : _aggregate
         }
     };
-
 
     var _emptyOutputs = function (workflow) {
         if (workflow === 'fetch') {
@@ -181,9 +167,12 @@ var HeatmapView = (function(){
         view.fetchDataView.actionBtn.removeAttr('disabled');
         view.preprocessView.preprocessBtn.removeAttr('disabled');
         view.runHeatmapView.runAnalysisBtn.removeAttr('disabled');
-        if (workflow === 'runAnalysis') {
+        if (workflow === 'RUN_HEATMAP_SUCCESS') {
             view.runHeatmapView.snapshotImageBtn.removeAttr('disabled');
             view.runHeatmapView.downloadFileBtn.removeAttr('disabled');
+        } else if (workflow === 'RUN_HEATMAP_FAILED') {
+            view.runHeatmapView.snapshotImageBtn.attr('disabled', 'disabled');
+            view.runHeatmapView.downloadFileBtn.attr('disabled', 'disabled');
         }
     };
 
@@ -202,24 +191,63 @@ var HeatmapView = (function(){
             _promise = null,
             _fetchDataParams = _getFetchDataViewValues(view.fetchDataView);
 
+        var _validateFetchInputs = function () {
+
+            var _retval = true,
+                _validations = [
+                inputValidator.isEmptySubset(_fetchDataParams.resultInstanceIds),
+                inputValidator.isEmptyHighDimensionalData(_fetchDataParams.conceptPaths)
+            ];
+
+            // clean first all error mesages
+            jQuery('.heim-fetch-err').remove();
+
+            if (_validations[0]) {
+                view.fetchDataView.outputArea.html('<p class="heim-fetch-err"><b>Error:'+ inputValidator.NO_SUBSET_ERR
+                    +'</b></p>');
+            }
+
+            if (_validations[1]) {
+                view.fetchDataView.conceptPathsInput.after('<p class="heim-fetch-err">'+ inputValidator.NO_HD_ERR
+                    +'</p>');
+            }
+
+            _validations.forEach(function(validateItem) {
+                _retval= _retval && (!validateItem);
+            });
+
+            return _retval;
+        };
+
         var _fetch = function (promise) {
             _onFetchData();
             // fetch data
             promise = heatmapService.fetchData(_fetchDataParams);
             // return promise when fetching and calculating summary has finished
-            promise.then(function (data) {
+            if (promise !== null)
+            promise.done(function (data) {
                 data.forEach(function (d) {
                     d.forEach(function (summaryJSON) {
                         _noOfSamples += summaryJSON['numberOfSamples'];
                     });
                 });
                 _resetActionButtons();
-                // empty outputs
-                _emptyOutputs('fetch');
                 // toggle view
                 _toggleAnalysisView({subsetNo: subsetNo, noOfSamples: _noOfSamples});
-            });
+            })
+                .fail(function (d) {
+                    view.fetchDataView.outputArea.html('<p style="color: red";><b>'+ d +'</b>');
+                    _resetActionButtons();
+                });
         };
+
+        // empty outputs
+        _emptyOutputs('fetch');
+
+        // validate inputs
+        if (!_validateFetchInputs()) {
+            return;
+        }
 
         // Notify user when there are outputs from previous jobs
         if (!_isEmptyEl(view.preprocessView.outputArea) || !_isEmptyEl(view.runHeatmapView.outputArea)) {
@@ -248,14 +276,17 @@ var HeatmapView = (function(){
         _onRunAnalysis();
         view.runHeatmapView.d3Heatmap.empty();
         heatmapService.runAnalysis(_runHeatmapInputArgs)
-            .then(function(data) {
+            .done(function(data) {
                 SmartRHeatmap.create(data.heatmapData);
-                _resetActionButtons('runAnalysis');
+                _resetActionButtons('RUN_HEATMAP_SUCCESS');
                 if (data.markerSelectionData) {
                     view.appendSelectionTable({
                         entries: data.markerSelectionData
                     })
                 }
+            })
+            .fail(function(d) {
+                _resetActionButtons('RUN_HEATMAP_FAILED');
             });
     };
 
@@ -265,10 +296,13 @@ var HeatmapView = (function(){
 
         var _preprocess = function () {
             heatmapService.preprocess(_preprocessInputArgs)
-                .then(function (data) {
+                .done(function (data) {
                     _resetActionButtons();
                     // empty outputs
                     _emptyOutputs('preprocess');
+                })
+                .fail(function () {
+                    _resetActionButtons();
                 });
         };
 
@@ -349,16 +383,7 @@ var HeatmapView = (function(){
             }
         );
 
-
-        // identifiers autocomplete
-        var _identifierItemTemplate = new Ext.XTemplate(
-            '<li class="ui-menu-item" role="presentation">',
-                '<a class="ui-corner-all">',
-                    '<span class="category-gene">{display}&gt;</span>&nbsp;',
-                    '<b>{keyword}</b>&nbsp;{synonyms}',
-                '</a>',
-            '</li>'
-        );
+        var _identifierItemTemplate = jQuery.templates('#biomarker-autocompletion-list-tmp');
 
         view.fetchDataView.identifierInput.autocomplete({
             source: function(request, response) {
@@ -389,7 +414,8 @@ var HeatmapView = (function(){
             minLength: 2
         });
         view.fetchDataView.identifierInput.data('ui-autocomplete')._renderItem = function(ul, item) {
-            return $(_identifierItemTemplate.append(ul[0], item.value));
+            var _item = _identifierItemTemplate.render(item.value);
+            return jQuery(_item).appendTo(ul);
         };
         view.fetchDataView.identifierInput.on('autocompleteselect',
             function(event, ui) {
@@ -437,12 +463,13 @@ var HeatmapView = (function(){
      * @param service
      * @param helper
      */
-    view.init = function (service, helper) {
+    view.init = function (service, helper, validator) {
         // instantiate tooltips
         $( "[title]" ).tooltip({track: true, tooltipClass:"sr-ui-tooltip"});
         // injects dependencies
         heatmapService = service;
         extJSHelper = helper;
+        inputValidator = validator;
         // register dropzone
         extJSHelper.registerDropzone(view.fetchDataView.conceptPathsInput);
         // register event handles
@@ -454,4 +481,4 @@ var HeatmapView = (function(){
     return view;
 })();
 
-HeatmapView.init(HeatmapService, HeimExtJSHelper);
+HeatmapView.init(HeatmapService, HeimExtJSHelper, HeatmapValidator);
