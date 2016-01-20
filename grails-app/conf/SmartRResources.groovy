@@ -21,4 +21,20 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'heatmapView.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'd3Heatmap-compiled.js']
     }
+
+    smartR_analysis_common {
+        dependsOn 'smartR_base'
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisInit.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'ajaxServices.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisModel.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'tabAnalysisView.js']
+    }
+
+    smartR_boxplot {
+        dependsOn 'smartR_analysis_common'
+
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotController.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotModel.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotView.js']
+    }
 }
