@@ -1,5 +1,5 @@
 <r:require modules="smartR_heatmap"/>
-<r:layoutResources disposition="defer"/>
+<r:layoutResources/>
 
  %{--Template for summary statistic--}%
 <script id="summary-row-tmp" type="text/x-jsrender">
@@ -322,3 +322,4 @@
 
     </div>
 </div>
+<r:layoutResources/>

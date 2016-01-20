@@ -1,0 +1,107 @@
+.square {
+    stroke: white;
+    stroke-width: 0;
+}
+
+.square:hover {
+    cursor: pointer;
+}
+
+.extraSquare {
+    stroke: white;
+    stroke-width: 0;
+}
+
+.feature {
+    font-size: 10px;
+}
+
+.featureSortText {
+    font-size: 10px;
+}
+
+.selected {
+    opacity: 1;
+}
+
+.square:hover {
+    opacity: 0.4;
+}
+
+.squareHighlighted {
+    opacity: 0.4;
+}
+
+.extraSquare:hover {
+    opacity: 0.4;
+}
+
+.bar {
+    fill: steelblue;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.bar:hover {
+    opacity: 0.4;
+}
+
+.barHighlighted {
+    opacity: 0.4;
+}
+
+.cuttoffHighlight {
+    opacity: 0.4;
+}
+
+.box {
+    fill-opacity: 0;
+    shape-rendering: crispEdges;
+}
+
+.box:hover {
+    cursor: pointer;
+    fill-opacity: 0.2;
+}
+
+.uid {
+    font-size: 12pt;
+}
+
+.selectText {
+    font-size: 16pt;
+}
+
+.highlight {
+    font-weight: bold;
+    fill: red;
+}
+
+.node {
+    fill: white;
+    stroke: rgb(0, 126, 126);
+    stroke-width: 1.5px;
+}
+
+.node:hover {
+    cursor: pointer;
+    fill: rgb(0, 126, 126);
+}
+
+.link {
+    fill: none;
+    stroke: #FF8700;
+    stroke-width: 2px;
+}
+
+.tooltip {
+    position: absolute;
+    text-align: center;
+    display: inline-block;
+    padding: 0;
+    font-size: 12px;
+    font-weight: bold;
+    color: black;
+    background: white;
+    pointer-events: none;
+}

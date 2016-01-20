@@ -4,9 +4,9 @@ if (! suppressMessages(require(reshape2))) {
 
 ### PREPARE SETTINGS ###
 
-significanceMeassure <- settings$significanceMeassure
-discardNullGenes <- strtoi(settings$discardNullGenes)
-maxRows <- ifelse(is.null(settings$maxRows), 100, as.integer(settings$maxRows))
+significanceMeassure <- SmartR.settings$significanceMeassure
+discardNullGenes <- strtoi(SmartR.settings$discardNullGenes)
+maxRows <- ifelse(is.null(SmartR.settings$maxRows), 100, as.integer(SmartR.settings$maxRows))
 
 ### COMPUTE RESULTS ###
 
@@ -26,7 +26,7 @@ makeMatrix <- function(raw.data) {
     } else {
         matrix[matrix$GENESYMBOL == ''
                 | is.na(matrix$GENESYMBOL)
-                | is.null(matrix$GENESYMBOL), ]$GENESYMBOL <- "NA"
+                | is.null(matrix$GENESYMBOL), "GENESYMBOL"] <- "NA"
     }
 
     matrix <- na.omit(matrix)
@@ -42,8 +42,8 @@ makeMatrix <- function(raw.data) {
 }
 
 fixString <- function(str) {
-    str <- gsub("(?!-)[[:punct:]]", "_", str, perl=TRUE)
-    str <- gsub(" ", "_", str)
+    str <- gsub("(?!-)[[:punct:]]", "", str, perl=TRUE)
+    str <- gsub(" ", "", str)
     str
 }
 
@@ -74,16 +74,16 @@ dendrogramToJSON <- function(d) {
     return(jsonString)
 }
 
-if (length(data.cohort1$mRNAData$PATIENTID) == 0) {
+if (length(SmartR.data.cohort1$mRNAData$PATIENTID) == 0) {
     stop('Your selection does not match any patient in the defined cohort!')
 }
 
-valueMatrix.cohort1 <- makeMatrix(data.cohort1$mRNAData)
+valueMatrix.cohort1 <- makeMatrix(SmartR.data.cohort1$mRNAData)
 colnames(valueMatrix.cohort1) <- sub("^X", "", colnames(valueMatrix.cohort1))
 patientIDs.cohort1 <- colnames(valueMatrix.cohort1)
 
-if (length(data.cohort2$mRNAData$PATIENTID) > 0) {
-    valueMatrix.cohort2 <- makeMatrix(data.cohort2$mRNAData)
+if (length(SmartR.data.cohort2$mRNAData$PATIENTID) > 0) {
+    valueMatrix.cohort2 <- makeMatrix(SmartR.data.cohort2$mRNAData)
     colnames(valueMatrix.cohort2) <- sub("^X", "", colnames(valueMatrix.cohort2))
     valueMatrix <- merge(valueMatrix.cohort1, valueMatrix.cohort2, by="UID", all=FALSE)
 } else {
@@ -164,7 +164,7 @@ rowDendrogramManhattanSingle <- computeDendrogram(zScoreMatrix[, -1], 'manhattan
 rowDendrogramManhattanAverage <- computeDendrogram(zScoreMatrix[, -1], 'manhattan', 'average')
 
 getFeatureName <- function(concept) {
-    featureName <- tail(strsplit(concept, '\\\\')[[1]], n=1)
+    featureName <- paste(tail(strsplit(concept, '\\\\')[[1]], n=2), collapse='--')
     featureName <- fixString(featureName)
     featureName
 }
@@ -190,15 +190,15 @@ buildLowDimFields <- function(featureName, local.patientIDs, global.patientIDs, 
 extraFields <- c()
 features <- c()
 
-if (length(data.cohort2$mRNAData$PATIENTID) > 0) {
+if (length(SmartR.data.cohort2$mRNAData$PATIENTID) > 0) {
     featureName <- 'Cohort'
     values <- sapply(patientIDs, FUN=function(id) ifelse(id %in% patientIDs.cohort1, 1, 2))
     extraFields <- buildLowDimFields(featureName, patientIDs, patientIDs, 'binary', values, FALSE)
     features <- featureName
 }
 
-numerical.lowDimData.cohort1 <- data.cohort1$additionalFeatures_numerical
-numerical.lowDimData.cohort2 <- data.cohort2$additionalFeatures_numerical
+numerical.lowDimData.cohort1 <- SmartR.data.cohort1$additionalFeatures_numerical
+numerical.lowDimData.cohort2 <- SmartR.data.cohort2$additionalFeatures_numerical
 numerical.lowDimData <- rbind(numerical.lowDimData.cohort1, numerical.lowDimData.cohort2)
 concepts <- unique(numerical.lowDimData$concept)
 for (concept in concepts) {
@@ -210,8 +210,8 @@ for (concept in concepts) {
     features <- c(features, featureName)
 }
 
-alphabetical.lowDimData.cohort1 <- data.cohort1$additionalFeatures_alphabetical
-alphabetical.lowDimData.cohort2 <- data.cohort2$additionalFeatures_alphabetical
+alphabetical.lowDimData.cohort1 <- SmartR.data.cohort1$additionalFeatures_alphabetical
+alphabetical.lowDimData.cohort2 <- SmartR.data.cohort2$additionalFeatures_alphabetical
 alphabetical.lowDimData <- rbind(alphabetical.lowDimData.cohort1, alphabetical.lowDimData.cohort2)
 folders <- as.vector(sapply(alphabetical.lowDimData$concept, conceptStrToFolderStr))
 unique.folders <- unique(folders)
@@ -225,45 +225,45 @@ for (folder in unique.folders) {
 
 ### WRITE OUTPUT ###
 
-output$extraFields <- extraFields
-output$features <- features
-output$fields <- fields
-output$significanceValues <- significanceValues
-output$patientIDs <- patientIDs
-output$uids <- uids
-output$significanceMeassure <- significanceMeassure
+SmartR.output$extraFields <- extraFields
+SmartR.output$features <- features
+SmartR.output$fields <- fields
+SmartR.output$significanceValues <- significanceValues
+SmartR.output$patientIDs <- patientIDs
+SmartR.output$uids <- uids
+SmartR.output$significanceMeassure <- significanceMeassure
 
-output$hclustEuclideanComplete <- list(
+SmartR.output$hclustEuclideanComplete <- list(
     order.dendrogram(colDendrogramEuclideanComplete) - 1,
     order.dendrogram(rowDendrogramEuclideanComplete) - 1,
     dendrogramToJSON(colDendrogramEuclideanComplete),
     dendrogramToJSON(rowDendrogramEuclideanComplete))
 
-output$hclustEuclideanSingle <- list(
+SmartR.output$hclustEuclideanSingle <- list(
     order.dendrogram(colDendrogramEuclideanSingle) - 1,
     order.dendrogram(rowDendrogramEuclideanSingle) - 1,
     dendrogramToJSON(colDendrogramEuclideanSingle),
     dendrogramToJSON(rowDendrogramEuclideanSingle))
 
-output$hclustEuclideanAverage <- list(
+SmartR.output$hclustEuclideanAverage <- list(
     order.dendrogram(colDendrogramEuclideanAverage) - 1,
     order.dendrogram(rowDendrogramEuclideanAverage) - 1,
     dendrogramToJSON(colDendrogramEuclideanAverage),
     dendrogramToJSON(rowDendrogramEuclideanAverage))
 
-output$hclustManhattanComplete <- list(
+SmartR.output$hclustManhattanComplete <- list(
     order.dendrogram(colDendrogramManhattanComplete) - 1,
     order.dendrogram(rowDendrogramManhattanComplete) - 1,
     dendrogramToJSON(colDendrogramManhattanComplete),
     dendrogramToJSON(rowDendrogramManhattanComplete))
 
-output$hclustManhattanSingle <- list(
+SmartR.output$hclustManhattanSingle <- list(
     order.dendrogram(colDendrogramManhattanSingle) - 1,
     order.dendrogram(rowDendrogramManhattanSingle) - 1,
     dendrogramToJSON(colDendrogramManhattanSingle),
     dendrogramToJSON(rowDendrogramManhattanSingle))
 
-output$hclustManhattanAverage <- list(
+SmartR.output$hclustManhattanAverage <- list(
     order.dendrogram(colDendrogramManhattanAverage) - 1,
     order.dendrogram(rowDendrogramManhattanAverage) - 1,
     dendrogramToJSON(colDendrogramManhattanAverage),

@@ -10,7 +10,7 @@ class smartRGrailsPlugin {
     public static final String TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME = 'transmartExtensionsRegistry'
 
     // the plugin version
-    def version = "0.3"
+    def version = "1.0"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.3 > *"
     // resources that are excluded from plugin packaging
@@ -20,8 +20,8 @@ class smartRGrailsPlugin {
 
     // TODO Fill in these fields
     def title = "SmartR Plugin" // Headline display name of the plugin
-    def author = "Sascha Herzinger"
-    def authorEmail = "sascha.herzinger@uni.lu"
+    def author = ""
+    def authorEmail = ""
     def description =
             '''
             Brief summary/description of the plugin.

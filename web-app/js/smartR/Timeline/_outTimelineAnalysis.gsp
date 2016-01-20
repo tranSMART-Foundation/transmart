@@ -1,174 +1,10 @@
 <!DOCTYPE html>
-<style>
-    .text {
-        font-family: 'Roboto', sans-serif;
-    }
-
-	.timeBox {
-		stroke: white;
-		stroke-width: 1px;
-		shape-rendering: crispEdges;
-		fill: black;
-	}
-
-	.line {
-  		stroke-width: 3px;
-  		fill: none;
-	}
-
-    .hovered {
-        opacity: 1;
-        stroke-width: 5px;
-    }
-
-    .selected {
-        opacity: 1;
-        stroke-width: 4px;
-    }
-
-    .assigned {
-        stroke-width: 5px;
-    }
-
-	.hoverline {
-		stroke: white;
-  		stroke-width: 1px;
-        pointer-events: none;
-        shape-rendering: crispedges;
-        stroke-dasharray: 5, 10;
-	}
-
-	.axis path, .axis line {
-    	fill: none;
-    	shape-rendering: crispedges;
-    	stroke: black;
-	}
-
-    .slider {
-        fill: black;
-    }
-
-    .brush .extent {
-        stroke: none;
-        stroke-width: 0px;
-        fill: steelblue;
-        fill-opacity: 0.60;
-    }
-
-    .box {
-        stroke: none;
-        fill: white;
-        stroke-width: 1px;
-        shape-rendering: crispedges;
-        fill-opacity: 0;
-    }
-
-    .box:hover {
-        cursor: pointer;
-        fill: orange;
-        fill-opacity: 0.4;
-    }
-
-    .draggableTimepoints {
-        cursor: pointer;
-    }
-
-    .x.brush .extent {
-        stroke: none;
-        stroke-width: 0px;
-        fill: rgb(81, 255, 237);
-        fill-opacity: 0.40;
-        shape-rendering: crispEdges;
-    }
-
-    .x.brush>.resize {
-        display: none;
-    }
-
-    .brushbutton {
-        stroke: black;
-        fill: rgb(0, 18, 152);
-        stroke-width: 0px;
-        shape-rendering: crispedges;
-    }
-
-    .brushbutton:hover {
-        cursor: pointer;
-        stroke: black;
-        fill: #E700FF;
-    }
-
-    .draggableTimepoints>.box:hover {
-        cursor: pointer;
-        fill: orange;
-    }
-
-    .tooltip {
-        position: absolute;
-        text-align: center;
-        display: inline-block;
-        padding: 0px;
-        font-size: 12px;
-        font-weight: bold;
-        color: black;
-        background: white;
-        pointer-events: none;
-    }
-
-    .contextMenu {
-        position: absolute;
-        text-align: center;
-        display: inline-block;
-        padding: 0px;
-        font-size: 12px;
-        font-weight: bold;
-        color: black;
-        background-color: white;
-    }
-
-    .mybutton {
-        width: 100%;
-        height: 30px;
-        color: black;
-        background-color: white;
-        font-size: 12px;
-        font-weight: bold;
-        border: none;
-    }
-
-    .mybutton:hover {
-        color: white;
-        background: #326FCB;
-    }
-
-    .node {
-        fill: white;
-        stroke: rgb(0, 126, 126);
-        stroke-width: 1.5px;
-    }
-
-    .node:hover {
-        cursor: pointer;
-        fill: rgb(0, 126, 126);
-    }
-
-    .link {
-        fill: none;
-        stroke: #FF8700;
-        stroke-width: 2px;
-    }
-
-    .correlogram {
-        stroke-width: 1px;
-        shape-rendering: crispEdges;
-    }
-</style>
 
 <div id="visualization">
 </div>
 
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
-<g:javascript src="resource/d3.js"/>
+<g:javascript src="resource/d3.min.js"/>
 <g:javascript src="resource/2D.js"/>
 
 <script type="text/javascript">
@@ -278,7 +114,7 @@
     var contextMenu = d3.select("#visualization").append("div")
     .attr("class", "contextMenu text")
     .style("visibility", "hidden")
-    .html("<input id='setColorButton' class='mybutton' type='button' value='Assign Unique Color' onclick='assignUniqueColor()'/><br/><input id='resetColorsButton' class='mybutton' type='button' value='Reset Line Colors' onclick='resetLineColors()'/><br/><input id='updateCohortsButton' class='mybutton' type='button' value='Update Cohorts' onclick='updateCohorts()'/>");
+    .html("<input id='setColorButton' class='mybutton' type='button' value='Assign Unique Color' onclick='assignUniqueColor()'/><br/><input id='resetColorsButton' class='mybutton' type='button' value='Reset Line Colors' onclick='resetLineColors()'/>");
 
     d3.select('#visualization')
     .on("contextmenu", function() {
@@ -411,15 +247,8 @@
     }
 
 	var lineGen = d3.svg.line()
+    .defined(function(d) { return x.domain().indexOf(d.timepoint) !== -1; })
 	.x(function(d) {
-        if (x.domain().indexOf(d.timepoint) < 0) {
-            var index = timepoints.indexOf(d.timepoint);
-            var firstDomainIndex = timepoints.indexOf(x.domain()[0]);
-            if (index < firstDomainIndex) {
-                return 0;
-            }
-            return timelineWidth;
-        }
         return x(d.timepoint);
     })
 	.y(function(d) { return y(d.value); })
@@ -835,7 +664,6 @@
     }
 
     function removeAutoCorrelationLines() {
-        computingIDs = [];
         d3.selectAll('.correlogram')
         .remove();
     }
@@ -882,56 +710,32 @@
         showCorrelogram = checked;
     }
 
-    var computingIDs = [];
     function computeAutoCorrelationLines(patientID, secondTry) {
         if (! showCorrelogram) {
             return;
         }
-        computingIDs.push(patientID);
-        setTimeout(function() {
-            if (computingIDs[computingIDs.length - 1] !== patientID) {
-                return;
+
+        var settings = { acfPatientID: patientID, xAxisSortOrder: x.domain(), interpolateNAs: interpolateNAs };
+
+        var onResponse = function(response) {
+            var acfEstimates = response.acfEstimates;
+            for (var i = 0; i < concepts.length; i++) {
+                var concept = concepts[i];
+                var acfEstimate = acfEstimates[concept];
+                var points = [];
+                for (var j = 0, len = acfEstimate.estimate.length; j < len; j++) {
+                    points.push({'value': acfEstimate.estimate[j], 'timepoint': acfEstimate.sortOrder[j]});
+                }
+                drawCorrelogram(points, concept);
             }
-            var data = prepareFormData();
-            data = addSettingsToData(data, { acfPatientID: patientID });
-            data = addSettingsToData(data, { xAxisSortOrder: x.domain() });
-            data = addSettingsToData(data, { interpolateNAs: interpolateNAs });
-            jQuery.ajax({
-                url: pageInfo.basePath + '/SmartR/updateOutputDIV',
-                type: "POST",
-                timeout: '600000',
-                data: data
-            }).done(function(serverAnswer) {
-                serverAnswer = JSON.parse(serverAnswer);
-                if (computingIDs[computingIDs.length - 1] !== patientID) {
-                    return;
-                }
-                if (serverAnswer.error) {
-                    alert(serverAnswer.error);
-                    return;
-                }
-                var acfEstimates = serverAnswer.acfEstimates;
-                for (var i = 0; i < concepts.length; i++) {
-                    var concept = concepts[i];
-                    var acfEstimate = acfEstimates[concept];
-                    var points = [];
-                    for (var j = 0, len = acfEstimate.estimate.length; j < len; j++) {
-                        points.push({'value': acfEstimate.estimate[j], 'timepoint': acfEstimate.sortOrder[j]});
-                    }
-                    drawCorrelogram(points, concept);
-                }
-                if (computingIDs[computingIDs.length - 1] === patientID) {
-                    computingIDs = [];
-                }
-            }).fail(function() {
-                if (computingIDs[computingIDs.length - 1] === patientID) {
-                    computingIDs = [];
-                    if (! secondTry) {
-                        computeAutoCorrelationLines(patientID, true);
-                    }
-                }
-            });
-        }, 500);
+
+            if (! d3.selectAll('.line.hovered').size()) {
+                removeAutoCorrelationLines();
+            }
+
+        };
+
+        startWorkflow(onResponse, settings, false, false);
     }
 
     function getEqualityCheck(concept, timepoint, patientID, value) {
@@ -998,42 +802,6 @@
             }
         }
         return newArray;
-    }
-
-    function updateCohorts() {
-        // we don't need to bother the database for the current analysis
-        for (var i = 0; i < patientIDs.length; i++) {
-            var patientID = patientIDs[i];
-            var index = selectedPatientIDs.indexOf(patientID);
-            if (index === -1) {
-                d3.selectAll('.line.patientID-' + patientID).remove();
-            }
-        }
-        var divs = [];
-        var selectedData = data.filter(function(d) { return selectedPatientIDs.indexOf(d.patientID) >= 0; });
-        for (i = 0; i < selectedPatientIDs.length; i++) {
-            var selectedPatientID = selectedPatientIDs[i];
-            // find the first suitable data point
-            var point = selectedData.find(getEqualityCheck(undefined, undefined, selectedPatientID, undefined));
-            var conceptPath = point.concept;
-            var timepoint = point.timepoint;
-            var value = point.value;
-            var equalPoints = selectedData.filter(getEqualityCheck(conceptPath, timepoint, undefined, value));
-            if (equalPoints.length > 1) {
-                var oldLength = selectedData.length;
-                selectedData = removePointsWithProperties(selectedData, undefined, timepoint, undefined, undefined);
-                var newLength = selectedData.length;
-                if (oldLength !== newLength) {
-                    i--;
-                    continue;
-                }
-            }
-
-            var concept = conceptPath + timepoint + '\\';
-            var div = createQueryCriteriaDIV(concept, 'ratio', 'numeric', 'EQ', value, '', 'ratio', 'Y', 'valueicon');
-            divs.push(div);
-        }
-        setCohorts(divs, false, false, false, 1);
     }
 
     function removeDendrograms() {
@@ -1113,14 +881,13 @@
         removeDendrograms();
         var similarityMeasure = dist;
         var linkageMeasure = link;
-        var data = prepareFormData();
-        data = addSettingsToData(data, { similarityMeasure: similarityMeasure });
-        data = addSettingsToData(data, { linkageMeasure: linkageMeasure });
-        data = addSettingsToData(data, { interpolateNAs: interpolateNAs });
-        data = addSettingsToData(data, { xAxisSortOrder: x.domain() });
+        var settings = { similarityMeasure: similarityMeasure,
+            linkageMeasure: linkageMeasure,
+            interpolateNAs: interpolateNAs,
+            xAxisSortOrder: x.domain() };
         clusteringDropdown.select('.buttonText').text('Loading...');
 
-        var doOnResponse = function(reponse) {
+        var onResponse = function(response) {
             clusteringDropdown.select('.buttonText').text('Timeline Clustering');
             for (var i = 0; i < concepts.length; i++) {
                 var concept = concepts[i];
@@ -1132,7 +899,7 @@
             }
         };
 
-        updateStatistics(doOnResponse, data, false);
+        startWorkflow(onResponse, settings, false, false);
     }
 
     var buttonWidth = 200;
@@ -1148,15 +915,15 @@
         height: buttonHeight,
         items: [
             {
-                callback: function() { cluster('COR', 'average'); }, 
+                callback: function() { cluster('COR', 'average'); },
                 label: 'Hierarch.-Corr.-Avg.'
             },
             {
-                callback: function() { cluster('EUCL', 'average'); }, 
+                callback: function() { cluster('EUCL', 'average'); },
                 label: 'Hierarch.-Eucl.-Avg.'
             },
             {
-                callback: function() { cluster('ACF', 'average'); }, 
+                callback: function() { cluster('ACF', 'average'); },
                 label: 'Hierarch.-Autocorr.-Avg.'
             }
         ]
@@ -1208,15 +975,15 @@
         checked: false
     });
 
-    // createD3Switch({
-    //     location: svg,
-    //     onlabel: 'SHOW Correlogram',
-    //     offlabel: 'HIDE Correlogram',
-    //     x: 2 - margin.left + buffer * 5 + buttonWidth * 5,
-    //     y: 2 - margin.top,
-    //     width: buttonWidth,
-    //     height: buttonHeight,
-    //     callback: swapCorrelogramBoolean,
-    //     checked: true
-    // });
+    createD3Switch({
+        location: svg,
+        onlabel: 'SHOW Correlogram',
+        offlabel: 'HIDE Correlogram',
+        x: 2 - margin.left + buffer * 5 + buttonWidth * 5,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: swapCorrelogramBoolean,
+        checked: true
+    });
 </script>

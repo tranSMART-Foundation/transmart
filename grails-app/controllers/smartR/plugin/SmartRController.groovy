@@ -10,8 +10,6 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 class SmartRController {
 
     SessionService sessionService
-    def smartRService
-    def scriptExecutorService
 
     static layout = 'smartR'
 
@@ -22,45 +20,10 @@ class SmartRController {
         ]
     }
 
-    def computeResults = {
-        params.init = params.init == null ? true : params.init // defaults to true
-        smartRService.runScript(params)
-        render ''
-    }
-
-    def reComputeResults = {
-        params.init = false
-        redirect controller: 'SmartR',
-                 action: 'computeResults', 
-                 params: params
-    }
-
-    // For handling results yourself
-    def renderResults = {
-        params.init = false
-        def (success, results) = scriptExecutorService.getResults(params.cookieID)
-        if (! success) {
-            render new JsonBuilder([error: results]).toString()
-        } else {
-            render results
-        }
-    }
-
-    // For (re)drawing the whole visualization
-    def renderResultsInTemplate = {
-        def (success, results) = scriptExecutorService.getResults(params.cookieID)
-        if (! success) {
-            render results
-        } else {
-            render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
-                    model: [results: results]
-        }       
-    }
-    
     /**
-    *   Renders the input form for initial script parameters
-    */
-    def renderInputDIV = {
+     *   Renders the input form for initial script parameters
+     */
+    def renderInput = {
         if (! params.script) {
             render 'Please select a script to execute.'
         } else {
@@ -69,27 +32,12 @@ class SmartRController {
     }
 
     /**
-     *   Renders the input form for initial script parameters
-     */
-    def renderInput = {
-        if (! params.script) {
-            render 'Please select a script to execute.'
-        } else {
-            render template: "/smartR/in${FilenameUtils.getBaseName(params.script).capitalize()}"
-        }
-    }
-
-    def renderLoadingScreen = {
-        render template: "/visualizations/outLoading"
-    }
-
-    /**
-    *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
+    *   Called to get the path to smartR.es6 such that the plugin can be loaded in the datasetExplorer
     */
     def loadScripts = {
 
         // list of required javascript files
-        def scripts = [servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js']
+        def scripts = [servletContext.contextPath + pluginContextPath + '/js/smartR/smartR-compiled.js']
 
         // list of required css files
         def styles = []

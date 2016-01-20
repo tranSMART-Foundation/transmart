@@ -14,11 +14,11 @@ window.HeatmapValidator = (function() {
     };
 
     validator.isEmptySubset = function (subsets) {
-        return subsets.length < 1 ? true : false;
+        return subsets.length < 1;
     };
 
     validator.isEmptyHighDimensionalData = function (hd) {
-        return hd === '' ? true : false;
+        return hd === '';
     };
 
     validator.isNumeric = function (val) {
