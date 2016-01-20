@@ -7,6 +7,7 @@ import heim.SmartRRuntimeConstants
 class smartRGrailsPlugin {
 
     public static final String DEFAULT_REMOTE_RSCRIPTS_DIRECTORY = '/tmp/smart_r_scripts'
+    public static final String TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME = 'transmartExtensionsRegistry'
 
     // the plugin version
     def version = "0.3"
@@ -101,8 +102,10 @@ class smartRGrailsPlugin {
             ctx.getBean(RScriptsSynchronizer).skip()
         }
 
-        ctx.getBean('transmartExtensionsRegistry')?.registerAnalysisTabExtension(
-                'smartR', '/SmartR/loadScripts', 'addSmartRPanel')
+        if (ctx.containsBean(TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME)) {
+            ctx.getBean(TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME)
+                    .registerAnalysisTabExtension('smartR', '/SmartR/loadScripts', 'addSmartRPanel')
+        }
 
     }
 
