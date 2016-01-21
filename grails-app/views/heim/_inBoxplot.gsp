@@ -1,3 +1,5 @@
+<r:require modules="smartR_boxplothack"/>
+<r:layoutResources disposition="defer"/>
 <table>
 	<tr>
 		<td style='padding-right: 2em; padding-bottom: 1em'>

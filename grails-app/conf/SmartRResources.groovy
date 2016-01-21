@@ -27,4 +27,8 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'smartRView.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'correlationView.js']
     }
+
+    smartR_boxplothack {
+        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'boxplotHack.js']
+    }
 }
