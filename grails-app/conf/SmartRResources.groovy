@@ -21,4 +21,15 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'heatmapView.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'd3Heatmap.js']
     }
+
+    smartR_correlation {
+        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'smartRService.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'smartRView.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'correlationView.js']
+    }
+
+    smartR_boxplothack {
+        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'boxplotHack.js']
+        resource url: [plugin: 'smart-r', dir: 'css', file: 'Boxplot.css']
+    }
 }
