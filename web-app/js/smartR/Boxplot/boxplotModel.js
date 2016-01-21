@@ -4,4 +4,6 @@
 
 window.smartR.BoxplotModel = function() {
     this.name = 'boxplot-model';
+
+    return this;
 };

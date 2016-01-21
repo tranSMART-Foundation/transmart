@@ -24,6 +24,7 @@ modules = {
 
     smartR_analysis_common {
         dependsOn 'smartR_base'
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'extjs-helper.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisInit.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'ajaxServices.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisModel.js']

@@ -16,6 +16,8 @@ smartR.ajaxServices = function(basePath, workflow) {
     /* returns a promise with the session id and
      * saves the session id for future calls */
     result.startSession = function ajaxServices_startSession() {
+        console.log(basePath);
+        console.log(workflow);
         return jQuery.ajax({
             url: basePath + '/RSession/create',
             type: 'POST',
@@ -65,6 +67,7 @@ smartR.ajaxServices = function(basePath, workflow) {
      * }
      */
     result.startScriptExecution = function ajaxServices_startScriptExecution(taskDataOrig) {
+        console.log('task', taskDataOrig)
         var taskData = jQuery.extend({}, taskDataOrig); // clone the thing
         state.currentRequestAbort();
 
@@ -77,11 +80,11 @@ smartR.ajaxServices = function(basePath, workflow) {
                 sessionId: state.sessionId,
                 arguments: taskData.arguments,
                 taskType: taskData.taskType,
-                workflow: workflow,
+                workflow: workflow
             })
         });
 
-        _setCancellationForAjaxCall(ajax);
+        _setCancellationForAjaxCall(runRequest);
 
         /* schedule checks and replace promise */
         runRequest
@@ -94,11 +97,11 @@ smartR.ajaxServices = function(basePath, workflow) {
             });
 
         return runRequest;
-    }
+    };
 
     function _setCancellationForAjaxCall(ajax) {
         /* request in-flight; aborting is cancelling this request */
-        data.currentRequestAbort = function() { ajax.abort(); };
+        state.currentRequestAbort = function() { ajax.abort(); };
         /* once the request finishes, there's nothing to abort.
          * this needs to be the 1st callback, so that later callbacks can
          * override this */
@@ -170,4 +173,4 @@ smartR.ajaxServices = function(basePath, workflow) {
     }
 
     return result;
-}
+};

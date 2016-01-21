@@ -36,6 +36,17 @@
 	</tr>
 </table>
 
+<button id="sr-btn-fetch-boxplot" class="sr-action-button">Fetch Data</button>
+<button id="sr-btn-run-boxplot" class="sr-action-button">Generate Boxplot</button>
+
+%{--result--}%
+<div id="heim-run-output" class="sr-output-container"></div>
+
+%{--d3 js heatmap placeholder--}%
+<div id='visualization' class='text sr-output-container'>
+	<div id="heatmap" class='text'></div>
+</div>
+
 <script>
 	activateDragAndDrop('concept1');
 	activateDragAndDrop('concept2');
@@ -65,6 +76,7 @@
 
 <g:javascript>
 	smartR.initAnalysis('boxplot');
+	console.log(smartR)
 </g:javascript>
 
 <r:layoutResources/>

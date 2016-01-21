@@ -388,15 +388,15 @@ function showCohortInfo() {
     }
     $('#cohortInfo').html(cohortsSummary)
 }
-showCohortInfo()
+//showCohortInfo()
 
 function updateInputView() {
     if (typeof updateOnView === 'function') updateOnView()
 }
 
 var panelItem = $('#resultsTabPanel__smartRPanel')
-panelItem.click(showCohortInfo)
-panelItem.click(updateInputView)
+//panelItem.click(showCohortInfo)
+//panelItem.click(updateInputView)
 
 function shortenConcept(concept) {
     var splits = concept.split('\\')

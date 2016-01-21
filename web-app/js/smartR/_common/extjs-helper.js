@@ -58,5 +58,57 @@ HeimExtJSHelper = (function(){
         return variableConceptPath;
     };
 
+    /* generate unique labels for the concept paths. It recursively resolves
+     * clashes. */
+    var _generateLabels = (function() {
+        function throwIfDuplicates(arr) {
+            var repeated =  arr.filter(function(el, index) {
+                return arr.indexOf(el) !== index;
+            });
+            if (repeated.length > 0) {
+                var error = new Error(
+                    "Duplicate concept keys: " + repeated, 'dups');
+                throw error;
+            }
+        }
+
+        return function _generateLabels(arr) {
+            throwIfDuplicates(arr);
+
+            var n = 0;
+            return arr.reduce(function(result, currentItem) {
+                result['n' + n++] = currentItem;
+                return result;
+            }, {});
+        };
+    })();
+
+    helper.createAnalysisConstraints = function (params) {
+        var _conceptKeys = '';
+
+        try {
+            _conceptKeys = _generateLabels(params.conceptPaths.split(/\|/));
+        } catch (err) {
+            throw err;
+        }
+
+        // params.conceptPaths are actually keys...
+        var _retval = {
+            conceptKeys : _conceptKeys,
+            resultInstanceIds: params.resultInstanceIds,
+            projection: ''
+        };
+
+        if (params['searchKeywordIds'].length > 0) {
+            _retval.dataConstraints = {
+                search_keyword_ids: {
+                    keyword_ids: params['searchKeywordIds']
+                }
+            }
+        }
+        return  _retval;
+    };
+
+
     return helper;
 })();

@@ -9,7 +9,10 @@ function switchAnimation(checked) {
         animationDuration = tmpAnimationDuration;
     }
 }
-var results = ${raw(results)};
+
+//var results = ${raw(results)};
+var results = {}; // TODO reading from JSON response
+
 results.cohort2 = results.cohort2 === undefined ? {concept: 'undefined', subsets: []} : results.cohort2;
 var margin = {top: 10, right: 60, bottom: 200, left: 60};
 var width = jQuery("#etrikspanel").width() / 2 - 200 - margin.left - margin.right;
@@ -579,6 +582,3 @@ createD3Switch({
     callback: switchAnimation,
     checked: true
 });
-</script>
-Status API Training Shop Blog About Pricing
-© 2016 GitHub, Inc. Terms Privacy Security Contact Help

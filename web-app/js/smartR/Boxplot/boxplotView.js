@@ -4,10 +4,11 @@
 
 window.smartR.BoxplotView = function (controller, model) {
 
-    var view = this;
+    var view = this, helper = HeimExtJSHelper;
 
     view.controller = controller;
     view.model = model;
+    view.workflow = 'boxplot';
 
     view.concept1 = {
         inputEl : $('#concept1'),
@@ -18,6 +19,7 @@ window.smartR.BoxplotView = function (controller, model) {
         inputEl : $('#subset1'),
         clearBtn : $('#sr-subset1-btn')
     };
+
     view.concept2 = {
         inputEl : $('#concept2'),
         clearBtn : $('#sr-concept2-btn')
@@ -27,6 +29,9 @@ window.smartR.BoxplotView = function (controller, model) {
         inputEl : $('#subset2'),
         clearBtn : $('#sr-subset2-btn')
     };
+
+    view.fetchBoxplotBtn = $('#sr-btn-fetch-boxplot');
+    view.generateBoxplotBtn = $('#sr-btn-run-boxplot');
 
     view.init = function () {
         bindUIActions();
@@ -43,8 +48,41 @@ window.smartR.BoxplotView = function (controller, model) {
         view.concept2.clearBtn.on('click', view.concept2.inputEl, _clearInputEl);
         view.subset2.clearBtn.on('click', view.subset2.inputEl, _clearInputEl);
 
+        view.generateBoxplotBtn.on('click', function () {
+            view.controller.generateBoxplot()
+                .done(function (d) {
+
+                })
+                .fail(function (jq, status, msg) {
+
+                });
+        });
+
+        view.fetchBoxplotBtn.on('click', function () {
+
+            var strConcept1 = helper.readConceptVariables(view.concept1.inputEl.attr('id'));
+            // TODO get other concepts
+
+            view.controller.fetch({
+                conceptPaths: strConcept1,
+                // CurrentSubsetIDs can contain undefined and null. Pass only nulls forward
+                resultInstanceIds : GLOBAL.CurrentSubsetIDs.map(function (v) { return v || null; }),
+                searchKeywordIds: ''
+            })
+                .done(function (d) {
+                    console.log(d)
+                })
+                .fail(function (jq, status, msg) {
+                    console.error(msg)
+                });
+        });
+
     };
 
     view.init();
+};
+
+window.smartR.BoxplotView.prototype.fooBar = function () {
+  console.log(this.controller);
 };
 

@@ -12,6 +12,8 @@ window.smartR.initAnalysis = function initAnalysis(name) {
     /* wiring of components */
         name = name.capitalize();
     var ajaxServices = smartR.ajaxServices(window.pageInfo.basePath, name);
+    ajaxServices.startSession();
+
     var model = smartR[name + 'Model']();
     var controller = smartR[name + 'Controller'](model, ajaxServices);
     smartR[name + 'View'](controller, model);
