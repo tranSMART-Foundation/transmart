@@ -2,6 +2,6 @@
 
 "use strict";
 
-window.smartR.boxplot_controller = function(model) {
+window.smartR.boxplot_controller = function(model, ajaxServices) {
 
 };
