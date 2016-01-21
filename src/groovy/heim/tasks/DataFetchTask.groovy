@@ -262,6 +262,7 @@ class DataFetchTask extends AbstractTask {
                 PeekingIterator<? extends DataRow> it =
                         Iterators.peekingIterator(tabularResult.iterator())
                 boolean isBioMarker = it.peek().hasProperty('bioMarker')
+                if (isBioMarker == null) isBioMarker = false
                 writeHeader(csvWriter, isBioMarker, tabularResult.indicesList)
                 it.each { DataRow row ->
                     if (Thread.interrupted()) {
@@ -393,9 +394,10 @@ class DataFetchTask extends AbstractTask {
             OntologyTerm ontologyTerm,
             Long resultInstanceId
     ) {
-
-        throw new InvalidArgumentsException(
-                'A result instance id should have been given')
+        if (!resultInstanceId) {
+            throw new InvalidArgumentsException(
+                    'A result instance id should have been given')
+        }
 
         def clinicalVariable = clinicalDataResource.createClinicalVariable(
                 ClinicalVariable.NORMALIZED_LEAFS_VARIABLE,
