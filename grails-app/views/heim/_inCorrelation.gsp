@@ -1,4 +1,4 @@
-<r:require modules="smartR_correlation"/>
+%{--<r:require modules="smartR_correlation"/>--}%
 <r:layoutResources disposition="defer"/>
 
 <mark>Step 1:</mark> Drop two numerical variables into this window.<br/>
