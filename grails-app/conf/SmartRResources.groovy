@@ -30,5 +30,6 @@ modules = {
 
     smartR_boxplothack {
         resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'boxplotHack.js']
+        resource url: [plugin: 'smart-r', dir: 'css', file: 'Boxplot.css']
     }
 }

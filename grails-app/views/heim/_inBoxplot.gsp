@@ -1,5 +1,125 @@
 <r:require modules="smartR_boxplothack"/>
 <r:layoutResources disposition="defer"/>
+<style>
+.text {
+	font-family: 'Roboto', sans-serif;
+	fill: black;
+}
+
+.boxplotValue {
+	font-size: 9px;
+}
+
+#boxplot1 {
+	background-color: white;
+}
+
+#boxplot2 {
+	background-color: white;
+}
+
+.whisker {
+	stroke: black;
+	stroke-width: 1px;
+}
+
+.hinge {
+	stroke: black;
+	stroke-width: 1px;
+}
+
+.connection {
+	stroke: black;
+	stroke-width: 1px;
+}
+
+.point {
+}
+
+.point:hover {
+	fill: red;
+}
+
+.outlier {
+	stroke: red;
+	stroke-width: 2px;
+}
+
+.brushed {
+	fill: red;
+	stroke: red;
+}
+
+.box {
+	fill: #008BFF;
+}
+
+.box.upper {
+	opacity: 0.3;
+}
+
+.box.lower {
+	opacity: 0.2;
+}
+
+.line {
+	fill: none;
+	stroke: black;
+	stroke-width: 1.5px;
+}
+
+.tooltip {
+	position: absolute;
+	text-align: center;
+	display: inline-block;
+	padding: 0px;
+	font-size: 12px;
+	font-weight: bold;
+	color: black;
+	background: white;
+	pointer-events: none;
+}
+
+.contextMenu {
+	position: absolute;
+	text-align: center;
+	display: inline-block;
+	padding: 0px;
+	font-size: 12px;
+	font-weight: bold;
+	color: black;
+	background-color: white;
+}
+
+.brush .extent {
+	fill: blue;
+	opacity: .25;
+	shape-rendering: crispEdges;
+
+}
+
+.axis path, .axis line {
+	fill: none;
+	stroke: black;
+	stroke-width: 1px;
+	shape-rendering: crispEdges;
+}
+
+.mybutton {
+	width: 100%;
+	height: 30px;
+	color: black;
+	background-color: white;
+	font-size: 12px;
+	font-weight: bold;
+	border: none;
+}
+
+.mybutton:hover {
+	color: white;
+	background: #326FCB;
+}
+</style>
 <table>
 	<tr>
 		<td style='padding-right: 2em; padding-bottom: 1em'>
@@ -36,7 +156,7 @@
 </table>
 
 <input id="submitButton" class='txt' type="button" value="(Re-)Run Analysis" onclick="runBoxplot()"/>
-
+<div id="boxplot-d3"></div>
 <script>
 	activateDragAndDrop('concept1');
 	activateDragAndDrop('concept2');
