@@ -2,10 +2,15 @@
 
 "use strict";
 
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
 window.smartR = window.smartR || {};
 
 window.smartR.initAnalysis = function initAnalysis(name) {
-    var model = smartR[name + '_model']();
-    var controller = smartR[name + '_controller'](model);
-    smartR[name + '_view'](controller, model);
+    name = name.capitalize();
+    var model = smartR[name + 'Model']();
+    var controller = smartR[name + 'Controller'](model);
+    smartR[name + 'View'](controller, model);
 };

@@ -1,3 +1,6 @@
+<r:require modules="smartR_boxplot"/>
+<r:layoutResources/>
+
 <table>
 	<tr>
 		<td style='padding-right: 2em; padding-bottom: 1em'>
@@ -5,14 +8,14 @@
 			NOTE: This window maps to the first cohort!<br/>
 			(Example: Age, Pulse, Blood Pressure)<br/>
 			<div id='concept1' class="queryGroupIncludeSmall"></div>
-			<input type="button" class='txt' onclick="clearVarSelection('concept1')" value="Clear Window">
+			<input type="button" class='txt'  value="Clear Window" id="sr-concept1-btn">
 		</td>
 		<td style='padding-right: 2em; padding-bottom: 1em'>
 			<mark>Step 2 (optional):</mark> Drop any number of concepts subsetting the choice made on the left into this window.<br/>
 			NOTE: This window maps to the first cohort!<br/>
 			(Example: Demographics/Male, Demographics/Female)<br/>
 			<div id='subsets1' class="queryGroupIncludeSmall"></div>
-			<input type="button" class='txt' onclick="clearVarSelection('subsets1')" value="Clear Window">
+			<input type="button" class='txt' onclick="clearVarSelection('subsets1')" value="Clear Window" id="sr-subset1-btn">
 		</td>
 	</tr>
 	<tr>
@@ -21,14 +24,14 @@
 			NOTE: This window maps to the second cohort!<br/>
 			(Example: Age, Pulse, Blood Pressure)<br/>
 			<div id='concept2' class="queryGroupIncludeSmall"></div>
-			<input type="button" class='txt' onclick="clearVarSelection('concept2')" value="Clear Window">
+			<input type="button" class='txt' onclick="clearVarSelection('concept2')" value="Clear Window" id="sr-subset-2">
 		</td>
 		<td style='padding-right: 2em; padding-bottom: 1em'>
 			<mark>Step 4 (optional):</mark> Drop any number of concepts subsetting the choice made on the left into this window.<br/>
 			NOTE: This window maps to the second cohort!<br/>
 			(Example: Demographics/Male, Demographics/Female)<br/>
 			<div id='subsets2' class="queryGroupIncludeSmall"></div>
-			<input type="button" class='txt' onclick="clearVarSelection('subsets2')" value="Clear Window">
+			<input type="button" class='txt' onclick="clearVarSelection('subsets2')" value="Clear Window" id="sr-concept-2">
 		</td>
 	</tr>
 </table>
@@ -59,3 +62,9 @@
 		return true;
 	}
 </script>
+
+<g:javascript>
+	smartR.initAnalysis('boxplot');
+</g:javascript>
+
+<r:layoutResources/>

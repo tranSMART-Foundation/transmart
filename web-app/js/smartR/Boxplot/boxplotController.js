@@ -5,3 +5,4 @@
 window.smartR.BoxplotController = function(model) {
 
 };
+
