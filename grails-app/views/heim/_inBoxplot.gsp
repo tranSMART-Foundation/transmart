@@ -35,6 +35,8 @@
 	</tr>
 </table>
 
+<input id="submitButton" class='txt' type="button" value="(Re-)Run Analysis" onclick="runBoxplot()"/>
+
 <script>
 	activateDragAndDrop('concept1');
 	activateDragAndDrop('concept2');

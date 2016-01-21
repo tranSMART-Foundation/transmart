@@ -1,4 +1,59 @@
-var runTask = function(arguments, taskType, workflow, sessionId, doneCallback) {
+var sessionId = '';
+var executionId = '';
+
+var _generateLabels = (function() {
+    function throwIfDuplicates(arr) {
+        var repeated =  arr.filter(function(el, index) {
+            return arr.indexOf(el) !== index;
+        });
+        if (repeated.length > 0) {
+            var error = new Error(
+                "Duplicate concept keys: " + repeated, 'dups');
+            throw error;
+        }
+    }
+
+    return function _generateLabels(arr) {
+        throwIfDuplicates(arr);
+
+        var n = 0;
+        return arr.reduce(function(result, currentItem) {
+            result['n' + n++] = currentItem;
+            return result;
+        }, {});
+    };
+})();
+
+var _createAnalysisConstraints = function (params) {
+    var _conceptKeys = '';
+
+    try {
+        _conceptKeys = _generateLabels(params.conceptPaths.split(/\|/));
+    } catch (err) {
+        throw err;
+    }
+
+    // params.conceptPaths are actually keys...
+    var _retval = {
+        conceptKeys : _conceptKeys,
+        resultInstanceIds: params.resultInstanceIds,
+        //projection: PROJECTION
+    };
+
+    return  _retval;
+};
+
+var _getFetchDataViewValues = function () {
+    var _conceptPath = extJSHelper.readConceptVariables(jQuery('#concept1').attr('id'));
+    return {
+        conceptPaths: _conceptPath,
+        // CurrentSubsetIDs can contain undefined and null. Pass only nulls forward
+        resultInstanceIds : GLOBAL.CurrentSubsetIDs.map(function (v) { return v || null; })
+    };
+};
+
+var runTask = function(arguments, taskType, workflow, doneCallback) {
+    console.log(sessionId);
     jQuery.ajax({
         url: pageInfo.basePath + '/ScriptExecution/run',
         type: 'POST',
@@ -9,22 +64,60 @@ var runTask = function(arguments, taskType, workflow, sessionId, doneCallback) {
             arguments: arguments,
             taskType : taskType,
             workflow : workflow
-        })}).done(doneCallback
+        })}).done(function(d) {
+            executionId = d.executionId;
+            doneCallback();
+        }
     );
 };
 
-var checkStatus = function() {
+var runAnalysis = function() {
+  runTask(_arguments,'run','boxplot', checkAnalysisStatus);
+};
+
+var checkAnalysisStatus = function() {
+    statusPoller(makeVisualization);
+};
+
+var makeVisualization = function() {
+   console.log('spagetti works');
+   //later
+};
+
+var checkDataFetchStatus = function() {
+    statusPoller(runAnalysis);
+};
+
+var statusPoller = function(callback) {
+    window.setTimeout(function() {
+        checkStatus(callback);
+    }, 1000);
+};
+
+var checkStatus = function(callback) {
+    console.log(executionId);
     var ajax = jQuery.ajax({
         type: 'GET',
         url : pageInfo.basePath + '/ScriptExecution/status',
         data: {
-            sessionId  : GLOBAL.HeimAnalyses.sessionId,
-            executionId: taskData.executionId
+            sessionId  : sessionId,
+            executionId: executionId
+        }
+    }).done(function(result) {
+
+        if (result.state == 'FINISHED') {
+            callback();
+        }
+        else {
+            statusPoller();
         }
     });
 };
 
-var runBoxplot = function (workflow, arguments) {
+var runBoxplot = function () {
+    var fetchArgs = _getFetchDataViewValues();
+    fetchArgs = _createAnalysisConstraints(fetchArgs);
+    console.log(fetchArgs);
     // ajax call to session creation
     jQuery.ajax({
         url: pageInfo.basePath + '/RSession/create',
@@ -32,10 +125,11 @@ var runBoxplot = function (workflow, arguments) {
         timeout: '30000',
         contentType: 'application/json',
         data : JSON.stringify( {
-            workflow : workflow
+            workflow : 'boxplot'
         })
     }).done(function(response) {
-        runTask(arguments,'run','boxplot',response.sessionId);
+        sessionId = response.sessionId;
+        runTask(fetchArgs,'fetchData','boxplot', checkDataFetchStatus);
 
     }).fail(function() {
         console.error('Cannot create r-session');
@@ -44,8 +138,8 @@ var runBoxplot = function (workflow, arguments) {
 };
 
 
-var ret = runBoxplot('boxplot',args)
-console.log(ret);
+//var ret = runBoxplot('boxplot',args)
+//console.log(ret);
 // boxplot visualization
 
 var visualization = function() {
@@ -59,7 +153,7 @@ var visualization = function() {
             animationDuration = tmpAnimationDuration;
         }
     }
-    var results = ${raw(results)};
+    var results = $(raw(results));
     results.cohort2 = results.cohort2 === undefined ? {concept: 'undefined', subsets: []} : results.cohort2;
     var margin = {top: 10, right: 60, bottom: 200, left: 60};
     var width = jQuery("#etrikspanel").width() / 2 - 200 - margin.left - margin.right;
@@ -631,3 +725,67 @@ var visualization = function() {
         checked: true
     });
 };
+
+
+var extJSHelper = (function(){
+
+    var helper = {};
+
+    helper.dropOntoNodeSelection = function (source, e, data) {
+        var analysisConcept;
+
+        var targetdiv = this.el;
+
+        if (data.node.leaf === false && !data.node.isLoaded()) {
+            data.node.reload(function () {
+                analysisConcept = dropOntoCategorySelection2(source, e, data, targetdiv);
+            });
+        }
+        else {
+            analysisConcept = dropOntoCategorySelection2(source, e, data, targetdiv);
+        }
+
+        return true;
+    };
+
+    helper.registerDropzone = function (el) {
+        var div = Ext.get(el.attr('id'));
+        var dtgI = new Ext.dd.DropTarget(div, {ddGroup: 'makeQuery'});
+        dtgI.notifyDrop = helper.dropOntoNodeSelection;
+    };
+
+    helper.clear = function (el) {
+        var div = Ext.get(el.attr('id'));
+        //Clear the drag and drop div.
+        var qc = Ext.get(div);
+        for (var i = qc.dom.childNodes.length - 1; i >= 0; i--) {
+            var child = qc.dom.childNodes[i];
+            qc.dom.removeChild(child);
+        }
+    };
+
+    var _fetchConceptPath = function (el) {
+        return el.getAttribute('conceptId').trim();
+    };
+
+    helper.readConceptVariables = function (elId) {
+        var variableConceptPath = '';
+        var variableEle = Ext.get(elId);
+
+        //If the variable element has children, we need to parse them and concatenate their values.
+        if (variableEle && variableEle.dom.childNodes[0]) {
+            //Loop through the variables and add them to a comma separated list.
+            for (var nodeIndex = 0; nodeIndex < variableEle.dom.childNodes.length; nodeIndex++) {
+                //If we already have a value, add the separator.
+                if (variableConceptPath != '') {
+                    variableConceptPath += '|';
+                }
+                //Add the concept path to the string.
+                variableConceptPath += _fetchConceptPath(variableEle.dom.childNodes[nodeIndex]);
+            }
+        }
+        return variableConceptPath;
+    };
+
+    return helper;
+})();
