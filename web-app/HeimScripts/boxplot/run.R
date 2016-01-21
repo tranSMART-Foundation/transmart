@@ -1,12 +1,15 @@
 
 
-main <- function(excludedPatientIDs) {
+main <- function() {
+  excludedPatientIDs <- c("")
   datapoints <- loaded_variables[[1]]
+  print(datapoints)
   data <- list()
-  points <- datapoints[c('patientID', 'value')]
+  points <- datapoints[,1:2]  #[c('patientID', 'value')]
+  names(points) <- c('patientID', 'value')
   subsets <- list() 
   patientIDs <- points$patientID
-  concept <- names(loaded_variables)[1]  #  datapoints$concept[1]
+  concept <- "Concept name"#names(loaded_variables)[1]  #  datapoints$concept[1]
   data$concept <- concept
   data$globalMin <- min(points$value)
   data$globalMax <- max(points$value)
@@ -45,6 +48,6 @@ main <- function(excludedPatientIDs) {
     }
   }
   data$subsets <- nonEmptySubsets
-  write(data,file="boxplot.json")
-  toJSON(data, pretty=TRUE)
+  dfOut <- list(cohort1 = data)
+  list(jsn = toJSON(dfOut, pretty=TRUE) )
 }

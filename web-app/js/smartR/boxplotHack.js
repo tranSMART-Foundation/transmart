@@ -1,5 +1,6 @@
 var sessionId = '';
 var executionId = '';
+var _JSON = {};
 
 var _generateLabels = (function() {
     function throwIfDuplicates(arr) {
@@ -72,16 +73,20 @@ var runTask = function(arguments, taskType, workflow, doneCallback) {
 };
 
 var runAnalysis = function() {
+    var _arguments = {};
   runTask(_arguments,'run','boxplot', checkAnalysisStatus);
 };
 
 var checkAnalysisStatus = function() {
+    console.log('in check Analysis status');
     statusPoller(makeVisualization);
 };
 
 var makeVisualization = function() {
    console.log('spagetti works');
-   //later
+    console.log('Inside spagetti, ');
+    console.log(_JSON);
+   visualization(_JSON);
 };
 
 var checkDataFetchStatus = function() {
@@ -95,7 +100,7 @@ var statusPoller = function(callback) {
 };
 
 var checkStatus = function(callback) {
-    console.log(executionId);
+    console.log('chcking status, execution id:'+executionId);
     var ajax = jQuery.ajax({
         type: 'GET',
         url : pageInfo.basePath + '/ScriptExecution/status',
@@ -104,12 +109,18 @@ var checkStatus = function(callback) {
             executionId: executionId
         }
     }).done(function(result) {
-
+        console.log('In checkStatus');
+        console.log(result);
         if (result.state == 'FINISHED') {
+            console.log('FINISHED!! : <');
+
+            if (result.result.artifacts && result.result.artifacts.jsn) {
+                _JSON = result.result.artifacts.jsn;
+            }
             callback();
         }
         else {
-            statusPoller();
+            statusPoller(callback);
         }
     });
 };
@@ -142,7 +153,7 @@ var runBoxplot = function () {
 //console.log(ret);
 // boxplot visualization
 
-var visualization = function() {
+var visualization = function(json) {
     var animationDuration = 1000;
     var tmpAnimationDuration = animationDuration;
     function switchAnimation(checked) {
@@ -153,8 +164,11 @@ var visualization = function() {
             animationDuration = tmpAnimationDuration;
         }
     }
-    var results = $(raw(results));
+    console.log('in visualization');
+    var results = json;
     results.cohort2 = results.cohort2 === undefined ? {concept: 'undefined', subsets: []} : results.cohort2;
+    console.log('XXXXXXXXX');
+    console.log(results.cohort1);
     var margin = {top: 10, right: 60, bottom: 200, left: 60};
     var width = jQuery("#etrikspanel").width() / 2 - 200 - margin.left - margin.right;
     var height = jQuery("#etrikspanel").height() * 0.65 - margin.top - margin.bottom;
@@ -171,6 +185,7 @@ var visualization = function() {
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    console.log(results);
     var x1 = d3.scale.ordinal()
         .domain(results.cohort1.subsets)
         .rangeBands([0, width], 1, 0.5);
