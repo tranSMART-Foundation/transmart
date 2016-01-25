@@ -95,8 +95,8 @@ HeimExtJSHelper = (function(){
         // params.conceptPaths are actually keys...
         var _retval = {
             conceptKeys : _conceptKeys,
-            resultInstanceIds: params.resultInstanceIds,
-            projection: ''
+            resultInstanceIds: params.resultInstanceIds
+            //projection: ''
         };
 
         if (params['searchKeywordIds'].length > 0) {

@@ -42,10 +42,8 @@
 %{--result--}%
 <div id="heim-run-output" class="sr-output-container"></div>
 
-%{--d3 js heatmap placeholder--}%
-<div id='visualization' class='text sr-output-container'>
-	<div id="heatmap" class='text'></div>
-</div>
+
+<div id="boxplot-d3"></div>
 
 <script>
 	activateDragAndDrop('concept1');
@@ -76,7 +74,6 @@
 
 <g:javascript>
 	smartR.initAnalysis('boxplot');
-	console.log(smartR)
 </g:javascript>
 
 <r:layoutResources/>

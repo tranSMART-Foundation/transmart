@@ -9,10 +9,20 @@ window.smartR.BoxplotController = function(model, ajaxServices) {
     controller.service = ajaxServices;
 
     controller.fetch = function (paramObj) {
-        return ajaxServices.startScriptExecution({
+        var defer = $.Deferred();
+
+        //
+        ajaxServices.startScriptExecution({
             arguments: helper.createAnalysisConstraints(paramObj),
             taskType: 'fetchData'
+        }).done(function (d) {
+
+            defer.resolve(d);
+        }).fail(function (jq, status, message) {
+            defer.reject([jq, status, message]);
         });
+
+        return defer.promise();
     };
 
     controller.generateBoxplot = function () {

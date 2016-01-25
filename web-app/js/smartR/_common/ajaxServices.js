@@ -5,6 +5,7 @@ smartR.ajaxServices = function(basePath, workflow) {
 
     var NOOP_ABORT = function() {};
     var TIMEOUT = 10000 /* 10 s */;
+    var CHECK_DELAY = 1000;
 
     /* we can only support on request at a time */
 
@@ -16,8 +17,6 @@ smartR.ajaxServices = function(basePath, workflow) {
     /* returns a promise with the session id and
      * saves the session id for future calls */
     result.startSession = function ajaxServices_startSession() {
-        console.log(basePath);
-        console.log(workflow);
         return jQuery.ajax({
             url: basePath + '/RSession/create',
             type: 'POST',
@@ -35,6 +34,7 @@ smartR.ajaxServices = function(basePath, workflow) {
 
     result.destroySession = function ajaxServices_destroySession(sessionId) {
         sessionId = sessionId || state.sessionId;
+
         if (!sessionId) {
             throw new Error('No session to destroy');
         }
@@ -67,7 +67,7 @@ smartR.ajaxServices = function(basePath, workflow) {
      * }
      */
     result.startScriptExecution = function ajaxServices_startScriptExecution(taskDataOrig) {
-        console.log('task', taskDataOrig)
+
         var taskData = jQuery.extend({}, taskDataOrig); // clone the thing
         state.currentRequestAbort();
 
@@ -90,7 +90,7 @@ smartR.ajaxServices = function(basePath, workflow) {
         runRequest
             .then(function(d) {
                 taskData.executionId = d.executionId;
-                _checkStatus(taskData, CHECK_DELAY);
+                return _checkStatus(taskData.executionId, CHECK_DELAY);
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
                 return errorThrown;

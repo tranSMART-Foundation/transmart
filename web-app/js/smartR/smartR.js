@@ -452,13 +452,13 @@ function getConcepts(divName) {
 }
 
 function changeInputDIV() {
-    $('#outputDIV').empty()
-    var request = $.ajax({
+    jQuery('#outputDIV').empty();
+    var request = jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderInput',
         type: 'POST',
         timeout: 10000,
-        data: {script: $('#scriptSelect').val()}
-    })
-    request.done(function(response) { $('#inputDIV').html(response) })
-    request.fail(function() { alert('Server does not respond. Network connection lost?') })
+        data: {script: jQuery('#scriptSelect').val()}
+    });
+    request.done(function(response) { jQuery('#inputDIV').html(response) });
+    request.fail(function() { alert('Server does not respond. Network connection lost?') });
 }
