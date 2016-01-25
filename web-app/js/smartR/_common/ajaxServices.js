@@ -111,14 +111,51 @@ smartR.ajaxServices = function(basePath, workflow) {
     }
 
     /* set a function to be executed after a period of time and
-     * simultaneous define the request cancellation function
-     * as the cancellation of this timeout */
-    function _setStatusRequestTimeout() {
-        var timeout = setTimeout.apply(undefined, arguments);
+     * simultaneously define the request cancellation function
+     * as the cancellation of this timeout.
+     * Return the result as a promise. */
+    function _setStatusRequestTimeout(funcToCall, delay /*, ... */) {
+        var defer = jQuery.Deferred();
+        var promise = defer.promise();
+
+        function _setStatusRequestTimeout_wrappedFunc() {
+            var restOfArguments = Array.prototype.slice.call(arguments)
+                .splice(2); // arguments after delay
+
+            // we cannot abort by calling clearTimeout() anymore
+            // funcToCall will probably set its own abort method
+            state.currentRequestAbort = NOOP_ABORT;
+
+            // funcToCall should itself return a promise or a final result
+            // but let's cover the case where it throws
+            var result;
+            try {
+                result = funcToCall.apply(undefined, restOfArguments);
+                defer.resolve(result);
+            } catch (e) {
+                defer.fail(e);
+            }
+        }
+
+        var timeout = window.setTimeout(
+            _setStatusRequestTimeout_wrappedFunc, delay);
+
         state.currentRequestAbort = function() {
             clearTimeout(timeout);
             state.currentRequestAbort = NOOP_ABORT;
+        };
+
+        promise.cancel = function timeoutRequest_cancel() {
+            // calling this method will by itself resolve the promise
+            // in case there's an ajax call pending.
+            state.currentRequestAbort();
+            // if there is a timeout pending, it won't though
+            if (defer.state() == 'pending') {
+                defer.fail(new Error('Request was aborted'));
         }
+        };
+
+        return promise;
     }
 
     /* aux function of _startScriptExecution. Needs to follow its contract
@@ -136,7 +173,7 @@ smartR.ajaxServices = function(basePath, workflow) {
         state.currentRequestAbort = function() { ajax.abort(); };
         ajax.always(function() { state.currentRequestAbort = NOOP_ABORT; });
 
-        ajax.then(function (d) {
+        return ajax.then(function (d) {
             if (d.state === 'FINISHED') {
                 return d;
             } else if (d.state === 'FAILED') {
@@ -146,7 +183,8 @@ smartR.ajaxServices = function(basePath, workflow) {
                 }).promise();
             } else {
                 // else still pending
-                _setStatusRequestTimeout(_checkStatus, delay, executionId, delay);
+                return _setStatusRequestTimeout(
+                    _checkStatus, delay, executionId, delay);
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             return errorThrown;
