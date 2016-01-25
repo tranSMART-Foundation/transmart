@@ -34,7 +34,6 @@ var SmartRHeatmap = (function(){
         var geneSymbols = data.geneSymbols;
         var numberOfClusteredColumns = data.numberOfClusteredColumns[0];
         var numberOfClusteredRows = data.numberOfClusteredRows[0];
-        var maxRows = 100;
         var warning = data.warnings === undefined ? '' : data.warnings;
 
         var rowClustering = false;
@@ -664,10 +663,19 @@ var SmartRHeatmap = (function(){
                     d3.select('.bar.idx-' + d[0]).classed('cuttoffHighlight', true);
                     d3.selectAll('.square.probe-' + probes[d[0]]).classed('cuttoffHighlight', true);
                 });
-            $('#txtMaxRow').val(maxRows - cutoff - 1);
+            $('#txtMaxRow').val($('#txtMaxRow').val() - cutoff - 1);
         }
 
         function cutoff() {
+            //HeatmapService.startScriptExecution({
+            //    taskType: 'run',
+            //    arguments: params,
+            //    onUltimateSuccess: HeatmapService.runAnalysisSuccess,
+            //    onUltimateFailure: HeatmapService.runAnalysisFailed,
+            //    phase: 'run',
+            //    progressMessage: 'Calculating',
+            //    successMessage: undefined
+            //});
             $('#heim-btn-run-heatmap').click();
         }
 
@@ -1005,7 +1013,7 @@ var SmartRHeatmap = (function(){
             width: buttonWidth,
             height: buttonHeight,
             min: 0,
-            max: maxRows - 2,
+            max: $('#txtMaxRow').val() - 2,
             init: 0,
             callback: animateCutoff,
             trigger: 'dragend'
