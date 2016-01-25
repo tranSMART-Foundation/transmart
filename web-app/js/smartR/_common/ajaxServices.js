@@ -87,16 +87,13 @@ smartR.ajaxServices = function(basePath, workflow) {
         _setCancellationForAjaxCall(runRequest);
 
         /* schedule checks and replace promise */
-        runRequest
+        return runRequest
             .then(function(d) {
                 taskData.executionId = d.executionId;
                 return _checkStatus(taskData.executionId, CHECK_DELAY);
-            })
-            .fail(function(jqXHR, textStatus, errorThrown) {
+            }, function(jqXHR, textStatus, errorThrown) {
                 return errorThrown;
             });
-
-        return runRequest;
     };
 
     function _setCancellationForAjaxCall(ajax) {
@@ -117,11 +114,10 @@ smartR.ajaxServices = function(basePath, workflow) {
     function _setStatusRequestTimeout(funcToCall, delay /*, ... */) {
         var defer = jQuery.Deferred();
         var promise = defer.promise();
+        var restOfArguments = Array.prototype.slice.call(arguments)
+            .splice(2); // arguments after delay
 
         function _setStatusRequestTimeout_wrappedFunc() {
-            var restOfArguments = Array.prototype.slice.call(arguments)
-                .splice(2); // arguments after delay
-
             // we cannot abort by calling clearTimeout() anymore
             // funcToCall will probably set its own abort method
             state.currentRequestAbort = NOOP_ABORT;

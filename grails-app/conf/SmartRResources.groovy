@@ -31,6 +31,8 @@ modules = {
 
     smartR_boxplot {
         dependsOn 'smartR_analysis_common'
+        resource url: [plugin: 'smart-r', dir: 'css', file: 'Boxplot.css']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'd3Boxplot.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotModel.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotController.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotView.js']

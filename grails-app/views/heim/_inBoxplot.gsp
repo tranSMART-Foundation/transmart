@@ -37,13 +37,14 @@
 </table>
 
 <button id="sr-btn-fetch-boxplot" class="sr-action-button">Fetch Data</button>
-<button id="sr-btn-run-boxplot" class="sr-action-button">Generate Boxplot</button>
+<button id="sr-btn-run-boxplot" class="sr-action-button">Run Boxplot</button>
 
 %{--result--}%
 <div id="heim-run-output" class="sr-output-container"></div>
 
 
-<div id="boxplot-d3"></div>
+<div id="boxplot1"></div>
+<div id="boxplot2"></div>
 
 <script>
 	activateDragAndDrop('concept1');

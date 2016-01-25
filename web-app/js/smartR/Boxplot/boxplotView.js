@@ -31,7 +31,7 @@ window.smartR.BoxplotView = function (controller, model) {
     };
 
     view.fetchBoxplotBtn = $('#sr-btn-fetch-boxplot');
-    view.generateBoxplotBtn = $('#sr-btn-run-boxplot');
+    view.runBoxplotBtn = $('#sr-btn-run-boxplot');
 
     view.init = function () {
         bindUIActions();
@@ -48,41 +48,26 @@ window.smartR.BoxplotView = function (controller, model) {
         view.concept2.clearBtn.on('click', view.concept2.inputEl, _clearInputEl);
         view.subset2.clearBtn.on('click', view.subset2.inputEl, _clearInputEl);
 
-        view.generateBoxplotBtn.on('click', function () {
-            view.controller.generateBoxplot()
-                .done(function (d) {
-
-                })
-                .fail(function (jq, status, msg) {
-
-                });
+        view.runBoxplotBtn.on('click', function () {
+            view.controller.run();
         });
 
         view.fetchBoxplotBtn.on('click', function () {
-
             var strConcept1 = helper.readConceptVariables(view.concept1.inputEl.attr('id'));
             // TODO get other concepts
-
             view.controller.fetch({
                 conceptPaths: strConcept1,
                 // CurrentSubsetIDs can contain undefined and null. Pass only nulls forward
                 resultInstanceIds : GLOBAL.CurrentSubsetIDs.map(function (v) { return v || null; }),
                 searchKeywordIds: ''
-            })
-                .done(function (d) {
-                    console.log(d)
-                })
-                .fail(function (jq, status, msg) {
-                    console.error(msg)
-                });
+            }).done(function (d) {
+                console.log(d);
+            }).fail(function (jq, status, msg) {
+                console.error(msg);
+            });
         });
 
     };
 
     view.init();
 };
-
-window.smartR.BoxplotView.prototype.fooBar = function () {
-  console.log(this.controller);
-};
-
