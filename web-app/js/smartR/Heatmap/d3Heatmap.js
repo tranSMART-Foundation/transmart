@@ -28,6 +28,7 @@ var SmartRHeatmap = (function(){
         var features = data.features === undefined ? [] : data.features;
         var fields = data.fields;
         var significanceValues = data.significanceValues;
+        var ranking = data.ranking[0];
         var patientIDs = data.patientIDs;
         var probes = data.probes;
         var geneSymbols = data.geneSymbols;
@@ -115,7 +116,28 @@ var SmartRHeatmap = (function(){
 
         var histogramScale = d3.scale.linear()
             .domain(d3.extent(significanceValues))
-            .range([0, histogramHeight]);
+            .range(function() {
+                switch (ranking) {
+                    case 'pval':
+                    case 'adjpval':
+                        return [histogramHeight, 0];
+                    default:
+                        return [0, histogramHeight];
+                }
+            }());
+
+        function getInternalSortValue(value) {
+            switch (value) {
+                case 'pval':
+                case 'adjpval':
+                    return 1 - value;
+                case 'ttest':
+                case 'logfold':
+                    return Math.abs(value);
+                default:
+                    return value;
+            }
+        }
 
         var heatmap = d3.select('#heatmap').append('svg')
             .attr('width', (width + margin.left + margin.right) * 4)
@@ -222,8 +244,6 @@ var SmartRHeatmap = (function(){
 
             function isSorted(arr) {
                 return arr.every(function (d, i) {
-                    return i === arr.length - 1 || arr[i][1] <= arr[i + 1][1];
-                }) || arr.every(function (d, i) {
                     return i === arr.length - 1 || arr[i][1] >= arr[i + 1][1];
                 });
             }
@@ -332,20 +352,20 @@ var SmartRHeatmap = (function(){
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
                 .on('click', function() { // FIXME: This is not working for all rankings
-                    var rowValues = [];
-                    for(var i = 0; i < significanceValues.length; i++) {
-                        var significanceValue = significanceValues[i];
-                        rowValues.push([i, Math.abs(significanceValue)]);
-                    }
+                    var rowValues = significanceValues.map(function(significanceValue, idx) {
+                        return [idx, significanceValue];
+                    });
+
                     if (isSorted(rowValues)) {
-                        rowValues.sort(function(a, b) { return a[1] - b[1]; });
+                        rowValues.sort(function(a, b) {
+                            return getInternalSortValue(a[1]) - getInternalSortValue(b[1]);
+                        });
                     } else {
-                        rowValues.sort(function(a, b) { return b[1] - a[1]; });
+                        rowValues.sort(function(a, b) {
+                            return getInternalSortValue(b[1]) - getInternalSortValue(a[1]);
+                        });
                     }
-                    var sortValues = [];
-                    for (i = 0; i < rowValues.length; i++) {
-                        sortValues.push(rowValues[i][0]);
-                    }
+                    var sortValues = rowValues.map(function(rowValue) { return rowValue[0]; });
                     updateRowOrder(sortValues);
                 });
 
@@ -448,13 +468,13 @@ var SmartRHeatmap = (function(){
             bar.enter()
                 .append('rect')
                 .attr('class', function(d) { return 'bar idx-' + d.idx ; })
-                .attr('width', function(d) { return histogramScale( Math.abs( d.significance) ) + _MINIMAL_WIDTH; })
+                .attr('width', function(d) { return histogramScale(d.significance) + _MINIMAL_WIDTH; })
                 .attr('height', gridFieldHeight)
-                .attr('x', function(d) { return - histogramScale( Math.abs( d.significance)) - _BAR_OFFSET; })
+                .attr('x', function(d) { return - histogramScale(d.significance) - _BAR_OFFSET; })
                 .attr('y', function(d) { return gridFieldHeight * d.idx; })
                 .style('fill', function(d) { return d.significance > 0 ? 'steelblue' : '#990000';})
                 .on('mouseover', function(d) {
-                    var html = 'FEATURE SIGNIFICANCE: ' + d.significance;
+                    var html = 'Ranking (' + ranking + '): ' + d.significance;
                     tooltip
                         .style('visibility', 'visible')
                         .html(html)
@@ -465,7 +485,7 @@ var SmartRHeatmap = (function(){
                     d3.select('.probe.probe-' +  probes[d.idx])
                         .classed('highlight', true);
                 })
-                .on('mouseout', function(d) {
+                .on('mouseout', function() {
                     tooltip.style('visibility', 'hidden');
                     d3.selectAll('.square').classed('squareHighlighted', false);
                     d3.selectAll('.probe').classed('highlight', false);
@@ -474,8 +494,8 @@ var SmartRHeatmap = (function(){
             bar.transition()
                 .duration(animationDuration)
                 .attr('height', gridFieldHeight)
-                .attr('width', function(d) { return histogramScale(Math.abs(d.significance)) + _MINIMAL_WIDTH ; })
-                .attr('x', function(d) { return - histogramScale(Math.abs(d.significance)) - _BAR_OFFSET; })
+                .attr('width', function(d) { return histogramScale(d.significance) + _MINIMAL_WIDTH ; })
+                .attr('x', function(d) { return - histogramScale(d.significance) - _BAR_OFFSET; })
                 .attr('y', function(d) { return gridFieldHeight * d.idx; })
                 .style('fill', function(d) { return d.significance > 0 ? 'steelblue' : '#990000'; });
 
@@ -731,7 +751,6 @@ var SmartRHeatmap = (function(){
 
         var colDendrogramVisible = false;
         var colDendrogram;
-
         function createColDendrogram() {
             var w = 200;
             var colDendrogramWidth = gridFieldWidth * numberOfClusteredColumns;
@@ -983,30 +1002,6 @@ var SmartRHeatmap = (function(){
             checked: true
         });
 
-        createD3Switch({
-            location: heatmap,
-            onlabel: 'Clustering rows ON',
-            offlabel: 'Clustering rows OFF',
-            x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-            y: 8 - margin.top + buttonHeight * 5 + padding * 2,
-            width: buttonWidth,
-            height: buttonHeight,
-            callback: switchRowClustering,
-            checked: rowClustering
-        });
-
-        createD3Switch({
-            location: heatmap,
-            onlabel: 'Clustering columns ON',
-            offlabel: 'Clustering columns OFF',
-            x: 2 - margin.left + padding * 1 + buttonWidth * 1,
-            y: 8 - margin.top + buttonHeight * 5 + padding * 2,
-            width: buttonWidth,
-            height: buttonHeight,
-            callback: switchColClustering,
-            checked: colClustering
-        });
-
         createD3Slider({
             location: heatmap,
             label: 'Zoom in %',
@@ -1021,21 +1016,11 @@ var SmartRHeatmap = (function(){
             trigger: 'dragend'
         });
 
-        var loadFeatureButton = createD3Button({
-            location: heatmap,
-            label: 'Load 100 add. feat.',
-            x: 2 - margin.left + padding * 1 + buttonWidth * 1,
-            y: 8 - margin.top + buttonHeight * 1 + padding * 1,
-            width: buttonWidth,
-            height: buttonHeight,
-            callback: loadRows
-        });
-
         var cuttoffButton = createD3Button({
             location: heatmap,
             label: 'Apply Cutoff',
             x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-            y: 8 - margin.top + buttonHeight * 2 + padding * 2,
+            y: 8 - margin.top + buttonHeight * 1 + padding * 1,
             width: buttonWidth,
             height: buttonHeight,
             callback: cutoff
@@ -1045,7 +1030,7 @@ var SmartRHeatmap = (function(){
             location: heatmap,
             label: 'Cutoff',
             x: 2 - margin.left + padding * 1 + buttonWidth * 1,
-            y: 8 - margin.top + buttonHeight * 2 + padding * 2 - 10,
+            y: 8 - margin.top + buttonHeight * 1 + padding * 1 - 10,
             width: buttonWidth,
             height: buttonHeight,
             min: 0,
@@ -1055,11 +1040,35 @@ var SmartRHeatmap = (function(){
             trigger: 'dragend'
         });
 
+        createD3Switch({
+            location: heatmap,
+            onlabel: 'Clustering rows ON',
+            offlabel: 'Clustering rows OFF',
+            x: 2 - margin.left + padding * 0 + buttonWidth * 0,
+            y: 8 - margin.top + buttonHeight * 3 + padding * 3,
+            width: buttonWidth,
+            height: buttonHeight,
+            callback: switchRowClustering,
+            checked: rowClustering
+        });
+
+        createD3Switch({
+            location: heatmap,
+            onlabel: 'Clustering columns ON',
+            offlabel: 'Clustering columns OFF',
+            x: 2 - margin.left + padding * 1 + buttonWidth * 1,
+            y: 8 - margin.top + buttonHeight * 3 + padding * 3,
+            width: buttonWidth,
+            height: buttonHeight,
+            callback: switchColClustering,
+            checked: colClustering
+        });
+
         createD3Dropdown({
             location: heatmap,
             label: 'Heatmap Coloring',
             x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-            y: 8 - margin.top + buttonHeight * 3 + padding * 3,
+            y: 8 - margin.top + buttonHeight * 2 + padding * 2,
             width: buttonWidth,
             height: buttonHeight,
             items: [
@@ -1090,7 +1099,7 @@ var SmartRHeatmap = (function(){
             location: heatmap,
             label: 'Heatmap Clustering',
             x: 2 - margin.left + padding * 1 + buttonWidth * 1,
-            y: 8 - margin.top + buttonHeight * 3 + padding * 3,
+            y: 8 - margin.top + buttonHeight * 2 + padding * 2,
             width: buttonWidth,
             height: buttonHeight,
             items: [
@@ -1120,7 +1129,6 @@ var SmartRHeatmap = (function(){
                 }
             ]
         });
-
     };
 
     return service;

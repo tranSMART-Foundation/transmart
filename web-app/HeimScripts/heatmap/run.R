@@ -39,6 +39,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
     "patientIDs"         = patientIDs,
     "probes"             = probes,
     "significanceValues" = significanceValues,
+    "ranking"            = ranking,
     "features"           = features,
     "extraFields"        = extraFields
   )
