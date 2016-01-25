@@ -6,7 +6,6 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery.tablesorter.min.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'd3.min.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'smartR.js']
-        resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'polyfill.min.js']
     }
 
     smartR_heatmap {
