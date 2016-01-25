@@ -676,6 +676,8 @@ var SmartRHeatmap = (function(){
             //    progressMessage: 'Calculating',
             //    successMessage: undefined
             //});
+            // TODO: Use ajax service to be provided by ajaxServices.js to re-compute analysis
+            // with new arguments (in this case filter for cut-off)
             $('#heim-btn-run-heatmap').click();
         }
 
