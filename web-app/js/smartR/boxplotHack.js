@@ -165,17 +165,17 @@ var visualization = function(json) {
         }
     }
     console.log('in visualization');
-    var results = json;
+    var results = JSON.parse(json);
     results.cohort2 = results.cohort2 === undefined ? {concept: 'undefined', subsets: []} : results.cohort2;
     console.log('XXXXXXXXX');
     console.log(results.cohort1);
     var margin = {top: 10, right: 60, bottom: 200, left: 60};
-    var width = jQuery("#etrikspanel").width() / 2 - 200 - margin.left - margin.right;
-    var height = jQuery("#etrikspanel").height() * 0.65 - margin.top - margin.bottom;
+    var width = 600//$("#smartRPanel").width() / 2 - 200 - margin.left - margin.right;
+    var height = 500//$("#smartRPanel").height() * 0.65 - margin.top - margin.bottom;
     var controls = d3.select('#controls').append('svg')
         .attr('width', '220px')
         .attr('height', height * 2);
-    var boxplot1 = d3.select("#boxplot1").append("svg")
+    var boxplot1 = d3.select("#boxplot-d3").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
@@ -185,7 +185,7 @@ var visualization = function(json) {
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    console.log(results);
+    //console.log(results);
     var x1 = d3.scale.ordinal()
         .domain(results.cohort1.subsets)
         .rangeBands([0, width], 1, 0.5);
