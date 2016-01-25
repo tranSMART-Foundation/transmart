@@ -114,26 +114,22 @@ var SmartRHeatmap = (function(){
 
         var selectedPatientIDs = [];
 
-        var histogramScale = d3.scale.linear()
+        var scale = d3.scale.linear()
             .domain(d3.extent(significanceValues))
-            .range(function() {
-                switch (ranking) {
-                    case 'pval':
-                    case 'adjpval':
-                        return [histogramHeight, 0];
-                    default:
-                        return [0, histogramHeight];
-                }
-            }());
+            .range((ranking === 'pval' || ranking === 'adjpval') ? [histogramHeight, 0] : [0, histogramHeight]);
+
+        var histogramScale = function(value) {
+            return (ranking === 'ttest' || ranking === 'logfold') ? scale(Math.abs(value)) : scale(value);
+        };
 
         function getInternalSortValue(value) {
-            switch (value) {
+            switch (ranking) {
                 case 'pval':
                 case 'adjpval':
                     return 1 - value;
                 case 'ttest':
                 case 'logfold':
-                    return Math.abs(value);
+                    return value < 0 ? 1 / value : value;
                 default:
                     return value;
             }
@@ -351,19 +347,15 @@ var SmartRHeatmap = (function(){
                 .attr('y', -2 - gridFieldHeight)
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
-                .on('click', function() { // FIXME: This is not working for all rankings
+                .on('click', function() {
                     var rowValues = significanceValues.map(function(significanceValue, idx) {
-                        return [idx, significanceValue];
+                        return [idx, getInternalSortValue(significanceValue)];
                     });
 
                     if (isSorted(rowValues)) {
-                        rowValues.sort(function(a, b) {
-                            return getInternalSortValue(a[1]) - getInternalSortValue(b[1]);
-                        });
+                        rowValues.sort(function(a, b) { return a[1] - b[1]; });
                     } else {
-                        rowValues.sort(function(a, b) {
-                            return getInternalSortValue(b[1]) - getInternalSortValue(a[1]);
-                        });
+                        rowValues.sort(function(a, b) { return b[1] - a[1]; });
                     }
                     var sortValues = rowValues.map(function(rowValue) { return rowValue[0]; });
                     updateRowOrder(sortValues);
@@ -375,7 +367,6 @@ var SmartRHeatmap = (function(){
                 .attr('y', -2 - gridFieldHeight)
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight);
-
 
             var selectText = selectItems.selectAll('.selectText')
                 .data(patientIDs, function(d) { return d; });
@@ -494,7 +485,7 @@ var SmartRHeatmap = (function(){
             bar.transition()
                 .duration(animationDuration)
                 .attr('height', gridFieldHeight)
-                .attr('width', function(d) { return histogramScale(d.significance) + _MINIMAL_WIDTH ; })
+                .attr('width', function(d) { return histogramScale(d.significance) + _MINIMAL_WIDTH; })
                 .attr('x', function(d) { return - histogramScale(d.significance) - _BAR_OFFSET; })
                 .attr('y', function(d) { return gridFieldHeight * d.idx; })
                 .style('fill', function(d) { return d.significance > 0 ? 'steelblue' : '#990000'; });
