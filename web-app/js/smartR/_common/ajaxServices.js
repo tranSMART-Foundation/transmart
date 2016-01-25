@@ -25,9 +25,11 @@ smartR.ajaxServices = function(basePath, workflow) {
             data: JSON.stringify( {
                 workflow: workflow
             })
-        }).then(function(response) {
+        })
+            .pipe(function(response) {
             return response.sessionId;
-        }).done(function(sessionId) {
+            }, transformAjaxFailure)
+            .done(function(sessionId) {
             state.sessionId = sessionId;
         });
     };
@@ -47,9 +49,9 @@ smartR.ajaxServices = function(basePath, workflow) {
             data: JSON.stringify( {
                 sessionId: sessionId
             })
-        }).done(function() {
-            state.sessionId = null;
-        });
+        })
+            .pipe(function(x) { return x; }, transformAjaxFailure)
+            .done(function() { state.sessionId = null; });
     };
 
     /*
@@ -88,12 +90,10 @@ smartR.ajaxServices = function(basePath, workflow) {
 
         /* schedule checks and replace promise */
         return runRequest
-            .then(function(d) {
+            .pipe(function(d) {
                 taskData.executionId = d.executionId;
                 return _checkStatus(taskData.executionId, CHECK_DELAY);
-            }, function(jqXHR, textStatus, errorThrown) {
-                return errorThrown;
-            });
+            }, transformAjaxFailure);
     };
 
     function _setCancellationForAjaxCall(ajax) {
@@ -114,8 +114,8 @@ smartR.ajaxServices = function(basePath, workflow) {
     function _setStatusRequestTimeout(funcToCall, delay /*, ... */) {
         var defer = jQuery.Deferred();
         var promise = defer.promise();
-        var restOfArguments = Array.prototype.slice.call(arguments)
-            .splice(2); // arguments after delay
+            var restOfArguments = Array.prototype.slice.call(arguments)
+                .splice(2); // arguments after delay
 
         function _setStatusRequestTimeout_wrappedFunc() {
             // we cannot abort by calling clearTimeout() anymore
@@ -126,8 +126,9 @@ smartR.ajaxServices = function(basePath, workflow) {
             // but let's cover the case where it throws
             var result;
             try {
-                result = funcToCall.apply(undefined, restOfArguments);
-                defer.resolve(result);
+                result = funcToCall.apply(undefined, restOfArguments); // promise
+                result.done(function(x) { defer.resolve(x); });
+                result.fail(function(x) { defer.reject(x); });
             } catch (e) {
                 defer.fail(e);
             }
@@ -169,7 +170,7 @@ smartR.ajaxServices = function(basePath, workflow) {
         state.currentRequestAbort = function() { ajax.abort(); };
         ajax.always(function() { state.currentRequestAbort = NOOP_ABORT; });
 
-        return ajax.then(function (d) {
+        return ajax.pipe(function (d) {
             if (d.state === 'FINISHED') {
                 return d;
             } else if (d.state === 'FAILED') {
@@ -182,11 +183,15 @@ smartR.ajaxServices = function(basePath, workflow) {
                 return _setStatusRequestTimeout(
                     _checkStatus, delay, executionId, delay);
             }
-        }).fail(function(jqXHR, textStatus, errorThrown) {
-            return errorThrown;
-        });
+        }, transformAjaxFailure);
     }
 
+    function transformAjaxFailure(jqXHR, textStatus, errorThrown) {
+        return {
+            status: jqXHR.status,
+            statusText: jqXHR.statusText
+        };
+    }
 
     result.downloadJsonFile = function(executionId, filename) {
         return jQuery.ajax({

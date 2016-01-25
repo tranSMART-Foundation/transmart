@@ -34,3 +34,5 @@
 /production
 *.DS_Store
 /SmartR.todo
+
+/node_modules

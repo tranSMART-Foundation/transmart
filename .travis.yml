@@ -13,6 +13,7 @@ cache:
   directories:
     - $HOME/.m2
     - $HOME/rserve
+    - node_modules
 
 jdk:
   - oraclejdk7
@@ -30,6 +31,7 @@ install:
   - maybe_make_inline_grails_dep $(travis_get_owner)/transmart-core-db core-db . transmart-core-db-tests
   - make -C ~/transmart-data/env ../vars
   - install_rserve ~/transmart-data
+  - npm install
 
 before_script:
   - start_rserve

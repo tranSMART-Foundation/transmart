@@ -73,6 +73,7 @@ grails.project.dependency.resolution = {
             export = false
         }
         test ':functional-test:2.0.0'
+        test ':karma-test-runner:0.2.4'
 
         // core-db doesn't export hibernate as dep as it was builtin in 2.2.4
         //runtime ':hibernate:3.6.10.16'
