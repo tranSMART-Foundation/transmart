@@ -709,7 +709,7 @@ var SmartRHeatmap = (function(){
                     .style('fill', function(d) {
                         switch (d.TYPE) {
                             case 'binary':
-                                return featureColorSetBinary[d.VALUE - 1];
+                                return featureColorSetBinary[d.VALUE];
                             case 'numerical':
                                 colorScale.range(featureColorSetSequential);
                                 return colorScale(1 / (1 + Math.pow(Math.E, -d.ZSCORE)));
@@ -821,17 +821,11 @@ var SmartRHeatmap = (function(){
                     return 'translate(' + (width + spacing + h - d.y) + ',' + d.x + ')';
                 }).on('click', function (d) {
                     var leafs = d.index.split(' ');
-                    var genes = [];
-                    for (var i = 0; i < leafs.length; i++) {
-                        var gene = geneSymbols[leafs[i]];
-                        genes.push(gene);
-                    }
-
-                    var geneList = genes.join(' ');
+                    var genes = leafs.map(function(leaf) { return geneSymbols[leaf]; });
                     $.ajax({
                         url: 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi',
                         type: 'POST',
-                        timeout: '10000',
+                        timeout: '5000',
                         async: false,
                         data: {
                             section: 'upload_gene_lists_general',
@@ -840,7 +834,7 @@ var SmartRHeatmap = (function(){
                             Category1: 'Human',
                             gene_list_1: 'gene_list_1',
                             SubCat1: 'hgnc_symbol',
-                            attachment1: geneList
+                            attachment1: genes.join(' ')
                         }
                     }).done(function (serverAnswer) {
                         var sessionID = serverAnswer.match(/tmp_\d+/)[0];
