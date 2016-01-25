@@ -656,17 +656,19 @@ var SmartRHeatmap = (function(){
                 .classed('cuttoffHighlight', false);
             d3.selectAll('.bar')
                 .classed('cuttoffHighlight', false);
-            for (var i = maxRows - 1; i >= maxRows - cutoff; i--) {
-                d3.selectAll('.square.uid-' +  uids[i])
-                    .classed('cuttoffHighlight', true);
-                d3.select('.bar.idx-' +  i)
-                    .classed('cuttoffHighlight', true);
-            }
+            d3.selectAll('.bar')
+                .map(function(d) { return [d.idx, histogramScale(d.significance)]; }) // This line is a bit hacky
+                .sort(function(a, b) { return a[1] - b[1]; })
+                .filter(function(d, i) { return i < cutoff; })
+                .each(function(d) {
+                    d3.select('.bar.idx-' + d[0]).classed('cuttoffHighlight', true);
+                    d3.selectAll('.square.probe-' + probes[d[0]]).classed('cuttoffHighlight', true);
+                });
+            $('#txtMaxRow').val(maxRows - cutoff - 1);
         }
 
         function cutoff() {
-            cuttoffButton.select('text').text('Loading...');
-            loadRows(maxRows - cutoffLevel);
+            $('#heim-btn-run-heatmap').click();
         }
 
         function reloadDendrograms() {
@@ -936,28 +938,6 @@ var SmartRHeatmap = (function(){
             }
             lastUsedClustering = clustering;
         }
-
-        function loadRows(nrows) {
-            var maxRows = nrows === undefined ? probes.length + 100 : nrows;
-            var data = prepareFormData();
-            data = addSettingsToData(data, { maxRows: maxRows });
-            loadFeatureButton.select('text').text('Loading...');
-            $.ajax({
-                url: pageInfo.basePath + '/SmartR/recomputeOutputDIV',
-                type: 'POST',
-                timeout: '600000',
-                data: data
-            }).done(function(serverAnswer) {
-                $('#outputDIV').html(serverAnswer);
-                loadFeatureButton.select('text').text('Load 100 additional rows');
-                cuttoffButton.select('text').text('Apply Cutoff');
-            }).fail(function() {
-                $('#outputDIV').html('An unexpected error occurred. This should never happen. Ask your administrator for help.');
-                loadFeatureButton.select('text').text('Load 100 additional rows');
-                cuttoffButton.select('text').text('Apply Cutoff');
-            });
-        }
-
 
         function switchRowClustering() {
             rowClustering = !rowClustering;

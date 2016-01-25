@@ -456,7 +456,7 @@ var HeatmapView = (function(){
         var table = tmpl.render(data);
         $('#heatmap').append(table);
         $('#markerSelectionTable').tablesorter();
-    }
+    };
 
     /**
      * Initialize helper
