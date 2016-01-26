@@ -1,7 +1,6 @@
 <r:require modules="smartR_boxplot"/>
 <r:layoutResources/>
 
-
 <div class="heim-analysis-container">
 
     <div id="heim-tabs" style="margin-top: 25px;">
@@ -80,34 +79,5 @@
 
     </div>
 </div>
-
-
-
-<script>
-    activateDragAndDrop('concept1');
-    activateDragAndDrop('concept2');
-    activateDragAndDrop('subsets1');
-    activateDragAndDrop('subsets2');
-
-    function register() {
-        registerConceptBox('concept1', [1], 'valueicon', 1, 1);
-        registerConceptBox('concept2', [2], 'valueicon', 0, 1);
-        registerConceptBox('subsets1', [1], 'alphaicon', 0, undefined);
-        registerConceptBox('subsets2', [2], 'alphaicon', 0, undefined);
-    }
-
-    function getSettings() {
-        return {};
-    }
-
-    function customSanityCheck() {
-        var conceptBox2 = Ext.get('concept2').dom;
-        if (conceptBox2.childNodes.length === 0 && ! isSubsetEmpty(2)) {
-            alert('You have specified a second cohort but you have not defined a second concept!\nConsider placing the same concept in the second box.');
-            return false;
-        }
-        return true;
-    }
-</script>
 
 <r:layoutResources/>
