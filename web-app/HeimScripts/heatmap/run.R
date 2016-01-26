@@ -1,6 +1,16 @@
 library(reshape2)
 library(limma)
 
+if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
+  remoteScriptDir <- "web-app/HeimScripts/heatmap"
+}
+
+utils <- paste(remoteScriptDir, "/utils.R", sep="")
+limmaUtils <- paste(remoteScriptDir, "/limmaUtils.R", sep="")
+source(utils)
+source(limmaUtils)
+
+
 SUBSET1REGEX <- "_s1$"  # Regex identifying columns of subset 1.
 markerTableJson <- "markerSelectionTable.json" # Name of the json file with limma outputs
 
@@ -57,15 +67,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   list(messages = msgs)
 }
 
-mergeDuplicates <- function(df) {
-  dupl.where <- duplicated(df$Row.Label)
-  dupl.rows <- df[dupl.where, ]
-  df <- df[! dupl.where, ]
-  uids <- paste(df$Row.Label, df$Bio.marker, sep="--")
-  uids[df$Row.Label == dupl.rows$Row.Label] <- paste(uids[df$Row.Label == dupl.rows$Row.Label], dupl.rows$Bio.marker[df$Row.Label == dupl.rows$Row.Label], sep="--")
-  df <- cbind(UID=uids, df[, -c(1,2)])
-  df
-}
+
 
 writeMarkerTable <- function(markerTable){
   colnames(markerTable) <- c("rowLabel", "biomarker",
@@ -74,24 +76,13 @@ writeMarkerTable <- function(markerTable){
   write(jsn, file = markerTableJson)
 }
 
-getMeasurements <- function(df) {
-  if (ncol(df) > 3){
-    return(df[, 3:ncol(df)])
-  }
-  else {
-    return( df[3] )
-  }
-}
+
 
 
 cleanUpLimmaOutput <- function() {
   if (file.exists(markerTableJson)) {
     file.remove(markerTableJson)
   }
-}
-
-hasTwoSubsets <- function(measurements) {
-  getSubset1Length(measurements) < ncol(measurements)
 }
 
 applyRanking <- function (df, ranking, max_rows) {
@@ -219,16 +210,6 @@ getRankingMethod <- function(rankingMethodName) {
   }
 }
 
-parseInput <- function() {
-  if (exists("preprocessed")) {
-    df <- preprocessed
-  }
-  else {
-    df <- mergeFetchedData(loaded_variables)
-  }
-
-  return(df)
-}
 
 toZscores <- function(measurements) {
   measurements <- scale(t(measurements))
@@ -265,30 +246,6 @@ applySorting <- function(df,sorting) {
   inds <- sort(colNames, index.return = TRUE)$ix
   measurements <- measurements[, inds]
   cbind(df[, c(1,2)], measurements)
-}
-
-getNode <- function(patientIDs) {
-  splittedIds <-
-    strsplit(patientIDs,"_") # During merge, which is always
-                             # run we append subset id, either
-                             # _s1 or _s2 to PATIENTID.
-  sapply(splittedIds, FUN = tail_elem,n = 2) # In proper patienid subset will
-                                             # always be  at the end.
-                                             # This select last but one elemnt
-                                             # - the node
-}
-
-getSubject <- function(patientIDs) {
-  splittedIds <- strsplit(patientIDs,"_")
-  sapply(splittedIds, FUN = discardNodeAndSubject)
-}
-
-discardNodeAndSubject <- function(label) {
-  label <- strsplit(label,"_")
-  endOfSubject <-
-    length(label) - 2  #last too elements are node and subset.
-  label <- label[1:endOfSubject]
-  paste(label, collapse = "_")
 }
 
 buildFields <- function(df) {
@@ -335,9 +292,6 @@ writeRunParams <- function(max_rows, sorting, ranking) {
   write(toJSON(params, pretty = TRUE), 'params.json')
 }
 
-fixString <- function(str) {
-  gsub("[^a-zA-Z0-9-]", "", str, perl = TRUE)
-}
 
 buildExtraFields <- function(df) {
   FEATURE <- rep("Cohort", nrow(df))
@@ -346,20 +300,6 @@ buildExtraFields <- function(df) {
   VALUE <- getSubset(PATIENTID)
   extraFields <- data.frame(FEATURE, PATIENTID, TYPE, VALUE,
                             stringsAsFactors = FALSE)
-}
-
-getSubset <- function(patientIDs) {
-  splittedIds <- strsplit(patientIDs,"_s") # During merge,
-                                           # which is always run we append subset id, either
-                                           # _s1 or _s2 to PATIENTID.
-  SUBSETS <- lapply(splittedIds, FUN = tail_elem) # In proper patienid
-                                                  # subset will always be  at the end.
-                                                  # This select last element after _s
-  SUBSETS <- sapply(SUBSETS, FUN = formatSubset)
-}
-
-tail_elem <- function(vect, n = 1) {
-  vect[length(vect) - n + 1]
 }
 
 #frontend expects 0 or 1 instead of 1 or 2 as subset number.
@@ -375,59 +315,6 @@ formatSubset <- function(subsetNumber) {
     ))
   }
 }
-
-
-### duplicated code from utils - when we get sourcing to work it will be moved
-
-mergeFetchedData <- function(listOfHdd){
-  df <- listOfHdd[[1]]
-  
-  #test if the different data.frames all contain the exact same set of probe IDs/metabolites/etc, independent of order.
-  row.Labels<- df$Row.Label
-  
-  for(i in 1:length(listOfHdd)){
-    if(!all(listOfHdd[[i]]$Row.Label %in% row.Labels) | !all(row.Labels %in% listOfHdd[[i]]$Row.Label) ){
-      assign("errors", "Mismatched probe_ids - different platform used?", envir = .GlobalEnv)
-    }
-  }
-  
-  #merge data.frames
-  expected.rowlen <- nrow(df)
-  labels <- names(listOfHdd)
-  df <- add.subset.label(df,labels[1])
-  
-  if(length(listOfHdd) > 1){
-    for(i in 2:length(listOfHdd)){
-      df2 <- listOfHdd[[i]]
-      label <- labels[i]
-      df2 <- add.subset.label(df2,label)
-      df <- merge(df, df2 ,by = c("Row.Label","Bio.marker"), all = T)
-      if(nrow(df) != expected.rowlen){
-        assign("errors", "Mismatched probe_ids - different platform used?", envir = .GlobalEnv)
-      }
-    }
-  }
-  return(df)
-}
-
-add.subset.label <- function(df,label) {
-  sample.names <- c("")
-  if (ncol(df) == 3) {
-    sample.names <-
-      colnames(df)[3] # R returns NA instead of column name
-                      # for colnames(df[,3:ncol(df)])
-  }else{
-    measurements <- getMeasurements(df)
-    sample.names <- colnames(measurements)
-  }
-  for (sample.name in sample.names) {
-    new.name <- paste(sample.name,label,sep = "_")
-    colnames(df)[colnames(df) == sample.name] <- new.name
-  }
-  return(df)
-}
-
-### end of duplicated code
 
 computeDendrogram <-
   function(distances, linkageMethod) {
@@ -565,43 +452,3 @@ addClusteringOutput <- function(jsn, measurements_arg) {
   )
   return(jsn)
 }
-
-### Limma part. It will be moved into a separate
-# module when we get R scripts sourcing to work here.
-
-getDEgenes <- function(df) {
-  measurements    <- getMeasurements(df)
-  enoughSamples   <- ncol(measurements) > 3 && ncol(measurements) - getSubset1Length(measurements) > 1
-  if (!enoughSamples){
-    stop("Not enough samples to find differentially expressed genes.")
-  }
-  design          <- getDesign(measurements)
-  contrast.matrix <- makeContrasts( S1-S2, levels = design )
-  fit             <- lmFit(measurements, design)
-  fit             <- contrasts.fit(fit, contrast.matrix)
-  fit             <- eBayes(fit)
-  contr           <- 1  #  We need a vector, not a df, so we'll do [, contr] on all stats
-  top.fit         <- data.frame (
-    logfold = fit$coefficients[, contr],
-    ttest   = fit$t[, contr],
-    pval    = fit$p.value[, contr],
-    adjpval = p.adjust(
-      p      = fit$p.value[, contr],
-      method ='fdr'),
-    bval    = fit$lods[, contr]
-  )
-  cbind(df[,1:2], top.fit)
-}
-
-getDesign <- function(measurements) {
-  subsets <- getSubset(colnames(measurements)) #s1 = 0, s2 = 1
-  classVectorS1 <- subsets + 1    #s1 = 1, s2 = 2
-  classVectorS2 <- - subsets + 2  #s1 = 2, s2 = 1
-  cbind(S1=classVectorS1, S2=classVectorS2)
-}
-
-getSubset1Length <- function(measurements) {
-  sum(grepl(pattern = SUBSET1REGEX, x = colnames(measurements))) # returns number of column names satisfying regexp.
-}
-
-### End of limma part
