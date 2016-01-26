@@ -22,22 +22,19 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
     col.names = TRUE
   )
   df          <- addStats(df, sorting, ranking, max_rows)
+  df          <- mergeDuplicates(df)
   df          <- df[1:min(max_rows, nrow(df)), ]  #  apply max_rows
   fields      <- buildFields(df)
   extraFields <- buildExtraFields(fields)
-  probes      <- df[, 1]
-  geneSymbols <- df[, 2]
-  #unique(fields["GENESYMBOL"])[,1] #[,1] in order to get a vector,
-  # otherwise we get a dataframe
+  uids        <- df[, 1]
   patientIDs  <- unique(fields["PATIENTID"])[,1]
 
   significanceValues <- df["SIGNIFICANCE"][,1]
   features <- unique(extraFields["FEATURE"])[,1]
   jsn <- list(
     "fields"             = fields,
-    "geneSymbols"        = geneSymbols,
     "patientIDs"         = patientIDs,
-    "probes"             = probes,
+    "uids"               = uids,
     "significanceValues" = significanceValues,
     "ranking"            = ranking,
     "features"           = features,
@@ -58,6 +55,16 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
 
   msgs <- c("Finished successfuly")
   list(messages = msgs)
+}
+
+mergeDuplicates <- function(df) {
+  dupl.where <- duplicated(df$Row.Label)
+  dupl.rows <- df[dupl.where, ]
+  df <- df[! dupl.where, ]
+  uids <- paste(df$Row.Label, df$Bio.marker, sep="--")
+  uids[df$Row.Label == dupl.rows$Row.Label] <- paste(uids[df$Row.Label == dupl.rows$Row.Label], dupl.rows$Bio.marker[df$Row.Label == dupl.rows$Row.Label], sep="--")
+  df <- cbind(UID=uids, df[, -c(1,2)])
+  df
 }
 
 writeMarkerTable <- function(markerTable){
@@ -219,6 +226,7 @@ parseInput <- function() {
   else {
     df <- mergeFetchedData(loaded_variables)
   }
+
   return(df)
 }
 
@@ -285,8 +293,7 @@ discardNodeAndSubject <- function(label) {
 
 buildFields <- function(df) {
   df <- melt(
-    df, na.rm = T, id = c("Row.Label",
-                          "Bio.marker",
+    df, na.rm = T, id = c("UID",
                           "SIGNIFICANCE",
                           "MEAN",
                           "SD")
@@ -299,7 +306,7 @@ buildFields <- function(df) {
   df["MEAN"]  <- NULL
   df["SD"]    <- NULL
   names(df)   <-
-    c("PROBE","GENESYMBOL","SIGNIFICANCE","PATIENTID","VALUE")
+    c("UID","SIGNIFICANCE","PATIENTID","VALUE")
   df["ZSCORE"] <- ZSCORE
   return(df)
 }
