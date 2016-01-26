@@ -88,12 +88,19 @@ smartR.ajaxServices = function(basePath, workflow) {
 
         _setCancellationForAjaxCall(runRequest);
 
-        /* schedule checks and replace promise */
-        return runRequest
+        /* schedule checks */
+        var promise = runRequest
             .pipe(function(d) {
                 taskData.executionId = d.executionId;
                 return _checkStatus(taskData.executionId, CHECK_DELAY);
             }, transformAjaxFailure);
+
+        promise.cancel = function timeoutRequest_cancel() {
+            // calling this method should by itself resolve the promise
+            state.currentRequestAbort();
+        };
+
+        return promise;
     };
 
     function _setCancellationForAjaxCall(ajax) {
@@ -139,17 +146,13 @@ smartR.ajaxServices = function(basePath, workflow) {
 
         state.currentRequestAbort = function() {
             clearTimeout(timeout);
-            state.currentRequestAbort = NOOP_ABORT;
-        };
-
-        promise.cancel = function timeoutRequest_cancel() {
-            // calling this method will by itself resolve the promise
-            // in case there's an ajax call pending.
-            state.currentRequestAbort();
-            // if there is a timeout pending, it won't though
             if (defer.state() == 'pending') {
-                defer.fail(new Error('Request was aborted'));
-        }
+                defer.reject({
+                    status: 0,
+                    statusText: 'abort'
+                });
+            }
+            state.currentRequestAbort = NOOP_ABORT;
         };
 
         return promise;

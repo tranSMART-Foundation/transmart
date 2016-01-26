@@ -15,13 +15,19 @@ describe('ajaxServices', function() {
         });
     }
 
-    function sharedExampleForPromiseFailureCustom(name, status, statusText) {
-        it(name, function() {
-            var spy = jasmine.createSpy();
-            this.promise.fail(spy);
-            expect(spy).toHaveBeenCalledWith({
-                status: status,
-                statusText: statusText
+    function sharedEnvironmentForPromiseCancellation(name) {
+        describe(name, function() {
+            beforeEach(function() {
+                this.promise.cancel();
+            });
+
+            it('the promise fails with status \'abort\'', function() {
+                var spy = jasmine.createSpy();
+                this.promise.fail(spy);
+                expect(spy).toHaveBeenCalledWith({
+                    status: 0,
+                    statusText: 'abort'
+                });
             });
         });
     }
@@ -99,7 +105,7 @@ describe('ajaxServices', function() {
         var taskData = {
             arguments: { arg1: 'arg1 value' },
             taskType: 'sampleTaskType',
-            phase: 'run',
+            phase: 'run'
         };
 
         beforeEach(function() {
@@ -127,6 +133,23 @@ describe('ajaxServices', function() {
             });
 
             sharedExampleForPromiseFailure('returns the error the server returned');
+        });
+
+        sharedEnvironmentForPromiseCancellation('the initial call is cancelled');
+
+        describe('another call to startScriptExecution is made', function() {
+            beforeEach(function() {
+                ajaxServices.startScriptExecution(taskData);
+            });
+
+            it('the first promise reports abortion', function() {
+                var spy = jasmine.createSpy();
+                this.promise.fail(spy);
+                expect(spy).toHaveBeenCalledWith({
+                    status: 0,
+                    statusText: 'abort'
+                });
+            });
         });
 
         describe('the initial call succeeds', function() {
@@ -178,6 +201,9 @@ describe('ajaxServices', function() {
                 });
             });
 
+            sharedEnvironmentForPromiseCancellation(
+                'the first call to /status is cancelled');
+
             describe('the first call to /status returns FINISHED', function() {
                 var response = {
                     state: 'FINISHED',
@@ -203,6 +229,15 @@ describe('ajaxServices', function() {
 
                 defineJsonResponse(response);
 
+                describe('the second call to /status is scheduled', function() {
+                    beforeEach(function() {
+                        jasmine.clock().tick(200 /* < 1000 */);
+                    });
+
+                    sharedEnvironmentForPromiseCancellation(
+                        'the second call /status is unscheduled');
+                });
+
                 it('makes a second call to /status 1 second later', function() {
                     expect(jasmine.Ajax.requests.count()).toBe(2);
                     jasmine.clock().tick(1001);
@@ -210,6 +245,15 @@ describe('ajaxServices', function() {
 
                     var url = this.mostRecentRequest().url.split('?')[0];
                     expect(url).toBe(BASE_PATH + '/ScriptExecution/status');
+                });
+
+                describe('the second call to /status is underway', function() {
+                    beforeEach(function() {
+                        jasmine.clock().tick(1001);
+                    });
+
+                    sharedEnvironmentForPromiseCancellation(
+                        'the second call /status is cancelled');
                 });
 
                 describe('the second call to /status returns FAILED', function() {
@@ -258,7 +302,7 @@ describe('ajaxServices', function() {
                         expect(spy).toHaveBeenCalledWith(response);
                     });
                 });
-            })
+            });
         });
     });
 });
