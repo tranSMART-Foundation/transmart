@@ -116,10 +116,10 @@ HeimExtJSHelper = (function(){
      */
     helper.concatenateConceptPath = function (arr) {
         var allconcepts = '';
-        arr.forEach(function (conceptPath) {
+        arr.forEach(function (conceptPath, idx) {
             var _str = helper.readConceptVariables(conceptPath.inputEl.attr('id'));
             if (_str.trim().length > 0 ) {
-                allconcepts += _str + '|';
+                allconcepts +=  (idx > 0 ? '|' : '') + _str;
             }
         });
         return allconcepts;

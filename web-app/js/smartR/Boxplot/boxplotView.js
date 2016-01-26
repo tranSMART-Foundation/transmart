@@ -43,7 +43,6 @@ window.smartR.BoxplotView = function (controller, model) {
         view.fetchBoxplotBtn.on('click', function () {
 
             var allConcepts = helper.concatenateConceptPath(view.concepts);
-            console.log('allConcepts', allConcepts);
 
             // TODO get other concepts
             view.controller.fetch({
