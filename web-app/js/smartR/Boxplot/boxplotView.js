@@ -10,30 +10,19 @@ window.smartR.BoxplotView = function (controller, model) {
     view.model = model;
     view.workflow = 'boxplot';
 
-    view.concept1 = {
-        inputEl : $('#concept1'),
-        clearBtn : $('#sr-concept1-btn')
-    };
-
-    view.subset1 = {
-        inputEl : $('#subset1'),
-        clearBtn : $('#sr-subset1-btn')
-    };
-
-    view.concept2 = {
-        inputEl : $('#concept2'),
-        clearBtn : $('#sr-concept2-btn')
-    };
-
-    view.subset2 = {
-        inputEl : $('#subset2'),
-        clearBtn : $('#sr-subset2-btn')
-    };
-
+    view.container = $('#heim-tabs');
+    view.concepts = [
+        { label: 'concept1', inputEl : $('#concept1'), clearBtn : $('#sr-concept1-btn')},
+        { label: 'subsets1', inputEl : $('#subsets1'), clearBtn : $('#sr-subset1-btn')},
+        { label: 'concept2', inputEl : $('#concept2'), clearBtn : $('#sr-concept2-btn')},
+        { label: 'subsets2', inputEl : $('#subsets2'), clearBtn : $('#sr-subset2-btn')}
+    ];
     view.fetchBoxplotBtn = $('#sr-btn-fetch-boxplot');
     view.runBoxplotBtn = $('#sr-btn-run-boxplot');
 
     view.init = function () {
+        // init tabs
+        view.container.tabs();
         bindUIActions();
     };
 
@@ -43,20 +32,22 @@ window.smartR.BoxplotView = function (controller, model) {
             event.data.empty();
         };
 
-        view.concept1.clearBtn.on('click', view.concept1.inputEl, _clearInputEl);
-        view.subset1.clearBtn.on('click', view.subset1.inputEl, _clearInputEl);
-        view.concept2.clearBtn.on('click', view.concept2.inputEl, _clearInputEl);
-        view.subset2.clearBtn.on('click', view.subset2.inputEl, _clearInputEl);
+        view.concepts.forEach(function (concept) {
+            concept.clearBtn.on('click', concept.inputEl, _clearInputEl);
+        });
 
         view.runBoxplotBtn.on('click', function () {
             view.controller.run();
         });
 
         view.fetchBoxplotBtn.on('click', function () {
-            var strConcept1 = helper.readConceptVariables(view.concept1.inputEl.attr('id'));
+
+            var allConcepts = helper.concatenateConceptPath(view.concepts);
+            console.log('allConcepts', allConcepts);
+
             // TODO get other concepts
             view.controller.fetch({
-                conceptPaths: strConcept1,
+                conceptPaths: allConcepts,
                 // CurrentSubsetIDs can contain undefined and null. Pass only nulls forward
                 resultInstanceIds : GLOBAL.CurrentSubsetIDs.map(function (v) { return v || null; }),
                 searchKeywordIds: ''

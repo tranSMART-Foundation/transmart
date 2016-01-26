@@ -109,6 +109,22 @@ HeimExtJSHelper = (function(){
         return  _retval;
     };
 
+    /**
+     *
+     * @param arr
+     * @param conceptPaths concecatenated strings
+     */
+    helper.concatenateConceptPath = function (arr) {
+        var allconcepts = '';
+        arr.forEach(function (conceptPath) {
+            var _str = helper.readConceptVariables(conceptPath.inputEl.attr('id'));
+            if (_str.trim().length > 0 ) {
+                allconcepts += _str + '|';
+            }
+        });
+        return allconcepts;
+    };
+
 
     return helper;
 })();
