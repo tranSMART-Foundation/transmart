@@ -1,13 +1,16 @@
 
 
-main <- function() {
-  excludedPatientIDs <- c("")
-  datapoints <- loaded_variables[[1]]
-  print(datapoints)
+main <- function(mapping = list(), excludedPatientIDs = c("")) {
+  numericalNode <- mapping["numeric"][[1]]
+  numericalNode <- mapping[numericalNode]
+  numericalNode <- paste(numericalNode,"s1",sep="_")
+  datapoints <- loaded_variables[numericalNode][[1]]
+  loaded_variables[numericalNode] <- NULL
   data <- list()
   points <- datapoints[,1:2]  #[c('patientID', 'value')]
-  names(points) <- c('patientID', 'value')
-  subsets <- list() 
+  colnames(points) <- c('patientID', 'value')
+  subsets <-  parseSubsets(loaded_variables)  #list()
+  print(subsets)
   patientIDs <- points$patientID
   concept <- "Concept name"#names(loaded_variables)[1]  #  datapoints$concept[1]
   data$concept <- concept
@@ -50,4 +53,23 @@ main <- function() {
   data$subsets <- nonEmptySubsets
   dfOut <- list(cohort1 = data)
   list(jsn = toJSON(dfOut, pretty=TRUE) )
+}
+
+dropEmpty <- function(df) {
+  df[df$value != "",]
+}
+
+parseSubsets <- function(subsetDfs) {
+  if (length(subsetDfs) == 0) {
+      return(list())
+  }
+  df <- subsetDfs[[1]]
+  df <- dropEmpty(df)
+  colnames(df) <- c('patientID', 'value')
+  for (subset in subsetDfs) {
+    colnames(subset) <- c('patientID', 'value')
+    subset <- dropEmpty(subset)
+    df <- rbind(df, subset)
+  }
+  df
 }
