@@ -110,8 +110,4 @@
     }
 </script>
 
-<g:javascript>
-    smartR.initAnalysis('boxplot');
-</g:javascript>
-
 <r:layoutResources/>

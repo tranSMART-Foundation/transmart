@@ -21,11 +21,11 @@ modules = {
 
     smartR_analysis_common {
         dependsOn 'smartR_base'
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'extjs-helper.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisInit.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'ajaxServices.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisModel.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'tabAnalysisView.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBox.js']
     }
 
     smartR_boxplot {
@@ -35,5 +35,6 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotModel.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotController.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotView.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplot.js']
     }
 }

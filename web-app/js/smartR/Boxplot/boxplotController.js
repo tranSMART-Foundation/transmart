@@ -2,32 +2,26 @@
 
 "use strict";
 
-window.smartR.BoxplotController = function(model, ajaxServices) {
+window.smartR.boxplotController = function(model, ajaxServices) {
 
-    var controller = this, helper = HeimExtJSHelper;
+    var controller = new window.smartR.BaseController(ajaxServices);
+
     controller.model = model;
     controller.service = ajaxServices;
 
-    controller.fetch = function (paramObj) {
-        var defer = $.Deferred();
-
-        // fetch data
-        ajaxServices.startScriptExecution({
-            arguments: helper.createAnalysisConstraints(paramObj),
-            taskType: 'fetchData'
-        }).done(function (d) {
-            // TODO return result to view layer
-            defer.resolve(d);
-        }).fail(function (jq, status, message) {
-            defer.reject(message);
+    controller.fetch = function(allConcepts, subsets) {
+        return ajaxServices.startScriptExecution({
+            arguments: {
+                conceptKeys: allConcepts,
+                resultInstanceIds: subsets,
+            },
+            taskType: 'fetchData',
+            phase: 'fetch',
         });
-
-        return defer.promise();
     };
 
     controller.run = function (paramObj) {
-        // TODO invoke run and retrieve json data
-        SmartRBoxplot.create(controller.model.json);
+
     };
 
     return controller;

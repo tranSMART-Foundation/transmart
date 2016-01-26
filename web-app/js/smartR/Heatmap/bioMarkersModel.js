@@ -1,29 +1,10 @@
 //# sourceURL=bioMarkersModel.js
 
 window.BioMarkersModel = (function() {
-    var Observable = function Observable() {
-        this.jquery = jQuery(this);
-    };
-    jQuery.extend(Observable.prototype, {
-        on: function() {
-            this.jquery.on.apply(this.jquery, arguments);
-            return this;
-        },
-        trigger: function() {
-            this.jquery.trigger.apply(this.jquery, arguments);
-            return this;
-        },
-        unbind: function() {
-            this.jquery.unbind.apply(this.jquery, arguments);
-            return this;
-        }
-    });
-
     var BioMarkersModel = function BioMarkersModel() {
-        Observable.call(this);
         this.selectedBioMarkers = {};
     };
-    BioMarkersModel.prototype = Object.create(Observable.prototype);
+    BioMarkersModel.prototype = Object.create(smartR.Observable.prototype);
     jQuery.extend(BioMarkersModel.prototype, {
         addBioMarker: function BioMarkersModel_addBioMarker(id, type, name, synonyms) {
             if (this.selectedBioMarkers.hasOwnProperty(id)) {
