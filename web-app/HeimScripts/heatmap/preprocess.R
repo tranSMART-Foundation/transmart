@@ -4,7 +4,14 @@ library("WGCNA")
 # Pre-processing parameters saved in global preprocessing_params
 # They can be considered fresh if the variable preprocessed exists
 
-main <- function(aggregate=FALSE){
+if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
+  remoteScriptDir <- "web-app/HeimScripts/heatmap"
+}
+
+utils <- paste(remoteScriptDir, "/utils.R", sep="")
+source(utils)
+
+main <- function(aggregate=FALSE) {
   msgs = c("")
   df <- mergeFetchedData(loaded_variables)
   good.input <- ncol(df) > 3 && nrow(df) > 0 && sum(df$Bio.marker != "") > 0 # more than one sample, contains any rows, non empty Bio.marker column.
@@ -27,7 +34,7 @@ main <- function(aggregate=FALSE){
   list(finished=T,messages=msgs)
 }
 
-aggregate.probes <- function(df){
+aggregate.probes <- function(df) {
   if(nrow(df)<2){
     stop("Cannot aggregate probes: there only is data for a single probe (ie. only one row of data) or 
         there is insufficient bio.marker information for the selected probes to be able to match the probes to 
@@ -64,63 +71,3 @@ This could mean the dataset used for aggregation is smaller than the initially s
   return(df[,c(lastColIndex, lastbutOne , 1:(lastbutOne-1))])
  
 }
-
-dropEmptyGene <- function(d){
-  d[!(d$Bio.marker == ""|
-        is.null(d$Bio.marker) |
-        is.na(d$Bio.marker) |
-        is.nan(d$Bio.marker)
-      ),]
-}
-
-
-### duplicated code from utils - when we get sourcing to work it will be moved
-
-
-mergeFetchedData <- function(listOfHdd){
-  df <- listOfHdd[[1]]
-  
-  #test if the different data.frames all contain the exact same set of probe IDs/metabolites/etc (independent of 
-  # order of occurrence).
-  row.Labels<- df$Row.Label
-  
-  for(i in 1:length(listOfHdd)){
-    if(!all(listOfHdd[[i]]$Row.Label %in% row.Labels) | !all(row.Labels %in% listOfHdd[[i]]$Row.Label) ){
-      assign("errors", "Mismatched probe_ids - different platform used?", envir = .GlobalEnv)
-    }
-  }
-  
-  #merge data.frames
-  expected.rowlen <- nrow(df)
-  labels <- names(listOfHdd)
-  df <- add.subset.label(df,labels[1])
-  
-  if(length(listOfHdd) > 1){
-    for(i in 2:length(listOfHdd)){
-      df2 <- listOfHdd[[i]]
-      label <- labels[i]
-      df2 <- add.subset.label(df2,label)
-      df <- merge(df, df2 ,by = c("Row.Label","Bio.marker"), all = T)
-      if(nrow(df) != expected.rowlen){
-        assign("errors", "Mismatched probe_ids - different platform used?", envir = .GlobalEnv)
-      }
-    }
-  }
-  return(df)
-}
-
-add.subset.label <- function(df,label){
-  sample.names <- c("")
-  if(ncol(df) == 3 ){
-    sample.names <- colnames(df)[3] # R returns NA instead of column name for colnames(df[,3:ncol(df)])
-  }else{
-  measurements <- df[,3:ncol(df)]
-  sample.names <- colnames(measurements)
-  }
-  for(sample.name in sample.names){
-    new.name <- paste(sample.name,label,sep="_")
-    colnames(df)[colnames(df)==sample.name] <- new.name
-  }
-  return(df)
-}
-
