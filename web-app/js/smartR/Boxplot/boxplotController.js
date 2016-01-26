@@ -13,10 +13,10 @@ window.smartR.boxplotController = function(model, ajaxServices) {
         return ajaxServices.startScriptExecution({
             arguments: {
                 conceptKeys: allConcepts,
-                resultInstanceIds: subsets,
+                resultInstanceIds: subsets
             },
             taskType: 'fetchData',
-            phase: 'fetch',
+            phase: 'fetch'
         });
     };
 
