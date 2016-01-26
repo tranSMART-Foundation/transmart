@@ -12,7 +12,8 @@ main <- function(mapping = list(), excludedPatientIDs = c("")) {
   subsets <-  parseSubsets(loaded_variables)  #list()
   print(subsets)
   patientIDs <- points$patientID
-  concept <- "Concept name"#names(loaded_variables)[1]  #  datapoints$concept[1]
+  concept <- rep(numericalNode,length(patientIDs))
+  points$concept <- concept
   data$concept <- concept
   data$globalMin <- min(points$value)
   data$globalMax <- max(points$value)
