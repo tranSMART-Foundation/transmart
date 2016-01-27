@@ -6,15 +6,14 @@
     <div id="heim-tabs" style="margin-top: 25px;">
 
         <ul>
-            <li class="heim-tab"><a href="#fragment-load"><span>Fetch</span></a></li>
-            <li class="heim-tab"><a href="#fragment-preprocess"><span>Preprocess</span></a></li>
+            <li class="heim-tab"><a href="#fragment-fetch"><span>Fetch</span></a></li>
             <li class="heim-tab"><a href="#fragment-run"><span>Run</span></a></li>
         </ul>
 
         %{--========================================================================================================--}%
         %{--Load Data--}%
         %{--========================================================================================================--}%
-        <div id="fragment-load">
+        <div id="fragment-fetch">
             <table>
                 <tr>
                     <td style='padding-right: 2em; padding-bottom: 1em'>
@@ -52,29 +51,18 @@
 
             <button id="sr-btn-fetch-boxplot" class="sr-action-button">Fetch Data</button>
 
-            <hr class="sr-divider">
-
             %{--result--}%
-            <div id="heim-run-output" class="sr-output-container"></div>
-
-
-            <div id="boxplot1"></div>
-            <div id="boxplot2"></div>
+            <div id="heim-fetch-output" class="sr-status-and-output-container"></div>
         </div>
 
-
-        %{--========================================================================================================--}%
-        %{--Preprocess--}%
-        %{--========================================================================================================--}%
-        <div id="fragment-preprocess">
-
-        </div>
 
         %{--========================================================================================================--}%
         %{--Run Analysis--}%
         %{--========================================================================================================--}%
         <div id="fragment-run">
             <button id="sr-btn-run-boxplot" class="sr-action-button">Run Boxplot</button>
+
+            <div id="heim-run-output" class="sr-status-and-output-container"></div>
         </div>
 
     </div>

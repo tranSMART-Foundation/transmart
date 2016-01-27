@@ -5,12 +5,14 @@
 window.smartR.boxplotView = function(controller,
                                      model,
                                      conceptFactory,
-                                     conceptBoxCollectionFactory) {
+                                     conceptBoxCollectionFactory,
+                                     executionStatusFactory) {
 
     var view = {};
 
     view.container = $('#heim-tabs');
 
+    /* component instantiation */
     var conceptBox1 = conceptFactory('concept1', 'sr-concept1-btn');
     var conceptBox2 = conceptFactory('concept2', 'sr-concept2-btn');
     var subsets1    = conceptFactory('subsets1', 'sr-subset1-btn');
@@ -22,6 +24,9 @@ window.smartR.boxplotView = function(controller,
         groups1: subsets1,
         groups2: subsets2,
     });
+
+    var executionStatus = executionStatusFactory();
+    /* END component instantiation */
 
     view.fetchBoxplotBtn = $('#sr-btn-fetch-boxplot');
     view.runBoxplotBtn = $('#sr-btn-run-boxplot');
@@ -45,7 +50,11 @@ window.smartR.boxplotView = function(controller,
         view.fetchBoxplotBtn.on('click', function() {
             var promise = window.smartR.util.getSubsetIds().pipe(function(subsets) {
                 return controller.fetch(conceptBoxCollection.getAllConcepts(), subsets);
+            }, function() {
+                return 'Could not create subsets.';
             });
+
+            executionStatus.bindPromise(promise, 'Fetching data');
 
             promise.done(function(data) {
                 window.alert(JSON.stringify(data));

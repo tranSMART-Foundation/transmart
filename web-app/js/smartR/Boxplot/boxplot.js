@@ -7,11 +7,13 @@ window.smartR.initBoxplotAnalysis = function initBoxplotAnalysis() {
     var ajaxServices = window.smartR.ajaxServices(window.pageInfo.basePath, 'boxplot');
     var conceptFactory = window.smartR.components.conceptBox;
     var conceptBoxCollectionFactory = window.smartR.components.conceptBoxCollection;
+    var executionStatusFactory = window.smartR.components.executionStatus;
 
     var model = window.smartR.boxplotModel();
     var controller = window.smartR.boxplotController(model, ajaxServices);
     var view = new window.smartR.boxplotView(controller, model,
-        conceptFactory, conceptBoxCollectionFactory);
+        conceptFactory, conceptBoxCollectionFactory, executionStatusFactory);
+
     view.init();
 };
 
