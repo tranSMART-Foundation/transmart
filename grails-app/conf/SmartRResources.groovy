@@ -26,6 +26,7 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisModel.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'tabAnalysisView.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBox.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBoxCollection.js']
     }
 
     smartR_boxplot {

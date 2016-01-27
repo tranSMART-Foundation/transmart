@@ -2,16 +2,26 @@
 
 "use strict";
 
-window.smartR.boxplotView = function(controller, model, conceptFactory) {
+window.smartR.boxplotView = function(controller,
+                                     model,
+                                     conceptFactory,
+                                     conceptBoxCollectionFactory) {
 
     var view = {};
 
     view.container = $('#heim-tabs');
 
-    view.conceptBox1 = conceptFactory.create('concept1', 'sr-concept1-btn');
-    view.conceptBox2 = conceptFactory.create('concept2', 'sr-concept2-btn');
-    view.subsets1    = conceptFactory.create('subsets1', 'sr-subset1-btn');
-    view.subsets2    = conceptFactory.create('subsets2', 'sr-subset2-btn');
+    var conceptBox1 = conceptFactory('concept1', 'sr-concept1-btn');
+    var conceptBox2 = conceptFactory('concept2', 'sr-concept2-btn');
+    var subsets1    = conceptFactory('subsets1', 'sr-subset1-btn');
+    var subsets2    = conceptFactory('subsets2', 'sr-subset2-btn');
+
+    var conceptBoxCollection = conceptBoxCollectionFactory({
+        box1: conceptBox1,
+        box2: conceptBox2,
+        groups1: subsets1,
+        groups2: subsets2,
+    });
 
     view.fetchBoxplotBtn = $('#sr-btn-fetch-boxplot');
     view.runBoxplotBtn = $('#sr-btn-run-boxplot');
@@ -33,22 +43,14 @@ window.smartR.boxplotView = function(controller, model, conceptFactory) {
         });
 
         view.fetchBoxplotBtn.on('click', function() {
-
-            // extend model properties
-            model['concepts1'] = view.conceptBox1.model;
-            model['concepts2'] = view.conceptBox2.model;
-            model['subsets1'] = view.subsets1.model;
-            model['subsets2'] = view.subsets2.model;
-
             var promise = window.smartR.util.getSubsetIds().pipe(function(subsets) {
-                return controller.fetch(model.getAllConcepts(), subsets);
+                return controller.fetch(conceptBoxCollection.getAllConcepts(), subsets);
             });
 
             promise.done(function(data) {
                 window.alert(JSON.stringify(data));
             });
         });
-
     }
 
     return view;
