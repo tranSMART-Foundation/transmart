@@ -6,7 +6,8 @@ window.smartR.boxplotView = function(controller,
                                      model,
                                      conceptFactory,
                                      conceptBoxCollectionFactory,
-                                     executionStatusFactory) {
+                                     executionStatusFactory,
+                                     downloadSvgFactory) {
 
     var view = {};
 
@@ -26,6 +27,8 @@ window.smartR.boxplotView = function(controller,
     });
 
     var executionStatus = executionStatusFactory();
+
+    var downloadSvg = downloadSvgFactory('heim-run-output', 'heim-btn-snapshot-image');
     /* END component instantiation */
 
     view.fetchBoxplotBtn = $('#sr-btn-fetch-boxplot');
