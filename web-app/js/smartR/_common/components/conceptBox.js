@@ -84,6 +84,8 @@ smartR.components.conceptBox = function(boxId, clearId) {
     };
 
     function dropOntoCategorySelection2(data) {
+        var foundLeafNode;
+
         if (!data.node.leaf) { // is folder
             for (var i = 0; i < data.node.childNodes.length; i++) {
                 var child = data.node.childNodes[i];
@@ -91,6 +93,7 @@ smartR.components.conceptBox = function(boxId, clearId) {
                     continue;
                 }
 
+                foundLeafNode = true;
                 this.conceptBoxModel.addConcept(window.convertNodeToConcept(child));
             }
 
