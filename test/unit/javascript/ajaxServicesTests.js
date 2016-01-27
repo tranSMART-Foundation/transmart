@@ -2,7 +2,16 @@ describe('ajaxServices', function() {
     var BASE_PATH = 'http://localhost/test_bpath';
     var TEST_WORKFLOW  = 'testwf';
     var ajaxServices = smartR.ajaxServices(BASE_PATH, TEST_WORKFLOW);
-    var standardFailure = { status: 400, statusText: 'Bad Request!' };
+    var standardFailure = {
+        status: 400,
+        statusText: 'Bad Request',
+        contextType: 'application/json',
+        responseText: JSON.stringify({
+            httpStatus: 400,
+            type: 'InvalidArgumentsException',
+            message: 'Parameter conceptKeys not passed',
+        }),
+    };
 
     function sharedExampleForPromiseFailure(name) {
         it(name, function() {
@@ -10,7 +19,8 @@ describe('ajaxServices', function() {
             this.promise.fail(spy);
             expect(spy).toHaveBeenCalledWith({
                 status: standardFailure.status,
-                statusText: standardFailure.statusText
+                statusText: standardFailure.statusText,
+                response: JSON.parse(standardFailure.responseText),
             });
         });
     }
@@ -26,7 +36,7 @@ describe('ajaxServices', function() {
                 this.promise.fail(spy);
                 expect(spy).toHaveBeenCalledWith({
                     status: 0,
-                    statusText: 'abort'
+                    statusText: 'abort',
                 });
             });
         });

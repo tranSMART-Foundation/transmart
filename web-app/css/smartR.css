@@ -20,10 +20,6 @@
     src: local('Roboto'), local('Roboto-Regular'), url(http://fonts.gstatic.com/s/roboto/v15/oMMgfZMQthOryQo9n22dcuvvDin1pK8aKteLpeZ5c0A.woff2) format('woff2');
 }
 
-.heim-fetch-err{
-    color: red;
-}
-
 #smartRPanel > * {
     font-family: 'Roboto', sans-serif; !important;
 }
@@ -65,6 +61,25 @@
 .heim-dropzone {display: table-cell; width: 400px; min-width: 200px;}
 .sr-drop-input { height: 100px; border: 1px solid #aaaaaa; margin-right: 5px; padding: 2px;border-radius: 5px;}
 .heim-action-button {padding: 5px;}
+div.sr-tab-status {
+    margin-bottom: 2em;
+}
+div.sr-status-progress {
+    color: darkgoldenrod;
+}
+div.sr-status-error {
+    color: red;
+}
+div.sr-status-and-output-container:before {
+    display: block;
+    content: "";
+    border-top: 1px dotted #8c8b8b;
+    margin: 2em 0 .5em 0;
+    clear: both;
+}
+div.sr-status-and-output-container:empty:before {
+    display: none;
+}
 .sr-output-container {padding-top: 20px; padding-bottom: 20px;}
 .sr-fetch-params-area {clear: both; margin-top: 20px;margin-bottom: 20px;}
 .sr-log-text {color: darkgreen}

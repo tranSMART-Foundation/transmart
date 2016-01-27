@@ -190,10 +190,15 @@ smartR.ajaxServices = function(basePath, workflow) {
     }
 
     function transformAjaxFailure(jqXHR, textStatus, errorThrown) {
-        return {
+        var ret = {
             status: jqXHR.status,
-            statusText: jqXHR.statusText
+            statusText: jqXHR.statusText,
         };
+        if (jqXHR.responseJSON !== undefined) {
+            ret.response = jqXHR.responseJSON;
+        }
+
+        return ret;
     }
 
     result.downloadJsonFile = function(executionId, filename) {
