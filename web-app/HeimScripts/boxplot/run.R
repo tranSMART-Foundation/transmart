@@ -1,18 +1,17 @@
 
 
-main <- function(mapping = list(), excludedPatientIDs = c("")) {
-  numericalNode <- mapping["numeric"][[1]]
-  numericalNode <- mapping[numericalNode]
-  numericalNode <- paste(numericalNode,"s1",sep="_")
-  datapoints <- loaded_variables[numericalNode][[1]]
-  loaded_variables[numericalNode] <- NULL
+main <- function( excludedPatientIDs = c("") ) {
+  input      <<- parseInput(loaded_variables)
+
+  subsets    <- parseSubsets(input$box2)
+  datapoints <- parseDataPoints(input$box1)
+
+  concept <- datapoints$concept[1]
+
   data <- list()
-  points <- datapoints[,1:2]  #[c('patientID', 'value')]
-  colnames(points) <- c('patientID', 'value')
-  subsets <-  parseSubsets(loaded_variables)  #list()
-  print(subsets)
+  points <- datapoints[,1:2]
+
   patientIDs <- points$patientID
-  concept <- rep(numericalNode,length(patientIDs))
   points$concept <- concept
   data$concept <- concept
   data$globalMin <- min(points$value)
@@ -25,7 +24,7 @@ main <- function(mapping = list(), excludedPatientIDs = c("")) {
       subset.values <- points[points$patientID %in% subset.points$patientID, ]
     } else {
       unassignedPatientIDs <- patientIDs[! patientIDs %in% assignedPatientIDs]
-      subset.points <- data.frame(patientID=unassignedPatientIDs, subset=rep(NA, length(unassignedPatientIDs)))			
+      subset.points <- data.frame(patientID=unassignedPatientIDs, subset=rep(NA, length(unassignedPatientIDs)))
       subset.values <- points[points$patientID %in% unassignedPatientIDs, ]
     }
     subset.points <- subset.points[! subset.points$patientID %in% excludedPatientIDs, ]
@@ -62,15 +61,54 @@ dropEmpty <- function(df) {
 
 parseSubsets <- function(subsetDfs) {
   if (length(subsetDfs) == 0) {
-      return(list())
+    return(list())
   }
   df <- subsetDfs[[1]]
-  df <- dropEmpty(df)
   colnames(df) <- c('patientID', 'value')
-  for (subset in subsetDfs) {
+  df <- dropEmpty(df)
+  if (length(subsetDfs) == 1) {
+    return(df)
+  }
+  for (i in 2:length(subsetDfs)) {
+    subset <- subsetDfs[[i]]
     colnames(subset) <- c('patientID', 'value')
     subset <- dropEmpty(subset)
     df <- rbind(df, subset)
   }
   df
+}
+
+parseDataPoints <- function(datapointsDfs) {
+  if (length(datapointsDfs) == 0) {
+    stop("No datapoints in box1 - cannot generate boxplot")
+  }
+  df <- datapointsDfs[[1]]
+  concept <- rep(colnames(df)[2], nrow(df))
+  colnames(df) <- c('patientID', 'value')
+  df$concept   <- concept
+  if (length(datapointsDfs) == 1) {
+    return(df)
+  }
+  for (i in 2:length(datapointsDfs)) {
+    pointsDF <- datapointsDfs[[i]]
+    concept            <- rep( colnames(pointsDF)[2], nrow(pointsDF) )
+    colnames(pointsDF) <- c('patientID', 'value')
+    pointsDF$concept   <- concept
+    df <- rbind(df, pointsDF)
+  }
+  df
+}
+
+parseInput <- function(input) {
+  dataLabels <- names(input)
+  splitted <- strsplit(dataLabels, "_")
+  sources <- sapply(splitted, function(x) { x[[1]] })
+  sources <- unique(sources)
+  labelsOrganizedBySource <- list()
+  for (dataSource in sources) {
+    regexpPattern <- paste(dataSource,"_",sep="")
+    indices <- grep(dataLabels, pattern =  regexpPattern)
+    labelsOrganizedBySource[[dataSource]] <- input[indices]
+  }
+  labelsOrganizedBySource
 }
