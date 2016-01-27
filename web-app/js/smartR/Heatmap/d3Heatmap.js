@@ -30,18 +30,16 @@ var SmartRHeatmap = (function(){
         var significanceValues = data.significanceValues;
         var ranking = data.ranking[0];
         var patientIDs = data.patientIDs;
-        var probes = data.probes;
-        var geneSymbols = data.geneSymbols;
+        var uids = data.uids;
         var numberOfClusteredColumns = data.numberOfClusteredColumns[0];
         var numberOfClusteredRows = data.numberOfClusteredRows[0];
-        var maxRows = 100;
         var warning = data.warnings === undefined ? '' : data.warnings;
 
         var rowClustering = false;
         var colClustering = false;
 
         var originalPatientIDs = patientIDs.slice();
-        var originalProbes = probes.slice();
+        var originalUIDs = uids.slice();
 
         function redGreen() {
             var colorSet = [];
@@ -110,7 +108,7 @@ var SmartRHeatmap = (function(){
         };
 
         var width = gridFieldWidth * patientIDs.length;
-        var height = gridFieldHeight * probes.length;
+        var height = gridFieldHeight * uids.length;
 
         var selectedPatientIDs = [];
 
@@ -145,7 +143,7 @@ var SmartRHeatmap = (function(){
             // gridFieldWidth/gridFieldHeight are adjusted outside as the zoom changes
             $(heatmap[0]).closest('svg')
                 .attr('width', margin.left + margin.right + (gridFieldWidth * patientIDs.length))
-                .attr('height', margin.top + margin.bottom + (gridFieldHeight * probes.length));
+                .attr('height', margin.top + margin.bottom + (gridFieldHeight * uids.length));
         }
         adjustDimensions();
 
@@ -167,15 +165,15 @@ var SmartRHeatmap = (function(){
 
         function updateHeatmap() {
             var square = squareItems.selectAll('.square')
-                .data(fields, function(d) { return 'patientID-' + d.PATIENTID + '-probe-' + d.PROBE; });
+                .data(fields, function(d) { return 'patientID-' + d.PATIENTID + '-uid-' + d.UID; });
 
             square.enter()
                 .append('rect')
                 .attr('class', function(d) {
-                    return 'square patientID-' + d.PATIENTID + ' probe-' + d.PROBE;
+                    return 'square patientID-' + d.PATIENTID + ' uid-' + d.UID;
                 })
                 .attr('x', function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
-                .attr('y', function(d) { return probes.indexOf(d.PROBE) * gridFieldHeight; })
+                .attr('y', function(d) { return uids.indexOf(d.UID) * gridFieldHeight; })
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
                 .attr('rx', 0)
@@ -183,7 +181,7 @@ var SmartRHeatmap = (function(){
                 .style('fill', 'white')
                 .on('mouseover', function(d) {
                     d3.select('.patientID.patientID-' +  d.PATIENTID).classed('highlight', true);
-                    d3.select('.probe.probe-' +  d.PROBE).classed('highlight', true);
+                    d3.select('.uid.uid-' +  d.UID).classed('highlight', true);
 
                     var html = '';
                     for(var key in d) {
@@ -197,19 +195,21 @@ var SmartRHeatmap = (function(){
                 })
                 .on('mouseout', function(d) {
                     d3.selectAll('.patientID').classed('highlight', false);
-                    d3.selectAll('.probe').classed('highlight', false);
-
+                    d3.selectAll('.uid').classed('highlight', false);
                     tooltip.style('visibility', 'hidden');
                 })
                 .on('click', function(d) {
-                    var url = 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + d.GENESYMBOL;
-                    window.open(url);
+                    var genes = d.UID.split("--");
+                    genes.each(function(gene) {
+                        var url = 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + gene;
+                        window.open(url);
+                    });
                 });
 
             square.transition()
                 .duration(animationDuration)
                 .attr('x', function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
-                .attr('y', function(d) { return probes.indexOf(d.PROBE) * gridFieldHeight; })
+                .attr('y', function(d) { return uids.indexOf(d.UID) * gridFieldHeight; })
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight);
 
@@ -233,8 +233,8 @@ var SmartRHeatmap = (function(){
             var colSortBox = colSortItems.selectAll('.colSortBox')
                 .data(patientIDs, function(d) { return d; });
 
-            function getValueForSquareSorting(patientID, probe) {
-                var square = d3.select('.square' + '.patientID-' + patientID + '.probe-' + probe);
+            function getValueForSquareSorting(patientID, uid) {
+                var square = d3.select('.square' + '.patientID-' + patientID + '.uid-' + uid);
                 return square[0][0] != null ? square.property('__data__').ZSCORE : Number.NEGATIVE_INFINITY;
             }
 
@@ -252,8 +252,8 @@ var SmartRHeatmap = (function(){
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
                 .on('click', function(patientID) {
-                    var rowValues = probes.map(function(probe, idx) {
-                        return [idx, getValueForSquareSorting(patientID, probe)];
+                    var rowValues = uids.map(function(uid, idx) {
+                        return [idx, getValueForSquareSorting(patientID, uid)];
                     });
                     if (isSorted(rowValues)) {
                         rowValues.sort(function(a, b) { return a[1] - b[1]; });
@@ -272,7 +272,7 @@ var SmartRHeatmap = (function(){
                 .attr('height', gridFieldHeight);
 
             var rowSortText = rowSortItems.selectAll('.rowSortText')
-                .data(probes, function(d) { return d; });
+                .data(uids, function(d) { return d; });
 
             rowSortText.enter()
                 .append('text')
@@ -291,7 +291,7 @@ var SmartRHeatmap = (function(){
                 });
 
             var rowSortBox = rowSortItems.selectAll('.rowSortBox')
-                .data(probes, function(d) { return d; });
+                .data(uids, function(d) { return d; });
 
             rowSortBox.enter()
                 .append('rect')
@@ -300,9 +300,9 @@ var SmartRHeatmap = (function(){
                 .attr('y', function(d, i) { return i * gridFieldHeight; })
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
-                .on('click', function(probe) {
+                .on('click', function(uid) {
                     var colValues = patientIDs.map(function(patientID, idx) {
-                        return [idx, getValueForSquareSorting(patientID, probe)];
+                        return [idx, getValueForSquareSorting(patientID, uid)];
                     });
                     if (isSorted(colValues)) {
                         colValues.sort(function(a, b) { return a[1] - b[1]; });
@@ -426,25 +426,22 @@ var SmartRHeatmap = (function(){
                         'translate(' + (gridFieldWidth / 2) + ',' + (-4 - gridFieldHeight * 2) + ')rotate(-45)';
                 });
 
-            var probe = labelItems.selectAll('.probe')
-                .data(probes, function(d) { return d; });
+            var uid = labelItems.selectAll('.uid')
+                .data(uids, function(d) { return d; });
 
-            probe.enter()
+            uid.enter()
                 .append('text')
-                .attr('class', function(d) { return 'probe text probe-' + d;})
+                .attr('class', function(d) { return 'uid text uid-' + d;})
                 .attr('x', width + gridFieldWidth + 7)
-                .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; })
+                .attr('y', function(d) { return uids.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; })
                 .attr('dy', '0.35em')
                 .style('text-anchor', 'start')
-                .text(function(d) {
-                    var i = probes.indexOf(d);
-                    return d + '  //  ' + geneSymbols[i];
-                });
+                .text(function(d) { return d; });
 
-            probe.transition()
+            uid.transition()
                 .duration(animationDuration)
                 .attr('x', width + gridFieldWidth + 7)
-                .attr('y', function(d) { return probes.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
+                .attr('y', function(d) { return uids.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
 
             var significanceIndexMap = $.map(significanceValues, function(d, i) {
                 return {significance: d, idx: i};
@@ -471,15 +468,15 @@ var SmartRHeatmap = (function(){
                         .html(html)
                         .style('left', mouseX() + 'px')
                         .style('top', mouseY() + 'px');
-                    d3.selectAll('.square.probe-' +  probes[d.idx])
+                    d3.selectAll('.square.uid-' +  uids[d.idx])
                         .classed('squareHighlighted', true);
-                    d3.select('.probe.probe-' +  probes[d.idx])
+                    d3.select('.uid.uid-' +  uids[d.idx])
                         .classed('highlight', true);
                 })
                 .on('mouseout', function() {
                     tooltip.style('visibility', 'hidden');
                     d3.selectAll('.square').classed('squareHighlighted', false);
-                    d3.selectAll('.probe').classed('highlight', false);
+                    d3.selectAll('.uid').classed('highlight', false);
                 });
 
             bar.transition()
@@ -636,7 +633,7 @@ var SmartRHeatmap = (function(){
             gridFieldWidth = 20 * zoomLevel;
             gridFieldHeight = 20 * zoomLevel;
             width = gridFieldWidth * patientIDs.length;
-            height = gridFieldHeight * probes.length;
+            height = gridFieldHeight * uids.length;
             heatmap
                 .attr('width', width + margin.left + margin.right)
                 .attr('height', width + margin.top + margin.bottom);
@@ -656,17 +653,30 @@ var SmartRHeatmap = (function(){
                 .classed('cuttoffHighlight', false);
             d3.selectAll('.bar')
                 .classed('cuttoffHighlight', false);
-            for (var i = maxRows - 1; i >= maxRows - cutoff; i--) {
-                d3.selectAll('.square.uid-' +  uids[i])
-                    .classed('cuttoffHighlight', true);
-                d3.select('.bar.idx-' +  i)
-                    .classed('cuttoffHighlight', true);
-            }
+            d3.selectAll('.bar')
+                .map(function(d) { return [d.idx, histogramScale(d.significance)]; }) // This line is a bit hacky
+                .sort(function(a, b) { return a[1] - b[1]; })
+                .filter(function(d, i) { return i < cutoff; })
+                .each(function(d) {
+                    d3.select('.bar.idx-' + d[0]).classed('cuttoffHighlight', true);
+                    d3.selectAll('.square.uid-' + uids[d[0]]).classed('cuttoffHighlight', true);
+                });
+            $('#txtMaxRow').val($('#txtMaxRow').val() - cutoff - 1);
         }
 
         function cutoff() {
-            cuttoffButton.select('text').text('Loading...');
-            loadRows(maxRows - cutoffLevel);
+            //HeatmapService.startScriptExecution({
+            //    taskType: 'run',
+            //    arguments: params,
+            //    onUltimateSuccess: HeatmapService.runAnalysisSuccess,
+            //    onUltimateFailure: HeatmapService.runAnalysisFailed,
+            //    phase: 'run',
+            //    progressMessage: 'Calculating',
+            //    successMessage: undefined
+            //});
+            // TODO: Use ajax service to be provided by ajaxServices.js to re-compute analysis
+            // with new arguments (in this case filter for cut-off)
+            $('#heim-btn-run-heatmap').click();
         }
 
         function reloadDendrograms() {
@@ -804,7 +814,7 @@ var SmartRHeatmap = (function(){
         function createRowDendrogram() {
             var h = 280;
             var rowDendrogramHeight = gridFieldWidth * numberOfClusteredRows;
-            var spacing = gridFieldWidth + getMaxWidth(d3.selectAll('.probe')) + 20;
+            var spacing = gridFieldWidth + getMaxWidth(d3.selectAll('.uid')) + 20;
 
             var cluster = d3.layout.cluster()
                 .size([rowDendrogramHeight, h])
@@ -831,7 +841,13 @@ var SmartRHeatmap = (function(){
                     return 'translate(' + (width + spacing + h - d.y) + ',' + d.x + ')';
                 }).on('click', function (d) {
                     var leafs = d.index.split(' ');
-                    var genes = leafs.map(function(leaf) { return geneSymbols[leaf]; });
+                    var genes = [];
+                    leafs.each(function(leaf) {
+                        var uid = uids[leaf];
+                        var split = uid.split("--");
+                        split.shift();
+                        split.each(function(gene) { genes.push(gene); });
+                    });
                     $.ajax({
                         url: 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi',
                         type: 'POST',
@@ -885,16 +901,13 @@ var SmartRHeatmap = (function(){
         }
 
         function updateRowOrder(sortValues) {
-            var sortedProbes = [];
-            var sortedGeneSymbols = [];
+            var sortedUIDs = [];
             var sortedSignificanceValues = [];
             sortValues.each(function(sortValue) {
-                sortedProbes.push(probes[sortValue]);
-                sortedGeneSymbols.push(geneSymbols[sortValue]);
+                sortedUIDs.push(uids[sortValue]);
                 sortedSignificanceValues.push(significanceValues[sortValue]);
             });
-            probes = sortedProbes;
-            geneSymbols = sortedGeneSymbols;
+            uids = sortedUIDs;
             significanceValues = sortedSignificanceValues;
             removeRowDendrogram();
             updateHeatmap();
@@ -906,7 +919,7 @@ var SmartRHeatmap = (function(){
         }
 
         function getInitialRowOrder() {
-            return probes.map(function(probe) { return originalProbes.indexOf(probe); });
+            return uids.map(function(uid) { return originalUIDs.indexOf(uid); });
         }
 
         function getInitialColOrder() {
@@ -936,28 +949,6 @@ var SmartRHeatmap = (function(){
             }
             lastUsedClustering = clustering;
         }
-
-        function loadRows(nrows) {
-            var maxRows = nrows === undefined ? probes.length + 100 : nrows;
-            var data = prepareFormData();
-            data = addSettingsToData(data, { maxRows: maxRows });
-            loadFeatureButton.select('text').text('Loading...');
-            $.ajax({
-                url: pageInfo.basePath + '/SmartR/recomputeOutputDIV',
-                type: 'POST',
-                timeout: '600000',
-                data: data
-            }).done(function(serverAnswer) {
-                $('#outputDIV').html(serverAnswer);
-                loadFeatureButton.select('text').text('Load 100 additional rows');
-                cuttoffButton.select('text').text('Apply Cutoff');
-            }).fail(function() {
-                $('#outputDIV').html('An unexpected error occurred. This should never happen. Ask your administrator for help.');
-                loadFeatureButton.select('text').text('Load 100 additional rows');
-                cuttoffButton.select('text').text('Apply Cutoff');
-            });
-        }
-
 
         function switchRowClustering() {
             rowClustering = !rowClustering;
@@ -1025,7 +1016,7 @@ var SmartRHeatmap = (function(){
             width: buttonWidth,
             height: buttonHeight,
             min: 0,
-            max: maxRows - 2,
+            max: $('#txtMaxRow').val() - 2,
             init: 0,
             callback: animateCutoff,
             trigger: 'dragend'
