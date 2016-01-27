@@ -54,7 +54,7 @@ window.smartR.components.executionStatus = function executionStatus() {
                 jQuery('.' + CLASS_FOR_STATUS_DIV).remove();
             } else {
                 getContainerOfTab(stage)
-                    .remove('.' + CLASS_FOR_STATUS_DIV);
+                    .children('.' + CLASS_FOR_STATUS_DIV).remove();
             }
         },
 
