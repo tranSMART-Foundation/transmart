@@ -3,7 +3,7 @@
 main <- function( excludedPatientIDs = c("") ) {
   input      <<- parseInput(loaded_variables)
 
-  subsets    <- parseSubsets(input$box2)
+  subsets    <- parseSubsets(input$groups1)
   datapoints <- parseDataPoints(input$box1)
 
   concept <- datapoints$concept[1]
