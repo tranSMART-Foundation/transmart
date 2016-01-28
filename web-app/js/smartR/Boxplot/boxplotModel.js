@@ -13,7 +13,7 @@ window.smartR.boxplotModel = function(components) {
     // expose runStep component
     model.getRunOutput = function BoxPlotModel_getRunOutput() {
         // yep, it's JSON encoded as a string inside JSON...
-        return JSON.parse(components.runStep.runOutput['jsn']);
+        return JSON.parse(components.runStep.runOutput['value']);
     };
     components.runStep.forwardEvent('runData', model);
 

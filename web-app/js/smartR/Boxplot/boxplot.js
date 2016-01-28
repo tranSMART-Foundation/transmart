@@ -20,7 +20,7 @@ window.smartR.initBoxplotAnalysis = function initBoxplotAnalysis() {
         groups2: subsets2,
     });
     var executionStatus = c.executionStatus();
-    var runStep = c.runStep(ajaxServices, executionStatus, ['jsn']);
+    var runStep = c.runStep(ajaxServices, executionStatus);
 
     var modelComponents = {
         conceptBoxCollection: conceptBoxCollection,

@@ -4,9 +4,7 @@
 
 window.smartR.components.runStep = function runStep(ajaxServices,
                                                     executionStatus,
-                                                    outputKeys, /* can be [] */
                                                     jsonFileToDownload /* can be empty */) {
-    outputKeys = outputKeys || [];
 
     var model = new window.smartR.Observable();
     var runOutput = {};
@@ -32,16 +30,6 @@ window.smartR.components.runStep = function runStep(ajaxServices,
                 .pipe(function(data) {
                     artifacts = data.result.artifacts;
 
-                    var missingKeys = outputKeys.filter(function(key) {
-                        return artifacts[key] === undefined;
-                    });
-
-                    if (missingKeys.length > 0) {
-                        var def = jQuery.Deferred();
-                        def.reject('Error: not found in output: ' + missingKeys);
-                        return def.promise();
-                    }
-
                     if (jsonFileToDownload) {
                         if (artifacts.files.indexOf(jsonFileToDownload) == -1) {
                             var def = jQuery.Deferred();
@@ -61,9 +49,7 @@ window.smartR.components.runStep = function runStep(ajaxServices,
                         finalData.file = fileData;
                     }
 
-                    outputKeys.forEach(function(key) {
-                        finalData[key] = artifacts[key];
-                    });
+                    finalData['value'] = artifacts['value'];
 
                     model.runOutput = finalData;
                 });

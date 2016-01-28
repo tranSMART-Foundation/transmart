@@ -52,7 +52,7 @@ main <- function( excludedPatientIDs = c("") ) {
   }
   data$subsets <- nonEmptySubsets
   dfOut <- list(cohort1 = data)
-  list(jsn = toJSON(dfOut))
+  toJSON(dfOut)
 }
 
 dropEmpty <- function(df) {
