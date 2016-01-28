@@ -6,7 +6,6 @@ window.smartR.initBoxplotAnalysis = function initBoxplotAnalysis() {
 
     var ajaxServices = window.smartR.ajaxServices(window.pageInfo.basePath, 'boxplot');
     var executionStatusFactory = window.smartR.components.executionStatus;
-    var summaryTableFactory = window.smartR.components.summaryTable;
 
     var conceptBox1 = window.smartR.components.conceptBox('concept1', 'sr-concept1-btn');
     var conceptBox2 = window.smartR.components.conceptBox('concept2', 'sr-concept2-btn');
@@ -24,9 +23,7 @@ window.smartR.initBoxplotAnalysis = function initBoxplotAnalysis() {
     var downloadSvgFactory = window.smartR.components.svgDownload;
 
     var controller = window.smartR.boxplotController(model, ajaxServices);
-    var view = new window.smartR.boxplotView(controller, model,
-        conceptFactory, conceptBoxCollectionFactory, executionStatusFactory,
-        downloadSvgFactory);
+    var view = new window.smartR.boxplotView(controller, model, executionStatusFactory, downloadSvgFactory);
 
     view.init();
 };
