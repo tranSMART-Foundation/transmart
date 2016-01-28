@@ -28,6 +28,7 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBox.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBoxCollection.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'executionStatus.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'svgDownload.js']
     }
 
     smartR_boxplot {

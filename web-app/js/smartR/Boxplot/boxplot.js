@@ -21,9 +21,12 @@ window.smartR.initBoxplotAnalysis = function initBoxplotAnalysis() {
         subsets1: subsets1,
         subsets2: subsets2
     }, conceptBoxCollectionFactory);
+    var downloadSvgFactory = window.smartR.components.svgDownload;
 
     var controller = window.smartR.boxplotController(model, ajaxServices);
-    var view = new window.smartR.boxplotView(controller, model, executionStatusFactory, summaryTableFactory);
+    var view = new window.smartR.boxplotView(controller, model,
+        conceptFactory, conceptBoxCollectionFactory, executionStatusFactory,
+        downloadSvgFactory);
 
     view.init();
 };
