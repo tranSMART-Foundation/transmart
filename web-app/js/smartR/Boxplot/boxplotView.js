@@ -37,12 +37,12 @@ window.smartR.boxplotView = function(controller,
     };
 
     function bindUIActions() {
-        view.runBoxplotBtn.on('click', function() {
-            controller.run();
-        });
-
         view.fetchBoxplotBtn.on('click', function() {
             controller.fetch(model.getAllConcepts());
+        });
+
+        view.runBoxplotBtn.on('click', function() {
+            controller.run();
         });
     }
 

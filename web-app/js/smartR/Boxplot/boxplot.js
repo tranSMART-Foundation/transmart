@@ -13,6 +13,7 @@ window.smartR.initBoxplotAnalysis = function initBoxplotAnalysis() {
     var subsets2    = c.conceptBox();
 
     var executionStatus = c.executionStatus();
+    var fetchDataStep = c.fetchDataStep(ajaxServices, executionStatus.forController);
     var runStep = c.runStep(ajaxServices, executionStatus.forController);
 
 
@@ -31,6 +32,7 @@ window.smartR.initBoxplotAnalysis = function initBoxplotAnalysis() {
 
     var controllerComponents = {
         executionStatus: executionStatus.forController,
+        fetchDataStep: fetchDataStep.forController,
         runStep: runStep.forController,
     };
     var controller = window.smartR.boxplotController(model, ajaxServices, controllerComponents);

@@ -7,20 +7,10 @@ window.smartR.boxplotController = function(model, ajaxServices, components) {
     var controller = new window.smartR.BaseController(ajaxServices);
 
     controller.fetch = function(allConcepts) {
-        var promise = window.smartR.util.getSubsetIds().pipe(function(subsets) {
-            return ajaxServices.startScriptExecution({
-                arguments: {
-                    conceptKeys: allConcepts,
-                    resultInstanceIds: subsets
-                },
-                taskType: 'fetchData',
-                phase: 'fetch'
-            });
-        }, function() {
-            return 'Could not create subsets.';
-        });
-
-        components.executionStatus.bindPromise(promise, 'Fetching data');
+        // TODO: validation
+        components.fetchDataStep.run(allConcepts);
+        // TODO: call summary at the end:
+        // .done(function() { this.summary(); }.bind(this));
     };
 
     controller.summary = function (phase) {

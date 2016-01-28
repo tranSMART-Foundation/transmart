@@ -28,6 +28,7 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'executionStatus.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'svgDownload.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'runStep.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'fetchDataStep.js']
     }
 
     smartR_boxplot {
