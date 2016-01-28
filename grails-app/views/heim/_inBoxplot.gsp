@@ -37,7 +37,7 @@
                         NOTE: This window maps to the second cohort!<br/>
                         (Example: Age, Pulse, Blood Pressure)<br/>
                         <div id='concept2' class="queryGroupIncludeSmall"></div>
-                        <input type="button" class='txt' value="Clear Window" id="sr-subset-2">
+                        <input type="button" class='txt' value="Clear Window" id="sr-concept2-btn">
                     </td>
                     <td style='padding-right: 2em; padding-bottom: 1em'>
                         <mark>Step 4 (optional):</mark> Drop any number of concepts subsetting the choice made on the left into this window.<br/>
