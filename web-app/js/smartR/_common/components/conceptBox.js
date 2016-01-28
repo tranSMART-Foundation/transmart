@@ -2,7 +2,7 @@
 
 "use strict";
 
-smartR.components.conceptBox = function(boxId, clearId) {
+smartR.components.conceptBox = function() {
 
     /* MODEL */
     var conceptBoxModel = {
@@ -44,14 +44,15 @@ smartR.components.conceptBox = function(boxId, clearId) {
 
 
     /* VIEW */
-    function ConceptBoxView(boxId, clearId /* jquery single element */, conceptBoxModel) {
-        this.boxExtJs = Ext.get(boxId);
-        this.clearEl = jQuery('#' + clearId);
+    function ConceptBoxView(conceptBoxModel) {
         this.conceptBoxModel = conceptBoxModel;
     }
 
     jQuery.extend(ConceptBoxView.prototype, {
-        init: function ConceptBoxView_init() {
+        init: function ConceptBoxView_init(boxId, clearId) {
+            this.boxExtJs = Ext.get(boxId);
+            this.clearEl = jQuery('#' + clearId);
+
             /* bind UI elements */
             registerDropZone.call(this);
             this.clearEl.on('click', function() {
@@ -115,11 +116,14 @@ smartR.components.conceptBox = function(boxId, clearId) {
         }
     };
 
-    var conceptBoxView = new ConceptBoxView(boxId, clearId, conceptBoxModel);
-
-    conceptBoxView.init();
+    var conceptBoxView = new ConceptBoxView(conceptBoxModel);
 
     return {
-        getLabelledConcepts: conceptBoxModel.getLabelledConcepts.bind(conceptBoxModel),
+        forView: {
+            init: conceptBoxView.init.bind(conceptBoxView),
+        },
+        forModel: {
+            getLabelledConcepts: conceptBoxModel.getLabelledConcepts.bind(conceptBoxModel)
+        },
     };
 };

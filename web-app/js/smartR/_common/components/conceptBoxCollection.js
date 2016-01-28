@@ -11,14 +11,16 @@ window.smartR.components.conceptBoxCollection = function conceptBoxCollection(di
     }
 
     return {
-        getAllConcepts: function BoxPlotCollections_getAllConcepts() {
-            var res = {};
+        forModel: {
+            getAllConcepts: function BoxPlotCollections_getAllConcepts() {
+                var res = {};
 
-            Object.keys(dict).forEach(function(key) {
-                prefixObjectKeys(res, key + '_', dict[key].getLabelledConcepts());
-            });
+                Object.keys(dict).forEach(function(key) {
+                    prefixObjectKeys(res, key + '_', dict[key].getLabelledConcepts());
+                });
 
-            return res;
+                return res;
+            }
         }
     };
 };

@@ -2,13 +2,14 @@
 
 "use strict";
 
-window.smartR.components.svgDownload = function svgArea(containerId, buttonId) {
-    var ret = {};
+window.smartR.components.svgDownload = function svgArea() {
+    var svgDownload = {};
 
-    ret.init = function SvgDownload_init(containerId, buttonId) {
+    svgDownload.init = function SvgDownload_init(containerId, buttonId, svgSelector /* opt */) {
         this.containerEl = jQuery('#' + containerId);
         this.buttonEl = jQuery('#' + buttonId);
         this.buttonEl.on('click', downloadSVG.bind(this));
+        this.svgSelector = svgSelector || 'svg';
         deactivateButton.call(this);
         setupMutationObserver.call(this);
     };
@@ -31,16 +32,23 @@ window.smartR.components.svgDownload = function svgArea(containerId, buttonId) {
         clonedSvg.remove();
     };
 
+    function getSvgElement() {
+        return this.containerEl.find(this.svgSelector);
+    }
+
     function setupMutationObserver() {
         var observer = new MutationObserver(function() {
-            if (this.containerEl.children('svg').length > 0) {
+            if (getSvgElement.call(this).length > 0) {
                 activateButton.call(this);
             } else {
                 deactivateButton.call(this);
             }
         }.bind(this));
 
-        observer.observe(this.containerEl[0], { childList: true, });
+        observer.observe(this.containerEl[0], {
+            childList: true,
+            subtree: true,
+        });
     }
 
     function deactivateButton() {
@@ -53,7 +61,7 @@ window.smartR.components.svgDownload = function svgArea(containerId, buttonId) {
 
     // aux for downloadSVG
     function copyWithCollapsedCSS() {
-        var heatmapElement = this.containerEl.children('svg');
+        var heatmapElement = getSvgElement.call(this);
         var relevantProperties = [
             'fill-opacity', 'fill', 'stroke', 'font-size', 'font-family',
             'shape-rendering', 'stroke-width'
@@ -101,7 +109,7 @@ window.smartR.components.svgDownload = function svgArea(containerId, buttonId) {
         return clonedSvg;
     }
 
-    ret.init(containerId, buttonId);
-
-    return ret;
+    return {
+        forView: svgDownload,
+    };
 };

@@ -50,7 +50,7 @@ window.smartR.components.executionStatus = function executionStatus() {
         return ret;
     }
 
-    return {
+    var executionStatus = {
         clear: function StatusArea_clear(stage) {
             // clear everything if stage is not given
             if (!stage) {
@@ -92,4 +92,10 @@ window.smartR.components.executionStatus = function executionStatus() {
                 }.bind(this));
         },
     };
+
+    return {
+        forController: {
+            bindPromise: executionStatus.bindPromise.bind(executionStatus),
+        },
+    }
 };

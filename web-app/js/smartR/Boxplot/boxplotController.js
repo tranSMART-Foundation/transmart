@@ -2,22 +2,25 @@
 
 "use strict";
 
-window.smartR.boxplotController = function(model, ajaxServices, controllerComponents) {
+window.smartR.boxplotController = function(model, ajaxServices, components) {
 
     var controller = new window.smartR.BaseController(ajaxServices);
 
-    controller.fetch = function(allConcepts, subsets) {
-
-        model.lastFetchedLabels = Object.keys(allConcepts);
-
-        return ajaxServices.startScriptExecution({
-            arguments: {
-                conceptKeys: allConcepts,
-                resultInstanceIds: subsets
-            },
-            taskType: 'fetchData',
-            phase: 'fetch'
+    controller.fetch = function(allConcepts) {
+        var promise = window.smartR.util.getSubsetIds().pipe(function(subsets) {
+            return ajaxServices.startScriptExecution({
+                arguments: {
+                    conceptKeys: allConcepts,
+                    resultInstanceIds: subsets
+                },
+                taskType: 'fetchData',
+                phase: 'fetch'
+            });
+        }, function() {
+            return 'Could not create subsets.';
         });
+
+        components.executionStatus.bindPromise(promise, 'Fetching data');
     };
 
     controller.summary = function (phase) {
@@ -37,7 +40,7 @@ window.smartR.boxplotController = function(model, ajaxServices, controllerCompon
 
     controller.run = function (paramObj) {
         // TODO: validation?
-        controllerComponents.runStep.run();
+        components.runStep.run();
     };
 
     return controller;
