@@ -76,7 +76,7 @@ smartR.components.conceptBox = function() {
         if (data.node.leaf === false && !data.node.isLoaded()) {
             data.node.reload(function() {
                 dropOntoCategorySelection2.call(this, data);
-            });
+            }.bind(this));
         } else {
             dropOntoCategorySelection2.call(this, data);
         }
