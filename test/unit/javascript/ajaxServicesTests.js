@@ -1,6 +1,7 @@
 describe('ajaxServices', function() {
     var BASE_PATH = 'http://localhost/test_bpath';
     var TEST_WORKFLOW  = 'testwf';
+    var executionId = '27480883-9019-401b-9035-48ca4e87aa18';
     var ajaxServices = smartR.ajaxServices(BASE_PATH, TEST_WORKFLOW);
     var standardFailure = {
         status: 400,
@@ -50,6 +51,12 @@ describe('ajaxServices', function() {
                 responseText: JSON.stringify(data)
             });
         });
+    }
+
+    function addExecutionIdToResponse(data) {
+        var copy = jQuery.extend({}, data);
+        copy.executionId = executionId;
+        return copy;
     }
 
     beforeEach(function () {
@@ -163,7 +170,6 @@ describe('ajaxServices', function() {
         });
 
         describe('the initial call succeeds', function() {
-            var executionId = '27480883-9019-401b-9035-48ca4e87aa18';
             var response = { executionId: executionId };
 
             defineJsonResponse(response);
@@ -228,7 +234,7 @@ describe('ajaxServices', function() {
                 it('returns the status response data', function() {
                     var spy = jasmine.createSpy();
                     this.promise.done(spy);
-                    expect(spy).toHaveBeenCalledWith(response);
+                    expect(spy).toHaveBeenCalledWith(addExecutionIdToResponse(response));
                 });
             });
 
@@ -296,7 +302,7 @@ describe('ajaxServices', function() {
                         state: 'FINISHED',
                         result: {
                             successful: true,
-                            artifacts: ['foo']
+                            artifacts: ['foo'],
                         }
                     };
 
@@ -309,7 +315,7 @@ describe('ajaxServices', function() {
                     it('returns the status response data', function() {
                         var spy = jasmine.createSpy();
                         this.promise.done(spy);
-                        expect(spy).toHaveBeenCalledWith(response);
+                        expect(spy).toHaveBeenCalledWith(addExecutionIdToResponse(response));
                     });
                 });
             });

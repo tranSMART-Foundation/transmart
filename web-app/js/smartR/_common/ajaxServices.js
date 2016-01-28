@@ -175,6 +175,7 @@ smartR.ajaxServices = function(basePath, workflow) {
 
         return ajax.pipe(function (d) {
             if (d.state === 'FINISHED') {
+                d.executionId = executionId;
                 return d;
             } else if (d.state === 'FAILED') {
                 return jQuery.Deferred().reject({
