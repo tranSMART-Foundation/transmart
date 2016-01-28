@@ -6,10 +6,10 @@ window.smartR.boxplotController = function(model, ajaxServices) {
 
     var controller = new window.smartR.BaseController(ajaxServices);
 
-    controller.model = model;
-    controller.service = ajaxServices;
-
     controller.fetch = function(allConcepts, subsets) {
+
+        model.lastFetchedLabels = Object.keys(allConcepts);
+
         return ajaxServices.startScriptExecution({
             arguments: {
                 conceptKeys: allConcepts,
@@ -20,8 +20,23 @@ window.smartR.boxplotController = function(model, ajaxServices) {
         });
     };
 
-    controller.run = function (paramObj) {
+    controller.summary = function (phase) {
+        var _summaryObj = {};
+         ajaxServices.startScriptExecution({
+            arguments: {
+                phase: phase,
+                projection: 'log_intensity'
+            },
+            taskType: 'summary',
+            phase: phase
+        }).done(function (d) {
+             _summaryObj = d;
+         });
+        return _summaryObj;
+    };
 
+    controller.run = function (paramObj) {
+        // console.log('run');
     };
 
     return controller;
