@@ -7,6 +7,9 @@ window.smartR.components.executionStatus = function executionStatus() {
     var CLASS_FOR_PARENT_DIV = 'sr-status-and-output-container';
     var CLASS_FOR_STATUS_DIV = 'sr-tab-status';
 
+    var CLASS_FOR_PROGRESS = 'sr-status-progress';
+    var CLASS_FOR_ERROR = 'sr-status-error';
+
     function getCurrentStage() {
         var currentTabId = jQuery('#heim-tabs')
             .find('.ui-tabs-active')
@@ -80,12 +83,12 @@ window.smartR.components.executionStatus = function executionStatus() {
 
         bindPromise: function StatusArea_bindPromise(promise, progressMessage) {
             var finalContent = progressMessage + ', please wait<span class="blink_me">_</span>';
-            this.set(finalContent, ['sr-status-progress']);
+            this.set(finalContent, [CLASS_FOR_PROGRESS]);
 
             promise
                 .done(function() { this.clear(); }.bind(this))
                 .fail(function(error) {
-                    this.set(buildErrorMessage(error), ['sr-status-error']);
+                    this.set(buildErrorMessage(error), [CLASS_FOR_ERROR]);
                 }.bind(this));
         },
     };

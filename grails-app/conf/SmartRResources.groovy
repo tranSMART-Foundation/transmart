@@ -23,12 +23,11 @@ modules = {
         dependsOn 'smartR_base'
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisInit.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'ajaxServices.js']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisModel.js']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'tabAnalysisView.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBox.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBoxCollection.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'executionStatus.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'svgDownload.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'runStep.js']
     }
 
     smartR_boxplot {

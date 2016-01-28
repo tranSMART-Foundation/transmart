@@ -15,21 +15,26 @@ window.smartR.Observable = function Observable() {
     this.jquery = jQuery(this);
 };
 jQuery.extend(window.smartR.Observable.prototype, {
-    on: function() {
+    on: function Observable_on() {
         this.jquery = this.jquery || jQuery(this); // so it works if constructor isn't called
         this.jquery.on.apply(this.jquery, arguments);
         return this;
     },
-    trigger: function() {
+    trigger: function Observable_trigger() {
         this.jquery = this.jquery || jQuery(this);
         this.jquery.trigger.apply(this.jquery, arguments);
         return this;
     },
-    unbind: function() {
+    unbind: function Observable_unbind() {
         this.jquery = this.jquery || jQuery(this);
         this.jquery.unbind.apply(this.jquery, arguments);
         return this;
-    }
+    },
+    forwardEvent: function Observable_forwardEvent(event, target) {
+        this.jquery.on(event, function() {
+            target.trigger.apply(target, arguments);
+        });
+    },
 });
 
 window.smartR.BaseController = function BaseController(ajaxServices) {

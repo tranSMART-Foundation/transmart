@@ -3,26 +3,37 @@
 "use strict";
 
 window.smartR.initBoxplotAnalysis = function initBoxplotAnalysis() {
+    var c = window.smartR.components;
 
     var ajaxServices = window.smartR.ajaxServices(window.pageInfo.basePath, 'boxplot');
-    var executionStatusFactory = window.smartR.components.executionStatus;
+    var executionStatusFactory = c.executionStatus;
 
-    var conceptBox1 = window.smartR.components.conceptBox('concept1', 'sr-concept1-btn');
-    var conceptBox2 = window.smartR.components.conceptBox('concept2', 'sr-concept2-btn');
-    var subsets1    = window.smartR.components.conceptBox('subsets1', 'sr-subset1-btn');
-    var subsets2    = window.smartR.components.conceptBox('subsets2', 'sr-subset2-btn');
+    var conceptBox1 = c.conceptBox('concept1', 'sr-concept1-btn');
+    var conceptBox2 = c.conceptBox('concept2', 'sr-concept2-btn');
+    var subsets1    = c.conceptBox('subsets1', 'sr-subset1-btn');
+    var subsets2    = c.conceptBox('subsets2', 'sr-subset2-btn');
 
-    var conceptBoxCollectionFactory = window.smartR.components.conceptBoxCollection;
+    var conceptBoxCollection = c.conceptBoxCollection({
+        box1: conceptBox1,
+        box2: conceptBox2,
+        groups1: subsets1,
+        groups2: subsets2,
+    });
+    var executionStatus = c.executionStatus();
+    var runStep = c.runStep(ajaxServices, executionStatus);
 
-    var model = window.smartR.boxplotModel({
-        conceptBox1: conceptBox1,
-        conceptBox2: conceptBox2,
-        subsets1: subsets1,
-        subsets2: subsets2
-    }, conceptBoxCollectionFactory);
-    var downloadSvgFactory = window.smartR.components.svgDownload;
+    var modelComponents = {
+        conceptBoxCollection: conceptBoxCollection,
+        runStep: runStep.forModel,
+    };
+    var model = window.smartR.boxplotModel(modelComponents);
 
-    var controller = window.smartR.boxplotController(model, ajaxServices);
+    var controllerComponents = {
+        runStep: runStep.forController,
+    };
+    var controller = window.smartR.boxplotController(model, ajaxServices, controllerComponents);
+
+    var downloadSvgFactory = c.svgDownload;
     var view = new window.smartR.boxplotView(controller, model, executionStatusFactory, downloadSvgFactory);
 
     view.init();
