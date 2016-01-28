@@ -2,23 +2,20 @@
 
 "use strict";
 
-window.smartR.boxplotModel = function(components, conceptBoxCollectionFactory) {
-    var model = {};
+window.smartR.boxplotModel = function(components) {
+    var model = new window.smartR.Observable();
 
-    model.concepts1 = components.conceptBox1;
-    model.concepts2 = components.conceptBox2;
+    var conceptBoxCollection = components.conceptBoxCollection;
 
-    model.subsets1 = components.subsets1;
-    model.subsets2 = components.subsets2;
+    model.getAllConcepts =
+        conceptBoxCollection.getAllConcepts.bind(conceptBoxCollection);
 
-    var conceptBoxCollection = conceptBoxCollectionFactory({
-        box1: components.conceptBox1,
-        box2: components.conceptBox2,
-        groups1: components.subsets1,
-        groups2: components.subsets2
-    });
-
-    model.getAllConcepts = conceptBoxCollection.getAllConcepts;
+    // expose runStep component
+    model.getRunOutput = function BoxPlotModel_getRunOutput() {
+        // yep, it's JSON encoded as a string inside JSON...
+        return JSON.parse(components.runStep.runOutput['jsn']);
+    };
+    components.runStep.forwardEvent('runData', model);
 
     return model;
 };

@@ -1,3 +1,5 @@
+//# sourceURL=d3Boxplot.js
+
 var animationDuration = 1000;
 var tmpAnimationDuration = animationDuration;
 
@@ -10,7 +12,7 @@ function switchAnimation(checked) {
     }
 }
 
-var SmartRBoxplot = (function () {
+window.SmartRBoxplot = (function () {
 
     var service = {};
 
@@ -25,7 +27,9 @@ var SmartRBoxplot = (function () {
         //var height = jQuery("#etrikspanel").height() * 0.65 - margin.top - margin.bottom;
         var width = 640;
         var height = 480;
-        var controls = d3.select('#controls').append('svg')
+        var controls = d3.select('#controls')
+            .style('float', 'left')
+            .append('svg')
             .attr('width', '220px')
             .attr('height', height * 2);
         var boxplot1 = d3.select("#boxplot1").append("svg")

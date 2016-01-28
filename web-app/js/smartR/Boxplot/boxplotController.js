@@ -2,7 +2,7 @@
 
 "use strict";
 
-window.smartR.boxplotController = function(model, ajaxServices) {
+window.smartR.boxplotController = function(model, ajaxServices, controllerComponents) {
 
     var controller = new window.smartR.BaseController(ajaxServices);
 
@@ -36,7 +36,8 @@ window.smartR.boxplotController = function(model, ajaxServices) {
     };
 
     controller.run = function (paramObj) {
-        // console.log('run');
+        // TODO: validation?
+        controllerComponents.runStep.run();
     };
 
     return controller;

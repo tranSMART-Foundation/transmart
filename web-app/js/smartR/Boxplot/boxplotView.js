@@ -18,6 +18,7 @@ window.smartR.boxplotView = function(controller,
 
     view.fetchBoxplotBtn = $('#sr-btn-fetch-boxplot');
     view.runBoxplotBtn = $('#sr-btn-run-boxplot');
+    view.runOutputContainer = $('#heim-run-output');
 
     view.init = function() {
         // init controller
@@ -28,11 +29,14 @@ window.smartR.boxplotView = function(controller,
 
         // bind ui
         bindUIActions();
+
+        // watch model
+        watchModel();
     };
 
     function bindUIActions() {
         view.runBoxplotBtn.on('click', function() {
-            view.controller.run();
+            controller.run();
         });
 
         view.fetchBoxplotBtn.on('click', function() {
@@ -43,10 +47,17 @@ window.smartR.boxplotView = function(controller,
             });
 
             executionStatus.bindPromise(promise, 'Fetching data');
+        });
+    }
 
-            promise.done(function(data) {
-                window.alert(JSON.stringify(data));
-            });
+    function watchModel() {
+        model.on('runData', function() {
+            view.runOutputContainer
+                .empty()
+                .append($('<div id="controls">'))
+                .append($('<div id="boxplot1">'))
+                .append($('<div id="boxplot2">'));
+            window.SmartRBoxplot.create(model.getRunOutput());
         });
     }
 
