@@ -39,14 +39,23 @@ class RScriptExecutionTask extends AbstractTask {
     }
 
     private void injectScriptDir(RConnection conn) {
-        def remoteScriptDir = fileToLoad.getParentFile()
+        def remoteScriptDir = fileToLoad.getParentFile().getParentFile()  // We need the HeimScripts root
         String path = RUtil.escapeRStringContent(remoteScriptDir.absolutePath)
         runRCommand(conn, "remoteScriptDir <- \"$path\"")
+    }
+
+    private void sourceCoreUtils(RConnection conn) {
+        def remoteScriptDirRoot = fileToLoad.getParentFile().getParentFile()
+        File remoteCoreUtilsDir = new File(remoteScriptDirRoot, 'core')
+        File coreUtilsIndex = new File(remoteCoreUtilsDir, 'index.R')
+        runRCommand(conn, "source('" +
+                "${RUtil.escapeRStringContent(coreUtilsIndex.absolutePath)}')")
     }
 
     private REXP callR(RConnection conn) {
         runRCommand(conn, 'library(jsonlite)')
         injectScriptDir(conn)
+        sourceCoreUtils(conn)
         runRCommand(conn, "source('" +
                 "${RUtil.escapeRStringContent(fileToLoad.toString())}')")
         def namedArguments = arguments.collect { RFunctionArg arg ->
