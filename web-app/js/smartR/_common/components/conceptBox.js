@@ -37,7 +37,7 @@ smartR.components.conceptBox = function() {
                 result['n' + n++] = currentItem;
                 return result;
             }, {});
-        },
+        }
     };
 
     jQuery.extend(conceptBoxModel, smartR.Observable.prototype);
@@ -70,7 +70,7 @@ smartR.components.conceptBox = function() {
         var div = this.boxExtJs;
         var dtgI = new Ext.dd.DropTarget(div, {ddGroup: 'makeQuery'});
         dtgI.notifyDrop = dropOntoNodeSelection.bind(this);
-    };
+    }
 
     function dropOntoNodeSelection(source, e, data) {
         if (data.node.leaf === false && !data.node.isLoaded()) {
@@ -82,7 +82,7 @@ smartR.components.conceptBox = function() {
         }
 
         return true;
-    };
+    }
 
     function dropOntoCategorySelection2(data) {
         var foundLeafNode;
@@ -114,16 +114,16 @@ smartR.components.conceptBox = function() {
             var child = qc.dom.childNodes[i];
             qc.dom.removeChild(child);
         }
-    };
+    }
 
     var conceptBoxView = new ConceptBoxView(conceptBoxModel);
 
     return {
         forView: {
-            init: conceptBoxView.init.bind(conceptBoxView),
+            init: conceptBoxView.init.bind(conceptBoxView)
         },
         forModel: {
             getLabelledConcepts: conceptBoxModel.getLabelledConcepts.bind(conceptBoxModel)
-        },
+        }
     };
 };

@@ -23,6 +23,7 @@ modules = {
         dependsOn 'smartR_base'
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisInit.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'ajaxServices.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'initServices.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBox.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBoxCollection.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'executionStatus.js']
@@ -39,5 +40,12 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotController.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotView.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplot.js']
+    }
+
+    smartR_correlation {
+        dependsOn 'smartR_analysis_common'
+        resource url: [plugin: 'smart-r', dir: 'css', file: 'Correlation.css']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'd3Correlation.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'correlation.js']
     }
 }
