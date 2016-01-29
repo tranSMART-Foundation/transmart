@@ -2,7 +2,7 @@
 
 "use strict";
 
-window.smartR.components.fetchDataStep = function runStep(ajaxServices, executionStatus) {
+window.smartR.components.fetchDataStep = function fetchDataStep(ajaxServices, executionStatus) {
 
     var model = new window.smartR.Observable();
     var loadedVariables = [];
@@ -22,7 +22,6 @@ window.smartR.components.fetchDataStep = function runStep(ajaxServices, executio
                     resultInstanceIds: subsets
                 },
                 taskType: 'fetchData',
-                phase: 'fetch'
             });
         }, function() {
             return 'Could not create subsets.';

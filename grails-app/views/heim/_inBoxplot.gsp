@@ -60,7 +60,7 @@
         %{--Run Analysis--}%
         %{--========================================================================================================--}%
         <div id="fragment-run">
-            <button id="sr-btn-run-boxplot" class="sr-action-button">Run Boxplot</button>
+            <button id="sr-btn-run-boxplot" class="sr-action-button" disabled>Run Boxplot</button>
             <button id="heim-btn-snapshot-image" class="heim-action-button" disabled>Capture Heatmap</button>
 
             <div id="heim-run-output" class="sr-status-and-output-container"></div>

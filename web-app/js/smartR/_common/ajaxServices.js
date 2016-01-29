@@ -204,13 +204,13 @@ smartR.ajaxServices = function(basePath, workflow) {
 
     result.downloadJsonFile = function(executionId, filename) {
         return jQuery.ajax({
-            url: _urlForFile(executionId, filename),
+            url: this.urlForFile(executionId, filename),
             dataType: 'json'
         });
     };
 
 
-    function _urlForFile(executionId, filename) {
+    result.urlForFile = function AjaxServices_urlForFile(executionId, filename) {
         return basePath +
             '/ScriptExecution/downloadFile?sessionId=' +
             state.sessionId +

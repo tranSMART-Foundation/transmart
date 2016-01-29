@@ -15,6 +15,8 @@ window.smartR.boxplotView = function(controller,
     components.groups1.init('subsets1', 'sr-subset1-btn');
     components.groups2.init('subsets2', 'sr-subset2-btn');
 
+    components.summaryStats.init('heim-fetch-output');
+
     components.downloadSvg.init('heim-run-output', 'heim-btn-snapshot-image', '#boxplot1 svg');
     /* END component instantiation */
 
@@ -54,6 +56,12 @@ window.smartR.boxplotView = function(controller,
                 .append($('<div id="boxplot1">'))
                 .append($('<div id="boxplot2">'));
             window.SmartRBoxplot.create(model.getRunOutput());
+        });
+
+        /* activate run button only when we have variables loaded */
+        model.on('loadedVariables', function() {
+            view.runBoxplotBtn.prop('disabled',
+                model.loadedVariables.length === 0);
         });
     }
 
