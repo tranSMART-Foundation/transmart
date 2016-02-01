@@ -22,7 +22,6 @@ window.smartR.components.runStep = function runStep(ajaxServices,
             var taskData = {
                 arguments: args,
                 taskType: 'run',
-                phase: 'run',
             };
 
             var artifacts;

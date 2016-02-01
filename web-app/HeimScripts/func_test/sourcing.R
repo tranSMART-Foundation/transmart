@@ -1,7 +1,7 @@
+demo <- paste(remoteScriptDir, "/func_test/sourced.R", sep="")
+source(demo)
 
 main <- function() {
-    demo <- paste(remoteScriptDir, "/sourced.R", sep="")
-    source(demo)
     res <- testFun()
     list("shouldBeTest"=res)
 }

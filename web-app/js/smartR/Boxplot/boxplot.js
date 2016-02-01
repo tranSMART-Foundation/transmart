@@ -14,6 +14,7 @@ window.smartR.initBoxplotAnalysis = function initBoxplotAnalysis() {
 
     var executionStatus = c.executionStatus();
     var fetchDataStep = c.fetchDataStep(ajaxServices, executionStatus.forController);
+    var summaryStats = c.summaryStats(ajaxServices, executionStatus.forController, fetchDataStep.forModel, 'fetch');
     var runStep = c.runStep(ajaxServices, executionStatus.forController);
 
 
@@ -25,6 +26,8 @@ window.smartR.initBoxplotAnalysis = function initBoxplotAnalysis() {
     });
     var modelComponents = {
         conceptBoxCollection: conceptBoxCollection.forModel,
+        fetchDataStep: fetchDataStep.forModel,
+        summaryStats: summaryStats.forModel,
         runStep: runStep.forModel,
     };
     var model = window.smartR.boxplotModel(modelComponents);
@@ -33,6 +36,7 @@ window.smartR.initBoxplotAnalysis = function initBoxplotAnalysis() {
     var controllerComponents = {
         executionStatus: executionStatus.forController,
         fetchDataStep: fetchDataStep.forController,
+        summaryStats: summaryStats.forController,
         runStep: runStep.forController,
     };
     var controller = window.smartR.boxplotController(model, ajaxServices, controllerComponents);
@@ -44,6 +48,7 @@ window.smartR.initBoxplotAnalysis = function initBoxplotAnalysis() {
         box2: conceptBox2.forView,
         groups1: subsets1.forView,
         groups2: subsets2.forView,
+        summaryStats: summaryStats.forView,
         downloadSvg: downloadSvg.forView,
     };
     var view = new window.smartR.boxplotView(controller, model, viewComponents);

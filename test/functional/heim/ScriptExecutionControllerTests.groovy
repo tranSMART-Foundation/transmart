@@ -17,43 +17,14 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
     private static final String SAMPLE_DATA_TO_WRITE = 'sample data to write'
     private static final String DATA_FETCH_TASK_TYPE = DataFetchTaskFactory.FETCH_DATA_TASK_NAME
 
-    private Map runSampleR() {
-        String sessionId = createSession('func_test')
+
+    private Map runRScript(String name, Map arguments = [:], String workflow = 'func_test') {
+        String sessionId = createSession(workflow)
         post '/ScriptExecution/run', {
             body json: [
                     sessionId: sessionId,
-                    taskType: 'sample',
-                    arguments: [
-                            data_to_pass: SAMPLE_DATA_TO_PASS,
-                            data_to_write: SAMPLE_DATA_TO_WRITE,
-                    ]
-            ]
-        }
-
-        assertStatus 200
-        assertThat JSON, hasEntry(
-                equalTo('executionId'),
-                isA(String))
-
-        String taskId = JSON.executionId
-        get '/ScriptExecution/status?' + buildQueryParameters(
-                sessionId:         sessionId,
-                executionId:       taskId,
-                waitForCompletion: true,
-        )
-
-        [sessionId: sessionId, taskId: taskId]
-    }
-
-    private Map runSourcing() {
-        String sessionId = createSession('func_test')
-        post '/ScriptExecution/run', {
-            body json: [
-                    sessionId: sessionId,
-                    taskType: 'sourcing',
-                    arguments: [
-
-                    ]
+                    taskType:  name,
+                    arguments: arguments
             ]
         }
 
@@ -142,7 +113,11 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
 
 
     void testRun() {
-        runSampleR()
+        def args = [
+                data_to_pass: SAMPLE_DATA_TO_PASS,
+                data_to_write: SAMPLE_DATA_TO_WRITE,
+        ]
+        runRScript('sample', args)
 
         assertStatus 200
         assertThat JSON, allOf(
@@ -161,14 +136,23 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
     }
 
     void testSourcing() {
-        runSourcing()
+        runRScript('sourcing')
         assertStatus 200
         Map artifacts = JSON.result.artifacts
         assert artifacts['shouldBeTest'] == 'test'
     }
 
+    void testCoreUtils() {
+        runRScript('autosourcing')
+        assertStatus 200
+    }
+
     void testRetrieveFile() {
-        Map m = runSampleR()
+        def args = [
+                data_to_pass: SAMPLE_DATA_TO_PASS,
+                data_to_write: SAMPLE_DATA_TO_WRITE,
+        ]
+        def m = runRScript('sample', args)
 
         get '/ScriptExecution/downloadFile?' + buildQueryParameters(
                 sessionId:         m.sessionId,
@@ -180,7 +164,11 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
     }
 
     void testRetrieveFileBadArguments() {
-        runSampleR()
+        def args = [
+                data_to_pass: SAMPLE_DATA_TO_PASS,
+                data_to_write: SAMPLE_DATA_TO_WRITE,
+        ]
+        runRScript('sample',args)
 
         // don't give any arguments
         get '/ScriptExecution/downloadFile'

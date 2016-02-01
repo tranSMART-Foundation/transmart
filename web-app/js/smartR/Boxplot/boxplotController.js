@@ -7,25 +7,11 @@ window.smartR.boxplotController = function(model, ajaxServices, components) {
     var controller = new window.smartR.BaseController(ajaxServices);
 
     controller.fetch = function(allConcepts) {
-        // TODO: validation
-        components.fetchDataStep.run(allConcepts);
-        // TODO: call summary at the end:
-        // .done(function() { this.summary(); }.bind(this));
-    };
+        model.clearLoadedData();
 
-    controller.summary = function (phase) {
-        var _summaryObj = {};
-         ajaxServices.startScriptExecution({
-            arguments: {
-                phase: phase,
-                projection: 'log_intensity'
-            },
-            taskType: 'summary',
-            phase: phase
-        }).done(function (d) {
-             _summaryObj = d;
-         });
-        return _summaryObj;
+        // TODO: validation
+        components.fetchDataStep.run(allConcepts)
+            .done(function() { components.summaryStats.run('fetch') });
     };
 
     controller.run = function (paramObj) {

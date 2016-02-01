@@ -93,6 +93,9 @@ div.sr-status-and-output-container:empty:before {
 .sr-summary-table tr th:nth-child(3){width: 20%;}
 .sr-summary-table tr td:nth-child(2){text-align: right;}
 .sr-summary-table tr td:nth-child(3){text-align: right;}
+.summary-stats-node { overflow: auto; }
+.summary-stats-node > img { float: left; }
+.summary-stats-node > table { margin-top: 57px; }
 .ui-icon-info {display: inline-block; }
 .sr-ui-tooltip {font-size: .85em; background: lightgoldenrodyellow !important;}
 

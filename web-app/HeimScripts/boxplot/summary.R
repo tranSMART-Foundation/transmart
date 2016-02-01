@@ -382,7 +382,7 @@ produce_summary_stats <- function(measurement_tables, phase)
   result_table$subset <-
     gsub(".*_","", rownames(result_table)) #take everything after _
   result_table$node <-
-    gsub("_.*","", rownames(result_table)) #take everything before _
+    discardSubset(rownames(result_table))
 
   nodes <-  result_table$node
   result_table$node[nodes == "preprocessed"] <-
@@ -470,7 +470,7 @@ write_summary_stats <- function(summary_stats)
 produce_boxplot <- function(measurement_tables, phase, projection)
 {
   #get node identifiers
-  nodes <- unique(gsub("_.*","",names(measurement_tables)))
+  nodes <- unique( discardSubset(names(measurement_tables)) )
 
   if (projection == "default_real_projection") {
     projection <- "intensity"
@@ -548,4 +548,8 @@ produce_boxplot <- function(measurement_tables, phase, projection)
     dev.off()
   }
   return(boxplot_results_all_nodes)
+}
+
+discardSubset <- function(labels) {
+  gsub("_s[[:digit:]]","",labels)
 }
