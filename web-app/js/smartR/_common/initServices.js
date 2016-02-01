@@ -22,27 +22,38 @@ smartR.initServices = function(ajaxServices) {
 
             conceptBoxes.map(function(box) {
                 var concepts = getConcepts(box);
-                Object.keys(concepts).each(function(key, concept) {
-                    allConcepts[box.attr('id') + '_' + key] = concept;
+                Object.keys(concepts).each(function(key) {
+                    allConcepts[box.attr('id') + '_' + key] = concepts[key];
                 });
             });
-
             smartR.util.getSubsetIds().pipe(function(subsets) {
-                console.log(ajaxServices.startScriptExecution({
+                ajaxServices.startScriptExecution({
+                    taskType: 'fetchData',
                     arguments: {
                         conceptKeys: allConcepts,
                         resultInstanceIds: subsets
-                    },
-                    taskType: 'fetchData'
-                }));
+                    }
+                });
             }, function() {
                 alert('Could not create subsets.');
             });
         });
     };
 
+    service.initRunButton = function(button) {
+        button.on('click', function() {
+            ajaxServices.startScriptExecution({
+                taskType: 'run',
+                arguments: {}
+            }).pipe(function(data) {
+                var foo = data.result.artifacts.value;
+                window.SmartRCorrelation.create(JSON.parse(foo));
+            })
+        })
+    };
+
     function activateDragAndDrop(box) {
-        var obj = Ext.get(box);
+        var obj = Ext.get(box.attr('id'));
         var dtgI = new Ext.dd.DropTarget(obj, {ddGroup: 'makeQuery'});
         dtgI.notifyDrop = dropOntoCategorySelection;
     }

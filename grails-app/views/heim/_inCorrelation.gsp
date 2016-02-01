@@ -16,5 +16,10 @@
 </select><br/>
 
 <button id="sr-btn-fetch-correlation" class="sr-action-button">Fetch Data</button>
+<button id="sr-btn-run-correlation" class="sr-action-button">Run Correlation Analysis</button>
+
+<div id='visualization' class='sr-output-container'>
+	<div id="scatterplot"></div>
+</div>
 
 <r:layoutResources/>
