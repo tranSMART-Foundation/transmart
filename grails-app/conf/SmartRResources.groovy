@@ -8,6 +8,11 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'd3.min.js']
     }
 
+    smartR_angular_common {
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'conceptBox.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'rServeService.js']
+    }
+
     smartR_heatmap {
         dependsOn 'smartR_base'
         resource url: [plugin: 'smart-r', dir: 'css', file: 'Heatmap.css']
@@ -50,6 +55,7 @@ modules = {
 
     smartR_correlation {
         dependsOn 'smartR_analysis_common'
+        dependsOn 'smartR_angular_common'
         resource url: [plugin: 'smart-r', dir: 'css', file: 'Correlation.css']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'd3Correlation.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'correlation.js']
