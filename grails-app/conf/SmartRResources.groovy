@@ -1,5 +1,6 @@
 modules = {
     smartR_base {
+        dependsOn 'angular'
         resource url: [plugin: 'smart-r', dir: 'css', file: 'smartR.css']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery-2.1.4.min.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery-ui-1.11.4.min.js']
@@ -22,9 +23,7 @@ modules = {
     smartR_analysis_common {
         dependsOn 'smartR_base'
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jsrender.js']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisInit.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'ajaxServices.js']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'initServices.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBox.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBoxCollection.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'executionStatus.js']
@@ -43,6 +42,9 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotView.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplot.js']
     }
+
+
+    // We start here with our angular port
 
     smartR_correlation {
         dependsOn 'smartR_analysis_common'
