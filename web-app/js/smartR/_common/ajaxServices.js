@@ -1,6 +1,6 @@
 //# sourceURL=ajaxServices.js
 
-smartR.ajaxServices = function(basePath, workflow) {
+window.smartR.ajaxServices = function(basePath, workflow) {
     var result = {};
 
     var NOOP_ABORT = function() {};
