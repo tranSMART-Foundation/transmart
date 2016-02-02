@@ -24,6 +24,7 @@ modules = {
     smartR_analysis_common {
         dependsOn 'smartR_base'
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jsrender.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisInit.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'ajaxServices.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBox.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBoxCollection.js']
