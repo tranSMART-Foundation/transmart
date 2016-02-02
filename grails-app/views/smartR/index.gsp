@@ -1,6 +1,6 @@
 <r:require modules="smartR_base" disposition="defer"/>
 
-<div ng-app="smartR">
+<div ng-app="smartR" style="padding: 10px;">
     <h1>SmartR - Dynamic Data Visualization and Interaction</h1>
     <br>
     <g:select name="scriptSelect" id="scriptSelect" from="${scriptList}"
