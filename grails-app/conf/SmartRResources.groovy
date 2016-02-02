@@ -11,8 +11,9 @@ modules = {
         dependsOn 'smartR_base'
         resource url: [plugin: 'smart-r', dir: 'css', file: 'Heatmap.css']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jsrender.js']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'extjs-helper.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'd3Heatmap.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisInit.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'extjs-helper.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'bioMarkersModel.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'heatmapValidator.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'heatmapService.js']
