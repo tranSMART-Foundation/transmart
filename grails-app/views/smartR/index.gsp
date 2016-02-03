@@ -1,6 +1,7 @@
 <r:require modules="smartR_base" disposition="defer"/>
+<r:layoutResources/>
 
-<div ng-app="smartR" style="padding: 10px;">
+<div ng-app="smartRApp">
     <h1>SmartR - Dynamic Data Visualization and Interaction</h1>
     <br>
     <g:select name="scriptSelect" id="scriptSelect" from="${scriptList}"
@@ -10,5 +11,5 @@
     <div id="inputDIV"></div>
 </div>
 
-
+<r:layoutResources/>
 

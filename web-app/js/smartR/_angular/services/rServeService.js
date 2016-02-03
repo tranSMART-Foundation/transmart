@@ -6,7 +6,6 @@ smartRApp.factory('rServeService', ['$rootScope', function($rootScope) {
             // TODO
         };
 
-
         service.fetchData = function () {
             console.log('about to fetch data');
         };

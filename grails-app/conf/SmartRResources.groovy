@@ -1,16 +1,10 @@
 modules = {
     smartR_base {
-        dependsOn 'angular'
         resource url: [plugin: 'smart-r', dir: 'css', file: 'smartR.css']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery-2.1.4.min.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery-ui-1.11.4.min.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery.tablesorter.min.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'd3.min.js']
-    }
-
-    smartR_angular_common {
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'conceptBox.js']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'rServeService.js']
     }
 
     smartR_heatmap {
@@ -50,12 +44,27 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplot.js']
     }
 
+    // Below this point we put only resources that are used by the angular js ported workflows
+    // Once we are completely done no code should be above this comment
 
-    // We start here with our angular port
+    smartR_resources {
+        resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'angular.min.js']
+        resource url: [plugin: 'smart-r', dir: 'css', file: 'smartR.css']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'smartR.js']
+        resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery-2.1.4.min.js']
+        resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery-ui-1.11.4.min.js']
+        resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery.tablesorter.min.js']
+        resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'd3.min.js']
+    }
+
+    smartR_angular_components {
+        dependsOn 'smartR_resources'
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'conceptBox.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'rServeService.js']
+    }
 
     smartR_correlation {
-        dependsOn 'smartR_analysis_common'
-        dependsOn 'smartR_angular_common'
+        dependsOn 'smartR_resources', 'smartR_angular_components'
         resource url: [plugin: 'smart-r', dir: 'css', file: 'Correlation.css']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'd3Correlation.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'correlation.js']
