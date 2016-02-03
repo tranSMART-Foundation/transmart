@@ -48,7 +48,8 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
     "significanceValues" = significanceValues,
     "ranking"            = ranking,
     "features"           = features,
-    "extraFields"        = extraFields
+    "extraFields"        = extraFields,
+    "maxRows"            = max_rows
   )
   writeRunParams(max_rows, sorting, ranking)
   measurements <- cleanUp(df)  # temporary stats like SD and MEAN need
