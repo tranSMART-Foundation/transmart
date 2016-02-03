@@ -76,6 +76,7 @@ getObservations <- function(study.name, concept.match = NULL, concept.links = NU
         conceptColumns <- grep("concept\\.|label", colnames(dataFrameObservations))
 
         conceptInfo <- unique(cbind(conceptNames, dataFrameObservations[ , conceptColumns, drop = FALSE]))
+        conceptInfo$conceptNames <- as.character(conceptInfo$conceptNames)
         dataFrameObservations <- dataFrameObservations[ , -conceptColumns, drop = FALSE]
         dataFrameObservations <- cbind(dataFrameObservations, conceptNames)
 
