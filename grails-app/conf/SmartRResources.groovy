@@ -8,12 +8,18 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'd3.min.js']
     }
 
+    smartR_angular_common {
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'conceptBox.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'rServeService.js']
+    }
+
     smartR_heatmap {
         dependsOn 'smartR_base'
         resource url: [plugin: 'smart-r', dir: 'css', file: 'Heatmap.css']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jsrender.js']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'extjs-helper.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'd3Heatmap.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisInit.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'extjs-helper.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'bioMarkersModel.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'heatmapValidator.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'heatmapService.js']
@@ -23,6 +29,7 @@ modules = {
     smartR_analysis_common {
         dependsOn 'smartR_base'
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jsrender.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisInit.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'ajaxServices.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBox.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common/components', file: 'conceptBoxCollection.js']
@@ -48,6 +55,7 @@ modules = {
 
     smartR_correlation {
         dependsOn 'smartR_analysis_common'
+        dependsOn 'smartR_angular_common'
         resource url: [plugin: 'smart-r', dir: 'css', file: 'Correlation.css']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'd3Correlation.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'correlation.js']

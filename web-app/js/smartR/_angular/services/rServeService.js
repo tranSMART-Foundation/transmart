@@ -1,9 +1,21 @@
-var app = angular.module('smartR.services.rServeService', []);
+smartRApp.factory('rServeService', ['$rootScope', function($rootScope) {
 
-app.factory('rServeService', ['$scope', function($scope) {
-    $scope.startSession = function() {
+        var service = {};
 
-    };
+        service.startSession = function() {
+            // TODO
+        };
 
-    // etc.
+
+        service.fetchData = function () {
+            console.log('about to fetch data');
+        };
+
+        service.runWorkflow = function () {
+            console.log('about to run workflow');
+        };
+
+        // etc.
+
+        return service;
 }]);

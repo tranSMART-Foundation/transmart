@@ -8,7 +8,7 @@ if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
   remoteScriptDir <- "web-app/HeimScripts/heatmap"
 }
 
-utils <- paste(remoteScriptDir, "/utils.R", sep="")
+utils <- paste(remoteScriptDir, "/heatmap/utils.R", sep="")
 source(utils)
 
 main <- function(aggregate=FALSE) {

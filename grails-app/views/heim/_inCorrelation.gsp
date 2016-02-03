@@ -3,11 +3,22 @@
 
 
 <div ng-controller="CorrelationController">
-    <conceptBox conceptGroup="'datapoints'"></conceptBox>
-    <conceptBox conceptGroup="'annotations'"></conceptBox>
+
+    <p>
+        {{fooBar}}  %{--print simple model--}%
+    </p>
+
+    %{-- start directives ..--}%
+
+        %{-- passing simple literal --}%
+        <concept-box info="'categorical'"></concept-box>
+
+        %{--passing model, in this case fooBar--}%
+        <concept-box info="fooBar"></concept-box>
+
+    %{-- end directives ..--}%
+
 </div>
-
-
 
         %{--<form name="sr-correlation-fetch-form">--}%
             %{--<div id="sr-conceptBox-data" class="queryGroupIncludeSmall"></div>--}%
