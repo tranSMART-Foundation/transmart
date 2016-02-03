@@ -34,6 +34,7 @@ var SmartRHeatmap = (function(){
         var numberOfClusteredColumns = data.numberOfClusteredColumns[0];
         var numberOfClusteredRows = data.numberOfClusteredRows[0];
         var warning = data.warnings === undefined ? '' : data.warnings;
+        var maxRows = data.maxRows[0];
 
         var rowClustering = false;
         var colClustering = false;
@@ -661,7 +662,6 @@ var SmartRHeatmap = (function(){
                     d3.select('.bar.idx-' + d[0]).classed('cuttoffHighlight', true);
                     d3.selectAll('.square.uid-' + uids[d[0]]).classed('cuttoffHighlight', true);
                 });
-            $('#txtMaxRow').val($('#txtMaxRow').val() - cutoff - 1);
         }
 
         function cutoff() {
@@ -676,6 +676,7 @@ var SmartRHeatmap = (function(){
             //});
             // TODO: Use ajax service to be provided by ajaxServices.js to re-compute analysis
             // with new arguments (in this case filter for cut-off)
+            $('#txtMaxRow').val(maxRows - cutoffLevel - 1);
             $('#heim-btn-run-heatmap').click();
         }
 
@@ -1016,7 +1017,7 @@ var SmartRHeatmap = (function(){
             width: buttonWidth,
             height: buttonHeight,
             min: 0,
-            max: $('#txtMaxRow').val() - 2,
+            max: maxRows - 2,
             init: 0,
             callback: animateCutoff,
             trigger: 'dragend'
