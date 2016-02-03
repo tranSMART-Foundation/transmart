@@ -1,4 +1,4 @@
-<r:require modules="smartR_base" disposition="defer"/>
+<r:require modules="smartR_resources"/>
 <r:layoutResources/>
 
 <div ng-app="smartRApp">

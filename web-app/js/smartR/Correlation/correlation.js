@@ -1,11 +1,7 @@
+
 smartRApp.controller('CorrelationController', ['$scope', 'rServeService', function ($scope, rServeService) {
 
-    $scope.conceptBoxes = {
-        box1 : 'Im box1',
-        box2 : 'Im box2'
-    };
-
-    $scope.fooBar = 'I was defined in controller';
+    $scope.conceptBoxes = {};
 
     $scope.workflowData = {};
 

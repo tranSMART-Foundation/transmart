@@ -469,7 +469,3 @@ function changeInputDIV() {
  */
 // init smartApp as angular module
 window.smartRApp = angular.module('smartR', []);
-
-// check if it's really create an angular module instance
-console.log('Is smartR is now an angular module?', smartRApp);
-

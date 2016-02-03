@@ -1,7 +1,6 @@
 <r:require modules="smartR_correlation"/>
 <r:layoutResources/>
 
-
 <div ng-controller="CorrelationController">
 
     <p>

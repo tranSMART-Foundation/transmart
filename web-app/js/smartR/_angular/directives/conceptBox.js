@@ -1,5 +1,4 @@
-smartRApp
-    .directive('conceptBox', function() {
+smartRApp.directive('conceptBox', function() {
         return {
             restrict: 'E',
             scope: {

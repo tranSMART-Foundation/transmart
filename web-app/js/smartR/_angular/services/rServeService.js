@@ -1,4 +1,4 @@
-smartRApp.factory('rServeService', ['$rootScope', function($rootScope) {
+smartRApp.factory('rServeService', ['$scope', function($scope) {
 
         var service = {};
 
