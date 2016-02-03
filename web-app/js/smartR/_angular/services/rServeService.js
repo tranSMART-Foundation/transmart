@@ -1,20 +1,21 @@
+
 smartRApp.factory('rServeService', ['$scope', function($scope) {
 
-        var service = {};
+    var service = {};
 
-        service.startSession = function() {
-            // TODO
-        };
+    service.startSession = function() {
+        // TODO
+    };
 
-        service.fetchData = function () {
-            console.log('about to fetch data');
-        };
+    service.fetchData = function () {
+        console.log('about to fetch data');
+    };
 
-        service.runWorkflow = function () {
-            console.log('about to run workflow');
-        };
+    service.runWorkflow = function () {
+        console.log('about to run workflow');
+    };
 
-        // etc.
+    // etc.
 
-        return service;
+    return service;
 }]);

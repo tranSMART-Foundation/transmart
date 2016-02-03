@@ -2,21 +2,10 @@
 <r:layoutResources/>
 
 <div ng-controller="CorrelationController">
-
-    <p>
-        {{fooBar}}  %{--print simple model--}%
-    </p>
-
-    %{-- start directives ..--}%
-
-        %{-- passing simple literal --}%
-        <concept-box info="'categorical'"></concept-box>
-
-        %{--passing model, in this case fooBar--}%
-        <concept-box info="fooBar"></concept-box>
-
-    %{-- end directives ..--}%
-
+    {{foobar}}
+    <abc></abc>
+    <conceptBox conceptGroup="'datapoints'"></conceptBox>
+    <conceptBox conceptGroup="annotations"></conceptBox>
 </div>
 
         %{--<form name="sr-correlation-fetch-form">--}%

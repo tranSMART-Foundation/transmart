@@ -462,10 +462,3 @@ function changeInputDIV() {
     request.done(function(response) { jQuery('#inputDIV').html(response) });
     request.fail(function() { alert('Server does not respond. Network connection lost?') });
 }
-
-/**
- * Here's  probably the most suitable  place to initialize smartRApp as global which later you can inject other
- * available angular modules
- */
-// init smartApp as angular module
-window.smartRApp = angular.module('smartR', []);

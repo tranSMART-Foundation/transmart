@@ -1,8 +1,8 @@
-<r:require modules="smartR_resources"/>
+<r:require module="smartR_core"/>
 <r:layoutResources/>
 
-<div ng-app="smartRApp">
-    <h1>SmartR - Dynamic Data Visualization and Interaction</h1>
+<div data-ng-app="smartRApp">
+    <h1>SmartRR - Dynamic Data Visualization and Interaction</h1>
     <br>
     <g:select name="scriptSelect" id="scriptSelect" from="${scriptList}"
               noSelection="['': 'Choose an algorithm']"
@@ -10,6 +10,4 @@
 
     <div id="inputDIV"></div>
 </div>
-
 <r:layoutResources/>
-
