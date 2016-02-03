@@ -63,7 +63,7 @@ modules = {
     }
 
     smartR_correlation {
-        dependsOn 'angular', 'smartR_angular_components'
+        dependsOn 'smartR_angular_components'
         resource url: [plugin: 'smart-r', dir: 'css', file: 'correlation.css']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'd3Correlation.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'correlation.js']

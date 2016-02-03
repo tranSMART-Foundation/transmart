@@ -1,5 +1,5 @@
 
-smartRApp.directive('conceptbox', function() {
+smartRApp.directive('conceptBox', function() {
     return {
         restrict: 'E',
         replace: true,
@@ -12,9 +12,9 @@ smartRApp.directive('conceptbox', function() {
         },
         link: function(scope, element, attrs) {
             //scope.$watch(
-            //    function() { return el[0].childNodes.length; },
-            //    function() { console.log(el); scope.conceptBoxes[scope.conceptGroup] = getConcepts(el); }
+            //    function() { return element[0].childNodes.length; },
+            //    function() { console.log(element); scope.conceptBoxes[scope.conceptGroup] = getConcepts(el); }
             //)
         }
     };
-});
+}); 

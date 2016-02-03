@@ -4,8 +4,8 @@
 <div ng-controller="CorrelationController">
     {{foobar}}
     <abc></abc>
-    <conceptBox conceptGroup="'datapoints'"></conceptBox>
-    <conceptBox conceptGroup="annotations"></conceptBox>
+    <concept-box conceptGroup="'datapoints'"></concept-box>
+    <concept-box conceptGroup="annotations"></concept-box>
 </div>
 
         %{--<form name="sr-correlation-fetch-form">--}%
