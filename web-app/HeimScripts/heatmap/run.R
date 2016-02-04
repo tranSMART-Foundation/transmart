@@ -2,7 +2,7 @@ library(reshape2)
 library(limma)
 
 if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
-  remoteScriptDir <- "web-app/HeimScripts/heatmap"
+  remoteScriptDir <- "web-app/HeimScripts"
 }
 
 utils <- paste(remoteScriptDir, "/heatmap/utils.R", sep="")
