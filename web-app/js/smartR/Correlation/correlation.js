@@ -1,7 +1,10 @@
 
 smartRApp.controller('CorrelationController', ['$scope', function ($scope) {
 
-    $scope.conceptBoxes = {};
+    $scope.conceptBoxes = {
+        datapoints: [],
+        annotations: []
+    };
 
     $scope.workflowData = {};
 

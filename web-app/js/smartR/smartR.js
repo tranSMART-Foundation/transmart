@@ -442,14 +442,7 @@ window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
     parentPanel.add(smartRPanel)
 }
 
-function clearVarSelection(divName) {
-    $('#' + divName).children().remove()
-}
 
-function getConcepts(divName) {
-    return $('#' + divName).children().toArray().map(function(childNode) {
-        return childNode.getAttribute('conceptid') })
-}
 
 function changeInputDIV() {
     jQuery('#outputDIV').empty();

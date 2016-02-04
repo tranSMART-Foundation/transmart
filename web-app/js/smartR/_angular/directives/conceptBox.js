@@ -1,15 +1,24 @@
 
 smartRApp.directive('conceptBox', [function() {
+
+    function clearVarSelection(divName) {
+        $('#' + divName).children().remove()
+    }
+
+    function getConcepts(box) {
+        return box.childNodes.map(function(childNode) {
+            return childNode.getAttribute('conceptid') })
+    }
+
     return {
         restrict: 'E',
         replace: true,
         scope: {
-            group: '@'
+            conceptGroup: '='
         },
         template: '<div class="queryGroupIncludeSmall"></div>',
         controller: function($scope) {
-            // TODO: Can how to get the CorrelationController scope? $parent doesn't seem optimal
-            $scope.$parent.conceptBoxes[$scope.group] = [];
+
         },
         link: function(scope, element) {
             // activate drag & drop for template element
@@ -19,10 +28,11 @@ smartRApp.directive('conceptBox', [function() {
                 dtgI.notifyDrop = dropOntoCategorySelection;
             });
 
-            // modify the model when concepts are added or removed
-            $scope.$watch(
+            //modify the model when concepts are added or removed
+            scope.$watch(
                 function() { return element[0].childNodes.length; },
-                function() { scope.$parent.conceptBoxes[scope.group] = getConcepts(element[0]) });
+                function() { scope.conceptGroup = [element[0].childNodes.length]; }
+            );
         }
     };
 }]);
