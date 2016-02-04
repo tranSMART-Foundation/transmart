@@ -236,15 +236,19 @@ verifyInput <- function(max_rows, sorting) {
 applySorting <- function(df,sorting) {
   measurements <- getMeasurements(df)
   colNames <- names(measurements)
+
   subsets <- getSubset(colNames)
   nodes <- getNode(colNames)
   subjects <- getSubject(colNames)
+
+  timelineValues <- getTimelineValues(nodes, fetch_params$ontologyTerms)
+
   if (sorting == "nodes") {
-    colNames <- paste(subsets, nodes, subjects, sep = "")
+    inds <- order(subsets, timelineValues, nodes, subjects)
   } else {
-    colNames <- paste(subsets, subjects, nodes, sep = "")
+    inds <- order(subsets, subjects, timelineValues, nodes)
   }
-  inds <- sort(colNames, index.return = TRUE)$ix
+
   measurements <- measurements[, inds]
   cbind(df[, c(1,2)], measurements)
 }
@@ -266,6 +270,9 @@ buildFields <- function(df) {
   names(df)   <-
     c("UID","SIGNIFICANCE","PATIENTID","VALUE")
   df["ZSCORE"] <- ZSCORE
+
+  df$PATIENTID <- replaceNodesWithTimelineLabel(df$PATIENTID, fetch_params$ontologyTerms)
+
   return(df)
 }
 

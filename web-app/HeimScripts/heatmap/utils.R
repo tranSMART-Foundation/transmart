@@ -42,6 +42,39 @@ getNode <- function(patientIDs) {
                                              # - the node
 }
 
+getTimelineValues <- function(nodes, ontologyTerms) {
+  sapply(nodes, function(n) {
+    metaValue <- ontologyTerms[[n]]$metadata$seriesMeta$value
+    t <- !is.na(as.numeric(metaValue))
+    if (length(t) && t) {
+      as.numeric(metaValue)
+    } else {
+      Inf
+    }
+  }, USE.NAMES = FALSE)
+}
+
+# takes array of labels like X16703_n0_s1 and returns array where the node
+# has been replace with its timeline label, if it exists (e.g. X16703_Week 10_s1)
+replaceNodesWithTimelineLabel <- function(columnLabels, ontologyTerms) {
+  # find node name
+  matches <- gregexpr("[^_]+(?=_s\\d$)", columnLabels, perl = TRUE)
+  replace <- regmatches(columnLabels, matches)
+  replace <- lapply(replace, function(x) {
+    node <- x[[1]]
+    ret <- ontologyTerms[[node]]$metadata$seriesMeta$label
+    if (length(ret)) {
+      # replace spaces with dashes
+      # so javascript can still use the return as class names
+      gsub("\\s", "-", ret, perl = TRUE)
+    } else {
+      node
+    }
+  })
+  regmatches(columnLabels, matches) <- replace
+  columnLabels
+}
+
 getSubject <- function(patientIDs) {
   splittedIds <- strsplit(patientIDs,"_")
   sapply(splittedIds, FUN = discardNodeAndSubject)
