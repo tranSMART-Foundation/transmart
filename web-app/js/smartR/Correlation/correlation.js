@@ -1,18 +1,16 @@
 
 smartRApp.controller('CorrelationController', ['$scope', function ($scope, $rServeService) {
 
-    $scope.foobar = 'test';
-
     $scope.conceptBoxes = {};
 
     $scope.workflowData = {};
 
     $scope.fetchData = function () {
-        $rServeService.fetchData();
+        //$rServeService.fetchData();
     }; // FIXME: mock-up
 
     $scope.runWorkflow = function () {
-        $scope.workflowData = $rServeService.runWorkflow();
+        //$scope.workflowData = $rServeService.runWorkflow();
     }; // FIXME: mock-up
 
     // $scope.fetchData(); // just trying if the call is working // please remove or do the necessities

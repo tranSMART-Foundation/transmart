@@ -2,9 +2,7 @@
 <r:layoutResources/>
 
 <div ng-controller="CorrelationController">
-    {{foobar}}
-    <abc></abc>
-    <concept-box conceptGroup="'datapoints'"></concept-box>
+    <concept-box conceptGroup="datapoints"></concept-box>
     <concept-box conceptGroup="annotations"></concept-box>
 </div>
 

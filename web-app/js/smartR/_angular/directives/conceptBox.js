@@ -19,9 +19,10 @@ smartRApp.directive('conceptBox', function() {
                 dtgI.notifyDrop = dropOntoCategorySelection;
             });
 
+            // modify the model when concepts are added or removed
             scope.$watch(
-                function() { return elements[0].childNodes.length; },
-                function() { console.log(elements[0]); scope.conceptBoxes[scope.conceptGroup] = getConcepts(elements[0]); }
+                function() { console.log(elements); return elements[0].childNodes.length; },
+                function(newValue, oldValue) { console.log(newValue, oldValue); }
             );
         }
     };
