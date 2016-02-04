@@ -1,5 +1,5 @@
 
-smartRApp.controller('CorrelationController', ['$scope', function ($scope, $rServeService) {
+smartRApp.controller('CorrelationController', ['$scope', function ($scope) {
 
     $scope.conceptBoxes = {};
 
