@@ -24,6 +24,7 @@ window.SmartRHeatmap = (function(){
      * @param data
      */
     service.create = function (data) {
+
         var extraFields = data.extraFields === undefined ? [] : data.extraFields;
         var features = data.features === undefined ? [] : data.features;
         var fields = data.fields;
@@ -451,16 +452,13 @@ window.SmartRHeatmap = (function(){
             var bar = barItems.selectAll('.bar')
                 .data(significanceIndexMap, function(d) { return d.idx; });
 
-            var _MINIMAL_WIDTH = 10;  // This value will be added to the scaled width. So that it is always >0 (visible)
-            var _BAR_OFFSET    = 20;  // Distance between significance bar and the heatmap.
-                                      // Visible offset will be effectively _BAR_OFFSET - _MINIMAL_WIDTH
             bar.enter()
                 .append('rect')
                 .attr('class', function(d) { return 'bar idx-' + d.idx ; })
-                .attr('width', function(d) { return histogramScale(d.significance) + _MINIMAL_WIDTH; })
+                .attr('width', function(d) { return histogramScale(d.significance)})
                 .attr('height', gridFieldHeight)
-                .attr('x', function(d) { return - histogramScale(d.significance) - _BAR_OFFSET; })
-                .attr('y', function(d) { return gridFieldHeight * d.idx; })
+                .attr('x', function(d) { return - histogramScale(d.significance); })
+                .attr('y', function(d, idx) { return gridFieldHeight * idx; })
                 .style('fill', function(d) { return d.significance > 0 ? 'steelblue' : '#990000';})
                 .on('mouseover', function(d) {
                     var html = 'Ranking (' + ranking + '): ' + d.significance;
@@ -483,8 +481,8 @@ window.SmartRHeatmap = (function(){
             bar.transition()
                 .duration(animationDuration)
                 .attr('height', gridFieldHeight)
-                .attr('width', function(d) { return histogramScale(d.significance) + _MINIMAL_WIDTH; })
-                .attr('x', function(d) { return - histogramScale(d.significance) - _BAR_OFFSET; })
+                .attr('width', function(d) { return histogramScale(d.significance); })
+                .attr('x', function(d) { return - histogramScale(d.significance); })
                 .attr('y', function(d) { return gridFieldHeight * d.idx; })
                 .style('fill', function(d) { return d.significance > 0 ? 'steelblue' : '#990000'; });
 
