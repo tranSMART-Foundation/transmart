@@ -236,7 +236,6 @@ var HeatmapView = (function(){
                 _toggleAnalysisView({subsetNo: subsetNo, noOfSamples: _noOfSamples});
             })
                 .fail(function (d) {
-                    view.fetchDataView.outputArea.html('<p style="color: red";><b>'+ d +'</b>');
                     _resetActionButtons();
                 });
         };

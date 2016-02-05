@@ -12,11 +12,11 @@ window.HeatmapService = (function(){
     var HEATMAP_DATA_FILE = 'heatmap.json';
     var MARKER_SELECTION_TABLE_FILE = 'markerSelectionTable.json';
 
+    var ajaxServices = window.smartR.ajaxServices(window.pageInfo.basePath, 'heatmap');
 
     var NOOP_ABORT = function() {};
 
     var service = {
-        currentRequestAbort: NOOP_ABORT,
         lastFetchedLabels: []
     };
 
@@ -84,33 +84,16 @@ window.HeatmapService = (function(){
      * @returns {*}
      */
     service.initialize = function () {
-        // ajax call to session creation
-        jQuery.ajax({
-            url: pageInfo.basePath + '/RSession/create',
-            type: 'POST',
-            timeout: '30000',
-            contentType: 'application/json',
-            data : JSON.stringify( {
-                workflow : 'heatmap'
-            })
-        }).done(function(response) {
-            GLOBAL.HeimAnalyses = {
-                type : 'heatmap',
-                sessionId :response.sessionId
-            };
-            return GLOBAL.HeimAnalyses;
-        }).fail(function() {
-            // TODO: error displayed in a placeholder somewhere in main heim-analysis page
-            console.error('Cannot create r-session');
-            return null;
-        });
+        window.smartR.currentSessionTearDown();
+        ajaxServices.startSession();
+        window.smartR.currentSessionTearDown =
+            ajaxServices.destroySession.bind(ajaxServices);
     };
 
     /* TaskData
      * {
      *   taskType: (string),
      *   arguments: (object)
-     *   executionId: (uuid),
      *   onUltimateSuccess: function (data) {},
      *   phase: (string) allows finding div id,
      *   progressMessage: (string),
@@ -122,47 +105,65 @@ window.HeatmapService = (function(){
         return jQuery('#heim-' + phase + '-output');
     };
 
+    function buildErrorMessage(error) {
+        var ret;
+        
+        if (!error) {
+            ret = 'Failure with no details.';
+        } else if (error.statusText !== undefined) {
+            if (error.status) { // for the 0, undefined cases
+                 ret = 'Error ' + error.status + ': ' + error.statusText + '.';
+            } else {
+                ret = error.statusText;
+            }
+
+            if (error.response && error.response.type && error.response.message) {
+                ret += ' ' + error.response.type + ': ' + error.response.message;
+            }
+        } else {
+            ret = error;
+        }
+
+        return ret;
+    }
+
     var startScriptExecution = function(taskData) {
-        service.currentRequestAbort();
+        var promise = ajaxServices.startScriptExecution(taskData)
+            .then(function(data) {
+                data.phase = taskData.phase;
+                return data;
+            });
+            
+        promise.fail(function (e) {
+                _divForPhase(taskData.phase)
+                    .html('<p style="color: red";><b>Error:'+ buildErrorMessage(e) +'</b>')
+                    .show();
+            });
 
-        var runRequest = jQuery.ajax({
-            url: pageInfo.basePath + '/ScriptExecution/run',
-            type: 'POST',
-            timeout: '30000',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                sessionId: GLOBAL.HeimAnalyses.sessionId,
-                arguments: taskData.arguments,
-                taskType : taskData.taskType,
-                workflow : 'heatmap'
-            })
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            _divForPhase(taskData.phase)
-                .html('<p style="color: red";><b>Error:'+ errorThrown +'</b>')
-                .show();
-        }).done(function(d) {
-            taskData.executionId = d.executionId;
-            service.checkStatus(taskData, CHECK_DELAY);
-        });
+        var div = _divForPhase(taskData.phase);
+        div.show();
+        div.html('<p class="sr-log-text">' +
+            taskData.progressMessage + ', please wait<span class="blink_me">_</span></p>');
 
-        service.currentRequestAbort = function() { runRequest.abort(); };
+        if (taskData.successMessage) {
+            var _html = '<p class="heim-fetch-success" style="color: green";> ' +
+                taskData.successMessage + '</p>';
+            promise.done(function() { div.html(_html); });
+        } else {
+            promise.done(function() { div.hide(); });
+        }
 
-        return runRequest;
-    };
+        promise.done(taskData.onUltimateSuccess);
+        if (taskData.onUltimateFailure) {
+            promise.fail(taskData.onUltimateFailure);
+        }
 
-    var urlForFile = function(executionId, filename) {
-        return pageInfo.basePath +
-            '/ScriptExecution/downloadFile?sessionId=' +
-            GLOBAL.HeimAnalyses.sessionId +
-            '&executionId=' +
-            executionId +
-            '&filename=' +
-            filename;
+        return promise;
     };
 
     var downloadJsonFile = function(executionId, filename) {
         return jQuery.ajax({
-            url: urlForFile(executionId, filename),
+            url: ajaxServices.urlForFile(executionId, filename),
             dataType: 'json'
         });
     };
@@ -224,11 +225,11 @@ window.HeatmapService = (function(){
         }
 
         function getSummary_onUltimateSuccess(data) {
-            var div = _divForPhase(this.phase);
+            var div = _divForPhase(data.phase);
             div.empty();
             fileSuffixes.forEach(function(label) {
-                var filename = urlForFile(this.executionId,
-                    this.phase + '_box_plot_node_' + label + '.png');
+                var filename = ajaxServices.urlForFile(data.executionId,
+                    data.phase + '_box_plot_node_' + label + '.png');
                 var plot = jQuery('<img>').attr('src', filename);
                 div.append(plot);
             }.bind(this));
@@ -236,8 +237,8 @@ window.HeatmapService = (function(){
             jQuery.when.apply(jQuery,
                 fileSuffixes.map(function (label) {
                     return downloadJsonFile(
-                        this.executionId,
-                        this.phase + '_summary_stats_node_' + label + '.json');
+                        data.executionId,
+                        data.phase + '_summary_stats_node_' + label + '.json');
                 }.bind(this))
             ).done(function() {
                 var _args = arguments;
@@ -310,10 +311,10 @@ window.HeatmapService = (function(){
 
         function runAnalysisSuccess(data) {
             var ajaxCalls = [];
-            ajaxCalls.push(downloadJsonFile(this.executionId, HEATMAP_DATA_FILE));
+            ajaxCalls.push(downloadJsonFile(data.executionId, HEATMAP_DATA_FILE));
             if (data.result.artifacts.files.indexOf(MARKER_SELECTION_TABLE_FILE) != -1) {
                 ajaxCalls.push(
-                    downloadJsonFile(this.executionId, MARKER_SELECTION_TABLE_FILE));
+                    downloadJsonFile(data.executionId, MARKER_SELECTION_TABLE_FILE));
             }
 
             jQuery.when.apply(jQuery, ajaxCalls)
@@ -414,55 +415,6 @@ window.HeatmapService = (function(){
         };
     })();
 
-    /**
-     * Check status of a task
-     * @param task
-     */
-    service.checkStatus = function(taskData, delay) {
-
-        var div = _divForPhase(taskData.phase);
-
-        div.show();
-        div.html('<p class="sr-log-text">' +
-            taskData.progressMessage + ', please wait<span class="blink_me">_</span></p>');
-
-        service.currentRequestAbort();
-
-        var ajax = jQuery.ajax({
-            type: 'GET',
-            url : pageInfo.basePath + '/ScriptExecution/status',
-            data: {
-                sessionId  : GLOBAL.HeimAnalyses.sessionId,
-                executionId: taskData.executionId
-            }
-        });
-
-        service.currentRequestAbort = function() { ajax.abort(); };
-
-        ajax.done(function (d) {
-            if (d.state === 'FINISHED') {
-                if (taskData.successMessage) {
-                    var _html = '<p class="heim-fetch-success" style="color: green";> ' +
-                        taskData.successMessage + '</p>';
-                    div.html(_html);
-                } else {
-                    div.hide();
-                }
-
-                taskData.onUltimateSuccess(d);
-            } else if (d.state === 'FAILED') {
-                var _errHTML = '<span style="color: red">' + d.result.exception +'</span>';
-                div.html(_errHTML);
-                taskData.onUltimateFailure(d.result.exception);
-            } else {
-                _setStatusRequestTimeout(service.checkStatus, delay, taskData, delay);
-            }
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-                taskData.onUltimateFailure(errorThrown);
-        });
-    };
-
     // aux for downloadSVG
    function copyWithCollapsedCSS(heatmapElement) {
         var relevantProperties = [
@@ -527,7 +479,7 @@ window.HeatmapService = (function(){
     service.downloadData = function() {
         function downloadFile(data) {
             var link = jQuery('<a/>')
-                .attr('href', urlForFile(this.executionId, 'analysis_data.zip'))
+                .attr('href', urlForFile(data.executionId, 'analysis_data.zip'))
                 .attr('download', 'heatmap_data.zip')
                 .css('display', 'none');
             jQuery('body').append(link);
