@@ -68,8 +68,9 @@ window.smartR.ajaxServices = function(basePath, workflow) {
             throw new Error('No session to destroy');
         }
 
+
         return jQuery.ajax({
-            url: basePath + '/RSession/create',
+            url: basePath + '/RSession/delete',
             type: 'POST',
             timeout: TIMEOUT,
             contentType: 'application/json',
