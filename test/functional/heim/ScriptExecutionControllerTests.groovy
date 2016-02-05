@@ -111,6 +111,17 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
         assertThat artifacts['files'], hasItem('heatmap.json')
     }
 
+    void testTouch() {
+        String sessionId = createSession('func_test')
+        post '/RSession/touch', {
+            body json: [
+                    sessionId: sessionId,
+            ]
+        }
+
+        assertStatus 204
+    }
+
 
     void testRun() {
         def args = [

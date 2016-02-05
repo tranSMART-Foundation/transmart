@@ -9,6 +9,7 @@ String.prototype.capitalize = function() {
 window.smartR = window.smartR || {
         components: {},
         util: {},
+        currentSessionTearDown: function() {},
     };
 
 window.smartR.Observable = function Observable() {
@@ -41,7 +42,10 @@ window.smartR.BaseController = function BaseController(ajaxServices) {
     this.ajaxServices = ajaxServices;
 };
 window.smartR.BaseController.prototype.init = function BaseController_init() {
+    window.smartR.currentSessionTearDown();
     this.ajaxServices.startSession();
+    window.smartR.currentSessionTearDown =
+        this.ajaxServices.destroySession.bind(this.ajaxServices);
 };
 
 window.smartR.util.getSubsetIds = function smartRUtil_getSubsetIds() {
