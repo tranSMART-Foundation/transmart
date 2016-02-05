@@ -1,38 +1,49 @@
 
-smartRApp.directive('conceptBox', [function() {
+smartRApp.directive('conceptBox', function() {
 
-    function clearVarSelection(divName) {
-        $('#' + divName).children().remove()
+    function clearWindow(dom) {
+        $(dom).children().remove()
     }
 
-    function getConcepts(box) {
-        return box.childNodes.map(function(childNode) {
-            return childNode.getAttribute('conceptid') })
+    function getConcepts(dom) {
+        return $(dom).children().toArray().map(function(childNode) {
+            return childNode.getAttribute('conceptid');
+        });
+    }
+
+    function activateDragAndDrop(dom) {
+        var extObj = Ext.get(dom);
+        var dtgI = new Ext.dd.DropTarget(extObj, {ddGroup: 'makeQuery'});
+        dtgI.notifyDrop = dropOntoCategorySelection;
     }
 
     return {
         restrict: 'E',
-        replace: true,
         scope: {
             conceptGroup: '='
         },
-        template: '<div class="queryGroupIncludeSmall"></div>',
-        controller: function($scope) {
-
-        },
+        // TODO: Replace this with templateUrl. The question is: In which context am I?
+        template: '<div class="queryGroupIncludeSmall"></div>' +
+                '<input type="button" value="Clear Window">',
         link: function(scope, element) {
-            // activate drag & drop for template element
+            var template_box = element.children()[0];
+            var template_btn = element.children()[1];
+
+            // activate drag & drop for our conceptBox once it is rendered
             scope.$evalAsync(function() {
-                var div = Ext.get(element[0]);
-                var dtgI = new Ext.dd.DropTarget(div, {ddGroup: 'makeQuery'});
-                dtgI.notifyDrop = dropOntoCategorySelection;
+                activateDragAndDrop(template_box);
             });
 
-            //modify the model when concepts are added or removed
-            scope.$watch(
-                function() { return element[0].childNodes.length; },
-                function() { scope.conceptGroup = [element[0].childNodes.length]; }
-            );
+            // bind the button to its clearing functionality
+            template_btn.addEventListener('click', function() {
+                clearWindow(template_box);
+            });
+
+            // this watches the childNodes of the conceptBox and updates the model on change
+            new MutationObserver(function() {
+                scope.conceptGroup = getConcepts(template_box); // update the model
+                scope.$apply(); // notify controller of the changes
+            }).observe(template_box, { childList: true });
         }
     };
-}]);
+});

@@ -1,23 +1,5 @@
 
-smartRApp.controller('CorrelationController', ['$scope', function ($scope) {
-
-    $scope.conceptBoxes = {
-        datapoints: [],
-        annotations: []
-    };
-
-    $scope.workflowData = {};
-
-    $scope.fetchData = function () {
-        //$rServeService.fetchData();
-    }; // FIXME: mock-up
-
-    $scope.runWorkflow = function () {
-        //$scope.workflowData = $rServeService.runWorkflow();
-    }; // FIXME: mock-up
-
-    // $scope.fetchData(); // just trying if the call is working // please remove or do the necessities
-
-    // TODO create d3 Correlation when there's data
-    // window.SmartRCorrelation.create(JSON.parse($scope.workflowData));
-}]);
+smartRApp.controller('CorrelationController', function ($scope) {
+    $scope.datapoints = [];
+    $scope.annotations = [];
+});

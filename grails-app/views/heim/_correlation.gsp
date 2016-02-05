@@ -2,10 +2,11 @@
 <r:layoutResources/>
 
 <div ng-controller="CorrelationController">
-    <concept-box concept-group="conceptBoxes.datapoints"></concept-box>
-    <concept-box concept-group="conceptBoxes.annotations"></concept-box>
+    <concept-box concept-group="datapoints"></concept-box>
+    <concept-box concept-group="annotations"></concept-box>
 
-    {{conceptBoxes}}
+    {{datapoints}}
+    {{annotations}}
 </div>
 
         %{--<form name="sr-correlation-fetch-form">--}%
