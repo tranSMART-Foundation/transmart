@@ -14,7 +14,7 @@ function switchAnimation(checked) { // general purpose callback, this is why it 
     }
 }
 
-var SmartRHeatmap = (function(){
+window.SmartRHeatmap = (function(){
 
     var service = {};
 
