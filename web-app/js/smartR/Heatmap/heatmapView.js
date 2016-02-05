@@ -73,8 +73,8 @@ var HeatmapView = (function(){
         var _conceptPath = extJSHelper.readConceptVariables(v.conceptPathsInput.attr('id'));
         return {
             conceptPaths: _conceptPath,
-            // CurrentSubsetIDs can contain undefined and null. Pass only nulls forward
-            resultInstanceIds : GLOBAL.CurrentSubsetIDs.map(function (v) { return v || null; }),
+            // CurrentSubsetIDs contains an undefined element at 0
+            resultInstanceIds : GLOBAL.CurrentSubsetIDs.slice(1,3),
             searchKeywordIds: Object.getOwnPropertyNames(bioMarkersModel.selectedBioMarkers)
         };
     };
@@ -341,6 +341,8 @@ var HeatmapView = (function(){
             function () {
                 for (var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
                     if (!isSubsetEmpty(i) && !GLOBAL.CurrentSubsetIDs[i]) {
+                        // replace undefined with null in the array
+                        GLOBAL.CurrentSubsetIDs[i] = null;
                         runAllQueries(_fetchDataAction);
                         return;
                     }
