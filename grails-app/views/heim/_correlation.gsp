@@ -10,7 +10,16 @@
     <br/>
     <br/>
     <input type="button" value="Fetch Data" ng-click="fetchData()">
+    <br/>
+    <br/>
+    <input type="button" value="Show Analysis" ng-click="createViz()">
+
+    <div id="visualization" class="sr-output-container">
+        <div id="scatterplot"></div>
+    </div>
 </div>
+
+
 
         %{--<form name="sr-correlation-fetch-form">--}%
             %{--<div id="sr-conceptBox-data" class="queryGroupIncludeSmall"></div>--}%

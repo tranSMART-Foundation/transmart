@@ -225,6 +225,7 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
     // new methods or refactored code below this line
 
     service.loadDataIntoSession = function(conceptBoxMap) {
+        // prepare concept object
         var allConcepts = {};
         Object.keys(conceptBoxMap).each(function(group) {
             var concepts = conceptBoxMap[group];

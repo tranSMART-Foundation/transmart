@@ -1,12 +1,11 @@
 library(reshape2)
 
-
 main <- function(method = 'pearson') {
     num_data <- parseNumericalData()
     num_data <- na.omit(num_data)
     colnames(num_data) <- c('patientID', 'x', 'y')
 
-    cat_data <- parseCategoricalData()
+#    cat_data <- parseCategoricalData()
 
     df <- num_data
     df$tag <- NA
@@ -47,18 +46,18 @@ conceptStrToFolderStr <- function(s) {
     substr(s, 0, tail(backslashs, 2)[1])
 }
 
-parseNumericalData() {
-    num_data1 <- loaded_variables[["sr-conceptBox-data_n0_s1"]]
-    num_data2 <- loaded_variables[["sr-conceptBox-data_n1_s1"]]
+parseNumericalData <- function() {
+    num_data1 <- loaded_variables[["datapoints_n0_s1"]]
+    num_data2 <- loaded_variables[["datapoints_n1_s1"]]
     num_data <- merge(num_data1, num_data2, by="Row.Label")
     num_data
 }
 
-parseCategoricalData() {
+parseCategoricalData <- function() {
     numTags <- length(loaded_variables) - 2
-    cat_data <- ifelse(numTags, loaded_variables[["sr-conceptBox-annotations_n0_s1"]], NULL)
+    cat_data <- ifelse(numTags, loaded_variables[["annotations_n0_s1"]], NULL)
     for (i in 1:(numTags-1)) {
-        cat_data <- merge(cat_data, loaded_variables[["sr-conceptBox-annotations_n" + i + "_s1"]], by="Row.Label")
+        cat_data <- merge(cat_data, loaded_variables[["annotations_n" + i + "_s1"]], by="Row.Label")
     }
     cat_data
 }
