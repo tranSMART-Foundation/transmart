@@ -1,5 +1,5 @@
 
-smartRApp.directive('conceptBox', function() {
+smartRApp.directive('conceptBox', [function() {
 
     function clearWindow(dom) {
         $(dom).children().remove()
@@ -46,4 +46,4 @@ smartRApp.directive('conceptBox', function() {
             }).observe(template_box, { childList: true });
         }
     };
-});
+}]);

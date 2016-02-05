@@ -4,8 +4,12 @@
 <div ng-controller="CorrelationController">
     <concept-box concept-group="conceptBoxes.datapoints"></concept-box>
     <concept-box concept-group="conceptBoxes.annotations"></concept-box>
-
+    <br/>
+    <br/>
     ConceptModel: {{conceptBoxes}}
+    <br/>
+    <br/>
+    <input type="button" value="Fetch Data" ng-click="fetchData()">
 </div>
 
         %{--<form name="sr-correlation-fetch-form">--}%

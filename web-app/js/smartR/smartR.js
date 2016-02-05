@@ -403,12 +403,6 @@ function shortenConcept(concept) {
     return splits[splits.length - 3] + '/' + splits[splits.length - 2]
 }
 
-function activateDragAndDrop(divName) {
-    var div = Ext.get(divName)
-    var dtgI = new Ext.dd.DropTarget(div, {ddGroup: 'makeQuery'})
-    dtgI.notifyDrop = dropOntoCategorySelection
-}
-
 window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
     var smartRPanel = new Ext.Panel({
         id: 'smartRPanel',

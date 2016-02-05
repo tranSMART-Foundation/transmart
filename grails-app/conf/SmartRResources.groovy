@@ -60,6 +60,7 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular', file: 'smartRApp.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'conceptBox.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'rServeService.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'smartRUtils.js']
     }
 
     smartR_correlation {
