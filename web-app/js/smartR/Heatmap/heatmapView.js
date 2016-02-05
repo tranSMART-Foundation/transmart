@@ -340,8 +340,7 @@ var HeatmapView = (function(){
             view.fetchDataView,
             function () {
                 for (var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
-                    if (isSubsetEmpty(i) &&             // trigger validation from transmartApp if it's true
-                        !GLOBAL.CurrentSubsetIDs[i]) {  // no subset ids being stored
+                    if (!isSubsetEmpty(i) && !GLOBAL.CurrentSubsetIDs[i]) {
                         runAllQueries(_fetchDataAction);
                         return;
                     }
