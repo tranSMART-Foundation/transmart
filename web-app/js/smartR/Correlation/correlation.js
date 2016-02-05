@@ -1,5 +1,7 @@
 
 smartRApp.controller('CorrelationController', function ($scope) {
-    $scope.datapoints = [];
-    $scope.annotations = [];
+    $scope.conceptBoxes = {
+        datapoints: [],
+        annotations: []
+    }
 });
