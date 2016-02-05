@@ -20,10 +20,6 @@
     src: local('Roboto'), local('Roboto-Regular'), url(http://fonts.gstatic.com/s/roboto/v15/oMMgfZMQthOryQo9n22dcuvvDin1pK8aKteLpeZ5c0A.woff2) format('woff2');
 }
 
-.heim-fetch-err{
-    color: red;
-}
-
 #smartRPanel > * {
     font-family: 'Roboto', sans-serif; !important;
 }

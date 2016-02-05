@@ -352,12 +352,9 @@ window.HeatmapService = (function(){
     };
 
     service.generateSummaryTable = function (data) {
-        // sort subset to mantain order
-        data.sort(function (a, b) {
-            a = a.subset;
-            b = b.subset;
-            return a.localeCompare(b);
-        });
+        var _data = [];
+        _data[0] = data.find(function(el) { return el.subset == 's1'; });
+        _data[1] = data.find(function(el) { return el.subset == 's2'; });
 
         // get template
         var rowTemplate = jQuery.templates('#summary-row-tmp');
@@ -366,19 +363,16 @@ window.HeatmapService = (function(){
         var _summaryObj = {summaryStat : []};
 
         // return null when there's no data from both subsets defined
-        if (typeof data[0] === 'undefined' && typeof data[0] === 'undefined')
+        if (_data[0] === undefined && _data[1] === undefined) {
             return null;
-        // use any available data
-        var _data = typeof data[0] === 'undefined' ? data[1] : data[0];
+        }
 
-        for (var key in _data) {
-            if (_data.hasOwnProperty(key)) {
-                _summaryObj.summaryStat.push({
-                    key: key,
-                    val1: (typeof data[0] === 'undefined') ? '-' : data[0][key],
-                    val2: (typeof data[1] === 'undefined') ? '-' : data[1][key]
-                });
-            }
+        for (var key in (_data[0] === undefined ? _data[1] : _data[0])) {
+            _summaryObj.summaryStat.push({
+                key: key,
+                val1: (_data[0] === undefined) ? '-' : _data[0][key],
+                val2: (_data[1] === undefined) ? '-' : _data[1][key]
+            });
         }
         // return and render
         return rowTemplate.render(_summaryObj);
