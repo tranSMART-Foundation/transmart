@@ -430,8 +430,6 @@ var HeatmapView = (function(){
                 this.value = v.display + ' ' + v.keyword;
                 return false;
             });
-        view.fetchDataView.identifierInput.on('autocompleteclose',
-            function() { this.value = ''; });
 
         view.fetchDataView.clearBtn.click(view.clearConceptPathInput);
 
