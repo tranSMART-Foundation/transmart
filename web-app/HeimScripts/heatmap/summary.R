@@ -458,7 +458,7 @@ write_summary_stats <- function(summary_stats)
   for (i in 1:length(summary_stats))
   {
     summary_stats_JSON <-
-      toJSON(summary_stats[[i]], dataframe = "rows", pretty = T)
+      toJSON(summary_stats[[i]], dataframe = "rows", pretty = T, digits = 17)
     fileName <- names(summary_stats)[[i]]
     write(summary_stats_JSON, fileName)
   }
