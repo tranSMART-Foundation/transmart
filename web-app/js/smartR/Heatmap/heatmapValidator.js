@@ -14,7 +14,8 @@ window.HeatmapValidator = (function() {
     };
 
     validator.isEmptySubset = function (subsets) {
-        return subsets.length < 1;
+        // we need to filter out nulls
+        return subsets.filter(function(x) { return x; }).length < 1;
     };
 
     validator.isEmptyHighDimensionalData = function (hd) {
