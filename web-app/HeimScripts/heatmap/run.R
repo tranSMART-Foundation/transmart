@@ -59,7 +59,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   jsn <- addClusteringOutput(jsn, measurements) #
   jsn <- toJSON(jsn,
                 pretty = TRUE,
-                digits = 17)
+                digits = I(17))
   writeDataForZip(df, measurements, patientIDs)  # for later zip generation
   write(jsn,file = "heatmap.json")   # json file be served the same way
                                      # like any other file would - get name via
@@ -74,7 +74,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
 writeMarkerTable <- function(markerTable){
   colnames(markerTable) <- c("rowLabel", "biomarker",
                              "log2FoldChange", "t", "pValue", "adjustedPValue", "B")
-  jsn                   <- toJSON(markerTable, pretty = TRUE, digits = 17)
+  jsn                   <- toJSON(markerTable, pretty = TRUE, digits = I(17))
   write(jsn, file = markerTableJson)
 }
 
