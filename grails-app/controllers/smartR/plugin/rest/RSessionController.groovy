@@ -33,27 +33,33 @@ class RSessionController {
         }
     }
 
+    def touch() {
+        sessionService.touchSession(sessionId)
+        render status: 204 // no content
+    }
+
     /**
      * Deletes an R session
      */
     def delete() {
+        sessionService.destroySession(sessionId)
+
+        response.status = 202 /* session shutdown runs asynchronously */
+        render ''
+    }
+
+    private UUID getSessionId() {
         def json = request.JSON
-        def sessionId
         if (!json.sessionId || !(json.sessionId instanceof String)) {
             throw new InvalidArgumentsException(
                     "No session id provided or not string: ${json.sessionId}")
         }
         try {
-            sessionId = UUID.fromString(json.sessionId)
+            UUID.fromString(json.sessionId)
         } catch (IllegalArgumentException iae) {
             throw new InvalidArgumentsException(
                     "Invalid session id (not a UUID): ${json.sessionId}")
         }
-
-        sessionService.destroySession(sessionId)
-
-        response.status = 202 /* session shutdown runs asynchronously */
-        render ''
     }
 
 }

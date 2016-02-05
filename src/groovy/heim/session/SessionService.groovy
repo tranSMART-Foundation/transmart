@@ -32,6 +32,7 @@ class SessionService implements DisposableBean {
     private static final int SESSION_LIFESPAN = 10 * 60 * 1000 // 10 min
 
     private final ReadWriteLock sessionBookKeepingLock = new ReentrantReadWriteLock()
+    // synchronizes the next two variables:
     private final Map<UUID, SessionContext> currentSessions = new HashMap<>()
     private final Set<UUID> sessionsShuttingDown = [] as Set
 
