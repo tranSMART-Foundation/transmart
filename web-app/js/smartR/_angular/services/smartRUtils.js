@@ -13,6 +13,15 @@ smartRApp.factory('smartRUtils', [function() {
         return allConcepts;
     };
 
+    service.makeSafeForCSS = function smartRUtils_makeSafeForCSS(str) {
+        return str.replace(/[^a-z0-9]/g, function(s) {
+            var c = s.charCodeAt(0);
+            if (c == 32) return '-';
+            if (c >= 65 && c <= 90) return '_' + s.toLowerCase();
+            return '__' + ('000' + c.toString(16)).slice(-4);
+        });
+    };
+
     service.getSubsetIds = function smartRUtil_getSubsetIds() {
         var defer = jQuery.Deferred();
 

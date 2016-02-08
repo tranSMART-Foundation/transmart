@@ -16,7 +16,6 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
         touchTimeout: null // for current session id
     };
 
-
     var workflow = '';
     /* returns a promise with the session id and
      * saves the session id for future calls */
@@ -274,13 +273,11 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
                         resultInstanceIds: subsets
                     }
                 }).then(
-                    function(answer) { return 'Task complete! State: ' + answer.state; },
-                    function(error) { return 'Error: ' + error; }
+                    function(ret) { return 'Task complete! State: ' + ret.state; },
+                    function(ret) { return 'Error: ' + ret.response; }
                 )
             },
-            function() {
-                return 'Could not create subsets. Did you select a cohort?';
-            });
+            function() { return 'Could not create subsets. Did you select a cohort?'; });
     };
 
     return service;

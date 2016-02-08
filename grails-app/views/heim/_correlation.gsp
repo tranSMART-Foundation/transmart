@@ -2,20 +2,28 @@
 <r:layoutResources/>
 
 <div ng-controller="CorrelationController">
-    <concept-box concept-group="conceptBoxes.datapoints"></concept-box>
-    <concept-box concept-group="conceptBoxes.annotations"></concept-box>
-    <br/>
-    <br/>
-    <input type="button" value="Fetch Data" ng-click="fetchData()">
-    <br/>
-    <br/>
-    <input type="button" value="Show Analysis" ng-click="createViz()">
-    <br/>
-    <br/>
-    {{message}}
-    <br/>
-    <br/>
-    <correlation-plot data="scriptResults" width="1200" height="1200"></correlation-plot>
+
+    <tab-container>
+
+        <workflow-tab tab-name="Fetch Data">
+            <concept-box concept-group="conceptBoxes.datapoints"></concept-box>
+            <concept-box concept-group="conceptBoxes.annotations"></concept-box>
+            <br/>
+            <br/>
+            <input type="button" value="Fetch Data" ng-click="fetchData()">
+            {{message}}
+        </workflow-tab>
+
+        <workflow-tab tab-name="Run Analysis">
+            <input type="button" value="Show Analysis" ng-click="createViz()">
+            {{message}}
+            <br/>
+            <br/>
+            <correlation-plot data="scriptResults" width="1200" height="1200"></correlation-plot>
+        </workflow-tab>
+
+    </tab-container>
+
 </div>
 
 
