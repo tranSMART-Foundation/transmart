@@ -73,8 +73,8 @@ var HeatmapView = (function(){
         var _conceptPath = extJSHelper.readConceptVariables(v.conceptPathsInput.attr('id'));
         return {
             conceptPaths: _conceptPath,
-            // CurrentSubsetIDs can contain undefined and null. Pass only nulls forward
-            resultInstanceIds : GLOBAL.CurrentSubsetIDs.map(function (v) { return v || null; }),
+            // CurrentSubsetIDs contains an undefined element at 0
+            resultInstanceIds : GLOBAL.CurrentSubsetIDs.slice(1,3),
             searchKeywordIds: Object.getOwnPropertyNames(bioMarkersModel.selectedBioMarkers)
         };
     };
@@ -236,7 +236,6 @@ var HeatmapView = (function(){
                 _toggleAnalysisView({subsetNo: subsetNo, noOfSamples: _noOfSamples});
             })
                 .fail(function (d) {
-                    view.fetchDataView.outputArea.html('<p style="color: red";><b>'+ d +'</b>');
                     _resetActionButtons();
                 });
         };
@@ -341,8 +340,9 @@ var HeatmapView = (function(){
             view.fetchDataView,
             function () {
                 for (var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
-                    if (isSubsetEmpty(i) &&             // trigger validation from transmartApp if it's true
-                        !GLOBAL.CurrentSubsetIDs[i]) {  // no subset ids being stored
+                    if (!isSubsetEmpty(i) && !GLOBAL.CurrentSubsetIDs[i]) {
+                        // replace undefined with null in the array
+                        GLOBAL.CurrentSubsetIDs[i] = null;
                         runAllQueries(_fetchDataAction);
                         return;
                     }
@@ -431,8 +431,6 @@ var HeatmapView = (function(){
                 this.value = v.display + ' ' + v.keyword;
                 return false;
             });
-        view.fetchDataView.identifierInput.on('autocompleteclose',
-            function() { this.value = ''; });
 
         view.fetchDataView.clearBtn.click(view.clearConceptPathInput);
 

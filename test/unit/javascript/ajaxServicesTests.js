@@ -43,6 +43,20 @@ describe('ajaxServices', function() {
         });
     }
 
+    function sharedExampleForExecutingTouches(sessionId) {
+        sessionId = sessionId || null
+        it('executes touching for 9 min after', function() {
+            jasmine.clock().tick(9 * 60 * 1000 - 1);
+            var numRequests = jasmine.Ajax.requests.count();
+            jasmine.clock().tick(1);
+            expect(jasmine.Ajax.requests.count()).toBe(numRequests + 1);
+
+            expect(this.mostRecentRequest().url)
+                .toBe(BASE_PATH + '/RSession/touch');
+            expect(this.mostRecentRequest().data().sessionId).toBe(sessionId);
+        });
+    }
+
     function defineJsonResponse(data) {
         beforeEach(function() {
             this.mostRecentRequest().respondWith({
@@ -70,6 +84,7 @@ describe('ajaxServices', function() {
     afterEach(function () {
         jasmine.Ajax.uninstall();
         jasmine.clock().uninstall();
+        ajaxServices.abandonCurrentSession();
     });
 
     describe('call startSession', function() {
@@ -106,6 +121,17 @@ describe('ajaxServices', function() {
                 var spy = jasmine.createSpy();
                 this.promise.done(spy);
                 expect(spy).toHaveBeenCalledWith(sessionId);
+            });
+
+            sharedExampleForExecutingTouches(sessionId);
+
+            it('executes second touching 9 min after first', function() {
+                jasmine.clock().tick(9 * 60 * 1000);
+                this.mostRecentRequest().respondWith({ status: 204 });
+                jasmine.clock().tick(9 * 60 * 1000 - 1);
+                expect(jasmine.Ajax.requests.count()).toBe(2);
+                jasmine.clock().tick(1);
+                expect(jasmine.Ajax.requests.count()).toBe(3);
             });
         });
 
@@ -215,6 +241,8 @@ describe('ajaxServices', function() {
                         statusText: response.result.exception
                     });
                 });
+
+                sharedExampleForExecutingTouches();
             });
 
             sharedEnvironmentForPromiseCancellation(
@@ -236,6 +264,8 @@ describe('ajaxServices', function() {
                     this.promise.done(spy);
                     expect(spy).toHaveBeenCalledWith(addExecutionIdToResponse(response));
                 });
+
+                sharedExampleForExecutingTouches();
             });
 
             describe('the first call to /status returns RUNNING', function() {

@@ -58,7 +58,8 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   measurements <- toZscores(measurements)
   jsn <- addClusteringOutput(jsn, measurements) #
   jsn <- toJSON(jsn,
-                pretty = TRUE)
+                pretty = TRUE,
+                digits = I(17))
   writeDataForZip(df, measurements, patientIDs)  # for later zip generation
   write(jsn,file = "heatmap.json")   # json file be served the same way
                                      # like any other file would - get name via
@@ -73,7 +74,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
 writeMarkerTable <- function(markerTable){
   colnames(markerTable) <- c("rowLabel", "biomarker",
                              "log2FoldChange", "t", "pValue", "adjustedPValue", "B")
-  jsn                   <- toJSON(markerTable, pretty = TRUE)
+  jsn                   <- toJSON(markerTable, pretty = TRUE, digits = I(17))
   write(jsn, file = markerTableJson)
 }
 
@@ -175,7 +176,12 @@ addStats <- function(df, sorting, ranking, max_rows) {
 }
 
 # Coefficient of variation
-coeffVar     <- function(x, na.rm = TRUE) ( sd(x, na.rm = na.rm)/mean(x, na.rm = na.rm) )
+coeffVar     <- function(x, na.rm = TRUE) {
+    c_sd <- sd(x, na.rm = na.rm)
+    c_mean <- mean(x, na.rm = na.rm)
+    if (c_mean == 0) {c_mean <- 0.0001} # override mean with 0.0001 when it's zero
+    c_sd/c_mean
+}
 
 # Specific implementation of range.
 normRange <- function(x, na.rm = TRUE) {

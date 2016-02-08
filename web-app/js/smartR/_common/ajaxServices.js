@@ -6,12 +6,14 @@ window.smartR.ajaxServices = function(basePath, workflow) {
     var NOOP_ABORT = function() {};
     var TIMEOUT = 10000 /* 10 s */;
     var CHECK_DELAY = 1000;
+    var SESSION_TOUCH_DELAY = 9 * 60 * 1000; /* 9 min; session timeout is 10 */
 
-    /* we can only support on request at a time */
+    /* we only support one session at a time */
 
     var state = {
         currentRequestAbort: NOOP_ABORT,
-        sessionId: null
+        sessionId: null,
+        touchTimeout: null, // for current session id
     };
 
     /* returns a promise with the session id and
@@ -27,12 +29,37 @@ window.smartR.ajaxServices = function(basePath, workflow) {
             })
         })
             .pipe(function(response) {
-            return response.sessionId;
+                return response.sessionId;
             }, transformAjaxFailure)
-            .done(function(sessionId) {
-            state.sessionId = sessionId;
-        });
+            .done((function(sessionId) {
+                state.sessionId = sessionId;
+                ajaxServices_scheduleTouch.call(this);
+            }).bind(this));
     };
+
+    result.touch = function ajaxServices_touch(sessionId) {
+        if (sessionId != state.sessionId) {
+            return;
+        }
+
+        jQuery.ajax({
+            url: basePath + '/RSession/touch',
+            type: 'POST',
+            timeout: TIMEOUT,
+            contentType: 'application/json',
+            data: JSON.stringify( {
+                sessionId: sessionId
+            })
+        }).done(ajaxServices_scheduleTouch.bind(this)); // schedule another
+    };
+
+    function ajaxServices_scheduleTouch() {
+        var sessionId = state.sessionId;
+        window.clearTimeout(state.touchTimeout);
+        state.touchTimeout = window.setTimeout(function() {
+            result.touch(sessionId);
+        }, SESSION_TOUCH_DELAY);
+    }
 
     result.destroySession = function ajaxServices_destroySession(sessionId) {
         sessionId = sessionId || state.sessionId;
@@ -41,8 +68,9 @@ window.smartR.ajaxServices = function(basePath, workflow) {
             throw new Error('No session to destroy');
         }
 
+
         return jQuery.ajax({
-            url: basePath + '/RSession/create',
+            url: basePath + '/RSession/delete',
             type: 'POST',
             timeout: TIMEOUT,
             contentType: 'application/json',
@@ -51,7 +79,17 @@ window.smartR.ajaxServices = function(basePath, workflow) {
             })
         })
             .pipe(function(x) { return x; }, transformAjaxFailure)
-            .done(function() { state.sessionId = null; });
+            .done(function() {
+                if (state.sessionId != sessionId) {
+                    return;
+                }
+                this.abandonCurrentSession();
+            }.bind(this));
+    };
+
+    result.abandonCurrentSession = function ajaxServices_abandonSession() {
+        window.clearTimeout(state.touchTimeout);
+        state.sessionId = null;
     };
 
     /*
@@ -99,6 +137,10 @@ window.smartR.ajaxServices = function(basePath, workflow) {
             // calling this method should by itself resolve the promise
             state.currentRequestAbort();
         };
+
+        // no touching necessary when a task is running
+        window.clearTimeout(state.touchTimeout);
+        promise.always(ajaxServices_scheduleTouch.bind(this));
 
         return promise;
     };
@@ -218,7 +260,7 @@ window.smartR.ajaxServices = function(basePath, workflow) {
             executionId +
             '&filename=' +
             filename;
-    }
+    };
 
     return result;
 };

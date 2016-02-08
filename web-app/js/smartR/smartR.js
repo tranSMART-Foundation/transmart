@@ -399,8 +399,8 @@ var panelItem = $('#resultsTabPanel__smartRPanel')
 //panelItem.click(updateInputView)
 
 function shortenConcept(concept) {
-    var splits = concept.split('\\')
-    return splits[splits.length - 3] + '/' + splits[splits.length - 2]
+    var splits = concept.split('\\');
+    return splits[splits.length - 3] + '/' + splits[splits.length - 2];
 }
 
 window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {

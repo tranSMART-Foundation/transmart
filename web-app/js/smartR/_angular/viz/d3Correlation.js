@@ -11,7 +11,9 @@ smartRApp.directive('correlationAnalysis', [function() {
         link: function (scope, element) {
             scope.$watch('data', function() {
                 $(element[0]).empty();
-                createCorrelationViz(scope, element[0]);
+                if (scope.data) {
+                    createCorrelationViz(scope, element[0]);
+                }
             });
         }
     };
@@ -365,11 +367,11 @@ smartRApp.directive('correlationAnalysis', [function() {
         }
 
         function updateLegend() {
-            var html = 'Correlation Coefficient: ${correlation}<br/>' +
+            var html = 'Correlation Coefficient: ' + correlation + '<br/>' +
                 'p-value: ' + pvalue + '<br/>' +
-                'Method:' + method + '<br/><br/>' +
-                'Selected:' + d3.selectAll('.point.selected').size() || d3.selectAll('.point').size() + '<br/>' +
-                'Displayed:' + d3.selectAll('.point').size() + '<br/><br/>';
+                'Method: ' + method + '<br/><br/>' +
+                'Selected: ' + d3.selectAll('.point.selected').size() || d3.selectAll('.point').size() + '<br/>' +
+                'Displayed: ' + d3.selectAll('.point').size() + '<br/><br/>';
             html = html + '<p style="background: #000000; color:#FFFFFF">Default</p>';
             for (var i = 0; i < tags.length; i++) {
                 var tag = tags[i];

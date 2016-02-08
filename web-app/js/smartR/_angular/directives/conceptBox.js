@@ -41,8 +41,9 @@ smartRApp.directive('conceptBox', [function() {
 
             // this watches the childNodes of the conceptBox and updates the model on change
             new MutationObserver(function() {
-                scope.conceptGroup = getConcepts(template_box); // update the model
-                scope.$apply(); // notify controller of the changes
+                scope.$apply(function() {
+                    scope.conceptGroup = getConcepts(template_box); // update the model
+                });
             }).observe(template_box, { childList: true });
         }
     };

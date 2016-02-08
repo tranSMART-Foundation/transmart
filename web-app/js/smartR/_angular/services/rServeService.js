@@ -6,45 +6,74 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
     var NOOP_ABORT = function() {};
     var TIMEOUT = 10000 /* 10 s */;
     var CHECK_DELAY = 1000;
+    var SESSION_TOUCH_DELAY = 9 * 60 * 1000; /* 9 min; session timeout is 10 */
 
-    /* we can only support on request at a time */
+    /* we only support one session at a time */
 
     var state = {
         currentRequestAbort: NOOP_ABORT,
-        sessionId: null
+        sessionId: null,
+        touchTimeout: null // for current session id
     };
 
+
+    var workflow = '';
     /* returns a promise with the session id and
      * saves the session id for future calls */
-    var workflow = '';
-    service.startSession = function RServeService_startSession(name) {
+    service.startSession = function rServeService_startSession(name) {
         workflow = name;
-        return jQuery.ajax({
+        return $.ajax({
                 url: pageInfo.basePath + '/RSession/create',
                 type: 'POST',
                 timeout: TIMEOUT,
                 contentType: 'application/json',
-                data: JSON.stringify( {
+                data: JSON.stringify({
                     workflow: workflow
                 })
             })
-            .pipe(function(response) {
+            .then(function(response) {
                 return response.sessionId;
             }, transformAjaxFailure)
-            .done(function(sessionId) {
+            .done((function(sessionId) {
                 state.sessionId = sessionId;
-            });
+                rServeService_scheduleTouch.call(this);
+            }).bind(this));
     };
 
-    service.destroySession = function RServeService_destroySession(sessionId) {
+    service.touch = function rServeService_touch(sessionId) {
+        if (sessionId != state.sessionId) {
+            return;
+        }
+
+        $.ajax({
+            url: pageInfo.basePath + '/RSession/touch',
+            type: 'POST',
+            timeout: TIMEOUT,
+            contentType: 'application/json',
+            data: JSON.stringify( {
+                sessionId: sessionId
+            })
+        }).done(rServeService_scheduleTouch.bind(this)); // schedule another
+    };
+
+    function rServeService_scheduleTouch() {
+        var sessionId = state.sessionId;
+        window.clearTimeout(state.touchTimeout);
+        state.touchTimeout = window.setTimeout(function() {
+            service.touch(sessionId);
+        }, SESSION_TOUCH_DELAY);
+    }
+
+    service.destroySession = function rServeService_destroySession(sessionId) {
         sessionId = sessionId || state.sessionId;
 
         if (!sessionId) {
             throw new Error('No session to destroy');
         }
 
-        return jQuery.ajax({
-                url: pageInfo.basePath + '/RSession/create',
+
+        return $.ajax({
+                url: pageInfo.basePath + '/RSession/delete',
                 type: 'POST',
                 timeout: TIMEOUT,
                 contentType: 'application/json',
@@ -52,8 +81,18 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
                     sessionId: sessionId
                 })
             })
-            .pipe(function(x) { return x; }, transformAjaxFailure)
-            .done(function() { state.sessionId = null; });
+            .then(function(x) { return x; }, transformAjaxFailure)
+            .done(function() {
+                if (state.sessionId != sessionId) {
+                    return;
+                }
+                this.abandonCurrentSession();
+            }.bind(this));
+    };
+
+    service.abandonCurrentSession = function rServeService_abandonSession() {
+        window.clearTimeout(state.touchTimeout);
+        state.sessionId = null;
     };
 
     /*
@@ -70,12 +109,12 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
      *   statusText: <a description of the error>,
      * }
      */
-    service.startScriptExecution = function RServeService_startScriptExecution(taskDataOrig) {
+    service.startScriptExecution = function rServeService_startScriptExecution(taskDataOrig) {
 
-        var taskData = jQuery.extend({}, taskDataOrig); // clone the thing
+        var taskData = $.extend({}, taskDataOrig); // clone the thing
         state.currentRequestAbort();
 
-        var runRequest = jQuery.ajax({
+        var runRequest = $.ajax({
             url: pageInfo.basePath + '/ScriptExecution/run',
             type: 'POST',
             timeout: TIMEOUT,
@@ -92,7 +131,7 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
 
         /* schedule checks */
         var promise = runRequest
-            .pipe(function(d) {
+            .then(function(d) {
                 taskData.executionId = d.executionId;
                 return _checkStatus(taskData.executionId, CHECK_DELAY);
             }, transformAjaxFailure);
@@ -101,6 +140,10 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
             // calling this method should by itself resolve the promise
             state.currentRequestAbort();
         };
+
+        // no touching necessary when a task is running
+        window.clearTimeout(state.touchTimeout);
+        promise.always(rServeService_scheduleTouch.bind(this));
 
         return promise;
     };
@@ -121,7 +164,7 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
      * as the cancellation of this timeout.
      * Return the result as a promise. */
     function _setStatusRequestTimeout(funcToCall, delay /*, ... */) {
-        var defer = jQuery.Deferred();
+        var defer = $.Deferred();
         var promise = defer.promise();
         var restOfArguments = Array.prototype.slice.call(arguments)
             .splice(2); // arguments after delay
@@ -163,7 +206,7 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
     /* aux function of _startScriptExecution. Needs to follow its contract
      * with respect to the fail and success result of the promise */
     function _checkStatus(executionId, delay) {
-        var ajax = jQuery.ajax({
+        var ajax = $.ajax({
             type: 'GET',
             url : pageInfo.basePath + '/ScriptExecution/status',
             data: {
@@ -175,12 +218,12 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
         state.currentRequestAbort = function() { ajax.abort(); };
         ajax.always(function() { state.currentRequestAbort = NOOP_ABORT; });
 
-        return ajax.pipe(function (d) {
+        return ajax.then(function (d) {
             if (d.state === 'FINISHED') {
                 d.executionId = executionId;
                 return d;
             } else if (d.state === 'FAILED') {
-                return jQuery.Deferred().reject({
+                return $.Deferred().reject({
                     status: 0,
                     statusText: d.result.exception
                 }).promise();
@@ -195,7 +238,7 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
     function transformAjaxFailure(jqXHR, textStatus, errorThrown) {
         var ret = {
             status: jqXHR.status,
-            statusText: jqXHR.statusText,
+            statusText: jqXHR.statusText
         };
         if (jqXHR.responseJSON !== undefined) {
             ret.response = jqXHR.responseJSON;
@@ -205,13 +248,14 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
     }
 
     service.downloadJsonFile = function(executionId, filename) {
-        return jQuery.ajax({
+        return $.ajax({
             url: this.urlForFile(executionId, filename),
             dataType: 'json'
         });
     };
 
-    service.urlForFile = function RServeService_urlForFile(executionId, filename) {
+
+    service.urlForFile = function rServeService_urlForFile(executionId, filename) {
         return pageInfo.basePath +
             '/ScriptExecution/downloadFile?sessionId=' +
             state.sessionId +
@@ -220,9 +264,6 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
             '&filename=' +
             filename;
     };
-
-
-    // new methods or refactored code below this line
 
     service.loadDataIntoSession = function(conceptBoxMap) {
         // prepare concept object
@@ -234,8 +275,8 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
             });
         });
 
-        smartRUtils.getSubsetIds().pipe(function(subsets) {
-            service.startScriptExecution({
+        return smartRUtils.getSubsetIds().then(function(subsets) {
+            return service.startScriptExecution({
                 taskType: 'fetchData',
                 arguments: {
                     conceptKeys: allConcepts,
@@ -243,7 +284,7 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
                 }
             });
         }, function() {
-            alert('Could not create subsets. Did you select a cohort?');
+            return 'Could not create subsets. Did you select a cohort?';
         });
     };
 

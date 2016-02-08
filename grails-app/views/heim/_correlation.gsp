@@ -12,7 +12,7 @@
     <input type="button" value="Show Analysis" ng-click="createViz()">
     <br/>
     <br/>
-    ScriptResults: {{scriptResults}}
+    {{message}}
     <br/>
     <br/>
     <correlation-analysis data="scriptResults" width="1200" height="1200"></correlation-analysis>

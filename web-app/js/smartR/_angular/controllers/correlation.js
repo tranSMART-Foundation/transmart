@@ -1,5 +1,5 @@
 
-smartRApp.controller('CorrelationController', ['$scope', 'rServeService', function($scope, rServeService) {
+smartRApp.controller('CorrelationController', ['$scope', 'rServeService', 'smartRUtils', function($scope, rServeService, smartRUtils) {
 
     rServeService.startSession('correlation');
 
@@ -9,9 +9,21 @@ smartRApp.controller('CorrelationController', ['$scope', 'rServeService', functi
     };
 
     $scope.scriptResults = {};
+    $scope.message = '';
 
     $scope.fetchData = function() {
-        rServeService.loadDataIntoSession($scope.conceptBoxes);
+        var promise = rServeService.loadDataIntoSession($scope.conceptBoxes);
+        promise.done(function() {
+            $scope.$apply(function() {
+                $scope.message = 'Data loaded into R session!';
+            });
+        });
+
+        promise.fail(function(error) {
+            $scope.$apply(function() {
+                $scope.message = error;
+            });
+        });
     };
 
     $scope.createViz = function() {
@@ -19,8 +31,9 @@ smartRApp.controller('CorrelationController', ['$scope', 'rServeService', functi
             taskType: 'run',
             arguments: {}
         }).pipe(function(answer) {
-            $scope.scriptResults = JSON.parse(answer.result.artifacts.value);
-            $scope.$apply();
+            $scope.$apply(function() {
+                $scope.scriptResults = JSON.parse(answer.result.artifacts.value);
+            });
         })
     }
 }]);

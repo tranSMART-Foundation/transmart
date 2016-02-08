@@ -3,6 +3,8 @@ library(reshape2)
 main <- function(method = 'pearson') {
     num_data <- parseNumericalData()
     num_data <- na.omit(num_data)
+    xArrLabel <- colnames(num_data)[2]
+    yArrLabel <- colnames(num_data)[3]
     colnames(num_data) <- c('patientID', 'x', 'y')
 
 #    cat_data <- parseCategoricalData()
@@ -30,8 +32,8 @@ main <- function(method = 'pearson') {
         pvalue = corTest$p.value,
         regLineSlope = regLineSlope,
         regLineYIntercept = regLineYIntercept,
-        xArrLabel = 'abc',
-        yArrLabel = 'efg',
+        xArrLabel = xArrLabel,
+        yArrLabel = yArrLabel,
         method = method,
         patientIDs = num_data[,1],
         tags = c(),
