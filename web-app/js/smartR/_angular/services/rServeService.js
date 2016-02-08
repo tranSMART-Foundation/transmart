@@ -71,7 +71,6 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
             throw new Error('No session to destroy');
         }
 
-
         return $.ajax({
                 url: pageInfo.basePath + '/RSession/delete',
                 type: 'POST',
@@ -265,27 +264,23 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
             filename;
     };
 
-    service.loadDataIntoSession = function(conceptBoxMap) {
-        // prepare concept object
-        var allConcepts = {};
-        Object.keys(conceptBoxMap).each(function(group) {
-            var concepts = conceptBoxMap[group];
-            concepts.each(function(concept, idx) {
-                allConcepts[group + '_' + 'n' + idx] = concept;
+    service.loadDataIntoSession = function rServeService_loadDataIntoSession(conceptKeys) {
+        return smartRUtils.getSubsetIds().then(
+            function(subsets) {
+                return service.startScriptExecution({
+                    taskType: 'fetchData',
+                    arguments: {
+                        conceptKeys: conceptKeys,
+                        resultInstanceIds: subsets
+                    }
+                }).then(
+                    function(answer) { return 'Task complete! State: ' + answer.state; },
+                    function(error) { return 'Error: ' + error; }
+                )
+            },
+            function() {
+                return 'Could not create subsets. Did you select a cohort?';
             });
-        });
-
-        return smartRUtils.getSubsetIds().then(function(subsets) {
-            return service.startScriptExecution({
-                taskType: 'fetchData',
-                arguments: {
-                    conceptKeys: allConcepts,
-                    resultInstanceIds: subsets
-                }
-            });
-        }, function() {
-            return 'Could not create subsets. Did you select a cohort?';
-        });
     };
 
     return service;

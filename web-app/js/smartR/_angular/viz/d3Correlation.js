@@ -1,5 +1,5 @@
 
-smartRApp.directive('correlationAnalysis', [function() {
+smartRApp.directive('correlationPlot', [function() {
 
     return {
         restrict: 'E',

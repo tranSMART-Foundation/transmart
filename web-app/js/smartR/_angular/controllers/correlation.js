@@ -1,39 +1,41 @@
 
-smartRApp.controller('CorrelationController', ['$scope', 'rServeService', 'smartRUtils', function($scope, rServeService, smartRUtils) {
+smartRApp.controller('CorrelationController',
+    ['$scope', 'smartRUtils', 'rServeService', function($scope, smartRUtils, rServeService) {
 
-    rServeService.startSession('correlation');
+        rServeService.startSession('correlation');
 
-    $scope.conceptBoxes = {
-        datapoints: [],
-        annotations: []
-    };
+        // model
+        $scope.conceptBoxes = {
+            datapoints: [],
+            annotations: []
+        };
+        $scope.scriptResults = {};
+        $scope.message = '';
 
-    $scope.scriptResults = {};
-    $scope.message = '';
+        $scope.fetchData = function() {
+            var conceptKeys = smartRUtils.conceptBoxMapToConceptKeys($scope.conceptBoxes);
+            var promise = rServeService.loadDataIntoSession(conceptKeys);
 
-    $scope.fetchData = function() {
-        var promise = rServeService.loadDataIntoSession($scope.conceptBoxes);
-        promise.done(function() {
-            $scope.$apply(function() {
-                $scope.message = 'Data loaded into R session!';
+            promise.always(function(msg) {
+                $scope.message = msg;
+                $scope.$apply();
             });
-        });
+        };
 
-        promise.fail(function(error) {
-            $scope.$apply(function() {
-                $scope.message = error;
+        $scope.createViz = function() {
+            var promise = rServeService.startScriptExecution({
+                taskType: 'run',
+                arguments: {}
             });
-        });
-    };
 
-    $scope.createViz = function() {
-        rServeService.startScriptExecution({
-            taskType: 'run',
-            arguments: {}
-        }).pipe(function(answer) {
-            $scope.$apply(function() {
+            promise.done(function(answer) {
                 $scope.scriptResults = JSON.parse(answer.result.artifacts.value);
+                $scope.$apply();
             });
-        })
-    }
-}]);
+
+            promise.fail(function(error) {
+                $scope.message = error;
+                $scope.$apply();
+            })
+        }
+    }]);

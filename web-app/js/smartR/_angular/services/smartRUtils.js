@@ -2,6 +2,17 @@ smartRApp.factory('smartRUtils', [function() {
 
     var service = {};
 
+    service.conceptBoxMapToConceptKeys = function smartRUtils_conceptBoxMapToConceptKeys(conceptBoxMap) {
+        var allConcepts = {};
+        Object.keys(conceptBoxMap).each(function(group) {
+            var concepts = conceptBoxMap[group];
+            concepts.each(function(concept, idx) {
+                allConcepts[group + '_' + 'n' + idx] = concept;
+            });
+        });
+        return allConcepts;
+    };
+
     service.getSubsetIds = function smartRUtil_getSubsetIds() {
         var defer = jQuery.Deferred();
 

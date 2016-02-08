@@ -15,7 +15,7 @@
     {{message}}
     <br/>
     <br/>
-    <correlation-analysis data="scriptResults" width="1200" height="1200"></correlation-analysis>
+    <correlation-plot data="scriptResults" width="1200" height="1200"></correlation-plot>
 </div>
 
 

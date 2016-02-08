@@ -60,7 +60,9 @@ modules = {
     smartR_angular_components {
         dependsOn 'angular'
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular', file: 'smartRApp.js']
+        // directives
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'conceptBox.js']
+        // services
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'rServeService.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'smartRUtils.js']
     }
