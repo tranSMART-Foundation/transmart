@@ -1,26 +1,53 @@
-window.SmartRCorrelation = (function () {
 
-    var service = {};
+smartRApp.directive('correlationAnalysis', [function() {
 
-    service.create = function (data) {
+    return {
+        restrict: 'E',
+        scope: {
+            data: '=',
+            width: '@',
+            height: '@'
+        },
+        link: function (scope, element) {
+            scope.$watch('data', function() {
+                $(element[0]).empty();
+                createCorrelationViz(scope, element[0]);
+            });
+        }
+    };
+
+    function createCorrelationViz(scope, root) {
         var animationDuration = 500;
-        var bins = 10
-        var w = 1200
-        var h = 1200
-        var margin = {top: 20, right: 20, bottom: h / 4, left: w / 4}
-        var width = w * 3 / 4 - margin.left - margin.right
-        var height = h * 3 / 4 - margin.top - margin.bottom
-        var bottomHistHeight = margin.bottom
-        var leftHistHeight = margin.left
-        var colors = ['#33FF33', '#3399FF', '#CC9900', '#CC99FF', '#FFFF00', 'blue']
+        var bins = 10;
+        var w = scope.width;
+        var h = scope.height;
+        var margin = {top: 20, right: 20, bottom: h / 4, left: w / 4};
+        var width = w * 3 / 4 - margin.left - margin.right;
+        var height = h * 3 / 4 - margin.top - margin.bottom;
+        var bottomHistHeight = margin.bottom;
+        var leftHistHeight = margin.left;
+        var colors = ['#33FF33', '#3399FF', '#CC9900', '#CC99FF', '#FFFF00', 'blue'];
         var x = d3.scale.linear()
-            .domain(d3.extent(data.points, function(d) { return d.x }))
-            .range([0, width])
+            .domain(d3.extent(scope.data.points, function(d) { return d.x }))
+            .range([0, width]);
         var y = d3.scale.linear()
-            .domain(d3.extent(data.points, function(d) { return d.y }))
-            .range([height, 0])
+            .domain(d3.extent(scope.data.points, function(d) { return d.y }))
+            .range([height, 0]);
 
-        var correlation, pvalue, regLineSlope, regLineYIntercept, patientIDs, tags, points, xArrLabel, yArrLabel, method, minX, maxX, minY, maxY
+        var correlation,
+            pvalue,
+            regLineSlope,
+            regLineYIntercept,
+            patientIDs,
+            tags,
+            points,
+            xArrLabel,
+            yArrLabel,
+            method,
+            minX,
+            maxX,
+            minY,
+            maxY;
         function setData(data) {
             correlation = data.correlation[0]
             pvalue = data.pvalue[0]
@@ -39,28 +66,28 @@ window.SmartRCorrelation = (function () {
             maxY = data.points.max(function(d) { return d.y })
         }
 
-        setData(data)
+        setData(scope.data)
 
         function updateStatistics(patientIDs, scatterUpdate, init) {
-            scatterUpdate = scatterUpdate === undefined ? false : scatterUpdate
-            init = init === undefined ? false : init
-            var settings = { patientIDs: patientIDs }
-            var onResponse = function(response) {
-                if (init) {
-                    d3.selectAll('#scatterplot *').remove()
-                    buildCorrelationAnalysis(response)
-                    return
-                }
-                setData(response)
-                if (scatterUpdate) updateScatterplot()
-                updateRegressionLine()
-                updateLegend()
-                updateHistogram()
-            }
-            startWorkflow(onResponse, settings, false, false)
+            //scatterUpdate = scatterUpdate === undefined ? false : scatterUpdate
+            //init = init === undefined ? false : init
+            //var settings = { patientIDs: patientIDs }
+            //var onResponse = function(response) {
+            //    if (init) {
+            //        d3.selectAll('#scatterplot *').remove()
+            //        buildCorrelationAnalysis(response)
+            //        return
+            //    }
+            //    setData(response)
+            //    if (scatterUpdate) updateScatterplot()
+            //    updateRegressionLine()
+            //    updateLegend()
+            //    updateHistogram()
+            //}
+            //startWorkflow(onResponse, settings, false, false)
         }
 
-        var svg = d3.select('#scatterplot').append('svg')
+        var svg = d3.select(root).append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
             .append('g')
@@ -73,7 +100,7 @@ window.SmartRCorrelation = (function () {
                     .style('top', mouseY() + 'px')
             })
 
-        var tooltip = d3.select('#scatterplot').append('div')
+        var tooltip = d3.select(root).append('div')
             .attr('class', 'tooltip')
             .style('visibility', 'hidden')
 
@@ -86,7 +113,7 @@ window.SmartRCorrelation = (function () {
         var drag = d3.behavior.drag()
             .on('drag', dragmove)
 
-        var legend = d3.select('#scatterplot').append('div')
+        var legend = d3.select(root).append('div')
             .attr('class', 'legend')
             .style('left', 0)
             .style('top', $('#scatterplot').offsetTop + 'px')
@@ -158,7 +185,7 @@ window.SmartRCorrelation = (function () {
 <input id='zoomButton' class='mybutton' type='button' value='Zoom'/><br/> \
 <input id='excludeButton' class='mybutton' type='button' value='Exclude'/><br/> \
 <input id='resetButton' class='mybutton' type='button' value='Reset'/>"
-        var contextMenu = d3.select('#scatterplot').append('div')
+        var contextMenu = d3.select(root).append('div')
             .attr('class', 'contextMenu')
             .style('visibility', 'hidden')
             .html(ctxHtml)
@@ -404,7 +431,6 @@ window.SmartRCorrelation = (function () {
         updateHistogram()
         updateRegressionLine()
         updateLegend()
-    };
+    }
 
-    return service;
-})();
+}]);

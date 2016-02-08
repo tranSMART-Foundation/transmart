@@ -8,6 +8,8 @@ smartRApp.controller('CorrelationController', ['$scope', 'rServeService', functi
         annotations: []
     };
 
+    $scope.scriptResults = {};
+
     $scope.fetchData = function() {
         rServeService.loadDataIntoSession($scope.conceptBoxes);
     };
@@ -17,8 +19,8 @@ smartRApp.controller('CorrelationController', ['$scope', 'rServeService', functi
             taskType: 'run',
             arguments: {}
         }).pipe(function(answer) {
-            var json = JSON.parse(answer.result.artifacts.value);
-            SmartRCorrelation.create(json);
+            $scope.scriptResults = JSON.parse(answer.result.artifacts.value);
+            $scope.$apply();
         })
     }
 }]);

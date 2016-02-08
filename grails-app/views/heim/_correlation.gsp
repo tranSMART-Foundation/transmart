@@ -6,17 +6,16 @@
     <concept-box concept-group="conceptBoxes.annotations"></concept-box>
     <br/>
     <br/>
-    ConceptModel: {{conceptBoxes}}
-    <br/>
-    <br/>
     <input type="button" value="Fetch Data" ng-click="fetchData()">
     <br/>
     <br/>
     <input type="button" value="Show Analysis" ng-click="createViz()">
-
-    <div id="visualization" class="sr-output-container">
-        <div id="scatterplot"></div>
-    </div>
+    <br/>
+    <br/>
+    ScriptResults: {{scriptResults}}
+    <br/>
+    <br/>
+    <correlation-analysis data="scriptResults" width="1200" height="1200"></correlation-analysis>
 </div>
 
 
