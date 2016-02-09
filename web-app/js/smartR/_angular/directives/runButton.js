@@ -5,7 +5,8 @@ smartRApp.directive('runButton', ['rServeService', function(rServeService) {
         scope: {
             storage: '=resultsStorage',
             script: '@scriptToRun',
-            name: '@buttonName'
+            name: '@buttonName',
+            arguments: '@parameterMap'
         },
         template: '<input type="button" value="{{name}}"><span></span>',
         link: function(scope, element) {
@@ -15,7 +16,7 @@ smartRApp.directive('runButton', ['rServeService', function(rServeService) {
             template_btn.onclick = function() {
                 rServeService.startScriptExecution({
                     taskType: scope.script,
-                    arguments: {}
+                    arguments: scope.arguments
                 }).then(
                     function (msg) { scope.storage = JSON.parse(msg.result.artifacts.value); },
                     function (msg) { template_msg.innerHTML = '  Failure: ' + msg; }

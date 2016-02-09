@@ -11,4 +11,7 @@ smartRApp.controller('CorrelationController',
             annotations: []
         };
         $scope.scriptResults = {};
+        $scope.params = {
+            method: 'pearson'
+        };
     }]);
