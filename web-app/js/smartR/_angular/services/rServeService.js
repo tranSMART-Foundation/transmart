@@ -1,5 +1,5 @@
 
-smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
+smartRApp.factory('rServeService', ['smartRUtils', '$q', function(smartRUtils, $q) {
 
     var service = {};
 
@@ -264,20 +264,32 @@ smartRApp.factory('rServeService', ['smartRUtils', function(smartRUtils) {
     };
 
     service.loadDataIntoSession = function rServeService_loadDataIntoSession(conceptKeys) {
-        return smartRUtils.getSubsetIds().then(
-            function(subsets) {
-                return service.startScriptExecution({
+        return $q(function(resolve, reject) {
+            var outerPromise = smartRUtils.getSubsetIds();
+
+            outerPromise.done(function(subsets) {
+                var innerPromise = service.startScriptExecution({
                     taskType: 'fetchData',
                     arguments: {
                         conceptKeys: conceptKeys,
                         resultInstanceIds: subsets
                     }
-                }).then(
-                    function(ret) { return 'Task complete! State: ' + ret.state; },
-                    function(ret) { return 'Error: ' + ret.response; }
-                )
-            },
-            function() { return 'Could not create subsets. Did you select a cohort?'; });
+                });
+
+                innerPromise.done(function(ret) {
+                    resolve('Task complete! State: ' + ret.state);
+                });
+
+                innerPromise.fail(function(ret) {
+                    reject('Error: ' + ret.response);
+                });
+
+            });
+
+            outerPromise.fail(function() {
+                reject('Could not create subsets. Did you select a cohort?');
+            });
+        });
     };
 
     return service;

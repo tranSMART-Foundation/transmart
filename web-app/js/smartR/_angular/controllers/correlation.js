@@ -16,9 +16,10 @@ smartRApp.controller('CorrelationController',
             var conceptKeys = smartRUtils.conceptBoxMapToConceptKeys($scope.conceptBoxes);
             var promise = rServeService.loadDataIntoSession(conceptKeys);
 
-            promise.always(function(msg) {
-                $scope.message = msg;
-                $scope.$apply();
+            promise.then(function(msg) {
+                $scope.message = 'Success: ' + msg;
+            }, function(msg) {
+                $scope.message = 'Failure: ' + msg;
             });
         };
 
@@ -30,12 +31,10 @@ smartRApp.controller('CorrelationController',
 
             promise.done(function(answer) {
                 $scope.scriptResults = JSON.parse(answer.result.artifacts.value);
-                $scope.$apply();
             });
 
             promise.fail(function(error) {
                 $scope.message = error;
-                $scope.$apply();
             })
         }
     }]);
