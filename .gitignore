@@ -10,6 +10,14 @@
 *Db.properties
 *Db.script
 
+# R generated files
+.RData
+.Rapp.history
+.Rhistory
+
+# InteliJ generated files
+*.iml
+
 # logs
 /stacktrace.log
 /test/reports
