@@ -10,13 +10,11 @@
             <concept-box concept-group="conceptBoxes.annotations"></concept-box>
             <br/>
             <br/>
-            <input type="button" value="Fetch Data" ng-click="fetchData()">
-            {{message}}
+            <fetch-button concept-map="conceptBoxes"></fetch-button>
         </workflow-tab>
 
         <workflow-tab tab-name="Run Analysis">
-            <input type="button" value="Show Analysis" ng-click="createViz()">
-            {{message}}
+            <input type="button" value="Show Analysis" ng-click="createViz()"> {{message}}
             <br/>
             <br/>
             <correlation-plot data="scriptResults" width="1200" height="1200"></correlation-plot>

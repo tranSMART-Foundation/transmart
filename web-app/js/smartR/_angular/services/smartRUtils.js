@@ -1,4 +1,4 @@
-smartRApp.factory('smartRUtils', [function() {
+smartRApp.factory('smartRUtils', ['$q', function($q) {
 
     var service = {};
 
@@ -23,7 +23,7 @@ smartRApp.factory('smartRUtils', [function() {
     };
 
     service.getSubsetIds = function smartRUtil_getSubsetIds() {
-        var defer = jQuery.Deferred();
+        var defer = $q.defer();
 
         function resolveResult() {
             var res = window.GLOBAL.CurrentSubsetIDs.map(function (v) {
@@ -41,13 +41,13 @@ smartRApp.factory('smartRUtils', [function() {
         for (var i = 1; i <= window.GLOBAL.NumOfSubsets; i++) {
             if (!window.isSubsetEmpty(i) && !window.GLOBAL.CurrentSubsetIDs[i]) {
                 window.runAllQueries(resolveResult);
-                return defer.promise();
+                return defer.promise;
             }
         }
 
         resolveResult();
 
-        return defer.promise();
+        return defer.promise;
     };
 
     return service;
