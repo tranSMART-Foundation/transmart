@@ -14,7 +14,7 @@
         </workflow-tab>
 
         <workflow-tab tab-name="Run Analysis">
-            <input type="button" value="Show Analysis" ng-click="createViz()"> {{message}}
+            <run-button results-storage="scriptResults" script-to-run="run" button-name="Create Plot"></run-button>
             <br/>
             <br/>
             <correlation-plot data="scriptResults" width="1200" height="1200"></correlation-plot>
