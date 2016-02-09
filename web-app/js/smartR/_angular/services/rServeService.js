@@ -281,7 +281,7 @@ smartRApp.factory('rServeService', ['smartRUtils', '$q', function(smartRUtils, $
                 });
 
                 innerPromise.fail(function(ret) {
-                    reject('Error: ' + ret.response);
+                    reject(ret.response);
                 });
 
             });
