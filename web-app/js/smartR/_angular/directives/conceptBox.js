@@ -22,7 +22,6 @@ smartRApp.directive('conceptBox', [function() {
         scope: {
             conceptGroup: '='
         },
-        // TODO: Replace this with templateUrl. The question is: In which context am I?
         template: '<div class="queryGroupIncludeSmall"></div>' +
                 '<input type="button" value="Clear Window">',
         link: function(scope, element) {
@@ -41,9 +40,8 @@ smartRApp.directive('conceptBox', [function() {
 
             // this watches the childNodes of the conceptBox and updates the model on change
             new MutationObserver(function() {
-                scope.$apply(function() {
-                    scope.conceptGroup = getConcepts(template_box); // update the model
-                });
+                scope.conceptGroup = getConcepts(template_box); // update the model
+                scope.$apply();
             }).observe(template_box, { childList: true });
         }
     };

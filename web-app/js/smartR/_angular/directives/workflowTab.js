@@ -1,22 +1,18 @@
 
 smartRApp.directive('workflowTab', ['smartRUtils', function(smartRUtils) {
-
     return {
         restrict: 'E',
         scope: {
-            tabName: '@'
+            name: '@tabName'
         },
         require: '^tabContainer',
-        template: '<div ng-transclude></div>',
         transclude: true,
+        template: '<ng-transclude-replace></ng-transclude-replace>',
         link: function(scope, element, attrs, tabContainerCtrl) {
-            var template = element.children()[0];
-
-            scope.$eval(function() {
-                tabContainerCtrl.addTab(scope.tabName);
-                template.id = 'fragment-' + smartRUtils.makeSafeForCSS(scope.tabName)
-            });
+            var id = 'fragment-' + smartRUtils.makeSafeForCSS(scope.name);
+            scope.id = id;
+            element[0].id = id;
+            tabContainerCtrl.addTab(scope);
         }
     };
-
 }]);
