@@ -114,26 +114,35 @@ addStats <- function(df, sorting, ranking, max_rows) {
     #this is the case for more than 1 sample
     df <-
       applySorting(df,sorting)  # no need for sorting in one sample case, we do it here only
-    if ( twoSubsets ){
-      markerTable  <- getDEgenes(df)  # relies on columns being sorted,
-    }                                 # with subset1 first, this is because of the way
-                                      # design matrix is being constructed
+
+    # is it valid measurements ?
+    validLimmaMeasurements <- isValidLimmaMeasurements(measurements)
+
+    if (twoSubsets && validLimmaMeasurements) {
+      markerTable  <- getDEgenes(measurements)  # relies on columns being sorted,
+    }                                           # with subset1 first, this is because of the way
+                                                # design matrix is being constructed
 
 
     useLimma <- !is.function(rankingMethod)  # rankingMethod is either a function or a character "limma"
     if (useLimma  && !twoSubsets) {  # cannot use any of the limma methods for single subset.
       stop( paste("Illegal ranking method: ", ranking, " two subsets needed.") )
     }
-    if (useLimma ) {
+
+    if (useLimma && validLimmaMeasurements) {
       if (!ranking %in% colnames(markerTable) ) {
           stop(paste("Illegal ranking method selected: ", ranking) )
       }
       rankingScore <- markerTable[ranking]
-
-    } else {
+    } else if (!useLimma && validLimmaMeasurements) {
       rankingScore <-
         apply(measurements, 1, rankingMethod, na.rm = TRUE )  # Calculating
-    }                                                         # ranking per probe (per row)
+    } else {
+      rankingScore <- data.frame(SIGNIFICANCE=numeric()) # when differential expression rank criteria
+                                                         # is selected while it's not valid limma measurements,
+                                                         # provide empty data frame to the significance columns.
+    }
+                                         # ranking per probe (per row)
     means <- rowMeans(measurements, na.rm = T)  # this is just an
                                                 # auxiliary column - it will not be
                                                 # used for JSON.
@@ -143,16 +152,20 @@ addStats <- function(df, sorting, ranking, max_rows) {
     df["MEAN"]         <- means
     df["SD"]           <- sdses
     df["SIGNIFICANCE"] <- rankingScore
-    df                 <- applyRanking(df, ranking, max_rows)
+
+    if (useLimma && validLimmaMeasurements) {
+        df <- applyRanking(df, ranking, max_rows)
+    }
+
     cleanUpLimmaOutput()  # In order to prevent displaying the table from previous run.
-    if (twoSubsets) {
+
+    if (twoSubsets && validLimmaMeasurements) {
       markerTable["SIGNIFICANCE"] <- rankingScore
       markerTable                 <- applyRanking(markerTable, ranking, max_rows)
       markerTable["SIGNIFICANCE"] <- NULL
       writeMarkerTable(markerTable)
     }
-  }
-  else {
+  } else {
     #one sample
     variance <-
       1.0  # We cannot get any significance measure for just
@@ -320,12 +333,11 @@ buildExtraFields <- function(df) {
 formatSubset <- function(subsetNumber) {
   if (subsetNumber == "1") {
     return(0)
-  }else if (subsetNumber == "2") {
+  } else if (subsetNumber == "2") {
     return(1)
-  }
-  else {
+  } else {
     stop(paste(
-      "Incorrect Assay ID: unexpected subset number: ",subsetNumber
+      "Incorrect Assay ID: unexpected subset number: ", subsetNumber
     ))
   }
 }
