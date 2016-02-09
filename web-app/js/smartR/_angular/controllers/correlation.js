@@ -14,26 +14,20 @@ smartRApp.controller('CorrelationController',
 
         $scope.fetchData = function() {
             var conceptKeys = smartRUtils.conceptBoxMapToConceptKeys($scope.conceptBoxes);
-            var promise = rServeService.loadDataIntoSession(conceptKeys);
 
-            promise.then(
+            rServeService.loadDataIntoSession(conceptKeys).then(
                 function(msg) { $scope.message = 'Success: ' + msg; },
                 function(msg) { $scope.message = 'Failure: ' + msg; }
             );
         };
 
         $scope.createViz = function() {
-            var promise = rServeService.startScriptExecution({
+            rServeService.startScriptExecution({
                 taskType: 'run',
                 arguments: {}
-            });
-
-            promise.then(function(answer) {
-                $scope.scriptResults = JSON.parse(answer.result.artifacts.value);
-                $scope.$apply();
-            }, function(error) {
-                $scope.message = error;
-                $scope.$apply();
-            });
+            }).then(
+                function(answer) { $scope.scriptResults = JSON.parse(answer.result.artifacts.value); },
+                function(error) { $scope.message = error; }
+            );
         }
     }]);

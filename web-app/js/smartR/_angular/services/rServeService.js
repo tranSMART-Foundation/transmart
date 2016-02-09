@@ -1,5 +1,5 @@
 
-smartRApp.factory('rServeService', ['smartRUtils', '$q', function(smartRUtils, $q) {
+smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', function(smartRUtils, $q, $http) {
 
     var service = {};
 
@@ -112,11 +112,11 @@ smartRApp.factory('rServeService', ['smartRUtils', '$q', function(smartRUtils, $
         var taskData = $.extend({}, taskDataOrig); // clone the thing
         state.currentRequestAbort();
 
-        var runRequest = $.ajax({
+        var runRequest = $http({
             url: pageInfo.basePath + '/ScriptExecution/run',
-            type: 'POST',
+            method: 'POST',
             timeout: TIMEOUT,
-            contentType: 'application/json',
+            responseType: 'json',
             data: JSON.stringify({
                 sessionId: state.sessionId,
                 arguments: taskData.arguments,
@@ -128,11 +128,13 @@ smartRApp.factory('rServeService', ['smartRUtils', '$q', function(smartRUtils, $
         _setCancellationForAjaxCall(runRequest);
 
         /* schedule checks */
-        var promise = runRequest
-            .then(function(d) {
-                taskData.executionId = d.executionId;
+        var promise = runRequest.then(
+            function(response) {
+                taskData.executionId = response.data.executionId;
                 return _checkStatus(taskData.executionId, CHECK_DELAY);
-            }, transformAjaxFailure);
+            },
+            transformAjaxFailure
+        );
 
         promise.cancel = function timeoutRequest_cancel() {
             // calling this method should by itself resolve the promise
@@ -141,7 +143,7 @@ smartRApp.factory('rServeService', ['smartRUtils', '$q', function(smartRUtils, $
 
         // no touching necessary when a task is running
         window.clearTimeout(state.touchTimeout);
-        promise.always(rServeService_scheduleTouch.bind(this));
+        promise.finally(rServeService_scheduleTouch.bind(this));
 
         return promise;
     };
@@ -152,7 +154,7 @@ smartRApp.factory('rServeService', ['smartRUtils', '$q', function(smartRUtils, $
         /* once the request finishes, there's nothing to abort.
          * this needs to be the 1st callback, so that later callbacks can
          * override this */
-        ajax.always(function() {
+        ajax.finally(function() {
             state.currentRequestAbort = NOOP_ABORT;
         });
     }
@@ -265,30 +267,23 @@ smartRApp.factory('rServeService', ['smartRUtils', '$q', function(smartRUtils, $
 
     service.loadDataIntoSession = function rServeService_loadDataIntoSession(conceptKeys) {
         return $q(function(resolve, reject) {
-            var outerPromise = smartRUtils.getSubsetIds();
-
-            outerPromise.done(function(subsets) {
-                var innerPromise = service.startScriptExecution({
-                    taskType: 'fetchData',
-                    arguments: {
-                        conceptKeys: conceptKeys,
-                        resultInstanceIds: subsets
-                    }
-                });
-
-                innerPromise.done(function(ret) {
-                    resolve('Task complete! State: ' + ret.state);
-                });
-
-                innerPromise.fail(function(ret) {
-                    reject(ret.response);
-                });
-
-            });
-
-            outerPromise.fail(function() {
-                reject('Could not create subsets. Did you select a cohort?');
-            });
+            smartRUtils.getSubsetIds().then(
+                function(subsets) {
+                    service.startScriptExecution({
+                        taskType: 'fetchData',
+                        arguments: {
+                            conceptKeys: conceptKeys,
+                            resultInstanceIds: subsets
+                        }
+                    }).then(
+                        function(ret) { resolve('Task complete! State: ' + ret.state); },
+                        function(ret) { reject(ret.response); }
+                    );
+                },
+                function() {
+                    reject('Could not create subsets. Did you select a cohort?');
+                }
+            );
         });
     };
 
