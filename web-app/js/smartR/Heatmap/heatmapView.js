@@ -41,7 +41,8 @@ var HeatmapView = (function(){
             snapshotImageBtn     : $('#heim-btn-snapshot-image'),
             downloadFileBtn      : $('#heim-btn-download-file'),
             outputArea           : $('#heim-run-output'),
-            d3Heatmap            : $('#heatmap')
+            d3Heatmap            : $('#heatmap'),
+            warningDiv           : $('#heim-heatmap-warnings')
         }
     };
 
@@ -104,9 +105,10 @@ var HeatmapView = (function(){
             view.preprocessView.outputArea.empty();
             view.runHeatmapView.outputArea.empty();
             view.runHeatmapView.d3Heatmap.empty();
+            view.runHeatmapView.warningDiv.empty();
         } else if (workflow === 'preprocess') {
             view.runHeatmapView.outputArea.empty();
-            view.runHeatmapView.d3Heatmap.empty();
+            view.runHeatmapView.warningDiv.empty();
         }
     };
 
@@ -274,6 +276,7 @@ var HeatmapView = (function(){
         var _runHeatmapInputArgs =  _getRunHeatmapViewValues(view.runHeatmapView);
         _onRunAnalysis();
         view.runHeatmapView.d3Heatmap.empty();
+        view.runHeatmapView.warningDiv.empty();
         heatmapService.runAnalysis(_runHeatmapInputArgs)
             .done(function(data) {
                 SmartRHeatmap.create(data.heatmapData);
