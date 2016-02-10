@@ -6,7 +6,7 @@ smartRApp.directive('runButton', ['rServeService', function(rServeService) {
             storage: '=resultsStorage',
             script: '@scriptToRun',
             name: '@buttonName',
-            arguments: '@parameterMap'
+            arguments: '=parameterMap'
         },
         template: '<input type="button" value="{{name}}"><span></span>',
         link: function(scope, element) {
