@@ -8,18 +8,19 @@ smartRApp.directive('runButton', ['rServeService', function(rServeService) {
             name: '@buttonName',
             arguments: '=parameterMap'
         },
-        template: '<input type="button" value="{{name}}"><span></span>',
+        template: '<input type="button" value="{{name}}"><span style="color:red"></span>',
         link: function(scope, element) {
             var template_btn = element.children()[0];
             var template_msg = element.children()[1];
 
             template_btn.onclick = function() {
+                template_msg.innerHTML = '';
                 rServeService.startScriptExecution({
                     taskType: scope.script,
                     arguments: scope.arguments
                 }).then(
-                    function (msg) { scope.storage = JSON.parse(msg.result.artifacts.value); },
-                    function (msg) { template_msg.innerHTML = '  Failure: ' + msg; }
+                    function (response) { scope.storage = JSON.parse(response.result.artifacts.value); },
+                    function (response) { template_msg.innerHTML = '  Failure: ' + response.statusText; }
                 );
             };
         }

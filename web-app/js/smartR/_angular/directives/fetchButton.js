@@ -11,6 +11,7 @@ smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', function(rSe
             var template_msg = element.children()[1];
 
             template_btn.onclick = function() {
+                template_msg.innerHTML = '';
                 var conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap);
                 rServeService.loadDataIntoSession(conceptKeys).then(
                     function(msg) { template_msg.innerHTML = '  Success: ' + msg; },
