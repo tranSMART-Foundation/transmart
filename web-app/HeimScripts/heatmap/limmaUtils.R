@@ -33,7 +33,7 @@ getSubset1Length <- function(measurements) {
 # to check if row  contains at least one row that contains 3 non missing values
 rowContainsAtLeastThreeData <- function (row) {sum(!is.na(row)) > 2}
 
-# measurements should contains at least one valid row
+# measurements should contain at least one valid row
 isValidLimmaMeasurements <- function (measurements) {
-   sum(apply(measurements, 1, rowContainsAtLeastThreeData)) > 1
+   sum(apply(measurements, 1, rowContainsAtLeastThreeData)) > 0
 }

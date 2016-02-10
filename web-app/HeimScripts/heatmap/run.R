@@ -49,13 +49,17 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
     "ranking"            = ranking,
     "features"           = features,
     "extraFields"        = extraFields,
-    "maxRows"            = max_rows
+    "maxRows"            = max_rows,
+    "warnings"           = c() # initiate empty vector
   )
   writeRunParams(max_rows, sorting, ranking)
   measurements <- cleanUp(df)  # temporary stats like SD and MEAN need
                                # to be removed for clustering to work
   measurements <- getMeasurements(measurements)
   measurements <- toZscores(measurements)
+  if (is.na(significanceValues)) {
+    jsn$warnings <- append(jsn$warnings, c("Signifince sorting could not be done due to insufficient data"))
+  }
   jsn <- addClusteringOutput(jsn, measurements) #
   jsn <- toJSON(jsn,
                 pretty = TRUE,
@@ -134,7 +138,7 @@ addStats <- function(df, sorting, ranking, max_rows) {
           stop(paste("Illegal ranking method selected: ", ranking) )
       }
       rankingScore <- markerTable[ranking]
-    } else if (!useLimma && validLimmaMeasurements) {
+    } else if (!useLimma) {
       rankingScore <-
         apply(measurements, 1, rankingMethod, na.rm = TRUE )  # Calculating
     } else {
@@ -393,7 +397,7 @@ addClusteringOutput <- function(jsn, measurements_arg) {
   if (is.null(jsn$numberOfClusteredRows)) jsn$numberOfClusteredRows <- 0
   if (is.null(jsn$numberOfClusteredColumns)) jsn$numberOfClusteredColumns <- 0
   if (jsn$numberOfClusteredRows < 2 | jsn$numberOfClusteredColumns < 2 ) {  # Cannot cluster less than 2x2 matrix
-    jsn$warnings <- c("Clustering could not be done due to insufficient data")
+    jsn$warnings <- append(jsn$warnings, c("Clustering could not be done due to insufficient data"))
     return(jsn)
   }
 
