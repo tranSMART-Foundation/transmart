@@ -1,5 +1,5 @@
 
-smartRApp.directive('correlationPlot', ['smartRUtils', function(smartRUtils) {
+smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
 
     return {
         restrict: 'E',
@@ -9,6 +9,10 @@ smartRApp.directive('correlationPlot', ['smartRUtils', function(smartRUtils) {
             height: '@'
         },
         link: function (scope, element) {
+
+            /**
+             * Watch data model (which is only changed by ajax calls when we want to (re)draw everything)
+             */
             scope.$watch('data', function() {
                 $(element[0]).empty();
                 if (scope.data) {
@@ -73,20 +77,28 @@ smartRApp.directive('correlationPlot', ['smartRUtils', function(smartRUtils) {
         function updateStatistics(patientIDs, scatterUpdate, init) {
             scatterUpdate = scatterUpdate === undefined ? false : scatterUpdate;
             init = init === undefined ? false : init;
-            var settings = { patientIDs: patientIDs };
-            var onResponse = function(response) {
-                if (init) {
-                    d3.selectAll('#scatterplot *').remove();
-                    createCorrelationViz(response);
-                    return
+            var arguments = { patientIDs: patientIDs };
+
+            rServeService.startScriptExecution({
+                taskType: 'run',
+                arguments: arguments
+            }).then(
+                function (response) {
+                    var results = JSON.parse(response.result.artifacts.value);
+                    if (init) {
+                        scope.data = results;
+                    } else {
+                        setData(results);
+                        if (scatterUpdate) updateScatterplot();
+                        updateRegressionLine();
+                        updateLegend();
+                        updateHistogram();
+                    }
+                },
+                function (response) {
+                    alert('  Failure: ' + response.statusText);
                 }
-                setData(response);
-                if (scatterUpdate) updateScatterplot();
-                updateRegressionLine();
-                updateLegend();
-                updateHistogram();
-            };
-            startWorkflow(onResponse, settings, false, false);
+            );
         }
 
         var svg = d3.select(root).append('svg')
@@ -202,12 +214,10 @@ smartRApp.directive('correlationPlot', ['smartRUtils', function(smartRUtils) {
 
         function updateSelection() {
             var extent = brush.extent();
-
-            console.log(extent)
-            var x0 = extent[0][0].map(function(d) { return x.invert(d) });
-            var x1 = extent[1][0].map(function(d) { return x.invert(d) });
-            var y0 = extent[0][1].map(function(d) { return y.invert(d) });
-            var y1 = extent[1][1].map(function(d) { return y.invert(d) });
+            var x0 = x.invert(extent[0][0]);
+            var x1 = x.invert(extent[1][0]);
+            var y0 = y.invert(extent[0][1]);
+            var y1 = y.invert(extent[1][1]);
             svg.selectAll('.point')
                 .classed('selected', false)
                 .style('fill', function(d) { return getColor(d.tag); })
