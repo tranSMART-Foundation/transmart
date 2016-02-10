@@ -5,7 +5,7 @@ library("WGCNA")
 # They can be considered fresh if the variable preprocessed exists
 
 if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
-  remoteScriptDir <- "web-app/HeimScripts/heatmap"
+  remoteScriptDir <- "web-app/HeimScripts"
 }
 
 utils <- paste(remoteScriptDir, "/heatmap/utils.R", sep="")
