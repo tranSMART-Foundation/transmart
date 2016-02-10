@@ -123,7 +123,7 @@ addStats <- function(df, sorting, ranking, max_rows) {
     validLimmaMeasurements <- isValidLimmaMeasurements(measurements)
 
     if (twoSubsets && validLimmaMeasurements) {
-      markerTable  <- getDEgenes(measurements)  # relies on columns being sorted,
+      markerTable  <- getDEgenes(df)  # relies on columns being sorted,
     }                                           # with subset1 first, this is because of the way
                                                 # design matrix is being constructed
 
@@ -138,13 +138,13 @@ addStats <- function(df, sorting, ranking, max_rows) {
           stop(paste("Illegal ranking method selected: ", ranking) )
       }
       rankingScore <- markerTable[ranking]
-    } else if (!useLimma) {
-      rankingScore <-
-        apply(measurements, 1, rankingMethod, na.rm = TRUE )  # Calculating
-    } else {
+    } else if (useLimma && !validLimmaMeasurements)  {
       rankingScore <- data.frame(SIGNIFICANCE=numeric()) # when differential expression rank criteria
                                                          # is selected while it's not valid limma measurements,
                                                          # provide empty data frame to the significance columns.
+    } else {
+      rankingScore <-
+        apply(measurements, 1, rankingMethod, na.rm = TRUE )  # Calculating
     }
                                          # ranking per probe (per row)
     means <- rowMeans(measurements, na.rm = T)  # this is just an

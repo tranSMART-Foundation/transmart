@@ -30,10 +30,19 @@ getSubset1Length <- function(measurements) {
   sum(grepl(pattern = SUBSET1REGEX, x = colnames(measurements))) # returns number of column names satisfying regexp.
 }
 
+# to check if a subset contains at least one non missing value
+isSubsetHasNonNA <- function (subset, measurements) {
+   sum(!is.na(measurements[,grep(paste(c(subset, '$'), collapse=''), names(measurements))])) > 0
+}
+
 # to check if row  contains at least one row that contains 3 non missing values
 rowContainsAtLeastThreeData <- function (row) {sum(!is.na(row)) > 2}
 
-# measurements should contain at least one valid row
+# measurements should contain at least :
+# - one valid row
+# - both subsets contains at least one non NA
 isValidLimmaMeasurements <- function (measurements) {
-   sum(apply(measurements, 1, rowContainsAtLeastThreeData)) > 0
+   sum(apply(measurements, 1, rowContainsAtLeastThreeData)) > 0 & # check one valid row
+   isSubsetHasNonNA ('s1', measurements) &                        # subset1 contains at least one non NA
+   isSubsetHasNonNA ('s2', measurements)                          # subset2 contains at least one non NA
 }
