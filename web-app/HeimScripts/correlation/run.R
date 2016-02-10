@@ -1,12 +1,16 @@
 library(reshape2)
 
-main <- function(method = "pearson") {
+main <- function(method = "pearson", patientIDs = NULL) {
 
     num_data1 <- loaded_variables[["datapoints_n0_s1"]]
     num_data2 <- loaded_variables[["datapoints_n1_s1"]]
     num_data <- merge(num_data1, num_data2, by="Row.Label")
     num_data <- na.omit(num_data)
     colnames(num_data) <- c("patientID", "x", "y")
+
+    if (! is.null(patientIDs)) {
+        num_data <- num_data[num_data$patientID %in% patientIDs, ]
+    }
 
 #    cat_data <- parseCategoricalData()
 
