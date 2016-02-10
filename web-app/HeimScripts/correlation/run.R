@@ -2,17 +2,12 @@ library(reshape2)
 
 main <- function(method = "pearson", patientIDs = NULL) {
 
-    num_data1 <- loaded_variables[["datapoints_n0_s1"]]
-    num_data2 <- loaded_variables[["datapoints_n1_s1"]]
-    num_data <- merge(num_data1, num_data2, by="Row.Label")
-    num_data <- na.omit(num_data)
-    colnames(num_data) <- c("patientID", "x", "y")
+    num_data <- parseNumericalData()
+    # cat_data <- parseCategoricalData()
 
     if (! is.null(patientIDs)) {
         num_data <- num_data[num_data$patientID %in% patientIDs, ]
     }
-
-#    cat_data <- parseCategoricalData()
 
     df <- num_data
     df$tag <- NA
@@ -53,11 +48,23 @@ conceptStrToFolderStr <- function(s) {
     substr(s, 0, tail(backslashs, 2)[1])
 }
 
+parseNumericalData <- function() {
+    num_data1 <- loaded_variables[["datapoints_n0_s1"]]
+    num_data2 <- loaded_variables[["datapoints_n1_s1"]]
+    num_data <- merge(num_data1, num_data2, by="Row.Label")
+    num_data <- na.omit(num_data)
+    colnames(num_data) <- c("patientID", "x", "y")
+    num_data
+}
+
 parseCategoricalData <- function() {
-    numTags <- length(loaded_variables) - 2
-    cat_data <- ifelse(numTags, loaded_variables[["annotations_n0_s1"]], NULL)
-    for (i in 1:(numTags-1)) {
-        cat_data <- merge(cat_data, loaded_variables[["annotations_n" + i + "_s1"]], by="Row.Label")
+    nTags <- length(loaded_variables) - 2
+    cat_data <- ifelse(nTags, loaded_variables[["annotations_n0_s1"]], NULL)
+    for (i in 1:(nTags-1)) {
+        cat_data <- merge(cat_data, loaded_variables[[paste("annotations_n", i, "_s1", sep="")]], by="Row.Label")
     }
+
+    cat_data[, apply(cat_data, 2, function(col) !all(col == ""))]
+
     cat_data
 }
