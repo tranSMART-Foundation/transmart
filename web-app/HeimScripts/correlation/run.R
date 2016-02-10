@@ -1,11 +1,12 @@
 library(reshape2)
 
-main <- function(method = 'pearson') {
-    num_data <- parseNumericalData()
+main <- function(method = "pearson") {
+
+    num_data1 <- loaded_variables[["datapoints_n0_s1"]]
+    num_data2 <- loaded_variables[["datapoints_n1_s1"]]
+    num_data <- merge(num_data1, num_data2, by="Row.Label")
     num_data <- na.omit(num_data)
-    xArrLabel <- colnames(num_data)[2]
-    yArrLabel <- colnames(num_data)[3]
-    colnames(num_data) <- c('patientID', 'x', 'y')
+    colnames(num_data) <- c("patientID", "x", "y")
 
 #    cat_data <- parseCategoricalData()
 
@@ -32,8 +33,8 @@ main <- function(method = 'pearson') {
         pvalue = corTest$p.value,
         regLineSlope = regLineSlope,
         regLineYIntercept = regLineYIntercept,
-        xArrLabel = xArrLabel,
-        yArrLabel = yArrLabel,
+        xArrLabel = fetch_params$ontologyTerms$datapoints_n0$fullName,
+        yArrLabel = fetch_params$ontologyTerms$datapoints_n1$fullName,
         method = method,
         patientIDs = num_data[,1],
         tags = c(),
@@ -46,13 +47,6 @@ conceptStrToFolderStr <- function(s) {
     splitString <- strsplit(s, "")[[1]]
     backslashs <- which(splitString == "\\")
     substr(s, 0, tail(backslashs, 2)[1])
-}
-
-parseNumericalData <- function() {
-    num_data1 <- loaded_variables[["datapoints_n0_s1"]]
-    num_data2 <- loaded_variables[["datapoints_n1_s1"]]
-    num_data <- merge(num_data1, num_data2, by="Row.Label")
-    num_data
 }
 
 parseCategoricalData <- function() {

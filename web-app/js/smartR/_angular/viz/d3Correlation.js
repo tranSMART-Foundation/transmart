@@ -1,5 +1,5 @@
 
-smartRApp.directive('correlationPlot', [function() {
+smartRApp.directive('correlationPlot', ['smartRUtils', function(smartRUtils) {
 
     return {
         restrict: 'E',
@@ -71,22 +71,22 @@ smartRApp.directive('correlationPlot', [function() {
         setData(scope.data);
 
         function updateStatistics(patientIDs, scatterUpdate, init) {
-            //scatterUpdate = scatterUpdate === undefined ? false : scatterUpdate
-            //init = init === undefined ? false : init
-            //var settings = { patientIDs: patientIDs }
-            //var onResponse = function(response) {
-            //    if (init) {
-            //        d3.selectAll('#scatterplot *').remove()
-            //        buildCorrelationAnalysis(response)
-            //        return
-            //    }
-            //    setData(response)
-            //    if (scatterUpdate) updateScatterplot()
-            //    updateRegressionLine()
-            //    updateLegend()
-            //    updateHistogram()
-            //}
-            //startWorkflow(onResponse, settings, false, false)
+            scatterUpdate = scatterUpdate === undefined ? false : scatterUpdate;
+            init = init === undefined ? false : init;
+            var settings = { patientIDs: patientIDs };
+            var onResponse = function(response) {
+                if (init) {
+                    d3.selectAll('#scatterplot *').remove();
+                    createCorrelationViz(response);
+                    return
+                }
+                setData(response);
+                if (scatterUpdate) updateScatterplot();
+                updateRegressionLine();
+                updateLegend();
+                updateHistogram();
+            };
+            startWorkflow(onResponse, settings, false, false);
         }
 
         var svg = d3.select(root).append('svg')
@@ -134,7 +134,7 @@ smartRApp.directive('correlationPlot', [function() {
         svg.append('text')
             .attr('class', 'axisLabels')
             .attr('transform', 'translate(' + width / 2 + ',' + - margin.top / 2 + ')')
-            .text(shortenConcept(xArrLabel));
+            .text(smartRUtils.shortenConcept(xArrLabel));
 
         svg.append('g')
             .attr('class', 'y axis')
@@ -149,7 +149,7 @@ smartRApp.directive('correlationPlot', [function() {
         svg.append('text')
             .attr('class', 'axisLabels')
             .attr('transform', 'translate('  + (width + margin.right / 2) + ',' + height / 2 + ')rotate(90)')
-            .text(shortenConcept(yArrLabel));
+            .text(smartRUtils.shortenConcept(yArrLabel));
 
         svg.append('g')
             .attr('class', 'x axis')
@@ -202,6 +202,8 @@ smartRApp.directive('correlationPlot', [function() {
 
         function updateSelection() {
             var extent = brush.extent();
+
+            console.log(extent)
             var x0 = extent[0][0].map(function(d) { return x.invert(d) });
             var x1 = extent[1][0].map(function(d) { return x.invert(d) });
             var y0 = extent[0][1].map(function(d) { return y.invert(d) });

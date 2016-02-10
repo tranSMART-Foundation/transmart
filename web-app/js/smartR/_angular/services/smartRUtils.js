@@ -22,6 +22,11 @@ smartRApp.factory('smartRUtils', ['$q', function($q) {
         });
     };
 
+    service.shortenConcept = function smartRUtils_shortenConcept(concept) {
+        var split = concept.split('\\');
+        return split[split.length - 3] + '/' + split[split.length - 2];
+    };
+
     service.getSubsetIds = function smartRUtil_getSubsetIds() {
         var defer = $q.defer();
 
