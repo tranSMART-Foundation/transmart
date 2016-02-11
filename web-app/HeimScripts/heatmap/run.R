@@ -100,10 +100,10 @@ applyRanking <- function (df, ranking, max_rows) {
     df["SIGNIFICANCE_ABS"] <- NULL
     df <- df[1:nrows, ]
     df <- df[with(df, order(sapply(df["SIGNIFICANCE"], function(d) ifelse(d < 0, 1 / d, d)), decreasing=TRUE)), ]
-  }else if(ranking %in% c("pval", "adjpval")){
+  } else if(ranking %in% c("pval", "adjpval")) {
     df <- df[with(df, order(SIGNIFICANCE)), ]
     df <- df[1:nrows, ]
-  }else{
+  } else {
     df <- df[with(df, order(-SIGNIFICANCE)), ]
     df <- df[1:nrows, ]
   }
@@ -157,7 +157,7 @@ addStats <- function(df, sorting, ranking, max_rows) {
     df["SD"]           <- sdses
     df["SIGNIFICANCE"] <- rankingScore
 
-    if (useLimma && validLimmaMeasurements) {
+    if (validLimmaMeasurements) {
         df <- applyRanking(df, ranking, max_rows)
     }
 

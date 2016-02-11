@@ -31,23 +31,22 @@ getSubset1Length <- function(measurements) {
 }
 
 # to check if a subset contains at least one non missing value
-isSubsetHasNonNA <- function (subset, measurements) {
+subsetHasNonNA <- function (subset, row) {
    # select the  measurements of a subset by matching the subset label with column names
    # each measurements column has subset information as suffix
    # eg: X1000314002_n0_s2, X1000314002_n0_s1
-   subsetMeasurement <- measurements[,grep(paste(c(subset, '$'), collapse=''), names(measurements))]
+   subsetMeasurement <- row[grep(paste(c(subset, '$'), collapse=''), names(row))]
    # check if there's non missing values
    sum(!is.na(subsetMeasurement)) > 0
 }
 
-# to check if row  contains at least one row that contains 3 non missing values
-rowContainsAtLeastThreeData <- function (row) {sum(!is.na(row)) > 2}
+# to check if row  contains at least one row that contains 3 non missing values and if a subset contains at least one
+# non missing value
+validMeasurementsRow <- function (row) {
+  sum(!is.na(row)) > 2 & subsetHasNonNA('s1', row) &  subsetHasNonNA('s2', row)
+}
 
-# measurements should contain at least :
-# - one valid row
-# - both subsets contains at least one non NA
+# checking valid measurements
 isValidLimmaMeasurements <- function (measurements) {
-   sum(apply(measurements, 1, rowContainsAtLeastThreeData)) > 0 & # check one valid row
-   isSubsetHasNonNA ('s1', measurements) &                        # subset1 contains at least one non NA
-   isSubsetHasNonNA ('s2', measurements)                          # subset2 contains at least one non NA
+    sum(apply(measurements, 1, validMeasurementsRow)) > 0
 }
