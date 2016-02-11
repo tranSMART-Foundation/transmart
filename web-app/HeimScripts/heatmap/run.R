@@ -58,7 +58,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   measurements <- getMeasurements(measurements)
   measurements <- toZscores(measurements)
   if (is.na(significanceValues)) {
-    jsn$warnings <- append(jsn$warnings, c("Signifince sorting could not be done due to insufficient data"))
+    jsn$warnings <- append(jsn$warnings, c("Significance sorting could not be done due to insufficient data"))
   }
   jsn <- addClusteringOutput(jsn, measurements) #
   jsn <- toJSON(jsn,
