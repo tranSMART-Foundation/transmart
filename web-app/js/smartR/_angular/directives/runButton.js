@@ -3,10 +3,10 @@ smartRApp.directive('runButton', ['rServeService', function(rServeService) {
     return {
         restrict: 'E',
         scope: {
-            storage: '=resultsStorage',
+            storage: '=storeResultsIn',
             script: '@scriptToRun',
             name: '@buttonName',
-            arguments: '=parameterMap'
+            arguments: '=argumentsToUse'
         },
         template: '<input type="button" value="{{name}}"><span style="padding-left: 10px;"></span>',
         link: function(scope, element) {

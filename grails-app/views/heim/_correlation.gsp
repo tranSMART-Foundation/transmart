@@ -22,7 +22,10 @@
 
             <br/>
             <br/>
-            <run-button button-name="Create Plot" results-storage="scriptResults" script-to-run="run" parameter-map="params"></run-button>
+            <run-button button-name="Create Plot"
+                        store-results-in="scriptResults"
+                        script-to-run="run"
+                        arguments-to-use="params"></run-button>
             <br/>
             <br/>
             <correlation-plot data="scriptResults" width="1200" height="1200"></correlation-plot>
