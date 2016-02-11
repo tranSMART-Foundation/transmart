@@ -32,7 +32,12 @@ getSubset1Length <- function(measurements) {
 
 # to check if a subset contains at least one non missing value
 isSubsetHasNonNA <- function (subset, measurements) {
-   sum(!is.na(measurements[,grep(paste(c(subset, '$'), collapse=''), names(measurements))])) > 0
+   # select the  measurements of a subset by matching the subset label with column names
+   # each measurements column has subset information as suffix
+   # eg: X1000314002_n0_s2, X1000314002_n0_s1
+   subsetMeasurement <- measurements[,grep(paste(c(subset, '$'), collapse=''), names(measurements))]
+   # check if there's non missing values
+   sum(!is.na(subsetMeasurement)) > 0
 }
 
 # to check if row  contains at least one row that contains 3 non missing values
