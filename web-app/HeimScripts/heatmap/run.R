@@ -157,7 +157,10 @@ addStats <- function(df, sorting, ranking, max_rows) {
     df["SD"]           <- sdses
     df["SIGNIFICANCE"] <- rankingScore
 
-    if (validLimmaMeasurements) {
+    if (useLimma & !validLimmaMeasurements) {
+        # dont apply ranking
+    } else {
+        # else apply
         df <- applyRanking(df, ranking, max_rows)
     }
 
