@@ -34,7 +34,7 @@ window.SmartRHeatmap = (function(){
         var uids = data.uids;
         var numberOfClusteredColumns = data.numberOfClusteredColumns[0];
         var numberOfClusteredRows = data.numberOfClusteredRows[0];
-        var warning = data.warnings === undefined ? '' : data.warnings;
+        var warnings = data.warnings === undefined ? '' : data.warnings;
         var maxRows = data.maxRows[0];
 
         var rowClustering = false;
@@ -162,8 +162,16 @@ window.SmartRHeatmap = (function(){
         var significanceSortItems = heatmap.append('g');
         var labelItems = heatmap.append('g');
         var barItems = heatmap.append('g');
-        var warningDiv = $('#heim-heatmap-warnings').append('strong')
-            .text(warning);
+        var warningDiv = [];
+
+        // print warnings
+        if (Array.isArray(warnings)) {
+            $.each(warnings, function (idx, warning) {
+                warningDiv.push('<div>  &bull; ' + warning + '</div>');
+            });
+            $('#heim-heatmap-warnings').html(warningDiv)
+        }
+
 
         function updateHeatmap() {
             var square = squareItems.selectAll('.square')

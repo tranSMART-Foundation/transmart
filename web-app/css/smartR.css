@@ -149,5 +149,6 @@ div.sr-status-and-output-container:empty:before {
 .heim-radiogroup div {display: block; margin-bottom: .5em}
 .heim-input-field-sub {float:left;}
 .heim-input-field-sub h3 {text-decoration: underline; font-weight: 100;}
+#heim-heatmap-warnings {margin-top: 10px}
 #sr-fetch-dialog {font-family: inherit;}
 .ui-dialog {z-index: 1000}
