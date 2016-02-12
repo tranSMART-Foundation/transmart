@@ -39,7 +39,7 @@ probably possible, but not supported. Run:
 	./gradlew setupSchema
 
 Specifying an alternative config file can be done with the Java system property
-`propertySource`.
+`propertySource`. A user with administrative privileges must be configured.
 
 
 Running
@@ -55,6 +55,8 @@ the usage help for more information.
 Worthy of mention is that transmart-batch will refuse to re-run a job with the
 same parameters (which depend on the `clinical.params` file contents). Use `-n`
 to force the job to be re-run.
+
+Details on how to prepare your datam, mapping and parameter files for transmart-batch can be found in the [docs folder](docs).
 
 To restart a job, take a note of the job execution id at the beginning of the
 failed job:
@@ -93,3 +95,7 @@ setup. After setting it up with transmart-data, you will also need to run the
 
     // everytime one wants to run the tests
     ./gradlew functionalTest
+
+To test on Oracle, the procedure is similar. There is one small difference:
+while the preparation step must be run with an administrator account (like with
+PostgreSQL), the tests themselves must be run as `tm_cz`.

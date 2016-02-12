@@ -15,6 +15,7 @@ import org.springframework.batch.item.validator.ValidatingItemProcessor
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
+import org.transmartproject.batch.batchartifacts.CollectMinimumPositiveValueListener
 import org.transmartproject.batch.batchartifacts.FailWithMessageTasklet
 import org.transmartproject.batch.batchartifacts.FoundExitStatusChangeListener
 import org.transmartproject.batch.batchartifacts.LogCountsStepListener
@@ -221,7 +222,7 @@ abstract class AbstractStandardHighDimJobConfiguration extends AbstractJobConfig
      * partitioning step (optional) *
      ********************************/
 
-    @SuppressWarnings('EmptyMethodInAbstractClass')
+    @SuppressWarnings(['EmptyMethodInAbstractClass'])
     Tasklet partitionTasklet() {
         null
     }
@@ -337,12 +338,14 @@ abstract class AbstractStandardHighDimJobConfiguration extends AbstractJobConfig
 
     @Bean
     Step firstPass() {
+        CollectMinimumPositiveValueListener listener = collectMinimumPositiveValueListener()
         TaskletStep step = steps.get('firstPass')
                 .chunk(dataFilePassChunkSize)
                 .reader(firstPassDataRowSplitterReader())
-                .processor(warningNonPositiveDataPointToNaNProcessor())
+                .processor(warningNegativeDataPointToNaNProcessor())
+                .stream(listener)
+                .listener(listener)
                 .listener(logCountsStepListener())
-                .listener(progressWriteListener())
                 .build()
 
         // visitedProbesValidatingReader() doesn't need to be registered
@@ -373,8 +376,7 @@ abstract class AbstractStandardHighDimJobConfiguration extends AbstractJobConfig
     StandardDataRowSplitterReader firstPassDataRowSplitterReader() {
         new StandardDataRowSplitterReader(
                 delegate: visitedProbesValidatingReader(),
-                dataPointClass: TripleStandardDataValue,
-                eagerLineListener: checkNumberOfValuesValidatingListener())
+                dataPointClass: TripleStandardDataValue)
     }
 
     @Bean
@@ -386,14 +388,8 @@ abstract class AbstractStandardHighDimJobConfiguration extends AbstractJobConfig
 
     @Bean
     @JobScope
-    CheckNumberOfValuesValidatingListener checkNumberOfValuesValidatingListener() {
-        new CheckNumberOfValuesValidatingListener()
-    }
-
-    @Bean
-    @JobScope
-    NonPositiveDataPointWarningProcessor warningNonPositiveDataPointToNaNProcessor() {
-        new NonPositiveDataPointWarningProcessor()
+    NegativeDataPointWarningProcessor warningNegativeDataPointToNaNProcessor() {
+        new NegativeDataPointWarningProcessor()
     }
 
     /***************
@@ -428,6 +424,7 @@ abstract class AbstractStandardHighDimJobConfiguration extends AbstractJobConfig
     }
 
     @Bean
+    @JobScope
     TripleDataValueWrappingReader secondPassReader() {
         new TripleDataValueWrappingReader(delegate: secondPassDataRowSplitterReader())
     }
@@ -445,5 +442,11 @@ abstract class AbstractStandardHighDimJobConfiguration extends AbstractJobConfig
     @JobScope
     PerDataRowLog2StatisticsListener perDataRowLog2StatisticsListener() {
         new PerDataRowLog2StatisticsListener()
+    }
+
+    @Bean
+    @JobScope
+    CollectMinimumPositiveValueListener collectMinimumPositiveValueListener() {
+        new CollectMinimumPositiveValueListener()
     }
 }

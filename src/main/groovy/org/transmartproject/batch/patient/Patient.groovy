@@ -3,6 +3,7 @@ package org.transmartproject.batch.patient
 import groovy.transform.ToString
 import groovy.transform.TypeChecked
 import groovy.util.logging.Slf4j
+import org.springframework.batch.core.step.FatalStepExecutionException
 import org.transmartproject.batch.concept.ConceptType
 
 /**
@@ -18,19 +19,26 @@ final class Patient {
     private final Map<DemographicVariable, Object> demographicValues = [:]
 
     void putDemographicValues(Map<DemographicVariable, String> values) {
-        values.each { DemographicVariable var, String value ->
+        values.each { DemographicVariable var, Object value ->
             if (demographicValues.containsKey(var)) {
                 log.warn "For patient $id, and demo variable $var, " +
                         "replacing ${demographicValues[var]} with $value"
             }
-            demographicValues[var] = var.type == ConceptType.NUMERICAL ?
-                    (value ?: null) as Long :
-                    value
+
+            try {
+                demographicValues[var] = var.type == ConceptType.NUMERICAL ?
+                        (value ?: null) as Long :
+                        value
+            } catch (NumberFormatException nfe) {
+                throw new FatalStepExecutionException(
+                        "Value $value for variable $var in patient $this is " +
+                                "not a valid long integer", nfe)
+            }
         }
     }
 
     Object getDemographicValue(DemographicVariable var) {
-        demographicValues[var] ?: var.defaultValue
+        demographicValues[var]
     }
 
     boolean isNew() {

@@ -25,7 +25,6 @@ import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
 import static org.transmartproject.batch.highdim.proteomics.data.ProteomicsDataCleanScenarioTests.NUMBER_OF_ASSAYS
 import static org.transmartproject.batch.highdim.proteomics.data.ProteomicsDataCleanScenarioTests.NUMBER_OF_PROBES
-import static org.transmartproject.batch.highdim.proteomics.data.ProteomicsDataCleanScenarioTests.ZERO_MEASURES
 
 /**
  * For proteomics, test a failure midway the first pass, and then restart the job with
@@ -148,8 +147,8 @@ class ProteomicsDataMidwayFailTests implements FileCorruptingTestTrait {
         Map<String, Object> r = jdbcTemplate.queryForMap q, p
 
         assertThat r, allOf(
-                hasEntry(is('intensity'), closeTo(value, DELTA)),
-                hasEntry(is('log_intensity'), closeTo(logValue, DELTA)),
+                hasEntry(equalToIgnoringCase('intensity'), closeTo(value, DELTA)),
+                hasEntry(equalToIgnoringCase('log_intensity'), closeTo(logValue, DELTA)),
         )
     }
 
@@ -158,6 +157,6 @@ class ProteomicsDataMidwayFailTests implements FileCorruptingTestTrait {
                 study_id: STUDY_ID
 
         assertThat count,
-                is(equalTo(NUMBER_OF_ASSAYS * NUMBER_OF_PROBES - ZERO_MEASURES))
+                is(equalTo(NUMBER_OF_ASSAYS * NUMBER_OF_PROBES))
     }
 }

@@ -20,8 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
 
 /**
- * test mRNA data import in the simplest scenario (good data not previously
- * loaded)
+ * test mRNA data import with multiple samples
  */
 @RunWith(SpringJUnit4ClassRunner)
 @ContextConfiguration(classes = GenericFunctionalTestConfiguration)
@@ -37,7 +36,7 @@ class MrnaMultipleSamplesTests implements JobRunningTestTrait {
     void testMultipleSamplesMeasurements() {
         def params = [study_id: STUDY_ID]
 
-        List r = jdbcTemplate.queryForList """
+        List r = queryForList """
                 SELECT DISTINCT S.subject_id, S.sample_cd, P.sex_cd
                 FROM
                     ${Tables.MRNA_DATA} D

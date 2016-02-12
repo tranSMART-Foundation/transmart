@@ -8,13 +8,12 @@ socio-economic info about patient.
 
 Parameters
 ------------
-- `COLUMN_MAP_FILE` mandatory. Points to the column file. See below for format.
-- `WORD_MAP_FILE` optional. Points to the file with dictionary to be used.
-- `SECURITY_REQUIRED` optional. Y/N. Define study as private (Y) or Public (N).
-- `TOP_NODE` optional
-- `STUDY_ID` optional
-- `XTRIAL_FILE` optional
-- `TAGS_FILE` optional
+- `COLUMN_MAP_FILE` **Mandatory**. Points to the column file. See below for format.
+- `WORD_MAP_FILE` Points to the file with dictionary to be used.
+- `XTRIAL_FILE` Points to [the cross study concepts file](xtrial.md).
+- `TAGS_FILE` Points to [the concepts tags file](tags.md).
+
+You could also use [the study-specific parameters](study-params.md).
 
 COLUMN_MAP_FILE format
 ------------
@@ -29,10 +28,10 @@ column is located
 - `Category Code` Path which contains the file
 - `Column Number` Index of the column from the left beginning from 0
 - `Data Label`  Label visible inside tranSMART after upload
-- `Data Label Source` IGNORED skip if you don't need Concept Type Column
+- `Data Label Source` works for template column only (has `\` in data label column). Refers to the data label column where to get data for dynamic concept path generation. See [templates](templates.md) documentation for more details.
 - `Control Vocab cd`  IGNORED skip if you don't need Concept Type Column
 - `Concept Type`  Use this concept type instead of inferring it from the first row
 
-Allowed values for Concept type: 
+Allowed values for Concept type:
 - `NUMERICAL` for numerical
 - `CATEGORICAL` for text

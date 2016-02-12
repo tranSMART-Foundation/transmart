@@ -30,6 +30,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.transmartproject.batch.batchartifacts.HeaderSavingLineCallbackHandler
 import org.transmartproject.batch.beans.AppConfig
 import org.transmartproject.batch.clinical.db.objects.Tables
+import org.transmartproject.batch.db.DatabaseImplementationClassPicker
+import org.transmartproject.batch.db.OracleTableTruncator
+import org.transmartproject.batch.db.PostgresTableTruncator
 import org.transmartproject.batch.db.TableTruncator
 
 import javax.sql.DataSource
@@ -90,15 +93,30 @@ class TestDatabasePrepareConfiguration {
                 .next(loadModifierDimension())
                 .next(loadModifierMetadata())
                 .next(loadCodeLookup())
+                .next(loadDeRcSnpInfo())
                 .build()
     }
 
     @Bean
-    Tasklet truncateCodeLookupTasklet(JdbcTemplate jdbcTemplate) {
+    DatabaseImplementationClassPicker databasePicker() {
+        new DatabaseImplementationClassPicker()
+    }
+
+    @Bean
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate(
+            JdbcTemplate jdbcTemplate) {
+        new NamedParameterJdbcTemplate(jdbcTemplate)
+    }
+
+    @Bean
+    TableTruncator tableTruncator(DatabaseImplementationClassPicker databasePicker) {
+        databasePicker.instantiateCorrectClass(PostgresTableTruncator, OracleTableTruncator)
+    }
+
+    @Bean
+    Tasklet truncateCodeLookupTasklet(TableTruncator tableTruncator) {
         new CallableTaskletAdapter(callable: { ->
-            new TableTruncator(
-                    jdbcTemplate: new NamedParameterJdbcTemplate(jdbcTemplate)
-            ).truncate(Tables.CODE_LOOKUP)
+            tableTruncator.truncate(Tables.CODE_LOOKUP, false)
             RepeatStatus.FINISHED
         } as Callable<RepeatStatus>)
     }
@@ -146,6 +164,21 @@ class TestDatabasePrepareConfiguration {
                 .chunk(CHUNK_SIZE)
                 .reader(tsvFileReader(new ClassPathResource('i2b2/code_lookup.tsv')))
                 .writer(codeLookupWriter())
+                .build()
+    }
+
+    @Bean
+    @StepScope
+    TsvFieldSetJdbcBatchItemWriter loadDeRcSnpInfoWriter() {
+        fieldSetJdbcWriter(Tables.RC_SNP_INFO)
+    }
+
+    @Bean
+    Step loadDeRcSnpInfo() {
+        steps.get('loadDeRcSnpInfo')
+                .chunk(CHUNK_SIZE)
+                .reader(tsvFileReader(new ClassPathResource('gwas/de_rc_snp_info.tsv')))
+                .writer(loadDeRcSnpInfoWriter())
                 .build()
     }
 

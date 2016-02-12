@@ -19,6 +19,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.transmartproject.batch.batchartifacts.BetterExitMessageJobExecutionListener
 import org.transmartproject.batch.batchartifacts.DefaultJobIncrementer
 import org.transmartproject.batch.db.*
+import org.transmartproject.batch.db.oracle.OracleSequenceReserver
+import org.transmartproject.batch.db.postgres.PostgresSequenceReserver
 
 import javax.sql.DataSource
 import java.nio.file.Path
@@ -32,6 +34,7 @@ import java.nio.file.Paths
 @ComponentScan([
         'org.transmartproject.batch.db',
         'org.transmartproject.batch.secureobject',
+        'org.transmartproject.batch.biodata',
 ])
 abstract class AbstractJobConfiguration implements StepBuildingConfigurationTrait {
 
@@ -42,6 +45,9 @@ abstract class AbstractJobConfiguration implements StepBuildingConfigurationTrai
 
     @Autowired
     MessageSource validationMessageSource
+
+    @Autowired
+    DatabaseImplementationClassPicker picker
 
     abstract Job job()
 

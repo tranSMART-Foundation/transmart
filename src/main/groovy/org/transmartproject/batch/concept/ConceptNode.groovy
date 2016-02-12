@@ -16,7 +16,6 @@ class ConceptNode {
     ConceptPath path
     String name
     String code
-    Long i2b2RecordId
 
     ConceptType type = ConceptType.UNKNOWN
 
@@ -32,9 +31,5 @@ class ConceptNode {
 
     ConceptNode(String path) {
         this(new ConceptPath(path))
-    }
-
-    boolean isNew() {
-        code == null
     }
 }

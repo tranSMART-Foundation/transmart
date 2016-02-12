@@ -4,12 +4,12 @@ import groovy.transform.TypeChecked
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert
 import org.springframework.stereotype.Component
 import org.transmartproject.batch.backout.BackoutComponent
+import org.transmartproject.batch.biodata.BioExperimentDAO
 import org.transmartproject.batch.clinical.db.objects.Sequences
 import org.transmartproject.batch.clinical.db.objects.Tables
 import org.transmartproject.batch.db.SequenceReserver
@@ -28,20 +28,20 @@ class SecureObjectDAO {
     @Autowired
     private SequenceReserver sequenceReserver
 
-    @Value(Tables.BIO_EXPERIMENT)
-    private SimpleJdbcInsert bioExperimentInsert
-
     @Value(Tables.SECURE_OBJECT)
     private SimpleJdbcInsert secureObjectInsert
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate
 
+    @Autowired
+    private BioExperimentDAO bioExperimentDAO
+
     void createSecureObject(String displayName,
                             String studyId,
                             SecureObjectToken token) {
 
-        long bioExperimentId = findOrCreateBioExperiment(studyId)
+        long bioExperimentId = bioExperimentDAO.findOrCreateBioExperiment(studyId)
         Map secureObjectValues = findOrCreateSecureObject(
                 bioExperimentId, displayName, token)
 
@@ -63,11 +63,11 @@ class SecureObjectDAO {
     int deletePermissionsForSecureObject(SecureObjectToken secureObjectToken) {
         jdbcTemplate.update("""
                 DELETE FROM ${Tables.SEARCH_AUTH_SEC_OBJ_ACC} ACC
-                USING ${Tables.SECURE_OBJECT} SO
-                WHERE
-                    SO.search_secure_object_id = ACC.secure_object_id
-                    AND SO.data_type = :data_type
-                    AND SO.bio_data_unique_id = :sobj""",
+                WHERE EXISTS(SELECT SO.* FROM ${Tables.SECURE_OBJECT} SO
+                                WHERE
+                                    SO.search_secure_object_id = ACC.secure_object_id
+                                    AND SO.data_type = :data_type
+                                    AND SO.bio_data_unique_id = :sobj)""",
                 [
                         data_type: CLINICAL_TRIAL_SECURE_OBJECT_DATA_TYPE,
                         sobj: secureObjectToken.toString()])
@@ -130,32 +130,6 @@ class SecureObjectDAO {
         }
 
         affected
-    }
-
-    private Long findOrCreateBioExperiment(String studyId) {
-        try {
-            def id = jdbcTemplate.queryForObject """
-                    SELECT bio_experiment_id
-                    FROM ${Tables.BIO_EXPERIMENT}
-                    WHERE accession = :study""",
-                    [study: studyId],
-                    Long
-
-            log.info "Found existing bio_experiment with id $id"
-            id
-        } catch (EmptyResultDataAccessException erdae) {
-            Long id = sequenceReserver.getNext(Sequences.BIO_DATA_ID)
-
-            bioExperimentInsert.execute(
-                    bio_experiment_id: (Object) id,
-                    title: 'Metadata not available',
-                    accession: studyId,
-                    etl_id: "METADATA:$studyId" as String
-            )
-            log.debug("Created new bio_experiment with id $id")
-
-            id
-        }
     }
 
     private Map findSecureObject(SecureObjectToken secureObjectToken) {
