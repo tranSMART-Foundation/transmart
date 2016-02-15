@@ -462,7 +462,7 @@ window.HeatmapService = (function(){
     service.downloadData = function() {
         function downloadFile(data) {
             var link = jQuery('<a/>')
-                .attr('href', urlForFile(data.executionId, 'analysis_data.zip'))
+                .attr('href', ajaxServices.urlForFile(data.executionId, 'analysis_data.zip'))
                 .attr('download', 'heatmap_data.zip')
                 .css('display', 'none');
             jQuery('body').append(link);
