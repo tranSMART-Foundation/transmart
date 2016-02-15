@@ -1,10 +1,6 @@
 
 getDEgenes <- function(df) {
   measurements    <- getMeasurements(df)
-  enoughSamples   <- ncol(measurements) > 3 && ncol(measurements) - getSubset1Length(measurements) > 1
-  if (!enoughSamples){
-    stop("Not enough samples to find differentially expressed genes.")
-  }
   design          <- getDesign(measurements)
   contrast.matrix <- makeContrasts( S1-S2, levels = design )
   fit             <- lmFit(measurements, design)
@@ -32,4 +28,25 @@ getDesign <- function(measurements) {
 
 getSubset1Length <- function(measurements) {
   sum(grepl(pattern = SUBSET1REGEX, x = colnames(measurements))) # returns number of column names satisfying regexp.
+}
+
+# to check if a subset contains at least one non missing value
+subsetHasNonNA <- function (subset, row) {
+   # select the  measurements of a subset by matching the subset label with column names
+   # each measurements column has subset information as suffix
+   # eg: X1000314002_n0_s2, X1000314002_n0_s1
+   subsetMeasurement <- row[grep(paste(c(subset, '$'), collapse=''), names(row))]
+   # check if there's non missing values
+   sum(!is.na(subsetMeasurement)) > 0
+}
+
+# to check if row  contains at least one row that contains 3 non missing values and if a subset contains at least one
+# non missing value
+validMeasurementsRow <- function (row) {
+  sum(!is.na(row)) > 2 & subsetHasNonNA('s1', row) &  subsetHasNonNA('s2', row)
+}
+
+# checking valid measurements
+isValidLimmaMeasurements <- function (measurements) {
+    sum(apply(measurements, 1, validMeasurementsRow)) > 0
 }

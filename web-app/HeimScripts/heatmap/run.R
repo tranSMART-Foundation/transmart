@@ -49,13 +49,17 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
     "ranking"            = ranking,
     "features"           = features,
     "extraFields"        = extraFields,
-    "maxRows"            = max_rows
+    "maxRows"            = max_rows,
+    "warnings"           = c() # initiate empty vector
   )
   writeRunParams(max_rows, sorting, ranking)
   measurements <- cleanUp(df)  # temporary stats like SD and MEAN need
                                # to be removed for clustering to work
   measurements <- getMeasurements(measurements)
   measurements <- toZscores(measurements)
+  if (is.na(significanceValues)) {
+    jsn$warnings <- append(jsn$warnings, c("Significance sorting could not be done due to insufficient data"))
+  }
   jsn <- addClusteringOutput(jsn, measurements) #
   jsn <- toJSON(jsn,
                 pretty = TRUE,
@@ -96,10 +100,10 @@ applyRanking <- function (df, ranking, max_rows) {
     df["SIGNIFICANCE_ABS"] <- NULL
     df <- df[1:nrows, ]
     df <- df[with(df, order(sapply(df["SIGNIFICANCE"], function(d) ifelse(d < 0, 1 / d, d)), decreasing=TRUE)), ]
-  }else if(ranking %in% c("pval", "adjpval")){
+  } else if(ranking %in% c("pval", "adjpval")) {
     df <- df[with(df, order(SIGNIFICANCE)), ]
     df <- df[1:nrows, ]
-  }else{
+  } else {
     df <- df[with(df, order(-SIGNIFICANCE)), ]
     df <- df[1:nrows, ]
   }
@@ -114,26 +118,35 @@ addStats <- function(df, sorting, ranking, max_rows) {
     #this is the case for more than 1 sample
     df <-
       applySorting(df,sorting)  # no need for sorting in one sample case, we do it here only
-    if ( twoSubsets ){
+
+    # is it valid measurements ?
+    validLimmaMeasurements <- isValidLimmaMeasurements(measurements)
+
+    if (twoSubsets && validLimmaMeasurements) {
       markerTable  <- getDEgenes(df)  # relies on columns being sorted,
-    }                                 # with subset1 first, this is because of the way
-                                      # design matrix is being constructed
+    }                                           # with subset1 first, this is because of the way
+                                                # design matrix is being constructed
 
 
     useLimma <- !is.function(rankingMethod)  # rankingMethod is either a function or a character "limma"
     if (useLimma  && !twoSubsets) {  # cannot use any of the limma methods for single subset.
       stop( paste("Illegal ranking method: ", ranking, " two subsets needed.") )
     }
-    if (useLimma ) {
+
+    if (useLimma && validLimmaMeasurements) {
       if (!ranking %in% colnames(markerTable) ) {
           stop(paste("Illegal ranking method selected: ", ranking) )
       }
       rankingScore <- markerTable[ranking]
-
+    } else if (useLimma && !validLimmaMeasurements)  {
+      rankingScore <- data.frame(SIGNIFICANCE=numeric()) # when differential expression rank criteria
+                                                         # is selected while it's not valid limma measurements,
+                                                         # provide empty data frame to the significance columns.
     } else {
       rankingScore <-
         apply(measurements, 1, rankingMethod, na.rm = TRUE )  # Calculating
-    }                                                         # ranking per probe (per row)
+    }
+                                         # ranking per probe (per row)
     means <- rowMeans(measurements, na.rm = T)  # this is just an
                                                 # auxiliary column - it will not be
                                                 # used for JSON.
@@ -143,16 +156,23 @@ addStats <- function(df, sorting, ranking, max_rows) {
     df["MEAN"]         <- means
     df["SD"]           <- sdses
     df["SIGNIFICANCE"] <- rankingScore
-    df                 <- applyRanking(df, ranking, max_rows)
+
+    if (useLimma & !validLimmaMeasurements) {
+        # dont apply ranking
+    } else {
+        # else apply
+        df <- applyRanking(df, ranking, max_rows)
+    }
+
     cleanUpLimmaOutput()  # In order to prevent displaying the table from previous run.
-    if (twoSubsets) {
+
+    if (twoSubsets && validLimmaMeasurements) {
       markerTable["SIGNIFICANCE"] <- rankingScore
       markerTable                 <- applyRanking(markerTable, ranking, max_rows)
       markerTable["SIGNIFICANCE"] <- NULL
       writeMarkerTable(markerTable)
     }
-  }
-  else {
+  } else {
     #one sample
     variance <-
       1.0  # We cannot get any significance measure for just
@@ -320,12 +340,11 @@ buildExtraFields <- function(df) {
 formatSubset <- function(subsetNumber) {
   if (subsetNumber == "1") {
     return(0)
-  }else if (subsetNumber == "2") {
+  } else if (subsetNumber == "2") {
     return(1)
-  }
-  else {
+  } else {
     stop(paste(
-      "Incorrect Assay ID: unexpected subset number: ",subsetNumber
+      "Incorrect Assay ID: unexpected subset number: ", subsetNumber
     ))
   }
 }
@@ -381,7 +400,7 @@ addClusteringOutput <- function(jsn, measurements_arg) {
   if (is.null(jsn$numberOfClusteredRows)) jsn$numberOfClusteredRows <- 0
   if (is.null(jsn$numberOfClusteredColumns)) jsn$numberOfClusteredColumns <- 0
   if (jsn$numberOfClusteredRows < 2 | jsn$numberOfClusteredColumns < 2 ) {  # Cannot cluster less than 2x2 matrix
-    jsn$warnings <- c("Clustering could not be done due to insufficient data")
+    jsn$warnings <- append(jsn$warnings, c("Clustering could not be done due to insufficient data"))
     return(jsn)
   }
 
