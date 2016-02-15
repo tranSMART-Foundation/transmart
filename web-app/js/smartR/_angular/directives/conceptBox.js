@@ -1,5 +1,5 @@
 
-smartRApp.directive('conceptBox', [function() {
+window.smartRApp.directive('conceptBox', [function() {
 
     function clearWindow(dom) {
         $(dom).children().remove()

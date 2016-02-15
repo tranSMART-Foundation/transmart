@@ -1,5 +1,5 @@
 
-smartRApp.directive('workflowTab', ['smartRUtils', function(smartRUtils) {
+window.smartRApp.directive('workflowTab', ['smartRUtils', function(smartRUtils) {
     return {
         restrict: 'E',
         scope: {

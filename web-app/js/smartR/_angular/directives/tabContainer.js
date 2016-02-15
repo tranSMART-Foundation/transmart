@@ -1,5 +1,5 @@
 
-smartRApp.directive('tabContainer', ['smartRUtils', '$timeout', function(smartRUtils, $timeout) {
+window.smartRApp.directive('tabContainer', ['smartRUtils', '$timeout', function(smartRUtils, $timeout) {
     return {
         restrict: 'E',
         transclude: true,

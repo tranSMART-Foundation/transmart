@@ -1,5 +1,5 @@
 
-smartRApp.directive('ngTranscludeReplace', ['$log', function ($log) {
+window.smartRApp.directive('ngTranscludeReplace', ['$log', function ($log) {
     return {
         terminal: true,
         restrict: 'EA',

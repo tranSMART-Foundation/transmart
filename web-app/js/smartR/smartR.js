@@ -421,20 +421,20 @@ window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
         autoLoad: {
             url: pageInfo.basePath + '/smartR/index',
             method: 'POST',
-            evalScripts: false
+            scripts: true
         },
         listeners: {
             render: function (panel) {
                 panel.body.on('click', function () {
                     if (typeof updateOnView === "function") {
-                        updateOnView()
+                        updateOnView();
                     }
                 })
             }
         }
-    })
-    parentPanel.add(smartRPanel)
-}
+    });
+    parentPanel.add(smartRPanel);
+};
 
 
 

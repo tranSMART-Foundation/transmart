@@ -1,4 +1,5 @@
-smartRApp.factory('smartRUtils', ['$q', function($q) {
+
+window.smartRApp.factory('smartRUtils', ['$q', function($q) {
 
     var service = {};
 

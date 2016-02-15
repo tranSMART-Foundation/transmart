@@ -1,5 +1,5 @@
 
-smartRApp.directive('runButton', ['rServeService', function(rServeService) {
+window.smartRApp.directive('runButton', ['rServeService', function(rServeService) {
     return {
         restrict: 'E',
         scope: {
