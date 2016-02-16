@@ -6,7 +6,13 @@ smartRApp.controller('HeatmapController',
         rServeService.startSession('heatmap');
 
         // model
-        $scope.conceptBoxes = {};
+        $scope.conceptBoxes = {
+            highDimensional : [],
+            numerical : [],
+            categorical : []
+        };
+
         $scope.scriptResults = {};
         $scope.params = {};
+
     }]);

@@ -148,7 +148,8 @@ check_input <- function(datasets, projection)
   # the letter "n"), followed by an underscore and a subset identifier - s<numerical id> - depending on subset, 
   # e.g. n0_s1, n0_s2, n1_s1, n1_s2.
   dataset_names <- names(datasets)
-  expected_format_names <- "^n[[:digit:]]+_s[[:digit:]]+$"
+  #expected_format_names <- "^n[[:digit:]]+_s[[:digit:]]+$"
+  expected_format_names <- "^[[:alpha:]]|[[:digit:]]+_n[[:digit:]]+_s[[:digit:]]+$"
   names_in_correct_format <-
     grepl(expected_format_names, dataset_names)
   if (any(!names_in_correct_format &
@@ -181,7 +182,8 @@ check_input <- function(datasets, projection)
     #for preprocessed data there is only 1 data.frame
   {
     column_names <- colnames(datasets$preprocessed)
-    expected_format_names <- ".+_n[[:digit:]]+_s[[:digit:]]+$"
+    # expected_format_names <- ".+_n[[:digit:]]+_s[[:digit:]]+$"
+    expected_format_names <- ".+_[[:alpha:]]|[[:digit:]]+_n[[:digit:]]+_s[[:digit:]]+$"
     names_in_correct_format <-
       grepl(expected_format_names, column_names)
     if (!all(

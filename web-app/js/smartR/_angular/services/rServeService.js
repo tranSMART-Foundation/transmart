@@ -266,7 +266,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
     };
 
     service.loadDataIntoSession = function rServeService_loadDataIntoSession(conceptKeys) {
-        return $q(function(resolve, reject) {
+        return $q( function(resolve, reject) {
             smartRUtils.getSubsetIds().then(
                 function(subsets) {
                     service.startScriptExecution({
@@ -283,6 +283,21 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
                 function() {
                     reject('Could not create subsets. Did you select a cohort?');
                 }
+            );
+        });
+    };
+
+    service.executeSummaryStats = function rServeService_executeSummaryStats(phase) {
+        return $q( function(resolve, reject) {
+            service.startScriptExecution({
+                taskType: 'summary',
+                arguments: {
+                    phase: phase,
+                    projection: 'default_real_projection' // always required, even for low-dim data
+                }
+            }).then(
+                function(ret) { resolve('Task complete! State: ' + ret.state); },
+                function(ret) { reject(ret.response); }
             );
         });
     };
