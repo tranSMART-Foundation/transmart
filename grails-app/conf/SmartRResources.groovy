@@ -24,7 +24,7 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'smartRUtils.js']
     }
 
-    smartR_heatmap { // FIXME: port to angular JS framework (see below)
+    smartR_heatmap_bak { // FIXME: port to angular JS framework (see below)
         dependsOn 'smartR_core'
         resource url: [plugin: 'smart-r', dir: 'css', file: 'heatmap.css']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_common', file: 'analysisInit.js']
@@ -38,12 +38,12 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Heatmap', file: 'heatmapView.js']
     }
 
-//    smartR_heatmap {
-//        dependsOn 'smartR_angular_components', 'smartR_core'
-//        resource url: [plugin: 'smart-r', dir: 'css', file: 'heatmap.css']
-//        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'heatmap.js']
-//        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Heatmap.js']
-//    }
+    smartR_heatmap {
+        dependsOn 'smartR_angular_components', 'smartR_core'
+        resource url: [plugin: 'smart-r', dir: 'css', file: 'heatmap.css']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'heatmap.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Heatmap.js']
+    }
 
     smartR_correlation {
         dependsOn 'smartR_angular_components', 'smartR_core'
