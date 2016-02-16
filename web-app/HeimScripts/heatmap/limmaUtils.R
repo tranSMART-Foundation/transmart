@@ -40,10 +40,10 @@ subsetHasNonNA <- function (subset, row) {
    sum(!is.na(subsetMeasurement)) > 0
 }
 
-# to check if row  contains at least one row that contains 3 non missing values and if a subset contains at least one
+# to check if row  contains at least one row that contains 4 non missing values and if a subset contains at least one
 # non missing value
 validMeasurementsRow <- function (row) {
-  sum(!is.na(row)) > 2 & subsetHasNonNA('s1', row) &  subsetHasNonNA('s2', row)
+  sum(!is.na(row)) > 3 & subsetHasNonNA('s1', row) &  subsetHasNonNA('s2', row)
 }
 
 # checking valid measurements

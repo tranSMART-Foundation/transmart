@@ -6,7 +6,6 @@
  */
 
 window.HeatmapService = (function(){
-    var CHECK_DELAY = 1000;
     var PROJECTION = 'log_intensity';
 
     var HEATMAP_DATA_FILE = 'heatmap.json';
@@ -14,18 +13,8 @@ window.HeatmapService = (function(){
 
     var ajaxServices = window.smartR.ajaxServices(window.pageInfo.basePath, 'heatmap');
 
-    var NOOP_ABORT = function() {};
-
     var service = {
         lastFetchedLabels: []
-    };
-
-    var _setStatusRequestTimeout = function() {
-        var timeout = setTimeout.apply(undefined, arguments);
-        service.currentRequestAbort = function() {
-            clearTimeout(timeout);
-            service.currentRequestAbort = NOOP_ABORT;
-        }
     };
 
     /* generate unique labels for the concept paths. It recursively resolves
@@ -410,7 +399,7 @@ window.HeatmapService = (function(){
     })();
 
     // aux for downloadSVG
-   function copyWithCollapsedCSS(heatmapElement) {
+    function copyWithCollapsedCSS(heatmapElement) {
         var relevantProperties = [
             'fill-opacity', 'fill', 'stroke', 'font-size', 'font-family',
             'shape-rendering', 'stroke-width'
@@ -473,7 +462,7 @@ window.HeatmapService = (function(){
     service.downloadData = function() {
         function downloadFile(data) {
             var link = jQuery('<a/>')
-                .attr('href', urlForFile(data.executionId, 'analysis_data.zip'))
+                .attr('href', ajaxServices.urlForFile(data.executionId, 'analysis_data.zip'))
                 .attr('download', 'heatmap_data.zip')
                 .css('display', 'none');
             jQuery('body').append(link);
