@@ -20,7 +20,7 @@
 
             <fetch-button concept-map="conceptBoxes" show-summary-stats="true"></fetch-button>
 
-            <summary-stat data="fetchResult"></summary-stat>
+            <summary-stats data="fetchResult"></summary-stats>
 
         </workflow-tab>
 

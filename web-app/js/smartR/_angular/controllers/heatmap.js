@@ -1,5 +1,8 @@
+//# sourceURL=heatmap.js
 
-smartRApp.controller('HeatmapController',
+'use strict';
+
+window.smartRApp.controller('HeatmapController',
     ['$scope', 'smartRUtils', 'rServeService', function($scope, smartRUtils, rServeService) {
 
         // initialize service
@@ -10,6 +13,11 @@ smartRApp.controller('HeatmapController',
             highDimensional : [],
             numerical : [],
             categorical : []
+        };
+
+        $scope.fetchSummary = {
+            img : {},
+            json : {}
         };
 
         $scope.scriptResults = {};
