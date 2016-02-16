@@ -1,4 +1,4 @@
-HeimExtJSHelper = (function(){
+window.HeimExtJSHelper = (function(){
 
     var helper = {};
 
