@@ -1,13 +1,21 @@
-<r:require modules="smartR_core"/>
-<r:layoutResources/>
+%{--load all js in one go--}%
+<r:require modules="smartR_all"/>
 
 <div data-ng-app="smartRApp" style="padding: 10px;">
     <h1>SmartR - Dynamic Data Visualization and Interaction</h1>
     <br>
-    <g:select name="scriptSelect" id="scriptSelect" from="${scriptList}"
-              noSelection="['': 'Choose an algorithm']"
-              onchange="changeInputDIV()" />
 
-    <div id="inputDIV"></div>
+    <select ng-model="template">
+        <option value="heatmap">heatmap</option>
+        <option value="correlation">correlation</option>
+    </select>
+
+    <hr style="margin: 20px;">
+
+    <ng-include src="template"></ng-include>
+
+    %{-- Render all templates --}%
+
+    <g:render template="/layouts/heatmap"/>
+    <g:render template="/layouts/correlation"/>
 </div>
-<r:layoutResources/>

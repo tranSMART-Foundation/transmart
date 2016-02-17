@@ -8,7 +8,7 @@ window.smartRApp.directive('summaryStats', ['rServeService', function(rServeServ
             scope: {
                 data: '='
             },
-            templateUrl: '<div>__THIS_IS_TEMPLATE__</div>', // TODO to use external template
+            template: '<div>__THIS_IS_TEMPLATE__</div>', // TODO to use external template
             link: function(scope, element) {
 
             }

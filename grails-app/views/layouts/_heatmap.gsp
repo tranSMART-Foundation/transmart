@@ -1,7 +1,6 @@
-<r:layoutResources/>
+<script type="text/ng-template" id="heatmap">
 
-<div ng-controller="HeatmapController">
-    <tab-container>
+    <tab-container ng-controller="HeatmapController">
 
         %{--========================================================================================================--}%
         %{-- Fetch Data --}%
@@ -40,6 +39,5 @@
         </workflow-tab>
 
     </tab-container>
-</div>
 
-<r:layoutResources/>
+</script>
