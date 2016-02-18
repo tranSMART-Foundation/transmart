@@ -1,7 +1,7 @@
 <script type="text/ng-template" id="heatmap">
+<div ng-controller="HeatmapController">
 
-    <tab-container ng-controller="HeatmapController">
-
+    <tab-container>
         %{--========================================================================================================--}%
         %{-- Fetch Data --}%
         %{--========================================================================================================--}%
@@ -16,9 +16,12 @@
             <br/>
             <br/>
 
-            <fetch-button concept-map="conceptBoxes" show-summary-stats="true"></fetch-button>
+            <fetch-button concept-map="conceptBoxes" show-summary-stats="true" summary-data="fetchSummaryData"></fetch-button>
 
-            <summary-stats data="fetchResult"></summary-stats>
+            <summary-stats summary-data="fetchSummaryData"></summary-stats>
+            <hr class="sr-divider">
+
+
 
         </workflow-tab>
 
@@ -30,7 +33,6 @@
         </workflow-tab>
 
 
-
         %{--========================================================================================================--}%
         %{--Run Analysis--}%
         %{--========================================================================================================--}%
@@ -39,5 +41,5 @@
         </workflow-tab>
 
     </tab-container>
-
+</div>
 </script>

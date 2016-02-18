@@ -1,5 +1,5 @@
 
-window.smartRApp.directive('conceptBox', [function() {
+window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
 
     function clearWindow(dom) {
         $(dom).children().remove()
@@ -22,8 +22,7 @@ window.smartRApp.directive('conceptBox', [function() {
         scope: {
             conceptGroup: '='
         },
-        template: '<div class="queryGroupIncludeSmall"></div>' +
-                '<input type="button" value="Clear Window">',
+        templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/conceptBox.html',
         link: function(scope, element) {
             var template_box = element.children()[0];
             var template_btn = element.children()[1];
