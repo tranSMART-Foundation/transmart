@@ -42,7 +42,11 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
                 ).finally(function() {
                     if (showSummary) {
                         rServeService.executeSummaryStats('fetch').then (
-                            function(msg) { template_msg.innerHTML = 'Success: ' + msg; },
+                            function(data) {
+                                console.log('after execute summary stats', data); // log
+                                // TODO: generate summary result directive
+                                template_msg.innerHTML = 'Success: ' + data.msg;
+                            },
                             function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
                         );
                     }

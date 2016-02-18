@@ -9,19 +9,19 @@
 
             <concept-box concept-group="conceptBoxes.highDimensional"></concept-box>
 
-            <concept-box concept-group="conceptBoxes.numerical"></concept-box>
-
-            <concept-box concept-group="conceptBoxes.categorical"></concept-box>
+            %{--<concept-box concept-group="conceptBoxes.numerical"></concept-box>--}%
+            %{--<concept-box concept-group="conceptBoxes.categorical"></concept-box>--}%
 
             <biomarker-selection biomarkers="selectedBiomarkers"></biomarker-selection>
 
             <br/>
-            <br/>
 
-            <fetch-button concept-map="conceptBoxes" biomarkers="selectedBiomarkers" show-summary-stats="true" summary-data="fetchSummaryData"></fetch-button>
+            <fetch-button concept-map="conceptBoxes" biomarkers="selectedBiomarkers" show-summary-stats="true"
+                          summary-data="fetchSummaryData"></fetch-button>
+
+            <hr class="sr-divider">
 
             <summary-stats summary-data="fetchSummaryData"></summary-stats>
-            <hr class="sr-divider">
 
 
 
