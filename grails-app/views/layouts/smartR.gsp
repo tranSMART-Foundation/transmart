@@ -1,5 +1,4 @@
-<%-- We only want to layout a body fragments in this plugin --%>
-<r:layoutResources />
-<r:layoutResources />
-
-<g:layoutBody />
+<r:require modules="smartR_all"/>
+<g:layoutBody/>
+<r:layoutResources disposition="head"/>
+<r:layoutResources disposition="defer"/>
