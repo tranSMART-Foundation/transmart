@@ -19,7 +19,7 @@ parse.ldd.cat.input <- function(sourceLabel, loaded_variables) {
     filtered.loaded_variables <- get.loaded_variables.by.source(sourceLabel, loaded_variables)
     df.withEmptySpace <- Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables) # merge alle matching dfs
     merged.values <- apply(df.withEmptySpace[,-1], 1, function(row) paste(row, collapse=""))
-    data.frame(Row.Labels=df.withEmptySpace["Row.Label"], value=merged.values)
+    data.frame(Row.Labels=df.withEmptySpace["Row.Label"], category=merged.values)
 }
 
 # give me only the loaded_variables that match my sourceLabel

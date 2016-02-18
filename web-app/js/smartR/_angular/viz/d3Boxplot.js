@@ -1,5 +1,5 @@
 
-window.smartRApp.directive('boxPlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
+window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
 
     return {
         restrict: 'E',
