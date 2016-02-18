@@ -1,5 +1,5 @@
 
-smartRApp.controller('TimelineController',
+window.smartRApp.controller('TimelineController',
     ['$scope', 'smartRUtils', 'rServeService', function($scope, smartRUtils, rServeService) {
 
         // initialize service

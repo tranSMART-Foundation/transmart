@@ -1,5 +1,5 @@
 
-smartRApp.controller('VolcanoplotController',
+window.smartRApp.controller('VolcanoplotController',
     ['$scope', 'smartRUtils', 'rServeService', function($scope, smartRUtils, rServeService) {
 
         // initialize service

@@ -1,5 +1,5 @@
 
-smartRApp.directive('timelinePlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
+window.smartRApp.directive('timelinePlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
 
     return {
         restrict: 'E',

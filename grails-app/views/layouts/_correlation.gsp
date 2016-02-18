@@ -1,7 +1,9 @@
-<script type="text/ng-template" id="correlation">
-    <div >
 
-        <tab-container ng-controller="CorrelationController">
+<script type="text/ng-template" id="correlation">
+
+    <div ng-controller="CorrelationController">
+
+        <tab-container>
 
             <workflow-tab tab-name="Fetch Data">
                 <concept-box concept-group="conceptBoxes.datapoints"></concept-box>
@@ -32,4 +34,5 @@
         </tab-container>
 
     </div>
+
 </script>
