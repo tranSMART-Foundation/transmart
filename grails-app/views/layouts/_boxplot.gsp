@@ -6,7 +6,7 @@
     <tab-container>
 
         <workflow-tab tab-name="Fetch Data">
-            <concept-box concept-group="conceptBoxes.concepts"></concept-box>
+            <concept-box concept-group="conceptBoxes.datapoints"></concept-box>
             <concept-box concept-group="conceptBoxes.subsets"></concept-box>
             <br/>
             <br/>

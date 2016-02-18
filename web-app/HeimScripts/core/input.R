@@ -1,3 +1,35 @@
+
+# TODO: Works only for LDD
+parse.input <- function(sourceLabel, loaded_variables, type) {
+    if (type == "numeric") return(parse.ldd.num.input(sourceLabel, loaded_variables))
+    if (type == "categoric") return(parse.ldd.cat.input(sourceLabel, loaded_variables))
+    stop(paste(type, "is not supported by parse.input, yet."))
+}
+
+# merge numeric LDD into single dataframe by given sourceLabel
+# basically this makes a single dataframe of a numeric concept box
+parse.ldd.num.input <- function(sourceLabel, loaded_variables) {
+    filtered.loaded_variables <- get.loaded_variables.by.source(sourceLabel, loaded_variables)
+    Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables) # merge alle matching dfs
+}
+
+# merge categoric LDD into single dataframe by given sourceLabel
+# basically this makes a single dataframe of a categoric concept box
+parse.ldd.cat.input <- function(sourceLabel, loaded_variables) {
+    filtered.loaded_variables <- get.loaded_variables.by.source(sourceLabel, loaded_variables)
+    df.withEmptySpace <- Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables) # merge alle matching dfs
+    merged.values <- apply(df.withEmptySpace[,-1], 1, function(row) paste(row, collapse=""))
+    data.frame(Row.Labels=df.withEmptySpace["Row.Label"], value=merged.values)
+}
+
+# give me only the loaded_variables that match my sourceLabel
+get.loaded_variables.by.source <- function(sourceLabel, loaded_variables) {
+    SoNoSu.labels <- names(loaded_variables)
+    matches <- grepl(paste("^", sourceLabel, sep=""), SoNoSu.labels) # which SoNoSu labels begin with sourceLabel
+    loaded_variables[SoNoSu.labels[matches]]
+}
+
+
 dropEmpty <- function(df) {
   df[df$value != "",]
 }
@@ -45,7 +77,7 @@ parseDataPoints <- function(datapointsDfs) {
 #  Parse input should be the entrypoint for every workflow. It will segregate data per source.
 #  It returns a list of lists. With source name (e.g. box1) as keys and named dataframes as values.
 parseInput <- function(input) {
-  validateLoadedVariables(input)
+#  validateLoadedVariables(input) // Fixme: Good idea but it is not working
   dataLabels <- names(input)
   splitted <- strsplit(dataLabels, "_")
   sources <- sapply(splitted, function(x) { x[[1]] })
@@ -67,7 +99,7 @@ validateLoadedVariables <- function(loadedVariablesList) {
         stop(paste("loaded_variables must be a list. Is a: ",offendingType,sep=""))
     }
     for (df in loadedVariablesList) {
-        if (!is.dataframe(df)) {
+        if (!is.data.frame(df)) {
             offendingType <- class(df)
             stop(paste("loaded_variables must contain only data.frames. Found: ",offendingType,sep=""))
         }
