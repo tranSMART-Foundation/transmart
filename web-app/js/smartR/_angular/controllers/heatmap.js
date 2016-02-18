@@ -14,8 +14,8 @@ window.smartRApp.controller('HeatmapController',
         };
 
         $scope.fetchSummaryData = {
-            img : 'img.png',
-            result : ['jajal']
+            img : '',
+            result : ['']
         };
 
         $scope.scriptResults = {};
