@@ -1,29 +1,13 @@
 //# sourceURL=biomarkerSelection.js
 
-window.smartRApp.directive('biomarkerSelection', [function() {
+window.smartRApp.directive('biomarkerSelection', ['$rootScope', function($rootScope) {
 
   return {
     restrict: 'E',
     scope: {
       biomarkers: '='
     },
-    template: '<div class="sr-fetch-params-area">' +
-        '<div class="heim-input-field heim-autocomplete">' +
-          '<label for="heim-input-txt-identifier">Select a biomarker:</label>' +
-          '<input id="heim-input-txt-identifier">' +
-          '<span style="color: darkgrey"> Biomarker can be a gene, pathway, mirID or UniProtID.</span>' +
-          '<div id="heim-input-list-identifiers">' +
-            '<ul><li ng-repeat="biomarker in biomarkers">' +
-              '<div>' +
-                '<span class="identifier-type">{{biomarker.type}} </span>' +
-                '<span class="identifier-name">{{biomarker.name}} </span>' +
-                '<span class="identifier-synonyms">{{biomarker.synonyms}} </span>' +
-              '</div>' +
-              '<button class="identifier-delete" ng-click="removeIdentifier(biomarker)">&#x2716;</button>' +
-            '</li></ul>' +
-          '</div>' +
-        '</div>' +
-      '</div>',
+    templateUrl: $rootScope.smartRPath + '/js/smartR/_angular/templates/biomarkerSelection.html',
     controller: function ($scope) {
       if (!$scope.biomarkers) {
         $scope.biomarkers = [];
