@@ -2,14 +2,14 @@
 
 'use strict';
 
-window.smartRApp.directive('summaryStats', ['rServeService', function(rServeService) {
+window.smartRApp.directive('summaryStats', ['rServeService', '$rootScope',  function(rServeService, $rootScope) {
         return {
             restrict: 'E',
             scope: {
-                data: '='
+                summaryData: '='
             },
-            template: '<div>__THIS_IS_TEMPLATE__</div>', // TODO to use external template
-            link: function(scope, element) {
+            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/summary.html',
+            link: function(scope, element, attrs) {
 
             }
         }

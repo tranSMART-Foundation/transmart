@@ -4,7 +4,8 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
         restrict: 'E',
         scope: {
             conceptMap: '=',
-            showSummaryStats: '='
+            showSummaryStats: '=',
+            summaryData: '='
         },
         template: '<input type="button" value="Fetch Data"><span style="padding-left: 10px;"></span>',
         link: function(scope, element) {
@@ -26,12 +27,20 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
                 ).finally(function() {
                         if (showSummary) {
                             rServeService.executeSummaryStats('fetch').then (
-                                function(msg) { template_msg.innerHTML = 'Success: ' + msg; },
+                                function(msg) {
+
+                                    template_msg.innerHTML = 'Success: ' + msg;
+                                    scope.summaryData = {
+                                        img : 'from button .png',
+                                        result : ['toto']
+                                    };
+                                    console.log(scope.summaryData);
+                                },
                                 function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
                             );
-                        } else {
-                            template_btn.disabled = false;
-                        }
+                        } 
+                        template_btn.disabled = false;
+                        
                 });
 
             };
