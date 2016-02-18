@@ -265,7 +265,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
             filename;
     };
 
-    service.loadDataIntoSession = function rServeService_loadDataIntoSession(conceptKeys) {
+    service.loadDataIntoSession = function rServeService_loadDataIntoSession(conceptKeys, dataConstraints) {
         return $q( function(resolve, reject) {
             smartRUtils.getSubsetIds().then(
                 function(subsets) {
@@ -273,7 +273,8 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
                         taskType: 'fetchData',
                         arguments: {
                             conceptKeys: conceptKeys,
-                            resultInstanceIds: subsets
+                            resultInstanceIds: subsets,
+                            dataConstraints: dataConstraints
                         }
                     }).then(
                         function(ret) { resolve('Task complete! State: ' + ret.state); },

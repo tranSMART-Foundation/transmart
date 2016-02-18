@@ -14,7 +14,9 @@
 
             <concept-box concept-group="conceptBoxes.categorical"></concept-box>
 
-            <br/>
+            <biomarker-selection></biomarker-selection>
+
+      <br/>
             <br/>
 
             <fetch-button concept-map="conceptBoxes" show-summary-stats="true"></fetch-button>

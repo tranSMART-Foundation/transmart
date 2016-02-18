@@ -21,4 +21,6 @@ window.smartRApp.controller('HeatmapController',
         $scope.scriptResults = {};
         $scope.params = {};
 
+        $scope.selectedBiomarkers = [];
+
     }]);
