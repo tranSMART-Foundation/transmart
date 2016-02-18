@@ -1,3 +1,4 @@
+//# sourceURL=biomarkerSelection.js
 
 window.smartRApp.directive('biomarkerSelection', [function() {
 

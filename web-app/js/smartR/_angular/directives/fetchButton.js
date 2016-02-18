@@ -4,6 +4,7 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
         restrict: 'E',
         scope: {
             conceptMap: '=',
+            biomarkers: '=',
             showSummaryStats: '=',
             summaryData: '='
         },
@@ -19,9 +20,21 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
                 template_btn.disabled = true;
                 template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
 
+                // Construct query constraints
                 var conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap);
+                var dataConstraints;
+                if (scope.biomarkers) {
+                    var searchKeywordIds = scope.biomarkers.map(function(biomarker) {
+                        return biomarker.id;
+                    });
+                    dataConstraints = {
+                        search_keyword_ids: {
+                            keyword_ids: searchKeywordIds
+                        }
+                    };
+                 }
 
-                rServeService.loadDataIntoSession(conceptKeys).then(
+                rServeService.loadDataIntoSession(conceptKeys, dataConstraints).then(
                     function(msg) { template_msg.innerHTML = 'Success: ' + msg; },
                     function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
                 ).finally(function() {
