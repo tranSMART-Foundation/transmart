@@ -31,8 +31,8 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
 
                                     template_msg.innerHTML = 'Success: ' + msg;
                                     scope.summaryData = {
-                                        img : 'from button .png',
-                                        result : ['toto']
+                                        img : '--',
+                                        result : ['--']
                                     };
                                     console.log(scope.summaryData);
                                 },
