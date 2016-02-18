@@ -33,8 +33,8 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'css', file: 'heatmap.css']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'heatmap.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Heatmap.js']
-        resource url: [plugin: 'smart-r', dir: 'css', file: 'correlation.css']
         // correlation
+        resource url: [plugin: 'smart-r', dir: 'css', file: 'correlation.css']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'correlation.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Correlation.js']
         // boxplot
