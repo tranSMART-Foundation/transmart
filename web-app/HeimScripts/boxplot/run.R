@@ -8,13 +8,19 @@ source(inputUtils)
 
 main <- function( excludedPatientIDs = NULL ) {
     datapoints <- parse.input(sourceLabel="datapoints", loaded_variables=loaded_variables, type="numeric")
-    datapoints <- datapoints[datapoints[,2] != "NA", ]
+    datapoints <- na.omit(datapoints)
     colnames(datapoints)[2] <- 'value'
 
     subsets <- parse.input(sourceLabel="subsets", loaded_variables=loaded_variables, type="categoric")
-    df <- merge(datapoints, subsets, by="patientID")
 
-    df$category[df$category == ""] <- "no subset"
+    if (nrow(subsets) > 0) {
+        df <- merge(datapoints, subsets, by="patientID")
+        df$category[df$category == ""] <- "no subset"
+    } else {
+        df <- datapoints
+        df$category <- "no subset"
+    }
+
     df$jitter <- runif(nrow(df), -0.5, 0.5)
 
     if (! is.null(excludedPatientIDs)) {
