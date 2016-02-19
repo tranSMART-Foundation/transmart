@@ -203,7 +203,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
                     .transition()
                     .duration(animationDuration)
                     .attr('cx', function(d) {
-                        return jitterChecked ? x(category) : x(category) + boxWidth * jitterWidth * d.jitter;
+                        return jitterChecked ? x(category) + boxWidth * jitterWidth * d.jitter : x(category);
                     });
             });
         }
