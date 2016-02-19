@@ -67,4 +67,11 @@ class SmartRController {
 
         render result as JSON;
     }
+
+    /**
+     * Get smart-r plugin context path
+     */
+    def smartRContextPath = {
+        render servletContext.contextPath + pluginContextPath as String;
+    }
 }

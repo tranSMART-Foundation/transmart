@@ -1,6 +1,10 @@
 
 window.smartRApp.controller('CorrelationController',
-    ['$scope', 'smartRUtils', 'rServeService', function($scope, smartRUtils, rServeService) {
+    ['$scope', 'smartRUtils', 'rServeService', '$css', function($scope, smartRUtils, rServeService, $css) {
+
+        $css.bind({
+            href: $scope.smartRPath + '/css/correlation.css'
+        }, $scope);
 
         // initialize service
         rServeService.startSession('correlation');

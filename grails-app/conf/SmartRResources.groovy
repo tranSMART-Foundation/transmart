@@ -8,6 +8,7 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jsrender.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'angular.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'angular-route.js']
+        resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'angular-css.js']
     }
 
     smartR_angular_components {
@@ -30,23 +31,18 @@ modules = {
     smartR_all {
         dependsOn 'smartR_angular_components'
         // heatmap
-        resource url: [plugin: 'smart-r', dir: 'css', file: 'heatmap.css']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'heatmap.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Heatmap.js']
         // correlation
-        resource url: [plugin: 'smart-r', dir: 'css', file: 'correlation.css']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'correlation.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Correlation.js']
         // boxplot
-        resource url: [plugin: 'smart-r', dir: 'css', file: 'boxplot.css']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'boxplot.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Boxplot.js']
         // timeline
-        resource url: [plugin: 'smart-r', dir: 'css', file: 'timeline.css']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'timeline.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Timeline.js']
         // volcano
-        resource url: [plugin: 'smart-r', dir: 'css', file: 'volcanoplot.css']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'volcanoplot.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Volcanoplot.js']
     }

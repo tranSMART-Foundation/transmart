@@ -11,8 +11,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             width: '@',
             height: '@'
         },
-        template: '<div id="controls" style="float:left; padding-right:10px;"></div>' +
-                '<div id="boxplot" style="float:left; padding-right:10px;"></div>',
+        template: '<div id="boxplot" style="float:left; padding-right:10px;"></div>',
         link: function (scope, element) {
             /**
              * Watch data model (which is only changed by ajax calls when we want to (re)draw everything)
@@ -27,7 +26,6 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
     };
 
     function createBoxplot(scope, root) {
-
         var concept = '',
             globalMin = 0,
             globalMax = 0,
