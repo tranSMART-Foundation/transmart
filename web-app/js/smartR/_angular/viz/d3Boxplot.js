@@ -40,8 +40,6 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
         }
         setData(scope.data);
 
-        console.log(scope.data)
-
         var animationDuration = 1000;
 
         var width = scope.width;
@@ -80,7 +78,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
         boxplot.append('text')
             .attr('transform', 'translate(' + (-40) + ',' + (height / 2) + ')rotate(-90)')
             .attr('text-anchor', 'middle')
-            .text(shortenConcept(concept));
+            .text(smartRUtils.shortenConcept(concept));
 
         var tooltip = boxplot.append('div')
             .attr('class', 'tooltip')
@@ -141,14 +139,20 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
         var excludedPatientIDs = [];
 
         function excludeSelection() {
-            alert('Implement me!')
-            //excludedPatientIDs = excludedPatientIDs.concat(currentSelection);
-            //var settings = {excludedPatientIDs: excludedPatientIDs};
-            //var onResponse = function (response) {
-            //    results = response;
-            //    init();
-            //};
-            //startWorkflow(onResponse, settings, false, false);
+            excludedPatientIDs = excludedPatientIDs.concat(currentSelection);
+            var settings = { excludedPatientIDs: excludedPatientIDs };
+
+            rServeService.startScriptExecution({
+                taskType: 'run',
+                arguments: settings
+            }).then(
+                function (response) {
+                    scope.data = JSON.parse(response.result.artifacts.value);
+                },
+                function (response) {
+                    alert('Failure: ' + response.statusText);
+                }
+            );
         }
 
         function removeOutliers() {
