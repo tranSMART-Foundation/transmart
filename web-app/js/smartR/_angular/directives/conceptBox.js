@@ -20,12 +20,14 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
     return {
         restrict: 'E',
         scope: {
-            conceptGroup: '='
+            conceptGroup: '=',
+            label: '=',
+            alt: '='
         },
         templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/conceptBox.html',
-        link: function(scope, element) {
-            var template_box = element.children()[0];
-            var template_btn = element.children()[1];
+        link: function(scope, element, attrs) {
+            var template_box = element[0].querySelector('.sr-drop-input');
+            var template_btn = element[0].querySelector('.sr-drop-btn');
 
             // activate drag & drop for our conceptBox once it is rendered
             scope.$evalAsync(function() {

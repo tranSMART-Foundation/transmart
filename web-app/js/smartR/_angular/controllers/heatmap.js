@@ -13,14 +13,10 @@ window.smartRApp.controller('HeatmapController',
             categorical : []
         };
 
-        $scope.fetchSummaryData = {
-            img : '',
-            result : ['']
-        };
-
-        $scope.scriptResults = {};
-        $scope.params = {};
-
         $scope.selectedBiomarkers = [];
 
+        // summary data for fetch
+        $scope.fetchSummaryData = {summary:[]};
+
+        $scope.scriptResults = {};
     }]);

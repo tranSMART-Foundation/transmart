@@ -7,7 +7,11 @@
         %{--========================================================================================================--}%
         <workflow-tab tab-name="Fetch Data">
 
-            <concept-box concept-group="conceptBoxes.highDimensional"></concept-box>
+            <concept-box
+                concept-group="conceptBoxes.highDimensional"
+                label="'High Dimensional'"
+                alt="'Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box. The nodes needs to be from the same platform.'">
+            </concept-box>
 
             %{--<concept-box concept-group="conceptBoxes.numerical"></concept-box>--}%
             %{--<concept-box concept-group="conceptBoxes.categorical"></concept-box>--}%

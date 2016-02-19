@@ -25,7 +25,7 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
                 // Construct query constraints
                 var conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap);
                 var dataConstraints;
-                if (scope.biomarkers) {
+                if (scope.biomarkers.length > 0) {
                     var searchKeywordIds = scope.biomarkers.map(function(biomarker) {
                         return biomarker.id;
                     });
@@ -43,14 +43,14 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
                     if (showSummary) {
                         rServeService.executeSummaryStats('fetch').then (
                             function(data) {
-                                console.log('after execute summary stats', data); // log
-                                // TODO: generate summary result directive
+                                scope.summaryData = data.result;
                                 template_msg.innerHTML = 'Success: ' + data.msg;
                             },
                             function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
-                        );
+                        ).finally(function () {
+                                template_btn.disabled = false;
+                            });
                     }
-                    template_btn.disabled = false;
                 });
 
             };
