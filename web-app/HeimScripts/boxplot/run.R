@@ -23,6 +23,7 @@ main <- function( excludedPatientIDs = NULL ) {
     output$concept <- fetch_params$ontologyTerms$datapoints_n0$fullName
     output$globalMin <- min(df[,2])
     output$globalMax <- max(df[,2])
+    output$categories <- unique(df$category)
 
     for (cat in unique(df$category)) {
         subset <- df[df$category == cat,]
@@ -38,5 +39,5 @@ main <- function( excludedPatientIDs = NULL ) {
         output[[cat]]$points <- subset
     }
 
-    toJSON(list(cohort1 = output))
+    toJSON(output)
 }

@@ -28,6 +28,12 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         return split[split.length - 3] + '/' + split[split.length - 2];
     };
 
+    d3.selection.prototype.moveToFront = function () {
+        return this.each(function () {
+            this.parentNode.appendChild(this);
+        });
+    };
+
     service.getSubsetIds = function smartRUtil_getSubsetIds() {
         var defer = $q.defer();
 
