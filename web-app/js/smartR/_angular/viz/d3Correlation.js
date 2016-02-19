@@ -276,7 +276,7 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                         .style('left', 10 + mouseX() + 'px')
                         .style('top', 10 + mouseY() + 'px')
                         .style('visibility', 'visible')
-                        .html(shortenConcept(xArrLabel) + ': ' + d.x + '<br/>' + shortenConcept(yArrLabel) + ': ' + d.y + '<br/>' + 'Patient ID: ' + d.patientID + '<br/>' + (d.tag ? 'Tag: ' + d.tag : ''));
+                        .html(smartRUtils.shortenConcept(xArrLabel) + ': ' + d.x + '<br/>' + smartRUtils.shortenConcept(yArrLabel) + ': ' + d.y + '<br/>' + 'Patient ID: ' + d.patientID + '<br/>' + (d.tag ? 'Tag: ' + d.tag : ''));
                 })
                 .on('mouseout', function() {
                     var p = d3.select(this);
