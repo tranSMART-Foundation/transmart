@@ -1,5 +1,7 @@
 //# sourceURL=d3Boxplot.js
 
+'use strict';
+
 window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
 
     return {
@@ -129,6 +131,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
                 bottom = extent[1][1];
             currentSelection = d3.selectAll('.point')
                 .filter(function (d) {
+                    var point = d3.select(this);
                     return y(d.value) >= top && y(d.value) <= bottom && point.attr('cx') >= left && point.attr('cx') <= right;
                 })
                 .classed('brushed', true)
@@ -191,26 +194,16 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
         var jitterWidth = 1.0;
         var jitterChecked = false;
 
-        function swapJitter(checked) {
-            if (!checked) {
-                for (var i = 0; i < categories.length; i++) {
-                    d3.selectAll('.point' + shortenNodeLabel(categories[i]))
-                        .transition()
-                        .duration(animationDuration)
-                        .attr('cx', x(categories[i]));
-                }
-                jitterChecked = false;
-            } else {
-                for (var i = 0; i < categories.length; i++) {
-                    d3.selectAll('.point.' + shortenNodeLabel(categories[i]))
-                        .transition()
-                        .duration(animationDuration)
-                        .attr('cx', function (d) {
-                            return x(categories[i]) + boxWidth * jitterWidth * d.jitter;
-                        });
-                }
-                jitterChecked = true;
-            }
+        function swapJitter() {
+            jitterChecked = !jitterChecked;
+            categories.forEach(function(category) {
+                d3.selectAll('.point.' + shortenNodeLabel(category))
+                    .transition()
+                    .duration(animationDuration)
+                    .attr('cx', function(d) {
+                        return jitterChecked ? x(category) : x(category) + boxWidth * jitterWidth * d.jitter;
+                    });
+            });
         }
 
         function swapBackgroundColor(checked) {
@@ -496,17 +489,6 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             height: buttonHeight,
             callback: swapJitter,
             checked: false
-        });
-        createD3Switch({
-            location: boxplot,
-            onlabel: 'Animation ON',
-            offlabel: 'Animation OFF',
-            x: -280,
-            y: 2 + padding * 5 + buttonHeight * 5,
-            width: buttonWidth,
-            height: buttonHeight,
-            callback: switchAnimation,
-            checked: true
         });
     }
 
