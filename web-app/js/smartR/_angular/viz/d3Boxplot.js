@@ -16,7 +16,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
              */
             scope.$watch('data', function () {
                 $(element[0]).empty();
-                if ($.isEmptyObject(scope.data)) {
+                if (! $.isEmptyObject(scope.data)) {
                     createBoxplot(scope, element[0]);
                 }
             });

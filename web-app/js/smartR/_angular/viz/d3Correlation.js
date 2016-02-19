@@ -15,7 +15,7 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
              */
             scope.$watch('data', function() {
                 $(element[0]).empty();
-                if ($.isEmptyObject(scope.data)) {
+                if (! $.isEmptyObject(scope.data)) {
                     createCorrelationViz(scope, element[0]);
                 }
             });
