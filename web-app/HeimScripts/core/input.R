@@ -11,6 +11,7 @@ parse.input <- function(sourceLabel, loaded_variables, type) {
 # returns data.frame(patientID=c(...), concept1=c(...), concept2=c(...), ...)
 parse.ldd.num.input <- function(sourceLabel, loaded_variables) {
     filtered.loaded_variables <- get.loaded_variables.by.source(sourceLabel, loaded_variables)
+    if (length(filtered.loaded_variables) == 0) return(data.frame(patientID=c()))
     df <- Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables) # merge alle matching dfs
     colnames(df)[1] <- 'patientID'
     df
@@ -21,6 +22,7 @@ parse.ldd.num.input <- function(sourceLabel, loaded_variables) {
 # returns data.frame(patientID=c(...), category=c(...))
 parse.ldd.cat.input <- function(sourceLabel, loaded_variables) {
     filtered.loaded_variables <- get.loaded_variables.by.source(sourceLabel, loaded_variables)
+    if (length(filtered.loaded_variables) == 0) return(data.frame(patientID=c(), category=c()))
     df.withEmptySpace <- Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables) # merge alle matching dfs
     merged.values <- apply(df.withEmptySpace[,-1], 1, function(row) paste(row, collapse=""))
     df <- data.frame(Row.Labels=df.withEmptySpace["Row.Label"], category=merged.values)
