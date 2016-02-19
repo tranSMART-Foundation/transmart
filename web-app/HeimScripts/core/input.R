@@ -8,18 +8,24 @@ parse.input <- function(sourceLabel, loaded_variables, type) {
 
 # merge numeric LDD into single dataframe by given sourceLabel
 # basically this makes a single dataframe of a numeric concept box
+# returns data.frame(patientID=c(...), concept1=c(...), concept2=c(...), ...)
 parse.ldd.num.input <- function(sourceLabel, loaded_variables) {
     filtered.loaded_variables <- get.loaded_variables.by.source(sourceLabel, loaded_variables)
-    Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables) # merge alle matching dfs
+    df <- Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables) # merge alle matching dfs
+    colnames(df)[1] <- 'patientID'
+    df
 }
 
 # merge categoric LDD into single dataframe by given sourceLabel
 # basically this makes a single dataframe of a categoric concept box
+# returns data.frame(patientID=c(...), category=c(...))
 parse.ldd.cat.input <- function(sourceLabel, loaded_variables) {
     filtered.loaded_variables <- get.loaded_variables.by.source(sourceLabel, loaded_variables)
     df.withEmptySpace <- Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables) # merge alle matching dfs
     merged.values <- apply(df.withEmptySpace[,-1], 1, function(row) paste(row, collapse=""))
-    data.frame(Row.Labels=df.withEmptySpace["Row.Label"], category=merged.values)
+    df <- data.frame(Row.Labels=df.withEmptySpace["Row.Label"], category=merged.values)
+    colnames(df)[1] <- 'patientID'
+    df
 }
 
 # give me only the loaded_variables that match my sourceLabel
