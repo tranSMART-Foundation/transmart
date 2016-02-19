@@ -1,3 +1,4 @@
+//# sourceURL=d3Boxplot.js
 
 window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
 
@@ -37,11 +38,13 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
         }
         setData(scope.data);
 
+        console.log(scope.data)
+
         var animationDuration = 1000;
 
         var width = scope.width;
         var height = scope.height;
-        var margin = {top: 20, right: 60, bottom: 200, left: 250};
+        var margin = {top: 20, right: 60, bottom: 200, left: 280};
 
         var boxWidth = 0.12 * width;
         var whiskerLength = boxWidth / 6;
@@ -246,7 +249,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             whisker.transition()
                 .duration(animationDuration)
                 .attr('x1', x(category) - whiskerLength / 2)
-                .attr('y2', function (d) { return y(d); })
+                .attr('y1', function (d) { return y(d); })
                 .attr('x2', x(category) + whiskerLength / 2)
                 .attr('y2', function (d) { return y(d); });
 
@@ -281,7 +284,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             hinge.transition()
                 .duration(animationDuration)
                 .attr('x1', x(category) - hingeLength / 2)
-                .attr('y2', function (d) { return y(d); })
+                .attr('y1', function (d) { return y(d); })
                 .attr('x2', x(category) + hingeLength / 2)
                 .attr('y2', function (d) { return y(d); });
 
@@ -314,7 +317,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             connection.transition()
                 .duration(animationDuration)
                 .attr('x1', x(category))
-                .attr('y2', function (d) { return y(d[0]); })
+                .attr('y1', function (d) { return y(d[0]); })
                 .attr('x2', x(category))
                 .attr('y2', function (d) { return y(d[1]); });
 
@@ -394,8 +397,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
                 .attr('cy', function (d) { return y(d.value); })
                 .attr('r', 3);
 
-            point
-                .exit()
+            point.exit()
                 .transition()
                 .duration(animationDuration)
                 .attr('r', 0)
@@ -445,28 +447,28 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
         var buttonHeight = 40;
         var padding = 5;
         createD3Button({
-            location: root,
+            location: boxplot,
             label: 'Remove Outliers',
-            x: 2,
+            x: -280,
             y: 2,
             width: buttonWidth,
             height: buttonHeight,
             callback: removeOutliers
         });
         createD3Button({
-            location: root,
+            location: boxplot,
             label: 'Reset',
-            x: 2,
+            x: -280,
             y: 2 + padding + buttonHeight,
             width: buttonWidth,
             height: buttonHeight,
             callback: reset
         });
         createD3Switch({
-            location: root,
+            location: boxplot,
             onlabel: 'Light Background ON',
             offlabel: 'Light Background OFF',
-            x: 2,
+            x: -280,
             y: 2 + padding * 2 + buttonHeight * 2,
             width: buttonWidth,
             height: buttonHeight,
@@ -474,10 +476,10 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             checked: true
         });
         createD3Switch({
-            location: root,
+            location: boxplot,
             onlabel: 'Density Estimation ON',
             offlabel: 'Density Estimation OFF',
-            x: 2,
+            x: -280,
             y: 2 + padding * 3 + buttonHeight * 3,
             width: buttonWidth,
             height: buttonHeight,
@@ -485,10 +487,10 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             checked: false
         });
         createD3Switch({
-            location: root,
+            location: boxplot,
             onlabel: 'Jitter Datapoints ON',
             offlabel: 'Jitter Datapoints OFF',
-            x: 2,
+            x: -280,
             y: 2 + padding * 4 + buttonHeight * 4,
             width: buttonWidth,
             height: buttonHeight,
@@ -496,10 +498,10 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             checked: false
         });
         createD3Switch({
-            location: root,
+            location: boxplot,
             onlabel: 'Animation ON',
             offlabel: 'Animation OFF',
-            x: 2,
+            x: -280,
             y: 2 + padding * 5 + buttonHeight * 5,
             width: buttonWidth,
             height: buttonHeight,

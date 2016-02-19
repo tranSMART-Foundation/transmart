@@ -2,14 +2,6 @@
         font-size: 9px;
     }
 
-    #boxplot1 {
-        background-color: white;
-    }
-
-    #boxplot2 {
-        background-color: white;
-    }
-
 	.whisker {
 		stroke: black;
 		stroke-width: 1px;
@@ -47,6 +39,7 @@
 	}
 
     .box.upper {
+        fill: #008BFF;
         opacity: 0.3;
     }
 

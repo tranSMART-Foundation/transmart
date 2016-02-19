@@ -22,7 +22,7 @@
                         arguments-to-use="params"></run-button>
             <br/>
             <br/>
-            <boxplot data="scriptResults" width="1200" height="1200"></boxplot>
+            <boxplot data="scriptResults" width="1000" height="500"></boxplot>
         </workflow-tab>
 
     </tab-container>

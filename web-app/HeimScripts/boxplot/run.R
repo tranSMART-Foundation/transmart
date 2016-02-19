@@ -1,6 +1,6 @@
 
 if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
-remoteScriptDir <- "web-app/HeimScripts"
+    remoteScriptDir <- "web-app/HeimScripts"
 }
 
 inputUtils <- paste(remoteScriptDir, "/core/input.R", sep="")
@@ -8,16 +8,19 @@ source(inputUtils)
 
 main <- function( excludedPatientIDs = NULL ) {
     datapoints <- parse.input(sourceLabel="datapoints", loaded_variables=loaded_variables, type="numeric")
+    datapoints <- datapoints[datapoints[,2] != "NA", ]
+    colnames(datapoints)[2] <- 'value'
+
     subsets <- parse.input(sourceLabel="subsets", loaded_variables=loaded_variables, type="categoric")
-    df <- merge(datapoints, subsets, by="Row.Label")
+    df <- merge(datapoints, subsets, by="patientID")
 
     df$category[df$category == ""] <- "no subset"
     df$jitter <- runif(nrow(df), -0.5, 0.5)
 
     if (! is.null(excludedPatientIDs)) {
-        df <- df[, ! df$Row.Label %in% excludedPatientIDs]
+        df <- df[, ! df$patientID %in% excludedPatientIDs]
     }
-    patientIDs <- df$Row.Label
+    patientIDs <- df$patientID
 
     output <- list()
     output$concept <- fetch_params$ontologyTerms$datapoints_n0$fullName
