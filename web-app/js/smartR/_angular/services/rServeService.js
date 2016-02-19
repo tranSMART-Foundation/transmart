@@ -1,3 +1,4 @@
+//# sourceURL=rServeService.js
 
 window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', function(smartRUtils, $q, $http) {
 
@@ -248,9 +249,10 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
     }
 
     service.downloadJsonFile = function(executionId, filename) {
-        return $.ajax({
-            url: this.urlForFile(executionId, filename),
-            dataType: 'json'
+        // Simple GET request example:
+        return $http({
+            method: 'GET',
+            url: this.urlForFile(executionId, filename)
         });
     };
 
@@ -269,13 +271,18 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
         return $q( function(resolve, reject) {
             smartRUtils.getSubsetIds().then(
                 function(subsets) {
+                    var _arg = {
+                        conceptKeys: conceptKeys,
+                        resultInstanceIds: subsets
+                    };
+
+                    if (typeof dataConstraints !== 'undefined') {
+                        _arg.dataConstraints = dataConstraints;
+                    }
+
                     service.startScriptExecution({
                         taskType: 'fetchData',
-                        arguments: {
-                            conceptKeys: conceptKeys,
-                            resultInstanceIds: subsets,
-                            dataConstraints: dataConstraints
-                        }
+                        arguments: _arg
                     }).then(
                         function(ret) { resolve('Task complete! State: ' + ret.state); },
                         function(ret) { reject(ret.response); }
@@ -297,9 +304,62 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
                     projection: 'default_real_projection' // always required, even for low-dim data
                 }
             }).then(
-                function(ret) { resolve('Task complete! State: ' + ret.state); },
+                function(ret) {
+                    var _result = {};
+                    if (ret.result.artifacts.files.length > 0) {
+                        service.composeSummaryResults(ret.result.artifacts.files, ret.executionId)
+                            .then(function (result) {
+                                _result = result;
+                                resolve({result : _result, msg:'Task complete! State: ' + ret.state});
+                            });
+                    } else {
+                        resolve({result : _result, msg:'Task complete! State: ' + ret.state});
+                    }
+                },
                 function(ret) { reject(ret.response); }
             );
+        });
+    };
+
+    service.composeSummaryResults = function rServeService_composeSummaryResults (files, executionId) {
+        return $q(function (resolve, reject) {
+            var retObj = {summary : []},
+
+                // find matched items in an array by key
+                _find = function composeSummaryResults_find (key, array) {
+                    // The variable results needs var in this case (without 'var' a global variable is created)
+                    var results = [];
+                    for (var i = 0; i < array.length; i++) {
+                        if (array[i].indexOf(key) > -1) {
+                            results.push(array[i]);
+                        }
+                    }
+                    return results;
+                },
+
+                // process each item
+                _processItem  = function composeSummaryResults_processItem(img, json) {
+                    return $q(function (resolve, reject) {
+                        service.downloadJsonFile(executionId, json).then(
+                            function (d) {
+                                resolve({img: service.urlForFile(executionId, img), json:d})
+                            },
+                            function (err) {reject(err);}
+                        );
+                    });
+                };
+
+            // first identify image and json files
+            var _images = _find('.png', files),_jsons = _find('.json', files);
+
+            // load each json file contents
+            for (var i = 0; i < _images.length; i++){
+                retObj.summary.push(_processItem(_images[i], _jsons[i]));
+            }
+
+            $.when.apply($, retObj.summary).then(function () {
+                resolve(retObj); // when all contents has been loaded
+            });
         });
     };
 
