@@ -6,7 +6,6 @@
         %{-- Fetch Data --}%
         %{--========================================================================================================--}%
         <workflow-tab tab-name="Fetch Data">
-
             <concept-box
                 concept-group="conceptBoxes.highDimensional"
                 label="'High Dimensional'"
@@ -17,25 +16,34 @@
             %{--<concept-box concept-group="conceptBoxes.categorical"></concept-box>--}%
 
             <biomarker-selection biomarkers="selectedBiomarkers"></biomarker-selection>
-
-            <br/>
-
-            <fetch-button concept-map="conceptBoxes" biomarkers="selectedBiomarkers" show-summary-stats="true"
-                          summary-data="fetchSummaryData"></fetch-button>
-
             <hr class="sr-divider">
-
+            <fetch-button concept-map="conceptBoxes"
+                          biomarkers="selectedBiomarkers"
+                          show-summary-stats="true"
+                          summary-data="fetchSummaryData">
+            </fetch-button>
+            <br/>
             <summary-stats summary-data="fetchSummaryData"></summary-stats>
-
-
-
         </workflow-tab>
 
         %{--========================================================================================================--}%
         %{-- Preprocess Data --}%
         %{--========================================================================================================--}%
         <workflow-tab tab-name="Preprocess">
+            %{--Aggregate Probes--}%
+            <div class="heim-input-field">
+                <input type="checkbox" ng-model="preprocessArgs.aggregateProbes">
+                <span>Aggregate probes</span>
+            </div>
 
+            <hr class="sr-divider">
+
+            <preprocess-button params="preprocessArgs"
+                               show-summary-stats="true"
+                               summary-data="preprocessSummaryData">
+            </preprocess-button>
+            <br/>
+            <summary-stats summary-data="preprocessSummaryData"></summary-stats>
         </workflow-tab>
 
 

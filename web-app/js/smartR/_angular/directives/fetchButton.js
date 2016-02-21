@@ -9,7 +9,7 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
             showSummaryStats: '=',
             summaryData: '='
         },
-        template: '<input type="button" value="Fetch Data"><span style="padding-left: 10px;"></span>',
+        template: '<input type="button" value="Fetch Data" class="heim-action-button"><span style="padding-left: 10px;"></span>',
         link: function(scope, element) {
 
             var template_btn = element.children()[0];
