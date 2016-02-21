@@ -21,8 +21,8 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
         restrict: 'E',
         scope: {
             conceptGroup: '=',
-            label: '=',
-            alt: '='
+            label: '@',
+            alt: '@'
         },
         templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/conceptBox.html',
         link: function(scope, element, attrs) {
