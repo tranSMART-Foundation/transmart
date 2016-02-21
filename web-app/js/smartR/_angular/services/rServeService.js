@@ -307,7 +307,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
                 function(ret) {
                     var _result = {};
                     if (ret.result.artifacts.files.length > 0) {
-                        service.composeSummaryResults(ret.result.artifacts.files, ret.executionId)
+                        service.composeSummaryResults(ret.result.artifacts.files, ret.executionId, phase)
                             .then(function (result) {
                                 _result = result;
                                 resolve({result : _result, msg:'Task complete! State: ' + ret.state});
@@ -321,9 +321,10 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
         });
     };
 
-    service.composeSummaryResults = function rServeService_composeSummaryResults (files, executionId) {
+    service.composeSummaryResults = function rServeService_composeSummaryResults (files, executionId, phase) {
         return $q(function (resolve, reject) {
             var retObj = {summary : []},
+                fileExt = {fetch : ['.png', 'json'], preprocess :['all.png', 'all.json']};
 
                 // find matched items in an array by key
                 _find = function composeSummaryResults_find (key, array) {
@@ -350,7 +351,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
                 };
 
             // first identify image and json files
-            var _images = _find('.png', files),_jsons = _find('.json', files);
+            var _images = _find(fileExt[phase][0], files),_jsons = _find(fileExt[phase][1], files);
 
             // load each json file contents
             for (var i = 0; i < _images.length; i++){
@@ -360,6 +361,18 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
             $.when.apply($, retObj.summary).then(function () {
                 resolve(retObj); // when all contents has been loaded
             });
+        });
+    };
+
+    service.preprocess = function rServeService_preprocess (args) {
+        return $q(function (resolve, reject) {
+            service.startScriptExecution({
+                taskType: 'preprocess',
+                arguments: args
+            }).then(
+                function(ret) { resolve('Task complete! State: ' + ret.state); },
+                function(ret) { reject(ret.response); }
+            );
         });
     };
 

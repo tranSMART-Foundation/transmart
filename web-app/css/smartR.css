@@ -156,6 +156,7 @@ div.sr-status-and-output-container:empty:before {
 .sr-summary-table {
     background-color: gainsboro;
     padding: 0;
+    margin-top: 25px
 }
 .sr-summary-table td, .sr-summary-table  th  {
     padding: 1em;
@@ -163,5 +164,5 @@ div.sr-status-and-output-container:empty:before {
     vertical-align: top;
 }
 .sr-summary-table th {
-    background-color: #efefef;
+    background-color: #efefef;;
 }

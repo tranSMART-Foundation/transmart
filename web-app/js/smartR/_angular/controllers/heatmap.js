@@ -6,17 +6,33 @@ window.smartRApp.controller('HeatmapController',
         // initialize service
         rServeService.startSession('heatmap');
 
-        // model
+        // ------------------------------------------------------------- //
+        // Fetch data                                                    //
+        // ------------------------------------------------------------- //
         $scope.conceptBoxes = {
             highDimensional : [],
             numerical : [],
             categorical : []
         };
-
         $scope.selectedBiomarkers = [];
-
-        // summary data for fetch
         $scope.fetchSummaryData = {summary:[]};
 
+        // ------------------------------------------------------------- //
+        // Preprocess                                                    //
+        // ------------------------------------------------------------- //
+        $scope.preprocessArgs = {
+            aggregateProbes : true
+        };
+        $scope.preprocessSummaryData = {summary:[]};
+
+        // ------------------------------------------------------------- //
+        // Run Heatmap                                                   //
+        // ------------------------------------------------------------- //
+        $scope.runArgs = {
+            maxRow : 100,
+            sortOn : 'nodes',
+            rankCriteria : 'coef'
+        };
         $scope.scriptResults = {};
+
     }]);
