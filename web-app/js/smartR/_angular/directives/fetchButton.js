@@ -41,22 +41,29 @@ window.smartRApp.directive('fetchButton',
                     }
 
                     rServeService.loadDataIntoSession(conceptKeys, dataConstraints).then(
-                        function(msg) { template_msg.innerHTML = 'Success: ' + msg; },
-                        function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
-                    ).finally(function() {
-                        if (showSummary) {
-                            rServeService.executeSummaryStats('fetch').then (
-                                function(data) {
-                                    scope.summaryData = data.result;
-                                    template_msg.innerHTML = 'Success: ' + data.msg;
-                                },
-                                function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
-                            ).finally(function () {
+                        function(msg) {
+                            if (showSummary) {
+                                rServeService.executeSummaryStats('fetch').then (
+                                    function(data) {
+                                        scope.summaryData = data.result;
+                                        template_msg.innerHTML = 'Success: ' + data.msg;
+                                    },
+                                    function(msg) {
+                                        template_msg.innerHTML = 'Failure: ' + msg;
+                                    }
+                                ).finally(function() {
+                                    template_btn.disabled = false;
+                                });
+                            } else {
+                                template_msg.innerHTML = 'Success: ' + msg;
                                 template_btn.disabled = false;
-                            });
+                            }
+                        },
+                        function(msg) {
+                            template_msg.innerHTML = 'Failure: ' + msg;
+                            template_btn.disabled = false;
                         }
-                    });
-
+                    )
                 };
             }
         };
