@@ -1,13 +1,17 @@
+//# sourceURL=fetchButton.js
 
 window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', function(rServeService, smartRUtils) {
     return {
         restrict: 'E',
         scope: {
             conceptMap: '=',
-            showSummaryStats: '='
+            biomarkers: '=',
+            showSummaryStats: '=',
+            summaryData: '='
         },
-        template: '<input type="button" value="Fetch Data"><span style="padding-left: 10px;"></span>',
+        template: '<input type="button" value="Fetch Data" class="heim-action-button"><span style="padding-left: 10px;"></span>',
         link: function(scope, element) {
+
             var template_btn = element.children()[0];
             var template_msg = element.children()[1];
 
@@ -18,20 +22,36 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
                 template_btn.disabled = true;
                 template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
 
+                // Construct query constraints
                 var conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap);
+                var dataConstraints;
 
-                rServeService.loadDataIntoSession(conceptKeys).then(
+                if (typeof scope.biomarkers !== 'undefined' && scope.biomarkers.length > 0) {
+                    var searchKeywordIds = scope.biomarkers.map(function(biomarker) {
+                        return biomarker.id;
+                    });
+                    dataConstraints = {
+                        search_keyword_ids: {
+                            keyword_ids: searchKeywordIds
+                        }
+                    };
+                }
+
+                rServeService.loadDataIntoSession(conceptKeys, dataConstraints).then(
                     function(msg) { template_msg.innerHTML = 'Success: ' + msg; },
                     function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
                 ).finally(function() {
-                        if (showSummary) {
-                            rServeService.executeSummaryStats('fetch').then (
-                                function(msg) { template_msg.innerHTML = 'Success: ' + msg; },
-                                function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
-                            );
-                        } else {
-                            template_btn.disabled = false;
-                        }
+                    if (showSummary) {
+                        rServeService.executeSummaryStats('fetch').then (
+                            function(data) {
+                                scope.summaryData = data.result;
+                                template_msg.innerHTML = 'Success: ' + data.msg;
+                            },
+                            function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
+                        ).finally(function () {
+                                template_btn.disabled = false;
+                            });
+                    }
                 });
 
             };

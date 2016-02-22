@@ -8,6 +8,5 @@ window.smartRApp = angular.module('smartRApp', ['ngRoute', 'door3.css'])
         // get plugin context path and put it in root scope
         $http.get(pageInfo.basePath + '/SmartR/smartRContextPath').then(
             function(d) { $rootScope.smartRPath = d.data; },
-            function(msg) { console.log(msg); }
-        );
-    });
+            function(msg) { console.error(msg); }
+    )});

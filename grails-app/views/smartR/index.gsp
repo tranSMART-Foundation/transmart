@@ -13,7 +13,7 @@
         <option value="timeline">Timeline Workflow</option>
     </select>
 
-    <hr style="margin: 20px;">
+    <hr class="sr-divider">
 
     <ng-include src="template"></ng-include>
 

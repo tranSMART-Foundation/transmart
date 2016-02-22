@@ -10,7 +10,7 @@
                 <concept-box concept-group="conceptBoxes.annotations"></concept-box>
                 <br/>
                 <br/>
-                <fetch-button concept-map="conceptBoxes"></fetch-button>
+                <fetch-button concept-map="conceptBoxes" show-summary-stats="false"></fetch-button>
             </workflow-tab>
 
             <workflow-tab tab-name="Run Analysis">
