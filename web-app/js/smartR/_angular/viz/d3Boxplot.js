@@ -102,12 +102,18 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
         var contextMenu = d3.select(root).append('div')
             .attr('class', 'contextMenu')
             .style('visibility', 'hidden')
-            .html('<input id="excludeButton" class="mybutton text" type="button" value="Exclude" onclick="excludeSelection()"/>' +
-                '<input id="resetButton" class="mybutton text" type="button" value="Reset" onclick="reset()"/>')
+            .html('<input id="excludeButton" class="mybutton text" type="button" value="Exclude Selection"/>' +
+                '<input id="resetButton" class="mybutton text" type="button" value="Reset All"/>')
             .on('click', function () {
                 d3.select(this).style('visibility', 'hidden');
                 removeBrush();
             });
+        $('#excludeButton').on('click', function() {
+            excludeSelection();
+        });
+        $('#resetButton').on('click', function() {
+            reset();
+        });
 
         boxplot.on('contextmenu', function () {
                 d3.event.preventDefault();
