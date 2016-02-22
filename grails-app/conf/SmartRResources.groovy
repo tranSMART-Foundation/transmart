@@ -22,6 +22,8 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'fetchButton.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'preprocessButton.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'runButton.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'capturePlotButton.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'Button.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'ngTranscludeReplace.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'summaryStatistics.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'biomarkerSelection.js']
