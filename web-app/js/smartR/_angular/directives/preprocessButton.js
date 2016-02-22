@@ -17,7 +17,6 @@ window.smartRApp.directive('preprocessButton', ['rServeService', function(rServe
             var template_msg = element.children()[1];
 
             template_btn.onclick = function() {
-                console.log('params', scope.params);
                 var _showSummary = scope.showSummaryStats,
                     _args = {aggregate:scope.params.aggregateProbes};
 
@@ -28,6 +27,7 @@ window.smartRApp.directive('preprocessButton', ['rServeService', function(rServe
                     function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
                 ).finally(function (){
                         if (_showSummary) {
+                            template_msg.innerHTML = 'Execute summary, please wait <span class="blink_me">_</span>';
                             rServeService.executeSummaryStats('preprocess').then (
                                 function(data) {
                                     scope.summaryData = data.result;
@@ -37,6 +37,8 @@ window.smartRApp.directive('preprocessButton', ['rServeService', function(rServe
                             ).finally(function () {
                                     template_btn.disabled = false;
                                 });
+                        } else {
+                            template_btn.disabled = false;
                         }
                     });
             };

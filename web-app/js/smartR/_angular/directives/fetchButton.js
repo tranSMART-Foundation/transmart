@@ -9,7 +9,9 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
             showSummaryStats: '=',
             summaryData: '='
         },
-        template: '<input type="button" value="Fetch Data" class="heim-action-button"><span style="padding-left: 10px;"></span>',
+        template:
+            '<input type="button" value="Fetch Data" class="heim-action-button">' +
+            '<span style="padding-left: 10px;"></span>',
         link: function(scope, element) {
 
             var template_btn = element.children()[0];
@@ -42,6 +44,7 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
                     function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
                 ).finally(function() {
                     if (showSummary) {
+                        template_msg.innerHTML = 'Execute summary, please wait <span class="blink_me">_</span>';
                         rServeService.executeSummaryStats('fetch').then (
                             function(data) {
                                 scope.summaryData = data.result;
@@ -51,6 +54,8 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
                         ).finally(function () {
                                 template_btn.disabled = false;
                             });
+                    } else {
+                        template_btn.disabled = false;
                     }
                 });
 
