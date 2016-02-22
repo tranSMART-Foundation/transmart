@@ -99,7 +99,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             })
             .call(brush);
 
-        var contextMenu = boxplot.append('div')
+        var contextMenu = d3.select(root).append('div')
             .attr('class', 'contextMenu')
             .style('visibility', 'hidden')
             .html('<input id="excludeButton" class="mybutton text" type="button" value="Exclude" onclick="excludeSelection()"/>' +
