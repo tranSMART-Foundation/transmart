@@ -8,8 +8,11 @@
         <workflow-tab tab-name="Fetch Data">
             <concept-box
                 concept-group="conceptBoxes.highDimensional"
+                type="HD"
+                min="1"
+                max="1"
                 label="High Dimensional"
-                alt="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box.
+                tooltip="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box.
                 The nodes needs to be from the same platform.">
             </concept-box>
 
