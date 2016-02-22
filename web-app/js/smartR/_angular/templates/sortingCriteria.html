@@ -1,0 +1,45 @@
+<h2>Ranking Criteria:</h2>
+<div class="heim-input-field-sub" id="sr-non-multi-subset">
+    <fieldset class="heim-radiogroup" id="sr-variability-group">
+        <h3>Expression variability</h3>
+        <div><label>
+            <input type="radio" ng-model="criteria"  name="rankCriteria" value="coef"> Coefficient of variation
+        </label></div>
+        <div><label>
+            <input type="radio" ng-model="criteria" name="rankCriteria" value="variance"> Variance
+        </label></div>
+        <div><label>
+            <input type="radio" ng-model="criteria" name="rankCriteria" value="range"> Range between max and min after
+            excluding outliers
+        </label></div>
+    </fieldset>
+    <fieldset class="heim-radiogroup" id="sr-expression-level-group">
+        <h3>Expression level</h3>
+        <div><label>
+            <input type="radio" ng-model="criteria" name="rankCriteria" value="mean"> Mean
+        </label></div>
+        <div><label>
+            <input type="radio" ng-model="criteria" name="rankCriteria" value="median"> Median
+        </label></div>
+    </fieldset>
+</div>
+<div class="heim-input-field-sub" id="sr-multi-subset">
+    <fieldset class="heim-radiogroup" id="sr-differential-exp-group">
+        <h3>Differential expression</h3>
+        <div><label>
+            <input type="radio" ng-model="criteria" name="rankCriteria" value="bval"> B-value/log odds ratio
+        </label></div>
+        <div><label>
+            <input type="radio" ng-model="criteria" name="rankCriteria" value="pval"> p-value
+        </label></div>
+        <div><label>
+            <input type="radio" ng-model="criteria" name="rankCriteria" value="adjpval"> Adjusted p-value (method “fdr”)
+        </label></div>
+        <div><label>
+            <input type="radio" ng-model="criteria" name="rankCriteria" value="logfold"> log fold-change
+        </label></div>
+        <div><label>
+            <input type="radio" ng-model="criteria" name="rankCriteria" value="ttest"> t-statistic
+        </label></div>
+    </fieldset>
+</div>
