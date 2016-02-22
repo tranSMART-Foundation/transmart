@@ -25,7 +25,8 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
                 // Construct query constraints
                 var conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap);
                 var dataConstraints;
-                if (scope.biomarkers.length > 0) {
+
+                if (typeof scope.biomarkers !== 'undefined' && scope.biomarkers.length > 0) {
                     var searchKeywordIds = scope.biomarkers.map(function(biomarker) {
                         return biomarker.id;
                     });
@@ -34,7 +35,7 @@ window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', funct
                             keyword_ids: searchKeywordIds
                         }
                     };
-                 }
+                }
 
                 rServeService.loadDataIntoSession(conceptKeys, dataConstraints).then(
                     function(msg) { template_msg.innerHTML = 'Success: ' + msg; },

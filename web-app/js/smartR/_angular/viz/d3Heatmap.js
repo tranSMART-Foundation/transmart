@@ -1,5 +1,6 @@
+//# sourceURL=d3Heatmap.js
 
-smartRApp.directive('heatmap', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
+window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
 
     return {
         restrict: 'E',
@@ -8,21 +9,33 @@ smartRApp.directive('heatmap', ['smartRUtils', 'rServeService', function(smartRU
             width: '@',
             height: '@'
         },
-        link: function (scope, element) {
+        link: function (scope, element, attrs) {
 
             /**
              * Watch data model (which is only changed by ajax calls when we want to (re)draw everything)
              */
-            scope.$watch('data', function () {
+            scope.$watch('data', function (newValue, oldValue) {
                 $(element[0]).empty();
-                if (scope.data) {
-                    createHeatmap(scope, element[0]);
+                if (angular.isArray(newValue.fields)) {
+                    createHeatmap(scope.data, element[0]);
                 }
-            });
+            }, true);
         }
     };
 
-    function createHeatmap(scope, root) {
+    var animationDuration = 1500;
+    var tmpAnimationDuration = animationDuration;
+
+    function switchAnimation(checked) { // general purpose callback, this is why it is not inside SmartRHeatmap
+        if (! checked) {
+            tmpAnimationDuration = animationDuration;
+            animationDuration = 0;
+        } else {
+            animationDuration = tmpAnimationDuration;
+        }
+    }
+
+    function createHeatmap(data, root) {
         var animationDuration = 1500;
         var extraFields = data.extraFields === undefined ? [] : data.extraFields;
         var features = data.features === undefined ? [] : data.features;
@@ -134,7 +147,7 @@ smartRApp.directive('heatmap', ['smartRUtils', 'rServeService', function(smartRU
             }
         }
 
-        var heatmap = d3.select('#heatmap').append('svg')
+        var heatmap = d3.select(root).append('svg')
             .attr('width', (width + margin.left + margin.right) * 4)
             .attr('height', (height + margin.top + margin.bottom) * 4)
             .append('g')
@@ -149,7 +162,7 @@ smartRApp.directive('heatmap', ['smartRUtils', 'rServeService', function(smartRU
 
         adjustDimensions();
 
-        var tooltip = d3.select('#heatmap').append('div')
+        var tooltip = d3.select(root).append('div')
             .attr('class', 'tooltip text')
             .style('visibility', 'hidden');
 

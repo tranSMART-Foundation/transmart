@@ -52,6 +52,18 @@
         %{--========================================================================================================--}%
         <workflow-tab tab-name="Run Analysis">
 
+            %{--TODO: Implement run analysis selections--}%
+
+            <hr class="sr-divider">
+
+            <run-button button-name="Create Plot"
+                        store-results-in="scriptResults"
+                        script-to-run="run"
+                        arguments-to-use="runArgs"
+                        serialized="true"></run-button>
+            <br/>
+            <heatmap-plot data="scriptResults" width="1200" height="1200"></heatmap-plot>
+
         </workflow-tab>
 
     </tab-container>

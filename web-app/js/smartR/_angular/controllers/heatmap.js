@@ -21,18 +21,18 @@ window.smartRApp.controller('HeatmapController',
         // Preprocess                                                    //
         // ------------------------------------------------------------- //
         $scope.preprocessArgs = {
-            aggregateProbes : true
+            aggregateProbes : false
         };
         $scope.preprocessSummaryData = {summary:[]};
 
         // ------------------------------------------------------------- //
         // Run Heatmap                                                   //
         // ------------------------------------------------------------- //
+        // TODO: Implement run analysis params inputs
         $scope.runArgs = {
-            maxRow : 100,
-            sortOn : 'nodes',
-            rankCriteria : 'coef'
+            max_row : 100,
+            sorting : 'nodes',
+            ranking : 'coef'
         };
         $scope.scriptResults = {};
-
     }]);
