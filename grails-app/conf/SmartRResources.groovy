@@ -24,6 +24,7 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'ngTranscludeReplace.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'summaryStatistics.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'biomarkerSelection.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'sortingCriteria.js']
         // services
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'rServeService.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'smartRUtils.js']

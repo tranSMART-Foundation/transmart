@@ -9,9 +9,11 @@
             <concept-box
                 concept-group="conceptBoxes.highDimensional"
                 label="High Dimensional"
-                alt="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box. The nodes needs to be from the same platform.">
+                alt="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box.
+                The nodes needs to be from the same platform.">
             </concept-box>
 
+            %{--TODO include low dimensions--}%
             %{--<concept-box concept-group="conceptBoxes.numerical"></concept-box>--}%
             %{--<concept-box concept-group="conceptBoxes.categorical"></concept-box>--}%
 
@@ -42,6 +44,7 @@
                                show-summary-stats="true"
                                summary-data="preprocessSummaryData">
             </preprocess-button>
+
             <br/>
             <summary-stats summary-data="preprocessSummaryData"></summary-stats>
         </workflow-tab>
@@ -52,14 +55,36 @@
         %{--========================================================================================================--}%
         <workflow-tab tab-name="Run Analysis">
 
-            %{--TODO: Implement run analysis selections--}%
+            %{--Number of max row to display--}%
+            <div class="heim-input-field heim-input-number sr-input-area">
+                <label>Max row to display</label>
+                <input type="text" id="txtMaxRow" ng-model="runParams.max_row"> rows (< 1000 is preferable).
+            </div>
+
+            %{--Type of sorting to apply--}%
+            <div class="heim-input-field sr-input-area">
+                <h2>Sort on:</h2>
+                <fieldset class="heim-radiogroup">
+                    <label>
+                        <input type="radio" ng-model="runParams.sorting" name="sortingSelect" value="nodes" checked> Nodes
+                    </label>
+                    <label>
+                        <input type="radio" ng-model="runParams.sorting" name="sortingSelect" value="subjects"> Subjects
+                    </label>
+                </fieldset>
+            </div>
+
+            %{--Type of sorting to apply--}%
+            <div class="heim-input-field  sr-input-area">
+                <sorting-criteria criteria="runParams.ranking"></sorting-criteria>
+            </div>
 
             <hr class="sr-divider">
 
             <run-button button-name="Create Plot"
                         store-results-in="scriptResults"
                         script-to-run="run"
-                        arguments-to-use="runArgs"
+                        arguments-to-use="runParams"
                         serialized="true"></run-button>
             <br/>
             <heatmap-plot data="scriptResults" width="1200" height="1200"></heatmap-plot>
