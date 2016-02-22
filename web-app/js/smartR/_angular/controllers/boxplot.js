@@ -11,7 +11,10 @@ window.smartRApp.controller('BoxplotController',
         rServeService.startSession('boxplot');
 
         // model
-        $scope.conceptBoxes = {};
+        $scope.conceptBoxes = {
+            datapoints: [],
+            subsets: []
+        };
         $scope.scriptResults = {};
         $scope.params = {};
     }]);
