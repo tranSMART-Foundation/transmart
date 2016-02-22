@@ -10,7 +10,7 @@ window.smartRApp.directive('runButton',
                 storage: '=storeResultsIn',
                 script: '@scriptToRun',
                 name: '@buttonName',
-                serialized: '=',
+                serialized: '@',
                 arguments: '=argumentsToUse'
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/runButton.html',
@@ -18,9 +18,11 @@ window.smartRApp.directive('runButton',
                 var template_btn = element.children()[0];
                 var template_msg = element.children()[1];
 
+                var serialized = JSON.parse(scope.serialized);
+
                 var _successCreatePlot = function (response) {
                     template_msg.innerHTML = ''; // empty template
-                    if (scope.serialized) { // when results are serialized, we need to deserialized them by
+                    if (serialized) { // when results are serialized, we need to deserialized them by
                         // downloading the results files.
                         rServeService.downloadJsonFile(response.executionId, 'heatmap.json').then(
                             function (d) {
