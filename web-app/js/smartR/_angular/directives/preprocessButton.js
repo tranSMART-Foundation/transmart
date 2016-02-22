@@ -1,32 +1,33 @@
 //# sourceURL=preprocessButton.js
 
-window.smartRApp.directive('preprocessButton', ['rServeService', function(rServeService) {
-    return {
-        restrict: 'E',
-        scope: {
-            params: '=',
-            showSummaryStats: '=',
-            summaryData: '='
-        },
-        template:
-            '<input type="button" value="Preprocess" class="heim-action-button">' +
-            '<span style="padding-left: 10px;"></span>',
-        link: function(scope, element) {
+'use strict';
 
-            var template_btn = element.children()[0];
-            var template_msg = element.children()[1];
+window.smartRApp.directive('preprocessButton',
+    ['$rootScope', 'rServeService', function($rootScope, rServeService) {
+        return {
+            restrict: 'E',
+            scope: {
+                params: '=',
+                showSummaryStats: '=',
+                summaryData: '='
+            },
+            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/preprocessButton.html',
+            link: function(scope, element) {
 
-            template_btn.onclick = function() {
-                console.log('params', scope.params);
-                var _showSummary = scope.showSummaryStats,
-                    _args = {aggregate:scope.params.aggregateProbes};
+                var template_btn = element.children()[0];
+                var template_msg = element.children()[1];
 
-                template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
+                template_btn.onclick = function() {
+                    console.log('params', scope.params);
+                    var _showSummary = scope.showSummaryStats,
+                        _args = {aggregate:scope.params.aggregateProbes};
 
-                rServeService.preprocess(_args).then(
-                    function(msg) { template_msg.innerHTML = 'Success: ' + msg; },
-                    function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
-                ).finally(function (){
+                    template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
+
+                    rServeService.preprocess(_args).then(
+                        function(msg) { template_msg.innerHTML = 'Success: ' + msg; },
+                        function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
+                    ).finally(function (){
                         if (_showSummary) {
                             rServeService.executeSummaryStats('preprocess').then (
                                 function(data) {
@@ -35,11 +36,11 @@ window.smartRApp.directive('preprocessButton', ['rServeService', function(rServe
                                 },
                                 function(msg) { template_msg.innerHTML = 'Failure: ' + msg; }
                             ).finally(function () {
-                                    template_btn.disabled = false;
-                                });
+                                template_btn.disabled = false;
+                            });
                         }
                     });
-            };
-        }
-    };
-}]);
+                };
+            }
+        };
+    }]);

@@ -1,3 +1,6 @@
+//# sourceURL=workflowTab.js
+
+'use strict';
 
 window.smartRApp.directive('workflowTab', ['smartRUtils', function(smartRUtils) {
     return {

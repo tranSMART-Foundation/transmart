@@ -1,52 +1,56 @@
+//# sourceURL=runButton.js
 
-window.smartRApp.directive('runButton', ['rServeService', function(rServeService) {
-    return {
-        restrict: 'E',
-        scope: {
-            storage: '=storeResultsIn',
-            script: '@scriptToRun',
-            name: '@buttonName',
-            serialized: '=',
-            arguments: '=argumentsToUse'
-        },
-        template: '<input type="button" value="{{name}}"><span style="padding-left: 10px;"></span>',
-        link: function(scope, element) {
-            var template_btn = element.children()[0];
-            var template_msg = element.children()[1];
+'use strict';
 
-            var _successCreatePlot = function (response) {
-                template_msg.innerHTML = ''; // empty template
-                if (scope.serialized) { // when results are serialized, we need to deserialized them by
-                    // downloading the results files.
-                    rServeService.downloadJsonFile(response.executionId, 'heatmap.json').then(
-                        function (d) {
-                            scope.storage = d.data;
-                        }
-                    );
-                } else { // results
-                    scope.storage = JSON.parse(response.result.artifacts.value);
-                }
-            };
+window.smartRApp.directive('runButton',
+    ['$rootScope', 'rServeService', function($rootScope, rServeService) {
+        return {
+            restrict: 'E',
+            scope: {
+                storage: '=storeResultsIn',
+                script: '@scriptToRun',
+                name: '@buttonName',
+                serialized: '=',
+                arguments: '=argumentsToUse'
+            },
+            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/runButton.html',
+            link: function(scope, element) {
+                var template_btn = element.children()[0];
+                var template_msg = element.children()[1];
 
-            var _failCreatePlot = function (response) {
-                template_msg.style.color = 'red';
-                template_msg.innerHTML = '  Failure: ' + response.statusText;
-            };
+                var _successCreatePlot = function (response) {
+                    template_msg.innerHTML = ''; // empty template
+                    if (scope.serialized) { // when results are serialized, we need to deserialized them by
+                        // downloading the results files.
+                        rServeService.downloadJsonFile(response.executionId, 'heatmap.json').then(
+                            function (d) {
+                                scope.storage = d.data;
+                            }
+                        );
+                    } else { // results
+                        scope.storage = JSON.parse(response.result.artifacts.value);
+                    }
+                };
 
-            template_btn.onclick = function() {
-                template_btn.disabled = true;
-                template_msg.style.color = 'black';
-                template_msg.innerHTML = 'Creating plot, please wait <span class="blink_me">_</span>';
-                rServeService.startScriptExecution({
-                    taskType: scope.script,
-                    arguments: scope.arguments
-                }).then(
-                    _successCreatePlot,
-                    _failCreatePlot
-                ).finally(function() {
-                    template_btn.disabled = false;
-                });
-            };
-        }
-    };
-}]);
+                var _failCreatePlot = function (response) {
+                    template_msg.style.color = 'red';
+                    template_msg.innerHTML = 'Failure: ' + response.statusText;
+                };
+
+                template_btn.onclick = function() {
+                    template_btn.disabled = true;
+                    template_msg.style.color = 'black';
+                    template_msg.innerHTML = 'Creating plot, please wait <span class="blink_me">_</span>';
+                    rServeService.startScriptExecution({
+                        taskType: scope.script,
+                        arguments: scope.arguments
+                    }).then(
+                        _successCreatePlot,
+                        _failCreatePlot
+                    ).finally(function() {
+                        template_btn.disabled = false;
+                    });
+                };
+            }
+        };
+    }]);

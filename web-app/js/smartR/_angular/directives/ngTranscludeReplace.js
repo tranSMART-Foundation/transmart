@@ -1,3 +1,6 @@
+//# sourceURL=ngTranscludeReplace.js
+
+'use strict';
 
 window.smartRApp.directive('ngTranscludeReplace', ['$log', function ($log) {
     return {
