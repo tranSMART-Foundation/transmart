@@ -47,10 +47,22 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
                 });
             };
 
+            var _setColor = function() {
+                if (scope.conceptGroup.length >= scope.min &&
+                    scope.conceptGroup.length <= scope.max &&
+                    _containsOnly()) {
+                    template_box.style.backgroundColor = 'green';
+                    template_box.style.opacity = 0.5;
+                } else {
+                    template_box.style.backgroundColor = 'red';
+                    template_box.style.opacity = 0.5;
+                }
+            };
 
-            // activate drag & drop for our conceptBox once it is rendered
+            // activate drag & drop for our conceptBox and color it once it is rendered
             scope.$evalAsync(function() {
                 _activateDragAndDrop();
+                _setColor();
             });
 
             // bind the button to its clearing functionality
@@ -61,19 +73,7 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
             // this watches the childNodes of the conceptBox and updates the model on change
             new MutationObserver(function() {
                 scope.conceptGroup = _getConcepts(); // update the model
-
-                // sanity check
-                if (scope.conceptGroup.length > scope.max) {
-                    alert('Sorry, but this window is limited to ' + scope.max + ' concepts.');
-                    _clearWindow();
-                }
-
-                // sanity check
-                if (! _containsOnly()) {
-                    alert('Sorry, but this window only permits nodes of type: ' + scope.type);
-                    _clearWindow();
-                }
-
+                _setColor(); // change to red or green color if input okay
                 scope.$apply();
             }).observe(template_box, { childList: true });
         }
