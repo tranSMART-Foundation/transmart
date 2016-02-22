@@ -24,7 +24,7 @@ main <- function( excludedPatientIDs = NULL ) {
     df$jitter <- runif(nrow(df), -0.5, 0.5)
 
     if (! is.null(excludedPatientIDs)) {
-        df <- df[, ! df$patientID %in% excludedPatientIDs]
+        df <- df[! df$patientID %in% excludedPatientIDs, ]
     }
     patientIDs <- df$patientID
 
