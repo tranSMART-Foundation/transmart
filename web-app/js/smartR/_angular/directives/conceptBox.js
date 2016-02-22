@@ -43,7 +43,8 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
             };
             var _containsOnly = function() {
                 return $(template_box).children().toArray().every(function(childNode) {
-                    return typeMap[childNode.getAttribute('setnodetype')] === scope.type;
+                    return typeMap[childNode.getAttribute('setnodetype')] === scope.type ||
+                        scope.type === 'LD-categoric'; // FIXME: Workaround for transmartApp master branch
                 });
             };
 
