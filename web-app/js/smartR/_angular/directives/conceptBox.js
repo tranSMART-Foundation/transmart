@@ -16,9 +16,12 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
         },
         templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/conceptBox.html',
         link: function(scope, element) {
-            var template_box = element[0].querySelector('.sr-drop-input');
-            var template_btn = element[0].querySelector('.sr-drop-btn');
+            var template_box = element[0].querySelector('.sr-drop-input'),
+                template_btn = element[0].querySelector('.sr-drop-btn'),
+                template_tooltip = element[0].querySelector('.sr-tooltip-dialog');
 
+            // instantiate tooltips
+            $(template_tooltip).tooltip({track: true, tooltipClass:"sr-ui-tooltip"});
 
             var _clearWindow = function() {
                 $(template_box).children().remove()
