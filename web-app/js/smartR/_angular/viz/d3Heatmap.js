@@ -147,6 +147,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         var heatmap = d3.select(root).append('svg')
             .attr('width', (width + margin.left + margin.right) * 4)
             .attr('height', (height + margin.top + margin.bottom) * 4)
+            .attr('class', 'visualization')
             .append('g')
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
