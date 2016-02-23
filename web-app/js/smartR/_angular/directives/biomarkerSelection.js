@@ -53,12 +53,21 @@ window.smartRApp.directive('biomarkerSelection', ['$rootScope', function($rootSc
             input.on('autocompleteselect',
                 function(event, ui) {
                     var v = ui.item.value;
-                    $scope.biomarkers.push({ id: v.id,
-                        type: v.display,
-                        name: v.keyword,
-                        synonyms: v.synonyms
-                    });
-                    $scope.$apply();
+
+                    // check if the item is not in the list yet
+                    if ($scope.biomarkers.filter(function(b) {
+                                return b.id == v.id;
+                            }).length == 0) {
+
+                        // add the biomarker to the list
+                        $scope.biomarkers.push({
+                            id: v.id,
+                            type: v.display,
+                            name: v.keyword,
+                            synonyms: v.synonyms
+                        });
+                        $scope.$apply();
+                    }
                     this.value = '';
                     return false;
                 }
