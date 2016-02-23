@@ -13,9 +13,9 @@ window.smartRApp.directive('volcanoPlot', ['smartRUtils', 'rServeService', funct
             /**
              * Watch data model (which is only changed by ajax calls when we want to (re)draw everything)
              */
-            scope.$watch('data', function () {
+            scope.$watch('data', function() {
                 $(element[0]).empty();
-                if (scope.data) {
+                if (! $.isEmptyObject(scope.data)) {
                     createVolcanoplot(scope, element[0]);
                 }
             });

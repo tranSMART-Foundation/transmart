@@ -9,7 +9,7 @@
         <option value="heatmap">Heatmap Workflow</option>
         <option value="correlation">Correlation Workflow</option>
         <option value="boxplot">Boxplot Workflow</option>
-        <option value="volcano">Volcano Workflow</option>
+        <option value="volcanoplot">Volcanoplot Workflow</option>
         <option value="timeline">Timeline Workflow</option>
     </select>
 
@@ -22,6 +22,6 @@
     <g:render template="/layouts/heatmap"/>
     <g:render template="/layouts/correlation"/>
     <g:render template="/layouts/boxplot"/>
-    <g:render template="/layouts/volcano"/>
+    <g:render template="/layouts/volcanoplot"/>
     <g:render template="/layouts/timeline"/>
 </div>

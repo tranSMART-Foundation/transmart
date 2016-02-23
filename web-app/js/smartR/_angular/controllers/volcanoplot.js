@@ -1,3 +1,6 @@
+//# sourceURL=volcanoplot.js
+
+'use strict';
 
 window.smartRApp.controller('VolcanoplotController',
     ['$scope', 'smartRUtils', 'rServeService', '$css', function($scope, smartRUtils, rServeService, $css) {
@@ -11,7 +14,9 @@ window.smartRApp.controller('VolcanoplotController',
         rServeService.startSession('volcanoplot');
 
         // model
-        $scope.conceptBoxes = {};
+        $scope.conceptBoxes = {
+            highDimensional: []
+        };
         $scope.scriptResults = {};
         $scope.params = {};
     }]);
