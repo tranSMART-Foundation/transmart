@@ -47,7 +47,6 @@ window.smartRApp.directive('capturePlotButton', [function() {
     };
 
     var downloadSVG = function(svgElement, fileName) {
-        console.log(fileName);
         var serializer = new XMLSerializer();
         var clonedSvg = copyWithCollapsedCSS(svgElement);
         var xmlString = serializer.serializeToString(clonedSvg[0]);
