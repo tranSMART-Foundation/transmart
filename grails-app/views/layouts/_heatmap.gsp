@@ -89,6 +89,7 @@
                         arguments-to-use="runParams"
                         serialized="true"></run-button>
             <capture-plot-button></capture-plot-button>
+            <download-results-button></download-results-button>
             <br/>
             <heatmap-plot data="scriptResults" width="1200" height="1200"></heatmap-plot>
 
