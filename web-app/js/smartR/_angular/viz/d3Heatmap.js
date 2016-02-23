@@ -139,9 +139,6 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 case 'pval':
                 case 'adjpval':
                     return 1 - value;
-                case 'ttest':
-                case 'logfold':
-                    return value < 0 ? 1 / value : value;
                 default:
                     return value;
             }
