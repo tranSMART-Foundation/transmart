@@ -14,21 +14,7 @@ class SmartRController {
     static layout = 'smartR'
 
     def index() {
-        [
-                scriptList: sessionService.availableWorkflows(),
-                //legacyScriptList: sessionService.legacyWorkflows(), FIXME display rest original scripts
-        ]
-    }
-
-    /**
-     *   Renders the input form for initial script parameters
-     */
-    def renderInput = {
-        if (! params.script) {
-            render 'Please select a script to execute.'
-        } else {
-            render template: "/heim/${FilenameUtils.getBaseName(params.script).capitalize()}"
-        }
+        [ scriptList: sessionService.availableWorkflows() ]
     }
 
     /**

@@ -84,9 +84,6 @@ class smartRGrailsPlugin {
         constants.pluginScriptDirectory = new File(smartRDir.canonicalPath, 'HeimScripts')
         log.info("Directory for heim scripts is ${constants.pluginScriptDirectory}")
 
-        constants.legacyScriptDirectory = new File(smartRDir.canonicalPath, 'Scripts')
-        log.info("Directory for legacy scripts is ${constants.legacyScriptDirectory}")
-
         if (!skipRScriptsTransfer(config)) {
             def remoteScriptDirectory =  config.smartR.remoteScriptDirectory
             if (!remoteScriptDirectory) {

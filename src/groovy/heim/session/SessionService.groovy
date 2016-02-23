@@ -81,12 +81,6 @@ class SessionService implements DisposableBean {
         dir.listFiles({ File f -> f.isDirectory() && !f.name.startsWith('_') } as FileFilter)*.name
     }
 
-    @Deprecated
-    List<String> legacyWorkflows() {
-        File dir = constants.legacyScriptDirectory
-        dir.listFiles()*.name
-    }
-
     UUID createSession(User user, String workflowType) {
         SessionContext newSession = new SessionContext(user, workflowType)
         log.debug("Created session with id ${newSession.sessionId} and " +
