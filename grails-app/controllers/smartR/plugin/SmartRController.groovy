@@ -1,9 +1,7 @@
 package smartR.plugin
 
 import grails.converters.JSON
-import groovy.json.JsonBuilder
 import heim.session.SessionService
-import org.apache.commons.io.FilenameUtils
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -59,5 +57,9 @@ class SmartRController {
      */
     def smartRContextPath = {
         render servletContext.contextPath + pluginContextPath as String;
+    }
+
+    def getIPAView = {
+        params
     }
 }

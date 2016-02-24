@@ -369,34 +369,10 @@ function mouseY() {
 }
 
 function getMaxWidth(selection) {
-    return selection[0].map(function(d) { return d.getBBox().width; }).max()
+    return selection[0].map(function (d) {
+        return d.getBBox().width;
+    }).max()
 }
-
-function showCohortInfo() {
-    var cohortsSummary = ''
-
-    for(var i = 1; i < GLOBAL.NumOfSubsets; i++) {
-        var currentQuery = getQuerySummary(i)
-        if(currentQuery !== '') {
-            cohortsSummary += '<br/>Subset ' + (i) + ': <br/>'
-            cohortsSummary += currentQuery
-            cohortsSummary += '<br/>'
-        }
-    }
-    if (!cohortsSummary) {
-        cohortsSummary = '<br/>WARNING: No subsets have been selected! Please go to the "Comparison" tab and select your subsets.'
-    }
-    $('#cohortInfo').html(cohortsSummary)
-}
-//showCohortInfo()
-
-function updateInputView() {
-    if (typeof updateOnView === 'function') updateOnView()
-}
-
-var panelItem = $('#resultsTabPanel__smartRPanel')
-//panelItem.click(showCohortInfo)
-//panelItem.click(updateInputView)
 
 window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
     var smartRPanel = new Ext.Panel({

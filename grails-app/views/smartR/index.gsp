@@ -13,6 +13,10 @@
         <option value="timeline">Timeline Workflow</option>
     </select>
 
+    <div style="width: 50%; margin: 0 auto; text-align: center">
+        <cohort-summary-info></cohort-summary-info>
+    </div>
+
     <hr class="sr-divider">
 
     <ng-include src="template"></ng-include>
