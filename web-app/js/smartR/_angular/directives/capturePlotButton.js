@@ -67,11 +67,20 @@ window.smartRApp.directive('capturePlotButton', [function() {
         restrict: 'E',
         scope: {
             filename: '@',
-            disabled: '='
+            data: '='
         },
         template:
-            '<input type="button" value="Capture" class="heim-action-button" ng-click="capture()" ng-disabled="disabled">',
-        link: function(scope) {
+            '<input type="button" value="Capture" class="heim-action-button" ng-click="capture()">',
+        link: function(scope, elements) {
+
+            var template_btn = elements.children()[0];
+            template_btn.disabled = true;
+
+            scope.$watch('data', function (newValue) {
+                if (newValue.hasOwnProperty('fields')) {
+                    template_btn.disabled = false;
+                }
+            });
 
             if (!scope.filename) {
                 // default filename
