@@ -209,10 +209,10 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                     tooltip
                         .style('visibility', 'visible')
                         .html(html)
-                        .style('left', mouseX() + 'px')
-                        .style('top', mouseY() + 'px');
+                        .style('left', smartRUtils.mouseX(root) + 'px')
+                        .style('top', smartRUtils.mouseY(root) + 'px');
                 })
-                .on('mouseout', function (d) {
+                .on('mouseout', function () {
                     d3.selectAll('.patientID').classed('highlight', false);
                     d3.selectAll('.uid').classed('highlight', false);
                     tooltip.style('visibility', 'hidden');
@@ -570,8 +570,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                     tooltip
                         .style('visibility', 'visible')
                         .html(html)
-                        .style('left', mouseX() + 'px')
-                        .style('top', mouseY() + 'px');
+                        .style('left', smartRUtils.mouseX(root) + 'px')
+                        .style('top', smartRUtils.mouseY(root) + 'px');
                     d3.selectAll('.square.uid-' + uids[d.idx])
                         .classed('squareHighlighted', true);
                     d3.select('.uid.uid-' + uids[d.idx])
@@ -632,8 +632,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                     tooltip
                         .style('visibility', 'visible')
                         .html(html)
-                        .style('left', mouseX() + 'px')
-                        .style('top', mouseY() + 'px');
+                        .style('left', smartRUtils.mouseX(root) + 'px')
+                        .style('top', smartRUtils.mouseY(root) + 'px');
                 })
                 .on('mouseout', function (d) {
                     d3.selectAll('.patientID').classed('highlight', false);
@@ -954,8 +954,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                     tooltip
                         .style('visibility', 'visible')
                         .html('Height: ' + d.height)
-                        .style('left', mouseX() + 'px')
-                        .style('top', mouseY() + 'px');
+                        .style('left', smartRUtils.mouseX(root) + 'px')
+                        .style('top', smartRUtils.mouseY(root) + 'px');
                 })
                 .on('mouseout', function () {
                     tooltip.style('visibility', 'hidden');
@@ -1035,8 +1035,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                     tooltip
                         .style('visibility', 'visible')
                         .html('Height: ' + d.height)
-                        .style('left', mouseX() + 'px')
-                        .style('top', mouseY() + 'px');
+                        .style('left', smartRUtils.mouseX(root) + 'px')
+                        .style('top', smartRUtils.mouseY(root) + 'px');
                 })
                 .on('mouseout', function () {
                     tooltip.style('visibility', 'hidden');

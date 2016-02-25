@@ -111,8 +111,8 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                 d3.event.preventDefault();
                 contextMenu
                     .style('visibility', 'visible')
-                    .style('left', mouseX() + 'px')
-                    .style('top', mouseY() + 'px')
+                    .style('left', smartRUtils.mouseX(root) + 'px')
+                    .style('top', smartRUtils.mouseY(root) + 'px')
             });
 
         var tooltip = d3.select(root).append('div')
@@ -121,8 +121,8 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
 
         function dragmove() {
             legend
-                .style('left', mouseX() + 'px')
-                .style('top', mouseY() + 'px');
+                .style('left', smartRUtils.mouseX(root) + 'px')
+                .style('top', smartRUtils.mouseY(root) + 'px');
         }
 
         var drag = d3.behavior.drag()
@@ -273,8 +273,8 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                 .on('mouseover', function(d) {
                     d3.select(this).style('fill', '#FF0000');
                     tooltip
-                        .style('left', 10 + mouseX() + 'px')
-                        .style('top', 10 + mouseY() + 'px')
+                        .style('left', 10 + smartRUtils.mouseX(root) + 'px')
+                        .style('top', 10 + smartRUtils.mouseY(root) + 'px')
                         .style('visibility', 'visible')
                         .html(smartRUtils.shortenConcept(xArrLabel) + ': ' + d.x + '<br/>' + smartRUtils.shortenConcept(yArrLabel) + ': ' + d.y + '<br/>' + 'Patient ID: ' + d.patientID + '<br/>' + (d.tag ? 'Tag: ' + d.tag : ''));
                 })
@@ -406,8 +406,8 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                     tooltip
                         .style('visibility', 'visible')
                         .html('slope: ' + regLineSlope + '<br/>intercept: ' + regLineYIntercept)
-                        .style('left', mouseX() + 'px')
-                        .style('top', mouseY() + 'px');
+                        .style('left', smartRUtils.mouseX(root) + 'px')
+                        .style('top', smartRUtils.mouseY(root) + 'px');
                 })
                 .on('mouseout', function () {
                     d3.select(this).attr('stroke', 'orange');

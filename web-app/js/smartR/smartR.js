@@ -358,16 +358,6 @@ function createD3Slider(args) {
     return slider
 }
 
-function mouseX() {
-    var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX;
-    return mouseXPos + $('#index').parent().scrollLeft() - $('#smartRPanel').offset().left
-}
-
-function mouseY() {
-    var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY;
-    return mouseYPos + $('#index').parent().scrollTop() - $('#smartRPanel').offset().top
-}
-
 function getMaxWidth(selection) {
     return selection[0].map(function (d) {
         return d.getBBox().width;

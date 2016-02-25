@@ -119,8 +119,8 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
                 d3.event.preventDefault();
                 contextMenu
                     .style('visibility', 'visible')
-                    .style('left', mouseX() + 'px')
-                    .style('top', mouseY() + 'px');
+                    .style('left', smartRUtils.mouseX(root) + 'px')
+                    .style('top', smartRUtils.mouseY(root) + 'px');
             });
 
         var currentSelection;
@@ -382,8 +382,8 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
                         .html('Value: ' + d.value + '</br>' +
                             'PatientID: ' + d.patientID + '</br>' +
                             'Outlier: ' + d.outlier)
-                        .style('left', mouseX() + 'px')
-                        .style('top', mouseY() + 'px');
+                        .style('left', smartRUtils.mouseX(root) + 'px')
+                        .style('top', smartRUtils.mouseY(root) + 'px');
                 })
                 .on('mouseout', function () {
                     tooltip.style('visibility', 'hidden');

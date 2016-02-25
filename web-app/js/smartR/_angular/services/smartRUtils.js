@@ -35,6 +35,20 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         });
     };
 
+    service.mouseX = function(root) {
+        var svg = $(root).children('svg');
+        var smartRPanel = $('#smartRPanel');
+        var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX;
+        return mouseXPos - svg.offset().left + svg.position().left;
+    };
+
+    service.mouseY = function(root) {
+        var svg = $(root).children('svg');
+        var smartRPanel = $('#smartRPanel');
+        var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY;
+        return mouseYPos - svg.offset().top + svg.position().top;
+    };
+
     service.getSubsetIds = function smartRUtil_getSubsetIds() {
         var defer = $q.defer();
 
