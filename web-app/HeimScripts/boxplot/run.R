@@ -1,11 +1,4 @@
 
-if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
-    remoteScriptDir <- "web-app/HeimScripts"
-}
-
-inputUtils <- paste(remoteScriptDir, "/core/input.R", sep="")
-source(inputUtils)
-
 main <- function( excludedPatientIDs = NULL ) {
     datapoints <- parse.input(sourceLabel="datapoints", loaded_variables=loaded_variables, type="numeric")
     datapoints <- na.omit(datapoints)

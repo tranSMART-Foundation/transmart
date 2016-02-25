@@ -46,7 +46,7 @@ class RScriptExecutionTask extends AbstractTask {
 
     private void sourceCoreUtils(RConnection conn) {
         def remoteScriptDirRoot = fileToLoad.getParentFile().getParentFile()
-        File remoteCoreUtilsDir = new File(remoteScriptDirRoot, 'core')
+        File remoteCoreUtilsDir = new File(remoteScriptDirRoot, '_core')
         File coreUtilsIndex = new File(remoteCoreUtilsDir, 'index.R')
         runRCommand(conn, "source('" +
                 "${RUtil.escapeRStringContent(coreUtilsIndex.absolutePath)}')")
