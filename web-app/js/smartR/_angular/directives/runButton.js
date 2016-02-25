@@ -27,7 +27,6 @@ window.smartRApp.directive('runButton',
                         rServeService.downloadJsonFile(response.executionId, 'heatmap.json').then(
                             function (d) {
                                 scope.storage = d.data;
-                                scope.storage.disableDownloadButtons = false;
                             }
                         );
                     } else { // results
