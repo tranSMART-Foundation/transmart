@@ -359,12 +359,12 @@ function createD3Slider(args) {
 }
 
 function mouseX() {
-    var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX
+    var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX;
     return mouseXPos + $('#index').parent().scrollLeft() - $('#smartRPanel').offset().left
 }
 
 function mouseY() {
-    var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY
+    var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY;
     return mouseYPos + $('#index').parent().scrollTop() - $('#smartRPanel').offset().top
 }
 

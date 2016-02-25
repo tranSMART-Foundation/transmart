@@ -1,17 +1,19 @@
-%{--load all js in one go--}%
 <r:require modules="smartR_all"/>
 
-<div data-ng-app="smartRApp" style="padding: 10px;">
-    <h1>SmartR - Dynamic Data Visualization and Interaction</h1>
+<div id="sr-index" data-ng-app="smartRApp" style="padding: 10px;">
+    <h1 style="font-size: 14px">SmartR - Dynamic Data Visualization and Interaction</h1>
     <br>
 
-    <select ng-model="template">
-        <option value="heatmap">Heatmap Workflow</option>
-        <option value="correlation">Correlation Workflow</option>
-        <option value="boxplot">Boxplot Workflow</option>
-        <option value="volcanoplot">Volcanoplot Workflow</option>
-        <option value="timeline">Timeline Workflow</option>
-    </select>
+    <div align="left">
+        <div class="sr-landing-dropdown" align="center">
+            <button class="sr-landing-dropBtn">SmartR Workflows</button>
+            <div class="sr-landing-dropdown-content" style="position: relative">
+                <g:each in="${scriptList}">
+                    <span ng-click="template='${it}'"> ${it.capitalize() + ' Workflow'} </span>
+                </g:each>
+            </div>
+        </div>
+    </div>
 
     <div style="width: 50%; margin: 0 auto; text-align: center">
         <cohort-summary-info></cohort-summary-info>
@@ -21,11 +23,7 @@
 
     <ng-include src="template"></ng-include>
 
-    %{-- Render all templates --}%
-
-    <g:render template="/layouts/heatmap"/>
-    <g:render template="/layouts/correlation"/>
-    <g:render template="/layouts/boxplot"/>
-    <g:render template="/layouts/volcanoplot"/>
-    <g:render template="/layouts/timeline"/>
+    <g:each in="${scriptList}">
+        <g:render template="/layouts/${it}"/>
+    </g:each>
 </div>

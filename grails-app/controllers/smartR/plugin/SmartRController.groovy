@@ -12,7 +12,7 @@ class SmartRController {
     static layout = 'smartR'
 
     def index() {
-        [ scriptList: sessionService.availableWorkflows() ]
+        [ scriptList: sessionService.availableWorkflows()]
     }
 
     /**
