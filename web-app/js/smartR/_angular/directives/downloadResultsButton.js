@@ -15,10 +15,10 @@ window.smartRApp.directive('downloadResultsButton', ['rServeService', function(r
     return {
         restrict: 'E',
         scope: {
-
+            disabled: '='
         },
         template:
-            '<input type="button" value="Download" class="heim-action-button">' +
+            '<input type="button" value="Download" class="heim-action-button" ng-disabled="disabled">' +
             '<span style="padding-left: 10px;"></span>',
         link: function(scope, element) {
 

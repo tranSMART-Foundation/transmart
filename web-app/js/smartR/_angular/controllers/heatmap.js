@@ -36,5 +36,8 @@ window.smartRApp.controller('HeatmapController',
             sorting : 'nodes',
             ranking : 'coef'
         };
-        $scope.scriptResults = {};
+        $scope.scriptResults = {
+            fields : [],
+            disableDownloadButtons : true
+        };
     }]);
