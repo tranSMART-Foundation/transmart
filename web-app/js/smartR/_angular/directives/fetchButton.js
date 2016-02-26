@@ -22,8 +22,13 @@ window.smartRApp.directive('fetchButton',
 
                     var showSummary = JSON.parse(scope.showSummaryStats); // string to boolean
 
+                    scope.summaryData = {summary:[]}; //reset
+
                     template_btn.disabled = true;
                     template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
+
+                    // tell parent scope to disable other buttons while i'm still fetching
+                    scope.$emit('disable::other::buttons', true);
 
                     // Construct query constraints
                     var conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap);
@@ -40,6 +45,7 @@ window.smartRApp.directive('fetchButton',
                         };
                     }
 
+                    // TODO refactor
                     rServeService.loadDataIntoSession(conceptKeys, dataConstraints).then(
                         function(msg) {
                             if (showSummary) {
@@ -47,9 +53,11 @@ window.smartRApp.directive('fetchButton',
                                     function(data) {
                                         scope.summaryData = data.result;
                                         template_msg.innerHTML = 'Success: ' + data.msg;
+                                        scope.$emit('disable::other::buttons', false);
                                     },
                                     function(msg) {
                                         template_msg.innerHTML = 'Failure: ' + msg;
+                                        scope.$emit('disable::other::buttons', false);
                                     }
                                 ).finally(function() {
                                     template_btn.disabled = false;
@@ -57,11 +65,13 @@ window.smartRApp.directive('fetchButton',
                             } else {
                                 template_msg.innerHTML = 'Success: ' + msg;
                                 template_btn.disabled = false;
+                                scope.$emit('disable::other::buttons', false);
                             }
                         },
                         function(msg) {
                             template_msg.innerHTML = 'Failure: ' + msg;
                             template_btn.disabled = false;
+                            scope.$emit('disable::other::buttons', false);
                         }
                     )
                 };

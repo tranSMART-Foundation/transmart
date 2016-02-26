@@ -7,6 +7,7 @@ window.smartRApp.directive('runButton',
         return {
             restrict: 'E',
             scope: {
+                disabled: '=',
                 storage: '=storeResultsIn',
                 script: '@scriptToRun',
                 name: '@buttonName',
@@ -15,7 +16,15 @@ window.smartRApp.directive('runButton',
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/runButton.html',
             link: function(scope, element) {
+
                 var template_btn = element.children()[0];
+                template_btn.disabled = Boolean(scope.disabled);
+
+                // watch disabled flag since it could change based on some situations
+                scope.$watch('disabled', function (newVal) {
+                    template_btn.disabled = Boolean(newVal);
+                }, true);
+
                 var template_msg = element.children()[1];
 
                 var serialized = JSON.parse(scope.serialized);

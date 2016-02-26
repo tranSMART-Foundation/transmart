@@ -4,6 +4,7 @@ window.smartRApp.directive('preprocessButton', ['rServeService', function(rServe
     return {
         restrict: 'E',
         scope: {
+            disabled: '=',
             params: '=',
             showSummaryStats: '=',
             summaryData: '='
@@ -15,6 +16,13 @@ window.smartRApp.directive('preprocessButton', ['rServeService', function(rServe
 
             var template_btn = element.children()[0];
             var template_msg = element.children()[1];
+
+            template_btn.disabled = Boolean(scope.disabled);
+
+            // watch disabled flag since it could change based on some situations
+            scope.$watch('disabled', function (newVal) {
+                template_btn.disabled = Boolean(newVal);
+            }, true);
 
             template_btn.onclick = function() {
                 var _showSummary = scope.showSummaryStats,

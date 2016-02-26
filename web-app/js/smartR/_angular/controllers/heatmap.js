@@ -22,20 +22,34 @@ window.smartRApp.controller('HeatmapController',
         $scope.selectedBiomarkers = [];
         $scope.fetchSummaryData = {summary:[]};
 
+        $scope.$on('disable::other::buttons', function (event, disabled) {
+            console.log('Ok, msg received.', [event, disabled]);
+            // when summary is fetched enable preprocess & run buttons
+            $scope.preprocess.disabled = disabled;
+            $scope.runAnalysis.disabled = disabled;
+        });
+
         // ------------------------------------------------------------- //
         // Preprocess                                                    //
         // ------------------------------------------------------------- //
-        $scope.preprocessArgs = {aggregateProbes : false};
-        $scope.preprocessSummaryData = {summary:[]};
+        $scope.preprocess = {
+            params :  {
+                aggregateProbes : false
+            },
+            disabled : true,
+            summaryData : {}
+        };
 
         // ------------------------------------------------------------- //
         // Run Heatmap                                                   //
         // ------------------------------------------------------------- //
-        $scope.runParams = {
-            max_row : 100,
-            sorting : 'nodes',
-            ranking : 'coef'
-        };
-
-        $scope.scriptResults = {};
+        $scope.runAnalysis = {
+            params: {
+                max_row : 100,
+                sorting : 'nodes',
+                ranking : 'coef'
+            },
+            disabled : true,
+            scriptResults : {}
+        }
     }]);
