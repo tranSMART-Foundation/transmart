@@ -36,5 +36,6 @@ window.smartRApp.controller('HeatmapController',
             sorting : 'nodes',
             ranking : 'coef'
         };
+
         $scope.scriptResults = {};
     }]);

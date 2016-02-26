@@ -88,8 +88,8 @@
                         script-to-run="run"
                         arguments-to-use="runParams"
                         serialized="true"></run-button>
-            <capture-plot-button filename="heatmap.svg"></capture-plot-button>
-            <download-results-button></download-results-button>
+            <capture-plot-button filename="heatmap.svg" data="scriptResults"></capture-plot-button>
+            <download-results-button data="scriptResults"></download-results-button>
             <br/>
             <heatmap-plot data="scriptResults" width="1200" height="1200"></heatmap-plot>
 
