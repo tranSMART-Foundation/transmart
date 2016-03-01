@@ -8,9 +8,11 @@ main <- function( excludedPatientIDs = NULL ) {
 
     if (nrow(subsets) > 0) {
         df <- merge(datapoints, subsets, by="patientID")
+        levels(df$category) <- c(levels(df$category), "no subset")
         df$category[df$category == ""] <- "no subset"
     } else {
         df <- datapoints
+        levels(df$category) <- c(levels(df$category), "no subset")
         df$category <- "no subset"
     }
 
