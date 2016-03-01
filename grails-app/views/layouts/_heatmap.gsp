@@ -7,7 +7,7 @@
         %{--========================================================================================================--}%
         <workflow-tab tab-name="Fetch Data">
             <concept-box
-                concept-group="conceptBoxes.highDimensional"
+                concept-group="fetch.conceptBoxes.highDimensional"
                 type="HD"
                 min="1"
                 max="1"
@@ -16,18 +16,20 @@
             </concept-box>
 
             %{--TODO include low dimensions--}%
-            %{--<concept-box concept-group="conceptBoxes.numerical"></concept-box>--}%
-            %{--<concept-box concept-group="conceptBoxes.categorical"></concept-box>--}%
+            %{--<concept-box concept-group="fetch.conceptBoxes.numerical"></concept-box>--}%
+            %{--<concept-box concept-group="fetch.conceptBoxes.categorical"></concept-box>--}%
 
-            <biomarker-selection biomarkers="selectedBiomarkers"></biomarker-selection>
+            <biomarker-selection biomarkers="fetch.selectedBiomarkers"></biomarker-selection>
             <hr class="sr-divider">
-            <fetch-button concept-map="conceptBoxes"
-                          biomarkers="selectedBiomarkers"
-                          show-summary-stats="true"
-                          summary-data="fetchSummaryData">
+            <fetch-button
+                    disabled="fetch.disabled"
+                    concept-map="fetch.conceptBoxes"
+                    biomarkers="fetch.selectedBiomarkers"
+                    show-summary-stats="true"
+                    summary-data="fetch.summaryData">
             </fetch-button>
             <br/>
-            <summary-stats summary-data="fetchSummaryData"></summary-stats>
+            <summary-stats summary-data="fetch.summaryData"></summary-stats>
         </workflow-tab>
 
         %{--========================================================================================================--}%
@@ -93,8 +95,8 @@
                         serialized="true"
                         disabled="runAnalysis.disabled">
             </run-button>
-            <capture-plot-button filename="heatmap.svg" data="runAnalysis.scriptResults"></capture-plot-button>
-            <download-results-button data="runAnalysis.scriptResults"></download-results-button>
+            <capture-plot-button filename="heatmap.svg" disabled="runAnalysis.download.disabled"></capture-plot-button>
+            <download-results-button disabled="runAnalysis.download.disabled"></download-results-button>
             <br/>
             <heatmap-plot data="runAnalysis.scriptResults" width="1200" height="1200"></heatmap-plot>
 

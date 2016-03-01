@@ -65,6 +65,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
     }
 
     service.destroySession = function rServeService_destroySession(sessionId) {
+        console.log('about to destroy session ..');
         sessionId = sessionId || state.sessionId;
 
         if (!sessionId) {
@@ -273,7 +274,8 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
                 function(subsets) {
                     var _arg = {
                         conceptKeys: conceptKeys,
-                        resultInstanceIds: subsets
+                        resultInstanceIds: subsets,
+                        projection:'log_intensity'
                     };
 
                     if (typeof dataConstraints !== 'undefined') {
@@ -301,7 +303,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
                 taskType: 'summary',
                 arguments: {
                     phase: phase,
-                    projection: 'default_real_projection' // always required, even for low-dim data
+                    projection: 'log_intensity' // always required, even for low-dim data
                 }
             }).then(
                 function(ret) {

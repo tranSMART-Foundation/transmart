@@ -14,19 +14,24 @@ window.smartRApp.controller('HeatmapController',
         // ------------------------------------------------------------- //
         // Fetch data                                                    //
         // ------------------------------------------------------------- //
-        $scope.conceptBoxes = {
-            highDimensional : [],
-            numerical : [],
-            categorical : []
+        $scope.fetch = {
+            conceptBoxes : {
+                highDimensional : [],
+                numerical : [],
+                categorical : []
+            },
+            disabled : false,
+            selectedBiomarkers : [],
+            summaryData : {}
         };
-        $scope.selectedBiomarkers = [];
-        $scope.fetchSummaryData = {summary:[]};
 
-        $scope.$on('disable::other::buttons', function (event, disabled) {
-            console.log('Ok, msg received.', [event, disabled]);
-            // when summary is fetched enable preprocess & run buttons
+        $scope.$on('on:fetching', function (event, disabled) {
             $scope.preprocess.disabled = disabled;
             $scope.runAnalysis.disabled = disabled;
+            $scope.runAnalysis.download.disabled = true;
+            // empty previous results
+            $scope.preprocess.summaryData = {};
+            $scope.runAnalysis.scriptResults = {};
         });
 
         // ------------------------------------------------------------- //
@@ -40,6 +45,13 @@ window.smartRApp.controller('HeatmapController',
             summaryData : {}
         };
 
+        $scope.$on('on:preprocessing', function (event, disabled) {
+            $scope.fetch.disabled = disabled;
+            $scope.runAnalysis.disabled = disabled;
+            $scope.runAnalysis.download.disabled = true;
+            $scope.runAnalysis.scriptResults = {};
+        });
+
         // ------------------------------------------------------------- //
         // Run Heatmap                                                   //
         // ------------------------------------------------------------- //
@@ -50,6 +62,14 @@ window.smartRApp.controller('HeatmapController',
                 ranking : 'coef'
             },
             disabled : true,
+            download :  {disabled : true},
             scriptResults : {}
-        }
+        };
+
+        $scope.$on('on:running', function (event, disabled) {
+            $scope.preprocess.disabled = disabled;
+            $scope.fetch.disabled = disabled;
+            $scope.runAnalysis.download.disabled = disabled;
+        });
+
     }]);

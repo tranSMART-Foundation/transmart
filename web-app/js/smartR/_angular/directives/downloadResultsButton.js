@@ -14,7 +14,9 @@ window.smartRApp.directive('downloadResultsButton', ['rServeService', function(r
 
     return {
         restrict: 'E',
-        scope: { data: '='},
+        scope: {
+            disabled: '='
+        },
         template:
             '<input type="button" value="Download" class="heim-action-button">' +
             '<span style="padding-left: 10px;"></span>',
@@ -25,10 +27,8 @@ window.smartRApp.directive('downloadResultsButton', ['rServeService', function(r
 
             var template_msg = element.children()[1];
 
-            scope.$watch('data', function (newValue) {
-                if (newValue.hasOwnProperty('fields')) {
-                    template_btn.disabled = false;
-                }
+            scope.$watch('disabled', function (newValue) {
+                template_btn.disabled = Boolean(newValue);
             });
 
             template_btn.onclick = function() {

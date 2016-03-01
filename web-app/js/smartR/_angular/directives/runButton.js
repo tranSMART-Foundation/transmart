@@ -11,23 +11,22 @@ window.smartRApp.directive('runButton',
                 storage: '=storeResultsIn',
                 script: '@scriptToRun',
                 name: '@buttonName',
-                serialized: '@',
+                serialized: '=',
                 arguments: '=argumentsToUse'
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/runButton.html',
             link: function(scope, element) {
 
-                var template_btn = element.children()[0];
-                template_btn.disabled = Boolean(scope.disabled);
+                var template_btn = element.children()[0],
+                    template_msg = element.children()[1],
+                    serialized = scope.serialized;
 
-                // watch disabled flag since it could change based on some situations
-                scope.$watch('disabled', function (newVal) {
-                    template_btn.disabled = Boolean(newVal);
+                template_btn.disabled = scope.disabled;
+
+                scope.$watch('disabled', function (newValue) {
+                    template_btn.disabled = newValue;
                 }, true);
 
-                var template_msg = element.children()[1];
-
-                var serialized = JSON.parse(scope.serialized);
 
                 var _successCreatePlot = function (response) {
                     template_msg.innerHTML = ''; // empty template
@@ -36,6 +35,7 @@ window.smartRApp.directive('runButton',
                         rServeService.downloadJsonFile(response.executionId, 'heatmap.json').then(
                             function (d) {
                                 scope.storage = d.data;
+                                scope.$emit('on:running', false);
                             }
                         );
                     } else { // results
@@ -49,9 +49,12 @@ window.smartRApp.directive('runButton',
                 };
 
                 template_btn.onclick = function() {
+
+                    scope.storage = {};
                     template_btn.disabled = true;
-                    template_msg.style.color = 'black';
                     template_msg.innerHTML = 'Creating plot, please wait <span class="blink_me">_</span>';
+                    scope.$emit('on:running', true);
+
                     rServeService.startScriptExecution({
                         taskType: scope.script,
                         arguments: scope.arguments
@@ -60,6 +63,7 @@ window.smartRApp.directive('runButton',
                         _failCreatePlot
                     ).finally(function() {
                         template_btn.disabled = false;
+                        scope.$emit('on:running', false);
                     });
                 };
             }
