@@ -34,7 +34,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             concept = data.concept[0];
             globalMin = data.globalMin[0];
             globalMax = data.globalMax[0];
-            categories = data.categories;
+            categories = data.categories.sort();
         }
         setData(scope.data);
 
@@ -91,7 +91,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             .attr('text-anchor', 'middle')
             .text(smartRUtils.shortenConcept(concept));
 
-        var tooltip = boxplot.append('div')
+        var tooltip = d3.select(root).append('div')
             .attr('class', 'tooltip')
             .style('visibility', 'hidden');
 
@@ -383,8 +383,8 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
                         .html('Value: ' + d.value + '</br>' +
                             'PatientID: ' + d.patientID + '</br>' +
                             'Outlier: ' + d.outlier)
-                        .style('left', smartRUtils.mouseX(root) + 'px')
-                        .style('top', smartRUtils.mouseY(root) + 'px');
+                        .style('left', smartRUtils.mouseX(root) + 5 + 'px')
+                        .style('top', smartRUtils.mouseY(root) + 5 + 'px');
                 })
                 .on('mouseout', function () {
                     tooltip.style('visibility', 'hidden');
