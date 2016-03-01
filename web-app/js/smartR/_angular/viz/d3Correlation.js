@@ -192,10 +192,10 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
             updateStatistics(selectedPatientIDs, false, true);
         }
 
-        var ctxHtml = "<input id='updateCohortsButton' class='mybutton' type='button' value='Update Cohorts'/><br/> \
-<input id='zoomButton' class='mybutton' type='button' value='Zoom'/><br/> \
-<input id='excludeButton' class='mybutton' type='button' value='Exclude'/><br/> \
-<input id='resetButton' class='mybutton' type='button' value='Reset'/>";
+        var ctxHtml = '<input id="zoomButton" class="mybutton" type="button" value="Zoom"/><br/> \
+            <input id="excludeButton" class="mybutton" type="button" value="Exclude"/><br/> \
+            <input id="resetButton" class="mybutton" type="button" value="Reset"/>';
+
         var contextMenu = d3.select(root).append('div')
             .attr('class', 'contextMenu')
             .style('visibility', 'hidden')

@@ -1,11 +1,11 @@
 library(reshape2)
 
-main <- function(method = "pearson", patientIDs = NULL) {
+main <- function(method = "pearson", patientIDs = integer()) {
 
     num_data <- parseNumericalData()
     # cat_data <- parseCategoricalData()
 
-    if (! is.null(patientIDs)) {
+    if (length(patientIDs) > 0) {
         num_data <- num_data[num_data$patientID %in% patientIDs, ]
     }
 
