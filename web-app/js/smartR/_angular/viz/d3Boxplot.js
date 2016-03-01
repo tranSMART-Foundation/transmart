@@ -29,14 +29,18 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
         var concept = '',
             globalMin = 0,
             globalMax = 0,
-            categories = [];
+            categories = [],
+            excludedPatientIDs = [];
         function setData(data) {
             concept = data.concept[0];
             globalMin = data.globalMin[0];
             globalMax = data.globalMax[0];
             categories = data.categories.sort();
+            excludedPatientIDs = data.excludedPatientIDs;
         }
         setData(scope.data);
+
+        console.log(excludedPatientIDs)
 
         var animationDuration = 1000;
 
@@ -152,8 +156,6 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
                 .classed('brushed', true)
                 .map(function(d) { return d.patientID; });
         }
-
-        var excludedPatientIDs = [];
 
         function excludeSelection() {
             excludedPatientIDs = excludedPatientIDs.concat(currentSelection);

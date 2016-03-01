@@ -1,5 +1,5 @@
 
-main <- function( excludedPatientIDs = NULL ) {
+main <- function( excludedPatientIDs = integer() ) {
     datapoints <- parse.input(sourceLabel="datapoints", loaded_variables=loaded_variables, type="numeric")
     datapoints <- na.omit(datapoints)
     colnames(datapoints)[2] <- 'value'
@@ -27,6 +27,7 @@ main <- function( excludedPatientIDs = NULL ) {
     output$globalMin <- min(df[,2])
     output$globalMax <- max(df[,2])
     output$categories <- unique(df$category)
+    output$excludedPatientIDs <- excludedPatientIDs
 
     for (cat in unique(df$category)) {
         subset <- df[df$category == cat,]
