@@ -11,7 +11,7 @@ parse.input <- function(sourceLabel, loaded_variables, type) {
 # returns data.frame(patientID=c(...), concept1=c(...), concept2=c(...), ...)
 parse.ldd.num.input <- function(sourceLabel, loaded_variables) {
     filtered.loaded_variables <- get.loaded_variables.by.source(sourceLabel, loaded_variables)
-    if (length(filtered.loaded_variables) == 0) return(data.frame(patientID=c()))
+    if (length(filtered.loaded_variables) == 0) return(data.frame(patientID=integer()))
     df <- Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables) # merge alle matching dfs
     colnames(df)[1] <- 'patientID'
     df
@@ -22,7 +22,7 @@ parse.ldd.num.input <- function(sourceLabel, loaded_variables) {
 # returns data.frame(patientID=c(...), category=c(...))
 parse.ldd.cat.input <- function(sourceLabel, loaded_variables) {
     filtered.loaded_variables <- get.loaded_variables.by.source(sourceLabel, loaded_variables)
-    if (length(filtered.loaded_variables) == 0) return(data.frame(patientID=c(), category=c()))
+    if (length(filtered.loaded_variables) == 0) return(data.frame(patientID=integer(), category=character()))
     df <- Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables) # merge alle matching dfs
     patientIDs <- df["Row.Label"]
     df["Row.Label"] <- NULL
@@ -35,6 +35,7 @@ parse.ldd.cat.input <- function(sourceLabel, loaded_variables) {
 # give me only the loaded_variables that match my sourceLabel
 get.loaded_variables.by.source <- function(sourceLabel, loaded_variables) {
     SoNoSu.labels <- names(loaded_variables)
+    SoNoSu.labels <- sort(SoNoSu.labels) # for determinism
     matches <- grepl(paste("^", sourceLabel, sep=""), SoNoSu.labels) # which SoNoSu labels begin with sourceLabel
     loaded_variables[SoNoSu.labels[matches]]
 }
