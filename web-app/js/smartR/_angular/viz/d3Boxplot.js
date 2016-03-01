@@ -40,12 +40,15 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
 
         var animationDuration = 1000;
 
-        var width = scope.width;
-        var height = scope.height;
+        var width = parseInt(scope.width);
+        var height = parseInt(scope.height);
         var margin = {top: 20, right: 60, bottom: 200, left: 280};
 
         var boxWidth = 0.12 * width;
         var whiskerLength = boxWidth / 6;
+
+        var colorScale = d3.scale.quantile()
+            .range(['rgb(158,1,66)', 'rgb(213,62,79)', 'rgb(244,109,67)', 'rgb(253,174,97)', 'rgb(254,224,139)', 'rgb(255,255,191)', 'rgb(230,245,152)', 'rgb(171,221,164)', 'rgb(102,194,165)', 'rgb(50,136,189)', 'rgb(94,79,162)']);
 
         var boxplot = d3.select(root).append('svg')
             .attr('width', width + margin.left + margin.right)
@@ -61,17 +64,27 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             .domain([globalMin, globalMax])
             .range([height, 0]);
 
-        var colorScale = d3.scale.quantile()
-            .range(['rgb(158,1,66)', 'rgb(213,62,79)', 'rgb(244,109,67)', 'rgb(253,174,97)', 'rgb(254,224,139)', 'rgb(255,255,191)', 'rgb(230,245,152)', 'rgb(171,221,164)', 'rgb(102,194,165)', 'rgb(50,136,189)', 'rgb(94,79,162)']);
-
         var yAxis = d3.svg.axis()
             .scale(y)
             .orient('left');
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient('bottom');
 
         boxplot.append('g')
             .attr('class', 'y axis')
             .attr('transform', 'translate(' + 0 + ',' + 0 + ')')
             .call(yAxis);
+
+        boxplot.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(' + 0 + ',' + (height + 20) + ')')
+            .call(xAxis)
+            .selectAll('text')
+            .attr('dy', '.35em')
+            .attr('transform', 'translate(' + 0 + ',' + 5 + ')rotate(45)')
+            .style('text-anchor', 'start');
 
         boxplot.append('text')
             .attr('transform', 'translate(' + (-40) + ',' + (height / 2) + ')rotate(-90)')
@@ -212,18 +225,6 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
                         return jitterChecked ? x(category) + boxWidth * jitterWidth * d.jitter : x(category);
                     });
             });
-        }
-
-        function swapBackgroundColor(checked) {
-            d3.selectAll(root)
-                .transition()
-                .duration(animationDuration)
-                .style('background-color', checked ? 'white' : 'black');
-
-            d3.selectAll('.whisker, .hinge, .connection, .line, .axis path, .axis line .box .brush .extent')
-                .transition()
-                .duration(animationDuration)
-                .style('stroke', checked ? 'black' : 'white');
         }
 
         var boxes = {};
@@ -424,12 +425,6 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
                 .transition()
                 .duration(animationDuration)
                 .attr('d', lineGen);
-
-            box.append('text')
-                .attr('class', 'text label')
-                .attr('transform', 'translate(' + (x(category)) + ',' + (height + 20) + ')rotate(45)')
-                .attr('text-anchor', 'start')
-                .text(category);
         }
 
         function removeBrush() {
@@ -465,23 +460,13 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             height: buttonHeight,
             callback: reset
         });
-        createD3Switch({
-            location: boxplot,
-            onlabel: 'Light Background ON',
-            offlabel: 'Light Background OFF',
-            x: -280,
-            y: 2 + padding * 2 + buttonHeight * 2,
-            width: buttonWidth,
-            height: buttonHeight,
-            callback: swapBackgroundColor,
-            checked: true
-        });
+
         createD3Switch({
             location: boxplot,
             onlabel: 'Density Estimation ON',
             offlabel: 'Density Estimation OFF',
             x: -280,
-            y: 2 + padding * 3 + buttonHeight * 3,
+            y: 2 + padding * 2 + buttonHeight * 2,
             width: buttonWidth,
             height: buttonHeight,
             callback: swapKDE,
@@ -492,7 +477,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             onlabel: 'Jitter Datapoints ON',
             offlabel: 'Jitter Datapoints OFF',
             x: -280,
-            y: 2 + padding * 4 + buttonHeight * 4,
+            y: 2 + padding * 3 + buttonHeight * 3,
             width: buttonWidth,
             height: buttonHeight,
             callback: swapJitter,
