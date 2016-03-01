@@ -12,7 +12,6 @@ main <- function( excludedPatientIDs = NULL ) {
         df$category[df$category == ""] <- "no subset"
     } else {
         df <- datapoints
-        levels(df$category) <- c(levels(df$category), "no subset")
         df$category <- "no subset"
     }
 
