@@ -1,4 +1,4 @@
-source("web-app/HeimScripts/core/input.R")
+source("web-app/HeimScripts/_core/input.R")
 
 loaded_variables_with_a_vector <- list(should_be_df = c(1,2,3))  # a Vector instead of a df
 loaded_variables_df <- data.frame(a = c(1,2,3))  # data.frame instead of a list
