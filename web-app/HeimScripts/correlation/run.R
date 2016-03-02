@@ -1,25 +1,27 @@
 library(reshape2)
 
-main <- function(method = "pearson", patientIDs = integer()) {
+main <- function(method = "pearson", selectedPatientIDs = integer()) {
 
     num_data <- parse.input(sourceLabel="datapoints", loaded_variables=loaded_variables, type="numeric")
-    car_data <- parse.input(sourceLabel="annotations", loaded_variables=loaded_variables, type="categoric")
-
-    num_data <- na.omit(num_data)
-    colnames(num_data) <- c("patientID", "x", "y")
-
-    if (length(patientIDs) > 0) {
-        num_data <- num_data[num_data$patientID %in% patientIDs, ]
-    }
+    cat_data <- parse.input(sourceLabel="annotations", loaded_variables=loaded_variables, type="categoric")
 
     df <- num_data
-    df$tag <- NA
-    apply(df, 1, function(row) unname(row))
+    df <- na.omit(df)
 
-    unname(unlist(df[1,-1]))
+    if (nrow(cat_data) > 0) {
+        df <- merge(df, cat_data, by="patientID")
+    } else {
+        df$annotation <- ''
+    }
+
+    colnames(df) <- c("patientID", "x", "y", "annotation")
+
+    if (length(selectedPatientIDs) > 0) {
+        df <- df[df$patientID %in% selectedPatientIDs, ]
+    }
 
     corTest <- tryCatch({
-        cor.test(num_data[,2], num_data[,3], method=method)
+        cor.test(df$x, df$y, method=method)
     }, error = function(e) {
         ll <- list()
         ll$estimate <- as.numeric(NA)
@@ -27,8 +29,8 @@ main <- function(method = "pearson", patientIDs = integer()) {
         ll
     })
 
-    regLineSlope <- corTest$estimate * (sd(num_data[,3]) / sd(num_data[,2]))
-    regLineYIntercept <- mean(num_data[,3]) - regLineSlope * mean(num_data[,2])
+    regLineSlope <- corTest$estimate * (sd(df$y) / sd(df$x))
+    regLineYIntercept <- mean(df$y) - regLineSlope * mean(df$x)
 
     output <- list(
         correlation = corTest$estimate,
@@ -38,9 +40,9 @@ main <- function(method = "pearson", patientIDs = integer()) {
         xArrLabel = fetch_params$ontologyTerms$datapoints_n0$fullName,
         yArrLabel = fetch_params$ontologyTerms$datapoints_n1$fullName,
         method = method,
-        patientIDs = num_data[,1],
-        tags = c(),
-        points = num_data
+        patientIDs = df$patientID,
+        annotations = unique(df$annotation),
+        points = df
     )
     toJSON(output)
 }

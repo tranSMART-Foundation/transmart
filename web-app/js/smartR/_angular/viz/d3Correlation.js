@@ -46,7 +46,7 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
             regLineSlope,
             regLineYIntercept,
             patientIDs,
-            tags,
+            annotations,
             points,
             xArrLabel,
             yArrLabel,
@@ -64,8 +64,7 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
             yArrLabel = data.yArrLabel[0];
             method = data.method[0];
             patientIDs = data.patientIDs;
-            //tags = data.tags.sort() // TODO
-            tags = [];
+            annotations = data.annotations.sort();
             points = data.points;
             minX = data.points.min(function(d) { return d.x });
             maxX = data.points.max(function(d) { return d.x });
@@ -78,7 +77,7 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
         function updateStatistics(patientIDs, scatterUpdate, init) {
             scatterUpdate = scatterUpdate === undefined ? false : scatterUpdate;
             init = init === undefined ? false : init;
-            var arguments = { patientIDs: patientIDs };
+            var arguments = { selectedPatientIDs: patientIDs };
 
             rServeService.startScriptExecution({
                 taskType: 'run',
@@ -221,7 +220,7 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
             var y1 = y.invert(extent[1][1]);
             svg.selectAll('.point')
                 .classed('selected', false)
-                .style('fill', function(d) { return getColor(d.tag); })
+                .style('fill', function(d) { return getColor(d.annotation); })
                 .style('stroke', 'white');
             if (brush.empty()) {
                 d3.selectAll('.point').classed('selected', true);
@@ -232,7 +231,7 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                     })
                     .classed('selected', true)
                     .style('fill', 'white')
-                    .style('stroke', function(d) { return getColor(d.tag); });
+                    .style('stroke', function(d) { return getColor(d.annotation); });
             }
         }
 
@@ -255,8 +254,8 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
             })
             .call(brush);
 
-        function getColor(tag) {
-            return tag ? colors[tags.indexOf(tag)] : '#000000';
+        function getColor(annotation) {
+            return annotation ? colors[annotations.indexOf(annotation)] : 'black';
         }
 
         function updateScatterplot() {
@@ -269,14 +268,14 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                 .attr('cx', function(d) { return x(d.x); })
                 .attr('cy', function(d) { return y(d.y); })
                 .attr('r', 5)
-                .style('fill', function(d) { return getColor(d.tag); })
+                .style('fill', function(d) { return getColor(d.annotation); })
                 .on('mouseover', function(d) {
                     d3.select(this).style('fill', '#FF0000');
                     tooltip
                         .style('left', 10 + smartRUtils.mouseX(root) + 'px')
                         .style('top', 10 + smartRUtils.mouseY(root) + 'px')
                         .style('visibility', 'visible')
-                        .html(smartRUtils.shortenConcept(xArrLabel) + ': ' + d.x + '<br/>' + smartRUtils.shortenConcept(yArrLabel) + ': ' + d.y + '<br/>' + 'Patient ID: ' + d.patientID + '<br/>' + (d.tag ? 'Tag: ' + d.tag : ''));
+                        .html(smartRUtils.shortenConcept(xArrLabel) + ': ' + d.x + '<br/>' + smartRUtils.shortenConcept(yArrLabel) + ': ' + d.y + '<br/>' + 'Patient ID: ' + d.patientID + '<br/>' + (d.annotation ? 'Tag: ' + d.annotation : ''));
                 })
                 .on('mouseout', function() {
                     var p = d3.select(this);
@@ -284,7 +283,7 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                         p.style('fill', '#FFFFFF');
                     }
                     else {
-                        p.style('fill', function(d) { return getColor(d.tag); });
+                        p.style('fill', function(d) { return getColor(d.annotation); });
                     }
                     tooltip.style('visibility', 'hidden');
                 });
@@ -385,13 +384,13 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                 'Method: ' + method + '<br/><br/>' +
                 'Selected: ' + d3.selectAll('.point.selected').size() || d3.selectAll('.point').size() + '<br/>' +
                 'Displayed: ' + d3.selectAll('.point').size() + '<br/><br/>';
+
             html = html + '<p style="background: #000000; color:#FFFFFF">Default</p>';
-            for (var i = 0; i < tags.length; i++) {
-                var tag = tags[i];
-                if (tag) {
-                    html += '<p style=background:' + getColor(tag) + '; color:#FFFFFF>' + tag + '</p>';
-                }
-            }
+
+            annotations.forEach(function(annotation) {
+                html += '<p style=background:' + getColor(annotation) + '; color:#FFFFFF>' + annotation + '</p>';
+            });
+
             legend.html(html);
         }
 

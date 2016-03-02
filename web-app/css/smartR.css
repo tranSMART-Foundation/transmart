@@ -216,3 +216,19 @@ div.sr-status-and-output-container:empty:before {
 .sr-landing-dropdown:hover .sr-landing-dropBtn {
     background-color: #3B5E94;
 }
+
+.mybutton {
+    min-width: 150px;
+    width: 100%;
+    height: 30px;
+    color: black;
+    background-color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border: none;
+}
+
+.mybutton:hover {
+    color: white;
+    background: #326FCB;
+}
