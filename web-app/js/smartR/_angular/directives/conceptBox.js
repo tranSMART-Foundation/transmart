@@ -41,13 +41,12 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
 
             var typeMap = {
                 hleaficon: 'HD',
-                alphaicon: 'LD-categoric',
+                null: 'LD-categoric', // FIXME: alphaicon does not exist yet in transmartApp master branch
                 valueicon: 'LD-numeric'
             };
             var _containsOnly = function() {
                 return $(template_box).children().toArray().every(function(childNode) {
-                    return typeMap[childNode.getAttribute('setnodetype')] === scope.type ||
-                        scope.type === 'LD-categoric'; // FIXME: Workaround for transmartApp master branch
+                    return typeMap[childNode.getAttribute('setnodetype')] === scope.type;
                 });
             };
 
