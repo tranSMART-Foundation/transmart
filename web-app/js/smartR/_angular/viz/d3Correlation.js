@@ -41,15 +41,16 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
             .domain(d3.extent(scope.data.points, function(d) { return d.y; }))
             .range([height, 0]);
 
+        var annotations = scope.data.annotations.sort();
+        var xArrLabel = scope.data.xArrLabel[0];
+        var yArrLabel = scope.data.yArrLabel[0];
+
         var correlation,
             pvalue,
             regLineSlope,
             regLineYIntercept,
             patientIDs,
-            annotations,
             points,
-            xArrLabel,
-            yArrLabel,
             method,
             minX,
             maxX,
@@ -60,11 +61,8 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
             pvalue = data.pvalue[0];
             regLineSlope = data.regLineSlope[0];
             regLineYIntercept = data.regLineYIntercept[0];
-            xArrLabel = data.xArrLabel[0];
-            yArrLabel = data.yArrLabel[0];
             method = data.method[0];
             patientIDs = data.patientIDs;
-            annotations = data.annotations.sort();
             points = data.points;
             minX = data.points.min(function(d) { return d.x });
             maxX = data.points.max(function(d) { return d.x });
@@ -88,6 +86,7 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                     if (init) {
                         scope.data = results;
                     } else {
+                        console.log(results);
                         setData(results);
                         if (scatterUpdate) updateScatterplot();
                         updateRegressionLine();
@@ -221,18 +220,13 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
             svg.selectAll('.point')
                 .classed('selected', false)
                 .style('fill', function(d) { return getColor(d.annotation); })
-                .style('stroke', 'white');
-            if (brush.empty()) {
-                d3.selectAll('.point').classed('selected', true);
-            } else {
-                svg.selectAll('.point')
-                    .filter(function(d) {
-                        return x0 <= d.x && d.x <= x1 && y1 <= d.y && d.y <= y0;
-                    })
-                    .classed('selected', true)
-                    .style('fill', 'white')
-                    .style('stroke', function(d) { return getColor(d.annotation); });
-            }
+                .style('stroke', 'white')
+                .filter(function(d) {
+                    return x0 <= d.x && d.x <= x1 && y1 <= d.y && d.y <= y0;
+                })
+                .classed('selected', true)
+                .style('fill', 'white')
+                .style('stroke', function(d) { return getColor(d.annotation); });
         }
 
         var brush = d3.svg.brush()
@@ -255,6 +249,10 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
             .call(brush);
 
         function getColor(annotation) {
+            console.log('---')
+            console.log(annotation)
+            console.log(annotations)
+            console.log(annotations.indexOf(annotation))
             return annotation ? colors[annotations.indexOf(annotation)] : 'black';
         }
 
@@ -275,16 +273,14 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                         .style('left', 10 + smartRUtils.mouseX(root) + 'px')
                         .style('top', 10 + smartRUtils.mouseY(root) + 'px')
                         .style('visibility', 'visible')
-                        .html(smartRUtils.shortenConcept(xArrLabel) + ': ' + d.x + '<br/>' + smartRUtils.shortenConcept(yArrLabel) + ': ' + d.y + '<br/>' + 'Patient ID: ' + d.patientID + '<br/>' + (d.annotation ? 'Tag: ' + d.annotation : ''));
+                        .html(smartRUtils.shortenConcept(xArrLabel) + ': ' + d.x + '<br/>' +
+                            smartRUtils.shortenConcept(yArrLabel) + ': ' + d.y + '<br/>' +
+                            'Patient ID: ' + d.patientID + '<br/>' +
+                            (d.annotation ? 'Tag: ' + d.annotation : ''));
                 })
                 .on('mouseout', function() {
                     var p = d3.select(this);
-                    if (p.classed('selected')) {
-                        p.style('fill', '#FFFFFF');
-                    }
-                    else {
-                        p.style('fill', function(d) { return getColor(d.annotation); });
-                    }
+                    p.style('fill', function(d) { return p.classed('selected') ? '#FFFFFF' : getColor(d.annotation) });
                     tooltip.style('visibility', 'hidden');
                 });
 
