@@ -1,15 +1,9 @@
 //# sourceURL=heatmap.js
 
 window.smartRApp.controller('HeatmapController',
-    ['$scope', 'smartRUtils', 'rServeService', '$css', function($scope, smartRUtils, rServeService, $css) {
+    ['$scope', 'smartRUtils', 'commonWorkflowService', function($scope, smartRUtils, commonWorkflowService) {
 
-        // load workflow specific css
-        $css.bind({
-            href: $scope.smartRPath + '/css/heatmap.css'
-        }, $scope);
-
-        // initialize service
-        rServeService.destroyAndStartSession('heatmap');
+        commonWorkflowService.initializeWorkflow('heatmap', $scope);
 
         // ------------------------------------------------------------- //
         // Fetch data                                                    //

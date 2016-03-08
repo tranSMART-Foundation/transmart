@@ -3,15 +3,9 @@
 'use strict';
 
 window.smartRApp.controller('VolcanoplotController',
-    ['$scope', 'smartRUtils', 'rServeService', '$css', function($scope, smartRUtils, rServeService, $css) {
+    ['$scope', 'smartRUtils', 'commonWorkflowService', function($scope, smartRUtils, commonWorkflowService) {
 
-        // load workflow specific css
-        $css.bind({
-            href: $scope.smartRPath + '/css/volcanoplot.css'
-        }, $scope);
-
-        // initialize service
-        rServeService.startSession('volcanoplot');
+        commonWorkflowService.initializeWorkflow('volcanoplot', $scope);
 
         // model
         $scope.conceptBoxes = {
