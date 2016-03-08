@@ -3,7 +3,7 @@
 'use strict';
 
 window.smartRApp.directive('runButton',
-    ['$rootScope', 'rServeService', function($rootScope, rServeService) {
+    ['$rootScope', 'rServeService', 'processService', function($rootScope, rServeService, processService) {
         return {
             restrict: 'E',
             scope: {
@@ -22,6 +22,7 @@ window.smartRApp.directive('runButton',
                     serialized = scope.serialized;
 
                 template_btn.disabled = scope.disabled;
+                processService.registerButton(scope, 'runButton');
 
                 scope.$watch('disabled', function (newValue) {
                     template_btn.disabled = newValue;
@@ -35,7 +36,6 @@ window.smartRApp.directive('runButton',
                         rServeService.downloadJsonFile(response.executionId, 'heatmap.json').then(
                             function (d) {
                                 scope.storage = d.data;
-                                scope.$emit('on:running', false);
                             }
                         );
                     } else { // results
@@ -48,12 +48,17 @@ window.smartRApp.directive('runButton',
                     template_msg.innerHTML = 'Failure: ' + response.statusText;
                 };
 
+                var _finishedRunning =  function() {
+                    template_btn.disabled = false;
+                    processService.onRunning(false);
+                };
+
                 template_btn.onclick = function() {
 
                     scope.storage = {};
                     template_btn.disabled = true;
                     template_msg.innerHTML = 'Creating plot, please wait <span class="blink_me">_</span>';
-                    scope.$emit('on:running', true);
+                    processService.onRunning(true);
 
                     rServeService.startScriptExecution({
                         taskType: scope.script,
@@ -61,10 +66,9 @@ window.smartRApp.directive('runButton',
                     }).then(
                         _successCreatePlot,
                         _failCreatePlot
-                    ).finally(function() {
-                        template_btn.disabled = false;
-                        scope.$emit('on:running', false);
-                    });
+                    ).finally(
+                        _finishedRunning
+                    );
                 };
             }
         };
