@@ -112,6 +112,17 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
         state.sessionId = null;
     };
 
+    service.destroyAndStartSession = function(workflowName) {
+
+        // delete session before creating a new one
+        $q.when(service.destroySession())
+            .then(function() {
+                // start a new session
+                service.startSession(workflowName);
+            });
+
+    }
+
     /*
      * taskData = {
      *     arguments: { ... },

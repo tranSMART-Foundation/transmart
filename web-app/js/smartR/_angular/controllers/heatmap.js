@@ -9,7 +9,7 @@ window.smartRApp.controller('HeatmapController',
         }, $scope);
 
         // initialize service
-        rServeService.startSession('heatmap');
+        rServeService.destroyAndStartSession('heatmap');
 
         // ------------------------------------------------------------- //
         // Fetch data                                                    //
