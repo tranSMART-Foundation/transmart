@@ -21,23 +21,27 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
     /* returns a promise with the session id and
      * saves the session id for future calls */
     service.startSession = function rServeService_startSession(name) {
+        console.log("Creating session for workflow: " + name);
         workflow = name;
-        return $.ajax({
-                url: pageInfo.basePath + '/RSession/create',
-                type: 'POST',
-                timeout: TIMEOUT,
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    workflow: workflow
-                })
-            })
+        return $http({
+            url: pageInfo.basePath + '/RSession/create',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            config: {
+                timeout: TIMEOUT
+            },
+            data: {
+                workflow: workflow
+            }
+        })
             .then(function(response) {
-                return response.sessionId;
-            }, transformAjaxFailure)
-            .done((function(sessionId) {
-                state.sessionId = sessionId;
-                rServeService_scheduleTouch.call(this);
-            }).bind(this));
+                state.sessionId = response.data.sessionId;
+                console.log("Created session " + state.sessionId);
+                rServeService_scheduleTouch();
+            }, transformAjaxFailure);
+
     };
 
     service.touch = function rServeService_touch(sessionId) {
@@ -45,15 +49,23 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
             return;
         }
 
-        $.ajax({
+        console.log("Touching session: " + sessionId);
+        return $http({
             url: pageInfo.basePath + '/RSession/touch',
-            type: 'POST',
-            timeout: TIMEOUT,
-            contentType: 'application/json',
-            data: JSON.stringify( {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            config: {
+                timeout: TIMEOUT
+            },
+            data: {
                 sessionId: sessionId
+            }
+        })
+            .finally(function() {
+                rServeService_scheduleTouch(); // schedule another
             })
-        }).done(rServeService_scheduleTouch.bind(this)); // schedule another
     };
 
     function rServeService_scheduleTouch() {
@@ -65,29 +77,34 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
     }
 
     service.destroySession = function rServeService_destroySession(sessionId) {
-        console.log('about to destroy session ..');
         sessionId = sessionId || state.sessionId;
 
         if (!sessionId) {
-            throw new Error('No session to destroy');
+            console.log('No session to destroy');
+            return;
         }
 
-        return $.ajax({
-                url: pageInfo.basePath + '/RSession/delete',
-                type: 'POST',
-                timeout: TIMEOUT,
-                contentType: 'application/json',
-                data: JSON.stringify( {
-                    sessionId: sessionId
-                })
-            })
-            .then(function(x) { return x; }, transformAjaxFailure)
-            .done(function() {
-                if (state.sessionId != sessionId) {
-                    return;
+        console.log('About to destroy session: ' + sessionId);
+        return $http({
+            url: pageInfo.basePath + '/RSession/delete',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            config: {
+                timeout: TIMEOUT
+            },
+            data: {
+                sessionId: sessionId
+            }
+        })
+            .catch(transformAjaxFailure)
+            .finally(function() {
+                if (state.sessionId == sessionId) {
+                    console.log("abandoning session " + sessionId);
+                    service.abandonCurrentSession();
                 }
-                this.abandonCurrentSession();
-            }.bind(this));
+            });
     };
 
     service.abandonCurrentSession = function rServeService_abandonSession() {
@@ -238,6 +255,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
     }
 
     function transformAjaxFailure(jqXHR, textStatus, errorThrown) {
+        console.log("transformAjaxFailure");
         var ret = {
             status: jqXHR.status,
             statusText: jqXHR.statusText
