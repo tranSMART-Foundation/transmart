@@ -1,6 +1,7 @@
 //# sourceURL=preprocessButton.js
 
-window.smartRApp.directive('preprocessButton', ['rServeService', function(rServeService) {
+window.smartRApp.directive('preprocessButton', ['rServeService', 'processService',
+    function(rServeService, processService) {
     return {
         restrict: 'E',
         scope: {
@@ -18,9 +19,10 @@ window.smartRApp.directive('preprocessButton', ['rServeService', function(rServe
             var template_msg = element.children()[1];
 
             template_btn.disabled = scope.disabled;
+            processService.registerButton(scope,  'preprocessButton');
             
             scope.$watch('disabled', function (newValue) {
-                template_btn.disabled = Boolean(newValue);
+                template_btn.disabled = newValue;
             }, true);
 
             template_btn.onclick = function() {
@@ -28,7 +30,7 @@ window.smartRApp.directive('preprocessButton', ['rServeService', function(rServe
                 var _init = function () {
                         template_btn.disabled = true;
                         template_msg.innerHTML = 'Preprocessing, please wait <span class="blink_me">_</span>';
-                        scope.$emit('on:preprocessing', true);
+                        processService.onPreprocessing(true);
                     },
 
                     _args = {aggregate:scope.params.aggregateProbes},
@@ -42,7 +44,7 @@ window.smartRApp.directive('preprocessButton', ['rServeService', function(rServe
                     _finishedPreprocessed = function (msg) {
                         template_msg.innerHTML = 'Success: ' + msg;
                         template_btn.disabled = false;
-                        scope.$emit('on:preprocessing', false);
+                        processService.onPreprocessing(false);
                     },
 
                     _afterDataPreprocessed = function (msg) {
@@ -60,7 +62,7 @@ window.smartRApp.directive('preprocessButton', ['rServeService', function(rServe
                                 template_msg.innerHTML = 'Failure: ' + msg;
                             })
                             .finally(function () {
-                                scope.$emit('on:preprocessing', false);
+                                processService.onPreprocessing(false);
                                 template_btn.disabled = false;
                             });
                     };
