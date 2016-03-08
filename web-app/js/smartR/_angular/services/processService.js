@@ -2,53 +2,58 @@
 
 window.smartRApp.factory('processService', [ function() {
 
-    var service = {
-        buttons : {}
+    var PREPROCESS_BTN = 'preprocessButton',
+        FETCH_BTN = 'fetchButton',
+        RUN_BTN = 'runButton',
+        CAPTURE_BTN = 'captureButton',
+        DOWNLOAD_BTN = 'downloadResultsButton',
+
+        service = {
+            buttons : {}
+        };
+
+    var _toggleButton = function (label, value) {
+        if (service.buttons.hasOwnProperty(label)) {
+            service.buttons[label].disabled = value;
+        }
+    };
+
+    var _emptyResult = function (label, attr) {
+        if (service.buttons.hasOwnProperty(label)) {
+            service.buttons[label][attr] = {};
+        }
     };
 
     service.registerButton = function (button, label) {
         service.buttons[label] = button;
     };
 
-    service.onFetching = function (isOnFetching) {
-        if (isOnFetching) {
-            service.buttons.preprocessButton.disabled = true;
-            service.buttons.preprocessButton.summaryData = {};
-            service.buttons.runButton.disabled = true;
-            service.buttons.runButton.storage = {};
-            service.buttons.captureButton.disabled = true;
-            service.buttons.downloadResultsButton.disabled = true;
-        } else {
-            service.buttons.preprocessButton.disabled = false;
-            service.buttons.runButton.disabled = false;
+    service.onFetching = function (value) {
+        _toggleButton(PREPROCESS_BTN, value);
+        _toggleButton(RUN_BTN, value);
+        if (value) {
+            _emptyResult(PREPROCESS_BTN, 'summaryData');
+            _emptyResult(RUN_BTN, 'storage');
+            _toggleButton(CAPTURE_BTN, true);
+            _toggleButton(DOWNLOAD_BTN, true);
         }
     };
 
-    service.onPreprocessing = function (isOnPreprocessing) {
-        if (isOnPreprocessing) {
-            service.buttons.fetchButton.disabled = true;
-            service.buttons.runButton.disabled = true;
-            service.buttons.runButton.storage = {};
-            service.buttons.captureButton.disabled = true;
-            service.buttons.downloadResultsButton.disabled = true;
-        } else {
-            service.buttons.fetchButton.disabled = false;
-            service.buttons.runButton.disabled = false;
+    service.onPreprocessing = function (value) {
+        _toggleButton(FETCH_BTN, value);
+        _toggleButton(RUN_BTN, value);
+        if (value) {
+            _emptyResult(RUN_BTN, 'storage');
+            _toggleButton(CAPTURE_BTN, true);
+            _toggleButton(DOWNLOAD_BTN, true);
         }
     };
 
-    service.onRunning = function (isOnRunning) {
-        if (isOnRunning) {
-            service.buttons.fetchButton.disabled = true;
-            service.buttons.preprocessButton.disabled = true;
-            service.buttons.captureButton.disabled = true;
-            service.buttons.downloadResultsButton.disabled = true;
-        } else {
-            service.buttons.fetchButton.disabled = false;
-            service.buttons.preprocessButton.disabled = false;
-            service.buttons.captureButton.disabled = false;
-            service.buttons.downloadResultsButton.disabled = false;
-        }
+    service.onRunning = function (value) {
+        _toggleButton(FETCH_BTN, value);
+        _toggleButton(PREPROCESS_BTN, value);
+        _toggleButton(CAPTURE_BTN, value);
+        _toggleButton(DOWNLOAD_BTN, value);
     };
 
     return service;

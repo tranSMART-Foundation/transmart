@@ -65,8 +65,7 @@ window.smartRApp.directive('runButton',
                         arguments: scope.arguments
                     }).then(
                         _successCreatePlot,
-                        _failCreatePlot,
-                        _finishedRunning
+                        _failCreatePlot
                     ).finally(
                         _finishedRunning
                     );

@@ -20,19 +20,9 @@ window.smartRApp.controller('HeatmapController',
                 numerical : [],
                 categorical : []
             },
-            disabled : false,
             selectedBiomarkers : [],
             summaryData : {}
         };
-
-        $scope.$on('on:fetching', function (event, disabled) {
-            $scope.preprocess.disabled = disabled;
-            $scope.runAnalysis.disabled = disabled;
-            $scope.runAnalysis.download.disabled = true;
-            // empty previous results
-            $scope.preprocess.summaryData = {};
-            $scope.runAnalysis.scriptResults = {};
-        });
 
         // ------------------------------------------------------------- //
         // Preprocess                                                    //
@@ -41,16 +31,8 @@ window.smartRApp.controller('HeatmapController',
             params :  {
                 aggregateProbes : false
             },
-            disabled : true,
             summaryData : {}
         };
-
-        $scope.$on('on:preprocessing', function (event, disabled) {
-            $scope.fetch.disabled = disabled;
-            $scope.runAnalysis.disabled = disabled;
-            $scope.runAnalysis.download.disabled = true;
-            $scope.runAnalysis.scriptResults = {};
-        });
 
         // ------------------------------------------------------------- //
         // Run Heatmap                                                   //
@@ -61,15 +43,6 @@ window.smartRApp.controller('HeatmapController',
                 sorting : 'nodes',
                 ranking : 'coef'
             },
-            disabled : true,
-            download :  {disabled : true},
             scriptResults : {}
         };
-
-        $scope.$on('on:running', function (event, disabled) {
-            $scope.preprocess.disabled = disabled;
-            $scope.fetch.disabled = disabled;
-            $scope.runAnalysis.download.disabled = disabled;
-        });
-
     }]);
