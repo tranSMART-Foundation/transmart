@@ -1,14 +1,8 @@
 
 window.smartRApp.controller('CorrelationController',
-    ['$scope', 'smartRUtils', 'rServeService', '$css', function($scope, smartRUtils, rServeService, $css) {
+    ['$scope', 'smartRUtils', 'commonWorkflowService', function($scope, smartRUtils, commonWorkflowService) {
 
-        // load workflow specific css
-        $css.bind({
-            href: $scope.smartRPath + '/css/correlation.css'
-        }, $scope);
-
-        // initialize service
-        rServeService.startSession('correlation');
+        commonWorkflowService.initializeWorkflow('correlation', $scope);
 
         // model
         $scope.conceptBoxes = {
