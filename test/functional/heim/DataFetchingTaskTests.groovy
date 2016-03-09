@@ -39,7 +39,7 @@ class DataFetchingTaskTests extends BaseAPITestCase {
     }
 
     void testMrnaDataFetching() {
-        String sessionId = createSession('func_test')
+        String sessionId = createSession('_func_test')
 
         post '/ScriptExecution/run', {
             body json: [
@@ -65,7 +65,7 @@ class DataFetchingTaskTests extends BaseAPITestCase {
 
     void testRefetchingReplacesDataset() {
         // instead of adding a new one
-        String sessionId = createSession('func_test')
+        String sessionId = createSession('_func_test')
 
         2.times {
             post '/ScriptExecution/run', {
@@ -92,7 +92,7 @@ class DataFetchingTaskTests extends BaseAPITestCase {
     }
 
     void testFetchingMultipleSubsets() {
-        String sessionId = createSession('func_test')
+        String sessionId = createSession('_func_test')
 
         get '/smartRTest/resultInstanceIds'
         assertStatus 200
@@ -124,7 +124,7 @@ class DataFetchingTaskTests extends BaseAPITestCase {
     }
 
     void testOnlySubset2() {
-        String sessionId = createSession('func_test')
+        String sessionId = createSession('_func_test')
 
         get '/smartRTest/resultInstanceIds'
         assertStatus 200

@@ -18,7 +18,7 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
     private static final String DATA_FETCH_TASK_TYPE = DataFetchTaskFactory.FETCH_DATA_TASK_NAME
 
 
-    private Map runRScript(String name, Map arguments = [:], String workflow = 'func_test') {
+    private Map runRScript(String name, Map arguments = [:], String workflow = '_func_test') {
         String sessionId = createSession(workflow)
         post '/ScriptExecution/run', {
             body json: [
@@ -112,7 +112,7 @@ class ScriptExecutionControllerTests extends BaseAPITestCase {
     }
 
     void testTouch() {
-        String sessionId = createSession('func_test')
+        String sessionId = createSession('_func_test')
         post '/RSession/touch', {
             body json: [
                     sessionId: sessionId,

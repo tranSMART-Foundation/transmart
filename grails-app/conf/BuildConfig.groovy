@@ -66,7 +66,7 @@ grails.project.dependency.resolution = {
         }
     }
     plugins {
-        runtime ':resources:1.2.1'
+        runtime ':resources:1.2.14'
 
         compile ":sendfile:0.2"
         build ':tomcat:7.0.47', {

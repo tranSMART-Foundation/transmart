@@ -1,9 +1,7 @@
 package smartR.plugin
 
 import grails.converters.JSON
-import groovy.json.JsonBuilder
 import heim.session.SessionService
-import org.apache.commons.io.FilenameUtils
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -14,21 +12,7 @@ class SmartRController {
     static layout = 'smartR'
 
     def index() {
-        [
-                scriptList: sessionService.availableWorkflows(),
-                //legacyScriptList: sessionService.legacyWorkflows(), FIXME display rest original scripts
-        ]
-    }
-
-    /**
-     *   Renders the input form for initial script parameters
-     */
-    def renderInput = {
-        if (! params.script) {
-            render 'Please select a script to execute.'
-        } else {
-            render template: "/heim/in${FilenameUtils.getBaseName(params.script).capitalize()}"
-        }
+        [ scriptList: sessionService.availableWorkflows()]
     }
 
     /**
@@ -66,5 +50,16 @@ class SmartRController {
         result.put("files", rows)
 
         render result as JSON;
+    }
+
+    /**
+     * Get smart-r plugin context path
+     */
+    def smartRContextPath = {
+        render servletContext.contextPath + pluginContextPath as String;
+    }
+
+    def getIPAView = {
+        params
     }
 }

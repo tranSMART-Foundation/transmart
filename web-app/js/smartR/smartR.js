@@ -358,55 +358,10 @@ function createD3Slider(args) {
     return slider
 }
 
-function mouseX() {
-    var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX
-    return mouseXPos + $('#index').parent().scrollLeft() - $('#smartRPanel').offset().left
-}
-
-function mouseY() {
-    var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY
-    return mouseYPos + $('#index').parent().scrollTop() - $('#smartRPanel').offset().top
-}
-
 function getMaxWidth(selection) {
-    return selection[0].map(function(d) { return d.getBBox().width; }).max()
-}
-
-function showCohortInfo() {
-    var cohortsSummary = ''
-
-    for(var i = 1; i < GLOBAL.NumOfSubsets; i++) {
-        var currentQuery = getQuerySummary(i)
-        if(currentQuery !== '') {
-            cohortsSummary += '<br/>Subset ' + (i) + ': <br/>'
-            cohortsSummary += currentQuery
-            cohortsSummary += '<br/>'
-        }
-    }
-    if (!cohortsSummary) {
-        cohortsSummary = '<br/>WARNING: No subsets have been selected! Please go to the "Comparison" tab and select your subsets.'
-    }
-    $('#cohortInfo').html(cohortsSummary)
-}
-//showCohortInfo()
-
-function updateInputView() {
-    if (typeof updateOnView === 'function') updateOnView()
-}
-
-var panelItem = $('#resultsTabPanel__smartRPanel')
-//panelItem.click(showCohortInfo)
-//panelItem.click(updateInputView)
-
-function shortenConcept(concept) {
-    var splits = concept.split('\\')
-    return splits[splits.length - 3] + '/' + splits[splits.length - 2]
-}
-
-function activateDragAndDrop(divName) {
-    var div = Ext.get(divName)
-    var dtgI = new Ext.dd.DropTarget(div, {ddGroup: 'makeQuery'})
-    dtgI.notifyDrop = dropOntoCategorySelection
+    return selection[0].map(function (d) {
+        return d.getBBox().width;
+    }).max()
 }
 
 window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
@@ -424,41 +379,33 @@ window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
             title: 'R Scripts',
             items: []
         }),
-        autoLoad: {
-            url: pageInfo.basePath + '/smartR/index',
-            method: 'POST',
-            evalScripts: false
-        },
         listeners: {
             render: function (panel) {
                 panel.body.on('click', function () {
                     if (typeof updateOnView === "function") {
-                        updateOnView()
+                        updateOnView();
                     }
-                })
+                });
+
+                /**
+                 * WORKAROUND : code below is needed to reorder the javascript script load that're broken due to
+                 * ExtJS panel
+                 */
+                // start workaround
+                var updater = panel.getUpdater();
+                updater.on('update', function() {
+                    var panelBody = jQuery(arguments[0].dom);
+                    var scripts = panelBody.children('script');
+                    scripts.remove(); // remove scripts from panel body
+                    panelBody.append(scripts); // re-append again
+                });
+                updater.update({
+                    url: pageInfo.basePath + '/smartR/index',
+                    method: 'POST',
+                    scripts: false });
+                // end workaround
             }
         }
-    })
-    parentPanel.add(smartRPanel)
-}
-
-function clearVarSelection(divName) {
-    $('#' + divName).children().remove()
-}
-
-function getConcepts(divName) {
-    return $('#' + divName).children().toArray().map(function(childNode) {
-        return childNode.getAttribute('conceptid') })
-}
-
-function changeInputDIV() {
-    jQuery('#outputDIV').empty();
-    var request = jQuery.ajax({
-        url: pageInfo.basePath + '/SmartR/renderInput',
-        type: 'POST',
-        timeout: 10000,
-        data: {script: jQuery('#scriptSelect').val()}
     });
-    request.done(function(response) { jQuery('#inputDIV').html(response) });
-    request.fail(function() { alert('Server does not respond. Network connection lost?') });
-}
+    parentPanel.add(smartRPanel);
+};
