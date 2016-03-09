@@ -259,13 +259,13 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
         }, transformAjaxFailure);
     }
 
-    function transformAjaxFailure(jqXHR, textStatus, errorThrown) {
+    function transformAjaxFailure(response) {
         var ret = {
-            status: jqXHR.status,
-            statusText: jqXHR.statusText
+            status: response.status,
+            statusText: response.statusText
         };
-        if (jqXHR.responseJSON !== undefined) {
-            ret.response = jqXHR.responseJSON;
+        if (response.data !== undefined) {
+            ret.response = response.data;
         }
 
         return ret;
