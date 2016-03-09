@@ -7,7 +7,7 @@
         %{--========================================================================================================--}%
         <workflow-tab tab-name="Fetch Data">
             <concept-box
-                concept-group="conceptBoxes.highDimensional"
+                concept-group="fetch.conceptBoxes.highDimensional"
                 type="HD"
                 min="1"
                 max="1"
@@ -16,18 +16,20 @@
             </concept-box>
 
             %{--TODO include low dimensions--}%
-            %{--<concept-box concept-group="conceptBoxes.numerical"></concept-box>--}%
-            %{--<concept-box concept-group="conceptBoxes.categorical"></concept-box>--}%
+            %{--<concept-box concept-group="fetch.conceptBoxes.numerical"></concept-box>--}%
+            %{--<concept-box concept-group="fetch.conceptBoxes.categorical"></concept-box>--}%
 
-            <biomarker-selection biomarkers="selectedBiomarkers"></biomarker-selection>
+            <biomarker-selection biomarkers="fetch.selectedBiomarkers"></biomarker-selection>
             <hr class="sr-divider">
-            <fetch-button concept-map="conceptBoxes"
-                          biomarkers="selectedBiomarkers"
-                          show-summary-stats="true"
-                          summary-data="fetchSummaryData">
+            <fetch-button
+                    disabled="fetch.disabled"
+                    concept-map="fetch.conceptBoxes"
+                    biomarkers="fetch.selectedBiomarkers"
+                    show-summary-stats="true"
+                    summary-data="fetch.summaryData">
             </fetch-button>
             <br/>
-            <summary-stats summary-data="fetchSummaryData"></summary-stats>
+            <summary-stats summary-data="fetch.summaryData"></summary-stats>
         </workflow-tab>
 
         %{--========================================================================================================--}%
@@ -36,19 +38,20 @@
         <workflow-tab tab-name="Preprocess">
             %{--Aggregate Probes--}%
             <div class="heim-input-field">
-                <input type="checkbox" ng-model="preprocessArgs.aggregateProbes">
+                <input type="checkbox" ng-model="preprocess.params.aggregateProbes">
                 <span>Aggregate probes</span>
             </div>
 
             <hr class="sr-divider">
 
-            <preprocess-button params="preprocessArgs"
+            <preprocess-button params="preprocess.params"
                                show-summary-stats="true"
-                               summary-data="preprocessSummaryData">
+                               summary-data="preprocess.summaryData"
+                               disabled="preprocess.disabled">
             </preprocess-button>
 
             <br/>
-            <summary-stats summary-data="preprocessSummaryData"></summary-stats>
+            <summary-stats summary-data="preprocess.summaryData"></summary-stats>
         </workflow-tab>
 
 
@@ -60,7 +63,7 @@
             %{--Number of max row to display--}%
             <div class="heim-input-field heim-input-number sr-input-area">
                 <label>Max row to display</label>
-                <input type="text" id="txtMaxRow" ng-model="runParams.max_row"> rows (< 1000 is preferable).
+                <input type="text" id="txtMaxRow" ng-model="runAnalysis.params.max_row"> rows (< 1000 is preferable).
             </div>
 
             %{--Type of sorting to apply--}%
@@ -68,30 +71,34 @@
                 <h2>Sort on:</h2>
                 <fieldset class="heim-radiogroup">
                     <label>
-                        <input type="radio" ng-model="runParams.sorting" name="sortingSelect" value="nodes" checked> Nodes
+                        <input type="radio" ng-model="runAnalysis.params.sorting" name="sortingSelect" value="nodes"
+                               checked> Nodes
                     </label>
                     <label>
-                        <input type="radio" ng-model="runParams.sorting" name="sortingSelect" value="subjects"> Subjects
+                        <input type="radio" ng-model="runAnalysis.params.sorting" name="sortingSelect" value="subjects">
+                        Subjects
                     </label>
                 </fieldset>
             </div>
 
             %{--Type of sorting to apply--}%
             <div class="heim-input-field  sr-input-area">
-                <sorting-criteria criteria="runParams.ranking"></sorting-criteria>
+                <sorting-criteria criteria="runAnalysis.params.ranking"></sorting-criteria>
             </div>
 
             <hr class="sr-divider">
 
             <run-button button-name="Create Plot"
-                        store-results-in="scriptResults"
+                        store-results-in="runAnalysis.scriptResults"
                         script-to-run="run"
                         arguments-to-use="runParams"
-                        serialized="true"></run-button>
-            <capture-plot-button filename="heatmap.svg" data="scriptResults"></capture-plot-button>
-            <download-results-button data="scriptResults"></download-results-button>
+                        serialized="true"
+                        disabled="runAnalysis.disabled">
+            </run-button>
+            <capture-plot-button filename="heatmap.svg" disabled="runAnalysis.download.disabled"></capture-plot-button>
+            <download-results-button disabled="runAnalysis.download.disabled"></download-results-button>
             <br/>
-            <heatmap-plot data="scriptResults" width="1200" height="1200"></heatmap-plot>
+            <heatmap-plot data="runAnalysis.scriptResults" width="1200" height="1200"></heatmap-plot>
 
         </workflow-tab>
 

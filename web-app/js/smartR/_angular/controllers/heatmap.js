@@ -14,28 +14,35 @@ window.smartRApp.controller('HeatmapController',
         // ------------------------------------------------------------- //
         // Fetch data                                                    //
         // ------------------------------------------------------------- //
-        $scope.conceptBoxes = {
-            highDimensional : [],
-            numerical : [],
-            categorical : []
+        $scope.fetch = {
+            conceptBoxes : {
+                highDimensional : [],
+                numerical : [],
+                categorical : []
+            },
+            selectedBiomarkers : [],
+            summaryData : {}
         };
-        $scope.selectedBiomarkers = [];
-        $scope.fetchSummaryData = {summary:[]};
 
         // ------------------------------------------------------------- //
         // Preprocess                                                    //
         // ------------------------------------------------------------- //
-        $scope.preprocessArgs = {aggregateProbes : false};
-        $scope.preprocessSummaryData = {summary:[]};
+        $scope.preprocess = {
+            params :  {
+                aggregateProbes : false
+            },
+            summaryData : {}
+        };
 
         // ------------------------------------------------------------- //
         // Run Heatmap                                                   //
         // ------------------------------------------------------------- //
-        $scope.runParams = {
-            max_row : 100,
-            sorting : 'nodes',
-            ranking : 'coef'
+        $scope.runAnalysis = {
+            params: {
+                max_row : 100,
+                sorting : 'nodes',
+                ranking : 'coef'
+            },
+            scriptResults : {}
         };
-
-        $scope.scriptResults = {};
     }]);
