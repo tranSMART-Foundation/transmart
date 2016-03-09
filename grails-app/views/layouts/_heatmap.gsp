@@ -62,7 +62,7 @@
 
             %{--Number of max row to display--}%
             <div class="heim-input-field heim-input-number sr-input-area">
-                <label>Max row to display</label>
+                <label>Number of rows to display</label>
                 <input type="text" id="txtMaxRow" ng-model="runAnalysis.params.max_row"> rows (< 1000 is preferable).
             </div>
 
