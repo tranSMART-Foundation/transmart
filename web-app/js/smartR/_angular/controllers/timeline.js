@@ -1,14 +1,8 @@
 
 window.smartRApp.controller('TimelineController',
-    ['$scope', 'smartRUtils', 'rServeService', '$css', function($scope, smartRUtils, rServeService, $css) {
+    ['$scope', 'smartRUtils', 'commonWorkflowService', function($scope, smartRUtils, commonWorkflowService) {
 
-        // load workflow specific css
-        $css.bind({
-            href: $scope.smartRPath + '/css/timeline.css'
-        }, $scope);
-
-        // initialize service
-        rServeService.startSession('timeline');
+        commonWorkflowService.initializeWorkflow('timeline', $scope);
 
         // model
         $scope.conceptBoxes = {};
