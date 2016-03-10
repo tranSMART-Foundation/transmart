@@ -96,7 +96,7 @@ fi
 echo "Finished setting up the transmart-date folder at $(date)"
 
 echo "++++++++++++++++++++++++++++"
-echo "+  Install of basic tools"
+echo "+  Install of basic tools and dependencies "
 echo "++++++++++++++++++++++++++++"
 
 # sudo make -C env ubuntu_deps_root
@@ -125,6 +125,10 @@ echo " "
 
 echo "Finished setting ubuntu dependencies (with root) at $(date)"
 
+echo "++++++++++++++++++++++++++++"
+echo "+  Dependency: Install of tranSMART-ETL"
+echo "++++++++++++++++++++++++++++"
+
 # make -C env ubuntu_deps_regular
 #   In the makefile target, ubuntu_deps_regular, causes a
 #   make of these four steps: 
@@ -136,7 +140,12 @@ make -C env update_etl
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
 ./checkFilesETLFolder.sh
 if [ "$( checkInstallError "The directory transmart-data/tranSMART-ETL was not installed properly; redo install" )" ] ; then exit -1; fi
+
 echo "make -C env update_etl - finished at $(date)"
+
+echo "++++++++++++++++++++++++++++"
+echo "+  Dependency: Install of data-integration"
+echo "++++++++++++++++++++++++++++"
 
 # (2)
 sudo -v
@@ -146,7 +155,12 @@ make -C env data-integration
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
 ./checkFilesDataIntegrationFolder.sh
 if [ "$( checkInstallError "The directory transmart-data/data-integration was not installed properly; redo install" )" ] ; then exit -1; fi
+
 echo "make -C env data-integration - finished at $(date)"
+
+echo "++++++++++++++++++++++++++++"
+echo "+  Dependency: Install of vars          "
+echo "++++++++++++++++++++++++++++"
 
 # (3)
 sudo -v
@@ -156,11 +170,16 @@ make -C env ../vars
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
 ./checkFilesVars.sh
 if [ "$( checkInstallError "vars file (transmart-data/vars) not set up properly; redo install" )" ] ; then exit -1; fi
+
 echo "make -C env ../vars - finished at $(date)"
 
 # (4) -- this last step is replaced by the sdk calls below
 # make -C env groovy
 echo " "
+
+echo "++++++++++++++++++++++++++++"
+echo "+  Dependency: Install of grails, groovy"
+echo "++++++++++++++++++++++++++++"
 
 echo "Finished setting ubuntu dependencies (without root) at $(date)"
 sudo -v
@@ -179,7 +198,12 @@ sdk install groovy 2.4.5 < AnswerYes.txt
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
 ./checkSdkmanApps.sh
 if [ "$( checkInstallError "groovy and/or grails not installed correctly; redo install" )" ] ; then exit -1; fi
+
 echo "Finished install of groovy and grails at $(date)"
+
+echo "++++++++++++++++++++++++++++"
+echo "+  Checks on install of tools and dependencies          "
+echo "++++++++++++++++++++++++++++"
 
 # fix files for postgres
 echo "Patch dir permits for TABLESPACES"
@@ -203,7 +227,7 @@ if [ "$( checkInstallError "PostgreSQL is not installed; redo install" )" ] ; th
 ./checkFilesPsql.sh
 if [ "$( checkInstallError "Database table folders needs by transmart not correct; fix as indicated; then redo install" )" ] ; then exit -1; fi
 
-echo "Finished installing basic tools at $(date)"
+echo "Finished installing basic tools and dependencies at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install Tomcat 7"
@@ -270,37 +294,6 @@ if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1;
 ./checkR.sh
 if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1; fi
 echo "Finished installing R and R packages at $(date)"
-
-echo "++++++++++++++++++++++++++++"
-echo "+  Load study GSE8581 in database"
-echo "++++++++++++++++++++++++++++"
-
-# only load database if not already loaded
-set +e
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
-./checkPsqlDataLoad.sh quiet
-returnCode=$?
-set -e
-
-if [ $returnCode -eq 0 ] ; then
-	echo "Database is already loaded"
-else
-	echo "Setting up PostgreSQL database"
-	cd $INSTALL_BASE/transmart-data
-	source ./vars
-	make -j4 postgres
-	echo "Finished setting up the PostgreSQL database at $(date)"
-	echo "Loading sample dataset GSE8581"
-	make update_datasets
-	make -C samples/postgres load_clinical_GSE8581
-	make -C samples/postgres load_ref_annotation_GSE8581
-	make -C samples/postgres load_expression_GSE8581
-fi
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
-./checkPsqlDataLoad.sh
-if [ "$( checkInstallError "Loading database failed; clear database and run install again" )" ] ; then exit -1; fi
-
-echo "Finished loading data in the PostgreSQL database at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Set up configuration files"
@@ -397,6 +390,21 @@ echo "+ Done with final checks"
 echo "++++++++++++++++++++++++++++"
 
 
-echo "Finished at $(date)"
+echo "Finished install of basic transmart system at $(date)"
+
+echo "--------------------------------------------"
+echo "To load datasets, use the these two files in the Scripts directory:
+echo "    datasetsList.txt - the list of posible datasets to load, and"
+echo "    load_datasets.sh - the script to load the datasets. "
+echo ""
+echo "First, in the file datasetsList.txt, un-comment the lines that "
+echo "corresponding to the data sets you wish to load. "
+echo ""
+echo "Then run the file load_datasets.sh"
+echo ""
+echo "-- Note that loading the same dataset twice is not recommended" 
+echo "   and may produce unpredictable results"
+echo "--------------------------------------------"
+
 exit 0
 
