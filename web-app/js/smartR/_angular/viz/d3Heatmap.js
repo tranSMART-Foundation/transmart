@@ -23,18 +23,6 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         }
     };
 
-    var animationDuration = 1500;
-    var tmpAnimationDuration = animationDuration;
-
-    function switchAnimation(checked) { // general purpose callback, this is why it is not inside SmartRHeatmap
-        if (! checked) {
-            tmpAnimationDuration = animationDuration;
-            animationDuration = 0;
-        } else {
-            animationDuration = tmpAnimationDuration;
-        }
-    }
-
     function createHeatmap(data, root) {
         var animationDuration = 1500;
         var extraFields = data.extraFields === undefined ? [] : data.extraFields;
@@ -54,6 +42,16 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
 
         var originalPatientIDs = patientIDs.slice();
         var originalUIDs = uids.slice();
+
+        var tmpAnimationDuration = animationDuration;
+        function switchAnimation(checked) {
+            if (! checked) {
+                tmpAnimationDuration = animationDuration;
+                animationDuration = 0;
+            } else {
+                animationDuration = tmpAnimationDuration;
+            }
+        }
 
         function redGreen() {
             var colorSet = [];
