@@ -41,10 +41,11 @@ echo "-------------------------------------"
 echo "|  Checking for postgres support folders"
 echo "-------------------------------------"
 
-varsFile=$HOME/transmart/transmart-data/vars
+base="$INSTALL_BASE/transmart-data"
+varsFile="$base/vars"
 
 if [ -e "$varsFile" ] ; then
-    source $varsFile
+    source "$varsFile"
 else
 	echo "vars file (at $varsFile) does not exist"
 fi

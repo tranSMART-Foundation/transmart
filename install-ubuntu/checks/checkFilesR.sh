@@ -9,7 +9,7 @@ echo "-------------------------------------"
 echo "|  Checking for required files and folders for the R install"
 echo "-------------------------------------"
 
-base="$HOME/transmart/transmart-data"
+base="$INSTALL_BASE/transmart-data"
 baseR="$base/R"
 
 returnValue=0

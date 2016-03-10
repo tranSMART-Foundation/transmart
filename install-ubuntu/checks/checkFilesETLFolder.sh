@@ -5,7 +5,7 @@
 # for the tranSAMRT install and data loading
 # ********************************************************************************
 
-base="$HOME/transmart/transmart-data"
+base="$INSTALL_BASE/transmart-data"
 baseEnv="$base/env"
 filepath="$baseEnv/tranSMART-ETL"
 
@@ -22,5 +22,6 @@ if [ ! -e "$filepath" ]; then
 	echo "  in the 'buildEnv' step of the install; repeat that step"
 	returnValue=1
 fi
+echo "tranSMART-ETL folder found at: $filepath"
 
 exit $returnValue

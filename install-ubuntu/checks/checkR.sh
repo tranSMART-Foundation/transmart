@@ -7,7 +7,8 @@
 # # ------------------ helper function -------------------
 . ./versionCompare.sh
 
-pathForRBin=$HOME/transmart/transmart-data/R/root/bin
+base="$INSTALL_BASE/transmart-data"
+pathForRBin="$base/R/root/bin"
 
 echo "-------------------------------------"
 echo "|  Checking for basics and packages required by R;"

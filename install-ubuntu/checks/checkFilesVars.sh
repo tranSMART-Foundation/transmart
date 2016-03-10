@@ -5,7 +5,7 @@
 # for the tranSAMRT install and data loading
 # ********************************************************************************
 
-base="$HOME/transmart/transmart-data"
+base="$INSTALL_BASE/transmart-data"
 filepath="$base/vars"
 
 echo "-------------------------------------"
@@ -20,5 +20,6 @@ if [ ! -e "$filepath" ]; then
 	echo "  in the 'buildEnv' step of the install; repeat that step"
 	returnValue=1
 fi
+echo "vars file found at $filepath"
 
 exit $returnValue

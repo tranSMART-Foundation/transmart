@@ -5,14 +5,13 @@
 # for the tranSAMRT install and data loading
 # ********************************************************************************
 
-base="$HOME/transmart/transmart-data"
+base="$INSTALL_BASE/transmart-data"
 baseEnv="$base/env"
 filepath="$baseEnv/data-integration"
 
 echo "-------------------------------------"
 echo "|  Checking for $filepath"
 echo "-------------------------------------"
-
 
 returnValue=0
 
@@ -22,5 +21,6 @@ if [ ! -e "$filepath" ]; then
 	echo "  in the 'buildEnv' step of the install; repeat that step"
 	returnValue=1
 fi
+echo "data-integration folder found at: $filepath"
 
 exit $returnValue
