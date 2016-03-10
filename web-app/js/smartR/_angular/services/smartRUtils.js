@@ -16,7 +16,7 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
     };
 
     service.makeSafeForCSS = function smartRUtils_makeSafeForCSS(str) {
-        return str.replace(/[^a-z0-9]/g, function(s) {
+        return String(str).replace(/[^a-z0-9]/g, function(s) {
             var c = s.charCodeAt(0);
             if (c == 32) return '-';
             if (c >= 65 && c <= 90) return s.toLowerCase();

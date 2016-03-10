@@ -185,7 +185,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             square.enter()
                 .append('rect')
                 .attr('class', function (d) {
-                    return 'square patientID-' + d.PATIENTID + ' uid-' + d.UID;
+                    return 'square patientID-' + smartRUtils.makeSafeForCSS(d.PATIENTID) + ' uid-' + smartRUtils.makeSafeForCSS(d.UID);
                 })
                 .attr('x', function (d) {
                     return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth;
@@ -199,8 +199,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('ry', 0)
                 .style('fill', 'white')
                 .on('mouseover', function (d) {
-                    d3.select('.patientID.patientID-' + d.PATIENTID).classed('highlight', true);
-                    d3.select('.uid.uid-' + d.UID).classed('highlight', true);
+                    d3.select('.patientID.patientID-' + smartRUtils.makeSafeForCSS(d.PATIENTID)).classed('highlight', true);
+                    d3.select('.uid.uid-' + smartRUtils.makeSafeForCSS(d.UID)).classed('highlight', true);
 
                     var html = '';
                     for (var key in d) {
@@ -265,7 +265,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 });
 
             function getValueForSquareSorting(patientID, uid) {
-                var square = d3.select('.square' + '.patientID-' + patientID + '.uid-' + uid);
+                var square = d3.select('.square' + '.patientID-' + smartRUtils.makeSafeForCSS(patientID) + '.uid-' + smartRUtils.makeSafeForCSS(uid));
                 return square[0][0] != null ? square.property('__data__').ZSCORE : Number.NEGATIVE_INFINITY;
             }
 
@@ -441,7 +441,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             selectText.enter()
                 .append('text')
                 .attr('class', function (d) {
-                    return 'text selectText patientID-' + d;
+                    return 'text selectText patientID-' + smartRUtils.makeSafeForCSS(d);
                 })
                 .attr('x', function (d, i) {
                     return i * gridFieldWidth + 0.5 * gridFieldWidth;
@@ -493,7 +493,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             patientID.enter()
                 .append('text')
                 .attr('class', function (d) {
-                    return 'patientID patientID-' + d;
+                    return 'patientID patientID-' + smartRUtils.makeSafeForCSS(d);
                 })
                 .attr('transform', function (d) {
                     return 'translate(' + (patientIDs.indexOf(d) * gridFieldWidth) + ',0)' +
@@ -519,7 +519,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             uid.enter()
                 .append('text')
                 .attr('class', function (d) {
-                    return 'uid text uid-' + d;
+                    return 'uid text uid-' + smartRUtils.makeSafeForCSS(d);
                 })
                 .attr('x', width + gridFieldWidth + 7)
                 .attr('y', function (d) {
@@ -550,7 +550,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             bar.enter()
                 .append('rect')
                 .attr('class', function (d) {
-                    return 'bar idx-' + d.idx;
+                    return 'bar idx-' + smartRUtils.makeSafeForCSS(d.idx);
                 })
                 .attr('width', function (d) {
                     return histogramScale(d.significance)
@@ -572,9 +572,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                         .html(html)
                         .style('left', smartRUtils.mouseX(root) + 'px')
                         .style('top', smartRUtils.mouseY(root) + 'px');
-                    d3.selectAll('.square.uid-' + uids[d.idx])
+                    d3.selectAll('.square.uid-' + smartRUtils.makeSafeForCSS(uids[d.idx]))
                         .classed('squareHighlighted', true);
-                    d3.select('.uid.uid-' + uids[d.idx])
+                    d3.select('.uid.uid-' + smartRUtils.makeSafeForCSS(uids[d.idx]))
                         .classed('highlight', true);
                 })
                 .on('mouseout', function () {
@@ -603,13 +603,13 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
 
             var extraSquare = featureItems.selectAll('.extraSquare')
                 .data(extraFields, function (d) {
-                    return 'patientID-' + d.PATIENTID + '-feature-' + d.FEATURE;
+                    return 'patientID-' + smartRUtils.makeSafeForCSS(d.PATIENTID) + '-feature-' + smartRUtils.makeSafeForCSS(d.FEATURE);
                 });
 
             extraSquare.enter()
                 .append('rect')
                 .attr('class', function (d) {
-                    return 'extraSquare patientID-' + d.PATIENTID + ' feature-' + d.FEATURE;
+                    return 'extraSquare patientID-' + smartRUtils.makeSafeForCSS(d.PATIENTID) + ' feature-' + smartRUtils.makeSafeForCSS(d.FEATURE);
                 })
                 .attr('x', function (d) {
                     return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth;
@@ -623,8 +623,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('ry', 0)
                 .style('fill', 'white')
                 .on('mouseover', function (d) {
-                    d3.select('.patientID.patientID-' + d.PATIENTID).classed('highlight', true);
-                    d3.select('.feature.feature-' + d.FEATURE).classed('highlight', true);
+                    d3.select('.patientID.patientID-' + smartRUtils.makeSafeForCSS(d.PATIENTID)).classed('highlight', true);
+                    d3.select('.feature.feature-' + smartRUtils.makeSafeForCSS(d.FEATURE)).classed('highlight', true);
                     var html = '';
                     for (var key in d) {
                         html += key + ': ' + d[key] + '<br/>';
@@ -660,7 +660,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             feature.enter()
                 .append('text')
                 .attr('class', function (d) {
-                    return 'feature text feature-' + d;
+                    return 'feature text feature-' + smartRUtils.makeSafeForCSS(d);
                 })
                 .attr('x', width + gridFieldWidth + 7)
                 .attr('y', function (d) {
@@ -721,7 +721,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                         var patientID = patientIDs[i];
                         var value = (-Math.pow(2, 32)).toString();
                         try {
-                            var square = d3.select('.extraSquare' + '.patientID-' + patientID + '.feature-' + feature);
+                            var square = d3.select('.extraSquare' + '.patientID-' + smartRUtils.makeSafeForCSS(patientID) + '.feature-' + smartRUtils.makeSafeForCSS(feature));
                             value = square.property('__data__').VALUE;
                         } catch (err) {
                             missingValues = true;
@@ -809,8 +809,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                     return i < cutoff;
                 })
                 .each(function (d) {
-                    d3.select('.bar.idx-' + d[0]).classed('cuttoffHighlight', true);
-                    d3.selectAll('.square.uid-' + uids[d[0]]).classed('cuttoffHighlight', true);
+                    d3.select('.bar.idx-' + smartRUtils.makeSafeForCSS(d[0])).classed('cuttoffHighlight', true);
+                    d3.selectAll('.square.uid-' + smartRUtils.makeSafeForCSS(uids[d[0]])) .classed('cuttoffHighlight', true);
                 });
         }
 
@@ -842,19 +842,18 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         }
 
         function selectCol(patientID) {
-            var colSquares = d3.selectAll('.square.patientID-' + patientID);
+            var colSquares = d3.selectAll('.square.patientID-' + smartRUtils.makeSafeForCSS(patientID));
             if (colSquares.classed('selected')) {
                 var index = selectedPatientIDs.indexOf(patientID);
                 selectedPatientIDs.splice(index, 1);
                 colSquares
                     .classed('selected', false);
-                d3.select('.selectText.patientID-' + patientID)
+                d3.select('.selectText.patientID-' + smartRUtils.makeSafeForCSS(patientID))
                     .text('□');
             } else {
                 selectedPatientIDs.push(patientID);
-                colSquares
-                    .classed('selected', true);
-                d3.select('.selectText.patientID-' + patientID)
+                colSquares.classed('selected', true);
+                d3.select('.selectText.patientID-' + smartRUtils.makeSafeForCSS(patientID))
                     .text('■');
             }
             if (selectedPatientIDs.length !== 0) {
@@ -879,7 +878,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 });
             for (var i = 0; i < features.length; i++) {
                 var feature = features[i];
-                d3.selectAll('.extraSquare.feature-' + feature)
+                d3.selectAll('.extraSquare.feature-' + smartRUtils.makeSafeForCSS(feature))
                     .style('fill', function (d) {
                         switch (d.TYPE) {
                             case 'binary':

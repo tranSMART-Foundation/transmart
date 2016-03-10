@@ -2,7 +2,7 @@ library(reshape2)
 library(limma)
 
 if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
-remoteScriptDir <- "web-app/HeimScripts"
+    remoteScriptDir <- "web-app/HeimScripts"
 }
 
 utils <- paste(remoteScriptDir, "/heatmap/utils.R", sep="")
@@ -18,18 +18,13 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
     max_rows <- as.numeric(max_rows)
     verifyInput(max_rows, sorting)
     df <- parseInput()
-    df["Row.Label"] <-
-    lapply(df["Row.Label"],fixString)  # remove illegal
-    # characters from probe names. This will
-    # prevent problems with CSS
-    # selectors on the frontend.
     write.table(
-    df,
-    "heatmap_orig_values.tsv",
-    sep = "\t",
-    na = "",
-    row.names = FALSE,
-    col.names = TRUE
+        df,
+        "heatmap_orig_values.tsv",
+        sep = "\t",
+        na = "",
+        row.names = FALSE,
+        col.names = TRUE
     )
     df          <- addStats(df, sorting, ranking, max_rows)
     df          <- mergeDuplicates(df)
@@ -42,15 +37,15 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
     significanceValues <- df["SIGNIFICANCE"][,1]
     features <- unique(extraFields["FEATURE"])[,1]
     jsn <- list(
-    "fields"             = fields,
-    "patientIDs"         = patientIDs,
-    "uids"               = uids,
-    "significanceValues" = significanceValues,
-    "ranking"            = ranking,
-    "features"           = features,
-    "extraFields"        = extraFields,
-    "maxRows"            = max_rows,
-    "warnings"           = c() # initiate empty vector
+        "fields"             = fields,
+        "patientIDs"         = patientIDs,
+        "uids"               = uids,
+        "significanceValues" = significanceValues,
+        "ranking"            = ranking,
+        "features"           = features,
+        "extraFields"        = extraFields,
+        "maxRows"            = max_rows,
+        "warnings"           = c() # initiate empty vector
     )
     writeRunParams(max_rows, sorting, ranking)
     measurements <- cleanUp(df)  # temporary stats like SD and MEAN need
@@ -61,11 +56,10 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
         jsn$warnings <- append(jsn$warnings, c("Significance sorting could not be done due to insufficient data"))
     }
     jsn <- addClusteringOutput(jsn, measurements) #
-    jsn <- toJSON(jsn,
-    pretty = TRUE,
-    digits = I(17))
+    jsn <- toJSON(jsn, pretty = TRUE, digits = I(17))
     writeDataForZip(df, measurements, patientIDs)  # for later zip generation
-    write(jsn,file = "heatmap.json")   # json file be served the same way
+    write(jsn, file = "heatmap.json")
+    # json file be served the same way
     # like any other file would - get name via
     # /status call and then /download
 
@@ -73,17 +67,12 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
     list(messages = msgs)
 }
 
-
-
 writeMarkerTable <- function(markerTable){
     colnames(markerTable) <- c("rowLabel", "biomarker",
     "log2FoldChange", "t", "pValue", "adjustedPValue", "B")
     jsn                   <- toJSON(markerTable, pretty = TRUE, digits = I(17))
     write(jsn, file = markerTableJson)
 }
-
-
-
 
 cleanUpLimmaOutput <- function() {
     if (file.exists(markerTableJson)) {
@@ -280,12 +269,8 @@ applySorting <- function(df,sorting) {
 }
 
 buildFields <- function(df) {
-    df <- melt(
-    df, na.rm = T, id = c("UID",
-    "SIGNIFICANCE",
-    "MEAN",
-    "SD")
-    )  # melt implicitly casts
+    df <- melt(df, na.rm = T, id = c("UID", "SIGNIFICANCE", "MEAN", "SD"))
+    # melt implicitly casts
     # characters to factors to make your like more exciting,
     # in order to encourage more adventures it does not
     # have characters.as.factors=F param.
@@ -293,8 +278,7 @@ buildFields <- function(df) {
     ZSCORE      <- (df$value - df$MEAN) / df$SD
     df["MEAN"]  <- NULL
     df["SD"]    <- NULL
-    names(df)   <-
-    c("UID","SIGNIFICANCE","PATIENTID","VALUE")
+    names(df)   <- c("UID","SIGNIFICANCE","PATIENTID","VALUE")
     df["ZSCORE"] <- ZSCORE
 
     df$PATIENTID <- replaceNodesWithTimelineLabel(df$PATIENTID, fetch_params$ontologyTerms)
@@ -306,12 +290,12 @@ writeDataForZip <- function(df, zScores, pidCols) {
     df      <- df[ , -which(names(df) %in% pidCols)]  # Drop patient columns
     df      <- cbind(df,zScores)                      # Replace with zScores
     write.table(
-    df,
-    "heatmap_data.tsv",
-    sep = "\t",
-    na = "",
-    row.names = FALSE,
-    col.names = TRUE
+        df,
+        "heatmap_data.tsv",
+        sep = "\t",
+        na = "",
+        row.names = FALSE,
+        col.names = TRUE
     )
 }
 
@@ -343,14 +327,11 @@ formatSubset <- function(subsetNumber) {
     } else if (subsetNumber == "2") {
         return(1)
     } else {
-        stop(paste(
-        "Incorrect Assay ID: unexpected subset number: ", subsetNumber
-        ))
+        stop(paste("Incorrect Assay ID: unexpected subset number: ", subsetNumber))
     }
 }
 
-computeDendrogram <-
-function(distances, linkageMethod) {
+computeDendrogram <- function(distances, linkageMethod) {
     as.dendrogram(hclust(distances, method = linkageMethod))
 }
 
@@ -362,12 +343,8 @@ dendrogramToJSON <- function(d) {
         index <- (start - 1):(start + members - 2)
         index <- paste(index, collapse = ' ')
         jsonString <<- paste(
-        jsonString,
-        sprintf(
-        '{"height":"%s", "index":"%s", "children":[',
-        height,
-        index
-        )
+            jsonString,
+            sprintf('{"height":"%s", "index":"%s", "children":[', height, index)
         )
         if (is.leaf(x)) {
             jsonString <<- paste(jsonString, ']}')
@@ -400,8 +377,8 @@ addClusteringOutput <- function(jsn, measurements_arg) {
     if (is.null(jsn$numberOfClusteredRows)) jsn$numberOfClusteredRows <- 0
     if (is.null(jsn$numberOfClusteredColumns)) jsn$numberOfClusteredColumns <- 0
     if (jsn$numberOfClusteredRows < 2 | jsn$numberOfClusteredColumns < 2 ) {  # Cannot cluster less than 2x2 matrix
-    jsn$warnings <- append(jsn$warnings, c("Clustering could not be done due to insufficient data"))
-    return(jsn)
+        jsn$warnings <- append(jsn$warnings, c("Clustering could not be done due to insufficient data"))
+        return(jsn)
     }
 
     euclideanDistancesRow <- dist(measurements_rows, method = "euclidean")
@@ -443,45 +420,45 @@ addClusteringOutput <- function(jsn, measurements_arg) {
 
 
     jsn$hclustEuclideanComplete <- list(
-    columnOrder(colDendrogramEuclideanComplete),
-    rowOrder(rowDendrogramEuclideanComplete),
-    dendrogramToJSON(colDendrogramEuclideanComplete),
-    dendrogramToJSON(rowDendrogramEuclideanComplete)
+        columnOrder(colDendrogramEuclideanComplete),
+        rowOrder(rowDendrogramEuclideanComplete),
+        dendrogramToJSON(colDendrogramEuclideanComplete),
+        dendrogramToJSON(rowDendrogramEuclideanComplete)
     )
 
     jsn$hclustEuclideanSingle <- list(
-    columnOrder(colDendrogramEuclideanSingle),
-    rowOrder(rowDendrogramEuclideanSingle),
-    dendrogramToJSON(colDendrogramEuclideanSingle),
-    dendrogramToJSON(rowDendrogramEuclideanSingle)
+        columnOrder(colDendrogramEuclideanSingle),
+        rowOrder(rowDendrogramEuclideanSingle),
+        dendrogramToJSON(colDendrogramEuclideanSingle),
+        dendrogramToJSON(rowDendrogramEuclideanSingle)
     )
 
     jsn$hclustEuclideanAverage <- list(
-    columnOrder(colDendrogramEuclideanAverage),
-    rowOrder(rowDendrogramEuclideanAverage),
-    dendrogramToJSON(colDendrogramEuclideanAverage),
-    dendrogramToJSON(rowDendrogramEuclideanAverage)
+        columnOrder(colDendrogramEuclideanAverage),
+        rowOrder(rowDendrogramEuclideanAverage),
+        dendrogramToJSON(colDendrogramEuclideanAverage),
+        dendrogramToJSON(rowDendrogramEuclideanAverage)
     )
 
     jsn$hclustManhattanComplete <- list(
-    columnOrder(colDendrogramManhattanComplete),
-    rowOrder(rowDendrogramManhattanComplete),
-    dendrogramToJSON(colDendrogramManhattanComplete),
-    dendrogramToJSON(rowDendrogramManhattanComplete)
+        columnOrder(colDendrogramManhattanComplete),
+        rowOrder(rowDendrogramManhattanComplete),
+        dendrogramToJSON(colDendrogramManhattanComplete),
+        dendrogramToJSON(rowDendrogramManhattanComplete)
     )
 
     jsn$hclustManhattanSingle <- list(
-    columnOrder(colDendrogramManhattanSingle),
-    rowOrder(rowDendrogramManhattanSingle),
-    dendrogramToJSON(colDendrogramManhattanSingle),
-    dendrogramToJSON(rowDendrogramManhattanSingle)
+        columnOrder(colDendrogramManhattanSingle),
+        rowOrder(rowDendrogramManhattanSingle),
+        dendrogramToJSON(colDendrogramManhattanSingle),
+        dendrogramToJSON(rowDendrogramManhattanSingle)
     )
 
     jsn$hclustManhattanAverage <- list(
-    columnOrder(colDendrogramManhattanAverage),
-    rowOrder(rowDendrogramManhattanAverage),
-    dendrogramToJSON(colDendrogramManhattanAverage),
-    dendrogramToJSON(rowDendrogramManhattanAverage)
+        columnOrder(colDendrogramManhattanAverage),
+        rowOrder(rowDendrogramManhattanAverage),
+        dendrogramToJSON(colDendrogramManhattanAverage),
+        dendrogramToJSON(rowDendrogramManhattanAverage)
     )
     return(jsn)
 }
