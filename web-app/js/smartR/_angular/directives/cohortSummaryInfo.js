@@ -13,7 +13,7 @@ window.smartRApp.directive('cohortSummaryInfo', [function() {
             function _showCohortInfo() {
                 var cohortsSummary = '';
 
-                for(var i = 1; i < GLOBAL.NumOfSubsets; i++) {
+                for(var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
                     var currentQuery = getQuerySummary(i);
                     if(currentQuery !== '') {
                         cohortsSummary += '<br/>Subset ' + (i) + ': <br/>';
