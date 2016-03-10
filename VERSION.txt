@@ -2,5 +2,6 @@ This repository is part of the tranSMART Foundation's release of
 transmartApp and the accompanying projects.
 
 Scripts
-	For transmart VERSION: 1.2.4
-	Scripts Version date: Tue Jan  5 10:15:00 EST 2016 (0.2)
+	For transmart VERSION: 16.1
+	Also know as VERSION: 1.2.5
+	Scripts Version date: Wed Mar  9 21:27:31 EST 2016

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version: Tue Jan  5 10:15:00 EST 2016 (0.2)
+# Version: Wed Mar  9 21:27:31 EST 2016
 # 
 #**********************************************************************************
 #  Script to load all that is needed to run an example/demo version of tranSMART 1.2.4
