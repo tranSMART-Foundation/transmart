@@ -295,6 +295,33 @@ if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1;
 if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1; fi
 echo "Finished installing R and R packages at $(date)"
 
+
+echo "++++++++++++++++++++++++++++"
+echo "+  Set up basic PostgreSQL; supports transmart login
+echo "++++++++++++++++++++++++++++"
+
+# only load database if not already loaded
+set +e
+cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+./checkPsqlDataLoad.sh quiet
+returnCode=$?
+set -e
+
+if [ $returnCode -eq 0 ] ; then
+	echo "Database is already loaded"
+else
+	echo "Setting up PostgreSQL database"
+	cd $INSTALL_BASE/transmart-data
+	source ./vars
+	make -j4 postgres
+fi
+cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+./checkPsqlDataLoad.sh
+if [ "$( checkInstallError "Loading database failed; clear database and run install again" )" ] ; then exit -1; fi
+
+echo "Finished setting up the PostgreSQL database at $(date)"
+
+
 echo "++++++++++++++++++++++++++++"
 echo "+  Set up configuration files"
 echo "++++++++++++++++++++++++++++"

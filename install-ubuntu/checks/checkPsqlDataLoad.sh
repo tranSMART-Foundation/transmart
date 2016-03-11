@@ -82,18 +82,15 @@ if [ "$runWithEcho" -eq 0 ]  ; then
 	echo "The transmartApp user 'guest' exists."
 fi
 
-results=$(sudo -u postgres psql transmart --command="select concept_path from i2b2demodata.concept_dimension where concept_path like '%GSE8581\\\\'" | grep "GSE8581")
+results=$(sudo -u postgres psql transmart --command="select count(*) from i2b2demodata.concept_dimension'" | grep "0")
 if [ -z "$results" ]; then
 	if [ "$runWithEcho" -eq 0 ]  ; then
-		echo "The transmartApp demo dataset GSE8581 has not been loaded"
-		echo "  it is likely that you did not load this dataset into the trasnamrt database."
-		echo "  See install instructions to do so."
+		echo "No demo data has been loaded in the transmartApp database"
+		echo "  This is expected at this point in the install process."
+		echo "  This message is just a reminder to load demo data as per the script 'load_datasets.sh'."
 	fi
 	exit 1
 fi 
-if [ "$runWithEcho" -eq 0 ]  ; then
-	echo "The transmartApp demo dataset GSE8581 is loaded."
-fi
 
 if [ "$runWithEcho" -eq 0 ]  ; then
 	echo "Done checking the PostgreSQL transmart database"

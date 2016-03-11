@@ -48,6 +48,8 @@ echo "++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE/transmart-data
 
+make update_datasets
+
 while read F  ; do
 	[[ $F = \#* ]] && continue
 	
