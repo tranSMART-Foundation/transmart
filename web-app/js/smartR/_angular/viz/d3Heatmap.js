@@ -37,8 +37,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         var warning = data.warnings === undefined ? '' : data.warnings;
         var maxRows = data.maxRows[0];
 
-        var rowClustering = false;
-        var colClustering = false;
+        var rowClustering = true;
+        var colClustering = true;
 
         var originalPatientIDs = patientIDs.slice();
         var originalUIDs = uids.slice();
