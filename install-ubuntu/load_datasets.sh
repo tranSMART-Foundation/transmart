@@ -42,7 +42,20 @@ echo "++++++++++++++++++++++++++++"
 if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
 export INSTALL_BASE
 
-echo "transmart-data is installed at this location: $INSTALL_BASE/transmart-data"
+if ! [ -d "$INSTALL_BASE/transmart-data" ] ; then
+	echo "This script assumes that the transmart-data directory is installed at $INSTALL_BASE/transmart-data"
+	echo "It does not appear to be there. Please fix that and restart this script."
+	echo "see the 'set up the transmart-data folder' step of installTransmart.sh"
+	exit 1
+fi
+
+echo "transmart-data is at this location: $INSTALL_BASE/transmart-data"
+
+echo "++++++++++++++++++++++++++++"
+echo "+  set up groovy and grails "
+echo "++++++++++++++++++++++++++++"
+source $HOME/.sdkman/bin/sdkman-init.sh
+echo "done"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Load studies from the uncommented lines in datasetsList.txt "
