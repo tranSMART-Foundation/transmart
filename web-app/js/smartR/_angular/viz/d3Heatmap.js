@@ -23,18 +23,6 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         }
     };
 
-    var animationDuration = 1500;
-    var tmpAnimationDuration = animationDuration;
-
-    function switchAnimation(checked) { // general purpose callback, this is why it is not inside SmartRHeatmap
-        if (! checked) {
-            tmpAnimationDuration = animationDuration;
-            animationDuration = 0;
-        } else {
-            animationDuration = tmpAnimationDuration;
-        }
-    }
-
     function createHeatmap(data, root) {
         var animationDuration = 1500;
         var extraFields = data.extraFields === undefined ? [] : data.extraFields;
@@ -49,65 +37,21 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         var warning = data.warnings === undefined ? '' : data.warnings;
         var maxRows = data.maxRows[0];
 
-        var rowClustering = false;
-        var colClustering = false;
+        var rowClustering = true;
+        var colClustering = true;
 
         var originalPatientIDs = patientIDs.slice();
         var originalUIDs = uids.slice();
 
-        function redGreen() {
-            var colorSet = [];
-            var NUM = 100;
-            var i = NUM;
-            while (i--) {
-                colorSet.push(d3.rgb((255 * i) / NUM, 0, 0));
+        var tmpAnimationDuration = animationDuration;
+        function switchAnimation(checked) {
+            if (! checked) {
+                tmpAnimationDuration = animationDuration;
+                animationDuration = 0;
+            } else {
+                animationDuration = tmpAnimationDuration;
             }
-            i = NUM;
-            while (i--) {
-                colorSet.push(d3.rgb(0, (255 * (NUM - i)) / NUM, 0));
-            }
-            return colorSet.reverse();
         }
-
-        function redBlue() {
-            var colorSet = [];
-            var STEP = 1 / 200;
-            var sR = 255, sG = 0, sB = 0;
-            var eR = 0, eG = 0, eB = 255;
-            for (var i = 0; i < 1; i += STEP) {
-                colorSet.push(d3.rgb((eR - sR) * i + sR, (eG - sG) * i + sG, (eB - sB) * i + sB));
-            }
-            return colorSet;
-        }
-
-        function odd(color) {
-            var colorSet = [];
-            var STEP = 1 / 200;
-            var idx1, idx2, fractBetween;
-            for (var i = 0; i < 1; i += STEP) {
-                var value = i * (color.length - 1);
-                idx1 = Math.floor(value);
-                idx2 = idx1 + 1;
-                fractBetween = value - idx1;
-                var r = (color[idx2][0] - color[idx1][0]) * fractBetween + color[idx1][0];
-                var g = (color[idx2][1] - color[idx1][1]) * fractBetween + color[idx1][1];
-                var b = (color[idx2][2] - color[idx1][2]) * fractBetween + color[idx1][2];
-                colorSet.push(d3.rgb(255 * r, 255 * g, 255 * b));
-            }
-            return colorSet;
-        }
-
-        var colorSets = [
-            redGreen(),
-            redBlue(),
-            odd([[0, 0, 1], [0, 1, 1], [0, 1, 0], [1, 1, 0], [1, 0, 0]]),
-            odd([[0, 0, 1], [0, 1, 0], [1, 0, 0]]),
-            odd([[0, 0, 1], [1, 1, 0], [1, 0, 0]])
-        ];
-
-        var featureColorSetBinary = ['#FF8000', '#FFFF00'];
-        var featureColorSetSequential = ['rgb(247,252,253)', 'rgb(224,236,244)', 'rgb(191,211,230)', 'rgb(158,188,218)', 'rgb(140,150,198)', 'rgb(140,107,177)', 'rgb(136,65,157)', 'rgb(129,15,124)', 'rgb(77,0,75)'];
-        var featureColorCategorical = d3.scale.category10();
 
         var gridFieldWidth = 20;
         var gridFieldHeight = 20;
@@ -185,7 +129,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             square.enter()
                 .append('rect')
                 .attr('class', function (d) {
-                    return 'square patientID-' + d.PATIENTID + ' uid-' + d.UID;
+                    return 'square patientID-' + smartRUtils.makeSafeForCSS(d.PATIENTID) +
+                        ' uid-' + smartRUtils.makeSafeForCSS(d.UID);
                 })
                 .attr('x', function (d) {
                     return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth;
@@ -199,8 +144,10 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('ry', 0)
                 .style('fill', 'white')
                 .on('mouseover', function (d) {
-                    d3.select('.patientID.patientID-' + d.PATIENTID).classed('highlight', true);
-                    d3.select('.uid.uid-' + d.UID).classed('highlight', true);
+                    d3.select('.patientID.patientID-' + smartRUtils.makeSafeForCSS(d.PATIENTID))
+                        .classed('highlight', true);
+                    d3.select('.uid.uid-' + smartRUtils.makeSafeForCSS(d.UID))
+                        .classed('highlight', true);
 
                     var html = '';
                     for (var key in d) {
@@ -265,7 +212,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 });
 
             function getValueForSquareSorting(patientID, uid) {
-                var square = d3.select('.square' + '.patientID-' + patientID + '.uid-' + uid);
+                var square = d3.select('.square' + '.patientID-' + smartRUtils.makeSafeForCSS(patientID) +
+                    '.uid-' + smartRUtils.makeSafeForCSS(uid));
                 return square[0][0] != null ? square.property('__data__').ZSCORE : Number.NEGATIVE_INFINITY;
             }
 
@@ -321,7 +269,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .append('text')
                 .attr('class', 'text rowSortText')
                 .attr('transform', function (d, i) {
-                    return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' + (i * gridFieldHeight + 0.5 * gridFieldHeight) + ')rotate(-90)';
+                    return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' +
+                        (i * gridFieldHeight + 0.5 * gridFieldHeight) + ')rotate(-90)';
                 })
                 .attr('dy', '0.35em')
                 .attr('text-anchor', 'middle')
@@ -330,7 +279,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             rowSortText.transition()
                 .duration(animationDuration)
                 .attr('transform', function (d, i) {
-                    return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' + (i * gridFieldHeight + 0.5 * gridFieldHeight) + ')rotate(-90)';
+                    return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' +
+                        (i * gridFieldHeight + 0.5 * gridFieldHeight) + ')rotate(-90)';
                 });
 
             var rowSortBox = rowSortItems.selectAll('.rowSortBox')
@@ -441,7 +391,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             selectText.enter()
                 .append('text')
                 .attr('class', function (d) {
-                    return 'text selectText patientID-' + d;
+                    return 'text selectText patientID-' + smartRUtils.makeSafeForCSS(d);
                 })
                 .attr('x', function (d, i) {
                     return i * gridFieldWidth + 0.5 * gridFieldWidth;
@@ -493,7 +443,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             patientID.enter()
                 .append('text')
                 .attr('class', function (d) {
-                    return 'patientID patientID-' + d;
+                    return 'patientID patientID-' + smartRUtils.makeSafeForCSS(d);
                 })
                 .attr('transform', function (d) {
                     return 'translate(' + (patientIDs.indexOf(d) * gridFieldWidth) + ',0)' +
@@ -519,7 +469,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             uid.enter()
                 .append('text')
                 .attr('class', function (d) {
-                    return 'uid text uid-' + d;
+                    return 'uid text uid-' + smartRUtils.makeSafeForCSS(d);
                 })
                 .attr('x', width + gridFieldWidth + 7)
                 .attr('y', function (d) {
@@ -550,7 +500,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             bar.enter()
                 .append('rect')
                 .attr('class', function (d) {
-                    return 'bar idx-' + d.idx;
+                    return 'bar idx-' + smartRUtils.makeSafeForCSS(d.idx);
                 })
                 .attr('width', function (d) {
                     return histogramScale(d.significance)
@@ -572,9 +522,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                         .html(html)
                         .style('left', smartRUtils.mouseX(root) + 'px')
                         .style('top', smartRUtils.mouseY(root) + 'px');
-                    d3.selectAll('.square.uid-' + uids[d.idx])
+                    d3.selectAll('.square.uid-' + smartRUtils.makeSafeForCSS(uids[d.idx]))
                         .classed('squareHighlighted', true);
-                    d3.select('.uid.uid-' + uids[d.idx])
+                    d3.select('.uid.uid-' + smartRUtils.makeSafeForCSS(uids[d.idx]))
                         .classed('highlight', true);
                 })
                 .on('mouseout', function () {
@@ -599,17 +549,20 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                     return d.significance > 0 ? 'steelblue' : '#990000';
                 });
 
-            var featurePosY = -gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) - features.length * gridFieldWidth / 2 - 20;
+            var featurePosY = -gridFieldWidth * 2 - getMaxWidth(d3.selectAll('.patientID')) -
+                features.length * gridFieldWidth / 2 - 20;
 
             var extraSquare = featureItems.selectAll('.extraSquare')
                 .data(extraFields, function (d) {
-                    return 'patientID-' + d.PATIENTID + '-feature-' + d.FEATURE;
+                    return 'patientID-' + smartRUtils.makeSafeForCSS(d.PATIENTID) +
+                        '-feature-' + smartRUtils.makeSafeForCSS(d.FEATURE);
                 });
 
             extraSquare.enter()
                 .append('rect')
                 .attr('class', function (d) {
-                    return 'extraSquare patientID-' + d.PATIENTID + ' feature-' + d.FEATURE;
+                    return 'extraSquare patientID-' + smartRUtils.makeSafeForCSS(d.PATIENTID) +
+                        ' feature-' + smartRUtils.makeSafeForCSS(d.FEATURE);
                 })
                 .attr('x', function (d) {
                     return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth;
@@ -623,8 +576,10 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('ry', 0)
                 .style('fill', 'white')
                 .on('mouseover', function (d) {
-                    d3.select('.patientID.patientID-' + d.PATIENTID).classed('highlight', true);
-                    d3.select('.feature.feature-' + d.FEATURE).classed('highlight', true);
+                    d3.select('.patientID.patientID-' + smartRUtils.makeSafeForCSS(d.PATIENTID))
+                        .classed('highlight', true);
+                    d3.select('.feature.feature-' + smartRUtils.makeSafeForCSS(d.FEATURE))
+                        .classed('highlight', true);
                     var html = '';
                     for (var key in d) {
                         html += key + ': ' + d[key] + '<br/>';
@@ -660,7 +615,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             feature.enter()
                 .append('text')
                 .attr('class', function (d) {
-                    return 'feature text feature-' + d;
+                    return 'feature text feature-' + smartRUtils.makeSafeForCSS(d);
                 })
                 .attr('x', width + gridFieldWidth + 7)
                 .attr('y', function (d) {
@@ -688,7 +643,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .append('text')
                 .attr('class', 'text featureSortText')
                 .attr('transform', function (d) {
-                    return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' + (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) + ')rotate(-90)';
+                    return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' +
+                        (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) +
+                        ')rotate(-90)';
                 })
                 .attr('dy', '0.35em')
                 .attr('text-anchor', 'middle')
@@ -697,7 +654,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             featureSortText.transition()
                 .duration(animationDuration)
                 .attr('transform', function (d) {
-                    return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' + (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) + ')rotate(-90)';
+                    return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' +
+                        (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) +
+                        ')rotate(-90)';
                 });
 
             var featureSortBox = featureItems.selectAll('.featureSortBox')
@@ -721,7 +680,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                         var patientID = patientIDs[i];
                         var value = (-Math.pow(2, 32)).toString();
                         try {
-                            var square = d3.select('.extraSquare' + '.patientID-' + patientID + '.feature-' + feature);
+                            var square = d3.select('.extraSquare' + '.patientID-' +
+                                smartRUtils.makeSafeForCSS(patientID) + '.feature-' +
+                                smartRUtils.makeSafeForCSS(feature));
                             value = square.property('__data__').VALUE;
                         } catch (err) {
                             missingValues = true;
@@ -744,7 +705,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                         sortValues.push(featureValues[i][0]);
                     }
                     if (missingValues) {
-                        alert('Feature is missing for one or more patients.\nEvery missing value will be set to lowest possible value for sorting;');
+                        alert('Feature is missing for one or more patients.\n' +
+                            'Every missing value will be set to lowest possible value for sorting;');
                     }
                     updateColOrder(sortValues);
                 });
@@ -809,8 +771,10 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                     return i < cutoff;
                 })
                 .each(function (d) {
-                    d3.select('.bar.idx-' + d[0]).classed('cuttoffHighlight', true);
-                    d3.selectAll('.square.uid-' + uids[d[0]]).classed('cuttoffHighlight', true);
+                    d3.select('.bar.idx-' + smartRUtils.makeSafeForCSS(d[0]))
+                        .classed('cuttoffHighlight', true);
+                    d3.selectAll('.square.uid-' + smartRUtils.makeSafeForCSS(uids[d[0]]))
+                        .classed('cuttoffHighlight', true);
                 });
         }
 
@@ -842,19 +806,18 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         }
 
         function selectCol(patientID) {
-            var colSquares = d3.selectAll('.square.patientID-' + patientID);
+            var colSquares = d3.selectAll('.square.patientID-' + smartRUtils.makeSafeForCSS(patientID));
             if (colSquares.classed('selected')) {
                 var index = selectedPatientIDs.indexOf(patientID);
                 selectedPatientIDs.splice(index, 1);
                 colSquares
                     .classed('selected', false);
-                d3.select('.selectText.patientID-' + patientID)
+                d3.select('.selectText.patientID-' + smartRUtils.makeSafeForCSS(patientID))
                     .text('□');
             } else {
                 selectedPatientIDs.push(patientID);
-                colSquares
-                    .classed('selected', true);
-                d3.select('.selectText.patientID-' + patientID)
+                colSquares.classed('selected', true);
+                d3.select('.selectText.patientID-' + smartRUtils.makeSafeForCSS(patientID))
                     .text('■');
             }
             if (selectedPatientIDs.length !== 0) {
@@ -866,20 +829,71 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             }
         }
 
-        function updateColors(colorIdx) {
-            var colorScale = d3.scale.quantile()
+        function updateColors(schema) {
+            var redGreenScale = d3.scale.quantile()
                 .domain([0, 1])
-                .range(colorSets[colorIdx]);
+                .range(function() {
+                    var colorSet = [];
+                    var NUM = 100;
+                    var i = NUM;
+                    while (i--) {
+                        colorSet.push(d3.rgb((255 * i) / NUM, 0, 0));
+                    }
+                    i = NUM;
+                    while (i--) {
+                        colorSet.push(d3.rgb(0, (255 * (NUM - i)) / NUM, 0));
+                    }
+                    return colorSet.reverse();
+                }());
 
+            var redBlueScale = d3.scale.quantile()
+                .domain([0, 1])
+                .range(function() {
+                    var colorSet = [];
+                    var NUM = 100;
+                    var i = NUM;
+                    while (i--) {
+                        colorSet.push(d3.rgb((255 * i) / NUM, 0, 0));
+                    }
+                    i = NUM;
+                    while (i--) {
+                        colorSet.push(d3.rgb(0, 0, (255 * (NUM - i)) / NUM));
+                    }
+                    return colorSet.reverse();
+                }());
+
+            var blueScale = d3.scale.linear()
+                .domain([0, 1])
+                .range(['#0000ff', '#e5e5ff']);
+
+            var greenScale = d3.scale.linear()
+                .domain([0, 1])
+                .range(['#00ff00', '#e5ffe5']);
+
+            var colorSchemas = {
+                redGreen: redGreenScale,
+                blueScale: blueScale,
+                redBlue: redBlueScale,
+                greenScale: greenScale
+            };
+            var colorScale = colorSchemas[schema];
             d3.selectAll('.square')
                 .transition()
                 .duration(animationDuration)
                 .style('fill', function (d) {
                     return colorScale(1 / (1 + Math.pow(Math.E, -d.ZSCORE)));
                 });
-            for (var i = 0; i < features.length; i++) {
-                var feature = features[i];
-                d3.selectAll('.extraSquare.feature-' + feature)
+
+            var featureColorSetBinary = ['#FF8000', '#FFFF00'];
+            var featureColorSetSequential = [
+                'rgb(247,252,253)', 'rgb(224,236,244)', 'rgb(191,211,230)',
+                'rgb(158,188,218)', 'rgb(140,150,198)', 'rgb(140,107,177)',
+                'rgb(136,65,157)', 'rgb(129,15,124)', 'rgb(77,0,75)'
+            ];
+            var featureColorCategorical = d3.scale.category10();
+
+            features.forEach(function(feature) {
+                d3.selectAll('.extraSquare.feature-' + smartRUtils.makeSafeForCSS(feature))
                     .style('fill', function (d) {
                         switch (d.TYPE) {
                             case 'binary':
@@ -891,7 +905,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                                 return featureColorCategorical(d.VALUE);
                         }
                     });
-            }
+            });
         }
 
         function unselectAll() {
@@ -909,7 +923,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         function createColDendrogram() {
             var w = 200;
             var colDendrogramWidth = gridFieldWidth * numberOfClusteredColumns;
-            var spacing = gridFieldWidth * 2 + getMaxWidth(d3.selectAll('.patientID')) + features.length * gridFieldHeight / 2 + 40;
+            var spacing = gridFieldWidth * 2 + getMaxWidth(d3.selectAll('.patientID')) +
+                features.length * gridFieldHeight / 2 + 40;
 
             var cluster = d3.layout.cluster()
                 .size([colDendrogramWidth, w])
@@ -1025,7 +1040,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                         }
                     }).done(function (serverAnswer) {
                         var sessionID = serverAnswer.match(/tmp_\d+/)[0];
-                        var url = 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=' + sessionID + '&list=gene_list_1__1&list_size=15&org=human';
+                        var url = 'http://biocompendium.embl.de/' +
+                            'cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=' +
+                            sessionID + '&list=gene_list_1__1&list_size=15&org=human';
                         window.open(url);
                     }).fail(function () {
                         alert('An error occurred. Maybe the external resource is unavailable.');
@@ -1133,7 +1150,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         function init() {
             updateHeatmap();
             reloadDendrograms();
-            updateColors(0);
+            updateColors('redGreen');
         }
 
         init();
@@ -1226,33 +1243,27 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             items: [
                 {
                     callback: function () {
-                        updateColors(0);
+                        updateColors('redGreen');
                     },
-                    label: 'Color Sheme 1'
+                    label: 'Red to Green Schema'
                 },
                 {
                     callback: function () {
-                        updateColors(1);
+                        updateColors('redBlue');
                     },
-                    label: 'Color Sheme 2'
+                    label: 'Red to Blue Schema'
                 },
                 {
                     callback: function () {
-                        updateColors(2);
+                        updateColors('blueScale');
                     },
-                    label: 'Color Sheme 3'
+                    label: 'Blue Schema'
                 },
                 {
                     callback: function () {
-                        updateColors(3);
+                        updateColors('greenScale');
                     },
-                    label: 'Color Sheme 4'
-                },
-                {
-                    callback: function () {
-                        updateColors(4);
-                    },
-                    label: 'Color Sheme 5'
+                    label: 'Green Schema'
                 }
             ]
         });
