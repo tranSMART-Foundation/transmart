@@ -50,6 +50,8 @@ echo "++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE/transmart-data
 
+source ./vars
+
 make update_datasets
 
 while read F  ; do
@@ -63,7 +65,7 @@ while read F  ; do
     make -C samples/postgres load_expression_$F
 	echo "************************ done loading $F *************************"
 	echo ""
-done < $SCRIPTS_BASE/install-ubuntu/datasetList.txt
+done < $SCRIPTS_BASE/Scripts/install-ubuntu/datasetList.txt
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Done loading studies"
