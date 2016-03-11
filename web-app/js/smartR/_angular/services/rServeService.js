@@ -20,40 +20,49 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
     var workflow = '';
     /* returns a promise with the session id and
      * saves the session id for future calls */
-    service.startSession = function rServeService_startSession(name) {
+    service.startSession = function(name) {
         workflow = name;
-        return $.ajax({
-                url: pageInfo.basePath + '/RSession/create',
-                type: 'POST',
-                timeout: TIMEOUT,
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    workflow: workflow
-                })
-            })
+        return $http({
+            url: pageInfo.basePath + '/RSession/create',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            config: {
+                timeout: TIMEOUT
+            },
+            data: {
+                workflow: workflow
+            }
+        })
             .then(function(response) {
-                return response.sessionId;
-            }, transformAjaxFailure)
-            .done((function(sessionId) {
-                state.sessionId = sessionId;
-                rServeService_scheduleTouch.call(this);
-            }).bind(this));
+                state.sessionId = response.data.sessionId;
+                rServeService_scheduleTouch();
+            }, transformAjaxFailure);
+
     };
 
-    service.touch = function rServeService_touch(sessionId) {
+    service.touch = function(sessionId) {
         if (sessionId != state.sessionId) {
             return;
         }
 
-        $.ajax({
+        return $http({
             url: pageInfo.basePath + '/RSession/touch',
-            type: 'POST',
-            timeout: TIMEOUT,
-            contentType: 'application/json',
-            data: JSON.stringify( {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            config: {
+                timeout: TIMEOUT
+            },
+            data: {
                 sessionId: sessionId
+            }
+        })
+            .finally(function() {
+                rServeService_scheduleTouch(); // schedule another
             })
-        }).done(rServeService_scheduleTouch.bind(this)); // schedule another
     };
 
     function rServeService_scheduleTouch() {
@@ -64,36 +73,49 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
         }, SESSION_TOUCH_DELAY);
     }
 
-    service.destroySession = function rServeService_destroySession(sessionId) {
-        console.log('about to destroy session ..');
+    service.destroySession = function(sessionId) {
         sessionId = sessionId || state.sessionId;
 
         if (!sessionId) {
-            throw new Error('No session to destroy');
+            return;
         }
 
-        return $.ajax({
-                url: pageInfo.basePath + '/RSession/delete',
-                type: 'POST',
-                timeout: TIMEOUT,
-                contentType: 'application/json',
-                data: JSON.stringify( {
-                    sessionId: sessionId
-                })
-            })
-            .then(function(x) { return x; }, transformAjaxFailure)
-            .done(function() {
-                if (state.sessionId != sessionId) {
-                    return;
+        return $http({
+            url: pageInfo.basePath + '/RSession/delete',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            config: {
+                timeout: TIMEOUT
+            },
+            data: {
+                sessionId: sessionId
+            }
+        })
+            .catch(transformAjaxFailure)
+            .finally(function() {
+                if (state.sessionId == sessionId) {
+                    service.abandonCurrentSession();
                 }
-                this.abandonCurrentSession();
-            }.bind(this));
+            });
     };
 
-    service.abandonCurrentSession = function rServeService_abandonSession() {
+    service.abandonCurrentSession = function() {
         window.clearTimeout(state.touchTimeout);
         state.sessionId = null;
     };
+
+    service.destroyAndStartSession = function(workflowName) {
+
+        // delete session before creating a new one
+        $q.when(service.destroySession())
+            .then(function() {
+                // start a new session
+                service.startSession(workflowName);
+            });
+
+    }
 
     /*
      * taskData = {
@@ -109,7 +131,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
      *   statusText: <a description of the error>,
      * }
      */
-    service.startScriptExecution = function rServeService_startScriptExecution(taskDataOrig) {
+    service.startScriptExecution = function(taskDataOrig) {
 
         var taskData = $.extend({}, taskDataOrig); // clone the thing
         state.currentRequestAbort();
@@ -237,13 +259,13 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
         }, transformAjaxFailure);
     }
 
-    function transformAjaxFailure(jqXHR, textStatus, errorThrown) {
+    function transformAjaxFailure(response) {
         var ret = {
-            status: jqXHR.status,
-            statusText: jqXHR.statusText
+            status: response.status,
+            statusText: response.statusText
         };
-        if (jqXHR.responseJSON !== undefined) {
-            ret.response = jqXHR.responseJSON;
+        if (response.data !== undefined) {
+            ret.response = response.data;
         }
 
         return ret;
@@ -258,7 +280,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
     };
 
 
-    service.urlForFile = function rServeService_urlForFile(executionId, filename) {
+    service.urlForFile = function(executionId, filename) {
         return pageInfo.basePath +
             '/ScriptExecution/downloadFile?sessionId=' +
             state.sessionId +
@@ -268,7 +290,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
             filename;
     };
 
-    service.loadDataIntoSession = function rServeService_loadDataIntoSession(conceptKeys, dataConstraints) {
+    service.loadDataIntoSession = function(conceptKeys, dataConstraints) {
         return $q( function(resolve, reject) {
             smartRUtils.getSubsetIds().then(
                 function(subsets) {
@@ -297,7 +319,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
         });
     };
 
-    service.executeSummaryStats = function rServeService_executeSummaryStats(phase) {
+    service.executeSummaryStats = function(phase) {
         return $q( function(resolve, reject) {
             service.startScriptExecution({
                 taskType: 'summary',
@@ -323,7 +345,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
         });
     };
 
-    service.composeSummaryResults = function rServeService_composeSummaryResults (files, executionId, phase) {
+    service.composeSummaryResults = function(files, executionId, phase) {
         return $q(function (resolve, reject) {
             var retObj = {summary : []},
                 fileExt = {fetch : ['.png', 'json'], preprocess :['all.png', 'all.json']};
@@ -366,7 +388,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
         });
     };
 
-    service.preprocess = function rServeService_preprocess (args) {
+    service.preprocess = function(args) {
         return $q(function (resolve, reject) {
             service.startScriptExecution({
                 taskType: 'preprocess',

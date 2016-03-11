@@ -91,7 +91,7 @@
             <run-button button-name="Create Plot"
                         store-results-in="runAnalysis.scriptResults"
                         script-to-run="run"
-                        arguments-to-use="runParams"
+                        arguments-to-use="runAnalysis.params"
                         serialized="true"
                         disabled="runAnalysis.disabled">
             </run-button>
