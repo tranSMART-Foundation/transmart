@@ -50,7 +50,14 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
     writeRunParams(max_rows, sorting, ranking)
     measurements <- cleanUp(df)  # temporary stats like SD and MEAN need
     # to be removed for clustering to work
-    measurements <- getMeasurements(measurements)
+
+    # discard UID column
+    if (ncol(df) > 2){
+        measurements <- measurements[, 2:ncol(measurements)]
+    } else {
+        measurements <- measurements[2]
+    }
+
     measurements <- toZscores(measurements)
     if (is.na(significanceValues)) {
         jsn$warnings <- append(jsn$warnings, c("Significance sorting could not be done due to insufficient data"))
