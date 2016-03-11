@@ -28,6 +28,14 @@ window.smartRApp.directive('fetchButton',
                     template_btn.disabled = newValue;
                 }, true);
 
+                scope.$watch('summaryData', function (newSummaryData) {
+                    if (newSummaryData.hasOwnProperty('allSamples')) { // when everything is retrieved
+                        console.log(newSummaryData);
+                        processService.onFetching(false, processService.status.SUCCESS);
+                        template_btn.disabled = false;
+                    }
+                }, true);
+
                 template_btn.onclick = function() {
 
                     var _init = function () {
@@ -78,11 +86,9 @@ window.smartRApp.directive('fetchButton',
                                     template_msg.innerHTML = 'Success: ' + data.msg;
                                 }, function(msg) {
                                     template_msg.innerHTML = 'Failure: ' + msg;
-                                })
-                                .finally(function () {
                                     processService.onFetching(false);
                                     template_btn.disabled = false;
-                                });
+                                })
                         },
                         conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap),
                         dataConstraints = _getDataConstraints(scope.biomarkers);

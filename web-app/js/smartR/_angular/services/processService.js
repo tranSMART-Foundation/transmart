@@ -9,12 +9,24 @@ window.smartRApp.factory('processService', [ function() {
         DOWNLOAD_BTN = 'downloadResultsButton',
 
         service = {
-            buttons : {}
+            buttons : {},
+            status : {
+                SUCCESS : 'success',
+                INPROGRESS : 'inprogress',
+                ERROR : 'error'
+            }
         };
 
     var _toggleButton = function (label, value) {
         if (service.buttons.hasOwnProperty(label)) {
             service.buttons[label].disabled = value;
+        }
+    };
+
+    // TODO
+    var _toggleRankCriteria = function (label, noOfSubsets) {
+        if (noOfSubsets > 1) {
+
         }
     };
 
@@ -28,14 +40,20 @@ window.smartRApp.factory('processService', [ function() {
         service.buttons[label] = button;
     };
 
-    service.onFetching = function (value) {
-        _toggleButton(PREPROCESS_BTN, value);
+    service.onFetching = function (value, status) {
         _toggleButton(RUN_BTN, value);
         if (value) {
             _emptyResult(PREPROCESS_BTN, 'summaryData');
             _emptyResult(RUN_BTN, 'storage');
             _toggleButton(CAPTURE_BTN, true);
             _toggleButton(DOWNLOAD_BTN, true);
+        }
+        if (!value && status === service.status.SUCCESS) {
+            // toggle preprocess button based on number of fetched samples
+            // disable it when sample only one.
+            _toggleButton(PREPROCESS_BTN, service.buttons[FETCH_BTN].summaryData.allSamples <= 1);
+        } else {
+            _toggleButton(PREPROCESS_BTN, value);
         }
     };
 
