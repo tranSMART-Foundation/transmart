@@ -1,19 +1,5 @@
 #!/bin/bash
 
-echo "--------------------------------------------"
-echo "To load datasets, use the these two files in the Scripts directory:
-echo "    datasetsList.txt - the list of posible datasets to load, and"
-echo "    load_datasets.sh - the script to load the datasets. "
-echo ""
-echo "First, in the file datasetsList.txt, un-comment the lines that "
-echo "corresponding to the data sets you wish to load. "
-echo ""
-echo "Then run the file load_datasets.sh"
-echo ""
-echo "-- Note that loading the same dataset twice is not recommended" 
-echo "   and may produce unpredictable results"
-echo "--------------------------------------------"
-
 if [ -z "$SCRIPTS_BASE" ] ; then SCRIPTS_BASE="$HOME" ; fi
 
 echo "Starting at $(date)"
@@ -33,6 +19,22 @@ else
 fi
 echo "Finished checking locations of Script Directory at $(date)"
 
+echo "--------------------------------------------"
+echo "To load datasets, use the these two files in the Scripts directory: "
+echo "    datasetsList.txt - the list of posible datasets to load, and"
+echo "    load_datasets.sh - the script to load the datasets. "
+echo ""
+echo "First, in the file datasetsList.txt, un-comment the lines that "
+echo "corresponding to the data sets you wish to load. "
+echo ""
+echo "Then run the file load_datasets.sh with:"
+echo "    cd $SCRIPTS_BASE"
+echo "    ./Scripts/install-ubuntu/load_datasets.sh"
+echo ""
+echo "-- Note that loading the same dataset twice is not recommended" 
+echo "   and may produce unpredictable results"
+echo "--------------------------------------------"
+
 echo "++++++++++++++++++++++++++++"
 echo "+  Checking locations of working dir (tranSMART install base) "
 echo "++++++++++++++++++++++++++++"
@@ -40,7 +42,7 @@ echo "++++++++++++++++++++++++++++"
 if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
 export INSTALL_BASE
 
-echo "tranSMART will be installed at this location: $INSTALL_BASE"
+echo "transmart-data is installed at this location: $INSTALL_BASE/transmart-data"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Load studies from the uncommented lines in datasetsList.txt "
@@ -61,7 +63,7 @@ while read F  ; do
     make -C samples/postgres load_expression_$F
 	echo "************************ done loading $F *************************"
 	echo ""
-done < datasetList.txt
+done < $SCRIPTS_BASE/install-ubuntu/datasetList.txt
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Done loading studies"

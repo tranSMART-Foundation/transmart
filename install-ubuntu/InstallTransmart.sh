@@ -12,8 +12,8 @@
 #   git clone https://github.com/tranSMART-Foundation/Scripts.git
 #
 # to run the install scripts
-#   cd ~
-#   /Scripts/install-ubuntu/InstallTransmart.sh
+#   cd $HOME
+#   ./Scripts/install-ubuntu/InstallTransmart.sh
 #
 # to run the checking scripts
 #   Scripts/install-ubuntu/checks/checkAll.sh
@@ -351,10 +351,10 @@ fi
 
 cd war-files
 if ! [ -e transmart.war ]; then
-	curl http://75.124.74.64/wars/transmart.V1.2.4.war --output transmart.war
+	curl http://75.124.74.64/wars/transmart.V1.2.5-Beta.war --output transmart.war
 fi
 if ! [ -e gwava.war ]; then
-	curl http://75.124.74.64/wars/gwava.V1.2.4.war --output gwava.war
+	curl http://75.124.74.64/wars/gwava.V1.2.5-Beta.war --output gwava.war
 fi
 sudo cp *.war /var/lib/tomcat7/webapps/
 
@@ -430,7 +430,9 @@ echo ""
 echo "First, in the file datasetsList.txt, un-comment the lines that "
 echo "corresponding to the data sets you wish to load. "
 echo ""
-echo "Then run the file load_datasets.sh"
+echo "Then run the file load_datasets.sh with:"
+echo "    cd $SCRIPTS_BASE"
+echo "    ./Scripts/install-ubuntu/load_datasets.sh"
 echo ""
 echo "-- Note that loading the same dataset twice is not recommended" 
 echo "   and may produce unpredictable results"
