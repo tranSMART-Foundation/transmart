@@ -332,6 +332,7 @@ source ./vars
 make -C config install
 sudo mkdir -p /usr/share/tomcat7/.grails/transmartConfig/
 sudo cp $HOME/.grails/transmartConfig/*.groovy /usr/share/tomcat7/.grails/transmartConfig/
+sudo chown -R tomcat7:tomcat7 /usr/share/tomcat7/.grails
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
 ./checkFilesConfig.sh
