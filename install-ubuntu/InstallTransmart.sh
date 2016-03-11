@@ -437,7 +437,5 @@ echo "    ./Scripts/install-ubuntu/load_datasets.sh"
 echo ""
 echo "-- Note that loading the same dataset twice is not recommended" 
 echo "   and may produce unpredictable results"
-echo "--------------------------------------------"
-
-exit 0
+echo "--------------------------------------------
 
