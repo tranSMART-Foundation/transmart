@@ -180,7 +180,8 @@ function createD3Dropdown(args) {
                 .duration(300)
                 .style('visibility', 'visible')
                 .attr('y', function(d) {
-                    var idx = args.items.findIndex(function(item) { return item.label === d.label })
+                    var labels = args.items.map(function(item) { return item.label; });
+                    var idx = labels.indexOf(d.label);
                     return 2 + args.y + (idx + 1) * args.height
                 })
 
@@ -189,7 +190,8 @@ function createD3Dropdown(args) {
                 .duration(300)
                 .style('visibility', 'visible')
                 .attr('y', function(d) {
-                    var idx = args.items.findIndex(function(item) { return item.label === d.label })
+                    var labels = args.items.map(function(item) { return item.label; });
+                    var idx = labels.indexOf(d.label);
                     return 2 + args.y + (idx + 1) * args.height + args.height / 2
                 })
 
