@@ -371,6 +371,7 @@ echo "++++++++++++++++++++++++++++"
 cd $INSTALL_BASE/transmart-data
 sudo -v
 source ./vars
+#  (TODO)  Should check to see if it is already running
 make -C solr start > $INSTALL_BASE/transmart-data/solr.log 2>&1 & 
 echo "Sleeping - waiting for SOLR to start (2 minutes)"
 sleep 2m
@@ -383,6 +384,7 @@ echo "++++++++++++++++++++++++++++"
 
 # the (commented out) service command is the correct way to do this
 # and unfortunately, this does not work either.
+#  (TODO)  Should check to see if it is already running
 sudo -v
 cd $SCRIPTS_BASE/Scripts/install-ubuntu
 sudo -u tomcat7 bash -c "INSTALL_BASE=\"$INSTALL_BASE\" ./runRServe.sh"
@@ -393,6 +395,7 @@ echo "++++++++++++++++++++++++++++"
 echo "+  start Tomcat"
 echo "++++++++++++++++++++++++++++"
 
+#  (TODO)  Should check to see if it is already running
 sudo service tomcat7 restart
 echo "Finished starting Tomcat7 at $(date)"
 echo "Sleeping - waiting for tomcat/transmart to start (3 minutes)"
@@ -420,7 +423,7 @@ echo "++++++++++++++++++++++++++++"
 echo "Finished install of basic transmart system at $(date)"
 
 echo "--------------------------------------------"
-echo "To load datasets, use the these two files in the Scripts directory:
+echo "To load datasets, use the these two files in the Scripts directory: "
 echo "    datasetsList.txt - the list of posible datasets to load, and"
 echo "    load_datasets.sh - the script to load the datasets. "
 echo ""

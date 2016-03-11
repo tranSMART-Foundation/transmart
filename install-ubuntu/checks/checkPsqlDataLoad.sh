@@ -82,10 +82,10 @@ if [ "$runWithEcho" -eq 0 ]  ; then
 	echo "The transmartApp user 'guest' exists."
 fi
 
-results=$(sudo -u postgres psql transmart --command="select count(*) from i2b2demodata.concept_dimension'" | grep "0")
+results=$(sudo -u postgres psql transmart --command="select count(*) from i2b2demodata.concept_dimension" | grep "0")
 if [ -z "$results" ]; then
 	if [ "$runWithEcho" -eq 0 ]  ; then
-		echo "No demo data has been loaded in the transmartApp database"
+		echo "No demo data has been loaded in the transmartApp database."
 		echo "  This is expected at this point in the install process."
 		echo "  This message is just a reminder to load demo data as per the script 'load_datasets.sh'."
 	fi
