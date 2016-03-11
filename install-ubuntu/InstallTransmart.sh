@@ -297,7 +297,7 @@ echo "Finished installing R and R packages at $(date)"
 
 
 echo "++++++++++++++++++++++++++++"
-echo "+  Set up basic PostgreSQL; supports transmart login
+echo "+  Set up basic PostgreSQL; supports transmart login"
 echo "++++++++++++++++++++++++++++"
 
 # only load database if not already loaded
