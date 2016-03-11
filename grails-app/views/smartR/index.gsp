@@ -5,14 +5,11 @@
     <br>
 
     <div align="left">
-        <div class="sr-landing-dropdown" align="center">
-            <button class="sr-landing-dropBtn">SmartR Workflows</button>
-            <div class="sr-landing-dropdown-content" style="position: relative">
-                <g:each in="${scriptList}">
-                    <span ng-click="template='${it}'"> ${it.capitalize() + ' Workflow'} </span>
-                </g:each>
-            </div>
-        </div>
+        <g:select name="sr-workflowSelect"
+                  from="${scriptList}"
+                  noSelection="${['': 'Please select a workflow']}"
+                  optionValue="${{it.capitalize() + ' Workflow'}}"
+                  ng-model="template"/>
     </div>
 
     <div style="width: 50%; margin: 0 auto; text-align: center">

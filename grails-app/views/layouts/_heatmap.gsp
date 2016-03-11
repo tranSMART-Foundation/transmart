@@ -10,7 +10,7 @@
                 concept-group="fetch.conceptBoxes.highDimensional"
                 type="HD"
                 min="1"
-                max="1"
+                max="512"
                 label="High Dimensional"
                 tooltip="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box. The nodes needs to be from the same platform.">
             </concept-box>
@@ -91,7 +91,7 @@
             <run-button button-name="Create Plot"
                         store-results-in="runAnalysis.scriptResults"
                         script-to-run="run"
-                        arguments-to-use="runParams"
+                        arguments-to-use="runAnalysis.params"
                         serialized="true"
                         disabled="runAnalysis.disabled">
             </run-button>

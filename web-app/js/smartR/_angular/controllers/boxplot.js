@@ -1,14 +1,8 @@
 
 window.smartRApp.controller('BoxplotController',
-    ['$scope', 'smartRUtils', 'rServeService', '$css', function($scope, smartRUtils, rServeService, $css) {
+    ['$scope', 'smartRUtils', 'commonWorkflowService', function($scope, smartRUtils, commonWorkflowService) {
 
-        // load workflow specific css
-        $css.bind({
-            href: $scope.smartRPath + '/css/boxplot.css'
-        }, $scope);
-
-        // initialize service
-        rServeService.startSession('boxplot');
+        commonWorkflowService.initializeWorkflow('boxplot', $scope);
 
         // model
         $scope.conceptBoxes = {
