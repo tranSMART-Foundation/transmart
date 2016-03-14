@@ -115,7 +115,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
                 service.startSession(workflowName);
             });
 
-    }
+    };
 
     /*
      * taskData = {
@@ -347,8 +347,8 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
 
     service.composeSummaryResults = function(files, executionId, phase) {
         return $q(function (resolve, reject) {
-            var retObj = {summary : []},
-                fileExt = {fetch : ['.png', 'json'], preprocess :['all.png', 'all.json']};
+            var retObj = {summary : [], allSamples : 0},
+                fileExt = {fetch : ['.png', 'json'], preprocess :['all.png', 'all.json']},
 
                 // find matched items in an array by key
                 _find = function composeSummaryResults_find (key, array) {
@@ -367,6 +367,10 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
                     return $q(function (resolve, reject) {
                         service.downloadJsonFile(executionId, json).then(
                             function (d) {
+                                retObj.subsets = d.data.length;
+                                d.data.forEach(function (subset) {
+                                    retObj.allSamples += subset.numberOfSamples;
+                                });
                                 resolve({img: service.urlForFile(executionId, img), json:d})
                             },
                             function (err) {reject(err);}
@@ -375,7 +379,8 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
                 };
 
             // first identify image and json files
-            var _images = _find(fileExt[phase][0], files),_jsons = _find(fileExt[phase][1], files);
+            var _images = _find(fileExt[phase][0], files),
+                _jsons = _find(fileExt[phase][1], files);
 
             // load each json file contents
             for (var i = 0; i < _images.length; i++){

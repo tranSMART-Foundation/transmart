@@ -28,7 +28,7 @@ window.smartRApp.directive('downloadResultsButton', ['rServeService', 'processSe
 
             var template_msg = element.children()[1];
 
-            processService.registerButton(scope, 'downloadResultsButton');
+            processService.registerComponent(scope, 'downloadResultsButton');
 
             scope.$watch('disabled', function (newValue) {
                 template_btn.disabled = Boolean(newValue);

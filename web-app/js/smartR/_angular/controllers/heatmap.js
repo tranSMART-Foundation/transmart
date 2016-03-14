@@ -43,6 +43,7 @@ window.smartRApp.controller('HeatmapController',
             download : {
                 disabled : true
             },
+            subsets : 0,
             scriptResults : {}
         };
     }]);

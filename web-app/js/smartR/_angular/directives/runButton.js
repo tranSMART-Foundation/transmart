@@ -22,7 +22,7 @@ window.smartRApp.directive('runButton',
                     serialized = scope.serialized;
 
                 template_btn.disabled = scope.disabled;
-                processService.registerButton(scope, 'runButton');
+                processService.registerComponent(scope, 'runButton');
 
                 scope.$watch('disabled', function (newValue) {
                     template_btn.disabled = newValue;

@@ -20,7 +20,7 @@ window.smartRApp.directive('conceptBox', ['$rootScope', 'processService', functi
                 template_btn = element[0].querySelector('.sr-drop-btn'),
                 template_tooltip = element[0].querySelector('.sr-tooltip-dialog');
 
-            processService.registerButton(scope, 'conceptBox');
+            processService.registerComponent(scope, 'conceptBox');
 
             scope.$watch('conceptGroup', function (newValue) {
                 if (angular.isArray(newValue)) {
