@@ -12,7 +12,8 @@
                 min="1"
                 max="512"
                 label="High Dimensional"
-                tooltip="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box. The nodes needs to be from the same platform.">
+                tooltip="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box.
+                The nodes needs to be from the same platform.">
             </concept-box>
 
             %{--TODO include low dimensions--}%

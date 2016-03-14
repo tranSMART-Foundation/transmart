@@ -2,7 +2,7 @@
 
 'use strict';
 
-window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
+window.smartRApp.directive('conceptBox', ['$rootScope', 'processService', function($rootScope, processService) {
 
     return {
         restrict: 'E',
@@ -19,6 +19,16 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
             var template_box = element[0].querySelector('.sr-drop-input'),
                 template_btn = element[0].querySelector('.sr-drop-btn'),
                 template_tooltip = element[0].querySelector('.sr-tooltip-dialog');
+
+            processService.registerButton(scope, 'conceptBox');
+
+            scope.$watch('conceptGroup', function (newValue) {
+                if (angular.isArray(newValue)) {
+                    if (newValue.length > 0) {
+                        processService.toggleButton('fetchButton', false)
+                    }
+                }
+            }, true);
 
             // instantiate tooltips
             $(template_tooltip).tooltip({track: true, tooltipClass:"sr-ui-tooltip"});

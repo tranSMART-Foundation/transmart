@@ -9,6 +9,7 @@ window.smartRApp.controller('HeatmapController',
         // Fetch data                                                    //
         // ------------------------------------------------------------- //
         $scope.fetch = {
+            disabled : true,
             conceptBoxes : {
                 highDimensional : [],
                 numerical : [],
@@ -22,6 +23,7 @@ window.smartRApp.controller('HeatmapController',
         // Preprocess                                                    //
         // ------------------------------------------------------------- //
         $scope.preprocess = {
+            disabled : true,
             params :  {
                 aggregateProbes : false
             },
@@ -32,10 +34,14 @@ window.smartRApp.controller('HeatmapController',
         // Run Heatmap                                                   //
         // ------------------------------------------------------------- //
         $scope.runAnalysis = {
+            disabled : true,
             params: {
                 max_row : 100,
                 sorting : 'nodes',
                 ranking : 'coef'
+            },
+            download : {
+                disabled : true
             },
             scriptResults : {}
         };

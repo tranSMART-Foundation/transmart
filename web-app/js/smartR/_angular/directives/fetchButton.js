@@ -28,6 +28,7 @@ window.smartRApp.directive('fetchButton',
                     template_btn.disabled = newValue;
                 }, true);
 
+
                 template_btn.onclick = function() {
 
                     var _init = function () {
