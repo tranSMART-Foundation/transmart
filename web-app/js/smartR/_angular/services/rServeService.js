@@ -348,7 +348,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
     service.composeSummaryResults = function(files, executionId, phase) {
         return $q(function (resolve, reject) {
             var retObj = {summary : [], allSamples : 0},
-                fileExt = {fetch : ['.png', 'json'], preprocess :['all.png', 'all.json']};
+                fileExt = {fetch : ['.png', 'json'], preprocess :['all.png', 'all.json']},
 
                 // find matched items in an array by key
                 _find = function composeSummaryResults_find (key, array) {
