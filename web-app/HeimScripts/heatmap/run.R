@@ -50,7 +50,14 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
     writeRunParams(max_rows, sorting, ranking)
     measurements <- cleanUp(df)  # temporary stats like SD and MEAN need
     # to be removed for clustering to work
-    measurements <- getMeasurements(measurements)
+
+    # discard UID column
+    if (ncol(df) > 2){
+        measurements <- measurements[, 2:ncol(measurements)]
+    } else {
+        measurements <- measurements[2]
+    }
+
     measurements <- toZscores(measurements)
     if (is.na(significanceValues)) {
         jsn$warnings <- append(jsn$warnings, c("Significance sorting could not be done due to insufficient data"))
@@ -400,8 +407,8 @@ addClusteringOutput <- function(jsn, measurements_arg) {
     rowDendrogramManhattanSingle <- computeDendrogram( manhattanDistancesRow, 'single')
     rowDendrogramManhattanAverage <- computeDendrogram( manhattanDistancesRow, 'average')
 
-    calculateOrderInTermsOfIndexes <- function(dendogram, originalOrderedLabels) {
-        clusterOrderedLabels  <- labels(dendogram)
+    calculateOrderInTermsOfIndexes <- function(dendrogram, originalOrderedLabels) {
+        clusterOrderedLabels  <- labels(dendrogram)
 
         allIndexes <- 1 : length(originalOrderedLabels)
         orderOfClustered <- match(clusterOrderedLabels, originalOrderedLabels)
@@ -411,11 +418,11 @@ addClusteringOutput <- function(jsn, measurements_arg) {
         c(orderOfClustered, notIncluded) - 1  # start at 0
     }
 
-    columnOrder <- function(dendogram) {
-        calculateOrderInTermsOfIndexes(dendogram, colnames(measurements_arg))
+    columnOrder <- function(dendrogram) {
+        calculateOrderInTermsOfIndexes(dendrogram, colnames(measurements_arg))
     }
-    rowOrder <- function(dendogram) {
-        calculateOrderInTermsOfIndexes(dendogram, rownames(measurements_arg))
+    rowOrder <- function(dendrogram) {
+        calculateOrderInTermsOfIndexes(dendrogram, rownames(measurements_arg))
     }
 
 
