@@ -75,7 +75,7 @@ window.smartRApp.directive('capturePlotButton', ['processService', function(proc
 
             var template_btn = elements.children()[0];
             template_btn.disabled = true;
-            processService.registerButton(scope, 'captureButton');
+            processService.registerComponent(scope, 'captureButton');
 
             scope.$watch('disabled', function (newValue) {
                 template_btn.disabled = Boolean(newValue);
