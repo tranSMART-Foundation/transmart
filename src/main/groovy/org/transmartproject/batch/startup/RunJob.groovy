@@ -6,12 +6,16 @@ import org.springframework.batch.core.launch.support.CommandLineJobRunner
 import org.transmartproject.batch.backout.BackoutJobSpecification
 import org.transmartproject.batch.clinical.ClinicalJobSpecification
 import org.transmartproject.batch.gwas.GwasJobSpecification
+import org.transmartproject.batch.highdim.acgh.data.AcghDataJobSpecification
+import org.transmartproject.batch.highdim.acgh.platform.AcghAnnotationJobSpecification
 import org.transmartproject.batch.highdim.metabolomics.data.MetabolomicsDataJobSpecification
 import org.transmartproject.batch.highdim.metabolomics.platform.MetabolomicsAnnotationJobSpecification
 import org.transmartproject.batch.highdim.mrna.data.MrnaDataJobSpecification
 import org.transmartproject.batch.highdim.mrna.platform.MrnaAnnotationJobSpecification
 import org.transmartproject.batch.highdim.proteomics.data.ProteomicsDataJobSpecification
 import org.transmartproject.batch.highdim.proteomics.platform.ProteomicsAnnotationJobSpecification
+import org.transmartproject.batch.highdim.rnaseq.data.RnaSeqDataJobSpecification
+import org.transmartproject.batch.highdim.rnaseq.platform.RnaSeqAnnotationJobSpecification
 import org.transmartproject.batch.i2b2.I2b2JobSpecification
 import org.transmartproject.batch.tag.TagsLoadJobSpecification
 
@@ -39,6 +43,10 @@ final class RunJob {
             'proteomics'             : ProteomicsDataJobSpecification,
             'gwas'                   : GwasJobSpecification,
             'backout'                : BackoutJobSpecification,
+            'rnaseq_annotation'      : RnaSeqAnnotationJobSpecification,
+            'rnaseq'                 : RnaSeqDataJobSpecification,
+            'acgh_annotation'        : AcghAnnotationJobSpecification,
+            'acgh'                   : AcghDataJobSpecification,
     ]
 
     OptionAccessor opts

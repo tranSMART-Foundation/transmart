@@ -66,4 +66,18 @@ class TableLists {
             Tables.BIO_ASSAY_ANALYSIS_GWAS,
             Tables.BIO_ASY_ANAL_GWAS_TOP500,
     ]
+
+    public static final List<String> RNA_SEQ_TABLES = [
+            Tables.GPL_INFO,
+            Tables.SUBJ_SAMPLE_MAP,
+            Tables.RNASEQ_DATA,
+            Tables.CHROMOSOMAL_REGION,
+    ]
+
+    public static final List<String> ACGH_TABLES = [
+            Tables.GPL_INFO,
+            Tables.SUBJ_SAMPLE_MAP,
+            Tables.ACGH_DATA,
+            Tables.CHROMOSOMAL_REGION,
+    ]
 }
