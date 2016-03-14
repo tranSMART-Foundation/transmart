@@ -22,15 +22,15 @@ window.smartRApp.directive('fetchButton',
 
                 template_btn.disabled = scope.disabled;
 
-                processService.registerButton(scope, 'fetchButton');
+                processService.registerComponent(scope, 'fetchButton');
 
                 scope.$watch('disabled', function (newValue) {
                     template_btn.disabled = newValue;
                 }, true);
 
                 scope.$watch('summaryData', function (newSummaryData) {
-                    if (newSummaryData.hasOwnProperty('allSamples')) { // when everything is retrieved
-                        console.log(newSummaryData);
+                    if (newSummaryData.hasOwnProperty('allSamples')) {
+                        // when everything is retrieved
                         processService.onFetching(false, processService.status.SUCCESS);
                         template_btn.disabled = false;
                     }

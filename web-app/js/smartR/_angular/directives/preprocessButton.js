@@ -19,7 +19,7 @@ window.smartRApp.directive('preprocessButton', ['rServeService', 'processService
             var template_msg = element.children()[1];
 
             template_btn.disabled = scope.disabled;
-            processService.registerButton(scope,  'preprocessButton');
+            processService.registerComponent(scope,  'preprocessButton');
             
             scope.$watch('disabled', function (newValue) {
                 template_btn.disabled = newValue;
