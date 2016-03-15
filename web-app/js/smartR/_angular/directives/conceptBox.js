@@ -16,6 +16,8 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
         },
         templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/conceptBox.html',
         link: function(scope, element) {
+            scope.instruction = '';
+
             var template_box = element[0].querySelector('.sr-drop-input'),
                 template_btn = element[0].querySelector('.sr-drop-btn'),
                 template_tooltip = element[0].querySelector('.sr-tooltip-dialog');
@@ -50,22 +52,9 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
                 });
             };
 
-            var _setColor = function() {
-                if (scope.conceptGroup.length >= scope.min &&
-                    scope.conceptGroup.length <= scope.max &&
-                    _containsOnly()) {
-                    template_box.style.backgroundColor = 'green';
-                    template_box.style.opacity = 0.5;
-                } else {
-                    template_box.style.backgroundColor = 'red';
-                    template_box.style.opacity = 0.5;
-                }
-            };
-
             // activate drag & drop for our conceptBox and color it once it is rendered
             scope.$evalAsync(function() {
                 _activateDragAndDrop();
-                _setColor();
             });
 
             // bind the button to its clearing functionality
@@ -76,9 +65,27 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
             // this watches the childNodes of the conceptBox and updates the model on change
             new MutationObserver(function() {
                 scope.conceptGroup = _getConcepts(); // update the model
-                _setColor(); // change to red or green color if input okay
                 scope.$apply();
             }).observe(template_box, { childList: true });
+
+            scope.$watch('conceptGroup', scope.validate);
+
+            scope.validate = function() {
+                if (scope.conceptGroup.length < scope.min) {
+                    scope.instruction = 'Drag at least ' + scope.min + ' node(s) into the box';
+                    return false;
+                }
+                if (scope.conceptGroup.length > scope.max) {
+                    scope.instruction = 'Select at most ' + scope.max + ' node(s)';
+                    return false;
+                }
+                if (!_containsOnly()) {
+                    scope.instruction = 'Node(s) do not have the correct type';
+                    return false;
+                }
+                scope.instruction = '';
+                return true;
+            }
         }
     };
 }]);
