@@ -16,7 +16,6 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
         },
         templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/conceptBox.html',
         link: function(scope, element) {
-            scope.instruction = '';
 
             var template_box = element[0].querySelector('.sr-drop-input'),
                 template_btn = element[0].querySelector('.sr-drop-btn'),
@@ -71,20 +70,11 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
             scope.$watch('conceptGroup', scope.validate);
 
             scope.validate = function() {
-                if (scope.conceptGroup.length < scope.min) {
-                    scope.instruction = 'Drag at least ' + scope.min + ' node(s) into the box';
-                    return false;
-                }
-                if (scope.conceptGroup.length > scope.max) {
-                    scope.instruction = 'Select at most ' + scope.max + ' node(s)';
-                    return false;
-                }
-                if (!_containsOnly()) {
-                    scope.instruction = 'Node(s) do not have the correct type';
-                    return false;
-                }
-                scope.instruction = '';
-                return true;
+                scope.instructionMinNodes = scope.conceptGroup.length < scope.min;
+                scope.instructionMaxNodes = scope.conceptGroup.length > scope.max;
+                scope.instructionNodeType = !_containsOnly();
+                return !(scope.instructionMinNodes || scope.instructionMaxNodes ||
+                        scope.instructionNodeType);
             }
         }
     };
