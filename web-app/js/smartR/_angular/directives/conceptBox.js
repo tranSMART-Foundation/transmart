@@ -2,7 +2,7 @@
 
 'use strict';
 
-window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
+window.smartRApp.directive('conceptBox', ['$rootScope', 'processService', function($rootScope, processService) {
 
     return {
         restrict: 'E',
@@ -19,6 +19,13 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
             var template_box = element[0].querySelector('.sr-drop-input'),
                 template_btn = element[0].querySelector('.sr-drop-btn'),
                 template_tooltip = element[0].querySelector('.sr-tooltip-dialog');
+
+            processService.registerComponent(scope, 'conceptBox');
+
+            // watch high dimensional concepts to enable/disable fetch button
+            scope.$watch('conceptGroup', function (newVal) {
+                processService.toggleButton('fetchButton', newVal < 1)
+            });
 
             // instantiate tooltips
             $(template_tooltip).tooltip({track: true, tooltipClass:"sr-ui-tooltip"});

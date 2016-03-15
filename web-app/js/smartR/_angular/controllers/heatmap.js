@@ -19,11 +19,6 @@ window.smartRApp.controller('HeatmapController',
             summaryData : {}
         };
 
-        // watch high dimensional concepts to enable/disable fetch button
-        $scope.$watch('fetch.conceptBoxes.highDimensional', function (newVal) {
-            $scope.fetch.disabled = newVal < 1 ? true : false;
-        });
-
         // ------------------------------------------------------------- //
         // Preprocess                                                    //
         // ------------------------------------------------------------- //
