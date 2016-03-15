@@ -9,7 +9,9 @@ window.smartRApp.controller('HeatmapController',
         // Fetch data                                                    //
         // ------------------------------------------------------------- //
         $scope.fetch = {
-            disabled : true,
+            btn : {
+                disabled : true
+            },
             conceptBoxes : {
                 highDimensional : [],
                 numerical : [],
@@ -23,18 +25,22 @@ window.smartRApp.controller('HeatmapController',
         // Preprocess                                                    //
         // ------------------------------------------------------------- //
         $scope.preprocess = {
-            disabled : true,
+            btn : {
+                disabled : true
+            },
             params :  {
                 aggregateProbes : false
             },
-            summaryData : {}
+            summaryData : {allSamples : 0}
         };
 
         // ------------------------------------------------------------- //
         // Run Heatmap                                                   //
         // ------------------------------------------------------------- //
         $scope.runAnalysis = {
-            disabled : true,
+            btn : {
+                disabled : true
+            },
             params: {
                 max_row : 100,
                 sorting : 'nodes',
@@ -46,4 +52,18 @@ window.smartRApp.controller('HeatmapController',
             subsets : 0,
             scriptResults : {}
         };
+
+        commonWorkflowService.registerCondition(
+            'fetch.conceptBoxes.highDimensional',           // input reference
+            ['fetch.btn'],                                  // affected components
+            commonWorkflowService.disableComponentsBasedOnInput
+        );
+
+        commonWorkflowService.registerCondition(
+            'fetch.summaryData',
+            ['preprocess.btn', 'runAnalysis.btn'],
+            commonWorkflowService.disableComponentsBasedOnResults
+        );
+
+
     }]);

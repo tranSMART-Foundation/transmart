@@ -23,7 +23,7 @@
             <biomarker-selection biomarkers="fetch.selectedBiomarkers"></biomarker-selection>
             <hr class="sr-divider">
             <fetch-button
-                    disabled="fetch.disabled"
+                    disabled="fetch.btn.disabled"
                     concept-map="fetch.conceptBoxes"
                     biomarkers="fetch.selectedBiomarkers"
                     show-summary-stats="true"
@@ -48,7 +48,7 @@
             <preprocess-button params="preprocess.params"
                                show-summary-stats="true"
                                summary-data="preprocess.summaryData"
-                               disabled="preprocess.disabled">
+                               disabled="preprocess.btn.disabled">
             </preprocess-button>
 
             <br/>
@@ -95,7 +95,7 @@
                         script-to-run="run"
                         arguments-to-use="runAnalysis.params"
                         serialized="true"
-                        disabled="runAnalysis.disabled">
+                        disabled="runAnalysis.btn.disabled">
             </run-button>
             <capture-plot-button filename="heatmap.svg" disabled="runAnalysis.download.disabled"></capture-plot-button>
             <download-results-button disabled="runAnalysis.download.disabled"></download-results-button>

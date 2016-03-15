@@ -3,8 +3,8 @@
 'use strict';
 
 window.smartRApp.directive('fetchButton',
-    ['$rootScope', 'rServeService', 'smartRUtils', 'processService',
-        function($rootScope, rServeService, smartRUtils, processService) {
+    ['$rootScope', 'rServeService', 'smartRUtils',
+        function($rootScope, rServeService, smartRUtils) {
         return {
             restrict: 'E',
             scope: {
@@ -22,8 +22,6 @@ window.smartRApp.directive('fetchButton',
 
                 template_btn.disabled = scope.disabled;
 
-                processService.registerComponent(scope, 'fetchButton');
-
                 scope.$watch('disabled', function (newValue) {
                     template_btn.disabled = newValue;
                 }, true);
@@ -31,7 +29,6 @@ window.smartRApp.directive('fetchButton',
                 scope.$watch('summaryData', function (newSummaryData) {
                     if (newSummaryData.hasOwnProperty('allSamples')) {
                         // when everything is retrieved
-                        processService.onFetching(false, processService.status.SUCCESS);
                         template_btn.disabled = false;
                     }
                 }, true);
@@ -42,7 +39,6 @@ window.smartRApp.directive('fetchButton',
                             scope.summaryData = {}; // reset
                             template_btn.disabled = true;
                             template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
-                            processService.onFetching(true);
                         },
 
                         _getDataConstraints = function (biomarkers) {
@@ -68,7 +64,6 @@ window.smartRApp.directive('fetchButton',
                         _finishedFetching = function (msg) {
                             template_msg.innerHTML = 'Success: ' + msg;
                             template_btn.disabled = false;
-                            processService.onFetching(false);
                         },
 
                         _afterDataFetched = function (msg) {
@@ -86,7 +81,6 @@ window.smartRApp.directive('fetchButton',
                                     template_msg.innerHTML = 'Success: ' + data.msg;
                                 }, function(msg) {
                                     template_msg.innerHTML = 'Failure: ' + msg;
-                                    processService.onFetching(false);
                                     template_btn.disabled = false;
                                 })
                         },
