@@ -94,7 +94,7 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                     }
                 },
                 function (response) {
-                    alert('  Failure: ' + response.statusText);
+                    console.error('  Failure: ' + response.statusText);
                 }
             );
         }

@@ -40,8 +40,6 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
         }
         setData(scope.data);
 
-        console.log(excludedPatientIDs)
-
         var animationDuration = 1000;
 
         var width = parseInt(scope.width);
@@ -169,7 +167,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
                     scope.data = JSON.parse(response.result.artifacts.value);
                 },
                 function (response) {
-                    alert('Failure: ' + response.statusText);
+                    console.error('Failure: ' + response.statusText);
                 }
             );
         }
