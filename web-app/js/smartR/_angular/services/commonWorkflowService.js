@@ -1,3 +1,4 @@
+//# sourceURL=commonWorkflowService.js
 
 window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', function(rServeService, $css) {
 
@@ -33,16 +34,16 @@ window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', func
     /**
      * Register sourceLabel as object reference. If there's any changes on this object, will invoke callback
      * @param  sourceLabel      - reference object label
-     * @param  targetLabelArr   - array of target labels
+     * @param  targetLabels   - array of target labels
      * @param callback (newObject, oldObject, targetArray) - invoked when source obj has new value
      *
      */
-    service.registerCondition = function (sourceLabel, targetLabelArr, callback) {
+    service.registerCondition = function (sourceLabel, targetLabels, callback) {
 
         var targetObjects = [];
 
-        if (angular.isArray(targetLabelArr)) {
-           targetLabelArr.forEach (function (targetLabel) {
+        if (angular.isArray(targetLabels)) {
+           targetLabels.forEach (function (targetLabel) {
                targetObjects.push(fetchFromObject(service.currentScope, targetLabel));
            });
         }
@@ -52,17 +53,43 @@ window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', func
         }, true);
     };
 
-    service.disableComponentsBasedOnInput = function (newSourceVal, oldSourceVal, targetObjArr) {
-        targetObjArr.forEach(function (component) {
+    /**
+     * Disable target objects when model changes
+     * @param newArray
+     * @param oldArray
+     * @param targetObjArr
+     */
+    service.disableComponentsBasedOnInput = function (newArray, oldArray, affectedComponents) {
+        affectedComponents.forEach(function (component) {
             if (component.hasOwnProperty('disabled')) {
-                component.disabled = newSourceVal.length <= 0;
+                component.disabled = newArray.length <= 0;
             }
         });
     };
 
-    service.disableComponentsBasedOnResults = function (newSourceVal, oldSourceVal, targetObjArr) {
-        targetObjArr.forEach(function (component) {
-            component.disabled = angular.isUndefined(newSourceVal.allSamples);
+    /**
+     * Disable target objects when summary data changes
+     * @param newSourceVal
+     * @param oldSourceVal
+     * @param targetObjArr
+     */
+    service.disableComponentsBasedOnResult = function (newSummaryData, oldSummaryData, affectedComponents) {
+        console.log(newSummaryData);
+        affectedComponents.forEach(function (component) {
+            component.disabled = Object.keys(newSummaryData).length == 0;
+        });
+    };
+
+    service.clearOldResultsOnReFetch = function (newSummaryData, oldSummaryData, affectedComponents) {
+        affectedComponents.forEach(function (component) {
+            component.scriptResults = {};
+        });
+    };
+
+    service.disableComponentsBasedOnComponent = function (newComponentState, oldComponentState, affectedComponents) {
+        console.log(newComponentState);
+        affectedComponents.forEach(function (component) {
+            component.disabled = newComponentState.disabled;
         });
     };
 

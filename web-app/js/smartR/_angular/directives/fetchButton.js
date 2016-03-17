@@ -29,7 +29,7 @@ window.smartRApp.directive('fetchButton',
                 scope.$watch('summaryData', function (newSummaryData) {
                     if (newSummaryData.hasOwnProperty('allSamples')) {
                         // when everything is retrieved
-                        template_btn.disabled = false;
+                        scope.disabled = false;
                     }
                 }, true);
 
@@ -37,7 +37,7 @@ window.smartRApp.directive('fetchButton',
 
                     var _init = function () {
                             scope.summaryData = {}; // reset
-                            template_btn.disabled = true;
+                            scope.disabled = true;
                             template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
                         },
 
@@ -63,7 +63,7 @@ window.smartRApp.directive('fetchButton',
 
                         _finishedFetching = function (msg) {
                             template_msg.innerHTML = 'Success: ' + msg;
-                            template_btn.disabled = false;
+                            scope.disabled = false;
                         },
 
                         _afterDataFetched = function (msg) {
@@ -81,7 +81,7 @@ window.smartRApp.directive('fetchButton',
                                     template_msg.innerHTML = 'Success: ' + data.msg;
                                 }, function(msg) {
                                     template_msg.innerHTML = 'Failure: ' + msg;
-                                    template_btn.disabled = false;
+                                    scope.disabled = false;
                                 })
                         },
                         conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap),

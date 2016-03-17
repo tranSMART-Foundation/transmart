@@ -1,7 +1,6 @@
 //# sourceURL=downloadResultsButton.js
 
-window.smartRApp.directive('downloadResultsButton', ['rServeService', 'processService',
-    function(rServeService, processService)
+window.smartRApp.directive('downloadResultsButton', ['rServeService', function(rServeService)
 {
     function downloadFile(data) {
         var link = jQuery('<a/>')
@@ -27,8 +26,6 @@ window.smartRApp.directive('downloadResultsButton', ['rServeService', 'processSe
             template_btn.disabled = true;
 
             var template_msg = element.children()[1];
-
-            processService.registerComponent(scope, 'downloadResultsButton');
 
             scope.$watch('disabled', function (newValue) {
                 template_btn.disabled = Boolean(newValue);

@@ -1,6 +1,6 @@
 //# sourceURL=capturePlotButton.js
 
-window.smartRApp.directive('capturePlotButton', ['processService', function(processService) {
+window.smartRApp.directive('capturePlotButton', [function() {
 
     // aux for downloadSVG
     var copyWithCollapsedCSS = function(svgElement) {
@@ -75,7 +75,6 @@ window.smartRApp.directive('capturePlotButton', ['processService', function(proc
 
             var template_btn = elements.children()[0];
             template_btn.disabled = true;
-            processService.registerComponent(scope, 'captureButton');
 
             scope.$watch('disabled', function (newValue) {
                 template_btn.disabled = Boolean(newValue);

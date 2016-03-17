@@ -27,10 +27,10 @@
                     concept-map="fetch.conceptBoxes"
                     biomarkers="fetch.selectedBiomarkers"
                     show-summary-stats="true"
-                    summary-data="fetch.summaryData">
+                    summary-data="fetch.scriptResults">
             </fetch-button>
             <br/>
-            <summary-stats summary-data="fetch.summaryData"></summary-stats>
+            <summary-stats summary-data="fetch.scriptResults"></summary-stats>
         </workflow-tab>
 
         %{--========================================================================================================--}%
@@ -47,12 +47,12 @@
 
             <preprocess-button params="preprocess.params"
                                show-summary-stats="true"
-                               summary-data="preprocess.summaryData"
+                               summary-data="preprocess.scriptResults"
                                disabled="preprocess.btn.disabled">
             </preprocess-button>
 
             <br/>
-            <summary-stats summary-data="preprocess.summaryData"></summary-stats>
+            <summary-stats summary-data="preprocess.scriptResults"></summary-stats>
         </workflow-tab>
 
 

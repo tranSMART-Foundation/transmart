@@ -3,7 +3,7 @@
 'use strict';
 
 window.smartRApp.directive('runButton',
-    ['$rootScope', 'rServeService', 'processService', function($rootScope, rServeService, processService) {
+    ['$rootScope', 'rServeService', function($rootScope, rServeService) {
         return {
             restrict: 'E',
             scope: {
@@ -22,7 +22,6 @@ window.smartRApp.directive('runButton',
                     serialized = scope.serialized;
 
                 template_btn.disabled = scope.disabled;
-                processService.registerComponent(scope, 'runButton');
 
                 scope.$watch('disabled', function (newValue) {
                     template_btn.disabled = newValue;
@@ -50,7 +49,6 @@ window.smartRApp.directive('runButton',
 
                 var _finishedRunning =  function() {
                     template_btn.disabled = false;
-                    processService.onRunning(false);
                 };
 
                 template_btn.onclick = function() {
@@ -58,7 +56,6 @@ window.smartRApp.directive('runButton',
                     scope.storage = {};
                     template_btn.disabled = true;
                     template_msg.innerHTML = 'Creating plot, please wait <span class="blink_me">_</span>';
-                    processService.onRunning(true);
 
                     rServeService.startScriptExecution({
                         taskType: scope.script,

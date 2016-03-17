@@ -18,7 +18,7 @@ window.smartRApp.controller('HeatmapController',
                 categorical : []
             },
             selectedBiomarkers : [],
-            summaryData : {}
+            scriptResults : {}
         };
 
         // ------------------------------------------------------------- //
@@ -31,7 +31,7 @@ window.smartRApp.controller('HeatmapController',
             params :  {
                 aggregateProbes : false
             },
-            summaryData : {allSamples : 0}
+            scriptResults : {}
         };
 
         // ------------------------------------------------------------- //
@@ -60,10 +60,23 @@ window.smartRApp.controller('HeatmapController',
         );
 
         commonWorkflowService.registerCondition(
-            'fetch.summaryData',
+            'fetch.btn',
             ['preprocess.btn', 'runAnalysis.btn'],
-            commonWorkflowService.disableComponentsBasedOnResults
+            commonWorkflowService.disableComponentsBasedOnComponent
         );
+
+        //commonWorkflowService.registerCondition(
+        //    'fetch.scriptResults',
+        //    ['preprocess.btn', 'runAnalysis.btn'],
+        //    commonWorkflowService.disableComponentsBasedOnResult
+        //);
+
+        commonWorkflowService.registerCondition(
+            'fetch.scriptResults',
+            ['preprocess', 'runAnalysis'],
+            commonWorkflowService.clearOldResultsOnReFetch
+        );
+
 
 
     }]);
