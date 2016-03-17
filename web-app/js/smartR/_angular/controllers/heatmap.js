@@ -18,7 +18,9 @@ window.smartRApp.controller('HeatmapController',
                 categorical : []
             },
             selectedBiomarkers : [],
-            scriptResults : {}
+            scriptResults : {},
+            totalSamples : 0,
+            subsets : 0
         };
 
         // ------------------------------------------------------------- //
@@ -54,29 +56,15 @@ window.smartRApp.controller('HeatmapController',
         };
 
         commonWorkflowService.registerCondition(
-            'fetch.conceptBoxes.highDimensional',           // input reference
-            ['fetch.btn'],                                  // affected components
-            commonWorkflowService.disableComponentsBasedOnInput
+            ['fetch.conceptBoxes.highDimensional'],
+            ['fetch.btn'],
+            commonWorkflowService.whenSelectHighDimensionalNodes
         );
 
         commonWorkflowService.registerCondition(
-            'fetch.btn',
-            ['preprocess.btn', 'runAnalysis.btn'],
-            commonWorkflowService.disableComponentsBasedOnComponent
-        );
-
-        //commonWorkflowService.registerCondition(
-        //    'fetch.scriptResults',
-        //    ['preprocess.btn', 'runAnalysis.btn'],
-        //    commonWorkflowService.disableComponentsBasedOnResult
-        //);
-
-        commonWorkflowService.registerCondition(
-            'fetch.scriptResults',
+            ['fetch.btn', 'fetch.totalSamples', 'fetch.subsets'],
             ['preprocess', 'runAnalysis'],
-            commonWorkflowService.clearOldResultsOnReFetch
+            commonWorkflowService.whenFetchData
         );
-
-
 
     }]);

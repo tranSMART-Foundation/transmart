@@ -27,7 +27,9 @@
                     concept-map="fetch.conceptBoxes"
                     biomarkers="fetch.selectedBiomarkers"
                     show-summary-stats="true"
-                    summary-data="fetch.scriptResults">
+                    summary-data="fetch.scriptResults"
+                    all-samples="fetch.totalSamples"
+                    subsets="fetch.subsets">
             </fetch-button>
             <br/>
             <summary-stats summary-data="fetch.scriptResults"></summary-stats>

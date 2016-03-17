@@ -12,7 +12,9 @@ window.smartRApp.directive('fetchButton',
                 conceptMap: '=',
                 biomarkers: '=',
                 showSummaryStats: '=',
-                summaryData: '='
+                summaryData: '=',
+                allSamples: '=',
+                subsets: '='
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/fetchButton.html',
             link: function(scope, element) {
@@ -27,8 +29,10 @@ window.smartRApp.directive('fetchButton',
                 }, true);
 
                 scope.$watch('summaryData', function (newSummaryData) {
-                    if (newSummaryData.hasOwnProperty('allSamples')) {
+                    if (newSummaryData.hasOwnProperty('allSamples') && newSummaryData.hasOwnProperty('subsets')) {
                         // when everything is retrieved
+                        scope.allSamples = newSummaryData.allSamples;
+                        scope.subsets = newSummaryData.subsets;
                         scope.disabled = false;
                     }
                 }, true);
@@ -37,6 +41,8 @@ window.smartRApp.directive('fetchButton',
 
                     var _init = function () {
                             scope.summaryData = {}; // reset
+                            scope.allSamples = 0;
+                            scope.subsets = 0;
                             scope.disabled = true;
                             template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
                         },

@@ -21,6 +21,16 @@ window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', func
         return obj[prop];
     };
 
+    var getModels = function (labels) {
+        var models = [];
+        if (angular.isArray(labels)) {
+            labels.forEach (function (label) {
+                models.push(fetchFromObject(service.currentScope, label));
+            });
+        }
+        return models;
+    };
+
     service.initializeWorkflow = function(workflowName, scope) {
         service.currentScope = scope;
         // load workflow specific css
@@ -33,64 +43,52 @@ window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', func
 
     /**
      * Register sourceLabel as object reference. If there's any changes on this object, will invoke callback
-     * @param  sourceLabel      - reference object label
-     * @param  targetLabels   - array of target labels
+     * @param  sourceLabels - reference object label
+     * @param  targetLabels - array of target labels
      * @param callback (newObject, oldObject, targetArray) - invoked when source obj has new value
      *
      */
-    service.registerCondition = function (sourceLabel, targetLabels, callback) {
+    service.registerCondition = function (sourceLabels, targetLabels, callback) {
+        var _scope = service.currentScope,
+            targetModels = getModels(targetLabels);
 
-        var targetObjects = [];
-
-        if (angular.isArray(targetLabels)) {
-           targetLabels.forEach (function (targetLabel) {
-               targetObjects.push(fetchFromObject(service.currentScope, targetLabel));
-           });
-        }
-
-        service.currentScope.$watch (sourceLabel, function (n, o) {
-            callback(n,  o, targetObjects);
-        }, true);
+        _scope.$watchGroup (sourceLabels, function (n, o) {
+            callback(n,  o, _scope, targetModels);
+        });
     };
 
     /**
-     * Disable target objects when model changes
-     * @param newArray
-     * @param oldArray
-     * @param targetObjArr
+     *
+     * @param newValues
+     * @param oldValues
+     * @param scope
+     * @param affectedComponents
      */
-    service.disableComponentsBasedOnInput = function (newArray, oldArray, affectedComponents) {
+    service.whenSelectHighDimensionalNodes = function (newValues, oldValues, scope, affectedComponents) {
         affectedComponents.forEach(function (component) {
             if (component.hasOwnProperty('disabled')) {
-                component.disabled = newArray.length <= 0;
+                component.disabled = newValues[0].length <= 0;
             }
         });
     };
 
-    /**
-     * Disable target objects when summary data changes
-     * @param newSourceVal
-     * @param oldSourceVal
-     * @param targetObjArr
-     */
-    service.disableComponentsBasedOnResult = function (newSummaryData, oldSummaryData, affectedComponents) {
-        console.log(newSummaryData);
-        affectedComponents.forEach(function (component) {
-            component.disabled = Object.keys(newSummaryData).length == 0;
-        });
-    };
+    service.whenFetchData =  function (newValues, oldValues, scope, affectedComponents) {
+        var preprocessModel = affectedComponents[0],
+            runModel = affectedComponents[1],
+            fetchBtnFlag = newValues[0],
+            fetchSamples = newValues[1],
+            fetchSubsets = newValues[2]; // TODO show/hide rank criteria based on this
 
-    service.clearOldResultsOnReFetch = function (newSummaryData, oldSummaryData, affectedComponents) {
-        affectedComponents.forEach(function (component) {
-            component.scriptResults = {};
-        });
-    };
+        console.log(newValues);
 
-    service.disableComponentsBasedOnComponent = function (newComponentState, oldComponentState, affectedComponents) {
-        console.log(newComponentState);
-        affectedComponents.forEach(function (component) {
-            component.disabled = newComponentState.disabled;
-        });
+        if (fetchBtnFlag) { // empty preprocess & run result when fetching
+            preprocessModel.scriptResults = {};
+            runModel.scriptResults = {};
+        }
+
+        preprocessModel.btn.disabled = fetchBtnFlag.disabled;
+        preprocessModel.btn.disabled = fetchSamples <= 1; // enable button only when samples > 1
+        runModel.btn.disabled = fetchBtnFlag.disabled;
     };
 
     return service;
