@@ -218,7 +218,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
         function swapJitter() {
             jitterChecked = !jitterChecked;
             categories.forEach(function(category) {
-                d3.selectAll('.point.' + shortenNodeLabel(category))
+                d3.selectAll('.point.' + smartRUtils.makeSafeForCSS(shortenNodeLabel(category)))
                     .transition()
                     .duration(animationDuration)
                     .attr('cx', function(d) {
@@ -392,7 +392,8 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
 
             point
                 .attr('class', function (d) {
-                    return 'point patientID-' + d.patientID + (d.outlier ? ' outlier ' : ' ') + boxLabel;
+                    return 'point patientID-' + smartRUtils.makeSafeForCSS(d.patientID) +
+                        (d.outlier ? ' outlier ' : ' ') + smartRUtils.makeSafeForCSS(boxLabel);
                 }) // This is here and not in the .enter() because points might become outlier on removal of other points
                 .transition()
                 .duration(animationDuration)
