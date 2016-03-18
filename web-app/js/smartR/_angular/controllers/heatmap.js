@@ -62,9 +62,21 @@ window.smartRApp.controller('HeatmapController',
         );
 
         commonWorkflowService.registerCondition(
-            ['fetch.btn', 'fetch.totalSamples', 'fetch.subsets'],
+            ['fetch.btn.disabled', 'fetch.totalSamples', 'fetch.subsets'],
             ['preprocess', 'runAnalysis'],
-            commonWorkflowService.whenFetchData
+            commonWorkflowService.whenFetchHeatmapData
+        );
+
+        commonWorkflowService.registerCondition(
+            ['preprocess.btn.disabled'],
+            ['fetch', 'runAnalysis'],
+            commonWorkflowService.whenPreprocessHeatmapData
+        );
+
+        commonWorkflowService.registerCondition(
+            ['runAnalysis.btn.disabled', 'runAnalysis.scriptResults'],
+            ['fetch', 'preprocess', 'runAnalysis.download'],
+            commonWorkflowService.whenRunHeatmapAnalysis
         );
 
     }]);

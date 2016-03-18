@@ -45,7 +45,7 @@ window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', func
      * Register sourceLabel as object reference. If there's any changes on this object, will invoke callback
      * @param  sourceLabels - reference object label
      * @param  targetLabels - array of target labels
-     * @param callback (newObject, oldObject, targetArray) - invoked when source obj has new value
+     * @param callback (newObject, oldObject, scope, targetArray) - invoked when source obj has new value
      *
      */
     service.registerCondition = function (sourceLabels, targetLabels, callback) {
@@ -58,7 +58,7 @@ window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', func
     };
 
     /**
-     *
+     * Components are enabled/disabled according to presence of high dimensional nodes
      * @param newValues
      * @param oldValues
      * @param scope
@@ -72,23 +72,92 @@ window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', func
         });
     };
 
-    service.whenFetchData =  function (newValues, oldValues, scope, affectedComponents) {
+    /**
+     * Collective behaviour when fetching data for heatmap
+     * @param newValues - new values of components models that determine other components states
+     * @param oldValues - old values of components models that determine other components states
+     * @param scope
+     * @param affectedComponents - list of affected component's models
+     */
+    service.whenFetchHeatmapData =  function (newValues, oldValues, scope, affectedComponents) {
+
         var preprocessModel = affectedComponents[0],
             runModel = affectedComponents[1],
             fetchBtnFlag = newValues[0],
             fetchSamples = newValues[1],
-            fetchSubsets = newValues[2]; // TODO show/hide rank criteria based on this
+            fetchSubsets = newValues[2];
+        
+        
+        var _toggleRankCriteria = function (runAnalysisModel, noOfSamples, noOfSubsets) {
 
-        console.log(newValues);
+            runAnalysisModel.subsets = noOfSubsets;
+
+            if (noOfSubsets > 1) {
+                runAnalysisModel.params.ranking = 'bval';
+            } else {
+                runAnalysisModel.params.ranking = 'coef';
+            }
+            if (noOfSamples === 1) {
+                runAnalysisModel.params.ranking = 'mean';
+            }
+        };
+
 
         if (fetchBtnFlag) { // empty preprocess & run result when fetching
             preprocessModel.scriptResults = {};
             runModel.scriptResults = {};
+        } else {
+            if (fetchSamples > 0 && fetchSubsets > 0) {
+                _toggleRankCriteria(runModel, fetchSamples, fetchSubsets);
+            }
         }
 
-        preprocessModel.btn.disabled = fetchBtnFlag.disabled;
-        preprocessModel.btn.disabled = fetchSamples <= 1; // enable button only when samples > 1
-        runModel.btn.disabled = fetchBtnFlag.disabled;
+        preprocessModel.btn.disabled = fetchBtnFlag;
+        preprocessModel.btn.disabled = runModel.btn.disabled ? true : fetchSamples <= 1;
+        runModel.btn.disabled = fetchBtnFlag;
+    };
+
+    /**
+     * Collective behaviour when preprocess data for heatmap
+     * @param newValues
+     * @param oldValues
+     * @param scope
+     * @param affectedComponents
+     */
+    service.whenPreprocessHeatmapData = function (newValues, oldValues, scope, affectedComponents) {
+        var preprocessBtnFlag = newValues[0],
+            fetchModel = affectedComponents[0],
+            runModel = affectedComponents[1];
+
+        // toggle fetch & run buttons
+        fetchModel.btn.disabled = preprocessBtnFlag;
+        runModel.btn.disabled = preprocessBtnFlag;
+
+        if (preprocessBtnFlag) {
+            runModel.scriptResults = {};
+        }
+    };
+
+    /**
+     * Collective behaviour when running heatmap
+     * @param newValues
+     * @param oldValues
+     * @param scope
+     * @param affectedComponents
+     */
+    service.whenRunHeatmapAnalysis = function (newValues, oldValues, scope, affectedComponents) {
+        var runBtnFlag = newValues[0],
+            runResults = newValues[1],
+            fetchModel = affectedComponents[0],
+            preprocessModel = affectedComponents[1],
+            downloadBtns = affectedComponents[2];
+
+        // toggle downloads related buttons
+        downloadBtns.disabled = Object.keys(runResults).length !== 0;
+
+        // toggle fetch & preprocess buttons
+        fetchModel.btn.disabled = runBtnFlag;
+        preprocessModel.btn.disabled = runBtnFlag;
     };
 
     return service;

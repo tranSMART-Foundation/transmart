@@ -27,7 +27,6 @@ window.smartRApp.directive('runButton',
                     template_btn.disabled = newValue;
                 }, true);
 
-
                 var _successCreatePlot = function (response) {
                     template_msg.innerHTML = ''; // empty template
                     if (serialized) { // when results are serialized, we need to deserialized them by
@@ -35,26 +34,25 @@ window.smartRApp.directive('runButton',
                         rServeService.downloadJsonFile(response.executionId, 'heatmap.json').then(
                             function (d) {
                                 scope.storage = d.data;
+                                scope.disabled = false;
                             }
                         );
                     } else { // results
                         scope.storage = JSON.parse(response.result.artifacts.value);
+                        scope.disabled = false;
                     }
                 };
 
                 var _failCreatePlot = function (response) {
                     template_msg.style.color = 'red';
                     template_msg.innerHTML = 'Failure: ' + response.statusText;
-                };
-
-                var _finishedRunning =  function() {
-                    template_btn.disabled = false;
+                    scope.disabled = false;
                 };
 
                 template_btn.onclick = function() {
 
                     scope.storage = {};
-                    template_btn.disabled = true;
+                    scope.disabled = true;
                     template_msg.innerHTML = 'Creating plot, please wait <span class="blink_me">_</span>';
 
                     rServeService.startScriptExecution({
@@ -63,8 +61,6 @@ window.smartRApp.directive('runButton',
                     }).then(
                         _successCreatePlot,
                         _failCreatePlot
-                    ).finally(
-                        _finishedRunning
                     );
                 };
             }

@@ -64,7 +64,6 @@ window.smartRApp.directive('preprocessButton', ['rServeService',
                                 template_msg.innerHTML = 'Success: ' + data.msg;
                             }, function(msg) {
                                 template_msg.innerHTML = 'Failure: ' + msg;
-                                scope.disabled = false;
                             })
                     };
 
