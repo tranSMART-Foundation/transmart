@@ -10,9 +10,9 @@ window.smartRApp.directive('fetchButton',
             scope: {
                 disabled: '=',
                 conceptMap: '=',
-                biomarkers: '=',
-                showSummaryStats: '=',
-                summaryData: '='
+                biomarkers: '=?',
+                showSummaryStats: '=?',
+                summaryData: '=?'
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/fetchButton.html',
             link: function(scope, element) {
@@ -28,13 +28,15 @@ window.smartRApp.directive('fetchButton',
                     template_btn.disabled = newValue;
                 }, true);
 
-                scope.$watch('summaryData', function (newSummaryData) {
-                    if (newSummaryData.hasOwnProperty('allSamples')) {
-                        // when everything is retrieved
-                        processService.onFetching(false, processService.status.SUCCESS);
-                        template_btn.disabled = false;
-                    }
-                }, true);
+                if (angular.isDefined(scope.summaryData)) {
+                    scope.$watch('summaryData', function (newSummaryData) {
+                        if (newSummaryData.hasOwnProperty('allSamples')) {
+                            // when everything is retrieved
+                            processService.onFetching(false, processService.status.SUCCESS);
+                            template_btn.disabled = false;
+                        }
+                    }, true);
+                }
 
                 template_btn.onclick = function() {
 
