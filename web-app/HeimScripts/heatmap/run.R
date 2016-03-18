@@ -41,6 +41,11 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
         "patientIDs"         = patientIDs,
         "uids"               = uids,
         "significanceValues" = significanceValues,
+        "logfoldValues"      = df["LOGFOLD"],
+        "ttestValues"        = df["TTEST"],
+        "pvalValues"         = df["PVAL"],
+        "adjpvalValues"      = df["ADJPVAL"],
+        "bvalValues"         = df["BVAL"],
         "ranking"            = ranking,
         "features"           = features,
         "extraFields"        = extraFields,
@@ -110,6 +115,14 @@ addStats <- function(df, sorting, ranking, max_rows) {
     measurements  <- getMeasurements(df)
     rankingMethod <- getRankingMethod(ranking)
     twoSubsets    <- hasTwoSubsets(measurements)
+
+    logfold.values <- data.frame(LOGFOLD=numeric())
+    ttest.values <- data.frame(TTEST=numeric())
+    pval.values <- data.frame(PVAL=numeric())
+    adjpval.values <- data.frame(ADJPVAL=numeric())
+    bval.values <- data.frame(BVAL=numeric())
+    rankingScore <- data.frame(SIGNIFICANCE=numeric())
+
     if (ncol(df) > 3) {
         #this is the case for more than 1 sample
         df <- applySorting(df,sorting)  # no need for sorting in one sample case, we do it here only
@@ -125,39 +138,34 @@ addStats <- function(df, sorting, ranking, max_rows) {
 
         useLimma <- !is.function(rankingMethod)  # rankingMethod is either a function or a character "limma"
         if (useLimma  && !twoSubsets) {  # cannot use any of the limma methods for single subset.
-        stop( paste("Illegal ranking method: ", ranking, " two subsets needed.") )
+            stop( paste("Illegal ranking method: ", ranking, " two subsets needed.") )
         }
 
         if (useLimma && validLimmaMeasurements) {
             if (!ranking %in% colnames(markerTable) ) {
                 stop(paste("Illegal ranking method selected: ", ranking) )
             }
+            logfold.values <- markerTable["logfold"]
+            ttest.values <- markerTable["ttest"]
+            pval.values <- markerTable["pval"]
+            adjpval.values <- markerTable["adjpval"]
+            bval.values <- markerTable["bval"]
+
             rankingScore <- markerTable[ranking]
         } else if (useLimma && !validLimmaMeasurements)  {
-            rankingScore <- data.frame(SIGNIFICANCE=numeric()) # when differential expression rank criteria
+            # when differential expression rank criteria
             # is selected while it's not valid limma measurements,
             # provide empty data frame to the significance columns.
         } else {
-            rankingScore <-
-            apply(measurements, 1, rankingMethod, na.rm = TRUE )  # Calculating
+            rankingScore <- apply(measurements, 1, rankingMethod, na.rm = TRUE )  # Calculating
         }
         # ranking per probe (per row)
         means <- rowMeans(measurements, na.rm = T)  # this is just an
-        # auxiliary column - it will not be
-        # used for JSON.
+                                                    # auxiliary column - it will not be
+                                                    # used for JSON.
         sdses <- apply(measurements,1 ,sd , na.rm = T)  # this is just
-        # an auxiliary column -
-        # it will not be used for JSON.
-        df["MEAN"]         <- means
-        df["SD"]           <- sdses
-        df["SIGNIFICANCE"] <- rankingScore
-
-        if (useLimma & !validLimmaMeasurements) {
-            # dont apply ranking
-        } else {
-            # else apply
-            df <- applyRanking(df, ranking, max_rows)
-        }
+                                                        # an auxiliary column -
+                                                        # it will not be used for JSON.
 
         cleanUpLimmaOutput()  # In order to prevent displaying the table from previous run.
 
@@ -169,12 +177,10 @@ addStats <- function(df, sorting, ranking, max_rows) {
         }
     } else {
         #one sample
-        variance <-
-        1.0  # We cannot get any significance measure for just
+        variance <- 1.0  # We cannot get any significance measure for just
         # one sample
         if ( nrow(measurements) > 1) {
-            meanS <-
-            mean(df[,3], na.rm = T)  # For just one sample we take mean
+            meanS <- mean(df[,3], na.rm = T)  # For just one sample we take mean
             # over all genes (whole column), not per gene
             sds <- sd(df[,3],na.rm = T)  # For just one sample we take mean
             # over all genes (whole column), not per gene
@@ -183,11 +189,28 @@ addStats <- function(df, sorting, ranking, max_rows) {
             sds  <- 1
         }
 
-        df["MEAN"] <- rep(meanS, nrow(df))
-        df["SD"] <- rep(sds, nrow(df))
-        df["SIGNIFICANCE"] <- rep(variance, nrow(df))
+        means <- rep(meanS, nrow(df))
+        sdses <- rep(sds, nrow(df))
+        rankingScore <- rep(variance, nrow(df))
     }
-    return(df)
+
+    df["MEAN"]         <- means
+    df["SD"]           <- sdses
+    df["SIGNIFICANCE"] <- rankingScore
+    df["LOGFOLD"] <- logfold.values
+    df["TTEST"] <- ttest.values
+    df["PVAL"] <- pval.values
+    df["ADJPVAL"] <- adjpval.values
+    df["BVAL"] <- bval.values
+
+    if (useLimma & !validLimmaMeasurements) {
+        # dont apply ranking
+    } else {
+        # else apply
+        df <- applyRanking(df, ranking, max_rows)
+    }
+
+    df
 }
 
 # Coefficient of variation
@@ -240,8 +263,13 @@ toZscores <- function(measurements) {
 
 cleanUp <- function(df) {
     df["MEAN"] <- NULL
-    df["SD"]  <- NULL
+    df["SD"] <- NULL
     df["SIGNIFICANCE"] <- NULL
+    df["LOGFOLD"] <- NULL
+    df["TTEST"] <- NULL
+    df["PVAL"] <- NULL
+    df["ADJPVAL"] <- NULL
+    df["BVAL"] <- NULL
     df
 }
 
@@ -274,16 +302,26 @@ applySorting <- function(df,sorting) {
 }
 
 buildFields <- function(df) {
-    df <- melt(df, na.rm = T, id = c("UID", "SIGNIFICANCE", "MEAN", "SD"))
+#    df["MEAN"] <- NULL
+#    df["SD"] <- NULL
+#    df["SIGNIFICANCE"] <- NULL
+#    df["LOGFOLD"] <- NULL
+#    df["TTEST"] <- NULL
+#    df["PVAL"] <- NULL
+#    df["ADJPVAL"] <- NULL
+#    df["BVAL"] <- NULL
+
+    df <- melt(df, na.rm=T, id=c("UID", "MEAN", "SD", "SIGNIFICANCE", "LOGFOLD", "TTEST", "PVAL", "ADJPVAL", "BVAL"))
     # melt implicitly casts
-    # characters to factors to make your like more exciting,
+    # characters to factors to make your life more exciting,
     # in order to encourage more adventures it does not
     # have characters.as.factors=F param.
     df$variable <- as.character(df$variable)
     ZSCORE      <- (df$value - df$MEAN) / df$SD
     df["MEAN"]  <- NULL
     df["SD"]    <- NULL
-    names(df)   <- c("UID","SIGNIFICANCE","PATIENTID","VALUE")
+
+    names(df)   <- c("UID", "SIGNIFICANCE", "LOGFOLD", "TTEST", "PVAL", "ADJPVAL", "BVAL", "PATIENTID", "VALUE")
     df["ZSCORE"] <- ZSCORE
     df["SUBSET"] <- getSubset(df$PATIENTID)
 
