@@ -138,10 +138,10 @@ getSubset <- function(patientIDs) {
     splittedIds <- strsplit(patientIDs,"_s") # During merge,
     # which is always run we append subset id, either
     # _s1 or _s2 to PATIENTID.
-    subsets <- lapply(splittedIds, FUN = tail_elem) # In proper patienid
-    subsets
+    subsets <- sapply(splittedIds, FUN = tail_elem) # In proper patienid
+
 }
 
 tail_elem <- function(vect, n = 1) {
-    vect[length(vect) - n + 1]
+    as.integer(vect[length(vect) - n + 1])
 }

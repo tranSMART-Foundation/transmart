@@ -320,8 +320,8 @@ writeRunParams <- function(max_rows, sorting, ranking) {
 buildExtraFields <- function(df) {
     FEATURE <- rep("Cohort", nrow(df))
     PATIENTID <- as.character(df$PATIENTID)
-    TYPE <- rep("binary",nrow(df))
-    VALUE <- getSubset(PATIENTID)
+    TYPE <- rep("subset",nrow(df))
+    VALUE <- df$SUBSET
     extraFields <- data.frame(FEATURE, PATIENTID, TYPE, VALUE, stringsAsFactors = FALSE)
 }
 

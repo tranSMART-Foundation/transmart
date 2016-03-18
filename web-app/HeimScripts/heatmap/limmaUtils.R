@@ -20,9 +20,9 @@ getDEgenes <- function(df) {
 }
 
 getDesign <- function(measurements) {
-  subsets <- getSubset(colnames(measurements)) #s1 = 0, s2 = 1
-  classVectorS1 <- subsets + 1    #s1 = 1, s2 = 2
-  classVectorS2 <- - subsets + 2  #s1 = 2, s2 = 1
+  subsets <- getSubset(colnames(measurements)) #s1 = 1, s2 = 2
+  classVectorS1 <- subsets             #s1 = 1, s2 = 2
+  classVectorS2 <- - subsets + 3       #s1 = 2, s2 = 1
   cbind(S1=classVectorS1, S2=classVectorS2)
 }
 
