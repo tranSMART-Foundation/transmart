@@ -8,19 +8,19 @@
             <workflow-tab tab-name="Fetch Data">
                 <concept-box style="display: inline-block"
                              concept-group="conceptBoxes.datapoints"
-                             type="LD-numeric"
+                             type="LD-numerical"
                              min="2"
                              max="2"
-                             label="Numeric Variables"
-                             tooltip="Select two numeric variables from the tree to compare them.">
+                             label="Numerical Variables"
+                             tooltip="Select two numerical variables from the tree to compare them.">
                 </concept-box>
                 <concept-box style="display: inline-block;"
                              concept-group="conceptBoxes.annotations"
-                             type="LD-categoric"
+                             type="LD-categorical"
                              min="0"
-                             max="10"
-                             label="(optional) Categoric Variables"
-                             tooltip="Select an arbitrary amount of categoric variables from the tree to annotate the numeric datapoints.">
+                             max="-1"
+                             label="(optional) Categorical Variables"
+                             tooltip="Select an arbitrary amount of categorical variables from the tree to annotate the numerical datapoints.">
                 </concept-box>
                 <br/>
                 <br/>

@@ -13,7 +13,7 @@
                         <concept-box concept-group="fetch.conceptBoxes.highDimensional"
                                      type="HD"
                                      min="1"
-                                     max="512"
+                                     max="-1"
                                      label="High Dimensional Variables"
                                      tooltip="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box. The nodes needs to be from the same platform.">
                         </concept-box>
