@@ -12,7 +12,7 @@ window.smartRApp.directive('fetchButton',
                 conceptMap: '=',
                 biomarkers: '=?',
                 showSummaryStats: '=?',
-                summaryData: '=?'
+                summaryData: '=?',
                 allSamples: '=?',
                 subsets: '=?'
             },
@@ -32,8 +32,9 @@ window.smartRApp.directive('fetchButton',
                     scope.$watch('summaryData', function (newSummaryData) {
                         if (newSummaryData.hasOwnProperty('allSamples')) {
                             // when everything is retrieved
-                            processService.onFetching(false, processService.status.SUCCESS);
-                            template_btn.disabled = false;
+                            scope.allSamples = newSummaryData.allSamples;
+                            scope.subsets = newSummaryData.subsets;
+                            scope.disabled = false;
                         }
                     }, true);
                 }

@@ -31,7 +31,6 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/directives', file: 'cohortSummaryInfo.js']
         // services
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'rServeService.js']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'processService.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'smartRUtils.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/services', file: 'commonWorkflowService.js']
     }
