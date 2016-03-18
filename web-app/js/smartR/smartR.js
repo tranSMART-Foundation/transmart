@@ -411,3 +411,4 @@ window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
     });
     parentPanel.add(smartRPanel);
 };
+
