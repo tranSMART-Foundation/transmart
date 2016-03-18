@@ -26,7 +26,6 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
     function createHeatmap(data, root) {
         var animationDuration = 1500;
         var extraFields = data.extraFields === undefined ? [] : data.extraFields;
-        console.log(extraFields)
         var features = data.features === undefined ? [] : data.features;
         var fields = data.fields;
         var significanceValues = data.significanceValues;
