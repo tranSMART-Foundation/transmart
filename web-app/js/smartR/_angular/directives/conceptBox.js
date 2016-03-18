@@ -70,7 +70,6 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
             scope.$watch('conceptGroup', scope.validate);
 
             scope.validate = function() {
-                console.log(scope.max)
                 scope.instructionMinNodes = scope.conceptGroup.length < scope.min;
                 scope.instructionMaxNodes = ~scope.max && scope.conceptGroup.length > scope.max;
                 scope.instructionNodeType = !_containsOnly();

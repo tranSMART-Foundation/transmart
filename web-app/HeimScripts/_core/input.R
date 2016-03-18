@@ -1,8 +1,8 @@
 
 # TODO: Works only for LDD
 parse.input <- function(sourceLabel, loaded_variables, type) {
-    if (type == "numeric") return(parse.ldd.num.input(sourceLabel, loaded_variables))
-    if (type == "categoric") return(parse.ldd.cat.input(sourceLabel, loaded_variables))
+    if (type == "numerical") return(parse.ldd.num.input(sourceLabel, loaded_variables))
+    if (type == "categorical") return(parse.ldd.cat.input(sourceLabel, loaded_variables))
     stop(paste(type, "is not supported by parse.input, yet."))
 }
 
