@@ -18,24 +18,24 @@
                                      tooltip="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box. The nodes needs to be from the same platform.">
                         </concept-box>
                     </td>
-                    <td>
-                        <concept-box concept-group="fetch.conceptBoxes.numerical"
-                                     type="LD-numerical"
-                                     min="0"
-                                     max="-1"
-                                     label="(optional) Numerical Variables"
-                                     tooltip="Select an arbitrary number of numerical variables to expand the heatmap with low dimensional data.">
-                        </concept-box>
-                    </td>
-                    <td>
-                        <concept-box concept-group="fetch.conceptBoxes.categorical"
-                                     type="LD-categorical"
-                                     min="0"
-                                     max="-1"
-                                     label="(optional) Categorical Variables"
-                                     tooltip="Select an arbitrary number of categorical variables to expand the heatmap with low dimensional data.">
-                        </concept-box>
-                    </td>
+                    %{--<td>--}%
+                        %{--<concept-box concept-group="fetch.conceptBoxes.numerical"--}%
+                                     %{--type="LD-numerical"--}%
+                                     %{--min="0"--}%
+                                     %{--max="-1"--}%
+                                     %{--label="(optional) Numerical Variables"--}%
+                                     %{--tooltip="Select an arbitrary number of numerical variables to expand the heatmap with low dimensional data.">--}%
+                        %{--</concept-box>--}%
+                    %{--</td>--}%
+                    %{--<td>--}%
+                        %{--<concept-box concept-group="fetch.conceptBoxes.categorical"--}%
+                                     %{--type="LD-categorical"--}%
+                                     %{--min="0"--}%
+                                     %{--max="-1"--}%
+                                     %{--label="(optional) Categorical Variables"--}%
+                                     %{--tooltip="Select an arbitrary number of categorical variables to expand the heatmap with low dimensional data.">--}%
+                        %{--</concept-box>--}%
+                    %{--</td>--}%
                 </tr>
             </table>
 
