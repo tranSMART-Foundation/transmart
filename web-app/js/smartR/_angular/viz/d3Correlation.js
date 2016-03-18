@@ -86,7 +86,6 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                     if (init) {
                         scope.data = results;
                     } else {
-                        console.log(results);
                         setData(results);
                         if (scatterUpdate) updateScatterplot();
                         updateRegressionLine();
@@ -95,7 +94,7 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
                     }
                 },
                 function (response) {
-                    alert('  Failure: ' + response.statusText);
+                    console.error('  Failure: ' + response.statusText);
                 }
             );
         }
@@ -249,10 +248,6 @@ window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', f
             .call(brush);
 
         function getColor(annotation) {
-            console.log('---')
-            console.log(annotation)
-            console.log(annotations)
-            console.log(annotations.indexOf(annotation))
             return annotation ? colors[annotations.indexOf(annotation)] : 'black';
         }
 
