@@ -898,6 +898,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                         switch (d.TYPE) {
                             case 'binary':
                                 return featureColorSetBinary[d.VALUE];
+                            case 'subset':
+                                return featureColorSetBinary[d.VALUE - 1];
                             case 'numerical':
                                 colorScale.range(featureColorSetSequential);
                                 return colorScale(1 / (1 + Math.pow(Math.E, -d.ZSCORE)));

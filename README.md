@@ -4,6 +4,7 @@
 
 
 ---
+
 *SmartR is still under development and requires testers in order to further improve.
 There is no warranty of any kind that it works as intended.
 Keep it mind that making use of this software is at your own risk!*
