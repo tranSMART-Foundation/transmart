@@ -48,25 +48,14 @@ getTimelineValues <- function(nodes, ontologyTerms) {
     }, USE.NAMES = FALSE)
 }
 
-# takes array of labels like X16703_n0_s1 and returns array where the node
-# has been replace with its timeline label, if it exists (e.g. X16703_Week 10_s1)
-replaceNodesWithTimelineLabel <- function(columnLabels, ontologyTerms) {
-    # find node name
-    matches <- gregexpr("[^_]+(?=_s\\d$)", columnLabels, perl = TRUE)
-    replace <- regmatches(columnLabels, matches)
-    replace <- lapply(replace, function(x) {
-        node <- x[[1]]
-        ret <- ontologyTerms[[node]]$metadata$seriesMeta$label
-        if (length(ret)) {
-            # replace spaces with dashes
-            # so javascript can still use the return as class names
-            gsub("\\s", "-", ret, perl = TRUE)
-        } else {
-            node
-        }
-    })
-    regmatches(columnLabels, matches) <- replace
-    columnLabels
+# nodeID has usually this format: 'X123_highDimensional_n0_s1)
+# this method pretifies it with the actual node label like this: '123_BreastCancer'
+library(stringr)
+replaceNodeIDNodeLabel <- function(ids, ontologyTerms) {
+    patientIDs <- str_extract(ids, "(?<=X)[0-9]+")
+    nodes <- str_extract(ids, "(?<=_{1}).+_n[0-9]+")  # i.e. highDimensional_n3
+    nodeLabels <- lapply(ontologyTerms[nodes], function(terms) return(terms$name))
+    paste(patientIDs, nodeLabels, sep="_")
 }
 
 getSubject <- function(patientIDs) {
@@ -149,10 +138,8 @@ getSubset <- function(patientIDs) {
     splittedIds <- strsplit(patientIDs,"_s") # During merge,
     # which is always run we append subset id, either
     # _s1 or _s2 to PATIENTID.
-    SUBSETS <- lapply(splittedIds, FUN = tail_elem) # In proper patienid
-    # subset will always be  at the end.
-    # This select last element after _s
-    SUBSETS <- sapply(SUBSETS, FUN = formatSubset)
+    subsets <- lapply(splittedIds, FUN = tail_elem) # In proper patienid
+    subsets
 }
 
 tail_elem <- function(vect, n = 1) {

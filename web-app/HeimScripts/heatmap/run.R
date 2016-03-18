@@ -112,8 +112,7 @@ addStats <- function(df, sorting, ranking, max_rows) {
     twoSubsets    <- hasTwoSubsets(measurements)
     if (ncol(df) > 3) {
         #this is the case for more than 1 sample
-        df <-
-        applySorting(df,sorting)  # no need for sorting in one sample case, we do it here only
+        df <- applySorting(df,sorting)  # no need for sorting in one sample case, we do it here only
 
         # is it valid measurements ?
         validLimmaMeasurements <- isValidLimmaMeasurements(measurements)
@@ -258,7 +257,6 @@ verifyInput <- function(max_rows, sorting) {
 applySorting <- function(df,sorting) {
     measurements <- getMeasurements(df)
     colNames <- names(measurements)
-
     subsets <- getSubset(colNames)
     nodes <- getNode(colNames)
     subjects <- getSubject(colNames)
@@ -287,8 +285,9 @@ buildFields <- function(df) {
     df["SD"]    <- NULL
     names(df)   <- c("UID","SIGNIFICANCE","PATIENTID","VALUE")
     df["ZSCORE"] <- ZSCORE
+    df["SUBSET"] <- getSubset(df$PATIENTID)
 
-    df$PATIENTID <- replaceNodesWithTimelineLabel(df$PATIENTID, fetch_params$ontologyTerms)
+    df$PATIENTID <- replaceNodeIDNodeLabel(df$PATIENTID, fetch_params$ontologyTerms)
 
     return(df)
 }
@@ -323,19 +322,7 @@ buildExtraFields <- function(df) {
     PATIENTID <- as.character(df$PATIENTID)
     TYPE <- rep("binary",nrow(df))
     VALUE <- getSubset(PATIENTID)
-    extraFields <- data.frame(FEATURE, PATIENTID, TYPE, VALUE,
-    stringsAsFactors = FALSE)
-}
-
-#frontend expects 0 or 1 instead of 1 or 2 as subset number.
-formatSubset <- function(subsetNumber) {
-    if (subsetNumber == "1") {
-        return(0)
-    } else if (subsetNumber == "2") {
-        return(1)
-    } else {
-        stop(paste("Incorrect Assay ID: unexpected subset number: ", subsetNumber))
-    }
+    extraFields <- data.frame(FEATURE, PATIENTID, TYPE, VALUE, stringsAsFactors = FALSE)
 }
 
 computeDendrogram <- function(distances, linkageMethod) {
