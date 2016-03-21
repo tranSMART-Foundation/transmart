@@ -23,8 +23,8 @@
         </label></div>
     </fieldset>
 </div>
-<div class="heim-input-field-sub" id="sr-multi-subset" ng-if="subsets > 1">
-    <fieldset class="heim-radiogroup" id="sr-differential-exp-group">
+<div class="heim-input-field-sub" id="sr-multi-subset" >
+    <fieldset class="heim-radiogroup" id="sr-differential-exp-group" ng-disabled="subsets < 2">
         <h3>Differential expression</h3>
         <div><label>
             <input type="radio" ng-model="criteria"  value="bval"> B-value/log odds ratio
