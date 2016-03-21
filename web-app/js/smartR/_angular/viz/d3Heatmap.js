@@ -29,6 +29,11 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         var features = data.features === undefined ? [] : data.features;
         var fields = data.fields;
         var significanceValues = data.significanceValues;
+        var logfoldValues = data.logfoldValues;
+        var ttestValues = data.ttestValues;
+        var pvalValues = data.pvalValues;
+        var adjpvalValues = data.adjpvalValues;
+        var bvalValues = data.bvalValues;
         var ranking = data.ranking[0];
         var patientIDs = data.patientIDs;
         var uids = data.uids;
@@ -1149,6 +1154,29 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             cluster();
         }
 
+        function changeRanking(method) {
+            ranking = method;
+            console.log(significanceValues)
+            console.log(pvalValues)
+            switch(method) {
+                case 'pval':
+                    significanceValues = pvalValues;
+                    break;
+                case 'adjpval':
+                    significanceValues = adjpvalValues;
+                    break;
+                case 'ttest':
+                    significanceValues = ttestValues;
+                    break;
+                case 'logfold':
+                    significanceValues = logfoldValues;
+                    break;
+                default:
+                    significanceValues = bvalValues;
+            }
+            updateHeatmap();
+        }
+
         function init() {
             updateHeatmap();
             reloadDendrograms();
@@ -1316,6 +1344,53 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 }
             ]
         });
+
+        if (ranking === 'bval' ||
+            ranking === 'pval' ||
+            ranking === 'adjpval' ||
+            ranking === 'logfold' ||
+            ranking === 'ttest') {
+            createD3Dropdown({
+                location: heatmap,
+                label: 'Ranking Method',
+                x: 2 - margin.left + padding * 0 + buttonWidth * 0,
+                y: 8 - margin.top + buttonHeight * 4 + padding * 4,
+                width: buttonWidth,
+                height: buttonHeight,
+                items: [
+                    {
+                        callback: function () {
+                            changeRanking('bval');
+                        },
+                        label: 'B Value'
+                    },
+                    {
+                        callback: function () {
+                            changeRanking('ttest');
+                        },
+                        label: 'T Test'
+                    },
+                    {
+                        callback: function () {
+                            changeRanking('logfold');
+                        },
+                        label: 'Logfold'
+                    },
+                    {
+                        callback: function () {
+                            changeRanking('pval');
+                        },
+                        label: 'p Value'
+                    },
+                    {
+                        callback: function () {
+                            changeRanking('adjpval');
+                        },
+                        label: 'adj. p Value'
+                    }
+                ]
+            });
+        }
     }
 
 }]);
