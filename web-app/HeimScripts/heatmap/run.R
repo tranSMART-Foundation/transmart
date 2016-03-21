@@ -302,15 +302,6 @@ applySorting <- function(df,sorting) {
 }
 
 buildFields <- function(df) {
-#    df["MEAN"] <- NULL
-#    df["SD"] <- NULL
-#    df["SIGNIFICANCE"] <- NULL
-#    df["LOGFOLD"] <- NULL
-#    df["TTEST"] <- NULL
-#    df["PVAL"] <- NULL
-#    df["ADJPVAL"] <- NULL
-#    df["BVAL"] <- NULL
-
     df <- melt(df, na.rm=T, id=c("UID", "MEAN", "SD", "SIGNIFICANCE", "LOGFOLD", "TTEST", "PVAL", "ADJPVAL", "BVAL"))
     # melt implicitly casts
     # characters to factors to make your life more exciting,
