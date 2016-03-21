@@ -75,13 +75,19 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
 
         var selectedPatientIDs = [];
 
-        var scale = d3.scale.linear()
-            .domain(d3.extent(significanceValues))
-            .range((ranking === 'pval' || ranking === 'adjpval') ? [histogramHeight, 0] : [0, histogramHeight]);
+        var scale = null;
+        var histogramScale = null;
 
-        var histogramScale = function (value) {
-            return (ranking === 'ttest' || ranking === 'logfold') ? scale(Math.abs(value)) : scale(value);
-        };
+        function setScales() {
+            scale = d3.scale.linear()
+                .domain(d3.extent(significanceValues))
+                .range((ranking === 'pval' || ranking === 'adjpval') ? [histogramHeight, 0] : [0, histogramHeight]);
+
+            histogramScale = function (value) {
+                return (ranking === 'ttest' || ranking === 'logfold') ? scale(Math.abs(value)) : scale(value);
+            }
+        }
+        setScales();
 
         function getInternalSortValue(value) {
             switch (ranking) {
@@ -1090,12 +1096,29 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         function updateRowOrder(sortValues) {
             var sortedUIDs = [];
             var sortedSignificanceValues = [];
+            var sortedLogfoldValues = [];
+            var sortedTtestValues = [];
+            var sortedPvalValues = [];
+            var sortedAdjpvalValues = [];
+            var sortedBvalValues = [];
+
             sortValues.each(function (sortValue) {
                 sortedUIDs.push(uids[sortValue]);
                 sortedSignificanceValues.push(significanceValues[sortValue]);
+                sortedLogfoldValues.push(logfoldValues[sortValue]);
+                sortedTtestValues.push(ttestValues[sortValue]);
+                sortedPvalValues.push(pvalValues[sortValue]);
+                sortedAdjpvalValues.push(adjpvalValues[sortValue]);
+                sortedBvalValues.push(bvalValues[sortValue]);
             });
             uids = sortedUIDs;
             significanceValues = sortedSignificanceValues;
+            logfoldValues = sortedLogfoldValues;
+            ttestValues = sortedTtestValues;
+            pvalValues = sortedPvalValues;
+            adjpvalValues = sortedAdjpvalValues;
+            bvalValues = sortedBvalValues;
+
             removeRowDendrogram();
             updateHeatmap();
             animateCutoff();
@@ -1156,8 +1179,6 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
 
         function changeRanking(method) {
             ranking = method;
-            console.log(significanceValues)
-            console.log(pvalValues)
             switch(method) {
                 case 'pval':
                     significanceValues = pvalValues;
@@ -1174,6 +1195,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 default:
                     significanceValues = bvalValues;
             }
+            setScales();
             updateHeatmap();
         }
 
