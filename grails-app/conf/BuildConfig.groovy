@@ -66,8 +66,11 @@ grails.project.dependency.resolution = {
         }
     }
     plugins {
-        runtime ':resources:1.2.14'
+    	// for release support (e.g. to 'publish' plugin to nexus)
+        build "org.grails.plugins:release:3.1.2" 
 
+        runtime ':resources:1.2.14'
+        
         compile ":sendfile:0.2"
         build ':tomcat:7.0.47', {
             export = false
