@@ -42,8 +42,8 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
 
             var typeMap = {
                 hleaficon: 'HD',
-                null: 'LD-categoric', // FIXME: alphaicon does not exist yet in transmartApp master branch
-                valueicon: 'LD-numeric'
+                null: 'LD-categorical', // FIXME: alphaicon does not exist yet in transmartApp master branch
+                valueicon: 'LD-numerical'
             };
             var _containsOnly = function() {
                 return $(template_box).children().toArray().every(function(childNode) {
@@ -71,10 +71,9 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
 
             scope.validate = function() {
                 scope.instructionMinNodes = scope.conceptGroup.length < scope.min;
-                scope.instructionMaxNodes = scope.conceptGroup.length > scope.max;
+                scope.instructionMaxNodes = ~scope.max && scope.conceptGroup.length > scope.max;
                 scope.instructionNodeType = !_containsOnly();
-                return !(scope.instructionMinNodes || scope.instructionMaxNodes ||
-                        scope.instructionNodeType);
+                return !(scope.instructionMinNodes || scope.instructionMaxNodes || scope.instructionNodeType);
             }
         }
     };

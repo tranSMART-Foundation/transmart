@@ -2,8 +2,8 @@ library(reshape2)
 
 main <- function(method = "pearson", selectedPatientIDs = integer()) {
 
-    num_data <- parse.input(sourceLabel="datapoints", loaded_variables=loaded_variables, type="numeric")
-    cat_data <- parse.input(sourceLabel="annotations", loaded_variables=loaded_variables, type="categoric")
+    num_data <- parse.input(sourceLabel="datapoints", loaded_variables=loaded_variables, type="numerical")
+    cat_data <- parse.input(sourceLabel="annotations", loaded_variables=loaded_variables, type="categorical")
 
     df <- num_data
     df <- na.omit(df)

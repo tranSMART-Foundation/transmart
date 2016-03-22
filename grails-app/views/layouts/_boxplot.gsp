@@ -8,19 +8,19 @@
         <workflow-tab tab-name="Fetch Data">
             <concept-box style="display: inline-block;"
                          concept-group="conceptBoxes.datapoints"
-                         type="LD-numeric"
+                         type="LD-numerical"
                          min="1"
                          max="1"
-                         label="Numeric Variable"
-                         tooltip="Select a single numeric variable that you would like to have displayed.">
+                         label="Numerical Variable"
+                         tooltip="Select a single numerical variable that you would like to have displayed.">
             </concept-box>
             <concept-box style="display: inline-block;"
                          concept-group="conceptBoxes.subsets"
-                         type="LD-categoric"
+                         type="LD-categorical"
                          min="0"
-                         max="10"
-                         label="(optional) Categoric Variables"
-                         tooltip="Select an arbitrary amount of categoric variables to split the numeric variable into subsets.">
+                         max="-1"
+                         label="(optional) Categorical Variables"
+                         tooltip="Select an arbitrary amount of categorical variables to split the numerical variable into subsets.">
             </concept-box>
             <br/>
             <br/>

@@ -6,18 +6,39 @@
         %{-- Fetch Data --}%
         %{--========================================================================================================--}%
         <workflow-tab tab-name="Fetch Data">
-            <concept-box
-                concept-group="fetch.conceptBoxes.highDimensional"
-                type="HD"
-                min="1"
-                max="512"
-                label="High Dimensional"
-                tooltip="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box. The nodes needs to be from the same platform.">
-            </concept-box>
 
-            %{--TODO include low dimensions--}%
-            %{--<concept-box concept-group="fetch.conceptBoxes.numerical"></concept-box>--}%
-            %{--<concept-box concept-group="fetch.conceptBoxes.categorical"></concept-box>--}%
+            <table>
+                <tr>
+                    <td>
+                        <concept-box concept-group="fetch.conceptBoxes.highDimensional"
+                                     type="HD"
+                                     min="1"
+                                     max="-1"
+                                     label="High Dimensional Variables"
+                                     tooltip="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box. The nodes needs to be from the same platform.">
+                        </concept-box>
+                    </td>
+                    %{--<td>--}%
+                        %{--<concept-box concept-group="fetch.conceptBoxes.numerical"--}%
+                                     %{--type="LD-numerical"--}%
+                                     %{--min="0"--}%
+                                     %{--max="-1"--}%
+                                     %{--label="(optional) Numerical Variables"--}%
+                                     %{--tooltip="Select an arbitrary number of numerical variables to expand the heatmap with low dimensional data.">--}%
+                        %{--</concept-box>--}%
+                    %{--</td>--}%
+                    %{--<td>--}%
+                        %{--<concept-box concept-group="fetch.conceptBoxes.categorical"--}%
+                                     %{--type="LD-categorical"--}%
+                                     %{--min="0"--}%
+                                     %{--max="-1"--}%
+                                     %{--label="(optional) Categorical Variables"--}%
+                                     %{--tooltip="Select an arbitrary number of categorical variables to expand the heatmap with low dimensional data.">--}%
+                        %{--</concept-box>--}%
+                    %{--</td>--}%
+                </tr>
+            </table>
+
 
             <biomarker-selection biomarkers="fetch.selectedBiomarkers"></biomarker-selection>
             <hr class="sr-divider">
@@ -59,11 +80,12 @@
         %{--Run Analysis--}%
         %{--========================================================================================================--}%
         <workflow-tab tab-name="Run Analysis">
-
             %{--Number of max row to display--}%
             <div class="heim-input-field heim-input-number sr-input-area">
-                <label>Number of rows to display</label>
-                <input type="text" id="txtMaxRow" ng-model="runAnalysis.params.max_row"> rows (< 1000 is preferable).
+                Show <input type="text" id="txtMaxRow" ng-model="runAnalysis.params.max_row">
+                of {{fetch.summaryData.summary[0].$$state.value.json.data[0].totalNumberOfValuesIncludingMissing /
+                    fetch.summaryData.summary[0].$$state.value.json.data[0].numberOfSamples}}
+                rows in total. (< 1000 is preferable.)
             </div>
 
             %{--Type of sorting to apply--}%
