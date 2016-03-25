@@ -694,6 +694,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight / 2)
                 .on('click', function (feature) {
+                    d3.selectAll('.box').classed('sortedBy', false);
+                    d3.select(this).classed('sortedBy', true);
+                    
                     var featureValues = [];
                     var missingValues = false;
                     for (var i = 0; i < patientIDs.length; i++) {
