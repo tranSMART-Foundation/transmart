@@ -957,11 +957,12 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             var legendElementWidth = legendWidth / uniqueSortedZscores.length;
             var legendElementHeight = legendHeight;
 
-            var legend = legendItems.selectAll('.legend')
+            var legendColor = legendItems.selectAll('.legendColor')
                 .data(uniqueSortedZscores, function(d) { return d; });
 
-            legend.enter()
+            legendColor.enter()
                 .append('rect')
+                .attr('class', 'legendColor')
                 .attr('x', function(d, i) {
                     return 2 - margin.left + buttonPadding * 1 + buttonWidth * 1 + + i * legendElementWidth;
                 })
@@ -970,8 +971,16 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('height', legendElementHeight)
                 .style('fill', function(d) { return colorScale(1 / (1 + Math.pow(Math.E, -d))); });
 
-            legend.enter()
+            legendColor.transition()
+                .duration(animationDuration)
+                .style('fill', function(d) { return colorScale(1 / (1 + Math.pow(Math.E, -d))); });
+
+            var legendText = legendItems.selectAll('.legendText')
+                .data(uniqueSortedZscores, function(d) { return d; });
+
+            legendText.enter()
                 .append('text')
+                .attr('class', 'legendText')
                 .attr('x', function(d, i) {
                     return 2 - margin.left + buttonPadding * 1 + buttonWidth * 1 + + i * legendElementWidth;
                 })
@@ -985,7 +994,16 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                     }
                 });
 
-            legend.exit().remove();
+            legendText.transition()
+                .text(function(d, i) {
+                    if (i === 0) {
+                        return Number((uniqueSortedZscores.min()).toFixed(1));
+                    } else if (i === uniqueSortedZscores.length - 1) {
+                        return Number((uniqueSortedZscores.max()).toFixed(1));
+                    } else {
+                        return null;
+                    }
+                });
         }
 
         function unselectAll() {
