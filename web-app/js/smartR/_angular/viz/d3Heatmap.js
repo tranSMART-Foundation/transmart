@@ -63,7 +63,10 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         var dendrogramHeight = 300;
         var histogramHeight = 200;
         var legendWidth = 200;
-        var legendHeight = 50;
+        var legendHeight = 40;
+        var buttonWidth = 200;
+        var buttonHeight = 40;
+        var buttonPadding = 20;
 
         var margin = {
             top: gridFieldHeight * 2 + 100 + features.length * gridFieldHeight / 2 + dendrogramHeight,
@@ -826,7 +829,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             // TODO: Use ajax service to be provided by ajaxServices.js to re-compute analysis
             // with new arguments (in this case filter for cut-off)
             $('#txtMaxRow').val(maxRows - cutoffLevel - 1);
-            $('#heim-btn-run-heatmap').click();
+            $('run-button input').click();
         }
 
         function reloadDendrograms() {
@@ -957,24 +960,23 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             var legend = legendItems.selectAll('.legend')
                 .data(uniqueSortedZscores, function(d) { return d; });
 
-            legend.append('text')
-                .attr('x', width + 40)
-                .attr('y', -8)
-                .text(function() { return Number((uniqueSortedZscores.min()).toFixed(1)); })
-                .style('text-anchor', 'middle');
-
             legend.enter()
                 .append('rect')
-                .attr('x', function(d, i) { return width + 40 + i * legendElementWidth; })
-                .attr('y', -20 - legendHeight)
+                .attr('x', function(d, i) {
+                    return 2 - margin.left + buttonPadding * 1 + buttonWidth * 1 + + i * legendElementWidth;
+                })
+                .attr('y', 8 - margin.top + buttonHeight * 4 + buttonPadding * 4)
                 .attr('width', Math.ceil(legendElementWidth))
                 .attr('height', legendElementHeight)
-                .style('fill', function(d) { return colorScale(1 / (1 + Math.pow(Math.E, -d))); })
+                .style('fill', function(d) { return colorScale(1 / (1 + Math.pow(Math.E, -d))); });
 
             legend.enter()
                 .append('text')
-                .attr('x', function(d, i) { return width + 40 + i * legendElementWidth; })
-                .attr('y', -10)
+                .attr('x', function(d, i) {
+                    return 2 - margin.left + buttonPadding * 1 + buttonWidth * 1 + + i * legendElementWidth;
+                })
+                .attr('y', 8 - margin.top + buttonHeight * 4 + buttonPadding * 4 + legendHeight + 10)
+                .attr('text-anchor', 'middle')
                 .text(function(d, i) {
                     if (i === 0 || i === uniqueSortedZscores.length - 1) {
                         return Number((uniqueSortedZscores.min()).toFixed(1));
@@ -982,6 +984,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                         return null;
                     }
                 });
+
+            legend.exit().remove();
         }
 
         function unselectAll() {
@@ -1270,16 +1274,12 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
 
         init();
 
-        var buttonWidth = 200;
-        var buttonHeight = 40;
-        var padding = 20;
-
         createD3Switch({
             location: heatmap,
             onlabel: 'Animation ON',
             offlabel: 'Animation OFF',
-            x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-            y: 8 - margin.top + buttonHeight * 0 + padding * 0,
+            x: 2 - margin.left + buttonPadding * 0 + buttonWidth * 0,
+            y: 8 - margin.top + buttonHeight * 0 + buttonPadding * 0,
             width: buttonWidth,
             height: buttonHeight,
             callback: switchAnimation,
@@ -1289,8 +1289,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         createD3Slider({
             location: heatmap,
             label: 'Zoom in %',
-            x: 2 - margin.left + padding * 1 + buttonWidth * 1,
-            y: 8 - margin.top + buttonHeight * 0 + padding * 0 - 10,
+            x: 2 - margin.left + buttonPadding * 1 + buttonWidth * 1,
+            y: 8 - margin.top + buttonHeight * 0 + buttonPadding * 0 - 10,
             width: buttonWidth,
             height: buttonHeight,
             min: 1,
@@ -1303,8 +1303,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         var cuttoffButton = createD3Button({
             location: heatmap,
             label: 'Apply Cutoff',
-            x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-            y: 8 - margin.top + buttonHeight * 1 + padding * 1,
+            x: 2 - margin.left + buttonPadding * 0 + buttonWidth * 0,
+            y: 8 - margin.top + buttonHeight * 1 + buttonPadding * 1,
             width: buttonWidth,
             height: buttonHeight,
             callback: cutoff
@@ -1313,8 +1313,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         createD3Slider({
             location: heatmap,
             label: 'Cutoff',
-            x: 2 - margin.left + padding * 1 + buttonWidth * 1,
-            y: 8 - margin.top + buttonHeight * 1 + padding * 1 - 10,
+            x: 2 - margin.left + buttonPadding * 1 + buttonWidth * 1,
+            y: 8 - margin.top + buttonHeight * 1 + buttonPadding * 1 - 10,
             width: buttonWidth,
             height: buttonHeight,
             min: 0,
@@ -1328,8 +1328,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             location: heatmap,
             onlabel: 'Clustering rows ON',
             offlabel: 'Clustering rows OFF',
-            x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-            y: 8 - margin.top + buttonHeight * 3 + padding * 3,
+            x: 2 - margin.left + buttonPadding * 0 + buttonWidth * 0,
+            y: 8 - margin.top + buttonHeight * 3 + buttonPadding * 3,
             width: buttonWidth,
             height: buttonHeight,
             callback: switchRowClustering,
@@ -1340,8 +1340,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             location: heatmap,
             onlabel: 'Clustering columns ON',
             offlabel: 'Clustering columns OFF',
-            x: 2 - margin.left + padding * 1 + buttonWidth * 1,
-            y: 8 - margin.top + buttonHeight * 3 + padding * 3,
+            x: 2 - margin.left + buttonPadding * 1 + buttonWidth * 1,
+            y: 8 - margin.top + buttonHeight * 3 + buttonPadding * 3,
             width: buttonWidth,
             height: buttonHeight,
             callback: switchColClustering,
@@ -1356,8 +1356,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             createD3Dropdown({
                 location: heatmap,
                 label: 'Ranking Method',
-                x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-                y: 8 - margin.top + buttonHeight * 4 + padding * 4,
+                x: 2 - margin.left + buttonPadding * 0 + buttonWidth * 0,
+                y: 8 - margin.top + buttonHeight * 4 + buttonPadding * 4,
                 width: buttonWidth,
                 height: buttonHeight,
                 items: [
@@ -1399,8 +1399,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         createD3Dropdown({
             location: heatmap,
             label: 'Heatmap Coloring',
-            x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-            y: 8 - margin.top + buttonHeight * 2 + padding * 2,
+            x: 2 - margin.left + buttonPadding * 0 + buttonWidth * 0,
+            y: 8 - margin.top + buttonHeight * 2 + buttonPadding * 2,
             width: buttonWidth,
             height: buttonHeight,
             items: [
@@ -1434,8 +1434,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         createD3Dropdown({
             location: heatmap,
             label: 'Heatmap Clustering',
-            x: 2 - margin.left + padding * 1 + buttonWidth * 1,
-            y: 8 - margin.top + buttonHeight * 2 + padding * 2,
+            x: 2 - margin.left + buttonPadding * 1 + buttonWidth * 1,
+            y: 8 - margin.top + buttonHeight * 2 + buttonPadding * 2,
             width: buttonWidth,
             height: buttonHeight,
             items: [
