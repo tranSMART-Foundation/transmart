@@ -121,7 +121,7 @@
             <capture-plot-button filename="heatmap.svg" disabled="runAnalysis.download.disabled"></capture-plot-button>
             <download-results-button disabled="runAnalysis.download.disabled"></download-results-button>
             <br/>
-            <heatmap-plot data="runAnalysis.scriptResults" width="1200" height="1200"></heatmap-plot>
+            <heatmap-plot data="runAnalysis.scriptResults" width="1200" height="1200" params="runAnalysis.params"></heatmap-plot>
 
         </workflow-tab>
 

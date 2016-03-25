@@ -7,7 +7,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         scope: {
             data: '=',
             width: '@',
-            height: '@'
+            height: '@',
+            params: '='
         },
         link: function (scope, element, attrs) {
 
@@ -17,13 +18,13 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             scope.$watch('data', function (newValue, oldValue) {
                 $(element[0]).empty();
                 if (angular.isArray(newValue.fields)) {
-                    createHeatmap(scope.data, element[0]);
+                    createHeatmap(scope.data, element[0], scope.params);
                 }
             }, true);
         }
     };
 
-    function createHeatmap(data, root) {
+    function createHeatmap(data, root, params) {
         var animationDuration = 1500;
         var extraFields = data.extraFields === undefined ? [] : data.extraFields;
         var features = data.features === undefined ? [] : data.features;
@@ -828,7 +829,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             //});
             // TODO: Use ajax service to be provided by ajaxServices.js to re-compute analysis
             // with new arguments (in this case filter for cut-off)
-            $('#txtMaxRow').val(maxRows - cutoffLevel - 1);
+            params.max_row = maxRows - cutoffLevel - 1;
             $('run-button input').click();
         }
 
