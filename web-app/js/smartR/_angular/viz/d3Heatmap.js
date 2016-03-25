@@ -62,6 +62,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         var gridFieldHeight = 20;
         var dendrogramHeight = 300;
         var histogramHeight = 200;
+        var legendWidth = 200;
+        var legendHeight = 50;
 
         var margin = {
             top: gridFieldHeight * 2 + 100 + features.length * gridFieldHeight / 2 + dendrogramHeight,
@@ -128,8 +130,18 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         var significanceSortItems = heatmap.append('g');
         var labelItems = heatmap.append('g');
         var barItems = heatmap.append('g');
+        var legendItems = heatmap.append('g');
         var warningDiv = $('#heim-heatmap-warnings').append('strong')
             .text(warning);
+
+        var uniqueSortedZscores = fields.map(function(d) {
+            return parseFloat(d.ZSCORE);
+        });
+        uniqueSortedZscores.sort(function(a, b) { return a - b; });
+        uniqueSortedZscores.filter(function(d, i) {
+            return !i || d != uniqueSortedZscores[i - 1];
+        });
+
 
         function updateHeatmap() {
             var square = squareItems.selectAll('.square')
@@ -696,7 +708,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .on('click', function (feature) {
                     d3.selectAll('.box').classed('sortedBy', false);
                     d3.select(this).classed('sortedBy', true);
-                    
+
                     var featureValues = [];
                     var missingValues = false;
                     for (var i = 0; i < patientIDs.length; i++) {
@@ -852,6 +864,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             }
         }
 
+        var colorScale;
         function updateColors(schema) {
             var redGreenScale = d3.scale.quantile()
                 .domain([0, 1])
@@ -899,7 +912,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 redBlue: redBlueScale,
                 greenScale: greenScale
             };
-            var colorScale = colorSchemas[schema];
+
+            colorScale = colorSchemas[schema];
+
             d3.selectAll('.square')
                 .transition()
                 .duration(animationDuration)
@@ -931,6 +946,42 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                         }
                     });
             });
+
+            updateLegend();
+        }
+
+        function updateLegend() {
+            var legendElementWidth = legendWidth / uniqueSortedZscores.length;
+            var legendElementHeight = legendHeight;
+
+            var legend = legendItems.selectAll('.legend')
+                .data(uniqueSortedZscores, function(d) { return d; });
+
+            legend.append('text')
+                .attr('x', width + 40)
+                .attr('y', -8)
+                .text(function() { return Number((uniqueSortedZscores.min()).toFixed(1)); })
+                .style('text-anchor', 'middle');
+
+            legend.enter()
+                .append('rect')
+                .attr('x', function(d, i) { return width + 40 + i * legendElementWidth; })
+                .attr('y', -20 - legendHeight)
+                .attr('width', Math.ceil(legendElementWidth))
+                .attr('height', legendElementHeight)
+                .style('fill', function(d) { return colorScale(1 / (1 + Math.pow(Math.E, -d))); })
+
+            legend.enter()
+                .append('text')
+                .attr('x', function(d, i) { return width + 40 + i * legendElementWidth; })
+                .attr('y', -10)
+                .text(function(d, i) {
+                    if (i === 0 || i === uniqueSortedZscores.length - 1) {
+                        return Number((uniqueSortedZscores.min()).toFixed(1));
+                    } else {
+                        return null;
+                    }
+                });
         }
 
         function unselectAll() {
