@@ -244,6 +244,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
                 .on('click', function (patientID) {
+                    d3.selectAll('.box').classed('sortedBy', false);
+                    d3.select(this).classed('sortedBy', true);
+
                     var rowValues = uids.map(function (uid, idx) {
                         return [idx, getValueForSquareSorting(patientID, uid)];
                     });
@@ -309,6 +312,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
                 .on('click', function (uid) {
+                    d3.selectAll('.box').classed('sortedBy', false);
+                    d3.select(this).classed('sortedBy', true);
+
                     var colValues = patientIDs.map(function (patientID, idx) {
                         return [idx, getValueForSquareSorting(patientID, uid)];
                     });
@@ -368,6 +374,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
                 .on('click', function () {
+                    d3.selectAll('.box').classed('sortedBy', false);
+                    d3.select(this).classed('sortedBy', true);
+
                     var rowValues = significanceValues.map(function (significanceValue, idx) {
                         return [idx, getInternalSortValue(significanceValue)];
                     });
