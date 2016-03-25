@@ -1285,6 +1285,54 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             checked: colClustering
         });
 
+        if (ranking === 'bval' ||
+            ranking === 'pval' ||
+            ranking === 'adjpval' ||
+            ranking === 'logfold' ||
+            ranking === 'ttest') {
+            createD3Dropdown({
+                location: heatmap,
+                label: 'Ranking Method',
+                x: 2 - margin.left + padding * 0 + buttonWidth * 0,
+                y: 8 - margin.top + buttonHeight * 4 + padding * 4,
+                width: buttonWidth,
+                height: buttonHeight,
+                items: [
+                    {
+                        callback: function () {
+                            changeRanking('bval');
+                        },
+                        label: 'B Value'
+                    },
+                    {
+                        callback: function () {
+                            changeRanking('ttest');
+                        },
+                        label: 'T Test'
+                    },
+                    {
+                        callback: function () {
+                            changeRanking('logfold');
+                        },
+                        label: 'Logfold'
+                    },
+                    {
+                        callback: function () {
+                            changeRanking('pval');
+                        },
+                        label: 'p Value'
+                    },
+                    {
+                        callback: function () {
+                            changeRanking('adjpval');
+                        },
+                        label: 'adj. p Value'
+                    }
+                ]
+            });
+        }
+
+
         createD3Dropdown({
             location: heatmap,
             label: 'Heatmap Coloring',
@@ -1366,53 +1414,6 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 }
             ]
         });
-
-        if (ranking === 'bval' ||
-            ranking === 'pval' ||
-            ranking === 'adjpval' ||
-            ranking === 'logfold' ||
-            ranking === 'ttest') {
-            createD3Dropdown({
-                location: heatmap,
-                label: 'Ranking Method',
-                x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-                y: 8 - margin.top + buttonHeight * 4 + padding * 4,
-                width: buttonWidth,
-                height: buttonHeight,
-                items: [
-                    {
-                        callback: function () {
-                            changeRanking('bval');
-                        },
-                        label: 'B Value'
-                    },
-                    {
-                        callback: function () {
-                            changeRanking('ttest');
-                        },
-                        label: 'T Test'
-                    },
-                    {
-                        callback: function () {
-                            changeRanking('logfold');
-                        },
-                        label: 'Logfold'
-                    },
-                    {
-                        callback: function () {
-                            changeRanking('pval');
-                        },
-                        label: 'p Value'
-                    },
-                    {
-                        callback: function () {
-                            changeRanking('adjpval');
-                        },
-                        label: 'adj. p Value'
-                    }
-                ]
-            });
-        }
     }
 
 }]);
