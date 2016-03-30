@@ -23,13 +23,13 @@ window.smartRApp.directive('downloadResultsButton', ['rServeService', function(r
         link: function(scope, element) {
 
             var template_btn = element.children()[0];
-            template_btn.disabled = true;
-
             var template_msg = element.children()[1];
 
+            template_btn.disabled = scope.disabled;
+
             scope.$watch('disabled', function (newValue) {
-                template_btn.disabled = Boolean(newValue);
-            });
+                template_btn.disabled = newValue;
+            }, true);
 
             template_btn.onclick = function() {
 

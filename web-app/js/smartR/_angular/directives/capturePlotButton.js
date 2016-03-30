@@ -74,11 +74,11 @@ window.smartRApp.directive('capturePlotButton', [function() {
         link: function(scope, elements) {
 
             var template_btn = elements.children()[0];
-            template_btn.disabled = true;
+            template_btn.disabled = scope.disabled;
 
             scope.$watch('disabled', function (newValue) {
-                template_btn.disabled = Boolean(newValue);
-            });
+                template_btn.disabled = newValue;
+            }, true);
 
             if (!scope.filename) {
                 // default filename
