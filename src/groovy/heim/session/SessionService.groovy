@@ -1,5 +1,6 @@
 package heim.session
 
+import grails.util.Environment
 import groovy.util.logging.Log4j
 import heim.SmartRExecutorService
 import heim.SmartRRuntimeConstants
@@ -27,6 +28,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 @Component
 @Log4j
 class SessionService implements DisposableBean {
+
+    private static final String[] HIDDEN_WORKFLOWS = ['timeline', 'volcanoplot']
 
     private static final int COLLECTION_INTERVAL = 5 * 60 * 1000 // 5 min
     private static final int SESSION_LIFESPAN = 10 * 60 * 1000 // 10 min
@@ -78,7 +81,10 @@ class SessionService implements DisposableBean {
 
     List<String> availableWorkflows() {
         File dir = constants.pluginScriptDirectory
-        dir.listFiles({ File f -> f.isDirectory() && !f.name.startsWith('_') } as FileFilter)*.name
+        dir.listFiles({ File f ->
+            f.isDirectory() && !f.name.startsWith('_') &&
+                    (Environment.current == Environment.DEVELOPMENT || !(f.name in HIDDEN_WORKFLOWS))
+        } as FileFilter)*.name
     }
 
     UUID createSession(User user, String workflowType) {

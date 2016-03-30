@@ -62,11 +62,12 @@
         %{--Run Analysis--}%
         %{--========================================================================================================--}%
         <workflow-tab tab-name="Run Analysis">
-
             %{--Number of max row to display--}%
             <div class="heim-input-field heim-input-number sr-input-area">
-                <label>Number of rows to display</label>
-                <input type="text" id="txtMaxRow" ng-model="runAnalysis.params.max_row"> rows (< 1000 is preferable).
+                Show <input type="text" id="txtMaxRow" ng-model="runAnalysis.params.max_row">
+                of {{fetch.summaryData.summary[0].$$state.value.json.data[0].totalNumberOfValuesIncludingMissing /
+                    fetch.summaryData.summary[0].$$state.value.json.data[0].numberOfSamples}}
+                rows in total. (< 1000 is preferable.)
             </div>
 
             %{--Type of sorting to apply--}%
@@ -102,7 +103,7 @@
             <capture-plot-button filename="heatmap.svg" disabled="runAnalysis.download.disabled"></capture-plot-button>
             <download-results-button disabled="runAnalysis.download.disabled"></download-results-button>
             <br/>
-            <heatmap-plot data="runAnalysis.scriptResults" width="1200" height="1200"></heatmap-plot>
+            <heatmap-plot data="runAnalysis.scriptResults" width="1200" height="1200" params="runAnalysis.params"></heatmap-plot>
 
         </workflow-tab>
 

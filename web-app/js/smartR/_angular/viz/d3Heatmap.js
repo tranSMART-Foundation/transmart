@@ -7,7 +7,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         scope: {
             data: '=',
             width: '@',
-            height: '@'
+            height: '@',
+            params: '='
         },
         link: function (scope, element, attrs) {
 
@@ -17,18 +18,23 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             scope.$watch('data', function (newValue, oldValue) {
                 $(element[0]).empty();
                 if (angular.isArray(newValue.fields)) {
-                    createHeatmap(scope.data, element[0]);
+                    createHeatmap(scope.data, element[0], scope.params);
                 }
             }, true);
         }
     };
 
-    function createHeatmap(data, root) {
+    function createHeatmap(data, root, params) {
         var animationDuration = 1500;
         var extraFields = data.extraFields === undefined ? [] : data.extraFields;
         var features = data.features === undefined ? [] : data.features;
         var fields = data.fields;
         var significanceValues = data.significanceValues;
+        var logfoldValues = data.logfoldValues;
+        var ttestValues = data.ttestValues;
+        var pvalValues = data.pvalValues;
+        var adjpvalValues = data.adjpvalValues;
+        var bvalValues = data.bvalValues;
         var ranking = data.ranking[0];
         var patientIDs = data.patientIDs;
         var uids = data.uids;
@@ -57,6 +63,11 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         var gridFieldHeight = 20;
         var dendrogramHeight = 300;
         var histogramHeight = 200;
+        var legendWidth = 200;
+        var legendHeight = 40;
+        var buttonWidth = 200;
+        var buttonHeight = 40;
+        var buttonPadding = 20;
 
         var margin = {
             top: gridFieldHeight * 2 + 100 + features.length * gridFieldHeight / 2 + dendrogramHeight,
@@ -70,13 +81,19 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
 
         var selectedPatientIDs = [];
 
-        var scale = d3.scale.linear()
-            .domain(d3.extent(significanceValues))
-            .range((ranking === 'pval' || ranking === 'adjpval') ? [histogramHeight, 0] : [0, histogramHeight]);
+        var scale = null;
+        var histogramScale = null;
 
-        var histogramScale = function (value) {
-            return (ranking === 'ttest' || ranking === 'logfold') ? scale(Math.abs(value)) : scale(value);
-        };
+        function setScales() {
+            scale = d3.scale.linear()
+                .domain(d3.extent(significanceValues))
+                .range((ranking === 'pval' || ranking === 'adjpval') ? [histogramHeight, 0] : [0, histogramHeight]);
+
+            histogramScale = function (value) {
+                return (ranking === 'ttest' || ranking === 'logfold') ? scale(Math.abs(value)) : scale(value);
+            }
+        }
+        setScales();
 
         function getInternalSortValue(value) {
             switch (ranking) {
@@ -117,8 +134,18 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         var significanceSortItems = heatmap.append('g');
         var labelItems = heatmap.append('g');
         var barItems = heatmap.append('g');
+        var legendItems = heatmap.append('g');
         var warningDiv = $('#heim-heatmap-warnings').append('strong')
             .text(warning);
+
+        var uniqueSortedZscores = fields.map(function(d) {
+            return parseFloat(d.ZSCORE);
+        });
+        uniqueSortedZscores.sort(function(a, b) { return a - b; });
+        uniqueSortedZscores.filter(function(d, i) {
+            return !i || d != uniqueSortedZscores[i - 1];
+        });
+
 
         function updateHeatmap() {
             var square = squareItems.selectAll('.square')
@@ -233,6 +260,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
                 .on('click', function (patientID) {
+                    d3.selectAll('.box').classed('sortedBy', false);
+                    d3.select(this).classed('sortedBy', true);
+
                     var rowValues = uids.map(function (uid, idx) {
                         return [idx, getValueForSquareSorting(patientID, uid)];
                     });
@@ -298,6 +328,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
                 .on('click', function (uid) {
+                    d3.selectAll('.box').classed('sortedBy', false);
+                    d3.select(this).classed('sortedBy', true);
+
                     var colValues = patientIDs.map(function (patientID, idx) {
                         return [idx, getValueForSquareSorting(patientID, uid)];
                     });
@@ -357,6 +390,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight)
                 .on('click', function () {
+                    d3.selectAll('.box').classed('sortedBy', false);
+                    d3.select(this).classed('sortedBy', true);
+
                     var rowValues = significanceValues.map(function (significanceValue, idx) {
                         return [idx, getInternalSortValue(significanceValue)];
                     });
@@ -674,6 +710,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('width', gridFieldWidth)
                 .attr('height', gridFieldHeight / 2)
                 .on('click', function (feature) {
+                    d3.selectAll('.box').classed('sortedBy', false);
+                    d3.select(this).classed('sortedBy', true);
+
                     var featureValues = [];
                     var missingValues = false;
                     for (var i = 0; i < patientIDs.length; i++) {
@@ -790,8 +829,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             //});
             // TODO: Use ajax service to be provided by ajaxServices.js to re-compute analysis
             // with new arguments (in this case filter for cut-off)
-            $('#txtMaxRow').val(maxRows - cutoffLevel - 1);
-            $('#heim-btn-run-heatmap').click();
+            params.max_row = maxRows - cutoffLevel - 1;
+            $('run-button input').click();
         }
 
         function reloadDendrograms() {
@@ -829,6 +868,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             }
         }
 
+        var colorScale;
         function updateColors(schema) {
             var redGreenScale = d3.scale.quantile()
                 .domain([0, 1])
@@ -876,7 +916,9 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 redBlue: redBlueScale,
                 greenScale: greenScale
             };
-            var colorScale = colorSchemas[schema];
+
+            colorScale = colorSchemas[schema];
+
             d3.selectAll('.square')
                 .transition()
                 .duration(animationDuration)
@@ -908,6 +950,61 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                         }
                     });
             });
+
+            updateLegend();
+        }
+
+        function updateLegend() {
+            var legendElementWidth = legendWidth / uniqueSortedZscores.length;
+            var legendElementHeight = legendHeight;
+
+            var legendColor = legendItems.selectAll('.legendColor')
+                .data(uniqueSortedZscores, function(d) { return d; });
+
+            legendColor.enter()
+                .append('rect')
+                .attr('class', 'legendColor')
+                .attr('x', function(d, i) {
+                    return 2 - margin.left + buttonPadding * 1 + buttonWidth * 1 + + i * legendElementWidth;
+                })
+                .attr('y', 8 - margin.top + buttonHeight * 4 + buttonPadding * 4)
+                .attr('width', Math.ceil(legendElementWidth))
+                .attr('height', legendElementHeight)
+                .style('fill', function(d) { return colorScale(1 / (1 + Math.pow(Math.E, -d))); });
+
+            legendColor.transition()
+                .duration(animationDuration)
+                .style('fill', function(d) { return colorScale(1 / (1 + Math.pow(Math.E, -d))); });
+
+            var legendText = legendItems.selectAll('.legendText')
+                .data(uniqueSortedZscores, function(d) { return d; });
+
+            legendText.enter()
+                .append('text')
+                .attr('class', 'legendText')
+                .attr('x', function(d, i) {
+                    return 2 - margin.left + buttonPadding * 1 + buttonWidth * 1 + + i * legendElementWidth;
+                })
+                .attr('y', 8 - margin.top + buttonHeight * 4 + buttonPadding * 4 + legendHeight + 10)
+                .attr('text-anchor', 'middle')
+                .text(function(d, i) {
+                    if (i === 0 || i === uniqueSortedZscores.length - 1) {
+                        return Number((uniqueSortedZscores.min()).toFixed(1));
+                    } else {
+                        return null;
+                    }
+                });
+
+            legendText.transition()
+                .text(function(d, i) {
+                    if (i === 0) {
+                        return Number((uniqueSortedZscores.min()).toFixed(1));
+                    } else if (i === uniqueSortedZscores.length - 1) {
+                        return Number((uniqueSortedZscores.max()).toFixed(1));
+                    } else {
+                        return null;
+                    }
+                });
         }
 
         function unselectAll() {
@@ -1085,12 +1182,29 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         function updateRowOrder(sortValues) {
             var sortedUIDs = [];
             var sortedSignificanceValues = [];
+            var sortedLogfoldValues = [];
+            var sortedTtestValues = [];
+            var sortedPvalValues = [];
+            var sortedAdjpvalValues = [];
+            var sortedBvalValues = [];
+
             sortValues.each(function (sortValue) {
                 sortedUIDs.push(uids[sortValue]);
                 sortedSignificanceValues.push(significanceValues[sortValue]);
+                sortedLogfoldValues.push(logfoldValues[sortValue]);
+                sortedTtestValues.push(ttestValues[sortValue]);
+                sortedPvalValues.push(pvalValues[sortValue]);
+                sortedAdjpvalValues.push(adjpvalValues[sortValue]);
+                sortedBvalValues.push(bvalValues[sortValue]);
             });
             uids = sortedUIDs;
             significanceValues = sortedSignificanceValues;
+            logfoldValues = sortedLogfoldValues;
+            ttestValues = sortedTtestValues;
+            pvalValues = sortedPvalValues;
+            adjpvalValues = sortedAdjpvalValues;
+            bvalValues = sortedBvalValues;
+
             removeRowDendrogram();
             updateHeatmap();
             animateCutoff();
@@ -1149,6 +1263,28 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             cluster();
         }
 
+        function changeRanking(method) {
+            ranking = method;
+            switch(method) {
+                case 'pval':
+                    significanceValues = pvalValues;
+                    break;
+                case 'adjpval':
+                    significanceValues = adjpvalValues;
+                    break;
+                case 'ttest':
+                    significanceValues = ttestValues;
+                    break;
+                case 'logfold':
+                    significanceValues = logfoldValues;
+                    break;
+                default:
+                    significanceValues = bvalValues;
+            }
+            setScales();
+            updateHeatmap();
+        }
+
         function init() {
             updateHeatmap();
             reloadDendrograms();
@@ -1157,16 +1293,12 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
 
         init();
 
-        var buttonWidth = 200;
-        var buttonHeight = 40;
-        var padding = 20;
-
         createD3Switch({
             location: heatmap,
             onlabel: 'Animation ON',
             offlabel: 'Animation OFF',
-            x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-            y: 8 - margin.top + buttonHeight * 0 + padding * 0,
+            x: 2 - margin.left + buttonPadding * 0 + buttonWidth * 0,
+            y: 8 - margin.top + buttonHeight * 0 + buttonPadding * 0,
             width: buttonWidth,
             height: buttonHeight,
             callback: switchAnimation,
@@ -1176,8 +1308,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         createD3Slider({
             location: heatmap,
             label: 'Zoom in %',
-            x: 2 - margin.left + padding * 1 + buttonWidth * 1,
-            y: 8 - margin.top + buttonHeight * 0 + padding * 0 - 10,
+            x: 2 - margin.left + buttonPadding * 1 + buttonWidth * 1,
+            y: 8 - margin.top + buttonHeight * 0 + buttonPadding * 0 - 10,
             width: buttonWidth,
             height: buttonHeight,
             min: 1,
@@ -1190,8 +1322,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         var cuttoffButton = createD3Button({
             location: heatmap,
             label: 'Apply Cutoff',
-            x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-            y: 8 - margin.top + buttonHeight * 1 + padding * 1,
+            x: 2 - margin.left + buttonPadding * 0 + buttonWidth * 0,
+            y: 8 - margin.top + buttonHeight * 1 + buttonPadding * 1,
             width: buttonWidth,
             height: buttonHeight,
             callback: cutoff
@@ -1200,8 +1332,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         createD3Slider({
             location: heatmap,
             label: 'Cutoff',
-            x: 2 - margin.left + padding * 1 + buttonWidth * 1,
-            y: 8 - margin.top + buttonHeight * 1 + padding * 1 - 10,
+            x: 2 - margin.left + buttonPadding * 1 + buttonWidth * 1,
+            y: 8 - margin.top + buttonHeight * 1 + buttonPadding * 1 - 10,
             width: buttonWidth,
             height: buttonHeight,
             min: 0,
@@ -1215,8 +1347,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             location: heatmap,
             onlabel: 'Clustering rows ON',
             offlabel: 'Clustering rows OFF',
-            x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-            y: 8 - margin.top + buttonHeight * 3 + padding * 3,
+            x: 2 - margin.left + buttonPadding * 0 + buttonWidth * 0,
+            y: 8 - margin.top + buttonHeight * 3 + buttonPadding * 3,
             width: buttonWidth,
             height: buttonHeight,
             callback: switchRowClustering,
@@ -1227,19 +1359,67 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             location: heatmap,
             onlabel: 'Clustering columns ON',
             offlabel: 'Clustering columns OFF',
-            x: 2 - margin.left + padding * 1 + buttonWidth * 1,
-            y: 8 - margin.top + buttonHeight * 3 + padding * 3,
+            x: 2 - margin.left + buttonPadding * 1 + buttonWidth * 1,
+            y: 8 - margin.top + buttonHeight * 3 + buttonPadding * 3,
             width: buttonWidth,
             height: buttonHeight,
             callback: switchColClustering,
             checked: colClustering
         });
 
+        if (ranking === 'bval' ||
+            ranking === 'pval' ||
+            ranking === 'adjpval' ||
+            ranking === 'logfold' ||
+            ranking === 'ttest') {
+            createD3Dropdown({
+                location: heatmap,
+                label: 'Ranking Method',
+                x: 2 - margin.left + buttonPadding * 0 + buttonWidth * 0,
+                y: 8 - margin.top + buttonHeight * 4 + buttonPadding * 4,
+                width: buttonWidth,
+                height: buttonHeight,
+                items: [
+                    {
+                        callback: function () {
+                            changeRanking('bval');
+                        },
+                        label: 'B Value'
+                    },
+                    {
+                        callback: function () {
+                            changeRanking('ttest');
+                        },
+                        label: 'T Test'
+                    },
+                    {
+                        callback: function () {
+                            changeRanking('logfold');
+                        },
+                        label: 'Logfold'
+                    },
+                    {
+                        callback: function () {
+                            changeRanking('pval');
+                        },
+                        label: 'p Value'
+                    },
+                    {
+                        callback: function () {
+                            changeRanking('adjpval');
+                        },
+                        label: 'adj. p Value'
+                    }
+                ]
+            });
+        }
+
+
         createD3Dropdown({
             location: heatmap,
             label: 'Heatmap Coloring',
-            x: 2 - margin.left + padding * 0 + buttonWidth * 0,
-            y: 8 - margin.top + buttonHeight * 2 + padding * 2,
+            x: 2 - margin.left + buttonPadding * 0 + buttonWidth * 0,
+            y: 8 - margin.top + buttonHeight * 2 + buttonPadding * 2,
             width: buttonWidth,
             height: buttonHeight,
             items: [
@@ -1273,8 +1453,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         createD3Dropdown({
             location: heatmap,
             label: 'Heatmap Clustering',
-            x: 2 - margin.left + padding * 1 + buttonWidth * 1,
-            y: 8 - margin.top + buttonHeight * 2 + padding * 2,
+            x: 2 - margin.left + buttonPadding * 1 + buttonWidth * 1,
+            y: 8 - margin.top + buttonHeight * 2 + buttonPadding * 2,
             width: buttonWidth,
             height: buttonHeight,
             items: [
