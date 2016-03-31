@@ -91,7 +91,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
 
             histogramScale = function (value) {
                 return (ranking === 'ttest' || ranking === 'logfold') ? scale(Math.abs(value)) : scale(value);
-            }
+            };
         }
         setScales();
 
@@ -539,7 +539,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                     return 'bar idx-' + smartRUtils.makeSafeForCSS(d.idx);
                 })
                 .attr('width', function (d) {
-                    return histogramScale(d.significance)
+                    return histogramScale(d.significance);
                 })
                 .attr('height', gridFieldHeight)
                 .attr('x', function (d) {
@@ -965,7 +965,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .append('rect')
                 .attr('class', 'legendColor')
                 .attr('x', function(d, i) {
-                    return 2 - margin.left + buttonPadding * 1 + buttonWidth * 1 + + i * legendElementWidth;
+                    return 2 - margin.left + buttonPadding * 1 + buttonWidth * 1 + i * legendElementWidth;
                 })
                 .attr('y', 8 - margin.top + buttonHeight * 4 + buttonPadding * 4)
                 .attr('width', Math.ceil(legendElementWidth))
@@ -983,7 +983,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .append('text')
                 .attr('class', 'legendText')
                 .attr('x', function(d, i) {
-                    return 2 - margin.left + buttonPadding * 1 + buttonWidth * 1 + + i * legendElementWidth;
+                    return 2 - margin.left + buttonPadding * 1 + buttonWidth * 1 + i * legendElementWidth;
                 })
                 .attr('y', 8 - margin.top + buttonHeight * 4 + buttonPadding * 4 + legendHeight + 10)
                 .attr('text-anchor', 'middle')
