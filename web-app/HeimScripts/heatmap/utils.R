@@ -52,7 +52,7 @@ getTimelineValues <- function(nodes, ontologyTerms) {
 # this method pretifies it with the actual node label like this: '123_BreastCancer'
 library(stringr)
 replaceNodeIDNodeLabel <- function(ids, ontologyTerms) {
-    patientIDs <- str_extract(ids, "(?<=X)[0-9]+")
+    patientIDs <- str_extract(ids, "(?!^X).+?(?=_)")
     nodes <- str_extract(ids, "(?<=_{1}).+_n[0-9]+")  # i.e. highDimensional_n3
     nodeLabels <- lapply(ontologyTerms[nodes], function(terms) return(terms$name))
     paste(patientIDs, nodeLabels, sep="_")
