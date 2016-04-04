@@ -291,7 +291,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
     };
 
     service.loadDataIntoSession = function(conceptKeys, dataConstraints) {
-        return $q( function(resolve, reject) {
+        return $q(function(resolve, reject) {
             smartRUtils.getSubsetIds().then(
                 function(subsets) {
                     var _arg = {
@@ -309,7 +309,7 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
                         arguments: _arg
                     }).then(
                         function(ret) { resolve('Task complete! State: ' + ret.state); },
-                        function(ret) { reject(ret.response); }
+                        function(ret) { reject(ret.statusText); }
                     );
                 },
                 function() {
