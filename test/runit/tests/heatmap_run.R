@@ -41,7 +41,7 @@ test.get.subset <- function()
 {
   test_patient_ids <- c("Assay1_blabla_s1","Assay2_bleblee_s2")
   result <- getSubset(test_patient_ids)
-  expected <- c(0,1)
+  expected <- c(1,2)
   checkEquals(result, expected)
 }
 

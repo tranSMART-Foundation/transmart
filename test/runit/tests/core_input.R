@@ -20,7 +20,7 @@ test.validateLoadedVariables2 <- function() {
 
 # Case of a proper loaded_variable
 test.validateLoadedVariables3 <- function() {
-  ret <- checkException( validateLoadedVariables(loaded_variables_proper1  ) )
+  ret <- validateLoadedVariables(loaded_variables_proper1 )
   checkTrue(ret)
 }
 
