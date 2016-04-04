@@ -311,8 +311,9 @@ buildFields <- function(df) {
     ZSCORE      <- (df$value - df$MEAN) / df$SD
     df["MEAN"]  <- NULL
     df["SD"]    <- NULL
+    df["SIGNIFICANCE"] <- NULL
 
-    names(df)   <- c("UID", "SIGNIFICANCE", "LOGFOLD", "TTEST", "PVAL", "ADJPVAL", "BVAL", "PATIENTID", "VALUE")
+    names(df)   <- c("UID", "LOGFOLD", "TTEST", "PVAL", "ADJPVAL", "BVAL", "PATIENTID", "VALUE")
     df["ZSCORE"] <- ZSCORE
     df["SUBSET"] <- getSubset(df$PATIENTID)
 
