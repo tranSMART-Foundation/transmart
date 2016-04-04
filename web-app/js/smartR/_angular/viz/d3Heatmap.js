@@ -190,15 +190,8 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                     d3.selectAll('.patientID').classed('highlight', false);
                     d3.selectAll('.uid').classed('highlight', false);
                     tooltip.style('visibility', 'hidden');
-                })
-                .on('click', function (d) {
-                    var genes = d.UID.split("--");
-                    genes.each(function (gene) {
-                        var url = 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + gene;
-                        window.open(url);
-                    });
                 });
-
+                
             square.transition()
                 .duration(animationDuration)
                 .attr('x', function (d) {
