@@ -54,7 +54,7 @@ window.smartRApp.directive('fetchButton',
                                 var searchKeywordIds = biomarkers.map(function(biomarker) {
                                     return String(biomarker.id);
                                 });
-                                return dataConstraints = {
+                                return {
                                     search_keyword_ids: {
                                         keyword_ids: searchKeywordIds
                                     }
@@ -62,34 +62,30 @@ window.smartRApp.directive('fetchButton',
                             }
                         },
 
-                        _fetchDataIntoRSession = function (conceptKeys, dataConstraints) {
-                            return rServeService.loadDataIntoSession(conceptKeys, dataConstraints)
-                                .then(function(msg) {
-                                    return msg;
-                                });
-                        },
-
-                        _finishedFetching = function (msg) {
+                        _onSuccess = function(msg) {
                             template_msg.innerHTML = 'Success: ' + msg;
                             scope.disabled = false;
                         },
 
-                        _afterDataFetched = function (msg) {
+                        _onFailure = function(msg) {
+                            template_msg.innerHTML = 'Failure: ' + msg;
+                            scope.disabled = false;
+                        },
 
+                        _afterDataFetched = function (msg) {
                             if (!scope.showSummaryStats) {
-                                return _finishedFetching(msg);
+                                return _onSuccess(msg);
                             }
 
                             template_msg.innerHTML =
                                 'Execute summary statistics, please wait <span class="blink_me">_</span>';
 
                             return rServeService.executeSummaryStats('fetch')
-                                .then (function (data) {
+                                .then(function(data) {
                                     scope.summaryData = data.result;
-                                    template_msg.innerHTML = 'Success: ' + data.msg;
+                                    _onSuccess(data.msg);
                                 }, function(msg) {
-                                    template_msg.innerHTML = 'Failure: ' + msg;
-                                    scope.disabled = false;
+                                    _onFailure(msg);
                                 })
                         },
                         conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap),
@@ -97,8 +93,11 @@ window.smartRApp.directive('fetchButton',
 
                     _init();
 
-                    _fetchDataIntoRSession(conceptKeys, dataConstraints)
-                        .then(_afterDataFetched);
+                    rServeService.loadDataIntoSession(conceptKeys, dataConstraints)
+                        .then(
+                            _afterDataFetched,
+                            _onFailure
+                        );
 
                 }; // end onclick
             }
