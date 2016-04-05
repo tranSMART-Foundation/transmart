@@ -96,9 +96,8 @@ function HeatmapController($scope, smartRUtils, commonWorkflowService) {
 
             // disable tabs when certain criteria are not met
             fetchModel.tab.disabled = preprocessRunning || runAnalysisRunning;
-            preprocessModel.tab.disabled = fetchRunning || runAnalysisRunning || !scope.fetch.loaded;
-                // FIXME: this is always zero. Probably has something to do with promises.
-                // || scope.fetch.totalSamples <= 1; 
+            preprocessModel.tab.disabled = fetchRunning || runAnalysisRunning || !scope.fetch.loaded
+                || scope.fetch.totalSamples <= 1;
             runAnalysisModel.tab.disabled = fetchRunning || preprocessRunning || !scope.fetch.loaded;
 
             // disable buttons when certain criteria are not met
@@ -107,9 +106,11 @@ function HeatmapController($scope, smartRUtils, commonWorkflowService) {
 
             // set ranking criteria
             runAnalysisModel.subsets = scope.fetch.subsets;
-            if (scope.fetch.subsets < 2 &&
-                    ['logfold', 'bval', 'pval', 'adjpval', 'ttest'].indexOf(runAnalysisModel.params.ranking) !== -1) {
+            if (scope.fetch.totalSamples < 2) {
                 runAnalysisModel.params.ranking = 'mean';
+            } else if (scope.fetch.subsets < 2 &&
+                    ['logfold', 'bval', 'pval', 'adjpval', 'ttest'].indexOf(runAnalysisModel.params.ranking) !== -1) {
+                runAnalysisModel.params.ranking = 'coef';
             } else if (scope.fetch.subsets > 1 &&
                     ['logfold', 'bval', 'pval', 'adjpval', 'ttest'].indexOf(runAnalysisModel.params.ranking) === -1) {
                 runAnalysisModel.params.ranking = 'bval';
