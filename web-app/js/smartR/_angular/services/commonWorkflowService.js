@@ -52,7 +52,7 @@ window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', func
         var _scope = service.currentScope,
             targetModels = getModels(targetLabels);
 
-        _scope.$watchGroup (sourceLabels, function (n, o) {
+        _scope.$watchGroup(sourceLabels, function (n, o) {
             callback(n,  o, _scope, targetModels);
         });
     };

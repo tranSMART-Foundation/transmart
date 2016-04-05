@@ -8,6 +8,7 @@ window.smartRApp.directive('runButton',
             restrict: 'E',
             scope: {
                 disabled: '=',
+                running: '=',
                 storage: '=storeResultsIn',
                 script: '@scriptToRun',
                 name: '@buttonName',
@@ -29,6 +30,7 @@ window.smartRApp.directive('runButton',
 
                 var _successCreatePlot = function (response) {
                     template_msg.innerHTML = ''; // empty template
+                    scope.running = false;
                     if (serialized) { // when results are serialized, we need to deserialized them by
                         // downloading the results files.
                         rServeService.downloadJsonFile(response.executionId, 'heatmap.json').then(
@@ -47,12 +49,13 @@ window.smartRApp.directive('runButton',
                     template_msg.style.color = 'red';
                     template_msg.innerHTML = 'Failure: ' + response.statusText;
                     scope.disabled = false;
+                    scope.running = false;
                 };
 
                 template_btn.onclick = function() {
-
                     scope.storage = {};
                     scope.disabled = true;
+                    scope.running = true;
                     template_msg.innerHTML = 'Creating plot, please wait <span class="blink_me">_</span>';
 
                     rServeService.startScriptExecution({

@@ -6,7 +6,8 @@ window.smartRApp.directive('workflowTab', ['smartRUtils', function(smartRUtils) 
     return {
         restrict: 'E',
         scope: {
-            name: '@tabName'
+            name: '@tabName',
+            disabled: '='
         },
         require: '^tabContainer',
         transclude: true,

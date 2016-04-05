@@ -10,11 +10,11 @@ window.smartRApp.directive('tabContainer',
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/tabContainer.html',
             controller: function($scope) {
                 $scope.tabs = [];
-                this.addTab = function(name) {
-                    $scope.tabs.push(name);
+                this.addTab = function(tab) {
+                    $scope.tabs.push(tab);
                 };
             },
-            link: function(scope, element) {
+            link: function() {
                 $timeout(function() { // init jQuery UI tabs after DOM has rendered
                     $('#heim-tabs').tabs();
                 });

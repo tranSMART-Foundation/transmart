@@ -6,9 +6,9 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
 
     service.conceptBoxMapToConceptKeys = function smartRUtils_conceptBoxMapToConceptKeys(conceptBoxMap) {
         var allConcepts = {};
-        Object.keys(conceptBoxMap).each(function(group) {
-            var concepts = conceptBoxMap[group];
-            concepts.each(function(concept, idx) {
+        Object.keys(conceptBoxMap).forEach(function(group) {
+            var concepts = conceptBoxMap[group].concepts;
+            concepts.forEach(function(concept, idx) {
                 allConcepts[group + '_' + 'n' + idx] = concept;
             });
         });
@@ -37,7 +37,7 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
     };
 
     d3.selection.prototype.moveToFront = function () {
-        return this.each(function () {
+        return this.forEach(function () {
             this.parentNode.appendChild(this);
         });
     };
@@ -54,6 +54,10 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         var smartRPanel = $('#smartRPanel');
         var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY;
         return mouseYPos - svg.offset().top + svg.position().top;
+    };
+
+    service.countCohorts = function() {
+        return !window.isSubsetEmpty(1) + !window.isSubsetEmpty(2);
     };
 
     service.getSubsetIds = function smartRUtil_getSubsetIds() {

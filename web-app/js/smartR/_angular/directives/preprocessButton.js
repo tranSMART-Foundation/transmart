@@ -6,6 +6,7 @@ window.smartRApp.directive('preprocessButton', ['rServeService',
         restrict: 'E',
         scope: {
             disabled: '=',
+            running: '=',
             params: '=',
             showSummaryStats: '=',
             summaryData: '='
@@ -14,7 +15,6 @@ window.smartRApp.directive('preprocessButton', ['rServeService',
             '<input type="button" value="Preprocess" class="heim-action-button">' +
             '<span style="padding-left: 10px;"></span>',
         link: function(scope, element) {
-
             var template_btn = element.children()[0];
             var template_msg = element.children()[1];
 
@@ -36,6 +36,7 @@ window.smartRApp.directive('preprocessButton', ['rServeService',
                 var _init = function () {
                         scope.summaryData = {}; // reset
                         scope.disabled = true;
+                        scope.running = true;
                         template_msg.innerHTML = 'Preprocessing, please wait <span class="blink_me">_</span>';
                     },
 
@@ -50,6 +51,7 @@ window.smartRApp.directive('preprocessButton', ['rServeService',
                     _finishedPreprocessed = function (msg) {
                         template_msg.innerHTML = 'Success: ' + msg;
                         scope.disabled = false;
+                        scope.running = false;
                     },
 
                     _afterDataPreprocessed = function (msg) {
@@ -62,8 +64,10 @@ window.smartRApp.directive('preprocessButton', ['rServeService',
                             .then (function (data) {
                                 scope.summaryData = data.result;
                                 template_msg.innerHTML = 'Success: ' + data.msg;
+                                scope.running = false;
                             }, function(msg) {
                                 template_msg.innerHTML = 'Failure: ' + msg;
+                                scope.running = false;
                             })
                     };
 
