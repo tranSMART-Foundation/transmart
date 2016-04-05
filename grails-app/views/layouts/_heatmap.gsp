@@ -68,8 +68,8 @@
             %{--Number of max row to display--}%
             <div class="heim-input-field heim-input-number sr-input-area">
                 Show <input type="text" id="txtMaxRow" ng-model="runAnalysis.params.max_row">
-                of {{fetch.summaryData.summary[0].$$state.value.json.data[0].totalNumberOfValuesIncludingMissing /
-                    fetch.summaryData.summary[0].$$state.value.json.data[0].numberOfSamples}}
+                of {{fetch.scriptResults.summary[0].$$state.value.json.data[0].totalNumberOfValuesIncludingMissing /
+                    fetch.scriptResults.allSamples}}
                 rows in total. (< 1000 is preferable.)
             </div>
 
