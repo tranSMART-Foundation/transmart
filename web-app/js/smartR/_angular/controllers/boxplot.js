@@ -6,8 +6,8 @@ window.smartRApp.controller('BoxplotController',
 
         // model
         $scope.conceptBoxes = {
-            datapoints: [],
-            subsets: []
+            datapoints: {concepts: [], valid: false},
+            subsets: {concepts: [], valid: false}
         };
         $scope.scriptResults = {};
         $scope.params = {};
