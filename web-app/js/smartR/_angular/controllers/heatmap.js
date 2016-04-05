@@ -108,8 +108,7 @@ function HeatmapController($scope, smartRUtils, commonWorkflowService) {
             runAnalysisModel.subsets = scope.fetch.subsets;
             if (scope.fetch.totalSamples < 2) {
                 runAnalysisModel.params.ranking = 'mean';
-            } else if (scope.fetch.subsets < 2 &&
-                    ['logfold', 'bval', 'pval', 'adjpval', 'ttest'].indexOf(runAnalysisModel.params.ranking) !== -1) {
+            } else if (scope.fetch.subsets < 2) {
                 runAnalysisModel.params.ranking = 'coef';
             } else if (scope.fetch.subsets > 1 &&
                     ['logfold', 'bval', 'pval', 'adjpval', 'ttest'].indexOf(runAnalysisModel.params.ranking) === -1) {
