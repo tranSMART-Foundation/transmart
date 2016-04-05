@@ -26,18 +26,9 @@ window.smartRApp.directive('fetchButton',
 
                 template_btn.disabled = scope.disabled;
 
-                scope.$watch('disabled', function (newValue) {
+                scope.$watch('disabled', function(newValue) {
                     template_btn.disabled = newValue;
                 }, true);
-
-                if (angular.isDefined(scope.summaryData)) {
-                    scope.$watch('summaryData', function (newSummaryData) {
-                        if (newSummaryData.hasOwnProperty('allSamples')) {
-                            // when everything is retrieved
-                            scope.allSamples = newSummaryData.allSamples;
-                        }
-                    }, true);
-                }
 
                 template_btn.onclick = function() {
 
@@ -65,10 +56,10 @@ window.smartRApp.directive('fetchButton',
 
                         _onSuccess = function(msg) {
                             template_msg.innerHTML = 'Success: ' + msg;
+                            scope.subsets = smartRUtils.countCohorts();
                             scope.loaded = true;
                             scope.disabled = false;
                             scope.running = false;
-                            scope.subsets = smartRUtils.countCohorts();
                         },
 
                         _onFailure = function(msg) {
@@ -80,7 +71,8 @@ window.smartRApp.directive('fetchButton',
 
                         _afterDataFetched = function (msg) {
                             if (!scope.showSummaryStats) {
-                                return _onSuccess(msg);
+                                _onSuccess(msg);
+                                return;
                             }
 
                             template_msg.innerHTML =
@@ -89,10 +81,11 @@ window.smartRApp.directive('fetchButton',
                             return rServeService.executeSummaryStats('fetch')
                                 .then(function(data) {
                                     scope.summaryData = data.result;
+                                    scope.allSamples = data.result.allSamples;
                                     _onSuccess(data.msg);
                                 }, function(msg) {
                                     _onFailure(msg);
-                                })
+                                });
                         },
                         conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap),
                         dataConstraints = _getDataConstraints(scope.biomarkers);
