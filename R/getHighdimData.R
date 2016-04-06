@@ -107,7 +107,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
     trial.name = 'trial_name',
     patient.set = 'patient_set',
     ontology.term = 'ontology_term',
-    assay.ids = 'assay_ids',
+    assay.ids = 'assay_id_list',
     search.keyword = 'search_keyword',
     chromosome = 'chromosome_segment',
     genes = 'genes',
