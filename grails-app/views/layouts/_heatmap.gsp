@@ -5,7 +5,7 @@
         %{--========================================================================================================--}%
         %{-- Fetch Data --}%
         %{--========================================================================================================--}%
-        <workflow-tab tab-name="Fetch Data">
+        <workflow-tab tab-name="Fetch Data" disabled="fetch.tab.disabled">
             <concept-box
                 concept-group="fetch.conceptBoxes.highDimensional"
                 type="HD"
@@ -23,6 +23,8 @@
             <biomarker-selection biomarkers="fetch.selectedBiomarkers"></biomarker-selection>
             <hr class="sr-divider">
             <fetch-button
+                    loaded="fetch.loaded"
+                    running="fetch.running"
                     disabled="fetch.btn.disabled"
                     concept-map="fetch.conceptBoxes"
                     biomarkers="fetch.selectedBiomarkers"
@@ -38,7 +40,7 @@
         %{--========================================================================================================--}%
         %{-- Preprocess Data --}%
         %{--========================================================================================================--}%
-        <workflow-tab tab-name="Preprocess">
+        <workflow-tab tab-name="Preprocess" disabled="preprocess.tab.disabled">
             %{--Aggregate Probes--}%
             <div class="heim-input-field">
                 <input type="checkbox" ng-model="preprocess.params.aggregateProbes">
@@ -50,7 +52,8 @@
             <preprocess-button params="preprocess.params"
                                show-summary-stats="true"
                                summary-data="preprocess.scriptResults"
-                               disabled="preprocess.btn.disabled">
+                               disabled="preprocess.btn.disabled"
+                               running="preprocess.running">
             </preprocess-button>
 
             <br/>
@@ -61,12 +64,12 @@
         %{--========================================================================================================--}%
         %{--Run Analysis--}%
         %{--========================================================================================================--}%
-        <workflow-tab tab-name="Run Analysis">
+        <workflow-tab tab-name="Run Analysis" disabled="runAnalysis.tab.disabled">
             %{--Number of max row to display--}%
             <div class="heim-input-field heim-input-number sr-input-area">
                 Show <input type="text" id="txtMaxRow" ng-model="runAnalysis.params.max_row">
-                of {{fetch.summaryData.summary[0].$$state.value.json.data[0].totalNumberOfValuesIncludingMissing /
-                    fetch.summaryData.summary[0].$$state.value.json.data[0].numberOfSamples}}
+                of {{fetch.scriptResults.summary[0].$$state.value.json.data[0].totalNumberOfValuesIncludingMissing /
+                    fetch.scriptResults.allSamples}}
                 rows in total. (< 1000 is preferable.)
             </div>
 
@@ -98,7 +101,8 @@
                         script-to-run="run"
                         arguments-to-use="runAnalysis.params"
                         serialized="true"
-                        disabled="runAnalysis.btn.disabled">
+                        disabled="runAnalysis.btn.disabled"
+                        running="runAnalysis.running">
             </run-button>
             <capture-plot-button filename="heatmap.svg" disabled="runAnalysis.download.disabled"></capture-plot-button>
             <download-results-button disabled="runAnalysis.download.disabled"></download-results-button>

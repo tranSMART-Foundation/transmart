@@ -63,17 +63,19 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
 
             // this watches the childNodes of the conceptBox and updates the model on change
             new MutationObserver(function() {
-                scope.conceptGroup = _getConcepts(); // update the model
+                scope.conceptGroup.concepts = _getConcepts(); // update the model
                 scope.$apply();
             }).observe(template_box, { childList: true });
 
-            scope.$watch('conceptGroup', scope.validate);
+            scope.$watch('conceptGroup.concepts', scope.validate);
 
             scope.validate = function() {
-                scope.instructionMinNodes = scope.conceptGroup.length < scope.min;
-                scope.instructionMaxNodes = ~scope.max && scope.conceptGroup.length > scope.max;
+                scope.instructionMinNodes = scope.conceptGroup.concepts.length < scope.min;
+                scope.instructionMaxNodes = ~scope.max && scope.conceptGroup.concepts.length > scope.max;
                 scope.instructionNodeType = !_containsOnly();
-                return !(scope.instructionMinNodes || scope.instructionMaxNodes || scope.instructionNodeType);
+                var isValid = !(scope.instructionMinNodes || scope.instructionMaxNodes || scope.instructionNodeType);
+                scope.conceptGroup.valid = isValid;
+                return isValid;
             }
         }
     };

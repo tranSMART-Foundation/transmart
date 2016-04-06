@@ -232,9 +232,9 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
     function _checkStatus(executionId, delay) {
         var ajax = $.ajax({
             type: 'GET',
-            url : pageInfo.basePath + '/ScriptExecution/status',
+            url: pageInfo.basePath + '/ScriptExecution/status',
             data: {
-                sessionId  : state.sessionId,
+                sessionId : state.sessionId,
                 executionId: executionId
             }
         });
@@ -320,35 +320,32 @@ window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', functio
     };
 
     service.executeSummaryStats = function(phase) {
-        return $q( function(resolve, reject) {
-            service.startScriptExecution({
-                taskType: 'summary',
-                arguments: {
-                    phase: phase,
-                    projection: 'log_intensity' // always required, even for low-dim data
+        return service.startScriptExecution({
+            taskType: 'summary',
+            arguments: {
+                phase: phase,
+                projection: 'log_intensity' // always required, even for low-dim data
+            }
+        }).then(
+            function(ret) {
+                if (ret.result.artifacts.files.length > 0) {
+                    return service.composeSummaryResults(ret.result.artifacts.files, ret.executionId, phase)
+                        .then(
+                            function(result) { return {result: result, msg: 'Task complete! State: ' + ret.state}; },
+                            transformAjaxFailure
+                        );
+                } else {
+                    return {result: {}, msg: 'Task complete! State: ' + ret.state};
                 }
-            }).then(
-                function(ret) {
-                    var _result = {};
-                    if (ret.result.artifacts.files.length > 0) {
-                        service.composeSummaryResults(ret.result.artifacts.files, ret.executionId, phase)
-                            .then(function (result) {
-                                _result = result;
-                                resolve({result : _result, msg:'Task complete! State: ' + ret.state});
-                            });
-                    } else {
-                        resolve({result : _result, msg:'Task complete! State: ' + ret.state});
-                    }
-                },
-                function(ret) { reject(ret.response); }
-            );
-        });
+            },
+            transformAjaxFailure
+        );
     };
 
     service.composeSummaryResults = function(files, executionId, phase) {
         return $q(function (resolve, reject) {
-            var retObj = {summary : [], allSamples : 0},
-                fileExt = {fetch : ['.png', 'json'], preprocess :['all.png', 'all.json']},
+            var retObj = {summary: [], allSamples: 0},
+                fileExt = {fetch: ['.png', 'json'], preprocess:['all.png', 'all.json']},
 
                 // find matched items in an array by key
                 _find = function composeSummaryResults_find (key, array) {

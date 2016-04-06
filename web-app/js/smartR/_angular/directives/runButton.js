@@ -8,13 +8,14 @@ window.smartRApp.directive('runButton',
             restrict: 'E',
             scope: {
                 disabled: '=',
+                running: '=',
                 storage: '=storeResultsIn',
                 script: '@scriptToRun',
                 name: '@buttonName',
                 serialized: '=',
                 arguments: '=argumentsToUse'
             },
-            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/runButton.html',
+            templateUrl: $rootScope.smartRPath + '/js/smartR/_angular/templates/runButton.html',
             link: function(scope, element) {
 
                 var template_btn = element.children()[0],
@@ -27,40 +28,43 @@ window.smartRApp.directive('runButton',
                     template_btn.disabled = newValue;
                 }, true);
 
-                var _successCreatePlot = function (response) {
+                var _downloadData = function(response) {
                     template_msg.innerHTML = ''; // empty template
                     if (serialized) { // when results are serialized, we need to deserialized them by
                         // downloading the results files.
                         rServeService.downloadJsonFile(response.executionId, 'heatmap.json').then(
-                            function (d) {
-                                scope.storage = d.data;
-                                scope.disabled = false;
-                            }
+                            function(d) { scope.storage = d.data; _done(); },
+                            _onFail
                         );
                     } else { // results
                         scope.storage = JSON.parse(response.result.artifacts.value);
-                        scope.disabled = false;
+                        _done();
                     }
                 };
 
-                var _failCreatePlot = function (response) {
+                var _done = function() {
+                    scope.disabled = false;
+                    scope.running = false;
+                };
+
+                var _onFail = function(response) {
                     template_msg.style.color = 'red';
                     template_msg.innerHTML = 'Failure: ' + response.statusText;
-                    scope.disabled = false;
+                    _done();
                 };
 
                 template_btn.onclick = function() {
-
                     scope.storage = {};
                     scope.disabled = true;
+                    scope.running = true;
                     template_msg.innerHTML = 'Creating plot, please wait <span class="blink_me">_</span>';
 
                     rServeService.startScriptExecution({
                         taskType: scope.script,
                         arguments: scope.arguments
                     }).then(
-                        _successCreatePlot,
-                        _failCreatePlot
+                        _downloadData,
+                        _onFail
                     );
                 };
             }
