@@ -41,22 +41,6 @@ window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', func
         rServeService.destroyAndStartSession(workflowName);
     };
 
-    /**
-     * Register sourceLabel as object reference. If there's any changes on this object, will invoke callback
-     * @param  sourceLabels - reference object label
-     * @param  targetLabels - array of target labels
-     * @param callback (newObject, oldObject, scope, targetArray) - invoked when source obj has new value
-     *
-     */
-    service.registerCondition = function (sourceLabels, targetLabels, callback) {
-        var _scope = service.currentScope,
-            targetModels = getModels(targetLabels);
-
-        _scope.$watchGroup(sourceLabels, function (n, o) {
-            callback(n,  o, _scope, targetModels);
-        });
-    };
-
     return service;
 
 }]);

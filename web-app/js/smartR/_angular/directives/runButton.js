@@ -7,7 +7,6 @@ window.smartRApp.directive('runButton',
         return {
             restrict: 'E',
             scope: {
-                disabled: '=',
                 running: '=',
                 storage: '=storeResultsIn',
                 script: '@scriptToRun',
@@ -21,12 +20,6 @@ window.smartRApp.directive('runButton',
                 var template_btn = element.children()[0],
                     template_msg = element.children()[1],
                     serialized = scope.serialized;
-
-                template_btn.disabled = scope.disabled;
-
-                scope.$watch('disabled', function (newValue) {
-                    template_btn.disabled = newValue;
-                }, true);
 
                 var _downloadData = function(response) {
                     template_msg.innerHTML = ''; // empty template
@@ -43,6 +36,7 @@ window.smartRApp.directive('runButton',
                 };
 
                 var _done = function() {
+                    template_btn.disabled = false;
                     scope.disabled = false;
                     scope.running = false;
                 };
@@ -54,6 +48,7 @@ window.smartRApp.directive('runButton',
                 };
 
                 template_btn.onclick = function() {
+                    template_btn.disabled = true;
                     scope.storage = {};
                     scope.disabled = true;
                     scope.running = true;

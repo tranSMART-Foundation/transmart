@@ -1,6 +1,6 @@
 //# sourceURL=heatmap.js
 
-function HeatmapController($scope, smartRUtils, commonWorkflowService) {
+function HeatmapController($scope, commonWorkflowService) {
 
     commonWorkflowService.initializeWorkflow('heatmap', $scope);
 
@@ -8,17 +8,12 @@ function HeatmapController($scope, smartRUtils, commonWorkflowService) {
     // Fetch data                                                    //
     // ------------------------------------------------------------- //
     $scope.fetch = {
-        btn: {
-            disabled: true
-        },
-        tab: {
-            disabled: false
-        },
         conceptBoxes: {
-            highDimensional: {concepts: [], valid: false},
-            numerical: {concepts: [], valid: false},
-            categorical: {concepts: [], valid: false}
+            highDimensional: [],
+            numerical: [],
+            categorical: []
         },
+        disabled: false,
         running: false,
         loaded: false,
         selectedBiomarkers: [],
@@ -31,15 +26,10 @@ function HeatmapController($scope, smartRUtils, commonWorkflowService) {
     // Preprocess                                                    //
     // ------------------------------------------------------------- //
     $scope.preprocess = {
-        btn: {
-            disabled: false
-        },
-        tab: {
-            disabled: true
-        },
         params:  {
             aggregateProbes: false
         },
+        disabled: true,
         running: false,
         scriptResults: {}
     };
@@ -48,12 +38,6 @@ function HeatmapController($scope, smartRUtils, commonWorkflowService) {
     // Run Heatmap                                                   //
     // ------------------------------------------------------------- //
     $scope.runAnalysis = {
-        btn: {
-            disabled: false
-        },
-        tab: {
-            disabled: true
-        },
         params: {
             max_row: 100,
             sorting: 'nodes',
@@ -62,57 +46,47 @@ function HeatmapController($scope, smartRUtils, commonWorkflowService) {
         download: {
             disabled: true
         },
+        disabled: true,
         running: false,
         subsets: 0,
         scriptResults: {}
     };
 
-    commonWorkflowService.registerCondition(
-        ['fetch.running',
-            'preprocess.running',
-            'runAnalysis.running',
-            'fetch.conceptBoxes.highDimensional.valid'
-        ],
-        ['fetch', 'preprocess', 'runAnalysis'],
-        function(newValues, oldValues, scope, affectedComponents) {
+    $scope.$watchGroup(['fetch.running', 'preprocess.running', 'runAnalysis.running'],
+        function(newValues) {
             var fetchRunning = newValues[0],
                 preprocessRunning = newValues[1],
-                runAnalysisRunning = newValues[2],
-                conceptBoxesHighDimensionalValid = newValues[3];
-            var fetchModel = affectedComponents[0],
-                preprocessModel = affectedComponents[1],
-                runAnalysisModel = affectedComponents[2];
+                runAnalysisRunning = newValues[2];
 
             // clear old results
             if (fetchRunning) {
-                preprocessModel.scriptResults = {};
-                runAnalysisModel.scriptResults = {};
+                $scope.preprocess.scriptResults = {};
+                $scope.runAnalysis.scriptResults = {};
             }
 
             // clear old results
             if (preprocessRunning) {
-                runAnalysisModel.scriptResults = {};
+                $scope.runAnalysis.scriptResults = {};
             }
 
             // disable tabs when certain criteria are not met
-            fetchModel.tab.disabled = preprocessRunning || runAnalysisRunning;
-            preprocessModel.tab.disabled = fetchRunning || runAnalysisRunning || !scope.fetch.loaded
-                || scope.fetch.totalSamples <= 1;
-            runAnalysisModel.tab.disabled = fetchRunning || preprocessRunning || !scope.fetch.loaded;
+            $scope.fetch.disabled = preprocessRunning || runAnalysisRunning;
+            $scope.preprocess.disabled = fetchRunning || runAnalysisRunning || !$scope.fetch.loaded
+                || $scope.fetch.totalSamples <= 1;
+            $scope.runAnalysis.disabled = fetchRunning || preprocessRunning || !$scope.fetch.loaded;
 
             // disable buttons when certain criteria are not met
-            fetchModel.btn.disabled = !conceptBoxesHighDimensionalValid;
-            runAnalysisModel.download.disabled = runAnalysisRunning || $.isEmptyObject(scope.runAnalysis.scriptResults);
+            $scope.runAnalysis.download.disabled = runAnalysisRunning || $.isEmptyObject($scope.runAnalysis.scriptResults);
 
             // set ranking criteria
-            runAnalysisModel.subsets = scope.fetch.subsets;
-            if (scope.fetch.totalSamples < 2) {
-                runAnalysisModel.params.ranking = 'mean';
-            } else if (scope.fetch.subsets < 2) {
-                runAnalysisModel.params.ranking = 'coef';
-            } else if (scope.fetch.subsets > 1 &&
-                    ['logfold', 'bval', 'pval', 'adjpval', 'ttest'].indexOf(runAnalysisModel.params.ranking) === -1) {
-                runAnalysisModel.params.ranking = 'bval';
+            $scope.runAnalysis.subsets = $scope.fetch.subsets;
+            if ($scope.fetch.totalSamples < 2) {
+                $scope.runAnalysis.params.ranking = 'mean';
+            } else if ($scope.fetch.subsets < 2) {
+                $scope.runAnalysis.params.ranking = 'coef';
+            } else if ($scope.fetch.subsets > 1 &&
+                    ['logfold', 'bval', 'pval', 'adjpval', 'ttest'].indexOf($scope.runAnalysis.params.ranking) === -1) {
+                $scope.runAnalysis.params.ranking = 'bval';
             }
         }
     );

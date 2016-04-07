@@ -7,7 +7,7 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
     service.conceptBoxMapToConceptKeys = function smartRUtils_conceptBoxMapToConceptKeys(conceptBoxMap) {
         var allConcepts = {};
         Object.keys(conceptBoxMap).forEach(function(group) {
-            var concepts = conceptBoxMap[group].concepts;
+            var concepts = conceptBoxMap[group];
             concepts.forEach(function(concept, idx) {
                 allConcepts[group + '_' + 'n' + idx] = concept;
             });

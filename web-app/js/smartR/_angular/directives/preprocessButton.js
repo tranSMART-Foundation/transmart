@@ -5,7 +5,6 @@ window.smartRApp.directive('preprocessButton', ['rServeService',
     return {
         restrict: 'E',
         scope: {
-            disabled: '=',
             running: '=',
             params: '=',
             showSummaryStats: '=',
@@ -18,12 +17,6 @@ window.smartRApp.directive('preprocessButton', ['rServeService',
             var template_btn = element.children()[0];
             var template_msg = element.children()[1];
 
-            template_btn.disabled = scope.disabled;
-
-            scope.$watch('disabled', function (newValue) {
-                template_btn.disabled = newValue;
-            }, true);
-
             scope.$watch('summaryData', function (newSummaryData) {
                 if (newSummaryData.hasOwnProperty('allSamples')) {
                     // when everything is retrieved
@@ -34,6 +27,7 @@ window.smartRApp.directive('preprocessButton', ['rServeService',
             template_btn.onclick = function() {
 
                 var _init = function () {
+                        template_btn.disabled = true;
                         scope.summaryData = {}; // reset
                         scope.disabled = true;
                         scope.running = true;
@@ -55,6 +49,8 @@ window.smartRApp.directive('preprocessButton', ['rServeService',
                     },
 
                     _afterDataPreprocessed = function (msg) {
+                        template_btn.disabled = false;
+
                         if (!scope.showSummaryStats) {
                             return _finishedPreprocessed(msg);
                         }
@@ -74,7 +70,7 @@ window.smartRApp.directive('preprocessButton', ['rServeService',
                 _init();
 
                 _preprocessData(_args)
-                    .then(_afterDataPreprocessed);
+                    .then(_afterDataPreprocessed, _afterDataPreprocessed);
 
             };
         }

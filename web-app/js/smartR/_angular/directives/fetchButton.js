@@ -10,7 +10,6 @@ window.smartRApp.directive('fetchButton',
                 scope: {
                     loaded: '=',
                     running: '=',
-                    disabled: '=',
                     conceptMap: '=',
                     biomarkers: '=?',
                     showSummaryStats: '=?',
@@ -24,17 +23,11 @@ window.smartRApp.directive('fetchButton',
                     var template_btn = element.children()[0],
                         template_msg = element.children()[1];
 
-                    template_btn.disabled = scope.disabled;
-
-                    scope.$watch('disabled', function(newValue) {
-                        template_btn.disabled = newValue;
-                    });
-
                     var _init = function () {
+                        template_btn.disabled = true;
                         scope.summaryData = {}; // reset
                         scope.allSamples = 0;
                         scope.subsets = 0;
-                        scope.disabled = true;
                         scope.running = true;
                         template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
                     };
@@ -43,14 +36,14 @@ window.smartRApp.directive('fetchButton',
                         template_msg.innerHTML = 'Task completed!';
                         scope.subsets = smartRUtils.countCohorts();
                         scope.loaded = true;
-                        scope.disabled = false;
+                        template_btn.disabled = false;
                         scope.running = false;
                     };
 
                     var _onFailure = function(msg) {
                         template_msg.innerHTML = 'Failure: ' + msg;
                         scope.loaded = false;
-                        scope.disabled = false;
+                        template_btn.disabled = false;
                         scope.running = false;
                     };
 

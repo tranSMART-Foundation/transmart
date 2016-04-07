@@ -6,8 +6,8 @@ window.smartRApp.controller('CorrelationController',
 
         // model
         $scope.conceptBoxes = {
-            datapoints: {concepts: [], valid: false},
-            annotations: {concepts: [], valid: false}
+            datapoints: [],
+            annotations: []
         };
         $scope.scriptResults = {};
         $scope.params = {
