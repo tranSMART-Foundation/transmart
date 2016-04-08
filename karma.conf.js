@@ -2,87 +2,90 @@
 // Generated on Mon Jan 25 2016 12:15:37 GMT+0100 (CET)
 
 module.exports = function(config) {
-  config.set({
+    config.set({
 
-    // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '',
-
-
-    // frameworks to use
-    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine'],
+        // base path that will be used to resolve all patterns (eg. files, exclude)
+        basePath: '',
 
 
-    // list of files / patterns to load in the browser
-    files: [
-	  // jasmine
-      'node_modules/jasmine-ajax/lib/mock-ajax.js',
-      'node_modules/jasmine-def/node_modules/lade/lib/lade.js',
-      'node_modules/jasmine-def/lib/jasmine-def.js',
+        // frameworks to use
+        // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+        frameworks: ['jasmine'],
 
-      // libraries
-      'web-app/js/resource/jquery-2.1.4.min.js',
 
-      // application code
-      'web-app/js/smartR/_common/analysisInit.js',
-      'web-app/js/smartR/_common/ajaxServices.js',
+        // list of files / patterns to load in the browser
+        files: [
+            // libraries
+            'web-app/js/resource/jquery-2.1.4.min.js',
+            'web-app/js/resource/angular.js',
+            'web-app/js/resource/angular-route.js',
 
-	  // test files
-      'test/unit/javascript/**/*.js',
+            // jasmine
+            'node_modules/jasmine-ajax/lib/mock-ajax.js',
+            'node_modules/jasmine-def/node_modules/lade/lib/lade.js',
+            'node_modules/jasmine-def/lib/jasmine-def.js',
+            'web-app/js/resource/angular-mocks.js',
+
+            // application code
+            'web-app/js/smartR/_angular/smartRApp.js',
+            'web-app/js/smartR/_angular/services/smartRUtils.js',
+
+            // test files
+            'test/unit/javascript/**/*.js'
 //      'test/functional/javascript/**/*.js'
-    ],
+        ],
 
 
-    // list of files to exclude
-    exclude: [
-    ],
+        // list of files to exclude
+        exclude: [
+        ],
 
 
-    // preprocess matching files before serving them to the browser
-    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-    },
+        // preprocess matching files before serving them to the browser
+        // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+        preprocessors: {
+        },
 
 
-    // test results reporter to use
-    // possible values: 'dots', 'progress'
-    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', 'remote'],
+        // test results reporter to use
+        // possible values: 'dots', 'progress'
+        // available reporters: https://npmjs.org/browse/keyword/karma-reporter
+        reporters: ['progress'],
 
-    remoteReporter: {
-      host: 'localhost',
-      port: '9889'
-    },
-
-
-    // web server port
-    port: 9876,
+        remoteReporter: {
+            host: 'localhost',
+            port: '9889'
+        },
 
 
-    // enable / disable colors in the output (reporters and logs)
-    colors: true,
+        // web server port
+        port: 9876,
 
 
-    // level of logging
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_INFO,
+        // enable / disable colors in the output (reporters and logs)
+        colors: true,
 
 
-    // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+        // level of logging
+        // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+        logLevel: config.LOG_INFO,
 
 
-    // start these browsers
-    // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+        // enable / disable watching file and executing tests whenever any file changes
+        autoWatch: true,
 
 
-    // Continuous Integration mode
-    // if true, Karma captures browsers, runs the tests and exits
-    singleRun: true,
+        // start these browsers
+        // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+        browsers: ['PhantomJS'],
 
-    // Concurrency level
-    // how many browser should be started simultaneous
-    concurrency: Infinity
-  })
-}
+
+        // Continuous Integration mode
+        // if true, Karma captures browsers, runs the tests and exits
+        singleRun: true,
+
+        // Concurrency level
+        // how many browser should be started simultaneous
+        concurrency: Infinity
+    })
+};
