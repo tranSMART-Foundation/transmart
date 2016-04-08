@@ -21,16 +21,6 @@ window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', func
         return obj[prop];
     };
 
-    var getModels = function (labels) {
-        var models = [];
-        if (angular.isArray(labels)) {
-            labels.forEach (function (label) {
-                models.push(fetchFromObject(service.currentScope, label));
-            });
-        }
-        return models;
-    };
-
     service.initializeWorkflow = function(workflowName, scope) {
         service.currentScope = scope;
         // load workflow specific css
