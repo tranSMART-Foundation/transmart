@@ -1,6 +1,7 @@
 //# sourceURL=heatmap.js
 
-function HeatmapController($scope, commonWorkflowService) {
+window.smartRApp.controller('HeatmapController',
+    ['$scope', 'commonWorkflowService', function($scope, commonWorkflowService) {
 
     commonWorkflowService.initializeWorkflow('heatmap', $scope);
 
@@ -8,14 +9,14 @@ function HeatmapController($scope, commonWorkflowService) {
     // Fetch data                                                    //
     // ------------------------------------------------------------- //
     $scope.fetch = {
+        disabled: false,
+        running: false,
+        loaded: false,
         conceptBoxes: {
             highDimensional: [],
             numerical: [],
             categorical: []
         },
-        disabled: false,
-        running: false,
-        loaded: false,
         selectedBiomarkers: [],
         scriptResults: {},
         totalSamples: 0,
@@ -26,11 +27,11 @@ function HeatmapController($scope, commonWorkflowService) {
     // Preprocess                                                    //
     // ------------------------------------------------------------- //
     $scope.preprocess = {
+        disabled: true,
+        running: false,
         params:  {
             aggregateProbes: false
         },
-        disabled: true,
-        running: false,
         scriptResults: {}
     };
 
@@ -38,6 +39,8 @@ function HeatmapController($scope, commonWorkflowService) {
     // Run Heatmap                                                   //
     // ------------------------------------------------------------- //
     $scope.runAnalysis = {
+        disabled: true,
+        running: false,
         params: {
             max_row: 100,
             sorting: 'nodes',
@@ -46,8 +49,6 @@ function HeatmapController($scope, commonWorkflowService) {
         download: {
             disabled: true
         },
-        disabled: true,
-        running: false,
         subsets: 0,
         scriptResults: {}
     };
@@ -90,7 +91,4 @@ function HeatmapController($scope, commonWorkflowService) {
             }
         }
     );
-}
-
-window.smartRApp.controller('HeatmapController',
-    ['$scope', 'smartRUtils', 'commonWorkflowService', HeatmapController]);
+}]);
