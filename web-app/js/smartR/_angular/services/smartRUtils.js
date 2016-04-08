@@ -33,7 +33,8 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
 
     service.shortenConcept = function smartRUtils_shortenConcept(concept) {
         var split = concept.split('\\');
-        return split[split.length - 3] + '/' + split[split.length - 2];
+        split = split.filter(function(str) { return str !== ''; });
+        return split[split.length - 2] + '/' + split[split.length - 1];
     };
 
     d3.selection.prototype.moveToFront = function () {
