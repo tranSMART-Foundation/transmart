@@ -7,7 +7,6 @@ module.exports = function(config) {
         // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: '',
 
-
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: ['jasmine'],
@@ -19,12 +18,14 @@ module.exports = function(config) {
             'web-app/js/resource/jquery-2.1.4.min.js',
             'web-app/js/resource/angular.js',
             'web-app/js/resource/angular-route.js',
+            'web-app/js/resource/angular-css.js',
+            'web-app/js/resource/d3.min.js',
 
-            // jasmine
-            'node_modules/jasmine-ajax/lib/mock-ajax.js',
-            'node_modules/jasmine-def/node_modules/lade/lib/lade.js',
-            'node_modules/jasmine-def/lib/jasmine-def.js',
+            // mocks (i.e. for module() and inject())
             'web-app/js/resource/angular-mocks.js',
+
+            // test setup
+            'test/unit/javascript/testSetup.js',
 
             // application code
             'web-app/js/smartR/_angular/smartRApp.js',
@@ -50,7 +51,7 @@ module.exports = function(config) {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress'],
+        reporters: ['progress', 'remote'],
 
         remoteReporter: {
             host: 'localhost',
