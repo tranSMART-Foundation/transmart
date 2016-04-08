@@ -15,11 +15,31 @@ describe('smartRUtils', function() {
         expect(smartRUtils).toBeDefined();
     });
 
-    it('has functional conceptBoxMapToConceptKeys()', function() {
-        var conceptBoxMap = {a: ['c1', 'c2'], 'foo bar __-!*()123 abc': ['c3'], b: [], c: ['12--_- c31/??/*&^/foobar']};
+    it('has working conceptBoxMapToConceptKeys()', function() {
+        var params = {a: ['c1', 'c2'], 'foo bar __-!*()123 abc': ['c3'], b: [], c: ['12--_- c31/??/*&^/foobar']};
         var expected = {a_n0: 'c1', a_n1: 'c2', 'foo bar __-!*()123 abc_n0': 'c3', c_n0: '12--_- c31/??/*&^/foobar'};
-        var result = smartRUtils.conceptBoxMapToConceptKeys(conceptBoxMap);
+        var result = smartRUtils.conceptBoxMapToConceptKeys(params);
         expect(result).toEqual(expected);
     });
-    
+
+    it('has working makeSafeForCSS()', function() {
+        var regex = /[_a-zA-Z]+[_a-zA-Z0-9-]*/;
+        var testStr1 = '!@#$%^&*asdfghj _-;:,<.>/|\\"+=0987654321';
+        var testStr2 = '__foo-bar-123';
+        expect(testStr1.replace(regex, '')).not.toEqual('');
+        expect(smartRUtils.makeSafeForCSS(testStr1).replace(regex, '')).toEqual('');
+        expect(testStr2.replace(regex, '')).toEqual('');
+        expect(smartRUtils.makeSafeForCSS(testStr2).replace(regex, '')).toEqual('');
+    });
+
+    it('has working shortenConcept()', function() {
+        var testStr1 = '\\foo bar\\ab c d';
+        var testStr2 = 'foo bar\\abcd';
+        var testStr3 = '\\a\\b\\c\\d\\e\\f\\g\\h';
+        var testStr4 = 'foo bar\\abcd\\';
+        expect(smartRUtils.shortenConcept(testStr1)).toEqual('foo bar/ab c d');
+        expect(smartRUtils.shortenConcept(testStr2)).toEqual('foo bar/abcd');
+        expect(smartRUtils.shortenConcept(testStr3)).toEqual('g/h');
+        expect(smartRUtils.shortenConcept(testStr4)).toEqual('foo bar/abcd');
+    });
 });
