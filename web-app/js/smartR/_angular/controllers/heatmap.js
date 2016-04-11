@@ -72,12 +72,13 @@ window.smartRApp.controller('HeatmapController',
 
             // disable tabs when certain criteria are not met
             $scope.fetch.disabled = preprocessRunning || runAnalysisRunning;
-            $scope.preprocess.disabled = fetchRunning || runAnalysisRunning || !$scope.fetch.loaded
-                || $scope.fetch.totalSamples <= 1;
+            $scope.preprocess.disabled = fetchRunning || runAnalysisRunning || !$scope.fetch.loaded || 
+                $scope.fetch.totalSamples <= 1;
             $scope.runAnalysis.disabled = fetchRunning || preprocessRunning || !$scope.fetch.loaded;
 
             // disable buttons when certain criteria are not met
-            $scope.runAnalysis.download.disabled = runAnalysisRunning || $.isEmptyObject($scope.runAnalysis.scriptResults);
+            $scope.runAnalysis.download.disabled = runAnalysisRunning || 
+                $.isEmptyObject($scope.runAnalysis.scriptResults);
 
             // set ranking criteria
             $scope.runAnalysis.subsets = $scope.fetch.subsets;
