@@ -1227,6 +1227,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
             if (!lastUsedClustering && typeof clustering === 'undefined') {
                 return; // Nothing should be done if clustering switches are turned on without clustering type set.
             }
+            d3.selectAll('.box').classed('sortedBy', false);
             clustering = (typeof clustering === 'undefined') ? lastUsedClustering : clustering;
             var clusterData = data[clustering];
             if (rowClustering && numberOfClusteredRows > 0) {
