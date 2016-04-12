@@ -182,10 +182,10 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         if(ping$status == 200) { return(TRUE) }
 
         if(!'error' %in% names(ping$content)) {
-            return(stopfn(cat("HTTP ", ping$status, ": ", ping$statusMessage)))
+            return(stopfn(paste("HTTP ", ping$status, ": ", ping$statusMessage, sep='')))
         }
         if(ping$status != 401 || ping$content[['error']] != "invalid_token") {
-            return(stopfn(cat("HTTP ", ping$status, ": ", ping$statusMessage, "\n", ping$content[['error']],  ": ", ping$content[['error_description']])))
+            return(stopfn(paste("HTTP ", ping$status, ": ", ping$statusMessage, "\n", ping$content[['error']],  ": ", ping$content[['error_description']], sep='')))
         }
     } else if (!exists("refresh_token", envir = transmartClientEnv)) {
         return(stopfn("Unable to refresh authentication: no refresh token"))
@@ -208,7 +208,12 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             "If the server is not down, you may have encountered a bug.\n",
             "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
             "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.")
-    stop(e, call.=FALSE)
+    # If e is a condition adding the call. parameter triggers another warning
+    if(inherits(args[[1L]], "condition")) {
+        stop(e)
+    } else {
+        stop(e, call.=FALSE)
+    }
 }
 
 .transmartGetJSON <- function(apiCall, ...) { .transmartServerGetRequest(apiCall, ensureJSON = TRUE, accept.type = "hal", ...) }
