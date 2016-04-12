@@ -23,6 +23,6 @@
     "karma-phantomjs-launcher": "^0.2.3",
     "karma-remote-reporter": "^0.2.0",
     "phantomjs": "^2.0.0",
-    "ng-html2js": "^0.2.2"
+    "ng-html2js": "^2,0.0"
   }
 }
