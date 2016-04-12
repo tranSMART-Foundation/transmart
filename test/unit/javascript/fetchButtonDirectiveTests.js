@@ -3,7 +3,8 @@
 describe('fetchButton', function() {
     var $compile,
         $rootScope,
-        $httpBackend;
+        $httpBackend,
+        element;
 
     beforeEach(module('smartRApp'));
     beforeEach(module('smartRTemplates'));
@@ -12,13 +13,17 @@ describe('fetchButton', function() {
         $compile = _$compile_;
         $rootScope = _$rootScope_;
         $httpBackend = _$httpBackend_;
+
+        element = $compile(angular.element('<fetch-button></fetch-button>'))($rootScope);
+        $rootScope.$digest();
     }));
 
-    it('replaces element with content', function() {
-        var element = angular.element('<fetch-button></fetch-button>');
-        $compile(element)($rootScope);
-        $rootScope.$digest();
-        expect(element.html()).toContain('input');
-        expect(element.html()).toContain('span');
+    it('replaces element with content', function() {    
+        expect(element.find('input')).toBeDefined();
+        expect(element.find('span')).toBeDefined();
+    });
+
+    it('should contain initially no text', function() {
+        expect(element.find('span').text()).toEqual('');
     });
 });
