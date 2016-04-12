@@ -10,6 +10,11 @@ module.exports = function(config) {
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: ['jasmine'],
 
+        plugins: [
+            'karma-jasmine',
+            'karma-phantomjs-launcher',
+            'karma-ng-html2js-preprocessor',
+        ],        
 
         // list of files / patterns to load in the browser
         files: [
@@ -23,6 +28,7 @@ module.exports = function(config) {
             // stuff for testing only
             'web-app/js/resource/angular-mocks.js',
             'test/unit/javascript/testSetup.js',
+            // 'node_modules/karma-ng-html2js-preprocessor/lib/html2js.js',
 
             // application code
             'web-app/js/smartR/_angular/services/smartRUtils.js',
