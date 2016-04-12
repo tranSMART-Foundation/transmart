@@ -1,7 +1,7 @@
 
-describe('fetchButton', function() {
-    'use strict';
+'use strict';
 
+describe('fetchButton', function() {
     var $compile,
         $rootScope,
         $httpBackend;
