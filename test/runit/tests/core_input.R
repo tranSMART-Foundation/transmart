@@ -10,24 +10,24 @@ ClinicalNumericProper <- data.frame(Row.Label = letters[1:5], NumVect = 1:5 )
 
 # Case of loaded_variables containing smt else than a dataframe
 test.validateLoadedVariables1 <- function() {
-  checkException( validateLoadedVariables(loaded_variables_with_a_vector) )
+	checkException( validateLoadedVariables(loaded_variables_with_a_vector) )
 }
 
 # Case of loaded_variables of type data.frame instead of list
 test.validateLoadedVariables2 <- function() {
-  checkException( validateLoadedVariables(loaded_variables_df ) )
+	checkException( validateLoadedVariables(loaded_variables_df ) )
 }
 
 # Case of a proper loaded_variable
 test.validateLoadedVariables3 <- function() {
-  ret <- checkException( validateLoadedVariables(loaded_variables_proper1  ) )
-  checkTrue(ret)
+	ret <- checkException( validateLoadedVariables(loaded_variables_proper1  ) )
+	checkFalse(ret)
 }
 
 test.isHDD1 <- function() {
-  checkException( isHDD(ClinicalNumericProper) )
+	checkException( isHDD(ClinicalNumericProper) )
 }
 
 test.isHDD2 <- function() {
-  checkTrue( isHDD(HDDproper) )
+	checkTrue( isHDD(HDDproper) )
 }
