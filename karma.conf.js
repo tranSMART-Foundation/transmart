@@ -14,6 +14,7 @@ module.exports = function(config) {
             'karma-jasmine',
             'karma-phantomjs-launcher',
             'karma-ng-html2js-preprocessor',
+            'karma-remote-reporter'
         ],        
 
         // list of files / patterns to load in the browser
@@ -61,7 +62,7 @@ module.exports = function(config) {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress'],
+        reporters: ['progress', 'remote'],
 
         remoteReporter: {
             host: 'localhost',
