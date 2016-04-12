@@ -1,9 +1,6 @@
-// Karma configuration
-// Generated on Mon Jan 25 2016 12:15:37 GMT+0100 (CET)
+'use strict';
 
 module.exports = function(config) {
-    'use strict';
-
     config.set({
 
         // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -23,10 +20,8 @@ module.exports = function(config) {
             'web-app/js/resource/angular-css.js',
             'web-app/js/resource/d3.min.js',
 
-            // libs needed for testing
+            // stuff for testing only
             'web-app/js/resource/angular-mocks.js',
-
-            // test setup (globals vars and smartRApp mock)
             'test/unit/javascript/testSetup.js',
 
             // application code
