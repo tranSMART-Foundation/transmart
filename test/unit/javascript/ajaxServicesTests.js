@@ -2,8 +2,10 @@
 
 describe('ajaxServices', function() {
 
-    var foo = '';
-    expect(foo).toEqual('');
+    it('foo', function() {
+        var bar = '';
+        expect(bar).toEqual('');    
+    });
 
     // FIXME: These tests are for the old ajaxService. Adapt them to angular.
 
