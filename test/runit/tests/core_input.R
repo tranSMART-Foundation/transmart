@@ -20,8 +20,9 @@ test.validateLoadedVariables2 <- function() {
 
 # Case of a proper loaded_variable
 test.validateLoadedVariables3 <- function() {
-	ret <- checkException( validateLoadedVariables(loaded_variables_proper1  ) )
-	checkFalse(ret)
+	# the inner checkException will throw an exception because there is no exception thrown
+	# the outer checkException catches it and validates to true
+	checkException(checkException( validateLoadedVariables(loaded_variables_proper1  ) ))
 }
 
 test.isHDD1 <- function() {
