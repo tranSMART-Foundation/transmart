@@ -2,6 +2,8 @@
 // Generated on Mon Jan 25 2016 12:15:37 GMT+0100 (CET)
 
 module.exports = function(config) {
+    'use strict';
+
     config.set({
 
         // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -21,37 +23,44 @@ module.exports = function(config) {
             'web-app/js/resource/angular-css.js',
             'web-app/js/resource/d3.min.js',
 
-            // mocks (i.e. for module() and inject())
+            // libs needed for testing
             'web-app/js/resource/angular-mocks.js',
 
-            // test setup
+            // test setup (globals vars and smartRApp mock)
             'test/unit/javascript/testSetup.js',
 
             // application code
-            'web-app/js/smartR/_angular/smartRApp.js',
             'web-app/js/smartR/_angular/services/smartRUtils.js',
+            'web-app/js/smartR/_angular/services/rServeService.js',
+            'web-app/js/smartR/_angular/directives/fetchButton.js',
+
+            // templates
+            'web-app/js/smartR/_angular/templates/*.html',
 
             // test files
             'test/unit/javascript/**/*.js'
 //      'test/functional/javascript/**/*.js'
         ],
 
-
         // list of files to exclude
         exclude: [
         ],
 
-
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
+            'web-app/js/smartR/_angular/templates/*.html': 'ng-html2js'
         },
 
-
+        ngHtml2JsPreprocessor: {
+            stripPrefix: 'web-app',
+            moduleName: 'smartRTemplates'
+        },
+        
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress', 'remote'],
+        reporters: ['progress'],
 
         remoteReporter: {
             host: 'localhost',
@@ -88,5 +97,5 @@ module.exports = function(config) {
         // Concurrency level
         // how many browser should be started simultaneous
         concurrency: Infinity
-    })
+    });
 };
