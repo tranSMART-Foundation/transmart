@@ -1,5 +1,4 @@
-// Karma configuration
-// Generated on Mon Jan 25 2016 12:15:37 GMT+0100 (CET)
+'use strict';
 
 module.exports = function(config) {
     config.set({
@@ -11,6 +10,12 @@ module.exports = function(config) {
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: ['jasmine'],
 
+        plugins: [
+            'karma-jasmine',
+            'karma-phantomjs-launcher',
+            'karma-ng-html2js-preprocessor',
+            'karma-remote-reporter'
+        ],        
 
         // list of files / patterns to load in the browser
         files: [
@@ -21,33 +26,39 @@ module.exports = function(config) {
             'web-app/js/resource/angular-css.js',
             'web-app/js/resource/d3.min.js',
 
-            // mocks (i.e. for module() and inject())
+            // stuff for testing only
             'web-app/js/resource/angular-mocks.js',
-
-            // test setup
             'test/unit/javascript/testSetup.js',
+            // 'node_modules/karma-ng-html2js-preprocessor/lib/html2js.js',
 
             // application code
-            'web-app/js/smartR/_angular/smartRApp.js',
             'web-app/js/smartR/_angular/services/smartRUtils.js',
+            'web-app/js/smartR/_angular/services/rServeService.js',
+            'web-app/js/smartR/_angular/directives/fetchButton.js',
+
+            // templates
+            'web-app/js/smartR/_angular/templates/*.html',
 
             // test files
             'test/unit/javascript/**/*.js'
 //      'test/functional/javascript/**/*.js'
         ],
 
-
         // list of files to exclude
         exclude: [
         ],
 
-
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
+            'web-app/js/smartR/_angular/templates/*.html': 'ng-html2js'
         },
 
-
+        ngHtml2JsPreprocessor: {
+            stripPrefix: 'web-app',
+            moduleName: 'smartRTemplates'
+        },
+        
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
@@ -88,5 +99,5 @@ module.exports = function(config) {
         // Concurrency level
         // how many browser should be started simultaneous
         concurrency: Infinity
-    })
+    });
 };

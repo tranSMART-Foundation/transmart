@@ -1,11 +1,9 @@
-'use strict';
-
 describe('smartRUtils', function() {
+    'use strict';
+
     var smartRUtils;
 
-    beforeEach(function() {
-        module('smartRApp');
-    });
+    beforeEach(module('smartRApp'));
 
     beforeEach(inject(function(_smartRUtils_) {
         smartRUtils = _smartRUtils_;
