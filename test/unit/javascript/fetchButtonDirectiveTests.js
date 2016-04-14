@@ -20,9 +20,30 @@ describe('fetchButton', function() {
         smartRUtils = _smartRUtils_;
         rServeService = _rServeService_;
 
-        element = $compile(angular.element('<fetch-button></fetch-button>'))($rootScope);
+        $rootScope.conceptMap = {};
+
+        element = $compile(angular.element('<fetch-button concept-map="conceptMap"></fetch-button>'))($rootScope);
         $rootScope.$digest();
     }));
+
+    var _clickButton = function(loadDataIntoSessionSuccess) {
+        var defer = $q.defer();
+        spyOn(rServeService, 'loadDataIntoSession').and.returnValue(defer.promise);
+        element.find('input').click();
+        if (loadDataIntoSessionSuccess) {
+            defer.resolve();
+        } else {
+            defer.reject('foobar');
+        }
+        $rootScope.$digest();
+    };
+
+    var _prepareScope = function(cohorts, showSummaryStats, conceptMap) {
+        spyOn(smartRUtils, 'countCohorts').and.returnValue(cohorts);
+        element.isolateScope().showSummaryStats = showSummaryStats;
+        element.isolateScope().conceptMap = conceptMap;
+        $rootScope.$digest();
+    };
 
     it('replaces element with content', function() {
         expect(element.find('input')).toBeDefined();
@@ -34,87 +55,35 @@ describe('fetchButton', function() {
     });
 
     it('should show text when clicked', function() {
-        try { // we do not care about the background functionality at this point
+        try { // we just want to see if the progress message is there
             element.find('input').click();
         } catch(e) {}
         expect(element.find('span').text()).toContain('Fetching data');
     });
 
-    describe('successful', function() {
-        beforeEach(function() {
-            spyOn(smartRUtils, 'conceptBoxMapToConceptKeys').and.returnValue({foo: 'bar'});
-            spyOn(smartRUtils, 'countCohorts').and.returnValue(1);
-            var defer = $q.defer();
-            spyOn(rServeService, 'loadDataIntoSession').and.returnValue(defer.promise);
-            element.find('input').click();
-            defer.resolve('SUCCESS');
-            $rootScope.$digest();
-        });
-
-        it('should show success when successful with showSummaryStats disabled', function() {
-            expect(element.find('span').text()).toEqual('SUCCESS');
-        });
-
-        element.isolateScope().showSummaryStats = true;
-
-        it('should show success when successful with showSummaryStats enabled', function() {
-            expect(element.find('span').text()).toEqual('SUCCESS');
-        });
+    it('should show another text after data is loaded if showSummaryStats is enabled', function() {
+        _prepareScope(1, true, {foo: ['concept']});
+        try { // we just want to see if the progress message is there
+            _clickButton(true);
+        } catch (e) {}
+        expect(element.find('span').text()).toContain('Execute summary statistics');
     });
 
-    describe('fail because no cohorts', function() {
-        beforeEach(function() {
-            spyOn(smartRUtils, 'conceptBoxMapToConceptKeys').and.returnValue({foo: 'bar'});
-            spyOn(smartRUtils, 'countCohorts').and.returnValue(0);
-        });
-
-        it('should fail with showSummaryStats disabled', function() {
-            expect(element.find('span').text()).toEqual('Error: No cohorts selected!');
-        });
-
-        element.isolateScope().showSummaryStats = true;
-
-        it('should fail with showSummaryStats enabled', function() {
-            expect(element.find('span').text()).toEqual('Error: No cohorts selected!');
-        });
+    it('should succeed', function() {
+        _prepareScope(2, false, {foo: ['concept']});
+        _clickButton(true);
+        expect(element.find('span').text()).toBe('Task complete!');
     });
 
-    describe('fail because no concepts', function() {
-        beforeEach(function() {
-            spyOn(smartRUtils, 'conceptBoxMapToConceptKeys').and.returnValue({});
-            element.find('input').click();
-        });
-
-        it('should fail with showSummaryStats disabled', function() {
-            expect(element.find('span').text()).toEqual('Error: No data selected!');
-        });
-
-        element.isolateScope().showSummaryStats = true;
-
-        it('should fail with showSummaryStats enabled', function() {
-            expect(element.find('span').text()).toEqual('Error: No data selected!');
-        });
+    it('should show error due to missing cohorts', function() {
+        _prepareScope(0, false, {foo: ['concept']});
+        _clickButton(true);
+        expect(element.find('span').text()).toBe('Error: No cohorts selected!');
     });
 
-    describe('fail because loadDataIntoSession fails', function() {
-        beforeEach(function() {
-            spyOn(smartRUtils, 'conceptBoxMapToConceptKeys').and.returnValue({foo: 'bar'});
-            spyOn(smartRUtils, 'countCohorts').and.returnValue(1);
-            var defer = $q.defer();
-            spyOn(rServeService, 'loadDataIntoSession').and.returnValue(defer.promise);
-            element.find('input').click();
-            defer.reject('FAILURE');
-            $rootScope.$digest();
-        });
-
-        it('should fail with showSummaryStats disabled', function() {
-            expect(element.find('span').text()).toEqual('FAILURE');
-        });
-
-        element.isolateScope().showSummaryStats = true;
-
-        it('should fail with showSummaryStats enabled', function() {
-            expect(element.find('span').text()).toEqual('FAILURE');
-        });
+    it('should show error due to missing concepts', function() {
+        _prepareScope(1, false, {});
+        _clickButton(true);
+        expect(element.find('span').text()).toBe('Error: No concepts selected!');
     });
 });

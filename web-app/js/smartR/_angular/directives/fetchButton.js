@@ -10,8 +10,8 @@ window.smartRApp.directive('fetchButton', [
         return {
             restrict: 'E',
             scope: {
-                loaded: '=',
-                running: '=',
+                loaded: '=?',
+                running: '=?',
                 conceptMap: '=',
                 biomarkers: '=?',
                 showSummaryStats: '=?',
@@ -35,7 +35,7 @@ window.smartRApp.directive('fetchButton', [
                 };
 
                 var _onSuccess = function() {
-                    template_msg.innerHTML = 'Task completed!';
+                    template_msg.innerHTML = 'Task complete!';
                     scope.subsets = smartRUtils.countCohorts();
                     scope.loaded = true;
                     template_btn.disabled = false;
@@ -43,7 +43,7 @@ window.smartRApp.directive('fetchButton', [
                 };
 
                 var _onFailure = function(msg) {
-                    template_msg.innerHTML = 'Failure: ' + msg;
+                    template_msg.innerHTML = 'Error: ' + msg;
                     scope.loaded = false;
                     template_btn.disabled = false;
                     scope.running = false;
@@ -52,15 +52,15 @@ window.smartRApp.directive('fetchButton', [
                 // we add this conditional $watch because there is some crazy promise resolving for allSamples
                 // going on. This is a workaround which observes allSamples and uses it as criteria for successful
                 // completion.
-                if (scope.showSummaryStats) {
-                    scope.$watch('summaryData', function(newValue) {
-                        // prevents initial firing
-                        if (scope.running && Object.keys(newValue).indexOf('subsets') !== -1) {
-                            scope.allSamples = scope.summaryData.allSamples;
-                            _onSuccess();
-                        }
-                    }, true);
-                }
+                scope.$watch('summaryData', function(newValue) {
+                    if (scope.summaryData &&
+                            scope.showSummaryStats &&
+                            scope.running &&
+                            Object.keys(newValue).indexOf('subsets') !== -1) {
+                        scope.allSamples = scope.summaryData.allSamples;
+                        _onSuccess();
+                    }
+                }, true);
 
                 var _getDataConstraints = function (biomarkers) {
                     if (typeof biomarkers !== 'undefined' && biomarkers.length > 0) {
@@ -85,15 +85,29 @@ window.smartRApp.directive('fetchButton', [
                         'Execute summary statistics, please wait <span class="blink_me">_</span>';
 
                     return rServeService.executeSummaryStats('fetch')
-                        .then(function(data) {
-                            scope.summaryData = data.result;
-                        }, _onFailure);
+                        .then(
+                            function(data) { scope.summaryData = data.result; },
+                            _onFailure
+                        );
                 };
 
                 template_btn.onclick = function() {
                     _init();
+
+
+                    if (smartRUtils.countCohorts() === 0) {
+                        template_msg.innerHTML = 'Error: No cohorts selected!';
+                        return;
+                    }
+
                     var conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap);
+                    if ($.isEmptyObject(conceptKeys)) {
+                        template_msg.innerHTML = 'Error: No concepts selected!';
+                        return;
+                    }
+
                     var dataConstraints = _getDataConstraints(scope.biomarkers);
+
                     rServeService.loadDataIntoSession(conceptKeys, dataConstraints)
                         .then(_afterDataFetched, _onFailure);
                 };
