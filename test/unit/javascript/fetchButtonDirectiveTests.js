@@ -26,16 +26,27 @@ describe('fetchButton', function() {
         $rootScope.$digest();
     }));
 
-    var _clickButton = function(loadDataIntoSessionSuccess) {
-        var defer = $q.defer();
-        spyOn(rServeService, 'loadDataIntoSession').and.returnValue(defer.promise);
+
+
+
+    var _clickButton = function(loadDataIntoSessionReturn, executeSummaryStatsReturn) {
+        var defer1 = $q.defer();
+        var defer2 = $q.defer();
+        spyOn(rServeService, 'loadDataIntoSession').and.returnValue(defer1.promise);
+        spyOn(rServeService, 'executeSummaryStats').and.returnValue(defer2.promise);
+
         element.find('input').click();
-        if (loadDataIntoSessionSuccess) {
-            defer.resolve();
-        } else {
-            defer.reject('foobar');
+
+        if (loadDataIntoSessionReturn) {
+            eval('defer1.' + loadDataIntoSessionReturn);
+            $rootScope.$digest();
         }
-        $rootScope.$digest();
+
+
+        if (executeSummaryStatsReturn) {
+            eval('defer2.' + executeSummaryStatsReturn);
+            $rootScope.$digest();
+        }
     };
 
     var _prepareScope = function(cohorts, showSummaryStats, conceptMap) {
@@ -50,40 +61,67 @@ describe('fetchButton', function() {
         expect(element.find('span')).toBeDefined();
     });
 
-    it('should contain initially no text', function() {
+    it('should be correctly initialized', function() {
+        element.isolateScope()._init();
         expect(element.find('span').text()).toEqual('');
+        expect(element.isolateScope().running).toEqual(false);
+        expect(element.isolateScope().loaded).toEqual(false);
+        expect(element.isolateScope().subsets).toEqual(0);
+        expect(element.isolateScope().allSamples).toEqual(0);
     });
 
-    it('should show text when clicked', function() {
+    it('should have the correct scope when clicked', function() {
         try { // we just want to see if the progress message is there
             element.find('input').click();
         } catch(e) {}
         expect(element.find('span').text()).toContain('Fetching data');
+        expect(element.isolateScope().running).toBe(true);
+        expect(element.isolateScope().loaded).toBe(false);
+        expect(element.isolateScope().subsets).toEqual(0);
+        expect(element.isolateScope().allSamples).toEqual(0);
     });
 
     it('should show another text after data is loaded if showSummaryStats is enabled', function() {
         _prepareScope(1, true, {foo: ['concept']});
         try { // we just want to see if the progress message is there
-            _clickButton(true);
+            _clickButton('resolve()');
         } catch (e) {}
         expect(element.find('span').text()).toContain('Execute summary statistics');
+        expect(element.isolateScope().running).toBe(true);
+        expect(element.isolateScope().loaded).toBe(false);
+        expect(element.isolateScope().subsets).toEqual(0);
+        expect(element.isolateScope().allSamples).toEqual(0);
     });
 
-    it('should succeed', function() {
+    it('should have the correct scope when successful without showSummaryStats', function() {
         _prepareScope(2, false, {foo: ['concept']});
-        _clickButton(true);
+        _clickButton('resolve()');
         expect(element.find('span').text()).toBe('Task complete!');
+        expect(element.isolateScope().running).toBe(false);
+        expect(element.isolateScope().loaded).toBe(true);
+        expect(element.isolateScope().subsets).toEqual(2);
+        expect(element.isolateScope().allSamples).toEqual(0);
+    });
+
+    it('should have the correct scope when successful with showSummaryStats', function() {
+        _prepareScope(1, true, {foo: ['concept']});
+        _clickButton('resolve()', 'resolve({result: {allSamples: 1337, subsets: null}})');
+        expect(element.find('span').text()).toBe('Task complete!');
+        expect(element.isolateScope().running).toBe(false);
+        expect(element.isolateScope().loaded).toBe(true);
+        expect(element.isolateScope().subsets).toEqual(1);
+        expect(element.isolateScope().allSamples).toEqual(1337);
     });
 
     it('should show error due to missing cohorts', function() {
         _prepareScope(0, false, {foo: ['concept']});
-        _clickButton(true);
+        _clickButton();
         expect(element.find('span').text()).toBe('Error: No cohorts selected!');
     });
 
     it('should show error due to missing concepts', function() {
         _prepareScope(1, false, {});
-        _clickButton(true);
+        _clickButton();
         expect(element.find('span').text()).toBe('Error: No concepts selected!');
     });
 });

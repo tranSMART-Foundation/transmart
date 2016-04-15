@@ -10,9 +10,9 @@ window.smartRApp.directive('fetchButton', [
         return {
             restrict: 'E',
             scope: {
+                conceptMap: '=',
                 loaded: '=?',
                 running: '=?',
-                conceptMap: '=',
                 biomarkers: '=?',
                 showSummaryStats: '=?',
                 summaryData: '=?',
@@ -25,14 +25,14 @@ window.smartRApp.directive('fetchButton', [
                 var template_btn = element.children()[0],
                     template_msg = element.children()[1];
 
-                var _init = function () {
-                    template_btn.disabled = true;
-                    scope.summaryData = {}; // reset
+                (scope._init = function () {
+                    scope.summaryData = {};
                     scope.allSamples = 0;
                     scope.subsets = 0;
-                    scope.running = true;
-                    template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
-                };
+                    scope.loaded = false;
+                    scope.running = false;
+                    template_msg.innerHTML = '';
+                }).call();
 
                 var _onSuccess = function() {
                     template_msg.innerHTML = 'Task complete!';
@@ -78,31 +78,33 @@ window.smartRApp.directive('fetchButton', [
                 var _afterDataFetched = function() {
                     if (!scope.showSummaryStats) {
                         _onSuccess();
-                        return;
+                    } else {
+                        template_msg.innerHTML =
+                            'Execute summary statistics, please wait <span class="blink_me">_</span>';
+
+                        rServeService.executeSummaryStats('fetch')
+                            .then(
+                                function(data) { scope.summaryData = data.result; }, // this will trigger $watch
+                                _onFailure
+                            );
                     }
-
-                    template_msg.innerHTML =
-                        'Execute summary statistics, please wait <span class="blink_me">_</span>';
-
-                    return rServeService.executeSummaryStats('fetch')
-                        .then(
-                            function(data) { scope.summaryData = data.result; },
-                            _onFailure
-                        );
                 };
 
                 template_btn.onclick = function() {
-                    _init();
+                    scope._init();
+                    scope.running = true;
+                    template_btn.disabled = true;
+                    template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
 
 
                     if (smartRUtils.countCohorts() === 0) {
-                        template_msg.innerHTML = 'Error: No cohorts selected!';
+                        _onFailure('No cohorts selected!');
                         return;
                     }
 
                     var conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap);
                     if ($.isEmptyObject(conceptKeys)) {
-                        template_msg.innerHTML = 'Error: No concepts selected!';
+                        _onFailure('No concepts selected!');
                         return;
                     }
 
