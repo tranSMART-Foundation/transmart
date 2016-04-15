@@ -25,15 +25,6 @@ window.smartRApp.directive('fetchButton', [
                 var template_btn = element.children()[0],
                     template_msg = element.children()[1];
 
-                (scope._init = function () {
-                    scope.summaryData = {};
-                    scope.allSamples = 0;
-                    scope.subsets = 0;
-                    scope.loaded = false;
-                    scope.running = false;
-                    template_msg.innerHTML = '';
-                }).call();
-
                 var _onSuccess = function() {
                     template_msg.innerHTML = 'Task complete!';
                     scope.subsets = smartRUtils.countCohorts();
@@ -57,7 +48,7 @@ window.smartRApp.directive('fetchButton', [
                             scope.showSummaryStats &&
                             scope.running &&
                             Object.keys(newValue).indexOf('subsets') !== -1) {
-                        scope.allSamples = scope.summaryData.allSamples;
+                        scope.allSamples = newValue.allSamples;
                         _onSuccess();
                     }
                 }, true);
@@ -91,11 +82,14 @@ window.smartRApp.directive('fetchButton', [
                 };
 
                 template_btn.onclick = function() {
-                    scope._init();
+                    scope.summaryData = {};
+                    scope.allSamples = 0;
+                    scope.subsets = 0;
+                    scope.loaded = false;
                     scope.running = true;
+
                     template_btn.disabled = true;
                     template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
-
 
                     if (smartRUtils.countCohorts() === 0) {
                         _onFailure('No cohorts selected!');

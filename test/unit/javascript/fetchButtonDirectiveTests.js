@@ -26,9 +26,6 @@ describe('fetchButton', function() {
         $rootScope.$digest();
     }));
 
-
-
-
     var _clickButton = function(loadDataIntoSessionReturn, executeSummaryStatsReturn) {
         var defer1 = $q.defer();
         var defer2 = $q.defer();
@@ -59,15 +56,6 @@ describe('fetchButton', function() {
     it('replaces element with content', function() {
         expect(element.find('input')).toBeDefined();
         expect(element.find('span')).toBeDefined();
-    });
-
-    it('should be correctly initialized', function() {
-        element.isolateScope()._init();
-        expect(element.find('span').text()).toEqual('');
-        expect(element.isolateScope().running).toEqual(false);
-        expect(element.isolateScope().loaded).toEqual(false);
-        expect(element.isolateScope().subsets).toEqual(0);
-        expect(element.isolateScope().allSamples).toEqual(0);
     });
 
     it('should have the correct scope when clicked', function() {
