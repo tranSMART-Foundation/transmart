@@ -12,7 +12,7 @@ window.smartRApp.factory('rServeService', [
 
         var NOOP_ABORT = function() {};
         var TIMEOUT = 10000 /* 10 s */;
-        var CHECK_DELAY = 1000;
+        var CHECK_DELAY = 500;
         var SESSION_TOUCH_DELAY = 9 * 60 * 1000; /* 9 min; session timeout is 10 */
 
         /* we only support one session at a time */
@@ -169,7 +169,7 @@ window.smartRApp.factory('rServeService', [
                 runRequest.then(
                     function(response) {
                         taskData.executionId = response.data.executionId;
-                        _checkStatus(taskData.executionId, CHECK_DELAY, resolve, reject);
+                        _checkStatus(taskData.executionId, resolve, reject);
                     },
                     function(response) {
                         reject(response.statusText);
@@ -191,17 +191,18 @@ window.smartRApp.factory('rServeService', [
 
         /* aux function of _startScriptExecution. Needs to follow its contract
          * with respect to the fail and success result of the promise */
-        function _checkStatus(executionId, delay, resolve, reject) {
+        function _checkStatus(executionId, resolve, reject) {
             var canceler = $q.defer();
             var statusRequest = $http({
                 method: 'GET',
+                timeout: canceler.promise,
                 url: pageInfo.basePath + '/ScriptExecution/status' +
                     '?sessionId=' + state.sessionId +
                     '&executionId=' + executionId
             });
 
-            state.currentRequestAbort = function() { canceler.resolve(); };
             statusRequest.finally(function() { state.currentRequestAbort = NOOP_ABORT; });
+            state.currentRequestAbort = function() { canceler.resolve(); };
 
             statusRequest.then(
                 function (d) {
@@ -212,7 +213,9 @@ window.smartRApp.factory('rServeService', [
                         reject(d.data.result.exception);
                     } else {
                         // else still pending
-                        window.setTimeout(_checkStatus(executionId, delay, resolve, reject), delay);
+                        window.setTimeout(function() {
+                            _checkStatus(executionId, resolve, reject);
+                        }, CHECK_DELAY);
                     }
                 },
                 function(response) { reject(response.statusText); }
