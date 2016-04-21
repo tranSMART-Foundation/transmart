@@ -11,9 +11,9 @@ window.smartRApp.factory('rServeService', [
         var service = {};
 
         var NOOP_ABORT = function() {};
-        var TIMEOUT = 10000 /* 10 s */;
-        var CHECK_DELAY = 500;
-        var SESSION_TOUCH_DELAY = 9 * 60 * 1000; /* 9 min; session timeout is 10 */
+        var TIMEOUT = 10000; // 10 s
+        var CHECK_DELAY = 500; // 0.5 s
+        var SESSION_TOUCH_DELAY = 60000; // 1 min
 
         /* we only support one session at a time */
 
@@ -79,10 +79,9 @@ window.smartRApp.factory('rServeService', [
         };
 
         function rServeService_scheduleTouch() {
-            var sessionId = state.sessionId;
             window.clearTimeout(state.touchTimeout);
             state.touchTimeout = window.setTimeout(function() {
-                service.touch(sessionId);
+                service.touch(state.sessionId);
             }, SESSION_TOUCH_DELAY);
         }
 
