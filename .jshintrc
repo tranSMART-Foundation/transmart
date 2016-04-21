@@ -90,6 +90,7 @@
         "module":   true,
         "inject":   true,
         "pageInfo": true,
-        "d3":       true
+        "d3":       true,
+        "Ext":      true
     }        // additional predefined global variables
 }

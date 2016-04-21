@@ -42,13 +42,7 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         split = split.filter(function(str) { return str !== ''; });
         return split[split.length - 2] + '/' + split[split.length - 1];
     };
-
-    d3.selection.prototype.moveToFront = function () {
-        return this.forEach(function () {
-            this.parentNode.appendChild(this);
-        });
-    };
-
+    
     service.mouseX = function(root) {
         var svg = $(root).children('svg');
         var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX;
@@ -59,6 +53,12 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         var svg = $(root).children('svg');
         var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY;
         return mouseYPos - svg.offset().top + svg.position().top;
+    };
+    
+    service.getMaxWidth = function(selection) {
+        return selection[0].map(function (d) {
+            return d.getBBox().width;
+        }).max();
     };
 
     service.countCohorts = function() {

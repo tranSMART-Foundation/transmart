@@ -38,7 +38,6 @@ window.smartRApp.directive('runButton', [
 
                 var _prepareResults = function(response) {
                     if (scope.serialized) {
-                        console.log('hi')
                         // when results are serialized, we need to deserialized them by
                         // downloading the results files.
                         rServeService.downloadJsonFile(response.executionId, 'heatmap.json').then(
