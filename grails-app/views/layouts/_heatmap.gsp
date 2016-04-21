@@ -42,7 +42,7 @@
         <workflow-tab tab-name="Preprocess" disabled="preprocess.disabled">
             %{--Aggregate Probes--}%
             <div class="heim-input-field">
-                <input type="checkbox" ng-model="preprocess.params.aggregateProbes">
+                <input type="checkbox" ng-model="preprocess.params.aggregate">
                 <span>Aggregate probes</span>
             </div>
 

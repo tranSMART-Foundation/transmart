@@ -1,5 +1,6 @@
+'use strict';
+
 describe('smartRUtils', function() {
-    'use strict';
 
     var smartRUtils;
 
