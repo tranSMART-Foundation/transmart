@@ -85,13 +85,13 @@ window.smartRApp.directive('fetchButton', [
                     template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
 
                     if (smartRUtils.countCohorts() === 0) {
-                        _onFailure('Error: No cohorts selected!');
+                        _onFailure('No cohorts selected!');
                         return;
                     }
 
                     var conceptKeys = smartRUtils.conceptBoxMapToConceptKeys(scope.conceptMap);
                     if ($.isEmptyObject(conceptKeys)) {
-                        _onFailure('Error: No concepts selected!');
+                        _onFailure('No concepts selected!');
                         return;
                     }
 
