@@ -2,7 +2,11 @@
 
 'use strict';
 
-window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
+window.smartRApp.directive('boxplot', [
+    'smartRUtils',
+    'rServeService',
+    'controlElements',
+    function(smartRUtils, rServeService, controlElements) {
 
     return {
         restrict: 'E',
@@ -27,15 +31,15 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
 
     function createBoxplot(scope, root) {
         var concept = '',
-            globalMin = 0,
-            globalMax = 0,
+            globalMin = Number.MIN_VALUE,
+            globalMax = Number.MAX_VALUE,
             categories = [],
             excludedPatientIDs = [];
         function setData(data) {
             concept = data.concept[0];
             globalMin = data.globalMin[0];
             globalMax = data.globalMax[0];
-            categories = data.categories.sort();
+            categories = data['Subset 2'] ? ['Subset 1', 'Subset 2'] : ['Subset 1'];
             excludedPatientIDs = data.excludedPatientIDs;
         }
         setData(scope.data);
@@ -193,11 +197,11 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             };
         }
 
-        function gaussKernel(scale) {
-            return function (u) {
-                return Math.exp(-u * u / 2) / Math.sqrt(2 * Math.PI) / scale;
-            };
-        }
+        // function gaussKernel(scale) {
+        //     return function (u) {
+        //         return Math.exp(-u * u / 2) / Math.sqrt(2 * Math.PI) / scale;
+        //     };
+        // }
 
         function swapKDE(checked) {
             if (!checked) {
@@ -233,7 +237,6 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             var params = scope.data[category];
             createBox(params, category, boxes[category]);
         });
-        d3.selectAll('.text, .line, .point').moveToFront();
 
         function createBox(params, category, box) {
             var boxLabel = shortenNodeLabel(category);
@@ -368,7 +371,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
                 .text(params.median);
 
             var point = box.selectAll('.point')
-                .data(params.points, function (d) { return boxLabel + '-' + d.patientID; });
+                .data(params.rawData, function (d) { return boxLabel + '-' + d.patientID; });
 
             point.enter()
                 .append('circle')
@@ -409,7 +412,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             var yCopy = y.copy();
             yCopy.domain([params.lowerWhisker, params.upperWhisker]);
             var kde = kernelDensityEstimator(epanechnikovKernel(6), yCopy.ticks(100));
-            var values = params.points.map(function (d) { return d.value; });
+            var values = params.rawData.map(function (d) { return d.value; });
             var estFun = kde(values);
             var kdeDomain = d3.extent(estFun, function (d) { return d[1]; });
             var kdeScale = d3.scale.linear()
@@ -443,7 +446,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
         var buttonWidth = 200;
         var buttonHeight = 40;
         var padding = 5;
-        createD3Button({
+        controlElements.createD3Button({
             location: boxplot,
             label: 'Remove Outliers',
             x: -280,
@@ -452,7 +455,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             height: buttonHeight,
             callback: removeOutliers
         });
-        createD3Button({
+        controlElements.createD3Button({
             location: boxplot,
             label: 'Reset',
             x: -280,
@@ -462,7 +465,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             callback: reset
         });
 
-        createD3Switch({
+        controlElements.createD3Switch({
             location: boxplot,
             onlabel: 'Density Estimation ON',
             offlabel: 'Density Estimation OFF',
@@ -473,7 +476,7 @@ window.smartRApp.directive('boxplot', ['smartRUtils', 'rServeService', function(
             callback: swapKDE,
             checked: false
         });
-        createD3Switch({
+        controlElements.createD3Switch({
             location: boxplot,
             onlabel: 'Jitter Datapoints ON',
             offlabel: 'Jitter Datapoints OFF',

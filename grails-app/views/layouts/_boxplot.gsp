@@ -14,14 +14,16 @@
                          label="Numerical Variable"
                          tooltip="Select a single numerical variable that you would like to have displayed.">
             </concept-box>
-            <concept-box style="display: inline-block;"
-                         concept-group="conceptBoxes.subsets"
-                         type="LD-categorical"
-                         min="0"
-                         max="-1"
-                         label="(optional) Categorical Variables"
-                         tooltip="Select an arbitrary amount of categorical variables to split the numerical variable into subsets.">
-            </concept-box>
+            %{--Nice idea but somehow lost it's initial purpose because cross-study support is gone.
+                Maybe implement later--}%
+            %{--<concept-box style="display: inline-block;"--}%
+                         %{--concept-group="conceptBoxes.subsets"--}%
+                         %{--type="LD-categorical"--}%
+                         %{--min="0"--}%
+                         %{--max="-1"--}%
+                         %{--label="(optional) Categorical Variables"--}%
+                         %{--tooltip="Select an arbitrary amount of categorical variables to split the numerical variable into subsets.">--}%
+            %{--</concept-box>--}%
             <br/>
             <br/>
             <fetch-button concept-map="conceptBoxes" show-summary-stats="false" disabled="false"></fetch-button>

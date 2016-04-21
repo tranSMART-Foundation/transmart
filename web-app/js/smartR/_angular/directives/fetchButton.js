@@ -21,7 +21,6 @@ window.smartRApp.directive('fetchButton', [
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/fetchButton.html',
             link: function(scope, element) {
-
                 var template_btn = element.children()[0],
                     template_msg = element.children()[1];
 
@@ -66,19 +65,13 @@ window.smartRApp.directive('fetchButton', [
                     }
                 };
 
-                var _afterDataFetched = function() {
-                    if (!scope.showSummaryStats) {
-                        _onSuccess();
-                    } else {
-                        template_msg.innerHTML =
-                            'Execute summary statistics, please wait <span class="blink_me">_</span>';
-
-                        rServeService.executeSummaryStats('fetch')
-                            .then(
-                                function(data) { scope.summaryData = data.result; }, // this will trigger $watch
-                                _onFailure
-                            );
-                    }
+                var _showSummaryStats = function() {
+                    template_msg.innerHTML = 'Execute summary statistics, please wait <span class="blink_me">_</span>';
+                    rServeService.executeSummaryStats('fetch')
+                        .then(
+                            function(data) { scope.summaryData = data.result; }, // this will trigger $watch
+                            _onFailure
+                        );
                 };
 
                 template_btn.onclick = function() {
@@ -105,7 +98,10 @@ window.smartRApp.directive('fetchButton', [
                     var dataConstraints = _getDataConstraints(scope.biomarkers);
 
                     rServeService.loadDataIntoSession(conceptKeys, dataConstraints)
-                        .then(_afterDataFetched, _onFailure);
+                        .then(
+                            scope.showSummaryStats ? _showSummaryStats : _onSuccess,
+                            _onFailure
+                        );
                 };
             }
         };

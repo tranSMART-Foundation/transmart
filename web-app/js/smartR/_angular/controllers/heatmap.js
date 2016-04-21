@@ -30,7 +30,7 @@ window.smartRApp.controller('HeatmapController',
         disabled: true,
         running: false,
         params:  {
-            aggregateProbes: false
+            aggregate: false
         },
         scriptResults: {}
     };

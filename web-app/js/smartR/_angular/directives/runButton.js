@@ -2,49 +2,51 @@
 
 'use strict';
 
-window.smartRApp.directive('runButton',
-    ['$rootScope', 'rServeService', function($rootScope, rServeService) {
+window.smartRApp.directive('runButton', [
+    '$rootScope',
+    'rServeService',
+    function($rootScope, rServeService) {
         return {
             restrict: 'E',
             scope: {
-                running: '=',
+                running: '=?',
                 storage: '=storeResultsIn',
                 script: '@scriptToRun',
                 name: '@buttonName',
-                serialized: '=',
-                arguments: '=argumentsToUse'
+                serialized: '=?',
+                params: '=?argumentsToUse'
             },
             templateUrl: $rootScope.smartRPath + '/js/smartR/_angular/templates/runButton.html',
             link: function(scope, element) {
-
                 var template_btn = element.children()[0],
-                    template_msg = element.children()[1],
-                    serialized = scope.serialized;
+                    template_msg = element.children()[1];
 
-                var _downloadData = function(response) {
-                    template_msg.innerHTML = ''; // empty template
-                    if (serialized) { // when results are serialized, we need to deserialized them by
-                        // downloading the results files.
-                        rServeService.downloadJsonFile(response.executionId, 'heatmap.json').then(
-                            function(d) { scope.storage = d.data; _done(); },
-                            _onFail
-                        );
-                    } else { // results
-                        scope.storage = JSON.parse(response.result.artifacts.value);
-                        _done();
-                    }
-                };
-
-                var _done = function() {
+                var _onSuccess = function(data) {
+                    scope.storage = data;
+                    template_msg.innerHTML = '';
                     template_btn.disabled = false;
                     scope.disabled = false;
                     scope.running = false;
                 };
 
-                var _onFail = function(response) {
-                    template_msg.style.color = 'red';
-                    template_msg.innerHTML = 'Failure: ' + response.statusText;
-                    _done();
+                var _onFail = function(msg) {
+                    template_msg.innerHTML = 'Error: ' + msg;
+                    template_btn.disabled = false;
+                    scope.disabled = false;
+                    scope.running = false;
+                };
+
+                var _prepareResults = function(response) {
+                    if (scope.serialized) {
+                        // when results are serialized, we need to deserialized them by
+                        // downloading the results files.
+                        rServeService.downloadJsonFile(response.executionId, 'heatmap.json').then(
+                            function(d) { _onSuccess(d.data); },
+                            _onFail
+                        );
+                    } else {
+                        _onSuccess(JSON.parse(response.result.artifacts.value));
+                    }
                 };
 
                 template_btn.onclick = function() {
@@ -56,9 +58,9 @@ window.smartRApp.directive('runButton',
 
                     rServeService.startScriptExecution({
                         taskType: scope.script,
-                        arguments: scope.arguments
+                        arguments: scope.params ? scope.params : {}
                     }).then(
-                        _downloadData,
+                        _prepareResults,
                         _onFail
                     );
                 };

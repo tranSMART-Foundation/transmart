@@ -45,7 +45,7 @@
     "evil"          : false,     // true: Tolerate use of `eval` and `new Function()`
     "expr"          : false,     // true: Tolerate `ExpressionStatement` as Programs
     "funcscope"     : false,     // true: Tolerate defining variables inside control statements
-    
+
     "globalstrict"  : true,     // true: Allow global "use strict" (also enables 'strict')
     "iterator"      : false,     // true: Tolerate using the `__iterator__` property
     "lastsemic"     : false,     // true: Tolerate omitting a semicolon for the last statement of a 1-line block
@@ -89,6 +89,8 @@
         "angular":  true,
         "module":   true,
         "inject":   true,
-        "pageInfo": true
+        "pageInfo": true,
+        "d3":       true,
+        "Ext":      true
     }        // additional predefined global variables
 }
