@@ -130,13 +130,6 @@ window.smartRApp.factory('rServeService', [
          *     taskType: 'fetchData' or name of R script minus .R,
          *     phase: 'fetch' | 'preprocess' | 'run',
          * }
-         *
-         * If it succeeds, the result will be the data returned by the server.
-         * If it fails, it will return an object with at least these fields:
-         * {
-         *   status: 0 | <http error code>,
-         *   statusText: <a description of the error>,
-         * }
          */
         service.startScriptExecution = function(taskDataOrig) {
 
@@ -289,6 +282,7 @@ window.smartRApp.factory('rServeService', [
         };
 
         service.composeSummaryResults = function(files, executionId, phase) {
+            // FIXME: errors from downloadJsonFile do not lead to a reject
             return $q(function(resolve, reject) {
                 var retObj = {summary: [], allSamples: 0},
                     fileExt = {fetch: ['.png', 'json'], preprocess:['all.png', 'all.json']},
