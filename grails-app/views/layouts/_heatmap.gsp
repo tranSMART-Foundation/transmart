@@ -29,9 +29,9 @@
                     biomarkers="fetch.selectedBiomarkers"
                     show-summary-stats="true"
                     summary-data="fetch.scriptResults"
-                    all-samples="global.totalSamples"
-                    subsets="global.subsets"
-                    number-of-rows="global.numberOfRows">
+                    all-samples="common.totalSamples"
+                    subsets="common.subsets"
+                    number-of-rows="common.numberOfRows">
             </fetch-button>
             <br/>
             <summary-stats summary-data="fetch.scriptResults"></summary-stats>
@@ -53,8 +53,8 @@
                                show-summary-stats="true"
                                summary-data="preprocess.scriptResults"
                                running="preprocess.running"
-                               all-samples="global.totalSamples"
-                               number-of-rows="global.numberOfRows">
+                               all-samples="common.totalSamples"
+                               number-of-rows="common.numberOfRows">
             </preprocess-button>
 
             <br/>
@@ -69,7 +69,7 @@
             %{--Number of max row to display--}%
             <div class="heim-input-field heim-input-number sr-input-area">
                 Show <input type="text" id="txtMaxRow" ng-model="runAnalysis.params.max_row">
-                of {{ global.numberOfRows }} rows in total. (< 1000 is preferable.)
+                of {{ common.numberOfRows }} rows in total. (< 1000 is preferable.)
             </div>
 
             %{--Type of sorting to apply--}%
@@ -90,8 +90,8 @@
             %{--Type of sorting to apply--}%
             <div class="heim-input-field  sr-input-area">
                 <sorting-criteria criteria="runAnalysis.params.ranking"
-                                  subsets="global.subsets"
-                                  samples="global.totalSamples">
+                                  subsets="common.subsets"
+                                  samples="common.totalSamples">
                 </sorting-criteria>
             </div>
 

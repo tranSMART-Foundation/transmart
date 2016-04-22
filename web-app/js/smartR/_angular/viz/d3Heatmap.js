@@ -1322,7 +1322,7 @@ window.smartRApp.directive('heatmapPlot', [
                 trigger: 'dragend'
             });
 
-            var cuttoffButton = controlElements.createD3Button({
+            controlElements.createD3Button({
                 location: heatmap,
                 label: 'Apply Cutoff',
                 x: 2 - margin.left,

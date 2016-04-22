@@ -53,13 +53,13 @@ window.smartRApp.controller('HeatmapController', [
             },
             scriptResults: {}
         };
-        
-        $scope.global = {
+
+        $scope.common = {
             subsets: 0,
             totalSamples: 0,
             numberOfRows: 0
         };
-        
+
         $scope.$watchGroup(['fetch.running', 'preprocess.running', 'runAnalysis.running'],
             function(newValues) {
                 var fetchRunning = newValues[0],
@@ -80,7 +80,7 @@ window.smartRApp.controller('HeatmapController', [
                 // disable tabs when certain criteria are not met
                 $scope.fetch.disabled = preprocessRunning || runAnalysisRunning;
                 $scope.preprocess.disabled = fetchRunning || runAnalysisRunning || !$scope.fetch.loaded ||
-                    $scope.global.totalSamples <= 1;
+                    $scope.common.totalSamples <= 1;
                 $scope.runAnalysis.disabled = fetchRunning || preprocessRunning || !$scope.fetch.loaded;
 
                 // disable buttons when certain criteria are not met
@@ -88,13 +88,13 @@ window.smartRApp.controller('HeatmapController', [
                     $.isEmptyObject($scope.runAnalysis.scriptResults);
 
                 // set ranking criteria
-                if ($scope.global.totalSamples < 2) {
+                if ($scope.common.totalSamples < 2 &&
+                        $scope.runAnalysis.params.ranking !== 'median') {
                     $scope.runAnalysis.params.ranking = 'mean';
-                } else if ($scope.global.subsets < 2) {
+                } else if ($scope.common.subsets < 2 &&
+                        $scope.runAnalysis.params.ranking !== 'variance' &&
+                        $scope.runAnalysis.params.ranking !== 'range') {
                     $scope.runAnalysis.params.ranking = 'coef';
-                } else if ($scope.global.subsets > 1 &&
-                    ['logfold', 'bval', 'pval', 'adjpval', 'ttest'].indexOf($scope.runAnalysis.params.ranking) === -1) {
-                    $scope.runAnalysis.params.ranking = 'bval';
                 }
             }
         );
