@@ -143,14 +143,14 @@ window.smartRApp.directive('heatmapPlot', [
             // var warningDiv = $('#heim-heatmap-warnings').append('strong')
             //     .text(warning);
 
-            var uniqueSortedZscores = fields.map(function(d) {
-                return parseFloat(d.ZSCORE);
-            });
-            uniqueSortedZscores.sort(function(a, b) { return a - b; });
-            uniqueSortedZscores.filter(function(d, i) {
-                return !i || d !== uniqueSortedZscores[i - 1];
-            });
-
+            // this code is needed for the legend generation
+            var zScores = fields.map(function(d) { return d.ZSCORE; });
+            var maxZScore = Math.max.apply(null, zScores);
+            var minZScore = Math.min.apply(null, zScores);
+            var steps = [];
+            for (var i = minZScore; i < maxZScore; i+= (maxZScore - minZScore) / 200) {
+                steps.push(i);
+            }
 
             function updateHeatmap() {
                 var square = squareItems.selectAll('.square')
@@ -957,11 +957,11 @@ window.smartRApp.directive('heatmapPlot', [
             }
 
             function updateLegend() {
-                var legendElementWidth = legendWidth / uniqueSortedZscores.length;
+                var legendElementWidth = legendWidth / steps.length;
                 var legendElementHeight = legendHeight;
 
                 var legendColor = legendItems.selectAll('.legendColor')
-                    .data(uniqueSortedZscores, function(d) { return d; });
+                    .data(steps, function(d) { return d; });
 
                 legendColor.enter()
                     .append('rect')
@@ -979,7 +979,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .style('fill', function(d) { return colorScale(1 / (1 + Math.pow(Math.E, -d))); });
 
                 var legendText = legendItems.selectAll('.legendText')
-                    .data(uniqueSortedZscores, function(d) { return d; });
+                    .data(steps, function(d) { return d; });
 
                 legendText.enter()
                     .append('text')
@@ -990,8 +990,8 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('y', 8 - margin.top + buttonHeight * 4 + buttonPadding * 4 + legendHeight + 10)
                     .attr('text-anchor', 'middle')
                     .text(function(d, i) {
-                        if (i === 0 || i === uniqueSortedZscores.length - 1) {
-                            return Number((uniqueSortedZscores.min()).toFixed(1));
+                        if (i === 0 || i === steps.length - 1) {
+                            return Number((steps.min()).toFixed(1));
                         } else {
                             return null;
                         }
@@ -1000,9 +1000,9 @@ window.smartRApp.directive('heatmapPlot', [
                 legendText.transition()
                     .text(function(d, i) {
                         if (i === 0) {
-                            return Number((uniqueSortedZscores.min()).toFixed(1));
-                        } else if (i === uniqueSortedZscores.length - 1) {
-                            return Number((uniqueSortedZscores.max()).toFixed(1));
+                            return Number((steps.min()).toFixed(1));
+                        } else if (i === steps.length - 1) {
+                            return Number((steps.max()).toFixed(1));
                         } else {
                             return null;
                         }
@@ -1322,7 +1322,7 @@ window.smartRApp.directive('heatmapPlot', [
                 trigger: 'dragend'
             });
 
-            var cuttoffButton = controlElements.createD3Button({
+            controlElements.createD3Button({
                 location: heatmap,
                 label: 'Apply Cutoff',
                 x: 2 - margin.left,

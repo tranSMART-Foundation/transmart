@@ -29,8 +29,9 @@
                     biomarkers="fetch.selectedBiomarkers"
                     show-summary-stats="true"
                     summary-data="fetch.scriptResults"
-                    all-samples="fetch.totalSamples"
-                    subsets="fetch.subsets">
+                    all-samples="common.totalSamples"
+                    subsets="common.subsets"
+                    number-of-rows="common.numberOfRows">
             </fetch-button>
             <br/>
             <summary-stats summary-data="fetch.scriptResults"></summary-stats>
@@ -51,7 +52,9 @@
             <preprocess-button params="preprocess.params"
                                show-summary-stats="true"
                                summary-data="preprocess.scriptResults"
-                               running="preprocess.running">
+                               running="preprocess.running"
+                               all-samples="common.totalSamples"
+                               number-of-rows="common.numberOfRows">
             </preprocess-button>
 
             <br/>
@@ -66,9 +69,7 @@
             %{--Number of max row to display--}%
             <div class="heim-input-field heim-input-number sr-input-area">
                 Show <input type="text" id="txtMaxRow" ng-model="runAnalysis.params.max_row">
-                of {{fetch.scriptResults.summary[0].$$state.value.json.data[0].totalNumberOfValuesIncludingMissing /
-                    fetch.scriptResults.summary[0].$$state.value.json.data[0].numberOfSamples}}
-                rows in total. (< 1000 is preferable.)
+                of {{ common.numberOfRows }} rows in total. (< 1000 is preferable.)
             </div>
 
             %{--Type of sorting to apply--}%
@@ -88,7 +89,9 @@
 
             %{--Type of sorting to apply--}%
             <div class="heim-input-field  sr-input-area">
-                <sorting-criteria criteria="runAnalysis.params.ranking" subsets="runAnalysis.subsets">
+                <sorting-criteria criteria="runAnalysis.params.ranking"
+                                  subsets="common.subsets"
+                                  samples="common.totalSamples">
                 </sorting-criteria>
             </div>
 

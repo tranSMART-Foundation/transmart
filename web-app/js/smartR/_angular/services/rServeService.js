@@ -247,7 +247,7 @@ window.smartRApp.factory('rServeService', [
                             arguments: _arg
                         }).then(
                             resolve,
-                            function(ret) { reject(ret.statusText); }
+                            function(response) { reject(response); }
                         );
                     },
                     function() {
@@ -266,17 +266,18 @@ window.smartRApp.factory('rServeService', [
                         projection: 'log_intensity' // always required, even for low-dim data
                     }
                 }).then(
-                    function(ret) {
-                        if (ret.result.artifacts.files.length > 0) {
-                            service.composeSummaryResults(ret.result.artifacts.files, ret.executionId, phase).then(
-                                function(result) { resolve({result: result}); },
-                                function(msg) { reject(msg.statusText); }
-                            );
+                    function(response) {
+                        if (response.result.artifacts.files.length > 0) {
+                            service.composeSummaryResults(response.result.artifacts.files, response.executionId, phase)
+                                .then(
+                                    function(result) { resolve({result: result}); },
+                                    function(msg) { reject(msg.statusText); }
+                                );
                         } else {
                             resolve({result: {}});
                         }
                     },
-                    function(msg) { reject(msg.statusText); }
+                    function(response) { reject(response); }
                 );
             });
         };
@@ -284,7 +285,7 @@ window.smartRApp.factory('rServeService', [
         service.composeSummaryResults = function(files, executionId, phase) {
             // FIXME: errors from downloadJsonFile do not lead to a reject
             return $q(function(resolve, reject) {
-                var retObj = {summary: [], allSamples: 0},
+                var retObj = {summary: [], allSamples: 0, numberOfRows: 0},
                     fileExt = {fetch: ['.png', 'json'], preprocess:['all.png', 'all.json']},
 
                 // find matched items in an array by key
@@ -305,8 +306,10 @@ window.smartRApp.factory('rServeService', [
                             service.downloadJsonFile(executionId, json).then(
                                 function (d) {
                                     retObj.subsets = d.data.length;
-                                    d.data.forEach(function (subset) {
+                                    d.data.forEach(function(subset) {
                                         retObj.allSamples += subset.numberOfSamples;
+                                        retObj.numberOfRows = subset.totalNumberOfValuesIncludingMissing /
+                                            subset.numberOfSamples;
                                     });
                                     resolve({img: service.urlForFile(executionId, img), json:d});
                                 },
@@ -337,7 +340,7 @@ window.smartRApp.factory('rServeService', [
                     arguments: args
                 }).then(
                     resolve,
-                    function(ret) { reject(ret.statusText); }
+                    function(response) { reject(response); }
                 );
             });
         };

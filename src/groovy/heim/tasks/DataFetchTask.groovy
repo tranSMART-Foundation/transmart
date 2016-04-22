@@ -292,6 +292,7 @@ class DataFetchTask extends AbstractTask {
                 """
                 loaded_variables[['$escapedLabel']] <- read.csv(
                                '$escapedFilename', sep = "\t", header = TRUE, stringsAsFactors = FALSE);
+                loaded_variables <- loaded_variables[order(names(loaded_variables))]; # for determinism
                 names(loaded_variables)""",
         ]
         REXP rexp = rServeSession.doWithRConnection { RConnection conn ->

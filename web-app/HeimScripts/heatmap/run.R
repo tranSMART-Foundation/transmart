@@ -123,20 +123,20 @@ addStats <- function(df, sorting, ranking, max_rows) {
     bval.values <- data.frame(BVAL=numeric())
     rankingScore <- data.frame(SIGNIFICANCE=numeric())
 
+    useLimma <- !is.function(rankingMethod)  # rankingMethod is either a function or a character "limma"
+    validLimmaMeasurements <- isValidLimmaMeasurements(measurements)
+
     if (ncol(df) > 3) {
         #this is the case for more than 1 sample
         df <- applySorting(df,sorting)  # no need for sorting in one sample case, we do it here only
 
         # is it valid measurements ?
-        validLimmaMeasurements <- isValidLimmaMeasurements(measurements)
 
         if (twoSubsets && validLimmaMeasurements) {
             markerTable  <- getDEgenes(df)  # relies on columns being sorted,
         }                                           # with subset1 first, this is because of the way
         # design matrix is being constructed
 
-
-        useLimma <- !is.function(rankingMethod)  # rankingMethod is either a function or a character "limma"
         if (useLimma  && !twoSubsets) {  # cannot use any of the limma methods for single subset.
             stop( paste("Illegal ranking method: ", ranking, " two subsets needed.") )
         }
