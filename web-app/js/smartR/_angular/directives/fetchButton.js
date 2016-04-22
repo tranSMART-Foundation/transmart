@@ -17,7 +17,8 @@ window.smartRApp.directive('fetchButton', [
                 showSummaryStats: '=?',
                 summaryData: '=?',
                 allSamples: '=?',
-                subsets: '=?'
+                subsets: '=?',
+                numberOfRows: '=?'
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/fetchButton.html',
             link: function(scope, element) {
@@ -41,13 +42,14 @@ window.smartRApp.directive('fetchButton', [
 
                 // we add this conditional $watch because there is some crazy promise resolving for allSamples
                 // going on. This is a workaround which observes allSamples and uses it as criteria for successful
-                // completion.
+                // completion. FIXME
                 scope.$watch('summaryData', function(newValue) {
                     if (scope.summaryData &&
                             scope.showSummaryStats &&
                             scope.running &&
                             Object.keys(newValue).indexOf('subsets') !== -1) {
                         scope.allSamples = newValue.allSamples;
+                        scope.numberOfRows = newValue.numberOfRows;
                         _onSuccess();
                     }
                 }, true);

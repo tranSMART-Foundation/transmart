@@ -285,7 +285,7 @@ window.smartRApp.factory('rServeService', [
         service.composeSummaryResults = function(files, executionId, phase) {
             // FIXME: errors from downloadJsonFile do not lead to a reject
             return $q(function(resolve, reject) {
-                var retObj = {summary: [], allSamples: 0},
+                var retObj = {summary: [], allSamples: 0, numberOfRows: 0},
                     fileExt = {fetch: ['.png', 'json'], preprocess:['all.png', 'all.json']},
 
                 // find matched items in an array by key
@@ -308,6 +308,8 @@ window.smartRApp.factory('rServeService', [
                                     retObj.subsets = d.data.length;
                                     d.data.forEach(function(subset) {
                                         retObj.allSamples += subset.numberOfSamples;
+                                        retObj.numberOfRows = subset.totalNumberOfValuesIncludingMissing /
+                                            subset.numberOfSamples;
                                     });
                                     resolve({img: service.urlForFile(executionId, img), json:d});
                                 },

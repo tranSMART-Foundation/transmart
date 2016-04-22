@@ -12,7 +12,9 @@ window.smartRApp.directive('preprocessButton', [
                 running: '=?',
                 params: '=?',
                 showSummaryStats: '=',
-                summaryData: '='
+                summaryData: '=',
+                allSamples: '=?',
+                numberOfRows: '=?'
             },
             templateUrl: $rootScope.smartRPath + '/js/smartR/_angular/templates/preprocessButton.html',
             link: function(scope, element) {
@@ -31,6 +33,20 @@ window.smartRApp.directive('preprocessButton', [
                     template_btn.disabled = false;
                     scope.running = false;
                 };
+
+                // we add this conditional $watch because there is some crazy promise resolving for allSamples
+                // going on. This is a workaround which observes allSamples and uses it as criteria for successful
+                // completion. FIXME
+                scope.$watch('summaryData', function(newValue) {
+                    if (scope.summaryData &&
+                            scope.showSummaryStats &&
+                            scope.running &&
+                            Object.keys(newValue).indexOf('subsets') !== -1) {
+                        scope.allSamples = newValue.allSamples;
+                        scope.numberOfRows = newValue.numberOfRows;
+                        _onSuccess();
+                    }
+                }, true);
 
                 var _showSummaryStats = function() {
                     template_msg.innerHTML = 'Execute summary statistics, please wait <span class="blink_me">_</span>';
