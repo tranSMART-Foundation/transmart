@@ -88,7 +88,9 @@
 
             %{--Type of sorting to apply--}%
             <div class="heim-input-field  sr-input-area">
-                <sorting-criteria criteria="runAnalysis.params.ranking" subsets="runAnalysis.subsets">
+                <sorting-criteria criteria="runAnalysis.params.ranking"
+                                  subsets="runAnalysis.subsets"
+                                  samples="fetch.totalSamples">
                 </sorting-criteria>
             </div>
 

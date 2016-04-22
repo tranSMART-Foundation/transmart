@@ -1,6 +1,6 @@
 <h2>Ranking Criteria:</h2>
 <div class="heim-input-field-sub" id="sr-non-multi-subset">
-    <fieldset class="heim-radiogroup" id="sr-variability-group">
+    <fieldset class="heim-radiogroup" id="sr-variability-group" ng-disabled="samples < 2">
         <h3>Expression variability</h3>
         <div><label>
             <input type="radio" ng-model="criteria"   value="coef"> Coefficient of variation

@@ -1,5 +1,7 @@
 //# sourceURL=heatmap.js
 
+'use strict';
+
 window.smartRApp.controller('HeatmapController',
     ['$scope', 'commonWorkflowService', function($scope, commonWorkflowService) {
 
@@ -72,12 +74,12 @@ window.smartRApp.controller('HeatmapController',
 
             // disable tabs when certain criteria are not met
             $scope.fetch.disabled = preprocessRunning || runAnalysisRunning;
-            $scope.preprocess.disabled = fetchRunning || runAnalysisRunning || !$scope.fetch.loaded || 
+            $scope.preprocess.disabled = fetchRunning || runAnalysisRunning || !$scope.fetch.loaded ||
                 $scope.fetch.totalSamples <= 1;
             $scope.runAnalysis.disabled = fetchRunning || preprocessRunning || !$scope.fetch.loaded;
 
             // disable buttons when certain criteria are not met
-            $scope.runAnalysis.download.disabled = runAnalysisRunning || 
+            $scope.runAnalysis.download.disabled = runAnalysisRunning ||
                 $.isEmptyObject($scope.runAnalysis.scriptResults);
 
             // set ranking criteria
