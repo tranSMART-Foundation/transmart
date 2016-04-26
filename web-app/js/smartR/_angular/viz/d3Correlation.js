@@ -131,6 +131,7 @@ window.smartRApp.directive('correlationPlot', [
 
             var tip = d3.tip()
                 .attr('class', 'd3-tip')
+                .offset([-10, 0])
                 .html(function(d) { return d; });
 
             svg.call(tip);
@@ -180,7 +181,9 @@ window.smartRApp.directive('correlationPlot', [
                     .orient('right'));
 
             function excludeSelection() {
-                var remainingPatientIDs = d3.selectAll('.point:not(.selected)').map(function(d) { return d.patientID; });
+                var remainingPatientIDs = d3.selectAll('.point:not(.selected)').map(function(d) {
+                    return d.patientID;
+                });
                 updateStatistics(remainingPatientIDs, true);
             }
 
@@ -200,6 +203,7 @@ window.smartRApp.directive('correlationPlot', [
 
             var contextMenu = d3.tip()
                 .attr('class', 'd3-tip sr-contextMenu')
+                .offset([-10, 0])
                 .html(ctxHtml);
 
             svg.call(contextMenu);

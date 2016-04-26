@@ -12,9 +12,9 @@
 .d3-tip:after {
     box-sizing: border-box;
     display: inline;
-    font-size: 10px;
+    font-size: 16px;
     width: 100%;
-    line-height: 1;
+    line-height: 0.8;
     color: rgba(0, 0, 0, 0.8);
     position: absolute;
     pointer-events: none;
