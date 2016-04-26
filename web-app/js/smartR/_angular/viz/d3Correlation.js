@@ -31,9 +31,9 @@ window.smartRApp.directive('correlationPlot', [
         function createCorrelationViz(scope, root) {
             var animationDuration = 500;
             var bins = 10;
-            var w = scope.width;
-            var h = scope.height;
-            var margin = {top: 20, right: 20, bottom: h / 4, left: w / 4};
+            var w = parseInt(scope.width);
+            var h = parseInt(scope.height);
+            var margin = {top: 20, right: 250, bottom: h / 4 + 230, left: w / 4};
             var width = w * 3 / 4 - margin.left - margin.right;
             var height = h * 3 / 4 - margin.top - margin.bottom;
             var bottomHistHeight = margin.bottom;
@@ -47,6 +47,13 @@ window.smartRApp.directive('correlationPlot', [
                 .range([height, 0]);
 
             var annotations = scope.data.annotations.sort();
+            for (var i = 0; i < annotations.length; i++) {
+                var annotation = annotations[i];
+                if (annotation === '') {
+                    annotations[i] = 'Default';
+                }
+            }
+
             var xArrLabel = scope.data.xArrLabel[0];
             var yArrLabel = scope.data.yArrLabel[0];
 
@@ -89,6 +96,7 @@ window.smartRApp.directive('correlationPlot', [
                     function (response) {
                         var results = JSON.parse(response.result.artifacts.value);
                         if (init) {
+                            removePlot();
                             scope.data = results;
                         } else {
                             setData(results);
@@ -96,14 +104,19 @@ window.smartRApp.directive('correlationPlot', [
                                 updateScatterplot();
                             }
                             updateRegressionLine();
-                            updateLegend();
+                            updateLegends();
                             updateHistogram();
                         }
                     },
                     function (response) {
-                        console.error('  Failure: ' + response.statusText);
+                        console.error(response);
                     }
                 );
+            }
+
+            function removePlot() {
+                d3.select(root).selectAll('*').remove();
+                d3.selectAll('.d3-tip').remove();
             }
 
             var svg = d3.select(root).append('svg')
@@ -113,30 +126,14 @@ window.smartRApp.directive('correlationPlot', [
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
                 .on('contextmenu', function() {
                     d3.event.preventDefault();
-                    contextMenu
-                        .style('visibility', 'visible')
-                        .style('left', smartRUtils.mouseX(root) + 'px')
-                        .style('top', smartRUtils.mouseY(root) + 'px');
+                    contextMenu.show();
                 });
 
-            var tooltip = d3.select(root).append('div')
-                .attr('class', 'tooltip')
-                .style('visibility', 'hidden');
+            var tip = d3.tip()
+                .attr('class', 'd3-tip')
+                .html(function(d) { return d; });
 
-            function dragmove() {
-                legend
-                    .style('left', smartRUtils.mouseX(root) + 'px')
-                    .style('top', smartRUtils.mouseY(root) + 'px');
-            }
-
-            var drag = d3.behavior.drag()
-                .on('drag', dragmove);
-
-            var legend = d3.select(root).append('div')
-                .attr('class', 'legend')
-                .style('left', 0)
-                .style('top', $('#scatterplot').offsetTop + 'px')
-                .call(drag);
+            svg.call(tip);
 
             svg.append('g')
                 .attr('class', 'x axis')
@@ -150,7 +147,7 @@ window.smartRApp.directive('correlationPlot', [
 
             svg.append('text')
                 .attr('class', 'axisLabels')
-                .attr('transform', 'translate(' + width / 2 + ',' + - margin.top / 2 + ')')
+                .attr('transform', 'translate(' + width / 2 + ',' + (- 10) + ')')
                 .text(smartRUtils.shortenConcept(xArrLabel));
 
             svg.append('g')
@@ -165,7 +162,7 @@ window.smartRApp.directive('correlationPlot', [
 
             svg.append('text')
                 .attr('class', 'axisLabels')
-                .attr('transform', 'translate('  + (width + margin.right / 2) + ',' + height / 2 + ')rotate(90)')
+                .attr('transform', 'translate('  + (width + 10) + ',' + height / 2 + ')rotate(90)')
                 .text(smartRUtils.shortenConcept(yArrLabel));
 
             svg.append('g')
@@ -196,25 +193,36 @@ window.smartRApp.directive('correlationPlot', [
                 updateStatistics(selectedPatientIDs, false, true);
             }
 
-            var ctxHtml = '<input id="zoomButton" class="mybutton" type="button" value="Zoom"/><br/>' +
-            '<input id="excludeButton" class="mybutton" type="button" value="Exclude"/><br/>' +
-            '<input id="resetButton" class="mybutton" type="button" value="Reset"/>';
+            var ctxHtml = '<input id="zoomButton" class="sr-ctxMenuBtn" type="button" value="Zoom"/><br/>' +
+            '<input id="excludeButton" class="sr-ctxMenuBtn" type="button" value="Exclude"/><br/>' +
+            '<input id="resetButton" class="sr-ctxMenuBtn" type="button" value="Reset"/>';
 
-            var contextMenu = d3.select(root).append('div')
-                .attr('class', 'contextMenu')
-                .style('visibility', 'hidden')
+
+            var contextMenu = d3.tip()
+                .attr('class', 'd3-tip sr-contextMenu')
                 .html(ctxHtml);
-            $('#zoomButton').on('click', function() {
-                contextMenu.style('visibility', 'hidden');
-                zoomSelection();
+
+            svg.call(contextMenu);
+
+            // This binds event listeners to the buttons whenever the context menu is rendered
+            var observer = new MutationObserver(function() {
+                $('#zoomButton').on('click', function() {
+                    contextMenu.hide();
+                    zoomSelection();
+                });
+                $('#excludeButton').on('click', function() {
+                    contextMenu.hide();
+                    excludeSelection();
+                });
+                $('#resetButton').on('click', function() {
+                    contextMenu.hide();
+                    reset();
+                });
             });
-            $('#excludeButton').on('click', function() {
-                contextMenu.style('visibility', 'hidden');
-                excludeSelection();
-            });
-            $('#resetButton').on('click', function() {
-                contextMenu.style('visibility', 'hidden');
-                reset();
+
+            observer.observe(document.querySelector('.sr-contextMenu'), {
+                childList: true,
+                subtree: true
             });
 
             function updateSelection() {
@@ -239,9 +247,7 @@ window.smartRApp.directive('correlationPlot', [
                 .x(d3.scale.identity().domain([0, width]))
                 .y(d3.scale.identity().domain([0, height]))
                 .on('brushend', function() {
-                    contextMenu
-                        .style('visibility', 'hidden')
-                        .style('top', -100 + 'px');
+                    contextMenu.hide();
                     updateSelection();
                     var selectedPatientIDs = d3.selectAll('.point.selected').map(function(d) { return d.patientID; });
                     updateStatistics(selectedPatientIDs);
@@ -255,7 +261,7 @@ window.smartRApp.directive('correlationPlot', [
                 .call(brush);
 
             function getColor(annotation) {
-                return annotation ? colors[annotations.indexOf(annotation)] : 'black';
+                return annotation && annotation !== 'Default' ? colors[annotations.indexOf(annotation)] : 'black';
             }
 
             function updateScatterplot() {
@@ -271,21 +277,17 @@ window.smartRApp.directive('correlationPlot', [
                     .style('fill', function(d) { return getColor(d.annotation); })
                     .on('mouseover', function(d) {
                         d3.select(this).style('fill', '#FF0000');
-                        tooltip
-                            .style('left', 10 + smartRUtils.mouseX(root) + 'px')
-                            .style('top', 10 + smartRUtils.mouseY(root) + 'px')
-                            .style('visibility', 'visible')
-                            .html(smartRUtils.shortenConcept(xArrLabel) + ': ' + d.x + '<br/>' +
-                                smartRUtils.shortenConcept(yArrLabel) + ': ' + d.y + '<br/>' +
-                                'Patient ID: ' + d.patientID + '<br/>' +
-                                (d.annotation ? 'Tag: ' + d.annotation : ''));
+                        tip.show(smartRUtils.shortenConcept(xArrLabel) + ': ' + d.x + '<br/>' +
+                            smartRUtils.shortenConcept(yArrLabel) + ': ' + d.y + '<br/>' +
+                            'Patient ID: ' + d.patientID + '<br/>' +
+                            (d.annotation ? 'Tag: ' + d.annotation : ''));
                     })
                     .on('mouseout', function() {
                         var p = d3.select(this);
                         p.style('fill', function(d) {
                             return p.classed('selected') ? '#FFFFFF' : getColor(d.annotation);
                         });
-                        tooltip.style('visibility', 'hidden');
+                        tip.hide();
                     });
 
                 point.exit()
@@ -378,20 +380,47 @@ window.smartRApp.directive('correlationPlot', [
                     .text('');
             }
 
-            function updateLegend() {
-                var html = 'Correlation Coefficient: ' + correlation + '<br/>' +
-                    'p-value: ' + pvalue + '<br/>' +
-                    'Method: ' + method + '<br/><br/>' +
-                    'Selected: ' + d3.selectAll('.point.selected').size() || d3.selectAll('.point').size() + '<br/>' +
-                    'Displayed: ' + d3.selectAll('.point').size() + '<br/><br/>';
-
-                html = html + '<p style="background: #000000; color:#FFFFFF">Default</p>';
+            function updateLegends() {
+                var _LEGEND_LINE_SPACING = 15,
+                    _LEGEND_RECT_SIZE = 10;
+                var text = [
+                    {name: 'Correlation Coefficient: ' + correlation},
+                    {name: 'p-value: ' + pvalue},
+                    {name: 'Method: ' + method},
+                    {name: 'Selected: ' + d3.selectAll('.point.selected').size() || d3.selectAll('.point').size()},
+                    {name: 'Displayed: ' + d3.selectAll('.point').size()}
+                ];
 
                 annotations.forEach(function(annotation) {
-                    html += '<p style=background:' + getColor(annotation) + '; color:#FFFFFF>' + annotation + '</p>';
+                    text.push({color: getColor(annotation), name: annotation});
                 });
 
-                legend.html(html);
+                var legend = svg.selectAll('.legend')
+                    .data(text, function(d) { return d.name; });
+
+                var legendEnter = legend.enter()
+                    .append('g')
+                    .attr('class', 'legend')
+                    .attr('transform', function(d, i) {
+                        return 'translate(' + (width + 40) + ',' + (i * (_LEGEND_RECT_SIZE + _LEGEND_LINE_SPACING)) + ')';
+                    });
+
+                legendEnter.append('text');
+                legendEnter.append('rect');
+
+                legend.select('text')
+                    .attr('x', function(d) { return d.color ? 20 : 0; })
+                    .attr('y', 9)
+                    .text(function(d) { return d.name; });
+
+                legend.select('rect')
+                    .attr('width', _LEGEND_RECT_SIZE)
+                    .attr('height', _LEGEND_RECT_SIZE)
+                    .style('fill', function(d) { return d.color; })
+                    .style('visibility', function(d) { return d.color ? 'visible' : 'hidden'; });
+
+                legend.exit()
+                    .remove();
             }
 
             function updateRegressionLine() {
@@ -402,15 +431,11 @@ window.smartRApp.directive('correlationPlot', [
                     .attr('class', 'regressionLine')
                     .on('mouseover', function () {
                         d3.select(this).attr('stroke', 'red');
-                        tooltip
-                            .style('visibility', 'visible')
-                            .html('slope: ' + regLineSlope + '<br/>intercept: ' + regLineYIntercept)
-                            .style('left', smartRUtils.mouseX(root) + 'px')
-                            .style('top', smartRUtils.mouseY(root) + 'px');
+                        tip.show('slope: ' + regLineSlope + '<br/>intercept: ' + regLineYIntercept);
                     })
                     .on('mouseout', function () {
                         d3.select(this).attr('stroke', 'orange');
-                        tooltip.style('visibility', 'hidden');
+                        tip.hide();
                     });
 
                 regressionLine.transition()
@@ -431,7 +456,7 @@ window.smartRApp.directive('correlationPlot', [
             updateScatterplot();
             updateHistogram();
             updateRegressionLine();
-            updateLegend();
+            updateLegends();
         }
 
     }]);

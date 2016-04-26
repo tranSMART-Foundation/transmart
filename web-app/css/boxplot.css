@@ -53,29 +53,6 @@
     stroke-width: 1.5px;
 }
 
-.tooltip {
-    position: absolute;
-    text-align: center;
-    display: inline-block;
-    padding: 0px;
-    font-size: 12px;
-    font-weight: bold;
-    color: black;
-    background: white;
-    pointer-events: none;
-}
-
-.contextMenu {
-    position: absolute;
-    text-align: center;
-    display: inline-block;
-    padding: 0px;
-    font-size: 12px;
-    font-weight: bold;
-    color: black;
-    background-color: white;
-}
-
 .brush .extent {
     fill: blue;
     opacity: .25;

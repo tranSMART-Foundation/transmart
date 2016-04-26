@@ -48,7 +48,7 @@
                 </run-button>
                 <br/>
                 <br/>
-                <correlation-plot data="scriptResults" width="1200" height="1200"></correlation-plot>
+                <correlation-plot data="scriptResults" width="1500" height="1500"></correlation-plot>
             </workflow-tab>
 
         </tab-container>

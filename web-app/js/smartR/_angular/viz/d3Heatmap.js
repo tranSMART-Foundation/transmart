@@ -126,9 +126,11 @@ window.smartRApp.directive('heatmapPlot', [
 
             adjustDimensions();
 
-            var tooltip = d3.select(root).append('div')
-                .attr('class', 'tooltip text')
-                .style('visibility', 'hidden');
+            var tip = d3.tip()
+                .attr('class', 'd3-tip')
+                .html(function(d) { return d; });
+
+            heatmap.call(tip);
 
             var featureItems = heatmap.append('g');
             var squareItems = heatmap.append('g');
@@ -187,17 +189,14 @@ window.smartRApp.directive('heatmapPlot', [
                                 html += key + ': ' + d[key] + '<br/>';
                             }
                         }
-                        tooltip
-                            .style('visibility', 'visible')
-                            .html(html)
-                            .style('left', smartRUtils.mouseX(root) + 'px')
-                            .style('top', smartRUtils.mouseY(root) + 'px');
+                        tip.show(html);
                     })
                     .on('mouseout', function () {
                         d3.selectAll('.patientID').classed('highlight', false);
                         d3.selectAll('.uid').classed('highlight', false);
-                        tooltip.style('visibility', 'hidden');
+                        tip.hide();
                     });
+
 
                 square.transition()
                     .duration(animationDuration)
@@ -553,18 +552,14 @@ window.smartRApp.directive('heatmapPlot', [
                     })
                     .on('mouseover', function (d) {
                         var html = 'Ranking (' + ranking + '): ' + d.significance;
-                        tooltip
-                            .style('visibility', 'visible')
-                            .html(html)
-                            .style('left', smartRUtils.mouseX(root) + 'px')
-                            .style('top', smartRUtils.mouseY(root) + 'px');
+                        tip.show(html);
                         d3.selectAll('.square.uid-' + smartRUtils.makeSafeForCSS(uids[d.idx]))
                             .classed('squareHighlighted', true);
                         d3.select('.uid.uid-' + smartRUtils.makeSafeForCSS(uids[d.idx]))
                             .classed('highlight', true);
                     })
                     .on('mouseout', function () {
-                        tooltip.style('visibility', 'hidden');
+                        tip.hide();
                         d3.selectAll('.square').classed('squareHighlighted', false);
                         d3.selectAll('.uid').classed('highlight', false);
                     });
@@ -622,16 +617,12 @@ window.smartRApp.directive('heatmapPlot', [
                                 html += key + ': ' + d[key] + '<br/>';
                             }
                         }
-                        tooltip
-                            .style('visibility', 'visible')
-                            .html(html)
-                            .style('left', smartRUtils.mouseX(root) + 'px')
-                            .style('top', smartRUtils.mouseY(root) + 'px');
+                        tip.show(html);
                     })
                     .on('mouseout', function () {
+                        tip.hide();
                         d3.selectAll('.patientID').classed('highlight', false);
                         d3.selectAll('.feature').classed('highlight', false);
-                        tooltip.style('visibility', 'hidden');
                     });
 
                 extraSquare.transition()
@@ -1067,14 +1058,10 @@ window.smartRApp.directive('heatmapPlot', [
                         }
                     })
                     .on('mouseover', function (d) {
-                        tooltip
-                            .style('visibility', 'visible')
-                            .html('Height: ' + d.height)
-                            .style('left', smartRUtils.mouseX(root) + 'px')
-                            .style('top', smartRUtils.mouseY(root) + 'px');
+                        tip.show('Height: ' + d.height);
                     })
                     .on('mouseout', function () {
-                        tooltip.style('visibility', 'hidden');
+                        tip.hide();
                     });
                 colDendrogramVisible = true;
             }
@@ -1150,14 +1137,10 @@ window.smartRApp.directive('heatmapPlot', [
                         });
                     })
                     .on('mouseover', function (d) {
-                        tooltip
-                            .style('visibility', 'visible')
-                            .html('Height: ' + d.height)
-                            .style('left', smartRUtils.mouseX(root) + 'px')
-                            .style('top', smartRUtils.mouseY(root) + 'px');
+                        tip.show('Height: ' + d.height);
                     })
                     .on('mouseout', function () {
-                        tooltip.style('visibility', 'hidden');
+                        tip.hide();
                     });
                 rowDendrogramVisible = true;
             }
