@@ -4,7 +4,9 @@
     <span ng-show="instructionMinNodes" class="sr-instruction">Drag at least {{min}} node(s) into the box<br /></span>
     <span ng-show="instructionMaxNodes" class="sr-instruction">Select at most {{max}} node(s)<br /></span>
     <span ng-show="instructionNodeType" class="sr-instruction">Node(s) do not have the correct type<br /></span>
-    <div class="sr-drop-input" ng-class="{true:'sr-drop-input-valid', false:'sr-drop-input-invalid'}[validate()]"></div>
+    <div class="sr-drop-input" ng-class="{true:'sr-drop-input-valid', false:'sr-drop-input-invalid'}[validate()]"
+        style="overflow-y:auto">
+    </div>
     <div style="margin-top: 10px; text-align: right;">
         <input type="button" value="Clear Window" class="sr-drop-btn">
     </div>
