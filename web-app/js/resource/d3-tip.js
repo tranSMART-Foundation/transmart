@@ -75,6 +75,11 @@
             return tip
         }
 
+        // makes the tooltip disappear when smartR window is scrolled
+        $('#sr-index').parent().on('scroll', function() {
+            tip.hide();
+        });
+
         // Public: Proxy attr calls to the d3 tip container.  Sets or gets attribute value.
         //
         // n - name of the attribute
