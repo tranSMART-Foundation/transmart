@@ -85,6 +85,9 @@ window.smartRApp.directive('correlationPlot', [
             setData(scope.data);
 
             function updateStatistics(patientIDs, scatterUpdate, init) {
+                patientIDs = patientIDs.length !== 0 ? patientIDs : d3.selectAll('.point').map(function(d) {
+                    return d.patientID;
+                });
                 scatterUpdate = scatterUpdate === undefined ? false : scatterUpdate;
                 init = init === undefined ? false : init;
                 var args = { selectedPatientIDs: patientIDs };
