@@ -25,7 +25,7 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
             $(template_tooltip).tooltip({track: true, tooltipClass:"sr-ui-tooltip"});
 
             var _clearWindow = function() {
-                $(template_box).children().remove()
+                $(template_box).children().remove();
             };
 
             var _getConcepts = function() {
@@ -37,7 +37,7 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
             var _activateDragAndDrop = function() {
                 var extObj = Ext.get(template_box);
                 var dtgI = new Ext.dd.DropTarget(extObj, {ddGroup: 'makeQuery'});
-                dtgI.notifyDrop = dropOntoCategorySelection;
+                dtgI.notifyDrop = dropOntoCategorySelection; // jshint ignore:line
             };
 
             var typeMap = {
@@ -71,10 +71,10 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
 
             scope.validate = function() {
                 scope.instructionMinNodes = scope.conceptGroup.length < scope.min;
-                scope.instructionMaxNodes = ~scope.max && scope.conceptGroup.length > scope.max;
+                scope.instructionMaxNodes = scope.max !== -1 && scope.conceptGroup.length > scope.max;
                 scope.instructionNodeType = !_containsOnly();
                 return !(scope.instructionMinNodes || scope.instructionMaxNodes || scope.instructionNodeType);
-            }
+            };
         }
     };
 }]);
