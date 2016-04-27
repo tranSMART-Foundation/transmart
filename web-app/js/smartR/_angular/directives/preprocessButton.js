@@ -23,7 +23,7 @@ window.smartRApp.directive('preprocessButton', [
                 var template_msg = element.children()[1];
 
                 var _onSuccess = function() {
-                    template_msg.innerHTML = 'Task complete!';
+                    template_msg.innerHTML = 'Task complete! Go to the "Run Analysis" tab to continue.';
                     template_btn.disabled = false;
                     scope.running = false;
                 };

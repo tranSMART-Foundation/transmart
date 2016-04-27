@@ -97,15 +97,18 @@ window.smartRApp.directive('boxplot', [
             .attr('text-anchor', 'middle')
             .text(smartRUtils.shortenConcept(concept));
 
-        var tooltip = d3.select(root).append('div')
-            .attr('class', 'tooltip')
-            .style('visibility', 'hidden');
+        var tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-10, 0])
+            .html(function(d) { return d; });
+    
+        boxplot.call(tip);
 
         var brush = d3.svg.brush()
             .x(d3.scale.identity().domain([0, width]))
             .y(d3.scale.identity().domain([-5, height + 5]))
             .on('brush', function () {
-                contextMenu.style('visibility', 'hidden');
+                contextMenu.hide();
                 updateSelection();
             });
 
@@ -118,29 +121,35 @@ window.smartRApp.directive('boxplot', [
             })
             .call(brush);
 
-        var contextMenu = d3.select(root).append('div')
-            .attr('class', 'contextMenu')
-            .style('visibility', 'hidden')
-            .html('<input id="excludeButton" class="mybutton text" type="button" value="Exclude Selection"/>' +
-                '<input id="resetButton" class="mybutton text" type="button" value="Reset All"/>')
-            .on('click', function () {
-                d3.select(this).style('visibility', 'hidden');
-                removeBrush();
+        var ctxHtml = '<input id="excludeButton" class="sr-ctx-menu-btn" type="button" value="Exclude Selection"/>' +
+                '<input id="resetButton" class="sr-ctx-menu-btn" type="button" value="Reset All"/>';
+
+        var contextMenu = d3.tip()
+            .attr('class', 'd3-tip sr-contextmenu')
+            .html(ctxHtml);
+
+        boxplot.call(contextMenu);
+
+        var observer = new MutationObserver(function() { 
+            $('#excludeButton').on('click', function() {
+                contextMenu.hide();
+                excludeSelection();
             });
-        $('#excludeButton').on('click', function() {
-            excludeSelection();
+            $('#resetButton').on('click', function() {
+                contextMenu.hide();
+                reset();
+            });
         });
-        $('#resetButton').on('click', function() {
-            reset();
+
+        observer.observe(document.querySelector('.sr-contextmenu'), {
+            childList: true,
+            subtree: true
         });
 
         boxplot.on('contextmenu', function () {
-                d3.event.preventDefault();
-                contextMenu
-                    .style('visibility', 'visible')
-                    .style('left', smartRUtils.mouseX(root) + 'px')
-                    .style('top', smartRUtils.mouseY(root) + 'px');
-            });
+            d3.event.preventDefault();
+            contextMenu.show();
+        });
 
         var currentSelection;
         function updateSelection() {
@@ -168,12 +177,18 @@ window.smartRApp.directive('boxplot', [
                 arguments: settings
             }).then(
                 function (response) {
+                    removePlot();
                     scope.data = JSON.parse(response.result.artifacts.value);
                 },
                 function (response) {
-                    console.error('Failure: ' + response.statusText);
+                    console.error(response);
                 }
             );
+        }
+
+        function removePlot() {
+            d3.select(root).selectAll('*').remove();
+            d3.selectAll('.d3-tip').remove();
         }
 
         function removeOutliers() {
@@ -381,16 +396,12 @@ window.smartRApp.directive('boxplot', [
                 .attr('r', 0)
                 .attr('fill', function (d) { return colorScale(d.value); })
                 .on('mouseover', function (d) {
-                    tooltip
-                        .style('visibility', 'visible')
-                        .html('Value: ' + d.value + '</br>' +
-                            'PatientID: ' + d.patientID + '</br>' +
-                            'Outlier: ' + d.outlier)
-                        .style('left', smartRUtils.mouseX(root) + 5 + 'px')
-                        .style('top', smartRUtils.mouseY(root) + 5 + 'px');
+                    tip.show('Value: ' + d.value + '</br>' +
+                        'PatientID: ' + d.patientID + '</br>' +
+                        'Outlier: ' + d.outlier);
                 })
                 .on('mouseout', function () {
-                    tooltip.style('visibility', 'hidden');
+                    tip.hide();
                 });
 
             point

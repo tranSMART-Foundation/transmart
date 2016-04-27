@@ -3,10 +3,6 @@
     stroke-width: 0;
 }
 
-.square:hover {
-    cursor: pointer;
-}
-
 .extraSquare {
     stroke: white;
     stroke-width: 0;

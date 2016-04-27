@@ -185,18 +185,29 @@ div.sr-status-and-output-container:empty:before {
     color:red;
 }
 
-.mybutton {
+.sr-contextmenu {
+    border-radius: 8px !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+}
+
+.sr-contextmenu:after {
+    color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.sr-ctx-menu-btn {
     min-width: 150px;
-    width: 100%;
     height: 30px;
-    color: black;
-    background-color: white;
-    font-size: 12px;
+    margin: 5px;
+    border-radius: 5px;
     font-weight: bold;
+    font-size: 12px;
+    background-color: #FFFFFF;
+    color: #000000;
     border: none;
 }
 
-.mybutton:hover {
-    color: white;
-    background: #326FCB;
+.sr-ctx-menu-btn:hover {
+    color: #FFFFFF;
+    background-color: #326FCB;
 }
+

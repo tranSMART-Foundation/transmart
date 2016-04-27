@@ -9,8 +9,9 @@
                   from="${scriptList}"
                   noSelection="${['': 'Please select a workflow']}"
                   optionValue="${{it.capitalize() + ' Workflow'}}"
-                  ng-model="template"/>
-        <button ng-click="template=''">Reset SmartR</button>
+                  ng-model="template"
+                  onchange="cleanUpSmartR()"/>
+        <button id="sr-reset-btn" ng-click="template=''" onclick="cleanUpSmartR()">Reset SmartR</button>
     </div>
 
     <div style="width: 50%; margin: 0 auto; text-align: center">
@@ -25,3 +26,4 @@
         <g:render template="/layouts/${it}"/>
     </g:each>
 </div>
+
