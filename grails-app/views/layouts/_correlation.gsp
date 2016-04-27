@@ -35,16 +35,13 @@
                     <h2>Correlation computation method:</h2>
                     <fieldset class="heim-radiogroup">
                         <label>
-                            <input type="radio" ng-model="params.method" name="sortingSelect" value="pearson"
-                                   checked> Pearson
+                            <input type="radio" ng-model="runAnalysis.params.method" name="sortingSelect" value="pearson" checked> Pearson
                         </label>
                         <label>
-                            <input type="radio" ng-model="params.method" name="sortingSelect" value="kendall"
-                                   checked> Kendall
+                            <input type="radio" ng-model="runAnalysis.params.method" name="sortingSelect" value="kendall"> Kendall
                         </label>
                         <label>
-                            <input type="radio" ng-model="params.method" name="sortingSelect" value="spearman"
-                                   checked> Spearman
+                            <input type="radio" ng-model="runAnalysis.params.method" name="sortingSelect" value="spearman"> Spearman
                         </label>
                     </fieldset>
                 </div>
