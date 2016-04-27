@@ -9,7 +9,7 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
     service.conceptBoxMapToConceptKeys = function smartRUtils_conceptBoxMapToConceptKeys(conceptBoxMap) {
         var allConcepts = {};
         Object.keys(conceptBoxMap).forEach(function(group) {
-            var concepts = conceptBoxMap[group];
+            var concepts = conceptBoxMap[group].concepts;
             concepts.forEach(function(concept, idx) {
                 allConcepts[group + '_' + 'n' + idx] = concept;
             });
@@ -54,7 +54,7 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
      * @param function
      */
     service.callOnScroll = function(callback) {
-        $('#sr-index').parent().scroll(function() { 
+        $('#sr-index').parent().scroll(function() {
             var scrollPos = $(this).scrollTop();
             callback(scrollPos);
         });

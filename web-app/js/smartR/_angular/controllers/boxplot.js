@@ -14,7 +14,7 @@ window.smartRApp.controller('BoxplotController', [
             disabled: false,
             loaded: false,
             conceptBoxes: {
-                datapoints: []
+                datapoints: {concepts: [], valid: false}
             }
         };
 

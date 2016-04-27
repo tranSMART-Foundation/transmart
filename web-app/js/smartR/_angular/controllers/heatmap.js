@@ -17,9 +17,9 @@ window.smartRApp.controller('HeatmapController', [
             running: false,
             loaded: false,
             conceptBoxes: {
-                highDimensional: [],
-                numerical: [],
-                categorical: []
+                highDimensional: {concepts: [], valid: false}, 
+                numerical: {concepts: [], valid: true},
+                categorical: {concepts: [], valid: true} 
             },
             selectedBiomarkers: [],
             scriptResults: {}
