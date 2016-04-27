@@ -10,8 +10,8 @@
                   noSelection="${['': 'Please select a workflow']}"
                   optionValue="${{it.capitalize() + ' Workflow'}}"
                   ng-model="template"
-                  onchange="cleanUp()"/>
-        <button id="sr-resetBtn" ng-click="template=''" >Reset SmartR</button>
+                  onchange="cleanUpSmartR()"/>
+        <button id="sr-reset-btn" ng-click="template=''" onclick="cleanUpSmartR()">Reset SmartR</button>
     </div>
 
     <div style="width: 50%; margin: 0 auto; text-align: center">
@@ -27,12 +27,3 @@
     </g:each>
 </div>
 
-<script>
-    function cleanUp() {
-        var el1 = $('.d3-tip');
-        if (el1) {
-            el1.remove();
-        }
-    }
-    document.getElementById('sr-resetBtn').on('click', cleanUp);
-</script>

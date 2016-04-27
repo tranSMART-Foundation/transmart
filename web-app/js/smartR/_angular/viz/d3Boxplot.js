@@ -121,11 +121,11 @@ window.smartRApp.directive('boxplot', [
             })
             .call(brush);
 
-        var ctxHtml = '<input id="excludeButton" class="sr-ctxMenuBtn" type="button" value="Exclude Selection"/>' +
-                '<input id="resetButton" class="sr-ctxMenuBtn" type="button" value="Reset All"/>';
+        var ctxHtml = '<input id="excludeButton" class="sr-ctx-menu-btn" type="button" value="Exclude Selection"/>' +
+                '<input id="resetButton" class="sr-ctx-menu-btn" type="button" value="Reset All"/>';
 
         var contextMenu = d3.tip()
-            .attr('class', 'd3-tip sr-contextMenu')
+            .attr('class', 'd3-tip sr-contextmenu')
             .html(ctxHtml);
 
         boxplot.call(contextMenu);
@@ -135,13 +135,13 @@ window.smartRApp.directive('boxplot', [
                 contextMenu.hide();
                 excludeSelection();
             });
-            $('#resetbutton').on('click', function() {
+            $('#resetButton').on('click', function() {
                 contextMenu.hide();
                 reset();
             });
         });
 
-        observer.observe(document.querySelector('.sr-contextMenu'), {
+        observer.observe(document.querySelector('.sr-contextmenu'), {
             childList: true,
             subtree: true
         });

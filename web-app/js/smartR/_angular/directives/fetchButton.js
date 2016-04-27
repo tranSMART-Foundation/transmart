@@ -26,7 +26,7 @@ window.smartRApp.directive('fetchButton', [
                     template_msg = element.children()[1];
 
                 var _onSuccess = function() {
-                    template_msg.innerHTML = 'Task complete! Go to the "Preprocess"- or "Run" tab to continue.';
+                    template_msg.innerHTML = 'Task complete! Go to the "Preprocess" or "Run Analysis" tab to continue.';
                     scope.subsets = smartRUtils.countCohorts();
                     scope.loaded = true;
                     template_btn.disabled = false;

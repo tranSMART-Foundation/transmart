@@ -185,16 +185,16 @@ div.sr-status-and-output-container:empty:before {
     color:red;
 }
 
-.sr-contextMenu {
+.sr-contextmenu {
     border-radius: 8px !important;
     background: rgba(0, 0, 0, 0.4) !important;
 }
 
-.sr-contextMenu:after {
+.sr-contextmenu:after {
     color: rgba(0, 0, 0, 0.4) !important;
 }
 
-.sr-ctxMenuBtn {
+.sr-ctx-menu-btn {
     min-width: 150px;
     height: 30px;
     margin: 5px;
@@ -206,7 +206,8 @@ div.sr-status-and-output-container:empty:before {
     border: none;
 }
 
-.sr-ctxMenuBtn:hover {
+.sr-ctx-menu-btn:hover {
     color: #FFFFFF;
     background-color: #326FCB;
 }
+

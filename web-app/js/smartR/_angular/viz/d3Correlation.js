@@ -199,13 +199,13 @@ window.smartRApp.directive('correlationPlot', [
                 updateStatistics(selectedPatientIDs, false, true);
             }
 
-            var ctxHtml = '<input id="zoomButton" class="sr-ctxMenuBtn" type="button" value="Zoom"/><br/>' +
-            '<input id="excludeButton" class="sr-ctxMenuBtn" type="button" value="Exclude"/><br/>' +
-            '<input id="resetButton" class="sr-ctxMenuBtn" type="button" value="Reset"/>';
+            var ctxHtml = '<input id="zoomButton" class="sr-ctx-menu-btn" type="button" value="Zoom"/><br/>' +
+            '<input id="excludeButton" class="sr-ctx-menu-btn" type="button" value="Exclude"/><br/>' +
+            '<input id="resetButton" class="sr-ctx-menu-btn" type="button" value="Reset"/>';
 
 
             var contextMenu = d3.tip()
-                .attr('class', 'd3-tip sr-contextMenu')
+                .attr('class', 'd3-tip sr-contextmenu')
                 .offset([-10, 0])
                 .html(ctxHtml);
 
@@ -227,7 +227,7 @@ window.smartRApp.directive('correlationPlot', [
                 });
             });
 
-            observer.observe(document.querySelector('.sr-contextMenu'), {
+            observer.observe(document.querySelector('.sr-contextmenu'), {
                 childList: true,
                 subtree: true
             });

@@ -17,12 +17,6 @@ window.addSmartRPanel = function addSmartRPanel(parentPanel) {
         }),
         listeners: {
             render: function (panel) {
-                panel.body.on('click', function () {
-                    if (typeof updateOnView === "function") {
-                        updateOnView();
-                    }
-                });
-
                 /**
                  * WORKAROUND : code below is needed to reorder the javascript script load that're broken due to
                  * ExtJS panel
@@ -43,6 +37,14 @@ window.addSmartRPanel = function addSmartRPanel(parentPanel) {
             }
         }
     });
-    parentPanel.add(smartRPanel);
+    parentPanel.insert(4, smartRPanel);
 };
+
+function cleanUpSmartR() {
+    var el1 = $('.d3-tip');
+    if (el1) {
+        el1.remove();
+    }
+}
+cleanUpSmartR();
 
