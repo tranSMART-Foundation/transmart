@@ -18,3 +18,6 @@
   
 #### Releases
 - https://github.com/transmart/SmartR/releases
+
+#### Wiki
+- https://wiki.transmartfoundation.org/display/transmartwiki/SmartR
