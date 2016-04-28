@@ -96,13 +96,13 @@
                         <input type="radio"
                                ng-model="runAnalysis.params.geneCardsAllowed"
                                name="geneCardsAllowedSelect"
-                               ng-value="true"> yes
+                               ng-value="true"> yes (use GeneCards)
                     </label>
                     <label>
                         <input type="radio"
                                ng-model="runAnalysis.params.geneCardsAllowed"
                                name="geneCardsAllowedSelect"
-                               ng-value="false" checked> no
+                               ng-value="false" checked> no (use EMBL EBI)
                     </label>
                 </fieldset>
             </div>
