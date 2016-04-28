@@ -5,7 +5,8 @@
 window.smartRApp.directive('heatmapPlot', [
     'smartRUtils',
     'controlElements',
-    function(smartRUtils, controlElements) {
+    '$http',
+    function(smartRUtils, controlElements, $http) {
 
         return {
             restrict: 'E',
@@ -47,7 +48,7 @@ window.smartRApp.directive('heatmapPlot', [
             var numberOfClusteredRows = data.numberOfClusteredRows[0];
             // var warning = data.warnings === undefined ? '' : data.warnings;
             var maxRows = data.maxRows[0];
-
+            var geneCardsAllowed = JSON.parse(params.geneCardsAllowed);
             var rowClustering = true;
             var colClustering = true;
 
@@ -515,6 +516,23 @@ window.smartRApp.directive('heatmapPlot', [
                     .style('text-anchor', 'start')
                     .text(function (d) {
                         return d;
+                    })
+                    .on('click', function(d) {
+                        var genes = d.split('--');
+                        genes.shift();
+                        var urls = [];
+                        if (geneCardsAllowed) {
+                            genes.forEach(function(gene) {
+                                urls.push('http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + gene);
+                            });
+                        } else {
+                            genes.forEach(function(gene) {
+                                urls.push('https://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query=' + gene);
+                            });
+                        }
+                        urls.forEach(function(url) {
+                            window.open(url);
+                        });
                     });
 
                 uid.transition()
@@ -1109,32 +1127,21 @@ window.smartRApp.directive('heatmapPlot', [
                             var uid = uids[leaf];
                             var split = uid.split("--");
                             split.shift();
-                            split.each(function (gene) {
-                                genes.push(gene);
-                            });
+                            genes = genes.concat(split);
                         });
-                        $.ajax({
-                            url: 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi',
-                            type: 'POST',
-                            timeout: '5000',
-                            async: false,
+
+                        $http({
+                            url: pageInfo.basePath + '/SmartR/goToBiocompendium',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            config: {
+                                timeout: 5000
+                            },
                             data: {
-                                section: 'upload_gene_lists_general',
-                                primary_org: 'Human',
-                                background: 'whole_genome',
-                                Category1: 'Human',
-                                gene_list_1: 'gene_list_1',
-                                SubCat1: 'hgnc_symbol',
-                                attachment1: genes.join(' ')
+                                genes: genes.join(' ')
                             }
-                        }).done(function (serverAnswer) {
-                            var sessionID = serverAnswer.match(/tmp_\d+/)[0];
-                            var url = 'http://biocompendium.embl.de/' +
-                                'cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=' +
-                                sessionID + '&list=gene_list_1__1&list_size=15&org=human';
-                            window.open(url);
-                        }).fail(function () {
-                            alert('An error occurred. Maybe the external resource is unavailable.');
                         });
                     })
                     .on('mouseover', function (d) {
