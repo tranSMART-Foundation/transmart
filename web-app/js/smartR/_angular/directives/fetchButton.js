@@ -68,7 +68,7 @@ window.smartRApp.directive('fetchButton', [
                 };
 
                 var _showSummaryStats = function() {
-                    template_msg.innerHTML = 'Execute summary statistics, please wait <span class="blink_me">_</span>';
+                    template_msg.innerHTML = 'Executing summary statistics, please wait <span class="blink_me">_</span>';
                     rServeService.executeSummaryStats('fetch')
                         .then(
                             function(data) { scope.summaryData = data.result; }, // this will trigger $watch
