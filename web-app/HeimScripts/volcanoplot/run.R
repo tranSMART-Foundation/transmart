@@ -5,10 +5,10 @@ library(limma)
 library(jsonlite)
 
 ## SE: Just to get things working for dev purposes
-rm(list = ls())
-load("/Users/serge/Documents/Projects/SmartR/Dev/R_workspace_objects/data.Rda")
-load("/Users/serge/Documents/Projects/SmartR/Dev/R_workspace_objects/fetchParams.Rda")
-setwd("/Users/serge/GitHub/SmartR")
+# rm(list = ls())
+# load("/Users/serge/Documents/Projects/SmartR/Dev/R_workspace_objects/data.Rda")
+# load("/Users/serge/Documents/Projects/SmartR/Dev/R_workspace_objects/fetchParams.Rda")
+# setwd("/Users/serge/GitHub/SmartR")
 
 if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
   remoteScriptDir <- "web-app/HeimScripts"
@@ -81,8 +81,8 @@ main <- function() {
   
   measurements <- cleanUp(df)  # temporary stats like SD and MEAN need to be removed for clustering to work
   
-  ## SE: For dev purposes
-  return(jsn)
+#   ## SE: For dev purposes
+#   return(jsn)
 }
 
 
@@ -90,8 +90,8 @@ main <- function() {
 #####################
 
 
-# SE: For dev purposes we call the function here
-out = main()
-print(cbind(PROBE = as.character(out$uids), FC=out$logfoldValues, P=out$pvalValues)[1:10,])
+# # SE: For dev purposes we call the function here
+# out = main()
+# print(cbind(PROBE = as.character(out$uids), FC=out$logfoldValues, P=out$pvalValues)[1:10,])
 
 
