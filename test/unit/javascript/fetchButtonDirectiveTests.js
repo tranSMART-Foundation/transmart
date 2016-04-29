@@ -35,13 +35,13 @@ describe('fetchButton', function() {
         element.find('input').click();
 
         if (loadDataIntoSessionReturn) {
-            eval('defer1.' + loadDataIntoSessionReturn);
+            eval('defer1.' + loadDataIntoSessionReturn); // jshint ignore:line
             $rootScope.$digest();
         }
 
 
         if (executeSummaryStatsReturn) {
-            eval('defer2.' + executeSummaryStatsReturn);
+            eval('defer2.' + executeSummaryStatsReturn); // jshint ignore:line
             $rootScope.$digest();
         }
     };
@@ -74,7 +74,7 @@ describe('fetchButton', function() {
         try { // we just want to see if the progress message is there
             _clickButton('resolve()');
         } catch (e) {}
-        expect(element.find('span').text()).toContain('Execute summary statistics');
+        expect(element.find('span').text()).toContain('Executing summary statistics');
         expect(element.isolateScope().running).toBe(true);
         expect(element.isolateScope().loaded).toBe(false);
         expect(element.isolateScope().subsets).toEqual(0);

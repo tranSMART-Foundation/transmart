@@ -18,14 +18,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     max_rows <- as.numeric(max_rows)
     verifyInput(max_rows, sorting)
     df <- parseInput()
-    write.table(
-        df,
-        "heatmap_orig_values.tsv",
-        sep = "\t",
-        na = "",
-        row.names = FALSE,
-        col.names = TRUE
-    )
+    original_df <- df
     df          <- addStats(df, sorting, ranking, max_rows)
     df          <- mergeDuplicates(df)
     df          <- df[1:min(max_rows, nrow(df)), ]  #  apply max_rows
@@ -69,6 +62,16 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     }
     jsn <- addClusteringOutput(jsn, measurements) #
     jsn <- toJSON(jsn, pretty = TRUE, digits = I(17))
+
+    colnames(original_df)[-c(1,2)] <- idToNodeLabel(colnames(original_df)[-c(1,2)], fetch_params$ontologyTerms)
+    write.table(
+        original_df,
+        "heatmap_orig_values.tsv",
+        sep = "\t",
+        na = "",
+        row.names = FALSE,
+        col.names = TRUE
+    )
     writeDataForZip(df, measurements, patientIDs)  # for later zip generation
     write(jsn, file = "heatmap.json")
     # json file be served the same way
@@ -317,12 +320,15 @@ buildFields <- function(df) {
     df["ZSCORE"] <- ZSCORE
     df["SUBSET"] <- getSubset(df$PATIENTID)
 
-    df$PATIENTID <- replaceNodeIDNodeLabel(df$PATIENTID, fetch_params$ontologyTerms)
+    df$PATIENTID <- idToNodeLabel(df$PATIENTID, fetch_params$ontologyTerms)
 
     return(df)
 }
 
 writeDataForZip <- function(df, zScores, pidCols) {
+    colnames(df)[1:length(pidCols)+1] <- idToNodeLabel(colnames(df)[1:length(pidCols)+1], fetch_params$ontologyTerms)
+    colnames(zScores) <- idToNodeLabel(colnames(zScores), fetch_params$ontologyTerms)
+
     df      <- df[ , -which(names(df) %in% pidCols)]  # Drop patient columns
     df      <- cbind(df,zScores)                      # Replace with zScores
     write.table(
