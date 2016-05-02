@@ -118,7 +118,7 @@ applyRanking <- function (df, ranking, max_rows) {
         df <- df[1:nrows, ]
     }
 
-    print(df[1:20,])
+#     print(df[1:20,])
 
     df
 }
