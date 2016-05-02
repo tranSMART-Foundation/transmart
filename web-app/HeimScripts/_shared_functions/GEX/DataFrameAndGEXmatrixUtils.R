@@ -448,3 +448,19 @@ getRankingMethod <- function(rankingMethodName) {
     return("Limma")
   }
 }
+
+
+writeDataForZip <- function(df, zScores, pidCols) {
+  df      <- df[ , -which(names(df) %in% pidCols)]  # Drop patient columns
+  df      <- cbind(df,zScores)                      # Replace with zScores
+  write.table(
+    df,
+    "heatmap_data.tsv",
+    sep = "\t",
+    na = "",
+    row.names = FALSE,
+    col.names = TRUE
+  )
+}
+
+
