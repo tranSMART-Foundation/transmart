@@ -1,14 +1,5 @@
 library(reshape2)
 library(limma)
-library(jsonlite)
-
-## SE: Just to get things working for dev purposes
-# rm(list = ls())
-# load("/Users/serge/Documents/Projects/SmartR/Dev/R_workspace_objects/data.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Dev/R_workspace_objects/fetchParams.Rda")
-# setwd("/Users/serge/GitHub/SmartR")
-
-
 
 if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
     remoteScriptDir <- "web-app/HeimScripts"
@@ -117,9 +108,6 @@ applyRanking <- function (df, ranking, max_rows) {
         df <- df[with(df, order(-SIGNIFICANCE)), ]
         df <- df[1:nrows, ]
     }
-
-#     print(df[1:20,])
-
     df
 }
 
@@ -152,16 +140,6 @@ addStats <- function(df, sorting, ranking, max_rows) {
         if (useLimma  && !twoSubsets) {  # cannot use any of the limma methods for single subset.
             stop( paste("Illegal ranking method: ", ranking, " two subsets needed.") )
         }
-
-
-#         ## SE: For testing purposes
-#         useLimma = FALSE
-#         validLimmaMeasurements = FALSE
-#
-#         print(useLimma)
-#         print(validLimmaMeasurements)
-#         print("------")
-
 
         if (useLimma && validLimmaMeasurements) {
             if (!ranking %in% colnames(markerTable) ) {
@@ -508,6 +486,3 @@ addClusteringOutput <- function(jsn, measurements_arg) {
     )
     return(jsn)
 }
-
-
-main()
