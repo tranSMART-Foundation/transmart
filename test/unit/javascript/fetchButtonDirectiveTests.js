@@ -112,7 +112,7 @@ describe('fetchButton', function() {
         _clickButton();
         expect(element.find('span').text()).toBe('Error: No concepts selected!');
     });
-    
+
     it('should show error due to invalid concepts', function() {
         _prepareScope(1, false, {foo: {concepts: [], valid: false}});
         _clickButton();

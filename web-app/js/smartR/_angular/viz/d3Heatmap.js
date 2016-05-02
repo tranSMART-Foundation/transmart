@@ -5,8 +5,7 @@
 window.smartRApp.directive('heatmapPlot', [
     'smartRUtils',
     'controlElements',
-    '$http',
-    function(smartRUtils, controlElements, $http) {
+    function(smartRUtils, controlElements) {
 
         return {
             restrict: 'E',
@@ -567,7 +566,7 @@ window.smartRApp.directive('heatmapPlot', [
                         return gridFieldHeight * idx;
                     })
                     .style('fill', function (d) {
-                        return d.significance > 0 ? 'steelblue' : '#990000';
+                        return d.significance > 0 ? '#990000' : 'steelblue';
                     })
                     .on('mouseover', function (d) {
                         var html = 'Ranking (' + ranking + '): ' + d.significance;
@@ -596,7 +595,7 @@ window.smartRApp.directive('heatmapPlot', [
                         return gridFieldHeight * d.idx;
                     })
                     .style('fill', function (d) {
-                        return d.significance > 0 ? 'steelblue' : '#990000';
+                        return d.significance > 0 ? '#990000' : 'steelblue';
                     });
 
                 var featurePosY = -gridFieldWidth * 2 - smartRUtils.getMaxWidth(d3.selectAll('.patientID')) -
@@ -1130,19 +1129,26 @@ window.smartRApp.directive('heatmapPlot', [
                             genes = genes.concat(split);
                         });
 
-                        $http({
-                            url: pageInfo.basePath + '/SmartR/goToBiocompendium',
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            config: {
-                                timeout: 5000
-                            },
+                        var request = $.ajax({
+                            url: pageInfo.basePath + '/SmartR/biocompendium',
+                            type: 'POST',
+                            timeout: 5000,
                             data: {
                                 genes: genes.join(' ')
                             }
                         });
+
+                        request.then(
+                            function(response) {
+                                console.log(response);
+                                var sessionID = response.match(/tmp_\d+/)[0];
+                                var url = 'http://biocompendium.embl.de/' +
+                                    'cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=' +
+                                    sessionID + '&list=gene_list_1__1&list_size=15&org=human';
+                                window.open(url);
+                            },
+                            function(response) { alert("Error:", response); }
+                        );
                     })
                     .on('mouseover', function (d) {
                         tip.show('Height: ' + d.height);

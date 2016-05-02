@@ -4,6 +4,9 @@ import grails.converters.JSON
 import heim.session.SessionService
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
+import groovyx.net.http.HTTPBuilder
+import groovyx.net.http.ContentType
+
 
 class SmartRController {
 
@@ -59,7 +62,22 @@ class SmartRController {
         render servletContext.contextPath + pluginContextPath as String;
     }
 
-    def getIPAView = {
-        params
+    def biocompendium = {
+        def url = 'http://biocompendium.embl.de'
+        def path = '/cgi-bin/biocompendium.cgi'
+        def http = new HTTPBuilder(url)
+        def query = [
+            section: 'upload_gene_lists_general',
+            primary_org: 'Human',
+            background: 'whole_genome',
+            Category1: 'Human',
+            gene_list_1: 'gene_list_1',
+            SubCat1: 'hgnc_symbol',
+            attachment1: params.genes
+        ]
+        http.post(path: path, body: query, requestContentType: ContentType.URLENC) { response ->
+            def text = response.entity.content.text
+            render text
+        }
     }
 }
