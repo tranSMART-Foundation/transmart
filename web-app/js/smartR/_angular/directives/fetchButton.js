@@ -17,8 +17,8 @@ window.smartRApp.directive('fetchButton', [
                 showSummaryStats: '=?',
                 summaryData: '=?',
                 allSamples: '=?',
-                subsets: '=?',
-                numberOfRows: '=?'
+                numberOfRows: '=?',
+                allowedCohorts: '='
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/fetchButton.html',
             link: function(scope, element) {
@@ -27,7 +27,6 @@ window.smartRApp.directive('fetchButton', [
 
                 var _onSuccess = function() {
                     template_msg.innerHTML = 'Task complete! Go to the "Preprocess" or "Run Analysis" tab to continue.';
-                    scope.subsets = smartRUtils.countCohorts();
                     scope.loaded = true;
                     template_btn.disabled = false;
                     scope.running = false;
@@ -79,15 +78,21 @@ window.smartRApp.directive('fetchButton', [
                 template_btn.onclick = function() {
                     scope.summaryData = {};
                     scope.allSamples = 0;
-                    scope.subsets = 0;
                     scope.loaded = false;
                     scope.running = true;
 
                     template_btn.disabled = true;
                     template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
 
-                    if (smartRUtils.countCohorts() === 0) {
+                    var cohorts = smartRUtils.countCohorts();
+
+                    if (cohorts === 0) {
                         _onFailure('No cohorts selected!');
+                        return;
+                    }
+
+                    if (scope.allowedCohorts.indexOf(cohorts) === -1) {
+                        _onFailure('This workflow requires ' + scope.allowedCohorts + ' cohort(s), but you selected ' + cohorts);
                         return;
                     }
 

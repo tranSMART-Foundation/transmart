@@ -5,7 +5,8 @@
 window.smartRApp.controller('HeatmapController', [
     '$scope',
     'commonWorkflowService',
-    function($scope, commonWorkflowService) {
+    'smartRUtils',
+    function($scope, commonWorkflowService, smartRUtils) {
 
         commonWorkflowService.initializeWorkflow('heatmap', $scope);
 
@@ -56,7 +57,6 @@ window.smartRApp.controller('HeatmapController', [
         };
 
         $scope.common = {
-            subsets: 0,
             totalSamples: 0,
             numberOfRows: 0
         };
@@ -92,7 +92,7 @@ window.smartRApp.controller('HeatmapController', [
                 if ($scope.common.totalSamples < 2 &&
                         $scope.runAnalysis.params.ranking !== 'median') {
                     $scope.runAnalysis.params.ranking = 'mean';
-                } else if ($scope.common.subsets < 2 &&
+                } else if (smartRUtils.countCohorts() < 2 &&
                         $scope.runAnalysis.params.ranking !== 'variance' &&
                         $scope.runAnalysis.params.ranking !== 'range') {
                     $scope.runAnalysis.params.ranking = 'coef';

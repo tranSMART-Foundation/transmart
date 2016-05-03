@@ -30,7 +30,7 @@
                     show-summary-stats="true"
                     summary-data="fetch.scriptResults"
                     all-samples="common.totalSamples"
-                    subsets="common.subsets"
+                    allowed-cohorts="[1,2]"
                     number-of-rows="common.numberOfRows">
             </fetch-button>
             <br/>
@@ -110,7 +110,6 @@
             %{--Type of sorting to apply--}%
             <div class="heim-input-field  sr-input-area">
                 <sorting-criteria criteria="runAnalysis.params.ranking"
-                                  subsets="common.subsets"
                                   samples="common.totalSamples">
                 </sorting-criteria>
             </div>
