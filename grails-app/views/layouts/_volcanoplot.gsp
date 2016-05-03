@@ -1,42 +1,43 @@
 
 <script type="text/ng-template" id="volcanoplot">
 
-<div ng-controller="VolcanoplotController">
+    <div ng-controller="VolcanoplotController">
 
-    <tab-container>
+        <tab-container>
 
-        <workflow-tab tab-name="Fetch Data">
-            <concept-box style="display: inline-block"
-                         concept-group="conceptBoxes.highDimensional"
-                         type="HD"
-                         min="1"
-                         max="1"
-                         label="High Dimensional Variable"
-                         tooltip="Select one high dimensional variable you would like to have displayed.">
-            </concept-box>
-            <br/>
-            <br/>
-            <fetch-button concept-map="conceptBoxes"
-                          show-summary-stats="false">
-            </fetch-button>
-        </workflow-tab>
+            <workflow-tab tab-name="Fetch Data" disabled="fetch.disabled">
+                <concept-box style="display: inline-block"
+                             concept-group="fetch.conceptBoxes.highDimensional"
+                             type="HD"
+                             min="1"
+                             max="-1"
+                             label="High Dimensional Variables"
+                             tooltip="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box.
+                             The nodes needs to be from the same platform.">
+                </concept-box>
+                <br/>
+                <br/>
+                <fetch-button concept-map="fetch.conceptBoxes"
+                              loaded="fetch.loaded"
+                              running="fetch.running">
+                </fetch-button>
+            </workflow-tab>
 
-        <workflow-tab tab-name="Run Analysis">
-            <br/>
-            <br/>
-            <run-button button-name="Create Plot"
-                        store-results-in="scriptResults"
-                        script-to-run="run"
-                        arguments-to-use="params"
-                        serialized="true">
-            </run-button>
-            <br/>
-            <br/>
-            <volcano-plot data="scriptResults" width="1200" height="1200"></volcano-plot>
-        </workflow-tab>
+            <workflow-tab tab-name="Run Analysis" disabled="runAnalysis.disabled">
+                <run-button button-name="Create Plot"
+                            store-results-in="runAnalysis.scriptResults"
+                            script-to-run="run"
+                            arguments-to-use="runAnalysis.params"
+                            filename="volcanoplot.json"
+                            running="runAnalysis.running">
+                </run-button>
+                <br/>
+                <br/>
+                <volcano-plot data="runAnalysis.scriptResults" width="1500" height="1500"></volcano-plot>
+            </workflow-tab>
 
-    </tab-container>
+        </tab-container>
 
-</div>
+    </div>
 
 </script>

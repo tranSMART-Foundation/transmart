@@ -121,7 +121,7 @@
                         store-results-in="runAnalysis.scriptResults"
                         script-to-run="run"
                         arguments-to-use="runAnalysis.params"
-                        serialized="true"
+                        filename="heatmap.json"
                         running="runAnalysis.running">
             </run-button>
             <capture-plot-button filename="heatmap.svg" disabled="runAnalysis.download.disabled"></capture-plot-button>
