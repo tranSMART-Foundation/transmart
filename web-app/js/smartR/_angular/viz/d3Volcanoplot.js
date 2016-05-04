@@ -64,29 +64,6 @@ window.smartRApp.directive('volcanoPlot', [
 
             volcanoplot.call(tip);
 
-
-            var ctxHtml = '<input id="sr-kegg-btn" class="sr-ctx-menu-btn" type="button" value="Search on KEGG"/>';
-
-            var contextMenu = d3.tip()
-                .attr('class', 'd3-tip sr-contextmenu')
-                .offset([-10, 0])
-                .html(ctxHtml);
-
-            volcanoplot.call(contextMenu);
-
-            // This binds event listeners to the buttons whenever the context menu is rendered
-            var observer = new MutationObserver(function() {
-                $('#sr-kegg-btn').on('click', function() {
-                    contextMenu.hide();
-                    launchKEGGPWEA();
-                });
-            });
-
-            observer.observe(document.querySelector('.sr-contextmenu'), {
-                childList: true,
-                subtree: true
-            });
-
             var x = d3.scale.linear()
                 .domain([-Math.max.apply(null, logFCs), Math.max.apply(null, logFCs)])
                 .range([0, width]);
@@ -358,36 +335,6 @@ window.smartRApp.directive('volcanoPlot', [
                         .text(function (d) {
                             return d.value;
                         });
-            }
-
-            function launchKEGGPWEA() {
-                var genes = getTopRankedPoints().data().map(function (d) {
-                    var split = d.uid.split('--');
-                    split.shift();
-                    return split;
-                });
-
-
-                var request = $.ajax({
-                    url: pageInfo.basePath + '/SmartR/biocompendium',
-                    type: 'POST',
-                    timeout: 5000,
-                    data: {
-                        genes: genes.join(' ')
-                    }
-                });
-
-                request.then(
-                    function(response) {
-                        console.log(response);
-                        var sessionID = response.match(/tmp_\d+/)[0];
-                        var url = 'http://biocompendium.embl.de/' +
-                        'cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=' +
-                            sessionID + '&list=gene_list_1__1&list_size=15&org=human';
-                        window.open(url);
-                    },
-                    function(response) { alert("Error:", response); }
-                );
             }
 
             function updateVolcano() {
