@@ -18,7 +18,8 @@ window.smartRApp.directive('fetchButton', [
                 summaryData: '=?',
                 allSamples: '=?',
                 numberOfRows: '=?',
-                allowedCohorts: '='
+                allowedCohorts: '=',
+                projection: '@?'
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/fetchButton.html',
             link: function(scope, element) {
@@ -111,7 +112,7 @@ window.smartRApp.directive('fetchButton', [
 
                     var dataConstraints = _getDataConstraints(scope.biomarkers);
 
-                    rServeService.loadDataIntoSession(conceptKeys, dataConstraints)
+                    rServeService.loadDataIntoSession(conceptKeys, dataConstraints, scope.projection)
                         .then(
                             scope.showSummaryStats ? _showSummaryStats : _onSuccess,
                             _onFailure
