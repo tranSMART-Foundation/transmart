@@ -34,7 +34,7 @@
                 </run-button>
                 <br/>
                 <br/>
-                <volcano-plot data="runAnalysis.scriptResults" width="1500" height="1500"></volcano-plot>
+                <volcano-plot data="runAnalysis.scriptResults" width="1000" height="1000"></volcano-plot>
             </workflow-tab>
 
         </tab-container>

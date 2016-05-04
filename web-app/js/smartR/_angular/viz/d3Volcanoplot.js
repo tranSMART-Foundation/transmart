@@ -4,8 +4,7 @@
 
 window.smartRApp.directive('volcanoPlot', [
     'smartRUtils',
-    'controlElements',
-    function(smartRUtils, controlElements) {
+    function(smartRUtils) {
 
         return {
             restrict: 'E',
@@ -22,6 +21,7 @@ window.smartRApp.directive('volcanoPlot', [
                 scope.$watch('data', function() {
                     $(element[0]).empty();
                     if (!$.isEmptyObject(scope.data)) {
+                        smartRUtils.prepareWindowSize(scope.width, scope.height);
                         createVolcanoplot(scope, element[0]);
                     }
                 });
@@ -47,14 +47,11 @@ window.smartRApp.directive('volcanoPlot', [
             var currentNegLog10P = -Math.log10(0.05);
 
             var margin = {top: 100, right: 100, bottom: 100, left: 100};
-            var width = 1200 - margin.left - margin.right;
-            var height = 800 - margin.top - margin.bottom;
-
-//            var volcanotable = d3.select(root).append('table')
-//                .attr('width', width)
-//                .attr('height', height);
+            var width = scope.width - margin.left - margin.right;
+            var height = scope.height - margin.top - margin.bottom;
 
             var volcanoplot = d3.select(root).append('svg')
+                .style('float', 'left')
                 .attr('width', width + margin.left + margin.right)
                 .attr('height', height + margin.top + margin.bottom)
                 .append('g')
@@ -66,6 +63,29 @@ window.smartRApp.directive('volcanoPlot', [
                 .html(function(d) { return d; });
 
             volcanoplot.call(tip);
+
+
+            var ctxHtml = '<input id="sr-kegg-btn" class="sr-ctx-menu-btn" type="button" value="Search on KEGG"/>';
+
+            var contextMenu = d3.tip()
+                .attr('class', 'd3-tip sr-contextmenu')
+                .offset([-10, 0])
+                .html(ctxHtml);
+
+            volcanoplot.call(contextMenu);
+
+            // This binds event listeners to the buttons whenever the context menu is rendered
+            var observer = new MutationObserver(function() {
+                $('#sr-kegg-btn').on('click', function() {
+                    contextMenu.hide();
+                    launchKEGGPWEA();
+                });
+            });
+
+            observer.observe(document.querySelector('.sr-contextmenu'), {
+                childList: true,
+                subtree: true
+            });
 
             var x = d3.scale.linear()
                 .domain([-Math.max.apply(null, logFCs), Math.max.apply(null, logFCs)])
@@ -156,7 +176,8 @@ window.smartRApp.directive('volcanoPlot', [
             }
 
             var pDrag = d3.behavior.drag()
-                .on('drag', pDragged);
+                .on('drag', pDragged)
+                .on('dragend', d3.tip);
 
             volcanoplot.append('line')
                 .attr('class', 'pLine')
@@ -293,7 +314,7 @@ window.smartRApp.directive('volcanoPlot', [
             }
 
             function resetVolcanotable() {
-                d3.select('#volcanotable').selectAll('*').remove();
+                d3.selectAll('.volcanoplot-table').remove();
             }
 
             function drawVolcanotable(points) {
@@ -303,8 +324,8 @@ window.smartRApp.directive('volcanoPlot', [
                 }
                 var columns = ['uid', 'logFC', 'negativeLog10PValues', 'pValue'];
                 var HEADER = ['ID', 'log2 FC', '- log10 p', 'p'];
-                var table = d3.select('#volcanotable').append('table')
-                    .attr('class', 'mytable');
+                var table = d3.select(root).append('table')
+                    .attr('class', 'volcanoplot-table');
                 var thead = table.append('thead');
                 var tbody = table.append('tbody');
 
@@ -342,8 +363,31 @@ window.smartRApp.directive('volcanoPlot', [
             function launchKEGGPWEA() {
                 var genes = getTopRankedPoints().data().map(function (d) {
                     var split = d.uid.split('--');
-                    return split[split.length - 1];
+                    split.shift();
+                    return split;
                 });
+
+
+                var request = $.ajax({
+                    url: pageInfo.basePath + '/SmartR/biocompendium',
+                    type: 'POST',
+                    timeout: 5000,
+                    data: {
+                        genes: genes.join(' ')
+                    }
+                });
+
+                request.then(
+                    function(response) {
+                        console.log(response);
+                        var sessionID = response.match(/tmp_\d+/)[0];
+                        var url = 'http://biocompendium.embl.de/' +
+                        'cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=' +
+                            sessionID + '&list=gene_list_1__1&list_size=15&org=human';
+                        window.open(url);
+                    },
+                    function(response) { alert("Error:", response); }
+                );
             }
 
             function updateVolcano() {
@@ -384,26 +428,7 @@ window.smartRApp.directive('volcanoPlot', [
 
             updateVolcano();
             drawVolcanotable(getTopRankedPoints().data());
-
-            var buttonWidth = 200;
-            var buttonHeight = 40;
-            var keggButton = controlElements.createD3Button({
-                location: volcanoplot,
-                label: 'Find KEGG Pathway',
-                x: 0,
-                y: -buttonHeight - 5,
-                width: buttonWidth,
-                height: buttonHeight,
-                callback: launchKEGGPWEA
-            });
-
-            keggButton
-                .on('mouseover', function () {
-                    getTopRankedPoints().style('stroke', '#FF0000');
-                })
-                .on('mouseout', function () {
-                    getTopRankedPoints().style('stroke', null);
-                });
         }
 
     }]);
+

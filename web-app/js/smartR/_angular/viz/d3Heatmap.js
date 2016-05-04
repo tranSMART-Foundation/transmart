@@ -84,6 +84,10 @@ window.smartRApp.directive('heatmapPlot', [
             var width = gridFieldWidth * patientIDs.length;
             var height = gridFieldHeight * uids.length;
 
+            // FIXME: This is here because the sizing of the whole heatmap is kind of messed up
+            // At one point in the future we need to fix this
+            smartRUtils.prepareWindowSize(width * 2 + margin.left + margin.right, height * 2 + margin.top + margin.right);
+
             var selectedPatientIDs = [];
 
             var scale = null;
