@@ -4,18 +4,15 @@
 
 window.smartRApp.directive('sortingCriteria', [
     '$rootScope',
-    'smartRUtils',
-    function($rootScope, smartRUtils) {
+    function($rootScope) {
         return {
             restrict: 'E',
             scope: {
                 criteria : '=',
-                samples: '='
+                samples: '=',
+                subsets: '='
             },
-            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/sortingCriteria.html',
-            link: function(scope) {
-                scope.subsets = smartRUtils.countCohorts();
-            }
+            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/sortingCriteria.html'
         };
     }
 ]);

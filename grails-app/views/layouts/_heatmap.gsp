@@ -110,7 +110,8 @@
             %{--Type of sorting to apply--}%
             <div class="heim-input-field  sr-input-area">
                 <sorting-criteria criteria="runAnalysis.params.ranking"
-                                  samples="common.totalSamples">
+                                  samples="common.totalSamples"
+                                  subsets="common.subsets">
                 </sorting-criteria>
             </div>
 
