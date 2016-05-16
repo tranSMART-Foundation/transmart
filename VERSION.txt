@@ -1,7 +1,7 @@
 This repository is part of the tranSMART Foundation's release of 
 transmartApp and the accompanying projects.
 
-VERSION: 1.2.5-Beta-SNAPSHOT
+VERSION: 16.1
 
 (The version number is also annotated in
 web-app/index.html and in comments in build.xml)
