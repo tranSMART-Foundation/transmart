@@ -264,7 +264,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('width', gridFieldWidth)
                     .attr('height', gridFieldHeight)
                     .on('click', function (patientID) {
-                        d3.selectAll('.box').classed('sortedBy', false);
+                        d3.selectAll('.colSortBox').classed('sortedBy', false);
                         d3.select(this).classed('sortedBy', true);
 
                         var rowValues = uids.map(function (uid, idx) {
@@ -332,7 +332,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('width', gridFieldWidth)
                     .attr('height', gridFieldHeight)
                     .on('click', function (uid) {
-                        d3.selectAll('.box').classed('sortedBy', false);
+                        d3.selectAll('.rowSortBox').classed('sortedBy', false);
                         d3.select(this).classed('sortedBy', true);
 
                         var colValues = patientIDs.map(function (patientID, idx) {
