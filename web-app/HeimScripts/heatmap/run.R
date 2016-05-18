@@ -5,8 +5,8 @@ library(jsonlite)
 
 # # SE: Just to get things working for dev purposes
 # rm(list = ls())
-# load("/Users/serge/Documents/Projects/SmartR/Dev/R_workspace_objects/data.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Dev/R_workspace_objects/fetchParams.Rda")
+# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
+# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
 # setwd("/Users/serge/GitHub/SmartR")
 # #######
 
@@ -98,7 +98,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     list(messages = msgs)
     
 #     ## SE: For dev purposes
-#     return(jsn)
+     # return(jsn)
 }
 
 ## Check input args for heatmap 

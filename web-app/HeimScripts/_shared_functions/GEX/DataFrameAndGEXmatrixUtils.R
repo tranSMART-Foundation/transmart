@@ -191,15 +191,42 @@ mergeDuplicates <- function(df) {
 }
 
 
+# nodeID has usually this format: 'X123_highDimensional_n0_s1)
+# this method pretifies it with the actual node label like this: '123_BreastCancer'
+idToNodeLabel <- function(ids, ontologyTerms) {
+  # extract patientID (123)
+  patientIDs <- sub("_.+_n[0-9]+_s[0-9]+", "", ids, perl=TRUE) # remove the _highDimensional_n0_s1
+  patientIDs <- sub("^X", "", patientIDs, perl=TRUE) # remove the X
+  # extract subset (s1)
+  subsets <- substring(ids, first=nchar(ids)-1, last=nchar(ids))
+  # extract node label (Breast)
+  nodes <- sub(".+?_", "", ids, perl=TRUE) # remove the X123_
+  nodes <- as.vector(substring(nodes, first=1, last=nchar(nodes)-3))
+  nodeLabels <- as.vector(sapply(nodes, function(node) return(ontologyTerms[[node]]$name)))
+  # put everything together (123, Breast, s1)
+  paste(patientIDs, nodeLabels, subsets, sep="_")
+}
+
 
 ## Checking if a variable called preprocessed exists in R
-## workspace, else loaded_variables is used to create data frame df
+## workspace, else loaded_variables is used to create data frame df.
+## Column names in data frame get modified by replacing matrix id
+## (e.g.: n0, n1, ...) by corresponding name in fetch_params list var
 parseInput <- function() {
+  
+  ## Retrieving the input data frame
   if (exists("preprocessed")) {
     df <- preprocessed
   } else {
     df <- mergeFetchedData(loaded_variables)
   }
+  
+  ## Renaming the column names in the data frame:
+  ## - removing "X" as prefix
+  ## - replacing node id by node name
+  ## (e.g. 'X144_n0_s1' -> '144_Breast_s2')
+  colnames(df)[c(-1,-2)] = idToNodeLabel(colnames(df)[c(-1,-2)], fetch_params$ontologyTerms)
+  
   return(df)
 }
 
