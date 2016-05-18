@@ -341,8 +341,6 @@ buildFields <- function(df) {
   df["ZSCORE"] <- ZSCORE
   df["SUBSET"] <- getSubset(df$PATIENTID)
 
-  df$PATIENTID <- replaceNodeIDNodeLabel(df$PATIENTID, fetch_params$ontologyTerms)
-
   return(df)
 }
 
