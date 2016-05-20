@@ -18,8 +18,28 @@
 # to run the checking scripts
 #   Scripts/install-ubuntu/checks/checkAll.sh
 
+# Script Parameters
+TRANSMART_DATA_NAME="transmart-data-release-16.1"
+TRANSMART_DATA_TAR="#TRANSMART_DATA_NAME.tar.gz"
+TRANSMART_DATA_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_TAR"
+TRANSMART_DATA_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_TAR.asc"
+
+TRANSMART_ETL_NAME="tranSMART-ETL-release-16.1"
+TRANSMART_ETL_TAR="#TRANSMART_ETL_NAME.tar.gz"
+TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_TAR"
+TRANSMART_ETL_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_TAR.asc"
+
 # on error; stop/exit
 set -e
+
+# Helper function: use gpg to verify downaload
+# assumes <name> is downloaded file and <name>.asc is signature file
+# on current directory
+function verifyWithGpg {
+	fileNmae=$1
+	gpg --verify $filename.asc
+	return $?
+}
 
 # Helper function: check and quit on error
 function checkInstallError {
@@ -33,6 +53,14 @@ function checkInstallError {
 	return $returnValue
 }
 
+if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
+export INSTALL_BASE
+
+if ! [ -d "$INSTALL_BASE" ] ; then
+	mkdir -p "$INSTALL_BASE"
+fi
+echo "tranSMART will be installed at this location: $INSTALL_BASE"
+
 if [ -z "$SCRIPTS_BASE" ] ; then SCRIPTS_BASE="$HOME" ; fi
 
 echo "Starting at $(date)"
@@ -42,10 +70,8 @@ echo "++++++++++++++++++++++++++++"
 if ! [ -d "$SCRIPTS_BASE/Scripts" ] ; then
 	echo "This script assumes that the Scripts directory is installed at $SCRIPTS_BASE/Scripts"
 	echo "It does not appear to be there. Please fix that and restart this script."
-	echo "  cd $SCRIPTS_BASE"
-	echo "  sudo apt-get update"
-	echo "  sudo apt-get install -y git"
-	echo "  git clone https://github.com/tranSMART-Foundation/Scripts.git"
+	echo "Either set \$SCRIPTS_BASE to be the directory of the location of this script"
+	echo "which appears to be $HERE; OR, copy the that directory to this location: $SCRIPTS_BASE/Scripts"
 	exit 1
 else
 	echo "Script directory found: $SCRIPTS_BASE/Scripts"
@@ -56,14 +82,6 @@ echo "++++++++++++++++++++++++++++"
 echo "+  set up working dir (tranSMART install base) "
 echo "++++++++++++++++++++++++++++"
 
-if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
-export INSTALL_BASE
-
-if ! [ -d "$INSTALL_BASE" ] ; then
-	mkdir -p "$INSTALL_BASE"
-fi
-echo "tranSMART will be installed at this location: $INSTALL_BASE"
-
 # give user option to suppress sudo timeout (see welcome.sh)
 cd $SCRIPTS_BASE/Scripts/install-ubuntu
 source welcome.sh
@@ -73,9 +91,13 @@ sudo -k
 sudo -v
 
 echo "++++++++++++++++++++++++++++"
-echo "+  install make "
+echo "+  install make, curl, unzip, tar "
 echo "++++++++++++++++++++++++++++"
+sudo apt-get update
 sudo apt-get -q install -y make
+sudo apt-get -q install -y curl
+sudo apt-get -q install -y unzip
+sudo apt-get -q install -y tar
 
 echo "++++++++++++++++++++++++++++"
 echo "+  set up the transmart-data folder"
@@ -83,17 +105,35 @@ echo "++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE
 sudo -v
-sudo apt-get -q install -y curl
-sudo apt-get -q install -y unzip
-if ! [ -e transmart-data-release-1.2.4.zip ] ; then
-	curl https://codeload.github.com/tranSMART-Foundation/transmart-data/zip/release-1.2.5-Beta -o transmart-data-release-1.2.5-Beta.zip
+if ! [ -e $TRANSMART_DATA_TAR ] ; then
+	curl $TRANSMART_DATA_URL -o $TRANSMART_DATA_TAR
+	curl TRANSMART_DATA_ASC_URL -o $TRANSMART_DATA_TAR.asc
+	verifyWithGpg($TRANSMART_DATA_TAR)	
 fi
 if ! [ -e transmart-data ] ; then
-	unzip transmart-data-release-1.2.5-Beta.zip
-	mv transmart-data-release-1.2.5-Beta transmart-data
+	tar -xz $TRANSMART_DATA_TAR
+	mv $TRANSMART_DATA_NAME transmart-data
 fi
 
 echo "Finished setting up the transmart-date folder at $(date)"
+
+echo "++++++++++++++++++++++++++++"
+echo "+  set up the tranSMART-ETL folder"
+echo "++++++++++++++++++++++++++++"
+
+cd $INSTALL_BASE/transmart-data/env
+sudo -v
+if ! [ -e $TRANSMART_ETL_TAR ] ; then
+	curl $TRANSMART_ETL_URL -o $TRANSMART_ETL_TAR
+	curl TRANSMART_ETL_ASC_URL -o $TRANSMART_ETL_TAR.asc
+	verifyWithGpg($TRANSMART_ETL_TAR)
+fi
+if ! [ -e tranSMART-ETL ] ; then
+	tar -xz $TRANSMART_ETL_TAR
+	mv $TRANSMART_ETL_NAME tranSMART-ETL
+fi
+
+echo "Finished setting up the tranSMART-ETL folder at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install of basic tools and dependencies "
