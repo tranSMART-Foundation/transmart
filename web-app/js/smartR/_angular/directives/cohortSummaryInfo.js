@@ -6,7 +6,7 @@ window.smartRApp.directive('cohortSummaryInfo', [function() {
 
     return {
         restrict: 'E',
-        template: '<span style="font-size: 11px;"></span>',
+        template: '<span id="sr-cohort-selection" style="font-size: 11px;"></span>',
         controller: function($scope, $element) {
             var span = $element.children()[0];
 

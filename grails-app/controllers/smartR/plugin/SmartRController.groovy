@@ -6,10 +6,18 @@ import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.ContentType
-
+import org.transmartproject.core.dataquery.highdim.HighDimensionResource
+import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
+import org.transmartproject.core.dataquery.assay.Assay
+import org.transmartproject.core.dataquery.assay.SampleType
+import org.transmartproject.core.dataquery.assay.Timepoint
+import org.transmartproject.core.dataquery.assay.TissueType
+import org.transmartproject.core.dataquery.highdim.Platform
+import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
 
 class SmartRController {
 
+    HighDimensionResource highDimensionResourceService
     SessionService sessionService
 
     static layout = 'smartR'
@@ -79,5 +87,55 @@ class SmartRController {
             def text = response.entity.content.text
             render text
         }
+    }
+
+    // This is a copy of Rmodules HighDimensionController
+    def nodeDetails() {
+        def conceptKeys = request.JSON.conceptKeys
+        conceptKeys = conceptKeys.collect { [concept_key: it] }
+        println conceptKeys.collect { [concept_key: it] }
+        def constraints = []
+
+        constraints << highDimensionResourceService.createAssayConstraint(
+                AssayConstraint.DISJUNCTION_CONSTRAINT,
+                subconstraints: [(AssayConstraint.ONTOLOGY_TERM_CONSTRAINT): conceptKeys]
+        )
+
+        def assayMultiMap = highDimensionResourceService.
+                getSubResourcesAssayMultiMap(constraints)
+
+        def result = assayMultiMap.collectEntries { HighDimensionDataTypeResource dataTypeResource,
+                                                    Collection<Assay> assays ->
+            def details = [
+                    platforms:   new HashSet<Platform>(),
+                    trialNames:  new HashSet<String>(),
+                    timepoints:  new HashSet<Timepoint>(),
+                    tissueTypes: new HashSet<TissueType>(),
+                    sampleTypes: new HashSet<SampleType>(),
+            ]
+
+            [
+                    dataTypeResource.dataTypeName,
+                    assays.inject(details, { accum, Assay assay ->
+                        accum.platforms   << platformToMap(assay.platform)
+                        accum.trialNames  << assay.trialName
+                        accum.timepoints  << assay.timepoint
+                        accum.tissueTypes << assay.tissueType
+                        accum.sampleTypes << assay.sampleType
+                        accum
+                    })
+            ]
+        }
+
+        render result as JSON
+    }
+
+    private platformToMap(Platform p) {
+        Platform.metaClass.properties.
+                collect { it.name }.
+                minus(['class', 'template']).
+                collectEntries {
+                    [  it, p."$it" ]
+                }
     }
 }
