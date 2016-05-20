@@ -563,7 +563,7 @@ discardSubset <- function(labels) {
 
 ## SE: for debug
 #main(phase = "preprocess", projection = "log_intensity")
-main(phase = "fetch", projection = "log_intensity")
+#main(phase = "fetch", projection = "log_intensity")
 
 
 
