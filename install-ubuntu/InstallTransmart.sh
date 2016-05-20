@@ -20,12 +20,12 @@
 
 # Script Parameters
 TRANSMART_DATA_NAME="transmart-data-release-16.1"
-TRANSMART_DATA_TAR="#TRANSMART_DATA_NAME.tar.gz"
+TRANSMART_DATA_TAR="TRANSMART_DATA_NAME.tar.gz"
 TRANSMART_DATA_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_TAR"
 TRANSMART_DATA_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_TAR.asc"
 
 TRANSMART_ETL_NAME="tranSMART-ETL-release-16.1"
-TRANSMART_ETL_TAR="#TRANSMART_ETL_NAME.tar.gz"
+TRANSMART_ETL_TAR="TRANSMART_ETL_NAME.tar.gz"
 TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_TAR"
 TRANSMART_ETL_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_TAR.asc"
 
