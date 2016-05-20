@@ -7,6 +7,8 @@ library(jsonlite)
 # rm(list = ls())
 # load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
 # load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
+# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
+# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
 # setwd("/Users/serge/GitHub/SmartR")
 #######
 
@@ -35,7 +37,11 @@ markerTableJson <- "markerSelectionTable.json" # Name of the json file with limm
 main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsAllowed = FALSE) {
     max_rows <- as.numeric(max_rows)
     verifyInput(max_rows, sorting)
-    df <- parseInput()
+    
+    ## Returns a list containing two variables named HD and LD
+    data.list <- parseInput()
+    
+    df = data.list$HD
     
     ## SE: for debug
     ## df = df[, c(1, 2, 4, 109, 110)]
@@ -49,7 +55,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     ## df = df[, c(1, 2, 4, 109)]
         
     ## two subsets, multiple samples 
-    # df = df[, c(1, 2, 4, 5, 6, 7, 8, 107, 108, 109)]
+   # df = df[, c(1, 2, 4, 5, 6, 7, 8, 107, 108, 109)]
     
         
     write.table(
@@ -88,7 +94,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     ## SE: for debug
 #     print(ranking.df[1:5,])
 #     print(df[1:5,])
-    
+#     print(buildExtraFields(fields))
     
     ## The returned jsn object that will be dumped to file
     jsn <- list(
@@ -143,7 +149,8 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     list(messages = msgs)
     
 #     ## SE: For debug purposes
-       # return(df)
+    
+       return(df)
 }
 
 ## Check input args for heatmap 
@@ -159,6 +166,6 @@ verifyInput <- function(max_rows, sorting) {
 
 # SE: For debug purposes
 # out = main(ranking = "mean")
-# print(out[1:20,])
+#print(out[1:20,])
 
 

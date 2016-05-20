@@ -342,6 +342,9 @@ getAllStatRanksForExtDataFrame = function(df){
 ## stat columns get removed.
 getMeasurements <- function(df) {
   
+  ## SE: For debug
+  ## print(df[1:5,])
+  
   ## This is the first col containing measurements
   idx_first_data_col = 3
   
@@ -415,15 +418,31 @@ idToNodeLabel <- function(ids, ontologyTerms) {
 ## workspace, else loaded_variables is used to create data frame df.
 ## Column names in data frame get modified by replacing matrix id
 ## (e.g.: n0, n1, ...) by corresponding name in fetch_params list var
-parseInput <- function() {
+parseInput<- function() {
   
   ## Retrieving the input data frame
   if (exists("preprocessed")) {
-    df <- preprocessed
+    
+    ## Retrieving low and high dim data into separate vars
+    df <- preprocessed$HD
+    ld = preprocessed$LD
+    
   } else {
-    df <- mergeFetchedData(loaded_variables)
+    
+    ld_var.idx = grep("^(categoric)|(numeric)", names(loaded_variables), perl = TRUE)
+    hd_var.idx = grep("^highDimensional", names(loaded_variables), perl = TRUE)
+    
+    
+    df <- mergeFetchedData(loaded_variables[hd_var.idx])
+    
+    ## Either there is low dim data available ...
+    if(length(ld_var.idx)>0){
+      ld = loaded_variables[ld_var.idx]
+    ## ... or not
+    } else{
+      ld = NULL
+    }
   }
-  
   
   ## Renaming the column names in the data frame:
   ## - removing "X" as prefix
@@ -431,8 +450,31 @@ parseInput <- function() {
   ## (e.g. 'X144_n0_s1' -> '144_Breast_s2')
   colnames(df)[c(-1,-2)] = idToNodeLabel(colnames(df)[c(-1,-2)], fetch_params$ontologyTerms)
   
-  return(df)
+  return(list(HD = df, LD = ld))
 }
+
+
+# ## Checking if a variable called preprocessed exists in R
+# ## workspace, else loaded_variables is used to create data frame df.
+# ## Column names in data frame get modified by replacing matrix id
+# ## (e.g.: n0, n1, ...) by corresponding name in fetch_params list var
+# parseInput <- function() {
+#   
+#   ## Retrieving the input data frame
+#   if (exists("preprocessed")) {
+#     df <- preprocessed
+#   } else {
+#     df <- mergeFetchedData(loaded_variables)
+#   }
+#   
+#   ## Renaming the column names in the data frame:
+#   ## - removing "X" as prefix
+#   ## - replacing node id by node name
+#   ## (e.g. 'X144_n0_s1' -> '144_Breast_s2')
+#   colnames(df)[c(-1,-2)] = idToNodeLabel(colnames(df)[c(-1,-2)], fetch_params$ontologyTerms)
+#   
+#   return(df)
+# }
 
 
 
@@ -737,4 +779,43 @@ writeDataForZip <- function(df, zScores, pidCols) {
   )
 }
 
+
+## SE: Currently not working - see SH-189 !!!!!!
+aggregate.probes <- function(df) {
+  if(nrow(df)<2){
+    stop("Cannot aggregate probes: there only is data for a single probe (ie. only one row of data) or 
+         there is insufficient bio.marker information for the selected probes to be able to match the probes to 
+         biomarkers for aggregation (e.g. in case of micro-array data to match probe ID to gene symbol). 
+         Suggestion: skip probe aggregation.")
+  }
+  measurements <- df[,3:ncol(df)]
+  row.names(measurements) <- df[,1]
+  collapsed <- collapseRows(measurements, df[,2], df[,1], "MaxMean",
+                            connectivityBasedCollapsing = FALSE, #in Rmodules = TRUE. In our spec, not required
+                            methodFunction = NULL, # It only needs to be specified if method="function"
+                            #connectivityPower = 1, # ignored when connectivityBasedCollapsing = FALSE
+                            selectFewestMissing = FALSE)
+  
+  #collapsed returns 0 if collapseRows does not work, otherwise it returns a list
+  if(is.numeric(collapsed))
+  {
+    stop("Probe aggregation is not possible: there are too many missing data points in the data for succesfull probe
+         aggregation. Skip probe aggregation or select more genes/proteins/metabolites/... 
+         
+         Note: for aggregation only the data from probes that have accompanying bio.marker information is used
+         (e.g. in case of micro-array data only the probes are used that have gene symbol information coupled to it).
+         This could mean the dataset used for aggregation is smaller than the initially selected dataset.")
+  }
+  collapsedMeasurements <- collapsed$datETcollapsed
+  Bio.marker <- collapsed$group2row[,1] # first column of this matrix always contains gene
+  Row.Label <- collapsed$group2row[,2]  # second column of this matrix always contains probe_id
+  lastColIndex <- ncol(df)
+  lastbutOne <- lastColIndex -1
+  df <- data.frame(collapsedMeasurements)
+  df["Bio.marker"] <- Bio.marker
+  df["Row.Label"] <- Row.Label
+  row.names(df) <- NULL # WGCNA adds row.names. We do not need them to be set
+  return(df[,c(lastColIndex, lastbutOne , 1:(lastbutOne-1))])
+  
+  }
 

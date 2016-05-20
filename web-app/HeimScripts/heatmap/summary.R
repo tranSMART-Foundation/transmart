@@ -84,6 +84,10 @@ main <- function(phase = NA, projection = NA)
   return(list(messages = "Finished successfully"))
 }
 
+
+
+
+### Functions ###
 get_input_data <- function(phase)
 {
   #check if the phase parameter
@@ -553,3 +557,15 @@ produce_boxplot <- function(measurement_tables, phase, projection)
 discardSubset <- function(labels) {
   gsub("_s[[:digit:]]","",labels)
 }
+
+## End Functions ##
+
+
+## SE: for debug
+#main(phase = "preprocess", projection = "log_intensity")
+main(phase = "fetch", projection = "log_intensity")
+
+
+
+
+
