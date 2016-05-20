@@ -36,7 +36,9 @@ set -e
 # assumes <name> is downloaded file and <name>.asc is signature file
 # on current directory
 function verifyWithGpg {
-	fileNmae=$1
+	filename=$1
+	echo "verifyWithGpg $filename"
+	echo "verifyWithGpg $filename.asc"
 	gpg --verify $filename.asc
 	return $?
 }
