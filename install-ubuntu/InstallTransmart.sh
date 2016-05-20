@@ -108,7 +108,7 @@ sudo -v
 if ! [ -e $TRANSMART_DATA_TAR ] ; then
 	curl $TRANSMART_DATA_URL -o $TRANSMART_DATA_TAR
 	curl TRANSMART_DATA_ASC_URL -o $TRANSMART_DATA_TAR.asc
-	verifyWithGpg($TRANSMART_DATA_TAR)	
+	if [ "$( verifyWithGpg $TRANSMART_DATA_TAR )" ] ; then exit -1; fi
 fi
 if ! [ -e transmart-data ] ; then
 	tar -xz $TRANSMART_DATA_TAR
