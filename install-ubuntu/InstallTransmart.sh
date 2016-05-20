@@ -109,7 +109,10 @@ cd $INSTALL_BASE
 sudo -v
 if ! [ -e $TRANSMART_DATA_TAR ] ; then
 	curl $TRANSMART_DATA_URL -o $TRANSMART_DATA_TAR
-	curl TRANSMART_DATA_ASC_URL -o $TRANSMART_DATA_TAR.asc
+	curl $TRANSMART_DATA_ASC_URL -o $TRANSMART_DATA_TAR.asc
+	echo "++++++++++++++++++++++++++++"
+	echo "+  Testing verify with $TRANSMART_DATA_TAR and $TRANSMART_DATA_TAR.asc"
+	echo "++++++++++++++++++++++++++++"
 	if [ "$( verifyWithGpg $TRANSMART_DATA_TAR )" ] ; then exit -1; fi
 fi
 if ! [ -e transmart-data ] ; then
