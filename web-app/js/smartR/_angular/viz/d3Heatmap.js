@@ -30,6 +30,7 @@ window.smartRApp.directive('heatmapPlot', [
         };
 
         function createHeatmap(data, root, params) {
+            console.log(data);
             var animationDuration = 1500;
             var extraFields = data.extraFields === undefined ? [] : data.extraFields;
             var features = data.features === undefined ? [] : data.features;
@@ -188,12 +189,12 @@ window.smartRApp.directive('heatmapPlot', [
                         d3.select('.uid.uid-' + smartRUtils.makeSafeForCSS(d.UID))
                             .classed('highlight', true);
 
-                        var html = '';
-                        for (var key in d) {
-                            if (d.hasOwnProperty(key)) {
-                                html += key + ': ' + d[key] + '<br/>';
-                            }
-                        }
+                        var html = 'Log2: ' + d.VALUE + '<br/>' +
+                            'z-Score: ' + d.ZSCORE + '<br/>' +
+                            'Column: ' + d.PATIENTID + '<br/>' +
+                            'Row: ' + d.UID + '<br/>' +
+                            'Subset: ' + d.SUBSET + '<br/>';
+
                         tip.show(html);
                     })
                     .on('mouseout', function () {
