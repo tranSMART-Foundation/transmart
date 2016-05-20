@@ -110,8 +110,8 @@ if ! [ -e $TRANSMART_DATA_TAR ] ; then
 	curl $TRANSMART_DATA_URL -o $TRANSMART_DATA_TAR
 	curl $TRANSMART_DATA_ASC_URL -o $TRANSMART_DATA_TAR.asc
 fi
-return = $(verifyWithGpg "$TRANSMART_DATA_TAR")
-if [ "$return" != "0" ] ; then
+returnedValue=$(verifyWithGpg "$TRANSMART_DATA_TAR")
+if [ "$returnedValue" != "0" ] ; then
 	echo "++++++++++++++++++++++++++++"
 	echo "+  VERIFY(gpg) failed transmart-data folder"
 	echo "++++++++++++++++++++++++++++"
@@ -134,8 +134,8 @@ if ! [ -e $TRANSMART_ETL_TAR ] ; then
 	curl $TRANSMART_ETL_URL -o $TRANSMART_ETL_TAR
 	curl $TRANSMART_ETL_ASC_URL -o $TRANSMART_ETL_TAR.asc
 fi
-return = $(verifyWithGpg "$TRANSMART_ETL_TAR")
-if [ "$return" != "0" ] ; then
+returnedValue=$(verifyWithGpg "$TRANSMART_ETL_TAR")
+if [ "$returnedValue" != "0" ] ; then
 	echo "++++++++++++++++++++++++++++"
 	echo "+  VERIFY(gpg) failed tranSMART-ETL folder"
 	echo "++++++++++++++++++++++++++++"
