@@ -113,7 +113,7 @@ if ! [ -e $TRANSMART_DATA_TAR ] ; then
 	curl $TRANSMART_DATA_URL -o $TRANSMART_DATA_TAR
 	curl $TRANSMART_DATA_ASC_URL -o $TRANSMART_DATA_TAR.asc
 fi
-if [ "$( verifyWithGpg $TRANSMART_DATA_TAR )" ] ; then 
+if [ $(verifyWithGpg "$TRANSMART_DATA_TAR") ] ; then 
 	echo "++++++++++++++++++++++++++++"
 	echo "+  VERIFY(gpg) failed transmart-data folder"
 	echo "++++++++++++++++++++++++++++"
@@ -136,7 +136,7 @@ if ! [ -e $TRANSMART_ETL_TAR ] ; then
 	curl $TRANSMART_ETL_URL -o $TRANSMART_ETL_TAR
 	curl $TRANSMART_ETL_ASC_URL -o $TRANSMART_ETL_TAR.asc
 fi
-if [ "$( verifyWithGpg $TRANSMART_ETL_TAR )" ] ; then
+if [ $(verifyWithGpg "$TRANSMART_ETL_TAR") ] ; then
 	echo "++++++++++++++++++++++++++++"
 	echo "+  VERIFY(gpg) failed tranSMART-ETL folder"
 	echo "++++++++++++++++++++++++++++"
@@ -148,7 +148,7 @@ if ! [ -e tranSMART-ETL ] ; then
 fi
 echo "Finished setting up the tranSMART-ETL folder at $(date)"
 
-exit -1;
+exit -1
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install of basic tools and dependencies "
