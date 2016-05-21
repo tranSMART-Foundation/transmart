@@ -126,7 +126,7 @@ if [ "$returnedValue" != "0" ] ; then
 	exit -1
 fi
 if ! [ -e transmart-data ] ; then
-	upzip $TRANSMART_DATA_ZIP
+	unzip $TRANSMART_DATA_ZIP
 	mv $TRANSMART_DATA_NAME transmart-data
 fi
 
