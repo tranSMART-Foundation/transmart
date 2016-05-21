@@ -29,6 +29,14 @@ TRANSMART_ETL_TAR="$TRANSMART_ETL_NAME.tar.gz"
 TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_TAR"
 TRANSMART_ETL_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_TAR.asc"
 
+TRANSMAER_WAR_NAME="transmart.war"
+TRANSMART_WAR_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME"
+TRANSMART_WAR_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME.asc"
+
+TRANSMAER_GWAVA_WAR_NAME="gwava.war"
+TRANSMART_GWAVA_WAR_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME"
+TRANSMART_GWAVA_WAR_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.asc"
+
 # on error; stop/exit
 set -e
 
@@ -146,6 +154,46 @@ if ! [ -e tranSMART-ETL ] ; then
 	mv $TRANSMART_ETL_NAME tranSMART-ETL
 fi
 echo "Finished setting up the tranSMART-ETL folder at $(date)"
+
+echo "++++++++++++++++++++++++++++"
+echo "+  Download and verify war files"
+echo "++++++++++++++++++++++++++++"
+
+cd $INSTALL_BASE
+sudo -v
+if ! [ -d war-files ]; then
+	mkdir war-files
+fi
+
+cd war-files
+if ! [ -e transmart.war ]; then
+	curl TRANSMART_WAR_URL --output transmart.war
+	curl TRANSMART_WAR_ASC_URL --output transmart.war.asc
+fi
+returnedValue=$(verifyWithGpg "transmart.war")
+if [ "$returnedValue" != "0" ] ; then
+	echo "++++++++++++++++++++++++++++"
+	echo "+  VERIFY(gpg) failed transmart.war"
+	echo "++++++++++++++++++++++++++++"
+	exit -1 
+fi
+
+if ! [ -e gwava.war ]; then
+	curl TRANSMART_GWAVA_WAR_URL --output gwava.war
+	curl TRANSMART_GWAVA_WAR_ASC_URL --output gwava.war.asc
+fi
+returnedValue=$(verifyWithGpg "gwava.war")
+if [ "$returnedValue" != "0" ] ; then
+	echo "++++++++++++++++++++++++++++"
+	echo "+  VERIFY(gpg) failed gwava.war"
+	echo "++++++++++++++++++++++++++++"
+	exit -1 
+fi
+
+cd ..
+ls -la war-files
+
+echo "Finished downloading and verifying war files at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install of basic tools and dependencies "
@@ -396,19 +444,7 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Install war files"
 echo "++++++++++++++++++++++++++++"
 
-cd $INSTALL_BASE
-sudo -v
-if ! [ -d war-files ]; then
-	mkdir war-files
-fi
-
-cd war-files
-if ! [ -e transmart.war ]; then
-	curl http://library.transmartfoundation.org/wars/transmart.V1.2.5-Beta.war --output transmart.war
-fi
-if ! [ -e gwava.war ]; then
-	curl http://library.transmartfoundation.org/wars/gwava.V1.2.5-Beta.war --output gwava.war
-fi
+cd $INSTALL_BASE/war-files
 sudo cp *.war /var/lib/tomcat7/webapps/
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
