@@ -20,14 +20,14 @@
 
 # Script Parameters
 TRANSMART_DATA_NAME="transmart-data-release-16.1"
-TRANSMART_DATA_TAR="$TRANSMART_DATA_NAME.tar.gz"
-TRANSMART_DATA_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_TAR"
-TRANSMART_DATA_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_TAR.asc"
+TRANSMART_DATA_ZIP="$TRANSMART_DATA_NAME.zip"
+TRANSMART_DATA_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_ZIP"
+TRANSMART_DATA_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_ZIP.asc"
 
 TRANSMART_ETL_NAME="tranSMART-ETL-release-16.1"
-TRANSMART_ETL_TAR="$TRANSMART_ETL_NAME.tar.gz"
-TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_TAR"
-TRANSMART_ETL_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_TAR.asc"
+TRANSMART_ETL_ZIP="$TRANSMART_ETL_NAME.zip"
+TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP"
+TRANSMART_ETL_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP.asc"
 
 TRANSMAER_WAR_NAME="transmart.war"
 TRANSMART_WAR_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME"
@@ -114,11 +114,11 @@ echo "++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE
 sudo -v
-if ! [ -e $TRANSMART_DATA_TAR ] ; then
-	curl $TRANSMART_DATA_URL -o $TRANSMART_DATA_TAR
-	curl $TRANSMART_DATA_ASC_URL -o $TRANSMART_DATA_TAR.asc
+if ! [ -e $TRANSMART_DATA_ZIP ] ; then
+	curl $TRANSMART_DATA_URL -o $TRANSMART_DATA_ZIP
+	curl $TRANSMART_DATA_ASC_URL -o $TRANSMART_DATA_ZIP.asc
 fi
-returnedValue=$(verifyWithGpg "$TRANSMART_DATA_TAR")
+returnedValue=$(verifyWithGpg "$TRANSMART_DATA_ZIP")
 if [ "$returnedValue" != "0" ] ; then
 	echo "++++++++++++++++++++++++++++"
 	echo "+  VERIFY(gpg) failed transmart-data folder"
@@ -126,7 +126,7 @@ if [ "$returnedValue" != "0" ] ; then
 	exit -1
 fi
 if ! [ -e transmart-data ] ; then
-	tar -xzf $TRANSMART_DATA_TAR
+	upzip $TRANSMART_DATA_ZIP
 	mv $TRANSMART_DATA_NAME transmart-data
 fi
 
@@ -138,11 +138,11 @@ echo "++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE/transmart-data/env
 sudo -v
-if ! [ -e $TRANSMART_ETL_TAR ] ; then
-	curl $TRANSMART_ETL_URL -o $TRANSMART_ETL_TAR
-	curl $TRANSMART_ETL_ASC_URL -o $TRANSMART_ETL_TAR.asc
+if ! [ -e $TRANSMART_ETL_ZIP ] ; then
+	curl $TRANSMART_ETL_URL -o $TRANSMART_ETL_ZIP
+	curl $TRANSMART_ETL_ASC_URL -o $TRANSMART_ETL_ZIP.asc
 fi
-returnedValue=$(verifyWithGpg "$TRANSMART_ETL_TAR")
+returnedValue=$(verifyWithGpg "$TRANSMART_ETL_ZIP")
 if [ "$returnedValue" != "0" ] ; then
 	echo "++++++++++++++++++++++++++++"
 	echo "+  VERIFY(gpg) failed tranSMART-ETL folder"
@@ -150,7 +150,7 @@ if [ "$returnedValue" != "0" ] ; then
 	exit -1 
 fi
 if ! [ -e tranSMART-ETL ] ; then
-	tar -xzf $TRANSMART_ETL_TAR
+	unzip $TRANSMART_ETL_ZIP
 	mv $TRANSMART_ETL_NAME tranSMART-ETL
 fi
 echo "Finished setting up the tranSMART-ETL folder at $(date)"
