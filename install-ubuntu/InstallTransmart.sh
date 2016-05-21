@@ -167,8 +167,8 @@ fi
 
 cd war-files
 if ! [ -e transmart.war ]; then
-	curl TRANSMART_WAR_URL --output transmart.war
-	curl TRANSMART_WAR_ASC_URL --output transmart.war.asc
+	curl $TRANSMART_WAR_URL --output transmart.war
+	curl $TRANSMART_WAR_ASC_URL --output transmart.war.asc
 fi
 returnedValue=$(verifyWithGpg "transmart.war")
 if [ "$returnedValue" != "0" ] ; then
@@ -179,8 +179,8 @@ if [ "$returnedValue" != "0" ] ; then
 fi
 
 if ! [ -e gwava.war ]; then
-	curl TRANSMART_GWAVA_WAR_URL --output gwava.war
-	curl TRANSMART_GWAVA_WAR_ASC_URL --output gwava.war.asc
+	curl $TRANSMART_GWAVA_WAR_URL --output gwava.war
+	curl $TRANSMART_GWAVA_WAR_ASC_URL --output gwava.war.asc
 fi
 returnedValue=$(verifyWithGpg "gwava.war")
 if [ "$returnedValue" != "0" ] ; then
