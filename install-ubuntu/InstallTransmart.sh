@@ -102,11 +102,11 @@ sudo -v
 echo "++++++++++++++++++++++++++++"
 echo "+  install make, curl, unzip, tar "
 echo "++++++++++++++++++++++++++++"
-#sudo apt-get update
-#sudo apt-get -q install -y make
-#sudo apt-get -q install -y curl
-#sudo apt-get -q install -y unzip
-#sudo apt-get -q install -y tar
+sudo apt-get update
+sudo apt-get -q install -y make
+sudo apt-get -q install -y curl
+sudo apt-get -q install -y unzip
+sudo apt-get -q install -y tar
 
 echo "++++++++++++++++++++++++++++"
 echo "+  set up the transmart-data folder"
@@ -126,6 +126,7 @@ if [ "$returnedValue" != "0" ] ; then
 	exit -1
 fi
 if ! [ -e transmart-data ] ; then
+	echo "unzipping $TRANSMART_DATA_ZIP"
 	unzip $TRANSMART_DATA_ZIP
 	mv $TRANSMART_DATA_NAME transmart-data
 fi
@@ -150,6 +151,7 @@ if [ "$returnedValue" != "0" ] ; then
 	exit -1 
 fi
 if ! [ -e tranSMART-ETL ] ; then
+	echo "unzipping $TRANSMART_ETL_ZIP"
 	unzip $TRANSMART_ETL_ZIP
 	mv $TRANSMART_ETL_NAME tranSMART-ETL
 fi
@@ -191,6 +193,7 @@ if [ "$returnedValue" != "0" ] ; then
 fi
 
 cd ..
+echo "War files as downloaded"
 ls -la war-files
 
 echo "Finished downloading and verifying war files at $(date)"
