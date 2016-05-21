@@ -29,11 +29,11 @@ TRANSMART_ETL_ZIP="$TRANSMART_ETL_NAME.zip"
 TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP"
 TRANSMART_ETL_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP.asc"
 
-TRANSMAER_WAR_NAME="transmart.war"
+TRANSMART_WAR_NAME="transmart.war"
 TRANSMART_WAR_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME"
 TRANSMART_WAR_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME.asc"
 
-TRANSMAER_GWAVA_WAR_NAME="gwava.war"
+TRANSMART_GWAVA_WAR_NAME="gwava.war"
 TRANSMART_GWAVA_WAR_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME"
 TRANSMART_GWAVA_WAR_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.asc"
 
@@ -102,11 +102,11 @@ sudo -v
 echo "++++++++++++++++++++++++++++"
 echo "+  install make, curl, unzip, tar "
 echo "++++++++++++++++++++++++++++"
-sudo apt-get update
-sudo apt-get -q install -y make
-sudo apt-get -q install -y curl
-sudo apt-get -q install -y unzip
-sudo apt-get -q install -y tar
+#sudo apt-get update
+#sudo apt-get -q install -y make
+#sudo apt-get -q install -y curl
+#sudo apt-get -q install -y unzip
+#sudo apt-get -q install -y tar
 
 echo "++++++++++++++++++++++++++++"
 echo "+  set up the transmart-data folder"
