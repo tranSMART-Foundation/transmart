@@ -107,7 +107,7 @@ main <- function(phase = NA, projection = NA)
 
 
 ## SE: for debug
-b = main(phase = "preprocess", projection = "log_intensity")
+#b = main(phase = "preprocess", projection = "log_intensity")
 #a = main(phase = "fetch", projection = "log_intensity")
 
 
