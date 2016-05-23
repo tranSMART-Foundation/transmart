@@ -4,12 +4,12 @@ library(jsonlite)
 
 
 # SE: Just to get things working for dev purposes
-# rm(list = ls())
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
-# setwd("/Users/serge/GitHub/SmartR")
+#  rm(list = ls())
+#  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
+#  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
+#  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
+#  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
+#  setwd("/Users/serge/GitHub/SmartR")
 #######
 
 
@@ -36,30 +36,35 @@ markerTableJson <- "markerSelectionTable.json" # Name of the json file with limm
 
 main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsAllowed = FALSE) {
     max_rows <- as.numeric(max_rows)
-    verifyInput(max_rows, sorting)
+    verifyInputHeatmap(max_rows, sorting)
     
     ## Returns a list containing two variables named HD and LD
     data.list <- parseInput()
     
-    df = data.list$HD
+    hd.df = data.list$HD
+    ld.df = data.list$LD    
+    
+    ## Low dimensional annotation data frame  
+    extraFieldsExtended.df = buildExtraFieldsExtended(ld.df)
+    
     
     ## SE: for debug
-    ## df = df[, c(1, 2, 4, 109, 110)]
+    ## hd.df = hd.df[, c(1, 2, 4, 109, 110)]
     ## Two subsets, 2 samples in one subset and one in the other
-    ## df = df[, c(1, 2, 4, 109, 110)]
+    ## hd.df = hd.df[, c(1, 2, 4, 109, 110)]
     
     ## Two subsets, one sample in one subset and one in the other
-    ## df = df[, c(1, 2, 4, 110)]
+    ## hd.df = hd.df[, c(1, 2, 4, 110)]
 
     ## two subsets, multiple samples 
-    ## df = df[, c(1, 2, 4, 109)]
+    ## hd.df = hd.df[, c(1, 2, 4, 109)]
         
     ## two subsets, multiple samples 
-   # df = df[, c(1, 2, 4, 5, 6, 7, 8, 107, 108, 109)]
+   # hd.df = hd.df[, c(1, 2, 4, 5, 6, 7, 8, 107, 108, 109)]
     
         
     write.table(
-        df,
+        hd.df,
         "heatmap_orig_values.tsv",
         sep = "\t",
         na = "",
@@ -69,19 +74,19 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     
     ## Creating the extended data frame containing besides the input data,
     ## a set of statistics. 
-    df          <- addStats(df, sorting, ranking, max_rows)
+    hd.df          <- addStats(hd.df, sorting, ranking, max_rows)
     
 
-    df          <- mergeDuplicates(df)
-    df          <- df[1:min(max_rows, nrow(df)), ]  #  apply max_rows
+    hd.df          <- mergeDuplicates(hd.df)
+    hd.df          <- hd.df[1:min(max_rows, nrow(hd.df)), ]  #  apply max_rows
     
-    fields      <- buildFields(df)
+    fields      <- buildFields(hd.df)
     extraFields <- buildExtraFields(fields)
-    uids        <- df[, 1]
+    uids        <- hd.df[, 1]
     patientIDs  <- unique(fields["PATIENTID"])[,1]
     
 
-    significanceValues <- df["SIGNIFICANCE"][,1]
+    significanceValues <- hd.df["SIGNIFICANCE"][,1]
     
         
     features <- unique(extraFields["FEATURE"])[,1]
@@ -89,41 +94,37 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     
     ## A df containing the computed value rankings for
     ## all possible statistical methods
-    ranking.df = getAllStatRanksForExtDataFrame(df)
+    ranking_hd.df = getAllStatRanksForExtDataFrame(hd.df)
     
-    ## SE: for debug
-#     print(ranking.df[1:5,])
-#     print(df[1:5,])
-#     print(buildExtraFields(fields))
-    
+
     ## The returned jsn object that will be dumped to file
     jsn <- list(
-        "fields"             = fields,
-        "patientIDs"         = patientIDs,
-        "uids"               = uids,
-        # "significanceValues" = significanceValues,
-        "logfoldValues"      = df["LOGFOLD"][,1],
-        "ttestValues"        = df["TTEST"][,1],
-        "pvalValues"         = df["PVAL"][,1],
-        "adjpvalValues"      = df["ADJPVAL"][,1],
-        "bvalValues"         = df["BVAL"][,1],
-        "ranking"            = ranking,
-        "features"           = features,
-        "extraFields"        = extraFields,
-        "maxRows"            = max_rows,
-        "allStatRanking"   = ranking.df,
-        "warnings"           = c() # initiate empty vector
+        "fields"              = fields,
+        "patientIDs"          = patientIDs,
+        "uids"                = uids,
+        "logfoldValues"       = hd.df["LOGFOLD"][,1],
+        "ttestValues"         = hd.df["TTEST"][,1],
+        "pvalValues"          = hd.df["PVAL"][,1],
+        "adjpvalValues"       = hd.df["ADJPVAL"][,1],
+        "bvalValues"          = hd.df["BVAL"][,1],
+        "ranking"             = ranking,
+        "features"            = features,
+        "extraFields"         = extraFields,
+        "extraFieldsExtended" = extraFieldsExtended.df,
+        "maxRows"             = max_rows,
+        "allStatRanking"      = ranking_hd.df,
+        "warnings"            = c() # initiate empty vector
     )
     
     ## To keep track of the parameters selected for the execution of the code
     writeRunParams(max_rows, sorting, ranking)
     
     # temporary stats like SD and MEAN need to be removed for clustering to work
-    measurements <- cleanUp(df)  
+    measurements <- cleanUp(hd.df)  
 
     
     # discard UID column
-    if (ncol(df) > 2){
+    if (ncol(hd.df) > 2){
         measurements <- measurements[, 2:ncol(measurements)]
     } else {
         measurements <- measurements[2]
@@ -139,7 +140,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     
     jsn <- addClusteringOutput(jsn, measurements) #
     jsn <- toJSON(jsn, pretty = TRUE, digits = I(17))
-    writeDataForZip(df, measurements, patientIDs)  # for later zip generation
+    writeDataForZip(hd.df, measurements, patientIDs)  # for later zip generation
     write(jsn, file = "heatmap.json")
     # json file be served the same way
     # like any other file would - get name via
@@ -149,23 +150,14 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     list(messages = msgs)
     
 #     ## SE: For debug purposes
-    
-       return(df)
+#       return(jsn)
 }
 
-## Check input args for heatmap 
-verifyInput <- function(max_rows, sorting) {
-    if (max_rows <= 0) {
-        stop("Max rows argument needs to be higher than zero.")
-    }
-    if (!(sorting == "nodes" || sorting == "subjects")) {
-        stop("Unsupported sorting type. Only nodes and subjects are allowed")
-    }
-}
+
 
 
 # SE: For debug purposes
-# out = main(ranking = "mean")
+# out = main(ranking = "median")
 #print(out[1:20,])
 
 

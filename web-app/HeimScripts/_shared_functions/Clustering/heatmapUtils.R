@@ -4,6 +4,16 @@
 
 
 
+## Check input args for heatmap run.R script
+verifyInputHeatmap <- function(max_rows, sorting) {
+  if (max_rows <= 0) {
+    stop("Max rows argument needs to be higher than zero.")
+  }
+  if (!(sorting == "nodes" || sorting == "subjects")) {
+    stop("Unsupported sorting type. Only nodes and subjects are allowed")
+  }
+}
+
 
 computeDendrogram <- function(distances, linkageMethod) {
   as.dendrogram(hclust(distances, method = linkageMethod))

@@ -424,7 +424,7 @@ parseInput<- function() {
   if (exists("preprocessed")) {
     
     ## Retrieving low and high dim data into separate vars
-    df <- preprocessed$HD
+    df = preprocessed$HD
     ld = preprocessed$LD
     
   } else {
@@ -432,7 +432,7 @@ parseInput<- function() {
     ld_var.idx = grep("^(categoric)|(numeric)", names(loaded_variables), perl = TRUE)
     hd_var.idx = grep("^highDimensional", names(loaded_variables), perl = TRUE)
     
-    
+    ## Merging high dim data from different nodes
     df <- mergeFetchedData(loaded_variables[hd_var.idx])
     
     ## Either there is low dim data available ...
@@ -599,6 +599,58 @@ buildExtraFields <- function(df) {
   VALUE <- df$SUBSET
   extraFields <- data.frame(FEATURE, PATIENTID, TYPE, VALUE, stringsAsFactors = FALSE)
 }
+
+
+
+
+## Creates a data frame containing the restructured low dim data
+## The column names and content are as follows:
+## - FEATURE: The low dim node name (e.g. "\\Demo Data\\Sorlie(2003) GSE4382\\Subjects\\Demographics\\Age\\")
+## - PATIENTID: The patient id (e.g. "112")
+## - TYPE: Value type ("numeric", "categoric")
+## - VALUE: The value  (e.g.: 55, "Cause of Death, Other", NA )
+##
+## If a value is not existing, the corresponding cell in the returned data frame
+## is set to NA.
+buildExtraFieldsExtended <- function(ld.df) {
+  
+  
+  varNames_with_subset.vec = unlist(names(ld.df))
+  
+  varNames_without_subset.vec = paste(strsplit2(varNames_with_subset.vec, "_")[,1],
+                                      strsplit2(varNames_with_subset.vec, "_")[,2], sep="_")
+  
+  type.vec = strsplit2(varNames_with_subset.vec, "_")[,1]
+  
+  names = character(length=length(varNames_without_subset.vec))
+  
+  ## Declaring the variables to store the extra field data
+  FEATURE.vec = character(length = 0)
+  PATIENTID.vec = character(length = 0)  
+  TYPE.vec = character(length = 0)  
+  VALUE.vec = character(length = 0)
+  
+  ## Feature Names 
+  for(i in 1:length(varNames_without_subset.vec)){
+    
+    names[i] = get("fullName", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
+    FEATURE = names[i]
+    
+    ld_var._df = ld.df[[varNames_with_subset.vec[i]]]
+    
+    for(j in 1:dim(ld_var._df)[1]){
+      FEATURE.vec = c(FEATURE.vec, FEATURE)
+      PATIENTID.vec = c(PATIENTID.vec, ld_var._df[j,1])
+      TYPE.vec = c(TYPE.vec, type.vec[i])
+      VALUE.vec = c(VALUE.vec, ld_var._df[j,2])
+    }
+  }
+  
+  res.df = data.frame(FEATURE = FEATURE.vec, PATIENTID = PATIENTID.vec, TYPE = TYPE.vec, VALUE = VALUE.vec)
+  
+  return(res.df)
+}
+
 
 
 
@@ -780,15 +832,22 @@ writeDataForZip <- function(df, zScores, pidCols) {
 }
 
 
-## SE: Currently not working - see SH-189 !!!!!!
+
+## Probe signal aggregation based on maxMean for initial data frame containing probe id, biomarker
+## and sample measurements. Probes are merged according to maxMean, this means the row with highest mean
+## intensity for same biomarker will be retained.
 aggregate.probes <- function(df) {
+  
   if(nrow(df)<2){
     stop("Cannot aggregate probes: there only is data for a single probe (ie. only one row of data) or 
          there is insufficient bio.marker information for the selected probes to be able to match the probes to 
          biomarkers for aggregation (e.g. in case of micro-array data to match probe ID to gene symbol). 
          Suggestion: skip probe aggregation.")
   }
+  
   measurements <- df[,3:ncol(df)]
+  
+  
   row.names(measurements) <- df[,1]
   collapsed <- collapseRows(measurements, df[,2], df[,1], "MaxMean",
                             connectivityBasedCollapsing = FALSE, #in Rmodules = TRUE. In our spec, not required

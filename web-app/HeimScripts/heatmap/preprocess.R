@@ -6,12 +6,12 @@ library(WGCNA)
 
 
 # SE: Just to get things working for dev purposes
-rm(list = ls())
-load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
-load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
-#load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
-#load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
-setwd("/Users/serge/GitHub/SmartR")
+#rm(list = ls())
+#load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
+#load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
+# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
+# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
+# setwd("/Users/serge/GitHub/SmartR")
 #######
 
 
@@ -49,7 +49,10 @@ main <- function(aggregate=FALSE) {
   
   if(aggregate && good.input){
     df <- dropEmptyGene(df)
+    
     aggr  <- aggregate.probes(df)
+    
+   
     
     ## SE: modified assign value to list type to handle also low dim data
     assign("preprocessed", list(HD = aggr, LD=ld), envir = .GlobalEnv)
@@ -68,15 +71,16 @@ main <- function(aggregate=FALSE) {
 
   assign("preprocessing_params", list(aggregate=aggregate), envir = .GlobalEnv)
 
+  
   list(finished=T,messages=msgs)
  
   ## SE: For debug 
-#  return(df)
+  #return(df)
 }
 
 
 
 
 ## SE: For debug
-#df = main(aggregate=F)
-
+main(aggregate=T)
+# print(dim(df))
