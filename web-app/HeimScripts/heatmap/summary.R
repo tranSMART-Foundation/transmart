@@ -63,10 +63,17 @@
 library(jsonlite)
 library(gplots)
 
+## SE: For debug
+#setwd("/Users/serge/GitHub/SmartR")
+
+if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
+  remoteScriptDir <- "web-app/HeimScripts"
+}
 
 ## Loading functions ##
 summaryStatistics <- paste(remoteScriptDir, "/_shared_functions/SummaryStatistics/summaryStatistics.R", sep="")
 source(summaryStatistics)
+
 
 
 main <- function(phase = NA, projection = NA)

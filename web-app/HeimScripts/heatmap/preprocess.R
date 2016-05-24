@@ -9,9 +9,9 @@ library(WGCNA)
 #rm(list = ls())
 #load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
 #load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
-# setwd("/Users/serge/GitHub/SmartR")
+#load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
+#load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
+#setwd("/Users/serge/GitHub/SmartR")
 #######
 
 
@@ -82,5 +82,5 @@ main <- function(aggregate=FALSE) {
 
 
 ## SE: For debug
-main(aggregate=T)
+#main(aggregate=T)
 # print(dim(df))

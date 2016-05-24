@@ -1,9 +1,11 @@
+###############################################################
+### Functions related to generating the summary statistics  ###
+###############################################################
 
-
-### Functions related to generating the summary statistics.###
-
-
-
+## Retrieve high dimensional input data according to phase
+## parameter provided as input:
+## - fetch -> loaded_variables
+## - preprocess -> preprocessed  
 get_input_data <- function(phase)
 {
   #check if the phase parameter
@@ -474,4 +476,3 @@ discardSubset <- function(labels) {
   gsub("_s[[:digit:]]","",labels)
 }
 
-## End Functions ##
