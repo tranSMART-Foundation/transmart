@@ -30,16 +30,19 @@ describe('fetchButton', function() {
     var _clickButton = function(loadDataIntoSessionReturn, executeSummaryStatsReturn) {
         var defer1 = $q.defer();
         var defer2 = $q.defer();
+        var defer3 = $q.defer();
         spyOn(rServeService, 'loadDataIntoSession').and.returnValue(defer1.promise);
         spyOn(rServeService, 'executeSummaryStats').and.returnValue(defer2.promise);
+        spyOn(rServeService, 'deleteSessionFiles').and.returnValue(defer3.promise);
 
         element.find('input').click();
+        defer3.resolve();
+        $rootScope.$digest();
 
         if (loadDataIntoSessionReturn) {
             eval('defer1.' + loadDataIntoSessionReturn); // jshint ignore:line
             $rootScope.$digest();
         }
-
 
         if (executeSummaryStatsReturn) {
             eval('defer2.' + executeSummaryStatsReturn); // jshint ignore:line
