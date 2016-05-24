@@ -195,6 +195,12 @@ class SessionService implements DisposableBean {
         res
     }
 
+    void removeAllFiles(UUID sessionUUID) {
+        doWithSession(sessionUUID) {
+            sessionFiles.removeAll()
+        }
+    }
+
     boolean isSessionActive(UUID sessionId) {
         withSessionBookKeepingLock(false) {
             currentSessions.containsKey(sessionId) &&

@@ -5,6 +5,8 @@ import com.google.common.collect.Table
 import org.springframework.stereotype.Component
 import org.transmartproject.core.exceptions.NoSuchResourceException
 
+import java.nio.file.NoSuchFileException
+
 /**
  * A holder for the files that were created during the session,
  * mapping the logical task/filename combination to a file path.
@@ -24,4 +26,16 @@ class SessionFiles {
         files.get(taskId, filename)
     }
 
+    void removeAll() {
+        try {
+            for (File f: files.values()) {
+                println f.getAbsolutePath()
+                println f.delete()
+            }
+        }
+        catch(NoSuchFileException e) {}
+        finally {
+            files = HashBasedTable.create()
+        }
+    }
 }

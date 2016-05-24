@@ -85,6 +85,24 @@ window.smartRApp.factory('rServeService', [
             }, SESSION_TOUCH_DELAY);
         }
 
+        service.deleteSessionFiles = function(sessionId) {
+            sessionId = sessionId || state.sessionId;
+
+            return $http({
+                url: pageInfo.basePath + '/RSession/deleteFiles',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                config: {
+                    timeout: TIMEOUT
+                },
+                data: {
+                    sessionId: sessionId
+                }
+            });
+        }
+
         service.destroySession = function(sessionId) {
             sessionId = sessionId || state.sessionId;
 

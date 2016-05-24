@@ -77,14 +77,14 @@ window.smartRApp.directive('fetchButton', [
                 };
 
                 template_btn.onclick = function() {
+                    template_btn.disabled = true;
+                    template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
+
                     scope.summaryData = {};
                     scope.allSamples = 0;
                     scope.loaded = false;
                     scope.running = true;
-
-                    template_btn.disabled = true;
-                    template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
-
+                    var deleteReq = rServeService.deleteSessionFiles(); // cleanup our working directory
                     var cohorts = smartRUtils.countCohorts();
 
                     if (cohorts === 0) {
@@ -93,7 +93,8 @@ window.smartRApp.directive('fetchButton', [
                     }
 
                     if (scope.allowedCohorts.indexOf(cohorts) === -1) {
-                        _onFailure('This workflow requires ' + scope.allowedCohorts + ' cohort(s), but you selected ' + cohorts);
+                        _onFailure('This workflow requires ' + scope.allowedCohorts +
+                                   ' cohort(s), but you selected ' + cohorts);
                         return;
                     }
 
@@ -112,12 +113,16 @@ window.smartRApp.directive('fetchButton', [
 
                     var dataConstraints = _getDataConstraints(scope.biomarkers);
 
-                    rServeService.loadDataIntoSession(conceptKeys, dataConstraints, scope.projection)
-                        .then(
+                    deleteReq.then(
+                        rServeService.loadDataIntoSession(conceptKeys, dataConstraints, scope.projection).then(
                             scope.showSummaryStats ? _showSummaryStats : _onSuccess,
                             _onFailure
-                        );
-                };
-            }
-        };
+                        ),
+                        _onFailure
+                    );
+
+
+            };
+        }
+    };
     }]);

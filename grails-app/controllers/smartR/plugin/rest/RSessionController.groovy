@@ -48,6 +48,16 @@ class RSessionController {
         render ''
     }
 
+    /**
+     * Delete files assoiated with this session
+     */
+    def deleteFiles() {
+        sessionService.removeAllFiles(sessionId)
+
+        response.status = 200
+        render ''
+    }
+
     private UUID getSessionId() {
         def json = request.JSON
         if (!json.sessionId || !(json.sessionId instanceof String)) {
