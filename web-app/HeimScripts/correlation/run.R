@@ -2,12 +2,38 @@ library(reshape2)
 
 main <- function(method = "pearson", selectedPatientIDs = integer()) {
 
-    num_data <- parse.input(sourceLabel="datapoints", loaded_variables=loaded_variables, type="numerical")
-    cat_data <- parse.input(sourceLabel="annotations", loaded_variables=loaded_variables, type="categorical")
+    save(loaded_variables, file="/Users/sascha/loaded_variables.Rda")
+    save(fetch_params, file="/Users/sascha/fetch_params.Rda")
+    df1 <- loaded_variables$datapoints_n0_s1
+    df2 <- loaded_variables$datapoints_n1_s1
+
+    if (nrow(df1) == 0) {
+        stop(paste("Variable '", fetch_params$ontologyTerms$datapoints_n0$name, "' has no patients for subset 1"), sep="")
+    }
+    if (nrow(df2) == 0) {
+        stop(paste("Variable '", fetch_params$ontologyTerms$datapoints_n1$name, "' has no patients for subset 1"), sep="")
+    }
+    num_data <- merge(df1, df2, by="Row.Label")
+    num_data <- na.omit(num_data)
+    colnames(num_data) <- c("patientID", "x", "y")
+
+    cat_data <- data.frame(patientID=integer(), annotation=character())
+    filtered.loaded_variables <- get.loaded_variables.by.source("annotations", loaded_variables)
+    if (length(filtered.loaded_variables) > 0) {
+        merged.df <- Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables)
+        merged.df <- merged.df[, colSums(is.na(merged.df)) != nrow(merged.df)] # remove NA columns
+        
+        annotations <- apply(merged.df[,-1], 1, function(row) {
+                row <- row[row != ""]
+                paste(row, collapse="-AND-")
+        })
+        cat_data <- data.frame(
+           patientID=as.integer(merged.df$Row.Label),
+           annotation=as.character(annotations)
+        )
+    }
 
     df <- num_data
-    df <- na.omit(df)
-
     if (nrow(cat_data) > 0) {
         df <- merge(df, cat_data, by="patientID")
     } else {
@@ -52,3 +78,5 @@ conceptStrToFolderStr <- function(s) {
     backslashs <- which(splitString == "\\")
     substr(s, 0, tail(backslashs, 2)[1])
 }
+
+main()
