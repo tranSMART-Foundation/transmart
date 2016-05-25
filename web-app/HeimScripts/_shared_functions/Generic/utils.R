@@ -3,11 +3,13 @@
 ## SmartR data objects                                              ##                           
 ######################################################################
 
-
+## Retrieve High dim node for vector of patientIDs
 getNode <- function(patientIDs) {
+
     splittedIds <- strsplit(patientIDs,"_") # During merge, which is always
     # run we append subset id, either
     # _s1 or _s2 to PATIENTID.
+    
     sapply(splittedIds, FUN = tail_elem,n = 2) # In proper patienid subset will
     # always be  at the end.
     # This select last but one elemnt
@@ -44,6 +46,7 @@ replaceNodeIDNodeLabel <- function(ids, ontologyTerms) {
 
 
 
+## Get subjects for vector of patientIDs
 getSubject <- function(patientIDs) {
     splittedIds <- strsplit(patientIDs,"_")
     sapply(splittedIds, FUN = discardNodeAndSubject)

@@ -3,12 +3,14 @@ library(limma)
 library(jsonlite)
 
 
-# # SE: Just to get things working for dev purposes
-# rm(list = ls())
-# load("/Users/serge/Documents/Projects/SmartR/Dev/R_workspace_objects/data.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Dev/R_workspace_objects/fetchParams.Rda")
-# setwd("/Users/serge/GitHub/SmartR")
-# #######
+# SE: Just to get things working for dev purposes
+#  rm(list = ls())
+#  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
+#  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
+#  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
+#  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
+#  setwd("/Users/serge/GitHub/SmartR")
+#######
 
 
 if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
@@ -26,6 +28,7 @@ source(utils)
 source(limmaUtils)
 source(dataFrameUtils)
 source(heatmapUtils)
+#######################
 
 
 SUBSET1REGEX <- "_s1$"  # Regex identifying columns of subset 1.
@@ -33,48 +36,95 @@ markerTableJson <- "markerSelectionTable.json" # Name of the json file with limm
 
 main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsAllowed = FALSE) {
     max_rows <- as.numeric(max_rows)
-    verifyInput(max_rows, sorting)
-    df <- parseInput()
+    verifyInputHeatmap(max_rows, sorting)
+    
+    ## Returns a list containing two variables named HD and LD
+    data.list <- parseInput()
+    
+    hd.df = data.list$HD
+    ld.df = data.list$LD    
+    
+    ## Low dimensional annotation data frame  
+    extraFieldsExtended.df = buildExtraFieldsExtended(ld.df)
+    
+    
+    ## SE: for debug
+    ## hd.df = hd.df[, c(1, 2, 4, 109, 110)]
+    ## Two subsets, 2 samples in one subset and one in the other
+    ## hd.df = hd.df[, c(1, 2, 4, 109, 110)]
+    
+    ## Two subsets, one sample in one subset and one in the other
+    ## hd.df = hd.df[, c(1, 2, 4, 110)]
+
+    ## two subsets, multiple samples 
+    ## hd.df = hd.df[, c(1, 2, 4, 109)]
+        
+    ## two subsets, multiple samples 
+   # hd.df = hd.df[, c(1, 2, 4, 5, 6, 7, 8, 107, 108, 109)]
+    
+        
     write.table(
-        df,
+        hd.df,
         "heatmap_orig_values.tsv",
         sep = "\t",
         na = "",
         row.names = FALSE,
         col.names = TRUE
     )
-    df          <- addStats(df, sorting, ranking, max_rows)
-    df          <- mergeDuplicates(df)
-    df          <- df[1:min(max_rows, nrow(df)), ]  #  apply max_rows
-    fields      <- buildFields(df)
+    
+    ## Creating the extended data frame containing besides the input data,
+    ## a set of statistics. 
+    hd.df          <- addStats(hd.df, sorting, ranking, max_rows)
+    
+
+    hd.df          <- mergeDuplicates(hd.df)
+    hd.df          <- hd.df[1:min(max_rows, nrow(hd.df)), ]  #  apply max_rows
+    
+    fields      <- buildFields(hd.df)
     extraFields <- buildExtraFields(fields)
-    uids        <- df[, 1]
+    uids        <- hd.df[, 1]
     patientIDs  <- unique(fields["PATIENTID"])[,1]
+    
 
-    significanceValues <- df["SIGNIFICANCE"][,1]
+    significanceValues <- hd.df["SIGNIFICANCE"][,1]
+    
+        
     features <- unique(extraFields["FEATURE"])[,1]
-    jsn <- list(
-        "fields"             = fields,
-        "patientIDs"         = patientIDs,
-        "uids"               = uids,
-        "significanceValues" = significanceValues,
-        "logfoldValues"      = df["LOGFOLD"][,1],
-        "ttestValues"        = df["TTEST"][,1],
-        "pvalValues"         = df["PVAL"][,1],
-        "adjpvalValues"      = df["ADJPVAL"][,1],
-        "bvalValues"         = df["BVAL"][,1],
-        "ranking"            = ranking,
-        "features"           = features,
-        "extraFields"        = extraFields,
-        "maxRows"            = max_rows,
-        "warnings"           = c() # initiate empty vector
-    )
-    writeRunParams(max_rows, sorting, ranking)
-    measurements <- cleanUp(df)  # temporary stats like SD and MEAN need
-    # to be removed for clustering to work
 
+    
+    ## A df containing the computed value rankings for
+    ## all possible statistical methods
+    ranking_hd.df = getAllStatRanksForExtDataFrame(hd.df)
+    
+
+    ## The returned jsn object that will be dumped to file
+    jsn <- list(
+        "fields"              = fields,
+        "patientIDs"          = patientIDs,
+        "uids"                = uids,
+        "logfoldValues"       = hd.df["LOGFOLD"][,1],
+        "ttestValues"         = hd.df["TTEST"][,1],
+        "pvalValues"          = hd.df["PVAL"][,1],
+        "adjpvalValues"       = hd.df["ADJPVAL"][,1],
+        "bvalValues"          = hd.df["BVAL"][,1],
+        "ranking"             = ranking,
+        "features"            = features,
+        "extraFields"         = extraFields,
+        "extraFieldsExtended" = extraFieldsExtended.df,
+        "maxRows"             = max_rows,
+        "allStatRanking"      = ranking_hd.df,
+        "warnings"            = c() # initiate empty vector
+    )
+    
+    ## To keep track of the parameters selected for the execution of the code
+    writeRunParams(max_rows, sorting, ranking)
+    
+    # temporary stats like SD and MEAN need to be removed for clustering to work
+    measurements <- cleanUp(hd.df)  
+
+    
     # discard UID column
-    if (ncol(df) > 2){
+    if (ncol(hd.df) > 2){
         measurements <- measurements[, 2:ncol(measurements)]
     } else {
         measurements <- measurements[2]
@@ -83,12 +133,14 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     measurements <- toZscores(measurements)
     
     
-    if (is.na(significanceValues)) {
+    ## If no significanceValues are available throw a warning:
+    if (all(is.na(significanceValues)))
         jsn$warnings <- append(jsn$warnings, c("Significance sorting could not be done due to insufficient data"))
-    }
+    
+    
     jsn <- addClusteringOutput(jsn, measurements) #
     jsn <- toJSON(jsn, pretty = TRUE, digits = I(17))
-    writeDataForZip(df, measurements, patientIDs)  # for later zip generation
+    writeDataForZip(hd.df, measurements, patientIDs)  # for later zip generation
     write(jsn, file = "heatmap.json")
     # json file be served the same way
     # like any other file would - get name via
@@ -97,23 +149,15 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     msgs <- c("Finished successfuly")
     list(messages = msgs)
     
-#     ## SE: For dev purposes
-#     return(jsn)
-}
-
-## Check input args for heatmap 
-verifyInput <- function(max_rows, sorting) {
-    if (max_rows <= 0) {
-        stop("Max rows argument needs to be higher than zero.")
-    }
-    if (!(sorting == "nodes" || sorting == "subjects")) {
-        stop("Unsupported sorting type. Only nodes and subjects allowed")
-    }
+#     ## SE: For debug purposes
+#       return(jsn)
 }
 
 
-# # SE: For dev purposes we call the function here
-# out = main()
-# print(out)
+
+
+# SE: For debug purposes
+# out = main(ranking = "median")
+#print(out[1:20,])
 
 
