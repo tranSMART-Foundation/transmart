@@ -22,30 +22,31 @@
 TRANSMART_DATA_NAME="transmart-data-release-16.1"
 TRANSMART_DATA_ZIP="$TRANSMART_DATA_NAME.zip"
 TRANSMART_DATA_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_ZIP"
-TRANSMART_DATA_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_ZIP.asc"
+TRANSMART_DATA_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_ZIP.sig"
 
 TRANSMART_ETL_NAME="tranSMART-ETL-release-16.1"
 TRANSMART_ETL_ZIP="$TRANSMART_ETL_NAME.zip"
 TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP"
-TRANSMART_ETL_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP.asc"
+TRANSMART_ETL_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP.sig"
 
 TRANSMART_WAR_NAME="transmart.war"
 TRANSMART_WAR_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME"
-TRANSMART_WAR_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME.asc"
+TRANSMART_WAR_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME.sig"
 
 TRANSMART_GWAVA_WAR_NAME="gwava.war"
 TRANSMART_GWAVA_WAR_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME"
-TRANSMART_GWAVA_WAR_ASC_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.asc"
+TRANSMART_GWAVA_WAR_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.sig"
 
 # on error; stop/exit
 set -e
 
 # Helper function: use gpg to verify downaload
-# assumes <name> is downloaded file and <name>.asc is signature file
+# This assumes that the verify-signature setup is done and that the script directory has been verified
+# assumes <name> is downloaded file and <name>.sig is signature file
 # on current directory
 function verifyWithGpg {
 	filename=$1
-	gpg --verify $filename.asc
+	gpg --verify $filename.sig
 	echo "$?"
 	return $?
 }
@@ -116,7 +117,7 @@ cd $INSTALL_BASE
 sudo -v
 if ! [ -e $TRANSMART_DATA_ZIP ] ; then
 	curl $TRANSMART_DATA_URL -o $TRANSMART_DATA_ZIP
-	curl $TRANSMART_DATA_ASC_URL -o $TRANSMART_DATA_ZIP.asc
+	curl $TRANSMART_DATA_SIG_URL -o $TRANSMART_DATA_ZIP.sig
 fi
 returnedValue=$(verifyWithGpg "$TRANSMART_DATA_ZIP")
 if [ "$returnedValue" != "0" ] ; then
@@ -141,7 +142,7 @@ cd $INSTALL_BASE/transmart-data/env
 sudo -v
 if ! [ -e $TRANSMART_ETL_ZIP ] ; then
 	curl $TRANSMART_ETL_URL -o $TRANSMART_ETL_ZIP
-	curl $TRANSMART_ETL_ASC_URL -o $TRANSMART_ETL_ZIP.asc
+	curl $TRANSMART_ETL_SIG_URL -o $TRANSMART_ETL_ZIP.sig
 fi
 returnedValue=$(verifyWithGpg "$TRANSMART_ETL_ZIP")
 if [ "$returnedValue" != "0" ] ; then
@@ -170,7 +171,7 @@ fi
 cd war-files
 if ! [ -e transmart.war ]; then
 	curl $TRANSMART_WAR_URL --output transmart.war
-	curl $TRANSMART_WAR_ASC_URL --output transmart.war.asc
+	curl $TRANSMART_WAR_SIG_URL --output transmart.war.sig
 fi
 returnedValue=$(verifyWithGpg "transmart.war")
 if [ "$returnedValue" != "0" ] ; then
@@ -182,7 +183,7 @@ fi
 
 if ! [ -e gwava.war ]; then
 	curl $TRANSMART_GWAVA_WAR_URL --output gwava.war
-	curl $TRANSMART_GWAVA_WAR_ASC_URL --output gwava.war.asc
+	curl $TRANSMART_GWAVA_WAR_SIG_URL --output gwava.war.sig
 fi
 returnedValue=$(verifyWithGpg "gwava.war")
 if [ "$returnedValue" != "0" ] ; then
