@@ -6,12 +6,11 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.transmartproject.batch.beans.GenericFunctionalTestConfiguration
+import org.transmartproject.batch.beans.PersistentContext
 import org.transmartproject.batch.clinical.db.objects.Tables
-import org.transmartproject.batch.db.TableTruncator
 import org.transmartproject.batch.junit.JobRunningTestTrait
 import org.transmartproject.batch.junit.RunJobRule
 import org.transmartproject.batch.support.TableLists
@@ -43,7 +42,7 @@ class MrnaDataCleanScenarioTests implements JobRunningTestTrait {
     @ClassRule
     public final static TestRule RUN_JOB_RULES = new RuleChain([
             new RunJobRule(STUDY_ID, 'expression'),
-            new RunJobRule(PLATFORM_ID, 'annotation'),
+            new RunJobRule(PLATFORM_ID, 'mrna_annotation'),
             new RunJobRule("${STUDY_ID}_simple", 'clinical'),
     ])
 
@@ -53,8 +52,7 @@ class MrnaDataCleanScenarioTests implements JobRunningTestTrait {
 
     @AfterClass
     static void cleanDatabase() {
-        new AnnotationConfigApplicationContext(
-                GenericFunctionalTestConfiguration).getBean(TableTruncator).
+        PersistentContext.truncator.
                 truncate(TableLists.CLINICAL_TABLES + TableLists.MRNA_TABLES + 'ts_batch.batch_job_instance')
     }
 
@@ -90,6 +88,7 @@ class MrnaDataCleanScenarioTests implements JobRunningTestTrait {
                     sample_type,
                     trial_name,
                     tissue_type,
+                    timepoint,
                     gpl_id,
                     sample_cd
                 FROM ${Tables.SUBJ_SAMPLE_MAP} SSM
@@ -101,11 +100,12 @@ class MrnaDataCleanScenarioTests implements JobRunningTestTrait {
 
         assertThat r, allOf(
                 hasEntry('pd_sourcesystem_cd', "$STUDY_ID:$subjectId" as String),
-                hasEntry('cd_concept_path', '\\Public Studies\\GSE8581\\MRNA\\Biomarker_Data\\GPL570_BOGUS\\Lung\\'),
+                hasEntry('cd_concept_path', '\\Public Studies\\GSE8581\\Biomarker Data\\GPL570_BOGUS\\Lung\\'),
                 hasEntry(is('assay_id'), isA(Number)),
                 hasEntry('sample_type', 'Human'),
                 hasEntry('trial_name', STUDY_ID),
                 hasEntry('tissue_type', 'Lung'),
+                hasEntry('timepoint', 'T'),
                 hasEntry('gpl_id', 'GPL570_BOGUS'),
                 hasEntry('sample_cd', sampleCode),
         )

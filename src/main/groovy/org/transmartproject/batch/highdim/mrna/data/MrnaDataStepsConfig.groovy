@@ -19,7 +19,6 @@ import org.transmartproject.batch.db.DeleteByColumnValueWriter
 import org.transmartproject.batch.db.PostgresPartitionTasklet
 import org.transmartproject.batch.db.oracle.OraclePartitionTasklet
 import org.transmartproject.batch.highdim.beans.AbstractTypicalHdDataStepsConfig
-import org.transmartproject.batch.highdim.datastd.TripleStandardDataValue
 import org.transmartproject.batch.startup.StudyJobParametersModule
 
 /**
@@ -50,7 +49,7 @@ class MrnaDataStepsConfig extends AbstractTypicalHdDataStepsConfig {
     @Bean
     @Override
     @JobScope
-    ItemWriter<TripleStandardDataValue> getDataWriter() {
+    MrnaDataWriter getDataWriter() {
         new MrnaDataWriter()
     }
 
