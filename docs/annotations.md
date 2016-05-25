@@ -7,7 +7,7 @@ high dimensional type. The annotation is generally not specific to a certain
 dataset, and can be shared between two or more similar datasets.
 
 For historical reasons, parameter files named `annotation.params` refer to mRNA
-platforms. Other platforms' data types have more descriptive names.
+platforms. But you should prefer to use the `mrna_annotation.params` name for new files instead.
 
 Parameters
 ----------
@@ -22,6 +22,7 @@ Parameters
   the same name as the parameters file, minus its extension.
 - `ORGANISM` _Default: Homo Sapiens_. The scientific name of the species the annotation is associated
   with.
+- `GENOME_RELEASE` **Mandatory** if platform contains chromosomal region information. The genome build if applicable (e.g. `hg19`).
 
 <!-- vim: tw=80 et ft=markdown spell:
 -->

@@ -3,6 +3,13 @@ package org.transmartproject.batch.highdim.assays
 import org.springframework.batch.core.Step
 import org.springframework.batch.item.ItemStreamReader
 import org.springframework.batch.item.ItemWriter
+import org.springframework.batch.item.file.FlatFileItemReader
+import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper
+import org.springframework.batch.item.file.mapping.DefaultLineMapper
+import org.springframework.batch.item.file.separator.DefaultRecordSeparatorPolicy
+import org.springframework.batch.item.file.transform.DefaultFieldSetFactory
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer
+import org.springframework.batch.item.file.transform.FieldSetFactory
 import org.springframework.batch.item.validator.ValidatingItemProcessor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
@@ -14,6 +21,9 @@ import org.transmartproject.batch.clinical.db.objects.Tables
 import org.transmartproject.batch.db.DeleteByColumnValueWriter
 import org.transmartproject.batch.highdim.jobparams.StandardAssayParametersModule
 import org.transmartproject.batch.support.JobParameterFileResource
+import org.transmartproject.batch.support.ScientificNotationFormat
+
+import static org.springframework.batch.item.file.transform.DelimitedLineTokenizer.DELIMITER_TAB
 
 /**
  * Assay spring batch steps configuration
@@ -29,25 +39,43 @@ class AssayStepsConfig implements StepBuildingConfigurationTrait {
     Step readMappingFile(MappingsFileRowStore assayMappings,
                          MappingsFileRowValidator mappingFileRowValidator,
                          PlatformAndConceptsContextPromoterListener platformContextPromoterListener) {
-        def reader = tsvFileReader(
-                mappingFileResource(),
-                beanClass: MappingFileRow,
-                columnNames: ['studyId', 'siteId', 'subjectId', 'sampleCd',
-                              'platform', 'tissueType', 'attr1', 'attr2',
-                              'categoryCd', 'source_cd'],
-                linesToSkip: 1,
-                saveState: false,)
-
-
         steps.get('readMappingFile')
                 .allowStartIfComplete(true)
                 .chunk(1)
-                .reader(reader)
-                .processor(new ValidatingItemProcessor(adaptValidator(mappingFileRowValidator)))
+                .reader(mappingFileItemStreamReader())
+                .processor(compositeOf(
+                    new UpperCasePlatformIdItemProcessor(),
+                    new ValidatingItemProcessor(adaptValidator(mappingFileRowValidator)),
+                ))
                 .writer(new PutInBeanWriter(bean: assayMappings))
                 .stream(mappingFileRowValidator)
                 .listener(platformContextPromoterListener)
                 .build()
+    }
+
+    @Bean
+    ItemStreamReader<MappingFileRow> mappingFileItemStreamReader() {
+        FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory(
+                numberFormat: new ScientificNotationFormat()
+        )
+
+        DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer(
+                delimiter: DELIMITER_TAB,
+                names: ['studyId', 'siteId', 'subjectId', 'sampleCd',
+                        'platform', 'sampleType', 'tissueType', 'timePoint',
+                        'categoryCd', 'source_cd'],
+                fieldSetFactory: fieldSetFactory,
+        )
+        new FlatFileItemReader(
+                lineMapper: new DefaultLineMapper(
+                        lineTokenizer: lineTokenizer,
+                        fieldSetMapper: new BeanWrapperFieldSetMapper(targetType: MappingFileRow),
+                ),
+                recordSeparatorPolicy: new DefaultRecordSeparatorPolicy(),
+                resource: mappingFileResource(),
+                linesToSkip: 1,
+                skippedLinesCallback: new AssaysWrongFileHeaderWarningHandler(lineTokenizer),
+        )
     }
 
     @Bean
