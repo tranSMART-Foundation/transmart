@@ -21,7 +21,9 @@ import org.springframework.batch.item.file.mapping.DefaultLineMapper
 import org.springframework.batch.item.file.mapping.FieldSetMapper
 import org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper
 import org.springframework.batch.item.file.separator.DefaultRecordSeparatorPolicy
+import org.springframework.batch.item.file.transform.DefaultFieldSetFactory
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer
+import org.springframework.batch.item.file.transform.FieldSetFactory
 import org.springframework.batch.item.support.CompositeItemProcessor
 import org.springframework.batch.item.support.CompositeItemWriter
 import org.springframework.batch.item.validator.SpringValidator
@@ -34,8 +36,7 @@ import org.springframework.core.io.Resource
 import org.springframework.util.Assert
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 import org.transmartproject.batch.batchartifacts.*
-import org.transmartproject.batch.clinical.facts.ClinicalDataRow
-import org.transmartproject.batch.facts.ClinicalFactsRowSet
+import org.transmartproject.batch.support.ScientificNotationFormat
 import org.transmartproject.batch.support.TokenizerColumnsReplacingHeaderHandler
 
 import static org.springframework.batch.item.file.transform.DelimitedLineTokenizer.DELIMITER_TAB
@@ -43,7 +44,8 @@ import static org.springframework.batch.item.file.transform.DelimitedLineTokeniz
 /**
  * Trait with auxiliary methods for building steps.
  */
-@SuppressWarnings('BracesForClassRule') // buggy with traits
+@SuppressWarnings('BracesForClassRule')
+// buggy with traits
 trait StepBuildingConfigurationTrait {
 
     @Autowired
@@ -131,17 +133,11 @@ trait StepBuildingConfigurationTrait {
     }
 
     ItemProcessor compositeOf(ItemProcessor... processors) {
-        CompositeItemProcessor<ClinicalDataRow, ClinicalFactsRowSet> result =
-                new CompositeItemProcessor<ClinicalDataRow, ClinicalFactsRowSet>()
-        result.setDelegates(processors.toList())
-        result
+        new CompositeItemProcessor(delegates: processors.toList())
     }
 
     ItemWriter compositeOf(ItemWriter... writers) {
-        CompositeItemWriter result =
-                new CompositeItemWriter()
-        result.setDelegates(writers.toList())
-        result
+        new CompositeItemWriter(delegates: writers.toList())
     }
 
     static Step wrapStepWithName(final String name,
@@ -283,16 +279,28 @@ trait StepBuildingConfigurationTrait {
             tokenizerClass = EmptyStringsToNullLineTokenizer
         }
 
-        tokenizerClass.newInstance(
+        DelimitedLineTokenizer result = tokenizerClass.newInstance(
                 names: ((columnNames && columnNames != 'auto') ?
                         columnNames : []) as String[],
                 delimiter: DELIMITER_TAB,
                 strict: !allowMissingTrailingColumns,)
 
+        FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory(
+                numberFormat: new ScientificNotationFormat()
+        )
+        result.setFieldSetFactory(fieldSetFactory)
+
+        result
     }
 
     Validator adaptValidator(
             org.springframework.validation.Validator springValidator) {
-        new MessageResolverSpringValidator(springValidator, validationMessageSource())
+        adaptValidator(springValidator, [] as Set)
+    }
+
+    Validator adaptValidator(
+            org.springframework.validation.Validator springValidator,
+            Set<ValidationErrorMatcherBean> nonStoppingValidationErrors) {
+        new MessageResolverSpringValidator(springValidator, validationMessageSource(), nonStoppingValidationErrors)
     }
 }

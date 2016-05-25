@@ -37,6 +37,8 @@ class ProteomicsPlatformJobConfig {
     Step insertGplInfo
 
     @Resource
+    Step fillUniprotIdToUniprotNameMapping
+    @Resource
     Step deleteAnnotations
     @Resource
     Step insertAnnotations
@@ -44,9 +46,10 @@ class ProteomicsPlatformJobConfig {
     @Bean
     Job proteomicsPlatformLoadJob() {
         jobs.get(JOB_NAME)
-                .start(deleteGplInfo)
-                .next(deleteAnnotations)
+                .start(deleteAnnotations)
+                .next(deleteGplInfo)
                 .next(insertGplInfo)
+                .next(fillUniprotIdToUniprotNameMapping)
                 .next(insertAnnotations)
                 .build()
     }

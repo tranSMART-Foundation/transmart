@@ -7,15 +7,17 @@ Annotation
 The parameters file should be named `proteomics_annotation.params`.
 
 The annotations file has 7 columns.
-3 of them contain gene related information. These can be in any order, but their names
-need to be correct.
-The recommended order is `probesetID`, `uniprotID`,
+3 of them contain gene related information.
+The required order is `probesetID`, `uniprotID`,
 `species`, `gpl_id`, `chromosome`, `start`, `end`.
 
 Constraints:
 
 - The only mandatory columns are `probesetID` and `uniprotID`.
 - All gene region columns (`chromosome`, `start` and `end`) are required if at least one is provided. That is, either all or none of the gene information columns must be included.
+
+**Note:** The proteomics platform upload relies on the proteomics dictionary to seek uniprot names for the given uniprot identifiers. Currently proteomics dictionary could be uploaded by means of transmart-data.
+If there is no such protein information in the dictionary or the dictionary is not loaded at all the pipeline would fill in uniprot names with uniprot ids and warn user about this action.
 
 Example file:
 
@@ -39,12 +41,12 @@ Subject-Sample Mapping
 
 Here is a subject-sample mapping example file:
 
-| trial_name | site_id | subject_id | sample_cd               | platform   | tissue_type | attr1 | attr2 | cat_cd                                                                                                              | src_cd |
-|------------|---------|------------|-------------------------|------------|-------------|-------|-------|---------------------------------------------------------------------------------------------------------------------|--------|
-| CLUC       |         | CACO2      | LFQ.intensity.CACO2_1   | PROT_ANNOT | Colon       | LFQ-1 |       | Molecular profiling+High-throughput molecular profiling+Expression (protein)+LC-MS-MS+Protein level+ATTR1+MZ ratios | STD    |
-| CLUC       |         | CACO2      | LFQ.intensity.CACO2_2   | PROT_ANNOT | Colon       | LFQ-2 |       | Molecular profiling+High-throughput molecular profiling+Expression (protein)+LC-MS-MS+Protein level+ATTR1+MZ ratios | STD    |
-| CLUC       |         | COLO205    | LFQ.intensity.COLO205_1 | PROT_ANNOT | Colon       | LFQ-1 |       | Molecular profiling+High-throughput molecular profiling+Expression (protein)+LC-MS-MS+Protein level+ATTR1+MZ ratios | STD    |
-| CLUC       |         | COLO205    | LFQ.intensity.COLO205_2 | PROT_ANNOT | Colon       | LFQ-2 |       | Molecular profiling+High-throughput molecular profiling+Expression (protein)+LC-MS-MS+Protein level+ATTR1+MZ ratios | STD    |
+| trial_name | site_id | subject_id | sample_cd               | platform   | sample_type | tissue_type | time_point | cat_cd                                                                                                                   | src_cd |
+|------------|---------|------------|-------------------------|------------|-------------|-------------|------------|--------------------------------------------------------------------------------------------------------------------------|--------|
+| CLUC       |         | CACO2      | LFQ.intensity.CACO2_1   | PROT_ANNOT | LFQ-1       | Colon       | Week1      | Molecular profiling+High-throughput molecular profiling+Expression (protein)+LC-MS-MS+Protein level+SAMPLETYPE+MZ ratios | STD    |
+| CLUC       |         | CACO2      | LFQ.intensity.CACO2_2   | PROT_ANNOT | LFQ-2       | Colon       | Week1      | Molecular profiling+High-throughput molecular profiling+Expression (protein)+LC-MS-MS+Protein level+SAMPLETYPE+MZ ratios | STD    |
+| CLUC       |         | COLO205    | LFQ.intensity.COLO205_1 | PROT_ANNOT | LFQ-1       | Colon       | Week1      | Molecular profiling+High-throughput molecular profiling+Expression (protein)+LC-MS-MS+Protein level+SAMPLETYPE+MZ ratios | STD    |
+| CLUC       |         | COLO205    | LFQ.intensity.COLO205_2 | PROT_ANNOT | LFQ-2       | Colon       | Week1      | Molecular profiling+High-throughput molecular profiling+Expression (protein)+LC-MS-MS+Protein level+SAMPLETYPE+MZ ratios | STD    |
 
 
 Data
@@ -55,7 +57,7 @@ For the content of this file see [the HD data parameters](hd-params.md) and [the
 
 Example data file:
 
-| REF_ID | LFQ.intensity.CACO2_1 | LFQ.intensity.CACO2_2 | LFQ.intensity.COLO205_1 | LFQ.intensity.COLO205_2 |
+| ID_REF | LFQ.intensity.CACO2_1 | LFQ.intensity.CACO2_2 | LFQ.intensity.COLO205_1 | LFQ.intensity.COLO205_2 |
 |--------|-----------------------|-----------------------|-------------------------|-------------------------|
 | 1860   | 9089400000            | 8792800000            | 8949100000              | 7252500000              |
 | 2243   | 4997100000            | 5527800000            | 4280900000              | 4196200000              |
@@ -68,7 +70,7 @@ Example data file:
 
 Format expectations:
 
-- The first column has to be named `REF_ID` and contain a row identifier. The row identifier has to match the `probesetID` from the related platform.
+- The first column has to be named `ID_REF` and contain a row identifier. The row identifier has to match the `probesetID` from the related platform.
 - The rest of the columns have to be intensities. There must not be other columns in the file.
 - The header names for the intensities columns have to match the `sample_cd` values of the subject sample mapping file.
 

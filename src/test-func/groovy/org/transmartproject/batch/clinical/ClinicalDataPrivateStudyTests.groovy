@@ -5,12 +5,11 @@ import org.junit.ClassRule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.transmartproject.batch.beans.GenericFunctionalTestConfiguration
+import org.transmartproject.batch.beans.PersistentContext
 import org.transmartproject.batch.clinical.db.objects.Tables
-import org.transmartproject.batch.db.TableTruncator
 import org.transmartproject.batch.junit.JobRunningTestTrait
 import org.transmartproject.batch.junit.RunJobRule
 import org.transmartproject.batch.support.TableLists
@@ -31,13 +30,12 @@ class ClinicalDataPrivateStudyTests implements JobRunningTestTrait {
     public final static TestRule RUN_JOB_RULE = new RunJobRule(
             "${STUDY_ID}_simple",
             'clinical',
-            '-d', 'SECURITY_REQUIRED=Y')
+            ['-d', 'SECURITY_REQUIRED=Y'])
 
     @AfterClass
     static void cleanDatabase() {
         // TODO: implement backout study and call it here
-        new AnnotationConfigApplicationContext(
-                GenericFunctionalTestConfiguration).getBean(TableTruncator).
+        PersistentContext.truncator.
                 truncate(TableLists.CLINICAL_TABLES + 'ts_batch.batch_job_instance')
     }
 

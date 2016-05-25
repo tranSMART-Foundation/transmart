@@ -37,22 +37,16 @@ abstract class AbstractPlatformJobSpecification
 
     void validate(ExternalJobParametersInternalInterface ejp)
             throws InvalidParametersFileException {
-        ejp.with {
-            mandatory PLATFORM
-            mandatory TITLE
-            mandatory ANNOTATIONS_FILE
-        }
-        if (ejp[MARKER_TYPE]) {
-            throw new InvalidParametersFileException(
-                    "Parameter $MARKER_TYPE is not user settable")
-        }
+        mandatory ejp, PLATFORM
+        mandatory ejp, TITLE
+        mandatory ejp, ANNOTATIONS_FILE
     }
 
     abstract String getMarkerType()
 
     void munge(ExternalJobParametersInternalInterface ejp)
             throws InvalidParametersFileException {
-        ejp[ANNOTATIONS_FILE] = ejp.convertRelativePath ANNOTATIONS_FILE
+        ejp[ANNOTATIONS_FILE] = convertRelativePath ejp, ANNOTATIONS_FILE
 
         ejp[ORGANISM] = ejp[ORGANISM] ?: DEFAULT_ORGANISM
 

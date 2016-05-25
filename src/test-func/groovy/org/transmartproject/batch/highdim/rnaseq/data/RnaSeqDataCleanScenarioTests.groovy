@@ -6,18 +6,15 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.transmartproject.batch.beans.GenericFunctionalTestConfiguration
+import org.transmartproject.batch.beans.PersistentContext
 import org.transmartproject.batch.clinical.db.objects.Tables
-import org.transmartproject.batch.db.TableTruncator
 import org.transmartproject.batch.junit.JobRunningTestTrait
 import org.transmartproject.batch.junit.RunJobRule
 import org.transmartproject.batch.support.TableLists
 
-import static org.hamcrest.Matchers.equalTo
-import static org.hamcrest.Matchers.is
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
 import static org.transmartproject.batch.matchers.AcceptAnyNumberIsCloseTo.castingCloseTo
@@ -50,8 +47,7 @@ class RnaSeqDataCleanScenarioTests implements JobRunningTestTrait {
 
     @AfterClass
     static void cleanDatabase() {
-        new AnnotationConfigApplicationContext(
-                GenericFunctionalTestConfiguration).getBean(TableTruncator).
+        PersistentContext.truncator.
                 truncate(TableLists.CLINICAL_TABLES + TableLists.RNA_SEQ_TABLES + 'ts_batch.batch_job_instance',)
     }
 
@@ -87,6 +83,7 @@ class RnaSeqDataCleanScenarioTests implements JobRunningTestTrait {
                     sample_type,
                     trial_name,
                     tissue_type,
+                    timepoint,
                     gpl_id
                 FROM ${Tables.SUBJ_SAMPLE_MAP} SSM
                 LEFT JOIN ${Tables.PATIENT_DIMENSION} PD ON (SSM.patient_id = PD.patient_num)
@@ -97,11 +94,12 @@ class RnaSeqDataCleanScenarioTests implements JobRunningTestTrait {
 
         assertThat r, allOf(
                 hasEntry('pd_sourcesystem_cd', "$STUDY_ID:$subjectId" as String),
-                hasEntry('cd_concept_path', '\\Public Studies\\CLUC\\RNASEQ\\Test\\RnaSeq\\rcnt\\data\\'),
+                hasEntry('cd_concept_path', '\\Public Studies\\CLUC\\Test\\RnaSeq\\rcnt\\data\\'),
                 hasEntry(is('assay_id'), isA(Number)),
-                hasEntry('sample_type', 'Colon'),
+                hasEntry('sample_type', 'rcnt'),
                 hasEntry('trial_name', STUDY_ID),
-                hasEntry('tissue_type', 'rcnt'),
+                hasEntry('tissue_type', 'Colon'),
+                hasEntry('timepoint', 'tp1'),
                 hasEntry('gpl_id', PLATFORM_ID),
         )
     }

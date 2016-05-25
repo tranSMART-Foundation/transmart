@@ -13,19 +13,13 @@ final class StudyJobParametersModule implements ExternalJobParametersModule {
     final Set<String> supportedParameters =
             [STUDY_ID, TOP_NODE, SECURITY_REQUIRED]
 
+    void validate(ExternalJobParametersInternalInterface ejp) {
+        mandatory(ejp, STUDY_ID)
+    }
+
     void munge(ExternalJobParametersInternalInterface ejp)
             throws InvalidParametersFileException {
-        if (!ejp[STUDY_ID]) {
-            def absolutePath = ejp.filePath.toAbsolutePath()
-            def count = absolutePath.nameCount
-            if (count < 2) {
-                throw new InvalidParametersFileException("Could not " +
-                        "determine study id from path ${absolutePath}")
-            }
-            ejp[STUDY_ID] = absolutePath.subpath(count - 2, count - 1)
-        }
-
-        ejp.mungeBoolean(SECURITY_REQUIRED, false)
+        mungeBoolean(ejp, SECURITY_REQUIRED, false)
 
         if (!ejp[TOP_NODE]) {
             def prefix = ejp[SECURITY_REQUIRED] == 'Y' ?
@@ -36,6 +30,8 @@ final class StudyJobParametersModule implements ExternalJobParametersModule {
         }
 
         // should come last so the proper case is preserved for TOP_NODE
-        ejp[STUDY_ID] = ejp[STUDY_ID].toUpperCase(LocaleContextHolder.locale)
+        if (ejp[STUDY_ID]) {
+            ejp[STUDY_ID] = ejp[STUDY_ID].toUpperCase(LocaleContextHolder.locale)
+        }
     }
 }

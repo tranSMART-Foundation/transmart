@@ -4,14 +4,14 @@ import org.junit.AfterClass
 import org.junit.ClassRule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.transmartproject.batch.beans.GenericFunctionalTestConfiguration
+import org.transmartproject.batch.beans.PersistentContext
 import org.transmartproject.batch.clinical.db.objects.Tables
-import org.transmartproject.batch.db.TableTruncator
 import org.transmartproject.batch.junit.JobRunningTestTrait
 import org.transmartproject.batch.junit.RunJobRule
+import org.transmartproject.batch.startup.RunJob
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
@@ -31,12 +31,11 @@ class MrnaPlatformCleanScenarioTests implements JobRunningTestTrait {
     static final long NUMBER_OF_PROBES = 19
 
     @ClassRule
-    public final static RunJobRule RUN_JOB_RULE = new RunJobRule(PLATFORM_ID, 'annotation')
+    public final static RunJobRule RUN_JOB_RULE = new RunJobRule(PLATFORM_ID, 'mrna_annotation')
 
     @AfterClass
     static void cleanDatabase() {
-        new AnnotationConfigApplicationContext(
-                GenericFunctionalTestConfiguration).getBean(TableTruncator).
+        PersistentContext.truncator.
                 truncate([Tables.GPL_INFO, Tables.MRNA_ANNOTATION, 'ts_batch.batch_job_instance'])
     }
 
@@ -49,7 +48,7 @@ class MrnaPlatformCleanScenarioTests implements JobRunningTestTrait {
         def p = [platform: PLATFORM_ID_NORM]
 
         Map<String, Object> r = queryForMap q, p
-        /* these are the values in GPL570_bogus/annotation.params */
+        /* these are the values in GPL570_bogus/mrna_annotation.params */
         assertThat r, allOf(
                 hasEntry('title', 'Affymetrix Human Genome U133A 2.0 Array'),
                 hasEntry('organism', 'Homo Sapiens'),
@@ -140,6 +139,21 @@ class MrnaPlatformCleanScenarioTests implements JobRunningTestTrait {
         assertThat date, allOf(
                 is(notNullValue()),
                 is(expectedDate))
+    }
+
+    @Test
+    void testOldParamsFileIsSupported() {
+        def runJob = RunJob.createInstance('-p', 'studies/' + PLATFORM_ID + '/annotation.params')
+        def intResult = runJob.run()
+
+        assertThat 'second execution is successful', intResult, is(0)
+        def q = """
+                SELECT COUNT(DISTINCT probe_id)
+                FROM ${Tables.MRNA_ANNOTATION}
+                WHERE gpl_id = :platform"""
+        def p = [platform: PLATFORM_ID_NORM]
+        def count = jdbcTemplate.queryForObject q, p, Long
+        assertThat count, is(equalTo(NUMBER_OF_PROBES))
     }
 
 }
