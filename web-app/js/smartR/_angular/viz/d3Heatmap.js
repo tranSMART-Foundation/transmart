@@ -157,6 +157,7 @@ window.smartRApp.directive('heatmapPlot', [
             }
 
             function updateHeatmap() {
+                updateHeatmapTable();
                 var square = squareItems.selectAll('.square')
                     .data(fields, function (d) {
                         return 'patientID-' + d.PATIENTID + '-uid-' + d.UID;
@@ -771,6 +772,59 @@ window.smartRApp.directive('heatmapPlot', [
                     })
                     .attr('width', gridFieldWidth)
                     .attr('height', gridFieldHeight / 2);
+            }
+
+            function resetHeatmapTable() {
+                d3.selectAll('.sr-heatmap-table').remove();
+            }
+
+            function updateHeatmapTable() {
+                resetHeatmapTable();
+
+                var HEADER = ['Probe Name', 'Entity', 'Log2 Fold Change', 't-test', 'p-value', 'Adjusted p-value', 'B-value'];
+                var table = d3.select(root).append('table')
+                    .attr('class', 'sr-heatmap-table');
+                var thead = table.append('thead');
+                var tbody = table.append('tbody');
+
+                thead.append('tr')
+                    .selectAll('th')
+                    .data(HEADER)
+                    .enter()
+                    .append('th')
+                    .text(function (d) {
+                        return d;
+                    });
+
+                var probeIDs = [];
+                var entities = [];
+                uids.forEach(function(uid) {
+                    probeIDs.push(uid.match(/.+(?=--)/)[0]);
+                    entities.push(uid.match(/.+?--(.*)/)[1]);
+                });
+
+                var rows = tbody.selectAll('tr')
+                    .data(Array(probeIDs.length).fill().map(function(v, i) { return i; }))
+                    .enter()
+                    .append('tr');
+
+                rows.selectAll('td')
+                    .data(function(d, i) { 
+                        return [
+                            probeIDs[i],
+                            entities[i],
+                            logfoldValues[i],
+                            ttestValues[i],
+                            pvalValues[i],
+                            adjpvalValues[i],
+                            bvalValues[i]
+                        ];
+                    })
+                    .enter()
+                    .append('td')
+                    .text(function(d) {
+                        return d;
+                    });
             }
 
             function zoom(zoomLevel) {

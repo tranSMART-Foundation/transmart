@@ -100,14 +100,20 @@
     stroke-width: 2px;
 }
 
-.tooltip {
-    position: absolute;
-    text-align: center;
-    display: inline-block;
-    padding: 0;
-    font-size: 12px;
-    font-weight: bold;
-    color: black;
-    background: white;
-    pointer-events: none;
+.sr-heatmap-table {
+    border-collapse: collapse;
 }
+
+.sr-heatmap-table th {
+    font-weight: bold;
+}
+
+.sr-heatmap-table tr {
+
+}
+
+.sr-heatmap-table td {
+    border: solid 1px black;
+    padding: 4px;
+}
+
