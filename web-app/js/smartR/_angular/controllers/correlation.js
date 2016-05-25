@@ -8,7 +8,6 @@ window.smartRApp.controller('CorrelationController',
         commonWorkflowService.initializeWorkflow('correlation', $scope);
 
         $scope.fetch = {
-            valid: false,
             disabled: false,
             running: false,
             loaded: false,

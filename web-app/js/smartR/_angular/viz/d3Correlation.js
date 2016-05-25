@@ -22,6 +22,7 @@ window.smartRApp.directive('correlationPlot', [
                 scope.$watch('data', function() {
                     $(element[0]).empty();
                     if (! $.isEmptyObject(scope.data)) {
+                        smartRUtils.prepareWindowSize(scope.width, scope.height);
                         createCorrelationViz(scope, element[0]);
                     }
                 });

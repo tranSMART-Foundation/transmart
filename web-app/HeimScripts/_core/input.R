@@ -1,37 +1,3 @@
-
-# TODO: Works only for LDD
-parse.input <- function(sourceLabel, loaded_variables, type) {
-    if (type == "numerical") return(parse.ldd.num.input(sourceLabel, loaded_variables))
-    if (type == "categorical") return(parse.ldd.cat.input(sourceLabel, loaded_variables))
-    stop(paste(type, "is not supported by parse.input, yet."))
-}
-
-# merge numeric LDD into single dataframe by given sourceLabel
-# basically this makes a single dataframe of a numeric concept box
-# returns data.frame(patientID=c(...), concept1=c(...), concept2=c(...), ...)
-parse.ldd.num.input <- function(sourceLabel, loaded_variables) {
-    filtered.loaded_variables <- get.loaded_variables.by.source(sourceLabel, loaded_variables)
-    if (length(filtered.loaded_variables) == 0) return(data.frame(patientID=integer()))
-    df <- Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables) # merge alle matching dfs
-    colnames(df)[1] <- 'patientID'
-    df
-}
-
-# merge categoric LDD into single dataframe by given sourceLabel
-# basically this makes a single dataframe of a categoric concept box
-# returns data.frame(patientID=c(...), category=c(...))
-parse.ldd.cat.input <- function(sourceLabel, loaded_variables) {
-    filtered.loaded_variables <- get.loaded_variables.by.source(sourceLabel, loaded_variables)
-    if (length(filtered.loaded_variables) == 0) return(data.frame(patientID=integer(), category=character()))
-    df <- Reduce(function(...) merge(..., by='Row.Label', all=T), filtered.loaded_variables) # merge alle matching dfs
-    patientIDs <- df["Row.Label"]
-    df["Row.Label"] <- NULL
-    merged.values <- apply(df, 1, function(row) paste(row, collapse=""))
-    df <- data.frame(patientIDs, category=merged.values)
-    colnames(df)[1] <- 'patientID'
-    df
-}
-
 # give me only the loaded_variables that match my sourceLabel
 get.loaded_variables.by.source <- function(sourceLabel, loaded_variables) {
     SoNoSu.labels <- names(loaded_variables)

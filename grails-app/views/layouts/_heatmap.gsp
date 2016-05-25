@@ -30,7 +30,7 @@
                     show-summary-stats="true"
                     summary-data="fetch.scriptResults"
                     all-samples="common.totalSamples"
-                    subsets="common.subsets"
+                    allowed-cohorts="[1,2]"
                     number-of-rows="common.numberOfRows">
             </fetch-button>
             <br/>
@@ -110,8 +110,8 @@
             %{--Type of sorting to apply--}%
             <div class="heim-input-field  sr-input-area">
                 <sorting-criteria criteria="runAnalysis.params.ranking"
-                                  subsets="common.subsets"
-                                  samples="common.totalSamples">
+                                  samples="common.totalSamples"
+                                  subsets="common.subsets">
                 </sorting-criteria>
             </div>
 
@@ -121,12 +121,13 @@
                         store-results-in="runAnalysis.scriptResults"
                         script-to-run="run"
                         arguments-to-use="runAnalysis.params"
-                        serialized="true"
+                        filename="heatmap.json"
                         running="runAnalysis.running">
             </run-button>
             <capture-plot-button filename="heatmap.svg" disabled="runAnalysis.download.disabled"></capture-plot-button>
             <download-results-button disabled="runAnalysis.download.disabled"></download-results-button>
             <br/>
+            <workflow-warnings warnings="runAnalysis.scriptResults.warnings"></workflow-warnings>
             <heatmap-plot data="runAnalysis.scriptResults" width="1200" height="1200" params="runAnalysis.params"></heatmap-plot>
 
         </workflow-tab>

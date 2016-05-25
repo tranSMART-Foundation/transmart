@@ -23,6 +23,7 @@ window.smartRApp.directive('boxplot', [
             scope.$watch('data', function () {
                 $(element[0]).empty();
                 if (! $.isEmptyObject(scope.data)) {
+                    smartRUtils.prepareWindowSize(scope.width, scope.height);
                     createBoxplot(scope, element[0]);
                 }
             });
@@ -101,7 +102,7 @@ window.smartRApp.directive('boxplot', [
             .attr('class', 'd3-tip')
             .offset([-10, 0])
             .html(function(d) { return d; });
-    
+
         boxplot.call(tip);
 
         var brush = d3.svg.brush()
@@ -130,7 +131,7 @@ window.smartRApp.directive('boxplot', [
 
         boxplot.call(contextMenu);
 
-        var observer = new MutationObserver(function() { 
+        var observer = new MutationObserver(function() {
             $('#excludeButton').on('click', function() {
                 contextMenu.hide();
                 excludeSelection();

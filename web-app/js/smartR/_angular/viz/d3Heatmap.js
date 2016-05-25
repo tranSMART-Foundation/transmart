@@ -5,8 +5,7 @@
 window.smartRApp.directive('heatmapPlot', [
     'smartRUtils',
     'controlElements',
-    '$http',
-    function(smartRUtils, controlElements, $http) {
+    function(smartRUtils, controlElements) {
 
         return {
             restrict: 'E',
@@ -31,6 +30,7 @@ window.smartRApp.directive('heatmapPlot', [
         };
 
         function createHeatmap(data, root, params) {
+            console.log(data);
             var animationDuration = 1500;
             var extraFields = data.extraFields === undefined ? [] : data.extraFields;
             var features = data.features === undefined ? [] : data.features;
@@ -46,12 +46,10 @@ window.smartRApp.directive('heatmapPlot', [
             var uids = data.uids;
             var numberOfClusteredColumns = data.numberOfClusteredColumns[0];
             var numberOfClusteredRows = data.numberOfClusteredRows[0];
-            // var warning = data.warnings === undefined ? '' : data.warnings;
             var maxRows = data.maxRows[0];
             var geneCardsAllowed = JSON.parse(params.geneCardsAllowed);
             var rowClustering = true;
             var colClustering = true;
-
             var originalPatientIDs = patientIDs.slice();
             var originalUIDs = uids.slice();
 
@@ -84,6 +82,10 @@ window.smartRApp.directive('heatmapPlot', [
 
             var width = gridFieldWidth * patientIDs.length;
             var height = gridFieldHeight * uids.length;
+
+            // FIXME: This is here because the sizing of the whole heatmap is kind of messed up
+            // At one point in the future we need to fix this
+            smartRUtils.prepareWindowSize(width * 2 + margin.left + margin.right, height * 2 + margin.top + margin.right);
 
             var selectedPatientIDs = [];
 
@@ -144,8 +146,6 @@ window.smartRApp.directive('heatmapPlot', [
             var labelItems = heatmap.append('g');
             var barItems = heatmap.append('g');
             var legendItems = heatmap.append('g');
-            // var warningDiv = $('#heim-heatmap-warnings').append('strong')
-            //     .text(warning);
 
             // this code is needed for the legend generation
             var zScores = fields.map(function(d) { return d.ZSCORE; });
@@ -157,6 +157,7 @@ window.smartRApp.directive('heatmapPlot', [
             }
 
             function updateHeatmap() {
+                updateHeatmapTable();
                 var square = squareItems.selectAll('.square')
                     .data(fields, function (d) {
                         return 'patientID-' + d.PATIENTID + '-uid-' + d.UID;
@@ -185,12 +186,12 @@ window.smartRApp.directive('heatmapPlot', [
                         d3.select('.uid.uid-' + smartRUtils.makeSafeForCSS(d.UID))
                             .classed('highlight', true);
 
-                        var html = '';
-                        for (var key in d) {
-                            if (d.hasOwnProperty(key)) {
-                                html += key + ': ' + d[key] + '<br/>';
-                            }
-                        }
+                        var html = 'Log2: ' + d.VALUE + '<br/>' +
+                            'z-Score: ' + d.ZSCORE + '<br/>' +
+                            'Column: ' + d.PATIENTID + '<br/>' +
+                            'Row: ' + d.UID + '<br/>' +
+                            'Subset: ' + d.SUBSET + '<br/>';
+
                         tip.show(html);
                     })
                     .on('mouseout', function () {
@@ -261,7 +262,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('width', gridFieldWidth)
                     .attr('height', gridFieldHeight)
                     .on('click', function (patientID) {
-                        d3.selectAll('.box').classed('sortedBy', false);
+                        d3.selectAll('.colSortBox').classed('sortedBy', false);
                         d3.select(this).classed('sortedBy', true);
 
                         var rowValues = uids.map(function (uid, idx) {
@@ -329,7 +330,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('width', gridFieldWidth)
                     .attr('height', gridFieldHeight)
                     .on('click', function (uid) {
-                        d3.selectAll('.box').classed('sortedBy', false);
+                        d3.selectAll('.rowSortBox').classed('sortedBy', false);
                         d3.select(this).classed('sortedBy', true);
 
                         var colValues = patientIDs.map(function (patientID, idx) {
@@ -567,7 +568,7 @@ window.smartRApp.directive('heatmapPlot', [
                         return gridFieldHeight * idx;
                     })
                     .style('fill', function (d) {
-                        return d.significance > 0 ? 'steelblue' : '#990000';
+                        return d.significance > 0 ? '#990000' : 'steelblue';
                     })
                     .on('mouseover', function (d) {
                         var html = 'Ranking (' + ranking + '): ' + d.significance;
@@ -596,7 +597,7 @@ window.smartRApp.directive('heatmapPlot', [
                         return gridFieldHeight * d.idx;
                     })
                     .style('fill', function (d) {
-                        return d.significance > 0 ? 'steelblue' : '#990000';
+                        return d.significance > 0 ? '#990000' : 'steelblue';
                     });
 
                 var featurePosY = -gridFieldWidth * 2 - smartRUtils.getMaxWidth(d3.selectAll('.patientID')) -
@@ -771,6 +772,59 @@ window.smartRApp.directive('heatmapPlot', [
                     })
                     .attr('width', gridFieldWidth)
                     .attr('height', gridFieldHeight / 2);
+            }
+
+            function resetHeatmapTable() {
+                d3.selectAll('.sr-heatmap-table').remove();
+            }
+
+            function updateHeatmapTable() {
+                resetHeatmapTable();
+
+                var HEADER = ['Probe Name', 'Entity', 'Log2 Fold Change', 't-test', 'p-value', 'Adjusted p-value', 'B-value'];
+                var table = d3.select(root).append('table')
+                    .attr('class', 'sr-heatmap-table');
+                var thead = table.append('thead');
+                var tbody = table.append('tbody');
+
+                thead.append('tr')
+                    .selectAll('th')
+                    .data(HEADER)
+                    .enter()
+                    .append('th')
+                    .text(function (d) {
+                        return d;
+                    });
+
+                var probeIDs = [];
+                var entities = [];
+                uids.forEach(function(uid) {
+                    probeIDs.push(uid.match(/.+(?=--)/)[0]);
+                    entities.push(uid.match(/.+?--(.*)/)[1]);
+                });
+
+                var rows = tbody.selectAll('tr')
+                    .data(Array(probeIDs.length).fill().map(function(v, i) { return i; }))
+                    .enter()
+                    .append('tr');
+
+                rows.selectAll('td')
+                    .data(function(d, i) { 
+                        return [
+                            probeIDs[i],
+                            entities[i],
+                            logfoldValues[i],
+                            ttestValues[i],
+                            pvalValues[i],
+                            adjpvalValues[i],
+                            bvalValues[i]
+                        ];
+                    })
+                    .enter()
+                    .append('td')
+                    .text(function(d) {
+                        return d;
+                    });
             }
 
             function zoom(zoomLevel) {
@@ -1130,19 +1184,26 @@ window.smartRApp.directive('heatmapPlot', [
                             genes = genes.concat(split);
                         });
 
-                        $http({
-                            url: pageInfo.basePath + '/SmartR/goToBiocompendium',
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            config: {
-                                timeout: 5000
-                            },
+                        var request = $.ajax({
+                            url: pageInfo.basePath + '/SmartR/biocompendium',
+                            type: 'POST',
+                            timeout: 5000,
                             data: {
                                 genes: genes.join(' ')
                             }
                         });
+
+                        request.then(
+                            function(response) {
+                                console.log(response);
+                                var sessionID = response.match(/tmp_\d+/)[0];
+                                var url = 'http://biocompendium.embl.de/' +
+                                    'cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=' +
+                                    sessionID + '&list=gene_list_1__1&list_size=15&org=human';
+                                window.open(url);
+                            },
+                            function(response) { alert("Error:", response); }
+                        );
                     })
                     .on('mouseover', function (d) {
                         tip.show('Height: ' + d.height);

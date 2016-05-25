@@ -9,18 +9,6 @@
     shape-rendering: crispEdges;
 }
 
-.tooltip {
-    position: absolute;
-    text-align: center;
-    display: inline-block;
-    padding: 0;
-    font-size: 12px;
-    font-weight: bold;
-    color: #FFFFFF;
-    background: #123456;
-    pointer-events: none;
-}
-
 .square {
 
 }
@@ -56,7 +44,7 @@
     font-size: 14px;
 }
 
-.mytable, .myth, .mytd {
+.volcanoplot-table, .myth, .mytd {
     border: 1px solid black;
     border-collapse: collapse;
 }

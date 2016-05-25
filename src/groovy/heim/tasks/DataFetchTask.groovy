@@ -261,7 +261,10 @@ class DataFetchTask extends AbstractTask {
             try {
                 PeekingIterator<? extends DataRow> it =
                         Iterators.peekingIterator(tabularResult.iterator())
-                boolean isBioMarker = it.peek().hasProperty('bioMarker')
+                boolean isBioMarker = false 
+                try { 
+                    isBioMarker = it.peek().hasProperty('bioMarker')
+                } catch(NoSuchElementException e) {}
                 if (isBioMarker == null) isBioMarker = false
                 writeHeader(csvWriter, isBioMarker, tabularResult.indicesList)
                 it.each { DataRow row ->

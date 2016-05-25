@@ -6,6 +6,9 @@ main <- function(excludedPatientIDs = integer()) {
     output$excludedPatientIDs <- excludedPatientIDs
 
     df1 <- loaded_variables$datapoints_n0_s1
+    if (nrow(df1) == 0) {
+        stop(paste("Variable '", fetch_params$ontologyTerms$datapoints_n0$name, "' has no patients for subset 1"), sep="")
+    }
     df1 <- prepareData(df1, excludedPatientIDs)
     output <- addBoxplotStats(output, "Subset 1", df1)
     output$globalMin <- min(df1$value)
@@ -13,6 +16,9 @@ main <- function(excludedPatientIDs = integer()) {
 
     if(!is.null(loaded_variables$datapoints_n0_s2)) {
         df2 <- loaded_variables$datapoints_n0_s2
+        if (nrow(df2) == 0) {
+            stop(paste("Variable '", fetch_params$ontologyTerms$datapoints_n0$name, "' has no patients for subset 2"), sep="")
+        }
         df2 <- prepareData(df2, excludedPatientIDs)
         output <- addBoxplotStats(output, "Subset 2", df2)
         output$globalMin <- min(df1$value, df2$value)

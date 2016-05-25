@@ -85,6 +85,24 @@ window.smartRApp.factory('rServeService', [
             }, SESSION_TOUCH_DELAY);
         }
 
+        service.deleteSessionFiles = function(sessionId) {
+            sessionId = sessionId || state.sessionId;
+
+            return $http({
+                url: pageInfo.basePath + '/RSession/deleteFiles',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                config: {
+                    timeout: TIMEOUT
+                },
+                data: {
+                    sessionId: sessionId
+                }
+            });
+        }
+
         service.destroySession = function(sessionId) {
             sessionId = sessionId || state.sessionId;
 
@@ -160,6 +178,9 @@ window.smartRApp.factory('rServeService', [
             var promise = $q(function(resolve, reject) {
                 runRequest.then(
                     function(response) {
+                        if (!response.data) {
+                            console.error('Unexpected response:', response);
+                        }
                         taskData.executionId = response.data.executionId;
                         _checkStatus(taskData.executionId, resolve, reject);
                     },
@@ -228,14 +249,15 @@ window.smartRApp.factory('rServeService', [
                 '&executionId=' + executionId + '&filename=' + filename;
         };
 
-        service.loadDataIntoSession = function(conceptKeys, dataConstraints) {
+        service.loadDataIntoSession = function(conceptKeys, dataConstraints, projection) {
+            projection = typeof projection === 'undefined' ? 'log_intensity' : projection; // default to log_intensity
             return $q(function(resolve, reject) {
                 smartRUtils.getSubsetIds().then(
                     function(subsets) {
                         var _arg = {
                             conceptKeys: conceptKeys,
                             resultInstanceIds: subsets,
-                            projection:'log_intensity'
+                            projection: projection
                         };
 
                         if (typeof dataConstraints !== 'undefined') {
@@ -257,13 +279,14 @@ window.smartRApp.factory('rServeService', [
             });
         };
 
-        service.executeSummaryStats = function(phase) {
+        service.executeSummaryStats = function(phase, projection) {
+            projection = typeof projection === 'undefined' ? 'log_intensity' : projection; // default to log_intensity
             return $q(function(resolve, reject) {
                 service.startScriptExecution({
                     taskType: 'summary',
                     arguments: {
                         phase: phase,
-                        projection: 'log_intensity' // always required, even for low-dim data
+                        projection: projection // always required, even for low-dim data
                     }
                 }).then(
                     function(response) {

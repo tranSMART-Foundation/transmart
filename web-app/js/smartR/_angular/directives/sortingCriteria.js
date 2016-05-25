@@ -9,8 +9,8 @@ window.smartRApp.directive('sortingCriteria', [
             restrict: 'E',
             scope: {
                 criteria : '=',
-                subsets : '=',
-                samples: '='
+                samples: '=',
+                subsets: '='
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/sortingCriteria.html'
         };

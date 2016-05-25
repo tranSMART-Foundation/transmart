@@ -15,7 +15,7 @@
 ## the accordingly highest ranked probes
 applyRanking <- function (df, ranking, max_rows) {
   nrows = min(max_rows, nrow(df))
-  
+
   if (ranking %in% c("ttest", "logfold")) {
     df["SIGNIFICANCE_ABS"] <- abs(df["SIGNIFICANCE"])
     df <- df[with(df, order(-SIGNIFICANCE_ABS)), ]
@@ -29,7 +29,7 @@ applyRanking <- function (df, ranking, max_rows) {
     df <- df[with(df, order(-SIGNIFICANCE)), ]
     df <- df[1:nrows, ]
   }
-  
+
   df
 }
 
@@ -41,18 +41,18 @@ applySorting <- function(df,sorting) {
   subsets <- getSubset(colNames)
   nodes <- getNode(colNames)
   subjects <- getSubject(colNames)
-  
+
   timelineValues <- getTimelineValues(nodes, fetch_params$ontologyTerms)
-  
-  
+
+
   if (sorting == "nodes") {
     inds <- order(subsets, timelineValues, nodes, subjects)
   } else {
     inds <- order(subsets, subjects, timelineValues, nodes)
   }
-  
+
   measurements <- measurements[, inds]
-  
+
   cbind(df[, c(1,2)], measurements)
 }
 
@@ -67,47 +67,48 @@ addStats <- function(df, sorting, ranking, max_rows) {
   measurements  <- getMeasurements(df)
   rankingMethod <- getRankingMethod(ranking)
   twoSubsets    <- hasTwoSubsets(measurements)
-  
+
   logfold.values <- data.frame(LOGFOLD=numeric())
   ttest.values <- data.frame(TTEST=numeric())
   pval.values <- data.frame(PVAL=numeric())
   adjpval.values <- data.frame(ADJPVAL=numeric())
   bval.values <- data.frame(BVAL=numeric())
   rankingScore <- data.frame(SIGNIFICANCE=numeric())
-  
-  
+
+  useLimma <- !is.function(rankingMethod)  # rankingMethod is either a function or a character "limma"
+  # is it a valid GEX matrix for differential expression analysis containing enough not NA values?
+  validLimmaMeasurements <- isValidLimmaMeasurements(measurements)
+
   if (ncol(df) > 3) {
-    
+
     #this is the case for more than 1 sample
     df <- applySorting(df,sorting)  # no need for sorting in one sample case, we do it here only
-    
-    
-    # is it a valid GEX matrix for differential expression analysis containing enough not NA values?
+
+
     validLimmaMeasurements <- isValidLimmaMeasurements(measurements)
-    
-    
+
+
     if (twoSubsets && validLimmaMeasurements) {
       markerTable  <- getDEgenes(df)  # relies on columns being sorted,
     }                                 # with subset1 first, this is because of the way
     # design matrix is being constructed
-    
-    useLimma <- !is.function(rankingMethod)  # rankingMethod is either a function or a character "limma"
+
     if (useLimma  && !twoSubsets) {  # cannot use any of the limma methods for single subset.
       stop( paste("Illegal ranking method: ", ranking, " two subsets needed.") )
     }
-    
-    
+
+
     if (useLimma && validLimmaMeasurements) {
-      
+
       if (!ranking %in% colnames(markerTable) )
         stop(paste("Illegal ranking method selected: ", ranking) )
-      
+
       logfold.values <- markerTable["logfold"]
       ttest.values <- markerTable["ttest"]
       pval.values <- markerTable["pval"]
       adjpval.values <- markerTable["adjpval"]
       bval.values <- markerTable["bval"]
-      
+
       # Obtain the rankingScore based on selected diff expr statistics
       rankingScore <- markerTable[ranking]
     } else if (useLimma && !validLimmaMeasurements)  {
@@ -115,19 +116,19 @@ addStats <- function(df, sorting, ranking, max_rows) {
       # is selected while it's not valid limma measurements,
       # provide empty data frame to the significance columns.
     } else {
-      
+
       rankingScore <- apply(measurements, 1, rankingMethod, na.rm = TRUE )  # Calculating ranking per probe (per row)
     }
-    
+
     means <- rowMeans(measurements, na.rm = T)  # this is just an
     # auxiliary column - it will not be
     # used for JSON.
     sdses <- apply(measurements,1 ,sd , na.rm = T)  # this is just
     # an auxiliary column -
     # it will not be used for JSON.
-    
+
     cleanUpLimmaOutput(markerTableJson = markerTableJson)  # In order to prevent displaying the table from previous run.
-    
+
     if (twoSubsets && validLimmaMeasurements) {
       markerTable["SIGNIFICANCE"] <- rankingScore
       markerTable                 <- applyRanking(markerTable, ranking, max_rows)
@@ -135,7 +136,7 @@ addStats <- function(df, sorting, ranking, max_rows) {
       writeMarkerTable(markerTable, markerTableJson = markerTableJson)
     }
   }
-  
+
   df["MEAN"]         <- means
   df["SD"]           <- sdses
   df["SIGNIFICANCE"] <- rankingScore
@@ -144,14 +145,14 @@ addStats <- function(df, sorting, ranking, max_rows) {
   df["PVAL"] <- pval.values
   df["ADJPVAL"] <- adjpval.values
   df["BVAL"] <- bval.values
-  
+
   if (useLimma & !validLimmaMeasurements) {
     # dont apply ranking
   } else {
     # else apply
     df <- applyRanking(df, ranking, max_rows)
   }
-  
+
   return(df)
 }
 
@@ -174,14 +175,14 @@ getMeasurements <- function(df) {
 ## This function removes rows with duplicate probe id (). Only the data row with first
 ## occurence of the probe id is kept. Probe id and gene symbol get merged to uid variable.
 mergeDuplicates <- function(df) {
-  
+
   ## Which probes have multiple entries in df GEX matrix?
   ## This situation can happen when non unique probe ids get
   ## used like for example gene symbols
   dupl.where <- duplicated(df$Row.Label)
   dupl.rows <- df[dupl.where, ]
   df <- df[! dupl.where, ]
-  
+
   uids <- paste(df$Row.Label, df$Bio.marker, sep="--")
   uids[df$Row.Label == dupl.rows$Row.Label] <- paste(uids[df$Row.Label == dupl.rows$Row.Label], dupl.rows$Bio.marker[df$Row.Label == dupl.rows$Row.Label], sep="--")
   df <- cbind(UID=uids, df[, -c(1,2)])
@@ -206,21 +207,21 @@ parseInput <- function() {
 
 mergeFetchedData <- function(listOfHdd){
   df <- listOfHdd[[1]]
-  
+
   #test if the different data.frames all contain the exact same set of probe IDs/metabolites/etc, independent of order.
   row.Labels<- df$Row.Label
-  
+
   for(i in 1:length(listOfHdd)){
     if(!all(listOfHdd[[i]]$Row.Label %in% row.Labels) | !all(row.Labels %in% listOfHdd[[i]]$Row.Label) ){
       assign("errors", "Mismatched probe_ids - different platform used?", envir = .GlobalEnv)
     }
   }
-  
+
   #merge data.frames
   expected.rowlen <- nrow(df)
   labels <- names(listOfHdd)
   df <- add.subset.label(df,labels[1])
-  
+
   if(length(listOfHdd) > 1){
     for(i in 2:length(listOfHdd)){
       df2 <- listOfHdd[[i]]
@@ -277,7 +278,7 @@ cleanUp <- function(df) {
 ## the accordingly highest ranked probes
 applyRanking <- function (df, ranking, max_rows) {
   nrows = min(max_rows, nrow(df))
-  
+
   if (ranking %in% c("ttest", "logfold")) {
     df["SIGNIFICANCE_ABS"] <- abs(df["SIGNIFICANCE"])
     df <- df[with(df, order(-SIGNIFICANCE_ABS)), ]
@@ -291,7 +292,7 @@ applyRanking <- function (df, ranking, max_rows) {
     df <- df[with(df, order(-SIGNIFICANCE)), ]
     df <- df[1:nrows, ]
   }
-  
+
   df
 }
 
@@ -308,13 +309,13 @@ buildFields <- function(df) {
   df["MEAN"]  <- NULL
   df["SD"]    <- NULL
   df["SIGNIFICANCE"] <- NULL
-  
+
   names(df)   <- c("UID", "LOGFOLD", "TTEST", "PVAL", "ADJPVAL", "BVAL", "PATIENTID", "VALUE")
   df["ZSCORE"] <- ZSCORE
   df["SUBSET"] <- getSubset(df$PATIENTID)
-  
+
   df$PATIENTID <- replaceNodeIDNodeLabel(df$PATIENTID, fetch_params$ontologyTerms)
-  
+
   return(df)
 }
 
@@ -359,7 +360,7 @@ getSubset <- function(patientIDs) {
   # which is always run we append subset id, either
   # _s1 or _s2 to PATIENTID.
   subsets <- sapply(splittedIds, FUN = tail_elem) # In proper patienid
-  
+
 }
 
 
@@ -448,3 +449,19 @@ getRankingMethod <- function(rankingMethodName) {
     return("Limma")
   }
 }
+
+
+writeDataForZip <- function(df, zScores, pidCols) {
+  df      <- df[ , -which(names(df) %in% pidCols)]  # Drop patient columns
+  df      <- cbind(df,zScores)                      # Replace with zScores
+  write.table(
+    df,
+    "heatmap_data.tsv",
+    sep = "\t",
+    na = "",
+    row.names = FALSE,
+    col.names = TRUE
+  )
+}
+
+

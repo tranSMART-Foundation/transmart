@@ -60,6 +60,11 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         });
     };
 
+    service.prepareWindowSize = function(width, height) {
+        $('#heim-tabs').css('min-width', parseInt(width) + 25);
+        $('#heim-tabs').css('min-height', parseInt(height) + 25);
+    };
+
     service.countCohorts = function() {
         return !window.isSubsetEmpty(1) + !window.isSubsetEmpty(2);
     };

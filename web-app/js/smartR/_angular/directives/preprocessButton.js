@@ -14,7 +14,8 @@ window.smartRApp.directive('preprocessButton', [
                 showSummaryStats: '=',
                 summaryData: '=',
                 allSamples: '=?',
-                numberOfRows: '=?'
+                numberOfRows: '=?',
+                projection: '@?'
             },
             templateUrl: $rootScope.smartRPath + '/js/smartR/_angular/templates/preprocessButton.html',
             link: function(scope, element) {
@@ -50,10 +51,9 @@ window.smartRApp.directive('preprocessButton', [
 
                 var _showSummaryStats = function() {
                     template_msg.innerHTML = 'Execute summary statistics, please wait <span class="blink_me">_</span>';
-                    rServeService.executeSummaryStats('preprocess').then(
+                    rServeService.executeSummaryStats('preprocess', scope.projection).then(
                         function (data) {
-                            scope.summaryData = data.result;
-                            _onSuccess();
+                            scope.summaryData = data.result; // this will trigger $watch
                         },
                         _onFail
                     );

@@ -32,41 +32,41 @@ markerTableJson <- "markerSelectionTable.json" # Name of the json file with limm
 
 
 main <- function() {
-  
+
 
   ## Get Gene Expression Matrix as data frame
   df <- parseInput()
-  
+
   ## Defining the content for these variables to
   ## perform differential expression analysis:
   max_rows = dim(df)[1]
   sorting = "nodes"
   ranking = "pval"
-  
-  
+
+
   ## File containing the original
   ## GEX values that can be downloaded
   ## by the user
   write.table(
     df,
-    "heatmap_orig_values.tsv",
+    "volcanoplot_orig_values.tsv",
     sep = "\t",
     na = "",
     row.names = FALSE,
     col.names = TRUE
   )
-  
+
   df          <- addStats(df, sorting, ranking, max_rows)
   df          <- mergeDuplicates(df)
   df          <- df[1:min(max_rows, nrow(df)), ]  #  apply max_rows
-  
+
   fields      <- buildFields(df)
   extraFields <- buildExtraFields(fields)
   uids        <- df[, 1]
   patientIDs  <- unique(fields["PATIENTID"])[,1]
-  
+
   negativeLog10PvalValues = -log10(df["PVAL"][,1])
-  
+
   ## Output json object containing results
   jsn <- list(
     "uids"                    = uids,
@@ -76,13 +76,19 @@ main <- function() {
     "patientIDs"              = patientIDs,
     "warnings"                = c() # initiate empty vector
   )
-  
+  jsn <- toJSON(jsn)
+
   writeRunParams()
-  
+
   measurements <- cleanUp(df)  # temporary stats like SD and MEAN need to be removed for clustering to work
-  
-#   ## SE: For dev purposes
-#   return(jsn)
+
+  write(jsn, file = "volcanoplot.json")
+  # json file be served the same way
+  # like any other file would - get name via
+  # /status call and then /download
+
+  msgs <- c("Finished successfuly")
+  list(messages = msgs)
 }
 
 

@@ -26,7 +26,8 @@
                 <br/>
                 <fetch-button concept-map="fetch.conceptBoxes"
                               loaded="fetch.loaded"
-                              running="fetch.running">
+                              running="fetch.running"
+                              allowed-cohorts="[1]">
                 </fetch-button>
             </workflow-tab>
 

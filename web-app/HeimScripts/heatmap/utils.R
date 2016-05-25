@@ -50,14 +50,18 @@ getTimelineValues <- function(nodes, ontologyTerms) {
 
 # nodeID has usually this format: 'X123_highDimensional_n0_s1)
 # this method pretifies it with the actual node label like this: '123_BreastCancer'
-replaceNodeIDNodeLabel <- function(ids, ontologyTerms) {
+idToNodeLabel <- function(ids, ontologyTerms) {
+    # extract patientID (123)
     patientIDs <- sub("_.+_n[0-9]+_s[0-9]+", "", ids, perl=TRUE) # remove the _highDimensional_n0_s1
     patientIDs <- sub("^X", "", patientIDs, perl=TRUE) # remove the X
-    nodes <- sub("_s[0-9]+", "", ids, perl=TRUE) # remove the _s1
-    nodes <- sub(".+?_", "", nodes, perl=TRUE) # remove the X123_
-    # replace highDimensional with Breast
-    nodeLabels <- lapply(ontologyTerms[nodes], function(terms) return(terms$name))
-    paste(patientIDs, nodeLabels, sep="_")
+    # extract subset (s1)
+    subsets <- substring(ids, first=nchar(ids)-1, last=nchar(ids))
+    # extract node label (Breast)
+    nodes <- sub(".+?_", "", ids, perl=TRUE) # remove the X123_
+    nodes <- as.vector(substring(nodes, first=1, last=nchar(nodes)-3))
+    nodeLabels <- as.vector(sapply(nodes, function(node) return(ontologyTerms[[node]]$name)))
+    # put everything together (123, Breast, s1)
+    paste(patientIDs, nodeLabels, subsets, sep="_")
 }
 
 getSubject <- function(patientIDs) {
