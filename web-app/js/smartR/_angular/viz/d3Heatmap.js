@@ -46,12 +46,10 @@ window.smartRApp.directive('heatmapPlot', [
             var uids = data.uids;
             var numberOfClusteredColumns = data.numberOfClusteredColumns[0];
             var numberOfClusteredRows = data.numberOfClusteredRows[0];
-            // var warning = data.warnings === undefined ? '' : data.warnings;
             var maxRows = data.maxRows[0];
             var geneCardsAllowed = JSON.parse(params.geneCardsAllowed);
             var rowClustering = true;
             var colClustering = true;
-
             var originalPatientIDs = patientIDs.slice();
             var originalUIDs = uids.slice();
 
@@ -148,8 +146,6 @@ window.smartRApp.directive('heatmapPlot', [
             var labelItems = heatmap.append('g');
             var barItems = heatmap.append('g');
             var legendItems = heatmap.append('g');
-            // var warningDiv = $('#heim-heatmap-warnings').append('strong')
-            //     .text(warning);
 
             // this code is needed for the legend generation
             var zScores = fields.map(function(d) { return d.ZSCORE; });
