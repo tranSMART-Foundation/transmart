@@ -392,7 +392,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('width', gridFieldWidth)
                     .attr('height', gridFieldHeight)
                     .on('click', function () {
-                        d3.selectAll('.box').classed('sortedBy', false);
+                        d3.selectAll('.colSortBox').classed('sortedBy', false);
                         d3.select(this).classed('sortedBy', true);
 
                         var rowValues = significanceValues.map(function (significanceValue, idx) {
