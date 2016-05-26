@@ -314,7 +314,7 @@ class DataFetchTask extends AbstractTask {
         }
         line += columns.collect {
             if (it instanceof AssayColumn) {
-                it.patientInTrialId  // for high dim data, use patient id rather than row label as the CSV header
+                it.patient.id  // for high dim data, use patient id rather than row label as the CSV header
             } else {
                 it.label
             }
@@ -324,7 +324,8 @@ class DataFetchTask extends AbstractTask {
     }
 
     private static void writeLine(CSVWriter writer, boolean isBioMarker, DataRow row) {
-        List line = [row.label]
+        def rowLabel = row.hasProperty('patient') && row.patient.hasProperty('id') ? row.patient.id : row.label
+        List line = [rowLabel]
         if (isBioMarker) {
             line += ((BioMarkerDataRow) row).bioMarker
         }
