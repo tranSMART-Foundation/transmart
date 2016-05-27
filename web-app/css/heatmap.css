@@ -1,11 +1,7 @@
 .square {
-    stroke: white;
-    stroke-width: 0;
 }
 
 .extraSquare {
-    stroke: white;
-    stroke-width: 0;
 }
 
 .feature {
@@ -31,7 +27,6 @@
 }
 
 .bar {
-    fill: steelblue;
     shape-rendering: crispEdges;
 }
 
