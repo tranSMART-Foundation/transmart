@@ -88,6 +88,10 @@ applySorting <- function(df,sorting) {
 ## functions like variance, mean, median
 addStats <- function(df, sorting, ranking, max_rows) {
   
+  # In order to prevent displaying the table from previous run.
+  cleanUpLimmaOutput(markerTableJson = markerTableJson)
+  
+  
   measurements  <- getMeasurements(df)
 
   
@@ -156,9 +160,7 @@ addStats <- function(df, sorting, ranking, max_rows) {
         rankingScore <- apply(measurements, 1, rankingMethod, na.rm = TRUE )  # Calculating ranking per probe (per row)
     }
     
-    
-    cleanUpLimmaOutput(markerTableJson = markerTableJson)  # In order to prevent displaying the table from previous run.
-    
+  
     
     ## Copy of markerTable that will be used for file dump
     if(exists("markerTable")){
@@ -174,6 +176,7 @@ addStats <- function(df, sorting, ranking, max_rows) {
     sdses <- apply(measurements,1 ,sd , na.rm = T)  
   
   } else{
+    
     ## In case there is only one sample some ranking methods won't work
     if(ranking %in% c("mean", "median")){
       rankingScore <- apply(measurements, 1, rankingMethod, na.rm = TRUE )  # Calculating ranking per probe (per row)
@@ -212,7 +215,7 @@ addStats <- function(df, sorting, ranking, max_rows) {
 
 
 ## This function generates a data frame containing the complete set
-## of rankings according to the following statistics:
+## of  the following statistics:
 ## -- coefficient of variation
 ## -- variance
 ## -- mean
@@ -222,9 +225,8 @@ addStats <- function(df, sorting, ranking, max_rows) {
 ## -- Adjusted P-value
 ## -- B value
 ## Statistics are only computed if data allows it. Else the corresponding values
-## for this  column in the results data frame remains set to NA. Ranking is performed
-## for all statistics from highest to lowest value.
-getAllStatRanksForExtDataFrame = function(df){
+## for this  column in the results data frame remains set to NA.
+getAllStatForExtDataFrame = function(df){
   
   ## We expect in this case that Limma has been performed and the
   ## data frame contains valid statistical data for Limma
@@ -249,8 +251,7 @@ getAllStatRanksForExtDataFrame = function(df){
   ## coef, variance, range, means, median, logfold, ttest, pval, adjpval and bval
   ## so altogether 11 columns including uid
   
-  
-  rankingStat.df = data.frame(UID = df$UID, COEF = NA, VARIANCE = NA,
+  Stat.df = data.frame(ROWNAME = df$ROWNAME, COEF = NA, VARIANCE = NA,
                               RANGE = NA, MEAN = NA,
                               MEDIAN = NA, TTEST = NA,
                               LOGFOLD = NA, PVAL = NA,
@@ -258,30 +259,36 @@ getAllStatRanksForExtDataFrame = function(df){
   
   
   
-  ### RANKING INFO ... ###
+  ### STAT INFO ... ###
   
   ## - for limma
   if(hasLimma && containsAllColnamesStat){
     
-    ## Vectors storing the ordered item position
-    ## in input vector in drecreasing order ...
-    idx_logfold_rank.vec = order(df$LOGFOLD, decreasing = TRUE)
-    idx_ttest_rank.vec = order(df$TTEST, decreasing = TRUE)
-    idx_pval_rank.vec = order(df$PVAL, decreasing = TRUE)
-    idx_adjpval_rank.vec = order(df$ADJPVAL, decreasing = TRUE)
-    idx_bval_rank.vec = order(df$BVAL, decreasing = TRUE)
+#     ## Vectors storing the ordered item position
+#     ## in input vector in drecreasing order ...
+#     idx_logfold_rank.vec = order(df$LOGFOLD, decreasing = TRUE)
+#     idx_ttest_rank.vec = order(df$TTEST, decreasing = TRUE)
+#     idx_pval_rank.vec = order(df$PVAL, decreasing = TRUE)
+#     idx_adjpval_rank.vec = order(df$ADJPVAL, decreasing = TRUE)
+#     idx_bval_rank.vec = order(df$BVAL, decreasing = TRUE)
     
-    ## ... and applying this data to obtain the corresponding
-    ## ranks according to UID
-    for(i in 1:length(idx_logfold_rank.vec)){
-      rankingStat.df$LOGFOLD[idx_logfold_rank.vec[i]] = i
-      rankingStat.df$TTEST[idx_ttest_rank.vec[i]] = i
-      
-      rankingStat.df$PVAL[idx_pval_rank.vec[i]] = i
-      rankingStat.df$ADJPVAL[idx_adjpval_rank.vec[i]] = i
-      rankingStat.df$BVAL[idx_bval_rank.vec[i]] = i
-    }
+#     ## ... and applying this data to obtain the corresponding
+#     ## ranks according to UID
+#     for(i in 1:length(idx_logfold_rank.vec)){
+#       rankingStat.df$LOGFOLD[idx_logfold_rank.vec[i]] = i
+#       rankingStat.df$TTEST[idx_ttest_rank.vec[i]] = i
+#       
+#       rankingStat.df$PVAL[idx_pval_rank.vec[i]] = i
+#       rankingStat.df$ADJPVAL[idx_adjpval_rank.vec[i]] = i
+#       rankingStat.df$BVAL[idx_bval_rank.vec[i]] = i
+#     }
     
+    
+    Stat.df$LOGFOLD = df$LOGFOLD
+    Stat.df$TTEST = df$TTEST
+    Stat.df$PVAL = df$PVAL
+    Stat.df$ADJPVAL = df$ADJPVAL
+    Stat.df$BVAL = df$BVAL
   }
     
   ## - for other statistics (coefficient of variance, variance,
@@ -313,22 +320,21 @@ getAllStatRanksForExtDataFrame = function(df){
   ## to perform ranking on
   measurements.df = getMeasurements(df)
     
-    
-  ## Performing ranking for all statistics (besides Limma specific ones)
+  ## Performing all statistics tests and store the values in the output data frame
+  ## (besides Limma specific ones)
   for(i in 1:length(stat_tests)){
     if(stat_tests[i]){
       stat_test = names(stat_tests)[i]
         
-      idx_stat_test_rank.vec = order(apply(measurements.df, 1, stat_test), decreasing = TRUE)
-        
-      for(j in 1:length(idx_stat_test_rank.vec)){
-        rankingStat.df[[stat_tests2col[stat_test]]][idx_stat_test_rank.vec[j]] = j
-      }
-        
-    }
+      ## Calculating values for the different stats
+      stat_test_value.vec = apply(measurements.df, 1, stat_test)
       
+      ## Storing the different stats as col in results data frame
+      Stat.df[[stat_tests2col[ stat_test ]]] = stat_test_value.vec
+    }
   }
-  return(rankingStat.df)
+  
+  return(Stat.df)
 }
 
 
@@ -342,8 +348,6 @@ getAllStatRanksForExtDataFrame = function(df){
 ## stat columns get removed.
 getMeasurements <- function(df) {
   
-  ## SE: For debug
-  ## print(df[1:5,])
   
   ## This is the first col containing measurements
   idx_first_data_col = 3
@@ -391,7 +395,7 @@ mergeDuplicates <- function(df) {
                                                      dupl.rows$Bio.marker[df$Row.Label == dupl.rows$Row.Label],
                                                      sep="--")
   
-  df <- cbind(UID=uids, df[, -c(1,2)])
+  df <- cbind(ROWNAME=uids, df[, -c(1,2)])
 
   df
 }
@@ -570,41 +574,55 @@ applyRanking <- function (df, ranking, max_rows) {
 }
 
 
-
+## Creating an unpivoted-type data frame based on high dim analysis data frame
+## providing essentially as output the value, and zscore for given colname and rowname
 buildFields <- function(df) {
-  df <- melt(df, na.rm=T, id=c("UID", "MEAN", "SD", "SIGNIFICANCE", "LOGFOLD", "TTEST", "PVAL", "ADJPVAL", "BVAL"))
+  
+  
+  df <- melt(df, na.rm=T, id=c("ROWNAME", "MEAN", "SD", "SIGNIFICANCE", "LOGFOLD", "TTEST", "PVAL", "ADJPVAL", "BVAL"))
   # melt implicitly casts
   # characters to factors to make your life more exciting,
   # in order to encourage more adventures it does not
   # have characters.as.factors=F param.
   df$variable <- as.character(df$variable)
   ZSCORE      <- (df$value - df$MEAN) / df$SD
-  df["MEAN"]  <- NULL
-  df["SD"]    <- NULL
-  df["SIGNIFICANCE"] <- NULL
+  
+  idx_exclude.vec = which(colnames(df) %in% c("MEAN", "SD", "SIGNIFICANCE", "LOGFOLD", "TTEST", "PVAL", "ADJPVAL", "BVAL"))
+  df = df[, -idx_exclude.vec]
 
-  names(df)   <- c("UID", "LOGFOLD", "TTEST", "PVAL", "ADJPVAL", "BVAL", "PATIENTID", "VALUE")
+  names(df)   <- c("ROWNAME", "COLNAME", "VALUE")
+  df["PATIENTID"] <- getSubject(df$COLNAME)
   df["ZSCORE"] <- ZSCORE
-  df["SUBSET"] <- getSubset(df$PATIENTID)
+  df["SUBSET"] <- getSubset(df$COLNAME)
 
-  return(df)
+  return(df[, c("PATIENTID", "ROWNAME", "COLNAME", "VALUE", "ZSCORE", "SUBSET")])
 }
 
 
 
-buildExtraFields <- function(df) {
-  FEATURE <- rep("Cohort", nrow(df))
-  PATIENTID <- as.character(df$PATIENTID)
+## Creates a data frame containing the restructured high dim data.
+## providing the cohort/subset information for each colname and rowname as value.
+## Rowname is set here to "Cohort" instead of probeid to help trace down
+## what sample id/colname corresponds to which cohort
+buildExtraFieldsHighDim <- function(df) {
+  
+  ROWNAME <- rep("Cohort", nrow(df))
+  COLNAME <- as.character(df$COLNAME)
+  PATIENTID = as.integer(getSubject(COLNAME))
+  SUBSET = as.integer(getSubset(COLNAME))
   TYPE <- rep("subset",nrow(df))
   VALUE <- df$SUBSET
-  extraFields <- data.frame(FEATURE, PATIENTID, TYPE, VALUE, stringsAsFactors = FALSE)
+  
+  extraFields <- unique(data.frame(PATIENTID, COLNAME, ROWNAME, VALUE, SUBSET, stringsAsFactors = FALSE))
+
 }
 
 
 
 
-## Creates a data frame containing the restructured low dim data
-## The column names and content are as follows:
+## Creates a data frame containing the restructured low dim data. This relies essentially an unpivot operation 
+## for the input but using as input a list of data tables/data frames.
+## The output column names and content are as follows:
 ## - FEATURE: The low dim node name (e.g. "\\Demo Data\\Sorlie(2003) GSE4382\\Subjects\\Demographics\\Age\\")
 ## - PATIENTID: The patient id (e.g. "112")
 ## - TYPE: Value type ("numeric", "categoric")
@@ -612,42 +630,74 @@ buildExtraFields <- function(df) {
 ##
 ## If a value is not existing, the corresponding cell in the returned data frame
 ## is set to NA.
-buildExtraFieldsExtended <- function(ld.df) {
+buildExtraFieldsLowDim <- function(ld.list) {
+  
+  if(is.null(ld.list)){
+    return(NULL)
+  }
   
   
-  varNames_with_subset.vec = unlist(names(ld.df))
+  ## Getting name mapping for the nodes
+  nodes = node2name()
+  
+  
+  varNames_with_subset.vec = unlist(names(ld.list))
+  
   
   varNames_without_subset.vec = paste(strsplit2(varNames_with_subset.vec, "_")[,1],
                                       strsplit2(varNames_with_subset.vec, "_")[,2], sep="_")
   
-  type.vec = strsplit2(varNames_with_subset.vec, "_")[,1]
   
-  names = character(length=length(varNames_without_subset.vec))
+  type.vec = strsplit2(varNames_with_subset.vec, "_")[,1]
+
+  subset.vec = strsplit2(varNames_with_subset.vec, "_")[,3]
+  
+    
+  fullnames = character(length=length(varNames_without_subset.vec))
   
   ## Declaring the variables to store the extra field data
-  FEATURE.vec = character(length = 0)
+  ROWNAME.vec = character(length = 0)
   PATIENTID.vec = character(length = 0)  
-  TYPE.vec = character(length = 0)  
   VALUE.vec = character(length = 0)
-  
-  ## Feature Names 
+  COLNAME.vec = character(length = 0)
+  SUBSET.vec = character(length = 0)
+    
+  ## Iterating over full low dim variable names 
   for(i in 1:length(varNames_without_subset.vec)){
     
-    names[i] = get("fullName", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
-    FEATURE = names[i]
+    ROWNAME = get("fullName", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
+
+    NAME = get("name", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
     
-    ld_var._df = ld.df[[varNames_with_subset.vec[i]]]
+    ## Accessing data frame for given full low dim variable name
+    ## This data frame provides for each subject the corresponding
+    ## value for given variable
+    ld_var.df = ld.list[[varNames_with_subset.vec[i]]]
+
     
-    for(j in 1:dim(ld_var._df)[1]){
-      FEATURE.vec = c(FEATURE.vec, FEATURE)
-      PATIENTID.vec = c(PATIENTID.vec, ld_var._df[j,1])
-      TYPE.vec = c(TYPE.vec, type.vec[i])
-      VALUE.vec = c(VALUE.vec, ld_var._df[j,2])
+    for(j in 1:dim(ld_var.df)[1]){
+      ROWNAME.vec = c(ROWNAME.vec, ROWNAME)
+      PATIENTID.vec = c(PATIENTID.vec, ld_var.df[j,1])
+      #TYPE.vec = c(TYPE.vec, type.vec[i])
+      SUBSET.vec = c(SUBSET.vec, subset.vec[i])
+      VALUE.vec = c(VALUE.vec, ld_var.df[j,2])
+      
+      COLNAME.vec = c(COLNAME.vec, paste(ld_var.df[j,1], NAME , subset.vec[i], sep="_"))
+
     }
   }
   
-  res.df = data.frame(FEATURE = FEATURE.vec, PATIENTID = PATIENTID.vec, TYPE = TYPE.vec, VALUE = VALUE.vec)
+  res.df = data.frame( PATIENTID = as.integer(PATIENTID.vec),
+                       COLNAME = COLNAME.vec,
+                       ROWNAME = ROWNAME.vec,
+                       VALUE = VALUE.vec,
+                       SUBSET = as.integer(gsub("^s", "", SUBSET.vec))
+                       )
   
+  
+  ## Filtering out lines where VALUE is NA
+  res.df = res.df[-which(is.na(res.df$VALUE)),]
+
   return(res.df)
 }
 
@@ -760,8 +810,18 @@ validMeasurementsRow <- function (row) {
 
 ## Convert GEX matrix to Z-scores
 toZscores <- function(measurements) {
-  measurements <- scale(t(measurements))
-  t(measurements)
+  
+  ## Row-wise Z-score if more then one sample 
+  if(ncol(measurements)>1){
+    measurements = scale(t(measurements))
+    measurements = t(measurements)
+    
+  } else{
+    ## Column-wise z-score when only one sample
+    measurements <- scale(measurements)
+  }
+  
+  return(measurements)
 }
 
 

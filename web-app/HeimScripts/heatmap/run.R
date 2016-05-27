@@ -4,12 +4,12 @@ library(jsonlite)
 
 
 # SE: Just to get things working for dev purposes
-#  rm(list = ls())
+  rm(list = ls())
 #  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
 #  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
-#  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
-#  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
-#  setwd("/Users/serge/GitHub/SmartR")
+load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
+load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
+setwd("/Users/serge/GitHub/SmartR")
 #######
 
 
@@ -41,28 +41,13 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     ## Returns a list containing two variables named HD and LD
     data.list <- parseInput()
     
+    ## Splitting up input into low dim and high dim vars 
     hd.df = data.list$HD
-    ld.df = data.list$LD    
+    ld.list = data.list$LD    
     
-    ## Low dimensional annotation data frame  
-    extraFieldsExtended.df = buildExtraFieldsExtended(ld.df)
-    
-    
-    ## SE: for debug
-    ## hd.df = hd.df[, c(1, 2, 4, 109, 110)]
-    ## Two subsets, 2 samples in one subset and one in the other
-    ## hd.df = hd.df[, c(1, 2, 4, 109, 110)]
-    
-    ## Two subsets, one sample in one subset and one in the other
-    ## hd.df = hd.df[, c(1, 2, 4, 110)]
-
-    ## two subsets, multiple samples 
-    ## hd.df = hd.df[, c(1, 2, 4, 109)]
-        
-    ## two subsets, multiple samples 
-   # hd.df = hd.df[, c(1, 2, 4, 5, 6, 7, 8, 107, 108, 109)]
-    
-        
+    ## SE: For debug
+    ## hd.df = hd.df[,1:3]
+  
     write.table(
         hd.df,
         "heatmap_orig_values.tsv",
@@ -72,47 +57,61 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
         col.names = TRUE
     )
     
-    ## Creating the extended data frame containing besides the input data,
-    ## a set of statistics. 
+    ## Creating the extended diff expr analysis data frame containing besides the input data,
+    ## a set of statistics. The returned data frame is ranked according to provided ranking statistic
     hd.df          <- addStats(hd.df, sorting, ranking, max_rows)
     
-
     hd.df          <- mergeDuplicates(hd.df)
-    hd.df          <- hd.df[1:min(max_rows, nrow(hd.df)), ]  #  apply max_rows
     
-    fields      <- buildFields(hd.df)
-    extraFields <- buildExtraFields(fields)
-    uids        <- hd.df[, 1]
-    patientIDs  <- unique(fields["PATIENTID"])[,1]
+    ## Filtering down the hd.df to retain only the n top ranked rows
+    hd.df          <- hd.df[1:min(max_rows, nrow(hd.df)), ]  
     
+    
+    ## High dimensional value data frame with unpivoted data structure
+    ## Providing intensity values and zscore for given patient, sample id/colname,
+    ## probe id/rowname and subset
+    fields.df      <- buildFields(hd.df)
+    
+
+    
+    ## High dimensional annotation data frame with unpivoted data structure
+    ## providing the information on which sample/colnames belongs to which cohort
+    extraFieldsHighDim.df <- buildExtraFieldsHighDim(fields.df)
+
+    
+    ## Low dimensional annotation data frame  
+    extraFieldsLowDim.df = buildExtraFieldsLowDim(ld.list)
+    
+    
+    ## rowNames reflect here the unique identifiers of the GEX matrix this means "probeID--geneSymbol"
+    rowNames        <- hd.df[, 1]
+    
+    ## colNames should reflect here only the sample names (e.g. "67_Breast_s1")
+    colNames = colnames(hd.df)[grep("^\\d+_\\w+_s\\d$", colnames(hd.df), perl = TRUE)]
 
     significanceValues <- hd.df["SIGNIFICANCE"][,1]
     
-        
-    features <- unique(extraFields["FEATURE"])[,1]
-
     
-    ## A df containing the computed value rankings for
+    ## A df containing the computed values for
     ## all possible statistical methods
-    ranking_hd.df = getAllStatRanksForExtDataFrame(hd.df)
-    
+    statistics_hd.df = getAllStatForExtDataFrame(hd.df)
 
+
+    ## Concatenating the two extraField types (that have been generated
+    ## for the low and high dim data) 
+    extraFields.df = rbind(extraFieldsHighDim.df, extraFieldsLowDim.df)
+    
+    
     ## The returned jsn object that will be dumped to file
     jsn <- list(
-        "fields"              = fields,
-        "patientIDs"          = patientIDs,
-        "uids"                = uids,
-        "logfoldValues"       = hd.df["LOGFOLD"][,1],
-        "ttestValues"         = hd.df["TTEST"][,1],
-        "pvalValues"          = hd.df["PVAL"][,1],
-        "adjpvalValues"       = hd.df["ADJPVAL"][,1],
-        "bvalValues"          = hd.df["BVAL"][,1],
+        "fields"              = fields.df,
+        "patientIDs"          = getSubject(colNames),
+        "colNames"            = colNames,
+        "rowNames"            = rowNames,
         "ranking"             = ranking,
-        "features"            = features,
-        "extraFields"         = extraFields,
-        "extraFieldsExtended" = extraFieldsExtended.df,
+        "extraFields"         = extraFields.df,
         "maxRows"             = max_rows,
-        "allStatRanking"      = ranking_hd.df,
+        "allStatValues"      = statistics_hd.df,
         "warnings"            = c() # initiate empty vector
     )
     
@@ -120,27 +119,45 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     writeRunParams(max_rows, sorting, ranking)
     
     # temporary stats like SD and MEAN need to be removed for clustering to work
-    measurements <- cleanUp(hd.df)  
+    measurements.df <- cleanUp(hd.df)  
 
-    
-    # discard UID column
-    if (ncol(hd.df) > 2){
-        measurements <- measurements[, 2:ncol(measurements)]
+   
+
+    ## discard rownames / probe id column
+    ## in case of more samples
+    if (ncol(hd.df) > 10){
+        measurements.df <- measurements.df[, 2:ncol(measurements.df)]
     } else {
-        measurements <- measurements[2]
+        ## if only one sample
+        colname = colnames(hd.df)[2] 
+        measurements.df <- data.frame(VALUES = hd.df[,2])
+        colnames(measurements.df) = colname
+        
     }
 
-    measurements <- toZscores(measurements)
+    rownames(measurements.df) = as.vector(rowNames)
+
     
+    ## GEX intensity matrix converted to zeta scores
+    ## for clustering purposes
+    measurementsAsZscore.matrix <- toZscores(measurements.df)
+
+  
     
     ## If no significanceValues are available throw a warning:
     if (all(is.na(significanceValues)))
         jsn$warnings <- append(jsn$warnings, c("Significance sorting could not be done due to insufficient data"))
     
     
-    jsn <- addClusteringOutput(jsn, measurements) #
+    jsn <- addClusteringOutput(jsn, measurementsAsZscore.matrix) 
+    
+
+    
+    ## Transforming the output list to json format
     jsn <- toJSON(jsn, pretty = TRUE, digits = I(17))
-    writeDataForZip(hd.df, measurements, patientIDs)  # for later zip generation
+    
+    
+    writeDataForZip(hd.df, measurementsAsZscore.matrix, colNames)  # for later zip generation
     write(jsn, file = "heatmap.json")
     # json file be served the same way
     # like any other file would - get name via
@@ -148,16 +165,13 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
 
     msgs <- c("Finished successfuly")
     list(messages = msgs)
-    
-#     ## SE: For debug purposes
-#       return(jsn)
 }
 
 
 
 
 # SE: For debug purposes
-# out = main(ranking = "median")
-#print(out[1:20,])
+#out = main(ranking = "median")
+
 
 

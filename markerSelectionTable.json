@@ -1,0 +1,902 @@
+[
+  {
+    "rowLabel": "CXCL14",
+    "biomarker": "CXCL14",
+    "log2FoldChange": 0.207236842105263,
+    "t": 0.22288423910315,
+    "pValue": 0.82517854532488,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64652455068662
+  },
+  {
+    "rowLabel": "C1QB",
+    "biomarker": "C1QB",
+    "log2FoldChange": -0.148026315789472,
+    "t": -0.294565450231558,
+    "pValue": 0.770411441068765,
+    "adjustedPValue": 0.997248014331532,
+    "B": -4.64456850438336
+  },
+  {
+    "rowLabel": "IGHG1",
+    "biomarker": "IGHG1",
+    "log2FoldChange": -1.15736842105263,
+    "t": -1.76950198896631,
+    "pValue": 0.0872618651581415,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.49862010863864
+  },
+  {
+    "rowLabel": "HLA-DQA1",
+    "biomarker": "HLADQA1",
+    "log2FoldChange": -0.968289473684209,
+    "t": -1.48523459956244,
+    "pValue": 0.148206521418153,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.5401239210806
+  },
+  {
+    "rowLabel": "ESR1",
+    "biomarker": "ESR1",
+    "log2FoldChange": 0.670592105263159,
+    "t": 1.37678907091692,
+    "pValue": 0.179050333784555,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.55457363075384
+  },
+  {
+    "rowLabel": "TNFSF10",
+    "biomarker": "TNFSF10",
+    "log2FoldChange": 0.117763157894736,
+    "t": 0.242613893749472,
+    "pValue": 0.810001849772614,
+    "adjustedPValue": 0.997248014331532,
+    "B": -4.64603978010151
+  },
+  {
+    "rowLabel": "SPARCL1",
+    "biomarker": "SPARCL1",
+    "log2FoldChange": -0.909736842105265,
+    "t": -1.87220884059946,
+    "pValue": 0.0712314050328906,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.48247789672859
+  },
+  {
+    "rowLabel": "C1QC",
+    "biomarker": "C1QC",
+    "log2FoldChange": 0.553355263157895,
+    "t": 0.80722508795746,
+    "pValue": 0.426068399116034,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.6153519355318
+  },
+  {
+    "rowLabel": "FABP4",
+    "biomarker": "FABP4",
+    "log2FoldChange": -0.726710526315788,
+    "t": -0.681024119964435,
+    "pValue": 0.501225597190991,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.62494953226957
+  },
+  {
+    "rowLabel": "C10ORF116",
+    "biomarker": "C10ORF116",
+    "log2FoldChange": -0.0761184210526347,
+    "t": -0.128107866699972,
+    "pValue": 0.898942501024925,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64828285886582
+  },
+  {
+    "rowLabel": "SFRP4",
+    "biomarker": "SFRP4",
+    "log2FoldChange": -0.48375,
+    "t": -0.826567422879614,
+    "pValue": 0.415190573771886,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.61374836437781
+  },
+  {
+    "rowLabel": "RNASE1",
+    "biomarker": "RNASE1",
+    "log2FoldChange": -0.479934210526316,
+    "t": -1.35990108248509,
+    "pValue": 0.184277061857459,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.55674884122812
+  },
+  {
+    "rowLabel": "SERPING1",
+    "biomarker": "SERPING1",
+    "log2FoldChange": -0.786842105263158,
+    "t": -2.52570852063747,
+    "pValue": 0.0172285985567263,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.36928759703258
+  },
+  {
+    "rowLabel": "PRLR",
+    "biomarker": "PRLR",
+    "log2FoldChange": 0.551052631578947,
+    "t": 1.20630949535446,
+    "pValue": 0.237388399384182,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.57555300988944
+  },
+  {
+    "rowLabel": "LTF",
+    "biomarker": "LTF",
+    "log2FoldChange": 0.700921052631578,
+    "t": 0.761235573048553,
+    "pValue": 0.452625146348683,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.61902433785276
+  },
+  {
+    "rowLabel": "ASPN",
+    "biomarker": "ASPN",
+    "log2FoldChange": -0.610131578947368,
+    "t": -1.13736341479632,
+    "pValue": 0.264640393988511,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.58339572874105
+  },
+  {
+    "rowLabel": "MUC1",
+    "biomarker": "MUC1",
+    "log2FoldChange": -0.183026315789474,
+    "t": -0.324009839511043,
+    "pValue": 0.748241780525405,
+    "adjustedPValue": 0.997126422841199,
+    "B": -4.64360971824999
+  },
+  {
+    "rowLabel": "COMP",
+    "biomarker": "COMP",
+    "log2FoldChange": 0.175657894736843,
+    "t": 0.356761746217591,
+    "pValue": 0.723837333710287,
+    "adjustedPValue": 0.997126422841199,
+    "B": -4.64243753759446
+  },
+  {
+    "rowLabel": "CYP4X1",
+    "biomarker": "CYP4X1",
+    "log2FoldChange": -1.11519736842105,
+    "t": -1.09264044494103,
+    "pValue": 0.283491220317982,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.58827588634192
+  },
+  {
+    "rowLabel": "ISLR",
+    "biomarker": "ISLR",
+    "log2FoldChange": -1.29927631578947,
+    "t": -2.79861894574865,
+    "pValue": 0.00900180335501042,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.3184757158916
+  },
+  {
+    "rowLabel": "RERG",
+    "biomarker": "RERG",
+    "log2FoldChange": 0.612039473684211,
+    "t": 1.01093155493108,
+    "pValue": 0.320359385190858,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.59675831906184
+  },
+  {
+    "rowLabel": "FCER1G",
+    "biomarker": "FCER1G",
+    "log2FoldChange": 0.0613157894736838,
+    "t": 0.164641284826597,
+    "pValue": 0.870361624991382,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64771713844341
+  },
+  {
+    "rowLabel": "HLA-DPA1",
+    "biomarker": "HLADPA1",
+    "log2FoldChange": -0.55875,
+    "t": -1.12611673362477,
+    "pValue": 0.269293230836866,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.58463849726557
+  },
+  {
+    "rowLabel": "MS4A7",
+    "biomarker": "MS4A7",
+    "log2FoldChange": 0.204407894736843,
+    "t": 0.503747249638646,
+    "pValue": 0.618221340796467,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.63581998122522
+  },
+  {
+    "rowLabel": "MS4A6A",
+    "biomarker": "MS4A6A",
+    "log2FoldChange": -1.29,
+    "t": -1.27747396209117,
+    "pValue": 0.211506297571907,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.56706362054845
+  },
+  {
+    "rowLabel": "CFB",
+    "biomarker": "CFB",
+    "log2FoldChange": 0.448684210526316,
+    "t": 0.702902091557262,
+    "pValue": 0.487687453004601,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.62339454043166
+  },
+  {
+    "rowLabel": "SCUBE2",
+    "biomarker": "SCUBE2",
+    "log2FoldChange": 0.06296052631579,
+    "t": 0.0782044290707226,
+    "pValue": 0.938199286448162,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.6488278227813
+  },
+  {
+    "rowLabel": "MMP7",
+    "biomarker": "MMP7",
+    "log2FoldChange": -0.624736842105263,
+    "t": -0.724312934103681,
+    "pValue": 0.474641751685478,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.62182820124158
+  },
+  {
+    "rowLabel": "NAT1",
+    "biomarker": "NAT1",
+    "log2FoldChange": 1.23052631578947,
+    "t": 1.60165078420637,
+    "pValue": 0.120005312259116,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.52372968795425
+  },
+  {
+    "rowLabel": "TYROBP",
+    "biomarker": "TYROBP",
+    "log2FoldChange": -0.0374342105263157,
+    "t": -0.0831960844106129,
+    "pValue": 0.934263772807531,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64878516525771
+  },
+  {
+    "rowLabel": "C1S",
+    "biomarker": "C1S",
+    "log2FoldChange": -1.22144736842105,
+    "t": -2.84008940570921,
+    "pValue": 0.00813619662036684,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.31065379952584
+  },
+  {
+    "rowLabel": "CD36",
+    "biomarker": "CD36",
+    "log2FoldChange": -0.427763157894738,
+    "t": -0.526127787775114,
+    "pValue": 0.602775895634854,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.63461986043625
+  },
+  {
+    "rowLabel": "VWF",
+    "biomarker": "VWF",
+    "log2FoldChange": 0.0423026315789481,
+    "t": 0.0912873030101205,
+    "pValue": 0.927888139306122,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64871042013682
+  },
+  {
+    "rowLabel": "LUM",
+    "biomarker": "LUM",
+    "log2FoldChange": -0.68625,
+    "t": -1.45012696965926,
+    "pValue": 0.157688242385572,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.54489140031504
+  },
+  {
+    "rowLabel": "HLA-DQB1",
+    "biomarker": "HLADQB1",
+    "log2FoldChange": -0.799342105263158,
+    "t": -1.70664282984892,
+    "pValue": 0.0985113767995699,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.50821632360815
+  },
+  {
+    "rowLabel": "COL3A1",
+    "biomarker": "COL3A1",
+    "log2FoldChange": -0.629276315789474,
+    "t": -1.3454062407867,
+    "pValue": 0.188857227449138,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.55859924077157
+  },
+  {
+    "rowLabel": "CTSK",
+    "biomarker": "CTSK",
+    "log2FoldChange": -0.622763157894736,
+    "t": -1.16055061202005,
+    "pValue": 0.255232290309568,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.58080092366013
+  },
+  {
+    "rowLabel": "IFI27",
+    "biomarker": "IFI27",
+    "log2FoldChange": 0.0279605263157885,
+    "t": 0.0458474093673507,
+    "pValue": 0.963744220970675,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64904038491766
+  },
+  {
+    "rowLabel": "CYP4Z1",
+    "biomarker": "CYP4Z1",
+    "log2FoldChange": -1.54460526315789,
+    "t": -1.74538074942672,
+    "pValue": 0.0914429145042133,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.50232881785839
+  },
+  {
+    "rowLabel": "HLA-DRB1",
+    "biomarker": "HLADRB1",
+    "log2FoldChange": -0.649078947368422,
+    "t": -0.93373589755686,
+    "pValue": 0.358103310479377,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.60424227190298
+  },
+  {
+    "rowLabel": "NPNT",
+    "biomarker": "NPNT",
+    "log2FoldChange": 0.236315789473684,
+    "t": 0.456088432717733,
+    "pValue": 0.651702995953173,
+    "adjustedPValue": 0.994020160284917,
+    "B": -4.63820709940933
+  },
+  {
+    "rowLabel": "CD34",
+    "biomarker": "CD34",
+    "log2FoldChange": -0.845657894736842,
+    "t": -1.78033805247557,
+    "pValue": 0.0854370709868831,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.4969435749703
+  },
+  {
+    "rowLabel": "AEBP1",
+    "biomarker": "AEBP1",
+    "log2FoldChange": -0.833815789473685,
+    "t": -2.30938135418168,
+    "pValue": 0.0281952047679102,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.40839538671234
+  },
+  {
+    "rowLabel": "COL11A1",
+    "biomarker": "COL11A1",
+    "log2FoldChange": -0.684144736842105,
+    "t": -1.02507405628147,
+    "pValue": 0.313751906556506,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.59533091070746
+  },
+  {
+    "rowLabel": "CD163",
+    "biomarker": "CD163",
+    "log2FoldChange": -0.0385526315789484,
+    "t": -0.0737383477115284,
+    "pValue": 0.941721777610481,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64886375415177
+  },
+  {
+    "rowLabel": "MGP",
+    "biomarker": "MGP",
+    "log2FoldChange": 1.21276315789474,
+    "t": 1.93493699834987,
+    "pValue": 0.0627448000103088,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.47235423223029
+  },
+  {
+    "rowLabel": "APOD",
+    "biomarker": "APOD",
+    "log2FoldChange": 0.0475657894736843,
+    "t": 0.0532035984606977,
+    "pValue": 0.957932285201526,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64900179513266
+  },
+  {
+    "rowLabel": "DPT",
+    "biomarker": "DPT",
+    "log2FoldChange": -1.10828947368421,
+    "t": -1.80855163531863,
+    "pValue": 0.080837531293112,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.49254852680697
+  },
+  {
+    "rowLabel": "CRABP2",
+    "biomarker": "CRABP2",
+    "log2FoldChange": -0.754078947368421,
+    "t": -1.73905633702075,
+    "pValue": 0.0925667825919558,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.50329583920958
+  },
+  {
+    "rowLabel": "FGL2",
+    "biomarker": "FGL2",
+    "log2FoldChange": 0.100921052631579,
+    "t": 0.226926010429173,
+    "pValue": 0.822063668940896,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64642856560152
+  },
+  {
+    "rowLabel": "FXYD3",
+    "biomarker": "FXYD3",
+    "log2FoldChange": 0.630263157894737,
+    "t": 1.85241591989584,
+    "pValue": 0.0741071199877043,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.4856315906238
+  },
+  {
+    "rowLabel": "LRRC15",
+    "biomarker": "LRRC15",
+    "log2FoldChange": -0.352434210526316,
+    "t": -0.580503013449159,
+    "pValue": 0.566032200523005,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.631495150624
+  },
+  {
+    "rowLabel": "RARRES3",
+    "biomarker": "RARRES3",
+    "log2FoldChange": -0.0209210526315786,
+    "t": -0.04610133612928,
+    "pValue": 0.963543564317347,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64903914833026
+  },
+  {
+    "rowLabel": "CSF1R",
+    "biomarker": "CSF1R",
+    "log2FoldChange": -0.339539473684211,
+    "t": -1.00723203791352,
+    "pValue": 0.322103509677963,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.59712886308499
+  },
+  {
+    "rowLabel": "HLA-DPB1",
+    "biomarker": "HLADPB1",
+    "log2FoldChange": -0.430000000000001,
+    "t": -0.849934081682309,
+    "pValue": 0.40228214745703,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.61176498669192
+  },
+  {
+    "rowLabel": "SCGB2A2",
+    "biomarker": "SCGB2A2",
+    "log2FoldChange": -1.78296052631579,
+    "t": -1.6143207498761,
+    "pValue": 0.117221749198279,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.5218931260496
+  },
+  {
+    "rowLabel": "GATA3",
+    "biomarker": "GATA3",
+    "log2FoldChange": 0.961513157894736,
+    "t": 2.49617022856151,
+    "pValue": 0.0184494618485021,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.37469928857132
+  },
+  {
+    "rowLabel": "MMP9",
+    "biomarker": "MMP9",
+    "log2FoldChange": 0.164736842105264,
+    "t": 0.27715007472598,
+    "pValue": 0.783618949021576,
+    "adjustedPValue": 0.997248014331532,
+    "B": -4.64509311381296
+  },
+  {
+    "rowLabel": "TRPS1",
+    "biomarker": "TRPS1",
+    "log2FoldChange": 0.558421052631578,
+    "t": 1.52887769231845,
+    "pValue": 0.137064430560982,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.53408149551877
+  },
+  {
+    "rowLabel": "MX1",
+    "biomarker": "MX1",
+    "log2FoldChange": -0.625328947368421,
+    "t": -1.14456947852139,
+    "pValue": 0.261689991298977,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.58259400951296
+  },
+  {
+    "rowLabel": "CYBRD1",
+    "biomarker": "CYBRD1",
+    "log2FoldChange": 0.663552631578947,
+    "t": 0.931137269735816,
+    "pValue": 0.359423237983987,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.60448504984601
+  },
+  {
+    "rowLabel": "MYO6",
+    "biomarker": "MYO6",
+    "log2FoldChange": -0.0352631578947369,
+    "t": -0.101713740280713,
+    "pValue": 0.919679662473721,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64860389255207
+  },
+  {
+    "rowLabel": "NUPR1",
+    "biomarker": "NUPR1",
+    "log2FoldChange": -0.136907894736843,
+    "t": -0.387176616005727,
+    "pValue": 0.701435160321229,
+    "adjustedPValue": 0.996805427321168,
+    "B": -4.64124972565846
+  },
+  {
+    "rowLabel": "PECAM1",
+    "biomarker": "PECAM1",
+    "log2FoldChange": -0.30625,
+    "t": -0.855151577564165,
+    "pValue": 0.399434778852346,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.61131525899232
+  },
+  {
+    "rowLabel": "H2AFV",
+    "biomarker": "H2AFV",
+    "log2FoldChange": -0.612434210526316,
+    "t": -0.740251471813236,
+    "pValue": 0.46506261343965,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.62063374254431
+  },
+  {
+    "rowLabel": "FCGR3A",
+    "biomarker": "FCGR3A",
+    "log2FoldChange": 0.202697368421053,
+    "t": 0.327851227403694,
+    "pValue": 0.745365092647954,
+    "adjustedPValue": 0.997126422841199,
+    "B": -4.64347799022303
+  },
+  {
+    "rowLabel": "AQP1",
+    "biomarker": "AQP1",
+    "log2FoldChange": -0.380328947368421,
+    "t": -0.730148515607776,
+    "pValue": 0.471121368441486,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.62139368432174
+  },
+  {
+    "rowLabel": "FCGR2A",
+    "biomarker": "FCGR2A",
+    "log2FoldChange": -0.0640789473684222,
+    "t": -0.210079515689466,
+    "pValue": 0.835065675979955,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64681732179347
+  },
+  {
+    "rowLabel": "TREM2",
+    "biomarker": "TREM2",
+    "log2FoldChange": 0.788157894736842,
+    "t": 0.923908417923765,
+    "pValue": 0.363111899150396,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.6051572374945
+  },
+  {
+    "rowLabel": "DARC",
+    "biomarker": "DARC",
+    "log2FoldChange": -0.183684210526315,
+    "t": -0.357059580141632,
+    "pValue": 0.72361671270814,
+    "adjustedPValue": 0.997126422841199,
+    "B": -4.64242636887057
+  },
+  {
+    "rowLabel": "DNALI1",
+    "biomarker": "DNALI1",
+    "log2FoldChange": 0.734934210526316,
+    "t": 0.883223222924919,
+    "pValue": 0.384335015930048,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.60885286621566
+  },
+  {
+    "rowLabel": "RGS1",
+    "biomarker": "RGS1",
+    "log2FoldChange": -0.51453947368421,
+    "t": -0.926539936275696,
+    "pValue": 0.361766239988538,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.60491308156707
+  },
+  {
+    "rowLabel": "SLC40A1",
+    "biomarker": "SLC40A1",
+    "log2FoldChange": -0.574407894736842,
+    "t": -0.934919582386421,
+    "pValue": 0.357503143367132,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.60413148606585
+  },
+  {
+    "rowLabel": "PSMG4",
+    "biomarker": "PSMG4",
+    "log2FoldChange": -0.261447368421053,
+    "t": -0.303133981165895,
+    "pValue": 0.763938566102544,
+    "adjustedPValue": 0.997248014331532,
+    "B": -4.64429879246939
+  },
+  {
+    "rowLabel": "FMOD",
+    "biomarker": "FMOD",
+    "log2FoldChange": 0.714605263157894,
+    "t": 1.29181836782345,
+    "pValue": 0.206559043260088,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.56530519003955
+  },
+  {
+    "rowLabel": "LTBP2",
+    "biomarker": "LTBP2",
+    "log2FoldChange": -0.45796052631579,
+    "t": -1.51542386568496,
+    "pValue": 0.140424411125403,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.53595769097421
+  },
+  {
+    "rowLabel": "MS4A4A",
+    "biomarker": "MS4A4A",
+    "log2FoldChange": -0.712565789473684,
+    "t": -1.31300246478824,
+    "pValue": 0.199415175373697,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.56267985549215
+  },
+  {
+    "rowLabel": "PBX1",
+    "biomarker": "PBX1",
+    "log2FoldChange": 0.33296052631579,
+    "t": 0.730617103486845,
+    "pValue": 0.470839345985366,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.62135865234867
+  },
+  {
+    "rowLabel": "HLA-DQB2",
+    "biomarker": "HLADQB2",
+    "log2FoldChange": -0.496184210526315,
+    "t": -1.10157225658387,
+    "pValue": 0.279651837449235,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.5873144886461
+  },
+  {
+    "rowLabel": "XBP1",
+    "biomarker": "XBP1",
+    "log2FoldChange": 0.746776315789474,
+    "t": 2.561152069651,
+    "pValue": 0.0158621612919686,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.36276789006641
+  },
+  {
+    "rowLabel": "SYBU",
+    "biomarker": "SYBU",
+    "log2FoldChange": 0.421973684210527,
+    "t": 1.30679227734221,
+    "pValue": 0.20148948070962,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.56345297741788
+  },
+  {
+    "rowLabel": "TGFB3",
+    "biomarker": "TGFB3",
+    "log2FoldChange": -0.306973684210527,
+    "t": -0.795859834644745,
+    "pValue": 0.43254089593803,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.61627792672748
+  },
+  {
+    "rowLabel": "HBA2",
+    "biomarker": "HBA2",
+    "log2FoldChange": 1.44927631578947,
+    "t": 1.72484179749199,
+    "pValue": 0.0951353757224509,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.50546103771705
+  },
+  {
+    "rowLabel": "SLC39A6",
+    "biomarker": "SLC39A6",
+    "log2FoldChange": 1.59585526315789,
+    "t": 2.16360403551947,
+    "pValue": 0.0388200300698859,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.43394330587468
+  },
+  {
+    "rowLabel": "C1R",
+    "biomarker": "C1R",
+    "log2FoldChange": -1.03486842105263,
+    "t": -2.82112808197153,
+    "pValue": 0.00852178039758396,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.31423272320325
+  },
+  {
+    "rowLabel": "TACSTD2",
+    "biomarker": "TACSTD2",
+    "log2FoldChange": -0.0072368421052631,
+    "t": -0.0208251251876221,
+    "pValue": 0.983526915342317,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64912874748794
+  },
+  {
+    "rowLabel": "MFAP5",
+    "biomarker": "MFAP5",
+    "log2FoldChange": -0.469407894736843,
+    "t": -0.865032455100209,
+    "pValue": 0.394077499309669,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.61045673061596
+  },
+  {
+    "rowLabel": "C17ORF28",
+    "biomarker": "C17ORF28",
+    "log2FoldChange": 0.0698026315789471,
+    "t": 0.249441710845079,
+    "pValue": 0.804766802520427,
+    "adjustedPValue": 0.997248014331532,
+    "B": -4.64586251710888
+  },
+  {
+    "rowLabel": "THBS2",
+    "biomarker": "THBS2",
+    "log2FoldChange": -0.68375,
+    "t": -1.93458364625837,
+    "pValue": 0.0627900314327602,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.47241179499469
+  },
+  {
+    "rowLabel": "RNASE6",
+    "biomarker": "RNASE6",
+    "log2FoldChange": 0.0193421052631577,
+    "t": 0.0474668744331816,
+    "pValue": 0.962464537904683,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64903238126115
+  },
+  {
+    "rowLabel": "IFIT1",
+    "biomarker": "IFIT1",
+    "log2FoldChange": -0.155657894736841,
+    "t": -0.233839815608484,
+    "pValue": 0.816742261206678,
+    "adjustedPValue": 0.998593348418139,
+    "B": -4.64626040295777
+  },
+  {
+    "rowLabel": "GPR65",
+    "biomarker": "GPR65",
+    "log2FoldChange": -0.0272368421052631,
+    "t": -0.0436118438273573,
+    "pValue": 0.965510900429553,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64905097712232
+  },
+  {
+    "rowLabel": "IFITM1",
+    "biomarker": "IFITM1",
+    "log2FoldChange": -0.636052631578947,
+    "t": -1.26035261189173,
+    "pValue": 0.217528647715448,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.56914190963148
+  },
+  {
+    "rowLabel": "SELENBP1",
+    "biomarker": "SELENBP1",
+    "log2FoldChange": -0.0339473684210532,
+    "t": -0.10568530199824,
+    "pValue": 0.916555266254636,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64856029174634
+  },
+  {
+    "rowLabel": "COL12A1",
+    "biomarker": "COL12A1",
+    "log2FoldChange": -0.0642763157894737,
+    "t": -0.137928836979965,
+    "pValue": 0.891244113805208,
+    "adjustedPValue": 0.998904104858327,
+    "B": -4.64814462135303
+  },
+  {
+    "rowLabel": "FAP",
+    "biomarker": "FAP",
+    "log2FoldChange": -0.593223684210525,
+    "t": -1.34380086920898,
+    "pValue": 0.189369888592571,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.55880323383538
+  },
+  {
+    "rowLabel": "GRHL1",
+    "biomarker": "GRHL1",
+    "log2FoldChange": 0.157828947368421,
+    "t": 0.555482952269913,
+    "pValue": 0.58279869100985,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.63296957689188
+  },
+  {
+    "rowLabel": "OMD",
+    "biomarker": "OMD",
+    "log2FoldChange": 0.276447368421053,
+    "t": 0.481016372502776,
+    "pValue": 0.63409234823805,
+    "adjustedPValue": 0.992592556340344,
+    "B": -4.6369872058079
+  },
+  {
+    "rowLabel": "PRELP",
+    "biomarker": "PRELP",
+    "log2FoldChange": -0.615855263157894,
+    "t": -1.30011854103585,
+    "pValue": 0.203737029136233,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.5642805795557
+  },
+  {
+    "rowLabel": "PHC2",
+    "biomarker": "PHC2",
+    "log2FoldChange": -1.88217105263158,
+    "t": -3.94895430318977,
+    "pValue": 0.00045571416746115,
+    "adjustedPValue": 0.991487918852367,
+    "B": -4.10099037515473
+  }
+]
