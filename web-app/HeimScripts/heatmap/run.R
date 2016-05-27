@@ -4,12 +4,12 @@ library(jsonlite)
 
 
 # SE: Just to get things working for dev purposes
-  rm(list = ls())
+#  rm(list = ls())
 #  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
 #  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
-load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
-load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
-setwd("/Users/serge/GitHub/SmartR")
+#load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
+#load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
+#setwd("/Users/serge/GitHub/SmartR")
 #######
 
 
@@ -165,13 +165,15 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
 
     msgs <- c("Finished successfuly")
     list(messages = msgs)
+    
+    return(hd.df)
 }
 
 
 
 
-# SE: For debug purposes
-#out = main(ranking = "median")
+## SE: For debug purposes
+## out = main(ranking = "median")
 
 
 
