@@ -65,7 +65,7 @@ window.smartRApp.directive('heatmapPlot', [
             }
 
             var gridFieldWidth = 20;
-            var gridFieldHeight = 20;
+            var gridFieldHeight = 10;
             var dendrogramHeight = 300;
             var histogramHeight = 200;
             var legendWidth = 200;
@@ -224,6 +224,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight)
                     .attr('dy', '0.35em')
                     .attr('text-anchor', 'middle')
+                    .style('font-size', gridFieldHeight + 'px')
                     .text('↑↓');
 
                 colSortText.transition()
@@ -231,7 +232,8 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('x', function (d, i) {
                         return i * gridFieldWidth + 0.5 * gridFieldWidth;
                     })
-                    .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight);
+                    .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight)
+                    .style('font-size', gridFieldHeight + 'px');
 
                 var colSortBox = colSortItems.selectAll('.colSortBox')
                     .data(patientIDs, function (d) {
@@ -304,10 +306,12 @@ window.smartRApp.directive('heatmapPlot', [
                     })
                     .attr('dy', '0.35em')
                     .attr('text-anchor', 'middle')
+                    .style('font-size', gridFieldHeight + 'px')
                     .text('↑↓');
 
                 rowSortText.transition()
                     .duration(animationDuration)
+                    .style('font-size', gridFieldHeight + 'px')
                     .attr('transform', function (d, i) {
                         return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' +
                             (i * gridFieldHeight + 0.5 * gridFieldHeight) + ')rotate(-90)';
@@ -370,10 +374,12 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight)
                     .attr('dy', '0.35em')
                     .attr('text-anchor', 'middle')
+                    .style('font-size', gridFieldHeight + 'px')
                     .text('↑↓');
 
                 significanceSortText.transition()
                     .duration(animationDuration)
+                    .style('font-size', gridFieldHeight + 'px')
                     .attr('x', -gridFieldWidth - 10 + 0.5 * gridFieldWidth)
                     .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight);
 
@@ -435,10 +441,12 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('y', -2 - gridFieldHeight * 2 + 0.5 * gridFieldHeight)
                     .attr('dy', '0.35em')
                     .attr('text-anchor', 'middle')
+                    .style('font-size', gridFieldHeight + 'px')
                     .text('□');
 
                 selectText.transition()
                     .duration(animationDuration)
+                    .style('font-size', gridFieldHeight + 'px')
                     .attr('x', function (d, i) {
                         return i * gridFieldWidth + 0.5 * gridFieldWidth;
                     })
@@ -486,12 +494,14 @@ window.smartRApp.directive('heatmapPlot', [
                             'translate(' + (gridFieldWidth / 2) + ',' + (-4 - gridFieldHeight * 2) + ')rotate(-45)';
                     })
                     .style('text-anchor', 'start')
+                    .style('font-size', gridFieldHeight + 'px')
                     .text(function (d) {
                         return d;
                     });
 
                 patientID.transition()
                     .duration(animationDuration)
+                    .style('font-size', gridFieldHeight + 'px')
                     .attr('transform', function (d) {
                         return 'translate(' + (patientIDs.indexOf(d) * gridFieldWidth) + ',0)' +
                             'translate(' + (gridFieldWidth / 2) + ',' + (-4 - gridFieldHeight * 2) + ')rotate(-45)';
@@ -513,6 +523,7 @@ window.smartRApp.directive('heatmapPlot', [
                     })
                     .attr('dy', '0.35em')
                     .style('text-anchor', 'start')
+                    .style('font-size', gridFieldHeight + 'px')
                     .text(function (d) {
                         return d;
                     })
@@ -536,6 +547,7 @@ window.smartRApp.directive('heatmapPlot', [
 
                 uid.transition()
                     .duration(animationDuration)
+                    .style('font-size', gridFieldHeight + 'px')
                     .attr('x', width + gridFieldWidth + 7)
                     .attr('y', function (d) {
                         return uids.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight;
@@ -598,6 +610,7 @@ window.smartRApp.directive('heatmapPlot', [
                         return d.significance > 0 ? '#990000' : 'steelblue';
                     });
 
+                // FIXME: This line is not working properly
                 var featurePosY = -gridFieldWidth * 2 - smartRUtils.getMaxWidth(d3.selectAll('.patientID')) -
                     features.length * gridFieldWidth / 2 - 20;
 
@@ -670,12 +683,14 @@ window.smartRApp.directive('heatmapPlot', [
                     })
                     .attr('dy', '0.35em')
                     .style('text-anchor', 'start')
+                    .style('font-size', gridFieldHeight + 'px')
                     .text(function (d) {
                         return d;
                     });
 
                 feature.transition()
                     .duration(animationDuration)
+                    .style('font-size', gridFieldHeight + 'px')
                     .attr('x', width + gridFieldWidth + 7)
                     .attr('y', function (d) {
                         return featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4;
@@ -696,10 +711,12 @@ window.smartRApp.directive('heatmapPlot', [
                     })
                     .attr('dy', '0.35em')
                     .attr('text-anchor', 'middle')
+                    .style('font-size', gridFieldHeight + 'px')
                     .text('↑↓');
 
                 featureSortText.transition()
                     .duration(animationDuration)
+                    .style('font-size', gridFieldHeight + 'px')
                     .attr('transform', function (d) {
                         return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' +
                             (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) +
@@ -827,20 +844,8 @@ window.smartRApp.directive('heatmapPlot', [
 
             function zoom(zoomLevel) {
                 zoomLevel /= 100;
-                d3.selectAll('.patientID')
-                    .style('font-size', Math.ceil(14 * zoomLevel) + 'px');
-                d3.selectAll('.selectText')
-                    .style('font-size', Math.ceil(16 * zoomLevel) + 'px');
-                d3.selectAll('.uid')
-                    .style('font-size', Math.ceil(12 * zoomLevel) + 'px');
-                d3.selectAll('.feature')
-                    .style('font-size', Math.ceil(10 * zoomLevel) + 'px');
-                d3.selectAll('.significanceSortText, .rowSortText, .colSortText')
-                    .style('font-size', Math.ceil(14 * zoomLevel) + 'px');
-                d3.selectAll('.featureSortText')
-                    .style('font-size', Math.ceil(10 * zoomLevel) + 'px');
                 gridFieldWidth = 20 * zoomLevel;
-                gridFieldHeight = 20 * zoomLevel;
+                gridFieldHeight = 10 * zoomLevel;
                 width = gridFieldWidth * patientIDs.length;
                 height = gridFieldHeight * uids.length;
                 heatmap
@@ -1337,24 +1342,33 @@ window.smartRApp.directive('heatmapPlot', [
             init();
 
             var animationCheck = document.getElementById('sr-heatmap-animate-check');
+            animationCheck.checked = true;
             animationCheck.addEventListener('change', function() { switchAnimation(animationCheck.checked); });
 
+            document.getElementById('sr-heatmap-row-check').checked = true;
+            document.getElementById('sr-heatmap-col-check').checked = true;
+
             var zoomRange = document.getElementById('sr-heatmap-zoom-range');
+            zoomRange.value = 100;
             zoomRange.addEventListener('mouseup', function() { zoom(parseInt(zoomRange.value)); });
 
             document.getElementById('sr-heatmap-cutoff-btn').addEventListener('click', cutoff);
 
             var cutoffRange = document.getElementById('sr-heatmap-cutoff-range');
+            cutoffRange.value = 0;
             cutoffRange.setAttribute('max', maxRows);
             cutoffRange.addEventListener('mouseup', function() { animateCutoff(parseInt(cutoffRange.value)); });
 
             var clusterSelect = document.getElementById('sr-heatmap-cluster-select');
+            clusterSelect.selectedIndex = 0;
             clusterSelect.addEventListener('change', function() { cluster(clusterSelect.value); });
 
             var colorSelect = document.getElementById('sr-heatmap-color-select');
+            colorSelect.selectedIndex = 0;
             colorSelect.addEventListener('change', function() { updateColors(colorSelect.value); });
 
             var rankingSelect = document.getElementById('sr-heatmap-ranking-select');
+            rankingSelect.selectedIndex = 0;
             rankingSelect.addEventListener('change', function() { changeRanking(rankingSelect.value); });
         }
     }]);

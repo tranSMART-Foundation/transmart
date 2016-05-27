@@ -9,11 +9,9 @@
 }
 
 .feature {
-    font-size: 10px;
 }
 
 .featureSortText {
-    font-size: 10px;
 }
 
 .selected {
@@ -34,7 +32,6 @@
 
 .bar {
     fill: steelblue;
-    stroke: black;
     shape-rendering: crispEdges;
 }
 
@@ -65,7 +62,6 @@
 }
 
 .uid {
-    font-size: 12pt;
     cursor: pointer;
 }
 
@@ -75,7 +71,6 @@
 }
 
 .selectText {
-    font-size: 16pt;
 }
 
 .highlight {
