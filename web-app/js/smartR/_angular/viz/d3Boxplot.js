@@ -26,6 +26,7 @@ window.smartRApp.directive('boxplot', [
                 $(template_viz).empty();
                 if (! $.isEmptyObject(scope.data)) {
                     smartRUtils.prepareWindowSize(scope.width, scope.height);
+                    scope.showControls = true;
                     createBoxplot(scope, template_viz, template_ctrl);
                 }
             });

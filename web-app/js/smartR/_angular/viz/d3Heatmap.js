@@ -25,6 +25,7 @@ window.smartRApp.directive('heatmapPlot', [
                 scope.$watch('data', function(newValue) {
                     $(template_viz).empty();
                     if (angular.isArray(newValue.fields)) {
+                        scope.showControls = true;
                         createHeatmap(scope.data, template_viz, template_ctrl, scope.params);
                     }
                 }, true);
