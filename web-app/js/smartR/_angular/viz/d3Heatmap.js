@@ -4,8 +4,8 @@
 
 window.smartRApp.directive('heatmapPlot', [
     'smartRUtils',
-    'controlElements',
-    function(smartRUtils, controlElements) {
+    '$rootScope',
+    function(smartRUtils, $rootScope) {
 
         return {
             restrict: 'E',
@@ -15,21 +15,23 @@ window.smartRApp.directive('heatmapPlot', [
                 height: '@',
                 params: '='
             },
+            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/heatmap.html',
             link: function(scope, element) {
-
+                var template_ctrl = element.children()[0],
+                    template_viz = element.children()[1];
                 /**
                  * Watch data model (which is only changed by ajax calls when we want to (re)draw everything)
                  */
                 scope.$watch('data', function(newValue) {
-                    $(element[0]).empty();
+                    $(template_viz).empty();
                     if (angular.isArray(newValue.fields)) {
-                        createHeatmap(scope.data, element[0], scope.params);
+                        createHeatmap(scope.data, template_viz, template_ctrl, scope.params);
                     }
                 }, true);
             }
         };
 
-        function createHeatmap(data, root, params) {
+        function createHeatmap(data, root, controls, params) {
             console.log(data);
             var animationDuration = 1500;
             var extraFields = data.extraFields === undefined ? [] : data.extraFields;
@@ -48,8 +50,6 @@ window.smartRApp.directive('heatmapPlot', [
             var numberOfClusteredRows = data.numberOfClusteredRows[0];
             var maxRows = data.maxRows[0];
             var geneCardsAllowed = JSON.parse(params.geneCardsAllowed);
-            var rowClustering = true;
-            var colClustering = true;
             var originalPatientIDs = patientIDs.slice();
             var originalUIDs = uids.slice();
 
@@ -69,15 +69,12 @@ window.smartRApp.directive('heatmapPlot', [
             var histogramHeight = 200;
             var legendWidth = 200;
             var legendHeight = 40;
-            var buttonWidth = 200;
-            var buttonHeight = 40;
-            var buttonPadding = 20;
 
             var margin = {
                 top: gridFieldHeight * 2 + 100 + features.length * gridFieldHeight / 2 + dendrogramHeight,
                 right: gridFieldWidth + 300 + dendrogramHeight,
                 bottom: 10,
-                left: histogramHeight + 250
+                left: histogramHeight
             };
 
             var width = gridFieldWidth * patientIDs.length;
@@ -1031,9 +1028,9 @@ window.smartRApp.directive('heatmapPlot', [
                     .append('rect')
                     .attr('class', 'legendColor')
                     .attr('x', function(d, i) {
-                        return 2 - margin.left + buttonPadding + buttonWidth + i * legendElementWidth;
+                        return 2 - margin.left + i * legendElementWidth;
                     })
-                    .attr('y', 8 - margin.top + buttonHeight * 4 + buttonPadding * 4)
+                    .attr('y', 8 - margin.top + 100)
                     .attr('width', Math.ceil(legendElementWidth))
                     .attr('height', legendElementHeight)
                     .style('fill', function(d) { return colorScale(1 / (1 + Math.pow(Math.E, -d))); });
@@ -1049,9 +1046,9 @@ window.smartRApp.directive('heatmapPlot', [
                     .append('text')
                     .attr('class', 'legendText')
                     .attr('x', function(d, i) {
-                        return 2 - margin.left + buttonPadding + buttonWidth + i * legendElementWidth;
+                        return 2 - margin.left + i * legendElementWidth;
                     })
-                    .attr('y', 8 - margin.top + buttonHeight * 4 + buttonPadding * 4 + legendHeight + 10)
+                    .attr('y', 8 - margin.top + 100)
                     .attr('text-anchor', 'middle')
                     .text(function(d, i) {
                         if (i === 0 || i === steps.length - 1) {
@@ -1291,14 +1288,14 @@ window.smartRApp.directive('heatmapPlot', [
                 d3.selectAll('.box').classed('sortedBy', false);
                 clustering = (typeof clustering === 'undefined') ? lastUsedClustering : clustering;
                 var clusterData = data[clustering];
-                if (rowClustering && numberOfClusteredRows > 0) {
+                if (document.getElementById('sr-heatmap-row-check').checked && numberOfClusteredRows > 0) {
                     rowDendrogram = JSON.parse(clusterData[3]);
                     updateRowOrder(transformClusterOrderWRTInitialOrder(clusterData[1], getInitialRowOrder()));
                     createRowDendrogram(rowDendrogram);
                 } else {
                     removeRowDendrogram();
                 }
-                if (colClustering && numberOfClusteredColumns > 0) {
+                if (document.getElementById('sr-heatmap-col-check').checked && numberOfClusteredColumns > 0) {
                     colDendrogram = JSON.parse(clusterData[2]);
                     updateColOrder(transformClusterOrderWRTInitialOrder(clusterData[0], getInitialColOrder()));
                     createColDendrogram(colDendrogram);
@@ -1306,16 +1303,6 @@ window.smartRApp.directive('heatmapPlot', [
                     removeColDendrogram();
                 }
                 lastUsedClustering = clustering;
-            }
-
-            function switchRowClustering() {
-                rowClustering = !rowClustering;
-                cluster();
-            }
-
-            function switchColClustering() {
-                colClustering = !colClustering;
-                cluster();
             }
 
             function changeRanking(method) {
@@ -1348,209 +1335,25 @@ window.smartRApp.directive('heatmapPlot', [
 
             init();
 
-            controlElements.createD3Switch({
-                location: heatmap,
-                onlabel: 'Animation ON',
-                offlabel: 'Animation OFF',
-                x: 2 - margin.left,
-                y: 8 - margin.top,
-                width: buttonWidth,
-                height: buttonHeight,
-                callback: switchAnimation,
-                checked: true
-            });
+            var animationCheck = document.getElementById('sr-heatmap-animate-check');
+            animationCheck.addEventListener('change', function() { switchAnimation(animationCheck.checked); });
 
-            controlElements.createD3Slider({
-                location: heatmap,
-                label: 'Zoom in %',
-                x: 2 - margin.left + buttonPadding + buttonWidth,
-                y: 8 - margin.top - 10,
-                width: buttonWidth,
-                height: buttonHeight,
-                min: 1,
-                max: 200,
-                init: 100,
-                callback: zoom,
-                trigger: 'dragend'
-            });
+            var zoomRange = document.getElementById('sr-heatmap-zoom-range');
+            zoomRange.addEventListener('mouseup', function() { zoom(parseInt(zoomRange.value)); });
 
-            controlElements.createD3Button({
-                location: heatmap,
-                label: 'Apply Cutoff',
-                x: 2 - margin.left,
-                y: 8 - margin.top + buttonHeight + buttonPadding,
-                width: buttonWidth,
-                height: buttonHeight,
-                callback: cutoff
-            });
+            document.getElementById('sr-heatmap-cutoff-btn').addEventListener('click', cutoff);
 
-            controlElements.createD3Slider({
-                location: heatmap,
-                label: 'Cutoff',
-                x: 2 - margin.left + buttonPadding + buttonWidth,
-                y: 8 - margin.top + buttonHeight + buttonPadding - 10,
-                width: buttonWidth,
-                height: buttonHeight,
-                min: 0,
-                max: maxRows - 2,
-                init: 0,
-                callback: animateCutoff,
-                trigger: 'dragend'
-            });
+            var cutoffRange = document.getElementById('sr-heatmap-cutoff-range');
+            cutoffRange.setAttribute('max', maxRows);
+            cutoffRange.addEventListener('mouseup', function() { animateCutoff(parseInt(cutoffRange.value)); });
 
-            controlElements.createD3Switch({
-                location: heatmap,
-                onlabel: 'Clustering rows ON',
-                offlabel: 'Clustering rows OFF',
-                x: 2 - margin.left,
-                y: 8 - margin.top + buttonHeight * 3 + buttonPadding * 3,
-                width: buttonWidth,
-                height: buttonHeight,
-                callback: switchRowClustering,
-                checked: rowClustering
-            });
+            var clusterSelect = document.getElementById('sr-heatmap-cluster-select');
+            clusterSelect.addEventListener('change', function() { cluster(clusterSelect.value); });
 
-            controlElements.createD3Switch({
-                location: heatmap,
-                onlabel: 'Clustering columns ON',
-                offlabel: 'Clustering columns OFF',
-                x: 2 - margin.left + buttonPadding + buttonWidth,
-                y: 8 - margin.top + buttonHeight * 3 + buttonPadding * 3,
-                width: buttonWidth,
-                height: buttonHeight,
-                callback: switchColClustering,
-                checked: colClustering
-            });
+            var colorSelect = document.getElementById('sr-heatmap-color-select');
+            colorSelect.addEventListener('change', function() { updateColors(colorSelect.value); });
 
-            if (ranking === 'bval' ||
-                ranking === 'pval' ||
-                ranking === 'adjpval' ||
-                ranking === 'logfold' ||
-                ranking === 'ttest') {
-                controlElements.createD3Dropdown({
-                    location: heatmap,
-                    label: 'Ranking Method',
-                    x: 2 - margin.left,
-                    y: 8 - margin.top + buttonHeight * 4 + buttonPadding * 4,
-                    width: buttonWidth,
-                    height: buttonHeight,
-                    items: [
-                        {
-                            callback: function () {
-                                changeRanking('bval');
-                            },
-                            label: 'B Value'
-                        },
-                        {
-                            callback: function () {
-                                changeRanking('ttest');
-                            },
-                            label: 'T Test'
-                        },
-                        {
-                            callback: function () {
-                                changeRanking('logfold');
-                            },
-                            label: 'Logfold'
-                        },
-                        {
-                            callback: function () {
-                                changeRanking('pval');
-                            },
-                            label: 'p Value'
-                        },
-                        {
-                            callback: function () {
-                                changeRanking('adjpval');
-                            },
-                            label: 'adj. p Value'
-                        }
-                    ]
-                });
-            }
-
-
-            controlElements.createD3Dropdown({
-                location: heatmap,
-                label: 'Heatmap Coloring',
-                x: 2 - margin.left,
-                y: 8 - margin.top + buttonHeight * 2 + buttonPadding * 2,
-                width: buttonWidth,
-                height: buttonHeight,
-                items: [
-                    {
-                        callback: function () {
-                            updateColors('redGreen');
-                        },
-                        label: 'Red to Green Schema'
-                    },
-                    {
-                        callback: function () {
-                            updateColors('redBlue');
-                        },
-                        label: 'Red to Blue Schema'
-                    },
-                    {
-                        callback: function () {
-                            updateColors('blueScale');
-                        },
-                        label: 'Blue Schema'
-                    },
-                    {
-                        callback: function () {
-                            updateColors('greenScale');
-                        },
-                        label: 'Green Schema'
-                    }
-                ]
-            });
-
-            controlElements.createD3Dropdown({
-                location: heatmap,
-                label: 'Heatmap Clustering',
-                x: 2 - margin.left + buttonPadding + buttonWidth,
-                y: 8 - margin.top + buttonHeight * 2 + buttonPadding * 2,
-                width: buttonWidth,
-                height: buttonHeight,
-                items: [
-                    {
-                        callback: function () {
-                            cluster('hclustEuclideanAverage');
-                        },
-                        label: 'Hierarch.-Eucl.-Average'
-                    },
-                    {
-                        callback: function () {
-                            cluster('hclustEuclideanComplete');
-                        },
-                        label: 'Hierarch.-Eucl.-Complete'
-                    },
-                    {
-                        callback: function () {
-                            cluster('hclustEuclideanSingle');
-                        },
-                        label: 'Hierarch.-Eucl.-Single'
-                    },
-                    {
-                        callback: function () {
-                            cluster('hclustManhattanAverage');
-                        },
-                        label: 'Hierarch.-Manhat.-Average'
-                    },
-                    {
-                        callback: function () {
-                            cluster('hclustManhattanComplete');
-                        },
-                        label: 'Hierarch.-Manhat.-Complete'
-                    },
-                    {
-                        callback: function () {
-                            cluster('hclustManhattanSingle');
-                        },
-                        label: 'Hierarch.-Manhat.-Single'
-                    }
-                ]
-            });
+            var rankingSelect = document.getElementById('sr-heatmap-ranking-select');
+            rankingSelect.addEventListener('change', function() { changeRanking(rankingSelect.value); });
         }
-
     }]);

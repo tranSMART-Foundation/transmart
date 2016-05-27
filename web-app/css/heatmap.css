@@ -117,3 +117,16 @@
     padding: 4px;
 }
 
+.sr-workflow-controls>div {
+    float: right;
+    padding: 5px 15px 5px 15px;
+}
+
+#sr-heatmap-cluster-select {
+    width: 100%;
+}
+
+#sr-heatmap-zoom-range {
+    float: right;
+}
+
