@@ -5,8 +5,8 @@
 window.smartRApp.directive('boxplot', [
     'smartRUtils',
     'rServeService',
-    'controlElements',
-    function(smartRUtils, rServeService, controlElements) {
+    '$rootScope',
+    function(smartRUtils, rServeService, $rootScope) {
 
     return {
         restrict: 'E',
@@ -15,16 +15,19 @@ window.smartRApp.directive('boxplot', [
             width: '@',
             height: '@'
         },
-        template: '<div id="boxplot" style="float:left; padding-right:10px;"></div>',
+        templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/boxplot.html',
         link: function (scope, element) {
+            var template_ctrl = element.children()[0],
+                template_viz = element.children()[1];
             /**
              * Watch data model (which is only changed by ajax calls when we want to (re)draw everything)
              */
             scope.$watch('data', function () {
-                $(element[0]).empty();
+                $(template_viz).empty();
                 if (! $.isEmptyObject(scope.data)) {
                     smartRUtils.prepareWindowSize(scope.width, scope.height);
-                    createBoxplot(scope, element[0]);
+                    scope.showControls = true;
+                    createBoxplot(scope, template_viz, template_ctrl);
                 }
             });
         }
@@ -455,50 +458,12 @@ window.smartRApp.directive('boxplot', [
             excludeSelection(); // Abusing the method because I can
         }
 
-        var buttonWidth = 200;
-        var buttonHeight = 40;
-        var padding = 5;
-        controlElements.createD3Button({
-            location: boxplot,
-            label: 'Remove Outliers',
-            x: -280,
-            y: 2,
-            width: buttonWidth,
-            height: buttonHeight,
-            callback: removeOutliers
-        });
-        controlElements.createD3Button({
-            location: boxplot,
-            label: 'Reset',
-            x: -280,
-            y: 2 + padding + buttonHeight,
-            width: buttonWidth,
-            height: buttonHeight,
-            callback: reset
-        });
-
-        controlElements.createD3Switch({
-            location: boxplot,
-            onlabel: 'Density Estimation ON',
-            offlabel: 'Density Estimation OFF',
-            x: -280,
-            y: 2 + padding * 2 + buttonHeight * 2,
-            width: buttonWidth,
-            height: buttonHeight,
-            callback: swapKDE,
-            checked: false
-        });
-        controlElements.createD3Switch({
-            location: boxplot,
-            onlabel: 'Jitter Datapoints ON',
-            offlabel: 'Jitter Datapoints OFF',
-            x: -280,
-            y: 2 + padding * 3 + buttonHeight * 3,
-            width: buttonWidth,
-            height: buttonHeight,
-            callback: swapJitter,
-            checked: false
-        });
+        document.getElementById('sr-boxplot-remove-btn').addEventListener('click', removeOutliers);
+        document.getElementById('sr-boxplot-reset-btn').addEventListener('click', reset);
+        var kdeCheck = document.getElementById('sr-boxplot-kde-check');
+        kdeCheck.addEventListener('change', function() { swapKDE(kdeCheck.checked); });
+        var jitterCheck = document.getElementById('sr-boxplot-jitter-check');
+        jitterCheck.addEventListener('change', function() { swapJitter(jitterCheck.checked); });
     }
 
 }]);

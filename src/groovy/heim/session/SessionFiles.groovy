@@ -29,8 +29,7 @@ class SessionFiles {
     void removeAll() {
         try {
             for (File f: files.values()) {
-                println f.getAbsolutePath()
-                println f.delete()
+                f.delete()
             }
         }
         catch(NoSuchFileException e) {}

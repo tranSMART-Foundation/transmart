@@ -66,3 +66,9 @@
     stroke-width: 1px;
     shape-rendering: crispEdges;
 }
+
+.sr-workflow-controls>div {
+    float:right;
+    padding: 5px 15px 5px 15px;
+}
+
