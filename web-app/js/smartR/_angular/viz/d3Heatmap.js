@@ -1037,7 +1037,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .append('rect')
                     .attr('class', 'legendColor')
                     .attr('x', function(d, i) {
-                        return 2 - margin.left + i * legendElementWidth;
+                        return 5 - margin.left + i * legendElementWidth;
                     })
                     .attr('y', 8 - margin.top + 100)
                     .attr('width', Math.ceil(legendElementWidth))
@@ -1055,7 +1055,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .append('text')
                     .attr('class', 'legendText')
                     .attr('x', function(d, i) {
-                        return 2 - margin.left + i * legendElementWidth;
+                        return 5 - margin.left + i * legendElementWidth;
                     })
                     .attr('y', 8 - margin.top + 100)
                     .attr('text-anchor', 'middle')
