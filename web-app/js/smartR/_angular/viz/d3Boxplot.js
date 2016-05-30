@@ -461,8 +461,10 @@ window.smartRApp.directive('boxplot', [
         document.getElementById('sr-boxplot-remove-btn').addEventListener('click', removeOutliers);
         document.getElementById('sr-boxplot-reset-btn').addEventListener('click', reset);
         var kdeCheck = document.getElementById('sr-boxplot-kde-check');
+        kdeCheck.checked = false;
         kdeCheck.addEventListener('change', function() { swapKDE(kdeCheck.checked); });
         var jitterCheck = document.getElementById('sr-boxplot-jitter-check');
+        jitterCheck.checked = false;
         jitterCheck.addEventListener('change', function() { swapJitter(jitterCheck.checked); });
     }
 
