@@ -150,7 +150,7 @@ window.smartRApp.directive('heatmapPlot', [
             var maxZScore = Math.max.apply(null, zScores);
             var minZScore = Math.min.apply(null, zScores);
             var steps = [];
-            for (var i = minZScore; i < maxZScore; i+= (maxZScore - minZScore) / 200) {
+            for (var i = minZScore; i < maxZScore; i+= (maxZScore - minZScore) / 50) {
                 steps.push(i);
             }
 
@@ -1048,35 +1048,21 @@ window.smartRApp.directive('heatmapPlot', [
                     .duration(animationDuration)
                     .style('fill', function(d) { return colorScale(1 / (1 + Math.pow(Math.E, -d))); });
 
-                var legendText = legendItems.selectAll('.legendText')
-                    .data(steps, function(d) { return d; });
+                d3.selectAll('.legendText').remove();
 
-                legendText.enter()
-                    .append('text')
+                legendItems.append('text')
                     .attr('class', 'legendText')
-                    .attr('x', function(d, i) {
-                        return 5 - margin.left + i * legendElementWidth;
-                    })
+                    .attr('x', 5 - margin.left)
                     .attr('y', 8 - margin.top + 100)
-                    .attr('text-anchor', 'middle')
-                    .text(function(d, i) {
-                        if (i === 0 || i === steps.length - 1) {
-                            return Number((steps.min()).toFixed(1));
-                        } else {
-                            return null;
-                        }
-                    });
+                    .attr('text-anchor', 'start')
+                    .text(steps.min().toFixed(1));
 
-                legendText.transition()
-                    .text(function(d, i) {
-                        if (i === 0) {
-                            return Number((steps.min()).toFixed(1));
-                        } else if (i === steps.length - 1) {
-                            return Number((steps.max()).toFixed(1));
-                        } else {
-                            return null;
-                        }
-                    });
+                legendItems.append('text')
+                    .attr('class', 'legendText')
+                    .attr('x', 5 - margin.left + legendWidth)
+                    .attr('y', 8 - margin.top + 100)
+                    .attr('text-anchor', 'end')
+                    .text(steps.max().toFixed(1));
             }
 
             function unselectAll() {
