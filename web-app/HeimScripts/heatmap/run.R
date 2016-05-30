@@ -165,8 +165,6 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
 
     msgs <- c("Finished successfuly")
     list(messages = msgs)
-    
-    return(hd.df)
 }
 
 

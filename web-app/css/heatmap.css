@@ -56,11 +56,11 @@
     stroke: red;
 }
 
-.uid {
+.rowname {
     cursor: pointer;
 }
 
-.uid:hover {
+.rowname:hover {
     fill: blue;
     text-decoration: underline;
 }
