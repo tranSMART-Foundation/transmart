@@ -52,8 +52,8 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         return $.fn.textWidth.fakeEl.width();
     };    
     
-    service.getTextWidth = function(cssSelector) {
-        return $(cssSelector).textWidth();
+    service.getTextWidth = function(text, font) {
+        return $.fn.textWidth(text, font);
     };
 
     /**

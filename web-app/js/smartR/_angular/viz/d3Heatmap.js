@@ -611,7 +611,10 @@ window.smartRApp.directive('heatmapPlot', [
                     });
 
                 // FIXME: This line is not working properly
-                var featurePosY = -gridFieldWidth * 2 - smartRUtils.getTextWidth(d3.select('.patientID')[0]) -
+                var longestPatient = patientIDs.reduce(function(prev, curr) {
+                    return curr.length > prev.length ? curr : prev;
+                }, '');
+                var featurePosY = -gridFieldWidth * 2 - smartRUtils.getTextWidth(longestPatient) -
                     features.length * gridFieldWidth / 2 - 20;
 
                 var extraSquare = featureItems.selectAll('.extraSquare')
@@ -1091,7 +1094,10 @@ window.smartRApp.directive('heatmapPlot', [
             function createColDendrogram() {
                 var w = 200;
                 var colDendrogramWidth = gridFieldWidth * numberOfClusteredColumns;
-                var spacing = gridFieldWidth * 2 + smartRUtils.getTextWidth(d3.select('.patientID')[0]) +
+                var longestPatient = patientIDs.reduce(function(prev, curr) {
+                    return curr.length > prev.length ? curr : prev;
+                }, '');
+                var spacing = gridFieldWidth * 2 + smartRUtils.getTextWidth(longestPatient) +
                     features.length * gridFieldHeight / 2 + 40;
 
                 var cluster = d3.layout.cluster()
@@ -1148,7 +1154,10 @@ window.smartRApp.directive('heatmapPlot', [
             function createRowDendrogram() {
                 var h = 280;
                 var rowDendrogramHeight = gridFieldWidth * numberOfClusteredRows;
-                var spacing = gridFieldWidth + smartRUtils.getTextWidth(d3.select('.uid')[0]) + 20;
+                var longestUID = uids.reduce(function(prev, curr) {
+                    return curr.length > prev.length ? curr : prev;
+                }, '');
+                var spacing = gridFieldWidth + smartRUtils.getTextWidth(longestUID) + 20;
 
                 var cluster = d3.layout.cluster()
                     .size([rowDendrogramHeight, h])
