@@ -217,3 +217,20 @@ div.sr-status-and-output-container:empty:before {
     background-color: #326FCB;
 }
 
+.sr-workflow-controls {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+.sr-workflow-controls-hider {
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    cursor: pointer;
+    padding: 5px;
+    position: fixed;
+    right: 0;
+}
+
