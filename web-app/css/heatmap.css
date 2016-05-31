@@ -1,6 +1,14 @@
 .square {
 }
 
+.square:hover {
+    opacity: 0.4;
+}
+
+.squareHighlighted {
+    opacity: 0.4;
+}
+
 .extraSquare {
 }
 
@@ -12,14 +20,6 @@
 
 .selected {
     opacity: 1;
-}
-
-.square:hover {
-    opacity: 0.4;
-}
-
-.squareHighlighted {
-    opacity: 0.4;
 }
 
 .extraSquare:hover {
