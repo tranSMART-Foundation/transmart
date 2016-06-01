@@ -48,6 +48,20 @@ window.smartRApp.directive('boxplot', [
         }
         setData(scope.data);
 
+        var removeBtn = smartRUtils.getElementWithoutEventListeners('sr-boxplot-remove-btn');
+        removeBtn.addEventListener('click', removeOutliers);
+
+        var resetBtn = smartRUtils.getElementWithoutEventListeners('sr-boxplot-reset-btn');
+        resetBtn.addEventListener('click', reset);
+
+        var kdeCheck = smartRUtils.getElementWithoutEventListeners('sr-boxplot-kde-check');
+        kdeCheck.addEventListener('change', function() { swapKDE(kdeCheck.checked); });
+        kdeCheck.checked = false;
+
+        var jitterCheck = smartRUtils.getElementWithoutEventListeners('sr-boxplot-jitter-check');
+        jitterCheck.addEventListener('change', function() { swapJitter(jitterCheck.checked); });
+        jitterCheck.checked = false;
+
         var animationDuration = 1000;
 
         var width = parseInt(scope.width);
@@ -458,14 +472,6 @@ window.smartRApp.directive('boxplot', [
             excludeSelection(); // Abusing the method because I can
         }
 
-        document.getElementById('sr-boxplot-remove-btn').addEventListener('click', removeOutliers);
-        document.getElementById('sr-boxplot-reset-btn').addEventListener('click', reset);
-        var kdeCheck = document.getElementById('sr-boxplot-kde-check');
-        kdeCheck.checked = false;
-        kdeCheck.addEventListener('change', function() { swapKDE(kdeCheck.checked); });
-        var jitterCheck = document.getElementById('sr-boxplot-jitter-check');
-        jitterCheck.checked = false;
-        jitterCheck.addEventListener('change', function() { swapJitter(jitterCheck.checked); });
     }
 
 }]);

@@ -142,7 +142,11 @@
             <download-results-button disabled="runAnalysis.download.disabled"></download-results-button>
             <br/>
             <workflow-warnings warnings="runAnalysis.scriptResults.warnings"></workflow-warnings>
-            <heatmap-plot data="runAnalysis.scriptResults" width="1200" height="1200" params="runAnalysis.params"></heatmap-plot>
+            <heatmap-plot data="runAnalysis.scriptResults"
+                          width="1200"
+                          height="1200"
+                          params="runAnalysis.params">
+            </heatmap-plot>
 
         </workflow-tab>
 

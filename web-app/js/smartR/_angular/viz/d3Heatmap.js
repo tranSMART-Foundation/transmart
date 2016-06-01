@@ -17,47 +17,42 @@ window.smartRApp.directive('heatmapPlot', [
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/heatmap.html',
             link: function(scope, element) {
-                var template_ctrl = element.children()[0],
-                    template_viz = element.children()[1];
+                var viz = element.children()[1];
                 /**
                  * Watch data model (which is only changed by ajax calls when we want to (re)draw everything)
                  */
                 scope.$watch('data', function(newValue) {
-                    $(template_viz).empty();
+                    scope.showControls = false;
+                    angular.element(viz).empty();
                     if (angular.isArray(newValue.fields)) {
                         scope.showControls = true;
-                        createHeatmap(scope.data, template_viz, template_ctrl, scope.params);
+                        createHeatmap(scope, viz);
                     }
                 }, true);
             }
         };
 
-        function createHeatmap(data, root, controls, params) {
-            console.log(data);
+        function createHeatmap(scope, root) {
+            console.log(scope.data);
             var ANIMATION_DURATION = 1500;
-            var animationDuration = ANIMATION_DURATION;
 
-            var fields = data.fields;
-            var extraFields = data.extraFields;
-            var features = typeof data.features === 'undefined' ? [] : data.features;
+            var fields = scope.data.fields;
+            var extraFields = scope.data.extraFields;
+            var features = scope.data.features || [];
 
-            var colNames = data.colNames; // unique
-            var rowNames = data.rowNames; // unique
+            var colNames = scope.data.colNames; // unique
+            var rowNames = scope.data.rowNames; // unique
 
             var originalColNames = colNames.slice();
             var originalRowNames = rowNames.slice();
 
-            var ranking = data.ranking[0].toUpperCase();
-            var statistics = data.allStatValues;
+            var ranking = scope.data.ranking[0].toUpperCase();
+            var statistics = scope.data.allStatValues;
             var significanceValues = statistics.map(function(d) { return d[ranking]; });
 
-            var maxRows = data.maxRows[0];
+            var maxRows = scope.data.maxRows[0];
 
-            var geneCardsAllowed = JSON.parse(params.geneCardsAllowed);
-
-            function switchAnimation(checked) {
-                animationDuration = checked ? ANIMATION_DURATION : 0;
-            }
+            var geneCardsAllowed = JSON.parse(scope.params.geneCardsAllowed);
 
             var gridFieldWidth = 20;
             var gridFieldHeight = 10;
@@ -84,6 +79,55 @@ window.smartRApp.directive('heatmapPlot', [
 
             var scale = null;
             var histogramScale = null;
+
+            var animationCheck = smartRUtils.getElementWithoutEventListeners('sr-heatmap-animate-check');
+            animationCheck.checked = fields.length < 10000;
+
+            var zoomRange = smartRUtils.getElementWithoutEventListeners('sr-heatmap-zoom-range');
+            zoomRange.addEventListener('mouseup', function() { zoom(parseInt(zoomRange.value)); });
+            zoomRange.value = 100;
+
+            var cutoffBtn = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cutoff-btn');
+            cutoffBtn.addEventListener('click', cutoff);
+
+            var cutoffRange = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cutoff-range');
+            cutoffRange.addEventListener('mouseup', function() { animateCutoff(parseInt(cutoffRange.value)); });
+            cutoffRange.setAttribute('max', maxRows);
+            cutoffRange.value = 0;
+
+            var clusterSelect = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cluster-select');
+            clusterSelect.addEventListener('change', function() { cluster(clusterSelect.value); });
+            clusterSelect.disabled = maxRows < 2;
+            clusterSelect.selectedIndex = 0;
+
+            var clusterRowCheck = smartRUtils.getElementWithoutEventListeners('sr-heatmap-row-check');
+            clusterRowCheck.disabled = maxRows < 2;
+            clusterRowCheck.checked = true;
+
+            var clusterColCheck = smartRUtils.getElementWithoutEventListeners('sr-heatmap-col-check');
+            clusterColCheck.disabled = maxRows < 2;
+            clusterColCheck.checked = true;
+
+            var colorSelect = smartRUtils.getElementWithoutEventListeners('sr-heatmap-color-select');
+            colorSelect.addEventListener('change', function() { updateColors(colorSelect.value); });
+            colorSelect.selectedIndex = 0;
+
+            var rankingSelect = smartRUtils.getElementWithoutEventListeners('sr-heatmap-ranking-select');
+            rankingSelect.addEventListener('change', function() { setRanking(rankingSelect.value); });
+            while (rankingSelect.firstChild) {
+                rankingSelect.removeChild(rankingSelect.firstChild);
+            }
+            for (var stat in statistics[0]) { // collect existing statistics headers
+                if (statistics[0].hasOwnProperty(stat) && stat !== 'ROWNAME') {
+                    var option = document.createElement('option');
+                    if (ranking === stat) {
+                        option.selected = true;
+                    }
+                    option.setAttribute('value', stat);
+                    option.innerHTML = stat.toLowerCase();
+                    rankingSelect.appendChild(option);
+                }
+            }
 
             function setScales() {
                 scale = d3.scale.linear()
@@ -142,18 +186,15 @@ window.smartRApp.directive('heatmapPlot', [
 
             // this code is needed for the legend generation
             var zScores = fields.map(function(d) { return d.ZSCORE; });
-            var maxZScore = Math.max.apply(null, zScores);
-            var minZScore = Math.min.apply(null, zScores);
+            var maxZScore = zScores.reduce(function(prev, curr) { return curr > prev ? curr : prev; });
+            var minZScore = zScores.reduce(function(prev, curr) { return curr < prev ? curr : prev; });
             var steps = [];
             for (var i = minZScore; i < maxZScore; i+= (maxZScore - minZScore) / 50) {
                 steps.push(i);
             }
 
             function updateHeatmap() {
-                var t0 = performance.now();
-                console.log('A'); 
                 updateHeatmapTable();
-                console.log('B');
                 var square = squareItems.selectAll('.square')
                     .data(fields);
 
@@ -189,7 +230,7 @@ window.smartRApp.directive('heatmapPlot', [
                     });
 
                 square.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('x', function(d) { return colNames.indexOf(d.COLNAME) * gridFieldWidth; })
                     .attr('y', function(d) { return rowNames.indexOf(d.ROWNAME) * gridFieldHeight; })
                     .attr('width', gridFieldWidth)
@@ -206,7 +247,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .text('↑↓');
 
                 colSortText.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('x', function(d, i) { return i * gridFieldWidth + 0.5 * gridFieldWidth; })
                     .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight)
                     .style('font-size', gridFieldHeight + 'px');
@@ -246,7 +287,7 @@ window.smartRApp.directive('heatmapPlot', [
                     });
 
                 colSortBox.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('x', function(d, i) { return i * gridFieldWidth; })
                     .attr('y', -2 - gridFieldHeight)
                     .attr('width', gridFieldWidth)
@@ -263,7 +304,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .text('↑↓');
 
                 rowSortText.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .style('font-size', gridFieldHeight + 'px')
                     .attr('transform', function(d, i) {
                         return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' +
@@ -293,7 +334,7 @@ window.smartRApp.directive('heatmapPlot', [
                     });
 
                 rowSortBox.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('x', width + 2)
                     .attr('y', function(d, i) { return i * gridFieldHeight; })
                     .attr('width', gridFieldWidth)
@@ -310,7 +351,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .text('↑↓');
 
                 significanceSortText.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .style('font-size', gridFieldHeight + 'px')
                     .attr('x', -gridFieldWidth - 10 + 0.5 * gridFieldWidth)
                     .attr('y', -2 - gridFieldHeight + 0.5 * gridFieldHeight);
@@ -339,7 +380,7 @@ window.smartRApp.directive('heatmapPlot', [
                     });
 
                 significanceSortBox.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('x', -gridFieldWidth - 10)
                     .attr('y', -2 - gridFieldHeight)
                     .attr('width', gridFieldWidth)
@@ -358,7 +399,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .text('□');
 
                 selectText.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .style('font-size', gridFieldHeight + 'px')
                     .attr('x', function(d, i) { return i * gridFieldWidth + 0.5 * gridFieldWidth; })
                     .attr('y', -2 - gridFieldHeight * 2 + 0.5 * gridFieldHeight);
@@ -372,7 +413,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .on('click', function(colName) { selectCol(colName); });
 
                 selectBox.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('x', function(d, i) { return i * gridFieldWidth; })
                     .attr('y', -2 - gridFieldHeight * 2)
                     .attr('width', gridFieldWidth)
@@ -388,7 +429,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .text(function(d) { return d; });
 
                 colName.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .style('font-size', gridFieldHeight + 'px')
                     .attr('transform', function(d) {
                         return 'translate(' + (colNames.indexOf(d) * gridFieldWidth) + ',0)' +
@@ -423,7 +464,7 @@ window.smartRApp.directive('heatmapPlot', [
                     });
 
                 rowName.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .style('font-size', gridFieldHeight + 'px')
                     .attr('x', width + gridFieldWidth + 7)
                     .attr('y', function(d) { return rowNames.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
@@ -453,7 +494,7 @@ window.smartRApp.directive('heatmapPlot', [
                     });
 
                 bar.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('height', gridFieldHeight)
                     .attr('width', function(d) { return histogramScale(d.significance); })
                     .attr('x', function(d) { return -histogramScale(d.significance); })
@@ -493,7 +534,7 @@ window.smartRApp.directive('heatmapPlot', [
                     });
 
                 extraSquare.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('x', function(d) { return colNames.indexOf(d.COLNAME) * gridFieldWidth; })
                     .attr('y', function(d) { return featurePosY + features.indexOf(d.ROWNAME) * gridFieldHeight / 2; })
                     .attr('width', gridFieldWidth)
@@ -510,7 +551,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .text(function(d) { return d; });
 
                 feature.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .style('font-size', gridFieldHeight + 'px')
                     .attr('x', width + gridFieldWidth + 7)
                     .attr('y', function(d) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4; });
@@ -526,7 +567,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .text('↑↓');
 
                 featureSortText.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .style('font-size', gridFieldHeight + 'px')
                     .attr('transform', function(d) {
                         return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' +
@@ -582,13 +623,11 @@ window.smartRApp.directive('heatmapPlot', [
 
 
                 featureSortBox.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('x', width + 2)
                     .attr('y', function(d) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2; })
                     .attr('width', gridFieldWidth)
                     .attr('height', gridFieldHeight / 2);
-                var t1 = performance.now();
-                console.log((t1 - t0) / 1000);
             }
 
             function updateHeatmapTable() {
@@ -648,11 +687,11 @@ window.smartRApp.directive('heatmapPlot', [
                 heatmap
                     .attr('width', width + margin.left + margin.right)
                     .attr('height', width + margin.top + margin.bottom);
-                var temp = animationDuration;
-                animationDuration = 0;
+                var temp = ANIMATION_DURATION;
+                ANIMATION_DURATION = 0;
                 updateHeatmap();
                 reloadDendrograms();
-                animationDuration = temp;
+                ANIMATION_DURATION = temp;
                 adjustDimensions();
             }
 
@@ -687,7 +726,7 @@ window.smartRApp.directive('heatmapPlot', [
                 //});
                 // TODO: Use ajax service to be provided by ajaxServices.js to re-compute analysis
                 // with new arguments (in this case filter for cut-off)
-                params.max_row = maxRows - cutoffLevel - 1;
+                scope.params.max_row = maxRows - cutoffLevel - 1;
                 $('run-button input').click();
             }
 
@@ -779,7 +818,7 @@ window.smartRApp.directive('heatmapPlot', [
 
                 d3.selectAll('.square')
                     .transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .style('fill', function(d) {
                         return colorScale(1 / (1 + Math.pow(Math.E, -d.ZSCORE)));
                     });
@@ -828,7 +867,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('height', legendElementHeight);
 
                 legendColor.transition()
-                    .duration(animationDuration)
+                    .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .style('fill', function(d) { return colorScale(1 / (1 + Math.pow(Math.E, -d))); });
 
                 d3.selectAll('.legendText').remove();
@@ -972,7 +1011,6 @@ window.smartRApp.directive('heatmapPlot', [
 
                         request.then(
                             function(response) {
-                                console.log(response);
                                 var sessionID = response.match(/tmp_\d+/)[0];
                                 var url = 'http://biocompendium.embl.de/' +
                                     'cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=' +
@@ -1061,7 +1099,7 @@ window.smartRApp.directive('heatmapPlot', [
                 }
                 d3.selectAll('.box').classed('sortedBy', false);
                 clustering = (typeof clustering === 'undefined') ? lastUsedClustering : clustering;
-                var clusterData = data.hclust[clustering];
+                var clusterData = scope.data.hclust[clustering];
                 if (document.getElementById('sr-heatmap-row-check').checked && rowNames.length > 0) {
                     rowDendrogram = JSON.parse(clusterData[3]);
                     updateRowOrder(transformClusterOrderWRTInitialOrder(clusterData[1], getInitialRowOrder()), false);
@@ -1088,57 +1126,15 @@ window.smartRApp.directive('heatmapPlot', [
             }
 
             function init() {
-                animationDuration = 0;
+                var temp = ANIMATION_DURATION;
+                ANIMATION_DURATION = 0;
                 updateHeatmap();
                 reloadDendrograms();
                 updateColors('redGreen');
-                animationDuration = ANIMATION_DURATION;
+                ANIMATION_DURATION = temp;
             }
 
             init();
 
-            var animationCheck = document.getElementById('sr-heatmap-animate-check');
-            animationCheck.checked = true;
-            animationCheck.addEventListener('change', function() { switchAnimation(animationCheck.checked); });
-
-            document.getElementById('sr-heatmap-row-check').checked = true;
-            document.getElementById('sr-heatmap-col-check').checked = true;
-
-            var zoomRange = document.getElementById('sr-heatmap-zoom-range');
-            zoomRange.value = 100;
-            zoomRange.addEventListener('mouseup', function() { zoom(parseInt(zoomRange.value)); });
-
-            document.getElementById('sr-heatmap-cutoff-btn').addEventListener('click', cutoff);
-
-            var cutoffRange = document.getElementById('sr-heatmap-cutoff-range');
-            cutoffRange.value = 0;
-            cutoffRange.setAttribute('max', maxRows);
-            cutoffRange.addEventListener('mouseup', function() { animateCutoff(parseInt(cutoffRange.value)); });
-
-            var clusterSelect = document.getElementById('sr-heatmap-cluster-select');
-            clusterSelect.selectedIndex = 0;
-            clusterSelect.disabled = maxRows < 2;
-            clusterSelect.addEventListener('change', function() { cluster(clusterSelect.value); });
-
-            var colorSelect = document.getElementById('sr-heatmap-color-select');
-            colorSelect.selectedIndex = 0;
-            colorSelect.addEventListener('change', function() { updateColors(colorSelect.value); });
-
-            var rankingSelect = document.getElementById('sr-heatmap-ranking-select');
-            while (rankingSelect.firstChild) {
-                rankingSelect.removeChild(rankingSelect.firstChild);
-            }
-            for (var stat in statistics[0]) { // collect existing statistics headers
-                if (statistics[0].hasOwnProperty(stat) && stat !== 'ROWNAME') {
-                    var option = document.createElement('option');
-                    if (ranking === stat) {
-                        option.selected = true;
-                    }
-                    option.setAttribute('value', stat);
-                    option.innerHTML = stat.toLowerCase();
-                    rankingSelect.appendChild(option);
-                }
-            }
-            rankingSelect.addEventListener('change', function() { setRanking(rankingSelect.value); });
         }
     }]);
