@@ -29,7 +29,7 @@ TRANSMART_ETL_NAME="tranSMART-ETL-release-16.1"
 TRANSMART_ETL_ZIP="$TRANSMART_ETL_NAME.zip"
 TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP"
 TRANSMART_ETL_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP.sig"
-TRANSMART_ETL_MD%_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP.md5"
+TRANSMART_ETL_MD5_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP.md5"
 
 TRANSMART_WAR_NAME="transmart.war"
 TRANSMART_WAR_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME"
