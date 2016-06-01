@@ -87,7 +87,6 @@ main <- function(phase = NA, projection = NA)
     input_data = input_data[hd_idx.vec]
   }
   
-  #return(input_data)
   
   check_input(input_data, projection)
   
@@ -100,7 +99,6 @@ main <- function(phase = NA, projection = NA)
   if (phase == "preprocess")
   {
     data_measurements <- split_on_subsets(data_measurements)
-    
   }
   
   summary_stats_json <- produce_summary_stats(data_measurements, phase)
@@ -114,8 +112,8 @@ main <- function(phase = NA, projection = NA)
 
 
 ## SE: for debug
-#b = main(phase = "preprocess", projection = "log_intensity")
-#a = main(phase = "fetch", projection = "log_intensity")
+# b = main(phase = "preprocess", projection = "log_intensity")
+# a = main(phase = "fetch", projection = "log_intensity")
 
 
 
