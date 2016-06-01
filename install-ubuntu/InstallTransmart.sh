@@ -23,32 +23,36 @@ TRANSMART_DATA_NAME="transmart-data-release-16.1"
 TRANSMART_DATA_ZIP="$TRANSMART_DATA_NAME.zip"
 TRANSMART_DATA_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_ZIP"
 TRANSMART_DATA_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_ZIP.sig"
+TRANSMART_DATA_MD5_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_ZIP.md5"
 
 TRANSMART_ETL_NAME="tranSMART-ETL-release-16.1"
 TRANSMART_ETL_ZIP="$TRANSMART_ETL_NAME.zip"
 TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP"
 TRANSMART_ETL_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP.sig"
+TRANSMART_ETL_MD%_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP.md5"
 
 TRANSMART_WAR_NAME="transmart.war"
 TRANSMART_WAR_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME"
 TRANSMART_WAR_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME.sig"
+TRANSMART_WAR_MD5_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME.md5"
 
 TRANSMART_GWAVA_WAR_NAME="gwava.war"
 TRANSMART_GWAVA_WAR_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME"
 TRANSMART_GWAVA_WAR_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.sig"
+TRANSMART_GWAVA_WAR_MD5_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.md5"
 
 # on error; stop/exit
 set -e
 
-# Helper function: use gpg to verify downaload
-# This assumes that the verify-signature setup is done and that the script directory has been verified
-# assumes <name> is downloaded file and <name>.sig is signature file
+# Helper function: use md5 to verify downaload
+# This assumes <name> is downloaded file and <name>.md5 is signature file
 # on current directory
-function verifyWithGpg {
+function verifyWithMd5 {
 	filename=$1
-	gpg --verify $filename.sig
-	echo "$?"
-	return $?
+	check1=$( gpg --default-key ACC50501 --print-md MD5 $filename )
+	check2=$( cut -d* -f1 $filename.md5 )
+	echo "MD5 hash from file:    $check1"
+	echo "MD5 hash from Library: $check2"
 }
 
 # Helper function: check and quit on error
@@ -117,15 +121,10 @@ cd $INSTALL_BASE
 sudo -v
 if ! [ -e $TRANSMART_DATA_ZIP ] ; then
 	curl $TRANSMART_DATA_URL -o $TRANSMART_DATA_ZIP
-	curl $TRANSMART_DATA_SIG_URL -o $TRANSMART_DATA_ZIP.sig
+	curl $TRANSMART_DATA_MD5_URL -o $TRANSMART_DATA_ZIP.md5
 fi
-returnedValue=$(verifyWithGpg "$TRANSMART_DATA_ZIP")
-if [ "$returnedValue" != "0" ] ; then
-	echo "++++++++++++++++++++++++++++"
-	echo "+  VERIFY(gpg) failed transmart-data folder"
-	echo "++++++++++++++++++++++++++++"
-	exit -1
-fi
+verifyWithMd5 "$TRANSMART_DATA_ZIP"
+
 if ! [ -e transmart-data ] ; then
 	echo "unzipping $TRANSMART_DATA_ZIP"
 	unzip $TRANSMART_DATA_ZIP
@@ -142,15 +141,10 @@ cd $INSTALL_BASE/transmart-data/env
 sudo -v
 if ! [ -e $TRANSMART_ETL_ZIP ] ; then
 	curl $TRANSMART_ETL_URL -o $TRANSMART_ETL_ZIP
-	curl $TRANSMART_ETL_SIG_URL -o $TRANSMART_ETL_ZIP.sig
+	curl $TRANSMART_ETL_MD5_URL -o $TRANSMART_ETL_ZIP.md5
 fi
-returnedValue=$(verifyWithGpg "$TRANSMART_ETL_ZIP")
-if [ "$returnedValue" != "0" ] ; then
-	echo "++++++++++++++++++++++++++++"
-	echo "+  VERIFY(gpg) failed tranSMART-ETL folder"
-	echo "++++++++++++++++++++++++++++"
-	exit -1 
-fi
+verifyWithMd5 "$TRANSMART_ETL_ZIP"
+
 if ! [ -e tranSMART-ETL ] ; then
 	echo "unzipping $TRANSMART_ETL_ZIP"
 	unzip $TRANSMART_ETL_ZIP
@@ -171,34 +165,22 @@ fi
 cd war-files
 if ! [ -e transmart.war ]; then
 	curl $TRANSMART_WAR_URL --output transmart.war
-	curl $TRANSMART_WAR_SIG_URL --output transmart.war.sig
+	curl $TRANSMART_WAR_MD5_URL --output transmart.war.md5
 fi
-returnedValue=$(verifyWithGpg "transmart.war")
-if [ "$returnedValue" != "0" ] ; then
-	echo "++++++++++++++++++++++++++++"
-	echo "+  VERIFY(gpg) failed transmart.war"
-	echo "++++++++++++++++++++++++++++"
-	exit -1 
-fi
+verifyWithMd5 "transmart.war"
 
 if ! [ -e gwava.war ]; then
 	curl $TRANSMART_GWAVA_WAR_URL --output gwava.war
-	curl $TRANSMART_GWAVA_WAR_SIG_URL --output gwava.war.sig
+	curl $TRANSMART_GWAVA_WAR_MD5_URL --output gwava.war.md5
 fi
-returnedValue=$(verifyWithGpg "gwava.war")
-if [ "$returnedValue" != "0" ] ; then
-	echo "++++++++++++++++++++++++++++"
-	echo "+  VERIFY(gpg) failed gwava.war"
-	echo "++++++++++++++++++++++++++++"
-	exit -1 
-fi
+verifyWithMd5 "gwava.war"
 
 cd ..
 echo "War files as downloaded"
 ls -la war-files
 
 echo "Finished downloading and verifying war files at $(date)"
-
+exit
 echo "++++++++++++++++++++++++++++"
 echo "+  Install of basic tools and dependencies "
 echo "++++++++++++++++++++++++++++"
