@@ -578,6 +578,7 @@ applyRanking <- function (df, ranking, max_rows) {
 ## providing essentially as output the value, and zscore for given colname and rowname
 buildFields <- function(df) {
   
+
   
   df <- melt(df, na.rm=T, id=c("ROWNAME", "MEAN", "SD", "SIGNIFICANCE", "LOGFOLD", "TTEST", "PVAL", "ADJPVAL", "BVAL"))
   # melt implicitly casts
@@ -585,7 +586,26 @@ buildFields <- function(df) {
   # in order to encourage more adventures it does not
   # have characters.as.factors=F param.
   df$variable <- as.character(df$variable)
-  ZSCORE      <- (df$value - df$MEAN) / df$SD
+  
+  ## Caclulating Z-score for sample data
+  ## - If there is more then one sample
+  num_samples = length(unique(df$variable))
+  
+  if(num_samples>1){
+    ZSCORE      <- (df$value - df$MEAN) / df$SD
+  } else if(num_samples==1) {
+    ## - If there is only one sample we use the sample data itself to calculate the z-score
+    ## for the values
+    ZSCORE      <- (df$value - mean(df$value)) / sd(df$value)
+  } else {
+    
+    stop(paste("The GEX matrix does not contain enough samples to",
+               "perform z-score calculation.",
+               "Please check the high dimensional input data"))
+    
+    
+  }
+  
   
   idx_exclude.vec = which(colnames(df) %in% c("MEAN", "SD", "SIGNIFICANCE", "LOGFOLD", "TTEST", "PVAL", "ADJPVAL", "BVAL"))
   df = df[, -idx_exclude.vec]
@@ -612,8 +632,9 @@ buildExtraFieldsHighDim <- function(df) {
   SUBSET = as.integer(getSubset(COLNAME))
   TYPE <- rep("subset",nrow(df))
   VALUE <- df$SUBSET
+  ZSCORE <- rep(NA, length(VALUE))
   
-  extraFields <- unique(data.frame(PATIENTID, COLNAME, ROWNAME, VALUE, SUBSET, stringsAsFactors = FALSE))
+  extraFields <- unique(data.frame(PATIENTID, COLNAME, ROWNAME, VALUE, ZSCORE, TYPE, SUBSET, stringsAsFactors = FALSE))
 
 }
 
@@ -649,9 +670,9 @@ buildExtraFieldsLowDim <- function(ld.list) {
   
   
   type.vec = strsplit2(varNames_with_subset.vec, "_")[,1]
-
-  subset.vec = strsplit2(varNames_with_subset.vec, "_")[,3]
   
+  subset.vec = strsplit2(varNames_with_subset.vec, "_")[,3]
+
     
   fullnames = character(length=length(varNames_without_subset.vec))
   
@@ -660,14 +681,19 @@ buildExtraFieldsLowDim <- function(ld.list) {
   PATIENTID.vec = character(length = 0)  
   VALUE.vec = character(length = 0)
   COLNAME.vec = character(length = 0)
+  TYPE.vec = character(length = 0)
   SUBSET.vec = character(length = 0)
-    
+  ZSCORE.vec = character(length = 0)
+  
+  
   ## Iterating over full low dim variable names 
   for(i in 1:length(varNames_without_subset.vec)){
     
     ROWNAME = get("fullName", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
 
     NAME = get("name", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
+    
+    
     
     ## Accessing data frame for given full low dim variable name
     ## This data frame provides for each subject the corresponding
@@ -678,19 +704,40 @@ buildExtraFieldsLowDim <- function(ld.list) {
     for(j in 1:dim(ld_var.df)[1]){
       ROWNAME.vec = c(ROWNAME.vec, ROWNAME)
       PATIENTID.vec = c(PATIENTID.vec, ld_var.df[j,1])
-      #TYPE.vec = c(TYPE.vec, type.vec[i])
+      TYPE.vec = c(TYPE.vec, type.vec[i])
       SUBSET.vec = c(SUBSET.vec, subset.vec[i])
       VALUE.vec = c(VALUE.vec, ld_var.df[j,2])
       
+      ## Calculating z-score for ZSCORE.vec
+      ## if corresponding data type is numeric
+      if(type.vec[i] == "numeric"){
+        ZSCORE.value = (ld_var.df[j,2] - mean(ld_var.df[,2], na.rm = TRUE)) / sd(ld_var.df[,2], na.rm = TRUE)
+        
+        ## In case there is not enough data to calculate z-score
+        ## after removing NAs from mean and standard deviation
+        ## we set the content of theZSCORE.value variable to the string "NA" 
+        if(is.na(ZSCORE.value)){
+          ZSCORE.value = NA
+        }
+        
+      } else{
+        ZSCORE.value = NA
+      }
+      
+      ZSCORE.vec = c(ZSCORE.vec, ZSCORE.value)
+      
       COLNAME.vec = c(COLNAME.vec, paste(ld_var.df[j,1], NAME , subset.vec[i], sep="_"))
-
+      
     }
   }
   
+
   res.df = data.frame( PATIENTID = as.integer(PATIENTID.vec),
                        COLNAME = COLNAME.vec,
                        ROWNAME = ROWNAME.vec,
                        VALUE = VALUE.vec,
+                       ZSCORE = ZSCORE.vec,
+                       TYPE = TYPE.vec,
                        SUBSET = as.integer(gsub("^s", "", SUBSET.vec))
                        )
   
