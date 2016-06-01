@@ -180,7 +180,7 @@ echo "War files as downloaded"
 ls -la war-files
 
 echo "Finished downloading and verifying war files at $(date)"
-exit
+
 echo "++++++++++++++++++++++++++++"
 echo "+  Install of basic tools and dependencies "
 echo "++++++++++++++++++++++++++++"
