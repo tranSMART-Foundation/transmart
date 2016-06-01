@@ -4,12 +4,12 @@ library(jsonlite)
 
 
 # SE: Just to get things working for dev purposes
-#  rm(list = ls())
-#  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
-#  load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
-#load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
-#load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
-#setwd("/Users/serge/GitHub/SmartR")
+  rm(list = ls())
+#load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
+#load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
+load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
+load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
+setwd("/Users/serge/GitHub/SmartR")
 #######
 
 
@@ -46,7 +46,9 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     ld.list = data.list$LD    
     
     ## SE: For debug
-    ## hd.df = hd.df[,1:3]
+    #hd.df = hd.df[,1:3]
+    
+
   
     write.table(
         hd.df,
@@ -83,6 +85,11 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     extraFieldsLowDim.df = buildExtraFieldsLowDim(ld.list)
     
     
+
+    ldd_rownames.vector = as.vector(unique(extraFieldsLowDim.df[, "ROWNAME"]))
+    
+
+    
     ## rowNames reflect here the unique identifiers of the GEX matrix this means "probeID--geneSymbol"
     rowNames        <- hd.df[, 1]
     
@@ -110,6 +117,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
         "rowNames"            = rowNames,
         "ranking"             = ranking,
         "extraFields"         = extraFields.df,
+        "features"            = ldd_rownames.vector,
         "maxRows"             = max_rows,
         "allStatValues"      = statistics_hd.df,
         "warnings"            = c() # initiate empty vector
@@ -173,7 +181,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
 
 
 ## SE: For debug purposes
-## out = main(ranking = "median")
+out = main(ranking = "median")
 
 
 
