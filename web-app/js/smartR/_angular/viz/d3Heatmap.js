@@ -38,8 +38,9 @@ window.smartRApp.directive('heatmapPlot', [
 
             var fields = scope.data.fields;
             var extraFields = scope.data.extraFields;
-            var features = scope.data.features || [];
+            var features = scope.data.features.constructor === Array ? scope.data.features : [];
 
+            var patientIDs = scope.data.patientIDs.map(function(d) { return parseInt(d); });
             var colNames = scope.data.colNames; // unique
             var rowNames = scope.data.rowNames; // unique
 
@@ -420,24 +421,29 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('height', gridFieldHeight);
 
                 var colName = colNameItems.selectAll('.colname')
-                    .data(colNames);
+                    .data(colNames.map(function(colName, i) {
+                        return { colName: colName, patientID: patientIDs[i] };
+                    }), function(d) { return d.colName; });
 
                 colName.enter()
                     .append('text')
-                    .attr('class', function(d) { return 'colname colname-' + smartRUtils.makeSafeForCSS(d); })
+                    .attr('class', function(d) {
+                        return 'colname colname-' + smartRUtils.makeSafeForCSS(d.colName) +
+                            ' patientID-' + smartRUtils.makeSafeForCSS(d.patientID);
+                    })
                     .style('text-anchor', 'start')
-                    .text(function(d) { return d; });
+                    .text(function(d) { return d.colName; });
 
                 colName.transition()
                     .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .style('font-size', gridFieldHeight + 'px')
                     .attr('transform', function(d) {
-                        return 'translate(' + (colNames.indexOf(d) * gridFieldWidth) + ',0)' +
+                        return 'translate(' + (colNames.indexOf(d.colName) * gridFieldWidth) + ',0)' +
                             'translate(' + (gridFieldWidth / 2) + ',' + (-4 - gridFieldHeight * 2) + ')rotate(-45)';
                     });
 
                 var rowName = labelItems.selectAll('.rowname')
-                    .data(rowNames);
+                    .data(rowNames, function(d) { return d; });
 
                 rowName.enter()
                     .append('text')
@@ -505,7 +511,7 @@ window.smartRApp.directive('heatmapPlot', [
                     return curr.length > prev.length ? curr : prev;
                 }, '');
                 var featurePosY = -gridFieldWidth * 2 - smartRUtils.getTextWidth(longestColName) -
-                    features.length * gridFieldWidth / 2 - 20;
+                    features.length * gridFieldWidth - 20;
 
                 var extraSquare = featureItems.selectAll('.extraSquare')
                     .data(extraFields);
@@ -514,10 +520,10 @@ window.smartRApp.directive('heatmapPlot', [
                     .append('rect')
                     .attr('class', function(d) {
                         return 'extraSquare colname-' + smartRUtils.makeSafeForCSS(d.COLNAME) +
-                            ' feature-' + smartRUtils.makeSafeForCSS(d.ROWNAME);
+                            ' rowname-' + smartRUtils.makeSafeForCSS(d.ROWNAME);
                     })
                     .on('mouseover', function(d) {
-                        d3.select('.colname.colname-' + smartRUtils.makeSafeForCSS(d.COLNAME)).classed('highlight', true);
+                        d3.select('.colname.patientID-' + smartRUtils.makeSafeForCSS(d.PATIENTID)).classed('highlight', true);
                         d3.select('.feature.feature-' + smartRUtils.makeSafeForCSS(d.ROWNAME)).classed('highlight', true);
                         var html = '';
                         for (var key in d) {
@@ -535,8 +541,8 @@ window.smartRApp.directive('heatmapPlot', [
 
                 extraSquare.transition()
                     .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
-                    .attr('x', function(d) { return colNames.indexOf(d.COLNAME) * gridFieldWidth; })
-                    .attr('y', function(d) { return featurePosY + features.indexOf(d.ROWNAME) * gridFieldHeight / 2; })
+                    .attr('x', function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
+                    .attr('y', function(d) { return featurePosY + features.indexOf(d.ROWNAME) * gridFieldHeight; })
                     .attr('width', gridFieldWidth)
                     .attr('height', gridFieldHeight / 2);
 
@@ -548,7 +554,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('class', function(d) { return 'feature feature-' + smartRUtils.makeSafeForCSS(d); })
                     .attr('dy', '0.35em')
                     .style('text-anchor', 'start')
-                    .text(function(d) { return d; });
+                    .text(function(d) { return smartRUtils.shortenConcept(d); });
 
                 feature.transition()
                     .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
@@ -571,7 +577,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .style('font-size', gridFieldHeight + 'px')
                     .attr('transform', function(d) {
                         return 'translate(' + (width + 2 + 0.5 * gridFieldWidth) + ',0)' + 'translate(0,' +
-                            (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) + ')rotate(-90)';
+                            (featurePosY + features.indexOf(d) * gridFieldHeight + gridFieldHeight / 2) + ')rotate(-90)';
                     });
 
                 var featureSortBox = featureItems.selectAll('.featureSortBox')
@@ -625,9 +631,9 @@ window.smartRApp.directive('heatmapPlot', [
                 featureSortBox.transition()
                     .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('x', width + 2)
-                    .attr('y', function(d) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2; })
+                    .attr('y', function(d) { return featurePosY + features.indexOf(d) * gridFieldHeight; })
                     .attr('width', gridFieldWidth)
-                    .attr('height', gridFieldHeight / 2);
+                    .attr('height', gridFieldHeight);
             }
 
             function updateHeatmapTable() {
@@ -832,12 +838,13 @@ window.smartRApp.directive('heatmapPlot', [
                 var featureColorCategorical = d3.scale.category10();
 
                 features.forEach(function(feature) {
-                    d3.selectAll('.extraSquare.feature-' + smartRUtils.makeSafeForCSS(feature))
+                    d3.selectAll('.extraSquare.rowname-' + smartRUtils.makeSafeForCSS(feature))
                         .style('fill', function(d) {
+                            console.log(d.TYPE);
                             switch (d.TYPE) {
                                 case 'binary':
                                     return featureColorSetBinary[d.VALUE];
-                                case 'cohort':
+                                case 'subset':
                                     return featureColorSetBinary[d.VALUE - 1];
                                 case 'numerical':
                                     colorScale.range(featureColorSetSequential);
@@ -906,7 +913,7 @@ window.smartRApp.directive('heatmapPlot', [
                     return curr.length > prev.length ? curr : prev;
                 }, '');
                 var spacing = gridFieldWidth * 2 + smartRUtils.getTextWidth(longestColName) +
-                    features.length * gridFieldHeight / 2 + 40;
+                    features.length * gridFieldHeight + 40;
 
                 var cluster = d3.layout.cluster()
                     .size([colDendrogramWidth, w])
@@ -1041,9 +1048,14 @@ window.smartRApp.directive('heatmapPlot', [
 
             function updateColOrder(sortValues, update) {
                 update = typeof update === 'undefined' ? true : update;
-                colNames = sortValues.map(function(sortValue) {
-                    return colNames[sortValue];
+                var newColnames = [];
+                var newPatientIDs = [];
+                sortValues.forEach(function(sortValue) {
+                    newColnames.push(colNames[sortValue]);
+                    newPatientIDs.push(patientIDs[sortValue]);
                 });
+                colNames = newColnames;
+                patientIDs = newPatientIDs;
                 unselectAll();
                 removeColDendrogram();
                 if (update) {
