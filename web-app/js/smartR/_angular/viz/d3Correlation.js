@@ -86,11 +86,11 @@ window.smartRApp.directive('correlationPlot', [
             setData(scope.data);
 
             function updateStatistics(patientIDs, scatterUpdate, init) {
-                patientIDs = patientIDs.length !== 0 ? patientIDs : d3.selectAll('.point').map(function(d) {
-                    return d.patientID;
-                });
-                scatterUpdate = scatterUpdate === undefined ? false : scatterUpdate;
-                init = init === undefined ? false : init;
+                if (! init) {
+                    patientIDs = patientIDs.length !== 0 ? patientIDs : d3.selectAll('.point').map(function(d) {
+                        return d.patientID;
+                    });
+                }
                 var args = { selectedPatientIDs: patientIDs };
 
                 rServeService.startScriptExecution({
@@ -131,6 +131,8 @@ window.smartRApp.directive('correlationPlot', [
                 .on('contextmenu', function() {
                     d3.event.preventDefault();
                     contextMenu.show();
+                    var div = document.getElementsByClassName('sr-contextmenu')[0];
+                    _addCtxMenuTo(div);
                 });
 
             var tip = d3.tip()
@@ -200,38 +202,46 @@ window.smartRApp.directive('correlationPlot', [
                 updateStatistics(selectedPatientIDs, false, true);
             }
 
-            var ctxHtml = '<input id="zoomButton" class="sr-ctx-menu-btn" type="button" value="Zoom"/><br/>' +
-            '<input id="excludeButton" class="sr-ctx-menu-btn" type="button" value="Exclude"/><br/>' +
-            '<input id="resetButton" class="sr-ctx-menu-btn" type="button" value="Reset"/>';
-
-
-            var contextMenu = d3.tip()
-                .attr('class', 'd3-tip sr-contextmenu')
-                .offset([-10, 0])
-                .html(ctxHtml);
-
-            svg.call(contextMenu);
-
-            // This binds event listeners to the buttons whenever the context menu is rendered
-            var observer = new MutationObserver(function() {
-                $('#zoomButton').on('click', function() {
+            function _addCtxMenuTo(element) {
+                var zoomBtn = document.createElement('input');
+                zoomBtn.type = 'button';
+                zoomBtn.classList = 'sr-ctx-menu-btn';
+                zoomBtn.value = 'Zoom';
+                zoomBtn.addEventListener('click', function() {
                     contextMenu.hide();
                     zoomSelection();
                 });
-                $('#excludeButton').on('click', function() {
+
+                var excludeBtn = document.createElement('input');
+                excludeBtn.type = 'button';
+                excludeBtn.classList = 'sr-ctx-menu-btn';
+                excludeBtn.value = 'Exclude';
+                excludeBtn.addEventListener('click', function() {
                     contextMenu.hide();
                     excludeSelection();
                 });
-                $('#resetButton').on('click', function() {
+
+                var resetBtn = document.createElement('input');
+                resetBtn.type = 'button';
+                resetBtn.classList = 'sr-ctx-menu-btn';
+                resetBtn.value = 'Reset';
+                resetBtn.addEventListener('click', function() {
                     contextMenu.hide();
                     reset();
                 });
-            });
 
-            observer.observe(document.querySelector('.sr-contextmenu'), {
-                childList: true,
-                subtree: true
-            });
+                element.appendChild(zoomBtn);
+                element.appendChild(document.createElement('br'));
+                element.appendChild(excludeBtn);
+                element.appendChild(document.createElement('br'));
+                element.appendChild(resetBtn);
+            }
+
+            var contextMenu = d3.tip()
+                .attr('class', 'd3-tip sr-contextmenu')
+                .offset([-10, 0]);
+
+            svg.call(contextMenu);
 
             function updateSelection() {
                 var extent = brush.extent();
@@ -458,7 +468,7 @@ window.smartRApp.directive('correlationPlot', [
             }
 
             function reset() {
-                updateStatistics([], false, true);
+                updateStatistics([], true, true);
             }
 
             updateScatterplot();

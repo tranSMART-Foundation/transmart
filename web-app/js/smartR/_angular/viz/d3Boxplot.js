@@ -139,34 +139,39 @@ window.smartRApp.directive('boxplot', [
             })
             .call(brush);
 
-        var ctxHtml = '<input id="excludeButton" class="sr-ctx-menu-btn" type="button" value="Exclude Selection"/>' +
-                '<input id="resetButton" class="sr-ctx-menu-btn" type="button" value="Reset All"/>';
-
         var contextMenu = d3.tip()
-            .attr('class', 'd3-tip sr-contextmenu')
-            .html(ctxHtml);
+            .attr('class', 'd3-tip sr-contextmenu');
 
         boxplot.call(contextMenu);
 
-        var observer = new MutationObserver(function() {
-            $('#excludeButton').on('click', function() {
+        function _addCtxMenuTo(element) {
+            var excludeBtn = document.createElement('input');
+            excludeBtn.type = 'button';
+            excludeBtn.classList = 'sr-ctx-menu-btn';
+            excludeBtn.value = 'Exclude Selection';
+            excludeBtn.addEventListener('click', function() {
                 contextMenu.hide();
                 excludeSelection();
             });
-            $('#resetButton').on('click', function() {
+
+            var resetBtn = document.createElement('input');
+            resetBtn.type = 'button';
+            resetBtn.classList = 'sr-ctx-menu-btn';
+            resetBtn.value = 'Reset All';
+            resetBtn.addEventListener('click', function() {
                 contextMenu.hide();
                 reset();
             });
-        });
 
-        observer.observe(document.querySelector('.sr-contextmenu'), {
-            childList: true,
-            subtree: true
-        });
+            element.appendChild(excludeBtn);
+            element.appendChild(resetBtn);
+        }
 
         boxplot.on('contextmenu', function () {
             d3.event.preventDefault();
             contextMenu.show();
+            var div = document.getElementsByClassName('sr-contextmenu')[0];
+            _addCtxMenuTo(div);
         });
 
         var currentSelection;
