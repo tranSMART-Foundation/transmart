@@ -456,12 +456,29 @@ window.smartRApp.directive('correlationPlot', [
                         tip.hide();
                     });
 
+                var x1 = x(minX),
+                    y1 = y(regLineYIntercept + regLineSlope * minX),
+                    x2 = x(maxX),
+                    y2 = y(regLineYIntercept + regLineSlope * maxX);
+
+                x1 = x1 < 0 ? 0 : x1;
+                x1 = x1 > width ? width : x1;
+
+                x2 = x2 < 0 ? 0 : x2;
+                x2 = x2 > width ? width : x2;
+
+                y1 = y1 < 0 ? 0 : y1;
+                y1 = y1 > height ? height : y1;
+
+                y2 = y2 < 0 ? 0 : y2;
+                y2 = y2 > height ? height : y2;
+
                 regressionLine.transition()
                     .duration(animationDuration)
-                    .attr('x1', x(minX))
-                    .attr('y1', y(regLineYIntercept + regLineSlope * minX))
-                    .attr('x2', x(maxX))
-                    .attr('y2', y(regLineYIntercept + regLineSlope * maxX));
+                    .attr('x1', x1)
+                    .attr('y1', y1)
+                    .attr('x2', x2)
+                    .attr('y2', y2);
 
                 regressionLine.exit()
                     .remove();
