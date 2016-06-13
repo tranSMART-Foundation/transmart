@@ -28,8 +28,8 @@ getSubjects <- function(study.name, as.data.frame = TRUE) {
     serverResult <- .transmartGetJSON(paste("/studies/", study.name,"/subjects", sep=""))
     listOfSubjects <- serverResult$subjects
 
-    subjectIDs <- sapply(listOfSubjects, FUN = function(x) { x[["id"]] })
-    names(listOfSubjects) <- paste("id",subjectIDs,sep="")
+    subjectIDs <- sapply(listOfSubjects, FUN = function(x) { x$inTrialId })
+    names(listOfSubjects) <- subjectIDs
 
     if (as.data.frame) return(.listToDataFrame(listOfSubjects))
     listOfSubjects
