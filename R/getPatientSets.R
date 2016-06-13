@@ -29,7 +29,14 @@ getPatientSet <- function(id) {
     .ensureTransmartConnection()
 
     patientSet <- .transmartGetJSON(paste("/patient_sets/", id, sep=''))
-    names(patientSet$patients) <- sapply(patientSet$patients, function(p) {p$inTrialId})
 
+    # Don't expose id, it should not be used and will be removed from a future version of rest-api
+    if (length(patientSet$patients) && "id" %in% names(patientSet$patients[[1]])) {
+        for (i in seq_along(patientSet$patients)) {
+            patientSet$patients[[i]]$id <- NULL
+        }
+    }
+
+    names(patientSet$patients) <- sapply(patientSet$patients, function(p) {p$inTrialId})
     patientSet
 }
