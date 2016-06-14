@@ -48,8 +48,6 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     ## SE: For debug
     #hd.df = hd.df[,1:3]
     
-
-  
     write.table(
         hd.df,
         "heatmap_orig_values.tsv",
@@ -87,6 +85,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     
 
     ldd_rownames.vector = as.vector(unique(extraFieldsLowDim.df[, "ROWNAME"]))
+    ldd_rownames.vector = c("Cohort", ldd_rownames.vector)
     
 
     
