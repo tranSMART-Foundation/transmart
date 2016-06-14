@@ -712,14 +712,6 @@ buildExtraFieldsLowDim <- function(ld.list) {
       ## if corresponding data type is numeric
       if(type.vec[i] == "numeric"){
         ZSCORE.value = (ld_var.df[j,2] - mean(ld_var.df[,2], na.rm = TRUE)) / sd(ld_var.df[,2], na.rm = TRUE)
-        
-        ## In case there is not enough data to calculate z-score
-        ## after removing NAs from mean and standard deviation
-        ## we set the content of theZSCORE.value variable to the string "NA" 
-        if(is.na(ZSCORE.value)){
-          ZSCORE.value = NA
-        }
-        
       } else{
         ZSCORE.value = NA
       }
