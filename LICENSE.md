@@ -20,7 +20,7 @@ apply:
 | Dependency | License  | Reference
 | ---------- | -------- | -----------------------------------------------------------
 | Protobuf   | BSD      | <http://grails.org/License>
-| RCurl      | BSD      | <http://cran.r-project.org/web/packages/RCurl/index.html>
+| httr       | MIT      | <http://cran.r-project.org/web/packages/httr/index.html>
 | rjson      | GPL2     | <http://cran.r-project.org/web/packages/rjson/index.html>
 | RProtoBuf  | GPL2     | <http://cran.r-project.org/web/packages/RProtoBuf/index.html>
 | plyr       | MIT      | <http://cran.r-project.org/web/packages/plyr/index.html>

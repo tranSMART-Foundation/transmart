@@ -93,15 +93,13 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
         return(FALSE)
     }
 
-    oauth.exchange.token.path <- paste(sep = "",
-            "/oauth/token?grant_type=authorization_code&client_id=",
-            transmartClientEnv$client_id,
-            "&client_secret=", transmartClientEnv$client_secret,
-            "&code=", URLencode(request.token, TRUE),
-            "&redirect_uri=", URLencode(transmartClientEnv$oauthDomain, TRUE),
-            URLencode("/oauth/verify", TRUE))
+    oauth.exchange.token.path <- "/oauth/token"
+    http.body <- list(
+        grant_type="authorization_code",
+        code=request.token,
+        redirect_uri=paste(transmartClientEnv$oauthDomain, "/oauth/verify", sep=""))
 
-    oauthResponse <- .transmartServerGetOauthRequest(oauth.exchange.token.path, "Authentication")
+    oauthResponse <- .transmartServerPostOauthRequest(oauth.exchange.token.path, "Authentication", http.body)
     if (is.null(oauthResponse)) return(FALSE)
 
     list2env(oauthResponse$content, envir = transmartClientEnv)
@@ -119,16 +117,12 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     transmartClientEnv$client_id <- "api-client"
     transmartClientEnv$client_secret <- "api-client"
     message("Trying to reauthenticate using the refresh token...")
-    refreshPath <- paste(sep = "",
-                        "/oauth/token?grant_type=refresh_token",
-                        "&client_id=", transmartClientEnv$client_id,
-                        "&client_secret=", transmartClientEnv$client_secret,
-                        "&refresh_token=", URLencode(transmartClientEnv$refresh_token, TRUE),
-                        "&redirect_uri=", URLencode(transmartClientEnv$oauthDomain, TRUE),
-                        URLencode("/oauth/verify", TRUE),
-                        "")
+    refreshPath <- "/oauth/token"
+    http.body <- list(grant_type="refresh_token",
+        refresh_token=transmartClientEnv$refresh_token,
+        redirect_uri=paste(transmartClientEnv$oauthDomain, "/oauth/verify", sep=""))
     
-    oauthResponse <- .transmartServerGetOauthRequest(refreshPath, "Refreshing access")
+    oauthResponse <- .transmartServerPostOauthRequest(refreshPath, "Refreshing access", http.body)
     if (is.null(oauthResponse)) return(FALSE)
     if (!'access_token' %in% names(oauthResponse$content)) {
         message("Refreshing access failed, server response did not contain access_token. HTTP", statusString)
@@ -139,8 +133,8 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     return(TRUE)
 }
 
-.transmartServerGetOauthRequest <- function(path, action) {
-    oauthResponse <- .transmartServerGetRequest(path, onlyContent=F)
+.transmartServerPostOauthRequest <- function(path, action, http.body) {
+    oauthResponse <- .transmartServerGetRequest(path, onlyContent=F, http.body=http.body)
     statusString <- paste("status code ", oauthResponse$status, ": ", oauthResponse$headers[['statusMessage']], sep='')
     if (!oauthResponse$JSON) {
         cat(action, " failed, could not parse server response of type ", oauthResponse$headers[['Content-Type']], ". ", statusString, "\n", sep='')
@@ -272,21 +266,33 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 }
 
 .serverMessageExchange <- 
-function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.progresscallback.download()) {
+function(apiCall, httpHeaderFields, accept.type = "default", http.body = NULL) {
     if (any(accept.type == c("default", "hal"))) {
-        if (accept.type == "hal") { httpHeaderFields <- c(httpHeaderFields, Accept = "application/hal+json;charset=UTF-8") }
-        headers <- basicHeaderGatherer()
+        if (accept.type == "hal") {
+            httpHeaderFields <- c(httpHeaderFields, Accept = "application/hal+json;charset=UTF-8")
+        }
         result <- list(JSON = FALSE)
-        result$content <- getURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
-                verbose = getOption("verbose"),
-                httpheader = httpHeaderFields,
-                headerfunction = headers$update)
-        if (getOption("verbose")) { message("Server response:\n", result$content, "\n") }
-        if(is.null(result)) { return(NULL) }
-        result$headers <- headers$value()
-        result$status <- as.integer(result$headers[['status']])
-        result$statusMessage <- result$headers[['statusMessage']]
-        switch(.contentType(result$headers),
+        api.url <- paste(sep="", transmartClientEnv$db_access_url, apiCall)
+        if (is.null(http.body) || length(http.body) == 0) {
+            req <- GET(api.url,
+                       add_headers(httpHeaderFields),
+                       authenticate(transmartClientEnv$client_id, transmartClientEnv$client_secret),
+                       progress(),
+                       config(verbose = getOption("verbose")))
+        } else {
+            req <- POST(api.url,
+                        body = http.body,
+                        add_headers(httpHeaderFields),
+                        authenticate(transmartClientEnv$client_id, transmartClientEnv$client_secret),
+                        progress(),
+                        encode='form',
+                        config(verbose = getOption("verbose")))
+        }
+        result$content <- content(req, "text")
+        result$headers <- headers(req)
+        result$status <- req$status_code
+        result$statusMessage <- http_status(req)$message
+	switch(.contentType(result$headers),
                json = {
                    result$content <- fromJSON(result$content)
                    result$JSON <- TRUE
@@ -297,37 +303,31 @@ function(apiCall, httpHeaderFields, accept.type = "default", progress = .make.pr
                })
         return(result)
     } else if (accept.type == "binary") {
-        progress$start(NA_integer_)
         result <- list(JSON = FALSE)
-        headers <- basicHeaderGatherer()
-        result$content <- getBinaryURL(paste(sep="", transmartClientEnv$db_access_url, apiCall),
-                verbose = getOption("verbose"),
-                headerfunction = headers$update,
-                noprogress = FALSE,
-                progressfunction = function(down, up) {up[which(up == 0)] <- NA; progress$update(down, up) },
-                httpheader = httpHeaderFields)
-        progress$end()
-        result$headers <- headers$value()
-        result$status <- as.integer(result$headers[['status']])
-        result$statusMessage <- result$headers[['statusMessage']]
-        if (getOption("verbose") && .contentType(result$headers) %in% c('json', 'hal', 'html')) {
-            message("Server response:\n", result$content, "\n")
+        api.url <- paste(sep="", transmartClientEnv$db_access_url, apiCall)
+        if (is.null(http.body) || length(http.body) == 0) {
+            req <- GET(api.url,
+                       add_headers(httpHeaderFields),
+                       authenticate(transmartClientEnv$client_id, transmartClientEnv$client_secret),
+                       progress(),
+                       config(verbose = getOption("verbose")))
+        } else {
+            req <- POST(api.url,
+                        body = http.body,
+                        add_headers(httpHeaderFields),
+                        authenticate(transmartClientEnv$client_id, transmartClientEnv$client_secret),
+                        progress(),
+                        encode='form',
+                        config(verbose = getOption("verbose")))
         }
+        result$content <- content(req, "raw")
+        result$headers <- headers(req)
+        result$status <- req$status_code
+        result$statusMessage <- http_status(req)$message
         return(result)
     }
     return(NULL)
 }
-
-.make.progresscallback.download <- function() {
-    start <- function(.total) cat("Retrieving data: \n")
-    update <- function(current, .total) {
-        # This trick unfortunately doesn't work in RStudio if we write to stderr.
-        cat(paste("\r", format(current / 1000000, digits=3, nsmall=3), "MB downloaded."))
-    }
-    end <- function() cat("\nDownload complete.\n")
-    environment()
-}
-
 
 .listToDataFrame <- function(l) {
     # TODO: (timdo) dependency on 'plyr' package removed; figure out whether dependency is present elsewhere, or remove dependency

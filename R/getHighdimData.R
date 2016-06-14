@@ -25,17 +25,7 @@
 
 # Performance notes
 # 
-# Downloading and parsing large data sets of high dimensional data can take a 
-# significant amount of time (minutes for several 100 mb). We have attempted to 
-# optimize the process a reasonable amount.
-# 
-# The current RCurl wrapper doesn't expose functionality to download a binary 
-# url and process the chunks asynchronously as they come in (that is only 
-# supported for text urls). Doing the downloading and parsing at the same time 
-# should give a significant improvement, but that would require changes in RCurl
-# or a different way of downloading the data.
-# 
-# The parser has also been optimized up to the level that the R code itself only
+# The parser has been optimized up to the level that the R code itself only
 # takes a minority of the runtime. The most time consuming operations are the 
 # foreign function calls to retrieve the fields from messages and to construct 
 # objects to parse the varint32 preceding each message. Significant further 
@@ -45,7 +35,6 @@
 
 getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL,
         data.constraints = list(), assay.constraints = list(), highdim.type = 1,
-        progress.download = .make.progresscallback.download(),
         progress.parse = .make.progresscallback.parse(),
         ...) {
 
@@ -93,7 +82,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         }
     }
 
-    serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary", errorHandler = errorHandler, progress = progress.download)
+    serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary", errorHandler = errorHandler)
     if (length(serverResult) == 0) {
         warning("No data could be found. The server yielded an empty dataset. Returning NULL.")
         return(NULL)
