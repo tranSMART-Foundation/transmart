@@ -744,6 +744,7 @@ buildExtraFieldsLowDim <- function(ld.list) {
   
   ## Filtering out lines where VALUE is NA
   res.df = res.df[-which(is.na(res.df$VALUE)),]
+  res.df = res.df[-which(res.df$VALUE == ""),]
 
   return(res.df)
 }
