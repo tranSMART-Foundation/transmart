@@ -921,6 +921,7 @@ getRankingMethod <- function(rankingMethodName) {
 writeDataForZip <- function(df, zScores, pidCols) {
   df      <- df[ , -which(names(df) %in% pidCols)]  # Drop patient columns
   df      <- cbind(df,zScores)                      # Replace with zScores
+  df      <- df[ , -which(colnames(df) == "SIGNIFICANCE")]
   write.table(
     df,
     "heatmap_data.tsv",
