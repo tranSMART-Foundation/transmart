@@ -270,6 +270,13 @@ allNA <- function(v1)
   return(all(is.na(v1)))
 }
 
+convertNodeNames <- function(nodeNames) {
+  nodes <- sub("_s[0-9]+", "", nodeNames)
+  names <- sapply(nodes, function(el) fetch_params$ontologyTerms[[el]]$name)
+  variableLabel <- sapply(1:length(names), function(i) sub(".*_", paste(names[i], "_", sep=""), nodeNames[i]))
+  variableLabel
+}
+
 # Function to produce one JSON file per data node containing the summary stats per subset for that node. 
 # Summary stats include: the number of values, number of missing values quartiles, min, max, mean, std deviation, median
 # NOTE: this function converts the data.frame to a vector containing all datapoints from the dataframe and calculates 
@@ -305,19 +312,18 @@ produce_summary_stats <- function(measurement_tables, phase)
     gsub(".*_","", rownames(result_table)) #take everything after _
   result_table$node <-
     discardSubset(rownames(result_table))
-  
+
   nodes <-  result_table$node
   result_table$node[nodes == "preprocessed"] <-
     "preprocessed_allNodesMerged"
-  
-  
+
   # calculate summary stats per data.frame
   for (i in 1:length(measurement_tables))
   {
     # get the name of the data.frame, identifying the node and subset
     identifier <- names(measurement_tables)[i]
-    result_table[identifier, "variableLabel"] <- identifier
-    
+    result_table[identifier, "variableLabel"] <- ifelse(grepl("preprocessed", identifier), identifier, convertNodeNames(identifier))
+
     if (!all(is.na(measurement_tables[[i]])))
     {
       result_table[identifier, "numberOfSamples"]  <-
@@ -371,6 +377,7 @@ produce_summary_stats <- function(measurement_tables, phase)
     }
     summary_stats_all_nodes[[fileName]] <- partial_table
   }
+
   return(summary_stats_all_nodes)
 }
 
@@ -441,7 +448,7 @@ produce_boxplot <- function(measurement_tables, phase, projection)
     if (!all(is.na(single_node_data)))
     {
       if (phase != "preprocess") {
-        plot_title <- paste("Box plot node:", node)
+        plot_title <- paste("Box plot node:", fetch_params$ontologyTerms[[node]]$name)
       }
       if (phase == "preprocess") {
         plot_title <- "Box plot node: preprocessed - all nodes merged"
