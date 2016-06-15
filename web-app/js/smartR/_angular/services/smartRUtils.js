@@ -37,6 +37,13 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         });
     };
 
+    service.getElementWithoutEventListeners = function(cssSelector) {
+        var element = document.getElementById(cssSelector);
+        var copy = element.cloneNode(true);
+        element.parentNode.replaceChild(copy, element);
+        return copy;
+    };
+
     service.shortenConcept = function smartRUtils_shortenConcept(concept) {
         var split = concept.split('\\');
         split = split.filter(function(str) { return str !== ''; });

@@ -48,6 +48,20 @@ window.smartRApp.directive('boxplot', [
         }
         setData(scope.data);
 
+        var removeBtn = smartRUtils.getElementWithoutEventListeners('sr-boxplot-remove-btn');
+        removeBtn.addEventListener('click', removeOutliers);
+
+        var resetBtn = smartRUtils.getElementWithoutEventListeners('sr-boxplot-reset-btn');
+        resetBtn.addEventListener('click', reset);
+
+        var kdeCheck = smartRUtils.getElementWithoutEventListeners('sr-boxplot-kde-check');
+        kdeCheck.addEventListener('change', function() { swapKDE(kdeCheck.checked); });
+        kdeCheck.checked = false;
+
+        var jitterCheck = smartRUtils.getElementWithoutEventListeners('sr-boxplot-jitter-check');
+        jitterCheck.addEventListener('change', function() { swapJitter(jitterCheck.checked); });
+        jitterCheck.checked = false;
+
         var animationDuration = 1000;
 
         var width = parseInt(scope.width);
@@ -125,34 +139,39 @@ window.smartRApp.directive('boxplot', [
             })
             .call(brush);
 
-        var ctxHtml = '<input id="excludeButton" class="sr-ctx-menu-btn" type="button" value="Exclude Selection"/>' +
-                '<input id="resetButton" class="sr-ctx-menu-btn" type="button" value="Reset All"/>';
-
         var contextMenu = d3.tip()
-            .attr('class', 'd3-tip sr-contextmenu')
-            .html(ctxHtml);
+            .attr('class', 'd3-tip sr-contextmenu');
 
         boxplot.call(contextMenu);
 
-        var observer = new MutationObserver(function() {
-            $('#excludeButton').on('click', function() {
+        function _addCtxMenuTo(element) {
+            var excludeBtn = document.createElement('input');
+            excludeBtn.type = 'button';
+            excludeBtn.classList = 'sr-ctx-menu-btn';
+            excludeBtn.value = 'Exclude Selection';
+            excludeBtn.addEventListener('click', function() {
                 contextMenu.hide();
                 excludeSelection();
             });
-            $('#resetButton').on('click', function() {
+
+            var resetBtn = document.createElement('input');
+            resetBtn.type = 'button';
+            resetBtn.classList = 'sr-ctx-menu-btn';
+            resetBtn.value = 'Reset All';
+            resetBtn.addEventListener('click', function() {
                 contextMenu.hide();
                 reset();
             });
-        });
 
-        observer.observe(document.querySelector('.sr-contextmenu'), {
-            childList: true,
-            subtree: true
-        });
+            element.appendChild(excludeBtn);
+            element.appendChild(resetBtn);
+        }
 
         boxplot.on('contextmenu', function () {
             d3.event.preventDefault();
             contextMenu.show();
+            var div = document.getElementsByClassName('sr-contextmenu')[0];
+            _addCtxMenuTo(div);
         });
 
         var currentSelection;
@@ -458,14 +477,6 @@ window.smartRApp.directive('boxplot', [
             excludeSelection(); // Abusing the method because I can
         }
 
-        document.getElementById('sr-boxplot-remove-btn').addEventListener('click', removeOutliers);
-        document.getElementById('sr-boxplot-reset-btn').addEventListener('click', reset);
-        var kdeCheck = document.getElementById('sr-boxplot-kde-check');
-        kdeCheck.checked = false;
-        kdeCheck.addEventListener('change', function() { swapKDE(kdeCheck.checked); });
-        var jitterCheck = document.getElementById('sr-boxplot-jitter-check');
-        jitterCheck.checked = false;
-        jitterCheck.addEventListener('change', function() { swapJitter(jitterCheck.checked); });
     }
 
 }]);

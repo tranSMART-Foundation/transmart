@@ -79,4 +79,3 @@ conceptStrToFolderStr <- function(s) {
     substr(s, 0, tail(backslashs, 2)[1])
 }
 
-main()
