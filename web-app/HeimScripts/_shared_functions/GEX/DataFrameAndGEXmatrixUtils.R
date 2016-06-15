@@ -8,6 +8,9 @@
 ## GEX data frame (variance, coefficient of variation, ... )            ##
 ##########################################################################
 
+if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
+  remoteScriptDir <- "web-app/HeimScripts"
+}
 
 ## Loading functions ##
 utils <- paste(remoteScriptDir, "/_shared_functions/Generic/utils.R", sep="")

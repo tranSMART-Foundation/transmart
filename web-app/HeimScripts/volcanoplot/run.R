@@ -65,7 +65,6 @@ main <- function() {
   df          <- df[1:min(max_rows, nrow(df)), ]  #  apply max_rows
 
   fields      <- buildFields(df)
-  extraFields <- buildExtraFields(fields)
   uids        <- df[, 1]
   patientIDs  <- unique(fields["PATIENTID"])[,1]
 
