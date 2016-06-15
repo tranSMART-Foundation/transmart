@@ -119,7 +119,7 @@ window.smartRApp.directive('boxplot', [
         boxplot.append('text')
             .attr('transform', 'translate(' + (-40) + ',' + (height / 2) + ')rotate(-90)')
             .attr('text-anchor', 'middle')
-            .text(smartRUtils.shortenConcept(concept));
+            .text(smartRUtils.shortenConcept(concept) + (useLog ? ' (log2)' : ''));
 
         var tip = d3.tip()
             .attr('class', 'd3-tip')
