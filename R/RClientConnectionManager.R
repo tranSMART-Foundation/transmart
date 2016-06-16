@@ -289,6 +289,7 @@ function(apiCall, httpHeaderFields, accept.type = "default", post.body = NULL) {
                         config(verbose = getOption("verbose")))
         }
         result$content <- content(req, "text")
+        if (getOption("verbose")) { message("Server response:\n", result$content, "\n") }
         result$headers <- headers(req)
         result$status <- req$status_code
         result$statusMessage <- http_status(req)$message
