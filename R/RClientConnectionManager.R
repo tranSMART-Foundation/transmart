@@ -94,12 +94,12 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     }
 
     oauth.exchange.token.path <- "/oauth/token"
-    http.body <- list(
+    post.body <- list(
         grant_type="authorization_code",
         code=request.token,
         redirect_uri=paste(transmartClientEnv$oauthDomain, "/oauth/verify", sep=""))
 
-    oauthResponse <- .transmartServerPostOauthRequest(oauth.exchange.token.path, "Authentication", http.body)
+    oauthResponse <- .transmartServerPostOauthRequest(oauth.exchange.token.path, "Authentication", post.body)
     if (is.null(oauthResponse)) return(FALSE)
 
     list2env(oauthResponse$content, envir = transmartClientEnv)
@@ -118,11 +118,11 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     transmartClientEnv$client_secret <- "api-client"
     message("Trying to reauthenticate using the refresh token...")
     refreshPath <- "/oauth/token"
-    http.body <- list(grant_type="refresh_token",
+    post.body <- list(grant_type="refresh_token",
         refresh_token=transmartClientEnv$refresh_token,
         redirect_uri=paste(transmartClientEnv$oauthDomain, "/oauth/verify", sep=""))
     
-    oauthResponse <- .transmartServerPostOauthRequest(refreshPath, "Refreshing access", http.body)
+    oauthResponse <- .transmartServerPostOauthRequest(refreshPath, "Refreshing access", post.body)
     if (is.null(oauthResponse)) return(FALSE)
     if (!'access_token' %in% names(oauthResponse$content)) {
         message("Refreshing access failed, server response did not contain access_token. HTTP", statusString)
@@ -133,8 +133,8 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     return(TRUE)
 }
 
-.transmartServerPostOauthRequest <- function(path, action, http.body) {
-    oauthResponse <- .transmartServerGetRequest(path, onlyContent=F, http.body=http.body)
+.transmartServerPostOauthRequest <- function(path, action, post.body) {
+    oauthResponse <- .transmartServerGetRequest(path, onlyContent=F, post.body=post.body)
     statusString <- paste("status code ", oauthResponse$status, ": ", oauthResponse$headers[['statusMessage']], sep='')
     if (!oauthResponse$JSON) {
         cat(action, " failed, could not parse server response of type ", oauthResponse$headers[['Content-Type']], ". ", statusString, "\n", sep='')
@@ -266,14 +266,14 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 }
 
 .serverMessageExchange <- 
-function(apiCall, httpHeaderFields, accept.type = "default", http.body = NULL) {
+function(apiCall, httpHeaderFields, accept.type = "default", post.body = NULL) {
     if (any(accept.type == c("default", "hal"))) {
         if (accept.type == "hal") {
             httpHeaderFields <- c(httpHeaderFields, Accept = "application/hal+json;charset=UTF-8")
         }
         result <- list(JSON = FALSE)
         api.url <- paste(sep="", transmartClientEnv$db_access_url, apiCall)
-        if (is.null(http.body) || length(http.body) == 0) {
+        if (is.null(post.body)) {
             req <- GET(api.url,
                        add_headers(httpHeaderFields),
                        authenticate(transmartClientEnv$client_id, transmartClientEnv$client_secret),
@@ -281,7 +281,7 @@ function(apiCall, httpHeaderFields, accept.type = "default", http.body = NULL) {
                        config(verbose = getOption("verbose")))
         } else {
             req <- POST(api.url,
-                        body = http.body,
+                        body = post.body,
                         add_headers(httpHeaderFields),
                         authenticate(transmartClientEnv$client_id, transmartClientEnv$client_secret),
                         progress(),
@@ -292,7 +292,7 @@ function(apiCall, httpHeaderFields, accept.type = "default", http.body = NULL) {
         result$headers <- headers(req)
         result$status <- req$status_code
         result$statusMessage <- http_status(req)$message
-	switch(.contentType(result$headers),
+    	switch(.contentType(result$headers),
                json = {
                    result$content <- fromJSON(result$content)
                    result$JSON <- TRUE
@@ -305,7 +305,7 @@ function(apiCall, httpHeaderFields, accept.type = "default", http.body = NULL) {
     } else if (accept.type == "binary") {
         result <- list(JSON = FALSE)
         api.url <- paste(sep="", transmartClientEnv$db_access_url, apiCall)
-        if (is.null(http.body) || length(http.body) == 0) {
+        if (is.null(post.body)) {
             req <- GET(api.url,
                        add_headers(httpHeaderFields),
                        authenticate(transmartClientEnv$client_id, transmartClientEnv$client_secret),
@@ -313,7 +313,7 @@ function(apiCall, httpHeaderFields, accept.type = "default", http.body = NULL) {
                        config(verbose = getOption("verbose")))
         } else {
             req <- POST(api.url,
-                        body = http.body,
+                        body = post.body,
                         add_headers(httpHeaderFields),
                         authenticate(transmartClientEnv$client_id, transmartClientEnv$client_secret),
                         progress(),
