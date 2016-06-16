@@ -249,10 +249,10 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 }
 
 .contentType <- function(headers) {
-    if(! 'Content-Type' %in% names(headers)) {
-        return('Content-Type header not found')
+    if(! 'content-type' %in% names(headers)) {
+        return('content-type header not found')
     }
-    h <- headers[['Content-Type']]
+    h <- headers[['content-type']]
     if(grepl("^application/json(;|\\W|$)", h)) {
         return('json')
     }
@@ -272,7 +272,7 @@ function(apiCall, httpHeaderFields, accept.type = "default", post.body = NULL) {
             httpHeaderFields <- c(httpHeaderFields, Accept = "application/hal+json;charset=UTF-8")
         }
         result <- list(JSON = FALSE)
-        api.url <- paste(sep="", transmartClientEnv$db_access_url, apiCall)
+        api.url <- paste0(transmartClientEnv$db_access_url, apiCall)
         if (is.null(post.body)) {
             req <- GET(api.url,
                        add_headers(httpHeaderFields),
@@ -287,6 +287,7 @@ function(apiCall, httpHeaderFields, accept.type = "default", post.body = NULL) {
                         progress(),
                         encode='form',
                         config(verbose = getOption("verbose")))
+            if (getOption("verbose")) { message("POST body:\n", .list2string(post.body), "\n") }
         }
         result$content <- content(req, "text")
         if (getOption("verbose")) { message("Server response:\n", result$content, "\n") }
@@ -390,4 +391,11 @@ function(apiCall, httpHeaderFields, accept.type = "default", post.body = NULL) {
         }
     }
     return(halList)
+}
+
+.list2string <- function(lst) {
+    if(is.null(names(lst))) return(paste(lst, sep=", "))
+
+    final <- character(length(lst)*2)
+    paste(mapply(function(name, val) {paste0(name, ': "', encodeString(val), '"')}, names(post), post), collapse=", ")
 }
