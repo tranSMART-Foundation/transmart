@@ -660,14 +660,8 @@ buildExtraFieldsLowDim <- function(ld.list) {
     return(NULL)
   }
   
-  
-  ## Getting name mapping for the nodes
-  nodes = node2name()
-  
-  
   varNames_with_subset.vec = unlist(names(ld.list))
-  
-  
+
   varNames_without_subset.vec = paste(strsplit2(varNames_with_subset.vec, "_")[,1],
                                       strsplit2(varNames_with_subset.vec, "_")[,2], sep="_")
   
@@ -687,59 +681,49 @@ buildExtraFieldsLowDim <- function(ld.list) {
   TYPE.vec = character(length = 0)
   SUBSET.vec = character(length = 0)
   ZSCORE.vec = character(length = 0)
-  
-  
+
+
   ## Iterating over full low dim variable names 
   for(i in 1:length(varNames_without_subset.vec)){
     
     ROWNAME = get("fullName", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
-
     NAME = get("name", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
-    
-    
     
     ## Accessing data frame for given full low dim variable name
     ## This data frame provides for each subject the corresponding
     ## value for given variable
     ld_var.df = ld.list[[varNames_with_subset.vec[i]]]
 
-    
     for(j in 1:dim(ld_var.df)[1]){
+      if (ld_var.df[j, 2] == "" || is.na(ld_var.df[j, 2])) next
+
       ROWNAME.vec = c(ROWNAME.vec, ROWNAME)
       PATIENTID.vec = c(PATIENTID.vec, ld_var.df[j,1])
       TYPE.vec = c(TYPE.vec, type.vec[i])
       SUBSET.vec = c(SUBSET.vec, subset.vec[i])
       VALUE.vec = c(VALUE.vec, ld_var.df[j,2])
-      
-      ## Calculating z-score for ZSCORE.vec
-      ## if corresponding data type is numeric
-      if(type.vec[i] == "numeric"){
-        ZSCORE.value = (ld_var.df[j,2] - mean(ld_var.df[,2], na.rm = TRUE)) / sd(ld_var.df[,2], na.rm = TRUE)
-      } else{
-        ZSCORE.value = NA
-      }
-      
-      ZSCORE.vec = c(ZSCORE.vec, ZSCORE.value)
-      
       COLNAME.vec = c(COLNAME.vec, paste(ld_var.df[j,1], NAME , subset.vec[i], sep="_"))
-      
     }
   }
-  
 
   res.df = data.frame( PATIENTID = as.integer(PATIENTID.vec),
                        COLNAME = COLNAME.vec,
                        ROWNAME = ROWNAME.vec,
                        VALUE = VALUE.vec,
-                       ZSCORE = ZSCORE.vec,
+                       ZSCORE = rep(NA, length(PATIENTID.vec)),
                        TYPE = TYPE.vec,
-                       SUBSET = as.integer(gsub("^s", "", SUBSET.vec))
-                       )
-  
-  
-  ## Filtering out lines where VALUE is NA
-  res.df = res.df[-which(is.na(res.df$VALUE)),]
-  res.df = res.df[-which(res.df$VALUE == ""),]
+                       SUBSET = as.integer(gsub("^s", "", SUBSET.vec)), stringsAsFactors=FALSE)
+
+  # z-score computation must be executed on both cohorts, hence it happens after all the data are in res.df
+  rownames <- unique(res.df$ROWNAME)
+  for (rowname in rownames) {
+      sub.res.df <- res.df[res.df$ROWNAME == rowname, ]
+      if (sub.res.df[1,]$TYPE == "numeric") {
+          values <- as.numeric(sub.res.df$VALUE)
+          ZSCORE.values <- (values - mean(values)) / sd(values)
+          res.df[res.df$ROWNAME == rowname, ]$ZSCORE <- ZSCORE.values
+      }
+  }
 
   return(res.df)
 }
