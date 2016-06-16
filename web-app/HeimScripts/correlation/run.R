@@ -2,8 +2,6 @@ library(reshape2)
 
 main <- function(method = "pearson", selectedPatientIDs = integer()) {
 
-    save(loaded_variables, file="/Users/sascha/loaded_variables.Rda")
-    save(fetch_params, file="/Users/sascha/fetch_params.Rda")
     df1 <- loaded_variables$datapoints_n0_s1
     df2 <- loaded_variables$datapoints_n1_s1
 
