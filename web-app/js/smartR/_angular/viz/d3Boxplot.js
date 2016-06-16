@@ -199,7 +199,7 @@ window.smartRApp.directive('boxplot', [
 
         function excludeSelection() {
             excludedPatientIDs = excludedPatientIDs.concat(currentSelection);
-            var settings = { excludedPatientIDs: excludedPatientIDs };
+            var settings = { excludedPatientIDs: excludedPatientIDs, useLog: logCheck.checked };
 
             rServeService.startScriptExecution({
                 taskType: 'run',
@@ -274,7 +274,7 @@ window.smartRApp.directive('boxplot', [
         }
 
         function swapLog() {
-            var settings = { excludedPatientIDs: [], useLog: logCheck.checked };
+            var settings = { excludedPatientIDs: excludedPatientIDs, useLog: logCheck.checked };
             rServeService.startScriptExecution({
                 taskType: 'run',
                 arguments: settings
