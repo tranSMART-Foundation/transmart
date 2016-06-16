@@ -76,7 +76,7 @@ source(summaryStatistics)
 
 
 
-main <- function(phase = NA, projection = NA)
+main <- function(phase = "", projection = "")
 {
   input_data <- get_input_data(phase)
   
