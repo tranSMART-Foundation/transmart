@@ -203,7 +203,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             "You can help fix it by contacting us. Type ?transmartRClient for contact details.\n", 
             "Optional: type options(verbose = TRUE) and replicate the bug to find out more details.")
     # If e is a condition adding the call. parameter triggers another warning
-    if(inherits(args[[1L]], "condition")) {
+    if(inherits(e, "condition")) {
         stop(e)
     } else {
         stop(e, call.=FALSE)
@@ -277,14 +277,12 @@ function(apiCall, httpHeaderFields, accept.type = "default", post.body = NULL) {
             req <- GET(api.url,
                        add_headers(httpHeaderFields),
                        authenticate(transmartClientEnv$client_id, transmartClientEnv$client_secret),
-                       progress(),
                        config(verbose = getOption("verbose")))
         } else {
             req <- POST(api.url,
                         body = post.body,
                         add_headers(httpHeaderFields),
                         authenticate(transmartClientEnv$client_id, transmartClientEnv$client_secret),
-                        progress(),
                         encode='form',
                         config(verbose = getOption("verbose")))
             if (getOption("verbose")) { message("POST body:\n", .list2string(post.body), "\n") }
