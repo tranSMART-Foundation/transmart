@@ -491,8 +491,6 @@ window.smartRApp.directive('heatmapPlot', [
 
                 bar.enter()
                     .append('rect')
-                    .attr('height', gridFieldHeight)
-                    .attr('y', function(d) { return gridFieldHeight * rowNames.indexOf(d.ROWNAME); })
                     .on('mouseover', function(d) {
                         var html = '';
                         for (var key in d) {
@@ -516,7 +514,9 @@ window.smartRApp.directive('heatmapPlot', [
                     .transition()
                     .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('width', function(d) { return histogramScale(d[ranking]); })
+                    .attr('height', gridFieldHeight)
                     .attr('x', function(d) { return -histogramScale(d[ranking]); })
+                    .attr('y', function(d) { return gridFieldHeight * rowNames.indexOf(d.ROWNAME); })
                     .style('fill', function(d) { return d[ranking] > 0 ? '#990000' : 'steelblue'; });
 
                 var featurePosY = -gridFieldWidth * 2 - longestColNameLength + 20;
