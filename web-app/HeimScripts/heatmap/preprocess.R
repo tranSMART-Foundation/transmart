@@ -36,7 +36,7 @@ main <- function(aggregate=FALSE) {
   df <- mergeFetchedData(loaded_variables[grep("highDimensional", names(loaded_variables))])
   
   ## Low dimensional data
-  ld.idx = grep( "^(categoric)|(numeric)$", names(loaded_variables))
+  ld.idx = grep( "^(categoric)|(numeric)", names(loaded_variables))
   
   if(length(ld.idx)==0)
     ld = c()
