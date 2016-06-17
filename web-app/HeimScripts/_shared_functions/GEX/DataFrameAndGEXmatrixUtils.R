@@ -408,13 +408,13 @@ mergeDuplicates <- function(df) {
 # this method pretifies it with the actual node label like this: '123_BreastCancer'
 idToNodeLabel <- function(ids, ontologyTerms) {
   # extract patientID (123)
-  patientIDs <- sub("_.+_n[0-9]+_s[0-9]+", "", ids, perl=TRUE) # remove the _highDimensional_n0_s1
+  patientIDs <- sub("_.+_n[0-9]+_s[1-2]{1}$", "", ids, perl=TRUE) # remove the _highDimensional_n0_s1
   patientIDs <- sub("^X", "", patientIDs, perl=TRUE) # remove the X
   # extract subset (s1)
   subsets <- substring(ids, first=nchar(ids)-1, last=nchar(ids))
   # extract node label (Breast)
-  nodes <- sub(".+?_", "", ids, perl=TRUE) # remove the X123_
-  nodes <- as.vector(substring(nodes, first=1, last=nchar(nodes)-3))
+  nodes <- sub("^.+?_", "", ids, perl=TRUE) # remove the X123_
+  nodes <- as.vector(substring(nodes, first=1, last=nchar(nodes)-3)) # remove the _s1
   nodeLabels <- as.vector(sapply(nodes, function(node) return(ontologyTerms[[node]]$name)))
   # put everything together (123, Breast, s1)
   paste(patientIDs, nodeLabels, subsets, sep="_")

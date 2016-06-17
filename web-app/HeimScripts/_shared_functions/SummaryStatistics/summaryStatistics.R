@@ -71,7 +71,7 @@ check_input <- function(datasets, projection)
   # e.g. n0_s1, n0_s2, n1_s1, n1_s2.
   dataset_names <- names(datasets)
   #expected_format_names <- "^n[[:digit:]]+_s[[:digit:]]+$"
-  expected_format_names <- "^[[:alpha:]]|[[:digit:]]+_n[[:digit:]]+_s[[:digit:]]+$"
+  expected_format_names <- "^.+_n[0-9]+_s[1-2]{1}$"
   names_in_correct_format <-
     grepl(expected_format_names, dataset_names)
   if (any(!names_in_correct_format &
@@ -104,7 +104,7 @@ check_input <- function(datasets, projection)
     #for preprocessed data there is only 1 data.frame
   {
     column_names <- colnames(datasets$preprocessed)
-    expected_format_names <- ".+_[[:alpha:]]|[[:digit:]]+_n[[:digit:]]+_s[[:digit:]]+$"
+    expected_format_names <- "^.+_n[0-9]+_s[1-2]{1}$"
     names_in_correct_format <-
       grepl(expected_format_names, column_names)
     if (!all(
@@ -162,7 +162,7 @@ split_on_subsets <- function(preprocessed_measurements)
   #   <sample_name>_n<numerical node id>_s<numerical subset id>, eg. sample234_n1_s1
   column_names <- colnames(preprocessed_measurements)
   
-  subsets_match_indices <- regexpr("s[[:digit:]]+$", column_names)
+  subsets_match_indices <- regexpr("s[1-2]{1}$", column_names)
   subsets_matches <-
     regmatches(x = column_names, m = subsets_match_indices)
   subset_names <- unique (subsets_matches)
@@ -271,7 +271,7 @@ allNA <- function(v1)
 }
 
 convertNodeNames <- function(nodeNames) {
-  nodes <- sub("_s[0-9]+", "", nodeNames)
+  nodes <- sub("_s[1-2]{1}", "", nodeNames)
   names <- sapply(nodes, function(el) fetch_params$ontologyTerms[[el]]$name)
   variableLabel <- sapply(1:length(names), function(i) sub(".*_", paste(names[i], "_", sep=""), nodeNames[i]))
   variableLabel
@@ -308,10 +308,8 @@ produce_summary_stats <- function(measurement_tables, phase)
     ))
   
   # add information about node and subset identifiers
-  result_table$subset <-
-    gsub(".*_","", rownames(result_table)) #take everything after _
-  result_table$node <-
-    discardSubset(rownames(result_table))
+  result_table$subset <- gsub(".*_","", rownames(result_table)) #take everything after _
+  result_table$node <- discardSubset(rownames(result_table))
 
   nodes <-  result_table$node
   result_table$node[nodes == "preprocessed"] <-
@@ -479,6 +477,6 @@ produce_boxplot <- function(measurement_tables, phase, projection)
 }
 
 discardSubset <- function(labels) {
-  gsub("_s[[:digit:]]","",labels)
+  gsub("_s[1-2]{1}","",labels)
 }
 

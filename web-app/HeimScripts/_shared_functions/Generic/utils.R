@@ -54,45 +54,9 @@ getTimelineValues <- function(nodes, ontologyTerms) {
     }, USE.NAMES = FALSE)
 }
 
-
-
-# nodeID has usually this format: 'X123_highDimensional_n0_s1)
-# this method pretifies it with the actual node label like this: '123_BreastCancer'
-replaceNodeIDNodeLabel <- function(ids, ontologyTerms) {
-    patientIDs <- sub("_.+_n[0-9]+_s[0-9]+", "", ids, perl=TRUE) # remove the _highDimensional_n0_s1
-    patientIDs <- sub("^X", "", patientIDs, perl=TRUE) # remove the X
-    nodes <- sub("_s[0-9]+", "", ids, perl=TRUE) # remove the _s1
-    nodes <- sub(".+?_", "", nodes, perl=TRUE) # remove the X123_
-    # replace highDimensional with Breast
-    nodeLabels <- lapply(ontologyTerms[nodes], function(terms) return(terms$name))
-    paste(patientIDs, nodeLabels, sep="_")
+getSubject <- function(str) {
+    sub("_.*", "", str)
 }
-
-
-
-## Get subjects for vector of patientIDs
-getSubject <- function(patientIDs) {
-    splittedIds <- strsplit(patientIDs,"_")
-    sapply(splittedIds, FUN = discardNodeAndSubject)
-}
-
-
-
-discardNodeAndSubject <- function(label) {
-    label <- strsplit(label,"_")
-    endOfSubject <-
-    length(label) - 2  #last too elements are node and subset.
-    label <- label[1:endOfSubject]
-    paste(label, collapse = "_")
-}
-
-
-
-fixString <- function(str) {
-    gsub("[^a-zA-Z0-9-]", "", str, perl = TRUE)
-}
-
-
 
 ## This function dumps the run parameters into a json format file
 ## The function can be called either
