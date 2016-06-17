@@ -324,8 +324,8 @@ produce_summary_stats <- function(measurement_tables, phase)
 
     if (!all(is.na(measurement_tables[[i]])))
     {
-      result_table[identifier, "numberOfSamples"]  <-
-        ncol(measurement_tables[[i]])
+      cols <- ncol(measurement_tables[[i]])
+      result_table[identifier, "numberOfSamples"] <- ifelse(is.null(cols), 1, cols)
     }
     
     # convert data.frame to a vector containing all values of that data.frame, a vector remains a vector
