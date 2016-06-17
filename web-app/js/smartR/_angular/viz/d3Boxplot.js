@@ -146,38 +146,28 @@ window.smartRApp.directive('boxplot', [
             .call(brush);
 
         var contextMenu = d3.tip()
-            .attr('class', 'd3-tip sr-contextmenu');
+            .attr('class', 'd3-tip sr-contextmenu')
+            .html(function(d) { return d; });
 
         boxplot.call(contextMenu);
 
-        function _addCtxMenuTo(element) {
-            var excludeBtn = document.createElement('input');
-            excludeBtn.type = 'button';
-            excludeBtn.classList = 'sr-ctx-menu-btn';
-            excludeBtn.value = 'Exclude Selection';
-            excludeBtn.addEventListener('click', function() {
+        function _addEventListeners() {
+            document.getElementById('sr-boxplot-exclude-btn').addEventListener('click', function() {
                 contextMenu.hide();
                 excludeSelection();
             });
 
-            var resetBtn = document.createElement('input');
-            resetBtn.type = 'button';
-            resetBtn.classList = 'sr-ctx-menu-btn';
-            resetBtn.value = 'Reset All';
-            resetBtn.addEventListener('click', function() {
+            document.getElementById('sr-boxplot-reset-btn-2').addEventListener('click', function() {
                 contextMenu.hide();
                 reset();
             });
-
-            element.appendChild(excludeBtn);
-            element.appendChild(resetBtn);
         }
 
         boxplot.on('contextmenu', function () {
             d3.event.preventDefault();
-            contextMenu.show();
-            var div = document.getElementsByClassName('sr-contextmenu')[0];
-            _addCtxMenuTo(div);
+            contextMenu.show('<input id="sr-boxplot-exclude-btn" value="Exclude" class="sr-ctx-menu-btn"><br/>' +
+                             '<input id="sr-boxplot-reset-btn-2" value="Reset" class="sr-ctx-menu-btn">');
+            _addEventListeners();
         });
 
         var currentSelection;
