@@ -65,6 +65,7 @@ window.smartRApp.directive('correlationPlot', [
                 patientIDs,
                 points,
                 method,
+                transformation,
                 minX,
                 maxX,
                 minY,
@@ -75,6 +76,7 @@ window.smartRApp.directive('correlationPlot', [
                 regLineSlope = data.regLineSlope[0];
                 regLineYIntercept = data.regLineYIntercept[0];
                 method = data.method[0];
+                transformation = data.transformation[0];
                 patientIDs = data.patientIDs;
                 points = data.points;
                 minX = data.points.min(function(d) { return d.x; });
@@ -91,7 +93,7 @@ window.smartRApp.directive('correlationPlot', [
                         return d.patientID;
                     });
                 }
-                var args = { selectedPatientIDs: patientIDs };
+                var args = { method: method, transformation: transformation, selectedPatientIDs: patientIDs };
 
                 rServeService.startScriptExecution({
                     taskType: 'run',
@@ -130,10 +132,26 @@ window.smartRApp.directive('correlationPlot', [
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
                 .on('contextmenu', function() {
                     d3.event.preventDefault();
-                    contextMenu.show();
-                    var div = document.getElementsByClassName('sr-contextmenu')[0];
-                    _addCtxMenuTo(div);
+                    contextMenu.show('<input id="sr-correlation-zoom-btn" value="Zoom" class="sr-ctx-menu-btn"><br/>' +
+                                     '<input id="sr-correlation-exclude-btn" value="Exclude" class="sr-ctx-menu-btn"><br/>' +
+                                     '<input id="sr-correlation-reset-btn" value="Reset" class="sr-ctx-menu-btn">');
+                    _addEventListeners();
                 });
+
+            function _addEventListeners() {
+                document.getElementById('sr-correlation-zoom-btn').addEventListener('click', function() {
+                    contextMenu.hide();
+                    zoomSelection();
+                });
+                document.getElementById('sr-correlation-exclude-btn').addEventListener('click', function() {
+                    contextMenu.hide();
+                    excludeSelection();
+                });
+                document.getElementById('sr-correlation-reset-btn').addEventListener('click', function() {
+                    contextMenu.hide();
+                    reset();
+                });
+            }
 
             var tip = d3.tip()
                 .attr('class', 'd3-tip')
@@ -155,7 +173,7 @@ window.smartRApp.directive('correlationPlot', [
             svg.append('text')
                 .attr('class', 'axisLabels')
                 .attr('transform', 'translate(' + width / 2 + ',' + (- 10) + ')')
-                .text(smartRUtils.shortenConcept(xArrLabel));
+                .text(smartRUtils.shortenConcept(xArrLabel) + ' (' + transformation + ')');
 
             svg.append('g')
                 .attr('class', 'y axis')
@@ -170,7 +188,7 @@ window.smartRApp.directive('correlationPlot', [
             svg.append('text')
                 .attr('class', 'axisLabels')
                 .attr('transform', 'translate('  + (width + 10) + ',' + height / 2 + ')rotate(90)')
-                .text(smartRUtils.shortenConcept(yArrLabel));
+                .text(smartRUtils.shortenConcept(yArrLabel) + ' (' + transformation + ')');
 
             svg.append('g')
                 .attr('class', 'x axis')
@@ -202,44 +220,10 @@ window.smartRApp.directive('correlationPlot', [
                 updateStatistics(selectedPatientIDs, false, true);
             }
 
-            function _addCtxMenuTo(element) {
-                var zoomBtn = document.createElement('input');
-                zoomBtn.type = 'button';
-                zoomBtn.classList = 'sr-ctx-menu-btn';
-                zoomBtn.value = 'Zoom';
-                zoomBtn.addEventListener('click', function() {
-                    contextMenu.hide();
-                    zoomSelection();
-                });
-
-                var excludeBtn = document.createElement('input');
-                excludeBtn.type = 'button';
-                excludeBtn.classList = 'sr-ctx-menu-btn';
-                excludeBtn.value = 'Exclude';
-                excludeBtn.addEventListener('click', function() {
-                    contextMenu.hide();
-                    excludeSelection();
-                });
-
-                var resetBtn = document.createElement('input');
-                resetBtn.type = 'button';
-                resetBtn.classList = 'sr-ctx-menu-btn';
-                resetBtn.value = 'Reset';
-                resetBtn.addEventListener('click', function() {
-                    contextMenu.hide();
-                    reset();
-                });
-
-                element.appendChild(zoomBtn);
-                element.appendChild(document.createElement('br'));
-                element.appendChild(excludeBtn);
-                element.appendChild(document.createElement('br'));
-                element.appendChild(resetBtn);
-            }
-
             var contextMenu = d3.tip()
                 .attr('class', 'd3-tip sr-contextmenu')
-                .offset([-10, 0]);
+                .offset([-10, 0])
+                .html(function(d) { return d; });
 
             svg.call(contextMenu);
 

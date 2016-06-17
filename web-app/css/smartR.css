@@ -210,6 +210,8 @@ div.sr-status-and-output-container:empty:before {
     background-color: #FFFFFF;
     color: #000000;
     border: none;
+    text-align: center;
+    cursor: pointer;
 }
 
 .sr-ctx-menu-btn:hover {

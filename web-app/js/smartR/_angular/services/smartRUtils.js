@@ -79,6 +79,13 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         $('#heim-tabs').css('min-height', parseInt(height) + 25);
     };
 
+    /** 
+    * removes all kind of elements that might live out of the viz directive (e.g. tooltips, contextmenu, ...)
+    */
+    service.cleanUp = function() {
+        $('.d3-tip').remove();
+    };
+
     service.countCohorts = function() {
         return !window.isSubsetEmpty(1) + !window.isSubsetEmpty(2);
     };
