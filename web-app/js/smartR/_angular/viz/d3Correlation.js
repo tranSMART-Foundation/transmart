@@ -65,6 +65,7 @@ window.smartRApp.directive('correlationPlot', [
                 patientIDs,
                 points,
                 method,
+                transformation,
                 minX,
                 maxX,
                 minY,
@@ -75,6 +76,7 @@ window.smartRApp.directive('correlationPlot', [
                 regLineSlope = data.regLineSlope[0];
                 regLineYIntercept = data.regLineYIntercept[0];
                 method = data.method[0];
+                transformation = data.transformation[0];
                 patientIDs = data.patientIDs;
                 points = data.points;
                 minX = data.points.min(function(d) { return d.x; });
@@ -91,7 +93,7 @@ window.smartRApp.directive('correlationPlot', [
                         return d.patientID;
                     });
                 }
-                var args = { selectedPatientIDs: patientIDs };
+                var args = { method: method, transformation: transformation, selectedPatientIDs: patientIDs };
 
                 rServeService.startScriptExecution({
                     taskType: 'run',
@@ -155,7 +157,7 @@ window.smartRApp.directive('correlationPlot', [
             svg.append('text')
                 .attr('class', 'axisLabels')
                 .attr('transform', 'translate(' + width / 2 + ',' + (- 10) + ')')
-                .text(smartRUtils.shortenConcept(xArrLabel));
+                .text(smartRUtils.shortenConcept(xArrLabel) + ' (' + transformation + ')');
 
             svg.append('g')
                 .attr('class', 'y axis')
@@ -170,7 +172,7 @@ window.smartRApp.directive('correlationPlot', [
             svg.append('text')
                 .attr('class', 'axisLabels')
                 .attr('transform', 'translate('  + (width + 10) + ',' + height / 2 + ')rotate(90)')
-                .text(smartRUtils.shortenConcept(yArrLabel));
+                .text(smartRUtils.shortenConcept(yArrLabel) + ' (' + transformation + ')');
 
             svg.append('g')
                 .attr('class', 'x axis')
