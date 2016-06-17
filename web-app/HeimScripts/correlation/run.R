@@ -55,7 +55,9 @@ main <- function(method = "pearson", transformation = "raw", selectedPatientIDs 
     }
 
     corTest <- tryCatch({
-        cor.test(df$x, df$y, method=method)
+        test <- cor.test(df$x, df$y, method=method)
+        test$p.value <- ifelse(test$p.value == 0, paste("<", as.character(.Machine$double.eps)), as.character(test$p.value))
+        test
     }, error = function(e) {
         ll <- list()
         ll$estimate <- as.numeric(NA)

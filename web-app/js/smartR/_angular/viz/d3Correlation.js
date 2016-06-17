@@ -139,15 +139,15 @@ window.smartRApp.directive('correlationPlot', [
                 });
 
             function _addEventListeners() {
-                document.getElementById('sr-correlation-zoom-btn').addEventListener('click', function() {
+                smartRUtils.getElementWithoutEventListeners('sr-correlation-zoom-btn').addEventListener('click', function() {
                     contextMenu.hide();
                     zoomSelection();
                 });
-                document.getElementById('sr-correlation-exclude-btn').addEventListener('click', function() {
+                smartRUtils.getElementWithoutEventListeners('sr-correlation-exclude-btn').addEventListener('click', function() {
                     contextMenu.hide();
                     excludeSelection();
                 });
-                document.getElementById('sr-correlation-reset-btn').addEventListener('click', function() {
+                smartRUtils.getElementWithoutEventListeners('sr-correlation-reset-btn').addEventListener('click', function() {
                     contextMenu.hide();
                     reset();
                 });
