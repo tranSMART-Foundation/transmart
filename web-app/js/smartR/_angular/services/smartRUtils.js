@@ -94,7 +94,7 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         var defer = $q.defer();
 
         function resolveResult() {
-            var res = window.GLOBAL.CurrentSubsetIDs.map(function (v) {
+            var res = window.GLOBAL.CurrentSubsetIDs.slice(1).map(function (v) {
                 return v || null;
             });
             if (res.some(function (el) {
