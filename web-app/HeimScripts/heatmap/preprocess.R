@@ -32,9 +32,14 @@ source(dataFrameUtils)
 main <- function(aggregate=FALSE) {
   msgs = c("")
   
+  df <- loaded_variables[grep("highDimensional", names(loaded_variables))]
+
+  if (aggregate && is.null(dim(df))) {
+      stop("Cannot aggregate probes: there only is data for a single probe (ie. only one row of data) or there is insufficient bio.marker information for the selected probes to be able to match the probes to biomarkers for aggregation (e.g. in case of micro-array data to match probe ID to gene symbol). Suggestion: skip probe aggregation.")
+  } 
+
   ## High dimensional data
   df <- mergeFetchedData(loaded_variables[grep("highDimensional", names(loaded_variables))])
-  
   ## Low dimensional data
   ld.idx = grep( "^(categoric)|(numeric)", names(loaded_variables))
   
