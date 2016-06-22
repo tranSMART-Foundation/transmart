@@ -2,7 +2,7 @@
 
 ###SmartR is a grails plugin seeking to improve the visual analytics of the [tranSMART platform](https://github.com/transmart/transmartApp) by using recent web technologies such as [d3](http://d3js.org/).
 
-[![Heatmap Example](https://imgur.com/WGFV2kD)](https://youtu.be/Gg0AdYt77Cs)
+[![Heatmap Example](https://i.imgur.com/WGFV2kD.png)](https://youtu.be/Gg0AdYt77Cs)
 
 #### Installation
 - SmartR will be part of the eTRIKS v3 and TranSMART 16.2 standard installation. No configuration required.
