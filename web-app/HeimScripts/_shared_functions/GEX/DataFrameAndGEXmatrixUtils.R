@@ -330,7 +330,7 @@ getAllStatForExtDataFrame = function(df){
       stat_test = names(stat_tests)[i]
         
       ## Calculating values for the different stats
-      stat_test_value.vec = apply(measurements.df, 1, stat_test)
+      stat_test_value.vec = apply(measurements.df, 1, stat_test, na.rm = TRUE)
       
       ## Storing the different stats as col in results data frame
       Stat.df[[stat_tests2col[ stat_test ]]] = stat_test_value.vec
