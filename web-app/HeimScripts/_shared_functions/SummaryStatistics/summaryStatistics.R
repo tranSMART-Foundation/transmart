@@ -330,6 +330,10 @@ produce_summary_stats <- function(measurement_tables, phase)
     
     # convert data.frame to a vector containing all values of that data.frame, a vector remains a vector
     measurements <- unlist(measurement_tables[[i]])
+   
+    if (length(measurements) == 0) {
+        stop("Cannot generate summary statistics because selection does not contain any data.")
+    } 
     
     # determine total number of values and number of missing values
     is.missing <- is.na(measurements)
