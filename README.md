@@ -14,12 +14,10 @@ SmartR will be included by default. No modification necessary.
 
 ##### tranSMART 1.2.4 and older
 1. Add ```runtime ':smart-r:1.0.RC1-SNAPSHOT'``` to **BuildConfig.groovy** in the **transmartApp** source code.
-2. Add the following code to **transmartApp/web-app/js/datasetExplorer/datasetExplorer.js** near [this location:](https://github.com/transmart/transmartApp/blob/release-1.2.4/web-app/js/datasetExplorer/datasetExplorer.js#L782)
-```
-loadPlugin('smartR', "/SmartR/loadScripts", function () {
+2. Add the following code to **transmartApp/web-app/js/datasetExplorer/datasetExplorer.js** near [>>this location<< :](https://github.com/transmart/transmartApp/blob/release-1.2.4/web-app/js/datasetExplorer/datasetExplorer.js#L782) 
+```loadPlugin('smartR', "/SmartR/loadScripts", function () {
     resultsTabPanel.insert(4, smartRPanel);
-})
-```
+})```
 3. Compile a WAR file via ```grails war``` for deployment.
 
 #### Requirements
