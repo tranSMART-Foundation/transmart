@@ -1,4 +1,6 @@
+<!--
 [![Build Status](https://travis-ci.org/transmart/SmartR.svg?branch=master)](https://travis-ci.org/transmart/SmartR)
+--->
 
 ###SmartR is a grails plugin seeking to improve the visual analytics of the [tranSMART platform](https://github.com/transmart/transmartApp) by using recent web technologies such as [d3](http://d3js.org/).
 
