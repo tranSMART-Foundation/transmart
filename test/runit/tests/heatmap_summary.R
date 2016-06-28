@@ -63,7 +63,7 @@ test.get_input_data.fetch <- function() {
 
 ## get_input_data should take variable preprocessed and return its contents as a named list if phase = "preprocess"
 test.get_input_data.preprocess <- function() {
-  checkEquals(list("preprocessed" = preprocessed), get_input_data("preprocess"))
+  checkEquals( preprocessed, get_input_data("preprocess"))
 }
 
 ## get_input_data should throw error if phase is NA or anything other than "fetch" and "preprocess
