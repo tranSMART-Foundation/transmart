@@ -19,6 +19,7 @@ transmart-batch \
 transmart-ICE \
 transmart-rest-api \
 RInterface \
+SmartR \
 GWAVA \
 transmart-test \
 Scripts \
