@@ -1,37 +1,34 @@
-#!/bin/tcsh
+out=~/Desktop/Process.txt
 
-set out = "~/Desktop/Process.txt"
-
-set dirs = (\
-transmart-core-api \
-transmart-core-db \
-Rmodules \
-transmart-legacy-db \
-folder-management-plugin \
-transmart-extensions \
-transmart-gwas-plugin \
-blend4j-plugin \
-transmart-metacore-plugin \
-transmartApp \
-transmart-data \
-tranSMART-ETL \
-transmart-batch \
-transmart-ICE \
-transmart-rest-api \
-RInterface \
-SmartR \
-GWAVA \
-transmart-test \
-Scripts \
-)
+dirs="transmart-core-api
+transmart-core-db
+Rmodules
+transmart-legacy-db
+folder-management-plugin
+transmart-extensions
+transmart-gwas-plugin
+blend4j-plugin
+transmart-metacore-plugin
+transmartApp
+transmart-data
+tranSMART-ETL
+transmart-batch
+transmart-ICE
+transmart-rest-api
+RInterface
+SmartR
+GWAVA
+transmart-test
+Scripts
+"
 
 echo "Mapping Command . . ." > $out
 
-foreach dir ($dirs)
+for dir in $dirs; do
 	pushd $dir
 		echo "" >> $out
 		echo "++ $dir ++" >> $out
-		echo "++ $dir ++"
+#		echo "++ $dir ++"
 # -------------- actual commands
 #		git checkout master >> $out
 #		git checkout release-1.2.5-Beta >> $out
@@ -53,12 +50,12 @@ foreach dir ($dirs)
 #		git branch >> $out
 #		git push >> $out
 #		git pull >> $out
-		git log -1 >> $out
-#		git status >> $out
+#		git log -1 >> $out
+		git status >> $out
 # -------------- actual commands		
-		echo "-- $dir --" >> $out
+#		echo "-- $dir --" >> $out
 	popd
-end
+done
 
 echo "DONE!" >> $out
 echo "DONE!"
