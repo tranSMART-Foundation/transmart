@@ -925,16 +925,11 @@ writeDataForZip <- function(df, zScores, pidCols) {
 ## and sample measurements. Probes are merged according to maxMean, this means the row with highest mean
 ## intensity for same biomarker will be retained.
 aggregate.probes <- function(df) {
-  
-  if(nrow(df)<2){
-    stop("Cannot aggregate probes: there only is data for a single probe (ie. only one row of data) or 
-         there is insufficient bio.marker information for the selected probes to be able to match the probes to 
-         biomarkers for aggregation (e.g. in case of micro-array data to match probe ID to gene symbol). 
-         Suggestion: skip probe aggregation.")
+  if (ncol(df) <= 3) {
+    stop("Cannot aggregate probes with single sample.")
   }
   
   measurements <- df[,3:ncol(df)]
-  
   
   row.names(measurements) <- df[,1]
   collapsed <- collapseRows(measurements, df[,2], df[,1], "MaxMean",
