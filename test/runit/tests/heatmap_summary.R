@@ -42,7 +42,7 @@ colnames(test_set_preprocessed) <-
   
   #loaded_variables and preprocessed are sometimes removed by a test function
   assign("loaded_variables", test_data, envir = .GlobalEnv)
-  assign("preprocessed", list(HD=test_set_preprocessed), envir = .GlobalEnv)
+  assign("preprocessed", list(preprocessed=test_set_preprocessed), envir = .GlobalEnv)
 }
 
 .tearDown <- function() {

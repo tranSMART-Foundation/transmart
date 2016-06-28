@@ -47,7 +47,8 @@ get_input_data <- function(phase)
         "Summary stats is run for phase \'preprocess\', but variable \'preprocessed\' does not exist in the environment."
       )
     }
-    input_data <- list("preprocessed" = preprocessed$HD)
+    #input_data <- list("preprocessed" = preprocessed$preprocessed)
+    input_data <- preprocessed
   }
   
   return(input_data)
