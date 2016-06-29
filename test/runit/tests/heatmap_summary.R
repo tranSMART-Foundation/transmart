@@ -21,7 +21,7 @@ test_set2[,3:6] <- test_set2[,3:6] + 1
 test_set2_measurements <-
   test_set2[, c("GSM210004", "GSM210005", "GSM210006", "GSM210007")]
 
-test_data <- list("n0_s1" = test_set)
+test_data <- list("highDimensional_n0_s1" = test_set)
 test_data_measurements <- list("n0_s1" = test_set_measurements)
 
 test_set_preprocessed  <- test_set
