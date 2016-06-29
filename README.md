@@ -9,7 +9,7 @@ functionality for obtaining an authentication token.
 
 ### Protocol Buffers
 
-The `protobuf` and its accompanying c implementation package need to be installed on the machine. 
+The `protobuf` and its accompanying c implementation package need to be installed on the machine.
 The Protocol Buffers must be at version 2.2.0 or newer and can be installed either via the distribution
 package manager.
 
@@ -20,7 +20,7 @@ Ubuntu:
 Redhat:
 
     # yum install protobuf-compiler protobuf protobuf-devel
-    
+
 Or install it from source with one of the packages available at [https://code.google.com/p/protobuf/downloads/list](https://code.google.com/p/protobuf/downloads/list).
 
 ### Curl
