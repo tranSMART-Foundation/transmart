@@ -16,11 +16,12 @@ transmart-batch
 transmart-ICE
 transmart-rest-api
 RInterface
-SmartR
 GWAVA
 transmart-test
-Scripts
+SmartR
 "
+
+#no 16.1 release of SmartR
 
 echo "Mapping Command . . ." > $out
 
@@ -31,21 +32,27 @@ for dir in $dirs; do
 #		echo "++ $dir ++"
 # -------------- actual commands
 #		git checkout master >> $out
-#		git checkout release-1.2.5-Beta >> $out
+#		git checkout release-16.1 >> $out
+#       git checkout -b merge-candidate >> $out
 #		git checkout for-testing-changes >> $out
+#   	git checkout -b release-16.1 origin/release-16.1 >> $out
 #		git fetch -p >> $out
 #		git fetch transmart >> $out
 #		git pull >> $out
 #		git log --since="Jan 4, 2016" --pretty=fuller >> $out
 #		git merge master >> $out
 #		git merge release-1.2.5-Beta >> $out
-#		git merge transmart/master >> $out
+#		git merge master -m "merge update master into release-16.1 as merge-candidate for new master">> $out
+#       git merge merge-candidate >> $out
 #		git merge transmart >> $out
 #		git branch -D trial-merge >> $out
+#       git remote add transmart git@github.com:transmart/${dir}.git >> $out
 #		git remote -v >> $out
-#		git diff --name-only transmart/master >> $out
+#       git diff --name-only master >> $out
 #		git branch -a >> $out
-#		git checkout -b release-16.1 >> $out
+#       git branch -d release-16.1
+#		git commit -a -m "update version number to 16.1" >> $out
+#       git commit --amend -m "update version number to 16.2-SNAPSHOT" >> $out
 #		git push -u origin release-16.1 >> $out
 #		git branch >> $out
 #		git push >> $out
