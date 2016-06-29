@@ -18,6 +18,7 @@ getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection
                 patient.set = NULL,
                 ontology.term = NULL,
                 assay.ids = NULL,
+                patient.ids = NULL,
                 search.keywords = NULL,
                 chromosome = NULL,
                 genes = NULL,
@@ -65,6 +66,7 @@ Assay constraints:
   \item{patient.set}{A number indicating the patient set.}
   \item{ontology.term}{A single character string containing the concept path.}
   \item{assay.ids}{A numeric vector containing the id's of the assays you want to retrieve.}
+  \item{patient.ids}{A character vector with the patient ids that you want to retrieve.}
   \item{assay.or}{Should be a named list containing multiple of the above assay constraints. The returned assays are those that match at least one of the specified constraints.}
 
 Data constraints:
