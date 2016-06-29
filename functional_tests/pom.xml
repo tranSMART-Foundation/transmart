@@ -11,7 +11,7 @@
 
 	<properties>
 		<gebVersion>0.10.0</gebVersion>
-		<seleniumVersion>2.45.0</seleniumVersion>
+		<seleniumVersion>2.53.0</seleniumVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<browser.name>unknown</browser.name><!-- replaced in profiles -->
@@ -148,6 +148,12 @@
 					<version>${seleniumVersion}</version>
 					<scope>test</scope>
 				</dependency>
+				<dependency>
+					<groupId>org.seleniumhq.selenium</groupId>
+					<artifactId>htmlunit-driver</artifactId>
+					<version>2.21</version>
+                    <scope>test</scope>
+				</dependency>
 			</dependencies>
 
 			<build>
@@ -270,15 +276,15 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-    <!-- use 'mvn surefire-report:report -Pfirefox' to generate report below (as html)
-         must be preceded (only once for new target dir) 'mvn site' -->
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.18.1</version>
-            </plugin>
-        </plugins>
-    </reporting>
+	<!-- use 'mvn surefire-report:report -Pfirefox' to generate report below 
+		(as html) must be preceded (only once for new target dir) 'mvn site' -->
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>2.18.1</version>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
