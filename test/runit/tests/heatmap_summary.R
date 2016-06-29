@@ -33,6 +33,28 @@ colnames(test_set_preprocessed) <-
   c("Row.Label" , "Bio.marker","GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1",
     "GSM210004_n0_s2", "GSM210005_n0_s2", "GSM210006_n1_s2", "GSM210007_n1_s2")
 
+
+## Creating fetch_params test data ##
+test_data_ontologyTerms_highDimensional = list(
+  key = "\\\\Demo Data\\Demo Data\\Sorlie(2003) GSE4382\\Biomarker Data\\Gene Expression\\Custom Array Stanford Microarray Database\\Breast\\",
+  level = 5,
+  fullName = "\\Demo Data\\Sorlie(2003) GSE4382\\Biomarker Data\\Gene Expression\\Custom Array Stanford Microarray Database\\Breast\\",
+  name = "Breast",
+  tooltip = "\\Demo Data\\Sorlie(2003) GSE4382\\Biomarker Data\\Gene Expression\\Custom Array Stanford Microarray Database\\Breast\\",
+  visualAttributes = c("LEAF", "ACTIVE", "HIGH_DIMENSIONAL"),
+  metadata = NULL,
+  dimensionCode = "\\Demo Data\\Sorlie(2003) GSE4382\\Biomarker Data\\Gene Expression\\Custom Array Stanford Microarray Database\\Breast\\",
+  dimensionTableName = "CONCEPT_DIMENSION"
+)
+
+test_set_fetch_params = list(
+  ontologyTerms = list(highDimensional_n0 = test_data_ontologyTerms_highDimensional),
+  resultInstanceIds = c(31249, 31250),
+  assayConstraints = NULL,
+  dataConstraints = NULL,
+  projection = "log_intensity"
+)
+
 .setUp <- function() {
   # A .png file is created by produce_boxplot. Should be written to temporary directory
   assign("origDirectory", getwd(), envir = .GlobalEnv)
@@ -43,6 +65,8 @@ colnames(test_set_preprocessed) <-
   #loaded_variables and preprocessed are sometimes removed by a test function
   assign("loaded_variables", test_data, envir = .GlobalEnv)
   assign("preprocessed", list(preprocessed=test_set_preprocessed), envir = .GlobalEnv)
+  assign("fetch_params", test_set_fetch_params, envir = .GlobalEnv)
+  
 }
 
 .tearDown <- function() {
