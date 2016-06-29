@@ -1,6 +1,6 @@
 class TransmartGwasGrailsPlugin {
     // the plugin version
-	def version = "16.1"
+	def version = "16.2-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.3.7 > *"
     // the other plugins this plugin depends on
@@ -22,7 +22,7 @@ Plugin to support the display of GWAS data, including eQTL and metabolic GWAS.
     def documentation = "http://grails.org/plugin/transmart-gwas"
 
     def doWithWebDescriptor = { xml ->
-        // TODO Implement additions to web.xml (optional), this event occurs before 
+        // TODO Implement additions to web.xml (optional), this event occurs before
     }
 
     def doWithSpring = {
