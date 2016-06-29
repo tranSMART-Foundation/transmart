@@ -23,6 +23,8 @@ grails.project.dependency.resolution = {
     dependencies {
     	// needed to support folder-management
         compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+
+		runtime 'org.transmartproject:transmart-core-api:1.2.2'
     }
     plugins {
 		compile(':resources:1.2.1')
@@ -37,7 +39,10 @@ grails.project.dependency.resolution = {
                 //compile(':transmart-legacy-db:16.1')
 		compile(':spring-security-core:2.0-RC2')
 		compile(':quartz:1.0-RC2')
-        compile(':mail:1.0')
+		compile(':mail:1.0')
+		compile(':cache:1.1.8')
+		runtime(':transmart-core:1.2.2')
+		runtime(':biomart-domain:1.2.2-SNAPSHOT')
 		build(":release:3.1.1")
 
     }
