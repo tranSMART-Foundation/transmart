@@ -1,6 +1,6 @@
 class TransmartJavaGrailsPlugin {
     // the plugin version
-    def version = "16.1"
+    def version = "16.2-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
@@ -22,7 +22,7 @@ Java backend for tranSMART
     def documentation = "http://grails.org/plugin/transmart-java"
 
     def doWithWebDescriptor = { xml ->
-        // TODO Implement additions to web.xml (optional), this event occurs before 
+        // TODO Implement additions to web.xml (optional), this event occurs before
     }
 
     def doWithSpring = {
