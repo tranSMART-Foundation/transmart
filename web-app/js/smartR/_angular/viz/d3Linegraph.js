@@ -2,7 +2,7 @@
 
 'use strict';
 
-window.smartRApp.directive('linegraph', [
+window.smartRApp.directive('lineGraph', [
     'smartRUtils',
     function(smartRUtils) {
 
@@ -16,9 +16,7 @@ window.smartRApp.directive('linegraph', [
             link: function (scope, element) {
                 scope.$watch('data', function() {
                     $(element[0]).empty();
-                    console.log(scope.data);
                     if (! $.isEmptyObject(scope.data)) {
-                        console.log(scope.data);
                         smartRUtils.prepareWindowSize(scope.width, scope.height);
                         createLinegraph(scope, element[0]);
                     }
@@ -27,9 +25,7 @@ window.smartRApp.directive('linegraph', [
         };
 
         function createLinegraph(scope, root) {
-            console.log(scope.data);
             var cf = crossfilter(scope.data);
-            console.log(cf.all);
         }
 
     }
