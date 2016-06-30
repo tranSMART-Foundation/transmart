@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 @Log4j
 class SessionService implements DisposableBean {
 
-    private static final String[] HIDDEN_WORKFLOWS = ['timeline']
+    private static final String[] HIDDEN_WORKFLOWS = []
 
     private static final int COLLECTION_INTERVAL = 5 * 60 * 1000 // 5 min
     private static final int SESSION_LIFESPAN = 10 * 60 * 1000 // 10 min
