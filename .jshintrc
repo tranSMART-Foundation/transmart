@@ -87,6 +87,7 @@
     // Custom Globals
     "globals"       : {
         "angular":  true,
+        "crossfilter": true,
         "module":   true,
         "inject":   true,
         "pageInfo": true,

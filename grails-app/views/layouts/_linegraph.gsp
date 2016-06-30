@@ -36,6 +36,7 @@
                             store-results-in="runAnalysis.scriptResults"
                             script-to-run="run"
                             arguments-to-use="runAnalysis.params"
+                            filename="linegraph.json"
                             running="runAnalysis.running">
                 </run-button>
                 <br/>

@@ -7,6 +7,7 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery.tablesorter.min.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'd3.min.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'd3-tip.js']
+        resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'crossfilter.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jsrender.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'angular.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'angular-route.js']
