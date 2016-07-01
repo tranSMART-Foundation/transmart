@@ -53,6 +53,7 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
 
     df <- data.frame(patientID=integer(),
                      value=c(), # can be string or integer
+                     time=integer(),
                      name=character(),
                      fullName=character(),
                      type=character(),
@@ -69,6 +70,7 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
 
         variable.df <- data.frame(patientID=as.integer(variable[,1]),
                                   value=variable[,2],
+                                  time=sample(1:10, nrow(variable), replace=TRUE), # TODO: use real time values
                                   name=rep(names[i], nrow(variable)),
                                   fullName=rep(fullNames[i], nrow(variable)),
                                   type=rep(types[i], nrow(variable)),
