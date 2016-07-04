@@ -5,6 +5,8 @@ main <- function() {
     save(fetch_params, file="/Users/sascha/fetch_params.Rda")
 
     df <- buildCrossfilterCompatibleDf(loaded_variables, fetch_params)
+    # TODO: this is disabled as long as I don't have real time data to test
+    # checkTimeNameSanity(df)
 
     output <- list()
     output$data_matrix <- df
@@ -14,14 +16,14 @@ main <- function() {
     list(messages="Finished successfully")
 }
 
-# returns character vector (e.g. c("Age", "Alive", "M0", ...))
+# returns character vector (e.g. c("Age", "Alive" or "Week1", "Week2" if handling time series data))
 getNames <- function(loaded_variables, fetch_params) {
     names.without.subset <- sub("_s[1-2]{1}$", "", names(loaded_variables))
     labels <- sapply(names.without.subset, function(el) fetch_params$ontologyTerms[[el]]$name)
     as.character(as.vector(labels))
 }
 
-# returns character vector (e.g. c("\\Demo Study\\Vital Status\\Alive\\", "\\Demo Study\\Vital Status\\Alive\\", ...))
+# returns character vector (e.g. c("\\Demo Study\\Vital Status\\Alive\\Week1", "\\Demo Study\\Vital Status\\Alive\\Week2", ...))
 getFullNames <- function(loaded_variables, fetch_params) {
     names.without.subset <- sub("_s[1-2]{1}$", "", names(loaded_variables))
     fullNames <- sapply(names.without.subset, function(el) fetch_params$ontologyTerms[[el]]$fullName)
@@ -37,6 +39,7 @@ getSubsets <- function(loaded_variables) {
 # returns character vector (e.g. c("numeric", "numeric", "categoric", ...))
 getTypes <- function(loaded_variables) {
     types <- sub("_.*$", "", names(loaded_variables))
+    types[types == "highData"] <- "highDimensional"
     types[types == "numData"] <- "numeric"
     types[types == "catData"] <- "categoric"
     as.character(types)
@@ -81,4 +84,16 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
     }
 
     df
+}
+
+# time (e.g. 15) and name (e.g. Day 15) must have a 1:1 relationship
+# It is not possible to have multiple times for one name or multiple names for one time
+checkTimeNameSanity <- function(df) {
+    df.without.duplicates <- unique(df[, c("time", "name")])
+    timeSane = nrow(df.without.duplicates) == length(unique(df.without.duplicates$time))
+    nameSane = nrow(df.without.duplicates) == length(unique(df.without.duplicates$name))
+    if (! (timeSane && nameSane)) {
+        stop("Node names and assigned time values must have a 1:1 relationship.
+             E.g. two nodes Age/Week1, Bloodpressure/Week1, must have both the same assigned time (e.g. 1)")
+    }
 }

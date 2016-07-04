@@ -7,6 +7,14 @@
 
             <workflow-tab tab-name="Fetch Data" disabled="fetch.disabled">
                 <concept-box style="display: inline-block"
+                             concept-group="fetch.conceptBoxes.highData"
+                             type="HD"
+                             min="0"
+                             max="-1"
+                             label="(optional) High Dimensional Variable"
+                             tooltip="Select an arbitrary number of high dimensional variables and drag them here.">
+                </concept-box>
+                <concept-box style="display: inline-block"
                              concept-group="fetch.conceptBoxes.numData"
                              type="LD-numerical"
                              min="0"

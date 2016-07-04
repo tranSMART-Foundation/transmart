@@ -12,6 +12,7 @@ window.smartRApp.controller('LinegraphController',
             running: false,
             loaded: false,
             conceptBoxes: {
+                highData: {concepts: [], valid: true},
                 numData: {concepts: [], valid: true},
                 catData: {concepts: [], valid: true}
             }
