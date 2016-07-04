@@ -335,7 +335,7 @@ test.produce_summary_stats.itemNA <- function() {
   expected_result[,"numberOfSamples"] <- NA #logical
   
   checkEquals(
-    list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_NA_set, phase)
+    list("fetch_summary_stats_node_highDimensional_n0.json" = expected_result), produce_summary_stats(test_NA_set, phase)
   )
 }
 
