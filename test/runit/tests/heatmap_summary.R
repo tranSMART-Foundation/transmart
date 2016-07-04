@@ -493,7 +493,7 @@ test.produce_boxplot.itemNA <- function() {
   test_NA_set <- list("highDimensional_n0_s1" = NA)
   expected_result <- "No data points to plot"
   checkEquals(
-    list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_NA_set, phase,"log_intensity")
+    list("fetch_box_plot_node_highDimensional_n0.png" = expected_result), produce_boxplot(test_NA_set, phase,"log_intensity")
   )
 }
 
@@ -506,7 +506,7 @@ test.produce_boxplot.1sample <- function() {
   expected_result <- boxplot_table
   names(expected_result$out) <- "sample16"
   checkEquals(
-    list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_sample, phase, "log_intensity")
+    list("fetch_box_plot_node_highDimensional_n0.png" = expected_result), produce_boxplot(test_data_one_sample, phase, "log_intensity")
   )
 }
 
@@ -519,7 +519,7 @@ test.produce_boxplot.1probe <- function() {
   expected_result <- boxplot_table
   names(expected_result$out) <- "p"
   checkEquals(
-    list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_probe, phase, "log_intensity")
+    list("fetch_box_plot_node_highDimensional_n0.png" = expected_result), produce_boxplot(test_data_one_probe, phase, "log_intensity")
   )
 }
 
@@ -535,7 +535,7 @@ test.produce_boxplot.1probe1sample <- function() {
     names = "s1"
   )
   checkEquals(
-    list("fetch_box_plot_node_n0.png" = expected_result), 
+    list("fetch_box_plot_node_highDimensional_n0.png" = expected_result), 
     produce_boxplot(test_data_one_probe_sample, phase, "log_intensity")
   )
 }
