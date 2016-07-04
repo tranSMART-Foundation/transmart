@@ -244,7 +244,7 @@ phase <- "fetch"
 #summary stats corresponding to test_set
 summary_stats_table <- data.frame(
   "variableLabel" = "highDimensional_n0_s1",
-  "node" = "n0",
+  "node" = "highDimensional_n0",
   "subset" = "s1",
   "totalNumberOfValuesIncludingMissing" = 20,
   "numberOfMissingValues" = 1,
@@ -269,7 +269,7 @@ summary_stats_table2[,c("min", "max", "mean", "q1", "median", "q3")] <-
 # 1 node, 1 subset
 test.produce_summary_stats.simplecase <- function() {
   checkEquals(
-    list("fetch_summary_stats_node_n0.json" = summary_stats_table), produce_summary_stats(test_data_measurements, phase)
+    list("fetch_summary_stats_node_highDimensional_n0.json" = summary_stats_table), produce_summary_stats(test_data_measurements, phase)
   )
 }
 
@@ -289,13 +289,13 @@ test.produce_summary_stats.multiplenodesandsubsets <- function() {
   expected_result_n1 <-
     rbind(summary_stats_table2,summary_stats_table)
   expected_result_n1[1 , c("variableLabel", "node","subset")] <-
-    c("highDimensional_n1_s1", "n1", "s1")
+    c("highDimensional_n1_s1", "highDimensional_n1", "s1")
   expected_result_n1[2 , c("variableLabel", "node","subset")] <-
-    c("highDimensional_n1_s2", "n1", "s2")
+    c("highDimensional_n1_s2", "highDimensional_n1", "s2")
   
   checkEquals(
     list(
-      "fetch_summary_stats_node_n0.json" = expected_result_n0, "fetch_summary_stats_node_n1.json" = expected_result_n1
+      "fetch_summary_stats_node_highDimensional_n0.json" = expected_result_n0, "fetch_summary_stats_node_highDimensional_n1.json" = expected_result_n1
     ), produce_summary_stats(test_data_measurements_multiple_nodes_subsets, phase)
   )
 }
@@ -350,7 +350,7 @@ test.produce_summary_stats.1sample <- function() {
     c(1, 5, 3, 1.58113883, 2, 3, 4)
   
   checkEquals(
-    list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_sample, phase)
+    list("fetch_summary_stats_node_highDimensional_n0.json" = expected_result), produce_summary_stats(test_data_one_sample, phase)
   )
 }
 
@@ -369,7 +369,7 @@ test.produce_summary_stats.1probe <- function() {
     c(1, 5, 3, 1.58113883, 2, 3, 4)
   
   checkEquals(
-    list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_probe, phase)
+    list("fetch_summary_stats_node_highDimensional_n0.json" = expected_result), produce_summary_stats(test_data_one_probe, phase)
   )
 }
 
@@ -384,7 +384,7 @@ test.produce_summary_stats.1probe1sample <- function() {
     c(1, 1, 1, as.numeric(NA), 1, 1, 1)
   
   checkEquals(
-    list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_probe_sample, phase)
+    list("fetch_summary_stats_node_highDimensional_n0.json" = expected_result), produce_summary_stats(test_data_one_probe_sample, phase)
   )
 }
 
@@ -448,7 +448,7 @@ boxplot_table_2subsets2 <- list(
 # 1 node, 1 subset
 test.produce_boxplot.simplecase <- function() {
   checkEquals(
-    list("fetch_box_plot_node_n0.png" = boxplot_table), produce_boxplot(test_data_measurements, phase, "log_intensity")
+    list("fetch_box_plot_node_highDimensional_n0.png" = boxplot_table), produce_boxplot(test_data_measurements, phase, "log_intensity")
   )
 }
 
@@ -463,7 +463,7 @@ test.produce_boxplot.multiplenodesandsubsets <- function() {
     )
   checkEquals(
     list(
-      "fetch_box_plot_node_n0.png" = boxplot_table_2subsets2, "fetch_box_plot_node_n1.png" = boxplot_table_2subsets
+      "fetch_box_plot_node_highDimensional_n0.png" = boxplot_table_2subsets2, "fetch_box_plot_node_highDimensional_n1.png" = boxplot_table_2subsets
     ), produce_boxplot(
       test_data_measurements_multiple_nodes_subsets, phase, "log_intensity"
     )
