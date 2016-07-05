@@ -56,16 +56,14 @@ window.smartRApp.directive('lineGraph', [
             // recomputes x scale for current filters
             (function calculateXScale() {
                 var times = getNonZeroGroupKeys(groupByTime);
-                var xTicks = times.map(function(time, i) {
-                    if (i === 0) { return 0; }
-                    return times[times.length - 1] / time * width;
+                var xTicks = times.map(function(time) {
+                    return time / times[times.length - 1] * width;
                 });
                 x.domain(times).range(xTicks);
             })();
 
             byType.filterExact('categoric');
             var catFullNames = getNonZeroGroupKeys(groupByFullName);
-
             byType.filterExact('numeric');
             var numFullNames = getNonZeroGroupKeys(groupByFullName);
 
@@ -108,8 +106,6 @@ window.smartRApp.directive('lineGraph', [
                 return getCategoricalDensity(patientID);
             });
             byType.filterAll();
-
-            console.log(categoricalDensities);
         }
 
     }
