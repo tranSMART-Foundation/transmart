@@ -920,14 +920,14 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('x', 5 - margin.left)
                     .attr('y', 8 - margin.top + 100)
                     .attr('text-anchor', 'start')
-                    .text(steps.min().toFixed(1));
+                    .text(Math.min.apply(null, steps).toFixed(1));
 
                 legendItems.append('text')
                     .attr('class', 'legendText')
                     .attr('x', 5 - margin.left + legendWidth)
                     .attr('y', 8 - margin.top + 100)
                     .attr('text-anchor', 'end')
-                    .text(steps.max().toFixed(1));
+                    .text(Math.max.apply(null, steps).toFixed(1));
             }
 
             function unselectAll() {
