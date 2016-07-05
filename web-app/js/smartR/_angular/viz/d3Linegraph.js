@@ -36,7 +36,6 @@ window.smartRApp.directive('lineGraph', [
             var byTime = cf.dimension(function(d) { return d.time; });
             var byFullName = cf.dimension(function(d) { return d.fullName; });
             var byType = cf.dimension(function(d) { return d.type; });
-            var bySubset = cf.dimension(function(d) { return d.subset; });
 
             var groupByPatientID = byPatientID.group();
             var groupByFullName = byFullName.group();

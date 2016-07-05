@@ -11,6 +11,7 @@ window.smartRApp.controller('LinegraphController',
             disabled: false,
             running: false,
             loaded: false,
+            selectedBiomarkers: [],
             conceptBoxes: {
                 highData: {concepts: [], valid: true},
                 numData: {concepts: [], valid: true},

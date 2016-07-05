@@ -30,12 +30,15 @@
                              label="(optional) Categorical Variables"
                              tooltip="Select an arbitrary number of categoric variables and drag them here.">
                 </concept-box>
-                <br/>
+
+                <biomarker-selection biomarkers="fetch.selectedBiomarkers"></biomarker-selection>
+                <hr class="sr-divider">
                 <br/>
                 <fetch-button concept-map="fetch.conceptBoxes"
                               loaded="fetch.loaded"
                               running="fetch.running"
-                              allowed-cohorts="[1,2]">
+                              allowed-cohorts="[1,2]"
+                              biomarkers="fetch.selectedBiomarkers">
                 </fetch-button>
             </workflow-tab>
 
