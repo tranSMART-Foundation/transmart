@@ -1,4 +1,6 @@
 library(jsonlite)
+library(plyr)
+library(reshape2)
 
 main <- function() {
     save(loaded_variables, file="/Users/sascha/loaded_variables.Rda")
@@ -53,7 +55,7 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
     fullNames <- getFullNames(loaded_variables, fetch_params)
     types <- getTypes(loaded_variables)
 
-
+    # initialize empty df
     df <- data.frame(patientID=integer(),
                      value=c(), # can be string or integer
                      time=integer(),
@@ -61,29 +63,41 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                      fullName=character(),
                      type=character(),
                      subset=integer(),
+                     annotations=character(),
                      stringsAsFactors=FALSE)
 
     # build big df step by step via binding row-wise every loaded variable
     for (i in 1:length(names(loaded_variables))) {
         variable <- loaded_variables[[i]]
-        # we are not interested in rows with value NA or ""
-        variable <- variable[variable[,2] != "" & !is.na(variable[,2]), ]
-        # if all values are NA or "" we don't include them in the df
-        if (nrow(variable) == 0) next
+        variable.df <- data.frame()
 
-        variable.df <- data.frame(patientID=as.integer(variable[,1]),
-                                  value=variable[,2],
-                                  time=sample(1:10, nrow(variable), replace=TRUE), # TODO: use real time values
-                                  name=rep(names[i], nrow(variable)),
-                                  fullName=rep(fullNames[i], nrow(variable)),
-                                  type=rep(types[i], nrow(variable)),
-                                  subset=rep(subsets[i], nrow(variable)),
-                                  stringsAsFactors=FALSE)
+        if (types[i] == "highDimensional") {
+            colnames(variable)[-(1:2)] <- sub("^X", "", colnames(variable[-(1:2)]))
+            variable.df <- melt(variable, id.vars=c("Row.Label", "Bio.marker"), variable.name="patientID")
+        } else {
+            variable.df <- data.frame(patientID=as.integer(variable[,1]),
+                                      value=variable[,2])
+        }
 
-        df <- rbind(df, variable.df)
+        # attach additional information
+        variable.df <- cbind(variable.df, time=sample(1:10, nrow(variable.df), replace=TRUE), # TODO: use real time values
+                             name=rep(names[i], nrow(variable.df)),
+                             fullName=rep(fullNames[i], nrow(variable.df)),
+                             type=rep(types[i], nrow(variable.df)),
+                             subset=rep(subsets[i], nrow(variable.df)),
+                             stringsAsFactors=FALSE)
+
+        # no value -> no interest
+        variable.df <- variable.df[variable.df$value != "" & !is.na(variable.df$value), ]
+        if (nrow(variable.df) == 0) next
+        # rbind.fill sets missing columns entries to NA
+        df <- rbind.fill(df, variable.df)
     }
 
     df
+}
+
+prepare.variable.df <- function(variable, name, fullName, type, subset) {
 }
 
 # time (e.g. 15) and name (e.g. Day 15) must have a 1:1 relationship
