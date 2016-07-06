@@ -97,9 +97,6 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
     df
 }
 
-prepare.variable.df <- function(variable, name, fullName, type, subset) {
-}
-
 # time (e.g. 15) and name (e.g. Day 15) must have a 1:1 relationship
 # It is not possible to have multiple times for one name or multiple names for one time
 checkTimeNameSanity <- function(df) {

@@ -1,2 +1,9 @@
 .sr-linegraph-x-axis {
+
+}
+
+.sr-linegraph-cat-box {
+    stroke: black;
+    fill: white;
+    shape-rendering: crispEdges;
 }
