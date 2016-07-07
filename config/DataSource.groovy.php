@@ -12,6 +12,20 @@ dataSource {
     username        = 'biomart_user'
     password        = '<?= $biomart_user_pwd ?>'
     dbCreate        = 'none'
+    
+    properties {
+      numTestsPerEvictionRun = 3
+      maxWait = 10000
+
+      testOnBorrow = true
+      testWhileIdle = true
+      testOnReturn = true
+
+      validationQuery = "select now()"
+
+      minEvictableIdleTimeMillis = 1000 * 60 * 5
+      timeBetweenEvictionRunsMillis = 1000 * 60 * 5
+   }
 }
 
 environments {
