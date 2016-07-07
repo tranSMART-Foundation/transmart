@@ -21,7 +21,7 @@ dataSource {
       testWhileIdle = true
       testOnReturn = true
 
-      validationQuery = "select now()"
+      validationQuery = "select 1"
 
       minEvictableIdleTimeMillis = 1000 * 60 * 5
       timeBetweenEvictionRunsMillis = 1000 * 60 * 5
