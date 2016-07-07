@@ -50,7 +50,7 @@ window.smartRApp.directive('lineGraph', [
 
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-linegraph-patient-range');
             patientRange.min = 0;
-            patientRange.max = getValuesForDimension(byPatientID, true).length;
+            patientRange.max = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
             patientRange.value = 5;
             patientRange.step = 1;
             patientRange.addEventListener('change', function() {
@@ -60,24 +60,19 @@ window.smartRApp.directive('lineGraph', [
 
             function numOfPatientsToShow(num) {
                 byPatientID.filterAll();
-                var shownPatients = getValuesForDimension(byPatientID, true).slice(0, num);
+                var shownPatients = smartRUtils.unique(getValuesForDimension(byPatientID)).slice(0, num);
                 byPatientID.filterFunction(function(patient) { return shownPatients.indexOf(patient) !== -1; });
             }
             numOfPatientsToShow(5);
 
-            function getValuesForDimension(dimension, unique) {
-                unique = typeof unique === 'undefined' ? false : unique;
-                var values = dimension.top(Infinity).map(function(record) { return dimension.accessor(record); });
-                if (unique) {
-                    values = smartRUtils.unique(values);
-                }
-                return values;
+            function getValuesForDimension(dimension) {
+                return dimension.top(Infinity).map(function(record) { return dimension.accessor(record); });
             }
 
             var x = d3.scale.linear();
             // recomputes x scale for current filters
             function calculateXScale() {
-                var times = getValuesForDimension(byTime, true);
+                var times = smartRUtils.unique(getValuesForDimension(byTime)).sort();
                 var xTicks = times.map(function(time) {
                     return (time - times[0]) / (times[times.length - 1] - times[0]) * LINEGRAPH_WIDTH;
                 });
@@ -86,10 +81,11 @@ window.smartRApp.directive('lineGraph', [
             calculateXScale();
 
             byType.filterExact('categoric');
-            var catFullNames = getValuesForDimension(byFullName, true);
+            var catFullNames = smartRUtils.unique(getValuesForDimension(byFullName));
             byType.filterExact('numeric');
-            var numFullNames = getValuesForDimension(byFullName, true);
-
+            var numFullNames = smartRUtils.unique(getValuesForDimension(byFullName));
+            byType.filterExact('highDimensional');
+            var highFullNames = smartRUtils.unique(getValuesForDimension(byFullName));
             byType.filterAll();
 
             var svg = d3.select(vizDiv).append('svg')
@@ -99,13 +95,17 @@ window.smartRApp.directive('lineGraph', [
                 .attr('transform', 'translate(' + MARGIN.left + ',' + MARGIN.top + ')');
 
             var xAxis = d3.svg.axis()
-                .scale(x)
-                .tickValues(getValuesForDimension(byTime, true)); // TODO: replace with node label, rather than time
+                .scale(x);
 
             svg.append('g')
                 .attr('class', 'sr-linegraph-x-axis')
                 .attr('transform', 'translate(' + 0 + ',' + LINEGRAPH_HEIGHT + ')')
                 .call(xAxis);
+
+            function renderNumericPlots() {
+                byType.filterExact('numeric');
+
+            }
 
             function renderCategoricPlots() {
                 byType.filterExact('categoric');
@@ -113,10 +113,11 @@ window.smartRApp.directive('lineGraph', [
                 var tmpByPatientID = cf.dimension(function(d) { return d.patientID; });
                 var tmpByTime = cf.dimension(function(d) { return d.time; });
 
-                var catBoxInfo = getValuesForDimension(byPatientID, true).map(function(patientID) {
+                var catPlotInfo = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
                     tmpByPatientID.filterExact(patientID);
                     var maxCount = 0;
-                    getValuesForDimension(byTime, true).forEach(function(time) {
+                    var times = smartRUtils.unique(getValuesForDimension(byTime));
+                    times.forEach(function(time) {
                         tmpByTime.filterExact(time);
                         var count = byValue.top(Infinity).length;
                         maxCount = count > maxCount ? count : maxCount;
@@ -126,26 +127,30 @@ window.smartRApp.directive('lineGraph', [
                     return {patientID: patientID, maxDensity: maxCount};
                 });
 
-                var totalDensity = catBoxInfo.reduce(function(prev, curr) { return curr.maxDensity + prev; }, 0);
-                catBoxInfo.forEach(function(d) {
-                    d.height = Math.floor(d.maxDensity / totalDensity * CAT_PLOTS_HEIGHT);
+                var totalDensity = catPlotInfo.reduce(function(prev, curr) { return curr.maxDensity + prev; }, 0);
+                catPlotInfo.forEach(function(d) {
+                    d.height = d3.round(d.maxDensity / totalDensity * CAT_PLOTS_HEIGHT);
                     tmpByPatientID.filterExact(d.patientID);
-                    d.subset = getValuesForDimension(bySubset, true);
+                    d.subset = smartRUtils.unique(getValuesForDimension(bySubset));
                 });
 
                 byType.filterAll();
                 tmpByPatientID.dispose();
                 tmpByTime.dispose();
 
-                var catBox = svg.selectAll('.sr-linegraph-cat-box')
-                    .data(catBoxInfo, function(d) { return d.patientID; });
+                // DATA JOIN
+                var catPlot = svg.selectAll('.sr-linegraph-cat-plot')
+                    .data(catPlotInfo, function(d) { return d.patientID; });
 
-                catBox.enter()
-                    .append('rect')
+                // ENTER g
+                var catPlotEnter = catPlot.enter()
+                    .append('g')
                     .attr('class', function(d) {
-                        return 'sr-linegraph-cat-box' + ' ' + smartRUtils.makeSafeForCSS('patientid-' + d.patientID);
-                    })
-                    .attr('x', 0)
+                        return 'sr-linegraph-cat-plot' + ' ' + 'patientid-' + smartRUtils.makeSafeForCSS(d.patientID);
+                    });
+
+                // ENTER rec
+                catPlotEnter.append('rect')
                     .attr('width', LINEGRAPH_WIDTH)
                     .attr('fill', function(d) {
                         if (d.subset.length === 2) { return 'rgba(255, 255, 0, 0.5)'; }
@@ -153,21 +158,33 @@ window.smartRApp.directive('lineGraph', [
                         return 'rgba(255, 0, 0, 0.5)';
                     });
 
-                catBox
-                    .attr('y', function(d, i) {
-                        var previousHeight = 0;
-                        for (var j = i - 1; j >= 0; j--) {
-                            previousHeight += catBoxInfo[i].height;
-                        }
-                        return LINEGRAPH_HEIGHT - CAT_PLOTS_OFFSET_BOTTOM - previousHeight - d.height;
-                    })
-                    .attr('height', function(d) { return d.height; });
+                // ENTER text
+                catPlotEnter.append('text')
+                    .text(function(d) { return d.patientID; })
+                    .attr('dy', '0.35em');
 
-                catBox.exit()
-                    .transition()
-                    .duration(500)
-                    .attr('height', 0)
-                    .remove();
+                // UPDATE g
+                catPlot.attr('transform', function(d, i) {
+                    var previousHeight = 0;
+                    for (var j = i - 1; j >= 0; j--) {
+                        previousHeight += catPlotInfo[i].height;
+                    }
+                    var y = LINEGRAPH_HEIGHT - CAT_PLOTS_OFFSET_BOTTOM - previousHeight - d.height;
+                    return 'translate(' + 0 + ',' + y + ')';
+                });
+
+                // UPDATE rect
+                catPlot.select('rect').attr('height', function(d) { return d.height; });
+
+                // UPDATE text
+                catPlot.select('text')
+                    .attr('transform', function(d) {
+                        return 'translate(' + (0) + ',' + (d.height / 2) + ')';
+                    })
+                    .style('font-size', function(d) { return d.height + 'px'; });
+
+                // EXIT g
+                catPlot.exit().remove();
             }
             renderCategoricPlots();
         }
