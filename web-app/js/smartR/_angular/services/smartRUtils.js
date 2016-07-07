@@ -57,8 +57,8 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         }
         $.fn.textWidth.fakeEl.text(text || this.val() || this.text()).css('font', font || this.css('font'));
         return $.fn.textWidth.fakeEl.width();
-    };    
-    
+    };
+
     service.getTextWidth = function(text, font) {
         return $.fn.textWidth(text, font);
     };
@@ -79,7 +79,7 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         $('#heim-tabs').css('min-height', parseInt(height) + 25);
     };
 
-    /** 
+    /**
     * removes all kind of elements that might live out of the viz directive (e.g. tooltips, contextmenu, ...)
     */
     service.cleanUp = function() {
@@ -116,6 +116,20 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         resolveResult();
 
         return defer.promise;
+    };
+
+    /**
+     * Some cool Array functions
+     */
+
+    // fast unique()
+    service.unique = function(arr) {
+        var a = [];
+        for (var i = 0, l = arr.length; i < l; i++)
+            if (a.indexOf(arr[i]) === -1 && arr[i] !== ''){
+                a.push(arr[i]);
+            }
+        return a;
     };
 
     return service;

@@ -48,14 +48,9 @@ window.smartRApp.directive('lineGraph', [
             var byType = cf.dimension(function(d) { return d.type; });
             var bySubset = cf.dimension(function(d) { return d.subset; });
 
-            var groupByPatientID = byPatientID.group();
-            var groupByFullName = byFullName.group();
-            var groupByTime = byTime.group();
-            var groupBySubset = bySubset.group();
-
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-linegraph-patient-range');
             patientRange.min = 0;
-            patientRange.max = getNonZeroGroupKeys(groupByPatientID).length;
+            patientRange.max = getValuesForDimension(byPatientID, true).length;
             patientRange.value = 5;
             patientRange.step = 1;
             patientRange.addEventListener('change', function() {
@@ -64,21 +59,25 @@ window.smartRApp.directive('lineGraph', [
             });
 
             function numOfPatientsToShow(num) {
-                var shownPatients = getNonZeroGroupKeys(groupByPatientID).slice(0, num); // show top 5 initially
+                byPatientID.filterAll();
+                var shownPatients = getValuesForDimension(byPatientID, true).slice(0, num);
                 byPatientID.filterFunction(function(patient) { return shownPatients.indexOf(patient) !== -1; });
             }
             numOfPatientsToShow(5);
 
-            function getNonZeroGroupKeys(group) {
-                return group.all()
-                    .filter(function(d) { return d.value > 0; })
-                    .map(function(d) { return d.key; });
+            function getValuesForDimension(dimension, unique) {
+                unique = typeof unique === 'undefined' ? false : unique;
+                var values = dimension.top(Infinity).map(function(record) { return dimension.accessor(record); });
+                if (unique) {
+                    values = smartRUtils.unique(values);
+                }
+                return values;
             }
 
             var x = d3.scale.linear();
             // recomputes x scale for current filters
             function calculateXScale() {
-                var times = getNonZeroGroupKeys(groupByTime);
+                var times = getValuesForDimension(byTime, true);
                 var xTicks = times.map(function(time) {
                     return (time - times[0]) / (times[times.length - 1] - times[0]) * LINEGRAPH_WIDTH;
                 });
@@ -87,9 +86,9 @@ window.smartRApp.directive('lineGraph', [
             calculateXScale();
 
             byType.filterExact('categoric');
-            var catFullNames = getNonZeroGroupKeys(groupByFullName);
+            var catFullNames = getValuesForDimension(byFullName, true);
             byType.filterExact('numeric');
-            var numFullNames = getNonZeroGroupKeys(groupByFullName);
+            var numFullNames = getValuesForDimension(byFullName, true);
 
             byType.filterAll();
 
@@ -101,7 +100,7 @@ window.smartRApp.directive('lineGraph', [
 
             var xAxis = d3.svg.axis()
                 .scale(x)
-                .tickValues(getNonZeroGroupKeys(groupByTime)); // TODO: replace with node label, rather than time
+                .tickValues(getValuesForDimension(byTime, true)); // TODO: replace with node label, rather than time
 
             svg.append('g')
                 .attr('class', 'sr-linegraph-x-axis')
@@ -114,10 +113,10 @@ window.smartRApp.directive('lineGraph', [
                 var tmpByPatientID = cf.dimension(function(d) { return d.patientID; });
                 var tmpByTime = cf.dimension(function(d) { return d.time; });
 
-                var catBoxInfo = getNonZeroGroupKeys(groupByPatientID).map(function(patientID) {
+                var catBoxInfo = getValuesForDimension(byPatientID, true).map(function(patientID) {
                     tmpByPatientID.filterExact(patientID);
                     var maxCount = 0;
-                    getNonZeroGroupKeys(groupByTime).forEach(function(time) {
+                    getValuesForDimension(byTime, true).forEach(function(time) {
                         tmpByTime.filterExact(time);
                         var count = byValue.top(Infinity).length;
                         maxCount = count > maxCount ? count : maxCount;
@@ -131,7 +130,7 @@ window.smartRApp.directive('lineGraph', [
                 catBoxInfo.forEach(function(d) {
                     d.height = Math.floor(d.maxDensity / totalDensity * CAT_PLOTS_HEIGHT);
                     tmpByPatientID.filterExact(d.patientID);
-                    d.subset = getNonZeroGroupKeys(groupBySubset);
+                    d.subset = getValuesForDimension(bySubset, true);
                 });
 
                 byType.filterAll();
@@ -139,7 +138,7 @@ window.smartRApp.directive('lineGraph', [
                 tmpByTime.dispose();
 
                 var catBox = svg.selectAll('.sr-linegraph-cat-box')
-                    .data(catBoxInfo);
+                    .data(catBoxInfo, function(d) { return d.patientID; });
 
                 catBox.enter()
                     .append('rect')
@@ -160,9 +159,15 @@ window.smartRApp.directive('lineGraph', [
                         for (var j = i - 1; j >= 0; j--) {
                             previousHeight += catBoxInfo[i].height;
                         }
-                        return LINEGRAPH_HEIGHT - CAT_PLOTS_OFFSET_BOTTOM - previousHeight + d.height;
+                        return LINEGRAPH_HEIGHT - CAT_PLOTS_OFFSET_BOTTOM - previousHeight - d.height;
                     })
                     .attr('height', function(d) { return d.height; });
+
+                catBox.exit()
+                    .transition()
+                    .duration(500)
+                    .attr('height', 0)
+                    .remove();
             }
             renderCategoricPlots();
         }
