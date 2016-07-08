@@ -43,10 +43,12 @@ window.smartRApp.directive('lineGraph', [
             var cf = crossfilter(data_matrix);
             var byPatientID = cf.dimension(function(d) { return d.patientID; });
             var byValue = cf.dimension(function(d) { return d.value; });
-            var byTime = cf.dimension(function(d) { return d.time; });
-            var byFullName = cf.dimension(function(d) { return d.fullName; });
+            var byTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
+            var byBioMarker = cf.dimension(function(d) { return d.bioMarker; });
             var byType = cf.dimension(function(d) { return d.type; });
             var bySubset = cf.dimension(function(d) { return d.subset; });
+
+            var groupBioMarker = byBioMarker.group();
 
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-linegraph-patient-range');
             patientRange.min = 0;
@@ -72,7 +74,7 @@ window.smartRApp.directive('lineGraph', [
             var x = d3.scale.linear();
             // recomputes x scale for current filters
             function calculateXScale() {
-                var times = smartRUtils.unique(getValuesForDimension(byTime)).sort();
+                var times = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort();
                 var xTicks = times.map(function(time) {
                     return (time - times[0]) / (times[times.length - 1] - times[0]) * LINEGRAPH_WIDTH;
                 });
@@ -81,11 +83,11 @@ window.smartRApp.directive('lineGraph', [
             calculateXScale();
 
             byType.filterExact('categoric');
-            var catFullNames = smartRUtils.unique(getValuesForDimension(byFullName));
+            var catBioMarkers = smartRUtils.unique(getValuesForDimension(byBioMarker));
             byType.filterExact('numeric');
-            var numFullNames = smartRUtils.unique(getValuesForDimension(byFullName));
+            var numBioMarkers = smartRUtils.unique(getValuesForDimension(byBioMarker));
             byType.filterExact('highDimensional');
-            var highFullNames = smartRUtils.unique(getValuesForDimension(byFullName));
+            var highBioMarkers = smartRUtils.unique(getValuesForDimension(byBioMarker));
             byType.filterAll();
 
             var svg = d3.select(vizDiv).append('svg')
@@ -94,36 +96,65 @@ window.smartRApp.directive('lineGraph', [
                 .append('g')
                 .attr('transform', 'translate(' + MARGIN.left + ',' + MARGIN.top + ')');
 
+            // temporary dimension because we don't want to affect the time filter
+            var tmpByTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
+            var tickFormat = {};
+            smartRUtils.unique(getValuesForDimension(byTimeInteger)).forEach(function(timeInteger) {
+                tmpByTimeInteger.filterExact(timeInteger);
+                tickFormat[timeInteger] = byTimeInteger.top(1)[0].timeString;
+            });
+            tmpByTimeInteger.dispose();
             var xAxis = d3.svg.axis()
-                .scale(x);
+                .scale(x)
+                .tickFormat(function(d) { return tickFormat[d]});
 
             svg.append('g')
                 .attr('class', 'sr-linegraph-x-axis')
                 .attr('transform', 'translate(' + 0 + ',' + LINEGRAPH_HEIGHT + ')')
                 .call(xAxis);
 
+            function iconGenerator(size) {
+                var squareShape = 'M0,0H' + size + 'V' + size + 'H0Z';
+                var iconTable = [
+                    //blue  orange  violet  red green
+                    {path: squareShape},{path: squareShape},{path: squareShape},{path: squareShape},{path: squareShape}, // square
+                    {path: ''},{path: ''},{path: ''},{path: ''},{path: ''}, // triangle
+                    {path: ''},{path: ''},{path: ''},{path: ''},{path: ''}, // diamond
+                    {path: ''},{path: ''},{path: ''},{path: ''},{path: ''}, // revTriangle
+                    {path: ''},{path: ''},{path: ''},{path: ''},{path: ''}  // hexagon
+                ];
+                var cache = {};
+                return function(bioMarker) {
+                    var icon = cache[bioMarker];
+                    if (typeof icon === 'undefined') {
+                        icon = iconTable[Object.keys(cache).length];
+                        cache[bioMarker] = icon;
+                    }
+                    return icon;
+                };
+            }
+
             function renderNumericPlots() {
                 byType.filterExact('numeric');
-
             }
 
             function renderCategoricPlots() {
                 byType.filterExact('categoric');
                 // temporary dimensions because we want to keep filters within this function scope
                 var tmpByPatientID = cf.dimension(function(d) { return d.patientID; });
-                var tmpByTime = cf.dimension(function(d) { return d.time; });
+                var tmpByTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
 
                 var catPlotInfo = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
                     tmpByPatientID.filterExact(patientID);
                     var maxCount = 0;
-                    var times = smartRUtils.unique(getValuesForDimension(byTime));
+                    var times = smartRUtils.unique(getValuesForDimension(byTimeInteger));
                     times.forEach(function(time) {
-                        tmpByTime.filterExact(time);
+                        tmpByTimeInteger.filterExact(time);
                         var count = byValue.top(Infinity).length;
                         maxCount = count > maxCount ? count : maxCount;
-                        tmpByTime.filterAll();
+                        // we need to disable this filter temporarily, otherwise it will affect the next iteration step
+                        tmpByTimeInteger.filterAll();
                     });
-                    tmpByPatientID.filterAll();
                     return {patientID: patientID, maxDensity: maxCount};
                 });
 
@@ -134,9 +165,11 @@ window.smartRApp.directive('lineGraph', [
                     d.subset = smartRUtils.unique(getValuesForDimension(bySubset));
                 });
 
-                byType.filterAll();
-                tmpByPatientID.dispose();
-                tmpByTime.dispose();
+                // we don't dispose them because we need them again and dimension creation is expensive
+                tmpByTimeInteger.filterAll();
+                tmpByPatientID.filterAll();
+
+                var iconGen = iconGenerator(1 / totalDensity * CAT_PLOTS_HEIGHT);
 
                 // DATA JOIN
                 var catPlot = svg.selectAll('.sr-linegraph-cat-plot')
@@ -148,7 +181,6 @@ window.smartRApp.directive('lineGraph', [
                     .attr('class', function(d) {
                         return 'sr-linegraph-cat-plot' + ' ' + 'patientid-' + smartRUtils.makeSafeForCSS(d.patientID);
                     });
-
                 // ENTER rec
                 catPlotEnter.append('rect')
                     .attr('width', LINEGRAPH_WIDTH)
@@ -185,6 +217,46 @@ window.smartRApp.directive('lineGraph', [
 
                 // EXIT g
                 catPlot.exit().remove();
+
+                // start ENTER UPDATE EXIT cycle for each separate plot to render data points
+                d3.selectAll('.sr-linegraph-cat-plot').each(function(d) {
+                    tmpByPatientID.filterExact(d.patientID);
+                    // a filtered & sorted list to determine the row placement
+                    var bioMarkerToRender = groupBioMarker.all()
+                        .filter(function(d) { return d.value > 0; })
+                        .sort(function(a, b) {
+                            var sortValue = a.value - b.value;
+                            return sortValue === 0 ? a.key.localeCompare(b.key) : sortValue;
+                        })
+                        .map(function(d) { return d.key; });
+                    // DATA JOIN
+                    var icon = d3.select(this).selectAll('.sr-linegraph-cat-icon')
+                        .data(byBioMarker.top(Infinity));
+
+                    // ENTER path
+                    icon.enter()
+                        .append('path')
+                        .attr('class', function(d) {
+                            return 'sr-linegraph-cat-icon' +
+                                ' patientid-' + smartRUtils.makeSafeForCSS(d.patientID) +
+                                ' time-' + smartRUtils.makeSafeForCSS(d.timeName) +
+                                ' biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker);
+                        })
+                        .attr('d', function(d) { return iconGen(d.bioMarker).path; })
+                        .attr('transform', function(d) {
+                            return 'translate(' + x(d.timeInteger) + ',' + 0 + ')';
+                        });
+
+                    // UPDATE path
+
+                    // EXIT path
+                });
+
+                // drop temporary filters
+                tmpByPatientID.dispose();
+                tmpByTimeInteger.dispose();
+                // reset other filters
+                byType.filterAll();
             }
             renderCategoricPlots();
         }

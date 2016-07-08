@@ -7,8 +7,7 @@ main <- function() {
     save(fetch_params, file="/Users/sascha/fetch_params.Rda")
 
     df <- buildCrossfilterCompatibleDf(loaded_variables, fetch_params)
-    # TODO: this is disabled as long as I don't have real time data to test
-    # checkTimeNameSanity(df)
+    checkTimeNameSanity(df)
 
     output <- list()
     output$data_matrix <- df
@@ -19,7 +18,7 @@ main <- function() {
 }
 
 # returns character vector (e.g. c("Age", "Alive" or "Week1", "Week2" if handling time series data))
-getNames <- function(loaded_variables, fetch_params) {
+getNodeNames <- function(loaded_variables, fetch_params) {
     names.without.subset <- sub("_s[1-2]{1}$", "", names(loaded_variables))
     labels <- sapply(names.without.subset, function(el) fetch_params$ontologyTerms[[el]]$name)
     as.character(as.vector(labels))
@@ -51,19 +50,18 @@ getTypes <- function(loaded_variables) {
 buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
     # gather information
     subsets <- getSubsets(loaded_variables)
-    names <- getNames(loaded_variables, fetch_params)
+    nodeNames <- getNodeNames(loaded_variables, fetch_params)
     fullNames <- getFullNames(loaded_variables, fetch_params)
     types <- getTypes(loaded_variables)
 
     # initialize empty df
     df <- data.frame(patientID=integer(),
                      value=c(), # can be string or integer
-                     time=integer(),
-                     name=character(),
-                     fullName=character(),
+                     timeInteger=integer(),
+                     timeString=character(),
+                     bioMarker=character(),
                      type=character(),
                      subset=integer(),
-                     annotations=character(),
                      stringsAsFactors=FALSE)
 
     # build big df step by step via binding row-wise every loaded variable
@@ -79,10 +77,13 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                                       value=variable[,2])
         }
 
+        split <- strsplit(fullNames[i], "\\\\")[[1]]
+        bioMarker <- split[length(split) - 1]
+
         # attach additional information
-        variable.df <- cbind(variable.df, time=sample(1:10, nrow(variable.df), replace=TRUE), # TODO: use real time values
-                             name=rep(names[i], nrow(variable.df)),
-                             fullName=rep(fullNames[i], nrow(variable.df)),
+        variable.df <- cbind(variable.df, timeInteger=sample(1:10, nrow(variable.df), replace=TRUE), # TODO: use real time value
+                             timeString=rep(nodeNames[i], nrow(variable.df)),
+                             bioMarker=rep(bioMarker, nrow(variable.df)),
                              type=rep(types[i], nrow(variable.df)),
                              subset=rep(subsets[i], nrow(variable.df)),
                              stringsAsFactors=FALSE)
@@ -100,7 +101,9 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
 # time (e.g. 15) and name (e.g. Day 15) must have a 1:1 relationship
 # It is not possible to have multiple times for one name or multiple names for one time
 checkTimeNameSanity <- function(df) {
-    df.without.duplicates <- unique(df[, c("time", "name")])
+    # FIXME: disabled until I have real data
+    return()
+    df.without.duplicates <- unique(df[, c("timeInteger", "timeString")])
     timeSane = nrow(df.without.duplicates) == length(unique(df.without.duplicates$time))
     nameSane = nrow(df.without.duplicates) == length(unique(df.without.duplicates$name))
     if (! (timeSane && nameSane)) {
