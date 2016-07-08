@@ -106,33 +106,56 @@ window.smartRApp.directive('lineGraph', [
             tmpByTimeInteger.dispose();
             var xAxis = d3.svg.axis()
                 .scale(x)
-                .tickFormat(function(d) { return tickFormat[d]});
+                .tickFormat(function(d) { return tickFormat[d]; });
 
             svg.append('g')
                 .attr('class', 'sr-linegraph-x-axis')
                 .attr('transform', 'translate(' + 0 + ',' + LINEGRAPH_HEIGHT + ')')
                 .call(xAxis);
 
-            function iconGenerator(size) {
-                var squareShape = 'M0,0H' + size + 'V' + size + 'H0Z';
+            function iconGenerator() {
+                var square = function(size) { return 'M0,0H' + size + 'V' + size + 'H0Z'; };
+                var triangle = function(size) { return 'M' + (size / 2) + ',0L' + size + ',' + size + 'H0Z'; };
+                var diamond = function(size) {
+                    return 'M' + (size / 2) + ',0' +
+                        'L' + size + ',' + (size / 2) +
+                        'L' + (size / 2) + ',' + size +
+                        'L0,' + (size / 2) + 'Z';
+                };
+                var revTriangle = function(size) { return 'M0,0H' + size + 'L' + (size / 2) + ',' + size + 'Z'; };
+                var hexagon = function(size) { return 'M' + (size / 2) + ',0' +
+                        'L' + size + ',' + size / 4 +
+                        'L' + size + ',' + (size * 3 / 4) +
+                        'L' + (size / 2) + ',' + size +
+                        'L0,' + (size * 3 / 4) +
+                        'L0,' + (size / 4) + 'Z';
+                };
+                var fallback = function(size) { return 'M0,0L' + size + ',' + size + 'M' + size + ',0L0,' + size; };
                 var iconTable = [
                     //blue  orange  violet  red green
-                    {path: squareShape},{path: squareShape},{path: squareShape},{path: squareShape},{path: squareShape}, // square
-                    {path: ''},{path: ''},{path: ''},{path: ''},{path: ''}, // triangle
-                    {path: ''},{path: ''},{path: ''},{path: ''},{path: ''}, // diamond
-                    {path: ''},{path: ''},{path: ''},{path: ''},{path: ''}, // revTriangle
-                    {path: ''},{path: ''},{path: ''},{path: ''},{path: ''}  // hexagon
+                    {shape: square},{shape: square},{shape: square},{shape: square},{shape: square}, // square
+                    {shape: triangle},{shape: triangle},{shape: triangle},{shape: triangle},{shape: triangle}, // triangle
+                    {shape: diamond},{shape: diamond},{shape: diamond},{shape: diamond},{shape: diamond}, // diamond
+                    {shape: revTriangle},{shape: revTriangle},{shape: revTriangle},{shape: revTriangle},{shape: revTriangle}, // revTriangle
+                    {shape: hexagon},{shape: hexagon},{shape: hexagon},{shape: hexagon},{shape: hexagon}, // hexagon
+                    {shape: fallback} // fallback
                 ];
                 var cache = {};
                 return function(bioMarker) {
                     var icon = cache[bioMarker];
-                    if (typeof icon === 'undefined') {
-                        icon = iconTable[Object.keys(cache).length];
+                    if (typeof cache[bioMarker] === 'undefined') {
+                        var itemsInCache = Object.keys(cache).length;
+                        icon = iconTable[itemsInCache >= iconTable.length - 1 ?
+                            iconTable[iconTable.length - 1] : itemsInCache];
                         cache[bioMarker] = icon;
                     }
+                    // FIXME: for testing until we got real data
+                    icon = iconTable[Math.floor(Math.random() * iconTable.length)];
                     return icon;
                 };
             }
+            var iconGen = iconGenerator();
+
 
             function renderNumericPlots() {
                 byType.filterExact('numeric');
@@ -144,6 +167,7 @@ window.smartRApp.directive('lineGraph', [
                 var tmpByPatientID = cf.dimension(function(d) { return d.patientID; });
                 var tmpByTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
 
+                var id = 0;
                 var catPlotInfo = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
                     tmpByPatientID.filterExact(patientID);
                     var maxCount = 0;
@@ -155,12 +179,13 @@ window.smartRApp.directive('lineGraph', [
                         // we need to disable this filter temporarily, otherwise it will affect the next iteration step
                         tmpByTimeInteger.filterAll();
                     });
-                    return {patientID: patientID, maxDensity: maxCount};
+                    return {id: id++, patientID: patientID, maxDensity: maxCount};
                 });
 
                 var totalDensity = catPlotInfo.reduce(function(prev, curr) { return curr.maxDensity + prev; }, 0);
+                var iconSize = 1 / totalDensity * CAT_PLOTS_HEIGHT;
                 catPlotInfo.forEach(function(d) {
-                    d.height = d3.round(d.maxDensity / totalDensity * CAT_PLOTS_HEIGHT);
+                    d.height = d.maxDensity * iconSize;
                     tmpByPatientID.filterExact(d.patientID);
                     d.subset = smartRUtils.unique(getValuesForDimension(bySubset));
                 });
@@ -169,11 +194,9 @@ window.smartRApp.directive('lineGraph', [
                 tmpByTimeInteger.filterAll();
                 tmpByPatientID.filterAll();
 
-                var iconGen = iconGenerator(1 / totalDensity * CAT_PLOTS_HEIGHT);
-
                 // DATA JOIN
                 var catPlot = svg.selectAll('.sr-linegraph-cat-plot')
-                    .data(catPlotInfo, function(d) { return d.patientID; });
+                    .data(catPlotInfo, function(d) { return d.id; });
 
                 // ENTER g
                 var catPlotEnter = catPlot.enter()
@@ -206,7 +229,8 @@ window.smartRApp.directive('lineGraph', [
                 });
 
                 // UPDATE rect
-                catPlot.select('rect').attr('height', function(d) { return d.height; });
+                catPlot.select('rect')
+                    .attr('height', function(d) { return d.height; });
 
                 // UPDATE text
                 catPlot.select('text')
@@ -221,7 +245,7 @@ window.smartRApp.directive('lineGraph', [
                 // start ENTER UPDATE EXIT cycle for each separate plot to render data points
                 d3.selectAll('.sr-linegraph-cat-plot').each(function(d) {
                     tmpByPatientID.filterExact(d.patientID);
-                    // a filtered & sorted list to determine the row placement
+                    // a filtered & sorted list to determine the placement within a patient row
                     var bioMarkerToRender = groupBioMarker.all()
                         .filter(function(d) { return d.value > 0; })
                         .sort(function(a, b) {
@@ -231,7 +255,7 @@ window.smartRApp.directive('lineGraph', [
                         .map(function(d) { return d.key; });
                     // DATA JOIN
                     var icon = d3.select(this).selectAll('.sr-linegraph-cat-icon')
-                        .data(byBioMarker.top(Infinity));
+                        .data(byBioMarker.top(Infinity), function(d) { return d.id; });
 
                     // ENTER path
                     icon.enter()
@@ -239,15 +263,17 @@ window.smartRApp.directive('lineGraph', [
                         .attr('class', function(d) {
                             return 'sr-linegraph-cat-icon' +
                                 ' patientid-' + smartRUtils.makeSafeForCSS(d.patientID) +
-                                ' time-' + smartRUtils.makeSafeForCSS(d.timeName) +
-                                ' biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker);
-                        })
-                        .attr('d', function(d) { return iconGen(d.bioMarker).path; })
-                        .attr('transform', function(d) {
-                            return 'translate(' + x(d.timeInteger) + ',' + 0 + ')';
+                                ' time-' + smartRUtils.makeSafeForCSS(d.timeInteger) +
+                                ' biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker) +
+                                ' subset-' + d.subset;
                         });
 
                     // UPDATE path
+                    icon
+                        .attr('d', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
+                        .attr('transform', function(d) {
+                            return 'translate(' + x(d.timeInteger) + ',' + 0 + ')';
+                        });
 
                     // EXIT path
                 });

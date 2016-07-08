@@ -95,6 +95,9 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
         df <- rbind.fill(df, variable.df)
     }
 
+    # before we are done we assign a unique id to every row to make it easier for the front-end
+    df <- cbind(id=1:nrow(df), df)
+
     df
 }
 
