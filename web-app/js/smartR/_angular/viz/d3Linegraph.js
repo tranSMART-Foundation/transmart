@@ -228,16 +228,15 @@ window.smartRApp.directive('lineGraph', [
                     return 'translate(' + 0 + ',' + y + ')';
                 });
 
+                // UPDATE text
+                catPlot.select('text')
+                    .style('font-size', function(d) { return d.height + 'px'; })
+                    .attr('x', 0)
+                    .attr('y', function(d) { return d.height / 2; });
+
                 // UPDATE rect
                 catPlot.select('rect')
                     .attr('height', function(d) { return d.height; });
-
-                // UPDATE text
-                catPlot.select('text')
-                    .attr('transform', function(d) {
-                        return 'translate(' + (0) + ',' + (d.height / 2) + ')';
-                    })
-                    .style('font-size', function(d) { return d.height + 'px'; });
 
                 // EXIT g
                 catPlot.exit().remove();
