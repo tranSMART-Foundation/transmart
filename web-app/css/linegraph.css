@@ -1,5 +1,8 @@
-.sr-linegraph-x-axis {
-
+.sr-linegraph-x-axis path,
+.sr-linegraph-x-axis line {
+    fill: none;
+    stroke: black;
+    stroke-width: 1px;
 }
 
 .sr-linegraph-cat-plot {
