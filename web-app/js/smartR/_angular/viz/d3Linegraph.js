@@ -128,6 +128,7 @@ window.smartRApp.directive('lineGraph', [
                 d3.select('.sr-linegraph-x-axis')
                     .call(xAxis);
             }
+            updateXAxis();
 
             function iconGenerator() {
                 var square = function(size) { return 'M0,0H' + size + 'V' + size + 'H0Z'; };
