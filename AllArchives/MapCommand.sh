@@ -1,58 +1,52 @@
-out=~/Desktop/Process.txt
+#!/bin/tcsh
 
-dirs="transmart-core-api
-transmart-core-db
-Rmodules
-transmart-legacy-db
-folder-management-plugin
-transmart-extensions
-transmart-gwas-plugin
-blend4j-plugin
-transmart-metacore-plugin
-transmartApp
-transmart-data
-tranSMART-ETL
-transmart-batch
-transmart-ICE
-transmart-rest-api
-RInterface
-GWAVA
-transmart-test
-SmartR
-"
+set out = "~/Desktop/Process.txt"
 
-#no 16.1 release of SmartR
+set dirs = (\
+transmart-core-api \
+transmart-core-db \
+Rmodules \
+transmart-legacy-db \
+folder-management-plugin \
+transmart-extensions \
+transmart-gwas-plugin \
+blend4j-plugin \
+transmart-metacore-plugin \
+transmartApp \
+transmart-data \
+tranSMART-ETL \
+transmart-batch \
+transmart-ICE \
+transmart-rest-api \
+RInterface \
+GWAVA \
+transmart-test \
+Scripts \
+)
 
 echo "Mapping Command . . ." > $out
 
-for dir in $dirs; do
+foreach dir ($dirs)
 	pushd $dir
 		echo "" >> $out
 		echo "++ $dir ++" >> $out
-#		echo "++ $dir ++"
+		echo "++ $dir ++"
 # -------------- actual commands
-#		git checkout master >> $out
+		git checkout master >> $out
 #		git checkout release-16.1 >> $out
-#       git checkout -b merge-candidate >> $out
 #		git checkout for-testing-changes >> $out
-#   	git checkout -b release-16.1 origin/release-16.1 >> $out
 #		git fetch -p >> $out
-#		git fetch transmart >> $out
-#		git pull >> $out
+#		git fetch -p transmart >> $out
 #		git log --since="Jan 4, 2016" --pretty=fuller >> $out
 #		git merge master >> $out
 #		git merge release-1.2.5-Beta >> $out
-#		git merge master -m "merge update master into release-16.1 as merge-candidate for new master">> $out
-#       git merge merge-candidate >> $out
+#		git merge transmart/master >> $out
 #		git merge transmart >> $out
 #		git branch -D trial-merge >> $out
-#       git remote add transmart git@github.com:transmart/${dir}.git >> $out
 #		git remote -v >> $out
-#       git diff --name-only master >> $out
+#		git diff --name-only transmart/master >> $out
 #		git branch -a >> $out
-#       git branch -d release-16.1
-#		git commit -a -m "update version number to 16.1" >> $out
-#       git commit --amend -m "update version number to 16.2-SNAPSHOT" >> $out
+#		git checkout -b release-16.1 >> $out
 #		git push -u origin release-16.1 >> $out
 #		git branch >> $out
 #		git push >> $out
@@ -60,9 +54,9 @@ for dir in $dirs; do
 #		git log -1 >> $out
 		git status >> $out
 # -------------- actual commands		
-#		echo "-- $dir --" >> $out
+		echo "-- $dir --" >> $out
 	popd
-done
+end
 
 echo "DONE!" >> $out
 echo "DONE!"
