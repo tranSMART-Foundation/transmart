@@ -30,14 +30,6 @@ window.smartRApp.directive('lineGraph', [
         };
 
         function createLinegraph(scope, vizDiv) {
-            var MARGIN = {top: 50, right: 50, bottom: 50, left: 50};
-            var LINEGRAPH_WIDTH = parseInt(scope.width) - MARGIN.left - MARGIN.right;
-            var LINEGRAPH_HEIGHT = parseInt(scope.height) - MARGIN.top - MARGIN.bottom;
-
-            var CAT_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2; // FIXME: make dynamic
-            var NUM_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2; // FIXME: make dynamic
-            var CAT_PLOTS_OFFSET_BOTTOM = 20;
-
             var data_matrix = scope.data.data_matrix;
 
             var cf = crossfilter(data_matrix);
@@ -50,6 +42,14 @@ window.smartRApp.directive('lineGraph', [
 
             var groupBioMarker = byBioMarker.group();
 
+            var MARGIN = {top: 50, right: 50, bottom: 50, left: 50};
+            var LINEGRAPH_WIDTH = parseInt(scope.width) - MARGIN.left - MARGIN.right;
+            var LINEGRAPH_HEIGHT = parseInt(scope.height) - MARGIN.top - MARGIN.bottom;
+
+            var CAT_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2; // FIXME: make dynamic
+            var NUM_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2; // FIXME: make dynamic
+            var CAT_PLOTS_OFFSET_BOTTOM = 20;
+
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-linegraph-patient-range');
             patientRange.min = 0;
             patientRange.max = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
@@ -60,27 +60,32 @@ window.smartRApp.directive('lineGraph', [
                 renderCategoricPlots();
             });
 
+            var x = d3.scale.linear();
+            // recomputes x scale for current filters
+            function calculateXScale() {
+                var tmpByType = cf.dimension(function(d) { return d.type; });
+                tmpByType.filterExact('categoric');
+                var padding = 1 / byPatientID.top(Infinity).length * CAT_PLOTS_HEIGHT;
+                tmpByType.dispose();
+                var times = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort(function(a, b) {
+                    return a - b;
+                });
+                x.domain(d3.extent(times)).range([padding, LINEGRAPH_WIDTH - padding]);
+                updateXAxis(); // after changing the scale we need to update the x axis too
+            }
+            calculateXScale();
+
             function numOfPatientsToShow(num) {
                 byPatientID.filterAll();
                 var shownPatients = smartRUtils.unique(getValuesForDimension(byPatientID)).slice(0, num);
                 byPatientID.filterFunction(function(patient) { return shownPatients.indexOf(patient) !== -1; });
+                calculateXScale();
             }
             numOfPatientsToShow(5);
 
             function getValuesForDimension(dimension) {
                 return dimension.top(Infinity).map(function(record) { return dimension.accessor(record); });
             }
-
-            var x = d3.scale.linear();
-            // recomputes x scale for current filters
-            function calculateXScale() {
-                var times = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort();
-                var xTicks = times.map(function(time) {
-                    return (time - times[0]) / (times[times.length - 1] - times[0]) * LINEGRAPH_WIDTH;
-                });
-                x.domain(times).range(xTicks);
-            }
-            calculateXScale();
 
             byType.filterExact('categoric');
             var catBioMarkers = smartRUtils.unique(getValuesForDimension(byBioMarker));
@@ -95,23 +100,27 @@ window.smartRApp.directive('lineGraph', [
                 .attr('height', LINEGRAPH_HEIGHT + MARGIN.top + MARGIN.bottom)
                 .append('g')
                 .attr('transform', 'translate(' + MARGIN.left + ',' + MARGIN.top + ')');
-
-            // temporary dimension because we don't want to affect the time filter
-            var tmpByTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
-            var tickFormat = {};
-            smartRUtils.unique(getValuesForDimension(byTimeInteger)).forEach(function(timeInteger) {
-                tmpByTimeInteger.filterExact(timeInteger);
-                tickFormat[timeInteger] = byTimeInteger.top(1)[0].timeString;
-            });
-            tmpByTimeInteger.dispose();
-            var xAxis = d3.svg.axis()
-                .scale(x)
-                .tickFormat(function(d) { return tickFormat[d]; });
-
+            
             svg.append('g')
                 .attr('class', 'sr-linegraph-x-axis')
                 .attr('transform', 'translate(' + 0 + ',' + LINEGRAPH_HEIGHT + ')')
-                .call(xAxis);
+
+            function updateXAxis() {
+                // temporary dimension because we don't want to affect the time filter
+                var tmpByTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
+                var tickFormat = {};
+                smartRUtils.unique(getValuesForDimension(byTimeInteger)).forEach(function(timeInteger) {
+                    tmpByTimeInteger.filterExact(timeInteger);
+                    tickFormat[timeInteger] = byTimeInteger.top(1)[0].timeString;
+                });
+                tmpByTimeInteger.dispose();
+                var xAxis = d3.svg.axis()
+                    .scale(x)
+                    .tickFormat(function(d) { return tickFormat[d]; });
+
+                d3.select('.sr-linegraph-x-axis')
+                    .call(xAxis);
+            }
 
             function iconGenerator() {
                 var square = function(size) { return 'M0,0H' + size + 'V' + size + 'H0Z'; };
@@ -132,13 +141,38 @@ window.smartRApp.directive('lineGraph', [
                 };
                 var fallback = function(size) { return 'M0,0L' + size + ',' + size + 'M' + size + ',0L0,' + size; };
                 var iconTable = [
-                    //blue  orange  violet  red green
-                    {shape: square},{shape: square},{shape: square},{shape: square},{shape: square}, // square
-                    {shape: triangle},{shape: triangle},{shape: triangle},{shape: triangle},{shape: triangle}, // triangle
-                    {shape: diamond},{shape: diamond},{shape: diamond},{shape: diamond},{shape: diamond}, // diamond
-                    {shape: revTriangle},{shape: revTriangle},{shape: revTriangle},{shape: revTriangle},{shape: revTriangle}, // revTriangle
-                    {shape: hexagon},{shape: hexagon},{shape: hexagon},{shape: hexagon},{shape: hexagon}, // hexagon
-                    {shape: fallback} // fallback
+                    // square
+                    {shape: square, fill: '#006980'},
+                    {shape: square, fill: '#4B0080'},
+                    {shape: square, fill: '#F6910E'},
+                    {shape: square, fill: '#0EF611'},
+                    {shape: square, fill: '#F60E1E'},
+                    // triangle
+                    {shape: triangle, fill: '#006980'},
+                    {shape: triangle, fill: '#4B0080'},
+                    {shape: triangle, fill: '#F6910E'},
+                    {shape: triangle, fill: '#0EF611'},
+                    {shape: triangle, fill: '#F60E1E'},
+                    // triangle
+                    {shape: diamond, fill: '#006980'},
+                    {shape: diamond, fill: '#4B0080'},
+                    {shape: diamond, fill: '#F6910E'},
+                    {shape: diamond, fill: '#0EF611'},
+                    {shape: diamond, fill: '#F60E1E'},
+                    // diamond
+                    {shape: revTriangle, fill: '#006980'},
+                    {shape: revTriangle, fill: '#4B0080'},
+                    {shape: revTriangle, fill: '#F6910E'},
+                    {shape: revTriangle, fill: '#0EF611'},
+                    {shape: revTriangle, fill: '#F60E1E'},
+                    // revTriangle
+                    {shape: hexagon, fill: '#006980'},
+                    {shape: hexagon, fill: '#4B0080'},
+                    {shape: hexagon, fill: '#F6910E'},
+                    {shape: hexagon, fill: '#0EF611'},
+                    {shape: hexagon, fill: '#F60E1E'},
+                    // hexagon
+                    {shape: fallback, fill: '#000000'} // fallback
                 ];
                 var cache = {};
                 return function(bioMarker) {
@@ -163,6 +197,7 @@ window.smartRApp.directive('lineGraph', [
 
             function renderCategoricPlots() {
                 byType.filterExact('categoric');
+                var iconSize = 1 / byPatientID.top(Infinity).length * CAT_PLOTS_HEIGHT;
                 // temporary dimensions because we want to keep filters within this function scope
                 var tmpByPatientID = cf.dimension(function(d) { return d.patientID; });
                 var tmpByTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
@@ -182,8 +217,6 @@ window.smartRApp.directive('lineGraph', [
                     return {id: id++, patientID: patientID, maxDensity: maxCount};
                 });
 
-                var totalDensity = catPlotInfo.reduce(function(prev, curr) { return curr.maxDensity + prev; }, 0);
-                var iconSize = 1 / totalDensity * CAT_PLOTS_HEIGHT;
                 catPlotInfo.forEach(function(d) {
                     d.height = d.maxDensity * iconSize;
                     tmpByPatientID.filterExact(d.patientID);
@@ -194,7 +227,6 @@ window.smartRApp.directive('lineGraph', [
                 tmpByTimeInteger.filterAll();
                 tmpByPatientID.filterAll();
 
-                // DATA JOIN
                 var catPlot = svg.selectAll('.sr-linegraph-cat-plot')
                     .data(catPlotInfo, function(d) { return d.id; });
 
@@ -265,16 +297,15 @@ window.smartRApp.directive('lineGraph', [
                                 ' time-' + smartRUtils.makeSafeForCSS(d.timeInteger) +
                                 ' biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker) +
                                 ' subset-' + d.subset;
-                        });
+                        })
+                        .style('fill', function(d) { return iconGen(d.bioMarker).fill; });
 
                     // UPDATE path
                     icon
                         .attr('d', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
                         .attr('transform', function(d) {
-                            return 'translate(' + x(d.timeInteger) + ',' + 0 + ')';
+                            return 'translate(' + (x(d.timeInteger) - iconSize / 2) + ',' + 0 + ')';
                         });
-
-                    // EXIT path
                 });
 
                 // drop temporary filters

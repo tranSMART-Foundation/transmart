@@ -11,3 +11,7 @@
     float: right;
     padding: 5px 15px 5px 15px;
 }
+
+.sr-linegraph-cat-icon {
+    stroke: none;
+}
