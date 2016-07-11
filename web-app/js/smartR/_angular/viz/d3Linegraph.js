@@ -100,7 +100,14 @@ window.smartRApp.directive('lineGraph', [
                 .attr('height', LINEGRAPH_HEIGHT + MARGIN.top + MARGIN.bottom)
                 .append('g')
                 .attr('transform', 'translate(' + MARGIN.left + ',' + MARGIN.top + ')');
-            
+
+            var tip = d3.tip()
+                .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .html(function(d) { return d; });
+
+            svg.call(tip);
+
             svg.append('g')
                 .attr('class', 'sr-linegraph-x-axis')
                 .attr('transform', 'translate(' + 0 + ',' + LINEGRAPH_HEIGHT + ')')
@@ -298,11 +305,14 @@ window.smartRApp.directive('lineGraph', [
                                 ' biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker) +
                                 ' subset-' + d.subset;
                         })
-                        .style('fill', function(d) { return iconGen(d.bioMarker).fill; });
+                        .style('fill', function(d) { return iconGen(d.bioMarker).fill; })
+                        .on('mouseover', function(d) {
+                            tip.show(JSON.stringify(d)); // TODO
+                        })
+                        .on('mouseout', tip.hide);
 
                     // UPDATE path
-                    icon
-                        .attr('d', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
+                    icon.attr('d', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
                         .attr('transform', function(d) {
                             return 'translate(' + (x(d.timeInteger) - iconSize / 2) + ',' + 0 + ')';
                         });

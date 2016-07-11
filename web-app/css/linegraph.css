@@ -15,3 +15,7 @@
 .sr-linegraph-cat-icon {
     stroke: none;
 }
+
+.sr-linegraph-cat-icon:hover {
+    opacity: 0.5;
+}
