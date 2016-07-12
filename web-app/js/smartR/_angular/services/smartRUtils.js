@@ -50,12 +50,20 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         return split[split.length - 2] + '/' + split[split.length - 1];
     };
 
-    // Calculate width of text from DOM element or string. By Phil Freo <http://philfreo.com>
-    $.fn.textWidth = function(text, font) {
+    $.fn.textWidth = function(text, css) {
         if (!$.fn.textWidth.fakeEl) {
             $.fn.textWidth.fakeEl = $('<span>').hide().appendTo(document.body);
         }
-        $.fn.textWidth.fakeEl.text(text || this.val() || this.text()).css('font', font || this.css('font'));
+        var textEl = $.fn.textWidth.fakeEl.text(text || this.val() || this.text());
+        if (css) {
+            for (var key in css) {
+                if (css.hasOwnProperty(key)) {
+                    textEl.css(key, css[key]);
+                }
+            }
+        } else {
+            textEl.css('font', this.css('font'));
+        }
         return $.fn.textWidth.fakeEl.width();
     };
 

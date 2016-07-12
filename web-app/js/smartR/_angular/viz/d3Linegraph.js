@@ -42,35 +42,23 @@ window.smartRApp.directive('lineGraph', [
 
             var groupBioMarker = byBioMarker.group();
 
-            // TODO: Ideally changing the margin should be followed by a re-rendering of the plot
-            var MARGIN = {
-                top: 50,
-                right: function() {
-                    var longestBioMarker = smartRUtils.unique(byBioMarker.top(Infinity)
-                        .map(function(d) { return d.bioMarker; }))
-                        .reduce(function(prev, curr) { return curr.length > prev.length ? curr : prev; }, '');
-                    return smartRUtils.getTextWidth(longestBioMarker) + 50;
-                }(),
-                bottom: 50,
-                left: smartRUtils.getTextWidth(byPatientID.top(1)[0].patientID) + 50
-            };
-            var LINEGRAPH_WIDTH = parseInt(scope.width) - MARGIN.left - MARGIN.right;
-            var LINEGRAPH_HEIGHT = parseInt(scope.height) - MARGIN.top - MARGIN.bottom;
+            var MARGIN = {top: 20, right: scope.width * 0.1, bottom: 100, left: scope.width * 0.1};
+            var LINEGRAPH_WIDTH = scope.width - MARGIN.left - MARGIN.right;
+            var LINEGRAPH_HEIGHT = scope.height - MARGIN.top - MARGIN.bottom;
 
             var CAT_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2; // FIXME: make dynamic
             var NUM_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2; // FIXME: make dynamic
             var CAT_PLOTS_OFFSET_BOTTOM = 20;
 
-            var LEGEND_ITEM_SIZE = 20;
             var LEGEND_OFFSET = 10;
 
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-linegraph-patient-range');
             patientRange.min = 0;
             patientRange.max = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
-            patientRange.value = 5;
+            patientRange.value = 25;
             patientRange.step = 1;
-            patientRange.addEventListener('change', function() {
-                numOfPatientsToShow(patientRange.value);
+            patientRange.addEventListener('input', function() {
+                updateShownPatients();
                 renderCategoricPlots();
             });
 
@@ -89,13 +77,15 @@ window.smartRApp.directive('lineGraph', [
             }
             calculateXScale();
 
-            function numOfPatientsToShow(num) {
+            var firstPatientToShow = 0;
+            function updateShownPatients() {
                 byPatientID.filterAll();
-                var shownPatients = smartRUtils.unique(getValuesForDimension(byPatientID)).slice(0, num);
+                var shownPatients = smartRUtils.unique(getValuesForDimension(byPatientID))
+                    .slice(firstPatientToShow, firstPatientToShow + parseInt(patientRange.value));
                 byPatientID.filterFunction(function(patient) { return shownPatients.indexOf(patient) !== -1; });
                 calculateXScale();
             }
-            numOfPatientsToShow(5);
+            updateShownPatients();
 
             function getValuesForDimension(dimension) {
                 return dimension.top(Infinity).map(function(record) { return dimension.accessor(record); });
@@ -230,7 +220,6 @@ window.smartRApp.directive('lineGraph', [
                 var tmpByPatientID = cf.dimension(function(d) { return d.patientID; });
                 var tmpByTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
 
-                var id = 0;
                 var catPlotInfo = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
                     tmpByPatientID.filterExact(patientID);
                     var maxCount = 0;
@@ -242,7 +231,7 @@ window.smartRApp.directive('lineGraph', [
                         // we need to disable this filter temporarily, otherwise it will affect the next iteration step
                         tmpByTimeInteger.filterAll();
                     });
-                    return {id: id++, patientID: patientID, maxDensity: maxCount};
+                    return {patientID: patientID, maxDensity: maxCount};
                 });
 
                 catPlotInfo.forEach(function(d) {
@@ -255,31 +244,40 @@ window.smartRApp.directive('lineGraph', [
                 tmpByTimeInteger.filterAll();
                 tmpByPatientID.filterAll();
 
+                var rowHeight = 1 / byPatientID.top(Infinity).length * CAT_PLOTS_HEIGHT;
+                var patientIDFontSize = rowHeight / 2;
+                var legendItemSize = 20; // TODO
+
                 /**
                  * BOX & PATIENTID SECTION
                  */
 
                 // DATA JOIN
                 var catPlot = svg.selectAll('.sr-linegraph-cat-plot')
-                    .data(catPlotInfo, function(d) { return d.id; });
+                    .data(catPlotInfo, function(d) {
+                        return 'patientID-' + d.patientID + ' subset-' + d.subset; // unique identifier for row
+                    });
 
                 // ENTER g
                 var catPlotEnter = catPlot.enter()
                     .append('g')
                     .attr('class', function(d) {
-                        return 'sr-linegraph-cat-plot' + ' ' + 'patientid-' + smartRUtils.makeSafeForCSS(d.patientID);
+                        return 'sr-linegraph-cat-plot' +
+                            ' patientid-' + smartRUtils.makeSafeForCSS(d.patientID) +
+                            ' subset-' + d.subset;
                     });
+
                 // ENTER rec
                 catPlotEnter.append('rect')
                     .attr('width', LINEGRAPH_WIDTH)
                     .attr('fill', function(d) {
-                        if (d.subset.length === 2) { return 'rgba(255, 255, 0, 0.5)'; }
-                        if (d.subset[0] === 1) { return 'rgba(0, 255, 0, 0.5)'; }
-                        return 'rgba(255, 0, 0, 0.5)';
+                        if (d.subset.length === 2) { return '#FFFFCC'; }
+                        if (d.subset[0] === 1) { return '#CCFFCC'; }
+                        return '#FFCCCC';
                     });
 
-                // ENTER line
-                catPlotEnter.append('line');
+                // ENTER path
+                catPlotEnter.append('path');
 
                 // ENTER text
                 catPlotEnter.append('text')
@@ -298,23 +296,32 @@ window.smartRApp.directive('lineGraph', [
 
                 // UPDATE text
                 catPlot.select('text')
-                    .style('font-size', function(d) { return (d.height / 2) + 'px'; })
-                    .attr('x', - MARGIN.left)
-                    .attr('y', function(d) { return d.height - (d.height / 4); });
-                
-                // UPDATE line
-                catPlot.select('line')
-                    .attr('x1', - MARGIN.left)
-                    .attr('x2', 0)
-                    .attr('y1', function(d) { return d.height; })
-                    .attr('y2', function(d) { return d.height; });
+                    .style('font-size', patientIDFontSize)
+                    .attr('x', - MARGIN.left + rowHeight / 2)
+                    .attr('y', function(d) { return d.height - patientIDFontSize / 2; });
+
+                // UPDATE path
+                catPlot.select('path')
+                    .attr('d', function(d) {
+                        var x1 = 0,
+                            y1 = d.height,
+                            x2 = - MARGIN.left + rowHeight / 2,
+                            y2 = d.height,
+                            x3 = Math.cos(225 * Math.PI / 180) * rowHeight / 2 + x2,
+                            y3 = Math.sin(225 * Math.PI / 180) * rowHeight / 2 + y2;
+                        return 'M' + x1 + ',' + y1 + 'L' + x2 + ',' + y2 + 'L' + x3 + ',' + y3;
+                    });
 
                 // UPDATE rect
                 catPlot.select('rect')
                     .attr('height', function(d) { return d.height; });
 
                 // EXIT g
-                catPlot.exit().remove();
+                var catPlotExit = catPlot.exit()
+                    .remove();
+
+                catPlotExit.select('rect')
+                    .attr('y', 0);
 
                 /**
                  * ICON SECTION
@@ -383,25 +390,64 @@ window.smartRApp.directive('lineGraph', [
                     .attr('class', 'sr-linegraph-legend-item')
                     .attr('transform', function(d, i) {
                         return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
-                            ((LINEGRAPH_HEIGHT - CAT_PLOTS_HEIGHT) + i * LEGEND_ITEM_SIZE) + ')';
+                            ((LINEGRAPH_HEIGHT - CAT_PLOTS_HEIGHT) + i * legendItemSize) + ')';
                     });
-
+                
                 // ENTER path
                 legendItemEnter.append('path')
-                    .attr('d', function(d) { return d.shape(LEGEND_ITEM_SIZE); })
-                    .style('fill', function(d) { return d.fill; });
+                    .attr('d', function(d) { return d.shape(legendItemSize); })
+                    .style('fill', function(d) { return d.fill; })
+                    .on('mouseover', function(d) {
+                        svg.selectAll('.sr-linegraph-cat-icon')
+                            .filter('biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker))
+                            .classed('icon-highlight', true);
+                    })
+                    .on('mouseout', function() {
+                        svg.selectAll('.sr-linegraph-cat-icon')
+                            .classed('icon-highlight', false);
+                    });
+
 
                 // ENTER text
                 legendItemEnter.append('text')
-                    .attr('transform', 'translate(' + (LEGEND_ITEM_SIZE + 3) + ',' +
-                        (0.5 * LEGEND_ITEM_SIZE) + ')rotate(45)')
+                    .attr('transform', 'translate(' + (legendItemSize + 3) + ',' +
+                        (0.5 * legendItemSize) + ')rotate(45)')
                     // .attr('dy', '0.35em')
-                    .style('font-size', function() { return LEGEND_ITEM_SIZE + 'px'; })
+                    .style('font-size', function() { return legendItemSize + 'px'; })
                     .text(function(d) { return d.bioMarker; });
 
                 // EXIT g
                 legendItem.exit()
                     .remove();
+
+                /**
+                 * CONTROL ELEMENTS SECTION
+                 */
+
+                svg.selectAll('.sr-linegraph-shift-element').remove();
+                svg.append('path')
+                    .attr('class', 'sr-linegraph-shift-element')
+                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' +
+                        (LINEGRAPH_HEIGHT - CAT_PLOTS_HEIGHT - CAT_PLOTS_OFFSET_BOTTOM) +
+                        'h' + (MARGIN.left / 2) +
+                        'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
+                    .on('click', function() {
+                        firstPatientToShow += 5;
+                        updateShownPatients();
+                        renderCategoricPlots();
+                    });
+
+                svg.append('path')
+                    .attr('class', 'sr-linegraph-shift-element')
+                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' +
+                        (LINEGRAPH_HEIGHT) +
+                        'h' + (MARGIN.left / 2) +
+                        'l' + (- MARGIN.left / 4) + ',' + (MARGIN.left / 3) + 'Z')
+                    .on('click', function() {
+                        firstPatientToShow -= 5;
+                        updateShownPatients();
+                        renderCategoricPlots();
+                    });
 
 
                 // drop temporary filters

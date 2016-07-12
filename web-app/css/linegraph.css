@@ -10,6 +10,11 @@
     shape-rendering: crispEdges;
 }
 
+.sr-linegraph-cat-plot path {
+    fill: none;
+    stroke-width: 1px;
+}
+
 .sr-workflow-controls>div {
     float: right;
     padding: 5px 15px 5px 15px;
@@ -21,4 +26,17 @@
 
 .sr-linegraph-cat-icon:hover {
     opacity: 0.5;
+}
+
+.icon-highlight {
+    opacity: 0.5;
+}
+
+.sr-linegraph-shift-element {
+
+}
+
+.sr-linegraph-shift-element:hover {
+    opacity: 0.5;
+    cursor: pointer;
 }
