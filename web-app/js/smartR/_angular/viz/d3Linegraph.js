@@ -127,17 +127,27 @@ window.smartRApp.directive('lineGraph', [
                     tickFormat[timeInteger] = timeString;
                 });
                 tmpByTimeInteger.dispose();
+                
                 var xAxis = d3.svg.axis()
                     .scale(x)
                     .tickFormat(function(d) { return tickFormat[d]; });
+
+                var padding = 8;
                 
-                var axisFontSize = smartRUtils.scaleFont(longestTimeString, {}, 20, MARGIN.bottom - 5, 1);
+                // this stuff is to calculate the height/free space we gain by rotation
+                var angle = 30;
+                var radius = MARGIN.bottom - padding;
+                var a = radius * Math.cos(angle * Math.PI / 180);
+                var b = Math.sqrt(radius * radius - a * a);
+                var heightGainByRotation = radius - b;
+
+                var axisFontSize = smartRUtils.scaleFont(longestTimeString, {}, 50, MARGIN.bottom - padding + heightGainByRotation, 1);
 
                 d3.select('.sr-linegraph-x-axis')
                     .call(xAxis)
                     .selectAll('text')
                     .attr('dy', '.35em')
-                    .attr('transform', 'translate(0, 8)rotate(30)')
+                    .attr('transform', 'translate(0,' + padding + ')rotate(' + angle + ')')
                     .style('text-anchor', 'start')
                     .style('font-size', axisFontSize + 'px');
             }
