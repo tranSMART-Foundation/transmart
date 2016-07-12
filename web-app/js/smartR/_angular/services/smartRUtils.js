@@ -71,6 +71,16 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         return $.fn.textWidth(text, font);
     };
 
+    service.scaleFont = function(text, css, startSize, targetWidth, shrinkStep)  {
+        var fontSize = startSize;
+        css['font-size'] = fontSize + 'px';
+        while (service.getTextWidth(text, css) > targetWidth) {
+            fontSize -= shrinkStep;
+            css['font-size'] = fontSize + 'px';
+        }
+        return fontSize;
+    };
+
     /**
      * Executes callback with scroll position when SmartR mainframe is scrolled
      * @param function

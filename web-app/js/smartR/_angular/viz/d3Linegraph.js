@@ -42,13 +42,12 @@ window.smartRApp.directive('lineGraph', [
 
             var groupBioMarker = byBioMarker.group();
 
-            var MARGIN = {top: 20, right: scope.width * 0.1, bottom: 100, left: scope.width * 0.1};
+            var MARGIN = {top: 20, right: scope.width * 0.1, bottom: scope.height * 0.1, left: scope.width * 0.1};
             var LINEGRAPH_WIDTH = scope.width - MARGIN.left - MARGIN.right;
             var LINEGRAPH_HEIGHT = scope.height - MARGIN.top - MARGIN.bottom;
 
             var CAT_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2; // FIXME: make dynamic
             var NUM_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2; // FIXME: make dynamic
-            var CAT_PLOTS_OFFSET_BOTTOM = 20;
 
             var LEGEND_OFFSET = 10;
 
@@ -114,23 +113,33 @@ window.smartRApp.directive('lineGraph', [
 
             svg.append('g')
                 .attr('class', 'sr-linegraph-x-axis')
-                .attr('transform', 'translate(' + 0 + ',' + LINEGRAPH_HEIGHT + ')')
+                .attr('transform', 'translate(' + 0 + ',' + LINEGRAPH_HEIGHT + ')');
 
             function updateXAxis() {
                 // temporary dimension because we don't want to affect the time filter
                 var tmpByTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
                 var tickFormat = {};
+                var longestTimeString = '';
                 smartRUtils.unique(getValuesForDimension(byTimeInteger)).forEach(function(timeInteger) {
                     tmpByTimeInteger.filterExact(timeInteger);
-                    tickFormat[timeInteger] = byTimeInteger.top(1)[0].timeString;
+                    var timeString = byTimeInteger.top(1)[0].timeString;
+                    longestTimeString = timeString.length > longestTimeString.length ? timeString : longestTimeString;
+                    tickFormat[timeInteger] = timeString;
                 });
                 tmpByTimeInteger.dispose();
                 var xAxis = d3.svg.axis()
                     .scale(x)
                     .tickFormat(function(d) { return tickFormat[d]; });
+                
+                var axisFontSize = smartRUtils.scaleFont(longestTimeString, {}, 20, MARGIN.bottom - 5, 1);
 
                 d3.select('.sr-linegraph-x-axis')
-                    .call(xAxis);
+                    .call(xAxis)
+                    .selectAll('text')
+                    .attr('dy', '.35em')
+                    .attr('transform', 'translate(0, 8)rotate(30)')
+                    .style('text-anchor', 'start')
+                    .style('font-size', axisFontSize + 'px');
             }
             updateXAxis();
 
@@ -211,10 +220,36 @@ window.smartRApp.directive('lineGraph', [
 
             function renderNumericPlots() {
                 byType.filterExact('numeric');
+                if (byPatientID.top(Infinity).length === 0) { return; }
+                var bioMarkers = smartRUtils.unique(getValuesForDimension(byBioMarker))
+                    .sort(function(a, b) { return a.localeCompare(b); }); // for determinism
+
+                var numPlotBoxHeight = NUM_PLOTS_HEIGHT / bioMarkers.length;
+
+                // DATA JOIN
+                var numPlotBox = svg.selectAll('.sr-linegraph-num-plot')
+                    .data(bioMarkers);
+
+                // ENTER g
+                var numPlotBoxEnter = numPlotBox.enter()
+                    .append('g')
+                    .attr('class', function(d) { return 'sr-linegraph-num-plot biomarker-' + d; })
+                    .attr('transform', function(d) {
+                        return 'translate(' + 0 + ',' + (bioMarkers.indexOf(d) * numPlotBoxHeight) + ')';
+                    });
+
+                // ENTER rect
+                numPlotBoxEnter.append('rect')
+                    .attr('width', LINEGRAPH_WIDTH)
+                    .attr('height', numPlotBoxHeight);
+
+                byType.filterAll();
             }
+            renderNumericPlots();
 
             function renderCategoricPlots() {
                 byType.filterExact('categoric');
+                if (byPatientID.top(Infinity).length === 0) { return; }
                 var iconSize = 1 / byPatientID.top(Infinity).length * CAT_PLOTS_HEIGHT;
                 // temporary dimensions because we want to keep filters within this function scope
                 var tmpByPatientID = cf.dimension(function(d) { return d.patientID; });
@@ -290,7 +325,7 @@ window.smartRApp.directive('lineGraph', [
                     for (var j = i - 1; j >= 0; j--) {
                         previousHeight += catPlotInfo[i].height;
                     }
-                    var y = LINEGRAPH_HEIGHT - CAT_PLOTS_OFFSET_BOTTOM - previousHeight - d.height;
+                    var y = LINEGRAPH_HEIGHT - previousHeight - d.height;
                     return 'translate(' + 0 + ',' + y + ')';
                 });
 
@@ -369,20 +404,23 @@ window.smartRApp.directive('lineGraph', [
                  * LEGEND SECTION
                  */
 
+                var iconCache = iconGen();
+                var legendData = [];
+                for (var key in iconCache) {
+                    if (iconCache.hasOwnProperty(key)) {
+                        var icon = iconCache[key];
+                        icon.bioMarker = key;
+                        legendData.push(icon);
+                    }
+                }
+                var longestBioMarker = legendData.map(function(d) { return d.bioMarker; })
+                    .reduce(function(prev, curr) { return prev.length > curr.length ? prev : curr; }, '');
+                var legendTextSize = smartRUtils.scaleFont(longestBioMarker, {}, legendItemSize,
+                        MARGIN.right - LEGEND_OFFSET - legendItemSize, 2);
+
                 // DATA JOIN
                 var legendItem = svg.selectAll('.sr-linegraph-legend-item')
-                    .data(function() {
-                        var iconCache = iconGen();
-                        var legendData = [];
-                        for (var key in iconCache) {
-                            if (iconCache.hasOwnProperty(key)) {
-                                var icon = iconCache[key];
-                                icon.bioMarker = key;
-                                legendData.push(icon);
-                            }
-                        }
-                        return legendData;
-                    }, function(d) { return d.id; });
+                    .data(legendData, function(d) { return d.id; });
 
                 // ENTER g
                 var legendItemEnter = legendItem.enter()
@@ -392,7 +430,7 @@ window.smartRApp.directive('lineGraph', [
                         return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
                             ((LINEGRAPH_HEIGHT - CAT_PLOTS_HEIGHT) + i * legendItemSize) + ')';
                     });
-                
+
                 // ENTER path
                 legendItemEnter.append('path')
                     .attr('d', function(d) { return d.shape(legendItemSize); })
@@ -410,10 +448,10 @@ window.smartRApp.directive('lineGraph', [
 
                 // ENTER text
                 legendItemEnter.append('text')
-                    .attr('transform', 'translate(' + (legendItemSize + 3) + ',' +
-                        (0.5 * legendItemSize) + ')rotate(45)')
-                    // .attr('dy', '0.35em')
-                    .style('font-size', function() { return legendItemSize + 'px'; })
+                    .attr('x', LEGEND_OFFSET + legendItemSize)
+                    .attr('y', legendItemSize / 2)
+                    .attr('dy', '0.35em')
+                    .style('font-size', function() { return legendTextSize + 'px'; })
                     .text(function(d) { return d.bioMarker; });
 
                 // EXIT g
@@ -427,8 +465,7 @@ window.smartRApp.directive('lineGraph', [
                 svg.selectAll('.sr-linegraph-shift-element').remove();
                 svg.append('path')
                     .attr('class', 'sr-linegraph-shift-element')
-                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' +
-                        (LINEGRAPH_HEIGHT - CAT_PLOTS_HEIGHT - CAT_PLOTS_OFFSET_BOTTOM) +
+                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (LINEGRAPH_HEIGHT - CAT_PLOTS_HEIGHT) +
                         'h' + (MARGIN.left / 2) +
                         'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
                     .on('click', function() {
@@ -439,8 +476,7 @@ window.smartRApp.directive('lineGraph', [
 
                 svg.append('path')
                     .attr('class', 'sr-linegraph-shift-element')
-                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' +
-                        (LINEGRAPH_HEIGHT) +
+                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (LINEGRAPH_HEIGHT + 10) +
                         'h' + (MARGIN.left / 2) +
                         'l' + (- MARGIN.left / 4) + ',' + (MARGIN.left / 3) + 'Z')
                     .on('click', function() {
