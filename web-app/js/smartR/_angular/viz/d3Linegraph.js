@@ -340,11 +340,8 @@ window.smartRApp.directive('lineGraph', [
 
                 var patientIDs = byPatientID.top(Infinity);
                 var rowHeight = 1 / patientIDs.length * CAT_PLOTS_HEIGHT;
-                var longestPatientID = patientIDs.reduce(function(prev, curr) {
-                    return prev.length > curr.length ? prev : curr;
-                }, '');
                 var patientIDFontSize = smartRUtils.scaleFont(
-                    longestPatientID, {}, rowHeight / 2, MARGIN.left - rowHeight / 2, 0, 1);
+                    patientIDs[0], {}, rowHeight * 2 / 3, MARGIN.left - 10, 0, 1);
                 var legendItemSize = 20; // TODO
 
                 /**
@@ -389,14 +386,14 @@ window.smartRApp.directive('lineGraph', [
                     for (var j = i - 1; j >= 0; j--) {
                         previousHeight += catPlotInfo[i].height;
                     }
-                    var y = CAT_PLOTS_POS + previousHeight + d.height;
+                    var y = CAT_PLOTS_POS + previousHeight;
                     return 'translate(' + 0 + ',' + y + ')';
                 });
 
                 // UPDATE text
                 catPlot.select('text')
                     .style('font-size', patientIDFontSize)
-                    .attr('x', - MARGIN.left + rowHeight / 2)
+                    .attr('x', - MARGIN.left + 10)
                     .attr('y', function(d) { return d.height - patientIDFontSize / 2; });
 
                 // UPDATE path
@@ -404,10 +401,10 @@ window.smartRApp.directive('lineGraph', [
                     .attr('d', function(d) {
                         var x1 = 0,
                             y1 = d.height,
-                            x2 = - MARGIN.left + rowHeight / 2,
+                            x2 = - MARGIN.left + 10,
                             y2 = d.height,
-                            x3 = Math.cos(225 * Math.PI / 180) * rowHeight / 2 + x2,
-                            y3 = Math.sin(225 * Math.PI / 180) * rowHeight / 2 + y2;
+                            x3 = Math.cos(225 * Math.PI / 180) * 10 + x2,
+                            y3 = Math.sin(225 * Math.PI / 180) * 10 + y2;
                         return 'M' + x1 + ',' + y1 + 'L' + x2 + ',' + y2 + 'L' + x3 + ',' + y3;
                     });
 

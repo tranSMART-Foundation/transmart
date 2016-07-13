@@ -95,7 +95,7 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         };
 
         var fontSize = startSize;
-        while (true) {
+        while (fontSize > 0) { // should stop long before
             css['font-size'] = fontSize + 'px';
             var currentWidth = service.getTextWidth(text, css);
             if (currentWidth - _spaceGainedByRotation(currentWidth, rotation) < targetWidth) {
@@ -168,10 +168,11 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
     // fast unique()
     service.unique = function(arr) {
         var a = [];
-        for (var i = 0, l = arr.length; i < l; i++)
-            if (a.indexOf(arr[i]) === -1 && arr[i] !== ''){
+        for (var i = 0, l = arr.length; i < l; i++) {
+            if (a.indexOf(arr[i]) === -1 && arr[i] !== '') {
                 a.push(arr[i]);
             }
+        }
         return a;
     };
 
