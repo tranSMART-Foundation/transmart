@@ -103,6 +103,7 @@ window.smartRApp.directive('lineGraph', [
             }
 
             var LEGEND_OFFSET = 10;
+            var LEGEND_ITEM_SIZE = 20;
 
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-linegraph-patient-range');
             patientRange.min = 0;
@@ -299,10 +300,24 @@ window.smartRApp.directive('lineGraph', [
                             (NUM_PLOTS_POS + bioMarkers.indexOf(d) * numPlotBoxHeight) + ')';
                     });
 
-                // ENTER rect
+                // ENTER rect (box)
                 numPlotBoxEnter.append('rect')
                     .attr('width', LINEGRAPH_WIDTH)
                     .attr('height', numPlotBoxHeight);
+
+                // ENTER rect (legend cohort 1)
+                numPlotBoxEnter.append('rect')
+                    .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET)
+                    .attr('y', function(d) { return numPlotBoxHeight / 2 - LEGEND_ITEM_SIZE; })
+                    .attr('height', LEGEND_ITEM_SIZE)
+                    .attr('width', LEGEND_ITEM_SIZE);
+
+                // ENTER rect (legend cohort 2)
+                numPlotBoxEnter.append('rect')
+                    .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET)
+                    .attr('y', function(d) { return numPlotBoxHeight / 2 + LEGEND_ITEM_SIZE; })
+                    .attr('height', LEGEND_ITEM_SIZE)
+                    .attr('width', LEGEND_ITEM_SIZE);
 
                 byType.filterAll();
             }
@@ -344,7 +359,6 @@ window.smartRApp.directive('lineGraph', [
                 var rowHeight = 1 / patientIDs.length * CAT_PLOTS_HEIGHT;
                 var patientIDFontSize = smartRUtils.scaleFont(
                     patientIDs[0], {}, rowHeight * 2 / 3, MARGIN.left - 10, 0, 1);
-                var legendItemSize = 20; // TODO
 
                 /**
                  * BOX & PATIENTID SECTION
@@ -478,8 +492,8 @@ window.smartRApp.directive('lineGraph', [
                 }
                 var longestBioMarker = legendData.map(function(d) { return d.bioMarker; })
                     .reduce(function(prev, curr) { return prev.length > curr.length ? prev : curr; }, '');
-                var legendTextSize = smartRUtils.scaleFont(longestBioMarker, {}, legendItemSize,
-                        MARGIN.right - LEGEND_OFFSET - legendItemSize, 0, 2);
+                var legendTextSize = smartRUtils.scaleFont(longestBioMarker, {}, LEGEND_ITEM_SIZE,
+                        MARGIN.right - LEGEND_OFFSET - LEGEND_ITEM_SIZE, 0, 2);
 
                 // DATA JOIN
                 var legendItem = svg.selectAll('.sr-linegraph-legend-item')
@@ -491,12 +505,12 @@ window.smartRApp.directive('lineGraph', [
                     .attr('class', 'sr-linegraph-legend-item')
                     .attr('transform', function(d, i) {
                         return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
-                            (CAT_PLOTS_POS + i * legendItemSize) + ')';
+                            (CAT_PLOTS_POS + i * LEGEND_ITEM_SIZE) + ')';
                     });
 
                 // ENTER path
                 legendItemEnter.append('path')
-                    .attr('d', function(d) { return d.shape(legendItemSize); })
+                    .attr('d', function(d) { return d.shape(LEGEND_ITEM_SIZE); })
                     .style('fill', function(d) { return d.fill; })
                     .on('mouseover', function(d) {
                         svg.selectAll('.sr-linegraph-cat-icon')
@@ -511,8 +525,8 @@ window.smartRApp.directive('lineGraph', [
 
                 // ENTER text
                 legendItemEnter.append('text')
-                    .attr('x', LEGEND_OFFSET + legendItemSize)
-                    .attr('y', legendItemSize / 2)
+                    .attr('x', LEGEND_OFFSET + LEGEND_ITEM_SIZE)
+                    .attr('y', LEGEND_ITEM_SIZE / 2)
                     .attr('dy', '0.35em')
                     .style('font-size', function() { return legendTextSize + 'px'; })
                     .text(function(d) { return d.bioMarker; });
