@@ -132,6 +132,8 @@ window.smartRApp.directive('lineGraph', [
             var firstPatientToShow = 0;
             function updateShownPatients() {
                 byPatientID.filterAll();
+                firstPatientToShow = firstPatientToShow + parseInt(patientRange.value) > parseInt(patientRange.max) ?
+                    parseInt(patientRange.max) - parseInt(patientRange.value) : firstPatientToShow;
                 var shownPatients = smartRUtils.unique(getValuesForDimension(byPatientID))
                     .slice(firstPatientToShow, firstPatientToShow + parseInt(patientRange.value));
                 byPatientID.filterFunction(function(patient) { return shownPatients.indexOf(patient) !== -1; });
@@ -531,6 +533,9 @@ window.smartRApp.directive('lineGraph', [
                         'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
                     .on('click', function() {
                         firstPatientToShow += 5;
+                        firstPatientToShow = firstPatientToShow + parseInt(patientRange.value) >
+                            parseInt(patientRange.max) ? parseInt(patientRange.max) - parseInt(patientRange.value) :
+                            firstPatientToShow;
                         updateShownPatients();
                         renderCategoricPlots();
                     });
@@ -542,6 +547,7 @@ window.smartRApp.directive('lineGraph', [
                         'l' + (- MARGIN.left / 4) + ',' + (MARGIN.left / 3) + 'Z')
                     .on('click', function() {
                         firstPatientToShow -= 5;
+                        firstPatientToShow = firstPatientToShow < 0 ? 0 : firstPatientToShow;
                         updateShownPatients();
                         renderCategoricPlots();
                     });
