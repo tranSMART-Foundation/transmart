@@ -67,16 +67,41 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         return $.fn.textWidth.fakeEl.width();
     };
 
+    /**
+     * This method creates a fake span to meassure the text with of a given string for given css attributes
+     * @param text
+     * @param font
+     * @return text width in px
+     */
     service.getTextWidth = function(text, font) {
         return $.fn.textWidth(text, font);
     };
 
-    service.scaleFont = function(text, css, startSize, targetWidth, shrinkStep)  {
+    /**
+     * This method returns the font-size for which the given text is still within boundaries of targetWidth
+     * It also takes rotation into account
+     *
+     * @param text
+     * @param css
+     * @param startSize
+     * @param targetWidth
+     * @param rotation
+     * @param shrinkStep
+     * @return font size in px
+     */
+    service.scaleFont = function(text, css, startSize, targetWidth, rotation, shrinkStep)  {
+        var _spaceGainedByRotation = function(r, a) {
+           return r - r * Math.cos(a * Math.PI / 180);
+        };
+
         var fontSize = startSize;
-        css['font-size'] = fontSize + 'px';
-        while (service.getTextWidth(text, css) > targetWidth) {
-            fontSize -= shrinkStep;
+        while (true) {
             css['font-size'] = fontSize + 'px';
+            var currentWidth = service.getTextWidth(text, css);
+            if (currentWidth - _spaceGainedByRotation(currentWidth, rotation) < targetWidth) {
+                break;
+            }
+            fontSize -= shrinkStep;
         }
         return fontSize;
     };

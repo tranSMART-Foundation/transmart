@@ -127,27 +127,22 @@ window.smartRApp.directive('lineGraph', [
                     tickFormat[timeInteger] = timeString;
                 });
                 tmpByTimeInteger.dispose();
-                
+
                 var xAxis = d3.svg.axis()
                     .scale(x)
                     .tickFormat(function(d) { return tickFormat[d]; });
 
-                var padding = 8;
-                
-                // this stuff is to calculate the height/free space we gain by rotation
-                var angle = 30;
-                var radius = MARGIN.bottom - padding;
-                var a = radius * Math.cos(angle * Math.PI / 180);
-                var b = Math.sqrt(radius * radius - a * a);
-                var heightGainByRotation = radius - b;
+                var offset = 8;
+                var textRotation = 30;
 
-                var axisFontSize = smartRUtils.scaleFont(longestTimeString, {}, 50, MARGIN.bottom - padding + heightGainByRotation, 1);
+                var axisFontSize = smartRUtils.scaleFont(longestTimeString,
+                    {}, 30, MARGIN.bottom - offset - 10, 90 - textRotation, 1);
 
                 d3.select('.sr-linegraph-x-axis')
                     .call(xAxis)
                     .selectAll('text')
                     .attr('dy', '.35em')
-                    .attr('transform', 'translate(0,' + padding + ')rotate(' + angle + ')')
+                    .attr('transform', 'translate(0,' + offset + ')rotate(' + textRotation + ')')
                     .style('text-anchor', 'start')
                     .style('font-size', axisFontSize + 'px');
             }
@@ -426,7 +421,7 @@ window.smartRApp.directive('lineGraph', [
                 var longestBioMarker = legendData.map(function(d) { return d.bioMarker; })
                     .reduce(function(prev, curr) { return prev.length > curr.length ? prev : curr; }, '');
                 var legendTextSize = smartRUtils.scaleFont(longestBioMarker, {}, legendItemSize,
-                        MARGIN.right - LEGEND_OFFSET - legendItemSize, 2);
+                        MARGIN.right - LEGEND_OFFSET - legendItemSize, 0, 2);
 
                 // DATA JOIN
                 var legendItem = svg.selectAll('.sr-linegraph-legend-item')
@@ -447,7 +442,7 @@ window.smartRApp.directive('lineGraph', [
                     .style('fill', function(d) { return d.fill; })
                     .on('mouseover', function(d) {
                         svg.selectAll('.sr-linegraph-cat-icon')
-                            .filter('biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker))
+                            .filter('.biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker))
                             .classed('icon-highlight', true);
                     })
                     .on('mouseout', function() {
