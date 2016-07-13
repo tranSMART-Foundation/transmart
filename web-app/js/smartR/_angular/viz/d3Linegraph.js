@@ -308,16 +308,32 @@ window.smartRApp.directive('lineGraph', [
                 // ENTER rect (legend cohort 1)
                 numPlotBoxEnter.append('rect')
                     .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET)
-                    .attr('y', function(d) { return numPlotBoxHeight / 2 - LEGEND_ITEM_SIZE; })
+                    .attr('y', numPlotBoxHeight / 2 - LEGEND_ITEM_SIZE)
                     .attr('height', LEGEND_ITEM_SIZE)
-                    .attr('width', LEGEND_ITEM_SIZE);
+                    .attr('width', LEGEND_ITEM_SIZE)
+                    .style('fill', '#CCFFCC');
 
                 // ENTER rect (legend cohort 2)
                 numPlotBoxEnter.append('rect')
                     .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET)
-                    .attr('y', function(d) { return numPlotBoxHeight / 2 + LEGEND_ITEM_SIZE; })
+                    .attr('y',  numPlotBoxHeight / 2 + LEGEND_ITEM_SIZE)
                     .attr('height', LEGEND_ITEM_SIZE)
-                    .attr('width', LEGEND_ITEM_SIZE);
+                    .attr('width', LEGEND_ITEM_SIZE)
+                    .style('fill', '#FFCCCC');
+
+                // ENTER text (legend cohort 1)
+                numPlotBoxEnter.append('text')
+                    .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET + LEGEND_ITEM_SIZE + 5)
+                    .attr('y', numPlotBoxHeight / 2 - LEGEND_ITEM_SIZE * (1 - 0.5))
+                    .attr('dy', '.35em')
+                    .text('Cohort 1');
+
+                // ENTER text (legend cohort 1)
+                numPlotBoxEnter.append('text')
+                    .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET + LEGEND_ITEM_SIZE + 5)
+                    .attr('y', numPlotBoxHeight / 2 + LEGEND_ITEM_SIZE * (1 + 0.5))
+                    .attr('dy', '.35em')
+                    .text('Cohort 2');
 
                 byType.filterAll();
             }
