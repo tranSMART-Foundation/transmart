@@ -20,17 +20,23 @@
 # Public License for more details.
 #
 # You should have received a copy of the GNU General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+# with this program. If not, see <http://www.gnu.org/licenses/>..
 
-getSubjects <- function(study.name, as.data.frame = TRUE) {
+getPatientSet <- function(id) {
+    if (!is.numeric(id) || id %% 1 != 0 || id < 0) {
+        stop(paste(id, "is not a valid positive integer"))
+    }
     .ensureTransmartConnection()
 
-    serverResult <- .transmartGetJSON(paste("/studies/", study.name,"/subjects", sep=""))
-    listOfSubjects <- serverResult$subjects
+    patientSet <- .transmartGetJSON(paste("/patient_sets/", id, sep=''))
 
-    subjectIDs <- sapply(listOfSubjects, FUN = function(x) { x$inTrialId })
-    names(listOfSubjects) <- subjectIDs
+    # Don't expose id, it should not be used and will be removed from a future version of rest-api
+    if (length(patientSet$patients) && "id" %in% names(patientSet$patients[[1]])) {
+        for (i in seq_along(patientSet$patients)) {
+            patientSet$patients[[i]]$id <- NULL
+        }
+    }
 
-    if (as.data.frame) return(.listToDataFrame(listOfSubjects))
-    listOfSubjects
+    names(patientSet$patients) <- sapply(patientSet$patients, function(p) {p$inTrialId})
+    patientSet
 }
