@@ -266,7 +266,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
 }
 
 .serverMessageExchange <- 
-function(apiCall, httpHeaderFields, accept.type = "default", post.body = NULL) {
+function(apiCall, httpHeaderFields, accept.type = "default", post.body = NULL, show.progress = (accept.type == 'binary') ) {
     if (any(accept.type == c("default", "hal"))) {
         if (accept.type == "hal") {
             httpHeaderFields <- c(httpHeaderFields, Accept = "application/hal+json;charset=UTF-8")
@@ -303,23 +303,25 @@ function(apiCall, httpHeaderFields, accept.type = "default", post.body = NULL) {
                })
         return(result)
     } else if (accept.type == "binary") {
+        if(show.progress) cat("Retrieving data...\n")
         result <- list(JSON = FALSE)
         api.url <- paste(sep="", transmartClientEnv$db_access_url, apiCall)
         if (is.null(post.body)) {
             req <- GET(api.url,
                        add_headers(httpHeaderFields),
                        authenticate(transmartClientEnv$client_id, transmartClientEnv$client_secret),
-                       progress(),
+                       if(show.progress) progress(),
                        config(verbose = getOption("verbose")))
         } else {
             req <- POST(api.url,
                         body = post.body,
                         add_headers(httpHeaderFields),
                         authenticate(transmartClientEnv$client_id, transmartClientEnv$client_secret),
-                        progress(),
+                        if(show.progress) progress(),
                         encode='form',
                         config(verbose = getOption("verbose")))
         }
+        if(show.progress) cat("\nDownload complete.\n")
         result$content <- content(req, "raw")
         result$headers <- headers(req)
         result$status <- req$status_code
@@ -395,5 +397,5 @@ function(apiCall, httpHeaderFields, accept.type = "default", post.body = NULL) {
     if(is.null(names(lst))) return(paste(lst, sep=", "))
 
     final <- character(length(lst)*2)
-    paste(mapply(function(name, val) {paste0(name, ': "', encodeString(val), '"')}, names(post), post), collapse=", ")
+    paste(mapply(function(name, val) {paste0(name, ': "', encodeString(val), '"')}, names(lst), lst), collapse=", ")
 }
