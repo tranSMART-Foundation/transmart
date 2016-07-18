@@ -33,14 +33,19 @@ window.smartRApp.directive('lineGraph', [
             var data_matrix = scope.data.data_matrix;
 
             var cf = crossfilter(data_matrix);
+
+            // these dimensions are used globally, e.g. for filtering certain patients or bioMarker
             var byPatientID = cf.dimension(function(d) { return d.patientID; });
             var byValue = cf.dimension(function(d) { return d.value; });
             var byTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
             var byBioMarker = cf.dimension(function(d) { return d.bioMarker; });
-            var byType = cf.dimension(function(d) { return d.type; });
             var bySubset = cf.dimension(function(d) { return d.subset; });
 
-            var groupBioMarker = byBioMarker.group();
+            // these dimensions are used temporarily, e.g. in function calls
+            var tmpByType = cf.dimension(function(d) { return d.type; });
+            var tmpByTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
+            var tmpByBioMarker = cf.dimension(function(d) { return d.bioMarker; });
+            var tmpByPatientID = cf.dimension(function(d) { return d.patientID; });
 
             var MARGIN = {
                 top: scope.height * 0.1,
@@ -55,13 +60,13 @@ window.smartRApp.directive('lineGraph', [
              * In this section we compute the plot sizes
              */
 
-            byType.filterExact('categoric');
-            var catBoxes = smartRUtils.unique(byPatientID.top(Infinity)).length;
+            tmpByType.filterExact('categoric');
+            var catBoxes = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
             var catDataDoExist = catBoxes > 0;
-            byType.filterExact('numeric');
-            var numBoxes = smartRUtils.unique(byBioMarker.top(Infinity)).length;
+            tmpByType.filterExact('numeric');
+            var numBoxes = smartRUtils.unique(getValuesForDimension(byBioMarker)).length;
             var numDataDoExist = numBoxes > 0;
-            byType.filterAll();
+            tmpByType.filterAll();
 
             var CAT_PLOTS_HEIGHT = 0;
             var NUM_PLOTS_HEIGHT = 0;
@@ -70,7 +75,7 @@ window.smartRApp.directive('lineGraph', [
             var TIME_AXIS_POS = 0;
 
             var _MAX_CAT_BOX_HEIGHT = 30;
-            var _MAX_NUM_BOX_HEIGHT = 100;
+            var _MAX_NUM_BOX_HEIGHT = 200;
             if (catDataDoExist && !numDataDoExist) {
                 if (LINEGRAPH_HEIGHT / catBoxes > _MAX_CAT_BOX_HEIGHT) {
                     CAT_PLOTS_HEIGHT = _MAX_CAT_BOX_HEIGHT * catBoxes;
@@ -118,10 +123,9 @@ window.smartRApp.directive('lineGraph', [
             var x = d3.scale.linear();
             // recomputes x scale for current filters
             function calculateXScale() {
-                var tmpByType = cf.dimension(function(d) { return d.type; });
                 tmpByType.filterExact('categoric');
                 var padding = 1 / byPatientID.top(Infinity).length * CAT_PLOTS_HEIGHT;
-                tmpByType.dispose();
+                tmpByType.filterAll();
                 var times = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort(function(a, b) {
                     return a - b;
                 });
@@ -146,14 +150,6 @@ window.smartRApp.directive('lineGraph', [
                 return dimension.top(Infinity).map(function(record) { return dimension.accessor(record); });
             }
 
-            byType.filterExact('categoric');
-            var catBioMarkers = smartRUtils.unique(getValuesForDimension(byBioMarker));
-            byType.filterExact('numeric');
-            var numBioMarkers = smartRUtils.unique(getValuesForDimension(byBioMarker));
-            byType.filterExact('highDimensional');
-            var highBioMarkers = smartRUtils.unique(getValuesForDimension(byBioMarker));
-            byType.filterAll();
-
             var svg = d3.select(vizDiv).append('svg')
                 .attr('width', LINEGRAPH_WIDTH + MARGIN.left + MARGIN.right)
                 .attr('height', LINEGRAPH_HEIGHT + MARGIN.top + MARGIN.bottom)
@@ -173,7 +169,6 @@ window.smartRApp.directive('lineGraph', [
 
             function updateXAxis() {
                 // temporary dimension because we don't want to affect the time filter
-                var tmpByTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
                 var tickFormat = {};
                 var longestTimeString = '';
                 smartRUtils.unique(getValuesForDimension(byTimeInteger)).forEach(function(timeInteger) {
@@ -182,7 +177,7 @@ window.smartRApp.directive('lineGraph', [
                     longestTimeString = timeString.length > longestTimeString.length ? timeString : longestTimeString;
                     tickFormat[timeInteger] = timeString;
                 });
-                tmpByTimeInteger.dispose();
+                tmpByTimeInteger.filterAll();
 
                 var xAxis = d3.svg.axis()
                     .scale(x)
@@ -280,8 +275,8 @@ window.smartRApp.directive('lineGraph', [
 
 
             function renderNumericPlots() {
-                byType.filterExact('numeric');
                 if (byPatientID.top(Infinity).length === 0) { return; }
+                tmpByType.filterExact('numeric');
                 var bioMarkers = smartRUtils.unique(getValuesForDimension(byBioMarker))
                     .sort(function(a, b) { return a.localeCompare(b); }); // for determinism
 
@@ -326,6 +321,7 @@ window.smartRApp.directive('lineGraph', [
                     .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET + LEGEND_ITEM_SIZE + 5)
                     .attr('y', numPlotBoxHeight / 2 - LEGEND_ITEM_SIZE * (1 - 0.5))
                     .attr('dy', '.35em')
+                    .style('font-size', smartRUtils.scaleFont('Cohort 1', {}, 20, MARGIN.right - LEGEND_OFFSET - LEGEND_ITEM_SIZE, 0, 1) + 'px')
                     .text('Cohort 1');
 
                 // ENTER text (legend cohort 1)
@@ -333,19 +329,25 @@ window.smartRApp.directive('lineGraph', [
                     .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET + LEGEND_ITEM_SIZE + 5)
                     .attr('y', numPlotBoxHeight / 2 + LEGEND_ITEM_SIZE * (1 + 0.5))
                     .attr('dy', '.35em')
+                    .style('font-size', smartRUtils.scaleFont('Cohort 2', {}, 20, MARGIN.right - LEGEND_OFFSET - LEGEND_ITEM_SIZE, 0, 1) + 'px')
                     .text('Cohort 2');
 
-                byType.filterAll();
+                // d3.selectAll('.sr-linegraph-num-plot').each(function(d) {
+                //     tmpByBioMarker.filterExact(d);
+                //     var values = getValuesForDimension(byValue);
+                //     var y = d3.scale.linear()
+                //         .domain(values)
+                //         .range(numPlotBoxHeight);
+                // });
+
+                tmpByType.filterAll();
             }
             renderNumericPlots();
 
             function renderCategoricPlots() {
-                byType.filterExact('categoric');
                 if (byPatientID.top(Infinity).length === 0) { return; }
+                tmpByType.filterExact('categoric');
                 var iconSize = 1 / byPatientID.top(Infinity).length * CAT_PLOTS_HEIGHT;
-                // temporary dimensions because we want to keep filters within this function scope
-                var tmpByPatientID = cf.dimension(function(d) { return d.patientID; });
-                var tmpByTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
 
                 var catPlotInfo = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
                     tmpByPatientID.filterExact(patientID);
@@ -367,7 +369,6 @@ window.smartRApp.directive('lineGraph', [
                     d.subset = smartRUtils.unique(getValuesForDimension(bySubset));
                 });
 
-                // we don't dispose them because we need them again and dimension creation is expensive
                 tmpByTimeInteger.filterAll();
                 tmpByPatientID.filterAll();
 
@@ -458,14 +459,7 @@ window.smartRApp.directive('lineGraph', [
                 // start ENTER UPDATE EXIT cycle for each separate plot to render data points
                 d3.selectAll('.sr-linegraph-cat-plot').each(function(d) {
                     tmpByPatientID.filterExact(d.patientID);
-                    // a filtered & sorted list to determine the placement within a patient row
-                    var bioMarkerToRender = groupBioMarker.all()
-                        .filter(function(d) { return d.value > 0; })
-                        .sort(function(a, b) {
-                            var sortValue = a.value - b.value;
-                            return sortValue === 0 ? a.key.localeCompare(b.key) : sortValue;
-                        })
-                        .map(function(d) { return d.key; });
+
                     // DATA JOIN
                     var icon = d3.select(this).selectAll('.sr-linegraph-cat-icon')
                         .data(byBioMarker.top(Infinity), function(d) { return d.id; });
@@ -492,6 +486,7 @@ window.smartRApp.directive('lineGraph', [
                             return 'translate(' + (x(d.timeInteger) - iconSize / 2) + ',' + 0 + ')';
                         });
                 });
+                tmpByPatientID.filterAll();
 
                 /**
                  * LEGEND SECTION
@@ -582,12 +577,7 @@ window.smartRApp.directive('lineGraph', [
                         renderCategoricPlots();
                     });
 
-
-                // drop temporary filters
-                tmpByPatientID.dispose();
-                tmpByTimeInteger.dispose();
-                // reset other filters
-                byType.filterAll();
+                tmpByType.filterAll();
             }
             renderCategoricPlots();
         }
