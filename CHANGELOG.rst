@@ -14,6 +14,8 @@ Unreleased
 - Added this CHANGELOG.rst file
 - Added support for patient_id_list constraint in getHighdimData
 - Fix bugs in error handling, e.g. when no Content-Type is provided by the server
+- implement getPatientSet
+- use inTrialId as patient id: The former 'id' field of patients should not be used outside of Transmart, instead the inTrialId should be used. New versions of rest-api don't export the 'id' field anymore.
 
 [0.3.1] - 2016-04-06
 ====================

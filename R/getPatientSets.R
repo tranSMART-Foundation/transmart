@@ -31,6 +31,7 @@ getPatientSet <- function(id) {
     patientSet <- .transmartGetJSON(paste("/patient_sets/", id, sep=''))
 
     # Don't expose id, it should not be used and will be removed from a future version of rest-api
+    # COMPAT: remove this block if support for the old rest-api is dropped.
     if (length(patientSet$patients) && "id" %in% names(patientSet$patients[[1]])) {
         for (i in seq_along(patientSet$patients)) {
             patientSet$patients[[i]]$id <- NULL
