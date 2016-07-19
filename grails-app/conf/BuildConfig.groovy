@@ -41,7 +41,7 @@ grails.project.dependency.resolution = {
 		compile(':quartz:1.0-RC2')
 		compile(':mail:1.0')
 		compile(':cache:1.1.8')
-		runtime(':transmart-core:1.2.2')
+		runtime(':transmart-core:16.2-SNAPSHOT')
 		runtime(':biomart-domain:16.2-SNAPSHOT')
 		build(":release:3.1.1")
 
