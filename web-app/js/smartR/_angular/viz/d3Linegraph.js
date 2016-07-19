@@ -316,13 +316,12 @@ window.smartRApp.directive('lineGraph', [
                     .attr('width', LEGEND_ITEM_SIZE)
                     .style('fill', '#FFCCCC');
 
-                var ssFontSize = smartRUtils.scaleFont('Cohort 1', {}, 20, MARGIN.right - LEGEND_OFFSET - LEGEND_ITEM_SIZE, 0, 1) + 'px';
                 // ENTER text (legend cohort 1)
                 numPlotBoxEnter.append('text')
                     .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET + LEGEND_ITEM_SIZE + 5)
                     .attr('y', numPlotBoxHeight / 2 - LEGEND_ITEM_SIZE * (1 - 0.5))
                     .attr('dy', '.35em')
-                    .style('font-size', ssFontSize)
+                    .style('font-size', '15px')
                     .text('Cohort 1');
 
                 // ENTER text (legend cohort 1)
@@ -330,7 +329,7 @@ window.smartRApp.directive('lineGraph', [
                     .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET + LEGEND_ITEM_SIZE + 5)
                     .attr('y', numPlotBoxHeight / 2 + LEGEND_ITEM_SIZE * (1 + 0.5))
                     .attr('dy', '.35em')
-                    .style('font-size', ssFontSize)
+                    .style('font-size', '15px')
                     .text('Cohort 2');
 
                 d3.selectAll('.sr-linegraph-num-plot').each(function(d) {
