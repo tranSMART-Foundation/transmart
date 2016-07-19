@@ -1,5 +1,4 @@
 # Copyright 2014, 2015 The Hyve B.V.
-# Copyright 2014 Janssen Research & Development, LLC.
 #
 # This file is part of tranSMART R Client: R package allowing access to
 # tranSMART's data via its RESTful API.
@@ -28,7 +27,7 @@ getPatientSet <- function(id) {
     }
     .ensureTransmartConnection()
 
-    patientSet <- .transmartGetJSON(paste("/patient_sets/", id, sep=''))
+    patientSet <- .transmartGetJSON(paste0("/patient_sets/", id))
 
     # Don't expose id, it should not be used and will be removed from a future version of rest-api
     # COMPAT: remove this block if support for the old rest-api is dropped.

@@ -31,6 +31,14 @@ getSubjects <- function(study.name, as.data.frame = TRUE) {
     subjectIDs <- sapply(listOfSubjects, FUN = function(x) { x$inTrialId })
     names(listOfSubjects) <- subjectIDs
 
+    # Don't expose id, it should not be used and will be removed from a future version of rest-api
+    # COMPAT: remove this block if support for the old rest-api is dropped.
+    if (length(listOfSubjects) && "id" %in% names(listOfSubjects[[1]])) {
+        for (i in seq_along(patientSet$patients)) {
+            listOfSubjects[[i]]$id <- NULL
+        }
+    }
+
     if (as.data.frame) return(.listToDataFrame(listOfSubjects))
     listOfSubjects
 }
