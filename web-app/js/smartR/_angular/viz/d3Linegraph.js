@@ -113,7 +113,7 @@ window.smartRApp.directive('lineGraph', [
             var plotTypeSelect = smartRUtils.getElementWithoutEventListeners('sr-linegraph-numplottype-select');
             plotTypeSelect.selectedIndex = 0;
             plotTypeSelect.addEventListener('change', function() {
-                renderNumericPlots(plotTypeSelect.value);
+                renderNumericPlots();
             });
 
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-linegraph-patient-range');
@@ -124,6 +124,7 @@ window.smartRApp.directive('lineGraph', [
             patientRange.addEventListener('input', function() {
                 updateShownPatients();
                 renderCategoricPlots();
+                renderNumericPlots();
             });
 
             var x = d3.scale.linear();
@@ -349,13 +350,23 @@ window.smartRApp.directive('lineGraph', [
                         .scale(y)
                         .orient('left');
 
-                    d3.select(this).append('g')
-                        .attr('class', 'sr-linegraph-y-axis')
-                        .call(yAxis)
-                        .append('text')
+                    // DATA JOIN
+                    var axis = d3.select(this).selectAll('.sr-linegraph-y-axis')
+                        .data([bioMarker], function(d) { return d; });
+
+                    // ENTER g
+                    var axisEnter = axis.enter()
+                        .append('g')
+                        .attr('class', 'sr-linegraph-y-axis');
+
+                    // ENTER text
+                    axisEnter.append('text')
                         .attr('text-anchor', 'middle')
                         .attr('transform', 'translate(' + (-30) + ',' + (numPlotBoxHeight / 2) + ')rotate(-90)')
                         .text(function(d) { return d; });
+
+                    // UPDATE g
+                    axisEnter.call(yAxis);
 
                     var timeIntegers = smartRUtils.unique(getValuesForDimension(byTimeInteger));
                     var boxplotData = timeIntegers.map(function(timeInteger) {
@@ -377,7 +388,7 @@ window.smartRApp.directive('lineGraph', [
                     tmpByTimeInteger.filterAll();
                             
                     // DATA JOIN
-                    var boxplot = d3.select(this)
+                    var boxplot = d3.select(this).selectAll('.sr-linegraph-boxplot')
                         .data(boxplotData, function(d) { return d.timeInteger; });
 
                     // ENTER g
@@ -389,18 +400,28 @@ window.smartRApp.directive('lineGraph', [
                                 ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker);
                         });
 
+                    // ENTER line
+                    boxplotEnter.append('line');
+
                     // UPDATE g
                     boxplotEnter.attr('transform', function(d) {
                         return 'translate(' + (x(d.timeInteger)) + ',' + (y(d.value)) + ')';
                     });
                     
+                    // UPDATE line
+                    boxplot.select('line')
+                        .attr('x1', 0)
+                        .attr('x2', 0)
+                        .attr('y1', function(d) { return - y(d.value); })
+                        .attr('y2', function(d) { return y(d.value); });
+
 
                     tmpByBioMarker.filterAll();
                 });
                 
                 tmpByType.filterAll();
             }
-            renderNumericPlots(plotTypeSelect.value);
+            renderNumericPlots();
 
             function renderCategoricPlots() {
                 if (byPatientID.top(Infinity).length === 0) { return; }

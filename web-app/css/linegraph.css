@@ -58,3 +58,8 @@
     stroke-width: 1px;
     shape-rendering: crispEdges;
 }
+
+.sr-linegraph-boxplot line {
+    stroke: blue;
+    stroke-width: 4px;
+}
