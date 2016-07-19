@@ -110,6 +110,12 @@ window.smartRApp.directive('lineGraph', [
             var LEGEND_OFFSET = 10;
             var LEGEND_ITEM_SIZE = 20;
 
+            var plotTypeSelect = smartRUtils.getElementWithoutEventListeners('sr-linegraph-numplottype-select');
+            plotTypeSelect.selectedIndex = 0;
+            plotTypeSelect.addEventListener('change', function() {
+                renderNumericPlots(plotTypeSelect.value);
+            });
+
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-linegraph-patient-range');
             patientRange.min = 0;
             patientRange.max = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
@@ -332,8 +338,9 @@ window.smartRApp.directive('lineGraph', [
                     .style('font-size', '15px')
                     .text('Cohort 2');
 
-                d3.selectAll('.sr-linegraph-num-plot').each(function(d) {
-                    tmpByBioMarker.filterExact(d);
+                // add items to each numbox
+                d3.selectAll('.sr-linegraph-num-plot').each(function(bioMarker) {
+                    tmpByBioMarker.filterExact(bioMarker);
                     var values = getValuesForDimension(byValue);
                     var y = d3.scale.linear()
                         .domain(d3.extent(values).reverse())
@@ -349,12 +356,51 @@ window.smartRApp.directive('lineGraph', [
                         .attr('text-anchor', 'middle')
                         .attr('transform', 'translate(' + (-30) + ',' + (numPlotBoxHeight / 2) + ')rotate(-90)')
                         .text(function(d) { return d; });
+
+                    var timeIntegers = smartRUtils.unique(getValuesForDimension(byTimeInteger));
+                    var boxplotData = timeIntegers.map(function(timeInteger) {
+                        tmpByTimeInteger.filterExact(timeInteger);
+
+                        var plotTypeKeys = {
+                            meanWithSd: {valueKey: 'mean', errorBarKey: 'sd'},
+                            medianWidthSd: {valueKey: 'median', errorBarKey: 'sd'}
+                        };
+                        var data = byTimeInteger.top(1)[0];
+                        var valueKey = plotTypeKeys[plotTypeSelect.value].valueKey;
+                        var errorBarKey = plotTypeKeys[plotTypeSelect.value].errorBarKey;
+
+                        var value = data[valueKey];
+                        var errorBar = data[errorBarKey];
+
+                        return {timeInteger: timeInteger, errorBar: errorBar, value: value};
+                    });
+                    tmpByTimeInteger.filterAll();
+                            
+                    // DATA JOIN
+                    var boxplot = d3.select(this)
+                        .data(boxplotData, function(d) { return d.timeInteger; });
+
+                    // ENTER g
+                    var boxplotEnter = boxplot.enter()
+                        .append('g')
+                        .attr('class', function(d) {
+                            return 'sr-linegraph-boxplot' +
+                                ' timeinteger-' + smartRUtils.makeSafeForCSS(d.timeInteger) +
+                                ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker);
+                        });
+
+                    // UPDATE g
+                    boxplotEnter.attr('transform', function(d) {
+                        return 'translate(' + (x(d.timeInteger)) + ',' + (y(d.value)) + ')';
+                    });
+                    
+
+                    tmpByBioMarker.filterAll();
                 });
-                tmpByBioMarker.filterAll();
                 
                 tmpByType.filterAll();
             }
-            renderNumericPlots();
+            renderNumericPlots(plotTypeSelect.value);
 
             function renderCategoricPlots() {
                 if (byPatientID.top(Infinity).length === 0) { return; }
