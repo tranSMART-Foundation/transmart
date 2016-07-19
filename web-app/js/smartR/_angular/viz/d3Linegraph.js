@@ -374,7 +374,7 @@ window.smartRApp.directive('lineGraph', [
 
                         var plotTypeKeys = {
                             meanWithSd: {valueKey: 'mean', errorBarKey: 'sd'},
-                            medianWidthSd: {valueKey: 'median', errorBarKey: 'sd'}
+                            medianWithSd: {valueKey: 'median', errorBarKey: 'sd'}
                         };
                         var data = byTimeInteger.top(1)[0];
                         var valueKey = plotTypeKeys[plotTypeSelect.value].valueKey;
