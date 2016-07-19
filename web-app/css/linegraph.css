@@ -5,6 +5,14 @@
     stroke-width: 1px;
 }
 
+.sr-linegraph-y-axis path,
+.sr-linegraph-y-axis line {
+    fill: none;
+    stroke: black;
+    stroke-width: 1px;
+    shape-rendering: crispEdges;
+}
+
 .sr-linegraph-cat-plot rect {
     stroke: black;
     stroke-width: 1px;

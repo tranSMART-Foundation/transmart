@@ -289,7 +289,7 @@ window.smartRApp.directive('lineGraph', [
                 // ENTER g
                 var numPlotBoxEnter = numPlotBox.enter()
                     .append('g')
-                    .attr('class', function(d) { return 'sr-linegraph-num-plot biomarker-' + d; })
+                    .attr('class', function(d) { return 'sr-linegraph-num-plot biomarker-' + smartRUtils.makeSafeForCSS(d); })
                     .attr('transform', function(d) {
                         return 'translate(' + 0 + ',' +
                             (NUM_PLOTS_POS + bioMarkers.indexOf(d) * numPlotBoxHeight) + ')';
@@ -316,12 +316,13 @@ window.smartRApp.directive('lineGraph', [
                     .attr('width', LEGEND_ITEM_SIZE)
                     .style('fill', '#FFCCCC');
 
+                var ssFontSize = smartRUtils.scaleFont('Cohort 1', {}, 20, MARGIN.right - LEGEND_OFFSET - LEGEND_ITEM_SIZE, 0, 1) + 'px';
                 // ENTER text (legend cohort 1)
                 numPlotBoxEnter.append('text')
                     .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET + LEGEND_ITEM_SIZE + 5)
                     .attr('y', numPlotBoxHeight / 2 - LEGEND_ITEM_SIZE * (1 - 0.5))
                     .attr('dy', '.35em')
-                    .style('font-size', smartRUtils.scaleFont('Cohort 1', {}, 20, MARGIN.right - LEGEND_OFFSET - LEGEND_ITEM_SIZE, 0, 1) + 'px')
+                    .style('font-size', ssFontSize)
                     .text('Cohort 1');
 
                 // ENTER text (legend cohort 1)
@@ -329,17 +330,25 @@ window.smartRApp.directive('lineGraph', [
                     .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET + LEGEND_ITEM_SIZE + 5)
                     .attr('y', numPlotBoxHeight / 2 + LEGEND_ITEM_SIZE * (1 + 0.5))
                     .attr('dy', '.35em')
-                    .style('font-size', smartRUtils.scaleFont('Cohort 2', {}, 20, MARGIN.right - LEGEND_OFFSET - LEGEND_ITEM_SIZE, 0, 1) + 'px')
+                    .style('font-size', ssFontSize)
                     .text('Cohort 2');
 
-                // d3.selectAll('.sr-linegraph-num-plot').each(function(d) {
-                //     tmpByBioMarker.filterExact(d);
-                //     var values = getValuesForDimension(byValue);
-                //     var y = d3.scale.linear()
-                //         .domain(values)
-                //         .range(numPlotBoxHeight);
-                // });
+                d3.selectAll('.sr-linegraph-num-plot').each(function(d) {
+                    tmpByBioMarker.filterExact(d);
+                    var values = getValuesForDimension(byValue);
+                    var y = d3.scale.linear()
+                        .domain(d3.extent(values).reverse())
+                        .range([0, numPlotBoxHeight]);
+                    var yAxis = d3.svg.axis()
+                        .scale(y)
+                        .orient('left');
 
+                    d3.select(this).append('g')
+                        .attr('class', 'sr-linegraph-y-axis')
+                        .call(yAxis);
+                });
+                tmpByBioMarker.filterAll();
+                
                 tmpByType.filterAll();
             }
             renderNumericPlots();
