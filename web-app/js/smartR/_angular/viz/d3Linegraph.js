@@ -345,7 +345,11 @@ window.smartRApp.directive('lineGraph', [
 
                     d3.select(this).append('g')
                         .attr('class', 'sr-linegraph-y-axis')
-                        .call(yAxis);
+                        .call(yAxis)
+                        .append('text')
+                        .attr('text-anchor', 'middle')
+                        .attr('transform', 'translate(' + (-30) + ',' + (numPlotBoxHeight / 2) + ')rotate(-90)')
+                        .text(function(d) { return d; });
                 });
                 tmpByBioMarker.filterAll();
                 
