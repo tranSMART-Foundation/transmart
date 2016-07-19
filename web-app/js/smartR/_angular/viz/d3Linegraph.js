@@ -32,20 +32,20 @@ window.smartRApp.directive('lineGraph', [
         function createLinegraph(scope, vizDiv) {
             var data_matrix = scope.data.data_matrix;
 
-            var cf = crossfilter(data_matrix);
+            var dataCF = crossfilter(data_matrix);
 
             // these dimensions are used globally, e.g. for filtering certain patients or bioMarker
-            var byPatientID = cf.dimension(function(d) { return d.patientID; });
-            var byValue = cf.dimension(function(d) { return d.value; });
-            var byTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
-            var byBioMarker = cf.dimension(function(d) { return d.bioMarker; });
-            var bySubset = cf.dimension(function(d) { return d.subset; });
+            var byPatientID = dataCF.dimension(function(d) { return d.patientID; });
+            var byValue = dataCF.dimension(function(d) { return d.value; });
+            var byTimeInteger = dataCF.dimension(function(d) { return d.timeInteger; });
+            var byBioMarker = dataCF.dimension(function(d) { return d.bioMarker; });
+            var bySubset = dataCF.dimension(function(d) { return d.subset; });
 
             // these dimensions are used temporarily, e.g. in function calls
-            var tmpByType = cf.dimension(function(d) { return d.type; });
-            var tmpByTimeInteger = cf.dimension(function(d) { return d.timeInteger; });
-            var tmpByBioMarker = cf.dimension(function(d) { return d.bioMarker; });
-            var tmpByPatientID = cf.dimension(function(d) { return d.patientID; });
+            var tmpByType = dataCF.dimension(function(d) { return d.type; });
+            var tmpByTimeInteger = dataCF.dimension(function(d) { return d.timeInteger; });
+            var tmpByBioMarker = dataCF.dimension(function(d) { return d.bioMarker; });
+            var tmpByPatientID = dataCF.dimension(function(d) { return d.patientID; });
 
             var MARGIN = {
                 top: scope.height * 0.1,
@@ -57,7 +57,7 @@ window.smartRApp.directive('lineGraph', [
             var LINEGRAPH_HEIGHT = scope.height - MARGIN.top - MARGIN.bottom;
 
             /**
-             * In this section we compute the plot sizes
+             * In this section where we compute the plot sizes
              */
 
             tmpByType.filterExact('categoric');
@@ -595,3 +595,4 @@ window.smartRApp.directive('lineGraph', [
         }
     }
 ]);
+

@@ -9,6 +9,11 @@ main <- function() {
     df <- buildCrossfilterCompatibleDf(loaded_variables, fetch_params)
     checkTimeNameSanity(df)
 
+    save(df, file="/Users/sascha/df.Rda")
+
+    numeric.stats.df <- getStatsForNumericType(df)
+    df <- merge(df, numeric.stats.df, by=c("bioMarker", "timeInteger"), all=TRUE)
+
     output <- list()
     output$data_matrix <- df
 
@@ -99,6 +104,31 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
     df <- cbind(id=1:nrow(df), df)
 
     df
+}
+
+# compute several statistics for the given data frame and return a statistic df
+getStatsForNumericType <- function(df) {
+    numeric.df <- df[df$type == 'numeric', ]
+    timeIntegers <- unique(numeric.df$timeInteger)
+    bioMarkers <- unique(numeric.df$bioMarker)
+
+    stats.df <- data.frame()
+    for (bioMarker in bioMarkers) {
+        for (timeInteger in timeIntegers) {
+            current.df <- numeric.df[numeric.df$timeInteger == timeInteger & numeric.df$bioMarker == bioMarker, ]
+            if (nrow(current.df) == 0) next
+            values <- as.numeric(current.df$value)
+            sd <- sd(values)
+            mean <- mean(values)
+            median <- median(values)
+            stats.df <- rbind(stats.df, data.frame(bioMarker=bioMarker,
+                                                   timeInteger=timeInteger,
+                                                   sd=sd,
+                                                   mean=mean,
+                                                   median=median))
+        }
+    }
+    stats.df
 }
 
 # time (e.g. 15) and name (e.g. Day 15) must have a 1:1 relationship
