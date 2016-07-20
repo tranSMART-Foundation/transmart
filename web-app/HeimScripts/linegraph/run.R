@@ -12,7 +12,7 @@ main <- function() {
     save(df, file="/Users/sascha/df.Rda")
 
     numeric.stats.df <- getStatsForNumericType(df)
-    df <- merge(df, numeric.stats.df, by=c("bioMarker", "timeInteger"), all=TRUE)
+    df <- merge(df, numeric.stats.df, by=c("bioMarker", "timeInteger", "subset"), all=TRUE)
 
     output <- list()
     output$data_matrix <- df
@@ -111,21 +111,27 @@ getStatsForNumericType <- function(df) {
     numeric.df <- df[df$type == 'numeric', ]
     timeIntegers <- unique(numeric.df$timeInteger)
     bioMarkers <- unique(numeric.df$bioMarker)
+    subsets <- unique(numeric.df$subset)
 
     stats.df <- data.frame()
-    for (bioMarker in bioMarkers) {
-        for (timeInteger in timeIntegers) {
-            current.df <- numeric.df[numeric.df$timeInteger == timeInteger & numeric.df$bioMarker == bioMarker, ]
-            if (nrow(current.df) == 0) next
-            values <- as.numeric(current.df$value)
-            sd <- sd(values)
-            mean <- mean(values)
-            median <- median(values)
-            stats.df <- rbind(stats.df, data.frame(bioMarker=bioMarker,
-                                                   timeInteger=timeInteger,
-                                                   sd=sd,
-                                                   mean=mean,
-                                                   median=median))
+    for (subset in subsets) {
+        for (bioMarker in bioMarkers) {
+            for (timeInteger in timeIntegers) {
+                current.df <- numeric.df[numeric.df$timeInteger == timeInteger &
+                                         numeric.df$bioMarker == bioMarker &
+                                         numeric.df$subset == subset, ]
+                if (nrow(current.df) == 0) next
+                values <- as.numeric(current.df$value)
+                sd <- sd(values)
+                mean <- mean(values)
+                median <- median(values)
+                stats.df <- rbind(stats.df, data.frame(bioMarker=bioMarker,
+                                                       timeInteger=timeInteger,
+                                                       subset=subset,
+                                                       sd=sd,
+                                                       mean=mean,
+                                                       median=median))
+            }
         }
     }
     stats.df

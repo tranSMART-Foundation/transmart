@@ -346,7 +346,7 @@ window.smartRApp.directive('lineGraph', [
                     .style('font-size', '15px')
                     .text('Cohort 2');
 
-                // add items to each numbox
+                // Add items to each numbox ---
                 d3.selectAll('.sr-linegraph-num-plot').each(function(bioMarker) {
                     var currentNumPlot = d3.select(this);
                     tmpByBioMarker.filterExact(bioMarker);
@@ -451,6 +451,7 @@ window.smartRApp.directive('lineGraph', [
 
                     tmpByBioMarker.filterAll();
                 });
+                // --- Add items to each numbox
 
                 tmpByType.filterAll();
             }
