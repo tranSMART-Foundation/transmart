@@ -63,3 +63,9 @@
     stroke: blue;
     stroke-width: 4px;
 }
+
+.sr-linegraph-timeline {
+    fill: none;
+    stroke: black;
+    stroke-width: 2px;
+}

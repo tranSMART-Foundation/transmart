@@ -388,7 +388,21 @@ window.smartRApp.directive('lineGraph', [
                     });
                     tmpByTimeInteger.filterAll();
 
-                    // var timeline = d3.select(this).selectAll('.sr-linegraph-timeline')
+                    var lineGen = d3.svg.line()
+                        .x(function(d) { return x(d.timeInteger); })
+                        .y(function(d) { return y(d.value); });
+
+                    // DATA JOIN
+                    var timeline = d3.select(this).selectAll('.sr-linegraph-timeline')
+                        .data([boxplotData]);
+
+                    // ENTER path
+                    timeline.enter()
+                        .append('path')
+                        .attr('class', 'sr-linegraph-timeline');
+
+                    // UPDATE path
+                    timeline.attr('d', lineGen);
 
                     // DATA JOIN
                     var boxplot = d3.select(this).selectAll('.sr-linegraph-boxplot')
