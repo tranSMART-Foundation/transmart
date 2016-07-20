@@ -55,6 +55,8 @@ window.smartRApp.directive('lineGraph', [
             var LINEGRAPH_WIDTH = scope.width - MARGIN.left - MARGIN.right;
             var LINEGRAPH_HEIGHT = scope.height - MARGIN.top - MARGIN.bottom;
 
+            var ERROR_BAR_WIDTH = 4;
+
             /**
              * In this section where we compute the plot sizes
              */
@@ -401,7 +403,7 @@ window.smartRApp.directive('lineGraph', [
                         // --- Generate data for timeline elements
 
                         var lineGen = d3.svg.line()
-                            .x(function(d) { return x(d.timeInteger); })
+                            .x(function(d) { return x(d.timeInteger) + (subset === 1 ? - ERROR_BAR_WIDTH / 2 : ERROR_BAR_WIDTH + 2); })
                             .y(function(d) { return y(d.value); });
 
                         // DATA JOIN
@@ -430,20 +432,26 @@ window.smartRApp.directive('lineGraph', [
                                     ' subset-' + subset;
                             });
 
-                        // ENTER line
-                        boxplotEnter.append('line');
+                        // ENTER rect
+                        boxplotEnter.append('rect')
+                            .on('mouseover', function(d) {
+                                tip.show(d);
+                            })
+                            .on('mouseout', function() {
+                                tip.hide();
+                            });
 
                         // UPDATE g
                         boxplotEnter.attr('transform', function(d) {
                             return 'translate(' + (x(d.timeInteger)) + ',' + (y(d.value)) + ')';
                         });
 
-                        // UPDATE line
-                        boxplot.select('line')
-                            .attr('x1', subset === 1 ? - 2 : 2)
-                            .attr('x2', subset === 1 ? - 2 : 2)
-                            .attr('y1', function(d) { return y(d.value - d.errorBar) - y(d.value); })
-                            .attr('y2', function(d) { return - (y(d.value) - y(d.value + d.errorBar)); });
+                        // UPDATE rect
+                        boxplot.select('rect')
+                            .attr('height', function(d) { return y(d.value - d.errorBar) - y(d.value + d.errorBar); })
+                            .attr('width', ERROR_BAR_WIDTH)
+                            .attr('x', subset === 1 ? - ERROR_BAR_WIDTH / 2 - 1 : ERROR_BAR_WIDTH / 2)
+                            .attr('y', function(d) { return - (y(d.value) - y(d.value + d.errorBar)); });
 
                     });
                     bySubset.filterAll();

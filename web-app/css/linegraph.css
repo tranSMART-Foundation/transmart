@@ -59,16 +59,23 @@
     shape-rendering: crispEdges;
 }
 
-.sr-linegraph-boxplot>line {
-    stroke-width: 4px;
+.sr-linegraph-boxplot rect {
+    stroke-width: 1px;
+    shape-rendering: crispEdges;
 }
 
-.sr-linegraph-boxplot.subset-1>line {
-    stroke: #CCFFCC;
+.sr-linegraph-boxplot rect:hover {
+    stroke: black !important;
 }
 
-.sr-linegraph-boxplot.subset-2>line {
-    stroke: #FFCCCC;
+.sr-linegraph-boxplot.subset-1 rect {
+    stroke: #99FF99;
+    fill: #99FF99;
+}
+
+.sr-linegraph-boxplot.subset-2 rect {
+    stroke: #FF9999;
+    fill: #FF9999;
 }
 
 .sr-linegraph-timeline {
