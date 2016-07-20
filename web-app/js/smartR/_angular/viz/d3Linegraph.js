@@ -36,7 +36,6 @@ window.smartRApp.directive('lineGraph', [
 
             // these dimensions are used globally, e.g. for filtering certain patients or bioMarker
             var byPatientID = dataCF.dimension(function(d) { return d.patientID; });
-            var byValue = dataCF.dimension(function(d) { return d.value; });
             var byTimeInteger = dataCF.dimension(function(d) { return d.timeInteger; });
             var byBioMarker = dataCF.dimension(function(d) { return d.bioMarker; });
             var bySubset = dataCF.dimension(function(d) { return d.subset; });
@@ -284,6 +283,14 @@ window.smartRApp.directive('lineGraph', [
             function renderNumericPlots() {
                 if (byPatientID.top(Infinity).length === 0) { return; }
                 tmpByType.filterExact('numeric');
+
+                var plotTypeKeys = {
+                    meanWithSd: {valueKey: 'mean', errorBarKey: 'sd'},
+                    medianWithSd: {valueKey: 'median', errorBarKey: 'sd'}
+                };
+                var valueKey = plotTypeKeys[plotTypeSelect.value].valueKey;
+                var errorBarKey = plotTypeKeys[plotTypeSelect.value].errorBarKey;
+
                 var bioMarkers = smartRUtils.unique(getValuesForDimension(byBioMarker))
                     .sort(function(a, b) { return a.localeCompare(b); }); // for determinism
 
@@ -342,9 +349,10 @@ window.smartRApp.directive('lineGraph', [
                 // add items to each numbox
                 d3.selectAll('.sr-linegraph-num-plot').each(function(bioMarker) {
                     tmpByBioMarker.filterExact(bioMarker);
-                    var values = getValuesForDimension(byValue);
+                    var upperBounds = byBioMarker.top(Infinity).map(function(d) { return d[valueKey] + d[errorBarKey]; });
+                    var lowerBounds = byBioMarker.top(Infinity).map(function(d) { return d[valueKey] - d[errorBarKey]; });
                     var y = d3.scale.linear()
-                        .domain(d3.extent(values).reverse())
+                        .domain(d3.extent(upperBounds.concat(lowerBounds)).reverse())
                         .range([0, numPlotBoxHeight]);
                     var yAxis = d3.svg.axis()
                         .scale(y)
@@ -372,21 +380,16 @@ window.smartRApp.directive('lineGraph', [
                     var boxplotData = timeIntegers.map(function(timeInteger) {
                         tmpByTimeInteger.filterExact(timeInteger);
 
-                        var plotTypeKeys = {
-                            meanWithSd: {valueKey: 'mean', errorBarKey: 'sd'},
-                            medianWithSd: {valueKey: 'median', errorBarKey: 'sd'}
-                        };
                         var data = byTimeInteger.top(1)[0];
-                        var valueKey = plotTypeKeys[plotTypeSelect.value].valueKey;
-                        var errorBarKey = plotTypeKeys[plotTypeSelect.value].errorBarKey;
-
                         var value = data[valueKey];
                         var errorBar = data[errorBarKey];
 
                         return {timeInteger: timeInteger, errorBar: errorBar, value: value};
                     });
                     tmpByTimeInteger.filterAll();
-                            
+
+                    // var timeline = d3.select(this).selectAll('.sr-linegraph-timeline')
+
                     // DATA JOIN
                     var boxplot = d3.select(this).selectAll('.sr-linegraph-boxplot')
                         .data(boxplotData, function(d) { return d.timeInteger; });
@@ -412,8 +415,8 @@ window.smartRApp.directive('lineGraph', [
                     boxplot.select('line')
                         .attr('x1', 0)
                         .attr('x2', 0)
-                        .attr('y1', function(d) { return - y(d.value); })
-                        .attr('y2', function(d) { return y(d.value); });
+                        .attr('y1', function(d) { return y(d.value - d.errorBar) - y(d.value); })
+                        .attr('y2', function(d) { return - (y(d.value) - y(d.value + d.errorBar)); });
 
 
                     tmpByBioMarker.filterAll();
@@ -434,7 +437,7 @@ window.smartRApp.directive('lineGraph', [
                     var times = smartRUtils.unique(getValuesForDimension(byTimeInteger));
                     times.forEach(function(time) {
                         tmpByTimeInteger.filterExact(time);
-                        var count = byValue.top(Infinity).length;
+                        var count = byBioMarker.top(Infinity).length;
                         maxCount = count > maxCount ? count : maxCount;
                         // we need to disable this filter temporarily, otherwise it will affect the next iteration step
                         tmpByTimeInteger.filterAll();
