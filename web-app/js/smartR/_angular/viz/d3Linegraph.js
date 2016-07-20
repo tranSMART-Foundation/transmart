@@ -348,7 +348,10 @@ window.smartRApp.directive('lineGraph', [
 
                 // add items to each numbox
                 d3.selectAll('.sr-linegraph-num-plot').each(function(bioMarker) {
+                    var currentNumPlot = d3.select(this);
                     tmpByBioMarker.filterExact(bioMarker);
+
+                    // Compute y ---
                     var upperBounds = byBioMarker.top(Infinity).map(function(d) { return d[valueKey] + d[errorBarKey]; });
                     var lowerBounds = byBioMarker.top(Infinity).map(function(d) { return d[valueKey] - d[errorBarKey]; });
                     var y = d3.scale.linear()
@@ -357,9 +360,11 @@ window.smartRApp.directive('lineGraph', [
                     var yAxis = d3.svg.axis()
                         .scale(y)
                         .orient('left');
+                    // --- Compute y
 
+                    // Render y axis ---
                     // DATA JOIN
-                    var axis = d3.select(this).selectAll('.sr-linegraph-y-axis')
+                    var axis = currentNumPlot.selectAll('.sr-linegraph-y-axis')
                         .data([bioMarker], function(d) { return d; });
 
                     // ENTER g
@@ -375,67 +380,78 @@ window.smartRApp.directive('lineGraph', [
 
                     // UPDATE g
                     axisEnter.call(yAxis);
+                    // --- Render y axis
 
-                    var timeIntegers = smartRUtils.unique(getValuesForDimension(byTimeInteger));
-                    var boxplotData = timeIntegers.map(function(timeInteger) {
-                        tmpByTimeInteger.filterExact(timeInteger);
+                    // Render timeline elements for each subset ---
+                    [1,2].forEach(function(subset){
+                        bySubset.filterExact(subset);
 
-                        var data = byTimeInteger.top(1)[0];
-                        var value = data[valueKey];
-                        var errorBar = data[errorBarKey];
+                        // Generate data for timeline elements ---
+                        var timeIntegers = smartRUtils.unique(getValuesForDimension(byTimeInteger));
+                        var boxplotData = timeIntegers.map(function(timeInteger) {
+                            tmpByTimeInteger.filterExact(timeInteger);
 
-                        return {timeInteger: timeInteger, errorBar: errorBar, value: value};
-                    });
-                    tmpByTimeInteger.filterAll();
+                            var data = byTimeInteger.top(1)[0];
+                            var value = data[valueKey];
+                            var errorBar = data[errorBarKey];
 
-                    var lineGen = d3.svg.line()
-                        .x(function(d) { return x(d.timeInteger); })
-                        .y(function(d) { return y(d.value); });
+                            return {timeInteger: timeInteger, errorBar: errorBar, value: value};
+                        });
+                        tmpByTimeInteger.filterAll();
+                        // --- Generate data for timeline elements
 
-                    // DATA JOIN
-                    var timeline = d3.select(this).selectAll('.sr-linegraph-timeline')
-                        .data([boxplotData]);
+                        var lineGen = d3.svg.line()
+                            .x(function(d) { return x(d.timeInteger); })
+                            .y(function(d) { return y(d.value); });
 
-                    // ENTER path
-                    timeline.enter()
-                        .append('path')
-                        .attr('class', 'sr-linegraph-timeline');
+                        // DATA JOIN
+                        var timeline = currentNumPlot.selectAll('.sr-linegraph-timeline').filter('subset-' + subset)
+                            .data([boxplotData]);
 
-                    // UPDATE path
-                    timeline.attr('d', lineGen);
+                        // ENTER path
+                        timeline.enter()
+                            .append('path')
+                            .attr('class', 'sr-linegraph-timeline subset-' + subset);
 
-                    // DATA JOIN
-                    var boxplot = d3.select(this).selectAll('.sr-linegraph-boxplot')
-                        .data(boxplotData, function(d) { return d.timeInteger; });
+                        // UPDATE path
+                        timeline.attr('d', lineGen);
 
-                    // ENTER g
-                    var boxplotEnter = boxplot.enter()
-                        .append('g')
-                        .attr('class', function(d) {
-                            return 'sr-linegraph-boxplot' +
-                                ' timeinteger-' + smartRUtils.makeSafeForCSS(d.timeInteger) +
-                                ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker);
+                        // DATA JOIN
+                        var boxplot = currentNumPlot.selectAll('.sr-linegraph-boxplot').filter('subset-' + subset)
+                            .data(boxplotData, function(d) { return d.timeInteger; });
+
+                        // ENTER g
+                        var boxplotEnter = boxplot.enter()
+                            .append('g')
+                            .attr('class', function(d) {
+                                return 'sr-linegraph-boxplot' +
+                                    ' timeinteger-' + smartRUtils.makeSafeForCSS(d.timeInteger) +
+                                    ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
+                                    ' subset-' + subset;
+                            });
+
+                        // ENTER line
+                        boxplotEnter.append('line');
+
+                        // UPDATE g
+                        boxplotEnter.attr('transform', function(d) {
+                            return 'translate(' + (x(d.timeInteger)) + ',' + (y(d.value)) + ')';
                         });
 
-                    // ENTER line
-                    boxplotEnter.append('line');
+                        // UPDATE line
+                        boxplot.select('line')
+                            .attr('x1', 0)
+                            .attr('x2', 0)
+                            .attr('y1', function(d) { return y(d.value - d.errorBar) - y(d.value); })
+                            .attr('y2', function(d) { return - (y(d.value) - y(d.value + d.errorBar)); });
 
-                    // UPDATE g
-                    boxplotEnter.attr('transform', function(d) {
-                        return 'translate(' + (x(d.timeInteger)) + ',' + (y(d.value)) + ')';
                     });
-                    
-                    // UPDATE line
-                    boxplot.select('line')
-                        .attr('x1', 0)
-                        .attr('x2', 0)
-                        .attr('y1', function(d) { return y(d.value - d.errorBar) - y(d.value); })
-                        .attr('y2', function(d) { return - (y(d.value) - y(d.value + d.errorBar)); });
-
+                    bySubset.filterAll();
+                    // --- Render timeline elements for each subset
 
                     tmpByBioMarker.filterAll();
                 });
-                
+
                 tmpByType.filterAll();
             }
             renderNumericPlots();
@@ -600,7 +616,7 @@ window.smartRApp.directive('lineGraph', [
                 var longestBioMarker = legendData.map(function(d) { return d.bioMarker; })
                     .reduce(function(prev, curr) { return prev.length > curr.length ? prev : curr; }, '');
                 var legendTextSize = smartRUtils.scaleFont(longestBioMarker, {}, LEGEND_ITEM_SIZE,
-                        MARGIN.right - LEGEND_OFFSET - LEGEND_ITEM_SIZE, 0, 2);
+                    MARGIN.right - LEGEND_OFFSET - LEGEND_ITEM_SIZE, 0, 2);
 
                 // DATA JOIN
                 var legendItem = svg.selectAll('.sr-linegraph-legend-item')
@@ -655,7 +671,7 @@ window.smartRApp.directive('lineGraph', [
                     .on('click', function() {
                         firstPatientToShow += 5;
                         firstPatientToShow = firstPatientToShow + parseInt(patientRange.value) >
-                            parseInt(patientRange.max) ? parseInt(patientRange.max) - parseInt(patientRange.value) :
+                        parseInt(patientRange.max) ? parseInt(patientRange.max) - parseInt(patientRange.value) :
                             firstPatientToShow;
                         updateShownPatients();
                         renderCategoricPlots();

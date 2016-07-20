@@ -52,20 +52,34 @@
     cursor: pointer;
 }
 
-.sr-linegraph-num-plot rect {
+.sr-linegraph-num-plot>rect {
     fill: none;
     stroke: black;
     stroke-width: 1px;
     shape-rendering: crispEdges;
 }
 
-.sr-linegraph-boxplot line {
-    stroke: blue;
+.sr-linegraph-boxplot>line {
     stroke-width: 4px;
+}
+
+.sr-linegraph-boxplot.subset-1>line {
+    stroke: #CCFFCC;
+}
+
+.sr-linegraph-boxplot.subset-2>line {
+    stroke: #FFCCCC;
 }
 
 .sr-linegraph-timeline {
     fill: none;
-    stroke: black;
     stroke-width: 2px;
+}
+
+.sr-linegraph-timeline.subset-1 {
+    stroke: #CCFFCC;
+}
+
+.sr-linegraph-timeline.subset-2 {
+    stroke: #FFCCCC;
 }
