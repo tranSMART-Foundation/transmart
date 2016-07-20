@@ -440,8 +440,8 @@ window.smartRApp.directive('lineGraph', [
 
                         // UPDATE line
                         boxplot.select('line')
-                            .attr('x1', 0)
-                            .attr('x2', 0)
+                            .attr('x1', subset === 1 ? - 2 : 2)
+                            .attr('x2', subset === 1 ? - 2 : 2)
                             .attr('y1', function(d) { return y(d.value - d.errorBar) - y(d.value); })
                             .attr('y2', function(d) { return - (y(d.value) - y(d.value + d.errorBar)); });
 
