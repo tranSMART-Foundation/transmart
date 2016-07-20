@@ -90,3 +90,9 @@
 .sr-linegraph-timeline.subset-2 {
     stroke: #FF9999;
 }
+
+.sr-linegraph-highlight-zone {
+    fill: black;
+    stroke: none;
+    opacity: 0.4;
+}

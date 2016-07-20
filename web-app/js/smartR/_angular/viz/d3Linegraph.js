@@ -435,7 +435,7 @@ window.smartRApp.directive('lineGraph', [
                         // ENTER rect
                         boxplotEnter.append('rect')
                             .on('mouseover', function(d) {
-                                tip.show(d);
+                                tip.show(d); // TODO
                             })
                             .on('mouseout', function() {
                                 tip.hide();
@@ -597,9 +597,13 @@ window.smartRApp.directive('lineGraph', [
                         })
                         .style('fill', function(d) { return iconGen(d.bioMarker).fill; })
                         .on('mouseover', function(d) {
+                            highlightTimepoint(d.timeInteger);
                             tip.show(JSON.stringify(d)); // TODO
                         })
-                        .on('mouseout', tip.hide);
+                        .on('mouseout', function() {
+                            disableHighlightTimepoint();
+                            tip.hide();
+                        });
 
                     // UPDATE path
                     icon.attr('d', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
@@ -701,6 +705,33 @@ window.smartRApp.directive('lineGraph', [
                 tmpByType.filterAll();
             }
             renderCategoricPlots();
+
+            function highlightTimepoint(timeInteger) {
+                var highlightWidth = 20; // TODO make dynamic
+                // DATA JOIN
+                var highlightZone = svg.selectAll('.sr-linegraph-highlight-zone')
+                    .data(['left', 'right']);
+
+                // ENTER rect
+                highlightZone.enter()
+                    .append('rect')
+                    .attr('class', function(d) { return 'sr-linegraph-highlight-zone ' + d; });
+
+                // UPDATE rect
+                highlightZone
+                    .attr('height', TIME_AXIS_POS)
+                    .attr('width', function(d) {
+                        return d === 'left' ? x(timeInteger) - highlightWidth / 2 : LINEGRAPH_WIDTH - x(timeInteger) - highlightWidth / 2;
+                    })
+                    .attr('x', function(d) {
+                        return d === 'left' ? 0 : x(timeInteger) + highlightWidth / 2;
+                    })
+                    .attr('y', 0);
+            }
+
+            function disableHighlightTimepoint() {
+                d3.selectAll('.sr-linegraph-highlight-zone').remove();
+            }
         }
     }
 ]);
