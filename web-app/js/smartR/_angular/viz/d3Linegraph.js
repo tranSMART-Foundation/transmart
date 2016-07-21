@@ -195,6 +195,8 @@ window.smartRApp.directive('lineGraph', [
                 tmpByTimeInteger.filterExact(fromTimeInteger);
                 tmpByTimeInteger.top(Infinity).forEach(function(d) { d.timeInteger = toTimeInteger; });
                 tmpByTimeInteger.filterAll();
+                renderNumericPlots();
+                renderCategoricPlots();
             }
 
             function updateXAxis() {
@@ -224,6 +226,8 @@ window.smartRApp.directive('lineGraph', [
                         LINEGRAPH_WIDTH : x(d.timeInteger) + (x(timeAxisData[i+1].timeInteger) - x(d.timeInteger)) / 2;
                     return {left: left, right: right, timeInteger: d.timeInteger};
                 });
+
+                var timeIntegers = timeZones.map(function(d) { return d.timeInteger; });
                 var drag = d3.behavior.drag()
                     .on('drag', function(draggedEl) {
                         var newX = d3.event.x;
@@ -231,16 +235,26 @@ window.smartRApp.directive('lineGraph', [
                         newX = newX > LINEGRAPH_WIDTH ? LINEGRAPH_WIDTH : newX;
                         d3.select(this).attr('transform', 'translate(' + (newX) + ',' + TICK_HEIGHT + ')');
 
-                        // Swap timepoints functionality ---
                         var matchingTimeZones = timeZones.filter(function(timeZone) {
                             return timeZone.left <= newX && newX <= timeZone.right;
                         });
                         var timeIntegerHovered = matchingTimeZones[0].timeInteger;
-                        // if hovered timepoint not the current one swap the elements
                         if (timeIntegerHovered !== draggedEl.timeInteger) {
-                            moveTimePoint(timeIntegerHovered, draggedEl.timeInteger);
+                            var indexHovered = timeIntegers.indexOf(timeIntegerHovered);
+                            var indexDragged = timeIntegers.indexOf(draggedEl.timeInteger);
+                            // this loop fixes a bug that occurs when dragging too fast and timepoints are skipped
+                            var dist = null;
+                            while (Math.abs(dist = indexDragged - indexHovered) > 0) {
+                                var toIndex = indexHovered;
+                                if (dist > 1) {
+                                    toIndex = indexDragged - 1;
+                                } else if (dist < -1) {
+                                    toIndex = indexDragged + 1;
+                                }
+                                moveTimePoint(timeIntegers[toIndex], timeIntegers[indexDragged]);
+                                indexDragged = toIndex;
+                            }
                         }
-                        // --- Swap timepoints functionality
                     })
                     .on('dragend', function(draggedEl) {
                         moveTimePoint(draggedEl.timeInteger, draggedEl.timeInteger);
@@ -258,13 +272,6 @@ window.smartRApp.directive('lineGraph', [
                     })
                     .call(drag);
 
-                // ENTER rect
-                timeAxisElementEnter.append('rect')
-                    .on('mouseenter', function(d) {
-                        highlightTimepoint(d.timeInteger);
-                    })
-                    .on('mouseleave', disableHighlightTimepoint);
-
                 // ENTER text
                 timeAxisElementEnter.append('text')
                     .attr('text-anchor', 'start')
@@ -274,10 +281,23 @@ window.smartRApp.directive('lineGraph', [
                     })
                     .text(function(d) { return d.timeString; });
 
+                // ENTER rect
+                timeAxisElementEnter.append('rect')
+                    .on('mouseenter', function(d) {
+                        highlightTimepoint(d.timeInteger);
+                    })
+                    .on('mouseleave', disableHighlightTimepoint);
+
                 // UPDATE g
                 timeAxisElement.attr('transform', function(d) {
                     return 'translate(' + (x(d.timeInteger)) + ',' + (TICK_HEIGHT) + ')';
                 });
+
+                // UPDATE text
+                timeAxisElement.select('text')
+                    .attr('transform', function() {
+                        return 'translate(' + (0) + ',' + (0) + ')rotate(90)';
+                    });
 
                 // UPDATE rect
                 timeAxisElement.select('rect')
@@ -285,11 +305,6 @@ window.smartRApp.directive('lineGraph', [
                     .attr('y', 0)
                     .attr('height', MARGIN.bottom)
                     .attr('width', timeAxisElementWidth);
-
-                timeAxisElement.select('text')
-                    .attr('transform', function() {
-                        return 'translate(' + (0) + ',' + (0) + ')rotate(90)';
-                    });
 
                 // REMOVE g
                 timeAxisElement.exit()
