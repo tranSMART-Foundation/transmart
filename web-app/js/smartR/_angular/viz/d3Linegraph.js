@@ -56,6 +56,7 @@ window.smartRApp.directive('lineGraph', [
             var LINEGRAPH_HEIGHT = scope.height - MARGIN.top - MARGIN.bottom;
 
             var ERROR_BAR_WIDTH = 4;
+            var MAX_XAXIS_ELEMENT_WIDTH = 40;
 
             /**
              * In this section where we compute the plot sizes
@@ -75,31 +76,31 @@ window.smartRApp.directive('lineGraph', [
             var NUM_PLOTS_POS = 0;
             var TIME_AXIS_POS = 0;
 
-            var _MAX_CAT_BOX_HEIGHT = 30;
-            var _MAX_NUM_BOX_HEIGHT = 200;
+            var MAX_CAT_BOX_HEIGHT = 30;
+            var MAX_NUM_BOX_HEIGHT = 200;
             if (catDataDoExist && !numDataDoExist) {
-                if (LINEGRAPH_HEIGHT / catBoxes > _MAX_CAT_BOX_HEIGHT) {
-                    CAT_PLOTS_HEIGHT = _MAX_CAT_BOX_HEIGHT * catBoxes;
+                if (LINEGRAPH_HEIGHT / catBoxes > MAX_CAT_BOX_HEIGHT) {
+                    CAT_PLOTS_HEIGHT = MAX_CAT_BOX_HEIGHT * catBoxes;
                 } else {
                     CAT_PLOTS_HEIGHT = LINEGRAPH_HEIGHT;
                 }
                 TIME_AXIS_POS = CAT_PLOTS_POS + CAT_PLOTS_HEIGHT;
             } else if (!catDataDoExist && numDataDoExist) {
-                if (LINEGRAPH_HEIGHT / numBoxes > _MAX_NUM_BOX_HEIGHT) {
-                    NUM_PLOTS_HEIGHT = _MAX_NUM_BOX_HEIGHT * numBoxes;
+                if (LINEGRAPH_HEIGHT / numBoxes > MAX_NUM_BOX_HEIGHT) {
+                    NUM_PLOTS_HEIGHT = MAX_NUM_BOX_HEIGHT * numBoxes;
                 } else {
                     NUM_PLOTS_HEIGHT = LINEGRAPH_HEIGHT;
                 }
                 TIME_AXIS_POS = NUM_PLOTS_POS + NUM_PLOTS_HEIGHT;
             } else {
-                if (LINEGRAPH_HEIGHT / 2 / catBoxes > _MAX_CAT_BOX_HEIGHT) {
-                    CAT_PLOTS_HEIGHT = _MAX_CAT_BOX_HEIGHT * catBoxes;
+                if (LINEGRAPH_HEIGHT / 2 / catBoxes > MAX_CAT_BOX_HEIGHT) {
+                    CAT_PLOTS_HEIGHT = MAX_CAT_BOX_HEIGHT * catBoxes;
                 } else {
                     CAT_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2;
                 }
 
-                if (LINEGRAPH_HEIGHT / 2 / numBoxes > _MAX_NUM_BOX_HEIGHT) {
-                    NUM_PLOTS_HEIGHT = _MAX_NUM_BOX_HEIGHT * numBoxes;
+                if (LINEGRAPH_HEIGHT / 2 / numBoxes > MAX_NUM_BOX_HEIGHT) {
+                    NUM_PLOTS_HEIGHT = MAX_NUM_BOX_HEIGHT * numBoxes;
                 } else {
                     NUM_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2;
                 }
@@ -177,33 +178,71 @@ window.smartRApp.directive('lineGraph', [
 
             function updateXAxis() {
                 // temporary dimension because we don't want to affect the time filter
-                var tickFormat = {};
-                var longestTimeString = '';
+                var timeAxisData = [];
                 smartRUtils.unique(getValuesForDimension(byTimeInteger)).forEach(function(timeInteger) {
                     tmpByTimeInteger.filterExact(timeInteger);
                     var timeString = byTimeInteger.top(1)[0].timeString;
-                    longestTimeString = timeString.length > longestTimeString.length ? timeString : longestTimeString;
-                    tickFormat[timeInteger] = timeString;
+                    timeAxisData.push({timeInteger: timeInteger, timeString: timeString});
                 });
                 tmpByTimeInteger.filterAll();
 
+                var potentialSpacePerTimeAxisElement = LINEGRAPH_WIDTH / timeAxisData.length;
+                var timeAxisElementWidth = potentialSpacePerTimeAxisElement > MAX_XAXIS_ELEMENT_WIDTH ?
+                    MAX_XAXIS_ELEMENT_WIDTH : potentialSpacePerTimeAxisElement;
+
+                var tickHeight = 8;
                 var xAxis = d3.svg.axis()
                     .scale(x)
-                    .tickFormat(function(d) { return tickFormat[d]; });
-
-                var offset = 8;
-                var textRotation = 30;
-
-                var axisFontSize = smartRUtils.scaleFont(longestTimeString,
-                    {}, 30, MARGIN.bottom - offset - 10, 90 - textRotation, 1);
-
+                    .tickFormat('')
+                    .tickSize(tickHeight, 0);
                 d3.select('.sr-linegraph-x-axis')
-                    .call(xAxis)
-                    .selectAll('text')
+                    .call(xAxis);
+
+                // DATA JOIN
+                var timeAxisElement = d3.select('.sr-linegraph-x-axis').selectAll('.sr-linegraph-time-element')
+                    .data(timeAxisData, function(d) { return d.timeInteger; });
+
+                // ENTER g
+                var timeAxisElementEnter = timeAxisElement.enter()
+                    .append('g')
+                    .attr('class', 'sr-linegraph-time-element');
+
+                // ENTER rect
+                timeAxisElementEnter.append('rect')
+                    .on('mouseenter', function(d) {
+                        highlightTimepoint(d.timeInteger);
+                    })
+                    .on('mouseleave', disableHighlightTimepoint);
+
+                // ENTER text
+                timeAxisElementEnter.append('text')
+                    .attr('text-anchor', 'start')
                     .attr('dy', '.35em')
-                    .attr('transform', 'translate(0,' + offset + ')rotate(' + textRotation + ')')
-                    .style('text-anchor', 'start')
-                    .style('font-size', axisFontSize + 'px');
+                    .attr('font-size', function(d) {
+                        return smartRUtils.scaleFont(d.timeString, {}, timeAxisElementWidth, MARGIN.bottom, 0, 1);
+                    })
+                    .text(function(d) { return d.timeString; });
+
+                // UPDATE g
+                timeAxisElement.attr('transform', function(d) {
+                    return 'translate(' + (x(d.timeInteger)) + ',' + (tickHeight) + ')';
+                });
+
+                // UPDATE rect
+                timeAxisElement.select('rect')
+                    .attr('x', - timeAxisElementWidth / 2)
+                    .attr('y', 0)
+                    .attr('height', MARGIN.bottom)
+                    .attr('width', timeAxisElementWidth);
+
+                timeAxisElement.select('text')
+                    .attr('transform', function() {
+                        return 'translate(' + (0) + ',' + (0) + ')rotate(90)';
+                    });
+
+                // REMOVE g
+                timeAxisElement.exit()
+                    .remove();
             }
             updateXAxis();
 
@@ -597,11 +636,9 @@ window.smartRApp.directive('lineGraph', [
                         })
                         .style('fill', function(d) { return iconGen(d.bioMarker).fill; })
                         .on('mouseover', function(d) {
-                            highlightTimepoint(d.timeInteger);
                             tip.show(JSON.stringify(d)); // TODO
                         })
                         .on('mouseout', function() {
-                            disableHighlightTimepoint();
                             tip.hide();
                         });
 

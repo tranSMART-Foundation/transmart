@@ -96,3 +96,13 @@
     stroke: none;
     opacity: 0.4;
 }
+
+.sr-linegraph-time-element > rect {
+    opacity: 0;
+}
+
+.sr-linegraph-time-element > rect:hover {
+    cursor: pointer;
+    fill: black;
+    opacity: 0.3;
+}
