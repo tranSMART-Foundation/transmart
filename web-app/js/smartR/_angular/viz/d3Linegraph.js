@@ -198,6 +198,12 @@ window.smartRApp.directive('lineGraph', [
                 d3.select('.sr-linegraph-x-axis')
                     .call(xAxis);
 
+                var drag = d3.behavior.drag()
+                    .on('drag', function(d) {
+                        var newX = d3.event.x;
+                        d3.select(this).attr('transform', 'translate(' + (newX) + ',' + tickHeight + ')');
+                    });
+
                 // DATA JOIN
                 var timeAxisElement = d3.select('.sr-linegraph-x-axis').selectAll('.sr-linegraph-time-element')
                     .data(timeAxisData, function(d) { return d.timeInteger; });
@@ -205,7 +211,8 @@ window.smartRApp.directive('lineGraph', [
                 // ENTER g
                 var timeAxisElementEnter = timeAxisElement.enter()
                     .append('g')
-                    .attr('class', 'sr-linegraph-time-element');
+                    .attr('class', 'sr-linegraph-time-element')
+                    .call(drag);
 
                 // ENTER rect
                 timeAxisElementEnter.append('rect')

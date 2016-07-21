@@ -103,6 +103,5 @@
 
 .sr-linegraph-time-element > rect:hover {
     cursor: pointer;
-    fill: black;
-    opacity: 0.3;
+    stroke: black;
 }
