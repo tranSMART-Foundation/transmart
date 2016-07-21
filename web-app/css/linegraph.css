@@ -102,6 +102,6 @@
 }
 
 .sr-linegraph-time-element > rect:hover {
-    cursor: pointer;
+    cursor: move;
     stroke: black;
 }

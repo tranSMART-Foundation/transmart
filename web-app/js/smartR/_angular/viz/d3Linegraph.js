@@ -57,6 +57,7 @@ window.smartRApp.directive('lineGraph', [
 
             var ERROR_BAR_WIDTH = 4;
             var MAX_XAXIS_ELEMENT_WIDTH = 40;
+            var TICK_HEIGHT = 8;
 
             /**
              * In this section where we compute the plot sizes
@@ -155,8 +156,11 @@ window.smartRApp.directive('lineGraph', [
             }
             updateShownPatients();
 
-            function getValuesForDimension(dimension) {
-                return dimension.top(Infinity).map(function(record) { return dimension.accessor(record); });
+            function getValuesForDimension(dimension, ascendingOrder) {
+                if (typeof ascendingOrder === 'undefined' || !ascendingOrder) {
+                    return dimension.top(Infinity).map(function(record) { return dimension.accessor(record); });
+                }
+                return dimension.bottom(Infinity).map(function(record) { return dimension.accessor(record); });
             }
 
             var svg = d3.select(vizDiv).append('svg')
@@ -176,10 +180,27 @@ window.smartRApp.directive('lineGraph', [
                 .attr('class', 'sr-linegraph-x-axis')
                 .attr('transform', 'translate(' + 0 + ',' + TIME_AXIS_POS + ')');
 
+            function moveTimePoint(fromTimeInteger, toTimeInteger) {
+                var hoveredTimeAxisElement = d3.selectAll('.sr-linegraph-time-element').filter('.timeinteger-' + fromTimeInteger);
+                var draggTimeAxisElement = d3.selectAll('.sr-linegraph-time-element').filter('.timeinteger-' + toTimeInteger);
+                hoveredTimeAxisElement.data()[0].timeInteger = toTimeInteger;
+                draggTimeAxisElement.data()[0].timeInteger = fromTimeInteger;
+                hoveredTimeAxisElement.classed('timeinteger-' + fromTimeInteger, false);
+                hoveredTimeAxisElement.classed('timeinteger-' + toTimeInteger, true);
+                draggTimeAxisElement.classed('timeinteger-' + toTimeInteger, false);
+                draggTimeAxisElement.classed('timeinteger-' + fromTimeInteger, true);
+                hoveredTimeAxisElement.attr('transform', 'translate(' + (x(toTimeInteger)) + ',' + (TICK_HEIGHT) + ')');
+                tmpByTimeInteger.filterExact(toTimeInteger);
+                tmpByTimeInteger.top(Infinity).forEach(function(d) { d.timeInteger = fromTimeInteger; });
+                tmpByTimeInteger.filterExact(fromTimeInteger);
+                tmpByTimeInteger.top(Infinity).forEach(function(d) { d.timeInteger = toTimeInteger; });
+                tmpByTimeInteger.filterAll();
+            }
+
             function updateXAxis() {
                 // temporary dimension because we don't want to affect the time filter
                 var timeAxisData = [];
-                smartRUtils.unique(getValuesForDimension(byTimeInteger)).forEach(function(timeInteger) {
+                smartRUtils.unique(getValuesForDimension(byTimeInteger, true)).forEach(function(timeInteger) {
                     tmpByTimeInteger.filterExact(timeInteger);
                     var timeString = byTimeInteger.top(1)[0].timeString;
                     timeAxisData.push({timeInteger: timeInteger, timeString: timeString});
@@ -190,18 +211,39 @@ window.smartRApp.directive('lineGraph', [
                 var timeAxisElementWidth = potentialSpacePerTimeAxisElement > MAX_XAXIS_ELEMENT_WIDTH ?
                     MAX_XAXIS_ELEMENT_WIDTH : potentialSpacePerTimeAxisElement;
 
-                var tickHeight = 8;
                 var xAxis = d3.svg.axis()
                     .scale(x)
                     .tickFormat('')
-                    .tickSize(tickHeight, 0);
+                    .tickSize(TICK_HEIGHT, 0);
                 d3.select('.sr-linegraph-x-axis')
                     .call(xAxis);
 
+                var timeZones = timeAxisData.map(function(d, i) {
+                    var left = i === 0 ? 0 : x(d.timeInteger) - (x(d.timeInteger) - x(timeAxisData[i-1].timeInteger)) / 2;
+                    var right = i === timeAxisData.length - 1 ? 
+                        LINEGRAPH_WIDTH : x(d.timeInteger) + (x(timeAxisData[i+1].timeInteger) - x(d.timeInteger)) / 2;
+                    return {left: left, right: right, timeInteger: d.timeInteger};
+                });
                 var drag = d3.behavior.drag()
-                    .on('drag', function(d) {
+                    .on('drag', function(draggedEl) {
                         var newX = d3.event.x;
-                        d3.select(this).attr('transform', 'translate(' + (newX) + ',' + tickHeight + ')');
+                        newX = newX < 0 ? 0 : newX;
+                        newX = newX > LINEGRAPH_WIDTH ? LINEGRAPH_WIDTH : newX;
+                        d3.select(this).attr('transform', 'translate(' + (newX) + ',' + TICK_HEIGHT + ')');
+
+                        // Swap timepoints functionality ---
+                        var matchingTimeZones = timeZones.filter(function(timeZone) {
+                            return timeZone.left <= newX && newX <= timeZone.right;
+                        });
+                        var timeIntegerHovered = matchingTimeZones[0].timeInteger;
+                        // if hovered timepoint not the current one swap the elements
+                        if (timeIntegerHovered !== draggedEl.timeInteger) {
+                            moveTimePoint(timeIntegerHovered, draggedEl.timeInteger);
+                        }
+                        // --- Swap timepoints functionality
+                    })
+                    .on('dragend', function(draggedEl) {
+                        moveTimePoint(draggedEl.timeInteger, draggedEl.timeInteger);
                     });
 
                 // DATA JOIN
@@ -211,7 +253,9 @@ window.smartRApp.directive('lineGraph', [
                 // ENTER g
                 var timeAxisElementEnter = timeAxisElement.enter()
                     .append('g')
-                    .attr('class', 'sr-linegraph-time-element')
+                    .attr('class', function(d) {
+                        return 'sr-linegraph-time-element' + ' timeinteger-' + d.timeInteger;
+                    })
                     .call(drag);
 
                 // ENTER rect
@@ -232,7 +276,7 @@ window.smartRApp.directive('lineGraph', [
 
                 // UPDATE g
                 timeAxisElement.attr('transform', function(d) {
-                    return 'translate(' + (x(d.timeInteger)) + ',' + (tickHeight) + ')';
+                    return 'translate(' + (x(d.timeInteger)) + ',' + (TICK_HEIGHT) + ')';
                 });
 
                 // UPDATE rect
