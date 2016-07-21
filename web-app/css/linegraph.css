@@ -69,12 +69,12 @@
 }
 
 .sr-linegraph-boxplot.subset-1 rect {
-    stroke: #99FF99;
+    stroke: none;
     fill: #99FF99;
 }
 
 .sr-linegraph-boxplot.subset-2 rect {
-    stroke: #FF9999;
+    stroke: none;
     fill: #FF9999;
 }
 

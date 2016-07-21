@@ -55,7 +55,7 @@ window.smartRApp.directive('lineGraph', [
             var LINEGRAPH_WIDTH = scope.width - MARGIN.left - MARGIN.right;
             var LINEGRAPH_HEIGHT = scope.height - MARGIN.top - MARGIN.bottom;
 
-            var ERROR_BAR_WIDTH = 4;
+            var ERROR_BAR_WIDTH = 5;
             var MAX_XAXIS_ELEMENT_WIDTH = 40;
             var TICK_HEIGHT = 8;
 
@@ -490,7 +490,8 @@ window.smartRApp.directive('lineGraph', [
                     // --- Render y axis
 
                     // Render timeline elements for each subset ---
-                    [1,2].forEach(function(subset){
+                    var subsets = smartRUtils.unique(getValuesForDimension(bySubset));
+                    subsets.forEach(function(subset){
                         bySubset.filterExact(subset);
 
                         // Generate data for timeline elements ---
@@ -512,7 +513,7 @@ window.smartRApp.directive('lineGraph', [
                             .y(function(d) { return y(d.value); });
 
                         // DATA JOIN
-                        var timeline = currentNumPlot.selectAll('.sr-linegraph-timeline').filter('subset-' + subset)
+                        var timeline = currentNumPlot.selectAll('.sr-linegraph-timeline.subset-' + subset)
                             .data([boxplotData]);
 
                         // ENTER path
@@ -523,8 +524,11 @@ window.smartRApp.directive('lineGraph', [
                         // UPDATE path
                         timeline.attr('d', lineGen);
 
+                        // REMOVE path
+                        timeline.exit().remove();
+
                         // DATA JOIN
-                        var boxplot = currentNumPlot.selectAll('.sr-linegraph-boxplot').filter('subset-' + subset)
+                        var boxplot = currentNumPlot.selectAll('.sr-linegraph-boxplot.subset-' + subset)
                             .data(boxplotData, function(d) { return d.timeInteger; });
 
                         // ENTER g
@@ -547,7 +551,7 @@ window.smartRApp.directive('lineGraph', [
                             });
 
                         // UPDATE g
-                        boxplotEnter.attr('transform', function(d) {
+                        boxplot.attr('transform', function(d) {
                             return 'translate(' + (x(d.timeInteger)) + ',' + (y(d.value)) + ')';
                         });
 
@@ -557,6 +561,9 @@ window.smartRApp.directive('lineGraph', [
                             .attr('width', ERROR_BAR_WIDTH)
                             .attr('x', subset === 1 ? - ERROR_BAR_WIDTH / 2 - 1 : ERROR_BAR_WIDTH / 2)
                             .attr('y', function(d) { return - (y(d.value) - y(d.value + d.errorBar)); });
+
+                        // EXIT g
+                        boxplot.exit().remove();
 
                     });
                     bySubset.filterAll();
@@ -672,11 +679,7 @@ window.smartRApp.directive('lineGraph', [
                     .attr('height', function(d) { return d.height; });
 
                 // EXIT g
-                var catPlotExit = catPlot.exit()
-                    .remove();
-
-                catPlotExit.select('rect')
-                    .attr('y', 0);
+                catPlot.exit().remove();
 
                 /**
                  * ICON SECTION
