@@ -181,7 +181,7 @@ window.smartRApp.directive('lineGraph', [
                 .attr('transform', 'translate(' + 0 + ',' + TIME_AXIS_POS + ')');
 
             // WARNING: using this function will reset all global filters to make sure all data are modified correctly
-            function moveTimePoint(fromTimeInteger, toTimeInteger) {
+            function swapTimeIntegerData(fromTimeInteger, toTimeInteger) {
                 byPatientID.filterAll();
                 byBioMarker.filterAll();
                 byTimeInteger.filterAll();
@@ -195,6 +195,7 @@ window.smartRApp.directive('lineGraph', [
                 dataCF.remove();
                 byTimeInteger.filterAll();
 
+                // FIXME: This shouldn't be here, but in the drag
                 d3.select('.sr-linegraph-time-element.timestring-' + smartRUtils.makeSafeForCSS(fromEntries[0].timeString))
                     .attr('transform', 'translate(' + (x(toTimeInteger)) + ',' + (TICK_HEIGHT) + ')');
 
@@ -203,8 +204,6 @@ window.smartRApp.directive('lineGraph', [
 
                 dataCF.add(fromEntries);
                 dataCF.add(toEntries);
-
-                updateXAxis();
             }
 
             function updateXAxis() {
@@ -246,18 +245,31 @@ window.smartRApp.directive('lineGraph', [
                         var matchingTimeZones = timeZones.filter(function(timeZone) {
                             return timeZone.left <= newX && newX <= timeZone.right;
                         });
-                        var timeIntegerHovered = matchingTimeZones[0].timeInteger;
-                        if (timeIntegerHovered !== draggedEl.timeInteger) {
-                            console.log(draggedEl.timeInteger);
-                            console.log('hovered', timeIntegerHovered);
-                            var indexHovered = timeIntegers.indexOf(timeIntegerHovered);
-                            var indexDragged = timeIntegers.indexOf(draggedEl.timeInteger);
-                            moveTimePoint(timeIntegerHovered, draggedEl.timeInteger);
-                            draggedEl.timeInteger = timeIntegerHovered;
+                        var timeIntegerDestination = matchingTimeZones[0].timeInteger;
+                        var timeIntegerOrigin = draggedEl.timeInteger;
+                        if (timeIntegerDestination !== timeIntegerOrigin) {
+                            var indexDestination = timeIntegers.indexOf(timeIntegerDestination);
+                            var indexOrigin = timeIntegers.indexOf(timeIntegerOrigin);
+
+                            var dist = 0;
+                            while (Math.abs(dist = indexOrigin - indexDestination) > 0) {
+                                var nextIntermediateIndex = indexDestination;
+                                if (dist > 1) {
+                                    nextIntermediateIndex = indexOrigin - 1;
+                                } else if (dist < -1) {
+                                    nextIntermediateIndex = indexOrigin + 1;
+                                }
+
+                                swapTimeIntegerData(timeIntegers[indexOrigin], timeIntegers[nextIntermediateIndex]);
+                                draggedEl.timeInteger = timeIntegers[nextIntermediateIndex];
+                                indexOrigin = nextIntermediateIndex;
+                            }
+
+                            updateXAxis();
                         }
                     })
                     .on('dragend', function(draggedEl) {
-                        moveTimePoint(draggedEl.timeInteger, draggedEl.timeInteger);
+                        swapTimeIntegerData(draggedEl.timeInteger, draggedEl.timeInteger);
                         updateXAxis();
                         renderNumericPlots();
                         renderCategoricPlots();
