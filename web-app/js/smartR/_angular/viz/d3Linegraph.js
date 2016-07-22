@@ -134,7 +134,7 @@ window.smartRApp.directive('lineGraph', [
             // recomputes x scale for current filters
             function calculateXScale() {
                 tmpByType.filterExact('categoric');
-                var padding = CAT_PLOTS_HEIGHT ? 1 / byPatientID.top(Infinity).length * CAT_PLOTS_HEIGHT : 10;
+                var padding = CAT_PLOTS_HEIGHT ? 1 / byTimeInteger.bottom(Infinity).length * CAT_PLOTS_HEIGHT : 10;
                 tmpByType.filterAll();
                 var times = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort(function(a, b) {
                     return a - b;
@@ -180,23 +180,28 @@ window.smartRApp.directive('lineGraph', [
                 .attr('class', 'sr-linegraph-x-axis')
                 .attr('transform', 'translate(' + 0 + ',' + TIME_AXIS_POS + ')');
 
+            // WARNING: using this function will reset all global filters to make sure all data are modified correctly
             function moveTimePoint(fromTimeInteger, toTimeInteger) {
-                var hoveredTimeAxisElement = d3.selectAll('.sr-linegraph-time-element').filter('.timeinteger-' + fromTimeInteger);
-                var draggTimeAxisElement = d3.selectAll('.sr-linegraph-time-element').filter('.timeinteger-' + toTimeInteger);
-                hoveredTimeAxisElement.data()[0].timeInteger = toTimeInteger;
-                draggTimeAxisElement.data()[0].timeInteger = fromTimeInteger;
-                hoveredTimeAxisElement.classed('timeinteger-' + fromTimeInteger, false);
-                hoveredTimeAxisElement.classed('timeinteger-' + toTimeInteger, true);
-                draggTimeAxisElement.classed('timeinteger-' + toTimeInteger, false);
-                draggTimeAxisElement.classed('timeinteger-' + fromTimeInteger, true);
-                hoveredTimeAxisElement.attr('transform', 'translate(' + (x(toTimeInteger)) + ',' + (TICK_HEIGHT) + ')');
-                tmpByTimeInteger.filterExact(toTimeInteger);
-                tmpByTimeInteger.top(Infinity).forEach(function(d) { d.timeInteger = fromTimeInteger; });
-                tmpByTimeInteger.filterExact(fromTimeInteger);
-                tmpByTimeInteger.top(Infinity).forEach(function(d) { d.timeInteger = toTimeInteger; });
-                tmpByTimeInteger.filterAll();
-                renderNumericPlots();
-                renderCategoricPlots();
+                byPatientID.filterAll();
+                byBioMarker.filterAll();
+                byTimeInteger.filterAll();
+                bySubset.filterAll();
+
+                byTimeInteger.filterExact(fromTimeInteger);
+                var fromEntries = byTimeInteger.bottom(Infinity);
+                dataCF.remove();
+                byTimeInteger.filterExact(toTimeInteger);
+                var toEntries = byTimeInteger.bottom(Infinity);
+                dataCF.remove();
+                byTimeInteger.filterAll();
+
+                fromEntries.forEach(function(d) { d.timeInteger = toTimeInteger; });
+                toEntries.forEach(function(d) { d.timeInteger = fromTimeInteger; });
+
+                dataCF.add(fromEntries);
+                dataCF.add(toEntries);
+
+                updateXAxis();
             }
 
             function updateXAxis() {
@@ -204,7 +209,7 @@ window.smartRApp.directive('lineGraph', [
                 var timeAxisData = [];
                 smartRUtils.unique(getValuesForDimension(byTimeInteger, true)).forEach(function(timeInteger) {
                     tmpByTimeInteger.filterExact(timeInteger);
-                    var timeString = byTimeInteger.top(1)[0].timeString;
+                    var timeString = byTimeInteger.bottom(1)[0].timeString;
                     timeAxisData.push({timeInteger: timeInteger, timeString: timeString});
                 });
                 tmpByTimeInteger.filterAll();
@@ -242,38 +247,30 @@ window.smartRApp.directive('lineGraph', [
                         if (timeIntegerHovered !== draggedEl.timeInteger) {
                             var indexHovered = timeIntegers.indexOf(timeIntegerHovered);
                             var indexDragged = timeIntegers.indexOf(draggedEl.timeInteger);
-                            // this loop fixes a bug that occurs when dragging too fast and timepoints are skipped
-                            var dist = null;
-                            while (Math.abs(dist = indexDragged - indexHovered) > 0) {
-                                var toIndex = indexHovered;
-                                if (dist > 1) {
-                                    toIndex = indexDragged - 1;
-                                } else if (dist < -1) {
-                                    toIndex = indexDragged + 1;
-                                }
-                                moveTimePoint(timeIntegers[toIndex], timeIntegers[indexDragged]);
-                                indexDragged = toIndex;
-                            }
+                            moveTimePoint(indexHovered, indexDragged);
                         }
                     })
                     .on('dragend', function(draggedEl) {
                         moveTimePoint(draggedEl.timeInteger, draggedEl.timeInteger);
+                        renderNumericPlots();
+                        renderCategoricPlots();
                     });
 
                 // DATA JOIN
                 var timeAxisElement = d3.select('.sr-linegraph-x-axis').selectAll('.sr-linegraph-time-element')
-                    .data(timeAxisData, function(d) { return d.timeInteger; });
+                    .data(timeAxisData, function(d) { return d.timeString; });
 
                 // ENTER g
                 var timeAxisElementEnter = timeAxisElement.enter()
                     .append('g')
                     .attr('class', function(d) {
-                        return 'sr-linegraph-time-element' + ' timeinteger-' + d.timeInteger;
+                        return 'sr-linegraph-time-element timestring-' + smartRUtils.makeSafeForCSS(d.timeString);
                     })
                     .call(drag);
 
                 // ENTER text
                 timeAxisElementEnter.append('text')
+                    .attr('transform', 'translate(0,0)rotate(90)')
                     .attr('text-anchor', 'start')
                     .attr('dy', '.35em')
                     .attr('font-size', function(d) {
@@ -293,22 +290,12 @@ window.smartRApp.directive('lineGraph', [
                     return 'translate(' + (x(d.timeInteger)) + ',' + (TICK_HEIGHT) + ')';
                 });
 
-                // UPDATE text
-                timeAxisElement.select('text')
-                    .attr('transform', function() {
-                        return 'translate(' + (0) + ',' + (0) + ')rotate(90)';
-                    });
-
                 // UPDATE rect
                 timeAxisElement.select('rect')
                     .attr('x', - timeAxisElementWidth / 2)
                     .attr('y', 0)
                     .attr('height', MARGIN.bottom)
                     .attr('width', timeAxisElementWidth);
-
-                // REMOVE g
-                timeAxisElement.exit()
-                    .remove();
             }
             updateXAxis();
 
@@ -388,8 +375,11 @@ window.smartRApp.directive('lineGraph', [
 
 
             function renderNumericPlots() {
-                if (byPatientID.top(Infinity).length === 0) { return; }
                 tmpByType.filterExact('numeric');
+                if (byTimeInteger.bottom(Infinity).length === 0) {
+                    tmpByType.filterAll();
+                    return;
+                }
 
                 var plotTypeKeys = {
                     meanWithSd: {valueKey: 'mean', errorBarKey: 'sd'},
@@ -459,8 +449,8 @@ window.smartRApp.directive('lineGraph', [
                     tmpByBioMarker.filterExact(bioMarker);
 
                     // Compute y ---
-                    var upperBounds = byBioMarker.top(Infinity).map(function(d) { return d[valueKey] + d[errorBarKey]; });
-                    var lowerBounds = byBioMarker.top(Infinity).map(function(d) { return d[valueKey] - d[errorBarKey]; });
+                    var upperBounds = byTimeInteger.bottom(Infinity).map(function(d) { return d[valueKey] + d[errorBarKey]; });
+                    var lowerBounds = byTimeInteger.bottom(Infinity).map(function(d) { return d[valueKey] - d[errorBarKey]; });
                     var y = d3.scale.linear()
                         .domain(d3.extent(upperBounds.concat(lowerBounds)).reverse())
                         .range([0, numPlotBoxHeight]);
@@ -495,15 +485,15 @@ window.smartRApp.directive('lineGraph', [
                         bySubset.filterExact(subset);
 
                         // Generate data for timeline elements ---
-                        var timeIntegers = smartRUtils.unique(getValuesForDimension(byTimeInteger));
-                        var boxplotData = timeIntegers.map(function(timeInteger) {
-                            tmpByTimeInteger.filterExact(timeInteger);
+                        
+                        var boxplotData = byTimeInteger.bottom(Infinity).map(function(d) {
+                            tmpByTimeInteger.filterExact(d.timeInteger);
 
-                            var data = byTimeInteger.top(1)[0];
+                            var data = byTimeInteger.bottom(1)[0];
                             var value = data[valueKey];
                             var errorBar = data[errorBarKey];
 
-                            return {timeInteger: timeInteger, errorBar: errorBar, value: value};
+                            return {timeInteger: d.timeInteger, timeString: d.timeString, errorBar: errorBar, value: value};
                         });
                         tmpByTimeInteger.filterAll();
                         // --- Generate data for timeline elements
@@ -529,14 +519,14 @@ window.smartRApp.directive('lineGraph', [
 
                         // DATA JOIN
                         var boxplot = currentNumPlot.selectAll('.sr-linegraph-boxplot.subset-' + subset)
-                            .data(boxplotData, function(d) { return d.timeInteger; });
+                            .data(boxplotData, function(d) { return d.timeString; });
 
                         // ENTER g
                         var boxplotEnter = boxplot.enter()
                             .append('g')
                             .attr('class', function(d) {
                                 return 'sr-linegraph-boxplot' +
-                                    ' timeinteger-' + smartRUtils.makeSafeForCSS(d.timeInteger) +
+                                    ' timestring-' + smartRUtils.makeSafeForCSS(d.timeString) +
                                     ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
                                     ' subset-' + subset;
                             });
@@ -578,9 +568,12 @@ window.smartRApp.directive('lineGraph', [
             renderNumericPlots();
 
             function renderCategoricPlots() {
-                if (byPatientID.top(Infinity).length === 0) { return; }
                 tmpByType.filterExact('categoric');
-                var iconSize = 1 / byPatientID.top(Infinity).length * CAT_PLOTS_HEIGHT;
+                if (byTimeInteger.bottom(Infinity).length === 0) {
+                    tmpByType.filterAll();
+                    return;
+                }
+                var iconSize = 1 / byTimeInteger.bottom(Infinity).length * CAT_PLOTS_HEIGHT;
 
                 var catPlotInfo = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
                     tmpByPatientID.filterExact(patientID);
@@ -588,7 +581,7 @@ window.smartRApp.directive('lineGraph', [
                     var times = smartRUtils.unique(getValuesForDimension(byTimeInteger));
                     times.forEach(function(time) {
                         tmpByTimeInteger.filterExact(time);
-                        var count = byBioMarker.top(Infinity).length;
+                        var count = byTimeInteger(Infinity).length;
                         maxCount = count > maxCount ? count : maxCount;
                         // we need to disable this filter temporarily, otherwise it will affect the next iteration step
                         tmpByTimeInteger.filterAll();
@@ -605,10 +598,9 @@ window.smartRApp.directive('lineGraph', [
                 tmpByTimeInteger.filterAll();
                 tmpByPatientID.filterAll();
 
-                var patientIDs = byPatientID.top(Infinity);
-                var rowHeight = 1 / patientIDs.length * CAT_PLOTS_HEIGHT;
-                var patientIDFontSize = smartRUtils.scaleFont(
-                    patientIDs[0], {}, rowHeight * 2 / 3, MARGIN.left - 10, 0, 1);
+                var entries = byTimeInteger.bottom(Infinity);
+                var rowHeight = 1 / entries.length * CAT_PLOTS_HEIGHT;
+                var patientIDFontSize = smartRUtils.scaleFont(entries[0].patientID, {}, rowHeight * 2 / 3, MARGIN.left - 10, 0, 1);
 
                 /**
                  * BOX & PATIENTID SECTION
@@ -691,7 +683,7 @@ window.smartRApp.directive('lineGraph', [
 
                     // DATA JOIN
                     var icon = d3.select(this).selectAll('.sr-linegraph-cat-icon')
-                        .data(byBioMarker.top(Infinity), function(d) { return d.id; });
+                        .data(byTimeInteger(Infinity), function(d) { return d.id; });
 
                     // ENTER path
                     icon.enter()
@@ -699,7 +691,7 @@ window.smartRApp.directive('lineGraph', [
                         .attr('class', function(d) {
                             return 'sr-linegraph-cat-icon' +
                                 ' patientid-' + smartRUtils.makeSafeForCSS(d.patientID) +
-                                ' time-' + smartRUtils.makeSafeForCSS(d.timeInteger) +
+                                ' timestring-' + smartRUtils.makeSafeForCSS(d.timeString) +
                                 ' biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker) +
                                 ' subset-' + d.subset;
                         })

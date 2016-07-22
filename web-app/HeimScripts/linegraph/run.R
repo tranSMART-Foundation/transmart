@@ -102,7 +102,7 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
         # if timeString never occured before, assign it a new timeInteger
         if (is.null(timeInteger)) {
             extractedTime <- extractTime(timeString)
-            if (is.null(extractTime)) {
+            if (is.null(extractedTime)) {
                 timeInteger <- length(names(times))
             } else {
                 timeInteger <- extractedTime
