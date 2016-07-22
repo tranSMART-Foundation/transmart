@@ -134,7 +134,7 @@ window.smartRApp.directive('lineGraph', [
             // recomputes x scale for current filters
             function calculateXScale() {
                 tmpByType.filterExact('categoric');
-                var padding = 1 / byPatientID.top(Infinity).length * CAT_PLOTS_HEIGHT;
+                var padding = CAT_PLOTS_HEIGHT ? 1 / byPatientID.top(Infinity).length * CAT_PLOTS_HEIGHT : 10;
                 tmpByType.filterAll();
                 var times = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort(function(a, b) {
                     return a - b;

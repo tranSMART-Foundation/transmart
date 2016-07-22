@@ -51,6 +51,15 @@ getTypes <- function(loaded_variables) {
     as.character(types)
 }
 
+# returns integer of extracted time if possible, NULL otherwise
+extractTime <- function(string) {
+    match <- regmatches(string, regexpr("\\d+", string)) 
+    if (length(match) > 0) {
+        return(as.numeric(match[1]))
+    }
+    NULL
+}
+
 # returns df that is compatible with crossfilter.js
 buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
     # gather information
@@ -69,6 +78,9 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                      subset=integer(),
                      stringsAsFactors=FALSE)
 
+
+    # maps name to numeric time (e.g. "Week 12" to 12)
+    times <- list()
     # build big df step by step via binding row-wise every loaded variable
     for (i in 1:length(names(loaded_variables))) {
         variable <- loaded_variables[[i]]
@@ -85,9 +97,23 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
         split <- strsplit(fullNames[i], "\\\\")[[1]]
         bioMarker <- split[length(split) - 1]
 
+        timeString <- nodeNames[i]
+        timeInteger <- times[timeString][[1]]
+        # if timeString never occured before, assign it a new timeInteger
+        if (is.null(timeInteger)) {
+            extractedTime <- extractTime(timeString)
+            if (is.null(extractTime)) {
+                timeInteger <- length(names(times))
+            } else {
+                timeInteger <- extractedTime
+            }
+            times[timeString] <- timeInteger
+        }
+
         # attach additional information
-        variable.df <- cbind(variable.df, timeInteger=sample(1:10, nrow(variable.df), replace=TRUE), # TODO: use real time value
-                             timeString=rep(nodeNames[i], nrow(variable.df)),
+        variable.df <- cbind(variable.df,
+                             timeInteger=rep(timeInteger, nrow(variable.df)),
+                             timeString=rep(timeString, nrow(variable.df)),
                              bioMarker=rep(bioMarker, nrow(variable.df)),
                              type=rep(types[i], nrow(variable.df)),
                              subset=rep(subsets[i], nrow(variable.df)),
@@ -140,11 +166,9 @@ getStatsForNumericType <- function(df) {
 # time (e.g. 15) and name (e.g. Day 15) must have a 1:1 relationship
 # It is not possible to have multiple times for one name or multiple names for one time
 checkTimeNameSanity <- function(df) {
-    # FIXME: disabled until I have real data
-    return()
     df.without.duplicates <- unique(df[, c("timeInteger", "timeString")])
-    timeSane = nrow(df.without.duplicates) == length(unique(df.without.duplicates$time))
-    nameSane = nrow(df.without.duplicates) == length(unique(df.without.duplicates$name))
+    timeSane = nrow(df.without.duplicates) == length(unique(df.without.duplicates$timeInteger))
+    nameSane = nrow(df.without.duplicates) == length(unique(df.without.duplicates$timeString))
     if (! (timeSane && nameSane)) {
         stop("Node names and assigned time values must have a 1:1 relationship.
              E.g. two nodes Age/Week1, Bloodpressure/Week1, must have both the same assigned time (e.g. 1)")
