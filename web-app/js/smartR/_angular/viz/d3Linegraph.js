@@ -813,7 +813,7 @@ window.smartRApp.directive('lineGraph', [
             renderCategoricPlots();
 
             function highlightTimepoint(timeInteger) {
-                var highlightWidth = document.querySelector('.sr-linegraph-cat-icon').getBBox().width; // HACK
+                var highlightWidth = document.querySelector('.sr-linegraph-time-element rect').getBBox().width; // HACK
                 // DATA JOIN
                 var highlightZone = svg.selectAll('.sr-linegraph-highlight-zone')
                     .data(['left', 'right']);
