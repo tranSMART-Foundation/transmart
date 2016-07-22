@@ -195,6 +195,9 @@ window.smartRApp.directive('lineGraph', [
                 dataCF.remove();
                 byTimeInteger.filterAll();
 
+                d3.select('.sr-linegraph-time-element.timestring-' + smartRUtils.makeSafeForCSS(fromEntries[0].timeString))
+                    .attr('transform', 'translate(' + (x(toTimeInteger)) + ',' + (TICK_HEIGHT) + ')');
+
                 fromEntries.forEach(function(d) { d.timeInteger = toTimeInteger; });
                 toEntries.forEach(function(d) { d.timeInteger = fromTimeInteger; });
 
@@ -245,13 +248,17 @@ window.smartRApp.directive('lineGraph', [
                         });
                         var timeIntegerHovered = matchingTimeZones[0].timeInteger;
                         if (timeIntegerHovered !== draggedEl.timeInteger) {
+                            console.log(draggedEl.timeInteger);
+                            console.log('hovered', timeIntegerHovered);
                             var indexHovered = timeIntegers.indexOf(timeIntegerHovered);
                             var indexDragged = timeIntegers.indexOf(draggedEl.timeInteger);
-                            moveTimePoint(indexHovered, indexDragged);
+                            moveTimePoint(timeIntegerHovered, draggedEl.timeInteger);
+                            draggedEl.timeInteger = timeIntegerHovered;
                         }
                     })
                     .on('dragend', function(draggedEl) {
                         moveTimePoint(draggedEl.timeInteger, draggedEl.timeInteger);
+                        updateXAxis();
                         renderNumericPlots();
                         renderCategoricPlots();
                     });
