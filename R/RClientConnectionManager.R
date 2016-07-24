@@ -137,7 +137,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     oauthResponse <- .transmartServerGetRequest(path, onlyContent=F, post.body=post.body)
     statusString <- paste("status code ", oauthResponse$status, ": ", oauthResponse$headers[['statusMessage']], sep='')
     if (!oauthResponse$JSON) {
-        cat(action, " failed, could not parse server response of type ", oauthResponse$headers[['Content-Type']], ". ", statusString, "\n", sep='')
+        cat(action, " failed, could not parse server response of type ", oauthResponse$headers$`content-type`, ". ", statusString, "\n", sep='')
         return(NULL)
     }
     if ('error' %in% names(oauthResponse$content)) {
@@ -241,7 +241,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
             return(errorHandler(errmsg, result))
         }
         if(ensureJSON && !result$JSON) {
-            return(errorHandler(paste("No JSON returned but", result$headers[['Content-Type']]), result))
+            return(errorHandler(paste("No JSON returned but type", result$headers$`content-type`), result))
         }
         return(result$content)
     }
@@ -252,7 +252,7 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     if(! 'content-type' %in% names(headers)) {
         return('content-type header not found')
     }
-    h <- headers[['content-type']]
+    h <- headers$`content-type`
     if(grepl("^application/json(;|\\W|$)", h)) {
         return('json')
     }
