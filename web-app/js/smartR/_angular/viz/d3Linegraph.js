@@ -209,10 +209,6 @@ window.smartRApp.directive('lineGraph', [
                 dataCF.remove();
                 byTimeInteger.filterAll();
 
-                // FIXME: This shouldn't be here, but in the drag
-                d3.select('.sr-linegraph-time-element.timestring-' + smartRUtils.makeSafeForCSS(fromEntries[0].timeString))
-                    .attr('transform', 'translate(' + (x(toTimeInteger)) + ',' + (TICK_HEIGHT) + ')');
-
                 fromEntries.forEach(function(d) { d.timeInteger = toTimeInteger; });
                 toEntries.forEach(function(d) { d.timeInteger = fromTimeInteger; });
 
@@ -239,7 +235,7 @@ window.smartRApp.directive('lineGraph', [
                     var left = i === 0 ? 0 : x(d.timeInteger) - (x(d.timeInteger) - x(timeAxisData[i-1].timeInteger)) / 2;
                     var right = i === timeAxisData.length - 1 ? 
                         LINEGRAPH_WIDTH : x(d.timeInteger) + (x(timeAxisData[i+1].timeInteger) - x(d.timeInteger)) / 2;
-                    return {left: left, right: right, timeInteger: d.timeInteger};
+                    return {left: left, right: right, timeInteger: d.timeInteger, timeString: d.timeString};
                 });
 
                 var timeIntegers = timeZones.map(function(d) { return d.timeInteger; });
@@ -255,8 +251,13 @@ window.smartRApp.directive('lineGraph', [
                             return timeZone.left <= newX && newX <= timeZone.right;
                         });
                         var timeIntegerDestination = matchingTimeZones[0].timeInteger;
+                        var timeStringDestination = matchingTimeZones[0].timeString;
                         var timeIntegerOrigin = draggedEl.timeInteger;
                         if (timeIntegerDestination !== timeIntegerOrigin) {
+                            // move hovered element to its new position
+                            d3.select('.sr-linegraph-time-element.timestring-' + smartRUtils.makeSafeForCSS(timeStringDestination))
+                                .attr('transform', 'translate(' + (x(timeIntegerOrigin)) + ',' + (TICK_HEIGHT) + ')');
+
                             var indexDestination = timeIntegers.indexOf(timeIntegerDestination);
                             var indexOrigin = timeIntegers.indexOf(timeIntegerOrigin);
 
@@ -579,7 +580,13 @@ window.smartRApp.directive('lineGraph', [
                         // ENTER rect
                         boxplotEnter.append('rect')
                             .on('mouseover', function(d) {
-                                tip.show(d); // TODO
+                                var html = '';
+                                for (var key in d) {
+                                    if (d.hasOwnProperty(key)) {
+                                        html += key + ': ' + d[key] + '<br/>';
+                                    }
+                                }
+                                tip.show(html);
                             })
                             .on('mouseout', function() {
                                 tip.hide();
@@ -744,7 +751,13 @@ window.smartRApp.directive('lineGraph', [
                         })
                         .style('fill', function(d) { return iconGen(d.bioMarker).fill; })
                         .on('mouseover', function(d) {
-                            tip.show(JSON.stringify(d)); // TODO
+                            var html = '';
+                            for (var key in d) {
+                                if (d.hasOwnProperty(key)) {
+                                    html += key + ': ' + d[key] + '<br/>';
+                                }
+                            }
+                            tip.show(html);
                         })
                         .on('mouseout', function() {
                             tip.hide();
