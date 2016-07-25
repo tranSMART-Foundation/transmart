@@ -107,6 +107,6 @@
 }
 
 .sr-linegraph-time-element > polygon {
-    stroke: none;
-    visibility: hidden;
+    fill: cyan;
+    opacity: 0.8;
 }
