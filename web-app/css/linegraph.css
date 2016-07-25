@@ -105,3 +105,8 @@
     cursor: move;
     stroke: black;
 }
+
+.sr-linegraph-time-element > polygon {
+    stroke: none;
+    visibility: hidden;
+}

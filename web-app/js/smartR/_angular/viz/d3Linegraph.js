@@ -306,8 +306,26 @@ window.smartRApp.directive('lineGraph', [
                 timeAxisElementEnter.append('rect')
                     .on('mouseenter', function(d) {
                         highlightTimepoint(d.timeInteger);
+                        d3.select(this.parentNode).selectAll('polygon')
+                            .style('visibility', 'visible');
                     })
-                    .on('mouseleave', disableHighlightTimepoint);
+                    .on('mouseleave', function() {
+                        disableHighlightTimepoint();
+                        d3.select(this.parentNode).selectAll('polygon')
+                            .style('visibility', 'hidden');
+                    });
+
+                // ENTER polygon (right)
+                timeAxisElementEnter.append('polygon')
+                    .attr('points', (timeAxisElementWidth / 2)+ ',' + 0 + ' ' +
+                        (timeAxisElementWidth / 2) + ',' + (MARGIN.bottom / 2) + ' ' +
+                        (timeAxisElementWidth / 2 + 20) + ',' + (MARGIN.bottom * 1/4));
+
+                // ENTER polygon (left)
+                timeAxisElementEnter.append('polygon')
+                    .attr('points', (- timeAxisElementWidth / 2)+ ',' + 0 + ' ' +
+                        (- timeAxisElementWidth / 2) + ',' + (MARGIN.bottom / 2) + ' ' +
+                        (- timeAxisElementWidth / 2 - 20) + ',' + (MARGIN.bottom * 1/4));
 
                 // UPDATE g
                 timeAxisElement.attr('transform', function(d) {
