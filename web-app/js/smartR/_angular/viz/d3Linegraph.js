@@ -238,6 +238,7 @@ window.smartRApp.directive('lineGraph', [
                 var timeIntegers = timeZones.map(function(d) { return d.timeInteger; });
                 var drag = d3.behavior.drag()
                     .on('drag', function(draggedEl) {
+                        permitHighlight = false;
                         var newX = d3.event.x;
                         newX = newX < 0 ? 0 : newX;
                         newX = newX > LINEGRAPH_WIDTH ? LINEGRAPH_WIDTH : newX;
@@ -275,6 +276,8 @@ window.smartRApp.directive('lineGraph', [
                         updateXAxis();
                         renderNumericPlots();
                         renderCategoricPlots();
+                        permitHighlight = true;
+                        highlightTimepoint(draggedEl.timeInteger);
                     });
 
                 // DATA JOIN
@@ -825,7 +828,12 @@ window.smartRApp.directive('lineGraph', [
             }
             renderCategoricPlots();
 
+            var permitHighlight = true;
             function highlightTimepoint(timeInteger) {
+                if (! permitHighlight) {
+                    disableHighlightTimepoint();
+                    return;
+                }
                 var highlightWidth = document.querySelector('.sr-linegraph-time-element rect').getBBox().width; // HACK
                 // DATA JOIN
                 var highlightZone = svg.selectAll('.sr-linegraph-highlight-zone')
