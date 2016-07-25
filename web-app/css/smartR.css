@@ -24,7 +24,7 @@
     color: red;
 }
 
-#smartRPanel > * {
+#smartRPanel text {
     font-family: 'Roboto', sans-serif; !important;
 }
 
