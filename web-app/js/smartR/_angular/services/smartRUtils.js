@@ -166,14 +166,18 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
      */
 
     // fast unique()
-    service.unique = function(arr) {
+    service.unique = function(arr, callback) {
+        callback = typeof callback === 'undefined' ? function(d) { return d; } : callback;
         var a = [];
+        var uniqArr = [];
         for (var i = 0, l = arr.length; i < l; i++) {
-            if (a.indexOf(arr[i]) === -1 && arr[i] !== '') {
-                a.push(arr[i]);
+            var value = callback(arr[i]);
+            if (a.indexOf(value) === -1) {
+                a.push(value);
+                uniqArr.push(arr[i]);
             }
         }
-        return a;
+        return uniqArr;
     };
 
     return service;

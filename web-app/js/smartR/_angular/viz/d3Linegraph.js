@@ -157,10 +157,16 @@ window.smartRApp.directive('lineGraph', [
             updateShownPatients();
 
             function getValuesForDimension(dimension, ascendingOrder) {
+
+                var values = [];
                 if (typeof ascendingOrder === 'undefined' || !ascendingOrder) {
-                    return dimension.top(Infinity).map(function(record) { return dimension.accessor(record); });
+                    values = dimension.top(Infinity).map(function(record) { return dimension.accessor(record); });
+                } else {
+                    values =dimension.bottom(Infinity).map(function(record) { return dimension.accessor(record); });
                 }
-                return dimension.bottom(Infinity).map(function(record) { return dimension.accessor(record); });
+
+
+                return values;
             }
 
             var svg = d3.select(vizDiv).append('svg')
@@ -182,6 +188,7 @@ window.smartRApp.directive('lineGraph', [
 
             // WARNING: using this function will reset all global filters to make sure all data are modified correctly
             function swapTimeIntegerData(fromTimeInteger, toTimeInteger) {
+
                 byPatientID.filterAll();
                 byBioMarker.filterAll();
                 byTimeInteger.filterAll();
@@ -204,6 +211,7 @@ window.smartRApp.directive('lineGraph', [
 
                 dataCF.add(fromEntries);
                 dataCF.add(toEntries);
+
             }
 
             function updateXAxis() {
@@ -251,6 +259,7 @@ window.smartRApp.directive('lineGraph', [
                             var indexDestination = timeIntegers.indexOf(timeIntegerDestination);
                             var indexOrigin = timeIntegers.indexOf(timeIntegerOrigin);
 
+                            // if two consecutive drag events are fired with a distance > 1 then this loop handles this scenario properly
                             var dist = 0;
                             while (Math.abs(dist = indexOrigin - indexDestination) > 0) {
                                 var nextIntermediateIndex = indexDestination;
@@ -500,21 +509,19 @@ window.smartRApp.directive('lineGraph', [
 
                     // Render timeline elements for each subset ---
                     var subsets = smartRUtils.unique(getValuesForDimension(bySubset));
+                    // FIXME: Is this loop really necessary?
                     subsets.forEach(function(subset){
                         bySubset.filterExact(subset);
 
                         // Generate data for timeline elements ---
                         
-                        var boxplotData = byTimeInteger.bottom(Infinity).map(function(d) {
-                            tmpByTimeInteger.filterExact(d.timeInteger);
-
-                            var data = byTimeInteger.bottom(1)[0];
-                            var value = data[valueKey];
-                            var errorBar = data[errorBarKey];
-
+                        var boxplotData = smartRUtils.unique(byTimeInteger.bottom(Infinity), function(d) {
+                            return d.timeInteger;
+                        }).map(function(d) {
+                            var value = d[valueKey];
+                            var errorBar = d[errorBarKey];
                             return {timeInteger: d.timeInteger, timeString: d.timeString, errorBar: errorBar, value: value};
                         });
-                        tmpByTimeInteger.filterAll();
                         // --- Generate data for timeline elements
 
                         var lineGen = d3.svg.line()
@@ -577,12 +584,13 @@ window.smartRApp.directive('lineGraph', [
                     });
                     bySubset.filterAll();
                     // --- Render timeline elements for each subset
-
+                    
                     tmpByBioMarker.filterAll();
                 });
                 // --- Add items to each numbox
 
                 tmpByType.filterAll();
+
             }
             renderNumericPlots();
 
