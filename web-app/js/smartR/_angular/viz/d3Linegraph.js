@@ -239,6 +239,7 @@ window.smartRApp.directive('lineGraph', [
                 });
 
                 var timeIntegers = timeZones.map(function(d) { return d.timeInteger; });
+                var timeStrings = timeZones.map(function(d) { return d.timeStrings; });
                 var drag = d3.behavior.drag()
                     .on('drag', function(draggedEl) {
                         permitHighlight = false;
@@ -251,13 +252,8 @@ window.smartRApp.directive('lineGraph', [
                             return timeZone.left <= newX && newX <= timeZone.right;
                         });
                         var timeIntegerDestination = matchingTimeZones[0].timeInteger;
-                        var timeStringDestination = matchingTimeZones[0].timeString;
                         var timeIntegerOrigin = draggedEl.timeInteger;
                         if (timeIntegerDestination !== timeIntegerOrigin) {
-                            // move hovered element to its new position
-                            d3.select('.sr-linegraph-time-element.timestring-' + smartRUtils.makeSafeForCSS(timeStringDestination))
-                                .attr('transform', 'translate(' + (x(timeIntegerOrigin)) + ',' + (TICK_HEIGHT) + ')');
-
                             var indexDestination = timeIntegers.indexOf(timeIntegerDestination);
                             var indexOrigin = timeIntegers.indexOf(timeIntegerOrigin);
 
@@ -270,6 +266,11 @@ window.smartRApp.directive('lineGraph', [
                                 } else if (dist < -1) {
                                     nextIntermediateIndex = indexOrigin + 1;
                                 }
+
+                                // move hovered element to its new position
+                                d3.select('.sr-linegraph-time-element.timestring-' +
+                                        smartRUtils.makeSafeForCSS(timeStrings[nextIntermediateIndex]))
+                                    .attr('transform', 'translate(' + (x(timeIntegerOrigin)) + ',' + (TICK_HEIGHT) + ')');
 
                                 swapTimeIntegerData(timeIntegers[indexOrigin], timeIntegers[nextIntermediateIndex]);
                                 draggedEl.timeInteger = timeIntegers[nextIntermediateIndex];
