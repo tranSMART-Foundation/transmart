@@ -521,6 +521,7 @@ window.smartRApp.directive('lineGraph', [
                     axisEnter.append('text')
                         .attr('text-anchor', 'middle')
                         .attr('transform', 'translate(' + (-30) + ',' + (numPlotBoxHeight / 2) + ')rotate(-90)')
+                        .attr('font-size', function(d) { return smartRUtils.scaleFont(d, {}, 20, numPlotBoxHeight, 0, 2); })
                         .text(function(d) { return d; });
 
                     // UPDATE g
