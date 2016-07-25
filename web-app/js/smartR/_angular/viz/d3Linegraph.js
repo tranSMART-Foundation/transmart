@@ -215,14 +215,7 @@ window.smartRApp.directive('lineGraph', [
             }
 
             function updateXAxis() {
-                // temporary dimension because we don't want to affect the time filter
-                var timeAxisData = [];
-                smartRUtils.unique(getValuesForDimension(byTimeInteger, true)).forEach(function(timeInteger) {
-                    tmpByTimeInteger.filterExact(timeInteger);
-                    var timeString = byTimeInteger.bottom(1)[0].timeString;
-                    timeAxisData.push({timeInteger: timeInteger, timeString: timeString});
-                });
-                tmpByTimeInteger.filterAll();
+                var timeAxisData = smartRUtils.unique(byTimeInteger.bottom(Infinity), function(d) { return d.timeInteger; });
 
                 var potentialSpacePerTimeAxisElement = LINEGRAPH_WIDTH / timeAxisData.length;
                 var timeAxisElementWidth = potentialSpacePerTimeAxisElement > MAX_XAXIS_ELEMENT_WIDTH ?
@@ -602,13 +595,14 @@ window.smartRApp.directive('lineGraph', [
                 }
                 var iconSize = 1 / byTimeInteger.bottom(Infinity).length * CAT_PLOTS_HEIGHT;
 
+                // FIXME: make use of the new unique callback to improve performance
                 var catPlotInfo = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
                     tmpByPatientID.filterExact(patientID);
                     var maxCount = 0;
                     var times = smartRUtils.unique(getValuesForDimension(byTimeInteger));
                     times.forEach(function(time) {
                         tmpByTimeInteger.filterExact(time);
-                        var count = byTimeInteger(Infinity).length;
+                        var count = byTimeInteger.bottom(Infinity).length;
                         maxCount = count > maxCount ? count : maxCount;
                         // we need to disable this filter temporarily, otherwise it will affect the next iteration step
                         tmpByTimeInteger.filterAll();
@@ -710,7 +704,7 @@ window.smartRApp.directive('lineGraph', [
 
                     // DATA JOIN
                     var icon = d3.select(this).selectAll('.sr-linegraph-cat-icon')
-                        .data(byTimeInteger(Infinity), function(d) { return d.id; });
+                        .data(byTimeInteger.bottom(Infinity), function(d) { return d.id; });
 
                     // ENTER path
                     icon.enter()
