@@ -1,112 +1,150 @@
-.sr-linegraph-x-axis path,
+#visualisation {
+    background-color: rgb(24, 24, 24);
+}
+
+/* all text elements */
+#visualisation text {
+    fill: rgb(145, 145, 145);
+}
+
+/* axis itself */
+.sr-linegraph-x-axis path {
+    fill: none;
+}
+
+/* axis ticks */
 .sr-linegraph-x-axis line {
     fill: none;
-    stroke: black;
+    stroke: rgb(52, 52, 52);
     stroke-width: 1px;
 }
 
-.sr-linegraph-y-axis path,
+/* axis itself */
+.sr-linegraph-y-axis path {
+    fill: none;
+    stroke: none;
+}
+
+/* axis ticks */
 .sr-linegraph-y-axis line {
     fill: none;
-    stroke: black;
+    stroke: rgb(52, 52, 52);
     stroke-width: 1px;
-    shape-rendering: crispEdges;
 }
 
+/* all boxes of cat plot */
 .sr-linegraph-cat-plot rect {
-    stroke: black;
-    stroke-width: 1px;
-    shape-rendering: crispEdges;
-}
-
-.sr-linegraph-cat-plot path {
     fill: none;
-    stroke: black;
-    stroke-width: 1px;
+    stroke: rgb(145,145,145);
+}
+
+/* subset 1 boxes of cat plot */
+.sr-linegraph-cat-plot.subset-1 rect{
+    fill: rgba(43, 156, 34, 0.4);
+}
+
+/* subset 2 boxes of cat plot */
+.sr-linegraph-cat-plot.subset-2 rect{
+    fill: rgba(217, 54, 51, 0.4);
+}
+
+/* patient id seperators on the left */
+.sr-linegraph-cat-icon {
+}
+
+/* icons of cat plot */
+.sr-linegraph-cat-icon {
+    stroke: none;
     shape-rendering: crispEdges;
 }
-
-.sr-workflow-controls>div {
-    float: right;
-    padding: 5px 15px 5px 15px;
-}
-
-.sr-linegraph-cat-icon {
-    stroke: green;
-}
-
 .sr-linegraph-cat-icon:hover {
-    opacity: 0.5;
-}
 
+}
+/* special class for icon hl */
 .icon-highlight {
-    opacity: 0.5;
 }
 
+/* arrows for scrolling up and down */
 .sr-linegraph-shift-element {
-
+    fill: rgb(38, 38, 38);
+    stroke: rgb(67, 67, 67);
 }
-
 .sr-linegraph-shift-element:hover {
-    opacity: 0.5;
+    fill: rgb(45, 45, 45);
     cursor: pointer;
 }
 
-.sr-linegraph-num-plot>rect {
+/* all boxes for num plots */
+.sr-linegraph-num-plot>rect:not(.legend) {
     fill: none;
-    stroke: black;
+    stroke: rgb(145, 145, 145);
     stroke-width: 1px;
     shape-rendering: crispEdges;
 }
 
+/* legend rects for subset 1 */
+.sr-linegraph-num-plot rect.legend.subset-1 {
+    fill: rgb(43, 156, 34);
+}
+
+/* legend rects for subset 1 */
+.sr-linegraph-num-plot rect.legend.subset-2 {
+    fill: rgb(217, 54, 51);
+}
+
+/* boxplots */
 .sr-linegraph-boxplot rect {
     stroke-width: 1px;
     shape-rendering: crispEdges;
 }
-
-.sr-linegraph-boxplot rect:hover {
-    stroke: black !important;
-}
-
 .sr-linegraph-boxplot.subset-1 rect {
     stroke: none;
-    fill: #99FF99;
+    fill: rgb(43, 156, 34);
 }
 
 .sr-linegraph-boxplot.subset-2 rect {
     stroke: none;
-    fill: #FF9999;
+    fill: rgb(217, 54, 51);
+}
+.sr-linegraph-boxplot rect:hover {
+    stroke: rgb(145, 145, 145) !important;
 }
 
+/* connection line between boxplots */
 .sr-linegraph-timeline {
     fill: none;
     stroke-width: 2px;
 }
-
 .sr-linegraph-timeline.subset-1 {
-    stroke: #99FF99;
+    stroke: rgb(43, 156, 34);
 }
-
 .sr-linegraph-timeline.subset-2 {
-    stroke: #FF9999;
+    stroke: rgb(217, 54, 51);
 }
 
+/* fields that appear when we hover over an axis element */
 .sr-linegraph-highlight-zone {
-    fill: black;
+    fill: rgb(145, 145, 145);
     stroke: none;
     opacity: 0.4;
 }
 
+/* invisible axis box to catch mouse events */
 .sr-linegraph-time-element > rect {
     opacity: 0;
 }
-
 .sr-linegraph-time-element > rect:hover {
     cursor: move;
-    stroke: black;
 }
 
+/* arrows that appear left and right when hovering over axis element */
 .sr-linegraph-time-element > polygon {
     fill: cyan;
     opacity: 0.8;
+}
+
+/* control panel */
+.sr-workflow-controls>div {
+    float: right;
+    padding: 5px 15px 5px 15px;
 }

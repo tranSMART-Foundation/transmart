@@ -276,8 +276,6 @@ window.smartRApp.directive('lineGraph', [
                                 draggedEl.timeInteger = timeIntegers[nextIntermediateIndex];
                                 indexOrigin = nextIntermediateIndex;
                             }
-
-                            updateXAxis();
                         }
                     })
                     .on('dragend', function(draggedEl) {
@@ -462,19 +460,19 @@ window.smartRApp.directive('lineGraph', [
 
                 // ENTER rect (legend cohort 1)
                 numPlotBoxEnter.append('rect')
+                    .attr('class', 'legend subset-1')
                     .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET)
                     .attr('y', numPlotBoxHeight / 2 - LEGEND_ITEM_SIZE)
                     .attr('height', LEGEND_ITEM_SIZE)
-                    .attr('width', LEGEND_ITEM_SIZE)
-                    .style('fill', '#CCFFCC');
+                    .attr('width', LEGEND_ITEM_SIZE);
 
                 // ENTER rect (legend cohort 2)
                 numPlotBoxEnter.append('rect')
+                    .attr('class', 'legend subset-2')
                     .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET)
                     .attr('y',  numPlotBoxHeight / 2 + LEGEND_ITEM_SIZE)
                     .attr('height', LEGEND_ITEM_SIZE)
-                    .attr('width', LEGEND_ITEM_SIZE)
-                    .style('fill', '#FFCCCC');
+                    .attr('width', LEGEND_ITEM_SIZE);
 
                 // ENTER text (legend cohort 1)
                 numPlotBoxEnter.append('text')
@@ -500,12 +498,19 @@ window.smartRApp.directive('lineGraph', [
                     // Compute y ---
                     var upperBounds = byTimeInteger.bottom(Infinity).map(function(d) { return d[valueKey] + d[errorBarKey]; });
                     var lowerBounds = byTimeInteger.bottom(Infinity).map(function(d) { return d[valueKey] - d[errorBarKey]; });
+                    var boundaries = d3.extent(upperBounds.concat(lowerBounds));
                     var y = d3.scale.linear()
-                        .domain(d3.extent(upperBounds.concat(lowerBounds)).reverse())
-                        .range([0, numPlotBoxHeight]);
+                        .domain(boundaries.slice().reverse())
+                        .range([10, numPlotBoxHeight - 10]);
                     var yAxis = d3.svg.axis()
                         .scale(y)
-                        .orient('left');
+                        .orient('left')
+                        .tickValues(function() {
+                            var stepSize = (boundaries[1] - boundaries[0]) / 8;
+                            return d3.range(boundaries[0], boundaries[1] + stepSize, stepSize);
+                        })
+                        .innerTickSize(- LINEGRAPH_WIDTH);
+
                     // --- Compute y
 
                     // Render y axis ---
@@ -622,6 +627,7 @@ window.smartRApp.directive('lineGraph', [
             }
             renderNumericPlots();
 
+            // FIXME: subset is very wrong in here
             function renderCategoricPlots() {
                 tmpByType.filterExact('categoric');
                 if (byTimeInteger.bottom(Infinity).length === 0) {
@@ -679,12 +685,7 @@ window.smartRApp.directive('lineGraph', [
 
                 // ENTER rec
                 catPlotEnter.append('rect')
-                    .attr('width', LINEGRAPH_WIDTH)
-                    .attr('fill', function(d) {
-                        if (d.subset.length === 2) { return '#FFFFCC'; }
-                        if (d.subset[0] === 1) { return '#CCFFCC'; }
-                        return '#FFCCCC';
-                    });
+                    .attr('width', LINEGRAPH_WIDTH);
 
                 // ENTER path
                 catPlotEnter.append('path');
