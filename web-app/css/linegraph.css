@@ -10,6 +10,7 @@
 /* axis itself */
 .sr-linegraph-x-axis path {
     fill: none;
+    stroke: none;
 }
 
 /* axis ticks */
@@ -77,9 +78,7 @@
 /* all boxes for num plots */
 .sr-linegraph-num-plot>rect:not(.legend) {
     fill: none;
-    stroke: rgb(145, 145, 145);
-    stroke-width: 1px;
-    shape-rendering: crispEdges;
+    stroke: none;
 }
 
 /* legend rects for subset 1 */

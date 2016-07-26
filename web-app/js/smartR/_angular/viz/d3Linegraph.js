@@ -57,7 +57,7 @@ window.smartRApp.directive('lineGraph', [
 
             var ERROR_BAR_WIDTH = 5;
             var MAX_XAXIS_ELEMENT_WIDTH = 40;
-            var TICK_HEIGHT = 8;
+            var TICK_HEIGHT = 0;
 
             /**
              * In this section where we compute the plot sizes
@@ -71,6 +71,8 @@ window.smartRApp.directive('lineGraph', [
             var numDataDoExist = numBoxes > 0;
             tmpByType.filterAll();
 
+            var NUM_PLOT_PADDING = 50;
+
             var CAT_PLOTS_HEIGHT = 0;
             var NUM_PLOTS_HEIGHT = 0;
             var CAT_PLOTS_POS = 0;
@@ -79,6 +81,9 @@ window.smartRApp.directive('lineGraph', [
 
             var MAX_CAT_BOX_HEIGHT = 30;
             var MAX_NUM_BOX_HEIGHT = 200;
+
+            // TODO: Pretty sure the code below can be simplified
+
             if (catDataDoExist && !numDataDoExist) {
                 if (LINEGRAPH_HEIGHT / catBoxes > MAX_CAT_BOX_HEIGHT) {
                     CAT_PLOTS_HEIGHT = MAX_CAT_BOX_HEIGHT * catBoxes;
@@ -88,7 +93,7 @@ window.smartRApp.directive('lineGraph', [
                 TIME_AXIS_POS = CAT_PLOTS_POS + CAT_PLOTS_HEIGHT;
             } else if (!catDataDoExist && numDataDoExist) {
                 if (LINEGRAPH_HEIGHT / numBoxes > MAX_NUM_BOX_HEIGHT) {
-                    NUM_PLOTS_HEIGHT = MAX_NUM_BOX_HEIGHT * numBoxes;
+                    NUM_PLOTS_HEIGHT = (MAX_NUM_BOX_HEIGHT + NUM_PLOT_PADDING) * numBoxes;
                 } else {
                     NUM_PLOTS_HEIGHT = LINEGRAPH_HEIGHT;
                 }
@@ -101,7 +106,7 @@ window.smartRApp.directive('lineGraph', [
                 }
 
                 if (LINEGRAPH_HEIGHT / 2 / numBoxes > MAX_NUM_BOX_HEIGHT) {
-                    NUM_PLOTS_HEIGHT = MAX_NUM_BOX_HEIGHT * numBoxes;
+                    NUM_PLOTS_HEIGHT = (MAX_NUM_BOX_HEIGHT + NUM_PLOT_PADDING) * numBoxes;
                 } else {
                     NUM_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2;
                 }
@@ -231,7 +236,7 @@ window.smartRApp.directive('lineGraph', [
                     .scale(x)
                     .tickFormat('')
                     .tickValues(timeAxisData.map(function(d) { return d.timeInteger; }))
-                    .tickSize(TICK_HEIGHT, 0);
+                    .innerTickSize(- NUM_PLOTS_HEIGHT);
                 d3.select('.sr-linegraph-x-axis')
                     .call(xAxis);
 
@@ -442,7 +447,7 @@ window.smartRApp.directive('lineGraph', [
                 var bioMarkers = smartRUtils.unique(getValuesForDimension(byBioMarker))
                     .sort(function(a, b) { return a.localeCompare(b); }); // for determinism
 
-                var numPlotBoxHeight = NUM_PLOTS_HEIGHT / bioMarkers.length;
+                var numPlotBoxHeight = (NUM_PLOTS_HEIGHT - bioMarkers.length * NUM_PLOT_PADDING) / bioMarkers.length;
 
                 // DATA JOIN
                 var numPlotBox = svg.selectAll('.sr-linegraph-num-plot')
@@ -454,7 +459,7 @@ window.smartRApp.directive('lineGraph', [
                     .attr('class', function(d) { return 'sr-linegraph-num-plot biomarker-' + smartRUtils.makeSafeForCSS(d); })
                     .attr('transform', function(d) {
                         return 'translate(' + 0 + ',' +
-                            (NUM_PLOTS_POS + bioMarkers.indexOf(d) * numPlotBoxHeight) + ')';
+                            (NUM_PLOTS_POS + bioMarkers.indexOf(d) * (numPlotBoxHeight + NUM_PLOT_PADDING)) + ')';
                     });
 
                 // ENTER rect (box)
@@ -505,7 +510,7 @@ window.smartRApp.directive('lineGraph', [
                     var boundaries = d3.extent(upperBounds.concat(lowerBounds));
                     var y = d3.scale.linear()
                         .domain(boundaries.slice().reverse())
-                        .range([10, numPlotBoxHeight - 10]);
+                        .range([0, numPlotBoxHeight]);
                     var yAxis = d3.svg.axis()
                         .scale(y)
                         .orient('left')
