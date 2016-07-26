@@ -139,7 +139,9 @@ window.smartRApp.directive('lineGraph', [
             // recomputes x scale for current filters
             function calculateXScale() {
                 tmpByType.filterExact('categoric');
-                var padding = CAT_PLOTS_HEIGHT ? 1 / byTimeInteger.bottom(Infinity).length * CAT_PLOTS_HEIGHT : 10;
+                var padding = CAT_PLOTS_HEIGHT ?
+                    1 / byTimeInteger.bottom(Infinity).length * CAT_PLOTS_HEIGHT :
+                    MAX_XAXIS_ELEMENT_WIDTH / 2;
                 tmpByType.filterAll();
                 var times = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort(function(a, b) {
                     return a - b;
@@ -342,9 +344,11 @@ window.smartRApp.directive('lineGraph', [
                     });
 
                 // UPDATE g
-                timeAxisElement.attr('transform', function(d) {
-                    return 'translate(' + (x(d.timeInteger)) + ',' + (TICK_HEIGHT) + ')';
-                });
+                timeAxisElement.transition()
+                    .duration(500)
+                    .attr('transform', function(d) {
+                        return 'translate(' + (x(d.timeInteger)) + ',' + (TICK_HEIGHT) + ')';
+                    });
 
                 // UPDATE rect
                 timeAxisElement.select('rect')
