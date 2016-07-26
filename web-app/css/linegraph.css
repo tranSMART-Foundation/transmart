@@ -106,7 +106,7 @@
     fill: rgb(217, 54, 51);
 }
 .sr-linegraph-boxplot rect:hover {
-    stroke: rgb(145, 145, 145) !important;
+    opacity: 0.5;
 }
 
 /* connection line between boxplots */
@@ -146,4 +146,13 @@
 .sr-workflow-controls>div {
     float: right;
     padding: 5px 15px 5px 15px;
+}
+
+.d3-tip {
+    background: rgba(145, 145, 145, 0.8) !important;
+    color: #000 !important;
+}
+
+.d3-tip:after {
+    color: rgba(145, 145, 145, 0.8) !important;
 }
