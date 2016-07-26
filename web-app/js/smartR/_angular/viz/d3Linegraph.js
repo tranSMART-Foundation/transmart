@@ -471,42 +471,54 @@ window.smartRApp.directive('lineGraph', [
                     .attr('width', LINEGRAPH_WIDTH)
                     .attr('height', numPlotBoxHeight);
 
-                // ENTER rect (legend cohort 1)
-                numPlotBoxEnter.append('rect')
-                    .attr('class', 'legend subset-1')
-                    .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET)
-                    .attr('y', numPlotBoxHeight / 2 - LEGEND_ITEM_SIZE)
-                    .attr('height', LEGEND_ITEM_SIZE)
-                    .attr('width', LEGEND_ITEM_SIZE);
-
-                // ENTER rect (legend cohort 2)
-                numPlotBoxEnter.append('rect')
-                    .attr('class', 'legend subset-2')
-                    .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET)
-                    .attr('y',  numPlotBoxHeight / 2 + LEGEND_ITEM_SIZE)
-                    .attr('height', LEGEND_ITEM_SIZE)
-                    .attr('width', LEGEND_ITEM_SIZE);
-
-                // ENTER text (legend cohort 1)
-                numPlotBoxEnter.append('text')
-                    .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET + LEGEND_ITEM_SIZE + 5)
-                    .attr('y', numPlotBoxHeight / 2 - LEGEND_ITEM_SIZE * (1 - 0.5))
-                    .attr('dy', '.35em')
-                    .style('font-size', '15px')
-                    .text('Cohort 1');
-
-                // ENTER text (legend cohort 1)
-                numPlotBoxEnter.append('text')
-                    .attr('x', LINEGRAPH_WIDTH + LEGEND_OFFSET + LEGEND_ITEM_SIZE + 5)
-                    .attr('y', numPlotBoxHeight / 2 + LEGEND_ITEM_SIZE * (1 + 0.5))
-                    .attr('dy', '.35em')
-                    .style('font-size', '15px')
-                    .text('Cohort 2');
-
                 // Add items to each numbox ---
                 d3.selectAll('.sr-linegraph-num-plot').each(function(bioMarker) {
                     var currentNumPlot = d3.select(this);
                     tmpByBioMarker.filterExact(bioMarker);
+
+                    // Add legend items ---
+                    // DATA JOIN
+                    var numPlotLegend = currentNumPlot.selectAll('.sr-linegraph-num-legend')
+                        .data([1,2], function(d) { return d; });
+
+                    // ENTER g
+                    var numPlotLegendEnter = numPlotLegend.enter()
+                        .append('g')
+                        .attr('class', function(d) { return 'sr-linegraph-num-legend subset-' + d; })
+                        .attr('transform', function(d) {
+                            return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
+                                (numPlotBoxHeight / 2 + (d === 1 ? - LEGEND_ITEM_SIZE : LEGEND_ITEM_SIZE)) + ')';
+                        });
+
+                    // ENTER rect
+                    numPlotLegendEnter.append('rect')
+                        .attr('height', LEGEND_ITEM_SIZE)
+                        .attr('width', LEGEND_ITEM_SIZE)
+                        .on('mouseover', function(d) { 
+                            d3.selectAll('.sr-linegraph-boxplot').filter(function() {
+                                var that = d3.select(this);
+                                return !that.classed('bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker)) ||
+                                    !that.classed('subset-' + smartRUtils.makeSafeForCSS(d));
+                            }).classed('timeline-lowlight', true);
+                            d3.selectAll('.sr-linegraph-timeline').filter(function() {
+                                var that = d3.select(this);
+                                return !that.classed('bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker)) ||
+                                    !that.classed('subset-' + smartRUtils.makeSafeForCSS(d));
+                            }).classed('timeline-lowlight', true);
+                        })
+                        .on('mouseout', function() {
+                            d3.selectAll('.sr-linegraph-boxplot').classed('timeline-lowlight', false);
+                            d3.selectAll('.sr-linegraph-timeline').classed('timeline-lowlight', false);
+                        });
+
+                    // ENTER text
+                    numPlotLegendEnter.append('text')
+                        .attr('x', LEGEND_ITEM_SIZE + 5)
+                        .attr('y', LEGEND_ITEM_SIZE / 2)
+                        .attr('dy', '.35em')
+                        .style('font-size', '15px')
+                        .text(function(d) { return 'Cohort ' + d; });
+                    // --- Add legend items
 
                     // Compute y ---
                     var upperBounds = byTimeInteger.bottom(Infinity).map(function(d) { return d[valueKey] + d[errorBarKey]; });
@@ -569,13 +581,17 @@ window.smartRApp.directive('lineGraph', [
                             .y(function(d) { return y(d.value); });
 
                         // DATA JOIN
-                        var timeline = currentNumPlot.selectAll('.sr-linegraph-timeline.subset-' + subset)
+                        var timeline = currentNumPlot.selectAll('.sr-linegraph-timeline' + 
+                                '.subset-' + subset +
+                                '.bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker))
                             .data([boxplotData]);
 
                         // ENTER path
                         timeline.enter()
                             .append('path')
-                            .attr('class', 'sr-linegraph-timeline subset-' + subset);
+                            .attr('class', 'sr-linegraph-timeline' + 
+                                ' subset-' + subset +
+                                ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker));
 
                         // UPDATE path
                         timeline.attr('d', lineGen);

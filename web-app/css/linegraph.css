@@ -76,18 +76,18 @@
 }
 
 /* all boxes for num plots */
-.sr-linegraph-num-plot>rect:not(.legend) {
+.sr-linegraph-num-plot>rect {
     fill: none;
     stroke: none;
 }
 
 /* legend rects for subset 1 */
-.sr-linegraph-num-plot rect.legend.subset-1 {
+.sr-linegraph-num-legend.subset-1 {
     fill: rgb(43, 156, 34);
 }
 
 /* legend rects for subset 1 */
-.sr-linegraph-num-plot rect.legend.subset-2 {
+.sr-linegraph-num-legend.subset-2 {
     fill: rgb(217, 54, 51);
 }
 
@@ -119,6 +119,11 @@
 }
 .sr-linegraph-timeline.subset-2 {
     stroke: rgb(217, 54, 51);
+}
+
+/* special hl class for all timeline objects */
+.timeline-lowlight {
+    opacity: 0.2;
 }
 
 /* fields that appear when we hover over an axis element */
