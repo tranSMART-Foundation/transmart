@@ -220,9 +220,12 @@ window.smartRApp.directive('lineGraph', [
             function updateXAxis() {
                 var timeAxisData = smartRUtils.unique(byTimeInteger.bottom(Infinity), function(d) { return d.timeInteger; });
 
-                var potentialSpacePerTimeAxisElement = LINEGRAPH_WIDTH / timeAxisData.length;
-                var timeAxisElementWidth = potentialSpacePerTimeAxisElement > MAX_XAXIS_ELEMENT_WIDTH ?
-                    MAX_XAXIS_ELEMENT_WIDTH : potentialSpacePerTimeAxisElement;
+                // compute size of time axis elements
+                var timeAxisElementWidth = timeAxisData.reduce(function(prev, curr, idx) {
+                    if (idx === 0) { return prev; }
+                    var dist = x(timeAxisData[idx].timeInteger) - x(timeAxisData[idx-1].timeInteger);
+                    return dist < prev ? dist : prev;
+                }, MAX_XAXIS_ELEMENT_WIDTH);
 
                 var xAxis = d3.svg.axis()
                     .scale(x)
