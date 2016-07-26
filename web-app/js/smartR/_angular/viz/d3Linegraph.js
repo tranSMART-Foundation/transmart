@@ -230,6 +230,7 @@ window.smartRApp.directive('lineGraph', [
                 var xAxis = d3.svg.axis()
                     .scale(x)
                     .tickFormat('')
+                    .tickValues(timeAxisData.map(function(d) { return d.timeInteger; }))
                     .tickSize(TICK_HEIGHT, 0);
                 d3.select('.sr-linegraph-x-axis')
                     .call(xAxis);
