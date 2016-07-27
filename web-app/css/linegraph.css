@@ -143,7 +143,7 @@
 
 /* arrows that appear left and right when hovering over axis element */
 .sr-linegraph-time-element > polygon {
-    fill: rgba(94, 198, 216, 0.5);
+    fill: rgba(94, 198, 216, 0.7);
 }
 
 /* control panel */
