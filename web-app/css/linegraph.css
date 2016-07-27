@@ -41,7 +41,7 @@
 
 /* subset 1 boxes of cat plot */
 .sr-linegraph-cat-plot.subset-1 rect{
-    fill: rgba(43, 156, 34, 0.4);
+    fill: rgba(94, 198, 216, 0.4);
 }
 
 /* subset 2 boxes of cat plot */
@@ -83,7 +83,7 @@
 
 /* legend rects for subset 1 */
 .sr-linegraph-num-legend.subset-1 {
-    fill: rgb(43, 156, 34);
+    fill: rgb(94, 198, 216);
 }
 
 /* legend rects for subset 1 */
@@ -98,7 +98,7 @@
 }
 .sr-linegraph-boxplot.subset-1 rect {
     stroke: none;
-    fill: rgb(43, 156, 34);
+    fill: rgb(94, 198, 216);
 }
 
 .sr-linegraph-boxplot.subset-2 rect {
@@ -115,7 +115,7 @@
     stroke-width: 2px;
 }
 .sr-linegraph-timeline.subset-1 {
-    stroke: rgb(43, 156, 34);
+    stroke: rgb(94, 198, 216);
 }
 .sr-linegraph-timeline.subset-2 {
     stroke: rgb(217, 54, 51);
@@ -143,8 +143,7 @@
 
 /* arrows that appear left and right when hovering over axis element */
 .sr-linegraph-time-element > polygon {
-    fill: cyan;
-    opacity: 0.8;
+    fill: rgba(94, 198, 216, 0.5);
 }
 
 /* control panel */
