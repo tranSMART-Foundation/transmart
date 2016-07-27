@@ -46,7 +46,8 @@ window.smartRApp.directive('conceptBox', [
 
                 var typeMap = {
                     hleaficon: 'HD',
-                    null: 'LD-categorical', // FIXME: alphaicon does not exist yet in transmartApp master branch
+                    alphaicon: 'LD-categorical',
+                    null: 'LD-categorical', // a fix for older tm version without alphaicon
                     valueicon: 'LD-numerical'
                 };
                 var _containsOnlyCorrectType = function() {
