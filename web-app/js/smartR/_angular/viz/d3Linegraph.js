@@ -191,7 +191,6 @@ window.smartRApp.directive('lineGraph', [
 
             var tip = d3.tip()
                 .attr('class', 'd3-tip')
-                .offset([-10, 0])
                 .html(function(d) { return d; });
 
             svg.call(tip);
@@ -621,7 +620,21 @@ window.smartRApp.directive('lineGraph', [
                                         html += key + ': ' + d[key] + '<br/>';
                                     }
                                 }
-                                tip.show(html);
+                                if (subsets.length > 1) {
+                                    if (subset === 1) {
+                                        tip.direction('w')
+                                            .offset([0, -10])
+                                            .show(html);
+                                    } else {
+                                        tip.direction('e')
+                                            .offset([0, 10])
+                                            .show(html);
+                                    }
+                                } else {
+                                    tip.direction('n')
+                                        .offset([-10, 0])
+                                        .show(html);
+                                }
                             })
                             .on('mouseout', function() {
                                 tip.hide();
