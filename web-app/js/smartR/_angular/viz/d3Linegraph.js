@@ -124,6 +124,12 @@ window.smartRApp.directive('lineGraph', [
                 renderNumericPlots();
             });
 
+            var evenlyCheck = smartRUtils.getElementWithoutEventListeners('sr-linegraph-evenly-check');
+            evenlyCheck.checked = false;
+            evenlyCheck.addEventListener('change', function() {
+                calculateXScale();
+            });
+
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-linegraph-patient-range');
             patientRange.min = 0;
             patientRange.max = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
@@ -146,7 +152,14 @@ window.smartRApp.directive('lineGraph', [
                 var times = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort(function(a, b) {
                     return a - b;
                 });
-                x.domain(d3.extent(times)).range([padding, LINEGRAPH_WIDTH - padding]);
+                if (evenlyCheck.checked) {
+                    var range = d3.range(padding,
+                            LINEGRAPH_WIDTH - padding + (LINEGRAPH_WIDTH - 2 * padding) / times.length,
+                            (LINEGRAPH_WIDTH - 2 * padding) / (times.length - 1));
+                    x.domain(times).range(range);
+                } else {
+                    x.domain(d3.extent(times)).range([padding, LINEGRAPH_WIDTH - padding]);
+                }
                 updateXAxis(); // after changing the scale we need to update the x axis too
             }
             calculateXScale();
