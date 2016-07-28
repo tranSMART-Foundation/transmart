@@ -128,6 +128,8 @@ window.smartRApp.directive('lineGraph', [
             evenlyCheck.checked = false;
             evenlyCheck.addEventListener('change', function() {
                 calculateXScale();
+                renderNumericPlots();
+                renderCategoricPlots();
             });
 
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-linegraph-patient-range');
