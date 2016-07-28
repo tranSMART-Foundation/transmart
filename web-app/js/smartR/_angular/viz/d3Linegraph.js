@@ -608,7 +608,10 @@ window.smartRApp.directive('lineGraph', [
                                 ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker));
 
                         // UPDATE path
-                        timeline.attr('d', lineGen);
+                        timeline
+                            .transition()
+                            .duration(500)
+                            .attr('d', lineGen);
 
                         // REMOVE path
                         timeline.exit().remove();
@@ -646,12 +649,16 @@ window.smartRApp.directive('lineGraph', [
 
 
                         // UPDATE g
-                        boxplot.attr('transform', function(d) {
+                        boxplot.transition()
+                            .duration(500)
+                            .attr('transform', function(d) {
                             return 'translate(' + (x(d.timeInteger)) + ',' + (y(d.value)) + ')';
                         });
 
                         // UPDATE rect
                         boxplot.select('rect')
+                            .transition()
+                            .duration(500)
                             .attr('height', function(d) { return y(d.value - d.errorBar) - y(d.value + d.errorBar); })
                             .attr('width', ERROR_BAR_WIDTH)
                             .attr('x', subset === 1 ? - ERROR_BAR_WIDTH / 2 - 1 : ERROR_BAR_WIDTH / 2)
