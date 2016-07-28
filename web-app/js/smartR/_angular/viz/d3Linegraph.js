@@ -59,6 +59,8 @@ window.smartRApp.directive('lineGraph', [
             var MAX_XAXIS_ELEMENT_WIDTH = 40;
             var TICK_HEIGHT = 0;
 
+            var ANIMATION_DURATION = 0;
+
             /**
              * In this section where we compute the plot sizes
              */
@@ -118,13 +120,13 @@ window.smartRApp.directive('lineGraph', [
             var LEGEND_OFFSET = 10;
             var LEGEND_ITEM_SIZE = 20;
 
-            var plotTypeSelect = smartRUtils.getElementWithoutEventListeners('sr-linegraph-numplottype-select');
+            var plotTypeSelect = smartRUtils.getElementWithoutEventListeners('sr-lg-numplottype-select');
             plotTypeSelect.selectedIndex = 0;
             plotTypeSelect.addEventListener('change', function() {
                 renderNumericPlots();
             });
 
-            var evenlyCheck = smartRUtils.getElementWithoutEventListeners('sr-linegraph-evenly-check');
+            var evenlyCheck = smartRUtils.getElementWithoutEventListeners('sr-lg-evenly-check');
             evenlyCheck.checked = false;
             evenlyCheck.addEventListener('change', function() {
                 calculateXScale();
@@ -132,7 +134,7 @@ window.smartRApp.directive('lineGraph', [
                 renderCategoricPlots();
             });
 
-            var patientRange = smartRUtils.getElementWithoutEventListeners('sr-linegraph-patient-range');
+            var patientRange = smartRUtils.getElementWithoutEventListeners('sr-lg-patient-range');
             patientRange.min = 0;
             patientRange.max = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
             patientRange.value = 25;
@@ -211,7 +213,7 @@ window.smartRApp.directive('lineGraph', [
             svg.call(tip);
 
             svg.append('g')
-                .attr('class', 'sr-linegraph-x-axis')
+                .attr('class', 'sr-lg-x-axis')
                 .attr('transform', 'translate(' + 0 + ',' + TIME_AXIS_POS + ')');
 
             // WARNING: using this function will reset all global filters to make sure all data are modified correctly
@@ -253,7 +255,9 @@ window.smartRApp.directive('lineGraph', [
                     .tickFormat('')
                     .tickValues(timeAxisData.map(function(d) { return d.timeInteger; }))
                     .innerTickSize(- NUM_PLOTS_HEIGHT);
-                d3.select('.sr-linegraph-x-axis')
+                d3.select('.sr-lg-x-axis')
+                    .transition()
+                    .duration(ANIMATION_DURATION)
                     .call(xAxis);
 
                 var timeZones = timeAxisData.map(function(d, i) {
@@ -295,7 +299,7 @@ window.smartRApp.directive('lineGraph', [
                                 }
 
                                 // move hovered element to its new position
-                                d3.select('.sr-linegraph-time-element.timestring-' +
+                                d3.select('.sr-lg-time-element.timestring-' +
                                         smartRUtils.makeSafeForCSS(timeStrings[nextIntermediateIndex]))
                                     .attr('transform', 'translate(' + (x(timeIntegerOrigin)) + ',' + (TICK_HEIGHT) + ')');
 
@@ -308,18 +312,17 @@ window.smartRApp.directive('lineGraph', [
                         renderNumericPlots();
                         renderCategoricPlots();
                         permitHighlight = true;
-                        highlightTimepoint(d.timeInteger, d.timeString);
                     });
 
                 // DATA JOIN
-                var timeAxisElement = d3.select('.sr-linegraph-x-axis').selectAll('.sr-linegraph-time-element')
+                var timeAxisElement = d3.select('.sr-lg-x-axis').selectAll('.sr-lg-time-element')
                     .data(timeAxisData, function(d) { return d.timeString; });
 
                 // ENTER g
                 var timeAxisElementEnter = timeAxisElement.enter()
                     .append('g')
                     .attr('class', function(d) {
-                        return 'sr-linegraph-time-element timestring-' + smartRUtils.makeSafeForCSS(d.timeString);
+                        return 'sr-lg-time-element timestring-' + smartRUtils.makeSafeForCSS(d.timeString);
                     })
                     .call(drag);
 
@@ -336,7 +339,7 @@ window.smartRApp.directive('lineGraph', [
                 // ENTER rect
                 timeAxisElementEnter.append('rect')
                     .on('mouseover', function(d) {
-                        highlightTimepoint(d.timeInteger, d.timeString);
+                        highlightTimepoint(d.timeString);
 
                         var g = d3.select(this.parentNode).moveToFront();
 
@@ -358,7 +361,7 @@ window.smartRApp.directive('lineGraph', [
 
                 // UPDATE g
                 timeAxisElement.transition()
-                    .duration(500)
+                    .duration(ANIMATION_DURATION)
                     .attr('transform', function(d) {
                         return 'translate(' + (x(d.timeInteger)) + ',' + (TICK_HEIGHT) + ')';
                     });
@@ -467,13 +470,13 @@ window.smartRApp.directive('lineGraph', [
                 var numPlotBoxHeight = (NUM_PLOTS_HEIGHT - bioMarkers.length * NUM_PLOT_PADDING) / bioMarkers.length;
 
                 // DATA JOIN
-                var numPlotBox = svg.selectAll('.sr-linegraph-num-plot')
+                var numPlotBox = svg.selectAll('.sr-lg-num-plot')
                     .data(bioMarkers);
 
                 // ENTER g
                 var numPlotBoxEnter = numPlotBox.enter()
                     .append('g')
-                    .attr('class', function(d) { return 'sr-linegraph-num-plot biomarker-' + smartRUtils.makeSafeForCSS(d); })
+                    .attr('class', function(d) { return 'sr-lg-num-plot biomarker-' + smartRUtils.makeSafeForCSS(d); })
                     .attr('transform', function(d) {
                         return 'translate(' + 0 + ',' +
                             (NUM_PLOTS_POS + bioMarkers.indexOf(d) * (numPlotBoxHeight + NUM_PLOT_PADDING)) + ')';
@@ -485,38 +488,38 @@ window.smartRApp.directive('lineGraph', [
                     .attr('height', numPlotBoxHeight);
 
                 // Add items to each numbox ---
-                d3.selectAll('.sr-linegraph-num-plot').each(function(bioMarker) {
+                d3.selectAll('.sr-lg-num-plot').each(function(bioMarker) {
                     var currentNumPlot = d3.select(this);
                     tmpByBioMarker.filterExact(bioMarker);
 
                     // Add legend items ---
                     // DATA JOIN
-                    var numPlotLegend = currentNumPlot.selectAll('.sr-linegraph-num-legend')
+                    var numPlotLegend = currentNumPlot.selectAll('.sr-lg-num-legend')
                         .data([1,2], function(d) { return d; });
 
                     // ENTER g
                     var numPlotLegendEnter = numPlotLegend.enter()
                         .append('g')
-                        .attr('class', function(d) { return 'sr-linegraph-num-legend subset-' + d; })
+                        .attr('class', function(d) { return 'sr-lg-num-legend subset-' + d; })
                         .attr('transform', function(d) {
                             return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
                                 (numPlotBoxHeight / 2 + (d === 1 ? - LEGEND_ITEM_SIZE : LEGEND_ITEM_SIZE)) + ')';
                         })
                         .on('mouseover', function(d) { 
-                            d3.selectAll('.sr-linegraph-boxplot').filter(function() {
+                            d3.selectAll('.sr-lg-boxplot').filter(function() {
                                 var that = d3.select(this);
                                 return !that.classed('bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker)) ||
                                     !that.classed('subset-' + smartRUtils.makeSafeForCSS(d));
                             }).classed('timeline-lowlight', true);
-                            d3.selectAll('.sr-linegraph-timeline').filter(function() {
+                            d3.selectAll('.sr-lg-timeline').filter(function() {
                                 var that = d3.select(this);
                                 return !that.classed('bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker)) ||
                                     !that.classed('subset-' + smartRUtils.makeSafeForCSS(d));
                             }).classed('timeline-lowlight', true);
                         })
                         .on('mouseout', function() {
-                            d3.selectAll('.sr-linegraph-boxplot').classed('timeline-lowlight', false);
-                            d3.selectAll('.sr-linegraph-timeline').classed('timeline-lowlight', false);
+                            d3.selectAll('.sr-lg-boxplot').classed('timeline-lowlight', false);
+                            d3.selectAll('.sr-lg-timeline').classed('timeline-lowlight', false);
                         });
 
                     // ENTER rect
@@ -554,13 +557,13 @@ window.smartRApp.directive('lineGraph', [
 
                     // Render y axis ---
                     // DATA JOIN
-                    var axis = currentNumPlot.selectAll('.sr-linegraph-y-axis')
+                    var axis = currentNumPlot.selectAll('.sr-lg-y-axis')
                         .data([bioMarker], function(d) { return d; });
 
                     // ENTER g
                     var axisEnter = axis.enter()
                         .append('g')
-                        .attr('class', 'sr-linegraph-y-axis');
+                        .attr('class', 'sr-lg-y-axis');
 
                     // ENTER text
                     axisEnter.append('text')
@@ -595,7 +598,7 @@ window.smartRApp.directive('lineGraph', [
                             .y(function(d) { return y(d.value); });
 
                         // DATA JOIN
-                        var timeline = currentNumPlot.selectAll('.sr-linegraph-timeline' + 
+                        var timeline = currentNumPlot.selectAll('.sr-lg-timeline' + 
                                 '.subset-' + subset +
                                 '.bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker))
                             .data([boxplotData]);
@@ -603,28 +606,28 @@ window.smartRApp.directive('lineGraph', [
                         // ENTER path
                         timeline.enter()
                             .append('path')
-                            .attr('class', 'sr-linegraph-timeline' + 
+                            .attr('class', 'sr-lg-timeline' + 
                                 ' subset-' + subset +
                                 ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker));
 
                         // UPDATE path
                         timeline
                             .transition()
-                            .duration(500)
+                            .duration(ANIMATION_DURATION)
                             .attr('d', lineGen);
 
                         // REMOVE path
                         timeline.exit().remove();
 
                         // DATA JOIN
-                        var boxplot = currentNumPlot.selectAll('.sr-linegraph-boxplot.subset-' + subset)
+                        var boxplot = currentNumPlot.selectAll('.sr-lg-boxplot.subset-' + subset)
                             .data(boxplotData, function(d) { return d.timeString; });
 
                         // ENTER g
                         var boxplotEnter = boxplot.enter()
                             .append('g')
                             .attr('class', function(d) {
-                                return 'sr-linegraph-boxplot' +
+                                return 'sr-lg-boxplot' +
                                     ' timestring-' + smartRUtils.makeSafeForCSS(d.timeString) +
                                     ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
                                     ' subset-' + subset;
@@ -650,7 +653,7 @@ window.smartRApp.directive('lineGraph', [
 
                         // UPDATE g
                         boxplot.transition()
-                            .duration(500)
+                            .duration(ANIMATION_DURATION)
                             .attr('transform', function(d) {
                             return 'translate(' + (x(d.timeInteger)) + ',' + (y(d.value)) + ')';
                         });
@@ -658,7 +661,7 @@ window.smartRApp.directive('lineGraph', [
                         // UPDATE rect
                         boxplot.select('rect')
                             .transition()
-                            .duration(500)
+                            .duration(ANIMATION_DURATION)
                             .attr('height', function(d) { return y(d.value - d.errorBar) - y(d.value + d.errorBar); })
                             .attr('width', ERROR_BAR_WIDTH)
                             .attr('x', subset === 1 ? - ERROR_BAR_WIDTH / 2 - 1 : ERROR_BAR_WIDTH / 2)
@@ -722,7 +725,7 @@ window.smartRApp.directive('lineGraph', [
                  */
 
                 // DATA JOIN
-                var catPlot = svg.selectAll('.sr-linegraph-cat-plot')
+                var catPlot = svg.selectAll('.sr-lg-cat-plot')
                     .data(catPlotInfo, function(d) {
                         return 'patientID-' + d.patientID + ' subset-' + d.subset; // unique identifier for row
                     });
@@ -731,7 +734,7 @@ window.smartRApp.directive('lineGraph', [
                 var catPlotEnter = catPlot.enter()
                     .append('g')
                     .attr('class', function(d) {
-                        return 'sr-linegraph-cat-plot' +
+                        return 'sr-lg-cat-plot' +
                             ' patientid-' + smartRUtils.makeSafeForCSS(d.patientID) +
                             ' subset-' + d.subset;
                     });
@@ -788,18 +791,18 @@ window.smartRApp.directive('lineGraph', [
                  */
 
                 // start ENTER UPDATE EXIT cycle for each separate plot to render data points
-                d3.selectAll('.sr-linegraph-cat-plot').each(function(d) {
+                d3.selectAll('.sr-lg-cat-plot').each(function(d) {
                     tmpByPatientID.filterExact(d.patientID);
 
                     // DATA JOIN
-                    var icon = d3.select(this).selectAll('.sr-linegraph-cat-icon')
+                    var icon = d3.select(this).selectAll('.sr-lg-cat-icon')
                         .data(byTimeInteger.bottom(Infinity), function(d) { return d.id; });
 
                     // ENTER path
                     icon.enter()
                         .append('path')
                         .attr('class', function(d) {
-                            return 'sr-linegraph-cat-icon' +
+                            return 'sr-lg-cat-icon' +
                                 ' patientid-' + smartRUtils.makeSafeForCSS(d.patientID) +
                                 ' timestring-' + smartRUtils.makeSafeForCSS(d.timeString) +
                                 ' biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker) +
@@ -846,13 +849,13 @@ window.smartRApp.directive('lineGraph', [
                     MARGIN.right - LEGEND_OFFSET - LEGEND_ITEM_SIZE, 0, 2);
 
                 // DATA JOIN
-                var legendItem = svg.selectAll('.sr-linegraph-legend-item')
+                var legendItem = svg.selectAll('.sr-lg-legend-item')
                     .data(legendData, function(d) { return d.id; });
 
                 // ENTER g
                 var legendItemEnter = legendItem.enter()
                     .append('g')
-                    .attr('class', 'sr-linegraph-legend-item')
+                    .attr('class', 'sr-lg-legend-item')
                     .attr('transform', function(d, i) {
                         return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
                             (CAT_PLOTS_POS + i * LEGEND_ITEM_SIZE) + ')';
@@ -863,12 +866,12 @@ window.smartRApp.directive('lineGraph', [
                     .attr('d', function(d) { return d.shape(LEGEND_ITEM_SIZE); })
                     .style('fill', function(d) { return d.fill; })
                     .on('mouseover', function(d) {
-                        svg.selectAll('.sr-linegraph-cat-icon')
+                        svg.selectAll('.sr-lg-cat-icon')
                             .filter('.biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker))
                             .classed('icon-highlight', true);
                     })
                     .on('mouseout', function() {
-                        svg.selectAll('.sr-linegraph-cat-icon')
+                        svg.selectAll('.sr-lg-cat-icon')
                             .classed('icon-highlight', false);
                     });
 
@@ -889,9 +892,9 @@ window.smartRApp.directive('lineGraph', [
                  * CONTROL ELEMENTS SECTION
                  */
 
-                svg.selectAll('.sr-linegraph-shift-element').remove();
+                svg.selectAll('.sr-lg-shift-element').remove();
                 svg.append('path')
-                    .attr('class', 'sr-linegraph-shift-element')
+                    .attr('class', 'sr-lg-shift-element')
                     .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS) +
                         'h' + (MARGIN.left / 2) +
                         'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
@@ -905,7 +908,7 @@ window.smartRApp.directive('lineGraph', [
                     });
 
                 svg.append('path')
-                    .attr('class', 'sr-linegraph-shift-element')
+                    .attr('class', 'sr-lg-shift-element')
                     .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS + CAT_PLOTS_HEIGHT + 10) +
                         'h' + (MARGIN.left / 2) +
                         'l' + (- MARGIN.left / 4) + ',' + (MARGIN.left / 3) + 'Z')
@@ -921,13 +924,13 @@ window.smartRApp.directive('lineGraph', [
             renderCategoricPlots();
 
             var permitHighlight = true;
-            function highlightTimepoint(timeInteger, timeString) {
+            function highlightTimepoint(timeString) {
                 if (! permitHighlight) {
                     disableHighlightTimepoint();
                     return;
                 }
                 // show tooltip for all associated boxplots
-                d3.selectAll('.sr-linegraph-boxplot.timestring-' + smartRUtils.makeSafeForCSS(timeString)).each(function(d) {
+                d3.selectAll('.sr-lg-boxplot.timestring-' + smartRUtils.makeSafeForCSS(timeString)).each(function(d) {
                     var tmpTip = d3.tip()
                         .attr('class', 'd3-tip temp-tip')
                         .html(function(d) { return d; });
@@ -955,6 +958,8 @@ window.smartRApp.directive('lineGraph', [
             function disableHighlightTimepoint() {
                 d3.selectAll('.temp-tip').remove();
             }
+
+            ANIMATION_DURATION = 500;
         }
     }
 ]);

@@ -8,57 +8,57 @@
 }
 
 /* axis itself */
-.sr-linegraph-x-axis path {
+.sr-lg-x-axis path {
     fill: none;
     stroke: none;
 }
 
 /* axis ticks */
-.sr-linegraph-x-axis line {
+.sr-lg-x-axis line {
     fill: none;
     stroke: rgb(52, 52, 52);
     stroke-width: 1px;
 }
 
 /* axis itself */
-.sr-linegraph-y-axis path {
+.sr-lg-y-axis path {
     fill: none;
     stroke: none;
 }
 
 /* axis ticks */
-.sr-linegraph-y-axis line {
+.sr-lg-y-axis line {
     fill: none;
     stroke: rgb(52, 52, 52);
     stroke-width: 1px;
 }
 
 /* all boxes of cat plot */
-.sr-linegraph-cat-plot rect {
+.sr-lg-cat-plot rect {
     fill: none;
     stroke: rgb(145,145,145);
 }
 
 /* subset 1 boxes of cat plot */
-.sr-linegraph-cat-plot.subset-1 rect{
+.sr-lg-cat-plot.subset-1 rect{
     fill: rgba(94, 198, 216, 0.4);
 }
 
 /* subset 2 boxes of cat plot */
-.sr-linegraph-cat-plot.subset-2 rect{
+.sr-lg-cat-plot.subset-2 rect{
     fill: rgba(217, 54, 51, 0.4);
 }
 
 /* patient id seperators on the left */
-.sr-linegraph-cat-icon {
+.sr-lg-cat-icon {
 }
 
 /* icons of cat plot */
-.sr-linegraph-cat-icon {
+.sr-lg-cat-icon {
     stroke: none;
     shape-rendering: crispEdges;
 }
-.sr-linegraph-cat-icon:hover {
+.sr-lg-cat-icon:hover {
 
 }
 /* special class for icon hl */
@@ -66,58 +66,58 @@
 }
 
 /* arrows for scrolling up and down */
-.sr-linegraph-shift-element {
+.sr-lg-shift-element {
     fill: rgb(38, 38, 38);
     stroke: rgb(67, 67, 67);
 }
-.sr-linegraph-shift-element:hover {
+.sr-lg-shift-element:hover {
     fill: rgb(45, 45, 45);
     cursor: pointer;
 }
 
 /* all boxes for num plots */
-.sr-linegraph-num-plot>rect {
+.sr-lg-num-plot>rect {
     fill: none;
     stroke: none;
 }
 
 /* legend rects for subset 1 */
-.sr-linegraph-num-legend.subset-1 {
+.sr-lg-num-legend.subset-1 {
     fill: rgb(94, 198, 216);
 }
 
 /* legend rects for subset 1 */
-.sr-linegraph-num-legend.subset-2 {
+.sr-lg-num-legend.subset-2 {
     fill: rgb(217, 54, 51);
 }
 
 /* boxplots */
-.sr-linegraph-boxplot rect {
+.sr-lg-boxplot rect {
     stroke-width: 1px;
     shape-rendering: crispEdges;
 }
-.sr-linegraph-boxplot.subset-1 rect {
+.sr-lg-boxplot.subset-1 rect {
     stroke: none;
     fill: rgb(94, 198, 216);
 }
 
-.sr-linegraph-boxplot.subset-2 rect {
+.sr-lg-boxplot.subset-2 rect {
     stroke: none;
     fill: rgb(217, 54, 51);
 }
-.sr-linegraph-boxplot rect:hover {
+.sr-lg-boxplot rect:hover {
     opacity: 0.5;
 }
 
 /* connection line between boxplots */
-.sr-linegraph-timeline {
+.sr-lg-timeline {
     fill: none;
     stroke-width: 2px;
 }
-.sr-linegraph-timeline.subset-1 {
+.sr-lg-timeline.subset-1 {
     stroke: rgb(94, 198, 216);
 }
-.sr-linegraph-timeline.subset-2 {
+.sr-lg-timeline.subset-2 {
     stroke: rgb(217, 54, 51);
 }
 
@@ -127,15 +127,15 @@
 }
 
 /* invisible axis box to catch mouse events */
-.sr-linegraph-time-element > rect {
+.sr-lg-time-element > rect {
     opacity: 0;
 }
-.sr-linegraph-time-element > rect:hover {
+.sr-lg-time-element > rect:hover {
     cursor: move;
 }
 
 /* arrows that appear left and right when hovering over axis element */
-.sr-linegraph-time-element > polygon {
+.sr-lg-time-element > polygon {
     fill: rgba(94, 198, 216, 0.7);
 }
 
