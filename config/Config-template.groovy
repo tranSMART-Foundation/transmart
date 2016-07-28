@@ -14,14 +14,14 @@
 def catalinaBase      = System.getProperty('catalina.base') ?: '.'
 
 def explodedWarDir    = catalinaBase + '/webapps/transmart'
-def solrPort          = 8080 //port of appserver where solr runs (under ctx path /solr)
+def solrPort          = 8983 //port of appserver where solr runs (under ctx path /solr)
 def searchIndex       = catalinaBase + '/searchIndex' //create this directory
 // for running transmart as WAR, create this directory and then create an alias
 def jobsDirectory     = "/var/tmp/jobs/"
 def oauthEnabled      = true
 def samlEnabled       = false
 def gwavaEnabled      = false
-def transmartURL      = "http://localhost:${System.getProperty('server.port', '8080')}/transmart/"
+def transmartURL      = "http://localhost:${System.getProperty('server.port', '8080')}/transmart"
 
 //Disabling/Enabling UI tabs
 ui {
@@ -34,6 +34,15 @@ ui {
         geneSignature.hide = false
         gwas.hide = false
         uploadData.hide = false
+        datasetExplorer {
+            gridView.hide = false
+            dataExport.hide = false
+            dataExportJobs.hide = false
+            // Note: by default the analysisJobs panel is NOT shown
+            // Currently, it is only used in special cases
+            analysisJobs.show = false
+            workspace.hide = false
+        }
     }
 }
 
@@ -114,6 +123,13 @@ environments {
 }
 /* }}} */
 
+/* {{{ Data Upload Configuration - see GWAS plugin Data Upload page */
+// This is the value that will appear in the To: entry of the e-mail popup 
+// that is displayed when the user clicks the Email administrator button,
+// on the GWAS plugin Data Upload page
+com.recomdata.dataUpload.adminEmail = 'No data upload adminEmail value set - contact site administrator'
+/* }}} */
+
 /* {{{ Personalization */
 // application logo to be used in the login page
 com.recomdata.largeLogo = "transmartlogo.jpg"
@@ -147,8 +163,8 @@ environments { development {
 
 /* {{{ Login */
 // Session timeout and heartbeat frequency (ping interval)
-com.recomdata.sessionTimeout = 300
-com.recomdata.heartbeatLaps = 30
+com.recomdata.sessionTimeout = 1800
+com.recomdata.heartbeatLaps = 300
 
 environments { development {
     com.recomdata.sessionTimeout = Integer.MAX_VALUE / 1000 as int /* ~24 days */
@@ -369,6 +385,7 @@ grails { plugin { springsecurity {
             '/secureObjectPath/**'        : ['ROLE_ADMIN'],
             '/userGroup/**'               : ['ROLE_ADMIN'],
             '/secureObjectAccess/**'      : ['ROLE_ADMIN'],
+            '/oauthAdmin/**'              : ['ROLE_ADMIN'],
             *                             : (oauthEnabled ?  oauthEndpoints : [:]),
             *                             : (gwavaEnabled ?  gwavaMappings : [:]),
             '/**'                         : ['IS_AUTHENTICATED_REMEMBERED'], // must be last
@@ -425,12 +442,10 @@ grails { plugin { springsecurity {
         grails.exceptionresolver.params.exclude = ['password', 'client_secret']
 
         def glowingBearRedirectUris = [
-                transmartURL - ~/transmart\/$/ + '#/login',
+                transmartURL - ~/transmart\/?$/ + 'connections',
         ]
-        if (transmartURL.startsWith('http://localhost:')) {
-            // for dev, node reverse proxy runs on 8001
-            glowingBearRedirectUris << 'http://localhost:8001/#/login'
-        }
+        // for dev, node reverse proxy runs on 8001
+        glowingBearRedirectUris << 'http://localhost:8001/connections'
 
         oauthProvider {
             authorization.requireRegisteredRedirectUri = true
@@ -443,7 +458,7 @@ grails { plugin { springsecurity {
                         authorities: ['ROLE_CLIENT'],
                         scopes: ['read', 'write'],
                         authorizedGrantTypes: ['authorization_code', 'refresh_token'],
-                        redirectUris: [transmartURL + 'oauth/verify']
+                        redirectUris: [(transmartURL - ~'\\/$') + '/oauth/verify'],
                     ],
                     [
                         clientId: 'glowingbear-js',

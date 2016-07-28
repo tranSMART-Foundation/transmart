@@ -168,11 +168,11 @@ BEGIN
 		return -16;
 	end if;
 
-  	--	check if platform exists in probeset_deapp .  If not, abort run.
+	--	check if platform exists in de_mrna_annotation .  If not, abort run.
 
 	select count(*) into pCount
-	from tm_cz.probeset_deapp
-	where platform in (select distinct m.platform from tm_lz.lt_src_mrna_subj_samp_map m);
+	from deapp.de_mrna_annotation
+	where gpl_id in (select distinct m.platform from tm_lz.lt_src_mrna_subj_samp_map m);
 
 	if pCount = 0 then
 		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No Gene Expression platforms in deapp.de_mrna_annotation',0,pCount,'Done') into rtnCd;
@@ -912,7 +912,8 @@ BEGIN
 		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
 		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
 		return -16;
-	end if;	
+	end if;
+
 	--	Insert records for subjects into observation_fact
 
 	begin
@@ -982,6 +983,13 @@ BEGIN
 	stepCt := stepCt + 1;
 	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Initialize data_type, visualattributes and xml in i2b2',rowCt,stepCt,'Done') into rtnCd;
 
+        update i2b2metadata.i2b2 a
+	set c_visualattributes='FAS'
+        where a.c_fullname = substr(topNode,1,instr(topNode,'\',1,3));
+        
+        stepCt := stepCt + 1;
+	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for study nodes in I2B2METADATA i2b2',RowCt,stepCt,'Done') into rtnCd;
+
   --Build concept Counts
   --Also marks any i2B2 records with no underlying data as Hidden, need to do at Trial level because there may be multiple platform and there is no longer
   -- a unique top-level node for mRNA data
@@ -1010,7 +1018,7 @@ BEGIN
 	stepCt := stepCt + 1;
 	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done') into rtnCd;
 
-	--	tag data with probeset_id from reference.probeset_deapp
+	--	tag data with probeset_id from reference.
 
 	execute ('truncate table tm_wz.wt_subject_mrna_probeset');
 
@@ -1032,9 +1040,9 @@ BEGIN
 	from
 	  tm_lz.lt_src_mrna_data md
       inner join deapp.de_subject_sample_mapping sd
-        inner join tm_cz.probeset_deapp gs
-        on sd.gpl_id = gs.platform
-      on md.expr_id = sd.sample_cd and md.probeset = gs.probeset
+        inner join deapp.de_mrna_annotation gs
+        on sd.gpl_id = gs.gpl_id
+      on md.expr_id = sd.sample_cd and md.probeset = gs.probe_id
 	where sd.platform = 'MRNA_AFFYMETRIX'
 	  and sd.trial_name = TrialId
 	  and sd.source_cd = sourceCd
@@ -1059,7 +1067,7 @@ BEGIN
 	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_mrna_probeset',rowCt,stepCt,'Done') into rtnCd;
 
 	if rowCt = 0 then
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Unable to match probesets to platform in probeset_deapp',0,rowCt,'Done') into rtnCd;
+		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Unable to match probesets to platform in de_mrna_annotation',0,rowCt,'Done') into rtnCd;
 		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
 		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
 		return -16;

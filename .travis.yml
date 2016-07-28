@@ -20,11 +20,14 @@ before_install:
     - sudo apt-get install -y tk-dev # while colorspace 1.2-6 is not out
 
 install:
-    - sudo apt-get install -qq php5-cli php5-json subversion groovy
+    - sudo apt-get install -qq php5-cli php5-json subversion
+    - make -C env groovy
     - make -C env ../vars
     - sed -i 's@PGSQL_BIN=.*@PGSQL_BIN="sudo -E -u postgres /usr/lib/postgresql/9.4/bin/"@' vars
 
 before_script:
     - ulimit -u 4096
+    - export PATH=./env:$PATH
+    - echo $(groovy --version)
 
 script: ./travis-test $TEST_SUITE

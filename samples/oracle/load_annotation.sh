@@ -54,6 +54,10 @@ if [ ! -z "$PLATFORM_DATA_TYPE" ]; then
 		      $LOAD_SCRIPTS_DIRECTORY/load_proteomics_annotation.sh ${1:+${PARAMS_FILENAME}}
 		      exit
 		      ;;
+	"Chromosomal") echo "chromosomal region platform"
+		      $LOAD_SCRIPTS_DIRECTORY/load_chromosomal_region_annotation.sh ${1:+${PARAMS_FILENAME}}
+		      exit
+		      ;;
 	*) echo "Unsupported PLATFORM_DATA_TYPE $PLATFORM_DATA_TYPE"
 	   exit
 	   ;;
@@ -73,7 +77,7 @@ groovy -cp "$LIB_CLASSPATH" InsertGplInfo.groovy \
 	-m "Gene Expression" \
 	-o "$ORGANISM" || { test $? -eq 3 && exit 0; }
 # the exit code is 3 if we are skip the rest
-# due to annotation being already loaden
+# due to annotation being already loaded
 
 
 groovy -cp "$LIB_CLASSPATH" LoadTsvFile.groovy \
