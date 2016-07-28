@@ -293,7 +293,7 @@ window.smartRApp.directive('lineGraph', [
                         renderNumericPlots();
                         renderCategoricPlots();
                         permitHighlight = true;
-                        highlightTimepoint(d.timeInteger);
+                        highlightTimepoint(d.timeInteger, d.timeString);
                     });
 
                 // DATA JOIN
@@ -320,8 +320,8 @@ window.smartRApp.directive('lineGraph', [
 
                 // ENTER rect
                 timeAxisElementEnter.append('rect')
-                    .on('mouseenter', function(d) {
-                        highlightTimepoint(d.timeInteger);
+                    .on('mouseover', function(d) {
+                        highlightTimepoint(d.timeInteger, d.timeString);
 
                         var g = d3.select(this.parentNode).moveToFront();
 
@@ -335,7 +335,7 @@ window.smartRApp.directive('lineGraph', [
                                 (- timeAxisElementWidth / 2) + ',' + (MARGIN.bottom / 2) + ' ' +
                                 (- timeAxisElementWidth / 2 - 20) + ',' + (MARGIN.bottom * 1/4));
                     })
-                    .on('mouseleave', function() {
+                    .on('mouseout', function() {
                         disableHighlightTimepoint();
                         d3.select(this.parentNode).selectAll('polygon')
                             .remove();
@@ -486,12 +486,7 @@ window.smartRApp.directive('lineGraph', [
                         .attr('transform', function(d) {
                             return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
                                 (numPlotBoxHeight / 2 + (d === 1 ? - LEGEND_ITEM_SIZE : LEGEND_ITEM_SIZE)) + ')';
-                        });
-
-                    // ENTER rect
-                    numPlotLegendEnter.append('rect')
-                        .attr('height', LEGEND_ITEM_SIZE)
-                        .attr('width', LEGEND_ITEM_SIZE)
+                        })
                         .on('mouseover', function(d) { 
                             d3.selectAll('.sr-linegraph-boxplot').filter(function() {
                                 var that = d3.select(this);
@@ -508,6 +503,12 @@ window.smartRApp.directive('lineGraph', [
                             d3.selectAll('.sr-linegraph-boxplot').classed('timeline-lowlight', false);
                             d3.selectAll('.sr-linegraph-timeline').classed('timeline-lowlight', false);
                         });
+
+                    // ENTER rect
+                    numPlotLegendEnter.append('rect')
+                        .attr('height', LEGEND_ITEM_SIZE)
+                        .attr('width', LEGEND_ITEM_SIZE);
+
 
                     // ENTER text
                     numPlotLegendEnter.append('text')
@@ -609,10 +610,7 @@ window.smartRApp.directive('lineGraph', [
                                     ' timestring-' + smartRUtils.makeSafeForCSS(d.timeString) +
                                     ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
                                     ' subset-' + subset;
-                            });
-
-                        // ENTER rect
-                        boxplotEnter.append('rect')
+                            })
                             .on('mouseover', function(d) {
                                 var html = '';
                                 for (var key in d) {
@@ -620,25 +618,17 @@ window.smartRApp.directive('lineGraph', [
                                         html += key + ': ' + d[key] + '<br/>';
                                     }
                                 }
-                                if (subsets.length > 1) {
-                                    if (subset === 1) {
-                                        tip.direction('w')
-                                            .offset([0, -10])
-                                            .show(html);
-                                    } else {
-                                        tip.direction('e')
-                                            .offset([0, 10])
-                                            .show(html);
-                                    }
-                                } else {
-                                    tip.direction('n')
-                                        .offset([-10, 0])
-                                        .show(html);
-                                }
+                                tip.direction('n')
+                                    .offset([-10, 0])
+                                    .show(html);
                             })
                             .on('mouseout', function() {
                                 tip.hide();
                             });
+
+                        // ENTER rect
+                        boxplotEnter.append('rect');
+
 
                         // UPDATE g
                         boxplot.attr('transform', function(d) {
@@ -909,35 +899,39 @@ window.smartRApp.directive('lineGraph', [
             renderCategoricPlots();
 
             var permitHighlight = true;
-            function highlightTimepoint(timeInteger) {
+            function highlightTimepoint(timeInteger, timeString) {
                 if (! permitHighlight) {
                     disableHighlightTimepoint();
                     return;
                 }
-                var highlightWidth = document.querySelector('.sr-linegraph-time-element rect').getBBox().width; // HACK
-                // DATA JOIN
-                var highlightZone = svg.selectAll('.sr-linegraph-highlight-zone')
-                    .data(['left', 'right']);
+                // show tooltip for all associated boxplots
+                d3.selectAll('.sr-linegraph-boxplot.timestring-' + smartRUtils.makeSafeForCSS(timeString)).each(function(d) {
+                    var tmpTip = d3.tip()
+                        .attr('class', 'd3-tip temp-tip')
+                        .html(function(d) { return d; });
+                    svg.call(tmpTip);
 
-                // ENTER rect
-                highlightZone.enter()
-                    .append('rect')
-                    .attr('class', function(d) { return 'sr-linegraph-highlight-zone ' + d; });
+                    var html = '';
+                    for (var key in d) {
+                        if (d.hasOwnProperty(key)) {
+                            html += key + ': ' + d[key] + '<br/>';
+                        }
+                    }
+                    if (d3.select(this).classed('subset-1')) {
+                        tmpTip.direction('w')
+                            .offset([0, -10])
+                            .show(html, this);
+                    } else {
+                        tmpTip.direction('e')
+                            .offset([0, 10])
+                            .show(html, this);
+                    }
+                });
 
-                // UPDATE rect
-                highlightZone
-                    .attr('height', TIME_AXIS_POS)
-                    .attr('width', function(d) {
-                        return d === 'left' ? x(timeInteger) - highlightWidth / 2 : LINEGRAPH_WIDTH - x(timeInteger) - highlightWidth / 2;
-                    })
-                    .attr('x', function(d) {
-                        return d === 'left' ? 0 : x(timeInteger) + highlightWidth / 2;
-                    })
-                    .attr('y', 0);
             }
 
             function disableHighlightTimepoint() {
-                d3.selectAll('.sr-linegraph-highlight-zone').remove();
+                d3.selectAll('.temp-tip').remove();
             }
         }
     }

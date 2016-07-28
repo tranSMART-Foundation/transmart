@@ -126,13 +126,6 @@
     opacity: 0.2;
 }
 
-/* fields that appear when we hover over an axis element */
-.sr-linegraph-highlight-zone {
-    fill: rgb(145, 145, 145);
-    stroke: none;
-    opacity: 0.4;
-}
-
 /* invisible axis box to catch mouse events */
 .sr-linegraph-time-element > rect {
     opacity: 0;
