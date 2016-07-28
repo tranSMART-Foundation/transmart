@@ -252,18 +252,20 @@ window.smartRApp.directive('lineGraph', [
                 var timeIntegers = timeZones.map(function(d) { return d.timeInteger; });
                 var timeStrings = timeZones.map(function(d) { return d.timeStrings; });
                 var drag = d3.behavior.drag()
-                    .on('drag', function(draggedEl) {
+                    .on('drag', function() {
                         permitHighlight = false;
                         var newX = d3.event.x;
                         newX = newX < 0 ? 0 : newX;
                         newX = newX > LINEGRAPH_WIDTH ? LINEGRAPH_WIDTH : newX;
                         d3.select(this).attr('transform', 'translate(' + (newX) + ',' + TICK_HEIGHT + ')');
-
+                    })
+                    .on('dragend', function(d) {
+                        var xPos = d3.transform(d3.select(this).attr('transform')).translate[0];
                         var matchingTimeZones = timeZones.filter(function(timeZone) {
-                            return timeZone.left <= newX && newX <= timeZone.right;
+                            return timeZone.left <= xPos && xPos <= timeZone.right;
                         });
                         var timeIntegerDestination = matchingTimeZones[0].timeInteger;
-                        var timeIntegerOrigin = draggedEl.timeInteger;
+                        var timeIntegerOrigin = d.timeInteger;
                         if (timeIntegerDestination !== timeIntegerOrigin) {
                             var indexDestination = timeIntegers.indexOf(timeIntegerDestination);
                             var indexOrigin = timeIntegers.indexOf(timeIntegerOrigin);
@@ -284,18 +286,15 @@ window.smartRApp.directive('lineGraph', [
                                     .attr('transform', 'translate(' + (x(timeIntegerOrigin)) + ',' + (TICK_HEIGHT) + ')');
 
                                 swapTimeIntegerData(timeIntegers[indexOrigin], timeIntegers[nextIntermediateIndex]);
-                                draggedEl.timeInteger = timeIntegers[nextIntermediateIndex];
+                                d.timeInteger = timeIntegers[nextIntermediateIndex];
                                 indexOrigin = nextIntermediateIndex;
                             }
                         }
-                    })
-                    .on('dragend', function(draggedEl) {
-                        swapTimeIntegerData(draggedEl.timeInteger, draggedEl.timeInteger);
                         updateXAxis();
                         renderNumericPlots();
                         renderCategoricPlots();
                         permitHighlight = true;
-                        highlightTimepoint(draggedEl.timeInteger);
+                        highlightTimepoint(d.timeInteger);
                     });
 
                 // DATA JOIN
