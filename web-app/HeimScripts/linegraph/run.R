@@ -148,13 +148,15 @@ getStatsForNumericType <- function(df) {
                                          numeric.df$subset == subset, ]
                 if (nrow(current.df) == 0) next
                 values <- as.numeric(current.df$value)
-                sd <- sd(values)
                 mean <- mean(values)
                 median <- median(values)
+                sd <- sd(values)
+                sem <- sd / sqrt(length(values))
                 stats.df <- rbind(stats.df, data.frame(bioMarker=bioMarker,
                                                        timeInteger=timeInteger,
                                                        subset=subset,
                                                        sd=sd,
+                                                       sem=sem,
                                                        mean=mean,
                                                        median=median))
             }

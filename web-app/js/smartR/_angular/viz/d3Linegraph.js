@@ -59,7 +59,10 @@ window.smartRApp.directive('lineGraph', [
             var MAX_XAXIS_ELEMENT_WIDTH = 40;
             var TICK_HEIGHT = 0;
 
-            var ANIMATION_DURATION = 0;
+            var ANIMATION_DURATION = 500;
+            var tmp_animation_duration = ANIMATION_DURATION;
+            // set to 0 for creating the plot initially
+            ANIMATION_DURATION = 0;
 
             /**
              * In this section where we compute the plot sizes
@@ -458,11 +461,13 @@ window.smartRApp.directive('lineGraph', [
                 }
 
                 var plotTypeKeys = {
-                    meanWithSd: {valueKey: 'mean', errorBarKey: 'sd'},
-                    medianWithSd: {valueKey: 'median', errorBarKey: 'sd'}
+                    meanWithSD: {valueKey: 'mean', errorKey: 'sd'},
+                    medianWithSD: {valueKey: 'median', errorKey: 'sd'},
+                    meanWithSEM: {valueKey: 'mean', errorKey: 'sem'},
+                    medianWithSEM: {valueKey: 'median', errorKey: 'sem'}
                 };
                 var valueKey = plotTypeKeys[plotTypeSelect.value].valueKey;
-                var errorBarKey = plotTypeKeys[plotTypeSelect.value].errorBarKey;
+                var errorKey = plotTypeKeys[plotTypeSelect.value].errorKey;
 
                 var bioMarkers = smartRUtils.unique(getValuesForDimension(byBioMarker))
                     .sort(function(a, b) { return a.localeCompare(b); }); // for determinism
@@ -538,8 +543,8 @@ window.smartRApp.directive('lineGraph', [
                     // --- Add legend items
 
                     // Compute y ---
-                    var upperBounds = byTimeInteger.bottom(Infinity).map(function(d) { return d[valueKey] + d[errorBarKey]; });
-                    var lowerBounds = byTimeInteger.bottom(Infinity).map(function(d) { return d[valueKey] - d[errorBarKey]; });
+                    var upperBounds = byTimeInteger.bottom(Infinity).map(function(d) { return d[valueKey] + d[errorKey]; });
+                    var lowerBounds = byTimeInteger.bottom(Infinity).map(function(d) { return d[valueKey] - d[errorKey]; });
                     var boundaries = d3.extent(upperBounds.concat(lowerBounds));
                     var y = d3.scale.linear()
                         .domain(boundaries.slice().reverse())
@@ -588,8 +593,8 @@ window.smartRApp.directive('lineGraph', [
                             return d.timeInteger;
                         }).map(function(d) {
                             var value = d[valueKey];
-                            var errorBar = d[errorBarKey];
-                            return {timeInteger: d.timeInteger, timeString: d.timeString, errorBar: errorBar, value: value};
+                            var error = d[errorKey];
+                            return {timeInteger: d.timeInteger, timeString: d.timeString, error: error, value: value};
                         });
                         // --- Generate data for timeline elements
 
@@ -662,10 +667,10 @@ window.smartRApp.directive('lineGraph', [
                         boxplot.select('rect')
                             .transition()
                             .duration(ANIMATION_DURATION)
-                            .attr('height', function(d) { return y(d.value - d.errorBar) - y(d.value + d.errorBar); })
+                            .attr('height', function(d) { return y(d.value - d.error) - y(d.value + d.error); })
                             .attr('width', ERROR_BAR_WIDTH)
                             .attr('x', subset === 1 ? - ERROR_BAR_WIDTH / 2 - 1 : ERROR_BAR_WIDTH / 2)
-                            .attr('y', function(d) { return - (y(d.value) - y(d.value + d.errorBar)); });
+                            .attr('y', function(d) { return - (y(d.value) - y(d.value + d.error)); });
 
                         // EXIT g
                         boxplot.exit().remove();
@@ -959,7 +964,7 @@ window.smartRApp.directive('lineGraph', [
                 d3.selectAll('.temp-tip').remove();
             }
 
-            ANIMATION_DURATION = 500;
+            ANIMATION_DURATION = tmp_animation_duration;
         }
     }
 ]);
