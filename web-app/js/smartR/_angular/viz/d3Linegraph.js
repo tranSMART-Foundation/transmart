@@ -706,7 +706,7 @@ window.smartRApp.directive('lineGraph', [
                                 }
                                 tip.direction('n')
                                     .offset([-10, 0])
-                                    .show(html);
+                                    .show(html, this);
                             })
                             .on('mouseout', function() {
                                 tip.hide();
