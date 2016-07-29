@@ -630,7 +630,11 @@ window.smartRApp.directive('lineGraph', [
                         // --- Generate data for timeline elements
 
                         var lineGen = d3.svg.line()
-                            .x(function(d) { return x(d.timeInteger) + (subset === 1 ? - ERROR_BAR_WIDTH / 2 : ERROR_BAR_WIDTH + 2); })
+                            .x(function(d) {
+                                var offset = plotTypeSelect.value === 'noGrouping' ?
+                                    0 : (subset === 1 ? - ERROR_BAR_WIDTH / 2 : ERROR_BAR_WIDTH + 2);
+                                return x(d.timeInteger) + offset;
+                            })
                             .y(function(d) { return y(d.value); })
                             .interpolate(smoothCheck.checked ? 'basis' : 'linear');
 
