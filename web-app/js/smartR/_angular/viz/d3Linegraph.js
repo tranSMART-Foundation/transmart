@@ -137,6 +137,12 @@ window.smartRApp.directive('lineGraph', [
                 renderCategoricPlots();
             });
 
+            var smoothCheck = smartRUtils.getElementWithoutEventListeners('sr-lg-smooth-check');
+            smoothCheck.checked = false;
+            smoothCheck.addEventListener('change', function() {
+                renderNumericPlots();
+            });
+
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-lg-patient-range');
             patientRange.min = 0;
             patientRange.max = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
@@ -460,11 +466,13 @@ window.smartRApp.directive('lineGraph', [
                     return;
                 }
 
+                // map the selection to the object key names
                 var plotTypeKeys = {
                     meanWithSD: {valueKey: 'mean', errorKey: 'sd'},
                     medianWithSD: {valueKey: 'median', errorKey: 'sd'},
                     meanWithSEM: {valueKey: 'mean', errorKey: 'sem'},
-                    medianWithSEM: {valueKey: 'median', errorKey: 'sem'}
+                    medianWithSEM: {valueKey: 'median', errorKey: 'sem'},
+                    noGrouping: {valueKey: 'value'}
                 };
                 var valueKey = plotTypeKeys[plotTypeSelect.value].valueKey;
                 var errorKey = plotTypeKeys[plotTypeSelect.value].errorKey;
@@ -543,8 +551,16 @@ window.smartRApp.directive('lineGraph', [
                     // --- Add legend items
 
                     // Compute y ---
-                    var upperBounds = byTimeInteger.bottom(Infinity).map(function(d) { return d[valueKey] + d[errorKey]; });
-                    var lowerBounds = byTimeInteger.bottom(Infinity).map(function(d) { return d[valueKey] - d[errorKey]; });
+                    var upperBounds = byTimeInteger.bottom(Infinity).map(function(d) {
+                        var error = d[errorKey];
+                        error = typeof error === 'undefined' ? 0 : error; // there is no error if we plot individuals
+                        return d[valueKey] + error;
+                    });
+                    var lowerBounds = byTimeInteger.bottom(Infinity).map(function(d) {
+                        var error = d[errorKey];
+                        error = typeof error === 'undefined' ? 0 : error; // there is no error if we plot individuals
+                        return d[valueKey] - error;
+                    });
                     var boundaries = d3.extent(upperBounds.concat(lowerBounds));
                     var y = d3.scale.linear()
                         .domain(boundaries.slice().reverse())
@@ -557,7 +573,6 @@ window.smartRApp.directive('lineGraph', [
                             return d3.range(boundaries[0], boundaries[1] + stepSize, stepSize);
                         })
                         .innerTickSize(- LINEGRAPH_WIDTH);
-
                     // --- Compute y
 
                     // Render y axis ---
@@ -588,25 +603,42 @@ window.smartRApp.directive('lineGraph', [
                         bySubset.filterExact(subset);
 
                         // Generate data for timeline elements ---
+                        var numericalData = [];
                         
-                        var boxplotData = smartRUtils.unique(byTimeInteger.bottom(Infinity), function(d) {
-                            return d.timeInteger;
-                        }).map(function(d) {
-                            var value = d[valueKey];
-                            var error = d[errorKey];
-                            return {timeInteger: d.timeInteger, timeString: d.timeString, error: error, value: value};
-                        });
+                        if (plotTypeSelect.value === 'noGrouping') {
+                            numericalData = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
+                                tmpByPatientID.filterExact(patientID);
+                                return byTimeInteger.bottom(Infinity).map(function(d) {
+                                    return {
+                                        patientID: d.patientID,
+                                        timeInteger: d.timeInteger,
+                                        timeString: d.timeString,
+                                        error: 0,
+                                        value: d[valueKey],
+                                        subset: d.subset
+                                    };
+                                });
+                            });
+                            tmpByPatientID.filterAll();
+                        } else {
+                            numericalData.push(smartRUtils.unique(byTimeInteger.bottom(Infinity), function(d) {
+                                return d.timeInteger;
+                            }).map(function(d) {
+                                return {timeInteger: d.timeInteger, timeString: d.timeString, error: d[errorKey], value: d[valueKey]}; 
+                            }));
+                        }
                         // --- Generate data for timeline elements
 
                         var lineGen = d3.svg.line()
                             .x(function(d) { return x(d.timeInteger) + (subset === 1 ? - ERROR_BAR_WIDTH / 2 : ERROR_BAR_WIDTH + 2); })
-                            .y(function(d) { return y(d.value); });
+                            .y(function(d) { return y(d.value); })
+                            .interpolate(smoothCheck.checked ? 'basis' : 'linear');
 
                         // DATA JOIN
                         var timeline = currentNumPlot.selectAll('.sr-lg-timeline' + 
                                 '.subset-' + subset +
                                 '.bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker))
-                            .data([boxplotData]);
+                            .data(numericalData);
 
                         // ENTER path
                         timeline.enter()
@@ -626,7 +658,7 @@ window.smartRApp.directive('lineGraph', [
 
                         // DATA JOIN
                         var boxplot = currentNumPlot.selectAll('.sr-lg-boxplot.subset-' + subset)
-                            .data(boxplotData, function(d) { return d.timeString; });
+                            .data(numericalData[0], function(d) { return d.timeString; });
 
                         // ENTER g
                         var boxplotEnter = boxplot.enter()
