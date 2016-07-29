@@ -649,7 +649,26 @@ window.smartRApp.directive('lineGraph', [
                             .append('path')
                             .attr('class', 'sr-lg-timeline' + 
                                 ' subset-' + subset +
-                                ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker));
+                                ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker))
+                            .on('mouseover', function(d) {
+                                var html = '';
+                                for (var key in d) {
+                                    if (d.hasOwnProperty(key)) {
+                                        html += key + ': ' + d[key] + '<br/>';
+                                    }
+                                }
+                                var context = d3.select('.sr-lg-num-plot.biomarker-' + smartRUtils.makeSafeForCSS(bioMarker) + ' rect')
+                                    .node();
+                                tip.direction('e')
+                                    .offset(function() {
+                                        var yOffset = y(d[d.length - 1].value) - numPlotBoxHeight / 2;
+                                        return [yOffset, 0];
+                                    })
+                                    .show(html, context);
+                            })
+                            .on('mouseout', function() {
+                                tip.hide();
+                            });
 
                         // UPDATE path
                         timeline
@@ -966,7 +985,7 @@ window.smartRApp.directive('lineGraph', [
 
             var permitHighlight = true;
             function highlightTimepoint(timeString) {
-                if (! permitHighlight) {
+                if (! permitHighlight || plotTypeSelect.value === 'noGrouping') {
                     disableHighlightTimepoint();
                     return;
                 }
