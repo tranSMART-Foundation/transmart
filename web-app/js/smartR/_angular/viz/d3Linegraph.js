@@ -593,7 +593,7 @@ window.smartRApp.directive('lineGraph', [
                         .text(function(d) { return d; });
 
                     // UPDATE g
-                    axisEnter.call(yAxis);
+                    axis.call(yAxis);
                     // --- Render y axis
 
                     // Render timeline elements for each subset ---
