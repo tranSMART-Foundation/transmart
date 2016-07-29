@@ -652,11 +652,16 @@ window.smartRApp.directive('lineGraph', [
                                 ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker))
                             .on('mouseover', function(d) {
                                 var html = '';
-                                for (var key in d) {
-                                    if (d.hasOwnProperty(key)) {
-                                        html += key + ': ' + d[key] + '<br/>';
-                                    }
+
+                                // TODO: tooltip for grouped timeline doesn't make so much sense atm
+                                if (plotTypeSelect.value === 'noGrouping') {
+                                    var maxValue = d3.max(d, function(el) { return el.value; });
+                                    var minValue = d3.min(d, function(el) { return el.value; });
+                                    html += 'PatientID: ' + d[0].patientID + '<br/>';
+                                    html += 'Maximum: ' + maxValue + '<br/>';
+                                    html += 'Minimum: ' + minValue + '<br/>';
                                 }
+
                                 var context = d3.select('.sr-lg-num-plot.biomarker-' + smartRUtils.makeSafeForCSS(bioMarker) + ' rect')
                                     .node();
                                 tip.direction('e')
