@@ -624,7 +624,13 @@ window.smartRApp.directive('lineGraph', [
                             numericalData.push(smartRUtils.unique(byTimeInteger.bottom(Infinity), function(d) {
                                 return d.timeInteger;
                             }).map(function(d) {
-                                return {timeInteger: d.timeInteger, timeString: d.timeString, error: d[errorKey], value: d[valueKey]}; 
+                                return {
+                                    timeInteger: d.timeInteger,
+                                    timeString: d.timeString,
+                                    error: d[errorKey],
+                                    value: d[valueKey],
+                                    subset: d.subset
+                                }; 
                             }));
                         }
                         // --- Generate data for timeline elements
@@ -639,17 +645,18 @@ window.smartRApp.directive('lineGraph', [
                             .interpolate(smoothCheck.checked ? 'basis' : 'linear');
 
                         // DATA JOIN
-                        var timeline = currentNumPlot.selectAll('.sr-lg-timeline' + 
-                                '.subset-' + subset +
-                                '.bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker))
-                            .data(numericalData);
+                        var timeline = currentNumPlot.selectAll('.sr-lg-timeline' + '.subset-' + subset)
+                            .data(numericalData, function(d) { return 'patientid-' + d[0].patientID + ' subset' + d[0].subset; });
 
                         // ENTER path
                         timeline.enter()
                             .append('path')
-                            .attr('class', 'sr-lg-timeline' + 
+                            .attr('class', function(d) {
+                                return 'sr-lg-timeline' + 
                                 ' subset-' + subset +
-                                ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker))
+                                ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
+                                ' patientid-' + d[0].patientID; // might or might not be defined
+                            })
                             .on('mouseover', function(d) {
                                 var html = '';
 
@@ -686,6 +693,7 @@ window.smartRApp.directive('lineGraph', [
 
                         // DATA JOIN
                         var boxplot = currentNumPlot.selectAll('.sr-lg-boxplot.subset-' + subset)
+                            // [0] works because all relevant data in the array are identical
                             .data(numericalData[0], function(d) { return d.timeString; });
 
                         // ENTER g
