@@ -64,8 +64,10 @@ window.smartRApp.directive('volcanoPlot', [
 
             volcanoplot.call(tip);
 
+            var maxAbsLogFCs = Math.max.apply(null, logFCs.map(Math.abs))
+
             var x = d3.scale.linear()
-                .domain([-Math.max.apply(null, logFCs), Math.max.apply(null, logFCs)])
+                .domain([-maxAbsLogFCs, maxAbsLogFCs])
                 .range([0, width]);
 
             var y = d3.scale.linear()
