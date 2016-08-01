@@ -91,7 +91,7 @@ window.smartRApp.directive('correlationPlot', [
 
             function updateStatistics(patientIDs, scatterUpdate, init) {
                 if (! init) {
-                    patientIDs = patientIDs.length !== 0 ? patientIDs : d3.selectAll('.point').map(function(d) {
+                    patientIDs = patientIDs.length !== 0 ? patientIDs : d3.selectAll('.point').data().map(function(d) {
                         return d.patientID;
                     });
                 }
@@ -207,7 +207,7 @@ window.smartRApp.directive('correlationPlot', [
                     .orient('right'));
 
             function excludeSelection() {
-                var remainingPatientIDs = d3.selectAll('.point:not(.selected)').map(function(d) {
+                var remainingPatientIDs = d3.selectAll('.point:not(.selected)').data().map(function(d) {
                     return d.patientID;
                 });
                 updateStatistics(remainingPatientIDs, true);
@@ -218,7 +218,7 @@ window.smartRApp.directive('correlationPlot', [
                     alert('Please select at least two elements before zooming!');
                     return;
                 }
-                var selectedPatientIDs = d3.selectAll('.point.selected').map(function(d) { return d.patientID; });
+                var selectedPatientIDs = d3.selectAll('.point.selected').data().map(function(d) { return d.patientID; });
                 updateStatistics(selectedPatientIDs, false, true);
             }
 
@@ -253,7 +253,7 @@ window.smartRApp.directive('correlationPlot', [
                 .on('brushend', function() {
                     contextMenu.hide();
                     updateSelection();
-                    var selectedPatientIDs = d3.selectAll('.point.selected').map(function(d) { return d.patientID; });
+                    var selectedPatientIDs = d3.selectAll('.point.selected').data().map(function(d) { return d.patientID; });
                     updateStatistics(selectedPatientIDs);
                 });
 
