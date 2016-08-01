@@ -247,6 +247,8 @@ window.smartRApp.directive('lineGraph', [
                 dataCF.add(fromEntries);
                 dataCF.add(toEntries);
 
+                // reapply patientID filter FIXME: Is that a good idea?
+                updateShownPatients();
             }
 
             function updateXAxis() {
