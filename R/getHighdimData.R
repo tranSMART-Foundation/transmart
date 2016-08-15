@@ -133,8 +133,9 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 
 # The argument is a single named list
 .expandConstraints <- function(constraints) {
-    # The JSON encoder encodes single item vectors as scalars. We need those to be lists as well sometimes.
-    j <- function(val) if (length(val) == 1) list(val) else val
+    # Previously used json packages encode length 1 vectors as scalars, we need them as lists. Jsonlite which we are using
+    # now doesn't do that so this wrapping function is now a no-op.
+    j <- function(val) val
     
     # some deep functional/lazy magic
     mapply(function(val, con) switch(con,

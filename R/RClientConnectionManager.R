@@ -265,6 +265,11 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     return('unknown')
 }
 
+# Wrap this in case we need to change json libraries again
+.fromJSON <- function(json) {
+	fromJSON(json, simplifyDataFrame=F, simplifyMatrix=F)
+}
+
 .serverMessageExchange <- 
 function(apiCall, httpHeaderFields, accept.type = "default", post.body = NULL, show.progress = (accept.type == 'binary') ) {
     if (any(accept.type == c("default", "hal"))) {
@@ -294,11 +299,11 @@ function(apiCall, httpHeaderFields, accept.type = "default", post.body = NULL, s
         result$statusMessage <- http_status(req)$message
     	switch(.contentType(result$headers),
                json = {
-                   result$content <- fromJSON(result$content)
+                   result$content <- .fromJSON(result$content)
                    result$JSON <- TRUE
                },
                hal = {
-                   result$content <- .simplifyHalList(fromJSON(result$content))
+                   result$content <- .simplifyHalList(.fromJSON(result$content))
                    result$JSON <- TRUE
                })
         return(result)

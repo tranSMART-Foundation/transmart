@@ -21,12 +21,13 @@ apply:
 | ---------- | -------- | -----------------------------------------------------------
 | Protobuf   | BSD      | <http://grails.org/License>
 | httr       | MIT      | <http://cran.r-project.org/web/packages/httr/index.html>
-| rjson      | GPL2     | <http://cran.r-project.org/web/packages/rjson/index.html>
-| RProtoBuf  | GPL2     | <http://cran.r-project.org/web/packages/RProtoBuf/index.html>
+| jsonlite   | MIT      | <http://cran.r-project.org/web/packages/jsonlite/index.html>
+| RProtoBuf  | GPL2+    | <http://cran.r-project.org/web/packages/RProtoBuf/index.html>
 | plyr       | MIT      | <http://cran.r-project.org/web/packages/plyr/index.html>
-| hash       | GPL3     | <http://cran.r-project.org/web/packages/hash/index.html>
-| bitopts    | GPL3     | <http://cran.r-project.org/web/packages/bitops/index.html>
-| RCpp       | GPL2     | <http://cran.r-project.org/web/packages/Rcpp/index.html>
+| hash       | GPL2+    | <http://cran.r-project.org/web/packages/hash/index.html>
+| reshape    | MIT      | <http://cran.r-project.org/web/packages/reshape/>
+| bitopts    | GPL2+    | <http://cran.r-project.org/web/packages/bitops/index.html>
+| RCpp       | GPL2+    | <http://cran.r-project.org/web/packages/Rcpp/index.html>
 | R overall  | Multiple | <http://www.r-project.org/Licenses/>
 
 This program is free software: you can redistribute it and/or modify it under
