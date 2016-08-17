@@ -26,11 +26,13 @@
 # Notes for first time installers:
 
 # The package transmartRClient depends on these packages: httr, jsonlite, RProtoBuf, plyr, hash, and reshape.
-# You can install them as follows:
+# 
+# These R packages depend on some system libraries: libcurl and the protocol buffer compiler/libraries.
+# On Ubuntu these can be found in the following packages: 
+# libcurl4-openssl-dev libssl-dev libprotoc-dev libprotobuf-dev
+# 
+# You can then install the R packages as follows:
 install.packages(pkgs=c("httr", "jsonlite", "RProtoBuf", "plyr", "hash", "reshape"))
-
-# RProtoBuf depends on the system protobuf headers. For Ubuntu you will need to
-# install the libprotoc-dev and libprotobuf-dev packages.
 
 # One nasty issue encountered in some MacOSX versions (at least in 10.9) is that
 # the R version installed via homebrew runs into a libl library error. Please
