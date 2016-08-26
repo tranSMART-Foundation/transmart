@@ -93,13 +93,13 @@
                                                fieldName:'amTagItem_' + amTagItem.id,searchAction:amTagItem.guiHandler + 'Search',
                                                searchController:'metaData', values:tagValues]}" />
                         </g:if>
-                    <g:else>
-                        <g:render template="extBusinessObjSearch" plugin="folderManagement"
-                                  model="${[fieldName:'amTagItem_' + amTagItem.id,searchAction:amTagItem.guiHandler + 'Search',
-                                           searchController:'metaData', values:tagValues]}" />
+                        <g:else>
+                            <g:render template="extBusinessObjSearch" plugin="folderManagement"
+                                      model="${[fieldName:'amTagItem_' + amTagItem.id,searchAction:amTagItem.guiHandler + 'Search',
+                                                searchController:'metaData', values:tagValues]}" />
+                        </g:else>
                     </g:else>
-                </g:else>
-            </td>
+                </td>
             </tr>
         </g:each>
     </g:if>
