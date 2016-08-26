@@ -720,7 +720,7 @@ class FmFolderController {
         folder.folderLevel = newFolderLevel
 
         if (folder.save()) {
-            List<FmFolder> subFolderList = FmFolder.findAll("from FmFolder as fd where fd.folderFullName like :fn",
+            List<FmFolder> subFolderList = FmFolder.findAll("from FmFolder as fd where fd.folderFullName like :fn escape '*'",
                     [fn: oldFullName + "%"])
 
             subFolderList.each {
@@ -745,7 +745,7 @@ class FmFolderController {
         folder.activeInd = false
 
         if (folder.save()) {
-            List<FmFolder> subFolderList = FmFolder.findAll("from FmFolder as fd where fd.folderFullName like :fn and fd.folderLevel = :fl",
+            List<FmFolder> subFolderList = FmFolder.findAll("from FmFolder as fd where fd.folderFullName like :fn escape '*' and fd.folderLevel = :fl",
                     [fn: folder.folderFullName + "%", fl: (folder.folderLevel + 1)])
 
             subFolderList.each {
@@ -765,7 +765,7 @@ class FmFolderController {
         if (parentPath == null) {
             return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and upper(fd.folderType) = upper(:fl) ", [fl: folderType])
         } else {
-            return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and upper(fd.folderType) = upper(:fl) and fd.folderFullName like :fn ",
+            return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and upper(fd.folderType) = upper(:fl) and fd.folderFullName like :fn escape '*' ",
                     [fl: folderType, fn: parentPath + "%"])
         }
 
@@ -774,19 +774,19 @@ class FmFolderController {
     //method which returns a list of folders which are the children of the folder of which the identifier is passed as parameter
     private List<FmFolder> getChildrenFolder(String parentId) {
         def folder = FmFolder.get(parentId)
-        return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn and fd.folderLevel= :fl ", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%"])
+        return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn escape '*' and fd.folderLevel= :fl ", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%"])
     }
 
     //method which returns a list of folders which are the children of the folder of which the identifier is passed as parameter by folder types
     private List<FmFolder> getChildrenFolderByType(Long parentId, String folderType) {
         def folder = FmFolder.get(parentId)
-        return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn and fd.folderLevel= :fl and upper(fd.folderType) = upper(:ft)", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%", ft: folderType])
+        return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn escape '*' and fd.folderLevel= :fl and upper(fd.folderType) = upper(:ft)", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%", ft: folderType])
     }
 
     //method which returns a list of folders which are the children of the folder of which the identifier is passed as parameter
     private List getChildrenFolderTypes(Long parentId) {
         def folder = FmFolder.get(parentId)
-        return FmFolder.executeQuery("select distinct(fd.folderType) from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn and fd.folderLevel= :fl ", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%"])
+        return FmFolder.executeQuery("select distinct(fd.folderType) from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn escape '*' and fd.folderLevel= :fl ", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%"])
     }
 
     private String createDataTable(Map<FmFolder, String> subFoldersAccessLevelMap, String folderType) {
@@ -967,7 +967,7 @@ class FmFolderController {
                     subjectLevelDataAvailable = ontologyService.checkSubjectLevelData(bioDataObject.accession)
                 }
 
-                if (folder.folderType.equalsIgnoreCase(FolderType.ASSAY.name()) && folder.folderType.equalsIgnoreCase(FolderType.ANALYSIS.name())) {
+                if (folder.folderType.equalsIgnoreCase(FolderType.ASSAY.name()) || folder.folderType.equalsIgnoreCase(FolderType.ANALYSIS.name())) {
                     measurements = BioAssayPlatform.executeQuery("SELECT DISTINCT platformType FROM BioAssayPlatform as p ORDER BY p.platformType")
                     vendors = BioAssayPlatform.executeQuery("SELECT DISTINCT vendor FROM BioAssayPlatform as p ORDER BY p.vendor")
                     technologies = BioAssayPlatform.executeQuery("SELECT DISTINCT platformTechnology FROM BioAssayPlatform as p ORDER BY p.platformTechnology")
@@ -977,10 +977,9 @@ class FmFolderController {
                 def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
                 def subFolderTypes = fmFolderService.getChildrenFolderTypes(folder.id)
                 subFolderTypes.each {
-                    log.debug "it = $it"
                     subFolders = fmFolderService.getChildrenFolderByType(folder.id, it)
                     if (subFolders != null && subFolders.size() > 0) {
-                        log.debug "${subFolders.size()} subFolders == $subFolders"
+                        log.debug "found ${subFolders.size()} subFolders == $subFolders"
                         def subFoldersAccessLevelMap = fmFolderService.getAccessLevelInfoForFolders(user, subFolders)
                         String gridTitle = "Associated " + StringUtils.capitalize(subFolders[0].pluralFolderTypeName.toLowerCase())
                         String gridData = createDataTable(subFoldersAccessLevelMap, gridTitle)
@@ -1503,19 +1502,43 @@ class FmFolderController {
             experiment = Experiment.findByAccession(params.accession)
         }
         def folder = fmFolderService.getFolderByBioDataObject(experiment)
-        if (params.returnJSON) {
+        if (folder) {
+            if (params.returnJSON) {
+                def fileList = folder.getFmFiles()
+                def infoList = [:]
+                for (file in fileList) {
+                    if (file.activeInd) {
+                        infoList.put(file.id, [displayName: file.displayName, fileType: file.fileType])
+                    }
+                }
+                render infoList as JSON
+            } else {
+                log.info("rendering filesTable folder ${folder}")
+                render(template: '/fmFolder/filesTable', plugin: "folderManagement", model: [folder: folder])
+            }
+        }
+    }
+
+    def getFolderHasFiles = {
+        //Get the folder ID for the study selected
+        def paramMap = params
+        def experiment = null
+        log.info("getFolderHasFiles id ${params.id} accession ${params.accession} returnJSON ${params.returnJSON}")
+        if (params.id) {
+            experiment = Experiment.get(params.id)
+        } else if (params.accession) {
+            experiment = Experiment.findByAccession(params.accession)
+        }
+        def folder = fmFolderService.getFolderByBioDataObject(experiment)
+        if (folder) {
             def fileList = folder.getFmFiles()
             def infoList = [:]
             for (file in fileList) {
                 if (file.activeInd) {
-                    infoList.put(file.id, [displayName: file.displayName, fileType: file.fileType])
+                    render "true"
                 }
             }
-            render infoList as JSON
-        } else {
-            log.info("rendering filesTable folder ${folder}")
-            render(template: '/fmFolder/filesTable', plugin: "folderManagement", model: [folder: folder])
         }
+        render "false"
     }
-
 }
