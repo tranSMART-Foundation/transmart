@@ -184,6 +184,7 @@ window.smartRApp.directive('boxplot', [
                     return y(d.value) >= top && y(d.value) <= bottom && point.attr('cx') >= left && point.attr('cx') <= right;
                 })
                 .classed('brushed', true)
+                .data()
                 .map(function(d) { return d.patientID; });
         }
 
@@ -211,7 +212,7 @@ window.smartRApp.directive('boxplot', [
         }
 
         function removeOutliers() {
-            currentSelection = d3.selectAll('.outlier').map(function (d) { return d.patientID; });
+            currentSelection = d3.selectAll('.outlier').data().map(function (d) { return d.patientID; });
             if (currentSelection) { excludeSelection(); }
         }
 
