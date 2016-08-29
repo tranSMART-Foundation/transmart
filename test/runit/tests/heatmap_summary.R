@@ -64,7 +64,7 @@ test_set_fetch_params = list(
   
   #loaded_variables and preprocessed are sometimes removed by a test function
   assign("loaded_variables", test_data, envir = .GlobalEnv)
-  assign("preprocessed", list(preprocessed=test_set_preprocessed), envir = .GlobalEnv)
+  assign("preprocessed", list(HD=test_set_preprocessed), envir = .GlobalEnv)
   assign("fetch_params", test_set_fetch_params, envir = .GlobalEnv)
   
 }
@@ -83,11 +83,6 @@ test_set_fetch_params = list(
 test.get_input_data.fetch <- function() {
   fetched_data <- get_input_data("fetch")
   checkEquals(loaded_variables, fetched_data)
-}
-
-## get_input_data should take variable preprocessed and return its contents as a named list if phase = "preprocess"
-test.get_input_data.preprocess <- function() {
-  checkEquals( preprocessed, get_input_data("preprocess"))
 }
 
 ## get_input_data should throw error if phase is NA or anything other than "fetch" and "preprocess
@@ -243,7 +238,7 @@ phase <- "fetch"
 
 #summary stats corresponding to test_set
 summary_stats_table <- data.frame(
-  "variableLabel" = "highDimensional_n0_s1",
+  "variableLabel" = "Breast_s1",
   "node" = "highDimensional_n0",
   "subset" = "s1",
   "totalNumberOfValuesIncludingMissing" = 20,
@@ -269,34 +264,7 @@ summary_stats_table2[,c("min", "max", "mean", "q1", "median", "q3")] <-
 # 1 node, 1 subset
 test.produce_summary_stats.simplecase <- function() {
   checkEquals(
-    list("fetch_summary_stats_node_highDimensional_n0.json" = summary_stats_table), produce_summary_stats(test_data_measurements, phase)
-  )
-}
-
-#multiple nodes, multiple subsets
-test.produce_summary_stats.multiplenodesandsubsets <- function() {
-  test_data_measurements_multiple_nodes_subsets <-
-    list(
-      "highDimensional_n0_s1" = test_set_measurements,"highDimensional_n0_s2" = test_set2_measurements,
-      "highDimensional_n1_s1" = test_set2_measurements, "highDimensional_n1_s2" = test_set_measurements
-    )
-  
-  expected_result_n0 <-
-    rbind(summary_stats_table,summary_stats_table2)
-  expected_result_n0[2 , c("variableLabel","subset")] <-
-    c("highDimensional_n0_s2", "s2")
-  
-  expected_result_n1 <-
-    rbind(summary_stats_table2,summary_stats_table)
-  expected_result_n1[1 , c("variableLabel", "node","subset")] <-
-    c("highDimensional_n1_s1", "highDimensional_n1", "s1")
-  expected_result_n1[2 , c("variableLabel", "node","subset")] <-
-    c("highDimensional_n1_s2", "highDimensional_n1", "s2")
-  
-  checkEquals(
-    list(
-      "fetch_summary_stats_node_highDimensional_n0.json" = expected_result_n0, "fetch_summary_stats_node_highDimensional_n1.json" = expected_result_n1
-    ), produce_summary_stats(test_data_measurements_multiple_nodes_subsets, phase)
+    list("fetch_summary_stats_node_highDimensional_n0.json" = summary_stats_table), produce_summary_stats(test_data_measurements, phase, test_set_fetch_params)
   )
 }
 
@@ -316,7 +284,7 @@ test.produce_summary_stats.preprocessed <- function() {
   
   checkEquals(
     list("preprocess_summary_stats_node_all.json" = expected_result), 
-    produce_summary_stats(split_preprocessed_measurements, "preprocess")
+    produce_summary_stats(split_preprocessed_measurements, "preprocess", test_set_fetch_params)
   )
 }
 
@@ -335,7 +303,7 @@ test.produce_summary_stats.itemNA <- function() {
   expected_result[,"numberOfSamples"] <- NA #logical
   
   checkEquals(
-    list("fetch_summary_stats_node_highDimensional_n0.json" = expected_result), produce_summary_stats(test_NA_set, phase)
+    list("fetch_summary_stats_node_highDimensional_n0.json" = expected_result), produce_summary_stats(test_NA_set, phase, test_set_fetch_params)
   )
 }
 
@@ -350,7 +318,7 @@ test.produce_summary_stats.1sample <- function() {
     c(1, 5, 3, 1.58113883, 2, 3, 4)
   
   checkEquals(
-    list("fetch_summary_stats_node_highDimensional_n0.json" = expected_result), produce_summary_stats(test_data_one_sample, phase)
+    list("fetch_summary_stats_node_highDimensional_n0.json" = expected_result), produce_summary_stats(test_data_one_sample, phase, test_set_fetch_params)
   )
 }
 
@@ -369,7 +337,7 @@ test.produce_summary_stats.1probe <- function() {
     c(1, 5, 3, 1.58113883, 2, 3, 4)
   
   checkEquals(
-    list("fetch_summary_stats_node_highDimensional_n0.json" = expected_result), produce_summary_stats(test_data_one_probe, phase)
+    list("fetch_summary_stats_node_highDimensional_n0.json" = expected_result), produce_summary_stats(test_data_one_probe, phase, test_set_fetch_params)
   )
 }
 
@@ -384,7 +352,7 @@ test.produce_summary_stats.1probe1sample <- function() {
     c(1, 1, 1, as.numeric(NA), 1, 1, 1)
   
   checkEquals(
-    list("fetch_summary_stats_node_highDimensional_n0.json" = expected_result), produce_summary_stats(test_data_one_probe_sample, phase)
+    list("fetch_summary_stats_node_highDimensional_n0.json" = expected_result), produce_summary_stats(test_data_one_probe_sample, phase, test_set_fetch_params)
   )
 }
 

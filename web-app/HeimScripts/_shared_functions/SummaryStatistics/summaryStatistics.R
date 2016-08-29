@@ -47,8 +47,7 @@ get_input_data <- function(phase)
         "Summary stats is run for phase \'preprocess\', but variable \'preprocessed\' does not exist in the environment."
       )
     }
-    #input_data <- list("preprocessed" = preprocessed$preprocessed)
-    input_data <- preprocessed
+    input_data <- list("preprocessed" = preprocessed$HD)
   }
   
   return(input_data)
@@ -271,10 +270,9 @@ allNA <- function(v1)
   return(all(is.na(v1)))
 }
 
-## Converting high dimensional node id to node name
-convertNodeNames <- function(nodeNames) {
+convertNodeNames <- function(nodeNames, fetch_params=fetch_params) {
   nodes <- sub("_s[1-2]{1}", "", nodeNames)
-  names <- sapply(nodes, function(el) fetch_params$ontologyTerms[[paste0("highDimensional_",el)]]$name)
+  names <- sapply(nodes, function(el) fetch_params$ontologyTerms[[el]]$name)
   variableLabel <- sapply(1:length(names), function(i) sub(".*_", paste(names[i], "_", sep=""), nodeNames[i]))
   variableLabel
 }
@@ -294,7 +292,7 @@ convertNodeNames <- function(nodeNames) {
 #         * build in  a test to determine if a variable is numeric or categorical and only calculate the statistics if 
 #           numeric.
 #         * If a variable is categorical: are missing values in that case NA or  "" (empty string?)
-produce_summary_stats <- function(measurement_tables, phase)
+produce_summary_stats <- function(measurement_tables, phase, fetch_params=fetch_params)
 {
   # construct data.frame to store the results from the summary statistics in
   table_columns <-
@@ -322,10 +320,9 @@ produce_summary_stats <- function(measurement_tables, phase)
   {
     # get the name of the data.frame, identifying the node and subset
     identifier <- names(measurement_tables)[i]
-#    result_table[identifier, "variableLabel"] <- ifelse(grepl("preprocessed", identifier), identifier, convertNodeNames(identifier))
-    result_table[identifier, "variableLabel"] <- ifelse(grepl("preprocessed", identifier), identifier, identifier)
-    
-    
+    result_table[identifier, "variableLabel"] <- ifelse(grepl("preprocessed", identifier), identifier,
+                                                        convertNodeNames(identifier, fetch_params))
+
     if (!all(is.na(measurement_tables[[i]])))
     {
       cols <- ncol(measurement_tables[[i]])
