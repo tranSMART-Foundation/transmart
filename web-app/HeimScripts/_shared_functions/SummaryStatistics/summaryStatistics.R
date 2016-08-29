@@ -270,9 +270,12 @@ allNA <- function(v1)
   return(all(is.na(v1)))
 }
 
-convertNodeNames <- function(nodeNames) {
+convertNodeNames <- function(nodeNames, fps=NULL) {
+    if (is.null(fps)) {
+        fps <- fetch_params
+    }
   nodes <- sub("_s[1-2]{1}", "", nodeNames)
-  names <- sapply(nodes, function(el) fetch_params$ontologyTerms[[el]]$name)
+  names <- sapply(nodes, function(el) fps$ontologyTerms[[el]]$name)
   variableLabel <- sapply(1:length(names), function(i) sub(".*_", paste(names[i], "_", sep=""), nodeNames[i]))
   variableLabel
 }
@@ -292,8 +295,12 @@ convertNodeNames <- function(nodeNames) {
 #         * build in  a test to determine if a variable is numeric or categorical and only calculate the statistics if 
 #           numeric.
 #         * If a variable is categorical: are missing values in that case NA or  "" (empty string?)
-produce_summary_stats <- function(measurement_tables, phase)
+produce_summary_stats <- function(measurement_tables, phase, fps=NULL)
 {
+    if (is.null(fps)) {
+        fps <- fetch_params
+    }
+
   # construct data.frame to store the results from the summary statistics in
   table_columns <-
     c(
@@ -320,7 +327,8 @@ produce_summary_stats <- function(measurement_tables, phase)
   {
     # get the name of the data.frame, identifying the node and subset
     identifier <- names(measurement_tables)[i]
-    result_table[identifier, "variableLabel"] <- ifelse(grepl("preprocessed", identifier), identifier, convertNodeNames(identifier))
+    result_table[identifier, "variableLabel"] <- ifelse(grepl("preprocessed", identifier), identifier,
+                                                        convertNodeNames(identifier, fps))
 
     if (!all(is.na(measurement_tables[[i]])))
     {
