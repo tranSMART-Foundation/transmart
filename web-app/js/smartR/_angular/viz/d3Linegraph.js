@@ -10,9 +10,7 @@ window.smartRApp.directive('lineGraph', [
         return {
             restrict: 'E',
             scope: {
-                data: '=',
-                width: '@',
-                height: '@'
+                data: '='
             },
             templateUrl: $rootScope.smartRPath + '/js/smartR/_angular/templates/linegraph.html',
             link: function (scope, element) {
@@ -22,7 +20,7 @@ window.smartRApp.directive('lineGraph', [
                 scope.$watch('data', function() {
                     $(template_viz).empty();
                     if (! $.isEmptyObject(scope.data)) {
-                        smartRUtils.prepareWindowSize(scope.width, scope.height);
+                        smartRUtils.prepareWindowSize(1000, 1000);
                         createLinegraph(scope, template_viz, template_ctrl);
                     }
                 });
@@ -31,6 +29,8 @@ window.smartRApp.directive('lineGraph', [
 
         function createLinegraph(scope, vizDiv) {
             var data_matrix = scope.data.data_matrix;
+            var vizDivWidth = document.getElementById('sr-index').getBoundingClientRect().width;
+            var vizDivHeight = document.getElementById('sr-index').getBoundingClientRect().height;
 
             var dataCF = crossfilter(data_matrix);
 
@@ -47,13 +47,13 @@ window.smartRApp.directive('lineGraph', [
             var tmpByPatientID = dataCF.dimension(function(d) { return d.patientID; });
 
             var MARGIN = {
-                top: scope.height * 0.1,
-                right: scope.width * 0.1,
-                bottom: scope.height * 0.1,
-                left: scope.width * 0.1
+                top: vizDivHeight * 0.1,
+                right: vizDivWidth * 0.1,
+                bottom: vizDivHeight * 0.1,
+                left: vizDivWidth * 0.1
             };
-            var LINEGRAPH_WIDTH = scope.width - MARGIN.left - MARGIN.right;
-            var LINEGRAPH_HEIGHT = scope.height - MARGIN.top - MARGIN.bottom;
+            var LINEGRAPH_WIDTH = vizDivWidth - MARGIN.left - MARGIN.right;
+            var LINEGRAPH_HEIGHT = vizDivHeight - MARGIN.top - MARGIN.bottom;
 
             var ERROR_BAR_WIDTH = 5;
             var MAX_XAXIS_ELEMENT_WIDTH = 40;
@@ -548,7 +548,7 @@ window.smartRApp.directive('lineGraph', [
                         .attr('x', LEGEND_ITEM_SIZE + 5)
                         .attr('y', LEGEND_ITEM_SIZE / 2)
                         .attr('dy', '.35em')
-                        .style('font-size', '15px')
+                        .style('font-size', smartRUtils.scaleFont('Cohort X', {}, 15, MARGIN.right - LEGEND_ITEM_SIZE - 5, 0, 1))
                         .text(function(d) { return 'Cohort ' + d; });
                     // --- Add legend items
 

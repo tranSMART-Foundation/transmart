@@ -52,7 +52,7 @@
                 </run-button>
                 <br/>
                 <br/>
-                <line-graph data="runAnalysis.scriptResults" width="1500" height="1500"></line-graph>
+                <line-graph data="runAnalysis.scriptResults"></line-graph>
             </workflow-tab>
 
         </tab-container>

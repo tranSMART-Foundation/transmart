@@ -222,7 +222,7 @@ div.sr-status-and-output-container:empty:before {
 .sr-workflow-controls {
     position: fixed;
     bottom: 0;
-    right: 0;
+    right: 104px;
     background: rgba(0, 0, 0, 0.5);
     color: white;
 }

@@ -117,6 +117,9 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         });
     };
 
+    /**
+     * Set minimum size for visualisation
+     */
     service.prepareWindowSize = function(width, height) {
         $('#heim-tabs').css('min-width', parseInt(width) + 25);
         $('#heim-tabs').css('min-height', parseInt(height) + 25);
