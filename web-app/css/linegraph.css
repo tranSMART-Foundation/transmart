@@ -115,7 +115,8 @@
     stroke-width: 2px;
 }
 .sr-lg-timeline:hover {
-    opacity: 0.5;
+    stroke: yellow !important;
+    stroke-width: 4px;
 }
 .sr-lg-timeline.subset-1 {
     stroke: rgb(94, 198, 216);

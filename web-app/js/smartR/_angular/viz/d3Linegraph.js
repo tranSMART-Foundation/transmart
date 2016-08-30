@@ -666,6 +666,7 @@ window.smartRApp.directive('lineGraph', [
                                 ' patientid-' + d[0].patientID; // might or might not be defined
                             })
                             .on('mouseover', function(d) {
+                                d3.select(this).moveToFront();
                                 var html = '';
 
                                 if (plotTypeSelect.value === 'noGrouping') {
