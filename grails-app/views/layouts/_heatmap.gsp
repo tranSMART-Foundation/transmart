@@ -138,7 +138,8 @@
                         filename="heatmap.json"
                         running="runAnalysis.running">
             </run-button>
-            <capture-plot-button filename="heatmap.svg" disabled="runAnalysis.download.disabled"></capture-plot-button>
+            <capture-plot-button filename="heatmap.svg" disabled="runAnalysis.download.disabled" target="heatmap-plot">
+            </capture-plot-button>
             <download-results-button disabled="runAnalysis.download.disabled"></download-results-button>
             <br/>
             <workflow-warnings warnings="runAnalysis.scriptResults.warnings"></workflow-warnings>

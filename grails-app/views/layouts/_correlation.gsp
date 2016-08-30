@@ -80,6 +80,7 @@
                             arguments-to-use="runAnalysis.params"
                             running="runAnalysis.running">
                 </run-button>
+                <capture-plot-button filename="correlation.svg" target="correlation-plot"></capture-plot-button>
                 <br/>
                 <br/>
                 <correlation-plot data="runAnalysis.scriptResults" width="1500" height="1500"></correlation-plot>
