@@ -90,6 +90,9 @@ window.smartRApp.directive('capturePlotButton', [function() {
 
             scope.capture = function() {
                 var svgElement = $(scope.target + ' svg')[0];
+                if (!svgElement) {
+                    return;
+                }
                 downloadSVG(svgElement, scope.filename);
             };
 
