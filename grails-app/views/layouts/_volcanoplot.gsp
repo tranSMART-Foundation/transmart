@@ -32,6 +32,7 @@
                             filename="volcanoplot.json"
                             running="runAnalysis.running">
                 </run-button>
+                <capture-plot-button filename="volcanoplot.svg" target="volcano-plot"></capture-plot-button>
                 <br/>
                 <br/>
                 <volcano-plot data="runAnalysis.scriptResults" width="1000" height="800"></volcano-plot>
