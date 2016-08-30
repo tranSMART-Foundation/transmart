@@ -390,23 +390,26 @@ window.smartRApp.directive('lineGraph', [
             updateXAxis();
 
             function iconGenerator() {
-                var square = function(size) { return 'M0,0H' + size + 'V' + size + 'H0Z'; };
-                var triangle = function(size) { return 'M' + (size / 2) + ',0L' + size + ',' + size + 'H0Z'; };
+                var square = function(size) { return '0,0 ' + size + ',0 ' + size + ',' + size + ' 0,' + size; };
+                var triangle = function(size) { return (size / 2) + ',0 ' + size + ',' + size + ' 0,' + size; };
                 var diamond = function(size) {
-                    return 'M' + (size / 2) + ',0' +
-                        'L' + size + ',' + (size / 2) +
-                        'L' + (size / 2) + ',' + size +
-                        'L0,' + (size / 2) + 'Z';
+                    return (size / 2) + ',0 ' + size + ',' + (size / 2) + ' ' + (size / 2) + ',' + size + ' 0,' + (size / 2);
                 };
-                var revTriangle = function(size) { return 'M0,0H' + size + 'L' + (size / 2) + ',' + size + 'Z'; };
-                var hexagon = function(size) { return 'M' + (size / 2) + ',0' +
-                        'L' + size + ',' + size / 4 +
-                        'L' + size + ',' + (size * 3 / 4) +
-                        'L' + (size / 2) + ',' + size +
-                        'L0,' + (size * 3 / 4) +
-                        'L0,' + (size / 4) + 'Z';
+                var revTriangle = function(size) { return '0,0 ' + size + ',0 ' + (size / 2) + ',' + size; };
+                var hexagon = function(size) {
+                    return (size / 2) + ',0 ' + 
+                        size + ',' + (size / 4) + ' ' +
+                        size + ',' + (size * 3 / 4) + ' ' +
+                        (size / 2) + ',' + size + ' ' +
+                        '0,' + (size * 3 / 4) + ' ' +
+                        '0,' + (size / 4);
                 };
-                var fallback = function(size) { return 'M0,0L' + size + ',' + size + 'M' + size + ',0L0,' + size; };
+                var fallback = function(size) {
+                    return (size / 4) + ',' + (size / 4) + ' ' +
+                        (size * 3 / 4) + ',' + (size / 4) + ' ' +
+                        (size * 3 / 4) + ',' + (size * 3 / 4) + ' ' +
+                        (size / 4) + ',' + (size * 3 / 4);
+                };
                 var iconTable = [
                     // square
                     {shape: square, fill: '#006980'},
@@ -876,9 +879,9 @@ window.smartRApp.directive('lineGraph', [
                     var icon = d3.select(this).selectAll('.sr-lg-cat-icon')
                         .data(byTimeInteger.bottom(Infinity), function(d) { return d.id; });
 
-                    // ENTER path
+                    // ENTER polygon
                     icon.enter()
-                        .append('path')
+                        .append('polygon')
                         .attr('class', function(d) {
                             return 'sr-lg-cat-icon' +
                                 ' patientid-' + smartRUtils.makeSafeForCSS(d.patientID) +
@@ -900,8 +903,8 @@ window.smartRApp.directive('lineGraph', [
                             tip.hide();
                         });
 
-                    // UPDATE path
-                    icon.attr('d', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
+                    // UPDATE polygon
+                    icon.attr('points', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
                         .attr('transform', function(d) {
                             return 'translate(' + (x(d.timeInteger) - iconSize / 2) + ',' + 0 + ')';
                         });
