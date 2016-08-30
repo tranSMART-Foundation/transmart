@@ -271,15 +271,6 @@ window.smartRApp.directive('lineGraph', [
                     .duration(ANIMATION_DURATION)
                     .call(xAxis);
 
-                var timeZones = timeAxisData.map(function(d, i) {
-                    var left = i === 0 ? 0 : x(d.timeInteger) - (x(d.timeInteger) - x(timeAxisData[i-1].timeInteger)) / 2;
-                    var right = i === timeAxisData.length - 1 ? 
-                        LINEGRAPH_WIDTH : x(d.timeInteger) + (x(timeAxisData[i+1].timeInteger) - x(d.timeInteger)) / 2;
-                    return {left: left, right: right, timeInteger: d.timeInteger, timeString: d.timeString};
-                });
-
-                var timeIntegers = timeZones.map(function(d) { return d.timeInteger; });
-                var timeStrings = timeZones.map(function(d) { return d.timeStrings; });
                 var drag = d3.behavior.drag()
                     .on('drag', function() {
                         permitHighlight = false;
@@ -290,6 +281,18 @@ window.smartRApp.directive('lineGraph', [
                     })
                     .on('dragend', function(d) {
                         var xPos = d3.transform(d3.select(this).attr('transform')).translate[0];
+                        timeAxisData = smartRUtils.unique(byTimeInteger.bottom(Infinity), function(d) { return d.timeInteger; });
+ 
+                        var timeZones = timeAxisData.map(function(d, i) {
+                            var left = i === 0 ?
+                                0 : x(timeAxisData[i-1].timeInteger) + (x(d.timeInteger) - x(timeAxisData[i-1].timeInteger)) / 2;
+                            var right = i === timeAxisData.length - 1 ? 
+                                LINEGRAPH_WIDTH : x(d.timeInteger) + (x(timeAxisData[i+1].timeInteger) - x(d.timeInteger)) / 2;
+                            return {left: left, right: right, timeInteger: d.timeInteger, timeString: d.timeString};
+                        });
+
+                        var timeIntegers = timeZones.map(function(d) { return d.timeInteger; });
+                        var timeStrings = timeZones.map(function(d) { return d.timeStrings; });
                         var matchingTimeZones = timeZones.filter(function(timeZone) {
                             return timeZone.left <= xPos && xPos <= timeZone.right;
                         });
