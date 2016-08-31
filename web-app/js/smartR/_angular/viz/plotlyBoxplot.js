@@ -32,38 +32,25 @@ window.smartRApp.directive('boxplot', [
         var cf = crossfilter(scope.data.dataMatrix);
         var byValue = cf.dimension(function(d) { return d.value; });
         var bySubset = cf.dimension(function(d) { return d.subset; });
+        var byName = cf.dimension(function(d) { return d.name; });
 
-        bySubset.filterExact(1);
-        var subset1 = {
-            y: byValue.top(Infinity).map(function(d) { return d.value; }),
-            type: 'box',
-            name: 'Subset 1',
-            jitter: 0.3,
-            pointpos: -1.8,
-            boxmean: 'sd',
-            marker: {
-                color: 'rgb(7, 40, 89)'
-            },
-            boxpoints: 'all'
-        };
-
-        bySubset.filterExact(2);
-        var subset2 = {
-            y: byValue.top(Infinity).map(function(d) { return d.value; }),
-            type: 'box',
-            name: 'Subset 2',
-            jitter: 0.3,
-            pointpos: -1.8,
-            boxmean: 'sd',
-            marker: {
-                color: '#FF851B'
-            },
-            boxpoints: 'all'
-        };
-
-        var plotData = [subset1, subset2];
+        var plotData = [];
+        smartRUtils.unique(smartRUtils.getValuesForDimension(byName)).forEach(function(name) {
+            byName.filterExact(name);
+            smartRUtils.unique(smartRUtils.getValuesForDimension(bySubset)).forEach(function(subset) {
+                bySubset.filterExact(subset);
+                plotData.push({
+                    type: 'box',
+                    y: smartRUtils.getValuesForDimension(byValue),
+                    boxpoints: 'all',
+                    jitter: 0.5
+                });
+                bySubset.filterAll();
+            });
+            byName.filterAll();
+        });
+        
         var layout = {
-            title: 'Boxplot of ' + scope.data.concept,
             height: 800
         };
         Plotly.newPlot(vizDiv, plotData, layout);

@@ -183,5 +183,16 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         return uniqArr;
     };
 
+    service.getValuesForDimension = function(dimension, ascendingOrder) {
+        var values = [];
+        if (typeof ascendingOrder === 'undefined' || !ascendingOrder) {
+            values = dimension.top(Infinity).map(function(record) { return dimension.accessor(record); });
+        } else {
+            values =dimension.bottom(Infinity).map(function(record) { return dimension.accessor(record); });
+        }
+
+        return values;
+    };
+
     return service;
 }]);

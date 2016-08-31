@@ -13,8 +13,10 @@ window.smartRApp.controller('BoxplotController', [
             running: false,
             disabled: false,
             loaded: false,
+            selectedBiomarkers: [],
             conceptBoxes: {
-                datapoints: {concepts: [], valid: false}
+                numData: {concepts: [], valid: false},
+                highDimensional: {concepts: [], valid: false}
             }
         };
 
