@@ -42,7 +42,6 @@
                         arguments-to-use="runAnalysis.params"
                         running="runAnalysis.running">
             </run-button>
-            <capture-plot-button filename="boxplot.svg" target="boxplot"></capture-plot-button>
             <br/>
             <br/>
             <boxplot data="runAnalysis.scriptResults"></boxplot>

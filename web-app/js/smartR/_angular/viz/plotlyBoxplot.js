@@ -40,6 +40,7 @@ window.smartRApp.directive('boxplot', [
             name: 'Subset 1',
             jitter: 0.3,
             pointpos: -1.8,
+            boxmean: 'sd',
             marker: {
                 color: 'rgb(7, 40, 89)'
             },
@@ -53,15 +54,17 @@ window.smartRApp.directive('boxplot', [
             name: 'Subset 2',
             jitter: 0.3,
             pointpos: -1.8,
+            boxmean: 'sd',
             marker: {
-                color: 'rgb(7, 40, 89)'
+                color: '#FF851B'
             },
             boxpoints: 'all'
         };
 
         var plotData = [subset1, subset2];
         var layout = {
-            title: 'Boxplot of ' + scope.data.concept
+            title: 'Boxplot of ' + scope.data.concept,
+            height: 800
         };
         Plotly.newPlot(vizDiv, plotData, layout);
     }
