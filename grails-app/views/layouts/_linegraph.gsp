@@ -50,6 +50,7 @@
                             filename="linegraph.json"
                             running="runAnalysis.running">
                 </run-button>
+                <capture-plot-button filename="linegraph.svg" target="line-graph"></capture-plot-button>
                 <br/>
                 <br/>
                 <line-graph data="runAnalysis.scriptResults"></line-graph>
