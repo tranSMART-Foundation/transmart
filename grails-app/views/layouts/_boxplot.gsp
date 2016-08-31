@@ -44,7 +44,7 @@
             </run-button>
             <br/>
             <br/>
-            <boxplot data="runAnalysis.scriptResults" width="1000" height="500"></boxplot>
+            <boxplot data="runAnalysis.scriptResults"></boxplot>
         </workflow-tab>
 
     </tab-container>
