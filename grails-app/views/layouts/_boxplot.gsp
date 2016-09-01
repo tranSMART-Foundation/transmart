@@ -12,7 +12,7 @@
                          min="-1"
                          max="-1"
                          label="Highdimensional Variable"
-                         tooltip="Select a single high dimensional variable that you would like to have displayed.">
+                         tooltip="Select one or more high dimensional variables that you would like to have displayed.">
             </concept-box>
             <concept-box style="display: inline-block;"
                          concept-group="fetch.conceptBoxes.numData"
@@ -20,7 +20,7 @@
                          min="-1"
                          max="-1"
                          label="Numerical Variable"
-                         tooltip="Select a single numerical variable that you would like to have displayed.">
+                         tooltip="Select one or more numerical variables that you would like to have displayed.">
             </concept-box>
             <br/>
             <br/>
@@ -30,6 +30,8 @@
                           loaded="fetch.loaded"
                           running="fetch.running"
                           biomarkers="fetch.selectedBiomarkers"
+                          disabled="fetch.button.disabled"
+                          message="fetch.button.message"
                           allowed-cohorts="[1,2]">
             </fetch-button>
         </workflow-tab>

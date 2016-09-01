@@ -19,7 +19,9 @@ window.smartRApp.directive('fetchButton', [
                 allSamples: '=?',
                 numberOfRows: '=?',
                 allowedCohorts: '=',
-                projection: '@?'
+                projection: '@?',
+                disabled: '=?',
+                message: '=?'
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/fetchButton.html',
             link: function(scope, element) {
@@ -27,16 +29,16 @@ window.smartRApp.directive('fetchButton', [
                     template_msg = element.children()[1];
 
                 var _onSuccess = function() {
-                    template_msg.innerHTML = 'Task complete! Go to the "Preprocess" or "Run Analysis" tab to continue.';
+                    scope.message = 'Task complete! Go to the "Preprocess" or "Run Analysis" tab to continue.';
                     scope.loaded = true;
-                    template_btn.disabled = false;
+                    scope.disabled = false;
                     scope.running = false;
                 };
 
                 var _onFailure = function(msg) {
-                    template_msg.innerHTML = 'Error: ' + msg;
+                    scope.message = 'Error: ' + msg;
                     scope.loaded = false;
-                    template_btn.disabled = false;
+                    scope.disabled = false;
                     scope.running = false;
                 };
 
@@ -54,6 +56,14 @@ window.smartRApp.directive('fetchButton', [
                     }
                 }, true);
 
+                scope.$watch('message', function(newValue) {
+                    if (newValue) {
+                        template_msg.innerHTML = newValue;
+                    } else {
+                        template_msg.innerHTML = '';
+                    }
+                });
+
                 var _getDataConstraints = function (biomarkers) {
                     if (typeof biomarkers !== 'undefined' && biomarkers.length > 0) {
                         var searchKeywordIds = biomarkers.map(function(biomarker) {
@@ -68,7 +78,7 @@ window.smartRApp.directive('fetchButton', [
                 };
 
                 var _showSummaryStats = function() {
-                    template_msg.innerHTML = 'Executing summary statistics, please wait <span class="blink_me">_</span>';
+                    scope.message = 'Executing summary statistics, please wait <span class="blink_me">_</span>';
                     rServeService.executeSummaryStats('fetch')
                         .then(
                             function(data) { scope.summaryData = data.result; }, // this will trigger $watch
@@ -77,8 +87,8 @@ window.smartRApp.directive('fetchButton', [
                 };
 
                 template_btn.onclick = function() {
-                    template_btn.disabled = true;
-                    template_msg.innerHTML = 'Fetching data, please wait <span class="blink_me">_</span>';
+                    scope.disabled = true;
+                    scope.message = 'Fetching data, please wait <span class="blink_me">_</span>';
 
                     scope.summaryData = {};
                     scope.allSamples = 0;

@@ -1,4 +1,4 @@
-//# sourceURL=d3Boxplot.js
+//# sourceURL=plotlyBoxplot.js
 
 'use strict';
 
@@ -37,11 +37,12 @@ window.smartRApp.directive('boxplot', [
         var plotData = [];
         smartRUtils.unique(smartRUtils.getValuesForDimension(byName)).forEach(function(name) {
             byName.filterExact(name);
-            smartRUtils.unique(smartRUtils.getValuesForDimension(bySubset)).forEach(function(subset) {
+            smartRUtils.unique(smartRUtils.getValuesForDimension(bySubset, true)).forEach(function(subset) {
                 bySubset.filterExact(subset);
                 plotData.push({
                     type: 'box',
                     y: smartRUtils.getValuesForDimension(byValue),
+                    name: smartRUtils.shortenConcept(name) + ' s' + subset,
                     boxpoints: 'all',
                     jitter: 0.5
                 });
