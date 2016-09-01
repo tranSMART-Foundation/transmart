@@ -11,7 +11,7 @@
                          type="HD"
                          min="-1"
                          max="-1"
-                         label="Highdimensional Variable"
+                         label="Highdimensional Variables"
                          tooltip="Select one or more high dimensional variables that you would like to have displayed.">
             </concept-box>
             <concept-box style="display: inline-block;"
@@ -19,7 +19,7 @@
                          type="LD-numerical"
                          min="-1"
                          max="-1"
-                         label="Numerical Variable"
+                         label="Numerical Variables"
                          tooltip="Select one or more numerical variables that you would like to have displayed.">
             </concept-box>
             <br/>
