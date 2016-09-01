@@ -21,7 +21,7 @@ dataSource {
       testWhileIdle = true
       testOnReturn = true
 
-      validationQuery = "select 1"
+      validationQuery = "select 1<?php if (isset($_ENV['ORACLE'])) { ?> from dual<?php } ?>"
 
       minEvictableIdleTimeMillis = 1000 * 60 * 5
       timeBetweenEvictionRunsMillis = 1000 * 60 * 5
