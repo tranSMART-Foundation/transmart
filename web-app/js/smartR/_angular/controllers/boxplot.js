@@ -29,7 +29,9 @@ window.smartRApp.controller('BoxplotController', [
             running: false,
             disabled: true,
             scriptResults: {},
-            params: {}
+            params: {
+                transformation: 'raw'
+            }
         };
 
         $scope.$watch(function() {
@@ -37,9 +39,9 @@ window.smartRApp.controller('BoxplotController', [
         },
         function() {
             if ($scope.fetch.conceptBoxes.highDimensional.concepts.length > 0 &&
-                ($scope.fetch.selectedBiomarkers.length === 0 || $scope.fetch.selectedBiomarkers.length > 10)) {
+                ($scope.fetch.selectedBiomarkers.length === 0 || $scope.fetch.selectedBiomarkers.length > 1)) {
                 $scope.fetch.button.disabled = true;
-                $scope.fetch.button.message = 'Please select between 1 and 10 biomarkers for your high dimensional data';
+                $scope.fetch.button.message = 'Please select exactly 1 biomarker for your high dimensional data';
             } else {
                 $scope.fetch.button.disabled = false;
                 $scope.fetch.button.message = '';

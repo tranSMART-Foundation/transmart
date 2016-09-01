@@ -42,8 +42,9 @@ window.smartRApp.directive('boxplot', [
                 plotData.push({
                     type: 'box',
                     y: smartRUtils.getValuesForDimension(byValue),
-                    name: smartRUtils.shortenConcept(name) + ' s' + subset,
+                    name: name + ' s' + subset,
                     boxpoints: 'all',
+                    boxmean: 'sd',
                     jitter: 0.5
                 });
                 bySubset.filterAll();
@@ -52,6 +53,7 @@ window.smartRApp.directive('boxplot', [
         });
         
         var layout = {
+            title: 'Boxplots (' + scope.data.transformation + ')',
             height: 800
         };
         Plotly.newPlot(vizDiv, plotData, layout);

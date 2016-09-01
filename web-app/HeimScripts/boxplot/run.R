@@ -2,18 +2,18 @@ library(jsonlite)
 library(plyr)
 library(reshape2)
 
-main <- function(excludedPatientIDs = integer(), useLog=FALSE) {
-
-    save(loaded_variables, file="~/loaded_variables.Rda")
-    save(fetch_params, file="~/fetch_params.Rda")
+main <- function(excludedPatientIDs = integer(), transformation="raw") {
 
     output <- list()
-    output$useLog <- useLog
+    output$transformation <- transformation
 
     df <- buildCrossfilterCompatibleDf(loaded_variables, fetch_params)
-    if (useLog) {
+    if (transformation == "log2") {
         df$value <- log2(df$value)
+    } else if (transformation == "log10") {
+        df$value <- log10(df$value)
     }
+
     df <- df[!is.infinite(df$value), ]
 
     output$dataMatrix <- df
@@ -25,7 +25,7 @@ main <- function(excludedPatientIDs = integer(), useLog=FALSE) {
 buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
     # gather information
     subsets <- getSubsets(loaded_variables)
-    fullNames <- getFullNames(loaded_variables, fetch_params)
+    names <- getNames(loaded_variables, fetch_params)
     types <- getTypes(loaded_variables)
 
     # initialize empty df
@@ -52,7 +52,7 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
 
         # attach additional information
         variable.df <- cbind(variable.df,
-                             name=rep(fullNames[i], nrow(variable.df)),
+                             name=rep(names[i], nrow(variable.df)),
                              type=rep(types[i], nrow(variable.df)),
                              subset=rep(subsets[i], nrow(variable.df)),
                              stringsAsFactors=FALSE)
@@ -71,10 +71,10 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
 }
 
 # returns character vector (e.g. c("\\Demo Study\\Vital Status\\Alive\\Week1", "\\Demo Study\\Vital Status\\Alive\\Week2", ...))
-getFullNames <- function(loaded_variables, fetch_params) {
+getNames <- function(loaded_variables, fetch_params) {
     names.without.subset <- sub("_s[1-2]{1}$", "", names(loaded_variables))
-    fullNames <- sapply(names.without.subset, function(el) fetch_params$ontologyTerms[[el]]$fullName)
-    as.character(as.vector(fullNames))
+    names <- sapply(names.without.subset, function(el) fetch_params$ontologyTerms[[el]]$name)
+    as.character(as.vector(names))
 }
 
 # returns integer vector (e.g. c(1,2,2,2,1,1,2))

@@ -37,8 +37,30 @@
         </workflow-tab>
 
         <workflow-tab tab-name="Run Analysis" disabled="runAnalysis.disabled">
+           <div class="heim-input-field sr-input-area">
+                <h2>Data transformation:</h2>
+                <fieldset class="heim-radiogroup">
+                    <label>
+                        <input type="radio"
+                               ng-model="runAnalysis.params.transformation"
+                               value="raw" checked> Raw Values
+                    </label>
+                    <label>
+                        <input type="radio"
+                               ng-model="runAnalysis.params.transformation"
+                               value="log2"> Log2
+                    </label>
+                    <label>
+                        <input type="radio"
+                               ng-model="runAnalysis.params.transformation"
+                               value="log10"> Log10
+
+                    </label>
+                </fieldset>
+            </div>
             <br/>
             <br/>
+            <hr class="sr-divider">
             <run-button button-name="Create Plot"
                         store-results-in="runAnalysis.scriptResults"
                         script-to-run="run"
