@@ -1520,27 +1520,4 @@ class FmFolderController {
             }
         }
     }
-
-    def getFolderHasFiles = {
-        //Get the folder ID for the study selected
-        def paramMap = params
-        def experiment = null
-        log.info("getFolderHasFiles id ${params.id} accession ${params.accession} returnJSON ${params.returnJSON}")
-        if (params.id) {
-            experiment = Experiment.get(params.id)
-        } else if (params.accession) {
-            experiment = Experiment.findByAccession(params.accession)
-        }
-        def folder = fmFolderService.getFolderByBioDataObject(experiment)
-        if (folder) {
-            def fileList = folder.getFmFiles()
-            def infoList = [:]
-            for (file in fileList) {
-                if (file.activeInd) {
-                    render "true"
-                }
-            }
-        }
-        render "false"
-    }
 }
