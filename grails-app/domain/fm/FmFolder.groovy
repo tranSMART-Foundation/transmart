@@ -122,7 +122,7 @@ class FmFolder implements Buildable {
                 folderLevel(this.folderLevel)
                 folderType(this.folderType)
 
-                List<FmFolder> subFolderList = FmFolder.findAll("from FmFolder as fd where fd.folderFullName like :fn and fd.folderLevel = :fl",
+                List<FmFolder> subFolderList = FmFolder.findAll("from FmFolder as fd where fd.folderFullName like :fn escape '*' and fd.folderLevel = :fl",
                         [fn: this.folderFullName + "%", fl: (this.folderLevel + 1)])
 
                 unescaped << '<fmFolders>'
