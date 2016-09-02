@@ -25,6 +25,7 @@ import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
 import org.transmartproject.db.dataquery.highdim.HighDimTestData
 import org.transmartproject.db.dataquery.highdim.SampleBioMarkerTestData
 import org.transmartproject.db.i2b2data.PatientDimension
+import org.transmartproject.db.ontology.ConceptTestData
 import org.transmartproject.db.search.SearchKeywordCoreDb
 
 import static org.transmartproject.db.dataquery.highdim.HighDimTestData.save
@@ -44,6 +45,8 @@ class RbmTestData {
         res
     }()
 
+    ConceptTestData concept = HighDimTestData.createConcept('RBMPUBLIC', 'concept code #1', TRIAL_NAME, 'RBM_CONCEPT')
+
     List<PatientDimension> patients =
         HighDimTestData.createTestPatients(2, -300, TRIAL_NAME)
 
@@ -58,7 +61,8 @@ class RbmTestData {
                     uniprotId: uniprotId,
                     uniprotName: uniprotName,
                     geneSymbol: geneSymbol,
-                    geneId: geneId
+                    geneId: geneId,
+                    platform: platform
             )
             res.id = id
             res
@@ -83,6 +87,7 @@ class RbmTestData {
             new DeSubjectRbmData(
                     annotations:  annotations,
                     assay:        assay,
+                    patient:      assay.patient,
                     value:        value,
                     logIntensity: Math.log(value),
                     unit:         unit ? "(${unit})" : null,
@@ -119,6 +124,8 @@ class RbmTestData {
         save assays
         save annotations
         save data
+
+        concept.saveAll()
     }
 
 }

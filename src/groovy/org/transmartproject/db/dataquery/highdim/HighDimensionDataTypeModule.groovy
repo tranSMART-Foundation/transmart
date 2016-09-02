@@ -28,6 +28,7 @@ import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
 import org.transmartproject.core.dataquery.highdim.dataconstraints.DataConstraint
 import org.transmartproject.core.dataquery.highdim.projections.Projection
+import org.transmartproject.core.querytool.HighDimensionFilterType
 
 public interface HighDimensionDataTypeModule {
 
@@ -113,4 +114,31 @@ public interface HighDimensionDataTypeModule {
      * @return List of marker types supported by this module
      */
     List<String> getPlatformMarkerTypes()
+
+    /**
+     * Search through the annotations of a given concept_code, for entries in search_property
+     * starting with search_term.
+     * @param concept_code
+     * @param search_term
+     * @param search_property
+     * @return An alphabetical list of annotations that start with search_term (case insensitive match),
+     * or an empty list if the search_property is unsupported
+     */
+    List<String> searchAnnotation(String concept_code, String search_term, String search_property)
+
+    /**
+     * @return A list of properties that can be used as search_property in {@link #searchAnnotation(String, String, String)}.
+     */
+    List<String> getSearchableAnnotationProperties()
+
+    /**
+     * @return A list of projections supported for filtering assays (e.g. to be used in cohort selection)
+     */
+    List<String> getSearchableProjections()
+
+    /**
+     * Get the {@link HighDimensionFilterType} for this high dimension data type.
+     * @return the filter type.
+     */
+    HighDimensionFilterType getHighDimensionFilterType()
 }
