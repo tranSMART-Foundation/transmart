@@ -35,7 +35,7 @@ class GrantItem extends BasicItem {
 
     @Override
     String getData() {
-        "\nGRANT $permission ON $name TO $owner;\n"
+        "\nGRANT $permission ON $name TO $owner WITH GRANT OPTION;\n"
     }
 
     @Override
