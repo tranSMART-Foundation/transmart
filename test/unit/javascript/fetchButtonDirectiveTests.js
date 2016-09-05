@@ -87,13 +87,26 @@ describe('fetchButton', function() {
     it('should have the correct scope when successful without showSummaryStats', function() {
         _prepareScope(2, [2], false, {foo: {concepts: ['concept'], valid: true}});
         _clickButton('resolve()');
-        expect(element.find('span').text()).toBe('Task complete! Go to the "Preprocess" or "Run Analysis" tab to continue.');
+        expect(element.find('span').text()).toBe('Task complete! Go to the "Run Analysis" tab to continue.');
         expect(element.isolateScope().running).toBe(false);
         expect(element.isolateScope().loaded).toBe(true);
         expect(element.isolateScope().allSamples).toEqual(0);
     });
 
     it('should have the correct scope when successful with showSummaryStats', function() {
+        _prepareScope(1, [1,2], true, {foo: {concepts: ['concept'], valid: true}});
+        _clickButton('resolve()', 'resolve({result: {allSamples: 1337, subsets: null}})');
+        expect(element.find('span').text()).toBe('Task complete! Go to the "Run Analysis" tab to continue.');
+        expect(element.isolateScope().running).toBe(false);
+        expect(element.isolateScope().loaded).toBe(true);
+        expect(element.isolateScope().allSamples).toEqual(1337);
+    });
+
+    it('should show `Task complete! Go to the "Preprocess" or "Run Analysis" tab to continue.`', function() {
+        // NOTE overriding parts of `beforeEach` here
+        var html = '<fetch-button concept-map="conceptMap" allowed-cohorts="allowedCohorts" has-preprocess-tab="true"></fetch-button>';
+        element = $compile(angular.element(html))($rootScope);
+        $rootScope.$digest();
         _prepareScope(1, [1,2], true, {foo: {concepts: ['concept'], valid: true}});
         _clickButton('resolve()', 'resolve({result: {allSamples: 1337, subsets: null}})');
         expect(element.find('span').text()).toBe('Task complete! Go to the "Preprocess" or "Run Analysis" tab to continue.');
