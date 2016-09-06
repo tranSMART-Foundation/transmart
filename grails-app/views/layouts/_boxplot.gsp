@@ -58,8 +58,6 @@
                     </label>
                 </fieldset>
             </div>
-            <br/>
-            <br/>
             <hr class="sr-divider">
             <run-button button-name="Create Plot"
                         store-results-in="runAnalysis.scriptResults"
