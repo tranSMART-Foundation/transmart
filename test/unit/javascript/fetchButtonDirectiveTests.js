@@ -67,18 +67,16 @@ describe('fetchButton', function() {
         try { // we just want to see if the progress message is there
             element.find('input').click();
         } catch(e) {}
-        expect(element.find('span').text()).toContain('Fetching data');
         expect(element.isolateScope().running).toBe(true);
         expect(element.isolateScope().loaded).toBe(false);
         expect(element.isolateScope().allSamples).toEqual(0);
     });
 
-    it('should show another text after data is loaded if showSummaryStats is enabled', function() {
+    it('should have correct scope when clicked if showSummaryStats is enabled', function() {
         _prepareScope(1, [1], true, {foo: {concepts: ['concept'], valid: true}});
         try { // we just want to see if the progress message is there
             _clickButton('resolve()');
         } catch (e) {}
-        expect(element.find('span').text()).toContain('Executing summary statistics');
         expect(element.isolateScope().running).toBe(true);
         expect(element.isolateScope().loaded).toBe(false);
         expect(element.isolateScope().allSamples).toEqual(0);
