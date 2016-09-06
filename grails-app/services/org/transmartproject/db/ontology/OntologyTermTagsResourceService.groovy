@@ -29,7 +29,10 @@ class OntologyTermTagsResourceService implements OntologyTermTagsResource {
         def terms = I2b2.findAllByFullNameInList((orderedTags*.ontologyTermFullName).unique())
         def termsMap = terms.collectEntries { [it.fullName, it] }
 
-        orderedTags.groupBy { termsMap[it.ontologyTermFullName] }
+        def result  = orderedTags.groupBy { termsMap[it.ontologyTermFullName] }
+        //remove tags that point to non-existing concept
+        result.remove(null)
+        result
     }
 
 }
