@@ -45,7 +45,8 @@
                     summary-data="fetch.scriptResults"
                     all-samples="common.totalSamples"
                     allowed-cohorts="[1,2]"
-                    number-of-rows="common.numberOfRows">
+                    number-of-rows="common.numberOfRows"
+                    has-preprocess-tab="true">
             </fetch-button>
             <br/>
             <summary-stats summary-data="fetch.scriptResults"></summary-stats>
