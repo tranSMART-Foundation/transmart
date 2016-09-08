@@ -154,7 +154,7 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
 
         for (var i = 1; i <= window.GLOBAL.NumOfSubsets; i++) {
             if (!window.isSubsetEmpty(i) && !window.GLOBAL.CurrentSubsetIDs[i]) {
-                window.runAllQueries(resolveResult);
+                window.runAllQueries(resolveResult, window.smartRPanel);
                 return defer.promise;
             }
         }

@@ -21,7 +21,8 @@ window.smartRApp.directive('fetchButton', [
                 allowedCohorts: '=',
                 projection: '@?',
                 disabled: '=?',
-                message: '=?'
+                message: '=?',
+                hasPreprocessTab: '=?'
             },
             templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/fetchButton.html',
             link: function(scope, element) {
@@ -29,7 +30,11 @@ window.smartRApp.directive('fetchButton', [
                     template_msg = element.children()[1];
 
                 var _onSuccess = function() {
-                    scope.message = 'Task complete! Go to the "Preprocess" or "Run Analysis" tab to continue.';
+                    if (scope.hasPreprocessTab) {
+                        scope.message = 'Task complete! Go to the "Preprocess" or "Run Analysis" tab to continue.';
+                    } else {
+                        scope.message = 'Task complete! Go to the "Run Analysis" tab to continue.';
+                    }
                     scope.loaded = true;
                     scope.disabled = false;
                     scope.running = false;

@@ -23,7 +23,7 @@
     }
 }());
 
-var smartRPanel = new Ext.Panel({
+window.smartRPanel = new Ext.Panel({
     id: 'smartRPanel',
     title: 'SmartR',
     region: 'center',
@@ -61,7 +61,7 @@ var smartRPanel = new Ext.Panel({
 });
 
 window.addSmartRPanel = function addSmartRPanel(parentPanel) {
-    parentPanel.insert(4, smartRPanel);
+    parentPanel.insert(4, window.smartRPanel);
 };
 
 function cleanUpSmartR() {
