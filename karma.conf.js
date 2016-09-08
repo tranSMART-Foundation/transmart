@@ -35,6 +35,7 @@ module.exports = function(config) {
             'web-app/js/smartR/_angular/services/smartRUtils.js',
             'web-app/js/smartR/_angular/services/rServeService.js',
             'web-app/js/smartR/_angular/directives/fetchButton.js',
+            'web-app/js/smartR/_angular/directives/runButton.js',
 
             // templates
             'web-app/js/smartR/_angular/templates/*.html',
