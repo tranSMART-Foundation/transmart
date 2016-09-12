@@ -15,11 +15,15 @@ window.smartRApp.directive('runButton', [
                 script: '@scriptToRun',
                 name: '@buttonName',
                 filename: '@?',
-                params: '=?argumentsToUse'
+                params: '=?argumentsToUse',
+                waitMessage: '@?'
             },
             templateUrl: $rootScope.smartRPath + '/js/smartR/_angular/templates/runButton.html',
             link: function(scope, element) {
                 var params = scope.params ? scope.params : {};
+                if (!scope.waitMessage) {
+                    scope.waitMessage = 'Creating plot, please wait';
+                }
 
                 var template_btn = element.children()[0],
                     template_msg = element.children()[1];
@@ -59,7 +63,7 @@ window.smartRApp.directive('runButton', [
                     scope.storage = {};
                     scope.disabled = true;
                     scope.running = true;
-                    template_msg.innerHTML = 'Creating plot, please wait <span class="blink_me">_</span>';
+                    template_msg.innerHTML = scope.waitMessage + ' <span class="blink_me">_</span>';
 
                     rServeService.startScriptExecution({
                         taskType: scope.script,
