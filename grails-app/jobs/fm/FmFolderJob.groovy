@@ -7,7 +7,7 @@ class FmFolderJob {
     def fmFolderService
 
     static triggers = {
-        if(!Holders.config.org.tarnsmartproject.mongoFiles.enableMongo){
+        if(!Holders.config.transmartproject.mongoFiles.enableMongo){
             def startDelay = Holders.config.com.recomdata.FmFolderJob.startDelayMs
             def cronExpression = Holders.config.com.recomdata.FmFolderJob.cronExpression
     
