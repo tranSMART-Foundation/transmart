@@ -30,7 +30,6 @@ window.smartRApp.directive('lineGraph', [
         function createLinegraph(scope, vizDiv) {
             var data_matrix = scope.data.data_matrix;
             var vizDivWidth = document.getElementById('sr-index').getBoundingClientRect().width;
-            var vizDivHeight = document.getElementById('sr-index').getBoundingClientRect().height;
 
             var dataCF = crossfilter(data_matrix);
 
@@ -46,11 +45,17 @@ window.smartRApp.directive('lineGraph', [
             var tmpByBioMarker = dataCF.dimension(function(d) { return d.bioMarker; });
             var tmpByPatientID = dataCF.dimension(function(d) { return d.patientID; });
 
+            tmpByType.filterExact('numeric');
+            var numOfNumericPlots = smartRUtils.unique(getValuesForDimension(byBioMarker)).length;
+            tmpByType.filterAll();
+
+            var vizDivHeight = 600 + 200 * numOfNumericPlots;
+
             var MARGIN = {
-                top: vizDivHeight * 0.1,
-                right: vizDivWidth * 0.1,
-                bottom: vizDivHeight * 0.1,
-                left: vizDivWidth * 0.1
+                top: 50,
+                right: 200,
+                bottom: 100,
+                left: 100
             };
             var LINEGRAPH_WIDTH = vizDivWidth - MARGIN.left - MARGIN.right;
             var LINEGRAPH_HEIGHT = vizDivHeight - MARGIN.top - MARGIN.bottom;
@@ -593,9 +598,9 @@ window.smartRApp.directive('lineGraph', [
 
                     // ENTER text
                     axisEnter.append('text')
-                        .attr('text-anchor', 'middle')
-                        .attr('transform', 'translate(' + (-30) + ',' + (numPlotBoxHeight / 2) + ')rotate(-90)')
-                        .attr('font-size', function(d) { return smartRUtils.scaleFont(d, {}, 20, numPlotBoxHeight, 0, 2); })
+                        .attr('text-anchor', 'start')
+                        .attr('transform', 'translate(' + (0) + ',' + (-15) + ')')
+                        .attr('font-size', '15px')
                         .text(function(d) { return d; });
 
                     // UPDATE g
@@ -771,7 +776,6 @@ window.smartRApp.directive('lineGraph', [
                     tmpByType.filterAll();
                     return;
                 }
-                var iconSize = 1 / byTimeInteger.bottom(Infinity).length * CAT_PLOTS_HEIGHT;
 
                 // FIXME: make use of the new unique callback to improve performance
                 var catPlotInfo = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
@@ -787,6 +791,8 @@ window.smartRApp.directive('lineGraph', [
                     });
                     return {patientID: patientID, maxDensity: maxCount};
                 });
+
+                var iconSize = 1 / catPlotInfo.length * CAT_PLOTS_HEIGHT;
 
                 catPlotInfo.forEach(function(d) {
                     d.height = d.maxDensity * iconSize;
