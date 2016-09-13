@@ -29,7 +29,6 @@ window.smartRApp.directive('lineGraph', [
 
         function createLinegraph(scope, vizDiv) {
             var data_matrix = scope.data.data_matrix;
-            console.log(data_matrix);
             var vizDivWidth = document.getElementById('sr-index').getBoundingClientRect().width;
             var vizDivHeight = document.getElementById('sr-index').getBoundingClientRect().height;
 
@@ -460,8 +459,6 @@ window.smartRApp.directive('lineGraph', [
                             iconTable[iconTable.length - 1] : itemsInCache];
                         cache[bioMarker] = icon;
                     }
-                    // FIXME: for testing until we got real data
-                    icon = iconTable[Math.floor(Math.random() * iconTable.length)];
                     return icon;
                 };
             }
@@ -768,7 +765,6 @@ window.smartRApp.directive('lineGraph', [
             }
             renderNumericPlots();
 
-            // FIXME: subset is very wrong in here
             function renderCategoricPlots() {
                 tmpByType.filterExact('categoric');
                 if (byTimeInteger.bottom(Infinity).length === 0) {
@@ -946,9 +942,9 @@ window.smartRApp.directive('lineGraph', [
                             (CAT_PLOTS_POS + i * LEGEND_ITEM_SIZE) + ')';
                     });
 
-                // ENTER path
-                legendItemEnter.append('path')
-                    .attr('d', function(d) { return d.shape(LEGEND_ITEM_SIZE); })
+                // ENTER polygon
+                legendItemEnter.append('polygon')
+                    .attr('points', function(d) { return d.shape(LEGEND_ITEM_SIZE); })
                     .style('fill', function(d) { return d.fill; })
                     .on('mouseover', function(d) {
                         svg.selectAll('.sr-lg-cat-icon')

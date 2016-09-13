@@ -114,7 +114,7 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                                                 timeInteger=rep(timeInteger, nrow(variable.label.df)),
                                                 timeString=rep(timeString, nrow(variable.label.df)),
                                                 bioMarker=rep(bioMarker, nrow(variable.label.df)),
-                                                type=rep(types[i], nrow(variable.label.df)),
+                                                type=rep('numeric', nrow(variable.label.df)),
                                                 subset=rep(subsets[i], nrow(variable.label.df)),
                                                 stringsAsFactors=FALSE)
                 # no value -> no interest
