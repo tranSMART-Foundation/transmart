@@ -38,6 +38,7 @@
                               loaded="fetch.loaded"
                               running="fetch.running"
                               allowed-cohorts="[1,2]"
+                              disabled="fetch.disabled"
                               biomarkers="fetch.selectedBiomarkers">
                 </fetch-button>
             </workflow-tab>

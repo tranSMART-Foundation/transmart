@@ -12,6 +12,9 @@ window.smartRApp.controller('LinegraphController',
             running: false,
             loaded: false,
             selectedBiomarkers: [],
+            button: {
+                disabled: false
+            },
             conceptBoxes: {
                 highData: {concepts: [], valid: true},
                 numData: {concepts: [], valid: true},
@@ -25,6 +28,20 @@ window.smartRApp.controller('LinegraphController',
             scriptResults: {},
             params: {}
         };
+
+        $scope.$watch(function() {
+            return $scope.fetch.conceptBoxes.highData.concepts.length + ' ' + $scope.fetch.selectedBiomarkers.length;
+        },
+        function() {
+            if ($scope.fetch.conceptBoxes.highData.concepts.length > 0 &&
+                ($scope.fetch.selectedBiomarkers.length === 0 || $scope.fetch.selectedBiomarkers.length > 10)) {
+                $scope.fetch.button.disabled = true;
+                $scope.fetch.button.message = 'Please select between 1 and 10 biomarker for your high dimensional data';
+            } else {
+                $scope.fetch.button.disabled = false;
+                $scope.fetch.button.message = '';
+            }
+        });
 
         $scope.$watchGroup(['fetch.running', 'runAnalysis.running'],
             function(newValues) {
