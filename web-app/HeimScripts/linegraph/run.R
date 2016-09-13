@@ -1,5 +1,4 @@
 library(jsonlite)
-library(plyr)
 library(reshape2)
 
 main <- function() {
@@ -89,41 +88,76 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
         if (types[i] == "highDimensional") {
             colnames(variable)[-(1:2)] <- sub("^X", "", colnames(variable[-(1:2)]))
             variable.df <- melt(variable, id.vars=c("Row.Label", "Bio.marker"), variable.name="patientID")
-        } else {
-            variable.df <- data.frame(patientID=as.integer(variable[,1]),
-                                      value=variable[,2])
-        }
 
-        split <- strsplit(fullNames[i], "\\\\")[[1]]
-        bioMarker <- split[length(split) - 1]
-
-        timeString <- nodeNames[i]
-        timeInteger <- times[timeString][[1]]
-        # if timeString never occured before, assign it a new timeInteger
-        if (is.null(timeInteger)) {
-            extractedTime <- extractTime(timeString)
-            if (is.null(extractedTime)) {
-                timeInteger <- length(names(times))
-            } else {
-                timeInteger <- extractedTime
+            variable.label.df <- data.frame()
+            # create for each unique row label an own df
+            for (rowLabel in unique(variable.df$Row.Label)) {
+                variable.label.df <- variable.df[variable.df$Row.Label == rowLabel, ]
+                split <- strsplit(fullNames[i], "\\\\")[[1]]
+                bioMarker <- split[length(split) - 1]
+                bioMarker <- paste(bioMarker, rowLabel, variable.label.df$Bio.marker[1], sep="--")
+                timeString <- nodeNames[i]
+                timeInteger <- times[timeString][[1]]
+                # if timeString never occured before, assign it a new timeInteger
+                if (is.null(timeInteger)) {
+                    extractedTime <- extractTime(timeString)
+                    if (is.null(extractedTime)) {
+                        timeInteger <- length(names(times))
+                    } else {
+                        timeInteger <- extractedTime
+                    }
+                    times[timeString] <- timeInteger
+                }
+                variable.label.df <- variable.label.df[, -c(1,2)]
+                variable.label.df <- data.frame(patientID=as.numeric(as.vector(variable.label.df$patientID)),
+                                                value=as.numeric(as.vector(variable.label.df$value)),
+                                                timeInteger=rep(timeInteger, nrow(variable.label.df)),
+                                                timeString=rep(timeString, nrow(variable.label.df)),
+                                                bioMarker=rep(bioMarker, nrow(variable.label.df)),
+                                                type=rep(types[i], nrow(variable.label.df)),
+                                                subset=rep(subsets[i], nrow(variable.label.df)),
+                                                stringsAsFactors=FALSE)
+                # no value -> no interest
+                variable.label.df <- variable.label.df[variable.label.df$value != "" & !is.na(variable.label.df$value), ]
+                if (nrow(variable.label.df) == 0) next
+                df <- rbind(df, variable.label.df)
             }
-            times[timeString] <- timeInteger
+        } else {
+            variable.df <- data.frame(patientID=as.integer(variable[,1]), value=variable[,2])
+            split <- strsplit(fullNames[i], "\\\\")[[1]]
+            bioMarker <- split[length(split) - 1]
+            timeString <- nodeNames[i]
+            timeInteger <- times[timeString][[1]]
+            values <- c()
+            if (types[i] == "categoric") {
+                values <- as.vector(variable.df$value)
+            } else {
+                values <- as.numeric(as.vector(variable.df$value))
+            }
+            # if timeString never occured before, assign it a new timeInteger
+            if (is.null(timeInteger)) {
+                extractedTime <- extractTime(timeString)
+                if (is.null(extractedTime)) {
+                    timeInteger <- length(names(times))
+                } else {
+                    timeInteger <- extractedTime
+                }
+                times[timeString] <- timeInteger
+            }
+            # attach additional information
+            variable.df <- data.frame(patientID=as.numeric(as.vector(variable.df$patientID)),
+                                 value=values,
+                                 timeInteger=rep(timeInteger, nrow(variable.df)),
+                                 timeString=rep(timeString, nrow(variable.df)),
+                                 bioMarker=rep(bioMarker, nrow(variable.df)),
+                                 type=rep(types[i], nrow(variable.df)),
+                                 subset=rep(subsets[i], nrow(variable.df)),
+                                 stringsAsFactors=FALSE)
+            # no value -> no interest
+            variable.df <- variable.df[variable.df$value != "" & !is.na(variable.df$value), ]
+            if (nrow(variable.df) == 0) next
+            df <- rbind(df, variable.df)
         }
-
-        # attach additional information
-        variable.df <- cbind(variable.df,
-                             timeInteger=rep(timeInteger, nrow(variable.df)),
-                             timeString=rep(timeString, nrow(variable.df)),
-                             bioMarker=rep(bioMarker, nrow(variable.df)),
-                             type=rep(types[i], nrow(variable.df)),
-                             subset=rep(subsets[i], nrow(variable.df)),
-                             stringsAsFactors=FALSE)
-
-        # no value -> no interest
-        variable.df <- variable.df[variable.df$value != "" & !is.na(variable.df$value), ]
-        if (nrow(variable.df) == 0) next
-        # rbind.fill sets missing columns entries to NA
-        df <- rbind.fill(df, variable.df)
     }
 
     # before we are done we assign a unique id to every row to make it easier for the front-end
@@ -146,19 +180,19 @@ getStatsForNumericType <- function(df) {
                 current.df <- numeric.df[numeric.df$timeInteger == timeInteger &
                                          numeric.df$bioMarker == bioMarker &
                                          numeric.df$subset == subset, ]
-                if (nrow(current.df) == 0) next
-                values <- as.numeric(current.df$value)
-                mean <- mean(values)
-                median <- median(values)
-                sd <- sd(values)
-                sem <- sd / sqrt(length(values))
-                stats.df <- rbind(stats.df, data.frame(bioMarker=bioMarker,
-                                                       timeInteger=timeInteger,
-                                                       subset=subset,
-                                                       sd=sd,
-                                                       sem=sem,
-                                                       mean=mean,
-                                                       median=median))
+                                     if (nrow(current.df) == 0) next
+                                     values <- as.numeric(current.df$value)
+                                     mean <- mean(values)
+                                     median <- median(values)
+                                     sd <- sd(values)
+                                     sem <- sd / sqrt(length(values))
+                                     stats.df <- rbind(stats.df, data.frame(bioMarker=bioMarker,
+                                                                            timeInteger=timeInteger,
+                                                                            subset=subset,
+                                                                            sd=sd,
+                                                                            sem=sem,
+                                                                            mean=mean,
+                                                                            median=median))
             }
         }
     }

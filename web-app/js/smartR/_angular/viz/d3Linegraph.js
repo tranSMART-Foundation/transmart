@@ -29,6 +29,7 @@ window.smartRApp.directive('lineGraph', [
 
         function createLinegraph(scope, vizDiv) {
             var data_matrix = scope.data.data_matrix;
+            console.log(data_matrix);
             var vizDivWidth = document.getElementById('sr-index').getBoundingClientRect().width;
             var vizDivHeight = document.getElementById('sr-index').getBoundingClientRect().height;
 
@@ -619,6 +620,7 @@ window.smartRApp.directive('lineGraph', [
                                 return byTimeInteger.bottom(Infinity).map(function(d) {
                                     return {
                                         patientID: d.patientID,
+                                        bioMarker: d.bioMarker,
                                         timeInteger: d.timeInteger,
                                         timeString: d.timeString,
                                         error: 0,
@@ -671,6 +673,7 @@ window.smartRApp.directive('lineGraph', [
 
                                 if (plotTypeSelect.value === 'noGrouping') {
                                     html += 'PatientID: ' + d[0].patientID + '<br/>';
+                                    html += 'BioMarker: ' + d[0].bioMarker + '<br/>';
                                 }
 
                                 var maxValue = d3.max(d, function(el) { return el.value; });
