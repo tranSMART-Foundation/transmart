@@ -540,7 +540,7 @@ window.smartRApp.directive('lineGraph', [
                     // ENTER text
                     axisEnter.append('text')
                         .attr('text-anchor', 'start')
-                        .attr('transform', 'translate(' + (0) + ',' + (-15) + ')')
+                        .attr('transform', 'translate(' + (0) + ',' + (-10) + ')')
                         .attr('font-size', '15px')
                         .text(function(d) { return d; });
 
@@ -849,7 +849,9 @@ window.smartRApp.directive('lineGraph', [
                                     html += key + ': ' + d[key] + '<br/>';
                                 }
                             }
-                            tip.show(html);
+                            tip.direction('n')
+                                .offset([-10, 0])
+                                .show(html, this);
                         })
                         .on('mouseout', function() {
                             tip.hide();
