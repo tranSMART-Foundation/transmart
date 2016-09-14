@@ -33,7 +33,6 @@ window.smartRApp.directive('heatmapPlot', [
         };
 
         function createHeatmap(scope, root) {
-            console.log(scope.data);
             var ANIMATION_DURATION = 1500;
 
             var fields = scope.data.fields;
@@ -575,7 +574,7 @@ window.smartRApp.directive('heatmapPlot', [
 
                 extraSquare.transition()
                     .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
-                    .attr('x', function(d) { return patientIDs.indexOf(d.PATIENTID) * gridFieldWidth; })
+                    .attr('x', function(d) { return colNames.indexOf(d.COLNAME) * gridFieldWidth; })
                     .attr('y', function(d) { return featurePosY - features.indexOf(d.ROWNAME) * gridFieldHeight; })
                     .attr('width', gridFieldWidth)
                     .attr('height', gridFieldHeight);
