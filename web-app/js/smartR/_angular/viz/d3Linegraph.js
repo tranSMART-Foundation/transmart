@@ -45,11 +45,27 @@ window.smartRApp.directive('lineGraph', [
             var tmpByBioMarker = dataCF.dimension(function(d) { return d.bioMarker; });
             var tmpByPatientID = dataCF.dimension(function(d) { return d.patientID; });
 
+            tmpByType.filterExact('categoric');
+            var totalNumOfCatBoxes = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
             tmpByType.filterExact('numeric');
-            var numOfNumericPlots = smartRUtils.unique(getValuesForDimension(byBioMarker)).length;
+            var totalNumOfNumBoxes = smartRUtils.unique(getValuesForDimension(byBioMarker)).length;
             tmpByType.filterAll();
 
-            var vizDivHeight = 600 + 200 * numOfNumericPlots;
+            var NUM_PLOT_HEIGHT = 200;
+            var NUM_PLOT_PADDING = 50;
+
+            var NUM_PLOTS_HEIGHT = totalNumOfNumBoxes * (NUM_PLOT_HEIGHT + NUM_PLOT_PADDING);
+            var CAT_PLOTS_HEIGHT = totalNumOfCatBoxes > 0 ? 1000 : 0;
+
+            var CAT_PLOTS_POS = NUM_PLOTS_HEIGHT;
+            var TIME_AXIS_POS = CAT_PLOTS_POS + CAT_PLOTS_HEIGHT;
+
+            var LEGEND_OFFSET = 10;
+            var LEGEND_ITEM_SIZE = 20;
+
+            var ERROR_BAR_WIDTH = 5;
+            var MAX_XAXIS_ELEMENT_WIDTH = 40;
+            var TICK_HEIGHT = 0;
 
             var MARGIN = {
                 top: 50,
@@ -57,76 +73,18 @@ window.smartRApp.directive('lineGraph', [
                 bottom: 100,
                 left: 100
             };
+
+            var vizDivHeight = NUM_PLOTS_HEIGHT + CAT_PLOTS_HEIGHT + MARGIN.top + MARGIN.bottom;
+
             var LINEGRAPH_WIDTH = vizDivWidth - MARGIN.left - MARGIN.right;
             var LINEGRAPH_HEIGHT = vizDivHeight - MARGIN.top - MARGIN.bottom;
-
-            var ERROR_BAR_WIDTH = 5;
-            var MAX_XAXIS_ELEMENT_WIDTH = 40;
-            var TICK_HEIGHT = 0;
 
             var ANIMATION_DURATION = 500;
             var tmp_animation_duration = ANIMATION_DURATION;
             // set to 0 for creating the plot initially
             ANIMATION_DURATION = 0;
 
-            /**
-             * In this section where we compute the plot sizes
-             */
 
-            tmpByType.filterExact('categoric');
-            var catBoxes = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
-            var catDataDoExist = catBoxes > 0;
-            tmpByType.filterExact('numeric');
-            var numBoxes = smartRUtils.unique(getValuesForDimension(byBioMarker)).length;
-            var numDataDoExist = numBoxes > 0;
-            tmpByType.filterAll();
-
-            var NUM_PLOT_PADDING = 50;
-
-            var CAT_PLOTS_HEIGHT = 0;
-            var NUM_PLOTS_HEIGHT = 0;
-            var CAT_PLOTS_POS = 0;
-            var NUM_PLOTS_POS = 0;
-            var TIME_AXIS_POS = 0;
-
-            var MAX_CAT_BOX_HEIGHT = 30;
-            var MAX_NUM_BOX_HEIGHT = 200;
-
-            // TODO: Pretty sure the code below can be simplified
-
-            if (catDataDoExist && !numDataDoExist) {
-                if (LINEGRAPH_HEIGHT / catBoxes > MAX_CAT_BOX_HEIGHT) {
-                    CAT_PLOTS_HEIGHT = MAX_CAT_BOX_HEIGHT * catBoxes;
-                } else {
-                    CAT_PLOTS_HEIGHT = LINEGRAPH_HEIGHT;
-                }
-                TIME_AXIS_POS = CAT_PLOTS_POS + CAT_PLOTS_HEIGHT;
-            } else if (!catDataDoExist && numDataDoExist) {
-                if (LINEGRAPH_HEIGHT / numBoxes > MAX_NUM_BOX_HEIGHT) {
-                    NUM_PLOTS_HEIGHT = (MAX_NUM_BOX_HEIGHT + NUM_PLOT_PADDING) * numBoxes;
-                } else {
-                    NUM_PLOTS_HEIGHT = LINEGRAPH_HEIGHT;
-                }
-                TIME_AXIS_POS = NUM_PLOTS_POS + NUM_PLOTS_HEIGHT;
-            } else {
-                if (LINEGRAPH_HEIGHT / 2 / catBoxes > MAX_CAT_BOX_HEIGHT) {
-                    CAT_PLOTS_HEIGHT = MAX_CAT_BOX_HEIGHT * catBoxes;
-                } else {
-                    CAT_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2;
-                }
-
-                if (LINEGRAPH_HEIGHT / 2 / numBoxes > MAX_NUM_BOX_HEIGHT) {
-                    NUM_PLOTS_HEIGHT = (MAX_NUM_BOX_HEIGHT + NUM_PLOT_PADDING) * numBoxes;
-                } else {
-                    NUM_PLOTS_HEIGHT = LINEGRAPH_HEIGHT / 2;
-                }
-
-                CAT_PLOTS_POS = NUM_PLOTS_POS + NUM_PLOTS_HEIGHT;
-                TIME_AXIS_POS = CAT_PLOTS_POS + CAT_PLOTS_HEIGHT;
-            }
-
-            var LEGEND_OFFSET = 10;
-            var LEGEND_ITEM_SIZE = 20;
 
             var plotTypeSelect = smartRUtils.getElementWithoutEventListeners('sr-lg-numplottype-select');
             plotTypeSelect.selectedIndex = 0;
@@ -154,18 +112,14 @@ window.smartRApp.directive('lineGraph', [
             patientRange.value = 25;
             patientRange.step = 1;
             patientRange.addEventListener('input', function() {
-                updateShownPatients();
                 renderCategoricPlots();
-                renderNumericPlots();
             });
 
             var x = d3.scale.linear();
             // recomputes x scale for current filters
             function calculateXScale() {
                 tmpByType.filterExact('categoric');
-                var padding = CAT_PLOTS_HEIGHT ?
-                    1 / byTimeInteger.bottom(Infinity).length * CAT_PLOTS_HEIGHT :
-                    MAX_XAXIS_ELEMENT_WIDTH / 2;
+                var padding = totalNumOfCatBoxes > 0 ? CAT_PLOTS_HEIGHT / parseInt(patientRange.value) : MAX_XAXIS_ELEMENT_WIDTH / 2;
                 tmpByType.filterAll();
                 var times = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort(function(a, b) {
                     return a - b;
@@ -182,18 +136,6 @@ window.smartRApp.directive('lineGraph', [
             }
             calculateXScale();
 
-            var firstPatientToShow = 0;
-            function updateShownPatients() {
-                byPatientID.filterAll();
-                firstPatientToShow = firstPatientToShow + parseInt(patientRange.value) > parseInt(patientRange.max) ?
-                    parseInt(patientRange.max) - parseInt(patientRange.value) : firstPatientToShow;
-                var shownPatients = smartRUtils.unique(getValuesForDimension(byPatientID))
-                    .slice(firstPatientToShow, firstPatientToShow + parseInt(patientRange.value));
-                byPatientID.filterFunction(function(patient) { return shownPatients.indexOf(patient) !== -1; });
-                calculateXScale();
-            }
-            updateShownPatients();
-            
             // helper function
             d3.selection.prototype.moveToFront = function() {  
                 return this.each(function(){
@@ -202,14 +144,12 @@ window.smartRApp.directive('lineGraph', [
             };
 
             function getValuesForDimension(dimension, ascendingOrder) {
-
                 var values = [];
                 if (typeof ascendingOrder === 'undefined' || !ascendingOrder) {
                     values = dimension.top(Infinity).map(function(record) { return dimension.accessor(record); });
                 } else {
                     values =dimension.bottom(Infinity).map(function(record) { return dimension.accessor(record); });
                 }
-
 
                 return values;
             }
@@ -231,8 +171,8 @@ window.smartRApp.directive('lineGraph', [
                 .attr('transform', 'translate(' + 0 + ',' + TIME_AXIS_POS + ')');
 
             // WARNING: using this function will reset all global filters to make sure all data are modified correctly
+            // FIXME: I should reapply the filters after
             function swapTimeIntegerData(fromTimeInteger, toTimeInteger) {
-
                 byPatientID.filterAll();
                 byBioMarker.filterAll();
                 byTimeInteger.filterAll();
@@ -251,9 +191,6 @@ window.smartRApp.directive('lineGraph', [
 
                 dataCF.add(fromEntries);
                 dataCF.add(toEntries);
-
-                // reapply patientID filter FIXME: Is that a good idea?
-                updateShownPatients();
             }
 
             function updateXAxis() {
@@ -270,7 +207,7 @@ window.smartRApp.directive('lineGraph', [
                     .scale(x)
                     .tickFormat('')
                     .tickValues(timeAxisData.map(function(d) { return d.timeInteger; }))
-                    .innerTickSize(- NUM_PLOTS_HEIGHT);
+                    .innerTickSize(- NUM_PLOTS_HEIGHT - CAT_PLOTS_HEIGHT);
                 d3.select('.sr-lg-x-axis')
                     .transition()
                     .duration(ANIMATION_DURATION)
@@ -503,7 +440,7 @@ window.smartRApp.directive('lineGraph', [
                     .attr('class', function(d) { return 'sr-lg-num-plot biomarker-' + smartRUtils.makeSafeForCSS(d); })
                     .attr('transform', function(d) {
                         return 'translate(' + 0 + ',' +
-                            (NUM_PLOTS_POS + bioMarkers.indexOf(d) * (numPlotBoxHeight + NUM_PLOT_PADDING)) + ')';
+                            (bioMarkers.indexOf(d) * (numPlotBoxHeight + NUM_PLOT_PADDING)) + ')';
                     });
 
                 // ENTER rect (box)
@@ -772,6 +709,11 @@ window.smartRApp.directive('lineGraph', [
 
             function renderCategoricPlots() {
                 tmpByType.filterExact('categoric');
+                // TODO: Which patients to display and which not?
+                // FIXME: up and down arrow
+                var displayedPatientID = getValuesForDimension(byPatientID).slice(0, parseInt(patientRange.value));
+                byPatientID.filterFunction(function(d) { return displayedPatientID.indexOf(d) !== -1; });
+
                 if (byTimeInteger.bottom(Infinity).length === 0) {
                     tmpByType.filterAll();
                     return;
@@ -910,7 +852,9 @@ window.smartRApp.directive('lineGraph', [
                         });
 
                     // UPDATE polygon
-                    icon.attr('points', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
+                    icon.transition()
+                        .duration(ANIMATION_DURATION)
+                        .attr('points', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
                         .attr('transform', function(d) {
                             return 'translate(' + (x(d.timeInteger) - iconSize / 2) + ',' + 0 + ')';
                         });
@@ -986,11 +930,6 @@ window.smartRApp.directive('lineGraph', [
                         'h' + (MARGIN.left / 2) +
                         'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
                     .on('click', function() {
-                        firstPatientToShow += 5;
-                        firstPatientToShow = firstPatientToShow + parseInt(patientRange.value) >
-                        parseInt(patientRange.max) ? parseInt(patientRange.max) - parseInt(patientRange.value) :
-                            firstPatientToShow;
-                        updateShownPatients();
                         renderCategoricPlots();
                     });
 
@@ -1000,12 +939,10 @@ window.smartRApp.directive('lineGraph', [
                         'h' + (MARGIN.left / 2) +
                         'l' + (- MARGIN.left / 4) + ',' + (MARGIN.left / 3) + 'Z')
                     .on('click', function() {
-                        firstPatientToShow -= 5;
-                        firstPatientToShow = firstPatientToShow < 0 ? 0 : firstPatientToShow;
-                        updateShownPatients();
                         renderCategoricPlots();
                     });
 
+                byPatientID.filterAll();
                 tmpByType.filterAll();
             }
             renderCategoricPlots();
