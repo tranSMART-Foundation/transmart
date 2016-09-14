@@ -3,16 +3,6 @@ library(limma)
 library(jsonlite)
 
 
-# SE: Just to get things working for dev purposes
-# rm(list = ls())
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
-# setwd("/Users/serge/GitHub/SmartR")
-#######
-
-
 if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
     remoteScriptDir <- "web-app/HeimScripts"
 }
@@ -45,8 +35,15 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     hd.df = data.list$HD
     ld.list = data.list$LD    
     
-    ## SE: For debug
-    #hd.df = hd.df[,1:3]
+    if (sorting == "nodes") {
+
+    } else {
+        colNames <- colnames(hd.df[, -c(1,2)])
+        subjects <- as.numeric(sub("_.+", "", colNames))
+        subsets <- as.numeric(substring(colNames, first=nchar(colNames), last=nchar(colNames)))
+        ordering <- order(as.numeric(paste(subjects, subsets, sep="")))
+        hd.df <- cbind(hd.df[, c(1,2)], hd.df[, -c(1,2)][, ordering])
+    }
     
     write.table(
         hd.df,
