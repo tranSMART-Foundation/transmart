@@ -353,37 +353,36 @@ window.smartRApp.directive('lineGraph', [
                         (size / 4) + ',' + (size * 3 / 4);
                 };
                 var iconTable = [
-                    // square
                     {shape: square, fill: '#006980'},
-                    {shape: square, fill: '#4B0080'},
-                    {shape: square, fill: '#F6910E'},
-                    {shape: square, fill: '#0EF611'},
-                    {shape: square, fill: '#F60E1E'},
-                    // triangle
-                    {shape: triangle, fill: '#006980'},
                     {shape: triangle, fill: '#4B0080'},
-                    {shape: triangle, fill: '#F6910E'},
-                    {shape: triangle, fill: '#0EF611'},
-                    {shape: triangle, fill: '#F60E1E'},
-                    // triangle
-                    {shape: diamond, fill: '#006980'},
-                    {shape: diamond, fill: '#4B0080'},
                     {shape: diamond, fill: '#F6910E'},
-                    {shape: diamond, fill: '#0EF611'},
-                    {shape: diamond, fill: '#F60E1E'},
-                    // diamond
-                    {shape: revTriangle, fill: '#006980'},
-                    {shape: revTriangle, fill: '#4B0080'},
-                    {shape: revTriangle, fill: '#F6910E'},
                     {shape: revTriangle, fill: '#0EF611'},
-                    {shape: revTriangle, fill: '#F60E1E'},
-                    // revTriangle
-                    {shape: hexagon, fill: '#006980'},
-                    {shape: hexagon, fill: '#4B0080'},
-                    {shape: hexagon, fill: '#F6910E'},
-                    {shape: hexagon, fill: '#0EF611'},
                     {shape: hexagon, fill: '#F60E1E'},
-                    // hexagon
+
+                    {shape: triangle, fill: '#006980'},
+                    {shape: diamond, fill: '#4B0080'},
+                    {shape: revTriangle, fill: '#F6910E'},
+                    {shape: hexagon, fill: '#0EF611'},
+                    {shape: square, fill: '#F60E1E'},
+
+                    {shape: diamond, fill: '#006980'},
+                    {shape: revTriangle, fill: '#4B0080'},
+                    {shape: hexagon, fill: '#F6910E'},
+                    {shape: square, fill: '#0EF611'},
+                    {shape: triangle, fill: '#F60E1E'},
+
+                    {shape: revTriangle, fill: '#006980'},
+                    {shape: hexagon, fill: '#4B0080'},
+                    {shape: square, fill: '#F6910E'},
+                    {shape: triangle, fill: '#0EF611'},
+                    {shape: diamond, fill: '#F60E1E'},
+
+                    {shape: hexagon, fill: '#006980'},
+                    {shape: square, fill: '#4B0080'},
+                    {shape: triangle, fill: '#F6910E'},
+                    {shape: diamond, fill: '#0EF611'},
+                    {shape: revTriangle, fill: '#F60E1E'},
+
                     {shape: fallback, fill: '#000000'} // fallback
                 ];
                 iconTable.forEach(function(d, i) { d.id = i; });
