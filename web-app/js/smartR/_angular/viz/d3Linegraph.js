@@ -518,7 +518,11 @@ window.smartRApp.directive('lineGraph', [
                         .orient('left')
                         .tickValues(function() {
                             var stepSize = (boundaries[1] - boundaries[0]) / 8;
-                            return d3.range(boundaries[0], boundaries[1] + stepSize, stepSize);
+                            var ticks = [];
+                            for (var i = 0; i <= 8; i++) {
+                                ticks.push(boundaries[0] + stepSize * i);
+                            }
+                            return ticks;
                         })
                         .innerTickSize(- LINEGRAPH_WIDTH);
                     // --- Compute y
