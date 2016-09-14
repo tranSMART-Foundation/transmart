@@ -645,60 +645,63 @@ window.smartRApp.directive('lineGraph', [
                         // REMOVE path
                         timeline.exit().remove();
 
-                        // DATA JOIN
-                        var boxplot = currentNumPlot.selectAll('.sr-lg-boxplot.subset-' + subset)
+                        if (plotTypeSelect.value !== 'noGrouping') {
+                            // DATA JOIN
+                            var boxplot = currentNumPlot.selectAll('.sr-lg-boxplot.subset-' + subset)
                             // [0] works because all relevant data in the array are identical
-                            .data(numericalData[0], function(d) { return d.timeString; });
+                                .data(numericalData[0], function(d) { return d.timeString; });
 
-                        // ENTER g
-                        var boxplotEnter = boxplot.enter()
-                            .append('g')
-                            .attr('class', function(d) {
-                                return 'sr-lg-boxplot' +
-                                    ' timestring-' + smartRUtils.makeSafeForCSS(d.timeString) +
-                                    ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
-                                    ' subset-' + subset;
-                            })
-                            .on('mouseover', function(d) {
-                                var html = '';
-                                for (var key in d) {
-                                    if (d.hasOwnProperty(key)) {
-                                        html += key + ': ' + d[key] + '<br/>';
+                            // ENTER g
+                            var boxplotEnter = boxplot.enter()
+                                .append('g')
+                                .attr('class', function(d) {
+                                    return 'sr-lg-boxplot' +
+                                        ' timestring-' + smartRUtils.makeSafeForCSS(d.timeString) +
+                                        ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
+                                        ' subset-' + subset;
+                                })
+                                .on('mouseover', function(d) {
+                                    var html = '';
+                                    for (var key in d) {
+                                        if (d.hasOwnProperty(key)) {
+                                            html += key + ': ' + d[key] + '<br/>';
+                                        }
                                     }
-                                }
-                                tip.direction('n')
-                                    .offset([-10, 0])
-                                    .show(html, this);
-                            })
-                            .on('mouseout', function() {
-                                tip.hide();
-                            });
+                                    tip.direction('n')
+                                        .offset([-10, 0])
+                                        .show(html, this);
+                                })
+                                .on('mouseout', function() {
+                                    tip.hide();
+                                });
 
-                        // ENTER rect
-                        boxplotEnter.append('rect');
+                            // ENTER rect
+                            boxplotEnter.append('rect');
 
 
-                        // UPDATE g
-                        boxplot.transition()
-                            .duration(ANIMATION_DURATION)
-                            .attr('transform', function(d) {
-                            return 'translate(' + (x(d.timeInteger)) + ',' + (y(d.value)) + ')';
-                        });
+                            // UPDATE g
+                            boxplot.transition()
+                                .duration(ANIMATION_DURATION)
+                                .attr('transform', function(d) {
+                                    return 'translate(' + (x(d.timeInteger)) + ',' + (y(d.value)) + ')';
+                                });
 
-                        // UPDATE rect
-                        boxplot.select('rect')
-                            .transition()
-                            .duration(ANIMATION_DURATION)
-                            .attr('height', function(d) {
-                                return y(d.value - (d.error ? d.error : 0)) - y(d.value + (d.error ? d.error : 0));
-                            })
-                            .attr('width', ERROR_BAR_WIDTH)
-                            .attr('x', subset === 1 ? - ERROR_BAR_WIDTH / 2 - 1 : ERROR_BAR_WIDTH / 2)
-                            .attr('y', function(d) { return - (y(d.value) - y(d.value + (d.error ? d.error : 0))); });
+                            // UPDATE rect
+                            boxplot.select('rect')
+                                .transition()
+                                .duration(ANIMATION_DURATION)
+                                .attr('height', function(d) {
+                                    return y(d.value - (d.error ? d.error : 0)) - y(d.value + (d.error ? d.error : 0));
+                                })
+                                .attr('width', ERROR_BAR_WIDTH)
+                                .attr('x', subset === 1 ? - ERROR_BAR_WIDTH / 2 - 1 : ERROR_BAR_WIDTH / 2)
+                                .attr('y', function(d) { return - (y(d.value) - y(d.value + (d.error ? d.error : 0))); });
 
-                        // EXIT g
-                        boxplot.exit().remove();
-
+                            // EXIT g
+                            boxplot.exit().remove();
+                        } else {
+                            currentNumPlot.selectAll('.sr-lg-boxplot.subset-' + subset).remove();
+                        }
                     });
                     bySubset.filterAll();
                     // --- Render timeline elements for each subset
