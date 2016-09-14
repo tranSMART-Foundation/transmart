@@ -689,10 +689,12 @@ window.smartRApp.directive('lineGraph', [
                         boxplot.select('rect')
                             .transition()
                             .duration(ANIMATION_DURATION)
-                            .attr('height', function(d) { return y(d.value - d.error) - y(d.value + d.error); })
+                            .attr('height', function(d) {
+                                return y(d.value - (d.error ? d.error : 0)) - y(d.value + (d.error ? d.error : 0));
+                            })
                             .attr('width', ERROR_BAR_WIDTH)
                             .attr('x', subset === 1 ? - ERROR_BAR_WIDTH / 2 - 1 : ERROR_BAR_WIDTH / 2)
-                            .attr('y', function(d) { return - (y(d.value) - y(d.value + d.error)); });
+                            .attr('y', function(d) { return - (y(d.value) - y(d.value + (d.error ? d.error : 0))); });
 
                         // EXIT g
                         boxplot.exit().remove();
