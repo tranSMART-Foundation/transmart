@@ -725,15 +725,16 @@ window.smartRApp.directive('lineGraph', [
 
             function renderCategoricPlots() {
                 tmpByType.filterExact('categoric');
-                // TODO: Which patients to display and which not?
-                // FIXME: up and down arrow
-                var displayedPatientID = getValuesForDimension(byPatientID).slice(0, parseInt(patientRange.value));
-                byPatientID.filterFunction(function(d) { return displayedPatientID.indexOf(d) !== -1; });
 
                 if (byTimeInteger.bottom(Infinity).length === 0) {
                     tmpByType.filterAll();
                     return;
                 }
+
+                // TODO: Which patients to display and which not?
+                // FIXME: up and down arrow
+                var displayedPatientID = getValuesForDimension(byPatientID).slice(0, parseInt(patientRange.value));
+                byPatientID.filterFunction(function(d) { return displayedPatientID.indexOf(d) !== -1; });
 
                 // FIXME: make use of the new unique callback to improve performance
                 var catPlotInfo = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
