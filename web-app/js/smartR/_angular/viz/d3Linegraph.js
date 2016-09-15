@@ -45,6 +45,14 @@ window.smartRApp.directive('lineGraph', [
             var tmpByBioMarker = dataCF.dimension(function(d) { return d.bioMarker; });
             var tmpByPatientID = dataCF.dimension(function(d) { return d.patientID; });
 
+            // convert string to string to numeric type for numeric data
+            tmpByType.filterExact('numeric');
+            var data = tmpByType.bottom(Infinity);
+            dataCF.remove();
+            data.forEach(function(d) { d.value = parseInt(d.value); });
+            dataCF.add(data);
+            tmpByType.filterAll();
+
             tmpByType.filterExact('categoric');
             var totalNumOfCatBoxes = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
             tmpByType.filterExact('numeric');
