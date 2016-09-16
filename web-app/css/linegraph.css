@@ -35,8 +35,6 @@
 
 /* all boxes of cat plot */
 .sr-lg-cat-plot rect {
-    fill: none;
-    stroke: rgb(145,145,145);
 }
 
 /* subset 1 boxes of cat plot */

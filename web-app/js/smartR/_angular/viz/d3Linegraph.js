@@ -117,7 +117,7 @@ window.smartRApp.directive('lineGraph', [
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-lg-patient-range');
             patientRange.min = 0;
             patientRange.max = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
-            patientRange.value = 25;
+            patientRange.value = 35;
             patientRange.step = 1;
             patientRange.addEventListener('input', function() {
                 renderCategoricPlots();
@@ -764,7 +764,6 @@ window.smartRApp.directive('lineGraph', [
 
                 var entries = byTimeInteger.bottom(Infinity);
                 var rowHeight = 1 / entries.length * CAT_PLOTS_HEIGHT;
-                var patientIDFontSize = smartRUtils.scaleFont(entries[0].patientID, {}, rowHeight * 2 / 3, MARGIN.left - 10, 0, 1);
 
                 /**
                  * BOX & PATIENTID SECTION
@@ -789,9 +788,6 @@ window.smartRApp.directive('lineGraph', [
                 catPlotEnter.append('rect')
                     .attr('width', LINEGRAPH_WIDTH);
 
-                // ENTER path
-                catPlotEnter.append('path');
-
                 // ENTER text
                 catPlotEnter.append('text')
                     .text(function(d) { return d.patientID; })
@@ -809,21 +805,10 @@ window.smartRApp.directive('lineGraph', [
 
                 // UPDATE text
                 catPlot.select('text')
-                    .style('font-size', patientIDFontSize)
-                    .attr('x', - MARGIN.left + 10)
-                    .attr('y', function(d) { return d.height - patientIDFontSize / 2; });
-
-                // UPDATE path
-                catPlot.select('path')
-                    .attr('d', function(d) {
-                        var x1 = 0,
-                            y1 = d.height,
-                            x2 = - MARGIN.left + 10,
-                            y2 = d.height,
-                            x3 = Math.cos(225 * Math.PI / 180) * 10 + x2,
-                            y3 = Math.sin(225 * Math.PI / 180) * 10 + y2;
-                        return 'M' + x1 + ',' + y1 + 'L' + x2 + ',' + y2 + 'L' + x3 + ',' + y3;
-                    });
+                    .style('font-size', rowHeight * 2 / 3 + 'px')
+                    .style('text-anchor', 'end')
+                    .attr('x', -5)
+                    .attr('y', function(d) { return d.height / 2; });
 
                 // UPDATE rect
                 catPlot.select('rect')
