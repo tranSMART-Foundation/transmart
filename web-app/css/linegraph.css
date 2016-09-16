@@ -35,6 +35,8 @@
 
 /* all boxes of cat plot */
 .sr-lg-cat-plot rect {
+    stroke-width: 1px;
+    stroke: rgb(24, 24, 24);
 }
 
 /* subset 1 boxes of cat plot */
@@ -47,13 +49,10 @@
     fill: rgba(217, 54, 51, 0.4);
 }
 
-/* patient id seperators on the left */
-.sr-lg-cat-icon {
-}
-
 /* icons of cat plot */
 .sr-lg-cat-icon {
-    stroke: none;
+    stroke-width: 1px;
+    stroke: rgb(24, 24, 24);
     shape-rendering: crispEdges;
 }
 .sr-lg-cat-icon:hover {

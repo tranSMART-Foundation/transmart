@@ -731,9 +731,8 @@ window.smartRApp.directive('lineGraph', [
                     return;
                 }
 
-                // TODO: Which patients to display and which not?
                 // FIXME: up and down arrow
-                var displayedPatientID = getValuesForDimension(byPatientID).slice(0, parseInt(patientRange.value));
+                var displayedPatientID = smartRUtils.unique(getValuesForDimension(byPatientID)).slice(0, parseInt(patientRange.value));
                 byPatientID.filterFunction(function(d) { return displayedPatientID.indexOf(d) !== -1; });
 
                 // FIXME: make use of the new unique callback to improve performance
@@ -761,9 +760,6 @@ window.smartRApp.directive('lineGraph', [
 
                 tmpByTimeInteger.filterAll();
                 tmpByPatientID.filterAll();
-
-                var entries = byTimeInteger.bottom(Infinity);
-                var rowHeight = 1 / entries.length * CAT_PLOTS_HEIGHT;
 
                 /**
                  * BOX & PATIENTID SECTION
@@ -805,7 +801,7 @@ window.smartRApp.directive('lineGraph', [
 
                 // UPDATE text
                 catPlot.select('text')
-                    .style('font-size', rowHeight * 2 / 3 + 'px')
+                    .style('font-size', function(d) { return (d.height / 2) + 'px'; })
                     .style('text-anchor', 'end')
                     .attr('x', -5)
                     .attr('y', function(d) { return d.height / 2; });
