@@ -32,24 +32,24 @@ window.smartRApp.directive('boxplot', [
         var cf = crossfilter(scope.data.dataMatrix);
         var byValue = cf.dimension(function(d) { return d.value; });
         var bySubset = cf.dimension(function(d) { return d.subset; });
-        var byName = cf.dimension(function(d) { return d.name; });
+        var byBioMarker = cf.dimension(function(d) { return d.bioMarker; });
 
         var plotData = [];
-        smartRUtils.unique(smartRUtils.getValuesForDimension(byName)).forEach(function(name) {
-            byName.filterExact(name);
+        smartRUtils.unique(smartRUtils.getValuesForDimension(byBioMarker)).forEach(function(bioMarker) {
+            byBioMarker.filterExact(bioMarker);
             smartRUtils.unique(smartRUtils.getValuesForDimension(bySubset, true)).forEach(function(subset) {
                 bySubset.filterExact(subset);
                 plotData.push({
                     type: 'box',
                     y: smartRUtils.getValuesForDimension(byValue),
-                    name: name + ' s' + subset,
+                    name: bioMarker + ' s' + subset,
                     boxpoints: 'all',
                     boxmean: 'sd',
                     jitter: 0.5
                 });
                 bySubset.filterAll();
             });
-            byName.filterAll();
+            byBioMarker.filterAll();
         });
         
         var layout = {

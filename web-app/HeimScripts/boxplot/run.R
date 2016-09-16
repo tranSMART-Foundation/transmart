@@ -3,7 +3,6 @@ library(plyr)
 library(reshape2)
 
 main <- function(excludedPatientIDs = integer(), transformation="raw") {
-
     output <- list()
     output$transformation <- transformation
 
@@ -31,12 +30,11 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
     # initialize empty df
     df <- data.frame(patientID=integer(),
                      value=integer(),
-                     name=character(),
+                     bioMarker=character(),
                      type=character(),
                      subset=integer(),
                      stringsAsFactors=FALSE)
-
-
+    
     # build big df step by step via binding row-wise every loaded variable
     for (i in 1:length(names(loaded_variables))) {
         variable <- loaded_variables[[i]]
@@ -44,24 +42,41 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
 
         if (types[i] == "highDimensional") {
             colnames(variable)[-(1:2)] <- sub("^X", "", colnames(variable[-(1:2)]))
-            variable.df <- melt(variable, id.vars=c("Row.Label", "Bio.marker"), variable.name="patientID")[, -c(1,2)]
+            variable.df <- melt(variable, id.vars=c("Row.Label", "Bio.marker"), variable.name="patientID")
+
+            variable.label.df <- data.frame()
+            # create for each unique row label an own df
+            for (rowLabel in unique(variable.df$Row.Label)) {
+                variable.label.df <- variable.df[variable.df$Row.Label == rowLabel, ]
+                bioMarker <- paste(names[i], rowLabel, variable.label.df$Bio.marker[1], sep="--")
+                variable.label.df <- variable.label.df[, -c(1,2)]
+                variable.label.df <- data.frame(patientID=as.numeric(as.vector(variable.label.df$patientID)),
+                                                value=as.numeric(as.vector(variable.label.df$value)),
+                                                bioMarker=rep(bioMarker, nrow(variable.label.df)),
+                                                type=rep('numeric', nrow(variable.label.df)),
+                                                subset=rep(subsets[i], nrow(variable.label.df)),
+                                                stringsAsFactors=FALSE)
+                # no value -> no interest
+                variable.label.df <- variable.label.df[variable.label.df$value != "" & !is.na(variable.label.df$value), ]
+                if (nrow(variable.label.df) == 0) next
+                df <- rbind(df, variable.label.df)
+            }
         } else {
-            variable.df <- data.frame(patientID=as.integer(variable[,1]),
-                                      value=variable[,2])
+            variable.df <- data.frame(patientID=as.integer(variable[,1]), value=variable[,2])
+            bioMarker <- names[i]
+            values <- as.numeric(as.vector(variable.df$value))
+            # attach additional information
+            variable.df <- data.frame(patientID=as.numeric(as.vector(variable.df$patientID)),
+                                 value=values,
+                                 bioMarker=rep(bioMarker, nrow(variable.df)),
+                                 type=rep(types[i], nrow(variable.df)),
+                                 subset=rep(subsets[i], nrow(variable.df)),
+                                 stringsAsFactors=FALSE)
+            # no value -> no interest
+            variable.df <- variable.df[variable.df$value != "" & !is.na(variable.df$value), ]
+            if (nrow(variable.df) == 0) next
+            df <- rbind(df, variable.df)
         }
-
-        # attach additional information
-        variable.df <- cbind(variable.df,
-                             name=rep(names[i], nrow(variable.df)),
-                             type=rep(types[i], nrow(variable.df)),
-                             subset=rep(subsets[i], nrow(variable.df)),
-                             stringsAsFactors=FALSE)
-
-        # no value -> no interest
-        variable.df <- variable.df[variable.df$value != "" & !is.na(variable.df$value), ]
-        if (nrow(variable.df) == 0) next
-        # rbind.fill sets missing columns entries to NA
-        df <- rbind.fill(df, variable.df)
     }
 
     # before we are done we assign a unique id to every row to make it easier for the front-end
