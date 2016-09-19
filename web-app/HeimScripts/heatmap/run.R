@@ -77,8 +77,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
 
     
     ## Low dimensional annotation data frame  
-    extraFieldsLowDim.df = buildExtraFieldsLowDim(ld.list)
-    
+    extraFieldsLowDim.df = buildExtraFieldsLowDim(ld.list, extraFieldsHighDim.df$COLNAME)
     
 
     ldd_rownames.vector = as.vector(unique(extraFieldsLowDim.df[, "ROWNAME"]))

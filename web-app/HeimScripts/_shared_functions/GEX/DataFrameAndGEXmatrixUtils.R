@@ -654,7 +654,7 @@ buildExtraFieldsHighDim <- function(df) {
 ##
 ## If a value is not existing, the corresponding cell in the returned data frame
 ## is set to NA.
-buildExtraFieldsLowDim <- function(ld.list) {
+buildExtraFieldsLowDim <- function(ld.list, colnames) {
   
   if(is.null(ld.list)){
     return(NULL)
@@ -687,8 +687,7 @@ buildExtraFieldsLowDim <- function(ld.list) {
   for(i in 1:length(varNames_without_subset.vec)){
     
     ROWNAME = get("fullName", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
-    NAME = get("name", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
-    
+
     ## Accessing data frame for given full low dim variable name
     ## This data frame provides for each subject the corresponding
     ## value for given variable
@@ -702,7 +701,7 @@ buildExtraFieldsLowDim <- function(ld.list) {
       TYPE.vec = c(TYPE.vec, type.vec[i])
       SUBSET.vec = c(SUBSET.vec, subset.vec[i])
       VALUE.vec = c(VALUE.vec, ld_var.df[j,2])
-      COLNAME.vec = c(COLNAME.vec, paste(ld_var.df[j,1], NAME , subset.vec[i], sep="_"))
+      COLNAME.vec = colnames
     }
   }
 
