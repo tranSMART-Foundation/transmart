@@ -852,9 +852,7 @@ window.smartRApp.directive('lineGraph', [
                         });
 
                     // UPDATE polygon
-                    icon.transition()
-                        .duration(ANIMATION_DURATION)
-                        .attr('points', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
+                    icon.attr('points', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
                         .attr('transform', function(d) {
                             return 'translate(' + (x(d.timeInteger) - iconSize / 2) + ',' + 0 + ')';
                         });
@@ -862,8 +860,46 @@ window.smartRApp.directive('lineGraph', [
                 tmpByPatientID.filterAll();
 
                 /**
-                 * LEGEND SECTION
+                 * CONTROL ELEMENTS SECTION
                  */
+
+                svg.selectAll('.sr-lg-shift-element').remove();
+                svg.append('path')
+                    .attr('class', 'sr-lg-shift-element')
+                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS) +
+                        'h' + (MARGIN.left / 2) +
+                        'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
+                    .on('click', function() {
+                        renderCategoricPlots();
+                    });
+
+                svg.append('path')
+                    .attr('class', 'sr-lg-shift-element')
+                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS + CAT_PLOTS_HEIGHT + 10) +
+                        'h' + (MARGIN.left / 2) +
+                        'l' + (- MARGIN.left / 4) + ',' + (MARGIN.left / 3) + 'Z')
+                    .on('click', function() {
+                        renderCategoricPlots();
+                    });
+
+                byPatientID.filterAll();
+                tmpByType.filterAll();
+
+                renderLegend();
+            }
+            renderCategoricPlots();
+
+            function renderLegend() {
+                var drag = d3.behavior.drag()
+                    .on('drag', function() {
+                        var newY = d3.event.y;
+                        newY = newY < CAT_PLOTS_POS ? CAT_PLOTS_POS : newY;
+                        newY = newY > LINEGRAPH_HEIGHT ? LINEGRAPH_HEIGHT : newY;
+                        d3.select(this).attr('transform', 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' + newY + ')');
+                    })
+                    .on('dragend', function() {
+                        var xPos = d3.transform(d3.select(this).attr('transform')).translate[0];
+                    });
 
                 var iconCache = iconGen();
                 var legendData = [];
@@ -890,7 +926,13 @@ window.smartRApp.directive('lineGraph', [
                     .attr('transform', function(d, i) {
                         return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
                             (CAT_PLOTS_POS + i * LEGEND_ITEM_SIZE) + ')';
-                    });
+                    })
+                    .call(drag);
+
+                // ENTER rect
+                legendItemEnter.append('rect')
+                    .attr('height', LEGEND_ITEM_SIZE)
+                    .attr('width', MARGIN.right);
 
                 // ENTER polygon
                 legendItemEnter.append('polygon')
@@ -918,34 +960,7 @@ window.smartRApp.directive('lineGraph', [
                 // EXIT g
                 legendItem.exit()
                     .remove();
-
-                /**
-                 * CONTROL ELEMENTS SECTION
-                 */
-
-                svg.selectAll('.sr-lg-shift-element').remove();
-                svg.append('path')
-                    .attr('class', 'sr-lg-shift-element')
-                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS) +
-                        'h' + (MARGIN.left / 2) +
-                        'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
-                    .on('click', function() {
-                        renderCategoricPlots();
-                    });
-
-                svg.append('path')
-                    .attr('class', 'sr-lg-shift-element')
-                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS + CAT_PLOTS_HEIGHT + 10) +
-                        'h' + (MARGIN.left / 2) +
-                        'l' + (- MARGIN.left / 4) + ',' + (MARGIN.left / 3) + 'Z')
-                    .on('click', function() {
-                        renderCategoricPlots();
-                    });
-
-                byPatientID.filterAll();
-                tmpByType.filterAll();
             }
-            renderCategoricPlots();
 
             var permitHighlight = true;
             function highlightTimepoint(timeString) {

@@ -75,6 +75,7 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                      bioMarker=character(),
                      type=character(),
                      subset=integer(),
+                     ranking=integer(),
                      stringsAsFactors=FALSE)
 
 
@@ -116,6 +117,7 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                                                 bioMarker=rep(bioMarker, nrow(variable.label.df)),
                                                 type=rep('numeric', nrow(variable.label.df)),
                                                 subset=rep(subsets[i], nrow(variable.label.df)),
+                                                ranking=rep(NA, nrow(variable.label.df)),
                                                 stringsAsFactors=FALSE)
                 # no value -> no interest
                 variable.label.df <- variable.label.df[variable.label.df$value != "" & !is.na(variable.label.df$value), ]
@@ -131,8 +133,10 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
             values <- c()
             if (types[i] == "categoric") {
                 values <- as.vector(variable.df$value)
+                rankings <- rep(0, nrow(variable.df))
             } else {
                 values <- as.numeric(as.vector(variable.df$value))
+                rankings <- rep(NA, nrow(variable.df))
             }
             # if timeString never occured before, assign it a new timeInteger
             if (is.null(timeInteger)) {
@@ -152,6 +156,7 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                                  bioMarker=rep(bioMarker, nrow(variable.df)),
                                  type=rep(types[i], nrow(variable.df)),
                                  subset=rep(subsets[i], nrow(variable.df)),
+                                 ranking=rankings,
                                  stringsAsFactors=FALSE)
             # no value -> no interest
             variable.df <- variable.df[variable.df$value != "" & !is.na(variable.df$value), ]
@@ -159,6 +164,15 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
             df <- rbind(df, variable.df)
         }
     }
+
+    # compute inverse freq of each event as a default ranking/order
+    totalNumOfEvents <- nrow(df[df$type == "categoric", ])
+    for (bioMarker in unique(df$bioMarker)) {
+        occurences <- nrow(df[df$bioMarker == bioMarker, ])
+        inverseFreq <- 1 / (occurences / totalNumOfEvents)
+        df[df$bioMarker == bioMarker, ]$ranking <- inverseFreq
+    }
+
 
     # before we are done we assign a unique id to every row to make it easier for the front-end
     df <- cbind(id=1:nrow(df), df)
