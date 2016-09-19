@@ -98,7 +98,12 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     ## all possible statistical methods
     statistics_hd.df = getAllStatForExtDataFrame(hd.df)
 
-
+    write.table(statistics_hd.df,
+                "heatmap_data.tsv",
+                sep = "\t",
+                na = "",
+                row.names = FALSE,
+                col.names = TRUE)
     ## Concatenating the two extraField types (that have been generated
     ## for the low and high dim data) 
     extraFields.df = rbind(extraFieldsHighDim.df, extraFieldsLowDim.df)
@@ -160,7 +165,6 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     jsn <- toJSON(jsn, pretty = TRUE, digits = I(17))
     
     
-    writeDataForZip(hd.df, measurementsAsZscore.matrix, colNames)  # for later zip generation
     write(jsn, file = "heatmap.json")
     # json file be served the same way
     # like any other file would - get name via

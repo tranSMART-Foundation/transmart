@@ -903,23 +903,6 @@ getRankingMethod <- function(rankingMethodName) {
   }
 }
 
-
-writeDataForZip <- function(df, zScores, pidCols) {
-  df      <- df[ , -which(names(df) %in% pidCols)]  # Drop patient columns
-  df      <- cbind(df,zScores)                      # Replace with zScores
-  df      <- df[ , -which(colnames(df) == "SIGNIFICANCE")]
-  write.table(
-    df,
-    "heatmap_data.tsv",
-    sep = "\t",
-    na = "",
-    row.names = FALSE,
-    col.names = TRUE
-  )
-}
-
-
-
 ## Probe signal aggregation based on maxMean for initial data frame containing probe id, biomarker
 ## and sample measurements. Probes are merged according to maxMean, this means the row with highest mean
 ## intensity for same biomarker will be retained.
