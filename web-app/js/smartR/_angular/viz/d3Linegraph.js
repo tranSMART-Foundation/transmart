@@ -46,54 +46,6 @@ window.smartRApp.directive('lineGraph', [
             var tmpByBioMarker = dataCF.dimension(function(d) { return d.bioMarker; });
             var tmpByPatientID = dataCF.dimension(function(d) { return d.patientID; });
 
-            // convert string to string to numeric type for numeric data
-            tmpByType.filterExact('numeric');
-            var data = tmpByType.bottom(Infinity);
-            dataCF.remove();
-            data.forEach(function(d) { d.value = parseInt(d.value); });
-            dataCF.add(data);
-            tmpByType.filterAll();
-
-            tmpByType.filterExact('categoric');
-            var totalNumOfCatBoxes = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
-            tmpByType.filterExact('numeric');
-            var totalNumOfNumBoxes = smartRUtils.unique(getValuesForDimension(byBioMarker)).length;
-            tmpByType.filterAll();
-
-            var NUM_PLOT_HEIGHT = 200;
-            var NUM_PLOT_PADDING = 50;
-
-            var NUM_PLOTS_HEIGHT = totalNumOfNumBoxes * (NUM_PLOT_HEIGHT + NUM_PLOT_PADDING);
-            var CAT_PLOTS_HEIGHT = totalNumOfCatBoxes > 0 ? 1000 : 0;
-
-            var CAT_PLOTS_POS = NUM_PLOTS_HEIGHT;
-            var TIME_AXIS_POS = CAT_PLOTS_POS + CAT_PLOTS_HEIGHT;
-
-            var LEGEND_OFFSET = 10;
-            var LEGEND_ITEM_SIZE = 20;
-
-            var ERROR_BAR_WIDTH = 5;
-            var MAX_XAXIS_ELEMENT_WIDTH = 40;
-            var TICK_HEIGHT = 0;
-
-            var MARGIN = {
-                top: 50,
-                right: 200,
-                bottom: 100,
-                left: 100
-            };
-
-            var vizDivHeight = NUM_PLOTS_HEIGHT + CAT_PLOTS_HEIGHT + MARGIN.top + MARGIN.bottom;
-
-            var LINEGRAPH_WIDTH = vizDivWidth - MARGIN.left - MARGIN.right;
-            var LINEGRAPH_HEIGHT = vizDivHeight - MARGIN.top - MARGIN.bottom;
-
-            var ANIMATION_DURATION = 500;
-            var tmp_animation_duration = ANIMATION_DURATION;
-            // set to 0 for creating the plot initially
-            ANIMATION_DURATION = 0;
-
-
 
             var plotTypeSelect = smartRUtils.getElementWithoutEventListeners('sr-lg-numplottype-select');
             plotTypeSelect.selectedIndex = 0;
@@ -123,6 +75,68 @@ window.smartRApp.directive('lineGraph', [
             patientRange.addEventListener('input', function() {
                 renderCategoricPlots();
             });
+
+            // convert string to string to numeric type for numeric data
+            tmpByType.filterExact('numeric');
+            var data = tmpByType.bottom(Infinity);
+            dataCF.remove();
+            data.forEach(function(d) { d.value = parseInt(d.value); });
+            dataCF.add(data);
+            tmpByType.filterAll();
+
+            tmpByType.filterExact('categoric');
+            var totalNumOfCatBoxes = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
+            var displayedPatientID = smartRUtils.unique(getValuesForDimension(byPatientID)).slice(0, parseInt(patientRange.value));
+            byPatientID.filterFunction(function(d) { return displayedPatientID.indexOf(d) !== -1; });
+            var numAllCatRows = 0;
+            smartRUtils.unique(getValuesForDimension(byPatientID)).forEach(function(patientID) {
+                byPatientID.filterExact(patientID);
+                var numRows = 0;
+                smartRUtils.unique(getValuesForDimension(byTimeInteger)).forEach(function(timeInteger) {
+                    tmpByTimeInteger.filterExact(timeInteger);
+                    var count = byTimeInteger.bottom(Infinity).length;
+                    numRows = count > numRows ? count : numRows;
+                    tmpByTimeInteger.filterAll();
+                });
+                numAllCatRows += numRows;
+            });
+            byPatientID.filterAll();
+            tmpByType.filterExact('numeric');
+            var totalNumOfNumBoxes = smartRUtils.unique(getValuesForDimension(byBioMarker)).length;
+            tmpByType.filterAll();
+
+            var NUM_PLOT_HEIGHT = 200;
+            var NUM_PLOT_PADDING = 50;
+            var ICON_SIZE = 20;
+
+            var NUM_PLOTS_HEIGHT = totalNumOfNumBoxes * (NUM_PLOT_HEIGHT + NUM_PLOT_PADDING);
+            var CAT_PLOTS_HEIGHT = numAllCatRows * ICON_SIZE;
+
+            var CAT_PLOTS_POS = NUM_PLOTS_HEIGHT;
+            var TIME_AXIS_POS = CAT_PLOTS_POS + CAT_PLOTS_HEIGHT;
+
+            var LEGEND_OFFSET = 10;
+
+            var ERROR_BAR_WIDTH = 5;
+            var MAX_XAXIS_ELEMENT_WIDTH = 40;
+            var TICK_HEIGHT = 0;
+
+            var MARGIN = {
+                top: 50,
+                right: 200,
+                bottom: 100,
+                left: 100
+            };
+
+            var vizDivHeight = NUM_PLOTS_HEIGHT + CAT_PLOTS_HEIGHT + MARGIN.top + MARGIN.bottom;
+
+            var LINEGRAPH_WIDTH = vizDivWidth - MARGIN.left - MARGIN.right;
+            var LINEGRAPH_HEIGHT = vizDivHeight - MARGIN.top - MARGIN.bottom;
+
+            var ANIMATION_DURATION = 500;
+            var tmp_animation_duration = ANIMATION_DURATION;
+            // set to 0 for creating the plot initially
+            ANIMATION_DURATION = 0;
 
             var x = d3.scale.linear();
             // recomputes x scale for current filters
@@ -472,7 +486,7 @@ window.smartRApp.directive('lineGraph', [
                         .attr('class', function(d) { return 'sr-lg-num-legend subset-' + d; })
                         .attr('transform', function(d) {
                             return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
-                                (numPlotBoxHeight / 2 + (d === 1 ? - LEGEND_ITEM_SIZE : LEGEND_ITEM_SIZE)) + ')';
+                                (numPlotBoxHeight / 2 + (d === 1 ? - ICON_SIZE : ICON_SIZE)) + ')';
                         })
                         .on('mouseover', function(d) { 
                             d3.selectAll('.sr-lg-boxplot').filter(function() {
@@ -493,16 +507,16 @@ window.smartRApp.directive('lineGraph', [
 
                     // ENTER rect
                     numPlotLegendEnter.append('rect')
-                        .attr('height', LEGEND_ITEM_SIZE)
-                        .attr('width', LEGEND_ITEM_SIZE);
+                        .attr('height', ICON_SIZE)
+                        .attr('width', ICON_SIZE);
 
 
                     // ENTER text
                     numPlotLegendEnter.append('text')
-                        .attr('x', LEGEND_ITEM_SIZE + 5)
-                        .attr('y', LEGEND_ITEM_SIZE / 2)
+                        .attr('x', ICON_SIZE + 5)
+                        .attr('y', ICON_SIZE / 2)
                         .attr('dy', '.35em')
-                        .style('font-size', smartRUtils.scaleFont('Cohort X', {}, 15, MARGIN.right - LEGEND_ITEM_SIZE - 5, 0, 1))
+                        .style('font-size', smartRUtils.scaleFont('Cohort X', {}, 15, MARGIN.right - ICON_SIZE - 5, 0, 1))
                         .text(function(d) { return 'Cohort ' + d; });
                     // --- Add legend items
 
@@ -755,10 +769,8 @@ window.smartRApp.directive('lineGraph', [
                     return {patientID: patientID, maxDensity: maxCount};
                 });
 
-                var iconSize = 1 / catPlotInfo.length * CAT_PLOTS_HEIGHT;
-
                 catPlotInfo.forEach(function(d) {
-                    d.height = d.maxDensity * iconSize;
+                    d.height = d.maxDensity * ICON_SIZE;
                     tmpByPatientID.filterExact(d.patientID);
                     d.subset = smartRUtils.unique(getValuesForDimension(bySubset));
                 });
@@ -806,7 +818,7 @@ window.smartRApp.directive('lineGraph', [
 
                 // UPDATE text
                 catPlot.select('text')
-                    .style('font-size', function(d) { return (d.height / 2) + 'px'; })
+                    .style('font-size', function() { return ICON_SIZE + 'px'; })
                     .style('text-anchor', 'end')
                     .attr('x', -5)
                     .attr('y', function(d) { return d.height / 2; });
@@ -859,12 +871,12 @@ window.smartRApp.directive('lineGraph', [
                         });
 
                     // UPDATE polygon
-                    icon.attr('points', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
+                    icon.attr('points', function(d) { return iconGen(d.bioMarker).shape(ICON_SIZE); })
                         .attr('transform', function(d) {
                             iconPlacement[d.timeInteger] = typeof iconPlacement[d.timeInteger] === 'undefined' ?
                                 0 : iconPlacement[d.timeInteger] + 1;
                             var innerIconRow = iconPlacement[d.timeInteger];
-                            return 'translate(' + (x(d.timeInteger) - iconSize / 2) + ',' + (innerIconRow * iconSize) + ')';
+                            return 'translate(' + (x(d.timeInteger) - ICON_SIZE / 2) + ',' + (innerIconRow * ICON_SIZE) + ')';
                         });
                 });
                 tmpByPatientID.filterAll();
@@ -922,8 +934,8 @@ window.smartRApp.directive('lineGraph', [
                 }
                 var longestBioMarker = legendData.map(function(d) { return d.bioMarker; })
                     .reduce(function(prev, curr) { return prev.length > curr.length ? prev : curr; }, '');
-                var legendTextSize = smartRUtils.scaleFont(longestBioMarker, {}, LEGEND_ITEM_SIZE,
-                    MARGIN.right - LEGEND_OFFSET - LEGEND_ITEM_SIZE, 0, 2);
+                var legendTextSize = smartRUtils.scaleFont(longestBioMarker, {}, ICON_SIZE,
+                    MARGIN.right - LEGEND_OFFSET - ICON_SIZE, 0, 2);
 
                 // DATA JOIN
                 var legendItem = svg.selectAll('.sr-lg-legend-item')
@@ -935,18 +947,18 @@ window.smartRApp.directive('lineGraph', [
                     .attr('class', 'sr-lg-legend-item')
                     .attr('transform', function(d, i) {
                         return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
-                            (CAT_PLOTS_POS + i * LEGEND_ITEM_SIZE) + ')';
+                            (CAT_PLOTS_POS + i * ICON_SIZE) + ')';
                     })
                     .call(drag);
 
                 // ENTER rect
                 legendItemEnter.append('rect')
-                    .attr('height', LEGEND_ITEM_SIZE)
+                    .attr('height', ICON_SIZE)
                     .attr('width', MARGIN.right);
 
                 // ENTER polygon
                 legendItemEnter.append('polygon')
-                    .attr('points', function(d) { return d.shape(LEGEND_ITEM_SIZE); })
+                    .attr('points', function(d) { return d.shape(ICON_SIZE); })
                     .style('fill', function(d) { return d.fill; })
                     .on('mouseover', function(d) {
                         svg.selectAll('.sr-lg-cat-icon')
@@ -961,8 +973,8 @@ window.smartRApp.directive('lineGraph', [
 
                 // ENTER text
                 legendItemEnter.append('text')
-                    .attr('x', LEGEND_OFFSET + LEGEND_ITEM_SIZE)
-                    .attr('y', LEGEND_ITEM_SIZE / 2)
+                    .attr('x', LEGEND_OFFSET + ICON_SIZE)
+                    .attr('y', ICON_SIZE / 2)
                     .attr('dy', '0.35em')
                     .style('font-size', function() { return legendTextSize + 'px'; })
                     .text(function(d) { return d.bioMarker; });
