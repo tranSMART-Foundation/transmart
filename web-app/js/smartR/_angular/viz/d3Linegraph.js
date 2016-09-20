@@ -735,18 +735,22 @@ window.smartRApp.directive('lineGraph', [
                 var displayedPatientID = smartRUtils.unique(getValuesForDimension(byPatientID)).slice(0, parseInt(patientRange.value));
                 byPatientID.filterFunction(function(d) { return displayedPatientID.indexOf(d) !== -1; });
 
-                // FIXME: make use of the new unique callback to improve performance
                 var catPlotInfo = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
                     tmpByPatientID.filterExact(patientID);
+                    // in case a patient is in both subsets we only take one as cat data are identical in that case
+                    var subsets = smartRUtils.unique(byTimeInteger.bottom(Infinity).map(function(d) { return d.subset; }));
+                    bySubset.filterExact(subsets[0]);
+
                     var maxCount = 0;
-                    var times = smartRUtils.unique(getValuesForDimension(byTimeInteger));
-                    times.forEach(function(time) {
-                        tmpByTimeInteger.filterExact(time);
+                    var timeIntegers = smartRUtils.unique(getValuesForDimension(byTimeInteger));
+                    timeIntegers.forEach(function(timeInteger) {
+                        tmpByTimeInteger.filterExact(timeInteger);
                         var count = byTimeInteger.bottom(Infinity).length;
                         maxCount = count > maxCount ? count : maxCount;
                         // we need to disable this filter temporarily, otherwise it will affect the next iteration step
                         tmpByTimeInteger.filterAll();
                     });
+                    bySubset.filterAll();
                     return {patientID: patientID, maxDensity: maxCount};
                 });
 
