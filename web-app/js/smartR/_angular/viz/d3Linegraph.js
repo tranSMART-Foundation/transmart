@@ -38,6 +38,7 @@ window.smartRApp.directive('lineGraph', [
             var byTimeInteger = dataCF.dimension(function(d) { return d.timeInteger; });
             var byBioMarker = dataCF.dimension(function(d) { return d.bioMarker; });
             var bySubset = dataCF.dimension(function(d) { return d.subset; });
+            var byRanking = dataCF.dimension(function(d) { return d.ranking; });
 
             // these dimensions are used temporarily, e.g. in function calls
             var tmpByType = dataCF.dimension(function(d) { return d.type; });
@@ -797,7 +798,7 @@ window.smartRApp.directive('lineGraph', [
                 catPlot.attr('transform', function(d, i) {
                     var previousHeight = 0;
                     for (var j = i - 1; j >= 0; j--) {
-                        previousHeight += catPlotInfo[i].height;
+                        previousHeight += catPlotInfo[j].height;
                     }
                     var y = CAT_PLOTS_POS + previousHeight;
                     return 'translate(' + 0 + ',' + y + ')';
@@ -825,9 +826,11 @@ window.smartRApp.directive('lineGraph', [
                 d3.selectAll('.sr-lg-cat-plot').each(function(d) {
                     tmpByPatientID.filterExact(d.patientID);
 
+                    var iconPlacement = {};
+
                     // DATA JOIN
                     var icon = d3.select(this).selectAll('.sr-lg-cat-icon')
-                        .data(byTimeInteger.bottom(Infinity), function(d) { return d.id; });
+                        .data(byRanking.top(Infinity), function(d) { return d.id; });
 
                     // ENTER polygon
                     icon.enter()
@@ -858,7 +861,10 @@ window.smartRApp.directive('lineGraph', [
                     // UPDATE polygon
                     icon.attr('points', function(d) { return iconGen(d.bioMarker).shape(iconSize); })
                         .attr('transform', function(d) {
-                            return 'translate(' + (x(d.timeInteger) - iconSize / 2) + ',' + 0 + ')';
+                            iconPlacement[d.timeInteger] = typeof iconPlacement[d.timeInteger] === 'undefined' ?
+                                0 : iconPlacement[d.timeInteger] + 1;
+                            var innerIconRow = iconPlacement[d.timeInteger];
+                            return 'translate(' + (x(d.timeInteger) - iconSize / 2) + ',' + (innerIconRow * iconSize) + ')';
                         });
                 });
                 tmpByPatientID.filterAll();
