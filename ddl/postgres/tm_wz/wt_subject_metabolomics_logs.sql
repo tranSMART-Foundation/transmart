@@ -3,7 +3,7 @@
 --
 CREATE TABLE wt_subject_metabolomics_logs (
     probeset character varying(500),
-    intensity_value bigint,
+    intensity_value double precision,
     pvalue double precision,
     num_calls bigint,
     assay_id bigint,
@@ -12,7 +12,7 @@ CREATE TABLE wt_subject_metabolomics_logs (
     subject_id character varying(50),
     trial_name character varying(50),
     timepoint character varying(100),
-    log_intensity bigint
+    log_intensity double precision
 );
 
 --
