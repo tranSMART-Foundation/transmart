@@ -38,14 +38,13 @@ window.smartRApp.directive('lineGraph', [
             var byTimeInteger = dataCF.dimension(function(d) { return d.timeInteger; });
             var byBioMarker = dataCF.dimension(function(d) { return d.bioMarker; });
             var bySubset = dataCF.dimension(function(d) { return d.subset; });
-            var byRanking = dataCF.dimension(function(d) { return d.ranking; });
 
             // these dimensions are used temporarily, e.g. in function calls
             var tmpByType = dataCF.dimension(function(d) { return d.type; });
             var tmpByTimeInteger = dataCF.dimension(function(d) { return d.timeInteger; });
             var tmpByBioMarker = dataCF.dimension(function(d) { return d.bioMarker; });
             var tmpByPatientID = dataCF.dimension(function(d) { return d.patientID; });
-
+            var tmpByRanking = dataCF.dimension(function(d) { return d.ranking; });
 
             var plotTypeSelect = smartRUtils.getElementWithoutEventListeners('sr-lg-numplottype-select');
             plotTypeSelect.selectedIndex = 0;
@@ -194,7 +193,6 @@ window.smartRApp.directive('lineGraph', [
                 .attr('transform', 'translate(' + 0 + ',' + TIME_AXIS_POS + ')');
 
             // WARNING: using this function will reset all global filters to make sure all data are modified correctly
-            // FIXME: I should reapply the filters after
             function swapTimeIntegerData(fromTimeInteger, toTimeInteger) {
                 byPatientID.filterAll();
                 byBioMarker.filterAll();
@@ -211,6 +209,32 @@ window.smartRApp.directive('lineGraph', [
 
                 fromEntries.forEach(function(d) { d.timeInteger = toTimeInteger; });
                 toEntries.forEach(function(d) { d.timeInteger = fromTimeInteger; });
+
+                dataCF.add(fromEntries);
+                dataCF.add(toEntries);
+            }
+
+            // WARNING: using this function will reset all global filters to make sure all data are modified correctly
+            function swapBioMarkerRanking(fromBioMarker, toBioMarker) {
+                byPatientID.filterAll();
+                byBioMarker.filterAll();
+                byTimeInteger.filterAll();
+                bySubset.filterAll();
+
+                tmpByType.filterExact('categoric');
+                byBioMarker.filterExact(fromBioMarker);
+                var fromEntries = byTimeInteger.bottom(Infinity);
+                var fromRanking = fromEntries[0].ranking;
+                dataCF.remove();
+                byBioMarker.filterExact(toBioMarker);
+                var toEntries = byTimeInteger.bottom(1);
+                var toRanking = toEntries[0].ranking;
+                dataCF.remove();
+                byBioMarker.filterAll();
+                tmpByType.filterAll();
+
+                fromEntries.forEach(function(d) { d.ranking = toRanking; });
+                toEntries.forEach(function(d) { d.ranking = fromRanking; });
 
                 dataCF.add(fromEntries);
                 dataCF.add(toEntries);
@@ -244,7 +268,7 @@ window.smartRApp.directive('lineGraph', [
                         newX = newX > LINEGRAPH_WIDTH ? LINEGRAPH_WIDTH : newX;
                         d3.select(this).attr('transform', 'translate(' + (newX) + ',' + TICK_HEIGHT + ')');
                     })
-                    .on('dragend', function(d) {
+                    .on('dragend', function(draggedElement) {
                         var xPos = d3.transform(d3.select(this).attr('transform')).translate[0];
                         timeAxisData = smartRUtils.unique(byTimeInteger.bottom(Infinity), function(d) { return d.timeInteger; });
  
@@ -257,12 +281,12 @@ window.smartRApp.directive('lineGraph', [
                         });
 
                         var timeIntegers = timeZones.map(function(d) { return d.timeInteger; });
-                        var timeStrings = timeZones.map(function(d) { return d.timeStrings; });
+                        var timeStrings = timeZones.map(function(d) { return d.timeString; });
                         var matchingTimeZones = timeZones.filter(function(timeZone) {
                             return timeZone.left <= xPos && xPos <= timeZone.right;
                         });
                         var timeIntegerDestination = matchingTimeZones[0].timeInteger;
-                        var timeIntegerOrigin = d.timeInteger;
+                        var timeIntegerOrigin = draggedElement.timeInteger;
                         if (timeIntegerDestination !== timeIntegerOrigin) {
                             var indexDestination = timeIntegers.indexOf(timeIntegerDestination);
                             var indexOrigin = timeIntegers.indexOf(timeIntegerOrigin);
@@ -283,7 +307,7 @@ window.smartRApp.directive('lineGraph', [
                                     .attr('transform', 'translate(' + (x(timeIntegerOrigin)) + ',' + (TICK_HEIGHT) + ')');
 
                                 swapTimeIntegerData(timeIntegers[indexOrigin], timeIntegers[nextIntermediateIndex]);
-                                d.timeInteger = timeIntegers[nextIntermediateIndex];
+                                draggedElement.timeInteger = timeIntegers[nextIntermediateIndex];
                                 indexOrigin = nextIntermediateIndex;
                             }
                         }
@@ -842,7 +866,7 @@ window.smartRApp.directive('lineGraph', [
 
                     // DATA JOIN
                     var icon = d3.select(this).selectAll('.sr-lg-cat-icon')
-                        .data(byRanking.top(Infinity), function(d) { return d.id; });
+                        .data(tmpByRanking.top(Infinity), function(d) { return d.id; });
 
                     // ENTER polygon
                     icon.enter()
@@ -912,42 +936,68 @@ window.smartRApp.directive('lineGraph', [
             renderCategoricPlots();
 
             function renderLegend() {
-                var drag = d3.behavior.drag()
-                    .on('drag', function() {
-                        var newY = d3.event.y;
-                        newY = newY < CAT_PLOTS_POS ? CAT_PLOTS_POS : newY;
-                        newY = newY > LINEGRAPH_HEIGHT ? LINEGRAPH_HEIGHT : newY;
-                        d3.select(this).attr('transform', 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' + newY + ')');
-                    })
-                    .on('dragend', function() {
-                        var xPos = d3.transform(d3.select(this).attr('transform')).translate[0];
-                    });
-
+                tmpByType.filterExact('categoric');
                 var iconCache = iconGen();
-                var legendData = [];
-                for (var key in iconCache) {
-                    if (iconCache.hasOwnProperty(key)) {
-                        var icon = iconCache[key];
-                        icon.bioMarker = key;
-                        legendData.push(icon);
-                    }
-                }
+                var legendData = smartRUtils.unique(tmpByRanking.top(Infinity), function(d) { return d.bioMarker; }).map(function(d, i) {
+                    return {bioMarker: d.bioMarker, ranking: d.ranking, icon: iconCache[d.bioMarker], row: i};
+                });
+                tmpByType.filterAll();
+
                 var longestBioMarker = legendData.map(function(d) { return d.bioMarker; })
                     .reduce(function(prev, curr) { return prev.length > curr.length ? prev : curr; }, '');
                 var legendTextSize = smartRUtils.scaleFont(longestBioMarker, {}, ICON_SIZE,
                     MARGIN.right - LEGEND_OFFSET - ICON_SIZE, 0, 2);
 
+                var drag = d3.behavior.drag()
+                    .on('drag', function(draggedLegendItem) {
+                        var newY = d3.event.y;
+                        newY = newY < CAT_PLOTS_POS ? CAT_PLOTS_POS : newY;
+                        newY = newY > LINEGRAPH_HEIGHT ? LINEGRAPH_HEIGHT : newY;
+                        d3.select(this)
+                            .attr('transform', 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' + (newY - ICON_SIZE / 2) + ')');
+                        var thisRow = draggedLegendItem.row;
+                        var thatRow = Math.floor((newY - CAT_PLOTS_POS) / ICON_SIZE);
+                        // if we hover over another another
+                        if (thisRow !== thatRow && thatRow < legendData.length) {
+                            var thatLegendItem = d3.select('.sr-lg-legend-item.row-' + thatRow);
+                            var thatBioMarker = thatLegendItem.data()[0].bioMarker;
+                            thatLegendItem.transition()
+                                .duration(ANIMATION_DURATION)
+                                .attr('transform', 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
+                                    (CAT_PLOTS_POS + thisRow * ICON_SIZE)  + ')');
+                            thatLegendItem
+                                .classed('row-' + thatRow, false)
+                                .classed('row-' + thisRow, true);
+
+                            d3.select('.sr-lg-legend-item.biomarker-' + smartRUtils.makeSafeForCSS(draggedLegendItem.bioMarker))
+                                .classed('row-' + thisRow, false)
+                                .classed('row-' + thatRow, true);
+
+                            draggedLegendItem.row = thatRow;
+
+                            swapBioMarkerRanking(thatBioMarker, draggedLegendItem.bioMarker);
+                        }
+                    })
+                    .on('dragend', function(draggedLegendItem) {
+                        d3.select('.sr-lg-legend-item.biomarker-' + smartRUtils.makeSafeForCSS(draggedLegendItem.bioMarker)).transition()
+                            .duration(ANIMATION_DURATION)
+                            .attr('transform', 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
+                                (CAT_PLOTS_POS + draggedLegendItem.row * ICON_SIZE)  + ')');
+                        var yPos = d3.transform(d3.select(this).attr('transform')).translate[1];
+                    });
+
                 // DATA JOIN
                 var legendItem = svg.selectAll('.sr-lg-legend-item')
-                    .data(legendData, function(d) { return d.id; });
+                    .data(legendData, function(d) { return d.icon.id; });
 
                 // ENTER g
                 var legendItemEnter = legendItem.enter()
                     .append('g')
-                    .attr('class', 'sr-lg-legend-item')
+                    .attr('class', function(d) {
+                        return 'sr-lg-legend-item' + ' biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker) + ' row-' + d.row;
+                    })
                     .attr('transform', function(d, i) {
-                        return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
-                            (CAT_PLOTS_POS + i * ICON_SIZE) + ')';
+                        return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' + (CAT_PLOTS_POS + i * ICON_SIZE) + ')';
                     })
                     .call(drag);
 
@@ -958,8 +1008,8 @@ window.smartRApp.directive('lineGraph', [
 
                 // ENTER polygon
                 legendItemEnter.append('polygon')
-                    .attr('points', function(d) { return d.shape(ICON_SIZE); })
-                    .style('fill', function(d) { return d.fill; })
+                    .attr('points', function(d) { return d.icon.shape(ICON_SIZE); })
+                    .style('fill', function(d) { return d.icon.fill; })
                     .on('mouseover', function(d) {
                         svg.selectAll('.sr-lg-cat-icon')
                             .filter('.biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker))
