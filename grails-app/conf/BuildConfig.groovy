@@ -24,7 +24,7 @@ grails.project.test.reports.dir = "target/test-reports"
 def dm, dmClass
 try {
     dmClass = new GroovyClassLoader().parseClass(
-            new File('../transmart-dev/DependencyManagement.groovy'))
+            new File('../transmart-dev/SmartRDependencyManagement.groovy'))
 } catch (Exception e) {
 }
 if (dmClass) {
