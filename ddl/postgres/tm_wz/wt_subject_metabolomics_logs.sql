@@ -9,7 +9,7 @@ CREATE TABLE wt_subject_metabolomics_logs (
     assay_id bigint,
     patient_id bigint,
     sample_id bigint,
-    subject_id character varying(50),
+    subject_id character varying(100),
     trial_name character varying(50),
     timepoint character varying(100),
     log_intensity double precision

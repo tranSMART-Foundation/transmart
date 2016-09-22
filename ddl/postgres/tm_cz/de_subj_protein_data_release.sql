@@ -6,7 +6,7 @@ CREATE TABLE de_subj_protein_data_release (
     component character varying(15),
     intensity bigint,
     patient_id bigint,
-    subject_id character varying(10),
+    subject_id character varying(100),
     gene_symbol character varying(100),
     gene_id integer,
     assay_id bigint,
