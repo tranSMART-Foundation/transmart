@@ -947,29 +947,40 @@ window.smartRApp.directive('lineGraph', [
                             .attr('transform', 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' + (newY - ICON_SIZE / 2) + ')');
                         var thisRow = draggedLegendItem.row;
                         var thatRow = Math.floor((newY - CAT_PLOTS_POS) / ICON_SIZE);
+                        thatRow = thatRow >= legendData.length ? legendData.length - 1 : thatRow;
                         // if we hover over another another
-                        if (thisRow !== thatRow && thatRow < legendData.length) {
-                            var thatLegendItem = d3.select('.sr-lg-legend-item.row-' + thatRow);
-                            var thatBioMarker = thatLegendItem.data()[0].bioMarker;
-                            thatLegendItem.transition()
-                                .duration(ANIMATION_DURATION)
-                                .attr('transform', 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
-                                    (CAT_PLOTS_POS + thisRow * ICON_SIZE)  + ')');
-                            thatLegendItem
-                                .classed('row-' + thatRow, false)
-                                .classed('row-' + thisRow, true);
+                        if (thisRow !== thatRow) {
+                            var dist = 0;
+                            while (Math.abs(dist = thisRow - thatRow) > 0) {
+                                var nextRow = thatRow;
+                                if (dist > 1) {
+                                    nextRow = thisRow - 1;
+                                } else if (dist < -1) {
+                                    nextRow = thisRow + 1;
+                                }
+                                var nextLegendItem = d3.select('.sr-lg-legend-item.row-' + nextRow);
+                                var nextBioMarker = nextLegendItem.data()[0].bioMarker;
+                                nextLegendItem.transition()
+                                    .duration(ANIMATION_DURATION)
+                                    .attr('transform', 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
+                                        (CAT_PLOTS_POS + thisRow * ICON_SIZE)  + ')');
+                                nextLegendItem
+                                    .classed('row-' + nextRow, false)
+                                    .classed('row-' + thisRow, true);
 
-                            d3.select('.sr-lg-legend-item.biomarker-' + smartRUtils.makeSafeForCSS(draggedLegendItem.bioMarker))
-                                .classed('row-' + thisRow, false)
-                                .classed('row-' + thatRow, true);
+                                d3.select('.sr-lg-legend-item.biomarker-' + smartRUtils.makeSafeForCSS(draggedLegendItem.bioMarker))
+                                    .classed('row-' + thisRow, false)
+                                    .classed('row-' + nextRow, true);
 
-                            draggedLegendItem.row = thatRow;
-
-                            swapBioMarkerRanking(thatBioMarker, draggedLegendItem.bioMarker);
+                                swapBioMarkerRanking(nextBioMarker, draggedLegendItem.bioMarker);
+                                draggedLegendItem.row = nextRow;
+                                thisRow = nextRow;
+                            }
                         }
                     })
                     .on('dragend', function(draggedLegendItem) {
-                        d3.select('.sr-lg-legend-item.biomarker-' + smartRUtils.makeSafeForCSS(draggedLegendItem.bioMarker)).transition()
+                        d3.select('.sr-lg-legend-item.biomarker-' + smartRUtils.makeSafeForCSS(draggedLegendItem.bioMarker))
+                            .transition()
                             .duration(ANIMATION_DURATION)
                             .attr('transform', 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
                                 (CAT_PLOTS_POS + draggedLegendItem.row * ICON_SIZE)  + ')');
