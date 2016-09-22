@@ -46,6 +46,9 @@ window.smartRApp.directive('lineGraph', [
             var tmpByPatientID = dataCF.dimension(function(d) { return d.patientID; });
             var tmpByRanking = dataCF.dimension(function(d) { return d.ranking; });
 
+            var groupByPatientIDRanking = byPatientID.group()
+                .reduceSum(function(d) { return typeof d.ranking === 'undefined' ? 0 : d.ranking; });
+
             var plotTypeSelect = smartRUtils.getElementWithoutEventListeners('sr-lg-numplottype-select');
             plotTypeSelect.selectedIndex = 0;
             plotTypeSelect.addEventListener('change', function() {
@@ -771,8 +774,10 @@ window.smartRApp.directive('lineGraph', [
                 }
 
                 // FIXME: up and down arrow
-                var displayedPatientID = smartRUtils.unique(getValuesForDimension(byPatientID)).slice(0, parseInt(patientRange.value));
-                byPatientID.filterFunction(function(d) { return displayedPatientID.indexOf(d) !== -1; });
+                // TODO: visualize ranking value
+                // show highest ranked patients first
+                var topRankedPatients = groupByPatientIDRanking.top(parseInt(patientRange.value)).map(function(d) { return d.key; });
+                byPatientID.filterFunction(function(d) { return topRankedPatients.indexOf(d) !== -1; });
 
                 var catPlotInfo = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
                     tmpByPatientID.filterExact(patientID);
@@ -983,7 +988,7 @@ window.smartRApp.directive('lineGraph', [
                             .duration(ANIMATION_DURATION)
                             .attr('transform', 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
                                 (CAT_PLOTS_POS + draggedLegendItem.row * ICON_SIZE)  + ')');
-                        var yPos = d3.transform(d3.select(this).attr('transform')).translate[1];
+                        renderCategoricPlots();
                     });
 
                 // DATA JOIN

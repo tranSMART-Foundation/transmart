@@ -62,13 +62,13 @@ extractTime <- function(string) {
 # returns df that is compatible with crossfilter.js
 buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
     # gather information
-    subsets <- getSubsets(loaded_variables)
+    allSubsets <- getSubsets(loaded_variables)
     nodeNames <- getNodeNames(loaded_variables, fetch_params)
     fullNames <- getFullNames(loaded_variables, fetch_params)
     types <- getTypes(loaded_variables)
 
     # initialize empty df
-    df <- data.frame(patientID=integer(),
+    df <- data.frame(patientID=character(),
                      value=c(), # can be string or integer
                      timeInteger=integer(),
                      timeString=character(),
@@ -95,6 +95,9 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
             for (rowLabel in unique(variable.df$Row.Label)) {
                 variable.label.df <- variable.df[variable.df$Row.Label == rowLabel, ]
                 split <- strsplit(fullNames[i], "\\\\")[[1]]
+                subsets <- rep(allSubsets[i], nrow(variable.label.df))
+                patientIDs <- as.numeric(as.vector(variable.label.df$patientID))
+                patientIDs <- paste(patientIDs, subsets, sep="_")
                 bioMarker <- split[length(split) - 1]
                 bioMarker <- paste(bioMarker, rowLabel, variable.label.df$Bio.marker[1], sep="--")
                 timeString <- nodeNames[i]
@@ -110,13 +113,13 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                     times[timeString] <- timeInteger
                 }
                 variable.label.df <- variable.label.df[, -c(1,2)]
-                variable.label.df <- data.frame(patientID=as.numeric(as.vector(variable.label.df$patientID)),
+                variable.label.df <- data.frame(patientID=patientIDs,
                                                 value=as.numeric(as.vector(variable.label.df$value)),
                                                 timeInteger=rep(timeInteger, nrow(variable.label.df)),
                                                 timeString=rep(timeString, nrow(variable.label.df)),
                                                 bioMarker=rep(bioMarker, nrow(variable.label.df)),
                                                 type=rep('numeric', nrow(variable.label.df)),
-                                                subset=rep(subsets[i], nrow(variable.label.df)),
+                                                subset=subsets,
                                                 ranking=rep(NA, nrow(variable.label.df)),
                                                 stringsAsFactors=FALSE)
                 # no value -> no interest
@@ -125,8 +128,11 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                 df <- rbind(df, variable.label.df)
             }
         } else {
-            variable.df <- data.frame(patientID=as.integer(variable[,1]), value=variable[,2])
+            variable.df <- data.frame(patientID=as.character(variable[,1]), value=variable[,2])
             split <- strsplit(fullNames[i], "\\\\")[[1]]
+            subsets <- rep(allSubsets[i], nrow(variable.df))
+            patientIDs <- as.character(as.vector(variable.df$patientID))
+            patientIDs <- paste(patientIDs, subsets, sep="_")
             bioMarker <- split[length(split) - 1]
             timeString <- nodeNames[i]
             timeInteger <- times[timeString][[1]]
@@ -149,13 +155,13 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                 times[timeString] <- timeInteger
             }
             # attach additional information
-            variable.df <- data.frame(patientID=as.numeric(as.vector(variable.df$patientID)),
+            variable.df <- data.frame(patientID=patientIDs,
                                  value=values,
                                  timeInteger=rep(timeInteger, nrow(variable.df)),
                                  timeString=rep(timeString, nrow(variable.df)),
                                  bioMarker=rep(bioMarker, nrow(variable.df)),
                                  type=rep(types[i], nrow(variable.df)),
-                                 subset=rep(subsets[i], nrow(variable.df)),
+                                 subset=subsets,
                                  ranking=rankings,
                                  stringsAsFactors=FALSE)
             # no value -> no interest
