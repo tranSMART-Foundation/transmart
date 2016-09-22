@@ -29,7 +29,6 @@ window.smartRApp.directive('lineGraph', [
 
         function createLinegraph(scope, vizDiv) {
             var data_matrix = scope.data.data_matrix;
-            var vizDivWidth = document.getElementById('sr-index').getBoundingClientRect().width;
 
             var dataCF = crossfilter(data_matrix);
 
@@ -115,10 +114,8 @@ window.smartRApp.directive('lineGraph', [
                 left: 100
             };
 
-            var vizDivHeight = NUM_PLOTS_HEIGHT + MARGIN.top + MARGIN.bottom;
-
-            var LINEGRAPH_WIDTH = vizDivWidth - MARGIN.left - MARGIN.right;
-            var LINEGRAPH_HEIGHT = vizDivHeight - MARGIN.top - MARGIN.bottom;
+            var LINEGRAPH_WIDTH = document.getElementById('sr-index').getBoundingClientRect().width - MARGIN.left - MARGIN.right;
+            var LINEGRAPH_HEIGHT = NUM_PLOTS_HEIGHT - MARGIN.top - MARGIN.bottom;
 
             var ANIMATION_DURATION = 500;
             var tmp_animation_duration = ANIMATION_DURATION;
@@ -128,6 +125,7 @@ window.smartRApp.directive('lineGraph', [
             function computeCatPlotsHeight() {
                 var catPlotsHeight = d3.selectAll('.sr-lg-cat-plot rect').data()
                     .reduce(function(prev, curr) { return prev + curr.height; }, 0);
+                LINEGRAPH_HEIGHT = NUM_PLOTS_HEIGHT + catPlotsHeight - MARGIN.top - MARGIN.bottom;
                 d3.select(vizDiv).select('svg').attr('height', NUM_PLOTS_HEIGHT + catPlotsHeight + MARGIN.top + MARGIN.bottom);
                 return catPlotsHeight;
             }
