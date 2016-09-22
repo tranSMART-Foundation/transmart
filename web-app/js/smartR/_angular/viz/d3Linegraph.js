@@ -76,6 +76,8 @@ window.smartRApp.directive('lineGraph', [
             patientRange.step = 1;
             patientRange.addEventListener('input', function() {
                 renderCategoricPlots();
+                computeCatPlotsHeight();
+                updateXAxis();
             });
 
             // convert string to string to numeric type for numeric data
@@ -88,21 +90,6 @@ window.smartRApp.directive('lineGraph', [
 
             tmpByType.filterExact('categoric');
             var totalNumOfCatBoxes = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
-            var displayedPatientID = smartRUtils.unique(getValuesForDimension(byPatientID)).slice(0, parseInt(patientRange.value));
-            byPatientID.filterFunction(function(d) { return displayedPatientID.indexOf(d) !== -1; });
-            var numAllCatRows = 0;
-            smartRUtils.unique(getValuesForDimension(byPatientID)).forEach(function(patientID) {
-                byPatientID.filterExact(patientID);
-                var numRows = 0;
-                smartRUtils.unique(getValuesForDimension(byTimeInteger)).forEach(function(timeInteger) {
-                    tmpByTimeInteger.filterExact(timeInteger);
-                    var count = byTimeInteger.bottom(Infinity).length;
-                    numRows = count > numRows ? count : numRows;
-                    tmpByTimeInteger.filterAll();
-                });
-                numAllCatRows += numRows;
-            });
-            byPatientID.filterAll();
             tmpByType.filterExact('numeric');
             var totalNumOfNumBoxes = smartRUtils.unique(getValuesForDimension(byBioMarker)).length;
             tmpByType.filterAll();
@@ -112,16 +99,14 @@ window.smartRApp.directive('lineGraph', [
             var ICON_SIZE = 20;
 
             var NUM_PLOTS_HEIGHT = totalNumOfNumBoxes * (NUM_PLOT_HEIGHT + NUM_PLOT_PADDING);
-            var CAT_PLOTS_HEIGHT = numAllCatRows * ICON_SIZE;
 
             var CAT_PLOTS_POS = NUM_PLOTS_HEIGHT;
-            var TIME_AXIS_POS = CAT_PLOTS_POS + CAT_PLOTS_HEIGHT;
 
             var LEGEND_OFFSET = 10;
 
             var ERROR_BAR_WIDTH = 5;
             var MAX_XAXIS_ELEMENT_WIDTH = 40;
-            var TICK_HEIGHT = 0;
+            var TICK_HEIGHT = 8;
 
             var MARGIN = {
                 top: 50,
@@ -130,7 +115,7 @@ window.smartRApp.directive('lineGraph', [
                 left: 100
             };
 
-            var vizDivHeight = NUM_PLOTS_HEIGHT + CAT_PLOTS_HEIGHT + MARGIN.top + MARGIN.bottom;
+            var vizDivHeight = NUM_PLOTS_HEIGHT + MARGIN.top + MARGIN.bottom;
 
             var LINEGRAPH_WIDTH = vizDivWidth - MARGIN.left - MARGIN.right;
             var LINEGRAPH_HEIGHT = vizDivHeight - MARGIN.top - MARGIN.bottom;
@@ -140,11 +125,18 @@ window.smartRApp.directive('lineGraph', [
             // set to 0 for creating the plot initially
             ANIMATION_DURATION = 0;
 
+            function computeCatPlotsHeight() {
+                var catPlotsHeight = d3.selectAll('.sr-lg-cat-plot rect').data()
+                    .reduce(function(prev, curr) { return prev + curr.height; }, 0);
+                d3.select(vizDiv).select('svg').attr('height', NUM_PLOTS_HEIGHT + catPlotsHeight + MARGIN.top + MARGIN.bottom);
+                return catPlotsHeight;
+            }
+
             var x = d3.scale.linear();
             // recomputes x scale for current filters
             function calculateXScale() {
                 tmpByType.filterExact('categoric');
-                var padding = totalNumOfCatBoxes > 0 ? CAT_PLOTS_HEIGHT / parseInt(patientRange.value) : MAX_XAXIS_ELEMENT_WIDTH / 2;
+                var padding = totalNumOfCatBoxes > 0 ? ICON_SIZE : MAX_XAXIS_ELEMENT_WIDTH / 2;
                 tmpByType.filterAll();
                 var times = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort(function(a, b) {
                     return a - b;
@@ -193,7 +185,7 @@ window.smartRApp.directive('lineGraph', [
 
             svg.append('g')
                 .attr('class', 'sr-lg-x-axis')
-                .attr('transform', 'translate(' + 0 + ',' + TIME_AXIS_POS + ')');
+                .attr('transform', 'translate(' + 0 + ',' + NUM_PLOT_HEIGHT + ')');
 
             // WARNING: using this function will reset all global filters to make sure all data are modified correctly
             function swapTimeIntegerData(fromTimeInteger, toTimeInteger) {
@@ -257,8 +249,11 @@ window.smartRApp.directive('lineGraph', [
                     .scale(x)
                     .tickFormat('')
                     .tickValues(timeAxisData.map(function(d) { return d.timeInteger; }))
-                    .innerTickSize(- NUM_PLOTS_HEIGHT - CAT_PLOTS_HEIGHT);
+                    .innerTickSize(- NUM_PLOTS_HEIGHT - computeCatPlotsHeight());
                 d3.select('.sr-lg-x-axis')
+                    .attr('transform', function() {
+                        return 'translate(0,' + (computeCatPlotsHeight() + NUM_PLOTS_HEIGHT) + ')';
+                    })
                     .transition()
                     .duration(ANIMATION_DURATION)
                     .call(xAxis);
@@ -284,7 +279,6 @@ window.smartRApp.directive('lineGraph', [
                         });
 
                         var timeIntegers = timeZones.map(function(d) { return d.timeInteger; });
-                        var timeStrings = timeZones.map(function(d) { return d.timeString; });
                         var matchingTimeZones = timeZones.filter(function(timeZone) {
                             return timeZone.left <= xPos && xPos <= timeZone.right;
                         });
@@ -303,12 +297,6 @@ window.smartRApp.directive('lineGraph', [
                                 } else if (dist < -1) {
                                     nextIntermediateIndex = indexOrigin + 1;
                                 }
-
-                                // move hovered element to its new position
-                                d3.select('.sr-lg-time-element.timestring-' +
-                                        smartRUtils.makeSafeForCSS(timeStrings[nextIntermediateIndex]))
-                                    .attr('transform', 'translate(' + (x(timeIntegerOrigin)) + ',' + (TICK_HEIGHT) + ')');
-
                                 swapTimeIntegerData(timeIntegers[indexOrigin], timeIntegers[nextIntermediateIndex]);
                                 draggedElement.timeInteger = timeIntegers[nextIntermediateIndex];
                                 indexOrigin = nextIntermediateIndex;
@@ -379,7 +367,6 @@ window.smartRApp.directive('lineGraph', [
                     .attr('height', MARGIN.bottom)
                     .attr('width', timeAxisElementWidth);
             }
-            updateXAxis();
 
             function iconGenerator() {
                 var square = function(size) { return '0,0 ' + size + ',0 ' + size + ',' + size + ' 0,' + size; };
@@ -832,8 +819,11 @@ window.smartRApp.directive('lineGraph', [
 
                 // ENTER text
                 catPlotEnter.append('text')
-                    .text(function(d) { return d.patientID; })
-                    .attr('dy', '0.35em');
+                    .attr('dy', '0.35em')
+                    .attr('x', -5)
+                    .style('text-anchor', 'end')
+                    .style('font-size', '14px')
+                    .text(function(d) { return d.patientID; });
 
                 // UPDATE g
                 catPlot.attr('transform', function(d, i) {
@@ -847,9 +837,6 @@ window.smartRApp.directive('lineGraph', [
 
                 // UPDATE text
                 catPlot.select('text')
-                    .style('font-size', function() { return ICON_SIZE + 'px'; })
-                    .style('text-anchor', 'end')
-                    .attr('x', -5)
                     .attr('y', function(d) { return d.height / 2; });
 
                 // UPDATE rect
@@ -913,26 +900,26 @@ window.smartRApp.directive('lineGraph', [
                 /**
                  * CONTROL ELEMENTS SECTION
                  */
-
-                svg.selectAll('.sr-lg-shift-element').remove();
-                svg.append('path')
-                    .attr('class', 'sr-lg-shift-element')
-                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS) +
-                        'h' + (MARGIN.left / 2) +
-                        'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
-                    .on('click', function() {
-                        renderCategoricPlots();
-                    });
-
-                svg.append('path')
-                    .attr('class', 'sr-lg-shift-element')
-                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS + CAT_PLOTS_HEIGHT + 10) +
-                        'h' + (MARGIN.left / 2) +
-                        'l' + (- MARGIN.left / 4) + ',' + (MARGIN.left / 3) + 'Z')
-                    .on('click', function() {
-                        renderCategoricPlots();
-                    });
-
+//
+//                svg.selectAll('.sr-lg-shift-element').remove();
+//                svg.append('path')
+//                    .attr('class', 'sr-lg-shift-element')
+//                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS) +
+//                        'h' + (MARGIN.left / 2) +
+//                        'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
+//                    .on('click', function() {
+//                        renderCategoricPlots();
+//                    });
+//
+//                svg.append('path')
+//                    .attr('class', 'sr-lg-shift-element')
+//                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS + CAT_PLOTS_HEIGHT + 10) +
+//                        'h' + (MARGIN.left / 2) +
+//                        'l' + (- MARGIN.left / 4) + ',' + (MARGIN.left / 3) + 'Z')
+//                    .on('click', function() {
+//                        renderCategoricPlots();
+//                    });
+//
                 byPatientID.filterAll();
                 tmpByType.filterAll();
 
@@ -1075,6 +1062,7 @@ window.smartRApp.directive('lineGraph', [
                 d3.selectAll('.temp-tip').remove();
             }
 
+            updateXAxis();
             ANIMATION_DURATION = tmp_animation_duration;
         }
     }
