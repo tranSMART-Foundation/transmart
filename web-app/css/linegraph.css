@@ -156,14 +156,10 @@
 }
 
 .sr-lg-legend-item {
+    cursor: ns-resize;
 }
 
 .sr-lg-legend-item>rect {
-    cursor: ns-resize;
     fill: white;
     opacity: 0;
-}
-
-.sr-lg-legend-item>rect:hover {
-    opacity: 0.4;
 }

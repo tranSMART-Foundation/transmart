@@ -987,6 +987,8 @@ window.smartRApp.directive('lineGraph', [
                     .attr('transform', function(d, i) {
                         return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' + (CAT_PLOTS_POS + i * ICON_SIZE) + ')';
                     })
+                    .on('mouseover', function() { d3.select(this).select('rect').style('opacity', 0.4); })
+                    .on('mouseout', function() { d3.select(this).select('rect').style('opacity', 0); })
                     .call(drag);
 
                 // ENTER rect
@@ -1007,7 +1009,6 @@ window.smartRApp.directive('lineGraph', [
                         svg.selectAll('.sr-lg-cat-icon')
                             .classed('icon-highlight', false);
                     });
-
 
                 // ENTER text
                 legendItemEnter.append('text')
