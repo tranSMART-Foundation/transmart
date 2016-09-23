@@ -35,11 +35,6 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     hd.df = data.list$HD
     ld.list = data.list$LD    
     
-    save(hd.df, file="~/hd.df.Rda")
-    save(ld.list, file="~/ld.list.Rda")
-    save(loaded_variables, file="~/loaded_variables.Rda")
-    save(fetch_params, file="~/fetch_params.Rda")
-    
     if (sorting == "nodes") {
 
     } else {
