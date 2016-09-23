@@ -695,13 +695,16 @@ buildExtraFieldsLowDim <- function(ld.list, colnames) {
 
     for(j in 1:dim(ld_var.df)[1]){
       if (ld_var.df[j, 2] == "" || is.na(ld_var.df[j, 2])) next
-
-      ROWNAME.vec = c(ROWNAME.vec, ROWNAME)
-      PATIENTID.vec = c(PATIENTID.vec, ld_var.df[j,1])
-      TYPE.vec = c(TYPE.vec, type.vec[i])
-      SUBSET.vec = c(SUBSET.vec, subset.vec[i])
-      VALUE.vec = c(VALUE.vec, ld_var.df[j,2])
-      COLNAME.vec = colnames
+      for (colname in colnames) {
+        patientID <- as.character(ld_var.df[j,1])
+        if (patientID != sub("_.+", "", colname)) next
+        ROWNAME.vec = c(ROWNAME.vec, ROWNAME)
+        PATIENTID.vec = c(PATIENTID.vec, patientID)
+        TYPE.vec = c(TYPE.vec, type.vec[i])
+        SUBSET.vec = c(SUBSET.vec, subset.vec[i])
+        VALUE.vec = c(VALUE.vec, ld_var.df[j,2])
+        COLNAME.vec = c(COLNAME.vec, colname)
+      }
     }
   }
 
