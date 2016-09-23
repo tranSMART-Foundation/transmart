@@ -907,6 +907,8 @@ window.smartRApp.directive('lineGraph', [
                 tmpByType.filterAll();
 
                 renderLegend();
+                // we need to update the xAxis because the plot size could have changed
+                updateXAxis();
             }
             renderCategoricPlots();
 
