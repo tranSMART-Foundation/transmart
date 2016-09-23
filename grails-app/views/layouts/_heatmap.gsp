@@ -89,15 +89,15 @@
 
             %{--Type of sorting to apply--}%
             <div class="heim-input-field sr-input-area">
-                <h2>Order columns by:</h2>
+                <h2>Group columns by:</h2>
                 <fieldset class="heim-radiogroup">
                     <label>
                         <input type="radio" ng-model="runAnalysis.params.sorting" name="sortingSelect" value="nodes"
-                               checked> Nodes
+                               checked> Node Order
                     </label>
                     <label>
                         <input type="radio" ng-model="runAnalysis.params.sorting" name="sortingSelect" value="subjects">
-                        Subjects
+                        Subject ID
                     </label>
                 </fieldset>
             </div>

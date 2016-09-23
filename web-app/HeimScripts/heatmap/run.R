@@ -56,7 +56,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     
     ## Creating the extended diff expr analysis data frame containing besides the input data,
     ## a set of statistics. The returned data frame is ranked according to provided ranking statistic
-    hd.df          <- addStats(hd.df, sorting, ranking, max_rows)
+    hd.df          <- addStats(hd.df, ranking, max_rows)
     
     hd.df          <- mergeDuplicates(hd.df)
     

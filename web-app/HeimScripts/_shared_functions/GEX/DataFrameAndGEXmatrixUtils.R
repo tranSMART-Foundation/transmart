@@ -42,54 +42,12 @@ applyRanking <- function (df, ranking, max_rows) {
 }
 
 
-## Sorting of measurement columns
-## in input data frame
-applySorting <- function(df,sorting) {
-  
-  measurements <- getMeasurements(df)
-  colNames <- names(measurements)
-  subsets <- getSubset(colNames)
-  nodes <- getNode(colNames)
-  subjects <- getSubject(colNames)
-
-  
-  timelineValues <- getTimelineValues(nodes, fetch_params$ontologyTerms)
-
-  
-   ## Converting subjects vector to integer if required for ordering
-   subjects_are_integer.logical = all(grepl("^\\d+$", subjects, perl = TRUE))
- 
-   if(subjects_are_integer.logical)
-     subjects = as.integer(subjects)
-
-   
-  ## Performing the sorting of columns
-    ## - according to nodes
-  if (sorting == "nodes") {
-    inds <- order(subsets, timelineValues, nodes, subjects)
-  
-    ## - or subjects
-  } else if (sorting == "subjects") {
-    inds <- order(subsets, subjects, timelineValues, nodes)
-    ## - else just stop the script as sth is wrong in the input params for this function
-  } else{
-    stop(paste("applySorting: Sorting can only be performed according to nodes/subjects. Please check your input:", sorting))
-  }
-
-  measurements <- measurements[, inds]
-
-  ## Returning the data frame with reordered columns
-  cbind(df[, c(1,2)], measurements)
-}
-
-
-
 ## Generates a filtered data frame containing the GEX matrix data
 ## as well as the statistics used to order and filter the df GEX data frame.
 ## Ordering and filtering can be performed based on Limma-based
 ## statistics (B value, P-value, Adjusted P-value) but also other statistical
 ## functions like variance, mean, median
-addStats <- function(df, sorting, ranking, max_rows) {
+addStats <- function(df, ranking, max_rows) {
   
   # In order to prevent displaying the table from previous run.
   cleanUpLimmaOutput(markerTableJson = markerTableJson)
@@ -120,11 +78,6 @@ addStats <- function(df, sorting, ranking, max_rows) {
 
   #this is the case for more than 1 sample available in the data frame
   if (ncol(df) > 3) {
-
-
-    df <- applySorting(df,sorting)  # no need for sorting in one sample case, we do it here only
-
-    
 
     validLimmaMeasurements <- isValidLimmaMeasurements(measurements)
 
