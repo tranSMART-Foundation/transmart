@@ -41,12 +41,12 @@
 
 /* subset 1 boxes of cat plot */
 .sr-lg-cat-plot.subset-1 rect{
-    fill: rgba(94, 198, 216, 0.4);
+    fill: rgba(94, 198, 216, 0.08);
 }
 
 /* subset 2 boxes of cat plot */
 .sr-lg-cat-plot.subset-2 rect{
-    fill: rgba(217, 54, 51, 0.4);
+    fill: rgba(217, 54, 51, 0.08);
 }
 
 /* icons of cat plot */

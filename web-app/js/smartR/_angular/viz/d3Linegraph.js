@@ -70,7 +70,7 @@ window.smartRApp.directive('lineGraph', [
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-lg-patient-range');
             patientRange.min = 0;
             patientRange.max = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
-            patientRange.value = 35;
+            patientRange.value = 20;
             patientRange.step = 1;
             patientRange.addEventListener('input', function() {
                 renderCategoricPlots();
@@ -383,32 +383,32 @@ window.smartRApp.directive('lineGraph', [
                     {shape: square, fill: '#006980'},
                     {shape: triangle, fill: '#4B0080'},
                     {shape: diamond, fill: '#F6910E'},
-                    {shape: revTriangle, fill: '#0EF611'},
-                    {shape: hexagon, fill: '#F60E1E'},
+                    {shape: revTriangle, fill: '#034931'},
+                    {shape: hexagon, fill: '#AD1F1F'},
 
                     {shape: triangle, fill: '#006980'},
                     {shape: diamond, fill: '#4B0080'},
                     {shape: revTriangle, fill: '#F6910E'},
-                    {shape: hexagon, fill: '#0EF611'},
-                    {shape: square, fill: '#F60E1E'},
+                    {shape: hexagon, fill: '#034931'},
+                    {shape: square, fill: '#AD1F1F'},
 
                     {shape: diamond, fill: '#006980'},
                     {shape: revTriangle, fill: '#4B0080'},
                     {shape: hexagon, fill: '#F6910E'},
-                    {shape: square, fill: '#0EF611'},
-                    {shape: triangle, fill: '#F60E1E'},
+                    {shape: square, fill: '#034931'},
+                    {shape: triangle, fill: '#AD1F1F'},
 
                     {shape: revTriangle, fill: '#006980'},
                     {shape: hexagon, fill: '#4B0080'},
                     {shape: square, fill: '#F6910E'},
-                    {shape: triangle, fill: '#0EF611'},
-                    {shape: diamond, fill: '#F60E1E'},
+                    {shape: triangle, fill: '#034931'},
+                    {shape: diamond, fill: '#AD1F1F'},
 
                     {shape: hexagon, fill: '#006980'},
                     {shape: square, fill: '#4B0080'},
                     {shape: triangle, fill: '#F6910E'},
-                    {shape: diamond, fill: '#0EF611'},
-                    {shape: revTriangle, fill: '#F60E1E'},
+                    {shape: diamond, fill: '#034931'},
+                    {shape: revTriangle, fill: '#AD1F1F'},
 
                     {shape: fallback, fill: '#000000'} // fallback
                 ];
@@ -915,8 +915,11 @@ window.smartRApp.directive('lineGraph', [
             function renderLegend() {
                 tmpByType.filterExact('categoric');
                 var iconCache = iconGen();
-                var legendData = smartRUtils.unique(tmpByRanking.top(Infinity), function(d) { return d.bioMarker; }).map(function(d, i) {
-                    return {bioMarker: d.bioMarker, ranking: d.ranking, icon: iconCache[d.bioMarker], row: i};
+                var legendData = Object.keys(iconCache).map(function(bioMarker, i) {
+                    tmpByBioMarker.filterExact(bioMarker);
+                    var entry = tmpByTimeInteger.bottom(1);
+                    tmpByBioMarker.filterAll();
+                    return {bioMarker: bioMarker, ranking: entry.ranking, icon: iconCache[bioMarker], row: i};
                 });
                 tmpByType.filterAll();
 
