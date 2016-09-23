@@ -654,7 +654,7 @@ buildExtraFieldsHighDim <- function(df) {
 ##
 ## If a value is not existing, the corresponding cell in the returned data frame
 ## is set to NA.
-buildExtraFieldsLowDim <- function(ld.list) {
+buildExtraFieldsLowDim <- function(ld.list, colnames) {
   
   if(is.null(ld.list)){
     return(NULL)
@@ -687,8 +687,7 @@ buildExtraFieldsLowDim <- function(ld.list) {
   for(i in 1:length(varNames_without_subset.vec)){
     
     ROWNAME = get("fullName", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
-    NAME = get("name", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
-    
+
     ## Accessing data frame for given full low dim variable name
     ## This data frame provides for each subject the corresponding
     ## value for given variable
@@ -696,13 +695,16 @@ buildExtraFieldsLowDim <- function(ld.list) {
 
     for(j in 1:dim(ld_var.df)[1]){
       if (ld_var.df[j, 2] == "" || is.na(ld_var.df[j, 2])) next
-
-      ROWNAME.vec = c(ROWNAME.vec, ROWNAME)
-      PATIENTID.vec = c(PATIENTID.vec, ld_var.df[j,1])
-      TYPE.vec = c(TYPE.vec, type.vec[i])
-      SUBSET.vec = c(SUBSET.vec, subset.vec[i])
-      VALUE.vec = c(VALUE.vec, ld_var.df[j,2])
-      COLNAME.vec = c(COLNAME.vec, paste(ld_var.df[j,1], NAME , subset.vec[i], sep="_"))
+      for (colname in colnames) {
+        patientID <- as.character(ld_var.df[j,1])
+        if (patientID != sub("_.+", "", colname)) next
+        ROWNAME.vec = c(ROWNAME.vec, ROWNAME)
+        PATIENTID.vec = c(PATIENTID.vec, patientID)
+        TYPE.vec = c(TYPE.vec, type.vec[i])
+        SUBSET.vec = c(SUBSET.vec, subset.vec[i])
+        VALUE.vec = c(VALUE.vec, ld_var.df[j,2])
+        COLNAME.vec = c(COLNAME.vec, colname)
+      }
     }
   }
 
@@ -903,23 +905,6 @@ getRankingMethod <- function(rankingMethodName) {
     return("Limma")
   }
 }
-
-
-writeDataForZip <- function(df, zScores, pidCols) {
-  df      <- df[ , -which(names(df) %in% pidCols)]  # Drop patient columns
-  df      <- cbind(df,zScores)                      # Replace with zScores
-  df      <- df[ , -which(colnames(df) == "SIGNIFICANCE")]
-  write.table(
-    df,
-    "heatmap_data.tsv",
-    sep = "\t",
-    na = "",
-    row.names = FALSE,
-    col.names = TRUE
-  )
-}
-
-
 
 ## Probe signal aggregation based on maxMean for initial data frame containing probe id, biomarker
 ## and sample measurements. Probes are merged according to maxMean, this means the row with highest mean
