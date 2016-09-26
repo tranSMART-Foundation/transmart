@@ -742,7 +742,10 @@ window.smartRApp.directive('lineGraph', [
             }
             renderNumericPlots();
 
-            function renderCategoricPlots() {
+            function renderCategoricPlots(fromRankedPos, toRankedPos) {
+                fromRankedPos = typeof fromRankedPos === 'undefined' ? 0 : fromRankedPos;
+                toRankedPos = typeof toRankedPos === 'undefined' ? parseInt(patientRange.value) : toRankedPos;
+
                 tmpByType.filterExact('categoric');
 
                 if (byTimeInteger.bottom(Infinity).length === 0) {
@@ -750,10 +753,23 @@ window.smartRApp.directive('lineGraph', [
                     return;
                 }
 
-                // FIXME: up and down arrow
+                if (fromRankedPos < 0) {
+                    fromRankedPos = 0;
+                } else if (fromRankedPos > totalNumOfCatBoxes - parseInt(patientRange.value)) {
+                    fromRankedPos = totalNumOfCatBoxes - parseInt(patientRange.value);
+                }
+
+                if (toRankedPos < parseInt(patientRange.value)) {
+                    toRankedPos = parseInt(patientRange.value);
+                } else if(toRankedPos > totalNumOfCatBoxes) {
+                    toRankedPos = totalNumOfCatBoxes;
+                }
+
                 // TODO: visualize ranking value
                 // show highest ranked patients first
-                var topRankedPatients = groupByPatientIDRanking.top(parseInt(patientRange.value)).map(function(d) { return d.key; });
+                var topRankedPatients = groupByPatientIDRanking.top(toRankedPos)
+                    .slice(fromRankedPos)
+                    .map(function(d) { return d.key; });
 
                 var catPlotInfo = topRankedPatients.map(function(patientID) {
                     tmpByPatientID.filterExact(patientID);
@@ -884,26 +900,26 @@ window.smartRApp.directive('lineGraph', [
                 /**
                  * CONTROL ELEMENTS SECTION
                  */
-//
-//                svg.selectAll('.sr-lg-shift-element').remove();
-//                svg.append('path')
-//                    .attr('class', 'sr-lg-shift-element')
-//                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS) +
-//                        'h' + (MARGIN.left / 2) +
-//                        'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
-//                    .on('click', function() {
-//                        renderCategoricPlots();
-//                    });
-//
-//                svg.append('path')
-//                    .attr('class', 'sr-lg-shift-element')
-//                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS + CAT_PLOTS_HEIGHT + 10) +
-//                        'h' + (MARGIN.left / 2) +
-//                        'l' + (- MARGIN.left / 4) + ',' + (MARGIN.left / 3) + 'Z')
-//                    .on('click', function() {
-//                        renderCategoricPlots();
-//                    });
-//
+
+                svg.selectAll('.sr-lg-shift-element').remove();
+                svg.append('path')
+                    .attr('class', 'sr-lg-shift-element')
+                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS) +
+                        'h' + (MARGIN.left / 2) +
+                        'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
+                    .on('click', function() {
+                        renderCategoricPlots(fromRankedPos - 5, toRankedPos - 5);
+                    });
+
+                svg.append('path')
+                    .attr('class', 'sr-lg-shift-element')
+                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS + computeCatPlotsHeight() + 10) +
+                        'h' + (MARGIN.left / 2) +
+                        'l' + (- MARGIN.left / 4) + ',' + (MARGIN.left / 3) + 'Z')
+                    .on('click', function() {
+                        renderCategoricPlots(fromRankedPos + 5, toRankedPos + 5);
+                    });
+
                 tmpByType.filterAll();
 
                 renderLegend();
