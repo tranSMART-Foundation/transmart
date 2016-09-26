@@ -837,7 +837,7 @@ window.smartRApp.directive('lineGraph', [
                 // ENTER rect (significance bar)
                 catPlotEnter.append('rect')
                     .attr('class', 'sr-lg-cat-plot-sig-bar')
-                    .attr('height', 5)
+                    .attr('height', 1)
                     .on('mouseover', function(d) {
                         var html = '';
                         for (var key in d) {
@@ -868,7 +868,7 @@ window.smartRApp.directive('lineGraph', [
                 // UPDATE rect (significance bar)
                 catPlot.select('.sr-lg-cat-plot-sig-bar')
                     .attr('width', function(d) { return rankingScale(d.patientRank); })
-                    .attr('x', function(d) { return - rankingScale(d.patientRank); });
+                    .attr('x', 0);
 
                 // EXIT g
                 catPlot.exit().remove();
@@ -914,12 +914,12 @@ window.smartRApp.directive('lineGraph', [
                         });
 
                     // UPDATE polygon
-                    icon.attr('points', function(d) { return iconGen(d.bioMarker).shape(ICON_SIZE); })
+                    icon.attr('points', function(d) { return iconGen(d.bioMarker).shape(ICON_SIZE - 2); }) // -2 for better fit
                         .attr('transform', function(d) {
                             iconPlacement[d.timeInteger] = typeof iconPlacement[d.timeInteger] === 'undefined' ?
                                 0 : iconPlacement[d.timeInteger] + 1;
                             var innerIconRow = iconPlacement[d.timeInteger];
-                            return 'translate(' + (x(d.timeInteger) - ICON_SIZE / 2) + ',' + (innerIconRow * ICON_SIZE) + ')';
+                            return 'translate(' + (x(d.timeInteger) - ICON_SIZE / 2) + ',' + (innerIconRow * ICON_SIZE + 1) + ')';
                         });
                     tmpByPatientID.filterAll();
                 });
