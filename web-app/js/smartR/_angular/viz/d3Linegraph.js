@@ -105,7 +105,7 @@ window.smartRApp.directive('lineGraph', [
 
             var MARGIN = {
                 top: 50,
-                right: 200,
+                right: 300,
                 bottom: 100,
                 left: 100
             };
@@ -380,37 +380,37 @@ window.smartRApp.directive('lineGraph', [
                         (size / 4) + ',' + (size * 3 / 4);
                 };
                 var iconTable = [
-                    {shape: square, fill: '#006980'},
-                    {shape: triangle, fill: '#4B0080'},
+                    {shape: square, fill: '#0D4FFF'},
+                    {shape: triangle, fill: '#9921EF'},
                     {shape: diamond, fill: '#F6910E'},
-                    {shape: revTriangle, fill: '#034931'},
+                    {shape: revTriangle, fill: '#0D865C'},
                     {shape: hexagon, fill: '#AD1F1F'},
 
-                    {shape: triangle, fill: '#006980'},
-                    {shape: diamond, fill: '#4B0080'},
+                    {shape: triangle, fill: '#0D4FFF'},
+                    {shape: diamond, fill: '#9921EF'},
                     {shape: revTriangle, fill: '#F6910E'},
-                    {shape: hexagon, fill: '#034931'},
+                    {shape: hexagon, fill: '#0D865C'},
                     {shape: square, fill: '#AD1F1F'},
 
-                    {shape: diamond, fill: '#006980'},
-                    {shape: revTriangle, fill: '#4B0080'},
+                    {shape: diamond, fill: '#0D4FFF'},
+                    {shape: revTriangle, fill: '#9921EF'},
                     {shape: hexagon, fill: '#F6910E'},
-                    {shape: square, fill: '#034931'},
+                    {shape: square, fill: '#0D865C'},
                     {shape: triangle, fill: '#AD1F1F'},
 
-                    {shape: revTriangle, fill: '#006980'},
-                    {shape: hexagon, fill: '#4B0080'},
+                    {shape: revTriangle, fill: '#0D4FFF'},
+                    {shape: hexagon, fill: '#9921EF'},
                     {shape: square, fill: '#F6910E'},
-                    {shape: triangle, fill: '#034931'},
+                    {shape: triangle, fill: '#0D865C'},
                     {shape: diamond, fill: '#AD1F1F'},
 
-                    {shape: hexagon, fill: '#006980'},
-                    {shape: square, fill: '#4B0080'},
+                    {shape: hexagon, fill: '#0D4FFF'},
+                    {shape: square, fill: '#9921EF'},
                     {shape: triangle, fill: '#F6910E'},
-                    {shape: diamond, fill: '#034931'},
+                    {shape: diamond, fill: '#0D865C'},
                     {shape: revTriangle, fill: '#AD1F1F'},
 
-                    {shape: fallback, fill: '#000000'} // fallback
+                    {shape: fallback, fill: '#FFFFFF'} // fallback
                 ];
 
                 var cache = {};
@@ -1074,7 +1074,7 @@ window.smartRApp.directive('lineGraph', [
                     .text(function(d) { return d.bioMarker; });
 
                 legendItem.select('.sr-lg-legend-num')
-                    .text(function(d) { return d.row; });
+                    .text(function(d) { return d.row + '.'; });
 
                 // EXIT g
                 legendItem.exit()
@@ -1084,6 +1084,7 @@ window.smartRApp.directive('lineGraph', [
                 svg.append('text')
                     .attr('class', 'sr-legend-descr')
                     .attr('transform', 'translate(' + (LINEGRAPH_WIDTH) + ',' + (CAT_PLOTS_POS - 10) + ')')
+                    .attr('font-size', '15px')
                     .text('Events (weighted by order)');
             }
 
