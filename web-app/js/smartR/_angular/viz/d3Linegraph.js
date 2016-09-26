@@ -118,10 +118,6 @@ window.smartRApp.directive('lineGraph', [
             // set to 0 for creating the plot initially
             ANIMATION_DURATION = 0;
 
-            var rankingScale = d3.scale.linear()
-                .domain(d3.extent(groupByPatientIDRanking.top(Infinity).map(function(d) { return d.value; })))
-                .range([0, MARGIN.left]);
-
             function computeCatPlotsHeight() {
                 var catPlotsHeight = d3.selectAll('.sr-lg-cat-plot-box').data()
                     .reduce(function(prev, curr) { return prev + curr.height; }, 0);
@@ -416,7 +412,6 @@ window.smartRApp.directive('lineGraph', [
 
                     {shape: fallback, fill: '#000000'} // fallback
                 ];
-                iconTable.forEach(function(d, i) { d.id = i; });
 
                 var cache = {};
                 return function(bioMarker) {
@@ -427,15 +422,32 @@ window.smartRApp.directive('lineGraph', [
                     var icon = cache[bioMarker];
                     if (typeof cache[bioMarker] === 'undefined') {
                         var itemsInCache = Object.keys(cache).length;
-                        icon = iconTable[itemsInCache >= iconTable.length - 1 ?
-                            iconTable[iconTable.length - 1] : itemsInCache];
+                        icon = iconTable[itemsInCache >= iconTable.length - 1 ? iconTable[iconTable.length - 1] : itemsInCache];
+                        icon.id = itemsInCache;
                         cache[bioMarker] = icon;
                     }
                     return icon;
                 };
             }
-            var iconGen = iconGenerator();
 
+            var iconGen = {};
+            function populateIconCache() {
+                tmpByType.filterExact('categoric');
+                iconGen = iconGenerator();
+                // populate cache with highest ranked bioMarkers first
+                smartRUtils.unique(getValuesForDimension(tmpByBioMarker)).map(function(bioMarker) {
+                    tmpByBioMarker.filterExact(bioMarker);
+                    var entry = tmpByTimeInteger.bottom(1)[0];
+                    tmpByBioMarker.filterAll();
+                    return {bioMarker: bioMarker, ranking: entry.ranking};
+                }).sort(function(a, b) {
+                    return b.ranking - a.ranking;
+                }).forEach(function(d) {
+                    iconGen(d.bioMarker);
+                });
+                tmpByType.filterAll();
+            }
+            populateIconCache();
 
             function renderNumericPlots() {
                 tmpByType.filterExact('numeric');
@@ -769,7 +781,10 @@ window.smartRApp.directive('lineGraph', [
                     toRankedPos = totalNumOfCatBoxes;
                 }
 
-                // TODO: visualize ranking value
+                var rankingScale = d3.scale.linear()
+                    .domain(d3.extent(groupByPatientIDRanking.top(Infinity).map(function(d) { return d.value; })))
+                    .range([0, MARGIN.left]);
+
                 // show highest ranked patients first
                 var topRankedPatients = groupByPatientIDRanking.top(toRankedPos).slice(fromRankedPos);
 
@@ -794,7 +809,6 @@ window.smartRApp.directive('lineGraph', [
                     d.subset = tmpByTimeInteger.bottom(1)[0].subset;
                     tmpByPatientID.filterAll();
                 });
-
 
                 /**
                  * BOX & PATIENTID SECTION
@@ -944,12 +958,13 @@ window.smartRApp.directive('lineGraph', [
             function renderLegend() {
                 tmpByType.filterExact('categoric');
                 var iconCache = iconGen();
-                var legendData = Object.keys(iconCache).map(function(bioMarker, i) {
+                var legendData = Object.keys(iconCache).map(function(bioMarker) {
                     tmpByBioMarker.filterExact(bioMarker);
-                    var entry = tmpByTimeInteger.bottom(1);
+                    var ranking = tmpByTimeInteger.bottom(1)[0].ranking;
                     tmpByBioMarker.filterAll();
-                    return {bioMarker: bioMarker, ranking: entry.ranking, icon: iconCache[bioMarker], row: i};
-                });
+                    return {bioMarker: bioMarker, ranking: ranking, icon: iconCache[bioMarker]};
+                }).sort(function(a, b) { return b.ranking - a.ranking; });
+                legendData.forEach(function(d, i) { d.row = i; });
                 tmpByType.filterAll();
 
                 var longestBioMarker = legendData.map(function(d) { return d.bioMarker; })
