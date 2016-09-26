@@ -70,7 +70,7 @@ window.smartRApp.directive('lineGraph', [
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-lg-patient-range');
             patientRange.min = 0;
             patientRange.max = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
-            patientRange.value = 20;
+            patientRange.value = parseInt(patientRange.max) < 20 ? parseInt(patientRange.max) : 20;
             patientRange.step = 1;
             patientRange.addEventListener('input', function() {
                 renderCategoricPlots();
