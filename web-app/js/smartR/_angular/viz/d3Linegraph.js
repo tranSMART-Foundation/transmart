@@ -97,7 +97,7 @@ window.smartRApp.directive('lineGraph', [
 
             var CAT_PLOTS_POS = NUM_PLOTS_HEIGHT;
 
-            var LEGEND_OFFSET = 10;
+            var LEGEND_OFFSET = 25;
 
             var ERROR_BAR_WIDTH = 5;
             var MAX_XAXIS_ELEMENT_WIDTH = 40;
@@ -1038,6 +1038,13 @@ window.smartRApp.directive('lineGraph', [
                     .on('mouseout', function() { d3.select(this).select('rect').style('opacity', 0); })
                     .call(drag);
 
+                // ENTER text
+                legendItemEnter.append('text')
+                    .attr('class', 'sr-lg-legend-num')
+                    .attr('dy', '0.35em')
+                    .attr('transform', 'translate(' + (- LEGEND_OFFSET + 2) + ',' + (ICON_SIZE / 2) + ')')
+                    .attr('font-size', ICON_SIZE + 'px');
+
                 // ENTER rect
                 legendItemEnter.append('rect')
                     .attr('height', ICON_SIZE)
@@ -1059,15 +1066,25 @@ window.smartRApp.directive('lineGraph', [
 
                 // ENTER text
                 legendItemEnter.append('text')
-                    .attr('x', LEGEND_OFFSET + ICON_SIZE)
+                    .attr('class', 'sr-lg-legend-text')
+                    .attr('x', ICON_SIZE + 3)
                     .attr('y', ICON_SIZE / 2)
                     .attr('dy', '0.35em')
                     .style('font-size', function() { return legendTextSize + 'px'; })
                     .text(function(d) { return d.bioMarker; });
 
+                legendItem.select('.sr-lg-legend-num')
+                    .text(function(d) { return d.row; });
+
                 // EXIT g
                 legendItem.exit()
                     .remove();
+
+                svg.select('.sr-legend-descr').remove();
+                svg.append('text')
+                    .attr('class', 'sr-legend-descr')
+                    .attr('transform', 'translate(' + (LINEGRAPH_WIDTH) + ',' + (CAT_PLOTS_POS - 10) + ')')
+                    .text('Events (weighted by order)');
             }
 
             var permitHighlight = true;

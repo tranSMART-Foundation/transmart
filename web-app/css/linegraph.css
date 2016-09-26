@@ -44,13 +44,20 @@
     fill: rgba(94, 198, 216, 0.08);
 }
 
+.sr-lg-cat-plot-box.subset-1:hover {
+    fill: rgba(94, 198, 216, 1);
+}
+
 /* subset 2 boxes of cat plot */
 .sr-lg-cat-plot-box.subset-2 {
     fill: rgba(217, 54, 51, 0.08);
 }
+.sr-lg-cat-plot-box.subset-2:hover {
+    fill: rgba(217, 54, 51, 1);
+}
 
 .sr-lg-cat-plot-sig-bar {
-    fill: red;
+    fill: #009e20;
     shape-rendering: crispEdge;
 }
 
