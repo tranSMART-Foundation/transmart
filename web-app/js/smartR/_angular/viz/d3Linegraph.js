@@ -118,8 +118,12 @@ window.smartRApp.directive('lineGraph', [
             // set to 0 for creating the plot initially
             ANIMATION_DURATION = 0;
 
+            var rankingScale = d3.scale.linear()
+                .domain(d3.extent(groupByPatientIDRanking.top(Infinity).map(function(d) { return d.value; })))
+                .range([0, MARGIN.left]);
+
             function computeCatPlotsHeight() {
-                var catPlotsHeight = d3.selectAll('.sr-lg-cat-plot rect').data()
+                var catPlotsHeight = d3.selectAll('.sr-lg-cat-plot-box').data()
                     .reduce(function(prev, curr) { return prev + curr.height; }, 0);
                 LINEGRAPH_HEIGHT = NUM_PLOTS_HEIGHT + catPlotsHeight - MARGIN.top - MARGIN.bottom;
                 d3.select(vizDiv).select('svg').attr('height', NUM_PLOTS_HEIGHT + catPlotsHeight + MARGIN.top + MARGIN.bottom);
@@ -597,7 +601,6 @@ window.smartRApp.directive('lineGraph', [
                                         subset: d.subset
                                     };
                                 });
-                                tmpByPatientID.filterAll();
                             });
                         } else {
                             numericalData.push(smartRUtils.unique(byTimeInteger.bottom(Infinity), function(d) {
@@ -612,6 +615,7 @@ window.smartRApp.directive('lineGraph', [
                                 }; 
                             }));
                         }
+                        tmpByPatientID.filterAll();
                         // --- Generate data for timeline elements
 
                         var lineGen = d3.svg.line()
@@ -767,12 +771,10 @@ window.smartRApp.directive('lineGraph', [
 
                 // TODO: visualize ranking value
                 // show highest ranked patients first
-                var topRankedPatients = groupByPatientIDRanking.top(toRankedPos)
-                    .slice(fromRankedPos)
-                    .map(function(d) { return d.key; });
+                var topRankedPatients = groupByPatientIDRanking.top(toRankedPos).slice(fromRankedPos);
 
-                var catPlotInfo = topRankedPatients.map(function(patientID) {
-                    tmpByPatientID.filterExact(patientID);
+                var catPlotInfo = topRankedPatients.map(function(d) {
+                    tmpByPatientID.filterExact(d.key);
                     var maxCount = 0;
                     var timeIntegers = smartRUtils.unique(getValuesForDimension(byTimeInteger));
                     timeIntegers.forEach(function(timeInteger) {
@@ -783,13 +785,13 @@ window.smartRApp.directive('lineGraph', [
                         tmpByTimeInteger.filterAll();
                     });
                     tmpByPatientID.filterAll();
-                    return {patientID: patientID, maxDensity: maxCount};
+                    return {patientID: d.key, patientRank: d.value, maxDensity: maxCount};
                 });
 
                 catPlotInfo.forEach(function(d) {
                     d.height = d.maxDensity * ICON_SIZE;
                     tmpByPatientID.filterExact(d.patientID);
-                    d.subset = smartRUtils.unique(getValuesForDimension(tmpBySubset));
+                    d.subset = tmpByTimeInteger.bottom(1)[0].subset;
                     tmpByPatientID.filterAll();
                 });
 
@@ -813,17 +815,27 @@ window.smartRApp.directive('lineGraph', [
                             ' subset-' + d.subset;
                     });
 
-                // ENTER rec
+                // ENTER rec (plot box)
                 catPlotEnter.append('rect')
+                    .attr('class', function(d) { return 'sr-lg-cat-plot-box subset-' + d.subset; })
                     .attr('width', LINEGRAPH_WIDTH);
 
-                // ENTER text
-                catPlotEnter.append('text')
-                    .attr('dy', '0.35em')
-                    .attr('x', -5)
-                    .style('text-anchor', 'end')
-                    .style('font-size', '14px')
-                    .text(function(d) { return d.patientID; });
+                // ENTER rect (significance bar)
+                catPlotEnter.append('rect')
+                    .attr('class', 'sr-lg-cat-plot-sig-bar')
+                    .attr('height', 5)
+                    .on('mouseover', function(d) {
+                        var html = '';
+                        for (var key in d) {
+                            if (d.hasOwnProperty(key)) {
+                                html += key + ': ' + d[key] + '<br/>';
+                            }
+                        }
+                        tip.direction('n')
+                            .offset([-10, 0])
+                            .show(html, this);
+                    })
+                    .on('mouseout', tip.hide);
 
                 // UPDATE g
                 catPlot.attr('transform', function(d, i) {
@@ -835,13 +847,14 @@ window.smartRApp.directive('lineGraph', [
                     return 'translate(' + 0 + ',' + y + ')';
                 });
 
-                // UPDATE text
-                catPlot.select('text')
-                    .attr('y', function(d) { return d.height / 2; });
-
-                // UPDATE rect
-                catPlot.select('rect')
+                // UPDATE rect (plot box)
+                catPlot.select('.sr-lg-cat-plot-box')
                     .attr('height', function(d) { return d.height; });
+
+                // UPDATE rect (significance bar)
+                catPlot.select('.sr-lg-cat-plot-sig-bar')
+                    .attr('width', function(d) { return rankingScale(d.patientRank); })
+                    .attr('x', function(d) { return - rankingScale(d.patientRank); });
 
                 // EXIT g
                 catPlot.exit().remove();
@@ -904,7 +917,7 @@ window.smartRApp.directive('lineGraph', [
                 svg.selectAll('.sr-lg-shift-element').remove();
                 svg.append('path')
                     .attr('class', 'sr-lg-shift-element')
-                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS) +
+                    .attr('d', 'M' + (-MARGIN.left + MARGIN.left / 4) + ',' + (CAT_PLOTS_POS - 10) +
                         'h' + (MARGIN.left / 2) +
                         'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
                     .on('click', function() {

@@ -34,19 +34,24 @@
 }
 
 /* all boxes of cat plot */
-.sr-lg-cat-plot rect {
+.sr-lg-cat-plot.sr-lg-cat-plot-box {
     stroke-width: 1px;
     stroke: rgb(24, 24, 24);
 }
 
 /* subset 1 boxes of cat plot */
-.sr-lg-cat-plot.subset-1 rect{
+.sr-lg-cat-plot-box.subset-1 {
     fill: rgba(94, 198, 216, 0.08);
 }
 
 /* subset 2 boxes of cat plot */
-.sr-lg-cat-plot.subset-2 rect{
+.sr-lg-cat-plot-box.subset-2 {
     fill: rgba(217, 54, 51, 0.08);
+}
+
+.sr-lg-cat-plot-sig-bar {
+    fill: red;
+    shape-rendering: crispEdge;
 }
 
 /* icons of cat plot */
