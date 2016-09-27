@@ -2,13 +2,11 @@ library(jsonlite)
 library(reshape2)
 
 main <- function() {
-    save(loaded_variables, file="/Users/sascha/loaded_variables.Rda")
-    save(fetch_params, file="/Users/sascha/fetch_params.Rda")
+#    save(loaded_variables, file="/Users/sascha/loaded_variables.Rda")
+#    save(fetch_params, file="/Users/sascha/fetch_params.Rda")
 
     df <- buildCrossfilterCompatibleDf(loaded_variables, fetch_params)
     checkTimeNameSanity(df)
-
-    save(df, file="/Users/sascha/df.Rda")
 
     numeric.stats.df <- getStatsForNumericType(df)
     df <- merge(df, numeric.stats.df, by=c("bioMarker", "timeInteger", "subset"), all=TRUE)
