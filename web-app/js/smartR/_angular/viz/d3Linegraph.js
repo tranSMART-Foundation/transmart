@@ -5,7 +5,8 @@
 window.smartRApp.directive('lineGraph', [
     'smartRUtils',
     '$rootScope',
-    function(smartRUtils, $rootScope) {
+    'rServeService',
+    function(smartRUtils, $rootScope, rServeService) {
 
         return {
             restrict: 'E',
@@ -911,6 +912,23 @@ window.smartRApp.directive('lineGraph', [
                         })
                         .on('mouseout', function() {
                             tip.hide();
+                        })
+                        .on('click', function(d) {
+                            var args = { info: d };
+                            rServeService.startScriptExecution({
+                                taskType: 'corrStats',
+                                arguments: args
+                            }).then(function(response) {
+                                var results = JSON.parse(response.result.artifacts.value);
+                                d3.selectAll('.sr-lg-cat-icon').style('opacity', function(d) {
+                                    var hits = results.filter(function(e) {
+                                        return e.bioMarker === d.bioMarker && e.timeInteger === d.timeInteger;
+                                    });
+                                    return hits.length === 0 ? 0 : Math.abs(hits[0].corrCoef);
+                                });
+                            }, function(response) {
+                                console.error(response);
+                            });
                         });
 
                     // UPDATE polygon

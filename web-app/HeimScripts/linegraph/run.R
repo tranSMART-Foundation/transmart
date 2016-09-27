@@ -14,6 +14,9 @@ main <- function() {
     output <- list()
     output$data_matrix <- df
 
+    # make available to other scripts
+    runResults <<- output
+
     json <- toJSON(output, pretty=TRUE, digits=I(17))
     write(json, file="linegraph.json")
     list(messages="Finished successfully")
