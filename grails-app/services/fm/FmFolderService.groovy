@@ -32,6 +32,9 @@ import com.mongodb.MongoClient;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile
 
+import org.transmart.searchapp.SecureObject
+import org.transmart.searchapp.SecureObjectAccess
+
 class FmFolderService {
 
     final private static DEFAULT_FILE_TYPES =
@@ -343,9 +346,9 @@ class FmFolderService {
             /*
              * POST the file - if it has readable content, the contents will be indexed.
              */
-            def useMongo=config.transmartproject.mongoFiles.enableMongo
+            def useMongo = config.transmartproject.mongoFiles.enableMongo
             url = new StringBuilder(solrUrl);
-            if(useMongo) url.append("/extract")
+            if (useMongo) url.append("/extract")
             // Use the file's unique ID as the document ID in SOLR
             url.append("?").append("literal.id=").append(URLEncoder.encode(fmFile.getUniqueId(), "UTF-8"));
 
@@ -357,7 +360,7 @@ class FmFolderService {
             // Use the file's name as document name is SOLR
             url.append("&").append("literal.name=").append(URLEncoder.encode(fmFile.originalName, "UTF-8"));
 
-            if(!useMongo){
+            if (!useMongo) {
                 // Get path to actual file in filestore.
                 String[] args = [filestoreDirectory + File.separator + fmFile.filestoreLocation + File.separator + fmFile.filestoreName] as String[];
 
@@ -366,54 +369,54 @@ class FmFolderService {
                         null, 0, 0, fileTypes, System.out, true, true, args);
 
                 postTool.execute();
-            }else{
-                if(config.transmartproject.mongoFiles.useDriver){
+            } else {
+                if (config.transmartproject.mongoFiles.useDriver) {
                     MongoClient mongo = new MongoClient(config.transmartproject.mongoFiles.dbServer, config.transmartproject.mongoFiles.dbPort)
                     DB db = mongo.getDB(config.transmartproject.mongoFiles.dbName)
                     GridFS gfs = new GridFS(db)
                     def http = new HTTPBuilder(url)
                     GridFSDBFile gfsFile = gfs.findOne(fmFile.filestoreName)
-                    http.request(Method.POST) {request ->
+                    http.request(Method.POST) { request ->
                         requestContentType: "multipart/form-data"
                         MultipartEntity multiPartContent = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE)
                         multiPartContent.addPart(fmFile.filestoreName, new InputStreamBody(gfsFile.getInputStream(), "application/octet-stream", fmFile.originalName))
                         request.setEntity(multiPartContent)
                         response.success = { resp ->
-                            log.info("File successfully indexed: "+fmFile.id)
+                            log.info("File successfully indexed: " + fmFile.id)
                         }
                         response.failure = { resp ->
-                            log.error("Problem to index file "+fmFile.id+": "+resp.status)
+                            log.error("Problem to index file " + fmFile.id + ": " + resp.status)
                         }
                     }
                     mongo.close()
-                }else{
-                    def apiURL=config.transmartproject.mongoFiles.apiURL
-                    def apiKey=config.transmartproject.mongoFiles.apiKey
-                    def http = new HTTPBuilder(apiURL+fmFile.filestoreName+"/fsfile")
+                } else {
+                    def apiURL = config.transmartproject.mongoFiles.apiURL
+                    def apiKey = config.transmartproject.mongoFiles.apiKey
+                    def http = new HTTPBuilder(apiURL + fmFile.filestoreName + "/fsfile")
                     url.append("&commit=true")
-                    http.request( Method.GET, ContentType.BINARY) { req ->
+                    http.request(Method.GET, ContentType.BINARY) { req ->
                         headers.'apikey' = MongoUtils.hash(apiKey)
                         response.success = { resp, binary ->
                             assert resp.statusLine.statusCode == 200
-                            def inputStream=binary
+                            def inputStream = binary
 
                             def http2 = new HTTPBuilder(url)
-                            http2.request(Method.POST) {request ->
+                            http2.request(Method.POST) { request ->
                                 requestContentType: "multipart/form-data"
                                 MultipartEntity multiPartContent = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE)
                                 multiPartContent.addPart(fmFile.filestoreName, new InputStreamBody(inputStream, "application/octet-stream", fmFile.originalName))
                                 request.setEntity(multiPartContent)
                                 response.success = { resp2 ->
-                                    log.info("File successfully indexed: "+fmFile.id)
+                                    log.info("File successfully indexed: " + fmFile.id)
                                 }
 
                                 response.failure = { resp2 ->
-                                    log.error("Problem to index file "+fmFile.id+": "+resp.status)
+                                    log.error("Problem to index file " + fmFile.id + ": " + resp.status)
                                 }
                             }
                         }
                         response.failure = { resp ->
-                            log.error("Problem during connection to API: "+resp.status)
+                            log.error("Problem during connection to API: " + resp.status)
                         }
                     }
                 }
@@ -448,6 +451,63 @@ class FmFolderService {
 
     }
 
+    def deleteFromAmApp(uniqueId) {
+        AmTagTemplateAssociation.executeUpdate("delete AmTagTemplateAssociation where objectUid = ?", [uniqueId])
+        AmTagAssociation.executeUpdate("delete AmTagAssociation where subjectUid = ?", [uniqueId])
+        AmData.executeUpdate("delete AmData where uniqueId not in (select ata.objectUid from AmTagAssociation ata)")
+        AmTagValue.executeUpdate("delete AmTagValue where id not in (select ad.id from AmData ad)")
+    }
+
+    def deleteFromFmApp(inst) {
+        //Delete information
+        FmFolderAssociation.executeUpdate("Delete FmFolderAssociation where fmFolder = ?", [inst])
+        FmFolder.executeUpdate("delete FmFolder where id = ? ", [inst.id])
+        FmData.executeUpdate("delete FmData fd where not exists (Select fm from FmFolder fm where fm.id = fd.id)")
+    }
+
+    def deleteStudy(FmFolder study) {
+        deleteFolder(study)
+        //Delete child elements
+        def children = study.getChildren()
+        children.each {
+            deleteFolder(it)
+            deleteFromAmApp(it.getUniqueId())
+            deleteFromFmApp(it)
+        }
+        //Check bio_experiment
+        Experiment experiment = FmFolderAssociation.findByFmFolder(study)?.getBioObject()
+        if (experiment) {
+            if (!org.transmartproject.db.ontology.I2b2Secure.findBySecureObjectToken(FmFolderAssociation.findByFmFolder(study).objectUid)) {
+                Experiment.executeUpdate("DELETE Experiment where id = ?", [experiment.id])
+                BioData.executeUpdate("Delete BioData where id = ?", [experiment.id])
+                def secureObject = SecureObject.findByBioDataId(experiment.id)
+                if (secureObject) {
+                    SecureObjectAccess.executeUpdate("Delete SecureObjectAccess where secureObject = ?", [secureObject])
+                    secureObject.delete(flush: true)
+                }
+            }
+        }
+        //Delete study
+        deleteFromAmApp(study.getUniqueId())
+        deleteFromFmApp(study)
+    }
+
+    def deleteProgram(FmFolder program) {
+        deleteFolder(program)
+        def children = program.getChildren()
+        children.each {
+            if (it.folderType == 'STUDY') {
+                deleteStudy(it)
+            } else if (it.folderType == 'FOLDER') {
+                deleteFolder(it)
+            }
+        }
+
+        //Delete program
+        deleteFromAmApp(program.getUniqueId())
+        deleteFromFmApp(program)
+    }
+
     def deleteFolder(FmFolder folder) {
         //Delete all files within this folder.
         //Convert PersistentSets to Arrays to avoid concurrent modification
@@ -476,45 +536,45 @@ class FmFolderService {
     }
 
     def deleteFile(FmFile file) {
-        def deleted = false 
+        def deleted = false
         try {
-            if(config.transmartproject.mongoFiles.enableMongo){
-                if(config.transmartproject.mongoFiles.useDriver){
+            if (config.transmartproject.mongoFiles.enableMongo) {
+                if (config.transmartproject.mongoFiles.useDriver) {
                     MongoClient mongo = new MongoClient(config.transmartproject.mongoFiles.dbServer, config.transmartproject.mongoFiles.dbPort)
-                    DB db = mongo.getDB( config.transmartproject.mongoFiles.dbName)
+                    DB db = mongo.getDB(config.transmartproject.mongoFiles.dbName)
                     GridFS gfs = new GridFS(db)
                     gfs.remove(file.filestoreName)
                     mongo.close()
-                    deleted=true
-                }else{
+                    deleted = true
+                } else {
                     def apiURL = config.transmartproject.mongoFiles.apiURL
                     def apiKey = config.transmartproject.mongoFiles.apiKey
-                    def http = new HTTPBuilder( apiURL+file.filestoreName+"/delete" )
+                    def http = new HTTPBuilder(apiURL + file.filestoreName + "/delete")
                     http.request(Method.GET) { req ->
                         headers.'apikey' = MongoUtils.hash(apiKey)
                         headers.'User-Agent' = "Mozilla/5.0 Firefox/3.0.4"
                         response.success = { resp ->
-                            if(resp.statusLine.statusCode == 200){
-                                log.info("File deleted: "+file.filestoreName)
+                            if (resp.statusLine.statusCode == 200) {
+                                log.info("File deleted: " + file.filestoreName)
                                 deleted = true
-                            }else{
-                                log.error("Error when deleting file: "+file.filestoreName)
+                            } else {
+                                log.error("Error when deleting file: " + file.filestoreName)
                             }
                         }
 
                         response.failure = { resp ->
-                            log.error("Error when deleting file: "+resp.status)
+                            log.error("Error when deleting file: " + resp.status)
                         }
                     }
                 }
-            }else{
+            } else {
                 File filestoreFile = getFile(file)
                 if (filestoreFile.exists()) {
                     filestoreFile.delete()
                 }
                 deleted = true
             }
-            if(deleted){
+            if (deleted) {
                 removeSolrEntry(file.getUniqueId())
                 def data = FmData.get(file.id)
                 if (data) {
@@ -525,7 +585,7 @@ class FmFolderService {
                 def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: "Browse-Delete file", eventmessage: file.displayName + " (" + file.getUniqueId() + ")", accesstime: new java.util.Date())
                 al.save()
                 return true
-            }else{
+            } else {
                 return false
             }
         }
@@ -741,7 +801,7 @@ class FmFolderService {
             //check for unique study identifer
             if (item.codeTypeName == 'STUDY_IDENTIFIER') {
                 def experiment = Experiment.findByAccession(values.list(item.tagItemAttr));
-                if ((experiment != null) && (object == experiment)) {
+                if ((experiment != null) && (object == experiment) && (!(object instanceof Experiment))) {
                     folder.errors.rejectValue("id", "blank", [item.displayName] as String[], "{0} must be unique.")
                 }
             }
