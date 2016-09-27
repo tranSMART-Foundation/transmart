@@ -914,11 +914,13 @@ window.smartRApp.directive('lineGraph', [
                             tip.hide();
                         })
                         .on('click', function(d) {
+                            smartRUtils.toggleLoadingScreen(true);
                             var args = { info: d };
                             rServeService.startScriptExecution({
                                 taskType: 'corrStats',
                                 arguments: args
                             }).then(function(response) {
+                                smartRUtils.toggleLoadingScreen(false);
                                 var results = JSON.parse(response.result.artifacts.value);
                                 d3.selectAll('.sr-lg-cat-icon').style('opacity', function(d) {
                                     var hits = results.filter(function(e) {
@@ -927,6 +929,7 @@ window.smartRApp.directive('lineGraph', [
                                     return hits.length === 0 ? 0 : Math.abs(hits[0].corrCoef);
                                 });
                             }, function(response) {
+                                smartRUtils.toggleLoadingScreen(false);
                                 console.error(response);
                             });
                         });

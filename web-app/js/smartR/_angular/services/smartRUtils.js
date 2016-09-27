@@ -222,5 +222,9 @@ window.smartRApp.factory('smartRUtils', ['$q', function($q) {
         return values;
     };
 
+    service.toggleLoadingScreen = function(visible) {
+        document.getElementById('sr-loading').style.visibility = visible ? 'visible' : 'hidden';
+    };
+
     return service;
 }]);
