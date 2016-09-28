@@ -282,6 +282,7 @@ class FmFolderController {
         folder.folderLevel = parentFolder.folderLevel + 1
         folder.folderType = FolderType.STUDY.name()
         folder.parent = parentFolder
+        params.accession = params.accession.toUpperCase()
 
         def experiment = Experiment.findOrCreateByAccession(params.accession)
 
@@ -810,36 +811,36 @@ class FmFolderController {
         }
 
         childMetaDataTagItems.eachWithIndex()
-        { obj, i ->
-            //
-            AmTagItem amTagItem = obj
-            if (amTagItem.viewInChildGrid) {
-                if (amTagItem.tagItemType == 'FIXED') {
-                    log.info("CREATEDATATABLE::FIXED TYPE == " + amTagItem.tagItemType + " ID = " + amTagItem.id + " " + amTagItem.displayName)
+                { obj, i ->
+                    //
+                    AmTagItem amTagItem = obj
+                    if (amTagItem.viewInChildGrid) {
+                        if (amTagItem.tagItemType == 'FIXED') {
+                            log.info("CREATEDATATABLE::FIXED TYPE == " + amTagItem.tagItemType + " ID = " + amTagItem.id + " " + amTagItem.displayName)
 
-                    if (dataObject.hasProperty(amTagItem.tagItemAttr)) {
-                        //log.info ("CREATEDATATABLE::FIXED COLUMNS == " + amTagItem.tagItemAttr + " " + amTagItem.displayName)
-                        table.putColumn(amTagItem.id.toString(),
+                            if (dataObject.hasProperty(amTagItem.tagItemAttr)) {
+                                //log.info ("CREATEDATATABLE::FIXED COLUMNS == " + amTagItem.tagItemAttr + " " + amTagItem.displayName)
+                                table.putColumn(amTagItem.id.toString(),
                                         new ExportColumn(amTagItem.id.toString(), amTagItem.displayName, "", 'String'));
+                            } else {
+                                log.error("CREATEDATATABLE::TAG ITEM ID = " + amTagItem.id + " COLUMN " + amTagItem.tagItemAttr + " is not a propery of " + dataObject)
+                            }
+
+                        } else if (amTagItem.tagItemType == 'CUSTOM') {
+                            log.info("CREATEDATATABLE::CUSTOM == " + amTagItem.tagItemType + " ID = " + amTagItem.id + " " + amTagItem.displayName)
+                            table.putColumn(amTagItem.id.toString(),
+                                    new ExportColumn(amTagItem.id.toString(), amTagItem.displayName, "", 'String'));
+
+                        } else {
+                            log.info("CREATEDATATABLE::BUSINESS OBJECT == " + amTagItem.tagItemType + " ID = " + amTagItem.id + " " + amTagItem.displayName)
+                            table.putColumn(amTagItem.id.toString(),
+                                    new ExportColumn(amTagItem.id.toString(), amTagItem.displayName, "", 'String'));
+                        }
                     } else {
-                        log.error("CREATEDATATABLE::TAG ITEM ID = " + amTagItem.id + " COLUMN " + amTagItem.tagItemAttr + " is not a propery of " + dataObject)
+                        log.info("COLUMN " + amTagItem.displayName + " is not to display in grid")
                     }
 
-                } else if (amTagItem.tagItemType == 'CUSTOM') {
-                    log.info("CREATEDATATABLE::CUSTOM == " + amTagItem.tagItemType + " ID = " + amTagItem.id + " " + amTagItem.displayName)
-                    table.putColumn(amTagItem.id.toString(),
-                                    new ExportColumn(amTagItem.id.toString(), amTagItem.displayName, "", 'String'));
-
-                } else {
-                    log.info("CREATEDATATABLE::BUSINESS OBJECT == " + amTagItem.tagItemType + " ID = " + amTagItem.id + " " + amTagItem.displayName)
-                    table.putColumn(amTagItem.id.toString(),
-                                    new ExportColumn(amTagItem.id.toString(), amTagItem.displayName, "", 'String'));
                 }
-            } else {
-                log.info("COLUMN " + amTagItem.displayName + " is not to display in grid")
-            }
-
-        }
 
         folders.each { folderObject ->
             log.info "FOLDER::$folderObject"
@@ -874,35 +875,32 @@ class FmFolderController {
 
                         log.info("ROWS == " + amTagItem.tagItemAttr + " " + bioDataObject[amTagItem.tagItemAttr])
                         newrow.put(amTagItem.id.toString(), bioDataDisplayValue ? bioDataDisplayValue : '');
-                    } else if (amTagItem.tagItemType == 'CUSTOM') {              
+                    } else if (amTagItem.tagItemType == 'CUSTOM') {
 
-						def tagValues = AmTagDisplayValue.findAllDisplayValue(folderObject.uniqueId, amTagItem.id)
-						log.info("CUSTOM PARAMETERS :: FolderUID:" + folderObject.uniqueId+ " bioDataObject:"+bioDataObject.getUniqueId() + " amTagItem_id:" + amTagItem.id)
-						newrow.put(amTagItem.id.toString(), createDisplayString(tagValues));
+                        def tagValues = AmTagDisplayValue.findAllDisplayValue(folderObject.uniqueId, amTagItem.id)
+                        log.info("CUSTOM PARAMETERS :: FolderUID:" + folderObject.uniqueId + " bioDataObject:" + bioDataObject.getUniqueId() + " amTagItem_id:" + amTagItem.id)
+                        newrow.put(amTagItem.id.toString(), createDisplayString(tagValues));
                     } else {
-						if (amTagItem.displayName=="Folder Name"){
-							newrow.put(amTagItem.id.toString(), createTitleString(amTagItem,folderObject.folderName,folderObject,true));
-						}
-						else if (amTagItem.displayName=="Assay Name"){
-                            newrow.put(amTagItem.id.toString(), createTitleString(amTagItem,folderObject.folderName,folderObject,true));
-                        }
-						else if (amTagItem.displayName=="Analysis Name") {
-                            newrow.put(amTagItem.id.toString(), createTitleString(amTagItem,folderObject.folderName,folderObject,true));
-                        }
-						else{
-							def tagValues = AmTagDisplayValue.findAllDisplayValue(folderObject.uniqueId, amTagItem.id)
-							log.info("BIOOBJECT PARAMETERS " + folderObject.uniqueId + " " + amTagItem.id + " tagValues " + tagValues)
+                        if (amTagItem.displayName == "Folder Name") {
+                            newrow.put(amTagItem.id.toString(), createTitleString(amTagItem, folderObject.folderName, folderObject, true));
+                        } else if (amTagItem.displayName == "Assay Name") {
+                            newrow.put(amTagItem.id.toString(), createTitleString(amTagItem, folderObject.folderName, folderObject, true));
+                        } else if (amTagItem.displayName == "Analysis Name") {
+                            newrow.put(amTagItem.id.toString(), createTitleString(amTagItem, folderObject.folderName, folderObject, true));
+                        } else {
+                            def tagValues = AmTagDisplayValue.findAllDisplayValue(folderObject.uniqueId, amTagItem.id)
+                            log.info("BIOOBJECT PARAMETERS " + folderObject.uniqueId + " " + amTagItem.id + " tagValues " + tagValues)
 
-							newrow.put(amTagItem.id.toString(), createDisplayString(tagValues));
+                            newrow.put(amTagItem.id.toString(), createDisplayString(tagValues));
                         }
 
-                    } 
-            	}
+                    }
+                }
 
-		 table.putRow(folderObject.uniqueId,newrow);
-            } 
+                table.putRow(folderObject.uniqueId, newrow);
+            }
 
-	}
+        }
         return table.toJSON_DataTables("", folderType).toString(5);
     }
 
@@ -997,8 +995,8 @@ class FmFolderController {
         }
 
         log.debug "FolderInstance = ${bioDataObject}"
-        def useMongo=grailsApplication.config.transmartproject.mongoFiles.enableMongo
-        render template: '/fmFolder/folderDetail', plugin: "folderManagement", 
+        def useMongo = grailsApplication.config.transmartproject.mongoFiles.enableMongo
+        render template: '/fmFolder/folderDetail', plugin: "folderManagement",
                 model: [
                         folder                   : folder,
                         bioDataObject            : bioDataObject,
@@ -1051,8 +1049,8 @@ class FmFolderController {
             log.info "fetch BioAssayAnalysisData for analysisId ${analysisId}"
 
             FmFolderAssociation fmm = FmFolderAssociation.findByFmFolder(FmFolder.findById(analysisId))
-            String ouid=fmm.objectUid
-            int AssaysNb= ouid.substring(ouid.indexOf(":")+1).toInteger() 
+            String ouid = fmm.objectUid
+            int AssaysNb = ouid.substring(ouid.indexOf(":") + 1).toInteger()
             def rows = BioAssayAnalysisData.createCriteria().list(criteriaParams) {
                 eq('analysis', BioAssayAnalysis.findById(AssaysNb))
                 order('rawPvalue', 'asc')
@@ -1074,8 +1072,8 @@ class FmFolderController {
 
                 log.info "row probesetId ${it.probesetId} rowGenes '${rowGenes}'"
 
-                if(genes) {
-    
+                if (genes) {
+
                     def lowerGenes = []
                     for (gene in rowGenes) {
                         lowerGenes.push(gene.toLowerCase())
@@ -1087,7 +1085,7 @@ class FmFolderController {
                         }
                     }
                 }
-                
+
                 if (foundGene || !genes) {
                     ExportRowNew newrow = new ExportRowNew()
                     newrow.put("probe", it.featureGroupName);
@@ -1145,14 +1143,14 @@ class FmFolderController {
 
         log.info "getBioDataObject::folder = " + folder
 
-        if(folder.folderType == 'PROGRAM') {
+        if (folder.folderType == 'PROGRAM') {
             bioDataObject = folder
             return bioDataObject
         }
 
         folderAssociation = FmFolderAssociation.findByFmFolder(folder)
         //for PROGRAM this would be
-            //folderAssociation = FmFolderAssociation.findByFmFolder(folder)
+        //folderAssociation = FmFolderAssociation.findByFmFolder(folder)
 
         if (folderAssociation) {
             log.info "getBioDataObject::folderAssociation = " + folderAssociation
@@ -1205,8 +1203,8 @@ class FmFolderController {
         def platforms = BioAssayPlatform.executeQuery("FROM BioAssayPlatform as p ORDER BY p.name")
 
         render(template: "editMetaData", plugin: "folderManagement",
-            model: [bioDataObject: bioDataObject, measurements: measurements, technologies: technologies, vendors: vendors, platforms: platforms,
-                    folder: folder, amTagTemplate: amTagTemplate, metaDataTagItems: metaDataTagItems]);
+                model: [bioDataObject: bioDataObject, measurements: measurements, technologies: technologies, vendors: vendors, platforms: platforms,
+                        folder       : folder, amTagTemplate: amTagTemplate, metaDataTagItems: metaDataTagItems]);
     }
 
     def updateMetaData = {
@@ -1311,6 +1309,27 @@ class FmFolderController {
         fmFolderService.removeSolrEntry(params.uid)
     }
 
+    def deleteStudy() {
+        def studyFolderId = params.id
+        def studyFolder = FmFolder.findById(studyFolderId)
+        fmFolderService.deleteStudy(studyFolder)
+        render 'ok'
+    }
+
+    def deleteProgram() {
+        def programFolderId = params.id
+        def programFolder = FmFolder.findById(programFolderId)
+        fmFolderService.deleteProgram(programFolder)
+        render 'ok'
+    }
+
+    def hasChildren() {
+        def parentId = params.id
+        def fmFolder = FmFolder.findById(parentId)
+        def result = [result: (fmFolder.getChildren().findAll { it.activeInd }.size() != 0)]
+        render result as JSON
+    }
+
     def deleteFolder = {
 
         if (!isAdmin()) {
@@ -1370,33 +1389,33 @@ class FmFolderController {
                         }.join('')
         response.addHeader 'Content-length', fmFile.fileSize.toString()
 
-        def useMongo=grailsApplication.config.transmartproject.mongoFiles.enableMongo
-        if(!useMongo){
+        def useMongo = grailsApplication.config.transmartproject.mongoFiles.enableMongo
+        if (!useMongo) {
             def file = fmFolderService.getFile fmFile
             file.newInputStream().withStream {
                 response.outputStream << it
             }
-        }else{
-            if(grailsApplication.config.transmartproject.mongoFiles.useDriver){
+        } else {
+            if (grailsApplication.config.transmartproject.mongoFiles.useDriver) {
                 MongoClient mongo = new MongoClient(grailsApplication.config.transmartproject.mongoFiles.dbServer,
-                                                    grailsApplication.config.transmartproject.mongoFiles.dbPort)
-                DB db = mongo.getDB( grailsApplication.config.transmartproject.mongoFiles.dbName)
+                        grailsApplication.config.transmartproject.mongoFiles.dbPort)
+                DB db = mongo.getDB(grailsApplication.config.transmartproject.mongoFiles.dbName)
                 GridFS gfs = new GridFS(db)
                 GridFSDBFile gfsFile = gfs.findOne(fmFile.filestoreName)
                 response.outputStream << gfsFile.getInputStream()
                 mongo.close()
-            }else {
-                def apiURL=grailsApplication.config.transmartproject.mongoFiles.apiURL
-                def apiKey=grailsApplication.config.transmartproject.mongoFiles.apiKey
-                def http = new HTTPBuilder(apiURL+fmFile.filestoreName+"/fsfile")
-                http.request( Method.GET, ContentType.BINARY) { req ->
+            } else {
+                def apiURL = grailsApplication.config.transmartproject.mongoFiles.apiURL
+                def apiKey = grailsApplication.config.transmartproject.mongoFiles.apiKey
+                def http = new HTTPBuilder(apiURL + fmFile.filestoreName + "/fsfile")
+                http.request(Method.GET, ContentType.BINARY) { req ->
                     headers.'apikey' = MongoUtils.hash(apiKey)
                     response.success = { resp, binary ->
                         assert resp.statusLine.statusCode == 200
                         response.outputStream << binary
                     }
                     response.failure = { resp ->
-                        log.error("Problem during connection to API: "+resp.status)
+                        log.error("Problem during connection to API: " + resp.status)
                         render(contentType: "text/plain", text: "Error writing ZIP: File not found")
                     }
                 }
@@ -1452,7 +1471,7 @@ class FmFolderController {
         queryString = "SELECT DISTINCT platformType FROM BioAssayPlatform as p " + queryString + "  ORDER BY p.platformType"
         def measurements = BioAssayPlatform.executeQuery(queryString)
         log.info queryString + " " + measurements
-        render(template: "selectMeasurements", plugin:"folderManagement", model: [measurements: measurements, measurement: params.measurementName])
+        render(template: "selectMeasurements", plugin: "folderManagement", model: [measurements: measurements, measurement: params.measurementName])
     }
 
     def ajaxPlatforms = {
@@ -1501,6 +1520,9 @@ class FmFolderController {
             experiment = Experiment.get(params.id)
         } else if (params.accession) {
             experiment = Experiment.findByAccession(params.accession)
+        } else if (params.folderId) {
+            def accession = FmFolderAssociation.findByFmFolder(FmFolder.findById(params.folderId)).objectUid.replace('EXP:', '')
+            experiment = Experiment.findByAccession(accession)
         }
         def folder = fmFolderService.getFolderByBioDataObject(experiment)
         if (params.returnJSON) {
