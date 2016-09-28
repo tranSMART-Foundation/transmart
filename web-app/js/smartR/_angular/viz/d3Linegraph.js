@@ -923,7 +923,8 @@ window.smartRApp.directive('lineGraph', [
                             }).then(function(response) {
                                 var results = JSON.parse(response.result.artifacts.value);
                                 d3.selectAll('.sr-lg-cat-icon').filter(function(d) {
-                                    return d.bioMarker !== args.info.bioMarker && d.timeInteger <= args.info.timeInteger;
+                                    return d.timeInteger < args.info.timeInteger ||
+                                        (d.bioMarker !== args.info.bioMarker && d.timeInteger === args.info.timeInteger);
                                 }).style('opacity', 0.2);
                                 results.forEach(function(result) { 
                                     var icons = d3.selectAll('.sr-lg-cat-icon' + 
