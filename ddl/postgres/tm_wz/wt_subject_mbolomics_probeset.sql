@@ -4,9 +4,9 @@
 CREATE TABLE wt_subject_mbolomics_probeset (
     probeset character varying(500),
     expr_id character varying(500),
-    intensity_value bigint,
+    intensity_value double precision,
     num_calls bigint,
-    pvalue bigint,
+    pvalue double precision,
     assay_id bigint,
     patient_id bigint,
     sample_id character varying(100),

@@ -9,7 +9,7 @@ CREATE TABLE wt_subject_mirna_logs (
     assay_id numeric(18,0),
     patient_id numeric(18,0),
     sample_id numeric(18,0),
-    subject_id character varying(50),
+    subject_id character varying(100),
     trial_name character varying(50),
     timepoint character varying(100),
     log_intensity numeric

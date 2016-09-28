@@ -7,7 +7,7 @@ CREATE TABLE de_subject_microarray_data (
     assay_id bigint,
     patient_id bigint,
     sample_id bigint,
-    subject_id character varying(50),
+    subject_id character varying(100),
     raw_intensity double precision,
     log_intensity double precision,
     zscore double precision,
