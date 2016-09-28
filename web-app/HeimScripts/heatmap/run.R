@@ -44,7 +44,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
         ordering <- order(as.numeric(paste(subjects, subsets, sep="")))
         hd.df <- cbind(hd.df[, c(1,2)], hd.df[, -c(1,2)][, ordering])
     }
-    
+
     write.table(
         hd.df,
         "heatmap_orig_values.tsv",
@@ -98,6 +98,8 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     ## all possible statistical methods
     statistics_hd.df = getAllStatForExtDataFrame(hd.df)
 
+    # remove columns that are only NA
+    statistics_hd.df <- statistics_hd.df[,colSums(is.na(statistics_hd.df))<nrow(statistics_hd.df)]
     write.table(statistics_hd.df,
                 "heatmap_data.tsv",
                 sep = "\t",
