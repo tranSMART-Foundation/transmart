@@ -66,12 +66,18 @@
     stroke-width: 1px;
     stroke: rgb(24, 24, 24);
     shape-rendering: crispEdges;
+    cursor: pointer;
 }
 .sr-lg-cat-icon:hover {
 
 }
 /* special class for icon hl */
 .icon-highlight {
+}
+
+.sr-lg-cat-stat-icon {
+    stroke: none;
+    fill: white;
 }
 
 /* arrows for scrolling up and down */

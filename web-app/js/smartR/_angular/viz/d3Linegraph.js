@@ -101,7 +101,6 @@ window.smartRApp.directive('lineGraph', [
             var LEGEND_OFFSET = 25;
 
             var ERROR_BAR_WIDTH = 5;
-            var MAX_XAXIS_ELEMENT_WIDTH = 40;
             var TICK_HEIGHT = 8;
 
             var MARGIN = {
@@ -131,11 +130,11 @@ window.smartRApp.directive('lineGraph', [
             // recomputes x scale for current filters
             function calculateXScale() {
                 tmpByType.filterExact('categoric');
-                var padding = totalNumOfCatBoxes > 0 ? ICON_SIZE : MAX_XAXIS_ELEMENT_WIDTH / 2;
                 tmpByType.filterAll();
                 var times = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort(function(a, b) {
                     return a - b;
                 });
+                var padding = ICON_SIZE * 2;
                 if (evenlyCheck.checked) {
                     var range = d3.range(padding,
                             LINEGRAPH_WIDTH - padding + (LINEGRAPH_WIDTH - 2 * padding) / times.length,
@@ -234,7 +233,7 @@ window.smartRApp.directive('lineGraph', [
                     if (idx === 0) { return prev; }
                     var dist = x(timeAxisData[idx].timeInteger) - x(timeAxisData[idx-1].timeInteger);
                     return dist < prev ? dist : prev;
-                }, MAX_XAXIS_ELEMENT_WIDTH);
+                }, ICON_SIZE);
 
                 var xAxis = d3.svg.axis()
                     .scale(x)
@@ -893,8 +892,9 @@ window.smartRApp.directive('lineGraph', [
                         .append('polygon')
                         .attr('class', function(d) {
                             return 'sr-lg-cat-icon' +
-                                ' patientid-' + smartRUtils.makeSafeForCSS(d.patientID) +
+                                ' patientid-' + d.patientID +
                                 ' timestring-' + smartRUtils.makeSafeForCSS(d.timeString) +
+                                ' timeinteger-' + d.timeInteger + 
                                 ' biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker) +
                                 ' subset-' + d.subset;
                         })
@@ -914,22 +914,42 @@ window.smartRApp.directive('lineGraph', [
                             tip.hide();
                         })
                         .on('click', function(d) {
-                            smartRUtils.toggleLoadingScreen(true);
+                            d3.selectAll('.sr-lg-cat-stat-icon').remove();
+                            d3.selectAll('.sr-lg-cat-icon').style('opacity', 1);
                             var args = { info: d };
                             rServeService.startScriptExecution({
                                 taskType: 'corrStats',
                                 arguments: args
                             }).then(function(response) {
-                                smartRUtils.toggleLoadingScreen(false);
                                 var results = JSON.parse(response.result.artifacts.value);
-                                d3.selectAll('.sr-lg-cat-icon').style('opacity', function(d) {
-                                    var hits = results.filter(function(e) {
-                                        return e.bioMarker === d.bioMarker && e.timeInteger === d.timeInteger;
+                                d3.selectAll('.sr-lg-cat-icon').filter(function(d) {
+                                    return d.bioMarker !== args.info.bioMarker && d.timeInteger <= args.info.timeInteger;
+                                }).style('opacity', 0.2);
+                                results.forEach(function(result) { 
+                                    var icons = d3.selectAll('.sr-lg-cat-icon' + 
+                                        '.biomarker-' + smartRUtils.makeSafeForCSS(result.bioMarker) +
+                                        '.timeinteger-' + result.timeInteger);
+                                    icons.each(function(d) { 
+                                        d3.select(this.parentNode).append('circle')
+                                            .attr('class', 'sr-lg-cat-stat-icon')
+                                            .attr('cx', x(d.timeInteger) + ICON_SIZE * 3 / 2)
+                                            .attr('cy', d3.transform(d3.select(this).attr('transform')).translate[1] + ICON_SIZE / 2)
+                                            .attr('r', ICON_SIZE * Math.abs(result.corrCoef) / 2)
+                                            .on('mouseover', function() {
+                                                var html = 'Dependend Variable: ' + args.info.bioMarker + '</br>';
+                                                for (var key in result) {
+                                                    if (result.hasOwnProperty(key)) {
+                                                        html += key + ': ' + result[key] + '<br/>';
+                                                    }
+                                                }
+                                                tip.direction('n')
+                                                    .offset([-10, 0])
+                                                    .show(html, this);
+                                            })
+                                            .on('mouseout', tip.hide);
                                     });
-                                    return hits.length === 0 ? 0 : Math.abs(hits[0].corrCoef);
                                 });
                             }, function(response) {
-                                smartRUtils.toggleLoadingScreen(false);
                                 console.error(response);
                             });
                         });

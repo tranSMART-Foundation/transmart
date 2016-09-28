@@ -17,7 +17,7 @@ main <- function(info) {
                                   logical(length=1)))
     # do the same for every other timepoint and biomarker to compute correlations
     output <- data.frame(bioMarker=character(), timeInteger=integer(), corrCoef=numeric(), pValue=numeric())
-    for (bioMarker in bioMarkers[bioMarkers != info$bioMarker]) {
+    for (bioMarker in bioMarkers) {
         for (timeInteger in timeIntegers[timeIntegers > info$timeInteger]) {
             time.df <- cat.df[cat.df$timeInteger == timeInteger, ]
             bin.vec_2 = as.numeric(vapply(patientIDs,
