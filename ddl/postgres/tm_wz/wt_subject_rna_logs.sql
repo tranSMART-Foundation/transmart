@@ -3,7 +3,7 @@
 --
 CREATE TABLE wt_subject_rna_logs (
     probeset_id character varying(200),
-    intensity_value bigint,
+    intensity_value double precision,
     pvalue double precision,
     num_calls bigint,
     assay_id bigint,
@@ -12,7 +12,7 @@ CREATE TABLE wt_subject_rna_logs (
     subject_id character varying(100),
     trial_name character varying(50),
     timepoint character varying(100),
-    log_intensity bigint
+    log_intensity double precision
 );
 
 --

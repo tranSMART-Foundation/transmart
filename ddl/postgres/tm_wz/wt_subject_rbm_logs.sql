@@ -12,7 +12,7 @@ CREATE TABLE wt_subject_rbm_logs (
     subject_id character varying(100),
     trial_name character varying(50),
     timepoint character varying(100),
-    log_intensity bigint
+    log_intensity double precision
 );
 
 --
