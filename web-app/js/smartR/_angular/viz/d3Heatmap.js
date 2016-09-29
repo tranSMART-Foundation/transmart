@@ -582,9 +582,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('class', function(d) { return 'feature feature-' + smartRUtils.makeSafeForCSS(d); })
                     .attr('dy', '0.35em')
                     .style('text-anchor', 'start')
-                    .text(function(d) {
-                        return d === 'Cohort' ? d : smartRUtils.shortenConcept(d);
-                    });
+                    .text(function(d) { return d; });
 
                 feature.transition()
                     .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
