@@ -34,8 +34,8 @@
 }
 
 /* all boxes of cat plot */
-.sr-lg-cat-plot.sr-lg-cat-plot-box {
-    stroke-width: 1px;
+.sr-lg-cat-plot-box {
+    stroke-width: 2px;
     stroke: rgb(24, 24, 24);
 }
 
