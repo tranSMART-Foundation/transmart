@@ -42,5 +42,5 @@
 /production
 *.DS_Store
 /SmartR.todo
-
+.tern-port
 /node_modules
