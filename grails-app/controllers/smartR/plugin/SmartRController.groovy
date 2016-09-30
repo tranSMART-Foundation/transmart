@@ -76,9 +76,9 @@ class SmartRController {
         def http = new HTTPBuilder(url)
         def query = [
             section: 'upload_gene_lists_general',
-            primary_org: 'Human',
+            primary_org: 'human',
             background: 'whole_genome',
-            Category1: 'Human',
+            Category1: 'human',
             gene_list_1: 'gene_list_1',
             SubCat1: 'hgnc_symbol',
             attachment1: params.genes

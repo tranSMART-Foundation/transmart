@@ -60,7 +60,7 @@ main <- function() {
     col.names = TRUE
   )
 
-  df          <- addStats(df, sorting, ranking, max_rows)
+  df          <- addStats(df, ranking, max_rows)
   df          <- mergeDuplicates(df)
   df          <- df[!is.na(df["LOGFOLD"][,1]),] # remove rows with NA valued logFC
   df          <- df[1:min(max_rows, nrow(df)), ]  #  apply max_rows
