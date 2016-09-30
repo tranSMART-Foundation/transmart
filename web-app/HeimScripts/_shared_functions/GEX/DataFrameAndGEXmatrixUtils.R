@@ -613,20 +613,21 @@ buildExtraFieldsLowDim <- function(ld.list, colnames) {
     return(NULL)
   }
   
-  varNames_with_subset.vec = unlist(names(ld.list))
+  ld.names <- unlist(names(ld.list))
+  ld.namesWOSubset <- sub("_s[1-2]{1}$", "", ld.names)
+  ld.labels <- sapply(ld.namesWOSubset, function(el) fetch_params$ontologyTerms[[el]]$name)
+  ld.labels <- as.character(as.vector(ld.labels))
+  ld.fullNames <- sapply(ld.namesWOSubset, function(el) fetch_params$ontologyTerms[[el]]$fullName)
+  ld.fullNames <- as.character(as.vector(ld.fullNames))
+  ld.rownames <- strsplit2(ld.fullNames, "\\\\")[,5]
+  ld.subsets <- as.integer(sub("^.*_s", "", ld.names))
+  ld.types <- sub("_.*$", "", ld.names)
 
-  varNames_without_subset.vec = paste(strsplit2(varNames_with_subset.vec, "_")[,1],
-                                      strsplit2(varNames_with_subset.vec, "_")[,2], sep="_")
-  
-  
-  type.vec = strsplit2(varNames_with_subset.vec, "_")[,1]
-  
-  subset.vec = strsplit2(varNames_with_subset.vec, "_")[,3]
+  hd.patientIDs <- strsplit2(colnames, "_")[,1]
+  hd.subsets <- as.integer(substr(colnames, nchar(colnames), nchar(colnames)))
+  split <- sub(".+?_", "", colnames)
+  hd.labels <- substr(split, 1, nchar(split) - 3)
 
-    
-  fullnames = character(length=length(varNames_without_subset.vec))
-  
-  ## Declaring the variables to store the extra field data
   ROWNAME.vec = character(length = 0)
   PATIENTID.vec = character(length = 0)  
   VALUE.vec = character(length = 0)
@@ -635,39 +636,47 @@ buildExtraFieldsLowDim <- function(ld.list, colnames) {
   SUBSET.vec = character(length = 0)
   ZSCORE.vec = character(length = 0)
 
-
-  ## Iterating over full low dim variable names 
-  for(i in 1:length(varNames_without_subset.vec)){
-    
-    ROWNAME = get("fullName", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
-
-    ## Accessing data frame for given full low dim variable name
-    ## This data frame provides for each subject the corresponding
-    ## value for given variable
-    ld_var.df = ld.list[[varNames_with_subset.vec[i]]]
-
-    for(j in 1:dim(ld_var.df)[1]){
-      if (ld_var.df[j, 2] == "" || is.na(ld_var.df[j, 2])) next
-      for (colname in colnames) {
-        patientID <- as.character(ld_var.df[j,1])
-        if (patientID != sub("_.+", "", colname)) next
-        ROWNAME.vec = c(ROWNAME.vec, ROWNAME)
-        PATIENTID.vec = c(PATIENTID.vec, patientID)
-        TYPE.vec = c(TYPE.vec, type.vec[i])
-        SUBSET.vec = c(SUBSET.vec, subset.vec[i])
-        VALUE.vec = c(VALUE.vec, ld_var.df[j,2])
-        COLNAME.vec = c(COLNAME.vec, colname)
+  for (i in 1:length(ld.names)) {
+      ld.var <- ld.list[[i]]
+      for (j in 1:nrow(ld.var)) {
+          ld.patientID <- ld.var[j, 1]
+          ld.value <- ld.var[j, 2]
+          ld.type <- ld.types[i]
+          ld.subset <- ld.subsets[i]
+          ld.label <- ld.labels[i]
+          ld.colname <- paste(ld.patientID, ld.label, paste("s", ld.subset, sep=""), sep="_")
+          if (ld.value == "" || is.na(ld.value)) next
+          if (! ld.colname %in% colnames) {
+              for (k in which(ld.patientID == hd.patientIDs & ld.subset == hd.subsets)) {
+                  ld.colname <- paste(hd.patientIDs[k], hd.labels[k], paste("s", hd.subsets[k], sep=""), sep="_")
+                  ld.rowname <- paste("(matched by subject)", ld.label)
+                  ROWNAME.vec <- c(ROWNAME.vec, ld.rowname)
+                  PATIENTID.vec <- c(PATIENTID.vec, ld.patientID)
+                  VALUE.vec <- c(VALUE.vec, ld.value)
+                  COLNAME.vec <- c(COLNAME.vec, ld.colname)
+                  TYPE.vec <- c(TYPE.vec, ld.type)
+                  SUBSET.vec <- c(SUBSET.vec, ld.subset)
+              }
+          } else {
+              ld.rowname <- paste("(matched by sample)", ld.rownames[i])
+              ROWNAME.vec <- c(ROWNAME.vec, ld.rowname)
+              PATIENTID.vec <- c(PATIENTID.vec, ld.patientID)
+              VALUE.vec <- c(VALUE.vec, ld.value)
+              COLNAME.vec <- c(COLNAME.vec, ld.colname)
+              TYPE.vec <- c(TYPE.vec, ld.type)
+              SUBSET.vec <- c(SUBSET.vec, ld.subset)
+          }
       }
-    }
   }
 
-  res.df = data.frame( PATIENTID = as.integer(PATIENTID.vec),
-                       COLNAME = COLNAME.vec,
-                       ROWNAME = ROWNAME.vec,
-                       VALUE = VALUE.vec,
-                       ZSCORE = rep(NA, length(PATIENTID.vec)),
-                       TYPE = TYPE.vec,
-                       SUBSET = as.integer(gsub("^s", "", SUBSET.vec)), stringsAsFactors=FALSE)
+
+  res.df = data.frame(PATIENTID = as.integer(PATIENTID.vec),
+                      COLNAME = COLNAME.vec,
+                      ROWNAME = ROWNAME.vec,
+                      VALUE = VALUE.vec,
+                      ZSCORE = rep(NA, length(PATIENTID.vec)),
+                      TYPE = TYPE.vec,
+                      SUBSET = as.integer(SUBSET.vec), stringsAsFactors=FALSE)
 
   # z-score computation must be executed on both cohorts, hence it happens after all the data are in res.df
   rownames <- unique(res.df$ROWNAME)
