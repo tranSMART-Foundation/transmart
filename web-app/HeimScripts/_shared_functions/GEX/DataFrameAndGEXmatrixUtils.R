@@ -658,7 +658,7 @@ buildExtraFieldsLowDim <- function(ld.list, colnames) {
                   SUBSET.vec <- c(SUBSET.vec, ld.subset)
               }
           } else {
-              ld.rowname <- paste("(matched by time)", ld.rownames[i])
+              ld.rowname <- paste("(matched by sample)", ld.rownames[i])
               ROWNAME.vec <- c(ROWNAME.vec, ld.rowname)
               PATIENTID.vec <- c(PATIENTID.vec, ld.patientID)
               VALUE.vec <- c(VALUE.vec, ld.value)

@@ -268,7 +268,11 @@ window.smartRApp.directive('heatmapPlot', [
 
                 function isSorted(arr) {
                     return arr.every(function(d, i) {
-                        return i === arr.length - 1 || arr[i][1] >= arr[i + 1][1];
+                        if (i === arr.length - 1) {
+                            return true;
+                        } 
+                        var diff = arr[i][1] - arr[i + 1][1];
+                        return isNaN(diff) ? (arr[i][1].localeCompare(arr[i + 1][1]) <= 0) : diff >= 0;
                     });
                 }
 
@@ -629,12 +633,12 @@ window.smartRApp.directive('heatmapPlot', [
                         if (isSorted(featureValues)) {
                             featureValues.sort(function(a, b) {
                                 var diff = a[1] - b[1];
-                                return isNaN(diff) ? a[1].localeCompare(b[1]) : diff;
+                                return isNaN(diff) ? b[1].localeCompare(a[1]) : diff;
                             });
                         } else {
                             featureValues.sort(function(a, b) {
                                 var diff = b[1] - a[1];
-                                return isNaN(diff) ? b[1].localeCompare(a[1]) : diff;
+                                return isNaN(diff) ? a[1].localeCompare(b[1]) : diff;
                             });
                         }
                         var sortValues = featureValues.map(function(featureValue) {
