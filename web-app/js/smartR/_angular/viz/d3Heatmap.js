@@ -99,8 +99,8 @@ window.smartRApp.directive('heatmapPlot', [
             cutoffBtn.addEventListener('click', cutoff);
 
             var cutoffRange = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cutoff-range');
-            cutoffRange.addEventListener('mouseup', function() { animateCutoff(parseInt(cutoffRange.value)); });
-            cutoffRange.setAttribute('max', maxRows);
+            cutoffRange.addEventListener('input', function() { animateCutoff(parseInt(cutoffRange.value)); });
+            cutoffRange.setAttribute('max', maxRows - JSON.parse(JSON.stringify(scope.params.selections.selectedRownames)).length - 1);
             cutoffRange.value = 0;
 
             var clusterSelect = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cluster-select');
@@ -510,7 +510,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('y', function(d) { return rowNames.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
 
                 var bar = barItems.selectAll('.bar')
-                    .data(statistics, function(d, i) { return i; });
+                    .data(statistics, function(d) { return d.ROWNAME; });
 
                 bar.enter()
                     .append('rect')
@@ -538,8 +538,8 @@ window.smartRApp.directive('heatmapPlot', [
                     .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('width', function(d) { return histogramScale(d[ranking]); })
                     .attr('height', gridFieldHeight)
-                    .attr('x', function(d) { return -histogramScale(d[ranking]); })
                     .attr('y', function(d) { return gridFieldHeight * rowNames.indexOf(d.ROWNAME); })
+                    .attr('x', function(d) { return -histogramScale(d[ranking]); })
                     .style('fill', function(d) { return d[ranking] > 0 ? '#990000' : 'steelblue'; });
 
                 var featurePosY = -gridFieldWidth * 2 - longestColNameLength + 20;
@@ -732,37 +732,30 @@ window.smartRApp.directive('heatmapPlot', [
                 adjustDimensions();
             }
 
-            var cutoffLevel = 0;
-
+            var selectedRownames = [];
             function animateCutoff(cutoff) {
+                selectedRownames = [];
                 cutoff = Math.floor(cutoff);
-                cutoffLevel = cutoff;
                 d3.selectAll('.square')
-                    .classed('cuttoffHighlight', false);
+                    .classed('cutoffHighlight', false);
                 d3.selectAll('.bar')
-                    .classed('cuttoffHighlight', false);
-                statistics.map(function(d) { return d[ranking]; })
-                    .sort(function(a, b) { return a - b; })
+                    .classed('cutoffHighlight', false);
+                statistics.slice().sort(function(a, b) { return a[ranking] - b[ranking]; })
                     .filter(function(d, i) { return i < cutoff; })
-                    .forEach(function(d) {
-                        d3.select('.bar.idx-' + smartRUtils.makeSafeForCSS(d[0])).classed('cuttoffHighlight', true);
-                        d3.selectAll('.square.rowname-' + smartRUtils.makeSafeForCSS(rowNames[d[0]])).classed('cuttoffHighlight', true);
+                    .forEach(function(d, i) {
+                        selectedRownames.push(d.ROWNAME);
+                        d3.select('.bar.idx-' + i).classed('cutoffHighlight', true);
+                        d3.selectAll('.square.rowname-' + smartRUtils.makeSafeForCSS(d.ROWNAME)).classed('cutoffHighlight', true);
                     });
             }
 
             function cutoff() {
-                //HeatmapService.startScriptExecution({
-                //    taskType: 'run',
-                //    arguments: params,
-                //    onUltimateSuccess: HeatmapService.runAnalysisSuccess,
-                //    onUltimateFailure: HeatmapService.runAnalysisFailed,
-                //    phase: 'run',
-                //    progressMessage: 'Calculating',
-                //    successMessage: undefined
-                //});
-                // TODO: Use ajax service to be provided by ajaxServices.js to re-compute analysis
-                // with new arguments (in this case filter for cut-off)
-                scope.params.max_row = maxRows - cutoffLevel - 1;
+                // if no rownames selected we reset the model
+                if (selectedRownames.length === 0) {
+                    scope.params.selections.selectedRownames = [];
+                }
+                scope.params.selections.selectedRownames = JSON.parse(JSON.stringify(scope.params.selections.selectedRownames))
+                    .concat(selectedRownames);
                 $('run-button input').click();
             }
 

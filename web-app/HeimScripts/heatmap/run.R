@@ -24,7 +24,7 @@ source(heatmapUtils)
 SUBSET1REGEX <- "_s1$"  # Regex identifying columns of subset 1.
 markerTableJson <- "markerSelectionTable.json" # Name of the json file with limma outputs
 
-main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsAllowed = FALSE) {
+main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", selections = character(), geneCardsAllowed = FALSE) {
     max_rows <- as.numeric(max_rows)
     verifyInputHeatmap(max_rows, sorting)
     
@@ -63,6 +63,9 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     ## Filtering down the hd.df to retain only the n top ranked rows
     hd.df          <- hd.df[1:min(max_rows, nrow(hd.df)), ]  
     
+    if (length(selections$selectedRownames > 0)) {
+        hd.df <- hd.df[!hd.df$ROWNAME %in% selections$selectedRownames, ]
+    }
     
     ## High dimensional value data frame with unpivoted data structure
     ## Providing intensity values and zscore for given patient, sample id/colname,
