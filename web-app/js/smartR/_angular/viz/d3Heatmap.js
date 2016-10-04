@@ -263,7 +263,7 @@ window.smartRApp.directive('heatmapPlot', [
                 function getValueForSquareSorting(colName, rowName) {
                     var square = d3.select('.square' + '.colname-' + smartRUtils.makeSafeForCSS(colName) +
                         '.rowname-' + smartRUtils.makeSafeForCSS(rowName));
-                    return square[0][0] ? square.property('__data__').ZSCORE : Number.NEGATIVE_INFINITY;
+                    return square[0][0] ? square.property('__data__').ZSCORE : (-Math.pow(2, 32)).toString();
                 }
 
                 function isSorted(arr) {
