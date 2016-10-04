@@ -45,6 +45,9 @@ window.smartRApp.controller('HeatmapController', [
             disabled: true,
             running: false,
             params: {
+                selections: {
+                    selectedRownames: [],
+                },
                 max_row: 100,
                 sorting: 'nodes',
                 ranking: 'coef',
