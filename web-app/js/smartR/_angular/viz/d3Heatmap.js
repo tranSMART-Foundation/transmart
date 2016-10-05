@@ -95,13 +95,27 @@ window.smartRApp.directive('heatmapPlot', [
             zoomRange.addEventListener('mouseup', function() { zoom(parseInt(zoomRange.value)); });
             zoomRange.value = 100;
 
+            var setCutoffBtnText = function() {
+                if (parseInt(cutoffRange.value) === 0) {
+                    cutoffBtn.value = 'Reset';
+                } else {
+                    cutoffBtn.value = 'Apply Cutoff';
+                }
+            };
+
             var cutoffBtn = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cutoff-btn');
             cutoffBtn.addEventListener('click', cutoff);
 
             var cutoffRange = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cutoff-range');
-            cutoffRange.addEventListener('mouseup', function() { animateCutoff(parseInt(cutoffRange.value)); });
-            cutoffRange.setAttribute('max', maxRows);
+            cutoffRange.addEventListener('input', function() {
+                animateCutoff(parseInt(cutoffRange.value));
+                setCutoffBtnText();
+            });
+            cutoffRange.setAttribute('max', maxRows - JSON.parse(JSON.stringify(scope.params.selections.selectedRownames)).length - 1);
             cutoffRange.value = 0;
+            cutoffRange.disabled = parseInt(cutoffRange.max) <= 1;
+            
+            setCutoffBtnText();
 
             var clusterSelect = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cluster-select');
             clusterSelect.addEventListener('change', function() { cluster(clusterSelect.value); });
@@ -263,7 +277,7 @@ window.smartRApp.directive('heatmapPlot', [
                 function getValueForSquareSorting(colName, rowName) {
                     var square = d3.select('.square' + '.colname-' + smartRUtils.makeSafeForCSS(colName) +
                         '.rowname-' + smartRUtils.makeSafeForCSS(rowName));
-                    return square[0][0] ? square.property('__data__').ZSCORE : Number.NEGATIVE_INFINITY;
+                    return square[0][0] ? square.property('__data__').ZSCORE : (-Math.pow(2, 32)).toString();
                 }
 
                 function isSorted(arr) {
@@ -510,7 +524,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('y', function(d) { return rowNames.indexOf(d) * gridFieldHeight + 0.5 * gridFieldHeight; });
 
                 var bar = barItems.selectAll('.bar')
-                    .data(statistics, function(d, i) { return i; });
+                    .data(statistics, function(d) { return d.ROWNAME; });
 
                 bar.enter()
                     .append('rect')
@@ -538,8 +552,8 @@ window.smartRApp.directive('heatmapPlot', [
                     .duration(animationCheck.checked ? ANIMATION_DURATION : 0)
                     .attr('width', function(d) { return histogramScale(d[ranking]); })
                     .attr('height', gridFieldHeight)
-                    .attr('x', function(d) { return -histogramScale(d[ranking]); })
                     .attr('y', function(d) { return gridFieldHeight * rowNames.indexOf(d.ROWNAME); })
+                    .attr('x', function(d) { return -histogramScale(d[ranking]); })
                     .style('fill', function(d) { return d[ranking] > 0 ? '#990000' : 'steelblue'; });
 
                 var featurePosY = -gridFieldWidth * 2 - longestColNameLength + 20;
@@ -732,37 +746,30 @@ window.smartRApp.directive('heatmapPlot', [
                 adjustDimensions();
             }
 
-            var cutoffLevel = 0;
-
+            var selectedRownames = [];
             function animateCutoff(cutoff) {
+                selectedRownames = [];
                 cutoff = Math.floor(cutoff);
-                cutoffLevel = cutoff;
                 d3.selectAll('.square')
-                    .classed('cuttoffHighlight', false);
+                    .classed('cutoffHighlight', false);
                 d3.selectAll('.bar')
-                    .classed('cuttoffHighlight', false);
-                statistics.map(function(d) { return d[ranking]; })
-                    .sort(function(a, b) { return a - b; })
+                    .classed('cutoffHighlight', false);
+                statistics.slice().sort(function(a, b) { return a[ranking] - b[ranking]; })
                     .filter(function(d, i) { return i < cutoff; })
-                    .forEach(function(d) {
-                        d3.select('.bar.idx-' + smartRUtils.makeSafeForCSS(d[0])).classed('cuttoffHighlight', true);
-                        d3.selectAll('.square.rowname-' + smartRUtils.makeSafeForCSS(rowNames[d[0]])).classed('cuttoffHighlight', true);
+                    .forEach(function(d, i) {
+                        selectedRownames.push(d.ROWNAME);
+                        d3.select('.bar.idx-' + i).classed('cutoffHighlight', true);
+                        d3.selectAll('.square.rowname-' + smartRUtils.makeSafeForCSS(d.ROWNAME)).classed('cutoffHighlight', true);
                     });
             }
 
             function cutoff() {
-                //HeatmapService.startScriptExecution({
-                //    taskType: 'run',
-                //    arguments: params,
-                //    onUltimateSuccess: HeatmapService.runAnalysisSuccess,
-                //    onUltimateFailure: HeatmapService.runAnalysisFailed,
-                //    phase: 'run',
-                //    progressMessage: 'Calculating',
-                //    successMessage: undefined
-                //});
-                // TODO: Use ajax service to be provided by ajaxServices.js to re-compute analysis
-                // with new arguments (in this case filter for cut-off)
-                scope.params.max_row = maxRows - cutoffLevel - 1;
+                // if no rownames selected we reset the model
+                if (selectedRownames.length === 0) {
+                    scope.params.selections.selectedRownames = [];
+                }
+                scope.params.selections.selectedRownames = JSON.parse(JSON.stringify(scope.params.selections.selectedRownames))
+                    .concat(selectedRownames);
                 $('run-button input').click();
             }
 
@@ -883,8 +890,10 @@ window.smartRApp.directive('heatmapPlot', [
                                 case 'subset':
                                     return featureColorSetBinary[d.VALUE - 1];
                                 case 'numeric':
-                                    colorScale.range(featureColorSetSequential);
-                                    return colorScale(1 / (1 + Math.pow(Math.E, -d.ZSCORE)));
+                                    var scale = d3.scale.quantile()
+                                        .domain([0, 1])
+                                        .range(featureColorSetSequential);
+                                    return scale(1 / (1 + Math.pow(Math.E, -d.ZSCORE)));
                                 default:
                                     return featureColorCategorical(d.VALUE);
                             }
