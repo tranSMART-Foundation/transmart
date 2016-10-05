@@ -876,8 +876,10 @@ window.smartRApp.directive('heatmapPlot', [
                                 case 'subset':
                                     return featureColorSetBinary[d.VALUE - 1];
                                 case 'numeric':
-                                    colorScale.range(featureColorSetSequential);
-                                    return colorScale(1 / (1 + Math.pow(Math.E, -d.ZSCORE)));
+                                    var scale = d3.scale.quantile()
+                                        .domain([0, 1])
+                                        .range(featureColorSetSequential);
+                                    return scale(1 / (1 + Math.pow(Math.E, -d.ZSCORE)));
                                 default:
                                     return featureColorCategorical(d.VALUE);
                             }
