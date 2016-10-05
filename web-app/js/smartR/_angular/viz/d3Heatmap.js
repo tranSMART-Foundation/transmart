@@ -97,7 +97,7 @@ window.smartRApp.directive('heatmapPlot', [
 
             var setCutoffBtnText = function() {
                 if (parseInt(cutoffRange.value) === 0) {
-                    cutoffBtn.value = 'Reset';
+                    cutoffBtn.value = 'Reset Cutoff';
                 } else {
                     cutoffBtn.value = 'Apply Cutoff';
                 }
