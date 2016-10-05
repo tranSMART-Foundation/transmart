@@ -95,13 +95,27 @@ window.smartRApp.directive('heatmapPlot', [
             zoomRange.addEventListener('mouseup', function() { zoom(parseInt(zoomRange.value)); });
             zoomRange.value = 100;
 
+            var setCutoffBtnText = function() {
+                if (parseInt(cutoffRange.value) === 0) {
+                    cutoffBtn.value = 'Reset';
+                } else {
+                    cutoffBtn.value = 'Apply Cutoff';
+                }
+            };
+
             var cutoffBtn = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cutoff-btn');
             cutoffBtn.addEventListener('click', cutoff);
 
             var cutoffRange = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cutoff-range');
-            cutoffRange.addEventListener('input', function() { animateCutoff(parseInt(cutoffRange.value)); });
+            cutoffRange.addEventListener('input', function() {
+                animateCutoff(parseInt(cutoffRange.value));
+                setCutoffBtnText();
+            });
             cutoffRange.setAttribute('max', maxRows - JSON.parse(JSON.stringify(scope.params.selections.selectedRownames)).length - 1);
             cutoffRange.value = 0;
+            cutoffRange.disabled = parseInt(cutoffRange.max) <= 1;
+            
+            setCutoffBtnText();
 
             var clusterSelect = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cluster-select');
             clusterSelect.addEventListener('change', function() { cluster(clusterSelect.value); });
@@ -876,8 +890,10 @@ window.smartRApp.directive('heatmapPlot', [
                                 case 'subset':
                                     return featureColorSetBinary[d.VALUE - 1];
                                 case 'numeric':
-                                    colorScale.range(featureColorSetSequential);
-                                    return colorScale(1 / (1 + Math.pow(Math.E, -d.ZSCORE)));
+                                    var scale = d3.scale.quantile()
+                                        .domain([0, 1])
+                                        .range(featureColorSetSequential);
+                                    return scale(1 / (1 + Math.pow(Math.E, -d.ZSCORE)));
                                 default:
                                     return featureColorCategorical(d.VALUE);
                             }
