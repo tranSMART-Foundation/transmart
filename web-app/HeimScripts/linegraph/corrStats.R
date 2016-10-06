@@ -1,7 +1,4 @@
-main <- function(info) {
-    save(loaded_variables, file="~/loaded_variables.Rda")
-    save(info, file="~/info.Rda")
-    save(runResults, file="~/runResults.Rda")
+main <- function(params) {
     df <- runResults$data_matrix
     # we only care about categoric data in this script
     cat.df <- df[df$type == "categoric", ]
@@ -10,15 +7,15 @@ main <- function(info) {
     bioMarkers <- unique(cat.df$bioMarker)
     timeIntegers <- unique(cat.df$timeInteger)
 
-    # create binary vector that represents occurence of info$bioMarker at info$timePoint for every patient
-    time.df <- cat.df[cat.df$timeInteger == info$timeInteger, ]
+    # create binary vector that represents occurence of params$bioMarker at params$timePoint for every patient
+    time.df <- cat.df[cat.df$timeInteger == params$timeInteger, ]
     bin.vec_1 = as.numeric(vapply(patientIDs,
-                                  function(patientID) any(time.df[time.df$patientID == patientID, ]$bioMarker == info$bioMarker),
+                                  function(patientID) any(time.df[time.df$patientID == patientID, ]$bioMarker == params$bioMarker),
                                   logical(length=1)))
     # do the same for every other timepoint and biomarker to compute correlations
     output <- data.frame(bioMarker=character(), timeInteger=integer(), corrCoef=numeric(), pValue=numeric())
     for (bioMarker in bioMarkers) {
-        for (timeInteger in timeIntegers[timeIntegers > info$timeInteger]) {
+        for (timeInteger in timeIntegers[timeIntegers > params$timeInteger]) {
             time.df <- cat.df[cat.df$timeInteger == timeInteger, ]
             bin.vec_2 = as.numeric(vapply(patientIDs,
                                           function(patientID) any(time.df[time.df$patientID == patientID, ]$bioMarker == bioMarker),

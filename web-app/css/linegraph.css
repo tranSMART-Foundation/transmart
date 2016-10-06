@@ -145,6 +145,12 @@
     opacity: 0.2;
 }
 
+.sr-lg-sd-line {
+    fill: none;
+    stroke: green;
+    stroke-width: 2px;
+}
+
 /* invisible axis box to catch mouse events */
 .sr-lg-time-element > rect {
     opacity: 0;

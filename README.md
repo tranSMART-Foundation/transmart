@@ -27,6 +27,7 @@ SmartR will be included by default. No modification necessary.
   - [reshape2](https://cran.r-project.org/web/packages/reshape2/index.html)
   - [WGCNA](https://cran.r-project.org/web/packages/WGCNA/index.html)
   - [limma](https://bioconductor.org/packages/release/bioc/html/limma.html)
+  - [zoo](https://cran.r-project.org/web/packages/zoo/index.html)
   
 #### Releases
 - https://github.com/transmart/SmartR/releases

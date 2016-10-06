@@ -84,7 +84,7 @@ window.smartRApp.directive('lineGraph', [
             var totalNumOfNumBoxes = smartRUtils.unique(getValuesForDimension(tmpByBioMarker)).length;
             var data = tmpByType.bottom(Infinity);
             dataCF.remove();
-            data.forEach(function(d) { d.value = parseInt(d.value); });
+            data.forEach(function(d) { d.value = parseFloat(d.value); });
             dataCF.add(data);
             tmpByType.filterExact('categoric');
             var totalNumOfCatBoxes = smartRUtils.unique(getValuesForDimension(byPatientID)).length;
@@ -511,8 +511,8 @@ window.smartRApp.directive('lineGraph', [
                         .on('mouseover', function(d) { 
                             d3.selectAll('.sr-lg-boxplot').filter(function() {
                                 var that = d3.select(this);
-                                return !that.classed('bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker)) ||
-                                    !that.classed('subset-' + smartRUtils.makeSafeForCSS(d));
+                                return !that.classed('biomarker-' + smartrutils.makesafeforcss(biomarker)) ||
+                                    !that.classed('subset-' + smartrutils.makesafeforcss(d));
                             }).classed('timeline-lowlight', true);
                             d3.selectAll('.sr-lg-timeline').filter(function() {
                                 var that = d3.select(this);
@@ -653,7 +653,9 @@ window.smartRApp.directive('lineGraph', [
                                 ' patientid-' + d[0].patientID; // might or might not be defined
                             })
                             .on('mouseover', function(d) {
+                                var that = this;
                                 d3.select(this).moveToFront();
+                                
                                 var html = '';
 
                                 if (plotTypeSelect.value === 'noGrouping') {
@@ -668,12 +670,39 @@ window.smartRApp.directive('lineGraph', [
 
                                 var context = d3.select('.sr-lg-num-plot.biomarker-' + smartRUtils.makeSafeForCSS(bioMarker) + ' rect')
                                     .node();
-                                tip.direction('e')
-                                    .offset(function() {
-                                        var yOffset = y(d[d.length - 1].value) - numPlotBoxHeight / 2;
-                                        return [yOffset, 0];
-                                    })
-                                    .show(html, context);
+                                tip.direction('e').offset(function() {
+                                    var yOffset = y(d[d.length - 1].value) - numPlotBoxHeight / 2;
+                                    return [yOffset, 0];
+                                }).show(html, context);
+
+                                var params = {
+                                    yVec: d.map(function(d) { return d.value; })
+                                };
+                                rServeService.startScriptExecution({
+                                    taskType: 'lineStats',
+                                    arguments: { params: params }
+                                }).then(function(response) {
+                                    var results = JSON.parse(response.result.artifacts.value);
+                                    var mean = parseFloat(results.mean[0]);
+                                    var sd = parseInt(results.sd[0]);
+                                    var sdLineData = [mean + sd, mean - sd];
+                                    // DATA JOIN
+                                    var sdLine = d3.select(that.parentNode).selectAll('.sr-lg-sd-line')
+                                        .data(sdLineData, function(d, i) { return i; });
+
+                                    // ENTER line
+                                    sdLine.enter()
+                                        .append('line')
+                                        .attr('class', 'sr-lg-sd-line');
+
+                                    sdLine.attr('x1', function() { return 0; })
+                                        .attr('x2', function() { return LINEGRAPH_WIDTH; })
+                                        .attr('y1', function(d) { return y(d); })
+                                        .attr('y2', function(d) { return y(d); });
+
+                                }, function(response) {
+                                    console.error(response);
+                                });
                             })
                             .on('mouseout', function() {
                                 tip.hide();
@@ -916,15 +945,15 @@ window.smartRApp.directive('lineGraph', [
                         .on('click', function(d) {
                             d3.selectAll('.sr-lg-cat-stat-icon').remove();
                             d3.selectAll('.sr-lg-cat-icon').style('opacity', 1);
-                            var args = { info: d };
+                            var args = { params: d };
                             rServeService.startScriptExecution({
                                 taskType: 'corrStats',
                                 arguments: args
                             }).then(function(response) {
                                 var results = JSON.parse(response.result.artifacts.value);
                                 d3.selectAll('.sr-lg-cat-icon').filter(function(d) {
-                                    return d.timeInteger < args.info.timeInteger ||
-                                        (d.bioMarker !== args.info.bioMarker && d.timeInteger === args.info.timeInteger);
+                                    return d.timeInteger < args.params.timeInteger ||
+                                        (d.bioMarker !== args.params.bioMarker && d.timeInteger === args.params.timeInteger);
                                 }).style('opacity', 0.2);
                                 results.forEach(function(result) { 
                                     var icons = d3.selectAll('.sr-lg-cat-icon' + 
@@ -937,7 +966,7 @@ window.smartRApp.directive('lineGraph', [
                                             .attr('cy', d3.transform(d3.select(this).attr('transform')).translate[1] + ICON_SIZE / 2)
                                             .attr('r', ICON_SIZE * Math.abs(result.corrCoef) / 2)
                                             .on('mouseover', function() {
-                                                var html = 'Dependend Variable: ' + args.info.bioMarker + '</br>';
+                                                var html = 'Dependend Variable: ' + args.params.bioMarker + '</br>';
                                                 for (var key in result) {
                                                     if (result.hasOwnProperty(key)) {
                                                         html += key + ': ' + result[key] + '<br/>';
