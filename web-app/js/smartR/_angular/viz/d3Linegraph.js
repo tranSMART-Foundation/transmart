@@ -511,8 +511,8 @@ window.smartRApp.directive('lineGraph', [
                         .on('mouseover', function(d) { 
                             d3.selectAll('.sr-lg-boxplot').filter(function() {
                                 var that = d3.select(this);
-                                return !that.classed('biomarker-' + smartrutils.makesafeforcss(biomarker)) ||
-                                    !that.classed('subset-' + smartrutils.makesafeforcss(d));
+                                return !that.classed('biomarker-' + smartRUtils.makesafeforcss(bioMarker)) ||
+                                    !that.classed('subset-' + smartRUtils.makesafeforcss(d));
                             }).classed('timeline-lowlight', true);
                             d3.selectAll('.sr-lg-timeline').filter(function() {
                                 var that = d3.select(this);
@@ -686,25 +686,40 @@ window.smartRApp.directive('lineGraph', [
                                     var mean = parseFloat(results.mean[0]);
                                     var sd = parseFloat(results.sd[0]);
                                     var sdLineData = [mean + sd, mean - sd];
+
                                     // DATA JOIN
                                     var sdLine = d3.select(that.parentNode).selectAll('.sr-lg-sd-line')
                                         .data(sdLineData);
 
-                                    // ENTER line
-                                    sdLine.enter()
-                                        .append('line')
+                                    // ENTER g
+                                    var sdLineEnter = sdLine.enter()
+                                        .append('g')
                                         .attr('class', 'sr-lg-sd-line');
 
-                                    sdLine.transition()
-                                        .duration(ANIMATION_DURATION)
-                                        .attr('x1', function() { return 0; })
-                                        .attr('x2', function() { return LINEGRAPH_WIDTH; })
-                                        .attr('y1', function(d) { return y(d); })
-                                        .attr('y2', function(d) { return y(d); })
-                                        .moveToFront();
+                                    // ENTER line
+                                    sdLineEnter.append('line')
+                                        .attr('x1', 0)
+                                        .attr('x2', LINEGRAPH_WIDTH)
+                                        .attr('y1', 0)
+                                        .attr('y2', 0);
 
-                                }, function(response) {
-                                    console.error(response);
+                                    // ENTER text
+                                    sdLineEnter.append('text')
+                                        .attr('dy', '0.35em')
+                                        .attr('transform', 'translate(' + (-20) + ',' + (0) + ')')
+                                        .style('text-anchor', 'end');
+
+                                    // UPDATE g
+                                    sdLine.moveToFront()
+                                        .transition()
+                                        .duration(ANIMATION_DURATION)
+                                        .attr('transform', function(d) { 
+                                            return 'translate(0,' + (y(d)) + ')';
+                                        });
+
+                                    // UPDATE text
+                                    sdLine.select('text')
+                                        .text(function(d, i) { return d.toFixed(2) + (i === 0 ? ' (+SD)' : ' (-SD)'); });
                                 });
                             })
                             .on('mouseout', function() {

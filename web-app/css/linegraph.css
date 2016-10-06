@@ -145,7 +145,11 @@
     opacity: 0.2;
 }
 
-.sr-lg-sd-line {
+.sr-lg-sd-line>text {
+    fill: green !important;
+}
+
+.sr-lg-sd-line>line {
     fill: none;
     stroke: green;
     stroke-width: 2px;
