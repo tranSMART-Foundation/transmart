@@ -684,21 +684,24 @@ window.smartRApp.directive('lineGraph', [
                                 }).then(function(response) {
                                     var results = JSON.parse(response.result.artifacts.value);
                                     var mean = parseFloat(results.mean[0]);
-                                    var sd = parseInt(results.sd[0]);
+                                    var sd = parseFloat(results.sd[0]);
                                     var sdLineData = [mean + sd, mean - sd];
                                     // DATA JOIN
                                     var sdLine = d3.select(that.parentNode).selectAll('.sr-lg-sd-line')
-                                        .data(sdLineData, function(d, i) { return i; });
+                                        .data(sdLineData);
 
                                     // ENTER line
                                     sdLine.enter()
                                         .append('line')
                                         .attr('class', 'sr-lg-sd-line');
 
-                                    sdLine.attr('x1', function() { return 0; })
+                                    sdLine.transition()
+                                        .duration(ANIMATION_DURATION)
+                                        .attr('x1', function() { return 0; })
                                         .attr('x2', function() { return LINEGRAPH_WIDTH; })
                                         .attr('y1', function(d) { return y(d); })
-                                        .attr('y2', function(d) { return y(d); });
+                                        .attr('y2', function(d) { return y(d); })
+                                        .moveToFront();
 
                                 }, function(response) {
                                     console.error(response);
