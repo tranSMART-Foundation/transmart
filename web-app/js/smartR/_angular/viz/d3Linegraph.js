@@ -972,35 +972,12 @@ window.smartRApp.directive('lineGraph', [
                                 arguments: args
                             }).then(function(response) {
                                 d3.selectAll('.sr-lg-cat-plot *').style('opacity', 1);
-                                var results = JSON.parse(response.result.artifacts.value);
-                                d3.selectAll('.sr-lg-cat-icon').filter(function(d) {
-                                    return d.timeInteger < args.params.timeInteger ||
-                                        (d.bioMarker !== args.params.bioMarker && d.timeInteger === args.params.timeInteger);
-                                }).style('opacity', 0.2);
-                                results.forEach(function(result) { 
-                                    var icons = d3.selectAll('.sr-lg-cat-icon' + 
-                                        '.biomarker-' + smartRUtils.makeSafeForCSS(result.bioMarker) +
-                                        '.timeinteger-' + result.timeInteger);
-                                    icons.each(function(d) { 
-                                        d3.select(this.parentNode).append('circle')
-                                            .attr('class', 'sr-lg-cat-stat-icon')
-                                            .attr('cx', x(d.timeInteger) + ICON_SIZE * 3 / 2)
-                                            .attr('cy', d3.transform(d3.select(this).attr('transform')).translate[1] + ICON_SIZE / 2)
-                                            .attr('r', ICON_SIZE * Math.abs(result.corrCoef) / 2)
-                                            .on('mouseover', function() {
-                                                var html = 'Dependend Variable: ' + args.params.bioMarker + '</br>';
-                                                for (var key in result) {
-                                                    if (result.hasOwnProperty(key)) {
-                                                        html += key + ': ' + result[key] + '<br/>';
-                                                    }
-                                                }
-                                                tip.direction('n')
-                                                    .offset([-10, 0])
-                                                    .show(html, this);
-                                            })
-                                            .on('mouseout', tip.hide);
-                                    });
-                                });
+                                corrStats = {
+                                    statistics: JSON.parse(response.result.artifacts.value),
+                                    depBioMarker: args.params.bioMarker,
+                                    depTimeInteger: args.params.timeInteger
+                                };
+                                animateCorrStats();
                             }, function(response) {
                                 console.error(response);
                             });
@@ -1112,6 +1089,7 @@ window.smartRApp.directive('lineGraph', [
                             .attr('transform', 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
                                 (CAT_PLOTS_POS + draggedLegendItem.row * ICON_SIZE)  + ')');
                         renderCategoricPlots();
+                        animateCorrStats();
                     });
 
                 // DATA JOIN
@@ -1179,6 +1157,38 @@ window.smartRApp.directive('lineGraph', [
                     .attr('transform', 'translate(' + (LINEGRAPH_WIDTH) + ',' + (CAT_PLOTS_POS - 10) + ')')
                     .attr('font-size', '15px')
                     .text('Events (weighted by order)');
+            }
+
+            var corrStats = {};
+            function animateCorrStats() {
+                d3.selectAll('.sr-lg-cat-icon').filter(function(d) {
+                    return d.timeInteger < corrStats.depTimeInteger ||
+                        (d.bioMarker !== corrStats.depBioMarker && d.timeInteger === corrStats.depTimeInteger);
+                }).style('opacity', 0.2);
+                corrStats.statistics.forEach(function(stat) { 
+                    var icons = d3.selectAll('.sr-lg-cat-icon' + 
+                        '.biomarker-' + smartRUtils.makeSafeForCSS(stat.bioMarker) +
+                        '.timeinteger-' + stat.timeInteger);
+                    icons.each(function(d) { 
+                        d3.select(this.parentNode).append('circle')
+                            .attr('class', 'sr-lg-cat-stat-icon')
+                            .attr('cx', x(d.timeInteger) + ICON_SIZE * 3 / 2)
+                            .attr('cy', d3.transform(d3.select(this).attr('transform')).translate[1] + ICON_SIZE / 2)
+                            .attr('r', ICON_SIZE * Math.abs(stat.corrCoef) / 2)
+                            .on('mouseover', function() {
+                                var html = 'Dependend Variable: ' + corrStats.depBioMarker + '</br>';
+                                for (var key in stat) {
+                                    if (stat.hasOwnProperty(key)) {
+                                        html += key + ': ' + stat[key] + '<br/>';
+                                    }
+                                }
+                                tip.direction('n')
+                                    .offset([-10, 0])
+                                    .show(html, this);
+                            })
+                            .on('mouseout', tip.hide);
+                    });
+                });
             }
 
             var permitHighlight = true;
