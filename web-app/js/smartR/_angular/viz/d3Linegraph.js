@@ -51,6 +51,7 @@ window.smartRApp.directive('lineGraph', [
             var plotTypeSelect = smartRUtils.getElementWithoutEventListeners('sr-lg-numplottype-select');
             plotTypeSelect.selectedIndex = 0;
             plotTypeSelect.addEventListener('change', function() {
+                d3.selectAll('.sr-lg-sd-line').remove();
                 renderNumericPlots();
             });
 
@@ -962,12 +963,15 @@ window.smartRApp.directive('lineGraph', [
                         })
                         .on('click', function(d) {
                             d3.selectAll('.sr-lg-cat-stat-icon').remove();
-                            d3.selectAll('.sr-lg-cat-icon').style('opacity', 1);
+                            d3.selectAll('.sr-lg-cat-plot *').transition()
+                                .duration(1000)
+                                .style('opacity', 0.3);
                             var args = { params: d };
                             rServeService.startScriptExecution({
                                 taskType: 'corrStats',
                                 arguments: args
                             }).then(function(response) {
+                                d3.selectAll('.sr-lg-cat-plot *').style('opacity', 1);
                                 var results = JSON.parse(response.result.artifacts.value);
                                 d3.selectAll('.sr-lg-cat-icon').filter(function(d) {
                                     return d.timeInteger < args.params.timeInteger ||
