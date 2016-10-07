@@ -163,7 +163,7 @@ BEGIN
 	
 	if pCount > 0 then
 		select cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in lt_src_RNA_SEQ_subj_samp_map',1,stepCt,'ERROR') into rtnCd;
-		select CZ_ERROR_HANDLER(JOBID,PROCEDURENAME) into rtnCd;
+		select cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM) into rtnCd;
 		select cz_end_audit (jobId,'FAIL') into rtnCd;
 		return 164;
 	end if;

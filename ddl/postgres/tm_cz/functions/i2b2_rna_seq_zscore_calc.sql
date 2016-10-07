@@ -115,7 +115,7 @@ BEGIN
 		stepCt := stepCt + 1;
 		select cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
 ,0,stepCt,'Done') into rtnCd;
-		select cz_error_handler (jobID, procedureName) into rtnCd;
+		select cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM) into rtnCd;
 		select cz_end_audit (jobID, 'FAIL') into rtnCd;
 		return;
 	end if;
