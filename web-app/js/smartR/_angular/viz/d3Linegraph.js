@@ -907,7 +907,7 @@ window.smartRApp.directive('lineGraph', [
                     }
                     var y = CAT_PLOTS_POS + previousHeight;
                     return 'translate(' + 0 + ',' + y + ')';
-                });
+                }).moveToFront();
 
                 // UPDATE rect (plot box)
                 catPlot.select('.sr-lg-cat-plot-box')
@@ -1006,6 +1006,7 @@ window.smartRApp.directive('lineGraph', [
                         'l' + (- MARGIN.left / 4) + ',' + (- MARGIN.left / 3) + 'Z')
                     .on('click', function() {
                         renderCategoricPlots(fromRankedPos - 5, toRankedPos - 5);
+                        animateCorrStats();
                     });
 
                 svg.append('path')
@@ -1015,6 +1016,7 @@ window.smartRApp.directive('lineGraph', [
                         'l' + (- MARGIN.left / 4) + ',' + (MARGIN.left / 3) + 'Z')
                     .on('click', function() {
                         renderCategoricPlots(fromRankedPos + 5, toRankedPos + 5);
+                        animateCorrStats();
                     });
 
                 tmpByType.filterAll();
@@ -1161,6 +1163,7 @@ window.smartRApp.directive('lineGraph', [
 
             var corrStats = {};
             function animateCorrStats() {
+                if (typeof corrStats === 'undefined') { return; }
                 d3.selectAll('.sr-lg-cat-icon').filter(function(d) {
                     return d.timeInteger < corrStats.depTimeInteger ||
                         (d.bioMarker !== corrStats.depBioMarker && d.timeInteger === corrStats.depTimeInteger);
