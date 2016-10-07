@@ -435,6 +435,7 @@ grails { plugin { springsecurity {
                 '/observations/**': securedResourcesFilters,
                 '/patient_sets/**': securedResourcesFilters,
                 '/oauth/inspectToken': securedResourcesFilters,
+                '/transmart-rest-api-version': 'none',
                 '/**': [
                         'JOINED_FILTERS',
                         '-statelessSecurityContextPersistenceFilter',
