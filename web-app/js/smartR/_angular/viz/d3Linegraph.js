@@ -512,8 +512,8 @@ window.smartRApp.directive('lineGraph', [
                         .on('mouseover', function(d) { 
                             d3.selectAll('.sr-lg-boxplot').filter(function() {
                                 var that = d3.select(this);
-                                return !that.classed('biomarker-' + smartRUtils.makesafeforcss(bioMarker)) ||
-                                    !that.classed('subset-' + smartRUtils.makesafeforcss(d));
+                                return !that.classed('biomarker-' + smartRUtils.makeSafeForCSS(bioMarker)) ||
+                                    !that.classed('subset-' + smartRUtils.makeSafeForCSS(d));
                             }).classed('timeline-lowlight', true);
                             d3.selectAll('.sr-lg-timeline').filter(function() {
                                 var that = d3.select(this);
@@ -740,6 +740,7 @@ window.smartRApp.directive('lineGraph', [
                             })
                             .on('mouseout', function() {
                                 d3.select(this).classed('sr-lg-timeline-highlight', false);
+                                d3.select(this.parentNode).selectAll('.sr-lg-sd-line').remove();
                                 tip.hide();
                             });
 

@@ -150,7 +150,7 @@
 
 .sr-lg-sd-line>line {
     fill: none;
-    stroke-width: 2px;
+    stroke-width: 3px;
 }
 
 /* invisible axis box to catch mouse events */
