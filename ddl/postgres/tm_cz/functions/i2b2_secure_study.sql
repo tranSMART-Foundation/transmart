@@ -122,7 +122,7 @@ BEGIN
 	EXCEPTION
 	WHEN OTHERS THEN
 		--Handle errors.
-		cz_error_handler (jobID, procedureName);
+		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		
 		--End Proc
 		cz_end_audit (jobID, 'FAIL');

@@ -3,8 +3,8 @@
 --
 CREATE TABLE wt_subject_rna_med (
     probeset_id character varying(200),
-    intensity_value bigint,
-    log_intensity bigint,
+    intensity_value double precision,
+    log_intensity double precision,
     assay_id bigint,
     patient_id bigint,
     sample_id bigint,
@@ -13,9 +13,9 @@ CREATE TABLE wt_subject_rna_med (
     timepoint character varying(100),
     pvalue double precision,
     num_calls bigint,
-    mean_intensity bigint,
-    stddev_intensity bigint,
-    median_intensity bigint,
-    zscore bigint
+    mean_intensity double precision,
+    stddev_intensity double precision,
+    median_intensity double precision,
+    zscore double precision
 );
 

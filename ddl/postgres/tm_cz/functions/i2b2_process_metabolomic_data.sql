@@ -146,7 +146,7 @@ BEGIN
 	
 	if pCount > 0 then
 		perform cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		perform cz_error_handler(jobid,procedurename);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		select cz_end_audit (jobId,'FAIL') into rtnCd;
 		return 161;
 	end if;
@@ -163,7 +163,7 @@ BEGIN
 	
 	if PCOUNT = 0 then
 		perform cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_qpcr_metabolomics_annotation',1,stepCt,'ERROR');
-		perform CZ_ERROR_HANDLER(JOBID,PROCEDURENAME);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		select cz_end_audit (jobId,'FAIL') into rtnCd;
 		RETURN 163;
 	end if;
@@ -176,7 +176,7 @@ BEGIN
 	
 	if pCount > 0 then
 		perform cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		perform cz_error_handler(jobid,procedurename);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		select CZ_END_AUDIT (JOBID,'FAIL') into rtnCd;
 		return 162;
 	end if;
@@ -191,7 +191,7 @@ BEGIN
 	
 	if pCount > 0 then
 		perform cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in LT_SRC_METABOLOMIC_MAP',1,stepCt,'ERROR');
-		perform CZ_ERROR_HANDLER(JOBID,PROCEDURENAME);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		select cz_end_audit (jobId,'FAIL') into rtnCd;
 		RETURN 164;
 	end if;

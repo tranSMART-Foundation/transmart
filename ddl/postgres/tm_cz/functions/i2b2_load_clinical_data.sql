@@ -286,7 +286,7 @@ BEGIN
   
 	update tm_wz.wrk_clinical_data
 	set data_type = 'T'
-	   ,category_path = replace(replace(category_cd,'_',' '),'+','\')
+	   ,category_path = regexp_replace(regexp_replace(replace(category_cd,'_',' '),'([^\\])\+','\1\','g'),'\\\+','+','g')
 	   ,usubjid = REGEXP_REPLACE(TrialID || ':' || coalesce(site_id,'') || ':' || subject_id,
                    '(::){1,}', ':', 'g'); 
 	 get diagnostics rowCt := ROW_COUNT;
@@ -535,7 +535,7 @@ BEGIN
 	
 	begin
 	update tm_wz.wrk_clinical_data
-	set data_label=replace(replace(replace(replace(data_label,'%',' Pct'),'&',' and '),'+',' and '),'_',' ')
+	set data_label=replace(regexp_replace(regexp_replace(replace(replace(data_label,'%',' Pct'),'&',' and '),'([^\\])\+','\1 and ','g'),'\\\+','+','g'),'_',' ')
 	   ,data_value=replace(replace(replace(data_value,'%',' Pct'),'&',' and '),'+',' and ')
 	   ,category_cd=replace(replace(category_cd,'%',' Pct'),'&',' and ')
 	   ,category_path=replace(replace(category_path,'%',' Pct'),'&',' and ');
