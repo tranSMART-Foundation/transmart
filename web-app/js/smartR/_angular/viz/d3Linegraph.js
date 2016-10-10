@@ -517,7 +517,7 @@ window.smartRApp.directive('lineGraph', [
                             }).classed('timeline-lowlight', true);
                             d3.selectAll('.sr-lg-timeline').filter(function() {
                                 var that = d3.select(this);
-                                return !that.classed('bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker)) ||
+                                return !that.classed('biomarker-' + smartRUtils.makeSafeForCSS(bioMarker)) ||
                                     !that.classed('subset-' + smartRUtils.makeSafeForCSS(d));
                             }).classed('timeline-lowlight', true);
                         })
@@ -650,7 +650,7 @@ window.smartRApp.directive('lineGraph', [
                             .attr('class', function(d) {
                                 return 'sr-lg-timeline' + 
                                 ' subset-' + subset +
-                                ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
+                                ' biomarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
                                 ' patientid-' + d[0].patientID; // might or might not be defined
                             })
                             .on('mouseover', function(d) {
@@ -688,9 +688,10 @@ window.smartRApp.directive('lineGraph', [
                                     var results = JSON.parse(response.result.artifacts.value);
                                     var mean = parseFloat(results.mean[0]);
                                     var sd = parseFloat(results.sd[0]);
-                                    var sdLineData = [mean + sd, mean - sd];
+                                    var sdLineData = [mean + sd, mean - sd, mean];
 
-                                    if (d3.selectAll('.sr-lg-timeline-highlight').size() === 0) {
+                                    if (d3.selectAll('.sr-lg-timeline-highlight.biomarker-' +
+                                            smartRUtils.makeSafeForCSS(bioMarker)).size() === 0) {
                                         sdLineData = [];
                                     } else if (!d3.select(that).classed('sr-lg-timeline-highlight')) {
                                         return;
@@ -709,13 +710,15 @@ window.smartRApp.directive('lineGraph', [
                                         .attr('x1', 0)
                                         .attr('x2', LINEGRAPH_WIDTH)
                                         .attr('y1', 0)
-                                        .attr('y2', 0);
+                                        .attr('y2', 0)
+                                        .style('stroke', function(d, i) { return i === 2 ? '#6161a2' : 'green'; });
 
                                     // ENTER text
                                     sdLineEnter.append('text')
                                         .attr('dy', '0.35em')
                                         .attr('transform', 'translate(' + (-30) + ',' + (0) + ')')
-                                        .style('text-anchor', 'end');
+                                        .style('text-anchor', 'end')
+                                        .style('fill', function(d, i) { return i === 2 ? '#6161a2' : 'green'; });
 
                                     // UPDATE g
                                     sdLine.moveToFront()
@@ -727,7 +730,10 @@ window.smartRApp.directive('lineGraph', [
 
                                     // UPDATE text
                                     sdLine.select('text')
-                                        .text(function(d, i) { return d.toFixed(2) + (i === 0 ? ' (+SD)' : ' (-SD)'); });
+                                        .text(function(d, i) {
+                                            var descr = ['(+SD)', '(-SD)', '(mean)'];
+                                            return d.toFixed(2) + descr[i];
+                                        });
 
                                     sdLine.exit().remove();
                                 });
@@ -756,8 +762,7 @@ window.smartRApp.directive('lineGraph', [
                             var boxplotEnter = boxplot.enter()
                                 .append('g')
                                 .attr('class', function(d) {
-                                    return 'sr-lg-boxplot' +
-                                        ' timestring-' + smartRUtils.makeSafeForCSS(d.timeString) +
+                                    return 'sr-lg-boxplot' + ' timestring-' + smartRUtils.makeSafeForCSS(d.timeString) +
                                         ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
                                         ' subset-' + subset;
                                 })

@@ -146,12 +146,10 @@
 }
 
 .sr-lg-sd-line>text {
-    fill: green !important;
 }
 
 .sr-lg-sd-line>line {
     fill: none;
-    stroke: green;
     stroke-width: 2px;
 }
 
