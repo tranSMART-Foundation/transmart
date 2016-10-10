@@ -655,7 +655,9 @@ window.smartRApp.directive('lineGraph', [
                             })
                             .on('mouseover', function(d) {
                                 var that = this;
-                                d3.select(this).moveToFront();
+                                d3.select(this)
+                                    .classed('sr-lg-timeline-highlight', true)
+                                    .moveToFront();
                                 
                                 var html = '';
 
@@ -688,6 +690,11 @@ window.smartRApp.directive('lineGraph', [
                                     var sd = parseFloat(results.sd[0]);
                                     var sdLineData = [mean + sd, mean - sd];
 
+                                    if (d3.selectAll('.sr-lg-timeline-highlight').size() === 0) {
+                                        sdLineData = [];
+                                    } else if (!d3.select(that).classed('sr-lg-timeline-highlight')) {
+                                        return;
+                                    }
                                     // DATA JOIN
                                     var sdLine = d3.select(that.parentNode).selectAll('.sr-lg-sd-line')
                                         .data(sdLineData);
@@ -707,7 +714,7 @@ window.smartRApp.directive('lineGraph', [
                                     // ENTER text
                                     sdLineEnter.append('text')
                                         .attr('dy', '0.35em')
-                                        .attr('transform', 'translate(' + (-20) + ',' + (0) + ')')
+                                        .attr('transform', 'translate(' + (-30) + ',' + (0) + ')')
                                         .style('text-anchor', 'end');
 
                                     // UPDATE g
@@ -721,9 +728,12 @@ window.smartRApp.directive('lineGraph', [
                                     // UPDATE text
                                     sdLine.select('text')
                                         .text(function(d, i) { return d.toFixed(2) + (i === 0 ? ' (+SD)' : ' (-SD)'); });
+
+                                    sdLine.exit().remove();
                                 });
                             })
                             .on('mouseout', function() {
+                                d3.select(this).classed('sr-lg-timeline-highlight', false);
                                 tip.hide();
                             });
 

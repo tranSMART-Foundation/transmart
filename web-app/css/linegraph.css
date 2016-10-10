@@ -129,7 +129,7 @@
     fill: none;
     stroke-width: 2px;
 }
-.sr-lg-timeline:hover {
+.sr-lg-timeline-highlight {
     stroke: yellow !important;
     stroke-width: 4px;
 }
