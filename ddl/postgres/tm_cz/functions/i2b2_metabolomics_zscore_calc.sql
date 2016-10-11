@@ -546,7 +546,7 @@ select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) 
 			,subject_id
 			)
 			select probeset
-				  ,intensity_value  
+				  ,log_base ^ intensity_value  
 				  ,assay_id 
 				  ,intensity_value
 				  ,patient_id
@@ -565,7 +565,7 @@ select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) 
 			select probeset
 				  ,intensity_value 
 				  ,assay_id 
-				  ,log(2.0,cast(intensity_value as numeric))   -- wt_subject_mbolomics_probeset should only contain strictly positive intensities, otherwise throwing an error here is correct thing to do
+				  ,log(log_base,cast(intensity_value as numeric))   -- wt_subject_mbolomics_probeset should only contain strictly positive intensities, otherwise throwing an error here is correct thing to do
 				  ,patient_id
 				  ,subject_id
 			from WT_SUBJECT_MBOLOMICS_PROBESET
