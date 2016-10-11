@@ -4,7 +4,7 @@
 # Anyway, that's why it is installed here
 required.packages <- c("WGCNA", "impute", "multtest", "CGHbase", "CGHtest",
 					   "CGHtestpar", "edgeR", "snpStats", "preprocessCore",
-					   "GO.db", "AnnotationDbi");
+					   "GO.db", "AnnotationDbi", "QDNAseq");
 missing.packages <- function(required) {
 	return(required[
 		!(required %in% installed.packages()[,"Package"])]);
@@ -16,7 +16,7 @@ source("http://bioconductor.org/biocLite.R");
 bioclite.packages <-
 		intersect(new.packages, c("impute", "multtest", "CGHbase", "edgeR",
 								  "snpStats", "preprocessCore", "GO.db",
-								  "AnnotationDbi"));
+								  "AnnotationDbi", "QDNAseq"));
 if (length(bioclite.packages))
 	biocLite(bioclite.packages);
 if (length(intersect(new.packages, c("CGHtest")))) {
