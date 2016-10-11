@@ -171,7 +171,7 @@ BEGIN
 			,subject_id
 			)
 			PERFORM probeset
-				  ,intensity_value  
+				  ,log_base ^ intensity_value  
 				  ,assay_id 
 				  ,intensity_value
 				  ,patient_id
@@ -195,7 +195,7 @@ BEGIN
 			PERFORM probeset
 				  ,intensity_value 
 				  ,assay_id 
-				  ,log(2.0,intensity_value)
+				  ,log(log_base,intensity_value)
 				  ,patient_id
 		--		  ,sample_cd
 				  ,subject_id
