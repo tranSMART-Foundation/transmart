@@ -41,7 +41,6 @@ import org.transmartproject.db.dataquery.highdim.parameterproducers.AllDataProje
 import org.transmartproject.db.dataquery.highdim.parameterproducers.DataRetrievalParameterFactory
 import org.transmartproject.db.dataquery.highdim.parameterproducers.MapBasedParameterFactory
 
-import static org.hibernate.sql.JoinFragment.INNER_JOIN
 import static org.transmartproject.db.util.GormWorkarounds.createCriteriaBuilder
 
 class AcghModule extends AbstractHighDimensionDataTypeModule {
@@ -116,8 +115,8 @@ class AcghModule extends AbstractHighDimensionDataTypeModule {
                 createCriteriaBuilder(DeSubjectAcghData, 'acgh', session)
 
         criteriaBuilder.with {
-            createAlias 'jRegion', 'region', INNER_JOIN
-            createAlias 'jRegion.platform', 'platform', INNER_JOIN
+            createAlias 'jRegion', 'region', org.hibernate.criterion.CriteriaSpecification.INNER_JOIN
+            createAlias 'jRegion.platform', 'platform', org.hibernate.criterion.CriteriaSpecification.INNER_JOIN
 
             projections {
                 property 'acgh.assay.id', 'assayId'
