@@ -20,20 +20,26 @@
 package org.transmartproject.db.dataquery.highdim.protein
 
 import grails.orm.HibernateCriteriaBuilder
+import org.hibernate.Criteria
 import org.hibernate.ScrollableResults
+import org.hibernate.criterion.Restrictions
 import org.hibernate.engine.SessionImplementor
 import org.hibernate.transform.Transformers
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.core.dataquery.highdim.projections.Projection
+import org.transmartproject.core.querytool.ConstraintByOmicsValue
+import org.transmartproject.core.querytool.HighDimensionFilterType
 import org.transmartproject.db.dataquery.highdim.AbstractHighDimensionDataTypeModule
+import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
 import org.transmartproject.db.dataquery.highdim.DefaultHighDimensionTabularResult
 import org.transmartproject.db.dataquery.highdim.PlatformImpl
 import org.transmartproject.db.dataquery.highdim.correlations.CorrelationTypesRegistry
 import org.transmartproject.db.dataquery.highdim.correlations.SearchKeywordDataConstraintFactory
 import org.transmartproject.db.dataquery.highdim.parameterproducers.AllDataProjectionFactory
 import org.transmartproject.db.dataquery.highdim.parameterproducers.DataRetrievalParameterFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.SimpleAnnotationConstraintFactory
 import org.transmartproject.db.dataquery.highdim.parameterproducers.SimpleRealProjectionsFactory
 
 import static org.hibernate.sql.JoinFragment.INNER_JOIN
@@ -74,6 +80,7 @@ class ProteinModule extends AbstractHighDimensionDataTypeModule {
     @Override
     protected List<DataRetrievalParameterFactory> createDataConstraintFactories() {
         [ searchKeywordDataConstraintFactory,
+          new SimpleAnnotationConstraintFactory(field: 'annotation', annotationClass: DeProteinAnnotation.class),
                 standardDataConstraintFactory ]
     }
 
@@ -160,5 +167,34 @@ class ProteinModule extends AbstractHighDimensionDataTypeModule {
                     )
                 }
         )
+    }
+
+    @Override
+    List<String> searchAnnotation(String concept_code, String search_term, String search_property) {
+        if (!getSearchableAnnotationProperties().contains(search_property))
+            return []
+        DeProteinAnnotation.createCriteria().list {
+            dataRows {
+                'in'('assay', DeSubjectSampleMapping.createCriteria().listDistinct {eq('conceptCode', concept_code)} )
+            }
+            ilike(search_property, search_term + '%')
+            projections { distinct(search_property) }
+            order(search_property, 'ASC')
+        }
+    }
+
+    @Override
+    List<String> getSearchableAnnotationProperties() {
+        ['uniprotName', 'peptide']
+    }
+
+    @Override
+    HighDimensionFilterType getHighDimensionFilterType() {
+        HighDimensionFilterType.SINGLE_NUMERIC
+    }
+
+    @Override
+    List<String> getSearchableProjections() {
+        [Projection.LOG_INTENSITY_PROJECTION, Projection.DEFAULT_REAL_PROJECTION, Projection.ZSCORE_PROJECTION]
     }
 }

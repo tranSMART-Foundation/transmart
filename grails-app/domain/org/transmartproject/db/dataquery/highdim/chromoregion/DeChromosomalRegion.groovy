@@ -21,6 +21,8 @@ package org.transmartproject.db.dataquery.highdim.chromoregion
 
 import org.transmartproject.core.dataquery.highdim.chromoregion.Region
 import org.transmartproject.db.dataquery.highdim.DeGplInfo
+import org.transmartproject.db.dataquery.highdim.acgh.DeSubjectAcghData
+import org.transmartproject.db.dataquery.highdim.rnaseq.DeSubjectRnaseqData
 
 class DeChromosomalRegion implements Region {
 
@@ -32,11 +34,15 @@ class DeChromosomalRegion implements Region {
     String  cytoband
     String  geneSymbol
     Long    geneId
-
+    String  gplId
     /* unused */
     String  organism
 
     static belongsTo = [platform: DeGplInfo]
+    static hasMany = [dataRowsRnaSeq: DeSubjectRnaseqData,
+                      dataRowsAcgh: DeSubjectAcghData]
+    static mappedBy = [dataRowsRnaSeq: 'region',
+                       dataRowsAcgh: 'region']
 
 	static mapping = {
         table          schema: 'deapp'
@@ -48,7 +54,7 @@ class DeChromosomalRegion implements Region {
         name           column: 'region_name'
         numberOfProbes column: 'num_probes'
         platform       column: 'gpl_id'
-
+        gplId          insertable: false, updateable: false
         version false
 
 	}

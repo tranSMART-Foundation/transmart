@@ -21,6 +21,7 @@ package org.transmartproject.db.dataquery.highdim.rnaseq
 
 import com.google.common.collect.Lists
 import grails.test.mixin.TestMixin
+import groovy.test.GroovyAssert
 import org.hibernate.SessionFactory
 import org.junit.After
 import org.junit.Before
@@ -36,6 +37,8 @@ import org.transmartproject.core.dataquery.highdim.chromoregion.RegionRow
 import org.transmartproject.core.dataquery.highdim.dataconstraints.DataConstraint
 import org.transmartproject.core.dataquery.highdim.projections.Projection
 import org.transmartproject.core.dataquery.highdim.rnaseq.RnaSeqValues
+import org.transmartproject.core.exceptions.InvalidArgumentsException
+import org.transmartproject.core.querytool.ConstraintByOmicsValue
 import org.transmartproject.db.dataquery.highdim.DeGplInfo
 import org.transmartproject.db.dataquery.highdim.chromoregion.DeChromosomalRegion
 import org.transmartproject.db.test.RuleBasedIntegrationTestMixin
@@ -50,6 +53,7 @@ import static org.transmartproject.db.test.Matchers.hasSameInterfaceProperties
 class RnaSeqEndToEndRetrievalTests {
 
     private static final double DELTA = 0.0001
+    private static final String concept_code = 'concept code #1'
 
     HighDimensionResource highDimensionResourceService
 
@@ -65,6 +69,8 @@ class RnaSeqEndToEndRetrievalTests {
 
     AssayConstraint trialNameConstraint
 
+    String conceptKey
+
     @Before
     void setUp() {
         testData.saveAll()
@@ -77,6 +83,8 @@ class RnaSeqEndToEndRetrievalTests {
                 name: RnaSeqTestData.TRIAL_NAME)
 
         projection = rnaseqResource.createProjection([:], RNASEQ_VALUES_PROJECTION)
+
+        conceptKey = '\\\\' + testData.concept.tableAccesses[0].tableCode + testData.concept.conceptDimensions[0].conceptPath
     }
 
     @After
@@ -120,12 +128,12 @@ class RnaSeqEndToEndRetrievalTests {
                 hasProperty('label', equalTo(testData.regions[1].name)),
                 hasProperty('bioMarker', equalTo(testData.regions[1].geneSymbol)),
                 hasProperty('platform', allOf(
-                    hasProperty('id', equalTo(testData.regionPlatform.id)),
-                    hasProperty('title', equalTo(testData.regionPlatform.title)),
-                    hasProperty('organism', equalTo(testData.regionPlatform.organism)),
-                    hasProperty('annotationDate', equalTo(testData.regionPlatform.annotationDate)),
-                    hasProperty('markerType', equalTo(testData.regionPlatform.markerType)),
-                    hasProperty('genomeReleaseId', equalTo(testData.regionPlatform.genomeReleaseId)),
+                        hasProperty('id', equalTo(testData.regionPlatform.id)),
+                        hasProperty('title', equalTo(testData.regionPlatform.title)),
+                        hasProperty('organism', equalTo(testData.regionPlatform.organism)),
+                        hasProperty('annotationDate', equalTo(testData.regionPlatform.annotationDate)),
+                        hasProperty('markerType', equalTo(testData.regionPlatform.markerType)),
+                        hasProperty('genomeReleaseId', equalTo(testData.regionPlatform.genomeReleaseId)),
                 )),
         )
         assertThat regionRows[1], allOf(
@@ -151,12 +159,12 @@ class RnaSeqEndToEndRetrievalTests {
         assertThat regionRows[0][assayColumns[0]],
                 hasSameInterfaceProperties(RnaSeqValues, testData.rnaseqData[3])
 
-       assertThat(regionRows[1]*.normalizedReadcount,
-                  contains(testData.rnaseqData[-3..-4]*.normalizedReadcount.collect { Double it -> closeTo it, DELTA })
-                 )
-       assertThat(regionRows[0]*.normalizedReadcount,
-                  contains(testData.rnaseqData[-1..-2]*.normalizedReadcount.collect { Double it -> closeTo it, DELTA })
-                 )
+        assertThat(regionRows[1]*.normalizedReadcount,
+                contains(testData.rnaseqData[-3..-4]*.normalizedReadcount.collect { Double it -> closeTo it, DELTA })
+        )
+        assertThat(regionRows[0]*.normalizedReadcount,
+                contains(testData.rnaseqData[-1..-2]*.normalizedReadcount.collect { Double it -> closeTo it, DELTA })
+        )
     }
 
     @Test
@@ -165,7 +173,7 @@ class RnaSeqEndToEndRetrievalTests {
                 [:], Projection.LOG_INTENSITY_PROJECTION)
 
         dataQueryResult = rnaseqResource.retrieveData(
-                [ trialNameConstraint ], [], logIntensityProjection)
+                [trialNameConstraint], [], logIntensityProjection)
 
         def resultList = Lists.newArrayList(dataQueryResult)
 
@@ -183,7 +191,7 @@ class RnaSeqEndToEndRetrievalTests {
                 [:], Projection.DEFAULT_REAL_PROJECTION)
 
         dataQueryResult = rnaseqResource.retrieveData(
-                [ trialNameConstraint ], [], realProjection)
+                [trialNameConstraint], [], realProjection)
 
         def resultList = Lists.newArrayList(dataQueryResult)
 
@@ -200,7 +208,7 @@ class RnaSeqEndToEndRetrievalTests {
                 [:], Projection.ZSCORE_PROJECTION)
 
         dataQueryResult = rnaseqResource.retrieveData(
-                [ trialNameConstraint ], [], zscoreProjection)
+                [trialNameConstraint], [], zscoreProjection)
 
         def resultList = Lists.newArrayList(dataQueryResult)
 
@@ -231,7 +239,7 @@ class RnaSeqEndToEndRetrievalTests {
 
         assertThat regionRows, hasSize(1)
         assertThat regionRows[0], hasSameInterfaceProperties(
-                Region, testData.regions[0], [ 'platform' ])
+                Region, testData.regions[0], ['platform'])
     }
 
     @Test
@@ -248,33 +256,33 @@ class RnaSeqEndToEndRetrievalTests {
                         subconstraints: [
                                 (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [
                                         /* test region wider then the segment */
-                                        [ chromosome: '1', start: 44, end: 8888 ],
+                                        [chromosome: '1', start: 44, end: 8888],
                                         /* segment aligned at the end of test region;
                                          *segment shorter than region */
-                                        [ chromosome: '2', start: 88, end: 99 ],
+                                        [chromosome: '2', start: 88, end: 99],
                                 ]
                         ]
                 )
         ]
 
         def anotherPlatform = new DeGplInfo(
-                title:          'Another Test Region Platform',
-                organism:       'Homo Sapiens',
+                title: 'Another Test Region Platform',
+                organism: 'Homo Sapiens',
                 annotationDate: Date.parse('yyyy-MM-dd', '2013-08-03'),
-                markerType:     'RNASEQ_RCNT',
-                genomeReleaseId:'hg19',
+                markerType: 'RNASEQ_RCNT',
+                genomeReleaseId: 'hg19',
         )
         anotherPlatform.id = 'test-another-platform'
         anotherPlatform.save failOnError: true, flush: true
 
         // this region should not appear in the result set
         def anotherRegion = new DeChromosomalRegion(
-                platform:       anotherPlatform,
-                chromosome:     '1',
-                start:          1,
-                end:            10,
+                platform: anotherPlatform,
+                chromosome: '1',
+                start: 1,
+                end: 10,
                 numberOfProbes: 42,
-                name:           'region 1:1-10'
+                name: 'region 1:1-10'
         )
         anotherRegion.id = -2010L
         anotherRegion.save failOnError: true, flush: true
@@ -286,9 +294,9 @@ class RnaSeqEndToEndRetrievalTests {
         assertThat regionRows, hasSize(2)
         assertThat regionRows, contains(
                 hasSameInterfaceProperties(
-                        Region, testData.regions[1], [ 'platform' ]),
+                        Region, testData.regions[1], ['platform']),
                 hasSameInterfaceProperties(
-                        Region, testData.regions[0], [ 'platform' ]))
+                        Region, testData.regions[0], ['platform']))
     }
 
     @Test
@@ -304,9 +312,9 @@ class RnaSeqEndToEndRetrievalTests {
                         DataConstraint.DISJUNCTION_CONSTRAINT,
                         subconstraints: [
                                 (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [
-                                        [ chromosome: 'X' ],
-                                        [ chromosome: '1', start: 1,   end: 32 ],
-                                        [ chromosome: '2', start: 100, end: 1000 ],
+                                        [chromosome: 'X'],
+                                        [chromosome: '1', start: 1, end: 32],
+                                        [chromosome: '2', start: 100, end: 1000],
                                 ]
                         ]
                 )
@@ -330,7 +338,7 @@ class RnaSeqEndToEndRetrievalTests {
         ]
         def dataConstraints = [
                 rnaseqResource.createDataConstraint([keyword_ids: [testData.searchKeywords.
-                        find({ it.keyword == 'AURKA' }).id]],
+                                                                           find({ it.keyword == 'AURKA' }).id]],
                         DataConstraint.SEARCH_KEYWORD_IDS_CONSTRAINT
                 )
         ]
@@ -353,7 +361,149 @@ class RnaSeqEndToEndRetrievalTests {
                                 String property) {
         contains testData.rnaseqData.
                 findAll { it.region == region }.
-                sort    { it.assay.id }. // data is sorted by assay id
+                sort { it.assay.id }. // data is sorted by assay id
                 collect { closeTo it."$property" as Double, DELTA }
+    }
+
+    @Test
+    void testAnnotationSearchGeneSymbol() {
+        def gene_symbols = rnaseqResource.searchAnnotation(concept_code, 'AD', 'geneSymbol')
+        assertThat gene_symbols, allOf(
+                hasSize(1),
+                contains(
+                        equalTo("ADIRF")
+                )
+        )
+    }
+
+    @Test
+    void testAnnotationSearchCytoband() {
+        def cytoband = rnaseqResource.searchAnnotation(concept_code, '1p', 'cytoband')
+        assertThat cytoband, allOf(
+                hasSize(1),
+                contains(
+                        equalTo("1p12.1")
+                )
+        )
+    }
+
+    @Test
+    void testAnnotationSearchName() {
+        def names = rnaseqResource.searchAnnotation ( concept_code, 'region', 'name' )
+        assertThat names, allOf (
+                hasSize ( 2 ),
+                // should be in alphabetical order
+                contains (
+                        equalTo ( "region 1:33-9999" ),
+                        equalTo ( "region 2:66-99" )
+                )
+        )
+    }
+
+    @Test
+    void testAnnotationSearchEmpty() {
+        def symbols = rnaseqResource.searchAnnotation(concept_code, 'FOO', 'geneSymbol')
+        assertThat symbols, hasSize(0)
+    }
+
+    @Test
+    void testAnnotationSearchInvalid() {
+        GroovyAssert.shouldFail(InvalidArgumentsException.class) {rnaseqResource.searchAnnotation(concept_code, 'T', 'FOO')}
+    }
+
+    @Test
+    void testGeneSymbolAnnotationConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.RNASEQ_RCNT,
+                property: 'geneSymbol',
+                selector: 'AURKA',
+                projectionType: Projection.LOG_NORMALIZED_READ_COUNT_PROJECTION
+        )
+
+        def distribution = rnaseqResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.rnaseqData.findAll {it.region.geneSymbol == 'AURKA'}.collectEntries {[it.patient.id, it.logNormalizedReadcount]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testCytobandAnnotationConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.RNASEQ_RCNT,
+                property: 'cytoband',
+                selector: '1p12.1',
+                projectionType: Projection.LOG_NORMALIZED_READ_COUNT_PROJECTION
+        )
+
+        def distribution = rnaseqResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.rnaseqData.findAll {it.region.cytoband == '1p12.1'}.collectEntries {[it.patient.id, it.logNormalizedReadcount]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testNameAnnotationConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.RNASEQ_RCNT,
+                property: 'name',
+                selector: 'region 1:33-9999',
+                projectionType: Projection.LOG_NORMALIZED_READ_COUNT_PROJECTION
+        )
+
+        def distribution = rnaseqResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.rnaseqData.findAll {it.region.name == 'region 1:33-9999'}.collectEntries {[it.patient.id, it.logNormalizedReadcount]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testLogNormalizedReadCountConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.RNASEQ_RCNT,
+                property: 'name',
+                selector: 'region 1:33-9999',
+                projectionType: Projection.LOG_NORMALIZED_READ_COUNT_PROJECTION,
+                operator: 'BETWEEN',
+                constraint: '-0.5:0.5'
+        )
+
+        def distribution = rnaseqResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.rnaseqData.findAll {it.region.name == 'region 1:33-9999' && -0.5 <= it.logNormalizedReadcount && it.logNormalizedReadcount <= 0.5}.collectEntries {[it.patient.id, it.logNormalizedReadcount]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testNormalizedReadCountConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.RNASEQ_RCNT,
+                property: 'name',
+                selector: 'region 1:33-9999',
+                projectionType: Projection.NORMALIZED_READ_COUNT_PROJECTION,
+                operator: 'BETWEEN',
+                constraint: '-0.5:1.5'
+        )
+
+        def distribution = rnaseqResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.rnaseqData.findAll {it.region.name == 'region 1:33-9999' && -0.5 <= it.normalizedReadcount && it.normalizedReadcount <= 1.5}.collectEntries {[it.patient.id, it.normalizedReadcount]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testZScoreConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.RNASEQ_RCNT,
+                property: 'name',
+                selector: 'region 1:33-9999',
+                projectionType: Projection.ZSCORE_PROJECTION,
+                operator: 'BETWEEN',
+                constraint: '0.75:1.25'
+        )
+
+        def distribution = rnaseqResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.rnaseqData.findAll {it.region.name == 'region 1:33-9999' && 0.75 <= it.zscore && it.zscore <= 1.25}.collectEntries {[it.patient.id, it.zscore]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
     }
 }

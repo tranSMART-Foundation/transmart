@@ -30,17 +30,21 @@ import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
 import org.transmartproject.core.dataquery.highdim.projections.Projection
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.exceptions.UnexpectedResultException
+import org.transmartproject.core.querytool.HighDimensionFilterType
 import org.transmartproject.db.dataquery.highdim.AbstractHighDimensionDataTypeModule
+import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
 import org.transmartproject.db.dataquery.highdim.DefaultHighDimensionTabularResult
 import org.transmartproject.db.dataquery.highdim.PlatformImpl
 import org.transmartproject.db.dataquery.highdim.acgh.AcghDataTypeResource
 import org.transmartproject.db.dataquery.highdim.chromoregion.ChromosomeSegmentConstraintFactory
+import org.transmartproject.db.dataquery.highdim.chromoregion.DeChromosomalRegion
 import org.transmartproject.db.dataquery.highdim.chromoregion.RegionRowImpl
 import org.transmartproject.db.dataquery.highdim.correlations.CorrelationTypesRegistry
 import org.transmartproject.db.dataquery.highdim.correlations.SearchKeywordDataConstraintFactory
 import org.transmartproject.db.dataquery.highdim.parameterproducers.AllDataProjectionFactory
 import org.transmartproject.db.dataquery.highdim.parameterproducers.DataRetrievalParameterFactory
 import org.transmartproject.db.dataquery.highdim.parameterproducers.MapBasedParameterFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.SimpleAnnotationConstraintFactory
 import org.transmartproject.db.dataquery.highdim.parameterproducers.SimpleRealProjectionsFactory
 
 import static org.hibernate.sql.JoinFragment.INNER_JOIN
@@ -94,6 +98,7 @@ class RnaSeqModule extends AbstractHighDimensionDataTypeModule {
         [
                 standardDataConstraintFactory,
                 chromosomeSegmentConstraintFactory,
+                new SimpleAnnotationConstraintFactory(field: 'region', annotationClass: DeChromosomalRegion.class),
                 new SearchKeywordDataConstraintFactory(correlationTypesRegistry,
                         'GENE', 'region', 'geneId')
         ]
@@ -112,7 +117,9 @@ class RnaSeqModule extends AbstractHighDimensionDataTypeModule {
                 ),
                 new SimpleRealProjectionsFactory(
                         (Projection.LOG_INTENSITY_PROJECTION): 'logNormalizedReadcount',
+                        (Projection.LOG_NORMALIZED_READ_COUNT_PROJECTION): 'logNormalizedReadcount',  // alias that is more descriptive
                         (Projection.DEFAULT_REAL_PROJECTION):  'normalizedReadcount',
+                        (Projection.NORMALIZED_READ_COUNT_PROJECTION): 'normalizedReadcount',                    // alias that is more descriptive
                         (Projection.ZSCORE_PROJECTION):        'zscore'
                 ),
                 new AllDataProjectionFactory(dataProperties, rowProperties)
@@ -209,5 +216,36 @@ class RnaSeqModule extends AbstractHighDimensionDataTypeModule {
                         )
                 }
         )
+    }
+
+    @Override
+    List<String> searchAnnotation(String concept_code, String search_term, String search_property) {
+        if (!getSearchableAnnotationProperties().contains(search_property))
+            return []
+        DeChromosomalRegion.createCriteria().list {
+            eq('gplId', DeSubjectSampleMapping.createCriteria().get {
+                eq('conceptCode', concept_code)
+                projections {distinct 'platform.id'}
+            })
+            ilike(search_property, search_term + '%')
+            projections { distinct(search_property) }
+            order(search_property, 'ASC')
+            maxResults(100)
+        }
+    }
+
+    @Override
+    List<String> getSearchableAnnotationProperties() {
+        ['geneSymbol', 'cytoband', 'name']
+    }
+
+    @Override
+    HighDimensionFilterType getHighDimensionFilterType() {
+        HighDimensionFilterType.SINGLE_NUMERIC
+    }
+
+    @Override
+    List<String> getSearchableProjections() {
+        [Projection.LOG_NORMALIZED_READ_COUNT_PROJECTION, Projection.NORMALIZED_READ_COUNT_PROJECTION, Projection.ZSCORE_PROJECTION]
     }
 }

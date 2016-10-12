@@ -21,6 +21,7 @@ package org.transmartproject.db.dataquery.highdim.metabolite
 
 import com.google.common.collect.Lists
 import grails.test.mixin.TestMixin
+import groovy.test.GroovyAssert
 import org.hamcrest.Matcher
 import org.junit.After
 import org.junit.Before
@@ -33,6 +34,8 @@ import org.transmartproject.core.dataquery.highdim.HighDimensionResource
 import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
 import org.transmartproject.core.dataquery.highdim.dataconstraints.DataConstraint
 import org.transmartproject.core.dataquery.highdim.projections.Projection
+import org.transmartproject.core.exceptions.InvalidArgumentsException
+import org.transmartproject.core.querytool.ConstraintByOmicsValue
 import org.transmartproject.db.test.RuleBasedIntegrationTestMixin
 
 import static org.hamcrest.MatcherAssert.assertThat
@@ -60,10 +63,13 @@ class MetaboliteEndToEndRetrievalTest {
 
     MetaboliteTestData testData = new MetaboliteTestData()
 
+    String conceptKey
+
     @Before
     void setup() {
         testData.saveAll()
         metaboliteResource = highDimensionResourceService.getSubResourceForType('metabolite')
+        conceptKey = '\\\\' + testData.concept.tableAccesses[0].tableCode + testData.concept.conceptDimensions[0].conceptPath
     }
 
     @After
@@ -257,4 +263,95 @@ class MetaboliteEndToEndRetrievalTest {
         assertThat res, hasItem(contains(Double.NaN))
     }
 
+    @Test
+    void testSearchAnnotationBiochemicalName() {
+        def concept_code = 'concept code #1'
+
+        def bcnames = metaboliteResource.searchAnnotation(concept_code, 'Crypt', 'biochemicalName')
+        assertThat bcnames, allOf(
+                hasSize(2),
+                contains(
+                        equalTo('Cryptoxanthin 5,6:5\',8\'-diepoxide'),
+                        equalTo('Cryptoxanthin epoxide')
+                )
+        )
+    }
+
+    @Test
+    void testSearchAnnotationHmdbId() {
+        def concept_code = 'concept code #1'
+        def ids = metaboliteResource.searchAnnotation(concept_code, 'HMDB', 'hmdbId')
+        assertThat ids, allOf(
+                hasSize(3),
+                contains(
+                        equalTo('HMDB30536'),
+                        equalTo('HMDB30537'),
+                        equalTo('HMDB30538')
+                )
+        )
+    }
+
+    @Test
+    void testSearchAnnotationEmptyResult() {
+        def concept_code = 'concept code #1'
+        def empty = metaboliteResource.searchAnnotation(concept_code, 'FOO', 'biochemicalName')
+        assertThat empty, hasSize(0)
+    }
+
+    @Test
+    void testSearchAnnotationInvalidProperty() {
+        def concept_code = 'concept code #1'
+        GroovyAssert.shouldFail(InvalidArgumentsException.class) {metaboliteResource.searchAnnotation(concept_code, 'HMDB', 'FOO')}
+    }
+
+    @Test
+    void testLogIntensityConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.METABOLOMICS,
+                property: 'hmdbId',
+                selector: 'HMDB30536',
+                projectionType: Projection.LOG_INTENSITY_PROJECTION,
+                operator: 'BETWEEN',
+                constraint: '-1.5:-0.5'
+        )
+
+        def distribution = metaboliteResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.data.findAll {it.annotation.hmdbId == 'HMDB30536' && -1.5 <= it.logIntensity && it.logIntensity <= -0.5}.collectEntries {[it.patient.id, it.logIntensity]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues) // groovy maps are equal if they have same size, keys and values
+    }
+
+    @Test
+    void testRawIntensityConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.METABOLOMICS,
+                property: 'hmdbId',
+                selector: 'HMDB30536',
+                projectionType: Projection.DEFAULT_REAL_PROJECTION,
+                operator: 'BETWEEN',
+                constraint: '0.55:0.65'
+        )
+
+        def distribution = metaboliteResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.data.findAll {it.annotation.hmdbId == 'HMDB30536' && 0.55 <= it.rawIntensity && it.rawIntensity <= 0.65}.collectEntries {[it.patient.id, it.rawIntensity]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues) // groovy maps are equal if they have same size, keys and values
+    }
+
+    @Test
+    void testZScoreConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.METABOLOMICS,
+                property: 'hmdbId',
+                selector: 'HMDB30536',
+                projectionType: Projection.ZSCORE_PROJECTION,
+                operator: 'BETWEEN',
+                constraint: '1:1.5'
+        )
+
+        def distribution = metaboliteResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.data.findAll {it.annotation.hmdbId == 'HMDB30536' && 1 <= it.zscore && it.zscore <= 1.5}.collectEntries {[it.patient.id, it.zscore]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues) // groovy maps are equal if they have same size, keys and values
+    }
 }

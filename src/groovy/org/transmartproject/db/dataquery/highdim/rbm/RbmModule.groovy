@@ -27,13 +27,16 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.core.dataquery.highdim.projections.Projection
+import org.transmartproject.core.querytool.HighDimensionFilterType
 import org.transmartproject.db.dataquery.highdim.AbstractHighDimensionDataTypeModule
+import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
 import org.transmartproject.db.dataquery.highdim.DefaultHighDimensionTabularResult
 import org.transmartproject.db.dataquery.highdim.RepeatedEntriesCollectingTabularResult
 import org.transmartproject.db.dataquery.highdim.correlations.CorrelationTypesRegistry
 import org.transmartproject.db.dataquery.highdim.correlations.SearchKeywordDataConstraintFactory
 import org.transmartproject.db.dataquery.highdim.parameterproducers.AllDataProjectionFactory
 import org.transmartproject.db.dataquery.highdim.parameterproducers.DataRetrievalParameterFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.SimpleAnnotationConstraintFactory
 import org.transmartproject.db.dataquery.highdim.parameterproducers.SimpleRealProjectionsFactory
 
 import static org.hibernate.sql.JoinFragment.INNER_JOIN
@@ -71,6 +74,7 @@ class RbmModule extends AbstractHighDimensionDataTypeModule {
     protected List<DataRetrievalParameterFactory> createDataConstraintFactories() {
         [
                 standardDataConstraintFactory,
+                new SimpleAnnotationConstraintFactory(field: 'p', annotationClass: DeRbmAnnotation.class),
                 new SearchKeywordDataConstraintFactory(correlationTypesRegistry,
                         'PROTEIN', 'p', 'uniprotId'),
         ]
@@ -153,4 +157,38 @@ class RbmModule extends AbstractHighDimensionDataTypeModule {
         )
     }
 
+    @Override
+    List<String> searchAnnotation(String concept_code, String search_term, String search_property) {
+        if (!getSearchableAnnotationProperties().contains(search_property))
+            return []
+
+        DeRbmAnnotation.createCriteria().list {
+            ilike(search_property, search_term + '%')
+            'in'('gplId', DeSubjectSampleMapping.createCriteria().listDistinct {
+                eq('conceptCode', concept_code)
+                projections {
+                    distinct('platform')
+                }
+            }.collect {it.id})
+            projections {
+                distinct(search_property)
+            }
+            order(search_property, 'ASC')
+        }
+    }
+
+    @Override
+    List<String> getSearchableAnnotationProperties() {
+        ['antigenName','uniprotName','geneSymbol']
+    }
+
+    @Override
+    HighDimensionFilterType getHighDimensionFilterType() {
+        HighDimensionFilterType.SINGLE_NUMERIC
+    }
+
+    @Override
+    List<String> getSearchableProjections() {
+        [Projection.LOG_INTENSITY_PROJECTION, Projection.DEFAULT_REAL_PROJECTION, Projection.ZSCORE_PROJECTION]
+    }
 }

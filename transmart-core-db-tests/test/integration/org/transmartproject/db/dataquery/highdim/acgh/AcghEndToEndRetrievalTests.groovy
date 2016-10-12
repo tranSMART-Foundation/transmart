@@ -21,6 +21,7 @@ package org.transmartproject.db.dataquery.highdim.acgh
 
 import com.google.common.collect.Lists
 import grails.test.mixin.TestMixin
+import groovy.test.GroovyAssert
 import org.hibernate.SessionFactory
 import org.junit.After
 import org.junit.Before
@@ -36,6 +37,8 @@ import org.transmartproject.core.dataquery.highdim.chromoregion.Region
 import org.transmartproject.core.dataquery.highdim.chromoregion.RegionRow
 import org.transmartproject.core.dataquery.highdim.dataconstraints.DataConstraint
 import org.transmartproject.core.dataquery.highdim.projections.Projection
+import org.transmartproject.core.exceptions.InvalidArgumentsException
+import org.transmartproject.core.querytool.ConstraintByOmicsValue
 import org.transmartproject.db.dataquery.highdim.DeGplInfo
 import org.transmartproject.db.dataquery.highdim.chromoregion.DeChromosomalRegion
 import org.transmartproject.db.test.RuleBasedIntegrationTestMixin
@@ -61,6 +64,10 @@ class AcghEndToEndRetrievalTests {
 
     AcghTestData testData = new AcghTestData()
 
+    private static final String concept_code = 'concept code #1'
+
+    String conceptKey
+
     @Before
     void setUp() {
         testData.saveAll()
@@ -70,6 +77,8 @@ class AcghEndToEndRetrievalTests {
 
         /* projection never varies in our tests */
         projection = acghResource.createProjection([:], ACGH_VALUES_PROJECTION)
+
+        conceptKey = '\\\\' + testData.concept.tableAccesses[0].tableCode + testData.concept.conceptDimensions[0].conceptPath
     }
 
     @After
@@ -295,4 +304,220 @@ class AcghEndToEndRetrievalTests {
         )
     }
 
+    @Test
+    void testSearchAnnotationGeneSymbol() {
+        def symbols = acghResource.searchAnnotation(concept_code, 'A', 'geneSymbol')
+        assertThat symbols, allOf(
+                hasSize(2),
+                contains(
+                        equalTo('ADIRF'),
+                        equalTo('AURKA')
+                )
+        )
+    }
+
+    @Test
+    void testSearchAnnotationCytoband() {
+        def cyto = acghResource.searchAnnotation(concept_code, 'cyto', 'cytoband')
+        assertThat cyto, allOf(
+                hasSize(2),
+                contains(
+                        equalTo('cytoband1'),
+                        equalTo('cytoband2')
+                )
+        )
+    }
+
+    @Test
+    void testSearchAnnotationRegionName() {
+        def names = acghResource.searchAnnotation(concept_code, 'region 1', 'name')
+        assertThat names, allOf(
+                hasSize(1),
+                contains(
+                        equalTo('region 1:33-9999')
+                )
+        )
+    }
+
+    @Test
+    void testSearchAnnotationGeneSymbolNoResult() {
+        def empty = acghResource.searchAnnotation(concept_code, 'FOO', 'geneSymbol')
+        assertThat empty, hasSize(0)
+    }
+
+    @Test
+    void testSearchAnnotationInvalidProperty() {
+        GroovyAssert.shouldFail(InvalidArgumentsException.class) {acghResource.searchAnnotation(concept_code, 'A', 'FOO')}
+    }
+
+    @Test
+    void testGeneSymbolAnnotationConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+                property: 'geneSymbol',
+                selector: 'AURKA',
+                projectionType: Projection.PROB_GAIN
+        )
+
+        def distribution = acghResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.acghData.findAll {it.region.geneSymbol == 'AURKA'}.collectEntries {[it.patient.id, it.probabilityOfGain]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testCytobandAnnotationConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+                property: 'cytoband',
+                selector: 'cytoband1',
+                projectionType: Projection.PROB_GAIN
+        )
+
+        def distribution = acghResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1'}.collectEntries {[it.patient.id, it.probabilityOfGain]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testNameAnnotationConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+                property: 'name',
+                selector: 'region 1:33-9999',
+                projectionType: Projection.PROB_GAIN
+        )
+
+        def distribution = acghResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.acghData.findAll {it.region.name == 'region 1:33-9999'}.collectEntries {[it.patient.id, it.probabilityOfGain]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testChipCopyNumberValueConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+                property: 'cytoband',
+                selector: 'cytoband1',
+                projectionType: Projection.CHIP_COPYNUMBER_VALUE,
+                operator: 'BETWEEN',
+                constraint: '0.10:0.12'
+        )
+
+        def distribution = acghResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && 0.10 <= it.chipCopyNumberValue && it.chipCopyNumberValue <= 0.12}
+                .collectEntries {[it.patient.id, it.chipCopyNumberValue]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testSegmentCopyNumberValueConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+                property: 'cytoband',
+                selector: 'cytoband1',
+                projectionType: Projection.SEGMENT_COPY_NUMBER_VALUE,
+                operator: 'BETWEEN',
+                constraint: '0.10:0.15'
+        )
+
+        def distribution = acghResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && 0.10 <= it.segmentCopyNumberValue && it.segmentCopyNumberValue <= 0.15}
+                .collectEntries {[it.patient.id, it.segmentCopyNumberValue]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testFlagConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+                property: 'cytoband',
+                selector: 'cytoband1',
+                projectionType: Projection.FLAG,
+                operator: 'BETWEEN',
+                constraint: '-1:0'
+        )
+
+        def distribution = acghResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && -1 <= it.flag && it.flag <= 0}
+                .collectEntries {[it.patient.id, it.flag]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testProbAmpConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+                property: 'cytoband',
+                selector: 'cytoband1',
+                projectionType: Projection.PROB_AMP,
+                operator: 'BETWEEN',
+                constraint: '0.10:0.20'
+        )
+
+        def distribution = acghResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && 0.10 <= it.probabilityOfAmplification && it.probabilityOfAmplification <= 0.20}
+                .collectEntries {[it.patient.id, it.probabilityOfAmplification]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testProbGainConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+                property: 'cytoband',
+                selector: 'cytoband1',
+                projectionType: Projection.PROB_GAIN,
+                operator: 'BETWEEN',
+                constraint: '0.10:0.15'
+        )
+
+        def distribution = acghResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && 0.10 <= it.probabilityOfGain && it.probabilityOfGain <= 0.15}
+                .collectEntries {[it.patient.id, it.probabilityOfGain]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testProbLossConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+                property: 'cytoband',
+                selector: 'cytoband1',
+                projectionType: Projection.PROB_LOSS,
+                operator: 'BETWEEN',
+                constraint: '0.10:0.15'
+        )
+
+        def distribution = acghResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && 0.10 <= it.probabilityOfLoss && it.probabilityOfLoss <= 0.15}
+                .collectEntries {[it.patient.id, it.probabilityOfLoss]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
+
+    @Test
+    void testProbNormConstraint() {
+        def constraint = new ConstraintByOmicsValue(
+                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+                property: 'cytoband',
+                selector: 'cytoband1',
+                projectionType: Projection.PROB_NORM,
+                operator: 'BETWEEN',
+                constraint: '0.10:0.13'
+        )
+
+        def distribution = acghResource.getDistribution(constraint, conceptKey, null)
+        def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && 0.10 <= it.probabilityOfNormal && it.probabilityOfNormal <= 0.13}
+                .collectEntries {[it.patient.id, it.probabilityOfNormal]}
+        assertThat distribution.size(), greaterThanOrEqualTo(1)
+        assert distribution.equals(correctValues)
+    }
 }

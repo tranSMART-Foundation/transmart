@@ -18,7 +18,6 @@
  */
 
 package org.transmartproject.db.querytool
-
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
@@ -261,7 +260,6 @@ class PatientSetQueryBuilderServiceTests {
 
         assertThat sql, containsString("AND (valueflag_cd = 'N')")
     }
-
 
     // The rest are error tests
 
