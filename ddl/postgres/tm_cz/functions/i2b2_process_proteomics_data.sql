@@ -306,38 +306,6 @@ BEGIN
 	select cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done') into rtnCd;
 
 	begin
-	delete from DE_SUBJECT_PROTEIN_DATA
-	where trial_name = TrialId ;
-	exception
-	when others then
-		perform tm_cz.cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
-		perform tm_cz.cz_end_audit (jobID, 'FAIL');
-		return -16;
-	end;
-	
-	stepCt := stepCt + 1;
-	get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Delete data from DE_SUBJECT_PROTEIN_DATA',rowCt,stepCt,'Done') into rtnCd;
-		
-	--	Cleanup any existing data in de_subject_sample_mapping.  
-
-	begin
-	delete from DE_SUBJECT_SAMPLE_MAPPING ssm
-	where trial_name = TrialID 
-	  and coalesce(ssm.source_cd,'STD') = sourceCd
-	  and platform = 'PROTEIN'
-	; --Making sure only proteomics data is deleted
-	exception
-	when others then
-		perform tm_cz.cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
-		perform tm_cz.cz_end_audit (jobID, 'FAIL');
-		return -16;
-	end;
-		  
-	stepCt := stepCt + 1;
-	get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Delete trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done') into rtnCd;
-	begin
 	execute('truncate table tm_wz.WT_PROTEOMICS_NODES');
 	execute('truncate table tm_wz.WT_PROTEOMICS_NODE_VALUES');
 	exception

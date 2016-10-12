@@ -341,27 +341,6 @@ BEGIN
 	partitionName := 'deapp.de_subject_metabolomics_data_' || partitionId::text;
 	partitionIndx := 'de_subject_metabolomics_data_' || partitionId::text;
 
-	--	Cleanup any existing data in de_subject_sample_mapping.  
-	begin
-	delete from DE_SUBJECT_SAMPLE_MAPPING 
-	where trial_name = TrialID 
-	  and coalesce(source_cd,'STD') = sourceCd
-	  and platform = 'METABOLOMICS'; --Making sure only metabolomic data is deleted
-	  get diagnostics rowCt := ROW_COUNT;
-	  exception
-	when others then
-		errorNumber := SQLSTATE;
-		errorMessage := SQLERRM;
-		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
-		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
-		return -16;
-	end;
-		  
-	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Delete trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
-
 --	truncate tmp node table
 
 	EXECUTE('truncate table tm_wz.WT_METABOLOMIC_NODES');

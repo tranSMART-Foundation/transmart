@@ -315,37 +315,6 @@ BEGIN
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
 	perform cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
 	
-        begin
-	delete from de_subject_mirna_data
-	where trial_source = TrialId || ':' || sourceCd;
-	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Delete data from de_subject_mirna_data',rowCt,stepCt,'Done');
-	exception
-	when others then
-		errorNumber := SQLSTATE;
-		errorMessage := SQLERRM;
-		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
-		perform tm_cz.cz_end_audit (jobID, 'FAIL');
-		return -16;
-	end;
-
-	begin
-	delete from deapp.DE_SUBJECT_SAMPLE_MAPPING d 
-	where trial_name = TrialID 
-	  and coalesce(d.source_cd,'STD') = sourceCd
-	  and platform = mirna_type;
-	exception
-	when others then
-		errorNumber := SQLSTATE;
-		errorMessage := SQLERRM;
-		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
-		perform tm_cz.cz_end_audit (jobID, 'FAIL');
-		return -16;
-	end;
-	  
-	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Delete trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
-
 	begin
 		execute('truncate table tm_wz.WT_QPCR_MIRNA_NODES');
 	exception
