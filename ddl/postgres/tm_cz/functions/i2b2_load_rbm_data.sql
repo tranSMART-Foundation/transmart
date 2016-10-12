@@ -37,7 +37,6 @@ DECLARE
   gplTitle		varchar(1000);
   pExists		bigint;
   partTbl   	bigint;
-  partExists 	bigint;
   sampleCt		bigint;
   idxExists 	bigint;
   logBase		bigint;
@@ -324,22 +323,7 @@ BEGIN
 	stepCt := stepCt + 1;
 	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done') into rtnCd;
 	
-	select count(*) into partExists
-	from deapp.de_subject_sample_mapping sm
-	where sm.trial_name = TrialId
-	and coalesce(sm.source_cd,'STD') = sourceCd
-	and sm.platform = 'RBM'
-	and sm.partition_id is not null;
-	
-	if partExists = 0 then
-		select nextval('deapp.seq_rbm_partition_id') into partitionId;
-	else
-		select distinct partition_id into partitionId
-		from deapp.de_subject_sample_mapping sm
-		where sm.trial_name = TrialId
-		and coalesce(sm.source_cd,'STD') = sourceCd
-		and sm.platform = 'RBM';
-	end if;
+	select nextval('deapp.seq_rbm_partition_id') into partitionId;
 
 	partitionName := 'deapp.de_subject_rbm_data_' || partitionId::text;
 	partitionIndx := 'de_subject_rbm_data_' || partitionId::text;

@@ -35,7 +35,6 @@ Declare
   gplTitle		character varying(1000);
   pExists		numeric;
   partTbl   	numeric;
-  partExists 	numeric;
   sampleCt		numeric;
   idxExists 	numeric;
   logBase		numeric;

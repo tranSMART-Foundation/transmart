@@ -34,7 +34,6 @@ DECLARE
   gplTitle		varchar(1000);
   pExists		bigint;
   partTbl   	bigint;
-  partExists 	bigint;
   sampleCt		bigint;
   idxExists 	bigint;
   logBase		bigint;
@@ -213,23 +212,8 @@ BEGIN
 		return -16;
 	end;
 
-	select count(*) into partExists
-	from deapp.de_subject_sample_mapping sm
-	where sm.trial_name = TrialId
-	and coalesce(sm.source_cd,'STD') = sourceCd
-	and sm.platform = 'RNA_AFFYMETRIX'
-	and sm.partition_id is not null;
+	select nextval('deapp.seq_rna_partition_id') into partitionId;
 	
-	if partExists = 0 then
-		select nextval('deapp.seq_rna_partition_id') into partitionId;
-	else
-		select distinct partition_id into partitionId
-		from deapp.de_subject_sample_mapping sm
-		where sm.trial_name = TrialId
-		and coalesce(sm.source_cd,'STD') = sourceCd
-		and sm.platform = 'RNA_AFFYMETRIX';
-	end if;
-
 	partitionName := 'deapp.de_subject_rna_data_' || partitionId::text;
 	partitionIndx := 'de_subject_rna_data_' || partitionId::text;	
 	stepCt := stepCt + 1;
