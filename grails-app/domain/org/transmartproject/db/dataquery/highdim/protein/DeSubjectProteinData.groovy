@@ -21,6 +21,7 @@ package org.transmartproject.db.dataquery.highdim.protein
 
 import groovy.transform.EqualsAndHashCode
 import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
+import org.transmartproject.db.i2b2data.PatientDimension
 
 @EqualsAndHashCode(includes = 'assay,annotation')
 class DeSubjectProteinData implements Serializable {
@@ -48,6 +49,7 @@ class DeSubjectProteinData implements Serializable {
     static belongsTo = [
             assay:      DeSubjectSampleMapping,
             annotation: DeProteinAnnotation,
+            patient:    PatientDimension
     ]
 
     static mapping = {
@@ -56,6 +58,7 @@ class DeSubjectProteinData implements Serializable {
 
         assay      column: 'assay_id'
         annotation column: 'protein_annotation_id'
+        patient    column: 'patient_id'
 
         // this is needed due to a Criteria bug.
         // see https://forum.hibernate.org/viewtopic.php?f=1&t=1012372
