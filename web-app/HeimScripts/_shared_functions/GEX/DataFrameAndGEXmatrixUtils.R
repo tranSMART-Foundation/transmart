@@ -615,11 +615,10 @@ buildExtraFieldsLowDim <- function(ld.list, colnames) {
   
   ld.names <- unlist(names(ld.list))
   ld.namesWOSubset <- sub("_s[1-2]{1}$", "", ld.names)
-  ld.labels <- sapply(ld.namesWOSubset, function(el) fetch_params$ontologyTerms[[el]]$name)
-  ld.labels <- as.character(as.vector(ld.labels))
   ld.fullNames <- sapply(ld.namesWOSubset, function(el) fetch_params$ontologyTerms[[el]]$fullName)
   ld.fullNames <- as.character(as.vector(ld.fullNames))
-  ld.rownames <- strsplit2(ld.fullNames, "\\\\")[,5]
+  split <- strsplit2(ld.fullNames, "\\\\")
+  ld.rownames <- apply(split, 1, function(row) paste(tail(row[row != ""], n=2), collapse="//"))
   ld.subsets <- as.integer(sub("^.*_s", "", ld.names))
   ld.types <- sub("_.*$", "", ld.names)
 
@@ -643,13 +642,13 @@ buildExtraFieldsLowDim <- function(ld.list, colnames) {
           ld.value <- ld.var[j, 2]
           ld.type <- ld.types[i]
           ld.subset <- ld.subsets[i]
-          ld.label <- ld.labels[i]
-          ld.colname <- paste(ld.patientID, ld.label, paste("s", ld.subset, sep=""), sep="_")
+          ld.rowname <- ld.rownames[i]
+          ld.colname <- paste(ld.patientID, ld.rowname, paste("s", ld.subset, sep=""), sep="_")
           if (ld.value == "" || is.na(ld.value)) next
           if (! ld.colname %in% colnames) {
               for (k in which(ld.patientID == hd.patientIDs & ld.subset == hd.subsets)) {
                   ld.colname <- paste(hd.patientIDs[k], hd.labels[k], paste("s", hd.subsets[k], sep=""), sep="_")
-                  ld.rowname <- paste("(matched by subject)", ld.label)
+                  ld.rowname <- paste("(matched by subject)", ld.rowname)
                   ROWNAME.vec <- c(ROWNAME.vec, ld.rowname)
                   PATIENTID.vec <- c(PATIENTID.vec, ld.patientID)
                   VALUE.vec <- c(VALUE.vec, ld.value)
@@ -658,7 +657,7 @@ buildExtraFieldsLowDim <- function(ld.list, colnames) {
                   SUBSET.vec <- c(SUBSET.vec, ld.subset)
               }
           } else {
-              ld.rowname <- paste("(matched by sample)", ld.rownames[i])
+              ld.rowname <- paste("(matched by sample)", ld.rowname)
               ROWNAME.vec <- c(ROWNAME.vec, ld.rowname)
               PATIENTID.vec <- c(PATIENTID.vec, ld.patientID)
               VALUE.vec <- c(VALUE.vec, ld.value)
