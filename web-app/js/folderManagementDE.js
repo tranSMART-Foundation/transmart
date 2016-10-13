@@ -163,25 +163,6 @@ FM.handleFolderFilesRequest = function(source, node, callback) {
     });
 }
 
-FM.handleFolderHasFilesRequest = function(source, originalResponse, node, callback) {
-
-    Ext.Ajax.request({
-        url: pageInfo.basePath+"/fmFolder/getFolderHasFiles",
-        method: 'GET',
-        success: function(response) {
-            if (response.responseText == "true") {
-                node.appendChild(FM.getFileFolderNode(node));
-            }
-            source.parseXml(originalResponse, node);
-            source.endAppending(node, callback);
-        },
-        timeout: '120000', //2 minutes
-        params: {accession: node.attributes.accession}
-    });
-
-
-}
-
 FM.addFileNodes = function(source, response, node, callback) {
     var json = Ext.util.JSON.decode(response.responseText);
     node.beginUpdate();
