@@ -368,7 +368,9 @@ idToNodeLabel <- function(ids, ontologyTerms) {
   # extract node label (Breast)
   nodes <- sub("^.+?_", "", ids, perl=TRUE) # remove the X123_
   nodes <- as.vector(substring(nodes, first=1, last=nchar(nodes)-3)) # remove the _s1
-  nodeLabels <- as.vector(sapply(nodes, function(node) return(ontologyTerms[[node]]$name)))
+  fullNames <- as.vector(sapply(nodes, function(node) return(ontologyTerms[[node]]$fullName)))
+  split <- strsplit2(fullNames, "\\\\") 
+  nodeLabels <- apply(split, 1, function(row) paste(tail(row[row != ""], n=2), collapse="//"))
   # put everything together (123, Breast, s1)
   paste(patientIDs, nodeLabels, subsets, sep="_")
 }
@@ -412,31 +414,6 @@ parseInput<- function() {
   
   return(list(HD = df, LD = ld))
 }
-
-
-# ## Checking if a variable called preprocessed exists in R
-# ## workspace, else loaded_variables is used to create data frame df.
-# ## Column names in data frame get modified by replacing matrix id
-# ## (e.g.: n0, n1, ...) by corresponding name in fetch_params list var
-# parseInput <- function() {
-#   
-#   ## Retrieving the input data frame
-#   if (exists("preprocessed")) {
-#     df <- preprocessed
-#   } else {
-#     df <- mergeFetchedData(loaded_variables)
-#   }
-#   
-#   ## Renaming the column names in the data frame:
-#   ## - removing "X" as prefix
-#   ## - replacing node id by node name
-#   ## (e.g. 'X144_n0_s1' -> '144_Breast_s2')
-#   colnames(df)[c(-1,-2)] = idToNodeLabel(colnames(df)[c(-1,-2)], fetch_params$ontologyTerms)
-#   
-#   return(df)
-# }
-
-
 
 mergeFetchedData <- function(listOfHdd){
   df <- listOfHdd[[1]]
@@ -608,7 +585,6 @@ buildExtraFieldsHighDim <- function(df) {
 ## If a value is not existing, the corresponding cell in the returned data frame
 ## is set to NA.
 buildExtraFieldsLowDim <- function(ld.list, colnames) {
-  
   if(is.null(ld.list)){
     return(NULL)
   }
@@ -640,15 +616,15 @@ buildExtraFieldsLowDim <- function(ld.list, colnames) {
       for (j in 1:nrow(ld.var)) {
           ld.patientID <- ld.var[j, 1]
           ld.value <- ld.var[j, 2]
+          if (ld.value == "" || is.na(ld.value)) next
           ld.type <- ld.types[i]
           ld.subset <- ld.subsets[i]
-          ld.rowname <- ld.rownames[i]
-          ld.colname <- paste(ld.patientID, ld.rowname, paste("s", ld.subset, sep=""), sep="_")
-          if (ld.value == "" || is.na(ld.value)) next
+          ld.rowname.tmp <- ld.rownames[i]
+          ld.colname <- paste(ld.patientID, ld.rowname.tmp, paste("s", ld.subset, sep=""), sep="_")
           if (! ld.colname %in% colnames) {
               for (k in which(ld.patientID == hd.patientIDs & ld.subset == hd.subsets)) {
                   ld.colname <- paste(hd.patientIDs[k], hd.labels[k], paste("s", hd.subsets[k], sep=""), sep="_")
-                  ld.rowname <- paste("(matched by subject)", ld.rowname)
+                  ld.rowname <- paste("(matched by subject)", ld.rowname.tmp)
                   ROWNAME.vec <- c(ROWNAME.vec, ld.rowname)
                   PATIENTID.vec <- c(PATIENTID.vec, ld.patientID)
                   VALUE.vec <- c(VALUE.vec, ld.value)
@@ -657,7 +633,7 @@ buildExtraFieldsLowDim <- function(ld.list, colnames) {
                   SUBSET.vec <- c(SUBSET.vec, ld.subset)
               }
           } else {
-              ld.rowname <- paste("(matched by sample)", ld.rowname)
+              ld.rowname <- paste("(matched by sample)", ld.rowname.tmp)
               ROWNAME.vec <- c(ROWNAME.vec, ld.rowname)
               PATIENTID.vec <- c(PATIENTID.vec, ld.patientID)
               VALUE.vec <- c(VALUE.vec, ld.value)

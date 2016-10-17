@@ -70,7 +70,7 @@ window.smartRApp.directive('heatmapPlot', [
             var legendHeight = 40;
 
             var margin = {
-                top: gridFieldHeight * 2 + features.length * gridFieldHeight + dendrogramHeight + 100,
+                top: gridFieldHeight * 2 + longestColNameLength +  features.length * gridFieldHeight + dendrogramHeight + 100,
                 right: gridFieldWidth + 300 + dendrogramHeight,
                 bottom: 10,
                 left: histogramHeight
@@ -556,7 +556,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('x', function(d) { return -histogramScale(d[ranking]); })
                     .style('fill', function(d) { return d[ranking] > 0 ? '#990000' : 'steelblue'; });
 
-                var featurePosY = -gridFieldWidth * 2 - longestColNameLength + 20;
+                var featurePosY = -gridFieldWidth * 2 - longestColNameLength;
 
                 var extraSquare = featureItems.selectAll('.extraSquare')
                     .data(extraFields);
