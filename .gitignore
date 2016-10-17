@@ -2,3 +2,5 @@
 /plugin.xml
 web-app/node_modules
 web-app/tmp
+/grails-dalliance-*.zip
+/grails-dalliance-*.zip.sha1
