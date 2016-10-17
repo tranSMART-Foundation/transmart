@@ -62,6 +62,9 @@ class MetacoreEnrichmentController {
 			line ->
 			if (i > 0) {
 				def values = line.split('\t',13) //If GENE_SYMBOL is empty need add limit to split or length line will be less 11
+				if (values.size() < 12) {
+				    return
+				}
 				def z_score = 0
 				
 				try {
