@@ -34,7 +34,6 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://download.java.net/maven/2/"
         //mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
-        mavenRepo "http://repo.etriks.org/content/groups/public/"
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
@@ -46,6 +45,6 @@ grails.project.dependency.resolution = {
               ":rest-client-builder:1.0.3") {
             export = false
         }
-	runtime ':biomart-domain:1.2.2-SNAPSHOT'
+	runtime ':biomart-domain:16.2-SNAPSHOT'
     }
 }
