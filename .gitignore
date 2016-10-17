@@ -17,6 +17,7 @@
 /stacktrace.log
 /test/reports
 /logs
+/System.out
 
 # project release file
 /*.war
@@ -31,3 +32,7 @@
 
 # "temporary" build files
 /target
+
+# zip files
+/grails-xnat-viewer-*.zip
+/grails-xnat-viewer-*.zip.sha1
