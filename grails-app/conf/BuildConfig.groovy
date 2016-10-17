@@ -2,6 +2,7 @@ grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 
+grails.project.dependency.resolver = "maven"
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
     inherits("global") {
@@ -18,13 +19,13 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        compile 'uk.ac.ebi.mydas:mydas:1.7.0.hyve-SNAPSHOT'
+        compile 'uk.ac.ebi.mydas:mydas:1.7.0.transmart-16.2-SNAPSHOT'
         compile 'net.sf.opencsv:opencsv:2.3'
-        compile 'org.transmartproject:transmart-core-api:1.0-SNAPSHOT'
+        compile 'org.transmartproject:transmart-core-api:16.2-SNAPSHOT'
     }
 
     plugins {
-        build(":tomcat:7.0.47",
+        build(":tomcat:7.0.50",
               ":release:3.0.1",
               ":rest-client-builder:1.0.3") {
             export = false
