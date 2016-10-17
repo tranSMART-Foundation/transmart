@@ -6,3 +6,7 @@
 /out
 .project
 /plugin.xml
+grails-app/i18n
+grails-transmart-mydas-*.zip
+grails-transmart-mydas-*.zip.sha1
+/logs
