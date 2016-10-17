@@ -38,19 +38,18 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        // runtime 'mysql:mysql-connector-java:5.1.27'
         compile('org.transmartproject:transmart-core-api:16.2-SNAPSHOT')
-        compile 'org.apache.httpcomponents:httpcore:4.3.3'
-        compile 'org.apache.httpcomponents:httpclient:4.3.6'
-        compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.1') {
-            excludes('httpcore', 'httpclient')
+        compile 'org.apache.httpcomponents:httpcore:4.4.1'
+        compile 'org.apache.httpcomponents:httpclient:4.4.1'
+        compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') {
+            excludes('groovy', 'nekohtml', 'httpclient', 'httpcore')
         }
     }
 
     plugins {
         compile(':search-domain:16.2-SNAPSHOT')
-        build(":release:3.0.1",
-              ":rest-client-builder:1.0.3") {
+        build(":release:3.1.1",
+              ":rest-client-builder:2.1.1") {
             export = false
         }
         compile ':scaffolding:1.0.0'
