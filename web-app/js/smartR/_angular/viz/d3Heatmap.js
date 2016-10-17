@@ -70,7 +70,7 @@ window.smartRApp.directive('heatmapPlot', [
             var legendHeight = 40;
 
             var margin = {
-                top: gridFieldHeight * 2 + features.length * gridFieldHeight + dendrogramHeight + 100,
+                top: gridFieldHeight * 2 + longestColNameLength +  features.length * gridFieldHeight + dendrogramHeight + 100,
                 right: gridFieldWidth + 300 + dendrogramHeight,
                 bottom: 10,
                 left: histogramHeight
@@ -167,6 +167,9 @@ window.smartRApp.directive('heatmapPlot', [
                     case 'PVAL':
                     case 'ADJPVAL':
                         return 1 - value;
+                    case 'TTEST':
+                    case 'LOGFOLD':
+                        return Math.abs(value);
                     default:
                         return value;
                 }
@@ -556,7 +559,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('x', function(d) { return -histogramScale(d[ranking]); })
                     .style('fill', function(d) { return d[ranking] > 0 ? '#990000' : 'steelblue'; });
 
-                var featurePosY = -gridFieldWidth * 2 - longestColNameLength + 20;
+                var featurePosY = -gridFieldWidth * 2 - longestColNameLength;
 
                 var extraSquare = featureItems.selectAll('.extraSquare')
                     .data(extraFields);
@@ -754,7 +757,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .classed('cutoffHighlight', false);
                 d3.selectAll('.bar')
                     .classed('cutoffHighlight', false);
-                statistics.slice().sort(function(a, b) { return a[ranking] - b[ranking]; })
+                statistics.slice().sort(function(a, b) { return getInternalSortValue(a[ranking]) - getInternalSortValue(b[ranking]); })
                     .filter(function(d, i) { return i < cutoff; })
                     .forEach(function(d, i) {
                         selectedRownames.push(d.ROWNAME);
