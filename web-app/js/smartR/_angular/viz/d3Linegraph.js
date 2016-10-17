@@ -111,8 +111,13 @@ window.smartRApp.directive('lineGraph', [
                 left: 100
             };
 
-            var LINEGRAPH_WIDTH = document.getElementById('sr-index').getBoundingClientRect().width - MARGIN.left - MARGIN.right;
-            var LINEGRAPH_HEIGHT = NUM_PLOTS_HEIGHT - MARGIN.top - MARGIN.bottom;
+            var timeIntegers = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort(function(a, b) { return a - b; });
+            var BINS = timeIntegers[timeIntegers.length - 1] - timeIntegers[0];
+
+            var LINEGRAPH_WIDTH = BINS * ICON_SIZE * 2;
+            var LINEGRAPH_HEIGHT = NUM_PLOTS_HEIGHT;
+
+            smartRUtils.prepareWindowSize(LINEGRAPH_WIDTH + MARGIN.left + MARGIN.right, LINEGRAPH_HEIGHT + MARGIN.top + MARGIN.bottom);
 
             var ANIMATION_DURATION = 500;
             var tmp_animation_duration = ANIMATION_DURATION;
