@@ -1,7 +1,8 @@
-<plugin name='transmart-metacore-plugin' version='1.2.2-SNAPSHOT' grailsVersion='2.3 &gt; *'>
+<plugin name='transmart-metacore-plugin' version='16.2-SNAPSHOT' grailsVersion='2.3 &gt; *'>
   <author>Valeria Hohlova</author>
   <title>Transmart Metacore Plugin</title>
-  <description>Provides MetaCore integration</description>
+  <description>Transmart MetaCore support
+</description>
   <documentation>http://grails.org/plugin/transmart-metacore-plugin</documentation>
   <type>TransmartMetacorePluginGrailsPlugin</type>
   <resources>
