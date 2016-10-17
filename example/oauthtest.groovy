@@ -12,12 +12,12 @@ import org.scribe.utils.Preconditions;
 class GrailsOAuth20Api extends DefaultApi20 {
 	@Override
 	public String getAccessTokenEndpoint() {
-		return "http://localhost:8080/transmart-rest-api/oauth/token?grant_type=authorization_code&redirect_uri=http://localhost:8080/transmart-rest-api/oauth/verify";
+		return "http://localhost:8080/transmart/oauth/token?grant_type=authorization_code&redirect_uri=http://localhost:8080/transmart/oauth/verify";
 	}
 
 	@Override
 	public String getAuthorizationUrl(OAuthConfig oAuthConfig) {
-		return "http://localhost:8080/transmart-rest-api/oauth/authorize?response_type=code&client_id=myId&client_secret=mySecret&redirect_uri=http://localhost:8080/transmart-rest-api/oauth/verify";
+		return "http://localhost:8080/transmart/oauth/authorize?response_type=code&client_id=api-client&client_secret=api-client&redirect_uri=http://localhost:8080/transmart/oauth/verify";
 	}
 
 	@Override
@@ -45,14 +45,14 @@ public class GrailsTokenExtractor implements AccessTokenExtractor {
 		}
 	}
 }
-final String PROTECTED_RESOURCE_URL = "http://localhost:8080/transmart-rest-api/studies";
+final String PROTECTED_RESOURCE_URL = "http://localhost:8080/transmart/studies";
 final Token EMPTY_TOKEN = new Token('', '')
 
 // If you choose to use a callback, "oauth_verifier" will be the return value by Twitter (request param)
 OAuthService service = new ServiceBuilder()
 		.provider(GrailsOAuth20Api.class)
-		.apiKey("myId")
-		.apiSecret("mySecret")
+		.apiKey("api-client")
+		.apiSecret("api-client")
 		.build();
 Scanner in2 = new Scanner(System.in);
 
