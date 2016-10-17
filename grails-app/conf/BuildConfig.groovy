@@ -13,6 +13,7 @@ grails.project.dependency.resolution = {
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
         grailsCentral()
+        mavenLocal()
         mavenCentral()
     }
     dependencies {
@@ -22,8 +23,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        runtime ':resources:1.2'
-        build(":tomcat:7.0.41",
+        runtime ':resources:1.2.1'
+        build(":tomcat:7.0.50",
               ":release:3.0.0",
               ":rest-client-builder:1.0.3") {
             export = false
