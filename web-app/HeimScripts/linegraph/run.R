@@ -53,9 +53,10 @@ getTypes <- function(loaded_variables) {
 
 # returns integer of extracted time if possible, NULL otherwise
 extractTime <- function(string) {
-    match <- regmatches(string, regexpr("\\d+", string)) 
-    if (length(match) > 0) {
-        return(as.numeric(match[1]))
+    match <- regmatches(string, regexpr("-? ?\\d+", string)) 
+    timeInteger <- as.numeric(match[1])
+    if (!is.na(timeInteger) && timeInteger%%1 == 0) {
+        return(timeInteger)
     }
     NULL
 }
@@ -107,7 +108,15 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                 if (is.null(timeInteger)) {
                     extractedTime <- extractTime(timeString)
                     if (is.null(extractedTime)) {
-                        timeInteger <- length(names(times))
+                        timeIntegers <- as.vector(unlist(times))
+                        timeInteger <- 0
+                        while (TRUE) {
+                            if (timeInteger %in% timeIntegers) {
+                                timeInteger <- timeInteger + 1
+                            } else {
+                                break;
+                            }
+                        }
                     } else {
                         timeInteger <- extractedTime
                     }
@@ -149,7 +158,15 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
             if (is.null(timeInteger)) {
                 extractedTime <- extractTime(timeString)
                 if (is.null(extractedTime)) {
-                    timeInteger <- length(names(times))
+                    timeIntegers <- as.vector(unlist(times))
+                    timeInteger <- 0
+                    while (TRUE) {
+                        if (timeInteger %in% timeIntegers) {
+                            timeInteger <- timeInteger + 1
+                        } else {
+                            break;
+                        }
+                    }
                 } else {
                     timeInteger <- extractedTime
                 }
