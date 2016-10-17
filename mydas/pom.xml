@@ -125,14 +125,14 @@
     </build>
 
     
-	<distributionManagement>
+    <distributionManagement>
         <repository>
             <id>repo.transmartfoundation.org-releases</id>
-            <url>http://repo.transmartfoundation.org/content/repositories/releases/</url>
+            <url>https://repo.transmartfoundation.org/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
             <id>repo.transmartfoundation.org-snapshots</id>
-            <url>http://repo.transmartfoundation.org/content/repositories/snapshots/</url>
+            <url>https://repo.transmartfoundation.org/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
