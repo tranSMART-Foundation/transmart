@@ -22,13 +22,6 @@ main <- function() {
     list(messages="Finished successfully")
 }
 
-# returns character vector (e.g. c("Age", "Alive" or "Week1", "Week2" if handling time series data))
-getNodeNames <- function(loaded_variables, fetch_params) {
-    names.without.subset <- sub("_s[1-2]{1}$", "", names(loaded_variables))
-    labels <- sapply(names.without.subset, function(el) fetch_params$ontologyTerms[[el]]$name)
-    as.character(as.vector(labels))
-}
-
 # returns character vector (e.g. c("\\Demo Study\\Vital Status\\Alive\\Week1", "\\Demo Study\\Vital Status\\Alive\\Week2", ...))
 getFullNames <- function(loaded_variables, fetch_params) {
     names.without.subset <- sub("_s[1-2]{1}$", "", names(loaded_variables))
@@ -65,7 +58,6 @@ extractTime <- function(string) {
 buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
     # gather information
     allSubsets <- getSubsets(loaded_variables)
-    nodeNames <- getNodeNames(loaded_variables, fetch_params)
     fullNames <- getFullNames(loaded_variables, fetch_params)
     types <- getTypes(loaded_variables)
 
@@ -100,9 +92,9 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                 subsets <- rep(allSubsets[i], nrow(variable.label.df))
                 patientIDs <- as.numeric(as.vector(variable.label.df$patientID))
                 patientIDs <- paste(patientIDs, subsets, sep="_")
-                bioMarker <- split[length(split) - 1]
+                bioMarker <- paste(split[length(split) - 2], split[length(split) - 1], sep="//")
                 bioMarker <- paste(bioMarker, rowLabel, variable.label.df$Bio.marker[1], sep="--")
-                timeString <- nodeNames[i]
+                timeString <- split[length(split)]
                 timeInteger <- times[timeString][[1]]
                 # if timeString never occured before, assign it a new timeInteger
                 if (is.null(timeInteger)) {
@@ -143,8 +135,8 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
             subsets <- rep(allSubsets[i], nrow(variable.df))
             patientIDs <- as.character(as.vector(variable.df$patientID))
             patientIDs <- paste(patientIDs, subsets, sep="_")
-            bioMarker <- split[length(split) - 1]
-            timeString <- nodeNames[i]
+            bioMarker <- paste(split[length(split) - 2], split[length(split) - 1], sep="//")
+            timeString <- split[length(split)]
             timeInteger <- times[timeString][[1]]
             values <- c()
             if (types[i] == "categoric") {
