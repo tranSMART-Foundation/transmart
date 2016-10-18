@@ -951,6 +951,28 @@ window.smartRApp.directive('lineGraph', [
                     tmpByPatientID.filterExact(d.patientID);
 
                     var iconPlacement = {};
+                    var iconBins = {};
+                    timeIntegers.map(function(d) { iconBins[d] = []; });
+                    var bioMarkers = smartRUtils.unique(getValuesForDimension(tmpByBioMarker));
+                    bioMarkers.forEach(function(bioMarker) {
+                        tmpByBioMarker.filterExact(bioMarker);
+                        var row = 0;
+                        while (true) {
+                            var iconData = tmpByRanking.bottom(Infinity);
+                            if (iconData.length === 0) { break; }
+                            var fits = iconData.every(function(e) { // jshint ignore:line
+                                return iconBins[e.timeInteger].indexOf(row) === -1;
+                            });
+                            if (fits) {
+                                iconData.forEach(function(e) { iconBins[e.timeInteger].push(row); }); // jshint ignore:line
+                                iconPlacement[bioMarker] = row;
+                                break;
+                            }
+                            row += 1;
+                        }
+                        tmpByBioMarker.filterAll();
+                    });
+
 
                     // DATA JOIN
                     var icon = d3.select(this).selectAll('.sr-lg-cat-icon')
@@ -1008,9 +1030,7 @@ window.smartRApp.directive('lineGraph', [
                     // UPDATE polygon
                     icon.attr('points', function(d) { return iconGen(d.bioMarker).shape(ICON_SIZE - 2); }) // -2 for better fit
                         .attr('transform', function(d) {
-                            iconPlacement[d.timeInteger] = typeof iconPlacement[d.timeInteger] === 'undefined' ?
-                                0 : iconPlacement[d.timeInteger] + 1;
-                            var innerIconRow = iconPlacement[d.timeInteger];
+                            var innerIconRow = iconPlacement[d.bioMarker];
                             return 'translate(' + (x(d.timeInteger) - ICON_SIZE / 2) + ',' + (innerIconRow * ICON_SIZE + 1) + ')';
                         });
                     tmpByPatientID.filterAll();
