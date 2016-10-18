@@ -96,20 +96,22 @@ window.smartRApp.directive('conceptBox', [
                     scope.instructionMinNodes = scope.conceptGroup.concepts.length < min;
                     scope.instructionMaxNodes = max !== -1 && scope.conceptGroup.concepts.length > max;
                     scope.instructionNodeType = !_containsOnlyCorrectType();
-                    if (scope.type === 'HD' && scope.conceptGroup.concepts.length > 1) {
-                        _getNodeDetails(scope.conceptGroup.concepts, function(response) {
-                            if (Object.keys(response.data).length < 2) {
-                                var platforms = response.data[Object.keys(response.data)[0]].platforms;
-                                scope.instructionNodePlatform = !platforms.every(function(el) { 
-                                    return el.title === platforms[0].title;
-                                });
-                            } else {
-                                scope.instructionNodePlatform = true;
-                            }
-                        });
-                    } else {
-                        scope.instructionNodePlatform = false;
-                    }
+                    // FIXME: Disabled for now because this causes problems with certain datasets for unknown reasons
+                    // if (scope.type === 'HD' && scope.conceptGroup.concepts.length > 1) {
+                    //     _getNodeDetails(scope.conceptGroup.concepts, function(response) {
+                    //         if (Object.keys(response.data).length < 2) {
+                    //             var platforms = response.data[Object.keys(response.data)[0]].platforms;
+                    //             scope.instructionNodePlatform = !platforms.every(function(el) { 
+                    //                 return el.title === platforms[0].title;
+                    //             });
+                    //         } else {
+                    //             scope.instructionNodePlatform = true;
+                    //         }
+                    //     });
+                    // } else {
+                    //     scope.instructionNodePlatform = false;
+                    // }
+                    scope.instructionNodePlatform = false;
                 };
 
                 scope.$watchGroup([
