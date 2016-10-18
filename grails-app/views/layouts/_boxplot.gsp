@@ -11,7 +11,7 @@
                          type="HD"
                          min="-1"
                          max="-1"
-                         label="Highdimensional Variables"
+                         label="High Dimensional Variables"
                          tooltip="Select one or more high dimensional variables that you would like to have displayed.">
             </concept-box>
             <concept-box style="display: inline-block;"
