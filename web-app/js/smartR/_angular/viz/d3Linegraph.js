@@ -1000,6 +1000,7 @@ window.smartRApp.directive('lineGraph', [
                                 };
                                 animateCorrStats();
                             }, function(response) {
+                                d3.selectAll('.sr-lg-cat-plot *').style('opacity', 1);
                                 console.error(response);
                             });
                         });
