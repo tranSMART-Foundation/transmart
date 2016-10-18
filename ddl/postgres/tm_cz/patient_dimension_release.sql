@@ -9,7 +9,7 @@ CREATE TABLE patient_dimension_release (
     sex_cd character varying(50),
     age_in_years_num bigint,
     language_cd character varying(50),
-    race_cd character varying(50),
+    race_cd character varying(100),
     marital_status_cd character varying(50),
     religion_cd character varying(50),
     zip_cd character varying(50),

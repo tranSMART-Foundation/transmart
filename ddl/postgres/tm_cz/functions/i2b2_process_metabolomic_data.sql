@@ -41,7 +41,6 @@ Declare
   gplTitle		varchar(1000);
   pExists		bigint;
   partTbl   	bigint;
-  partExists 	bigint;
   sampleCt		bigint;
   idxExists 	bigint;
   logBase		bigint;
@@ -321,46 +320,10 @@ BEGIN
 	stepCt := stepCt + 1;
 	perform cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
 
-	select count(*) into partExists
-	from deapp.de_subject_sample_mapping sm
-	where sm.trial_name = TrialId
-	and coalesce(sm.source_cd,'STD') = sourceCd
-	and sm.platform = 'METABOLOMICS'
-	and sm.partition_id is not null;
+	select nextval('deapp.seq_metabolomics_partition_id') into partitionId;
 	
-	if partExists = 0 then
-		select nextval('deapp.seq_metabolomics_partition_id') into partitionId;
-	else
-		select distinct partition_id into partitionId
-		from deapp.de_subject_sample_mapping sm
-		where sm.trial_name = TrialId
-		and coalesce(sm.source_cd,'STD') = sourceCd
-		and sm.platform = 'METABOLOMICS';
-	end if;
-
 	partitionName := 'deapp.de_subject_metabolomics_data_' || partitionId::text;
 	partitionIndx := 'de_subject_metabolomics_data_' || partitionId::text;
-
-	--	Cleanup any existing data in de_subject_sample_mapping.  
-	begin
-	delete from DE_SUBJECT_SAMPLE_MAPPING 
-	where trial_name = TrialID 
-	  and coalesce(source_cd,'STD') = sourceCd
-	  and platform = 'METABOLOMICS'; --Making sure only metabolomic data is deleted
-	  get diagnostics rowCt := ROW_COUNT;
-	  exception
-	when others then
-		errorNumber := SQLSTATE;
-		errorMessage := SQLERRM;
-		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
-		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
-		return -16;
-	end;
-		  
-	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Delete trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 
 --	truncate tmp node table
 

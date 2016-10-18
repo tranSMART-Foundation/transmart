@@ -49,7 +49,6 @@ Declare
 	gplTitle		varchar(1000);
 	pExists			numeric;
 	partTbl   		numeric;
-	partExists 		numeric;
 	sampleCt		numeric;
 	idxExists 		numeric;
 	logBase			numeric;
@@ -357,25 +356,9 @@ BEGIN
 	stepCt := stepCt + 1;
 	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done') into rtnCd;
 
-	--	check if trial/source_cd already loaded, if yes, get existing partition_id else get new one
-
-	select count(*) into partExists
-	from deapp.de_subject_sample_mapping sm
-	where sm.trial_name = TrialId
-	  and coalesce(sm.source_cd,'STD') = sourceCd
-	  and sm.platform = 'MRNA_AFFYMETRIX'
-	  and sm.partition_id is not null;
-
-	if partExists = 0 then
-		select nextval('deapp.seq_mrna_partition_id') into partitionId;
-	else
-		select distinct partition_id into partitionId
-		from deapp.de_subject_sample_mapping sm
-		where sm.trial_name = TrialId
-		  and coalesce(sm.source_cd,'STD') = sourceCd
-		  and sm.platform = 'MRNA_AFFYMETRIX';
-	end if;
-
+	--	get next partitionId
+    select nextval('deapp.seq_mrna_partition_id') into partitionId;
+	
 	partitionName := 'deapp.de_subject_microarray_data_' || partitionId::text; -- revert to using partitions
 	partitionIndx := 'de_subject_microarray_data_' || partitionId::text; -- revert to using partitions
 	-- partitionName := 'deapp.de_subject_microarray_data';

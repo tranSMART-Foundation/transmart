@@ -356,16 +356,8 @@ BEGIN
 	  and sm.platform = 'ACGH'
 	  and sm.partition_id is not null;
 
-	if partExists = 0 then
-		select nextval('deapp.seq_mrna_partition_id') into partitionId;
-	else
-		select distinct partition_id into partitionId
-		from deapp.de_subject_sample_mapping sm
-		where sm.trial_name = TrialId
-		  and coalesce(sm.source_cd,'STD') = sourceCd
-		--  and sm.platform = 'MRNA_AFFYMETRIX';
-		  and sm.platform = 'ACGH';
-	end if;
+	-- take new partition regardless of partExists, but we need the partExists value later
+	select nextval('deapp.seq_mrna_partition_id') into partitionId;
 
 	partitionName := 'deapp.de_subject_acgh_data_' || partitionId::text;
 	partitionIndx := 'de_subject_acgh_data_' || partitionId::text;
