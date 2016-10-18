@@ -68,7 +68,7 @@ BEGIN
 	stepCt := stepCt + 1;
 	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete counts for trial from I2B2DEMODATA concept_counts',rowCt,stepCt,'Done') into rtnCd;
 
-	--	Join each node (folder or leaf) in the path to it's leaf in the work table to count patient numbers
+	--	Join each node (folder or leaf) in the path to its leaf in the work table to count patient numbers
 
 	begin
 	insert into i2b2demodata.concept_counts
@@ -82,12 +82,10 @@ BEGIN
 	from i2b2metadata.i2b2 fa
 	    ,i2b2metadata.i2b2 la
 		,i2b2demodata.observation_fact tpm
-		,i2b2demodata.patient_dimension p
 	where fa.c_fullname like path || '%' escape '`'
 	  and substr(fa.c_visualattributes,2,1) != 'H'
 	  and la.c_fullname like fa.c_fullname || '%' escape '`'
 	  and la.c_visualattributes like 'L%'
-	  and tpm.patient_num = p.patient_num
 	  and la.c_basecode = tpm.concept_cd   -- outer join in oracle ???
 	group by fa.c_fullname
 			,ltrim(SUBSTR(fa.c_fullname, 1,instr(fa.c_fullname, '\',-1,2)));
