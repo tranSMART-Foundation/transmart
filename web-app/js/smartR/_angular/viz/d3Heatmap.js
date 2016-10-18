@@ -111,7 +111,9 @@ window.smartRApp.directive('heatmapPlot', [
                 animateCutoff(parseInt(cutoffRange.value));
                 setCutoffBtnText();
             });
-            cutoffRange.setAttribute('max', maxRows - JSON.parse(JSON.stringify(scope.params.selections.selectedRownames)).length - 1);
+            var numSelectedRownames = JSON.parse(JSON.stringify(scope.params.selections.selectedRownames)).length;
+            maxRows = numSelectedRownames === 0 ? maxRows : selectedColNames;
+            cutoffRange.setAttribute('max', maxRows - 1);
             cutoffRange.value = 0;
             cutoffRange.disabled = parseInt(cutoffRange.max) <= 1;
             
