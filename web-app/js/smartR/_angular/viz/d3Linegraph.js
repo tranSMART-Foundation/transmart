@@ -1197,7 +1197,7 @@ window.smartRApp.directive('lineGraph', [
                     icons.each(function(d) { 
                         d3.select(this.parentNode).append('circle')
                             .attr('class', 'sr-lg-cat-stat-icon')
-                            .attr('cx', x(d.timeInteger) + ICON_SIZE * 3 / 2)
+                            .attr('cx', x(d.timeInteger) + ICON_SIZE)
                             .attr('cy', d3.transform(d3.select(this).attr('transform')).translate[1] + ICON_SIZE / 2)
                             .attr('r', ICON_SIZE * Math.abs(stat.corrCoef) / 2)
                             .on('mouseover', function() {
