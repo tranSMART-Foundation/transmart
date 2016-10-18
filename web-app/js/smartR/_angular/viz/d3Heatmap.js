@@ -559,7 +559,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .attr('x', function(d) { return -histogramScale(d[ranking]); })
                     .style('fill', function(d) { return d[ranking] > 0 ? '#990000' : 'steelblue'; });
 
-                var featurePosY = -gridFieldWidth * 2 - longestColNameLength;
+                var featurePosY = -gridFieldWidth * 2 - longestColNameLength + 20;
 
                 var extraSquare = featureItems.selectAll('.extraSquare')
                     .data(extraFields);
