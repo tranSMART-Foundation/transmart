@@ -1,7 +1,5 @@
 main <- function(params) {
     df <- runResults$data_matrix
-    save(params, file="~/params.Rda")
-    save(df, file="~/df.Rda")
     # we only care about categoric data in this script
     cat.df <- df[df$type == "categoric", ]
 
