@@ -14,11 +14,11 @@ CREATE TABLE de_subject_rbm_data_release (
     timepoint character varying(100),
     data_uid character varying(100),
     value bigint,
-    log_intensity bigint,
-    mean_intensity bigint,
-    stddev_intensity bigint,
-    median_intensity bigint,
-    zscore bigint,
+    log_intensity double precision,
+    mean_intensity double precision,
+    stddev_intensity double precision,
+    median_intensity double precision,
+    zscore double precision,
     rbm_panel character varying(50),
     release_study character varying(15)
 );

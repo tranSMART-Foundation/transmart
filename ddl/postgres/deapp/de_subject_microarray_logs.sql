@@ -9,7 +9,7 @@ CREATE TABLE de_subject_microarray_logs (
     gene_symbol character varying(50),
     assay_id bigint,
     patient_id bigint,
-    subject_id character varying(20),
+    subject_id character varying(100),
     trial_name character varying(15),
     timepoint character varying(30),
     log_intensity numeric

@@ -281,26 +281,26 @@ BEGIN
 	EXCEPTION
 	--when unmapped_patients then
 	--	cz_write_audit(jobId,databasename,procedurename,'No site_id/subject_id mapped to patient_dimension',1,stepCt,'ERROR');
-	--	cz_error_handler(jobid,procedurename);
+	--	cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 	--	cz_end_audit (jobId,'FAIL');
 	when missing_platform then
 		cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		cz_error_handler(jobid,procedurename);
+		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		cz_end_audit (jobId,'FAIL');
 		--select 16 into rtn_code from dual;
 	when missing_tissue then
 		cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		cz_error_handler(jobid,procedurename);
+		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		CZ_END_AUDIT (JOBID,'FAIL');
 		--select 16 into rtn_code from dual;
 	when unmapped_platform then
 		cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_mrna_annotation',1,stepCt,'ERROR');
-		CZ_ERROR_HANDLER(JOBID,PROCEDURENAME);
+		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		cz_end_audit (jobId,'FAIL');
 		--select 16 into rtn_code from dual;
 	WHEN OTHERS THEN
 		--Handle errors.
-		cz_error_handler (jobID, procedureName);
+		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		--End Proc
 		cz_end_audit (jobID, 'FAIL');
 		--select 16 into rtn_code from dual;

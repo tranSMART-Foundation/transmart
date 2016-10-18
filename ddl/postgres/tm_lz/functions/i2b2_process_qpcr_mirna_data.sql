@@ -979,36 +979,36 @@ BEGIN
 	EXCEPTION
 	--when unmapped_patients then
 	--	cz_write_audit(jobId,databasename,procedurename,'No site_id/subject_id mapped to patient_dimension',1,stepCt,'ERROR');
-	--	cz_error_handler(jobid,procedurename);
+	--	cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 	--	cz_end_audit (jobId,'FAIL');
 	when missing_platform then
 		cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		cz_error_handler(jobid,procedurename);
+		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		cz_end_audit (jobId,'FAIL');
 		PERFORM 161 into rtn_code ;
 	when missing_tissue then
 		cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		cz_error_handler(jobid,procedurename);
+		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		CZ_END_AUDIT (JOBID,'FAIL');
 		PERFORM 162 into rtn_code ;
 	when unmapped_platform then
 		cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_qpcr_mirna_annotation',1,stepCt,'ERROR');
-		CZ_ERROR_HANDLER(JOBID,PROCEDURENAME);
+		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		cz_end_audit (jobId,'FAIL');
 		PERFORM 163 into rtn_code ;--mod
 	when multiple_platform then
 		cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in LT_SRC_MIRNA_SUBJ_SAMP_MAP',1,stepCt,'ERROR');
-		CZ_ERROR_HANDLER(JOBID,PROCEDURENAME);
+		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		cz_end_audit (jobId,'FAIL');
 		PERFORM 164 into rtn_code ;
 	when no_probeset_recs then
 		cz_write_audit(jobId,databasename,procedurename,'Unable to match probesets to platform in probeset_deapp',1,stepCt,'ERROR');
-		CZ_ERROR_HANDLER(JOBID,PROCEDURENAME);
+		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		cz_end_audit (jobId,'FAIL');
 		PERFORM 165 into rtn_code ;
 	WHEN OTHERS THEN
 		--Handle errors.
-		cz_error_handler (jobID, procedureName);
+		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		--End Proc
 		cz_end_audit (jobID, 'FAIL');
 		PERFORM 16  into rtn_code ;

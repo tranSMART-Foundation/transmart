@@ -2,7 +2,7 @@
 -- Name: heat_map_results; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE heat_map_results (
-    subject_id character varying(50),
+    subject_id character varying(100),
     log_intensity double precision,
     cohort_id character varying(255),
     probe_id character varying(100),
