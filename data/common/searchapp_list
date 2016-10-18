@@ -10,5 +10,3 @@ search_request_map
 search_role
 search_role_auth_user
 search_sec_access_level
-search_taxonomy
-search_taxonomy_rels
