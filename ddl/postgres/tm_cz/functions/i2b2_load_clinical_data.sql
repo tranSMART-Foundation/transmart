@@ -135,7 +135,7 @@ Declare
 	
 	if topLevel < 3 then
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Path specified in top_node must contain at least 2 nodes',0,stepCt,'Message') into rtnCd;
+		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Path specified in top_node must contain at least 2 nodes',0,stepCt,'Msg') into rtnCd;
 		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
 		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
 		return -16;
@@ -656,7 +656,7 @@ Declare
 			  
 	if rowCt > 0 then
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Duplicate values found in key columns',0,stepCt,'Message') into rtnCd;
+		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Duplicate values found in key columns',0,stepCt,'Msg') into rtnCd;
 		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
 		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
 		return -16;
@@ -679,7 +679,7 @@ Declare
 			  
 	if pCount > 0 then
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Multiple visit names for category/label/value',0,stepCt,'Message') into rtnCd;
+		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Multiple visit names for category/label/value',0,stepCt,'Msg') into rtnCd;
 		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
 		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
 		return -16;
