@@ -300,9 +300,8 @@ class DataFetchTask extends AbstractTask {
         List<String> commands = [
                 "if (!exists('loaded_variables')) { loaded_variables <- list() }",
                 """
-                require(data.table);
-                loaded_variables[['$escapedLabel']] <- fread(
-                               '$escapedFilename', sep = "\t", header = TRUE, stringsAsFactors = FALSE, data.table=FALSE);
+                loaded_variables[['$escapedLabel']] <- read.csv(
+                               '$escapedFilename', sep = "\t", header = TRUE, stringsAsFactors = FALSE);
                 loaded_variables <- loaded_variables[order(names(loaded_variables))]; # for determinism
                 names(loaded_variables)""",
         ]
