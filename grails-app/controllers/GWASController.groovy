@@ -1027,29 +1027,6 @@ class GWASController {
         return html
     }
 
-    /***
-     * 
-     * Returns list of secure Gwas analyses.
-     * 
-     */
-
-    def getExperimentSecureStudyList(){
-
-        StringBuilder s = new StringBuilder();
-        s.append("SELECT so.bioDataUniqueId, so.bioDataId FROM SecureObject so Where so.dataType='Experiment'")
-        def t=[:];
-        //return access levels for the children of this path that have them
-        def results = SecureObject.executeQuery(s.toString());
-        for (row in results){
-            def token = row[0];
-            def dataid = row[1];
-            token=token.replaceFirst("EXP:","")
-            log.info(token+":"+dataid);
-            t.put(token,dataid);
-        }
-        return t;
-    }
-
     // Load the trial analysis for the given trial
     def getTrialAnalysis = {
         new AccessLog(username: springSecurityService.getPrincipal().username,
