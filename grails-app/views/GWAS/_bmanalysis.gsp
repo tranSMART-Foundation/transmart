@@ -49,6 +49,7 @@
                <ul>
                   <li><a href="#results_${analysisId}">Analysis Results</a></li>
                   <li><a href="#qqplot_${analysisId}" onclick="loadQQPlot('${analysisId}');">QQ Plot</a></li>
+                  <li><a href="#manhattanplot_${analysisId}" onclick="loadManhattanPlot('${analysisId}');">Manhattan Plot</a></li>
                </ul>
              
                 <div id="results_${analysisId}">
@@ -81,6 +82,19 @@
                      <div id ="qqplot_results_${analysisId}" class="heatmap_analysis"></div>
 
                   </div>
+               </div>
+               
+                <div id="manhattanplot_${analysisId}">
+                  <div class='vis-toolBar' >
+                   <div id="btnmanhattanplotExport_${analysisId}" class='vis-toolbar-item' onclick="">
+                        <a href="" target="_blank" id="manhattanplot_export_${analysisId}">
+                            <img alt="" src="${resource(dir:'images',file:'internal-link.gif')}" /> Export as PNG
+                        </a>
+                     </div>
+
+                     <div id ="manhattanplot_results_${analysisId}" class="heatmap_analysis"></div>
+
+		     </div>
                </div>
             </div>
         </div>

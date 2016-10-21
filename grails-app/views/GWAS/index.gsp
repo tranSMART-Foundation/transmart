@@ -5,63 +5,19 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" >        
         
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
-        <title>${grailsApplication.config.com.recomdata.searchtool.appTitle}</title>
-        
-        <!-- jQuery CSS for cupertino theme -->
-        <link rel="stylesheet" href="${resource(dir:'css',file:'/jquery/cupertino/jquery-ui-1.8.18.custom.css')}"></link>        
-        <link rel="stylesheet" href="${resource(dir:'css',file:'/jquery/skin/ui.dynatree.css')}"></link>        
-        
-        <!-- Our CSS -->
-        <link rel="stylesheet" href="${resource(dir:'css',file:'/jquery.loadmask.css')}"></link>
-        <link rel="stylesheet" href="${resource(dir:'css',file:'/main.css')}"></link>        
-        <link rel="stylesheet" href="${resource(dir:'css',file:'/colorbox.css')}"></link>
-        <link rel="stylesheet" href="${resource(dir:'css',file:'/jquery/simpleModal.css')}"></link>
-        <link rel="stylesheet" href="${resource(dir:'css',file:'/jquery/multiselect/ui.multiselect.css')}"></link>
-        <link rel="stylesheet" href="${resource(dir:'css',file:'/jquery/multiselect/common.css')}"></link>
-                                
+        <title>${grailsApplication.config.com.recomdata.appTitle}</title>
+
         <!-- jQuery JS libraries -->
-        <script type="text/javascript" src="${resource(dir:'js', file:'/jQuery/jquery-1.8.3.min.js')}"></script>   
-	    <script>jQuery.noConflict();</script> 
-        
-        <script type="text/javascript" src="${resource(dir:'js', file:'/jQuery/jquery-ui.min.js')}"></script>
-        
-        <script type="text/javascript" src="${resource(dir:'js', file:'/jQuery/jquery.cookie.js')}"></script>   
-        <script type="text/javascript" src="${resource(dir:'js', file:'/jQuery/jquery.dynatree.min.js')}"></script>
-        <script type="text/javascript" src="${resource(dir:'js', file:'/jQuery/jquery.paging.min.js')}"></script>
-		<script type="text/javascript" src="${resource(dir:'js', file:'/jQuery/jquery.loadmask.min.js')}"></script>   
- 		<script type="text/javascript" src="${resource(dir:'js', file:'/jQuery/jquery.ajaxmanager.js')}"></script>  
-  		<script type="text/javascript" src="${resource(dir:'js', file:'/jQuery/jquery.numeric.js')}"></script>
-  		<script type="text/javascript" src="${resource(dir:'js', file:'/jQuery/jquery.colorbox-min.js')}"></script>  
-  		<script type="text/javascript" src="${resource(dir:'js', file:'/jQuery/jquery.simplemodal.min.js')}"></script>  
-  		<script type="text/javascript" src="${resource(dir:'js', file:'/jQuery/jquery.dataTables.js')}"></script>
-  		<script type="text/javascript" src="${resource(dir:'js', file:'/facetedSearch/facetedSearchBrowse.js')}"></script>
-  		<script type="text/javascript" src="${resource(dir:'js', file:'/jQuery/ui.multiselect.js')}"></script>
-  		<script type="text/javascript" src="${resource(dir:'js', file:'/help/D2H_ctxt.js')}"></script>
-  		
-  		<g:ifPlugin name="folder-management">
-            <g:render template="/folderManagementUrls" plugin="folderManagement"/>
+
+        <r:require module="gwasTab" />
+        <r:script disposition="head">window.jQuery = jQuery.noConflict();</r:script>
+        <r:layoutResources /><%-- XXX: Use template --%>
+
+        <g:ifPlugin name="folder-management">
+             <g:render template="/folderManagementUrls" plugin="folderManagement"/>
   			<script type="text/javascript" src="${resource(dir:'js', file:'folderManagement.js', plugin: 'folderManagement')}"></script>
   			<link rel="stylesheet" href="${resource(dir:'css', file:'folderManagement.css', plugin: 'folderManagement')}"></link>        
   		</g:ifPlugin>
-
-
-            <script type="text/javascript" src="${resource(dir:'js', file:'gwas.js', plugin:'transmart-gwas')}"></script>
-            <link rel="stylesheet" href="${resource(dir:'css', file:'gwas.css', plugin: 'transmart-gwas')}"></link>
-  
-  		        
-  		<!--  SVG Export -->
-  		<script type="text/javascript" src="${resource(dir:'js',file:'/svgExport/rgbcolor.js')}"></script>  
-  		  
-	
-        <g:javascript library="prototype" /> 
-        
-        <!-- Our JS -->        
-       
-        <script type="text/javascript" src="${resource(dir:'js',file:'/maintabpanel.js')}"></script>
-        
-        <!-- Protovis Visualization library and IE plugin (for lack of SVG support in IE8) -->
-        <script type="text/javascript" src="${resource(dir:'js',file:'/protovis/protovis-r3.2.js')}"></script>
-        <script type="text/javascript" src="${resource(dir:'js',file:'/protovis/protovis-msie.min.js')}"></script> 
 
         <script type="text/javascript" charset="utf-8">
 	        var searchResultsURL = "${createLink([action:'loadSearchResults'])}";
@@ -86,7 +42,7 @@
 	        var getStudyAnalysesUrl = "${createLink([controller:'GWAS',action:'getTrialAnalysis'])}";
         
 			//These are the URLS for the different browse windows.
-			var studyBrowseWindow = "${createLink([controller:'experiment',action:'browseExperimentsMultiSelect',plugin: 'biomartForGit'])}";
+			var studyBrowseWindow = "${createLink([controller:'experiment',action:'browseGWASExperimentsMultiSelect',plugin: 'biomartForGit'])}";
 			var analysisBrowseWindow = "${createLink([controller:'experimentAnalysis',action:'browseAnalysisMultiSelect',plugin: 'biomartForGit'])}";
 			var dataTypeBrowseWindow = "${createLink([controller:'GWAS',action:'browseDataTypesMultiSelect'])}";
         </script>
@@ -163,8 +119,14 @@
 				$('#save-modal .basic').click(openSaveSearchDialog);
 			});
 		</script>
+		<script type="text/javascript">
+    			var sMailto = "mailto:${grailsApplication.config.com.recomdata.contactUs}?subject=tranSMART Bug/Feature Requests";
+ 
+    			function doMailto() {
+       				document.location.href = sMailto;
+   			}
+ 		</script>
 
-        <r:layoutResources /><%-- XXX: Use template --%>
     </head>
     <body>
         <div id="header-div">        
@@ -190,9 +152,9 @@
 				<div class='toolbar-item' onclick="jQuery('.analysesopen .analysischeckbox').attr('checked', 'checked'); updateSelectedAnalyses();">Select All Visible Analyses</div>
 				<div class='toolbar-item' onclick="jQuery('.analysesopen .analysischeckbox').removeAttr('checked'); updateSelectedAnalyses();">Unselect All Visible Analyses</div>
 	  			<div class='toolbar-item' onclick="filterSelectedAnalyses();">Add Selected to Filter</div>
-<!--
+
 				<div class='toolbar-item' onclick="exportAnalysisandMail();"> Email Analysis</div>
--->
+
                 <g:ifPlugin name="folder-management">
                     <div class="toolbar-item">
                         <g:render template="/fmFolder/exportCart" model="[exportCount: exportCount]" plugin="folderManagement"/>
@@ -222,48 +184,49 @@
 						</ul>
 					</div>
 				</div>--%>
-						<div style="display: inline-block;">
-			 <tmpl:/GWAS/helpIcon id="1289"/>
-		</div>
+				<div style="display: inline-block;">
+				  <tmpl:/GWAS/helpIcon id="1289"/>
+				</div>
 			</div>
 		
 			<div id="topTabs" class="analysis-tabs">
-		       <ul>
-		          <li id="analysisViewTab"><a href="#results-div" onclick="showSearchResults('analysis')">Analysis View</a></li>
-		          <li id="tableViewTab"><a href="#table-results-div" onclick="showSearchResults('table')">Table View</a></li>
-		       </ul>
-		     
-	       		<div id="results-div">
-	
-	         	
-				</div>
-				
-				<div id="table-results-div">
-					<div id="results_table_wrapper" class="dataTables_wrapper" role="grid">
-					</div>
-				</div> 
+			  <ul>
+		            <li id="analysisViewTab"><a href="#results-div" onclick="showSearchResults('analysis')">Analysis View</a></li>
+		            <li id="tableViewTab"><a href="#table-results-div" onclick="showSearchResults('table')">Table View</a></li>
+			  </ul>
+
+	       		  <div id="results-div">
+
+			  </div>
+
+			  <div id="table-results-div">
+			    <div id="results_table_wrapper" class="dataTables_wrapper" role="grid">
+			    </div>
+			  </div> 
 			</div>
 		</div>
               
-        <div id="search-div">         
-            <select id="search-categories"></select>                          
-            <input id="search-ac"/></input>                                                          
-        </div>
+		<button id="feedBack"><a href="javascript:doMailto()" style="text-decoration: none;"><font color="#FFFFFF">User Feedback</font></a></button>
+
+		<div id="search-div">         
+		  <select id="search-categories"></select>                          
+		  <input id="search-ac" placeholder="type search here"/></input>                                                          
+		</div>
        
-        <div id="title-search-div" class="ui-widget-header boxtitle">
-	         <h2 style="float:left" class="title">Active Filters</h2>
-	         <div id="activeFilterHelp" style="float: right; margin: 2px">
-				<tmpl:/GWAS/helpIcon id="1298"/>
-			 </div>
-			 <h2 style="float:right; padding-right:5px;" class="title">
-			 	<%-- Save/load disabled for now
-			 	
-			 	<span id='save-modal'>
-			 		<a href="#" class="basic">Save</a>
-				 </span>
-			 	<a href="#" onclick="loadSearch(); return false;">Load</a>--%>
-			 	<a href="#" onclick="clearSearch(); return false;">Clear</a>
-			 </h2> 
+		<div id="title-search-div" class="ui-widget-header boxtitle">
+	          <h2 style="float:left" class="title">Active Filters</h2>
+	          <div id="activeFilterHelp" style="float: right; margin: 2px">
+		    <tmpl:/GWAS/helpIcon id="1298"/>
+		  </div>
+		  <h2 style="float:right; padding-right:5px;" class="title">
+		    <%-- Save/load disabled for now
+
+			 <span id='save-modal'>
+			   <a href="#" class="basic">Save</a>
+			 </span>
+			 <a href="#" onclick="loadSearch(); return false;">Load</a>--%>
+		    <a href="#" onclick="clearSearch(); return false;">Clear</a>
+		  </h2> 
 		</div>
 
 		<!-- Save search modal content -->
@@ -280,73 +243,71 @@
 		<div id="active-search-div"></div>
 	 
 		<div id="title-filter" class="ui-widget-header boxtitle">
-			 <h2 style="float:left" class="title">Filter Browser</h2>		
-	         <div id="filterBrowserHelp" style="float: right; margin: 2px">
-				<tmpl:/GWAS/helpIcon id="1297"/>
-			 </div>	 
+		  <h2 style="float:left" class="title">Filter Browser</h2>		
+	          <div id="filterBrowserHelp" style="float: right; margin: 2px">
+		    <tmpl:/GWAS/helpIcon id="1297"/>
+		  </div>	 
 		</div>
 		<div id="side-scroll">
-		        <div id="filter-div"></div>
+		  <div id="filter-div"></div>
 		</div>
 		<button id="toggle-btn"></button>
 		<div id="searchHelp" style="position: absolute; top: 30px; left: 272px">
-			<tmpl:/GWAS/helpIcon id="1296"/>
+		  <tmpl:/GWAS/helpIcon id="1296"/>
 		</div>
 		
 		<div id="hiddenItems" style="display:none">
-		        <!-- For image export -->
-		        <canvas id="canvas" width="1000px" height="600px"></canvas>  
-
+		  <!-- For image export -->
+		  <canvas id="canvas" width="1000px" height="600px"></canvas>  
 		</div>
 	
 		<!--  This is the DIV we stuff the browse windows into. -->
 		<div id="divBrowsePopups" style="width:800px; display: none;">
 			
 		</div>
-		
-        <g:ifPlugin name="transmart-gwas">
-            <g:render template="/manhattan/plotOptions" plugin="transmartGwas"/>
+
+	<g:ifPlugin name="transmart-gwas">
+          <g:render template="/manhattan/plotOptions" plugin="transmartGwas"/>
         </g:ifPlugin>
-		<!-- This DIV for export Analysis details -->
+
+	<!-- This DIV for export Analysis details -->
 		<div id="divMailStatus"></div>
 		<div id="divTomailIds" style="width:300px; display: none;">
-			<table class="columndetail">
-				<tr>
-				<td class="columnname">Send mail to :</td>
-					<td>
-						<input id="toEmailID" style="width: 210px">
-					</td>
-				</tr>
-			</table><br><br>
-				<g:radio name="radioMail" value="link" checked="true"/>Send as Link (full set) <br><br>
-				<g:radio name="radioMail" value="attachment" />Send as Attachment(top 200 rows)
+		  <table class="columndetail">
+		    <tr>
+		      <td class="columnname">Send mail to :</td>
+		      <td>
+			<input id="toEmailID" style="width: 210px">
+		      </td>
+		    </tr>
+		  </table><br><br>
+		  <g:radio name="radioMail" value="link" checked="true"/>Send as Link (full set) <br><br>
+		  <g:radio name="radioMail" value="attachment" />Send as Attachment(top 200 rows)
 
 		</div>
+
 		<!--  Everything for the across trial function goes here and is displayed using colorbox -->
 		<div style="display:none">
-			<div id="xtHolder">
-				<div id="xtTopbar">
-					<p>Cross Trial Analysis</p>
-					<ul id="xtMenu">
-						<li>Summary</li>
-						<li>Heatmap</li>
-						<li>Boxplot</li>
-					</ul>
-					<p>close</p>
-				</div>
-				<div id="xtSummary"><!-- Summary Tab Content -->
-							
-				
-				</div>
-				<div id="xtHeatmap"><!-- Heatmap Tab Content -->
-				
-				
-				</div>
-				<div id="xtBoxplot"><!-- Boxplot Tab Content -->
-				
-				
-				</div>
-			</div>
+		  <div id="xtHolder">
+		    <div id="xtTopbar">
+		      <p>Cross Trial Analysis</p>
+		      <ul id="xtMenu">
+			<li>Summary</li>
+			<li>Heatmap</li>
+			<li>Boxplot</li>
+		      </ul>
+		      <p>close</p>
+		    </div>
+		    <div id="xtSummary"><!-- Summary Tab Content -->
+
+		    </div>
+		    <div id="xtHeatmap"><!-- Heatmap Tab Content -->
+
+		    </div>
+		    <div id="xtBoxplot"><!-- Boxplot Tab Content -->
+
+		    </div>
+		  </div>
 		</div>
        <!--  Used to measure the width of a text element (in svg plots) -->
        <span id="ruler" style="visibility: hidden; white-space: nowrap;"></span> 

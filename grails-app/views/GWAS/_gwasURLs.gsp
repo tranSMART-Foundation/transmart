@@ -6,4 +6,5 @@
     var getTableDataURL = "${createLink([controller:'gwasSearch',action:'getTableResults'])}";
     var getAnalysisDataURL = "${createLink([controller:'gwasSearch',action:'getAnalysisResults'])}";
     var exportAnalysisURL = "${createLink([controller:'gwasSearch', action:'exportAnalysis'])}";
+    var getManhattanPlotUrl = "${createLink([controller:'gwasSearch',action:'getManhattanPlotImage'])}";
 </script>

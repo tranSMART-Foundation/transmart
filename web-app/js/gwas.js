@@ -34,6 +34,41 @@ function loadQQPlot(analysisID) {
 			});
 }
 
+//added by hari
+//This  function loads Manhattan Plot
+function loadManhattanPlot(analysisID) {
+	jQuery('#manhattanplot_results_' + analysisID).empty().addClass('ajaxloading');
+	jQuery
+			.ajax({
+				"url" : getManhattanPlotUrl,
+				bDestroy : true,
+				bServerSide : true,
+				data : {
+					analysisId : analysisID,
+					pvalueCutoff : jQuery(
+							'#analysis_results_table_' + analysisID + '_cutoff')
+							.val(),
+					search : jQuery(
+							'#analysis_results_table_' + analysisID + '_search')
+							.val()
+				},
+				"success" : function(json) {
+					jQuery('#analysis_holder_' + analysisID).unmask();
+					jQuery('#manhattanplot_results_' + analysisID).prepend(
+							"<img src='" + json.imageURL + "' style='width:800px; height:500px;' />").removeClass(
+							'ajaxloading');
+					jQuery('#manhattanplot_export_' + analysisID).attr('href',
+							json.imageURL);
+				},
+				"error" : function(xhr) {
+					jQuery('#manhattanplot_results_' + analysisID).append(
+							xhr.responseText).removeClass('ajaxloading');
+					jQuery('#analysis_holder_' + analysisID).unmask();
+				},
+				"dataType" : "json"
+			});
+}
+
 // This function will load the analysis data into a GRAILS template.
 function loadAnalysisResultsGrid(analysisID, paramMap) {
 	paramMap.analysisId = analysisID
@@ -75,6 +110,8 @@ function loadTableResultsGrid(paramMap) {
 			});
 }
 
+var plotOptionsDialog;
+
 function startPlotter() {
 	var selectedboxes = jQuery(".analysischeckbox:checked");
 	if (selectedboxes.length == 0) {
@@ -102,10 +139,10 @@ function openPlotOptions() {
 	if (selectedboxes.length == 0) {
 		alert("No analyses are selected! Please select analyses to plot.");
 	} else {
-		jQuery('#divPlotOptions').dialog("destroy");
-		jQuery('#divPlotOptions').dialog({
+		plotOptionsDialog && plotOptionsDialog.dialog("destroy");
+		plotOptionsDialog = jQuery('#divPlotOptions').dialog({
 			modal : false,
-			height : 300,
+			height : 250,
 			width : 400,
 			title : "Manhattan Plot Options",
 			show : 'fade',
@@ -803,12 +840,14 @@ function showFacetResults(tabToShow)	{
 
 			},
 			error: function(xhr) {
-                // this is a bit bogus - but the problem is that the Jquery request is returning the HTML for the display
+
+		// this is a bit bogus - but the problem is that the Jquery request is returning the HTML for the display
                 // an uncomfortable mix of data and rendering - so rather then send an error as a JSON status return
                 // it is being signaled by a 500 error status and a Grails-generated error page.
                 // but if the error page contains the string 'solrConnection' (which is most likely the case)
-                // then the probablity is high that SORL is not running on the server.
-                var html = xhr['responseText'];
+                // then the probablity is high that SOLR is not running on the server.
+
+		var html = xhr['responseText'];
                 var userMessage = "Unknown server error - data loading failed"
                 if (html.indexOf("solrConnection") > -1) {
                     userMessage = "Server error - cannot connect to SOLR on the tranSMART server - is it running?"
