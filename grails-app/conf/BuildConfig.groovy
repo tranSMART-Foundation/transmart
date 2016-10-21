@@ -15,6 +15,7 @@ grails.project.dependency.resolution = {
 	legacyResolve false
     repositories {
         grailsCentral()
+        mavenLocal()
         mavenCentral()
 
         mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
@@ -24,7 +25,10 @@ grails.project.dependency.resolution = {
     	// needed to support folder-management
         compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
-		runtime 'org.transmartproject:transmart-core-api:16.2-SNAPSHOT'
+        // maybe change to compile to match Pfizer version
+        runtime 'org.transmartproject:transmart-core-api:16.2-SNAPSHOT'
+	//compile 'com.google.protobuf:protobuf-java:2.5.0'
+	//compile 'com.google.guava:guava:14.0.1'
     }
     plugins {
 		compile(':resources:1.2.1')
@@ -34,6 +38,7 @@ grails.project.dependency.resolution = {
 		//compile(':biomart-domain:16.2-SNAPSHOT')
 		//// already included in folder-management
 		//compile(':search-domain:16.2-SNAPSHOT')
+		//compile(':transmart-rest-api:16.2-SNAPSHOT')
 		compile(':folder-management:16.2-SNAPSHOT')
 		//// already included in folder-management
 		//compile(':transmart-legacy-db:16.2-SNAPSHOT')
