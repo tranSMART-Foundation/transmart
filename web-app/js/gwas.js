@@ -554,7 +554,7 @@ function convertCategory(valueToConvert)	{
 
 //Method to add the autocomplete for the search keywords
 function addSearchAutoComplete()	{
-	jQuery("#search-ac").uiAutocomplete({
+	jQuery("#search-ac").autocomplete({
 		source: sourceURL,
 		minLength:2,
 		select: function(event, ui) { 
@@ -567,9 +567,9 @@ function addSearchAutoComplete()	{
 			addSearchTerm(searchParam);
 			return false;
 		}
-	}).data("uiAutocomplete")._renderItem = function( ul, item ) {
+	}).data("autocomplete")._renderItem = function( ul, item ) {
 		return jQuery('<li></li>')		
-		  .data("item.uiAutocomplete", item )
+		  .data("item.autocomplete", item )
 		  .append('<a><span class="category-' + item.category.toLowerCase() + '">' + item.category + '&gt;</span>&nbsp;<b>' + item.label + '</b>&nbsp;' + item.synonyms + '</a>')
 		  .appendTo(ul);
 	};	
@@ -577,13 +577,13 @@ function addSearchAutoComplete()	{
 	// Add an onchange event to the select so we can set the category in the URL for the autocomplete
 	var categorySelect = document.getElementById("search-categories"); 
 	categorySelect.onchange=function()	{
-		jQuery('#search-ac').uiAutocomplete('option', 'source', sourceURL + "?category=" + this.options[this.selectedIndex].value);
+		jQuery('#search-ac').autocomplete('option', 'source', sourceURL + "?category=" + this.options[this.selectedIndex].value);
 	};
 		
 	// Capture the enter key on the slider and fire off the search event on the autocomplete
 	jQuery("#search-categories").keypress(function(event)	{
 		if (event.which == 13)	{
-			jQuery("#search-ac").uiAutocomplete('search');
+			jQuery("#search-ac").autocomplete('search');
 		}
 	});
  jQuery("#search-ac").keypress(function(event)	{
@@ -3183,7 +3183,7 @@ function clearSearch()	{
 	
 	// Change the category picker back to ALL and set autocomplete to not have a category (ALL by default)
 	document.getElementById("search-categories").selectedIndex = 0;
-	jQuery('#search-ac').uiAutocomplete('option', 'source', sourceURL);
+	jQuery('#search-ac').autocomplete('option', 'source', sourceURL);
 		
 	var tree = jQuery("#filter-div").dynatree("getTree");
 	
