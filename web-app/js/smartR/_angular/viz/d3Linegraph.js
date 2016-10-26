@@ -48,6 +48,13 @@ window.smartRApp.directive('lineGraph', [
             var groupByPatientIDRanking = byPatientID.group()
                 .reduceSum(function(d) { return typeof d.ranking === 'undefined' ? 0 : d.ranking; });
 
+            var originalRanking = {};
+            tmpByType.filterExact('categoric');
+            smartRUtils.unique(tmpByTimeInteger.bottom(Infinity), function(d) { return d.bioMarker; }).forEach(function(d) {
+                originalRanking[d.bioMarker] = d.ranking;
+            });
+            tmpByType.filterAll();
+
             var plotTypeSelect = smartRUtils.getElementWithoutEventListeners('sr-lg-numplottype-select');
             plotTypeSelect.selectedIndex = 0;
             plotTypeSelect.addEventListener('change', function() {
@@ -67,6 +74,14 @@ window.smartRApp.directive('lineGraph', [
             smoothCheck.checked = false;
             smoothCheck.addEventListener('change', function() {
                 renderNumericPlots();
+            });
+
+            var legendLocked = true;
+            var legendCheck = smartRUtils.getElementWithoutEventListeners('sr-lg-legend-check');
+            legendCheck.checked = false;
+            legendCheck.disabled = !!totalNumOfCatBoxes;
+            legendCheck.addEventListener('change', function() {
+                switchLegendLock();
             });
 
             var patientRange = smartRUtils.getElementWithoutEventListeners('sr-lg-patient-range');
@@ -1061,7 +1076,6 @@ window.smartRApp.directive('lineGraph', [
 
                 tmpByType.filterAll();
 
-                renderLegend();
                 // we need to update the xAxis because the plot size could have changed
                 updateXAxis();
             }
@@ -1086,6 +1100,7 @@ window.smartRApp.directive('lineGraph', [
 
                 var drag = d3.behavior.drag()
                     .on('drag', function(draggedLegendItem) {
+                        if (legendLocked) { return; }
                         var newY = d3.event.y;
                         newY = newY < CAT_PLOTS_POS ? CAT_PLOTS_POS : newY;
                         newY = newY > LINEGRAPH_HEIGHT ? LINEGRAPH_HEIGHT : newY;
@@ -1125,12 +1140,14 @@ window.smartRApp.directive('lineGraph', [
                         }
                     })
                     .on('dragend', function(draggedLegendItem) {
+                        if (legendLocked) { return; }
                         d3.select('.sr-lg-legend-item.biomarker-' + smartRUtils.makeSafeForCSS(draggedLegendItem.bioMarker))
                             .transition()
                             .duration(ANIMATION_DURATION)
                             .attr('transform', 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
                                 (CAT_PLOTS_POS + draggedLegendItem.row * ICON_SIZE)  + ')');
                         renderCategoricPlots();
+                        renderLegend();
                         animateCorrStats();
                     });
 
@@ -1143,9 +1160,6 @@ window.smartRApp.directive('lineGraph', [
                     .append('g')
                     .attr('class', function(d) {
                         return 'sr-lg-legend-item' + ' biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker) + ' row-' + d.row;
-                    })
-                    .attr('transform', function(d, i) {
-                        return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' + (CAT_PLOTS_POS + i * ICON_SIZE) + ')';
                     })
                     .on('mouseover', function() { d3.select(this).select('rect').style('opacity', 0.4); })
                     .on('mouseout', function() { d3.select(this).select('rect').style('opacity', 0); })
@@ -1186,8 +1200,14 @@ window.smartRApp.directive('lineGraph', [
                     .style('font-size', function() { return legendTextSize + 'px'; })
                     .text(function(d) { return d.bioMarker; });
 
+                // UPDATE g
+                legendItem.attr('transform', function(d, i) {
+                    return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' + (CAT_PLOTS_POS + i * ICON_SIZE) + ')';
+                });
+
+                // UPDATE text
                 legendItem.select('.sr-lg-legend-num')
-                    .text(function(d) { return d.row + '.'; });
+                    .text(function(d) { return (d.row + 1) + '.'; });
 
                 // EXIT g
                 legendItem.exit()
@@ -1198,10 +1218,39 @@ window.smartRApp.directive('lineGraph', [
                     .attr('class', 'sr-legend-descr')
                     .attr('transform', 'translate(' + (LINEGRAPH_WIDTH) + ',' + (CAT_PLOTS_POS - 10) + ')')
                     .attr('font-size', '15px')
-                    .text('Events (weighted by order)');
+                    .text(function() {
+                        if (legendLocked) {
+                            return 'Events (weighted by inv. freq.)';
+                        } else {
+                            return 'Events (weighted by inv. pos.)';
+                        }
+                    });
+            }
+            renderLegend();
+
+            function switchLegendLock() {
+                legendLocked = !legendCheck.checked;
+                byPatientID.filterAll();
+                byTimeInteger.filterAll();
+                tmpByType.filterExact('categoric');
+                var data = tmpByRanking.top(Infinity);
+                var bioMarkerOrder = {};
+                smartRUtils.unique(data.map(function(d) { return d.bioMarker; })).forEach(function(bioMarker, i) {
+                    bioMarkerOrder[bioMarker] = i + 1;
+                });
+                dataCF.remove();
+                if (legendLocked) {
+                    data.forEach(function(d) { d.ranking = originalRanking[d.bioMarker]; });
+                } else {
+                    data.forEach(function(d) { d.ranking = 1 / bioMarkerOrder[d.bioMarker]; });
+                }
+                dataCF.add(data);
+                tmpByType.filterAll();
+                renderLegend();
+                renderCategoricPlots();
             }
 
-            var corrStats = {};
+            var corrStats = { statistics: [] };
             function animateCorrStats() {
                 if (typeof corrStats === 'undefined') { return; }
                 d3.selectAll('.sr-lg-cat-icon').filter(function(d) {
