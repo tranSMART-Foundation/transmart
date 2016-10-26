@@ -169,7 +169,7 @@ window.smartRApp.directive('lineGraph', [
             calculateXScale();
 
             // helper function
-            d3.selection.prototype.moveToFront = function() {  
+            d3.selection.prototype.moveToFront = function() {
                 return this.each(function(){
                     this.parentNode.appendChild(this);
                 });
@@ -280,11 +280,11 @@ window.smartRApp.directive('lineGraph', [
                     .on('dragend', function(draggedElement) {
                         var xPos = d3.transform(d3.select(this).attr('transform')).translate[0];
                         timeAxisData = smartRUtils.unique(byTimeInteger.bottom(Infinity), function(d) { return d.timeInteger; });
- 
+
                         var timeZones = timeAxisData.map(function(d, i) {
                             var left = i === 0 ?
                                 0 : x(timeAxisData[i-1].timeInteger) + (x(d.timeInteger) - x(timeAxisData[i-1].timeInteger)) / 2;
-                            var right = i === timeAxisData.length - 1 ? 
+                            var right = i === timeAxisData.length - 1 ?
                                 LINEGRAPH_WIDTH : x(d.timeInteger) + (x(timeAxisData[i+1].timeInteger) - x(d.timeInteger)) / 2;
                             return {left: left, right: right, timeInteger: d.timeInteger, timeString: d.timeString};
                         });
@@ -387,7 +387,7 @@ window.smartRApp.directive('lineGraph', [
                 };
                 var revTriangle = function(size) { return '0,0 ' + size + ',0 ' + (size / 2) + ',' + size; };
                 var hexagon = function(size) {
-                    return (size / 2) + ',0 ' + 
+                    return (size / 2) + ',0 ' +
                         size + ',' + (size / 4) + ' ' +
                         size + ',' + (size * 3 / 4) + ' ' +
                         (size / 2) + ',' + size + ' ' +
@@ -529,7 +529,7 @@ window.smartRApp.directive('lineGraph', [
                             return 'translate(' + (LINEGRAPH_WIDTH + LEGEND_OFFSET) + ',' +
                                 (numPlotBoxHeight / 2 + (d === 1 ? - ICON_SIZE : ICON_SIZE)) + ')';
                         })
-                        .on('mouseover', function(d) { 
+                        .on('mouseover', function(d) {
                             d3.selectAll('.sr-lg-boxplot').filter(function() {
                                 var that = d3.select(this);
                                 return !that.classed('biomarker-' + smartRUtils.makeSafeForCSS(bioMarker)) ||
@@ -619,7 +619,7 @@ window.smartRApp.directive('lineGraph', [
 
                         // Generate data for timeline elements ---
                         var numericalData = [];
-                        
+
                         if (plotTypeSelect.value === 'noGrouping') {
                             numericalData = smartRUtils.unique(getValuesForDimension(byPatientID)).map(function(patientID) {
                                 tmpByPatientID.filterExact(patientID);
@@ -645,7 +645,7 @@ window.smartRApp.directive('lineGraph', [
                                     error: d[errorKey],
                                     value: d[valueKey],
                                     subset: d.subset
-                                }; 
+                                };
                             }));
                         }
                         tmpByPatientID.filterAll();
@@ -668,7 +668,7 @@ window.smartRApp.directive('lineGraph', [
                         timeline.enter()
                             .append('path')
                             .attr('class', function(d) {
-                                return 'sr-lg-timeline' + 
+                                return 'sr-lg-timeline' +
                                 ' subset-' + subset +
                                 ' biomarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
                                 ' patientid-' + d[0].patientID; // might or might not be defined
@@ -678,7 +678,7 @@ window.smartRApp.directive('lineGraph', [
                                 d3.select(this)
                                     .classed('sr-lg-timeline-highlight', true)
                                     .moveToFront();
-                                
+
                                 var html = '';
 
                                 if (plotTypeSelect.value === 'noGrouping') {
@@ -744,7 +744,7 @@ window.smartRApp.directive('lineGraph', [
                                     sdLine.moveToFront()
                                         .transition()
                                         .duration(ANIMATION_DURATION)
-                                        .attr('transform', function(d) { 
+                                        .attr('transform', function(d) {
                                             return 'translate(0,' + (y(d)) + ')';
                                         });
 
@@ -832,7 +832,7 @@ window.smartRApp.directive('lineGraph', [
                     });
                     tmpBySubset.filterAll();
                     // --- Render timeline elements for each subset
-                    
+
                     tmpByBioMarker.filterAll();
                 });
                 // --- Add items to each numbox
@@ -1000,7 +1000,7 @@ window.smartRApp.directive('lineGraph', [
                             return 'sr-lg-cat-icon' +
                                 ' patientid-' + d.patientID +
                                 ' timestring-' + smartRUtils.makeSafeForCSS(d.timeString) +
-                                ' timeinteger-' + d.timeInteger + 
+                                ' timeinteger-' + d.timeInteger +
                                 ' biomarker-' + smartRUtils.makeSafeForCSS(d.bioMarker) +
                                 ' subset-' + d.subset;
                         })
@@ -1256,11 +1256,11 @@ window.smartRApp.directive('lineGraph', [
                 d3.selectAll('.sr-lg-cat-icon').filter(function(d) {
                     return (d.bioMarker !== corrStats.depBioMarker && d.timeInteger === corrStats.depTimeInteger);
                 }).style('opacity', 0.2);
-                corrStats.statistics.forEach(function(stat) { 
-                    var icons = d3.selectAll('.sr-lg-cat-icon' + 
+                corrStats.statistics.forEach(function(stat) {
+                    var icons = d3.selectAll('.sr-lg-cat-icon' +
                         '.biomarker-' + smartRUtils.makeSafeForCSS(stat.bioMarker) +
                         '.timeinteger-' + stat.timeInteger);
-                    icons.each(function(d) { 
+                    icons.each(function(d) {
                         d3.select(this.parentNode).append('circle')
                             .attr('class', 'sr-lg-cat-stat-icon')
                             .attr('cx', x(d.timeInteger) + ICON_SIZE)
