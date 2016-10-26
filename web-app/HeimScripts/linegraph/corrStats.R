@@ -14,7 +14,7 @@ main <- function(params) {
     # do the same for every other timepoint and biomarker to compute correlations
     output <- data.frame(bioMarker=character(), timeInteger=integer(), corrCoef=numeric(), pValue=numeric())
     for (bioMarker in bioMarkers) {
-        for (timeInteger in timeIntegers[timeIntegers > params$timeInteger]) {
+        for (timeInteger in timeIntegers[timeIntegers != params$timeInteger]) {
             time.df <- cat.df[cat.df$timeInteger == timeInteger & cat.df$bioMarker == bioMarker, ]
             bin.vec_2 <- as.numeric(patientIDs %in% time.df$patientID)
             test <- cor.test(bin.vec_1, bin.vec_2, method="pearson")

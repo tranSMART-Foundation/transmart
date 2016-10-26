@@ -1006,9 +1006,7 @@ window.smartRApp.directive('lineGraph', [
                         })
                         .on('click', function(d) {
                             d3.selectAll('.sr-lg-cat-stat-icon').remove();
-                            d3.selectAll('.sr-lg-cat-plot *').transition()
-                                .duration(1000)
-                                .style('opacity', 0.3);
+                            d3.selectAll('.sr-lg-cat-plot *').style('opacity', 0.3);
                             var args = { params: d };
                             rServeService.startScriptExecution({
                                 taskType: 'corrStats',
@@ -1207,8 +1205,7 @@ window.smartRApp.directive('lineGraph', [
             function animateCorrStats() {
                 if (typeof corrStats === 'undefined') { return; }
                 d3.selectAll('.sr-lg-cat-icon').filter(function(d) {
-                    return d.timeInteger < corrStats.depTimeInteger ||
-                        (d.bioMarker !== corrStats.depBioMarker && d.timeInteger === corrStats.depTimeInteger);
+                    return (d.bioMarker !== corrStats.depBioMarker && d.timeInteger === corrStats.depTimeInteger);
                 }).style('opacity', 0.2);
                 corrStats.statistics.forEach(function(stat) { 
                     var icons = d3.selectAll('.sr-lg-cat-icon' + 
