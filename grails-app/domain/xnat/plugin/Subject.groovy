@@ -18,7 +18,7 @@ class Subject implements Serializable{
 
 
     static mapping = {
-        table name: 'SUBJECT', schema: 'XNAT'
+        table name: 'XNAT_SUBJECT', schema: 'SEARCHAPP'
         version false
         id column: 'ID',
                 generator: 'increment'
