@@ -41,7 +41,7 @@ grails.project.dependency.resolution = {
         compile('org.transmartproject:transmart-core-api:16.2-SNAPSHOT')
         compile 'org.apache.httpcomponents:httpcore:4.4.1'
         compile 'org.apache.httpcomponents:httpclient:4.4.1'
-        compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') {
+        compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1') {
             excludes('groovy', 'nekohtml', 'httpclient', 'httpcore')
         }
     }
