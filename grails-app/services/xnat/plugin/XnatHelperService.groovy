@@ -51,46 +51,14 @@ class XnatHelperService {
 
         log.debug "Initial grid query: $sqlt, riid: $result_instance_id"
 
-
-        Sql sql1 = new Sql(dataSource)
-        String sqlt1 = '''SELECT sessionid from xnat.session where subjectid IN (SELECT xnat_subjectid from xnat.subject where tsmart_subjectid = ?)''';
-
-        def sessionid;
-        def scanid;
-        def subjectid = "OPT_045"
-        sql1.eachRow(sqlt1, [subjectid], {row ->
-//            System.out.println("sessionid id "+ row.sessionid);
-            sessionid = row.sessionid;
-        })
-
-        Sql sql2 = new Sql(dataSource)
-        String sqlt2 = '''SELECT scanid from xnat.scan where sessionid IN (SELECT sessionid from xnat.session where subjectid IN (SELECT xnat_subjectid from xnat.subject where tsmart_subjectid = ?))''';
-
-
-        sql2.eachRow(sqlt2, [subjectid], {row ->
-//            System.out.println("scan id "+ row.scanid);
-            scanid = row.scanid;
-        })
-
-
-        Sql sql3 = new Sql(dataSource)
-        String sqlt3 = '''select resourceid, filename from xnat.snapshot where scanid = ?''';
-
-
-        def resourceid;
-        def filename;
-        sql3.eachRow(sqlt3, [scanid], {row ->
-
-            resourceid = row.resourceid;
-            filename = row.filename;
-        })
-
-        //if i have an empty table structure so far
+        //If I have an empty table structure so far
         if (tablein.getColumns().size() == 0) {
 
             tablein.putColumn("study_id", new ExportColumn("study_id", "Study ID", "", "String"));
             tablein.putColumn("subject", new ExportColumn("subject", "Subject ID", "", "String"));
-            tablein.putColumn("T2_lesions_download", new ExportColumn("T2_lesions_download", "XNAT", "", "String"));
+            tablein.putColumn("patient", new ExportColumn("patient", "Patient", "", "String"));
+            tablein.putColumn("XNAT_image_download", new ExportColumn("XNAT_image_download", "XNAT", "", "String"));
+            tablein.putColumn("subset", new ExportColumn("subset", "Subset", "", "String"));
 
 
         }
@@ -109,19 +77,19 @@ class XnatHelperService {
             /*fill the row*/ {
 
                 def arr = row.SOURCESYSTEM_CD?.split(":")
+                String patient = arr?.length == 2 ? arr[1] : ""
 
                 ExportRowNew newrow = new ExportRowNew();
                 i++;
                 newrow.put("study_id", row.TRIAL);
 
-                newrow.put("subject", arr?.length == 2 ? arr[1] : "");
+                newrow.put("patient", patient);
 
-                if(subjectService.SubjectExists(arr?.length == 2 ? arr[1] : "")) {
-                    String subjectID =  arr?.length == 2 ? arr[1] : "";
-
-                    newrow.put("T2_lesions_download", "<a href='/"+ grails.util.Metadata.current.'app.name' +"/scan?subjectID=" + subjectID + "' target = '_blank' style='color:blue'>View Sessions</a>");
+                String subjectID = row.TRIAL + ':' + patient;
+                if(subjectService.SubjectExists(subjectID)) {
+                    newrow.put("XNAT_image_download", "<a href='/"+ grails.util.Metadata.current.'app.name' +"/scan?subjectID=" + subjectID + "' target = '_blank' style='color:blue'>View sessions</a>");
                 } else {
-                    newrow.put("T2_lesions_download", "");
+                    newrow.put("XNAT_image_download", "");
 
                 }
 
