@@ -81,8 +81,9 @@ class XnatHelperService {
 
                 ExportRowNew newrow = new ExportRowNew();
                 i++;
-                newrow.put("study_id", row.TRIAL);
 
+                newrow.put("study_id", row.TRIAL);
+                newrow.put("subject", subject);
                 newrow.put("patient", patient);
 
                 String subjectID = row.TRIAL + ':' + patient;
@@ -92,6 +93,8 @@ class XnatHelperService {
                     newrow.put("XNAT_image_download", "");
 
                 }
+
+                newrow.put("subset", subset);
 
                 tablein.putRow(subject, newrow);
 
