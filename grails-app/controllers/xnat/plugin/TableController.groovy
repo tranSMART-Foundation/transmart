@@ -37,8 +37,10 @@ class TableController {
         def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: "DatasetExplorer-Grid Analysis Drag", eventmessage: "RID1:" + result_instance_id1 + " RID2:" + result_instance_id2 + " Concept:" + concept_key, accesstime: new java.util.Date())
         al.save()
 
+        //Copied from Grid view, but must not use the same table!
         //XXX: session is a questionable place to store this because it breaks multi-window/tab nav
-        ExportTableNew table = (ExportTableNew) request.getSession().getAttribute("gridtable");
+        //ExportTableNew table = (ExportTableNew) request.getSession().getAttribute("gridtable");
+        ExportTableNew table;
         if (table == null) {
 
             table = new ExportTableNew();
@@ -84,6 +86,6 @@ class TableController {
         pw.write(table.toJSONObject().toString(5));
         pw.flush();
 
-        request.getSession().setAttribute("gridtable", table);
+        //request.getSession().setAttribute("gridtable", table);
     }
 }
