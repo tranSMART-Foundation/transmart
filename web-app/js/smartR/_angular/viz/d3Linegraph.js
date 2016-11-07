@@ -127,9 +127,8 @@ window.smartRApp.directive('lineGraph', [
             };
 
             var timeIntegers = smartRUtils.unique(getValuesForDimension(byTimeInteger)).sort(function(a, b) { return a - b; });
-            var BINS = timeIntegers[timeIntegers.length - 1] - timeIntegers[0];
 
-            var LINEGRAPH_WIDTH = BINS * ICON_SIZE * 2;
+            var LINEGRAPH_WIDTH = timeIntegers[timeIntegers.length - 1] * ICON_SIZE * 2;
             var LINEGRAPH_HEIGHT = NUM_PLOTS_HEIGHT;
 
             smartRUtils.prepareWindowSize(LINEGRAPH_WIDTH + MARGIN.left + MARGIN.right, LINEGRAPH_HEIGHT + MARGIN.top + MARGIN.bottom);
@@ -784,7 +783,7 @@ window.smartRApp.directive('lineGraph', [
                                 .append('g')
                                 .attr('class', function(d) {
                                     return 'sr-lg-boxplot' + ' timestring-' + smartRUtils.makeSafeForCSS(d.timeString) +
-                                        ' bioMarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
+                                        ' biomarker-' + smartRUtils.makeSafeForCSS(bioMarker) +
                                         ' subset-' + subset;
                                 })
                                 .on('mouseover', function(d) {
@@ -1082,6 +1081,9 @@ window.smartRApp.directive('lineGraph', [
             renderCategoricPlots();
 
             function renderLegend() {
+                if (! totalNumOfCatBoxes) {
+                    return;
+                }
                 tmpByType.filterExact('categoric');
                 var iconCache = iconGen();
                 var legendData = Object.keys(iconCache).map(function(bioMarker) {
