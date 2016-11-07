@@ -11,7 +11,7 @@
                              type="HD"
                              min="0"
                              max="-1"
-                             label="(optional) High Dimensional Variable"
+                             label="(optional) High Dimensional Variables"
                              tooltip="Select an arbitrary number of high dimensional variables and drag them here.">
                 </concept-box>
                 <concept-box style="display: inline-block"

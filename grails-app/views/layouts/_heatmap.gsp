@@ -11,7 +11,7 @@
                 type="HD"
                 min="1"
                 max="-1"
-                label="High Dimensional"
+                label="High Dimensional Variables"
                 tooltip="Select high dimensional data node(s) from the data tree and drag it into the box.
                 The nodes need to be from the same platform.">
             </concept-box>
