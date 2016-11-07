@@ -58,8 +58,6 @@ window.smartRApp.directive('heatmapPlot', [
             var ranking = scope.data.ranking[0].toUpperCase();
             var statistics = scope.data.allStatValues;
 
-            var maxRows = scope.data.maxRows[0];
-
             var geneCardsAllowed = JSON.parse(scope.params.geneCardsAllowed);
 
             var gridFieldWidth = 20;
@@ -111,25 +109,23 @@ window.smartRApp.directive('heatmapPlot', [
                 animateCutoff(parseInt(cutoffRange.value));
                 setCutoffBtnText();
             });
-            var numSelectedRownames = JSON.parse(JSON.stringify(scope.params.selections.selectedRownames)).length;
-            maxRows = numSelectedRownames === 0 ? maxRows : selectedColNames;
-            cutoffRange.setAttribute('max', maxRows - 1);
+            cutoffRange.setAttribute('max', rowNames.length - 1);
             cutoffRange.value = 0;
-            cutoffRange.disabled = parseInt(cutoffRange.max) <= 1;
+            cutoffRange.disabled = rowNames.length < 2;
             
             setCutoffBtnText();
 
             var clusterSelect = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cluster-select');
             clusterSelect.addEventListener('change', function() { cluster(clusterSelect.value); });
-            clusterSelect.disabled = maxRows < 2;
+            clusterSelect.disabled = rowNames.length < 2;
             clusterSelect.selectedIndex = 0;
 
             var clusterRowCheck = smartRUtils.getElementWithoutEventListeners('sr-heatmap-row-check');
-            clusterRowCheck.disabled = maxRows < 2;
+            clusterRowCheck.disabled = rowNames.length < 2;
             clusterRowCheck.checked = true;
 
             var clusterColCheck = smartRUtils.getElementWithoutEventListeners('sr-heatmap-col-check');
-            clusterColCheck.disabled = maxRows < 2;
+            clusterColCheck.disabled = rowNames.length < 2;
             clusterColCheck.checked = true;
 
             var colorSelect = smartRUtils.getElementWithoutEventListeners('sr-heatmap-color-select');
