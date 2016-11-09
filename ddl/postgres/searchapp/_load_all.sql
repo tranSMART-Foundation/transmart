@@ -48,4 +48,7 @@
 \i searchapp/search_user_settings.sql
 \i searchapp/views/solr_keywords_lineage.sql
 \i searchapp/subset.sql
+\i searchapp/import_xnat_configuration.sql
+\i searchapp/import_xnat_variable.sql
+\i searchapp/xnat_subject.sql
 \i searchapp/_misc.sql
