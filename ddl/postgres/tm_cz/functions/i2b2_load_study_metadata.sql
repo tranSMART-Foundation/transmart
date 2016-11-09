@@ -918,7 +918,7 @@ BEGIN
 
 	begin
 	delete from i2b2metadata.i2b2_tags
-	where upper(tag_type) = 'Trial';
+	where upper(tag_type) = 'TRIAL';
 	exception
 	when others then
 		errorNumber := SQLSTATE;
@@ -1032,7 +1032,7 @@ BEGIN
 		select tm_cz.czx_end_audit (jobID, 'SUCCESS') into rtnCd;
 	END IF;
 
-	return 1;
+	return 0;
 	
 END;
 
