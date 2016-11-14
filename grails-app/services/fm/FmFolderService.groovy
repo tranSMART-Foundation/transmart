@@ -170,11 +170,14 @@ class FmFolderService {
      * @param file file to be proceessed
      * @return
      */
-    private void processFile(FmFolder fmFolder, File file) {
+    private void processFile(FmFolder fmFolder, File file, String customName = null, String description = null) {
         log.info "Importing file $file into folder $fmFolder"
 
         // Check if folder already contains file with same name.
         def fmFile;
+
+        def newFileName = customName?:file.getName()
+		
         for (f in fmFolder.fmFiles) {
             if (f.originalName == file.getName()) {
                 fmFile = f;
@@ -196,7 +199,8 @@ class FmFolderService {
                     fileSize: file.length(),
                     filestoreLocation: "",
                     filestoreName: "",
-                    linkUrl: ""
+                    linkUrl: "",
+                    fileDescription: description
             );
             if (!fmFile.save(flush: true)) {
                 fmFile.errors.each {
