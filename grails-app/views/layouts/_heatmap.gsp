@@ -11,9 +11,9 @@
                 type="HD"
                 min="1"
                 max="-1"
-                label="High Dimensional"
-                tooltip="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box.
-                The nodes needs to be from the same platform.">
+                label="High Dimensional Variables"
+                tooltip="Select high dimensional data node(s) from the data tree and drag it into the box.
+                The nodes need to be from the same platform.">
             </concept-box>
 
             <concept-box
@@ -21,8 +21,8 @@
                 type="LD-numerical"
                 min="0"
                 max="-1"
-                label="Numeric Variables"
-                tooltip="Select numeric data node(s) from the Data Set Explorer Tree and drag it into the box.">
+                label="(optional) Numerical Variables"
+                tooltip="Select numeric data node(s) from the data tree and drag it into the box.">
             </concept-box>
 
             <concept-box
@@ -30,8 +30,8 @@
                 type="LD-categorical"
                 min="0"
                 max="-1"
-                label="Categoric Variables"
-                tooltip="Select categoric data node(s) from the Data Set Explorer Tree and drag it into the box.">
+                label="(optional) Categoric Variables"
+                tooltip="Select categoric data node(s) from the data tree and drag it into the box.">
             </concept-box>
 
             <biomarker-selection biomarkers="fetch.selectedBiomarkers"></biomarker-selection>

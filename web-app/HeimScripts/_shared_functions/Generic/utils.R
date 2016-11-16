@@ -4,29 +4,6 @@
 ######################################################################
 
 
-
-## Returns a vector providing the data tree node names 
-## as a named vector where a node name identifier like "numeric_n0" is mapped to
-## its real name in the tree (e.g. "Alive")
-node2name = function(){
-  
-  names = character(length = length(names(fetch_params$ontologyTerms)))
-  node_names = character(length = length(names(fetch_params$ontologyTerms)))
-  
-  for(i in 1:length(names(fetch_params$ontologyTerms))){
-    node_name = names(fetch_params$ontologyTerms)[i]
-    name = get(names(fetch_params$ontologyTerms)[i], fetch_params$ontologyTerms )$name
-    
-    names[i] = name
-    node_names[i] = node_name
-  }
-  names(names) = node_names
-  
-  return(names)
-}
-
-
-
 ## Retrieve High dim node for vector of patientIDs
 getNode <- function(patientIDs) {
 

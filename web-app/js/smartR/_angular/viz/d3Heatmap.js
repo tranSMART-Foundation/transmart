@@ -58,8 +58,6 @@ window.smartRApp.directive('heatmapPlot', [
             var ranking = scope.data.ranking[0].toUpperCase();
             var statistics = scope.data.allStatValues;
 
-            var maxRows = scope.data.maxRows[0];
-
             var geneCardsAllowed = JSON.parse(scope.params.geneCardsAllowed);
 
             var gridFieldWidth = 20;
@@ -70,7 +68,7 @@ window.smartRApp.directive('heatmapPlot', [
             var legendHeight = 40;
 
             var margin = {
-                top: gridFieldHeight * 2 + features.length * gridFieldHeight + dendrogramHeight + 100,
+                top: gridFieldHeight * 2 + longestColNameLength +  features.length * gridFieldHeight + dendrogramHeight + 100,
                 right: gridFieldWidth + 300 + dendrogramHeight,
                 bottom: 10,
                 left: histogramHeight
@@ -111,23 +109,23 @@ window.smartRApp.directive('heatmapPlot', [
                 animateCutoff(parseInt(cutoffRange.value));
                 setCutoffBtnText();
             });
-            cutoffRange.setAttribute('max', maxRows - JSON.parse(JSON.stringify(scope.params.selections.selectedRownames)).length - 1);
+            cutoffRange.setAttribute('max', rowNames.length - 1);
             cutoffRange.value = 0;
-            cutoffRange.disabled = parseInt(cutoffRange.max) <= 1;
+            cutoffRange.disabled = rowNames.length < 2;
             
             setCutoffBtnText();
 
             var clusterSelect = smartRUtils.getElementWithoutEventListeners('sr-heatmap-cluster-select');
             clusterSelect.addEventListener('change', function() { cluster(clusterSelect.value); });
-            clusterSelect.disabled = maxRows < 2;
+            clusterSelect.disabled = rowNames.length < 2;
             clusterSelect.selectedIndex = 0;
 
             var clusterRowCheck = smartRUtils.getElementWithoutEventListeners('sr-heatmap-row-check');
-            clusterRowCheck.disabled = maxRows < 2;
+            clusterRowCheck.disabled = rowNames.length < 2;
             clusterRowCheck.checked = true;
 
             var clusterColCheck = smartRUtils.getElementWithoutEventListeners('sr-heatmap-col-check');
-            clusterColCheck.disabled = maxRows < 2;
+            clusterColCheck.disabled = rowNames.length < 2;
             clusterColCheck.checked = true;
 
             var colorSelect = smartRUtils.getElementWithoutEventListeners('sr-heatmap-color-select');
@@ -167,6 +165,9 @@ window.smartRApp.directive('heatmapPlot', [
                     case 'PVAL':
                     case 'ADJPVAL':
                         return 1 - value;
+                    case 'TTEST':
+                    case 'LOGFOLD':
+                        return Math.abs(value);
                     default:
                         return value;
                 }
@@ -754,7 +755,7 @@ window.smartRApp.directive('heatmapPlot', [
                     .classed('cutoffHighlight', false);
                 d3.selectAll('.bar')
                     .classed('cutoffHighlight', false);
-                statistics.slice().sort(function(a, b) { return a[ranking] - b[ranking]; })
+                statistics.slice().sort(function(a, b) { return getInternalSortValue(a[ranking]) - getInternalSortValue(b[ranking]); })
                     .filter(function(d, i) { return i < cutoff; })
                     .forEach(function(d, i) {
                         selectedRownames.push(d.ROWNAME);

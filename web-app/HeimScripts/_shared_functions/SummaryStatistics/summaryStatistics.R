@@ -270,14 +270,17 @@ allNA <- function(v1)
   return(all(is.na(v1)))
 }
 
-convertNodeNames <- function(nodeNames, fps=NULL) {
-    if (is.null(fps)) {
-        fps <- fetch_params
-    }
-  nodes <- sub("_s[1-2]{1}", "", nodeNames)
-  names <- sapply(nodes, function(el) fps$ontologyTerms[[el]]$name)
-  variableLabel <- sapply(1:length(names), function(i) sub(".*_", paste(names[i], "_", sep=""), nodeNames[i]))
-  variableLabel
+convertNodeName <- function(nodeID, fps=NULL) {
+  if (is.null(fps)) {
+      fps <- fetch_params
+  }
+  nodeID.wo.subset <- sub("_s[1-2]{1}", "", nodeID)
+  subset <- sub(".*_", "", nodeID)
+  fullName <- fps$ontologyTerms[[nodeID.wo.subset]]$fullName
+  split <- strsplit(fullName, "\\\\")[[1]]
+  name.wo.subset <- paste(split[length(split)-1], split[length(split)], sep="//")
+  name <- paste(name.wo.subset, subset, sep="_")
+  name
 }
 
 # Function to produce one JSON file per data node containing the summary stats per subset for that node. 
@@ -328,7 +331,7 @@ produce_summary_stats <- function(measurement_tables, phase, fps=NULL)
     # get the name of the data.frame, identifying the node and subset
     identifier <- names(measurement_tables)[i]
     result_table[identifier, "variableLabel"] <- ifelse(grepl("preprocessed", identifier), identifier,
-                                                        convertNodeNames(identifier, fps))
+                                                        convertNodeName(identifier, fps))
 
     if (!all(is.na(measurement_tables[[i]])))
     {

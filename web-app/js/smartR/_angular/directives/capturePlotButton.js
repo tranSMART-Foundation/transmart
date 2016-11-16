@@ -8,7 +8,7 @@ window.smartRApp.directive('capturePlotButton', [function() {
     var copyWithCollapsedCSS = function(svgElement) {
         var relevantProperties = [
             'fill-opacity', 'fill', 'stroke', 'font-size', 'font-family', 'font-weight',
-            'shape-rendering', 'stroke-width', 'opacity', 'text-anchor'
+            'shape-rendering', 'stroke-width', 'opacity', 'text-anchor', 'background'
         ];
         var clonedSvg = jQuery(svgElement).clone().attr('display', 'none');
         clonedSvg.insertAfter(svgElement);

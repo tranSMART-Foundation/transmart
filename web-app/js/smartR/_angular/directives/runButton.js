@@ -31,14 +31,12 @@ window.smartRApp.directive('runButton', [
                 var _onSuccess = function(data) {
                     scope.storage = data;
                     template_msg.innerHTML = '';
-                    template_btn.disabled = false;
                     scope.disabled = false;
                     scope.running = false;
                 };
 
                 var _onFail = function(msg) {
                     template_msg.innerHTML = 'Error: ' + msg;
-                    template_btn.disabled = false;
                     scope.disabled = false;
                     scope.running = false;
                 };
@@ -59,9 +57,8 @@ window.smartRApp.directive('runButton', [
 
                 template_btn.onclick = function() {
                     smartRUtils.cleanUp();
-                    template_btn.disabled = true;
-                    scope.storage = {};
                     scope.disabled = true;
+                    scope.storage = {};
                     scope.running = true;
                     template_msg.innerHTML = scope.waitMessage + ' <span class="blink_me">_</span>';
 

@@ -1,47 +1,42 @@
-//# sourceURL=boxplot.js
+//# sourceURL=linegraph.js
 
 'use strict';
 
-window.smartRApp.controller('BoxplotController', [
-    '$scope',
-    'smartRUtils',
-    'commonWorkflowService',
-    function($scope, smartRUtils, commonWorkflowService) {
+window.smartRApp.controller('LinegraphController',
+    ['$scope', 'smartRUtils', 'commonWorkflowService', function($scope, smartRUtils, commonWorkflowService) {
 
-        commonWorkflowService.initializeWorkflow('boxplot', $scope);
+        commonWorkflowService.initializeWorkflow('linegraph', $scope);
 
         $scope.fetch = {
-            running: false,
             disabled: false,
-            button: {
-                disabled: false,
-                message: ''
-            },
+            running: false,
             loaded: false,
             selectedBiomarkers: [],
+            button: {
+                disabled: false
+            },
             conceptBoxes: {
-                numData: {concepts: [], valid: false},
-                highDimensional: {concepts: [], valid: false}
+                highData: {concepts: [], valid: true},
+                numData: {concepts: [], valid: true},
+                catData: {concepts: [], valid: true}
             }
         };
 
         $scope.runAnalysis = {
-            running: false,
             disabled: true,
+            running: false,
             scriptResults: {},
-            params: {
-                transformation: 'raw'
-            }
+            params: {}
         };
 
         $scope.$watch(function() {
-            return $scope.fetch.conceptBoxes.highDimensional.concepts.length + ' ' + $scope.fetch.selectedBiomarkers.length;
+            return $scope.fetch.conceptBoxes.highData.concepts.length + ' ' + $scope.fetch.selectedBiomarkers.length;
         },
         function() {
-            if ($scope.fetch.conceptBoxes.highDimensional.concepts.length > 0 &&
+            if ($scope.fetch.conceptBoxes.highData.concepts.length > 0 &&
                 ($scope.fetch.selectedBiomarkers.length === 0 || $scope.fetch.selectedBiomarkers.length > 10)) {
                 $scope.fetch.button.disabled = true;
-                $scope.fetch.button.message = 'Please select between 1 and 10 biomarkers for your high dimensional data';
+                $scope.fetch.button.message = 'Please select between 1 and 10 biomarker for your high dimensional data';
             } else {
                 $scope.fetch.button.disabled = false;
                 $scope.fetch.button.message = '';

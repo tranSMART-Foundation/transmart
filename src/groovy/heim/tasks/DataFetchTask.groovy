@@ -224,9 +224,11 @@ class DataFetchTask extends AbstractTask {
     private clearPreviousLoadedVariables() {
         String removeLoaded = "if (exists('loaded_variables')) { remove(loaded_variables, pos = '.GlobalEnv')}"
         String removePreprocessed = "if (exists('preprocessed')) { remove(preprocessed, pos = '.GlobalEnv')}"
+        String removeFetchParams = "if (exists('fetch_params')) { remove(fetch_params, pos = '.GlobalEnv')}"
         rServeSession.doWithRConnection { RConnection conn ->
             RUtil.runRCommand conn, removeLoaded
             RUtil.runRCommand conn, removePreprocessed
+            RUtil.runRCommand conn, removeFetchParams
         }
     }
 
@@ -309,6 +311,7 @@ class DataFetchTask extends AbstractTask {
             RUtil.runRCommand conn, commands[0]
             RUtil.runRCommand conn, commands[1] /* return value */
         }
+        clearPreviousCreatedFiles()
         rexp.asNativeJavaObject() as List
     }
 
