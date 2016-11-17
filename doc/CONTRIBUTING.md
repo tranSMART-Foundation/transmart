@@ -12,62 +12,62 @@
 
 1. Add JAVA_HOME, GRAILS_HOME, and the grails binaries to your environment
 In an unix-like environment you could add something like this to your .bashrc
-```
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/
-export GRAILS_HOME=~/.grails/grails-2.3.11/
-export PATH=$GRAILS_HOME/bin:$PATH
-```
+    ```
+    export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/
+    export GRAILS_HOME=~/.grails/grails-2.3.11/
+    export PATH=$GRAILS_HOME/bin:$PATH
+    ```
 
 2. If you use Oracle JDK7 you must update your cacerts file, with a newer version (i.e. from Oracle JDK8)
-```
-sudo cp /Library/Java/JavaVirtualMachines/jdk1.8.0_112.jdk/Contents/Home/jre/lib/security/cacerts /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/security/cacerts
-```
+    ```
+    sudo cp /Library/Java/JavaVirtualMachines/jdk1.8.0_112.jdk/Contents/Home/jre/lib/security/cacerts /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/security/cacerts
+    ```
 
 3. Prepare your .grails folder
-```
-mkdir ~/.grails
-mkdir ~/.grails/transmartConfig
-mv Config-template.groovy ~/.grails/transmartConfig/Config.groovy
-mv DataSource.groovy.php ~/.grails/transmartConfig/DataSource.groovy
-```
+    ```
+    mkdir ~/.grails
+    mkdir ~/.grails/transmartConfig
+    mv Config-template.groovy ~/.grails/transmartConfig/Config.groovy
+    mv DataSource.groovy.php ~/.grails/transmartConfig/DataSource.groovy
+    ```
 
 4. Link tranSMART to your SmartR directory
-- Search this line `runtime ':resources:1.2.1'` and change it to `runtime ':resources:1.2.14'`
-- Remove this line `runtime ':smart-r:16.2-SNAPSHOT'`
-- Add this line to the end of the file `grails.plugin.location.SmartR="../relative/path/to/SmartR"`
+    - Search this line `runtime ':resources:1.2.1'` and change it to `runtime ':resources:1.2.14'`
+    - Remove this line `runtime ':smart-r:16.2-SNAPSHOT'`
+    - Add this line to the end of the file `grails.plugin.location.SmartR="../relative/path/to/SmartR"`
 
 5. Prepare your Configuration files
-- Add this line to the end of Config.groovy `org.transmart.configFine = true`
-- Modify parameters if necessary
-- Remove the php code from DataSource.groovy and edit it as needed
+    - Add this line to the end of Config.groovy `org.transmart.configFine = true`
+    - Modify parameters if necessary
+    - Remove the php code from DataSource.groovy and edit it as needed
 
 6. (optional) If you want to use a remote DB, you must establish an connection to it now. This step depends on your settings in DataSource.groovy
-```
-ssh -L 3080:localhost:5432 foobar@10.11.12.13 -p 8022
-```
+    ```
+    ssh -L 3080:localhost:5432 foobar@10.11.12.13 -p 8022
+    ```
 
 7. Start Rserve
-```
-R
-require(RServe)
-Rserve(args="--no-save")
-```
+    ```
+    R
+    require(RServe)
+    Rserve(args="--no-save")
+    ```
 
 8. Run tranSMART
-```
-cd /wherever/transmartApp
-grails run-app
-```
-NOTE: This will crash the first time, probably because of some circular dependency. Run it again and it should work.
+    ```
+    cd /wherever/transmartApp
+    grails run-app
+    ```
+    NOTE: This will crash the first time, probably because of some circular dependency. Run it again and it should work.
 
 
 ## SmartR development
 
 1. Coding Guidelines
-- The code must pass all checks of jshint, with the ruleset defined in .jshintrc
+    - The code must pass all checks of jshint, with the ruleset defined in .jshintrc
 
 2. Tests
-- Your code must pass all tests in order to be accepted
+    - Your code must pass all tests in order to be accepted
 
 ## SmartR Components & Workflow Structure (Example Boxplot)
 
