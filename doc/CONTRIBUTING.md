@@ -1,14 +1,14 @@
 ## SETUP (The following steps HIGHLY depend on your environment. Feel free to skip those if you know what you are doing or have a better tutorial)
 
 0. Preparation
-- Download [Grails 2.3.11](https://grails.org/download.html)
-- Download [Oracle JDK7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html) or OpenJDK 7
-    - Version 8+ is not supported at the moment.
-- Download the [tranSMART configuration template](https://github.com/transmart/transmart-data/blob/master/config/Config-template.groovy)
-- Download the [tranSMART data source configuration](https://github.com/transmart/transmart-data/blob/master/config/DataSource.groovy.php)
-- Clone the [tranSMART repository](https://github.com/transmart/transmartApp)
-- Clone the [SmartR repository](https://github.com/transmart/SmartR)
-- Install the [necessary R packages](https://github.com/transmart/SmartR#requirements)
+    - Download [Grails 2.3.11](https://grails.org/download.html)
+    - Download [Oracle JDK7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html) or OpenJDK 7
+        - Version 8+ is not supported at the moment.
+    - Download the [tranSMART configuration template](https://github.com/transmart/transmart-data/blob/master/config/Config-template.groovy)
+    - Download the [tranSMART data source configuration](https://github.com/transmart/transmart-data/blob/master/config/DataSource.groovy.php)
+    - Clone the [tranSMART repository](https://github.com/transmart/transmartApp)
+    - Clone the [SmartR repository](https://github.com/transmart/SmartR)
+    - Install the [necessary R packages](https://github.com/transmart/SmartR#requirements)
 
 1. Add JAVA_HOME, GRAILS_HOME, and the grails binaries to your environment
 In an unix-like environment you could add something like this to your .bashrc
@@ -59,7 +59,6 @@ In an unix-like environment you could add something like this to your .bashrc
     grails run-app
     ```
     NOTE: This will crash the first time, probably because of some circular dependency. Run it again and it should work.
-
 
 ## SmartR development
 
