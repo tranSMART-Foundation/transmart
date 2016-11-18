@@ -36,6 +36,6 @@ class RScriptOutputManagerSpec extends Specification {
             result
             result.size() == 1
             result[0] instanceof File
-            result[0].getAbsolutePath() == SmartRRuntimeConstants.instance.baseDir+"/$sessionId/$taskId/plot.png"
+            result[0].getAbsolutePath() == SmartRRuntimeConstants.instance.baseDir.toString()+"/$sessionId/$taskId/plot.png"
     }
 }
