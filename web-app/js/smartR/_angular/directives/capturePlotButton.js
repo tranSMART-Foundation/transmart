@@ -49,7 +49,7 @@ window.smartRApp.directive('capturePlotButton', [function() {
                 $(scope.target + ' svg').wrap('<div id="sr-capture-container"></div>');
                 var b64 = btoa(unescape(encodeURIComponent($('#sr-capture-container').html())));
                 var tab = window.open();
-                tab.document.write("<a href-lang='image/svg+xml' href='data:image/svg+xml;base64,\n"+b64+"' title='file.svg'>Download</a>");
+                tab.document.write("<a href-lang='image/svg+xml' href='data:image/svg+xml;base64,\n"+b64+"' title='file.svg' download>Download SVG</a>");
                 $(scope.target + ' svg').unwrap();
                 $(scope.target + ' svg defs').remove();
             });
