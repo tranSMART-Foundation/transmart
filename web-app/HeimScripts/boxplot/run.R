@@ -27,6 +27,9 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
     names <- getNames(loaded_variables, fetch_params)
     types <- getTypes(loaded_variables)
 
+    save(loaded_variables, file="~/loaded_variables.Rda")
+    save(fetch_params, file="~/fetch_params.Rda")
+
     # initialize empty df
     df <- data.frame(patientID=integer(),
                      value=integer(),
@@ -34,7 +37,7 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                      type=character(),
                      subset=integer(),
                      stringsAsFactors=FALSE)
-    
+
     # build big df step by step via binding row-wise every loaded variable
     for (i in 1:length(names(loaded_variables))) {
         variable <- loaded_variables[[i]]
@@ -61,7 +64,7 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
                 if (nrow(variable.label.df) == 0) next
                 df <- rbind(df, variable.label.df)
             }
-        } else {
+        } else  if (types[i] == "numeric"){
             variable.df <- data.frame(patientID=as.integer(variable[,1]), value=variable[,2])
             bioMarker <- names[i]
             values <- as.numeric(as.vector(variable.df$value))
@@ -82,6 +85,19 @@ buildCrossfilterCompatibleDf <- function(loaded_variables, fetch_params) {
     # before we are done we assign a unique id to every row to make it easier for the front-end
     df <- cbind(id=1:nrow(df), df)
 
+    groups <- loaded_variables[grep("^groups", names(loaded_variables))]
+    subsets <- getSubsets(groups)
+    for (i in 1:length(groups)) {
+        group <- groups[[i]]
+        subset <- subsets[i]
+        na.omit(group)
+        group <- group[group[,2] != "",]
+        groupName <- group[1,2]
+        patients <- group[, "Row.Label"]
+        if (! any(patients %in% df$patientID)) next
+        df[df$patientID %in% patients & df$subset == subset, ]$bioMarker <-
+            paste(df[df$patientID %in% patients & df$subset == subset, ]$bioMarker, groupName, sep=" g:")
+    }
     df
 }
 

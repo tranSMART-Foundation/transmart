@@ -51,7 +51,7 @@ window.smartRApp.directive('boxplot', [
             });
             byBioMarker.filterAll();
         });
-        
+
         var layout = {
             title: 'Boxplots (' + scope.data.transformation + ')',
             height: 800
