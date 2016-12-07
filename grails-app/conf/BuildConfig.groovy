@@ -27,7 +27,7 @@ grails.project.dependency.resolution = {
         }
         compile 'org.apache.httpcomponents:httpclient:4.4.1'
         compile 'org.mongodb:mongo-java-driver:2.10.1'
-        compile 'org.apache.httpcomponents:httpcore:4.4.5'
+        compile 'org.apache.httpcomponents:httpcore:4.4.1'
         compile 'org.apache.httpcomponents:httpmime:4.4.1'
         compile 'org.apache.james:apache-mime4j:0.6'
         test('junit:junit:4.11') {
