@@ -66,6 +66,7 @@ local.properties
 
 # plugin release files
 /*.zip
+/*.zip.sha1
 /plugin.xml
 
 # older plugin install locations
