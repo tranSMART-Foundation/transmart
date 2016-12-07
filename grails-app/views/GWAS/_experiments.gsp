@@ -20,7 +20,7 @@
     <g:each in="${experiments.entrySet().sort{it.key.accession}}" status="ti" var="experimentresult">        
         <div class="${ (ti % 2) == 0 ? 'result-trial-odd' : 'result-trial-even'}" id="TrialDet_${experimentresult.key.id}_anchor">
         	<g:set var="safeTitle">${experimentresult.key.title.replace("'", "\\'")}</g:set>
-            <a href="#" onclick="javascript:showDetailDialog('${createLink(controller:'experimentAnalysis',action:'expDetail',id:experimentresult.key.id)}', '${experimentresult.key.accession}: ${safeTitle}', 600);">
+            <a href="#" onclick="javascript:gwasShowDetailDialog('${createLink(controller:'experimentAnalysis',action:'expDetail',id:experimentresult.key.id)}', '${experimentresult.key.accession}: ${safeTitle}', 600);">
                <span style="display:block; float:left;">
                    <img alt="" src="${resource(file:'/images/view_detailed.png')}" />
                </span>
@@ -29,7 +29,7 @@
                <g:ifPlugin name="folder-management">
 	               <span class="result-analysis-label">
 		               <g:set var="ts" value="${Calendar.instance.time.time}" />
-		               <a id="toggleFile_${experimentresult.key.id}" href="#" onclick="javascript:toggleFileDiv('${experimentresult.key.id}', '${createLink(controller:'fmFolder',action:'getFolderFiles',params:[id:experimentresult.key.id,trialNumber:experimentresult.key.id,unqKey:ts])}');">
+		               <a id="toggleFile_${experimentresult.key.id}" href="#" onclick="javascript:gwasToggleFileDiv('${experimentresult.key.id}', '${createLink(controller:'fmFolder',action:'getFolderFiles',params:[id:experimentresult.key.id,trialNumber:experimentresult.key.id,unqKey:ts])}');">
 		                <img alt="expand/collapse" id="imgFileExpand_${experimentresult.key.id}" src="${resource(file:'/images/down_arrow_small2.png')}" style="display: inline;"/>
 		    				  Files
 		               </a>
@@ -40,7 +40,7 @@
 
                <span class="result-analysis-label">
                    <g:set var="ts" value="${Calendar.instance.time.time}" />
-                   <a id="toggleDetail_${experimentresult.key.id}" href="#" onclick="javascript:toggleDetailDiv('${experimentresult.key.id}', '${createLink(controller:'GWAS',action:'getTrialAnalysis',params:[id:experimentresult.key.id,trialNumber:experimentresult.key.id,unqKey:ts])}');">
+                   <a id="toggleDetail_${experimentresult.key.id}" href="#" onclick="javascript:gwasToggleDetailDiv('${experimentresult.key.id}', '${createLink(controller:'GWAS',action:'getTrialAnalysis',params:[id:experimentresult.key.id,trialNumber:experimentresult.key.id,unqKey:ts])}');">
                     <img alt="expand/collapse" id="imgExpand_${experimentresult.key.id}" src="${resource(file:'/images/down_arrow_small2.png')}" style="display: inline;"/>
                           Analyses
                    </a>
