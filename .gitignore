@@ -11,3 +11,10 @@ target-eclipse/
 *.ipr
 *.iws
 *.log
+
+
+/*.zip
+/*.zip.sha1
+/plugin.xml
+
+grails-app/i18n/
