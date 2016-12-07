@@ -14,100 +14,121 @@
         <r:layoutResources /><%-- XXX: Use template --%>
 
         <g:ifPlugin name="folder-management">
-             <g:render template="/folderManagementUrls" plugin="folderManagement"/>
-  			<script type="text/javascript" src="${resource(dir:'js', file:'folderManagement.js', plugin: 'folderManagement')}"></script>
-  			<link rel="stylesheet" href="${resource(dir:'css', file:'folderManagement.css', plugin: 'folderManagement')}"></link>        
-  		</g:ifPlugin>
+          <g:render template="/folderManagementUrls" plugin="folderManagement"/>
+	  <script type="text/javascript" src="${resource(dir:'js', file:'folderManagement.js', plugin: 'folderManagement')}"></script>
+	  <link rel="stylesheet" href="${resource(dir:'css', file:'folderManagement.css', plugin: 'folderManagement')}"></link>
+	</g:ifPlugin>
+
+        <script type="text/javascript" src="${resource(dir:'js', file:'gwas.js', plugin:'transmart-gwas')}"></script>
 
         <script type="text/javascript" charset="utf-8">
-	        var searchResultsURL = "${createLink([action:'loadSearchResults'])}";
-	        var facetResultsURL = "${createLink([action:'getFacetResults'])}";
-	        var facetTableResultsURL = "${createLink([action:'getFacetResultsForTable'])}";
-	        var newSearchURL = "${createLink([action:'newSearch'])}";
-	        var visualizationURL = "${createLink([action:'newVisualization'])}";
-	        var tableURL = "${createLink([action:'newTable'])}";
-	        var treeURL = "${createLink([action:'getDynatree'])}";
-	        var sourceURL = "${createLink([action:'searchAutoComplete'])}";	      
-	        var getCategoriesURL = "${createLink([action:'getSearchCategories'])}";
-	        var getHeatmapNumberProbesURL = "${createLink([action:'getHeatmapNumberProbes'])}";
-	        var getHeatmapDataURL = "${createLink([action:'getHeatmapData'])}";
-	        var getHeatmapDataForExportURL = "${createLink([action:'getHeatmapDataForExport2'])}";
-	        var getBoxPlotDataURL = "${createLink([action:'getBoxPlotData'])}";
-	        var getLinePlotDataURL = "${createLink([action:'getLinePlotData'])}";	        
-	        var saveSearchURL = "${createLink([action:'saveFacetedSearch'])}";
-	        var loadSearchURL = "${createLink([action:'loadFacetedSearch'])}";
-	        var deleteSearchURL = "${createLink([action:'deleteFacetedSearch'])}";
-	        var exportAsImage = "${createLink([action:'exportAsImage'])}";
+	        var gwasSearchResultsURL = "${createLink([controller:'GWAS',action:'loadSearchResults'])}";
+	        var gwasFacetResultsURL = "${createLink([controller:'GWAS',action:'getFacetResults'])}";
+	        var gwasFacetTableResultsURL = "${createLink([controller:'GWAS',action:'getFacetResultsForTable'])}";
+	        var gwasNewSearchURL = "${createLink([controller:'GWAS',action:'newSearch'])}";
+	        var visualizationURL = "${createLink([action:'newVisualization'])}"; <!-- not used -->
+	        var gwasTableURL = "${createLink([action:'newTable'])}"; <!-- not used -->
+	        var gwasTreeURL = "${createLink([controller:'GWAS',action:'getDynatree'])}"; <!-- treeURL must overwrite transmartApp -->
+	        var gwasSourceURL = "${createLink([controller:'GWAS',action:'searchAutoComplete'])}";
+	        var gwasGetCategoriesURL = "${createLink([controller:'GWAS',action:'getSearchCategories'])}";
+	        var gwasGetHeatmapNumberProbesURL = "${createLink([action:'getHeatmapNumberProbes'])}"; <!-- not used -->
+	        var gwasGetHeatmapDataURL = "${createLink([action:'getHeatmapData'])}"; <!-- not used -->
+	        var gwasGetHeatmapDataForExportURL = "${createLink([action:'getHeatmapDataForExport2'])}";
+	        var gwasGetBoxPlotDataURL = "${createLink([action:'getBoxPlotData'])}";
+	        var gwasGetLinePlotDataURL = "${createLink([action:'getLinePlotData'])}";
+	        var gwasSaveSearchURL = "${createLink([action:'saveFacetedSearch'])}";
+	        var gwasLoadSearchURL = "${createLink([action:'loadFacetedSearch'])}";
+	        var gwasDeleteSearchURL = "${createLink([action:'deleteFacetedSearch'])}";
+	        var gwasExportAsImage = "${createLink([action:'exportAsImage'])}";
 
 	        var getStudyAnalysesUrl = "${createLink([controller:'GWAS',action:'getTrialAnalysis'])}";
         
-			//These are the URLS for the different browse windows.
-			var studyBrowseWindow = "${createLink([controller:'experiment',action:'browseGWASExperimentsMultiSelect',plugin: 'biomartForGit'])}";
-			var analysisBrowseWindow = "${createLink([controller:'experimentAnalysis',action:'browseAnalysisMultiSelect',plugin: 'biomartForGit'])}";
-			var dataTypeBrowseWindow = "${createLink([controller:'GWAS',action:'browseDataTypesMultiSelect'])}";
+		//These are the URLS for the different browse windows.
+		var studyBrowseWindow = "${createLink([controller:'experiment',action:'browseGWASExperimentsMultiSelect',plugin: 'biomartForGit'])}";
+		var analysisBrowseWindow = "${createLink([controller:'experimentAnalysis',action:'browseAnalysisMultiSelect',plugin: 'biomartForGit'])}";
+		var dataTypeBrowseWindow = "${createLink([controller:'GWAS',action:'browseDataTypesMultiSelect'])}";
+		var regionBrowseWindow = "${createLink([controller:'gwasSearch',action:'getRegionFilter'])}";
+		var eqtlTranscriptGeneWindow = "${createLink([controller:'gwasSearch',action:'getEqtlTranscriptGeneFilter'])}";
         </script>
 
-    <g:ifPlugin name="transmart-gwas">
-            <g:render template="/GWAS/gwasURLs" plugin="transmart-gwas"/>
+	<g:ifPlugin name="transmart-gwas">
+          <g:render template="/GWAS/gwasURLs" plugin="transmart-gwas"/>
         </g:ifPlugin>
 
         <script type="text/javascript" charset="utf-8">
 	        var mouse_inside_options_div = false;
-            var popupWindowPropertiesMap = [];
+		var popupWindowPropertiesMap = [];
 
 	        jQuery(document).ready(function() {
-		        addSelectCategories();
-		        addSearchAutoComplete();
-		        addToggleButton();
-                popupWindowPropertiesMap['Study'] = {'URLToUse': studyBrowseWindow, 'filteringFunction': applyPopupFiltersStudy}
-                popupWindowPropertiesMap['Analyses'] = {'URLToUse': analysisBrowseWindow, 'filteringFunction': applyPopupFiltersAnalyses}
-                popupWindowPropertiesMap['Data Type'] = {'URLToUse': dataTypeBrowseWindow, 'filteringFunction': applyPopupFiltersDataTypes}
+		        gwasAddSelectCategories();
+		        gwasAddSearchAutoComplete();
+		        gwasAddToggleButton();
+                        popupWindowPropertiesMap['Study'] = {
+		                'URLToUse': studyBrowseWindow,
+		                'filteringFunction': gwasApplyPopupFiltersStudy
+		        }
+                        popupWindowPropertiesMap['Analyses'] = {
+		                'URLToUse': analysisBrowseWindow,
+		                'filteringFunction': gwasApplyPopupFiltersAnalyses
+		        }
+                        popupWindowPropertiesMap['Data Type'] = {
+		                'URLToUse': dataTypeBrowseWindow,
+		                'filteringFunction': gwasApplyPopupFiltersDataTypes
+		        }
+                        popupWindowPropertiesMap['Region of Interest'] = {
+		                'URLToUse': regionBrowseWindow,
+		                'filteringFunction': gwasApplyPopupFiltersRegions,
+		                'dialogHeight' : 450,
+		                'dialogWidth' : 900
+		        }
+                        popupWindowPropertiesMap['eQTL Transcript Gene'] = {
+		                'URLToUse': eqtlTranscriptGeneWindow,
+		                'filteringFunction': gwasApplyPopupFiltersEqtlTranscriptGene
+		        }
 
 		        jQuery("#xtButton").colorbox({opacity:.75, inline:true, width:"95%", height:"95%"});
-      
 
-		    	showSearchResults('analysis'); //reload the full search results for the analysis/study view
+			gwasShowSearchResults('analysis'); //reload the full search results for the analysis/study view
 
 		    	//Disabling this, we aren't using the d3js code that takes advantage of HTML5.
-		    	//showIEWarningMsg();
-
+			//gwasShowIEWarningMsg();
 
 		        jQuery("#searchResultOptions_btn").click(function(){
 		        	jQuery("#searchResultOptions").toggle();
-		        	});
+		        });
 		        
 		        //used to hide the options div when the mouse is clicked outside of it
 
-	            jQuery('#searchResultOptions_holder').hover(function(){ 
-	            	mouse_inside_options_div=true; 
-	            }, function(){ 
-	            	mouse_inside_options_div=false; 
-	            });
+	                jQuery('#searchResultOptions_holder').hover(function(){
+	                        mouse_inside_options_div=true;
+	                }, function(){
+	                        mouse_inside_options_div=false;
+	                });
 
-	            jQuery("body").mouseup(function(){ 
-		            //top menu options
-	                if(! mouse_inside_options_div ){
-		                jQuery('#searchResultOptions').hide();
-	                }
+	                jQuery("body").mouseup(function(){
+		                //top menu options
+	                        if(! mouse_inside_options_div ){
+		                        jQuery('#searchResultOptions').hide();
+	                        }
 
-	                var analysisID = jQuery('body').data('heatmapControlsID');
+	                        var analysisID = jQuery('body').data('heatmapControlsID');
 
-	                if(analysisID > 1){
-	            		jQuery('#heatmapControls_' +analysisID).hide();
-		             }
+	                        if(analysisID > 1){
+	                                jQuery('#heatmapControls_' +analysisID).hide();
+		                }
 
-	            });
+	                });
 
-	        	jQuery('#topTabs').tabs();	
-	        	jQuery('#topTabs').bind( "tabsshow", function(event, ui) {
-		        	var id = ui.panel.id;
-	        	    if (ui.panel.id == "results-div") {
-	        	    	
-	        	    } else if (ui.panel.id == "table-results-div")	{
+	                jQuery('#topTabs').tabs();
+	                jQuery('#topTabs').bind( "tabsshow", function(event, ui) {
+		                var id = ui.panel.id;
+	                        if (ui.panel.id == "results-div") {
+
+	                        } else if (ui.panel.id == "table-results-div")	{
 						
-	        	    }
-	        	});
- 
+	                        }
+	        });
+
 	        });	
             
         </script>
@@ -116,7 +137,7 @@
         <script type="text/javascript">		
 			jQuery(function ($) {
 				// Load dialog on click of Save link
-				$('#save-modal .basic').click(openSaveSearchDialog);
+				$('#save-modal .basic').click(gwasOpenSaveSearchDialog);
 			});
 		</script>
 		<script type="text/javascript">
@@ -144,16 +165,16 @@
 				<div class='toolbar-item'>Expand All</div>
 
 				 -->
-				<div class='toolbar-item' onclick='collapseAllStudies();'>Collapse All Studies</div>
-				<div class='toolbar-item' onclick='expandAllStudies();'>Expand All Studies</div>
+				<div class='toolbar-item' onclick='gwasCollapseAllStudies();'>Collapse All Studies</div>
+				<div class='toolbar-item' onclick='gwasExpandAllStudies();'>Expand All Studies</div>
 				<g:ifPlugin name="transmart-gwas">
-                    <div class='toolbar-item' onclick='openPlotOptions();'>Manhattan Plot</div>
+				<div class='toolbar-item' onclick='gwasOpenPlotOptions();'>Manhattan Plot</div>
                 </g:ifPlugin>
-				<div class='toolbar-item' onclick="jQuery('.analysesopen .analysischeckbox').attr('checked', 'checked'); updateSelectedAnalyses();">Select All Visible Analyses</div>
-				<div class='toolbar-item' onclick="jQuery('.analysesopen .analysischeckbox').removeAttr('checked'); updateSelectedAnalyses();">Unselect All Visible Analyses</div>
-	  			<div class='toolbar-item' onclick="filterSelectedAnalyses();">Add Selected to Filter</div>
+				<div class='toolbar-item' onclick="jQuery('.analysesopen .analysischeckbox').attr('checked', 'checked'); gwasUpdateSelectedAnalyses();">Select All Visible Analyses</div>
+				<div class='toolbar-item' onclick="jQuery('.analysesopen .analysischeckbox').removeAttr('checked'); gwasUpdateSelectedAnalyses();">Unselect All Visible Analyses</div>
+				<div class='toolbar-item' onclick="gwasFilterSelectedAnalyses();">Add Selected to Filter</div>
 
-				<div class='toolbar-item' onclick="exportAnalysisandMail();"> Email Analysis</div>
+				<div class='toolbar-item' onclick="gwasExportAnalysisandMail();"> Email Analysis</div>
 
                 <g:ifPlugin name="folder-management">
                     <div class="toolbar-item">
@@ -168,7 +189,7 @@
 					<div id="searchResultOptions" class='auto-hide' style="display:none;">
 						<ul>
 							<li>
-								<select id="probesPerPage" onchange="showSearchResults(); ">
+								<select id="probesPerPage" onchange="gwasShowSearchResults(); ">
 								    <option value="10">10</option>
 								    <option value="20" selected="selected">20</option>
 								    <option value="50">50</option>
@@ -179,7 +200,7 @@
 								</select>  Probes/Page
 							</li>
 							<li>
-								<input type="checkBox" id="cbShowSignificantResults" checked="true" onclick="showSearchResults(); ">Show only significant results</input>		
+								<input type="checkBox" id="cbShowSignificantResults" checked="true" onclick="gwasShowSearchResults(); ">Show only significant results</input>
 							</li>
 						</ul>
 					</div>
@@ -191,8 +212,8 @@
 		
 			<div id="topTabs" class="analysis-tabs">
 			  <ul>
-		            <li id="analysisViewTab"><a href="#results-div" onclick="showSearchResults('analysis')">Analysis View</a></li>
-		            <li id="tableViewTab"><a href="#table-results-div" onclick="showSearchResults('table')">Table View</a></li>
+		            <li id="analysisViewTab"><a href="#results-div" onclick="gwasShowSearchResults('analysis')">Analysis View</a></li>
+		            <li id="tableViewTab"><a href="#table-results-div" onclick="gwasShowSearchResults('table')">Table View</a></li>
 			  </ul>
 
 	       		  <div id="results-div">
@@ -224,8 +245,8 @@
 			 <span id='save-modal'>
 			   <a href="#" class="basic">Save</a>
 			 </span>
-			 <a href="#" onclick="loadSearch(); return false;">Load</a>--%>
-		    <a href="#" onclick="clearSearch(); return false;">Clear</a>
+			 <a href="#" onclick="gwasLoadSearch(); return false;">Load</a>--%>
+		    <a href="#" onclick="gwasClearSearch(); return false;">Clear</a>
 		  </h2> 
 		</div>
 
@@ -235,7 +256,7 @@
 			Enter Name <input type="text" id="searchName" size="50"/><br/><br/>
 			Enter Description <textarea id="searchDescription" rows="5" cols="70" ></textarea><br/>
 			<br/>
-			<a href="#" onclick="saveSearch(); return false;">Save</a>&nbsp;   
+			<a href="#" onclick="gwasSaveSearch(); return false;">Save</a>&nbsp;
 			<a href="#" onclick="jQuery.modal.close();return false;">Cancel</a>   
 			
 		</div>
@@ -249,7 +270,7 @@
 		  </div>	 
 		</div>
 		<div id="side-scroll">
-		  <div id="filter-div"></div>
+		  <div id="gwas-filter-div"></div>
 		</div>
 		<button id="toggle-btn"></button>
 		<div id="searchHelp" style="position: absolute; top: 30px; left: 272px">
