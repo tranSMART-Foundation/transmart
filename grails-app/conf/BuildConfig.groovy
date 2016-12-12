@@ -48,6 +48,7 @@ grails.project.dependency.resolution = {
         dm.configureRepositories delegate
     }
     dependencies {
+        compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
         // compile 'org.apache.ant:ant:1.9.6'
         compile 'net.sf.opencsv:opencsv:2.3'
         compile 'org.rosuda:Rserve:1.7.3'
@@ -87,8 +88,8 @@ grails.project.dependency.resolution = {
         if (!dm) {
             runtime ':transmart-core:16.2'
 
-            test ':transmart-core:16.2'
-            test ':transmart-core-db-tests:16.2'
+            //test ':transmart-core:16.2'
+            //test ':transmart-core-db-tests:16.2'
         } else {
             dm.internalDependencies delegate
         }
