@@ -40,7 +40,6 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
         compile 'org.anarres.lzo:lzo-core:1.0.5'
-        compile(':quartz:1.0-RC2')
     }
 
     plugins {
@@ -49,5 +48,6 @@ grails.project.dependency.resolution = {
             export = false
         }
         compile ':plugin-config:0.2.1'
+        compile(':quartz:1.0-RC2')
     }
 }
