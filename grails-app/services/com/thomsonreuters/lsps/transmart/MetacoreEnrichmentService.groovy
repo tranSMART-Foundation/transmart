@@ -118,7 +118,7 @@ class MetacoreEnrichmentService {
 		def settingsMode = metacoreSettingsMode()
 
 		if (settingsMode == 'demo') {
-			baseUrl = grailsApplication?.config?.com?.thomsonreuters?.transmart?.demoEnrichmentURL?:'http://pathwaymaps.com:7080'
+			baseUrl = grailsApplication?.config?.com?.thomsonreuters?.transmart?.demoEnrichmentURL?:'http://pathwaymaps.com'
 			mapBaseUrl = grailsApplication?.config?.com?.thomsonreuters?.transmart?.demoMapBaseURL?:'http://pathwaymaps.com/maps/'
 		}
 		else {
