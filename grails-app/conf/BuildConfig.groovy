@@ -19,9 +19,9 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        compile 'uk.ac.ebi.mydas:mydas:1.7.0.transmart-16.2-SNAPSHOT'
+        compile 'uk.ac.ebi.mydas:mydas:1.7.0.transmart-16.2'
         compile 'net.sf.opencsv:opencsv:2.3'
-        compile 'org.transmartproject:transmart-core-api:16.2-SNAPSHOT'
+        compile 'org.transmartproject:transmart-core-api:16.2'
     }
 
     plugins {
