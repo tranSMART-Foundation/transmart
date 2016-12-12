@@ -24,25 +24,25 @@ grails.project.dependency.resolution = {
     	// needed to support folder-management
         compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
-		runtime 'org.transmartproject:transmart-core-api:16.2-SNAPSHOT'
+		runtime 'org.transmartproject:transmart-core-api:16.2'
     }
     plugins {
 		compile(':resources:1.2.1')
 		//// already included in biomart-domain
-                //compile(':transmart-java:16.2-SNAPSHOT')
+                //compile(':transmart-java:16.2')
 		//// already included in search-domain
-                //compile(':biomart-domain:16.2-SNAPSHOT')
+                //compile(':biomart-domain:16.2')
 		//// already included in folder-management
-                //compile(':search-domain:16.2-SNAPSHOT')
-		compile(':folder-management:16.2-SNAPSHOT')
+                //compile(':search-domain:16.2')
+		compile(':folder-management:16.2')
 		//// already included in folder-management
-                //compile(':transmart-legacy-db:16.2-SNAPSHOT')
+                //compile(':transmart-legacy-db:16.2')
 		compile(':spring-security-core:2.0-RC2')
 		compile(':quartz:1.0-RC2')
 		compile(':mail:1.0')
 		compile(':cache:1.1.8')
-		runtime(':transmart-core:16.2-SNAPSHOT')
-		runtime(':biomart-domain:16.2-SNAPSHOT')
+		runtime(':transmart-core:16.2')
+		runtime(':biomart-domain:16.2')
 		build(":release:3.1.1")
 
     }
