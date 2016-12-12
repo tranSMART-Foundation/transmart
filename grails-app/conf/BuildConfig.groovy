@@ -38,7 +38,7 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        compile('org.transmartproject:transmart-core-api:16.2-SNAPSHOT')
+        compile('org.transmartproject:transmart-core-api:16.2')
         compile 'org.apache.httpcomponents:httpcore:4.4.1'
         compile 'org.apache.httpcomponents:httpclient:4.4.1'
         compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1') {
@@ -47,7 +47,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        compile(':search-domain:16.2-SNAPSHOT')
+        compile(':search-domain:16.2')
         build(":release:3.1.1",
               ":rest-client-builder:2.1.1") {
             export = false
