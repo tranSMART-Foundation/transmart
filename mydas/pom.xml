@@ -17,7 +17,7 @@
 
     <groupId>uk.ac.ebi.mydas</groupId>
     <artifactId>mydas_master</artifactId>
-    <version>1.7.0.transmart-16.2-SNAPSHOT</version>
+    <version>1.7.0.transmart-16.2</version>
 
     <packaging>pom</packaging>
     <name>mydas_master Maven Webapp</name>
