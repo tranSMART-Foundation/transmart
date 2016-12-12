@@ -173,11 +173,14 @@ class FmFolderService {
      * @param file file to be proceessed
      * @return
      */
-    private void processFile(FmFolder fmFolder, File file) {
+    private void processFile(FmFolder fmFolder, File file, String customName = null, String description = null) {
         log.info "Importing file $file into folder $fmFolder"
 
         // Check if folder already contains file with same name.
         def fmFile;
+
+        def newFileName = customName?:file.getName()
+		
         for (f in fmFolder.fmFiles) {
             if (f.originalName == file.getName()) {
                 fmFile = f;
@@ -199,7 +202,8 @@ class FmFolderService {
                     fileSize: file.length(),
                     filestoreLocation: "",
                     filestoreName: "",
-                    linkUrl: ""
+                    linkUrl: "",
+                    fileDescription: description
             );
             if (!fmFile.save(flush: true)) {
                 fmFile.errors.each {
@@ -954,7 +958,7 @@ class FmFolderService {
      */
     List<FmFolder> getChildrenFolder(String parentId) {
         def folder = FmFolder.get(parentId)
-        return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn and fd.folderLevel= :fl ", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%"])
+        return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn escape '*' and fd.folderLevel= :fl ", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%"])
     }
 
     /**
@@ -963,7 +967,7 @@ class FmFolderService {
      */
     List<FmFolder> getChildrenFolderByType(Long parentId, String folderType) {
         def folder = FmFolder.get(parentId)
-        return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn and fd.folderLevel= :fl and upper(fd.folderType) = upper(:ft)", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%", ft: folderType])
+        return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn escape '*' and fd.folderLevel= :fl and upper(fd.folderType) = upper(:ft)", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%", ft: folderType])
     }
 
     /**
@@ -972,6 +976,7 @@ class FmFolderService {
      */
     List getChildrenFolderTypes(Long parentId) {
         def folder = FmFolder.get(parentId)
-        return FmFolder.executeQuery("select distinct(fd.folderType) from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn and fd.folderLevel= :fl ", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%"])
+        log.info "escaped query for parentId ${parentId} folderFullname ${folder.folderFullName}"
+        return FmFolder.executeQuery("select distinct(fd.folderType) from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn escape '*' and fd.folderLevel= :fl ", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%"])
     }
 }

@@ -31,7 +31,7 @@ class MetaDataController {
             }
 
     /**
-     * Find the top 15 diseases with a case-insensitive LIKE
+     * Find the top 10 concepts with a case-insensitive LIKE
      */
     def extSearch = {
         log.info "EXT SEARCH called"
@@ -55,7 +55,7 @@ class MetaDataController {
     }
 
     /**
-     * Find the top 15 compounds with a case-insensitive LIKE
+     * Find the top 10 compounds with a case-insensitive LIKE
      */
     def bioCompoundSearch = {
         log.info "EXT bioCompoundSearch called"
@@ -65,7 +65,7 @@ class MetaDataController {
 
     }
     /**
-     * Find the top 15 diseases with a case-insensitive LIKE
+     * Find the top 10 diseases with a case-insensitive LIKE
      */
     def bioDiseaseSearch = {
         log.info "EXT bioDiseaseSearch called"
@@ -76,7 +76,7 @@ class MetaDataController {
     }
 
     /**
-     * Find the top 15 genes with a case-insensitive LIKE
+     * Find the top 10 genes with a case-insensitive LIKE
      */
     def bioMarkerSearch = {
         log.info "EXT bioMarkerSearch called"
@@ -87,7 +87,7 @@ class MetaDataController {
     }
 
     /**
-     * Find the top 15 biosources with a case-insensitive LIKE
+     * Find the top 10 biosources with a case-insensitive LIKE
      */
     def biosourceSearch = {
         log.info "EXT biosourceSearch called"
@@ -98,7 +98,7 @@ class MetaDataController {
     }
 
     /**
-     * Find the top 15 diseases, genes, pathways or observations with a case-insensitive LIKE
+     * Find the top 10 diseases, genes, pathways, observations or concepts with a case-insensitive LIKE
      */
     def programTargetSearch = {
         log.info "EXT programTargetSearch called"
@@ -129,7 +129,7 @@ class MetaDataController {
     }
 
     def bioAssayPlatformSearch = {
-        log.info "EXT platformSearch called"
+        log.info "EXT bioAssayPlatformSearch called"
         log.info params
         Map pagingMap = [max: 20];
 
@@ -168,7 +168,9 @@ class MetaDataController {
 
         def platforms = BioAssayPlatform.executeQuery(sb.toString(), paramMap, pagingMap);
         // .executeQuery("from BioAssayPlatform p WHERE upper(p.name) LIKE :term  order by platformType, vendor, platformTechnology, name", [term: value+'%'], [max: 20]);
-        log.info platforms
+
+        log.info "Platforms: " + platforms
+
         for (platform in platforms) {
             String displayString = platform.name
             //+ " -- [MEASUREMENT::"+platform.platformType + " VENDOR::" + platform.vendor + " TECH::" + platform.platformTechnology + "]"

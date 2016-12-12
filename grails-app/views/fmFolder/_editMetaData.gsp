@@ -1,3 +1,5 @@
+<g:logMsg>editMetaData page</g:logMsg>
+
 <%@ page import="annotation.*; org.transmart.biomart.*; com.recomdata.util.*" %>
 
 <g:form name="editMetadataForm">
