@@ -12,7 +12,7 @@ window.smartRApp.factory('rServeService', [
 
         var NOOP_ABORT = function() {};
         var TIMEOUT = 10000; // 10 s
-        var CHECK_DELAY = 500; // 0.5 s
+        var CHECK_DELAY = 400; // 0.5 s
         var SESSION_TOUCH_DELAY = 60000; // 1 min
 
         /* we only support one session at a time */

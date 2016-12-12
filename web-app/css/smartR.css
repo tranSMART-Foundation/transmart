@@ -1,5 +1,20 @@
 /* override  jquery-ui stylings */
 
+#sr-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0.7;
+    background-color: white;
+    z-index: 99999;
+    text-align: center;
+    font-size: 50pt;
+    visibility: hidden;
+}
+
 .ui-tabs  {
     font-size: .9em;
     font-family: Arial, Helvetica, sans-serif;
@@ -24,7 +39,7 @@
     color: red;
 }
 
-#smartRPanel > * {
+#smartRPanel text {
     font-family: 'Roboto', sans-serif; !important;
 }
 
@@ -221,8 +236,6 @@ div.sr-status-and-output-container:empty:before {
 
 .sr-workflow-controls {
     position: fixed;
-    bottom: 0;
-    right: 0;
     background: rgba(0, 0, 0, 0.5);
     color: white;
 }

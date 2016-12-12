@@ -4,9 +4,10 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'css', file: 'tooltip.css']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery-2.1.4.min.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery-ui-1.11.4.min.js']
-        resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jquery.tablesorter.min.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'd3.min.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'd3-tip.js']
+        resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'crossfilter.js']
+        resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'plotly-latest.min.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'jsrender.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'angular.js']
         resource url: [plugin: 'smart-r', dir: 'js/resource', file: 'angular-route.js']
@@ -49,12 +50,12 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Correlation.js']
         // boxplot
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'boxplot.js']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Boxplot.js']
-        // timeline
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'timeline.js']
-        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Timeline.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'plotlyBoxplot.js']
         // volcano
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'volcanoplot.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Volcanoplot.js']
+        // linegraph
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'linegraph.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Linegraph.js']
     }
 }

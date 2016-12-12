@@ -22,7 +22,8 @@ describe('fetchButton', function() {
 
         $rootScope.conceptMap = {};
         $rootScope.allowedCohorts = [];
-        var html = '<fetch-button concept-map="conceptMap" allowed-cohorts="allowedCohorts"></fetch-button>';
+        $rootScope.hasPreprocessTab = false;
+        var html = '<fetch-button concept-map="conceptMap" allowed-cohorts="allowedCohorts" has-preprocess-tab="hasPreprocessTab"></fetch-button>';
         element = $compile(angular.element(html))($rootScope);
         $rootScope.$digest();
     }));
@@ -50,11 +51,12 @@ describe('fetchButton', function() {
         }
     };
 
-    var _prepareScope = function(cohorts, allowedCohorts, showSummaryStats, conceptMap) {
+    var _prepareScope = function(cohorts, allowedCohorts, showSummaryStats, conceptMap, hasPreprocessTab) {
         spyOn(smartRUtils, 'countCohorts').and.returnValue(cohorts);
         element.isolateScope().allowedCohorts = String(allowedCohorts);
         element.isolateScope().showSummaryStats = showSummaryStats;
         element.isolateScope().conceptMap = conceptMap;
+        $rootScope.hasPreprocessTab = hasPreprocessTab;
         $rootScope.$digest();
     };
 
@@ -67,18 +69,16 @@ describe('fetchButton', function() {
         try { // we just want to see if the progress message is there
             element.find('input').click();
         } catch(e) {}
-        expect(element.find('span').text()).toContain('Fetching data');
         expect(element.isolateScope().running).toBe(true);
         expect(element.isolateScope().loaded).toBe(false);
         expect(element.isolateScope().allSamples).toEqual(0);
     });
 
-    it('should show another text after data is loaded if showSummaryStats is enabled', function() {
+    it('should have correct scope when clicked if showSummaryStats is enabled', function() {
         _prepareScope(1, [1], true, {foo: {concepts: ['concept'], valid: true}});
         try { // we just want to see if the progress message is there
             _clickButton('resolve()');
         } catch (e) {}
-        expect(element.find('span').text()).toContain('Executing summary statistics');
         expect(element.isolateScope().running).toBe(true);
         expect(element.isolateScope().loaded).toBe(false);
         expect(element.isolateScope().allSamples).toEqual(0);
@@ -87,7 +87,7 @@ describe('fetchButton', function() {
     it('should have the correct scope when successful without showSummaryStats', function() {
         _prepareScope(2, [2], false, {foo: {concepts: ['concept'], valid: true}});
         _clickButton('resolve()');
-        expect(element.find('span').text()).toBe('Task complete! Go to the "Preprocess" or "Run Analysis" tab to continue.');
+        expect(element.find('span').text()).toBe('Task complete! Go to the "Run Analysis" tab to continue.');
         expect(element.isolateScope().running).toBe(false);
         expect(element.isolateScope().loaded).toBe(true);
         expect(element.isolateScope().allSamples).toEqual(0);
@@ -95,6 +95,15 @@ describe('fetchButton', function() {
 
     it('should have the correct scope when successful with showSummaryStats', function() {
         _prepareScope(1, [1,2], true, {foo: {concepts: ['concept'], valid: true}});
+        _clickButton('resolve()', 'resolve({result: {allSamples: 1337, subsets: null}})');
+        expect(element.find('span').text()).toBe('Task complete! Go to the "Run Analysis" tab to continue.');
+        expect(element.isolateScope().running).toBe(false);
+        expect(element.isolateScope().loaded).toBe(true);
+        expect(element.isolateScope().allSamples).toEqual(1337);
+    });
+
+    it('should show `Task complete! Go to the "Preprocess" or "Run Analysis" tab to continue.`', function() {
+        _prepareScope(1, [1,2], true, {foo: {concepts: ['concept'], valid: true}}, true);
         _clickButton('resolve()', 'resolve({result: {allSamples: 1337, subsets: null}})');
         expect(element.find('span').text()).toBe('Task complete! Go to the "Preprocess" or "Run Analysis" tab to continue.');
         expect(element.isolateScope().running).toBe(false);

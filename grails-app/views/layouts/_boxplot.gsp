@@ -7,35 +7,58 @@
 
         <workflow-tab tab-name="Fetch Data" disabled="fetch.disabled">
             <concept-box style="display: inline-block;"
-                         concept-group="fetch.conceptBoxes.datapoints"
-                         type="LD-numerical"
-                         min="1"
-                         max="1"
-                         label="Numerical Variable"
-                         tooltip="Select a single numerical variable that you would like to have displayed.">
+                         concept-group="fetch.conceptBoxes.highDimensional"
+                         type="HD"
+                         min="-1"
+                         max="-1"
+                         label="High Dimensional Variables"
+                         tooltip="Select one or more high dimensional variables that you would like to have displayed.">
             </concept-box>
-            %{--Nice idea but somehow lost it's initial purpose because cross-study support is gone.
-                Maybe implement later--}%
-            %{--<concept-box style="display: inline-block;"--}%
-                         %{--concept-group="fetch.conceptBoxes.subsets"--}%
-                         %{--type="LD-categorical"--}%
-                         %{--min="0"--}%
-                         %{--max="-1"--}%
-                         %{--label="(optional) Categorical Variables"--}%
-                         %{--tooltip="Select an arbitrary amount of categorical variables to split the numerical variable into subsets.">--}%
-            %{--</concept-box>--}%
+            <concept-box style="display: inline-block;"
+                         concept-group="fetch.conceptBoxes.numData"
+                         type="LD-numerical"
+                         min="-1"
+                         max="-1"
+                         label="Numerical Variables"
+                         tooltip="Select one or more numerical variables that you would like to have displayed.">
+            </concept-box>
             <br/>
             <br/>
+            <biomarker-selection biomarkers="fetch.selectedBiomarkers"></biomarker-selection>
+            <hr class="sr-divider">
             <fetch-button concept-map="fetch.conceptBoxes"
                           loaded="fetch.loaded"
                           running="fetch.running"
+                          biomarkers="fetch.selectedBiomarkers"
+                          disabled="fetch.button.disabled"
+                          message="fetch.button.message"
                           allowed-cohorts="[1,2]">
             </fetch-button>
         </workflow-tab>
 
         <workflow-tab tab-name="Run Analysis" disabled="runAnalysis.disabled">
-            <br/>
-            <br/>
+           <div class="heim-input-field sr-input-area">
+                <h2>Data transformation:</h2>
+                <fieldset class="heim-radiogroup">
+                    <label>
+                        <input type="radio"
+                               ng-model="runAnalysis.params.transformation"
+                               value="raw" checked> Raw Values
+                    </label>
+                    <label>
+                        <input type="radio"
+                               ng-model="runAnalysis.params.transformation"
+                               value="log2"> Log2
+                    </label>
+                    <label>
+                        <input type="radio"
+                               ng-model="runAnalysis.params.transformation"
+                               value="log10"> Log10
+
+                    </label>
+                </fieldset>
+            </div>
+            <hr class="sr-divider">
             <run-button button-name="Create Plot"
                         store-results-in="runAnalysis.scriptResults"
                         script-to-run="run"
@@ -44,7 +67,7 @@
             </run-button>
             <br/>
             <br/>
-            <boxplot data="runAnalysis.scriptResults" width="1000" height="500"></boxplot>
+            <boxplot data="runAnalysis.scriptResults"></boxplot>
         </workflow-tab>
 
     </tab-container>

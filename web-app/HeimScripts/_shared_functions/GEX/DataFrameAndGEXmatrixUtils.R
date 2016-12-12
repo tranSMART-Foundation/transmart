@@ -42,54 +42,12 @@ applyRanking <- function (df, ranking, max_rows) {
 }
 
 
-## Sorting of measurement columns
-## in input data frame
-applySorting <- function(df,sorting) {
-  
-  measurements <- getMeasurements(df)
-  colNames <- names(measurements)
-  subsets <- getSubset(colNames)
-  nodes <- getNode(colNames)
-  subjects <- getSubject(colNames)
-
-  
-  timelineValues <- getTimelineValues(nodes, fetch_params$ontologyTerms)
-
-  
-   ## Converting subjects vector to integer if required for ordering
-   subjects_are_integer.logical = all(grepl("^\\d+$", subjects, perl = TRUE))
- 
-   if(subjects_are_integer.logical)
-     subjects = as.integer(subjects)
-
-   
-  ## Performing the sorting of columns
-    ## - according to nodes
-  if (sorting == "nodes") {
-    inds <- order(subsets, timelineValues, nodes, subjects)
-  
-    ## - or subjects
-  } else if (sorting == "subjects") {
-    inds <- order(subsets, subjects, timelineValues, nodes)
-    ## - else just stop the script as sth is wrong in the input params for this function
-  } else{
-    stop(paste("applySorting: Sorting can only be performed according to nodes/subjects. Please check your input:", sorting))
-  }
-
-  measurements <- measurements[, inds]
-
-  ## Returning the data frame with reordered columns
-  cbind(df[, c(1,2)], measurements)
-}
-
-
-
 ## Generates a filtered data frame containing the GEX matrix data
 ## as well as the statistics used to order and filter the df GEX data frame.
 ## Ordering and filtering can be performed based on Limma-based
 ## statistics (B value, P-value, Adjusted P-value) but also other statistical
 ## functions like variance, mean, median
-addStats <- function(df, sorting, ranking, max_rows) {
+addStats <- function(df, ranking, max_rows) {
   
   # In order to prevent displaying the table from previous run.
   cleanUpLimmaOutput(markerTableJson = markerTableJson)
@@ -120,11 +78,6 @@ addStats <- function(df, sorting, ranking, max_rows) {
 
   #this is the case for more than 1 sample available in the data frame
   if (ncol(df) > 3) {
-
-
-    df <- applySorting(df,sorting)  # no need for sorting in one sample case, we do it here only
-
-    
 
     validLimmaMeasurements <- isValidLimmaMeasurements(measurements)
 
@@ -415,7 +368,9 @@ idToNodeLabel <- function(ids, ontologyTerms) {
   # extract node label (Breast)
   nodes <- sub("^.+?_", "", ids, perl=TRUE) # remove the X123_
   nodes <- as.vector(substring(nodes, first=1, last=nchar(nodes)-3)) # remove the _s1
-  nodeLabels <- as.vector(sapply(nodes, function(node) return(ontologyTerms[[node]]$name)))
+  fullNames <- as.vector(sapply(nodes, function(node) return(ontologyTerms[[node]]$fullName)))
+  split <- strsplit2(fullNames, "\\\\") 
+  nodeLabels <- apply(split, 1, function(row) paste(tail(row[row != ""], n=2), collapse="//"))
   # put everything together (123, Breast, s1)
   paste(patientIDs, nodeLabels, subsets, sep="_")
 }
@@ -459,31 +414,6 @@ parseInput<- function() {
   
   return(list(HD = df, LD = ld))
 }
-
-
-# ## Checking if a variable called preprocessed exists in R
-# ## workspace, else loaded_variables is used to create data frame df.
-# ## Column names in data frame get modified by replacing matrix id
-# ## (e.g.: n0, n1, ...) by corresponding name in fetch_params list var
-# parseInput <- function() {
-#   
-#   ## Retrieving the input data frame
-#   if (exists("preprocessed")) {
-#     df <- preprocessed
-#   } else {
-#     df <- mergeFetchedData(loaded_variables)
-#   }
-#   
-#   ## Renaming the column names in the data frame:
-#   ## - removing "X" as prefix
-#   ## - replacing node id by node name
-#   ## (e.g. 'X144_n0_s1' -> '144_Breast_s2')
-#   colnames(df)[c(-1,-2)] = idToNodeLabel(colnames(df)[c(-1,-2)], fetch_params$ontologyTerms)
-#   
-#   return(df)
-# }
-
-
 
 mergeFetchedData <- function(listOfHdd){
   df <- listOfHdd[[1]]
@@ -654,26 +584,25 @@ buildExtraFieldsHighDim <- function(df) {
 ##
 ## If a value is not existing, the corresponding cell in the returned data frame
 ## is set to NA.
-buildExtraFieldsLowDim <- function(ld.list) {
-  
+buildExtraFieldsLowDim <- function(ld.list, colnames) {
   if(is.null(ld.list)){
     return(NULL)
   }
   
-  varNames_with_subset.vec = unlist(names(ld.list))
+  ld.names <- unlist(names(ld.list))
+  ld.namesWOSubset <- sub("_s[1-2]{1}$", "", ld.names)
+  ld.fullNames <- sapply(ld.namesWOSubset, function(el) fetch_params$ontologyTerms[[el]]$fullName)
+  ld.fullNames <- as.character(as.vector(ld.fullNames))
+  split <- strsplit2(ld.fullNames, "\\\\")
+  ld.rownames <- apply(split, 1, function(row) paste(tail(row[row != ""], n=2), collapse="//"))
+  ld.subsets <- as.integer(sub("^.*_s", "", ld.names))
+  ld.types <- sub("_.*$", "", ld.names)
 
-  varNames_without_subset.vec = paste(strsplit2(varNames_with_subset.vec, "_")[,1],
-                                      strsplit2(varNames_with_subset.vec, "_")[,2], sep="_")
-  
-  
-  type.vec = strsplit2(varNames_with_subset.vec, "_")[,1]
-  
-  subset.vec = strsplit2(varNames_with_subset.vec, "_")[,3]
+  hd.patientIDs <- strsplit2(colnames, "_")[,1]
+  hd.subsets <- as.integer(substr(colnames, nchar(colnames), nchar(colnames)))
+  split <- sub(".+?_", "", colnames)
+  hd.labels <- substr(split, 1, nchar(split) - 3)
 
-    
-  fullnames = character(length=length(varNames_without_subset.vec))
-  
-  ## Declaring the variables to store the extra field data
   ROWNAME.vec = character(length = 0)
   PATIENTID.vec = character(length = 0)  
   VALUE.vec = character(length = 0)
@@ -682,37 +611,47 @@ buildExtraFieldsLowDim <- function(ld.list) {
   SUBSET.vec = character(length = 0)
   ZSCORE.vec = character(length = 0)
 
-
-  ## Iterating over full low dim variable names 
-  for(i in 1:length(varNames_without_subset.vec)){
-    
-    ROWNAME = get("fullName", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
-    NAME = get("name", get(varNames_without_subset.vec[i], fetch_params$ontologyTerms))
-    
-    ## Accessing data frame for given full low dim variable name
-    ## This data frame provides for each subject the corresponding
-    ## value for given variable
-    ld_var.df = ld.list[[varNames_with_subset.vec[i]]]
-
-    for(j in 1:dim(ld_var.df)[1]){
-      if (ld_var.df[j, 2] == "" || is.na(ld_var.df[j, 2])) next
-
-      ROWNAME.vec = c(ROWNAME.vec, ROWNAME)
-      PATIENTID.vec = c(PATIENTID.vec, ld_var.df[j,1])
-      TYPE.vec = c(TYPE.vec, type.vec[i])
-      SUBSET.vec = c(SUBSET.vec, subset.vec[i])
-      VALUE.vec = c(VALUE.vec, ld_var.df[j,2])
-      COLNAME.vec = c(COLNAME.vec, paste(ld_var.df[j,1], NAME , subset.vec[i], sep="_"))
-    }
+  for (i in 1:length(ld.names)) {
+      ld.var <- ld.list[[i]]
+      for (j in 1:nrow(ld.var)) {
+          ld.patientID <- ld.var[j, 1]
+          ld.value <- ld.var[j, 2]
+          if (ld.value == "" || is.na(ld.value)) next
+          ld.type <- ld.types[i]
+          ld.subset <- ld.subsets[i]
+          ld.rowname.tmp <- ld.rownames[i]
+          ld.colname <- paste(ld.patientID, ld.rowname.tmp, paste("s", ld.subset, sep=""), sep="_")
+          if (! ld.colname %in% colnames) {
+              for (k in which(ld.patientID == hd.patientIDs & ld.subset == hd.subsets)) {
+                  ld.colname <- paste(hd.patientIDs[k], hd.labels[k], paste("s", hd.subsets[k], sep=""), sep="_")
+                  ld.rowname <- paste("(matched by subject)", ld.rowname.tmp)
+                  ROWNAME.vec <- c(ROWNAME.vec, ld.rowname)
+                  PATIENTID.vec <- c(PATIENTID.vec, ld.patientID)
+                  VALUE.vec <- c(VALUE.vec, ld.value)
+                  COLNAME.vec <- c(COLNAME.vec, ld.colname)
+                  TYPE.vec <- c(TYPE.vec, ld.type)
+                  SUBSET.vec <- c(SUBSET.vec, ld.subset)
+              }
+          } else {
+              ld.rowname <- paste("(matched by sample)", ld.rowname.tmp)
+              ROWNAME.vec <- c(ROWNAME.vec, ld.rowname)
+              PATIENTID.vec <- c(PATIENTID.vec, ld.patientID)
+              VALUE.vec <- c(VALUE.vec, ld.value)
+              COLNAME.vec <- c(COLNAME.vec, ld.colname)
+              TYPE.vec <- c(TYPE.vec, ld.type)
+              SUBSET.vec <- c(SUBSET.vec, ld.subset)
+          }
+      }
   }
 
-  res.df = data.frame( PATIENTID = as.integer(PATIENTID.vec),
-                       COLNAME = COLNAME.vec,
-                       ROWNAME = ROWNAME.vec,
-                       VALUE = VALUE.vec,
-                       ZSCORE = rep(NA, length(PATIENTID.vec)),
-                       TYPE = TYPE.vec,
-                       SUBSET = as.integer(gsub("^s", "", SUBSET.vec)), stringsAsFactors=FALSE)
+
+  res.df = data.frame(PATIENTID = as.integer(PATIENTID.vec),
+                      COLNAME = COLNAME.vec,
+                      ROWNAME = ROWNAME.vec,
+                      VALUE = VALUE.vec,
+                      ZSCORE = rep(NA, length(PATIENTID.vec)),
+                      TYPE = TYPE.vec,
+                      SUBSET = as.integer(SUBSET.vec), stringsAsFactors=FALSE)
 
   # z-score computation must be executed on both cohorts, hence it happens after all the data are in res.df
   rownames <- unique(res.df$ROWNAME)
@@ -903,23 +842,6 @@ getRankingMethod <- function(rankingMethodName) {
     return("Limma")
   }
 }
-
-
-writeDataForZip <- function(df, zScores, pidCols) {
-  df      <- df[ , -which(names(df) %in% pidCols)]  # Drop patient columns
-  df      <- cbind(df,zScores)                      # Replace with zScores
-  df      <- df[ , -which(colnames(df) == "SIGNIFICANCE")]
-  write.table(
-    df,
-    "heatmap_data.tsv",
-    sep = "\t",
-    na = "",
-    row.names = FALSE,
-    col.names = TRUE
-  )
-}
-
-
 
 ## Probe signal aggregation based on maxMean for initial data frame containing probe id, biomarker
 ## and sample measurements. Probes are merged according to maxMean, this means the row with highest mean

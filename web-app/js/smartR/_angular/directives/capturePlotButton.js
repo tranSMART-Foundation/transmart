@@ -7,8 +7,8 @@ window.smartRApp.directive('capturePlotButton', [function() {
     // aux for downloadSVG
     var copyWithCollapsedCSS = function(svgElement) {
         var relevantProperties = [
-            'fill-opacity', 'fill', 'stroke', 'font-size', 'font-family',
-            'shape-rendering', 'stroke-width'
+            'fill-opacity', 'fill', 'stroke', 'font-size', 'font-family', 'font-weight',
+            'shape-rendering', 'stroke-width', 'opacity', 'text-anchor', 'background'
         ];
         var clonedSvg = jQuery(svgElement).clone().attr('display', 'none');
         clonedSvg.insertAfter(svgElement);
@@ -68,8 +68,9 @@ window.smartRApp.directive('capturePlotButton', [function() {
     return {
         restrict: 'E',
         scope: {
-            disabled: '=',
-            filename: '@'
+            disabled: '=?',
+            filename: '@',
+            target: '@'
         },
         template:
             '<input type="button" value="Capture" class="heim-action-button" ng-click="capture()">',
@@ -88,7 +89,10 @@ window.smartRApp.directive('capturePlotButton', [function() {
             }
 
             scope.capture = function() {
-                var svgElement = jQuery('svg.visualization')[0];
+                var svgElement = $(scope.target + ' svg')[0];
+                if (!svgElement) {
+                    return;
+                }
                 downloadSVG(svgElement, scope.filename);
             };
 

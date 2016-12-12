@@ -11,9 +11,9 @@
                 type="HD"
                 min="1"
                 max="-1"
-                label="High Dimensional"
-                tooltip="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box.
-                The nodes needs to be from the same platform.">
+                label="High Dimensional Variables"
+                tooltip="Select high dimensional data node(s) from the data tree and drag it into the box.
+                The nodes need to be from the same platform.">
             </concept-box>
 
             <concept-box
@@ -21,8 +21,8 @@
                 type="LD-numerical"
                 min="0"
                 max="-1"
-                label="Numeric Variables"
-                tooltip="Select numeric data node(s) from the Data Set Explorer Tree and drag it into the box.">
+                label="(optional) Numerical Variables"
+                tooltip="Select numeric data node(s) from the data tree and drag it into the box.">
             </concept-box>
 
             <concept-box
@@ -30,8 +30,8 @@
                 type="LD-categorical"
                 min="0"
                 max="-1"
-                label="Categoric Variables"
-                tooltip="Select categoric data node(s) from the Data Set Explorer Tree and drag it into the box.">
+                label="(optional) Categoric Variables"
+                tooltip="Select categoric data node(s) from the data tree and drag it into the box.">
             </concept-box>
 
             <biomarker-selection biomarkers="fetch.selectedBiomarkers"></biomarker-selection>
@@ -45,7 +45,8 @@
                     summary-data="fetch.scriptResults"
                     all-samples="common.totalSamples"
                     allowed-cohorts="[1,2]"
-                    number-of-rows="common.numberOfRows">
+                    number-of-rows="common.numberOfRows"
+                    has-preprocess-tab="true">
             </fetch-button>
             <br/>
             <summary-stats summary-data="fetch.scriptResults"></summary-stats>
@@ -88,15 +89,15 @@
 
             %{--Type of sorting to apply--}%
             <div class="heim-input-field sr-input-area">
-                <h2>Order columns by:</h2>
+                <h2>Group columns by:</h2>
                 <fieldset class="heim-radiogroup">
                     <label>
                         <input type="radio" ng-model="runAnalysis.params.sorting" name="sortingSelect" value="nodes"
-                               checked> Nodes
+                               checked> Node Order
                     </label>
                     <label>
                         <input type="radio" ng-model="runAnalysis.params.sorting" name="sortingSelect" value="subjects">
-                        Subjects
+                        Subject ID
                     </label>
                 </fieldset>
             </div>
@@ -138,7 +139,8 @@
                         filename="heatmap.json"
                         running="runAnalysis.running">
             </run-button>
-            <capture-plot-button filename="heatmap.svg" disabled="runAnalysis.download.disabled"></capture-plot-button>
+            <capture-plot-button filename="heatmap.svg" disabled="runAnalysis.download.disabled" target="heatmap-plot">
+            </capture-plot-button>
             <download-results-button disabled="runAnalysis.download.disabled"></download-results-button>
             <br/>
             <workflow-warnings warnings="runAnalysis.scriptResults.warnings"></workflow-warnings>

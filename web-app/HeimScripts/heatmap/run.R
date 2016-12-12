@@ -3,16 +3,6 @@ library(limma)
 library(jsonlite)
 
 
-# SE: Just to get things working for dev purposes
-# rm(list = ls())
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/data.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetchParams.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/loaded_variables_withLDD.Rda")
-# load("/Users/serge/Documents/Projects/SmartR/Development_env_Input_workspace/R_workspace_objects/Heatmap/fetch_params_withLDD.Rda")
-# setwd("/Users/serge/GitHub/SmartR")
-#######
-
-
 if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
     remoteScriptDir <- "web-app/HeimScripts"
 }
@@ -34,7 +24,7 @@ source(heatmapUtils)
 SUBSET1REGEX <- "_s1$"  # Regex identifying columns of subset 1.
 markerTableJson <- "markerSelectionTable.json" # Name of the json file with limma outputs
 
-main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsAllowed = FALSE) {
+main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", selections = list(), geneCardsAllowed = FALSE) {
     max_rows <- as.numeric(max_rows)
     verifyInputHeatmap(max_rows, sorting)
     
@@ -45,8 +35,15 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     hd.df = data.list$HD
     ld.list = data.list$LD    
     
-    ## SE: For debug
-    #hd.df = hd.df[,1:3]
+    if (sorting == "nodes") {
+
+    } else {
+        colNames <- colnames(hd.df[, -c(1,2)])
+        subjects <- as.numeric(sub("_.+", "", colNames))
+        subsets <- as.numeric(substring(colNames, first=nchar(colNames), last=nchar(colNames)))
+        ordering <- order(as.numeric(paste(subjects, subsets, sep="")))
+        hd.df <- cbind(hd.df[, c(1,2)], hd.df[, -c(1,2)][, ordering])
+    }
     
     write.table(
         hd.df,
@@ -59,13 +56,16 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     
     ## Creating the extended diff expr analysis data frame containing besides the input data,
     ## a set of statistics. The returned data frame is ranked according to provided ranking statistic
-    hd.df          <- addStats(hd.df, sorting, ranking, max_rows)
+    hd.df          <- addStats(hd.df, ranking, max_rows)
     
     hd.df          <- mergeDuplicates(hd.df)
     
     ## Filtering down the hd.df to retain only the n top ranked rows
     hd.df          <- hd.df[1:min(max_rows, nrow(hd.df)), ]  
     
+    if (!is.null(selections$selectedRownames) && length(selections$selectedRownames > 0)) {
+        hd.df <- hd.df[!hd.df$ROWNAME %in% selections$selectedRownames, ]
+    }
     
     ## High dimensional value data frame with unpivoted data structure
     ## Providing intensity values and zscore for given patient, sample id/colname,
@@ -80,8 +80,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
 
     
     ## Low dimensional annotation data frame  
-    extraFieldsLowDim.df = buildExtraFieldsLowDim(ld.list)
-    
+    extraFieldsLowDim.df = buildExtraFieldsLowDim(ld.list, extraFieldsHighDim.df$COLNAME)
     
 
     ldd_rownames.vector = as.vector(unique(extraFieldsLowDim.df[, "ROWNAME"]))
@@ -102,7 +101,12 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     ## all possible statistical methods
     statistics_hd.df = getAllStatForExtDataFrame(hd.df)
 
-
+    write.table(statistics_hd.df,
+                "heatmap_data.tsv",
+                sep = "\t",
+                na = "",
+                row.names = FALSE,
+                col.names = TRUE)
     ## Concatenating the two extraField types (that have been generated
     ## for the low and high dim data) 
     extraFields.df = rbind(extraFieldsHighDim.df, extraFieldsLowDim.df)
@@ -164,7 +168,6 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef", geneCardsA
     jsn <- toJSON(jsn, pretty = TRUE, digits = I(17))
     
     
-    writeDataForZip(hd.df, measurementsAsZscore.matrix, colNames)  # for later zip generation
     write(jsn, file = "heatmap.json")
     # json file be served the same way
     # like any other file would - get name via

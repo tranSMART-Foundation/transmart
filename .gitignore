@@ -28,6 +28,7 @@
 
 # plugin release files
 /*.zip
+/*.zip.sha1
 /plugin.xml
 
 # older plugin install locations
@@ -42,5 +43,5 @@
 /production
 *.DS_Store
 /SmartR.todo
-
+.tern-port
 /node_modules

@@ -79,17 +79,19 @@ window.smartRApp.directive('correlationPlot', [
                 transformation = data.transformation[0];
                 patientIDs = data.patientIDs;
                 points = data.points;
-                minX = data.points.min(function(d) { return d.x; });
-                maxX = data.points.max(function(d) { return d.x; });
-                minY = data.points.min(function(d) { return d.y; });
-                maxY = data.points.max(function(d) { return d.y; });
+                var xValues =  data.points.map(function(d) { return d.x; });
+                var yValues =  data.points.map(function(d) { return d.y; });
+                minX = Math.min.apply(null, xValues);
+                minY = Math.min.apply(null, yValues);
+                maxX = Math.max.apply(null, xValues);
+                maxY = Math.max.apply(null, yValues);
             }
 
             setData(scope.data);
 
             function updateStatistics(patientIDs, scatterUpdate, init) {
                 if (! init) {
-                    patientIDs = patientIDs.length !== 0 ? patientIDs : d3.selectAll('.point').map(function(d) {
+                    patientIDs = patientIDs.length !== 0 ? patientIDs : d3.selectAll('.point').data().map(function(d) {
                         return d.patientID;
                     });
                 }
@@ -205,7 +207,7 @@ window.smartRApp.directive('correlationPlot', [
                     .orient('right'));
 
             function excludeSelection() {
-                var remainingPatientIDs = d3.selectAll('.point:not(.selected)').map(function(d) {
+                var remainingPatientIDs = d3.selectAll('.point:not(.selected)').data().map(function(d) {
                     return d.patientID;
                 });
                 updateStatistics(remainingPatientIDs, true);
@@ -216,7 +218,7 @@ window.smartRApp.directive('correlationPlot', [
                     alert('Please select at least two elements before zooming!');
                     return;
                 }
-                var selectedPatientIDs = d3.selectAll('.point.selected').map(function(d) { return d.patientID; });
+                var selectedPatientIDs = d3.selectAll('.point.selected').data().map(function(d) { return d.patientID; });
                 updateStatistics(selectedPatientIDs, false, true);
             }
 
@@ -251,7 +253,7 @@ window.smartRApp.directive('correlationPlot', [
                 .on('brushend', function() {
                     contextMenu.hide();
                     updateSelection();
-                    var selectedPatientIDs = d3.selectAll('.point.selected').map(function(d) { return d.patientID; });
+                    var selectedPatientIDs = d3.selectAll('.point.selected').data().map(function(d) { return d.patientID; });
                     updateStatistics(selectedPatientIDs);
                 });
 
@@ -307,10 +309,10 @@ window.smartRApp.directive('correlationPlot', [
                     .bins(bins)(points.map(function(d) { return d.y; }));
 
                 var bottomHistHeightScale = d3.scale.linear()
-                    .domain([0, bottomHistData.max(function(d) { return d.y; })])
+                    .domain([0, Math.max.apply(null, bottomHistData.map(function(d) { return d.y; }))])
                     .range([1, bottomHistHeight]);
                 var leftHistHeightScale = d3.scale.linear()
-                    .domain([0, leftHistData.max(function(d) { return d.y; })])
+                    .domain([0, Math.max.apply(null, leftHistData.map(function(d) { return d.y; }))])
                     .range([2, leftHistHeight]);
 
                 var bottomHistGroup = svg.selectAll('.bar.bottom')
