@@ -48,6 +48,6 @@ grails.project.dependency.resolution = {
             export = false
         }
         compile ':plugin-config:0.2.1'
-        compile(':quartz:1.0-RC2')
+        compile ':rdc-rmodules:16.2'
     }
 }
