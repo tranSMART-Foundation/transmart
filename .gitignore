@@ -6,4 +6,8 @@
 /.project
 /.settings
 /*.zip
+/*.zip.sha1
 /target-eclipse
+
+/.gradle
+/example/.gradle
