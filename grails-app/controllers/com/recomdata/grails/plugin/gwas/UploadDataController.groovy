@@ -89,7 +89,13 @@ class UploadDataController {
 
         def filename = type + "-template.txt"
         def templateFile = new File(templatesDir + "/" + filename)
-        def template = templateFile.getBytes()
+        String template
+        if(templateFile == null) {
+            log.info("template file not found: ${templatesDir}/${filename}")
+            template = ""
+        } else {
+            def template = templateFile.getBytes()
+        }
         response.setContentType("text/plain")
         response.setHeader("Content-Disposition", "attachment;filename=" + filename)
         response.setIntHeader('Content-length', template.length)
@@ -139,12 +145,16 @@ class UploadDataController {
             fileName = f.getOriginalFilename()
         }
 
+        if (description == null) {
+            description = ""
+        }
+
         //Get the fmFolder associated with this study
         Experiment experiment = Experiment.findByAccession(accession)
         def folder = fmFolderService.getFolderByBioDataObject(experiment)
         def tempFile = new File(grailsApplication.config.com.recomdata.FmFolderService.filestoreDirectory, f.getOriginalFilename())
         f.transferTo(tempFile)
-        fmFolderService.processFile(tempFile, folder, fileName, description)
+        fmFolderService.processFile(folder, tempFile, fileName, description)
         tempFile.delete()
         render(view: "fileComplete");
     }
@@ -158,6 +168,8 @@ class UploadDataController {
             upload = new AnalysisMetadata(params)
         }
         bindData(upload, params)
+        //Save the uploaded file, if any
+        def result = new DataUploadResult();
 
         //Handle special cases where separated lists must be saved
 
@@ -169,6 +181,12 @@ class UploadDataController {
             }
         } else {
             upload.phenotypeIds = "";
+            flash.message = "Phenotypes is a required field."
+            result.error="Phenotypes is a required field."
+            upload.status = "ERROR"
+            upload.save(flush: true)
+            render(view: "complete", model: [result: result, uploadDataInstance: upload]);
+            return
         }
 
         if (params.genotypePlatform) {
@@ -212,9 +230,6 @@ class UploadDataController {
             filename = sdf.format(upload.etlDate) + f.getOriginalFilename()
             upload.filename = uploadsDir + "/" + filename
         }
-
-        //Save the uploaded file, if any
-        def result = new DataUploadResult();
 
         if (f && !f.isEmpty()) {
             def fullpath = uploadsDir + "/" + filename

@@ -5,7 +5,7 @@
         </label>
         <label>Search:
             <input value="${search}" type="text" style="width: 50px" id="table_results_search">
-            <span class="linkbutton" onclick="loadTableResultsGrid({cutoff: jQuery('#table_results_cutoff').val(), search: jQuery('#table_results_search').val()})">OK</span>
+            <span class="linkbutton" onclick="gwasLoadTableResultsGrid({cutoff: jQuery('#table_results_cutoff').val(), search: jQuery('#table_results_search').val()})">OK</span>
         </label>
     </div>
     <div style="height: 300px; overflow: auto; border-top: 1px solid black; margin-bottom: 10px">

@@ -22,14 +22,14 @@ class AuditLogFilters {
     def filters = {
 		search(controller: 'GWAS', action: 'getFacetResults') {
 			before = { model ->
-				auditLogService.report("GWAS Active Filter", request,
+				auditLogService?.report("GWAS Active Filter", request,
 						user: currentUserBean,
 						query: params.q ?: '',
 						facetQuery: params.fq ?: '',
 				)
 			}
 		}
-        other(controller: 'GWAS|gwas*|uploadData', action: '*', actionExclude:'getFacetResults|newSearch|index|getDynatree|getSearchCategories') {
+        other(controller: 'GWAS|gwasSearch|uploadData', action: '*', actionExclude:'getFacetResults|newSearch|index|getDynatree|getSearchCategories') {
             after = { model ->
                 def task = "Gwas (${controllerName}.${actionName})"
                 switch (actionName) {
@@ -60,7 +60,7 @@ class AuditLogFilters {
                 String analysis = (params?.analysisIds) ?
                         getAnalysisNames(params.analysisIds) :
                         getAnalysisName(params.getLong('analysisId'))
-                auditLogService.report(task, request,
+                auditLogService?.report(task, request,
                         user: currentUserBean,
                         experiment: experimentService.getExperimentAccession(params.getLong('trialNumber')) ?: '',
                         analysis: analysis ?: '',

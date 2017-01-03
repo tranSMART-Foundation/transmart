@@ -15,6 +15,7 @@ grails.project.dependency.resolution = {
 	legacyResolve false
     repositories {
         grailsCentral()
+        mavenLocal()
         mavenCentral()
 
         mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
@@ -24,7 +25,7 @@ grails.project.dependency.resolution = {
     	// needed to support folder-management
         compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
-		runtime 'org.transmartproject:transmart-core-api:16.2'
+        runtime 'org.transmartproject:transmart-core-api:16.2'
     }
     plugins {
 		compile(':resources:1.2.1')
