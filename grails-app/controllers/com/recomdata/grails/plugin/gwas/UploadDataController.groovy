@@ -89,7 +89,13 @@ class UploadDataController {
 
         def filename = type + "-template.txt"
         def templateFile = new File(templatesDir + "/" + filename)
-        def template = templateFile.getBytes()
+        String template
+        if(templateFile == null) {
+            log.info("template file not found: ${templatesDir}/${filename}")
+            template = ""
+        } else {
+            def template = templateFile.getBytes()
+        }
         response.setContentType("text/plain")
         response.setHeader("Content-Disposition", "attachment;filename=" + filename)
         response.setIntHeader('Content-length', template.length)
