@@ -1,4 +1,4 @@
-required.packages <- c("reshape2", "ggplot2", "data.table", "Cairo",
+required.packages <- c("reshape", "reshape2", "ggplot2", "data.table", "Cairo",
 		"snowfall", "gplots", "Rserve", "foreach", "doParallel", "visreg",
 		"pROC", "jsonlite", "RUnit");
 missing.packages <- function(required) {
