@@ -1,4 +1,3 @@
-biomart/a.sql
 deapp/de_mrna_annotation_bkp.sql
 deapp/de_snp_data_dataset_loc_bk.sql
 deapp/de_subject_sample_mapping_bk.sql
