@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_annotation_deapp(numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_annotation_deapp(currentjobid numeric DEFAULT (-1)) RETURNS numeric
+CREATE FUNCTION i2b2_load_annotation_deapp(currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
     AS $$
 /*************************************************************************

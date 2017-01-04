@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_study_metadata(numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_study_metadata(currentjobid numeric DEFAULT (-1)) RETURNS bigint
+CREATE FUNCTION i2b2_load_study_metadata(currentjobid numeric DEFAULT 0) RETURNS bigint
     LANGUAGE plpgsql SECURITY DEFINER
     AS $$
 /*************************************************************************

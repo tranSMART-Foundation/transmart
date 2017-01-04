@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_add_snp_biomarker_nodes(character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_add_snp_biomarker_nodes(trial_id character varying, ont_path character varying, currentjobid numeric DEFAULT (-1)) RETURNS void
+CREATE FUNCTION i2b2_add_snp_biomarker_nodes(trial_id character varying, ont_path character varying, currentjobid numeric DEFAULT 0) RETURNS void
     LANGUAGE plpgsql
     AS $_$
 DECLARE
