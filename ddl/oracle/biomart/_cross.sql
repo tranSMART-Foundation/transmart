@@ -45,10 +45,10 @@ SELECT DISTINCT t4.bio_marker_id,
   t1.bio_experiment_id,
   t1.bio_assay_analysis_id,
   t1.bio_assay_analysis_id*100+t4.bio_marker_id
-FROM BIO_ASSAY_ANALYSIS_DATA t1,
-  BIO_EXPERIMENT t2,
+FROM BIOMART.BIO_ASSAY_ANALYSIS_DATA t1,
+  BIOMART.BIO_EXPERIMENT t2,
   DEAPP.DE_MRNA_ANNOTATION t3,
-  BIO_MARKER t4
+  BIOMART.BIO_MARKER t4
 WHERE t1.bio_experiment_id = t2.bio_experiment_id
 AND t2.bio_experiment_type ='Experiment'
 AND t3.probeset_id         = t1.probeset_id
