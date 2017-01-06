@@ -47,8 +47,10 @@ window.smartRApp.controller('PatientmapperController',
                         applied_path: '@',
                         modifiedNode: {}
                     };
-                    createPanelItemNew(panel, concept);
+                    selectConcept(createPanelItemNew(panel, concept));
                 });
+                appendQueryPanelInto(1);
+                appendQueryPanelInto(2);
                 runAllQueries(function() {
                     $.ajax({
                         url: pageInfo.basePath + '/chart/clearGrid',
