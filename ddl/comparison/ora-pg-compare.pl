@@ -636,6 +636,7 @@ sub parsePostgresFunctions($){
 	    open(IN,"$dir$d/$f") || die "Failed to read $d/$f";
 	    while(<IN>) {
 		s/\s*--.*//g;
+		s/\(-1\)/-1/g;
 		if(/^\s*CREATE\s+FUNCTION\s+(\S+)\s*\(([^\)]*)\)\s*RETURNS (.*)/) {
 		    $func = $1;
 		    $ret = $2;
@@ -1750,7 +1751,7 @@ if(defined(SKIPP)) {
     close SKIPP;
 }
 
-# Triggers to isnore in Postgres
+# Triggers to ignore in Postgres
 # e.g. logon_trigger to set Oracle user identifier
 open(SKIPOT, "skip_oracle_trigger.txt") || print STDERR "Unable to open skip_oracle_trigger.txt";
 if(defined(SKIPOT)) {
