@@ -42,7 +42,7 @@ function gwasLoadManhattanPlot(analysisID) {
 	jQuery('#manhattanplot_results_' + analysisID).empty().addClass('ajaxloading');
 	jQuery
 			.ajax({
-				"url" : getManhattanPlotUrl,
+				"url" : gwasGetManhattanPlotUrl,
 				bDestroy : true,
 				bServerSide : true,
 				data : {
@@ -712,7 +712,7 @@ function gwasShowSearchResults(tabToShow)	{
 		}
 	}
 	
-    console.log('gwas gwasShowSearchResults tab'+tabToShow);
+	console.log('gwas gwasShowSearchResults tab '+tabToShow);
 	// call method which retrieves facet counts and search results
 	gwasShowFacetResults(tabToShow);
 	
@@ -765,7 +765,7 @@ function gwasClearFacetResults()	{
 //Method to load the facet results in the search tree and populate search results panel
 function gwasShowFacetResults(tabToShow)	{
 	
-    console.log('gwas showFacetResults');
+	console.log('gwas showFacetResults '+tabToShow);
 	var savedSearchTermsArray;
 	var savedSearchTerms;
 	
@@ -790,8 +790,8 @@ function gwasShowFacetResults(tabToShow)	{
 	var categories = new Array();    // will be an array of categories "Cat1","Cat2"
 	var terms = new Array();         // will be an array of strings "Term1|Term2", "Term3"
 
-	// first, loop through each term and add categories and terms to respective arrays 		
- for (var i=0; i<savedSearchTermsArray.length; i++)	{
+	// first, loop through each term and add categories and terms to respective arrays
+	for (var i=0; i<savedSearchTermsArray.length; i++)	{
 		var fields = savedSearchTermsArray[i].split(SEARCH_DELIMITER);
 		// search terms are in format <Category Display>|<Category>:<Search term display>:<Search term id>
 		var termId = fields[2]; 
@@ -810,22 +810,22 @@ function gwasShowFacetResults(tabToShow)	{
 		}
 	}
  
-    console.log('gwasShowFacetResults: getTree')
+	console.log('gwasShowFacetResults: getTree')
 	jQuery("#gwas-filter-div").dynatree();
 	var tree = jQuery("#gwas-filter-div").dynatree("getTree");
 
 	// create an array of the categories that come from the tree
 	var treeCategories = new Array();
 	tree.visit(  function(node) {
-     if (node.data.isCategory)  {
-  	   var categoryName = node.data.categoryName.split("|");
-  	   var cat = categoryName[1].replace(/ /g, "_");
-  	   
-  	   treeCategories.push(cat);        	    
-     }
-   }
-   , false
- );
+		if (node.data.isCategory)  {
+			var categoryName = node.data.categoryName.split("|");
+			var cat = categoryName[1].replace(/ /g, "_");
+
+			treeCategories.push(cat);
+		}
+	}
+		     , false
+	);
 
  // now construct the facetSearch array by concatenating the values from the cats and terms array
  for (var i=0; i<categories.length; i++)	{
@@ -936,7 +936,7 @@ function gwasShowFacetResults(tabToShow)	{
 				console.log('Error!  Status = ' + xhr.status + xhr.statusText);
 			}
 	   	});
- }
+	}
 }
 
 //Add the search term to the array and show it in the panel.
@@ -2327,7 +2327,6 @@ function gwasShowVisualization(analysisID, changedPaging)	{
 		openAnalyses.push(analysisID); //store this as an open analysis
 		
 		if (hmFlag == "0")	{
-o
 			gwasSetVisTabs(analysisID);
 			jQuery(loadingDiv).mask("Loading...");
 			gwasLoadAnalysisResultsGrid(analysisID, {'max': 10, 'offset':0, 'cutoff': 0, 'search': "", 'sortField': "", "order": "asc"});
