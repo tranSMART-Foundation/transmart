@@ -2,8 +2,8 @@ mkdir signing
 cd signing
 
 // obtain release artifacts: transmart.war, gwava.war, 
-// transmart-data-release-16.1.zip, tranSMART-ETL-release-16.1.zip
-// Scripts-release-16.1.zip
+// transmart-data-release-16.2.zip, tranSMART-ETL-release-16.2.zip
+// Scripts-release-16.2.zip
 
 // generate all signatures and hash codes (md5 and SHA1)
 
@@ -15,17 +15,17 @@ gpg --default-key ACC50501 --armor --output gwava.war.sig --detach-sig gwava.war
 gpg --default-key ACC50501 --print-md MD5 gwava.war > gwava.war.md5 
 gpg --default-key ACC50501 --print-md SHA1 gwava.war > gwava.war.sha
 
-gpg --default-key ACC50501 --armor --output transmart-data-release-16.1.zip.sig --detach-sig transmart-data-release-16.1.zip
-gpg --default-key ACC50501 --print-md MD5 transmart-data-release-16.1.zip > transmart-data-release-16.1.zip.md5 
-gpg --default-key ACC50501 --print-md SHA1 transmart-data-release-16.1.zip > transmart-data-release-16.1.zip.sha
+gpg --default-key ACC50501 --armor --output transmart-data-release-16.2.zip.sig --detach-sig transmart-data-release-16.2.zip
+gpg --default-key ACC50501 --print-md MD5 transmart-data-release-16.2.zip > transmart-data-release-16.2.zip.md5 
+gpg --default-key ACC50501 --print-md SHA1 transmart-data-release-16.2.zip > transmart-data-release-16.2.zip.sha
 
-gpg --default-key ACC50501 --armor --output tranSMART-ETL-release-16.1.zip.sig --detach-sig tranSMART-ETL-release-16.1.zip
-gpg --default-key ACC50501 --print-md MD5 tranSMART-ETL-release-16.1.zip > tranSMART-ETL-release-16.1.zip.md5 
-gpg --default-key ACC50501 --print-md SHA1 tranSMART-ETL-release-16.1.zip > tranSMART-ETL-release-16.1.zip.sha
+gpg --default-key ACC50501 --armor --output tranSMART-ETL-release-16.2.zip.sig --detach-sig tranSMART-ETL-release-16.2.zip
+gpg --default-key ACC50501 --print-md MD5 tranSMART-ETL-release-16.2.zip > tranSMART-ETL-release-16.2.zip.md5 
+gpg --default-key ACC50501 --print-md SHA1 tranSMART-ETL-release-16.2.zip > tranSMART-ETL-release-16.2.zip.sha
 
-gpg --default-key ACC50501 --armor --output Scripts-release-16.1.zip.sig --detach-sig Scripts-release-16.1.zip
-gpg --default-key ACC50501 --print-md MD5 Scripts-release-16.1.zip > Scripts-release-16.1.zip.md5 
-gpg --default-key ACC50501 --print-md SHA1 Scripts-release-16.1.zip > Scripts-release-16.1.zip.sha
+gpg --default-key ACC50501 --armor --output Scripts-release-16.2.zip.sig --detach-sig Scripts-release-16.2.zip
+gpg --default-key ACC50501 --print-md MD5 Scripts-release-16.2.zip > Scripts-release-16.2.zip.md5 
+gpg --default-key ACC50501 --print-md SHA1 Scripts-release-16.2.zip > Scripts-release-16.2.zip.sha
 
 // copy all artifacts, signatures, and hashcodes to this location on library.transmartfoundation.org
-// /var/www/html/release/release16_1_0_artifacts
+// /var/www/html/release/release16_2_0_artifacts

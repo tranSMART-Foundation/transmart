@@ -6,7 +6,7 @@ https://wiki.transmartfoundation.org/display/transmartwiki/Install+the+current+o
     sudo yum install -y git
     git clone https://github.com/tranSMART-Foundation/Scripts.git
     cd Scripts
-    git checkout release-16.1
+    git checkout release-16.2
     cd ..
     Scripts/install-rhel/InstallTransmart.sh 2>&1 | tee install.log
     cd Scripts/install-rhel/checks/

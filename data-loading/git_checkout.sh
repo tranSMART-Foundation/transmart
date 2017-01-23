@@ -3,7 +3,7 @@
 #todo check database path. Surely ~transmart/transmart?
 # copying a vars file from somewhere that surely does not exist yet
 
-TRANSMART_RELEASE="release-16.1"
+TRANSMART_RELEASE="release-16.2"
 #TRANSMART_DATABASE="oracle"
 TRANSMART_DATABASE="postgres"
 

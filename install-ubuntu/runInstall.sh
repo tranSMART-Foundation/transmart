@@ -16,7 +16,7 @@ mkdir -p "$SCRIPTS_BASE"
 cd "$SCRIPTS_BASE"
 git clone https://github.com/tranSMART-Foundation/Scripts.git
 cd Scripts
-git checkout release-16.1
+git checkout release-16.2
 cd ..
 Scripts/install-ubuntu/InstallTransmart.sh 2>&1 | tee install.log
 

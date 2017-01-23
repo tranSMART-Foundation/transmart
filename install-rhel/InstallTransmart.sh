@@ -3,7 +3,7 @@
 # Version: Wed Mar  9 21:27:31 EST 2016
 # 
 #**********************************************************************************
-#  Script to load all that is needed to run an example/demo version of tranSMART 16.1 on RHEL 7.2
+#  Script to load all that is needed to run an example/demo version of tranSMART 16.2 on RHEL 7.2
 #**********************************************************************************
 
 # set up with 
@@ -11,7 +11,7 @@
 #   sudo yum install -y git
 #   git clone https://github.com/tranSMART-Foundation/Scripts.git
 #   cd Scripts
-#   git checkout release-16.1
+#   git checkout release-16.2
 #   cd ..
 #
 # to run the install scripts
@@ -22,27 +22,27 @@
 #   Scripts/install-rhel/checks/checkAll.sh
 
 # Script Parameters
-TRANSMART_DATA_NAME="transmart-data-release-16.1"
+TRANSMART_DATA_NAME="transmart-data-release-16.2"
 TRANSMART_DATA_ZIP="$TRANSMART_DATA_NAME.zip"
-TRANSMART_DATA_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_ZIP"
-TRANSMART_DATA_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_ZIP.sig"
-TRANSMART_DATA_MD5_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_DATA_ZIP.md5"
+TRANSMART_DATA_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_DATA_ZIP"
+TRANSMART_DATA_SIG_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_DATA_ZIP.sig"
+TRANSMART_DATA_MD5_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_DATA_ZIP.md5"
 
-TRANSMART_ETL_NAME="tranSMART-ETL-release-16.1"
+TRANSMART_ETL_NAME="tranSMART-ETL-release-16.2"
 TRANSMART_ETL_ZIP="$TRANSMART_ETL_NAME.zip"
-TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP"
-TRANSMART_ETL_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP.sig"
-TRANSMART_ETL_MD5_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_ETL_ZIP.md5"
+TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_ETL_ZIP"
+TRANSMART_ETL_SIG_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_ETL_ZIP.sig"
+TRANSMART_ETL_MD5_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_ETL_ZIP.md5"
 
 TRANSMART_WAR_NAME="transmart.war"
-TRANSMART_WAR_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME"
-TRANSMART_WAR_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME.sig"
-TRANSMART_WAR_MD5_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_WAR_NAME.md5"
+TRANSMART_WAR_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_WAR_NAME"
+TRANSMART_WAR_SIG_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_WAR_NAME.sig"
+TRANSMART_WAR_MD5_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_WAR_NAME.md5"
 
 TRANSMART_GWAVA_WAR_NAME="gwava.war"
-TRANSMART_GWAVA_WAR_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME"
-TRANSMART_GWAVA_WAR_SIG_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.sig"
-TRANSMART_GWAVA_WAR_MD5_URL="http://library.transmartfoundation.org/release/release16_1_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.md5"
+TRANSMART_GWAVA_WAR_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_GWAVA_WAR_NAME"
+TRANSMART_GWAVA_WAR_SIG_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.sig"
+TRANSMART_GWAVA_WAR_MD5_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.md5"
 
 # on error; stop/exit
 set -e
