@@ -62,9 +62,9 @@ ui {
  */
 
 /* If you want to be able to regenerate this file easily, instead of editing
- * the generated file directly, create a Config-extra.groovy file in the root of
- * the transmart-data checkout. That file will be appended to this one whenever
- * the Config.groovy target is run */
+ * the generated file directly, create a Config-extra.php file in the config
+ * directory of the transmart-data checkout. That file will be appended to
+ * this one whenever the Config.groovy target is run */
 
 environments { production {
     if (transmartURL.startsWith('http://localhost:')) {
@@ -162,9 +162,16 @@ environments { development {
 } }
 
 // Keys without defaults (see Config-extra.php.sample):
-// com.recomdata.projectName
-// com.recomdata.providerName
-// com.recomdata.providerURL
+// name and URL of the supporter entity shown on the welcome page
+// com.recomdata.providerName = "tranSMART Foundation"
+// com.recomdata.providerURL = "http://www.transmartfoundation.org"
+// com.recomdata.providerLogo = "/transmart/static/images/transmartlogo.jpg"
+
+// name and URL and logo of the project
+// shown on the login page
+// com.recomdata.projectName = "My project"
+// com.recomdata.projectURL = "http://myproject.org/"
+// com.recomdata.projectLogo = "/myprojectbanner.jpg"
 /* }}} */
 
 /* {{{ Login */
