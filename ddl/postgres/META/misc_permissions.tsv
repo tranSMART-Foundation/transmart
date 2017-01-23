@@ -5,6 +5,7 @@ deapp	de_metabolite_sub_pathways	r	biomart	r
 deapp	de_metabolite_sub_pway_metab	r	biomart	r
 deapp	de_metabolite_super_pathways	r	biomart	r
 deapp	de_mrna_annotation	r	biomart	r
+fmapp	fm_folder_association	r	biomart	r
 biomart	bio_assay_data_annotation	r	searchapp	r
 biomart	bio_marker_correl_mv	r	searchapp	r
 biomart	bio_assay_platform	r	amapp	r
