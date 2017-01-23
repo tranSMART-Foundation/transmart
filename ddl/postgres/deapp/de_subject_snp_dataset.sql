@@ -9,7 +9,7 @@ CREATE TABLE de_subject_snp_dataset (
     trial_name character varying(255),
     patient_num bigint,
     timepoint character varying(255),
-    subject_id character varying(100),
+    subject_id character varying(255),
     sample_type character varying(255),
     paired_dataset_id bigint,
     patient_gender character varying(1)
