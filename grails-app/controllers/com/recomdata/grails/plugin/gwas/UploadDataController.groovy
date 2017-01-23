@@ -94,7 +94,7 @@ class UploadDataController {
             log.info("template file not found: ${templatesDir}/${filename}")
             template = ""
         } else {
-            def template = templateFile.getBytes()
+            template = templateFile.getBytes()
         }
         response.setContentType("text/plain")
         response.setHeader("Content-Disposition", "attachment;filename=" + filename)
