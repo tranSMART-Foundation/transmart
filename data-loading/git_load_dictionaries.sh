@@ -1,5 +1,7 @@
 #!/bin/sh
 
+#todo check database path. Surely ~transmart/transmart?
+
 # download dictionary loaders
 # download latest dictionaries
 # from dictionaries/

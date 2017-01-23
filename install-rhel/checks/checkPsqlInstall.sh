@@ -28,6 +28,7 @@ echo "checking to see if PostgreSQL is running"
 postgresRunning=$(ps aux | grep postgres | grep -v "grep" | grep "stats collector process")
 if [ -z "$postgresRunning" ]; then 
 	echo "PostgreSQL does not appear to be running; start it"
+	#todo rhel check service restart command
 	echo  "  with the command: sudo /etc/init.d/postgresql restart"  
 	exit 1
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Helper function: use gpg to verify downaload
+# Helper function: use gpg to verify download
 # assumes <name> is downloaded file and <name>.asc is signature file
 # on current directory
 function verifyWithGpg {

@@ -31,7 +31,7 @@ foreach dir ($dirs)
 		echo "++ $dir ++" >> $out
 		echo "++ $dir ++"
 # -------------- actual commands
-        git checkout release-1.2.5-Beta >> $out
+        git checkout release-16.1 >> $out
 		git commit -a -m "created tags for release" >> $out
         git push >> $out
 		git status >> $out
@@ -43,9 +43,9 @@ end
 echo "DONE!"
 
 # various log options
-# git log --pretty=oneline v1.2.4...HEAD >> $out
-# git log --pretty=full v1.2.4...HEAD >> $out
-# git shortlog -s -n --all v1.2.4...HEAD >> $out
+# git log --pretty=oneline release-16.1...HEAD >> $out
+# git log --pretty=full release-16.1...HEAD >> $out
+# git shortlog -s -n --all release-16.1...HEAD >> $out
 
 # various checking commands
 # git status >> $out
@@ -61,9 +61,9 @@ echo "DONE!"
 #		git diff --name-only transmart/master >> $out
 
 # create release branch (original)
-#		git checkout -b release-1.2.5-Beta
-#		git push -u origin release-1.2.5-Beta
+#		git checkout -b release-16.1
+#		git push -u origin release-16.1
 
 # create release branch (incremental)
 #		git fetch origin
-#		git checkout -b release-1.2.5-Beta origin/release-1.2.5-Beta
+#		git checkout -b release-16.1 origin/release-16.1
