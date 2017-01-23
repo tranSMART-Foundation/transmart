@@ -469,18 +469,34 @@ class GwasSearchController {
 
     }
 
-    private String getCachedImageDir() {
+    private String getCachedImageDirForQQPlot() {
         grailsApplication.config.com.recomdata.rwg.qqplots.cacheImages
     }
 
-    private File cachedImagePathFor(Long analysisId) {
-        new File(new File(cachedImageDir, analysisId as String), 'QQPlot.png')
+    private String getCachedImageDirForManhattanPlot() {
+        grailsApplication.config.com.recomdata.rwg.manhattanplots.cacheImages
     }
 
-    private String imageUrlFor(Long analysisId) {
+    private File cachedImagePathForQQPlot(Long analysisId) {
+        new File(new File(cachedImageDirForQQPlot, analysisId as String), 'QQPlot.png')
+    }
+
+    private File cachedImagePathForManhattanPlot(Long analysisId) {
+        new File(new File(cachedImageDirForManhattanPlot, analysisId as String), 'manhattan.png')
+    }
+
+    private String imageUrlForQQPlot(Long analysisId) {
         grailsLinkGenerator.link(
                 controller: 'gwasSearch',
                 action: 'downloadQQPlotImage',
+                absolute: true,
+                params: [analysisId: analysisId])
+    }
+
+    private String imageUrlForManhattanPlot(Long analysisId) {
+        grailsLinkGenerator.link(
+                controller: 'gwasSearch',
+                action: 'downloadManhattanPlotImage',
                 absolute: true,
                 params: [analysisId: analysisId])
     }
@@ -495,7 +511,28 @@ class GwasSearchController {
             return
         }
 
-        def targetFile = cachedImagePathFor(analysisId)
+        def targetFile = cachedImagePathForQQPlot(analysisId)
+
+        if (!targetFile.isFile()) {
+            log.warn "Request for $targetFile, but such file does not exist"
+            render status: 404
+            return
+        }
+
+        sendFileService.sendFile servletContext, request, response, targetFile
+    }
+
+    def downloadManhattanPlotImage() {
+        // Should probably check access
+
+        def analysisId = params.getLong('analysisId')
+        if (!analysisId) {
+            log.warn "Request without analysisId"
+            render status: 404
+            return
+        }
+
+        def targetFile = cachedImagePathForManhattanPlot(analysisId)
 
         if (!targetFile.isFile()) {
             log.warn "Request for $targetFile, but such file does not exist"
@@ -518,12 +555,11 @@ class GwasSearchController {
 
             //get rdc-modules plugin info
             String pluginDir =  grailsApplication.config.RModules.pluginScriptDirectory;
-
-            File cachedQqPlotFile = cachedImagePathFor(params.getLong('analysisId'))
+            File cachedQqPlotFile = cachedImagePathForQQPlot(params.getLong('analysisId'))
 
             // use QQPlots cached images if they are available. QQPlots takes >10 minutes to run and only needs to be generated once per analysis.
             if (cachedQqPlotFile.exists()) {
-                returnJSON['imageURL'] = imageUrlFor(params.getLong('analysisId'))
+                returnJSON['imageURL'] = imageUrlForQQPlot(params.getLong('analysisId'))
                 render returnJSON as JSON;
                 return;
             }
@@ -557,11 +593,10 @@ class GwasSearchController {
             def transcriptGeneNames = getTranscriptGeneNames(session['solrSearchFilter'])
             def analysisIds = [currentAnalysis.id]
 
-			
             switch(currentAnalysis.assayDataType)
             {
                 case "GWAS" :
-				case "GWAS Fail" :
+                case "GWAS Fail" :
                 case "Metabolic GWAS" :
                     analysisData = regionSearchService.getAnalysisData(analysisIds, regions, 0, 0, pvalueCutoff, "null", "asc", search, "gwas", geneNames, transcriptGeneNames, false).results
                     analysisIndexData = gwasSearchService.getGwasIndexData()
@@ -644,7 +679,7 @@ class GwasSearchController {
             def currentDataFile = gwasWebService.writeDataFile(currentWorkingDirectory, returnedAnalysisData,"QQPlot.txt")
 
             //Run the R script to generate the image file.
-			RModulesJobProcessingService.runRScript(currentWorkingDirectory,"/QQ/QQPlot.R","create.qq.plot('QQPlot.txt')", pluginDir)
+            RModulesJobProcessingService.runRScript(currentWorkingDirectory,"/QQ/QQPlot.R","create.qq.plot('QQPlot.txt')", pluginDir)
 
             //Verify the image file exists.
             def imagePath = currentWorkingDirectory + File.separator + "QQPlot.png"
@@ -655,8 +690,8 @@ class GwasSearchController {
             }
             else
             {
-                FileUtils.copyFile(new File(imagePath), cachedQqPlotFile);
-                returnJSON['imageURL'] = imageUrlFor(currentAnalysis.id)
+                FileUtils.copyFile(new File(imagePath), cachedQqPlotFile)
+                returnJSON['imageURL'] = imageUrlForQQPlot(currentAnalysis.id)
                 render returnJSON as JSON;
                 return;
             }
@@ -676,7 +711,7 @@ class GwasSearchController {
             def currentAnalysis = BioAssayAnalysis.get(params.analysisId)
             String manhattanPlotDir = grailsApplication.config.com.recomdata.rwg.manhattanplots.cacheImages;
             String explodedDeplDir = servletContext.getRealPath("/");
-            String tempImageFolder = explodedDeplDir + grailsApplication.config.com.recomdata.rwg.manhattanplots.temporaryImageFolder
+            String tempImageFolder = grailsApplication.config.com.recomdata.plugins.tempFolderDirectory
 
             //get rdc-modules plugin info
             def pluginManager = PluginManagerHolder.pluginManager
@@ -686,12 +721,11 @@ class GwasSearchController {
 
             def manhattanPlotExistingImage = manhattanPlotDir + File.separator + params.analysisId +  File.separator + "manhattan.png"
 
-            File manhattanPlotFile = new File(manhattanPlotExistingImage)
+            File cachedManhattanPlotFile = cachedImagePathForManhattanPlot(params.getLong('analysisId'))
 
-            // use QQPlots cached images if they are available. QQPlots takes >10 minutes to run and only needs to be generated once per analysis.
-            if (manhattanPlotFile.exists()) {
-                def manhattanPlotImageURL = gwasWebService.moveManhattanCachedImageFile(manhattanPlotExistingImage,"ManhattanPlots"+File.separator+"manhattanplot-"+params.analysisId + ".png",tempImageFolder)
-                returnJSON['imageURL'] = manhattanPlotImageURL
+            // use Manhattan Plot cached images if they are available. Plotting takes time to run and only needs to be generated once per analysis.
+            if (cachedManhattanPlotFile.exists()) {
+                returnJSON['imageURL'] = imageUrlForManhattanPlot(params.getLong('analysisId'))
                 render returnJSON as JSON;
                 return;
             }
@@ -823,9 +857,8 @@ class GwasSearchController {
                 throw new Exception("Image file creation failed!")
             }
             else {
-                FileUtils.copyFile(new File(imagePath), new File(manhattanPlotExistingImage));
-                def manhattanPlotImageURL = gwasWebService.moveManhattanCachedImageFile(manhattanPlotExistingImage,"ManhattanPlots"+File.separator+"manhattanplot-"+params.analysisId + ".png",tempImageFolder)
-                returnJSON['imageURL'] = manhattanPlotImageURL
+                FileUtils.copyFile(new File(imagePath), cachedManhattanPlotFile)
+                returnJSON['imageURL'] = imageUrlForManhattanPlot(currentAnalysis.id)
                 render returnJSON as JSON;
                 return;
             }

@@ -735,8 +735,7 @@ AND CHROMOSOME = (SELECT chrom FROM DEAPP.DE_RC_SNP_INFO WHERE RS_ID=? and hg_ve
         //added
 	def moveManhattanCachedImageFile(currentFileLocation, newImageFileName, moveToDirectoryName)
 	{
-
-		String tempImageJobFolder = grailsApplication.config.com.recomdata.rwg.manhattanplots.temporaryImageFolder
+		String tempImageJobFolder = grailsApplication.config.com.recomdata.plugins.tempFolderDirectory
 		def imageURL = grailsApplication.config.imageURL
 		
 		//For each of the image files we find, move them to the new directory.
@@ -744,15 +743,13 @@ AND CHROMOSOME = (SELECT chrom FROM DEAPP.DE_RC_SNP_INFO WHERE RS_ID=? and hg_ve
 		//Move the image to a location where we can actually render it.
 		File oldImage = new File(currentFileLocation);
 		File newImage = new File(tempImageLocation);
- 
+
 		if (!newImage.exists()) {
-		
-			FileUtils.copyFile(oldImage,newImage)
-			
+                    FileUtils.copyFile(oldImage,newImage)
 		}
 		
-		String currentLink = "../${tempImageJobFolder}/${newImageFileName}"
-		
+		String currentLink = "${tempImageLocation}"
+
 		//Delete the old directory.
 		
 		return currentLink
