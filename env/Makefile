@@ -100,7 +100,7 @@ update_repos = if [ ! -d $(1) ]; then \
 	git clone -b $(3) '$(2)' $(1); \
 	else cd $(1) && git pull; fi
 
-# Note: in the release case - we are making a strong assumption that tramSMART-ETL
+# Note: in the release case - we are making a strong assumption that tranSMART-ETL
 #   already exists, is NOT a git archive, and can not be updated
 update_etl:
 	echo "for release build tranSMART-ETL is not automatically updated from git, because it is assumed to be already loaded from a zip file"
@@ -131,7 +131,7 @@ data-integration/.keep: $(KETTLE_ARCHIVE)
 	php -d variables_order=E $< > $@
 
 ubuntu_deps_root: install_ubuntu_packages /var/lib/postgresql/tablespaces
-# Note: in the release case - we are making a strong assumption that tramSMART-ETL
+# Note: in the release case - we are making a strong assumption that tranSMART-ETL
 #   already exists, is NOT a git archive, and can not be updated
 # ubuntu_deps_regular: update_etl data-integration ../vars groovy
 ubuntu_deps_regular: data-integration ../vars groovy
