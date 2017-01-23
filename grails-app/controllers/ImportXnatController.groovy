@@ -1,6 +1,7 @@
 import org.transmart.searchapp.ImportXnatConfiguration;
 import org.transmart.searchapp.ImportXnatVariable;
 import groovy.xml.MarkupBuilder
+import org.codehaus.groovy.grails.plugins.GrailsPluginUtils
 
 /**
  * ImportXnat controller.
@@ -85,7 +86,7 @@ class ImportXnatController {
 
 		long version = params.version.toLong()
 		if (importXnatConfiguration.version > version) {
-			importXnatConfiguration.errors.rejectValue 'version', "importxnatconfiguration.optimistic.locking.failure",
+                        importXnatConfiguration.errors.rejectValue 'version', "importxnatconfiguration.optimistic.locking.failure",
 				"Another user has updated this Configuration while you were editing."
 			render view: 'edit', model: [importXnatConfiguration: importXnatConfiguration]
 			return
@@ -93,7 +94,7 @@ class ImportXnatController {
 
 		importXnatConfiguration.properties = params
 		if (importXnatConfiguration.save()) {
-			redirect action: show, id: importXnatConfiguration.id
+                        redirect action: show, id: importXnatConfiguration.id
 		}
 		else {
 			render view: 'edit', model: [importXnatConfiguration: importXnatConfiguration]
@@ -109,13 +110,14 @@ class ImportXnatController {
 		def importXnatVariable = new ImportXnatVariable(params)
 
 		if (!importXnatConfiguration) {
-			flash.message = "Import XNAT Configuration not found with id $params.id"
+                        flash.message = "Import XNAT Configuration not found with id $params.id"
 			redirect(action: list)
 			return
 		}
 
 		def importXnatVariableList = importXnatConfiguration.variables
-		[importXnatVariable: importXnatVariable, importXnatVariableList: importXnatVariableList, importXnatConfiguration: importXnatConfiguration]
+
+                [importXnatVariable: importXnatVariable, importXnatVariableList: importXnatVariableList, importXnatConfiguration: importXnatConfiguration]
 	}
 
 	/**
@@ -170,16 +172,16 @@ class ImportXnatController {
 			def username = importXnatConfiguration.username
 			def project = importXnatConfiguration.project
 			def node = importXnatConfiguration.node
-			//def kettledir = (getTransmartDataLocation() + "/env/data-integration/")
-			def kettledir = (getScriptsLocation() + "/xnattotransmartlink/")
-			def datadir = (getScriptsLocation() + "/xnattotransmartlink/")
+			def kettledir = (getTransmartDataLocation() + "/env/data-integration/")
+			//def kettledir = (getScriptsLocation() + "/xnattotransmartlink/")
+			def datadir = (getTransmartWorkingdir() + "/xnattotransmartlink/")
 
-			def cmd = "python " +
-					getScriptsLocation() +
-					"/xnattotransmartlink/downloadscript.py" +
-					" ${url} ${username} ${password} ${project} ${node} ${kettledir} ${datadir}"
-			log.debug(cmd)
-			def process = (cmd).execute(null, new File(getScriptsLocation() + "/xnattotransmartlink"))
+                        //check kettledir exists
+                        // make any missing datadir levels
+			def cmd = ["python",
+                                   getScriptsLocation() + "/xnattotransmartlink/downloadscript.py",
+                                   url, username, password, project, node, kettledir, datadir]
+			def process = new ProcessBuilder(cmd).directory(new File(getScriptsLocation() + "/xnattotransmartlink")).start()
 			process.waitFor()
 			def inText = process.in.text
 			def errText = process.err.text
@@ -201,7 +203,7 @@ class ImportXnatController {
 		def importXnatVariableList = importXnatConfiguration.variables
 		def project = importXnatConfiguration.project
 		def xmlFile = (getScriptsLocation() + "/xnattotransmartlink/${project}.xml")
-		def writer = new FileWriter(new File(xmlFile))
+                def writer = new FileWriter(new File(xmlFile))
 		def xml = new MarkupBuilder(writer)
 
 		xml.project(name: project) {
@@ -227,6 +229,7 @@ class ImportXnatController {
 		def project = importXnatConfiguration.project
 
 		def xmlFile = (getScriptsLocation() + "/xnattotransmartlink/${project}.xml")
+
 		def file = new File(xmlFile)
 		response.setContentType("application/xml;charset='utf8'")
 		response.setHeader("Content-disposition", "attachment;filename=${file.getName()}")
@@ -236,18 +239,64 @@ class ImportXnatController {
 	}
 
 	def getTransmartDataLocation = {
-		def dir = grailsApplication.config.org.transmart.data.location
+		String dir = grailsApplication.config.org.transmart.data.location
 		if (dir.isEmpty()) {
 			dir = grailsAttributes.getApplicationContext().getResource("/").getFile().getParentFile().getParentFile().toString() + "/transmart-data"
 		}
 		return dir
 	}
 
-	def getScriptsLocation = {
-		def dir = grailsApplication.config.org.transmart.importxnatplugin.location
+	def getTransmartWorkingdir = {
+		String dir = grailsApplication.config.org.transmart.importxnatplugin.workingdir
 		if (dir.isEmpty()) {
-			dir = grailsAttributes.getApplicationContext().getResource("/").getFile().getParentFile().getParentFile().toString() + "/transmart-xnat-importer-plugin/scripts"
+			dir = grailsApplication.config.jobsDirectory
 		}
 		return dir
+	}
+
+	def getScriptsLocation = {
+            def servletContext = grailsApplication.mainContext.servletContext
+            def tsAppRScriptsDir
+            // Find the top level directory
+            def basePath = ((String[])[
+                                servletContext.getRealPath("/"),
+                                servletContext.getRealPath("/") + "../",
+                                servletContext.getResource("/")?.file,
+                                "webapps${servletContext.contextPath}",
+                                "web-app/"
+                            ]).find { obj ->
+                                obj && (tsAppRScriptsDir = new File(obj, 'dataExportRScripts')).isDirectory()
+            }
+            File xnatImportModulesDir = GrailsPluginUtils.getPluginDirForName('transmart-xnat-importer')?.file
+            if (!xnatImportModulesDir) {
+                // it actually varies...
+                xnatImportModulesDir = GrailsPluginUtils.getPluginDirForName('transmartXnatImporterPlugin')?.file
+            }
+            if (!xnatImportModulesDir) {
+                String version = grailsApplication.mainContext.pluginManager.allPlugins.find {
+                    it.name == 'transmart-xnat-importer' || it.name == 'transmartXnatImporter'
+                }?.version
+                xnatImportModulesDir = new File("$basePath/plugins", "transmart-xnat-importer-${version}")
+            }
+            if (!xnatImportModulesDir) {
+                throw new RuntimeException('Could not determine directory for ' +
+                                           'transmart-xnat-importer plugin')
+            }
+
+            String dir = "";
+
+            if(xnatImportModulesDir) {
+//                dir = xnatImportModulesDir.getCanonicalPath()
+                dir = xnatImportModulesDir.getPath()
+            }
+
+            if (!xnatImportModulesDir) {
+                dir = grailsApplication.config.org.transmart.importxnatplugin.location
+                if (dir.isEmpty()) {
+                    dir = grailsAttributes.getApplicationContext().getResource("/").getFile().getParentFile().getParentFile().toString() + "/xnattotransmartlink/scripts"
+                }
+            }
+
+            return dir
 	}
 }
