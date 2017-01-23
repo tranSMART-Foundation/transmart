@@ -805,7 +805,7 @@ BEGIN
 	--	insert any site/subject/samples that are not in de_subject_sample_mapping
 
 	begin
-	insert into de_subject_sample_mapping
+	insert into deapp.de_subject_sample_mapping
 	(patient_id
 	,site_id
 	,subject_id
