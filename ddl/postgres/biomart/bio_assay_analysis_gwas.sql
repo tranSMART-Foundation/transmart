@@ -9,7 +9,11 @@ CREATE TABLE bio_assay_analysis_gwas (
     etl_id bigint,
     ext_data character varying(4000),
     p_value double precision,
-    log_p_value double precision
+    log_p_value double precision,
+    effect_allele character varying(100),
+    other_allele character varying(100),
+    beta character varying(100),
+    standard_error character varying(100)
 );
 
 --
