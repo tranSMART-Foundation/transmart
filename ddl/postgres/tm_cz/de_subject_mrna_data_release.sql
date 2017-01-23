@@ -9,7 +9,7 @@ CREATE TABLE de_subject_mrna_data_release (
     timepoint character varying(100),
     pvalue double precision,
     refseq character varying(50),
-    subject_id character varying(50),
+    subject_id character varying(100),
     raw_intensity bigint,
     mean_intensity double precision,
     stddev_intensity double precision,

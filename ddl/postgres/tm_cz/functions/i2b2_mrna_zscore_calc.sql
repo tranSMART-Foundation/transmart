@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_mrna_zscore_calc(character varying, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_mrna_zscore_calc(trial_id character varying, source_cd character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT (-1), data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2) RETURNS void
+CREATE FUNCTION i2b2_mrna_zscore_calc(trial_id character varying, source_cd character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2) RETURNS void
     LANGUAGE plpgsql
     AS $_$
 DECLARE
@@ -378,12 +378,12 @@ BEGIN
 
   WHEN invalid_runType or trial_mismatch or trial_missing then
     --Handle errors.
-    cz_error_handler (jobID, procedureName);
+    cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     --End Proc
     cz_end_audit (jobID, 'FAIL');
   when OTHERS THEN
     --Handle errors.
-    cz_error_handler (jobID, procedureName);
+    cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     --End Proc
     cz_end_audit (jobID, 'FAIL');
 	

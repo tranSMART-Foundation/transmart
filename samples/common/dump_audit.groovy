@@ -89,6 +89,8 @@ sql.eachRow "SELECT procedure_name, step_desc, step_status, records_manipulated,
         /* for Oracle it's an oracle.sql.TIMESTAMPLTZ */
         itCop[4] = itCop[4].dateValue(sql.connection).dateTimeString
     }
+    /* some procedures fail to define a procedure name! */
+    if (itCop[0] == null) {itCop[0] = ''}
     if (itCop[0].size() > colSize[0]) {
         itCop[0] = itCop[0].substring(itCop[0].length() - colSize[0])
     }

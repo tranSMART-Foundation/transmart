@@ -13,7 +13,7 @@ CREATE SEQUENCE de_variant_subject_idx_seq
 --
 CREATE TABLE de_variant_subject_idx (
     dataset_id character varying(50),
-    subject_id character varying(50),
+    subject_id character varying(100),
     "position" bigint,
     variant_subject_idx_id bigint DEFAULT nextval('de_variant_subject_idx_seq'::regclass) NOT NULL
 );

@@ -274,6 +274,8 @@ sub parseOracleViews($){
 			$oViewFile{"$schema.$view"} = "$d/$f";
 			$cview = 1;
 		    }
+		    elsif($vuse =~ /^COMMENT/) {#COMMENT ON VIEW - ignore
+		    }
 		    else {
 			print STDERR "$d/$f unexpected view $view     $vuse     '$rest'\n";
 		    }
@@ -553,6 +555,8 @@ sub parseOracle($){
 			$oViewFile{"$schema.$view"} = "$d/$f";
 			$cview = 1;
 		    }
+		    elsif($vuse =~ /^COMMENT/) {#COMMENT ON VIEW - ignore
+		    }
 		    else {
 			print STDERR "$d/$f unexpected view $view     $vuse     '$rest'\n";
 		    }
@@ -632,6 +636,7 @@ sub parsePostgresFunctions($){
 	    open(IN,"$dir$d/$f") || die "Failed to read $d/$f";
 	    while(<IN>) {
 		s/\s*--.*//g;
+		s/\(-1\)/-1/g;
 		if(/^\s*CREATE\s+FUNCTION\s+(\S+)\s*\(([^\)]*)\)\s*RETURNS (.*)/) {
 		    $func = $1;
 		    $ret = $2;
@@ -721,6 +726,8 @@ sub parsePostgresViews($){
 		    if($vuse =~ /^CREATE/) {
 			$pViewFile{"$schema.$view"} = "$d/$f";
 			$cview = 1;
+		    }
+		    elsif($vuse =~ /^COMMENT/) {#COMMENT ON VIEW - ignore
 		    }
 		    else {
 			print STDERR "$d/$f unexpected view $view     $vuse     '$rest'\n";
@@ -1131,6 +1138,8 @@ sub parsePostgres($){
 		    if($vuse =~ /^CREATE/) {
 			$pViewFile{"$schema.$view"} = "$d/$f";
 			$cview = 1;
+		    }
+		    elsif($vuse =~ /^COMMENT/) {#COMMENT ON VIEW - ignore
 		    }
 		    else {
 			print STDERR "$d/$f unexpected view $view     $vuse     '$rest'\n";
@@ -1708,6 +1717,8 @@ sub compareSequence($){
     ($ov) = ($otxt =~ /CACHE (\S+)/);
     ($pv) = ($ptxt =~ /CACHE (\S+)/);
     if(!defined($ov) || !defined($pv) || ($ov ne $pv)){
+	if(!defined($ov)){$ov = "undefined"}
+	if(!defined($pv)){$pv = "undefined"}
 	# check for the default values specified
 	if($ov ne "20" || $pv ne "1") {$compstr .= "CACHE $ov $pv\n"}
     }
@@ -1740,7 +1751,7 @@ if(defined(SKIPP)) {
     close SKIPP;
 }
 
-# Triggers to isnore in Postgres
+# Triggers to ignore in Postgres
 # e.g. logon_trigger to set Oracle user identifier
 open(SKIPOT, "skip_oracle_trigger.txt") || print STDERR "Unable to open skip_oracle_trigger.txt";
 if(defined(SKIPOT)) {

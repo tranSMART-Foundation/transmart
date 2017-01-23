@@ -1,7 +1,11 @@
 --
 -- Name: i2b2_secure_study(text, bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_secure_study(trial_id text, currentjobid bigint DEFAULT NULL::bigint) RETURNS void
+
+SET check_function_bodies = false;
+SET search_path = tm_cz, pg_catalog;
+
+CREATE OR REPLACE FUNCTION i2b2_secure_study(trial_id text, currentjobid bigint DEFAULT NULL::bigint) RETURNS void
     LANGUAGE plpgsql
     AS $_$
 DECLARE
@@ -23,16 +27,18 @@ DECLARE
 ******************************************************************/
 
 	--Audit variables
-	newJobFlag integer(1);
+	newJobFlag integer;
 	databaseName varchar(100);
 	procedureName varchar(100);
 	jobID bigint;
 	stepCt bigint;
-	
+	rowCt bigint;
+
 	v_bio_experiment_id	bigint;
 	pExists				integer;
 	TrialId				varchar(100);
 
+	rtnCd numeric;
 
 BEGIN
 
@@ -42,28 +48,28 @@ BEGIN
 	newJobFlag := 0; -- False (Default)
 	jobID := currentJobID;
 
-	PERFORM sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName ;
-	procedureName := $$PLSQL_UNIT;
+	databaseName := 'TM_CZ';
+	procedureName := 'i2b2_secure_study';
 
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it
 	IF(coalesce(jobID::text, '') = '' or jobID < 1)
 	THEN
 		newJobFlag := 1; -- True
-		cz_start_audit (procedureName, databaseName, jobID);
+		select cz_start_audit (procedureName, databaseName) into jobID;
 	END IF;
   
 	stepCt := 0;
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Start ' || procedureName,0,stepCt,'Done');
+	select cz_write_audit(jobID,databaseName,procedureName,'Start ' || procedureName,0,stepCt,'Done') into rtnCd;
 	
 	--	create security records in observation_fact
 	
-	i2b2_create_security_for_trial(TrialId, 'Y', jobID);
+	select i2b2_create_security_for_trial(TrialId, 'Y', jobID) into rtnCd;
 	
 	--	load i2b2_secure
 	
-	i2b2_load_security_data(jobID);
+	select i2b2_load_security_data(jobID) into rtnCd;
 	
 	--	check if entry exists for study in bio_experiment
 	
@@ -74,13 +80,14 @@ BEGIN
 	if pExists = 0 then
 		insert into biomart.bio_experiment
 		(title, accession, etl_id)
-		PERFORM 'Metadata not available'
+		          'Metadata not available'
 			  ,TrialId
 			  ,'METADATA:' || TrialId
 		;
-	    stepCt := stepCt + 1;
-		cz_write_audit(jobId,databaseName,procedureName,'Insert trial/study into biomart.bio_experiment',SQL%ROWCOUNT,stepCt,'Done');
-		commit;
+		get diagnostics rowCt := ROW_COUNT;
+		stepCt := stepCt + 1;
+		select cz_write_audit(jobID,databaseName,procedureName,'Insert trial/study into biomart.bio_experiment',rowCt,stepCt,'Done') into rtnCd;
+		--commit;
 	end if;
 	
 	select bio_experiment_id into v_bio_experiment_id
@@ -93,10 +100,10 @@ BEGIN
 	,data_type
 	,bio_data_unique_id
 	)
-	PERFORM v_bio_experiment_id
+	      select v_bio_experiment_id
 	      ,parse_nth_value(md.c_fullname,2,'\') || ' - ' || md.c_name as display_name
-		  ,'BIO_CLINICAL_TRIAL' as data_type
-		  ,'EXP:' || TrialId as bio_data_unique_id
+	      ,'BIO_CLINICAL_TRIAL' as data_type
+	      ,'EXP:' || TrialId as bio_data_unique_id
 	from i2b2metadata.i2b2 md
 	where md.sourcesystem_cd = TrialId
 	  and md.c_hlevel = 
@@ -105,27 +112,29 @@ BEGIN
 	  and not exists
 		 (select 1 from searchapp.search_secure_object so
 		  where v_bio_experiment_id = so.bio_data_id);
+	get diagnostics rowCt := ROW_COUNT;
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Inserted trial/study into SEARCHAPP search_secure_object',SQL%ROWCOUNT,stepCt,'Done');
-	commit;
+	select cz_write_audit(jobID,databaseName,procedureName,'Inserted trial/study into SEARCHAPP search_secure_object',rowCt,stepCt,'Done') into rtnCd;
+	--commit;
 		
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'End ' || procedureName,SQL%ROWCOUNT,stepCt,'Done');
-	commit;
+	select cz_write_audit(jobID,databaseName,procedureName,'End ' || procedureName,rowCt,stepCt,'Done') into rtnCd;
+	--commit;
 	
     ---Cleanup OVERALL JOB if this proc is being run standalone
 	IF newJobFlag = 1
 	THEN
-		cz_end_audit (jobID, 'SUCCESS');
+		perform cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 
 	EXCEPTION
 	WHEN OTHERS THEN
-		--Handle errors.
-		cz_error_handler (jobID, procedureName);
+	raise notice 'Error % %', SQLSTATE, SQLERRM;
+    --Handle errors.
+		perform cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
 		
 		--End Proc
-		cz_end_audit (jobID, 'FAIL');
+		perform cz_end_audit (jobID, 'FAIL');
 	
 END;
  

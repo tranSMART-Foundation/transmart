@@ -5,7 +5,7 @@
 SET search_path = tm_cz, pg_catalog;
 
 
-CREATE OR REPLACE FUNCTION i2b2_process_metabolomic_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_code character varying DEFAULT 'STD'::character varying, log_base bigint DEFAULT 2, secure_study character varying DEFAULT 'N'::character varying, currentjobid bigint DEFAULT (-1)) RETURNS numeric
+CREATE OR REPLACE FUNCTION i2b2_process_metabolomic_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_code character varying DEFAULT 'STD'::character varying, log_base bigint DEFAULT 2, secure_study character varying DEFAULT 'N'::character varying, currentjobid bigint DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql
     AS $$
 
@@ -41,7 +41,6 @@ Declare
   gplTitle		varchar(1000);
   pExists		bigint;
   partTbl   	bigint;
-  partExists 	bigint;
   sampleCt		bigint;
   idxExists 	bigint;
   logBase		bigint;
@@ -146,7 +145,7 @@ BEGIN
 	
 	if pCount > 0 then
 		perform cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		perform cz_error_handler(jobid,procedurename);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		select cz_end_audit (jobId,'FAIL') into rtnCd;
 		return 161;
 	end if;
@@ -163,7 +162,7 @@ BEGIN
 	
 	if PCOUNT = 0 then
 		perform cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_qpcr_metabolomics_annotation',1,stepCt,'ERROR');
-		perform CZ_ERROR_HANDLER(JOBID,PROCEDURENAME);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		select cz_end_audit (jobId,'FAIL') into rtnCd;
 		RETURN 163;
 	end if;
@@ -176,7 +175,7 @@ BEGIN
 	
 	if pCount > 0 then
 		perform cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		perform cz_error_handler(jobid,procedurename);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		select CZ_END_AUDIT (JOBID,'FAIL') into rtnCd;
 		return 162;
 	end if;
@@ -191,7 +190,7 @@ BEGIN
 	
 	if pCount > 0 then
 		perform cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in LT_SRC_METABOLOMIC_MAP',1,stepCt,'ERROR');
-		perform CZ_ERROR_HANDLER(JOBID,PROCEDURENAME);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		select cz_end_audit (jobId,'FAIL') into rtnCd;
 		RETURN 164;
 	end if;
@@ -321,46 +320,10 @@ BEGIN
 	stepCt := stepCt + 1;
 	perform cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
 
-	select count(*) into partExists
-	from deapp.de_subject_sample_mapping sm
-	where sm.trial_name = TrialId
-	and coalesce(sm.source_cd,'STD') = sourceCd
-	and sm.platform = 'METABOLOMICS'
-	and sm.partition_id is not null;
+	select nextval('deapp.seq_metabolomics_partition_id') into partitionId;
 	
-	if partExists = 0 then
-		select nextval('deapp.seq_metabolomics_partition_id') into partitionId;
-	else
-		select distinct partition_id into partitionId
-		from deapp.de_subject_sample_mapping sm
-		where sm.trial_name = TrialId
-		and coalesce(sm.source_cd,'STD') = sourceCd
-		and sm.platform = 'METABOLOMICS';
-	end if;
-
 	partitionName := 'deapp.de_subject_metabolomics_data_' || partitionId::text;
 	partitionIndx := 'de_subject_metabolomics_data_' || partitionId::text;
-
-	--	Cleanup any existing data in de_subject_sample_mapping.  
-	begin
-	delete from DE_SUBJECT_SAMPLE_MAPPING 
-	where trial_name = TrialID 
-	  and coalesce(source_cd,'STD') = sourceCd
-	  and platform = 'METABOLOMICS'; --Making sure only metabolomic data is deleted
-	  get diagnostics rowCt := ROW_COUNT;
-	  exception
-	when others then
-		errorNumber := SQLSTATE;
-		errorMessage := SQLERRM;
-		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
-		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
-		return -16;
-	end;
-		  
-	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Delete trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 
 --	truncate tmp node table
 

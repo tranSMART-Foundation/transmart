@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_process_acgh_data(character varying, character varying, character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_process_acgh_data(trial_id character varying, top_node character varying, source_cd character varying DEFAULT 'STD'::character varying, secure_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT (-1)) RETURNS numeric
+CREATE FUNCTION i2b2_process_acgh_data(trial_id character varying, top_node character varying, source_cd character varying DEFAULT 'STD'::character varying, secure_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
     AS $$
 /*************************************************************************
@@ -356,16 +356,8 @@ BEGIN
 	  and sm.platform = 'ACGH'
 	  and sm.partition_id is not null;
 
-	if partExists = 0 then
-		select nextval('deapp.seq_mrna_partition_id') into partitionId;
-	else
-		select distinct partition_id into partitionId
-		from deapp.de_subject_sample_mapping sm
-		where sm.trial_name = TrialId
-		  and coalesce(sm.source_cd,'STD') = sourceCd
-		--  and sm.platform = 'MRNA_AFFYMETRIX';
-		  and sm.platform = 'ACGH';
-	end if;
+	-- take new partition regardless of partExists, but we need the partExists value later
+	select nextval('deapp.seq_mrna_partition_id') into partitionId;
 
 	partitionName := 'deapp.de_subject_acgh_data_' || partitionId::text;
 	partitionIndx := 'de_subject_acgh_data_' || partitionId::text;

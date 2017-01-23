@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_create_security_for_trial(character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_create_security_for_trial(trial_id character varying, secured_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT (-1)) RETURNS numeric
+CREATE FUNCTION i2b2_create_security_for_trial(trial_id character varying, secured_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
     AS $$
 /*************************************************************************

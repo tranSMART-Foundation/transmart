@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_study_metadata(numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_study_metadata(currentjobid numeric DEFAULT (-1)) RETURNS bigint
+CREATE FUNCTION i2b2_load_study_metadata(currentjobid numeric DEFAULT 0) RETURNS bigint
     LANGUAGE plpgsql SECURITY DEFINER
     AS $$
 /*************************************************************************
@@ -703,7 +703,7 @@ BEGIN
 	get diagnostics rowCt := ROW_COUNT;	
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add GEO study to bio_cotent',rowCt,stepCt,'Done') into rtnCd;
+	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add GEO study to bio_content',rowCt,stepCt,'Done') into rtnCd;
 	
 	--	insert GSE studies into bio_content_reference
 	
@@ -829,7 +829,7 @@ BEGIN
 		select length(study_pubmed_rec.pubmed_ids)-length(replace(study_pubmed_rec.pubmed_ids,'|',''))+1 into dcount;
 		while dcount > 0
 		Loop	
-			-- multiple pubmed id can be separated by |, pubmed id and title are separated by :
+			-- multiple pubmed id can be separated by |, pubmed id and title are separated by @
 			
 			select tm_cz.parse_nth_value(study_pubmed_rec.pubmed_ids,dcount,'|') into tmp_pubmed;			
 			select tm_cz.instr(tmp_pubmed,'@') into lcount;
@@ -918,7 +918,7 @@ BEGIN
 
 	begin
 	delete from i2b2metadata.i2b2_tags
-	where upper(tag_type) = 'Trial';
+	where upper(tag_type) = 'TRIAL';
 	exception
 	when others then
 		errorNumber := SQLSTATE;
@@ -1032,7 +1032,7 @@ BEGIN
 		select tm_cz.czx_end_audit (jobID, 'SUCCESS') into rtnCd;
 	END IF;
 
-	return 1;
+	return 0;
 	
 END;
 

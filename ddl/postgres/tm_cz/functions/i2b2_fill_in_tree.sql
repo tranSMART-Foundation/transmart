@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_fill_in_tree(character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_fill_in_tree(trial_id character varying, path character varying, currentjobid numeric DEFAULT (-1)) RETURNS numeric
+CREATE FUNCTION i2b2_fill_in_tree(trial_id character varying, path character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
     AS $$
 /*************************************************************************

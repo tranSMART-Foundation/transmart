@@ -13,6 +13,7 @@ CREATE TABLE de_subject_protein_data (
     intensity numeric,
     zscore numeric,
     log_intensity numeric,
+    timepoint character varying(100),
     partition_id numeric
 );
 

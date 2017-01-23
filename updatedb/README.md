@@ -1,7 +1,7 @@
 Updating DB from one release to the next.
 -----------------------------------------
 
-Each floder in this directory contains instructions and helper files for
+Each folder in this directory contains instructions and helper files for
 updating the database to be compatible with the release version indicated in
 the directory name. In each case, the top level folder contains a README.md
 and the contained folders are postgres, oracle, and common. The directory postgres

@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_metabolomics_zscore_calc(character varying, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_metabolomics_zscore_calc(trial_id character varying, source_cd character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT (-1), data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2) RETURNS void
+CREATE FUNCTION i2b2_metabolomics_zscore_calc(trial_id character varying, source_cd character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2) RETURNS void
     LANGUAGE plpgsql
     AS $_$
 DECLARE
@@ -171,7 +171,7 @@ BEGIN
 			,subject_id
 			)
 			PERFORM probeset
-				  ,intensity_value  
+				  ,log_base ^ intensity_value  
 				  ,assay_id 
 				  ,intensity_value
 				  ,patient_id
@@ -195,7 +195,7 @@ BEGIN
 			PERFORM probeset
 				  ,intensity_value 
 				  ,assay_id 
-				  ,log(2,intensity_value)
+				  ,log(log_base,intensity_value)
 				  ,patient_id
 		--		  ,sample_cd
 				  ,subject_id
@@ -314,7 +314,7 @@ BEGIN
 		  ,m.assay_id
                   ,m.subject_id 
                   ,m.intensity_value
-                  ,log(2,m.intensity_value)
+                  ,log(2.0,m.intensity_value)
 			  ,case when m.intensity_value < -2.5
 			        then -2.5
 					when m.intensity_value > 2.5
@@ -394,13 +394,13 @@ BEGIN
 
   WHEN invalid_runType or trial_mismatch or trial_missing then
     --Handle errors.
-    cz_error_handler (jobID, procedureName);
+    cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     --End Proc
   
     cz_end_audit (jobID, 'FAIL');
   when OTHERS THEN
     --Handle errors.
-    cz_error_handler (jobID, procedureName);
+    cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 
 
     cz_end_audit (jobID, 'FAIL');
@@ -412,7 +412,7 @@ $_$;
 --
 -- Name: i2b2_metabolomics_zscore_calc(character varying, character varying, character varying, numeric, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_metabolomics_zscore_calc(trial_id character varying, partition_name character varying, partition_indx character varying, partitionid numeric, source_cd character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT (-1), data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2) RETURNS void
+CREATE FUNCTION i2b2_metabolomics_zscore_calc(trial_id character varying, partition_name character varying, partition_indx character varying, partitionid numeric, source_cd character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2) RETURNS void
     LANGUAGE plpgsql
     AS $$
 DECLARE
@@ -546,7 +546,7 @@ select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) 
 			,subject_id
 			)
 			select probeset
-				  ,intensity_value  
+				  ,log_base ^ intensity_value  
 				  ,assay_id 
 				  ,intensity_value
 				  ,patient_id
@@ -565,7 +565,7 @@ select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) 
 			select probeset
 				  ,intensity_value 
 				  ,assay_id 
-				  ,CASE WHEN intensity_value <= 0 THEN log(2,(intensity_value + 0.001)) ELSE log(2,intensity_value) END
+				  ,log(log_base,cast(intensity_value as numeric))   -- wt_subject_mbolomics_probeset should only contain strictly positive intensities, otherwise throwing an error here is correct thing to do
 				  ,patient_id
 				  ,subject_id
 			from WT_SUBJECT_MBOLOMICS_PROBESET
@@ -670,8 +670,8 @@ select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) 
 	',assay_id ,subject_id ,raw_intensity ,log_intensity ,zscore ,patient_id) ' ||
 	'select ' || partitioniD::text || ', ''' || TrialId || '''' ||
 		  ',''' || TrialId || ''',d.id ,m.assay_id ,m.subject_id ' ||
-           ',m.intensity_value ,round(m.log_intensity,4) ' ||
-            ',round(CASE WHEN m.zscore < -2.5 THEN -2.5 WHEN m.zscore >  2.5 THEN  2.5 ELSE round(m.zscore,5) END,5) ' ||  
+           ',m.intensity_value ,m.log_intensity ' ||
+            ',CASE WHEN m.zscore < -2.5 THEN -2.5 WHEN m.zscore >  2.5 THEN  2.5 ELSE m.zscore END ' ||  
             ',m.patient_id ' ||
 			'from WT_SUBJECT_METABOLOMICS_MED m, ' ||
         '(select distinct mp.source_cd,mp.platform From TM_LZ.LT_SRC_METABOLOMIC_MAP mp where mp.trial_name = ''' || TrialId || ''') as mpp ' ||

@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_process_mrna_data(character varying, character varying, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_process_mrna_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_cd character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT (-1)) RETURNS numeric
+CREATE FUNCTION i2b2_process_mrna_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_cd character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
     AS $$
 
@@ -29,6 +29,7 @@ Declare
 	jobID 			numeric(18,0);
 	stepCt 			numeric(18,0);
 	rowCt			numeric(18,0);
+        thisRowCt		numeric(18,0);
 	errorNumber		character varying;
 	errorMessage	character varying;
 	rtnCd			integer;
@@ -49,7 +50,7 @@ Declare
 	gplTitle		varchar(1000);
 	pExists			numeric;
 	partTbl   		numeric;
-	partExists 		numeric;
+        partExists 		numeric;
 	sampleCt		numeric;
 	idxExists 		numeric;
 	logBase			numeric;
@@ -59,6 +60,24 @@ Declare
 	partitioniD		numeric(18,0);
 	partitionName	varchar(100);
 	partitionIndx	varchar(100);
+        thisPatient     bigint;
+
+        doPatient CURSOR is
+        select distinct dsss.patient_id
+	    from deapp.de_subject_sample_mapping dsss
+	    where dsss.platform = 'MRNA_AFFYMETRIX'
+		and dsss.trial_name = TrialId
+		and dsss.source_cd = sourceCd
+	    ORDER BY dsss.patient_id;
+
+        doAssay CURSOR is
+        select distinct assay_id, gpl_id, sample_cd
+	    from deapp.de_subject_sample_mapping dsssa
+	    where dsssa.patient_id = thisPatient
+		and dsssa.platform = 'MRNA_AFFYMETRIX'
+		and dsssa.trial_name = TrialId
+		and dsssa.source_cd = sourceCd
+	    ORDER BY dsssa.assay_id;
 
 	--	cursor to add leaf nodes, cursor is used here because there are few nodes to be added
 
@@ -357,25 +376,9 @@ BEGIN
 	stepCt := stepCt + 1;
 	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done') into rtnCd;
 
-	--	check if trial/source_cd already loaded, if yes, get existing partition_id else get new one
-
-	select count(*) into partExists
-	from deapp.de_subject_sample_mapping sm
-	where sm.trial_name = TrialId
-	  and coalesce(sm.source_cd,'STD') = sourceCd
-	  and sm.platform = 'MRNA_AFFYMETRIX'
-	  and sm.partition_id is not null;
-
-	if partExists = 0 then
-		select nextval('deapp.seq_mrna_partition_id') into partitionId;
-	else
-		select distinct partition_id into partitionId
-		from deapp.de_subject_sample_mapping sm
-		where sm.trial_name = TrialId
-		  and coalesce(sm.source_cd,'STD') = sourceCd
-		  and sm.platform = 'MRNA_AFFYMETRIX';
-	end if;
-
+	--	get next partitionId
+    select nextval('deapp.seq_mrna_partition_id') into partitionId;
+	
 	partitionName := 'deapp.de_subject_microarray_data_' || partitionId::text; -- revert to using partitions
 	partitionIndx := 'de_subject_microarray_data_' || partitionId::text; -- revert to using partitions
 	-- partitionName := 'deapp.de_subject_microarray_data';
@@ -609,7 +612,7 @@ BEGIN
 		return -16;
 	end;
     stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in tm_wz.wt_mrna_nodes',rowCt,stepCt,'Done') into rtnCd;
+	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create TISSUETYPE nodes in tm_wz.wt_mrna_nodes',rowCt,stepCt,'Done') into rtnCd;
 
 	--	set node_name
 
@@ -1025,6 +1028,10 @@ BEGIN
 	--	note: assay_id represents a unique subject/site/sample
 
 	begin
+        rowCt := 0;
+        FOR r_patient in doPatient loop
+            thisPatient := r_patient.patient_id;
+            FOR r_assay in doAssay loop
 	insert into tm_wz.wt_subject_mrna_probeset
 	(probeset_id
 	,intensity_value
@@ -1034,25 +1041,23 @@ BEGIN
 	)
 	select gs.probeset_id
 		  ,avg(md.intensity_value::double precision)
-		  ,sd.assay_id
-          ,sd.patient_id
+		  ,r_assay.assay_id
+		  ,thisPatient
 		  ,TrialId
 	from
 	  tm_lz.lt_src_mrna_data md
-      inner join deapp.de_subject_sample_mapping sd
         inner join deapp.de_mrna_annotation gs
-        on sd.gpl_id = gs.gpl_id
-      on md.expr_id = sd.sample_cd and md.probeset = gs.probe_id
-	where sd.platform = 'MRNA_AFFYMETRIX'
-	  and sd.trial_name = TrialId
-	  and sd.source_cd = sourceCd
-	  and case when dataType = 'R'
+                on md.probeset = gs.probe_id
+                where md.expr_id = r_assay.sample_cd
+		    and r_assay.gpl_id = gs.gpl_id
+		    and case when dataType = 'R'
 			   then case when md.intensity_value > 0 then 1 else 0 end
 			   else 1 end = 1         --	take only >0 for dataType R
-	group by gs.probeset_id
-		  ,sd.assay_id
-          ,sd.patient_id;
-	get diagnostics rowCt := ROW_COUNT;
+	        group by gs.probeset_id;
+		get diagnostics thisRowCt := ROW_COUNT;
+		rowCt := rowCt + thisRowCt;
+	    END LOOP;
+	END LOOP;
 	exception
 	when others then
 		errorNumber := SQLSTATE;

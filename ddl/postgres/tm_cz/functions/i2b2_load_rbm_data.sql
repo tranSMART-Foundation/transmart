@@ -2,7 +2,7 @@
 -- Name: i2b2_load_rbm_data(character varying, character varying, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
 SET search_path = tm_cz, pg_catalog;
-CREATE OR REPLACE FUNCTION i2b2_load_rbm_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_code character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT NULL::character varying, currentjobid numeric DEFAULT (-1)) RETURNS numeric
+CREATE OR REPLACE FUNCTION i2b2_load_rbm_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_code character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT NULL::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql
     AS $$
 DECLARE
@@ -37,7 +37,6 @@ DECLARE
   gplTitle		varchar(1000);
   pExists		bigint;
   partTbl   	bigint;
-  partExists 	bigint;
   sampleCt		bigint;
   idxExists 	bigint;
   logBase		bigint;
@@ -324,22 +323,7 @@ BEGIN
 	stepCt := stepCt + 1;
 	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done') into rtnCd;
 	
-	select count(*) into partExists
-	from deapp.de_subject_sample_mapping sm
-	where sm.trial_name = TrialId
-	and coalesce(sm.source_cd,'STD') = sourceCd
-	and sm.platform = 'RBM'
-	and sm.partition_id is not null;
-	
-	if partExists = 0 then
-		select nextval('deapp.seq_rbm_partition_id') into partitionId;
-	else
-		select distinct partition_id into partitionId
-		from deapp.de_subject_sample_mapping sm
-		where sm.trial_name = TrialId
-		and coalesce(sm.source_cd,'STD') = sourceCd
-		and sm.platform = 'RBM';
-	end if;
+	select nextval('deapp.seq_rbm_partition_id') into partitionId;
 
 	partitionName := 'deapp.de_subject_rbm_data_' || partitionId::text;
 	partitionIndx := 'de_subject_rbm_data_' || partitionId::text;

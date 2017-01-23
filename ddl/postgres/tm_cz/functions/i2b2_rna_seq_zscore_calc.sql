@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_rna_seq_zscore_calc(character varying, character varying, character varying, numeric, character varying, numeric, character varying, bigint, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_rna_seq_zscore_calc(trial_id character varying, partition_name character varying, partition_indx character varying, partitionid numeric, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT (-1), data_type character varying DEFAULT 'R'::character varying, log_base bigint DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS void
+CREATE FUNCTION i2b2_rna_seq_zscore_calc(trial_id character varying, partition_name character varying, partition_indx character varying, partitionid numeric, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base bigint DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS void
     LANGUAGE plpgsql
     AS $$
 DECLARE
@@ -115,7 +115,7 @@ BEGIN
 		stepCt := stepCt + 1;
 		select cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
 ,0,stepCt,'Done') into rtnCd;
-		select cz_error_handler (jobID, procedureName) into rtnCd;
+		select cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM) into rtnCd;
 		select cz_end_audit (jobID, 'FAIL') into rtnCd;
 		return;
 	end if;

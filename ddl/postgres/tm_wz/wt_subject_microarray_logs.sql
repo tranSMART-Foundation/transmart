@@ -3,13 +3,13 @@
 --
 CREATE TABLE wt_subject_microarray_logs (
     probeset_id bigint,
-    intensity_value numeric,
+    intensity_value double precision,
     pvalue double precision,	-- was set to numeric on test server but is float in oracle
     num_calls numeric,
     assay_id bigint,
     patient_id bigint,
     sample_id bigint,
-    subject_id character varying(50),
+    subject_id character varying(100),
     trial_name character varying(50),
     timepoint character varying(100),
     log_intensity double precision,
