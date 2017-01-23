@@ -401,7 +401,9 @@ BEGIN
 		  ,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'ATTR1') > 1 then attribute_1 else null end as attribute_1
           ,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'ATTR2') > 1 then attribute_2 else null end as attribute_2
 		  ,'PLATFORM'
-	from  WT_PROTEOMICS_NODE_VALUES;
+	from  WT_PROTEOMICS_NODE_VALUES
+	where category_cd like '%PLATFORM%'
+	  and platform is not null;
 	exception
 	when others then
 		perform tm_cz.cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
