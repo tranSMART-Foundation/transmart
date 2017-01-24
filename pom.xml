@@ -91,7 +91,7 @@
                             <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
                             <skipPoms>false</skipPoms>
                             <generateGitPropertiesFile>false</generateGitPropertiesFile>
-                            <failOnNoGitDirectory>true</failOnNoGitDirectory>
+                            <failOnNoGitDirectory>false</failOnNoGitDirectory>
                             <gitDescribe>
                                 <skip>false</skip>
                                 <always>false</always>
