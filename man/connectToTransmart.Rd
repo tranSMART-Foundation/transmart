@@ -9,13 +9,14 @@
   tranSMART database.
 }
 \usage{
-connectToTransmart(transmartDomain, use.authentication = TRUE, token = NULL, ...)
+connectToTransmart(transmartDomain, use.authentication = TRUE, token = NULL, apiPrefix = NULL, ...)
 }
 
 \arguments{
   \item{transmartDomain}{a character string naming the domain of the tranSMART server to connect to.}
   \item{use.authentication}{logical indicating whether or not to use OAuth authentication. Must be TRUE (default setting) if the tranSMART server requires OAuth authentication}
   \item{token}{A token that can be used to authenticate to Transmart. This is  the "refresh token" in OAuth terminology. To get such a token, use \code{\link{getTransmartToken}} after authenticating interactively for the first time.}
+  \item{apiPrefix}{Prefix for API calls on the tranSMART server. E.g., '/v1' for instances that serve the API endpoints under '/v1' ('/v1/studies' for instance). If not provided, the R client will try to discover based on (the existence of) the '/versions/v1' endpoint.}
   \item{\dots}{additional arguments to be passed on to \code{\link{authenticateWithTransmart}}}
 }
 \details{
