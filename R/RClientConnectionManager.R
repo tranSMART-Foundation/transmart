@@ -23,12 +23,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 connectToTransmart <- 
-function (transmartDomain, use.authentication = TRUE, token = NULL, .access.token = NULL, ...) {
+function (transmartDomain, use.authentication = TRUE, token = NULL, .access.token = NULL, apiPrefix = NULL, ...) {
     if (!exists("transmartClientEnv") || transmartClientEnv$transmartDomain != transmartDomain) { 
         assign("transmartClientEnv", new.env(parent = .GlobalEnv), envir = .GlobalEnv)
     }
 
     transmartClientEnv$transmartDomain <- transmartDomain
+    transmartClientEnv$apiPrefix <- apiPrefix
     transmartClientEnv$db_access_url <- transmartClientEnv$transmartDomain
     if (!is.null(token)) {
         transmartClientEnv$refresh_token <- token
@@ -94,12 +95,17 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     }
 
     oauth.exchange.token.path <- "/oauth/token"
-    post.body <- list(
-        grant_type="authorization_code",
-        code=request.token,
-        redirect_uri=paste(transmartClientEnv$oauthDomain, "/oauth/verify", sep=""))
+    oauth.exchange.token.params <- paste(
+        "grant_type=authorization_code",
+        "client_id=api-client",
+        "client_secret=api-client",
+        paste("code=", request.token, sep=""),
+        paste("redirect_uri=", transmartClientEnv$oauthDomain, "/oauth/verify", sep=""),
+        sep="&"
+    )
+    oauth.exchange.token.request = paste(oauth.exchange.token.path, oauth.exchange.token.params, sep="?")
 
-    oauthResponse <- .transmartServerPostOauthRequest(oauth.exchange.token.path, "Authentication", post.body)
+    oauthResponse <- .transmartServerPostOauthRequest(oauth.exchange.token.request, "Authentication", list())
     if (is.null(oauthResponse)) return(FALSE)
 
     list2env(oauthResponse$content, envir = transmartClientEnv)
@@ -210,7 +216,39 @@ function (oauthDomain = transmartClientEnv$transmartDomain, prefetched.request.t
     }
 }
 
-.transmartGetJSON <- function(apiCall, ...) { .transmartServerGetRequest(apiCall, ensureJSON = TRUE, accept.type = "hal", ...) }
+.transmartGetApiPrefix <- function() {
+    if (exists("apiPrefix", envir = transmartClientEnv)) {
+        apiPrefix <- transmartClientEnv$apiPrefix
+    } else {
+        apiPrefix <- NULL
+    }
+    if (is.null(apiPrefix)) {
+        apiPrefix <- ""
+        if (getOption("verbose")) {
+            message("Checking availability of the v1 API version. ")
+        }
+        api.versions <- .transmartServerGetRequest("/versions/v1", accept.type = "default", onlyContent = F)
+        if (api.versions$status == 200 && api.versions$JSON) {
+            if ("prefix" %in% names(api.versions$content)) {
+                apiPrefix <- api.versions$content[["prefix"]]
+            }
+        }
+        transmartClientEnv$apiPrefix <- apiPrefix
+    }
+    if (getOption("verbose")) {
+        message(paste("Using API prefix: ", apiPrefix, sep=""))
+    }
+    apiPrefix
+}
+
+.transmartGetJSON <- function(apiCall, noPrefix = FALSE, ...) {
+    if (noPrefix) {
+        apiPrefix <- ""
+    } else {
+        apiPrefix <- .transmartGetApiPrefix()
+    }
+    .transmartServerGetRequest(paste(apiPrefix, apiCall, sep=''), ensureJSON = TRUE, accept.type = "hal", ...)
+}
 
 # If you just want a result, use the default parameters. If you want to do your own error handling, call with
 # onlyContent = NULL, this will return a list with data, headers and status code.
