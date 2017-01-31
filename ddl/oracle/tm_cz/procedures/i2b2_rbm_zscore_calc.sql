@@ -268,7 +268,7 @@ BEGIN
 */	
 
 
-	insert into de_subject_rbm_data 
+	insert into deapp.de_subject_rbm_data
 	(trial_name
         --,rbm_annotation_id
 	,antigen_name
