@@ -1,5 +1,4 @@
 # Copyright 2014, 2015 The Hyve B.V.
-# Copyright 2014 Janssen Research & Development, LLC.
 #
 # This file is part of tranSMART R Client: R package allowing access to
 # tranSMART's data via its RESTful API.
@@ -20,25 +19,24 @@
 # Public License for more details.
 #
 # You should have received a copy of the GNU General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+# with this program. If not, see <http://www.gnu.org/licenses/>..
 
-getSubjects <- function(study.name, as.data.frame = TRUE) {
+getPatientSet <- function(id) {
+    if (!is.numeric(id) || id %% 1 != 0 || id < 0) {
+        stop(paste(id, "is not a valid positive integer"))
+    }
     .ensureTransmartConnection()
 
-    serverResult <- .transmartGetJSON(paste("/studies/", study.name,"/subjects", sep=""))
-    listOfSubjects <- serverResult$subjects
-
-    subjectIDs <- sapply(listOfSubjects, FUN = function(x) { x$inTrialId })
-    names(listOfSubjects) <- subjectIDs
+    patientSet <- .transmartGetJSON(paste0("/patient_sets/", id))
 
     # Don't expose id, it should not be used and will be removed from a future version of rest-api
     # COMPAT: remove this block if support for the old rest-api is dropped.
-    if (length(listOfSubjects) && "id" %in% names(listOfSubjects[[1]])) {
+    if (length(patientSet$patients) && "id" %in% names(patientSet$patients[[1]])) {
         for (i in seq_along(patientSet$patients)) {
-            listOfSubjects[[i]]$id <- NULL
+            patientSet$patients[[i]]$id <- NULL
         }
     }
 
-    if (as.data.frame) return(.listToDataFrame(listOfSubjects))
-    listOfSubjects
+    names(patientSet$patients) <- sapply(patientSet$patients, function(p) {p$inTrialId})
+    patientSet
 }

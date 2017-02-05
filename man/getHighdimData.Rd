@@ -12,7 +12,6 @@ It retrieves the data from the server and parses it, converting the high dimensi
 \usage{
 getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection = NULL,
                 data.constraints = list(), assay.constraints = list(),
-                progress.download = .make.progresscallback.download(),
                 progress.parse = .make.progresscallback.parse(),
                 trial.name = NULL,
                 patient.set = NULL,
@@ -42,21 +41,7 @@ getHighdimData(study.name, concept.match = NULL, concept.link = NULL, projection
 }
   \item{data.constraints}{A list of raw data constraints. These are converted to JSON with \code{\link{toJSON}} and passed to the server as-is. For a more user friendly way to specify constraints, see the assay constraint parameters.}
   \item{assay.constraints}{Just like \code{data.constraints} but for assay constraints. See the data constraint parameters for a more user friendly syntax to pass such constraints.}
-  \item{progress.download}{(The default should be fine for most users) A list of functions that will be called during the download, this allows displaying download progress to the user. The list must contain three items of the following signature:
-
-  \code{%
-    progress.download$start <- function(total) {\ldots}\cr
-    progress.download$update <- function(current, total) {\ldots}\cr
-    progress.download$end <- function() {\ldots}
-  }
-
-  \describe{
-    \item{\code{start}}{is called before the download starts, with \code{total} set to the total number of bytes to be processed. \code{total} may be \code{NA} if this information is not available.}
-    \item{\code{update}}{is called during the download, with \code{total} as the total number of bytes to be processed and \code{current} the current number of bytes that have been processed. \code{total} will generally be the same value as in the call to \code{start()}.}
-    \item{\code{close}}{will be called once the download has finished.}
-  }
-  }
-  \item{progress.parse}{(The default should be fine for most users) This argument functions identical to \code{progress.download} but the functions will be called before, during and after the parsing of the downloaded data. }
+  \item{progress.parse}{(The default should be fine for most users) This argument functions will be called before, during and after the parsing of the downloaded data. }
 
 The remaining parameters are constraints that limit the amount of data that is returned.
 

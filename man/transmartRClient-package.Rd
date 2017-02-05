@@ -12,17 +12,8 @@ RESTful API. The R client currently allows a user to retrieve both clinical
 and high dimensional data (to which the user is authorized to access).
 }
 \details{
-  \tabular{ll}{
-    Package: \tab transmartRClient\cr
-    Type: \tab Package\cr
-    Version: \tab 0.2\cr
-    Date: \tab 2014-02-26\cr
-    License: \tab GPL-3 and higher \cr
-  }
-  
-  \cr
-  
-  The following functions are available in the package:
+
+The following functions are available in the package:
   \tabular{l}{
   \code{\link{connectToTransmart}}\cr
   \code{\link{getStudies}}\cr
@@ -30,6 +21,8 @@ and high dimensional data (to which the user is authorized to access).
   \code{\link{getConcepts}}\cr
   \code{\link{getObservations}}\cr
   \code{\link{getHighdimData}}\cr
+  \code{\link{highdimInfo}}\cr
+  \code{\link{getPatientSet}}\cr
 }
 }
 

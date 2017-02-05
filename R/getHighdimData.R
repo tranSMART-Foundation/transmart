@@ -25,17 +25,7 @@
 
 # Performance notes
 # 
-# Downloading and parsing large data sets of high dimensional data can take a 
-# significant amount of time (minutes for several 100 mb). We have attempted to 
-# optimize the process a reasonable amount.
-# 
-# The current RCurl wrapper doesn't expose functionality to download a binary 
-# url and process the chunks asynchronously as they come in (that is only 
-# supported for text urls). Doing the downloading and parsing at the same time 
-# should give a significant improvement, but that would require changes in RCurl
-# or a different way of downloading the data.
-# 
-# The parser has also been optimized up to the level that the R code itself only
+# The parser has been optimized up to the level that the R code itself only
 # takes a minority of the runtime. The most time consuming operations are the 
 # foreign function calls to retrieve the fields from messages and to construct 
 # objects to parse the varint32 preceding each message. Significant further 
@@ -45,7 +35,6 @@
 
 getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL, projection = NULL,
         data.constraints = list(), assay.constraints = list(), highdim.type = 1,
-        progress.download = .make.progresscallback.download(),
         progress.parse = .make.progresscallback.parse(),
         ...) {
 
@@ -93,7 +82,7 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
         }
     }
 
-    serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary", errorHandler = errorHandler, progress = progress.download)
+    serverResult <- .transmartServerGetRequest(projectionLink, accept.type = "binary", errorHandler = errorHandler)
     if (length(serverResult) == 0) {
         warning("No data could be found. The server yielded an empty dataset. Returning NULL.")
         return(NULL)
@@ -144,8 +133,9 @@ getHighdimData <- function(study.name, concept.match = NULL, concept.link = NULL
 
 # The argument is a single named list
 .expandConstraints <- function(constraints) {
-    # The JSON encoder encodes single item vectors as scalars. We need those to be lists as well sometimes.
-    j <- function(val) if (length(val) == 1) list(val) else val
+    # Previously used json packages encode length 1 vectors as scalars, we need them as lists. Jsonlite which we are using
+    # now doesn't do that so this wrapping function is now a no-op.
+    j <- function(val) val
     
     # some deep functional/lazy magic
     mapply(function(val, con) switch(con,
@@ -261,7 +251,7 @@ highdimInfo <- function(study.name = NULL, concept.match = NULL, concept.link = 
     .ensureTransmartConnection()
     concept.link <- .getConceptLink(study.name, concept.match, concept.link)
 
-    serverResult <- .transmartGetJSON(paste(concept.link, "/highdim", sep=""))
+    serverResult <- .transmartGetJSON(paste(concept.link, "/highdim", sep=""), noPrefix = TRUE)
     if (length(serverResult$dataTypes) == 0) {
         stop("This high dimensional concept contains no data.")
     }
