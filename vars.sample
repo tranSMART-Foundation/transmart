@@ -29,7 +29,7 @@ TABLESPACES=$HOME/pg/tablespaces/
 # The directory where the postgres client utilities are
 # If using a package manager, probably /usr/bin/
 # end with /
-PGSQL_BIN=$HOME/pg/bin/
+PGSQL_BIN=/usr/bin/
 # }}}
 
 # {{{ Oracle
