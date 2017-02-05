@@ -133,7 +133,7 @@ environments {
 // This is the value that will appear in the To: entry of the e-mail popup 
 // that is displayed when the user clicks the Email administrator button,
 // on the GWAS plugin Data Upload page
-com.recomdata.dataUpload.adminEmail = 'No data upload adminEmail value set - contact site administrator'
+com.recomdata.dataUpload.adminEmail = "transmart-discuss@googlegroups.com"
 /* }}} */
 
 /* {{{ Personalization */
@@ -309,6 +309,13 @@ com.recomdata.dataUpload.etl.dir = gwasEtlDirectory.absolutePath
         it.mkdir()
     }
 }
+
+/* }}} */
+
+/* {{{ GWAS plink */
+
+grails.plugin.transmartGwasPlink.enabled=false
+grails.plugin.transmartGwasPlink.plinkPath="/usr/lib/plink.plink"
 
 /* }}} */
 
@@ -604,17 +611,21 @@ if (samlEnabled) {
 /* {{{ gwava */
 if (gwavaEnabled) {
     // assume deployment alongside transmart
-    com { recomdata { rwg { webstart {
-        def url       = new URL(transmartURL)
-        codebase      = "$url.protocol://$url.host${url.port != -1 ? ":$url.port" : ''}/gwava"
-        jar           = './ManhattanViz2.1g.jar'
-        mainClass     = 'com.pfizer.mrbt.genomics.Driver'
-        gwavaInstance = 'transmartstg'
-        transmart.url = transmartURL - ~'\\/$'
-   } } } }
-   com { recomdata { rwg { qqplots {
-       cacheImages = new File(jobsDirectory, 'cachedQQplotImages').toString()
-   } } } }
+    com { recomdata { rwg {
+        webstart {
+            def url       = new URL(transmartURL)
+            codebase      = "$url.protocol://$url.host${url.port != -1 ? ":$url.port" : ''}/gwava"
+            jar           = './ManhattanViz2.1g.jar'
+            mainClass     = 'com.pfizer.mrbt.genomics.Driver'
+            gwavaInstance = 'transmartstg'
+            transmart.url = transmartURL - ~'\\/$'
+        }
+        qqplots {
+            cacheImages = new File(jobsDirectory, 'cachedQQplotImages').toString()
+        }
+        manhattanplots {
+            cacheImages = new File(jobsDirectory, 'cachedManhattanplotImages').toString()
+    } } } }
 }
 /* }}} */
 
@@ -678,6 +689,34 @@ com { recomdata { solr {
     maxNewsStories = 10
     maxRows = 10000
 }}}
+
+/* }}} */
+
+/* {{{ Metacore analytics */
+
+com.thomsonreuters.transmart.metacoreAnalyticsEnable = false
+/* with no other settings defined, these URLs are used.
+ The demoEnrichmentURL default in the 16.1 metacore plugin code
+ is obsolete so the correct URL must be defined here. */
+com.thomsonreuters.transmart.demoEnrichmentURL = "http://pathwaymaps.com"
+com.thomsonreuters.transmart.demoMapBaseURL = "http://pathwaymaps.com/maps/"
+
+/* this value is defined automatically to 'demo', 'system' or 'user' */
+//com.thomsonreuters.transmart.metacoreSettingsMode = "demo"
+
+/* these settings are used to override the demo settings */
+//com.thomsonreuters.transmart.metacoreURL = "http://localhost/"
+//com.thomsonreuters.transmart.metacoreDefaultLogin = ""
+//com.thomsonreuters.transmart.metacoreDefaultPassword = ""
+//com.thomsonreuters.transmart.metacoreLogin = ""
+//com.thomsonreuters.transmart.metacorePassword = ""
+
+/* }}} */
+
+/* {{{ galaxy plugin (blend4j) */
+
+com.galaxy.blend4j.galaxyEnabled = false
+com.galaxy.blend4j.galaxyURL = "http://usegalaxy.org/"
 
 /* }}} */
 
