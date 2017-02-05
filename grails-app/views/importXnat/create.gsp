@@ -67,7 +67,7 @@
 
 						<tr class="prop">
 							<td valign="top" class="name">
-								<label for="node">TranSMART Nodename (under Public Series):</label>
+								<label for="node">TranSMART Nodename (under Public Studies):</label>
 							</td>
 							<td valign="top" class="value ${hasErrors(bean:importXnatConfiguration,field:'node','errors')}">
 								<input type="text" id="node" name="node" value="${fieldValue(bean:importXnatConfiguration,field:'node')}"/>
