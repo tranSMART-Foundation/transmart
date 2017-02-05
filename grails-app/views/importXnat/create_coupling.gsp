@@ -116,7 +116,7 @@
 					</ul>
 				</li>
 				<li>
-					XNAT (REST) URL: the REST api link to the attribute in XNAT. All possible links can be found here: <a target="_blank" href="https://wiki.xnat.org/display/XNAT/XNAT+REST+XML+Path+Shortcuts">XNAT REST XML Path Shortcuts</a><br />
+					XNAT (REST) URL: the REST api link to the attribute in XNAT. All possible links can be found here: <a target="_blank" href="https://wiki.xnat.org/display/XNAT16/XNAT+REST+XML+Path+Shortcuts">XNAT REST XML Path Shortcuts</a><br />
 					Note that although an attribute in XNAT can be shown at the session level for convenience, it could be stored at the subject level. By looking at the links above each table in the REST api, it can be determined if it is subject or session data. 
 				</li>
 			</ul>
