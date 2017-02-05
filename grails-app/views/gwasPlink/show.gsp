@@ -1,6 +1,7 @@
 <div id="analysisWidget" xmlns="http://www.w3.org/1999/html">
     <h2>GWAS</h2>
 
+    <script type="text/javascript" src="${resource(dir:'js', file:'gwasPlink.js')}"></script>
     <form id="analysisForm">
         <fieldset class="inputFields">
             <p>
@@ -54,7 +55,7 @@
                 <label for="divCategoryVariable">Phenotypes:</label>
                 <input id="makePheno" type="checkbox"> make all selected subjects as case
                 <img src="${resource(dir: 'images', file: 'help/helpicon.png')}" alt="Help" border="0" width="18" height="18" style="vertical-align:middle;margin-left:5pt;"
-                    title="Drag only numerical nodes into the box below. If you drag more than one node and some subjects have data in multiple nodes the values for analisys for those subjects will be chosen at random. If checkbox is checked then the value for all selected subjects will be 2 (case) and for all remaining subjects 1 (control)." />
+                    title="Drag only numerical nodes into the box below. If you drag more than one node and some subjects have data in multiple nodes the values for analysis for those subjects will be chosen at random. If checkbox is checked then the value for all selected subjects will be 2 (case) and for all remaining subjects 1 (control)." />
             </p>
             <div id="divCategoryVariable" class="queryGroupIncludeSmall highDimBox"></div>
             <input type="button" value="Clean" onclick="javascript: clearDiv('divCategoryVariable')" style="padding:0px;"/>
@@ -63,7 +64,7 @@
             <div class="covariatesOption" style="display: none;">
             <p>
                 <label for="divGroupByVariable">Covariates: <img src="${resource(dir: 'images', file: 'help/helpicon.png')}" alt="Help" border="0" width="18" height="18" style="vertical-align:middle;margin-left:5pt;"
-                    title="You can drag either cathegorical or numerical nodes into the box below. If you drag more than one node and some subjects have data in multiple nodes the values for analisys for those subjects will be chosen at random. If the value is one of '-9', 'NULL', '' (empty string/no value) it will be converted to -9. The first value that is not converted to '-9' will be converted to 1 (control). All other values will be converted to 2 (case)." /></label>
+                    title="You can drag either categorical or numerical nodes into the box below. If you drag more than one node and some subjects have data in multiple nodes the values for analysis for those subjects will be chosen at random. If the value is one of '-9', 'NULL', '' (empty string/no value) it will be converted to -9. The first value that is not converted to '-9' will be converted to 1 (control). All other values will be converted to 2 (case)." /></label>
             </p>
             <div id="divGroupByVariable" class="queryGroupIncludeSmall highDimBox"></div>
             <input type="button" value="Clean" onclick="javascript: clearDiv('divGroupByVariable')" style="padding:0px;"/>

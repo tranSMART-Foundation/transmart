@@ -28,7 +28,7 @@ class GwasPlinkController {
         JSONObject result = new JSONObject()
         JSONArray rows = new JSONArray()
 
-        ['gwasPlink.js'].each {
+        ['gwasPlinkAdd.js'].each {
             JSONObject aScript = new JSONObject()
             aScript.put("path", "${servletContext.contextPath}${pluginContextPath}/js/${it}" as String)
             aScript.put("type", "script")
