@@ -172,17 +172,21 @@ class ImportXnatController {
 			def username = importXnatConfiguration.username
 			def project = importXnatConfiguration.project
 			def node = importXnatConfiguration.node
-			def kettledir = (getTransmartDataLocation() + "/env/data-integration/")
-			//def kettledir = (getScriptsLocation() + "/xnattotransmartlink/")
 			def datadir = (getTransmartWorkingdir() + "/xnattotransmartlink/")
+			def etldir = getTransmartETLdir()
+			def kitchendir = getTransmartKitchendir()
+			def scriptdir = (getScriptsLocation() + "/xnattotransmartlink/")
+			def kettlehome = getKettleHome()
 
-                        //check kettledir exists
                         // make any missing datadir levels
 			def cmd = ["python",
                                    getScriptsLocation() + "/xnattotransmartlink/downloadscript.py",
-                                   url, username, password, project, node, kettledir, datadir]
-			def process = new ProcessBuilder(cmd).directory(new File(getScriptsLocation() + "/xnattotransmartlink")).start()
+                                   url, username, password, project, node, datadir, kitchendir, etldir, scriptdir, kettlehome]
+			log.info("Running cmd ${cmd}")
+                        def process = new ProcessBuilder(cmd).directory(new File(datadir)).start()
+                        log.info("process started")
 			process.waitFor()
+                        log.info("process ended")
 			def inText = process.in.text
 			def errText = process.err.text
 			if (errText) {
@@ -202,7 +206,7 @@ class ImportXnatController {
 		def importXnatConfiguration = ImportXnatConfiguration.get(params.id)
 		def importXnatVariableList = importXnatConfiguration.variables
 		def project = importXnatConfiguration.project
-		def xmlFile = (getScriptsLocation() + "/xnattotransmartlink/${project}.xml")
+		def xmlFile =  (getTransmartWorkingdir() + "/xnattotransmartlink/${project}.xml")
                 def writer = new FileWriter(new File(xmlFile))
 		def xml = new MarkupBuilder(writer)
 
@@ -228,7 +232,7 @@ class ImportXnatController {
 		def importXnatVariableList = importXnatConfiguration.variables
 		def project = importXnatConfiguration.project
 
-		def xmlFile = (getScriptsLocation() + "/xnattotransmartlink/${project}.xml")
+		def xmlFile = (getTransmartWorkingDir() + "/xnattotransmartlink/${project}.xml")
 
 		def file = new File(xmlFile)
 		response.setContentType("application/xml;charset='utf8'")
@@ -239,19 +243,64 @@ class ImportXnatController {
 	}
 
 	def getTransmartDataLocation = {
-		String dir = grailsApplication.config.org.transmart.data.location
-		if (dir.isEmpty()) {
-			dir = grailsAttributes.getApplicationContext().getResource("/").getFile().getParentFile().getParentFile().toString() + "/transmart-data"
-		}
-		return dir
+            def dir = grailsApplication.config.org.transmart.data.location
+            if (dir.isEmpty()) {
+                dir = grailsAttributes.getApplicationContext().getResource("/").getFile().getParentFile().getParentFile().toString() + "/transmart-data"
+                if (dir.isEmpty()) {
+                    log.info("getTransmartDataLocation no value, set empty")
+                    dir = ""
+                }
+            }
+            return dir
+	}
+
+	def getTransmartETLdir = {
+            def dir = grailsApplication.config.org.transmart.importxnatplugin.etldir
+            if (dir.isEmpty()) {
+                dir = getTransmartDataLocation()+"/env/tranSMART-ETL/Kettle/postgres/Kettle-ETL"
+                if (dir.isEmpty()) {
+                    log.info("getTransmartETLdir no value, set empty")
+                    dir = ""
+                }
+            }
+            return dir
+	}
+
+	def getTransmartKitchendir = {
+            def dir = grailsApplication.config.org.transmart.importxnatplugin.etldir
+            if (dir.isEmpty()) { 
+                dir = getTransmartDataLocation()+"/env/data-integration"
+                if (dir.isEmpty()) {
+                    log.info("getTransmartKitchendir no value, set empty")
+                    dir = ""
+                }
+            }
+            return dir
+	}
+
+	def getKettleHome = {
+            def dir = grailsApplication.config.org.transmart.importxnatplugin.kettlehome
+            if (dir.isEmpty()) {
+                dir = getTransmartDataLocation()+"/samples/postgres/kettle-home"
+                if (dir.isEmpty()) {
+                    log.info("getKettleHome no value, set empty")
+                    dir = ""
+                }
+            }
+            return dir
 	}
 
 	def getTransmartWorkingdir = {
-		String dir = grailsApplication.config.org.transmart.importxnatplugin.workingdir
-		if (dir.isEmpty()) {
-			dir = grailsApplication.config.jobsDirectory
-		}
-		return dir
+            def dir = grailsApplication.config.org.transmart.importxnatplugin.workingdir
+
+            if (dir.isEmpty()) {
+                dir = grailsApplication.config.RModules.tempFolderDirectory
+                if (dir.isEmpty()) {
+                    log.info("getTransmartWorkingdir no value, set empty")
+                    dir = ""
+                }
+            }
+            return dir
 	}
 
 	def getScriptsLocation = {
@@ -283,17 +332,20 @@ class ImportXnatController {
                                            'transmart-xnat-importer plugin')
             }
 
-            String dir = "";
+            def dir = "";
 
             if(xnatImportModulesDir) {
-//                dir = xnatImportModulesDir.getCanonicalPath()
                 dir = xnatImportModulesDir.getPath()
             }
 
             if (!xnatImportModulesDir) {
                 dir = grailsApplication.config.org.transmart.importxnatplugin.location
                 if (dir.isEmpty()) {
-                    dir = grailsAttributes.getApplicationContext().getResource("/").getFile().getParentFile().getParentFile().toString() + "/xnattotransmartlink/scripts"
+                    dir = grailsAttributes.getApplicationContext().getResource("/").getFile().getParentFile().getParentFile().toString() + "/xnattotransmartlink/"
+                    if (dir.isEmpty()) {
+                        log.info("getScriptsLocation no value, set empty")
+                        dir = ""
+                    }
                 }
             }
 
