@@ -46,7 +46,7 @@
 					</tr>
 
 					<tr class="prop">
-						<td valign="top" class="name">TranSMART Nodename (under Public Series):</td>
+						<td valign="top" class="name">TranSMART Nodename (under Public Studies):</td>
 						<td valign="top" class="value">${importXnatConfiguration.node}</td>
 					</tr>
 	
