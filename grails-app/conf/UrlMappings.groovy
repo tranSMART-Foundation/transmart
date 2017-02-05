@@ -24,8 +24,12 @@
  */
 
 class UrlMappings {
-    /* This empty mappings file seems to be required when inlining core-db
-     * plugins. Otherwise we get:
-     * Class not found loading Grails application: UrlMappings */
-    static mappings = { }
+    static mappings = {
+        // copied from SmartR plugin
+        "/$controller/$action?/$id?(.${format})?"{
+            constraints {
+                // apply constraints here
+            }
+        }
+    }
 }
