@@ -389,7 +389,7 @@ var metacoreTabLoaded = false;
 var metacoreEnrichmentPanel = new Ext.Panel(
     {
         id: 'metacoreEnrichmentPanel',
-        title: 'MetaCore Enrichment Analysis',
+        title: 'MetaCore',
         region: 'center',
         split: true,
         height: 90,
