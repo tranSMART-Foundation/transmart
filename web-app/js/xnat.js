@@ -4,6 +4,8 @@ var EWB = {
 
     injectToAnalyseTab: function () {
 
+	if(!GLOBAL.xnatViewerEnabled) return;
+
         // We need to wait for tranSMART ExtJS layout to have initialized
         var _cmp = Ext.getCmp("resultsTabPanel")
 
