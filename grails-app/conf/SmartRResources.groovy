@@ -62,7 +62,9 @@ modules = {
         // linegraph
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'linegraph.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'd3Linegraph.js']
-        //Ipa connector
+        // patientmapper
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'patientmapper.js']
+        // IPA connector
         resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: 'ipaconnector.js']
     }
 }
