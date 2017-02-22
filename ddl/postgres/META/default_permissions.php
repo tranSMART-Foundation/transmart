@@ -66,6 +66,10 @@ $permissions = [
 		'tm_cz' => 'full',
 		'biomart_user' => 'full',
 	],
+	'gwas_plink' => [
+		'tm_cz' => 'full',
+		'biomart_user' => 'full',
+	],
 ];
 
 $stdout = fopen('php://stdout', 'w');

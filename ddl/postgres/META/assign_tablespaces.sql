@@ -19,6 +19,7 @@ BEGIN
         ['searchapp', 'transmart'],
         ['biomart', 'transmart'],
         ['galaxy', 'transmart'],
+        ['gwas_plink', 'transmart'],
         ['fmapp', 'transmart'],
         ['amapp', 'transmart'],
         ['ts_batch', 'transmart']

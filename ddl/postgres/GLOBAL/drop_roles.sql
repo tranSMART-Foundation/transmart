@@ -13,6 +13,7 @@ BEGIN
         'deapp',
         'fmapp',
         'galaxy',
+        'gwas_plink',
         'i2b2demodata',
         'i2b2metadata',
         'searchapp',
