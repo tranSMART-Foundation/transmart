@@ -15,10 +15,10 @@
 \i biomart/functions/refresh_bio_lit_int_model_mv.sql
 \i biomart/functions/refresh_bio_marker_correl_mv.sql
 \i biomart/functions/tea_npv_precompute.sql
+\i biomart/bio_data_uid.sql
 \i biomart/bio_assay_platform.sql
 \i biomart/bio_compound.sql
 \i biomart/bio_concept_code.sql
-\i biomart/bio_data_uid.sql
 \i biomart/bio_disease.sql
 \i biomart/bio_marker.sql
 \i biomart/bio_observation.sql

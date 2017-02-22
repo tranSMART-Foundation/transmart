@@ -19,3 +19,14 @@ ALTER TABLE ONLY bio_data_uid
 ALTER TABLE ONLY bio_data_uid
     ADD CONSTRAINT bio_data_uid_uk UNIQUE (unique_id);
 
+
+--
+-- Name: seq_bio_data_id; Type: SEQUENCE; Schema: biomart; Owner: -
+--
+CREATE SEQUENCE seq_bio_data_id
+    START WITH 868883
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+

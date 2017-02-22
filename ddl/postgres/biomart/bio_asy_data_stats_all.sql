@@ -69,7 +69,7 @@ ALTER TABLE ONLY bio_asy_data_stats_all
 -- Name: seq_bio_data_fact_id; Type: SEQUENCE; Schema: biomart; Owner: -
 --
 CREATE SEQUENCE seq_bio_data_fact_id
-    START WITH 26518741
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
