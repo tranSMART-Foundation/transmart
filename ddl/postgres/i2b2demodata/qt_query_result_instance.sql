@@ -2,7 +2,7 @@
 -- Name: qt_sq_qri_qriid; Type: SEQUENCE; Schema: i2b2demodata; Owner: -
 --
 CREATE SEQUENCE qt_sq_qri_qriid
-    START WITH 28714
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE

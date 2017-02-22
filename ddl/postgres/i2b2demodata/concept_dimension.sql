@@ -29,7 +29,7 @@ CREATE INDEX cd_uploadid_idx ON concept_dimension USING btree (upload_id);
 -- Name: concept_id; Type: SEQUENCE; Schema: i2b2demodata; Owner: -
 --
 CREATE SEQUENCE concept_id
-    START WITH 1341004
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
