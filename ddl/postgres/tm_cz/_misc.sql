@@ -25,7 +25,7 @@ SET default_with_oids = false;
 -- Name: emt_temp_seq; Type: SEQUENCE; Schema: tm_cz; Owner: -
 --
 CREATE SEQUENCE emt_temp_seq
-    START WITH 11621
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -45,7 +45,7 @@ CREATE SEQUENCE rtqalimits_testid_seq
 -- Name: rtqastatslist_testid_seq; Type: SEQUENCE; Schema: tm_cz; Owner: -
 --
 CREATE SEQUENCE rtqastatslist_testid_seq
-    START WITH 80000
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -55,7 +55,7 @@ CREATE SEQUENCE rtqastatslist_testid_seq
 -- Name: seq_child_rollup_id; Type: SEQUENCE; Schema: tm_cz; Owner: -
 --
 CREATE SEQUENCE seq_child_rollup_id
-    START WITH 1681
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -65,7 +65,7 @@ CREATE SEQUENCE seq_child_rollup_id
 -- Name: seq_cz_job_id; Type: SEQUENCE; Schema: tm_cz; Owner: -
 --
 CREATE SEQUENCE seq_cz_job_id
-    START WITH 413
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -75,7 +75,7 @@ CREATE SEQUENCE seq_cz_job_id
 -- Name: seq_cz_test_category; Type: SEQUENCE; Schema: tm_cz; Owner: -
 --
 CREATE SEQUENCE seq_cz_test_category
-    START WITH 5
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
