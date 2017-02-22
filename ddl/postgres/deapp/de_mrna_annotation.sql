@@ -50,7 +50,7 @@ CREATE TRIGGER trg_de_mrna_annotation_id BEFORE INSERT ON de_mrna_annotation FOR
 -- Name: seq_de_mrna_annotation_id; Type: SEQUENCE; Schema: deapp; Owner: -
 --
 CREATE SEQUENCE seq_de_mrna_annotation_id
-    START WITH 263161
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE

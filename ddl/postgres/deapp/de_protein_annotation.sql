@@ -2,7 +2,7 @@
 -- Name: protein_annotation_id; Type: SEQUENCE; Schema: deapp; Owner: -
 --
 CREATE SEQUENCE protein_annotation_id
-    START WITH 4742232
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
