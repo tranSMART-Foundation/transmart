@@ -49,7 +49,7 @@ CREATE TRIGGER trg_am_tag_item_id BEFORE INSERT ON am_tag_item FOR EACH ROW EXEC
 -- Name: seq_amapp_data_id; Type: SEQUENCE; Schema: amapp; Owner: -
 --
 CREATE SEQUENCE seq_amapp_data_id
-    START WITH 1995735
+    START WITH 66
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
