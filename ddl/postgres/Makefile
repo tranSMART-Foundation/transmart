@@ -13,6 +13,7 @@ SCHEMAS = \
 		  amapp \
 		  fmapp \
 		  galaxy \
+		  gwas_plink \
 		  ts_batch
 
 FULL_SCHEMA_DUMPS = $(foreach schema, $(SCHEMAS), _dumps/$(schema).sql)
