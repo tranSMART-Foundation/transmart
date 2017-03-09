@@ -3,6 +3,7 @@ package org.transmartproject.db.dataquery.clinical.patientconstraints
 import org.grails.datastore.mapping.query.api.Criteria
 import org.transmartproject.core.querytool.QueryResult
 import org.transmartproject.db.querytool.QtPatientSetCollection
+import org.transmartproject.db.support.InQuery
 
 class PatientSetsConstraint implements PatientConstraint {
 
@@ -20,7 +21,7 @@ class PatientSetsConstraint implements PatientConstraint {
             projections {
                 property 'patient.id'
             }
-            'in'('resultInstance.id', this.queryResults*.id)
+            InQuery.addIn('resultInstance.id', this.queryResults*.id)
         }
     }
 

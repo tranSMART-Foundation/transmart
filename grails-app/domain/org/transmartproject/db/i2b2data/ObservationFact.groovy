@@ -45,7 +45,7 @@ class ObservationFact implements Serializable {
     String     modifierCd
     Long       instanceNum
 
-    // unsed for now
+    // unused for now
     //BigDecimal quantityNum
     //String     unitsCd
     //Date       endDate
