@@ -1,4 +1,5 @@
 # list of non-web-application artifacts
 RInterface
+transmart-batch
 transmart-data
 tranSMART-ETL
