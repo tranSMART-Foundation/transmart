@@ -18,7 +18,7 @@ CREATE TABLE i2b2 (
     c_dimcode character varying(700) NOT NULL,
     c_comment text,
     c_tooltip character varying(900),
-    m_applied_path character varying(700) NOT NULL,
+    m_applied_path character varying(700) DEFAULT '@'::character varying NOT NULL,
     update_date timestamp without time zone NOT NULL,
     download_date timestamp without time zone,
     import_date timestamp without time zone,
