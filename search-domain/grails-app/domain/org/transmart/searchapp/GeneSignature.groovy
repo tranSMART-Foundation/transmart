@@ -186,11 +186,19 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
      */
     def beforeUpdate = {
         lastUpdated = new Date()
-        uniqueId = DOMAIN_KEY + ":" + id
+        if(uniqueId.startsWith(DOMAIN_KEY_GL)) {
+            uniqueId = DOMAIN_KEY_GL + ":" + id
+        } else {
+            uniqueId = DOMAIN_KEY + ":" + id
+        }
     }
 
     def updateUniqueId() {
         setUniqueId(DOMAIN_KEY + ":" + id);
+    }
+
+    def updateUniqueIdList() {
+        setUniqueId(DOMAIN_KEY_GL + ":" + id);
     }
 
     /**
@@ -199,6 +207,7 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
     def getPmIdsAsList() {
         List pmidList = new ArrayList();
 
+        log.info("getPmIdsAsList '${pmIds}'")
         if (pmIds == null) return pmidList;
 
         // parse into tokens
@@ -206,6 +215,8 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
         while (st.hasMoreTokens()) {
             pmidList.add(st.nextToken())
         }
+
+        log.info("pmIdList ${pmIdList}")
 
         return pmidList;
     }
@@ -215,6 +226,8 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
      */
     def clone() {
 
+        log.info("clone")
+
         // clone object using a map of params
         GeneSignature clone = new GeneSignature();
         copyPropertiesTo(clone)
@@ -223,9 +236,11 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
     }
 
     /**
-     * creat a Map with the properties and values for each property similar to a request map
+     * create a Map with the properties and values for each property similar to a request map
      */
     def createParamMap() {
+
+        log.info("createParamMap")
 
         Map params = new HashMap();
         params.put("name", name)
@@ -277,6 +292,7 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
      * copy properties from this instance to the specified object
      */
     def copyPropertiesTo(GeneSignature gs) {
+        log.info("GeneSignature copyPropertiesTo")
         gs.name = name
         gs.description = description
         gs.uploadFile = uploadFile
@@ -292,7 +308,7 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
         gs.analysisMethodOther = analysisMethodOther
         gs.multipleTestingCorrection = multipleTestingCorrection
         gs.pValueCutoffConceptCode = pValueCutoffConceptCode
-        gs.uniqueId = null
+        gs.uniqueId = uniqueId
         gs.publicFlag = publicFlag
         gs.deletedFlag = deletedFlag
         //gs.parentGeneSignature=parentGeneSignature
@@ -331,6 +347,8 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
         // gs sheet
         def headers = []
         def values = []
+
+        log.info("createWorkbook")
 
         // general section
         values.add(["1) General Info"])
