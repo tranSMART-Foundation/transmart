@@ -3,7 +3,7 @@
 --
 CREATE TABLE bio_assay_analysis_eqtl (
     bio_asy_analysis_eqtl_id bigint NOT NULL,
-    bio_assay_analysis_id bigint,
+    bio_assay_analysis_id bigint NOT NULL,
     rs_id character varying(50),
     gene character varying(50),
     p_value_char character varying(100),
