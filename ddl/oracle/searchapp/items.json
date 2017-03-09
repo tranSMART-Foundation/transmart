@@ -132,6 +132,35 @@
     } ]
   }, {
     "child" : {
+      "type" : "TABLE",
+      "owner" : "SEARCHAPP",
+      "name" : "IMPORT_XNAT_CONFIGURATION"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "SEARCHAPP",
+      "name" : "IMPORT_XNAT_VARIABLE"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "SEARCHAPP",
+      "name" : "IMPORT_XNAT_CONFIGURATION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "SEARCHAPP",
+      "name" : "IMPORT_XNAT_VAR_FK"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "SEARCHAPP",
+      "name" : "IMPORT_XNAT_VARIABLE"
+    } ]
+  }, {
+    "child" : {
       "type" : "VIEW",
       "owner" : "SEARCHAPP",
       "name" : "LISTSIG_GENES"
@@ -969,6 +998,36 @@
     "child" : {
       "type" : "TRIGGER",
       "owner" : "SEARCHAPP",
+      "name" : "TRG_IMPORT_XNAT_CONFIG_ID"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "SEARCHAPP",
+      "name" : "IMPORT_XNAT_CONFIGURATION"
+    }, {
+      "type" : "SEQUENCE",
+      "owner" : "SEARCHAPP",
+      "name" : "SEQ_SEARCH_DATA_ID"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "SEARCHAPP",
+      "name" : "TRG_IMPORT_XNAT_VAR_ID"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "SEARCHAPP",
+      "name" : "IMPORT_XNAT_VARIABLE"
+    }, {
+      "type" : "SEQUENCE",
+      "owner" : "SEARCHAPP",
+      "name" : "SEQ_SEARCH_DATA_ID"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "SEARCHAPP",
       "name" : "TRG_SAVED_FACETED_SEARCH_ID"
     },
     "parents" : [ {
@@ -1200,6 +1259,21 @@
       "type" : "TABLE",
       "owner" : "SEARCHAPP",
       "name" : "SAVED_FACETED_SEARCH"
+    }, {
+      "type" : "SEQUENCE",
+      "owner" : "SEARCHAPP",
+      "name" : "SEQ_SEARCH_DATA_ID"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "SEARCHAPP",
+      "name" : "TRG_XNAT_SUBJECT_ID"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "SEARCHAPP",
+      "name" : "XNAT_SUBJECT"
     } ]
   } ],
   "fileAssignments" : [ {
@@ -1286,6 +1360,27 @@
       "name" : "HIBERNATE_SEQUENCE"
     },
     "file" : "searchapp/_misc.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "SEARCHAPP",
+      "name" : "IMPORT_XNAT_CONFIGURATION"
+    },
+    "file" : "searchapp/import_xnat_configuration.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "SEARCHAPP",
+      "name" : "IMPORT_XNAT_VARIABLE"
+    },
+    "file" : "searchapp/import_xnat_variable.sql"
+  }, {
+    "item" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "SEARCHAPP",
+      "name" : "IMPORT_XNAT_VARIABLE_FK"
+    },
+    "file" : "searchapp/import_xnat_variable.sql"
   }, {
     "item" : {
       "type" : "TABLE",
@@ -1780,6 +1875,34 @@
     "item" : {
       "type" : "TRIGGER",
       "owner" : "SEARCHAPP",
+      "name" : "TRG_IMPORT_XNAT_CONFIG_ID"
+    },
+    "file" : "searchapp/import_xnat_configuration.sql"
+  }, {
+    "item" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "SEARCHAPP",
+      "name" : "IMPORT_XNAT_VAR_FK"
+    },
+    "file" : "searchapp/import_xnat_variable.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "SEARCHAPP",
+      "name" : "TRG_IMPORT_XNAT_CONFIG_ID"
+    },
+    "file" : "searchapp/import_xnat_configuration.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "SEARCHAPP",
+      "name" : "TRG_IMPORT_XNAT_VAR_ID"
+    },
+    "file" : "searchapp/import_xnat_variable.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "SEARCHAPP",
       "name" : "TRG_SRCH_REQ_UPLOAD_FIELD_ID"
     },
     "file" : "searchapp/search_required_upload_field.sql"
@@ -1916,5 +2039,19 @@
       "name" : "TRG_UPD_SAVED_FACETED_SEARCH"
     },
     "file" : "searchapp/saved_faceted_search.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "SEARCHAPP",
+      "name" : "TRG_XNAT_SUBJECT_ID"
+    },
+    "file" : "searchapp/xnat_subject.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "SEARCHAPP",
+      "name" : "XNAT_SUBJECT"
+    },
+    "file" : "searchapp/xnat_subject.sql"
   } ]
 }
