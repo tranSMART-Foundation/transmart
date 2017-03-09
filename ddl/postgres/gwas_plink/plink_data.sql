@@ -1,15 +1,15 @@
 --
--- Name: gwas_plink.plink_data; Type: TABLE; Schema: gwas_plink; Owner: -
+-- Name: plink_data; Type: TABLE; Schema: gwas_plink; Owner: -
 --
-CREATE TABLE gwas_plink.plink_data (
+CREATE TABLE plink_data (
 	plink_data_id integer,
-	study_id      character varying(100) not null default nextval('gwas_plink.plink_data_plink_data_id_seq'::regclass),
+	study_id      character varying(50) default nextval('seq_plink_data_id'::regclass) not null,
 	bed           oid,
 	bim           oid,
 	fam           oid
 );
 
-ALTER TABLE gwas_plink.plink_data
+ALTER TABLE plink_data
         ADD PRIMARY KEY plink_data_pkey (plink_data_id);
 
-CREATE UNIQUE INDEX plink_data_study_id_key ON gwas_plink.plink_data(study_id);
+CREATE UNIQUE INDEX plink_data_study_id_key ON plink_data(study_id);

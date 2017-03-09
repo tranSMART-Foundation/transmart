@@ -9,6 +9,7 @@ SCHEMAS = \
     amapp \
     fmapp \
     galaxy \
+    gwas_plink \
     biomart_stage \
     biomart_user \
     tm_cz

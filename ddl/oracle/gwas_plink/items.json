@@ -1,0 +1,39 @@
+{
+  "dependencies" : [ {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "GWAS_PLINK",
+      "name" : "PLINK_DATA"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "SEQUENCE",
+      "owner" : "GWAS_PLINK",
+      "name" : "SEQ_PLINK_DATA_ID"
+    },
+    "parents" : [ ]
+  } ],
+  "fileAssignments" : [ {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "GWAS_PLINK",
+      "name" : "PLINK_DATA"
+    },
+    "file" : "gwas_plink/plink_data.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "GWAS_PLINK",
+      "name" : "TRG_PLINK_DATA_ID"
+    },
+    "file" : "gwas_plink/plink_data.sql"
+  }, {
+    "item" : {
+      "type" : "SEQUENCE",
+      "owner" : "GWAS_PLINK",
+      "name" : "SEQ_PLINK_DATA_ID"
+    },
+    "file" : "gwas_plink/_misc.sql"
+  } ]
+}

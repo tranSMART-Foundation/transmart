@@ -1,7 +1,7 @@
 --
--- Name: plink_data_plink_data_id.seq; Type: SEQUENCE; Schema: gwas_plink; Owner: -
+-- Name: seq_plink_data_id.seq; Type: SEQUENCE; Schema: gwas_plink; Owner: -
 --
-CREATE SEQUENCE plink_data_plink_data_id.seq
+CREATE SEQUENCE seq_plink_data_id
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
