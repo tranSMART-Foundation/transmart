@@ -288,7 +288,7 @@ withPool nConn, { pool ->
                         }))
 
         if (failed) {
-            Log.err "Failed loading failes: $failed"
+            Log.err "Failed loading files: $failed"
             System.exit 1
         }
     }
