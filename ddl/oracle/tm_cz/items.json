@@ -2067,35 +2067,7 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "TM_CZ",
-      "name" : "CZ_FORM_LAYOUT"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "SEQUENCE",
-      "owner" : "TM_CZ",
-      "name" : "SEQ_CZ_FORM_LAYOUT_ID"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "TM_CZ",
       "name" : "UPDATEZSCORE_PROTEOMICS"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_REQUIRED_UPLOAD_FIELD"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "SEQUENCE",
-      "owner" : "TM_CZ",
-      "name" : "SEQ_REQUIRED_UPLOAD_FIELD_ID"
     },
     "parents" : [ ]
   }, {
@@ -3108,13 +3080,6 @@
       "owner" : "I2B2DEMODATA",
       "name" : "DIMLOADER"
     } ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "TM_CZ",
-      "name" : "DK1"
-    },
-    "parents" : [ ]
   }, {
     "child" : {
       "type" : "SYNONYM",
@@ -8460,13 +8425,6 @@
     "child" : {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
-      "name" : "I2B2_PROTEIN_INC_SUB_ZSCORE2"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
       "name" : "I2B2_PROTEIN_INC_ZSCORE_CALC"
     },
     "parents" : [ {
@@ -8497,108 +8455,6 @@
       "type" : "SYNONYM",
       "owner" : "TM_CZ",
       "name" : "DE_SUBJECT_PROTEIN_DATA"
-    }, {
-      "type" : "SYNONYM",
-      "owner" : "TM_CZ",
-      "name" : "WT_SUBJECT_PROTEOMICS_CALCS"
-    }, {
-      "type" : "SYNONYM",
-      "owner" : "TM_CZ",
-      "name" : "WT_SUBJECT_PROTEOMICS_LOGS"
-    }, {
-      "type" : "SYNONYM",
-      "owner" : "TM_CZ",
-      "name" : "WT_SUBJECT_PROTEOMICS_MED"
-    }, {
-      "type" : "SYNONYM",
-      "owner" : "TM_CZ",
-      "name" : "WT_SUBJECT_PROTEOMICS_PROBESET"
-    } ]
-  }, {
-    "child" : {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "I2B2_PROTEIN_INC_ZSCORE_CALC2"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_PROTEIN_ANNOTATION"
-    }, {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_SUBJECT_PROTEIN_DATA"
-    }, {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_END_AUDIT"
-    }, {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_ERROR_HANDLER"
-    }, {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_START_AUDIT"
-    }, {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_WRITE_AUDIT"
-    }, {
-      "type" : "SYNONYM",
-      "owner" : "TM_CZ",
-      "name" : "DE_SUBJECT_PROTEIN_DATA"
-    }, {
-      "type" : "SYNONYM",
-      "owner" : "TM_CZ",
-      "name" : "WT_SUBJECT_PROTEOMICS_CALCS"
-    }, {
-      "type" : "SYNONYM",
-      "owner" : "TM_CZ",
-      "name" : "WT_SUBJECT_PROTEOMICS_LOGS"
-    }, {
-      "type" : "SYNONYM",
-      "owner" : "TM_CZ",
-      "name" : "WT_SUBJECT_PROTEOMICS_MED"
-    }, {
-      "type" : "SYNONYM",
-      "owner" : "TM_CZ",
-      "name" : "WT_SUBJECT_PROTEOMICS_PROBESET"
-    } ]
-  }, {
-    "child" : {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "I2B2_PROTEIN_INC_ZSCORE_CALC3"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_PROTEIN_ANNOTATION"
-    }, {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_END_AUDIT"
-    }, {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_ERROR_HANDLER"
-    }, {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_START_AUDIT"
-    }, {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_WRITE_AUDIT"
-    }, {
-      "type" : "SYNONYM",
-      "owner" : "TM_CZ",
-      "name" : "DE_SUBJECT_PROTEIN_DATA"
-    }, {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "I2B2_PROTEIN_INC_SUB_ZSCORE"
     }, {
       "type" : "SYNONYM",
       "owner" : "TM_CZ",
@@ -12187,36 +12043,6 @@
     "child" : {
       "type" : "TRIGGER",
       "owner" : "TM_CZ",
-      "name" : "TRG_CZ_FORM_LAYOUT_ID"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_FORM_LAYOUT"
-    }, {
-      "type" : "SEQUENCE",
-      "owner" : "TM_CZ",
-      "name" : "SEQ_CZ_FORM_LAYOUT_ID"
-    } ]
-  }, {
-    "child" : {
-      "type" : "TRIGGER",
-      "owner" : "TM_CZ",
-      "name" : "TRG_CZ_REQ_UPLOAD_FIELD_ID"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_REQUIRED_UPLOAD_FIELD"
-    }, {
-      "type" : "SEQUENCE",
-      "owner" : "TM_CZ",
-      "name" : "SEQ_REQUIRED_UPLOAD_FIELD_ID"
-    } ]
-  }, {
-    "child" : {
-      "type" : "TRIGGER",
-      "owner" : "TM_CZ",
       "name" : "TRG_CZ_JOB_ID"
     },
     "parents" : [ {
@@ -13477,20 +13303,6 @@
     "file" : "tm_cz/procedures/cz_error_handler.sql"
   }, {
     "item" : {
-      "type" : "TABLE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_FORM_LAYOUT"
-    },
-    "file" : "tm_cz/cz_form_layout.sql"
-  }, {
-    "item" : {
-      "type" : "SEQUENCE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_FORM_LAYOUT_SEQ"
-    },
-    "file" : "tm_cz/_misc.sql"
-  }, {
-    "item" : {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "CZ_INFO_HANDLER"
@@ -13720,13 +13532,6 @@
       "name" : "DE_SUBJ_SAMPLE_MAP_RELEASE"
     },
     "file" : "tm_cz/de_subj_sample_map_release.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "TM_CZ",
-      "name" : "DK1"
-    },
-    "file" : "tm_cz/dk1.sql"
   }, {
     "item" : {
       "type" : "PROCEDURE",
@@ -14200,30 +14005,9 @@
     "item" : {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
-      "name" : "I2B2_PROTEIN_INC_SUB_ZSCORE2"
-    },
-    "file" : "tm_cz/procedures/i2b2_protein_inc_sub_zscore2.sql"
-  }, {
-    "item" : {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
       "name" : "I2B2_PROTEIN_INC_ZSCORE_CALC"
     },
     "file" : "tm_cz/procedures/i2b2_protein_inc_zscore_calc.sql"
-  }, {
-    "item" : {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "I2B2_PROTEIN_INC_ZSCORE_CALC2"
-    },
-    "file" : "tm_cz/procedures/i2b2_protein_inc_zscore_calc2.sql"
-  }, {
-    "item" : {
-      "type" : "PROCEDURE",
-      "owner" : "TM_CZ",
-      "name" : "I2B2_PROTEIN_INC_ZSCORE_CALC3"
-    },
-    "file" : "tm_cz/procedures/i2b2_protein_inc_zscore_calc3.sql"
   }, {
     "item" : {
       "type" : "PROCEDURE",
@@ -14718,13 +14502,6 @@
     "item" : {
       "type" : "SEQUENCE",
       "owner" : "TM_CZ",
-      "name" : "SEQ_CZ_FORM_LAYOUT_ID"
-    },
-    "file" : "tm_cz/cz_form_layout.sql"
-  }, {
-    "item" : {
-      "type" : "SEQUENCE",
-      "owner" : "TM_CZ",
       "name" : "SEQ_PROBESET_ID"
     },
     "file" : "tm_cz/_misc.sql"
@@ -14828,27 +14605,6 @@
     "file" : "tm_cz/updatezscore_proteomics.sql"
   }, {
     "item" : {
-      "type" : "TABLE",
-      "owner" : "TM_CZ",
-      "name" : "CZ_REQUIRED_UPLOAD_FIELD"
-    },
-    "file" : "tm_cz/cz_required_upload_field.sql"
-  }, {
-    "item" : {
-      "type" : "TRIGGER",
-      "owner" : "TM_CZ",
-      "name" : "TRG_CZ_REQ_UPLOAD_FIELD_ID"
-    },
-    "file" : "tm_cz/cz_required_upload_field.sql"
-  }, {
-    "item" : {
-      "type" : "SEQUENCE",
-      "owner" : "TM_CZ",
-      "name" : "SEQ_REQUIRED_UPLOAD_FIELD_ID"
-    },
-    "file" : "tm_cz/cz_required_upload_field.sql"
-  }, {
-    "item" : {
       "type" : "TRIGGER",
       "owner" : "TM_CZ",
       "name" : "TRG_ANTIGEN_DEAPP"
@@ -14896,13 +14652,6 @@
       "name" : "TRG_CZ_DW_VERSION_ID"
     },
     "file" : "tm_cz/cz_dw_version.sql"
-  }, {
-    "item" : {
-      "type" : "TRIGGER",
-      "owner" : "TM_CZ",
-      "name" : "TRG_CZ_FORM_LAYOUT_ID"
-    },
-    "file" : "tm_cz/cz_form_layout.sql"
   }, {
     "item" : {
       "type" : "TRIGGER",
