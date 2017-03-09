@@ -179,6 +179,11 @@ class ImportXnatController {
 			def kettlehome = getKettleHome()
 
                         // make any missing datadir levels
+                        def testFile = new File(datadir)
+                        if(!testFile.exists()){
+                            testFile.mkdirs()
+                        }
+
 			def cmd = ["python",
                                    getScriptsLocation() + "/xnattotransmartlink/downloadscript.py",
                                    url, username, password, project, node, datadir, kitchendir, etldir, scriptdir, kettlehome]
@@ -300,6 +305,7 @@ class ImportXnatController {
                     dir = ""
                 }
             }
+
             return dir
 	}
 
@@ -346,6 +352,13 @@ class ImportXnatController {
                         log.info("getScriptsLocation no value, set empty")
                         dir = ""
                     }
+                }
+            }
+
+            if(dir != "") {
+                def testFile = new File(dir)
+                if(!testFile.exists()){
+                    testFile.mkdirs()
                 }
             }
 
