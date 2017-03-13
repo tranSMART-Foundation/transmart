@@ -1,8 +1,10 @@
 package org.transmartproject.db.dataquery.clinical.patientconstraints
 
+import grails.gorm.DetachedCriteria
 import org.grails.datastore.mapping.query.api.Criteria
 import org.transmartproject.core.querytool.QueryResult
 import org.transmartproject.db.querytool.QtPatientSetCollection
+import org.transmartproject.db.support.InQuery
 
 class PatientSetsConstraint implements PatientConstraint {
 
@@ -16,12 +18,10 @@ class PatientSetsConstraint implements PatientConstraint {
 
     @Override
     void addToCriteria(Criteria criteria) {
-        criteria.in 'id', QtPatientSetCollection.where {
-            projections {
-                property 'patient.id'
-            }
-            'in'('resultInstance.id', this.queryResults*.id)
-        }
+        def subCriteria = new DetachedCriteria(QtPatientSetCollection)
+                .property('patient.id')
+        InQuery.addIn(subCriteria, 'resultInstance.id', this.queryResults*.id)
+        criteria.in('id', subCriteria)
     }
 
 }
