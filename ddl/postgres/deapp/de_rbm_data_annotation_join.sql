@@ -18,6 +18,9 @@ ALTER TABLE ONLY de_rbm_data_annotation_join
 ALTER TABLE ONLY de_rbm_data_annotation_join
     ADD CONSTRAINT de_rbm_data_ann_jn_ann_id_fk FOREIGN KEY (annotation_id) REFERENCES de_rbm_annotation(id) ON DELETE CASCADE;
 
+-- Breaks ETL on postgres as table is partitioned
+-- and foreign keys do not work on partitions
+
 --
 -- Name: de_rbm_data_ann_jn_data_id_fk; Type: FK CONSTRAINT; Schema: deapp; Owner: -
 --

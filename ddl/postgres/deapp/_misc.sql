@@ -7,7 +7,7 @@ ALTER SEQUENCE de_gene_info_gene_info_id_seq OWNED BY de_gene_info.gene_info_id;
 -- Name: metabolite_sub_pth_id; Type: SEQUENCE; Schema: deapp; Owner: -
 --
 CREATE SEQUENCE metabolite_sub_pth_id
-    START WITH 1095
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -17,7 +17,7 @@ CREATE SEQUENCE metabolite_sub_pth_id
 -- Name: metabolite_sup_pth_id; Type: SEQUENCE; Schema: deapp; Owner: -
 --
 CREATE SEQUENCE metabolite_sup_pth_id
-    START WITH 152
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -27,7 +27,7 @@ CREATE SEQUENCE metabolite_sup_pth_id
 -- Name: metabolomics_annot_id; Type: SEQUENCE; Schema: deapp; Owner: -
 --
 CREATE SEQUENCE metabolomics_annot_id
-    START WITH 4479
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -37,7 +37,7 @@ CREATE SEQUENCE metabolomics_annot_id
 -- Name: seq_assay_id; Type: SEQUENCE; Schema: deapp; Owner: -
 --
 CREATE SEQUENCE seq_assay_id
-    START WITH 45741
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -77,7 +77,7 @@ CREATE SEQUENCE seq_proteomics_partition_id
 -- Name: seq_rbm_partition_id; Type: SEQUENCE; Schema: deapp; Owner: -
 --
 CREATE SEQUENCE seq_rbm_partition_id
-    START WITH 29
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -87,7 +87,7 @@ CREATE SEQUENCE seq_rbm_partition_id
 -- Name: seq_rna_partition_id; Type: SEQUENCE; Schema: deapp; Owner: -
 --
 CREATE SEQUENCE seq_rna_partition_id
-    START WITH 107
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -97,7 +97,7 @@ CREATE SEQUENCE seq_rna_partition_id
 -- Name: tt; Type: SEQUENCE; Schema: deapp; Owner: -
 --
 CREATE SEQUENCE tt
-    START WITH 241
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE

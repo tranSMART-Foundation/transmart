@@ -959,7 +959,15 @@
       "owner" : "DEAPP",
       "name" : "DE_TWO_REGION_JUNCTION_EVENT"
     },
-      "parents" : [ ]
+      "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_TWO_REGION_EVENT"
+      }, {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_TWO_REGION_JUNCTION"
+    } ]
   }, {
     "child" : {
       "type" : "SEQUENCE",
@@ -1017,7 +1025,11 @@
       "owner" : "DEAPP",
       "name" : "DE_VARIANT_POPULATION_DATA"
     },
-    "parents" : [ ]
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_VARIANT_DATASET"
+    } ]
   }, {
     "child" : {
       "type" : "SEQUENCE",
@@ -1027,11 +1039,37 @@
     "parents" : [ ]
   }, {
     "child" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "DEAPP",
+      "name" : "DE_VARIANT_POPULATION_DATA_FK"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_VARIANT_POPULATION_DATA"
+    } ]
+  }, {
+    "child" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
       "name" : "DE_VARIANT_POPULATION_INFO"
     },
-    "parents" : [ ]
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_VARIANT_DATASET"
+    } ]
+  }, {
+    "child" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "DEAPP",
+      "name" : "DE_VARIANT_POPULATION_INFO_FK"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_VARIANT_POPULATION_INFO"
+    } ]
   }, {
     "child" : {
       "type" : "SEQUENCE",
@@ -2046,6 +2084,28 @@
     "child" : {
       "type" : "REF_CONSTRAINT",
       "owner" : "DEAPP",
+      "name" : "TWO_REGION_JN_EVENT_IE_FK"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_TWO_REGION_JUNCTION_EVENT"
+    } ]
+  }, {
+    "child" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "DEAPP",
+      "name" : "TWO_REGION_JN_EVENT_IJ_FK"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_TWO_REGION_JUNCTION_EVENT"
+    } ]
+  }, {
+    "child" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "DEAPP",
       "name" : "VARIANT_SUBJECT_DETAIL_FK"
     },
     "parents" : [ {
@@ -2821,6 +2881,20 @@
     "file" : "deapp/de_two_region_junction.sql"
   }, {
     "item" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "DEAPP",
+      "name" : "TWO_REGION_JN_EVENT_IE_FK"
+    },
+    "file" : "deapp/de_two_region_junction_event.sql"
+  }, {
+    "item" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "DEAPP",
+      "name" : "TWO_REGION_JN_EVENT_IJ_FK"
+    },
+    "file" : "deapp/de_two_region_junction_event.sql"
+  }, {
+    "item" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
       "name" : "DE_TWO_REGION_JUNCTION_EVENT"
@@ -2832,14 +2906,14 @@
       "owner" : "DEAPP",
       "name" : "DE_TWO_RGN_JUNCTION_EVENT_SEQ"
     },
-    "file" : "deapp/de_two_region_junction.sql"
+    "file" : "deapp/de_two_region_junction_event.sql"
   }, {
     "item" : {
       "type" : "TRIGGER",
       "owner" : "DEAPP",
       "name" : "TRG_DE_TWO_RGN_JUNCTION_EVENT_ID"
     },
-    "file" : "deapp/de_two_region_junction.sql"
+    "file" : "deapp/de_two_region_junction_event.sql"
   }, {
     "item" : {
       "type" : "TABLE",
@@ -2870,6 +2944,13 @@
     "file" : "deapp/de_variant_population_data.sql"
   }, {
     "item" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "DEAPP",
+      "name" : "DE_VARIANT_POPULATION_DATA_FK"
+    },
+    "file" : "deapp/de_variant_population_data.sql"
+ }, {
+    "item" : {
       "type" : "SEQUENCE",
       "owner" : "DEAPP",
       "name" : "DE_VARIANT_POPULATION_DATA_SEQ"
@@ -2883,6 +2964,13 @@
     },
     "file" : "deapp/de_variant_population_info.sql"
   }, {
+    "item" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "DEAPP",
+      "name" : "DE_VARIANT_POPULATION_INFO_FK"
+    },
+    "file" : "deapp/de_variant_population_info.sql"
+ }, {
     "item" : {
       "type" : "SEQUENCE",
       "owner" : "DEAPP",

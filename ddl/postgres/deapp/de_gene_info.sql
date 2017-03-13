@@ -17,7 +17,7 @@ CREATE TABLE de_gene_info (
     entrez_id integer,
     gene_symbol character varying(255) NOT NULL,
     gene_name character varying(255),
-    chrom character varying(40),
+    chrom character varying(40) NOT NULL,
     chrom_start integer,
     chrom_stop integer,
     strand smallint
@@ -28,6 +28,17 @@ CREATE TABLE de_gene_info (
 --
 ALTER TABLE ONLY de_gene_info ALTER COLUMN gene_info_id SET DEFAULT nextval('de_gene_info_gene_info_id_seq'::regclass);
 
+--
+-- Name: de_gene_info_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
+--
+ALTER TABLE ONLY de_gene_info
+    ADD CONSTRAINT de_gene_info_pk PRIMARY KEY (gene_info_id);
+
+--
+-- Name: de_gene_info_uk; Type: CONSTRAINT; Schema: deapp; Owner: -
+--
+ALTER TABLE ONLY de_gene_info
+    ADD CONSTRAINT de_gene_info_uk UNIQUE (gene_source_id,gene_symbol);
 --
 -- Name: de_gene_info_entrez_id_gene_source_id_idx; Type: INDEX; Schema: deapp; Owner: -
 --

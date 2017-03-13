@@ -74,7 +74,7 @@ BEGIN
     
     v_row_count := SQL%ROWCOUNT;
  
-  czx_write_audit(jobId,databaseName,procedureName,'Loaded bio_assay_featurwe_group with ' || v_row_count || ' records' ,0,stepCt,'Done');
+  czx_write_audit(jobId,databaseName,procedureName,'Loaded bio_assay_feature_group with ' || v_row_count || ' records' ,0,stepCt,'Done');
 	stepCt := stepCt + 1;
   
   if v_row_count = 0 then

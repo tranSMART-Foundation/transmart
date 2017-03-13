@@ -8,6 +8,12 @@ CREATE TABLE bio_asy_analysis_data_ext (
 );
 
 --
+-- Name: bio_asy_analysis_data_id_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+--
+ALTER TABLE ONLY bio_asy_analysis_data_ext
+    ADD CONSTRAINT bio_asy_analysis_data_id_pk PRIMARY KEY (bio_asy_analysis_data_id);
+
+--
 -- Name: bio_asy_analysis_data_ext_fk; Type: FK CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_asy_analysis_data_ext

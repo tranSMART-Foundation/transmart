@@ -2600,13 +2600,6 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "BIOMART",
-      "name" : "MESH_ALL"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "BIOMART",
       "name" : "MESH_DESCRIPTOR"
     },
     "parents" : [ ]
@@ -2615,13 +2608,6 @@
       "type" : "TABLE",
       "owner" : "BIOMART",
       "name" : "MESH_ENTRY"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "BIOMART",
-      "name" : "MESH_TEMP"
     },
     "parents" : [ ]
   }, {
@@ -5499,13 +5485,6 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "BIOMART",
-      "name" : "MESH_ALL"
-    },
-    "file" : "biomart/mesh_all.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "BIOMART",
       "name" : "MESH_DESCRIPTOR"
     },
     "file" : "biomart/mesh_descriptor.sql"
@@ -5516,13 +5495,6 @@
       "name" : "MESH_ENTRY"
     },
     "file" : "biomart/mesh_entry.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "BIOMART",
-      "name" : "MESH_TEMP"
-    },
-    "file" : "biomart/mesh_temp.sql"
   }, {
     "item" : {
       "type" : "TABLE",

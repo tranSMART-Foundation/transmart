@@ -54,7 +54,7 @@ CREATE TRIGGER trg_de_subj_rbm_data_id BEFORE INSERT ON de_subject_rbm_data FOR 
 -- Name: de_subject_rbm_data_seq; Type: SEQUENCE; Schema: deapp; Owner: -
 --
 CREATE SEQUENCE de_subject_rbm_data_seq
-    START WITH 1272564
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE

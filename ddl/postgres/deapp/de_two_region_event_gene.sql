@@ -38,5 +38,5 @@ ALTER TABLE ONLY de_two_region_event_gene
 -- Name: two_region_event_gene_id_event_fk; Type: FK CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_two_region_event_gene
-    ADD CONSTRAINT two_region_event_gene_id_event_fk FOREIGN KEY (event_id) REFERENCES de_two_region_event(two_region_event_id);
+    ADD CONSTRAINT two_region_event_gene_fk FOREIGN KEY (event_id) REFERENCES de_two_region_event(two_region_event_id);
 

@@ -37,7 +37,7 @@ CREATE TRIGGER trg_de_pathway_gene_id BEFORE INSERT ON de_pathway_gene FOR EACH 
 -- Name: seq_data_id; Type: SEQUENCE; Schema: deapp; Owner: -
 --
 CREATE SEQUENCE seq_data_id
-    START WITH 11594011
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE

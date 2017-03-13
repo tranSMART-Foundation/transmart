@@ -64,6 +64,7 @@ BEGIN
         'fmapp',
         'biomart_user',
         'galaxy',
+        'gwas_plink',
         'searchapp',
         'biomart',
         'ts_batch'

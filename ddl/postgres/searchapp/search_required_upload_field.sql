@@ -37,7 +37,7 @@ CREATE TRIGGER trg_srch_req_up_field_id BEFORE INSERT ON search_required_upload_
 -- Name: seq_req_upload_field_id; Type: SEQUENCE; Schema: searchapp; Owner: -
 --
 CREATE SEQUENCE seq_req_upload_field_id
-    START WITH 41
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE

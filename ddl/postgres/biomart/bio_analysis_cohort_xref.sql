@@ -14,8 +14,3 @@ CREATE TABLE bio_analysis_cohort_xref (
 ALTER TABLE ONLY bio_analysis_cohort_xref
     ADD CONSTRAINT bio_analysis_cohort_xref_pk PRIMARY KEY (bio_assay_analysis_id);
 
---
--- Name: bacx_idx1; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE INDEX bacx_idx1 ON bio_analysis_cohort_xref USING btree (bio_assay_analysis_id);
-

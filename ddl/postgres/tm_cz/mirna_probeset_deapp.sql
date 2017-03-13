@@ -2,9 +2,9 @@
 -- Name: seq_probeset_id; Type: SEQUENCE; Schema: tm_cz; Owner: -
 --
 CREATE SEQUENCE seq_probeset_id
-    START WITH 1112968
+    START WITH 1
     INCREMENT BY 1
-    MINVALUE 249739
+    NO MINVALUE
     NO MAXVALUE
     CACHE 20;
 

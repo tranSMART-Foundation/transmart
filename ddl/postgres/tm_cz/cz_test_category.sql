@@ -42,7 +42,7 @@ ALTER TABLE ONLY cz_test_category
 -- Name: seq_cz; Type: SEQUENCE; Schema: tm_cz; Owner: -
 --
 CREATE SEQUENCE seq_cz
-    START WITH 141
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE

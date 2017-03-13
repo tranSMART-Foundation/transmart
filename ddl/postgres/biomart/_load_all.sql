@@ -15,10 +15,10 @@
 \i biomart/functions/refresh_bio_lit_int_model_mv.sql
 \i biomart/functions/refresh_bio_marker_correl_mv.sql
 \i biomart/functions/tea_npv_precompute.sql
+\i biomart/bio_data_uid.sql
 \i biomart/bio_assay_platform.sql
 \i biomart/bio_compound.sql
 \i biomart/bio_concept_code.sql
-\i biomart/bio_data_uid.sql
 \i biomart/bio_disease.sql
 \i biomart/bio_marker.sql
 \i biomart/bio_observation.sql
@@ -150,12 +150,8 @@
 \i biomart/gse_analysis.sql
 \i biomart/gse_probeset.sql
 \i biomart/heat_map_results.sql
-\i biomart/mesh.sql
-\i biomart/mesh_copy.sql
 \i biomart/mesh_descriptor.sql
 \i biomart/mesh_entry.sql
-\i biomart/mesh_path.sql
-\i biomart/mesh_temp.sql
 \i biomart/views/mesh_with_parent.sql
 \i biomart/mirna_bio_assay_data_annot.sql
 \i biomart/mirna_bio_assay_feature_group.sql

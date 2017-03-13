@@ -28,14 +28,3 @@ $$;
 -- Name: trg_bio_asy_adi_id; Type: TRIGGER; Schema: biomart; Owner: -
 --
 CREATE TRIGGER trg_bio_asy_adi_id BEFORE INSERT ON bio_asy_analysis_data_idx FOR EACH ROW EXECUTE PROCEDURE tf_trg_bio_asy_adi_id();
-
---
--- Name: seq_bio_data_id; Type: SEQUENCE; Schema: biomart; Owner: -
---
-CREATE SEQUENCE seq_bio_data_id
-    START WITH 391713417
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-

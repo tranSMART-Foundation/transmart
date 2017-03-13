@@ -2,7 +2,7 @@
 -- Name: bio_assay_data_stats_seq; Type: SEQUENCE; Schema: biomart; Owner: -
 --
 CREATE SEQUENCE bio_assay_data_stats_seq
-    START WITH 34497441
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -12,7 +12,7 @@ CREATE SEQUENCE bio_assay_data_stats_seq
 -- Name: hibernate_sequence; Type: SEQUENCE; Schema: biomart; Owner: -
 --
 CREATE SEQUENCE hibernate_sequence
-    START WITH 21270
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE

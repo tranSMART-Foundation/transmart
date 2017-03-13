@@ -14,7 +14,7 @@ CREATE TABLE de_subject_acgh_data (
     probnorm double precision,
     probgain double precision,
     probamp double precision,
-    trial_source character varying(100),
+    trial_source character varying(200),
     partition_id numeric
 );
 

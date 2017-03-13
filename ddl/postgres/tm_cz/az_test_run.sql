@@ -55,7 +55,7 @@ ALTER TABLE ONLY az_test_run
 -- Name: seq_cz_test; Type: SEQUENCE; Schema: tm_cz; Owner: -
 --
 CREATE SEQUENCE seq_cz_test
-    START WITH 8259
+    START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE

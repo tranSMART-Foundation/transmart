@@ -122,7 +122,7 @@ dataExport {
 //// here we need the directory to use for ETL
 //org.transmart.data.location = "/path/to/transmart-data"
 //org.transmart.importxnatplugin.location = "/home/transmart/transmart-xnat-importer-plugin/scripts"
-//org.transmart.xnatImporterEnabled = "true"
+//org.transmart.xnatImporterEnable = true
 
 /* }}} */
 

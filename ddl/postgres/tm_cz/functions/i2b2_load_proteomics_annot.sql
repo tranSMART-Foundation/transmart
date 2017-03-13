@@ -124,19 +124,19 @@ BEGIN
        ---Cleanup OVERALL JOB if this proc is being run standalone
   IF newJobFlag = 1
   THEN
-    select cz_end_audit (jobID, 'SUCCESS') into rtnCd; 
+    perform cz_end_audit (jobID, 'SUCCESS');
   END IF; 
 
-  return rtnCd;
+  return 1;
   
   EXCEPTION 
   WHEN OTHERS THEN
     errorNumber := SQLSTATE;
     errorMessage := SQLERRM;
-    select cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
-    select cz_end_audit (jobID, 'FAIL') into rtnCd;
+    perform cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+    perform cz_end_audit (jobID, 'FAIL');
 
-  return rtnCd;
+  return -16;
 END;
 $$;
 

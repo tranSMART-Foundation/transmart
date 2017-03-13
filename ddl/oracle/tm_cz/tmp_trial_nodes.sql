@@ -1,3 +1,5 @@
+-- used by transmart-ICE testing
+
 --
 -- Type: TABLE; Owner: TM_CZ; Name: TMP_TRIAL_NODES
 --

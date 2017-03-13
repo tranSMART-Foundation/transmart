@@ -20,7 +20,7 @@ BEGIN
 	TrialID := upper(trial_id);
         coun:=0;
         
-        -- call the cursor and update the z-score value for incmental data;
+        -- call the cursor and update the z-score value for incremental data;
             for UpdateZscore in zscore_params
               loop
  
