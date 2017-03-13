@@ -134,7 +134,7 @@ if ! [ -e transmart-data ] ; then
 	mv $TRANSMART_DATA_NAME transmart-data
 fi
 
-echo "Finished setting up the transmart-date folder at $(date)"
+echo "Finished setting up the transmart-data folder at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  set up the tranSMART-ETL folder"
@@ -152,6 +152,8 @@ if ! [ -e tranSMART-ETL ] ; then
 	echo "unzipping $TRANSMART_ETL_ZIP"
 	unzip $TRANSMART_ETL_ZIP
 	mv $TRANSMART_ETL_NAME tranSMART-ETL
+	cd tranSMART-ETL
+	mvn package
 fi
 echo "Finished setting up the tranSMART-ETL folder at $(date)"
 
