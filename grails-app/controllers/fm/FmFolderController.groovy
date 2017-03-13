@@ -1426,16 +1426,18 @@ class FmFolderController {
 
     def ajaxTechnologies = {
         def queryString = " where 1=1"
-        if (params.measurementName != null && params.measurementName != 'null') {
+        if (params.measurementName != null && params.measurementName != 'null' && params.measurementName != 'undefined') {
             queryString += " and platformType = '" + params.measurementName + "'"
+            log.info("ajaxTechnologies with measurement = '" + params.measurementName + "'")
         }
-        if (params.vendorName != null && params.vendorName != 'null') {
+        if (params.vendorName != null && params.vendorName != 'null' && params.vendorName != 'undefined') {
             queryString += " and vendor = '" + params.vendorName + "'"
+            log.info("ajaxTechnologies with vendor = '" + params.vendorName + "'")
         }
 
         queryString = "SELECT DISTINCT platformTechnology FROM BioAssayPlatform as p " + queryString + "  ORDER BY p.platformTechnology"
         def technologies = BioAssayPlatform.executeQuery(queryString)
-        log.info queryString + " " + technologies
+        log.info("ajaxTechnologies technologies from: " + queryString + " " + technologies)
         render(template: "selectTechnologies", plugin: "folderManagement", model: [technologies: technologies, technology: params.technologyName])
     }
 
@@ -1443,17 +1445,19 @@ class FmFolderController {
         log.info params
         def queryString = " where 1=1"
 
-        if (params.technologyName != null && params.technologyName != 'null') {
+        if (params.technologyName != null && params.technologyName != 'null' && params.technologyName != 'undefined') {
             queryString += " and platformTechnology = '" + params.technologyName + "'"
+            log.info("ajaxVendors with technology = '" + params.technologyName + "'")
         }
 
-        if (params.measurementName != null && params.measurementName != 'null') {
+        if (params.measurementName != null && params.measurementName != 'null' && params.measurementName != 'undefined') {
             queryString += " and platformType = '" + params.measurementName + "'"
+            log.info("ajaxVendors with measurement = '" + params.measurementName + "'")
         }
 
         queryString = "SELECT DISTINCT vendor FROM BioAssayPlatform as p " + queryString + "  ORDER BY p.vendor"
         def vendors = BioAssayPlatform.executeQuery(queryString)
-        log.info queryString + " " + vendors
+        log.info("ajaxVendors vendors from: " + queryString + " " + vendors)
         render(template: "selectVendors", plugin: "folderManagement", model: [vendors: vendors, vendor: params.vendorName])
     }
 
@@ -1461,12 +1465,14 @@ class FmFolderController {
         log.info params
         def queryString = " where 1=1"
 
-        if (params.technologyName != null && params.technologyName != 'null') {
+        if (params.technologyName != null && params.technologyName != 'null' && params.technologyName != 'undefined') {
             queryString += " and platformTechnology = '" + params.technologyName + "'"
+            log.info("ajaxMeasurements with technology = '" + params.technologyName + "'")
         }
 
-        if (params.vendorName != null && params.vendorName != 'null') {
+        if (params.vendorName != null && params.vendorName != 'null' && params.vendorName != 'undefined') {
             queryString += " and vendor = '" + params.vendorName + "'"
+            log.info("ajaxMeasurements with vendor = '" + params.vendorName + "'")
         }
 
         queryString = "SELECT DISTINCT platformType FROM BioAssayPlatform as p " + queryString + "  ORDER BY p.platformType"
@@ -1479,21 +1485,20 @@ class FmFolderController {
         log.info params
         def queryString = " where 1=1"
 
-        if (params.measurementName != null && params.measurementName != 'null') {
+        if (params.measurementName != null && params.measurementName != 'null' && params.measurementName != 'undefined') {
             queryString += " and platformType = '" + params.measurementName + "'"
         }
 
-        if (params.technologyName != null && params.technologyName != 'null') {
+        if (params.technologyName != null && params.technologyName != 'null' && params.technologyName != 'undefined') {
             queryString += " and platformTechnology = '" + params.technologyName + "'"
         }
 
-        if (params.vendorName != null && params.vendorName != 'null') {
+        if (params.vendorName != null && params.vendorName != 'null' && params.vendorName != 'undefined') {
             queryString += " and vendor = '" + params.vendorName + "'"
         }
 
         queryString = "FROM BioAssayPlatform as p " + queryString + "  ORDER BY p.platformType"
         def platforms = BioAssayPlatform.executeQuery(queryString)
-        log.info queryString + " " + platforms
         render(template: "selectPlatforms", plugin: "folderManagement", model: [platforms: platforms])
     }
 
