@@ -117,6 +117,13 @@ sudo yum -q install -y unzip
 sudo yum -q install -y tar
 
 echo "++++++++++++++++++++++++++++"
+echo "+ install ant and maven"
+echo "++++++++++++++++++++++++++++"
+sudo yum -q install -y ant
+sudo yum -q install -y maven
+echo "Finished install of ant and maven at $(date)"
+
+echo "++++++++++++++++++++++++++++"
 echo "+  set up the transmart-data folder"
 echo "++++++++++++++++++++++++++++"
 
@@ -271,10 +278,6 @@ echo "+  Dependency: Install of grails, groovy"
 echo "++++++++++++++++++++++++++++"
 
 echo "Finished setting RHEL dependencies (without root) at $(date)"
-sudo -v
-sudo yum -q install -y ant
-sudo yum -q install -y maven
-echo "Finished install of ant and maven at $(date)"
 
 # No longer need to remove this as the make step that creates it is not skipped!
 # rm $INSTALL_BASE/transmart-data/env/groovy

@@ -115,6 +115,14 @@ sudo apt-get -q install -y make
 sudo apt-get -q install -y curl
 sudo apt-get -q install -y unzip
 sudo apt-get -q install -y tar
+sudo apt-get -q install -y maven
+
+echo "++++++++++++++++++++++++++++"
+echo "+ install ant and maven"
+echo "++++++++++++++++++++++++++++"
+sudo apt-get -q install -y ant
+sudo apt-get -q install -y maven
+echo "Finished install of ant and maven at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  set up the transmart-data folder"
@@ -273,10 +281,6 @@ echo "+  Dependency: Install of grails, groovy"
 echo "++++++++++++++++++++++++++++"
 
 echo "Finished setting ubuntu dependencies (without root) at $(date)"
-sudo -v
-sudo apt-get -q install -y ant
-sudo apt-get -q install -y maven
-echo "Finished install of ant and maven at $(date)"
 
 # No longer need to remove this as the make step that creates it is not skipped!
 # rm $INSTALL_BASE/transmart-data/env/groovy
