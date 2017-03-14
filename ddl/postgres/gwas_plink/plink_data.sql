@@ -9,7 +9,8 @@ CREATE TABLE plink_data (
 	fam           oid
 );
 
-ALTER TABLE plink_data
-        ADD PRIMARY KEY plink_data_pkey (plink_data_id);
+ALTER TABLE ONLY plink_data
+        ADD CONSTRAINT plink_data_pkey PRIMARY KEY (plink_data_id);
 
-CREATE UNIQUE INDEX plink_data_study_id_key ON plink_data(study_id);
+ALTER TABLE ONLY plink_data
+        ADD CONSTRAINT plink_data_study_id_key UNIQUE (study_id);
