@@ -150,6 +150,7 @@
 \i biomart/gse_analysis.sql
 \i biomart/gse_probeset.sql
 \i biomart/heat_map_results.sql
+\i biomart/mesh.sql
 \i biomart/mesh_descriptor.sql
 \i biomart/mesh_entry.sql
 \i biomart/views/mesh_with_parent.sql
