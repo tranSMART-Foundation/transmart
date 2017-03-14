@@ -13,7 +13,7 @@ function checkForPostgresTablespaceFolder {
     name=$1
     checkPath="$TABLESPACES/$name"
     
-    x=$(ls -la $TABLESPACES | grep "$name")
+    x=$(ls -la $TABLESPACES/ | grep "$name")
     if [ -z "$x" ] ; then
     	echo "the folder at $checkPath"
     	echo "  was not found; it needs to be (sudo mkdir) created"
