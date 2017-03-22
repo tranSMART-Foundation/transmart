@@ -18,18 +18,14 @@
  */
 
 package org.transmartproject.db.dataquery.highdim.rnaseqcog
-
 import grails.orm.HibernateCriteriaBuilder
-import org.hibernate.Criteria
 import org.hibernate.ScrollableResults
-import org.hibernate.criterion.Restrictions
 import org.hibernate.engine.SessionImplementor
 import org.hibernate.transform.Transformers
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.core.dataquery.highdim.projections.Projection
-import org.transmartproject.core.querytool.ConstraintByOmicsValue
 import org.transmartproject.core.querytool.HighDimensionFilterType
 import org.transmartproject.db.dataquery.highdim.AbstractHighDimensionDataTypeModule
 import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
@@ -41,7 +37,6 @@ import org.transmartproject.db.dataquery.highdim.parameterproducers.*
 
 import static org.hibernate.sql.JoinFragment.INNER_JOIN
 import static org.transmartproject.db.util.GormWorkarounds.createCriteriaBuilder
-
 /**
  * Module for RNA-seq, as implemented for Oracle by Cognizant.
  * This name is to distinguish it from the TraIT implementation.
@@ -170,12 +165,13 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
             ilike(search_property, search_term + '%')
             projections { distinct(search_property) }
             order(search_property, 'ASC')
+            maxResults(100)
         }
     }
 
     @Override
     List<String> getSearchableAnnotationProperties() {
-        ['geneSymbol']
+        ['geneSymbol','transcriptId']
     }
 
     @Override

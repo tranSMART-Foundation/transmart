@@ -187,7 +187,7 @@ class MrnaModule extends AbstractHighDimensionDataTypeModule {
 
     @Override
     List<String> getSearchableAnnotationProperties() {
-        ['geneSymbol']
+        ['geneSymbol', 'probeId']
     }
 
     @Override
