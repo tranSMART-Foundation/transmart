@@ -44,7 +44,7 @@ BEGIN
 	jobID := currentJobID;
 
 	databaseName := 'TM_CZ';
-	procedureName := 'I2B2_ADD_NODE';
+	procedureName := 'I2B2_MOVE_STUDY';
 	
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it
