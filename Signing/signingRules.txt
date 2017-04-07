@@ -4,6 +4,8 @@ cd signing
 // obtain release artifacts: transmart.war, gwava.war, 
 // transmart-data-release-16.2.zip, tranSMART-ETL-release-16.2.zip
 // Scripts-release-16.2.zip
+// transmart-batch-release-16.2.zip
+// RInterface-release-16.2.zip
 
 // generate all signatures and hash codes (md5 and SHA1)
 
