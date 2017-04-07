@@ -491,7 +491,7 @@ echo "++++++++++++++++++++++++++++"
 
 set e+
 cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
-./checkFilesTomcat.sh
+sudo ./checkFilesTomcat.sh
 ./checkTools.sh
 ./checkWeb.sh
 
