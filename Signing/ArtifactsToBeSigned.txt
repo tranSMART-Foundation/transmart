@@ -1,4 +1,5 @@
 # list of non-web-application artifacts
+Scripts
 RInterface
 transmart-batch
 transmart-data
