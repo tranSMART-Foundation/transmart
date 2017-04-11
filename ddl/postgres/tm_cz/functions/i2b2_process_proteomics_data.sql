@@ -1,8 +1,7 @@
 --
 -- Name: i2b2_process_proteomics_data(character varying, character varying, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-SET search_path = tm_cz, pg_catalog;
-CREATE OR REPLACE FUNCTION i2b2_process_proteomics_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_cd character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT NULL::character varying, currentjobid numeric DEFAULT NULL::numeric) RETURNS numeric
+CREATE FUNCTION i2b2_process_proteomics_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_cd character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT NULL::character varying, currentjobid numeric DEFAULT NULL::numeric) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
     AS $$
 /*************************************************************************
@@ -401,9 +400,9 @@ BEGIN
 		  ,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'ATTR1') > 1 then attribute_1 else null end as attribute_1
           ,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'ATTR2') > 1 then attribute_2 else null end as attribute_2
 		  ,'PLATFORM'
-	from  WT_PROTEOMICS_NODE_VALUES
-	where category_cd like '%PLATFORM%'
-	  and platform is not null;
+	from  WT_PROTEOMICS_NODE_VALUES;
+--	where category_cd like '%PLATFORM%'
+--	  and platform is not null;
 	exception
 	when others then
 		perform tm_cz.cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
