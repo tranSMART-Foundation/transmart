@@ -57,7 +57,6 @@ BEGIN
     IF owner <> 'tm_cz' OR owner IS NULL THEN
         result := result || ('user tm_cz=' || allPermissions)::aclitem;
     END IF;
-
     RETURN result;
 END;
 $$ LANGUAGE plpgsql;
@@ -103,6 +102,7 @@ BEGIN
                 WHEN 'r' THEN 'r'
                 WHEN 'S' THEN 'rwU' -- from the docs, w or U would suffice
                 WHEN 'v' THEN 'r'
+                WHEN 'm' THEN 'r'
                 WHEN 'f' THEN 'X'
                 WHEN 'a' THEN 'X'
                 WHEN 's' THEN 'U' -- usage only; not create
@@ -130,7 +130,6 @@ BEGIN
         nschema = schema_name
         AND nname = name
         AND ntype = type;
-
     RETURN res;
 END;
 $$ LANGUAGE plpgsql;
@@ -150,6 +149,7 @@ BEGIN
         CASE type
             WHEN 'r' THEN 'TABLE'
             WHEN 'v' THEN 'TABLE'
+            WHEN 'm' THEN 'TABLE'    -- MATERIALIZED VIEW
             WHEN 'S' THEN 'SEQUENCE'
             WHEN 'f' THEN 'FUNCTION'
             WHEN 'a' THEN 'FUNCTION' -- It's actually AGGREGATE, but we have to reference to it as FUNCTION in DDL
@@ -348,6 +348,81 @@ BEGIN
         END IF;
 
         RAISE NOTICE 'Updating permissions of %.% to % (before: %)',
+            CASE obj.kind
+                WHEN 's' THEN 'SCHEMA'
+                WHEN 'T' THEN 'TABLESPACE'
+                ELSE obj.nspname
+            END, obj.name, wanted_acls, obj.acl;
+
+        PERFORM public.grant_aclitems(
+            wanted_acls,
+            CASE COALESCE(array_length(obj.acl, 1), 0)
+                WHEN 0 THEN NULL
+                ELSE obj.acl
+            END,
+            obj.kind,
+            CASE obj.kind
+                WHEN 's' THEN obj.name
+                WHEN 'T' THEN obj.name
+                ELSE obj.nspname || '.' || obj.name
+            END);
+
+    END LOOP;
+
+
+    -- Second loop needed for materialized views new in release 16.2
+    
+    FOR obj IN
+        SELECT
+            c.relname AS name,
+            n.nspname AS nspname,
+            c.relkind AS kind,
+            r.rolname AS ownr,
+            ARRAY[]::aclitem[] AS acl
+        FROM
+            pg_catalog.pg_class c
+		JOIN pg_namespace n ON n.oid = c.relnamespace
+		JOIN pg_roles r ON r.oid = c.relowner
+        WHERE
+             c.relkind = 'm' AND n.nspname = ANY(schemas) LOOP
+
+        SELECT
+            ARRAY[]::aclitem[] ||
+            public.assign_permissions_1(
+                obj.name,
+                obj.nspname,
+                obj.kind::char,
+                obj.ownr)
+            || public.assign_permissions_2(
+                obj.name,
+                obj.nspname,
+                obj.kind::char,
+                obj.ownr)
+            || public.assign_permissions_3(
+                obj.name,
+                obj.nspname,
+                obj.kind::char,
+                obj.ownr)
+            || public.assign_permissions_4(
+                obj.name,
+                obj.nspname,
+                obj.kind::char,
+                obj.ownr)
+            INTO wanted_acls;
+
+        SELECT COALESCE(array_accum(v)::aclitem[], ARRAY[]::aclitem[])
+        INTO wanted_acls
+        FROM UNNEST(wanted_acls) A(v)
+        WHERE v IS NOT NULL;
+
+        SELECT COALESCE(obj.acl, ARRAY[]::aclitem[])
+        INTO obj.acl;
+
+        IF public.equal_aclitem_arrays(obj.acl, wanted_acls) THEN
+            CONTINUE;
+        END IF;
+
+        RAISE NOTICE 'Materialized views updating permissions of %.% to % (before: %)',
             CASE obj.kind
                 WHEN 's' THEN 'SCHEMA'
                 WHEN 'T' THEN 'TABLESPACE'
