@@ -66,7 +66,7 @@ BEGIN
 		return 150;
 	end if;
   
---	For Load, make sure that the TrialId passed as parameter is the same as the trial in stg_subject_proteomics_data
+--	For Load, make sure that the TrialId passed as parameter is the same as the trial in WT_SUBJECT_PROTEOMICS_PROBESET
 --	If not, raise exception
 
 	if runType = 'L' then
@@ -160,7 +160,7 @@ BEGIN
 
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_mirna_logs',rowCt,stepCt,'Done') into rtnCd;
+	select cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ.wt_subject_proteomics_logs',rowCt,stepCt,'Done') into rtnCd;
 
 	
     

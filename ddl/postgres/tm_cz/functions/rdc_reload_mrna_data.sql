@@ -33,18 +33,12 @@ DECLARE
   tablespaceName	varchar(200);
   
     --Audit variables
-  newJobFlag integer(1);
+  newJobFlag numeric(1);
   databaseName varchar(100);
   procedureName varchar(100);
-  jobID bigint;
-  stepCt bigint;
-  
-  --unmapped_patients exception;
-  missing_platform	exception;
-  missing_tissue	EXCEPTION;
-  unmapped_platform exception;
-  
-
+  jobID integer;
+  stepCt integer;
+  rowCt integer;
 
 BEGIN
 	TrialID := upper(trial_id);
@@ -68,20 +62,20 @@ BEGIN
   newJobFlag := 0; -- False (Default)
   jobID := currentJobID;
 
-  PERFORM sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName ;
-  procedureName := $$PLSQL_UNIT;
+  databaseName := 'TM_CZ';
+  procedureName := 'RDC_RELOAD_MRNA_DATA';
 
   --Audit JOB Initialization
   --If Job ID does not exist, then this is a single procedure run and we need to create it
   IF(coalesce(jobID::text, '') = '' or jobID < 1)
   THEN
     newJobFlag := 1; -- True
-    cz_start_audit (procedureName, databaseName, jobID);
+    perform cz_start_audit (procedureName, databaseName, jobID);
   END IF;
     	
 	stepCt := 0;
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_mrna_data',0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_mrna_data',0,stepCt,'Done');
 		
 	--	truncate tmp tables
 
@@ -112,7 +106,7 @@ BEGIN
 	end if;
 	
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
 	
 	insert into wt_subject_microarray_logs 
 	(probeset_id
@@ -123,7 +117,7 @@ BEGIN
 	,sample_id
 	,subject_id
 	)
-	PERFORM distinct gs.probeset_id
+	select distinct gs.probeset_id
 		  ,avg(md.intensity_value)
 		  ,sd.assay_id
 		  ,avg(md.intensity_value)
@@ -145,14 +139,14 @@ BEGIN
 		  ,sd.sample_id
 		  ,sd.subject_id;
 	
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_microarray_logs',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_microarray_logs',rowCt,stepCt,'Done');
 
 	commit;
     
 	EXECUTE('create index tm_wz.wt_subject_mrna_logs_i1 on tm_wz.wt_subject_microarray_logs (trial_name, probeset_id) nologging  tablespace "INDX"');
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_microarray_logs',0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_microarray_logs',0,stepCt,'Done');
 		
 --	calculate mean_intensity, median_intensity, and stddev_intensity per experiment, probe
 
@@ -163,7 +157,7 @@ BEGIN
 	,median_intensity
 	,stddev_intensity
 	)
-	PERFORM d.trial_name 
+	select d.trial_name 
 		  ,d.probeset_id
 		  ,avg(log_intensity)
 		  ,median(log_intensity)
@@ -171,18 +165,18 @@ BEGIN
 	from wt_subject_microarray_logs d 
 	group by d.trial_name 
 			,d.probeset_id;
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_microarray_calcs',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_microarray_calcs',rowCt,stepCt,'Done');
 
 	commit;
 
 	EXECUTE('create index tm_wz.wt_subject_mrna_calcs_i1 on tm_wz.wt_subject_microarray_calcs (trial_name, probeset_id) nologging tablespace "INDX"');
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_microarray_calcs',0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_microarray_calcs',0,stepCt,'Done');
 		
 -- calculate zscore
 
-	insert into wt_subject_microarray_med parallel 
+	insert into wt_subject_microarray_med
 	(probeset_id
 	,intensity_value
 	,log_intensity
@@ -194,7 +188,7 @@ BEGIN
 	,patient_id
 	,sample_id
 	,subject_id)
-	PERFORM d.probeset_id
+	select d.probeset_id
 		  ,d.intensity_value 
 		  ,d.log_intensity 
 		  ,d.assay_id  
@@ -208,8 +202,8 @@ BEGIN
     from wt_subject_microarray_logs d 
 		,wt_subject_microarray_calcs c 
     where d.probeset_id = c.probeset_id;
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_microarray_med',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_microarray_med',rowCt,stepCt,'Done');
 
     commit;
 
@@ -240,7 +234,7 @@ BEGIN
 	,sample_id
 	,subject_id
 	)
-	PERFORM TrialId
+	select TrialId
 	      ,m.assay_id
 	      ,m.probeset_id 
 		  ,case when dataType = 'R' then m.intensity_value
@@ -252,8 +246,8 @@ BEGIN
 		  ,m.sample_id
 		  ,m.subject_id
 	from wt_subject_microarray_med m;
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in DEAPP de_subject_microarray_data',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in DEAPP de_subject_microarray_data',rowCt,stepCt,'Done');
 
   	commit;
 	
@@ -264,45 +258,26 @@ BEGIN
 	EXECUTE('truncate table tm_wz.wt_subject_microarray_med');
 
    	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
 	
     ---Cleanup OVERALL JOB if this proc is being run standalone
 	
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_mrna_data',0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_mrna_data',0,stepCt,'Done');
 
 	IF newJobFlag = 1
 	THEN
-		cz_end_audit (jobID, 'SUCCESS');
+		perform cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 	
 	--select 0 into rtn_code from dual;
 
 	EXCEPTION
-	--when unmapped_patients then
-	--	cz_write_audit(jobId,databasename,procedurename,'No site_id/subject_id mapped to patient_dimension',1,stepCt,'ERROR');
-	--	cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-	--	cz_end_audit (jobId,'FAIL');
-	when missing_platform then
-		cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		cz_end_audit (jobId,'FAIL');
-		--select 16 into rtn_code from dual;
-	when missing_tissue then
-		cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		CZ_END_AUDIT (JOBID,'FAIL');
-		--select 16 into rtn_code from dual;
-	when unmapped_platform then
-		cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_mrna_annotation',1,stepCt,'ERROR');
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		cz_end_audit (jobId,'FAIL');
-		--select 16 into rtn_code from dual;
 	WHEN OTHERS THEN
 		--Handle errors.
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		--End Proc
-		cz_end_audit (jobID, 'FAIL');
+		perform cz_end_audit (jobID, 'FAIL');
 		--select 16 into rtn_code from dual;
 END;
  

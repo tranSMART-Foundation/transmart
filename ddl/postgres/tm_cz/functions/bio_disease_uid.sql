@@ -9,7 +9,7 @@ BEGIN
   -- Creates bio_disease_uid.
 
   RETURN 'DIS:' || coalesce(MESH_CODE, 'ERROR');
-END BIO_DISEASE_UID;
+END;
  
 $_$;
 

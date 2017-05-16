@@ -12,27 +12,19 @@ DECLARE
 
 	--	Define the abstract result set record
 
-	TYPE r_type IS RECORD (
-		rtn_text          varchar(2000)
-	);
-
-	--	Define the abstract result set table
-	TYPE tr_type IS TABLE OF r_type;
-
-	--	Define the result set
-
-	rtn_array tr_type;
+	tabSize integer;
+	tabList character varying(500)[] = array(select tablename from pg_tables where tableowner = 'tm_cz' and tablename like '%_release');
 
 	--	Variables
 
 	tText 			varchar(2000);
 
     --Audit variables
-	newJobFlag integer(1);
+	newJobFlag numeric(1);
 	databaseName varchar(100);
 	procedureName varchar(100);
-	jobID bigint;
-	stepCt bigint;
+	jobID integer;
+	stepCt integer;
 
 	
 BEGIN
@@ -41,42 +33,39 @@ BEGIN
 	newJobFlag := 0; -- False (Default)
 	jobID := -1;
 
-	PERFORM sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName ;
-	procedureName := $$PLSQL_UNIT;
+	databaseName := 'TM_CZ';
+	procedureName := 'I2B2_TRUNCATE_RELEASE_TABLES';
 
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it
 	IF(coalesce(jobID::text, '') = '' or jobID < 1)
 	THEN
 		newJobFlag := 1; -- True
-		cz_start_audit (procedureName, databaseName, jobID);
+		perform cz_start_audit(procedureName, databaseName, jobID);
 	END IF;
 
 	stepCt := 0;
-	cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_truncate_release_tablese',0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_truncate_release_tables',0,stepCt,'Done');
 	stepCt := stepCt + 1;
 
-	tText := 'Select table_name from all_tables where owner = ' || '''' || 'TM_CZ' || '''' || 'and table_name like ' || '''' || '%_RELEASE' || '''';
+	tabSize = array_length(tabList, 1);
 
-	EXECUTE(tText) BULK COLLECT INTO rtn_array;
-
-	for i in rtn_array.first .. rtn_array.last
+	for i in 0 .. (tabSize - 1)
 	loop
-		RAISE NOTICE '%', rtn_array(i).rtn_text;
+		RAISE NOTICE '%', tabList[i];
 
-		if (rtn_array(i)(.rtn_text IS NOT NULL AND .rtn_text::text <> '')) then
-			tText := 'truncate table ' || rtn_array(i).rtn_text;
+		if (tabList[i] IS NOT NULL AND tablist[i] <> '') then
+			tText := 'truncate table ' || tabList[i];
 
 			EXECUTE(tText);
-			tText := 'Truncated ' || rtn_array(i).rtn_text;
-
-			cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Done');
+			tText := 'Truncated ' || tabList[i];
+			perform cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Done');
 
 		end if;
 
 	end loop;
 
-	cz_write_audit(jobId,databaseName,procedureName,'End i2b2_truncate_release_tablese',0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_truncate_release_tables',tabSize,stepCt,'Done');
 	stepCt := stepCt + 1;
 
 END;

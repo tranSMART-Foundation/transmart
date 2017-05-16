@@ -31,12 +31,12 @@ DECLARE
   tableSpace	varchar(50);
    
   --Audit variables
-  newJobFlag integer(1);
+  newJobFlag numeric(1);
   databaseName varchar(100);
   procedureName varchar(100);
-  jobID bigint;
-  stepCt bigint;
-  
+  jobID integer;
+  stepCt integer;
+  rowCt integer;
 
 BEGIN
 
@@ -47,15 +47,15 @@ BEGIN
   newJobFlag := 0; -- False (Default)
   jobID := currentJobID;
 
-  PERFORM sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName ;
-  procedureName := $$PLSQL_UNIT;
+  databaseName := 'TM_CZ';
+  procedureName := 'I2B2_MRNA_INDEX_MAINT';
 
   --Audit JOB Initialization
   --If Job ID does not exist, then this is a single procedure run and we need to create it
   IF(coalesce(jobID::text, '') = '' or jobID < 1)
   THEN
     newJobFlag := 1; -- True
-    cz_start_audit (procedureName, databaseName, jobID);
+    perform cz_start_audit (procedureName, databaseName, jobID);
   END IF;
     	
   stepCt := 0;
@@ -79,7 +79,7 @@ BEGIN
    
 	if runType = 'DROP' then
 		stepCt := stepCt + 1;
-		cz_write_audit(jobId,databaseName,procedureName,'Start de_subject_microarray_data index drop',0,stepCt,'Done');
+		perform cz_write_audit(jobId,databaseName,procedureName,'Start de_subject_microarray_data index drop',0,stepCt,'Done');
 		--	drop the indexes
 		select count(*) 
 		into idxExists
@@ -91,7 +91,7 @@ BEGIN
 		if idxExists = 1 then
 			EXECUTE('drop index deapp.de_microarray_data_idx1');
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Drop de_microarray_data_idx1',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Drop de_microarray_data_idx1',0,stepCt,'Done');
 		end if;
 		
 		select count(*) 
@@ -104,7 +104,7 @@ BEGIN
 		if idxExists = 1 then
 			EXECUTE('drop index deapp.de_microarray_data_idx2');
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Drop de_microarray_data_idx2',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Drop de_microarray_data_idx2',0,stepCt,'Done');
 		end if;
 				
 		select count(*) 
@@ -117,7 +117,7 @@ BEGIN
 		if idxExists = 1 then
 			EXECUTE('drop index deapp.de_microarray_data_idx3');
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Drop de_microarray_data_idx3',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Drop de_microarray_data_idx3',0,stepCt,'Done');
 		end if;
 				
 		select count(*) 
@@ -130,7 +130,7 @@ BEGIN
 		if idxExists = 1 then
 			EXECUTE('drop index deapp.de_microarray_data_idx4');
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Drop de_microarray_data_idx4',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Drop de_microarray_data_idx4',0,stepCt,'Done');
 		end if;
 				
 		select count(*) 
@@ -143,7 +143,7 @@ BEGIN
 		if idxExists = 1 then
 			EXECUTE('drop index deapp.de_microarray_data_idx5');
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Drop de_microarray_data_idx5',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Drop de_microarray_data_idx5',0,stepCt,'Done');
 		end if;
 				
 		select count(*) 
@@ -156,13 +156,13 @@ BEGIN
 		if idxExists = 1 then
 			EXECUTE('drop index deapp.de_microarray_data_idx10');
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Drop de_microarray_data_idx10',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Drop de_microarray_data_idx10',0,stepCt,'Done');
 		end if;
 						
 	else
 		--	add indexes
 		stepCt := stepCt + 1;
-		cz_write_audit(jobId,databaseName,procedureName,'Start de_subject_microarray_data index create',0,stepCt,'Done');
+		perform cz_write_audit(jobId,databaseName,procedureName,'Start de_subject_microarray_data index create',0,stepCt,'Done');
 				
 		select count(*) 
 		into idxExists
@@ -174,7 +174,7 @@ BEGIN
 		if idxExists = 0 then
 			EXECUTE('create index deapp.de_microarray_data_idx1 on deapp.de_subject_microarray_data(trial_name, assay_id, probeset_id) ' || localVar || ' nologging compress tablespace "' || tableSpace || '"'); 
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Create de_microarray_data_idx1',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Create de_microarray_data_idx1',0,stepCt,'Done');
 		end if;
 				
 		select count(*) 
@@ -187,7 +187,7 @@ BEGIN
 		if idxExists = 0 then		
 			EXECUTE('create index deapp.de_microarray_data_idx2 on deapp.de_subject_microarray_data(assay_id, probeset_id) ' || localVar || ' nologging compress tablespace "' || tableSpace || '"');
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Create de_microarray_data_idx2',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Create de_microarray_data_idx2',0,stepCt,'Done');
 		end if;
 				
 		select count(*) 
@@ -200,7 +200,7 @@ BEGIN
 		if idxExists = 0 then		
 			EXECUTE('create ' || bitmapVar || ' index deapp.de_microarray_data_idx3 on deapp.de_subject_microarray_data(assay_id) ' || localVar || ' nologging ' || bitmapCompress || ' tablespace "' || tableSpace || '"');
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Create de_microarray_data_idx3',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Create de_microarray_data_idx3',0,stepCt,'Done');
 		end if;
 				
 		select count(*) 
@@ -213,7 +213,7 @@ BEGIN
 		if idxExists = 0 then
 			EXECUTE('create ' || bitmapVar || ' index deapp.de_microarray_data_idx4 on deapp.de_subject_microarray_data(probeset_id) ' || localVar || ' nologging ' || bitmapCompress || ' tablespace "' || tableSpace || '"');
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Create de_microarray_data_idx4',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Create de_microarray_data_idx4',0,stepCt,'Done');
 		end if;
 
 		if pExists = 0 then
@@ -229,7 +229,7 @@ BEGIN
 			if idxExists = 0 then
 				EXECUTE('create index deapp.de_microarray_data_idx5 on deapp.de_subject_microarray_data(trial_source) ' || localVar || ' nologging ' || bitmapCompress || ' tablespace "' || tableSpace || '"');
 				stepCt := stepCt + 1;
-				cz_write_audit(jobId,databaseName,procedureName,'Create de_microarray_data_idx5',0,stepCt,'Done');
+				perform cz_write_audit(jobId,databaseName,procedureName,'Create de_microarray_data_idx5',0,stepCt,'Done');
 			end if;
 		end if;
 
@@ -245,30 +245,31 @@ BEGIN
 		if idxExists = 0 then
 			execute immediate('create index deapp.de_microarray_data_idx10 on deapp.de_subject_microarray_data(assay_id, subject_id, probeset_id, zscore) ' || localVar || ' nologging compress tablespace "' || tableSpace || '"');
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Create de_microarray_data_idx10',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Create de_microarray_data_idx10',0,stepCt,'Done');
 		end if;
 */
 							
 	end if;
 	
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'End FUNCTION'||procedureName,SQL%ROWCOUNT,stepCt,'Done');
+	get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'End FUNCTION'||procedureName,rowCt,stepCt,'Done');
 	commit;	
 
 	
     ---Cleanup OVERALL JOB if this proc is being run standalone
 	IF newJobFlag = 1
 	THEN
-		cz_end_audit (jobID, 'SUCCESS');
+		perform cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 
 	EXCEPTION
 	WHEN OTHERS THEN
 		--Handle errors.
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		
 		--End Proc
-		cz_end_audit (jobID, 'FAIL');
+		perform cz_end_audit (jobID, 'FAIL');
 end;
  
  

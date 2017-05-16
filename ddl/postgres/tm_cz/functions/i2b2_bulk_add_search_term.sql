@@ -23,11 +23,12 @@ DECLARE
 ******************************************************************/
 
 	--Audit variables
-	newJobFlag integer(1);
+	newJobFlag numeric(1);
 	databaseName varchar(100);
 	procedureName varchar(100);
 	jobID bigint;
 	stepCt bigint;
+	rowCt integer;
 
 	v_keyword_term	varchar(500);
   v_display_category varchar(500);
@@ -45,22 +46,13 @@ DECLARE
 	Lcount 			integer; 
 	Ncount 			integer;
   
-	--v_category_display	varchar2(200);
+	--v_category_display	character varying(200);
 
-  	type keyword_rec  is record
-	(keywordName		varchar(500)),
-   dataCategory varchar(500),
-   UIDPrefix varchar(20),
-   uniqueID varchar(500),
-   sourceCd varchar(500),
-   parentTerm varchar(500),
-   bio_data_id bigint
-	);
+	keyArray tm_lz.lt_src_search_keyword[] = array(select row(keyword, display_category, data_category, UID_prefix, unique_id, source_cd, parent_term, bio_data_id) 
+	  	from tm_lz.lt_src_search_keyword
+    		where (keyword IS NOT NULL AND keyword::text <> ''));
+	keySize integer;
 
-	type keyword_table is table of keyword_rec; 
-	keyword_array keyword_table;
-	
-  
 
 BEGIN
 
@@ -69,124 +61,123 @@ BEGIN
 	jobID := currentJobID;
 
 	PERFORM sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName ;
-	procedureName := $$PLSQL_UNIT;
+	procedureName := 'I2B2_BULK_ADD_SEARCH_TERM';
 
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it
 	IF(coalesce(jobID::text, '') = '' or jobID < 1)
 	THEN
 		newJobFlag := 1; -- True
-		cz_start_audit (procedureName, databaseName, jobID);
+		perform cz_start_audit (procedureName, databaseName, jobID);
 	END IF;
     	
 	--stepCt := 0;
+	--rowCt := 0;
   
-	--cz_write_audit(jobId,databaseName,procedureName,'Start Procedure',SQL%ROWCOUNT,stepCt,'Done');
+	--perform cz_write_audit(jobId,databaseName,procedureName,'Start Procedure',0,stepCt,'Done');
 	--Stepct := Stepct + 1;	
-  
-	  select keyword, display_category, data_category, UID_prefix, unique_id, source_cd, parent_term, bio_data_id
-    bulk collect into keyword_array
-  	from tm_lz.lt_src_search_keyword
-    where (keyword IS NOT NULL AND keyword::text <> '');
 
- 
-	for i in keyword_array.first .. keyword_array.last
+	keySize = array_length(keyArray, 1);
+	for i in 0 .. (keySize - 1)
 	loop
-		v_keyword_term := keyword_array(i).keywordName;
-    v_display_category := keyword_array(i).displayCategory;
-    v_data_category := keyword_array(i).dataCategory;
-    v_prefix := keyword_array(i).UIDPrefix;
-    v_unique_ID := keyword_array(i).uniqueID;
-    v_source_cd := keyword_array(i).sourceCd;
-    v_parent_term := keyword_array(i).parentTerm;
-    v_bio_data_id := keyword_array(i).bio_data_id;
+		v_keyword_term := keyArray[i].keyword;
+    		v_display_category := keyArray[i].display_category;
+    		v_data_category := keyArray[i].data_category;
+    		v_prefix := keyArray[i].UID_prefix;
+    		v_unique_ID := keyArray[i].unique_id;
+    		v_source_cd := keyArray[i].source_cd;
+    		v_parent_term := keyArray[i].parent_term;
+    		v_bio_data_id := keyArray[i].bio_data_id;
     
     --dbms_output.put_line('keyword: ' || v_keyword_term);
 
 
 		if (coalesce(v_display_category::text, '') = '') then
 			v_display_category := v_data_category;
-    end if;
+    		end if;
 
 
-    if (coalesce(v_unique_ID::text, '') = '') then
-      if ((v_prefix IS NOT NULL AND v_prefix::text <> '')) then
-        v_unique_ID := v_prefix || ':' || v_data_category || ':' || v_keyword_term;
-      end if;
-    end if;
+    		if (coalesce(v_unique_ID::text, '') = '') then
+      		   if ((v_prefix IS NOT NULL AND v_prefix::text <> '')) then
+        	      v_unique_ID := v_prefix || ':' || v_data_category || ':' || v_keyword_term;
+      		   end if;
+    		end if;
    
 
 		-- Insert taxonomy term into searchapp.search_keyword
-		-- (searches Search_Keyword with the parent term to find the category to use)
-		Insert Into Searchapp.Search_Keyword 
-		(Data_Category
-		,Keyword
-		,Unique_Id
-		,Source_Code
-		,Display_Data_Category
-    ,Bio_data_id)
-		PERFORM v_data_category
+		-- (searches search_keyword with the parent term to find the category to use)
+		insert into searchapp.search_keyword 
+		(data_category
+		,keyword
+		,unique_id
+		,source_code
+		,display_data_category
+    		,bio_data_id)
+		select v_data_category
 			  ,v_keyword_term
 			  ,v_unique_ID
 			  ,v_source_cd
 			  ,v_display_category
-        ,v_bio_data_id
+        		  ,v_bio_data_id
 		
 		where not exists
 			(select 1 from searchapp.search_keyword x
 			 where upper(x.data_category) = upper(v_data_category)
 			   and upper(x.keyword) = upper(v_keyword_term)
-         and upper(x.bio_data_id) = upper(v_bio_data_id));
-		Cz_Write_Audit(Jobid,Databasename,Procedurename,v_keyword_term || ' added to Searchapp.Search_Keyword',Sql%Rowcount,Stepct,'Done');
+         		   and upper(x.bio_data_id) = upper(v_bio_data_id));
+		get diagnostics rowCt := ROW_COUNT;	
+		perform cz_write_audit(Jobid,Databasename,Procedurename,v_keyword_term || ' added to searchapp.search_keyword',rowCt,Stepct,'Done');
 		Stepct := Stepct + 1;	
 		commit;
   
-		-- Get the ID of the new term in Search_Keyword
-		Select Search_Keyword_Id  Into keyword_Id 
-		From  Searchapp.Search_Keyword 
-		Where Upper(Keyword) = Upper(v_keyword_term)
+		-- Get the ID of the new term in search_keyword
+		select search_keyword_id  into keyword_id 
+		from  searchapp.search_keyword 
+		where upper(keyword) = upper(v_keyword_term)
 		and upper(data_category) = upper(v_data_category)
-    and upper(bio_data_id) = upper(v_bio_data_id);
-		Cz_Write_Audit(Jobid,Databasename,Procedurename,'New search keyword ID stored in Keyword_Id',Sql%Rowcount,Stepct,'Done');
+    		and upper(bio_data_id) = upper(v_bio_data_id);
+		get diagnostics rowCt := ROW_COUNT;
+		perform cz_write_audit(Jobid,Databasename,Procedurename,'New search keyword ID stored in keyword_id',rowCt,Stepct,'Done');
 		Stepct := Stepct + 1;	
 		
-		-- Insert the new term into Searchapp.Search_v_keyword_term 
+		-- Insert the new term into searchapp.search_keyword_term 
 		insert into searchapp.search_keyword_term 
 		(keyword_term
 		,search_keyword_id
 		,rank
 		,term_length)
-		PERFORM UPPER(v_keyword_term)
-			  ,Keyword_Id
+		select upper(v_keyword_term)
+			  ,keyword_id
 			  ,1
-			  ,Length(v_keyword_term) 
+			  ,length(v_keyword_term) 
 		
 		where not exists
 			(select 1 from searchapp.search_keyword_term x
 			 where upper(x.keyword_term) = upper(v_keyword_term)
-			   and x.search_keyword_id = Keyword_Id);
-		Cz_Write_Audit(Jobid,Databasename,Procedurename,'Term added to Searchapp.Search_v_keyword_term',Sql%Rowcount,Stepct,'Done');
+			   and x.search_keyword_id = keyword_id);
+		get diagnostics rowCt := ROW_COUNT;
+		perform cz_write_audit(Jobid,Databasename,Procedurename,'Term added to searchapp.search_keyword_term',rowCt,Stepct,'Done');
 		Stepct := Stepct + 1;	
 		commit;
 
 	end loop;
 
-	Cz_Write_Audit(Jobid,Databasename,Procedurename,'End '|| procedureName,0,Stepct,'Done');
+	perform cz_write_audit(Jobid,Databasename,Procedurename,'End '|| procedureName,0,Stepct,'Done');
 	Stepct := Stepct + 1;  
 
  
      ---Cleanup OVERALL JOB if this proc is being run standalone    
   IF newJobFlag = 1
   THEN
-    cz_end_audit (jobID, 'SUCCESS');
+    perform cz_end_audit (jobID, 'SUCCESS');
   END IF;
   
     EXCEPTION
   WHEN OTHERS THEN
     --Handle errors.
-    cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+    perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     --End Proc
-    cz_end_audit (jobID, 'FAIL');
+    perform cz_end_audit (jobID, 'FAIL');
   
 END;
  

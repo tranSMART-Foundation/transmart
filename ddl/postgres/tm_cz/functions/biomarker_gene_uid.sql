@@ -9,7 +9,7 @@ BEGIN
   -- Creates uid for biomarker_gene.
 
   RETURN 'GENE:' || coalesce(GENE_ID, 'ERROR');
-END biomarker_gene_uid;
+END;
  
 $_$;
 

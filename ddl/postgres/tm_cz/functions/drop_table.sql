@@ -32,7 +32,7 @@ BEGIN
       WHEN OTHERS THEN
       RAISE EXCEPTION 'An error was encountered - % -ERROR- %',SQLSTATE,SQLERRM;
 
-END DROP_TABLE;
+END;
 
 $$;
 

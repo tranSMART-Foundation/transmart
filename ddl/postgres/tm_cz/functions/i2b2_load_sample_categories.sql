@@ -9,11 +9,12 @@ DECLARE
 
 
 	--Audit variables
-	newJobFlag integer(1);
+	newJobFlag numeric(1);
 	databaseName varchar(100);
 	procedureName varchar(100);
-	jobID bigint;
-	stepCt bigint;
+	jobID integer;
+	stepCt integer;
+	rowCt integer;
 
 	--	JEA@20110916	New
 	--	JEA@20120209	Remove insert of sample to patient_dimension
@@ -29,15 +30,15 @@ BEGIN
 	newJobFlag := 0; -- False (Default)
 	jobID := currentJobID;
 
-	PERFORM sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName ;
-	procedureName := $$PLSQL_UNIT;
+	databaseName := 'TM_CZ';
+	procedureName := 'I2B2_LOAD_SAMPLE_CATEGORIES';
 
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it
 	IF(coalesce(jobID::text, '') = '' or jobID < 1)
 	THEN
 		newJobFlag := 1; -- True
-		cz_start_audit (procedureName, databaseName, jobID);
+		perform cz_start_audit (procedureName, databaseName, jobID);
 	END IF;
   
 	stepCt := 0;
@@ -48,7 +49,8 @@ BEGIN
 	where trial_cd in (select distinct trial_cd from lt_src_sample_categories);
 	
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Deleted existing study data in lz_src_sample_categories',SQL%ROWCOUNT,stepCt,'Done');
+	get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Deleted existing study data in lz_src_sample_categories',rowCt,stepCt,'Done');
 	commit;	
 
 /*	
@@ -89,7 +91,8 @@ BEGIN
 		  ) s;
 			
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Added new sample_cds for study in I2B2DEMODATA patient_dimension',SQL%ROWCOUNT,stepCt,'Done');
+	get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Added new sample_cds for study in I2B2DEMODATA patient_dimension',rowCt,stepCt,'Done');
 	commit;
 */
 
@@ -103,7 +106,7 @@ BEGIN
 	,category_cd
 	,category_value
 	)
-	PERFORM distinct s.trial_cd
+	select distinct s.trial_cd
 		  ,s.site_cd
 		  ,s.subject_cd
 		  ,s.sample_cd
@@ -116,21 +119,22 @@ BEGIN
 	;
 		  
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Inserted sample data in lz_src_sample_categories',SQL%ROWCOUNT,stepCt,'Done');
+	get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Inserted sample data in lz_src_sample_categories',rowCt,stepCt,'Done');
 	commit;
 
 	if newjobflag = 1
 	then
-		cz_end_audit (jobID, 'SUCCESS');
+		perform cz_end_audit (jobID, 'SUCCESS');
 	end if;
 
 	exception
 	when others then
 		--Handle errors.
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		
 		--End Proc
-		cz_end_audit (jobID, 'FAIL');
+		perform cz_end_audit (jobID, 'FAIL');
 	
 END;
  

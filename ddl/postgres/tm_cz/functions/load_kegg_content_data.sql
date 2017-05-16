@@ -1,7 +1,8 @@
 --
 -- Name: load_kegg_content_data(); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION load_kegg_content_data() RETURNS void
+SET search_path = tm_cz, pg_catalog;
+CREATE OR REPLACE FUNCTION load_kegg_content_data() RETURNS void
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -57,7 +58,7 @@ begin
   , file_type
   --, etl_id
   )
-  PERFORM distinct
+  select distinct
     bcr.bio_content_repo_id
   , bcr.location||'dbget-bin/show_pathway?'|| bm.primary_external_id
   , 'Data'
@@ -77,7 +78,7 @@ begin
   , bio_data_id
   , content_reference_type
   )
-  PERFORM distinct
+  select distinct
     bc.bio_file_content_id
   , path.bio_marker_id
   , bcr.location_type

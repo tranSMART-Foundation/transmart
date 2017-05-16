@@ -66,7 +66,7 @@ BEGIN
     return list_values;
 
 
-END number_parser;
+END;
  
 $$;
 

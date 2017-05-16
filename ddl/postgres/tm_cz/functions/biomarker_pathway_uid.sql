@@ -9,7 +9,7 @@ BEGIN
   -- Creates uid for biomarker_pathway.
 
   RETURN 'PATHWAY:'|| P_SOURCE || ':' || coalesce(PATHWAY_ID, 'ERROR');
-END biomarker_pathway_uid;
+END;
  
 $_$;
 

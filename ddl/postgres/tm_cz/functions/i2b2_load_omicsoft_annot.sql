@@ -36,8 +36,6 @@ DECLARE
   
   v_row_count     integer;
 	
-	no_new_annotations	exception;
-	
 	
 BEGIN	
 	
@@ -48,25 +46,25 @@ BEGIN
   v_row_count := 0;
 
 
-	PERFORM sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName ;
-	procedureName := $$PLSQL_UNIT;
+	databaseName := 'TM_CZ';
+	procedureName := 'I2B2_LOAD_OMICSOFT_ANNOT';
 
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it
 	IF(coalesce(jobID::text, '') = '' or jobID < 1)
 	THEN
 		newJobFlag := 1; -- True
-		czx_start_audit (procedureName, databaseName, jobID);
+		perform czx_start_audit (procedureName, databaseName, jobID);
 	END IF;
     	
 	stepCt := 1;	
-	czx_write_audit(jobId,databaseName,procedureName,'Starting i2b2_load_omicsoft_annot',0,stepCt,'Done');
+	perform czx_write_audit(jobId,databaseName,procedureName,'Starting i2b2_load_omicsoft_annot',0,stepCt,'Done');
 
   -- load any missing probe_ids into bio_assay_feature_group
   insert into BIOMART.bio_assay_feature_group(
     feature_group_name
   , feature_group_type)
-    PERFORM distinct
+    select distinct
     probe_id
   , 'PROBESET'
     from TM_LZ.lt_src_omicsoft_annot lz
@@ -74,11 +72,13 @@ BEGIN
     
     v_row_count := SQL%ROWCOUNT;
  
-  czx_write_audit(jobId,databaseName,procedureName,'Loaded bio_assay_feature_group with ' || v_row_count || ' records' ,0,stepCt,'Done');
+  perform czx_write_audit(jobId,databaseName,procedureName,'Loaded bio_assay_feature_group with ' || v_row_count || ' records' ,0,stepCt,'Done');
 	stepCt := stepCt + 1;
   
   if v_row_count = 0 then
-		raise no_new_annotations;
+		perform czx_write_audit(jobId, databaseName, procedureName, 'No new feature groups to load - terminating normally',0,stepCt,'Done');
+		perform czx_end_audit(jobId, 'Success');
+		return;
 	end if;
   
   -- need to get platform from analysis
@@ -86,7 +86,7 @@ BEGIN
    bio_assay_feature_group_id
   , bio_marker_id
   , data_table)
-    PERFORM distinct
+    select distinct
       bafg.bio_assay_feature_group_id
     , bm.bio_marker_id -- analysis
     , 'BAAD'
@@ -99,23 +99,20 @@ BEGIN
     
   v_row_count := SQL%ROWCOUNT;
   
-  czx_write_audit(jobId,databaseName,procedureName,'Loaded bio_assay_data_annotation with ' || v_row_count || ' records' ,0,stepCt,'Done');
+  perform czx_write_audit(jobId,databaseName,procedureName,'Loaded bio_assay_data_annotation with ' || v_row_count || ' records' ,0,stepCt,'Done');
 	stepCt := stepCt + 1;
 	
-	czx_write_audit(jobId,databaseName,procedureName,'End i2b2_load_omicsoft_annot',0,stepCt,'Done');
+	perform czx_write_audit(jobId,databaseName,procedureName,'End i2b2_load_omicsoft_annot',0,stepCt,'Done');
 	stepCt := stepCt + 1;
 	
-	czx_end_audit(jobId, 'Success');
+	perform czx_end_audit(jobId, 'Success');
 	
 	exception
-	when no_new_annotations then
-		czx_write_audit(jobId, databaseName, procedureName, 'No new feature groups to load - terminating normally',0,stepCt,'Done');
-		czx_end_audit(jobId, 'Success');
 	when others then
     --Handle errors.
-		czx_error_handler (jobID, procedureName);
+		perform czx_error_handler (jobID, procedureName);
     --End Proc
-		czx_end_audit (jobID, 'FAIL');
+		perform czx_end_audit (jobID, 'FAIL');
     rtn_code := 16;
 	
 END;

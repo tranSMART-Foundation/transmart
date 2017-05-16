@@ -26,7 +26,7 @@ DECLARE
   root_level	integer;
  
   --Audit variables
-  newJobFlag integer(1);
+  newJobFlag numeric(1);
   databaseName varchar(100);
   procedureName varchar(100);
   jobID numeric;
@@ -42,18 +42,18 @@ BEGIN
 	jobID := currentJobID;
 
 	PERFORM sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName ;
-	procedureName := $$PLSQL_UNIT;
+	procedureName := 'I2B2_MOVE_NODE';
   
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it
 	IF(coalesce(jobID::text, '') = '' or jobID < 1)
 	THEN
 		newJobFlag := 1; -- True
-	cz_start_audit (procedureName, databaseName, jobID);
+	perform cz_start_audit (procedureName, databaseName, jobID);
 	END IF;
 
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_move_node',0,stepCt,'Done');  
+	perform cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_move_node',0,stepCt,'Done');  
 	
 	PERFORM parse_nth_value(topNode, 2, '\') into root_node ;
 	
@@ -68,7 +68,7 @@ BEGIN
 		set CONCEPT_PATH = replace(concept_path, old_path, new_path)
 		where concept_path like old_path || '%';
 		stepCt := stepCt + 1;
-		cz_write_audit(jobId,databaseName,procedureName,'Update concept_dimension with new path',SQL%ROWCOUNT,stepCt,'Done'); 
+		perform cz_write_audit(jobId,databaseName,procedureName,'Update concept_dimension with new path',SQL%ROWCOUNT,stepCt,'Done'); 
 		COMMIT;
     
 		--I2B2
@@ -76,7 +76,7 @@ BEGIN
 		set c_fullname = replace(c_fullname, old_path, new_path)
 		where c_fullname like old_path || '%';
 		stepCt := stepCt + 1;
-		cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',SQL%ROWCOUNT,stepCt,'Done'); 
+		perform cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',SQL%ROWCOUNT,stepCt,'Done'); 
 		COMMIT;
   
 		--update level data
@@ -84,7 +84,7 @@ BEGIN
 		set c_hlevel = (length(c_fullname) - coalesce(length(replace(c_fullname, '\')),0)) / length('\') - 2 + root_level
 		where c_fullname like new_path || '%';
 		stepCt := stepCt + 1;
-		cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new level',SQL%ROWCOUNT,stepCt,'Done'); 
+		perform cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new level',SQL%ROWCOUNT,stepCt,'Done'); 
 		COMMIT;
 		
 		--Update tooltip and dimcode
@@ -93,7 +93,7 @@ BEGIN
 		c_tooltip = c_fullname
 		where c_fullname like new_path || '%';
 		stepCt := stepCt + 1;
-		cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new dimcode and tooltip',SQL%ROWCOUNT,stepCt,'Done'); 
+		perform cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new dimcode and tooltip',SQL%ROWCOUNT,stepCt,'Done'); 
 		COMMIT;
 
 		--if topNode != '' then
@@ -103,15 +103,15 @@ BEGIN
 	
 	IF newJobFlag = 1
 	THEN
-		cz_end_audit (jobID, 'SUCCESS');
+		perform cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 
 	EXCEPTION
 	WHEN OTHERS THEN
 		--Handle errors.
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		--End Proc
-		cz_end_audit (jobID, 'FAIL');
+		perform cz_end_audit (jobID, 'FAIL');
 		
 END;
  
