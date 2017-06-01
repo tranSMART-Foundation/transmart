@@ -197,7 +197,7 @@ group by fd.unique_id, f.folder_name, f.description;
 --
 -- Type: VIEW; Owner: BIOMART_USER; Name: BROWSE_ASSAYS_VIEW
 --
-  CREATE OR REPLACE FORCE VIEW "BIOMART_USER"."BROWSE_ASSAYS_VIEW" ("ID", "TITLE", "DESCRIPTION", "MEASUREMENT_TYPE", "PLATFORM_NAME", "VENDOR", "TECHNOLOGY", "GENE", "MIRNA", "BIOMARKER_TYPE") AS 
+  CREATE OR REPLACE FORCE VIEW "BIOMART_USER"."BROWSE_ASSAYS_VIEW" ("ID", "TITLE", "DESCRIPTION", "MEASUREMENT_TYPE", "PLATFORM_NAME", "VENDOR", "TECHNOLOGY", "GENE", "MIRNA", "BIOMARKER_TYPE", "BIOSOURCE") AS
   select DISTINCT fd.unique_id
   , f.folder_name as title
   , f.description
@@ -208,13 +208,14 @@ group by fd.unique_id, f.folder_name, f.description;
   , x.gene
   , x.mirna
   , x.biomarker_type
+  , x.biosource
   from fmapp.fm_folder f
   inner join fmapp.fm_data_uid fd on f.folder_id = fd.fm_data_id
   left outer join amapp.am_tag_association ata on fd.unique_id = ata.subject_uid and ata.object_type = 'BIO_ASSAY_PLATFORM'
   left outer join biomart.bio_data_uid bdu on bdu.unique_id = ata.object_uid
   left outer join biomart.bio_assay_platform bap on bap.bio_assay_platform_id = bdu.bio_data_id
   left outer join
-    (select id, gene, mirna, biomarker_type from
+    (select id, gene, mirna, biomarker_type, biosource from
       (
       select
         fdu.unique_id as id, 'BIO_MARKER_' || SUBSTR( ata.object_uid, 1, INSTR( ata.object_uid, ':' ) - 1 )  as object_type, ata.object_uid as object_uid
@@ -226,7 +227,19 @@ group by fd.unique_id, f.folder_name, f.description;
         where
           ata.object_type in ('BIO_MARKER')
           and ff.folder_type = 'ASSAY'
-      union
+
+    union
+      select
+        fdu.unique_id as id, ata.object_type as object_type, ata.object_uid as object_uid
+        from
+          fmapp.fm_folder ff
+          inner join fmapp.fm_data_uid fdu on ff.folder_id = fdu.fm_data_id
+          inner join amapp.am_tag_association ata on fdu.unique_id = ata.subject_uid
+        where
+          ata.object_type in ('BIOSOURCE')
+          and ff.folder_type = 'ASSAY'
+
+    union
       select
         fdu.unique_id as id, ati.code_type_name as object_type, ata.object_uid as object_uid
       from
@@ -239,9 +252,9 @@ group by fd.unique_id, f.folder_name, f.description;
         and ff.folder_type = 'ASSAY'
     ) pivot (
       listagg(to_char(object_uid), '|') within group (order by object_uid)
-      for object_type in ('BIO_MARKER_GENE' as gene,'BIO_MARKER_MIRNA' as mirna,'ASSAY_TYPE_OF_BM_STUDIED' as biomarker_type)
+      for object_type in ('BIO_MARKER_GENE' as gene,'BIO_MARKER_MIRNA' as mirna,'ASSAY_TYPE_OF_BM_STUDIED' as biomarker_type,'BIOSOURCE' as biosource)
 
     )
     ) x on x.id = fd.unique_id
   where f.folder_type = 'ASSAY' and f.active_ind = 1
-group by fd.unique_id, f.folder_name, f.description, x.gene, x.mirna, x.biomarker_type;
+group by fd.unique_id, f.folder_name, f.description, x.gene, x.mirna, x.biomarker_type, x.biosource;
