@@ -40,7 +40,7 @@ connectToTransmart("http://transmart-demo.thehyve.net/transmart")
 #   Always check what the latest adress is of the transmart demo server and if this matches with the adress filled in in the connectToTransmart function below. 
 #   You can look this up at the foundation's website http://transmartfoundation.org - Go to "PLATFORM" in the menu on top of the page and 
 #   follow the link(s) to the transmart foundation demo instance.
-connectToTransmart("http://75.124.74.64/transmart")
+connectToTransmart("http://postgres-test.transmartfoundation.org/transmart")
 
 # retrieve a list of the available studies in the database:
 studies <- getStudies()
