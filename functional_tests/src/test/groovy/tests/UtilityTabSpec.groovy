@@ -1,13 +1,10 @@
-import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.*
+package tests
 
-import geb.junit4.GebReportingTest
+import tests.GebReportingSpecTransmart
+import spock.lang.Stepwise
 
-import org.junit.Test
-
-import pages.modules.CommonHeaderModule
-
-import functions.Utilities
+import pages.modules.LoginFormModule
+import pages.modules.UtilityModule
 
 import functions.Constants
 
@@ -15,31 +12,28 @@ import pages.LoginPage
 import pages.BrowsePage
 import pages.BrowseResultsPage
 
-import geb.spock.GebSpec
-import geb.spock.GebReportingSpec
-import spock.lang.Stepwise
-
 @Stepwise
-class UtilityTabSpec extends GebReportingSpec {
+class UtilityTabSpec extends GebReportingSpecTransmart {
 
+    def setupSpec() {
+        loginTransmart(Constants.LANDING_PAGE.class)
+    }
+    
     def "start on the Browse tab"() {
 
-        def util = new Utilities()
-
         when:
-        util.goToPageMaybeLogin(BrowsePage)
+        isAt(Constants.LANDING_PAGE.class)
 
         then:
-        assert at(BrowsePage)
-
+        assert at(Constants.LANDING_PAGE.class)
     }
 
     def "click on the Utilities tab"() {
-        commonHeader { module CommonHeaderModule }
+        utility { module UtilityModule }
 
         when:
-        commonHeader.tableMenuUtilities.click()
-        int menuSize = commonHeader.utilitiesMenuSize()
+        utility.tableMenuUtilities.click()
+        int menuSize = utility.utilitiesMenuSize()
 
 // Report a Bug displayed if bugreportURL is configured
 // With 5 items, check all the others
@@ -48,22 +42,22 @@ class UtilityTabSpec extends GebReportingSpec {
         then:
         menuSize == 5 || menuSize == 6
         and:
-        commonHeader.utilitiesHelp()
+        utility.utilitiesHelp()
         and:
-        menuSize == 5 || commonHeader.utilitiesBug()
+        menuSize == 5 || utility.utilitiesBug()
         and:
-        commonHeader.utilitiesContact()
+        utility.utilitiesContact()
         and:
-        commonHeader.utilitiesAbout()
+        utility.utilitiesAbout()
         and:
-        commonHeader.utilitiesPassword()
+        utility.utilitiesPassword()
         and:
-        commonHeader.utilitiesLogout()
+        utility.utilitiesLogout()
     }
 
     def "logout gives login page"() {
         when:
-        commonHeader.utilitiesDoLogout()
+        utility.utilitiesDoLogout()
 
         then:
         assert at(LoginPage)
@@ -71,14 +65,19 @@ class UtilityTabSpec extends GebReportingSpec {
     
     def "login as admin"() {
         when:
-        usernameField.value Constants.ADMIN_USERNAME
-        passwordField.value Constants.ADMIN_PASSWORD
+        loginForm { module LoginFormModule }
+            
+        loginForm.usernameField.value Constants.ADMIN_USERNAME
+        loginForm.passwordField.value Constants.ADMIN_PASSWORD
 
-        loginButton.click()
+        loginForm.loginButton.click()
 
         then:
         assert at(Constants.LANDING_PAGE.class)
 
+    }
+
+    def cleanupSpec() {
     }
 
 }
