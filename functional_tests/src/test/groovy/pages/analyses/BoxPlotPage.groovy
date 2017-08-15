@@ -1,15 +1,15 @@
 package pages.analyses
 
-import pages.AnalyzePage
+import pages.AnalyzeWorkflow
 
-class BoxPlotPage extends AnalyzePage {
+class BoxPlotPage extends AnalyzeWorkflow {
 
     static at = {
         selectedAnalysis == 'Box Plot with ANOVA'
     }
 
     static content = {
-        def parentContent = AnalyzePage.content
+        def parentContent = AnalyzeWorkflow.content
         parentContent.delegate = delegate
         parentContent.call()
 
