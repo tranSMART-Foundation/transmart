@@ -30,13 +30,16 @@ class HighDimensionPopupModule extends Module {
             $('div.search-item').findAll {
                 WebElement element = it.firstElement()
                 element.location.x != 0
-            }.collect { new SearchItem(navigator: it) }
+            }
+        }
+        keywordKeyword { keyword ->
+            keyword.find('b').text()
         }
     }
 
     void selectSearchItem(String keyword) {
         searchKeywords.find {
-            it.searchKeyword == keyword
+            keywordKeyword(it) == keyword
         }.click()
     }
 

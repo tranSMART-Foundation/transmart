@@ -5,15 +5,27 @@ import geb.Module
 import geb.navigator.Navigator
 import org.openqa.selenium.WebElement
 
+import functions.Constants
+
 /**
- * Created by price on 18-11-2014.
+ * Created by peter.rice@transmartfoundation.org on 18-nov-2014.
  */
 class CommonHeaderModule extends Module {
+
+    static base = { $('div#header-div') }
+
+    static content = {
+        // selected common header tab
+        currentMenuItem (wait: true)     { $('th.menuVisited') }
+        // table of all common header tabs
+        tableMenu                        { $('table#menuLinks') }
+    }
+
 
 // test which tab is selected and return name
 
 // check through menu table - check names, find selected name,
-// search for any passed in option e.g. to check for metacore plugin.
+// check for items hidden by Config.groovy
 
     final static String TOPMENU_BROWSE = 'Browse'
     final static String TOPMENU_ANALYZE = 'Analyze'
@@ -24,30 +36,27 @@ class CommonHeaderModule extends Module {
     final static String TOPMENU_ADMIN = 'Admin'
     final static String TOPMENU_UTILITIES = 'Utilities'
 
-    final static List<String> ALL_TOPMENU =
-        ImmutableList.of(TOPMENU_BROWSE, TOPMENU_ANALYZE,
-                         TOPMENU_SAMPLE_EXPLORER, TOPMENU_GENE_SIGNATURE_LISTS,
-                         TOPMENU_GWAS, TOPMENU_UPLOAD_DATA,
-//                         TOPMENU_ADMIN,
-                         TOPMENU_UTILITIES)
+    private List<String> ALL_TOPMENU = []
 
-    final static String UTILITIES_HELP = 'Help'
-    final static String UTILITIES_CONTACT = 'Contact Us'
-    final static String UTILITIES_ABOUT = 'About'
-    final static String UTILITIES_PASSWORD = 'Change My Password'
-    final static String UTILITIES_LOGOUT = 'Log Out'
 
-    final static List<String> ALL_UTILITIESMENU =
-        ImmutableList.of(UTILITIES_HELP, UTILITIES_CONTACT, UTILITIES_ABOUT, UTILITIES_PASSWORD, UTILITIES_LOGOUT)
+    def CommonHeader() {
+        ALL_TOPMENU.add(TOPMENU_BROWSE)
+        ALL_TOPMENU.add(TOPMENU_ANALYZE)
+        ALL_TOPMENU.add(TOPMENU_SAMPLE_EXPLORER)
+        ALL_TOPMENU.add(TOPMENU_GENE_SIGNATURE_LISTS)
+        ALL_TOPMENU.add(TOPMENU_GWAS)
+        ALL_TOPMENU.add(TOPMENU_UPLOAD_DATA)
+//        ALL_TOPMENU.add(TOPMENU_ADMIN)
+        ALL_TOPMENU.add(TOPMENU_UTILITIES)
+    }
 
- 
     private List<String> headerList() {
         def res = ImmutableList.builder()
 
         tableMenu.find('tr').eachWithIndex { tr, trIndex ->
             if (trIndex == 0) {
                 def expectedTopMenu = ALL_TOPMENU.iterator()
-                def rowHeader = tr.find('th').text()
+                //def rowHeader = tr.find('th').text()
                 String nextTop
                 String thText
                 tr.children('th').each { th ->
@@ -61,120 +70,8 @@ class CommonHeaderModule extends Module {
                     }
                 }
             } else {
-                assert trIndex == 0
+                assert trIndex == 0 : "Multiple top menus"
             }
-        }
-
-        res.build()
-    }
-
-    private utilitiesAbout() {
-        def util = utilitiesMenuFind('About')
-        assert util : "'About' not found in utility menu"
-
-        String utilText = withAlert(wait:true) {util.click()}
-        assert utilText.startsWith('tranSMART v1.2')
-//      assert utilText.startsWith('tranSMART v1.2.rev2-eTI (PostgreSQL)')
-
-// clicking has hidden the utilities menu
-// although the alert has been faked
-// we need to get it back to able to continue
-        tableMenuUtilities.click()
-    }
-     
-    private Boolean utilitiesContact() {
-        def util = utilitiesMenuFind('Contact Us')
-        assert util : "'Contact Us' not found in utility menu"
-
-        String utilHref = util.getAttribute('href')
-        assert utilHref.startsWith('mailto:')
-        true
-    }
-     
-     
-    private Boolean utilitiesPassword() {
-        def util = utilitiesMenuFind('Change My Password')
-        assert util  : "'Change My Password' not found in utility menu"
-
-        String utilHref = util.getAttribute('href')
-        assert utilHref.startsWith('http://')
-        true
-    }
-     
-    private Boolean utilitiesHelp() {
-        def util = utilitiesMenuFind('Help')
-        assert util : "'Help' not found in utility menu"
-
-        String utilHref = util.getAttribute('href')
-        assert utilHref.startsWith('http://')
-        true
-    }
-     
-    private Boolean utilitiesBug() {
-        def util = utilitiesMenuFind('Report a Bug')
-        assert util : "'Report a Bug' not found in utility menu"
-
-        String utilHref = util.getAttribute('href')
-        assert utilHref.startsWith('http://')
-        true
-    }
-     
-    private void utilitiesDoLogout() {
-        def util = utilitiesMenuFind('Log Out')
-        assert util  : "'Log Out' not found in utility menu"
-
-        util.click()
-    }
-     
-    private Boolean utilitiesLogout() {
-        def util = utilitiesMenuFind('Log Out')
-        assert util  : "'Log Out' not found in utility menu"
-
-        String utilHref = util.getAttribute('href')
-        assert utilHref.startsWith('http://')
-        assert utilHref.endsWith('/transmart/login/forceAuth')
-        true
-    }
-     
-    private int utilitiesMenuSize() {
-
-        int ret = 0
-
-        utilitiesMenu.find('li a').each { li ->
-            ret++;
-        }
-
-        ret
-    }
-    
-    private Navigator utilitiesMenuFind(String util) {
-
-        Navigator ret = null
-
-        utilitiesMenu.find('li a').each { li ->
-            if(li.text() == util) {
-                ret = li
-            }
-        }
-
-        if(!ret){
-            println "utilitiesMenuFind '${util}' not found"
-        }
-        
-        ret
-    }
-    
-    private List<String> utilitiesList() {
-        def res = ImmutableList.builder()
-
-        def expectedUtilitiesMenu = ALL_UTILITIESMENU.iterator()
-        String nextUtility
-        String liText
-        utilitiesMenu.find('li a').eachWithIndex { li, liIndex ->
-            nextUtility = expectedUtilitiesMenu.next()
-            liText = li.text()
-            assert liText == nextUtility : "Unexpected utilitiesmenu item"
-            res.add(liText)
         }
 
         res.build()
@@ -186,7 +83,7 @@ class CommonHeaderModule extends Module {
 
         tableMenu.find('tr').eachWithIndex { tr, trIndex ->
             if (trIndex == 0) {
-                def rowHeader = tr.find('th').text()
+                //def rowHeader = tr.find('th').text()
                 String thText
                 tr.children('th').each { th ->
                     thText = th.text()
@@ -195,6 +92,10 @@ class CommonHeaderModule extends Module {
                     }
                 }
             }
+            else {
+                println "Found tableMenu[${trIndex}] testing for '${tabName}'"
+            }
+
         }
 
         if(!ret){
@@ -204,28 +105,7 @@ class CommonHeaderModule extends Module {
         ret
     }
 
-    static content = {
-        commonheader(wait: true)         { $() }
-        
-        currentMenuItem(required: false) { $('th', class: 'menuVisited') }
-
-        divHeader                        { $('div#header-div') }
-        tableMenu                        { $('table#menuLinks') }
-        tableMenuUtilities               { $('#utilitiesMenuButton') }
-        utilitiesMenu                    { $('ul#utilitiesMenuList') }
-
-/*
-        listCommonheaderTab() {
-            $('th', class: 'menuDetail').findAll{
-                WebElement element = it
-                true
-            }
-        }.collect { new SearchItem(navigator: it) }
-*/
-
-    }
-
-    Navigator headerTab () { tableMenu().find('th', class: 'menuVisited') }
-    Navigator listHeaderTab() { tablemenu().find('th') }
+    Navigator listHeaderTab() { tableMenu().find('th') }
     Navigator findHeaderTab (String tabName) { listHeaderTab().find(tabName) }
+
 }
