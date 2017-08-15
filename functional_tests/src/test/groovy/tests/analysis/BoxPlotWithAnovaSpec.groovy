@@ -1,28 +1,37 @@
 package tests.analysis
 
-import org.junit.Test
+import tests.GebReportingSpecTransmart
+import spock.lang.Stepwise
 
 import functions.Constants
 
-import pages.AnalyzePage
+import pages.AnalyzeQuery
+import pages.AnalyzeWorkflow
+import pages.modules.AnalyzeTabModule
 import pages.analyses.BoxPlotPage
-
-import tests.CheckLoginPageAbstract
 
 import static org.hamcrest.Matchers.containsInAnyOrder
 import static org.hamcrest.Matchers.is
 
-public class BoxPlotWithANOVATests extends CheckLoginPageAbstract{
+@Stepwise
+class BoxPlotWithAnovaSpec extends GebReportingSpecTransmart {
 
-    @Test
-    void boxPlotTest() {
+    def setupSpec() {
+        loginTransmart(AnalyzeQuery)
+    }
 
+    def "Execute boxplot"() {
+
+        when:
+        println "executing boxPlotTest"
         def params = setParams()
 
         setUpAnalysisSubPage 'Box Plot with ANOVA', params
 
         runAnalysis params
+        waitFor(60 * 3) { resultOutput } // may need to wait up to 3 min for result!
 
+        then:
         verifyPage()
     }
 
@@ -36,29 +45,40 @@ public class BoxPlotWithANOVATests extends CheckLoginPageAbstract{
 
     private void runAnalysis(Map params) {
 
-        dragNodeToBox params.variable, independentVariableBox
+        println "runAnalysis dragNodeToBox ${params.variable}, independentVariableBox"
+        workflowDragNodeToBox params.variable, independentVariableBox
 
-        dragNodeToBox params.categoryVariableDragged, categoryBox,
+        println "workflowDragNodeToBox ${params.categoryVariableDragged}, categoryBox, "+
+                "containsInAnyOrder(params.categoryVariables.collect { is it as String })"
+        workflowDragNodeToBox params.categoryVariableDragged, categoryBox,
                 containsInAnyOrder(params.categoryVariables.collect { is it as String })
 
+        println "runButton.click()"
         runButton.click()
+        println "waitFor results"
         waitFor(8, message: "SurvivalAnalysis RunButton.click() - timed out") { resultOutput } // wait up to 8 seconds for result
     }
 
     private setUpAnalysisSubPage(String analysisHeader, Map params) {
-        goToPageMaybeLogin AnalyzePage
+        println "dragNodeToSubset ${params.subsetNode}, 1"
+        
+        queryDragNodeToSubset params.subsetNode, 1
 
-        dragNodeToSubset params.subsetNode, 1, 1
-
+        analyzeTab.tabWorkflows.click()
+        println "selectAnalysis analysisHeader"
         selectAnalysis analysisHeader
+        println "page BoxPlotPage"
         page BoxPlotPage
+
+        println "verifyAt()"
         verifyAt()
 
+        println "waitFor analysisWidgetHeader"
         waitFor { analysisWidgetHeader }
     }
 
     private setParams() {
-
+        println "executing setParams"
         String diagnosisKey = "${Constants.GSE8581_KEY}Endpoints\\Diagnosis\\"
 
         return [
@@ -83,4 +103,7 @@ public class BoxPlotWithANOVATests extends CheckLoginPageAbstract{
                 ]]
     }
 
+    def cleanupSpec() {
+    }
+    
 }
