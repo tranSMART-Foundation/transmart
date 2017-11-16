@@ -76,7 +76,7 @@ class TerminalConceptVariablesDataQuery {
             criteriaBuilder.in('patient',  Lists.newArrayList(patients))
         }
 
-        criteriaBuilder.in('conceptCode', clinicalVariables*.code)
+        clinicalVariables.collate(1000).each { criteriaBuilder.in('conceptCode', it*.code) } // used to avoid "ORA-01795: maximum number of expressions in a list is 1000" thanks to https://stackoverflow.com/a/21837744/535203
 
         criteriaBuilder.scroll ScrollMode.FORWARD_ONLY
     }
@@ -121,10 +121,10 @@ class TerminalConceptVariablesDataQuery {
 
             or {
                 if (conceptPaths.keySet()) {
-                    'in' 'conceptPath', conceptPaths.keySet()
+                    conceptPaths.keySet().asList().collate(1000).each { 'in' 'conceptPath', it } // used to avoid "ORA-01795: maximum number of expressions in a list is 1000" thanks to https://stackoverflow.com/a/21837744/535203
                 }
                 if (conceptCodes.keySet()) {
-                    'in' 'conceptCode', conceptCodes.keySet()
+                    conceptCodes.keySet().asList().collate(1000).each { 'in' 'conceptCode', it } // used to avoid "ORA-01795: maximum number of expressions in a list is 1000" thanks to https://stackoverflow.com/a/21837744/535203
                 }
             }
         }
