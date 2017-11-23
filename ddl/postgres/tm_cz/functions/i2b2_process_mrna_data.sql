@@ -757,7 +757,8 @@ BEGIN
 		  and pd.source_cd = sourceCD
 		  and coalesce(pd.site_id,'') = coalesce(upd.site_id,'')
 		  and pd.subject_id = upd.subject_id
-		  and pd.sample_cd = upd.sample_cd;
+		  and pd.sample_cd = upd.sample_cd
+		  and pd.platform = 'MRNA_AFFYMETRIX';
 		get diagnostics rowCt := ROW_COUNT;
 		exception
 		when others then
@@ -910,7 +911,7 @@ BEGIN
 	--	check if all records from lt_src_mrna_subj_samp_map were added/updated
 	
 	if sCount <> pCount then
-	stepCt := stepCt + 1;
+	        stepCt := stepCt + 1;
 		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Not all records in lt_src_mrna_subj_samp_map inserted/updated in de_subject_sample_mapping',0,stepCt,'Done') into rtnCd;
 		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
 		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
