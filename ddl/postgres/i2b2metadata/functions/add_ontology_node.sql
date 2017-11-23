@@ -80,7 +80,7 @@ BEGIN
     RAISE NOTICE 'node type: %, data type: %, concept code: %', is_leaf, data_type, concept_code;
   
 ------------------------------------------------------------
--- obtail the proper level for the node by finding the 
+-- obtain the proper level for the node by finding the
 -- level of its parent and adding one.
 ------------------------------------------------------------
     select c_hlevel+1 into hlevel
