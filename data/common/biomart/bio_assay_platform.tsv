@@ -102,7 +102,7 @@
 "606"	"Agi_G4502A"	""	"TCGA Agi_G4502A"	"Agi_G4502A"	"Agi_G4502A"	"Homo sapiens"	"Agilent Technologies"	"Transcription Profiling"	"DNA Microarray"
 "607"	"."	""	"desc"	"Agi_UNC_244"	"Agi_UNC_244"	"Homo sapiens"	"Agilent Technologies"	"Transcription Profiling"	"DNA Microarray"
 "608"	"Agilent 180k"	""	"Agilent 180k CGH array"	"180k-region"	"180k-region"	"Homo sapiens"	"Agilent Technologies"	"Chromosomal Region"	"Nucleotide sequencing"
-"609"	"Agilent 244k"	""	"Agilent 244k CGH array"	"Agi_G4502A"	"Agi_G4502A"	"Homo sapiens"	"Agilent Technologies"	"Chromosomal region"	"Nucleotide sequencing"
+"609"	"Agilent 244k"	""	"Agilent 244k CGH array"	"244k-region"	"244k-region"	"Homo sapiens"	"Agilent Technologies"	"Chromosomal region"	"Nucleotide sequencing"
 "610"	"Cell-line_mirna"	""	"Cell-line_mirna"	"Cell-line_mirna"	"Cell-line_mirna"	"Homo sapiens"	"Other"	"MicroRNA Profiling"	"qPCR"
 "611"	"Cell-line_proteomics"	""	"Cell-line_proteomics"	"Cell-line_proteomics"	"Cell-line_proteomics"	"Homo sapiens"	"Other"	"Protein expression profiling"	"Mass spectrometry"
 "612"	"GPL5175 subset"	""	"GPL5175 subset"	"ExonArray-GPL5175subset"	"GPL5175subset"	"Homo sapiens"	"Affymetrix, Inc."	"Transcription Profiling"	"DNA Microarray"
