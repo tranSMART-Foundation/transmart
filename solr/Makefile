@@ -74,7 +74,7 @@ start: solr_home
 	java -jar start.jar
 
 $(FULL_IMPORT_TARGETS):
-	curl -f "http://localhost:8983/solr/$(patsubst %_full_import,%,$@)/dataimport?command=full-import"
+	curl -f "http://localhost:8983/solr/$(patsubst %_full_import,%,$@)/dataimport?command=full-import&clean=true"
 
 $(DELTA_IMPORT_TARGETS):
 	curl -f "http://localhost:8983/solr/$(patsubst %_delta_import,%,$@)/dataimport?command=delta-import"
