@@ -4,7 +4,7 @@ modules = {
         dependsOn 'jquery', 'jquery-ui', 'jquery-plugins', 'extjs', 'session_timeout'
 
         /* and files in transmartApp */
-        resource url: 'css/main.css',                                 disposition: 'head'
+/*        resource url: 'css/main.css',                                 disposition: 'head'*/
         resource url: 'js/facetedSearch/facetedSearchBrowse.js',      disposition: 'head'
         resource url: 'js/maintabpanel.js',                           disposition: 'head'
         resource url: 'js/datasetExplorer/protovis/protovis-r3.2.js', disposition: 'head'
