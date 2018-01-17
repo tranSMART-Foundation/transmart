@@ -35,12 +35,20 @@
                 <g:if test="${folder.folderType.equalsIgnoreCase(FolderType.PROGRAM.name())}">
                     <span name="${folder.id}" class="greybutton buttonicon addstudy">Add new study</span>
                     <span name="${folder.id}" class="greybutton buttonicon addfolder">Add new folder</span>
+		    <g:if test="S{grailsApplication.config.ui.browse.delete.allowprogram}">
+		        <span name="${folder.id}" data-parent="${folder.parent?.id}" class="greybutton buttonicon deletefolder">
+                            Delete this ${folder.folderType.toLowerCase()}</span>
+                    </g:if>
                 </g:if>
                 
                 <g:if test="${folder.folderType.equalsIgnoreCase(FolderType.STUDY.name())}">
                     <span name="${folder.id}" class="greybutton buttonicon addanalysis">Add new analysis</span>
                     <span name="${folder.id}" class="greybutton buttonicon addassay">Add new assay</span>
                     <span name="${folder.id}" class="greybutton buttonicon addfolder">Add new folder</span>
+		    <g:if test="S{grailsApplication.config.ui.browse.delete.allowstudy}">
+		        <span name="${folder.id}" data-parent="${folder.parent?.id}" class="greybutton buttonicon deletefolder">
+                            Delete this ${folder.folderType.toLowerCase()}</span>
+		    </g:if>
                 </g:if>
                         
                 <g:if test="${folder.folderType.equalsIgnoreCase(FolderType.FOLDER.name()) ||
