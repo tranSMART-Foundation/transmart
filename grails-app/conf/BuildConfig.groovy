@@ -1,4 +1,4 @@
-/*************************************************************************   
+/*************************************************************************
 * Copyright 2008-2012 Janssen Research & Development, LLC.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,7 +62,7 @@ grails.project.dependency.resolution = {
 
         /* serializable ImmutableMap only on guava 16 */
         compile group: 'com.google.guava', name: 'guava', version: '16.0-dev-20140115-68c8348'
-        compile 'org.transmartproject:transmart-core-api:16.2-SNAPSHOT'
+        compile 'org.transmartproject:transmart-core-api:16.2'
 
         /* compile instead of test due to technical limitations
          * (referenced from resources.groovy) */

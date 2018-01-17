@@ -27,7 +27,14 @@
             %{--Display independent variable--}%
             <div id="displaydivIndependentVariable" class="independentVars"></div>
 
-            <label for="txtMaxDrawNumber">Max rows to display:</label>
+            <label for="txtMaxDrawNumber">
+                Max rows to display:
+                <g:if test="${grailsApplication.config.org.transmartproject.helpUrls.heatMapMaxRows}">
+                    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.heatMapMaxRows}">
+                        <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+                    </a>
+                </g:if>
+            </label>
             <input type="text" id="txtMaxDrawNumber"  value="50"/>
 
         </fieldset>

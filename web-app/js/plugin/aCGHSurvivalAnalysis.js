@@ -159,7 +159,7 @@ var SurvivalAnalysisInputBar = Ext.extend(GenericAnalysisInputBar, {
             isDroppable: true,
             notifyFunc: dropOntoCategorySelection,
             toolTipTitle: 'Tip: Censoring Variable',
-            toolTipTxt: 'Drag and drop survival status (e.g alive or dead).'
+            toolTipTxt: 'Drag categorical data node indicating status subjects in which the selected event in survival time did NOT happen (for example, for Overall Survival Time, Censoring Variable to select is ‘Alive’).'
         },{
             title: 'Alteration Type',
             id:  'sa-input-alteration',
