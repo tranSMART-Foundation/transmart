@@ -62,7 +62,7 @@ interface HighDimensionDataTypeResource<R extends DataRow<AssayColumn, ? /* depe
      * mRNA, one could want to retrieve the raw intensities or some form of
      * normalized data.
      * @return the request result set
-     * @throws EmptySetException iif no assays can be found
+     * @throws EmptySetException if no assays can be found
      */
     TabularResult<AssayColumn, R> retrieveData(List<AssayConstraint> assayConstraints,
                                                  List<DataConstraint> dataConstraints,
@@ -147,7 +147,7 @@ interface HighDimensionDataTypeResource<R extends DataRow<AssayColumn, ? /* depe
      * Used to match assays (via their platforms) to data types.
      *
      * @param platform the platform to match
-     * @return true iif the the platform and this data type match
+     * @return true if the the platform and this data type match
      */
     boolean matchesPlatform(Platform platform)
 
