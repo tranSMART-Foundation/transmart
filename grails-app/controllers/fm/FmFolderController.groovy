@@ -818,7 +818,7 @@ class FmFolderController {
                     log.info("CREATEDATATABLE::FIXED TYPE == " + amTagItem.tagItemType + " ID = " + amTagItem.id + " " + amTagItem.displayName)
 
                     if (dataObject.hasProperty(amTagItem.tagItemAttr)) {
-                        //log.info ("CREATEDATATABLE::FIXED COLUMNS == " + amTagItem.tagItemAttr + " " + amTagItem.displayName)
+                        log.info ("CREATEDATATABLE::FIXED COLUMNS == " + amTagItem.tagItemAttr + " " + amTagItem.displayName)
                         table.putColumn(amTagItem.id.toString(),
                                         new ExportColumn(amTagItem.id.toString(), amTagItem.displayName, "", 'String'));
                     } else {
