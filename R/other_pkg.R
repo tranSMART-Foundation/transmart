@@ -19,13 +19,13 @@ bioclite.packages <-
 								  "AnnotationDbi", "QDNAseq"));
 if (length(bioclite.packages))
 	biocLite(bioclite.packages);
-# 1.10.0 version contains an importent fix.
+# 1.10.0 version contains an important fix.
 # We still need to install the old package with biocLite first to install all dependencies.
 # For some reasons below installations does not take care of installing dependencies first.
 download.file(
-		url="http://bioconductor.org/packages/release/bioc/src/contrib/QDNAseq_1.10.0.tar.gz",
-		dest="/tmp/QDNAseq_1.10.0.tar.gz", method="internal");
-install.packages("/tmp/QDNAseq_1.10.0.tar.gz",
+		url="http://bioconductor.org/packages/release/bioc/src/contrib/QDNAseq_1.14.0.tar.gz",
+		dest="/tmp/QDNAseq_1.14.0.tar.gz", method="internal");
+install.packages("/tmp/QDNAseq_1.14.0.tar.gz",
 		repos=NULL, type="source");
 
 if (length(intersect(new.packages, c("CGHtest")))) {
