@@ -9,7 +9,7 @@ BEGIN
   -- Creates uid for bio_assay_platform.
 
   RETURN 'BAP:' || coalesce(PLATFORM_NAME, 'ERROR');
-END bio_assay_platform_uid;
+END;
 
 $_$;
 

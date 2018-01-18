@@ -9,7 +9,7 @@ BEGIN
   -- Creates uid for bio_experiment.
 
   RETURN 'EXP:' || coalesce(PRIMARY_ID, 'ERROR');
-END bio_experiment_uid;
+END;
  
 $_$;
 

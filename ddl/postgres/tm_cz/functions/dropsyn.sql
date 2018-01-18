@@ -20,7 +20,7 @@ BEGIN
     EXECUTE sqlstr;
     COMMIT;
   END LOOP;
-END dropsyn;
+END;
 
 $$;
 

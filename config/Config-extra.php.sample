@@ -26,6 +26,10 @@ EOD
 //com.recomdata.providerName = "tranSMART Foundation"
 //com.recomdata.providerURL = "http://www.transmartfoundation.org"
 
+// image location by default under /transmart/static e.g. images/project_logo.png
+//com.recomdata.providerLogo = "/etriksbanner.png"
+//com.recomdata.projectLogo = "/sshtunnel.png"
+
 // Contact e-mail
 //com.recomdata.contactUs = "support@mycompany.com"
 //com.recomdata.adminEmail = "support@mycompany.com"
@@ -75,6 +79,53 @@ dataExport {
 //com.recomdata.passwordstrength.description =
 //    'It should contain a minimum of 8 characters including at least ' +
 //    '1 upper and 1 lower case letter, 1 digit and 1 special character.'
+
+// Plugins to be enabled
+
+/* {{{ Metacore analytics */
+
+//com.thomsonreuters.transmart.metacoreAnalyticsEnable = true
+//com.thomsonreuters.transmart.demoEnrichmentURL = "http://pathwaymaps.com"
+//com.thomsonreuters.transmart.demoMapBaseURL = "http://pathwaymaps.com/maps/"
+
+/* }}} */
+
+/* {{{ galaxy plugin (blend4j) */
+
+//com.galaxy.blend4j.galaxyEnabled = true
+//com.galaxy.blend4j.galaxyURL = "http://usegalaxy.org/"
+
+/* }}} */
+
+/* {{{ GWAS PLINK Configuration */
+
+//// need the local path to the plink executable
+//grails.plugin.transmartGwasPlink.enabled=true
+//grails.plugin.transmartGwasPlink.plinkPath= '/usr/bin/plink/plink'
+
+/* }}} */
+
+/* {{{ XNAT viewer Configuration */
+
+//// create a test user at central.xnat.org and use the user/password
+//// to access public data, or set up a private xnat server and provide
+//// the access credentials
+//org.xnat.domain = 'central.xnat.org'
+//org.xnat.username = 'xnatuser'
+//org.xnat.password = 'xnatpassword'
+
+/* }}} */
+
+/* {{{ XNATimport plugin Configuration */
+
+//// username and password are prompted for by the plugin
+//// here we need the directory to use for ETL
+//org.transmart.data.location = "/path/to/transmart-data"
+//org.transmart.importxnatplugin.location = "/home/transmart/transmart-xnat-importer-plugin/scripts"
+//org.transmart.xnatImporterEnable = true
+
+/* }}} */
+
 
 // You MUST leave this at the end
 // Do not move it up, otherwise syntax errors may not be detected

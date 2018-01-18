@@ -9,21 +9,24 @@ DECLARE
    start_pos 		bigint;
    end_pos   		bigint;
    string_length 	integer;
-   string_tokens 	varchar(32676);
+   string_tokens 	character varying(32676);
    counter 			integer;
-   token_value 		varchar(1000);
-   text_delimiter 	char(1);
+   token_value 		character varying(1000);
+   text_delimiter 	character varying(1);
    noInitCap 		boolean;
 
    --	create array to hold strings that will not be initcapped
 
-	type excluded_aat is table of category_path_excluded_words%ROWTYPE index by integer;
-	excludedText excluded_aat;
-	exclCt integer;
+   cat_path_exc_rec record;
+
+   excludedText tm_cz.category_path_excluded_words[] = array(select row(excluded_text) from tm_cz.category_path_excluded_words);	
+
+   exclCt integer;
+   exclSize integer;
 
    --	text to return
-   initcap_text varchar(1000);
 
+   initcap_text character varying(1000);
 
 BEGIN
   -------------------------------------------------------------------------------
@@ -35,14 +38,10 @@ BEGIN
    -- Copyright ? 2009 Recombinant Data Corp.
    -------------------------------------------------------------------------------
 
-	--	Load exclusion text
-
-	select excluded_text
-		bulk collect into excludedText
-		from category_path_excluded_words;
-
-	--	Add a delimiter to the end of the string so we dont lose last value and
+	--	Add a delimiter to the end of the string so we don't lose last value and
 	--	surround \ with spaces
+
+	exclSize := array_length(excludedText, 1);
 
 	text_delimiter := ' ';
 	string_tokens := replace(text_to_parse,'\',' \ ') || text_delimiter;
@@ -52,7 +51,7 @@ BEGIN
 
 	--set start and end for first token
 	start_pos := 1;
-	end_pos   := instr(string_tokens,text_delimiter,1,1);
+	end_pos   := tm_cz.instr(string_tokens,text_delimiter,1,1);
 	counter := 1;
 
 	LOOP
@@ -62,17 +61,18 @@ BEGIN
 		--	check if token_value is in excludedText, if yes, set indicator
 
 		noInitCap := false;
-		exclCt := excludedText.FIRST;
+		exclCt := 0;
 
 		if (substring(token_value from 1 for 1) = '(' and substring(token_value from length(token_value) for 1) = ')' ) then
 			noInitCap := true;
 		else
-		while ((exclCt IS NOT NULL AND exclCt::text <> '') and not noInitCap)
+
+			while ((exclCt < exclSize) and not noInitCap)
 			loop
-				if token_value = excludedText(exclCt).excluded_text then
+				if token_value = excludedText[exclCt].excluded_text then
 					noInitCap := true;
 				end if;
-				exclCt := excludedText.NEXT (exclCt);
+				exclCt := exclCt + 1;
 			end loop;
 		end if;
 
@@ -92,14 +92,14 @@ BEGIN
 			start_pos := end_pos + 1;
 			--	increment counter
 			counter := counter + 1;
-			end_pos := instr(string_tokens, text_delimiter,1, counter);
+			end_pos := tm_cz.instr(string_tokens, text_delimiter,1, counter);
 
 		END IF;
   END LOOP;
 
   return initcap_text;
 
-END RDC_INIT_CAP;
+END;
  
 $$;
 

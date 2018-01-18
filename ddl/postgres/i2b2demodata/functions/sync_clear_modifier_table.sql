@@ -36,7 +36,7 @@ BEGIN
     --Create new patient(patient_mapping) if temp table patient_ide does not exists
 	-- in patient_mapping table.
 	EXECUTE 'insert into '|| interModifierTableName ||'  (modifier_cd,modifier_path,name_char,modifier_blob,update_date,download_date,import_date,sourcesystem_cd,upload_id)
-			    PERFORM  modifier_cd, substring(modifier_path from 1 for 700),
+			    select  modifier_cd, substring(modifier_path from 1 for 700),
                         name_char,modifier_blob,
                         update_date,download_date,
                         LOCALTIMESTAMP,sourcesystem_cd,

@@ -52,7 +52,7 @@ BEGIN
      WHEN NO_DATA_FOUND THEN
        NULL;
      
-END sf_xtab; 
+END;
  
 $$;
 

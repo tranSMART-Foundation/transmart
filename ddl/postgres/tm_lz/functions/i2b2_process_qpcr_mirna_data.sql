@@ -4,21 +4,12 @@
 CREATE FUNCTION i2b2_process_qpcr_mirna_data(trial_id character varying, top_node character varying, mirna_type character varying, data_type character varying DEFAULT 'R'::character varying, source_cd character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT NULL::character varying, currentjobid numeric DEFAULT 0, OUT rtn_code numeric) RETURNS numeric
     LANGUAGE plpgsql
     AS $_$
-DECLARE
-
 /*************************************************************************
 
 * This store procedure is for ETL for Sanofi to load  qpcr or seq miRNA data
 * Date: 12/05/2013
 
 ******************************************************************/
-
-
-
-
-
-
-
 
 
 --	***  NOTE ***
@@ -29,6 +20,7 @@ DECLARE
 --		attribute_1	=>	tissue_type
 --		atrribute_2	=>	timepoint	
 
+Declare
   TrialID		varchar(100);
   RootNode		varchar(2000);
   root_level	integer;
@@ -43,52 +35,44 @@ DECLARE
   sqlText		varchar(1000);
   tText			varchar(1000);
   gplTitle		varchar(1000);
-  pExists		bigint;
-  partTbl   	bigint;
-  partExists 	bigint;
-  sampleCt		bigint;
-  idxExists 	bigint;
-  logBase		bigint;
+  pExists		numeric;
+  partTbl   	numeric;
+  partExists 	numeric;
+  sampleCt		numeric;
+  idxExists 	numeric;
+  logBase		numeric;
   pCount		integer;
   sCount		integer;
   tablespaceName	varchar(200);
-  v_bio_experiment_id	bigint;
+  v_bio_experiment_id	numeric(18,0);
   mirnaType varchar(15);
- -- mirnaPlatform varchar2(20);
+ -- mirnaPlatform varchar(20);
   
     --Audit variables
-  newJobFlag integer(1);
+  newJobFlag numeric(1);
   databaseName varchar(100);
   procedureName varchar(100);
-  jobID bigint;
-  stepCt bigint;
-  
-  --unmapped_patients exception;
-  missing_platform	exception;
-  missing_tissue	EXCEPTION;
-  unmapped_platform exception;
-  multiple_platform	exception;
-  no_probeset_recs	exception;
- -- missing_mirna_type	EXCEPTION;
-  
+  jobID integer;
+  stepCt integer;
+  rowCt  integer;
+  errorNumber		character varying;
+  errorMessage	character varying;
 
-  
-	addNodes CURSOR FOR
-	SELECT distinct t.leaf_node
+	addNodes CURSOR is
+	select distinct t.leaf_node
           ,t.node_name
 	from  wt_qpcr_mirna_nodes t
 	where not exists
 		 (select 1 from i2b2 x
 		  where t.leaf_node = x.c_fullname);
 
- 
 --	cursor to define the path for delete_one_node  this will delete any nodes that are hidden after i2b2_create_concept_counts
 
-  delNodes CURSOR FOR
-  SELECT distinct c_fullname 
+  delNodes CURSOR for
+  select distinct c_fullname 
   from  i2b2
   where c_fullname like topNode || '%'
-    and substring(c_visualattributes from 2 for 1) = 'H';
+    and substr(c_visualattributes,2,1) = 'H';
     --and c_visualattributes like '_H_';
 
 
@@ -102,10 +86,10 @@ BEGIN
 		secureStudy := 'Y';
 	end if;
 	
-	topNode := REGEXP_REPLACE('\' || top_node || '\','(\\){2,}', '\');	
-	PERFORM length(topNode)-length(replace(topNode,'\','')) into topLevel ;
+	topNode := REGEXP_REPLACE('\' || top_node || '\','(\\){2,}', '\', 'g');	
+	select length(topNode)-length(replace(topNode,'\','')) into topLevel ;
 	
-	if coalesce(data_type::text, '') = '' then
+	if data_type is null then
 		dataType := 'R';
 	else
 		if data_type in ('R','T','L') then
@@ -115,11 +99,6 @@ BEGIN
 		end if;
 	end if;
 
-	---check for mirna_type is not null if it is null raise an exception 
-	/*if mirna_type is null then
-	raise missing_mirna_type;
-	end if;
-	*/
 	logBase := log_base;
 	sourceCd := upper(coalesce(source_cd,'STD'));
 
@@ -127,20 +106,20 @@ BEGIN
   newJobFlag := 0; -- False (Default)
   jobID := currentJobID;
 
-  PERFORM sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName ;
-  procedureName := $$PLSQL_UNIT;
+  databaseName := 'TM_LZ';
+  procedureName := 'I2B2_PROCESS_QPCR_MIRNA_DATA';
 
   --Audit JOB Initialization
   --If Job ID does not exist, then this is a single procedure run and we need to create it
-  IF(coalesce(jobID::text, '') = '' or jobID < 1)
+  IF(jobID IS NULL or jobID < 1)
   THEN
     newJobFlag := 1; -- True
-    cz_start_audit (procedureName, databaseName, jobID);
+    select cz_start_audit (procedureName, databaseName) into jobID;
   END IF;
     	
 	stepCt := 0;
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_qpcr_mirna_data',0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_qpcr_mirna_data',0,stepCt,'Done');
 	
 	--	Get count of records in LT_SRC_MIRNA_SUBJ_SAMP_MAP
 	
@@ -151,38 +130,54 @@ BEGIN
 	
 	select count(*) into pCount
 	from LT_SRC_MIRNA_SUBJ_SAMP_MAP
-	where coalesce(platform::text, '') = '';
+	where platform is null;
 	
 	if pCount > 0 then
-		raise missing_platform;
+		perform cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
+		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform cz_end_audit (jobId,'FAIL');
+		select 161 into rtn_code;
+		return;
 	end if;
   
-  	--	check if platform exists in de_qpcr_mirna_annotation .  If not, abort run.
+  	--	check if platform exists in lt_qpcr_mirna_annotation .  If not, abort run.
 	
 	select count(*) into pCount
 	from LT_QPCR_MIRNA_ANNOTATION
 	where ID_REF in (select distinct m.platform from LT_SRC_MIRNA_SUBJ_SAMP_MAP m);
 	
-	--if PCOUNT = 0 then
-		--RAISE UNMAPPED_platform;
-	--end if;--mod
+	if PCOUNT = 0 then
+		perform cz_write_audit(jobId,databasename,procedurename,'Unmapped platform',1,stepCt,'ERROR');
+		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform cz_end_audit (jobId,'FAIL');
+		select 162 into rtn_code;
+		return;
+	end if;--mod
 	
 	select count(*) into pCount
 	from DE_gpl_info
 	where platform in (select distinct m.platform from LT_SRC_MIRNA_SUBJ_SAMP_MAP m);
 	
-	/*if PCOUNT = 0 then
-		RAISE UNMAPPED_platform;
-	end if;*/
+	if PCOUNT = 0 then
+		perform cz_write_audit(jobId,databasename,procedurename,'No platform in de_gpl_info',1,stepCt,'ERROR');
+		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform cz_end_audit (jobId,'FAIL');
+		select 163 into rtn_code;
+		return;
+	end if;
 		
 	--	check if all subject_sample map records have a tissue_type, If not, abort run
 	
 	select count(*) into pCount
 	from LT_SRC_MIRNA_SUBJ_SAMP_MAP
-	where coalesce(tissue_type::text, '') = '';
+	where tissue_type is null;
 	
 	if pCount > 0 then
-		raise missing_tissue;
+		perform cz_write_audit(jobId,databasename,procedurename,'Missing tissue',1,stepCt,'ERROR');
+		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform cz_end_audit (jobId,'FAIL');
+		select 164 into rtn_code;
+		return;
 	end if;
 	
 	--	check if there are multiple platforms, if yes, then platform must be supplied in LT_SRC_QPCR_MIRNA_DATA
@@ -191,26 +186,29 @@ BEGIN
 	from (select sample_cd
 		  from LT_SRC_MIRNA_SUBJ_SAMP_MAP
 		  group by sample_cd
-		  GROUP BY xd.concept_Cd
-		  having Max(xf.valtype_cd) = 'N');
-		  
+		  having count(distinct platform) > 1) t;
+
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName, HAVING count(distinct platform) > 1);
+	perform cz_write_audit(jobId,databaseName, 'HAVING count(distinct platform) > 1');
 	
 	if pCount > 0 then
-		raise multiple_platform;
+		perform cz_write_audit(jobId,databasename,procedurename,'Multiple platforms',1,stepCt,'ERROR');
+		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform cz_end_audit (jobId,'FAIL');
+		select 165 into rtn_code;
+		return;
 	end if;
 		
 	-- Get root_node from topNode
   
-	PERFORM parse_nth_value(topNode, 2, '\') into RootNode ;
+	select parse_nth_value(topNode, 2, '\') into RootNode ;
 	
 	select count(*) into pExists
 	from table_access
 	where c_name = rootNode;
 	
 	if pExists = 0 then
-		i2b2_add_root_node(rootNode, jobId);
+		perform tm_cz.i2b2_add_root_node(rootNode, jobId);
 	end if;
 	
 	select c_hlevel into root_level
@@ -219,15 +217,15 @@ BEGIN
 	
 	-- Get study name from topNode
   
-	PERFORM parse_nth_value(topNode, topLevel, '\') into study_name ;
+	select parse_nth_value(topNode, topLevel, '\') into study_name ;
 	
 	--	Add any upper level nodes as needed
 	
-	tPath := REGEXP_REPLACE(replace(top_node,study_name,null),'(\\){2,}', '\');
-	PERFORM length(tPath) - length(replace(tPath,'\',null)) into pCount ;
+	tPath := REGEXP_REPLACE(replace(top_node,study_name,''),'(\\){2,}', '\', 'g');
+	select length(tPath) - length(replace(tPath,'\','')) into pCount ;
 
 	if pCount > 2 then
-		i2b2_fill_in_tree(null, tPath, jobId);
+		perform i2b2_fill_in_tree(null, tPath, jobId);
 	end if;
 
 	--	uppercase study_id in lt_src_mirna_subj_samp_map in case curator forgot
@@ -235,8 +233,8 @@ BEGIN
 	update LT_SRC_MIRNA_SUBJ_SAMP_MAP
 	set trial_name=upper(trial_name);
 	
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in LT_SRC_MIRNA_SUBJ_SAMP_MAP',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in LT_SRC_MIRNA_SUBJ_SAMP_MAP',rowCt,stepCt,'Done');
 	commit;	
 	
 	--	create records in patient_dimension for subject_ids if they do not exist
@@ -252,7 +250,7 @@ BEGIN
       import_date,
       sourcesystem_cd
     )
-    PERFORM nextval('seq_patient_num')
+    select nextval('seq_patient_num')
 		  ,x.sex_cd
 		  ,x.age_in_years_num
 		  ,x.race_cd
@@ -277,13 +275,14 @@ BEGIN
 				 regexp_replace(TrialID || ':' || s.site_id || ':' || s.subject_id,'(::){1,}', ':'))
 		) x;
 	
-	pCount := SQL%ROWCOUNT;
+	get diagnostics rowCt := ROW_COUNT;
+	pCount := rowCt;
 	
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension',pCount,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension',pCount,stepCt,'Done');
 	commit;
 	
-	i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
+	perform i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
 
 	--	Delete existing observation_fact data, will be repopulated
 	
@@ -295,8 +294,8 @@ BEGIN
 		    and coalesce(x.source_cd,'STD') = sourceCD
 		    and x.platform = mirna_type);
 
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
 	commit;
 
 	select count(*) into pExists
@@ -309,8 +308,8 @@ BEGIN
 		
 		delete from de_subject_mirna_data
 		where trial_source = TrialId || ':' || sourceCd;
-		stepCt := stepCt + 1;
-		cz_write_audit(jobId,databaseName,procedureName,'Delete data from de_subject_mirna_data',SQL%ROWCOUNT,stepCt,'Done');
+		stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+		perform cz_write_audit(jobId,databaseName,procedureName,'Delete data from de_subject_mirna_data',rowCt,stepCt,'Done');
 		commit;
 	else
 		--	Create partition in de_subject_MIRNA_data if it doesn't exist else truncate partition
@@ -329,13 +328,13 @@ BEGIN
 						   'NOLOGGING COMPRESS TABLESPACE "TRANSMART" ';
 			EXECUTE(sqlText);
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Adding partition to de_subject_mirna_data',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Adding partition to de_subject_mirna_data',0,stepCt,'Done');
 				
 		else
 			sqlText := 'alter table deapp.de_subject_mirna_data truncate partition "' || TrialID || ':' || sourceCd || '"';
 			EXECUTE(sqlText);
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Truncating partition in de_subject_mirna_data',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Truncating partition in de_subject_mirna_data',0,stepCt,'Done');
 		end if;
 		
 	end if;
@@ -347,8 +346,8 @@ BEGIN
 	  and coalesce(source_cd,'STD') = sourceCd
 	  and platform = mirna_type; --Making sure only miRNA data is deleted
 		  
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Delete trial from DEAPP de_subject_sample_mapping',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Delete trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 
 	commit;
 
@@ -369,7 +368,7 @@ BEGIN
 	,attribute_2
 	,title
 	)
-	PERFORM distinct a.category_cd
+	select distinct a.category_cd
 				   ,coalesce(a.platform,'GPL570')
 				   ,coalesce(a.tissue_type,'Unspecified Tissue Type')
 	               ,a.attribute_1
@@ -387,8 +386,8 @@ BEGIN
 	  ;
         
 	--  and decode(dataType,'R',sign(a.intensity_value),1) = 1;	--	take all values when dataType T, only >0 for dataType R
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP wt_qpcr_mirna_node_values',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP wt_qpcr_mirna_node_values',rowCt,stepCt,'Done');
 	commit;
 	
 	insert into WT_QPCR_MIRNA_NODES
@@ -400,7 +399,7 @@ BEGIN
     ,attribute_2
 	,node_type
 	)
-	PERFORM distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
+	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
 	       category_cd,'PLATFORM',title),'ATTR1',attribute_1),'ATTR2',attribute_2),'TISSUETYPE',tissue_type),'+','\'),'_',' ') || '\','(\\){2,}', '\') 
 		  ,category_cd
 		  ,platform as platform
@@ -410,8 +409,8 @@ BEGIN
 		  ,'LEAF'
 	from  WT_QPCR_MIRNA_NODE_VALUES;
 		   
-    stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_mirna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+    stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_mirna_nodes',rowCt,stepCt,'Done');
 	commit;
 	
 	--	insert for platform node so platform concept can be populated
@@ -425,7 +424,7 @@ BEGIN
     ,attribute_2
 	,node_type
 	)
-	PERFORM distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
+	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
 	       substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'PLATFORM',title),'ATTR1',attribute_1),'ATTR2',attribute_2),'TISSUETYPE',tissue_type),'+','\'),'_',' ') || '\',
 		   '(\\){2,}', '\')
 		  ,substr(category_cd,1,instr(category_cd,'PLATFORM')+8)
@@ -436,8 +435,8 @@ BEGIN
 		  ,'PLATFORM'
 	from  WT_QPCR_MIRNA_NODE_VALUES;
 		   
-    stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in wt_qpcr_mirna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+    stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in wt_qpcr_mirna_nodes',rowCt,stepCt,'Done');
 	commit;
 	
 	--	insert for ATTR1 node so ATTR1 concept can be populated in tissue_type_cd
@@ -451,7 +450,7 @@ BEGIN
 	,attribute_2
 	,node_type
 	)
-	PERFORM distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
+	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
 	       substr(category_cd,1,instr(category_cd,'ATTR1')+5),'PLATFORM',title),'ATTR1',attribute_1),'ATTR2',attribute_2),'TISSUETYPE',tissue_type),'+','\'),'_',' ') || '\',
 		   '(\\){2,}', '\')
 		  ,substr(category_cd,1,instr(category_cd,'ATTR1')+5)
@@ -464,8 +463,8 @@ BEGIN
 	where category_cd like '%ATTR1%'
 	  and (attribute_1 IS NOT NULL AND attribute_1::text <> '');
 		   
-    stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in WT_QPCR_MIRNA_NODES',SQL%ROWCOUNT,stepCt,'Done');
+    stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in WT_QPCR_MIRNA_NODES',rowCt,stepCt,'Done');
 	commit;
 	
 	--	insert for ATTR2 node so ATTR2 concept can be populated in timepoint_cd
@@ -479,7 +478,7 @@ BEGIN
 	,attribute_2
 	,node_type
 	)
-	PERFORM distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
+	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
 	       substr(category_cd,1,instr(category_cd,'ATTR2')+5),'PLATFORM',title),'ATTR1',attribute_1),'ATTR2',attribute_2),'TISSUETYPE',tissue_type),'+','\'),'_',' ') || '\',
 		   '(\\){2,}', '\')
 		  ,substr(category_cd,1,instr(category_cd,'ATTR2')+5)
@@ -492,8 +491,8 @@ BEGIN
 	where category_cd like '%ATTR2%'
 	  and (attribute_2 IS NOT NULL AND attribute_2::text <> '');
 		   
-    stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_QPCR_MIRNA_NODES',SQL%ROWCOUNT,stepCt,'Done');
+    stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_QPCR_MIRNA_NODES',rowCt,stepCt,'Done');
 	commit;
 	
 	--	insert for tissue_type node so sample_type_cd can be populated
@@ -507,7 +506,7 @@ BEGIN
     ,attribute_2
 	,node_type
 	)
-	PERFORM distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
+	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
 	       substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),'PLATFORM',title),'ATTR1',attribute_1),'ATTR2',attribute_2),'TISSUETYPE',tissue_type),'+','\'),'_',' ') || '\',
 		   '(\\){2,}', '\')
 		  ,substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10)
@@ -519,15 +518,15 @@ BEGIN
 	from  WT_QPCR_MIRNA_NODE_VALUES
 	where category_cd like '%TISSUETYPE%';
 		   
-    stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in wt_qpcr_mirna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+    stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in wt_qpcr_mirna_nodes',rowCt,stepCt,'Done');
 	commit;
 				
 	update WT_QPCR_MIRNA_NODES
 	set node_name=parse_nth_value(leaf_node,length(leaf_node)-length(replace(leaf_node,'\',null)),'\');
 		   
-    stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Updated node_name in DEAPP tmp_mirna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+    stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Updated node_name in DEAPP tmp_mirna_nodes',rowCt,stepCt,'Done');
 	commit;
 		
 --	add leaf nodes for miRNA data  The cursor will only add nodes that do not already exist.
@@ -536,13 +535,13 @@ BEGIN
 
     --Add nodes for all types (ALSO DELETES EXISTING NODE)
 
-		i2b2_add_node(TrialID, r_addNodes.leaf_node, r_addNodes.node_name, jobId);
-		stepCt := stepCt + 1;
+		perform tm_cz.i2b2_add_node(TrialID, r_addNodes.leaf_node, r_addNodes.node_name, jobId);
+		stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
 		tText := 'Added Leaf Node: ' || r_addNodes.leaf_node || '  Name: ' || r_addNodes.node_name;
 		
-		cz_write_audit(jobId,databaseName,procedureName,tText,SQL%ROWCOUNT,stepCt,'Done');
+		perform cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 		
-		i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID);
+		perform i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID);
 
 	END LOOP;  
 	
@@ -558,8 +557,8 @@ BEGIN
 				   )
 	  and coalesce(t.concept_cd::text, '') = '';
 	
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Update WT_QPCR_MIRNA_NODES with newly created concept_cds',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Update WT_QPCR_MIRNA_NODES with newly created concept_cds',rowCt,stepCt,'Done');
 	commit;
 	 
 	
@@ -613,7 +612,7 @@ BEGIN
 	,omic_source_study
 	,omic_patient_id
     )
-	PERFORM t.patient_id
+	select t.patient_id
 		  ,t.site_id
 		  ,t.subject_id
 		  ,t.subject_type
@@ -699,8 +698,8 @@ BEGIN
 		  and a.source_cd = sourceCD
 		  and  (ln.concept_cd IS NOT NULL AND ln.concept_cd::text <> '')) t;
 
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Insert trial into DEAPP de_subject_sample_mapping',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert trial into DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 
   commit;
 
@@ -713,7 +712,7 @@ BEGIN
 	--execute immediate('create index de_subject_smpl_mpng_idx4 on de_subject_sample_mapping(gpl_id) parallel nologging');
 	--execute immediate('create index de_subject_smpl_mpng_idx4 on de_subject_sample_mapping(platform, gpl_id) parallel nologging');
     --stepCt := stepCt + 1;
-	--cz_write_audit(jobId,databaseName,procedureName,'Recreate indexes on DEAPP de_subject_sample_mapping',0,stepCt,'Done');
+	--perform cz_write_audit(jobId,databaseName,procedureName,'Recreate indexes on DEAPP de_subject_sample_mapping',0,stepCt,'Done');
 
 --	Insert records for patients and samples into observation_fact
 
@@ -732,7 +731,7 @@ BEGIN
 	,units_cd
         ,INSTANCE_NUM
     )
-    PERFORM distinct m.patient_id
+    select distinct m.patient_id
 		  ,m.concept_code
 		  ,'@'
 		  ,'T' -- Text data type
@@ -750,8 +749,8 @@ BEGIN
 	  and m.source_cd = sourceCD
       and m.platform = mirna_type;
 	  
-    stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',SQL%ROWCOUNT,stepCt,'Done');
+    stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
     commit;
     
@@ -771,7 +770,7 @@ BEGIN
 	,location_cd
 	,units_cd
     )
-    PERFORM distinct m.sample_id
+    select distinct m.sample_id
 		  ,m.concept_code
 		  ,m.trial_name
 		  ,'T' -- Text data type
@@ -789,8 +788,8 @@ BEGIN
       and m.platform = mirna_type
 	 and m.patient_id != m.sample_id;
 	  
-    stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Insert sample facts into I2B2DEMODATA observation_fact',SQL%ROWCOUNT,stepCt,'Done');
+    stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert sample facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
     commit;
     
@@ -800,21 +799,19 @@ BEGIN
 	set c_columndatatype = 'T', c_metadataxml = null, c_visualattributes='FA'
 	where t.c_basecode in (select distinct x.concept_cd from WT_QPCR_MIRNA_NODES x);
   
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Initialize data_type and xml in i2b2',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Initialize data_type and xml in i2b2',rowCt,stepCt,'Done');
 	commit;
 	
+	begin
 	update i2b2
 	SET c_columndatatype = 'N',
       --Static XML String
 		c_metadataxml = '<?xml version="1.0"?><ValueMetadata><Version>3.02</Version><CreationDateTime>10/21/2013 01:22:59</CreationDateTime><TestID></TestID><TestName></TestName><DataType>PosFloat</DataType><CodeType></CodeType><Loinc></Loinc><Flagstouse></Flagstouse><Oktousevalues>Y</Oktousevalues><MaxStringLength></MaxStringLength><LowofLowValue>0</LowofLowValue><HighofLowValue>0</HighofLowValue><LowofHighValue>100</LowofHighValue>100<HighofHighValue>100</HighofHighValue><LowofToxicValue></LowofToxicValue><HighofToxicValue></HighofToxicValue><EnumValues></EnumValues><CommentsDeterminingExclusion><Com></Com></CommentsDeterminingExclusion><UnitValues><NormalUnits>ratio</NormalUnits><EqualUnits></EqualUnits><ExcludingUnits></ExcludingUnits><ConvertingUnits><Units></Units><MultiplyingFactor></MultiplyingFactor></ConvertingUnits></UnitValues><Analysis><Enums /><Counts /><New /></Analysis></ValueMetadata>'
-	where c_basecode IN (
-		  SELECT xd.concept_cd
-		  from WT_QPCR_MIRNA_NODES xd
-			  ,observation_fact xf
-		  where xf.concept_cd = xd.concept_cd
-		  procedureName,'Update c_columndatatype and c_metadataxml for numeric data types in I2B2METADATA i2b2',SQL%ROWCOUNT,stepCt,'Done');
-	commit;
+		where n.c_fullname=(select leaf_node from WT_QPCR_MIRNA_NODES where category_cd=ul.category_cd and leaf_node=n.c_fullname);
+	end;
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Update c_columndatatype and c_metadataxml for numeric data types in I2B2METADATA i2b2',rowCt,stepCt,'Done');
  
 /*
 	--UPDATE VISUAL ATTRIBUTES for Leaf Active (Default is folder)
@@ -835,8 +832,8 @@ BEGIN
 						     and x.platform = mirna_type
 							 and (x.concept_code IS NOT NULL AND x.concept_code::text <> ''));
 	  
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for leaf nodes in I2B2METADATA i2b2',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for leaf nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
   
 	COMMIT;
   
@@ -844,9 +841,9 @@ BEGIN
   --Also marks any i2B2 records with no underlying data as Hidden, need to do at Trial level because there may be multiple platform and there is no longer
   -- a unique top-level node for miRNA data
   
-    i2b2_create_concept_counts(topNode ,jobID );
+    perform i2b2_create_concept_counts(topNode ,jobID );
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
 	
 	--	delete each node that is hidden
 	
@@ -854,20 +851,20 @@ BEGIN
 
     --	deletes hidden nodes for a trial one at a time
 
-		i2b2_delete_1_node(r_delNodes.c_fullname);
-		stepCt := stepCt + 1;
+		perform i2b2_delete_1_node(r_delNodes.c_fullname);
+		stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
 		tText := 'Deleted node: ' || r_delNodes.c_fullname;
 		
-		cz_write_audit(jobId,databaseName,procedureName,tText,SQL%ROWCOUNT,stepCt,'Done');
+		perform cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
 	END LOOP;  	
 
 
   --Reload Security: Inserts one record for every I2B2 record into the security table
 
-    i2b2_load_security_data(jobId);
+    perform i2b2_load_security_data(jobId);
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
 
 --	tag data with probeset_id from reference.probeset_deapp
   
@@ -876,7 +873,7 @@ BEGIN
 	--	note: assay_id represents a unique subject/site/sample
 	
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'TrialId:'||TrialID,0,stepCt,'test');
+	perform cz_write_audit(jobId,databaseName,procedureName,'TrialId:'||TrialID,0,stepCt,'test');
   
 	insert into WT_SUBJECT_MIRNA_PROBESET  --mod
 	(probeset_id
@@ -888,7 +885,7 @@ BEGIN
 	,trial_name
 	,assay_id
 	)
-	PERFORM    p.probeset_id 
+	select    p.probeset_id 
 		  ,avg(md.intensity_value)
                   ,sd.patient_id
 		  ,TrialId
@@ -906,17 +903,20 @@ BEGIN
 	group by  p.probeset_id 
 		  ,sd.patient_id,sd.assay_id;
 		  
-	pExists := SQL%ROWCOUNT;
 	
-	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_mirna_probeset',SQL%ROWCOUNT,stepCt,'Done');
+	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	pExists := rowCt;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_mirna_probeset',rowCt,stepCt,'Done');
 	
 	commit;		
 	
-	/*if pExists = 0 then
-		raise no_probeset_recs;
-	end if;*/
---mod
+	if pExists = 0 then
+		perform cz_write_audit(jobId,databasename,procedurename,'Unable to match probesets to platform in probeset_deapp',1,stepCt,'ERROR');
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+		perform cz_end_audit (jobId,'FAIL');
+		select 165 into rtn_code;
+		return;
+	end if;
 
 	--	insert into de_subject_mirna_data when dataType is T (transformed)
  
@@ -931,7 +931,7 @@ BEGIN
 		,trial_name
 		,zscore
 		)
-		PERFORM (TrialId || ':' || sourceCd)
+		select (TrialId || ':' || sourceCd)
 			  ,probeset_id
 			  ,assay_id
 			  ,patient_id
@@ -946,8 +946,8 @@ BEGIN
 			   end as zscore
 		from WT_SUBJECT_MIRNA_PROBESET --mod
 		where trial_name = TrialID;
-		stepCt := stepCt + 1;
-		cz_write_audit(jobId,databaseName,procedureName,'Insert transformed into DEAPP de_subject_mirna_data',SQL%ROWCOUNT,stepCt,'Done');
+		stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+		perform cz_write_audit(jobId,databaseName,procedureName,'Insert transformed into DEAPP de_subject_mirna_data',rowCt,stepCt,'Done');
 
 		commit;	
 	else
@@ -956,9 +956,9 @@ BEGIN
 	--	wt_subject_mirna_probeset as part of a Load.  
 
 		if dataType = 'R' or dataType = 'L' then
-			i2b2_mirna_zscore_calc(TrialID,'L',jobId,dataType,logBase,sourceCD);
+			perform i2b2_mirna_zscore_calc(TrialID,'L',jobId,dataType,logBase,sourceCD);
 			stepCt := stepCt + 1;
-			cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score',0,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score',0,stepCt,'Done');
 			commit;
 		end if;
 	
@@ -967,51 +967,22 @@ BEGIN
     ---Cleanup OVERALL JOB if this proc is being run standalone
 	
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_QPCR_miRNA_DATA',0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_QPCR_miRNA_DATA',0,stepCt,'Done');
 
 	IF newJobFlag = 1
 	THEN
-		cz_end_audit (jobID, 'SUCCESS');
+		perform cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 	
-	PERFORM 0 into rtn_code ;
+	select 0 into rtn_code;
 
 	EXCEPTION
-	--when unmapped_patients then
-	--	cz_write_audit(jobId,databasename,procedurename,'No site_id/subject_id mapped to patient_dimension',1,stepCt,'ERROR');
-	--	cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-	--	cz_end_audit (jobId,'FAIL');
-	when missing_platform then
-		cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		cz_end_audit (jobId,'FAIL');
-		PERFORM 161 into rtn_code ;
-	when missing_tissue then
-		cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		CZ_END_AUDIT (JOBID,'FAIL');
-		PERFORM 162 into rtn_code ;
-	when unmapped_platform then
-		cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_qpcr_mirna_annotation',1,stepCt,'ERROR');
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		cz_end_audit (jobId,'FAIL');
-		PERFORM 163 into rtn_code ;--mod
-	when multiple_platform then
-		cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in LT_SRC_MIRNA_SUBJ_SAMP_MAP',1,stepCt,'ERROR');
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		cz_end_audit (jobId,'FAIL');
-		PERFORM 164 into rtn_code ;
-	when no_probeset_recs then
-		cz_write_audit(jobId,databasename,procedurename,'Unable to match probesets to platform in probeset_deapp',1,stepCt,'ERROR');
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		cz_end_audit (jobId,'FAIL');
-		PERFORM 165 into rtn_code ;
 	WHEN OTHERS THEN
 		--Handle errors.
-		cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		--End Proc
-		cz_end_audit (jobID, 'FAIL');
-		PERFORM 16  into rtn_code ;
+		perform cz_end_audit (jobID, 'FAIL');
+		select 16  into rtn_code ;
 END;
  
 $_$;

@@ -9,7 +9,7 @@ BEGIN
   -- Creates uid for bio_curation_dataset.
 
   RETURN 'BCD:' || coalesce(BIO_CURATION_TYPE, 'ERROR');
-END BIO_CURATION_DATASET_UID;
+END;
  
 $_$;
 

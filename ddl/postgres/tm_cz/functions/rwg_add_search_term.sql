@@ -7,7 +7,7 @@
 -- DATASOURCE: dbi:Oracle:host=mydb.mydom.fr;sid=SIDNAME
 
 
-CREATE OR REPLACE FUNCTION tm_cz.rwg_add_search_term (
+CREATE FUNCTION tm_cz.rwg_add_search_term (
   New_Term text,
   category_name text,
   category_display	text,

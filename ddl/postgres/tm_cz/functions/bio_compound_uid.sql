@@ -9,7 +9,7 @@ BEGIN
   -- Function to create compound_uid.
 
   RETURN 'COM:' || JNJ_NUMBER;
-END BIO_COMPOUND_UID;
+END;
  
 $_$;
 

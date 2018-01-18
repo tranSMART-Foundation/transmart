@@ -40,6 +40,8 @@ ALTER FUNCTION i2b2_create_concept_counts(character varying, numeric) SET search
 
 ALTER FUNCTION i2b2_create_security_for_trial(character varying, character varying, numeric) SET search_path TO tm_cz, i2b2demodata, i2b2metadata, searchapp, biomart, pg_temp;
 
+ALTER FUNCTION tm_cz.i2b2_create_security_inc_trial(character varying,character varying,numeric) SET search_path TO tm_cz, i2b2demodata, i2b2metadata, searchapp, biomart, pg_temp;
+
 ALTER FUNCTION i2b2_delete_1_node(character varying) SET search_path TO tm_cz, i2b2demodata, i2b2metadata, pg_temp;
 
 ALTER FUNCTION i2b2_delete_all_nodes(character varying, numeric) SET search_path TO tm_cz, i2b2demodata, i2b2metadata, pg_temp;
@@ -55,6 +57,8 @@ ALTER FUNCTION i2b2_load_annotation_deapp(numeric) SET search_path TO tm_cz, dea
 ALTER FUNCTION i2b2_load_chrom_region(character varying, character varying, character varying, character varying, numeric) SET search_path TO tm_cz, deapp;
 
 ALTER FUNCTION i2b2_load_clinical_data(character varying, character varying, character varying, character varying, numeric) SET search_path TO tm_cz, tm_lz, tm_wz, i2b2demodata, i2b2metadata, deapp, pg_temp;
+
+ALTER FUNCTION tm_cz.i2b2_load_clinical_inc_data(character varying,character varying,character varying,character varying,numeric) SET search_path TO tm_cz, tm_lz, tm_wz, i2b2demodata, i2b2metadata, deapp, pg_temp;
 
 ALTER FUNCTION i2b2_load_gwas_top50(numeric, numeric) SET search_path TO tm_cz, tm_lz, tm_wz, i2b2demodata, i2b2metadata, deapp, biomart, biomart_stage, pg_temp;
 
@@ -81,6 +85,8 @@ ALTER FUNCTION i2b2_process_mrna_data(character varying, character varying, char
 ALTER FUNCTION i2b2_process_proteomics_data(character varying, character varying, character varying, character varying, numeric, character varying, numeric) SET search_path TO tm_cz, tm_lz, tm_wz, i2b2demodata, i2b2metadata, deapp, pg_temp;
 
 ALTER FUNCTION i2b2_process_qpcr_mirna_data(character varying, character varying, character varying, character varying, numeric, character varying, numeric, character varying) SET search_path TO tm_cz, tm_lz, tm_wz, i2b2demodata, i2b2metadata, deapp, pg_temp;
+
+ALTER FUNCTION tm_cz.i2b2_process_rna_seq_data(character varying,character varying,character varying,character varying,numeric,character varying,numeric) SET search_path TO tm_cz, tm_lz, tm_wz, deapp, i2b2demodata, pg_temp;
 
 ALTER FUNCTION i2b2_process_rnaseq_data(character varying, character varying, character varying, character varying, character varying, numeric, numeric) SET search_path TO tm_cz, tm_lz, tm_wz, deapp, i2b2demodata, pg_temp;
 

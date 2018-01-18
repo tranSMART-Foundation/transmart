@@ -125,6 +125,66 @@ BEGIN
             EXECUTE(command);
 
         END LOOP;
+
+	-- Second loop needed for materialized views new in release 16.2
+
+        FOR obj_name, obj_type, cur_owner IN
+                SELECT c.relname, c.relkind, r.rolname
+                FROM pg_catalog.pg_class c
+		JOIN pg_namespace n ON n.oid = c.relnamespace
+		JOIN pg_roles r ON r.oid = c.relowner
+                WHERE n.nspname = schema_name AND c.relkind = 'm'
+                LOOP
+
+            SELECT proper_owner
+            INTO wanted_owner
+            FROM ownership_exceptions E
+            WHERE E.schema_name = locals.schema_name
+                AND E.object_name = locals.obj_name;
+
+            IF NOT FOUND THEN
+                wanted_owner := schema_name;
+            END IF;
+
+            IF cur_owner = wanted_owner THEN
+	        raise notice 'Skip has wanted_owner %', cur_owner;
+                CONTINUE;
+            END IF;
+
+            RAISE NOTICE 'Extra check the owner of % %.% is %; changing to %',
+                    CASE obj_type
+                        WHEN 'T' THEN 'type'
+                        WHEN 'r' THEN 'table'
+                        WHEN 'S' THEN 'sequence'
+                        WHEN 'v' THEN 'view'
+                        WHEN 'f' THEN 'function'
+                        WHEN 'a' THEN 'aggregate'
+                        WHEN 's' THEN 'schema'
+                        WHEN 'm' THEN 'materialized view'
+                    END,
+                    schema_name,
+                    obj_name,
+                    cur_owner,
+                    wanted_owner;
+
+            -- ALTER TABLE can be used for all the types here
+            command := 'ALTER ' ||
+                    CASE obj_type
+                        WHEN 'T' THEN 'TYPE'
+                        WHEN 'f' THEN 'FUNCTION'
+                        WHEN 'a' THEN 'AGGREGATE'
+                        WHEN 's' THEN 'SCHEMA'
+                        ELSE 'TABLE'
+                    END || ' ' ||
+                    CASE obj_type
+                        WHEN 's' THEN '' -- do not qualify schema names
+                        ELSE schema_name || '.'
+                    END
+                    || obj_name || ' OWNER TO ' || wanted_owner;
+
+            EXECUTE(command);
+
+        END LOOP;
     END LOOP;
 
     RAISE NOTICE 'Finished assigning owners';

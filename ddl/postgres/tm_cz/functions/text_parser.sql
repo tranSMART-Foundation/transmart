@@ -61,7 +61,7 @@ BEGIN
 
   return list_values;
 
-END text_parser;
+END;
  
 $$;
 

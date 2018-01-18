@@ -19,6 +19,7 @@ CREATE FUNCTION i2b2_process_qpcr_mirna_data(trial_id character varying, top_nod
 --		tissue_type	=>	sample_type
 --		attribute_1	=>	tissue_type
 --		atrribute_2	=>	timepoint	
+
 Declare
   TrialID		varchar(100);
   RootNode		varchar(2000);
@@ -48,8 +49,8 @@ Declare
   
     --Audit variables
   newJobFlag numeric(1);
-  databaseName VARCHAR(100);
-  procedureName VARCHAR(100);
+  databaseName varchar(100);
+  procedureName varchar(100);
   jobID numeric(18,0);
   stepCt numeric(18,0);
   rowCt	integer;
@@ -120,7 +121,7 @@ BEGIN
   END IF;
     	
 	stepCt := 0;
-	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	stepCt := stepCt + 1;
 	perform cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_qpcr_mirna_data',0,stepCt,'Done');
 	
 	--	Get count of records in LT_SRC_MIRNA_SUBJ_SAMP_MAP
@@ -159,7 +160,7 @@ BEGIN
 	where platform in (select distinct m.platform from LT_SRC_MIRNA_SUBJ_SAMP_MAP m);
 	
 	if PCOUNT = 0 then
-		perform cz_write_audit(jobId,databasename,procedurename,'No platoform in de_gpl_info',1,stepCt,'ERROR');
+		perform cz_write_audit(jobId,databasename,procedurename,'No platform in de_gpl_info',1,stepCt,'ERROR');
 		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
 		perform cz_end_audit (jobId,'FAIL');
 		return 163;
@@ -1130,7 +1131,7 @@ BEGIN
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
 	
-	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	stepCt := stepCt + 1;
 	perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_QPCR_miRNA_DATA',0,stepCt,'Done');
 
 	IF newJobFlag = 1
