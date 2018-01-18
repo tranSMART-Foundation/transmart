@@ -587,7 +587,7 @@ BEGIN
   --TIMEPOINT_CD	= concept_cd from ATTR2 records in wt_proteomics_nodes
   --TISSUE_TYPE     = attribute_1
   --TISSUE_TYPE_CD  = concept_cd from ATTR1 records in wt_proteomics_nodes
-  --PLATFORM        = PROTEOMICS - this is required by ui code
+  --PLATFORM        = PROTEIN - this is required by ui code
   --PLATFORM_CD     = concept_cd from PLATFORM records in wt_proteomics_nodes
   --DATA_UID		= concatenation of concept_cd-patient_num
   --GPL_ID			= platform from wt_subject_proteomics_data
@@ -954,6 +954,7 @@ BEGIN
 	end;
 	
 	--	note: assay_id represents a unique subject/site/sample
+
 
 	begin
 	insert into WT_SUBJECT_PROTEOMICS_PROBESET  --mod
