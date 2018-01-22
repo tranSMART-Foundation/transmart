@@ -16,7 +16,7 @@ class FractalisController {
 		def scripts = [servletContext.contextPath + pluginContextPath + '/js/fractalis.js']
 
 		// list of required css files
-		def styles = []
+		def styles = [servletContext.contextPath + pluginContextPath + '/css/fractalis.css']
 
 		JSONObject result = new JSONObject()
 		JSONArray rows = new JSONArray()
