@@ -47,14 +47,18 @@ function activateDragAndDrop (conceptBox) {
 }
 
 function observeConceptBox (conceptBox) {
-    new MutationObserver(function (target) {
-        Array.prototype.map.call(target[0].addedNodes, function (node) {
-            return getConceptAttributes(node);
-        }).map(function (attr) {
-            return {query: buildPicSureQuery(attr.path, attr.dataType), dataType: attr.dataType};
-        }).forEach(function (d) {
-            window.fjs.loadData({dataType: d.dataType, query: d.query});
+    new MutationObserver(function (targets) {
+        var descriptors = [];
+        targets.forEach(function (target) {
+            Array.prototype.map.call(target.addedNodes, function (node) {
+                return getConceptAttributes(node);
+            }).map(function (attr) {
+                return {query: buildPicSureQuery(attr.path, attr.dataType), dataType: attr.dataType};
+            }).forEach(function (d) {
+                descriptors.push({dataType: d.dataType, query: d.query});
+            });
         });
+        window.fjs.loadData(descriptors);
     }).observe(conceptBox, { childList: true });
 }
 
@@ -103,5 +107,5 @@ function setChart () {
 
 function clearCache () {
     window.fjs.clearCache();
-    Array.prototype.forEach.call(document.querySelector('.fjs-concept-box').children, function (node) { node.remove(); });
+    document.querySelector('.fjs-concept-box').innerHTML = '';
 }
