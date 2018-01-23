@@ -60,7 +60,7 @@ function observeConcepts (conceptBox, fjs) {
         var conceptAttrs = getConceptAttributes(conceptBox);
         var picSureQueries = conceptAttrs.map(function (attr) { return buildPicSureQuery(attr); });
         picSureQueries.forEach(function (query, i) {
-            fjs.load({dataType: conceptAttrs[i].dataType, query: query});
+            fjs.loadData({dataType: conceptAttrs[i].dataType, query: query});
         });
     }).observe(conceptBox, { childList: true });
 }
