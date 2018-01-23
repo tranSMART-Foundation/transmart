@@ -19,6 +19,7 @@
                 Please drag all data you want to analyse from the tree on the left into this box here.
                 This will load the selected data into the Fractalis data cache, so that subsequent analyses become really fast!
             </p>
+            <input type="button" value="Clear analysis cache" style="margin-top: 1vh;" onclick="clearCache()"/>
         </div>
     </div>
     <hr>

@@ -89,7 +89,7 @@ function shortenConcept (concept) {
     return split[split.length - 2] + '/' + split[split.length - 1];
 }
 
-function setChart() {
+function setChart () {
     var placeholder = document.createElement('div');
     placeholder.appendChild(document.createElement('div'));
     var placeholders = document.querySelector('.fjs-placeholders');
@@ -101,4 +101,9 @@ function setChart() {
         selector: placeholder.children[0],
         chart: document.querySelector('.fjs-analysis-select').value
     })
+}
+
+function clearCache () {
+    window.fjs.clearCache();
+    Array.prototype.forEach.call(document.querySelector('.fjs-concept-box').children, function (node) { node.remove(); });
 }
