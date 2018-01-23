@@ -17,9 +17,13 @@ window.fractalisPanel = new Ext.Panel({
     listeners: {
         activate: function() {
             var conceptBox = document.querySelector('.fjs-concept-box');
+            var analysisSelect = document.querySelector('.fjs-analysis-select');
             var fjs = initFractalis();
             activateDragAndDrop(conceptBox);
-            observeConcepts(conceptBox, fjs);
+            observeConceptBox(conceptBox, fjs);
+            // analysisSelect.addEventListener('change', function () {
+            //     fjs.setChart({selector: '.fjs-chart-placeholder', chart: analysisSelect.value});
+            // })
         }
     }
 });
@@ -46,34 +50,36 @@ function activateDragAndDrop (conceptBox) {
     dtgI.notifyDrop = dropOntoCategorySelection;
 }
 
-function getConceptAttributes (conceptBox) {
-    return Array.prototype.map.call(conceptBox.children, function (child) {
-        return {
-            path: child.getAttribute('conceptid'),
-            dataType: child.getAttribute('setnodetype') === 'valueicon' ? 'numerical' : 'categorical'
-        };
-    });
-}
-
-function observeConcepts (conceptBox, fjs) {
-    new MutationObserver(function () {
-        var conceptAttrs = getConceptAttributes(conceptBox);
-        var picSureQueries = conceptAttrs.map(function (attr) { return buildPicSureQuery(attr); });
-        picSureQueries.forEach(function (query, i) {
-            fjs.loadData({dataType: conceptAttrs[i].dataType, query: query});
+function observeConceptBox (conceptBox, fjs) {
+    new MutationObserver(function (target) {
+        Array.prototype.map.call(target[0].addedNodes, function (node) {
+            return getConceptAttributes(node);
+        }).map(function (attr) {
+            return {query: buildPicSureQuery(attr.path, attr.dataType), dataType: attr.dataType};
+        }).forEach(function (d) {
+            fjs.loadData({dataType: d.dataType, query: d.query});
         });
     }).observe(conceptBox, { childList: true });
 }
 
-function buildPicSureQuery (attr) {
-    var alias = shortenConcept(attr.path);
+function getConceptAttributes (node) {
+    return {
+        path: node.getAttribute('conceptid'),
+        dataType: node.getAttribute('setnodetype') === 'valueicon' ? 'numerical' : 'categorical'
+    };
+}
+
+
+
+function buildPicSureQuery (path, type) {
+    var alias = shortenConcept(path);
     return {
         "select": [
-            {"field": {"pui": attr.path}, "alias": alias}
+            {"field": {"pui": path}, "alias": alias}
         ],
         "where": [
             {
-                "field": {"pui": attr.path, "dataType": "STRING"},  // FIXME: dataType should be attr.dataType but PIC-SURE only knows STRING
+                "field": {"pui": path, "dataType": "STRING"},  // FIXME: dataType should be attr.dataType but PIC-SURE only knows STRING
                 "predicate": "CONTAINS",
                 "fields": {"ENOUNTER": "YES"}
             }
