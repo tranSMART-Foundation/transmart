@@ -24,28 +24,20 @@
     <hr>
     <div class="fjs-block-2">
         <div style="text-align: center;">
-            <select class="fjs-analysis-select">
+            <select class="fjs-analysis-select" data-placeholder="1">
                 <option selected disabled>--Choose an analysis--</option>
                 <option value="correlation-analysis">Correlation Analysis</option>
-                <option value="boxplot">Boxplots</option>
+                <option value="boxplot">Boxplot Analysis</option>
+                <option value="pca-analysis">Principle Component Analysis</option>
             </select>
-            <select class="fjs-analysis-select">
-                <option selected disabled>--Choose an analysis--</option>
-                <option value="correlation-analysis">Correlation Analysis</option>
-                <option value="boxplot">Boxplots</option>
-            </select>
-            <select class="fjs-analysis-select" onchange>
-                <option selected disabled>--Choose an analysis--</option>
-                <option value="correlation-analysis">Correlation Analysis</option>
-                <option value="boxplot">Boxplots</option>
-            </select>
+            <input type="button" value="Add" onclick="setChart()"/>
         </div>
         <div>
             <p>
                 <span style="font-weight: bold;">Step 2)</span>
                 Now please select what analysis you want to perform.
                 Don't worry. This choice is not final and you can change it at any point in time.
-                You are asking why there're multiple selections? Fractalis supports a multi chart view and lets charts interact with each other!
+                You are asking why there's an 'add' button? Fractalis supports multiple charts in parallel and lets them interact with each other!
             </p>
         </div>
     </div>
@@ -63,9 +55,6 @@
     </div>
     <hr>
     <div class="fjs-placeholders">
-        <div class="fjs-chart-placeholder-1"></div>
-        <div class="fjs-chart-placeholder-2"></div>
-        <div class="fjs-chart-placeholder-3"></div>
     </div>
 </div>
 </body>

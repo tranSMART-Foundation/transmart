@@ -48,7 +48,11 @@
     display: flex;
 }
 
-.fjs-block-4 > div{
-    width: auto;
-    height: 100%;
+.fjs-placeholders {
+    display: flex;
+}
+
+.fjs-placeholders > div{
+    flex: 1;
+    height: 30vh;
 }

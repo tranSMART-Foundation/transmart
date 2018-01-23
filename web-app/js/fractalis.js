@@ -17,13 +17,11 @@ window.fractalisPanel = new Ext.Panel({
     listeners: {
         activate: function() {
             var conceptBox = document.querySelector('.fjs-concept-box');
-            var analysisSelect = document.querySelector('.fjs-analysis-select');
-            var fjs = initFractalis();
+            if (typeof window.fjs === 'undefined') {
+                window.fjs = initFractalis();
+            }
             activateDragAndDrop(conceptBox);
-            observeConceptBox(conceptBox, fjs);
-            // analysisSelect.addEventListener('change', function () {
-            //     fjs.setChart({selector: '.fjs-chart-placeholder', chart: analysisSelect.value});
-            // })
+            observeConceptBox(conceptBox);
         }
     }
 });
@@ -50,14 +48,14 @@ function activateDragAndDrop (conceptBox) {
     dtgI.notifyDrop = dropOntoCategorySelection;
 }
 
-function observeConceptBox (conceptBox, fjs) {
+function observeConceptBox (conceptBox) {
     new MutationObserver(function (target) {
         Array.prototype.map.call(target[0].addedNodes, function (node) {
             return getConceptAttributes(node);
         }).map(function (attr) {
             return {query: buildPicSureQuery(attr.path, attr.dataType), dataType: attr.dataType};
         }).forEach(function (d) {
-            fjs.loadData({dataType: d.dataType, query: d.query});
+            window.fjs.loadData({dataType: d.dataType, query: d.query});
         });
     }).observe(conceptBox, { childList: true });
 }
@@ -68,8 +66,6 @@ function getConceptAttributes (node) {
         dataType: node.getAttribute('setnodetype') === 'valueicon' ? 'numerical' : 'categorical'
     };
 }
-
-
 
 function buildPicSureQuery (path, type) {
     var alias = shortenConcept(path);
@@ -91,4 +87,18 @@ function shortenConcept (concept) {
     var split = concept.split('\\');
     split = split.filter(function(str) { return str !== ''; });
     return split[split.length - 2] + '/' + split[split.length - 1];
+}
+
+function setChart() {
+    var placeholder = document.createElement('div');
+    placeholder.appendChild(document.createElement('div'));
+    var placeholders = document.querySelector('.fjs-placeholders');
+    placeholders.appendChild(placeholder);
+    Array.prototype.forEach.call(placeholders.children, function (placeholder) {
+        placeholder.style.width = (Math.floor(100 / placeholders.children.length)) + '%';
+    });
+    window.fjs.setChart({
+        selector: placeholder.children[0],
+        chart: document.querySelector('.fjs-analysis-select').value
+    })
 }
