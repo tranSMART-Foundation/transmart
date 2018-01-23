@@ -12,10 +12,8 @@ window.fractalisPanel = new Ext.Panel({
     autoLoad: {
         url: pageInfo.basePath + '/fractalis/index',
         method: 'POST',
-        scripts: false
-    },
-    listeners: {
-        activate: function() {
+        scripts: false,
+        callback: function() {
             var conceptBox = document.querySelector('.fjs-concept-box');
             if (typeof window.fjs === 'undefined') {
                 window.fjs = initFractalis();
