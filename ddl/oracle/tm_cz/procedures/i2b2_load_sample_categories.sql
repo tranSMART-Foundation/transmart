@@ -68,7 +68,7 @@ BEGIN
     )
     select seq_patient_num.nextval,
 		   null as sex_cd,
-		   0 as age_in_years_num,
+		   null as age_in_years_num,
 		   null as race_cd,
 		   sysdate,
 		   sysdate,

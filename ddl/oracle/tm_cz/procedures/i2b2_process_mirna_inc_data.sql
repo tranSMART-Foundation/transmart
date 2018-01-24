@@ -264,7 +264,7 @@ BEGIN
 		  ,sysdate
 		  ,x.sourcesystem_cd
 	from (select distinct 'Unknown' as sex_cd,
-				 0 as age_in_years_num,
+				 null as age_in_years_num,
 				 null as race_cd,
 				 regexp_replace(TrialID || ':' || s.site_id || ':' || s.subject_id,'(::){1,}', ':') as sourcesystem_cd
 		 from LT_SRC_MIRNA_SUBJ_SAMP_MAP s

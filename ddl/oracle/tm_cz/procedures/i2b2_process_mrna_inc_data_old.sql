@@ -247,7 +247,7 @@ dbms_output.PUT_LINE('1');
 		  ,sysdate
 		  ,x.sourcesystem_cd
 	from (select distinct 'Unknown' as sex_cd,
-				 0 as age_in_years_num,
+				 null as age_in_years_num,
 				 null as race_cd,
 				 regexp_replace(TrialID || ':' || s.site_id || ':' || s.subject_id,'(::){1,}', ':') as sourcesystem_cd
 		 from lt_src_mrna_subj_samp_map s
