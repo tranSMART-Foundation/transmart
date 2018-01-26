@@ -1,5 +1,0 @@
---
--- default permissions for gwas_plink
---
-
-ALTER TABLE gwas_plink.plink
