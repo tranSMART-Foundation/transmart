@@ -102,6 +102,7 @@ where ('${dataimporter.request.clean}' != 'false' or id = '${dataimporter.reques
     , gene
     , mirna
     , biomarker_type
+    , biosource
     from biomart_user.browse_assays_view
     where ('${dataimporter.request.clean}' != 'false' or id = '${dataimporter.request.uid}')
     ">
@@ -118,6 +119,7 @@ where ('${dataimporter.request.clean}' != 'false' or id = '${dataimporter.reques
             <field name="ASSAY_PLATFORM_NAME" column="PLATFORM_NAME" splitBy="\|" />
             <field name="ASSAY_VENDOR" column="VENDOR" splitBy="\|" />
             <field name="ASSAY_TECHNOLOGY" column="TECHNOLOGY" splitBy="\|" />
+            <field name="BIOSOURCE" column="BIOSOURCE" splitBy="\|" />
         </entity>
     <entity name="ANALYSIS" transformer="RegexTransformer" query="
 select
