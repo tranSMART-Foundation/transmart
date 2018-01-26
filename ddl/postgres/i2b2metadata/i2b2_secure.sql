@@ -36,3 +36,8 @@ CREATE TABLE i2b2_secure (
 --
 CREATE INDEX idx_i2b2_secure_fullname ON i2b2_secure USING btree (c_fullname);
 
+--
+-- Name: idx_i2b2_secure_fullname; Type: INDEX; Schema: i2b2metadata; Owner: -
+--
+CREATE INDEX i2b2_secure_srcsystem_cd_idx ON i2b2_secure USING btree (sourcesystem_cd);
+
