@@ -4,6 +4,16 @@
 </head>
 
 <body>
+
+<div class="fjs-spinner">
+    <span>Retrieving patient ids...</span>
+    <div class="fjs-rect1"></div>
+    <div class="fjs-rect2"></div>
+    <div class="fjs-rect3"></div>
+    <div class="fjs-rect4"></div>
+    <div class="fjs-rect5"></div>
+</div>
+
 <div class="fjs-transmart">
     <div class="fjs-block-0">
         <p>Welcome to Fractalis in tranSMART!</p>

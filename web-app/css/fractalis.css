@@ -56,3 +56,68 @@
     flex: 1;
     height: 30vh;
 }
+
+
+
+.fjs-spinner {
+    margin: 100px auto;
+    width: 50px;
+    height: 40px;
+    text-align: center;
+    font-size: 10px;
+    display: none;
+}
+
+.fjs-spinner > span {
+    font-size: 2em;
+    white-space: nowrap;
+    color: black;
+    margin-left: -100%;
+    margin-right: -100%;
+    text-align: center;
+}
+
+.fjs-spinner > div {
+    background-color: #333;
+    height: 100%;
+    width: 6px;
+    display: inline-block;
+
+    -webkit-animation: fjs-sk-stretchdelay 1.2s infinite ease-in-out;
+    animation: fjs-sk-stretchdelay 1.2s infinite ease-in-out;
+}
+
+.fjs-spinner .fjs-rect2 {
+    -webkit-animation-delay: -1.1s;
+    animation-delay: -1.1s;
+}
+
+.fjs-spinner .fjs-rect3 {
+    -webkit-animation-delay: -1.0s;
+    animation-delay: -1.0s;
+}
+
+.fjs-spinner .fjs-rect4 {
+    -webkit-animation-delay: -0.9s;
+    animation-delay: -0.9s;
+}
+
+.fjs-spinner .fjs-rect5 {
+    -webkit-animation-delay: -0.8s;
+    animation-delay: -0.8s;
+}
+
+@-webkit-keyframes fjs-sk-stretchdelay {
+    0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
+    20% { -webkit-transform: scaleY(1.0) }
+}
+
+@keyframes fjs-sk-stretchdelay {
+    0%, 40%, 100% {
+        transform: scaleY(0.4);
+        -webkit-transform: scaleY(0.4);
+    }  20% {
+           transform: scaleY(1.0);
+           -webkit-transform: scaleY(1.0);
+       }
+}

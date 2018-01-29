@@ -24,10 +24,25 @@ window.fractalisPanel = new Ext.Panel({
     },
     listeners: {
         activate: function () {
-            getPatientIDs().then(function (ids) {
-                var subset1 = ids.filter(function (d) { return d.subset === 1; }).map(function (d) { return d.id; });
-                var subset2 = ids.filter(function (d) { return d.subset === 2; }).map(function (d) { return d.id; });
-                window.fjs.setSubsets([subset1, subset2]);
+            getPatientIDs().then(
+                function (ids) {
+                    var subset1 = ids.filter(function (d) {
+                        return d.subset === 1;
+                    }).map(function (d) {
+                        return d.id;
+                    });
+                    var subset2 = ids.filter(function (d) {
+                        return d.subset === 2;
+                    }).map(function (d) {
+                        return d.id;
+                    });
+                    window.fjs.setSubsets([subset1, subset2]);
+                },
+                function (error) {
+                    alert('Could not retrieve patient ids. Reason: ' + error);
+                }
+            ).then(function () {
+                showLoadingScreen(false);
             });
         }
     }
@@ -148,4 +163,13 @@ function getPatientIDs () {
         });
     });
     return dfd.promise();
+}
+
+function showLoadingScreen (bb) {
+    var container = document.querySelector('.fjs-spinner');
+    if (bb) {
+        container.style.display = 'block'
+    } else {
+        container.style.display = 'none'
+    }
 }
