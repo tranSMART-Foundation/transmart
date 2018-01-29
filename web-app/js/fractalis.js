@@ -21,6 +21,15 @@ window.fractalisPanel = new Ext.Panel({
             activateDragAndDrop(conceptBox);
             observeConceptBox(conceptBox);
         }
+    },
+    listeners: {
+        activate: function () {
+            getPatientIDs().then(function (ids) {
+                var subset1 = ids.filter(function (d) { return d.subset === 1; }).map(function (d) { return d.id; });
+                var subset2 = ids.filter(function (d) { return d.subset === 2; }).map(function (d) { return d.id; });
+                window.fjs.setSubsets([subset1, subset2]);
+            });
+        }
     }
 });
 
@@ -108,4 +117,35 @@ function setChart () {
 function clearCache () {
     window.fjs.clearCache();
     document.querySelector('.fjs-concept-box').innerHTML = '';
+}
+
+function getPatientIDs () {
+    var dfd = jQuery.Deferred();
+    runAllQueries(function () {
+        jQuery.ajax({
+            url: pageInfo.basePath + '/chart/clearGrid',
+            method: 'POST',
+            data: {
+                charttype: 'cleargrid'
+            }
+        }).then(function () {
+            jQuery.ajax({
+                url: pageInfo.basePath + '/chart/analysisGrid',
+                type: 'POST',
+                data: {
+                    concept_key: '',
+                    result_instance_id1: GLOBAL.CurrentSubsetIDs[1],
+                    result_instance_id2: GLOBAL.CurrentSubsetIDs[2]
+                }
+            }).then(function (res) {
+                var ids = [];
+                JSON.parse(res).rows.map(function (d) {
+                    ids.push({id: d.patient, subset: d.subset === 'subset1' ? 1 : 2});
+                });
+                dfd.resolve(ids);
+            });
+
+        });
+    });
+    return dfd.promise();
 }
