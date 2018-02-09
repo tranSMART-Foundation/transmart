@@ -47,8 +47,7 @@
             <p>
                 <span style="font-weight: bold;">Step 2)</span>
                 Now please select what analysis you want to perform.
-                Don't worry. This choice is not final and you can change it at any point in time.
-                You are asking why there's an 'add' button? Fractalis supports multiple charts in parallel and lets them interact with each other!
+                You can add multiple charts in parallel and let them interact with each other!
             </p>
         </div>
     </div>
@@ -60,7 +59,6 @@
                 It will take some time to prepare the data for the first time, so this is a good opportunity to learn about the Fractalis control panel.
                 Did you notice the black transparent bar that appeared on the screen? Here you can assign "roles" to the data you loaded into the cache in the first step.
                 E.g. what is your X- and what is your Y-axis in a scatter plot? This panel also lets you set analysis parameters, see currently running jobs, and a couple of other things.
-                Just play with it, it's pretty intuitive!
             </p>
         </div>
     </div>

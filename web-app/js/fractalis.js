@@ -23,6 +23,9 @@ window.fractalisPanel = new Ext.Panel({
         }
     },
     listeners: {
+        deactivate: function () {
+          fjs_resetUrl();
+        },
         activate: function () {
             fjs_setUrl();
             fjs_showLoadingScreen(true);
@@ -62,6 +65,9 @@ function fjs_initFractalis () {
         fractalisNode: 'http://127.0.0.1:5000',
         getAuth: function () {
             return {token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzYW1scHxhdmxib3RAZGJtaS5obXMuaGFydmFyZC5lZHUiLCJhdWQiOiJ5d0FxNFh1NEtsM3VZTmRtM20wNUNjNW93ME9pYnZYdCIsImlzcyI6MTUxNTQzMTA3MCwiZXhwIjoxNTE3MjcwNDAwLCJlbWFpbCI6ImF2bGJvdEBkYm1pLmhtcy5oYXJ2YXJkLmVkdSIsImRlc2NyaXB0aW9uIjoiQXV0b2dlbmVyYXRlZCB0b2tlbiBmb3IgbmhhbmVzLmhtcy5oYXJ2YXJkLmVkdSJ9.dK698TIevR2BpY9RL7qPHEA39C0YhrgtCGlRAfpKRuw'}
+        },
+        options: {
+            controlPanelPosition: 'right'
         }
     });
 }
@@ -123,10 +129,25 @@ function fjs_setUrl () {
     window.history.pushState(null, '', url)
 }
 
+function fjs_resetUrl () {
+    var url = pageInfo.basePath + '/datasetExplorer';
+    window.history.pushState(null, '', url)
+}
+
 function fjs_handleStateIDs (stateIDs) {
-    stateIDs.forEach(function (stateID) {
+    Ext.Msg.alert('The url you specified contains a Fractalis state.\n' +
+        'We will attempt to recover the associated charts and inform you once this has been done.');
+    window.fjs_clearCache();
+    Promise.all(stateIDs.map(function (stateID) {
         var chartID = fjs_addChartContainer();
-        window.fjs.id2chart(chartID, stateID);
+        return window.fjs.id2chart(chartID, stateID);
+    })).then(
+        function () {
+            Ext.Msg.alert('All charts have been successfully recovered. Please proceed to the Fractalis tab.');
+        }
+    ).catch(function () {
+        Ext.Msg.alert('Could not recover one or more charts from URL.\n' +
+            'Contact your administrator if this issue persists.');
     });
     fjs_setUrl();
 }
