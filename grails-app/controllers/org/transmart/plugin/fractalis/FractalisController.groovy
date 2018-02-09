@@ -47,4 +47,9 @@ class FractalisController {
 
 		render result.toString()
 	}
+
+    def state() {
+        [url: request.scheme + '://' + request.serverName + ':' +
+                request.serverPort + request.contextPath + '/datasetExplorer']
+    }
 }

@@ -16,15 +16,17 @@ window.fractalisPanel = new Ext.Panel({
         callback: function() {
             var conceptBox = document.querySelector('.fjs-concept-box');
             if (typeof window.fjs === 'undefined') {
-                window.fjs = initFractalis();
+                window.fjs = fjs_initFractalis();
             }
-            activateDragAndDrop(conceptBox);
-            observeConceptBox(conceptBox);
+            fjs_activateDragAndDrop(conceptBox);
+            fjs_observeConceptBox(conceptBox);
         }
     },
     listeners: {
         activate: function () {
-            getPatientIDs().then(
+            fjs_setUrl();
+            fjs_showLoadingScreen(true);
+            fjs_getPatientIDs().then(
                 function (ids) {
                     var subset1 = ids.filter(function (d) {
                         return d.subset === 1;
@@ -42,7 +44,7 @@ window.fractalisPanel = new Ext.Panel({
                     alert('Could not retrieve patient ids. Reason: ' + error);
                 }
             ).then(function () {
-                showLoadingScreen(false);
+                fjs_showLoadingScreen(false);
             });
         }
     }
@@ -53,7 +55,7 @@ window.addFractalisPanel = function addFractalisPanel(parentPanel) {
     parentPanel.insert(4, window.fractalisPanel);
 };
 
-function initFractalis () {
+function fjs_initFractalis () {
     return fractal.init({
         handler: 'pic-sure',
         dataSource: 'https://nhanes.hms.harvard.edu',
@@ -64,20 +66,20 @@ function initFractalis () {
     });
 }
 
-function activateDragAndDrop (conceptBox) {
+function fjs_activateDragAndDrop (conceptBox) {
     var extObj = Ext.get(conceptBox);
     var dtgI = new Ext.dd.DropTarget(extObj, {ddGroup: 'makeQuery'});
     dtgI.notifyDrop = dropOntoCategorySelection;
 }
 
-function observeConceptBox (conceptBox) {
+function fjs_observeConceptBox (conceptBox) {
     new MutationObserver(function (targets) {
         var descriptors = [];
         targets.forEach(function (target) {
             Array.prototype.map.call(target.addedNodes, function (node) {
-                return getConceptAttributes(node);
+                return fjs_getConceptAttributes(node);
             }).map(function (attr) {
-                return {query: buildPicSureQuery(attr.path, attr.dataType), dataType: attr.dataType};
+                return {query: fjs_buildPicSureQuery(attr.path, attr.dataType), dataType: attr.dataType};
             }).forEach(function (d) {
                 descriptors.push({dataType: d.dataType, query: d.query});
             });
@@ -86,15 +88,15 @@ function observeConceptBox (conceptBox) {
     }).observe(conceptBox, { childList: true });
 }
 
-function getConceptAttributes (node) {
+function fjs_getConceptAttributes (node) {
     return {
         path: node.getAttribute('conceptid'),
         dataType: node.getAttribute('setnodetype') === 'valueicon' ? 'numerical' : 'categorical'
     };
 }
 
-function buildPicSureQuery (path, type) {
-    var alias = shortenConcept(path);
+function fjs_buildPicSureQuery (path, type) {
+    var alias = fjs_shortenConcept(path);
     return {
         "select": [
             {"field": {"pui": path}, "alias": alias}
@@ -109,32 +111,52 @@ function buildPicSureQuery (path, type) {
     }
 }
 
-function shortenConcept (concept) {
+function fjs_shortenConcept (concept) {
     var split = concept.split('\\');
     split = split.filter(function(str) { return str !== ''; });
     return split[split.length - 2] + '/' + split[split.length - 1];
 }
 
-function setChart () {
-    var placeholder = document.createElement('div');
-    placeholder.appendChild(document.createElement('div'));
-    var placeholders = document.querySelector('.fjs-placeholders');
-    placeholders.appendChild(placeholder);
-    Array.prototype.forEach.call(placeholders.children, function (placeholder) {
-        placeholder.style.width = (Math.floor(100 / placeholders.children.length)) + '%';
-    });
-    window.fjs.setChart({
-        selector: placeholder.children[0],
-        chart: document.querySelector('.fjs-analysis-select').value
-    })
+var chartStates = {};
+function fjs_setUrl () {
+    var url = pageInfo.basePath + '/fractalis/state/' + Object.values(chartStates).join('+');
+    window.history.pushState(null, '', url)
 }
 
-function clearCache () {
+function fjs_handleStateIDs (stateIDs) {
+    stateIDs.forEach(function (stateID) {
+        var chartID = fjs_addChartContainer();
+        window.fjs.id2chart(chartID, stateID);
+    });
+    fjs_setUrl();
+}
+
+function fjs_addChartContainer () {
+    var chart = document.createElement('div');
+    var container = document.querySelector('.fjs-placeholders');
+    chart.id = 'fjs-chart-' + container.children.length;
+    container.appendChild(chart);
+    Array.prototype.forEach.call(container.children, function (chart) {
+        chart.style.width = (Math.floor(100 / container.children.length)) + '%';
+    });
+    return chart.id;
+}
+
+function fjs_setChart () {
+    var chartID = fjs_addChartContainer();
+    var vm = window.fjs.setChart(document.querySelector('.fjs-analysis-select').value, '#' + chartID);
+    window.fjs.chart2id(vm, function (id) {
+        chartStates[chartID] = id;
+        fjs_setUrl();
+    });
+}
+
+function fjs_clearCache () {
     window.fjs.clearCache();
     document.querySelector('.fjs-concept-box').innerHTML = '';
 }
 
-function getPatientIDs () {
+function fjs_getPatientIDs () {
     var dfd = jQuery.Deferred();
     runAllQueries(function () {
         jQuery.ajax({
@@ -165,7 +187,7 @@ function getPatientIDs () {
     return dfd.promise();
 }
 
-function showLoadingScreen (bb) {
+function fjs_showLoadingScreen (bb) {
     var container = document.querySelector('.fjs-spinner');
     if (bb) {
         container.style.display = 'block'
