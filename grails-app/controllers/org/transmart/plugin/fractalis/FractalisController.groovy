@@ -1,9 +1,12 @@
 package org.transmart.plugin.fractalis
 
+import grails.converters.JSON
 import org.json.JSONArray
 import org.json.JSONObject
 
 class FractalisController {
+
+	def i2b2HelperService
 
 	def index() {}
 
@@ -15,7 +18,7 @@ class FractalisController {
 		// list of required javascript files
 		def scripts = [
 				servletContext.contextPath + pluginContextPath + '/js/fractalis.js',
-				servletContext.contextPath + pluginContextPath + '/js/resources/fractal-0.1.9.min.js'
+				servletContext.contextPath + pluginContextPath + '/js/resources/fractal-0.2.0.min.js'
 		]
 		// list of required css files
 		def styles = [
@@ -52,4 +55,21 @@ class FractalisController {
         [url: request.scheme + '://' + request.serverName + ':' +
                 request.serverPort + request.contextPath + '/datasetExplorer']
     }
+
+	def patients() {
+		def resultInstanceID1 = request.getParameter('result_instance_id1')
+		def resultInstanceID2 = request.getParameter('result_instance_id2')
+
+        def subjectIDs1 = ''
+        def subjectIDs2 = ''
+		if (resultInstanceID1 != null && resultInstanceID1.trim().length() != 0) {
+            subjectIDs1 = i2b2HelperService.getSubjects(resultInstanceID1)
+		}
+		if (resultInstanceID2 != null && resultInstanceID2.trim().length() != 0) {
+			subjectIDs2 = i2b2HelperService.getSubjects(resultInstanceID2)
+		}
+
+        def response = ['subjectIDs1': subjectIDs1, 'subjectIDs2': subjectIDs2]
+		render response as JSON
+	}
 }

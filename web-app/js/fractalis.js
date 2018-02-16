@@ -24,23 +24,15 @@ window.fractalisPanel = new Ext.Panel({
     },
     listeners: {
         deactivate: function () {
-          fjs_resetUrl();
+            fjs_resetUrl();
         },
         activate: function () {
             fjs_setUrl();
             fjs_showLoadingScreen(true);
             fjs_getPatientIDs().then(
                 function (ids) {
-                    var subset1 = ids.filter(function (d) {
-                        return d.subset === 1;
-                    }).map(function (d) {
-                        return d.id;
-                    });
-                    var subset2 = ids.filter(function (d) {
-                        return d.subset === 2;
-                    }).map(function (d) {
-                        return d.id;
-                    });
+                    var subset1 = ids.subjectIDs1.split(',');
+                    var subset2 = ids.subjectIDs2.split(',');
                     window.fjs.setSubsets([subset1, subset2]);
                 },
                 function (error) {
@@ -64,7 +56,7 @@ function fjs_initFractalis () {
         dataSource: 'https://nhanes.hms.harvard.edu',
         fractalisNode: 'http://127.0.0.1:5000',
         getAuth: function () {
-            return {token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzYW1scHxhdmxib3RAZGJtaS5obXMuaGFydmFyZC5lZHUiLCJhdWQiOiJ5d0FxNFh1NEtsM3VZTmRtM20wNUNjNW93ME9pYnZYdCIsImlzcyI6MTUxNTQzMTA3MCwiZXhwIjoxNTE3MjcwNDAwLCJlbWFpbCI6ImF2bGJvdEBkYm1pLmhtcy5oYXJ2YXJkLmVkdSIsImRlc2NyaXB0aW9uIjoiQXV0b2dlbmVyYXRlZCB0b2tlbiBmb3IgbmhhbmVzLmhtcy5oYXJ2YXJkLmVkdSJ9.dK698TIevR2BpY9RL7qPHEA39C0YhrgtCGlRAfpKRuw'}
+            return {token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb21tb258cHVibGljdXNlckBkYm1pLmhtcy5oYXJ2YXJkLmVkdSIsImVtYWlsIjoicHVibGljdXNlciJ9.LLfNCgifHzzxNhor8mALUXoPR18g8beAWpwTG1dv4YY'}
         },
         options: {
             controlPanelPosition: 'right'
@@ -103,6 +95,8 @@ function fjs_getConceptAttributes (node) {
 
 function fjs_buildPicSureQuery (path, type) {
     var alias = fjs_shortenConcept(path);
+    path = path.replace(/\\+/g, '/');
+    path = '/nhanes/Demo' + path; // #FIXME This is a VERY ugly hardcoded hack that should not be in production
     return {
         "select": [
             {"field": {"pui": path}, "alias": alias}
@@ -125,11 +119,13 @@ function fjs_shortenConcept (concept) {
 
 var chartStates = {};
 function fjs_setUrl () {
+    return
     var url = pageInfo.basePath + '/fractalis/state/' + Object.values(chartStates).join('+');
     window.history.pushState(null, '', url)
 }
 
 function fjs_resetUrl () {
+    return
     var url = pageInfo.basePath + '/datasetExplorer';
     window.history.pushState(null, '', url)
 }
@@ -157,15 +153,13 @@ function fjs_addChartContainer () {
     var container = document.querySelector('.fjs-placeholders');
     chart.id = 'fjs-chart-' + container.children.length;
     container.appendChild(chart);
-    Array.prototype.forEach.call(container.children, function (chart) {
-        chart.style.width = (Math.floor(100 / container.children.length)) + '%';
-    });
     return chart.id;
 }
 
 function fjs_setChart () {
     var chartID = fjs_addChartContainer();
     var vm = window.fjs.setChart(document.querySelector('.fjs-analysis-select').value, '#' + chartID);
+    return
     window.fjs.chart2id(vm, function (id) {
         chartStates[chartID] = id;
         fjs_setUrl();
@@ -181,29 +175,16 @@ function fjs_getPatientIDs () {
     var dfd = jQuery.Deferred();
     runAllQueries(function () {
         jQuery.ajax({
-            url: pageInfo.basePath + '/chart/clearGrid',
-            method: 'POST',
+            url: pageInfo.basePath + '/fractalis/patients',
+            type: 'POST',
             data: {
-                charttype: 'cleargrid'
+                result_instance_id1: GLOBAL.CurrentSubsetIDs[1],
+                result_instance_id2: GLOBAL.CurrentSubsetIDs[2]
             }
-        }).then(function () {
-            jQuery.ajax({
-                url: pageInfo.basePath + '/chart/analysisGrid',
-                type: 'POST',
-                data: {
-                    concept_key: '',
-                    result_instance_id1: GLOBAL.CurrentSubsetIDs[1],
-                    result_instance_id2: GLOBAL.CurrentSubsetIDs[2]
-                }
-            }).then(function (res) {
-                var ids = [];
-                JSON.parse(res).rows.map(function (d) {
-                    ids.push({id: d.patient, subset: d.subset === 'subset1' ? 1 : 2});
-                });
-                dfd.resolve(ids);
-            });
-
+        }).then(function (res) {
+            dfd.resolve(res);
         });
+
     });
     return dfd.promise();
 }
