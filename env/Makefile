@@ -1,10 +1,13 @@
 KETTLE_VERSION=4.4.0
 TRANSMART_RELEASE_BRANCH=release-16.2
 
-UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev php5-cli php5-json curl \
-				tar openjdk-7-jdk gfortran g++ unzip libreadline-dev \
+UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
+				tar gfortran g++ unzip libreadline-dev \
 				libxt-dev libpango1.0-dev libprotoc-dev \
 				texlive-fonts-recommended tex-gyre liblz4-tool pv zip
+
+UBUNTU14_PACKAGES=php5-cli php5-json openjdk-7-jdk
+UBUNTU16_PACKAGES=php7.0-cli php7.0-json
 
 GROOVY_VERSION=2.1.9
 
@@ -85,13 +88,21 @@ $(PHP_BIN): $(PHP_SRCDIR)/.keep
 php: $(PHP_BIN)
 	ln -s $< $@
 
-install_ubuntu_packages:
+install_ubuntu_packages14:
 	. /etc/lsb-release; \
-		test $$DISTRIB_RELEASE != '12.04' || \
+		test $$DISTRIB_RELEASE != '16.04' || \
 	    grep ondrej/php5 /etc/apt/sources.list || ( \
 				gpg --recv-keys --keyserver keyserver.ubuntu.com $(ONDREJ_KEY) && \
 				(gpg -a --export $(ONDREJ_KEY) | apt-key add -) && \
 				echo 'deb http://ppa.launchpad.net/ondrej/php5/ubuntu precise main' >> /etc/apt/sources.list)
+	apt-get update
+	apt-get install -y $(UBUNTU14_PACKAGES)
+
+install_ubuntu_packages16:
+	apt-get update
+	apt-get install -y $(UBUNTU16_PACKAGES)
+
+install_ubuntu_packages:
 	apt-get update
 	apt-get install -y $(UBUNTU_PACKAGES)
 
