@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Version: Wed Mar  9 21:27:31 EST 2016
+# Version: Mon Nov  13 05:30:00 EST 2017
 # 
-#**********************************************************************************
-#  Script to load all that is needed to run an example/demo version of tranSMART 1.2.4
-#**********************************************************************************
+#************************************************************************************
+#  Script to load all that is needed to run an example/demo version of tranSMART 16.2
+#************************************************************************************
 
 # set up with 
 #   sudo apt-get update
@@ -13,10 +13,10 @@
 #
 # to run the install scripts
 #   cd $HOME
-#   ./Scripts/install-ubuntu/InstallTransmart.sh
+#   ./Scripts/install-ubuntu16/InstallTransmart.sh
 #
 # to run the checking scripts
-#   Scripts/install-ubuntu/checks/checkAll.sh
+#   Scripts/install-ubuntu16/checks/checkAll.sh
 
 # on error; stop/exit
 set -e
@@ -65,7 +65,7 @@ fi
 echo "tranSMART will be installed at this location: $INSTALL_BASE"
 
 # give user option to suppress sudo timeout (see welcome.sh)
-cd $SCRIPTS_BASE/Scripts/install-ubuntu
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16
 source welcome.sh
 
 # set up sudo early
@@ -85,12 +85,12 @@ cd $INSTALL_BASE
 sudo -v
 sudo apt-get -q install -y curl
 sudo apt-get -q install -y unzip
-if ! [ -e transmart-data-release-1.2.4.zip ] ; then
-	curl https://codeload.github.com/tranSMART-Foundation/transmart-data/zip/release-1.2.5-Beta -o transmart-data-release-1.2.5-Beta.zip
+if ! [ -e transmart-data-release-16.2.zip ] ; then
+    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/transmart-data-release-16.2.zip --output transmart-data-release-16.2.zip
 fi
 if ! [ -e transmart-data ] ; then
-	unzip transmart-data-release-1.2.5-Beta.zip
-	mv transmart-data-release-1.2.5-Beta transmart-data
+	unzip transmart-data-release-16.2.zip
+	mv transmart-data-release-16.2 transmart-data
 fi
 
 echo "Finished setting up the transmart-date folder at $(date)"
@@ -105,9 +105,10 @@ echo "++++++++++++++++++++++++++++"
 # (1)
 sudo -v
 cd $INSTALL_BASE/transmart-data
-sudo make -C env install_ubuntu_packages 
+sudo make -C env install_ubuntu_packages16 
+sudo make -C env install_ubuntu_packages
 # verify these packages
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkMakefilePackages.sh
 if [ "$( checkInstallError "Some Basic Command-Line Tool from 'sudo make -C env install_ubuntu_packages' is missing; redo install" )" ] ; then exit -1; fi
 echo "sudo make -C env install_ubuntu_packages - finished at $(date)"
@@ -117,7 +118,7 @@ sudo -v
 cd $INSTALL_BASE/transmart-data
 sudo make -C env /var/lib/postgresql/tablespaces
 # verify tablespaces
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkFilesTablespace.sh
 if [ "$( checkInstallError "TABLESPACE files (/var/lib/postgresql/tablespaces) not set up properly; redo install" )" ] ; then exit -1; fi
 echo "sudo make -C env /var/lib/postgresql/tablespaces - finished at $(date)"
@@ -135,9 +136,9 @@ echo "++++++++++++++++++++++++++++"
 # (1)
 sudo -v
 cd $INSTALL_BASE/transmart-data
-make -C env update_etl
+make -C env update_etl_git
 # verify ETL folder
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkFilesETLFolder.sh
 if [ "$( checkInstallError "The directory transmart-data/tranSMART-ETL was not installed properly; redo install" )" ] ; then exit -1; fi
 
@@ -152,7 +153,7 @@ sudo -v
 cd $INSTALL_BASE/transmart-data
 make -C env data-integration 
 # verify data-integration folder
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkFilesDataIntegrationFolder.sh
 if [ "$( checkInstallError "The directory transmart-data/data-integration was not installed properly; redo install" )" ] ; then exit -1; fi
 
@@ -167,7 +168,7 @@ sudo -v
 cd $INSTALL_BASE/transmart-data
 make -C env ../vars
 # verify setup of vars file
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkFilesVars.sh
 if [ "$( checkInstallError "vars file (transmart-data/vars) not set up properly; redo install" )" ] ; then exit -1; fi
 
@@ -195,7 +196,7 @@ echo "Y" > AnswerYes.txt
 source $HOME/.sdkman/bin/sdkman-init.sh
 sdk install grails 2.3.11 < AnswerYes.txt
 sdk install groovy 2.4.5 < AnswerYes.txt
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkSdkmanApps.sh
 if [ "$( checkInstallError "groovy and/or grails not installed correctly; redo install" )" ] ; then exit -1; fi
 
@@ -213,7 +214,7 @@ cd $INSTALL_BASE/transmart-data
 sudo chmod 700 $TABLESPACES/*
 
 echo "Checks on basic load"
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./basics.sh
 if [ "$( checkInstallError "Some Basic Command-Line Tool is missing; redo install" )" ] ; then exit -1; fi
 ./checkVersions.sh
@@ -237,10 +238,10 @@ sudo -v
 cd $HOME
 sudo apt-get -q install -y tomcat7 
 sudo service tomcat7 stop
-$SCRIPTS_BASE/Scripts/install-ubuntu/updateTomcatConfig.sh
+$SCRIPTS_BASE/Scripts/install-ubuntu16/updateTomcatConfig.sh
 
 echo "+  Checks on tomcat install"
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkTomcatInstall.sh
 if [ "$( checkInstallError "Tomcat install failed; redo install" )" ] ; then exit -1; fi
 
@@ -288,7 +289,7 @@ cd $INSTALL_BASE/transmart-data
 source ./vars
 sudo TABLESPACES=$TABLESPACES TRANSMART_USER="tomcat7" make -C R install_rserve_init
 
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkFilesR.sh
 if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1; fi
 ./checkR.sh
@@ -302,7 +303,7 @@ echo "++++++++++++++++++++++++++++"
 
 # only load database if not already loaded
 set +e
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkPsqlDataLoad.sh quiet
 returnCode=$?
 set -e
@@ -315,7 +316,7 @@ else
 	source ./vars
 	make -j4 postgres
 fi
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkPsqlDataLoad.sh
 if [ "$( checkInstallError "Loading database failed; clear database and run install again" )" ] ; then exit -1; fi
 
@@ -334,7 +335,7 @@ sudo mkdir -p /usr/share/tomcat7/.grails/transmartConfig/
 sudo cp $HOME/.grails/transmartConfig/*.groovy /usr/share/tomcat7/.grails/transmartConfig/
 sudo chown -R tomcat7:tomcat7 /usr/share/tomcat7/.grails
 
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkFilesConfig.sh
 if [ "$( checkInstallError "configuration files not set up correctly, see install script and redo" )" ] ; then exit -1; fi
 
@@ -352,15 +353,15 @@ fi
 
 cd war-files
 if ! [ -e transmart.war ]; then
-	curl http://library.transmartfoundation.org/wars/transmart.V1.2.5-Beta.war --output transmart.war
+    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/transmart.war --output transmart.war
 fi
 if ! [ -e gwava.war ]; then
-	curl http://library.transmartfoundation.org/wars/gwava.V1.2.5-Beta.war --output gwava.war
+    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/gwava.war --output gwava.war
 fi
 sudo cp *.war /var/lib/tomcat7/webapps/
 
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
-./checkFilesTomcatWar.sh
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
+sudo ./checkFilesTomcatWar.sh
 if [ "$( checkInstallError "transmart war file not set up correctly, see install script and redo" )" ] ; then exit -1; fi
 
 echo "Finished installing war files at $(date)"
@@ -387,9 +388,10 @@ echo "++++++++++++++++++++++++++++"
 # and unfortunately, this does not work either.
 #  (TODO)  Should check to see if it is already running
 sudo -v
-cd $SCRIPTS_BASE/Scripts/install-ubuntu
-sudo -u tomcat7 bash -c "INSTALL_BASE=\"$INSTALL_BASE\" ./runRServe.sh"
-#sudo service rserve start - is not working - not sure why
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16
+# rserve runs as user transmart
+# using /etc/init.d/rserve
+sudo systemctl start rserve
 echo "Finished starting RServe at $(date)"
 
 echo "++++++++++++++++++++++++++++"
@@ -407,14 +409,14 @@ echo "+ Done with install - making final checks - (may take a while)"
 echo "++++++++++++++++++++++++++++"
 
 set e+
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
-./checkFilesTomcat.sh
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
+sudo ./checkFilesTomcat.sh
 ./checkTools.sh
 ./checkWeb.sh
 
 echo "++++++++++++++++++++++++++++"
 echo "+ To redo all checks"
-echo "cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks"
+echo "cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks"
 echo "./checkAll.sh"
 echo "++++++++++++++++++++++++++++"
 echo "+ Done with final checks"
@@ -433,7 +435,7 @@ echo "corresponding to the data sets you wish to load. "
 echo ""
 echo "Then run the file load_datasets.sh with:"
 echo "    cd $SCRIPTS_BASE"
-echo "    ./Scripts/install-ubuntu/load_datasets.sh"
+echo "    ./Scripts/install-ubuntu16/load_datasets.sh"
 echo ""
 echo "-- Note that loading the same dataset twice is not recommended" 
 echo "   and may produce unpredictable results"
