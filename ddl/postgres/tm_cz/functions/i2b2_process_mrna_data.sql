@@ -317,7 +317,7 @@ BEGIN
 		  ,current_timestamp
 		  ,x.sourcesystem_cd
 	from (select distinct 'Unknown' as sex_cd,
-				 null as age_in_years_num,
+				 null::integer as age_in_years_num,
 				 null as race_cd,
 				 regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g') as sourcesystem_cd
 		 from tm_lz.lt_src_mrna_subj_samp_map s
@@ -1146,14 +1146,14 @@ BEGIN
 		insert into tm_wz.wt_subject_microarray_logs
 		(probeset_id
 		,assay_id
-        ,patient_id
+		,patient_id
 		,raw_intensity
 		,log_intensity
 		,trial_name
 		)
 		select probeset_id
 			  ,assay_id
-              ,patient_id
+			  ,patient_id
 			  ,case when dataType = 'R' then intensity_value else 
 				    case when logBase = -1 then 0 else power(logBase::double precision, intensity_value::double precision) end
 			   end

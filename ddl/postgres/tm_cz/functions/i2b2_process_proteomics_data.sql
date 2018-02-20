@@ -255,7 +255,7 @@ BEGIN
 		  ,now()
 		  ,x.sourcesystem_cd
 	from (select distinct 'Unknown' as sex_cd,
-				 null as age_in_years_num,
+				 null::integer as age_in_years_num,
 				 null as race_cd,
 				 regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g') as sourcesystem_cd
 		 from LT_SRC_PROTEOMICS_SUB_SAM_MAP s

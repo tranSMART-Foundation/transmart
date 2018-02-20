@@ -70,7 +70,7 @@ BEGIN
     )
     select seq_patient_num.nextval,
 		   'Unknown' as sex_cd,
-		   null as age_in_years_num,
+		   null::integer as age_in_years_num,
 		   null as race_cd,
 		   sysdate,
 		   sysdate,
