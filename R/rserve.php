@@ -30,7 +30,7 @@ function do_start {
         # but obviously we are unable to do that
         exec 7>&1
         exec 1>/dev/null
-        sudo --user="$USER" "<?= $r ?> CMD Rserve --quiet --vanilla" >&7
+        sudo --user="$USER" "<?= $r ?>" CMD Rserve --quiet --vanilla >&7
         EXIT_VAL=$?
         exec 1>&7 7>&-
         if [ $EXIT_VAL -eq 0 ]; then
