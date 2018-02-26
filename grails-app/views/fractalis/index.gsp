@@ -22,18 +22,6 @@
     </div>
     <hr>
     <div class="fjs-block-1">
-        <div class="fjs-concept-box"></div>
-        <div>
-            <p>
-                <span style="font-weight: bold;">Step 1)</span>
-                Please drag all data you want to analyse from the tree on the left into this box here.
-                This will load the selected data into the Fractalis data cache, so that subsequent analyses become really fast!
-            </p>
-            <input type="button" value="Clear analysis cache" style="margin-top: 1vh;" onclick="fjs_clearCache()"/>
-        </div>
-    </div>
-    <hr>
-    <div class="fjs-block-2">
         <div style="text-align: center;">
             <select class="fjs-analysis-select" data-placeholder="1">
                 <option selected disabled>--Choose an analysis--</option>
@@ -41,14 +29,26 @@
                 <option value="boxplot">Boxplot Analysis</option>
                 <option value="pca-analysis">Principle Component Analysis</option>
             </select>
-            <input type="button" value="Add" onclick="fjs_setChart()"/>
+            <input type="button" value="Add" onclick="fjsService.setChart()"/>
         </div>
         <div>
             <p>
-                <span style="font-weight: bold;">Step 2)</span>
-                Now please select what analysis you want to perform.
+                <span style="font-weight: bold;">Step 1)</span>
+                Please select what analysis you want to perform.
                 You can add multiple charts in parallel and let them interact with each other!
             </p>
+        </div>
+    </div>
+    <hr>
+    <div class="fjs-block-2">
+        <div class="fjs-concept-box"></div>
+        <div>
+            <p>
+                <span style="font-weight: bold;">Step 2)</span>
+                Now please drag all data you want to analyse from the tree on the left into this box here.
+                This will load the selected data into the Fractalis data cache, so that subsequent analyses become really fast!
+            </p>
+            <input type="button" value="Clear analysis cache" style="margin-top: 1vh;" onclick="fjsService.clearCache()"/>
         </div>
     </div>
     <hr>

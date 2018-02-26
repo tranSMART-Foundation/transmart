@@ -1,0 +1,11 @@
+{
+  "extends": "standard",
+  "plugins": ["html"],
+  "globals": {
+    "Ext": true,
+    "jQuery": true
+  },
+  "rules": {
+    "no-extra-semi": "warn"
+  }
+}

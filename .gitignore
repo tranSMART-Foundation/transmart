@@ -15,3 +15,4 @@
 /target-eclipse
 cobertura.ser
 .slcache/
+node_modules/
