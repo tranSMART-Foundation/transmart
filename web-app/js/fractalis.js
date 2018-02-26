@@ -1,9 +1,9 @@
 // # sourceURL=fractalis.js
 
 // eslint-disable-next-line no-unused-vars
-const addFractalisPanel = parentPanel => parentPanel.insert(4, window.fractalisPanel)
+window.addFractalisPanel = parentPanel => parentPanel.insert(4, fractalisPanel)
 
-window.fractalisPanel = new Ext.Panel({
+const fractalisPanel = new Ext.Panel({
   id: 'fractalisPanel',
   title: 'Fractalis',
   region: 'center',
@@ -18,8 +18,8 @@ window.fractalisPanel = new Ext.Panel({
     scripts: false,
     callback: () => {
       const conceptBox = document.querySelector('.fjs-concept-box')
-      if (typeof window.fjs === 'undefined') {
-        window.fjs = fjsService.initFractalis()
+      if (fjsService.fjs == null) {
+        fjsService.initFractalis()
       }
       fjsService.activateDragAndDrop(conceptBox)
       fjsService.observeConceptBox(conceptBox)
@@ -36,7 +36,7 @@ window.fractalisPanel = new Ext.Panel({
         .then(ids => {
           const subset1 = ids.subjectIDs1.split(',')
           const subset2 = ids.subjectIDs2.split(',')
-          window.fjs.setSubsets([subset1, subset2])
+          fjsService.fjs.setSubsets([subset1, subset2])
         }, error => Ext.Msg.alert('Could not retrieve patient ids. Reason: ' + error))
         .then(() => fjsService.showLoadingScreen(false))
     }
@@ -44,8 +44,10 @@ window.fractalisPanel = new Ext.Panel({
 })
 
 const fjsService = {
+  fjs: null,
+
   initFractalis () {
-    return window.fractal.init({
+    this.fjs = window.fractal.init({
       handler: 'pic-sure',
       dataSource: 'https://nhanes.hms.harvard.edu',
       fractalisNode: 'http://127.0.0.1:5000',
@@ -65,19 +67,21 @@ const fjsService = {
   },
 
   observeConceptBox (conceptBox) {
-    new window.MutationObserver(targets => {
-      const descriptors = []
+    const observer = new window.MutationObserver(targets => {
       targets.forEach(target => {
-        Array.prototype.map.call(target.addedNodes, node => {
-          return this.getConceptAttributes(node)
-        }).map(attr => {
-          return {query: this.buildPicSureQuery(attr.path, attr.dataType), dataType: attr.dataType}
-        }).forEach(d => {
-          descriptors.push({dataType: d.dataType, query: d.query})
+        Array.prototype.forEach.call(target.addedNodes, node => {
+          const attr = this.getConceptAttributes(node)
+          const descriptor = {query: this.buildPicSureQuery(attr.path, attr.dataType), dataType: attr.dataType}
+          this.fjs.loadData([descriptor]).then(() => {
+            node.innerHTML = '<span>Request has been submitted!</span>'
+            node.style.background = '#82ff69'
+            node.className = 'fjs-fade-out'
+            window.setTimeout(() => node.remove(), 2000)
+          })
         })
       })
-      window.fjs.loadData(descriptors)
-    }).observe(conceptBox, { childList: true })
+    })
+    observer.observe(conceptBox, {childList: true})
   },
 
   getConceptAttributes (node) {
@@ -113,21 +117,24 @@ const fjsService = {
 
   chartStates: {},
   setUrl () {
+    return
     const url = window.pageInfo.basePath + '/fractalis/state/' + Object.values(this.chartStates).join('+')
     window.history.pushState(null, '', url)
   },
 
   resetUrl () {
+    return
     const url = window.pageInfo.basePath + '/datasetExplorer'
     window.history.pushState(null, '', url)
   },
 
   handleStateIDs (stateIDs) {
+    return
     Ext.Msg.alert('The url you specified contains a Fractalis state.\n' +
       'We will attempt to recover the associated charts and inform you once this has been done.')
     Promise.all(stateIDs.map(stateID => {
       const chartID = this.addChartContainer()
-      return window.fjs.id2chart(chartID, stateID)
+      return this.fjs.id2chart(chartID, stateID)
     })).then(() => {
       Ext.Msg.alert('All charts have been successfully recovered. Please proceed to the Fractalis tab.')
     }).catch(e => {
@@ -147,15 +154,15 @@ const fjsService = {
 
   setChart () {
     const chartID = this.addChartContainer()
-    const vm = window.fjs.setChart(document.querySelector('.fjs-analysis-select').value, '#' + chartID)
-    window.fjs.chart2id(vm, id => {
+    const vm = this.fjs.setChart(document.querySelector('.fjs-analysis-select').value, '#' + chartID)
+    this.fjs.chart2id(vm, id => {
       this.chartStates[chartID] = id
       this.setUrl()
     })
   },
 
   clearCache () {
-    window.fjs.clearCache()
+    this.fjs.clearCache()
     document.querySelector('.fjs-concept-box').innerHTML = ''
   },
 

@@ -6,7 +6,7 @@
 <body>
 
 <div class="fjs-spinner">
-    <span>Retrieving patient ids...</span>
+    <span>Looking for patient ids...</span>
     <div class="fjs-rect1"></div>
     <div class="fjs-rect2"></div>
     <div class="fjs-rect3"></div>

@@ -10,23 +10,23 @@
 </html>
 
 <script type="text/javascript">
-    var matches = window.location.href.match(/\/fractalis\/state\/(.+)/);
-    var stateIDs = matches == null ? [] : matches[1].split('+');
+    const matches = window.location.href.match(/\/fractalis\/state\/(.+)/)
+    const stateIDs = matches == null ? [] : matches[1].split('+')
     fetch('${url}', {method: 'GET', redirect: 'follow', credentials: 'same-origin'})
-        .then(function(res) { return res.text(); })
-        .then(function(html) {
-            var doc = document.open("text/html", "replace");
-            doc.write(html);
-            doc.close();
-            var interval = setInterval(function() {
+        .then(res => res.text())
+        .then(html => {
+            const doc = document.open("text/html", "replace")
+            doc.write(html)
+            doc.close()
+            const interval = setInterval(() => {
                 if (typeof window.fjs === 'object') {
                     if (stateIDs.length) {
-                        fjs_handleStateIDs(stateIDs);
+                        fjsService.handleStateIDs(stateIDs)
                     } else {
-                        fjs_resetUrl();
+                        fjsService.resetUrl()
                     }
-                    clearInterval(interval);
+                    clearInterval(interval)
                 }
-            }, 100);
-        });
+            }, 100)
+        })
 </script>
