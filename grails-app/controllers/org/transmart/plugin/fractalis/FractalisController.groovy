@@ -1,8 +1,6 @@
 package org.transmart.plugin.fractalis
 
 import grails.converters.JSON
-import org.json.JSONArray
-import org.json.JSONObject
 
 class FractalisController {
 
@@ -13,42 +11,24 @@ class FractalisController {
 	/**
 	 *   Called to get the path to fractalis.js such that the plugin can be loaded in the datasetExplorer
 	 */
-	def loadScripts = {
+	def loadScripts() {
 
-		// list of required javascript files
-		def scripts = [
-				servletContext.contextPath + pluginContextPath + '/js/fractalis.js',
-				servletContext.contextPath + pluginContextPath + '/js/resources/fractal-0.2.0.min.js'
-		]
-		// list of required css files
-		def styles = [
-                servletContext.contextPath + pluginContextPath + '/css/fractalis.css'
-		]
+		def scripts = ['fractalis', 'resources/fractal-0.2.0.min']
+		def styles = ['fractalis']
 
-		JSONObject result = new JSONObject()
-		JSONArray rows = new JSONArray()
+		List rows = []
 
 		// for all js files
 		for (file in scripts) {
-			def m = [:]
-			m["path"] = file.toString()
-			m["type"] = "script"
-			rows.put(m)
+			rows << [path: servletContext.contextPath + pluginContextPath + '/js/' + file + '.js', type: "script"]
 		}
 
 		// for all css files
 		for (file in styles) {
-			def n = [:]
-			n["path"] = file.toString()
-			n["type"] = "css"
-			rows.put(n)
+			rows << [path: servletContext.contextPath + pluginContextPath + '/css/' + file + '.css', type: "css"]
 		}
 
-		result.put("success", true)
-		result.put("totalCount", scripts.size())
-		result.put("files", rows)
-
-		render result.toString()
+		render([success: true, totalCount: scripts.size(), files: rows] as JSON)
 	}
 
     def state() {
