@@ -1,6 +1,5 @@
 package org.transmart.plugin.auth0
 
-import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import grails.converters.JSON
 import grails.gsp.PageRenderer
@@ -15,11 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder
 import org.transmart.searchapp.AccessLog
 import org.transmart.searchapp.AuthUser
+import org.transmart.searchapp.Role
 import us.monoid.json.JSONObject
 import us.monoid.web.Resty
 
 import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 
 /**
  * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>
@@ -37,6 +36,9 @@ class Auth0Service implements InitializingBean {
 	@Autowired private AuthService authService
 	@Autowired private Auth0Config auth0Config
 	@Autowired private PageRenderer groovyPageRenderer
+	@Autowired private UserService userService
+
+	def mailService
 
 	/**
 	 * Handle the Auth0 callback.
@@ -188,7 +190,7 @@ class Auth0Service implements InitializingBean {
 
 		user.save()
 		if (user.hasErrors()) {
-			logger.error 'Could not create user {} because {}', credentials.username, authService.errorStrings(user)
+			logger.error 'Could not create user {} because {}', credentials.username, userService.errorStrings(user)
 		}
 		logger.info 'getCredentials() New user record has been created: {}', credentials.username
 		user
@@ -268,7 +270,7 @@ class Auth0Service implements InitializingBean {
 			user.description = (description as JSON).toString()
 			user.save()
 			if (user.hasErrors()) {
-				logger.error 'Error updating user{}: {}', credentials.username, authService.errorStrings(user)
+				logger.error 'Error updating user{}: {}', credentials.username, userService.errorStrings(user)
 			}
 
 			logger.info 'Saved new user registration information for {}', email
@@ -354,6 +356,47 @@ class Auth0Service implements InitializingBean {
 		mailService.sendMail(to: to, subject: subject, body: body)
 	}
 
+	void changeUserLevel(AuthUser user, UserLevel newLevel, String appUrl,
+	                     String userGuideLink, String access1DetailsMessage) {
+
+		updateRoles newLevel, user
+
+		String alertMsg = "User <b>$user.username</b> has been granted <b>$newLevel</b> access."
+		log.info alertMsg
+		accessLog authService.currentUsername(), 'GrantAccess', alertMsg
+
+		UserLevel userLevel = authService.userLevel(user)
+		String levelName
+		switch (userLevel) {
+			case UserLevel.ONE: levelName = auth0Config.instanceType == 'grdr' ? 'Open Data' : 'Level 1'; break
+			case UserLevel.TWO: levelName = auth0Config.instanceType == 'grdr' ? 'Controlled Data' : 'Level 2'; break
+			case UserLevel.ADMIN: levelName = 'Administrator'; break
+			default: levelName = 'Unknown'
+		}
+
+		String body = groovyPageRenderer.render(template: '/auth0/email_accessgranted', model: [
+				access1DetailsMessage: access1DetailsMessage,
+				appUrl               : appUrl,
+				levelName            : levelName,
+				userGuideLink        : userGuideLink,
+				userlevel            : userLevel])
+		sendEmail user.email, 'Access Granted', body
+	}
+
+	@CompileDynamic
+	private void updateRoles(UserLevel level, AuthUser user) {
+		for (Role role in Role.list()) {
+			role.removeFromPeople user
+		}
+
+		switch (level) {
+			case UserLevel.ZERO:  authService.grantRoles user, Roles.PUBLIC_USER; break
+			case UserLevel.ONE:   authService.grantRoles user, Roles.PUBLIC_USER, Roles.STUDY_OWNER; break
+			case UserLevel.TWO:   authService.grantRoles user, Roles.PUBLIC_USER, Roles.DATASET_EXPLORER_ADMIN; break
+			case UserLevel.ADMIN: authService.grantRoles user, Roles.PUBLIC_USER, Roles.ADMIN; break
+		}
+	}
+
 	/**
 	 * Check if the latest TOS has been re-agreed-to by the current user.
 	 *
@@ -423,27 +466,6 @@ class Auth0Service implements InitializingBean {
 		(auth0Config.webtaskBaseUrl + '/connection_details_base64?webtask_no_cache=1&' + urlMethod).toURL().text
 	}
 
-	String getIRCTKey() {
-		AuthUser user = authService.currentAuthUser()
-		try {
-			String token = JWT.create()
-					.withClaim('email', user.username)
-					.withClaim('sub', user.uniqueId)
-					.sign(algorithm)
-
-			Resty resty = new Resty()
-			resty.withHeader('Authorization', 'Bearer ' + token)
-			String apiKey = resty.json(auth0Config.irctFullUrl).toObject().getString('key')
-
-			logger.info 'External API token has been received and added to session variables.'
-			apiKey ?: 'No API key available.'
-		}
-		catch (e) {
-			throw new RuntimeException('Could not get API token for _' + user.username + '_ because ```' +
-					e.class.name + '/' + e.message.split('\n')[0] + '```')
-		}
-	}
-
 	void afterPropertiesSet() {
 		algorithm = Algorithm.HMAC256(auth0Config.auth0ClientSecret)
 		oauthTokenUrl = 'https://' + auth0Config.auth0Domain + '/oauth/token'
@@ -451,14 +473,6 @@ class Auth0Service implements InitializingBean {
 	}
 
 	protected HttpServletRequest currentRequest() {
-		currentRequestAttributes().request
-	}
-
-	protected HttpServletResponse currentResponse() {
-		currentRequestAttributes().response
-	}
-
-	protected GrailsWebRequest currentRequestAttributes() {
-		(GrailsWebRequest) RequestContextHolder.currentRequestAttributes()
+		((GrailsWebRequest) RequestContextHolder.currentRequestAttributes()).request
 	}
 }

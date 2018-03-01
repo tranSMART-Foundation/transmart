@@ -1,6 +1,5 @@
 package org.transmart.plugin.auth0
 
-import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.userdetails.NoStackUsernameNotFoundException
 import grails.transaction.Transactional
@@ -14,15 +13,14 @@ import org.codehaus.groovy.grails.commons.GrailsControllerClass
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.MessageSource
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.web.authentication.logout.LogoutHandler
-import org.springframework.validation.FieldError
 import org.springframework.web.context.request.RequestContextHolder
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.Role
@@ -40,16 +38,12 @@ class AuthService implements InitializingBean {
 
 	protected static final GrantedAuthority PUBLIC_USER = new SimpleGrantedAuthority(Roles.PUBLIC_USER.authority)
 
-	@Autowired private Auth0Config auth0Config
 	@Autowired private GrailsApplication grailsApplication
 	@Autowired private List<LogoutHandler> logoutHandlers
-	@Autowired private MessageSource messageSource
 	@Autowired private SpringSecurityService springSecurityService
 
 	private Map<String, Map<String, UserLevel>> levels = [:].withDefault { [:] }
 	private Map<String, String> controllerDefaultActions = [:]
-
-	def mailService
 
 	/**
 	 * @return the current auth if authenticated
@@ -221,39 +215,6 @@ class AuthService implements InitializingBean {
 		}
 	}
 
-	Map currentUserInfo(String username = null) {
-		AuthUser user
-		UserLevel level
-		if (!username) {
-			user = currentAuthUser()
-			level = currentUserLevel()
-		}
-		else {
-			user = authUser(username)
-			level = userLevel(user)
-		}
-
-		if (!user) {
-			// TODO
-		}
-
-		Map details = user.description ? (Map) JSON.parse(user.description) : [:]
-		details + [
-				email   : user.email ?: user.username ?: '',
-				id      : user.id,
-				level   : level,
-				type    : user.type,
-				username: user.username]
-	}
-
-	@Transactional
-	void updateUserDescription(Map data) {
-		AuthUser user = currentAuthUser()
-		user.description = ((currentUserInfo() + data) as JSON).toString()
-		user.name = user.userRealName = (data.firstname ?: '').toString() + ' ' + (data.lastname ?: '')
-		user.save()
-	}
-
 	void checkUserLevelAccess(String controller, String action) {
 		String username = currentUsername()
 		logger.debug 'checkUserLevelAccess() controller "{}" action "{}" user "{}"', controller, action, username
@@ -323,24 +284,9 @@ class AuthService implements InitializingBean {
 	 * it in the security context.
 	 */
 	void authenticateAs(String username) {
-		springSecurityService.reauthenticate username
-	}
-
-	/**
-	 * @param o a domain class instance
-	 * @return resolved error strings
-	 */
-	@CompileDynamic
-	Map<String, List<String>> errorStrings(o) {
-		Locale locale = Locale.getDefault()
-		Map<String, List<String>> stringsByField = [:].withDefault { [] }
-		for (fieldErrors in o.errors) {
-			for (error in fieldErrors.allErrors) {
-				String message = messageSource.getMessage(error, locale)
-				stringsByField[((FieldError) error).field] << message
-			}
-		}
-		[:] + stringsByField
+		AuthUserDetails userDetails = loadAuthUserDetails(username)
+		SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(
+				userDetails, null, userDetails.authorities)
 	}
 
 	protected HttpServletRequest currentRequest() {

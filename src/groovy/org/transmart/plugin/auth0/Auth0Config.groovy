@@ -74,8 +74,19 @@ class Auth0Config implements InitializingBean {
 	@Value('${loginBannerMessage:Please Login Below.}')
 	String loginBannerMessage
 
+	@Value('${edu.harvard.transmart.email.support}')
+	String supportEmail
+
 	@Value('${com.recomdata.userSignupEnabled:true}')
 	boolean userSignupEnabled
+
+	String userGuideUrl
+
+	@Value('${edu.harvard.transmart.instance.userguideurl:http://s3.amazon.com/dbmi-public-docs/i2b2_transmart_userguide.pdf}')
+	private String userGuideUrlDefault
+
+	@Value('${edu.harvard.transmart.instance.userguideurl:https://s3.amazonaws.com/hms-dbmi-docs/GRDR_User_Guide.pdf}')
+	private String userGuideUrlGRDR
 
 	@Autowired private AuthService authService
 	@Autowired private ServletContext servletContext
@@ -109,5 +120,6 @@ class Auth0Config implements InitializingBean {
 	 */
 	void init() {
 		isTOS = authService.setting('tos.text') != null
+		userGuideUrl = instanceType == 'grdr' ? userGuideUrlGRDR : userGuideUrlDefault
 	}
 }

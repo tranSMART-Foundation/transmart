@@ -14,12 +14,6 @@ class AuthTagLib {
 	AuthService authService
 	Auth0Config auth0Config
 
-	@Value('${edu.harvard.transmart.instance.userguideurl:http://s3.amazon.com/dbmi-public-docs/i2b2_transmart_userguide.pdf}')
-	private String userGuideUrl
-
-	@Value('${edu.harvard.transmart.instance.userguideurl:https://s3.amazonaws.com/hms-dbmi-docs/GRDR_User_Guide.pdf}')
-	private String userGuideUrlGRDR
-
 	/**
 	 * Renders the body if the current user has level 0.
 	 */
@@ -121,10 +115,12 @@ class AuthTagLib {
 
 	def useUserGuide = {
 		if (auth0Config.instanceType == 'grdr') {
-			out << '''<b>NIH NCATS User's Guide</b> is available here: <br /><br /><a href="''' + userGuideUrlGRDR + '">' + userGuideUrlGRDR + '</a><br />'
+			out << '''<b>NIH NCATS User's Guide</b> is available here: <br /><br /><a href="''' + auth0Config.userGuideUrl + '">' +
+					auth0Config.userGuideUrl + '</a><br />'
 		}
 		else {
-			out << 'To learn more about the application, please visit <a href="' + userGuideUrl + '">' + userGuideUrl + '</a>.'
+			out << 'To learn more about the application, please visit <a href="' + auth0Config.userGuideUrl + '">' +
+					auth0Config.userGuideUrl + '</a>.'
 		}
 	}
 

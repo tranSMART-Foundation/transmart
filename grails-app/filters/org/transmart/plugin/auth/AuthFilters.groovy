@@ -41,7 +41,9 @@ class AuthFilters {
 					model.isTOS = auth0Config.isTOS
 					model.pmsdnLogo = auth0Config.pmsdnLogo
 					model.principal = authService.principal()
+					model.supportEmail = auth0Config.supportEmail
 					model.useRecaptcha = auth0Config.useRecaptcha
+					model.userGuideUrl = auth0Config.userGuideUrl
 				}
 				true
 			}

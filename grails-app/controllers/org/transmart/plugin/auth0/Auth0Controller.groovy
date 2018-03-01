@@ -5,6 +5,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.AccountExpiredException
 import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.DisabledException
@@ -28,8 +29,14 @@ class Auth0Controller implements InitializingBean {
 	@Autowired private AuthService authService
 	@Autowired private Auth0Service auth0Service
 	@Autowired private Auth0Config auth0Config
+	@Autowired private UserService userService
 
 	// can't be initialized in afterPropertiesSet() since GORM isn't available yet
+	@Lazy private String access1DetailsMessage = { ->
+		String suffix = auth0Config.instanceType == 'baseline' || auth0Config.instanceType == '' ? '' :
+				'.' + auth0Config.instanceType
+		message(code: 'edu.harvard.transmart.access1.details' + suffix)
+	}()
 	@Lazy private String authViewName = { ->
 		String loginTemplatesValue = authService.setting('login-template')?.fieldvalue ?: ''
 		if (loginTemplatesValue && !loginTemplatesValue.equalsIgnoreCase('default')) {
@@ -40,6 +47,11 @@ class Auth0Controller implements InitializingBean {
 		}
 	}()
 	@Lazy private String notAuthorizedTemplate = { -> authService.setting('notAuthorizedTemplate')?.fieldvalue ?: '' }()
+	@Lazy private String userGuideLink = { ->
+		String userGuidePropertyId = 'edu.harvard.transmart.UserGuideMessage' +
+				(auth0Config.instanceType ? '.' + auth0Config.instanceType : '')
+		message(code: userGuidePropertyId, args: [auth0Config.userGuideUrl, "User's Guide"])
+	}()
 
 	def auth() {
 		nocache response
@@ -192,7 +204,7 @@ class Auth0Controller implements InitializingBean {
 
 		Map userInfo = [:]
 		try {
-			userInfo = authService.currentUserInfo(credentials.username)
+			userInfo = userService.currentUserInfo(credentials.username)
 		}
 		catch (e) {
 			logger.error e.message
@@ -246,14 +258,27 @@ class Auth0Controller implements InitializingBean {
 			logger.debug 'No credentials for user in session. This should never happen.'
 		}
 
-		[needAgreement: needAgreement,
+		[needAgreement   : needAgreement,
 		 tosEffectiveDate: new SimpleDateFormat('MMM dd, yyyy').format(settings.lastUpdated),
-		 tosValue: settings.fieldvalue + (authService.setting('tos.text_cont')?.fieldvalue ?: '')]
+		 tosValue        : settings.fieldvalue + (authService.setting('tos.text_cont')?.fieldvalue ?: '')]
+	}
+
+	def userlist(AuthUser user, String state) {
+		if (state) {
+			// Admin is changing state of a user
+			auth0Service.changeUserLevel(user, UserLevel.valueOf(state),
+					createLink(uri: '/', absolute: true).toString(), userGuideLink, access1DetailsMessage)
+			redirect action: 'userlist'
+			return
+		}
+
+		accessLog authService.currentUsername(), 'View userlist'
+		[users: userService.buildUserListUserInfo(), userSignupEnabled: auth0Config.userSignupEnabled]
 	}
 
 	protected Map buildAuthModel() {
 		[auth0ConnectionCss: auth0Service.webtaskCSS(),
-		 auth0ConnectionJs: auth0Service.webtaskJavaScript()] + authModel
+		 auth0ConnectionJs : auth0Service.webtaskJavaScript()] + authModel
 	}
 
 	private void accessLog(String username, String event, String message = null) {

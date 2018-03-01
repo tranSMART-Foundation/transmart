@@ -3,6 +3,7 @@
  */
 class Auth0UrlMappings {
 	static mappings = {
+		"/admin/userlist"(controller: 'auth0', action: 'userlist')
 		"/login/auth"(controller: 'auth0', action: 'auth')
 		"/login/authfail"(controller: 'auth0', action: 'authfail')
 		"/login/callback"(controller: 'auth0', action: 'callback')
