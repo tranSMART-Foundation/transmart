@@ -19,7 +19,7 @@
             doc.write(html)
             doc.close()
             const interval = setInterval(() => {
-                if (typeof window.fjs === 'object') {
+                if (typeof fjsService !== 'undefined' && fjsService.fjs != null) {
                     if (stateIDs.length) {
                         fjsService.handleStateIDs(stateIDs)
                     } else {

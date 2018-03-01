@@ -117,29 +117,26 @@ const fjsService = {
 
   chartStates: {},
   setUrl () {
-    return
     const url = window.pageInfo.basePath + '/fractalis/state/' + Object.values(this.chartStates).join('+')
     window.history.pushState(null, '', url)
   },
 
   resetUrl () {
-    return
     const url = window.pageInfo.basePath + '/datasetExplorer'
     window.history.pushState(null, '', url)
   },
 
   handleStateIDs (stateIDs) {
-    return
     Ext.Msg.alert('The url you specified contains a Fractalis state.\n' +
       'We will attempt to recover the associated charts and inform you once this has been done.')
     Promise.all(stateIDs.map(stateID => {
       const chartID = this.addChartContainer()
-      return this.fjs.id2chart(chartID, stateID)
+      return this.fjs.id2chart('#' + chartID, stateID)
     })).then(() => {
       Ext.Msg.alert('All charts have been successfully recovered. Please proceed to the Fractalis tab.')
     }).catch(e => {
       Ext.Msg.alert('Could not recover one or more charts from URL.\n' +
-        'Contact your administrator if this issue persists.')
+        'Contact your administrator if this issue persists. Error: ' + e.toString())
     })
     this.setUrl()
   },
