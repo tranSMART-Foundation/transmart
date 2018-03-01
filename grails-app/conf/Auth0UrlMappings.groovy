@@ -1,3 +1,5 @@
+import org.springframework.security.access.AccessDeniedException
+
 /**
  * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>
  */
@@ -17,5 +19,8 @@ class Auth0UrlMappings {
 		"/registration/notauthorized"(controller: 'auth0', action: 'notauthorized')
 		"/registration/notyet"(controller: 'auth0', action: 'notyet')
 		"/registration/thankyou"(controller: 'auth0', action: 'thankyou')
+
+		"403"(view: '/auth0/denied')
+		"500"(view: '/auth0/denied', exception: AccessDeniedException)
 	}
 }
