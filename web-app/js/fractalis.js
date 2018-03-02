@@ -50,7 +50,7 @@ const fjsService = {
     this.fjs = window.fractal.init({
       handler: 'pic-sure',
       dataSource: 'https://nhanes.hms.harvard.edu',
-      fractalisNode: 'http://127.0.0.1:5000',
+      fractalisNode: 'http://ec2-54-236-31-35.compute-1.amazonaws.com',
       getAuth: () => {
         return {token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb21tb258cHVibGljdXNlckBkYm1pLmhtcy5oYXJ2YXJkLmVkdSIsImVtYWlsIjoicHVibGljdXNlciJ9.LLfNCgifHzzxNhor8mALUXoPR18g8beAWpwTG1dv4YY'}
       },
