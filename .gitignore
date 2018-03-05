@@ -4,6 +4,7 @@
 *.log
 *.sublime-workspace
 .DS_Store
+.slcache
 /.classpath
 /.idea
 /.project
@@ -13,6 +14,6 @@
 /plugin.xml
 /target
 /target-eclipse
+/web-app/WEB-INF
 cobertura.ser
-.slcache/
-node_modules/
+node_modules
