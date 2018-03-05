@@ -6,15 +6,16 @@ class TransmartFractalisGrailsPlugin {
 
 	def version = "0.1-SNAPSHOT"
 	def grailsVersion = "2.3 > *"
-    def title = 'Transmart Fractalis Plugin'
-	def author = "Burt Beckwith & Sascha Herzinger"
-	def authorEmail = "Burt_Beckwith@hms.harvard.edu & Sascha_Herzinger@hms.harvard.edu"
-	def description = 'A plugin to connect i2b2-tranSMART with https://git-r3lab.uni.lu/Fractalis'
+	def title = 'Transmart Fractalis Plugin'
+	def author = "Sascha Herzinger"
+	def authorEmail = "Sascha_Herzinger@hms.harvard.edu"
+	def description = 'Connects i2b2-tranSMART with https://git-r3lab.uni.lu/Fractalis'
 	def documentation = ''
-    def license = 'APACHE'
-    def organization = [name: '', url: '']
-    def issueManagement = [url: 'TODO' ]
-    def scm = [url: 'TODO']
+	def license = 'APACHE'
+	def organization = [name: '', url: '']
+	def developers = [[name: 'Burt Beckwith', email: 'burt_beckwith@hms.harvard.edu']]
+	def issueManagement = [url: 'TODO' ]
+	def scm = [url: 'https://github.com/i2b2-tranSMART/transmart-fractalis']
 
 	def doWithApplicationContext = { ctx ->
 		File fractalisDir = GrailsPluginUtils.getPluginDirForName('transmart-fractalis')?.file
@@ -35,6 +36,5 @@ class TransmartFractalisGrailsPlugin {
 			ctx.getBean(TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME).registerAnalysisTabExtension(
                     'transmart-fractalis', '/Fractalis/loadScripts', 'addFractalisPanel')
 		}
-
 	}
 }

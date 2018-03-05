@@ -9,7 +9,7 @@ class FractalisController {
 	def index() {}
 
 	/**
-	 *   Called to get the path to fractalis.js such that the plugin can be loaded in the datasetExplorer
+	 * Called to get the path to fractalis.js such that the plugin can be loaded in the datasetExplorer
 	 */
 	def loadScripts() {
 
@@ -31,25 +31,24 @@ class FractalisController {
 		render([success: true, totalCount: scripts.size(), files: rows] as JSON)
 	}
 
-    def state() {
-        [url: request.scheme + '://' + request.serverName + ':' +
-                request.serverPort + request.contextPath + '/datasetExplorer']
-    }
+	def state() {
+		[url: request.scheme + '://' + request.serverName + ':' +
+		      request.serverPort + request.contextPath + '/datasetExplorer']
+	}
 
 	def patients() {
-		def resultInstanceID1 = request.getParameter('result_instance_id1')
-		def resultInstanceID2 = request.getParameter('result_instance_id2')
+		String resultInstanceID1 = params.result_instance_id1
+		String resultInstanceID2 = params.result_instance_id2
 
-        def subjectIDs1 = ''
-        def subjectIDs2 = ''
-		if (resultInstanceID1 != null && resultInstanceID1.trim().length() != 0) {
-            subjectIDs1 = i2b2HelperService.getSubjects(resultInstanceID1)
+		String subjectIDs1 = ''
+		String subjectIDs2 = ''
+		if (resultInstanceID1?.trim()) {
+			subjectIDs1 = i2b2HelperService.getSubjects(resultInstanceID1)
 		}
-		if (resultInstanceID2 != null && resultInstanceID2.trim().length() != 0) {
+		if (resultInstanceID2?.trim()) {
 			subjectIDs2 = i2b2HelperService.getSubjects(resultInstanceID2)
 		}
 
-        def response = ['subjectIDs1': subjectIDs1, 'subjectIDs2': subjectIDs2]
-		render response as JSON
+		render([subjectIDs1: subjectIDs1, subjectIDs2: subjectIDs2] as JSON)
 	}
 }
