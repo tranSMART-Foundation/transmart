@@ -111,7 +111,7 @@ class Auth0Config implements InitializingBean {
 		irctFullUrl = irctHost + irctUrl
 
 		uiHeroImageUrl = servletContext.contextPath + '/images/' +
-				(instanceType == 'pmsdn' ? 'pmsdnHeroImage' : 'transmartlogo') + '.jpg'
+				(instanceType == 'pmsdn' ? 'pmsdnHeroImage' : 'transmartlogoHMS') + '.jpg'
 	}
 
 	/**
