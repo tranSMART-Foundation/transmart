@@ -8,18 +8,12 @@ class Settings {
 	Long userid
 
 	static mapping = {
-		table 'SEARCH_USER_FEEDBACK'
-		id generator: 'sequence', params: [sequence: 'SEQ_SEARCH_DATA_ID'], column: 'SEARCH_USER_FEEDBACK_ID'
-		version false
+		table 'BIOMART_USER.APPLICATION_SETTINGS'
+		id generator: 'sequence', params: [sequence: 'BIOMART_USER.APPLICATION_SETTINGS_ID_SEQ']
 		cache true
-
-		fieldname column: 'APP_VERSION'
-		fieldvalue column: 'FEEDBACK_TEXT'
-		lastUpdated column: 'CREATE_DATE'
-		userid column: 'SEARCH_USER_ID'
 	}
 
 	static constraints = {
-		userid nullable: true
+		fieldvalue maxSize: 2000
 	}
 }
