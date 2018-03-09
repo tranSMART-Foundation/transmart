@@ -352,8 +352,12 @@ class Auth0Service implements InitializingBean {
 	}
 
 	@CompileDynamic
-	private void sendEmail(String to, String subject, String body) {
-		mailService.sendMail(to: to, subject: subject, body: body)
+	private void sendEmail(String recipient, String theSubject, String body) {
+		mailService.sendMail {
+			to recipient
+			subject theSubject
+			html body
+		}
 	}
 
 	void changeUserLevel(AuthUser user, UserLevel newLevel, String appUrl,
