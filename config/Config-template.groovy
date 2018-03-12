@@ -40,7 +40,7 @@ ui {
             dataExportJobs.hide = false
             // Note: by default the analysisJobs panel is NOT shown
             // Currently, it is only used in special cases
-            analysisJobs.show = false
+            analysisJobs.hide = true
             workspace.hide = false
         }
     }
@@ -358,7 +358,7 @@ grails { plugin { springsecurity {
     requestMap.className = 'org.transmart.searchapp.Requestmap'
     // requestmap in db
     securityConfigType = grails.plugin.springsecurity.SecurityConfigType.Requestmap
-    // url to redirect after login in
+    // url to redirect after login
     // just_rest branch provides alternative default via org.transmart.defaultLoginRedirect
     successHandler.defaultTargetUrl = org.transmart.defaultLoginRedirect ?: '/userLanding'
     // logout url
@@ -406,6 +406,9 @@ grails { plugin { springsecurity {
             '/userGroup/**'               : ['ROLE_ADMIN'],
             '/secureObjectAccess/**'      : ['ROLE_ADMIN'],
             '/oauthAdmin/**'              : ['ROLE_ADMIN'],
+//            '/buildInfo/**'               : ['ROLE_ADMIN'],
+            '/configInfo/**'              : ['ROLE_ADMIN'],
+//            '/statusInfo/**'              : ['ROLE_ADMIN'],
             *                             : (oauthEnabled ?  oauthEndpoints : [:]),
             *                             : (gwavaEnabled ?  gwavaMappings : [:]),
             '/**'                         : ['IS_AUTHENTICATED_REMEMBERED'], // must be last
