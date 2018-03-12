@@ -21,8 +21,10 @@ grails.project.dependency.resolution = {
 	plugins {
 		compile ':mail:1.0.7'
 		compile ':spring-security-core:2.0.0'
-		compile ':search-domain:16.2'
 		compile ':cache:1.1.8'
+
+		compile ':search-domain:18.1-SNAPSHOT'
+		compile ':transmart-core:18.1-SNAPSHOT'
 
 		build ':release:3.1.2', ':rest-client-builder:2.1.1', {
 			export = false

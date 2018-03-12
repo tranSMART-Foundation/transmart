@@ -5,14 +5,13 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.AccountExpiredException
 import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.LockedException
 import org.springframework.security.web.WebAttributes
-import org.transmart.searchapp.AccessLog
 import org.transmart.searchapp.AuthUser
+import org.transmartproject.db.log.AccessLogService
 
 import java.text.SimpleDateFormat
 
@@ -26,6 +25,7 @@ class Auth0Controller implements InitializingBean {
 
 	private Map authModel
 
+	@Autowired private AccessLogService accessLogService
 	@Autowired private AuthService authService
 	@Autowired private Auth0Service auth0Service
 	@Autowired private Auth0Config auth0Config
@@ -282,7 +282,7 @@ class Auth0Controller implements InitializingBean {
 	}
 
 	private void accessLog(String username, String event, String message = null) {
-		new AccessLog(username: username, event: event, eventmessage: message, accesstime: new Date()).save()
+		accessLogService.report username, event, message
 	}
 
 	private void nocache(response) {

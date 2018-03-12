@@ -12,9 +12,9 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder
-import org.transmart.searchapp.AccessLog
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.Role
+import org.transmartproject.db.log.AccessLogService
 import us.monoid.json.JSONObject
 import us.monoid.web.Resty
 
@@ -33,6 +33,7 @@ class Auth0Service implements InitializingBean {
 	private String oauthTokenUrl
 	private String userInfoUrl
 
+	@Autowired private AccessLogService accessLogService
 	@Autowired private AuthService authService
 	@Autowired private Auth0Config auth0Config
 	@Autowired private PageRenderer groovyPageRenderer
@@ -348,7 +349,7 @@ class Auth0Service implements InitializingBean {
 	}
 
 	private void accessLog(String username, String event, String message = null) {
-		new AccessLog(username: username, event: event, eventmessage: message, accesstime: new Date()).save()
+		accessLogService.report username, event, message
 	}
 
 	@CompileDynamic
