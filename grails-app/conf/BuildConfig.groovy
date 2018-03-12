@@ -19,6 +19,7 @@ grails.project.dependency.resolution = {
 	}
 
 	plugins {
+		compile ':hibernate:3.6.10.19', { export = false }
 		compile ':mail:1.0.7'
 		compile ':spring-security-core:2.0.0'
 		compile ':cache:1.1.8'
