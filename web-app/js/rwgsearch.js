@@ -860,7 +860,7 @@ $j(document).ready(function() {
     	var id = $j(this).attr('name');
     	var parent = $j(this).data('parent');
     	
-    	if (confirm("Are you sure you want to delete this folder and the files and folders beneath it?")) {
+    	if (confirm("Are you sure you want to delete this folder and the files and folders below it?")) {
 			$j.ajax({
 				url:deleteFolderURL,
 				data: {id: id},
@@ -901,8 +901,64 @@ $j(document).ready(function() {
 	});
 	  
 	$j('body').on('click', '#closeupload', function() {
-	      $j('#uploadFilesOverlay').fadeOut();
-	}); 
+	      jQuery('#uploadFilesOverlay').fadeOut();  
+	});
+
+	$j('#metadata-viewer').on('click', '.deletestudy', function () {
+
+		var id = $j(this).attr('name');
+		var parent = $j('#parentId').val();
+		if (confirm("Are you sure you want to delete this study?")) {
+			findChildByParent(id, function (hasChildren) {
+				if (hasChildren) {
+					if (!confirm("This study contains some elements below it. Are you sure?")) {
+						return;
+					}
+				}
+				$j.ajax({
+					url: deleteStudyURL,
+					data: {id: id},
+					success: function (response) {
+						updateFolder(parent);
+						showDetailDialog(parent);
+						$j('.result-folder-name').removeClass('selected');
+						$j('#result-folder-name-' + parent).addClass('selected');
+					},
+					error: function (xhr) {
+						alert(xhr.message);
+					}
+				});
+			})
+
+		}
+	});
+
+	$j('#metadata-viewer').on('click', '.deleteprogram', function () {
+
+		var id = $j(this).attr('name');
+		if (confirm("Are you sure you want to delete this program?")) {
+			findChildByParent(id, function (hasChildren) {
+				if (hasChildren) {
+					if (!confirm("This program contains some elements below it. Are you sure?")) {
+						return;
+					}
+				}
+				$j.ajax({
+					url: deleteProgramURL,
+					data: {id: id},
+					success: function (response) {
+						showSearchResults();
+						goWelcome();
+					},
+					error: function (xhr) {
+						alert(xhr.message);
+					}
+				});
+			})
+
+		}
+	});
+
 	$j('#metadata-viewer').on('click', '.addstudy', function() {
 
     	var id = $j(this).attr('name');
@@ -1329,4 +1385,16 @@ function createUploader() {
 
 function setUploaderEndPoint(id) {
 	uploader.setEndpoint(uploadActionURL+'?parentId='+id);
+}
+
+function findChildByParent(parent, callFunc){
+	var hasChildren = true
+	$j.ajax({
+		url: hasChildrenURL,
+		data: {id: parent},
+		success: function(response) {
+			hasChildren = response.result
+			callFunc(hasChildren);
+		}
+	});
 }
