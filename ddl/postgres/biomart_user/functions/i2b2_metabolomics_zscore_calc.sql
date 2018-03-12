@@ -110,7 +110,7 @@ BEGIN
   stepCt := 0;
   
 	stepCt := stepCt + 1;
-	pereform cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
+	perform cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
   
 	if runType != 'L' then
 		stepCt := stepCt + 1;
@@ -128,7 +128,7 @@ BEGIN
 		if idxExists = 0 then
 			stepCt := stepCt + 1;
 			get diagnostics rowCt := ROW_COUNT;
-			perorm cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in DE_SUBJECT_METABOLOMICS_DATA - procedure exiting',rowCt,stepCt,'Done');
+			perform cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in DE_SUBJECT_METABOLOMICS_DATA - procedure exiting',rowCt,stepCt,'Done');
 		--Handle errors.
 	       	perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 		--End Proc
