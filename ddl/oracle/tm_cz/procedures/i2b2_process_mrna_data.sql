@@ -5,8 +5,9 @@
 (
   trial_id 		VARCHAR2
  ,top_node		varchar2
- ,data_type		varchar2 := 'R'		--	R = raw data, do zscore calc, T = transformed data, load raw values as zscore,
-									--	L = log intensity data, skip log step in zscore calc
+ ,data_type		varchar2 := 'R'		--	R = raw data, do zscore calc,
+						--	T = transformed data, load raw values as zscore,
+						--	L = log intensity data, skip log step in zscore calc
  ,source_cd		varchar2 := 'STD'	--	default source_cd = 'STD'
  ,log_base		number := 2			--	log base value for conversion back to raw
  ,secure_study	varchar2			--	security setting if new patients added to patient_dimension
@@ -986,7 +987,8 @@ EXECUTE IMMEDIATE 'alter session set NLS_NUMERIC_CHARACTERS=".,"';
 		commit;	
 	else
 		
-	--	Calculate ZScores and insert data into de_subject_microarray_data.  The 'L' parameter indicates that the gene expression data will be selected from
+	--	Calculate ZScores and insert data into de_subject_microarray_data.
+	--	The 'L' parameter indicates that the gene expression data will be selected from
 	--	wt_subject_mrna_probeset as part of a Load.  
 
 		if dataType = 'R' or dataType = 'L' then
