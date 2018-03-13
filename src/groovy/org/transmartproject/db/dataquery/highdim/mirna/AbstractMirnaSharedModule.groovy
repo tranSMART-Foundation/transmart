@@ -18,18 +18,14 @@
  */
 
 package org.transmartproject.db.dataquery.highdim.mirna
-
 import grails.orm.HibernateCriteriaBuilder
-import org.hibernate.Criteria
 import org.hibernate.ScrollableResults
-import org.hibernate.criterion.Restrictions
 import org.hibernate.engine.SessionImplementor
 import org.hibernate.transform.Transformers
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.core.dataquery.highdim.projections.Projection
-import org.transmartproject.core.querytool.ConstraintByOmicsValue
 import org.transmartproject.core.querytool.HighDimensionFilterType
 import org.transmartproject.db.dataquery.highdim.AbstractHighDimensionDataTypeModule
 import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
@@ -43,7 +39,6 @@ import javax.annotation.PostConstruct
 
 import static org.hibernate.sql.JoinFragment.INNER_JOIN
 import static org.transmartproject.db.util.GormWorkarounds.createCriteriaBuilder
-
 /*
  * Mirna QPCR and Mirna SEQ are different data types (according to the user), but they have basically the same
  * implementation. We solve that by having a shared implementation in AbstractMirnaSharedModule.
@@ -164,6 +159,7 @@ abstract class AbstractMirnaSharedModule extends AbstractHighDimensionDataTypeMo
             ilike(search_property, search_term + '%')
             projections { distinct(search_property) }
             order(search_property, 'ASC')
+            maxResults(100)
         }
     }
 

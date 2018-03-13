@@ -174,6 +174,7 @@ class RbmModule extends AbstractHighDimensionDataTypeModule {
                 distinct(search_property)
             }
             order(search_property, 'ASC')
+            maxResults(100)
         }
     }
 
