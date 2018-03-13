@@ -17,7 +17,6 @@ grails.project.dependency.resolution = {
         mavenCentral()
 
         mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
-        mavenRepo "https://repo.thehyve.nl/content/repositories/public/"
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
