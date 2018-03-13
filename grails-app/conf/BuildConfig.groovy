@@ -96,14 +96,13 @@ grails.project.dependency.resolution = {
             mavenCentral()
 
             mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
-            mavenRepo "https://repo.thehyve.nl/content/repositories/public/"
         }
     } else {
         dm.configureRepositories delegate
     }
 
     dependencies {
-        compile 'org.transmartproject:transmart-core-api:16.2'
+        compile 'org.transmartproject:transmart-core-api:16.3'
         compile 'org.javassist:javassist:3.16.1-GA'
 
         // includes fix for GRAILS-11126
@@ -148,10 +147,10 @@ grails.project.dependency.resolution = {
         test ':functional-test:2.0.0'
 
         if (!dm) {
-            runtime ':transmart-core:16.2'
+            runtime ':transmart-core:16.3'
 
-            //test ':transmart-core:16.2'
-            //test ':transmart-core-db-tests:16.2'
+            //test ':transmart-core:16.3'
+            //test ':transmart-core-db-tests:16.3'
         } else {
             dm.internalDependencies delegate
         }
