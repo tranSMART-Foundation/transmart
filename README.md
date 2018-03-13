@@ -15,10 +15,11 @@ package manager.
 
 Ubuntu:
 
-    # apt-get install libprotobuf-dev protobuf-c-compiler
+    # apt-get install libcurl4-openssl-dev libssl-dev libprotoc-dev libprotobuf-dev protobuf-c-compiler
 
 Redhat:
 
+    # # Incomplete, you also need libcurl and libssl development packages and maybe a protobuf-compiler devel package
     # yum install protobuf-compiler protobuf protobuf-devel
 
 Or install it from source with one of the packages available at [https://code.google.com/p/protobuf/downloads/list](https://code.google.com/p/protobuf/downloads/list).
