@@ -6,9 +6,9 @@ package org.transmartproject.core.dataquery.highdim.dataconstraints
  *
  * This is only a marker interface.
  *
- * Some constants that identify well-know, general constraints are included.
+ * Some constants that identify well-known, general constraints are included.
  * This interface should only include constants for constraints that are
- * expected to be support in a significant number of different analyses.
+ * expected to be supported in a significant number of different analyses.
  */
 public interface DataConstraint {
 
