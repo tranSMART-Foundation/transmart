@@ -35,11 +35,10 @@ grails.project.dependency.resolution = {
         mavenCentral()
 
         mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
-        mavenRepo 'https://repo.thehyve.nl/content/repositories/public/'
     }
 
     dependencies {
-        compile('org.transmartproject:transmart-core-api:16.2')
+        compile('org.transmartproject:transmart-core-api:16.3')
         compile group: 'com.google.guava', name: 'guava', version: '14.0.1'
 
         runtime('org.postgresql:postgresql:9.3-1100-jdbc41') {
