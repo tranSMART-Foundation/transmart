@@ -20,7 +20,7 @@ This repository is a set of make files and scripts for:
 * generating configuration files for tranSMART.
 
 The current schema is the one necessary to support the
-[`master` branch][master] of transmart (release 16.2) for Oracle and Postgres
+[`master` branch][master] of transmart (release 16.3) for Oracle and Postgres
 
 This goal is to have this project displace `transmart-DB` by providing a better
 way to manage the tranSMART database.

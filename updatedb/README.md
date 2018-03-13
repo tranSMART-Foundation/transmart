@@ -11,4 +11,4 @@ the type of database being upgraded.
 
 NOTE: in all cases the upgrade is for one version step only. That is, for example,
 the folder labeled release-16.1 is for an upgrade from 1.2.4 to 16.1, a folder labeled
-release-16.2 will be for the upgrade from 16.1 to 16.2, and so on.
+release-16.2 is be for the upgrade from 16.1 to 16.2, and so on.
