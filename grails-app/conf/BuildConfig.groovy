@@ -34,7 +34,6 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://download.java.net/maven/2/"
         //mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
-        mavenRepo "https://repo.thehyve.nl/content/repositories/public/"
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
@@ -48,6 +47,6 @@ grails.project.dependency.resolution = {
             export = false
         }
         compile ':plugin-config:0.2.1'
-        compile ':rdc-rmodules:16.2'
+        compile ':rdc-rmodules:16.3'
     }
 }
