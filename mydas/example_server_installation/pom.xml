@@ -28,21 +28,21 @@
     <groupId>uk.ac.ebi.mydas.example</groupId>
     <artifactId>mydas_example</artifactId>
     <packaging>war</packaging>
-    <version>1.7.0.transmart-16.2</version>
+    <version>1.7.0.transmart-16.3</version>
     <name>mydas_example Maven Webapp</name>
     <url>http://www.ebi.ac.uk</url>
 
     <parent>
         <groupId>uk.ac.ebi.mydas</groupId>
         <artifactId>mydas_master</artifactId>
-        <version>1.7.0.transmart-16.2</version>
+        <version>1.7.0.transmart-16.3</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>uk.ac.ebi.mydas</groupId>
             <artifactId>mydas</artifactId>
-            <version>1.7.0.transmart-16.2</version>
+            <version>1.7.0.transmart-16.3</version>
         </dependency>
 
         <dependency>
