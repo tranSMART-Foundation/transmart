@@ -3,7 +3,8 @@
 # Version: Mon Nov  13 05:30:00 EST 2017
 # 
 #************************************************************************************
-#  Script to load all that is needed to run an example/demo version of tranSMART 16.2
+#  Script to load all that is needed to run an example/demo
+#  version of tranSMART 16.3
 #************************************************************************************
 
 # set up with 
@@ -85,12 +86,12 @@ cd $INSTALL_BASE
 sudo -v
 sudo apt-get -q install -y curl
 sudo apt-get -q install -y unzip
-if ! [ -e transmart-data-release-16.2.zip ] ; then
-    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/transmart-data-release-16.2.zip --output transmart-data-release-16.2.zip
+if ! [ -e transmart-data-release-16.3.zip ] ; then
+    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/transmart-data-release-16.3.zip --output transmart-data-release-16.3.zip
 fi
 if ! [ -e transmart-data ] ; then
-	unzip transmart-data-release-16.2.zip
-	mv transmart-data-release-16.2 transmart-data
+	unzip transmart-data-release-16.3.zip
+	mv transmart-data-release-16.3 transmart-data
 fi
 
 echo "Finished setting up the transmart-date folder at $(date)"
