@@ -29,7 +29,7 @@ echo "corresponding to the data sets you wish to load. "
 echo ""
 echo "Then run the file load_datasets.sh with:"
 echo "    cd $SCRIPTS_BASE"
-echo "    ./Scripts/install-ubuntu/load_datasets.sh"
+echo "    ./Scripts/install-ubuntu14/load_datasets.sh"
 echo ""
 echo "-- Note that loading the same dataset twice is not recommended" 
 echo "   and may produce unpredictable results"
@@ -78,7 +78,7 @@ while read F  ; do
     make -C samples/postgres load_expression_$F
 	echo "************************ done loading $F *************************"
 	echo ""
-done < $SCRIPTS_BASE/Scripts/install-ubuntu/datasetList.txt
+done < $SCRIPTS_BASE/Scripts/install-ubuntu14/datasetList.txt
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Done loading studies"

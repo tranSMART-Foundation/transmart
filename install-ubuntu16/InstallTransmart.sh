@@ -1,62 +1,25 @@
 #!/bin/bash
 
-# Version: Fri Aug 19 16:17:31 BST 2016
+# Version: Mon Nov  13 05:30:00 EST 2017
 # 
-#**********************************************************************************
-#  Script to load all that is needed to run an example/demo version of tranSMART 16.2 on Ubuntu 14.04
-#**********************************************************************************
+#************************************************************************************
+#  Script to load all that is needed to run an example/demo version of tranSMART 16.2
+#************************************************************************************
 
 # set up with 
 #   sudo apt-get update
 #   sudo apt-get install -y git
 #   git clone https://github.com/tranSMART-Foundation/Scripts.git
-#   cd Scripts
-#   git checkout release-16.2
-#   cd ..
 #
 # to run the install scripts
 #   cd $HOME
-#   ./Scripts/install-ubuntu/InstallTransmart.sh
+#   ./Scripts/install-ubuntu16/InstallTransmart.sh
 #
 # to run the checking scripts
-#   Scripts/install-ubuntu/checks/checkAll.sh
-
-# Script Parameters
-TRANSMART_DATA_NAME="transmart-data-release-16.2"
-TRANSMART_DATA_ZIP="$TRANSMART_DATA_NAME.zip"
-TRANSMART_DATA_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_DATA_ZIP"
-TRANSMART_DATA_SIG_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_DATA_ZIP.sig"
-TRANSMART_DATA_MD5_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_DATA_ZIP.md5"
-
-TRANSMART_ETL_NAME="tranSMART-ETL-release-16.2"
-TRANSMART_ETL_ZIP="$TRANSMART_ETL_NAME.zip"
-TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_ETL_ZIP"
-TRANSMART_ETL_SIG_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_ETL_ZIP.sig"
-TRANSMART_ETL_MD5_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_ETL_ZIP.md5"
-
-TRANSMART_WAR_NAME="transmart.war"
-TRANSMART_WAR_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_WAR_NAME"
-TRANSMART_WAR_SIG_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_WAR_NAME.sig"
-TRANSMART_WAR_MD5_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_WAR_NAME.md5"
-
-TRANSMART_GWAVA_WAR_NAME="gwava.war"
-TRANSMART_GWAVA_WAR_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_GWAVA_WAR_NAME"
-TRANSMART_GWAVA_WAR_SIG_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.sig"
-TRANSMART_GWAVA_WAR_MD5_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.md5"
+#   Scripts/install-ubuntu16/checks/checkAll.sh
 
 # on error; stop/exit
 set -e
-
-# Helper function: use md5 to verify downaload
-# This assumes <name> is downloaded file and <name>.md5 is signature file
-# on current directory
-function verifyWithMd5 {
-	filename=$1
-	check1=$( gpg --default-key ACC50501 --print-md MD5 $filename )
-	check2=$( cut -d* -f1 $filename.md5 )
-	echo "MD5 hash from file:    $check1"
-	echo "MD5 hash from Library: $check2"
-}
 
 # Helper function: check and quit on error
 function checkInstallError {
@@ -70,14 +33,6 @@ function checkInstallError {
 	return $returnValue
 }
 
-if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
-export INSTALL_BASE
-
-if ! [ -d "$INSTALL_BASE" ] ; then
-	mkdir -p "$INSTALL_BASE"
-fi
-echo "tranSMART will be installed at this location: $INSTALL_BASE"
-
 if [ -z "$SCRIPTS_BASE" ] ; then SCRIPTS_BASE="$HOME" ; fi
 
 echo "Starting at $(date)"
@@ -87,8 +42,10 @@ echo "++++++++++++++++++++++++++++"
 if ! [ -d "$SCRIPTS_BASE/Scripts" ] ; then
 	echo "This script assumes that the Scripts directory is installed at $SCRIPTS_BASE/Scripts"
 	echo "It does not appear to be there. Please fix that and restart this script."
-	echo "Either set \$SCRIPTS_BASE to be the directory of the location of this script"
-	echo "which appears to be $HERE; OR, copy the that directory to this location: $SCRIPTS_BASE/Scripts"
+	echo "  cd $SCRIPTS_BASE"
+	echo "  sudo apt-get update"
+	echo "  sudo apt-get install -y git"
+	echo "  git clone https://github.com/tranSMART-Foundation/Scripts.git"
 	exit 1
 else
 	echo "Script directory found: $SCRIPTS_BASE/Scripts"
@@ -99,8 +56,16 @@ echo "++++++++++++++++++++++++++++"
 echo "+  set up working dir (tranSMART install base) "
 echo "++++++++++++++++++++++++++++"
 
+if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
+export INSTALL_BASE
+
+if ! [ -d "$INSTALL_BASE" ] ; then
+	mkdir -p "$INSTALL_BASE"
+fi
+echo "tranSMART will be installed at this location: $INSTALL_BASE"
+
 # give user option to suppress sudo timeout (see welcome.sh)
-cd $SCRIPTS_BASE/Scripts/install-ubuntu
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16
 source welcome.sh
 
 # set up sudo early
@@ -108,21 +73,9 @@ sudo -k
 sudo -v
 
 echo "++++++++++++++++++++++++++++"
-echo "+  install make, curl, unzip, tar "
+echo "+  install make "
 echo "++++++++++++++++++++++++++++"
-sudo apt-get update
 sudo apt-get -q install -y make
-sudo apt-get -q install -y curl
-sudo apt-get -q install -y unzip
-sudo apt-get -q install -y tar
-sudo apt-get -q install -y maven
-
-echo "++++++++++++++++++++++++++++"
-echo "+ install ant and maven"
-echo "++++++++++++++++++++++++++++"
-sudo apt-get -q install -y ant
-sudo apt-get -q install -y maven
-echo "Finished install of ant and maven at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  set up the transmart-data folder"
@@ -130,69 +83,17 @@ echo "++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE
 sudo -v
-if ! [ -e $TRANSMART_DATA_ZIP ] ; then
-	curl $TRANSMART_DATA_URL -o $TRANSMART_DATA_ZIP
-	curl $TRANSMART_DATA_MD5_URL -o $TRANSMART_DATA_ZIP.md5
+sudo apt-get -q install -y curl
+sudo apt-get -q install -y unzip
+if ! [ -e transmart-data-release-16.2.zip ] ; then
+    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/transmart-data-release-16.2.zip --output transmart-data-release-16.2.zip
 fi
-verifyWithMd5 "$TRANSMART_DATA_ZIP"
-
 if ! [ -e transmart-data ] ; then
-	echo "unzipping $TRANSMART_DATA_ZIP"
-	unzip $TRANSMART_DATA_ZIP
-	mv $TRANSMART_DATA_NAME transmart-data
+	unzip transmart-data-release-16.2.zip
+	mv transmart-data-release-16.2 transmart-data
 fi
 
-echo "Finished setting up the transmart-data folder at $(date)"
-
-echo "++++++++++++++++++++++++++++"
-echo "+  set up the tranSMART-ETL folder"
-echo "++++++++++++++++++++++++++++"
-
-cd $INSTALL_BASE/transmart-data/env
-sudo -v
-if ! [ -e $TRANSMART_ETL_ZIP ] ; then
-	curl $TRANSMART_ETL_URL -o $TRANSMART_ETL_ZIP
-	curl $TRANSMART_ETL_MD5_URL -o $TRANSMART_ETL_ZIP.md5
-fi
-verifyWithMd5 "$TRANSMART_ETL_ZIP"
-
-if ! [ -e tranSMART-ETL ] ; then
-	echo "unzipping $TRANSMART_ETL_ZIP"
-	unzip $TRANSMART_ETL_ZIP
-	mv $TRANSMART_ETL_NAME tranSMART-ETL
-	cd tranSMART-ETL
-	mvn package
-fi
-echo "Finished setting up the tranSMART-ETL folder at $(date)"
-
-echo "++++++++++++++++++++++++++++"
-echo "+  Download and verify war files"
-echo "++++++++++++++++++++++++++++"
-
-cd $INSTALL_BASE
-sudo -v
-if ! [ -d war-files ]; then
-	mkdir war-files
-fi
-
-cd war-files
-if ! [ -e transmart.war ]; then
-	curl $TRANSMART_WAR_URL --output transmart.war
-	curl $TRANSMART_WAR_MD5_URL --output transmart.war.md5
-fi
-verifyWithMd5 "transmart.war"
-
-if ! [ -e gwava.war ]; then
-	curl $TRANSMART_GWAVA_WAR_URL --output gwava.war
-	curl $TRANSMART_GWAVA_WAR_MD5_URL --output gwava.war.md5
-fi
-verifyWithMd5 "gwava.war"
-
-cd ..
-echo "War files as downloaded"
-ls -la war-files
-
-echo "Finished downloading and verifying war files at $(date)"
+echo "Finished setting up the transmart-date folder at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install of basic tools and dependencies "
@@ -204,9 +105,10 @@ echo "++++++++++++++++++++++++++++"
 # (1)
 sudo -v
 cd $INSTALL_BASE/transmart-data
-sudo make -C env install_ubuntu_packages 
+sudo make -C env install_ubuntu_packages16 
+sudo make -C env install_ubuntu_packages
 # verify these packages
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkMakefilePackages.sh
 if [ "$( checkInstallError "Some Basic Command-Line Tool from 'sudo make -C env install_ubuntu_packages' is missing; redo install" )" ] ; then exit -1; fi
 echo "sudo make -C env install_ubuntu_packages - finished at $(date)"
@@ -216,7 +118,7 @@ sudo -v
 cd $INSTALL_BASE/transmart-data
 sudo make -C env /var/lib/postgresql/tablespaces
 # verify tablespaces
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkFilesTablespace.sh
 if [ "$( checkInstallError "TABLESPACE files (/var/lib/postgresql/tablespaces) not set up properly; redo install" )" ] ; then exit -1; fi
 echo "sudo make -C env /var/lib/postgresql/tablespaces - finished at $(date)"
@@ -234,9 +136,9 @@ echo "++++++++++++++++++++++++++++"
 # (1)
 sudo -v
 cd $INSTALL_BASE/transmart-data
-make -C env update_etl
+make -C env update_etl_git
 # verify ETL folder
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkFilesETLFolder.sh
 if [ "$( checkInstallError "The directory transmart-data/tranSMART-ETL was not installed properly; redo install" )" ] ; then exit -1; fi
 
@@ -251,7 +153,7 @@ sudo -v
 cd $INSTALL_BASE/transmart-data
 make -C env data-integration 
 # verify data-integration folder
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkFilesDataIntegrationFolder.sh
 if [ "$( checkInstallError "The directory transmart-data/data-integration was not installed properly; redo install" )" ] ; then exit -1; fi
 
@@ -266,7 +168,7 @@ sudo -v
 cd $INSTALL_BASE/transmart-data
 make -C env ../vars
 # verify setup of vars file
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkFilesVars.sh
 if [ "$( checkInstallError "vars file (transmart-data/vars) not set up properly; redo install" )" ] ; then exit -1; fi
 
@@ -281,6 +183,10 @@ echo "+  Dependency: Install of grails, groovy"
 echo "++++++++++++++++++++++++++++"
 
 echo "Finished setting ubuntu dependencies (without root) at $(date)"
+sudo -v
+sudo apt-get -q install -y ant
+sudo apt-get -q install -y maven
+echo "Finished install of ant and maven at $(date)"
 
 # No longer need to remove this as the make step that creates it is not skipped!
 # rm $INSTALL_BASE/transmart-data/env/groovy
@@ -290,7 +196,7 @@ echo "Y" > AnswerYes.txt
 source $HOME/.sdkman/bin/sdkman-init.sh
 sdk install grails 2.3.11 < AnswerYes.txt
 sdk install groovy 2.4.5 < AnswerYes.txt
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkSdkmanApps.sh
 if [ "$( checkInstallError "groovy and/or grails not installed correctly; redo install" )" ] ; then exit -1; fi
 
@@ -308,7 +214,7 @@ cd $INSTALL_BASE/transmart-data
 sudo chmod 700 $TABLESPACES/*
 
 echo "Checks on basic load"
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./basics.sh
 if [ "$( checkInstallError "Some Basic Command-Line Tool is missing; redo install" )" ] ; then exit -1; fi
 ./checkVersions.sh
@@ -332,10 +238,10 @@ sudo -v
 cd $HOME
 sudo apt-get -q install -y tomcat7 
 sudo service tomcat7 stop
-$SCRIPTS_BASE/Scripts/install-ubuntu/updateTomcatConfig.sh
+$SCRIPTS_BASE/Scripts/install-ubuntu16/updateTomcatConfig.sh
 
 echo "+  Checks on tomcat install"
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkTomcatInstall.sh
 if [ "$( checkInstallError "Tomcat install failed; redo install" )" ] ; then exit -1; fi
 
@@ -383,7 +289,7 @@ cd $INSTALL_BASE/transmart-data
 source ./vars
 sudo TABLESPACES=$TABLESPACES TRANSMART_USER="tomcat7" make -C R install_rserve_init
 
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkFilesR.sh
 if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1; fi
 ./checkR.sh
@@ -397,7 +303,7 @@ echo "++++++++++++++++++++++++++++"
 
 # only load database if not already loaded
 set +e
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkPsqlDataLoad.sh quiet
 returnCode=$?
 set -e
@@ -410,7 +316,7 @@ else
 	source ./vars
 	make -j4 postgres
 fi
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkPsqlDataLoad.sh
 if [ "$( checkInstallError "Loading database failed; clear database and run install again" )" ] ; then exit -1; fi
 
@@ -429,7 +335,7 @@ sudo mkdir -p /usr/share/tomcat7/.grails/transmartConfig/
 sudo cp $HOME/.grails/transmartConfig/*.groovy /usr/share/tomcat7/.grails/transmartConfig/
 sudo chown -R tomcat7:tomcat7 /usr/share/tomcat7/.grails
 
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 ./checkFilesConfig.sh
 if [ "$( checkInstallError "configuration files not set up correctly, see install script and redo" )" ] ; then exit -1; fi
 
@@ -439,11 +345,23 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Install war files"
 echo "++++++++++++++++++++++++++++"
 
-cd $INSTALL_BASE/war-files
+cd $INSTALL_BASE
+sudo -v
+if ! [ -d war-files ]; then
+	mkdir war-files
+fi
+
+cd war-files
+if ! [ -e transmart.war ]; then
+    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/transmart.war --output transmart.war
+fi
+if ! [ -e gwava.war ]; then
+    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/gwava.war --output gwava.war
+fi
 sudo cp *.war /var/lib/tomcat7/webapps/
 
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
-./checkFilesTomcatWar.sh
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
+sudo ./checkFilesTomcatWar.sh
 if [ "$( checkInstallError "transmart war file not set up correctly, see install script and redo" )" ] ; then exit -1; fi
 
 echo "Finished installing war files at $(date)"
@@ -470,9 +388,10 @@ echo "++++++++++++++++++++++++++++"
 # and unfortunately, this does not work either.
 #  (TODO)  Should check to see if it is already running
 sudo -v
-cd $SCRIPTS_BASE/Scripts/install-ubuntu
-sudo -u tomcat7 bash -c "INSTALL_BASE=\"$INSTALL_BASE\" ./runRServe.sh"
-#sudo service rserve start - is not working - not sure why
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16
+# rserve runs as user transmart
+# using /etc/init.d/rserve
+sudo systemctl start rserve
 echo "Finished starting RServe at $(date)"
 
 echo "++++++++++++++++++++++++++++"
@@ -490,14 +409,14 @@ echo "+ Done with install - making final checks - (may take a while)"
 echo "++++++++++++++++++++++++++++"
 
 set e+
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks
 sudo ./checkFilesTomcat.sh
 ./checkTools.sh
 ./checkWeb.sh
 
 echo "++++++++++++++++++++++++++++"
 echo "+ To redo all checks"
-echo "cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks"
+echo "cd $SCRIPTS_BASE/Scripts/install-ubuntu16/checks"
 echo "./checkAll.sh"
 echo "++++++++++++++++++++++++++++"
 echo "+ Done with final checks"
@@ -508,7 +427,7 @@ echo "Finished install of basic transmart system at $(date)"
 
 echo "--------------------------------------------"
 echo "To load datasets, use the these two files in the Scripts directory: "
-echo "    datasetsList.txt - the list of possible datasets to load, and"
+echo "    datasetsList.txt - the list of posible datasets to load, and"
 echo "    load_datasets.sh - the script to load the datasets. "
 echo ""
 echo "First, in the file datasetsList.txt, un-comment the lines that "
@@ -516,7 +435,7 @@ echo "corresponding to the data sets you wish to load. "
 echo ""
 echo "Then run the file load_datasets.sh with:"
 echo "    cd $SCRIPTS_BASE"
-echo "    ./Scripts/install-ubuntu/load_datasets.sh"
+echo "    ./Scripts/install-ubuntu16/load_datasets.sh"
 echo ""
 echo "-- Note that loading the same dataset twice is not recommended" 
 echo "   and may produce unpredictable results"
