@@ -6,7 +6,7 @@
 
     <h2>
         Variable Selection
-        <a href='JavaScript:D2H_ShowHelp(1507,helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP )'>
+        <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.kMeansClustering ?: "JavaScript:D2H_ShowHelp(1507,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
             <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
         </a>
     </h2>
@@ -30,7 +30,14 @@
             <label for="txtClusters">Number of clusters:</label>
             <input type="text" id="txtClusters" value="2"/>
 
-            <label for="txtMaxDrawNumber">Max rows to display:</label>
+            <label for="txtMaxDrawNumber">
+                Max rows to display:
+                <g:if test="${grailsApplication.config.org.transmartproject.helpUrls.kMeansClusteringMaxRows}">
+                    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.kMeansClusteringMaxRows}">
+                        <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+                    </a>
+                </g:if>
+            </label>
             <input type="text" id="txtMaxDrawNumber"/>
 
         </fieldset>

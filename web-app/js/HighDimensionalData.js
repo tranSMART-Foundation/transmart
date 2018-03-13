@@ -35,7 +35,7 @@ var HighDimensionalData = function () {
     // div id
     this.divId = null;
     
-    this.hideAggregration = null;
+    this.hideAggregation = null;
 }
 
 /**
@@ -77,7 +77,7 @@ HighDimensionalData.prototype.populate_data = function () {
                 this.create_pathway_search_box('searchPathway', 'divpathway');
                 
             	document.getElementById("probesAggregation").checked = false;
-                if(this.hideAggregration){
+                if(this.hideAggregation){
                 	document.getElementById("probesAggregationDiv").style.visibility = "hidden";
                 }else{
                 	document.getElementById("probesAggregationDiv").style.visibility = "visible";
@@ -350,10 +350,10 @@ HighDimensionalData.prototype.get_inputs = function (divId) {
     ]
 }
 
-HighDimensionalData.prototype.gather_high_dimensional_data = function (divId, hideAggregration, doValidatePlatforms) {
+HighDimensionalData.prototype.gather_high_dimensional_data = function (divId, hideAggregation, doValidatePlatforms) {
 
     var _this = this;
-    this.hideAggregration=hideAggregration;
+    this.hideAggregation=hideAggregation;
     doValidatePlatforms = typeof doValidatePlatforms !== 'undefined' ? doValidatePlatforms : true;
 
     /**
@@ -375,11 +375,11 @@ HighDimensionalData.prototype.gather_high_dimensional_data = function (divId, hi
     _reset_global_var();
 
     // check if global subset id is already defined or not
-    // if not the re-run query
+    // if not then re-run query
     if (!variableDivEmpty(divId)
         && ((GLOBAL.CurrentSubsetIDs[1] == null) || (multipleSubsets() && GLOBAL.CurrentSubsetIDs[2] == null))) {
         runAllQueriesForSubsetId(function () {
-            _this.gather_high_dimensional_data(divId, hideAggregration, doValidatePlatforms);
+            _this.gather_high_dimensional_data(divId, hideAggregation, doValidatePlatforms);
         }, divId);
         return;
     }

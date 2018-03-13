@@ -6,7 +6,7 @@
 
     <h2>
         Variable Selection
-        <a href='JavaScript:D2H_ShowHelp(1505,helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP )'>
+        <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.heatMap ?: "JavaScript:D2H_ShowHelp(1505,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
             <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
         </a>
     </h2>
@@ -27,7 +27,14 @@
             %{--Display independent variable--}%
             <div id="displaydivIndependentVariable" class="independentVars"></div>
 
-            <label for="txtMaxDrawNumber">Max rows to display:</label>
+            <label for="txtMaxDrawNumber">
+                Max rows to display:
+                <g:if test="${grailsApplication.config.org.transmartproject.helpUrls.heatMapMaxRows}">
+                    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.heatMapMaxRows}">
+                        <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+                    </a>
+                </g:if>
+            </label>
             <input type="text" id="txtMaxDrawNumber"  value="50"/>
 
         </fieldset>

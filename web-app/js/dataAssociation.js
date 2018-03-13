@@ -322,7 +322,7 @@ function dropNumericOntoCategorySelection2(source, e, data, targetdiv)
             data.node.attributes.oktousevalues="N";
 
             //Add the item to the input.
-            var concept = createPanelItemNew(targetdiv, convertNodeToConcept(data.node));
+            var concept = createPanelItemNew(targetdiv, convertNodeToConcept(data.node), true);
 
             //Set back to original value
             data.node.attributes.oktousevalues=val;
@@ -382,7 +382,7 @@ function dropOntoCategorySelection2(source, e, data, targetdiv)
         //Adding this condition for certain nodes like Dosage and Response, where children of Dosage & Response are intentionally hidden
         if (data.node.childrenRendered && data.node.firstChild == null) {
             foundLeafNode = true;
-            var concept = createPanelItemNew(targetdiv, convertNodeToConcept(data.node));
+            var concept = createPanelItemNew(targetdiv, convertNodeToConcept(data.node), true);
         }
 
         //If no leaf nodes found, alert the user.
@@ -392,7 +392,7 @@ function dropOntoCategorySelection2(source, e, data, targetdiv)
         }
     } else {
         //Add the item to the input.
-        var concept = createPanelItemNew(targetdiv, convertNodeToConcept(data.node));
+        var concept = createPanelItemNew(targetdiv, convertNodeToConcept(data.node), true);
     }
     return concept;
 }
