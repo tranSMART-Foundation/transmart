@@ -16,8 +16,8 @@ grails.project.fork = [
         console: defaultVMSettings
 ]
 
-grails.project.repos.default = 'repo.thehyve.nl-snapshots'
-grails.project.repos."${grails.project.repos.default}".url = 'https://repo.thehyve.nl/content/repositories/snapshots/'
+grails.project.repos.default = 'repo.transmartfoundation.org'
+grails.project.repos."${grails.project.repos.default}".url = 'https://repo.transmartfoundation.org/content/repositories/public/'
 
 grails.project.dependency.resolver = 'maven'
 grails.project.dependency.resolution = {
@@ -27,7 +27,7 @@ grails.project.dependency.resolution = {
     inherits('global') {}
 
     repositories {
-        //  grailsPlugins()
+        // grailsPlugins()
         // grailsHome()
         grailsCentral()
 
