@@ -17,7 +17,6 @@ grails.project.dependency.resolution = {
         mavenLocal()
 
         mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
-        mavenRepo "https://repo.thehyve.nl/content/repositories/public/"
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
@@ -45,12 +44,12 @@ grails.project.dependency.resolution = {
 
     plugins {
         compile(':resources:1.2.1')
-        compile(':search-domain:16.2')
+        compile(':search-domain:16.3')
         // already included in search-domain
-        //compile(':biomart-domain:16.2')
+        //compile(':biomart-domain:16.3')
         // already included in biomart-domain
-        //compile(':transmart-java:16.2')
-        compile(':transmart-legacy-db:16.2')
+        //compile(':transmart-java:16.3')
+        compile(':transmart-legacy-db:16.3')
         compile(':spring-security-core:2.0-RC2')
         //compile ':spring-security-ldap:2.0-RC2')
         compile(':quartz:1.0-RC2')
