@@ -9,7 +9,7 @@ apply plugin: 'codenarc'
 apply plugin: 'maven'
 
 group 'org.transmartproject'
-version '16.2'
+version '16.3'
 
 repositories {
     mavenCentral()
