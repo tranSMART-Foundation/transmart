@@ -30,8 +30,6 @@ grails.project.dependency.resolution = {
         mavenCentral()
 
         mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
-        // mavenRepo "http://repo.etriks.org/content/groups/public/"
-
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
@@ -44,13 +42,13 @@ grails.project.dependency.resolution = {
 
     plugins {
         build(":release:3.0.1",
-              ":rest-client-builder:1.0.3") {
+              ":rest-client-builder:2.0.1") {
             export = false
         }
         runtime ':resources:1.2.1'
         runtime ':hibernate:3.6.10.7'
-        compile ':rdc-rmodules:16.2'
-        compile ':transmart-legacy-db:16.2'
+        compile ':rdc-rmodules:16.3'
+        compile ':transmart-legacy-db:16.3'
         build ':tomcat:7.0.50'
     }
 

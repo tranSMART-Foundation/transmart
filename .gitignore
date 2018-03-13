@@ -7,3 +7,8 @@
 /target
 /.settings
 /plugin.xml
+/*.zip
+/*.zip.sha1
+/System.out
+/grails-app/i18n/
+
