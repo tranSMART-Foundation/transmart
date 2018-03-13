@@ -45,6 +45,6 @@ grails.project.dependency.resolution = {
               ":rest-client-builder:1.0.3") {
             export = false
         }
-	runtime ':biomart-domain:16.2'
+	runtime ':biomart-domain:16.3'
     }
 }
