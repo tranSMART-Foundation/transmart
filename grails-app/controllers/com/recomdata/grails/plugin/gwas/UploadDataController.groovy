@@ -94,11 +94,11 @@ class UploadDataController {
             log.info("template file not found: ${templatesDir}/${filename}")
             template = ""
         } else {
-            template = templateFile.getBytes()
+            template = templateFile.getText()
         }
         response.setContentType("text/plain")
-        response.setHeader("Content-Disposition", "attachment;filename=" + filename)
-        response.setIntHeader('Content-length', template.length)
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename)
+        response.addHeader('Content-length', template.length().toString())
         response.outputStream << template
         response.outputStream.flush()
     }
@@ -168,6 +168,7 @@ class UploadDataController {
             upload = new AnalysisMetadata(params)
         }
         bindData(upload, params)
+
         //Save the uploaded file, if any
         def result = new DataUploadResult();
 
@@ -190,6 +191,7 @@ class UploadDataController {
         }
 
         if (params.genotypePlatform) {
+            log.info "genotypePlatform ${params.genotypePlatform}"
             if (params.genotypePlatform instanceof String) {
                 upload.genotypePlatformIds = params.genotypePlatform
             } else {
@@ -200,6 +202,7 @@ class UploadDataController {
         }
 
         if (params.expressionPlatform) {
+            log.info "expressionPlatform ${params.expressionPlatform}"
             if (params.expressionPlatform instanceof String) {
                 upload.expressionPlatformIds = params.expressionPlatform
             } else {
@@ -210,6 +213,7 @@ class UploadDataController {
         }
 
         if (params.researchUnit) {
+            log.info "researchUnit ${params.researchUnit}"
             if (params.researchUnit instanceof String) {
                 upload.researchUnit = params.researchUnit
             } else {
@@ -229,6 +233,7 @@ class UploadDataController {
             upload.etlDate = new Date()
             filename = sdf.format(upload.etlDate) + f.getOriginalFilename()
             upload.filename = uploadsDir + "/" + filename
+            log.info "upload.filename ${upload.filename}"
         }
 
         if (f && !f.isEmpty()) {
@@ -241,13 +246,16 @@ class UploadDataController {
                     render(view: "complete", model: [result: result, uploadDataInstance: upload])
                     return
                 }
+                log.info "wrote uploaded data to file ${fullpath}"
             }
             catch (Exception e) {
                 upload.status = "ERROR"
                 upload.save(flush: true)
                 if (e.getMessage() != null) {
+                    log.info "exception message ${e.getMessage()}"
                     flash.message2 = e.getMessage() + ". If you wish to skip those SNPs, please click 'Continue'. If you wish to reload, click 'Cancel'."
                     def model = [uploadDataInstance: upload]
+                    log.info "add field data so far ${upload}"
                     addFieldData(model, upload)
                     render(view: "uploadData", model: model)
                 } else {
@@ -281,6 +289,7 @@ class UploadDataController {
 
         if (upload.hasErrors()) {
             flash.message = "The metadata could not be saved - please correct the highlighted errors."
+            log.info "upload errors '${upload.errors}'"
             def errors = upload.errors
             def model = [uploadDataInstance: upload]
             addFieldData(model, upload)
@@ -295,7 +304,6 @@ class UploadDataController {
         def genotypeMap = [:]
         def expressionMap = [:]
         def researchUnitMap = [:]
-
         if (upload) {
             if (upload.phenotypeIds) {
                 for (tag in upload.phenotypeIds.split(";")) {
@@ -391,15 +399,18 @@ class UploadDataController {
         //Verify that a given study has a folder to upload to.
         //TODO This assumes folder-management
         def returnData = [:]
+        def folder
         Experiment experiment = Experiment.findByAccession(params.accession)
         if (!experiment) {
             returnData.message = "No experiment found with accession " + params.accession
         }
-        def folder = fmFolderService.getFolderByBioDataObject(experiment)
-        if (!folder) {
-            returnData.message = "No folder association found for accession " + experiment.accession + ", unique ID " + experiment.uniqueId?.uniqueId
-        } else {
-            returnData.put('found', true)
+        if(experiment) {
+            folder = fmFolderService.getFolderByBioDataObject(experiment)
+            if (!folder) {
+                returnData.message = "No folder association found for accession " + experiment.accession + ", unique ID " + experiment.uniqueId?.uniqueId
+            } else {
+                returnData.put('found', true)
+            }
         }
         render returnData as JSON
     }
