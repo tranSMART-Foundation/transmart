@@ -24,7 +24,9 @@ class Auth0JWTToken extends AbstractAuthenticationToken {
 		details = JWT.decode(jwt)
 	}
 
-	String getCredentials() { decodedJWT.token }
+	String getCredentials() { jwtToken }
+
+	String getJwtToken() { decodedJWT.token }
 
 	Collection<GrantedAuthority> getAuthorities() {
 		(Collection<GrantedAuthority>) principal?.authorities
