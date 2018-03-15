@@ -19,8 +19,10 @@ const fractalisPanel = new Ext.Panel({
     callback: () => {
       const conceptBox = document.querySelector('.fjs-concept-box')
       if (fjsService.fjs == null) {
-        fjsService.initFractalis().catch(error => {
-          Ext.Msg.alert('Could not initialize Fractalis. Reason: ' + error)
+        fjsService.initFractalis().catch(() => {
+          Ext.Msg.alert(` Could not initialize Fractalis.
+            This is likely due to a misconfigured setup.
+            Please contact your admin.`)
         })
       }
       fjsService.activateDragAndDrop(conceptBox)
