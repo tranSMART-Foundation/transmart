@@ -58,8 +58,8 @@ class FractalisController {
 
 	def settings() {
 		render([
-			dataSource: grailsApplication.config.Fractalis.dataSource,
-			node: grailsApplication.config.Fractalis.node
+			dataSource: grailsApplication.config.fractalis.dataSource,
+			node: grailsApplication.config.fractalis.node
 		] as JSON)
 	}
 
