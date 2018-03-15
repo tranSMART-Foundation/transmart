@@ -19,7 +19,9 @@ const fractalisPanel = new Ext.Panel({
     callback: () => {
       const conceptBox = document.querySelector('.fjs-concept-box')
       if (fjsService.fjs == null) {
-        fjsService.initFractalis()
+        fjsService.initFractalis().catch(error => {
+          Ext.Msg.alert('Could not initialize Fractalis. Reason: ' + error)
+        })
       }
       fjsService.activateDragAndDrop(conceptBox)
       fjsService.observeConceptBox(conceptBox)
@@ -45,19 +47,27 @@ const fractalisPanel = new Ext.Panel({
 
 const fjsService = {
   fjs: null,
+  token: null,
 
-  initFractalis () {
+  async initFractalis () {
+    const settings = await this.fetchAsync('settings')
+    this.token = await this.fetchAsync('token')
     this.fjs = window.fractal.init({
       handler: 'pic-sure',
-      dataSource: 'https://nhanes.hms.harvard.edu',
-      fractalisNode: 'http://ec2-54-236-31-35.compute-1.amazonaws.com',
+      dataSource: settings.dataSource,
+      fractalisNode: settings.node,
       getAuth: () => {
-        return {token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb21tb258cHVibGljdXNlckBkYm1pLmhtcy5oYXJ2YXJkLmVkdSIsImVtYWlsIjoicHVibGljdXNlciJ9.LLfNCgifHzzxNhor8mALUXoPR18g8beAWpwTG1dv4YY'}
+        return this.token
       },
       options: {
         controlPanelPosition: 'right'
       }
     })
+  },
+
+  async fetchAsync (action) {
+    return (await window.fetch(window.pageInfo.basePath + '/fractalis/' + action,
+      {method: 'GET', redirect: 'follow', credentials: 'same-origin'})).json()
   },
 
   activateDragAndDrop (conceptBox) {

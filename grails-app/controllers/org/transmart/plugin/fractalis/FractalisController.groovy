@@ -1,10 +1,14 @@
 package org.transmart.plugin.fractalis
 
 import grails.converters.JSON
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
+
 
 class FractalisController {
 
 	def i2b2HelperService
+	def grailsApplication
 
 	def index() {}
 
@@ -33,7 +37,7 @@ class FractalisController {
 
 	def state() {
 		[url: request.scheme + '://' + request.serverName + ':' +
-		      request.serverPort + request.contextPath + '/datasetExplorer']
+			request.serverPort + request.contextPath + '/datasetExplorer']
 	}
 
 	def patients() {
@@ -50,5 +54,20 @@ class FractalisController {
 		}
 
 		render([subjectIDs1: subjectIDs1, subjectIDs2: subjectIDs2] as JSON)
+	}
+
+	def settings() {
+		render([
+			dataSource: grailsApplication.config.Fractalis.dataSource,
+			node: grailsApplication.config.Fractalis.node
+		] as JSON)
+	}
+
+	def token() {
+		Authentication auth = SecurityContextHolder.context.authentication
+		if (auth.respondsTo('getJwtToken')) {
+			render([token: auth.getJwtToken()] as JSON)
+		}
+		throw new RuntimeException("Unable to retrieve Auth0 token.")
 	}
 }
