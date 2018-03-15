@@ -21,24 +21,15 @@ class UserService {
 		UserLevel level
 		if (!username) {
 			user = authService.currentAuthUser()
-			level = authService.currentUserLevel()
 		}
 		else {
 			user = authService.authUser(username)
-			level = authService.userLevel(user)
 		}
 
 		if (!user) {
 			// TODO
 		}
-
-		Map details = user.description ? (Map) JSON.parse(user.description) : [:]
-		details + [
-				email   : user.email ?: user.username ?: '',
-				id      : user.id,
-				level   : level,
-				type    : user.type,
-				username: user.username]
+		currentUserInfo(user)
 	}
 
 	/**
@@ -73,5 +64,16 @@ class UserService {
 					level: authService.userLevel(authUser)]
 		}
 		userData
+	}
+
+	Map currentUserInfo(AuthUser user) {
+		UserLevel level = authService.userLevel(user)
+		Map details = user.description ? (Map) JSON.parse(user.description) : [:]
+		details + [
+				email   : user.email ?: user.username ?: '',
+				id      : user.id,
+				level   : level,
+				type    : user.type,
+				username: user.username]
 	}
 }
