@@ -49,7 +49,16 @@ class Auth0Service implements InitializingBean {
 	 */
 	Map<String, String> callback(String code) {
 		HttpServletRequest request = currentRequest()
-		String redirectUri = request.scheme + '://' + request.serverName + ':' + request.serverPort + request.contextPath
+		String port
+		String scheme = request.scheme.toLowerCase()
+		if ((scheme == 'http' && request.serverPort == 80) || (scheme == 'https' && request.serverPort == 443)) {
+			port = ''
+		}
+		else {
+			port = ':' + request.serverPort
+		}
+		String redirectUri = request.scheme + '://' + request.serverName + port + request.contextPath
+
 		Credentials credentials = createCredentials(code, redirectUri)
 
 		if (credentials.username && credentials.level > UserLevel.ZERO) {
