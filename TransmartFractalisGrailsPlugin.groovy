@@ -1,8 +1,6 @@
-import org.codehaus.groovy.grails.plugins.GrailsPluginUtils
-
 class TransmartFractalisGrailsPlugin {
 
-	public static final String TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME = 'transmartExtensionsRegistry'
+	private static final String TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME = 'transmartExtensionsRegistry'
 
 	def version = "0.1-SNAPSHOT"
 	def grailsVersion = "2.3 > *"
@@ -14,24 +12,10 @@ class TransmartFractalisGrailsPlugin {
 	def license = 'APACHE'
 	def organization = [name: '', url: '']
 	def developers = [[name: 'Burt Beckwith', email: 'burt_beckwith@hms.harvard.edu']]
-	def issueManagement = [url: 'TODO' ]
+	def issueManagement = [url: 'TODO']
 	def scm = [url: 'https://github.com/i2b2-tranSMART/transmart-fractalis']
 
 	def doWithApplicationContext = { ctx ->
-		File fractalisDir = GrailsPluginUtils.getPluginDirForName('transmart-fractalis')?.file
-		if (!fractalisDir) {
-			String pluginPath = ctx.pluginManager.allPlugins.find {
-				it.name == 'transmart-fractalis'
-			}.pluginPath
-
-			fractalisDir = ctx.getResource(pluginPath).file
-		} else {
-			fractalisDir = new File(fractalisDir, 'web-app')
-		}
-		if (!fractalisDir) {
-			throw new RuntimeException('Could not determine directory for transmart-fractalis plugin')
-		}
-
 		if (ctx.containsBean(TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME)) {
 			ctx.getBean(TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME).registerAnalysisTabExtension(
                     'transmart-fractalis', '/Fractalis/loadScripts', 'addFractalisPanel')
