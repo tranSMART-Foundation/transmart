@@ -1,14 +1,22 @@
 package org.transmart.plugin.fractalis
 
 import grails.converters.JSON
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 
-
 class FractalisController {
 
+	private static final List<String> scripts = ['fractalis', 'resources/fractal-0.2.0.min'].asImmutable()
+	private static final List<String> styles = ['fractalis'].asImmutable()
+
+	@Value('${fractalis.dataSource:}')
+	private String dataSource
+
+	@Value('${fractalis.node:}')
+	private String node
+
 	def i2b2HelperService
-	def grailsApplication
 
 	def index() {}
 
@@ -16,9 +24,6 @@ class FractalisController {
 	 * Called to get the path to fractalis.js such that the plugin can be loaded in the datasetExplorer
 	 */
 	def loadScripts() {
-
-		def scripts = ['fractalis', 'resources/fractal-0.2.0.min']
-		def styles = ['fractalis']
 
 		List rows = []
 
@@ -57,17 +62,15 @@ class FractalisController {
 	}
 
 	def settings() {
-		render([
-			dataSource: grailsApplication.config.fractalis.dataSource,
-			node: grailsApplication.config.fractalis.node
-		] as JSON)
+		render([dataSource: dataSource, node: node] as JSON)
 	}
 
 	def token() {
 		Authentication auth = SecurityContextHolder.context.authentication
-		if (auth.respondsTo('getJwtToken')) {
-			render([token: auth.getJwtToken()] as JSON)
+		if (!auth.respondsTo('getJwtToken')) {
+			throw new RuntimeException("Unable to retrieve Auth0 token.")
 		}
-		throw new RuntimeException("Unable to retrieve Auth0 token.")
+
+		render([token: auth.getJwtToken()] as JSON)
 	}
 }
