@@ -254,6 +254,7 @@ class Auth0Service implements InitializingBean {
 	private AuthUser updateAuthUser(AuthUser updateUser, String username, String email, String firstname, String lastname,
 	                                Credentials credentials, Map params) {
 		logger.info 'Searching for user account:{}', username
+		// Used for logging this action
 		Boolean existedUser = updateUser?: false
 		AuthUser user = updateUser?: authService.authUser(username)
 
@@ -283,7 +284,7 @@ class Auth0Service implements InitializingBean {
 			description.picture = credentials.picture ?: ''
 
 			user.description = (description as JSON).toString()
-			user.save()
+			user.save(flush: true)
 			if (user.hasErrors()) {
 				logger.error 'Error updating user{}: {}', credentials.username, userService.errorStrings(user)
 			}
