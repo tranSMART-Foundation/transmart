@@ -67,6 +67,11 @@ const fjsService = {
     })
   },
 
+  resetView () {
+    this.initFractalis()
+    document.querySelector('.fjs-placeholders').innerHTML = ''
+  },
+
   async fetchAsync (action) {
     return (await window.fetch(window.pageInfo.basePath + '/fractalis/' + action,
       {method: 'GET', redirect: 'follow', credentials: 'same-origin'})).json()

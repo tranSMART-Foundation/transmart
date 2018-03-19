@@ -49,6 +49,7 @@
                 This will load the selected data into the Fractalis data cache, so that subsequent analyses become really fast!
             </p>
             <input type="button" value="Clear analysis cache" style="margin-top: 1vh;" onclick="fjsService.clearCache()"/>
+            <input type="button" value="Reset View" style="margin-top: 1vh;" onclick="fjsService.resetView()"/>
         </div>
     </div>
     <hr>
