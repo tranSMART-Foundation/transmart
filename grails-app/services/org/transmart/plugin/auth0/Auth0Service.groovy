@@ -252,12 +252,20 @@ class Auth0Service implements InitializingBean {
 		}
 	}
 
-	private AuthUser updateAuthUser(AuthUser updateUser, String username, String email, String firstname, String lastname,
-	                                Credentials credentials, Map params) {
+	private AuthUser updateAuthUser(AuthUser user, String username, String email, String firstname,
+	                                String lastname, Credentials credentials, Map params) {
+
+		boolean existingUser
+		if (user) {
+			username = user.username
+			existingUser = true
+		}
+		else {
+			user = authService.authUser(username)
+			existingUser = false
+		}
+
 		logger.info 'Searching for user account:{}', username
-		// Used for logging this action
-		Boolean existedUser = updateUser?: false
-		AuthUser user = updateUser?: authService.authUser(username)
 
 		if (!user) {
 			logger.error 'The registration/update information for username:{} and e-mail:{} could not be recorded.',
@@ -285,14 +293,14 @@ class Auth0Service implements InitializingBean {
 			description.picture = credentials.picture ?: ''
 
 			user.description = (description as JSON).toString()
-			user.save(flush: true)
+			user.save()
 			if (user.hasErrors()) {
 				logger.error 'Error updating user{}: {}', credentials.username, userService.errorStrings(user)
 			}
 			else{
 				logger.info 'Saved/Updated user registration information for {}', email
-				if (existedUser) {
-					accessLog username ?: email, "Profile-update", "User profile $email has been updated"
+				if (existingUser) {
+					accessLog username ?: email, 'Profile-update', "User profile $email has been updated"
 				}
 			}
 			user
@@ -498,6 +506,19 @@ class Auth0Service implements InitializingBean {
 		webtask 'css=true'
 	}
 
+	/**
+	 * Update existing user details information.
+	 *
+	 * @param params The params from request
+	 * @return Updated user instance, that may contain errors
+	 */
+	@Transactional
+	AuthUser updateUser(String email, String firstname, String lastname, Map params) {
+		AuthUser user = authService.currentAuthUser()
+		updateAuthUser user, null, email, firstname, lastname, credentials(),
+				userService.currentUserInfo(user) + params
+	}
+
 	private String webtask(String urlMethod) {
 		(auth0Config.webtaskBaseUrl + '/connection_details_base64?webtask_no_cache=1&' + urlMethod).toURL().text
 	}
@@ -510,22 +531,5 @@ class Auth0Service implements InitializingBean {
 
 	protected HttpServletRequest currentRequest() {
 		((GrailsWebRequest) RequestContextHolder.currentRequestAttributes()).request
-	}
-
-	/**
-	 * Update existed user details information
-	 *
-	 * @param params The params from request
-	 * @return Updated user instance, that may contain errors
-	 */
-	@Transactional
-	AuthUser updateUser(String username, String email, String firstname, String lastname, Map params) {
-
-		AuthUser user = authService.authUser(username)
-		Map userDescription = userService.currentUserInfo(user)
-
-		userDescription.putAll(params)
-		updateAuthUser(user, username, email, firstname, lastname, credentials(), userDescription)
-
 	}
 }
