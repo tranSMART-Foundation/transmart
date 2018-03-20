@@ -41,6 +41,6 @@ class Auth0JWTToken extends AbstractAuthenticationToken {
 	}
 
 	boolean isAuthenticated() {
-		super.authenticated && !hasExpired()
+		super.isAuthenticated() && !hasExpired()
 	}
 }
