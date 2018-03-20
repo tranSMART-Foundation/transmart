@@ -11,6 +11,7 @@ import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.context.request.RequestContextHolder
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.Role
@@ -64,7 +65,7 @@ class Auth0Service implements InitializingBean {
 		if (credentials.username && credentials.level > UserLevel.ZERO) {
 			credentials.tosVerified = verifyTOSAccepted(credentials.id)
 			if (credentials.tosVerified) {
-				authService.authenticateAs credentials.username
+				authenticateAs credentials
 				[uri: auth0Config.redirectOnSuccess]
 			}
 			else {
@@ -473,7 +474,18 @@ class Auth0Service implements InitializingBean {
 
 		credentials.tosVerified = null
 
-		authService.authenticateAs credentials.username
+		authenticateAs credentials
+	}
+
+	/**
+	 * Build an <code>Authentication</code> for the given credentials and register
+	 * it in the security context.
+	 */
+	void authenticateAs(Credentials credentials) {
+		Auth0JWTToken tokenAuth = new Auth0JWTToken(credentials.idToken)
+		tokenAuth.principal = authService.loadAuthUserDetailsByUniqueId(tokenAuth.decodedJWT.subject)
+		tokenAuth.authenticated = true
+		SecurityContextHolder.context.authentication = tokenAuth
 	}
 
 	@Cacheable('webtask')
