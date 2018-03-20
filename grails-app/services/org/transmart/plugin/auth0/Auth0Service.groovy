@@ -228,7 +228,7 @@ class Auth0Service implements InitializingBean {
 		if (auth0Config.useRecaptcha) {
 			verifyRecaptchaResponse recaptchaResponse, username ?: email ?: 'unknown'
 		}
-		AuthUser authUser = updateAuthUser(username, email, firstname, lastname, credentials, params)
+		AuthUser authUser = updateAuthUser(null, username, email, firstname, lastname, credentials, params)
 		sendSignupEmails username, email, authUser, loginUrl, appUrl
 		grantRolesAndStoreAuth authUser, username
 	}
@@ -252,22 +252,36 @@ class Auth0Service implements InitializingBean {
 		}
 	}
 
-	private AuthUser updateAuthUser(String username, String email, String firstname, String lastname,
-	                                Credentials credentials, Map params) {
+	private AuthUser updateAuthUser(AuthUser user, String username, String email, String firstname,
+	                                String lastname, Credentials credentials, Map params) {
+
+		boolean existingUser
+		if (user) {
+			username = user.username
+			existingUser = true
+		}
+		else {
+			user = authService.authUser(username)
+			existingUser = false
+		}
+
 		logger.info 'Searching for user account:{}', username
-		AuthUser user = authService.authUser(username)
+
 		if (!user) {
-			logger.error 'The registration information for username:{} and e-mail:{} could not be recorded.',
+			logger.error 'The registration/update information for username:{} and e-mail:{} could not be recorded.',
 					username ?: 'N/A', email ?: 'N/A'
 			throw new RuntimeException('The username ' + username +
 					' was not authenticated previously. Cannot record registration information.')
 		}
 
 		try {
-			user.userRealName = (firstname ?: '') + ' ' + (lastname ?: '')
+			if (firstname || lastname) {
+				user.userRealName = ((firstname ?: '') + ' ' + (lastname ?: '')).trim()
+			}
 			user.name = user.userRealName
-			user.email = email
-
+			if (email) {
+				user.email = email
+			}
 			Map description = [:] + params
 			description.remove 'g-recaptcha-response'
 			description.remove 'action'
@@ -283,8 +297,12 @@ class Auth0Service implements InitializingBean {
 			if (user.hasErrors()) {
 				logger.error 'Error updating user{}: {}', credentials.username, userService.errorStrings(user)
 			}
-
-			logger.info 'Saved new user registration information for {}', email
+			else{
+				logger.info 'Saved/Updated user registration information for {}', email
+				if (existingUser) {
+					accessLog username ?: email, 'Profile-update', "User profile $email has been updated"
+				}
+			}
 			user
 		}
 		catch (e) {
@@ -486,6 +504,19 @@ class Auth0Service implements InitializingBean {
 	@Cacheable('webtask')
 	String webtaskCSS() {
 		webtask 'css=true'
+	}
+
+	/**
+	 * Update existing user details information.
+	 *
+	 * @param params The params from request
+	 * @return Updated user instance, that may contain errors
+	 */
+	@Transactional
+	AuthUser updateUser(String email, String firstname, String lastname, Map params) {
+		AuthUser user = authService.currentAuthUser()
+		updateAuthUser user, null, email, firstname, lastname, credentials(),
+				userService.currentUserInfo(user) + params
 	}
 
 	private String webtask(String urlMethod) {
