@@ -3,9 +3,9 @@ package org.transmart.plugin.auth0
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
 import groovy.transform.CompileStatic
-import org.spockframework.util.Assert
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.util.Assert
 
 /**
  * Based on com.auth0.spring.security.api.Auth0JWTToken from auth0-spring-security-api.
