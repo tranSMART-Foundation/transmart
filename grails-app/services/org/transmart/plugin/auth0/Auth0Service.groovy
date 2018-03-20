@@ -276,7 +276,7 @@ class Auth0Service implements InitializingBean {
 
 		try {
 			if (firstname || lastname) {
-				user.userRealName = (firstname ?: '') + ' ' + (lastname ?: '')
+				user.userRealName = ((firstname ?: '') + ' ' + (lastname ?: '')).trim()
 			}
 			user.name = user.userRealName
 			if (email) {
