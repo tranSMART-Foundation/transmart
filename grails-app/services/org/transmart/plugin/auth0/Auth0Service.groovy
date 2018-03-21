@@ -11,6 +11,7 @@ import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.context.request.RequestContextHolder
 import org.transmart.searchapp.AuthUser
@@ -297,7 +298,7 @@ class Auth0Service implements InitializingBean {
 			if (user.hasErrors()) {
 				logger.error 'Error updating user{}: {}', credentials.username, userService.errorStrings(user)
 			}
-			else{
+			else {
 				logger.info 'Saved/Updated user registration information for {}', email
 				if (existingUser) {
 					accessLog username ?: email, 'Profile-update', "User profile $email has been updated"
@@ -517,6 +518,18 @@ class Auth0Service implements InitializingBean {
 		AuthUser user = authService.currentAuthUser()
 		updateAuthUser user, null, email, firstname, lastname, credentials(),
 				userService.currentUserInfo(user) + params
+	}
+
+	/**
+	 * Convenience method to get the JWT token from the current authentication.
+	 */
+	String jwtToken() {
+		if (authService.loggedIn()) {
+			Authentication auth = authService.authentication()
+			if (auth instanceof Auth0JWTToken) {
+				((Auth0JWTToken) auth).jwtToken
+			}
+		}
 	}
 
 	private String webtask(String urlMethod) {
