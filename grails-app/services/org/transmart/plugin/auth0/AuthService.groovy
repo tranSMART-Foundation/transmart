@@ -178,7 +178,12 @@ class AuthService implements InitializingBean {
 	 *         ZERO otherwise
 	 */
 	UserLevel userLevel(AuthUser authUser) {
-		userLevel authUser.authorities*.authority
+		if (authUser.username == currentUsername()) {
+			currentUserLevel()
+		}
+		else {
+			userLevel authUser.authorities*.authority
+		}
 	}
 
 	/**
