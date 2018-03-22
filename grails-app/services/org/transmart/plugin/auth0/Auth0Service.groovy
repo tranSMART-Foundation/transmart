@@ -1,6 +1,8 @@
 package org.transmart.plugin.auth0
 
+import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.interfaces.DecodedJWT
 import grails.converters.JSON
 import grails.gsp.PageRenderer
 import grails.plugin.cache.Cacheable
@@ -147,6 +149,9 @@ class Auth0Service implements InitializingBean {
 			// }
 
 			String email = userInfo.getString('email')
+
+			idToken = rebuildJwt(idToken, email)
+
 			credentials = new Credentials(
 					accessToken: accessToken,
 					connection: userInfo.getJSONArray('identities').getJSONObject(0).getString('connection'),
@@ -175,6 +180,19 @@ class Auth0Service implements InitializingBean {
 		}
 
 		credentials
+	}
+
+	private String rebuildJwt(String idToken, String email) {
+		DecodedJWT decodedJwt = JWT.decode(idToken)
+		JWT.create()
+				.withAudience(decodedJwt.audience as String[]) // 'aud', e.g. 'ywAq4Xu4Kl3uYNdm3m05Cc5ow0OibvXt'
+				.withExpiresAt(decodedJwt.expiresAt) // 'exp'
+				.withIssuedAt(decodedJwt.issuedAt) // 'iat'
+				.withIssuer(decodedJwt.issuer) // 'iss', e.g. 'https://avillachlab.auth0.com/'
+				.withKeyId(decodedJwt.keyId) // 'kid', e.g. 'RkNBQjE5OUNENzY3NjIwN0VCMTgwNjE3MDUwRTJDMUZFNDg4NkFERg'
+				.withSubject(decodedJwt.subject) // 'sub', e.g. 'google-oauth2|...'
+				.withClaim('email', email)
+				.sign(algorithm)
 	}
 
 	@Transactional
