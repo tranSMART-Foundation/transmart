@@ -16,7 +16,7 @@
 
 <div class="fjs-transmart">
     <div class="fjs-block-0">
-        <p>Welcome to Fractalis in tranSMART!</p>
+        <p>Welcome to Fractalis in i2b2/tranSMART 18.1-beta!</p>
         <p>Fractalis is a de-facto successor to SmartR, a popular plugin in tranSMART 16.2.</p>
         <p>More information: <a href="https://git-r3lab.uni.lu/Fractalis/fractalis">https://git-r3lab.uni.lu/Fractalis/fractalis</a></p>
     </div>

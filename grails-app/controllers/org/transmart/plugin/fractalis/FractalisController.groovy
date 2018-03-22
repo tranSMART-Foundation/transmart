@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 
 class FractalisController {
 
-	private static final List<String> scripts = ['fractalis', 'resources/fractal-0.2.0.min'].asImmutable()
+	private static final List<String> scripts = ['fractalis', 'resources/fractal-0.3.2.beta.min'].asImmutable()
 	private static final List<String> styles = ['fractalis'].asImmutable()
 
 	@Value('${fractalis.dataSource:}')
@@ -19,6 +19,7 @@ class FractalisController {
 	def i2b2HelperService
 
 	def index() {}
+
 
 	/**
 	 * Called to get the path to fractalis.js such that the plugin can be loaded in the datasetExplorer
