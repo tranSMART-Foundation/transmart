@@ -74,6 +74,10 @@ class SpringSecurityAuth0GrailsPlugin {
 	}
 
 	def doWithApplicationContext = { ApplicationContext ctx ->
+		if (!SpringSecurityUtils.securityConfig.auth0.active) {
+			return
+		}
+
 		Auth0Config auth0Config = ctx.auth0Config
 		auth0Config.init()
 	}

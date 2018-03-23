@@ -1,6 +1,6 @@
 security {
 	auth0 {
-		active = true
+		active = false
 		base64EncodedSecret = false
 		clientId = null // must be set
 		clientSecret = null // must be set
