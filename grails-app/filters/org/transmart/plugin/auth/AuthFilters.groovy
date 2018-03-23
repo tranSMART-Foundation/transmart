@@ -1,5 +1,6 @@
 package org.transmart.plugin.auth
 
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.transmart.plugin.auth0.Auth0Config
 import org.transmart.plugin.auth0.AuthService
 
@@ -10,6 +11,7 @@ class AuthFilters {
 
 	Auth0Config auth0Config
 	AuthService authService
+	boolean active = SpringSecurityUtils.securityConfig.auth0.active
 
 	def filters = {
 
@@ -19,7 +21,9 @@ class AuthFilters {
 		 */
 		checkUserLevelAccess(controller: '*', action: '*') {
 			before = {
-				authService.checkUserLevelAccess controllerName, actionName
+				if (active) {
+					authService.checkUserLevelAccess controllerName, actionName
+				}
 				true
 			}
 		}
@@ -29,7 +33,7 @@ class AuthFilters {
 		 */
 		commonModel(controller: 'auth0', action: '*') {
 			after = { Map model ->
-				if (model != null) {
+				if (active && model != null) {
 					model.appTitle = auth0Config.appTitle
 					model.captchaSitekey = auth0Config.captchaSitekey
 					model.emailLogo = auth0Config.emailLogo
