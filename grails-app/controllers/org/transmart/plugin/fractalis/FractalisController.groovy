@@ -20,7 +20,6 @@ class FractalisController {
 
 	def index() {}
 
-
 	/**
 	 * Called to get the path to fractalis.js such that the plugin can be loaded in the datasetExplorer
 	 */
