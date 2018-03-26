@@ -1,0 +1,1 @@
+[![Snapshot Build Status](http://ec2-35-170-59-132.compute-1.amazonaws.com:8080/jenkins/buildStatus/icon?job=spring-security-auth0)](http://ec2-35-170-59-132.compute-1.amazonaws.com:8080/jenkins/job/spring-security-auth0)
