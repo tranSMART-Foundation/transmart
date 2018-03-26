@@ -8,6 +8,9 @@ import org.springframework.context.MessageSource
 import org.springframework.validation.FieldError
 import org.transmart.searchapp.AuthUser
 
+/**
+ * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>
+ */
 @CompileStatic
 class UserService {
 
