@@ -1,1 +1,2 @@
-[![Snapshot Build Status](http://ec2-35-170-59-132.compute-1.amazonaws.com:8080/jenkins/buildStatus/icon?job=spring-security-auth0)](http://ec2-35-170-59-132.compute-1.amazonaws.com:8080/jenkins/job/spring-security-auth0)
+[![Snapshot Build Status](http://ec2-35-170-59-132.compute-1.amazonaws.com:8080/jenkins/view/New%20Plugins/job/spring-security-auth0-snapshots/badge/icon)](http://ec2-35-170-59-132.compute-1.amazonaws.com:8080/jenkins/view/New%20Plugins/job/spring-security-auth0-snapshots/)
+[![Release Build Status](http://ec2-35-170-59-132.compute-1.amazonaws.com:8080/jenkins/view/New%20Plugins/job/spring-security-auth0-releases/badge/icon)](http://ec2-35-170-59-132.compute-1.amazonaws.com:8080/jenkins/view/New%20Plugins/job/spring-security-auth0-releases/)
