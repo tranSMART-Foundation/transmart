@@ -49,17 +49,16 @@ const fractalisPanel = new Ext.Panel({
 
 const fjsService = {
   fjs: null,
-  token: null,
+  settings: null,
 
   async initFractalis () {
-    const settings = await this.fetchAsync('settings')
-    this.token = await this.fetchAsync('token')
+    this.settings = await this.fetchAsync('settings')
     this.fjs = window.fractal.init({
       handler: 'pic-sure',
-      dataSource: settings.dataSource,
-      fractalisNode: settings.node,
+      dataSource: this.settings.dataSource,
+      fractalisNode: this.settings.node,
       getAuth: () => {
-        return this.token
+        return { token: this.settings.token }
       },
       options: {
         controlPanelPosition: 'right'
@@ -111,7 +110,7 @@ const fjsService = {
   buildPicSureQuery (path, type) {
     const alias = this.shortenConcept(path)
     path = path.replace(/\\+/g, '/')
-    path = '/nhanes/Demo' + path // #FIXME This is a VERY ugly hardcoded hack that should not be in production
+    path = this.settings.resourceName + path
     return {
       'select': [
         {'field': {'pui': path}, 'alias': alias}

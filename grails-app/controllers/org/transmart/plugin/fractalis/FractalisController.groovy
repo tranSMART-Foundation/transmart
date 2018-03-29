@@ -16,6 +16,9 @@ class FractalisController {
 	@Value('${fractalis.node:}')
 	private String node
 
+	@Value('${fractalis.resourceName:}')
+	private String resourceName
+
 	def i2b2HelperService
 
 	def index() {}
@@ -62,15 +65,15 @@ class FractalisController {
 	}
 
 	def settings() {
-		render([dataSource: dataSource, node: node] as JSON)
-	}
-
-	def token() {
 		Authentication auth = SecurityContextHolder.context.authentication
 		if (!auth.respondsTo('getJwtToken')) {
 			throw new RuntimeException("Unable to retrieve Auth0 token.")
 		}
-
-		render([token: auth.getJwtToken()] as JSON)
+		render([
+			dataSource: dataSource,
+			node: node,
+			resourceName: resourceName,
+			token: auth.getJwtToken()
+		] as JSON)
 	}
 }
