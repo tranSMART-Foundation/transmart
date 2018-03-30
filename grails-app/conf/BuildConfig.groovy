@@ -15,7 +15,9 @@ grails.project.dependency.resolution = {
 		mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
 	}
 
-	dependencies {}
+	dependencies {
+		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
+	}
 
 	plugins {
 		compile ':spring-security-core:2.0.0'
