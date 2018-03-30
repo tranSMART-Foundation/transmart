@@ -1,8 +1,11 @@
 package org.transmart.plugin.shared
 
 import grails.test.mixin.TestFor
+import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.validation.Errors
 import spock.lang.Specification
+
+import javax.servlet.http.HttpServletResponse
 
 /**
  * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>
@@ -74,5 +77,20 @@ class UtilServiceSpec extends Specification {
 		val.validate()
 		!val.errors.fieldErrors
 		!service.errorStrings(val)
+	}
+
+	void 'test sendDownload'() {
+		when:
+		HttpServletResponse response = new MockHttpServletResponse()
+		String contentType = 'text/plain'
+		String filename = 'test.txt'
+		String content = 'the content'
+		service.sendDownload response, contentType, filename, content.bytes
+
+		then:
+		response.contentLength == content.length()
+		response.contentType == contentType
+		response.contentAsString == content
+		response.getHeader('Content-Disposition').contains 'filename=' + filename
 	}
 }

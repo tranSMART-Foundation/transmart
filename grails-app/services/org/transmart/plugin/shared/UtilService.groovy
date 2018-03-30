@@ -6,6 +6,8 @@ import org.springframework.context.MessageSource
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 
+import javax.servlet.http.HttpServletResponse
+
 /**
  * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>
  */
@@ -28,5 +30,13 @@ class UtilService {
 			}
 		}
 		[:] + stringsByField
+	}
+
+	void sendDownload(HttpServletResponse response, String contentType, String filename, byte[] content) {
+		response.contentType = contentType
+		response.setHeader 'Content-Disposition', 'attachment;filename=' + filename
+		response.setHeader 'Content-Length', content.length as String
+		response.outputStream << content
+		response.outputStream.flush()
 	}
 }
