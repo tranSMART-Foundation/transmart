@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.context.request.RequestContextHolder
+import org.transmart.plugin.shared.SecurityService
+import org.transmart.plugin.shared.UtilService
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.Role
 import org.transmartproject.db.log.AccessLogService
@@ -41,7 +43,9 @@ class Auth0Service implements InitializingBean {
 	@Autowired private AuthService authService
 	@Autowired private Auth0Config auth0Config
 	@Autowired private PageRenderer groovyPageRenderer
+	@Autowired private SecurityService securityService
 	@Autowired private UserService userService
+	@Autowired private UtilService utilService
 
 	def mailService
 
@@ -220,7 +224,7 @@ class Auth0Service implements InitializingBean {
 
 		user.save()
 		if (user.hasErrors()) {
-			logger.error 'Could not create user {} because {}', credentials.username, userService.errorStrings(user)
+			logger.error 'Could not create user {} because {}', credentials.username, utilService.errorStrings(user)
 		}
 		logger.info 'getCredentials() New user record has been created: {}', credentials.username
 		user
@@ -314,7 +318,7 @@ class Auth0Service implements InitializingBean {
 			user.description = (description as JSON).toString()
 			user.save()
 			if (user.hasErrors()) {
-				logger.error 'Error updating user{}: {}', credentials.username, userService.errorStrings(user)
+				logger.error 'Error updating user{}: {}', credentials.username, utilService.errorStrings(user)
 			}
 			else {
 				logger.info 'Saved/Updated user registration information for {}', email
@@ -382,7 +386,7 @@ class Auth0Service implements InitializingBean {
 
 			// If configuration is set to auto-approve, after filling out the registration form
 			// the user will be redirected to the default internal page of the applications.
-			authService.authenticateAs username
+			securityService.authenticateAs username
 			logger.info 'Automated approval is set. User {} has roles assigned and logged into the app.', username
 
 			[uri: auth0Config.redirectOnSuccess]
@@ -415,7 +419,7 @@ class Auth0Service implements InitializingBean {
 
 		String alertMsg = "User <b>$user.username</b> has been granted <b>$newLevel</b> access."
 		log.info alertMsg
-		accessLog authService.currentUsername(), 'GrantAccess', alertMsg
+		accessLog securityService.currentUsername(), 'GrantAccess', alertMsg
 
 		UserLevel userLevel = authService.userLevel(user)
 		String levelName
@@ -542,8 +546,8 @@ class Auth0Service implements InitializingBean {
 	 * Convenience method to get the JWT token from the current authentication.
 	 */
 	String jwtToken() {
-		if (authService.loggedIn()) {
-			Authentication auth = authService.authentication()
+		if (securityService.loggedIn()) {
+			Authentication auth = securityService.authentication()
 			if (auth instanceof Auth0JWTToken) {
 				((Auth0JWTToken) auth).jwtToken
 			}

@@ -10,6 +10,7 @@ import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.LockedException
 import org.springframework.security.web.WebAttributes
+import org.transmart.plugin.shared.SecurityService
 import org.transmart.searchapp.AuthUser
 import org.transmartproject.db.log.AccessLogService
 
@@ -29,6 +30,7 @@ class Auth0Controller implements InitializingBean {
 	@Autowired private AuthService authService
 	@Autowired private Auth0Service auth0Service
 	@Autowired private Auth0Config auth0Config
+	@Autowired private SecurityService securityService
 	@Autowired private UserService userService
 
 	// can't be initialized in afterPropertiesSet() since GORM isn't available yet
@@ -61,7 +63,7 @@ class Auth0Controller implements InitializingBean {
 			logger.info 'Automatic login with userid {}', auth0Config.guestUserName
 			AuthUser authUser = authService.authUser(auth0Config.guestUserName)
 			if (authUser) {
-				authService.authenticateAs authUser.username
+				securityService.authenticateAs authUser.username
 				if (authUser.authorities) {
 					logger.debug 'User has roles, meaning has access to the system. Redirecting to the standard URL.'
 					redirect uri: auth0Config.redirectOnSuccess
@@ -74,7 +76,7 @@ class Auth0Controller implements InitializingBean {
 			}
 		}
 
-		if (authService.loggedIn()) {
+		if (securityService.loggedIn()) {
 			redirect uri: auth0Config.redirectOnSuccess
 		}
 		else {
@@ -172,7 +174,7 @@ class Auth0Controller implements InitializingBean {
 	}
 
 	def logout() {
-		accessLog authService.currentUsername(), 'Logout'
+		accessLog securityService.currentUsername(), 'Logout'
 
 		authService.logout()
 
@@ -272,7 +274,7 @@ class Auth0Controller implements InitializingBean {
 			return
 		}
 
-		accessLog authService.currentUsername(), 'View userlist'
+		accessLog securityService.currentUsername(), 'View userlist'
 		[users: userService.buildUserListUserInfo(), userSignupEnabled: auth0Config.userSignupEnabled]
 	}
 

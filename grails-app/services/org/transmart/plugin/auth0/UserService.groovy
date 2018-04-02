@@ -1,11 +1,8 @@
 package org.transmart.plugin.auth0
 
 import grails.converters.JSON
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.MessageSource
-import org.springframework.validation.FieldError
 import org.transmart.searchapp.AuthUser
 
 /**
@@ -17,7 +14,6 @@ class UserService {
 	static transactional = false
 
 	@Autowired private AuthService authService
-	@Autowired private MessageSource messageSource
 
 	Map currentUserInfo(String username = null) {
 		AuthUser user
@@ -33,23 +29,6 @@ class UserService {
 			// TODO
 		}
 		currentUserInfo(user)
-	}
-
-	/**
-	 * @param o a domain class instance
-	 * @return resolved error strings
-	 */
-	@CompileDynamic
-	Map<String, List<String>> errorStrings(o) {
-		Locale locale = Locale.getDefault()
-		Map<String, List<String>> stringsByField = [:].withDefault { [] }
-		for (fieldErrors in o.errors) {
-			for (error in fieldErrors.allErrors) {
-				String message = messageSource.getMessage(error, locale)
-				stringsByField[((FieldError) error).field] << message
-			}
-		}
-		[:] + stringsByField
 	}
 
 	List<Map> buildUserListUserInfo() {

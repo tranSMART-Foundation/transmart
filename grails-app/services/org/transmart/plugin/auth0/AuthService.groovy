@@ -14,7 +14,6 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -22,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.web.authentication.logout.LogoutHandler
 import org.springframework.web.context.request.RequestContextHolder
+import org.transmart.plugin.shared.SecurityService
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.Role
 
@@ -40,24 +40,11 @@ class AuthService implements InitializingBean {
 
 	@Autowired private GrailsApplication grailsApplication
 	@Autowired private List<LogoutHandler> logoutHandlers
+	@Autowired private SecurityService securityService
 	@Autowired private SpringSecurityService springSecurityService
 
 	private Map<String, Map<String, UserLevel>> levels = [:].withDefault { [:] }
 	private Map<String, String> controllerDefaultActions = [:]
-
-	/**
-	 * @return the current auth if authenticated
-	 */
-	Authentication authentication() {
-		springSecurityService.getAuthentication()
-	}
-
-	/**
-	 * @return the current auth principal if authenticated
-	 */
-	AuthUserDetails principal() {
-		loggedIn() ? (AuthUserDetails) springSecurityService.getPrincipal() : null
-	}
 
 	/**
 	 * Find the <code>AuthUser</code> with the specified unique id and build
@@ -114,17 +101,10 @@ class AuthService implements InitializingBean {
 	}
 
 	/**
-	 * @return the current auth username if authenticated
-	 */
-	String currentUsername() {
-		principal()?.username
-	}
-
-	/**
 	 * @return the <code>AuthUser</code> instance for the currently authenticated user.
 	 */
 	AuthUser currentAuthUser() {
-		authUser currentUsername()
+		authUser securityService.currentUsername()
 	}
 
 	/**
@@ -133,20 +113,6 @@ class AuthService implements InitializingBean {
 	 */
 	AuthUser authUser(String username) {
 		findBy 'username', username
-	}
-
-	/**
-	 * @return the id of the AuthUser instance for the currently authenticated user.
-	 */
-	long currentUserId() {
-		(long) springSecurityService.getCurrentUserId()
-	}
-
-	/**
-	 * @return true if authenticated and not anonymous.
-	 */
-	boolean loggedIn() {
-		springSecurityService.isLoggedIn()
 	}
 
 	/**
@@ -159,8 +125,8 @@ class AuthService implements InitializingBean {
 	 *         ZERO otherwise
 	 */
 	UserLevel currentUserLevel() {
-		if (loggedIn()) {
-			userLevel principal().authorities.collect { GrantedAuthority a -> a.authority }
+		if (securityService.loggedIn()) {
+			userLevel securityService.principal().authorities.collect { GrantedAuthority a -> a.authority }
 		}
 		else {
 			UserLevel.UNREGISTERED
@@ -178,7 +144,7 @@ class AuthService implements InitializingBean {
 	 *         ZERO otherwise
 	 */
 	UserLevel userLevel(AuthUser authUser) {
-		if (authUser.username == currentUsername()) {
+		if (authUser.username == securityService.currentUsername()) {
 			currentUserLevel()
 		}
 		else {
@@ -221,7 +187,7 @@ class AuthService implements InitializingBean {
 	}
 
 	void checkUserLevelAccess(String controller, String action) {
-		String username = currentUsername()
+		String username = securityService.currentUsername()
 		logger.debug 'checkUserLevelAccess() controller "{}" action "{}" user "{}"', controller, action, username
 		if (controller && levels.containsKey(controller)) {
 			if (!action) {
@@ -248,7 +214,7 @@ class AuthService implements InitializingBean {
 	/**
 	 * Get a <code>Settings</code> instance for the currently authenticated user.
 	 */
-	Settings userSetting(String name, long userId = currentUserId()) {
+	Settings userSetting(String name, long userId = securityService.currentUserId()) {
 		findSetting name, userId
 	}
 
@@ -282,16 +248,6 @@ class AuthService implements InitializingBean {
 			cache true
 			lock true
 		}.addToPeople user
-	}
-
-	/**
-	 * Build an <code>Authentication</code> for the given username and register
-	 * it in the security context.
-	 */
-	void authenticateAs(String username) {
-		AuthUserDetails userDetails = loadAuthUserDetails(username)
-		SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(
-				userDetails, null, userDetails.authorities)
 	}
 
 	protected HttpServletRequest currentRequest() {

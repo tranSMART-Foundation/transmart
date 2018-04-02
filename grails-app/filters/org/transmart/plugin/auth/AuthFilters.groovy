@@ -3,6 +3,7 @@ package org.transmart.plugin.auth
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.transmart.plugin.auth0.Auth0Config
 import org.transmart.plugin.auth0.AuthService
+import org.transmart.plugin.shared.SecurityService
 
 /**
  * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>
@@ -11,6 +12,8 @@ class AuthFilters {
 
 	Auth0Config auth0Config
 	AuthService authService
+	SecurityService securityService
+
 	boolean active = SpringSecurityUtils.securityConfig.auth0.active
 
 	def filters = {
@@ -44,7 +47,7 @@ class AuthFilters {
 					model.instanceTypeSuffix = auth0Config.instanceTypeSuffix
 					model.isTOS = auth0Config.isTOS
 					model.pmsdnLogo = auth0Config.pmsdnLogo
-					model.principal = authService.principal()
+					model.principal = securityService.principal()
 					model.supportEmail = auth0Config.supportEmail
 					model.useRecaptcha = auth0Config.useRecaptcha
 					model.userGuideUrl = auth0Config.userGuideUrl
