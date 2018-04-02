@@ -20,6 +20,7 @@ grails.project.dependency.resolution = {
 	dependencies {
 		compile 'com.auth0:mvc-auth-commons:1.0.0'
 		compile 'us.monoid.web:resty:0.3.2'
+		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
 	}
 
 	plugins {
