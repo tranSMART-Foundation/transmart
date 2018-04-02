@@ -1,5 +1,6 @@
 package sendfile
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
@@ -54,7 +55,7 @@ class SendFileService {
 		response.setDateHeader 'Last-Modified', lastModified
 		response.setHeader 'Pragma', 'none'
 		response.addHeader 'Expires', 'Fri, 04 Aug 2078 12:00:00 GMT'
-		response.setHeader 'Etag', '"gf_' + path.encodeAsMD5() + '"'
+		response.setHeader 'Etag', '"gf_' + encodeAsMD5(path) + '"'
 		response.setHeader  'Cache-Control', 'max-age=604800,public'
 
 		if (modified) {
@@ -177,7 +178,7 @@ class SendFileService {
 			while (offset < max && len >= 0) {
 				len = stream.read(buffer, 0, Math.min(buffer.length, (int)(max - offset)))
 				if (len > 0) {
-					response.outputStream.write buffer, 0, len
+					response.outputStream.write buffer, 0, (int) len
 				}
 			}
 		}
@@ -199,5 +200,10 @@ class SendFileService {
 			}
 		}
 		list
+	}
+
+	@CompileDynamic
+	private String encodeAsMD5(String s) {
+		s.encodeAsMD5()
 	}
 }
