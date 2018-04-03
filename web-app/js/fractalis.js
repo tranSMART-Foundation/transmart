@@ -119,7 +119,7 @@ const fjsService = {
         {
           'field': {'pui': path, 'dataType': 'STRING'}, // FIXME: dataType should be attr.dataType but PIC-SURE only knows STRING
           'predicate': 'CONTAINS',
-          'fields': {'ENOUNTER': 'YES'}
+          'fields': {'ENCOUNTER': 'YES'}
         }
       ]
     }
