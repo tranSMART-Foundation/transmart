@@ -61,8 +61,8 @@ CREATE VIEW biomart_user.browse_assays_view AS
       LEFT JOIN
         (SELECT fdu.unique_id AS id, string_agg((ata_1.object_uid)::text, '|'::text ORDER BY (ata_1.object_uid)::text) AS object_uids
           FROM ((fmapp.fm_folder ff
-          JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
-          JOIN amapp.am_tag_association ata_1 ON (((fdu.unique_id)::text = (ata_1.subject_uid)::text)))
+            JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
+            JOIN amapp.am_tag_association ata_1 ON (((fdu.unique_id)::text = (ata_1.subject_uid)::text)))
           WHERE (((ata_1.object_type)::text = 'BIO_MARKER'::text)
             AND (substr(ata_1.object_uid, 1, instr( ata_1.object_uid, ':' ) - 1 ) = 'GENE'::text)
             AND ((ff.folder_type)::text = 'ASSAY'::text))
@@ -70,8 +70,8 @@ CREATE VIEW biomart_user.browse_assays_view AS
       LEFT JOIN
         (SELECT fdu.unique_id AS id, string_agg((ata_1.object_uid)::text, '|'::text ORDER BY (ata_1.object_uid)::text) AS object_uids
           FROM ((fmapp.fm_folder ff
-          JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
-          JOIN amapp.am_tag_association ata_1 ON (((fdu.unique_id)::text = (ata_1.subject_uid)::text)))
+            JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
+            JOIN amapp.am_tag_association ata_1 ON (((fdu.unique_id)::text = (ata_1.subject_uid)::text)))
           WHERE (((ata_1.object_type)::text = 'BIO_MARKER'::text)
             AND (substr(ata_1.object_uid, 1, instr( ata_1.object_uid, ':' ) - 1 ) = 'MIRNA'::text)
             AND ((ff.folder_type)::text = 'ASSAY'::text))
@@ -79,8 +79,8 @@ CREATE VIEW biomart_user.browse_assays_view AS
       LEFT JOIN
         (SELECT fdu.unique_id AS id, string_agg((ata_1.object_uid)::text, '|'::text ORDER BY (ata_1.object_uid)::text) AS object_uids
           FROM ((fmapp.fm_folder ff
-          JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
-          JOIN amapp.am_tag_association ata_1 ON (((fdu.unique_id)::text = (ata_1.subject_uid)::text)))
+            JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
+            JOIN amapp.am_tag_association ata_1 ON (((fdu.unique_id)::text = (ata_1.subject_uid)::text)))
           WHERE (((ata_1.object_type)::text = 'BIOSOURCE'::text)
             AND ((ff.folder_type)::text = 'ASSAY'::text))
           GROUP BY fdu.unique_id) biosource ON (((biosource.id)::text = (fd.unique_id)::text)))
@@ -88,9 +88,9 @@ CREATE VIEW biomart_user.browse_assays_view AS
         (SELECT fdu.unique_id AS id,
           string_agg((ata_1.object_uid)::text, '|'::text ORDER BY (ata_1.object_uid)::text) AS object_uids
           FROM (((fmapp.fm_folder ff
-          JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
-          JOIN amapp.am_tag_association ata_1 ON (((fdu.unique_id)::text = (ata_1.subject_uid)::text)))
-          JOIN amapp.am_tag_item ati ON ((ata_1.tag_item_id = ati.tag_item_id)))
+            JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
+            JOIN amapp.am_tag_association ata_1 ON (((fdu.unique_id)::text = (ata_1.subject_uid)::text)))
+            JOIN amapp.am_tag_item ati ON ((ata_1.tag_item_id = ati.tag_item_id)))
           WHERE ((((ata_1.object_type)::text = 'BIO_CONCEPT_CODE'::text)
             AND ((ati.code_type_name)::text = 'ASSAY_TYPE_OF_BM_STUDIED'::text))
             AND ((ff.folder_type)::text = 'ASSAY'::text))
@@ -117,91 +117,154 @@ CREATE VIEW browse_programs_view AS
     JOIN fmapp.fm_data_uid fd ON ((f.folder_id = fd.fm_data_id)))
     LEFT JOIN
       (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
-      FROM ((((fmapp.fm_folder ff JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
-        JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
-        JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
-        JOIN biomart.bio_disease bd ON ((bd.bio_disease_id = bdu.bio_data_id)))
-      WHERE (((ata.object_type)::text = ANY (ARRAY[('BIO_DISEASE'::character varying)::text, ('PROGRAM_TARGET'::character varying)::text]))
-        AND ((ff.folder_type)::text = 'PROGRAM':text))
-      GROUP BY fdu.unique_id) diseases ON (((diseases.id)::text = (fd.unique_id)::text)))
-      LEFT JOIN (SELECT fdu.unique_id AS id,
-	  string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
-      FROM ((((fmapp.fm_folder ff
-        JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
-        JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
-        JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
-        JOIN biomart.bio_observation bo ON ((bo.bio_observation_id = bdu.bio_data_id)))
-      WHERE (((ata.object_type)::text = ANY (ARRAY[('BIO_OBSERVATION'::character varying)::text, ('PROGRAM_TARGET'::character varying)::text]))
-        AND ((ff.folder_type)::text = 'PROGRAM'::text))
-      GROUP BY fdu.unique_id) observations ON (((observations.id)::text = (fd.unique_id)::text)))
-    LEFT JOIN
-      (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
-      FROM ((((fmapp.fm_folder ff
-        JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
-        JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
-        JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
-        JOIN biomart.bio_marker bm ON ((bm.bio_marker_id = bdu.bio_data_id)))
-      WHERE ((((bm.bio_marker_type)::text = 'PATHWAY'::text)
-        AND (((ata.object_type)::text = 'BIO_MARKER'::text)
-          OR ((ata.object_type)::text = 'PROGRAM_TARGET'::text)))
-        AND ((ff.folder_type)::text = 'PROGRAM'::text))
-      GROUP BY fdu.unique_id) pathways ON (((pathways.id)::text = (fd.unique_id)::text)))
+        FROM ((((fmapp.fm_folder ff JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
+          JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
+          JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
+          JOIN biomart.bio_disease bd ON ((bd.bio_disease_id = bdu.bio_data_id)))
+        WHERE (((ata.object_type)::text = ANY (ARRAY[('BIO_DISEASE'::character varying)::text, ('PROGRAM_TARGET'::character varying)::text]))
+          AND ((ff.folder_type)::text = 'PROGRAM'::text))
+        GROUP BY fdu.unique_id) diseases ON (((diseases.id)::text = (fd.unique_id)::text)))
     LEFT JOIN
       (SELECT fdu.unique_id AS id,
 	  string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
-      FROM ((((fmapp.fm_folder ff
-        JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
-        JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
-        JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
-        JOIN biomart.bio_marker bm ON ((bm.bio_marker_id = bdu.bio_data_id)))
-      WHERE ((((bm.bio_marker_type)::text = 'GENE'::text)
-        AND (((ata.object_type)::text = 'BIO_MARKER'::text)
-          OR ((ata.object_type)::text = 'PROGRAM_TARGET'::text)))
-        AND ((ff.folder_type)::text = 'PROGRAM'::text))
-      GROUP BY fdu.unique_id) genes ON (((genes.id)::text = (fd.unique_id)::text)))
+        FROM ((((fmapp.fm_folder ff
+          JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
+          JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
+          JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
+          JOIN biomart.bio_observation bo ON ((bo.bio_observation_id = bdu.bio_data_id)))
+        WHERE (((ata.object_type)::text = ANY (ARRAY[('BIO_OBSERVATION'::character varying)::text, ('PROGRAM_TARGET'::character varying)::text]))
+          AND ((ff.folder_type)::text = 'PROGRAM'::text))
+        GROUP BY fdu.unique_id) observations ON (((observations.id)::text = (fd.unique_id)::text)))
+    LEFT JOIN
+      (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
+        FROM ((((fmapp.fm_folder ff
+          JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
+          JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
+          JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
+          JOIN biomart.bio_marker bm ON ((bm.bio_marker_id = bdu.bio_data_id)))
+        WHERE ((((bm.bio_marker_type)::text = 'PATHWAY'::text)
+          AND (((ata.object_type)::text = 'BIO_MARKER'::text)
+            OR ((ata.object_type)::text = 'PROGRAM_TARGET'::text)))
+          AND ((ff.folder_type)::text = 'PROGRAM'::text))
+        GROUP BY fdu.unique_id) pathways ON (((pathways.id)::text = (fd.unique_id)::text)))
+    LEFT JOIN
+      (SELECT fdu.unique_id AS id,
+	  string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
+        FROM ((((fmapp.fm_folder ff
+          JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
+          JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
+          JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
+          JOIN biomart.bio_marker bm ON ((bm.bio_marker_id = bdu.bio_data_id)))
+        WHERE ((((bm.bio_marker_type)::text = 'GENE'::text)
+          AND (((ata.object_type)::text = 'BIO_MARKER'::text)
+            OR ((ata.object_type)::text = 'PROGRAM_TARGET'::text)))
+          AND ((ff.folder_type)::text = 'PROGRAM'::text))
+        GROUP BY fdu.unique_id) genes ON (((genes.id)::text = (fd.unique_id)::text)))
     LEFT JOIN
       (SELECT fdu.unique_id AS id,
         string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
-      FROM (((((fmapp.fm_folder ff JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
-        JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
-        JOIN amapp.am_tag_item ati ON ((ata.tag_item_id = ati.tag_item_id)))
-        JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
-        JOIN biomart.bio_concept_code bcc ON ((bcc.bio_concept_code_id = bdu.bio_data_id)))
-      WHERE ((((ata.object_type)::text = ANY (ARRAY[('BIO_CONCEPT_CODE'::character varying)::text, ('PROGRAM_TARGET'::character varying)::text]))
-        AND ((ff.folder_type)::text = 'PROGRAM'::text))
-        AND ((ati.code_type_name)::text = 'THERAPEUTIC_DOMAIN'::text))
-      GROUP BY fdu.unique_id) therapeutic_domains ON (((therapeutic_domains.id)::text = (fd.unique_id)::text)))
+        FROM (((((fmapp.fm_folder ff JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
+          JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
+          JOIN amapp.am_tag_item ati ON ((ata.tag_item_id = ati.tag_item_id)))
+          JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
+          JOIN biomart.bio_concept_code bcc ON ((bcc.bio_concept_code_id = bdu.bio_data_id)))
+        WHERE ((((ata.object_type)::text = ANY (ARRAY[('BIO_CONCEPT_CODE'::character varying)::text, ('PROGRAM_TARGET'::character varying)::text]))
+          AND ((ff.folder_type)::text = 'PROGRAM'::text))
+          AND ((ati.code_type_name)::text = 'THERAPEUTIC_DOMAIN'::text))
+        GROUP BY fdu.unique_id) therapeutic_domains ON (((therapeutic_domains.id)::text = (fd.unique_id)::text)))
     LEFT JOIN
-    (SELECT fdu.unique_id AS id,
+      (SELECT fdu.unique_id AS id,
 	string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
-      FROM (((((fmapp.fm_folder ff
-JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
-JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
-JOIN amapp.am_tag_item ati ON ((ata.tag_item_id = ati.tag_item_id)))
-JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
-JOIN biomart.bio_concept_code bcc ON ((bcc.bio_concept_code_id = bdu.bio_data_id)))
-WHERE ((((ata.object_type)::text = ANY (ARRAY[('BIO_CONCEPT_CODE'::character varying)::text, ('PROGRAM_TARGET'::character varying)::text])) AND ((ff.folder_type)::text = 'PROGRAM'::text))
-AND ((ati.code_type_name)::text = 'PROGRAM_INSTITUTION'::text))
-GROUP BY fdu.unique_id) institutions ON (((institutions.id)::text = (fd.unique_id)::text)))
-LEFT JOIN (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
-FROM (((((fmapp.fm_folder ff
-JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
-JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
-JOIN amapp.am_tag_item ati ON ((ata.tag_item_id = ati.tag_item_id)))
-JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
-JOIN biomart.bio_concept_code bcc ON ((bcc.bio_concept_code_id = bdu.bio_data_id)))
-WHERE ((((ata.object_type)::text = ANY (ARRAY[('BIO_CONCEPT_CODE'::character varying)::text, ('PROGRAM_TARGET'::character varying)::text]))
-	    AND ((ff.folder_type)::text = 'PROGRAM'::text))
-	AND ((ati.code_type_name)::text = 'PROGRAM_TARGET_PATHWAY_PHENOTYPE'::text))
-GROUP BY fdu.unique_id) targets ON (((targets.id)::text = (fd.unique_id)::text)))
-WHERE (((f.folder_type)::text = 'PROGRAM'::text)
-AND f.active_ind);
+        FROM (((((fmapp.fm_folder ff
+          JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
+          JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
+          JOIN amapp.am_tag_item ati ON ((ata.tag_item_id = ati.tag_item_id)))
+          JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
+          JOIN biomart.bio_concept_code bcc ON ((bcc.bio_concept_code_id = bdu.bio_data_id)))
+        WHERE ((((ata.object_type)::text = ANY (ARRAY[('BIO_CONCEPT_CODE'::character varying)::text, ('PROGRAM_TARGET'::character varying)::text]))
+          AND ((ff.folder_type)::text = 'PROGRAM'::text))
+          AND ((ati.code_type_name)::text = 'PROGRAM_INSTITUTION'::text))
+        GROUP BY fdu.unique_id) institutions ON (((institutions.id)::text = (fd.unique_id)::text)))
+    LEFT JOIN
+      (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
+        FROM (((((fmapp.fm_folder ff
+          JOIN fmapp.fm_data_uid fdu ON ((ff.folder_id = fdu.fm_data_id)))
+          JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
+          JOIN amapp.am_tag_item ati ON ((ata.tag_item_id = ati.tag_item_id)))
+          JOIN biomart.bio_data_uid bdu ON (((bdu.unique_id)::text = (ata.object_uid)::text)))
+          JOIN biomart.bio_concept_code bcc ON ((bcc.bio_concept_code_id = bdu.bio_data_id)))
+        WHERE ((((ata.object_type)::text = ANY (ARRAY[('BIO_CONCEPT_CODE'::character varying)::text, ('PROGRAM_TARGET'::character varying)::text]))
+          AND ((ff.folder_type)::text = 'PROGRAM'::text))
+          AND ((ati.code_type_name)::text = 'PROGRAM_TARGET_PATHWAY_PHENOTYPE'::text))
+        GROUP BY fdu.unique_id) targets ON (((targets.id)::text = (fd.unique_id)::text)))
+  WHERE (((f.folder_type)::text = 'PROGRAM'::text)
+    AND f.active_ind);
 
 --
 -- Name: browse_studies_view; Type: VIEW; Schema: biomart_user; Owner: -
 --
 CREATE VIEW browse_studies_view AS
-    SELECT fd.unique_id AS id, exp.title, exp.description, exp.design, exp.biomarker_type, exp.access_type, exp.accession, exp.institution, exp.country, diseases.object_uids AS disease, compounds.object_uids AS compound, study_objectives.object_uids AS study_objective, species.object_uids AS organism, phases.object_uids AS study_phase FROM (((((((((biomart.bio_experiment exp JOIN biomart.bio_data_uid bd ON ((exp.bio_experiment_id = bd.bio_data_id))) JOIN fmapp.fm_folder_association fa ON (((fa.object_uid)::text = (bd.unique_id)::text))) JOIN fmapp.fm_data_uid fd ON ((fa.folder_id = fd.fm_data_id))) JOIN fmapp.fm_folder ff ON ((ff.folder_id = fa.folder_id))) LEFT JOIN (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids FROM ((fmapp.fm_folder_association ffa JOIN fmapp.fm_data_uid fdu ON ((ffa.folder_id = fdu.fm_data_id))) JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text))) WHERE ((ata.object_type)::text = 'BIO_DISEASE'::text) GROUP BY fdu.unique_id) diseases ON (((diseases.id)::text = (fd.unique_id)::text))) LEFT JOIN (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids FROM ((fmapp.fm_folder_association ffa JOIN fmapp.fm_data_uid fdu ON ((ffa.folder_id = fdu.fm_data_id))) JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text))) WHERE ((ata.object_type)::text = 'BIO_COMPOUND'::text) GROUP BY fdu.unique_id) compounds ON (((compounds.id)::text = (fd.unique_id)::text))) LEFT JOIN (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids FROM (((fmapp.fm_folder_association ffa JOIN fmapp.fm_data_uid fdu ON ((ffa.folder_id = fdu.fm_data_id))) JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text))) JOIN amapp.am_tag_item ati ON ((ata.tag_item_id = ati.tag_item_id))) WHERE (((ata.object_type)::text = 'BIO_CONCEPT_CODE'::text) AND ((ati.code_type_name)::text = 'STUDY_OBJECTIVE'::text)) GROUP BY fdu.unique_id) study_objectives ON (((study_objectives.id)::text = (fd.unique_id)::text))) LEFT JOIN (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids FROM (((fmapp.fm_folder_association ffa JOIN fmapp.fm_data_uid fdu ON ((ffa.folder_id = fdu.fm_data_id))) JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text))) JOIN amapp.am_tag_item ati ON ((ata.tag_item_id = ati.tag_item_id))) WHERE (((ata.object_type)::text = 'BIO_CONCEPT_CODE'::text) AND ((ati.code_type_name)::text = 'SPECIES'::text)) GROUP BY fdu.unique_id) species ON (((species.id)::text = (fd.unique_id)::text))) LEFT JOIN (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids FROM (((fmapp.fm_folder_association ffa JOIN fmapp.fm_data_uid fdu ON ((ffa.folder_id = fdu.fm_data_id))) JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text))) JOIN amapp.am_tag_item ati ON ((ata.tag_item_id = ati.tag_item_id))) WHERE (((ata.object_type)::text = 'BIO_CONCEPT_CODE'::text) AND ((ati.code_type_name)::text = 'STUDY_PHASE'::text)) GROUP BY fdu.unique_id) phases ON (((phases.id)::text = (fd.unique_id)::text))) WHERE ff.active_ind;
+  SELECT fd.unique_id AS id,
+    exp.title,
+    exp.description,
+    exp.design,
+    exp.biomarker_type,
+    exp.access_type,
+    exp.accession,
+    exp.institution,
+    exp.country,
+    diseases.object_uids AS disease,
+    compounds.object_uids AS compound,
+    study_objectives.object_uids AS study_objective,
+    species.object_uids AS organism,
+    phases.object_uids AS study_phase
+  FROM (((((((((biomart.bio_experiment exp
+    JOIN biomart.bio_data_uid bd ON ((exp.bio_experiment_id = bd.bio_data_id)))
+    JOIN fmapp.fm_folder_association fa ON (((fa.object_uid)::text = (bd.unique_id)::text)))
+    JOIN fmapp.fm_data_uid fd ON ((fa.folder_id = fd.fm_data_id)))
+    JOIN fmapp.fm_folder ff ON ((ff.folder_id = fa.folder_id)))
+    LEFT JOIN
+      (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
+        FROM ((fmapp.fm_folder_association ffa
+          JOIN fmapp.fm_data_uid fdu ON ((ffa.folder_id = fdu.fm_data_id)))
+          JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
+        WHERE ((ata.object_type)::text = 'BIO_DISEASE'::text)
+        GROUP BY fdu.unique_id) diseases ON (((diseases.id)::text = (fd.unique_id)::text)))
+    LEFT JOIN
+      (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
+        FROM ((fmapp.fm_folder_association ffa
+          JOIN fmapp.fm_data_uid fdu ON ((ffa.folder_id = fdu.fm_data_id)))
+          JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
+        WHERE ((ata.object_type)::text = 'BIO_COMPOUND'::text)
+        GROUP BY fdu.unique_id) compounds ON (((compounds.id)::text = (fd.unique_id)::text)))
+    LEFT JOIN
+      (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
+        FROM (((fmapp.fm_folder_association ffa
+          JOIN fmapp.fm_data_uid fdu ON ((ffa.folder_id = fdu.fm_data_id)))
+          JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
+          JOIN amapp.am_tag_item ati ON ((ata.tag_item_id = ati.tag_item_id)))
+        WHERE (((ata.object_type)::text = 'BIO_CONCEPT_CODE'::text)
+          AND ((ati.code_type_name)::text = 'STUDY_OBJECTIVE'::text))
+        GROUP BY fdu.unique_id) study_objectives ON (((study_objectives.id)::text = (fd.unique_id)::text)))
+    LEFT JOIN
+      (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
+        FROM (((fmapp.fm_folder_association ffa
+          JOIN fmapp.fm_data_uid fdu ON ((ffa.folder_id = fdu.fm_data_id)))
+          JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
+	  JOIN amapp.am_tag_item ati ON ((ata.tag_item_id = ati.tag_item_id)))
+        WHERE (((ata.object_type)::text = 'BIO_CONCEPT_CODE'::text)
+          AND ((ati.code_type_name)::text = 'SPECIES'::text))
+        GROUP BY fdu.unique_id) species ON (((species.id)::text = (fd.unique_id)::text)))
+    LEFT JOIN
+      (SELECT fdu.unique_id AS id, string_agg((ata.object_uid)::text, '|'::text ORDER BY (ata.object_uid)::text) AS object_uids
+        FROM (((fmapp.fm_folder_association ffa
+          JOIN fmapp.fm_data_uid fdu ON ((ffa.folder_id = fdu.fm_data_id)))
+          JOIN amapp.am_tag_association ata ON (((fdu.unique_id)::text = (ata.subject_uid)::text)))
+          JOIN amapp.am_tag_item ati ON ((ata.tag_item_id = ati.tag_item_id)))
+        WHERE (((ata.object_type)::text = 'BIO_CONCEPT_CODE'::text)
+          AND ((ati.code_type_name)::text = 'STUDY_PHASE'::text))
+        GROUP BY fdu.unique_id) phases ON (((phases.id)::text = (fd.unique_id)::text)))
+  WHERE ff.active_ind;
 
 
 SET default_with_oids = false;
