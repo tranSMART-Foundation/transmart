@@ -1,7 +1,5 @@
 package org.transmart.plugin.auth0
 
-import org.springframework.beans.factory.annotation.Value
-
 /**
  * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>
  */

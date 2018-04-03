@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
+import org.transmart.plugin.shared.SecurityService
 import spock.lang.Specification
 
 /**
@@ -20,6 +21,7 @@ class AuthTagLibSpec extends Specification {
 		defineBeans {
 			authService(AuthService)
 			securityContextLogoutHandler(SecurityContextLogoutHandler)
+			securityService(SecurityService)
 			springSecurityService(SpringSecurityService)
 		}
 		applicationContext.springSecurityService.authenticationTrustResolver = new AuthenticationTrustResolverImpl()
