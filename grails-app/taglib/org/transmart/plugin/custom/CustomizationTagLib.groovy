@@ -1,11 +1,8 @@
 package org.transmart.plugin.custom
 
-import groovy.transform.CompileStatic
-
 /**
  * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>
  */
-@CompileStatic
 class CustomizationTagLib {
 
 	static namespace = 'transmart'
