@@ -10,6 +10,10 @@ import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.LockedException
 import org.springframework.security.web.WebAttributes
+import org.transmart.plugin.custom.CustomizationConfig
+import org.transmart.plugin.custom.CustomizationService
+import org.transmart.plugin.custom.Settings
+import org.transmart.plugin.custom.UserLevel
 import org.transmart.plugin.shared.SecurityService
 import org.transmart.searchapp.AuthUser
 import org.transmartproject.db.log.AccessLogService
@@ -30,17 +34,19 @@ class Auth0Controller implements InitializingBean {
 	@Autowired private AuthService authService
 	@Autowired private Auth0Service auth0Service
 	@Autowired private Auth0Config auth0Config
+	@Autowired private CustomizationConfig customizationConfig
+	@Autowired private CustomizationService customizationService
 	@Autowired private SecurityService securityService
 	@Autowired private UserService userService
 
 	// can't be initialized in afterPropertiesSet() since GORM isn't available yet
 	@Lazy private String access1DetailsMessage = { ->
-		String suffix = auth0Config.instanceType == 'baseline' || auth0Config.instanceType == '' ? '' :
-				'.' + auth0Config.instanceType
+		String suffix = customizationConfig.instanceType == 'baseline' || customizationConfig.instanceType == '' ? '' :
+				'.' + customizationConfig.instanceType
 		message(code: 'edu.harvard.transmart.access1.details' + suffix)
 	}()
 	@Lazy private String authViewName = { ->
-		String loginTemplatesValue = authService.setting('login-template')?.fieldvalue ?: ''
+		String loginTemplatesValue = customizationService.setting('login-template')?.fieldvalue ?: ''
 		if (loginTemplatesValue && !loginTemplatesValue.equalsIgnoreCase('default')) {
 			loginTemplatesValue
 		}
@@ -48,20 +54,20 @@ class Auth0Controller implements InitializingBean {
 			'auth'
 		}
 	}()
-	@Lazy private String notAuthorizedTemplate = { -> authService.setting('notAuthorizedTemplate')?.fieldvalue ?: '' }()
+	@Lazy private String notAuthorizedTemplate = { -> customizationService.setting('notAuthorizedTemplate')?.fieldvalue ?: '' }()
 	@Lazy private String userGuideLink = { ->
 		String userGuidePropertyId = 'edu.harvard.transmart.UserGuideMessage' +
-				(auth0Config.instanceType ? '.' + auth0Config.instanceType : '')
-		message(code: userGuidePropertyId, args: [auth0Config.userGuideUrl, "User's Guide"])
+				(customizationConfig.instanceType ? '.' + customizationConfig.instanceType : '')
+		message(code: userGuidePropertyId, args: [customizationConfig.userGuideUrl, "User's Guide"])
 	}()
 
 	def auth() {
 		nocache response
 
 		boolean forcedFormLogin = request.queryString
-		if (auth0Config.guestAutoLogin && !forcedFormLogin) {
-			logger.info 'Automatic login with userid {}', auth0Config.guestUserName
-			AuthUser authUser = authService.authUser(auth0Config.guestUserName)
+		if (customizationConfig.guestAutoLogin && !forcedFormLogin) {
+			logger.info 'Automatic login with userid {}', customizationConfig.guestUserName
+			AuthUser authUser = authService.authUser(customizationConfig.guestUserName)
 			if (authUser) {
 				securityService.authenticateAs authUser.username
 				if (authUser.authorities) {
@@ -178,7 +184,7 @@ class Auth0Controller implements InitializingBean {
 
 		authService.logout()
 
-		if (auth0Config.guestAutoLogin) {
+		if (customizationConfig.guestAutoLogin) {
 			redirect action: 'forceAuth'
 		}
 		else {
@@ -204,13 +210,7 @@ class Auth0Controller implements InitializingBean {
 			return
 		}
 
-		Map userInfo = [:]
-		try {
-			userInfo = userService.currentUserInfo(credentials.username)
-		}
-		catch (e) {
-			logger.error e.message
-		}
+		Map userInfo = userService.currentUserInfo(credentials.username)
 
 		logger.info 'Registration starting for {}', credentials.username
 
@@ -225,7 +225,7 @@ class Auth0Controller implements InitializingBean {
 			return
 		}
 
-		if (!auth0Config.userSignupEnabled) {
+		if (!customizationConfig.userSignupEnabled) {
 			redirect action: 'notauthorized'
 			return
 		}
@@ -238,7 +238,7 @@ class Auth0Controller implements InitializingBean {
 	}
 
 	def tos() {
-		Settings settings = authService.setting('tos.text')
+		Settings settings = customizationService.setting('tos.text')
 		if (!settings) {
 			// If no TOS has been configured in the database, display just an informational message
 			return [tosEffectiveDate: 'N/A', tosValue: 'No Terms of Service has been set up, yet.']
@@ -262,7 +262,7 @@ class Auth0Controller implements InitializingBean {
 
 		[needAgreement   : needAgreement,
 		 tosEffectiveDate: new SimpleDateFormat('MMM dd, yyyy').format(settings.lastUpdated),
-		 tosValue        : settings.fieldvalue + (authService.setting('tos.text_cont')?.fieldvalue ?: '')]
+		 tosValue        : settings.fieldvalue + (customizationService.setting('tos.text_cont')?.fieldvalue ?: '')]
 	}
 
 	def userlist(AuthUser user, String state) {
@@ -275,7 +275,7 @@ class Auth0Controller implements InitializingBean {
 		}
 
 		accessLog securityService.currentUsername(), 'View userlist'
-		[users: userService.buildUserListUserInfo(), userSignupEnabled: auth0Config.userSignupEnabled]
+		[users: userService.buildUserListUserInfo(), userSignupEnabled: customizationConfig.userSignupEnabled]
 	}
 
 	protected Map buildAuthModel() {
@@ -299,6 +299,6 @@ class Auth0Controller implements InitializingBean {
 		authModel = [auth0CallbackUrl: auth0Config.auth0CallbackUrl,
 		             auth0ClientId   : auth0Config.auth0ClientId,
 		             auth0Domain     : auth0Config.auth0Domain,
-		             uiHeroImageUrl  : auth0Config.uiHeroImageUrl]
+		             uiHeroImageUrl  : customizationConfig.uiHeroImageUrl]
 	}
 }

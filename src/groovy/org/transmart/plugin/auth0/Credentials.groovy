@@ -2,6 +2,7 @@ package org.transmart.plugin.auth0
 
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
+import org.transmart.plugin.custom.UserLevel
 
 /**
  * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>

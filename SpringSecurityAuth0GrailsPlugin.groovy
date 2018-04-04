@@ -1,7 +1,6 @@
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.apache.commons.codec.binary.Base64
-import org.springframework.context.ApplicationContext
 import org.springframework.util.Assert
 import org.transmart.plugin.auth0.Auth0AuthenticationEntryPoint
 import org.transmart.plugin.auth0.Auth0AuthenticationFilter
@@ -71,15 +70,6 @@ class SpringSecurityAuth0GrailsPlugin {
 		if (printStatusMessages) {
 			println '... finished configuring Transmart Spring Security Auth0\n'
 		}
-	}
-
-	def doWithApplicationContext = { ApplicationContext ctx ->
-		if (!SpringSecurityUtils.securityConfig.auth0.active) {
-			return
-		}
-
-		Auth0Config auth0Config = ctx.auth0Config
-		auth0Config.init()
 	}
 
 	private String getRequiredConfigString(ConfigObject conf, String propertyName) {

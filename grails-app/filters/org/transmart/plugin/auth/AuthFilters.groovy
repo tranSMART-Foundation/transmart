@@ -1,8 +1,9 @@
 package org.transmart.plugin.auth
 
 import grails.plugin.springsecurity.SpringSecurityUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.transmart.plugin.auth0.Auth0Config
-import org.transmart.plugin.auth0.AuthService
+import org.transmart.plugin.custom.CustomizationConfig
 import org.transmart.plugin.shared.SecurityService
 
 /**
@@ -10,26 +11,13 @@ import org.transmart.plugin.shared.SecurityService
  */
 class AuthFilters {
 
-	Auth0Config auth0Config
-	AuthService authService
-	SecurityService securityService
+	private @Autowired Auth0Config auth0Config
+	private @Autowired CustomizationConfig customizationConfig
+	private @Autowired SecurityService securityService
 
 	boolean active = SpringSecurityUtils.securityConfig.auth0.active
 
 	def filters = {
-
-		/**
-		 * Intercepts all requests to enforce minimum <code>UserLevel</code> for controller
-		 * actions annotated with <code>@RequiresLevel</code>.
-		 */
-		checkUserLevelAccess(controller: '*', action: '*') {
-			before = {
-				if (active) {
-					authService.checkUserLevelAccess controllerName, actionName
-				}
-				true
-			}
-		}
 
 		/**
 		 * Automatically store commonly used config vars in the GSP model.
@@ -37,20 +25,20 @@ class AuthFilters {
 		commonModel(controller: 'auth0', action: '*') {
 			after = { Map model ->
 				if (active && model != null) {
-					model.appTitle = auth0Config.appTitle
+					model.appTitle = customizationConfig.appTitle
 					model.captchaSitekey = auth0Config.captchaSitekey
-					model.emailLogo = auth0Config.emailLogo
-					model.googleAnalyticsTracking = auth0Config.googleAnalyticsTracking
-					model.guestAutoLogin = auth0Config.guestAutoLogin
-					model.instanceName = auth0Config.instanceName
-					model.instanceType = auth0Config.instanceType
-					model.instanceTypeSuffix = auth0Config.instanceTypeSuffix
-					model.isTOS = auth0Config.isTOS
-					model.pmsdnLogo = auth0Config.pmsdnLogo
+					model.emailLogo = customizationConfig.emailLogo
+					model.googleAnalyticsTracking = customizationConfig.googleAnalyticsTracking
+					model.guestAutoLogin = customizationConfig.guestAutoLogin
+					model.instanceName = customizationConfig.instanceName
+					model.instanceType = customizationConfig.instanceType
+					model.instanceTypeSuffix = customizationConfig.instanceTypeSuffix
+					model.isTOS = customizationConfig.isTOS
+					model.pmsdnLogo = customizationConfig.pmsdnLogo
 					model.principal = securityService.principal()
-					model.supportEmail = auth0Config.supportEmail
+					model.supportEmail = customizationConfig.supportEmail
 					model.useRecaptcha = auth0Config.useRecaptcha
-					model.userGuideUrl = auth0Config.userGuideUrl
+					model.userGuideUrl = customizationConfig.userGuideUrl
 				}
 				true
 			}

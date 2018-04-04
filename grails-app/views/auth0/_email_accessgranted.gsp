@@ -23,15 +23,15 @@
 						<br />
 						<div id="divBodyText" class="body-text">
 							The administrator has granted you <strong>${levelName}</strong> access for <b>${instanceName}</b> data.<br /><br />
-							<auth:ifLevelOne>
+							<transmart:ifLevelOne>
 							${access1DetailsMessage}<br />
-							</auth:ifLevelOne>
-							<auth:ifLevelTwo>
+							</transmart:ifLevelOne>
+							<transmart:ifLevelTwo>
 							In addition to viewing aggregate data and running statistical analysis, Level 2 access will allow you to investigate patient-level data and download certain data as well.<br />
-							</auth:ifLevelTwo>
-							<auth:ifLevelAdmin>
+							</transmart:ifLevelTwo>
+							<transmart:ifLevelAdmin>
 							The <b>${levelName}</b> access will allow you, in addition to viewing aggregate data and running statistical analysis, to get patient level data, download the data and perform user administration.<br />
-							</auth:ifLevelAdmin>
+							</transmart:ifLevelAdmin>
 							<br />
 							${userGuideLink}<br />
 							<br />

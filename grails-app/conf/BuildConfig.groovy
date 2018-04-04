@@ -29,9 +29,11 @@ grails.project.dependency.resolution = {
 		compile ':spring-security-core:2.0.0'
 		compile ':cache:1.1.8'
 
-		compile ':search-domain:18.1-SNAPSHOT'
-		compile ':transmart-core:18.1-SNAPSHOT'
-		compile ':transmart-shared:18.1-SNAPSHOT'
+		String tmVersion = '18.1-SNAPSHOT'
+		compile ':search-domain:'    + tmVersion
+		compile ':transmart-core:'   + tmVersion
+		compile ':transmart-custom:' + tmVersion
+		compile ':transmart-shared:' + tmVersion
 
 		build ':release:3.1.2', ':rest-client-builder:2.1.1', {
 			export = false

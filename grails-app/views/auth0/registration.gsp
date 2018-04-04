@@ -25,9 +25,9 @@
 <div class="container">
 	<div class="row well">
 		<h1>
-			<strong>${instanceName}</strong> Request for <auth:useAccessLevelDescription />
+			<strong>${instanceName}</strong> Request for <transmart:useAccessLevelDescription />
 		</h1>
-		<auth:useAccessLevelMemo />
+		<transmart:useAccessLevelMemo />
 		<hr/>
 		<div class="bs-callout bs-callout-warning hidden">
 			<h4>Oh snap!</h4>
@@ -47,7 +47,7 @@
 				<button type="button" class="previous btn btn-info pull-left">&lt; Previous</button>
 				<button type="button" class="next btn btn-info pull-right">Next &gt;</button>
 				<button class="btn btn-info pull-right" type="submit">
-					<span class="clearfix"></span><auth:useRegisterButton />
+					<span class="clearfix"></span><transmart:useRegisterButton />
 				</button>
 			</div>
 		</g:form>

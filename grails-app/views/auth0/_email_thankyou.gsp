@@ -41,7 +41,7 @@
 							Please bookmark the following URL: <br/>
 							<blockquote>${loginUrl.encodeAsRaw()}</blockquote> for your convenience.<br />
 							<br/>
-							<auth:useUserGuide/><br/>
+							<transmart:useUserGuide/><br/>
 							<br/>
 							Thank you!.<br/>
 							<br />

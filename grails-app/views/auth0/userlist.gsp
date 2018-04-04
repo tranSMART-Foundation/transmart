@@ -1,4 +1,4 @@
-<%@page import='org.transmart.plugin.auth0.UserLevel' %> %{--TODO why isn't the import working?--}%
+<%@page import='org.transmart.plugin.custom.UserLevel' %> %{--TODO why isn't the import working?--}%
 <html>
 <head>
 <meta name="layout" content="bootstrap"/>
@@ -57,17 +57,17 @@
 							<div class="btn-group">
 								<g:set var='levelClass' value='primary' />
 								<g:set var='levelDesc' value="Level${user.level.level}" />
-								<g:if test="${user.level == org.transmart.plugin.auth0.UserLevel.UNREGISTERED}">
+								<g:if test="${user.level == org.transmart.plugin.custom.UserLevel.UNREGISTERED}">
 									<g:set var='levelClass' value='danger' />
 									<g:set var='levelDesc' value='Unregistered' />
 								</g:if>
-								<g:if test="${user.level == org.transmart.plugin.auth0.UserLevel.ZERO}">
+								<g:if test="${user.level == org.transmart.plugin.custom.UserLevel.ZERO}">
 									<g:set var='levelClass' value='danger' />
 								</g:if>
-								<g:if test="${user.level == org.transmart.plugin.auth0.UserLevel.ONE}">
+								<g:if test="${user.level == org.transmart.plugin.custom.UserLevel.ONE}">
 									<g:set var='levelClass' value='info' />
 								</g:if>
-								<g:if test="${user.level == org.transmart.plugin.auth0.UserLevel.ADMIN}">
+								<g:if test="${user.level == org.transmart.plugin.custom.UserLevel.ADMIN}">
 									<g:set var='levelClass' value='warning' />
 									<g:set var='levelDesc' value='Admin' />
 								</g:if>
@@ -76,11 +76,11 @@
 									${levelDesc} <span class="caret"></span>
 								</a>
 								<ul class="dropdown-menu">
-									<li><g:link action='userlist' params="[state: org.transmart.plugin.auth0.UserLevel.ZERO]" id="${user.id}">Level0</g:link></li>
-									<li><g:link action='userlist' params="[state: org.transmart.plugin.auth0.UserLevel.ONE]" id="${user.id}">Level1</g:link></li>
-									<li><g:link action='userlist' params="[state: org.transmart.plugin.auth0.UserLevel.TWO]" id="${user.id}">Level2</g:link></li>
+									<li><g:link action='userlist' params="[state: org.transmart.plugin.custom.UserLevel.ZERO]" id="${user.id}">Level0</g:link></li>
+									<li><g:link action='userlist' params="[state: org.transmart.plugin.custom.UserLevel.ONE]" id="${user.id}">Level1</g:link></li>
+									<li><g:link action='userlist' params="[state: org.transmart.plugin.custom.UserLevel.TWO]" id="${user.id}">Level2</g:link></li>
 									<li role="separator" class="divider"></li>
-									<li><g:link action='userlist' params="[state: org.transmart.plugin.auth0.UserLevel.ADMIN]" id="${user.id}">Admin</g:link></li>
+									<li><g:link action='userlist' params="[state: org.transmart.plugin.custom.UserLevel.ADMIN]" id="${user.id}">Admin</g:link></li>
 								</ul>
 							</div>
 						</td>
@@ -123,8 +123,8 @@
 					<div id="messageId"></div>
 					<select name="accessLevel" id="userLevel" class="btn btn-info dropdown-toggle customized" required>
 						<option value="" disabled selected>Access level</option>
-						<option value="${org.transmart.plugin.auth0.UserLevel.ONE}">${org.transmart.plugin.auth0.UserLevel.ONE.description}</option>
-						<option value="${org.transmart.plugin.auth0.UserLevel.TWO}">${org.transmart.plugin.auth0.UserLevel.TWO.description}</option>
+						<option value="${org.transmart.plugin.custom.UserLevel.ONE}">${org.transmart.plugin.custom.UserLevel.ONE.description}</option>
+						<option value="${org.transmart.plugin.custom.UserLevel.TWO}">${org.transmart.plugin.custom.UserLevel.TWO.description}</option>
 					</select>
 				</div>
 				<div class="modal-footer">

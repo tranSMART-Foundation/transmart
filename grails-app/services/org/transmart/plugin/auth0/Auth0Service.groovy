@@ -6,6 +6,7 @@ import com.auth0.jwt.interfaces.DecodedJWT
 import grails.converters.JSON
 import grails.gsp.PageRenderer
 import grails.plugin.cache.Cacheable
+import grails.plugin.mail.MailService
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -16,6 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.context.request.RequestContextHolder
+import org.transmart.plugin.custom.CustomizationConfig
+import org.transmart.plugin.custom.CustomizationService
+import org.transmart.plugin.custom.Roles
+import org.transmart.plugin.custom.Settings
+import org.transmart.plugin.custom.UserLevel
 import org.transmart.plugin.shared.SecurityService
 import org.transmart.plugin.shared.UtilService
 import org.transmart.searchapp.AuthUser
@@ -42,12 +48,13 @@ class Auth0Service implements InitializingBean {
 	@Autowired private AccessLogService accessLogService
 	@Autowired private AuthService authService
 	@Autowired private Auth0Config auth0Config
+	@Autowired private CustomizationConfig customizationConfig
+	@Autowired private CustomizationService customizationService
+	@Autowired private MailService mailService
 	@Autowired private PageRenderer groovyPageRenderer
 	@Autowired private SecurityService securityService
 	@Autowired private UserService userService
 	@Autowired private UtilService utilService
-
-	def mailService
 
 	/**
 	 * Handle the Auth0 callback.
@@ -96,92 +103,84 @@ class Auth0Service implements InitializingBean {
 	 * @param code the 'code' querystring parameter from the Auth0 callback
 	 * @param redirectUri base of the callback url, e.g. https://server/contextPath
 	 */
-	@CompileDynamic
 	Credentials createCredentials(String code, String redirectUri) {
 
-		Credentials credentials
+		JSONObject json = new JSONObject(
+				client_id: auth0Config.auth0ClientId,
+				client_secret: auth0Config.auth0ClientSecret,
+				code: code,
+				grant_type: 'authorization_code',
+				redirect_uri: redirectUri)
 
-		try {
-			JSONObject json = new JSONObject(
-					client_id: auth0Config.auth0ClientId,
-					client_secret: auth0Config.auth0ClientSecret,
-					code: code,
-					grant_type: 'authorization_code',
-					redirect_uri: redirectUri)
+		Resty resty = new Resty()
+		JSONObject tokenInfo = resty.json(oauthTokenUrl, Resty.content(json)).toObject()
+		// {
+		//   "access_token":"...",
+		//   "expires_in":86400,
+		//   "id_token":"...",
+		//   "token_type":"Bearer"
+		// }
 
-			Resty resty = new Resty()
-			JSONObject tokenInfo = resty.json(oauthTokenUrl, Resty.content(json)).toObject()
-			// {
-			//   "access_token":"...",
-			//   "expires_in":86400,
-			//   "id_token":"...",
-			//   "token_type":"Bearer"
-			// }
+		String accessToken = tokenInfo.getString('access_token')
+		String idToken = tokenInfo.getString('id_token')
 
-			String accessToken = tokenInfo.getString('access_token')
-			String idToken = tokenInfo.getString('id_token')
+		JSONObject userInfo = resty.json(userInfoUrl + accessToken).toObject()
+		// {
+		// 	"app_metadata":
+		// 		{
+		// 			"roles":["ROLE_CITI_USER"]
+		// 		},
+		// 		"clientID":"...",
+		// 		"created_at":"2017-11-21T15:19:50.683Z",
+		// 		"email":"burtbeckwith@gmail.com",
+		// 		"email_verified":true,
+		// 		"family_name":"Beckwith",
+		// 		"gender":"male",
+		// 		"given_name":"Burt",
+		// 		"identities":[
+		// 			{
+		// 				"connection":"google-oauth2",
+		// 				"isSocial":true,
+		// 				"provider":"google-oauth2",
+		// 				"user_id":"..."
+		// 			}
+		// 		],
+		// 		"locale":"en",
+		// 		"name":"Burt Beckwith",
+		// 		"nickname":"burtbeckwith",
+		// 		"picture":"https://lh3.googleusercontent.com/-rG-S66wU1LI/AAAAAAAAAAI/AAAAAAAAAfE/ijUU6rz8j3I/photo.jpg",
+		// 		"roles":["ROLE_CITI_USER"],
+		// 		"sub":"google-oauth2|...",
+		// 		"updated_at":"2018-02-20T13:25:20.721Z",
+		// 		"user_id":"google-oauth2|..."
+		// }
 
-			JSONObject userInfo = resty.json(userInfoUrl + accessToken).toObject()
-			// {
-			// 	"app_metadata":
-			// 		{
-			// 			"roles":["ROLE_CITI_USER"]
-			// 		},
-			// 		"clientID":"...",
-			// 		"created_at":"2017-11-21T15:19:50.683Z",
-			// 		"email":"burtbeckwith@gmail.com",
-			// 		"email_verified":true,
-			// 		"family_name":"Beckwith",
-			// 		"gender":"male",
-			// 		"given_name":"Burt",
-			// 		"identities":[
-			// 			{
-			// 				"connection":"google-oauth2",
-			// 				"isSocial":true,
-			// 				"provider":"google-oauth2",
-			// 				"user_id":"..."
-			// 			}
-			// 		],
-			// 		"locale":"en",
-			// 		"name":"Burt Beckwith",
-			// 		"nickname":"burtbeckwith",
-			// 		"picture":"https://lh3.googleusercontent.com/-rG-S66wU1LI/AAAAAAAAAAI/AAAAAAAAAfE/ijUU6rz8j3I/photo.jpg",
-			// 		"roles":["ROLE_CITI_USER"],
-			// 		"sub":"google-oauth2|...",
-			// 		"updated_at":"2018-02-20T13:25:20.721Z",
-			// 		"user_id":"google-oauth2|..."
-			// }
+		String email = userInfo.getString('email')
 
-			String email = userInfo.getString('email')
+		idToken = rebuildJwt(idToken, email)
 
-			idToken = rebuildJwt(idToken, email)
+		Credentials credentials = new Credentials(
+				accessToken: accessToken,
+				connection: userInfo.getJSONArray('identities').getJSONObject(0).getString('connection'),
+				email: email,
+				idToken: idToken,
+				name: 'unregistered',
+				nickname: 'unregistered',
+				picture: '',
+				username: email)
 
-			credentials = new Credentials(
-					accessToken: accessToken,
-					connection: userInfo.getJSONArray('identities').getJSONObject(0).getString('connection'),
-					email: email,
-					idToken: idToken,
-					name: 'unregistered',
-					nickname: 'unregistered',
-					picture: '',
-					username: email)
-
-			currentRequest().session.setAttribute CREDENTIALS_KEY, credentials
-
-			AuthUser existingUser = authService.authUser(credentials.username)
-			if (existingUser) {
-				credentials.id = existingUser.id
-				credentials.level = authService.userLevel(existingUser)
-			}
-			else {
-				String uniqueId = userInfo.getString('sub')
-				createUser credentials, uniqueId
-				credentials.level = UserLevel.UNREGISTERED
-			}
+		AuthUser existingUser = authService.authUser(credentials.username)
+		if (existingUser) {
+			credentials.id = existingUser.id
+			credentials.level = customizationService.userLevel(existingUser)
 		}
-		catch (e) {
-			logger.error e.message
+		else {
+			String uniqueId = userInfo.getString('sub')
+			createUser credentials, uniqueId
+			credentials.level = UserLevel.UNREGISTERED
 		}
+
+		currentRequest().session.setAttribute CREDENTIALS_KEY, credentials
 
 		credentials
 	}
@@ -336,7 +335,7 @@ class Auth0Service implements InitializingBean {
 
 	private void sendSignupEmails(String username, String email, AuthUser authUser, String loginUrl, String appUrl) {
 		Map personDescription = (Map) JSON.parse(authUser.description)
-		String emailLogo = auth0Config.instanceType == 'pmsdn' ? auth0Config.pmsdnLogo : auth0Config.emailLogo
+		String emailLogo = customizationConfig.instanceType == 'pmsdn' ? customizationConfig.pmsdnLogo : customizationConfig.emailLogo
 		if (!emailLogo.startsWith('data:')) {
 			if (appUrl.endsWith('/') && emailLogo.startsWith('/')) {
 				emailLogo = appUrl + emailLogo.substring(1)
@@ -348,12 +347,12 @@ class Auth0Service implements InitializingBean {
 
 		// Send notification to admin that a user has completed the sign-up form
 		String body = groovyPageRenderer.render(
-				template: '/auth0/email_signup' + auth0Config.instanceTypeSuffix, model: [
+				template: '/auth0/email_signup' + customizationConfig.instanceTypeSuffix, model: [
 				appUrl      : appUrl,
 				emailLogo   : emailLogo,
-				instanceName: auth0Config.instanceName,
+				instanceName: customizationConfig.instanceName,
 				person      : personDescription])
-		sendEmail auth0Config.emailNotify, 'Registration Request', body
+		sendEmail customizationConfig.emailNotify, 'Registration Request', body
 
 		logger.debug 'Sent `Registration Request` e-mail to administrator(s)'
 
@@ -365,7 +364,7 @@ class Auth0Service implements InitializingBean {
 				email       : personDescription.email ?: 'E-mailAddress',
 				emailLogo   : emailLogo,
 				firstName   : personDescription.firstname ?: 'FirstName',
-				instanceName: auth0Config.instanceName,
+				instanceName: customizationConfig.instanceName,
 				lastName    : personDescription.lastname ?: 'LastName',
 				loginUrl    : loginUrl,
 				user        : authUser])
@@ -379,7 +378,7 @@ class Auth0Service implements InitializingBean {
 	 *         or a redirect action under the 'action' key
 	 */
 	private Map<String, String> grantRolesAndStoreAuth(AuthUser authUser, String username) {
-		if ('auto'.equalsIgnoreCase(auth0Config.accessLevel1)) {
+		if ('auto'.equalsIgnoreCase(customizationConfig.accessLevel1)) {
 			// If configuration is set to auto-approve, go ahead and assign the basic roles.
 			authService.grantRoles authUser, Roles.STUDY_OWNER, Roles.PUBLIC_USER
 			logger.debug 'Assigned basic, Level1 access to new user'
@@ -418,14 +417,14 @@ class Auth0Service implements InitializingBean {
 		updateRoles newLevel, user
 
 		String alertMsg = "User <b>$user.username</b> has been granted <b>$newLevel</b> access."
-		log.info alertMsg
+		logger.info alertMsg
 		accessLog securityService.currentUsername(), 'GrantAccess', alertMsg
 
-		UserLevel userLevel = authService.userLevel(user)
+		UserLevel userLevel = customizationService.userLevel(user)
 		String levelName
 		switch (userLevel) {
-			case UserLevel.ONE: levelName = auth0Config.instanceType == 'grdr' ? 'Open Data' : 'Level 1'; break
-			case UserLevel.TWO: levelName = auth0Config.instanceType == 'grdr' ? 'Controlled Data' : 'Level 2'; break
+			case UserLevel.ONE:   levelName = customizationConfig.instanceType == 'grdr' ? 'Open Data' : 'Level 1'; break
+			case UserLevel.TWO:   levelName = customizationConfig.instanceType == 'grdr' ? 'Controlled Data' : 'Level 2'; break
 			case UserLevel.ADMIN: levelName = 'Administrator'; break
 			default: levelName = 'Unknown'
 		}
@@ -439,17 +438,21 @@ class Auth0Service implements InitializingBean {
 		sendEmail user.email, 'Access Granted', body
 	}
 
-	@CompileDynamic
 	private void updateRoles(UserLevel level, AuthUser user) {
-		for (Role role in Role.list()) {
-			role.removeFromPeople user
-		}
+		removeRoles user
 
 		switch (level) {
 			case UserLevel.ZERO:  authService.grantRoles user, Roles.PUBLIC_USER; break
 			case UserLevel.ONE:   authService.grantRoles user, Roles.PUBLIC_USER, Roles.STUDY_OWNER; break
 			case UserLevel.TWO:   authService.grantRoles user, Roles.PUBLIC_USER, Roles.DATASET_EXPLORER_ADMIN; break
 			case UserLevel.ADMIN: authService.grantRoles user, Roles.PUBLIC_USER, Roles.ADMIN; break
+		}
+	}
+
+	@CompileDynamic
+	private void removeRoles(AuthUser user) {
+		for (Role role in Role.list()) {
+			role.removeFromPeople user
 		}
 	}
 
@@ -463,7 +466,7 @@ class Auth0Service implements InitializingBean {
 	boolean verifyTOSAccepted(long potentialUserId) {
 		logger.debug 'verifyTOSAccepted({})', potentialUserId
 
-		Settings defaultTosSettings = authService.setting('tos.text')
+		Settings defaultTosSettings = customizationService.setting('tos.text')
 		if (!defaultTosSettings) {
 			logger.debug 'There is no TOS set up.'
 			// There is no TOS settings. Verify by default. If the Settings does
@@ -471,7 +474,7 @@ class Auth0Service implements InitializingBean {
 			return true
 		}
 
-		Settings userTosSettings = authService.userSetting('tos.text', potentialUserId)
+		Settings userTosSettings = customizationService.userSetting('tos.text', potentialUserId)
 		if (!userTosSettings) {
 			logger.debug 'User never accepted TOS, before.'
 			// User never approved TOS. Fail by default.
@@ -493,7 +496,7 @@ class Auth0Service implements InitializingBean {
 
 	@Transactional
 	void checkTOS(Credentials credentials) {
-		Settings tosTextSettings = authService.userSetting('tos.text', credentials.id)
+		Settings tosTextSettings = customizationService.userSetting('tos.text', credentials.id)
 		if (!tosTextSettings) {
 			// This is the first time accepting. Create new settings record
 			new Settings(userid: credentials.id, fieldname: 'tos.text', fieldvalue: 'Accepted').save()
