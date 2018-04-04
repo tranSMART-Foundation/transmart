@@ -2,7 +2,7 @@ import org.springframework.context.ApplicationContext
 import org.transmart.plugin.custom.CustomizationConfig
 
 class TransmartCustomGrailsPlugin {
-	String version = '0.1-SNAPSHOT'
+	String version = '18.1-SNAPSHOT'
 	String grailsVersion = '2.3 > *'
 	String title = 'Transmart Customization Plugin'
 	String author = 'Burt Beckwith'
