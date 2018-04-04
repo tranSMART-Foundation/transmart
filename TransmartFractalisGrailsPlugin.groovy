@@ -2,11 +2,11 @@ class TransmartFractalisGrailsPlugin {
 
 	private static final String TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME = 'transmartExtensionsRegistry'
 
-	def version = "0.1-SNAPSHOT"
-	def grailsVersion = "2.3 > *"
+	def version = '18.1-SNAPSHOT'
+	def grailsVersion = '2.3 > *'
 	def title = 'Transmart Fractalis Plugin'
-	def author = "Sascha Herzinger"
-	def authorEmail = "Sascha_Herzinger@hms.harvard.edu"
+	def author = 'Sascha Herzinger'
+	def authorEmail = 'Sascha_Herzinger@hms.harvard.edu'
 	def description = 'Connects i2b2-tranSMART with https://git-r3lab.uni.lu/Fractalis'
 	def documentation = ''
 	def license = 'APACHE'
