@@ -1,0 +1,2 @@
+[![Snapshot Build Status](http://ec2-35-170-59-132.compute-1.amazonaws.com:8080/jenkins/view/New%20Plugins/job/transmart-custom-snapshots/badge/icon)](http://ec2-35-170-59-132.compute-1.amazonaws.com:8080/jenkins/view/New%20Plugins/job/transmart-custom-snapshots/)
+[![Release Build Status](http://ec2-35-170-59-132.compute-1.amazonaws.com:8080/jenkins/view/New%20Plugins/job/transmart-custom-releases/badge/icon)](http://ec2-35-170-59-132.compute-1.amazonaws.com:8080/jenkins/view/New%20Plugins/job/transmart-custom-releases/)
