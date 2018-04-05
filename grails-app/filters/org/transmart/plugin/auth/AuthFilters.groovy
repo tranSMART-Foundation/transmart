@@ -1,7 +1,6 @@
 package org.transmart.plugin.auth
 
 import grails.plugin.springsecurity.SpringSecurityUtils
-import org.springframework.beans.factory.annotation.Autowired
 import org.transmart.plugin.auth0.Auth0Config
 import org.transmart.plugin.custom.CustomizationConfig
 import org.transmart.plugin.shared.SecurityService
@@ -11,9 +10,9 @@ import org.transmart.plugin.shared.SecurityService
  */
 class AuthFilters {
 
-	private @Autowired Auth0Config auth0Config
-	private @Autowired CustomizationConfig customizationConfig
-	private @Autowired SecurityService securityService
+	Auth0Config auth0Config
+	CustomizationConfig customizationConfig
+	SecurityService securityService
 
 	boolean active = SpringSecurityUtils.securityConfig.auth0.active
 
