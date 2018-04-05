@@ -8,7 +8,7 @@ import org.transmart.plugin.auth0.Auth0AuthenticationProvider
 import org.transmart.plugin.auth0.Auth0Config
 
 class SpringSecurityAuth0GrailsPlugin {
-	String version = '0.1-SNAPSHOT'
+	String version = '18.1-SNAPSHOT'
 	String grailsVersion = '2.3 > *'
 	String title = 'Spring Security Auth0 Plugin'
 	String author = 'Burt Beckwith'
