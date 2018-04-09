@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.GrantedAuthority
 import org.transmart.plugin.shared.SecurityService
+import org.transmart.plugin.shared.security.Roles
 import org.transmart.searchapp.AuthUser
 
 import java.lang.reflect.Method

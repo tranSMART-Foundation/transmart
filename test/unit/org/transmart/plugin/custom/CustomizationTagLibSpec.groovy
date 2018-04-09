@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.User
 import org.transmart.plugin.shared.SecurityService
+import org.transmart.plugin.shared.security.Roles
 import spock.lang.Specification
 
 /**
