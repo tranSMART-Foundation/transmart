@@ -7,8 +7,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.User
 import org.transmart.plugin.shared.SecurityService
+import org.transmart.plugin.shared.security.AuthUserDetails
 import org.transmart.plugin.shared.security.Roles
 import spock.lang.Specification
 
@@ -175,6 +175,8 @@ class CustomizationTagLibSpec extends Specification {
 			authorities << new SimpleGrantedAuthority(role.authority)
 		}
 		SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(
-				new User('username', 'password', authorities), 'password', authorities)
+				new AuthUserDetails('username', 'password',
+						true, true, true, true,
+						authorities, 1, 'userRealName'), 'password', authorities)
 	}
 }
