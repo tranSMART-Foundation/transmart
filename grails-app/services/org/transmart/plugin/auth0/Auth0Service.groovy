@@ -19,11 +19,11 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.context.request.RequestContextHolder
 import org.transmart.plugin.custom.CustomizationConfig
 import org.transmart.plugin.custom.CustomizationService
-import org.transmart.plugin.custom.Roles
 import org.transmart.plugin.custom.Settings
 import org.transmart.plugin.custom.UserLevel
 import org.transmart.plugin.shared.SecurityService
 import org.transmart.plugin.shared.UtilService
+import org.transmart.plugin.shared.security.Roles
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.Role
 import org.transmartproject.db.log.AccessLogService

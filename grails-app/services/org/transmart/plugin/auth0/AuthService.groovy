@@ -14,8 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.web.authentication.logout.LogoutHandler
 import org.springframework.web.context.request.RequestContextHolder
-import org.transmart.plugin.custom.Roles
 import org.transmart.plugin.shared.SecurityService
+import org.transmart.plugin.shared.security.AuthUserDetails
+import org.transmart.plugin.shared.security.Roles
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.Role
 

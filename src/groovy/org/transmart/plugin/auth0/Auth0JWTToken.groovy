@@ -6,6 +6,7 @@ import groovy.transform.CompileStatic
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.util.Assert
+import org.transmart.plugin.shared.security.AuthUserDetails
 
 /**
  * Based on com.auth0.spring.security.api.Auth0JWTToken from auth0-spring-security-api.
