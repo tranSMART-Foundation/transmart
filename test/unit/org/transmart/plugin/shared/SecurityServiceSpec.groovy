@@ -2,14 +2,13 @@ package org.transmart.plugin.shared
 
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.test.mixin.TestFor
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.cache.NullUserCache
+import org.transmart.plugin.shared.security.AuthUserDetails
 import spock.lang.Specification
 
 /**
@@ -17,6 +16,9 @@ import spock.lang.Specification
  */
 @TestFor(SecurityService)
 class SecurityServiceSpec extends Specification {
+
+	private static final String username = 'username!'
+	private static final long id = 42
 
 	void setupSpec() {
 		defineBeans {
@@ -47,7 +49,7 @@ class SecurityServiceSpec extends Specification {
 
 	void 'test principal'() {
 		given:
-		User principal = new User('username', 'password', [])
+		def principal = newAuthUserDetails()
 		SecurityContextHolder.context.authentication =
 				new UsernamePasswordAuthenticationToken(principal, 'credentials')
 
@@ -57,10 +59,8 @@ class SecurityServiceSpec extends Specification {
 
 	void 'test currentUsername'() {
 		given:
-		String username = 'username!'
 		SecurityContextHolder.context.authentication =
-				new UsernamePasswordAuthenticationToken(
-						new User(username, 'password', []), 'credentials')
+				new UsernamePasswordAuthenticationToken(newAuthUserDetails(), 'credentials')
 
 		expect:
 		username == service.currentUsername()
@@ -68,12 +68,8 @@ class SecurityServiceSpec extends Specification {
 
 	void 'test currentUserId'() {
 		given:
-		long id = 42
 		SecurityContextHolder.context.authentication =
-				new UsernamePasswordAuthenticationToken(
-						new GrailsUser('username', 'password', true,
-								true, true, true, [], id),
-						'credentials')
+				new UsernamePasswordAuthenticationToken(newAuthUserDetails(), 'credentials')
 
 		expect:
 		id == service.currentUserId()
@@ -93,12 +89,18 @@ class SecurityServiceSpec extends Specification {
 
 	void 'test authenticateAs'() {
 		when:
-		String username = 'username!!'
 		SpringSecurityUtils.application = grailsApplication
 		service.authenticateAs username
 
 		then:
 		service.loggedIn()
-		username == service.currentUsername()
+		username == applicationContext.springSecurityService.principal.username
+	}
+
+	private AuthUserDetails newAuthUserDetails() {
+		new AuthUserDetails(username, 'password',
+				true, true, true, true,
+				[], id, 'userRealName')
+
 	}
 }
