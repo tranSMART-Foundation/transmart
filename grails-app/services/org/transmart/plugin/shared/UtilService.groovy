@@ -3,6 +3,7 @@ package org.transmart.plugin.shared
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSource
+import org.springframework.util.StreamUtils
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 
@@ -22,7 +23,7 @@ class UtilService {
 	 * @return resolved error strings
 	 */
 	Map<String, List<String>> errorStrings(GroovyObject o, Locale locale = Locale.getDefault()) {
-		Map<String, List<String>> stringsByField = [:].withDefault { [] }
+		Map<String, List<String>> stringsByField = [:].withDefault { [] } as Map
 		if (o.hasProperty('errors')) {
 			Errors errors = (Errors) o['errors']
 			for (FieldError fieldError in errors.fieldErrors) {
@@ -33,10 +34,16 @@ class UtilService {
 	}
 
 	void sendDownload(HttpServletResponse response, String contentType, String filename, byte[] content) {
-		response.contentType = contentType
-		response.setHeader 'Content-Disposition', 'attachment;filename=' + filename
 		response.setHeader 'Content-Length', content.length as String
-		response.outputStream << content
+		sendDownload response, contentType, filename, new ByteArrayInputStream(content)
+	}
+
+	void sendDownload(HttpServletResponse response, String contentType, String filename, InputStream inputStream) {
+		if (contentType) {
+			response.contentType = contentType
+		}
+		response.setHeader 'Content-Disposition', 'attachment;filename=' + filename
+		StreamUtils.copy inputStream, response.outputStream
 		response.outputStream.flush()
 	}
 }

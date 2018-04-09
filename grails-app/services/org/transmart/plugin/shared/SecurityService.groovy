@@ -8,7 +8,7 @@ import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.userdetails.UserDetails
+import org.transmart.plugin.shared.security.AuthUserDetails
 
 /**
  * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>
@@ -38,8 +38,8 @@ class SecurityService implements InitializingBean {
 	/**
 	 * @return the current auth principal if authenticated
 	 */
-	UserDetails principal() {
-		loggedIn() ? (UserDetails) springSecurityService.getPrincipal() : null
+	AuthUserDetails principal() {
+		loggedIn() ? (AuthUserDetails) springSecurityService.getPrincipal() : null
 	}
 
 	/**
@@ -53,7 +53,7 @@ class SecurityService implements InitializingBean {
 	 * @return the id of the AuthUser instance for the currently authenticated user.
 	 */
 	long currentUserId() {
-		(long) springSecurityService.getCurrentUserId()
+		principal()?.authUserId ?: -1
 	}
 
 	/**
