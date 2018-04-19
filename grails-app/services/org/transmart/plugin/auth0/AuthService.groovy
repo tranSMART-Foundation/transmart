@@ -86,7 +86,7 @@ class AuthService {
 
 		new AuthUserDetails(authUser.username, authUser.passwd, authUser.enabled, true /*!user.accountExpired*/,
 				true, true /*!user.accountLocked*/, authorities,
-				authUser.id, authUser.userRealName)
+				authUser.id, authUser.userRealName, authUser.email)
 	}
 
 	/**
