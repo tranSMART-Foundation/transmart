@@ -72,7 +72,7 @@ class SecurityService implements InitializingBean {
 	}
 
 	String jwtToken() {
-		String email = currentUsername()
+		String email = principal().email
 		Date now = new Date()
 		JWT.create()
 				.withAudience(clientId)      // 'aud'
