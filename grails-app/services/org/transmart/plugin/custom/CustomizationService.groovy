@@ -24,7 +24,7 @@ import java.lang.reflect.Method
 @Slf4j('logger')
 class CustomizationService implements InitializingBean  {
 
-	private Map<String, Map<String, UserLevel>> levels = [:].withDefault { [:] }
+	private Map<String, Map<String, UserLevel>> levels = [:].withDefault { [:] } as Map
 	private Map<String, String> controllerDefaultActions = [:]
 
 	@Autowired private GrailsApplication grailsApplication

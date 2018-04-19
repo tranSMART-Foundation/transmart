@@ -175,8 +175,7 @@ class CustomizationTagLibSpec extends Specification {
 			authorities << new SimpleGrantedAuthority(role.authority)
 		}
 		SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(
-				new AuthUserDetails('username', 'password',
-						true, true, true, true,
-						authorities, 1, 'userRealName'), 'password', authorities)
+				new AuthUserDetails('username', 'password', true, true, true, true,
+						authorities, 1, 'userRealName', 'user@email.com'), 'password', authorities)
 	}
 }
