@@ -100,7 +100,7 @@ class SecurityServiceSpec extends Specification {
 	private AuthUserDetails newAuthUserDetails() {
 		new AuthUserDetails(username, 'password',
 				true, true, true, true,
-				[], id, 'userRealName')
+				[], id, 'userRealName', 'user@email.com')
 
 	}
 }

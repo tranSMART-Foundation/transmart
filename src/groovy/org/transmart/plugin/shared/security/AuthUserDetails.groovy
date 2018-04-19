@@ -10,14 +10,16 @@ import org.springframework.security.core.GrantedAuthority
 @CompileStatic
 class AuthUserDetails extends GrailsUser {
 
+	final String email
 	final String userRealName
 
 	AuthUserDetails(String username, String password, boolean enabled,
 	                boolean accountNonExpired, boolean credentialsNonExpired,
 	                boolean accountNonLocked, Collection<GrantedAuthority> authorities,
-	                long id, String userRealName) {
+	                long id, String userRealName, String email) {
 		super(username, password, enabled, accountNonExpired, credentialsNonExpired,
 				accountNonLocked, authorities, id)
+		this.email = email
 		this.userRealName = userRealName
 	}
 
