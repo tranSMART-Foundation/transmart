@@ -16,7 +16,8 @@ class TransmartFractalisGrailsPlugin {
 	def scm = [url: 'https://github.com/i2b2-tranSMART/transmart-fractalis']
 
 	def doWithApplicationContext = { ctx ->
-		if (ctx.containsBean(TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME)) {
+		if (true.is(application.config.fractalis.active) &&
+				ctx.containsBean(TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME)) {
 			ctx.getBean(TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME).registerAnalysisTabExtension(
                     'transmart-fractalis', '/Fractalis/loadScripts', 'addFractalisPanel')
 		}
