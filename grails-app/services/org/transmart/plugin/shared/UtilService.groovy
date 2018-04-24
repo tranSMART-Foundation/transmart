@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse
 @CompileStatic
 class UtilService {
 
+	static transactional = false
+
 	@Autowired private MessageSource messageSource
 
 	/**
