@@ -564,9 +564,11 @@ class Auth0Service implements InitializingBean {
 	}
 
 	void afterPropertiesSet() {
-		algorithm = Algorithm.HMAC256(auth0Config.auth0ClientSecret)
-		oauthTokenUrl = 'https://' + auth0Config.auth0Domain + '/oauth/token'
-		userInfoUrl = 'https://' + auth0Config.auth0Domain + '/userinfo?access_token='
+		if (auth0Config) { // not injected if active=false
+			algorithm = Algorithm.HMAC256(auth0Config.auth0ClientSecret)
+			oauthTokenUrl = 'https://' + auth0Config.auth0Domain + '/oauth/token'
+			userInfoUrl = 'https://' + auth0Config.auth0Domain + '/userinfo?access_token='
+		}
 	}
 
 	protected HttpServletRequest currentRequest() {
