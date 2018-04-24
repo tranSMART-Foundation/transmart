@@ -47,7 +47,6 @@ class Auth0Service implements InitializingBean {
 
 	@Autowired private AccessLogService accessLogService
 	@Autowired private AuthService authService
-	@Autowired private Auth0Config auth0Config
 	@Autowired private CustomizationConfig customizationConfig
 	@Autowired private CustomizationService customizationService
 	@Autowired private MailService mailService
@@ -55,6 +54,9 @@ class Auth0Service implements InitializingBean {
 	@Autowired private SecurityService securityService
 	@Autowired private UserService userService
 	@Autowired private UtilService utilService
+
+	@Autowired(required = false)
+	private Auth0Config auth0Config
 
 	/**
 	 * Handle the Auth0 callback.
