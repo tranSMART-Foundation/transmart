@@ -24,6 +24,8 @@ import java.lang.reflect.Method
 @Slf4j('logger')
 class CustomizationService implements InitializingBean  {
 
+	static transactional = false
+
 	private Map<String, Map<String, UserLevel>> levels = [:].withDefault { [:] } as Map
 	private Map<String, String> controllerDefaultActions = [:]
 
