@@ -317,7 +317,7 @@ class Auth0Service implements InitializingBean {
 			description.picture = credentials.picture ?: ''
 
 			user.description = (description as JSON).toString()
-			user.save()
+			user.save(flush:true)
 			if (user.hasErrors()) {
 				logger.error 'Error updating user{}: {}', credentials.username, utilService.errorStrings(user)
 			}
