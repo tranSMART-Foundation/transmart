@@ -1,4 +1,4 @@
-package otg.grails.plugin.transmart.shared
+package org.transmart.plugin.shared
 
 import groovy.transform.CompileStatic
 
