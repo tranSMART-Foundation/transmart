@@ -1,11 +1,12 @@
 import geb.Page
+import org.openqa.selenium.Point
 import org.openqa.selenium.Dimension
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.FirefoxOptions
 import geb.report.ScreenshotReporter
-//import org.openqa.selenium.firefox.FirefoxDriverService
+
 //import org.openqa.selenium.chrome.ChromeDriver
-//import org.openqa.selenium.chrome.ChromeDriverService
 //import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.os.ExecutableFinder
 
@@ -37,12 +38,18 @@ reporter = new ScreenshotReporter()
 
 def instantiateDriver(String className) {
     def driverInstance = Class.forName(className).newInstance(profile)
-    driverInstance.manage().window().size = new Dimension(1280, 1024)
+    driverInstance.manage().window().size = new Dimension(1600, 1024)
     driverInstance
 }
 
 def instantiateDriverWebDriver(String className) {
+    println "instantiateDriverWebDriver '${className}'"
     def profile = new org.openqa.selenium.firefox.FirefoxProfile()
+    def options = new org.openqa.selenium.firefox.FirefoxOptions()
+
+//    options.setLogLevel(Level.OFF)
+    options.setProfile(profile)
+
     profile.setPreference("intl.accept_languages", "en-us")
     profile.setPreference("browser.download.dir", "/data/scratch/git-master/transmart-test/functional_tests/savefiles")
     profile.setPreference("browser.download.folderList", 2)
@@ -51,8 +58,25 @@ def instantiateDriverWebDriver(String className) {
                           " application/pdf, application/octet-stream,"+
                           " text/plain")
     profile.setPreference("pdfjs.disabled", true)
-    def driverInstance = Class.forName(className).newInstance(profile)
+
+    //set more capabilities as per your requirements
+ 
+    def driverInstance = Class.forName(className).newInstance(options)
     driverInstance.manage().window().size = new Dimension(1280, 1024)
+
+    println "initial window size ${driverInstance.manage().window().size}"
+
+//// Note: maximize() just hangs
+////    driverInstance.manage().window().maximize()
+
+// set to top left before resize - else setSize is ignored!
+//    driverInstance.manage().window().setPosition(new Point(0,0))
+// somehow sets to a smaller size than the previous default(1366, 704)
+//    driverInstance.manage().window().setSize(new Dimension(1600, 1024))
+//    println "size updated"
+//    println "updated window size ${driverInstance.manage().window().size}"
+// reports reduced size (1221, 661)
+    println "instantiateDriverWebDriver"
     driverInstance
 }
 
@@ -60,7 +84,7 @@ def instantiateDriverProfile(String className) {
     def profile = new org.openqa.selenium.firefox.FirefoxProfile()
     profile.setPreference("intl.accept_languages", "en-us")
     def driverInstance = Class.forName(className).newInstance(profile)
-    driverInstance.manage().window().size = new Dimension(1280, 1024)
+    driverInstance.manage().window().size = new Dimension(1600, 1024)
     driverInstance
 }
 
@@ -70,7 +94,7 @@ def instantiateDriverChrome(String className) {
 //    profile.setPreference("intl.accept_languages", "en-us")
     profile.addArguments("--start-maximized")
     def driverInstance = Class.forName(className).newInstance(profile)
-    driverInstance.manage().window().size = new Dimension(1280, 1024)
+    driverInstance.manage().window().size = new Dimension(1600, 1024)
     driverInstance
 }
 */
