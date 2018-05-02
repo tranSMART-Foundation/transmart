@@ -71,7 +71,7 @@ class LoginSpec extends GebReportingSpecTransmart {
         then:
         assert at(LoginFailedPage)
 
-        assert topMessage == 'Please login...' : "unexpected login prompt"
+        assert loginForm.usernameLabel.text() == "Username :" : "unexpected login prompt"
         assert loginForm.errorMessage.contains('Login has failed') ||
                loginForm.errorMessage.contains('Your account has been locked') :
                        "unexpected login error message"

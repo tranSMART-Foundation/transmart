@@ -1,6 +1,6 @@
 package pages.modules
 
-import com.google.common.collect.*
+//import com.google.common.collect.*
 import geb.Module
 import geb.navigator.Navigator
 import org.openqa.selenium.WebElement
@@ -11,6 +11,8 @@ import functions.Constants
  * Created by peter.rice@transmartfoundation.org on 18-nov-2014.
  */
 class CommonHeaderModule extends Module {
+
+    final static String testString = "Here I am in CommonHeader"
 
     static base = { $('div#header-div') }
 
@@ -27,6 +29,7 @@ class CommonHeaderModule extends Module {
 // check through menu table - check names, find selected name,
 // check for items hidden by Config.groovy
 
+    final static String TOPMENU_SEARCH = 'Search'
     final static String TOPMENU_BROWSE = 'Browse'
     final static String TOPMENU_ANALYZE = 'Analyze'
     final static String TOPMENU_SAMPLE_EXPLORER = 'Sample Explorer'
@@ -105,6 +108,11 @@ class CommonHeaderModule extends Module {
         ret
     }
 
+    String currentItem() {
+//        println "CommonHeader currentItem"
+        currentMenuItem.text()
+    }
+    
     Navigator listHeaderTab() { tableMenu().find('th') }
     Navigator findHeaderTab (String tabName) { listHeaderTab().find(tabName) }
 

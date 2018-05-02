@@ -12,13 +12,13 @@ import pages.modules.AnalyzeModule
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.contains
 
-class AnalyzeWorkflow extends Page {
+class AnalyzeSmartR extends Page {
 
     static url = 'datasetExplorer/index'
 
     static at = {
         commonHeader.currentMenuItem?.text() == commonHeader.TOPMENU_ANALYZE
-        analyzeTab.tabSelected.text() == analyzeTab.ANALYZE_TAB_WORKFLOWS
+        analyzeTab.tabSelected.text() == analyzeTab.ANALYZE_TAB_SMARTR
     }
 
     static content = {
@@ -26,13 +26,16 @@ class AnalyzeWorkflow extends Page {
         analyzeTab { module AnalyzeTabModule }
         analyzeTree { module AnalyzeTreeModule }
         analyze { module AnalyzeModule }
+        workflows { $('select#sr-workflowSelect option') }
 
-        selectedAnalysis (wait: true) {
-            $('span#selectedAnalysis')?.text()
-        }
+        selectedAnalysis { workflows.value() }
+        resetButton { $('button#sr-reset-btn').click() }
+
         menuItem { String text ->
-            $('a.x-menu-item').find {
-                it.text().trim() == text
+            println "Looking for SmartR workflow '$text'"
+            workflows.find {
+                println "Checking SmartR workflow value '${it.value()}' text '${it.text()}'"
+                it.value().trim() == text || it.text().trim() == text 
             }
         }
         boxConcepts (wait: true) { box ->
@@ -40,18 +43,9 @@ class AnalyzeWorkflow extends Page {
                 it.attr('conceptid')
             }
         }
-        analysisImages {
-            $('#analysisOutput img')
-        }
-        extButton { String text ->
-            $('button.x-btn-text').find {
-                it.text() == text
-            }
-        }
     }
 
-    void selectAnalysis(String analysis) {
-        extButton('Analysis').click()
+    void selectSmartRAnalysis(String analysis) {
         menuItem(analysis).click()
     }
 

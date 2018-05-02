@@ -29,6 +29,8 @@ class Constants {
 
     public static final String GSE8581_KEY = '\\\\Public Studies\\Public Studies\\COPD_Bhattacharya_GSE8581\\'
     public static final String GSE13168_KEY = '\\\\Public Studies\\Public Studies\\Asthma_Misior_GSE13168\\'
+    public static final String GSE15258_KEY = '\\\\eTRIKS Rheumatoid Arthritis\\eTRIKS Rheumatoid Arthritis\\Bienkowska(2009) GSE15258\\'
+    public static final String GSE35643_KEY = '\\\\eTRIKS Asthma\\eTRIKS Asthma\\Gounni(2012) GSE35643\\'
 
     /*
     def Constants(Browser browser) {

@@ -13,6 +13,7 @@ import functions.Constants
 import pages.AnalyzeQuery
 import pages.AnalyzeWorkflow
 import pages.modules.AnalyzeTabModule
+import pages.modules.AnalyzeTreeModule
 import pages.analyses.CoxRegressionResult
 import pages.analyses.SurvivalAnalysisPage
 import pages.analyses.SurvivalAnalysisSummary
@@ -114,13 +115,13 @@ class SurvivalAnalysisSpec extends GebReportingSpecTransmart {
 
         waitFor { analysisWidgetHeader }
 
-        workflowDragNodeToBox params.timeVariable, timeBox
+        analyzeTree.treeDragNodeToBox params.timeVariable, timeBox
 
         if (params.categoryVariables) { // check all expected variables were found
-            workflowDragNodeToBox params.categoryVariableDragged, categoryBox,
+            analyzeTree.treeDragNodeToBox params.categoryVariableDragged, categoryBox,
             containsInAnyOrder(params.categoryVariables.collect { is it as String })
         } else {                // leaf node
-            workflowDragNodeToBox params.categoryVariableDragged, categoryBox
+            analyzeTree.treeDragNodeToBox params.categoryVariableDragged, categoryBox
         }
 
         if (params.searchKeyword) {

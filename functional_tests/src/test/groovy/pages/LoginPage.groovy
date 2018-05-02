@@ -12,7 +12,10 @@ class LoginPage extends Page {
     static url = 'login/forceAuth'
 
     static at = {
-        topMessage == 'Please login...'
+        println "LoginPage at..."
+        println "usernameLabel '${loginForm.usernameLabel.text()}'"
+        println "passwordLabel '${loginForm.passwordLabel.text()}'"
+        loginForm.usernameLabel.text() == 'Username :'
     }
 
     static content = {

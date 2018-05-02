@@ -12,6 +12,7 @@ import functions.Constants
 import pages.LoginPage
 import pages.AnalyzeWorkflow
 import pages.modules.AnalyzeTabModule
+import pages.modules.AnalyzeTreeModule
 import pages.analyses.HeatmapAnalysisPage
 import tests.GebReportingSpecTransmart
 
@@ -33,7 +34,7 @@ abstract class HeatmapSupportAbstract extends GebReportingSpecTransmart {
 
 		waitFor { analysisWidgetHeader }
                 
-		if(!workflowDragNodeToBox(params.biomarkerNode, highDimBox)) {
+		if(!analyzeTree.treeDragNodeToBox(params.biomarkerNode, highDimBox)) {
                     return false
                 }
 	}

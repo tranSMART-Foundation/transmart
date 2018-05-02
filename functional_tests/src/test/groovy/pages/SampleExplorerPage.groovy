@@ -19,7 +19,7 @@ class SampleExplorerPage extends Page {
     static url = 'sampleExplorer/list'
 
     static at = {
-        commonHeader.currentMenuItem()?.text() == HEADER_TAB_NAME
+        commonHeader.currentMenuItem()?.text() == commonHeader.TOPMENU_SAMPLE_EXPLORER
         byId.text() == "By ID"
     }
 

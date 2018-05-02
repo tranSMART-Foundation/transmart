@@ -7,6 +7,7 @@ import functions.Constants
 
 import pages.AnalyzeQuery
 import pages.modules.AnalyzeTabModule
+import pages.modules.AnalyzeTreeModule
 import pages.analyses.SurvivalAnalysisPage
 
 import java.util.regex.Pattern
@@ -17,7 +18,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder
 import static org.hamcrest.Matchers.is
 
 @Stepwise
-class ScrapTests extends GebReportingSpecTransmart {
+class ScrapTestsSpec extends GebReportingSpecTransmart {
 
         def highDimExpectations = [
                                    expectedMarkerType: 'Gene Expression',
@@ -64,9 +65,9 @@ class ScrapTests extends GebReportingSpecTransmart {
         waitFor { analysisWidgetHeader }
 
         
-        workflowDragNodeToBox params.timeVariable, timeBox
+        analyzeTree.treeDragNodeToBox params.timeVariable, timeBox
 
-        workflowDragNodeToBox params.categoryVariableDragged, categoryBox
+        analyzeTree.treeDragNodeToBox params.categoryVariableDragged, categoryBox
 
         then:
         waitFor (15) {setGeneTarget(params.searchKeyword)}

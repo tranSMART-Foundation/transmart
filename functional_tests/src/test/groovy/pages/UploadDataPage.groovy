@@ -19,7 +19,7 @@ class UploadDataPage extends Page {
     static url = 'uploadData/index'
 
     static at = {
-        commonHeader.currentMenuItem?.text() == HEADER_TAB_NAME
+        commonHeader.currentMenuItem?.text() == commonHeader.TOPMENU_UPLOAD_DATA
         sideHeader.text() == "Upload target"
         sideTarget.size() == 3
     }

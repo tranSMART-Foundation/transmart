@@ -28,6 +28,13 @@ class LoginFormModule extends Module {
                                { $('input#loginButton') }
         loginButtonFailed(to: LoginFailedPage)
                                { $('input#loginButton') }
+// labels
+                               
+//        usernameLabel { $('label.for')[0].value() }
+//        passwordLabel { $('label.for')[1].value() }
+
+        usernameLabel { $('label[for=j_username]') }
+        passwordLabel { $('label[for=j_password]') }
 
 // input fields
         usernameField          { $('input#j_username') }

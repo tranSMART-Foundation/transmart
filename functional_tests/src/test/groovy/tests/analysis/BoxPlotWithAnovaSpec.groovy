@@ -8,6 +8,7 @@ import functions.Constants
 import pages.AnalyzeQuery
 import pages.AnalyzeWorkflow
 import pages.modules.AnalyzeTabModule
+import pages.modules.AnalyzeTreeModule
 import pages.analyses.BoxPlotPage
 
 import static org.hamcrest.Matchers.containsInAnyOrder
@@ -29,8 +30,10 @@ class BoxPlotWithAnovaSpec extends GebReportingSpecTransmart {
         setUpAnalysisSubPage 'Box Plot with ANOVA', params
 
         runAnalysis params
-        waitFor(60 * 3) { resultOutput } // may need to wait up to 3 min for result!
-
+        println "waiting for resultOutput"
+        waitFor(60*3, message: "Boxplot with ANOVA RunButton.click() - timed out") { resultOutput } // wait up to 3 minutes for result
+        println "ready to verifyPage"
+        
         then:
         verifyPage()
     }
@@ -46,17 +49,15 @@ class BoxPlotWithAnovaSpec extends GebReportingSpecTransmart {
     private void runAnalysis(Map params) {
 
         println "runAnalysis dragNodeToBox ${params.variable}, independentVariableBox"
-        workflowDragNodeToBox params.variable, independentVariableBox
+        analyzeTree.treeDragNodeToBox params.variable, independentVariableBox
 
-        println "workflowDragNodeToBox ${params.categoryVariableDragged}, categoryBox, "+
+        println "analyzeTree.treeDragNodeToBox ${params.categoryVariableDragged}, dependentVariableBox, "+
                 "containsInAnyOrder(params.categoryVariables.collect { is it as String })"
-        workflowDragNodeToBox params.categoryVariableDragged, categoryBox,
+        analyzeTree.treeDragNodeToBox params.categoryVariableDragged, dependentVariableBox,
                 containsInAnyOrder(params.categoryVariables.collect { is it as String })
 
         println "runButton.click()"
         runButton.click()
-        println "waitFor results"
-        waitFor(8, message: "SurvivalAnalysis RunButton.click() - timed out") { resultOutput } // wait up to 8 seconds for result
     }
 
     private setUpAnalysisSubPage(String analysisHeader, Map params) {

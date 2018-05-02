@@ -20,7 +20,7 @@ class AdminPage extends Page {
     static url = 'accessLog/index'
 
     static at = {
-        commonHeader.currentMenuItem?.text() == HEADER_TAB_NAME
+        commonHeader.currentMenuItem?.text() == commonHeader.TOPMENU_ADMIN
     }
 
     static content = {
@@ -35,32 +35,32 @@ class AdminPage extends Page {
 
         groupsOptions  { $("div.navContainer1").has("h1.panelheader", text: "Groups") }
         groupsOptionsList  { groupsOptions.find("a.list", text: "Group List") }
-        groupsOptionsCreate  { groupsOptions.find("a.list", text: "Create Group") }
-        groupsOptionsMembers  { groupsOptions.find("a.list", text: "Group Membership") }
+        groupsOptionsCreate  { groupsOptions.find("a.create", "Create Group") }
+        groupsOptionsMembers  { groupsOptions.find("a.create", text: "Group Membership") }
 
-        usersOptions  { $("div.navContainer1").has("h1.panelheader", text: "...") }
+        usersOptions  { $("div.navContainer1").has("h1.panelheader", text: "Users") }
         usersOptionsList  { usersOptions.find("a.list", text: "User List") }
-        usersOptionsCreate  { usersOptions.find("a.list", text: "Create User") }
+        usersOptionsCreate  { usersOptions.find("a.create", text: "Create User") }
 
         galaxyOptions  { $("div.navContainer1").has("h1.panelheader", text: "Galaxy Users") }
         galaxyOptions  { galaxyOptions.find("a.list", text: "User List") }
-        galaxyOptions  { galaxyOptions.find("a.list", text: "Create User") }
+        galaxyOptions  { galaxyOptions.find("a.create", text: "Create User") }
 
         accessOptions  { $("div.navContainer1").has("h1.panelheader", text: "Access Control") }
-        accessOptionsGroup  { accessOptions.find("a.list", text: "Access Control by Group") }
-        accessOptionsStudy  { accessOptions.find("a.list", text: "Access Control by Study") }
+        accessOptionsGroup  { accessOptions.find("a.create", text: "Access Control by Group") }
+        accessOptionsStudy  { accessOptions.find("a.create", text: "Access Control by Study") }
 
         studyOptions  { $("div.navContainer1").has("h1.panelheader", text: "Study") }
         studyOptionsList  { studyOptions.find("a.list", text: "Study List") }
-        studyOptionsAdd  { studyOptions.find("a.list", text: "Add Study") }
+        studyOptionsAdd  { studyOptions.find("a.create", text: "Add Study") }
 
         secureOptions  { $("div.navContainer1").has("h1.panelheader", text: "Secure Object Paths") }
         secureOptions  { secureOptions.find("a.list", text: "SecureObjectPath List") }
-        secureOptions  { secureOptions.find("a.list", text: "Add SecureObjectPath") }
+        secureOptions  { secureOptions.find("a.create", text: "Add SecureObjectPath") }
 
         roleOptions  { $("div.navContainer1").has("h1.panelheader", text: "Roles") }
         roleOptionsList  { roleOptions.find("a.list", text: "Role List") }
-        roleOptionsCreate  { roleOptions.find("a.list", text: "Create Role") }
+        roleOptionsCreate  { roleOptions.find("a.create", text: "Create Role") }
 
         requestmapOptions  { $("div.navContainer1").has("h1.panelheader", text: "RequestMap Setup") }
         requestmapOptions  { requestmapOptions.find("a.list", text: "Requestmap List") }
@@ -68,11 +68,12 @@ class AdminPage extends Page {
 
         xnatOptions  { $("div.navContainer1").has("h1.panelheader", text: "Import XNAT clinical data") }
         xnatOptionsList  { xnatOptions.find("a.list", text: "Configuration List") }
-        xnatOptionsCreate  { xnatOptions.find("a.list", text: "Create Configuration") }
+        xnatOptionsCreate  { xnatOptions.find("a.create", text: "Create Configuration") }
 
         packageOptions  { $("div.navContainer1").has("h1.panelheader", text: "Package and Configuration") }
-        packageOptionsBuild  { packageOptions.find("a.list", text: "Build Information") }
-        packageOptionsSupport  { packageOptions.find("a.list", text: "Status of Support Connections") }
+        packageOptionsConfig  { packageOptions.find("a.list", text: "Configuration Detail") }
+        packageOptionsBuild   { packageOptions.find("a.list", text: "Build Information") }
+        packageOptionsSupport { packageOptions.find("a.list", text: "Status of Support Connections") }
     }
 }
 

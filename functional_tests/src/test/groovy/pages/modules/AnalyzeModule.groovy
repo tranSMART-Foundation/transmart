@@ -12,8 +12,6 @@ import functions.Constants
  */
 class AnalyzeModule extends Module {
 
-    public static final String HEADER_TAB_NAME = 'Analyze'
-
     static base = { $('div#centerMainPanel') }
 
     static content = {

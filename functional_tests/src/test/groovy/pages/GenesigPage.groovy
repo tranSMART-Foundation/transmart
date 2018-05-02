@@ -19,7 +19,7 @@ class GenesigPage extends Page {
     static url = 'geneSignature/list'
 
     static at = {
-        commonHeader.currentMenuItem?.text() == HEADER_TAB_NAME
+        commonHeader.currentMenuItem?.text() == commonHeader.TOPMENU_GENE_SIGNATURE_LISTS
         if(!mySigsOpen.isDisplayed())
             mySigs.find('tr').size() > 0
         if(!pubSigsOpen.isDisplayed())

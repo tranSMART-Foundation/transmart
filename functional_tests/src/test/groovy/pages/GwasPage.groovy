@@ -19,7 +19,7 @@ class GwasPage extends Page {
     static url = '/transmart/GWAS/index'
 
     static at = {
-        commonHeader.currentMenuItem?.text() == HEADER_TAB_NAME
+        commonHeader.currentMenuItem?.text() == commonHeader.TOPMENU_GWAS
         gwasTabs.size() == 8
         gwasResultsTable.size() > 0
     }
