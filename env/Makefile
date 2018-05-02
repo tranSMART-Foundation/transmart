@@ -1,5 +1,5 @@
 KETTLE_VERSION=4.4.0
-TRANSMART_RELEASE_BRANCH=release-16.2
+TRANSMART_RELEASE_BRANCH=release-16.3
 
 UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
 				tar gfortran g++ unzip libreadline-dev \
