@@ -25,8 +25,5 @@ To run the tests:
 To run "headless" one can use the non-graphics x-windows 'displays'. 
 For example see runtest.sh in this directory.
 
-There is a version mismatch somewhere in the updated pom.xml
-file. Until this is fixed the error can be skipped with
-export_JAVA_OPTIONS=-Xverify:none
 
 
