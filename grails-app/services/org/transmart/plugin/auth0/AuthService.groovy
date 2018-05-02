@@ -34,6 +34,7 @@ class AuthService {
 
 	@Autowired private List<LogoutHandler> logoutHandlers
 	@Autowired private SecurityService securityService
+	@Autowired private UserService userService
 
 	/**
 	 * Find the <code>AuthUser</code> with the specified unique id and build
@@ -41,7 +42,7 @@ class AuthService {
 	 */
 	@Transactional(readOnly = true, noRollbackFor = [IllegalArgumentException, UsernameNotFoundException])
 	AuthUserDetails loadAuthUserDetailsByUniqueId(String uniqueId) throws UsernameNotFoundException {
-		AuthUser authUser = findBy('uniqueId', uniqueId)
+		AuthUser authUser = userService.findBy('uniqueId', uniqueId)
 		if (authUser) {
 			userDetails authUser
 		}
@@ -57,21 +58,13 @@ class AuthService {
 	 */
 	@Transactional(readOnly = true, noRollbackFor = [IllegalArgumentException, UsernameNotFoundException])
 	AuthUserDetails loadAuthUserDetails(String username) throws UsernameNotFoundException {
-		AuthUser authUser = authUser(username)
+		AuthUser authUser = userService.authUser(username)
 		if (authUser) {
 			userDetails authUser
 		}
 		else {
 			logger.warn 'No AuthUser found with username "{}"', username
 			throw new NoStackUsernameNotFoundException()
-		}
-	}
-
-	@CompileDynamic // TODO use GrailsCompileStatic
-	protected AuthUser findBy(String name, String value) {
-		AuthUser.createCriteria().get {
-			eq name, value
-			cache true
 		}
 	}
 
@@ -87,21 +80,6 @@ class AuthService {
 		new AuthUserDetails(authUser.username, authUser.passwd, authUser.enabled, true /*!user.accountExpired*/,
 				true, true /*!user.accountLocked*/, authorities,
 				authUser.id, authUser.userRealName, authUser.email)
-	}
-
-	/**
-	 * @return the <code>AuthUser</code> instance for the currently authenticated user.
-	 */
-	AuthUser currentAuthUser() {
-		authUser securityService.currentUsername()
-	}
-
-	/**
-	 * Retrieve the <code>AuthUser</code> for the specified username.
-	 * The query cache is used to reduce unnecessary database calls.
-	 */
-	AuthUser authUser(String username) {
-		findBy 'username', username
 	}
 
 	void logout() {

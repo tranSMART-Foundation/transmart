@@ -171,7 +171,7 @@ class Auth0Service implements InitializingBean {
 				picture: '',
 				username: email)
 
-		AuthUser existingUser = authService.authUser(credentials.username)
+		AuthUser existingUser = userService.authUser(credentials.username)
 		if (existingUser) {
 			credentials.id = existingUser.id
 			credentials.level = customizationService.userLevel(existingUser)
@@ -252,7 +252,7 @@ class Auth0Service implements InitializingBean {
 		if (auth0Config.useRecaptcha) {
 			verifyRecaptchaResponse recaptchaResponse, username ?: email ?: 'unknown'
 		}
-		AuthUser authUser = updateAuthUser(null, username, email, firstname, lastname, credentials, params)
+		AuthUser authUser = userService.updateAuthUser(null, username, email, firstname, lastname, credentials, params)
 		sendSignupEmails username, email, authUser, loginUrl, appUrl
 		grantRolesAndStoreAuth authUser, username
 	}
@@ -273,65 +273,6 @@ class Auth0Service implements InitializingBean {
 			accessLog username, 'captcha_verify-ERROR',
 					confirmation.toString() + ' from host ' + currentRequest().remoteHost
 			throw new RuntimeException('Captcha verification step has failed.')
-		}
-	}
-
-	private AuthUser updateAuthUser(AuthUser user, String username, String email, String firstname,
-	                                String lastname, Credentials credentials, Map params) {
-
-		boolean existingUser
-		if (user) {
-			username = user.username
-			existingUser = true
-		}
-		else {
-			user = authService.authUser(username)
-			existingUser = false
-		}
-
-		logger.info 'Searching for user account:{}', username
-
-		if (!user) {
-			logger.error 'The registration/update information for username:{} and e-mail:{} could not be recorded.',
-					username ?: 'N/A', email ?: 'N/A'
-			throw new RuntimeException('The username ' + username +
-					' was not authenticated previously. Cannot record registration information.')
-		}
-
-		try {
-			if (firstname || lastname) {
-				user.userRealName = ((firstname ?: '') + ' ' + (lastname ?: '')).trim()
-			}
-			user.name = user.userRealName
-			if (email) {
-				user.email = email
-			}
-			Map description = [:] + params
-			description.remove 'g-recaptcha-response'
-			description.remove 'action'
-			description.remove 'controller'
-
-			description.access_token = credentials.accessToken
-			description.id_token = credentials.idToken
-			description.connection = credentials.connection
-			description.picture = credentials.picture ?: ''
-
-			user.description = (description as JSON).toString()
-			user.save(flush:true)
-			if (user.hasErrors()) {
-				logger.error 'Error updating user{}: {}', credentials.username, utilService.errorStrings(user)
-			}
-			else {
-				logger.info 'Saved/Updated user registration information for {}', email
-				if (existingUser) {
-					accessLog username ?: email, 'Profile-update', "User profile $email has been updated"
-				}
-			}
-			user
-		}
-		catch (e) {
-			logger.error 'Could not save record:{}/{}', e.getClass().name, e.message
-			throw new RuntimeException('Could not save record. ' + e.getClass().name + '/' + e.message)
 		}
 	}
 
@@ -532,19 +473,6 @@ class Auth0Service implements InitializingBean {
 	@Cacheable('webtask')
 	String webtaskCSS() {
 		webtask 'css=true'
-	}
-
-	/**
-	 * Update existing user details information.
-	 *
-	 * @param params The params from request
-	 * @return Updated user instance, that may contain errors
-	 */
-	@Transactional
-	AuthUser updateUser(String email, String firstname, String lastname, Map params) {
-		AuthUser user = authService.currentAuthUser()
-		updateAuthUser user, null, email, firstname, lastname, credentials(),
-				userService.currentUserInfo(user) + params
 	}
 
 	/**
