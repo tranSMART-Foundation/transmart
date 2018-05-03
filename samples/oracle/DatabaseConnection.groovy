@@ -21,7 +21,9 @@ import groovy.sql.Sql
 
 static def setupDatabaseConnection() {
   String driver = "oracle.jdbc.driver.OracleDriver"
-  String jdbcUrl = "jdbc:oracle:thin:@${System.getenv('ORAHOST')}:${System.getenv('ORAPORT')}:${System.getenv('ORASID')}"
+  String jdbcUrl = "jdbc:oracle:thin:@${System.getenv('ORAHOST')}:${System.getenv('ORAPORT')}"
+  if(System.getenv('ORASVC')) jdbcUrl += "/${System.getenv('ORASVC')}"
+  else jdbcUrl += ":${System.getenv('ORASID')}"
   String username = System.getenv('ORAUSER')
   String password = System.getenv('ORAPASSWORD')
   Sql sql = Sql.newInstance jdbcUrl, username, password, driver
