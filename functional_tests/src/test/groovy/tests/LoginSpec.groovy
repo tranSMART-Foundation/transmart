@@ -1,6 +1,11 @@
-import geb.junit4.GebReportingTest
+package tests
+
+import tests.GebReportingSpecTransmart
+import spock.lang.Stepwise
+
 import geb.navigator.Navigator
-import org.junit.Test
+
+import junit.framework.AssertionFailedError
 
 import functions.Constants
 
@@ -8,14 +13,15 @@ import pages.LoginFailedPage
 import pages.LoginPage
 import pages.BrowsePage
 
-import pages.modules.CommonHeaderModule
+import pages.modules.LoginFormModule
+import pages.modules.UtilityModule
 
-import geb.spock.GebSpec
-import geb.spock.GebReportingSpec
-import spock.lang.Stepwise
 
 @Stepwise
-class LoginSpec extends GebReportingSpec {
+class LoginSpec extends GebReportingSpecTransmart {
+    def setupSpec() {
+    }
+    
 
     def "go to login screen"() {
 
@@ -23,22 +29,32 @@ class LoginSpec extends GebReportingSpec {
         
         if (Constants.AUTO_LOGIN_ENABLED) {
 
+            println "Auto login enabled: we have to logout first"
             /* Auto login enabled: we have to logout first */
+
             to Constants.LANDING_PAGE.class
 
-            //Utility menu, logout
-            selectLogout()
+            println "At landing page"
 
+//            at(Constants.LANDING_PAGE.class)
+
+            utility { module UtilityModule }
+
+//            utility.tableMenuUtilities.click()
+//            utility.utilitiesDoLogout()
+            println "selectLogout run"
+            to(LoginPage)
         }
         else {
-    
+            println "Login required (no auto login)"
             to LoginPage
-
+            println "should be at LoginPage"
         }
 
         then:
         
         assert at(LoginPage)
+        println "assert at(LoginPage) passed"
     }
     
     def "login with bad credentials"() {
@@ -46,17 +62,18 @@ class LoginSpec extends GebReportingSpec {
         /* add a random number to avoid being locked out by repeated failures */
 
         when:
-        usernameField.value Constants.BAD_USERNAME+(Math.abs(new Random().nextInt() % 9999) + 1)
-        passwordField.value Constants.BAD_PASSWORD
+        loginForm { module LoginFormModule }
+        loginForm.usernameField.value Constants.BAD_USERNAME+(Math.abs(new Random().nextInt() % 9999) + 1)
+        loginForm.passwordField.value Constants.BAD_PASSWORD
 
-        loginButtonFailed.click()
+        loginForm.loginButtonFailed.click()
 
         then:
         assert at(LoginFailedPage)
 
-        assert topMessage == 'Please login...' : "unexpected login prompt"
-        assert errorMessage.contains('Login has failed') ||
-               errorMessage.contains('Your account has been locked') :
+        assert loginForm.usernameLabel.text() == "Username :" : "unexpected login prompt"
+        assert loginForm.errorMessage.contains('Login has failed') ||
+               loginForm.errorMessage.contains('Your account has been locked') :
                        "unexpected login error message"
         
     }
@@ -65,24 +82,17 @@ class LoginSpec extends GebReportingSpec {
     {
 
         when:
-        usernameField.value Constants.GOOD_USERNAME
-        passwordField.value Constants.GOOD_PASSWORD
-        loginButtonLanding.click()
+        loginForm { module LoginFormModule }
+        loginForm.usernameField.value Constants.GOOD_USERNAME
+        loginForm.passwordField.value Constants.GOOD_PASSWORD
+
+        loginForm.loginButtonLanding.click()
 
         then:
         assert at(Constants.LANDING_PAGE.class)
     }
 
-   void selectLogout ()
-    {
-        
-        commonHeader { module CommonHeaderModule }
-
-        commonHeader.tableMenuUtilities.click()
-
-        commonHeader.utilitiesDoLogout()
-        assert at(LoginPage)
+    def cleanupSpec() {
     }
 
 }
-

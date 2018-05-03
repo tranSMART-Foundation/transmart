@@ -1,40 +1,38 @@
+package tests
+
+import tests.GebReportingSpecTransmart
+import spock.lang.Stepwise
+
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
 
-import geb.junit4.GebReportingTest
+import functions.Constants
 
-import org.junit.Test
+import pages.UploadDataPage
 
 import pages.modules.CommonHeaderModule
 
-import functions.Constants
-
-import pages.LoginPage
-import pages.UploadDataPage
-
-import functions.Utilities
-
-import geb.spock.GebSpec
-import geb.spock.GebReportingSpec
-import spock.lang.Stepwise
-
 @Stepwise
-class UploadDataPageSpec extends GebReportingSpec {
+class UploadDataPageSpec extends GebReportingSpecTransmart {
 
     // Assume a standard set of Upload Data tab metadata has been loaded
     // using transmart-data and supplied loading scripts
 
-    def util = new Utilities()
+    def setupSpec() {
+        loginTransmart(UploadDataPage)
+    }
 
     def "start on the upload data tab"() {
 
         when:
-        util.goToPageMaybeLogin(UploadDataPage)
+        isAt(UploadDataPage)
 
         then:
         assert at(UploadDataPage)
 
     }
 
-
+    def cleanupSpec() {
+    }
+    
 }

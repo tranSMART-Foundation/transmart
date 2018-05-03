@@ -5,6 +5,7 @@ import geb.waiting.WaitTimeoutException
 import geb.navigator.Navigator
 
 import pages.modules.CommonHeaderModule
+import pages.modules.UtilityModule
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.contains
@@ -18,13 +19,17 @@ class SampleExplorerPage extends Page {
     static url = 'sampleExplorer/list'
 
     static at = {
-        commonHeader.headerTab()?.text() == HEADER_TAB_NAME
+        commonHeader.currentMenuItem()?.text() == commonHeader.TOPMENU_SAMPLE_EXPLORER
+        byId.text() == "By ID"
     }
 
     static content = {
         sampleExplorer(wait: true) { $() }
 
         commonHeader { module CommonHeaderModule }
+        utility { module UtilityModule }
+
+        byId  { $("tbody", text: "By ID") }
     }
     
 }

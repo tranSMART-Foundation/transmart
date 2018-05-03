@@ -2,26 +2,97 @@ package pages
 
 import geb.Page
 
+import junit.framework.AssertionFailedError
+
 import functions.Constants
+import pages.modules.LoginFormModule
 
 class LoginPage extends Page {
 
     static url = 'login/forceAuth'
 
     static at = {
-        topMessage == 'Please login...'
+        println "LoginPage at..."
+        println "usernameLabel '${loginForm.usernameLabel.text()}'"
+        println "passwordLabel '${loginForm.passwordLabel.text()}'"
+        loginForm.usernameLabel.text() == 'Username :'
     }
 
     static content = {
-        topMessage { $('h3')?.text()?.trim() }
-        loginButtonNoTo { $('input#loginButton') }
-        loginButton(to: [Constants.LANDING_PAGE.class, LoginFailedPage]) { $('input#loginButton') }
-        loginButtonLanding(to: [Constants.LANDING_PAGE.class, ChangeMyPasswordPage]) { $('input#loginButton') }
-        loginButtonFailed(to: LoginFailedPage) { $('input#loginButton') }
-        usernameField { $('input#j_username') }
-        passwordField { $('input#j_password') }
-        errorMessage  { $('div.login_message').text() }
+        topMessage (required: false) { $('h3')?.first()?.text()?.trim() }
+        loginForm { module LoginFormModule }
     }
+
+    void login(String userLevel = "guest") {
+        if(userLevel == "guest") {
+            loginGuest()
+        }
+        else if (userLevel == "admin") {
+            loginAdmin()
+        }
+        else if (userLevel == "user") {
+            loginUser()
+        }
+        else if (userLevel == "other") {
+            loginOther()
+        }
+        else {
+            assert userLevel : "Unknown userLevel ${userLevel}"
+        }
+    }
+    
+    void loginGuest() {
+
+        loginForm.usernameField.value Constants.GUEST_USERNAME
+        loginForm.passwordField.value Constants.GUEST_PASSWORD
+
+        loginForm.loginButtonNoTo.click()
+
+    }
+
+    void loginUser() {
+
+        loginForm.usernameField.value Constants.GOOD_USERNAME
+        loginForm.passwordField.value Constants.GOOD_PASSWORD
+
+        loginForm.loginButtonNoTo.click()
+
+    }
+
+    void loginAs(String username, String password) {
+        loginForm.usernameField.value username
+        loginForm.passwordField.value password
+        loginForm.loginButtonNoTo.click()
+    }
+
+    void loginAdmin() {
+
+        loginForm.usernameField.value Constants.ADMIN_USERNAME
+        loginForm.passwordField.value Constants.ADMIN_PASSWORD
+
+        loginForm.loginButtonNoTo.click()
+
+    }
+
+    void goToPageMaybeLogin(Class<? extends Page> page, boolean firstCall = true) {
+        via page
+
+        if (isAt(page)) {
+            return
+        } else if (isAt(LoginPage)) {
+            login(page)
+        } else if (isAt(Constants.LANDING_PAGE.class)) {
+            if (!firstCall) {
+                throw new AssertionFailedError('Redirection loop')
+            }
+            /* if auto-login is on, we're unfortunately forwarded here */
+            goToPageMaybeLogin(page, false)
+        } else {
+            throw new AssertionFailedError(
+                    "Expected to be at either the LoginPage, $Constants.LANDING_PAGE or $page")
+        }
+    }
+
 }
 
 

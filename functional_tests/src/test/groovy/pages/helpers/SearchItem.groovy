@@ -1,18 +1,22 @@
 package pages.helpers
 
-import geb.navigator.AbstractNavigator
-import geb.navigator.Navigator
 
-class SearchItem implements Navigator {
+import geb.navigator.AbstractNavigator
+//import geb.navigator.Navigator
+import geb.Module
+
+class SearchItem extends Module {
 
     @Delegate
     AbstractNavigator navigator
 
     String getType() {
+//        println "in SearchItem.getType"
         find('span').text()[0..-2] //remove tailing >
     }
 
     String getSearchKeyword() {
+        println "in SearchItem.getSearchKeyword"
         find('b').text()
     }
 
@@ -23,6 +27,7 @@ class SearchItem implements Navigator {
          * unless there are actually no synonyms, in which case only the leading
          * space should be there.
          */
+//        println "in SearchItem.getSynonyms"
         browser.js.exec(find('b').firstElement(), '''
             var textNode = arguments[0].nextSibling
             if (textNode === null) {
@@ -40,6 +45,7 @@ class SearchItem implements Navigator {
 
     @Override
     public String toString() {
+//        println "in SearchItem.toString"
         "SearchItem{" +
                 "type=" + type + ', ' +
                 "searchKeyword=" + searchKeyword + ', ' +

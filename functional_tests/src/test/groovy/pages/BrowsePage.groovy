@@ -3,39 +3,25 @@ package pages
 import geb.Page
 import geb.navigator.Navigator
 
+import pages.modules.BrowseTreeModule
 import pages.modules.CommonHeaderModule
-
-// $ function is $(css-selector,index-or-range,attribute-or-text-matchers)
+import pages.modules.UtilityModule
 
 class BrowsePage extends Page {
-    public static final String HEADER_TAB_NAME = 'Browse'
-
     static url = 'RWG/index'
 
     static at = {
-        commonHeader.headerTab()?.text() == HEADER_TAB_NAME
+        println "BrowsePage test"
+        println "BrowsePage test '${commonHeader.currentMenuItem?.text()}' == '${commonHeader.TOPMENU_BROWSE}'"
+        commonHeader.currentMenuItem?.text() == commonHeader.TOPMENU_BROWSE
+        browseTree.programs.size() > 0
     }
 
     static content = {
-        browse(wait: true)       { $() }
-        divColorBox              { $('div#colorbox') }
-        divSidebar               { $('div#sidebar') }
-        divMain                  { $('div#main') }
-        divHiddenItems           { $('div#hiddenitems') }
-        divExportOverlay         { $('div#exportOverlay') }
-        divEditMetadataOverlay   { $('div#editMetadataOverlay') }
-        divCreateAnalysisOverlay { $('div#createAnalysisOverlay') }
-        divCreateAssayOverlay    { $('div#createAssayOverlay') }
-        divCreateFolderOverlay   { $('div#createFolderOverlay') }
-        divCreateStudyOverlay    { $('div#createStudyOverlay') }
-        divCreateProgramOverlay  { $('div#createProgramOverlay') }
-        divBrowsePopups          { $('div#divBrowsePopups') }
-        divPlotOptions           { $('div#divPlotOptions') }
-        divSidebarToggle         { $('div#sidebartoggle') }
-        divFilterBrowser         { $('div#filter-browser') }
-
+        visited { $('th.menuVisited') }
+        browseTree { module BrowseTreeModule }
         commonHeader { module CommonHeaderModule }
-
+        utility { module UtilityModule }
     }
 
 }
