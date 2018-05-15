@@ -18,7 +18,7 @@
     <div class="fjs-block-0">
         <p>Welcome to Fractalis in i2b2/tranSMART 18.1-beta!</p>
         <p>Fractalis is a de-facto successor to SmartR.</p>
-        <p>More information: <a href="https://git-r3lab.uni.lu/Fractalis/fractalis">https://git-r3lab.uni.lu/Fractalis/fractalis</a></p>
+        <p>More information: <a href="https://fractalis.lcsb.uni.lu/">https://fractalis.lcsb.uni.lu/</a></p>
     </div>
     <hr>
     <div class="fjs-block-1">
