@@ -50,6 +50,8 @@ const fractalisPanel = new Ext.Panel({
 const fjsService = {
   fjs: null,
   settings: null,
+  chartWidth: '30vw',
+  chartHeight: '30vw',
 
   async initFractalis () {
     this.settings = await this.fetchAsync('settings')
@@ -61,7 +63,8 @@ const fjsService = {
         return { token: this.settings.token }
       },
       options: {
-        controlPanelPosition: 'right'
+        controlPanelPosition: 'right',
+        controlPanelExpanded: true
       }
     })
   },
@@ -69,6 +72,15 @@ const fjsService = {
   resetView () {
     this.initFractalis()
     document.querySelector('.fjs-placeholders').innerHTML = ''
+  },
+
+  setChartSize (value) {
+    this.chartWidth = value + 'vw'
+    this.chartHeight = value + 'vw'
+    Array.prototype.forEach.call(document.querySelectorAll('.fjs-placeholders > div'), div => {
+      div.style.width = this.chartWidth
+      div.style.height = this.chartHeight
+    })
   },
 
   async fetchAsync (action) {
@@ -133,16 +145,19 @@ const fjsService = {
 
   chartStates: {},
   setUrl () {
+    return // FIXME
     const url = window.pageInfo.basePath + '/fractalis/state/' + Object.values(this.chartStates).join('+')
     window.history.pushState(null, '', url)
   },
 
   resetUrl () {
+    return // FIXME
     const url = window.pageInfo.basePath + '/datasetExplorer'
     window.history.pushState(null, '', url)
   },
 
   handleStateIDs (stateIDs) {
+    return // FIXME
     Ext.Msg.alert('The url you specified contains a Fractalis state.\n' +
       'We will attempt to recover the associated charts and inform you once this has been done.')
     Promise.all(stateIDs.map(stateID => {
@@ -161,6 +176,8 @@ const fjsService = {
     const chart = document.createElement('div')
     const container = document.querySelector('.fjs-placeholders')
     chart.id = 'fjs-chart-' + container.children.length
+    chart.style.width = this.chartWidth
+    chart.style.height = this.chartHeight
     container.appendChild(chart)
     return chart.id
   },

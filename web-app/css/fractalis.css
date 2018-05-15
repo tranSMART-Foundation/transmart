@@ -10,11 +10,6 @@
     flex-wrap: wrap;
 }
 
-.fjs-placeholders > div{
-    width: 45%;
-    height: 30vh;
-}
-
 .fjs-transmart > hr {
     margin: 2vh 0 2vh 0;
 }
@@ -53,12 +48,20 @@
     display: flex;
 }
 
+.fjs-fieldset {
+    margin: 5px;
+    border: none;
+}
+
+.fjs-fieldset > legend {
+    font-weight: bold;
+}
+
 .fjs-fade-out {
     visibility: hidden;
     opacity: 0;
     transition: visibility 0s 2s, opacity 2s linear;
 }
-
 
 .fjs-spinner {
     margin: 100px auto;

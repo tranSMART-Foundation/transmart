@@ -30,6 +30,12 @@
                 <option value="pca-analysis">Principle Component Analysis</option>
             </select>
             <input type="button" value="Add" onclick="fjsService.setChart()"/>
+            <br/>
+            <br/>
+            <label>
+                Chart Size:
+                <input type="range" min="10" max="100" value="30" step="5" oninput="fjsService.setChartSize(this.value)"/>
+            </label>
         </div>
         <div>
             <p>
