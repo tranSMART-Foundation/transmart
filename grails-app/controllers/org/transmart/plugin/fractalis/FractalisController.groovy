@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 
 class FractalisController {
 
-	private static final List<String> scripts = ['fractalis', 'resources/fractal-0.5.2.min'].asImmutable()
+	private static final List<String> scripts = ['fractalis', 'resources/fractal-0.6.0.min'].asImmutable()
 	private static final List<String> styles = ['fractalis'].asImmutable()
 
 	@Value('${fractalis.dataSource:}')
