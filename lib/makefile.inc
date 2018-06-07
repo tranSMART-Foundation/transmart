@@ -1,5 +1,6 @@
-JDBC_DL_PSQL     := http://files.thehyve.net
-JDBC_DRIVER_PSQL := postgresql-9.2-1003.jdbc4.jar
+JDBC_DL_PSQL     := https://jdbc.postgresql.org/download
+# JDBC_DRIVER_PSQL := postgresql-9.2-1003.jdbc4.jar
+JDBC_DRIVER_PSQL := postgresql-42.2.2.jre7.jar
 JDBC_DL_ORA      := http://files.thehyve.net
 JDBC_DRIVER_ORA  := ojdbc6-12.1.0.2.jar
 JDBC_XDB_ORA     := xdb.jar
@@ -15,7 +16,7 @@ JDBC_XDB_ORA_PATH     := $(LIB_DIR)$(JDBC_XDB_ORA)
 $(JDBC_DRIVER_PSQL_PATH):
 	curl -f $(JDBC_DL_PSQL)/$(JDBC_DRIVER_PSQL) > $@
 
-# For correctness, the dependency on XDB should be split off since some uses of this rule don't need XCB, but it doesn't matter a lot.
+# For correctness, the dependency on XDB should be split off since some uses of this rule don't need XDB, but it doesn't matter a lot.
 $(JDBC_DRIVER_ORA_PATH): $(JDBC_XDB_ORA_PATH)
 	curl -f $(JDBC_DL_ORA)/$(JDBC_DRIVER_ORA) > $@
 
