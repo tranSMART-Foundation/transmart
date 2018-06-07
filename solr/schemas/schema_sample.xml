@@ -5,6 +5,8 @@
     <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
 
     <field name="trial_name" type="string" indexed="true" stored="true" required="true" />
+    <field name="sample_id" type="string" indexed="true" stored="true" required="true" />
+
     <field name="barcode" type="string" indexed="true" stored="true" required="false" />
     <field name="plate_id" type="string" indexed="true" stored="true" required="false" />
     <field name="patient_id" type="string" indexed="true" stored="true" required="true" />
@@ -15,7 +17,17 @@
     <field name="description" type="string" indexed="true" stored="true" required="false" />
     <field name="comment" type="string" indexed="true" stored="true" required="false" />
     <field name="location" type="string" indexed="true" stored="true" required="false" />
+
+    <field name="tissue_type" type="string" indexed="true" stored="true" required="false" />
+    <field name="data_types" type="string" indexed="true" stored="true" required="false" />
+    <field name="disease" type="string" indexed="true" stored="true" required="false" />
+    <field name="tissue_state" type="string" indexed="true" stored="true" required="false" />
+    <field name="biobank" type="string" indexed="true" stored="true" required="false" />
     <field name="source_organism" type="string" indexed="true" stored="true" required="true" />
+    <field name="treatment" type="string" indexed="true" stored="true" required="false" />
+    <field name="sample_treatment" type="string" indexed="true" stored="true" required="false" /> 
+    <field name="subject_treatment" type="string" indexed="true" stored="true" required="false" /> 
+    <field name="timepoint" type="string" indexed="true" stored="true" required="true" />
     <field name="_version_" type="long" indexed="true"  stored="true" multiValued="false"/>
 
     <dynamicField name="*" type="ignored" multiValued="true"/>
