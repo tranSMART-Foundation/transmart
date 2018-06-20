@@ -90,6 +90,10 @@ class Auth0Controller implements InitializingBean {
 		}
 	}
 
+	def adminLogin() {
+		forward controller: 'login', action: 'auth'
+	}
+
 	def authfail() {
 		String username = session[SpringSecurityUtils.SPRING_SECURITY_LAST_USERNAME_KEY] // TODO set apf.storeLastUsername=true
 		String msg = params.error_message ?: ''

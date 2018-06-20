@@ -23,8 +23,11 @@ class Auth0Config implements InitializingBean {
 	String redirectOnLogout
 	String redirectOnSuccess
 	boolean useRecaptcha
-
 	String webtaskBaseUrl
+
+	boolean autoCreateAdmin
+	String autoCreateAdminPassword
+	String autoCreateAdminEmail
 
 	@Value('${edu.harvard.transmart.captcha.secret:}')
 	String captchaSecret
@@ -52,5 +55,9 @@ class Auth0Config implements InitializingBean {
 		auth0Domain = conf.domain
 		useRecaptcha = conf.useRecaptcha
 		webtaskBaseUrl = conf.webtaskBaseUrl
+
+		autoCreateAdmin = conf.admin.autoCreate
+		autoCreateAdminPassword = conf.admin.autoCreatePassword
+		autoCreateAdminEmail = conf.admin.autoCreateEmail
 	}
 }

@@ -12,6 +12,9 @@
 <body>
 <g:render template='/layouts/navbar_nomenu' />
 <div class="container" style="background-color: white;">
+	<div style="position: absolute; top: 70px; right: 50px;">
+		<g:link uri='/login/admin'>Admin Login</g:link>
+	</div>
 	<div align="center" style="clear: both; margin-left: auto; margin-right: auto; margin-top: 20px; text-align: center">
 		<table style="width: auto; border: 0; text-align: center; margin: auto;" align="center">
 			<tr>
