@@ -3,19 +3,21 @@ package org.transmart.plugin.auth0
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
+import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.gsp.PageRenderer
 import grails.plugin.cache.Cacheable
 import grails.plugin.mail.MailService
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.transaction.TransactionStatus
 import org.springframework.web.context.request.RequestContextHolder
 import org.transmart.plugin.custom.CustomizationConfig
 import org.transmart.plugin.custom.CustomizationService
@@ -35,7 +37,7 @@ import javax.servlet.http.HttpServletRequest
 /**
  * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>
  */
-@CompileStatic
+@GrailsCompileStatic
 @Slf4j('logger')
 class Auth0Service implements InitializingBean {
 
@@ -52,6 +54,7 @@ class Auth0Service implements InitializingBean {
 	@Autowired private MailService mailService
 	@Autowired private PageRenderer groovyPageRenderer
 	@Autowired private SecurityService securityService
+	@Autowired private SpringSecurityService springSecurityService
 	@Autowired private UserService userService
 	@Autowired private UtilService utilService
 
@@ -171,7 +174,21 @@ class Auth0Service implements InitializingBean {
 				picture: '',
 				username: email)
 
-		AuthUser existingUser = userService.authUser(credentials.username)
+		AuthUser existingUser
+		List<AuthUser> uninitialized = AuthUser.findAllByUsernameAndPasswdAndEnabledAndUniqueIdLikeAndDescriptionIsNull(
+				credentials.username, 'auth0', false, '%UNINITIALIZED')
+		if (uninitialized.size() > 1) {
+			// TODO
+		}
+		else if (uninitialized.size() == 1) {
+			existingUser = uninitialized[0]
+			String uniqueId = userInfo.getString('sub')
+			finishUninitializedUser existingUser, credentials, uniqueId
+		}
+		else {
+			existingUser = userService.authUser(credentials.username)
+		}
+
 		if (existingUser) {
 			credentials.id = existingUser.id
 			credentials.level = customizationService.userLevel(existingUser)
@@ -202,15 +219,8 @@ class Auth0Service implements InitializingBean {
 
 	@Transactional
 	AuthUser createUser(Credentials credentials, String uniqueId) {
-		String description = ([about     : '',
-		                       connection: credentials.connection,
-		                       firstname : '',
-		                       lastname  : '',
-		                       phone     : '',
-		                       picture   : credentials.picture] as JSON).toString()
-
 		AuthUser user = new AuthUser(
-				description: description,
+				description: buildDescription(credentials),
 				email: credentials.email,
 				emailShow: true,
 				enabled: true,
@@ -229,6 +239,30 @@ class Auth0Service implements InitializingBean {
 		}
 		logger.info 'getCredentials() New user record has been created: {}', credentials.username
 		user
+	}
+
+	@Transactional
+	void finishUninitializedUser(AuthUser user, Credentials credentials, String uniqueId) {
+		user.description = buildDescription(credentials)
+		user.enabled = true
+		user.uniqueId = uniqueId
+		user.save()
+		if (user.hasErrors()) {
+			logger.error 'Could not finish uninitialized user {} because {}', credentials.username, utilService.errorStrings(user)
+		}
+		else {
+			logger.info 'finishUninitializedUser() updated uninitialized user {}', credentials.username
+		}
+		user
+	}
+
+	private String buildDescription(Credentials credentials) {
+		([about     : '',
+		  connection: credentials.connection,
+		  firstname : '',
+		  lastname  : '',
+		  phone     : '',
+		  picture   : credentials.picture] as JSON).toString()
 	}
 
 	/**
@@ -386,9 +420,9 @@ class Auth0Service implements InitializingBean {
 
 		switch (level) {
 			case UserLevel.ZERO:  authService.grantRoles user, Roles.PUBLIC_USER; break
-			case UserLevel.ONE:   authService.grantRoles user, Roles.PUBLIC_USER, Roles.STUDY_OWNER; break
-			case UserLevel.TWO:   authService.grantRoles user, Roles.PUBLIC_USER, Roles.DATASET_EXPLORER_ADMIN; break
-			case UserLevel.ADMIN: authService.grantRoles user, Roles.PUBLIC_USER, Roles.ADMIN; break
+			case UserLevel.ONE:   authService.grantRoles user, Roles.STUDY_OWNER; break
+			case UserLevel.TWO:   authService.grantRoles user, Roles.DATASET_EXPLORER_ADMIN; break
+			case UserLevel.ADMIN: authService.grantRoles user, Roles.ADMIN; break
 		}
 	}
 
@@ -484,6 +518,66 @@ class Auth0Service implements InitializingBean {
 			if (auth instanceof Auth0JWTToken) {
 				((Auth0JWTToken) auth).jwtToken
 			}
+		}
+	}
+
+	@Transactional
+	void autoCreateAdmin() {
+		if (!auth0Config?.autoCreateAdmin) {
+			logger.info 'Auth0 is disabled, or admin auto-create is disabled, not creating admin user'
+			return
+		}
+
+		if (Role.findByAuthority(Roles.ADMIN.authority).people) {
+			logger.info 'admin auto-create is enabled but an admin user exists, not creating admin user'
+			return
+		}
+
+		String username = auth0Config.autoCreateAdminUsername
+		if (!username) {
+			logger.error 'admin auto-create is enabled but no username is specified, cannot create admin user'
+			return
+		}
+
+		if (AuthUser.countByUsername(username)) {
+			logger.error 'admin auto-create is enabled but non-admin user "{}" exists, not creating admin user', username
+			return
+		}
+
+		String password = auth0Config.autoCreateAdminPassword
+		if (!password) {
+			logger.error 'admin auto-create is enabled but no password is specified, cannot create admin user'
+			return
+		}
+
+		String email = auth0Config.autoCreateAdminEmail // can be null
+
+		// don't double-hash
+		boolean hashed = (password.length() == 59 || password.length() == 60) &&
+				(password.startsWith('$2a$') || password.startsWith('$2b$') || password.startsWith('$2y$'))
+
+		AuthUser admin = new AuthUser(description: 'System admin', email: email ?: null, enabled: true,
+				name: 'System admin', passwd: hashed ? password : springSecurityService.encodePassword(password),
+				uniqueId: username, userRealName: 'System admin', username: username)
+
+		String errorMessage = createAdmin(admin, transactionStatus)
+		if (errorMessage) {
+			accessLogService.report 'BootStrap', 'admin auto-create', errorMessage
+		}
+	}
+
+	private String createAdmin(AuthUser admin, TransactionStatus transactionStatus) {
+		if (admin.save(flush: true)) {
+			Role.findByAuthority(Roles.ADMIN.authority).addToPeople admin
+			logger.info 'auto-created admin user'
+			accessLogService.report 'BootStrap', 'admin auto-create', 'created admin user'
+			null
+		}
+		else {
+			transactionStatus.setRollbackOnly()
+			String message = 'auto-create admin user failed: ' + utilService.errorStrings(admin)
+			logger.error message
+			message
 		}
 	}
 

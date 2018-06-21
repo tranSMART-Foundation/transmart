@@ -26,8 +26,10 @@ class Auth0Config implements InitializingBean {
 	String webtaskBaseUrl
 
 	boolean autoCreateAdmin
-	String autoCreateAdminPassword
 	String autoCreateAdminEmail
+	String autoCreateAdminPassword
+	String autoCreateAdminUsername
+	List<String> preRegistrationProviderPrefixes
 
 	@Value('${edu.harvard.transmart.captcha.secret:}')
 	String captchaSecret
@@ -49,15 +51,18 @@ class Auth0Config implements InitializingBean {
 		redirectOnSuccess = conf.successHandler.defaultTargetUrl
 
 		conf = conf.auth0
-		auth0CallbackUrl = conf.loginCallback
-		auth0ClientId = conf.clientId
-		auth0ClientSecret = conf.clientSecret
-		auth0Domain = conf.domain
-		useRecaptcha = conf.useRecaptcha
-		webtaskBaseUrl = conf.webtaskBaseUrl
+		auth0CallbackUrl = conf.loginCallback ?: ''
+		auth0ClientId = conf.clientId ?: ''
+		auth0ClientSecret = conf.clientSecret ?: ''
+		auth0Domain = conf.domain ?: ''
+		useRecaptcha = true.is(conf.useRecaptcha)
+		webtaskBaseUrl = conf.webtaskBaseUrl ?: ''
 
-		autoCreateAdmin = conf.admin.autoCreate
-		autoCreateAdminPassword = conf.admin.autoCreatePassword
-		autoCreateAdminEmail = conf.admin.autoCreateEmail
+		preRegistrationProviderPrefixes = conf.preRegistrationProviderPrefixes ?: []
+
+		autoCreateAdmin = true.is(conf.admin.autoCreate)
+		autoCreateAdminEmail = conf.admin.autoCreateEmail ?: ''
+		autoCreateAdminPassword = conf.admin.autoCreatePassword ?: ''
+		autoCreateAdminUsername = conf.admin.autoCreateUsername ?: ''
 	}
 }

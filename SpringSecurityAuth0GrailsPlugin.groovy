@@ -1,11 +1,13 @@
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.apache.commons.codec.binary.Base64
+import org.springframework.context.ApplicationContext
 import org.springframework.util.Assert
 import org.transmart.plugin.auth0.Auth0AuthenticationEntryPoint
 import org.transmart.plugin.auth0.Auth0AuthenticationFilter
 import org.transmart.plugin.auth0.Auth0AuthenticationProvider
 import org.transmart.plugin.auth0.Auth0Config
+import org.transmart.plugin.auth0.Auth0Service
 
 class SpringSecurityAuth0GrailsPlugin {
 	String version = '18.1-SNAPSHOT'
@@ -70,6 +72,11 @@ class SpringSecurityAuth0GrailsPlugin {
 		if (printStatusMessages) {
 			println '... finished configuring Transmart Spring Security Auth0\n'
 		}
+	}
+
+	def doWithApplicationContext = { ApplicationContext ctx ->
+		Auth0Service auth0Service = ctx.auth0Service
+		auth0Service.autoCreateAdmin()
 	}
 
 	private String getRequiredConfigString(ConfigObject conf, String propertyName) {
