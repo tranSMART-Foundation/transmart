@@ -1,9 +1,8 @@
 package org.transmart.plugin.auth0
 
+import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.transaction.Transactional
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmart.plugin.custom.CustomizationService
@@ -16,7 +15,7 @@ import org.transmartproject.db.log.AccessLogService
 /**
  * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>
  */
-@CompileStatic
+@GrailsCompileStatic
 @Slf4j('logger')
 class UserService {
 
@@ -163,10 +162,9 @@ class UserService {
 		findBy 'username', username
 	}
 
-	@CompileDynamic // TODO use GrailsCompileStatic
-	protected AuthUser findBy(String name, String value) {
-		AuthUser.createCriteria().get {
-			eq name, value
+	AuthUser findBy(String propertyName, String propertyValue) {
+		(AuthUser) AuthUser.createCriteria().get {
+			eq propertyName, propertyValue
 			cache true
 		}
 	}

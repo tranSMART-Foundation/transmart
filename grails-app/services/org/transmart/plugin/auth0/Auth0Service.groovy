@@ -161,6 +161,7 @@ class Auth0Service implements InitializingBean {
 		// }
 
 		String email = userInfo.getString('email')
+		String uniqueId = userInfo.getString('sub')
 
 		idToken = rebuildJwt(idToken, email)
 
@@ -171,30 +172,30 @@ class Auth0Service implements InitializingBean {
 				idToken: idToken,
 				name: 'unregistered',
 				nickname: 'unregistered',
-				picture: '',
-				username: email)
+				picture: '')
 
 		AuthUser existingUser
-		List<AuthUser> uninitialized = AuthUser.findAllByUsernameAndPasswdAndEnabledAndUniqueIdLikeAndDescriptionIsNull(
-				credentials.username, 'auth0', false, '%UNINITIALIZED')
+		List<AuthUser> uninitialized = AuthUser.findAllByEmailAndPasswdAndEnabledAndUniqueIdLikeAndDescriptionIsNull(
+				credentials.email, 'auth0', false, '%UNINITIALIZED')
 		if (uninitialized.size() > 1) {
 			// TODO
 		}
 		else if (uninitialized.size() == 1) {
 			existingUser = uninitialized[0]
-			String uniqueId = userInfo.getString('sub')
+			credentials.username = existingUser.username = UUID.randomUUID().toString()
 			finishUninitializedUser existingUser, credentials, uniqueId
 		}
 		else {
-			existingUser = userService.authUser(credentials.username)
+			existingUser = userService.findBy('uniqueId', uniqueId)
 		}
 
 		if (existingUser) {
 			credentials.id = existingUser.id
 			credentials.level = customizationService.userLevel(existingUser)
+			credentials.username = existingUser.username
 		}
 		else {
-			String uniqueId = userInfo.getString('sub')
+			credentials.username = UUID.randomUUID().toString()
 			createUser credentials, uniqueId
 			credentials.level = UserLevel.UNREGISTERED
 		}
