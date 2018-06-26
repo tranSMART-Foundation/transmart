@@ -24,6 +24,7 @@ class Auth0Config implements InitializingBean {
 	String redirectOnSuccess
 	boolean useRecaptcha
 	String webtaskBaseUrl
+	boolean registrationEnabled
 
 	boolean autoCreateAdmin
 	String autoCreateAdminEmail
@@ -57,6 +58,7 @@ class Auth0Config implements InitializingBean {
 		auth0Domain = conf.domain ?: ''
 		useRecaptcha = true.is(conf.useRecaptcha)
 		webtaskBaseUrl = conf.webtaskBaseUrl ?: ''
+		registrationEnabled = !false.is(conf.registrationEnabled)
 
 		preRegistrationProviderPrefixes = conf.preRegistrationProviderPrefixes ?: []
 

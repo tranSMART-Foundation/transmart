@@ -92,7 +92,12 @@ class Auth0Service implements InitializingBean {
 			}
 		}
 		else {
-			[action: 'registration']
+			if (auth0Config.registrationEnabled) {
+				[action: 'registration']
+			}
+			else {
+				[action: 'notauthorized']
+			}
 		}
 	}
 
