@@ -19,9 +19,9 @@ class AuthFilters {
 	def filters = {
 
 		/**
-		 * Automatically store commonly used config vars in the GSP model.
+		 * Automatically store commonly used config vars in the GSP model for /auth9/** urls.
 		 */
-		commonModel(controller: 'auth0', action: '*') {
+		auth0CommonModel(controller: 'auth0', action: '*') {
 			after = { Map model ->
 				if (active && model != null) {
 					model.appTitle = customizationConfig.appTitle
@@ -38,6 +38,18 @@ class AuthFilters {
 					model.supportEmail = customizationConfig.supportEmail
 					model.useRecaptcha = auth0Config.useRecaptcha
 					model.userGuideUrl = customizationConfig.userGuideUrl
+				}
+				true
+			}
+		}
+
+		/**
+		 * Automatically store some config vars in the GSP model for all urls.
+		 */
+		commonModel(controller: '*', action: '*') {
+			after = { Map model ->
+				if (model != null) {
+					model.auth0Active = active
 				}
 				true
 			}

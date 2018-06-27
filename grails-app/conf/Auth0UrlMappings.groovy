@@ -8,8 +8,13 @@ import org.springframework.security.access.AccessDeniedException
 class Auth0UrlMappings {
 	static mappings = { ApplicationContext ctx ->
 		if (SpringSecurityUtils.securityConfig.auth0.active) {
-			"/admin/userlist"(controller: 'auth0', action: 'userlist')
-			"/login/admin"(controller: 'auth0', action: 'adminLogin')
+			"/authUser/create"(controller: 'auth0', action: 'adminUserCreate')
+			"/authUser/edit/$id?"(controller: 'auth0', action: 'adminUserEdit')
+			"/authUser/list"(controller: 'auth0', action: 'adminUserList')
+			"/authUser/save"(controller: 'auth0', action: 'adminUserSave')
+			"/authUser/show/$id?"(controller: 'auth0', action: 'adminUserShow')
+			"/authUser/update"(controller: 'auth0', action: 'adminUserUpdate')
+			"/login/admin"(controller: 'auth0', action: 'passwordLogin')
 			"/login/auth"(controller: 'auth0', action: 'auth')
 			"/login/authfail"(controller: 'auth0', action: 'authfail')
 			"/login/callback"(controller: 'auth0', action: 'callback')

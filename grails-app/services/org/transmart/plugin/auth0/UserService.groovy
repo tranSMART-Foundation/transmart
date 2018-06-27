@@ -38,18 +38,22 @@ class UserService {
 	List<Map> buildUserListUserInfo() {
 		List<Map> userData = []
 		for (AuthUser authUser in AuthUser.list()) {
-			Map description = (Map) JSON.parse(authUser.description ?: '{}')
-			userData << [
-					connection : description.connection ?: 'no connection data',
-					email      : authUser.email ?: 'unknown',
-					firstName  : description.firstname ?: 'UNKNOWN',
-					id         : authUser.id,
-					institution: description.institution ?: 'UNKNOWN',
-					lastName   : description.lastname ?: 'UNKNOWN',
-					lastUpdated: authUser.lastUpdated,
-					level      : customizationService.userLevel(authUser)]
+			userData << buildUserInfo(authUser)
 		}
 		userData
+	}
+
+	Map buildUserInfo(AuthUser authUser) {
+		Map description = (Map) JSON.parse(authUser.description ?: '{}')
+		[connection : description.connection ?: 'no connection data',
+		 email      : authUser.email ?: 'unknown',
+		 fullName   : authUser.userRealName,
+		 id         : authUser.id,
+		 institution: description.institution ?: 'unknown',
+		 lastUpdated: authUser.lastUpdated,
+		 level      : customizationService.userLevel(authUser).description,
+		 enabled    : authUser.enabled,
+		 username   : authUser.username]
 	}
 
 	Map currentUserInfo(AuthUser user) {
@@ -71,7 +75,7 @@ class UserService {
 	 */
 	@Transactional
 	AuthUser updateUser(String email, String firstname, String lastname, Map params) {
-        AuthUser user = currentAuthUser()
+		AuthUser user = currentAuthUser()
 		updateAuthUser user, null, email, firstname, lastname, null,
 				currentUserInfo(user) + params
 	}
@@ -82,8 +86,8 @@ class UserService {
 	 * @param user If NULL then update info for new user.
 	 * @return
 	 */
-	public AuthUser updateAuthUser(AuthUser user, String username, String email, String firstname,
-									String lastname, Credentials credentials, Map params) {
+	AuthUser updateAuthUser(AuthUser user, String username, String email, String firstname,
+	                        String lastname, Credentials credentials, Map params) {
 
 		boolean existingUser
 		if (user) {
@@ -125,7 +129,7 @@ class UserService {
 			}
 
 			user.description = (description as JSON).toString()
-			user.save(flush:true)
+			user.save(flush: true)
 			if (user.hasErrors()) {
 				logger.error 'Error updating user{}: {}', username, utilService.errorStrings(user)
 			}

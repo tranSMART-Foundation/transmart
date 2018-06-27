@@ -16,6 +16,8 @@ import org.transmart.plugin.custom.Settings
 import org.transmart.plugin.custom.UserLevel
 import org.transmart.plugin.shared.SecurityService
 import org.transmart.searchapp.AuthUser
+import org.transmart.searchapp.AuthUserSecureAccess
+import org.transmart.searchapp.SecureObjectAccess
 import org.transmartproject.db.log.AccessLogService
 
 import java.text.SimpleDateFormat
@@ -26,7 +28,14 @@ import java.text.SimpleDateFormat
 @Slf4j('logger')
 class Auth0Controller implements InitializingBean {
 
-	static allowedMethods = [checkTOS: 'POST']
+	// TODO providers shouldn't be hard-coded
+	private static final Map<String, String> auth0Providers = [Google                  : 'google-oauth2|',
+	                                                           GitHub                  : 'github|',
+	                                                           ORCiD                   : 'oauth2|ORCiD|',
+	                                                           'Harvard Medical School': 'samlp|',
+	                                                           'eRA Commons'           : 'samlp|']
+
+	static allowedMethods = [adminUserSave: 'POST', adminUserUpdate: 'POST', checkTOS: 'POST']
 
 	private Map authModel
 
@@ -90,7 +99,7 @@ class Auth0Controller implements InitializingBean {
 		}
 	}
 
-	def adminLogin() {
+	def passwordLogin() {
 		forward controller: 'login', action: 'auth'
 	}
 
@@ -269,17 +278,109 @@ class Auth0Controller implements InitializingBean {
 		 tosValue        : settings.fieldvalue + (customizationService.setting('tos.text_cont')?.fieldvalue ?: '')]
 	}
 
-	def userlist(AuthUser user, String state) {
-		if (state) {
-			// Admin is changing state of a user
-			auth0Service.changeUserLevel(user, UserLevel.valueOf(state),
-					createLink(uri: '/', absolute: true).toString(), userGuideLink, access1DetailsMessage)
-			redirect action: 'userlist'
+	def adminUserList() {
+		accessLog securityService.currentUsername(), 'View userlist'
+
+		render view: 'userlist', model: [users: userService.buildUserListUserInfo()]
+	}
+
+	def adminUserShow(AuthUser authUser) {
+		if (!authUser) {
+			flash.message = "AuthUser not found with id $params.id"
+			redirect action: 'adminUserList'
 			return
 		}
 
-		accessLog securityService.currentUsername(), 'View userlist'
-		[users: userService.buildUserListUserInfo(), userSignupEnabled: customizationConfig.userSignupEnabled]
+		Map person = userService.buildUserInfo(authUser)
+		person.groups = authUser.groups
+		person.changePassword = authUser.changePassword
+
+		[person   : person,
+		 roleNames: authUser.authorities*.authority.sort(),
+		 soas     : SecureObjectAccess.findAllByPrincipal(authUser, [sort: 'accessLevel']),
+		 ausas    : AuthUserSecureAccess.findAllByAuthUser(authUser, [sort: 'accessLevel'])]
+	}
+
+	def adminUserEdit(AuthUser authUser) {
+		if (authUser) {
+			buildPersonModel authUser
+		}
+		else {
+			flash.message = "AuthUser not found with id $params.id"
+			redirect action: 'list'
+		}
+	}
+
+	def adminUserUpdate(AuthUser authUser) {
+		saveOrUpdate authUser
+	}
+
+	def adminUserCreate() {
+		buildPersonModel new AuthUser(), UserLevel.UNREGISTERED
+	}
+
+	def adminUserSave() {
+		saveOrUpdate()
+	}
+
+	private saveOrUpdate(AuthUser authUser) {
+
+		boolean create = params.id == null
+		if (create) {
+			authUser = new AuthUser(enabled: false, passwd: 'auth0',
+					uniqueId: auth0Providers[(params.auth0Provider ?: 'Google')] + 'UNINITIALIZED',
+					username: UUID.randomUUID().toString())
+		}
+
+		authUser.description = auth0Service.buildDescription(params.connection ?: '')
+		authUser.email = params.email ?: ''
+
+		authUser.userRealName = params.userRealName ?: ''
+		authUser.name = authUser.userRealName
+
+		String message
+		if (create) {
+			message = "User: ${authUser.username} for ${authUser.userRealName} created"
+		}
+		else {
+			message = "${authUser.username} has been updated. Changed fields include: "
+			message += authUser.dirtyPropertyNames.collect { String field ->
+				def newValue = authUser[field]
+				def oldValue = authUser.getPersistentValue(field)
+				if (newValue != oldValue) {
+					"$field ($oldValue -> $newValue)"
+				}
+			}.findAll().join(', ')
+		}
+
+		UserLevel userLevel = UserLevel.valueOf(params.userLevel)
+		boolean ok = auth0Service.createOrUpdate(authUser, create, userLevel, message,
+				createLink(uri: '/', absolute: true).toString(), userGuideLink, access1DetailsMessage)
+
+		if (ok) {
+			redirect action: 'adminUserShow', id: authUser.id
+		}
+		else {
+			flash.message = 'An error occurred, cannot save user'
+			render view: create ? 'adminUserCreate' : 'adminUserEdit', model: buildPersonModel(authUser, userLevel)
+		}
+	}
+
+	private Map buildPersonModel(AuthUser authUser, UserLevel userLevel = null) {
+		Map description = (Map) JSON.parse(authUser.description ?: '{}')
+
+		String auth0Provider = auth0Providers.values().find { String provider ->
+			authUser.uniqueId?.startsWith provider
+		}
+		String providerId = auth0Provider ? authUser.uniqueId - auth0Providers[auth0Provider] : ''
+
+		[person        : authUser,
+		 userLevel     : userLevel ?: customizationService.userLevel(authUser),
+		 affiliation   : description.institution,
+		 connection    : description.connection ?: 'no connection data',
+		 auth0Providers: auth0Providers.keySet(),
+		 auth0Provider : auth0Provider,
+		 providerId    : providerId]
 	}
 
 	protected Map buildAuthModel() {

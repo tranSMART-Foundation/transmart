@@ -180,8 +180,15 @@ class Auth0Service implements InitializingBean {
 				picture: '')
 
 		AuthUser existingUser
-		List<AuthUser> uninitialized = AuthUser.findAllByEmailAndPasswdAndEnabledAndUniqueIdLikeAndDescriptionIsNull(
-				credentials.email, 'auth0', false, '%UNINITIALIZED')
+
+		List<AuthUser> uninitialized = AuthUser.executeQuery('''
+				select u from AuthUser u
+				where lower(u.email)=:email
+				  and u.passwd='auth0'
+				  and u.enabled=false
+				  and u.uniqueId like '%UNINITIALIZED'
+				  and u.description is null''',
+				[email: email.toLowerCase()])
 		if (uninitialized.size() > 1) {
 			// TODO
 		}
@@ -226,7 +233,7 @@ class Auth0Service implements InitializingBean {
 	@Transactional
 	AuthUser createUser(Credentials credentials, String uniqueId) {
 		AuthUser user = new AuthUser(
-				description: buildDescription(credentials),
+				description: buildDescription(credentials.connection),
 				email: credentials.email,
 				emailShow: true,
 				enabled: true,
@@ -243,13 +250,13 @@ class Auth0Service implements InitializingBean {
 		if (user.hasErrors()) {
 			logger.error 'Could not create user {} because {}', credentials.username, utilService.errorStrings(user)
 		}
-		logger.info 'getCredentials() New user record has been created: {}', credentials.username
+		logger.info 'New user record has been created: {}', credentials.username
 		user
 	}
 
 	@Transactional
 	void finishUninitializedUser(AuthUser user, Credentials credentials, String uniqueId) {
-		user.description = buildDescription(credentials)
+		user.description = buildDescription(credentials.connection)
 		user.enabled = true
 		user.uniqueId = uniqueId
 		user.save()
@@ -262,13 +269,13 @@ class Auth0Service implements InitializingBean {
 		user
 	}
 
-	private String buildDescription(Credentials credentials) {
+	String buildDescription(String connection) {
 		([about     : '',
-		  connection: credentials.connection,
+		  connection: connection,
 		  firstname : '',
 		  lastname  : '',
 		  phone     : '',
-		  picture   : credentials.picture] as JSON).toString()
+		  picture   : ''] as JSON).toString()
 	}
 
 	/**
@@ -363,7 +370,7 @@ class Auth0Service implements InitializingBean {
 	private Map<String, String> grantRolesAndStoreAuth(AuthUser authUser, String username) {
 		if ('auto'.equalsIgnoreCase(customizationConfig.accessLevel1)) {
 			// If configuration is set to auto-approve, go ahead and assign the basic roles.
-			authService.grantRoles authUser, Roles.STUDY_OWNER, Roles.PUBLIC_USER
+			authService.grantRoles authUser, Roles.STUDY_OWNER
 			logger.debug 'Assigned basic, Level1 access to new user'
 
 			// If configuration is set to auto-approve, after filling out the registration form
@@ -394,48 +401,59 @@ class Auth0Service implements InitializingBean {
 		}
 	}
 
+	@Transactional
+	boolean createOrUpdate(AuthUser authUser, boolean create, UserLevel userLevel, String message,
+	                       String appUrl, String userGuideLink, String access1DetailsMessage) {
+
+		if (authUser.save(flush: true)) {
+			if (create || userLevel != customizationService.userLevel(authUser)) {
+				changeUserLevel(authUser, userLevel, appUrl, userGuideLink, access1DetailsMessage)
+			}
+
+			accessLogService.report "User ${create ? 'Created' : 'Updated'}", message
+			true
+		}
+		else {
+			transactionStatus.setRollbackOnly()
+			false
+		}
+	}
+
+	@Transactional
 	void changeUserLevel(AuthUser user, UserLevel newLevel, String appUrl,
 	                     String userGuideLink, String access1DetailsMessage) {
 
 		updateRoles newLevel, user
 
-		String alertMsg = "User <b>$user.username</b> has been granted <b>$newLevel</b> access."
+		String alertMsg = "User <b>$user.username</b> has been granted <b>$newLevel.description</b> access."
 		logger.info alertMsg
 		accessLog securityService.currentUsername(), 'GrantAccess', alertMsg
 
-		UserLevel userLevel = customizationService.userLevel(user)
-		String levelName
-		switch (userLevel) {
-			case UserLevel.ONE:   levelName = customizationConfig.instanceType == 'grdr' ? 'Open Data' : 'Level 1'; break
-			case UserLevel.TWO:   levelName = customizationConfig.instanceType == 'grdr' ? 'Controlled Data' : 'Level 2'; break
-			case UserLevel.ADMIN: levelName = 'Administrator'; break
-			default: levelName = 'Unknown'
+		if (!user.email) {
+			return
 		}
 
 		String body = groovyPageRenderer.render(template: '/auth0/email_accessgranted', model: [
 				access1DetailsMessage: access1DetailsMessage,
 				appUrl               : appUrl,
-				levelName            : levelName,
+				levelName            : newLevel.description,
 				userGuideLink        : userGuideLink,
-				userlevel            : userLevel])
+				userlevel            : newLevel])
 		sendEmail user.email, 'Access Granted', body
 	}
 
 	private void updateRoles(UserLevel level, AuthUser user) {
-		removeRoles user
+		if (user.authorities) {
+			for (Role role in user.authorities) {
+				role.removeFromPeople user
+			}
+		}
 
 		switch (level) {
 			case UserLevel.ZERO:  authService.grantRoles user, Roles.PUBLIC_USER; break
 			case UserLevel.ONE:   authService.grantRoles user, Roles.STUDY_OWNER; break
 			case UserLevel.TWO:   authService.grantRoles user, Roles.DATASET_EXPLORER_ADMIN; break
 			case UserLevel.ADMIN: authService.grantRoles user, Roles.ADMIN; break
-		}
-	}
-
-	@CompileDynamic
-	private void removeRoles(AuthUser user) {
-		for (Role role in Role.list()) {
-			role.removeFromPeople user
 		}
 	}
 
