@@ -25,7 +25,9 @@ const fractalisPanel = new Ext.Panel({
             Please contact your admin.`)
         })
       }
-      fjsService.activateDragAndDrop(conceptBox)
+      window.setTimeout(() => {
+        fjsService.activateDragAndDrop(document.querySelector('.fjs-concept-box'))
+      }, 1000)
       fjsService.observeConceptBox(conceptBox)
     }
   },
@@ -34,6 +36,9 @@ const fractalisPanel = new Ext.Panel({
       fjsService.resetUrl()
     },
     activate: () => {
+      window.setTimeout(() => {
+        fjsService.activateDragAndDrop(document.querySelector('.fjs-concept-box'))
+      }, 1000)
       fjsService.setUrl()
       fjsService.showLoadingScreen(true)
       fjsService.getPatientIDs()
