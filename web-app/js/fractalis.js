@@ -25,9 +25,7 @@ const fractalisPanel = new Ext.Panel({
             Please contact your admin.`)
         })
       }
-      window.setTimeout(() => {
-        fjsService.activateDragAndDrop(document.querySelector('.fjs-concept-box'))
-      }, 1000)
+      fjsService.activateDragAndDrop(conceptBox)
       fjsService.observeConceptBox(conceptBox)
     }
   },
@@ -36,9 +34,8 @@ const fractalisPanel = new Ext.Panel({
       fjsService.resetUrl()
     },
     activate: () => {
-      window.setTimeout(() => {
-        fjsService.activateDragAndDrop(document.querySelector('.fjs-concept-box'))
-      }, 1000)
+      const conceptBox = document.querySelector('.fjs-concept-box')
+      fjsService.activateDragAndDrop(conceptBox)
       fjsService.setUrl()
       fjsService.showLoadingScreen(true)
       fjsService.getPatientIDs()
@@ -94,6 +91,12 @@ const fjsService = {
   },
 
   activateDragAndDrop (conceptBox) {
+    if (typeof window.dropOntoCategorySelection === 'undefined' || window.dropOntoCategorySelection == null) {
+      window.setTimeout(() => {
+        this.activateDragAndDrop(conceptBox)
+      }, 500)
+      return
+    }
     const extObj = Ext.get(conceptBox)
     const dtgI = new Ext.dd.DropTarget(extObj, {ddGroup: 'makeQuery'})
     dtgI.notifyDrop = window.dropOntoCategorySelection
