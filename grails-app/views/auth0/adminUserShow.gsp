@@ -35,35 +35,19 @@
 			</tr>
 
 			<tr class="prop">
-				<td valign="top" class="name">Affiliation:</td>
-				<td valign="top" class="value">${person.institution?.encodeAsHTML()}</td>
-			</tr>
-
-			<tr class="prop">
 				<td valign="top" class="name">Connection:</td>
 				<td valign="top" class="value">${person.connection?.encodeAsHTML()}</td>
 			</tr>
 
 			<tr class="prop">
-				<td valign="top" class="name">Last Updated:</td>
-				<td valign="top" class="value">${person.lastUpdated?.encodeAsHTML()}</td>
+				<td valign="top" class="name">Unique ID:</td>
+				<td valign="top" class="value">${person.uniqueId?.encodeAsHTML()}</td>
 			</tr>
 
 			<tr class="prop">
 				<td valign="top" class="name">Access Level:</td>
 				<td valign="top" class="value">${person.level}</td>
 			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">Show Email:</td>
-				<td valign="top" class="value">${person.emailShow}</td>
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">Enabled:</td>
-				<td valign="top" class="value">${person.enabled}</td>
-			</tr>
-
 
 			<tr class="prop">
 				<td valign="top" class="name">Roles:</td>
@@ -95,7 +79,6 @@
 					</ul>
 				</td>
 			</tr>
-			</tr>
 			<tr class="prop">
 				<td valign="top" class="name">Studies with Access(via groups):</td>
 				<td valign="top" class="value">
@@ -107,8 +90,8 @@
 				</td>
 			</tr>
 			<tr class="prop">
-				<td valign="top" class="name">Force user to change the password:</td>
-				<td valign="top" class="value">${person.changePassword ? 'Yes' : 'No'}</td>
+				<td valign="top" class="name">Last Updated:</td>
+				<td valign="top" class="value">${person.lastUpdated?.encodeAsHTML()}</td>
 			</tr>
 			</tbody>
 		</table>

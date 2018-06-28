@@ -1,5 +1,6 @@
 package org.transmart.plugin.auth0
 
+import org.apache.commons.validator.routines.EmailValidator
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
 import groovy.util.logging.Slf4j
@@ -328,15 +329,35 @@ class Auth0Controller implements InitializingBean {
 		boolean create = params.id == null
 		if (create) {
 			authUser = new AuthUser(enabled: false, passwd: 'auth0',
-					uniqueId: auth0Providers[(params.auth0Provider ?: 'Google')] + 'UNINITIALIZED',
 					username: UUID.randomUUID().toString())
 		}
 
-		authUser.description = auth0Service.buildDescription(params.connection ?: '')
-		authUser.email = params.email ?: ''
-
 		authUser.userRealName = params.userRealName ?: ''
 		authUser.name = authUser.userRealName
+
+		authUser.email = params.email ?: ''
+
+		authUser.validate()
+
+		if (authUser.email) {
+			if (!EmailValidator.getInstance().isValid(authUser.email)) {
+				authUser.errors.rejectValue 'email', 'valid', null,
+						'Please enter a valid email address'
+			}
+		}
+		else {
+			authUser.errors.rejectValue 'email', 'blank', null,
+					'Email address is required'
+		}
+
+		authUser.uniqueId = auth0Providers[params.auth0Provider]
+		String providerId = params.uniqueId ?: ''
+		if (providerId) {
+			authUser.uniqueId +=providerId
+		}
+		if (create) {
+			authUser.uniqueId += '_UNINITIALIZED'
+		}
 
 		String message
 		if (create) {
@@ -354,7 +375,7 @@ class Auth0Controller implements InitializingBean {
 		}
 
 		UserLevel userLevel = UserLevel.valueOf(params.userLevel)
-		boolean ok = auth0Service.createOrUpdate(authUser, create, userLevel, message,
+		boolean ok = !authUser.hasErrors() && auth0Service.createOrUpdate(authUser, create, userLevel, message,
 				createLink(uri: '/', absolute: true).toString(), userGuideLink, access1DetailsMessage)
 
 		if (ok) {
@@ -372,15 +393,14 @@ class Auth0Controller implements InitializingBean {
 		String auth0Provider = auth0Providers.values().find { String provider ->
 			authUser.uniqueId?.startsWith provider
 		}
-		String providerId = auth0Provider ? authUser.uniqueId - auth0Providers[auth0Provider] : ''
+		String providerId = (auth0Provider ? authUser.uniqueId - auth0Provider : '') - '_UNINITIALIZED'
 
 		[person        : authUser,
 		 userLevel     : userLevel ?: customizationService.userLevel(authUser),
-		 affiliation   : description.institution,
-		 connection    : description.connection ?: 'no connection data',
+		 connection    : description.connection,
 		 auth0Providers: auth0Providers.keySet(),
 		 auth0Provider : auth0Provider,
-		 providerId    : providerId]
+		 uniqueId      : providerId]
 	}
 
 	protected Map buildAuthModel() {

@@ -165,8 +165,44 @@ class Auth0Service implements InitializingBean {
 		// 		"user_id":"google-oauth2|..."
 		// }
 
-		String email = userInfo.getString('email')
+		String email = userInfo.optString('email')
 		String uniqueId = userInfo.getString('sub')
+
+		AuthUser existingUser
+
+		String uniqueIdRoot = uniqueId.substring(0, uniqueId.lastIndexOf('|') + 1)
+
+		Map args = [:]
+		args.uniqueId = uniqueId
+		args.uniqueIdUninit = uniqueIdRoot + '%UNINITIALIZED'
+		String hql = '''
+				select u from AuthUser u
+				where u.passwd='auth0'
+				  and u.enabled=false
+				  and u.description is null
+				  and (u.uniqueId=:uniqueId or u.uniqueId like :uniqueIdUninit)
+				 '''
+		if (email) {
+			hql += ' and lower(u.email)=:email'
+			args.email = email.toLowerCase()
+		}
+
+		List<AuthUser> uninitialized = AuthUser.executeQuery(hql, args)
+		boolean foundUninitialized = false
+		if (uninitialized.size() > 1) {
+			// TODO
+		}
+		else if (uninitialized.size() == 1) {
+			existingUser = uninitialized[0]
+			foundUninitialized = true
+		}
+		else {
+			existingUser = userService.findBy('uniqueId', uniqueId)
+		}
+
+		if (existingUser && !email) {
+			email = existingUser.email
+		}
 
 		idToken = rebuildJwt(idToken, email)
 
@@ -179,32 +215,13 @@ class Auth0Service implements InitializingBean {
 				nickname: 'unregistered',
 				picture: '')
 
-		AuthUser existingUser
-
-		List<AuthUser> uninitialized = AuthUser.executeQuery('''
-				select u from AuthUser u
-				where lower(u.email)=:email
-				  and u.passwd='auth0'
-				  and u.enabled=false
-				  and u.uniqueId like '%UNINITIALIZED'
-				  and u.description is null''',
-				[email: email.toLowerCase()])
-		if (uninitialized.size() > 1) {
-			// TODO
-		}
-		else if (uninitialized.size() == 1) {
-			existingUser = uninitialized[0]
-			credentials.username = existingUser.username = UUID.randomUUID().toString()
-			finishUninitializedUser existingUser, credentials, uniqueId
-		}
-		else {
-			existingUser = userService.findBy('uniqueId', uniqueId)
-		}
-
 		if (existingUser) {
 			credentials.id = existingUser.id
 			credentials.level = customizationService.userLevel(existingUser)
 			credentials.username = existingUser.username
+			if (foundUninitialized) {
+				finishUninitializedUser existingUser, credentials, uniqueId
+			}
 		}
 		else {
 			credentials.username = UUID.randomUUID().toString()

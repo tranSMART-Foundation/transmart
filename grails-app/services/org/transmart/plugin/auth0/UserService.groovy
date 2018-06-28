@@ -45,15 +45,14 @@ class UserService {
 
 	Map buildUserInfo(AuthUser authUser) {
 		Map description = (Map) JSON.parse(authUser.description ?: '{}')
-		[connection : description.connection ?: 'no connection data',
+		[connection : description.connection,
 		 email      : authUser.email ?: 'unknown',
 		 fullName   : authUser.userRealName,
 		 id         : authUser.id,
-		 institution: description.institution ?: 'unknown',
 		 lastUpdated: authUser.lastUpdated,
 		 level      : customizationService.userLevel(authUser).description,
-		 enabled    : authUser.enabled,
-		 username   : authUser.username]
+		 username   : authUser.username,
+		 uniqueId   : authUser.uniqueId]
 	}
 
 	Map currentUserInfo(AuthUser user) {

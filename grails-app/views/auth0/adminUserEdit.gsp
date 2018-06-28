@@ -36,23 +36,9 @@
 				</tr>
 
 				<tr class="prop">
-					<td valign="top" class="name"><label for="enabled">Enabled:</label></td>
-					<td valign="top" class="value ${hasErrors(bean: person, field: 'enabled', 'errors')}">
-						<g:checkBox name="enabled" value="${person.enabled}"/>
-					</td>
-				</tr>
-
-				<tr class="prop">
 					<td valign="top" class="name"><label for="email">Email:</label></td>
 					<td valign="top" class="value ${hasErrors(bean: person, field: 'email', 'errors')}">
 						<input type="text" id="email" name="email" value="${person?.email?.encodeAsHTML()}"/>
-					</td>
-				</tr>
-
-				<tr class="prop">
-					<td valign="top" class="name"><label for="affiliation">Affiliation:</label></td>
-					<td valign="top" class="value">
-						<g:textField name='affiliation' value="${(affiliation ?: 'unknown')?.encodeAsHTML()}"/>
 					</td>
 				</tr>
 
@@ -79,9 +65,9 @@
 				</tr>
 
 				<tr class="prop">
-					<td valign="top" class="name"><label for="providerId">Provider ID / Username:</label></td>
+					<td valign="top" class="name"><label for="uniqueId">Provider ID:</label></td>
 					<td valign="top" class="value">
-						<g:textField name='providerId' value="${providerId}"/>
+						<g:textField name='uniqueId' value="${uniqueId}"/>
 					</td>
 				</tr>
 

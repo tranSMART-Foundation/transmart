@@ -35,13 +35,6 @@
 				</tr>
 
 				<tr class="prop">
-					<td valign="top" class="name"><label for="affiliation">Affiliation:</label></td>
-					<td valign="top" class="value">
-						<g:textField name='affiliation' value="${affiliation?.encodeAsHTML()}"/>
-					</td>
-				</tr>
-
-				<tr class="prop">
 					<td valign="top" class="name"><label>User Level:</label></td>
 					<td valign="top" class="value">
 						<g:select name='userLevel' value="${userLevel}" optionValue='description'
@@ -57,9 +50,9 @@
 				</tr>
 
 				<tr class="prop">
-					<td valign="top" class="name"><label for="providerId">Provider ID / Username:</label></td>
-					<td valign="top" class="value">
-						<g:textField name='providerId' value="${providerId}"/>
+					<td valign="top" class="name"><label for="uniqueId">Provider ID:</label></td>
+					<td valign="top" class="value ${hasErrors(bean: person, field: 'uniqueId', 'errors')}">
+						<g:textField name='uniqueId' value="${uniqueId}"/>
 					</td>
 				</tr>
 

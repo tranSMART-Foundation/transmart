@@ -18,11 +18,10 @@
 				<th>Username</th>
 				<th>Full Name</th>
 				<th>Email</th>
-				<th>Affiliation</th>
 				<th>Connection</th>
-				<th>Last Updated</th>
+				<th>Unique ID</th>
 				<th>Access Level</th>
-				<th>Enabled</th>
+				<th>Last Updated</th>
 				<th>&nbsp;</th>
 			</tr>
 			</thead>
@@ -33,11 +32,10 @@
 					<td>${person.username.encodeAsHTML()}</td>
 					<td>${person.fullName?.encodeAsHTML()}</td>
 					<td>${person.email?.encodeAsHTML()}</td>
-					<td>${person.institution.encodeAsHTML()}</td>
 					<td>${person.connection.encodeAsHTML()}</td>
-					<td>${person.lastUpdated.toString().encodeAsHTML()}</td>
+					<td>${person.uniqueId?.encodeAsHTML()}</td>
 					<td>${person.level.encodeAsHTML()}</td>
-					<td>${person.enabled.encodeAsHTML()}</td>
+					<td>${person.lastUpdated.toString().encodeAsHTML()}</td>
 					<td class="actionButtons">
 						<span class="actionButton">
 							<g:link controller='authUser' action='show' id="${person.id}">Show</g:link>
