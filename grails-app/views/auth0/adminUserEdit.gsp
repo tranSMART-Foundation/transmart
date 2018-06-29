@@ -31,21 +31,14 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label for="userRealName">Full Name:</label></td>
 					<td valign="top" class="value ${hasErrors(bean: person, field: 'userRealName', 'errors')}">
-						<input type="text" id="userRealName" name="userRealName" value="${person.userRealName?.encodeAsHTML()}"/>
+						<g:textField name='userRealName' value="${person.userRealName?.encodeAsHTML()}"/>
 					</td>
 				</tr>
 
 				<tr class="prop">
 					<td valign="top" class="name"><label for="email">Email:</label></td>
 					<td valign="top" class="value ${hasErrors(bean: person, field: 'email', 'errors')}">
-						<input type="text" id="email" name="email" value="${person?.email?.encodeAsHTML()}"/>
-					</td>
-				</tr>
-
-				<tr class="prop">
-					<td valign="top" class="name"><label for="connection">Connection:</label></td>
-					<td valign="top" class="value">
-						<g:textField name='connection' value="${connection?.encodeAsHTML()}"/>
+						<g:textField name='email' value="${person?.email?.encodeAsHTML()}"/>
 					</td>
 				</tr>
 
@@ -66,7 +59,7 @@
 
 				<tr class="prop">
 					<td valign="top" class="name"><label for="uniqueId">Provider ID:</label></td>
-					<td valign="top" class="value">
+					<td valign="top" class="value ${hasErrors(bean: person, field: 'uniqueId', 'errors')}">
 						<g:textField name='uniqueId' value="${uniqueId}"/>
 					</td>
 				</tr>

@@ -1,9 +1,9 @@
 package org.transmart.plugin.auth0
 
-import org.apache.commons.validator.routines.EmailValidator
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
 import groovy.util.logging.Slf4j
+import org.apache.commons.validator.routines.EmailValidator
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.AccountExpiredException
@@ -16,8 +16,10 @@ import org.transmart.plugin.custom.CustomizationService
 import org.transmart.plugin.custom.Settings
 import org.transmart.plugin.custom.UserLevel
 import org.transmart.plugin.shared.SecurityService
+import org.transmart.plugin.shared.security.Roles
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.AuthUserSecureAccess
+import org.transmart.searchapp.Role
 import org.transmart.searchapp.SecureObjectAccess
 import org.transmartproject.db.log.AccessLogService
 
@@ -101,7 +103,12 @@ class Auth0Controller implements InitializingBean {
 	}
 
 	def passwordLogin() {
-		forward controller: 'login', action: 'auth'
+		if (auth0AdminExists()) {
+			render status: 404
+		}
+		else {
+			forward controller: 'login', action: 'auth'
+		}
 	}
 
 	def authfail() {
@@ -340,7 +347,7 @@ class Auth0Controller implements InitializingBean {
 		authUser.validate()
 
 		if (authUser.email) {
-			if (!EmailValidator.getInstance().isValid(authUser.email)) {
+			if (!EmailValidator.instance.isValid(authUser.email)) {
 				authUser.errors.rejectValue 'email', 'valid', null,
 						'Please enter a valid email address'
 			}
@@ -353,7 +360,7 @@ class Auth0Controller implements InitializingBean {
 		authUser.uniqueId = auth0Providers[params.auth0Provider]
 		String providerId = params.uniqueId ?: ''
 		if (providerId) {
-			authUser.uniqueId +=providerId
+			authUser.uniqueId += providerId
 		}
 		if (create) {
 			authUser.uniqueId += '_UNINITIALIZED'
@@ -390,22 +397,27 @@ class Auth0Controller implements InitializingBean {
 	private Map buildPersonModel(AuthUser authUser, UserLevel userLevel = null) {
 		Map description = (Map) JSON.parse(authUser.description ?: '{}')
 
-		String auth0Provider = auth0Providers.values().find { String provider ->
-			authUser.uniqueId?.startsWith provider
+		Map.Entry<String, String> auth0ProviderEntry = auth0Providers.entrySet().find { Map.Entry<String, String> entry ->
+			authUser.uniqueId?.startsWith entry.value
 		}
-		String providerId = (auth0Provider ? authUser.uniqueId - auth0Provider : '') - '_UNINITIALIZED'
+		String providerId = (auth0ProviderEntry ? authUser.uniqueId - auth0ProviderEntry.value : '') - '_UNINITIALIZED'
 
 		[person        : authUser,
 		 userLevel     : userLevel ?: customizationService.userLevel(authUser),
 		 connection    : description.connection,
 		 auth0Providers: auth0Providers.keySet(),
-		 auth0Provider : auth0Provider,
+		 auth0Provider : auth0ProviderEntry?.key,
 		 uniqueId      : providerId]
 	}
 
 	protected Map buildAuthModel() {
 		[auth0ConnectionCss: auth0Service.webtaskCSS(),
-		 auth0ConnectionJs : auth0Service.webtaskJavaScript()] + authModel
+		 auth0ConnectionJs : auth0Service.webtaskJavaScript(),
+		 auth0AdminExists: auth0AdminExists()] + authModel
+	}
+
+	private boolean auth0AdminExists() {
+		Role.findByAuthority(Roles.ADMIN.authority).people.any { AuthUser u -> u.passwd == 'auth0' }
 	}
 
 	private void accessLog(String username, String event, String message = null) {

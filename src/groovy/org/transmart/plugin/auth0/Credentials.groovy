@@ -23,4 +23,5 @@ class Credentials implements Serializable {
 	String picture = ''
 	Boolean tosVerified
 	String username
+	String uniqueId
 }

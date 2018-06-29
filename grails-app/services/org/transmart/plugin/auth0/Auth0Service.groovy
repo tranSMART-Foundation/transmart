@@ -1,5 +1,6 @@
 package org.transmart.plugin.auth0
 
+import au.com.bytecode.opencsv.CSVParser
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
@@ -12,6 +13,7 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import groovy.util.logging.Slf4j
+import org.apache.commons.validator.routines.EmailValidator
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
@@ -165,8 +167,8 @@ class Auth0Service implements InitializingBean {
 		// 		"user_id":"google-oauth2|..."
 		// }
 
-		String email = userInfo.optString('email')
-		String uniqueId = userInfo.getString('sub')
+		String email = determineEmail(userInfo)
+		String uniqueId = determineUniqueId(userInfo)
 
 		AuthUser existingUser
 
@@ -213,7 +215,8 @@ class Auth0Service implements InitializingBean {
 				idToken: idToken,
 				name: 'unregistered',
 				nickname: 'unregistered',
-				picture: '')
+				picture: '',
+				uniqueId: uniqueId)
 
 		if (existingUser) {
 			credentials.id = existingUser.id
@@ -232,6 +235,24 @@ class Auth0Service implements InitializingBean {
 		currentRequest().session.setAttribute CREDENTIALS_KEY, credentials
 
 		credentials
+	}
+
+	private String determineUniqueId(JSONObject userInfo) {
+		String uniqueId = userInfo.getString('sub')
+		if (uniqueId.startsWith('github|') && (uniqueId - 'github|').isNumber()) {
+			'github|' + userInfo.getString('nickname')
+		}
+		else {
+			uniqueId
+		}
+	}
+
+	// primarily for ORCiD which returns the ORCiD in the 'email' claim
+	private String determineEmail(JSONObject userInfo) {
+		String email = userInfo.optString('email')
+		if (email && EmailValidator.instance.isValid(email)) {
+			email
+		}
 	}
 
 	private String rebuildJwt(String idToken, String email) {
@@ -461,7 +482,7 @@ class Auth0Service implements InitializingBean {
 
 	private void updateRoles(UserLevel level, AuthUser user) {
 		if (user.authorities) {
-			for (Role role in user.authorities) {
+			for (Role role in (user.authorities as List<Role>)) { // cast to create a new collection to avoid ConcurrentModificationException
 				role.removeFromPeople user
 			}
 		}
@@ -535,7 +556,7 @@ class Auth0Service implements InitializingBean {
 	 */
 	void authenticateAs(Credentials credentials) {
 		Auth0JWTToken tokenAuth = new Auth0JWTToken(credentials.idToken)
-		tokenAuth.principal = authService.loadAuthUserDetailsByUniqueId(tokenAuth.decodedJWT.subject)
+		tokenAuth.principal = authService.loadAuthUserDetailsByUniqueId(credentials.uniqueId)
 		tokenAuth.authenticated = true
 		SecurityContextHolder.context.authentication = tokenAuth
 	}

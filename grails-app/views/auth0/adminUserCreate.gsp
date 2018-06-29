@@ -6,7 +6,9 @@
 
 <body>
 <div class="body">
+
 	<h1>Create User</h1>
+
 	<g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 	</g:if>
@@ -15,6 +17,7 @@
 		<g:renderErrors bean="${person}" as="list"/>
 	</div>
 	</g:hasErrors>
+
 	<g:form controller='authUser' action='save'>
 		<div class="dialog">
 			<table>
@@ -23,14 +26,14 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label for="userRealName">Full Name:</label></td>
 					<td valign="top" class="value ${hasErrors(bean: person, field: 'userRealName', 'errors')}">
-						<input type="text" id="userRealName" name="userRealName" value="${person.userRealName?.encodeAsHTML()}"/>
+						<g:textField name='userRealName' value="${person.userRealName?.encodeAsHTML()}"/>
 					</td>
 				</tr>
 
 				<tr class="prop">
 					<td valign="top" class="name"><label for="email">Email:</label></td>
 					<td valign="top" class="value ${hasErrors(bean: person, field: 'email', 'errors')}">
-						<input type="text" id="email" name="email" value="${person?.email?.encodeAsHTML()}"/>
+						<g:textField name='email' value="${person?.email?.encodeAsHTML()}"/>
 					</td>
 				</tr>
 
