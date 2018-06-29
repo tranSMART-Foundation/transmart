@@ -52,11 +52,6 @@ class Auth0Controller implements InitializingBean {
 	@Autowired private UserService userService
 
 	// can't be initialized in afterPropertiesSet() since GORM isn't available yet
-	@Lazy private String access1DetailsMessage = { ->
-		String suffix = customizationConfig.instanceType == 'baseline' || customizationConfig.instanceType == '' ? '' :
-				'.' + customizationConfig.instanceType
-		message(code: 'edu.harvard.transmart.access1.details' + suffix)
-	}()
 	@Lazy private String authViewName = { ->
 		String loginTemplatesValue = customizationService.setting('login-template')?.fieldvalue ?: ''
 		if (loginTemplatesValue && !loginTemplatesValue.equalsIgnoreCase('default')) {
@@ -67,11 +62,6 @@ class Auth0Controller implements InitializingBean {
 		}
 	}()
 	@Lazy private String notAuthorizedTemplate = { -> customizationService.setting('notAuthorizedTemplate')?.fieldvalue ?: '' }()
-	@Lazy private String userGuideLink = { ->
-		String userGuidePropertyId = 'edu.harvard.transmart.UserGuideMessage' +
-				(customizationConfig.instanceType ? '.' + customizationConfig.instanceType : '')
-		message(code: userGuidePropertyId, args: [customizationConfig.userGuideUrl, "User's Guide"])
-	}()
 
 	def auth() {
 		nocache response
@@ -382,8 +372,8 @@ class Auth0Controller implements InitializingBean {
 		}
 
 		UserLevel userLevel = UserLevel.valueOf(params.userLevel)
-		boolean ok = !authUser.hasErrors() && auth0Service.createOrUpdate(authUser, create, userLevel, message,
-				createLink(uri: '/', absolute: true).toString(), userGuideLink, access1DetailsMessage)
+		boolean ok = !authUser.hasErrors() && auth0Service.createOrUpdate(authUser, create,
+				userLevel, message, createLink(uri: '/', absolute: true).toString())
 
 		if (ok) {
 			redirect action: 'adminUserShow', id: authUser.id

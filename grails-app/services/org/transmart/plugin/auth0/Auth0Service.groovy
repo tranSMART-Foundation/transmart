@@ -440,12 +440,11 @@ class Auth0Service implements InitializingBean {
 	}
 
 	@Transactional
-	boolean createOrUpdate(AuthUser authUser, boolean create, UserLevel userLevel, String message,
-	                       String appUrl, String userGuideLink, String access1DetailsMessage) {
+	boolean createOrUpdate(AuthUser authUser, boolean create, UserLevel userLevel, String message, String appUrl) {
 
 		if (authUser.save(flush: true)) {
 			if (create || userLevel != customizationService.userLevel(authUser)) {
-				changeUserLevel(authUser, userLevel, appUrl, userGuideLink, access1DetailsMessage)
+				changeUserLevel authUser, userLevel, appUrl
 			}
 
 			accessLogService.report "User ${create ? 'Created' : 'Updated'}", message
@@ -458,8 +457,7 @@ class Auth0Service implements InitializingBean {
 	}
 
 	@Transactional
-	void changeUserLevel(AuthUser user, UserLevel newLevel, String appUrl,
-	                     String userGuideLink, String access1DetailsMessage) {
+	void changeUserLevel(AuthUser user, UserLevel newLevel, String appUrl) {
 
 		updateRoles newLevel, user
 
@@ -472,11 +470,13 @@ class Auth0Service implements InitializingBean {
 		}
 
 		String body = groovyPageRenderer.render(template: '/auth0/email_accessgranted', model: [
-				access1DetailsMessage: access1DetailsMessage,
 				appUrl               : appUrl,
+				emailLogo            : customizationConfig.emailLogo,
+				instanceName         : customizationConfig.instanceName,
+				supportEmail         : customizationConfig.supportEmail,
+				userGuideUrl         : customizationConfig.userGuideUrl,
 				levelName            : newLevel.description,
-				userGuideLink        : userGuideLink,
-				userlevel            : newLevel])
+				user                 : user])
 		sendEmail user.email, 'Access Granted', body
 	}
 
