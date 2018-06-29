@@ -1,5 +1,7 @@
 package org.transmart.plugin.custom
 
+import org.transmart.searchapp.AuthUser
+
 /**
  * @author <a href='mailto:burt_beckwith@hms.harvard.edu'>Burt Beckwith</a>
  */
@@ -16,35 +18,35 @@ class CustomizationTagLib {
 	 * Renders the body if the current user has level 0.
 	 */
 	def ifLevelZero = { Map attrs, Closure body ->
-		ifLevel UserLevel.ZERO, body
+		ifLevel attrs, UserLevel.ZERO, body
 	}
 
 	/**
 	 * Renders the body if the current user has level 1.
 	 */
 	def ifLevelOne = { Map attrs, Closure body ->
-		ifLevel UserLevel.ONE, body
+		ifLevel attrs, UserLevel.ONE, body
 	}
 
 	/**
 	 * Renders the body if the current user has level 2.
 	 */
 	def ifLevelTwo = { Map attrs, Closure body ->
-		ifLevel UserLevel.TWO, body
+		ifLevel attrs, UserLevel.TWO, body
 	}
 
 	/**
 	 * Renders the body if the current user has level admin.
 	 */
 	def ifLevelAdmin = { Map attrs, Closure body ->
-		ifLevel UserLevel.ADMIN, body
+		ifLevel attrs, UserLevel.ADMIN, body
 	}
 
 	/**
 	 * Renders the body if the current user is unregistered.
 	 */
 	def ifLevelUnregistered = { Map attrs, Closure body ->
-		ifLevel UserLevel.UNREGISTERED, body
+		ifLevel attrs, UserLevel.UNREGISTERED, body
 	}
 
 	/**
@@ -122,8 +124,11 @@ class CustomizationTagLib {
 
 	// UICustomizationTagLib end
 
-	protected void ifLevel(UserLevel level, Closure body) {
-		if (customizationService.currentUserLevel() == level) {
+	protected void ifLevel(Map attrs, UserLevel level, Closure body) {
+		UserLevel authUserLevel = attrs.user instanceof AuthUser ?
+				customizationService.userLevel((AuthUser) attrs.user) :
+				customizationService.currentUserLevel()
+		if (authUserLevel == level) {
 			out << (String) body()
 		}
 	}
