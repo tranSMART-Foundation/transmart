@@ -1260,6 +1260,8 @@ class I2b2HelperService {
     def ExportTableNew addConceptDataToTable(ExportTableNew tablein, String concept_key, String result_instance_id, AuthUser user) {
         checkQueryResultAccess result_instance_id
 
+        ExportColumn hascol
+
         log.debug "----------------- start addConceptDataToTable <<<<<< <<<<<< <<<<<<"
         log.trace "concept_key = " + concept_key
 
@@ -1281,11 +1283,9 @@ class I2b2HelperService {
         String columnname = getColumnNameFromKey(concept_key).replace(" ", "_")
         String columntooltip = keyToPath(concept_key).replaceAll('[^a-zA-Z0-9_/\\-\\\\()\\[\\]]+','_')
 
-
         if (leafConceptFlag) {
             log.debug "----------------- this is a Leaf Node"
 
-            def ExportColumn hascol;
             def valueLeafNodeFlag = isValueConceptKey(concept_key)
             def columnType = "string"
             if (valueLeafNodeFlag) {
@@ -1297,12 +1297,12 @@ class I2b2HelperService {
                 tablein.putColumn("subject", new ExportColumn("subject", "Subject", "", "string"));
             }
 
-            hascol = tablein.getColumnByBasename(columnname); // check existing column with basename
+            hascol = tablein.getColumnByBasename(columnname); // check existing column with same basename
 
             if (tablein.getColumn(columnid) == null) {
-                tablein.putColumn(columnid, new ExportColumn(columnid, columnname, "", columnType,columntooltip));
+                tablein.putColumn(columnid, new ExportColumn(columnid, columnname, "", columnType, columntooltip));
                 if(hascol)
-                    tablein.setColumnUnique(columnid); // make labels unique
+                    tablein.setColumnUnique(columnid); // make labels unique by expanding
             }
 
             if (xTrialsCaseFlag) {
@@ -1347,8 +1347,13 @@ class I2b2HelperService {
             if (tablein.getColumn("subject") == null) {
                 tablein.putColumn("subject", new ExportColumn("subject", "Subject", "", "string"));
             }
+
+            hascol = tablein.getColumnByBasename(columnname); // check existing column with same basename
+
             if (tablein.getColumn(columnid) == null) {
                 tablein.putColumn(columnid, new ExportColumn(columnid, columnname, "", columnType,columntooltip));
+                if(hascol)
+                    tablein.setColumnUnique(columnid); // make labels unique by expanding
             }
 
             if (xTrialsCaseFlag) {
