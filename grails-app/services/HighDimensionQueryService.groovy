@@ -67,7 +67,7 @@ class HighDimensionQueryService {
                 }
             }
         })
-        log.info "High dimensional concepts found: " + concepts
+
         concepts
     }
 
@@ -76,6 +76,8 @@ class HighDimensionQueryService {
      */
     def ExportTableNew addHighDimConceptDataToTable(ExportTableNew tablein, omics_constraint, String result_instance_id) {
         checkQueryResultAccess result_instance_id
+        ExportColumn hascol
+
         def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
 
         if (!i2b2HelperService.isValidOmicsParams(omics_constraint)) {
@@ -85,15 +87,25 @@ class HighDimensionQueryService {
         def concept_key = omics_constraint.concept_key
         def selector = omics_constraint.omics_selector
         def projection_type = omics_constraint.omics_projection_type
-        String columnname =  "${projection_type}: ${selector} in ${concept_key}"
-        String columnid = columnname.encodeAsSHA1()
+        def newlabel = "${selector} ${projection_type}"
 
-        /*add the column to the table if its not there*/
+        String columnname =  newlabel
+        String columnid = "${concept_key}${newlabel}\\".encodeAsSHA1()
+
+        // Clean up tooltip - remove all except alphanumeric, _-/\()[]
+        String columntooltip = "${i2b2HelperService.keyToPath(concept_key)}${newlabel}\\".replaceAll('[^a-zA-Z0-9_/\\-\\\\()\\[\\]]+','_')
+
+        /* add the subject and columnid column to the table if it's not there*/
         if (tablein.getColumn("subject") == null) {
             tablein.putColumn("subject", new ExportColumn("subject", "Subject", "", "string"));
         }
+
+        hascol = tablein.getColumnByBasename(columnname); // check existing column with same basename
+
         if (tablein.getColumn(columnid) == null) {
-            tablein.putColumn(columnid, new ExportColumn(columnid, columnname, "", "number"));
+            tablein.putColumn(columnid, new ExportColumn(columnid, columnname, "", "number", columntooltip));
+            if(hascol)
+                tablein.setColumnUnique(columnid); // make labels unique by expanding
         }
 
         def resource = highDimensionResourceService.getHighDimDataTypeResourceFromConcept(concept_key)
@@ -127,7 +139,7 @@ class HighDimensionQueryService {
     }
 
     /**
-     * Converts a clob to a string for retuirned Oracle columns
+     * Converts a clob to a string for returned Oracle columns
      */
     def String clobToString(clob) {
         if (clob == null) {
