@@ -13,17 +13,17 @@ var GWASPlinkInsView
 
 function showAdditionalPlinkAnalysisOptions() {
     if (jQuery('#analysisType option:selected').val() == "linear") {
-        jQuery('.additionalPlinkAnalysisOptions').each(function(i,e){e.show();});
-        jQuery('.phenotypeOption').each(function(i,e){e.show();});
-        jQuery('.covariatesOption').each(function(i,e){e.show();});
+        jQuery('.additionalPlinkAnalysisOptions').show();
+        jQuery('.phenotypeOption').show();
+        jQuery('.covariatesOption').show();
     } else if (jQuery('#analysisType option:selected').val() == "logistic" ) {
-        jQuery('.additionalPlinkAnalysisOptions').each(function(i,e){e.show();});
-        jQuery('.phenotypeOption').each(function(i,e){e.hide();});
-        jQuery('.covariatesOption').each(function(i,e){e.show();});
+        jQuery('.additionalPlinkAnalysisOptions').show();
+        jQuery('.phenotypeOption').hide();
+        jQuery('.covariatesOption').show();
     } else {
-        jQuery('.additionalPlinkAnalysisOptions').each(function(i,e){e.hide();});
-        jQuery('.phenotypeOption').each(function(i,e){e.show();});
-        jQuery('.covariatesOption').each(function(i,e){e.hide();});
+        jQuery('.additionalPlinkAnalysisOptions').hide();
+        jQuery('.phenotypeOption').show();
+        jQuery('.covariatesOption').hide();
     }
 }
 
