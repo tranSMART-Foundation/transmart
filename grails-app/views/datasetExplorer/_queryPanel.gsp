@@ -58,12 +58,15 @@
     <g:set var="providerName" value="${grailsApplication.config?.com?.recomdata?.providerName}"/>
     <g:set var="providerLogo" value="${grailsApplication.config?.com?.recomdata?.providerLogo}"/>
     <g:if test="${projectName}">
-        <g:if test="${projectLogo}">
-            <img src="${projectLogo}" alt="${projectName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
-        </g:if>
-	<g:else>
-            <img src="${resource(dir: 'images', file: 'project_logo.png')}" alt="${projectName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
-        </g:else>
+        <a id="projectpowered" target="_blank" href="${grailsApplication.config?.com?.recomdata?.projectURL}"
+           style="text-decoration: none;">
+            <g:if test="${projectLogo}">
+                <img src="${projectLogo}" alt="${projectName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
+            </g:if>
+	    <g:else>
+                <img src="${resource(dir: 'images', file: 'project_logo.png')}" alt="${projectName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
+            </g:else>
+	</a>
     </g:if>
     <g:if test="${projectName && providerName}">
         <span style="font-size:20px;display: inline-block;line-height: 35px; height: 35px;">&nbsp;+&nbsp;</span>
