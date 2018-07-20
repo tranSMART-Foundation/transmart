@@ -227,15 +227,17 @@ class ConfigService {
             'com.recomdata.smallLogo': [
                 desc:'application logo to be used in the search page (path appended to transmart URL)'],
             'com.recomdata.projectName': [
-                desc:'Project name for welcome screen'],
+                desc:'Project name for welcome/login/query screens'],
             'com.recomdata.projectLogo': [
-                desc:'Project logo for welcome screen'],
+                desc:'Project logo for welcome/login/query screens'],
+            'com.recomdata.projectURL': [
+                desc:'Project URL for link on welcome/login/query pages'],
             'com.recomdata.providerName': [
-                desc:'Provider name for welcome screen'],
+                desc:'Provider name for welcome/login/query screens'],
             'com.recomdata.providerLogo': [
-                desc:'Provider logo for welcome screen'],
+                desc:'Provider logo for welcome/login/query screens'],
             'com.recomdata.providerURL': [
-                desc:'Provider URL for link on welcome page'],
+                desc:'Provider URL for link on welcome/login/query pages'],
             'com.recomdata.skipdisclaimer': [
                 desc:'If true, do not show the disclaimer text on welcome screen'],
             'com.recomdata.disclaimer': [
@@ -741,6 +743,7 @@ class ConfigService {
             else if(k == "com.recomdata.smallLogo"){addConfig(generalParams,k,v,'')} 
             else if(k == "com.recomdata.projectName"){addConfig(generalParams,k,v,'')}
             else if(k == "com.recomdata.projectLogo"){addConfig(generalParams,k,v,'')}
+            else if(k == "com.recomdata.projectURL"){addConfig(generalParams,k,v,'')}
             else if(k == "com.recomdata.providerName"){addConfig(generalParams,k,v,'')}
             else if(k == "com.recomdata.providerLogo"){addConfig(generalParams,k,v,'')}
             else if(k == "com.recomdata.providerURL"){addConfig(generalParams,k,v,'')}
@@ -1051,6 +1054,7 @@ class ConfigService {
             else if(k == "com.recomdata.searchtool.genegoURL"){addConfig(searchParams,k,v,'')}
 
             // smartr
+            else if(k == "smartR.baseDir"){addConfig(smartrParams,k,v,'')}
             else if(k == "smartR.remoteScriptDirectory"){addConfig(smartrParams,k,v,'')}
             else if(k == "grails.plugin.transmartGwasPlink.enabled"){addConfig(smartrParams,k,v,'')}
 
