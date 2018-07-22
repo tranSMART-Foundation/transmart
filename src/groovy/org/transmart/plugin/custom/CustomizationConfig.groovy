@@ -21,7 +21,7 @@ class CustomizationConfig implements InitializingBean {
 	@Value('${edu.harvard.transmart.access.level1:}')
 	String accessLevel1
 
-	@Value('${com.recomdata.searchtool.appTitle:}')
+	@Value('${com.recomdata.appTitle:}')
 	String appTitle
 
 	@Value('${edu.harvard.transmart.email.logo:}')
@@ -54,11 +54,14 @@ class CustomizationConfig implements InitializingBean {
 	@Value('${loginBannerMessage:Please Login Below.}')
 	String loginBannerMessage
 
-	@Value('${edu.harvard.transmart.email.support:}')
+	@Value('${com.recomdata.contactUs:}')
 	String supportEmail
 
 	@Value('${com.recomdata.userSignupEnabled:true}')
 	boolean userSignupEnabled
+
+	@Value('${edu.harvard.transmart.instance.quickstarturl:}')
+	String quickStartUrl
 
 	@Value('${edu.harvard.transmart.instance.userguideurl:http://s3.amazon.com/dbmi-public-docs/i2b2_transmart_userguide.pdf}')
 	String userGuideUrl
