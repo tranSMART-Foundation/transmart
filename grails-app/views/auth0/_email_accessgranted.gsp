@@ -23,17 +23,10 @@
 						<br />
 						<div id="divBodyText" class="body-text">
 							The administrator has granted you <strong>${levelName}</strong> access for <b>${instanceName}</b> data.<br /><br />
-							<transmart:ifLevelOne user="${user}">
-							<b>Level 1</b> access allows you to obtain aggregate data by running statistical analysis through the web interface.<br /><br />
-							Should you wish to download patient-level data for your research after viewing the aggregate data, you will need to apply for <i>Level 2</i> access, requiring an approved IRB protocol.<br />
-							</transmart:ifLevelOne>
-							<transmart:ifLevelTwo user="${user}">
-							In addition to viewing aggregate data and running statistical analysis, Level 2 access will allow you to investigate patient-level data and download certain data as well.<br />
-							</transmart:ifLevelTwo>
-							<transmart:ifLevelAdmin user="${user}">
-							The <b>${levelName}</b> access will allow you, in addition to viewing aggregate data and running statistical analysis, to get patient level data, download the data and perform user administration.<br />
-							</transmart:ifLevelAdmin>
-							<br />
+							<transmart:ifLevelOne user="${user}">${level1EmailMessage}</transmart:ifLevelOne>
+							<transmart:ifLevelTwo user="${user}">${level2EmailMessage}</transmart:ifLevelTwo>
+							<transmart:ifLevelAdmin user="${user}">${adminEmailMessage}</transmart:ifLevelAdmin>
+							<br /><br />
 							To learn more about the application, please visit our <a href="${userGuideUrl}">User's Guide</a><br />
 							<br />
 							<div class="text-center">

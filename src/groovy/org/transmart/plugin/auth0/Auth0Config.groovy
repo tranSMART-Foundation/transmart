@@ -41,6 +41,15 @@ class Auth0Config implements InitializingBean {
 	@Value('${edu.harvard.transmart.captcha.verifyurl:}')
 	String captchaVerifyUrl
 
+	@Value('${edu.harvard.transmart.auth0.emailMessage.level1:}')
+	String level1EmailMessage
+
+	@Value('${edu.harvard.transmart.auth0.emailMessage.level2:}')
+	String level2EmailMessage
+
+	@Value('${edu.harvard.transmart.auth0.emailMessage.admin:}')
+	String adminEmailMessage
+
 	@Autowired private AuthService authService
 	@Autowired private CustomizationConfig customizationConfig
 	@Autowired private ServletContext servletContext

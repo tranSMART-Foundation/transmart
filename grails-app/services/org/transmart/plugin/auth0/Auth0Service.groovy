@@ -1,6 +1,5 @@
 package org.transmart.plugin.auth0
 
-import au.com.bytecode.opencsv.CSVParser
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
@@ -476,6 +475,9 @@ class Auth0Service implements InitializingBean {
 				supportEmail         : customizationConfig.supportEmail,
 				userGuideUrl         : customizationConfig.userGuideUrl,
 				levelName            : newLevel.description,
+				level1EmailMessage   : auth0Config.level1EmailMessage,
+				level2EmailMessage   : auth0Config.level2EmailMessage,
+				adminEmailMessage    : auth0Config.adminEmailMessage,
 				user                 : user])
 		sendEmail user.email, 'Access Granted', body
 	}
