@@ -17,7 +17,6 @@
 			<table id="table600" border="0" width="600" cellpadding="0" cellspacing="0" class="container">
 				<tr>
 					<td id="tdLogo" class="container-padding content" align="left">
-						<img src="${emailLogo}" height="50px"/><br/>
 						<hr />
 						<div id="divTitle" class="title">Access Granted</div>
 						<br />
@@ -27,7 +26,8 @@
 							<transmart:ifLevelTwo user="${user}">${level2EmailMessage}</transmart:ifLevelTwo>
 							<transmart:ifLevelAdmin user="${user}">${adminEmailMessage}</transmart:ifLevelAdmin>
 							<br /><br />
-							To learn more about the application, please visit our <a href="${userGuideUrl}">User's Guide</a><br />
+							To learn more about the application, please visit our <g:if test="${quickStartUrl}"><a href="${quickStartUrl}">Quick Start Guide</a> and our</g:if> <a href="${userGuideUrl}">User's Guide</a>
+							<br />
 							<br />
 							<div class="text-center">
 								<p>Now you can <br /><br />

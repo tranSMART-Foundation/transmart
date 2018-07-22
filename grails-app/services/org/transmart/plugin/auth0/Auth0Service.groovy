@@ -473,6 +473,7 @@ class Auth0Service implements InitializingBean {
 				emailLogo            : customizationConfig.emailLogo,
 				instanceName         : customizationConfig.instanceName,
 				supportEmail         : customizationConfig.supportEmail,
+				quickStartUrl        : customizationConfig.quickStartUrl,
 				userGuideUrl         : customizationConfig.userGuideUrl,
 				levelName            : newLevel.description,
 				level1EmailMessage   : auth0Config.level1EmailMessage,
