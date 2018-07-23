@@ -63,7 +63,7 @@ class CustomizationConfig implements InitializingBean {
 	@Value('${edu.harvard.transmart.instance.quickstarturl:}')
 	String quickStartUrl
 
-	@Value('${edu.harvard.transmart.instance.userguideurl:http://s3.amazon.com/dbmi-public-docs/i2b2_transmart_userguide.pdf}')
+	@Value('${edu.harvard.transmart.instance.userguideurl:}')
 	String userGuideUrl
 
 	@Autowired private CustomizationService customizationService
