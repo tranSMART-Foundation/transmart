@@ -239,9 +239,11 @@ class Auth0Service implements InitializingBean {
 			}
 		}
 		else {
-			credentials.username = UUID.randomUUID().toString()
-			createUser credentials, uniqueId
-			credentials.level = UserLevel.UNREGISTERED
+			if (auth0Config.registrationEnabled) {
+				credentials.username = UUID.randomUUID().toString()
+				createUser credentials, uniqueId
+				credentials.level = UserLevel.UNREGISTERED
+			}
 		}
 
 		currentRequest().session.setAttribute CREDENTIALS_KEY, credentials
