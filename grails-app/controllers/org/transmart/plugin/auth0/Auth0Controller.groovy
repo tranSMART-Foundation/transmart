@@ -31,12 +31,12 @@ import java.text.SimpleDateFormat
 @Slf4j('logger')
 class Auth0Controller implements InitializingBean {
 
-	// TODO providers shouldn't be hard-coded
-	private static final Map<String, String> auth0Providers = [Google                  : 'google-oauth2|',
-	                                                           GitHub                  : 'github|',
-	                                                           ORCiD                   : 'oauth2|ORCiD|',
-	                                                           'Harvard Medical School': 'samlp|',
-	                                                           'eRA Commons'           : 'samlp|']
+	private static final List<UserLevel> USER_LEVELS
+	static {
+		List<UserLevel> userLevels = UserLevel.values() as List
+		userLevels.remove UserLevel.UNREGISTERED
+		USER_LEVELS = userLevels.asImmutable()
+	}
 
 	static allowedMethods = [adminUserSave: 'POST', adminUserUpdate: 'POST', checkTOS: 'POST']
 
@@ -347,7 +347,7 @@ class Auth0Controller implements InitializingBean {
 					'Email address is required'
 		}
 
-		authUser.uniqueId = auth0Providers[params.auth0Provider]
+		authUser.uniqueId = Auth0Service.auth0Providers[params.auth0Provider]
 		String providerId = params.uniqueId ?: ''
 		if (providerId) {
 			authUser.uniqueId += providerId
@@ -387,7 +387,7 @@ class Auth0Controller implements InitializingBean {
 	private Map buildPersonModel(AuthUser authUser, UserLevel userLevel = null) {
 		Map description = (Map) JSON.parse(authUser.description ?: '{}')
 
-		Map.Entry<String, String> auth0ProviderEntry = auth0Providers.entrySet().find { Map.Entry<String, String> entry ->
+		Map.Entry<String, String> auth0ProviderEntry = Auth0Service.auth0Providers.entrySet().find { Map.Entry<String, String> entry ->
 			authUser.uniqueId?.startsWith entry.value
 		}
 		String providerId = (auth0ProviderEntry ? authUser.uniqueId - auth0ProviderEntry.value : '') - '_UNINITIALIZED'
@@ -395,9 +395,10 @@ class Auth0Controller implements InitializingBean {
 		[person        : authUser,
 		 userLevel     : userLevel ?: customizationService.userLevel(authUser),
 		 connection    : description.connection,
-		 auth0Providers: auth0Providers.keySet(),
+		 auth0Providers: Auth0Service.auth0Providers.keySet(),
 		 auth0Provider : auth0ProviderEntry?.key,
-		 uniqueId      : providerId]
+		 uniqueId      : providerId,
+		 userLevels    : USER_LEVELS]
 	}
 
 	protected Map buildAuthModel() {

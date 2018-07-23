@@ -42,6 +42,13 @@ import javax.servlet.http.HttpServletRequest
 @Slf4j('logger')
 class Auth0Service implements InitializingBean {
 
+	// TODO providers shouldn't be hard-coded
+	public static final Map<String, String> auth0Providers = [Google                  : 'google-oauth2|',
+	                                                          GitHub                  : 'github|',
+	                                                          ORCiD                   : 'oauth2|ORCiD|',
+	                                                          'Harvard Medical School': 'samlp|',
+	                                                          'eRA Commons'           : 'samlp|'].asImmutable()
+
 	private static final String CREDENTIALS_KEY = 'auth0Credentials'
 
 	private Algorithm algorithm
@@ -166,6 +173,8 @@ class Auth0Service implements InitializingBean {
 		// 		"user_id":"google-oauth2|..."
 		// }
 
+		logger.debug 'Auth0 user info: {}', userInfo
+
 		String email = determineEmail(userInfo)
 		String uniqueId = determineUniqueId(userInfo)
 
@@ -189,6 +198,7 @@ class Auth0Service implements InitializingBean {
 		}
 
 		List<AuthUser> uninitialized = AuthUser.executeQuery(hql, args)
+		logger.debug 'Auth0 Credentials uninitialized: {} {}', uninitialized*.username, uninitialized*.email
 		boolean foundUninitialized = false
 		if (uninitialized.size() > 1) {
 			// TODO
@@ -199,6 +209,9 @@ class Auth0Service implements InitializingBean {
 		}
 		else {
 			existingUser = userService.findBy('uniqueId', uniqueId)
+			if (existingUser) {
+				logger.debug 'Auth0 Credentials existingUser for uniqueId {}: {}/{}', uniqueId, existingUser.username, existingUser.email
+			}
 		}
 
 		if (existingUser && !email) {
@@ -233,6 +246,7 @@ class Auth0Service implements InitializingBean {
 
 		currentRequest().session.setAttribute CREDENTIALS_KEY, credentials
 
+		logger.debug 'Auth0 Credentials: {}', credentials
 		credentials
 	}
 
@@ -468,18 +482,25 @@ class Auth0Service implements InitializingBean {
 			return
 		}
 
+		Map.Entry<String, String> auth0ProviderEntry = auth0Providers.entrySet().find { Map.Entry<String, String> entry ->
+			user.uniqueId?.startsWith entry.value
+		}
+		String providerId = (auth0ProviderEntry ? user.uniqueId - auth0ProviderEntry.value : '') - '_UNINITIALIZED'
+
 		String body = groovyPageRenderer.render(template: '/auth0/email_accessgranted', model: [
-				appUrl               : appUrl,
-				emailLogo            : customizationConfig.emailLogo,
-				instanceName         : customizationConfig.instanceName,
-				supportEmail         : customizationConfig.supportEmail,
-				quickStartUrl        : customizationConfig.quickStartUrl,
-				userGuideUrl         : customizationConfig.userGuideUrl,
-				levelName            : newLevel.description,
-				level1EmailMessage   : auth0Config.level1EmailMessage,
-				level2EmailMessage   : auth0Config.level2EmailMessage,
-				adminEmailMessage    : auth0Config.adminEmailMessage,
-				user                 : user])
+				adminEmailMessage : auth0Config.adminEmailMessage,
+				appUrl            : appUrl,
+				authProvider      : auth0ProviderEntry?.key,
+				authProviderId    : providerId,
+				emailLogo         : customizationConfig.emailLogo,
+				instanceName      : customizationConfig.instanceName,
+				level1EmailMessage: auth0Config.level1EmailMessage,
+				level2EmailMessage: auth0Config.level2EmailMessage,
+				levelName         : newLevel.description,
+				quickStartUrl     : customizationConfig.quickStartUrl,
+				supportEmail      : customizationConfig.supportEmail,
+				user              : user,
+				userGuideUrl      : customizationConfig.userGuideUrl])
 		sendEmail user.email, 'Access Granted', body
 	}
 

@@ -21,14 +21,18 @@
 						<div id="divTitle" class="title">Access Granted</div>
 						<br />
 						<div id="divBodyText" class="body-text">
-							The administrator has granted you <strong>${levelName}</strong> access for <b>${instanceName}</b> data.<br /><br />
+							The administrator has granted your ${authProvider} account ${authProviderId} <strong>${levelName}</strong> access for <b>${instanceName}</b> data.<br /><br />
 							<transmart:ifLevelOne user="${user}">${level1EmailMessage}</transmart:ifLevelOne>
 							<transmart:ifLevelTwo user="${user}">${level2EmailMessage}</transmart:ifLevelTwo>
 							<transmart:ifLevelAdmin user="${user}">${adminEmailMessage}</transmart:ifLevelAdmin>
 							<br /><br />
-							To learn more about the application, please visit our <g:if test="${quickStartUrl}"><a href="${quickStartUrl}">Quick Start Guide</a> and our</g:if> <a href="${userGuideUrl}">User's Guide</a>
+							<g:if test="${quickStartUrl || userGuideUrl}">To learn more about the application, please visit
+							<g:if test="${quickStartUrl}">our <a href="${quickStartUrl}">${instanceName} Quick Start Guide</a></g:if>
+							<g:if test="${quickStartUrl && userGuideUrl}"> and </g:if>
+							<g:if test="${userGuideUrl}">our <a href="${userGuideUrl}">User's Guide</a></g:if>
 							<br />
 							<br />
+							</g:if>
 							<div class="text-center">
 								<p>Now you can <br /><br />
 								<a href="${appUrl}" class="btn btn-primary">Login to i2b2/tranSMART</a><br /><br />

@@ -40,8 +40,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label>User Level:</label></td>
 					<td valign="top" class="value">
-						<g:select name='userLevel' value="${userLevel}" optionValue='description'
-						          from="${org.transmart.plugin.custom.UserLevel.values()}"/>
+						<g:select name='userLevel' value="${userLevel}" optionValue='description' from="${userLevels}"/>
 					</td>
 				</tr>
 
