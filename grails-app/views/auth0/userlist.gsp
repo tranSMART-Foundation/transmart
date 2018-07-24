@@ -1,4 +1,3 @@
-<%@page import='org.transmart.plugin.custom.UserLevel' %> %{--TODO why isn't the import working?--}%
 <html>
 <head>
 	<meta name="layout" content="admin"/>
@@ -8,7 +7,7 @@
 <div class="body">
 	<h1>AuthUser List</h1>
 	<g:if test="${flash.message}">
-		<div class="message">${flash.message}</div>
+	<div class="message">${flash.message}</div>
 	</g:if>
 	<div class="list">
 		<table>
@@ -46,11 +45,6 @@
 			</tbody>
 		</table>
 	</div>
-
-	<div class="paginateButtons">
-		<g:paginate total="${users.size()}"/>
-	</div>
-
 </div>
 </body>
 </html>
