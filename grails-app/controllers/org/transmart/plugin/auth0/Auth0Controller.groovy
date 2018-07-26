@@ -193,9 +193,11 @@ class Auth0Controller implements InitializingBean {
 	def logout() {
 		accessLog securityService.currentUsername(), 'Logout'
 
+		boolean auth0Login = securityService.authentication() instanceof Auth0JWTToken
+
 		authService.logout()
 
-		if (customizationConfig.guestAutoLogin) {
+		if (customizationConfig.guestAutoLogin || !auth0Login) {
 			redirect action: 'forceAuth'
 		}
 		else {
