@@ -180,17 +180,15 @@ class Auth0Service implements InitializingBean {
 
 		AuthUser existingUser
 
-		String uniqueIdRoot = uniqueId.substring(0, uniqueId.lastIndexOf('|') + 1)
-
 		Map args = [:]
 		args.uniqueId = uniqueId
-		args.uniqueIdUninit = uniqueIdRoot + '%UNINITIALIZED'
+		args.uniqueIdUninit = uniqueId + '_UNINITIALIZED'
 		String hql = '''
 				select u from AuthUser u
 				where u.passwd='auth0'
 				  and u.enabled=false
 				  and u.description is null
-				  and (u.uniqueId=:uniqueId or u.uniqueId like :uniqueIdUninit)
+				  and (u.uniqueId=:uniqueId or u.uniqueId=:uniqueIdUninit)
 				 '''
 		if (email) {
 			hql += ' and lower(u.email)=:email'
