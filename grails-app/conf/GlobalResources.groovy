@@ -7,7 +7,7 @@ def envSwitch = { devValue, otherValue ->
 modules = {
     main_mod {
         dependsOn 'jquery-ui'
-        resource url: 'images/searchtool.ico'
+        resource url: 'images/transmart.ico'
         resource url: 'css/main.css'
         resource url: 'css/sanofi.css'
     }

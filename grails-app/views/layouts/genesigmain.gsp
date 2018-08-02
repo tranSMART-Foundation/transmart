@@ -2,8 +2,8 @@
 <head>
     <title><g:layoutTitle default="Gene Signature"/></title>
 
-    <link href="${resource(dir: 'images', file: 'searchtool.ico')}" rel="shortcut icon" />
-    <link href="${resource(dir: 'images', file: 'searchtool.ico')}" rel="icon" />
+    <link href="${resource(dir: 'images', file: 'transmart.ico')}" rel="shortcut icon" />
+    <link href="${resource(dir: 'images', file: 'transmart.ico')}" rel="icon" />
 
     <g:javascript library="jquery" />
     <r:require module="signatureTab" />

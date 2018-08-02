@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link rel="shortcut icon" href="${resource(dir: 'images', file: 'searchtool.ico')}">
-    <link rel="icon" href="${resource(dir: 'images', file: 'searchtool.ico')}">
+    <link rel="shortcut icon" href="${resource(dir: 'images', file: 'transmart.ico')}">
+    <link rel="icon" href="${resource(dir: 'images', file: 'transmart.ico')}">
     <link rel="stylesheet" href="${resource(dir: 'css', file: 'main.css')}">
     <title>${grailsApplication.config.com.recomdata.appTitle}</title>
 </head>

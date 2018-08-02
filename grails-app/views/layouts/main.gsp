@@ -2,8 +2,8 @@
 <head>
     <title>Transmart</title>
 
-    <link href="${resource(dir: 'images', file: 'searchtool.ico')}" rel="shortcut icon" />
-    <link href="${resource(dir: 'images', file: 'searchtool.ico')}" rel="icon" />
+    <link href="${resource(dir: 'images', file: 'transmart.ico')}" rel="shortcut icon" />
+    <link href="${resource(dir: 'images', file: 'transmart.ico')}" rel="icon" />
     <link href="${resource(dir: 'css', file: 'main.css')}" rel="stylesheet" />
 
     <g:javascript library="jquery" />

@@ -7,8 +7,8 @@
 
 <title>${grailsApplication.config.com.recomdata.appTitle}</title>
 
-<link href="${resource(dir: 'images', file: 'searchtool.ico')}" rel="shortcut icon" />
-<link href="${resource(dir: 'images', file: 'searchtool.ico')}" rel="icon" />
+<link href="${resource(dir: 'images', file: 'transmart.ico')}" rel="shortcut icon" />
+<link href="${resource(dir: 'images', file: 'transmart.ico')}" rel="icon" />
 
 <g:javascript library="jquery" />
 <r:require module="browseTab" />
