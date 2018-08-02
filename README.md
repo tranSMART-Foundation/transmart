@@ -22,12 +22,8 @@ This repository is a set of make files and scripts for:
 The current schema is the one necessary to support the
 [`master` branch][master] of transmart (release 16.3) for Oracle and Postgres
 
-This goal is to have this project displace `transmart-DB` by providing a better
-way to manage the tranSMART database.
-
-This project does not handle database upgrades and is therefore more adequate
-for development. Using [Liquibase][liquibase] here or some other more ad hoc
-solution for that problem is being studied.
+Database update scripts are included to migrate the schema from
+version 1.2.4 to 16.2 to 16.2 to 16.3 for postgres and oracle.
 
 A script is available that can compare dumps from two databases,
 intended for an installed copy to be compared to the latest
@@ -41,10 +37,8 @@ The following are required:
 * GNU make
 * PostgreSQL client utilities (`psql`, `psql_dump`, etc.)
 * curl
-* php (>= 5.4)
+* php (>= 5.4 or >= 7 for Ubuntu 16 onwards)
 * tar with support for the -J switch (GNU tar only?)
-* An up-to-date checkout of the [`tranSMART-ETL` repository][ts_etl]. Revision
-  e712fcd7 is necessary for Faceted Search support (ETL only)
 * Groovy (>= 2.1). Can be installed with `make -C env groovy` and updating the
   `PATH` (Oracle and some secondary functionality only)
 * [Kettle][kettle] (ETL only)
@@ -57,6 +51,11 @@ install all these dependencies by running
 
     sudo make -C env ubuntu_deps_root
 	make -C env ubuntu_deps_regular
+
+Using Ubuntu 16 you can run
+
+    sudo make -C env ubuntu_deps_root16
+	make -C env ubuntu_deps_regular16
 
 which will also prepare some directories for the tablespaces and assign them the
 correct ownership .
@@ -71,7 +70,7 @@ Start with copying the `vars.sample` file, editing it and sourcing it in:
     # edit file and save...
 	. ./vars
 
-If you ran `make -C env ubuntu_deps_regular`, you will have a `vars` file
+If you ran `make -C env ubuntu_deps_regular` or `make -C env ubuntu_deps_regular16`, you will have a `vars` file
 created for you. You can skip the previous step and do only:
 
     . ./vars
@@ -80,10 +79,15 @@ The several options are fairly self-explanatory.
 
 ### PostgreSQL-specific notes
 
-The configured PostgreSQL user must be a database superuser. You can connect to
-PostgreSQL with UNIX sockets by specifying the parent directory of the socket
-in `PGHOST`. In that case, `localhost` will be used in the situation where UNIX
-sockets are not supported, such as for JDBC connections.
+Release 16.3 of tranSMART supports postgreSQL version 9.6. Earlier
+releases work with versions up to postgreSQL 9.5.
+
+
+The configured PostgreSQL user must be a database superuser. You can
+connect to PostgreSQL with UNIX sockets by specifying the parent
+directory of the socket in `PGHOST`. In that case, `localhost` will be
+used in the situation where UNIX sockets are not supported, such as
+for JDBC connections.
 
 The variable `$TABLESPACES` is the parent directory for where the tablespaces
 will be created in the PostgreSQL server's filesystem.
@@ -185,14 +189,16 @@ For instance, a clinical data tarball could contain the following tree:
 `-- clinical.params
 ```
 
-Feeds are listed in `samples/studies/public-feeds` and, optionally, in a
-git-ignored `private-feeds`, in the root of the project. Each file contains a
+Feeds are listed in `samples/studies/public-feeds` and, optionally, in
+a git-ignored `private-feeds` in the root of the project. The
+`private-feeds` file can be used to list directories containing local
+studeis arvived in .xz files as described above. Each file contains a
 list of feeds in the following format:
 ```
 <feed type> <type-specific feed location data>
 ```
 
-The two supported feed types right now are `http-index` and `ftp-flat`.
+The two supported feed types are `http-index` and `ftp-flat`.
 Examples:
 ```
 http-index http://studies.thehyve.net/datasets_index
@@ -243,11 +249,17 @@ Do not forget to update your Solr index, if your setup requires it to be
 triggered manually.
 
 ### For MacOSX
-The loading scripts use the -e option from the  function readlink. This is a function that is not in the readlink that is installed on Mac OSX, to bypass this problem you are required to install greadlink (stands for GNU readlink). After installing greadlink edit ~/transmart-data/samples/postgres/process_params.inc and on change readlink to greadlink (line 20). Save the changes and the upload should work.
+The loading scripts use the -e option from the function readlink. This
+is a function that is not in the readlink that is installed on Mac
+OSX. To bypass this problem you are required to install greadlink
+(stands for GNU readlink). After installing greadlink edit
+~/transmart-data/samples/postgres/process_params.inc and change
+readlink to greadlink (line 20). Save the changes and the upload
+should work.
 
 ### Starting Solr
 
-To start a Solr instance with one core for Faceted Search and another for the
+To start a Solr instance with three cores for the browse tab, faceted search and
 sample explorer:
 
     make -C solr start
@@ -256,15 +268,17 @@ Once it is running, you can run full imports with:
 
 	make -C solr browse_full_import rwg_full_import sample_full_import
 
-The Faceted Search core also supports delta imports:
+The three cores also support delta imports:
 
-    make -C solr rwg_delta_import
+    make -C solr browse_delta_import rwg_delta_import sample_delta_import
 
 Due to different functionality in tranSMART versions targeting each RDBMS,
 there's a separate Solr core for Oracle:
 
     ORACLE=1 make -C solr start
-	ORACLE=1 make -C solr sanofi_full_import
+    ORACLE=1 make -C solr sanofi_full_import
+
+If you have sourced the vars file, the ORACLE variable should be already defined.
 
 Document (e.g. PDFs) reindexing has a special procedure.
 
