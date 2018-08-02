@@ -142,10 +142,15 @@ data-integration/.keep: $(KETTLE_ARCHIVE)
 	php -d variables_order=E $< > $@
 
 ubuntu_deps_root: install_ubuntu_packages /var/lib/postgresql/tablespaces
+
+ubuntu_deps_root16: install_ubuntu_packages16 /var/lib/postgresql/tablespaces
+
 # Note: in the release case - we are making a strong assumption that tranSMART-ETL
 #   already exists, is NOT a git archive, and can not be updated
 # ubuntu_deps_regular: update_etl data-integration ../vars groovy
 ubuntu_deps_regular: data-integration ../vars groovy
+
+ubuntu_deps_regular16: data-integration ../vars groovy
 
 .DELETE_ON_ERROR:
 
