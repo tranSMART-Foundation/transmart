@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 
 class FractalisController {
 
-	private static final List<String> scripts = ['fractalis', 'resources/fractal-0.6.0.min'].asImmutable()
+	private static final List<String> scripts = ['fractalis', 'resources/fractal.min'].asImmutable()
 	private static final List<String> styles = ['fractalis'].asImmutable()
 
 	@Value('${fractalis.dataSource:}')
@@ -49,8 +49,8 @@ class FractalisController {
 	}
 
 	def patients() {
-		String resultInstanceID1 = params.result_instance_id1
-		String resultInstanceID2 = params.result_instance_id2
+		String resultInstanceID1 = request.JSON['result_instance_id1']
+		String resultInstanceID2 = request.JSON['result_instance_id2']
 
 		String subjectIDs1 = ''
 		String subjectIDs2 = ''

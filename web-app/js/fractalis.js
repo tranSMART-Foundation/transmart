@@ -17,35 +17,17 @@ const fractalisPanel = new Ext.Panel({
     method: 'POST',
     scripts: false,
     callback: () => {
-      const conceptBox = document.querySelector('.fjs-concept-box')
       if (fjsService.fjs == null) {
         fjsService.initFractalis().catch(() => {
-          Ext.Msg.alert(` Could not initialize Fractalis.
+          Ext.Msg.alert(`Could not initialize Fractalis.
             This is likely due to a misconfigured setup.
             Please contact your admin.`)
         })
       }
-      fjsService.activateDragAndDrop(conceptBox)
-      fjsService.observeConceptBox(conceptBox)
     }
   },
   listeners: {
-    deactivate: () => {
-      fjsService.resetUrl()
-    },
-    activate: () => {
-      const conceptBox = document.querySelector('.fjs-concept-box')
-      fjsService.activateDragAndDrop(conceptBox)
-      fjsService.setUrl()
-      fjsService.showLoadingScreen(true)
-      fjsService.getPatientIDs()
-        .then(ids => {
-          const subset1 = ids.subjectIDs1.split(',')
-          const subset2 = ids.subjectIDs2.split(',')
-          fjsService.fjs.setSubsets([subset1, subset2])
-        }, error => Ext.Msg.alert('Could not retrieve patient ids. Reason: ' + error))
-        .then(() => fjsService.showLoadingScreen(false))
-    }
+    activate: () => { fjsService.activate() }
   }
 })
 
@@ -54,9 +36,10 @@ const fjsService = {
   settings: null,
   chartWidth: '30vw',
   chartHeight: '30vw',
+  conceptBoxObserver: null,
 
   async initFractalis () {
-    this.settings = await this.fetchAsync('settings')
+    this.settings = await this.fetchAsync('settings', 'GET')
     this.fjs = window.fractal.init({
       handler: 'pic-sure',
       dataSource: this.settings.dataSource,
@@ -69,6 +52,19 @@ const fjsService = {
         controlPanelExpanded: true
       }
     })
+  },
+
+  activate () {
+    let conceptBox, spinner
+    if ((conceptBox = document.querySelector('.fjs-concept-box')) == null
+        || (spinner = document.querySelector('.fjs-spinner')) == null
+        || window.dropOntoCategorySelection == null) {
+      setTimeout(this.activate, 1000)
+      return
+    }
+    fjsService.getPatientIDs()
+    fjsService.activateDragAndDrop(conceptBox)
+    fjsService.observeConceptBox(conceptBox)
   },
 
   resetView () {
@@ -85,25 +81,26 @@ const fjsService = {
     })
   },
 
-  async fetchAsync (action) {
-    return (await window.fetch(window.pageInfo.basePath + '/fractalis/' + action,
-      {method: 'GET', redirect: 'follow', credentials: 'same-origin'})).json()
+  async fetchAsync (action, method, data) {
+    return (await window.fetch(window.pageInfo.basePath + '/fractalis/' + action, {
+      method: method,
+      redirect: 'follow',
+      credentials: 'same-origin',
+      body: typeof data !== 'object' || method !== 'POST' ? undefined : JSON.stringify(data)
+    })).json()
   },
 
   activateDragAndDrop (conceptBox) {
-    if (typeof window.dropOntoCategorySelection === 'undefined' || window.dropOntoCategorySelection == null) {
-      window.setTimeout(() => {
-        this.activateDragAndDrop(conceptBox)
-      }, 500)
-      return
-    }
     const extObj = Ext.get(conceptBox)
     const dtgI = new Ext.dd.DropTarget(extObj, {ddGroup: 'makeQuery'})
     dtgI.notifyDrop = window.dropOntoCategorySelection
   },
 
   observeConceptBox (conceptBox) {
-    const observer = new window.MutationObserver(targets => {
+    if (this.conceptBoxObserver != null) {
+      this.conceptBoxObserver.disconnect()
+    }
+    this.conceptBoxObserver = new MutationObserver(targets => {
       targets.forEach(target => {
         Array.prototype.forEach.call(target.addedNodes, node => {
           const attr = this.getConceptAttributes(node)
@@ -117,7 +114,7 @@ const fjsService = {
         })
       })
     })
-    observer.observe(conceptBox, {childList: true})
+    this.conceptBoxObserver.observe(conceptBox, {childList: true})
   },
 
   getConceptAttributes (node) {
@@ -151,35 +148,6 @@ const fjsService = {
     return split[split.length - 2] + '/' + split[split.length - 1]
   },
 
-  chartStates: {},
-  setUrl () {
-    return // FIXME
-    const url = window.pageInfo.basePath + '/fractalis/state/' + Object.values(this.chartStates).join('+')
-    window.history.pushState(null, '', url)
-  },
-
-  resetUrl () {
-    return // FIXME
-    const url = window.pageInfo.basePath + '/datasetExplorer'
-    window.history.pushState(null, '', url)
-  },
-
-  handleStateIDs (stateIDs) {
-    return // FIXME
-    Ext.Msg.alert('The url you specified contains a Fractalis state.\n' +
-      'We will attempt to recover the associated charts and inform you once this has been done.')
-    Promise.all(stateIDs.map(stateID => {
-      const chartID = this.addChartContainer()
-      return this.fjs.id2chart('#' + chartID, stateID)
-    })).then(() => {
-      Ext.Msg.alert('All charts have been successfully recovered. Please proceed to the Fractalis tab.')
-    }).catch(e => {
-      Ext.Msg.alert('Could not recover one or more charts from URL.\n' +
-        'Contact your administrator if this issue persists. Error: ' + e.toString())
-    })
-    this.setUrl()
-  },
-
   addChartContainer () {
     const chart = document.createElement('div')
     const container = document.querySelector('.fjs-placeholders')
@@ -192,11 +160,7 @@ const fjsService = {
 
   setChart () {
     const chartID = this.addChartContainer()
-    const vm = this.fjs.setChart(document.querySelector('.fjs-analysis-select').value, '#' + chartID)
-    this.fjs.chart2id(vm, id => {
-      this.chartStates[chartID] = id
-      this.setUrl()
-    })
+    this.fjs.setChart(document.querySelector('.fjs-analysis-select').value, '#' + chartID)
   },
 
   clearCache () {
@@ -205,18 +169,21 @@ const fjsService = {
   },
 
   getPatientIDs () {
-    const dfd = jQuery.Deferred()
+    this.showLoadingScreen(true)
     window.runAllQueries(() => {
-      jQuery.ajax({
-        url: window.pageInfo.basePath + '/fractalis/patients',
-        type: 'POST',
-        data: {
-          result_instance_id1: window.GLOBAL.CurrentSubsetIDs[1],
-          result_instance_id2: window.GLOBAL.CurrentSubsetIDs[2]
-        }
-      }).then(res => dfd.resolve(res))
+      this.fetchAsync('patients', 'POST', {
+        result_instance_id1: window.GLOBAL.CurrentSubsetIDs[1],
+        result_instance_id2: window.GLOBAL.CurrentSubsetIDs[2]
+      })
+      .then(ids => {
+        const subset1 = ids.subjectIDs1.split(',')
+        const subset2 = ids.subjectIDs2.split(',')
+        fjsService.fjs.setSubsets([subset1, subset2])
+      })
+      .then(() => {
+        this.showLoadingScreen(false)
+      })
     })
-    return dfd.promise()
   },
 
   showLoadingScreen (bb) {

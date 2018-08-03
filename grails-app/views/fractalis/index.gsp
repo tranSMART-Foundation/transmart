@@ -25,9 +25,11 @@
         <div style="text-align: center;">
             <select class="fjs-analysis-select" data-placeholder="1">
                 <option selected disabled>--Choose an analysis--</option>
-                <option value="correlation-analysis">Correlation Analysis</option>
-                <option value="boxplot">Boxplot Analysis</option>
-                <option value="pca-analysis">Principle Component Analysis</option>
+                <option value="scatterplot">Scatterplot</option>
+                <option value="boxplot">Boxplot</option>
+                <option value="pca">Principle Component Analysis</option>
+                <option value="survivalplot">Survival Analysis</option>
+                <option value="histogram">Histogram</option>
             </select>
             <input type="button" value="Add" onclick="fjsService.setChart()"/>
             <br/>
