@@ -1,6 +1,7 @@
 package org.transmart.plugin.fractalis
 
 import grails.converters.JSON
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -20,6 +21,7 @@ class FractalisController {
 	private String resourceName
 
 	def i2b2HelperService
+	LinkGenerator linkGenerator
 
 	def index() {}
 
@@ -32,12 +34,12 @@ class FractalisController {
 
 		// for all js files
 		for (file in scripts) {
-			rows << [path: servletContext.contextPath + pluginContextPath + '/js/' + file + '.js', type: "script"]
+			rows << [path: resource(dir: 'js', file: file + '.js'), type: "script"]
 		}
 
 		// for all css files
 		for (file in styles) {
-			rows << [path: servletContext.contextPath + pluginContextPath + '/css/' + file + '.css', type: "css"]
+			rows << [path: resource(dir: 'css', file: file + '.css'), type: "css"]
 		}
 
 		render([success: true, totalCount: scripts.size(), files: rows] as JSON)
