@@ -1,122 +1,121 @@
-.fjs-concept-box {
+.fjs-tm-control-elements {
+    text-align: center;
+}
+
+.fjs-tm-control-elements > div {
+    margin-bottom: 2vh;
+}
+
+.fjs-tm-button {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    touch-action: manipulation;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #333;
+    background: #fff none;
+}
+
+.fjs-tm-button:hover {
+    background: #ddd none;
+}
+
+.fjs-tm-headline {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.fjs-tm-concept-box {
     height: 10vh;
     overflow-y: auto;
     border-radius: 8px;
     box-shadow: inset 0 0 5px #000;
+    width: 50%;
+    margin: auto;
 }
 
-.fjs-placeholders {
+.fjs-tm-charts {
     display: flex;
     flex-wrap: wrap;
 }
 
-.fjs-transmart > hr {
-    margin: 2vh 0 2vh 0;
-}
-
-.fjs-block-0 {
-    text-align: center;
-    font-weight: bold;
-    padding: 0 1vw 0 1vw;
-}
-
-.fjs-block-1 {
-    display: flex;
-    padding: 0 1vw 0 1vw;
-}
-
-.fjs-block-1 > div {
-    width: 50%;
-    padding: 0 1vw 0 1vw;
-}
-
-.fjs-block-2 {
-    display: flex;
-    padding: 0 1vw 0 1vw;
-}
-
-.fjs-block-2 > div {
-    width: 50%;
-    padding: 1vh 1vw 1vh 1vw;
-}
-
-.fjs-block-3 {
-    padding: 0 1vw 0 1vw;
-}
-
-.fjs-block-4 {
-    display: flex;
-}
-
-.fjs-fieldset {
-    margin: 5px;
-    border: none;
-}
-
-.fjs-fieldset > legend {
-    font-weight: bold;
-}
-
-.fjs-fade-out {
+.fjs-tm-fade-out {
     visibility: hidden;
     opacity: 0;
     transition: visibility 0s 2s, opacity 2s linear;
 }
 
-.fjs-spinner {
+.fjs-tm-block {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 99999;
+}
+
+.fjs-tm-spinner {
     margin: 100px auto;
     width: 50px;
     height: 40px;
     text-align: center;
     font-size: 10px;
-    display: none;
+    display: block;
 }
 
-.fjs-spinner > span {
+.fjs-tm-spinner > span {
     font-size: 2em;
     white-space: nowrap;
-    color: black;
+    color: #fff;
     margin-left: -100%;
     margin-right: -100%;
     text-align: center;
 }
 
-.fjs-spinner > div {
-    background-color: #333;
+.fjs-tm-spinner > div {
+    background-color: #fff;
     height: 100%;
     width: 6px;
     display: inline-block;
 
-    -webkit-animation: fjs-sk-stretchdelay 1.2s infinite ease-in-out;
-    animation: fjs-sk-stretchdelay 1.2s infinite ease-in-out;
+    -webkit-animation: fjs-tm-sk-stretchdelay 1.2s infinite ease-in-out;
+    animation: fjs-tm-sk-stretchdelay 1.2s infinite ease-in-out;
 }
 
-.fjs-spinner .fjs-rect2 {
+.fjs-tm-spinner .fjs-tm-rect2 {
     -webkit-animation-delay: -1.1s;
     animation-delay: -1.1s;
 }
 
-.fjs-spinner .fjs-rect3 {
+.fjs-tm-spinner .fjs-tm-rect3 {
     -webkit-animation-delay: -1.0s;
     animation-delay: -1.0s;
 }
 
-.fjs-spinner .fjs-rect4 {
+.fjs-tm-spinner .fjs-tm-rect4 {
     -webkit-animation-delay: -0.9s;
     animation-delay: -0.9s;
 }
 
-.fjs-spinner .fjs-rect5 {
+.fjs-tm-spinner .fjs-tm-rect5 {
     -webkit-animation-delay: -0.8s;
     animation-delay: -0.8s;
 }
 
-@-webkit-keyframes fjs-sk-stretchdelay {
+@-webkit-keyframes fjs-tm-sk-stretchdelay {
     0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
     20% { -webkit-transform: scaleY(1.0) }
 }
 
-@keyframes fjs-sk-stretchdelay {
+@keyframes fjs-tm-sk-stretchdelay {
     0%, 40%, 100% {
         transform: scaleY(0.4);
         -webkit-transform: scaleY(0.4);

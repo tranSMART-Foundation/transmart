@@ -5,75 +5,71 @@
 
 <body>
 
-<div class="fjs-spinner">
-    <span>Looking for patient ids...</span>
-    <div class="fjs-rect1"></div>
-    <div class="fjs-rect2"></div>
-    <div class="fjs-rect3"></div>
-    <div class="fjs-rect4"></div>
-    <div class="fjs-rect5"></div>
+<div class="fjs-tm-block">
+    <div class="fjs-tm-spinner">
+        <span>Looking for patient ids...</span>
+        <div class="fjs-tm-rect1"></div>
+        <div class="fjs-tm-rect2"></div>
+        <div class="fjs-tm-rect3"></div>
+        <div class="fjs-tm-rect4"></div>
+        <div class="fjs-tm-rect5"></div>
+    </div>
 </div>
 
 <div class="fjs-transmart">
-    <div class="fjs-block-0">
-        <p>Welcome to Fractalis in i2b2/tranSMART 18.1-beta!</p>
-        <p>Fractalis is a de-facto successor to SmartR.</p>
-        <p>More information: <a href="https://fractalis.lcsb.uni.lu/">https://fractalis.lcsb.uni.lu/</a></p>
-    </div>
-    <hr>
-    <div class="fjs-block-1">
-        <div style="text-align: center;">
-            <select class="fjs-analysis-select" data-placeholder="1">
-                <option selected disabled>--Choose an analysis--</option>
-                <option value="scatterplot">Scatterplot</option>
-                <option value="boxplot">Boxplot</option>
-                <option value="pca">Principle Component Analysis</option>
-                <option value="survivalplot">Survival Analysis</option>
-                <option value="histogram">Histogram</option>
-            </select>
-            <input type="button" value="Add" onclick="fjsService.setChart()"/>
-            <br/>
-            <br/>
-            <label>
-                Chart Size:
-                <input type="range" min="10" max="100" value="30" step="5" oninput="fjsService.setChartSize(this.value)"/>
-            </label>
+    <br/>
+    <div class="fjs-tm-control-elements">
+        <span class="fjs-tm-headline">Add chart to view:</span>
+        <div class="fjs-tm-chart-buttons">
+            <button class="fjs-tm-button"
+                    value="scatterplot"
+                    onclick="fjsService.setChart(this.value)">
+                Scatter Plot
+            </button>
+            <button class="fjs-tm-button"
+                    value="boxplot"
+                    onclick="fjsService.setChart(this.value)">
+                Box Plot
+            </button>
+            <button class="fjs-tm-button"
+                    value="pca"
+                    onclick="fjsService.setChart(this.value)">
+                PCA
+            </button>
+            <button class="fjs-tm-button"
+                    value="histogram"
+                    onclick="fjsService.setChart(this.value)">
+                Histogram
+            </button>
+            <button class="fjs-tm-button"
+                    value="survivalplot"
+                    onclick="fjsService.setChart(this.value)">
+                Survival Plot
+            </button>
         </div>
-        <div>
-            <p>
-                <span style="font-weight: bold;">Step 1)</span>
-                Please select what analysis you want to perform.
-                You can add multiple charts in parallel and let them interact with each other!
-            </p>
+
+        <span class="fjs-tm-headline">Set chart size:</span>
+        <div class="fjs-tm-chart-size">
+            <button class="fjs-tm-button" value="10" onclick="fjsService.setChartSize(this.value)">10%</button>
+            <button class="fjs-tm-button" value="20" onclick="fjsService.setChartSize(this.value)">20%</button>
+            <button class="fjs-tm-button" value="30" onclick="fjsService.setChartSize(this.value)">30%</button>
+            <button class="fjs-tm-button" value="40" onclick="fjsService.setChartSize(this.value)">40%</button>
+            <button class="fjs-tm-button" value="50" onclick="fjsService.setChartSize(this.value)">50%</button>
+            <button class="fjs-tm-button" value="60" onclick="fjsService.setChartSize(this.value)">60%</button>
+            <button class="fjs-tm-button" value="70" onclick="fjsService.setChartSize(this.value)">70%</button>
+            <button class="fjs-tm-button" value="80" onclick="fjsService.setChartSize(this.value)">80%</button>
+            <button class="fjs-tm-button" value="90" onclick="fjsService.setChartSize(this.value)">70%</button>
+            <button class="fjs-tm-button" value="100" onclick="fjsService.setChartSize(this.value)">100%</button>
         </div>
-    </div>
-    <hr>
-    <div class="fjs-block-2">
-        <div class="fjs-concept-box"></div>
-        <div>
-            <p>
-                <span style="font-weight: bold;">Step 2)</span>
-                Now please drag all data you want to analyse from the tree on the left into this box here.
-                This will load the selected data into the Fractalis data cache, so that subsequent analyses become really fast!
-            </p>
-            <input type="button" value="Clear analysis cache" style="margin-top: 1vh;" onclick="fjsService.clearCache()"/>
-            <input type="button" value="Reset View" style="margin-top: 1vh;" onclick="fjsService.resetView()"/>
-        </div>
-    </div>
-    <hr>
-    <div class="fjs-block-3">
-        <div>
-            <p>
-                <span style="font-weight: bold;">Step 3)</span>
-                It will take some time to prepare the data for the first time, so this is a good opportunity to learn about the Fractalis control panel.
-                Did you notice the black transparent bar that appeared on the screen? Here you can assign "roles" to the data you loaded into the cache in the first step.
-                E.g. what is your X- and what is your Y-axis in a scatter plot? This panel also lets you set analysis parameters, see currently running jobs, and a couple of other things.
-            </p>
+
+        <span class="fjs-tm-headline">Drop variables of interest:</span>
+        <div class="fjs-tm-concept-box-container">
+            <div class="fjs-tm-concept-box"></div>
         </div>
     </div>
-    <hr>
-    <div class="fjs-placeholders">
-    </div>
+
+    <div class="fjs-tm-charts"></div>
+
 </div>
 </body>
 </html>

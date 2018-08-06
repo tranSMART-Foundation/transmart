@@ -5,7 +5,7 @@ window.addFractalisPanel = parentPanel => parentPanel.insert(4, fractalisPanel)
 
 const fractalisPanel = new Ext.Panel({
   id: 'fractalisPanel',
-  title: 'Fractalis',
+  title: 'Data Analysis (Fractalis)',
   region: 'center',
   split: true,
   height: 90,
@@ -56,8 +56,8 @@ const fjsService = {
 
   activate () {
     let conceptBox, spinner
-    if ((conceptBox = document.querySelector('.fjs-concept-box')) == null
-        || (spinner = document.querySelector('.fjs-spinner')) == null
+    if ((conceptBox = document.querySelector('.fjs-tm-concept-box')) == null
+        || (spinner = document.querySelector('.fjs-tm-spinner')) == null
         || window.dropOntoCategorySelection == null) {
       setTimeout(this.activate, 1000)
       return
@@ -69,13 +69,13 @@ const fjsService = {
 
   resetView () {
     this.initFractalis()
-    document.querySelector('.fjs-placeholders').innerHTML = ''
+    document.querySelector('.fjs-tm-charts').innerHTML = ''
   },
 
   setChartSize (value) {
     this.chartWidth = value + 'vw'
     this.chartHeight = value + 'vw'
-    Array.prototype.forEach.call(document.querySelectorAll('.fjs-placeholders > div'), div => {
+    Array.prototype.forEach.call(document.querySelectorAll('.fjs-tm-charts > div'), div => {
       div.style.width = this.chartWidth
       div.style.height = this.chartHeight
     })
@@ -108,7 +108,7 @@ const fjsService = {
           this.fjs.loadData([descriptor]).then(() => {
             node.innerHTML = '<span>Request has been submitted!</span>'
             node.style.background = '#82ff69'
-            node.className = 'fjs-fade-out'
+            node.className = 'fjs-tm-fade-out'
             window.setTimeout(() => node.remove(), 2000)
           })
         })
@@ -150,22 +150,22 @@ const fjsService = {
 
   addChartContainer () {
     const chart = document.createElement('div')
-    const container = document.querySelector('.fjs-placeholders')
-    chart.id = 'fjs-chart-' + container.children.length
+    const container = document.querySelector('.fjs-tm-charts')
+    chart.id = 'fjs-tm-chart-' + container.children.length
     chart.style.width = this.chartWidth
     chart.style.height = this.chartHeight
     container.appendChild(chart)
     return chart.id
   },
 
-  setChart () {
+  setChart (chartName) {
     const chartID = this.addChartContainer()
-    this.fjs.setChart(document.querySelector('.fjs-analysis-select').value, '#' + chartID)
+    this.fjs.setChart(chartName, '#' + chartID)
   },
 
   clearCache () {
     this.fjs.clearCache()
-    document.querySelector('.fjs-concept-box').innerHTML = ''
+    document.querySelector('.fjs-tm-concept-box').innerHTML = ''
   },
 
   getPatientIDs () {
@@ -187,7 +187,7 @@ const fjsService = {
   },
 
   showLoadingScreen (bb) {
-    const container = document.querySelector('.fjs-spinner')
+    const container = document.querySelector('.fjs-tm-block')
     if (bb) {
       container.style.display = 'block'
     } else {
