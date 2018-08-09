@@ -9,6 +9,7 @@ for those files that are particular to postgres, the directory oracle for those
 files that run on oracle, ane the folder common for files that do not depend on 
 the type of database being upgraded. 
 
-NOTE: in all cases the upgrade is for one version step only. That is, for example,
-the folder labeled release-16.1 is for an upgrade from 1.2.4 to 16.1, a folder labeled
-release-16.2 is be for the upgrade from 16.1 to 16.2, and so on.
+NOTE: in all cases the upgrade is for one version step only. That is,
+for example, the folder labeled release-16.1 is for an upgrade from
+1.2.4 to 16.1, a folder labeled release-16.2 is for the upgrade
+from 16.1 to 16.2, and so on.
