@@ -1,6 +1,6 @@
 <html>
 <head>
-    <link rel="stylesheet" href="${resource(dir: 'css', file: 'fractalis.css')}"/>
+    <link rel="stylesheet" href="${resource(dir: 'css', file: 'fractalis.css', plugin: 'transmart-fractalis')}"/>
 </head>
 
 <body>

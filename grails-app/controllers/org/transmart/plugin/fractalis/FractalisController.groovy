@@ -21,7 +21,6 @@ class FractalisController {
 	private String resourceName
 
 	def i2b2HelperService
-	LinkGenerator linkGenerator
 
 	def index() {}
 
@@ -34,12 +33,12 @@ class FractalisController {
 
 		// for all js files
 		for (file in scripts) {
-			rows << [path: resource(dir: 'js', file: file + '.js'), type: "script"]
+			rows << [path: servletContext.contextPath + pluginContextPath + '/js/' + file + '.js', type: "script"]
 		}
 
 		// for all css files
 		for (file in styles) {
-			rows << [path: resource(dir: 'css', file: file + '.css'), type: "css"]
+			rows << [path: servletContext.contextPath + pluginContextPath + '/css/' + file + '.css', type: "css"]
 		}
 
 		render([success: true, totalCount: scripts.size(), files: rows] as JSON)
