@@ -46,6 +46,11 @@
                     onclick="fjsService.setChart(this.value)">
                 Survival Plot
             </button>
+            <button class="fjs-tm-del-button"
+                    value=""
+                    onclick="fjsService.fjs.removeAllCharts()">
+                Clear View
+            </button>
         </div>
 
         <span class="fjs-tm-headline">Set chart size:</span>
@@ -65,6 +70,10 @@
         <span class="fjs-tm-headline">Drop variables of interest:</span>
         <div class="fjs-tm-concept-box-container">
             <div class="fjs-tm-concept-box"></div>
+            <button class="fjs-tm-del-button"
+                    onclick="fjsService.fjs.clearCache()">
+                Clear Cache
+            </button>
         </div>
     </div>
 
