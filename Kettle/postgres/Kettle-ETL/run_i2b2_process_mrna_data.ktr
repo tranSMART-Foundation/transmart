@@ -321,7 +321,7 @@
     </lookup>
     <result>
       <name>rtnCd</name>
-      <type>Integer</type>
+      <type>Bigint</type>
     </result>
     <auto_commit>Y</auto_commit>
      <cluster_schema/>
