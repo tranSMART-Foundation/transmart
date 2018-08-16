@@ -313,7 +313,7 @@
     <connection>TM_LZ</connection>
     <sql>select coalesce(x.organism,'Homo sapiens') as ORGANISM
 from (select organism, count(*) from LT_PROTEIN_ANNOTATION
-      where gpl_id = '${GPL_ID';
+      where gpl_id = '${GPL_ID}'
       group by organism
       order by count(*) desc) x</sql>
     <limit>1</limit>
