@@ -68,6 +68,7 @@ const fjsService = {
   },
 
   resetView () {
+    this.fjs.removeAllCharts()
     this.initFractalis()
     document.querySelector('.fjs-tm-charts').innerHTML = ''
   },

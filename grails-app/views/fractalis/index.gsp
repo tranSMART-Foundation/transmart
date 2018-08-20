@@ -48,7 +48,7 @@
             </button>
             <button class="fjs-tm-del-button"
                     value=""
-                    onclick="fjsService.fjs.removeAllCharts()">
+                    onclick="fjsService.resetView()">
                 Clear View
             </button>
         </div>
