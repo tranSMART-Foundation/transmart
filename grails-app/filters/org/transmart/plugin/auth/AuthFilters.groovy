@@ -19,7 +19,7 @@ class AuthFilters {
 	def filters = {
 
 		/**
-		 * Automatically store commonly used config vars in the GSP model for /auth9/** urls.
+		 * Automatically store commonly used config vars in the GSP model for /auth0/** urls.
 		 */
 		auth0CommonModel(controller: 'auth0', action: '*') {
 			after = { Map model ->

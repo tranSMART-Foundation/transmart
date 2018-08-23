@@ -404,8 +404,10 @@ class Auth0Controller implements InitializingBean {
 	}
 
 	protected Map buildAuthModel() {
-		[auth0ConnectionCss: auth0Service.webtaskCSS(),
-		 auth0ConnectionJs : auth0Service.webtaskJavaScript(),
+		String webtaskCSS = auth0Config.webtaskBaseUrl ? auth0Service.webtaskCSS() : ''
+		String webtaskJavaScript = auth0Config.webtaskBaseUrl ? auth0Service.webtaskJavaScript() : ''
+		[auth0ConnectionCss: webtaskCSS,
+		 auth0ConnectionJs : webtaskJavaScript,
 		 auth0AdminExists: auth0AdminExists()] + authModel
 	}
 
