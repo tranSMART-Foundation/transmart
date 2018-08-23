@@ -1,13 +1,14 @@
 import org.springframework.context.ApplicationContext
+import org.transmart.plugin.custom.CmsService
 import org.transmart.plugin.custom.CustomizationConfig
 
 class TransmartCustomGrailsPlugin {
 	String version = '18.1-SNAPSHOT'
 	String grailsVersion = '2.3 > *'
-	String title = 'Transmart Customization Plugin'
+	String title = 'tranSMART Customization Plugin'
 	String author = 'Burt Beckwith'
 	String authorEmail = 'burt_beckwith@hms.harvard.edu'
-	String description = 'Transmart Customization Plugin'
+	String description = 'tranSMART Customization Plugin'
 	String documentation = 'TODO'
 	String license = 'APACHE'
 	def organization = [name: 'TODO', url: 'TODO']
@@ -21,5 +22,8 @@ class TransmartCustomGrailsPlugin {
 	def doWithApplicationContext = { ApplicationContext ctx ->
 		CustomizationConfig customizationConfig = ctx.customizationConfig
 		customizationConfig.init()
+
+		CmsService cmsService = ctx.cmsService
+		cmsService.init()
 	}
 }

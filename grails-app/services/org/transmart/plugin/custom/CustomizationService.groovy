@@ -151,7 +151,7 @@ class CustomizationService implements InitializingBean  {
 		logger.debug 'levels {}, controllerDefaultActions {}', levels, controllerDefaultActions
 	}
 
-	@CompileDynamic // TODO use GrailsCompileStatic
+	@CompileDynamic
 	private Settings findSetting(String name, long userId) {
 		Settings.createCriteria().get {
 			eq 'fieldname', name
