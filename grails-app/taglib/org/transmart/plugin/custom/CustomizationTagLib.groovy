@@ -93,33 +93,18 @@ class CustomizationTagLib {
 	// UICustomizationTagLib start
 
 	def useAccessLevelDescription = {
-		out << (customizationConfig.instanceType == 'grdr' ? 'Open Data Access' : 'Level 1 Access')
+		out << 'Level 1 Access'
 	}
 
-	def useAccessLevelMemo = {
-		if (customizationConfig.instanceType == 'grdr') {
-			out << '<div class="description"><p>Although <i>Open Data</i> access does not require prior permission, authorization or review, you are required to <br />register and provide the minimal information as requested in the form below.</p></div>'
-		}
-	}
+	def useAccessLevelMemo = {}
 
 	def useRegisterButton = {
-		if (customizationConfig.instanceType == 'pmsdn') {
-			out << "I agree to the terms and register"
-		}
-		else {
-			out << "Register"
-		}
+		out << 'Register'
 	}
 
 	def useUserGuide = {
-		if (customizationConfig.instanceType == 'grdr') {
-			out << '''<b>NIH NCATS User's Guide</b> is available here: <br /><br /><a href="''' + customizationConfig.userGuideUrl + '">' +
-					customizationConfig.userGuideUrl + '</a><br />'
-		}
-		else {
-			out << 'To learn more about the application, please visit <a href="' + customizationConfig.userGuideUrl + '">' +
-					customizationConfig.userGuideUrl + '</a>.'
-		}
+		out << 'To learn more about the application, please visit <a href="' + customizationConfig.userGuideUrl + '">' +
+				customizationConfig.userGuideUrl + '</a>.'
 	}
 
 	// UICustomizationTagLib end
