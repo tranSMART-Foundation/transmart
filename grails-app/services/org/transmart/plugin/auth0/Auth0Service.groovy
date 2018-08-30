@@ -376,7 +376,7 @@ class Auth0Service implements InitializingBean {
 
 	private void sendSignupEmails(String username, String email, AuthUser authUser, String loginUrl, String appUrl) {
 		Map personDescription = (Map) JSON.parse(authUser.description)
-		String emailLogo = customizationConfig.instanceType == 'pmsdn' ? customizationConfig.pmsdnLogo : customizationConfig.emailLogo
+		String emailLogo = customizationConfig.emailLogo
 		if (!emailLogo.startsWith('data:')) {
 			if (appUrl.endsWith('/') && emailLogo.startsWith('/')) {
 				emailLogo = appUrl + emailLogo.substring(1)
@@ -388,7 +388,7 @@ class Auth0Service implements InitializingBean {
 
 		// Send notification to admin that a user has completed the sign-up form
 		String body = groovyPageRenderer.render(
-				template: '/auth0/email_signup' + customizationConfig.instanceTypeSuffix, model: [
+				template: '/auth0/email_signup', model: [
 				appUrl      : appUrl,
 				emailLogo   : emailLogo,
 				instanceName: customizationConfig.instanceName,

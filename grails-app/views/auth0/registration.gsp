@@ -39,9 +39,9 @@
 		</div>
 		<g:form class="demo-form" action='confirm'>
 			<g:hiddenField name='username' value="${user.username}" />
-			<g:render template="/user/personal${instanceTypeSuffix}"/>
-			<g:render template="/user/professional${instanceTypeSuffix}"/>
-			<g:render template="/user/other${instanceTypeSuffix}"/>
+			<g:render template="/user/personal"/>
+			<g:render template="/user/professional"/>
+			<g:render template="/user/other"/>
 			<br/>
 			<div class="form-navigation">
 				<button type="button" class="previous btn btn-info pull-left">&lt; Previous</button>

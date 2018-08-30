@@ -31,9 +31,7 @@ class AuthFilters {
 					model.guestAutoLogin = customizationConfig.guestAutoLogin
 					model.instanceName = customizationConfig.instanceName
 					model.instanceType = customizationConfig.instanceType
-					model.instanceTypeSuffix = customizationConfig.instanceTypeSuffix
 					model.isTOS = customizationConfig.isTOS
-					model.pmsdnLogo = customizationConfig.pmsdnLogo
 					model.principal = securityService.principal()
 					model.supportEmail = customizationConfig.supportEmail
 					model.useRecaptcha = auth0Config.useRecaptcha
