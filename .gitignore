@@ -147,3 +147,8 @@
 transmart-data/vars
 transmart-data/vars-*
 transmart-data/private-feeds
+
+transmart-batch/batchdb.properties
+transmart-batch/batchdb-*.properties
+
+transmart-batch/logback.groovy
