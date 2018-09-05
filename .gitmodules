@@ -1,3 +1,0 @@
-[submodule "loader"]
-	path = loader
-	url = git://github.com/thehyve/transmart-loader.git
