@@ -1,0 +1,3 @@
+# list of war-file artifacts
+transmart.war
+gwava.war
