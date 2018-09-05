@@ -1,0 +1,19 @@
+<DASSTYLE>
+    <STYLESHEET version="1.1">
+        <CATEGORY id="default">
+            <TYPE id="acgh-normal-frequency">
+                <GLYPH>
+                    <HISTOGRAM>
+                        <MIN>0.0</MIN>
+                        <MAX>1.0</MAX>
+                        <HEIGHT>35</HEIGHT>
+                        <STEPS>50</STEPS>
+                        <COLOR1>#90EE90</COLOR1>
+                        <COLOR2>#008000</COLOR2>
+                        <COLOR3>#006400</COLOR3>
+                    </HISTOGRAM>
+                </GLYPH>
+            </TYPE>
+        </CATEGORY>
+    </STYLESHEET>
+</DASSTYLE>

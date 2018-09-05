@@ -1,0 +1,19 @@
+<DASSTYLE>
+    <STYLESHEET version="1.1">
+        <CATEGORY id="default">
+            <TYPE id="acgh-gain-frequency">
+                <GLYPH>
+                    <HISTOGRAM>
+                      <MIN>0.0</MIN>
+                      <MAX>1.0</MAX>
+                      <HEIGHT>35</HEIGHT>
+                      <STEPS>50</STEPS>
+                      <COLOR1>#ADD8E6</COLOR1>
+                      <COLOR2>#0000FF</COLOR2>
+                      <COLOR3>#00008B</COLOR3>
+                    </HISTOGRAM>
+                </GLYPH>
+            </TYPE>
+        </CATEGORY>
+    </STYLESHEET>
+</DASSTYLE>

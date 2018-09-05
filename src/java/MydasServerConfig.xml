@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2007 Philip Jones, EMBL-European Bioinformatics Institute
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  ~
+  ~ For further details of the mydas project, including source code,
+  ~ downloads and documentation, please see:
+  ~
+  ~ http://code.google.com/p/mydas/
+  ~
+  -->
+
+<mydasserver xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="http://mydas.googlecode.com/svn/trunk/mydas/server_core/src/main/resources/mydasserverconfig.xsd">
+    <!-- The global element holds details of configuration common to the entire server. -->
+    <global>
+
+        <!-- The URL of the DAS server up to and including /das/ (e.g. http://www.ebi.ac.uk/das-srv/uniprot/das/)
+        This should be the external URL.  (Allows correct access to the service through reverse-proxies etc.)-->
+        <baseurl>http://localhost:8080/das/</baseurl>
+
+        <!-- A boolean switch indicating if the output from the DAS server should be compressed or not.
+
+         Note that compression does not work with jetty, hence this is set to false here, but you are
+         advised to set this to true for deploying your DAS source on a full featured web server. -->
+        <gzipped>false</gzipped>
+
+        <!-- If set to true, then if the browser points to /das or /das/ then
+            the output of the sources command should be displayed.  This is
+            useful for creating a home page based upon the data source
+            details.-->
+        <slash-das-points-to-dsn>true</slash-das-points-to-dsn>
+
+        <!-- The name of the default DAS stylesheet to be used for all of the defined datasources.
+        This can be overridden for individual datasources by including a stylesheet element for them. -->
+        <default-stylesheet>TEST.style</default-stylesheet>
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+            to present the dsn command response in a human-readable format.
+            Optional - the processing instruction will only be included if this
+            element is present.
+            README: Please change images, styles and scripts paths in dsn.html and sortable.js -->
+        <!--dsn-xslt-url>/xslt/dsn.xsl</dsn-xslt-url-->
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+            to present the sources command response in a human-readable format.
+            Optional - the processing instruction will only be included if this
+            element is present.
+            Note: The XSL provided can display more than one coordinate system however
+            it does not look "nice" yet. 
+            It takes test-ranges as default values for sequence and features commands and
+            1-100 as default rows for entry_points command.
+            README: Please change images, styles and scripts paths in dsn.html and sortable.js -->
+        <!--sources-xslt-url>/xslt/sources.xsl</sources-xslt-url-->
+
+        <!-- NOTE - THE XSLTs LISTED BELOW (COMMENTED OUT) ARE UNDER DEVELOPMENT, SO NOT
+        CURRENTLY AVAILABLE.  You can of course substitute your own XSLT and provide a link
+        to it here. -->
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+            to present the dna command response in a human-readable format.
+            Optional - the processing instruction will only be included if this
+            element is present. -->
+        <!--<dna-xslt-url>/xslt/dna.xsl</dna-xslt-url>-->
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+            to present the entry-points command response in a human-readable format.
+            Optional - the processing instruction will only be included if this
+            element is present.-->
+        <!--<entry-points-xslt-url>/xslt/entry-point.xsl</entry-points-xslt-url>-->
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+          to present the sequence command response in a human-readable format.
+          Optional - the processing instruction will only be included if this
+          element is present. -->
+        <!--<sequence-xslt-url>/xslt/sequence.xsl</sequence-xslt-url>-->
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+            to present the features command response in a human-readable format.
+            Optional - the processing instruction will only be included if this
+            element is present. -->
+        <!--<features-xslt-url>/xslt/features.xsl</features-xslt-url>-->
+
+        <!-- Gives the URI of an XSLT transformation that can be used by the browser
+            to present the types command response in a human-readable format.
+            Optional - the processing instruction will only be included if this
+            element is present. -->
+        <!--<types-xslt-url>/xslt/types.xsl</types-xslt-url>-->
+
+        <!-- These global properties are made available to all the plugin classes
+        through the DataSource interface, so the plugin author can
+        add arbitrary additional configuration to their data source. -->
+    </global>
+    <!-- The enclosing element for one or more datasource definitions. -->
+    <datasources>
+        <!-- Configuration for a single data source. All the information annotated in this
+        element will be available to the DataSource class.
+        Attributes:
+        uri: The uri (required) attribute uniquely identifies the group of sources, and must be globally unique, as provided in the /DASDSN/DSN/SOURCE element of the XML returned by the DAS source command.
+        title: The title (required) attribute is a short text label suitable for display.
+        description: description (required) attribute is a longer text description.
+        doc_href: The doc_href (optional) attribute is a URL location where more information about the data is available.
+        mapmaster: The mapmaster attribute is a URL location pointing to the 'reference source' for the coordinate system.
+        max_entry_points: The max_entry_points (optional) attribute is a integer defining the maximum number of entry points
+                          that a data source commits to retrieve when entry_points command is used
+        -->
+        <datasource uri="acgh-gain"
+                    title="acgh-gain"
+                    description="Frequency of gains in selected cohort"
+                    doc_href="http://acgh.thehyve.net"
+                    mapmaster="http://acgh.thehyve.net">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>acgh-gain-(\d+)(?:-(\S+))?</pattern>
+            <version uri="acgh-gain" created="2013-08-31">
+                <class>org.transmartproject.das.mydas.AcghDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/acgh-gain" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/das/acgh-gain/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/das/acgh-gain/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/acgh-gain/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>acgh-gain.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <datasource uri="acgh-loss"
+                    title="acgh-loss"
+                    description="Frequency of losses in selected cohort"
+                    doc_href="http://acgh.thehyve.net"
+                    mapmaster="http://acgh.thehyve.net">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>acgh-loss-(\d+)(?:-(\S+))?</pattern>
+            <version uri="acgh-loss" created="2013-08-31">
+                <class>org.transmartproject.das.mydas.AcghDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/acgh" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/das/acgh/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/das/acgh/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/acgh/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>acgh-loss.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <datasource uri="acgh-normal"
+                    title="acgh-normal"
+                    description="Frequency of normals in selected cohort"
+                    doc_href="http://acgh.thehyve.net"
+                    mapmaster="http://acgh.thehyve.net">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>acgh-normal-(\d+)(?:-(\S+))?</pattern>
+            <version uri="acgh-normal" created="2013-08-31">
+                <class>org.transmartproject.das.mydas.AcghDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/acgh" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/das/acgh/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/das/acgh/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/acgh/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>acgh-normal.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <datasource uri="acgh-amp"
+                    title="acgh-amp"
+                    description="Frequency of amplifications in selected cohort"
+                    doc_href="http://acgh.thehyve.net"
+                    mapmaster="http://acgh.thehyve.net">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>acgh-amp-(\d+)(?:-(\S+))?</pattern>
+            <version uri="acgh-amp" created="2013-08-31">
+                <class>org.transmartproject.das.mydas.AcghDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/acgh" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/das/acgh/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/das/acgh/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/acgh/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>acgh-amp.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <datasource uri="acgh-inv"
+                    title="acgh-inv"
+                    description="Frequency of invalids in selected cohort"
+                    doc_href="http://acgh.thehyve.net"
+                    mapmaster="http://acgh.thehyve.net">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>acgh-inv-(\d+)(?:-(\S+))?</pattern>
+            <version uri="acgh-inv" created="2013-08-31">
+                <class>org.transmartproject.das.mydas.AcghDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/das/acgh" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/das/acgh/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/das/acgh/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/das/acgh/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>acgh-inv.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <!-- VCF Datasource -->
+        <datasource uri="vcf"
+                    title="minor allele freq"
+                    description="Minor Allele Frequency of selected cohort"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>vcf-(\d+)(?:-(\S+))?</pattern>
+            <version uri="vcf" created="2013-09-27">
+                <class>org.transmartproject.das.mydas.CohortMAFDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/vcf" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/vcf/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/vcf/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/vcf/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>vcf.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+         <!--Summary Level MAF Datasource-->
+        <datasource uri="http://thehyve.nl"
+                    title="summary of minor allele freq"
+                    description="Minor Allele Frequency (MAF) whole study level"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>smaf-(\d+)(?:-(\S+))?</pattern>
+            <version uri="smaf" created="2013-09-30">
+                <class>org.transmartproject.das.mydas.SummaryMAFDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/smaf" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/smaf/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/smaf/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/smaf/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>vcf.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+         <!--Quality of Depth Datasource--> 
+        <datasource uri="http://thehyve.nl"
+                    title="quality of depth"
+                    description="Quality of Depth of whole study level"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>qd-(\d+)(?:-(\S+))?</pattern>
+            <version uri="qd" created="2013-10-02">
+                <class>org.transmartproject.das.mydas.QualityByDepthDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/qd" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/qd/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/qd/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/qd/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>vcf.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+         <!--Genomic Variants Datasource--> 
+        <datasource uri="gv"
+                    title="variants"
+                    description="Genomic Variants of selected cohort"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>gv-(\d+)(?:-(\S+))?</pattern>
+            <version uri="gv" created="2013-10-02">
+                <class>org.transmartproject.das.mydas.GenomicVariantsDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/gv" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/gv/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/gv/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/gv/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>variants.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+        <!--Genomic Variants Datasource-->
+        <datasource uri="vcfInfo"
+                    title="VCF INFO"
+                    description="Custom INFO field of selected cohort"
+                    doc_href="http://www.transmartproject.org/"
+                    mapmaster="http://www.transmartproject.org/">
+
+            <maintainer email="office@thehyve.nl" />
+            <pattern>vcfInfo-([^\-]+)-(\d+)(?:-(\S+))?</pattern>
+            <version uri="vcfInfo" created="2013-10-02">
+                <class>org.transmartproject.das.mydas.VcfInfoDS</class>
+                <!--TODO: Specify appropriate coordinates-->
+                <coordinates 	uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS94"
+                                source="Gene_ID"
+                                authority="Ensembl"
+                                taxid="9606"
+                                test_range="ENSG00000160916">Ensembl,Gene_ID,Homo sapiens</coordinates>
+                <capability type="das1:sources"		 	query_uri="http://localhost:8080/transmart/das/vcf" />
+                <capability type="das1:types"			query_uri="http://localhost:8080/transmart/das/vcf/types" />
+                <capability type="das1:features"		query_uri="http://localhost:8080/transmart/das/vcf/features" />
+                <capability type="das1:stylesheet"		query_uri="http://localhost:8080/transmart/das/vcf/stylesheet" />
+                <capability type="das1:rows-for-feature"	/>
+            </version>
+
+            <stylesheet>vcf.style</stylesheet>
+            <dna-command-enabled>true</dna-command-enabled>
+            <use-feature-id-for-feature-label>true</use-feature-id-for-feature-label>
+            <include-types-with-zero-count>true</include-types-with-zero-count>
+        </datasource>
+
+
+    </datasources>
+</mydasserver>
+

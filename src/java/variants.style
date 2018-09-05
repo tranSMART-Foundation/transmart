@@ -1,0 +1,46 @@
+<DASSTYLE>
+    <STYLESHEET version="1.1">
+        <CATEGORY id="default">
+            <TYPE id="INS">
+                <GLYPH>
+                    <TRIANGLE>
+                      <DIRECTION>N</DIRECTION>
+                      <FGCOLOR>green</FGCOLOR>
+                      <BUMP>yes</BUMP>
+                      <HEIGHT>10</HEIGHT>
+                      <LINEWIDTH>5</LINEWIDTH>
+                    </TRIANGLE>
+                </GLYPH>
+            </TYPE>
+            <TYPE id="DEL">
+                <GLYPH>
+                    <TRIANGLE>
+                      <DIRECTION>S</DIRECTION>
+                      <FGCOLOR>red</FGCOLOR>
+                      <BUMP>yes</BUMP>
+                      <HEIGHT>10</HEIGHT>
+                      <LINEWIDTH>5</LINEWIDTH>
+                    </TRIANGLE>
+                </GLYPH>
+            </TYPE>
+            <TYPE id="SNP">
+                <GLYPH>
+                    <CROSS>
+                      <FGCOLOR>blue</FGCOLOR>
+                      <BUMP>yes</BUMP>
+                      <HEIGHT>10</HEIGHT>
+                    </CROSS>
+                </GLYPH>
+            </TYPE>
+            <TYPE id="DIV">
+                <GLYPH>
+                    <DOT>
+                      <FGCOLOR>purple</FGCOLOR>
+                      <BUMP>yes</BUMP>
+                      <HEIGHT>10</HEIGHT>
+                    </DOT>
+                </GLYPH>
+            </TYPE>
+        </CATEGORY>
+    </STYLESHEET>
+</DASSTYLE>

@@ -1,0 +1,19 @@
+<DASSTYLE>
+    <STYLESHEET version="1.1">
+        <CATEGORY id="default">
+            <TYPE id="acgh-loss-frequency">
+                <GLYPH>
+                    <HISTOGRAM>
+                        <MIN>0.0</MIN>
+                        <MAX>1.0</MAX>
+                        <HEIGHT>35</HEIGHT>
+                        <STEPS>10</STEPS>
+                        <COLOR1>#FF6347</COLOR1>
+                        <COLOR2>#FF0000</COLOR2>
+                        <COLOR3>#8B0000</COLOR3>
+                    </HISTOGRAM>
+                </GLYPH>
+            </TYPE>
+        </CATEGORY>
+    </STYLESHEET>
+</DASSTYLE>
