@@ -1,0 +1,48 @@
+language: php # to have .travis installing the php version we indicate
+sudo: false
+php:
+  - 5.6
+addons:
+  apt:
+    packages:
+      - libreadline-dev
+      - clang
+      - gfortran
+      - libcairo2-dev
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/rserve
+    - node_modules
+
+jdk:
+  - oraclejdk7
+
+before_install:
+  - git clone --depth 1 git://github.com/transmart/transmart-travis.git ~/ts-travis
+  - git clone --depth 100 git://github.com/transmart/transmart-data.git ~/transmart-data
+  - source ~/ts-travis/init.sh
+  - source ~/ts-travis/grails_inline.sh
+  - source ~/ts-travis/maven_dep.sh
+  - source ~/ts-travis/rserve_install.sh
+
+install:
+  - maybe_build_maven_dep $(travis_get_owner)/transmart-core-api core-api
+  - maybe_make_inline_grails_dep $(travis_get_owner)/transmart-core-db core-db . transmart-core-db-tests
+  - make -C ~/transmart-data/env ../vars
+  - install_rserve ~/transmart-data
+  - npm install
+
+before_script:
+  - start_rserve
+
+script:
+  - grails refresh-dependencies --non-interactive
+  - grails test-app --non-interactive --stacktrace
+  - "\"$RSERVE_LOCATION\"/bin/Rscript test/runit/run_tests.R"
+
+notifications:
+  hipchat:
+    rooms:
+      secure: UKvpmZGc7nf/OGOY4e+mmvgaax/ezCTUNehuxhPqXSYwkec7OTY64znG6QN1rAP1YuWky1bdvTXiTXbr6STss4NlgMfmtK85GtxGWTFx6Xrq3L13YP9iG4ZaYQHGAzWat6CfKUmmkwhFgZCcg6n4msPW+YBpeGcFEglcOHRKcAxqx9S6vLzzIa+lsC2030bOL994IJrDgE48tyZtu8XhTpds737DsTgR0UW2WwH4PmyfdaxCvi4OmM/ZBrXBQgdK48R6RXmcP6WyvtLbxBVZCiZaf7TF06DLZffAJgxMhjJgczUzu/5kQpikodvCGxzYaKZ2cnRCKEVbF1YfFhMdjkUFalTdSmNhMUZapYb0Yt32wCR7inQDAVShJa0RGm3TEhtTWuFMlKCTFHgOV7jYc3wxQjDEFMdWWVvf9T0lXA5ULaBd0fbmBrP2Nj+9gtGOkVeu4X0ukXe10+COUj2oBzMR295+856LXHz9jp220VnCVU1VOxWnlyUvVO8qLnYlMyX5rukJ3XoR3dsff0h4qKKsPgDzkZDVucQreGci9a4sLpVuvH+o6P14oweZGU6gX5DSRUWvGOm1asZBSuwvmDIfIIrqbK63zfFQI0ClM6OaJl9K6qTL27BXUHOnx6jvchZET6ph9B+3v1eSAbLvEnNrfexfgNTwc5W3XX+AWdU=
+

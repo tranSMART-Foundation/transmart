@@ -35,9 +35,6 @@
 **/logs
 **/*.log
 
-# project release files
-*/*/*.war
-
 # plugin release files
 */*.zip
 */*.zip.sha1
@@ -56,3 +53,7 @@
 
 **/.DS_Store
 
+# R generated files
+**/.RData
+**/.Rapp.history
+**/.Rhistory

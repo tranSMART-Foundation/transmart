@@ -1,0 +1,21 @@
+CHANGELOG
+
+Current Version 0.3
+- **Fix: Big datasets lead no longer to an unpextect error**
+- Fix: Feature ranking works correctly now
+- Fix: Added log2 to Heatmap tooltip
+- Fix: Cutoff in Heatmap will not work anymore with 2 rows or less
+- **Fix: Heatmap can now handle datasets containing duplicated probeset ids**
+- Improved Heatmap script performance
+- Fix: Correlation visualization behaves correctly now when resizing
+- Fix: The "Run Analysis" button will now enable again even if JS rendering fails
+
+Version 0.2
+- Fix: Session management should be more stable now
+- Fix: Large datasets should not cause SmartR to crash anymore
+- Fix: Heatmap - switched red and green color
+- Fix: Heatmap - use log2 values instead of raw values for ranking
+- Fix: Heatmap - improved contrast
+
+Version 0.1
+- Introduced versioning. No changelog available behind this point.
