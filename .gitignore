@@ -44,6 +44,7 @@
 **/*.iws
 
 **/target
+**/target-eclipse
 **/.idea/
 **/*.ipr
 
