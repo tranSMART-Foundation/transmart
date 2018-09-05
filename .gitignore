@@ -1,31 +1,107 @@
 # IDE/eclipse/emacs support files
-**/.buildpath
-**/.classpath
-**/.idea/
-**/.launch
-**/.project
-**/.settings
+**/.settings**/*~
 **/*.tmproj
 **/ivy*
-**/*.iml
-**/*.ipr
-**/*.iws
-*.swo
-*.swp
+**/*.swo
+**/*.swp
 **/target
 **/target-eclipse
 
-**/*~
+# PDT-specific
+**/.buildpath
+
+# JDT-specific (Eclipse Java Development Tools)
+**/.classpath
+
+# Eclipse Core
+**/.project
+
+# Locally stored "Eclipse launch configurations"
+**/.launch
 
 */eclipse*
+
+# IntelliJ
+*/out/
+
+### JetBrains template
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
+**/*.iml
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+## Directory-based project format:
+**/.idea/
+# if you remove the above rule, at least ignore the following:
+
+# User-specific stuff:
+# .idea/workspace.xml
+# .idea/tasks.xml
+# .idea/dictionaries
+
+# Sensitive or high-churn files:
+# .idea/dataSources.ids
+# .idea/dataSources.xml
+# .idea/sqlDataSources.xml
+# .idea/dynamic.xml
+# .idea/uiDesigner.xml
+
+# Gradle:
+# .idea/gradle.xml
+# .idea/libraries
+
+# Mongo Explorer plugin:
+# .idea/mongoSettings.xml
+
+
+
+
+
+## File-based project format:
+**/*.ipr
+**/*.iws
+
 
 # default HSQL database files for production mode
 */prodDb.*
 
+### Eclipse template
+**/*.pydevproject
+**/.metadata
+**/.gradle
+*/bin/
+*/tmp/
+**/*.tmp
+**/*.bak
+**/*~.nib
+*/local.properties
+*/.loadpath
+
+# External tool builders
+**/.externalToolBuilders/
+
+# CDT-specific
+**/.cproject
+
+# Java annotation processor (APT)
+**/.factorypath
+
+# sbteclipse plugin
+**/.target
+
+# TeXlipse plugin
+**/.texlipse
+
+# web application files
+/web-app/WEB-INF/classes
+
+# default HSQL database files for production mode
+/prodDb.*
+
 # general HSQL database files
 *Db.properties
 *Db.script
-
 
 # grails generated files
 **/plugin.xml
@@ -58,3 +134,11 @@
 **/.RData
 **/.Rapp.history
 **/.Rhistory
+
+# JIRA plugin
+**/atlassian-ide-plugin.xml
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
+**/com_crashlytics_export_strings.xml
+**/crashlytics.properties
+**/crashlytics-build.properties
