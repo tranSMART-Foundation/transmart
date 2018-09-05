@@ -26,6 +26,7 @@
 *Db.properties
 *Db.script
 
+
 # grails generated files
 **/plugin.xml
 
@@ -57,3 +58,4 @@
 **/.RData
 **/.Rapp.history
 **/.Rhistory
+
