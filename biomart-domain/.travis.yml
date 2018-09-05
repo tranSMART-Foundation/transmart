@@ -1,0 +1,15 @@
+language: groovy
+
+jdk:
+    - oraclejdk7
+
+before_install:
+    - git clone --depth 1 git://github.com/thehyve/transmart-travis.git ~/ts-travis
+    - source ~/ts-travis/init.sh
+    - source ~/ts-travis/grails_inline.sh
+
+install:
+    - make_inline_dependency ../transmart-java
+
+script:
+    - grails package --non-interactive --stacktrace
