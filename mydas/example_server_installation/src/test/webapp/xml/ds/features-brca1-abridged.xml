@@ -1,0 +1,87 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE DASGFF SYSTEM "http://www.biodas.org/dtd/dasgff.dtd">
+<?xml-stylesheet href="../../../../main/webapp/xslt/features.xsl" type="text/xsl"?> 
+<DASGFF>
+  <GFF version="1.0" href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features?segment=BRCA1_HUMAN">
+    <SEGMENT id="BRCA1_HUMAN" start="1" stop="1863" version="e40f752dedf675e2f7c99142ebb2607a">
+      <FEATURE id="P38398" label="P38398">
+        <TYPE id="description" category="description">description</TYPE>
+        <METHOD id="Standard">Swiss-Prot</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>RECOMENDED : Breast cancer type 1 susceptibility protein</NOTE>
+        <NOTE>SYNONYM : RING finger protein 53</NOTE>
+        <LINK href="http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=P38398">http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=P38398</LINK>
+      </FEATURE>
+      <FEATURE id="9606" label="Homo sapiens (Human)">
+        <TYPE id="dbxref" category="dbxref">dbxref</TYPE>
+        <METHOD id="TAX-ID">TAX-ID</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <LINK href="http://www.ebi.ac.uk/newt/display?search=9606">9606</LINK>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Cell cycle" label="P38398_KEYWORD_Cell cycle">
+        <TYPE id="KEYWORD" category="KEYWORD">Cell cycle</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cell cycle</NOTE>
+      </FEATURE>
+      <FEATURE id="pubmed:14722926" label="pubmed:14722926">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Valarmathi M.T., Sawhney M., Deo S.S.V., Shukla N.K., Das S.N. (2004). "Novel germline mutations in the BRCA1 and BRCA2 genes in Indian breast and breast-ovarian cancer families.", Hum. Mutat., 23 205-205</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=14722926">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1002/humu.9213">Resolve DOI: 10.1002/humu.9213</LINK>
+      </FEATURE>
+      <FEATURE id="P38398_DOMAIN_1756_1855" label="P38398_DOMAIN_1756_1855">
+        <TYPE id="DOMAIN" category="Regions">Other domain of interest</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1756</START>
+        <END>1855</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_ZN_FING_24_65" label="BRCA1 zinc finger">
+        <TYPE id="ZN_FING" category="ZN_FING">zinc finger region</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>24</START>
+        <END>65</END>
+        <SCORE>13.5</SCORE>
+        <ORIENTATION>2</ORIENTATION>
+        <PHASE>+</PHASE>
+        <TARGET id="P04637" start="20" stop="30">P53_HUMAN</TARGET>
+        <TARGET id="P04637" start="57" stop="190">P53_HUMAN</TARGET>
+        <GROUP id="x433" label="cAMP-dependent chloride channel" type="transmembrane">
+            <NOTE>Cystic fibrosis</NOTE>
+            <LINK href="http://www.ebi.ac.uk/interpro">InterPro</LINK>
+            <TARGET id="P13569" start="224" stop="277">CFTR_HUMAN</TARGET>
+        </GROUP>
+      </FEATURE>
+      <FEATURE id="P38398_COMPBIAS_651_654" label="P38398_COMPBIAS_651_654">
+        <TYPE id="COMPBIAS" category="Regions">compositionally biased region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>651</START>
+        <END>654</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+    </SEGMENT>
+  </GFF>
+</DASGFF>

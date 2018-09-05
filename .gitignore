@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # IDE/eclipse support files
 **/.buildpath
 **/.classpath
@@ -49,4 +50,3 @@
 **/*.ipr
 
 */grails-app/i18n/
-

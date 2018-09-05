@@ -1,0 +1,25 @@
+MYDAS EXAMPLE SERVER CHANGELOG
+==============================
+
+Changes in version 1.0.2 (2007-08-31)
+-------------------------------------
+
+src/main/webapp
+* Uncommented <dsn-xslt-url> and <features-xslt-url> elements in MydasServerConfig.xml
+
+src/main/webapp/xslt
+* Added types.html and types.xsl
+* Removed dsn-simple.html, entities.xsl, patent.xsl
+* Changed resource location URLs in dsn.html and dsn.xsl
+* Updated features.html and features.xsl:
+  - Changed resource location URLs
+  - Handle error segment and unknown segment
+  - Handle multiple segment IDs
+* Added sortable table image path location handling to stylefree.xsl
+
+src/main/webapp/xslt/styles
+* Added classes for warning messages, hidden elements and number formatting to common.css
+
+src/test
+* Added webapp directory
+

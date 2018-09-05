@@ -1,0 +1,8 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE DASGFF SYSTEM "http://www.biodas.org/dtd/dasgff.dtd">
+<?xml-stylesheet href="../../../../main/webapp/xslt/features.xsl" type="text/xsl"?>
+<DASGFF>
+  <GFF version="1.0" href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features?segment=BRCA1_HUMA">
+    <UNKNOWNSEGMENT id="BRCA1_HUMA"/>
+  </GFF>
+</DASGFF>

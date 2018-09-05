@@ -1,0 +1,2133 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE DASGFF SYSTEM "http://www.biodas.org/dtd/dasgff.dtd">
+<?xml-stylesheet href="../../../../main/webapp/xslt/features.xsl" type="text/xsl"?> 
+<DASGFF>
+  <GFF version="1.0" href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features?segment=BRCA1_HUMAN">
+    <SEGMENT id="BRCA1_HUMAN" start="1" stop="1863" version="e40f752dedf675e2f7c99142ebb2607a">
+      <FEATURE id="P38398" label="P38398">
+        <TYPE id="description" category="description">description</TYPE>
+        <METHOD id="Standard">Swiss-Prot</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>RECOMENDED : Breast cancer type 1 susceptibility protein</NOTE>
+        <NOTE>SYNONYM : RING finger protein 53</NOTE>
+        <LINK href="http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=P38398">http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=P38398</LINK>
+      </FEATURE>
+      <FEATURE id="9606" label="Homo sapiens (Human)">
+        <TYPE id="dbxref" category="dbxref">dbxref</TYPE>
+        <METHOD id="TAX-ID">TAX-ID</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <LINK href="http://www.ebi.ac.uk/newt/display?search=9606">http://www.ebi.ac.uk/newt/display?search=9606</LINK>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_3D-structure" label="P38398_KEYWORD_3D-structure">
+        <TYPE id="KEYWORD" category="KEYWORD">3D-structure</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>3D-structure</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Anti-oncogene" label="P38398_KEYWORD_Anti-oncogene">
+        <TYPE id="KEYWORD" category="KEYWORD">Anti-oncogene</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Anti-oncogene</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Cell cycle" label="P38398_KEYWORD_Cell cycle">
+        <TYPE id="KEYWORD" category="KEYWORD">Cell cycle</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cell cycle</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Disease mutation" label="P38398_KEYWORD_Disease mutation">
+        <TYPE id="KEYWORD" category="KEYWORD">Disease mutation</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Disease mutation</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_DNA damage" label="P38398_KEYWORD_DNA damage">
+        <TYPE id="KEYWORD" category="KEYWORD">DNA damage</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>DNA damage</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_DNA repair" label="P38398_KEYWORD_DNA repair">
+        <TYPE id="KEYWORD" category="KEYWORD">DNA repair</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>DNA repair</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_DNA-binding" label="P38398_KEYWORD_DNA-binding">
+        <TYPE id="KEYWORD" category="KEYWORD">DNA-binding</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>DNA-binding</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Fatty acid biosynthesis" label="P38398_KEYWORD_Fatty acid biosynthesis">
+        <TYPE id="KEYWORD" category="KEYWORD">Fatty acid biosynthesis</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Fatty acid biosynthesis</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Lipid synthesis" label="P38398_KEYWORD_Lipid synthesis">
+        <TYPE id="KEYWORD" category="KEYWORD">Lipid synthesis</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Lipid synthesis</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Metal-binding" label="P38398_KEYWORD_Metal-binding">
+        <TYPE id="KEYWORD" category="KEYWORD">Metal-binding</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Metal-binding</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Nucleus" label="P38398_KEYWORD_Nucleus">
+        <TYPE id="KEYWORD" category="KEYWORD">Nucleus</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Nucleus</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Phosphorylation" label="P38398_KEYWORD_Phosphorylation">
+        <TYPE id="KEYWORD" category="KEYWORD">Phosphorylation</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Phosphorylation</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Polymorphism" label="P38398_KEYWORD_Polymorphism">
+        <TYPE id="KEYWORD" category="KEYWORD">Polymorphism</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Polymorphism</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Repeat" label="P38398_KEYWORD_Repeat">
+        <TYPE id="KEYWORD" category="KEYWORD">Repeat</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Repeat</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Zinc" label="P38398_KEYWORD_Zinc">
+        <TYPE id="KEYWORD" category="KEYWORD">Zinc</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Zinc</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_KEYWORD_Zinc-finger" label="P38398_KEYWORD_Zinc-finger">
+        <TYPE id="KEYWORD" category="KEYWORD">Zinc-finger</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Zinc-finger</NOTE>
+      </FEATURE>
+      <FEATURE id="P38398_CHAIN_1_1863" label="P38398_CHAIN_1_1863">
+        <TYPE id="CHAIN" category="Molecule Processing">chain</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1</START>
+        <END>1863</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_DOMAIN_1642_1736" label="P38398_DOMAIN_1642_1736">
+        <TYPE id="DOMAIN" category="Regions">Other domain of interest</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1642</START>
+        <END>1736</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_DOMAIN_1756_1855" label="P38398_DOMAIN_1756_1855">
+        <TYPE id="DOMAIN" category="Regions">Other domain of interest</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1756</START>
+        <END>1855</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_ZN_FING_24_65" label="P38398_ZN_FING_24_65">
+        <TYPE id="ZN_FING" category="ZN_FING">zinc finger region</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>24</START>
+        <END>65</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_COMPBIAS_651_654" label="P38398_COMPBIAS_651_654">
+        <TYPE id="COMPBIAS" category="Regions">compositionally biased region</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>651</START>
+        <END>654</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_840_840" label="P38398_MOD_RES_840_840">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>840</START>
+        <END>840</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1143_1143" label="P38398_MOD_RES_1143_1143">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1143</START>
+        <END>1143</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1211_1211" label="P38398_MOD_RES_1211_1211">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1211</START>
+        <END>1211</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1212_1212" label="P38398_MOD_RES_1212_1212">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1212</START>
+        <END>1212</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1217_1217" label="P38398_MOD_RES_1217_1217">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1217</START>
+        <END>1217</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1218_1218" label="P38398_MOD_RES_1218_1218">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1218</START>
+        <END>1218</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1239_1239" label="P38398_MOD_RES_1239_1239">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1239</START>
+        <END>1239</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1245_1245" label="P38398_MOD_RES_1245_1245">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1245</START>
+        <END>1245</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1280_1280" label="P38398_MOD_RES_1280_1280">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1280</START>
+        <END>1280</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1330_1330" label="P38398_MOD_RES_1330_1330">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1330</START>
+        <END>1330</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1336_1336" label="P38398_MOD_RES_1336_1336">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1336</START>
+        <END>1336</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1342_1342" label="P38398_MOD_RES_1342_1342">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1342</START>
+        <END>1342</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1387_1387" label="P38398_MOD_RES_1387_1387">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1387</START>
+        <END>1387</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1394_1394" label="P38398_MOD_RES_1394_1394">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1394</START>
+        <END>1394</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1423_1423" label="P38398_MOD_RES_1423_1423">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1423</START>
+        <END>1423</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1457_1457" label="P38398_MOD_RES_1457_1457">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1457</START>
+        <END>1457</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1466_1466" label="P38398_MOD_RES_1466_1466">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1466</START>
+        <END>1466</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1524_1524" label="P38398_MOD_RES_1524_1524">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1524</START>
+        <END>1524</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1700_1700" label="P38398_MOD_RES_1700_1700">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1700</START>
+        <END>1700</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MOD_RES_1720_1720" label="P38398_MOD_RES_1720_1720">
+        <TYPE id="MOD_RES" category="Amino acid modifications(pre and PTM)">Post-translationally modified residue</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1720</START>
+        <END>1720</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_10_10" label="P38398_VARIANT_10_10">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>10</START>
+        <END>10</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_11_11" label="P38398_VARIANT_11_11">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>11</START>
+        <END>11</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_21_21" label="P38398_VARIANT_21_21">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>21</START>
+        <END>21</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_22_22" label="P38398_VARIANT_22_22">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>22</START>
+        <END>22</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_23_23" label="P38398_VARIANT_23_23">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>23</START>
+        <END>23</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_61_61" label="P38398_VARIANT_61_61">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>61</START>
+        <END>61</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_64_64" label="P38398_VARIANT_64_64">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>64</START>
+        <END>64</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_64_64" label="P38398_VARIANT_64_64">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>64</START>
+        <END>64</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_71_71" label="P38398_VARIANT_71_71">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>71</START>
+        <END>71</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_227_227" label="P38398_VARIANT_227_227">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>227</START>
+        <END>227</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_239_239" label="P38398_VARIANT_239_239">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>239</START>
+        <END>239</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_271_271" label="P38398_VARIANT_271_271">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>271</START>
+        <END>271</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_275_275" label="P38398_VARIANT_275_275">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>275</START>
+        <END>275</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_346_346" label="P38398_VARIANT_346_346">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>346</START>
+        <END>346</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_356_356" label="P38398_VARIANT_356_356">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>356</START>
+        <END>356</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_369_369" label="P38398_VARIANT_369_369">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>369</START>
+        <END>369</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_379_379" label="P38398_VARIANT_379_379">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>379</START>
+        <END>379</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_461_461" label="P38398_VARIANT_461_461">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>461</START>
+        <END>461</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_465_465" label="P38398_VARIANT_465_465">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>465</START>
+        <END>465</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_507_507" label="P38398_VARIANT_507_507">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>507</START>
+        <END>507</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_552_552" label="P38398_VARIANT_552_552">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>552</START>
+        <END>552</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_656_656" label="P38398_VARIANT_656_656">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>656</START>
+        <END>656</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_693_693" label="P38398_VARIANT_693_693">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>693</START>
+        <END>693</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_723_723" label="P38398_VARIANT_723_723">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>723</START>
+        <END>723</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_749_749" label="P38398_VARIANT_749_749">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>749</START>
+        <END>749</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_772_772" label="P38398_VARIANT_772_772">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>772</START>
+        <END>772</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_820_820" label="P38398_VARIANT_820_820">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>820</START>
+        <END>820</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_826_826" label="P38398_VARIANT_826_826">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>826</START>
+        <END>826</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_835_835" label="P38398_VARIANT_835_835">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>835</START>
+        <END>835</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_841_841" label="P38398_VARIANT_841_841">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>841</START>
+        <END>841</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_856_856" label="P38398_VARIANT_856_856">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>856</START>
+        <END>856</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_866_866" label="P38398_VARIANT_866_866">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>866</START>
+        <END>866</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_871_871" label="P38398_VARIANT_871_871">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>871</START>
+        <END>871</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_888_888" label="P38398_VARIANT_888_888">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>888</START>
+        <END>888</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_892_892" label="P38398_VARIANT_892_892">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>892</START>
+        <END>892</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_925_925" label="P38398_VARIANT_925_925">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>925</START>
+        <END>925</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_960_960" label="P38398_VARIANT_960_960">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>960</START>
+        <END>960</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_989_989" label="P38398_VARIANT_989_989">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>989</START>
+        <END>989</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1008_1008" label="P38398_VARIANT_1008_1008">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1008</START>
+        <END>1008</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1025_1025" label="P38398_VARIANT_1025_1025">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1025</START>
+        <END>1025</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1038_1038" label="P38398_VARIANT_1038_1038">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1038</START>
+        <END>1038</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1040_1040" label="P38398_VARIANT_1040_1040">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1040</START>
+        <END>1040</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1047_1047" label="P38398_VARIANT_1047_1047">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1047</START>
+        <END>1047</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1060_1060" label="P38398_VARIANT_1060_1060">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1060</START>
+        <END>1060</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1139_1139" label="P38398_VARIANT_1139_1139">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1139</START>
+        <END>1139</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1140_1140" label="P38398_VARIANT_1140_1140">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1140</START>
+        <END>1140</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1150_1150" label="P38398_VARIANT_1150_1150">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1150</START>
+        <END>1150</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1183_1183" label="P38398_VARIANT_1183_1183">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1183</START>
+        <END>1183</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1187_1187" label="P38398_VARIANT_1187_1187">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1187</START>
+        <END>1187</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1200_1200" label="P38398_VARIANT_1200_1200">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1200</START>
+        <END>1200</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1204_1204" label="P38398_VARIANT_1204_1204">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1204</START>
+        <END>1204</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1207_1207" label="P38398_VARIANT_1207_1207">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1207</START>
+        <END>1207</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1210_1210" label="P38398_VARIANT_1210_1210">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1210</START>
+        <END>1210</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1217_1217" label="P38398_VARIANT_1217_1217">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1217</START>
+        <END>1217</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1219_1219" label="P38398_VARIANT_1219_1219">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1219</START>
+        <END>1219</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1226_1226" label="P38398_VARIANT_1226_1226">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1226</START>
+        <END>1226</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1243_1243" label="P38398_VARIANT_1243_1243">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1243</START>
+        <END>1243</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1297_1297" label="P38398_VARIANT_1297_1297">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1297</START>
+        <END>1297</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1347_1347" label="P38398_VARIANT_1347_1347">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1347</START>
+        <END>1347</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1406_1406" label="P38398_VARIANT_1406_1406">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1406</START>
+        <END>1406</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1411_1411" label="P38398_VARIANT_1411_1411">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1411</START>
+        <END>1411</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1431_1431" label="P38398_VARIANT_1431_1431">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1431</START>
+        <END>1431</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1443_1443" label="P38398_VARIANT_1443_1443">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1443</START>
+        <END>1443</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1443_1443" label="P38398_VARIANT_1443_1443">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1443</START>
+        <END>1443</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1512_1512" label="P38398_VARIANT_1512_1512">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1512</START>
+        <END>1512</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1561_1561" label="P38398_VARIANT_1561_1561">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1561</START>
+        <END>1561</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1606_1606" label="P38398_VARIANT_1606_1606">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1606</START>
+        <END>1606</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1613_1613" label="P38398_VARIANT_1613_1613">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1613</START>
+        <END>1613</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1620_1620" label="P38398_VARIANT_1620_1620">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1620</START>
+        <END>1620</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1628_1628" label="P38398_VARIANT_1628_1628">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1628</START>
+        <END>1628</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1628_1628" label="P38398_VARIANT_1628_1628">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1628</START>
+        <END>1628</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1637_1637" label="P38398_VARIANT_1637_1637">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1637</START>
+        <END>1637</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1641_1641" label="P38398_VARIANT_1641_1641">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1641</START>
+        <END>1641</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1652_1652" label="P38398_VARIANT_1652_1652">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1652</START>
+        <END>1652</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1665_1665" label="P38398_VARIANT_1665_1665">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1665</START>
+        <END>1665</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1690_1690" label="P38398_VARIANT_1690_1690">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1690</START>
+        <END>1690</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1692_1692" label="P38398_VARIANT_1692_1692">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1692</START>
+        <END>1692</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1697_1697" label="P38398_VARIANT_1697_1697">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1697</START>
+        <END>1697</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1699_1699" label="P38398_VARIANT_1699_1699">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1699</START>
+        <END>1699</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1708_1708" label="P38398_VARIANT_1708_1708">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1708</START>
+        <END>1708</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1713_1713" label="P38398_VARIANT_1713_1713">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1713</START>
+        <END>1713</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1749_1749" label="P38398_VARIANT_1749_1749">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1749</START>
+        <END>1749</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1775_1775" label="P38398_VARIANT_1775_1775">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1775</START>
+        <END>1775</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1776_1776" label="P38398_VARIANT_1776_1776">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1776</START>
+        <END>1776</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1786_1786" label="P38398_VARIANT_1786_1786">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1786</START>
+        <END>1786</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_VARIANT_1812_1812" label="P38398_VARIANT_1812_1812">
+        <TYPE id="VARIANT" category="Natural variations">Sequence variation</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1812</START>
+        <END>1812</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_71_71" label="P38398_MUTAGEN_71_71">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>71</START>
+        <END>71</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1143_1143" label="P38398_MUTAGEN_1143_1143">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1143</START>
+        <END>1143</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1239_1239" label="P38398_MUTAGEN_1239_1239">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1239</START>
+        <END>1239</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1280_1280" label="P38398_MUTAGEN_1280_1280">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1280</START>
+        <END>1280</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1298_1298" label="P38398_MUTAGEN_1298_1298">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1298</START>
+        <END>1298</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1330_1330" label="P38398_MUTAGEN_1330_1330">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1330</START>
+        <END>1330</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1387_1387" label="P38398_MUTAGEN_1387_1387">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1387</START>
+        <END>1387</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1394_1394" label="P38398_MUTAGEN_1394_1394">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1394</START>
+        <END>1394</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1423_1423" label="P38398_MUTAGEN_1423_1423">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1423</START>
+        <END>1423</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1457_1457" label="P38398_MUTAGEN_1457_1457">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1457</START>
+        <END>1457</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1466_1466" label="P38398_MUTAGEN_1466_1466">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1466</START>
+        <END>1466</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1524_1524" label="P38398_MUTAGEN_1524_1524">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1524</START>
+        <END>1524</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1720_1720" label="P38398_MUTAGEN_1720_1720">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1720</START>
+        <END>1720</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_MUTAGEN_1755_1755" label="P38398_MUTAGEN_1755_1755">
+        <TYPE id="MUTAGEN" category="Experimental info">mutagenesis site</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1755</START>
+        <END>1755</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_3_5" label="P38398_HELIX_3_5">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>3</START>
+        <END>5</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_8_21" label="P38398_HELIX_8_21">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>8</START>
+        <END>21</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_STRAND_25_27" label="P38398_STRAND_25_27">
+        <TYPE id="STRAND" category="Secondary structure">strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>25</START>
+        <END>27</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_46_53" label="P38398_HELIX_46_53">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>46</START>
+        <END>53</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_STRAND_54_58" label="P38398_STRAND_54_58">
+        <TYPE id="STRAND" category="Secondary structure">strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>54</START>
+        <END>58</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_TURN_62_64" label="P38398_TURN_62_64">
+        <TYPE id="TURN" category="Secondary structure">turn</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>62</START>
+        <END>64</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_TURN_70_72" label="P38398_TURN_70_72">
+        <TYPE id="TURN" category="Secondary structure">turn</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>70</START>
+        <END>72</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_STRAND_78_80" label="P38398_STRAND_78_80">
+        <TYPE id="STRAND" category="Secondary structure">strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>78</START>
+        <END>80</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_81_96" label="P38398_HELIX_81_96">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>81</START>
+        <END>96</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_STRAND_1651_1656" label="P38398_STRAND_1651_1656">
+        <TYPE id="STRAND" category="Secondary structure">strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1651</START>
+        <END>1656</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_1659_1672" label="P38398_HELIX_1659_1672">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1659</START>
+        <END>1672</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_STRAND_1686_1689" label="P38398_STRAND_1686_1689">
+        <TYPE id="STRAND" category="Secondary structure">strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1686</START>
+        <END>1689</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_STRAND_1695_1697" label="P38398_STRAND_1695_1697">
+        <TYPE id="STRAND" category="Secondary structure">strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1695</START>
+        <END>1697</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_1701_1708" label="P38398_HELIX_1701_1708">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1701</START>
+        <END>1708</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_STRAND_1712_1715" label="P38398_STRAND_1712_1715">
+        <TYPE id="STRAND" category="Secondary structure">strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1712</START>
+        <END>1715</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_1717_1724" label="P38398_HELIX_1717_1724">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1717</START>
+        <END>1724</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_1731_1734" label="P38398_HELIX_1731_1734">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1731</START>
+        <END>1734</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_TURN_1740_1742" label="P38398_TURN_1740_1742">
+        <TYPE id="TURN" category="Secondary structure">turn</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1740</START>
+        <END>1742</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_1748_1753" label="P38398_HELIX_1748_1753">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1748</START>
+        <END>1753</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_TURN_1760_1763" label="P38398_TURN_1760_1763">
+        <TYPE id="TURN" category="Secondary structure">turn</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1760</START>
+        <END>1763</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_STRAND_1765_1768" label="P38398_STRAND_1765_1768">
+        <TYPE id="STRAND" category="Secondary structure">strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1765</START>
+        <END>1768</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_STRAND_1773_1775" label="P38398_STRAND_1773_1775">
+        <TYPE id="STRAND" category="Secondary structure">strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1773</START>
+        <END>1775</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_1777_1786" label="P38398_HELIX_1777_1786">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1777</START>
+        <END>1786</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_1795_1797" label="P38398_HELIX_1795_1797">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1795</START>
+        <END>1797</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_STRAND_1806_1810" label="P38398_STRAND_1806_1810">
+        <TYPE id="STRAND" category="Secondary structure">strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1806</START>
+        <END>1810</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_1812_1814" label="P38398_HELIX_1812_1814">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1812</START>
+        <END>1814</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_1819_1822" label="P38398_HELIX_1819_1822">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1819</START>
+        <END>1822</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_TURN_1825_1827" label="P38398_TURN_1825_1827">
+        <TYPE id="TURN" category="Secondary structure">turn</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1825</START>
+        <END>1827</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_STRAND_1832_1834" label="P38398_STRAND_1832_1834">
+        <TYPE id="STRAND" category="Secondary structure">strand</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1832</START>
+        <END>1834</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_1835_1844" label="P38398_HELIX_1835_1844">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1835</START>
+        <END>1844</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="P38398_HELIX_1851_1853" label="P38398_HELIX_1851_1853">
+        <TYPE id="HELIX" category="Secondary structure">helix</TYPE>
+        <METHOD id="UNIPROT">UNIPROT</METHOD>
+        <START>1851</START>
+        <END>1853</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="pubmed:7545954" label="pubmed:7545954">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Miki Y., Swensen J., Shattuck-Eidens D., Futreal P.A., Harshman K., Tavtigian S., Liu Q., Cochran C., Bennett L.M., Ding W., Bell R., Rosenthal J., Hussey C., Tran T., McClure M., Frye C., Hattier T., Phelps R., Haugen-Strano A., Katcher H., Yakumo K., Gholami Z., Shaffer D., Stone S., Bayer S., Wray C., Bogden R., Dayananth P., Ward J., Tonin P., Narod S., Bristow P.K., Norris F.H., Helvering L., Morrison P., Rosteck P., Lai M., Barrett J.C., Lewis C., Neuhausen S., Cannon-Albright L., Godlgar D., Wiseman R., Kamb A., Skolnick M.H. (1994). "A strong candidate for the breast and ovarian cancer susceptibility gene BRCA1.", Science, 266 66-71</NOTE>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=7545954">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8938427" label="pubmed:8938427">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Smith T.M., Lee M.K., Szabo C.I., Jerome N., McEuen M., Taylor M., Hood L., King M.-C. (1996). "Complete genomic sequence and analysis of 117 kb of human DNA containing the gene BRCA1.", Genome Res., 6 1029-1049</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8938427">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="submission_3" label="submission_3">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="Unpublished/no plans to publish">Unpublished/no plans to publish</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Rieder M.J., Livingston R.J., Daniels M.R., Chung M.-W., Miyamoto K.E., Nguyen C.P., Nguyen D.A., Poel C.L., Robertson P.D., Schackwitz W.S., Sherwood J.K., Witrak L.A., Nickerson D.A. (2003). "NIEHS-SNPs, environmental genome project, NIEHS ES15478, Department of Genome Sciences, Seattle, WA (URL: http://egp.gs.washington.edu).", </NOTE>
+      </FEATURE>
+      <FEATURE id="pubmed:9528852" label="pubmed:9528852">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Jensen D.E., Proctor M., Marquis S.T., Gardner H.P., Ha S.I., Chodosh L.A., Ishov A.M., Tommerup N., Vissing H., Sekido Y., Minna J., Borodovsky A., Schultz D.C., Wilkinson K.D., Maul G.G., Barlev N., Berger S., Prendergast G.C., Rauscher F.J. III (1998). "BAP1: a novel ubiquitin hydrolase which binds to the BRCA1 RING finger and enhances BRCA1-mediated cell growth suppression.", Oncogene, 16 1097-1112</NOTE>
+        <LINK href="http://dx.doi.org/10.1038/sj.onc.1201861">Resolve DOI: 10.1038/sj.onc.1201861</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9528852">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10500182" label="pubmed:10500182">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Lorick K.L., Jensen J.P., Fang S., Ong A.M., Hatakeyama S., Weissman A.M. (1999). "RING fingers mediate ubiquitin-conjugating enzyme (E2)-dependent ubiquitination.", Proc. Natl. Acad. Sci. U.S.A., 96 11364-11369</NOTE>
+        <LINK href="http://dx.doi.org/10.1073/pnas.96.20.11364">Resolve DOI: 10.1073/pnas.96.20.11364</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10500182">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10783165" label="pubmed:10783165">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Wang Y., Cortez D., Yazdi P., Neff N., Elledge S.J., Qin J. (2000). "BASC, a super complex of BRCA1-associated proteins involved in the recognition and repair of aberrant DNA structures.", Genes Dev., 14 927-939</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10783165">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1101/gad.827000">Resolve DOI: 10.1101/gad.827000</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11114888" label="pubmed:11114888">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Tibbetts R.S., Cortez D., Brumbaugh K.M., Scully R., Livingston D., Elledge S.J., Abraham R.T. (2000). "Functional interactions between BRCA1 and the checkpoint kinase ATR during genotoxic stress.", Genes Dev., 14 2989-3002</NOTE>
+        <LINK href="http://dx.doi.org/10.1101/gad.851000">Resolve DOI: 10.1101/gad.851000</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11114888">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11301010" label="pubmed:11301010">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Cantor S.B., Bell D.W., Ganesan S., Kass E.M., Drapkin R., Grossman S., Wahrer D.C.R., Sgroi D.C., Lane W.S., Haber D.A., Livingston D.M. (2001). "BACH1, a novel helicase-like protein, interacts directly with BRCA1 and contributes to its DNA repair function.", Cell, 105 149-160</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/S0092-8674(01)00304-X">Resolve DOI: 10.1016/S0092-8674(01)00304-X</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11301010">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11739404" label="pubmed:11739404">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Ye Q., Hu Y.-F., Zhong H., Nye A.C., Belmont A.S., Li R. (2001). "BRCA1-induced large-scale chromatin unfolding and allele-specific effects of cancer-predisposing mutations.", J. Cell Biol., 155 911-921</NOTE>
+        <LINK href="http://dx.doi.org/10.1083/jcb.200108049">Resolve DOI: 10.1083/jcb.200108049</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11739404">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11239454" label="pubmed:11239454">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Garcia-Higuera I., Taniguchi T., Ganesan S., Meyn M.S., Timmers C., Hejna J., Grompe M., D'Andrea A.D. (2001). "Interaction of the Fanconi anemia proteins and BRCA1 in a common pathway.", Mol. Cell, 7 249-262</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/S1097-2765(01)00173-3">Resolve DOI: 10.1016/S1097-2765(01)00173-3</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11239454">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12183412" label="pubmed:12183412">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Xu B., O'Donnell A.H., Kim S.-T., Kastan M.B. (2002). "Phosphorylation of serine 1387 in BRCA1 is specifically required for the Atm-mediated S-phase checkpoint after ionizing irradiation.", Cancer Res., 62 4588-4591</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12183412">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12419185" label="pubmed:12419185">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Kobayashi J., Tauchi H., Sakamoto S., Nakamura A., Morishima K., Matsuura S., Kobayashi T., Tamai K., Tanimoto K., Komatsu K. (2002). "NBS1 localizes to gamma-H2AX foci through interaction with the FHA/BRCT domain.", Curr. Biol., 12 1846-1851</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/S0960-9822(02)01259-9">Resolve DOI: 10.1016/S0960-9822(02)01259-9</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12419185">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11877377" label="pubmed:11877377">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Yazdi P.T., Wang Y., Zhao S., Patel N., Lee E.Y.-H.P., Qin J. (2002). "SMC1 is a downstream effector in the ATM/NBS1 branch of the human S-phase checkpoint.", Genes Dev., 16 571-582</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11877377">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1101/gad.970702">Resolve DOI: 10.1101/gad.970702</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:11836499" label="pubmed:11836499">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Yarden R.I., Pardo-Reoyo S., Sgagias M., Cowan K.H., Brody L.C. (2002). "BRCA1 regulates the G2/M checkpoint by activating Chk1 kinase upon DNA damage.", Nat. Genet., 30 285-289</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=11836499">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/ng837">Resolve DOI: 10.1038/ng837</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12360400" label="pubmed:12360400">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Magnard C., Bachelier R., Vincent A., Jaquinod M., Kieffer S., Lenoir G.M., Venezia N.D. (2002). "BRCA1 interacts with acetyl-CoA carboxylase through its tandem of BRCT domains.", Oncogene, 21 6729-6739</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12360400">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/sj.onc.1205915">Resolve DOI: 10.1038/sj.onc.1205915</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12887909" label="pubmed:12887909">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Vandenberg C.J., Gergely F., Ong C.Y., Pace P., Mallery D.L., Hiom K., Patel K.J. (2003). "BRCA1-independent ubiquitination of FANCD2.", Mol. Cell, 12 247-254</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/S1097-2765(03)00281-8">Resolve DOI: 10.1016/S1097-2765(03)00281-8</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12887909">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:14636569" label="pubmed:14636569">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Dong Y., Hakimi M.-A., Chen X., Kumaraswamy E., Cooch N.S., Godwin A.K., Shiekhattar R. (2003). "Regulation of BRCC, a holoenzyme complex containing BRCA1 and BRCA2, by a signalosome-like subunit and its role in DNA repair.", Mol. Cell, 12 1087-1099</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/S1097-2765(03)00424-6">Resolve DOI: 10.1016/S1097-2765(03)00424-6</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=14636569">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:15456891" label="pubmed:15456891">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Zhang X., Succi J., Feng Z., Prithivirajsingh S., Story M.D., Legerski R.J. (2004). "Artemis is a phosphorylation target of ATM and ATR and is involved in the G2/M DNA damage checkpoint response.", Mol. Cell. Biol., 24 9207-9220</NOTE>
+        <LINK href="http://dx.doi.org/10.1128/MCB.24.20.9207-9220.2004">Resolve DOI: 10.1128/MCB.24.20.9207-9220.2004</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=15456891">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:15096610" label="pubmed:15096610">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Lin S.-Y., Li K., Stewart G.S., Elledge S.J. (2004). "Human claspin works with BRCA1 to both positively and negatively regulate cell proliferation.", Proc. Natl. Acad. Sci. U.S.A., 101 6484-6489</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=15096610">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1073/pnas.0401847101">Resolve DOI: 10.1073/pnas.0401847101</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:17081983" label="pubmed:17081983">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Olsen J.V., Blagoev B., Gnad F., Macek B., Kumar C., Mortensen P., Mann M. (2006). "Global, in vivo, and site-specific phosphorylation dynamics in signaling networks.", Cell, 127 635-648</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=17081983">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1016/j.cell.2006.09.026">Resolve DOI: 10.1016/j.cell.2006.09.026</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:16326698" label="pubmed:16326698">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Moreau K., Dizin E., Ray H., Luquain C., Lefai E., Foufelle F., Billaud M., Lenoir G.M., Venezia N.D. (2006). "BRCA1 affects lipid synthesis through its interaction with acetyl-CoA carboxylase.", J. Biol. Chem., 281 3172-3181</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=16326698">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1074/jbc.M504652200">Resolve DOI: 10.1074/jbc.M504652200</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:16698035" label="pubmed:16698035">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Ray H., Moreau K., Dizin E., Callebaut I., Venezia N.D. (2006). "ACCA phosphopeptide recognition by the BRCT repeats of BRCA1.", J. Mol. Biol., 359 973-982</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=16698035">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1016/j.jmb.2006.04.010">Resolve DOI: 10.1016/j.jmb.2006.04.010</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8807330" label="pubmed:8807330">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Couch F.J., Weber B.L. (1996). "Mutations and polymorphisms in the familial early-onset breast cancer (BRCA1) gene.", Hum. Mutat., 8 8-18</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8807330">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:17525332" label="pubmed:17525332">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Matsuoka S., Ballif B.A., Smogorzewska A., McDonald E.R. III, Hurov K.E., Luo J., Bakalarski C.E., Zhao Z., Solimini N., Lerenthal Y., Shiloh Y., Gygi S.P., Elledge S.J. (2007). "ATM and ATR substrate analysis reveals extensive protein networks responsive to DNA damage.", Science, 316 1160-1166</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=17525332">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1126/science.1140321">Resolve DOI: 10.1126/science.1140321</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:7939630" label="pubmed:7939630">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Futreal P.A., Liu Q., Shattuck-Eidens D., Cochran C., Harshman K., Tavtigian S., Bennett L.M., Haugen-Strano A., Swensen J., Miki Y., Eddington K., McClure M., Frye C., Weaver-Felhaus J., Ding W., Gholami Z., Soederkvist P., Terry L., Jhanwar S., Berchuk A., Iglehart J.D., Marks J., Ballinger D.G., Barrett J.C., Skolnick M.H., Kamb A., Wiseman R. (1994). "BRCA1 mutations in primary breast and ovarian carcinomas.", Science, 266 120-122</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=7939630">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:7894491" label="pubmed:7894491">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Castilla L.H., Couch F.J., Erdos M.R., Hoskins K.F., Calzone K., Garber J.E., Boyd J., Lubin M.B., Deshano M.L., Brody L.C., Collins F.S., Weber B.L. (1994). "Mutations in the BRCA1 gene in families with early-onset breast and ovarian cancer.", Nat. Genet., 8 387-391</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=7894491">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/ng1294-387">Resolve DOI: 10.1038/ng1294-387</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:7894493" label="pubmed:7894493">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Friedman L.S., Ostermeyer E.A., Szabo C.I., Dowd P., Lynch E.D., Rowell S.E., King M.-C. (1994). "Confirmation of BRCA1 by analysis of germline mutations linked to breast and ovarian cancer in ten families.", Nat. Genet., 8 399-404</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=7894493">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/ng1294-399">Resolve DOI: 10.1038/ng1294-399</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8554067" label="pubmed:8554067">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Serova O., Montagna M., Torchard D., Narod S.A., Tonin P., Sylla B., Lynch H.T., Feunteun J., Lenoir G.M. (1996). "A high incidence of BRCA1 mutations in 20 breast-ovarian cancer families.", Am. J. Hum. Genet., 58 42-51</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8554067">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/">Resolve DOI: </LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8968716" label="pubmed:8968716">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Barker D.F., Almeida E.F.A., Casey G., Fain P.R., Liao S.-Y., Masunaka I., Noble B., Kurosaki T., Anton-Culver H. (1996). "BRCA1 R841W: a strong candidate for a common mutation with moderate phenotype.", Genet. Epidemiol., 13 595-604</NOTE>
+        <LINK href="http://dx.doi.org/10.1002/(SICI)1098-2272(1996)13:6&lt;595::AID-GEPI5&gt;3.3.CO;2-0">Resolve DOI: 10.1002/(SICI)1098-2272(1996)13:6&lt;595::AID-GEPI5&gt;3.3.CO;2-0</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8968716">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8776600" label="pubmed:8776600">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Durocher F., Shattuck-Eidens D., McClure M., Labrie F., Skolnick M.H., Goldgar D.E., Simard J. (1996). "Comparison of BRCA1 polymorphisms, rare sequence variants and/or missense mutations in unaffected and breast/ovarian cancer populations.", Hum. Mol. Genet., 5 835-842</NOTE>
+        <LINK href="http://dx.doi.org/10.1093/hmg/5.6.835">Resolve DOI: 10.1093/hmg/5.6.835</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8776600">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8723683" label="pubmed:8723683">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Katagiri T., Emi M., Ito I., Kobayashi K., Yoshimoto M., Iwase T., Kasumi F., Miki Y., Skolnick M.H., Nakamura Y. (1996). "Mutations in the BRCA1 gene in Japanese breast cancer patients.", Hum. Mutat., 7 334-339</NOTE>
+        <LINK href="http://dx.doi.org/10.1002/(SICI)1098-1004(1996)7:4&lt;334::AID-HUMU7&gt;3.3.CO;2-K">Resolve DOI: 10.1002/(SICI)1098-1004(1996)7:4&lt;334::AID-HUMU7&gt;3.3.CO;2-K</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8723683">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9760198" label="pubmed:9760198">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Dong J., Chang-Claude J., Wu Y., Schumacher V., Debatin I., Tonin P., Royer-Pokora B. (1998). "A high proportion of mutations in the BRCA1 gene in German breast/ovarian cancer families with clustering of mutations in the 3' third of the gene.", Hum. Genet., 103 154-161</NOTE>
+        <LINK href="http://dx.doi.org/10.1007/s004390050799">Resolve DOI: 10.1007/s004390050799</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9760198">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9482581" label="pubmed:9482581">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Andersen T.I., Eiken H.G., Couch F., Kaada G., Skrede M., Johnsen H., Aloysius T.A., Tveit K.M., Tranebjaerg L., Doerum A., Moeller P., Weber B.L., Boerresen-Dale A.-L. (1998). "Constant denaturant gel electrophoresis (CDGE) in BRCA1 mutation screening.", Hum. Mutat., 11 166-174</NOTE>
+        <LINK href="http://dx.doi.org/10.1002/(SICI)1098-1004(1998)11:2&lt;166::AID-HUMU10&gt;3.3.CO;2-V">Resolve DOI: 10.1002/(SICI)1098-1004(1998)11:2&lt;166::AID-HUMU10&gt;3.3.CO;2-V</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9482581">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9609997" label="pubmed:9609997">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Katagiri T., Kasumi F., Yoshimoto M., Nomizu T., Asaishi K., Abe R., Tsuchiya A., Sugano M., Takai S., Yoneda M., Fukutomi T., Nanba K., Makita M., Okazaki H., Hirata K., Okazaki M., Furutsuma Y., Morishita Y., Iino Y., Karino T., Ayabe H., Hara S., Kajiwara T., Houga S., Shimizu T., Toda M., Yamazaki Y., Uchida T., Kunitomo K., Sonoo H., Kurebayashi J., Shimotsuma K., Nakamura Y., Miki Y. (1998). "High proportion of missense mutations of the BRCA1 and BRCA2 genes in Japanese breast cancer families.", J. Hum. Genet., 43 42-48</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=9609997">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1007/s100380050035">Resolve DOI: 10.1007/s100380050035</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10486320" label="pubmed:10486320">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Gayther S.A., Russell P., Harrington P., Antoniou A.C., Easton D.F., Ponder B.A.J. (1999). "The contribution of germline BRCA1 and BRCA2 mutations to familial ovarian cancer: no evidence for other ovarian cancer-susceptibility genes.", Am. J. Hum. Genet., 65 1021-1029</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10486320">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1086/302583">Resolve DOI: 10.1086/302583</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10323242" label="pubmed:10323242">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Li S.S.-L., Tseng H.-M., Yang T.-P., Liu C.-H., Teng S.-J., Huang H.-W., Chen L.-M., Kao H.-W., Chen J.H., Tseng J.-N., Chen A., Hou M.-F., Huang T.-J., Chang H.-T., Mok K.-T., Tsai J.-H. (1999). "Molecular characterization of germline mutations in the BRCA1 and BRCA2 genes from breast cancer families in Taiwan.", Hum. Genet., 104 201-204</NOTE>
+        <LINK href="http://dx.doi.org/10.1007/s004390050936">Resolve DOI: 10.1007/s004390050936</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10323242">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10196379" label="pubmed:10196379">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Janezic S.A., Ziogas A., Krumroy L.M., Krasner M., Plummer S.J., Cohen P., Gildea M., Barker D., Haile R., Casey G., Anton-Culver H. (1999). "Germline BRCA1 alterations in a population-based series of ovarian cancer cases.", Hum. Mol. Genet., 8 889-897</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10196379">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1093/hmg/8.5.889">Resolve DOI: 10.1093/hmg/8.5.889</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12215251" label="pubmed:12215251">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Deffenbaugh A.M., Frank T.S., Hoffman M., Cannon-Albright L., Neuhausen S.L. (2002). "Characterization of common BRCA1 and BRCA2 variants.", Genet. Test., 6 119-121</NOTE>
+        <LINK href="http://dx.doi.org/10.1089/10906570260199375">Resolve DOI: 10.1089/10906570260199375</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12215251">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12442274" label="pubmed:12442274">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Zhi X., Szabo C., Chopin S., Suter N., Wang Q.-S., Ostrander E.A., Sinilnikova O.M., Lenoir G.M., Goldgar D., Shi Y.-R. (2002). "BRCA1 and BRCA2 sequence variants in Chinese breast cancer families.", Hum. Mutat., 20 474-474</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12442274">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1002/humu.9083">Resolve DOI: 10.1002/humu.9083</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12442275" label="pubmed:12442275">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Ruiz-Flores P., Sinilnikova O.M., Badzioch M., Calderon-Garciduenas A.L., Chopin S., Fabrice O., Gonzalez-Guerrero J.F., Szabo C., Lenoir G., Goldgar D.E., Barrera-Saldana H.A. (2002). "BRCA1 and BRCA2 mutation analysis of early-onset and familial breast cancer cases in Mexico.", Hum. Mutat., 20 474-475</NOTE>
+        <LINK href="http://dx.doi.org/10.1002/humu.9084">Resolve DOI: 10.1002/humu.9084</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12442275">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12938098" label="pubmed:12938098">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Meyer P., Voigtlaender T., Bartram C.R., Klaes R. (2003). "Twenty-three novel BRCA1 and BRCA2 sequence alterations in breast and/or ovarian cancer families in Southern Germany.", Hum. Mutat., 22 259-259</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=12938098">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1002/humu.9174">Resolve DOI: 10.1002/humu.9174</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:15026808" label="pubmed:15026808">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Claes K., Poppe B., Coene I., De Paepe A., Messiaen L. (2004). "BRCA1 and BRCA2 germline mutation spectrum and frequencies in Belgian breast/ovarian cancer families.", Br. J. Cancer, 90 1244-1251</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=15026808">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1038/sj.bjc.6601656">Resolve DOI: 10.1038/sj.bjc.6601656</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:14746861" label="pubmed:14746861">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Malander S., Ridderheim M., Masbaeck A., Loman N., Kristoffersson U., Olsson H., Nilbert M., Borg A. (2004). "One in 10 ovarian cancer patients carry germ line BRCA1 or BRCA2 mutations: results of a prospective study in Southern Sweden.", Eur. J. Cancer, 40 422-428</NOTE>
+        <LINK href="http://dx.doi.org/10.1016/j.ejca.2003.09.016">Resolve DOI: 10.1016/j.ejca.2003.09.016</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=14746861">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:14722926" label="pubmed:14722926">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Valarmathi M.T., Sawhney M., Deo S.S.V., Shukla N.K., Das S.N. (2004). "Novel germline mutations in the BRCA1 and BRCA2 genes in Indian breast and breast-ovarian cancer families.", Hum. Mutat., 23 205-205</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=14722926">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1002/humu.9213">Resolve DOI: 10.1002/humu.9213</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:15365993" label="pubmed:15365993">
+        <TYPE id="reference" category="reference">reference</TYPE>
+        <METHOD id="journal article">journal article</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>0.0</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Seo J.H., Cho D.-Y., Ahn S.-H., Yoon K.-S., Kang C.-S., Cho H.M., Lee H.S., Choe J.J., Choi C.W., Kim B.S., Shin S.W., Kim Y.H., Kim J.S., Son G.-S., Lee J.-B., Koo B.H. (2004). "BRCA1 and BRCA2 germline mutations in Korean patients with sporadic breast cancer.", Hum. Mutat., 24 350-350</NOTE>
+        <LINK href="http://dx.doi.org/10.1002/humu.9275">Resolve DOI: 10.1002/humu.9275</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=15365993">View in CiteXplore</LINK>
+      </FEATURE>
+    </SEGMENT>
+  </GFF>
+</DASGFF>
