@@ -1,4 +1,4 @@
-# IDE/eclipse support files
+# IDE/eclipse/emacs support files
 **/.buildpath
 **/.classpath
 **/.idea/
@@ -15,6 +15,7 @@
 **/target
 **/target-eclipse
 
+**/*~
 
 */eclipse*
 
@@ -52,4 +53,6 @@
 **/System.out
 
 */grails-app/i18n/
+
+**/.DS_Store
 
