@@ -45,8 +45,11 @@
 */plugins
 */web-app/plugins
 */web-app/WEB-INF/classes
+*/web-app/node_modules
+*/web-app/tmp
 
 # other
 **/System.out
 
 */grails-app/i18n/
+
