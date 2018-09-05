@@ -278,10 +278,12 @@ class Auth0Controller implements InitializingBean {
 		 tosValue        : settings.fieldvalue + (customizationService.setting('tos.text_cont')?.fieldvalue ?: '')]
 	}
 
-	def adminUserList() {
+	def adminUserList(String sort, String order, Integer max, Integer offset) {
 		accessLog securityService.currentUsername(), 'View userlist'
 
-		render view: 'userlist', model: [users: userService.buildUserListUserInfo()]
+		render view: 'userlist', model: [
+				users: userService.buildUserListUserInfo(sort, order ?: 'asc', max ?: 10, offset ?: 0),
+				userCount: AuthUser.count()]
 	}
 
 	def adminUserShow(AuthUser authUser) {

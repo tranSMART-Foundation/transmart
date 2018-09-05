@@ -35,9 +35,9 @@ class UserService {
 		currentUserInfo user
 	}
 
-	List<Map> buildUserListUserInfo() {
+	List<Map> buildUserListUserInfo(String sort, String order, int max, int offset) {
 		List<Map> userData = []
-		for (AuthUser authUser in AuthUser.list()) {
+		for (AuthUser authUser in AuthUser.list(sort: sort, order: order, max: max, offset: offset)) {
 			userData << buildUserInfo(authUser)
 		}
 		userData

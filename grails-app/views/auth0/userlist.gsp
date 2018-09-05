@@ -13,14 +13,14 @@
 		<table>
 			<thead>
 			<tr>
-				<th>WWID</th>
-				<th>Username</th>
-				<th>Full Name</th>
-				<th>Email</th>
+				<g:sortableColumn property='id' title='WWID'/>
+				<g:sortableColumn property='username' title='Username'/>
+				<g:sortableColumn property='userRealName' title='Full Name'/>
+				<g:sortableColumn property='email' title='Email'/>
 				<th>Connection</th>
-				<th>Unique ID</th>
+				<g:sortableColumn property='uniqueId' title='Unique ID'/>
 				<th>Access Level</th>
-				<th>Last Updated</th>
+				<g:sortableColumn property='lastUpdated' title='Last Updated'/>
 				<th>&nbsp;</th>
 			</tr>
 			</thead>
@@ -34,7 +34,7 @@
 					<td>${person.connection.encodeAsHTML()}</td>
 					<td>${person.uniqueId?.encodeAsHTML()}</td>
 					<td>${person.level.encodeAsHTML()}</td>
-					<td>${person.lastUpdated.toString().encodeAsHTML()}</td>
+					<td>${person.lastUpdated.format('yyyy-MM-dd').encodeAsHTML()}</td>
 					<td class="actionButtons">
 						<span class="actionButton">
 							<g:link controller='authUser' action='show' id="${person.id}">Show</g:link>
@@ -44,6 +44,9 @@
 			</g:each>
 			</tbody>
 		</table>
+	</div>
+	<div class="paginateButtons">
+		<g:paginate total="${userCount}"/>
 	</div>
 </div>
 </body>
