@@ -71,6 +71,7 @@
 **/.metadata
 **/.gradle
 */bin/
+*/dist/
 */tmp/
 **/*.tmp
 **/*.bak
