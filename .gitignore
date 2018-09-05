@@ -1,18 +1,15 @@
-# IDE support files
-*/.classpath
-*/.launch
-*/.project
-*/.settings
-*/*.launch
-*/*.tmproj
-*/ivy*
-*/eclipse*
-*/*.iml
-
-# eclipse generated files
-**/.settings
+# IDE/eclipse support files
+**/.buildpath
 **/.classpath
+**/.launch
 **/.project
+**/.settings
+**/*.launch
+**/*.tmproj
+**/ivy*
+**/*.iml
+
+*/eclipse*
 
 # default HSQL database files for production mode
 */prodDb.*
@@ -21,21 +18,19 @@
 *Db.properties
 *Db.script
 
-# grails generate files
+# grails generated files
 */plugin.xml
 
 # logs
-*/stacktrace.log
-*/test/reports
-*/logs
-/biomart-domain/*.log
-/search-domain/*.log
-/transmart-java/*.log
+**/stacktrace.log
+**/test/reports
+**/logs
+**/*.log
 
-# project release file
-*/*.war
+# project release files
+*/*/*.war
 
-# plugin release file
+# plugin release files
 */*.zip
 */*.zip.sha1
 
@@ -44,14 +39,12 @@
 */web-app/plugins
 */web-app/WEB-INF/classes
 
-# "temporary" build files
-/transmart-java/eclipse-target
-/transmart-java/target
-/search-domain/eclipse-target
-/search-domain/target
-/biomart-domain/eclipse-target
-/biomart-domain/target
-
 # other
-*/System.out
-*/*.iws
+**/System.out
+**/*.iws
+
+**/target
+**/.idea/
+**/*.ipr
+
+*/grails-app/i18n/
