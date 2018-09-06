@@ -1262,7 +1262,7 @@ class I2b2HelperService {
 
         ExportColumn hascol
 
-        log.debug "----------------- start addConceptDataToTable <<<<<< <<<<<< <<<<<<"
+        log.debug "----------------- start addConceptDataToTable ...... ...... ......"
         log.trace "concept_key = " + concept_key
 
         def leafConceptFlag =  isLeafConceptKey(concept_key)
@@ -1570,7 +1570,7 @@ class I2b2HelperService {
     }
 
     def insertAcrossTrialsConceptDataIntoTable(columnid,concept_key,result_instance_id,valueLeafNodeFlag,tablein, user) {
-        log.debug "----------------- insertAcrossTrialsConceptDataIntoTable <<<< ---- <<<<<"
+        log.debug "----------------- insertAcrossTrialsConceptDataIntoTable .... ---- ....."
 
         def data = fetchAcrossTrialsData(concept_key,result_instance_id,user)
         data.each{
