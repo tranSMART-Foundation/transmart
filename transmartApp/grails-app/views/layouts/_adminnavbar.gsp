@@ -53,8 +53,8 @@
     </div>
 </div>
 
-<g:if test="${!!grailsApplication.getControllerClass('blend4j.plugin.GalaxyUserDetailsController')}">
-    <g:if test="${grailsApplication.config.com.galaxy.blend4j.galaxyEnabled}">
+<g:if test="${!!grailsApplication.getControllerClass('export.plugin.GalaxyUserDetailsController')}">
+    <g:if test="${grailsApplication.config.com.galaxy.export.galaxyEnabled}">
         <div class="navbarBox">
             <div class="navcontainer1">
                 <h1 class="panelHeader">

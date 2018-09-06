@@ -153,7 +153,7 @@ grails.project.dependency.resolution = {
             runtime ':dalliance-plugin:16.4-SNAPSHOT'
             runtime ':transmart-mydas:16.4-SNAPSHOT'
             runtime ':transmart-rest-api:16.4-SNAPSHOT'
-            runtime ':blend4j-plugin:16.4-SNAPSHOT'
+            runtime ':galaxy-export-plugin:16.4-SNAPSHOT'
             runtime ':transmart-metacore-plugin:16.4-SNAPSHOT'
             runtime ':transmart-xnat-importer:16.4-SNAPSHOT'
             runtime ':xnat-viewer:16.4-SNAPSHOT'
@@ -184,7 +184,7 @@ dm?.with {
     configureInternalPlugin 'runtime', 'dalliance-plugin'
     configureInternalPlugin 'runtime', 'transmart-mydas'
     configureInternalPlugin 'runtime', 'transmart-rest-api'
-    configureInternalPlugin 'runtime', 'blend4j-plugin'
+    configureInternalPlugin 'runtime', 'galaxy-export-plugin'
     configureInternalPlugin 'runtime', 'transmart-metacore-plugin'
 }
 

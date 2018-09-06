@@ -716,10 +716,10 @@ com.thomsonreuters.transmart.demoMapBaseURL = "http://pathwaymaps.com/maps/"
 
 /* }}} */
 
-/* {{{ galaxy plugin (blend4j) */
+/* {{{ galaxy export plugin */
 
-com.galaxy.blend4j.galaxyEnabled = false
-com.galaxy.blend4j.galaxyURL = "http://usegalaxy.org/"
+com.galaxy.export.galaxyEnabled = false
+com.galaxy.export.galaxyURL = "http://usegalaxy.org/"
 
 /* }}} */
 

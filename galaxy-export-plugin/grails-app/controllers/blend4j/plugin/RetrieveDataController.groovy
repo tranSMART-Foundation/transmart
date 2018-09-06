@@ -1,4 +1,4 @@
-package blend4j.plugin
+package galaxy.export.plugin
 
 import grails.converters.JSON
 
@@ -8,7 +8,7 @@ class RetrieveDataController  {
     def retrieveDataService
 
     def JobExportToGalaxy = {
-        final  galaxyURL = grailsApplication.config.com.galaxy.blend4j.galaxyURL;
+        final  galaxyURL = grailsApplication.config.com.galaxy.export.galaxyURL;
         final tempFolderDirectory  = grailsApplication.config.com.recomdata.plugins.tempFolderDirectory
         final String idOfTheUser = springSecurityService.getPrincipal().username;
 

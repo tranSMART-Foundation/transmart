@@ -1,4 +1,4 @@
-blend4j-plugin
-==============
+galaxy-export-plugin
+====================
 
-blend4j-plugin is a grails plugin to access galaxy.
+galaxy-export-plugin is a grails plugin to access galaxy and export data from tranSMART.

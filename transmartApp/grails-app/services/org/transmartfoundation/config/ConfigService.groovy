@@ -213,10 +213,10 @@ class ConfigService {
                 desc:'Data Export maximum jobs loaded '],
         ]
         Map galaxyParams = [
-            'com.galaxy.blend4j.galaxyEnabled': [
+            'com.galaxy.export.galaxyEnabled': [
                 default: false,
                 desc:'Galaxy export plugin enabled if true'],
-            'com.galaxy.blend4j.galaxyEnabled': [
+            'com.galaxy.export.galaxyEnabled': [
                 desc:'Galaxy server URL for Galaxy export tab'],
         ]
         Map generalParams = [
@@ -734,8 +734,8 @@ class ConfigService {
             else if(k == "com.recomdata.plugins.resultSize"){addConfig(exportParams,k,v,'')}
 
             // galaxy
-            else if(k == "com.galaxy.blend4j.galaxyEnabled"){addConfig(galaxyParams,k,v,'')}
-            else if(k == "com.galaxy.blend4j.galaxyURL"){addConfig(galaxyParams,k,v,'')}
+            else if(k == "com.galaxy.export.galaxyEnabled"){addConfig(galaxyParams,k,v,'')}
+            else if(k == "com.galaxy.export.galaxyURL"){addConfig(galaxyParams,k,v,'')}
 
             // general
             else if(k == "com.recomdata.appTitle"){addConfig(generalParams,k,v,'')}

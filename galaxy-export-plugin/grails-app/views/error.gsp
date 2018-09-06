@@ -6,14 +6,14 @@
     <g:if env="development"><link rel="stylesheet" href="${resource(dir: 'css', file: 'errors.css')}" type="text/css"></g:if>
   </head>
   <body>
-    <g:logMsg>blend4j-plugin An error has occurred</g:logMsg>
+    <g:logMsg>galaxy-export-plugin An error has occurred</g:logMsg>
     <g:logMsg>exception '${exception}'</g:logMsg>
     <g:if env="development">
       <g:renderException exception="${exception}" />
     </g:if>
     <g:else>
       <ul class="errors">
-        <li>blend4j-plugin</li>
+        <li>galaxy-export-plugin</li>
 	<li>An error has occurred</li>
 	<li><g:renderException exception="${exception}"/></li>
       </ul>

@@ -1,4 +1,4 @@
-class Blend4jPluginGrailsPlugin {
+class GalaxyExportPluginGrailsPlugin {
 
     public static final String TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME = 'transmartExtensionsRegistry'
 
@@ -12,7 +12,7 @@ class Blend4jPluginGrailsPlugin {
     ]
 
     // TODO Fill in these fields
-    def title = "Blend4j Plugin" // Headline display name of the plugin
+    def title = "Galaxy Export Plugin" // Headline display name of the plugin
     def author = "Transmart Foundation"
     def authorEmail = "admin@transmartproject.org"
     def description = '''\
@@ -20,7 +20,7 @@ Brief summary/description of the plugin.
 '''
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/blend4j-plugin"
+    def documentation = "http://grails.org/plugin/galaxy-export-plugin"
 
     // Extra (optional) plugin metadata
 
@@ -53,11 +53,11 @@ Brief summary/description of the plugin.
 
     def doWithApplicationContext = { ctx ->
         def grailsApplication = ctx.getBean('grailsApplication')
-        boolean galaxyEnabled = grailsApplication.config.com.galaxy.blend4j.galaxyEnabled
+        boolean galaxyEnabled = grailsApplication.config.com.galaxy.export.galaxyEnabled
         if (galaxyEnabled && ctx.containsBean(TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME)) {
             ctx.getBean(TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME)
-                    .registerAnalysisTabExtension('blend4j-plugin',
-                    '/Blend4jPlugin/loadScripts', 'addGalaxyPanel', )
+                    .registerAnalysisTabExtension('galaxy-export-plugin',
+                    '/GalaxyExportPlugin/loadScripts', 'addGalaxyPanel', )
         }
     }
 

@@ -1,4 +1,4 @@
-package blend4j.plugin
+package galaxy.export.plugin
 
 import com.github.jmchilton.blend4j.galaxy.GalaxyInstance
 import com.github.jmchilton.blend4j.galaxy.GalaxyInstanceFactory

@@ -1,10 +1,10 @@
-package blend4j.plugin
+package galaxy.export.plugin
 
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
-class Blend4jPluginController {
+class GrailsExportPluginController {
 
     /**
      *   Called to get the path to javascript resources such that the plugin can be loaded in the datasetExplorer

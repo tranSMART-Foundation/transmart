@@ -90,10 +90,10 @@ dataExport {
 
 /* }}} */
 
-/* {{{ galaxy plugin (blend4j) */
+/* {{{ galaxy export plugin */
 
-//com.galaxy.blend4j.galaxyEnabled = true
-//com.galaxy.blend4j.galaxyURL = "http://usegalaxy.org/"
+//com.galaxy.export.galaxyEnabled = true
+//com.galaxy.export.galaxyURL = "http://usegalaxy.org/"
 
 /* }}} */
 

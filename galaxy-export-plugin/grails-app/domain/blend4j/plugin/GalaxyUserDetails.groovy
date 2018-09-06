@@ -1,4 +1,4 @@
-package blend4j.plugin
+package galaxy.export.plugin
 
 class GalaxyUserDetails implements Serializable {
 
