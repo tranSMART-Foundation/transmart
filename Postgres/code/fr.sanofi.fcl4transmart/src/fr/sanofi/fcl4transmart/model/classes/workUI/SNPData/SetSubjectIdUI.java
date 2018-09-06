@@ -1,0 +1,213 @@
+package fr.sanofi.fcl4transmart.model.classes.workUI.SNPData;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.Vector;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+import fr.sanofi.fcl4transmart.controllers.FileHandler;
+import fr.sanofi.fcl4transmart.controllers.listeners.snpData.SetSubjectIdListener;
+import fr.sanofi.fcl4transmart.model.classes.dataType.SnpData;
+import fr.sanofi.fcl4transmart.model.interfaces.DataTypeItf;
+import fr.sanofi.fcl4transmart.model.interfaces.WorkItf;
+
+public class SetSubjectIdUI implements WorkItf {
+	private DataTypeItf dataType;
+	private Vector<Text> valuesFields;
+	private Vector<String> values;
+	private Vector<String> samples;
+	private Vector<Text> samplesFields;
+	public SetSubjectIdUI(DataTypeItf dataType){
+		this.dataType=dataType;
+	}
+	@Override
+	public Composite createUI(Composite parent) {		
+		this.valuesFields=new Vector<Text>();
+		this.samplesFields=new Vector<Text>();
+		this.initiate();
+		
+		Composite composite=new Composite(parent, SWT.NONE);
+		GridLayout gd=new GridLayout();
+		gd.numColumns=1;
+		gd.horizontalSpacing=0;
+		gd.verticalSpacing=0;
+		composite.setLayout(gd);
+		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		ScrolledComposite scroller=new ScrolledComposite(composite, SWT.H_SCROLL | SWT.V_SCROLL);
+		scroller.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gd=new GridLayout();
+		gd.numColumns=1;
+		gd.horizontalSpacing=0;
+		gd.verticalSpacing=0;
+		
+		Composite scrolledComposite=new Composite(scroller, SWT.NONE);
+		scroller.setContent(scrolledComposite); 
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 1;
+		scrolledComposite.setLayout(layout);
+		
+		Composite body=new Composite(scrolledComposite, SWT.NONE);
+		gd=new GridLayout();
+		gd.numColumns=2;
+		gd.horizontalSpacing=5;
+		gd.verticalSpacing=5;
+		body.setLayout(gd);
+		body.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		Label column1=new Label(body, SWT.NONE);
+		column1.setText("Sample");
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.widthHint=100;
+		column1.setLayoutData(gridData);
+		Label column2=new Label(body, SWT.NONE);
+		column2.setText("Value");
+		gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.widthHint=100;
+		column2.setLayoutData(gridData);
+		
+		///
+		for(int i=0; i<this.samples.size(); i++){
+			Text sampleText=new Text(body, SWT.BORDER);
+			sampleText.setText(samples.get(i));
+			sampleText.setEditable(false);
+			this.samplesFields.add(sampleText);
+			gridData = new GridData();
+			gridData.horizontalAlignment = SWT.FILL;
+			gridData.grabExcessHorizontalSpace = true;
+			gridData.widthHint=100;
+			sampleText.setLayoutData(gridData);
+			
+			Text subjectText=new Text(body, SWT.BORDER);
+			if(this.values.size()>i && this.values.get(i)!=null) subjectText.setText(this.values.get(i));
+			gridData = new GridData();
+			gridData.horizontalAlignment = SWT.FILL;
+			gridData.grabExcessHorizontalSpace = true;
+			gridData.widthHint=100;
+			subjectText.setLayoutData(gridData);
+			this.valuesFields.add(subjectText);
+			this.valuesFields.elementAt(i).addModifyListener(new ModifyListener(){
+				public void modifyText(ModifyEvent e){
+					int n=valuesFields.indexOf(e.getSource());
+					values.setElementAt(valuesFields.elementAt(n).getText(), n);
+				}
+			});
+		}
+		
+		@SuppressWarnings("unused")
+		Label lab=new Label(scrolledComposite, SWT.NONE);
+		
+		Button ok=new Button(scrolledComposite, SWT.PUSH);
+		ok.setText("Ok");
+		gridData = new GridData();
+		gridData.widthHint = 50;
+		ok.setLayoutData(gridData);
+		ok.addListener(SWT.Selection, new SetSubjectIdListener(this.dataType, this));
+		///
+
+		scrolledComposite.setSize(scrolledComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		return composite;
+	}
+	
+	public void initiate(){
+		this.values=new Vector<String>();
+		this.samples=new Vector<String>();
+		File rawFile= ((SnpData)this.dataType).getRawFile();
+		samples.addAll(FileHandler.getSamplesIdForSnp(rawFile));
+		File mappingFile=((SnpData)this.dataType).getMappingFile();
+		for(@SuppressWarnings("unused") String sample: samples){
+			this.values.add("");
+		}
+		if(mappingFile!=null){
+			try{
+				BufferedReader br = new BufferedReader(new FileReader(mappingFile));
+				String line;
+				while ((line=br.readLine())!=null){
+					String[] fields=line.split("\t", -1);
+					String sample=fields[3];
+					if(samples.contains(sample)){
+						this.values.set(this.samples.indexOf(sample), fields[2]);
+					}
+					else{
+						br.close();
+						return;
+					}
+				}
+				br.close();
+			}catch (Exception e){
+				displayMessage("Error: "+e.getLocalizedMessage());
+				e.printStackTrace();
+			}		
+		}
+	}
+
+	public Vector<String> getValues(){
+		return this.values;
+	}
+	public Vector<String> getSamples(){
+		return this.samples;
+	}
+	public void displayMessage(String message){
+	    int style = SWT.ICON_INFORMATION | SWT.OK;
+	    MessageBox messageBox = new MessageBox(new Shell(), style);
+	    messageBox.setMessage(message);
+	    messageBox.open();
+	}
+	@Override
+	public boolean canCopy() {
+		return true;
+	}
+
+	@Override
+	public boolean canPaste() {
+		return true;
+	}
+
+	@Override
+	public Vector<Vector<String>> copy() {
+		Vector<Vector<String>> data=new Vector<Vector<String>>();
+		data.add(samples);
+		data.add(values);
+		return data;
+	}
+	@Override
+	public void paste(Vector<Vector<String>> data) {
+		if(data.size()<1) return;
+		int l=values.size();
+		if(data.get(0).size()<l) l=data.get(0).size();
+		for(int i=0; i<l; i++){
+			this.values.set(i, data.get(0).get(i));
+			this.valuesFields.get(i).setText(data.get(0).get(i));
+		}		
+	}
+	@Override
+	public void mapFromClipboard(Vector<Vector<String>> data) {
+		if(data.size()<2) return;
+		for(int i=0; i<data.get(0).size(); i++){
+			int index=samples.indexOf(data.get(0).get(i));
+			if(index!=-1){
+				if(data.get(1).size()>i){
+					this.values.set(index, data.get(1).get(i));
+					this.valuesFields.get(index).setText(this.values.get(index));
+				}
+			}
+		}
+	}
+	
+
+}

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.sanofi.fcl4transmart</groupId>
+  <artifactId>eclipse-repository</artifactId>
+  <version>1.4.3</version>
+  <packaging>eclipse-repository</packaging>
+  <name>fcl4transmart RCP</name>
+
+  <parent>
+    <groupId>fr.sanofi.fcl4transmart</groupId>
+    <artifactId>code</artifactId>
+    <version>1.4.3</version>
+    <relativePath>..</relativePath>
+  </parent>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-p2-director-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <executions>
+          <execution>
+            <id>materialize-products</id>
+            <goals>
+              <goal>materialize-products</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <formats>
+            <linux>tar.gz</linux>
+          </formats>
+          <products>
+            <product>
+              <id>fr.sanofi.fcl4transmart.product</id>
+              <rootFolder>fcl4transmart</rootFolder>
+            </product>
+          </products>
+          <installFeatures>true</installFeatures>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

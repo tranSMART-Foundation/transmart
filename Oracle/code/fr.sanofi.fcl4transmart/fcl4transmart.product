@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="Framework Curation &amp; Loading For tranSMART" uid="fr.sanofi.fcl4transmart.product" id="fr.sanofi.fcl4transmart.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.4.3" useFeatures="true" includeLaunchers="true">
+
+   <configIni use="">
+   </configIni>
+
+   <launcherArgs>
+      <vmArgs>-Xms200m -Xmx1024m</vmArgs>
+   </launcherArgs>
+
+   <windowImages i16="/fr.sanofi.fcl4transmart/icons/16x16.gif" i32="/fr.sanofi.fcl4transmart/icons/32x32.gif" i48="/fr.sanofi.fcl4transmart/icons/48x48.gif" i64="/fr.sanofi.fcl4transmart/icons/64x64.gif" i128="/fr.sanofi.fcl4transmart/icons/128x128.gif"/>
+
+   <splash
+      location="fr.sanofi.fcl4transmart"
+      startupProgressRect="5,275,445,15"
+      startupMessageRect="7,252,445,20"
+      startupForegroundColor="000000" />
+   <launcher name="FCL4tranSMART">
+      <solaris/>
+      <win useIco="true">
+	<ico path="../fr.sanofi.fcl4transmart/icons/icons.ico"/>
+         <!-- bmp
+            winSmallLow="../fr.sanofi.fcl4transmart/icons/16x16_8.bmp"
+            winSmallHigh="../fr.sanofi.fcl4transmart/icons/16x16_32.bmp"
+            winMediumLow="../fr.sanofi.fcl4transmart/icons/32x32_8.bmp"
+            winMediumHigh="../fr.sanofi.fcl4transmart/icons/32x32_32.bmp"
+            winLargeLow="../fr.sanofi.fcl4transmart/icons/48x48_8.bmp"
+            winLargeHigh="../fr.sanofi.fcl4transmart/icons/48x48_32.bmp" -->
+      </win>
+   </launcher>
+
+   <plugins>
+   </plugins>
+
+   <features>
+      <feature id="fr.sanofi.fcl4transmart.feature"/>
+      <feature id="org.eclipse.e4.rcp"/>
+      <feature id="org.eclipse.emf.ecore"/>
+      <feature id="org.eclipse.emf.common"/>
+   </features>
+
+   <configurations>
+      <!--
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1" />
+      -->
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
+      <plugin id="org.eclipse.equinox.common" autostart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="4" />
+      <property name="equinox.use.ds" value="true" />
+   </configurations>
+</product>
