@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # IDE/eclipse/emacs support files
 **/.settings**/*~
 **/*.tmproj
@@ -152,4 +153,7 @@ transmart-data/private-feeds
 transmart-batch/batchdb.properties
 transmart-batch/batchdb-*.properties
 
-transmart-batch/logback.groovy
+**/*.sublime-workspace
+**/.slcache
+**/cobertura.ser
+**/node_modules
