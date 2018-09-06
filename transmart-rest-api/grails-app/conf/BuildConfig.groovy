@@ -102,7 +102,7 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
-        compile 'org.transmartproject:transmart-core-api:16.3'
+        compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
         compile 'org.javassist:javassist:3.16.1-GA'
 
         // includes fix for GRAILS-11126
@@ -147,10 +147,10 @@ grails.project.dependency.resolution = {
         test ':functional-test:2.0.0'
 
         if (!dm) {
-            runtime ':transmart-core:16.3'
+            runtime ':transmart-core:16.4-SNAPSHOT'
 
-            //test ':transmart-core:16.3'
-            //test ':transmart-core-db-tests:16.3'
+            //test ':transmart-core:16.4-SNAPSHOT'
+            //test ':transmart-core-db-tests:16.4-SNAPSHOT'
         } else {
             dm.internalDependencies delegate
         }

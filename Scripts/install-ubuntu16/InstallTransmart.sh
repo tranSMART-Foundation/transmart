@@ -4,7 +4,7 @@
 # 
 #************************************************************************************
 #  Script to load all that is needed to run an example/demo
-#  version of tranSMART 16.3
+#  version of tranSMART 16.4
 #************************************************************************************
 
 # set up with 
@@ -86,15 +86,15 @@ cd $INSTALL_BASE
 sudo -v
 sudo apt-get -q install -y curl
 sudo apt-get -q install -y unzip
-if ! [ -e transmart-data-release-16.3.zip ] ; then
-    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/transmart-data-release-16.3.zip --output transmart-data-release-16.3.zip
+if ! [ -e transmart-data-release-16.4.zip ] ; then
+    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/transmart-data-release-16.4.zip --output transmart-data-release-16.4.zip
 fi
 if ! [ -e transmart-data ] ; then
-	unzip transmart-data-release-16.3.zip
-	mv transmart-data-release-16.3 transmart-data
+	unzip transmart-data-release-16.4.zip
+	mv transmart-data-release-16.4 transmart-data
 fi
 
-echo "Finished setting up the transmart-date folder at $(date)"
+echo "Finished setting up the transmart-data folder at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Install of basic tools and dependencies "

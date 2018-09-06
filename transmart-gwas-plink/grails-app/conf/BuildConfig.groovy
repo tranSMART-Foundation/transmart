@@ -47,6 +47,6 @@ grails.project.dependency.resolution = {
             export = false
         }
         compile ':plugin-config:0.2.1'
-        compile ':rdc-rmodules:16.3'
+        compile ':rdc-rmodules:16.4-SNAPSHOT'
     }
 }

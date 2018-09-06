@@ -5,7 +5,7 @@
   <groupId>org.transmartproject</groupId>
   <artifactId>geb-functional-tests</artifactId>
   <packaging>jar</packaging>
-  <version>16.3</version>
+  <version>16.4-SNAPSHOT</version>
   <name>tranSMART - Functional Tests</name>
   <url>https://github.com/tranSMART-Foundation/transmart-test</url>
 

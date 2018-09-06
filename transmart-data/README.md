@@ -19,11 +19,12 @@ This repository is a set of make files and scripts for:
 * running the Solr cores for Faceted Search and the Sample Explorer;
 * generating configuration files for tranSMART.
 
-The current schema is the one necessary to support the
-[`master` branch][master] of transmart (release 16.3) for Oracle and Postgres
+The current schema is the one necessary to support the [`master`
+branch][master] of transmart and i2b2/tranSMART (release 16.4) for
+Oracle and Postgres
 
 Database update scripts are included to migrate the schema from
-version 1.2.4 to 16.2 to 16.2 to 16.3 for postgres and oracle.
+version 1.2.4 to 16.2 to 16.2 to 16.3 to 16.4 for postgres and oracle.
 
 A script is available that can compare dumps from two databases,
 intended for an installed copy to be compared to the latest
@@ -79,7 +80,7 @@ The several options are fairly self-explanatory.
 
 ### PostgreSQL-specific notes
 
-Release 16.3 of tranSMART supports postgreSQL version 9.6. Earlier
+Release 16.3 upwards of tranSMART supports postgreSQL version 9.6. Earlier
 releases work with versions up to postgreSQL 9.5.
 
 

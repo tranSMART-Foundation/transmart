@@ -1,6 +1,6 @@
 class TransmartJavaGrailsPlugin {
     // the plugin version
-    def version = "16.3"
+    def version = "16.4-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.3.7 > *"
     // the other plugins this plugin depends on

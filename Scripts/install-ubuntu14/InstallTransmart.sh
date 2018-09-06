@@ -5,7 +5,7 @@
 
 #**********************************************************************************
 #  Script to load all that is needed to run an example/demo version
-#  of tranSMART 16.3 on Ubuntu 14.04
+#  of tranSMART 16.4 on Ubuntu 14.04
 #**********************************************************************************
 
 # set up with 
@@ -13,7 +13,7 @@
 #   sudo apt-get install -y git
 #   git clone https://github.com/tranSMART-Foundation/Scripts.git
 #   cd Scripts
-#   git checkout release-16.3
+#   git checkout release-16.4
 #   cd ..
 #
 # to run the install scripts
@@ -24,13 +24,13 @@
 #   Scripts/install-ubuntu14/checks/checkAll.sh
 
 # Script Parameters
-TRANSMART_DATA_NAME="transmart-data-release-16.3"
+TRANSMART_DATA_NAME="transmart-data-release-16.4"
 TRANSMART_DATA_ZIP="$TRANSMART_DATA_NAME.zip"
 TRANSMART_DATA_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_DATA_ZIP"
 TRANSMART_DATA_SIG_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_DATA_ZIP.sig"
 TRANSMART_DATA_MD5_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_DATA_ZIP.md5"
 
-TRANSMART_ETL_NAME="tranSMART-ETL-release-16.3"
+TRANSMART_ETL_NAME="tranSMART-ETL-release-16.4"
 TRANSMART_ETL_ZIP="$TRANSMART_ETL_NAME.zip"
 TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_ETL_ZIP"
 TRANSMART_ETL_SIG_URL="http://library.transmartfoundation.org/release/release16_2_0_artifacts/$TRANSMART_ETL_ZIP.sig"
@@ -134,15 +134,15 @@ cd $INSTALL_BASE
 sudo -v
 sudo apt-get -q install -y curl
 sudo apt-get -q install -y unzip
-if ! [ -e transmart-data-release-16.3.zip ] ; then
-	curl https://codeload.github.com/tranSMART-Foundation/transmart-data/zip/release-16.3 -o transmart-data-release-16.3.zip
+if ! [ -e transmart-data-release-16.4.zip ] ; then
+	curl https://codeload.github.com/tranSMART-Foundation/transmart-data/zip/release-16.4 -o transmart-data-release-16.4.zip
 fi
-verifyWithMd5 "transmart-data-release-16.3.zip"
+verifyWithMd5 "transmart-data-release-16.4.zip"
 
 if ! [ -e transmart-data ] ; then
-	echo "unzipping transmart-data-release-16.3.zip"
-	unzip transmart-data-release-16.3.zip
-	mv transmart-data-release-16.3 transmart-data
+	echo "unzipping transmart-data-release-16.4.zip"
+	unzip transmart-data-release-16.4.zip
+	mv transmart-data-release-16.4 transmart-data
 fi
 
 echo "Finished setting up the transmart-data folder at $(date)"
@@ -450,10 +450,10 @@ fi
 
 cd war-files
 if ! [ -e transmart.war ]; then
-	curl http://library.transmartfoundation.org/wars/transmart.V16.3.war --output transmart.war
+	curl http://library.transmartfoundation.org/wars/transmart.V16.4.war --output transmart.war
 fi
 if ! [ -e gwava.war ]; then
-	curl http://library.transmartfoundation.org/wars/gwava.V16.3.war --output gwava.war
+	curl http://library.transmartfoundation.org/wars/gwava.V16.4.war --output gwava.war
 fi
 sudo cp *.war /var/lib/tomcat7/webapps/
 
@@ -505,13 +505,8 @@ echo "+ Done with install - making final checks - (may take a while)"
 echo "++++++++++++++++++++++++++++"
 
 set e+
-<<<<<<< HEAD:install-ubuntu/InstallTransmart.sh
-cd $SCRIPTS_BASE/Scripts/install-ubuntu/checks
-sudo ./checkFilesTomcat.sh
-=======
 cd $SCRIPTS_BASE/Scripts/install-ubuntu14/checks
 ./checkFilesTomcat.sh
->>>>>>> transmart/master:install-ubuntu14/InstallTransmart.sh
 ./checkTools.sh
 ./checkWeb.sh
 

@@ -44,12 +44,12 @@ grails.project.dependency.resolution = {
 
     plugins {
         compile(':resources:1.2.1')
-        compile(':search-domain:16.3')
+        compile(':search-domain:16.4-SNAPSHOT')
         // already included in search-domain
-        //compile(':biomart-domain:16.3')
+        //compile(':biomart-domain:16.4-SNAPSHOT')
         // already included in biomart-domain
-        //compile(':transmart-java:16.3')
-        compile(':transmart-legacy-db:16.3')
+        //compile(':transmart-java:16.4-SNAPSHOT')
+        compile(':transmart-legacy-db:16.4-SNAPSHOT')
         compile(':spring-security-core:2.0-RC2')
         //compile ':spring-security-ldap:2.0-RC2')
         compile(':quartz:1.0-RC2')
