@@ -71,7 +71,8 @@ class MirnaTestData {
             def res = new DeQpcrMirnaAnnotation(
                     mirnaId: mirna,
                     detector: detector,
-                    platform: platform
+                    platform: platform,
+                    gplId: 'gplId'
             )
             res.id = probesetId
             res
@@ -89,6 +90,7 @@ class MirnaTestData {
                                       double intensity ->
             new DeSubjectMirnaData(
                     probe: probe,
+                    jProbe: probe,
                     assay: assay,
                     patient: assay.patient,
 

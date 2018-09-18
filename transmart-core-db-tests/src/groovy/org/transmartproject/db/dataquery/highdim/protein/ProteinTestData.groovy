@@ -58,7 +58,8 @@ class ProteinTestData {
                     peptide:     peptide,
                     uniprotId:   biomarkerTestData.proteinBioMarkers.find { it.name == proteinName }.externalId,
                     uniprotName: uniprotName,
-                    platform:    platform
+                    platform:    platform,
+                    gplId:       'gplId'
             )
             res.id = id
             res
@@ -77,6 +78,7 @@ class ProteinTestData {
                     assay: assay,
                     patient: assay.patient,
                     annotation: annotation,
+                    jAnnotation: annotation,
                     intensity: intensity,
                     logIntensity: Math.log(intensity),
                     zscore:    (intensity - 0.35) / 0.1871

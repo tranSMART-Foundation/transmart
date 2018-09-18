@@ -20,11 +20,17 @@
 package org.thehyve.commons.test
 
 import org.hamcrest.Matcher
+import org.springframework.util.Assert
 
-import static org.hamcrest.Matchers.*
+import static org.hamcrest.Matchers.allOf
+import static org.hamcrest.Matchers.contains
+import static org.hamcrest.Matchers.containsInAnyOrder
+import static org.hamcrest.Matchers.hasEntry
+import static org.hamcrest.Matchers.hasProperty
+import static org.hamcrest.Matchers.is
 
 /**
- * Contains methods to create hamcrest matchers from Maps and Lists, all of them recursing into the objects where needed.
+ * Methods to create hamcrest matchers from Maps and Lists, all of them recursing into the objects where needed.
  * This makes it easier to create matchers from simple structures (Maps and Lists) that represent the expected values,
  * and wraps all the elements with the correct Matcher to avoid the pitfalls of some groovy conversions that are not
  * recognized in hamcrest.

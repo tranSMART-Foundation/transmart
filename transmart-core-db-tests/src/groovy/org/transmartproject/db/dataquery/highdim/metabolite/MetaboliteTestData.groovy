@@ -142,6 +142,7 @@ class MetaboliteTestData {
                     assay: assay,
                     patient: assay.patient,
                     annotation: annotation,
+                    jAnnotation: annotation,
                     rawIntensity: intensity,
                     logIntensity: Math.log(intensity),
                     zscore:    (intensity - 0.35) / 0.1871

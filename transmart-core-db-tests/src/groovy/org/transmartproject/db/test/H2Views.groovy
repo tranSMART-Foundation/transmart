@@ -1,7 +1,7 @@
 /*
  * Copyright © 2013-2014 The Hyve B.V.
  *
- * This file is part of transmart-core-db.
+ * This file is part of transmart-core-db
  *
  * Transmart-core-db is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -22,15 +22,16 @@ package org.transmartproject.db.test
 import groovy.sql.Sql
 import groovy.util.logging.Log4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
-import static org.transmartproject.db.test.H2Views.ObjectStatus.*
+import static org.transmartproject.db.test.H2Views.ObjectStatus.DOES_NOT_EXIST
+import static org.transmartproject.db.test.H2Views.ObjectStatus.IS_TABLE
+import static org.transmartproject.db.test.H2Views.ObjectStatus.IS_VIEW
 
 /**
- * This class is for integration test purposes, but has to be here due to
+ * For integration test purposes, but has to be in src/groovy due to
  * technical limitations. In particular, when resources.groovy is run, neither
  * the script's classloader nor the context classloader know anything about
  * the test classpath.
@@ -38,9 +39,13 @@ import static org.transmartproject.db.test.H2Views.ObjectStatus.*
 @Log4j
 class H2Views {
 
-    @Autowired
-    @Qualifier('dataSource')
-    DataSource dataSource
+    private static enum ObjectStatus {
+    	    IS_VIEW,
+	    IS_TABLE,
+	    DOES_NOT_EXIST
+    }
+
+    @Autowired DataSource dataSource
 
     private Sql sql
 
@@ -448,13 +453,7 @@ class H2Views {
                 geneid.info_name = 'GID' '''
     }
 
-    enum ObjectStatus {
-        IS_VIEW,
-        IS_TABLE,
-        DOES_NOT_EXIST
-    }
-
-    ObjectStatus getCurrentStatus(String schema, String viewName) {
+    private ObjectStatus getCurrentStatus(String schema, String viewName) {
         def res
 
         res = sql.firstRow """
@@ -481,7 +480,7 @@ class H2Views {
         DOES_NOT_EXIST
     }
 
-    Boolean handleCurrentState(String schema, String viewName) {
+    private boolean handleCurrentState(String schema, String viewName) {
         switch (getCurrentStatus(schema, viewName)) {
             case DOES_NOT_EXIST:
                 return false

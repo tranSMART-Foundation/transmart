@@ -219,7 +219,8 @@ class AcghEndToEndRetrievalTests {
                 start:          1,
                 end:            10,
                 numberOfProbes: 42,
-                name:           'region 1:1-10'
+                name:           'region 1:1-10',
+		gplId: 'gplId'
         )
         anotherRegion.id = -2000L
         anotherRegion.save failOnError: true, flush: true

@@ -105,6 +105,7 @@ class MrnaTestData {
                                       double intensity ->
             new DeSubjectMicroarrayDataCoreDb(
                     probe: probe,
+                    jProbe: probe,
                     assay: assay,
                     patient: assay.patient,
                     rawIntensity: intensity,

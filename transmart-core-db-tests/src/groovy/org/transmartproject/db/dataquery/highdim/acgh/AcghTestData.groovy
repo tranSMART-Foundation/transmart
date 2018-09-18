@@ -20,7 +20,6 @@
 package org.transmartproject.db.dataquery.highdim.acgh
 
 import org.transmartproject.core.dataquery.assay.Assay
-import org.transmartproject.core.dataquery.highdim.chromoregion.Region
 import org.transmartproject.db.dataquery.highdim.DeGplInfo
 import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
 import org.transmartproject.db.dataquery.highdim.HighDimTestData
@@ -89,7 +88,8 @@ class AcghTestData {
                         name: 'region 1:33-9999',
                         cytoband: 'cytoband1',
                         geneSymbol: 'ADIRF',
-                        geneId: -130753
+                        geneId: -130753,
+			gplId: 'gplId'
                 ),
                 new DeChromosomalRegion(
                         platform: regionPlatform,
@@ -100,7 +100,8 @@ class AcghTestData {
                         name: 'region 2:66-99',
                         cytoband: 'cytoband2',
                         geneSymbol: 'AURKA',
-                        geneId: -130751
+                        geneId: -130751,
+			gplId: 'gplId'
                 ),
         ]
         r[0].id = -1001L
@@ -118,11 +119,12 @@ class AcghTestData {
                                                            TRIAL_NAME,
                                                            conceptCode)
 
-    DeSubjectAcghData createACGHData(Region region,
+    DeSubjectAcghData createACGHData(DeChromosomalRegion region,
                                      Assay assay,
                                      flag = 0) {
         new DeSubjectAcghData(
                 region:                     region,
+                jRegion:                   region,
                 assay:                      assay,
                 patient:                    assay.patient,
                 chipCopyNumberValue:        0.11d,

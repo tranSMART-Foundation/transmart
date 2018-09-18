@@ -89,8 +89,9 @@ class RnaSeqTestData {
                         cytoband: '1p12.1',
                         name: 'region 1:33-9999',
                         geneSymbol: 'ADIRF',
-                        geneId: -130753
-                ),
+                        geneId: -130753,
+			gplId: 'gplId'
+		),
                 new DeChromosomalRegion(
                         platform: regionPlatform,
                         chromosome: '2',
@@ -100,7 +101,8 @@ class RnaSeqTestData {
                         cytoband: '2q7.2',
                         name: 'region 2:66-99',
                         geneSymbol: 'AURKA',
-                        geneId: -130751
+                        geneId: -130751,
+			gplId: 'gplId'
                 ),
         ]
         r[0].id = -1011L
@@ -124,6 +126,7 @@ class RnaSeqTestData {
                                         ) {
         new DeSubjectRnaseqData(
                 region:                     region,
+                jRegion:                    region,
                 assay:                      assay,
                 patient:                    assay.patient,
                 readcount:                  readcount,

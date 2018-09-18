@@ -19,7 +19,6 @@
 
 package org.transmartproject.db.dataquery.clinical
 
-import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.querytool.QueryResult
 import org.transmartproject.db.TestDataHelper
 import org.transmartproject.db.i2b2data.ConceptDimension
@@ -34,18 +33,19 @@ import static org.transmartproject.db.querytool.QueryResultData.getQueryResultFr
 
 class ClinicalTestData {
 
-    public static final long DUMMY_ENCOUNTER_ID = -300L
-    List<Patient> patients
+    public static final long DUMMY_ENCOUNTER_ID = -300
+    List<PatientDimension> patients
     List<ObservationFact> facts
 
-    @Lazy QtQueryMaster patientsQueryMaster = createQueryResult patients
+    @Lazy
+    QtQueryMaster patientsQueryMaster = createQueryResult patients
 
     QueryResult getQueryResult() {
         getQueryResultFromMaster patientsQueryMaster
     }
 
-    static ClinicalTestData createDefault(List<I2b2> concepts, List<Patient> patients) {
-        def facts = createDiagonalFacts(2, concepts, patients)
+    static ClinicalTestData createDefault(List<I2b2> concepts, List<PatientDimension> patients) {
+        List<ObservationFact> facts = createDiagonalFacts(2, concepts, patients)
         new ClinicalTestData(patients: patients, facts: facts)
     }
 
@@ -66,7 +66,7 @@ class ClinicalTestData {
      * @param patients
      * @return facts for leaf_concept[0] / patients[0], leaf_concept[1] / patients[1], etc...
      */
-    static List<ObservationFact> createDiagonalFacts(int count, List<I2b2> concepts, List<Patient> patients) {
+    static List<ObservationFact> createDiagonalFacts(int count, List<I2b2> concepts, List<PatientDimension> patients) {
 
         assert patients.size() >= count
 
@@ -76,7 +76,7 @@ class ClinicalTestData {
 
         assert leafConceptsCodes.size() >= count
 
-        def facts = []
+        List<ObservationFact> facts = []
         for (int i = 0; i < count; i++) {
             facts << createObservationFact(leafConceptsCodes[i], patients[i],
                     DUMMY_ENCOUNTER_ID, Math.pow(10, i + 1))
@@ -85,12 +85,12 @@ class ClinicalTestData {
     }
 
     static List<ObservationFact> createDiagonalCategoricalFacts(
-            int count, List<I2b2> concepts /* terminal */, List<Patient> patients) {
+            int count, List<I2b2> concepts /* terminal */, List<PatientDimension> patients) {
 
         assert patients.size() >= count
         assert concepts.size() > 0
 
-        def map = [:]
+       Map<PatientDimension, I2b2> map = [:]
         for (int i = 0; i < count; i++) {
             int j = i % concepts.size()
             assert LEAF in concepts[j].visualAttributes //leaf
@@ -102,7 +102,7 @@ class ClinicalTestData {
         createCategoricalFacts map
     }
 
-    static List<ObservationFact> createCategoricalFacts(Map<Patient, I2b2> values) {
+    static List<ObservationFact> createCategoricalFacts(Map<PatientDimension, I2b2> values) {
         values.collect { patient, i2b2 ->
             createObservationFact(
                     i2b2.code, patient, DUMMY_ENCOUNTER_ID, i2b2.name)
@@ -112,15 +112,15 @@ class ClinicalTestData {
     static ObservationFact createObservationFact(ConceptDimension concept,
                                                  PatientDimension patient,
                                                  Long encounterId,
-                                                 Object value) {
+                                                 value) {
         createObservationFact(concept.conceptCode, patient, encounterId, value)
     }
 
     static ObservationFact createObservationFact(String conceptCode,
                                                  PatientDimension patient,
                                                  Long encounterId,
-                                                 Object value) {
-        def of = new ObservationFact(
+                                                 value) {
+        ObservationFact of = new ObservationFact(
                 encounterNum:   encounterId as BigDecimal,
                 providerId:     'fakeProviderId',
                 modifierCd:     'fakeModifierCd',
@@ -142,9 +142,9 @@ class ClinicalTestData {
         of
     }
 
-    static List<ObservationFact> createFacts(List<ConceptDimension> concepts, List<Patient> patients)  {
+    static List<ObservationFact> createFacts(List<ConceptDimension> concepts, List<PatientDimension> patients)  {
         long encounterNum = -200
-        def list1 = concepts[0..1].collect { ConceptDimension concept ->
+        List<ObservationFact> list1 = concepts[0..1].collect { ConceptDimension concept ->
             patients.collect { PatientDimension patient ->
                 createObservationFact(concept, patient, --encounterNum,
                         "value for $concept.conceptCode/$patient.id")
