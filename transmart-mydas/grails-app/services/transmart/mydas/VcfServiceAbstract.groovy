@@ -26,7 +26,6 @@ abstract class VcfServiceAbstract extends TransmartDasServiceAbstract {
         projectionName = 'cohort'
     }
 
-    @Override
     protected Collection<DasType> getTypes() {
         return null
     }
