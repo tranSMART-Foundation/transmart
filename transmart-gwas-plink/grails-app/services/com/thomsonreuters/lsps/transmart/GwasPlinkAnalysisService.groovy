@@ -9,7 +9,8 @@ import jobs.UserParameters
 import jobs.misc.AnalysisQuartzJobAdapter
 import org.quartz.JobDataMap
 import org.quartz.JobDetail
-import org.quartz.SimpleTrigger
+import org.quartz.impl.JobDetailImpl
+import org.quartz.impl.triggers.SimpleTriggerImpl
 
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -168,9 +169,9 @@ class GwasPlinkAnalysisService {
         params.put('subsetSelectedFilesMap', [subset1: [], subset2: []])
         params.put("jobName", params.jobName)
 
-        JobDetail jobDetail = new JobDetail(params.jobName, params.jobType, AnalysisQuartzJobAdapter)
+        JobDetail jobDetail = new JobDetailImpl(params.jobName, params.jobType, AnalysisQuartzJobAdapter)
         jobDetail.jobDataMap = new JobDataMap(params)
-        SimpleTrigger trigger = new SimpleTrigger("triggerNow ${Calendar.instance.time.time}", analysisGroup)
-        quartzScheduler.scheduleJob(jobDetail, trigger)
+        quartzScheduler.scheduleJob jobDetail,
+				new SimpleTriggerImpl("triggerNow ${Calendar.instance.time.time}", analysisGroup)
     }
 }
