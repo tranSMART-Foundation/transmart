@@ -1,6 +1,7 @@
 package com.recomdata.transmart.data.export
 
 import com.recomdata.transmart.data.export.util.FileWriterUtil
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.highdim.AssayColumn
@@ -13,6 +14,11 @@ import org.transmartproject.core.dataquery.highdim.rnaseq.RnaSeqValues
 import javax.annotation.PostConstruct
 
 class RNASeqDataService {
+
+    private static final List<String> HEADER_NAMES = ['regionname', 'chromosome', 'start',
+	                                                  'end', 'num.probes', 'cytoband'].asImmutable()
+    private static final Closure<Integer> getReadcount = { RnaSeqValues v -> v.getReadcount() }
+    private static final String readcount = 'readcount'
 
     HighDimensionResource highDimensionResourceService
     HighDimensionDataTypeResource<RegionRow> rnaSeqResource
@@ -71,7 +77,7 @@ class RNASeqDataService {
         for (Iterator<RegionRow> iterator = rnaseqRegionResult.rows; iterator.hasNext();) {
             RegionRow row = (RegionRow) iterator.next()
 
-            String[] line = templateArray.clone()
+            String[] line = (String[]) templateArray.clone()
 
             line[0] = i++ as String
             line[1] = row.name as String
@@ -82,11 +88,9 @@ class RNASeqDataService {
             line[6] = row.cytoband
 
             int j = 7
-            PER_ASSAY_COLUMNS.each { k, Closure<RnaSeqValues> value ->
-                assays.each { AssayColumn assay ->
-                    line[j++] = value(row.getAt(assay)) as String
-                }
-            }
+	    for (AssayColumn assay in assays) {
+		line[j++] = getReadcount(row.getAt(assay)) as String
+	    }
 
             writerUtil.writeLine(line)
         }
@@ -97,21 +101,25 @@ class RNASeqDataService {
     ]
 
     private String[] createHeader(List<AssayColumn> assays) {
-        List<String> r = [
-                'regionname',
-                'chromosome',
-                'start',
-                'end',
-                'num.probes',
-                'cytoband',
-        ];
+	List<String> r = ([] + HEADER_NAMES) as List
 
-        PER_ASSAY_COLUMNS.keySet().each { String head ->
-            assays.each { AssayColumn assay ->
-                r << "${head}.${assay.patientInTrialId}".toString()
-            }
-        }
+	for (AssayColumn assay in assays) {
+		r << readcount + "." + assay.patientInTrialId
+	}
 
-        r.toArray(new String[r.size()])
+	r as String[]
+    }
+
+    @CompileDynamic
+    private List<AssayConstraint> createAssayConstraints(String study, long resultInstanceId) {
+	List<AssayConstraint> assayConstraints = [
+			rnaSeqResource.createAssayConstraint(
+					AssayConstraint.TRIAL_NAME_CONSTRAINT,
+					name: study),
+			rnaSeqResource.createAssayConstraint(
+					AssayConstraint.PATIENT_SET_CONSTRAINT,
+					result_instance_id: resultInstanceId),
+	]
+
     }
 }

@@ -1,4 +1,4 @@
-import org.codehaus.groovy.grails.plugins.PluginManagerHolder
+import grails.util.Holders
 import org.transmart.biomart.ContentRepository
 
 import java.text.DecimalFormat
@@ -403,7 +403,7 @@ class RecomTagLib {
         def no = attrs['false']
 
         //If the tag does not have true/false reactions, do the body. If it does, output the yes/no string.
-        if (PluginManagerHolder.pluginManager.hasGrailsPlugin(name)) {
+        if (Holders.pluginManager.hasGrailsPlugin(name)) {
             if (yes) {
                 out << yes
             } else {

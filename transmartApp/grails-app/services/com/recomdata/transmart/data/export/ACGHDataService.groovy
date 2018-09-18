@@ -69,7 +69,7 @@ class ACGHDataService {
         for (Iterator<RegionRow> iterator = regionResult.rows; iterator.hasNext();) {
             RegionRow row = (RegionRow) iterator.next()
 
-            String[] line = templateArray.clone()
+            String[] line = (String[]) templateArray.clone()
 
             line[0] = i++ as String
             line[1] = row.chromosome as String
@@ -80,7 +80,7 @@ class ACGHDataService {
 
             int j = 6
             PER_ASSAY_COLUMNS.each { k, Closure<AcghValues> value ->
-                assays.each { AssayColumn assay ->
+		for (AssayColumn assay in assays) {
                     line[j++] = value(row.getAt(assay)) as String
                 }
             }
@@ -89,30 +89,25 @@ class ACGHDataService {
         }
     }
 
-    private static final Map PER_ASSAY_COLUMNS = [
-            chip    : { AcghValues v -> v.getChipCopyNumberValue() },
-            flag    : { AcghValues v -> v.getCopyNumberState().getIntValue() },
-            probloss: { AcghValues v -> v.getProbabilityOfLoss() },
-            probnorm: { AcghValues v -> v.getProbabilityOfNormal() },
-            probgain: { AcghValues v -> v.getProbabilityOfGain() },
-            probamp : { AcghValues v -> v.getProbabilityOfAmplification() },
+    private static final List<String> HEADER = ['chromosome', 'start', 'end', 'num.probes', 'cytoband'].asImmutable()
+
+    private static final Map<String, Closure<AcghValues>> PER_ASSAY_COLUMNS = [
+			chip    : { AcghValues v -> v.getChipCopyNumberValue() },
+			flag    : { AcghValues v -> v.getCopyNumberState().getIntValue() },
+			probloss: { AcghValues v -> v.getProbabilityOfLoss() },
+			probnorm: { AcghValues v -> v.getProbabilityOfNormal() },
+			probgain: { AcghValues v -> v.getProbabilityOfGain() },
+			probamp : { AcghValues v -> v.getProbabilityOfAmplification() },
     ]
 
     private String[] createHeader(List<AssayColumn> assays) {
-        List<String> r = [
-                'chromosome',
-                'start',
-                'end',
-                'num.probes',
-                'cytoband',
-        ];
+	List<String> header = [] + HEADER
+	for (String head in PER_ASSAY_COLUMNS.keySet()) {
+		for (AssayColumn assay in assays) {
+			header << head + '.' + assay.patientInTrialId
+		}
+	}
 
-        PER_ASSAY_COLUMNS.keySet().each { String head ->
-            assays.each { AssayColumn assay ->
-                r << "${head}.${assay.patientInTrialId}".toString()
-            }
-        }
-
-        r.toArray(new String[r.size()])
+	header as String[]
     }
 }
