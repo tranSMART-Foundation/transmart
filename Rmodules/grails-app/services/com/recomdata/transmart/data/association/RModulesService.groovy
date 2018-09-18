@@ -16,213 +16,179 @@
 
 package com.recomdata.transmart.data.association
 
+import com.recomdata.asynchronous.JobResultsService
 import com.recomdata.transmart.data.association.asynchronous.RModulesJobService
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.quartz.JobDataMap
 import org.quartz.JobDetail
-import org.quartz.SimpleTrigger
+import org.quartz.impl.JobDetailImpl
+import org.quartz.impl.triggers.SimpleTriggerImpl
 
 class RModulesService {
 
-    static transactional = true
-	static scope = 'request'
+    static transactional = false
+    static scope = 'request'
 
-    static STATUS_LIST = [
-            "Started",
-            "Validating Cohort Information",
-            "Triggering Data-Export Job",
-            "Gathering Data",
-            "Running Conversions",
-            "Running Analysis",
-            "Rendering Output"]
+    private static final List<String> STATUS_LIST = [
+            'Started',
+            'Validating Cohort Information',
+            'Triggering Data-Export Job',
+            'Gathering Data',
+            'Running Conversions',
+            'Running Analysis',
+            'Rendering Output'].asImmutable()
 
-	/**
-	* quartzScheduler is available from the Quartz grails-plugin
-	*/
-    def quartzScheduler
-	
-	def jobResultsService
 	def asyncJobService
-	def grailsApplication
 	def i2b2ExportHelperService
 	def i2b2HelperService
+	JobResultsService jobResultsService
 	def pluginService
+	def quartzScheduler
 	
-	def jobStatusList = null
-	def jobDataMap = new JobDataMap()
+	private List<String> jobStatusList
+	private JobDataMap jobDataMap = new JobDataMap()
 
 	/**
-	 * This method will use the moduleName and fetch its statusList config param from the <Plugin>Config.groovy 
-	 * 
-	 * @param moduleName
-	 * @return
+	 * Use the moduleName and fetch its statusList config param from the <Plugin>Config.groovy
 	 */
-	def private setJobStatusList(params) {
-        jobStatusList = STATUS_LIST
+	private void setJobStatusList(Map params) {
+        	jobStatusList = STATUS_LIST
 		
 		//Set the status list and update the first status.
-		jobResultsService[params.jobName]["StatusList"] = jobStatusList
-    }
+		jobResultsService[params.jobName]['StatusList'] = jobStatusList
+    	}
 	
-	/**
-	 * Initialize the Job's process
-	 * @param params
-	 * @return
-	 */
-	def initJobProcess(params) {
-		setJobStatusList(params)
+	private void initJobProcess(Map params) {
+		setJobStatusList params
 		
 		//Update status to step 1 of jobStatusList : Started
 		//Can add more initialization process before starting the Job
-		asyncJobService.updateStatus(params.jobName, jobStatusList[0])
+		asyncJobService.updateStatus params.jobName, jobStatusList[0]
 	}
 	
-	/**
-	* Validate the Job's process
-	* @param params
-	* @return
-	*/
-   def validateJobProcess(params) {
+	private void validateJobProcess(Map params) {
 	   //Update the status to say we are validating, No validation code yet though.
 	   //Can add more validation process before starting the Job
-	   asyncJobService.updateStatus(params.jobName, jobStatusList[1])
-   }
+	   asyncJobService.updateStatus params.jobName, jobStatusList[1]
+	}
 
-   /**
-	 * @param params
-	 * @return
-	 */
-	def beforeScheduleJob(params) {
-	   initJobProcess(params)
+	private void beforeScheduleJob(Map params) {
+	   initJobProcess params
 	   
-	   validateJobProcess(params)
+	   validateJobProcess params
 	}
 	
 	/**
-	 * This method prepares the DataTypeMap to be embedded into the jobDataMap
-	 * @param plugin
-	 * @param params
-	 * @return
+	 * Prepares the DataTypeMap to be embedded into the jobDataMap
 	 */
-	def private prepareDataTypeMap(moduleMap, params) {
-		//We need to get the list of variables that dictate which data files to generate. We check each of them against the HTML form and build the Files Map.
-		def pluginDataTypeVariableMap = moduleMap.dataFileInputMapping;
-		def dataTypeMap = ["subset1":[], "subset2":[]]
+	private Map<String, List> prepareDataTypeMap(Map moduleMap, Map params) {
+		// Get the list of variables that dictate which data files to generate.
+		// Check each of them against the HTML form and build the Files Map.
+		Map pluginDataTypeVariables = moduleMap.dataFileInputMapping
+		List subset1 = []
+		List subset2 = []	
 		//Loop over the items in the input map.
-		pluginDataTypeVariableMap.each { currentPlugin ->
+		for (currentPlugin in pluginDataTypeVariables) {
 			//If true is in the key, we always include this data type.
-			if(currentPlugin.value =="TRUE") {
-				dataTypeMap["subset1"].push(currentPlugin.key)
-				dataTypeMap["subset2"].push(currentPlugin.key)
-			} else {
+			if (currentPlugin.value == 'TRUE') {
+				subset1 << currentPlugin.key
+				subset2 << currentPlugin.key
+			}
+			else {
 				//We may have a list of inputs, for each one we check to see if the value is true. If it is, that type of file gets included.
-				def inputList = currentPlugin.value
 				//Check each input.
-				inputList.split("\\|").each { currentInput ->
+				for (currentInput in currentPlugin.value.split('\\|')) {
 					//If we have an input name, check to see if it's true, if it is then we can add the file type to the map.
-					if(params[currentInput] == "true"){
-						dataTypeMap["subset1"].push(currentPlugin.key)
-						dataTypeMap["subset2"].push(currentPlugin.key)
+					if(params[currentInput] == 'true'){
+						subset1 << currentPlugin.key
+						subset2 << currentPlugin.key
 					}
 				}
 			}
 		}
 		
-		return dataTypeMap
+		[subset1: subset1, subset2: subset2]
 	}
 	
-	def private prepareConceptCodes(params) {
+	private void prepareConceptCodes(Map params) {
 		//Get the list of all the concepts that we are concerned with from the form.
 		String variablesConceptPaths = params.variablesConceptPaths
-		if(variablesConceptPaths != null && variablesConceptPaths != "") {
-			//Split the concepts on the var.
-			def conceptPaths = variablesConceptPaths.split("\\|")
-			//We need to convert from concept paths to an actual concept code.
-			List conceptCodesList = new ArrayList()
-			conceptPaths.each { conceptPath ->
-				conceptCodesList.add(i2b2HelperService.getConceptCodeFromKey("\\\\"+conceptPath.trim()))
+		if (variablesConceptPaths) {
+			List<String> conceptCodes = []
+			for (conceptPath in variablesConceptPaths.split('\\|')) {
+				conceptCodes << i2b2HelperService.getConceptCodeFromKey('\\\\' + conceptPath.trim())
 			}
-			String[] conceptCodesArray = conceptCodesList.toArray()
-			
-			jobDataMap.put("concept_cds", conceptCodesArray);
+			jobDataMap.concept_cds = conceptCodes.toArray()
 		}
 	}
 	
 	/**
 	 * Loads up the jobDataMap with all the variables from each R Module
-	 * @param userName
-	 * @param params
-	 * @return
 	 */
-	def private loadJobDataMap(userName, params) {
-		jobDataMap.put("analysis", params.analysis)
-		jobDataMap.put("userName", userName)
-		jobDataMap.put("jobName", params.jobName)
+	private void loadJobDataMap(String userName, Map params) {
+		jobDataMap.analysis = params.analysis
+		jobDataMap.userName = userName
+		jobDataMap.jobName = params.jobName
 
 		//Each subset needs a name and a RID. Put this info in a hash.
-		def resultInstanceIdHashMap = [:]
-		resultInstanceIdHashMap["subset1"] = params.result_instance_id1
-		resultInstanceIdHashMap["subset2"] = params.result_instance_id2
-		jobDataMap.put("result_instance_ids",resultInstanceIdHashMap);
-		jobDataMap.put("studyAccessions", i2b2ExportHelperService.findStudyAccessions(resultInstanceIdHashMap.values()) )
+		Map<String, String> resultInstanceIds = [subset1: params.result_instance_id1, subset2: params.result_instance_id2]
+		jobDataMap.result_instance_ids = resultInstanceIds
+		jobDataMap.studyAccessions = i2b2ExportHelperService.findStudyAccessions(resultInstanceIds.values())
 		
-		//We need to get module information.
-		def pluginModuleInstance = pluginService.findPluginModuleByModuleName(params.analysis)
-		
-		def moduleMap = null
-		def moduleMapStr = pluginModuleInstance?.paramsStr
+		Map moduleMap = null
+		String moduleMapStr = pluginService.findPluginModuleByModuleName(params.analysis)?.paramsStr
 		
 		try {
-			moduleMap = new org.codehaus.groovy.grails.web.json.JSONObject(moduleMapStr) as Map
-		} catch (Exception e) {
+			moduleMap = new JSONObject(moduleMapStr) as Map
+		}
+		catch (e) {
 			log.error('Module '+params.analysis+' params could not be loaded', e)
 		}
 		
 		if (null != moduleMap) {
-			jobDataMap.put("subsetSelectedFilesMap", prepareDataTypeMap(moduleMap, params))
-			jobDataMap.put("conversionSteps",moduleMap.converter)
-			jobDataMap.put("analysisSteps",moduleMap.processor)
-			jobDataMap.put("renderSteps",moduleMap.renderer)
-			jobDataMap.put("variableMap", moduleMap.variableMapping)
-			jobDataMap.put("pivotData", moduleMap.pivotData)
+			jobDataMap.subsetSelectedFilesMap = prepareDataTypeMap(moduleMap, params)
+			jobDataMap.conversionSteps = moduleMap.converter
+			jobDataMap.analysisSteps = moduleMap.processor
+			jobDataMap.renderSteps = moduleMap.renderer
+			jobDataMap.variableMap = moduleMap.variableMapping
+			jobDataMap.pivotData = moduleMap.pivotData
 		}
 		//Add each of the parameters from the html form to the job data map.
-		params.each { currentParam ->
-			jobDataMap.put(currentParam.key,currentParam.value)
+		for (currentParam in params) {
+			jobDataMap.put currentParam.key,currentParam.value
 		}
 		
 		//If concept codes exist put them in our jobDataMap.
-		prepareConceptCodes(params)
+		prepareConceptCodes params
 	}
 		
-     /**
-	 * This method will gather data from the passed in params collection and from the plugin descriptor stored in session to load up the jobs data map.
-	 * @param userName
-	 * @param params
-	 * @return
+	/**
+	 * Gather data from the passed in params collection and from the plugin
+	 * descriptor stored in session to load up the jobs data map.
 	 */
-	def scheduleJob(userName, params) {
-		
-		beforeScheduleJob(params)
-		
-		loadJobDataMap(userName, params)
+	Date scheduleJob(String userName, Map params) {
+		beforeScheduleJob params
+		loadJobDataMap userName, params
 
-		//Return if the user cancelled the job.
-		if (jobResultsService[params.jobName]["Status"] == "Cancelled")	{return}
-
-		//com.recomdata.transmart.plugin.PluginJobExecutionService should be implemented by all Plugins
-		def jobDetail = new JobDetail(params.jobName, params.jobType, RModulesJobService.class)
-		jobDetail.setJobDataMap(jobDataMap)
+		if (jobResultsService[params.jobName]['Status'] == 'Cancelled') {
+			return
+		}
 
 		if (asyncJobService.updateStatus(params.jobName, jobStatusList[2]))	{
 			return
 		}
-		def trigger = new SimpleTrigger("triggerNow"+Calendar.instance.time.time, 'RModules')
-		quartzScheduler.scheduleJob(jobDetail, trigger)
+
+		//com.recomdata.transmart.plugin.PluginJobExecutionService should be implemented by all Plugins
+		JobDetail jobDetail = new JobDetailImpl(params.jobName, params.jobType, RModulesJobService)
+		jobDetail.jobDataMap = jobDataMap
+
+		quartzScheduler.scheduleJob jobDetail,
+				new SimpleTriggerImpl('triggerNow' + System.currentTimeMillis(), 'RModules')
 	}
 	
-	// method for non-R jobs
-	def prepareDataForExport(userName, params) {
-		loadJobDataMap(userName, params);
-		return jobDataMap;
+	// method for non-R jobs, used in transmart-metacore-plugin
+	JobDataMap prepareDataForExport(String userName, Map params) {
+		loadJobDataMap userName, params
+		jobDataMap
 	}
 }

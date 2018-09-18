@@ -16,18 +16,38 @@
 
 package com.recomdata.transmart.data.association
 
-import com.google.common.collect.Maps
+import com.recomdata.asynchronous.JobResultsService
 import grails.converters.JSON
-import grails.util.Holders
-import jobs.*
+import jobs.AcghFrequencyPlot
+import jobs.AcghGroupTest
+import jobs.AcghSurvivalAnalysis
+import jobs.BoxPlot
+import jobs.CorrelationAnalysis
+import jobs.Geneprint
+import jobs.Heatmap
+import jobs.HierarchicalClustering
+import jobs.KMeansClustering
+import jobs.LineGraph
+import jobs.LogisticRegression
+import jobs.MarkerSelection
+import jobs.PCA
+import jobs.RNASeqGroupTest
+import jobs.ScatterPlot
+import jobs.SurvivalAnalysis
+import jobs.TableWithFisher
+import jobs.UserParameters
+import jobs.Waterfall
 import jobs.misc.AnalysisConstraints
 import jobs.misc.AnalysisQuartzJobAdapter
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.quartz.JobDataMap
 import org.quartz.JobDetail
-import org.quartz.SimpleTrigger
+import org.quartz.impl.JobDetailImpl
+import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.transmartproject.core.exceptions.InvalidArgumentsException
+import org.transmartproject.core.users.User
 
 import static jobs.misc.AnalysisQuartzJobAdapter.*
 
@@ -168,10 +188,10 @@ class RModulesController {
         params.put(PARAM_USER_PARAMETERS, userParams)
         params.put(PARAM_USER_IN_CONTEXT, currentUserBean.targetSource.target)
 
-        JobDetail jobDetail   = new JobDetail(params.jobName, params.jobType, AnalysisQuartzJobAdapter)
-        jobDetail.jobDataMap  = new JobDataMap(params)
-        SimpleTrigger trigger = new SimpleTrigger("triggerNow ${Calendar.instance.time.time}", 'RModules')
-        quartzScheduler.scheduleJob(jobDetail, trigger)
+	JobDetail jobDetail = new JobDetailImpl(params.jobName, params.jobType, AnalysisQuartzJobAdapter)
+	jobDetail.jobDataMap = new JobDataMap(params)
+	quartzScheduler.scheduleJob jobDetail,
+			new SimpleTriggerImpl('triggerNow ' + System.currentTimeMillis(), 'RModules')
     }
 
     public static AnalysisConstraints createAnalysisConstraints(Map params) {
@@ -223,9 +243,5 @@ class RModulesController {
         }
 
         constraints
-    }
-
-    private static def getQuartzScheduler() {
-        Holders.grailsApplication.mainContext.quartzScheduler
     }
 }
