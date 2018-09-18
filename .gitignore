@@ -26,12 +26,13 @@
 # IntelliJ
 */out/
 
-### JetBrains template
+# JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
 **/*.iml
 
-## Directory-based project format:
+# Directory-based project format:
 **/.idea/
+
 # if you remove the above rule, at least ignore the following:
 
 # User-specific stuff:
@@ -53,25 +54,25 @@
 # Mongo Explorer plugin:
 # .idea/mongoSettings.xml
 
+####################### end of .idea files ##############
 
-
-
-
-## File-based project format:
+# File-based project format:
 **/*.ipr
 **/*.iws
-
 
 # default HSQL database files for production mode
 */prodDb.*
 
-### Eclipse template
+# Eclipse template
 **/*.pydevproject
 **/.metadata
 **/.gradle
 **/*.tmp
 **/*.bak
 **/*~.nib
+
+# Emacs saved copies
+**/*~
 
 */local.properties
 */.loadpath
