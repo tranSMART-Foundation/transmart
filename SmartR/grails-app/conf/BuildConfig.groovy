@@ -60,9 +60,9 @@ grails.project.dependency.resolution = {
         //test 'com.jayway.restassured:rest-assured:2.4.1'
 
         runtime 'org.javassist:javassist:3.16.1-GA'
-        runtime 'com.ittm_solutions.ipacore:IpaApi:1.0.0'
+        runtime 'com.ittm_solutions.ipacore:IpaApi:16.4-SNAPSHOT'
 
-        test('org.gmock:gmock:0.9.0-r435-hyve2') {
+        test 'org.gmock:gmock:0.9.0-r435-hyve2', {
             transitive = false /* don't bring groovy-all */
             export     = false
         }
@@ -72,17 +72,14 @@ grails.project.dependency.resolution = {
         build "org.grails.plugins:release:3.1.2"
 
         // FIXME: Advanced workflows gets buggy when updating resources plugin to 1.2.14
-        runtime ':resources:1.2.1'
+        runtime ':resources:1.2.14'
 
-        compile ":sendfile:0.2"
-        build ':tomcat:7.0.47', {
+        //compile ':sendfile:0.2'
+        build ':tomcat:7.0.54', {
             export = false
         }
         test ':functional-test:2.0.0'
         test ':karma-test-runner:0.2.4'
-
-        // core-db doesn't export hibernate as dep as it was builtin in 2.2.4
-        //runtime ':hibernate:3.6.10.16'
 
         if (!dm) {
             runtime ':transmart-core:16.4-SNAPSHOT'

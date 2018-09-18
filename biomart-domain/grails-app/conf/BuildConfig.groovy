@@ -23,10 +23,10 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.13'
     }
     plugins {
-        compile(':transmart-java:16.4-SNAPSHOT')
-        compile(':hibernate:3.6.10.10')
-        build(":release:3.0.1",
-              ":rest-client-builder:1.0.3") {
+        compile ':transmart-java:16.4-SNAPSHOT'
+        compile ':hibernate:3.6.10.19'
+        build ':release:3.1.2',
+              ':rest-client-builder:2.1.1', {
             export = false
         }
     }

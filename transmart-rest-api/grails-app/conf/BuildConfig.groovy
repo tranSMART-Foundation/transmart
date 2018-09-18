@@ -110,7 +110,7 @@ grails.project.dependency.resolution = {
 
         compile 'com.google.protobuf:protobuf-java:2.5.0'
 
-        runtime 'org.postgresql:postgresql:9.3-1100-jdbc41', {
+        runtime 'org.postgresql:postgresql:42.2.2.jre7', {
             export = false
         }
         runtime 'com.oracle:ojdbc7:12.1.0.1', {
@@ -132,17 +132,17 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build ':release:3.0.1', ':rest-client-builder:2.1.1', {
+        build ':release:3.1.2', ':rest-client-builder:2.1.1', {
             export = false
         }
-        build ':tomcat:7.0.47', {
+        build ':tomcat:7.0.54', {
             export = false
         }
 
-        compile ':spring-security-core:2.0-RC2'
+        compile ':spring-security-core:2.0.0'
 
         // core-db doesn't export hibernate as dep as it was builtin in 2.2.4
-        runtime ':hibernate:3.6.10.16'
+        runtime ':hibernate:3.6.10.19'
 
         test ':functional-test:2.0.0'
 

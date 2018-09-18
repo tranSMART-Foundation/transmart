@@ -24,12 +24,13 @@ grails.project.dependency.resolution = {
         compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1', {
             excludes 'groovy', 'nekohtml'
         }
+	compile 'commons-net:commons-net:3.3'
         compile 'org.apache.httpcomponents:httpclient:4.4.1'
         compile 'org.mongodb:mongo-java-driver:2.10.1'
         compile 'org.apache.httpcomponents:httpcore:4.4.1'
         compile 'org.apache.httpcomponents:httpmime:4.4.1'
         compile 'org.apache.james:apache-mime4j:0.6'
-        test('junit:junit:4.11') {
+        test 'junit:junit:4.11', {
             transitive = false /* don't bring hamcrest */
             export = false
         }
@@ -43,16 +44,11 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        compile(':resources:1.2.1')
-        compile(':search-domain:16.4-SNAPSHOT')
-        // already included in search-domain
-        //compile(':biomart-domain:16.4-SNAPSHOT')
-        // already included in biomart-domain
-        //compile(':transmart-java:16.4-SNAPSHOT')
-        compile(':transmart-legacy-db:16.4-SNAPSHOT')
-        compile(':spring-security-core:2.0-RC2')
-        //compile ':spring-security-ldap:2.0-RC2')
-        compile(':quartz:1.0-RC2')
-        build(":release:3.1.1")
+        compile ':resources:1.2.14'
+        compile ':search-domain:16.4-SNAPSHOT'
+        compile ':transmart-legacy-db:16.4-SNAPSHOT'
+        compile ':spring-security-core:2.0.0'
+        compile ':quartz:1.0.2'
+        build ':release:3.1.2'
     }
 }

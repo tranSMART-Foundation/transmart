@@ -70,20 +70,21 @@ grails.project.dependency.resolution = {
             transitive = false /* don't bring groovy-all */
             export     = false
         }
-        test('org.hamcrest:hamcrest-library:1.3',
-                'org.hamcrest:hamcrest-core:1.3') {
+        test 'org.hamcrest:hamcrest-library:1.3',
+                'org.hamcrest:hamcrest-core:1.3', {
             export     = false
         }
     }
 
     plugins {
-        build(':release:3.0.1',
-              ':rest-client-builder:1.0.3') { export = false }
+        build ':release:3.1.2',
+              ':rest-client-builder:2.1.1', { export = false }
 
-        compile ':sendfile:0.2'
-        compile ':quartz:1.0-RC2'
+//        sendfile breaks in grails 2.5.4
+//        compile ':sendfile:0.2'
+        compile ':quartz:1.0.2'
 
-        runtime ':resources:1.2.1'
+        runtime ':resources:1.2.14'
 
         // support for static code analysis
         compile ":codenarc:0.21"

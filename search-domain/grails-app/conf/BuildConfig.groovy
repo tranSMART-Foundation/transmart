@@ -24,11 +24,9 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.13'
     }
     plugins {
-		build(":release:3.0.1",
-			":rest-client-builder:1.0.3") {
+		build ':release:3.1.2',
+			':rest-client-builder:2.1.1', {
 		export = false}
         compile ':biomart-domain:16.4-SNAPSHOT'
-        //// already included in biomart-domain
-        //compile ':transmart-java:16.4-SNAPSHOT'
     }
 }

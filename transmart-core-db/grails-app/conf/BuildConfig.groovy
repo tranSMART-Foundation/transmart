@@ -29,19 +29,20 @@ grails.project.dependency.resolution = {
     repositories {
         // grailsPlugins()
         // grailsHome()
-        grailsCentral()
 
         mavenLocal()
+
+	grailsCentral()
         mavenCentral()
 
-        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+	mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
     }
 
     dependencies {
-        compile('org.transmartproject:transmart-core-api:16.4-SNAPSHOT')
+        compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
         compile group: 'com.google.guava', name: 'guava', version: '14.0.1'
 
-        runtime('org.postgresql:postgresql:9.3-1100-jdbc41') {
+        runtime 'org.postgresql:postgresql:42.2.2.jre7', {
             transitive = false
             export     = false
         }
@@ -49,14 +50,14 @@ grails.project.dependency.resolution = {
 
     plugins {
         build ':tomcat:7.0.54'
-        build ':release:3.0.1', ':rest-client-builder:2.1.1', {
+        build ':release:3.1.2', ':rest-client-builder:2.1.1', {
             export = false
         }
 
-        compile(':db-reverse-engineer:0.5') {
+        compile ':db-reverse-engineer:0.5', {
             export = false
         }
 
-        runtime ':hibernate:3.6.10.16'
+        runtime ':hibernate:3.6.10.19'
     }
 }

@@ -86,8 +86,8 @@ grails.project.dependency.resolution = {
         compile 'axis:axis:1.4'
 
         /* for SAML authentication */
-        compile('org.springframework.security.extensions:spring-security-saml2-core:1.0.0.RELEASE') {
-            //excludes of spring securirty necessary because they are for an older version (3.1 branch)
+        compile 'org.springframework.security.extensions:spring-security-saml2-core:1.0.0.RELEASE', {
+            //excludes of spring security necessary because they are for an older version (3.1 branch)
             //also remove xercesImpl because it breaks tomcat and is not otherwise needed
             excludes 'spring-security-config', 'spring-security-core', 'spring-security-web', 'xercesImpl'
         }
@@ -98,7 +98,7 @@ grails.project.dependency.resolution = {
             transitive = false
         }
 
-        test('junit:junit:4.11') {
+        test 'junit:junit:4.11', {
             transitive = false /* don't bring hamcrest */
             export = false
         }
@@ -113,22 +113,22 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build ':release:3.1.1'
+        build ':release:3.1.2'
         build ':tomcat:7.0.54'
 
         compile ':hibernate:3.6.10.19'
         compile ':rest-client-builder:2.1.1'
         compile ':cache-ehcache:1.0.5'
-        compile ':quartz:1.0-RC2'
+        compile ':quartz:1.0.2'
         compile ':spring-security-kerberos:1.0.0'
-        compile ':spring-security-ldap:2.0-RC2'
-        compile ':spring-security-core:2.0-RC5'
+        compile ':spring-security-ldap:2.0.0'
+        compile ':spring-security-core:2.0.0'
         compile ':spring-security-oauth2-provider:2.0-RC5'
 
         runtime ':prototype:1.0'
         runtime ':jquery:1.11.1'
         runtime ':jquery-ui:1.10.4'
-        runtime ':resources:1.2.1'
+        runtime ':resources:1.2.14'
 
         // support for static code analysis - see codenarc.reports property below
         compile ":codenarc:0.21"
@@ -139,17 +139,6 @@ grails.project.dependency.resolution = {
             runtime ':transmart-core:16.4-SNAPSHOT'
             compile ':transmart-gwas:16.4-SNAPSHOT'
             compile ':transmart-gwas-plink:16.4-SNAPSHOT'
-            //// already included in transmart-gwas
-            //compile ':transmart-legacy-db:16.4-SNAPSHOT'
-            //// already included in transmart-gwas
-            //compile ':folder-management:16.4-SNAPSHOT'
-            //// already included in transmart-gwas, folder-management
-            //compile ':search-domain:16.4-SNAPSHOT'
-            //// already included in search-domain, transmart-gwas,
-            //                       folder-management
-            //compile ':biomart-domain:16.4-SNAPSHOT'
-            //// already included in biomart-domain
-            //compile ':transmart-java:16.4-SNAPSHOT'
             runtime ':dalliance-plugin:16.4-SNAPSHOT'
             runtime ':transmart-mydas:16.4-SNAPSHOT'
             runtime ':transmart-rest-api:16.4-SNAPSHOT'

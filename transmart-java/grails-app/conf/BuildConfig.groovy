@@ -17,11 +17,28 @@ grails.project.dependency.resolution = {
         mavenCentral()
 
         mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
+	mavenRepo 'http://52north.org/maven/repo/releases' // to resolve the excluded gnujaxp dependency
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
-        // runtime 'mysql:mysql-connector-java:5.1.21'
+	compile 'axis:axis:1.4', {
+		excludes 'axis-saaj', 'commons-logging'
+	}
+	compile 'com.jcraft:jsch:0.1.54'
+	compile 'com.thoughtworks.xstream:xstream:1.3', {
+		excludes 'xpp3_min'
+	}
+	compile 'commons-net:commons-net:3.3'
+	compile 'jfree:jfreechart:1.0.11', {
+		excludes 'gnujaxp', 'junit'
+	}
+
+	compile 'net.sf.opencsv:opencsv:2.3'
+	compile 'org.apache.lucene:lucene-core:2.4.0'
+	compile 'org.apache.lucene:lucene-highlighter:2.4.0'
+
+	// runtime 'mysql:mysql-connector-java:5.1.21'
         runtime 'com.oracle:ojdbc7:12.1.0.1', {
             export = false
         }
@@ -29,8 +46,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build(":release:3.0.1",
-                ":rest-client-builder:1.0.3") {
+        build ':release:3.1.2',
+                ':rest-client-builder:2.1.1', {
             export = false
         }
     }

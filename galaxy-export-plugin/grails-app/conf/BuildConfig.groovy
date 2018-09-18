@@ -33,23 +33,27 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        runtime('org.postgresql:postgresql:9.3-1100-jdbc41') {
+        runtime 'org.postgresql:postgresql:42.2.2.jre7', {
             transitive = false
             export = false
         }
-        compile('com.github.jmchilton.blend4j:blend4j:0.1.2')
+        runtime 'com.oracle:ojdbc7:12.1.0.1', {
+            transitive = false
+            export = false
+        }
+        compile 'com.github.jmchilton.blend4j:blend4j:0.1.2' 
     }
 
     plugins {
-        build(":release:3.0.1",
-              ":rest-client-builder:2.0.1") {
+        build ':release:3.1.2',
+              ':rest-client-builder:2.1.1', {
             export = false
         }
-        runtime ':resources:1.2.1'
-        runtime ':hibernate:3.6.10.7'
+        runtime ':resources:1.2.14'
+        runtime ':hibernate:3.6.10.19'
         compile ':rdc-rmodules:16.4-SNAPSHOT'
         compile ':transmart-legacy-db:16.4-SNAPSHOT'
-        build ':tomcat:7.0.50'
+        build ':tomcat:7.0.54'
     }
 
 
