@@ -28,8 +28,8 @@ public class GenericWrapper {
     Set<String> embeddedEntities
     Map<String,Object> values
 
-    public GenericWrapper(Map<String,Object> args) {
-        links = (Collection<Link>) args.remove('links') ?: []
+    public GenericWrapper(Map<String ,Object> args) {
+        links = (Collection<Link>) (args.remove('links') ?: [])
         embeddedEntities = (args.remove('embeddedEntities') ?: []) as Set<String>
         values = args
     }
