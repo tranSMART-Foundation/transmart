@@ -1,0 +1,2 @@
+rootProject.name = 'transmart-core-api'
+enableFeaturePreview('STABLE_PUBLISHING')
