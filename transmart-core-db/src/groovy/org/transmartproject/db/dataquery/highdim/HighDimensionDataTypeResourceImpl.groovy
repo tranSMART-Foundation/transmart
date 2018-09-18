@@ -204,7 +204,6 @@ class HighDimensionDataTypeResourceImpl implements HighDimensionDataTypeResource
         module.getSearchableProjections()
     }
 
-    @Override
     def getDistribution(ConstraintByOmicsValue constraint, String concept_key, Long result_instance_id = null) {
         // first translate the ConstraintByOmicsValue to DataConstraints and AssayConstraints
         def dataConstraints = []

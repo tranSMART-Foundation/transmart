@@ -33,7 +33,7 @@ class InMemoryTabularResult<I extends DataColumn, R extends DataRow> implements 
 
     InMemoryTabularResult(TabularResult delegate) {
         this.delegate = delegate
-        internalRows = delegate.rows.collect()
+        internalRows = delegate.rows.collect() as List
     }
 
     @Override

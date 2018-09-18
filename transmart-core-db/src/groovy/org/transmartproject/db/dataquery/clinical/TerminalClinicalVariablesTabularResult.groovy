@@ -107,7 +107,6 @@ class TerminalClinicalVariablesTabularResult extends
 
     final String columnEntityName = 'concept'
 
-    @Override
     protected Object getIndexObjectId(TerminalConceptVariable object) {
         object.conceptCode
     }

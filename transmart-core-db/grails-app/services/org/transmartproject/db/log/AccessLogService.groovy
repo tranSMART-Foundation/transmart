@@ -7,7 +7,6 @@ import org.transmartproject.core.users.User
 @Transactional
 class AccessLogService implements AccessLogEntryResource {
 
-    @Override
     AccessLogEntry report(Map<String, Object> additionalParams = [:], User user, String event) {
         new AccessLogEntry(
                 username:       user?.username,
@@ -18,7 +17,6 @@ class AccessLogService implements AccessLogEntryResource {
         ).save()
     }
 
-    @Override
     List<AccessLogEntry> listEvents(Map<String, Object> paginationParams = [:], Date startDate, Date endDate) {
         AccessLogEntry.createCriteria().list(
                 max:    paginationParams?.max,
