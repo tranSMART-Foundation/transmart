@@ -1,0 +1,5 @@
+rootProject.name = 'mydas_master'
+include ':mydas'
+
+project(':mydas').projectDir = "$rootDir/server_core" as File
+enableFeaturePreview('STABLE_PUBLISHING')

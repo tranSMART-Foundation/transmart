@@ -1,0 +1,26 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'uk.ac.ebi.mydas.client'
+version = '1.6.7'
+
+description = """MyDas Client API"""
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+
+
+repositories {
+        
+     maven { url "http://mydas.googlecode.com/svn/repository/" }
+     maven { url "http://download.java.net/maven/2" }
+     maven { url "http://download.java.net/maven/1" }
+     maven { url "http://repo.maven.apache.org/maven2" }
+}
+dependencies {
+    compile(group: 'uk.ac.ebi.mydas', name: 'mydas', version:'1.6.7') {
+exclude(module: 'commons-httpclient')
+    }
+    testCompile group: 'junit', name: 'junit', version:'4.7'
+}
