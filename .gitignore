@@ -2,6 +2,8 @@
 **/.settings**/*~
 **/*.tmproj
 **/ivy*
+**/*.swm
+**/*.swn
 **/*.swo
 **/*.swp
 **/target
@@ -27,9 +29,6 @@
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
 **/*.iml
-
-# mpeltonen/sbt-idea plugin
-.idea_modules/
 
 ## Directory-based project format:
 **/.idea/
@@ -70,14 +69,17 @@
 **/*.pydevproject
 **/.metadata
 **/.gradle
-*/bin/
-*/dist/
-*/tmp/
 **/*.tmp
 **/*.bak
 **/*~.nib
+
 */local.properties
 */.loadpath
+
+*/bin/
+*/build/
+*/dist/
+*/tmp/
 
 # External tool builders
 **/.externalToolBuilders/
@@ -90,6 +92,9 @@
 
 # sbteclipse plugin
 **/.target
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
 
 # TeXlipse plugin
 **/.texlipse
@@ -155,3 +160,5 @@ transmart-batch/batchdb-*.properties
 **/.slcache
 **/cobertura.ser
 **/node_modules
+
+**/logback.groovy
