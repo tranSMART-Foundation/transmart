@@ -73,6 +73,8 @@
 
 # Emacs saved copies
 **/*~
+**/#*
+**/.#*
 
 */local.properties
 */.loadpath
@@ -155,7 +157,7 @@ transmart-data/vars-*
 transmart-data/private-feeds
 
 transmart-batch/batchdb.properties
-transmart-batch/batchdb-*.properties
+transmart-batch/batgit add chdb-*.properties
 
 **/*.sublime-workspace
 **/.slcache
