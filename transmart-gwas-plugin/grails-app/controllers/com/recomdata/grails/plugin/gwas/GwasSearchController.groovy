@@ -3,12 +3,14 @@ package com.recomdata.grails.plugin.gwas
 import au.com.bytecode.opencsv.CSVWriter
 import com.recomdata.transmart.domain.searchapp.FormLayout
 import grails.converters.JSON
+import grails.util.Holders
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.transmart.biomart.BioAssayAnalysis
 import org.transmart.biomart.Experiment
-import org.transmart.searchapp.*
-import org.codehaus.groovy.grails.plugins.PluginManagerHolder
+import org.transmart.searchapp.GeneSignature
+import org.transmart.searchapp.GeneSignatureItem
+import org.transmart.searchapp.SearchKeyword
 
 import java.lang.reflect.UndeclaredThrowableException
 import java.util.regex.Matcher
@@ -714,7 +716,7 @@ class GwasSearchController {
             String tempImageFolder = grailsApplication.config.com.recomdata.plugins.tempFolderDirectory
 
             //get rdc-modules plugin info
-            def pluginManager = PluginManagerHolder.pluginManager
+            def pluginManager = Holders.pluginManager
             def plugin = pluginManager.getGrailsPlugin("rdc-rmodules")
             String pluginDir = "rdc-rmodules-"+plugin.version;
             pluginDir =  "${explodedDeplDir}/plugins/${pluginDir}/Rscripts/";

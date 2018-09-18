@@ -22,7 +22,7 @@ import grails.converters.JSON
  *
  *
  ******************************************************************/
-import org.codehaus.groovy.grails.plugins.PluginManagerHolder
+import grails.util.Holders
 import org.transmart.biomart.*
 import org.transmart.searchapp.AccessLog
 
@@ -51,7 +51,7 @@ class UploadDataController {
                 al.save();
                 def uploadDataInstance = new AnalysisMetadata()
                 def uploadFileInstance
-                if (PluginManagerHolder.pluginManager.hasGrailsPlugin('folder-management')) {
+                if (Holders.pluginManager.hasGrailsPlugin('folder-management')) {
                     uploadFileInstance = new FmFile()
                 }
                 def model = [uploadDataInstance: uploadDataInstance, uploadFileInstance: uploadFileInstance]
