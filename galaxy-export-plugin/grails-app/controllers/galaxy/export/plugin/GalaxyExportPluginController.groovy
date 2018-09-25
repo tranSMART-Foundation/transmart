@@ -4,7 +4,7 @@ import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
-class GrailsExportPluginController {
+class GalaxyExportPluginController {
 
     /**
      *   Called to get the path to javascript resources such that the plugin can be loaded in the datasetExplorer
