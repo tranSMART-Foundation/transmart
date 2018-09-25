@@ -135,7 +135,7 @@ data-integration/.keep: $(KETTLE_ARCHIVE)
 	 touch '$@'
 
 /var/lib/postgresql/tablespaces:
-	/bin/bash -c 'mkdir -p $@/{biomart,deapp,indx,search_app,transmart}'
+	/bin/bash -c 'mkdir -p $@/{indx,transmart}'
 	chown -R postgres:postgres $@
 
 ../vars: vars-ubuntu.php
