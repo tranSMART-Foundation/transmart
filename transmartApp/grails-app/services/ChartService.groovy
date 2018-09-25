@@ -1,4 +1,5 @@
 import org.apache.commons.math.stat.inference.TestUtils
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartRenderingInfo
 import org.jfree.chart.JFreeChart
@@ -10,132 +11,145 @@ import org.jfree.chart.labels.BoxAndWhiskerToolTipGenerator
 import org.jfree.chart.plot.CategoryPlot
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.chart.plot.XYPlot
-import org.jfree.chart.renderer.category.*
+import org.jfree.chart.renderer.category.BarRenderer
+import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer
+import org.jfree.chart.renderer.category.CategoryItemRendererState
+import org.jfree.chart.renderer.category.ScatterRenderer
+import org.jfree.chart.renderer.category.StandardBarPainter
 import org.jfree.chart.renderer.xy.StandardXYBarPainter
 import org.jfree.chart.renderer.xy.XYBarRenderer
 import org.jfree.data.category.CategoryDataset
 import org.jfree.data.category.DefaultCategoryDataset
 import org.jfree.data.general.Dataset
 import org.jfree.data.general.DefaultPieDataset
-import org.jfree.data.statistics.*
+import org.jfree.data.statistics.BoxAndWhiskerCalculator
+import org.jfree.data.statistics.BoxAndWhiskerItem
+import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset
+import org.jfree.data.statistics.DefaultMultiValueCategoryDataset
+import org.jfree.data.statistics.HistogramDataset
+import org.jfree.data.statistics.MultiValueCategoryDataset
 import org.jfree.graphics2d.svg.SVGGraphics2D
-import org.jfree.chart.axis.AxisLocation
-import org.jfree.chart.ui.RectangleInsets
+import org.jfree.ui.RectangleInsets
 import org.jfree.util.ShapeUtilities
 import org.transmart.searchapp.AuthUser
+import org.springframework.beans.factory.annotation.Autowired
+import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
 import org.transmartproject.core.dataquery.highdim.projections.Projection
 import org.transmartproject.core.exceptions.EmptySetException
 import org.transmartproject.core.querytool.ConstraintByOmicsValue
+import org.transmartproject.db.dataquery.highdim.HighDimensionResourceService
 
 import java.awt.*
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Rectangle2D
+import java.util.List
+
 /**
- * Created by Florian Guitton <f.guitton@imperial.ac.uk> on 17/12/2014.
+ * @author Florian Guitton <f.guitton@imperial.ac.uk>
  */
 class ChartService {
 
-    def i2b2HelperService
-    def highDimensionQueryService
-    def highDimensionResourceService
-    def springSecurityService
-    def public keyCache = []
+	static transactional = false
 
-    def getSubsetsFromRequest(params) {
+	@Autowired private HighDimensionQueryService highDimensionQueryService
+	@Autowired private I2b2HelperService i2b2HelperService
+	HighDimensionResourceService highDimensionResourceService
+	Map<Object, Map> getSubsetsFromRequest(GrailsParameterMap params) {
 
-        // We retrieve the result instance ids from the client
-        def result_instance_id1 = params.result_instance_id1 ?: null;
-        def result_instance_id2 = params.result_instance_id2 ?: null;
+	// We retrieve the result instance ids from the client
+	String result_instance_id1 = params.result_instance_id1 ?: null
+	String result_instance_id2 = params.result_instance_id2 ?: null
 
-        // We create our subset reference Map
-        [
-            1: [ exists: !(result_instance_id1 == null || result_instance_id1 == ""), instance: result_instance_id1],
-            2: [ exists: !(result_instance_id2 == null || result_instance_id1 == ""), instance: result_instance_id2],
-            commons: [:]
-        ]
-    }
+		[1: [ exists: !(result_instance_id1 == null || result_instance_id1 == ""), instance: result_instance_id1],
+		 2: [ exists: !(result_instance_id2 == null || result_instance_id1 == ""), instance: result_instance_id2],
+		 commons: [:]]
+	}
 
-    def computeChartsForSubsets(subsets) {
+	Map<Object, Map> computeChartsForSubsets(Map<Object, Map> subsets) {
 
-        // We intend to use some legacy functions that are used elsewhere
-        // We need to use a printer for this
-        StringWriter output = new StringWriter()
-        PrintWriter writer = new PrintWriter(output)
+		// We intend to use some legacy functions that are used elsewhere
+		// We need to use a printer for this
+		StringWriter output = new StringWriter()
+		PrintWriter writer = new PrintWriter(output)
 
-        // We want to automatically clear the output buffer as we go
-        output.metaClass.toStringAndFlush = {
-            def tmp = buf.toString()
-            buf.setLength(0)
-            tmp
-        }
+		// We want to automatically clear the output buffer as we go
+		output.metaClass.toStringAndFlush = {
+			def tmp = buf.toString()
+			buf.setLength(0)
+			tmp
+		}
 
-        // We need to run some common statistics first
-        // This must be changed for multiple (>2) cohort selection
-        // We grab the intersection count for our two cohort
-        if (subsets[1].exists && subsets[2].exists)
-            subsets.commons.patientIntersectionCount = i2b2HelperService.getPatientSetIntersectionSize(subsets[1].instance, subsets[2].instance)
+		// We need to run some common statistics first
+		// This must be changed for multiple (>2) cohort selection
+		// We grab the intersection count for our two cohorts
+		if (subsets[1].exists && subsets[2].exists) {
+			subsets.commons.patientIntersectionCount = i2b2HelperService.getPatientSetIntersectionSize(
+					subsets[1].instance, subsets[2].instance)
+		}
 
-        // Let's prepare our subset shared diagrams, we will fill them later
-        def ageHistogramHandle = [:]
-        def agePlotHandle = [:]
+		// Let's prepare our subset shared diagrams, we will fill them later
+		Map<String, List<Double>> ageHistogramHandle = [:]
+		Map<String, BoxAndWhiskerItem> agePlotHandle = [:]
 
-        subsets.findAll { n, p ->
-            p.exists
-        }.each { n, p ->
+		subsets.findAll { n, p -> p.exists }.each { n, p ->
 
-            // First we get the Query Definition
-            i2b2HelperService.renderQueryDefinition(p.instance, "Query Summary for Subset ${n}", writer)
-            p.query = output.toStringAndFlush()
-            def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
+			// First we get the Query Definition
+			i2b2HelperService.renderQueryDefinition(p.instance, "Query Summary for Subset ${n}", writer)
+			p.query = output.toStringAndFlush()
+			def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
 
-            // Let's fetch the patient count
-            p.patientCount = i2b2HelperService.getPatientSetSize(p.instance, user)
-            // Getting the age data
-            p.ageData = i2b2HelperService.getPatientDemographicValueDataForSubset("AGE_IN_YEARS_NUM", p.instance, user).toList()
-            if (p.ageData) {
-                p.ageStats = BoxAndWhiskerCalculator.calculateBoxAndWhiskerStatistics(p.ageData)
-                ageHistogramHandle["Subset $n"] = p.ageData
-                agePlotHandle["Subset $n"] = p.ageStats
-            }
+			// Let's fetch the patient count
+			p.patientCount = i2b2HelperService.getPatientSetSize(p.instance, user)
+			// Getting the age data
+			p.ageData = i2b2HelperService.getPatientDemographicValueDataForSubset(
+					'AGE_IN_YEARS_NUM', p.instance, user) as List<Double>
+			if (p.ageData) {
+				p.ageStats = BoxAndWhiskerCalculator.calculateBoxAndWhiskerStatistics(p.ageData)
+				ageHistogramHandle["Subset $n"] = p.ageData
+				agePlotHandle["Subset $n"] = p.ageStats
+			}
 
-            def moveKeyToEndOfMap = { map,key -> if (map.containsKey(key)) {def v=map[key];map.remove(key);map[key]=v} }
+			// Sex chart has to be generated for each subset
+			p.sexData = i2b2HelperService.getPatientDemographicDataForSubset('sex_cd', p.instance)
+			moveKeyToEndOfMap p.sexData, ''
+			p.sexPie = getSVGChart(type: 'pie', data: p.sexData, title: 'Sex')
 
-            // Sex chart has to be generated for each subset
-            p.sexData = i2b2HelperService.getPatientDemographicDataForSubset("sex_cd", p.instance, user)
-            moveKeyToEndOfMap(p.sexData,'')
-            p.sexPie = getSVGChart(type: 'pie', data: p.sexData, title: "Sex")
+			// Same thing for Race chart
+			p.raceData = i2b2HelperService.getPatientDemographicDataForSubset('race_cd', p.instance)
+			moveKeyToEndOfMap p.raceData, ''
+			p.racePie = getSVGChart(type: 'pie', data: p.raceData, title: 'Race')
+		}
 
-            // Same thing for Race chart
-            p.raceData = i2b2HelperService.getPatientDemographicDataForSubset("race_cd", p.instance, user)
-            moveKeyToEndOfMap(p.raceData,'')
-            p.racePie = getSVGChart(type: 'pie', data: p.raceData, title: "Race")
+		// Let's build our age diagrams now that we have all the points in
+		subsets.commons.ageHisto = getSVGChart(type: 'histogram', data: ageHistogramHandle, title: 'Age')
+		subsets.commons.agePlot = getSVGChart(type: 'boxplot', data: agePlotHandle, title: 'Age')
 
-        }
+		subsets
+	}
 
-        // Let's build our age diagrams now that we have all the points in
-        subsets.commons.ageHisto = getSVGChart(type: 'histogram', data: ageHistogramHandle, title: "Age")
-        subsets.commons.agePlot = getSVGChart(type: 'boxplot', data: agePlotHandle, title: "Age")
+	private void moveKeyToEndOfMap(Map map, String key) {
+		if (map.containsKey(key)) {
+			def v = map[key]
+			map.remove key
+			map[key] = v
+		}
+	}
 
-        subsets
-    }
+	Map<String, Map> getConceptsForSubsets(Map<Object, Map> subsets) {
 
-    def getConceptsForSubsets(subsets) {
+		// We also retrieve all concepts involved in the query
+		Map<String, Map> concepts = [:]
 
-        // We also retrieve all concepts involved in the query
-        def concepts = [:]
+		i2b2HelperService.getDistinctConceptSet(subsets[1].instance, subsets[2].instance).collect {
+			i2b2HelperService.getConceptKeyForAnalysis it
+		}.findAll() { String it -> !it.contains('SECURITY') }.each { String it ->
+			if (!i2b2HelperService.isHighDimensionalConceptKey(it)) {
+				concepts[it] = getConceptAnalysis(it, null, subsets, null)
+			}
+		}
 
-        i2b2HelperService.getDistinctConceptSet(subsets[1].instance, subsets[2].instance).collect {
-            i2b2HelperService.getConceptKeyForAnalysis(it)
-        }.findAll() {
-            it.indexOf("SECURITY") <= -1
-        }.each {
-            if (!i2b2HelperService.isHighDimensionalConceptKey(it)) {
-                concepts[it] = getConceptAnalysis(concept: it, subsets: subsets)
-            }
-        }
-
-        concepts
-    }
+		concepts
+	}
 
     def getHighDimensionalConceptsForSubsets(subsets) {
         // We also retrieve all concepts involved in the query
