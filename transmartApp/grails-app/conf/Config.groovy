@@ -1,13 +1,12 @@
+import grails.build.logging.GrailsConsole
 import grails.util.Environment
 
 def console
 if (!Environment.isWarDeployed() && Environment.isWithinShell()) {
-    console = grails.build.logging.GrailsConsole.instance
-} else {
-    console = [
-            info: { println "[INFO] $it" },
-            warn: { println "[WARN] $it" },
-    ]
+	console = GrailsConsole.instance
+}
+else {
+	console = [info: { println "[INFO] $it" }, warn: { println "[WARN] $it" }]
 }
 
 /**
@@ -27,84 +26,144 @@ if (!Environment.isWarDeployed() && Environment.isWithinShell()) {
 org.transmart.originalConfigBinding = getBinding()
 
 grails.config.locations = []
-def defaultConfigFiles
+List<String> defaultConfigFiles
 if (Environment.current != Environment.TEST) {
-    defaultConfigFiles = [
-            "${userHome}/.grails/${appName}Config/Config.groovy",
-            "${userHome}/.grails/${appName}Config/RModulesConfig.groovy",
-            "${userHome}/.grails/${appName}Config/DataSource.groovy"
-    ]
-} else {
-    // settings for the test environment
-    org.transmart.configFine = true
+	defaultConfigFiles = [
+			"$userHome/.grails/${appName}Config/Config.groovy",
+			"$userHome/.grails/${appName}Config/RModulesConfig.groovy",
+			"$userHome/.grails/${appName}Config/DataSource.groovy"
+	]
+}
+else {
+	// settings for the test environment
+
+	org.transmart.configFine = true
 }
 
-defaultConfigFiles.each { filePath ->
-    def f = new File(filePath)
-    if (f.exists()) {
-        if (f.name == 'RModulesConfig.groovy') {
-            console.warn "RModulesConfig.groovy is deprecated, it has been merged into Config.groovy. " +
-                    "Loading it anyway."
-        }
-        grails.config.locations << "file:${filePath}"
-    } else if (f.name != 'RModulesConfig.groovy') {
-        console.info "Configuration file ${filePath} does not exist."
-    }
+for (String filePath in defaultConfigFiles) {
+	File f = new File(filePath)
+	if (f.exists()) {
+		if (f.name == 'RModulesConfig.groovy') {
+			console.warn 'RModulesConfig.groovy is deprecated, it has been merged into Config.groovy. Loading it anyway.'
+        	}
+		grails.config.locations << 'file:' + filePath
+	}
+	else if (f.name != 'RModulesConfig.groovy') {
+		console.info "Configuration file $filePath does not exist."
+	}
 }
 String bashSafeEnvAppName = appName.toString().toUpperCase(Locale.ENGLISH).replaceAll(/-/, '_')
 
-def externalConfig = System.getenv("${bashSafeEnvAppName}_CONFIG_LOCATION")
+String externalConfig = System.getenv("${bashSafeEnvAppName}_CONFIG_LOCATION")
 if (externalConfig) {
-    grails.config.locations << "file:" + externalConfig
+	grails.config.locations << 'file:' + externalConfig
 }
-def externalDataSource = System.getenv("${bashSafeEnvAppName}_DATASOURCE_LOCATION")
+String externalDataSource = System.getenv("${bashSafeEnvAppName}_DATASOURCE_LOCATION")
 if (externalDataSource) {
-    grails.config.locations << "file:" + externalDataSource
+	grails.config.locations << 'file:' + externalDataSource
 }
-grails.config.locations.each { console.info "Including configuration file [${it}] in configuration building." }
+for (location in grails.config.locations) {
+	console.info "Including configuration file [$location] in configuration building."
+}
 
-grails.mime.disable.accept.header.userAgents = []
-grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
-grails.mime.types = [html         : [
-        'text/html',
-        'application/xhtml+xml'
-],
-                     xml          : [
-                             'text/xml',
-                             'application/xml'
-                     ],
-                     text         : 'text-plain',
-                     js           : 'text/javascript',
-                     rss          : 'application/rss+xml',
-                     atom         : 'application/atom+xml',
-                     css          : 'text/css',
-                     csv          : 'text/csv',
-                     all          : '*/*',
-                     json         : [
-                             'application/json',
-                             'text/json'
-                     ],
-                     form         : 'application/x-www-form-urlencoded',
-                     multipartForm: 'multipart/form-data',
-                     jnlp         : 'application/x-java-jnlp-file'
-]
-// The default codec used to encode data with ${}
-grails.views.javascript.library="jquery"
-grails.views.default.codec = "none" // none, html, base64
-grails.views.gsp.encoding = "UTF-8"
-grails.converters.encoding = "UTF-8"
-grails.converters.default.pretty.print = true
+grails {
+	cache {
+		enabled = true
+		ehcache {
+			ehcacheXmlLocation = 'classpath:ehcache.xml'
+			reloadable = false
+		}
+	}
+//	controllers.defaultScope = 'singleton'
+	converters.default.pretty.print = true
+	converters.encoding = 'UTF-8'
+	// Keep pre-2.3.0 behavior
+	databinding {
+		convertEmptyStringsToNull = false
+		trimStrings = false
+	}
+	enable.native2ascii = true // enabled native2ascii conversion of i18n properties files
+	exceptionresolver.params.exclude = ['password']
+	hibernate.pass.readonly = false
+	json.legacy.builder = false
+	mime {
+		disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
+		file.extensions = true // enables the parsing of file extensions from URLs into the request format
+		types = [
+				all          : '*/*',
+				atom         : 'application/atom+xml',
+				css          : 'text/css',
+				csv          : 'text/csv',
+				form         : 'application/x-www-form-urlencoded',
+				hal          : ['application/hal+json','application/hal+xml'],
+				html         : ['text/html', 'application/xhtml+xml'],
+				jnlp         : 'application/x-java-jnlp-file',
+				js           : 'text/javascript',
+				json         : ['application/json', 'text/json'],
+				multipartForm: 'multipart/form-data',
+				rss          : 'application/rss+xml',
+				text         : 'text-plain',
+				xml          : ['text/xml', 'application/xml']
+		]
+	}
+	plugin {
+		springsecurity {
+			kerberos.active = false
+			ldap.active = false // Disable by default to prevent authentication errors for installations without LDAP
+			oauthProvider {
+				accessTokenLookup.className = 'org.transmart.oauth2.AccessToken'
+				authorizationCodeLookup.className = 'org.transmart.oauth2.AuthorizationCode'
+				clientLookup.className = 'org.transmart.oauth2.Client'
+				refreshTokenLookup.className = 'org.transmart.oauth2.RefreshToken'
+			}
+			roleHierarchy = '''
+				ROLE_ADMIN > ROLE_DATASET_EXPLORER_ADMIN
+				ROLE_DATASET_EXPLORER_ADMIN > ROLE_PUBLIC_USER
+				ROLE_DATASET_EXPLORER_ADMIN > ROLE_SPECTATOR
+				ROLE_DATASET_EXPLORER_ADMIN > ROLE_STUDY_OWNER
+				ROLE_DATASET_EXPLORER_ADMIN > ROLE_TRAINING_USER
+				ROLE_STUDY_OWNER > ROLE_PUBLIC_USER
+			'''
+			useSecurityEventListener = true
+		}
+	}
+	// requires NIO connector though. If you use apache in front of tomcat in the
+	// same server, you can set this to false and set .apache = true
+	// Bear in mind bug GRAILS-11376 with Tomcat NIO and Grails 2.3.6+
+	plugins.sendfile.tomcat = false
+	project.groupId = appName
+	scaffolding.templates.domainSuffix = ''
+	spring.bean.packages = []
+	views.default.codec = 'none' // TODO html
+	views {
+		gsp {
+			codecs {
+				expression = 'none' // TODO html
+				scriptlet = 'none' // TODO html
+				taglib = 'none'
+				staticparts = 'none'
+			}
+			encoding = 'UTF-8'
+			htmlcodec = 'xml'
+			javascript.library = 'jquery'
+		}
+	}
+	web.disable.multipart = false
+}
 
-/* Keep pre-2.3.0 behavior */
-grails.databinding.convertEmptyStringsToNull = false
-grails.databinding.trimStrings = false
-
-// enabled native2ascii conversion of i18n properties files
-grails.enable.native2ascii = true
+org {
+	transmart {
+		security {
+			ldap {
+				inheritPassword = true
+				mappedUsernameProperty = 'username'
+			}
+		}
+	}
+}
 
 com.recomdata.search.autocomplete.max = 20
-// default paging size
-com.recomdata.search.paginate.max = 20
+com.recomdata.search.paginate.max = 20 // default paging size
 com.recomdata.search.paginate.maxsteps = 5
 com.recomdata.admin.paginate.max = 20
 
@@ -128,23 +187,23 @@ org.transmartproject.i2b2.group_id = 'Demo'
 //**************************
 
 // max genes to display after disease search
-com.recomdata.search.gene.max = 250;
+com.recomdata.search.gene.max = 250
 
 // set schema names for I2B2HelperService
-com.recomdata.i2b2helper.i2b2hive = "i2b2hive"
-com.recomdata.i2b2helper.i2b2metadata = "i2b2metadata"
-com.recomdata.i2b2helper.i2b2demodata = "i2b2demodata"
+com.recomdata.i2b2helper.i2b2hive = 'i2b2hive'
+com.recomdata.i2b2helper.i2b2metadata = 'i2b2metadata'
+com.recomdata.i2b2helper.i2b2demodata = 'i2b2demodata'
 
 com.recomdata.transmart.data.export.max.export.jobs.loaded = 20
 
 com.recomdata.transmart.data.export.dataTypesMap = [
-        'CLINICAL'  : 'Clinical & Low Dimensional Biomarker Data',
-        'MRNA'      : 'Gene Expression Data',
-        'SNP'       : 'SNP data (Microarray)',
-        'STUDY'     : 'Study Metadata',
-        'ADDITIONAL': 'Additional Data'
-        //,'GSEA':'Gene Set Enrichment Analysis (GSEA)'
-];
+	CLINICAL  : 'Clinical & Low Dimensional Biomarker Data',
+	MRNA      : 'Gene Expression Data',
+	SNP       : 'SNP data (Microarray)',
+	STUDY     : 'Study Metadata',
+//	GSEA      : 'Gene Set Enrichment Analysis (GSEA)',
+	ADDITIONAL: 'Additional Data'
+]
 
 // Data export FTP settings is Rserve running remote in relation to transmartApp
 com.recomdata.transmart.data.export.ftp.server = ''
@@ -154,125 +213,80 @@ com.recomdata.transmart.data.export.ftp.password = ''
 com.recomdata.transmart.data.export.ftp.remote.path = ''
 
 // Control which gene/pathway search is used in Dataset Explorer
-// A value of "native" forces Dataset Explorer's native algorithm.
-// Abscence of this property or any other value forces the use of the Search Algorithm
-//com.recomdata.search.genepathway="native"
+// A value of 'native' forces Dataset Explorer's native algorithm.
+// Absence of this property or any other value forces the use of the Search Algorithm
+//com.recomdata.search.genepathway='native'
 
 // The tags in the Concept to indicate Progression-free Survival and Censor flags, used by Survival Analysis
-com.recomdata.analysis.survival.survivalDataList = [
-        '(PFS)',
-        '(OS)',
-        '(TTT)',
-        '(DURTFI)'
-];
-com.recomdata.analysis.survival.censorFlagList = [
-        '(PFSCENS)',
-        '(OSCENS)',
-        '(TTTCENS)',
-        '(DURTFICS)'
-];
+com.recomdata.analysis.survival.survivalDataList = ['(PFS)', '(OS)', '(TTT)', '(DURTFI)']
+com.recomdata.analysis.survival.censorFlagList = ['(PFSCENS)', '(OSCENS)', '(TTTCENS)', '(DURTFICS)']
 
-com.recomdata.analysis.genepattern.file.dir = "data"; // Relative to the app root "web-app" - deprecated - replaced with data.file.dir
+com.recomdata.analysis.genepattern.file.dir = 'data' // Relative to the app root 'web-app' - deprecated - replaced with data.file.dir
 
-com.recomdata.analysis.data.file.dir = "data"; // Relative to the app root "web-app"
+com.recomdata.analysis.data.file.dir = 'data' // Relative to the app root 'web-app'
 
-// Disclaimer
-StringBuilder disclaimer = new StringBuilder()
-disclaimer.append("<p></p>")
-com.recomdata.disclaimer = disclaimer.toString()
+com.recomdata.disclaimer = '<p></p>'
 
 // customization views
 //com.recomdata.view.studyview='_clinicaltrialdetail'
 com.recomdata.skipdisclaimer = true
 
-grails.spring.bean.packages = []
-
 org.transmart.security.spnegoEnabled = false
 org.transmart.security.sniValidation = true
 org.transmart.security.sslValidation = true
 
-// requires NIO connector though. If you use apache in front of tomcat in the
-// same server, you can set this to false and set .apache = true
-// Bear in mind bug GRAILS-11376 with Tomcat NIO and Grails 2.3.6+
-grails.plugins.sendfile.tomcat = false
-
-grails.plugin.springsecurity.useSecurityEventListener = true
-
 bruteForceLoginLock {
-    allowedNumberOfAttempts = 3
-    lockTimeInMinutes = 10
+	allowedNumberOfAttempts = 3
+	lockTimeInMinutes = 10
 }
 
-log4j = {
-    /**
-     * Configuration for writing audit metrics.
-     * This needs to be placed in the out-of-tree Config.groovy, as the log4j config there will override this.
-     * (and don't forget to 'import org.apache.log4j.DailyRollingFileAppender',
-     * 'import org.transmart.logging.ChildProcessAppender' and 'import org.transmart.logging.JsonLayout'.)
-     */
-    /*
-    appenders {
-        // default log directory is either the tomcat root directory or the
-        // current working directory.
-        def catalinaBase = System.getProperty('catalina.base') ?: '.'
-        def logDirectory = "${catalinaBase}/logs".toString()
+log4j.main = {
+	/**
+	 * Configuration for writing audit metrics.
+	 * This needs to be placed in the out-of-tree Config.groovy, as the log4j config there will override this.
+	 * (and don't forget to 'import org.apache.log4j.DailyRollingFileAppender',
+	 * 'import org.transmart.logging.ChildProcessAppender' and 'import org.transmart.logging.JsonLayout'.)
+	 */
+	/*
+	appenders {
+		// default log directory is either the tomcat root directory or the current working directory.
+		String catalinaBase = System.getProperty('catalina.base') ?: '.'
+		String logDirectory = "$catalinaBase/logs"
 
-        // Use layout: JsonLayout(conversionPattern: '%m%n', singleLine: true) to get each message as a single line
-        // json the same way as ChildProcessAppender sends it.
-        appender new DailyRollingFileAppender(
-            name: 'fileAuditLogger',
-            datePattern: "'.'yyyy-MM-dd",
-            fileName: "${logDirectory}/audit.log",
-            layout: JsonLayout(conversionPattern:'%d %m%n')
-        )
-        // the default layout is a JsonLayout(conversionPattern: '%m%n, singleLine: true)
-        appender new ChildProcessAppender(
-                name: 'processAuditLogger',
-                command: ['/usr/bin/your/command/here', 'arg1', 'arg2']
-        )
-    }
-    trace fileAuditLogger: 'org.transmart.audit'
-    trace processAuditLogger: 'org.transmart.audit'
-    trace stdout: 'org.transmart.audit'
-    */
+		// Use layout: JsonLayout(conversionPattern: '%m%n', singleLine: true) to get each message as a single line
+		// json the same way as ChildProcessAppender sends it.
+		appender new DailyRollingFileAppender(
+			name: 'fileAuditLogger',
+			datePattern: "'.'yyyy-MM-dd",
+			fileName: "$logDirectory/audit.log",
+			layout: JsonLayout(conversionPattern:'%d %m%n')
+		)
+		// the default layout is a JsonLayout(conversionPattern: '%m%n, singleLine: true)
+		appender new ChildProcessAppender(
+			name: 'processAuditLogger',
+			command: ['/usr/bin/your/command/here', 'arg1', 'arg2']
+		)
+	}
+	trace fileAuditLogger: 'org.transmart.audit'
+	trace processAuditLogger: 'org.transmart.audit'
+	trace stdout: 'org.transmart.audit'
+	*/
 
-    environments {
-        test {
-            warn 'org.codehaus.groovy.grails.commons.spring'
-            warn 'org.codehaus.groovy.grails.domain.GrailsDomainClassCleaner'
-            warn 'org.codehaus.groovy.grails.plugins.DefaultGrailsPluginManager' //info to show plugin versions
-            warn 'org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder' //info to show joined-subclass indo
+	environments {
+		test {
+			warn 'org.codehaus.groovy.grails.commons.spring',
+			     'org.codehaus.groovy.grails.domain.GrailsDomainClassCleaner',
+			     'org.codehaus.groovy.grails.plugins.DefaultGrailsPluginManager', //info to show plugin versions
+			     'org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder' //info to show joined-subclass indo
 
-            root {
-                info('stdout')
-            }
-        }
-    }
+			root {
+				info 'stdout'
+			}
+		}
+	}
 
-    warn 'org.codehaus.groovy.grails.commons.cfg.ConfigurationHelper'
+	warn 'org.codehaus.groovy.grails.commons.cfg.ConfigurationHelper'
 }
-
-grails {
-    cache {
-        enabled = true
-        ehcache {
-            ehcacheXmlLocation = 'classpath:ehcache.xml'
-            reloadable = false
-        }
-    }
-}
-
-// Added by the Spring Security OAuth2 Provider plugin:
-grails.plugin.springsecurity.oauthProvider.clientLookup.className = 'org.transmart.oauth2.Client'
-grails.plugin.springsecurity.oauthProvider.authorizationCodeLookup.className = 'org.transmart.oauth2.AuthorizationCode'
-grails.plugin.springsecurity.oauthProvider.accessTokenLookup.className = 'org.transmart.oauth2.AccessToken'
-grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.className = 'org.transmart.oauth2.RefreshToken'
-
-// Disable LDAP by default to prevent authentication errors for installations without LDAP
-grails.plugin.springsecurity.ldap.active = false
-org.transmart.security.ldap.mappedUsernameProperty = 'username'
-org.transmart.security.ldap.inheritPassword = true
-grails.plugin.springsecurity.kerberos.active = false
 
 /**
  * Here you can set custom help pages for different pages.
