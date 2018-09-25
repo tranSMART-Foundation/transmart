@@ -23,7 +23,8 @@ class AmTagItem implements Comparable<AmTagItem> {
 //	AmTagAssociation amTagAssociation
 
     static mapping = {
-        table 'am_tag_item'
+        table 'AMAPP.am_tag_item'
+	id generator: 'sequence', params: [sequence: 'AMAPP.SEQ_AMAPP_DATA_ID'], column: 'tag_item_id'
         version false
         cache true
         sort "displayOrder"
