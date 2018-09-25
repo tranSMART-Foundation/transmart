@@ -10,25 +10,23 @@ package xnat.plugin
 
 
 class Subject implements Serializable{
-    int id
-    String tranSMART_subjectID
-    String xnat_subjectID
-    String xnat_project
-    List<Session> sessions = new ArrayList<Session>();
+    Long id
 
+    String transmartSubjectId
+    String xnatSubjectId
+    String xnatProject
+    List<Session> sessions = []
+
+    static transients = ['sessions']
 
     static mapping = {
-        table name: 'XNAT_SUBJECT', schema: 'SEARCHAPP'
+        table 'SEARCHAPP.XNAT_SUBJECT'
+	id generator: 'increment', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_DATA_ID', column: 'id']
         version false
-        id column: 'ID',
-                generator: 'increment'
-        tranSMART_subjectID column: 'TSMART_SUBJECTID'
-        xnat_subjectID column: 'XNAT_SUBJECTID'
-        xnat_project column: 'XNAT_PROJECT'
-    }
 
-    static constraints = {
-        id(nullable: false)
+	transmartSubjectId column: 'TSMART_SUBJECTID'
+        xnatSubjectId column: 'XNAT_SUBJECTID'
+        xnatProject column: 'XNAT_PROJECT'
     }
 
 }

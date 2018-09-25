@@ -14,7 +14,8 @@ class Session {
     String subjectID
     String sessionID
     String sessionName
-    List<Scan> scans = new ArrayList<Scan>();
+    List<Scan> scans = []
 
+    static transients = ['scans']
 
 }

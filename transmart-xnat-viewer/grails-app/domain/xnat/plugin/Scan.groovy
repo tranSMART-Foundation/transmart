@@ -15,7 +15,8 @@ class Scan {
     String sessionID
     String scanID
     String seriesDesc
-    List<Snapshot> snapshots = new ArrayList<Snapshot>();
+    List<Snapshot> snapshots = []
 
+    static transients = ['snapshots']
 
 }
