@@ -31,7 +31,7 @@ $(TBDIR_TARGETS):
 # lacks execute permissions in one of parent directories of $(TABLESPACES) (the
 # tablespaces directory). Therefore, make make look whether the directory exists
 # only if we need to create the tablespace. We accomplish this by not making
-# this rule not depend directly on $(TABLESPACES)% and instead call
+# this rule depend directly on $(TABLESPACES)% and instead call
 # $(MAKE) $(TABLESPACES)$* at the last moment
 tablespace_%:
 	test `$(PSQL_COMMAND) -c "select exists (select spcname from pg_tablespace where spcname = '$*')" -tA` \
