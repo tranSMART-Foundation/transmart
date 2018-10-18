@@ -11,8 +11,10 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
@@ -27,7 +29,6 @@ import uk.ac.ebi.mydas.model.DasAnnotatedSegment;
 import uk.ac.ebi.mydas.model.DasEntryPoint;
 import uk.ac.ebi.mydas.model.DasFeature;
 import uk.ac.ebi.mydas.model.DasTarget;
-
 public class Indexer {
 	private String dirPath;
 	private ServerConfiguration config;
@@ -58,8 +59,8 @@ public class Indexer {
 								
 								// Fine - process command.
 								AnnotationDataSource refDsn = dsnConfig.getDataSource();
-								FSDirectory dir = FSDirectory.open(new File(dirPath+"/"+dsn));
-								IndexWriter writer = new IndexWriter(dir, new StandardAnalyzer(Version.LUCENE_30),true, IndexWriter.MaxFieldLength.LIMITED);
+								FSDirectory dir = FSDirectory.open(new File(dirPath+"/"+dsn).toPath());
+								IndexWriter writer = new IndexWriter(dir, new IndexWriterConfig());
 								
 								Integer max =dsnConfig.getMaxEntryPoints();
 								int total = refDsn.getTotalEntryPoints();
@@ -85,7 +86,6 @@ public class Indexer {
 										}
 									}
 								}
-								writer.optimize();
 								writer.close();
 							}
 						} catch (DataSourceException e) {
@@ -113,73 +113,77 @@ public class Indexer {
 			Document doc = new Document();
 			String type="",method="",notes="",links="",targets="",parents="",parts="",segmentS="";
 
-			doc.add(new Field("segmentId", segment.getSegmentId(),																Field.Store.YES,	Field.Index.ANALYZED));
+			doc.add(new StringField("segmentId", segment.getSegmentId(), Field.Store.YES));
 			segmentS +=segment.getSegmentId();
 			if (segment.getSegmentLabel()!=null) {
-				doc.add(new Field("segmentLabel", segment.getSegmentLabel(),																Field.Store.YES,	Field.Index.ANALYZED));
+				doc.add(new StringField("segmentLabel", segment.getSegmentLabel(), Field.Store.YES));
 				segmentS += " "+segment.getSegmentLabel();
 			}
 			if (segment.getVersion()!=null) {
-				doc.add(new Field("segmentVersion", segment.getVersion(),																Field.Store.YES,	Field.Index.ANALYZED));
+				doc.add(new StringField("segmentVersion", segment.getVersion(), Field.Store.YES));
 				segmentS += " "+segment.getVersion();
 			}
 			if (segment.getStartCoordinate()!=null) {
-				doc.add(new Field("segmentStart", ""+segment.getStartCoordinate(),																Field.Store.YES,	Field.Index.ANALYZED));
+                                doc.add(new StringField("segmentStart", ""+segment.getStartCoordinate(), Field.Store.YES)); // as a String
+//				doc.add(new IntPoint("segmentStart", ""+segment.getStartCoordinate()));
+//				doc.add(new StoredField("segmentStart", ""+segment.getStartCoordinate()));
 				segmentS += " "+segment.getStartCoordinate();
 			}
 			if (segment.getStopCoordinate()!=null) {
-				doc.add(new Field("segmentStop", ""+segment.getStopCoordinate(),																Field.Store.YES,	Field.Index.ANALYZED));
+                                doc.add(new StringField("segmentStop", ""+segment.getStopCoordinate(), Field.Store.YES)); // as a String
+//				doc.add(new IntPoint("segmentStop", ""+segment.getStopCoordinate()));
+//				doc.add(new StoredField("segmentStop", ""+segment.getStopCoordinate()));
 				segmentS += " "+segment.getStopCoordinate();
 			}
 
 			
-			doc.add(new Field("featureId", feature.getFeatureId(),		Field.Store.YES,	Field.Index.ANALYZED));
-			if (feature.getFeatureLabel()!=null) doc.add(new Field("featureLabel", feature.getFeatureLabel(), Field.Store.YES, Field.Index.ANALYZED));
+			doc.add(new StringField("featureId", feature.getFeatureId(), Field.Store.YES));
+			if (feature.getFeatureLabel()!=null) doc.add(new StringField("featureLabel", feature.getFeatureLabel(), Field.Store.YES));
 			if (feature.getType()!=null){
 				if (feature.getType().getId()!=null){ 
-					doc.add(new Field("typeId", feature.getType().getId(), Field.Store.YES, Field.Index.ANALYZED));
+					doc.add(new StringField("typeId", feature.getType().getId(), Field.Store.YES));
 					type +=feature.getType().getId()+" ";
 				}
 				if (feature.getType().getCvId()!=null){
-					doc.add(new Field("typeCvId", feature.getType().getCvId(), Field.Store.YES, Field.Index.ANALYZED));
+					doc.add(new StringField("typeCvId", feature.getType().getCvId(), Field.Store.YES));
 					type +=feature.getType().getCvId()+" ";
 				}
 				if (feature.getType().getLabel()!=null){ 
-					doc.add(new Field("typeLabel", feature.getType().getLabel(), Field.Store.YES, Field.Index.ANALYZED));
+					doc.add(new StringField("typeLabel", feature.getType().getLabel(), Field.Store.YES));
 					type +=feature.getType().getLabel()+" ";
 				}
 				if (feature.getType().getCategory()!=null){
-					doc.add(new Field("typeCategory", feature.getType().getCategory(), Field.Store.YES, Field.Index.ANALYZED));
+					doc.add(new StringField("typeCategory", feature.getType().getCategory(), Field.Store.YES));
 					type +=feature.getType().getCategory()+" ";
 				}
-				doc.add(new Field("type",type, Field.Store.NO, Field.Index.ANALYZED));
+				doc.add(new StringField("type",type, Field.Store.NO));
 			}
 			if (feature.getMethod()!=null){
 				method+=feature.getMethod().getId()+" ";
-				doc.add(new Field("methodId", feature.getMethod().getId(), Field.Store.YES, Field.Index.ANALYZED));
+				doc.add(new StringField("methodId", feature.getMethod().getId(), Field.Store.YES));
 				if (feature.getMethod().getCvId()!=null){
 					method+=feature.getMethod().getCvId()+" ";
-					doc.add(new Field("methodCvId", feature.getMethod().getCvId(), Field.Store.YES, Field.Index.ANALYZED));
+					doc.add(new StringField("methodCvId", feature.getMethod().getCvId(), Field.Store.YES));
 				}
 				if (feature.getMethod().getLabel()!=null){
 					method+=feature.getMethod().getLabel()+" ";
-					doc.add(new Field("methodLabel", feature.getMethod().getLabel(), Field.Store.YES, Field.Index.ANALYZED));
+					doc.add(new StringField("methodLabel", feature.getMethod().getLabel(), Field.Store.YES));
 				}
-				doc.add(new Field("method",method, Field.Store.NO, Field.Index.ANALYZED));
+				doc.add(new StringField("method",method, Field.Store.NO));
 			}
-			doc.add(new Field("start",""+feature.getStartCoordinate(), Field.Store.YES, Field.Index.ANALYZED));
-			doc.add(new Field("stop",""+feature.getStopCoordinate(), Field.Store.YES, Field.Index.ANALYZED));
+			doc.add(new StringField("start",""+feature.getStartCoordinate(), Field.Store.YES));
+			doc.add(new StringField("stop",""+feature.getStopCoordinate(), Field.Store.YES));
 
-			if (feature.getScore()!=null) doc.add(new Field("score",""+feature.getScore(), Field.Store.YES, Field.Index.ANALYZED));
-			if (feature.getOrientation()!=null) doc.add(new Field("orientation",""+feature.getOrientation(), Field.Store.YES, Field.Index.ANALYZED));
-			if (feature.getPhase()!=null) doc.add(new Field("phase",""+feature.getPhase(), Field.Store.YES, Field.Index.ANALYZED));
+			if (feature.getScore()!=null) doc.add(new StringField("score",""+feature.getScore(), Field.Store.YES));
+			if (feature.getOrientation()!=null) doc.add(new StringField("orientation",""+feature.getOrientation(), Field.Store.YES));
+			if (feature.getPhase()!=null) doc.add(new StringField("phase",""+feature.getPhase(), Field.Store.YES));
 			if (feature.getNotes()!=null) {
 				String sep ="";
 				for (String note:feature.getNotes()){
 					notes+=sep+note;
 					sep =" ==NOTE== ";
 				}
-				doc.add(new Field("notes",notes, Field.Store.YES, Field.Index.ANALYZED));
+				doc.add(new StringField("notes",notes, Field.Store.YES));
 			}
 			if (feature.getLinks()!=null) {
 				String sep ="";
@@ -187,7 +191,7 @@ public class Indexer {
 					links+=sep+feature.getLinks().get(key) +" _-_ "+ key;
 					sep =" ==LINK== ";
 				}
-				doc.add(new Field("links",links, Field.Store.YES, Field.Index.ANALYZED));
+				doc.add(new StringField("links",links, Field.Store.YES));
 			}
 			if (feature.getTargets()!=null) {
 				String sep="";
@@ -198,7 +202,7 @@ public class Indexer {
 					if (target.getTargetName()!=null )targets += " _-_ "+target.getTargetName();
 					sep=" ==TARGET== ";
 				}
-				doc.add(new Field("targets",targets, Field.Store.YES, Field.Index.ANALYZED));
+				doc.add(new StringField("targets",targets, Field.Store.YES));
 			}
 			if (feature.getParents()!=null) {
 				String sep="";
@@ -206,7 +210,7 @@ public class Indexer {
 					parents+=sep+parent;
 					sep=" ==PARENT== ";
 				}
-				doc.add(new Field("parents",parents, Field.Store.YES, Field.Index.ANALYZED));
+				doc.add(new StringField("parents",parents, Field.Store.YES));
 			}
 			if (feature.getParts()!=null) {
 				String sep="";
@@ -214,9 +218,9 @@ public class Indexer {
 					parts+=sep+part;
 					sep=" ==PART== ";
 				}
-				doc.add(new Field("parts",parts, Field.Store.YES, Field.Index.ANALYZED));
+				doc.add(new StringField("parts",parts, Field.Store.YES));
 			}
-			doc.add(new Field("all",segmentS+" "+feature.getFeatureId()+" "+type+" "+method+" "+notes+" "+links+" "+targets+" "+parents+" "+parts, Field.Store.NO, Field.Index.ANALYZED));
+			doc.add(new StringField("all",segmentS+" "+feature.getFeatureId()+" "+type+" "+method+" "+notes+" "+links+" "+targets+" "+parents+" "+parts, Field.Store.NO));
 			writer.addDocument(doc);
 		}		
 	}

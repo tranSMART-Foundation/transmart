@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexReaderContext;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
@@ -33,7 +36,7 @@ public abstract class MyDasCollector extends TopDocsCollector<ScoreDoc> {
 			super(numHits);
 		}
 
-		@Override
+//		@Override
 		public void collect(int doc) throws IOException {
 			float score = scorer.score();
 
@@ -59,9 +62,17 @@ public abstract class MyDasCollector extends TopDocsCollector<ScoreDoc> {
 				hitsPerSegment.put(segmentId, current+1);
 		}
 
-		@Override
+//		@Override
 		public boolean acceptsDocsOutOfOrder() {
 			return false;
+		}
+		@Override
+		public boolean needsScores() {
+			return false;
+		}
+		@Override
+		public LeafCollector getLeafCollector(LeafReaderContext context) {
+                    return null;
 		}
 	}
 
@@ -71,7 +82,7 @@ public abstract class MyDasCollector extends TopDocsCollector<ScoreDoc> {
 			super(numHits);
 		}
 
-		@Override
+//		@Override
 		public void collect(int doc) throws IOException {
 			float score = scorer.score();
 
@@ -94,10 +105,18 @@ public abstract class MyDasCollector extends TopDocsCollector<ScoreDoc> {
 				hitsPerSegment.put(segmentId, current+1);
 		}
 
-		@Override
+//		@Override
 		public boolean acceptsDocsOutOfOrder() {
 			return true;
 		}
+		@Override
+		public boolean needsScores() {
+			return false;
+		}
+		@Override
+		public LeafCollector getLeafCollector(LeafReaderContext context) {
+                    return null;
+                }
 	}
 
 	/**
@@ -155,12 +174,12 @@ public abstract class MyDasCollector extends TopDocsCollector<ScoreDoc> {
 		return new TopDocs(totalHits, results, maxScore);
 	}
 
-	@Override
+//	@Override
 	public void setNextReader(IndexReader reader, int base) {
 		docBase = base;
 	}
 
-	@Override
+//	@Override
 	public void setScorer(Scorer scorer) throws IOException {
 		this.scorer = scorer;
 	}

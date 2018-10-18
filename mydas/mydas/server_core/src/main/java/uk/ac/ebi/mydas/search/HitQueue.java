@@ -47,8 +47,9 @@ final class HitQueue extends PriorityQueue<ScoreDoc> {
    * @see #getSentinelObject()
    */
   HitQueue(int size, boolean prePopulate) {
-    this.prePopulate = prePopulate;
-    initialize(size);
+      super(size,prePopulate);
+//    this.prePopulate = prePopulate;
+//    initialize(size);
   }
 
   // Returns null if prePopulate is false.

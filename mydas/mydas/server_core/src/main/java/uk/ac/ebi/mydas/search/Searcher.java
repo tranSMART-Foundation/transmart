@@ -16,8 +16,10 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -64,17 +66,19 @@ public class Searcher {
 			throw new SearcherException("Error trying to URLdecode the query",e);
 		}
 		
-		StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
+		StandardAnalyzer analyzer = new StandardAnalyzer();
 
 		Directory fsDir=null;
 		try {
-			fsDir = FSDirectory.open(new File(dirPath+"/"+dataSourceName));
+                    fsDir = FSDirectory.open(new File(dirPath+"/"+dataSourceName).toPath());
 		} catch (IOException e) {
 			throw new SearcherException("Error trying to open the index file",e);
 		}
 		IndexSearcher searcher=null;
+                IndexReader dReader = null;
 		try {
-			searcher = new IndexSearcher(fsDir);
+                        dReader = DirectoryReader.open(fsDir);
+                        searcher = new IndexSearcher(dReader);
 		} catch (CorruptIndexException e) {
 			throw new SearcherException("The index file is corrupt",e);
 		} catch (IOException e) {
@@ -84,7 +88,7 @@ public class Searcher {
 
 		Query q=null;
 		try {
-			q = new QueryParser(Version.LUCENE_30, "title", analyzer).parse(query);
+			q = new QueryParser("title", analyzer).parse(query);
 		} catch (ParseException e) {
 			throw new SearcherException("Error parsing the query.",e);
 		}
@@ -130,7 +134,7 @@ public class Searcher {
 		}
 
 		try {
-			searcher.close();
+			dReader.close();
 		} catch (IOException e) {
 			throw new SearcherException("Error closing the searcher.",e);
 		}
