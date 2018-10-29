@@ -1,9 +1,10 @@
 package annotation
 
+import groovy.util.logging.Slf4j
 import org.transmart.biomart.BioData
 import org.transmart.biomart.ConceptCode
 
-
+@Slf4j('logger')
 class MetaDataService {
 
     boolean transactional = true
@@ -13,7 +14,7 @@ class MetaDataService {
     }
 
     def getViewValues(fieldValue) {
-        log.info "MetaDataService.getViewValues called"
+        logger.info "MetaDataService.getViewValues called"
 
         def terms = fieldValue.split('\\|')
         def list = []
@@ -25,14 +26,14 @@ class MetaDataService {
                     }
                 }
 
-        log.info "list = " + list
+        logger.info "list = " + list
 
         def tagValues = ""
         if (list.size > 0) {
             tagValues = ConceptCode.executeQuery('from ConceptCode as cc where id in(:list)', [list: list])
         }
 
-        log.info "tagValues = " + tagValues
+        logger.info "tagValues = " + tagValues
 
         return tagValues
     }

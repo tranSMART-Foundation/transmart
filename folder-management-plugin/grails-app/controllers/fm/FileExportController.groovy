@@ -3,6 +3,10 @@ package fm
 import annotation.AmTagAssociation
 import annotation.AmTagTemplate
 import annotation.AmTagValue
+import groovy.util.logging.Slf4j
+import groovyx.net.http.ContentType;
+import groovyx.net.http.HTTPBuilder;
+import groovyx.net.http.Method;
 import org.transmart.biomart.BioAssayPlatform
 import org.transmart.biomart.BioData
 import org.transmart.biomart.ConceptCode
@@ -23,10 +27,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
-import groovyx.net.http.ContentType;
-import groovyx.net.http.HTTPBuilder;
-import groovyx.net.http.Method;
-
+@Slf4j('logger')
 class FileExportController {
 
     def fmFolderService
@@ -133,7 +134,7 @@ class FileExportController {
                         file.withInputStream({ is -> zipStream << is })
                     } else {
                         def errorMessage = "File not found for export: " + fileLocation
-                        log.error errorMessage
+                        logger.error errorMessage
                         errorResponse += errorMessage
                     }
                 } else{
@@ -144,7 +145,7 @@ class FileExportController {
                         GridFSDBFile gfsFile = gfs.findOne(fmFile.filestoreName)
                         if(gfsFile==null){
                             def errorMessage = "File not found for export: " + fileLocation
-                            log.error errorMessage
+                            logger.error errorMessage
                             errorResponse += errorMessage
                         }else{
                             zipStream << gfsFile.getInputStream()
@@ -168,7 +169,7 @@ class FileExportController {
                             }
                             response.failure = { resp ->
                                 def errorMessage = "File not found for export: " + fmFile.filestoreName
-                                log.error("Problem during connection to API: "+resp.status)
+                                logger.error("Problem during connection to API: "+resp.status)
                                 render(contentType: "text/plain", text: "Error writing ZIP: File not found")
                             }
                         }
@@ -211,10 +212,10 @@ class FileExportController {
             response.outputStream.flush()
         }
         catch (Exception e) {
-            log.error("Error writing ZIP", e)
+            logger.error("Error writing ZIP", e)
             render(contentType: "text/plain", text: errorResponse.join("\n") + "\nError writing ZIP: " + e.getMessage())
         } catch (OutOfMemoryError oe) {
-            log.error("Files too large to be exported: " + exportList)
+            logger.error("Files too large to be exported: " + exportList)
             render(contentType: "text/plain", text: "Error: Files too large to be exported.\nPlease click on the \"Previous\" button on your web browser to go back to tranSMART.")
         }
     }
@@ -357,7 +358,7 @@ class FileExportController {
             }
             zipStream.closeEntry()
         } catch (Exception e) {
-            log.error("Error writing ZIP", e)
+            logger.error("Error writing ZIP", e)
         }
     }
 

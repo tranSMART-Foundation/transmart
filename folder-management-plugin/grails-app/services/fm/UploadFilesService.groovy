@@ -15,6 +15,7 @@ import fm.FmData
 import fm.FmFile
 import fm.FmFolder
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 import org.transmart.mongo.MongoUtils
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.Method
@@ -25,6 +26,7 @@ import org.apache.http.entity.mime.content.InputStreamBody
 
 import groovyx.net.http.*
 
+@Slf4j('logger')
 class UploadFilesService {
 
     boolean transactional = true
@@ -44,11 +46,11 @@ class UploadFilesService {
             try {
                 fmFolder = FmFolder.get(parentId)
                 if (fmFolder == null) {
-                    log.error("Folder with id " + parentId + " does not exist.")
+                    logger.error("Folder with id " + parentId + " does not exist.")
                     return "Folder with id " + parentId + " does not exist."
                 }
             } catch (NumberFormatException ex) {
-                log.error("Loading failed: "+e.toString())
+                logger.error("Loading failed: "+e.toString())
                 return "Loading failed"
             }
 
@@ -60,7 +62,7 @@ class UploadFilesService {
                 fmFile.fileVersion++
                 fmFile.fileSize = fileSize
                 fmFile.linkUrl = ""
-                log.info("File = " + fileName + " (" + fmFile.id + ") - Existing")
+                logger.info("File = " + fileName + " (" + fmFile.id + ") - Existing")
             } else {
                 fmFile = new FmFile(
                     displayName: fileName,
@@ -73,14 +75,14 @@ class UploadFilesService {
                 )
                 if (!fmFile.save(flush:true)) {
                     fmFile.errors.each {
-                        log.error("File saving failed: "+it)
+                        logger.error("File saving failed: "+it)
                     }
                     return "Loading failed: fmfile saving"
                 }
                 fmFolder.addToFmFiles(fmFile)
                 if (!fmFolder.save(flush:true)) {
                     fmFolder.errors.each {
-                        log.error("Folder saving failed: "+it)
+                        logger.error("Folder saving failed: "+it)
                     }
                     return "Loading failed: fmfolder saving"
                 }
@@ -89,25 +91,25 @@ class UploadFilesService {
             fmFile.filestoreName = fmFile.id + "-" + fmFile.fileVersion + "." + fmFile.fileType;
             if (!fmFile.save(flush:true)) {
                 fmFile.errors.each {
-                    log.error("File saving failed: "+it)
+                    logger.error("File saving failed: "+it)
                 }
                 return "Loading failed: file saving"
              }
-            log.info("File = " + fmFile.filestoreName + " (" + fileName + ") - Stored")
+            logger.info("File = " + fmFile.filestoreName + " (" + fileName + ") - Stored")
 
             def useMongo=Holders.config.transmartproject.mongoFiles.enableMongo
             if(!useMongo){
-                log.info "Writing to filestore file '" + filestoreDirectory + File.separator + parentId + File.separator + fmFile.filestoreName + "'"
+                logger.info "Writing to filestore file '" + filestoreDirectory + File.separator + parentId + File.separator + fmFile.filestoreName + "'"
                 File filestoreDir = new File(filestoreDirectory + File.separator + parentId);
                 if (!filestoreDir.exists()) {
                     if (!filestoreDir.mkdirs()) {
-                        log.error("unable to create filestoredir " + filestoreDir.getPath());
+                        logger.error("unable to create filestoredir " + filestoreDir.getPath());
                         return "Loading failed: unable to create filestoredir";
                     }
                 }
                 OutputStream outputStream = new FileOutputStream(new File(filestoreDirectory + File.separator + parentId + File.separator + fmFile.filestoreName))
-                log.info "Copying from fileToUpload "+fileToUpload
-                log.info "Create outputStream ${outputStream}"
+                logger.info "Copying from fileToUpload "+fileToUpload
+                logger.info "Create outputStream ${outputStream}"
                 if(outputStream != null) {
                     fileBytes = new byte[1024]
                     int nread
@@ -117,11 +119,11 @@ class UploadFilesService {
                     }
                     outputStream.close();
                     fmFolderService.indexFile(fmFile)
-                    log.info("File successfully loaded: "+fmFile.id)
+                    logger.info("File successfully loaded: "+fmFile.id)
                     return "File successfully loaded"
                 }
                 else {
-                    log.error "Unable to write to filestoreDirectory "+filestoreDirectory
+                    logger.error "Unable to write to filestoreDirectory "+filestoreDirectory
                     return "Unable to write to filestoreDirectory"
                 }
             } else {
@@ -135,7 +137,7 @@ class UploadFilesService {
                     file.save()
                     mongo.close()
                     fmFolderService.indexFile(fmFile)
-                    log.info("File successfully loaded: "+fmFile.id)
+                    logger.info("File successfully loaded: "+fmFile.id)
                     return "File successfully loaded"
                 }else{
                     def apiURL = Holders.config.transmartproject.mongoFiles.apiURL
@@ -155,13 +157,13 @@ class UploadFilesService {
                         response.success = { resp ->
                             if(resp.status < 400){
                                 fmFolderService.indexFile(fmFile)
-                                log.info("File successfully loaded: "+fmFile.id)
+                                logger.info("File successfully loaded: "+fmFile.id)
                                 return "File successfully loaded"
                             }
                         }
 
                         response.failure = { resp ->
-                            log.error("Problem during connection to API: "+resp.status)
+                            logger.error("Problem during connection to API: "+resp.status)
                             if(fmFile!=null) fmFile.delete()
                             if(resp.status ==404){
                                 return "Problem during connection to API"
@@ -172,7 +174,7 @@ class UploadFilesService {
                 }
             }
         }catch(Exception e){
-            log.error("transfer error: "+e.toString())
+            logger.error("transfer error: "+e.toString())
             if(fmFile != null) fmFile.delete()
         }
     }

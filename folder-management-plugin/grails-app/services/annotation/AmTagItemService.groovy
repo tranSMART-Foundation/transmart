@@ -1,7 +1,9 @@
 package annotation
 
 import fm.FmFolder
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class AmTagItemService {
 
     boolean transactional = true
@@ -12,7 +14,7 @@ class AmTagItemService {
 
     def getDisplayItems(Long key) {
 
-        log.info "getDisplayItems Searching amTagItems for tag template " + key
+        logger.info "getDisplayItems Searching amTagItems for tag template " + key
 
         def amTagItems
 
@@ -26,9 +28,9 @@ class AmTagItemService {
 
             amTagItems = AmTagItem.findAll(sb.toString(), paramMap);
 
-            log.info "amTagItems = " + amTagItems + " for key = " + key
+            logger.info "amTagItems = " + amTagItems + " for key = " + key
         } else {
-            log.error "Unable to retrieve an amTagItems with a null key value"
+            logger.error "Unable to retrieve an amTagItems with a null key value"
         }
 
 
@@ -36,7 +38,7 @@ class AmTagItemService {
     }
 
     def getChildDisplayItems(Long key) {
-        log.info "getChildDisplayItems Searching child amTagItems for tag template " + key
+        logger.info "getChildDisplayItems Searching child amTagItems for tag template " + key
 
         def amTagItems
 
@@ -50,9 +52,9 @@ class AmTagItemService {
 
             amTagItems = AmTagItem.findAll(sb.toString(), paramMap);
 
-            log.info "amTagItems = " + amTagItems + " for key = " + key
+            logger.info "amTagItems = " + amTagItems + " for key = " + key
         } else {
-            log.error "Unable to retrieve an child amTagItems with a null key value"
+            logger.error "Unable to retrieve an child amTagItems with a null key value"
         }
 
         return amTagItems
@@ -60,7 +62,7 @@ class AmTagItemService {
     }
 
     def getEditableItems(Long key) {
-        log.info "getEditableItems Searching amTagItems for tag template " + key
+        logger.info "getEditableItems Searching amTagItems for tag template " + key
 
         def amTagItems = []
 
@@ -69,9 +71,9 @@ class AmTagItemService {
                 "from AmTagItem ati where ati.amTagTemplate.id = :templateId and ati.editable = '1' order by ati.displayOrder",
                 [templateId: key])
 
-            log.info "amTagItems = ${amTagItems} for key = ${key}"
+            logger.info "amTagItems = ${amTagItems} for key = ${key}"
         } else {
-            log.error "Unable to retrieve an amTagItems with a null key value"
+            logger.error "Unable to retrieve an amTagItems with a null key value"
         }
 
         amTagItems
@@ -79,7 +81,7 @@ class AmTagItemService {
 
     def getRequiredItems(Long key) {
 
-        log.info "getRequiredItems Searching amTagItems for tag template " + key
+        logger.info "getRequiredItems Searching amTagItems for tag template " + key
 
         def amTagItems
 
@@ -93,9 +95,9 @@ class AmTagItemService {
 
             amTagItems = AmTagItem.findAll(sb.toString(), paramMap);
 
-            log.info "amTagItems = " + amTagItems + " for key = " + key
+            logger.info "amTagItems = " + amTagItems + " for key = " + key
         } else {
-            log.error "Unable to retrieve an amTagItems with a null key value"
+            logger.error "Unable to retrieve an amTagItems with a null key value"
         }
 
 

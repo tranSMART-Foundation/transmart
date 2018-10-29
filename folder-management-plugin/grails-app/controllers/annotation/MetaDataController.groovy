@@ -1,10 +1,11 @@
 package annotation
 
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmart.biomart.BioAssayPlatform
 import org.transmart.biomart.ConceptCode
 
-
+@Slf4j('logger')
 class MetaDataController {
 
     def formLayoutService
@@ -34,16 +35,16 @@ class MetaDataController {
      * Find the top 10 concepts with a case-insensitive LIKE
      */
     def extSearch = {
-        log.info "EXT SEARCH called"
+        logger.info "EXT SEARCH called"
         def paramMap = params
-        log.info params
+        logger.info params
 
         def value = params.term ? params.term.toUpperCase() : ''
         def codeTypeName = params.codeTypeName ? params.codeTypeName : '';
 
         def conceptCodes = ConceptCode.executeQuery("FROM ConceptCode cc WHERE cc.codeTypeName = :codeTypeName and  upper(cc.codeName) LIKE :codeName order by codeTypeName", [codeTypeName: codeTypeName, codeName: value + "%"], [max: 10]);
 
-        log.info "There are " + conceptCodes.size() + " " + params.codeTypeName + " records found in ConceptCode"
+        logger.info "There are " + conceptCodes.size() + " " + params.codeTypeName + " records found in ConceptCode"
         def itemlist = [];
         for (conceptCode in conceptCodes) {
             if (conceptCode.uniqueId != null && conceptCode.codeName != null) {
@@ -58,9 +59,9 @@ class MetaDataController {
      * Find the top 10 compounds with a case-insensitive LIKE
      */
     def bioCompoundSearch = {
-        log.info "EXT bioCompoundSearch called"
+        logger.info "EXT bioCompoundSearch called"
         def paramMap = params
-        log.info params
+        logger.info params
         render searchKeywordService.findSearchKeywords("COMPOUND", params.term, 10) as JSON
 
     }
@@ -68,9 +69,9 @@ class MetaDataController {
      * Find the top 10 diseases with a case-insensitive LIKE
      */
     def bioDiseaseSearch = {
-        log.info "EXT bioDiseaseSearch called"
+        logger.info "EXT bioDiseaseSearch called"
         def paramMap = params
-        log.info params
+        logger.info params
         render searchKeywordService.findSearchKeywords("DISEASE", params.term, 10) as JSON
 
     }
@@ -79,9 +80,9 @@ class MetaDataController {
      * Find the top 10 genes with a case-insensitive LIKE
      */
     def bioMarkerSearch = {
-        log.info "EXT bioMarkerSearch called"
+        logger.info "EXT bioMarkerSearch called"
         def paramMap = params
-        log.info params
+        logger.info params
 
         render searchKeywordService.findSearchKeywords("GENE", params.term, 10) as JSON
     }
@@ -90,9 +91,9 @@ class MetaDataController {
      * Find the top 10 biosources with a case-insensitive LIKE
      */
     def biosourceSearch = {
-        log.info "EXT biosourceSearch called"
+        logger.info "EXT biosourceSearch called"
         def paramMap = params
-        log.info params
+        logger.info params
         render searchKeywordService.findSearchKeywords("BIOSOURCE", params.term, 10) as JSON
 
     }
@@ -101,9 +102,9 @@ class MetaDataController {
      * Find the top 10 diseases, genes, pathways, observations or concepts with a case-insensitive LIKE
      */
     def programTargetSearch = {
-        log.info "EXT programTargetSearch called"
+        logger.info "EXT programTargetSearch called"
         def paramMap = params
-        log.info params
+        logger.info params
         def itemlist = [];
 
         def value = params.term ? params.term.toUpperCase() : ''
@@ -129,8 +130,8 @@ class MetaDataController {
     }
 
     def bioAssayPlatformSearch = {
-        log.info "EXT bioAssayPlatformSearch called"
-        log.info params
+        logger.info "EXT bioAssayPlatformSearch called"
+        logger.info params
         Map pagingMap = [max: 20];
 
         def paramMap = [:];
@@ -163,13 +164,13 @@ class MetaDataController {
         // sort
         sb.append("order by platformType, vendor, platformTechnology, name");
 
-        log.info "SB == " + sb.toString()
-        log.info "paramMap = " + paramMap
+        logger.info "SB == " + sb.toString()
+        logger.info "paramMap = " + paramMap
 
         def platforms = BioAssayPlatform.executeQuery(sb.toString(), paramMap, pagingMap);
         // .executeQuery("from BioAssayPlatform p WHERE upper(p.name) LIKE :term  order by platformType, vendor, platformTechnology, name", [term: value+'%'], [max: 20]);
 
-        log.info "Platforms: " + platforms
+        logger.info "Platforms: " + platforms
 
         for (platform in platforms) {
             String displayString = platform.name

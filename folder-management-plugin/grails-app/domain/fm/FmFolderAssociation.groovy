@@ -1,8 +1,9 @@
 package fm
 
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 
-class FmFolderAssociation implements Serializable {
+@Slf4j('logger')class FmFolderAssociation implements Serializable {
 
     static transients = ['bioObject']
 
@@ -36,7 +37,7 @@ class FmFolderAssociation implements Serializable {
     }
 
     public getBioObject() {
-        log.info "ObjectUID=" + this.objectUid
+        logger.info "ObjectUID=" + this.objectUid
         def bioData = org.transmart.biomart.BioData.findByUniqueId(this.objectUid)
         def clazz = lookupDomainClass()
         if (!clazz || !bioData) {
@@ -58,7 +59,7 @@ class FmFolderAssociation implements Serializable {
  		
         def clazz = Holders.grailsApplication.getClassForName(domainClassName)
         if (!clazz) {
-            log.error "Persistent token class not found: '${domainClassName}'"
+            logger.error "Persistent token class not found: '${domainClassName}'"
         }
 
         return clazz

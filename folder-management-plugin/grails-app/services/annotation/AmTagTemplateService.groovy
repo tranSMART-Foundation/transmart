@@ -1,5 +1,8 @@
 package annotation
 
+import groovy.util.logging.Slf4j
+
+@Slf4j('logger')
 class AmTagTemplateService {
 
     boolean transactional = true
@@ -10,26 +13,26 @@ class AmTagTemplateService {
 
     def getTemplate(String key) {
 
-        log.info "Searching amTagTemplateAssociation for " + key
+        logger.info "Searching amTagTemplateAssociation for " + key
 
         def amTagTemplateAssociation
         def amTagTemplate
 
         if (key) {
             amTagTemplateAssociation = AmTagTemplateAssociation.findByObjectUid(key)
-            log.info "amTagTemplateAssociation = " + amTagTemplateAssociation + " for key = " + key
+            logger.info "amTagTemplateAssociation = " + amTagTemplateAssociation + " for key = " + key
         } else {
-            log.error "Unable to retrieve an AmTagTemplateAssociation with a null key value"
+            logger.error "Unable to retrieve an AmTagTemplateAssociation with a null key value"
         }
 
         if (amTagTemplateAssociation) {
-            log.info "Searching amTagTemplate"
+            logger.info "Searching amTagTemplate"
             amTagTemplate = AmTagTemplate.get(amTagTemplateAssociation.tagTemplateId)
-            log.info "amTagTemplate = " + amTagTemplate.toString()
-            log.info "amTagTemplate.tagItems = " + amTagTemplate.amTagItems
+            logger.info "amTagTemplate = " + amTagTemplate.toString()
+            logger.info "amTagTemplate.tagItems = " + amTagTemplate.amTagItems
 
         } else {
-            log.error "AmTagTemplate is null for tag template association = " + key
+            logger.error "AmTagTemplate is null for tag template association = " + key
         }
 
         return amTagTemplate
