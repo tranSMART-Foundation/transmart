@@ -65,9 +65,9 @@ class I2b2Secure {
 		String visualAttr = visualAttrs[conceptPath]
 		
 		if(isI2b2SecureExist(path)){
-			log.info "$conceptPath already exists ..."
+			logger.info "$conceptPath already exists ..."
 		}else{
-			log.info "insert concept path: $conceptPath into I2B2 ..."
+			logger.info "insert concept path: $conceptPath into I2B2 ..."
 			i2b2metadata.execute(qry, [c_hlevel, path, c_name, visualAttr, path, path, studyName, conceptCode, c_comment])
 		}
 	}

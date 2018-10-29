@@ -52,9 +52,9 @@ class BioDataExtCode {
             bioDataId = Integer.parseInt(v.split("\t")[1])
 
             if (isBioDataExtCodeExist(dataType, bioDataId)) {
-                //log.info "(\"$code\", $dataType) already exists in BIO_DATA_EXT_CODE ..."
+                //logger.info "(\"$code\", $dataType) already exists in BIO_DATA_EXT_CODE ..."
             } else {
-                log.info "Load (\"$code\", $dataType) into BIO_DATA_EXT_CODE ..."
+                logger.info "Load (\"$code\", $dataType) into BIO_DATA_EXT_CODE ..."
 
                 qry = """ insert into bio_data_ext_code(code, code_source, code_type, bio_data_type, bio_data_id) values(?, ?, ?, ?, ?) """
                 biomart.execute(qry, [

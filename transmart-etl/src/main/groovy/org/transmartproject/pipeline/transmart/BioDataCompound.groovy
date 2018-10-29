@@ -39,9 +39,9 @@ class BioDataCompound {
 	void loadBioDataCompound(long bioDataId, long bioCompoundId, String etlSource){
 
 		if(isBioDataCompoundExist(bioDataId, bioCompoundId, etlSource)){
-                    //log.info "($bioDataId, $bioCompoundId, $etlSource) already exists in BIO_DATA_COMPOUND ..."
+                    //logger.info "($bioDataId, $bioCompoundId, $etlSource) already exists in BIO_DATA_COMPOUND ..."
 		}else{
-			log.info "Start loading ($bioDataId, $bioCompoundId, $etlSource) into BIO_DATA_COMPOUND ..."
+			logger.info "Start loading ($bioDataId, $bioCompoundId, $etlSource) into BIO_DATA_COMPOUND ..."
 
 			String qry = """ insert into bio_data_compound(bio_data_id, bio_compound_id, etl_source) values(?, ?, ?) """
 			biomart.execute(qry, [
@@ -50,7 +50,7 @@ class BioDataCompound {
 				etlSource
 			])
 
-			log.info "End loading ($bioDataId, $bioCompoundId, $etlSource) into BIO_DATA_COMPOUND ..."
+			logger.info "End loading ($bioDataId, $bioCompoundId, $etlSource) into BIO_DATA_COMPOUND ..."
 		}
 	}
 

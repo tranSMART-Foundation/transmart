@@ -58,11 +58,11 @@ class MiRBaseDictionary {
 
     void loadData(File miRNAFile, File aliasesFile) {
         if (!miRNAFile.exists()) {
-            log.error("File is not found: ${miRNAFile.getAbsolutePath()}")
+            logger.error("File is not found: ${miRNAFile.getAbsolutePath()}")
             return
         }
         if (!aliasesFile.exists()) {
-            log.error("File is not found: ${aliasesFile.getAbsolutePath()}")
+            logger.error("File is not found: ${aliasesFile.getAbsolutePath()}")
             return
         }
 

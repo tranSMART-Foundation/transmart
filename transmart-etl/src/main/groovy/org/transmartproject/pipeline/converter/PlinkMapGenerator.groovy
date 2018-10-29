@@ -29,11 +29,10 @@
 package org.transmartproject.pipeline.converter
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger;
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class PlinkMapGenerator {
-
-	private static final Logger log = Logger.getLogger(Converter)
 
 	Sql sql
 	File mapFile
@@ -55,7 +54,7 @@ class PlinkMapGenerator {
 			mapFile.delete()
 			mapFile.createNewFile()
 		} else {
-			log.info("Create the file: " + mapFile.toString())
+			logger.info("Create the file: " + mapFile.toString())
 			mapFile.createNewFile()
 		}
 
@@ -68,7 +67,7 @@ class PlinkMapGenerator {
 			mapData.append(it.mapinfo + "\t\n")
 			index++
 		}
-		log.info "Write to MAP file: " + mapFile.toString() + " and total SNPs: " + index
+		logger.info "Write to MAP file: " + mapFile.toString() + " and total SNPs: " + index
 		mapFile.append(mapData.toString())
 	}
 

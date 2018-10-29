@@ -43,9 +43,9 @@ class GplInfo {
 		String qry = "insert into de_gpl_info(platform,title,organism,annotation_date,marker_type) values(?,?,?,sysdate,?)"
 
 		if(isGplInfoExist(platform, markerType)){
-                    //log.info "$platform:$markerType already exists in DE_GPL_INFO ..."
+                    //logger.info "$platform:$markerType already exists in DE_GPL_INFO ..."
 		}else{
-			log.info "Insert $platform:$markerType into DE_GPL_INFO ..."
+			logger.info "Insert $platform:$markerType into DE_GPL_INFO ..."
 			deapp.execute(qry, [
 				platform,
 				title,
@@ -58,10 +58,10 @@ class GplInfo {
 
 	void insertGplInfo(Map gplInfoMap){
 
-		log.info "Start inserting data into DE_GPL_INFO ... "
+		logger.info "Start inserting data into DE_GPL_INFO ... "
 
 		if(isGplInfoExist(gplInfoMap["platform"], gplInfoMap["markerType"])){
-			log.info "Platform [${gplInfoMap["platform"]}] already extists in DE_GPL_INFO ... "
+			logger.info "Platform [${gplInfoMap["platform"]}] already extists in DE_GPL_INFO ... "
 		}else{
 			String qry = """insert into de_gpl_info (platform, title, organism, annotation_date, marker_type, release_nbr) values(?, ?, ?, ?, ?,?) """
 			deapp.execute(qry, [
@@ -72,9 +72,9 @@ class GplInfo {
 				gplInfoMap["markerType"],
 				gplInfoMap["releaseNbr"]
 			])
-			log.info "Platform ${gplInfoMap["platform"]} is inserted into DE_GPL_INFO ... "
+			logger.info "Platform ${gplInfoMap["platform"]} is inserted into DE_GPL_INFO ... "
 		}
-		log.info "End loading data into the table DE_SNP_INFO ... "
+		logger.info "End loading data into the table DE_SNP_INFO ... "
 	}
 
 

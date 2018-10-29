@@ -38,7 +38,7 @@ class CopyNumberFormatter {
 
 	void format(){
 
-		log.info "Start formatting Copy Number file: " + copyNumberFile.toString()
+		logger.info "Start formatting Copy Number file: " + copyNumberFile.toString()
 
 		File f = new File(copyNumberFile.toString() + ".final")
 		if(f.size() > 0){
@@ -74,7 +74,7 @@ class CopyNumberFormatter {
 		// remove the suffix ".final" from the new copy number file
 		f.renameTo(copyNumberFile)
 		
-		log.info "End formatting Copy Number file: " + copyNumberFile.toString()
+		logger.info "End formatting Copy Number file: " + copyNumberFile.toString()
 	}
 
 

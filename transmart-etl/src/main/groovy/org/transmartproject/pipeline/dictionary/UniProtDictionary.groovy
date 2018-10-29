@@ -27,14 +27,12 @@
   
 package org.transmartproject.pipeline.dictionary
 
-
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
 /** Extracts protein dictionary and loads it into the database.
  */
+@Slf4j('logger')
 class UniProtDictionary {
-    private static final Logger log = Logger.getLogger(UniProtDictionary)
 
     static main(args) {
         if (!args) {
@@ -44,7 +42,7 @@ class UniProtDictionary {
 
         def fileLocation = args[0]
 
-        PropertyConfigurator.configure("conf/log4j.properties")
+//        PropertyConfigurator.configure("conf/log4j.properties")
         File file = new File(fileLocation)
         UniProtDictionary dict = new UniProtDictionary()
         dict.loadData(file)
@@ -55,7 +53,7 @@ class UniProtDictionary {
 
     void loadData(File file) {
         if (!file.exists()) {
-            log.error("File is not found: ${file.getAbsolutePath()}")
+            logger.error("File is not found: ${file.getAbsolutePath()}")
             return
         }
 

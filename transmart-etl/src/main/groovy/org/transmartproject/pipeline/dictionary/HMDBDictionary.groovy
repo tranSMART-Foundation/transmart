@@ -32,7 +32,8 @@ import groovy.util.logging.Slf4j
 /** Parses the metabolite dictionary and loads it into the database.
  */
 
-@Slf4j('logger')class HMDBDictionary {
+@Slf4j('logger')
+class HMDBDictionary {
 
     static main(args) {
         if (!args) {
@@ -54,7 +55,7 @@ import groovy.util.logging.Slf4j
 
     void loadData(File inputFile) {
         if (!inputFile.exists()) {
-            log.error("File is not found: ${inputFile.getAbsolutePath()}")
+            logger.error("File is not found: ${inputFile.getAbsolutePath()}")
             return
         }
 

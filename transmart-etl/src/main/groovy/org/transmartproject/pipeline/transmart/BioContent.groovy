@@ -57,9 +57,9 @@ class BioContent {
 		String qry = """ insert into bio_content(repository_id, location, file_type, etl_id_c) values(?, ?, ?, ?) """
 
 		if(isBioContentExist(repository_id, location)){
-                    //log.info "$repository_id:$location already exists in BIO_CONTENT ..."
+                    //logger.info "$repository_id:$location already exists in BIO_CONTENT ..."
 		}else{
-			log.info "Insert $repository_id:$location into BIO_CONTENT ..."
+			logger.info "Insert $repository_id:$location into BIO_CONTENT ..."
 			biomart.execute(qry, [
 				repository_id,
 				location,

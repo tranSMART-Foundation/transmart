@@ -39,9 +39,9 @@ class BioDisease {
 	void loadMeshBioDisease(String disease, String meshCode){
 
 		if(isMeshBioDiseaseExist(disease, meshCode)){
-                    //log.info "($disease, $meshCode) already exists in BIO_DISEASE ..."
+                    //logger.info "($disease, $meshCode) already exists in BIO_DISEASE ..."
 		}else{
-			log.info "Start loading ($disease, $meshCode) into BIO_DISEASE ..."
+			logger.info "Start loading ($disease, $meshCode) into BIO_DISEASE ..."
 
 			String qry = """ insert into bio_disease(disease, mesh_code) values(?, ?) """
 			biomart.execute(qry, [
@@ -49,7 +49,7 @@ class BioDisease {
 				meshCode
 			])
 
-			log.info "End loading ($disease, $meshCode) into BIO_DISEASE ..."
+			logger.info "End loading ($disease, $meshCode) into BIO_DISEASE ..."
 		}
 	}
 

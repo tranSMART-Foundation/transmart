@@ -62,7 +62,7 @@ class ConceptDimension {
 
 		def res = i2b2demodata.firstRow(qry, [conceptPath.replace("/", "\\")])
 		if(res.equals(null)){
-			log.info "No concept code for the concept: $conceptPath"
+			logger.info "No concept code for the concept: $conceptPath"
 			return null
 		}else{
 			return res[0]
@@ -92,13 +92,13 @@ class ConceptDimension {
 
 		String [] str = conceptPath.split("/")
 		String nameChar = str[str.size()-1]
-		log.info str.size() + ":\t" + nameChar
+		logger.info str.size() + ":\t" + nameChar
 
 		String qry = "insert into concept_dimension(concept_path, name_char, sourcesystem_cd, table_name) values(?,?,?,?)"
 
 		String concept = conceptPath.replace("/", "\\")
 		if(isConceptDimensionExist(concept)){
-			log.info "$conceptPath already exists ..."
+			logger.info "$conceptPath already exists ..."
 		}else{
 			i2b2demodata.execute(qry, [
 				concept,

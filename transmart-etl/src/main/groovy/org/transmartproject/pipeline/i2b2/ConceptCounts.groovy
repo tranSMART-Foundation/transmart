@@ -50,12 +50,12 @@ class ConceptCounts {
 			else sampleCounts[val] += 1
 		}
 
-		log.info "Total samples: $total"
-		log.info basePath + "\t" + platform
+		logger.info "Total samples: $total"
+		logger.info basePath + "\t" + platform
 
 		String [] str = basePath.split("/")
 		String parentPath = basePath.replace(str[-1] + "/", "")
-		log.info parentPath
+		logger.info parentPath
 		insertConceptCount(basePath, parentPath, total)
 		insertConceptCount(basePath + platform + "/", basePath, total)
 
@@ -78,9 +78,9 @@ class ConceptCounts {
 		String parentPath = parentConceptPath.replace("/", "\\")
 
 		if(isConceptCountsExist(path)){
-			log.info "$conceptPath already exists in CONCEPT_COUNTS ..."
+			logger.info "$conceptPath already exists in CONCEPT_COUNTS ..."
 		}else{
-			log.info "Insert ($path, $totalCnt) into CONCEPT_COUNTS ..."
+			logger.info "Insert ($path, $totalCnt) into CONCEPT_COUNTS ..."
 			i2b2demodata.execute(qry, [
 				path,
 				parentPath,

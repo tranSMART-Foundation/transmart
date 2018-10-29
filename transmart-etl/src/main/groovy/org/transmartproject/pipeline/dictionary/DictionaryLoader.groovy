@@ -49,7 +49,7 @@ class DictionaryLoader {
     SearchKeywordTerm searchKeywordTerm = new SearchKeywordTerm()
 
     public DictionaryLoader() {
-        log.info("Start loading property file ...")
+        logger.info("Start loading property file ...")
         Properties props = Util.loadConfiguration('')
         sqlBiomart = Util.createSqlFromPropertyFile(props, "biomart")
         sqlSearchApp = Util.createSqlFromPropertyFile(props, "searchapp")
@@ -69,7 +69,7 @@ class DictionaryLoader {
         bioMarker.setOrganism(bmEntry.organism)
         bioMarker.setBiomart(sqlBiomart)
         if (bioMarker.isBioMarkerExist(bmEntry.externalID, bmEntry.markerType)) {
-            //log.info "$bmEntry.organism:$bmEntry.symbol:$bmEntry.externalID:$bmEntry.markerType already exists in BIO_MARKER ..."
+            //logger.info "$bmEntry.organism:$bmEntry.symbol:$bmEntry.externalID:$bmEntry.markerType already exists in BIO_MARKER ..."
         } else {
             // Insert into BIO_MARKER
             bioMarker.insertBioMarker(bmEntry.symbol,
@@ -114,9 +114,9 @@ class DictionaryLoader {
         BioDataExtCode bioDataExtCode = new BioDataExtCode()
         bioDataExtCode.setBiomart(sqlBiomart)
         if (bioDataExtCode.isBioDataExtCodeExist(bioMarkerID, synonym)) {
-            //log.info("$bioMarkerID:$synonym already exists in BIO_DATA_EXT_CODE")
+            //logger.info("$bioMarkerID:$synonym already exists in BIO_DATA_EXT_CODE")
         } else {
-            log.info "Insert $bioMarkerID:$synonym:SYNONYM:BIO_MARKER.$dataCategory:Alias into BIO_DATA_EXT_CODE ..."
+            logger.info "Insert $bioMarkerID:$synonym:SYNONYM:BIO_MARKER.$dataCategory:Alias into BIO_DATA_EXT_CODE ..."
             bioDataExtCode.insertBioDataExtCode(bioMarkerID, synonym, dataCategory)
         }
 

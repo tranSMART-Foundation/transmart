@@ -38,7 +38,7 @@ class TestsData {
 
 	void loadTestsDataDirectory(File sourceDirectory){
 		if(sourceDirectory.isDirectory()){
-			log.info "Start processing the directory: " + sourceDirectory.toString()
+			logger.info "Start processing the directory: " + sourceDirectory.toString()
 			sourceDirectory.eachFile {
 				if(it.toString().indexOf(suffix) != -1){
 					File output = loadTestsDataFile(it)
@@ -77,19 +77,19 @@ class TestsData {
 		if(platform.size() > 0){
 			setPlatform(platform)
 		} else {
-			log.error("Platform name is empty")
+			logger.error("Platform name is empty")
 		}
 
 
 		if(GSEName.size() > 0){
 			setGSEName(GSEName)
 		} else {
-			log.error("GSE name is empty")
+			logger.error("GSE name is empty")
 		}
 
 		StringBuffer sb = new StringBuffer()
 		if(input.size() > 0){
-			log.info "Start transforming file: " + input.toString()
+			logger.info "Start transforming file: " + input.toString()
 			int index = 0
 			input.eachLine{
 				index++
@@ -97,7 +97,7 @@ class TestsData {
 					if(isCorrectColumn(it)){
 						isContinue = true
 					} else{
-						log.error("Columns didn't match the expected, please double check the file:" + input.toString())
+						logger.error("Columns didn't match the expected, please double check the file:" + input.toString())
 					}
 				}
 				if(isContinue && (it.indexOf("ID\t") != 0)){
@@ -106,7 +106,7 @@ class TestsData {
 				}
 			}
 		} else {
-			log.error("Empty file: " + input.toString())
+			logger.error("Empty file: " + input.toString())
 		}
 		output.append(sb.toString())
 
@@ -125,9 +125,9 @@ class TestsData {
 
 		if(input.size() > 0){
 			if(isTestsDataExist(GSEName, platform)){
-				log.warn("Exist TESTS data for:  " + GSEName + ":" + platform)
+				logger.warn("Exist TESTS data for:  " + GSEName + ":" + platform)
 			} else{
-				log.info "Start loading: " + input.toString()
+				logger.info "Start loading: " + input.toString()
 				sql.withTransaction {
 					sql.withBatch(100, "insert into $tableName(name,platform,id,test,probeset,RawPValue,AdjustedPValue,Estimate,FoldChange,MaxLSMean) values (?,?,?,?,?,?,?,?,?,?)", { ps ->
 						input.eachLine{
@@ -154,7 +154,7 @@ class TestsData {
 				}
 			}
 		} else {
-			log.error("Empty file: " + input.toString())
+			logger.error("Empty file: " + input.toString())
 		}
 	}
 
@@ -201,9 +201,9 @@ class TestsData {
 			if(!str[i].toString().toUpperCase().equals(expected[i].toString().toUpperCase())) {
 				println str[i].toString().toUpperCase()
 				println expected[i].toString().toUpperCase()
-				log.info "Actual Header: ${header.replace('\t', ',')}"
-				log.info ("Expected header: $expectedheader")
-				log.error("The file's actual header didn't match the expected one.")
+				logger.info "Actual Header: ${header.replace('\t', ',')}"
+				logger.info ("Expected header: $expectedheader")
+				logger.error("The file's actual header didn't match the expected one.")
 				flag = false
 			}
 		}

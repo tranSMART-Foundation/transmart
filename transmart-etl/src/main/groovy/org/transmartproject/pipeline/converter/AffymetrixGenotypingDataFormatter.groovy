@@ -44,7 +44,7 @@ class AffymetrixGenotypingDataFormatter {
 
 		gt.eachFileRecurse {
 			if(it.toString().indexOf(sourceGenotypingFilePattern) >= 0 ) {
-				log.info("Processing " + it)
+				logger.info("Processing " + it)
 				processGenotypingFile(it)
 			}
 		}
@@ -78,7 +78,7 @@ class AffymetrixGenotypingDataFormatter {
 			if(it.indexOf("#%affymetrix-algorithm-param-apt-opt-cel-count") >= 0 ) {
 				str = it.split("=")
 				expectedCelCount = Integer.parseInt(str[1].trim())
-				log.info "Expected CEL Count: " + expectedCelCount
+				logger.info "Expected CEL Count: " + expectedCelCount
 			}
 
 			if(it.indexOf("probeset_id") == 0){
@@ -122,7 +122,7 @@ class AffymetrixGenotypingDataFormatter {
 			}
 		}
 
-		log.info ("  Processed probe count:  $probeCount  ")
+		logger.info ("  Processed probe count:  $probeCount  ")
 	}
 
 

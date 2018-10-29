@@ -30,13 +30,11 @@ package org.transmartproject.pipeline.plink
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
-
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class SnpGeneMap {
-
-	private static final Logger log = Logger.getLogger(SnpGeneMap)
 
 	Sql deapp
 	String annotationTable
@@ -48,13 +46,13 @@ class SnpGeneMap {
 		// store unique set of SNP ID -> Gene ID
 		Map rs = [:]
 		if(snpGeneMap.size() >0){
-			log.info("Start loading " + snpGeneMap.toString() + " into DE_SNP_GENE_MAP ...")
+			logger.info("Start loading " + snpGeneMap.toString() + " into DE_SNP_GENE_MAP ...")
 			snpGeneMap.eachLine{
 				String [] str = it.split(/\t/)
 				rs[str[0]] = str[1]
 			}
 		}else{
-			log.error(snpGeneMap.toString() + " is empty.")
+			logger.error(snpGeneMap.toString() + " is empty.")
 		}
 
 
@@ -73,7 +71,7 @@ class SnpGeneMap {
 
 		loadSnpGeneMap("tmp_de_snp_gene_map")
 
-		log.info "Drop the temp table TMP_DE_SNP_GENE_MAP "
+		logger.info "Drop the temp table TMP_DE_SNP_GENE_MAP "
 		qry = " drop table tmp_de_snp_gene_map purge"
 		deapp.execute(qry)
 	}
@@ -81,7 +79,7 @@ class SnpGeneMap {
 	
 	void loadSnpGeneMap(String tmpSnpGeneMapTable){
 
-		log.info "Start loading data into the table DE_SNP_GENE_MAP ... "
+		logger.info "Start loading data into the table DE_SNP_GENE_MAP ... "
 
 		String qry = """insert into de_snp_gene_map nologging (snp_id, snp_name, entrez_gene_id)
 						select t2.snp_info_id, t1.snp_name, t1.entrez_gene_id
@@ -91,13 +89,13 @@ class SnpGeneMap {
 						select snp_id, snp_name, entrez_gene_id from de_snp_gene_map"""
 		deapp.execute(qry)
 
-		log.info "End loading data into the table DE_SNP_GENE_MAP ... "
+		logger.info "End loading data into the table DE_SNP_GENE_MAP ... "
 	}
 
 
 	void loadSnpGeneMap(Map columnMap){
 
-		log.info "Start loading data into the table DE_SNP_GENE_MAP ... "
+		logger.info "Start loading data into the table DE_SNP_GENE_MAP ... "
 
 		String qry = """insert into de_snp_gene_map nologging (snp_id, snp_name, entrez_gene_id)
 						select t2.snp_info_id, t1.${columnMap["probe"]}, t1.${columnMap["gene_id"]}
@@ -107,7 +105,7 @@ class SnpGeneMap {
 						select snp_id, snp_name, to_char(entrez_gene_id) from de_snp_gene_map"""
 		deapp.execute(qry)
 
-		log.info "End loading data into the table DE_SNP_GENE_MAP ... "
+		logger.info "End loading data into the table DE_SNP_GENE_MAP ... "
 	}
 
 
@@ -115,17 +113,17 @@ class SnpGeneMap {
 
 		String qry = "select count(1) from user_tables where table_name=upper(?)"
 		if(deapp.firstRow(qry, [tempSnpGeneMapTable])[0] > 0){
-			log.info "Drop table $tempSnpGeneMapTable ..."
+			logger.info "Drop table $tempSnpGeneMapTable ..."
 			qry = "drop table $tempSnpGeneMapTable purge"
 			deapp.execute(qry)
 		}
 
-		log.info "Start creating the temp table $tempSnpGeneMapTable ..."
+		logger.info "Start creating the temp table $tempSnpGeneMapTable ..."
 
 		qry = """ create table tmp_de_snp_gene_map as select * from de_snp_gene_map where 1=2 """
 		deapp.execute(qry)
 
-		log.info "End creating table $tempSnpGeneMapTable ..."
+		logger.info "End creating table $tempSnpGeneMapTable ..."
 	}
 
 

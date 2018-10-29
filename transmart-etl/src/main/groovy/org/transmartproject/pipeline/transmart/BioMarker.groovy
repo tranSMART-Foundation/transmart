@@ -48,7 +48,7 @@ class BioMarker {
                 insertBioMarker(str[2], "", str[1], "", "GENE")
             }
         } else {
-            log.info "Cannot find " + gene.toString()
+            logger.info "Cannot find " + gene.toString()
         }
     }
 
@@ -59,7 +59,7 @@ class BioMarker {
         String gid
 
         if (gene.size() > 0) {
-            log.info "Start loading ${gene.toString()} into BIO_MARKER ... "
+            logger.info "Start loading ${gene.toString()} into BIO_MARKER ... "
             gene.eachLine {
                 String[] str = it.split("\t")
                 genes[str[1].trim()] = 1
@@ -72,7 +72,7 @@ class BioMarker {
                 }
             }
         } else {
-            log.info "Cannot find " + gene.toString()
+            logger.info "Cannot find " + gene.toString()
         }
     }
 
@@ -85,7 +85,7 @@ class BioMarker {
                 insertBioMarker(str[1], str[1], str[0], source, "PATHWAY")
             }
         } else {
-            log.info "Cannot find " + pathway.toString()
+            logger.info "Cannot find " + pathway.toString()
         }
     }
 
@@ -104,7 +104,7 @@ class BioMarker {
 
         GroovyRowResult rowResult = biomart.firstRow(qry, [name, organism, markerType])
         if (rowResult == null) {
-            log.info("getBioMarkerExtID failed for name '$name' organism '$organism' markerType '$markerType'")
+            logger.info("getBioMarkerExtID failed for name '$name' organism '$organism' markerType '$markerType'")
             return null;
         }
         String bioMarkerExtID = rowResult[0]
@@ -160,9 +160,9 @@ class BioMarker {
 		                        primary_external_id, bio_marker_type) values(?, ?, ?, ?, ?, ?) """
 
         if (isBioMarkerExist(extId, markerType)) {
-            //log.info "$organism:$extId:$markerType already exists in BIO_MARKER ..."
+            //logger.info "$organism:$extId:$markerType already exists in BIO_MARKER ..."
         } else {
-            log.info "Insert $organism:$markerName:$extId:$markerType into BIO_MARKER ..."
+            logger.info "Insert $organism:$markerName:$extId:$markerType into BIO_MARKER ..."
             biomart.execute(qry, [
                     markerName,
                     description,

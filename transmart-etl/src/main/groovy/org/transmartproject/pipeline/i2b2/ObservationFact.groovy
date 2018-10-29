@@ -41,7 +41,7 @@ class ObservationFact {
 
 	void loadObservationFact(Map subjects){
 
-		log.info "Start loading OBSERVATION_FACT ..."
+		logger.info "Start loading OBSERVATION_FACT ..."
 
 		String conceptPath
 		subjects.each{key, val ->
@@ -81,7 +81,7 @@ class ObservationFact {
 							""";
 
 		if(isObservationFactExist(patientNum, conceptCode)){
-			log.info "($patientNum, $conceptCode) already exists in OBSERVATION_FACT ..."
+			logger.info "($patientNum, $conceptCode) already exists in OBSERVATION_FACT ..."
 		}else{
 			i2b2demodata.execute(qry, [
 				patientNum,

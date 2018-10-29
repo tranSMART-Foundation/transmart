@@ -29,12 +29,10 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioAssayDataset {
-
-	private static final Logger log = Logger.getLogger(BioAssayDataset)
 
 	Sql biomart
 	String testsDataTable
@@ -61,9 +59,9 @@ class BioAssayDataset {
 	void loadBioAssayDataset(String datasetName, String accession, String platform, long bioExperimentId){
 
 		if(isBioAssayDatasetExist(datasetName, bioExperimentId)){
-                    //log.info "$datasetName ($accession:$platform) already exists in BIO_ASSAY_DATASET ..."
+                    //logger.info "$datasetName ($accession:$platform) already exists in BIO_ASSAY_DATASET ..."
 		}else{
-			log.info "Start inserting $datasetName ($accession:$platform) into BIO_ASSAY_DATASET ..."
+			logger.info "Start inserting $datasetName ($accession:$platform) into BIO_ASSAY_DATASET ..."
 
 			String qry = """ insert into bio_assay_dataset(bio_experiment_id, dataset_name, dataset_description, 
 										accession, create_date) 
@@ -75,7 +73,7 @@ class BioAssayDataset {
 				accession
 			])
 
-			log.info "End loading $datasetName into BIO_ASSAY_DATASET ..."
+			logger.info "End loading $datasetName into BIO_ASSAY_DATASET ..."
 		}
 	}
 
