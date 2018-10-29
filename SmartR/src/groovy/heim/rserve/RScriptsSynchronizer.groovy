@@ -2,7 +2,7 @@ package heim.rserve
 
 import com.google.common.base.Charsets
 import groovy.transform.TypeChecked
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import heim.SmartRRuntimeConstants
 import org.rosuda.REngine.Rserve.RConnection
 import org.rosuda.REngine.Rserve.RFileOutputStream
@@ -23,7 +23,7 @@ import java.util.zip.ZipOutputStream
  */
 @Component
 @TypeChecked
-@Log4j
+@Slf4j('logger')
 class RScriptsSynchronizer {
 
     @Autowired
@@ -49,16 +49,16 @@ class RScriptsSynchronizer {
                     return
                 } catch (Throwable t) {
                     if (t instanceof InterruptedException) {
-                        log.warn('R scripts synchronization interrupted')
+                        logger.warn('R scripts synchronization interrupted')
                         return
                     }
-                    log.warn('Synchronization of R scripts has failed. ' +
+                    logger.warn('Synchronization of R scripts has failed. ' +
                             'Retries left: ' + totalTries, t)
                     Thread.sleep(RETRY_INTERVAL * 1000L)
                 }
             }
 
-            log.error('Synchronization of R scripts has failed. No more retries')
+            logger.error('Synchronization of R scripts has failed. No more retries')
         }
     }
 
@@ -71,7 +71,7 @@ class RScriptsSynchronizer {
                     throw new IllegalStateException("Can't copy the smartR scripts to the Rserver machine", t)
                 }
                 copySuccessful = true
-                log.info('Finished copying over the smartR scripts to the Rserve machine')
+                logger.info('Finished copying over the smartR scripts to the Rserve machine')
             }
         }
     }
@@ -79,7 +79,7 @@ class RScriptsSynchronizer {
     void skip() {
         synchronized (lock) {
             copySuccessful = true
-            log.info('Skipping on copying over the smartR scripts to the Rserve machine')
+            logger.info('Skipping on copying over the smartR scripts to the Rserve machine')
         }
     }
 

@@ -2,7 +2,7 @@ package heim.session
 
 import com.google.common.collect.ImmutableMap
 import grails.test.mixin.TestMixin
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import heim.jobs.JobInstance
 import heim.tasks.TaskResult
 import heim.tasks.TaskState
@@ -26,7 +26,7 @@ import static org.hamcrest.core.AllOf.allOf
  */
 @TestMixin(RuleBasedIntegrationTestMixin)
 @WithGMock
-@Log4j
+@Slf4j('logger')
 class SessionServiceTests {
 
     public static final String TEST_JOB_TYPE = 'test'
@@ -160,11 +160,11 @@ class SessionServiceTests {
                 }
 
                 try {
-                    log.debug('Task going to sleep now')
+                    logger.debug('Task going to sleep now')
                     Thread.sleep(5000L)
                     throw new RuntimeException('Waiting time exceeded')
                 } catch (InterruptedException ie) {
-                    log.info('Got interrupted as expected')
+                    logger.info('Got interrupted as expected')
                     interrupted.set(true)
                 }
             }, monitor: monitor, closed: closed)

@@ -1,7 +1,7 @@
 package heim.session
 
 import grails.util.Environment
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import heim.SmartRExecutorService
 import heim.SmartRRuntimeConstants
 import heim.jobs.JobInstance
@@ -26,7 +26,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
  * Public service with the controller is to communicate.
  */
 @Component
-@Log4j
+@Slf4j('logger')
 class SessionService implements DisposableBean {
 
     private static final String[] HIDDEN_WORKFLOWS = []
@@ -89,7 +89,7 @@ class SessionService implements DisposableBean {
 
     UUID createSession(User user, String workflowType) {
         SessionContext newSession = new SessionContext(user, workflowType)
-        log.debug("Created session with id ${newSession.sessionId} and " +
+        logger.debug("Created session with id ${newSession.sessionId} and " +
                 "workflow type $workflowType")
 
         withSessionBookKeepingLock(true) {
@@ -116,12 +116,12 @@ class SessionService implements DisposableBean {
         }
 
         smartRExecutorService.submit({
-            log.debug("Started callable for destroying session $sessionId")
+            logger.debug("Started callable for destroying session $sessionId")
             SmartRSessionSpringScope.withActiveSession(sessionContext) {
-                log.debug(
+                logger.debug(
                         "Running destruction callbacks for session $sessionId")
                 sessionContext.destroy()
-                log.debug("Finished running destruction " +
+                logger.debug("Finished running destruction " +
                         "callbacks for session $sessionId")
 
                 withSessionBookKeepingLock(true) {
@@ -131,7 +131,7 @@ class SessionService implements DisposableBean {
             }
         } as Callable<Void>)
 
-        log.debug("Submmitted session $sessionId for destruction")
+        logger.debug("Submmitted session $sessionId for destruction")
     }
 
     UUID createTask(Map<String, Object> arguments,
@@ -213,7 +213,7 @@ class SessionService implements DisposableBean {
             doWithSession(sessionId) {}
         }
         catch (NoSuchResourceException e) {
-            log.warn("Attempted to touch non-existent or shutting down " +
+            logger.warn("Attempted to touch non-existent or shutting down " +
                     "session: $sessionId. This is normal if the session was " +
                     "destroyed with tasks running.")
         }
@@ -226,7 +226,7 @@ class SessionService implements DisposableBean {
                 return null
             }
             if (sessionId in sessionsShuttingDown) {
-                log.warn("Session is shutting down: $sessionId")
+                logger.warn("Session is shutting down: $sessionId")
                 return null
             }
             sessionContext
@@ -237,7 +237,7 @@ class SessionService implements DisposableBean {
     private SessionContext fetchSessionContext(UUID sessionId) {
         SessionContext sessionContext = currentSessions[sessionId]
         if (!sessionContext) {
-            log.warn("No such session: $sessionId")
+            logger.warn("No such session: $sessionId")
             return null
         }
         sessionContext
@@ -245,7 +245,7 @@ class SessionService implements DisposableBean {
 
 
     void garbageCollection() {
-        log.debug('Started session garbage collecting')
+        logger.debug('Started session garbage collecting')
 
         // because we're holding the lock, no actual destruction will start
         // until this method returns (this function only schedules destruction
@@ -257,22 +257,22 @@ class SessionService implements DisposableBean {
                     if (isStale(sessionId, lastActivity)) {
                         if (!sessionsShuttingDown.contains(sessionId)) {
                             destroySession(sessionId)
-                            log.info("Terminated session: ${sessionId} " +
+                            logger.info("Terminated session: ${sessionId} " +
                                     "due to inactivity.")
                         } else {
-                            log.info("Session $sessionId is stale, but " +
+                            logger.info("Session $sessionId is stale, but " +
                                     "it's already shutting down")
                         }
                     }
             }
         }
-        log.debug('Finished session garbage collecting')
+        logger.debug('Finished session garbage collecting')
     }
 
     private boolean isStale(UUID sessionId, Date lastTouched) {
         SessionContext context = fetchOperationalSessionContext(sessionId)
         if (context == null) {
-            log.debug("Session $sessionId shut down between call to " +
+            logger.debug("Session $sessionId shut down between call to " +
                     "getCurrentSessions() and fetchOperationalSessionContext()?")
             return false
         }
@@ -285,11 +285,11 @@ class SessionService implements DisposableBean {
             boolean hasActiveTasks = jobTasksService.hasActiveTasks()
 
             boolean res = deltaPassed && !hasActiveTasks
-            if (res && log.debugEnabled) {
-                log.debug("Session $sessionId deemed stale " +
+            if (res && logger.debugEnabled) {
+                logger.debug("Session $sessionId deemed stale " +
                         "($delta > $SESSION_LIFESPAN and no active tasks)")
-            } else if (!res && log.debugEnabled) {
-                log.debug("Session $sessionId deemed active " +
+            } else if (!res && logger.debugEnabled) {
+                logger.debug("Session $sessionId deemed active " +
                         "($delta <= $SESSION_LIFESPAN) or (active tasks: $hasActiveTasks)")
             }
 

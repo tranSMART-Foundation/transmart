@@ -3,7 +3,7 @@ package heim.session
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.users.User
 
 import java.util.concurrent.atomic.AtomicReference
@@ -11,7 +11,8 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * Holds the data for a specific session.
  */
-@Log4j
+
+@Slf4j('logger')
 class SessionContext {
 
     public final static String SMART_R_USER_BEAN = 'smartRBean'
@@ -62,7 +63,7 @@ class SessionContext {
     void destroy() {
         destructionCallbacks.asMap().each { String bean,
                                             Collection<Runnable> callbacks ->
-            log.debug("Calling destruction callbacks for bean $bean")
+            logger.debug("Calling destruction callbacks for bean $bean")
             callbacks.each {
                 it.run()
             }

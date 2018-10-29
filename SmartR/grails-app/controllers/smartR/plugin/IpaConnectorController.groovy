@@ -2,13 +2,16 @@
 
 package smartR.plugin
 
-import grails.converters.JSON
 import com.google.gson.Gson
+import grails.converters.JSON
 import grails.util.Holders
+import groovy.util.logging.Slf4j
+
 import com.ittm_solutions.ipacore.IpaApiCached
 import com.ittm_solutions.ipacore.IpaApiException
 import com.ittm_solutions.ipacore.IpaApiAuthenticationFailedException
 
+@Slf4j('logger')
 class IpaConnectorController {
     static scope = "singleton"
 
@@ -42,7 +45,7 @@ class IpaConnectorController {
             password = ''
         }
         if (! userToIpaApiCached.containsKey(username)) {
-            log.debug "Creating new IpaApiCached for " + username
+            logger.debug "Creating new IpaApiCached for " + username
             userToIpaApiCached[username] = new IpaApiCached(username,password,projectName)
         }
         return userToIpaApiCached[username]
@@ -85,7 +88,7 @@ class IpaConnectorController {
             render(status: 401, text: 'authentication failed')
         } catch (IpaApiException|Exception e) {
             removeIpaApiCached(analysisParams.username)
-            log.error("IpaApiCached exception:",e)
+            logger.error("IpaApiCached exception:",e)
             render(status: 500, text: e.getMessage())
         }
     }
@@ -107,7 +110,7 @@ class IpaConnectorController {
             render(status: 401, text: 'authentication failed')
         } catch (IpaApiException|Exception e) {
             removeIpaApiCached(analysisParams.username)
-            log.error("IpaApiCached exception:",e)
+            logger.error("IpaApiCached exception:",e)
             render(status: 500, text: e.getMessage())
         }
     }
@@ -129,7 +132,7 @@ class IpaConnectorController {
             render(status: 401, text: 'authentication failed')
         } catch (IpaApiException|Exception e) {
             removeIpaApiCached(analysisParams.username)
-            log.error("IpaApiCached exception:",e)
+            logger.error("IpaApiCached exception:",e)
             render(status: 500, text: e.getMessage())
         }
     }

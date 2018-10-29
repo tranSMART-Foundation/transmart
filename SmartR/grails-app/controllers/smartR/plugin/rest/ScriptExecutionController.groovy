@@ -3,6 +3,7 @@ package smartR.plugin.rest
 import grails.validation.Validateable
 import heim.session.SessionService
 import heim.tasks.TaskResult
+import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import sendfile.SendFileService
 
@@ -11,7 +12,7 @@ class ScriptExecutionController {
     static scope = 'request'
 
     SessionService sessionService
-    @AutoWired private SendFileService sendFileService
+    @Autowired private SendFileService sendFileService
 
     static allowedMethods = [
             init  : 'POST',

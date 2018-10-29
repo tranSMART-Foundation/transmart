@@ -9,7 +9,7 @@ import com.google.common.collect.PeekingIterator
 import com.google.common.io.Closer
 import grails.converters.JSON
 import groovy.transform.ToString
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import heim.rserve.RServeSession
 import heim.rserve.RUtil
 import org.codehaus.groovy.grails.support.PersistenceContextInterceptor
@@ -43,7 +43,7 @@ import static org.transmartproject.core.dataquery.highdim.projections.Projection
 import static org.transmartproject.core.ontology.OntologyTerm.VisualAttributes.HIGH_DIMENSIONAL
 
 @Component
-@Log4j
+@Slf4j('logger')
 @Scope('prototype')
 @ToString(includes = 'ontologyTerms,resultInstanceIds,dataType')
 class DataFetchTask extends AbstractTask {
@@ -95,18 +95,18 @@ class DataFetchTask extends AbstractTask {
         @Override
         void run() {
             try {
-                if (log.debugEnabled) {
-                    log.debug("Will now fetch data with label '$label' for " +
+                if (logger.debugEnabled) {
+                    logger.debug("Will now fetch data with label '$label' for " +
                             "ontology term $ontologyTerm, result instance id " +
                             "$resultInstanceId")
                 }
 
                 TabularResult<?, ?> tabularResult = runWithInterceptor this.&doRun
 
-                log.debug("Finished opening tabular result for data set $label")
+                logger.debug("Finished opening tabular result for data set $label")
                 queryResultsQueue.put([(label): tabularResult])
             } catch (Exception e) {
-                log.error("Fetching of data set $label failed: ${e.message}", e)
+                logger.error("Fetching of data set $label failed: ${e.message}", e)
                 queryResultsQueue.put(e)
             }
         }
@@ -121,7 +121,7 @@ class DataFetchTask extends AbstractTask {
                 res = createClinicalDataResult ontologyTerm, resultInstanceId
             }
 
-            log.info("Fetch for $ontologyTerm (rid $resultInstanceId) " +
+            logger.info("Fetch for $ontologyTerm (rid $resultInstanceId) " +
                     "finished in $stopwatch")
             res
         }
@@ -183,10 +183,10 @@ class DataFetchTask extends AbstractTask {
             def fetchResult = queryResultsQueue.take() // will block
             taken++
 
-            log.debug("Took from queryResultsQueye: $fetchResult")
+            logger.debug("Took from queryResultsQueye: $fetchResult")
 
             if (fetchResult instanceof Exception) {
-                log.warn('Error fetching one of the datasets, ' +
+                logger.warn('Error fetching one of the datasets, ' +
                         'aborting writing in the R session (some datasets ' +
                         'may have been written): ' +
                         fetchResult.message, fetchResult)
@@ -260,7 +260,7 @@ class DataFetchTask extends AbstractTask {
             OutputStream os = new BufferedOutputStream(
                     conn.createFile(filename), 81920)
 
-            log.info("Will start writing tabular result in file $filename")
+            logger.info("Will start writing tabular result in file $filename")
             final Stopwatch stopwatch = Stopwatch.createStarted()
 
             Writer writer = new OutputStreamWriter(os, Charsets.UTF_8)
@@ -289,7 +289,7 @@ class DataFetchTask extends AbstractTask {
             }
 
 
-            log.info("Finished writing file $filename in $stopwatch")
+            logger.info("Finished writing file $filename in $stopwatch")
         }
 
         filename
@@ -430,21 +430,21 @@ class DataFetchTask extends AbstractTask {
         // retrieveData() may not work well with interruptions,
         // try to call just shutdown() before shutdownNow()
         try {
-            log.debug("Shutting down query executor in $this")
+            logger.debug("Shutting down query executor in $this")
             queriesExecutor.shutdown()
             try {
                 def terminated = queriesExecutor.awaitTermination(
                         MAX_MINUTES_TO_WAIT_FOR_TABRES_FETCH, TimeUnit.MINUTES)
-                log.debug("Finished waiting for termination in $this. " +
+                logger.debug("Finished waiting for termination in $this. " +
                         "Terminated? $terminated")
                 if (!terminated) {
-                    log.warn("Tabular result fetching threads did not finish " +
+                    logger.warn("Tabular result fetching threads did not finish " +
                             "in $MAX_MINUTES_TO_WAIT_FOR_TABRES_FETCH " +
                             "minutes. Will attempt to interrupt them.")
                     queriesExecutor.shutdownNow()
                 }
             } catch (InterruptedException ie) {
-                log.warn("Interrupted while awaiting for termination of " +
+                logger.warn("Interrupted while awaiting for termination of " +
                         "TabularResult fetch in $this")
             }
         } finally {

@@ -1,9 +1,11 @@
 import grails.util.Environment
+import groovy.util.logging.Slf4j
 import heim.rserve.RScriptsSynchronizer
 import org.codehaus.groovy.grails.plugins.GrailsPluginUtils
 import org.springframework.stereotype.Component
 import heim.SmartRRuntimeConstants
 
+@Slf4j('logger')
 class smartRGrailsPlugin {
 
     public static final String DEFAULT_REMOTE_RSCRIPTS_DIRECTORY = '/tmp/smart_r_scripts'
@@ -82,7 +84,7 @@ class smartRGrailsPlugin {
         }
 
         constants.pluginScriptDirectory = new File(smartRDir.canonicalPath, 'HeimScripts')
-        log.info("Directory for heim scripts is ${constants.pluginScriptDirectory}")
+        logger.info("Directory for heim scripts is ${constants.pluginScriptDirectory}")
 
         if (!skipRScriptsTransfer(config)) {
             def remoteScriptDirectory =  config.smartR.remoteScriptDirectory
@@ -90,11 +92,11 @@ class smartRGrailsPlugin {
                 remoteScriptDirectory = DEFAULT_REMOTE_RSCRIPTS_DIRECTORY
             }
             constants.remoteScriptDirectoryDir = remoteScriptDirectory
-            log.info("Location for R scripts in the Rserve server is ${constants.remoteScriptDirectoryDir}")
+            logger.info("Location for R scripts in the Rserve server is ${constants.remoteScriptDirectoryDir}")
 
             ctx.getBean(RScriptsSynchronizer).start()
         } else {
-            log.info('Skipping copying of R script in development mode with local Rserve')
+            logger.info('Skipping copying of R script in development mode with local Rserve')
             constants.remoteScriptDirectoryDir = constants.pluginScriptDirectory.absoluteFile
             ctx.getBean(RScriptsSynchronizer).skip()
         }
