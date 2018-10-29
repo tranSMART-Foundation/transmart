@@ -2,6 +2,7 @@ package xnat.plugin
 
 import com.recomdata.export.ExportTableNew
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.jfree.chart.servlet.ChartDeleter
 import org.jfree.chart.servlet.ServletUtilities
 import org.transmart.searchapp.AccessLog
@@ -12,6 +13,7 @@ import javax.servlet.ServletException
 import javax.servlet.ServletOutputStream
 import javax.servlet.http.HttpSession
 
+@Slf4j('logger')
 class TableController {
 
     def i2b2HelperService
@@ -50,12 +52,12 @@ class TableController {
             List<String> keys = i2b2HelperService.getConceptKeysInSubsets(result_instance_id1, result_instance_id2);
             Set<String> uniqueConcepts = i2b2HelperService.getDistinctConceptSet(result_instance_id1, result_instance_id2);
 
-            log.debug("Unique concepts: " + uniqueConcepts);
-            log.debug("keys: " + keys)
+            logger.debug("Unique concepts: " + uniqueConcepts);
+            logger.debug("keys: " + keys)
 
             for (int i = 0; i < keys.size(); i++) {
 
-                log.trace("adding concept data for " + keys.get(i));
+                logger.trace("adding concept data for " + keys.get(i));
                 if (s1) i2b2HelperService.addConceptDataToTable(table, keys.get(i), result_instance_id1);
                 if (s2) i2b2HelperService.addConceptDataToTable(table, keys.get(i), result_instance_id2);
             }

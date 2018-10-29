@@ -1,11 +1,12 @@
 package xnat.plugin
 
 import groovy.sql.Sql
-import com.recomdata.export.*
-import i2b2.*
+import groovy.util.logging.Slf4j
+import com.recomdata.export.ExportColumn
+import com.recomdata.export.ExportRowNew
+import com.recomdata.export.ExportTableNew
 
-//import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess
-
+@Slf4j('logger')
 class XnatHelperService {
 
     def i2b2HelperService
@@ -22,10 +23,10 @@ class XnatHelperService {
     def ExportTableNew addAllPatientDemographicDataForSubsetToTable(ExportTableNew tablein, String result_instance_id, String subset) {
         //checkQueryResultAccess result_instance_id
 
-        log.trace("Getting sampleCD's for patient number")
+        logger.trace("Getting sampleCD's for patient number")
         def mapOfSampleCdsByPatientNum = i2b2HelperService.buildMapOfSampleCdsByPatientNum(result_instance_id)
 
-        log.trace("Adding patient demographic data to grid with result instance id:" +result_instance_id+" and subset: "+subset)
+        logger.trace("Adding patient demographic data to grid with result instance id:" +result_instance_id+" and subset: "+subset)
         Sql sql = new Sql(dataSource)
         String sqlt = '''
             SELECT
@@ -49,7 +50,7 @@ class XnatHelperService {
             ORDER BY
                 I.PATIENT_NUM''';
 
-        log.debug "Initial grid query: $sqlt, riid: $result_instance_id"
+        logger.debug "Initial grid query: $sqlt, riid: $result_instance_id"
 
         //If I have an empty table structure so far
         if (tablein.getColumns().size() == 0) {
