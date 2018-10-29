@@ -2,21 +2,26 @@ package com.recomdata.transmart.rmodules
 
 import com.recomdata.transmart.data.association.RModulesOutputRenderService
 import grails.test.mixin.TestFor
-import org.gmock.WithGMock
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.User
+import org.transmart.plugin.shared.SecurityService
+import org.transmart.plugin.shared.security.AuthUserDetails
+import org.transmart.plugin.shared.security.Roles
 import org.transmartproject.core.exceptions.InvalidRequestException
+import sendfile.SendFileService
 
 import javax.servlet.ServletContext
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.*
+import static org.hamcrest.Matchers.is
 
 @TestFor(AnalysisFilesController)
-@WithGMock
 class AnalysisFilesControllerTests {
 
     private static final String USER_NAME = 'user'
@@ -24,13 +29,14 @@ class AnalysisFilesControllerTests {
     private static final String ADMIN_NAME = 'admin'
     private static final String EXISTING_FILE_NAME = 'file_that_exists'
     private static final String FILE_CONTENTS = 'file contents\n'
-    private static final String ANALYSIS_NAME = "$USER_NAME-Analysis-100"
+    private static final String ANALYSIS_NAME = USER_NAME + '-Analysis-100'
 
-    File temporaryDirectory
-    File analysisDirectory
-    File targetFile
-    def sendFileServiceMock
-    def mockGrailsUser
+    private File temporaryDirectory
+    private File analysisDirectory
+    private File targetFile
+    private User principal
+    private String username
+    private String path
 
     @Before
     void before() {
@@ -38,40 +44,39 @@ class AnalysisFilesControllerTests {
         analysisDirectory = new File(temporaryDirectory, ANALYSIS_NAME)
         analysisDirectory.mkdir()
 
-        controller.RModulesOutputRenderService = mock RModulesOutputRenderService
-        controller.RModulesOutputRenderService.tempFolderDirectory.
-                returns(temporaryDirectory.absolutePath).stub()
+        controller.RModulesOutputRenderService = new RModulesOutputRenderService()
+        controller.RModulesOutputRenderService.tempFolderDirectory = temporaryDirectory.absolutePath + '/'
 
-        sendFileServiceMock = mock()
-        controller.sendFileService = sendFileServiceMock
+	controller.sendFileService = new SendFileService() {
+	    void sendFile(ServletContext servletContext, HttpServletRequest request,
+		          HttpServletResponse response, File file, Map headers = [:]) {
+		assert file == targetFile
+	    }
+	}
 
-        mockGrailsUser = mock()
-        controller.springSecurityService = mock()
-        controller.springSecurityService.principal.
-                returns(mockGrailsUser).stub()
-
-        params.analysisName = ANALYSIS_NAME
+	controller.securityService = new SecurityService() {
+	    AuthUserDetails principal() {
+		AnalysisFilesControllerTests.this.principal
+	    }
+	}
     }
 
-    void setTestUsername(String username) {
-        mockGrailsUser.username.returns username
+    private void setAdmin(boolean admin) {
+	Collection<GrantedAuthority> authorities = []
+	if (admin) {
+	    authorities << new SimpleGrantedAuthority(Roles.ADMIN.authority)
+	}
+	principal = new AuthUserDetails(username, username,
+					true, true, true, true,
+					authorities, 1, 'userRealName', 'user@email.com')
     }
 
-    void setAdmin(boolean value) {
-        if (value) {
-            def adminAuthority = mock()
-            adminAuthority.authority.returns AnalysisFilesController.ROLE_ADMIN
-            mockGrailsUser.authorities.returns([adminAuthority])
-        } else {
-            mockGrailsUser.authorities.returns([])
-        }
-    }
-
-    void setFile(String filename) {
+    private void setFile(String filename) {
         targetFile = new File(analysisDirectory, filename)
+	targetFile.deleteOnExit()
         targetFile << FILE_CONTENTS
 
-        params.path = filename
+        path = filename
     }
 
     @After
@@ -82,95 +87,72 @@ class AnalysisFilesControllerTests {
     @Test
     void basicTest() {
         // test the normal circumstances (file exists and is allowed)
-        testUsername = USER_NAME
-        file         = EXISTING_FILE_NAME
+        username = USER_NAME
+	admin = false
+        file = EXISTING_FILE_NAME
 
-        sendFileServiceMock.sendFile(isA(ServletContext),
-                isA(HttpServletRequest), isA(HttpServletResponse),
-                is(equalTo(targetFile)))
-
-        play {
-            controller.download()
-        }
+	controller.download ANALYSIS_NAME, path
 
         assertThat response.status, is(200)
     }
 
     @Test
     void testNoPermission() {
-        testUsername = OTHER_USER_NAME
+        username = OTHER_USER_NAME
         admin        = false
 
-        play {
-            controller.download()
-        }
+	controller.download ANALYSIS_NAME, path
 
         assertThat response.status, is(403)
     }
 
     @Test
     void testAdminAlwaysHasPermission() {
-        testUsername = ADMIN_NAME
+        username = ADMIN_NAME
         admin        = true
         file         = EXISTING_FILE_NAME
 
-        sendFileServiceMock.sendFile(isA(ServletContext),
-                isA(HttpServletRequest), isA(HttpServletResponse),
-                is(equalTo(targetFile)))
-
-        play {
-            controller.download()
-        }
+	controller.download ANALYSIS_NAME, path
 
         assertThat response.status, is(200)
     }
 
     @Test
     void testBadAnalysisName() {
-        params.analysisName = 'not_a_valid_analysis_name'
-
-        play {
-            shouldFail InvalidRequestException, {
-                controller.download()
-            }
+	shouldFail InvalidRequestException, {
+	    controller.download 'not_a_valid_analysis_name', path
         }
     }
 
     @Test
     void testInexistingAnalysisName() {
-        testUsername        = USER_NAME
-        params.analysisName = ANALYSIS_NAME + '1'
+        username = USER_NAME
+	admin = false
 
-        play {
-            controller.download()
-        }
+        controller.download ANALYSIS_NAME + '1', path
 
         assertThat response.status, is(404)
     }
 
     @Test
     void testAccessToExternalFilesNotAllowed() {
-        testUsername        = USER_NAME
+        username        = USER_NAME
+	admin = false
 
         file = '../test'
-        play {
-            controller.download()
-        }
-        assertThat response.status, is(404)
+
+	controller.download ANALYSIS_NAME, path
+
+	assertThat response.status, is(404)
     }
 
     @Test
     void testNonExistingFile() {
-        testUsername = USER_NAME
+        username = USER_NAME
+	admin = false
 
-        params.path = 'file_that_does_not_exist'
-
-        play {
-            controller.download()
-        }
+        controller.download ANALYSIS_NAME, 'file_that_does_not_exist'
 
         assertThat response.status, is(404)
     }
-
-
 }

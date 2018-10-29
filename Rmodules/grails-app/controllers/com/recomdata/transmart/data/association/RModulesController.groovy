@@ -46,147 +46,104 @@ import org.quartz.JobDataMap
 import org.quartz.JobDetail
 import org.quartz.impl.JobDetailImpl
 import org.quartz.impl.triggers.SimpleTriggerImpl
+import org.transmart.plugin.shared.SecurityService
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.users.User
 
-import static jobs.misc.AnalysisQuartzJobAdapter.*
+import static jobs.misc.AnalysisQuartzJobAdapter.PARAM_ANALYSIS_CONSTRAINTS
+import static jobs.misc.AnalysisQuartzJobAdapter.PARAM_GRAILS_APPLICATION
+import static jobs.misc.AnalysisQuartzJobAdapter.PARAM_JOB_CLASS
+import static jobs.misc.AnalysisQuartzJobAdapter.PARAM_USER_IN_CONTEXT
+import static jobs.misc.AnalysisQuartzJobAdapter.PARAM_USER_PARAMETERS
 
 class RModulesController {
-    final static Map<String, String> lookup = [
-            "Gene Expression":  "mrna",
-            "MIRNA_QPCR":       "mirnaqpcr",
-            "MIRNA_SEQ":        "mirnaseq",
-            "RBM":              "rbm",
-            "PROTEOMICS":       "protein",
-            "RNASEQ":           "rnaseq_cog",
-            "METABOLOMICS":     "metabolite",
-            "Chromosomal":      "acgh",
-            "acgh":             "acgh",
-            "rnaseq":           "rnaseq",
-            "Chromosomal":      "acgh",
-            "RNASEQ_RCNT":      "rnaseq",
-            "VCF":		"vcf"
-    ]
 
-    def springSecurityService
+    private static final Map<String, String> lookup = [
+			'Gene Expression': 'mrna',
+			MIRNA_QPCR       : 'mirnaqpcr',
+			MIRNA_SEQ        : 'mirnaseq',
+			RBM              : 'rbm',
+			PROTEOMICS       : 'protein',
+			RNASEQ           : 'rnaseq_cog',
+			METABOLOMICS     : 'metabolite',
+			Chromosomal      : 'acgh',
+			acgh             : 'acgh',
+			rnaseq           : 'rnaseq',
+			RNASEQ_RCNT      : 'rnaseq',
+			VCF              : 'vcf'
+    ].asImmutable()
+
     def asyncJobService
-    def currentUserBean
-    def RModulesService
-    def grailsApplication
-    def jobResultsService
+    User currentUserBean
+    GrailsApplication grailsApplication
+    JobResultsService jobResultsService
+    def quartzScheduler
+    RModulesService RModulesService
+    SecurityService securityService
 
-    /**
-     * Method called that will cancel a running job
-     */
-    def canceljob = {
-        def jobName = request.getParameter("jobName")
-        def jsonResult = asyncJobService.canceljob(jobName)
-
-        response.setContentType("text/json")
-        response.outputStream << jsonResult.toString()
+    def canceljob(String jobName) {
+	response.contentType = 'text/json'
+	response.outputStream << asyncJobService.canceljob(jobName).toString()
     }
 
     /**
-     * Method that will create the new asynchronous job name
+     * Create the new asynchronous job name
      * Current methodology is username-jobtype-ID from sequence generator
      */
-    def createnewjob = {
-        def result = asyncJobService.createnewjob(params)
-
-        response.setContentType("text/json")
-        response.outputStream << result.toString()
+    def createnewjob() {
+     	response.contentType = 'text/json'
+	response.outputStream << asyncJobService.createnewjob(params).toString()
     }
 
-    /**
-     * Method that will schedule a Job
-     */
-    def scheduleJob = {
-        def jsonResult
+    def scheduleJob(String jobName, String analysis) {
+        def json
 
-        if (jobResultsService[params.jobName] == null) {
+        if (jobResultsService[jobName] == null) {
             throw new IllegalStateException('Cannot schedule job; it has not been created')
         }
 
         // has to come before and flush the new state, otherwise the
         // sessionFactory running on the quartz thread may get stale values
-        asyncJobService.updateJobInputs(params.jobName, params)
+        asyncJobService.updateJobInputs(jobName, params)
 
-        switch (params['analysis']) {
-            case 'heatmap':
-                jsonResult = createJob(params, Heatmap)
-                break
-            case 'kclust':
-                jsonResult = createJob(params, KMeansClustering)
-                break
-            case 'hclust':
-                jsonResult = createJob(params, HierarchicalClustering)
-                break
-            case 'markerSelection':
-                jsonResult = createJob(params, MarkerSelection)
-                break
-            case 'pca':
-                jsonResult = createJob(params, PCA)
-                break
-            case 'tableWithFisher':
-                jsonResult = createJob(params, TableWithFisher, false)
-                break
-            case 'boxPlot':
-                jsonResult = createJob(params, BoxPlot, false)
-                break
-            case 'scatterPlot':
-                jsonResult = createJob(params, ScatterPlot, false)
-                break
-            case 'survivalAnalysis':
-                jsonResult = createJob(params, SurvivalAnalysis, false)
-                break
-            case 'lineGraph':
-                jsonResult = createJob(params, LineGraph, false)
-                break
-            case 'correlationAnalysis':
-                jsonResult = createJob(params, CorrelationAnalysis, false)
-                break
-            case 'waterfall':
-                jsonResult = createJob(params, Waterfall, false)
-                break
-            case 'logisticRegression':
-                jsonResult = createJob(params, LogisticRegression, false)
-                break
-            case 'geneprint':
-                jsonResult = createJob(params, Geneprint)
-                break
-            case 'acghFrequencyPlot':
-                jsonResult = createJob(params, AcghFrequencyPlot)
-                break
-            case 'groupTestaCGH':
-                jsonResult = createJob(params, AcghGroupTest)
-                break
-            case 'aCGHSurvivalAnalysis':
-                jsonResult = createJob(params, AcghSurvivalAnalysis)
-                break
-            case 'groupTestRNASeq':
-                jsonResult = createJob(params, RNASeqGroupTest)
-                break
-            default:
-                jsonResult = RModulesService.scheduleJob(
-                        springSecurityService.principal.username, params)
+        switch (analysis) {
+ 	    case 'heatmap': json = createJob(Heatmap); break
+	    case 'kclust': json = createJob(KMeansClustering); break
+	    case 'hclust': json = createJob(HierarchicalClustering); break
+	    case 'markerSelection': json = createJob(MarkerSelection); break
+	    case 'pca': json = createJob(PCA); break
+	    case 'tableWithFisher': json = createJob(TableWithFisher, false); break
+	    case 'boxPlot': json = createJob(BoxPlot, false); break
+	    case 'scatterPlot': json = createJob(ScatterPlot, false); break
+	    case 'survivalAnalysis': json = createJob(SurvivalAnalysis, false); break
+	    case 'lineGraph': json = createJob(LineGraph, false); break
+	    case 'correlationAnalysis': json = createJob(CorrelationAnalysis, false); break
+	    case 'waterfall': json = createJob(Waterfall, false); break
+	    case 'logisticRegression': json = createJob(LogisticRegression, false); break
+	    case 'geneprint': json = createJob(Geneprint); break
+	    case 'acghFrequencyPlot': json = createJob(AcghFrequencyPlot); break
+	    case 'groupTestaCGH': json = createJob(AcghGroupTest); break
+	    case 'aCGHSurvivalAnalysis': json = createJob(AcghSurvivalAnalysis); break
+	    case 'groupTestRNASeq': json = createJob(RNASeqGroupTest); break
+	    default: json = RModulesService.scheduleJob(securityService.currentUsername(), params)
         }
 
-        response.setContentType("text/json")
-        response.outputStream << jsonResult.toString()
+        response.contentType = 'text/json'
+        response.outputStream << json.toString()
     }
 
-    private void createJob(Map params, Class clazz, boolean useAnalysisConstraints = true) {
+    private Date createJob(Class clazz, boolean useAnalysisConstraints = true) {
 
-        UserParameters userParams = new UserParameters(map: Maps.newHashMap(params))
+        UserParameters userParams = new UserParameters(map: [:] + params)
 
         params[PARAM_GRAILS_APPLICATION] = grailsApplication
         params[PARAM_JOB_CLASS] = clazz
         if (useAnalysisConstraints) {
-            params.put(PARAM_ANALYSIS_CONSTRAINTS, createAnalysisConstraints(params))
+            params[PARAM_ANALYSIS_CONSTRAINTS] = createAnalysisConstraints(params)
         }
 
-        params.put(PARAM_USER_PARAMETERS, userParams)
-        params.put(PARAM_USER_IN_CONTEXT, currentUserBean.targetSource.target)
+        params[PARAM_USER_PARAMETERS] = userParams
+        params[PARAM_USER_IN_CONTEXT] =  currentUserBean.targetSource.target
 
 	JobDetail jobDetail = new JobDetailImpl(params.jobName, params.jobType, AnalysisQuartzJobAdapter)
 	jobDetail.jobDataMap = new JobDataMap(params)
@@ -194,21 +151,20 @@ class RModulesController {
 			new SimpleTriggerImpl('triggerNow ' + System.currentTimeMillis(), 'RModules')
     }
 
-    public static AnalysisConstraints createAnalysisConstraints(Map params) {
+    static AnalysisConstraints createAnalysisConstraints(Map params) {
         Map map = validateParamAnalysisConstraints(params) as Map
-        map["data_type"] = lookup[map["data_type"]]
-        map = massageConstraints map
-        new AnalysisConstraints(map: map)
+        map.data_type = lookup[map.data_type]
+        new AnalysisConstraints(map: massageConstraints(map))
     }
 
     private static Map massageConstraints(Map analysisConstraints) {
-        analysisConstraints["dataConstraints"].each { constraintType, value ->
+        analysisConstraints.dataConstraints.each { String constraintType, value ->
             if (constraintType == 'search_keyword_ids') {
-                analysisConstraints["dataConstraints"][constraintType] = [ keyword_ids: value ]
+                analysisConstraints.dataConstraints[constraintType] = [ keyword_ids: value ]
             }
 
             if (constraintType == 'mirnas') {
-                analysisConstraints["dataConstraints"][constraintType] = [ names: value ]
+                analysisConstraints.dataConstraints[constraintType] = [ names: value ]
             }
         }
 
@@ -220,25 +176,23 @@ class RModulesController {
             throw new InvalidArgumentsException("No parameter $PARAM_ANALYSIS_CONSTRAINTS")
         }
 
-        def constraints
+        JSONElement constraints
         try {
             constraints = JSON.parse(params[PARAM_ANALYSIS_CONSTRAINTS])
-        } catch (ConverterException ce) {
-            throw new InvalidArgumentsException("Parameter $PARAM_ANALYSIS_CONSTRAINTS " +
-                    "is not a valid JSON string")
+        }
+	catch (ConverterException ignored) {
+            throw new InvalidArgumentsException("Parameter $PARAM_ANALYSIS_CONSTRAINTS is not a valid JSON string")
         }
 
         if (!(constraints instanceof Map)) {
             throw new InvalidArgumentsException(
-                    "Expected $PARAM_ANALYSIS_CONSTRAINTS to be an map (JSON object); " +
-                            "got ${constraints.getClass()}")
+                    "Expected $PARAM_ANALYSIS_CONSTRAINTS to be a map (JSON object); got ${constraints.getClass()}")
         }
 
         // great naming consistency here!
-        [ 'data_type', 'assayConstraints', 'dataConstraints' ].each {
+        for (String it in ['data_type', 'assayConstraints', 'dataConstraints']) {
             if (!constraints[it]) {
-                throw new InvalidArgumentsException("No sub-parameter '$it' " +
-                        "for request parameter $PARAM_ANALYSIS_CONSTRAINTS")
+                throw new InvalidArgumentsException("No sub-parameter '$it' for request parameter $PARAM_ANALYSIS_CONSTRAINTS")
             }
         }
 
