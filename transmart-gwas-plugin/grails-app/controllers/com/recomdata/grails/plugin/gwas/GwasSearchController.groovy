@@ -8,6 +8,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.transmart.biomart.BioAssayAnalysis
 import org.transmart.biomart.Experiment
+import org.transmart.plugin.shared.SecurityService
 import org.transmart.searchapp.GeneSignature
 import org.transmart.searchapp.GeneSignatureItem
 import org.transmart.searchapp.SearchKeyword
@@ -17,7 +18,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FileUtils
 
 import static java.util.UUID.randomUUID
 
@@ -27,6 +28,7 @@ class GwasSearchController {
     def gwasWebService
     def RModulesFileWritingService
     def RModulesJobProcessingService
+    @Autowired private SecurityService securityService
     def RModulesOutputRenderService
     def springSecurityService
     def gwasSearchService
