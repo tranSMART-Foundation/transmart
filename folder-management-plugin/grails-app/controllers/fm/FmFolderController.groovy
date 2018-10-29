@@ -146,7 +146,7 @@ class FmFolderController {
         logger.info "createAssay called"
         logger.info "params = " + params
 
-        //log.info "** action: expDetail called!"
+        //logger.info "** action: expDetail called!"
 
         def folder = new FmFolder()
         folder.folderType = FolderType.ASSAY.name()
