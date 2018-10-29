@@ -2,6 +2,9 @@ package galaxy.export.plugin
 
 import grails.transaction.Transactional
 
+import groovy.util.logging.Slf4j
+
+@Slf4j('logger')
 @Transactional
 class GalaxyUserDetailsService {
 
@@ -13,7 +16,7 @@ class GalaxyUserDetailsService {
                 galaxyUser.mailAddress = mailAddress;
                 galaxyUser.save();
             }catch(e){
-                log.error("The export job for galaxy couldn't be saved")
+                logger.error("The export job for galaxy couldn't be saved")
                 return false;
             }
             return true;

@@ -9,11 +9,14 @@ import com.github.jmchilton.blend4j.galaxy.beans.LibraryContent
 import com.github.jmchilton.blend4j.galaxy.beans.LibraryFolder
 import com.recomdata.transmart.domain.i2b2.AsyncJob
 import com.sun.jersey.api.client.ClientResponse
-import grails.transaction.Transactional
+import grails.transaction.Transactionali
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
 import org.json.JSONArray
 import org.json.JSONObject
 
+
+@Slf4j('logger')
 @Transactional
 class RetrieveDataService {
 
@@ -26,7 +29,7 @@ class RetrieveDataService {
             newJob.lastExportTime = new Date();
             newJob.save();
         }catch(e){
-            log.error("The export job for galaxy couldn't be saved")
+            logger.error("The export job for galaxy couldn't be saved")
             return false;
         }
         return true;
@@ -39,7 +42,7 @@ class RetrieveDataService {
             newJob.jobStatus = newState;
             newJob.save();
         }catch(e){
-            log.error("The export job for galaxy couldn't be updated")
+            logger.error("The export job for galaxy couldn't be updated")
             return false;
         }
         return true;
@@ -163,7 +166,7 @@ class RetrieveDataService {
 
         switch (exports.size()){
             case 0:
-                log.error("An error has occured while exporting to galaxy. The job name doesn't existe in the database");
+                logger.error("An error has occured while exporting to galaxy. The job name doesn't existe in the database");
                 return null;
             case 1:
                 return exports[0];
