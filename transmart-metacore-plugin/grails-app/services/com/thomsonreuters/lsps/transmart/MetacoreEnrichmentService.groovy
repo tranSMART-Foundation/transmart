@@ -1,5 +1,6 @@
 package com.thomsonreuters.lsps.transmart
 
+import groovy.util.logging.Slf4j
 import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
 import org.apache.http.util.EntityUtils
@@ -9,6 +10,7 @@ import static groovyx.net.http.Method.*
 
 import org.transmart.plugin.shared.SecurityService
 
+@Slf4j('logger')
 class MetacoreEnrichmentService {
 
     boolean transactional = true
@@ -135,7 +137,7 @@ class MetacoreEnrichmentService {
 		if (settingsMode == 'demo') {
 			// demo enrichment
 
-			log.info "Running demo enrichment: ${baseUrl}"
+			logger.info "Running demo enrichment: ${baseUrl}"
 
             site.post( path: '/enrichmentApp/enrichment',
                     body: [ limit: 50, idtype: cohortGeneLists['IdType'], id: cohortGeneLists['Data'][0] ]) {
@@ -148,14 +150,14 @@ class MetacoreEnrichmentService {
 		else {
 			// call API functions
 
-			log.info 'MetaCore - logging in'
+			logger.info 'MetaCore - logging in'
 			site.get( path: '/api/rpc.cgi',
 			  query: [ proc: 'login', login: metacoreParams.login, passwd: metacoreParams.password, output: 'json' ] ) {
 			  	resp, json ->
 
 				  def authKey = json?.Result[0]?.Key
 				  if (authKey) {
-					  log.info 'MetaCore - running enrichment'
+					  logger.info 'MetaCore - running enrichment'
 
 					  EntityUtils.consumeQuietly(resp.entity) // avoid "IllegalStateException: Invalid use of BasicClientConnManager: connection still allocated" thanks to http://stackoverflow.com/a/16211729/535203
 
@@ -171,7 +173,7 @@ class MetacoreEnrichmentService {
 						  EntityUtils.consumeQuietly(resp2.entity) // avoid "IllegalStateException: Invalid use of BasicClientConnManager: connection still allocated" thanks to http://stackoverflow.com/a/16211729/535203
 					  }
 
-					  log.info 'MetaCore - logging out'
+					  logger.info 'MetaCore - logging out'
 					  site.get ( path: '/api/rpc.cgi', query: [ proc: 'logout', auth_key: authKey ] )
 				  }
 			}

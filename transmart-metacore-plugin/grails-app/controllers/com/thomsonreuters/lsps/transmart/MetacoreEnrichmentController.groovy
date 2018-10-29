@@ -3,9 +3,11 @@ package com.thomsonreuters.lsps.transmart
 import com.transmart.util.FileWriterUtil
 
 import grails.converters.JSON
+@Slf4j('logger')
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
+@Slf4j('logger')
 class MetacoreEnrichmentController {
 	
 	def metacoreEnrichmentService
@@ -71,7 +73,7 @@ class MetacoreEnrichmentController {
 					z_score = Double.parseDouble(values[7])
 				}
 				catch (e) {
-					log.debug "Can not parse z_score ${values[7]}"
+					logger.debug "Can not parse z_score ${values[7]}"
 				}
 				if (values[11] && Math.abs(z_score) >= threshold) geneList << values[11]
 			}
@@ -84,7 +86,7 @@ class MetacoreEnrichmentController {
 			Data: [geneList as List]	
 		]
 		
-		log.info "Running enrichment for ${geneList.size()} genes; |z| >= ${threshold}"
+		logger.info "Running enrichment for ${geneList.size()} genes; |z| >= ${threshold}"
 		
 		render metacoreEnrichmentService.getEnrichmentByMaps(cohortData, metacoreParams) as JSON
 	}
@@ -97,7 +99,7 @@ class MetacoreEnrichmentController {
 			Data: [params.IdList as List]
 		]
 		
-		log.info "Running enrichment for ${params.IdList.size()} genes (IdType passed: ${params.IdType})"
+		logger.info "Running enrichment for ${params.IdList.size()} genes (IdType passed: ${params.IdType})"
 		
 		render metacoreEnrichmentService.getEnrichmentByMaps(cohortData, metacoreParams) as JSON
 	}
@@ -117,22 +119,22 @@ class MetacoreEnrichmentController {
 		def settings = params.settings
 		
 		if (params.containsKey('mode')) {
-			log.info "MC Settings - Setting mode: ${params.mode}"
+			logger.info "MC Settings - Setting mode: ${params.mode}"
 			metacoreEnrichmentService.setMetacoreSettingsMode(params.mode)
 		}	
 		
 		if (params.containsKey('baseUrl')) {
-			log.info "MC Settings - Setting baseUrl: ${params.baseUrl}"
+			logger.info "MC Settings - Setting baseUrl: ${params.baseUrl}"
 			metacoreEnrichmentService.setMetacoreBaseUrl(params.baseUrl)
 		}	
 		
 		if (params.containsKey('login')) {
-			log.info "MC Settings - Setting login: ${params.login}"
+			logger.info "MC Settings - Setting login: ${params.login}"
 			metacoreEnrichmentService.setMetacoreLogin(params.login)
 		}
 		
 		if (params.containsKey('password')) {
-			log.info "MC Settings - Setting new password"
+			logger.info "MC Settings - Setting new password"
 			metacoreEnrichmentService.setMetacorePassword(params.password)
 		}
 		
