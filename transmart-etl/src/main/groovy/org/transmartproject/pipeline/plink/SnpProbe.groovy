@@ -30,13 +30,11 @@ package org.transmartproject.pipeline.plink
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
-
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class SnpProbe {
-
-	private static final Logger log = Logger.getLogger(SnpProbe)
 
 	Sql deapp
 	String annotationTable
@@ -49,13 +47,13 @@ class SnpProbe {
 		// store unique set of SNP ID -> rs#
 		Map rs = [:]
 		if(probeInfo.size() >0){
-			log.info("Start loading " + probeInfo.toString() + " into DE_SNP_PROBE ...")
+			logger.info("Start loading " + probeInfo.toString() + " into DE_SNP_PROBE ...")
 			probeInfo.eachLine{
 				String [] str = it.split(/\t/)
 				rs[str[0]] = str[1]
 			}
 		}else{
-			log.error(probeInfo.toString() + " is empty.")
+			logger.error(probeInfo.toString() + " is empty.")
 		}
 
 		String qry = """ insert into tmp_de_snp_probe(probe_name, snp_name) values(?, ?) """
@@ -71,7 +69,7 @@ class SnpProbe {
 
 		loadSnpProbe("tmp_de_snp_probe")
 
-		log.info "Drop the temp table TMP_DE_SNP_PROBE "
+		logger.info "Drop the temp table TMP_DE_SNP_PROBE "
 		qry = " drop table tmp_de_snp_probe purge"
 		deapp.execute(qry)
 	}
@@ -79,7 +77,7 @@ class SnpProbe {
 	
 	void loadSnpProbe(String tmpSnpProbeTable){
 
-		log.info "Start loading data into the table DE_SNP_PROBE ... "
+		logger.info "Start loading data into the table DE_SNP_PROBE ... "
 		
 		String qry = """insert into de_snp_probe nologging (probe_name, snp_id, snp_name)
 						select t1.probe_name, t2.snp_info_id, t1.snp_name
@@ -87,13 +85,13 @@ class SnpProbe {
 						where t1.probe_name=t2.name and snp_info_id not in (select snp_id from de_snp_probe)"""
 		deapp.execute(qry)
 
-		log.info "End loading data into the table DE_SNP_PRObE ... "
+		logger.info "End loading data into the table DE_SNP_PRObE ... "
 	}
 	
 	
 	void loadSnpProbe(){
 
-		log.info "Start loading data into the table DE_SNP_PROBE ... "
+		logger.info "Start loading data into the table DE_SNP_PROBE ... "
 
 		String qry = """insert into de_snp_probe nologging (probe_name, snp_id, snp_name)
 						select t1.snp_id, t2.snp_info_id, t1.rs_id
@@ -102,14 +100,14 @@ class SnpProbe {
 							  upper(snp_id) not in (select upper(snp_name) from de_snp_probe)"""
 		deapp.execute(qry)
 
-		log.info "End loading data into the table DE_SNP_PRObE ... "
+		logger.info "End loading data into the table DE_SNP_PRObE ... "
 	}
 
 	
 
 	void loadSnpProbe(Map columnMap){
 
-		log.info "Start loading data into the table DE_SNP_PROBE ... "
+		logger.info "Start loading data into the table DE_SNP_PROBE ... "
 
 		String qry = """insert into de_snp_probe nologging (probe_name, snp_id, snp_name)
 						select distinct t1.${columnMap["probe"]}, t2.snp_info_id, t1.${columnMap["rs"]}
@@ -118,7 +116,7 @@ class SnpProbe {
 							  and t2.snp_info_id not in (select snp_id from de_snp_probe)"""
 		deapp.execute(qry)
 
-		log.info "End loading data into the table DE_SNP_PRObE ... "
+		logger.info "End loading data into the table DE_SNP_PRObE ... "
 	}
 
 
@@ -126,17 +124,17 @@ class SnpProbe {
 
 		String qry = "select count(1) from user_tables where table_name=upper(?)"
 		if(deapp.firstRow(qry, [tempSnpProbeTable])[0] > 0){
-			log.info "Drop table $tempSnpProbeTable ..."
+			logger.info "Drop table $tempSnpProbeTable ..."
 			qry = "drop table $tempSnpProbeTable purge"
 			deapp.execute(qry)
 		}
 
-		log.info "Start creating the temp table $tempSnpProbeTable ..."
+		logger.info "Start creating the temp table $tempSnpProbeTable ..."
 
 		qry = """ create table tmp_de_snp_probe as select * from de_snp_probe where 1=2 """
 		deapp.execute(qry)
 
-		log.info "End creating table $tempSnpProbeTable ..."
+		logger.info "End creating table $tempSnpProbeTable ..."
 	}
 
 

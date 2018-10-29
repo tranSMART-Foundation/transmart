@@ -28,19 +28,17 @@
 
 package org.transmartproject.pipeline.converter
 
-import org.apache.log4j.Logger;
+import groovy.util.logging.Slf4j
 
-
+@Slf4j('logger')
 class CopyNumberFileSplitter {
 
-	private static final Logger log = Logger.getLogger(CopyNumberFileSplitter)
-	
 	File copyNumberFile
 	String copyNumberFilePrefix
 	
 	void splitCopyNumberFile(){
 		
-		log.info "Start reading Copy NUmber file: " + copyNumberFile.toString()
+		logger.info "Start reading Copy NUmber file: " + copyNumberFile.toString()
 		
 		Map cnMap = [:]
 		copyNumberFile.eachLine{
@@ -53,7 +51,7 @@ class CopyNumberFileSplitter {
 	void writeCopyNumberFile(StringBuffer sb, String chr){
 		File cn = new File(copyNumberFilePrefix + ".chr" + chr)
 		if(!cn.exists()){
-			log.info "creat new Copy Number file: " + cn.toString()
+			logger.info "creat new Copy Number file: " + cn.toString()
 			cn.createNewFile()
 		}
 		

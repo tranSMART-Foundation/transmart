@@ -29,12 +29,10 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioAssayAnalysis {
-
-	private static final Logger log = Logger.getLogger(BioAssayAnalysis)
 
 	Sql biomart
 	long bioAssayAnalysisPlatformId
@@ -53,9 +51,9 @@ class BioAssayAnalysis {
 						 VALUES(?, ?, ?, ?, ?, 'comparison', 'Gene Expression', ?, sysdate) """
 
 		if(isBioAssayAnalysisExist(analysisName, studyName)){
-                    //log.info "$analysisName($studyName) already exists in BIO_ASSAY_ANALYSIS ..."
+                    //logger.info "$analysisName($studyName) already exists in BIO_ASSAY_ANALYSIS ..."
 		}else{
-			log.info "Start inserting $analysisName($studyName) into BIO_ASSAY_ANALYSIS ..."
+			logger.info "Start inserting $analysisName($studyName) into BIO_ASSAY_ANALYSIS ..."
 
 			biomart.execute(qry, [
 				analysisName,
@@ -66,7 +64,7 @@ class BioAssayAnalysis {
 				studyName
 			])
 
-			log.info "End inserting $analysisName($studyName) into BIO_ASY_ANALYSIS_PLTFM ..."
+			logger.info "End inserting $analysisName($studyName) into BIO_ASY_ANALYSIS_PLTFM ..."
 		}
 	}
 

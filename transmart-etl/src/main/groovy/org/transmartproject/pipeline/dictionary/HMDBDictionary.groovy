@@ -27,13 +27,12 @@
   
 package org.transmartproject.pipeline.dictionary
 
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
 /** Parses the metabolite dictionary and loads it into the database.
  */
-class HMDBDictionary {
-    private static final Logger log = Logger.getLogger(HMDBDictionary)
+
+@Slf4j('logger')class HMDBDictionary {
 
     static main(args) {
         if (!args) {
@@ -43,7 +42,8 @@ class HMDBDictionary {
 
         def fileLocation = args[0]
 
-        PropertyConfigurator.configure("conf/log4j.properties");
+//        PropertyConfigurator.configure("conf/log4j.properties");
+
         File inputFile = new File(fileLocation)
         HMDBDictionary dict = new HMDBDictionary()
         dict.loadData(inputFile)

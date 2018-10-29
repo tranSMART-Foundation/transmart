@@ -29,12 +29,10 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioObservation {
-
-	private static final Logger log = Logger.getLogger(BioObservation)
 
 	Sql biomart
 
@@ -51,9 +49,9 @@ class BioObservation {
 
 			//if(isBioObservationExist(obsName, obsCode)){
 			if(isBioObservationExist(obsCode)){
-                            //log.info "($obsName, $obsCode) already exists in BIO_OBSERVATION ..."
+                            //logger.info "($obsName, $obsCode) already exists in BIO_OBSERVATION ..."
 			}else{
-				log.info "Load ($obsName, $obsCode) into BIO_OBSERVATION ..."
+				logger.info "Load ($obsName, $obsCode) into BIO_OBSERVATION ..."
 
 				qry = """ insert into bio_observation(obs_name, obs_code, obs_descr, obs_type, obs_code_source) values(?, ?, ?, ?, ?) """
 				biomart.execute(qry, [

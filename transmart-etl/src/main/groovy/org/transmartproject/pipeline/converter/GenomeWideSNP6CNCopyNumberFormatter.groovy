@@ -31,13 +31,10 @@ package org.transmartproject.pipeline.converter
 import java.util.Properties;
 import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
+@Slf4j('logger')
 class GenomeWideSNP6CNCopyNumberFormatter {
-
-	private static final Logger log = Logger.getLogger(GenomeWideSNP6CNCopyNumberFormatter)
 
 	private static Properties props
 
@@ -47,15 +44,15 @@ class GenomeWideSNP6CNCopyNumberFormatter {
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
 		GenomeWideSNP6CNCopyNumberFormatter cnf = new GenomeWideSNP6CNCopyNumberFormatter()
 
 		if(args.size() > 0){
-			log.info("Start loading property files conf/Common.properties and ${args[0]} ...")
+			logger.info("Start loading property files conf/Common.properties and ${args[0]} ...")
 			cnf.setProperties(Util.loadConfiguration(args[0]));
 		} else {
-			log.info("Start loading property files conf/Common.properties and conf/SNP.properties ...")
+			logger.info("Start loading property files conf/Common.properties and conf/SNP.properties ...")
 			cnf.setProperties(Util.loadConfiguration("conf/SNP.properties"));
 		}
 
@@ -85,13 +82,13 @@ class GenomeWideSNP6CNCopyNumberFormatter {
 		String copyNumberFileDirectory = props.get("copy_number_source_directory")
 		String copyNumberFilePattern = props.get("copy_number_file_pattern")
 
-		log.info "Start looking Copy Number file for processing ..."
-		log.info("Search CopyNumber file from " + copyNumberFileDirectory)
+		logger.info "Start looking Copy Number file for processing ..."
+		logger.info("Search CopyNumber file from " + copyNumberFileDirectory)
 
 		File cn = new File(copyNumberFileDirectory)
 		if(cn.isDirectory()){
 			cn.eachFile{
-				log.info "Checking file's pattern: " + it.toString()
+				logger.info "Checking file's pattern: " + it.toString()
 				if(it.toString().indexOf(copyNumberFilePattern) > 0) {
 					al.add(it)
 				}
@@ -121,7 +118,7 @@ class GenomeWideSNP6CNCopyNumberFormatter {
 				else {
 					copyNumberColumnIndex = Integer.parseInt(copyNumberColumn)
 				}
-				log.info("Copy Number Column used: $copyNumberColumn[Column: $copyNumberColumnIndex]")
+				logger.info("Copy Number Column used: $copyNumberColumn[Column: $copyNumberColumnIndex]")
 			}
 			if(it.indexOf("CN_") == 0) {
 				index++
@@ -131,7 +128,7 @@ class GenomeWideSNP6CNCopyNumberFormatter {
 			}
 		}
 
-		log.info("Total processed probes: " + index )
+		logger.info("Total processed probes: " + index )
 
 		return sb
 	}

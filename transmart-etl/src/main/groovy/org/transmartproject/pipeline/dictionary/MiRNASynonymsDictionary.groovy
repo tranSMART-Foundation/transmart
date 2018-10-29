@@ -28,7 +28,7 @@
 package org.transmartproject.pipeline.dictionary
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
+import groovy.util.logging.Slf4j
 import org.apache.log4j.PropertyConfigurator
 import org.transmartproject.pipeline.util.Util
 
@@ -36,8 +36,9 @@ import org.transmartproject.pipeline.util.Util
 /** Extracts synonyms data from tsv file and
  *  adds it to BIOMART.BIO_DATA_EXT_CODE.
  */
+
+@Slf4j('logger')
 class MiRNASynonymsDictionary {
-    private static final Logger log = Logger.getLogger(MiRNASynonymsDictionary)
 
     Sql sqlBiomart
 
@@ -60,12 +61,12 @@ class MiRNASynonymsDictionary {
 
     void loadData(File synonymsFile, String organism) {
         if (!synonymsFile.exists()) {
-            log.error("File is not found: ${synonymsFile.getAbsolutePath()}")
+            logger.error("File is not found: ${synonymsFile.getAbsolutePath()}")
             return
         }
 
         def synonymsMap = parseSynonyms(synonymsFile)
-        log.info("Start loading property file ...")
+        logger.info("Start loading property file ...")
         Properties props = Util.loadConfiguration('')
         sqlBiomart = Util.createSqlFromPropertyFile(props, "biomart")
         try {
@@ -73,7 +74,7 @@ class MiRNASynonymsDictionary {
             def existingSynonymsMap = getExistingSynonymsMap('MIRNA', organism)
             def noInDbBioNamesSet = synonymsMap.keySet() - bioNameIdMap.keySet()
             if (noInDbBioNamesSet) {
-                log.warn("Db missing such symbols: $noInDbBioNamesSet")
+                logger.warn("Db missing such symbols: $noInDbBioNamesSet")
             }
             bioNameIdMap.each {nameIdEntry ->
                 def bioName = nameIdEntry.key
@@ -95,7 +96,7 @@ class MiRNASynonymsDictionary {
 
     Map<String, Set<String>> parseSynonyms(File synonymsFile) {
         if (!synonymsFile.exists()) {
-            log.error("File is not found: ${synonymsFile.getAbsolutePath()}")
+            logger.error("File is not found: ${synonymsFile.getAbsolutePath()}")
             return [:]
         }
 
@@ -120,7 +121,7 @@ class MiRNASynonymsDictionary {
     }
 
     protected void insertSynonym(entry) {
-        log.info "Add $entry.synonym synonym for $entry.bioName"
+        logger.info "Add $entry.synonym synonym for $entry.bioName"
 
         sqlBiomart.executeInsert("""
               insert into BIO_DATA_EXT_CODE(BIO_DATA_ID, CODE, CODE_TYPE, BIO_DATA_TYPE, CODE_SOURCE)
@@ -144,7 +145,7 @@ class MiRNASynonymsDictionary {
           [organism: organism, type: markerType],
             {row ->
                 if (nameIdMap[row.BIO_MARKER_NAME.toUpperCase()]) {
-                    log.warn("Bio marker with the same name detected: $row.BIO_MARKER_NAME")
+                    logger.warn("Bio marker with the same name detected: $row.BIO_MARKER_NAME")
                 }
                 nameIdMap[row.BIO_MARKER_NAME.toUpperCase()] = row.BIO_MARKER_ID
             })

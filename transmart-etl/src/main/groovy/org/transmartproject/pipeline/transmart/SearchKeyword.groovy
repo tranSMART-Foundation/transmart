@@ -29,16 +29,13 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.GroovyRowResult
-import org.apache.log4j.Logger;
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.util.Util
 
-
-
+@Slf4j('logger')
 class SearchKeyword {
-
-    private static final Logger log = Logger.getLogger(SearchKeyword)
 
     Sql biomart
     Sql searchapp
@@ -59,7 +56,7 @@ class SearchKeyword {
      */
     void loadPathwaySearchKeyword(String primarySourceCode) {
 
-        log.info("Start loading search keyword for pathways '${primarySourceCode}'...")
+        logger.info("Start loading search keyword for pathways '${primarySourceCode}'...")
 
         String qry = """ select distinct bio_marker_name, bio_marker_id, 
 					 primary_source_code, organism,
@@ -82,12 +79,12 @@ class SearchKeyword {
 //                                it.primary_source_code, 'PATHWAY', 'Pathway')
         }
 
-        log.info "End loading search keyword for pathways '${primarySourceCode}'... "
+        logger.info "End loading search keyword for pathways '${primarySourceCode}'... "
     }
 
 
     void loadGeneSearchKeyword() {
-        log.info "Start loading search keyword for all human genes ... "
+        logger.info "Start loading search keyword for all human genes ... "
 
 /*
 ** Specific to human genes
@@ -125,20 +122,20 @@ class SearchKeyword {
         }
 
 
-        log.info "End loading search keyword for all human genes ... "
+        logger.info "End loading search keyword for all human genes ... "
     }
 
 
     void loadOmicsoftGSESearchKeyword(String biomart) {
 
-        log.info "Start deleting search keyword for Omicsoft GSEs ... "
+        logger.info "Start deleting search keyword for Omicsoft GSEs ... "
 
         String qry = """ delete from search_keyword where data_category='STUDY' and
 									display_data_category='GEO' and  keyword like 'GSE%' """
         //searchapp.execute(qry)
 
 
-        log.info "Start inserting search keyword for Omicsoft GSEs ... "
+        logger.info "Start inserting search keyword for Omicsoft GSEs ... "
 
         qry = """ insert into search_keyword (keyword, bio_data_id, unique_id, data_category, display_data_category)
 				  select distinct accession, bio_experiment_id, 'Omicsoft: '||accession, 'STUDY', 'GEO'
@@ -147,19 +144,19 @@ class SearchKeyword {
 			  """
         searchapp.execute(qry)
 
-        log.info "Start loading search keyword for Omicsoft GSEs ... "
+        logger.info "Start loading search keyword for Omicsoft GSEs ... "
     }
 
 
     void loadOmicsoftCompoundSearchKeyword() {
 
-        log.info "Start deleting search keyword for Omicsoft compounds ... "
+        logger.info "Start deleting search keyword for Omicsoft compounds ... "
 
         String qry = """ delete from search_keyword where data_category='COMPOUND' and source_code='Omicsoft' """
         //searchapp.execute(qry)
 
 
-        log.info "Start inserting search keyword for Omicsoft compounds ... "
+        logger.info "Start inserting search keyword for Omicsoft compounds ... "
 
         qry = """ insert into search_keyword (bio_data_id, keyword, unique_id, data_category, display_data_category, source_code)
 				  select t2.bio_compound_id, t1.code_name, 'COM:'||t1.cas_registry, 'COMPOUND', 'Compound', 'Omicsoft'
@@ -169,19 +166,19 @@ class SearchKeyword {
 			  """
         searchapp.execute(qry)
 
-        log.info "Start loading search keyword for Omicsoft compounds ... "
+        logger.info "Start loading search keyword for Omicsoft compounds ... "
     }
 
 
     void loadOmicsoftDiseaseSearchKeyword(String biomart) {
 
-        log.info "Start deleting search keyword for Omicsoft diseases ... "
+        logger.info "Start deleting search keyword for Omicsoft diseases ... "
 
         String qry = """ delete from search_keyword where data_category='DISEASE' and source_code='Omicsoft' """
         //searchapp.execute(qry)
 
 
-        log.info "Start inserting search keyword for Omicsoft diseases ... "
+        logger.info "Start inserting search keyword for Omicsoft diseases ... "
 
         qry = """ insert into search_keyword (bio_data_id, keyword, unique_id, data_category, display_data_category, source_code)
 				  select distinct t2.bio_disease_id, t1.disease, 'DIS:'||t1.mesh_code, 'DISEASE', 'Disease', ''
@@ -191,16 +188,16 @@ class SearchKeyword {
 			  """
         searchapp.execute(qry)
 
-        log.info "End loading search keyword for Omicsoft diseases ... "
+        logger.info "End loading search keyword for Omicsoft diseases ... "
     }
 
 
     void loadOmicsoftCompoundSearchKeyword(String biomart) {
 
-        log.info "Start deleting search keyword for Omicsoft diseases ... "
+        logger.info "Start deleting search keyword for Omicsoft diseases ... "
         //searchapp.execute(qry)
 
-        log.info "End loading search keyword for Omicsoft diseases ... "
+        logger.info "End loading search keyword for Omicsoft diseases ... "
     }
 
 
@@ -209,9 +206,9 @@ class SearchKeyword {
                              String displayDataCategory) {
 
         if (isSearchKeywordExist(keyword, dataCategory) || isSearchKeywordExistById(uniqueId, dataCategory) ) {
-            //log.info "$keyword:$dataCategory:$bioDataId already exists in SEARCH_KEYWORD ..."
+            //logger.info "$keyword:$dataCategory:$bioDataId already exists in SEARCH_KEYWORD ..."
         } else {
-            log.info "Save $keyword:$dataCategory:$bioDataId into SEARCH_KEYWORD ..."
+            logger.info "Save $keyword:$dataCategory:$bioDataId into SEARCH_KEYWORD ..."
             savedKeys.add([
                     keyword,
                     bioDataId,
@@ -220,7 +217,7 @@ class SearchKeyword {
                     sourceCode,
                     displayDataCategory
             ])
-//            log.info "savedKeys "+savedKeys.size()
+//            logger.info "savedKeys "+savedKeys.size()
             if(savedKeys.size() >= 1) {
                 doInsertSearchKeyword()
             }
@@ -235,12 +232,12 @@ class SearchKeyword {
 					   source_code, display_data_category)
                                      values(?, ?, ?, ?, ?, ?) """
 
-        log.info "doInsertSearchKeyword list size: "+savedKeys.size()
+        logger.info "doInsertSearchKeyword list size: "+savedKeys.size()
         searchapp.withTransaction {
             searchapp.withBatch(qry, {stmt ->
                 savedKeys.each {
-                    log.info "savedKeys ${it}"
-                    log.info "Insert ${it[0]}:${it[3]}:${it[1]} into SEARCH_KEYWORD ..."
+                    logger.info "savedKeys ${it}"
+                    logger.info "Insert ${it[0]}:${it[3]}:${it[1]} into SEARCH_KEYWORD ..."
                     searchapp.execute(qry, it)
                 }
             })
@@ -295,7 +292,7 @@ class SearchKeyword {
     void closeSearchKeyword(){
         int nkeys = savedKeys.size()
         if(nkeys > 0) {
-            log.info "closeSearchKeyword insert remaining $nkeys keys"
+            logger.info "closeSearchKeyword insert remaining $nkeys keys"
             doInsertSearchKeyword()
         }
     }

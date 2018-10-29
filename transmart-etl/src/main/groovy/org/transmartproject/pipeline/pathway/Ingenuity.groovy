@@ -38,18 +38,16 @@ import org.transmartproject.pipeline.transmart.SearchKeywordTerm
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class Ingenuity {
-
-	private static final Logger log = Logger.getLogger(Ingenuity)
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
-		log.info("Start loading property file loader.properties ...")
+		logger.info("Start loading property file loader.properties ...")
 		Properties props = Util.loadConfiguration("conf/loader.properties");
 
 		Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
@@ -71,7 +69,7 @@ class Ingenuity {
 
 		// populate DE_PATHWAY
 		if(props.get("skip_de_pathway").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading Ingenuity pathway into DE_PATHWAY ..."
+			logger.info "Skip loading Ingenuity pathway into DE_PATHWAY ..."
 		}else{
 			Pathway p = new Pathway()
 			p.setSource("Ingenuity")
@@ -85,20 +83,20 @@ class Ingenuity {
 
 		// populate DE_PATHWAY_GENE
 		if(props.get("skip_de_pathway_gene").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into DE_PATHWAY_GENE ..."
+			logger.info "Skip loading new records into DE_PATHWAY_GENE ..."
 		}else{
 			PathwayGene pg = new PathwayGene()
 			pg.setSource("Ingenuity")
 			pg.setDeapp(deapp)
 
-			log.info "Start loading DE_PATHWAY_GENE for Ingenuity ..."
+			logger.info "Start loading DE_PATHWAY_GENE for Ingenuity ..."
 			pg.loadPathwayGene(ipaData, pathwayId)
 		}
 
 		
 		// populate BIO_MARKER
 		if(props.get("skip_bio_marker").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into BIO_MARKER ..."
+			logger.info "Skip loading new records into BIO_MARKER ..."
 		}else{
 			BioMarker bm = new BioMarker()
 			bm.setBiomart(biomart)
@@ -117,7 +115,7 @@ class Ingenuity {
 
 		// populate BIO_DATA_CORRELATION
 		if(props.get("skip_bio_data_correlation").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into BIO_DATA_CORRELATION ..."
+			logger.info "Skip loading new records into BIO_DATA_CORRELATION ..."
 		}else{
 			BioDataCorrelation bdc = new BioDataCorrelation()
 			bdc.setBiomart(biomart)
@@ -131,7 +129,7 @@ class Ingenuity {
 
 		// populate SEARCH_KEYWORD
 		if(props.get("skip_search_keyword").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into SEARCH_KEYWORD ..."
+			logger.info "Skip loading new records into SEARCH_KEYWORD ..."
 		}else{
 			SearchKeyword sk = new SearchKeyword()
 			sk.setSearchapp(searchapp)
@@ -143,7 +141,7 @@ class Ingenuity {
 		
 		// populate SEARCH_KEYWORD_TERM
 		if(props.get("skip_search_keyword_term").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into SEARCH_KEYWORD_TERM  ..."
+			logger.info "Skip loading new records into SEARCH_KEYWORD_TERM  ..."
 		}else{
 			SearchKeywordTerm skt = new SearchKeywordTerm()
 			skt.setSearchapp(searchapp)
@@ -161,7 +159,7 @@ class Ingenuity {
 		println "Entrez: " + entrez.size() + "\t" + entrez["207"]
 
 		if(input.size() >0){
-			log.info ("Start processing " + input.toString())
+			logger.info ("Start processing " + input.toString())
 		}else{
 			throw new RuntimeException(input.toString() + " is empty")
 		}
@@ -229,7 +227,7 @@ class Ingenuity {
 		createPathwayDataTable(biomart, pathwayDataTable)
 
 		if(ipaData.size() > 0){
-			log.info ("Start loading " + ipaData.toString())
+			logger.info ("Start loading " + ipaData.toString())
 		}else{
 			throw new RuntimeException(ipaData.toString() + " is empty")
 		}

@@ -34,16 +34,14 @@ import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
 import groovy.sql.GroovyRowResult
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.transmart.SearchKeyword
 import org.transmartproject.pipeline.transmart.SearchKeywordTerm
 
 
 
+@Slf4j('logger')
 class VCF {
-
-	private static final Logger log = Logger.getLogger(VCF)
 
 	private String genePairDelimiter, geneSymbolDelimiter
 	private int batchSize
@@ -53,9 +51,9 @@ class VCF {
 	
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 		
-		log.info("Start loading property file VCF.properties ...")
+		logger.info("Start loading property file VCF.properties ...")
 		Properties props = Util.loadConfiguration("conf/VCF.properties");
 
 		Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
@@ -105,9 +103,9 @@ class VCF {
             String hgVersion = props.get("human_genome_version")
 
             if(props.get("skip_de_rc_snp_info").toString().toLowerCase().equals("yes")){
-                log.info("Skip loading VCF's SNP RS# from table $vcfTable into DE_RC_SNP_INFO ...")
+                logger.info("Skip loading VCF's SNP RS# from table $vcfTable into DE_RC_SNP_INFO ...")
             }else{
-                log.info("Start loading VCF's SNP RS# from $vcfTable into DE_RC_SNP_INFO ...")
+                logger.info("Start loading VCF's SNP RS# from $vcfTable into DE_RC_SNP_INFO ...")
 
                 if (isPostgres) {
                     qry1 = "select rs_id,chrom, pos, ref, alt, gene_info, variation_class, $hgVersion AS hgversion from tm_lz.$vcfTable "
@@ -133,18 +131,18 @@ class VCF {
                             rowResult = deapp.firstRow(qry2, [snpInfoId, it.hgversion, it.rs_id])
                             int count = rowResult[0]
                             if(count > 0){
-                                log.info "${it.rs_id}:${it.chrom}:${it.pos} already exists in DE_RC_SNP_INFO ..."
+                                logger.info "${it.rs_id}:${it.chrom}:${it.pos} already exists in DE_RC_SNP_INFO ..."
                             }
                             else{
                                 if(it.gene_info == null || it.gene_info.indexOf(":") < 0) {
-                                    log.info "Insert ${it.rs_id}:${it.chrom}:${it.pos} ${snpInfoId} '' into DE_RC_SNP_INFO ..."
+                                    logger.info "Insert ${it.rs_id}:${it.chrom}:${it.pos} ${snpInfoId} '' into DE_RC_SNP_INFO ..."
                                     ps.addBatch([snpInfoId, it.rs_id, it.chrom, it.pos, it.ref, it.alt,
                                                  it.gene_info, null, null, it.variation_class, it.hgversion])
                                 } else {
                                     String[] genes = it.gene_info.split(/(:|\|)/)
                                     String geneName = genes[0]
                                     long geneId = genes[1].toInteger()
-                                    log.info "Insert ${it.rs_id}:${it.chrom}:${it.pos} ${snpInfoId} ${geneName}:${geneId} into DE_RC_SNP_INFO ..."
+                                    logger.info "Insert ${it.rs_id}:${it.chrom}:${it.pos} ${snpInfoId} ${geneName}:${geneId} into DE_RC_SNP_INFO ..."
                                     ps.addBatch([snpInfoId, it.rs_id, it.chrom, it.pos, it.ref, it.alt,
                                                  it.gene_info, geneName, geneId, it.variation_class, it.hgversion])
                                 }
@@ -153,7 +151,7 @@ class VCF {
                     })
                 //}
 
-                log.info("End loading VCF's SNP RS# from $vcfTable into DE_RC_SNP_INFO ...")
+                logger.info("End loading VCF's SNP RS# from $vcfTable into DE_RC_SNP_INFO ...")
             }
 	}
 
@@ -167,14 +165,14 @@ class VCF {
             String qry4;
             String vcfGeneTable = "vcf" + props.get("human_genome_version") + "_gene"
             if(isPostgres) {
-                log.info("On Postgres DE_SNP_GENE_MAP is a view, no need to load copy of data ...")
+                logger.info("On Postgres DE_SNP_GENE_MAP is a view, no need to load copy of data ...")
             }
             else {
     
                 if(props.get("skip_de_snp_gene_map").toString().toLowerCase().equals("yes")){
-                    log.info("Skip loading VCF's SNP RS# from table $vcfGeneTable into DE_SNP_GENE_MAP ...")
+                    logger.info("Skip loading VCF's SNP RS# from table $vcfGeneTable into DE_SNP_GENE_MAP ...")
                 }else{
-                    log.info("Start loading VCF's SNP RS# from $vcfGeneTable into DE_SNP_GENE_MAP ...")
+                    logger.info("Start loading VCF's SNP RS# from $vcfGeneTable into DE_SNP_GENE_MAP ...")
 
                     if(isPostgres) {
                         qry1 = "select rs_id, gene_id from tm_lz.$vcfGeneTable"
@@ -200,17 +198,17 @@ class VCF {
                                 rowResult = deapp.firstRow(qry2, [snpInfoId, it.rs_id, it.gene_id])
                                 int count = rowResult[0]
                                 if(count > 0){
-                                    log.info "${it.rs_id}:${it.gene_id} already exists in DE_SNP_GENE_MAP ..."
+                                    logger.info "${it.rs_id}:${it.gene_id} already exists in DE_SNP_GENE_MAP ..."
                                 }
                                 else{
-                                    log.info "Insert ${it.rs_id}:${it.gene_id} ${snpInfoId} into DE_SNP_GENE_MAP ..."
+                                    logger.info "Insert ${it.rs_id}:${it.gene_id} ${snpInfoId} into DE_SNP_GENE_MAP ..."
                                     ps.addBatch([snpInfoId, it.rs_id, it.gene_id])
                                 }
                             }
                         })
                     //}
                 
-                    log.info("End loading VCF's SNP RS# from $vcfGeneTable into DE_SNP_GENE_MAP ...")
+                    logger.info("End loading VCF's SNP RS# from $vcfGeneTable into DE_SNP_GENE_MAP ...")
                 }
             }
 	}
@@ -225,9 +223,9 @@ class VCF {
             String vcfTable = "vcf" + props.get("human_genome_version")
 
             if(props.get("skip_de_snp_info").toString().toLowerCase().equals("yes")){
-                log.info("Skip loading VCF's SNP RS# from table $vcfTable into DE_SNP_INFO ...")
+                logger.info("Skip loading VCF's SNP RS# from table $vcfTable into DE_SNP_INFO ...")
             }else{
-                log.info("Start loading VCF's SNP RS# from table $vcfTable into DE_SNP_INFO ...")
+                logger.info("Start loading VCF's SNP RS# from table $vcfTable into DE_SNP_INFO ...")
 
                 if(isPostgres) {
                     qry1 = "select rs_id, chrom, pos from tm_lz.$vcfTable"
@@ -245,10 +243,10 @@ class VCF {
                             GroovyRowResult rowResult = deapp.firstRow(qry2, [it.rs_id, it.chrom, it.pos])
                             int count = rowResult[0]
                             if(count > 0){
-                                log.info "${it.rs_id}:${it.chrom}:${it.pos} already exists in DE_SNP_INFO ..."
+                                logger.info "${it.rs_id}:${it.chrom}:${it.pos} already exists in DE_SNP_INFO ..."
                             }
                             else{
-                                log.info "Insert ${it.rs_id}:${it.chrom}:${it.pos} into DE_SNP_INFO ..."
+                                logger.info "Insert ${it.rs_id}:${it.chrom}:${it.pos} into DE_SNP_INFO ..."
                                 ps.addBatch([it.rs_id, it.chrom, it.pos])
                             }
                         }
@@ -256,7 +254,7 @@ class VCF {
                     })
                     //}
                 
-                log.info("End loading VCF's SNP RS# from table $vcfTable into DE_SNP_INFO ...")
+                logger.info("End loading VCF's SNP RS# from table $vcfTable into DE_SNP_INFO ...")
             }
 	}
 
@@ -268,9 +266,9 @@ class VCF {
             String qrysyn;
 
             if(props.get("skip_search_keyword").toString().toLowerCase().equals("yes")){
-                log.info("Skip loading SNP RS# from DE_SNP_INFO to SEARCH_KEYWORD ...")
+                logger.info("Skip loading SNP RS# from DE_SNP_INFO to SEARCH_KEYWORD ...")
             }else{
-                log.info("Start loading SNP RS# from DE_SNP_INFO to SEARCH_KEYWORD ...")
+                logger.info("Start loading SNP RS# from DE_SNP_INFO to SEARCH_KEYWORD ...")
 
                 if(isPostgres) {
     			//String stmt = "alter table search_keyword disable constraint "
@@ -296,7 +294,7 @@ class VCF {
                     }
                 }
                 
-                log.info("End loading SNP RS# from table DE_SNP_INFO into SEARCH_KEYWORD ...")
+                logger.info("End loading SNP RS# from table DE_SNP_INFO into SEARCH_KEYWORD ...")
             }
 	}
 
@@ -315,7 +313,7 @@ class VCF {
 						 values(?, ?, ?, ?, ?,  ?, ?, ?, ?) """
 
 		if(vcfData.size() > 0){
-			log.info("Start loading VCF data from the file [${vcfData.toString()}] into the table ${vcfTable} ...")
+			logger.info("Start loading VCF data from the file [${vcfData.toString()}] into the table ${vcfTable} ...")
 			//biomart.withTransaction {
 			biomart.withBatch(batchSize, qry, { stmt ->
 				vcfData.eachLine {
@@ -379,9 +377,9 @@ class VCF {
 				}
 			})
 			//}
-			log.info("End loading VCF data into ${vcfTable} ...")
+			logger.info("End loading VCF data into ${vcfTable} ...")
 		}else{
-			log.error("File ${vcfData.toString()} is empty or does not exist ...")
+			logger.error("File ${vcfData.toString()} is empty or does not exist ...")
 		}
 	}
 
@@ -394,7 +392,7 @@ class VCF {
 
 		File input = new File(props.get("vcf_source_file") + ".gene")
 		if(input.size() > 0){
-			log.info("Start loading VCF data into ${vcfGeneTable} ...")
+			logger.info("Start loading VCF data into ${vcfGeneTable} ...")
 			//biomart.withTransaction {
 			biomart.withBatch(batchSize, qry, { stmt ->
 				input.eachLine{
@@ -407,14 +405,14 @@ class VCF {
 			})
 			//}
 		} else{
-			log.info(input.toString() + " is empty or does not exist ...")
+			logger.info(input.toString() + " is empty or does not exist ...")
 		}
 	}
 
 
 	void processVCFData(Properties props){
 		if(props.get("skip_process_vcf_data").toString().toLowerCase().equals("yes")){
-			log.info("Skip processing VCF data: ${props.get("vcf_source_file")} ...")
+			logger.info("Skip processing VCF data: ${props.get("vcf_source_file")} ...")
 		}else{
 			File input = new File(props.get("vcf_source_file"))
 
@@ -430,9 +428,9 @@ class VCF {
 			}
 			geneOutput.createNewFile()
 
-			log.info("Start processing VCF data: " + input.toString() + "...")
+			logger.info("Start processing VCF data: " + input.toString() + "...")
 			readVCFData1(input, output, geneOutput, props)
-			log.info("End processing VCF data: " + input.toString() + "...")
+			logger.info("End processing VCF data: " + input.toString() + "...")
 		}
 	}
 
@@ -507,7 +505,7 @@ class VCF {
 			}
 
 			println lineNum
-			log.info("Total SNP# in " + vcfInput.toString() + ": \t" + lineNum)
+			logger.info("Total SNP# in " + vcfInput.toString() + ": \t" + lineNum)
 
 			output.append(sb.toString())
 			sb.delete(0, sb.size())
@@ -515,7 +513,7 @@ class VCF {
 			geneOutput.append(line.toString())
 			line.delete(0, line.size())
 		}else{
-			log.error("The file " + vcfInput.toString() + " is empty or does not exist ...")
+			logger.error("The file " + vcfInput.toString() + " is empty or does not exist ...")
 		}
 	}
 
@@ -551,7 +549,7 @@ class VCF {
 			}
 
 			println lineNum
-			log.info("Total SNP# in " + vcfInput.toString() + ": \t" + lineNum)
+			logger.info("Total SNP# in " + vcfInput.toString() + ": \t" + lineNum)
 
 			output.append(line.toString())
 			line.setLength(0)
@@ -559,7 +557,7 @@ class VCF {
 			geneOutput.append(gene.toString())
 			gene.setLength(0)
 		}else{
-			log.error("The file " + vcfInput.toString() + " is empty or does not exist ...")
+			logger.error("The file " + vcfInput.toString() + " is empty or does not exist ...")
 		}
 	}
 
@@ -675,10 +673,10 @@ class VCF {
             String vcfTable = "vcf" + props.get("human_genome_version")
 
             if(props.get("skip_create_vcf_index").toString().toLowerCase().equals("yes")){
-                log.info("Skip creating indexes on table ${vcfTable} ...")
+                logger.info("Skip creating indexes on table ${vcfTable} ...")
             }else{
 
-                log.info "Start creating indexes for table: ${vcfTable}"
+                logger.info "Start creating indexes for table: ${vcfTable}"
 
                 if(isPostgres) {
                     qry = """ create index idx_${vcfTable} on ${vcfTable} (rs_id)"""   /* tablespace indx */
@@ -700,7 +698,7 @@ class VCF {
             
                 sql.execute(qry)
 
-                log.info "End creating indexes for table: ${vcfTable}"
+                logger.info "End creating indexes for table: ${vcfTable}"
             }
         }
 
@@ -719,10 +717,10 @@ class VCF {
             String vcfGeneTable = "vcf" + props.get("human_genome_version") + "_gene"
 
             if(props.get("skip_create_vcf_gene_index").toString().toLowerCase().equals("yes")){
-                log.info("Skip creating indexes on table ${vcfGeneTable} ...")
+                logger.info("Skip creating indexes on table ${vcfGeneTable} ...")
             }else{
 
-                log.info "Start creating indexes for table: ${vcfGeneTable}"
+                logger.info "Start creating indexes for table: ${vcfGeneTable}"
 
                 if (isPostgres) {
                     qry = """ create index idx_${vcfGeneTable} on ${vcfGeneTable} (rs_id) """ /* tablespace indx */
@@ -744,7 +742,7 @@ class VCF {
                 
                 sql.execute(qry)
 
-                log.info "End creating indexes for table: ${vcfGeneTable}"
+                logger.info "End creating indexes for table: ${vcfGeneTable}"
             }
 	}
 
@@ -766,9 +764,9 @@ class VCF {
             String str = ""
 
             if(props.get("skip_create_vcf_table").toString().toLowerCase().equals("yes")){
-                log.info("Skip creating table: ${vcfTable} ...")
+                logger.info("Skip creating table: ${vcfTable} ...")
             }else{
-                log.info "Start creating table: ${vcfTable}"
+                logger.info "Start creating table: ${vcfTable}"
 
                 if(isPostgres){
                     ids.each{ str += "  $it  varchar(1000), \n" }
@@ -840,7 +838,7 @@ class VCF {
                 
                 sql.execute(qry)
 
-                log.info "End creating table: ${vcfTable}"
+                logger.info "End creating table: ${vcfTable}"
             }
 	}
 
@@ -859,9 +857,9 @@ class VCF {
             String vcfGeneTable = "vcf" + props.get("human_genome_version") + "_gene"
 
             if(props.get("skip_create_vcf_gene_table").toString().toLowerCase().equals("yes")){
-                log.info("Skip creating table: ${vcfGeneTable} ...")
+                logger.info("Skip creating table: ${vcfGeneTable} ...")
             }else{
-                log.info "Start creating table: ${vcfGeneTable}"
+                logger.info "Start creating table: ${vcfGeneTable}"
 
                 if(isPostgres) {
                     qry = """ create table ${vcfGeneTable} (
@@ -898,7 +896,7 @@ class VCF {
 
                 sql.execute(qry)
 
-			log.info "End creating table: ${vcfGeneTable}"
+			logger.info "End creating table: ${vcfGeneTable}"
 		}
 	}
 

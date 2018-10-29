@@ -28,13 +28,11 @@
 
 package org.transmartproject.pipeline.converter
 
+import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.util.Util
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class PlinkFamGenerator {
-
-	private static final Logger log = Logger.getLogger(PlinkFamGenerator)
 
 	Map patientMap, samples
 	File plinkFamFile
@@ -50,12 +48,12 @@ class PlinkFamGenerator {
 		
 		plinkFamFile = getPlinkFamFile()
 		if(plinkFamFile.size() > 0) {
-			log.info("Delete and re-create " + plinkFamFile.toString())
+			logger.info("Delete and re-create " + plinkFamFile.toString())
 			plinkFamFile.delete()
 			plinkFamFile.createNewFile()
 		}
 
-		log.info "Start creating .fam file: " + plinkFamFile.toString()
+		logger.info "Start creating .fam file: " + plinkFamFile.toString()
 
 		if(isPatientUnique()){
 			samples.each{key, val ->
@@ -63,9 +61,9 @@ class PlinkFamGenerator {
 				plinkFamFile.append(patientMap[key] + "\t" + patientMap[key] + "\t0\t0\t0\t-9\n")
 			}
 		}else{
-			log.error("Duplicated Patient id fount")
+			logger.error("Duplicated Patient id fount")
 		}
-		log.info "End creating .fam file: " + plinkFamFile.toString()
+		logger.info "End creating .fam file: " + plinkFamFile.toString()
 	}
 
 

@@ -35,12 +35,11 @@ import java.util.Map;
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
 import groovy.sql.GroovyRowResult
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class PathwayGene {
-
-	private static final Logger log = Logger.getLogger(PathwayGene)
 
 	Sql deapp
 	Sql biomart
@@ -75,7 +74,7 @@ class PathwayGene {
             deapp.withTransaction {
                 biomartuser.eachRow(qryOrg) { qo ->
                     String organism = qo.organism.toUpperCase()
-//                    log.info "organism: '${organism}'"
+//                    logger.info "organism: '${organism}'"
                     Map marker = [:]
                     biomartuser.eachRow(qryGeneMarker, [organism]) { qm ->
                         marker[qm.bio_marker_name] = qm.primary_external_id
@@ -91,10 +90,10 @@ class PathwayGene {
                                 GroovyRowResult rowResult = deapp.firstRow(qryPathId, [qp.pathway])
                                 if(rowResult != null) {
                                     dePathwayId = rowResult[0];
-                                    log.info "Pathway '${qp.pathway}' id '${dePathwayId}'"
+                                    logger.info "Pathway '${qp.pathway}' id '${dePathwayId}'"
                                 }
                                 else {
-                                    log.info "Pathway '${qp.pathway}' id not found..."
+                                    logger.info "Pathway '${qp.pathway}' id not found..."
                                     dePathwayId = null
                                 }
                             }
@@ -103,15 +102,15 @@ class PathwayGene {
                                 GroovyRowResult geneResult = deapp.firstRow(qryPathGeneExists, [dePathwayId, qp.gene_symbol,extId])
                                 int count = geneResult[0]
                                 if(count > 0) {
-                                    //log.info "$dePathwayId:$it.gene_symbol:$extId already exists in DE_PATHWAY_GENE ..."
+                                    //logger.info "$dePathwayId:$it.gene_symbol:$extId already exists in DE_PATHWAY_GENE ..."
                                 }
                                 else{
-                                    log.info "Insert $dePathwayId:$qp.gene_symbol:$extId into DE_PATHWAY_GENE ..."
+                                    logger.info "Insert $dePathwayId:$qp.gene_symbol:$extId into DE_PATHWAY_GENE ..."
                                     ps.addBatch([dePathwayId, qp.gene_symbol, extId])
                                 }
                             }
                             else {
-                                log.info "'Marker '${qp.gene_symbol}' 'GENE' not found in bio_marker for '${qo.organism}'"
+                                logger.info "'Marker '${qp.gene_symbol}' 'GENE' not found in bio_marker for '${qo.organism}'"
                             }
                         }
                     })
@@ -129,16 +128,16 @@ class PathwayGene {
 //                            bioMarker.setOrganism(it.organism)
 //                            String extId = bioMarker.getBioMarkerExtID(it.gene_symbol, 'GENE')
 //                            if(extId == null) {
-//                                log.info "$it.gene_symbol 'GENE' not found in bio_marker for ${it.organism}"
+//                                logger.info "$it.gene_symbol 'GENE' not found in bio_marker for ${it.organism}"
 //                            }
 //                            else {
 //                                GroovyRowResult geneResult = deapp.firstRow(qry3, [dePathwayId, it.gene_symbol, extId])
 //                                int count = geneResult[0]
 //                                if(count > 0){
-//                                    //log.info "$dePathwayId:$it.gene_symbol:$extId already exists in DE_PATHWAY_GENE ..."
+//                                    //logger.info "$dePathwayId:$it.gene_symbol:$extId already exists in DE_PATHWAY_GENE ..."
 //                                }
 //                                else{
-//                                    log.info "Insert $dePathwayId:$it.gene_symbol:$extId into DE_PATHWAY_GENE ..."
+//                                    logger.info "Insert $dePathwayId:$it.gene_symbol:$extId into DE_PATHWAY_GENE ..."
 //                                    ps.addBatch([dePathwayId, it.gene_symbol, extId])
 //                                }
 //                            }
@@ -157,15 +156,15 @@ class PathwayGene {
 		if(pathwayData.exists()){
 
 			if(isPathwayGeneSourceExist()){
-				log.warn("Pathway Gene from $source already loaded into DE_PATHWAY_GENE")
+				logger.warn("Pathway Gene from $source already loaded into DE_PATHWAY_GENE")
 
-				log.info("Start delete data for ${source} from DE_PATHWAY_GENE ...")
+				logger.info("Start delete data for ${source} from DE_PATHWAY_GENE ...")
 
 				String qry1 = "delete from de_pathway_gene where source=?"
 				deapp.execute(qry1, [source])
 			}
 
-			log.info("Start loading " + pathwayData.toString() + " into DE_PATHWAY_GENE")
+			logger.info("Start loading " + pathwayData.toString() + " into DE_PATHWAY_GENE")
 
 			deapp.withTransaction {
                             deapp.withBatch(1000, qry, { ps ->
@@ -202,9 +201,9 @@ class PathwayGene {
 		if(geneAssociation.exists()){
 
 			if(isPathwayGeneExistSource()){
-				log.info("Pathway Gene from $source already loaded into DE_PATHWAY_GENE")
+				logger.info("Pathway Gene from $source already loaded into DE_PATHWAY_GENE")
 			}else{
-				log.info("Start loading " + geneAssociation.toString() + " into DE_PATHWAY_GENE")
+				logger.info("Start loading " + geneAssociation.toString() + " into DE_PATHWAY_GENE")
 
 				geneAssociation.eachLine{
 					str = it.split("\t")
@@ -238,11 +237,11 @@ class PathwayGene {
 		if(pathwayData.exists()){
 			pathwayData.eachLine{
 				str = it.split("\t")
-				//log.info str[0] + "\t" + str[1] + "\t" + str[2]
+				//logger.info str[0] + "\t" + str[1] + "\t" + str[2]
 				insertPathwayGene(str[0], str[2], str[1])
 			}
 		}else{
-			log.error("Cannot find Pathway Definition file: " + pathwayData.toString())
+			logger.error("Cannot find Pathway Definition file: " + pathwayData.toString())
 			throw new RuntimeException("Cannot find Pathway Definition file: " + pathwayData.toString())
 		}
 	}
@@ -253,9 +252,9 @@ class PathwayGene {
 		String qry = "insert into de_pathway_gene(pathway_id, gene_symbol, gene_id) values(?,?,?)"
 
 		if(isPathwayGeneExist(pathwayIdMap[pathwayId].toString(), geneId)){
-                    //log.info "Pathway data for ($pathwayId, $geneSymbol, $geneId) already exists ..."
+                    //logger.info "Pathway data for ($pathwayId, $geneSymbol, $geneId) already exists ..."
 		}else{
-			log.info "Loading pathway data ($pathwayId, $geneSymbol, $geneId) ..."
+			logger.info "Loading pathway data ($pathwayId, $geneSymbol, $geneId) ..."
 			deapp.execute(qry, [
 				pathwayIdMap[pathwayId],
 				geneSymbol,

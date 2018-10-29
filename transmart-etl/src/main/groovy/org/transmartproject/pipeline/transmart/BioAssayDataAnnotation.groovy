@@ -29,18 +29,16 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioAssayDataAnnotation {
-
-	private static final Logger log = Logger.getLogger(BioAssayDataAnnotation)
 
 	Sql biomart
 	String testsDataTable, gxAnnotationTable
 
 	void loadBioAssayDataAnnotation(){
-		log.info "Start loading new probes into BIO_ASSAY_DATA_ANNOTATION ..."
+		logger.info "Start loading new probes into BIO_ASSAY_DATA_ANNOTATION ..."
 		
 		String qry = """ insert into bio_assay_data_annotation(bio_assay_feature_group_id, bio_marker_id)
 						 select t1.bio_assay_feature_group_id, t3.bio_marker_id
@@ -55,7 +53,7 @@ class BioAssayDataAnnotation {
 						from bio_assay_data_annotation """
 
 		biomart.execute(qry)
-		log.info "End loading new probes into BIO_ASSAY_DATA_ANNOTATION ..."
+		logger.info "End loading new probes into BIO_ASSAY_DATA_ANNOTATION ..."
 	}
 
 

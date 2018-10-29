@@ -29,12 +29,10 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioAssayAnalysisDataTea {
-
-	private static final Logger log = Logger.getLogger(BioAssayAnalysisDataTea)
 
 	Sql biomart
 	String testsDataTable
@@ -42,7 +40,7 @@ class BioAssayAnalysisDataTea {
 
 	void loadBioAssayAnalysisDataTea(){
 
-		log.info "Start loading data into BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+		logger.info "Start loading data into BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 
 		String qry = """ insert /*+ parallel (BIO_ASSAY_ANALYSIS_DATA_TEA, 8) */
 						into BIO_ASSAY_ANALYSIS_DATA_TEA
@@ -79,7 +77,7 @@ class BioAssayAnalysisDataTea {
 
 		biomart.execute(qry)
 
-		log.info "End loading data into BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+		logger.info "End loading data into BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 	}
 
 
@@ -95,7 +93,7 @@ class BioAssayAnalysisDataTea {
 
 
 	void dropBioAssayAnalysisDataTeaIndexes(){
-		log.info "Start dropping indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+		logger.info "Start dropping indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
 
 		String stmt = ""
 		String qry = """ select index_name from user_indexes
@@ -106,13 +104,13 @@ class BioAssayAnalysisDataTea {
 			biomart.execute(stmt)
 		}
 
-		log.info "End dropping indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+		logger.info "End dropping indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
 	}
 
 
 	void createBioAssayAnalysisDataTeaIndexes(){
 
-		log.info "End recreating indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+		logger.info "End recreating indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
 
 		String qry = ""
 		qry = """ create index idx_tea_probe_name on BIO_ASSAY_ANALYSIS_DATA_TEA 
@@ -150,13 +148,13 @@ class BioAssayAnalysisDataTea {
 				  TABLESPACE INDX NOLOGGING PARALLEL 8 """
 		biomart.execute(qry)
 
-		log.info "Start recreating indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+		logger.info "Start recreating indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
 	}
 
 
 	void disableBioAssayAnalysisDataTeaConstraints(){
 
-		log.info "Start disabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+		logger.info "Start disabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
 
 		String stmt = ""
 		String qry = """ select constraint_name from user_constraints
@@ -166,13 +164,13 @@ class BioAssayAnalysisDataTea {
 			biomart.execute(stmt)
 		}
 
-		log.info "Start disabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+		logger.info "Start disabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
 	}
 
 
 	void enableBioAssayAnalysisDataTeaConstraints(){
 
-		log.info "Start enabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+		logger.info "Start enabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
 
 		String stmt = ""
 		String qry = """ select constraint_name from user_constraints
@@ -182,7 +180,7 @@ class BioAssayAnalysisDataTea {
 			biomart.execute(stmt)
 		}
 
-		log.info "Start enabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+		logger.info "Start enabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
 	}
 
 

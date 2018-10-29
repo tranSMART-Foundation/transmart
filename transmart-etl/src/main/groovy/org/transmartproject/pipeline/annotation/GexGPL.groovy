@@ -30,23 +30,20 @@ package org.transmartproject.pipeline.annotation
 
 import java.util.Properties
 
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
-
 import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
 
+@Slf4j('logger')
 class GexGPL {
-
-    private static final Logger log = Logger.getLogger(GexGPL)
 
     Sql biomart
     String annotationTable, gplFilePattern
 
     static main(args) {
 
-	PropertyConfigurator.configure("conf/log4j.properties")
+//	PropertyConfigurator.configure("conf/log4j.properties")
 
 	Util util = new Util()
 
@@ -62,13 +59,13 @@ class GexGPL {
 
     void loadGexGPL(Properties props, Sql biomart){
 	if(props.get("skip_annotation_loader").toString().toLowerCase().equals("yes")){
-	    log.info "Skip loading GPL GeX annotation file(s) ..."
+	    logger.info "Skip loading GPL GeX annotation file(s) ..."
 	}else{
 	    setSql(biomart)
 	    setAnnotationTable(props.get("annotation_table"))
 	    setGPLFilePattern(props.get("file_pattern"))
 	    if(props.get("recreate_annotation_table").toString().toLowerCase().equals("yes")){
-		log.info "Start recreating annotation table ${props.get("annotation_table")} for GPL GeX annotation file(s) ..."
+		logger.info "Start recreating annotation table ${props.get("annotation_table")} for GPL GeX annotation file(s) ..."
 		createAnnotationTable()
 	    }
 	    String annotationSourceDirectory = props.get("source_directory")
@@ -94,7 +91,7 @@ class GexGPL {
 	if(input.isDirectory()){
 	    input.eachFile {
 		if((it.toString().indexOf(gplFilePattern) != -1)){
-		    log.info "Start loading GPL GeX annotation file ${it.toString()} ..."
+		    logger.info "Start loading GPL GeX annotation file ${it.toString()} ..."
 		    if(columnMap.equals(null)){
 			loadGPL(it)
 		    } else {
@@ -104,14 +101,14 @@ class GexGPL {
 	    }
 	} else {
 	    if(input.isFile()) {
-		log.info "Start loading GPL GeX annotation file: ${input.toString()} ..."
+		logger.info "Start loading GPL GeX annotation file: ${input.toString()} ..."
 		if(columnMap.equals(null)) {
 		    loadGPL(input)
 		} else {
 		    loadGPL(props, input)
 		}
 	    } else {
-		log.error "Neither a directory nor a file: " + input.toString()
+		logger.error "Neither a directory nor a file: " + input.toString()
 	    }
 	}
     }
@@ -163,26 +160,26 @@ class GexGPL {
     void loadGPL(File input){
 	Map columnMap = [:]
 	String platform = input.toString().split(/\./)[1]
-	log.info "Input File: " + input.toString() + "\t Platform: " + platform
+	logger.info "Input File: " + input.toString() + "\t Platform: " + platform
 	if(isGexGPLAnnotationExist(platform)) {
-	    log.warn "Annotaion data for ${input.toString()} already exist."
+	    logger.warn "Annotaion data for ${input.toString()} already exist."
 	    return
 	}
 	// store records need to be loaded
 	File output = new File(input.getParent() + "/" + input.toString().split(/\./)[1] + ".tsv")
-	log.info "Output file: " + output.toString()
+	logger.info "Output file: " + output.toString()
 	if(output.size() > 0){
 	    output.delete()
 	}
 	// store records need to be manually checked
 	File reject = new File(input.getParent() + "/" + input.toString().split(/\./)[1] + ".reject")
-	log.info "File for rejected records: " + reject.toString()
+	logger.info "File for rejected records: " + reject.toString()
 	if(reject.size() > 0){
 	    reject.delete()
 	}
 	// store discarded records, either control probes or w/o gene association
 	File discard = new File(input.getParent() + "/" + input.toString().split(/\./)[1] + ".discard")
-	log.info "File for rejected records: " + discard.toString()
+	logger.info "File for rejected records: " + discard.toString()
 	if(discard.size() > 0){
 	    discard.delete()
 	}
@@ -247,7 +244,7 @@ class GexGPL {
 		}
 	    }
 	}else{
-	    log.error("Empty file: " + input.toString())
+	    logger.error("Empty file: " + input.toString())
 	}
 	// write data from StringBuffer to files
 	if(sb.size() > 0) output.append(sb.toString())
@@ -265,7 +262,7 @@ class GexGPL {
      */
      void insertGexGPL(File input){
          if(input.size() >0){
-             log.info "Start loading GPL annotation data ..." 
+             logger.info "Start loading GPL annotation data ..." 
              biomart.withTransaction {
                  biomart.withBatch("insert into $annotationTable (platform,probe_id,gene_symbol,gene_descr,gene_id) values (?,?,?,?,?)",
                      { ps -> input.eachLine{
@@ -275,7 +272,7 @@ class GexGPL {
                      }) 
              }
          }else{
-             log.error("Empty file: " + input.toString())
+             logger.error("Empty file: " + input.toString())
          }
      }
      
@@ -335,19 +332,19 @@ class GexGPL {
     boolean isCorrectFormat(String header){
 	String [] str = header.split("\t")
 	if(!str[0].toString().toUpperCase().equals("Probe Set ID".toUpperCase())) {
-	    log.error("Actual header didn't match the expected one: ${str[0]} vs 'Probe Set ID'.")
+	    logger.error("Actual header didn't match the expected one: ${str[0]} vs 'Probe Set ID'.")
 	    return false
 	} else if(!str[1].toString().toUpperCase().equals("Gene Symbol".toUpperCase())) {
-	    log.error("Actual header didn't match the expected one: ${str[1]} vs 'Gene Symbol'.")
+	    logger.error("Actual header didn't match the expected one: ${str[1]} vs 'Gene Symbol'.")
 	    return  false
 	} else if(!str[2].toString().toUpperCase().equals("Gene Title".toUpperCase())) {
-	    log.error("Actual header didn't match the expected one: ${str[2]} vs 'Gene Title'.")
+	    logger.error("Actual header didn't match the expected one: ${str[2]} vs 'Gene Title'.")
 	    return false
 	} else if(!str[3].toString().toUpperCase().equals("Species Scientific Name".toUpperCase())) {
-	    log.error("Actual header didn't match the expected one: ${str[3]} vs 'Species Scientific Name'.")
+	    logger.error("Actual header didn't match the expected one: ${str[3]} vs 'Species Scientific Name'.")
 	    return false
 	} else if(!str[15].toString().toUpperCase().equals("Entrez Gene".toUpperCase())) {
-	    log.error("Actual header didn't match the expected one: ${str[15]} vs 'Entrez Gene'.")
+	    logger.error("Actual header didn't match the expected one: ${str[15]} vs 'Entrez Gene'.")
 	    return false
 	} else {
 	    return true
@@ -358,11 +355,11 @@ class GexGPL {
      void createAnnotationTable(){
          String qry = "select count(*) from user_tables where table_name=?"
          if(biomart.firstRow(qry, [annotationTable.toUpperCase()])[0] > 0){
-             log.info "The existing table $annotationTable will be dropped ... "
+             logger.info "The existing table $annotationTable will be dropped ... "
              qry = "drop table $annotationTable purge"
              biomart.execute(qry)
          }
-         log.info "Start creating table $annotationTable ..."
+         logger.info "Start creating table $annotationTable ..."
          qry = """ create table $annotationTable(
                      platform 	varchar2(100),
                      species  	varchar2(100),

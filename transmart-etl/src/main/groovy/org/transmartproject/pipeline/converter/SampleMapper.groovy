@@ -32,11 +32,10 @@ import org.transmartproject.pipeline.transmart.SubjectSampleMapping;
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger;
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class SampleMapper {
-
-	private static final Logger log = Logger.getLogger(SampleMapper)
 
 	File sampleMappingFile, gsmMappingFile
 	String outputDirectory
@@ -51,7 +50,7 @@ class SampleMapper {
 		String [] str
 		if(sampleMappingFile.exists()){
 
-			log.info("Reading " + sampleMappingFile.toString())
+			logger.info("Reading " + sampleMappingFile.toString())
 
 			sampleMappingFile.eachLine{
 				str = it.split(",")
@@ -59,7 +58,7 @@ class SampleMapper {
 					sampleMap[str[0].trim()] = str[1].trim().replace(".CEL", "") + ":" + str[2].trim().replace(".CEL", "")
 			}
 		}else{
-			log.warn("Cannot find " + sampleMappingFile.toString())
+			logger.warn("Cannot find " + sampleMappingFile.toString())
 		}
 		return sampleMap
 	}
@@ -77,16 +76,16 @@ class SampleMapper {
 		String [] str
 		if(gsmMappingFile.exists()){
 
-			log.info("Reading " + gsmMappingFile.toString())
+			logger.info("Reading " + gsmMappingFile.toString())
 
 			int index = 0
 			gsmMappingFile.eachLine{
 				if((it.indexOf("study_id") == -1) && (it.indexOf("GPL2004_2005") >= 0)){
-					log.info it
+					logger.info it
 					str = it.split("\t")
 					if(str.size() != 9){
-						log.warn("Line: " + index + " missing column(s) in: " + gsmMappingFile.toString())
-						log.info index + ":  " + str.size() + ":  " + it
+						logger.warn("Line: " + index + " missing column(s) in: " + gsmMappingFile.toString())
+						logger.info index + ":  " + str.size() + ":  " + it
 					} else{
 						def patientNum = sampleSubjectMapping[str[2].trim()]
 						dataMap["PATIENT_ID"] = patientNum
@@ -123,7 +122,7 @@ class SampleMapper {
 					}
 					index++
 					//if(str.size()==4 && it.indexOf(",,") == -1) {
-					//	log.info str.size() + ":" + it
+					//	logger.info str.size() + ":" + it
 					//	gsm1 = str[1].trim()
 					//	gsm2 = str[2].trim()
 					//	gsm3 = str[3].trim()
@@ -132,7 +131,7 @@ class SampleMapper {
 				}
 			}
 		}else{
-			log.warn("Cannot find " + gsmMappingFile.toString())
+			logger.warn("Cannot find " + gsmMappingFile.toString())
 		}
 
 		return gsmMapping

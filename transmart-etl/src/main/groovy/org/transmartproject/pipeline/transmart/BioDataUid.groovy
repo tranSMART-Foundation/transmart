@@ -29,12 +29,10 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioDataUid {
-
-	private static final Logger log = Logger.getLogger(BioDataUid)
 
 	Sql biomart
 
@@ -47,7 +45,7 @@ class BioDataUid {
 
 	void loadExperimentBioDataUid(){
 
-		log.info "Start inserting BIO_DATA_UID for BIO_EXPERIMENT ... "
+		logger.info "Start inserting BIO_DATA_UID for BIO_EXPERIMENT ... "
 
 		String qry = """ INSERT INTO BIO_DATA_UID(BIO_DATA_ID, UNIQUE_ID, BIO_DATA_TYPE)
 						 select bio_experiment_id, 'Omicsoft: '||accession, 'EXP'
@@ -56,13 +54,13 @@ class BioDataUid {
 					 """
 		biomart.execute(qry)
 
-		log.info "Stop inserting BIO_DATA_UID for BIO_EXPERIMENT ... "
+		logger.info "Stop inserting BIO_DATA_UID for BIO_EXPERIMENT ... "
 	}
 
 
 	void loadAnalysisBioDataUid(){
 
-		log.info "Start inserting BIO_DATA_UID for BIO_ASSAY_ANALYSIS ... "
+		logger.info "Start inserting BIO_DATA_UID for BIO_ASSAY_ANALYSIS ... "
 
 		String qry = """ INSERT INTO BIO_DATA_UID(BIO_DATA_ID, UNIQUE_ID, BIO_DATA_TYPE)
 						 SELECT bio_assay_analysis_id, etl_id||':'||analysis_name, 'BAA'
@@ -71,13 +69,13 @@ class BioDataUid {
 					 """
 		biomart.execute(qry)
 
-		log.info "Stop inserting into BIO_DATA_UID for BIO_ASSAY_ANALYSIS ... "
+		logger.info "Stop inserting into BIO_DATA_UID for BIO_ASSAY_ANALYSIS ... "
 	}
 
 	
 	void loadDiseaseBioDataUid(){
 
-		log.info "Start inserting BIO_DATA_UID for BIO_DISEASE ... "
+		logger.info "Start inserting BIO_DATA_UID for BIO_DISEASE ... "
 
 		String qry = """ insert into bio_data_uid (bio_data_id, unique_id, bio_data_type)
 					     select BIO_DISEASE_ID, 'DIS:'||MESH_CODE, 'BIO_DISEASE'
@@ -86,16 +84,16 @@ class BioDataUid {
 					"""
 		biomart.execute(qry)
 
-		log.info "Stop inserting BIO_DATA_UID for BIO_DISEASE ... "
+		logger.info "Stop inserting BIO_DATA_UID for BIO_DISEASE ... "
 	}
 
 	
 	void loadBioDataUid(long bioDataId, String uniqueId, String dataType){
 
 		if(isBioDataUidExist(bioDataId, uniqueId, dataType)){
-                    //log.info "($bioDataId, $uniqueId, $dataType) already exists in BIO_DATA_UID ..."
+                    //logger.info "($bioDataId, $uniqueId, $dataType) already exists in BIO_DATA_UID ..."
 		}else{
-			log.info "Start loading ($bioDataId, $uniqueId, $dataType) into BIO_DATA_UID ..."
+			logger.info "Start loading ($bioDataId, $uniqueId, $dataType) into BIO_DATA_UID ..."
 
 			String qry = """ insert into bio_data_uid(bio_data_id, unique_id, bio_data_type) values(?, ?, ?) """
 			biomart.execute(qry, [
@@ -104,7 +102,7 @@ class BioDataUid {
 				dataType
 			])
 
-			log.info "End loading ($bioDataId, $uniqueId, $dataType) into BIO_DATA_UID ..."
+			logger.info "End loading ($bioDataId, $uniqueId, $dataType) into BIO_DATA_UID ..."
 		}
 	}
 

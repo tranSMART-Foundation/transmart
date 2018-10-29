@@ -28,16 +28,14 @@
 
 package org.transmartproject.pipeline.plink
 
-import org.apache.log4j.Logger;
-
 import org.transmartproject.pipeline.i2b2.PatientDimension;
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class SubjectSnpDataset {
-
-	private static final Logger log = Logger.getLogger(SubjectSnpDataset)
 
 	Sql i2b2demodata, deapp
 	String trialName, platform, sourceSystemPrefix
@@ -60,7 +58,7 @@ class SubjectSnpDataset {
 
 			if(!isSubjectSnpDatasetExist(conceptCode, patientNum, trialName, platform)){
 
-				log.info ("insert the record ($patientNum,  $conceptCode, $subjectId, $gender) into DE_SUBJECT_SNP_DATASET ...")
+				logger.info ("insert the record ($patientNum,  $conceptCode, $subjectId, $gender) into DE_SUBJECT_SNP_DATASET ...")
 
 				subjectSnpDatasetRecord["concept_cd"] = conceptCode
 				subjectSnpDatasetRecord["platform_name"] = platform
@@ -73,7 +71,7 @@ class SubjectSnpDataset {
 
 				insertSubjectSnpDataset(subjectSnpDatasetRecord)
 			} else{
-				log.info ("The record ($patientNum,  $conceptCode, $subjectId, $gender) is already inserted into DE_SUBJECT_SNP_DATASET ...")
+				logger.info ("The record ($patientNum,  $conceptCode, $subjectId, $gender) is already inserted into DE_SUBJECT_SNP_DATASET ...")
 			}
 		}
 	}
@@ -112,7 +110,7 @@ class SubjectSnpDataset {
 
 		String datasetName, sample, sex, subjectId, indId, conceptCode
 
-		log.info "Start loading data into DE_SUBJECT_SNP_DATASET ..."
+		logger.info "Start loading data into DE_SUBJECT_SNP_DATASET ..."
 
 		String qry = """ insert into de_subject_snp_dataset(dataset_name, concept_cd, platform_name,
 						      trial_name, patient_num, subject_id, sample_type, patient_gender)
@@ -138,7 +136,7 @@ class SubjectSnpDataset {
 				if(pid > 0){
 					patientNum = pid
 				}else{
-					log.error("Cannot find patient_number for: " + individualId)
+					logger.error("Cannot find patient_number for: " + individualId)
 					throw new RuntimeException("Cannot find patient_number for: " + individualId)
 				}
 			}
@@ -161,7 +159,7 @@ class SubjectSnpDataset {
 				])
 		}
 
-		log.info "End loading data into DE_SUBJECT_SNP_DATASET ..."
+		logger.info "End loading data into DE_SUBJECT_SNP_DATASET ..."
 	}
 
 
@@ -205,7 +203,7 @@ class SubjectSnpDataset {
 
 	def loadSnpDatasetLocation(){
 
-		log.info "Start loading data into DE_SNP_DATA_DATASET_LOC ..."
+		logger.info "Start loading data into DE_SNP_DATA_DATASET_LOC ..."
 
 		String qry = "select count(1) from user_sequences where sequence_name=?"
 
@@ -230,7 +228,7 @@ class SubjectSnpDataset {
 		qry = "drop sequence loc"
 		deapp.execute(qry)
 
-		log.info "End loading data into DE_SNP_DATA_DATASET_LOC ..."
+		logger.info "End loading data into DE_SNP_DATA_DATASET_LOC ..."
 	}
 
 
@@ -354,7 +352,7 @@ class SubjectSnpDataset {
 
 
 		if(datasetIds.size() > 1) {
-			log.error "There are multiple dataset_ids ..."
+			logger.error "There are multiple dataset_ids ..."
 			return null
 		} else {
 			return datasetIds[0]
@@ -379,7 +377,7 @@ class SubjectSnpDataset {
 
 
 		if(datasetIds.size() > 1) {
-			log.error "There are multiple dataset_ids ..."
+			logger.error "There are multiple dataset_ids ..."
 			return null
 		} else {
 			return datasetIds[0]
@@ -402,7 +400,7 @@ class SubjectSnpDataset {
 		def datasetIds = deapp.firstRow(qry, [trial, patientNum, subjectId])
 
 		if(datasetIds.equals(null) || datasetIds.size() > 1) {
-			log.error "There is either no or multiple dataset_ids for " + subjectId
+			logger.error "There is either no or multiple dataset_ids for " + subjectId
 			throw new RuntimeException("There is either no or multiple dataset_ids for " + subjectId)
 		} else {
 			return datasetIds[0]
@@ -419,7 +417,7 @@ class SubjectSnpDataset {
 
 
 		if(datasetIds.size() > 1) {
-			log.error "There are multiple dataset_ids ..."
+			logger.error "There are multiple dataset_ids ..."
 			return null
 		} else {
 			return datasetIds[0]

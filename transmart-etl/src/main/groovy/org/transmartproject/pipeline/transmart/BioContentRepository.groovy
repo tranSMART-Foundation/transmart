@@ -28,16 +28,13 @@
 
 package org.transmartproject.pipeline.transmart
 
-import org.apache.log4j.Logger;
-
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
 import org.transmartproject.pipeline.util.Util
 
-
+@Slf4j('logger')
 class BioContentRepository {
-
-	private static final Logger log = Logger.getLogger(BioContentRepository)
 
 	Sql biomart
 
@@ -46,9 +43,9 @@ class BioContentRepository {
 		String qry = """ insert into bio_content_repository(location, active_y_n, repository_type, location_type) values(?, ?, ?, ?) """
 
 		if(isBioContentRepositoryExist(location, repositoryType)){
-                    //log.info "\"$location:$repositoryType\" already exists in BIO_CONTENT_REPOSITORY ..."
+                    //logger.info "\"$location:$repositoryType\" already exists in BIO_CONTENT_REPOSITORY ..."
 		}else{
-			log.info "Insert \"$location:$repositoryType\" into BIO_CONTENT_REPOSITORY ..."
+			logger.info "Insert \"$location:$repositoryType\" into BIO_CONTENT_REPOSITORY ..."
 			biomart.execute(qry, [
 				location,
 				isActive,

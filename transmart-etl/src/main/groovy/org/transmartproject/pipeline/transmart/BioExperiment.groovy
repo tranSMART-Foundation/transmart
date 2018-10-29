@@ -29,12 +29,10 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioExperiment {
-
-	private static final Logger log = Logger.getLogger(BioExperiment)
 
 	Sql biomart
 	String projectInfoTable, platform, GSEName, suffix
@@ -43,7 +41,7 @@ class BioExperiment {
 
 		addColumns()
 
-		log.info "Start loadng PROJECT_INFO into BIO_EXPERIMENT ... "
+		logger.info "Start loadng PROJECT_INFO into BIO_EXPERIMENT ... "
 
 		String qry = """ INSERT INTO BIO_EXPERIMENT(BIO_EXPERIMENT_TYPE, 
 								ETL_ID, 
@@ -125,7 +123,7 @@ class BioExperiment {
 			 """
 		//biomart.execute(qry)
 
-		log.info "End loadng PROJECT_INFO into BIO_EXPERIMENT ... "
+		logger.info "End loadng PROJECT_INFO into BIO_EXPERIMENT ... "
 	}
 
 
@@ -134,9 +132,9 @@ class BioExperiment {
 		addColumns()
 
 		if(isBioExperiemtnExist(gseNumber)){
-			log.warn "$gseNumber already loaded into BIO_EXPERIMENT."
+			logger.warn "$gseNumber already loaded into BIO_EXPERIMENT."
 		}else{
-			log.info "Start creating a record into BIO_EXPERIMENT for $gseNumber ... "
+			logger.info "Start creating a record into BIO_EXPERIMENT for $gseNumber ... "
 
 			String qry = """ INSERT INTO BIO_EXPERIMENT(BIO_EXPERIMENT_TYPE, ETL_ID, ENTRYDT, ACCESSION)
 							 SELECT distinct 'Experiment',
@@ -162,7 +160,7 @@ class BioExperiment {
 
 	void addColumns(){
 
-		log.info "Add missing columns as needed ... "
+		logger.info "Add missing columns as needed ... "
 		String [] columns = [
 			"INSTITUTION:100",
 			"COUNTRY:50",

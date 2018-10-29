@@ -28,16 +28,13 @@
 
 package org.transmartproject.pipeline.i2b2
 
-import org.apache.log4j.Logger;
-
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
 import org.transmartproject.pipeline.util.Util
 
-
+@Slf4j('logger')
 class I2b2Tags {
-
-	private static final Logger log = Logger.getLogger(I2b2Tags)
 
 	Sql i2b2metadata
 	String basePath, platform
@@ -55,12 +52,12 @@ class I2b2Tags {
 			else sampleCounts[val] += 1
 		}
 		
-		log.info "Total samples: $total"
-		log.info basePath + "\t" + platform
+		logger.info "Total samples: $total"
+		logger.info basePath + "\t" + platform
 		
 		String [] str = basePath.split("/")
 		String parentPath = basePath.replace(str[-1] + "/", "")
-		log.info parentPath
+		logger.info parentPath
 		insertConceptCount(basePath, parentPath, total)
 		insertConceptCount(basePath + platform + "/", basePath, total)
 		
@@ -81,9 +78,9 @@ class I2b2Tags {
 		String parentPath = parentConceptPath.replace("/", "\\")
 		
 		if(isI2b2TagsExist(path)){
-			log.info "$conceptPath already exists in I2B2_TAGS ..."
+			logger.info "$conceptPath already exists in I2B2_TAGS ..."
 		}else{
-			log.info "Insert ($path, $totalCnt) into I2B2_TAGS ..."
+			logger.info "Insert ($path, $totalCnt) into I2B2_TAGS ..."
 			i2b2metadata.execute(qry, [
 				path,
 				parentPath,

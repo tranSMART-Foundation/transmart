@@ -29,12 +29,10 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioAssayAnalysisData {
-
-	private static final Logger log = Logger.getLogger(BioAssayAnalysisData)
 
 	Sql biomart
 	String testsDataTable
@@ -42,7 +40,7 @@ class BioAssayAnalysisData {
 
 	void loadBioAssayAnalysisData(){
 
-		log.info "Start loading data into BIO_ASSAY_ANALYSIS_DATA ..."
+		logger.info "Start loading data into BIO_ASSAY_ANALYSIS_DATA ..."
 
 		String qry = """ insert /*+ parallel (BIO_ASSAY_ANALYSIS_DATA, 8) */
 						into BIO_ASSAY_ANALYSIS_DATA
@@ -79,16 +77,16 @@ class BioAssayAnalysisData {
 
 		biomart.execute(qry)
 
-		log.info "End loading data into BIO_ASSAY_ANALYSIS_DATA ..."
+		logger.info "End loading data into BIO_ASSAY_ANALYSIS_DATA ..."
 	}
 
 
 	void loadBioAssayAnalysisData(long bioDataId, String uniqueId, String dataType){
 
 		if(isBioAssayAnalysisDataExist(bioDataId, uniqueId, dataType)){
-                    //log.info "($bioDataId, $uniqueId, $dataType) already exists in BIO_ASSAY_ANALYSIS_DATA ..."
+                    //logger.info "($bioDataId, $uniqueId, $dataType) already exists in BIO_ASSAY_ANALYSIS_DATA ..."
 		}else{
-			log.info "Start loading ($bioDataId, $uniqueId, $dataType) into BIO_ASSAY_ANALYSIS_DATA ..."
+			logger.info "Start loading ($bioDataId, $uniqueId, $dataType) into BIO_ASSAY_ANALYSIS_DATA ..."
 
 			String qry = """ insert into bio_assay_analysis_data(bio_data_id, unique_id, bio_data_type) values(?, ?, ?) """
 			biomart.execute(qry, [
@@ -97,7 +95,7 @@ class BioAssayAnalysisData {
 				dataType
 			])
 
-			log.info "End loading ($bioDataId, $uniqueId, $dataType) into BIO_ASSAY_ANALYSIS_DATA ..."
+			logger.info "End loading ($bioDataId, $uniqueId, $dataType) into BIO_ASSAY_ANALYSIS_DATA ..."
 		}
 	}
 
@@ -113,7 +111,7 @@ class BioAssayAnalysisData {
 
 
 	void dropBioAssayAnalysisDataIndexes(){
-		log.info "Start dropping indexes for BIO_ASSAY_ANALYSIS_DATA ... "
+		logger.info "Start dropping indexes for BIO_ASSAY_ANALYSIS_DATA ... "
 		
 		String stmt = ""
 		String qry = """ select index_name from user_indexes 
@@ -124,13 +122,13 @@ class BioAssayAnalysisData {
 			biomart.execute(stmt)
 		}
 		
-		log.info "End dropping indexes for BIO_ASSAY_ANALYSIS_DATA ... "
+		logger.info "End dropping indexes for BIO_ASSAY_ANALYSIS_DATA ... "
 	}
 
 
 	void createBioAssayAnalysisDataIndexes(){
 		
-		log.info "End recreating indexes for BIO_ASSAY_ANALYSIS_DATA ... "
+		logger.info "End recreating indexes for BIO_ASSAY_ANALYSIS_DATA ... "
 		
 		String qry = ""
 		qry = """ create index idx_baad_probe on BIO_ASSAY_ANALYSIS_DATA (FEATURE_GROUP_NAME)
@@ -171,13 +169,13 @@ class BioAssayAnalysisData {
 				  TABLESPACE INDX NOLOGGING PARALLEL 8 """
 		biomart.execute(qry)
 
-		log.info "Start recreating indexes for BIO_ASSAY_ANALYSIS_DATA ... "
+		logger.info "Start recreating indexes for BIO_ASSAY_ANALYSIS_DATA ... "
 	}
 	
 	
 	void disableBioAssayAnalysisDataConstraints(){
 		
-		log.info "Start disabling constraints for BIO_ASSAY_ANALYSIS_DATA ... "
+		logger.info "Start disabling constraints for BIO_ASSAY_ANALYSIS_DATA ... "
 		
 		String stmt = ""
 		String qry = """ select constraint_name from user_constraints
@@ -187,13 +185,13 @@ class BioAssayAnalysisData {
 			biomart.execute(stmt)
 		}
 		
-		log.info "Start disabling constraints for BIO_ASSAY_ANALYSIS_DATA ... "
+		logger.info "Start disabling constraints for BIO_ASSAY_ANALYSIS_DATA ... "
 	}
 	
 	
 	void enableBioAssayAnalysisDataConstraints(){
 		
-		log.info "Start enabling constraints for BIO_ASSAY_ANALYSIS_DATA ... "
+		logger.info "Start enabling constraints for BIO_ASSAY_ANALYSIS_DATA ... "
 		
 		String stmt = ""
 		String qry = """ select constraint_name from user_constraints
@@ -203,7 +201,7 @@ class BioAssayAnalysisData {
 			biomart.execute(stmt)
 		}
 		
-		log.info "Start enabling constraints for BIO_ASSAY_ANALYSIS_DATA ... "
+		logger.info "Start enabling constraints for BIO_ASSAY_ANALYSIS_DATA ... "
 	}
 
 	

@@ -34,11 +34,10 @@ import org.transmartproject.pipeline.transmart.SubjectSampleMapping;
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger;
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class SamplePatientMapper {
-
-	private static final Logger log = Logger.getLogger(SamplePatientMapper)
 
 	File exptGsmMappingFile, gsmMappingFile, sampleInfoFile
 	String outputDirectory
@@ -62,7 +61,7 @@ class SamplePatientMapper {
 		String gsm1, gsm2, patientNum1, patientNum2, sampleId1, sampleId2
 		if(exptGsmMappingFile.exists()){
 
-			log.info("Reading " + exptGsmMappingFile.toString())
+			logger.info("Reading " + exptGsmMappingFile.toString())
 
 			exptGsmMappingFile.eachLine{
 				str = it.split(",")
@@ -77,7 +76,7 @@ class SamplePatientMapper {
 					if(!sampleId2.equals(null)) patientNum2 = patientMap[sampleId2]
 
 					if(!patientNum1.equals(null) && !patientNum2.equals(null) && !patientNum1.equals(patientNum2)){
-						log.error "Patient Number are inconsistent: $gsm1($patientNum1) and $gsm2($patientNum2)"
+						logger.error "Patient Number are inconsistent: $gsm1($patientNum1) and $gsm2($patientNum2)"
 						throw new RuntimeException("Patient Number are inconsistent: $gsm1($patientNum1) and $gsm2($patientNum2)")
 					}else{
 						if(!patientNum1.equals(null)) {
@@ -86,12 +85,12 @@ class SamplePatientMapper {
 						else if (!patientNum2.equals(null)) {
 							exptPatientMapping[str[0].trim()] = patientNum2
 						}
-						else log.error "Cannot find patient number for: $it "
+						else logger.error "Cannot find patient number for: $it "
 					}
 				}
 			}
 		}else{
-			log.warn("Cannot find " + exptGsmMappingFile.toString())
+			logger.warn("Cannot find " + exptGsmMappingFile.toString())
 		}
 	}
 
@@ -110,16 +109,16 @@ class SamplePatientMapper {
 
 		String [] str
 		if(sampleInfoFile.exists()){
-			log.info("Reading " + sampleInfoFile.toString())
+			logger.info("Reading " + sampleInfoFile.toString())
 			int index = 1
 			sampleInfoFile.eachLine{
 				//if((it.indexOf("study_id") == -1) && (it.indexOf("Data+SNP_Profiling+PLATFORM+TISSUETYPE") >= 0)){
 				if((it.indexOf("study_id") == -1) && (it.toUpperCase().indexOf("SNP_PROFILING") >= 0)){
-					//log.info it
+					//logger.info it
 					str = it.split("\t")
 					if(str.size() != 9){
-						log.warn("Line: " + index + " missing column(s) in: " + sampleInfoFile.toString())
-						log.info index + ":  " + str.size() + ":  " + it
+						logger.warn("Line: " + index + " missing column(s) in: " + sampleInfoFile.toString())
+						logger.info index + ":  " + str.size() + ":  " + it
 					} else{
 						Map dataMap = [:]
 
@@ -146,7 +145,7 @@ class SamplePatientMapper {
 				index++
 			}
 		}else{
-			log.warn("Cannot find " + sampleInfoFile.toString())
+			logger.warn("Cannot find " + sampleInfoFile.toString())
 		}
 		return sampleInfo
 	}
@@ -169,16 +168,16 @@ class SamplePatientMapper {
 		String [] str
 		if(gsmMappingFile.exists()){
 
-			log.info("Reading " + gsmMappingFile.toString())
+			logger.info("Reading " + gsmMappingFile.toString())
 
 			int index = 0
 			gsmMappingFile.eachLine{
 				if((it.indexOf("study_id") == -1) && (it.indexOf("GPL2004_2005") >= 0)){
-					log.info it
+					logger.info it
 					str = it.split("\t")
 					if(str.size() != 9){
-						log.warn("Line: " + index + " missing column(s) in: " + gsmMappingFile.toString())
-						log.info index + ":  " + str.size() + ":  " + it
+						logger.warn("Line: " + index + " missing column(s) in: " + gsmMappingFile.toString())
+						logger.info index + ":  " + str.size() + ":  " + it
 					} else{
 						def patientNum = sampleSubjectMapping[str[2].trim()]
 						dataMap["PATIENT_ID"] = patientNum
@@ -217,7 +216,7 @@ class SamplePatientMapper {
 				}
 			}
 		}else{
-			log.warn("Cannot find " + gsmMappingFile.toString())
+			logger.warn("Cannot find " + gsmMappingFile.toString())
 		}
 
 		return gsmMapping
@@ -227,11 +226,11 @@ class SamplePatientMapper {
 	Map loadSamplePatientMap(){
 		Map samplePatientMap = [:]
 		if(patientMap.equals(null) || patientMap.size() ==0){
-			log.error "patientMap is null"
+			logger.error "patientMap is null"
 		}else{
 			sampleIdMapping.each{k, v ->
 				if(patientMap[v].equals(null))
-					log.info k + "\t" + v
+					logger.info k + "\t" + v
 				samplePatientMap[k] = patientMap[v]
 			}
 		}

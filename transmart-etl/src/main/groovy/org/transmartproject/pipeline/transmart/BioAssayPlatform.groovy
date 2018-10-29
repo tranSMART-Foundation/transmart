@@ -29,14 +29,10 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
-
+@Slf4j('logger')
 class BioAssayPlatform {
-
-
-	private static final Logger log = Logger.getLogger(BioAssayPlatform)
 
 	Sql biomart
 	String projectInfoTable
@@ -49,7 +45,7 @@ class BioAssayPlatform {
 
 		Map platform = [:]
 
-		log.info "Start loading data from PROJECT_INFO into BIO_ASSAY_PLATFORM ..."
+		logger.info "Start loading data from PROJECT_INFO into BIO_ASSAY_PLATFORM ..."
 
 		String qry = """ select PROJECT_PLATFORM, PROJECT_PLATFORMDESCRIPTION,
 						  	PROJECT_PLATFORMORGANISM, PROJECT_PLATFORMPROVIDER
@@ -149,9 +145,9 @@ class BioAssayPlatform {
 						  values (?, ?, ?, ?, ?, ?) """
 
 		if(isBioAssayPlatformExist(name)){
-                    //log.warn("Platform ${platform["name"]} already exists.")
+                    //logger.warn("Platform ${platform["name"]} already exists.")
 		} else{
-			log.info "Adding platform: ${platform["name"]} ... "
+			logger.info "Adding platform: ${platform["name"]} ... "
 			biomart.execute(qry,[
 				name,
 				description,
@@ -182,9 +178,9 @@ class BioAssayPlatform {
 						  values (?, ?, ?, ?, ?,  ?, ?, ?) """
 
 		if(isBioAssayPlatformExist(name)){
-                    //log.warn("Platform ${platform["platform_name"]} already exists.")
+                    //logger.warn("Platform ${platform["platform_name"]} already exists.")
 		} else{
-			log.info "Adding platform: ${platform["platform_name"]} ... "
+			logger.info "Adding platform: ${platform["platform_name"]} ... "
 			biomart.execute(qry,[
 				name,
 				version,

@@ -28,13 +28,11 @@
 
 package org.transmartproject.pipeline.converter
 
-import org.apache.log4j.Logger;
-
+import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.util.Util
 
+@Slf4j('logger')
 class AffymetrixGenotypingDataFormatter {
-
-	private static final Logger log = Logger.getLogger(AffymetrixGenotypingDataFormatter)
 
 	String genotypingFileDirectory, outputDirectory, studyName
 	String sourceGenotypingFilePattern

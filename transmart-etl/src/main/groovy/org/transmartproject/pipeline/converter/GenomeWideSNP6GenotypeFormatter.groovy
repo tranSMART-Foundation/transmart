@@ -31,12 +31,10 @@ package org.transmartproject.pipeline.converter
 import java.util.Properties;
 import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class GenomeWideSNP6GenotypeFormatter {
-
-	private static final Logger log = Logger.getLogger(GenomeWideSNP6GenotypeFormatter)
 
 	Map snpCallMap, columnMap
 
@@ -44,7 +42,7 @@ class GenomeWideSNP6GenotypeFormatter {
 
 	static main(args) {
 
-		log.info("Start loading property file SNP.properties ...")
+		logger.info("Start loading property file SNP.properties ...")
 		Properties props = Util.loadConfiguration("conf/SNP.properties");
 
 		GenomeWideSNP6GenotypeFormatter gtf = new GenomeWideSNP6GenotypeFormatter()
@@ -84,7 +82,7 @@ class GenomeWideSNP6GenotypeFormatter {
 		}
 		output.append(sbGenotype.toString())
 		sbGenotype.setLength(0)
-		log.info("\nTotal processed probes: " + index )
+		logger.info("\nTotal processed probes: " + index )
 	}
 
 

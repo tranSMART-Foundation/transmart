@@ -40,19 +40,18 @@ import org.transmartproject.pipeline.transmart.SearchKeywordTerm
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class GeneOntology {
 
-	private static final Logger log = Logger.getLogger(GeneOntology)
 	private static Properties props
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
-		log.info("Start loading property file ...")
+		logger.info("Start loading property file ...")
 		props = Util.loadConfiguration("conf/Pathway.properties");
 
 		Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
@@ -93,7 +92,7 @@ class GeneOntology {
 		// process Gene Association data for Homo sapiens
                 String goa_human = props.get("gene_association_human");
                 if(goa_human == "") {
-                    log.info "gene_association_human empty, skipping"
+                    logger.info "gene_association_human empty, skipping"
                 }
                 else {    
                     File goahInput = new File(goa_human)
@@ -109,7 +108,7 @@ class GeneOntology {
 		// process Gene Association data for Mus musculus
                 String goa_mouse = props.get("gene_association_mouse");
                 if(goa_mouse == "") {
-                    log.info "gene_association_mouse empty, skipping"
+                    logger.info "gene_association_mouse empty, skipping"
                 }
                 else {    
                     File goamInput = new File(goa_mouse)
@@ -125,7 +124,7 @@ class GeneOntology {
 		// process Gene Association data for Rattus norvegicus
                 String goa_rat = props.get("gene_association_rat");
                 if(goa_rat == "") {
-                    log.info "gene_association_rat empty, skipping"
+                    logger.info "gene_association_rat empty, skipping"
                 }
                 else {    
                     File goarInput = new File(goa_rat)
@@ -145,7 +144,7 @@ class GeneOntology {
 		
 		// populate BIO_MARKER
 		if(props.get("skip_bio_marker").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into BIO_MARKER ..."
+			logger.info "Skip loading new records into BIO_MARKER ..."
 		}else{
                     geneOntology.loadBioMarker(biomartuser, biomart,
                                                props.get("pathway_table"), props.get("pathway_data_table"))
@@ -156,7 +155,7 @@ class GeneOntology {
 
 		// populate DE_PATHWAY
 		if(props.get("skip_de_pathway").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading records into DE_PATHWAY ..."
+			logger.info "Skip loading records into DE_PATHWAY ..."
 		}else{
 			Pathway p = new Pathway()
 			p.setSource("GO")
@@ -174,7 +173,7 @@ class GeneOntology {
 		
 		// populate DE_PATHWAY_GENE
 		if(props.get("skip_de_pathway_gene").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into DE_PATHWAY_GENE ..."
+			logger.info "Skip loading new records into DE_PATHWAY_GENE ..."
 		}else{
 			PathwayGene pg = new PathwayGene()
 			pg.setSource("GO")
@@ -183,16 +182,16 @@ class GeneOntology {
 			pg.setBiomartuser(biomartuser)
 
 			// load de_pathway_gene for human
-			log.info "Start loading DE_PATHWAY_GENE for GO  ..."
+			logger.info "Start loading DE_PATHWAY_GENE for GO  ..."
 			//pg.loadPathwayGene(goahOutput, humanGeneId, pathwayId)
 			pg.loadPathwayGene(props.get("pathway_data_table"))
 
 			// load de_pathway_gene for Mus musculus
-			//log.info "Start loading DE_PATHWAY_GENE for GO Mouse ..."
+			//logger.info "Start loading DE_PATHWAY_GENE for GO Mouse ..."
 			//pg.loadPathwayGene(goamOutput, mouseGeneId, pathwayId)
 
 			// load de_pathway_gene for Rattus norvegicus
-			//log.info "Start loading DE_PATHWAY_GENE for GO Rat ..."
+			//logger.info "Start loading DE_PATHWAY_GENE for GO Rat ..."
 			//pg.loadPathwayGene(goarOutput, ratGeneId, pathwayId)
 		}
 
@@ -210,7 +209,7 @@ class GeneOntology {
 
 		// populate BIO_DATA_CORRELATION
 		if(props.get("skip_bio_data_correlation").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into BIO_DATA_CORRELATION ..."
+			logger.info "Skip loading new records into BIO_DATA_CORRELATION ..."
 		}else{
 			BioDataCorrelation bdc = new BioDataCorrelation()
 			bdc.setBiomart(biomart)
@@ -233,7 +232,7 @@ class GeneOntology {
 		
 		// populate SEARCH_KEYWORD
 		if(props.get("skip_search_keyword").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into SEARCH_KEYWORD ..."
+			logger.info "Skip loading new records into SEARCH_KEYWORD ..."
 		}else{
                         SearchKeyword sk = new SearchKeyword()
 
@@ -249,7 +248,7 @@ class GeneOntology {
 		
 		// populate SEARCH_KEYWORD_TERM
 		if(props.get("skip_search_keyword_term").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into SEARCH_KEYWORD_TERM  ..."
+			logger.info "Skip loading new records into SEARCH_KEYWORD_TERM  ..."
 		}else{
                         SearchKeywordTerm skt = new SearchKeywordTerm()
 			skt.setSearchapp(searchapp)
@@ -265,7 +264,7 @@ class GeneOntology {
 
 	void loadBioMarker(Sql biomartuser, Sql biomart, String pathwayTable, String pathwayDataTable){
 
-		log.info "Start loading GO pathway into BIO_MARKER ..."
+		logger.info "Start loading GO pathway into BIO_MARKER ..."
 		
                 String qry1 = """ select distinct t1.descr, t1.descr, t2.organism, t2.pathway
 						 from ${pathwayTable} t1, ${pathwayDataTable} t2
@@ -280,14 +279,14 @@ class GeneOntology {
                     bioMarker.insertBioMarker(it.descr, it.descr, it.pathway, 'GO', 'PATHWAY')
                 }
 		
-		log.info "End loading GO pathway into BIO_MARKER ..."
+		logger.info "End loading GO pathway into BIO_MARKER ..."
 	}
 
 
 	void readGeneOntology(File goInput, File goOutput){
 
 		if(goInput.size() >0){
-			log.info ("Start processing " + goInput.toString())
+			logger.info ("Start processing " + goInput.toString())
 		}else{
 			throw new RuntimeException(goInput.toString() + " is empty")
 		}
@@ -328,7 +327,7 @@ class GeneOntology {
 	void loadGeneOntology(Sql biomartuser, File goOutput, String pathwayTable){
 
 		if(goOutput.size() > 0){
-			log.info ("Start loading GO " + goOutput.toString())
+			logger.info ("Start loading GO " + goOutput.toString())
 		}else{
 			throw new RuntimeException(goOutput.toString() + " is empty")
 		}
@@ -352,7 +351,7 @@ class GeneOntology {
 		Map goa = [:]
 
 		if(goaInput.size() >0){
-			log.info ("Start processing " + goaInput.toString())
+			logger.info ("Start processing " + goaInput.toString())
 		}else{
 			throw new RuntimeException(goaInput.toString() + " is empty")
 		}
@@ -392,7 +391,7 @@ class GeneOntology {
 		Map goa = [:]
 
 		if(goaInput.size() >0){
-			log.info ("Start processing " + goaInput.toString())
+			logger.info ("Start processing " + goaInput.toString())
 		}else{
 			throw new RuntimeException(goaInput.toString() + " is empty")
 		}
@@ -422,7 +421,7 @@ class GeneOntology {
 	void loadGeneAssociation(Sql biomartuser, File goaOutput, String pathwayDataTable){
 
 		if(goaOutput.size() > 0){
-			log.info ("Start loading GOA " + goaOutput.toString())
+			logger.info ("Start loading GOA " + goaOutput.toString())
 		}else{
 			throw new RuntimeException(goaOutput.toString() + " is empty")
 		}
@@ -449,7 +448,7 @@ class GeneOntology {
 
             Boolean isPostgres = Util.isPostgres()
 		
-            log.info "Start creating indexes ..."
+            logger.info "Start creating indexes ..."
 	
             if(isPostgres) {
 		String qry = "create index idx_god_symbol on ${pathwayDataTable}(gene_symbol)"	
@@ -467,14 +466,14 @@ class GeneOntology {
             }
             
             
-            log.info "End creating indexes ..."
+            logger.info "End creating indexes ..."
 	}
 
 	
 	void loadGeneAssociation(Sql biomart, File goaOutput, String pathwayDataTable, String organism){
 
 		if(goaOutput.size() > 0){
-			log.info ("Start loading GOA " + goaOutput.toString())
+			logger.info ("Start loading GOA " + goaOutput.toString())
 		}else{
 			throw new RuntimeException(goaOutput.toString() + " is empty")
 		}
@@ -528,7 +527,7 @@ class GeneOntology {
             String qry2;
 
 
-            log.info "Start creating table: ${pathwayTable}"
+            logger.info "Start creating table: ${pathwayTable}"
 
             if(isPostgres){
 		qry = """ create table ${pathwayTable} (
@@ -557,7 +556,7 @@ class GeneOntology {
 
 		biomartuser.execute(qry)
 
-		log.info "End creating table: ${pathwayTable}"
+		logger.info "End creating table: ${pathwayTable}"
 
 	}
 
@@ -569,7 +568,7 @@ class GeneOntology {
             String qry1;
             String qry2;
 
-		log.info "Start creating table: ${pathwayDataTable}"
+		logger.info "Start creating table: ${pathwayDataTable}"
 
             if(isPostgres){
 		qry = """ create table ${pathwayDataTable} (
@@ -603,7 +602,7 @@ class GeneOntology {
 
 		biomartuser.execute(qry)
 
-		log.info "End creating table: ${pathwayDataTable}"
+		logger.info "End creating table: ${pathwayDataTable}"
 
 	}
 

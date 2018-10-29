@@ -33,21 +33,19 @@ import java.util.Properties;
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
 import org.transmartproject.pipeline.transmart.BioAssayPlatform
 import org.transmartproject.pipeline.transmart.BioObservation
 
+@Slf4j('logger')
 class AssayPlatform {
-
-	private static final Logger log = Logger.getLogger(AssayPlatform)
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 		
-		log.info("Start loading property file AssayPlatform.properties ...")
+		logger.info("Start loading property file AssayPlatform.properties ...")
 		Properties props = Util.loadConfiguration("conf/AssayPlatform.properties");
 
 		Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
@@ -97,7 +95,7 @@ class AssayPlatform {
 				}
 			}
 		} else{
-			log.info "the file: ${f.toString()} is empty or not exist ..."
+			logger.info "the file: ${f.toString()} is empty or not exist ..."
 		}
 
 		return alPlatform

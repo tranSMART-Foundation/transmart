@@ -32,20 +32,17 @@ import java.util.Properties;
 
 import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
-
+@Slf4j('logger')
 class AffymetrixNetAffyGxAnnotation {
-
-	private static final Logger log = Logger.getLogger(AffymetrixNetAffyGxAnnotation)
 
 	Sql biomart
 	String annotationTable, annotationFilenamePattern, fieldSeparator
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
 		Util util = new Util()
 		AffymetrixNetAffyGxAnnotation affy = new AffymetrixNetAffyGxAnnotation()
@@ -61,10 +58,10 @@ class AffymetrixNetAffyGxAnnotation {
 	void loadAffymetrix(Properties props, Sql biomart){
 
 		if(props.get("skip_affymetrix_annotation_loader").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading Affymetrix GX annotation file(s) ..."
+			logger.info "Skip loading Affymetrix GX annotation file(s) ..."
 		}else{
 
-			log.info "Start loading Affymetrix GX annotation file(s) from ${props.get("affymetrix_annotation_source")} ..."
+			logger.info "Start loading Affymetrix GX annotation file(s) from ${props.get("affymetrix_annotation_source")} ..."
 
 			File annotationSource = new File(props.get("affymetrix_annotation_source"))
 
@@ -74,7 +71,7 @@ class AffymetrixNetAffyGxAnnotation {
 			setAnnotationFilenamePattern(props.get("annotation_filename_pattern"))
 
 			if(props.get("recreate_affymetrix_annotation_table").toString().toLowerCase().equals("yes")){
-				log.info "Start recreating Affymetrix annotation table ${props.get("affymetrix_annotation_table")} ..."
+				logger.info "Start recreating Affymetrix annotation table ${props.get("affymetrix_annotation_table")} ..."
 				createAnnotationTable()
 			}
 
@@ -94,7 +91,7 @@ class AffymetrixNetAffyGxAnnotation {
 		if(input.isDirectory()){
 			input.eachFile {
 				if(it.toString().indexOf(annotationFilenamePattern) != -1){
-					log.info it
+					logger.info it
 					loadAffymetrix(it)
 				}
 			}
@@ -102,7 +99,7 @@ class AffymetrixNetAffyGxAnnotation {
 			if(input.isFile()) {
 				loadAffymetrix(input)
 			} else {
-				log.info "Neither a directory nor a file: " + input.toString()
+				logger.info "Neither a directory nor a file: " + input.toString()
 			}
 		}
 	}
@@ -116,23 +113,23 @@ class AffymetrixNetAffyGxAnnotation {
 
 		String species = ""
 		String platform = input.toString().split(/\./)[0].split ("\\\\")[-1]
-		log.info "Input File: " + input.toString() + "\n\t Platform: " + platform
+		logger.info "Input File: " + input.toString() + "\n\t Platform: " + platform
 
 		if(isAnnotationExist(platform)) {
-			log.warn "Annotaion data for ${input.toString()} already exist."
+			logger.warn "Annotaion data for ${input.toString()} already exist."
 			return
 		}
 
 		// store records need to be loaded
 		File output = new File(input.getParent() + "/" + platform + ".tsv")
-		log.info "Output file: " + output.toString()
+		logger.info "Output file: " + output.toString()
 		if(output.size() > 0){
 			output.delete()
 		}
 
 		// store records need to be manually checked
 		File reject = new File(input.getParent() + "/" + platform + ".reject")
-		log.info "File for rejected records: " + reject.toString()
+		logger.info "File for rejected records: " + reject.toString()
 		if(reject.size() > 0){
 			reject.delete()
 		}
@@ -140,7 +137,7 @@ class AffymetrixNetAffyGxAnnotation {
 
 		// store discarded records, either control probes or w/o gene association
 		File discard = new File(input.getParent() + "/" + platform + ".discard")
-		log.info "File for rejected records: " + discard.toString()
+		logger.info "File for rejected records: " + discard.toString()
 		if(discard.size() > 0){
 			discard.delete()
 		}
@@ -188,7 +185,7 @@ class AffymetrixNetAffyGxAnnotation {
 				}
 			}
 		}else{
-			log.error("Empty file: " + input.toString())
+			logger.error("Empty file: " + input.toString())
 		}
 
 		// write data from StringBuffer to files
@@ -205,24 +202,24 @@ class AffymetrixNetAffyGxAnnotation {
 
 		String species = ""
 		String platform = input.toString().split(/\./)[0].split ("\\\\")[-1]
-		log.info "Input File: " + input.toString() + "\n\t Platform: " + platform
+		logger.info "Input File: " + input.toString() + "\n\t Platform: " + platform
 
 
 		if(isAnnotationExist(platform)) {
-			log.warn "Annotaion data for ${input.toString()} already exist."
+			logger.warn "Annotaion data for ${input.toString()} already exist."
 			return
 		}
 
 		// store records need to be loaded
 		File output = new File(input.getParent() + "/" + platform + ".tsv")
-		log.info "Output file: " + output.toString()
+		logger.info "Output file: " + output.toString()
 		if(output.size() > 0){
 			output.delete()
 		}
 
 		// store records need to be manually checked
 		File reject = new File(input.getParent() + "/" + platform + ".reject")
-		log.info "File for rejected records: " + reject.toString()
+		logger.info "File for rejected records: " + reject.toString()
 		if(reject.size() > 0){
 			reject.delete()
 		}
@@ -230,7 +227,7 @@ class AffymetrixNetAffyGxAnnotation {
 
 		// store discarded records, either control probes or w/o gene association
 		File discard = new File(input.getParent() + "/" + platform + ".discard")
-		log.info "File for discarded records: " + discard.toString()
+		logger.info "File for discarded records: " + discard.toString()
 		if(discard.size() > 0){
 			discard.delete()
 		}
@@ -274,7 +271,7 @@ class AffymetrixNetAffyGxAnnotation {
 				}
 			}
 		}else{
-			log.error("Empty file: " + input.toString())
+			logger.error("Empty file: " + input.toString())
 		}
 
 		// write data from StringBuffer to files
@@ -427,7 +424,7 @@ class AffymetrixNetAffyGxAnnotation {
 				})
 			}
 		}else{
-			log.error("Empty file: " + input.toString())
+			logger.error("Empty file: " + input.toString())
 		}
 	}
 
@@ -494,19 +491,19 @@ class AffymetrixNetAffyGxAnnotation {
 		String [] str = header.split(fieldSeparator)
 
 		if(!str[0].replace("\"", "").toString().toUpperCase().equals("Probe Set ID".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[0]} vs 'Probe Set ID'.")
+			logger.error("Actual header didn't match the expected one: ${str[0]} vs 'Probe Set ID'.")
 			return false
 		} else if(!str[14].toString().toUpperCase().equals("Gene Symbol".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[14]} vs 'Gene Symbol'.")
+			logger.error("Actual header didn't match the expected one: ${str[14]} vs 'Gene Symbol'.")
 			return  false
 		} else if(!str[13].toString().toUpperCase().equals("Gene Title".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[13]} vs 'Gene Title'.")
+			logger.error("Actual header didn't match the expected one: ${str[13]} vs 'Gene Title'.")
 			return false
 		} else if(!str[2].toString().toUpperCase().equals("Species Scientific Name".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[2]} vs 'Species Scientific Name'.")
+			logger.error("Actual header didn't match the expected one: ${str[2]} vs 'Species Scientific Name'.")
 			return false
 		} else if(!str[18].toString().toUpperCase().equals("Entrez Gene".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[18]} vs 'Entrez Gene'.")
+			logger.error("Actual header didn't match the expected one: ${str[18]} vs 'Entrez Gene'.")
 			return false
 		} else {
 			return true
@@ -543,16 +540,16 @@ class AffymetrixNetAffyGxAnnotation {
 		String [] str = header.split("\t")
 
 		if(!str[0].toString().toLowerCase().equals("transcript_cluster_id")) {
-			log.error("Column 1 didn't match the expected: ${str[0]} vs 'transcript_cluster_id'.")
+			logger.error("Column 1 didn't match the expected: ${str[0]} vs 'transcript_cluster_id'.")
 			return false
 		} else if(!str[1].toString().toLowerCase().equals("gene symbol")) {
-			log.error("Column 2 didn't match the expected: ${str[1]} vs 'Gene Symbol'.")
+			logger.error("Column 2 didn't match the expected: ${str[1]} vs 'Gene Symbol'.")
 			return  false
 		} else if(!str[3].toString().toLowerCase().equals("seqname")) {
-			log.error("Column 3 didn't match the expected: ${str[3]} vs 'seqname'.")
+			logger.error("Column 3 didn't match the expected: ${str[3]} vs 'seqname'.")
 			return false
 		} else if(!str[8].toString().toLowerCase().equals("gene_assignment")) {
-			log.error("Column 8 didn't match the expected: ${str[8]} vs 'gene_assignment'.")
+			logger.error("Column 8 didn't match the expected: ${str[8]} vs 'gene_assignment'.")
 			return false
 		} else {
 			return true
@@ -566,12 +563,12 @@ class AffymetrixNetAffyGxAnnotation {
 		if(biomart.firstRow(qry, [
 			annotationTable.toUpperCase()
 		])[0] > 0){
-			log.info "The existing table $annotationTable will be rename to ${annotationTable}_bk"
+			logger.info "The existing table $annotationTable will be rename to ${annotationTable}_bk"
 			qry = "drop table $annotationTable purge"
 			biomart.execute(qry)
 		}
 
-		log.info "Create table $annotationTable ..."
+		logger.info "Create table $annotationTable ..."
 		qry = """ create table $annotationTable(
 					platform 	varchar2(100),
 					species  	varchar2(100),

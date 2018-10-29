@@ -33,20 +33,17 @@ import java.util.Properties;
 
 import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
-
+@Slf4j('logger')
 class AgilentGPL {
-
-	private static final Logger log = Logger.getLogger(AgilentGPL)
 
 	Sql biomart, deapp
 	String annotationTable, organism, platform
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
 		Util util = new Util()
 
@@ -70,13 +67,13 @@ class AgilentGPL {
 	void loadAgilentGPL(Properties props, Sql deapp){
 
 		if(props.get("skip_agilent_annotation_loader").toString().trim().toLowerCase().equals("yes")){
-			log.info "Skip loading Agilent annotation file(s) ..."
+			logger.info "Skip loading Agilent annotation file(s) ..."
 		}else{
 
-			log.info "Start loading Agilent annotation file(s) from ${props.get("agilent_annotation_source")} ..."
+			logger.info "Start loading Agilent annotation file(s) from ${props.get("agilent_annotation_source")} ..."
 
 			if(props.get("recreate_agilent_annotation_table").toString().trim().toLowerCase().equals("yes")){
-				log.info "Start recreating Agilent annotation table ${props.get("agilent_annotation_table")} ..."
+				logger.info "Start recreating Agilent annotation table ${props.get("agilent_annotation_table")} ..."
 				createAnnotationTable()
 			}
 
@@ -94,7 +91,7 @@ class AgilentGPL {
 				readAgilentGPL(annotationSource)
 			}
 
-			log.info "End loading Agilent annotation file(s) from ${props.get("agilent_annotation_source")} ..."
+			logger.info "End loading Agilent annotation file(s) from ${props.get("agilent_annotation_source")} ..."
 		}
 	}
 
@@ -106,16 +103,16 @@ class AgilentGPL {
 		if(input.isDirectory()){
 			input.eachFile {
 				if((it.toString().indexOf("GPL.GPL") != -1) && (it.toString().indexOf(".txt") != -1)){
-					log.info "Start loading GPL GX annotation file ${it.toString()} ..."
+					logger.info "Start loading GPL GX annotation file ${it.toString()} ..."
 					readAgilentGPL(it)
 				}
 			}
 		} else{
 			if(input.isFile()) {
-				log.info "Start loading GPL GX annotation file: ${input.toString()} ..."
+				logger.info "Start loading GPL GX annotation file: ${input.toString()} ..."
 				readAgilentGPL(input)
 			} else {
-				log.error "Neither a directory nor a file: " + input.toString()
+				logger.error "Neither a directory nor a file: " + input.toString()
 			}
 		}
 	}
@@ -149,7 +146,7 @@ class AgilentGPL {
 		StringBuffer sb = new StringBuffer()
 
 		if(annotation.size() > 0){
-			log.info "Start reading ${annotation.toString()} ..."
+			logger.info "Start reading ${annotation.toString()} ..."
 
 			String [] str
 			String chr, startLocation, stopLocation
@@ -173,9 +170,9 @@ class AgilentGPL {
 					}
 				}
 			}
-			log.info "End reading ${annotation.toString()} ..."
+			logger.info "End reading ${annotation.toString()} ..."
 		}else{
-			log.error("Empty file: ${annotation.toString()} ... ")
+			logger.error("Empty file: ${annotation.toString()} ... ")
 		}
 
 		File output = new File(out)
@@ -191,7 +188,7 @@ class AgilentGPL {
 
 	void loadAgilentGPL(File input){
 		if(input.size() >0){
-			log.info "Start loading Agilent annotation data from ${input.toString()} ..."
+			logger.info "Start loading Agilent annotation data from ${input.toString()} ..."
 			deapp.withTransaction {
 				deapp.withBatch(""" insert into $annotationTable (platform, species, probe_id, gene_symbol, gene_descr, gene_id,
 											chromosome, start_loc, stop_loc) values (?, ?, ?, ?, ?,  ?, ?, ?, ?) """, { ps ->
@@ -217,15 +214,15 @@ class AgilentGPL {
 						})
 			}
 
-			log.info "Stop loading Agilent annotation data from ${input.toString()} ..."
+			logger.info "Stop loading Agilent annotation data from ${input.toString()} ..."
 		}else{
-			log.error("Empty file: " + input.toString())
+			logger.error("Empty file: " + input.toString())
 		}
 	}
 
 
 	void loadSnpInfo(Sql deapp){
-		log.info "Start loading into DE_SNP_INFO ..."
+		logger.info "Start loading into DE_SNP_INFO ..."
 		
 		String qry = """ insert into de_snp_info (name, chrom, chrom_pos)
 						 select probe_id, replace(substr(chromosome,4), '_random', ''), start_loc
@@ -233,12 +230,12 @@ class AgilentGPL {
 						 where probe_id not in (select name from de_snp_info)"""
 		deapp.execute(qry)
 		
-		log.info "End loading into DE_SNP_INFO ..."
+		logger.info "End loading into DE_SNP_INFO ..."
 	}
 	
 	
 	void loadSnpProbe(Sql deapp){
-		log.info "Start loading into DE_SNP_PROBE ..."
+		logger.info "Start loading into DE_SNP_PROBE ..."
 		
 		String qry = """ insert into de_snp_probe (probe_name, snp_id, snp_name)
 						 select name, snp_info_id, name
@@ -246,12 +243,12 @@ class AgilentGPL {
 						 where t1.name=t2.probe_id and t1.snp_info_id not in (select snp_id from de_snp_probe)"""
 		deapp.execute(qry)
 		
-		log.info "End loading into DE_SNP_PROBE ..."
+		logger.info "End loading into DE_SNP_PROBE ..."
 	}
 	
 	
 	void loadSnpGeneMap(Sql deapp){
-		log.info "Start loading into DE_SNP_GENE_MAP ..."
+		logger.info "Start loading into DE_SNP_GENE_MAP ..."
 		
 		String qry = """ insert into de_snp_gene_map (snp_id, snp_name, entrez_gene_id)
 						 select distinct t3.snp_info_id, t2.bio_marker_name, t2.primary_external_id 
@@ -261,18 +258,18 @@ class AgilentGPL {
 								and t1.probe_id = t3.name and t3.snp_info_id not in (select snp_id from de_snp_gene_map) """
 		deapp.execute(qry)
 		
-		log.info "End loading into DE_SNP_GENE_MAP ..."
+		logger.info "End loading into DE_SNP_GENE_MAP ..."
 	}
 	
 	
 	void loadGplInfo(Sql deapp){
-		log.info "Start loading into DE_GPL_INFO ..."
+		logger.info "Start loading into DE_GPL_INFO ..."
 		
 		String qry = """ insert into de_gpl_info (platform, title, organism, marker_type, annotation_date) values(?, ?, ?, ?, sysdate) 
 							   """
 		deapp.execute(qry,[platform, 'Agilent-014693 Human Genome CGH Microarray 244A (Probe name version)', 'Homo sapiens', 'SNP'])
 		
-		log.info "End loading into DE_GPL_INFO ..."
+		logger.info "End loading into DE_GPL_INFO ..."
 	}
 	
 	
@@ -291,12 +288,12 @@ class AgilentGPL {
 		if(deapp.firstRow(qry, [
 			annotationTable.toUpperCase()
 		])[0] > 0){
-			log.info "The existing table $annotationTable will be dropped ..."
+			logger.info "The existing table $annotationTable will be dropped ..."
 			qry = "drop table $annotationTable purge"
 			deapp.execute(qry)
 		}
 
-		log.info "Start creating table $annotationTable ..."
+		logger.info "Start creating table $annotationTable ..."
 		qry = """ create table $annotationTable(
 						platform 	varchar2(100),
 						species  	varchar2(100),
@@ -309,7 +306,7 @@ class AgilentGPL {
 						stop_loc		number(10)
 					) """
 		deapp.execute(qry)
-		log.info "End creating table $annotationTable ..."
+		logger.info "End creating table $annotationTable ..."
 	}
 
 

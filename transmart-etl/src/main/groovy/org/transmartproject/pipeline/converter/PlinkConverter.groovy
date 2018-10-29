@@ -28,11 +28,10 @@
 
 package org.transmartproject.pipeline.converter
 
-import org.apache.log4j.Logger;
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class PlinkConverter {
-
-	private static final Logger log = Logger.getLogger(PlinkConverter)
 
 	// full path of PLINK program 
 	String plink
@@ -46,27 +45,27 @@ class PlinkConverter {
 		
 		String fam = outputFile + ".fam"
 		if(!isFamExist(fam)) {
-			log.info "Cannot find PLINK FAM file " + fam
+			logger.info "Cannot find PLINK FAM file " + fam
 			throw new RuntimeException("Cannot find PLINK FAM file " + fam)
 		}
 		
 		String map = outputFile + ".map"
 		if(!isFamExist(map)) {
-			log.info "Cannot find PLINK MAP file " + map
+			logger.info "Cannot find PLINK MAP file " + map
 			throw new RuntimeException("Cannot find PLINK MAP file " + map)
 		}
 		
-		log.info "Read Long-formt PLINK files from " + plinkSourceFile
-		log.info "Write Binary PLINK files to " + plinkDestinationDirectory 
+		logger.info "Read Long-formt PLINK files from " + plinkSourceFile
+		logger.info "Write Binary PLINK files to " + plinkDestinationDirectory 
 		StringBuffer sb = new StringBuffer()
 		sb.append(plink + " --lfile " + plinkSourceFile)
 		sb.append(" --noweb --make-bed ")
 		sb.append(" --out " + outputFile)
 		
 		String command = sb.toString()
-		log.info "Run: " + command
+		logger.info "Run: " + command
 		Process proc = command.execute()
-		log.info(proc.getText())
+		logger.info(proc.getText())
 	}
 	
 	
@@ -82,8 +81,8 @@ class PlinkConverter {
 	
 	void recodePlinkFileByChr(String chr) {
 		
-		log.info "Read Binary PLINK files from: " + plinkDestinationDirectory
-		log.info "Generate PLINK files for chromosome: " + chr
+		logger.info "Read Binary PLINK files from: " + plinkDestinationDirectory
+		logger.info "Generate PLINK files for chromosome: " + chr
 		
 		StringBuffer sb = new StringBuffer()
 		sb.append(plink + " --bfile " + plinkDestinationDirectory + "/" + studyName)
@@ -91,16 +90,16 @@ class PlinkConverter {
 		sb.append(" --out " + plinkDestinationDirectory + "/chr" + chr)
 		
 		String command = sb.toString()
-		log.info "Run: " + command
+		logger.info "Run: " + command
 		Process proc = command.execute()
-		log.info(proc.getText())
+		logger.info(proc.getText())
 	}		
 	
 	
 	void recodePlinkFile() {
 		
-		log.info "Read Binary PLINK files from: " + plinkDestinationDirectory
-		log.info "Recode PLINK files for all chromosomes... "
+		logger.info "Read Binary PLINK files from: " + plinkDestinationDirectory
+		logger.info "Recode PLINK files for all chromosomes... "
 		
 		StringBuffer sb = new StringBuffer()
 		sb.append(plink + " --bfile " + plinkDestinationDirectory + "/" + studyName)
@@ -108,9 +107,9 @@ class PlinkConverter {
 		sb.append(" --out " + plinkDestinationDirectory + "/all")
 		
 		String command = sb.toString()
-		log.info "Run: " + command
+		logger.info "Run: " + command
 		Process proc = command.execute()
-		log.info(proc.getText())
+		logger.info(proc.getText())
 	}
 	
 	
@@ -130,9 +129,9 @@ class PlinkConverter {
 		File lgen = new File(plinkDestinationDirectory + "/" + studyName + ".lgen")
 		
 		if(lgen.exists()){
-			log.info "Start transforming PLINK Long format to Binart format ..."
+			logger.info "Start transforming PLINK Long format to Binart format ..."
 		} else{
-			log.error "PLINK Long format file: " + lgen.toString() + " doesn't exist."
+			logger.error "PLINK Long format file: " + lgen.toString() + " doesn't exist."
 			throw new RuntimeException("PLINK Long format file: " + lgen.toString() + " doesn't exist.")
 		}
 		

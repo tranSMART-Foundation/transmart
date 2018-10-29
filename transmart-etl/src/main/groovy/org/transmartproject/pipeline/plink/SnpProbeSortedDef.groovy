@@ -28,13 +28,11 @@
 
 package org.transmartproject.pipeline.plink
 
-import org.apache.log4j.Logger;
-
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class SnpProbeSortedDef {
-
-	private static final Logger log = Logger.getLogger(SnpProbeSortedDef)
 
 	Sql deapp
 	String platform, mapDirectory
@@ -60,7 +58,7 @@ class SnpProbeSortedDef {
 		}
 
 		if(map.exists() && map.size() > 0){
-			log.info "Create DE_SNP_PROBE_SORTED_DEF record for Chromosome: " + chr
+			logger.info "Create DE_SNP_PROBE_SORTED_DEF record for Chromosome: " + chr
 
 			map.eachLine{
 				totalProbes++
@@ -70,10 +68,10 @@ class SnpProbeSortedDef {
 				probe_def.append(str[1] + "\t" + str[0] + "\t" + str[3] + "\n")
 			}
 		}else{
-			log.error "The map file for Chromosome " + chr + ": " + map.toString() + " doesn't exist or is empty ... "
+			logger.error "The map file for Chromosome " + chr + ": " + map.toString() + " doesn't exist or is empty ... "
 		}
 
-		log.info "Total probes for Chromosome " + chr + ": " + totalProbes
+		logger.info "Total probes for Chromosome " + chr + ": " + totalProbes
 
 		return ['total':totalProbes, 'snpDef':probe_def]
 	}
@@ -96,9 +94,9 @@ class SnpProbeSortedDef {
 				         values(?, ?, ?, ?, ?) """
 
 		if(isSnpProbetSortedDefExist(platform, chr)){
-			log.info "DE_SNP_PROBE_SORTED_DEF already have a record for $platform's chromosome $chr ... "
+			logger.info "DE_SNP_PROBE_SORTED_DEF already have a record for $platform's chromosome $chr ... "
 		} else {
-			log.info "Start inserting DE_SNP_PROBE_SORTED_DEF for $platform's chromosome $chr ... "
+			logger.info "Start inserting DE_SNP_PROBE_SORTED_DEF for $platform's chromosome $chr ... "
 			deapp.execute qry, [
 				platform,
 				n,
@@ -106,7 +104,7 @@ class SnpProbeSortedDef {
 				snpDef,
 				snpDef
 			]
-			log.info "End inserting DE_SNP_PROBE_SORTED_DEF for $platform's chromosome $chr ... "
+			logger.info "End inserting DE_SNP_PROBE_SORTED_DEF for $platform's chromosome $chr ... "
 		}
 	}
 
@@ -131,7 +129,7 @@ class SnpProbeSortedDef {
 
 	def getSnpRsDefByAll(){
 
-		log.info "Start creating SNP def for ALL chromosomes ..."
+		logger.info "Start creating SNP def for ALL chromosomes ..."
 
 		StringBuffer snpDef = new StringBuffer()
 		def total = 0
@@ -143,7 +141,7 @@ class SnpProbeSortedDef {
 			snpDef.append(map['snpDef'].toString())
 		}
 
-		log.info "End creating SNP def for ALL chromosomes ..."
+		logger.info "End creating SNP def for ALL chromosomes ..."
 
 		return ["total":total, "snpDef":snpDef]
 	}

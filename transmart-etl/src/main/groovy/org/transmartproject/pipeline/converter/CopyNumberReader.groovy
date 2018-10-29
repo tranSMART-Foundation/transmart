@@ -28,17 +28,15 @@
 
 package org.transmartproject.pipeline.converter
 
-import org.apache.log4j.Logger;
+import groovy.util.logging.Slf4j
 
-class CopyNumberReader {
+@Slf4j('logger')class CopyNumberReader {
 
-	private static final Logger log = Logger.getLogger(CopyNumberReader)
-	
 	File copyNumberFile
 	
 	Map copyNumberReader(String chr){
 		
-		log.info "Start reading Copy Number file: " + copyNumberFile.toString()
+		logger.info "Start reading Copy Number file: " + copyNumberFile.toString()
 		
 		Map cnMap = [:]
 		copyNumberFile.eachLine{
@@ -46,7 +44,7 @@ class CopyNumberReader {
 			cnMap[str[0] + ":" + str[1]] = str[4]
 		}
 		
-		log.info "End reading Copy Number file: " + copyNumberFile.toString()
+		logger.info "End reading Copy Number file: " + copyNumberFile.toString()
 		
 		return cnMap
 	}

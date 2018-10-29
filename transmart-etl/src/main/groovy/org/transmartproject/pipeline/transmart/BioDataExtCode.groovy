@@ -30,12 +30,10 @@ package org.transmartproject.pipeline.transmart
 
 import groovy.sql.GroovyRowResult
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioDataExtCode {
-
-    private static final Logger log = Logger.getLogger(BioDataExtCode)
 
     Sql biomart
 

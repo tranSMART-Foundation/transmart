@@ -28,23 +28,20 @@
 
 package org.transmartproject.pipeline.annotation
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator
-
 import org.transmartproject.pipeline.plink.SnpGeneMap
 import org.transmartproject.pipeline.plink.SnpInfo
 import org.transmartproject.pipeline.plink.SnpProbe
 import org.transmartproject.pipeline.transmart.GplInfo
 import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class AnnotationLoader {
-
-	private static final Logger log = Logger.getLogger(AnnotationLoader)
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
 		Util util = new Util()
 		AnnotationLoader al = new AnnotationLoader()
@@ -79,7 +76,7 @@ class AnnotationLoader {
 	void loadGplInfo(Properties props, Sql deapp){
 
 		if(props.get("skip_de_gpl_info").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_GPL_INFO ..."
+			logger.info "Skip loading DE_GPL_INFO ..."
 		}else{
 			GplInfo gi = new GplInfo()
 			gi.setDeapp(deapp)
@@ -97,7 +94,7 @@ class AnnotationLoader {
 	void loadSnpInfo(Properties props, Sql deapp){
 
 		if(props.get("skip_de_snp_info").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SNP_INFO ..."
+			logger.info "Skip loading DE_SNP_INFO ..."
 		}else{
 			SnpInfo si = new SnpInfo()
 			si.setDeapp(deapp)
@@ -111,7 +108,7 @@ class AnnotationLoader {
 	void loadSnpProbe(Properties props, Sql deapp){
 
 		if(props.get("skip_de_snp_probe").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SNP_PROBE ..."
+			logger.info "Skip loading DE_SNP_PROBE ..."
 		}else{
 			SnpProbe sp = new SnpProbe()
 			sp.setDeapp(deapp)
@@ -125,7 +122,7 @@ class AnnotationLoader {
 	void loadSnpGeneMap(Properties props, Sql deapp){
 
 		if(props.get("skip_de_snp_gene_map").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SNP_GENE_MAP ..."
+			logger.info "Skip loading DE_SNP_GENE_MAP ..."
 		}else{
 			SnpGeneMap sp = new SnpGeneMap()
 			sp.setDeapp(deapp)
@@ -139,13 +136,13 @@ class AnnotationLoader {
 	void loadGPL(Properties props, Sql biomart, Map expectedProbes){
 
 		if(props.get("skip_gpl_annotation_loader").toString().toLowerCase().equals("yes")){
-			log.info "Skip processing GPL annotation file(s) ..."
+			logger.info "Skip processing GPL annotation file(s) ..."
 		}else{
 			GPLReader gr = new GPLReader()
 
 			File probeInfo = new File(props.get("destination_directory") + File.separator + props.get("probe_info_file"))
 			if(probeInfo.size() > 0) {
-				log.warn probeInfo.toString() + " is not empty."
+				logger.warn probeInfo.toString() + " is not empty."
 				probeInfo.delete()
 				probeInfo.createNewFile()
 			}
@@ -153,7 +150,7 @@ class AnnotationLoader {
 
 			File snpGeneMap = new File(props.get("destination_directory") + File.separator + props.get("snp_gene_map_file"))
 			if(snpGeneMap.size() > 0) {
-				log.warn snpGeneMap.toString() + " is not empty."
+				logger.warn snpGeneMap.toString() + " is not empty."
 				snpGeneMap.delete()
 				snpGeneMap.createNewFile()
 			}
@@ -162,7 +159,7 @@ class AnnotationLoader {
 
 			File snpMap = new File(props.get("destination_directory") + File.separator + props.get("snp_map_file"))
 			if(snpMap.size() > 0) {
-				log.warn snpMap.toString() + " is not empty."
+				logger.warn snpMap.toString() + " is not empty."
 				snpMap.delete()
 				snpMap.createNewFile()
 			}
@@ -179,7 +176,7 @@ class AnnotationLoader {
 	void loadAffymetrix(Properties props, Sql biomart){
 
 		if(props.get("skip_gx_annotation_loader").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading Affymetrix GX annotation file(s) ..."
+			logger.info "Skip loading Affymetrix GX annotation file(s) ..."
 		}else{
 
 			File annotationSource = new File(props.get("annotation_source"))
@@ -193,7 +190,7 @@ class AnnotationLoader {
 			a.setAnnotationTable(props.get("annotation_table"))
 
 			if(props.get("recreate_annotation_table").toString().toLowerCase().equals("yes")){
-				log.info "Start recreating annotation table ${props.get("annotation_table")} for Affymetrix GX annotation file(s) ..."
+				logger.info "Start recreating annotation table ${props.get("annotation_table")} for Affymetrix GX annotation file(s) ..."
 				a.createAnnotationTable()
 			}
 
@@ -205,7 +202,7 @@ class AnnotationLoader {
 	void loadTaxonomy(Properties props, Sql biomart){
 
 		if(props.get("skip_taxonomy_name").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading Taxonomy name ..."
+			logger.info "Skip loading Taxonomy name ..."
 		}else{
 			File taxonomy = new File("C:/Customers/NCBI/Taxonomy/names.dmp")
 
@@ -222,7 +219,7 @@ class AnnotationLoader {
 	void loadGeneInfo(Properties props, Sql biomart){
 
 		if(props.get("skip_gene_info").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading Gene Info ..."
+			logger.info "Skip loading Gene Info ..."
 		}else{
 			File geneInfo = new File("C:/Customers/NCBI/Taxonomy/gene_info")
 
@@ -238,7 +235,7 @@ class AnnotationLoader {
 	void loadGxGPL(Properties props, Sql biomart){
 
 		if(props.get("skip_gx_gpl_loader").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading GPL GX annotation file(s) ..."
+			logger.info "Skip loading GPL GX annotation file(s) ..."
 		}else{
 
 
@@ -247,7 +244,7 @@ class AnnotationLoader {
 			gpl.setAnnotationTable(props.get("annotation_table"))
 
 			if(props.get("recreate_annotation_table").toString().toLowerCase().equals("yes")){
-				log.info "Start recreating annotation table ${props.get("annotation_table")} for GPL GX annotation file(s) ..."
+				logger.info "Start recreating annotation table ${props.get("annotation_table")} for GPL GX annotation file(s) ..."
 				gpl.createAnnotationTable()
 			}
 

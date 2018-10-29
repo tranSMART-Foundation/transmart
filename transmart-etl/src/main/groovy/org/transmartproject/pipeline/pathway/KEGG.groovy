@@ -40,22 +40,21 @@ import org.transmartproject.pipeline.transmart.SearchKeywordTerm
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class KEGG {
 
-	private static final Logger log = Logger.getLogger(KEGG)
 	private static Properties props
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
-		log.info("Start loading property file ...")
+		logger.info("Start loading property file ...")
 		props = Util.loadConfiguration("conf/Pathway.properties");
 
-                log.info("Loaded props ${props}")
+                logger.info("Loaded props ${props}")
 		Sql i2b2demodata = Util.createSqlFromPropertyFile(props, "i2b2demodata")
 		Sql i2b2metadata = Util.createSqlFromPropertyFile(props, "i2b2metadata")
 		Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
@@ -105,12 +104,12 @@ class KEGG {
 		sk.setSearchapp(searchapp)
 		sk.setBiomart(biomart)
 		if(props.get("skip_search_keyword").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into SEARCH_KEYWORD table ..."
+			logger.info "Skip loading new records into SEARCH_KEYWORD table ..."
 		}else{
-			log.info "Start loading new pathway records into SEARCH_KEYWORD table ..."
+			logger.info "Start loading new pathway records into SEARCH_KEYWORD table ..."
 			sk.loadPathwaySearchKeyword("KEGG")
 			sk.loadGeneSearchKeyword()
-			log.info "End loading new pathway records into SEARCH_KEYWORD table ..."
+			logger.info "End loading new pathway records into SEARCH_KEYWORD table ..."
 		}
                 sk.closeSearchKeyword()
 	}
@@ -121,12 +120,12 @@ class KEGG {
             Boolean isPostgres = Util.isPostgres()
 
             if(props.get("skip_bio_data_correlation").toString().toLowerCase().equals("yes")){
-                log.info "Skip loading new records into BIO_DATA_CORRELATION table ..."
+                logger.info "Skip loading new records into BIO_DATA_CORRELATION table ..."
             }else{
                 String qry;
                 String qrykegg;
 
-                log.info "Start loading new records into BIO_DATA_CORRELATION table ..."
+                logger.info "Start loading new records into BIO_DATA_CORRELATION table ..."
 
                 if(isPostgres){
 
@@ -160,12 +159,12 @@ class KEGG {
                 }
                 deapp.eachRow(qrykegg) 
                 {
-                    log.info "load bio_data_correlation for pathway ${it.pathway} gene ${it.gene}"
+                    logger.info "load bio_data_correlation for pathway ${it.pathway} gene ${it.gene}"
                     biomart.execute(qry, it.pathway, it.gene_id)
                 }
                 
 
-                log.info "End loading new records into BIO_DATA_CORRELATION table ..."
+                logger.info "End loading new records into BIO_DATA_CORRELATION table ..."
             }
 	}
 
@@ -177,11 +176,11 @@ class KEGG {
 		bdc.setSource("KEGG")
 		bdc.setBioDataCorrelDescrId(bioDataCorrelDescrId)
 		if(props.get("skip_bio_data_correlation").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into BIO_DATA_CORRELATION table ..."
+			logger.info "Skip loading new records into BIO_DATA_CORRELATION table ..."
 		}else{
-			log.info "Start loading new records into BIO_DATA_CORRELATION table ..."
+			logger.info "Start loading new records into BIO_DATA_CORRELATION table ..."
 			bdc.loadBioDataCorrelation(keggData)
-			log.info "End loading new records into BIO_DATA_CORRELATION table ..."
+			logger.info "End loading new records into BIO_DATA_CORRELATION table ..."
 		}
 	}
 
@@ -199,7 +198,7 @@ class KEGG {
 		bm.setOrganism("HOMO SAPIENS")
 		bm.setBiomart(biomart)
 		if(props.get("skip_bio_marker").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into BIO_MARKER table ..."
+			logger.info "Skip loading new records into BIO_MARKER table ..."
 		}else{
 			bm.loadGenes(keggData)
 			bm.loadPathways(keggDef, "KEGG")
@@ -212,11 +211,11 @@ class KEGG {
 		pg.setSource("KEGG")
 		pg.setDeapp(deapp)
 		if(props.get("skip_de_pathway_gene").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into DE_PATHWAY_GENE table ..."
+			logger.info "Skip loading new records into DE_PATHWAY_GENE table ..."
 		}else{
-			log.info "Start loading new records into DE_PATHWAY_GENE table ..."
+			logger.info "Start loading new records into DE_PATHWAY_GENE table ..."
 			pg.loadPathwayGene(deapp, keggData)
-			log.info "Start loading new records into DE_PATHWAY_GENE table ..."
+			logger.info "Start loading new records into DE_PATHWAY_GENE table ..."
 		}
 	}
 
@@ -226,11 +225,11 @@ class KEGG {
 		p.setSource("KEGG")
 		p.setDeapp(deapp)
 		if(props.get("skip_de_pathway").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into DE_PATHWAY table ..."
+			logger.info "Skip loading new records into DE_PATHWAY table ..."
 		}else{
-			log.info "Start loading new records into DE_PATHWAY table ..."
+			logger.info "Start loading new records into DE_PATHWAY table ..."
 			p.loadPathwayDefinition(keggDef)
-			log.info "Stop loading new records into DE_PATHWAY table ..."
+			logger.info "Stop loading new records into DE_PATHWAY table ..."
 		}
 	}
 
@@ -239,7 +238,7 @@ class KEGG {
 		SearchKeywordTerm skt = new SearchKeywordTerm()
 		skt.setSearchapp(searchapp)
 		if(props.get("skip_search_keyword_term").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading new records into SEARCH_KEYWORD_TERM table ..."
+			logger.info "Skip loading new records into SEARCH_KEYWORD_TERM table ..."
 		}else{
 			skt.loadSearchKeywordTerm()
 		}
@@ -265,7 +264,7 @@ class KEGG {
 				geneId = str[1].replace("hsa:", "")
 				geneSymbol = str[2].replace("hsa:", "").split(" +")[0]
 				String line = pathway + "\t" + geneId + "\t" + geneSymbol
-				//log.info line
+				//logger.info line
 				sb.append(line + "\n")
 			}
 		}
@@ -290,13 +289,13 @@ class KEGG {
 
 		input.eachFile {
 			if(it.toString().indexOf(".conf") != -1) {
-				//log.info it
+				//logger.info it
 				it.eachLine { line ->
 					if((line.indexOf("hsa:") == -1) && (line.indexOf("?hsa") != -1)){
 						str = line.split("\t")
 						str1 = str[2].split(": ")
 						sb.append(str1[0] + "\t" + str1[1] + "\n")
-						//log.info str1[0] + "\t" + str1[1]
+						//logger.info str1[0] + "\t" + str1[1]
 					}
 				}
 			}
@@ -330,7 +329,7 @@ class KEGG {
             }
 
             if(keggData.size() > 0){
-                log.info("Start loading KEGG data file: ${keggData} into ${KEGGDataTable} ...")
+                logger.info("Start loading KEGG data file: ${keggData} into ${KEGGDataTable} ...")
 
                 deapp.withTransaction {
                     deapp.withBatch(1000, qry, {stmt ->
@@ -341,7 +340,7 @@ class KEGG {
                                     })
                 }
             }else{
-                log.error("File ${keggData} is empty ...")
+                logger.error("File ${keggData} is empty ...")
             }
 	}
 
@@ -360,7 +359,7 @@ class KEGG {
             }
             
             if(keggDef.size() > 0){
-                log.info("Start loading KEGG definition file: ${keggDef} into ${KEGGDefTable} ...")
+                logger.info("Start loading KEGG definition file: ${keggDef} into ${KEGGDefTable} ...")
 
                 deapp.withTransaction {
                     deapp.withBatch(1000, qry, {stmt ->
@@ -371,7 +370,7 @@ class KEGG {
                                     })
                 }
             }else{
-                log.error("File ${keggDef} is empty ...")
+                logger.error("File ${keggDef} is empty ...")
             }
 	}
 
@@ -384,7 +383,7 @@ class KEGG {
             String qry2;
 //            String qry3;
 
-		log.info "Start creating table: ${KEGGDataTable}"
+		logger.info "Start creating table: ${KEGGDataTable}"
 
                 if(isPostgres){
                     qry = """ create table ${KEGGDataTable} (
@@ -418,11 +417,11 @@ class KEGG {
 
 //                if(isPostgres)
 //{
-//    log.info ("access '${qry3}'")
+//    logger.info ("access '${qry3}'")
 //    deapp.execute(qry3);
 //}
 
-		log.info "End creating table: ${KEGGDataTable}"
+		logger.info "End creating table: ${KEGGDataTable}"
 	}
 
 
@@ -433,7 +432,7 @@ class KEGG {
             String qry1;
             String qry2;
 
-            log.info "Start creating table: ${KEGGDefTable}"
+            logger.info "Start creating table: ${KEGGDefTable}"
 
             if(isPostgres){
                 qry = """ create table ${KEGGDefTable} (
@@ -458,7 +457,7 @@ class KEGG {
 
             deapp.execute(qry)
 
-            log.info "End creating table: ${KEGGDefTable}"
+            logger.info "End creating table: ${KEGGDefTable}"
 	}
 
 }

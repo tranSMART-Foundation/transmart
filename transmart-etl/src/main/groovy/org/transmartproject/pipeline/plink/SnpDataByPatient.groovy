@@ -28,17 +28,15 @@
 
 package org.transmartproject.pipeline.plink
 
-import org.apache.log4j.Logger;
-
 import org.transmartproject.pipeline.converter.CopyNumberReader
 import org.transmartproject.pipeline.i2b2.PatientDimension;
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class SnpDataByPatient {
-
-	private static final Logger log = Logger.getLogger(SnpDataByPatient)
 
 	Sql deapp
 	String trial, prefix, path, sourceSystemPrefix
@@ -65,7 +63,7 @@ class SnpDataByPatient {
 	 */
 	def loadPatientSnpDataFromPed(String pedPath, String chr){
 
-		log.info "Start loaing SNP data for Chromosome $chr into DE_SNP_DATA_BY_PATIENT ..."
+		logger.info "Start loaing SNP data for Chromosome $chr into DE_SNP_DATA_BY_PATIENT ..."
 
 		String qry = """ insert into de_snp_data_by_patient (snp_dataset_id, 
 		                   trial_name, patient_num, chrom, 
@@ -90,7 +88,7 @@ class SnpDataByPatient {
 				if(pid > 0){
 					patientNum = pid
 				}else{
-					log.error("Cannot find patient_number for: " + subjectId)
+					logger.error("Cannot find patient_number for: " + subjectId)
 					throw new RuntimeException("Cannot find patient_number for: " + subjectId)
 				}
 			}
@@ -113,7 +111,7 @@ class SnpDataByPatient {
 					])
 			}
 		}
-		log.info "End loaing SNP data for Chromosome $chr into DE_SNP_DATA_BY_PATIENT ..."
+		logger.info "End loaing SNP data for Chromosome $chr into DE_SNP_DATA_BY_PATIENT ..."
 	}
 
 
@@ -126,7 +124,7 @@ class SnpDataByPatient {
 	 */
 	def loadPatientSnpDataFromPedWithCN(String chr, Map cnMap){
 
-		log.info "Start loaing SNP data with Copy Number for Chromosome $chr into DE_SNP_DATA_BY_PATIENT ..."
+		logger.info "Start loaing SNP data with Copy Number for Chromosome $chr into DE_SNP_DATA_BY_PATIENT ..."
 
 		List map = getMapData()
 
@@ -152,7 +150,7 @@ class SnpDataByPatient {
 					loadPatientSnpData(dataMap)
 			}
 		}
-		log.info "End loaing SNP data for Chromosome $chr into DE_SNP_DATA_BY_PATIENT ..."
+		logger.info "End loaing SNP data for Chromosome $chr into DE_SNP_DATA_BY_PATIENT ..."
 	}
 
 
@@ -164,7 +162,7 @@ class SnpDataByPatient {
 	 */
 	def loadPatientSnpDataFromPed(String chr){
 
-		log.info "Start loaing SNP data for Chromosome $chr into DE_SNP_DATA_BY_PATIENT ..."
+		logger.info "Start loaing SNP data for Chromosome $chr into DE_SNP_DATA_BY_PATIENT ..."
 
 		Map dataMap = [:]
 
@@ -188,7 +186,7 @@ class SnpDataByPatient {
 			}
 		}
 
-		log.info "End loaing SNP data for Chromosome $chr into DE_SNP_DATA_BY_PATIENT ..."
+		logger.info "End loaing SNP data for Chromosome $chr into DE_SNP_DATA_BY_PATIENT ..."
 	}
 
 
@@ -203,32 +201,32 @@ class SnpDataByPatient {
 
 		File map = new File(path + "/" + prefix + chr + ".map")
 		if(!map.exists()) {
-			log.warn "Cannot find MAP file: " + map.toString()
+			logger.warn "Cannot find MAP file: " + map.toString()
 		}
 
 		File ped = new File(path + "/" + prefix + chr + ".ped")
 		if(!ped.exists()) {
-			log.warn "Cannot find PED file: " + ped.toString()
+			logger.warn "Cannot find PED file: " + ped.toString()
 		}
 
 		File cn = new File(path + "/" + prefix + chr + ".cn")
 
 		if(map.exists() && ped.exists()) {
 			setPedFile(ped)
-			log.info "Loading PED file: " + ped.toString()
+			logger.info "Loading PED file: " + ped.toString()
 
 			setMapFile(map)
-			log.info "Loading Map file: " + map.toString()
+			logger.info "Loading Map file: " + map.toString()
 
 			if(cn.exists()){
-				log.info "Loading CN file: " + cn.toString()
+				logger.info "Loading CN file: " + cn.toString()
 				copyNumberReader.setCopyNumberFile(cn)
 				Map cnMap = copyNumberReader.copyNumberReader(chr)
-				log.info("Copy Number records for chr$chr: " + cnMap.size())
+				logger.info("Copy Number records for chr$chr: " + cnMap.size())
 				loadPatientSnpDataFromPedWithCN(chr, cnMap)
 			} else{
-				log.warn("Cannot find Copy Number file: " + cn.toString())
-				log.warn("Loading SNP data without Copy Number for Chromosome: " + chr)
+				logger.warn("Cannot find Copy Number file: " + cn.toString())
+				logger.warn("Loading SNP data without Copy Number for Chromosome: " + chr)
 				loadPatientSnpDataFromPed(chr)
 			}
 		}
@@ -237,7 +235,7 @@ class SnpDataByPatient {
 
 	void loadSnpDataByPatientAllChromosome(){
 
-		log.info "Start loading data for ALL chromsomes per patient ..."
+		logger.info "Start loading data for ALL chromsomes per patient ..."
 
 		Map dataMap = [:]
 
@@ -260,7 +258,7 @@ class SnpDataByPatient {
 			}
 		}
 		
-		log.info "End loading data for ALL chromsomes per patient ..."
+		logger.info "End loading data for ALL chromsomes per patient ..."
 	}
 
 
@@ -294,9 +292,9 @@ class SnpDataByPatient {
 		dataMap["dataByPatient"] = data.toString()
 
 		if(!isPatientSnpDataExist(Long.parseLong(datasetId), "ALL")) {
-			log.info "Start loading data for ALL chromsomes for patient:dataset ->" + datasetId + ":" + patientNum
+			logger.info "Start loading data for ALL chromsomes for patient:dataset ->" + datasetId + ":" + patientNum
 			loadPatientSnpData(dataMap)
-			log.info "End loading data for ALL chromsomes for patient:dataset ->" + datasetId + ":" + patientNum
+			logger.info "End loading data for ALL chromsomes for patient:dataset ->" + datasetId + ":" + patientNum
 		}
 	}
 
@@ -347,7 +345,7 @@ class SnpDataByPatient {
 	 */
 	void loadPatientSnpData(Map dataMap){
 
-		log.info "Start inserting SNP data for (${dataMap["chr"]}, ${dataMap["patientNum"]}, ${dataMap["datasetId"]}) into DE_SNP_DATA_BY_PATIENT ..."
+		logger.info "Start inserting SNP data for (${dataMap["chr"]}, ${dataMap["patientNum"]}, ${dataMap["datasetId"]}) into DE_SNP_DATA_BY_PATIENT ..."
 
 		String qry = """ insert into de_snp_data_by_patient (snp_dataset_id,
 								   trial_name, patient_num, chrom,
@@ -363,7 +361,7 @@ class SnpDataByPatient {
 			dataMap["pedByPatient"]
 		])
 
-		log.info "Start inserting SNP data for (${dataMap["chr"]}, ${dataMap["patientNum"]}, ${dataMap["datasetId"]}) into DE_SNP_DATA_BY_PATIENT ..."
+		logger.info "Start inserting SNP data for (${dataMap["chr"]}, ${dataMap["patientNum"]}, ${dataMap["datasetId"]}) into DE_SNP_DATA_BY_PATIENT ..."
 	}
 
 
@@ -417,21 +415,21 @@ class SnpDataByPatient {
 	List getMapData(){
 
 		List map = []
-		log.info "Loading MAP data from: " + mapFile.toString()
+		logger.info "Loading MAP data from: " + mapFile.toString()
 		int index = 0
 		mapFile.eachLine{
 			String [] str = it.split("\t")
 			map[index] = str[1]
 			index++
 		}
-		log.info("Total SNPs in " + mapFile.toString() + ":  " + map.size())
+		logger.info("Total SNPs in " + mapFile.toString() + ":  " + map.size())
 		return map
 	}
 
 
 	Map getPatientDatasetMap(){
 
-		log.info "Get patient_number: dataset_id map from de_snp_data_by_patient"
+		logger.info "Get patient_number: dataset_id map from de_snp_data_by_patient"
 		Map datasetMap = [:]
 		String qry = "select distinct patient_num, snp_dataset_id from de_snp_data_by_patient"
 		deapp.eachRow(qry) {
@@ -468,9 +466,9 @@ class SnpDataByPatient {
 	/*
 	 File getDataByPatientAllFile(){
 	 File f = new File(path + "/DataByPatient.all")
-	 log.info "Create the file " + f.toString()
+	 logger.info "Create the file " + f.toString()
 	 if(f.size() > 0){
-	 log.info f.toString() + ":" + f.size()
+	 logger.info f.toString() + ":" + f.size()
 	 f.delete()
 	 f.createNewFile()
 	 }
@@ -485,9 +483,9 @@ class SnpDataByPatient {
 	/*		
 	 File getPedByPatientAllFile(){
 	 File f = new File(path + "/PedByPatient.all")
-	 log.info "Create the file " + f.toString()
+	 logger.info "Create the file " + f.toString()
 	 if(f.size() > 0){
-	 log.info f.toString() + ":" + f.size()
+	 logger.info f.toString() + ":" + f.size()
 	 f.delete()
 	 f.createNewFile()
 	 }

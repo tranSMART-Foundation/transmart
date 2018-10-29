@@ -1,14 +1,14 @@
 package org.transmartproject.pipeline.dictionary
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
+import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.transmart.BioDataCorrelDescr
 import org.transmartproject.pipeline.transmart.BioDataCorrelation
 import org.transmartproject.pipeline.transmart.BioMarker
 import org.transmartproject.pipeline.util.Util
 
+@Slf4j('logger')
 class CorrelationLoader {
-    private static final Logger log = Logger.getLogger(CorrelationLoader)
 
     Sql sqlBiomart
     Sql sqlDeapp
@@ -18,7 +18,7 @@ class CorrelationLoader {
     long bioDataCorrelDescrId2
 
     public CorrelationLoader(String correlation1, String correlation2) {
-        log.info("Start loading property file ...")
+        logger.info("Start loading property file ...")
         Properties props = Util.loadConfiguration('')
         sqlBiomart = Util.createSqlFromPropertyFile(props, "biomart")
         sqlDeapp = Util.createSqlFromPropertyFile(props, "deapp")

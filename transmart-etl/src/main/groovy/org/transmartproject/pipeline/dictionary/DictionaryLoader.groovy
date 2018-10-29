@@ -28,7 +28,7 @@
 package org.transmartproject.pipeline.dictionary
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
+import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.transmart.BioDataExtCode
 import org.transmartproject.pipeline.transmart.BioMarker
 import org.transmartproject.pipeline.transmart.SearchKeyword
@@ -39,8 +39,8 @@ import org.transmartproject.pipeline.util.Util
  *  BIO_MARKER, BIO_DATA_EXT_CODE,
  *  SEARCH_KEYWORD, SEARCH_KEYWORD_TERM
  */
+@Slf4j('logger')
 class DictionaryLoader {
-    private static final Logger log = Logger.getLogger(DictionaryLoader)
 
     Sql sqlBiomart
     Sql sqlSearchApp

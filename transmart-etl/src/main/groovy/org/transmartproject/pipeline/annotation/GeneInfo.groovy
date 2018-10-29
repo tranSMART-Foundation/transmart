@@ -36,14 +36,12 @@ import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql;
 import groovy.sql.GroovyRowResult
+import groovy.util.logging.Slf4j
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator
 
+@Slf4j('logger')
 class GeneInfo {
-
-	private static final Logger log = Logger.getLogger(GeneInfo)
 
         private static SearchKeyword searchKeyword
         private static SearchKeywordTerm searchKeywordTerm
@@ -54,7 +52,7 @@ class GeneInfo {
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
 		Util util = new Util()
 		Properties props = Util.loadConfiguration("conf/GeneInfo.properties")
@@ -69,7 +67,7 @@ class GeneInfo {
                 searchKeywordTerm.setSearchapp(searchapp)
 
 		if(props.get("skip_load_gene_info").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading Gene Info ..."
+			logger.info "Skip loading Gene Info ..."
 		}else{
 			File geneInfo = new File(props.get("gene_info_source"))
 
@@ -94,13 +92,13 @@ class GeneInfo {
 			if(props.get("create_gene_info_table").toString().toLowerCase().equals("yes")){
 				gi.createGeneInfoTable()
 			}else{
-				log.info "Skip creating table "+props.get("gene_info_table")+" ..."
+				logger.info "Skip creating table "+props.get("gene_info_table")+" ..."
 			}
 
 			if(props.get("create_gene_synonym_table").toString().toLowerCase().equals("yes")){
 				gi.createGeneSynonymTable()
 			}else{
-				log.info "Skip creating table "+props.get("create_gene_synonym_table")+" ..."
+				logger.info "Skip creating table "+props.get("create_gene_synonym_table")+" ..."
 			}
 
 			Map selectedOrganism = gi.getSelectedOrganism(props.get("selected_organism"))
@@ -113,7 +111,7 @@ class GeneInfo {
 			gi.updateBioDataExtCode(selectedOrganism)
 
                         if(props.get("skip_search_keyword").toString().toLowerCase().equals("yes")){
-                            log.info("Skip loading Entrez GeneInfo annotation from ${gi.geneInfoTable} to SEARCH_KEYWORD ...")
+                            logger.info("Skip loading Entrez GeneInfo annotation from ${gi.geneInfoTable} to SEARCH_KEYWORD ...")
                         }else{
                             gi.loadSearchKeyword(searchapp,biomart,gi.geneInfoTable,gi.geneSynonymTable,selectedOrganism)
                             searchKeyword.closeSearchKeyword()
@@ -138,7 +136,7 @@ class GeneInfo {
 
         Boolean isPostgres = Util.isPostgres()
         String qry;
-		log.info "Start updating BIO_MARKER for $taxonomyId:$organism using Entrez data ..."
+		logger.info "Start updating BIO_MARKER for $taxonomyId:$organism using Entrez data ..."
 
         if(isPostgres){
 		qry = """ insert into bio_marker(bio_marker_name, bio_marker_description, organism, primary_source_code,
@@ -158,7 +156,7 @@ class GeneInfo {
 
 		biomart.execute(qry, [organism, taxonomyId, organism])
 
-		log.info "End updating BIO_MARKER for $taxonomyId:$organism using Entrez data ..."
+		logger.info "End updating BIO_MARKER for $taxonomyId:$organism using Entrez data ..."
 	}
 
 
@@ -168,7 +166,7 @@ class GeneInfo {
         Boolean isPostgres = Util.isPostgres()
         String qry;
 
-		log.info "Start updating BIO_MARKER using Entrez data ..."
+		logger.info "Start updating BIO_MARKER using Entrez data ..."
 
         if(isPostgres){
 		qry = """ insert into bio_marker(bio_marker_name, bio_marker_description, organism, primary_source_code,
@@ -186,31 +184,31 @@ class GeneInfo {
 						 	(select primary_external_id from bio_marker where organism=?) """
         }
 
-		log.info "Start updating Home sapiens gene info  ..."
+		logger.info "Start updating Home sapiens gene info  ..."
 		biomart.execute(qry, [
 			"Homo sapiens",
 			"9606",
 			"HOMO SAPIENS"
 		])
-		log.info "End updating Home sapiens gene info  ..."
+		logger.info "End updating Home sapiens gene info  ..."
 
-		log.info "Start updating Mus musculus gene info  ..."
+		logger.info "Start updating Mus musculus gene info  ..."
 		biomart.execute(qry, [
 			"Mus musculus",
 			"10090",
 			"MUS MUSCULUS"
 		])
-		log.info "End updating Mus musculus gene info  ..."
+		logger.info "End updating Mus musculus gene info  ..."
 
-		log.info "Start updating Rattus norvegicus gene info  ..."
+		logger.info "Start updating Rattus norvegicus gene info  ..."
 		biomart.execute(qry, [
 			"Rattus norvegicus",
 			"10116",
 			"RATTUS NORVEGICUS"
 		])
-		log.info "End updating Rattus norvegicus gene info  ..."
+		logger.info "End updating Rattus norvegicus gene info  ..."
 
-		log.info "End updating BIO_MARKER using Entrez data ..."
+		logger.info "End updating BIO_MARKER using Entrez data ..."
 	}
 
 	
@@ -232,7 +230,7 @@ class GeneInfo {
         String qry2
         String qry3
 
-        log.info "Start loading BIO_DATA_UID using Entrez data ..."
+        logger.info "Start loading BIO_DATA_UID using Entrez data ..."
 
         if(isPostgres){
             qry1 = """ select bio_marker_id, primary_external_id
@@ -252,7 +250,7 @@ class GeneInfo {
 //								from bio_data_uid """
         }
         
-        log.info "Start loading genes from $taxonomyId:$organism  ..."
+        logger.info "Start loading genes from $taxonomyId:$organism  ..."
 
         biomart.withTransaction {
             biomart.withBatch(1000, qry3, { ps ->
@@ -262,19 +260,19 @@ class GeneInfo {
                     GroovyRowResult rowResult = biomart.firstRow(qry2, [it.bio_marker_id, uniqueId])
                     int count = rowResult[0]
                     if(count > 0){
-                        //log.info "$organism:$it.bio_marker_id:$uniqueId already exists ($count) in BIO_DATA_UID ..."
+                        //logger.info "$organism:$it.bio_marker_id:$uniqueId already exists ($count) in BIO_DATA_UID ..."
                     }
                     else{
-                        log.info "Insert $organism:$it.bio_marker_id:$uniqueId into BIO_DATA_UID ..."
+                        logger.info "Insert $organism:$it.bio_marker_id:$uniqueId into BIO_DATA_UID ..."
                         ps.addBatch([it.bio_marker_id, uniqueId, 'BIO_MARKER.GENE'])
                     }
                 }
             })
         }
         
-        log.info "End loading genes from $taxonomyId:$organism  ..."
+        logger.info "End loading genes from $taxonomyId:$organism  ..."
 
-        log.info "End loading BIO_DATA_UID using Entrez data ..."
+        logger.info "End loading BIO_DATA_UID using Entrez data ..."
    }
    
 
@@ -293,7 +291,7 @@ class GeneInfo {
 
         Boolean isPostgres = Util.isPostgres()
         String qry;
-		log.info "Start loading BIO_DATA_EXT_CODE using Entrez's synonyms data ..."
+		logger.info "Start loading BIO_DATA_EXT_CODE using Entrez's synonyms data ..."
 
         if(isPostgres){
 		qry = """ insert into bio_data_ext_code(bio_data_id, code, code_source, code_type, bio_data_type)
@@ -315,11 +313,11 @@ class GeneInfo {
 								 from bio_data_ext_code """
         }
         
-		log.info "Start loading synonyms for genes from $taxonomyId:$organism  ..."
+		logger.info "Start loading synonyms for genes from $taxonomyId:$organism  ..."
 		biomart.execute(qry, [taxonomyId, organism])
-		log.info "End loading synonyms for genes from $taxonomyId:$organism  ..."
+		logger.info "End loading synonyms for genes from $taxonomyId:$organism  ..."
 
-		log.info "End loading BIO_DATA_EXT_CODE using Entrez's synonyms data ..."
+		logger.info "End loading BIO_DATA_EXT_CODE using Entrez's synonyms data ..."
 	}
 
 
@@ -328,7 +326,7 @@ class GeneInfo {
         Boolean isPostgres = Util.isPostgres()
         String qry;
 
-		log.info "Start loading BIO_DATA_EXT_CODE using Entrez's Synonyms data ..."
+		logger.info "Start loading BIO_DATA_EXT_CODE using Entrez's Synonyms data ..."
 
         if(isPostgres){
 		qry = """ insert into bio_data_ext_code(bio_data_id, code, code_source, code_type, bio_data_type)
@@ -350,28 +348,28 @@ class GeneInfo {
 						 from bio_data_ext_code """
         }
         
-		log.info "Start loading synonyms for Home sapiens genes  ..."
+		logger.info "Start loading synonyms for Home sapiens genes  ..."
 		biomart.execute(qry, [
 			"9606",
 			"HOMO SAPIENS"
 		])
-		log.info "End loading synonyms for Home sapiens genes  ..."
+		logger.info "End loading synonyms for Home sapiens genes  ..."
 
-		log.info "Start loading synonyms for Mus musculus genes  ..."
+		logger.info "Start loading synonyms for Mus musculus genes  ..."
 		biomart.execute(qry, [
 			"10090",
 			"MUS MUSCULUS"
 		])
-		log.info "End loading synonyms for Mus musculus genes  ..."
+		logger.info "End loading synonyms for Mus musculus genes  ..."
 
-		log.info "Start loading synonyms for Rattus norvegicus genes  ..."
+		logger.info "Start loading synonyms for Rattus norvegicus genes  ..."
 		biomart.execute(qry, [
 			"10116",
 			"RATTUS NORVEGICUS"
 		])
-		log.info "End loading synonyms for Rattus norvegicus genes  ..."
+		logger.info "End loading synonyms for Rattus norvegicus genes  ..."
 
-		log.info "End loading BIO_DATA_EXT_CODE using Entrez'S Synonyms data ..."
+		logger.info "End loading BIO_DATA_EXT_CODE using Entrez'S Synonyms data ..."
 	}
 
 
@@ -402,7 +400,7 @@ class GeneInfo {
 		StringBuffer sbSynonym = new StringBuffer()
 
 		if(geneInfo.size() > 0){
-			log.info "Reading Gene Info file: " + geneInfo.toString()
+			logger.info "Reading Gene Info file: " + geneInfo.toString()
 			geneInfo.eachLine {
 				String [] str = it.split(/\t/)
 				if(it.indexOf("#Format") !=  -1){
@@ -429,7 +427,7 @@ class GeneInfo {
 				}
 			}
 		}else{
-			log.error(geneInfo.toString() + " is empty.")
+			logger.error(geneInfo.toString() + " is empty.")
 			return
 		}
 
@@ -481,7 +479,7 @@ class GeneInfo {
 		StringBuffer sbSynonym = new StringBuffer()
 
 		if(geneInfo.size() > 0){
-			log.info "Extracting data for $taxonomyId:$organism from Gene Info file: " + geneInfo.toString()
+			logger.info "Extracting data for $taxonomyId:$organism from Gene Info file: " + geneInfo.toString()
 			geneInfo.eachLine {
 				String [] str = it.split(/\t/)
 				if(it.indexOf("#Format") !=  -1){
@@ -508,7 +506,7 @@ class GeneInfo {
 				}
 			}
 		}else{
-			log.error(geneInfo.toString() + " is empty.")
+			logger.error(geneInfo.toString() + " is empty.")
 			return
 		}
 
@@ -523,7 +521,7 @@ class GeneInfo {
 		String qry = "insert into $geneInfoTable (tax_id, gene_id, gene_symbol, gene_descr) values (?, ?, ?, ?)"
 
 		if(geneInfo.size() > 0){
-			log.info "Start loading file: " + geneInfo.toString()
+			logger.info "Start loading file: " + geneInfo.toString()
 			biomart.withTransaction {
 				biomart.withBatch(100, qry,  { stmt ->
 					geneInfo.eachLine {
@@ -543,7 +541,7 @@ class GeneInfo {
                                                     def ee = e.getNextException()
                                                     if(ee) {
                                                         ee.printStackTrace()
-                                                        log.info "extractSelectedGeneInfo exception"
+                                                        logger.info "extractSelectedGeneInfo exception"
                                                     }
                                                 }
                                                 
@@ -551,11 +549,11 @@ class GeneInfo {
 				})
 			}
 		}else{
-			log.error("Gene Info file is empty.")
+			logger.error("Gene Info file is empty.")
 			return
 		}
 
-		log.info "End loading Gene Info file: " + geneInfo.toString()
+		logger.info "End loading Gene Info file: " + geneInfo.toString()
 	}
 
 
@@ -564,7 +562,7 @@ class GeneInfo {
 		String qry = "insert into $geneSynonymTable (tax_id, gene_id, gene_symbol, gene_synonym) values (?, ?, ?, ?)"
 
 		if(geneSynonym.size() > 0){
-			log.info "Start loading file: " + geneSynonym.toString()
+			logger.info "Start loading file: " + geneSynonym.toString()
 			biomart.withTransaction {
 				biomart.withBatch(100, qry,  { stmt ->
 					geneSynonym.eachLine {
@@ -582,11 +580,11 @@ class GeneInfo {
 				})
 			}
 		}else{
-			log.error("Gene's synonym file is empty.")
+			logger.error("Gene's synonym file is empty.")
 			return
 		}
 
-		log.info "End loading gene synonym file: " + geneSynonym.toString()
+		logger.info "End loading gene synonym file: " + geneSynonym.toString()
 	}
 
 
@@ -603,7 +601,7 @@ class GeneInfo {
             qry2 = "drop table $geneInfoTable"
 
             if(biomart.firstRow(qry1, [geneInfoTable])[0] > 0){
-                log.info "Drop table $geneInfoTable ..."
+                logger.info "Drop table $geneInfoTable ..."
                 biomart.execute(qry2)
             }
         } else {
@@ -611,12 +609,12 @@ class GeneInfo {
             qry2 = "drop table $geneInfoTable purge"
 
             if(biomart.firstRow(qry1, [geneInfoTable.toUpperCase()])[0] > 0){
-                log.info "Drop table $geneInfoTable ..."
+                logger.info "Drop table $geneInfoTable ..."
                 biomart.execute(qry2)
             }
         }
 
-		log.info "Start creating table $geneInfoTable ..."
+		logger.info "Start creating table $geneInfoTable ..."
 
                 if(isPostgres){
                     qry = """ create table $geneInfoTable (
@@ -636,7 +634,7 @@ class GeneInfo {
                 
 		biomart.execute(qry)
 
-		log.info "End creating table $geneInfoTable ..."
+		logger.info "End creating table $geneInfoTable ..."
 	}
 
 
@@ -653,7 +651,7 @@ class GeneInfo {
             qry2 = "drop table $geneSynonymTable"
 
             if(biomart.firstRow(qry1, [geneSynonymTable])[0] > 0){
-                log.info "Drop table $geneSynonymTable ..."
+                logger.info "Drop table $geneSynonymTable ..."
                 biomart.execute(qry2)
             }
         } else {
@@ -661,12 +659,12 @@ class GeneInfo {
             qry2 = "drop table $geneSynonymTable purge"
 
             if(biomart.firstRow(qry1, [geneSynonymTable.toUpperCase()])[0] > 0){
-                log.info "Drop table $geneSynonymTable ..."
+                logger.info "Drop table $geneSynonymTable ..."
                 biomart.execute(qry2)
             }
         }
 
-		log.info "Start creating table $geneSynonymTable ..."
+		logger.info "Start creating table $geneSynonymTable ..."
 
                if(isPostgres){
 		qry = """ create table $geneSynonymTable (
@@ -687,7 +685,7 @@ class GeneInfo {
 
 		biomart.execute(qry)
 
-		log.info "End creating table $geneSynonymTable ..."
+		logger.info "End creating table $geneSynonymTable ..."
 	}
 
 
@@ -712,7 +710,7 @@ class GeneInfo {
 			         where tax_id=? and gene_symbol=?""" 
         }
                 
-        log.info("Start loading Entrez GeneInfo annotation from ${geneInfoTable} to SEARCH_KEYWORD ...")
+        logger.info("Start loading Entrez GeneInfo annotation from ${geneInfoTable} to SEARCH_KEYWORD ...")
 
         selectedOrganism.each{taxonomyId, organism ->
 
@@ -737,7 +735,7 @@ class GeneInfo {
             }
                         
 
-            log.info("End loading Entrex GeneInfo annotation from ${geneInfoTable} to SEARCH_KEYWORD ...")
+            logger.info("End loading Entrex GeneInfo annotation from ${geneInfoTable} to SEARCH_KEYWORD ...")
         }
     }
 

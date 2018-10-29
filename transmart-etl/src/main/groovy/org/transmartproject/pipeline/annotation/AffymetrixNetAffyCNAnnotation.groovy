@@ -29,30 +29,28 @@
 package org.transmartproject.pipeline.annotation
 
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.transmartproject.pipeline.util.Util
 
+@Slf4j('logger')
 class AffymetrixNetAffyCNAnnotation {
-
-	private static final Logger log = Logger.getLogger(AffymetrixNetAffyCNAnnotation)
 
 	private static Properties props
 	private int batchSize
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
 		AffymetrixNetAffyCNAnnotation cnAnno = new AffymetrixNetAffyCNAnnotation()
 
 		if(args.size() > 0){
-			log.info("Start loading property files conf/Common.properties and ${args[0]} ...")
+			logger.info("Start loading property files conf/Common.properties and ${args[0]} ...")
 			cnAnno.setProperties(Util.loadConfiguration(args[0]));
 		} else {
-			log.info("Start loading property files conf/Common.properties and conf/CN.properties ...")
+			logger.info("Start loading property files conf/Common.properties and conf/CN.properties ...")
 			cnAnno.setProperties(Util.loadConfiguration("conf/CN.properties"));
 		}
 
@@ -74,9 +72,9 @@ class AffymetrixNetAffyCNAnnotation {
 	void loadCNProbeGene(Sql sql){
 
 		if(props.get("skip_cn_probe_gene").toString().toLowerCase().equals("yes")){
-			log.info("Skip loading data into table CN_PROBE_GENE ...")
+			logger.info("Skip loading data into table CN_PROBE_GENE ...")
 		}else{
-			log.info "Start loading data into table CN_PROBE_GENE ..."
+			logger.info "Start loading data into table CN_PROBE_GENE ..."
 
 			String qry = """ insert into cn_probe_gene (cn_id, transcript_accession, probe_gene_relationship, 
 							     distance, unigene_cluster_id, gene_symbol, ncbi_gene_id, genebank_descr) 
@@ -109,16 +107,16 @@ class AffymetrixNetAffyCNAnnotation {
 								str[7]
 							])
 						} else{
-							log.info("Rejected: $it")
+							logger.info("Rejected: $it")
 						}
 					}
 					println index
 				})
 				//}
 
-				log.info "End loading data into table CN_SNP_INFO  ..."
+				logger.info "End loading data into table CN_SNP_INFO  ..."
 			} else{
-				log.error(cnProbe.toString() + " is empty or doesn't exist ... " )
+				logger.error(cnProbe.toString() + " is empty or doesn't exist ... " )
 			}
 		}
 	}
@@ -127,9 +125,9 @@ class AffymetrixNetAffyCNAnnotation {
 	void loadCNProbe(Sql sql){
 
 		if(props.get("skip_cn_probe_info").toString().toLowerCase().equals("yes")){
-			log.info("Skip loading data into table CN_PROBE_INFO  ...")
+			logger.info("Skip loading data into table CN_PROBE_INFO  ...")
 		}else{
-			log.info "Start loading data into table CN_PROBE_INFO  ..."
+			logger.info "Start loading data into table CN_PROBE_INFO  ..."
 
 			String qry = """ insert into cn_probe_info (cn_id, chr, chr_start, chr_stop, strand,
 								 chr_x_r1, chr_x_r2, cytoband, probe_count, snp_interference,
@@ -166,16 +164,16 @@ class AffymetrixNetAffyCNAnnotation {
 								str[11]
 							])
 						} else {
-							log.info ("Rejected: $it")
+							logger.info ("Rejected: $it")
 						}
 					}
 					println index
 				})
 				//}
 
-				log.info "End loading data into table CN_PROBE_INFO  ..."
+				logger.info "End loading data into table CN_PROBE_INFO  ..."
 			} else{
-				log.error(cnProbe.toString() + " is empty or doesn't exist ... " )
+				logger.error(cnProbe.toString() + " is empty or doesn't exist ... " )
 			}
 		}
 	}
@@ -237,9 +235,9 @@ class AffymetrixNetAffyCNAnnotation {
 		 */
 
 		if(props.get("skip_process_annotation_file").toString().toLowerCase().equals("yes")){
-			log.info("Skip processing: ${annotationFile.toString()} ...")
+			logger.info("Skip processing: ${annotationFile.toString()} ...")
 		}else{
-			log.info "Start processing: ${annotationFile.toString()} ..."
+			logger.info "Start processing: ${annotationFile.toString()} ..."
 
 			if(annotationFile.size() >0){
 				annotationFile.eachLine {
@@ -290,7 +288,7 @@ class AffymetrixNetAffyCNAnnotation {
 				gene.append(sbGene.toString())
 				sbGene.setLength(0)
 			}else{
-				log.error(annotationFile.toString() + " is empty or not exit ...")
+				logger.error(annotationFile.toString() + " is empty or not exit ...")
 			}
 		}
 	}
@@ -336,9 +334,9 @@ class AffymetrixNetAffyCNAnnotation {
 		String cnProbeTable = props.get("cn_probe_table")
 
 		if(props.get("skip_create_cn_probe_table").toString().toLowerCase().equals("yes")){
-			log.info("Skip creating table: ${cnProbeTable} ...")
+			logger.info("Skip creating table: ${cnProbeTable} ...")
 		}else{
-			log.info "Start creating table: ${cnProbeTable}"
+			logger.info "Start creating table: ${cnProbeTable}"
 
 			String qry = """ create table ${cnProbeTable} (
 								cn_id			varchar2(20),
@@ -364,7 +362,7 @@ class AffymetrixNetAffyCNAnnotation {
 
 			sql.execute(qry)
 
-			log.info "End creating table: ${cnProbeTable}"
+			logger.info "End creating table: ${cnProbeTable}"
 		}
 	}
 
@@ -374,9 +372,9 @@ class AffymetrixNetAffyCNAnnotation {
 		String cnGeneTable = props.get("cn_gene_table")
 
 		if(props.get("skip_create_cn_gene_table").toString().toLowerCase().equals("yes")){
-			log.info("Skip creating table: ${cnGeneTable} ...")
+			logger.info("Skip creating table: ${cnGeneTable} ...")
 		}else{
-			log.info "Start creating table: ${cnGeneTable}"
+			logger.info "Start creating table: ${cnGeneTable}"
 
 			String qry = """ create table ${cnGeneTable} (
 								cn_id			varchar2(20),
@@ -398,7 +396,7 @@ class AffymetrixNetAffyCNAnnotation {
 
 			sql.execute(qry)
 
-			log.info "End creating table: ${cnGeneTable}"
+			logger.info "End creating table: ${cnGeneTable}"
 		}
 	}
 

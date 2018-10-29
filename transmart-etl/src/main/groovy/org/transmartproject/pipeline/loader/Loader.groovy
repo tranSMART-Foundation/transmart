@@ -42,24 +42,21 @@ import org.transmartproject.pipeline.transmart.SubjectSampleMapping;
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
-
+@Slf4j('logger')
 class Loader {
-
-	private static final Logger log = Logger.getLogger(Loader)
 
 	static Map sampleTypes, subjects, platformMap
 	static List subjectSamples
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 		
 		println new Date()
 
-		log.info("Start loading property file ...")
+		logger.info("Start loading property file ...")
 		//Properties props = Util.loadConfiguration("loader.properties")
 		Properties props = Util.loadConfiguration("conf/SNP.properties")
 
@@ -179,11 +176,11 @@ class Loader {
 		cd.setStudyName(props.get("study_name"))
 
 		if(props.get("skip_concept_dimension").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading records into CONCEPT_DIMENSION table ..."
+			logger.info "Skip loading records into CONCEPT_DIMENSION table ..."
 		}else{
-			log.info "Start loading records into CONCEPT_DIMENSION table ..."
+			logger.info "Start loading records into CONCEPT_DIMENSION table ..."
 			cd.loadConceptDimensions(concepts)
-			log.info "End loading records into CONCEPT_DIMENSION table ..."
+			logger.info "End loading records into CONCEPT_DIMENSION table ..."
 		}
 
 		conceptPathToCode = cd.getConceptCode(concepts)
@@ -199,12 +196,12 @@ class Loader {
 		pd.setSourceSystemPrefix(props.get("source_system_prefix"))
 
 		if(props.get("skip_patient_dimension").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading records into PATIENT_DIMENSION table ..."
+			logger.info "Skip loading records into PATIENT_DIMENSION table ..."
 		}else{
-			log.info "Start loading records into PATIENT_DIMENSION table ..."
+			logger.info "Start loading records into PATIENT_DIMENSION table ..."
 
 			pd.loadPatientDimensionFromSamples(subjects)
-			log.info "End loading records into PATIENT_DIMENSION table ..."
+			logger.info "End loading records into PATIENT_DIMENSION table ..."
 		}
 
 		return pd.getPatientMap()
@@ -214,15 +211,15 @@ class Loader {
 	void loadI2b2(Properties props, Sql i2b2metadata, Map visualAttrs, Map conceptPathToCode){
 
 		if(props.get("skip_i2b2").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading records into I2B2 table ..."
+			logger.info "Skip loading records into I2B2 table ..."
 		}else{
-			log.info "Start loading records into I2B2 table ..."
+			logger.info "Start loading records into I2B2 table ..."
 			I2b2 i2b2 = new I2b2()
 			i2b2.setI2b2metadata(i2b2metadata)
 			i2b2.setStudyName(props.get("study_name"))
 			i2b2.setVisualAttrs(visualAttrs)
 			i2b2.loadConceptPaths(conceptPathToCode)
-			log.info "End loading records into I2B2 table ..."
+			logger.info "End loading records into I2B2 table ..."
 		}
 	}
 
@@ -230,16 +227,16 @@ class Loader {
 	void loadI2b2Secure(Properties props, Sql i2b2metadata, Map visualAttrs, Map conceptPathToCode){
 
 		if(props.get("skip_i2b2_secure").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading records into I2B2_secure table ..."
+			logger.info "Skip loading records into I2B2_secure table ..."
 		}else{
-			log.info "Start loading records into I2B2_secure table ..."
+			logger.info "Start loading records into I2B2_secure table ..."
 			I2b2Secure i2b2Secure = new I2b2Secure()
 			i2b2Secure.setI2b2metadata(i2b2metadata)
 			i2b2Secure.setStudyName(props.get("study_name"))
 			i2b2Secure.setVisualAttrs(visualAttrs)
 
 			i2b2Secure.loadConceptPaths(conceptPathToCode)
-			log.info "End loading records into I2B2_secure table ..."
+			logger.info "End loading records into I2B2_secure table ..."
 		}
 	}
 
@@ -247,9 +244,9 @@ class Loader {
 	void loadObservationFact(Properties props, Sql i2b2demodata, Map conceptPathToCode, Map subjectToPatient){
 
 		if(props.get("skip_observation_fact").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading records into OBSERVATION_FACT table ..."
+			logger.info "Skip loading records into OBSERVATION_FACT table ..."
 		}else{
-			log.info "Start loading records into OBSERVATION_FACT table ..."
+			logger.info "Start loading records into OBSERVATION_FACT table ..."
 			ObservationFact obsf = new ObservationFact()
 			obsf.setI2b2demodata(i2b2demodata)
 			obsf.setConceptPathToCode(conceptPathToCode)
@@ -257,7 +254,7 @@ class Loader {
 			obsf.setStudyName(props.get("study_name"))
 			obsf.setBasePath(props.get("snp_base_node") + "/" + props.get("platform_name") + "/")
 			obsf.loadObservationFact(subjects)
-			log.info "End loading records into OBSERVATION_FACT table ..."
+			logger.info "End loading records into OBSERVATION_FACT table ..."
 		}
 	}
 
@@ -265,16 +262,16 @@ class Loader {
 	void loadConceptCounts(Properties props, Sql i2b2demodata){
 
 		if(props.get("skip_concept_counts").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading records into CONCEPT_COUNTS table ..."
+			logger.info "Skip loading records into CONCEPT_COUNTS table ..."
 		}else{
-			log.info "Start loading records into CONCEPT_COUNTS table ..."
+			logger.info "Start loading records into CONCEPT_COUNTS table ..."
 			ConceptCounts cc = new ConceptCounts()
 			cc.setI2b2demodata(i2b2demodata)
 			cc.setPlatform(props.get("platform_name"))
 			cc.setBasePath(props.get("snp_base_node") + "/")
 			cc.setSubjects(subjects)
 			cc.loadConceptCounts()
-			log.info "End loading records into CONCEPT_COUNTS table ..."
+			logger.info "End loading records into CONCEPT_COUNTS table ..."
 		}
 	}
 
@@ -282,9 +279,9 @@ class Loader {
 	void loadDeSubjectSampleMapping(Properties props, Sql deapp, Map subjectToPatient, Map conceptPathToCode){
 
 		if(props.get("skip_de_subject_sample_mapping").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading records into DE_SUBJECT_SAMPLE_MAPPING table ..."
+			logger.info "Skip loading records into DE_SUBJECT_SAMPLE_MAPPING table ..."
 		}else{
-			log.info "Start loading records into DE_SUBJECT_SAMPLE_MAPPING table ..."
+			logger.info "Start loading records into DE_SUBJECT_SAMPLE_MAPPING table ..."
 			SubjectSampleMapping ssm = new SubjectSampleMapping()
 			ssm.setDeapp(deapp)
 			ssm.setPlatform(props.get("platform_type"))
@@ -293,7 +290,7 @@ class Loader {
 			ssm.setconceptPathToCode(conceptPathToCode)
 			ssm.setSubjectSamples(subjectSamples)
 			ssm.loadSubjectSampleMapping()
-			log.info "End loading records into DE_SUBJECT_SAMPLE_MAPPING table ..."
+			logger.info "End loading records into DE_SUBJECT_SAMPLE_MAPPING table ..."
 		}
 	}
 
@@ -301,9 +298,9 @@ class Loader {
 	void loadDeGPLInfo(Properties props, Sql deapp){
 
 		if(props.get("skip_de_gpl_info").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading records into DE_GPL_INFO table ..."
+			logger.info "Skip loading records into DE_GPL_INFO table ..."
 		}else{
-			log.info "Start loading records into DE_GPL_INFO table ..."
+			logger.info "Start loading records into DE_GPL_INFO table ..."
 			GplInfo gi = new GplInfo()
 			gi.setDeapp(deapp)
 			String gplPlatorm = props.get("platform")
@@ -311,7 +308,7 @@ class Loader {
 			String organism = props.get("organism")
 			String markerType = props.get("marker_type")
 			gi.insertGplInfo(gplPlatorm, title, organism, markerType)
-			log.info "End loading records into DE_GPL_INFO table ..."
+			logger.info "End loading records into DE_GPL_INFO table ..."
 		}
 	}
 
@@ -319,13 +316,13 @@ class Loader {
 	void loadBioContentRepository(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_content_repository").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading records into BIO_CONTENT_REPOSITORY table ..."
+			logger.info "Skip loading records into BIO_CONTENT_REPOSITORY table ..."
 		}else{
-			log.info "Start loading records into BIO_CONTENT_REPOSITORY table ..."
+			logger.info "Start loading records into BIO_CONTENT_REPOSITORY table ..."
 			BioContentRepository bcr = new BioContentRepository()
 			bcr.setBiomart(biomart)
 			bcr.insertBioContentRepository("http://www.genome.jp/", "Y", "KEGG", "URL")
-			log.info "End loading records into BIO_CONTENT_REPOSITORY table ..."
+			logger.info "End loading records into BIO_CONTENT_REPOSITORY table ..."
 		}
 	}
 
@@ -333,13 +330,13 @@ class Loader {
 	void loadBioContent(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_content").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading records into BIO_CONTENT table ..."
+			logger.info "Skip loading records into BIO_CONTENT table ..."
 		}else{
-			log.info "Start loading records into BIO_CONTENT table ..."
+			logger.info "Start loading records into BIO_CONTENT table ..."
 			BioContent bc = new BioContent()
 			bc.setBiomart(biomart)
 			bc.loadBioContentForKEGG()
-			log.info "End loading records into BIO_CONTENT table ..."
+			logger.info "End loading records into BIO_CONTENT table ..."
 		}
 	}
 
@@ -347,13 +344,13 @@ class Loader {
 	void loadBioContentReference(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_content_reference").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading records into BIO_CONTENT_REFERENCE table ..."
+			logger.info "Skip loading records into BIO_CONTENT_REFERENCE table ..."
 		}else{
-			log.info "Start loading records into BIO_CONTENT_REFERENCE table ..."
+			logger.info "Start loading records into BIO_CONTENT_REFERENCE table ..."
 			BioContentReference bcrf = new BioContentReference()
 			bcrf.setBiomart(biomart)
 			bcrf.loadBioContentReferenceForKEGG()
-			log.info "End loading records into BIO_CONTENT_REFERENCE table ..."
+			logger.info "End loading records into BIO_CONTENT_REFERENCE table ..."
 		}
 	}
 
@@ -378,21 +375,21 @@ class Loader {
 
 		String [] str
 		if(subjectSampleMapping.exists()){
-			log.info("Start reading " + subjectSampleMapping.toString())
+			logger.info("Start reading " + subjectSampleMapping.toString())
 			int index = 1
 			subjectSampleMapping.eachLine{
 				//if((it.indexOf("study_id") == -1) && (it.indexOf("Data+SNP_Profiling+PLATFORM+TISSUETYPE") >= 0)){
 				//if((it.indexOf("study_id") == -1) && (it.toUpperCase().indexOf("SNP_PROFILING") >= 0)){
 				if((it.indexOf("study_id") == -1) && (it.indexOf("subject_id") == -1)) {
 
-					//log.info it
+					//logger.info it
 
 					if(it.indexOf("\t") != -1) str = it.split("\t")
 					else str = it.split(" +")
 
 					if(str.size() != 9){
-						log.warn("Line: " + index + " missing column(s) in: " + subjectSampleMapping.toString())
-						log.info index + ":  " + str.size() + ":  " + it
+						logger.warn("Line: " + index + " missing column(s) in: " + subjectSampleMapping.toString())
+						logger.info index + ":  " + str.size() + ":  " + it
 					} else{
 						String sampleType = str[5].trim()
 
@@ -418,7 +415,7 @@ class Loader {
 				index++
 			}
 		}else{
-			log.error("Cannot find " + subjectSampleMapping.toString())
+			logger.error("Cannot find " + subjectSampleMapping.toString())
 			throw new RuntimeException("Cannot find " + subjectSampleMapping.toString())
 		}
 	}

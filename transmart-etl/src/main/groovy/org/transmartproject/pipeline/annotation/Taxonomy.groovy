@@ -33,17 +33,14 @@ import java.util.Properties;
 import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
-
+@Slf4j('logger')
 class Taxonomy {
-
-	private static final Logger log = Logger.getLogger(Taxonomy)
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
 		Util util = new Util()
 
@@ -61,7 +58,7 @@ class Taxonomy {
 	void loadTaxonomyData(Properties props, Sql biomart){
 
 		if(props.get("skip_taxonomy_name").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading Taxonomy name ..."
+			logger.info "Skip loading Taxonomy name ..."
 		}else{
 			File taxonomy = new File(props.get("taxonomy_source"))
 			String taxonomyTable = props.get("taxonomy_name_table")
@@ -88,7 +85,7 @@ class Taxonomy {
 		String qry = "insert into $taxonomyTable (tax_id, name_txt, unique_name, name_class) values (?, ?, ?, ?)"
 
 		if(taxonomy.size() > 0){
-			log.info "Start loading Taxonomy file: " + taxonomy.toString()
+			logger.info "Start loading Taxonomy file: " + taxonomy.toString()
 			biomart.withTransaction {
 				biomart.withBatch(20, qry,  { stmt ->
 					taxonomy.eachLine {
@@ -102,9 +99,9 @@ class Taxonomy {
 					}
 				})
 			}
-			log.info "End loading Taxonomy file: " + taxonomy.toString()
+			logger.info "End loading Taxonomy file: " + taxonomy.toString()
 		}else{
-			log.error("Taxonomy file is empty.")
+			logger.error("Taxonomy file is empty.")
 			return
 		}
 	}
@@ -115,12 +112,12 @@ class Taxonomy {
 		String qry = "select count(1) from user_tables where table_name=upper(?)"
 
 		if(biomart.firstRow(qry, [taxonomyTable])[0] > 0){
-			log.info "Drop table $taxonomyTable ..."
+			logger.info "Drop table $taxonomyTable ..."
 			qry = "drop table $taxonomyTable purge"
 			biomart.execute(qry)
 		}
 
-		log.info "Create table $taxonomyTable ..."
+		logger.info "Create table $taxonomyTable ..."
 		qry = """ create table $taxonomyTable (
 							tax_id   number(10,0),
 							name_txt   varchar2(200),

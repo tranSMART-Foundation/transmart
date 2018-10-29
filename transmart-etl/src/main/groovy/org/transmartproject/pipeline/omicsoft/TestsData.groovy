@@ -28,21 +28,13 @@
 package org.transmartproject.pipeline.omicsoft
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.Level
-
+@Slf4j('logger')
 class TestsData {
  
-	private static final Logger log = Logger.getLogger(TestsData)
-
 	Sql sql
 	String tableName, platform, GSEName, suffix
-
-	TestsData (Level logLevel){
-		log.setLevel(logLevel)
-	}
-
 
 	void loadTestsDataDirectory(File sourceDirectory){
 		if(sourceDirectory.isDirectory()){

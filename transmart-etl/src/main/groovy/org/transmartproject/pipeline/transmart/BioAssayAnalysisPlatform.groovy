@@ -29,26 +29,24 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioAssayAnalysisPlatform {
-
-	private static final Logger log = Logger.getLogger(BioAssayAnalysisPlatform)
 
 	Sql biomart
 
 	void loadBioAssayAnalysisPlatform(String analysisPlatformName){
 
 		if(isBioAssayAnalysisPlatformExist(analysisPlatformName)){
-                    //log.info "$analysisPlatformName already exists in BIO_ASY_ANALYSIS_PLTFM ..."
+                    //logger.info "$analysisPlatformName already exists in BIO_ASY_ANALYSIS_PLTFM ..."
 		}else{
-			log.info "Start loading $analysisPlatformName into BIO_ASY_ANALYSIS_PLTFM ..."
+			logger.info "Start loading $analysisPlatformName into BIO_ASY_ANALYSIS_PLTFM ..."
 
 			String qry = """ insert into bio_asy_analysis_pltfm(platform_name) values(?) """
 			biomart.execute(qry, [analysisPlatformName])
 
-			log.info "End loading $analysisPlatformName into BIO_ASY_ANALYSIS_PLTFM ..."
+			logger.info "End loading $analysisPlatformName into BIO_ASY_ANALYSIS_PLTFM ..."
 		}
 	}
 

@@ -29,12 +29,10 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioDataCompound {
-
-	private static final Logger log = Logger.getLogger(BioDataCompound)
 
 	Sql biomart
 

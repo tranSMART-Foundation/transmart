@@ -29,17 +29,12 @@
 package org.transmartproject.pipeline.transmart
 
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-
 import groovy.sql.Sql;
-
+import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.util.Util
 
-
+@Slf4j('logger')
 class GplInfo {
-
-	private static final Logger log = Logger.getLogger(GplInfo)
 
 	Sql deapp
 

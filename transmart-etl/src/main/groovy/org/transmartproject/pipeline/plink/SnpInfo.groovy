@@ -28,13 +28,11 @@
 
 package org.transmartproject.pipeline.plink
 
-import org.apache.log4j.Logger;
-
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class SnpInfo {
-
-	private static final Logger log = Logger.getLogger(SnpInfo)
 
 	Sql deapp
 	String annotationTable
@@ -49,7 +47,7 @@ class SnpInfo {
 		if(snpMap.size() > 0){
 			deapp.withTransaction {
 
-				log.info("Start loading " + snpMap.toString() + " into TMP_DE_SNP_INFO ...")
+				logger.info("Start loading " + snpMap.toString() + " into TMP_DE_SNP_INFO ...")
 
 				deapp.withBatch(qry, {stmt ->
 					snpMap.eachLine{
@@ -59,13 +57,13 @@ class SnpInfo {
 				})
 			}
 		}else{
-			log.error(snpMap.toString() + " is empty.")
+			logger.error(snpMap.toString() + " is empty.")
 		}
 
 
 		loadSnpInfo("tmp_de_snp_info")
 
-		log.info "Drop the temp table TMP_DE_SNP_INFO "
+		logger.info "Drop the temp table TMP_DE_SNP_INFO "
 		qry = " drop table tmp_de_snp_info purge"
 		deapp.execute(qry)
 	}
@@ -73,7 +71,7 @@ class SnpInfo {
 
 	void loadSnpInfo(String tmpSnpInfoTable){
 
-		log.info "Start loading data into the table DE_SNP_INFO ... "
+		logger.info "Start loading data into the table DE_SNP_INFO ... "
 
 		String qry = """insert into de_snp_info nologging (name, chrom, chrom_pos)
 						select distinct name, chrom, chrom_pos
@@ -81,12 +79,12 @@ class SnpInfo {
 						where upper(name) not in (select upper(name) from de_snp_info)"""
 		deapp.execute(qry)
 
-		log.info "End loading data into the table DE_SNP_INFO ... "
+		logger.info "End loading data into the table DE_SNP_INFO ... "
 	}
 
 	void loadSnpInfo(Map columnMap){
 
-		log.info "Start loading data into the table DE_SNP_INFO ... "
+		logger.info "Start loading data into the table DE_SNP_INFO ... "
 
 		String qry = """insert into de_snp_info nologging (name, chrom, chrom_pos)
 						select distinct ${columnMap["name"]}, ${columnMap["chr"]}, ${columnMap["pos"]}
@@ -94,7 +92,7 @@ class SnpInfo {
 						where upper(${columnMap["name"]}) not in (select upper(name) from de_snp_info)"""
 		deapp.execute(qry)
 
-		log.info "End loading data into the table DE_SNP_INFO ... "
+		logger.info "End loading data into the table DE_SNP_INFO ... "
 	}
 
 	
@@ -102,17 +100,17 @@ class SnpInfo {
 
 		String qry = "select count(1) from user_tables where table_name=upper(?)"
 		if(deapp.firstRow(qry, [tempSnpInfoTable])[0] > 0){
-			log.info "Drop table $tempSnpInfoTable ..."
+			logger.info "Drop table $tempSnpInfoTable ..."
 			qry = "drop table $tempSnpInfoTable purge"
 			deapp.execute(qry)
 		}
 
-		log.info "Start creating the temp table $tempSnpInfoTable ..."
+		logger.info "Start creating the temp table $tempSnpInfoTable ..."
 
 		qry = """ create table tmp_de_snp_info as select * from de_snp_info where 1=2 """
 		deapp.execute(qry)
 
-		log.info "End creating table $tempSnpInfoTable ..."
+		logger.info "End creating table $tempSnpInfoTable ..."
 	}
 
 }

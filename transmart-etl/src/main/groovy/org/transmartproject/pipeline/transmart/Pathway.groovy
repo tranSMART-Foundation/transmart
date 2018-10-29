@@ -24,22 +24,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************/
-  
 
 package org.transmartproject.pipeline.transmart
 
-
-import java.io.File;
+import java.io.File
 
 import org.transmartproject.pipeline.util.Util
 
-import groovy.sql.Sql
-import org.apache.log4j.Logger
 import groovy.sql.GroovyRowResult
+import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class Pathway {
 
-    private static final Logger log = Logger.getLogger(Pathway)
     Sql deapp
     Sql biomartuser
     String source
@@ -51,7 +49,7 @@ class Pathway {
         String qry2;
         String qry3;
 
-        log.info "Start loading ${source} pathway data into DE_PATHWAY..."
+        logger.info "Start loading ${source} pathway data into DE_PATHWAY..."
 
         qry1 = """ select t1.descr, t1.pathway
 			      from biomart_user.${pathwayTable} t1
@@ -66,17 +64,17 @@ class Pathway {
                     GroovyRowResult rowResult = deapp.firstRow(qry2, [source, it.descr, it.pathway])
                     int count = rowResult[0]
                     if(count > 0){
-                        //log.info "$source:$it.descr:$it.pathway already exists ($count) in DE_PATHWAY ..."
+                        //logger.info "$source:$it.descr:$it.pathway already exists ($count) in DE_PATHWAY ..."
                     }
                     else{
-                        log.info "Insert $source:$it.descr:$it.pathway into DE_PATHWAY ..."
+                        logger.info "Insert $source:$it.descr:$it.pathway into DE_PATHWAY ..."
                         ps.addBatch([it.descr, it.descr, source, it.pathway, "PATHWAY:"+it.pathway])
                     }
                 }
             })
         }
         
-        log.info "End loading ${source} pathway data into DE_PATHWAY ..."
+        logger.info "End loading ${source} pathway data into DE_PATHWAY ..."
     }
 
 
@@ -94,16 +92,16 @@ class Pathway {
 		if(pathwayDefinition.exists()){
 
 			if(isPathwaySourceExist()){
-				log.warn("Pathway from $source already loaded into de_pathway and will be deleted before loading ...")
+				logger.warn("Pathway from $source already loaded into de_pathway and will be deleted before loading ...")
 
-				log.info("Start deleting data for ${source} in DE_PATHWAY and DE_PATHWAY_GENE ...")
+				logger.info("Start deleting data for ${source} in DE_PATHWAY and DE_PATHWAY_GENE ...")
 
 				deapp.execute(qry1, [source])
 
 				deapp.execute(qry2, [source])
 			}
 
-			log.info("Start loading " + pathwayDefinition.toString() + " into de_pathway")
+			logger.info("Start loading " + pathwayDefinition.toString() + " into de_pathway")
 			deapp.withTransaction {
                         	deapp.withBatch(1000, qry, { ps ->
 					pathwayDefinition.eachLine{
@@ -134,7 +132,7 @@ class Pathway {
 				insertPathway(str[0], str[1])
 			}
 		}else{
-			log.error("Cannot find Pathway Definition file: " + pathwayDef.toString())
+			logger.error("Cannot find Pathway Definition file: " + pathwayDef.toString())
 			throw new RuntimeException("Cannot find Pathway Definition file: " + pathwayDef.toString())
 		}
 	}
@@ -163,9 +161,9 @@ class Pathway {
             String qry = "insert into de_pathway(name, description, source, externalid, pathway_uid) values(?,?,?,?,?)"
             
             if(isPathwayExist(pathwayId)){
-                //log.info "Pathway \"$pathwayId - $pathwayName\" already exists ..."
+                //logger.info "Pathway \"$pathwayId - $pathwayName\" already exists ..."
 		} else {
-			log.info "Loading the pathway \"$pathwayId - $pathwayName\" source '${source}' ..."
+			logger.info "Loading the pathway \"$pathwayId - $pathwayName\" source '${source}' ..."
 			deapp.execute(qry, [
 				pathwayName,
 				pathwayName,

@@ -33,26 +33,24 @@ import java.util.Properties;
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator;
+import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.transmart.SearchKeyword
 import org.transmartproject.pipeline.transmart.SearchKeywordTerm
 
 import org.transmartproject.pipeline.transmart.BioDataExtCode
 import org.transmartproject.pipeline.transmart.BioObservation
 
+@Slf4j('logger')
 class Observation {
-
-	private static final Logger log = Logger.getLogger(Observation)
 
         private static SearchKeyword searchKeyword
         private static SearchKeywordTerm searchKeywordTerm
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
-		log.info("Start loading property file loader.properties ...")
+		logger.info("Start loading property file loader.properties ...")
 		Properties props = Util.loadConfiguration("conf/Observation.properties");
 
 		Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
@@ -143,7 +141,7 @@ class Observation {
 				}
 			}
 		}else{
-			log.error("The file " + obsf.toString() + " is empty or not exist ...")
+			logger.error("The file " + obsf.toString() + " is empty or not exist ...")
 		}
 
 		return [obs, synonym]
@@ -154,9 +152,9 @@ class Observation {
 	void loadBioDataExtCode(Sql biomart, Properties props, Map synonym, Map codeMap){
 		
 		if(props.get("skip_bio_data_ext_code").toString().toLowerCase().equals("yes")){
-			log.info("Skip loading Observation's synonyms into BIO_DATA_EXT_CODE ...")
+			logger.info("Skip loading Observation's synonyms into BIO_DATA_EXT_CODE ...")
 		}else{
-			log.info("Start loading Observation's synonyms into BIO_DATA_EXT_CODE ...")
+			logger.info("Start loading Observation's synonyms into BIO_DATA_EXT_CODE ...")
 
 			Map obsExtMap = [:]
 			String [] str 
@@ -169,7 +167,7 @@ class Observation {
 			bdec.setBiomart(biomart)
 			bdec.loadBioDataExtCode(obsExtMap)
 			
-			log.info("End loading Observation's synonyms into BIO_DATA_EXT_CODE ...")
+			logger.info("End loading Observation's synonyms into BIO_DATA_EXT_CODE ...")
 		}
 	}
 
@@ -183,10 +181,10 @@ class Observation {
             Boolean isPostgres = Util.isPostgres()
 
             if(props.get("skip_bio_data_ext_code").toString().toLowerCase().equals("yes")){
-                log.info("Skip loading Observation's MeSH synonyms into BIO_DATA_EXT_CODE ...")
+                logger.info("Skip loading Observation's MeSH synonyms into BIO_DATA_EXT_CODE ...")
             }else{
-                log.info("Start loading Observation's MeSH synonyms into BIO_DATA_EXT_CODE ...")
-                log.info("MeSHTable ${MeSHTable} MeSHSynonymTable ${MeSHSynonymTable}")
+                logger.info("Start loading Observation's MeSH synonyms into BIO_DATA_EXT_CODE ...")
+                logger.info("MeSHTable ${MeSHTable} MeSHSynonymTable ${MeSHSynonymTable}")
 
                 if(isPostgres){
                     qry = """ insert into bio_data_ext_code(bio_data_id, code, code_source, code_type, bio_data_type)
@@ -208,7 +206,7 @@ class Observation {
 
                 biomart.execute(qry)
 
-                log.info("End loading Observation's MeSH synonyms into BIO_DATA_EXT_CODE ...")
+                logger.info("End loading Observation's MeSH synonyms into BIO_DATA_EXT_CODE ...")
             }
 	}
 
@@ -220,9 +218,9 @@ class Observation {
             String qrysyn
 
             if(props.get("skip_search_keyword").toString().toLowerCase().equals("yes")){
-                log.info("Skip loading Observation data into SEARCH_KEYWORD ...")
+                logger.info("Skip loading Observation data into SEARCH_KEYWORD ...")
             }else{
-                log.info("Start loading Observation data into SEARCH_KEYWORD ...")
+                logger.info("Start loading Observation data into SEARCH_KEYWORD ...")
 
                 String qryold = """ insert into SEARCH_KEYWORD (KEYWORD, BIO_DATA_ID, UNIQUE_ID, DATA_CATEGORY, DISPLAY_DATA_CATEGORY)
 						select obs_name, bio_observation_id, 'OBS:'||obs_code, to_nchar('OBSERVATION'), to_nchar('Observation')
@@ -268,7 +266,7 @@ class Observation {
 
                 }
 
-                log.info("End loading Observation data into SEARCH_KEYWORD ...")
+                logger.info("End loading Observation data into SEARCH_KEYWORD ...")
             }
 	}
 
@@ -276,9 +274,9 @@ class Observation {
 	void loadSearchKeywordTerm(Sql searchapp, Properties props){
 
 		if(props.get("skip_search_keyword_term").toString().toLowerCase().equals("yes")){
-			log.info("Skip loading Observation data into SEARCH_KEYWORD_TERM ...")
+			logger.info("Skip loading Observation data into SEARCH_KEYWORD_TERM ...")
 		}else{
-			log.info("Start loading Observation data into SEARCH_KEYWORD_TERM ...")
+			logger.info("Start loading Observation data into SEARCH_KEYWORD_TERM ...")
 
 			// Observation name
 			String qry = """ insert into search_keyword_term (KEYWORD_TERM, SEARCH_KEYWORD_ID, RANK,TERM_LENGTH)
@@ -302,7 +300,7 @@ class Observation {
 							 """
 			searchapp.execute(qrys)
 
-			log.info "End loading Observation data into SEARCH_KEYWORD_TERM ... "
+			logger.info "End loading Observation data into SEARCH_KEYWORD_TERM ... "
 		}
 	}
 }

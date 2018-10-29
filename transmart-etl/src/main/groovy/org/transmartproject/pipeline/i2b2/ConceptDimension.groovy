@@ -28,13 +28,11 @@
 
 package org.transmartproject.pipeline.i2b2
 
-import org.apache.log4j.Logger;
-
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class ConceptDimension {
-
-	private static final Logger log = Logger.getLogger(ConceptDimension)
 
 	Sql i2b2demodata
 	String tableName, studyName

@@ -36,11 +36,12 @@ import org.apache.log4j.PropertyConfigurator
 
 import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
 
+@Slf4j('logger')
 class GxGPL {
 
-	private static final Logger log = Logger.getLogger(GxGPL)
 
 	Sql biomart
 	String annotationTable, gplFilePattern
@@ -64,7 +65,7 @@ class GxGPL {
 	void loadGxGPL(Properties props, Sql biomart){
 
 		if(props.get("skip_gpl_annotation_loader").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading GPL GX annotation file(s) ..."
+			logger.info "Skip loading GPL GX annotation file(s) ..."
 		}else{
 
 			setSql(biomart)
@@ -72,7 +73,7 @@ class GxGPL {
 			setGPLFilePattern(props.get("gpl_file_pattern"))
 
 			if(props.get("recreate_gpl_annotation_table").toString().toLowerCase().equals("yes")){
-				log.info "Start recreating annotation table ${props.get("annotation_table")} for GPL GX annotation file(s) ..."
+				logger.info "Start recreating annotation table ${props.get("annotation_table")} for GPL GX annotation file(s) ..."
 				createAnnotationTable()
 			}
 
@@ -97,16 +98,16 @@ class GxGPL {
 		if(input.isDirectory()){
 			input.eachFile {
 				if((it.toString().indexOf(gplFilePattern) != -1)){
-					log.info "Start loading GPL GX annotation file ${it.toString()} ..."
+					logger.info "Start loading GPL GX annotation file ${it.toString()} ..."
 					loadGxGPL(it)
 				}
 			}
 		} else{
 			if(input.isFile()) {
-				log.info "Start loading GPL GX annotation file: ${input.toString()} ..."
+				logger.info "Start loading GPL GX annotation file: ${input.toString()} ..."
 				loadGxGPL(input)
 			} else {
-				log.error "Neither a directory nor a file: " + input.toString()
+				logger.error "Neither a directory nor a file: " + input.toString()
 			}
 		}
 	}
@@ -121,16 +122,16 @@ class GxGPL {
 		Map columnMap = [:]
 
 		String platform = input.toString().split(/\./)[1]
-		log.info "Input File: " + input.toString() + "\t Platform: " + platform
+		logger.info "Input File: " + input.toString() + "\t Platform: " + platform
 
 		if(isGxGPLAnnotationExist(platform)) {
-			log.warn "Annotaion data for ${input.toString()} already exist."
+			logger.warn "Annotaion data for ${input.toString()} already exist."
 			return
 		}
 
 		// store records need to be loaded
 		File output = new File(input.getParent() + "/" + input.toString().split(/\./)[1] + ".tsv")
-		log.info "Output file: " + output.toString()
+		logger.info "Output file: " + output.toString()
 		if(output.size() > 0){
 			output.delete()
 		}
@@ -138,14 +139,14 @@ class GxGPL {
 
 		// store records need to be manually checked
 		File reject = new File(input.getParent() + "/" + input.toString().split(/\./)[1] + ".reject")
-		log.info "File for rejected records: " + reject.toString()
+		logger.info "File for rejected records: " + reject.toString()
 		if(reject.size() > 0){
 			reject.delete()
 		}
 
 		// store discarded records, either control probes or w/o gene association
 		File discard = new File(input.getParent() + "/" + input.toString().split(/\./)[1] + ".discard")
-		log.info "File for rejected records: " + discard.toString()
+		logger.info "File for rejected records: " + discard.toString()
 		if(discard.size() > 0){
 			discard.delete()
 		}
@@ -223,7 +224,7 @@ class GxGPL {
 
 			}
 		}else{
-			log.error("Empty file: " + input.toString())
+			logger.error("Empty file: " + input.toString())
 		}
 
 		// write data from StringBuffer to files
@@ -243,7 +244,7 @@ class GxGPL {
 	 */
 	void insertGxGPL(File input){
 		if(input.size() >0){
-			log.info "Start loading GPL annotation data ..."
+			logger.info "Start loading GPL annotation data ..."
 			biomart.withTransaction {
 				biomart.withBatch("insert into $annotationTable (platform,probe_id,gene_symbol,gene_descr,gene_id) values (?,?,?,?,?)",
 						{ ps ->
@@ -260,7 +261,7 @@ class GxGPL {
 						})
 			}
 		}else{
-			log.error("Empty file: " + input.toString())
+			logger.error("Empty file: " + input.toString())
 		}
 	}
 
@@ -322,19 +323,19 @@ class GxGPL {
 		String [] str = header.split("\t")
 
 		if(!str[0].toString().toUpperCase().equals("Probe Set ID".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[0]} vs 'Probe Set ID'.")
+			logger.error("Actual header didn't match the expected one: ${str[0]} vs 'Probe Set ID'.")
 			return false
 		} else if(!str[1].toString().toUpperCase().equals("Gene Symbol".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[1]} vs 'Gene Symbol'.")
+			logger.error("Actual header didn't match the expected one: ${str[1]} vs 'Gene Symbol'.")
 			return  false
 		} else if(!str[2].toString().toUpperCase().equals("Gene Title".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[2]} vs 'Gene Title'.")
+			logger.error("Actual header didn't match the expected one: ${str[2]} vs 'Gene Title'.")
 			return false
 		} else if(!str[3].toString().toUpperCase().equals("Species Scientific Name".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[3]} vs 'Species Scientific Name'.")
+			logger.error("Actual header didn't match the expected one: ${str[3]} vs 'Species Scientific Name'.")
 			return false
 		} else if(!str[15].toString().toUpperCase().equals("Entrez Gene".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[15]} vs 'Entrez Gene'.")
+			logger.error("Actual header didn't match the expected one: ${str[15]} vs 'Entrez Gene'.")
 			return false
 		} else {
 			return true
@@ -347,14 +348,14 @@ class GxGPL {
 		if(biomart.firstRow(qry, [
 			annotationTable.toUpperCase()
 		])[0] > 0){
-			//log.info "The existing table $annotationTable will be rename to ${annotationTable}_bk"
+			//logger.info "The existing table $annotationTable will be rename to ${annotationTable}_bk"
 			//qry = "rename $annotationTable to ${annotationTable}_bk"
-			log.info "The existing table $annotationTable will be dropped ... "
+			logger.info "The existing table $annotationTable will be dropped ... "
 			qry = "drop table $annotationTable purge"
 			biomart.execute(qry)
 		}
 
-		log.info "Start creating table $annotationTable ..."
+		logger.info "Start creating table $annotationTable ..."
 		qry = """ create table $annotationTable(
 					platform 	varchar2(100),
 					species  	varchar2(100),

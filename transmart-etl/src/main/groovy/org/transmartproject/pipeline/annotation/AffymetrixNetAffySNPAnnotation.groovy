@@ -36,10 +36,12 @@ import org.transmartproject.pipeline.plink.SnpProbe
 import org.transmartproject.pipeline.transmart.GplInfo
 import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator
 
 
+@Slf4j('logger')
 class AffymetrixNetAffySNPAnnotation {
 
 	private static final Logger log = Logger.getLogger(AffymetrixNetAffySNPAnnotation)
@@ -70,7 +72,7 @@ class AffymetrixNetAffySNPAnnotation {
 	void loadGplInfo(Properties props, Sql deapp){
 
 		if(props.get("skip_de_gpl_info").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_GPL_INFO ..."
+			logger.info "Skip loading DE_GPL_INFO ..."
 		}else{
 			GplInfo gi = new GplInfo()
 			gi.setDeapp(deapp)
@@ -88,9 +90,9 @@ class AffymetrixNetAffySNPAnnotation {
 	void loadSnpInfo(Properties props, Sql deapp){
 
 		if(props.get("skip_de_snp_info").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SNP_INFO table ..."
+			logger.info "Skip loading DE_SNP_INFO table ..."
 		}else{
-			log.info "Start loading into DE_SNP_INFO table from ${props.get("affymetrix_annotation_table")} table ..."
+			logger.info "Start loading into DE_SNP_INFO table from ${props.get("affymetrix_annotation_table")} table ..."
 
 			SnpInfo snpInfo = new SnpInfo()
 			snpInfo.setAnnotationTable(props.get("affymetrix_annotation_table"))
@@ -108,9 +110,9 @@ class AffymetrixNetAffySNPAnnotation {
 	void loadSnpProbe(Properties props, Sql deapp){
 
 		if(props.get("skip_de_snp_probe").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SNP_PROBE table ..."
+			logger.info "Skip loading DE_SNP_PROBE table ..."
 		}else{
-			log.info "Start loading into DE_SNP_PROBE table from ${props.get("affymetrix_annotation_table")} table ..."
+			logger.info "Start loading into DE_SNP_PROBE table from ${props.get("affymetrix_annotation_table")} table ..."
 
 			SnpProbe snpProbe = new SnpProbe()
 			snpProbe.setAnnotationTable(props.get("affymetrix_annotation_table"))
@@ -127,9 +129,9 @@ class AffymetrixNetAffySNPAnnotation {
 	void loadSnpGeneMap(Properties props, Sql deapp){
 
 		if(props.get("skip_de_snp_gene_map").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SNP_GENE_MAP table ..."
+			logger.info "Skip loading DE_SNP_GENE_MAP table ..."
 		}else{
-			log.info "Start loading into DE_SNP_GENE_MAP table from ${props.get("affymetrix_annotation_table")} table ..."
+			logger.info "Start loading into DE_SNP_GENE_MAP table from ${props.get("affymetrix_annotation_table")} table ..."
 
 			SnpGeneMap snpGeneMap = new SnpGeneMap()
 			snpGeneMap.setAnnotationTable(props.get("affymetrix_annotation_table"))
@@ -146,10 +148,10 @@ class AffymetrixNetAffySNPAnnotation {
 	void loadAffymetrix(Properties props, Sql biomart){
 
 		if(props.get("skip_affymetrix_annotation_loader").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading Affymetrix NetAffy CSV annotation file(s) ..."
+			logger.info "Skip loading Affymetrix NetAffy CSV annotation file(s) ..."
 		}else{
 
-			log.info "Start loading Affymetrix NetAffy CSV annotation file(s) from ${props.get("affymetrix_annotation_source")} ..."
+			logger.info "Start loading Affymetrix NetAffy CSV annotation file(s) from ${props.get("affymetrix_annotation_source")} ..."
 
 			File annotationSource = new File(props.get("affymetrix_annotation_source"))
 
@@ -160,10 +162,10 @@ class AffymetrixNetAffySNPAnnotation {
 			setFieldSeparator(props.get("field_separator"))
 
 			if(props.get("recreate_affymetrix_annotation_table").toString().toLowerCase().equals("yes")){
-				log.info "Start recreating Affymetrix annotation table ${props.get("affymetrix_annotation_table")} ..."
+				logger.info "Start recreating Affymetrix annotation table ${props.get("affymetrix_annotation_table")} ..."
 				createAnnotationTable()
 
-				//log.info "Start recreating Affymetrix SNP-Gene mapping table ${props.get("affymetrix_snp_gene_table")} ..."
+				//logger.info "Start recreating Affymetrix SNP-Gene mapping table ${props.get("affymetrix_snp_gene_table")} ..."
 				//createSNPGeneTable()
 			}
 
@@ -183,7 +185,7 @@ class AffymetrixNetAffySNPAnnotation {
 		if(input.isDirectory()){
 			input.eachFile {
 				if((it.toString().indexOf(annotationFilePattern) != -1)){
-					log.info it
+					logger.info it
 					loadAffymetrixAll(it)
 				}
 			}
@@ -191,7 +193,7 @@ class AffymetrixNetAffySNPAnnotation {
 			if(input.isFile()) {
 				loadAffymetrixAll(input)
 			} else {
-				log.info "Neither a directory nor a file: " + input.toString()
+				logger.info "Neither a directory nor a file: " + input.toString()
 			}
 		}
 	}
@@ -204,23 +206,23 @@ class AffymetrixNetAffySNPAnnotation {
 	void loadAffymetrix(File input){
 
 		String platform = input.toString().split(/\./)[0]
-		log.info "Input File: " + input.toString() + "\t Platform: " + platform
+		logger.info "Input File: " + input.toString() + "\t Platform: " + platform
 
 		if(isAnnotationExist(platform)) {
-			log.warn "Annotaion data for ${input.toString()} already exist."
+			logger.warn "Annotaion data for ${input.toString()} already exist."
 			return
 		}
 
 		// store records need to be loaded
 		File output = new File(input.getParent() + "/" + input.toString().split(/\./)[1] + ".tsv")
-		log.info "Output file: " + output.toString()
+		logger.info "Output file: " + output.toString()
 		if(output.size() > 0){
 			output.delete()
 		}
 
 		// store records need to be manually checked
 		File reject = new File(input.getParent() + "/" + input.toString().split(/\./)[1] + ".reject")
-		log.info "File for rejected records: " + reject.toString()
+		logger.info "File for rejected records: " + reject.toString()
 		if(reject.size() > 0){
 			reject.delete()
 		}
@@ -228,7 +230,7 @@ class AffymetrixNetAffySNPAnnotation {
 
 		// store discarded records, either control probes or w/o gene association
 		File discard = new File(input.getParent() + "/" + input.toString().split(/\./)[1] + ".discard")
-		log.info "File for rejected records: " + discard.toString()
+		logger.info "File for rejected records: " + discard.toString()
 		if(discard.size() > 0){
 			discard.delete()
 		}
@@ -278,7 +280,7 @@ class AffymetrixNetAffySNPAnnotation {
 				}
 			}
 		}else{
-			log.error("Empty file: " + input.toString())
+			logger.error("Empty file: " + input.toString())
 		}
 
 		// write data from StringBuffer to files
@@ -300,30 +302,30 @@ class AffymetrixNetAffySNPAnnotation {
 		if(input.toString().indexOf("\\") != -1) platform = input.toString().split(/\./)[0].split ("\\\\")[-1]
 		// for *nix environments
 		else platform = input.toString().split(/\./)[0].split ("/")[-1]
-		log.info "Input File: " + input.toString() + "\n\t Platform: " + platform
+		logger.info "Input File: " + input.toString() + "\n\t Platform: " + platform
 
 		//if(isAnnotationExist(platform)) {
-		//	log.warn "Annotaion data for ${input.toString()} already exist."
+		//	logger.warn "Annotaion data for ${input.toString()} already exist."
 		//	return
 		//}
 
 		// create a map from an annotation file
 		File plinkMap = new File(input.getParent() + "/" + platform + ".map")
-		log.info "PLINK map file: " + plinkMap.toString()
+		logger.info "PLINK map file: " + plinkMap.toString()
 		if(plinkMap.size() > 0){
 			plinkMap.delete()
 		}
 
 		// store records need to be loaded
 		File output = new File(input.getParent() + "/" + platform + ".tsv")
-		log.info "Output file: " + output.toString()
+		logger.info "Output file: " + output.toString()
 		if(output.size() > 0){
 			output.delete()
 		}
 
 		// store records need to be manually checked
 		File reject = new File(input.getParent() + "/" + platform + ".reject")
-		log.info "File for rejected records: " + reject.toString()
+		logger.info "File for rejected records: " + reject.toString()
 		if(reject.size() > 0){
 			reject.delete()
 		}
@@ -363,7 +365,7 @@ class AffymetrixNetAffySNPAnnotation {
 				}
 			}
 		}else{
-			log.error("Empty file: " + input.toString())
+			logger.error("Empty file: " + input.toString())
 		}
 
 		println "Total SNPs: $line \n"
@@ -401,7 +403,7 @@ class AffymetrixNetAffySNPAnnotation {
 				else println it
 			}
 		} else{
-			log.error("Empty file: " + input.toString())
+			logger.error("Empty file: " + input.toString())
 		}
 
 		mapRecord.each{ k, v ->
@@ -579,7 +581,7 @@ class AffymetrixNetAffySNPAnnotation {
 						})
 			}
 		}else{
-			log.error("Empty file: " + input.toString())
+			logger.error("Empty file: " + input.toString())
 		}
 	}
 
@@ -641,19 +643,19 @@ class AffymetrixNetAffySNPAnnotation {
 		String [] str = header.split(fieldSeparator)
 
 		if(!str[0].toString().replace("\"", "").toUpperCase().equals("Probe Set ID".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[0]} vs 'Probe Set ID'.")
+			logger.error("Actual header didn't match the expected one: ${str[0]} vs 'Probe Set ID'.")
 			return false
 		} else if(!str[1].toString().toUpperCase().equals("dbSNP RS ID".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[1]} vs 'dbSNP RS ID'.")
+			logger.error("Actual header didn't match the expected one: ${str[1]} vs 'dbSNP RS ID'.")
 			return  false
 		} else if(!str[2].toString().toUpperCase().equals("Chromosome".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[2]} vs 'Chromosome'.")
+			logger.error("Actual header didn't match the expected one: ${str[2]} vs 'Chromosome'.")
 			return false
 		} else if(!str[3].toString().toUpperCase().equals("Physical Position".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[3]} vs 'Physical Position'.")
+			logger.error("Actual header didn't match the expected one: ${str[3]} vs 'Physical Position'.")
 			return false
 		} else if(!str[10].toString().toUpperCase().equals("Associated Gene".toUpperCase())) {
-			log.error("Actual header didn't match the expected one: ${str[10]} vs 'Associated Gene'.")
+			logger.error("Actual header didn't match the expected one: ${str[10]} vs 'Associated Gene'.")
 			return false
 		} else {
 			return true
@@ -690,16 +692,16 @@ class AffymetrixNetAffySNPAnnotation {
 		String [] str = header.split("\t")
 
 		if(!str[0].toString().toLowerCase().equals("transcript_cluster_id")) {
-			log.error("Column 1 didn't match the expected: ${str[0]} vs 'transcript_cluster_id'.")
+			logger.error("Column 1 didn't match the expected: ${str[0]} vs 'transcript_cluster_id'.")
 			return false
 		} else if(!str[1].toString().toLowerCase().equals("gene symbol")) {
-			log.error("Column 2 didn't match the expected: ${str[1]} vs 'Gene Symbol'.")
+			logger.error("Column 2 didn't match the expected: ${str[1]} vs 'Gene Symbol'.")
 			return  false
 		} else if(!str[3].toString().toLowerCase().equals("seqname")) {
-			log.error("Column 3 didn't match the expected: ${str[3]} vs 'seqname'.")
+			logger.error("Column 3 didn't match the expected: ${str[3]} vs 'seqname'.")
 			return false
 		} else if(!str[8].toString().toLowerCase().equals("gene_assignment")) {
-			log.error("Column 8 didn't match the expected: ${str[8]} vs 'gene_assignment'.")
+			logger.error("Column 8 didn't match the expected: ${str[8]} vs 'gene_assignment'.")
 			return false
 		} else {
 			return true
@@ -713,12 +715,12 @@ class AffymetrixNetAffySNPAnnotation {
 		if(biomart.firstRow(qry, [
 			annotationTable.toUpperCase()
 		])[0] > 0){
-			log.info "The existing table $annotationTable will be rename to ${annotationTable}_bk"
+			logger.info "The existing table $annotationTable will be rename to ${annotationTable}_bk"
 			qry = "drop table $annotationTable purge"
 			biomart.execute(qry)
 		}
 
-		log.info "Create table $annotationTable ..."
+		logger.info "Create table $annotationTable ..."
 		qry = """ create table $annotationTable(
 					probe_id 	varchar2(100),
 					rs_id 	    varchar2(100),
@@ -737,12 +739,12 @@ class AffymetrixNetAffySNPAnnotation {
 		if(biomart.firstRow(qry, [
 			snpGeneTable.toUpperCase()
 		])[0] > 0){
-			log.info "The existing table $snpGeneTable will be rename to ${snpGeneTable}_bk"
+			logger.info "The existing table $snpGeneTable will be rename to ${snpGeneTable}_bk"
 			qry = "drop table $snpGeneTable purge"
 			biomart.execute(qry)
 		}
 
-		log.info "Create table $snpGeneTable ..."
+		logger.info "Create table $snpGeneTable ..."
 		qry = """ create table $snpGeneTable(
 					platform 	varchar2(100),
 					probe_id 	varchar2(100),

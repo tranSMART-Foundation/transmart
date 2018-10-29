@@ -28,15 +28,12 @@
 
 package org.transmartproject.pipeline.plink
 
-import org.apache.log4j.Logger;
-
+import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.util.Util
 
-import groovy.sql.Sql
-
+@Slf4j('logger')
 class SnpCopyNumber {
-
-	private static final Logger log = Logger.getLogger(SnpCopyNumber)
 
 	Sql deapp
 	File copyNumberFile
@@ -45,7 +42,7 @@ class SnpCopyNumber {
 
 		if(copyNumberFile.size() > 0) {
 			
-			log.info("Start loading Copy Number from ${copyNumberFile.toString()} into DE_SNP_COPY_NUMBER ...")
+			logger.info("Start loading Copy Number from ${copyNumberFile.toString()} into DE_SNP_COPY_NUMBER ...")
 
 			String [] str
 			String qry = " insert into DE_SNP_COPY_NUMBER(patient_num, snp_name, chrom, chrom_pos, copy_number) values(?, ?, ?, ?, ?)"
@@ -65,7 +62,7 @@ class SnpCopyNumber {
 				})
 			}
 		} else {
-			log.info " ${copyNumberFile.toString()} is empty or doesn't exist ... "
+			logger.info " ${copyNumberFile.toString()} is empty or doesn't exist ... "
 		}
 	}
 

@@ -19,8 +19,7 @@
 package org.transmartproject.pipeline.util
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.syntax.Numbers
 import org.transmartproject.pipeline.tworegion.TwoRegion
 
@@ -29,8 +28,10 @@ import java.sql.SQLException
 /**
  * Created by j.hudecek on 2-9-2014.
  */
+
+@Slf4j('logger')
 class HighDimImport {
-    protected static final Logger log = Logger.getLogger(TwoRegion)
+
     protected static OptionAccessor options
 
     //DBs
@@ -64,9 +65,10 @@ class HighDimImport {
     protected static String executeSP;
 
     protected static void initDB() {
-        PropertyConfigurator.configure("conf/log4j.properties");
 
-        log.info("Start loading property file Common.properties ...")
+//        PropertyConfigurator.configure("conf/log4j.properties");
+
+        logger.info("Start loading property file Common.properties ...")
         Properties props = Util.loadConfiguration("conf/Common.properties");
 
         isOracle = props.getProperty("url","").contains('oracle');

@@ -31,16 +31,13 @@ package org.transmartproject.pipeline.annotation
 import java.util.Properties;
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.PropertyConfigurator
-import groovy.sql.Sql
 import org.transmartproject.pipeline.util.Util
 
+@Slf4j('logger')
 class GPLReader {
 
-	private static final Logger log = Logger.getLogger(GPLReader)	
-	
 	String  sourceDirectory
 	Sql sql
 	Map expectedProbes
@@ -48,7 +45,7 @@ class GPLReader {
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
 		Util util = new Util()
 		GPLReader al = new GPLReader()
@@ -65,7 +62,7 @@ class GPLReader {
 	void loadGxGPL(Properties props, Sql biomart){
 
 		if(props.get("skip_gx_gpl_loader").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading GX GPL annotation file(s) ..."
+			logger.info "Skip loading GX GPL annotation file(s) ..."
 		}else{
 
 
@@ -74,7 +71,7 @@ class GPLReader {
 			gpl.setAnnotationTable(props.get("annotation_table"))
 
 			if(props.get("recreate_annotation_table").toString().toLowerCase().equals("yes")){
-				log.info "Start recreating annotation table ${props.get("annotation_table")} for GPL GX annotation file(s) ..."
+				logger.info "Start recreating annotation table ${props.get("annotation_table")} for GPL GX annotation file(s) ..."
 				gpl.createAnnotationTable()
 			}
 
@@ -97,29 +94,29 @@ class GPLReader {
 				File inputFile = new File(sourceDirectory + File.separator + names[i])
 
 				if(inputFile.exists()){
-					log.info("Start parsing " + inputFile.toString())
+					logger.info("Start parsing " + inputFile.toString())
 
 					setGPLInputFile(inputFile)
 					numProbes = parseGPLFile() //probeInfo, snpGeneMap, snpMapFile)
 					if(numProbes == expectedProbes[names[i]])
-						log.info("Probes in " + names[i] + ": " + numProbes + "; expected: " + expectedProbes[names[i]])
+						logger.info("Probes in " + names[i] + ": " + numProbes + "; expected: " + expectedProbes[names[i]])
 					else
-						log.warn("Probes in " + names[i] + ": " + numProbes + "; expected: " + expectedProbes[names[i]])
+						logger.warn("Probes in " + names[i] + ": " + numProbes + "; expected: " + expectedProbes[names[i]])
 				}else{
-					log.warn("Cannot find the file: " + inputFile.toString())
+					logger.warn("Cannot find the file: " + inputFile.toString())
 				}
 			}
 		}else{
 			File inputFile = new File(sourceDirectory + File.separator + inputFileName)
 
-			log.info("Start parsing " + inputFile.toString())
+			logger.info("Start parsing " + inputFile.toString())
 
 			setGPLInputFile(inputFile)
 			numProbes = parseGPLFile() //probeInfo, snpGeneMap, snpMapFile)
 			if(numProbes == expectedProbes[inputFileName])
-				log.info("Probes in " + inputFileName + ": " + numProbes + "; expected: " + expectedProbes[inputFileName])
+				logger.info("Probes in " + inputFileName + ": " + numProbes + "; expected: " + expectedProbes[inputFileName])
 			else
-				log.warn("Probes in " + inputFileName + ": " + numProbes + "; expected: " + expectedProbes[inputFileName])
+				logger.warn("Probes in " + inputFileName + ": " + numProbes + "; expected: " + expectedProbes[inputFileName])
 		}
 	}
 
@@ -143,12 +140,12 @@ class GPLReader {
 
 					if((gplInput.name.indexOf("GPL2004") > -1) || (gplInput.name.indexOf("GPL2005") > -1)){
 						// used for GPL2004 and GPL2005
-						log.info str[0] + "\t" + str[1] + "\t" + str[2] + "\t" + str[5] + "\t" + str[12]
+						logger.info str[0] + "\t" + str[1] + "\t" + str[2] + "\t" + str[5] + "\t" + str[12]
 					}
 
 					if((gplInput.name.indexOf("GPL3718") > -1) || (gplInput.name.indexOf("GPL3720") > -1)){
 						// used for GPL3718 and GPL3720
-						log.info str[0] + "\t" + str[1] + "\t" + str[2] + "\t" + str[5] + "\t" + str[13]
+						logger.info str[0] + "\t" + str[1] + "\t" + str[2] + "\t" + str[5] + "\t" + str[13]
 					}
 				}else{
 					//if(isHeaderLine && numProbes < 10) {

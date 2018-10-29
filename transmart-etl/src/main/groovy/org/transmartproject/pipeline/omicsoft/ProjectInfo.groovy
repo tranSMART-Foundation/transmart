@@ -28,24 +28,14 @@
 package org.transmartproject.pipeline.omicsoft
 
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Level
-import org.apache.log4j.Logger;
- 
-
+@Slf4j('logger')
 class ProjectInfo {
-
-	private static final Logger log = Logger.getLogger(ProjectInfo)
 
 	Sql sql
 	String projectInfoTable, projectInfoSuffix
 	Map map = [:]
-
-
-	ProjectInfo(Level logLevel){
-		log.setLevel(logLevel)
-	}
-
 
 	void loadProjectInfo(File sourceDirectory){
 
@@ -68,9 +58,9 @@ class ProjectInfo {
 		String gseName = file.getName().split(/\./)[0].toUpperCase()
 
 		if(isProjectInfoExist(gseName)){
-			log.warn("$gseName already exists in $projectInfoTable")
+			logger.warn("$gseName already exists in $projectInfoTable")
 		}else{
-			log.info("Insert $gseName into $projectInfoTable ...")
+			logger.info("Insert $gseName into $projectInfoTable ...")
 
 			createProjectRecord(gseName, file.getName())
 			HashSet columns = getColumns(projectInfoTable)
@@ -111,7 +101,7 @@ class ProjectInfo {
 
 	void addColumn(String columnName){
 
-		log.info "Add new column $columnName to table $projectInfoTable ..."
+		logger.info "Add new column $columnName to table $projectInfoTable ..."
 
 		String qry = "alter table $projectInfoTable add $columnName varchar2(4000)"
 		sql.execute(qry)

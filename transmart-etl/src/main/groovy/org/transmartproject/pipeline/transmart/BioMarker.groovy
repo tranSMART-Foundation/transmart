@@ -29,16 +29,13 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.GroovyRowResult
-import org.apache.log4j.Logger;
-
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
 import org.transmartproject.pipeline.util.Util
 
-
+@Slf4j('logger')
 class BioMarker {
-
-    private static final Logger log = Logger.getLogger(BioMarker)
 
     Sql biomart
     String organism

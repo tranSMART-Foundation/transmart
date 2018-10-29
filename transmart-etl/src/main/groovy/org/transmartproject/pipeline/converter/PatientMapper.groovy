@@ -31,11 +31,10 @@ package org.transmartproject.pipeline.converter
 
 import org.transmartproject.pipeline.i2b2.PatientDimension
 import groovy.sql.Sql
-import org.apache.log4j.Logger;
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class PatientMapper {
-
-	private static final Logger log = Logger.getLogger(PatientMapper)
 
 	Sql sql
 	String studyName
@@ -62,17 +61,17 @@ class PatientMapper {
 					gsmMap[str[0]] = patientNumber
 					gsmMap[str[1]] = patientNumber
 
-					log.info("Add patient record for sample: " + val)
+					logger.info("Add patient record for sample: " + val)
 				}else{
 					if(patientNum1 != patientNum2) {
 						String errMsg = "Inconsistent patient number for " + str[0] + "(" + patientNum1 + ") and " + str[1] + "(" + patientNum2 + ")"
-						log.error(errMsg)
+						logger.error(errMsg)
 						throw new RuntimeException(errMsg)
 					}else{
 						patientMap[key] = patientNum1
 						gsmMap[str[0]] = patientNum1
 						gsmMap[str[1]] = patientNum1
-						log.info(key + " --> " + val + " --> " + patientNum1)
+						logger.info(key + " --> " + val + " --> " + patientNum1)
 					}
 				}
 			}
@@ -105,17 +104,17 @@ class PatientMapper {
 					gsmMap[str[0]] = patientNumber
 					gsmMap[str[1]] = patientNumber
 
-					log.info("Add patient record for sample: " + val)
+					logger.info("Add patient record for sample: " + val)
 				}else{
 					if(patientNum1 != patientNum2) {
 						String errMsg = "Inconsistent patient number for " + str[0] + "(" + patientNum1 + ") and " + str[1] + "(" + patientNum2 + ")"
-						log.error(errMsg)
+						logger.error(errMsg)
 						throw new RuntimeException(errMsg)
 					}else{
 						patientGsmMap[key] = patientNum1
 						gsmMap[str[0]] = patientNum1
 						gsmMap[str[1]] = patientNum1
-						log.info(key + " --> " + val + " --> " + patientNum1 + ":" + patientNum3)
+						logger.info(key + " --> " + val + " --> " + patientNum1 + ":" + patientNum3)
 						StringBuffer line = new StringBuffer()
 						line.append("update pt set sample_id='" + key + "' where patient_num=" + patientNum1 + ";\n")
 						line.append("update pt set sample_id='" + key + "' where patient_num=" + patientNum3 + ";\n")
@@ -138,7 +137,7 @@ class PatientMapper {
 		def v = sql.firstRow(qry)
 
 		if(v.equals(null)) {
-			log.warn("No patient number found for " + individualId)
+			logger.warn("No patient number found for " + individualId)
 			return 0
 		}else{
 			return v[0]
@@ -150,7 +149,7 @@ class PatientMapper {
 		def v = sql.firstRow(qry)
 
 		if(v.equals(null)) {
-			log.warn("No patient number found for " + subjectId)
+			logger.warn("No patient number found for " + subjectId)
 			return 0
 		}else{
 			return v[0]

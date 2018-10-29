@@ -31,15 +31,14 @@ package org.transmartproject.pipeline.disease
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator;
+import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.transmart.BioDataUid
 import org.transmartproject.pipeline.transmart.SearchKeyword
 import org.transmartproject.pipeline.transmart.SearchKeywordTerm
 
+@Slf4j('logger')
 class MeSH {
 
-	private static final Logger log = Logger.getLogger(MeSH)
 	private static Properties props
 	
         private static SearchKeyword searchKeyword
@@ -47,14 +46,14 @@ class MeSH {
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 		MeSH mesh = new MeSH()
 		
 		if(args.size() > 0){
-			log.info("Start loading property files conf/Common.properties and ${args[0]} ...")
+			logger.info("Start loading property files conf/Common.properties and ${args[0]} ...")
 			mesh.setProperties(Util.loadConfiguration(args[0]));
 		} else {
-			log.info("Start loading property files conf/Common.properties and conf/MeSH.properties ...")
+			logger.info("Start loading property files conf/Common.properties and conf/MeSH.properties ...")
 			mesh.setProperties(Util.loadConfiguration("conf/MeSH.properties"));
 		}
 
@@ -69,9 +68,9 @@ class MeSH {
 
 		// create a temporary table for MeSH data
 		if(props.get("skip_mesh_table").toString().toLowerCase().equals("yes")){
-			log.info "Skip creating temporary tables for MeSH data ..."
+			logger.info "Skip creating temporary tables for MeSH data ..."
 		}else{
-			log.info "Start creating temporary tables for MeSH data ..."
+			logger.info "Start creating temporary tables for MeSH data ..."
 			mesh.createMeSHTable(biomart, props.get("mesh_table"))
 			mesh.createMeSHSynonymTable(biomart, props.get("mesh_synonym_table"))
 		}
@@ -101,7 +100,7 @@ class MeSH {
 	void readMeSH(File input, File output, File synonym, String meshTree){
 
 		if(input.size() > 0){
-			log.info("Start processing MeSH file: ${input} ...")
+			logger.info("Start processing MeSH file: ${input} ...")
 
 			StringBuffer sb = new StringBuffer()
 			StringBuffer entry = new StringBuffer()
@@ -173,7 +172,7 @@ class MeSH {
 			}
 			synonym.append(entry.toString())
 		}else{
-			log.error("File ${input} is empty ...")
+			logger.error("File ${input} is empty ...")
 		}
 	}
 
@@ -184,16 +183,16 @@ class MeSH {
 		String MeSHTable = props.get("mesh_table")
 
 		if(props.get("skip_bio_disease").toString().toLowerCase().equals("yes")){
-			log.info("Skip loading MeSH data from ${MeSHTable} to BIO_DISEASE ...")
+			logger.info("Skip loading MeSH data from ${MeSHTable} to BIO_DISEASE ...")
 		}else{
-			log.info("Start loading MeSH data from ${MeSHTable} to BIO_DISEASE ...")
+			logger.info("Start loading MeSH data from ${MeSHTable} to BIO_DISEASE ...")
 
 			String qry = """ insert into bio_disease (disease, mesh_code, prefered_name) 
 						     select mh, ui, mh from $MeSHTable
 						     where ui not in (select mesh_code from bio_disease where mesh_code is not null)"""
 			biomart.execute(qry)
 
-			log.info("End loading MeSH data from ${MeSHTable} to BIO_DISEASE ...")
+			logger.info("End loading MeSH data from ${MeSHTable} to BIO_DISEASE ...")
 		}
 	}
 
@@ -223,13 +222,13 @@ class MeSH {
         
 
 		if(props.get("skip_bio_data_ext_code").toString().toLowerCase().equals("yes")){
-			log.info("Skip loading MeSH data from ${MeSHSynonymTable} to BIO_DATA_EXT_CODE ...")
+			logger.info("Skip loading MeSH data from ${MeSHSynonymTable} to BIO_DATA_EXT_CODE ...")
 		}else{
-			log.info("Start loading MeSH data from ${MeSHSynonymTable} to BIO_DATA_EXT_CODE ...")
+			logger.info("Start loading MeSH data from ${MeSHSynonymTable} to BIO_DATA_EXT_CODE ...")
 
 			biomart.execute(qry)
 
-			log.info("End loading MeSH data from ${MeSHSynonymTable} to BIO_DATA_EXT_CODE ...")
+			logger.info("End loading MeSH data from ${MeSHSynonymTable} to BIO_DATA_EXT_CODE ...")
 		}
 	}
 
@@ -277,10 +276,10 @@ class MeSH {
                 }
                 
 		if(props.get("skip_search_keyword").toString().toLowerCase().equals("yes")){
-			log.info("Skip loading MeSH data from ${MeSHTable} to SEARCH_KEYWORD ...")
+			logger.info("Skip loading MeSH data from ${MeSHTable} to SEARCH_KEYWORD ...")
 
 		}else{
-			log.info("Start loading MeSH data from ${MeSHTable} to SEARCH_KEYWORD ...")
+			logger.info("Start loading MeSH data from ${MeSHTable} to SEARCH_KEYWORD ...")
 
 			biomart.eachRow(qry)
                         {
@@ -303,7 +302,7 @@ class MeSH {
                         }
                         
 
-			log.info("End loading MeSH data from ${MeSHTable} to SEARCH_KEYWORD ...")
+			logger.info("End loading MeSH data from ${MeSHTable} to SEARCH_KEYWORD ...")
 		}
 	}
 
@@ -313,7 +312,7 @@ class MeSH {
 		String qry = "insert into $MeSHSynonymTable (mh, entry) values(?, ?)"
 
 		if(meshEntry.size() > 0){
-			log.info("Start loading MeSH synonym file: ${meshEntry} into ${MeSHSynonymTable} ...")
+			logger.info("Start loading MeSH synonym file: ${meshEntry} into ${MeSHSynonymTable} ...")
 
 			biomart.withTransaction {
                             biomart.withBatch(1000, qry, {stmt ->
@@ -325,7 +324,7 @@ class MeSH {
 			}
 
 		}else{
-			log.error("File ${meshEntry} is empty ...")
+			logger.error("File ${meshEntry} is empty ...")
 		}
 	}
 
@@ -335,7 +334,7 @@ class MeSH {
 		String qry = "insert into $MeSHTable (ui, mh, mn) values(?, ?, ?)"
 
 		if(mesh.size() > 0){
-			log.info("Start loading MeSH file: ${mesh} into ${MeSHTable} ...")
+			logger.info("Start loading MeSH file: ${mesh} into ${MeSHTable} ...")
 
 			biomart.withTransaction {
                             biomart.withBatch(1000, qry, {stmt ->
@@ -347,7 +346,7 @@ class MeSH {
 			}
 
 		}else{
-			log.error("File ${mesh} is empty ...")
+			logger.error("File ${mesh} is empty ...")
 		}
 	}
 
@@ -355,7 +354,7 @@ class MeSH {
 
             Boolean isPostgres = Util.isPostgres()
 
-            log.info "Start creating MeSH table: ${MeSHTable}"
+            logger.info "Start creating MeSH table: ${MeSHTable}"
 
             String qry;
             String qry1;
@@ -374,11 +373,11 @@ class MeSH {
                 qrygrant = "grant select on ${MeSHTable} to searchapp"
 
                 if(biomart.firstRow(qry1, [MeSHTable])[0] > 0) {
-                    log.info "Truncating table ${MeSHTable}"
+                    logger.info "Truncating table ${MeSHTable}"
                     biomart.execute(qry2)
                 }
                 else{
-                    log.info "Creating table ${MeSHTable}"
+                    logger.info "Creating table ${MeSHTable}"
                     biomart.execute(qry)
                 }
 
@@ -394,16 +393,16 @@ class MeSH {
                 qry1 = "select count(1) from user_tables where table_name=?"
                 qry2 = "truncate table ${MeSHTable}"
                 if(biomart.firstRow(qry1, [MeSHTable.toUpperCase()])[0] > 0) {
-                    log.info "Truncating table ${MeSHTable}"
+                    logger.info "Truncating table ${MeSHTable}"
                     biomart.execute(qry2)
                 }
                 else{
-                    log.info "Creating table ${MeSHTable}"
+                    logger.info "Creating table ${MeSHTable}"
                     biomart.execute(qry)
                 }
             }
                 
-            log.info "End creating table: ${MeSHTable}"
+            logger.info "End creating table: ${MeSHTable}"
 	}
 
 
@@ -411,7 +410,7 @@ class MeSH {
 
             Boolean isPostgres = Util.isPostgres()
 
-            log.info "Start creating table: ${MeSHSynonymTable}"
+            logger.info "Start creating table: ${MeSHSynonymTable}"
 
             String qry = "";
             String qry1 = "";
@@ -428,7 +427,7 @@ class MeSH {
                 qry2 = "drop table ${MeSHSynonymTable}"
                 qrygrant = "grant select on table ${MeSHSynonymTable} to searchapp"
 		if(biomart.firstRow(qry1, [MeSHSynonymTable])[0] > 0){
-                    log.info "Dropping table ${MeSHSynonymTable} postgres"
+                    logger.info "Dropping table ${MeSHSynonymTable} postgres"
                     biomart.execute(qry2)
 		}
 
@@ -446,14 +445,14 @@ class MeSH {
                 qry2 = "drop table ${MeSHSynonymTable} purge"
 
                 if(biomart.firstRow(qry1, [MeSHSynonymTable.toUpperCase()])[0] > 0){
-                    log.info "Dropping table ${MeSHSynonymTable} postgres"
+                    logger.info "Dropping table ${MeSHSynonymTable} postgres"
                     biomart.execute(qry2)
                 }
 
                 biomart.execute(qry)
             }
                                    
-            log.info "End creating table: ${MeSHSynonymTable}"
+            logger.info "End creating table: ${MeSHSynonymTable}"
 	}
 
 	

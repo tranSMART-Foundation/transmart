@@ -51,17 +51,17 @@ import org.transmartproject.pipeline.transmart.SearchKeyword
 import org.transmartproject.pipeline.transmart.SearchKeywordTerm
 import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
 
+@Slf4j('logger')
 class OmicsoftLoader {
-
-	private static final Logger log = Logger.getLogger(OmicsoftLoader)
 
 	static main(args) {
 
 		PropertyConfigurator.configure("conf/log4j.properties");
 
-		log.info ("Start loading ...")
+		logger.info ("Start loading ...")
 
 		Util util = new Util()
 
@@ -135,7 +135,7 @@ class OmicsoftLoader {
 
 				if(fileName.indexOf(props.get("tests_data_suffix")) != -1){
 
-					log.info "Start looking for project info file for ${it.toString()} ..."
+					logger.info "Start looking for project info file for ${it.toString()} ..."
 
 					String gseName = fileName.split(/ +/)[0]
 					String platform = fileName.split(/ +/)[1].split(/\./)[0]
@@ -143,40 +143,40 @@ class OmicsoftLoader {
 					File projectInfo = new File(props.get("project_info_directory") + File.separator + gseName + props.get("project_info_suffix"))
 					if(projectInfo.exists()){
 						if(!isStudyLoaded(biomart, gseName, platform)){
-							log.info "Start loading Study $gseName ... "
+							logger.info "Start loading Study $gseName ... "
 							loadTestsData(props, biomart, it)
 
 							if(isProjectInfoLoaded(biomart, gseName, props.get("project_info_table"))){
-								log.info "Project Info for Study $gseName is loaded already ... "
+								logger.info "Project Info for Study $gseName is loaded already ... "
 							}else{
 								loadProjectInfo(props, biomart, projectInfo)
 							}
 						} else{
-							log.info "Study $gseName is loaded already ... "
+							logger.info "Study $gseName is loaded already ... "
 						}
 					} else{
 						projectInfo = new File(props.get("project_info_directory") + File.separator + gseName.toLowerCase() + props.get("project_info_suffix"))
 						if(projectInfo.exists()){
 							if(!isStudyLoaded(biomart, gseName, platform)){
-								log.info "Start loading Study $gseName ... "
+								logger.info "Start loading Study $gseName ... "
 								loadTestsData(props, biomart, it)
 								
 								if(isProjectInfoLoaded(biomart, gseName, props.get("project_info_table"))){
-									log.info "Project Info for Study $gseName is loaded already ... "
+									logger.info "Project Info for Study $gseName is loaded already ... "
 								}else{
 									loadProjectInfo(props, biomart, projectInfo)
 								}
 							} else{
-								log.info "Study $gseName is loaded already ... "
+								logger.info "Study $gseName is loaded already ... "
 							}
 						} else{
-							log.error(projectInfo.toString() + " doen't exist." )
+							logger.error(projectInfo.toString() + " doen't exist." )
 						}
 					}
 				}
 			}
 		} else{
-			log.error("There is no such directory: " + testsDataDirectory.toString())
+			logger.error("There is no such directory: " + testsDataDirectory.toString())
 		}
 	}
 
@@ -187,7 +187,7 @@ class OmicsoftLoader {
 
 	boolean isAnnotationLoaded(Sql biomart, String annotationName){
 
-		log.info "Check if $annotationName is loaded already ... "
+		logger.info "Check if $annotationName is loaded already ... "
 
 		String qry = """ select count(*) from bio_assay_analysis_data t1, bio_experiment t2
 						 where t1.bio_experiment_id=t2.bio_experiment_id and t2.accession=?"""
@@ -198,7 +198,7 @@ class OmicsoftLoader {
 
 	boolean isProjectInfoLoaded(Sql biomart, String gseName, String projectInfotable){
 
-		log.info "Check if $gseName is loaded into $projectInfotable already ... "
+		logger.info "Check if $gseName is loaded into $projectInfotable already ... "
 
 		String qry = """ select count(*) from $projectInfotable	where name=? """
 		if(biomart.firstRow(qry, [gseName])[0] > 0)  return true
@@ -208,7 +208,7 @@ class OmicsoftLoader {
 
 	boolean isStudyLoaded(Sql biomart, String gseName){
 
-		log.info "Check if $gseName is loaded already ... "
+		logger.info "Check if $gseName is loaded already ... "
 
 		String qry = """ select count(*) from bio_assay_analysis_data t1, bio_experiment t2
 					     where t1.bio_experiment_id=t2.bio_experiment_id and t2.accession=?"""
@@ -220,7 +220,7 @@ class OmicsoftLoader {
 
 	boolean isStudyLoaded(Sql biomart, String gseName, String platform){
 
-		log.info "Check if $gseName is loaded already ... "
+		logger.info "Check if $gseName is loaded already ... "
 
 		String qry = """ select count(*) from bio_assay_analysis_data t1, bio_experiment t2, bio_assay_platform t3
 							 where t1.bio_experiment_id=t2.bio_experiment_id and t2.accession=? 
@@ -256,11 +256,11 @@ class OmicsoftLoader {
 	void createIndexes(Properties props, Sql biomart){
 
 		if(props.get("recreate_tests_index").toString().toLowerCase().equals("yes")){
-			log.info "Create index(es) for ${props.get("tests_data_table")} on  (platform, test) ... "
+			logger.info "Create index(es) for ${props.get("tests_data_table")} on  (platform, test) ... "
 			String qry = " create index idx_tests on ${props.get("tests_data_table")} (platform, test) nologging"
 			biomart.execute(qry)
 		}else{
-			log.info "Skip creating index(es) for ${props.get("tests_data_table")} on  (platform, test) ... "
+			logger.info "Skip creating index(es) for ${props.get("tests_data_table")} on  (platform, test) ... "
 		}
 	}
 
@@ -278,7 +278,7 @@ class OmicsoftLoader {
 
 		/*
 		 if(props.get("skip_project_info").toString().toLowerCase().equals("yes")){
-		 log.info "Skip loading PROJECT_INFO data ..."
+		 logger.info "Skip loading PROJECT_INFO data ..."
 		 }else{
 		 File projectInfoSourceDirectory = new File(props.get("project_info_directory"))
 		 ProjectInfo prj = new ProjectInfo()
@@ -294,7 +294,7 @@ class OmicsoftLoader {
 	void loadProjectInfo(Properties props, Sql biomart, File projectInfo){
 
 		if(props.get("skip_project_info").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading PROJECT_INFO data ..."
+			logger.info "Skip loading PROJECT_INFO data ..."
 		}else{
 
 			File projectInfoSourceDirectory = new File(props.get("project_info_directory"))
@@ -321,7 +321,7 @@ class OmicsoftLoader {
 
 		/*
 		 if(props.get("skip_tests_data").toString().toLowerCase().equals("yes")){
-		 log.info "Skip loading Tests data ..."
+		 logger.info "Skip loading Tests data ..."
 		 }else{
 		 File dataDir = new File(props.get("tests_data_directory"))
 		 TestsData td = new TestsData()
@@ -341,7 +341,7 @@ class OmicsoftLoader {
 	void loadTestsData(Properties props, Sql biomart, File input){
 
 		if(props.get("skip_tests_data").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading Tests data ..."
+			logger.info "Skip loading Tests data ..."
 		}else{
 
 			TestsData td = new TestsData()
@@ -359,7 +359,7 @@ class OmicsoftLoader {
 	void loadBioExperiemnt(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_experiment").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_EXPERIMENT  ..."
+			logger.info "Skip loading data into BIO_EXPERIMENT  ..."
 		}else{
 
 			String projectInfoTable = props.get("project_info_table")
@@ -375,7 +375,7 @@ class OmicsoftLoader {
 	void loadBioAssayPlatform(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_assay_platform").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_ASSAY_PLATFORM  ..."
+			logger.info "Skip loading data into BIO_ASSAY_PLATFORM  ..."
 		}else{
 
 			String projectInfoTable = props.get("project_info_table")
@@ -391,7 +391,7 @@ class OmicsoftLoader {
 	void loadBioAssayFeatureGroup(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_assay_feature_group").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into Bio_Assay_Feature_Group  ..."
+			logger.info "Skip loading data into Bio_Assay_Feature_Group  ..."
 		}else{
 
 			String testsDataTable = props.get("tests_data_table")
@@ -408,7 +408,7 @@ class OmicsoftLoader {
 	void loadBioAssayDataAnnotation(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_assay_data_annotation").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_ASSAY_DATA_ANNOTATION  ..."
+			logger.info "Skip loading data into BIO_ASSAY_DATA_ANNOTATION  ..."
 		}else{
 
 			String testsDataTable = props.get("tests_data_table")
@@ -428,7 +428,7 @@ class OmicsoftLoader {
 	void loadBioAssayAnalysisPlatform(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_assay_analysis_platform").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_ASY_ANALYSIS_PLTFM  ..."
+			logger.info "Skip loading data into BIO_ASY_ANALYSIS_PLTFM  ..."
 		}else{
 
 			String testsDataTable = props.get("tests_data_table")
@@ -444,7 +444,7 @@ class OmicsoftLoader {
 	void loadBioAssayAnalysis(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_assay_analysis").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_ASSAY_ANALYSIS ..."
+			logger.info "Skip loading data into BIO_ASSAY_ANALYSIS ..."
 		}else{
 
 			String testsDataTable = props.get("tests_data_table")
@@ -468,10 +468,10 @@ class OmicsoftLoader {
 	void updateBioAssayAnalysisTeaDataCount(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_assay_analysis").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_ASSAY_ANALYSIS ..."
+			logger.info "Skip loading data into BIO_ASSAY_ANALYSIS ..."
 		}else{
 
-			log.info("Start updating BIO_ASSAY_ANALYSIS's TEA_DATA_COUNT ...")
+			logger.info("Start updating BIO_ASSAY_ANALYSIS's TEA_DATA_COUNT ...")
 
 			BioAssayAnalysis baa = new BioAssayAnalysis()
 			baa.setBiomart(biomart)
@@ -486,7 +486,7 @@ class OmicsoftLoader {
 				baa.updateTeaDataCount((long) it.bio_assay_analysis_id, (int) it.tea_count)
 			}
 
-			log.info("End updating BIO_ASSAY_ANALYSIS's TEA_DATA_COUNT ...")
+			logger.info("End updating BIO_ASSAY_ANALYSIS's TEA_DATA_COUNT ...")
 		}
 	}
 
@@ -494,10 +494,10 @@ class OmicsoftLoader {
 	void updateBioAssayAnalysisDataCount(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_assay_analysis").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_ASSAY_ANALYSIS ..."
+			logger.info "Skip loading data into BIO_ASSAY_ANALYSIS ..."
 		}else{
 
-			log.info("Start updating BIO_ASSAY_ANALYSIS's DATA_COUNT ...")
+			logger.info("Start updating BIO_ASSAY_ANALYSIS's DATA_COUNT ...")
 
 			BioAssayAnalysis baa = new BioAssayAnalysis()
 			baa.setBiomart(biomart)
@@ -513,7 +513,7 @@ class OmicsoftLoader {
 				baa.updateDataCount((long) it.bio_assay_analysis_id, (int) it.tea_count)
 			}
 
-			log.info("End updating BIO_ASSAY_ANALYSIS's DATA_COUNT ...")
+			logger.info("End updating BIO_ASSAY_ANALYSIS's DATA_COUNT ...")
 		}
 	}
 
@@ -521,7 +521,7 @@ class OmicsoftLoader {
 	void loadBioAssayDataset(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_assay_dataset").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_ASSAY_DATASET ..."
+			logger.info "Skip loading data into BIO_ASSAY_DATASET ..."
 		}else{
 
 			String testsDataTable = props.get("tests_data_table")
@@ -537,7 +537,7 @@ class OmicsoftLoader {
 	void loadBioAssayAnalysisData(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_assay_analysis_data").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_ASSAY_ANALYSIS_DATA ..."
+			logger.info "Skip loading data into BIO_ASSAY_ANALYSIS_DATA ..."
 		}else{
 
 			BioAssayAnalysisPlatform aap = new BioAssayAnalysisPlatform()
@@ -551,37 +551,37 @@ class OmicsoftLoader {
 			baad.setTestsDataTable(testsDataTable)
 
 			if(props.get("drop_bio_assay_analysis_data_index").toString().toLowerCase().equals("yes")){
-				log.info "Start dropping indexes from BIO_ASSAY_ANALYSIS_DATA ..."
+				logger.info "Start dropping indexes from BIO_ASSAY_ANALYSIS_DATA ..."
 				baad.dropBioAssayAnalysisDataIndexes()
-				log.info "End dropping indexes from BIO_ASSAY_ANALYSIS_DATA ..."
+				logger.info "End dropping indexes from BIO_ASSAY_ANALYSIS_DATA ..."
 			}else{
-				log.info "Skip dropping indexes for BIO_ASSAY_ANALYSIS_DATA ..."
+				logger.info "Skip dropping indexes for BIO_ASSAY_ANALYSIS_DATA ..."
 			}
 
 			if(props.get("disable_bio_assay_analysis_data_constraint").toString().toLowerCase().equals("yes")){
-				log.info "Start disabling constraints from BIO_ASSAY_ANALYSIS_DATA ..."
+				logger.info "Start disabling constraints from BIO_ASSAY_ANALYSIS_DATA ..."
 				baad.disableBioAssayAnalysisDataConstraints()
-				log.info "End disabling constraints from BIO_ASSAY_ANALYSIS_DATA ..."
+				logger.info "End disabling constraints from BIO_ASSAY_ANALYSIS_DATA ..."
 			}else{
-				log.info "Skip disabling constraints for BIO_ASSAY_ANALYSIS_DATA ..."
+				logger.info "Skip disabling constraints for BIO_ASSAY_ANALYSIS_DATA ..."
 			}
 
 			baad.loadBioAssayAnalysisData()
 
 			if(props.get("create_bio_assay_analysis_data_index").toString().toLowerCase().equals("yes")){
-				log.info "Start creating indexes from BIO_ASSAY_ANALYSIS_DATA ..."
+				logger.info "Start creating indexes from BIO_ASSAY_ANALYSIS_DATA ..."
 				baad.createBioAssayAnalysisDataIndexes()
-				log.info "Start creating indexes from BIO_ASSAY_ANALYSIS_DATA ..."
+				logger.info "Start creating indexes from BIO_ASSAY_ANALYSIS_DATA ..."
 			}else{
-				log.info "Skip creating indexes for BIO_ASSAY_ANALYSIS_DATA ..."
+				logger.info "Skip creating indexes for BIO_ASSAY_ANALYSIS_DATA ..."
 			}
 
 			if(props.get("enable_bio_assay_analysis_data_constraint").toString().toLowerCase().equals("yes")){
-				log.info "Start enabling constraints from BIO_ASSAY_ANALYSIS_DATA ..."
+				logger.info "Start enabling constraints from BIO_ASSAY_ANALYSIS_DATA ..."
 				baad.enableBioAssayAnalysisDataConstraints()
-				log.info "End enabling constraints from BIO_ASSAY_ANALYSIS_DATA ..."
+				logger.info "End enabling constraints from BIO_ASSAY_ANALYSIS_DATA ..."
 			}else{
-				log.info "Skip enabling constraints for BIO_ASSAY_ANALYSIS_DATA ..."
+				logger.info "Skip enabling constraints for BIO_ASSAY_ANALYSIS_DATA ..."
 			}
 		}
 	}
@@ -590,7 +590,7 @@ class OmicsoftLoader {
 	void loadBioAssayAnalysisDataTea(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_assay_analysis_data_tea").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+			logger.info "Skip loading data into BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 		}else{
 
 			BioAssayAnalysisPlatform aap = new BioAssayAnalysisPlatform()
@@ -604,37 +604,37 @@ class OmicsoftLoader {
 			baadt.setTestsDataTable(testsDataTable)
 
 			if(props.get("drop_bio_assay_analysis_data_tea_index").toString().toLowerCase().equals("yes")){
-				log.info "Start dropping indexes from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+				logger.info "Start dropping indexes from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 				baadt.dropBioAssayAnalysisDataTeaIndexes()
-				log.info "End dropping indexes from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+				logger.info "End dropping indexes from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 			}else{
-				log.info "Skip dropping indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+				logger.info "Skip dropping indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 			}
 
 			if(props.get("disable_bio_assay_analysis_data_tea_constraint").toString().toLowerCase().equals("yes")){
-				log.info "Start disabling constraints from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+				logger.info "Start disabling constraints from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 				baadt.disableBioAssayAnalysisDataTeaConstraints()
-				log.info "End dropping indexes from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+				logger.info "End dropping indexes from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 			}else{
-				log.info "Skip disabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+				logger.info "Skip disabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 			}
 
 			baadt.loadBioAssayAnalysisDataTea()
 
 			if(props.get("create_bio_assay_analysis_data_tea_index").toString().toLowerCase().equals("yes")){
-				log.info "Start creating indexes from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+				logger.info "Start creating indexes from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 				baadt.createBioAssayAnalysisDataTeaIndexes()
-				log.info "End creating indexes from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+				logger.info "End creating indexes from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 			}else{
-				log.info "Skip creating indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+				logger.info "Skip creating indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 			}
 
 			if(props.get("enable_bio_assay_analysis_data_tea_constraint").toString().toLowerCase().equals("yes")){
-				log.info "Start enabling constraints from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+				logger.info "Start enabling constraints from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 				baadt.enableBioAssayAnalysisDataTeaConstraints()
-				log.info "Start enabling constraints from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+				logger.info "Start enabling constraints from BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 			}else{
-				log.info "Skip enabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+				logger.info "Skip enabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 			}
 		}
 	}
@@ -643,7 +643,7 @@ class OmicsoftLoader {
 	void loadBioDataUid(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_data_uid").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_DATA_UID ..."
+			logger.info "Skip loading data into BIO_DATA_UID ..."
 		}else{
 			BioDataUid bdu = new BioDataUid()
 			bdu.setBiomart(biomart)
@@ -656,7 +656,7 @@ class OmicsoftLoader {
 	void loadSearchKeyword(Properties props, Sql searchapp){
 
 		if(props.get("skip_search_keyword").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into Search_Keyword ..."
+			logger.info "Skip loading data into Search_Keyword ..."
 		}else{
 			SearchKeyword sk = new SearchKeyword()
 			sk.setSearchapp(searchapp)
@@ -671,7 +671,7 @@ class OmicsoftLoader {
 	void loadSearchKeywordTerm(Properties props, Sql searchapp){
 
 		if(props.get("skip_search_keyword_term").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into Search_Keyword_Term ..."
+			logger.info "Skip loading data into Search_Keyword_Term ..."
 		}else{
 			SearchKeywordTerm skt = new SearchKeywordTerm()
 			skt.setSearchapp(searchapp)
@@ -684,7 +684,7 @@ class OmicsoftLoader {
 	void loadBioContentRepository(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_content_repository").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_CONTENT_REPOSITORY ..."
+			logger.info "Skip loading data into BIO_CONTENT_REPOSITORY ..."
 		}else{
 			BioContentRepository bcr = new BioContentRepository()
 			bcr.setBiomart(biomart)
@@ -696,7 +696,7 @@ class OmicsoftLoader {
 	void loadBioContent(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_content").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_CONTENT ..."
+			logger.info "Skip loading data into BIO_CONTENT ..."
 		}else{
 
 			BioContentRepository bcr = new BioContentRepository()
@@ -720,7 +720,7 @@ class OmicsoftLoader {
 	void loadBioContentReference(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_content_reference").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_CONTENT_REFERENCE ..."
+			logger.info "Skip loading data into BIO_CONTENT_REFERENCE ..."
 		}else{
 
 			BioContentRepository bcrp = new BioContentRepository()
@@ -747,7 +747,7 @@ class OmicsoftLoader {
 	void loadBioDataOmicMarker(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_data_omic_marker").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading data into BIO_DATA_OMIC_MARKER ..."
+			logger.info "Skip loading data into BIO_DATA_OMIC_MARKER ..."
 		}else{
 			BioDataOmicMarker bdom = new BioDataOmicMarker()
 			bdom.setBiomart(biomart)
@@ -759,7 +759,7 @@ class OmicsoftLoader {
 	void loadBioDataDisease(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_data_disease").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading BIO_DATA_DISEASE data ..."
+			logger.info "Skip loading BIO_DATA_DISEASE data ..."
 		}else{
 
 			BioDataDisease bdd = new BioDataDisease()
@@ -771,7 +771,7 @@ class OmicsoftLoader {
 				diseaseMap[it.disease] = (long) it.bio_disease_id
 			}
 
-			log.info "Start loading BIO_DATA_DISEASE data ..."
+			logger.info "Start loading BIO_DATA_DISEASE data ..."
 
 			String projectInfoTable = props.get("project_info_table")
 
@@ -798,7 +798,7 @@ class OmicsoftLoader {
 				}
 			}
 
-			log.info "End loading BIO_DATA_DISEASE data ..."
+			logger.info "End loading BIO_DATA_DISEASE data ..."
 		}
 	}
 
@@ -807,10 +807,10 @@ class OmicsoftLoader {
 	void loadBioDataCompound(Properties props, Sql biomart){
 
 		if(props.get("skip_bio_data_compound").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading BIO_DATA_COMPOUND data ..."
+			logger.info "Skip loading BIO_DATA_COMPOUND data ..."
 		}else{
 
-			log.info "Start loading BIO_DATA_COMPOUND data ..."
+			logger.info "Start loading BIO_DATA_COMPOUND data ..."
 
 			BioDataCompound bdc = new BioDataCompound()
 			bdc.setBiomart(biomart)
@@ -857,7 +857,7 @@ class OmicsoftLoader {
 				}
 			}
 
-			log.info "End loading BIO_DATA_COMPOUND data ..."
+			logger.info "End loading BIO_DATA_COMPOUND data ..."
 		}
 	}
 
@@ -869,13 +869,13 @@ class OmicsoftLoader {
 		String qry = "select count(*) from user_tables where table_name='GSE_ANALYSIS'"
 
 		if(biomart.firstRow(qry)[0] > 0){
-			log.info "Start dropping the temporary table GSE_ANALYSIS ..."
+			logger.info "Start dropping the temporary table GSE_ANALYSIS ..."
 			qry = "drop table GSE_ANALYSIS purge"
 			biomart.execute(qry)
-			log.info "The temporary table GSE_ANALYSIS is dropped..."
+			logger.info "The temporary table GSE_ANALYSIS is dropped..."
 		}
 
-		log.info "Start creating a temporary table GSE_ANALYSIS ..."
+		logger.info "Start creating a temporary table GSE_ANALYSIS ..."
 
 		qry = """ create table GSE_ANALYSIS nologging as
 					   select name, platform, test, bio_experiment_id, bio_assay_analysis_id,
@@ -890,7 +890,7 @@ class OmicsoftLoader {
 
 		biomart.execute(qry)
 
-		log.info "The temporary table GSE_ANALYSIS is created ..."
+		logger.info "The temporary table GSE_ANALYSIS is created ..."
 	}
 
 
@@ -901,13 +901,13 @@ class OmicsoftLoader {
 		String qry = "select count(*) from user_tables where table_name='ASSAY_ANALYSIS_DATA'"
 
 		if(biomart.firstRow(qry)[0] > 0){
-			log.info "Start dropping the temporary table ASSAY_ANALYSIS_DATA ..."
+			logger.info "Start dropping the temporary table ASSAY_ANALYSIS_DATA ..."
 			qry = "drop table ASSAY_ANALYSIS_DATA purge"
 			biomart.execute(qry)
-			log.info "The temporary table ASSAY_ANALYSIS_DATA is dropped..."
+			logger.info "The temporary table ASSAY_ANALYSIS_DATA is dropped..."
 		}
 
-		log.info "Start creating a temporary table ASSAY_ANALYSIS_DATA ..."
+		logger.info "Start creating a temporary table ASSAY_ANALYSIS_DATA ..."
 
 		qry = """ create table ASSAY_ANALYSIS_DATA (
 						 BIO_ASY_ANALYSIS_DATA_ID,
@@ -940,7 +940,7 @@ class OmicsoftLoader {
 				  """
 		biomart.execute(qry)
 
-		log.info "The temporary table ASSAY_ANALYSIS_DATA is created ..."
+		logger.info "The temporary table ASSAY_ANALYSIS_DATA is created ..."
 	}
 
 

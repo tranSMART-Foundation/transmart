@@ -29,13 +29,12 @@
 package org.transmartproject.pipeline.i2b2
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
+import groovy.util.logging.Slf4j
 
 import org.transmartproject.pipeline.util.Util
 
+@Slf4j('logger')
 class PatientDimension {
-
-	private static final Logger log = Logger.getLogger(PatientDimension)
 
 	Sql i2b2demodata
 	String sourceSystemPrefix
@@ -53,11 +52,11 @@ class PatientDimension {
 	def loadPatientDimensionFromFam(File fam){
 
 		if(!fam.exists()){
-			log.error("Cannot fine the file: " + fam.toString())
+			logger.error("Cannot fine the file: " + fam.toString())
 			throw new RuntimeException("Cannot fine the file: " + fam.toString())
 		}
 
-		log.info  "Start loading data into PATIENT_DIMENSION from: " + fam.toString()
+		logger.info  "Start loading data into PATIENT_DIMENSION from: " + fam.toString()
 
 		String qry = "insert into patient_dimension(sex_cd, sourcesystem_cd) values (?, ?)"
 
@@ -75,26 +74,26 @@ class PatientDimension {
 			else sex = 'Unknown'
 
 			if(isPatientNumber(indId)){
-				log.info "Patient number exists for $indId ($sourceSystemPrefix) "
+				logger.info "Patient number exists for $indId ($sourceSystemPrefix) "
 			}else{
 				String sourcesystem_cd = sourceSystemPrefix + ":" + indId
 				def patient_num = getPatientNumberByIndividualId(sourcesystem_cd)
 				if(patient_num > 0)  {
-					log.info "Subject id exists for : " + patient_num + "(" + sourcesystem_cd + ")"
+					logger.info "Subject id exists for : " + patient_num + "(" + sourcesystem_cd + ")"
 				} else {
-					log.info "Create new patient record for : " + sourcesystem_cd
+					logger.info "Create new patient record for : " + sourcesystem_cd
 					i2b2demodata.execute(qry, [sex, sourcesystem_cd])
 				}
 			}
 		}
-		log.info "End loading data into PATIENT_DIMENSION ..."
+		logger.info "End loading data into PATIENT_DIMENSION ..."
 	}
 
 
 
 	def loadPatientDimensionFromSamples(Map samples){
 
-		log.info  "Start loading data into PATIENT_DIMENSION from Samples ... "
+		logger.info  "Start loading data into PATIENT_DIMENSION from Samples ... "
 
 		String qry = "insert into patient_dimension(sourcesystem_cd, import_date) values (?, sysdate)"
 
@@ -102,14 +101,14 @@ class PatientDimension {
 			String sourcesystem_cd = sourceSystemPrefix + ":" + key
 			def patient_num = getPatientNumberByIndividualId(sourcesystem_cd)
 			if(patient_num > 0)  {
-				log.info "Patient exists for : " + sourcesystem_cd + "(" + patient_num + ")"
+				logger.info "Patient exists for : " + sourcesystem_cd + "(" + patient_num + ")"
 			} else {
-				log.info "New patient for : " + sourcesystem_cd
+				logger.info "New patient for : " + sourcesystem_cd
 				i2b2demodata.execute(qry, [sourcesystem_cd])
 			}
 		}
 
-		log.info "End loading data into PATIENT_DIMENSION from Samples ..."
+		logger.info "End loading data into PATIENT_DIMENSION from Samples ..."
 	}
 
 
@@ -132,12 +131,12 @@ class PatientDimension {
 		String qry = "insert into patient_dimension(sourcesystem_cd) values(?)"
 
 		if(getPatientNumberBySubjectId(subjectId) == 0){
-			log.info "Add $subjectId to PATIENT_DIMENSION ... "
+			logger.info "Add $subjectId to PATIENT_DIMENSION ... "
 			i2b2demodata.execute(qry, [
 				sourceSystemPrefix + ":" + subjectId
 			])
 		}else{
-			log.info "$subjectId already exists in PATIENT_DIMENSION ... "
+			logger.info "$subjectId already exists in PATIENT_DIMENSION ... "
 		}
 	}
 

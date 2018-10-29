@@ -29,21 +29,19 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioCompound {
-
-	private static final Logger log = Logger.getLogger(BioCompound)
 
 	Sql biomart
 
 	void loadBioCompound(String codeName, String casRegistry){
 
 		if(isBioCompoundExist(codeName, casRegistry)){
-                    //log.info "($codeName, $casRegistry) already exists in BIO_COMPOUND ..."
+                    //logger.info "($codeName, $casRegistry) already exists in BIO_COMPOUND ..."
 		}else{
-			log.info "Start loading ($codeName, $casRegistry) into BIO_COMPOUND ..."
+			logger.info "Start loading ($codeName, $casRegistry) into BIO_COMPOUND ..."
 
 			String qry = """ insert into bio_compound(codeName, casRegistry) values(?, ?) """
 			biomart.execute(qry, [
@@ -51,7 +49,7 @@ class BioCompound {
 				casRegistry
 			])
 
-			log.info "End loading ($codeName, $casRegistry) into BIO_COMPOUND ..."
+			logger.info "End loading ($codeName, $casRegistry) into BIO_COMPOUND ..."
 		}
 	}
 

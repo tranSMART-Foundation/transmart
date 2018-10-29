@@ -28,13 +28,11 @@
 
 package org.transmartproject.pipeline.i2b2
 
-import org.apache.log4j.Logger;
-
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class I2b2 {
-
-	private static final Logger log = Logger.getLogger(I2b2)
 
 	Sql i2b2metadata
 	String studyName
@@ -67,9 +65,9 @@ class I2b2 {
 		String visualAttr = visualAttrs[conceptPath]
 		
 		if(isI2b2Exist(path)){
-			log.info "$conceptPath already exists ..."
+			logger.info "$conceptPath already exists ..."
 		}else{
-			log.info "insert concept path: $conceptPath into I2B2 ..."
+			logger.info "insert concept path: $conceptPath into I2B2 ..."
 			i2b2metadata.execute(qry, [c_hlevel, path, c_name, visualAttr, path, path, studyName, conceptCode, c_comment])
 		}
 	}
@@ -102,9 +100,9 @@ class I2b2 {
 						 WHERE CONCEPT_PATH = ?""";
 
 		if(isI2b2Exist(conceptPath)){
-			log.info "$conceptPath already exists ..."
+			logger.info "$conceptPath already exists ..."
 		}else{
-			log.info "insert concept path: $conceptPath into I2B2 ..."
+			logger.info "insert concept path: $conceptPath into I2B2 ..."
 			i2b2metadata.execute(qry, [conceptPath])
 		}
 	}

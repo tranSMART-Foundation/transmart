@@ -30,9 +30,6 @@ package org.transmartproject.pipeline.plink
 
 import java.util.Map;
 
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.Logger;
-
 import org.transmartproject.pipeline.i2b2.PatientDimension;
 import org.transmartproject.pipeline.transmart.SubjectSampleMapping
 import org.transmartproject.pipeline.util.Util
@@ -41,17 +38,17 @@ import org.transmartproject.pipeline.converter.CopyNumberFormatter
 import org.transmartproject.pipeline.converter.CopyNumberReader
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class PlinkLoader {
 
-	private static final Logger log = Logger.getLogger(PlinkLoader)
-	
 	// Get the Java runtime
 	private Runtime runtime = Runtime.getRuntime();
 	
 	public static void main(String [] args){
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 		
 		// extract parameters
 		//Properties props = Util.loadConfiguration("PLINK.properties");
@@ -61,9 +58,9 @@ class PlinkLoader {
 
 		// check if loading MAP file into de_snp_info and de_snp_probe tables
 		if(props.get("skip_load_map_info").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading annotation data from MAP ..."
+			logger.info "Skip loading annotation data from MAP ..."
 		}else{
-			//log.info "Start loading annotation data from MAP ..."
+			//logger.info "Start loading annotation data from MAP ..."
 			//pl.loadAnnotationData(props)
 		}
 
@@ -78,7 +75,7 @@ class PlinkLoader {
 
 		File map = new File(props.get("output_directory") + "/all.map")
 		if(map.exists()){
-			log.info("Satrt loading annotation data from MAP: " + map.toString())
+			logger.info("Satrt loading annotation data from MAP: " + map.toString())
 			SnpInfo si = new SnpInfo()
 			si.setDeapp(deapp)
 			si.loadSnpInfo(map)
@@ -89,28 +86,28 @@ class PlinkLoader {
 			                 where name not in (select snp_name from de_snp_probe) """
 			deapp.execute(qry)
 		}else{
-			log.error(map.toString() + "doesn't exist.")
+			logger.error(map.toString() + "doesn't exist.")
 		}
 	}
 
 
 	void load(Properties props){
 
-		log.info(Util.getMemoryUsage(runtime))
+		logger.info(Util.getMemoryUsage(runtime))
 
-		log.info("Loading property file: SNP.properties ...")
+		logger.info("Loading property file: SNP.properties ...")
 
 		Sql i2b2demodata = Util.createSqlFromPropertyFile(props, "i2b2demodata")
 		Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
 
 		// truncate tables as needed
 		//		Util.truncateSNPTable(deapp)
-		log.info(new Date())
+		logger.info(new Date())
 
 		// pre-normalize chromosome from letter to number
 		preNormalizeChromosomeName(deapp)
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
 		// create a PatientDimension object
 		PatientDimension patientDimension = createPatientDimension(props, i2b2demodata)
@@ -137,33 +134,33 @@ class PlinkLoader {
 
 		// populate DE_SUBJECT_SNP_DATASET and DE_SNP_DATASET_LOC, and also return a map:
 		Map patientSnpDatasetMap = loadSubjectSnpDataset(props, deapp, subjectSnpDatasetMap)
-		log.info(Util.getMemoryUsage(runtime))
+		logger.info(Util.getMemoryUsage(runtime))
 		//Util.printMap(patientSnpDatasetMap)
 
 
 		// Populate DE_SNP_PROBE_SORTED_DEF
 		loadSnpProbeSortedDef(props, deapp)
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
 
 		// Load DE_SNP_SUBJECT_SORTED_DEF
 		Map patientSubjectMap = getPatientSubjectMap(patientConceptCodeMap)
 		loadSnpSubjectSortedDef(props, deapp, patientSubjectMap)
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
 
 		// Load DE_SNP_COPY_NUMBER
 		loadSnpCopyNumber(props, deapp)
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
 
 		// Load DE_SN_CALLS_BY_GSM
 		loadSnpCallsByGsm(props, deapp, samplePatientMap)
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
 
 		// a map: patient_num -> dataset_id
@@ -175,20 +172,20 @@ class PlinkLoader {
 		// Populate DE_SNP_DATA_BY_PATIENT
 		//loadSnpDataByPatient(props, deapp, patientDimension, cnr, subjectSnpDataset)
 		loadSnpDataByPatient(props, deapp, patientSnpDatasetMap, cnr)
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
 
 		// Populate DE_SNP_DATA_BY_PROBE
 		loadSnpDataByProbe(props, deapp, cnr)
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
 
 		// Normalize Chromosome naming
 		postNormalizeChromosomeName(deapp)
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
 	}
 
@@ -214,7 +211,7 @@ class PlinkLoader {
 
 		Map subjectSnpDatasetMap = [:]
 		if(patientGenderMap.size() != patientConceptCodeMap.size()){
-			log.error ("Number of patients in PATIENT_DIMENSION didn't match with DE_SUBJECT_SAMPLE_MAPPING's one ...")
+			logger.error ("Number of patients in PATIENT_DIMENSION didn't match with DE_SUBJECT_SAMPLE_MAPPING's one ...")
 		}else{
 			patientConceptCodeMap.each{ k, v ->
 				String [] key = k.split(":")
@@ -240,7 +237,7 @@ class PlinkLoader {
 				else patientGenderMap[str[0]] = "U"
 			}
 		} else{
-			log.error ("PLINK FAM file: " + fam.toString() + " is empty or not exist ... ")
+			logger.error ("PLINK FAM file: " + fam.toString() + " is empty or not exist ... ")
 		}
 
 		return patientGenderMap
@@ -257,14 +254,14 @@ class PlinkLoader {
 		ssd.setTrialName(props.get("study_name"))
 
 		if(props.get("skip_snp_dataset").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SUBJECT_SNP_DATASET and DE_SNP_DATA_DATASET_LOC ..."
+			logger.info "Skip loading DE_SUBJECT_SNP_DATASET and DE_SNP_DATA_DATASET_LOC ..."
 		}else{
-			log.info "Start loading DE_SUBJECT_SNP_DATASET and DE_SNP_DATA_DATASET_LOC ..."
+			logger.info "Start loading DE_SUBJECT_SNP_DATASET and DE_SNP_DATA_DATASET_LOC ..."
 
 			ssd.loadSubjectSnpDataset(subjectSnpDatasetMap)
 			ssd.loadSnpDatasetLocation()
 
-			log.info "End loading DE_SUBJECT_SNP_DATASET and DE_SNP_DATA_DATASET_LOC ..."
+			logger.info "End loading DE_SUBJECT_SNP_DATASET and DE_SNP_DATA_DATASET_LOC ..."
 		}
 
 		Map patientSNpDatasetMap = ssd.getSnpDatasetId(props.get("study_name"))
@@ -275,13 +272,13 @@ class PlinkLoader {
 	void loadSubjectSnpDataset(Properties props, SubjectSnpDataset ssd){
 
 		if(props.get("skip_snp_dataset").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SUBJECT_SNP_DATASET and DE_SNP_DATA_DATASET_LOC ..."
+			logger.info "Skip loading DE_SUBJECT_SNP_DATASET and DE_SNP_DATA_DATASET_LOC ..."
 		}else{
-			log.info "Start loading DE_SUBJECT_SNP_DATASET and DE_SNP_DATA_DATASET_LOC ..."
+			logger.info "Start loading DE_SUBJECT_SNP_DATASET and DE_SNP_DATA_DATASET_LOC ..."
 			File fam = new File(props.get("output_directory") + "/" + props.get("fam_file_name"))
 			ssd.loadSnpDatasetFromFam(fam)
 			ssd.loadSnpDatasetLocation()
-			log.info "End loading DE_SUBJECT_SNP_DATASET and DE_SNP_DATA_DATASET_LOC ..."
+			logger.info "End loading DE_SUBJECT_SNP_DATASET and DE_SNP_DATA_DATASET_LOC ..."
 		}
 	}
 
@@ -317,9 +314,9 @@ class PlinkLoader {
 	void loadSnpProbeSortedDef(Properties props, Sql deapp){
 
 		if(props.get("skip_snp_probe_sorted_def").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SNP_PROBE_SORTED_DEF ..."
+			logger.info "Skip loading DE_SNP_PROBE_SORTED_DEF ..."
 		}else{
-			log.info "Start loading DE_SNP_PROBE_SORTED_DEF ..."
+			logger.info "Start loading DE_SNP_PROBE_SORTED_DEF ..."
 
 			SnpProbeSortedDef spsd = new SnpProbeSortedDef();
 			spsd.setMapDirectory(props.get("output_directory"))
@@ -333,7 +330,7 @@ class PlinkLoader {
 			def allProbes = spsd.getSnpProbeDefByChr("all")
 			spsd.loadSnpDefByChr("ALL", allProbes['total'], allProbes['snpDef'].toString())
 
-			log.info "End loading DE_SNP_PROBE_SORTED_DEF ..."
+			logger.info "End loading DE_SNP_PROBE_SORTED_DEF ..."
 		}
 	}
 
@@ -351,7 +348,7 @@ class PlinkLoader {
 	void loadSnpDataByPatient(Properties props, Sql deapp, Map patientSnpDatasetMap, CopyNumberReader cnr){
 
 		if(props.get("skip_snp_data_by_patient").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SNP_DATA_BY_PATIENT ..."
+			logger.info "Skip loading DE_SNP_DATA_BY_PATIENT ..."
 		}else{
 			int start_chr = Integer.parseInt(props.get("start_chr"))
 			int end_chr = Integer.parseInt(props.get("end_chr"))
@@ -378,7 +375,7 @@ class PlinkLoader {
 	void loadSnpDataByProbe(Properties props, Sql deapp, CopyNumberReader cnr){
 
 		if(props.get("skip_snp_data_by_probe").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SNP_DATA_BY_PROBE ..."
+			logger.info "Skip loading DE_SNP_DATA_BY_PROBE ..."
 		} else{
 
 			int start_chr = Integer.parseInt(props.get("start_chr"))
@@ -403,7 +400,7 @@ class PlinkLoader {
 	void loadSnpCopyNumber(Properties props, Sql deapp){
 
 		if(props.get("skip_snp_copy_number").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SNP_COPY_NUMBER ..."
+			logger.info "Skip loading DE_SNP_COPY_NUMBER ..."
 		} else{
 
 			int start_chr = Integer.parseInt(props.get("start_chr"))
@@ -429,7 +426,7 @@ class PlinkLoader {
 	void loadSnpCallsByGsm(Properties props, Sql deapp, Map samplePatientMap){
 
 		if(props.get("skip_snp_calls_by_gsm").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SNP_CALLS_BY_GSM ..."
+			logger.info "Skip loading DE_SNP_CALLS_BY_GSM ..."
 		} else{
 
 			SnpCallsByGsm scbg = new  SnpCallsByGsm()
@@ -449,7 +446,7 @@ class PlinkLoader {
 	void loadSnpSubjectSortedDef(Properties props, Sql deapp, Map patientSubjectMap){
 
 		if(props.get("skip_snp_subject_sorted_def").toString().toLowerCase().equals("yes")){
-			log.info "Skip loading DE_SNP_SUBJECT_SORTED_DEF ..."
+			logger.info "Skip loading DE_SNP_SUBJECT_SORTED_DEF ..."
 		} else{
 			SnpSubjectSortedDef sssd = new SnpSubjectSortedDef()
 			sssd.setDeapp(deapp)
@@ -470,7 +467,7 @@ class PlinkLoader {
 
 	void preNormalizeChromosomeName(Sql deapp){
 
-		log.info("Start renameing chromosomes from letter to number, such as X to 23, ...")
+		logger.info("Start renameing chromosomes from letter to number, such as X to 23, ...")
 
 		List <String> chrMap = [
 			"23:X",
@@ -482,13 +479,13 @@ class PlinkLoader {
 		Util.normalizeChromosomeNaming(deapp, "de_snp_data_by_patient", "chrom", chrMap)
 		Util.normalizeChromosomeNaming(deapp, "de_snp_probe_sorted_def", "chrom", chrMap)
 
-		log.info("End renameing chromosomes from X, Y, XY and MT to 23, 24, 25 and 26 ...")
+		logger.info("End renameing chromosomes from X, Y, XY and MT to 23, 24, 25 and 26 ...")
 	}
 
 
 	void postNormalizeChromosomeName(Sql deapp){
 
-		log.info("Start renameing chromosomes from 23, 24, 25 and 26 to X, Y, XY and MT ...")
+		logger.info("Start renameing chromosomes from 23, 24, 25 and 26 to X, Y, XY and MT ...")
 
 		List <String> chrMap = [
 			"X:23",
@@ -500,12 +497,12 @@ class PlinkLoader {
 		Util.normalizeChromosomeNaming(deapp, "de_snp_data_by_patient", "chrom", chrMap)
 		Util.normalizeChromosomeNaming(deapp, "de_snp_probe_sorted_def", "chrom", chrMap)
 
-		log.info("End renameing chromosomes from 23, 24, 25 and 26 to X, Y, XY and MT ...")
+		logger.info("End renameing chromosomes from 23, 24, 25 and 26 to X, Y, XY and MT ...")
 	}
 
 
 	SubjectSampleMapping createSubjectSampleMapping(Sql deapp){
-		log.info("Create a SubjectSampleMapping object ... ")
+		logger.info("Create a SubjectSampleMapping object ... ")
 		SubjectSampleMapping subjectSampleMapping = new SubjectSampleMapping()
 		subjectSampleMapping.setDeapp(deapp)
 		return subjectSampleMapping

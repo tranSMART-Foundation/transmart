@@ -28,11 +28,10 @@
 
 package org.transmartproject.pipeline.converter
 
-import org.apache.log4j.Logger;
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class CopyNumberFormatter {
-
-	private static final Logger log = Logger.getLogger(CopyNumberFormatter)
 
 	File copyNumberFile
 	Map samplePatientMap

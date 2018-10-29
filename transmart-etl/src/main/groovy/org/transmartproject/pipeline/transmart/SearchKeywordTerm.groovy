@@ -28,17 +28,14 @@
 
 package org.transmartproject.pipeline.transmart
 
-import org.apache.log4j.Logger;
-
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 import java.sql.SQLException;
 
 import org.transmartproject.pipeline.util.Util
 
-
+@Slf4j('logger')
 class SearchKeywordTerm {
-
-    private static final Logger log = Logger.getLogger(SearchKeywordTerm)
 
     Sql searchapp
 
@@ -46,7 +43,7 @@ class SearchKeywordTerm {
 
     void loadSearchKeywordTerm() {
 
-        log.info "Start populating SEARCH_KEYWORD_TERM using data from SEARCH_KEYWORD ... "
+        logger.info "Start populating SEARCH_KEYWORD_TERM using data from SEARCH_KEYWORD ... "
 
         String qry = """ insert into search_keyword_term (KEYWORD_TERM, SEARCH_KEYWORD_ID, RANK,TERM_LENGTH)
 	                 select upper(keyword), search_keyword_id, 1, length(keyword)
@@ -56,7 +53,7 @@ class SearchKeywordTerm {
 	 			    """
         searchapp.execute(qry)
 
-        log.info "End populating SEARCH_KEYWORD_TERM using data from SEARCH_KEYWORD ... "
+        logger.info "End populating SEARCH_KEYWORD_TERM using data from SEARCH_KEYWORD ... "
     }
 
 
@@ -64,16 +61,16 @@ class SearchKeywordTerm {
     void insertSearchKeywordTerm(String keywordTerm, long searchKeywordId, int rank) {
         String keywordTermUpper = keywordTerm.toUpperCase()
         if (isSearchKeywordTermExist(keywordTermUpper, searchKeywordId)) {
-            //log.info "$keywordTermUpper:$searchKeywordId already exists in SEARCH_KEYWORD_TERM ..."
+            //logger.info "$keywordTermUpper:$searchKeywordId already exists in SEARCH_KEYWORD_TERM ..."
         } else {
-            log.info "Save $keywordTermUpper:$searchKeywordId into SEARCH_KEYWORD_TERM ..."
+            logger.info "Save $keywordTermUpper:$searchKeywordId into SEARCH_KEYWORD_TERM ..."
             savedTerms.add([
                     keywordTermUpper,
                     searchKeywordId,
                     rank,
                     keywordTermUpper
             ])
-            log.info "savedTerms "+savedTerms.size()
+            logger.info "savedTerms "+savedTerms.size()
             if(savedTerms.size() >= 1000) {
                 doInsertSearchKeywordTerms()
             }
@@ -86,12 +83,12 @@ class SearchKeywordTerm {
         String qry = """ insert into search_keyword_term(keyword_term, search_keyword_id, rank, term_length)
                          values(?, ?, ?, length(?)) """
 
-        log.info "doInsertSearchKeywordTerms list size: "+savedTerms.size()
+        logger.info "doInsertSearchKeywordTerms list size: "+savedTerms.size()
         try {
         searchapp.withTransaction {
             searchapp.withBatch(qry, {stmt ->
                 savedTerms.each {
-                    log.info "Insert ${it[0]}:${it[1]} into SEARCH_KEYWORD_TERM ..."
+                    logger.info "Insert ${it[0]}:${it[1]} into SEARCH_KEYWORD_TERM ..."
                     stmt.addBatch(it)
                 }
            })
@@ -100,12 +97,12 @@ class SearchKeywordTerm {
         catch (SQLException e) {
             def ee = e.getNextException()
             if(ee) {ee.printStackTrace()
-            log.info "doInsertSearchKeywordTerms exception"
+            logger.info "doInsertSearchKeywordTerms exception"
             }
         }
         finally
         {
-            log.info "doInsertSearchKeywordTerms done"
+            logger.info "doInsertSearchKeywordTerms done"
         }
         
         savedTerms = []
@@ -129,7 +126,7 @@ class SearchKeywordTerm {
     void closeSearchKeywordTerm(){
         int nterms = savedTerms.size()
         if(nterms > 0) {
-            log.info "closeSearchKeywordTerm insert remaining $nterms terms"
+            logger.info "closeSearchKeywordTerm insert remaining $nterms terms"
             doInsertSearchKeywordTerms()
         }
     }

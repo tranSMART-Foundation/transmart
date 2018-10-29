@@ -28,18 +28,17 @@
 
 package org.transmartproject.pipeline.converter
 
-import org.apache.log4j.Logger;
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class GenotypeFormatter {
-
-	private static final Logger log = Logger.getLogger(GenotypeFormatter)
 
 	File genotypeFile
 	Map samplePatientMap
 
 	void format(){
 
-		log.info "Start formatting Genotype file: " + genotypeFile.toString()
+		logger.info "Start formatting Genotype file: " + genotypeFile.toString()
 
 		File f = new File(genotypeFile.toString().replace(".genotype", ".lgen"))
 		if(f.size() > 0){

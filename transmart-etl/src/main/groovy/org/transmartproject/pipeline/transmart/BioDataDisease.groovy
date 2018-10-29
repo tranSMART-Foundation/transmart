@@ -29,21 +29,19 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioDataDisease {
-
-	private static final Logger log = Logger.getLogger(BioDataDisease)
 
 	Sql biomart
 
 	void loadBioDataDisease(long bioDataId, long bioDiseaseId, String etlSource){
 
 		if(isBioDataDiseaseExist(bioDataId, bioDiseaseId, etlSource)){
-			log.info "($bioDataId, $bioDiseaseId, $etlSource) already exists in BIO_DATA_DISEASE ..."
+			logger.info "($bioDataId, $bioDiseaseId, $etlSource) already exists in BIO_DATA_DISEASE ..."
 		}else{
-			log.info "Start loading ($bioDataId, $bioDiseaseId, $etlSource) into BIO_DATA_DISEASE ..."
+			logger.info "Start loading ($bioDataId, $bioDiseaseId, $etlSource) into BIO_DATA_DISEASE ..."
 
 			String qry = """ insert into bio_data_disease(bio_data_id, bio_disease_id, etl_source) values(?, ?, ?) """
 			biomart.execute(qry, [
@@ -52,7 +50,7 @@ class BioDataDisease {
 				etlSource
 			])
 
-			log.info "End loading ($bioDataId, $bioDiseaseId, $etlSource) into BIO_DATA_DISEASE ..."
+			logger.info "End loading ($bioDataId, $bioDiseaseId, $etlSource) into BIO_DATA_DISEASE ..."
 		}
 	}
 

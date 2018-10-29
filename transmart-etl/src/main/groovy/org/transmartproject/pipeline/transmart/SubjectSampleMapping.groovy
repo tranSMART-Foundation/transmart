@@ -29,14 +29,11 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
-
-import org.apache.log4j.Logger;
-
+import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.util.Util
 
+@Slf4j('logger')
 class SubjectSampleMapping {
-
-	private static final Logger log = Logger.getLogger(SubjectSampleMapping)
 
 	Sql deapp
 	List subjectSamples
@@ -45,7 +42,7 @@ class SubjectSampleMapping {
 
 	void loadSubjectSampleMapping(){
 
-		log.info platformPath
+		logger.info platformPath
 		Util.printMap(subjectPatientMap)
 		Util.printMap(conceptPathToCode)
 
@@ -95,9 +92,9 @@ class SubjectSampleMapping {
 						values(?,?,?,seq_assay_id.nextval,?, ?,?,?,?,?, ?,?,?,?,?)"""
 
 		if(isSubjectSampleMappingExist(dataMap)){
-			log.info "Exist a record for $dataMap"
+			logger.info "Exist a record for $dataMap"
 		} else {
-			log.info "Insert a record for $dataMap"
+			logger.info "Insert a record for $dataMap"
 			deapp.execute(qry, [
 				dataMap["PATIENT_ID"],
 				dataMap["SUBJECT_ID"],
@@ -199,7 +196,7 @@ class SubjectSampleMapping {
 	 */
 	Map getPatientConceptCodeMap(String trialName, String platform){
 
-		log.info "Extract a map [patient_id -> subject_id:sample_type:concept_code] from DE_SUBJECT_SAMPLE_MAPPING ... "
+		logger.info "Extract a map [patient_id -> subject_id:sample_type:concept_code] from DE_SUBJECT_SAMPLE_MAPPING ... "
 
 		Map map = [:]
 		String qry = """ select patient_id, subject_id, sample_type, concept_code
@@ -222,7 +219,7 @@ class SubjectSampleMapping {
 	 */
 	Map getPatientSampleMap(String trialName, String platform){
 
-		log.info "Extract a map [sample_cd (GSM#) -> patient_id] from DE_SUBJECT_SAMPLE_MAPPING ... "
+		logger.info "Extract a map [sample_cd (GSM#) -> patient_id] from DE_SUBJECT_SAMPLE_MAPPING ... "
 
 		Map map = [:]
 		String qry = """ select patient_id, sample_cd
@@ -238,7 +235,7 @@ class SubjectSampleMapping {
 	
 	Map getPatientConceptCodeMap(String trialName){
 
-		log.info "Extract a map [patient_id -> subject_id:sample_type:concept_code] from DE_SUBJECT_SAMPLE_MAPPING ... "
+		logger.info "Extract a map [patient_id -> subject_id:sample_type:concept_code] from DE_SUBJECT_SAMPLE_MAPPING ... "
 
 		Map map = [:]
 		String qry = """ select patient_id, subject_id, sample_type, concept_code 

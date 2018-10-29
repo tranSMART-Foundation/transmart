@@ -27,14 +27,14 @@
   
 package org.transmartproject.pipeline.dictionary
 
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
 /** Extracts miRNA data from file miRNA.dat (http://mirbase.org/ftp.shtml) and
  *  adds it to BIOMART.BIO_MARKER.
  */
+
+@Slf4j('logger')
 class MiRBaseDictionary {
-    private static final Logger log = Logger.getLogger(MiRBaseDictionary)
 
     static main(args) {
         if (!args) {
@@ -45,7 +45,8 @@ class MiRBaseDictionary {
         def miRNAFileLocation = args[0]
         def aliasesFileLocation = args[1]
 
-        PropertyConfigurator.configure("conf/log4j.properties")
+//        PropertyConfigurator.configure("conf/log4j.properties")
+
         File miRNAFile = new File(miRNAFileLocation)
         File aliasesFile = new File(aliasesFileLocation)
         MiRBaseDictionary dict = new MiRBaseDictionary()

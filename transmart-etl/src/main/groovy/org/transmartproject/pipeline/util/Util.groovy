@@ -29,20 +29,18 @@
 package org.transmartproject.pipeline.util
 
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 import java.io.IOException;
 import java.sql.SQLClientInfoException;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class Util {
 
     private static Boolean isPostgres = false
     private static Boolean isPostgresSet = false
 
 	private static final long MEGABYTE = 1024L * 1024L;
-
-	private static final Logger log = Logger.getLogger(Util)
 
 	/**
 	 * load and combine Common.properties with data specific property file
@@ -361,37 +359,37 @@ class Util {
 
 		String qry1 = "select count(1) from user_tables where table_name=upper(?)"
 		if(sql.firstRow(qry1, [tableName])[0] > 0) {
-			log.info "Start dropping the table $tableName ... "
+			logger.info "Start dropping the table $tableName ... "
 			qry1 = "drop table $tableName purge"
 			sql.execute(qry1)
-			log.info "Start dropping the table $tableName ... "
+			logger.info "Start dropping the table $tableName ... "
 		}
 
-		log.info "Start creating the table $tableName ... "
+		logger.info "Start creating the table $tableName ... "
 		sql.execute(qry)
-		log.info "End creating the table $tableName ... "
+		logger.info "End creating the table $tableName ... "
 	}
 
 
 	static void truncateTestsTable(Sql sql, String tableName){
 
-		log.info "Start truncating the table $tableName ... "
+		logger.info "Start truncating the table $tableName ... "
 
 		String qry = "truncate table $tableName"
 		sql.execute(qry)
 
-		log.info "End truncating the table $tableName ... "
+		logger.info "End truncating the table $tableName ... "
 	}
 
 
 	static void truncateProjectInfoTable(Sql sql, String projectInfoTable){
 
-		log.info "Start truncating the table $projectInfoTable ... "
+		logger.info "Start truncating the table $projectInfoTable ... "
 
 		String qry = "truncate table $projectInfoTable"
 		sql.execute(qry)
 
-		log.info "End truncating the table $projectInfoTable ... "
+		logger.info "End truncating the table $projectInfoTable ... "
 	}
 
 
@@ -404,15 +402,15 @@ class Util {
 			projectInfoTable.toUpperCase()
 		])[0] > 0){
 
-			log.info "Start dropping the table $projectInfoTable ... "
+			logger.info "Start dropping the table $projectInfoTable ... "
 
 			qry = "drop table $projectInfoTable purge"
 			sql.execute(qry)
 
-			log.info "End dropping the table $projectInfoTable ... "
+			logger.info "End dropping the table $projectInfoTable ... "
 		}
 
-		log.info "Start creating the table $projectInfoTable ... "
+		logger.info "Start creating the table $projectInfoTable ... "
 
 		qry = """ CREATE TABLE $projectInfoTable
 			  (
@@ -464,7 +462,7 @@ class Util {
 		"""
 		sql.execute(qry)
 
-		log.info "End creating the table $projectInfoTable ... "
+		logger.info "End creating the table $projectInfoTable ... "
 	}
 
 }

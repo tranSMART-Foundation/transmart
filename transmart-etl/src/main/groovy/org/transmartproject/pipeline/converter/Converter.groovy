@@ -34,22 +34,20 @@ import org.transmartproject.pipeline.i2b2.PatientDimension
 import org.transmartproject.pipeline.util.Util
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
-import org.apache.log4j.PropertyConfigurator
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class Converter {
-
-	private static final Logger log = Logger.getLogger(Converter)
 
 	static Map subjectPatientMap, sampleCdPatientMap, celExperimentMap, celSampleCdMap
 	static Map sampleCdSubjectMap, patientGenderMap, celPatientMap, experimentPatientMap
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
 		println new Date()
-		log.info("Start processing SNP data ...")
+		logger.info("Start processing SNP data ...")
 
 		Properties props = Util.loadConfiguration("conf/Converter.properties");
 
@@ -58,35 +56,35 @@ class Converter {
 
 		Converter converter = new Converter()
 
-		log.info "Retrieve subject-patient map  from patient_dimension table ... "
+		logger.info "Retrieve subject-patient map  from patient_dimension table ... "
 		converter.getSubjectPatientGenderMap(props, i2b2demodata)
-		log.info "Print out subject-patient map (subjectPatientMap) ..."
+		logger.info "Print out subject-patient map (subjectPatientMap) ..."
 		Util.printMap(subjectPatientMap)
-		log.info "Print out patient-gender map (patientGenderMap) ..."
+		logger.info "Print out patient-gender map (patientGenderMap) ..."
 		Util.printMap(patientGenderMap)
 
 		// create subject-sample-patient mapping
 		converter.createSubjectSamplePatientMap(props)
-		log.info "Print sample_cd-subject map (sampleCdSubjectMap)..."
+		logger.info "Print sample_cd-subject map (sampleCdSubjectMap)..."
 		Util.printMap(sampleCdSubjectMap)
 		
-		log.info "Print cel-experiment map (celExperimentMap) ..."
+		logger.info "Print cel-experiment map (celExperimentMap) ..."
 		Util.printMap(celExperimentMap)
 
 		converter.createCelSampleCdMap(props)
-		log.info "Print cel-sample_cd map (celSampleCdMap) ..."
+		logger.info "Print cel-sample_cd map (celSampleCdMap) ..."
 		Util.printMap(celSampleCdMap)
 
 		converter.createSampleCdPatientMap()
-		log.info("Print sample_cd-patient mapping (sampleCdPatientMap) ...")
+		logger.info("Print sample_cd-patient mapping (sampleCdPatientMap) ...")
 		Util.printMap(sampleCdPatientMap)
 
 		converter.createCelPatientMap()
-		log.info "Print cel-patient map (celPatientMap) ..."
+		logger.info "Print cel-patient map (celPatientMap) ..."
 		Util.printMap(celPatientMap)
 
 		converter.createExperimentPatientMap()
-		log.info "Print experiment-patient map (experimentPatientMap) ..."
+		logger.info "Print experiment-patient map (experimentPatientMap) ..."
 		Util.printMap(experimentPatientMap)
 
 
@@ -121,7 +119,7 @@ class Converter {
 				}
 			}
 		}else{
-			log.error(celSampleCdMapping.toString() + " is empty ...")
+			logger.error(celSampleCdMapping.toString() + " is empty ...")
 		}
 	}
 
@@ -173,12 +171,12 @@ class Converter {
 
 		File plinkFamFile = new File(props.get("output_directory") + File.separator + props.get("study_name") + ".fam")
 		if(plinkFamFile.size() > 0) {
-			log.info("Delete/re-create " + plinkFamFile.toString())
+			logger.info("Delete/re-create " + plinkFamFile.toString())
 			plinkFamFile.delete()
 			plinkFamFile.createNewFile()
 		}
 
-		log.info "Start creating FAM file: " + plinkFamFile.toString()
+		logger.info "Start creating FAM file: " + plinkFamFile.toString()
 
 		Map famMap = [:]
 		sampleCdSubjectMap.each{key, val ->
@@ -192,14 +190,14 @@ class Converter {
 
 		plinkFamFile.append(sb.toString())
 
-		log.info "End creating FAM file: " + plinkFamFile.toString()
+		logger.info "End creating FAM file: " + plinkFamFile.toString()
 	}
 
 
 	void reformatCopyNumberFile(Properties props){
 
 		if(props.get("skip_copy_number_process").toString().toLowerCase().equals("yes")){
-			log.info "Skip processing Copy Number files ..."
+			logger.info "Skip processing Copy Number files ..."
 		} else{
 			AffymetrixCopyNumberFormatter cnf = new AffymetrixCopyNumberFormatter()
 			cnf.setCopyNumberFileDirectory(props.get("source_directory") + "/" + props.get("cn_directory"))
@@ -215,7 +213,7 @@ class Converter {
 	void createLongFormatPlinkFile(Properties props){
 
 		if(props.get("skip_lgen_file_creation").toString().toLowerCase().equals("yes")){
-			log.info "Skip creating PLINK format files ..."
+			logger.info "Skip creating PLINK format files ..."
 		} else{
 
 			AffymetrixGenotypingDataFormatter gtdf = new AffymetrixGenotypingDataFormatter()
@@ -226,10 +224,10 @@ class Converter {
 			gtdf.setCelPatientMap(celPatientMap)
 			gtdf.setCelSampleCdMap(celSampleCdMap)
 
-			log.info "Creating PLINK format files ..."
-			log.info new Date()
+			logger.info "Creating PLINK format files ..."
+			logger.info new Date()
 			gtdf.createGenotypingFile()
-			log.info  new Date()
+			logger.info  new Date()
 		}
 	}
 
@@ -237,7 +235,7 @@ class Converter {
 	void createPlinkFile(Properties props){
 
 		if(props.get("skip_plink_file_creation").toString().toLowerCase().equals("yes")){
-			log.info "Skip creating PLINK format files ..."
+			logger.info "Skip creating PLINK format files ..."
 		} else{
 			String outputDir = props.get("output_directory")
 
@@ -247,18 +245,18 @@ class Converter {
 			pc.setPlink(props.get("plink"))
 			pc.setStudyName(props.get("study_name"))
 
-			log.info "Creating Binary PLINK format file ..."
-			log.info new Date()
+			logger.info "Creating Binary PLINK format file ..."
+			logger.info new Date()
 			pc.createBinaryFromLongPlink()
-			log.info new Date()
+			logger.info new Date()
 
-			log.info "Creating PLINK format files for each Chromosome ..."
+			logger.info "Creating PLINK format files for each Chromosome ..."
 			pc.recodePlinkFileByChrs()
-			log.info new Date()
+			logger.info new Date()
 
-			log.info "Recoding Binary PLINK format file ..."
+			logger.info "Recoding Binary PLINK format file ..."
 			pc.recodePlinkFile()
-			log.info new Date()
+			logger.info new Date()
 		}
 	}
 
@@ -290,7 +288,7 @@ class Converter {
 
 		String qry = "select patient_num, old_patient_num from p"
 		sql.eachRow(qry) {
-			log.info it.patient_num + "\t" + it.old_patient_num
+			logger.info it.patient_num + "\t" + it.old_patient_num
 
 			line.append "update DE_SNP_DATA_BY_PATIENT set patient_num=" + it.patient_num + " where patient_num = " + it.old_patient_num + ";\n"
 			line.append "update DE_SNP_SUBJECT_SORTED_DEF set patient_num=" + it.patient_num + " where patient_num = " + it.old_patient_num + ";\n"
@@ -323,7 +321,7 @@ class Converter {
 		celExperimentMap = [:]
 		String [] str
 		if(celExperimentMapping.size() > 0){
-			log.info("Start reading CEL-experiment mapping file: " + celExperimentMapping.toString())
+			logger.info("Start reading CEL-experiment mapping file: " + celExperimentMapping.toString())
 			int index = 1
 			celExperimentMapping.eachLine{
 				if(it.indexOf("experiment_id") == -1){
@@ -332,8 +330,8 @@ class Converter {
 					else str = it.split(" +")
 
 					if(str.size() < 7){
-						log.warn("Line: " + index + " missing column(s) in: " + celExperimentMapping.toString())
-						log.info index + ":  " + str.size() + ":  " + it
+						logger.warn("Line: " + index + " missing column(s) in: " + celExperimentMapping.toString())
+						logger.info index + ":  " + str.size() + ":  " + it
 					} else{
 						celExperimentMap[str[1].trim()] = str[0].trim()  //+ ":" +  str[5].trim()
 						celExperimentMap[str[2].trim()] = str[0].trim()  //+ ":" +  str[5].trim()
@@ -342,7 +340,7 @@ class Converter {
 				index++
 			}
 		}else{
-			log.error(celExperimentMapping.toString() + " is empty ...")
+			logger.error(celExperimentMapping.toString() + " is empty ...")
 			throw new RuntimeException(celExperimentMapping.toString() + " is empty ...")
 		}
 
@@ -354,7 +352,7 @@ class Converter {
 		Map sampleCdSubjectMap = [:]
 		String [] str
 		if(subjectSampleMapping.size() > 0){
-			log.info("Start reading subject-sample mapping file: " + subjectSampleMapping.toString())
+			logger.info("Start reading subject-sample mapping file: " + subjectSampleMapping.toString())
 			int index = 1
 			subjectSampleMapping.eachLine{
 				if(it.indexOf("study_id") == -1){
@@ -362,8 +360,8 @@ class Converter {
 					else str = it.split(" +")
 
 					if(str.size() != 9){
-						log.warn("Line: " + index + " missing column(s) in: " + subjectSampleMapping.toString())
-						log.info index + ":  " + str.size() + ":  " + it
+						logger.warn("Line: " + index + " missing column(s) in: " + subjectSampleMapping.toString())
+						logger.info index + ":  " + str.size() + ":  " + it
 					} else{
 						sampleCdSubjectMap[str[3].trim()] = str[2].trim()
 					}
@@ -371,7 +369,7 @@ class Converter {
 				index++
 			}
 		}else{
-			log.error(subjectSampleMapping.toString() + " is empty ...")
+			logger.error(subjectSampleMapping.toString() + " is empty ...")
 			throw new RuntimeException(subjectSampleMapping.toString() + " is empty ...")
 		}
 

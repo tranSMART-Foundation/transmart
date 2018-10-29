@@ -29,19 +29,17 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioDataOmicMarker {
-
-	private static final Logger log = Logger.getLogger(BioDataOmicMarker)
 
 	Sql biomart
 	String testsDataTable, gxAnnotationTable
 
 	void loadBioDataOmicMarker(String gseAnalysis){
 		
-		log.info "Start loading data into Bio_Data_Omic_Marker ..."
+		logger.info "Start loading data into Bio_Data_Omic_Marker ..."
 		
 		String qry = """ insert into bio_data_omic_marker nologging
 								(bio_data_id, bio_marker_id, data_table)
@@ -54,7 +52,7 @@ class BioDataOmicMarker {
 
 		biomart.execute(qry)
 		
-		log.info "End loading data into Bio_Data_Omic_Marker ..."
+		logger.info "End loading data into Bio_Data_Omic_Marker ..."
 	}
 
 	

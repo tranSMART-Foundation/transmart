@@ -29,17 +29,13 @@
 package org.transmartproject.pipeline.plink
 
 import java.io.File;
-
-import org.apache.log4j.Logger;
-
+import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.i2b2.PatientDimension
 import org.transmartproject.pipeline.util.Util
 
-import groovy.sql.Sql
-
+@Slf4j('logger')
 class SnpSubjectSortedDef {
-
-	private static final Logger log = Logger.getLogger(SnpSubjectSortedDef)
 
 	String trialName
 	Sql deapp
@@ -49,9 +45,9 @@ class SnpSubjectSortedDef {
 	void loadSubjectSorteDef(){
 
 		if(isSubjectSortedDefExist(trialName)){
-			log.info " There are records for $trialName in DE_SNP_SUBJECT_SORTED_DEF ... "
+			logger.info " There are records for $trialName in DE_SNP_SUBJECT_SORTED_DEF ... "
 		} else {
-			log.info("Start loading records for $trialName into DE_SNP_SUBJECT_SORTED_DEF ...")
+			logger.info("Start loading records for $trialName into DE_SNP_SUBJECT_SORTED_DEF ...")
 
 			Map orderedPatientNumberList = getOrderedPatientNumberList()
 
@@ -70,7 +66,7 @@ class SnpSubjectSortedDef {
 				})
 			}
 			
-			log.info("End loading records for $trialName into DE_SNP_SUBJECT_SORTED_DEF ...")
+			logger.info("End loading records for $trialName into DE_SNP_SUBJECT_SORTED_DEF ...")
 		}
 	}
 
@@ -126,7 +122,7 @@ class SnpSubjectSortedDef {
 		Map patientNumberOrderedList = [:]
 
 		if(pedFile.exists() && pedFile.size() > 0) {
-			log.info "Extract subject sorted definition from PED file: " + pedFile.toString()
+			logger.info "Extract subject sorted definition from PED file: " + pedFile.toString()
 			int index = 0
 			String [] str
 			pedFile.eachLine {
@@ -136,7 +132,7 @@ class SnpSubjectSortedDef {
 			}
 		}
 		else{
-			log.error "PED file: " + pedFile.toString() + " doesn't exist or is empty ... "
+			logger.error "PED file: " + pedFile.toString() + " doesn't exist or is empty ... "
 		}
 
 		return patientNumberOrderedList

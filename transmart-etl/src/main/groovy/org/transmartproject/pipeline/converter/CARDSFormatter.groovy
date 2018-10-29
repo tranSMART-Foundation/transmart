@@ -29,31 +29,28 @@
 package org.transmartproject.pipeline.converter
 
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 import java.util.Properties;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import org.transmartproject.pipeline.util.Util
 
-
-class CARDSFormetter {
-	private static final Logger log = Logger.getLogger(CARDSFormetter)
+@Slf4j('logger')
+class CARDSFormatter {
 
 	private static Properties props
 	private int batchSize
 
 	static main(args) {
 
-		PropertyConfigurator.configure("conf/log4j.properties");
+//		PropertyConfigurator.configure("conf/log4j.properties");
 
-		CARDSFormetter cards = new CARDSFormetter()
+		CARDSFormatter cards = new CARDSFormatter()
 
 		if(args.size() > 0){
-			log.info("Start loading property files conf/Common.properties and ${args[0]} ...")
+			logger.info("Start loading property files conf/Common.properties and ${args[0]} ...")
 			cards.setProperties(Util.loadConfiguration(args[0]));
 		} else {
-			log.info("Start loading property files conf/Common.properties and conf/CARDS.properties ...")
+			logger.info("Start loading property files conf/Common.properties and conf/CARDS.properties ...")
 			cards.setProperties(Util.loadConfiguration("conf/CARDS.properties"));
 		}
 
@@ -80,7 +77,7 @@ class CARDSFormetter {
 	private void createMap(Sql sql){
 
 		if(props.get("skip_create_map").toString().toLowerCase().equals("yes")){
-			log.info "Skip creating CARDS MAP file ..."
+			logger.info "Skip creating CARDS MAP file ..."
 		}else{
 
 			File map = new File(props.get("output_cards_map"))
@@ -89,7 +86,7 @@ class CARDSFormetter {
 				map.createNewFile()
 			}
 
-			log.info("Start creating CARDS MAP file: " + map.toString())
+			logger.info("Start creating CARDS MAP file: " + map.toString())
 
 			StringBuffer sb = new StringBuffer()
 
@@ -104,7 +101,7 @@ class CARDSFormetter {
 			map.append(sb.toString())
 			sb.setLength(0)
 
-			log.info("End creating CARDS MAP file: " + map.toString())
+			logger.info("End creating CARDS MAP file: " + map.toString())
 		}
 	}
 
@@ -112,7 +109,7 @@ class CARDSFormetter {
 	private void createFam(Sql sql){
 
 		if(props.get("skip_create_fam").toString().toLowerCase().equals("yes")){
-			log.info "Skip creating CARDS FAM file ..."
+			logger.info "Skip creating CARDS FAM file ..."
 		}else{
 			File fam = new File(props.get("output_cards_fam"))
 			if(fam.size() > 0){
@@ -120,7 +117,7 @@ class CARDSFormetter {
 				fam.createNewFile()
 			}
 
-			log.info("Start creating CARDS FAM file: " + fam.toString())
+			logger.info("Start creating CARDS FAM file: " + fam.toString())
 
 			StringBuffer sb = new StringBuffer()
 
@@ -135,7 +132,7 @@ class CARDSFormetter {
 
 			sb.setLength(0)
 
-			log.info("End creating CARDS FAM file: " + fam.toString())
+			logger.info("End creating CARDS FAM file: " + fam.toString())
 		}
 	}
 
@@ -158,7 +155,7 @@ class CARDSFormetter {
 				subjectPatientMap[str[1].trim()] = str[0].trim()
 			}
 		} else{
-			log.error("CARDS subject-patient mapping file: " + map.toString() + " doesn't exist or is empty ...")
+			logger.error("CARDS subject-patient mapping file: " + map.toString() + " doesn't exist or is empty ...")
 		}
 		return subjectPatientMap
 	}
@@ -168,7 +165,7 @@ class CARDSFormetter {
 	private void formatLgen(Map subjectPatientMap){
 
 		if(props.get("skip_format_lgen").toString().toLowerCase().equals("yes")){
-			log.info "Skip formtting CARDS LGEN file ..."
+			logger.info "Skip formtting CARDS LGEN file ..."
 		}else{
 
 			String [] str
@@ -180,7 +177,7 @@ class CARDSFormetter {
 				lgenOutput.createNewFile()
 			}
 
-			log.info("Start formatting CARDS LGEN file: " + lgenOutput.toString())
+			logger.info("Start formatting CARDS LGEN file: " + lgenOutput.toString())
 
 			File genotypeInput = new File(props.get("output_genotype_data"))
 			if(genotypeInput.size()){
@@ -192,9 +189,9 @@ class CARDSFormetter {
 				lgenOutput.append(sb.toString())
 				sb.setLength(0)
 
-				log.info("End formatting CARDS LGEN file: " + lgenOutput.toString())
+				logger.info("End formatting CARDS LGEN file: " + lgenOutput.toString())
 			} else{
-				log.error("CARDS genotype data file: " + genotypeInput.toString() + " doesn't exist or is empty ...")
+				logger.error("CARDS genotype data file: " + genotypeInput.toString() + " doesn't exist or is empty ...")
 			}
 		}
 	}
@@ -203,7 +200,7 @@ class CARDSFormetter {
 	private void formatGenotype(Map snpMap){
 
 		if(props.get("skip_format_genotype").toString().toLowerCase().equals("yes")){
-			log.info "Skip formtting CARDS genotype data ..."
+			logger.info "Skip formtting CARDS genotype data ..."
 		}else{
 			String [] str, subjects
 			String genotype
@@ -216,7 +213,7 @@ class CARDSFormetter {
 				genotypeOutput.createNewFile()
 			}
 
-			log.info("Start creating CARDS genotype data file: " + genotypeOutput.toString())
+			logger.info("Start creating CARDS genotype data file: " + genotypeOutput.toString())
 
 			if(genotypeInput.size() > 0){
 				genotypeInput.eachLine{
@@ -236,10 +233,10 @@ class CARDSFormetter {
 				genotypeOutput.append(sb.toString())
 				sb.setLength(0)
 
-				log.info("End creating CARDS genotype data file: " + genotypeOutput.toString())
+				logger.info("End creating CARDS genotype data file: " + genotypeOutput.toString())
 
 			} else {
-				log.error("CARDS genotype file: " + genotypeInput.toString() + " doesn't exist or empty ...")
+				logger.error("CARDS genotype file: " + genotypeInput.toString() + " doesn't exist or empty ...")
 			}
 		}
 	}
@@ -259,7 +256,7 @@ class CARDSFormetter {
 				}
 			}
 		} else {
-			log.error("CARDS SNP list file: " + snp.toString() + " doesn't exist or empty ...")
+			logger.error("CARDS SNP list file: " + snp.toString() + " doesn't exist or empty ...")
 		}
 
 		return snpIdMap

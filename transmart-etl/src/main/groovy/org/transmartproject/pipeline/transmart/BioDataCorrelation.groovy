@@ -28,17 +28,15 @@
 
 package org.transmartproject.pipeline.transmart
 
-import org.apache.log4j.Logger;
 
 import groovy.sql.Sql;
 import groovy.sql.GroovyRowResult
+import groovy.util.logging.Slf4j
 
 import org.transmartproject.pipeline.util.Util
 
-
+@Slf4j('logger')
 class BioDataCorrelation {
-
-	private static final Logger log = Logger.getLogger(BioDataCorrelation)
 
 	Sql biomart
 	long bioDataCorrelDescrId
@@ -57,11 +55,11 @@ class BioDataCorrelation {
 							   c.correlation='PATHWAY GENE' and g.organism=? """
 		if(goa.size()>0){
 
-			log.info ("Start loading ${goa.toString()} into BIO_DATA_CORRELATION ...")
+			logger.info ("Start loading ${goa.toString()} into BIO_DATA_CORRELATION ...")
 
 			goa.eachLine{
 				String [] str = it.split("\t")
-				//log.info "insert (${str[0]}, ${str[1]}, $organism) into BIO_DATA_CORRELATION ..."
+				//logger.info "insert (${str[0]}, ${str[1]}, $organism) into BIO_DATA_CORRELATION ..."
 				biomart.execute(qry, [
 					str[0],
 					(String) geneId[str[1].toUpperCase()],
@@ -69,7 +67,7 @@ class BioDataCorrelation {
 				])
 			}
 		} else {
-			log.info "Cannot open the file:" + goa.toString()
+			logger.info "Cannot open the file:" + goa.toString()
 		}
 	}
 
@@ -109,18 +107,18 @@ class BioDataCorrelation {
 		if(bdc.size()>0){
 			bdc.eachLine{
 				String [] str = it.split("\t")
-				log.info "insert (${str[0]}, ${str[1]}, $organism) into BIO_DATA_CORRELATION ..."
+				logger.info "insert (${str[0]}, ${str[1]}, $organism) into BIO_DATA_CORRELATION ..."
 				biomart.execute(qry, [str[0], str[1], organism])
 			}
 		} else {
-			log.info "Cannot open the file:" + bdc.toString()
+			logger.info "Cannot open the file:" + bdc.toString()
 		}
 	}
 
 
         void loadBioDataCorrelation(Sql biomartuser, String pathwayDataTable){
 
-            log.info ("Start populating bio_data_correlation using table ${pathwayDataTable} ...")
+            logger.info ("Start populating bio_data_correlation using table ${pathwayDataTable} ...")
 
 //            Boolean isPostgres = Util.isPostgres()
 
@@ -181,10 +179,10 @@ class BioDataCorrelation {
                                 GroovyRowResult rowResult = biomartuser.firstRow(qryPath, [qd.pathway,organism])
                                 if(rowResult != null) {
                                     dePathwayId = rowResult[0]
-                                    log.info "Pathway '${qd.pathway}' id '${dePathwayId}'"
+                                    logger.info "Pathway '${qd.pathway}' id '${dePathwayId}'"
                                 }
                                 else {
-                                    log.info "Pathway '${qd.pathway}' id not found..."
+                                    logger.info "Pathway '${qd.pathway}' id not found..."
                                     dePathwayId = null
                                 }
                             }
@@ -194,22 +192,22 @@ class BioDataCorrelation {
                                 GroovyRowResult existResult = biomartuser.firstRow(qryExists, [dePathwayId,geneId,descId])
                                 int count = existResult[0]
                                 if(count > 0) {
-                                    log.info "$dePathwayId:$geneId already exists in BIO_DATA_CORRELATION ..."
+                                    logger.info "$dePathwayId:$geneId already exists in BIO_DATA_CORRELATION ..."
                                 }
                                 else {
-                                    log.info "loading '${qd.pathway}' '${qd.gene_symbol}' '${organism}'"
+                                    logger.info "loading '${qd.pathway}' '${qd.gene_symbol}' '${organism}'"
                                     ps.addBatch([dePathwayId,geneId,descId])
                                 }
                             }
                             else {
-                                log.info "Gene '${qd.gene_symbol}' not found for '${organism}'"
+                                logger.info "Gene '${qd.gene_symbol}' not found for '${organism}'"
                             }
                         }
                     })
                 }
             }
             
-            log.info ("End populating bio_data_correlation using table ${pathwayDataTable} ...")
+            logger.info ("End populating bio_data_correlation using table ${pathwayDataTable} ...")
         }
 
 
@@ -219,9 +217,9 @@ class BioDataCorrelation {
 		String qry = "insert into bio_data_correlation(bio_data_id,asso_bio_data_id,bio_data_correl_descr_id) values(?,?,?)"
 
 		if(isBioDataCorrelationExist(pathwayMarkerId, geneMarkerId, dataCorrelDecrId)){
-                    //log.info "$pathwayMarkerId:$geneMarkerId:$dataCorrelDecrId already exists in BIO_DATA_CORRELATION ..."
+                    //logger.info "$pathwayMarkerId:$geneMarkerId:$dataCorrelDecrId already exists in BIO_DATA_CORRELATION ..."
 		}else{
-			log.info "Insert $pathwayMarkerId:$geneMarkerId:$dataCorrelDecrId into BIO_DATA_CORRELATION ..."
+			logger.info "Insert $pathwayMarkerId:$geneMarkerId:$dataCorrelDecrId into BIO_DATA_CORRELATION ..."
 			biomart.execute(qry, [
 				pathwayMarkerId,
 				geneMarkerId,

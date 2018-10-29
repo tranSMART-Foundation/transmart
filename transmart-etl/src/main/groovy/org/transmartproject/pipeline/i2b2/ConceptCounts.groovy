@@ -28,16 +28,13 @@
 
 package org.transmartproject.pipeline.i2b2
 
-import org.apache.log4j.Logger;
-
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
 import org.transmartproject.pipeline.util.Util
 
-
+@Slf4j('logger')
 class ConceptCounts {
-
-	private static final Logger log = Logger.getLogger(ConceptCounts)
 
 	Sql i2b2demodata
 	String basePath, platform

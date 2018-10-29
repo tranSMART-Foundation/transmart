@@ -29,18 +29,16 @@
 package org.transmartproject.pipeline.transmart
 
 import groovy.sql.Sql;
+import groovy.util.logging.Slf4j
 
-import org.apache.log4j.Logger;
-
+@Slf4j('logger')
 class BioAssayFeatureGroup {
-
-	private static final Logger log = Logger.getLogger(BioAssayFeatureGroup)
 
 	Sql biomart
 	String testsDataTable
 
 	void loadBioAssayFeatureGroup(){
-		log.info "Start loading new probes into BIO_ASSAY_FEATURE_GROUP ..."
+		logger.info "Start loading new probes into BIO_ASSAY_FEATURE_GROUP ..."
 		String qry = """ insert into bio_assay_feature_group(feature_group_name, feature_group_type)
                          select probeset, 'PROBESET' from ${testsDataTable} 
                          minus
@@ -48,7 +46,7 @@ class BioAssayFeatureGroup {
 						 from bio_assay_feature_group """
 
 		biomart.execute(qry)
-		log.info "End loading new probes into BIO_ASSAY_FEATURE_GROUP ..."
+		logger.info "End loading new probes into BIO_ASSAY_FEATURE_GROUP ..."
 	}
 
 

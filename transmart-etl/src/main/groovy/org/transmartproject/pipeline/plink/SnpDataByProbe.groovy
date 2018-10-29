@@ -30,16 +30,15 @@ package org.transmartproject.pipeline.plink
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import org.transmartproject.pipeline.converter.CopyNumberReader
 import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 
 
+@Slf4j('logger')
 class SnpDataByProbe {
 
-	private static final Logger log = Logger.getLogger(SnpDataByProbe)
 	Runtime runtime = Runtime.getRuntime()
 
 	Sql deapp
@@ -64,18 +63,18 @@ class SnpDataByProbe {
 			
 			File cn = getCopyNumberFile(chr)
 			if(cn.equals(null)){
-				log.info "Start loading data without Copy Number ... "
+				logger.info "Start loading data without Copy Number ... "
 				loadSnpDataByProbeWithoutCN()
 			}else{
-				log.info "Start loading data with Copy Number ... "
+				logger.info "Start loading data with Copy Number ... "
 				copyNumberReader.setCopyNumberFile(cn)
 
 				// patient_num:snp_id -> copy_number
 				Map cnMap = copyNumberReader.copyNumberReader(chr)
-				log.info(Util.getMemoryUsage(runtime))
+				logger.info(Util.getMemoryUsage(runtime))
 
 				setCopyNumberMap(cnMap)
-				log.info("Copy Number for Chromosome " + chr + ": " + cnMap.size())
+				logger.info("Copy Number for Chromosome " + chr + ": " + cnMap.size())
 				loadSnpDataByProbeWithCN()
 				//loadSnpDataByProbeWithCN1()
 			}
@@ -91,7 +90,7 @@ class SnpDataByProbe {
 	 */	
 	def loadSnpDataByProbeWithoutCN(){
 
-		log.info "Start loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
+		logger.info "Start loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
 
 		File pedFile = getPedFile(chr)
 		List snpList = getMapData(chr)
@@ -101,7 +100,7 @@ class SnpDataByProbe {
 			snpMap[snpList[i]] = " "
 		}
 
-		log.info "Loop through PED file: " + pedFile.toString()
+		logger.info "Loop through PED file: " + pedFile.toString()
 
 		def index = 0
 		pedFile.eachLine {
@@ -134,16 +133,16 @@ class SnpDataByProbe {
 				dataMap["dataByProbe"] = value
 				loadSnpDataByProbe(dataMap)
 			}else{
-				log.info "No mapping info for " + key + " in Chromosome " + chr
+				logger.info "No mapping info for " + key + " in Chromosome " + chr
 			}
 		}
-		log.info "End loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
+		logger.info "End loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
 	}
 
 	
 	def loadSnpDataByProbeWithoutCN1(){
 
-		log.info "Start loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
+		logger.info "Start loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
 
 		File pedFile = getPedFile(chr)
 
@@ -199,31 +198,31 @@ class SnpDataByProbe {
 			})
 		}
 
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
-		log.info "End loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
+		logger.info "End loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
 	}
 
 	
 
 	def loadSnpDataByProbeWithCN(){
 
-		log.info "Start loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
+		logger.info "Start loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
 
 		//File pedFile = getPedFile(chr)
 
 		List snpList = getMapData(chr)
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
 		Map snpMap = [:]
 		for(i in 0 .. snpList.size()-1){
 			snpMap[snpList[i]] = " "
 		}
-		log.info(Util.getMemoryUsage(runtime))
+		logger.info(Util.getMemoryUsage(runtime))
 
-		log.info "Start loop through PED file: " + pedFile.toString()
+		logger.info "Start loop through PED file: " + pedFile.toString()
 
 		def index = 0
 		pedFile.eachLine {
@@ -238,14 +237,14 @@ class SnpDataByProbe {
 					else snpMap[snpList[i]] += copyNumberMap[key] + pedLineData[i] + " "
 				}
 			}else{
-				log.error("SNPs in MAP file did match to columns in PED file:" + pedFile.toString())
+				logger.error("SNPs in MAP file did match to columns in PED file:" + pedFile.toString())
 			}
 			index++
 		}
 
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
-		log.info "End loop through PED file: " + pedFile.toString()
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
+		logger.info "End loop through PED file: " + pedFile.toString()
 
 		Map snpIdMap = getSnpIdMapByChr()
 		snpMap.each() { key, value ->
@@ -260,28 +259,28 @@ class SnpDataByProbe {
 				dataMap["dataByProbe"] = value
 				loadSnpDataByProbe(dataMap)
 			}else{
-				log.info "No mapping info for " + key + " in Chromosome " + chr
+				logger.info "No mapping info for " + key + " in Chromosome " + chr
 			}
 		}
-		log.info "End loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
+		logger.info "End loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
 	}
 
 
 	def loadSnpDataByProbeWithCN1(){
 
-		log.info "Start loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
+		logger.info "Start loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
 
 		File pedFile = getPedFile(chr)
 
 		// [index] -> snp_id (the 2nd column of *.map file
 		List snpList = getMapData(chr)
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
 		// name -> snp_info_id : snp_probe_id : snp_name
 		Map snpIdMap = getSnpIdMapByChr()
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
 		StringBuffer sb = new StringBuffer()
 		int index1, index2
@@ -333,10 +332,10 @@ class SnpDataByProbe {
 			})
 		//}
 
-		log.info(Util.getMemoryUsage(runtime))
-		log.info(new Date())
+		logger.info(Util.getMemoryUsage(runtime))
+		logger.info(new Date())
 
-		log.info "End loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
+		logger.info "End loading DE_SNP_DATA_BY_PROBE for Chromosome $chr ..."
 	}
 
 
@@ -387,7 +386,7 @@ class SnpDataByProbe {
 	 */
 	Map getSnpIdMapByChr(){
 
-		log.info "Retrieve mapping info for SNP ID and RS# ..."
+		logger.info "Retrieve mapping info for SNP ID and RS# ..."
 
 		Map snpIdMap = [:]
 
@@ -402,7 +401,7 @@ class SnpDataByProbe {
 
 		deapp.eachRow(qry, [chr]) {
 			if(it.snp_name.equals(null)) {
-				log.info it.name + " in Chromosome " + chr + " without RS# "
+				logger.info it.name + " in Chromosome " + chr + " without RS# "
 				snpIdMap[it.name] = it.snp_info_id + ":0:NA"
 			}
 			else{
@@ -419,14 +418,14 @@ class SnpDataByProbe {
 		//File mapFile = getMapFile(chr)
 
 		List map = []
-		log.info "Loading MAP data from: " + mapFile.toString()
+		logger.info "Loading MAP data from: " + mapFile.toString()
 		int index = 0
 		mapFile.eachLine{
 			String [] str = it.split("\t")
 			map[index] = str[1]
 			index++
 		}
-		log.info("Total SNPs in " + mapFile.toString() + ":  " + map.size())
+		logger.info("Total SNPs in " + mapFile.toString() + ":  " + map.size())
 		return map
 	}
 
@@ -454,11 +453,11 @@ class SnpDataByProbe {
 		File pedFile = new File(path + "/" + prefix + chr + ".ped")
 
 		if(pedFile.exists()) {
-			log.info "Looking for PED file: " + pedFile.toString()
+			logger.info "Looking for PED file: " + pedFile.toString()
 			return pedFile
 		}
 		else{
-			log.error "Cannot find PED file: " + pedFile.toString()
+			logger.error "Cannot find PED file: " + pedFile.toString()
 			return null
 		}
 	}
@@ -468,11 +467,11 @@ class SnpDataByProbe {
 		File mapFile = new File(path + "/" + prefix + chr + ".map")
 
 		if(mapFile.exists()) {
-			log.info "Looking for MAP file: " + mapFile.toString()
+			logger.info "Looking for MAP file: " + mapFile.toString()
 			return mapFile
 		}
 		else{
-			log.error "Cannot find MAP file: " + mapFile.toString()
+			logger.error "Cannot find MAP file: " + mapFile.toString()
 			return null
 		}
 	}
@@ -481,10 +480,10 @@ class SnpDataByProbe {
 	File getCopyNumberFile(String chr){
 		File cn = new File(path + "/" + prefix + chr + ".cn")
 		if(cn.exists()){
-			log.info "Looking for Copy Number file: " + cn.toString()
+			logger.info "Looking for Copy Number file: " + cn.toString()
 			return cn
 		} else{
-			log.warn("Cannot find Copy Number file: " + cn.toString())
+			logger.warn("Cannot find Copy Number file: " + cn.toString())
 			return null
 		}
 	}

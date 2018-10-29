@@ -28,13 +28,12 @@
 
 package org.transmartproject.pipeline.converter
 
-import org.apache.log4j.Logger;
+import groovy.util.logging.Slf4j
 
 import org.transmartproject.pipeline.util.Util
 
+@Slf4j('logger')
 class AffymetrixCopyNumberFormatter {
-
-	private static final Logger log = Logger.getLogger(AffymetrixCopyNumberFormatter)
 
 	String copyNumberFileDirectory, copyNumberFilePrefix, studyName, outputDirectory
 	String sourceCopyNumberFilePattern
@@ -43,13 +42,13 @@ class AffymetrixCopyNumberFormatter {
 
 	def createCopyNumberFile(){
 
-		log.info "Start creating Copy Number file ..."
-		log.info("Search CopyNumber file from " + copyNumberFileDirectory)
+		logger.info "Start creating Copy Number file ..."
+		logger.info("Search CopyNumber file from " + copyNumberFileDirectory)
 
 		File cn = new File(copyNumberFileDirectory)
 		if(cn.isDirectory()){
 			cn.eachFile{
-				log.info "Checking file: " + it.toString()
+				logger.info "Checking file: " + it.toString()
 				if(it.toString().indexOf(sourceCopyNumberFilePattern) > 0) {
 					String experimentId = it.getName().replace(sourceCopyNumberFilePattern, "")
 					if(!experimentPatientMap[experimentId].equals(null))
@@ -72,7 +71,7 @@ class AffymetrixCopyNumberFormatter {
 		StringBuffer sb = new StringBuffer()
 		StringBuffer sbAll = new StringBuffer()
 
-		log.info("Start processing " + file.toString())
+		logger.info("Start processing " + file.toString())
 
 		Map cnByChr = [:]
 		String fileName = file.name
@@ -92,9 +91,9 @@ class AffymetrixCopyNumberFormatter {
 				def str = line.split("=")
 				try {
 					expectedDataRows = Long.parseLong(str[1].trim())
-					log.info("NumberDataRows in " + fileName + ": " + expectedDataRows)
+					logger.info("NumberDataRows in " + fileName + ": " + expectedDataRows)
 				} catch (Exception e){
-					log.warn("NumberDataRows in " + fileName + " is missing")
+					logger.warn("NumberDataRows in " + fileName + " is missing")
 				}
 			}
 
@@ -103,9 +102,9 @@ class AffymetrixCopyNumberFormatter {
 				def str = line.split("=")
 				try {
 					totalDataColumns = Integer.parseInt(str[1].trim())
-					log.info("NumberDataColumns in " + fileName + ": " + totalDataColumns)
+					logger.info("NumberDataColumns in " + fileName + ": " + totalDataColumns)
 				} catch (Exception e){
-					log.warn("NumberDataColumns in " + fileName + " is missing")
+					logger.warn("NumberDataColumns in " + fileName + " is missing")
 				}
 			}
 
@@ -142,9 +141,9 @@ class AffymetrixCopyNumberFormatter {
 		writeCopyNumberFileByChrs(cnByChr)
 
 		if(totalDataRows == expectedDataRows){
-			log.info(fileName + ": expected rows - " + expectedDataRows + ";processed rows - " + totalDataRows)
+			logger.info(fileName + ": expected rows - " + expectedDataRows + ";processed rows - " + totalDataRows)
 		}else{
-			log.error(fileName + ": expected rows - " + expectedDataRows + ";processed rows - " + totalDataRows)
+			logger.error(fileName + ": expected rows - " + expectedDataRows + ";processed rows - " + totalDataRows)
 		}
 	}
 
@@ -154,7 +153,7 @@ class AffymetrixCopyNumberFormatter {
 		copyNumberOutputFile = getCopyNumberOutputFile()
 
 		if(!copyNumberOutputFile.exists()) {
-			log.info("Create " + copyNumberOutputFile.toString())
+			logger.info("Create " + copyNumberOutputFile.toString())
 			copyNumberOutputFile.createNewFile()
 		}
 		copyNumberOutputFile.append(sb.toString())
@@ -171,7 +170,7 @@ class AffymetrixCopyNumberFormatter {
 	void writeCopyNumberFileByChr(String sb, String chr){
 		File cn = getCopyNumberOutputFileByChr(chr)
 		if(!cn.exists()){
-			log.info "Creat Copy Number file for: " + cn.toString()
+			logger.info "Creat Copy Number file for: " + cn.toString()
 			cn.createNewFile()
 		}
 
@@ -181,10 +180,10 @@ class AffymetrixCopyNumberFormatter {
 
 	void checkNameConsistency(String fileName, String sampleName){
 		if(fileName.indexOf(sampleName) == 0) {
-			log.info(fileName + " is consistent with SampleName: " + sampleName)
+			logger.info(fileName + " is consistent with SampleName: " + sampleName)
 		}
 		else {
-			log.warn(fileName + " is inconsistent with SampleName: " + sampleName)
+			logger.warn(fileName + " is inconsistent with SampleName: " + sampleName)
 		}
 	}
 
