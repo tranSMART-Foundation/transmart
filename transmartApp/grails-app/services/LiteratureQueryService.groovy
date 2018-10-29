@@ -1,10 +1,12 @@
 import com.recomdata.search.query.LiteratureDataQuery
+import groovy.util.logging.Slf4j
 import org.transmart.GlobalFilter
 import org.transmart.LiteratureFilter
 import org.transmart.SearchFilter
 import org.transmart.biomart.BioDataExternalCode
 import org.transmart.biomart.Literature
 
+@Slf4j('logger')
 class LiteratureQueryService {
 
     def globalFilterService
@@ -535,7 +537,7 @@ class LiteratureQueryService {
     }
 
     def findDiseaseURN(String name) {
-        log.info("Calling findDiseaseURN for " + name)
+        logger.info("Calling findDiseaseURN for " + name)
         def diseaseURN = null
         StringBuffer sql = new StringBuffer("select bdec.code from BioDataExternalCode bdec")
         sql.append(" where bdec.bioDataId in (select bdecInner.bioDataId from BioDataExternalCode bdecInner")
@@ -546,13 +548,13 @@ class LiteratureQueryService {
         sql.append(" and bdec.codeSource = ?")
         sql.append(" and bdec.codeType = ?")
         sql.append(" and bdec.bioDataType = ?")
-        log.trace(sql.toString())
+        logger.trace(sql.toString())
         def result = BioDataExternalCode.executeQuery(sql.toString(),
                 [name.toUpperCase(), "ARIADNE", "ALIAS", "BIO_DISEASE", "ARIADNE", "URN", "BIO_DISEASE"])
         if (result.size() == 1) {
             diseaseURN = result[0]
         } else {
-            log.warn("Unable to find the Disease URN.  Size = " + result.size())
+            logger.warn("Unable to find the Disease URN.  Size = " + result.size())
         }
         return diseaseURN
     }

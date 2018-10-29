@@ -1,8 +1,10 @@
 import com.recomdata.transmart.domain.searchapp.Subset
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.dataquery.highdim.projections.Projection
 import org.transmartproject.core.querytool.ConstraintByOmicsValue
 
+@Slf4j('logger')
 class SubsetController {
 
     def index = {}
@@ -89,7 +91,7 @@ class SubsetController {
         }
 
         def result = [success: success]
-        log.trace(result as JSON)
+        logger.trace(result as JSON)
         render result as JSON
     }
 
@@ -133,7 +135,7 @@ class SubsetController {
                     if (i.constraintByOmicsValue.operator == ConstraintByOmicsValue.Operator.BETWEEN) {
                         String[] bounds = i.constraintByOmicsValue.constraint.split(':')
                         if (bounds.length != 2) {
-                            log.error "BETWEEN constraint type found with values not seperated by ':'"
+                            logger.error "BETWEEN constraint type found with values not seperated by ':'"
                             result += i.constraintByOmicsValue.constraint
                         }
                         else {

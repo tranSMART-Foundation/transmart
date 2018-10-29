@@ -5,12 +5,14 @@
  */
 import com.recomdata.util.DomainObjectExcelHelper
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmart.SearchResult
 import org.transmart.biomart.BioAssayAnalysis
 import org.transmart.biomart.ClinicalTrial
 import org.transmart.biomart.Experiment
 import org.transmart.searchapp.SearchKeyword
 
+@Slf4j('logger')
 class TrialController {
 
     def trialQueryService
@@ -59,7 +61,7 @@ class TrialController {
             session.searchFilter.trialFilter.selectedtrials = befCTrials;
         }
 
-        log.info "filterTrial:" + session.searchFilter.trialFilter.selectedtrials
+        logger.info "filterTrial:" + session.searchFilter.trialFilter.selectedtrials
         def sResult = new SearchResult()
 
         session.searchFilter.datasource = "trial"
@@ -113,7 +115,7 @@ class TrialController {
             exp = Experiment.findByAccession(trialNumber);
             istrial = false;
         }
-        //	log.info("test encode:"+URLEncoder.encode("https://sss.ss/ge/pub/220202"));
+        //	logger.info("test encode:"+URLEncoder.encode("https://sss.ss/ge/pub/220202"));
 
         def skid = null;
         def sk = SearchKeyword.findByKeyword(trialNumber);
@@ -138,7 +140,7 @@ class TrialController {
 
 
         } else {
-            log.warn "Experiment is null, indicating that to the user..."
+            logger.warn "Experiment is null, indicating that to the user..."
             render(view: '/experiment/noresults')
         }
     }
@@ -159,7 +161,7 @@ class TrialController {
         boolean filtercheck = !session.searchFilter.trialFilter.newFilter;
 
         Set selectedTrials = session.searchFilter.trialFilter.selectedtrials;
-        log.info selectedTrials
+        logger.info selectedTrials
         boolean rootcheck = true;
         if (filtercheck)
             rootcheck = selectedTrials.contains("EmptyTrial")
@@ -216,7 +218,7 @@ class TrialController {
         response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0")
         response.setHeader("Pragma", "public");
         response.setHeader("Expires", "0");
-        //log.info "before call"
+        //logger.info "before call"
         response.outputStream << analysisDataExportService.renderAnalysisInExcel(geneexpr)
     }
 
@@ -231,7 +233,7 @@ class TrialController {
     }
 
     def downloadStudy = {
-        log.info("Downloading the Trial Study view");
+        logger.info("Downloading the Trial Study view");
         def sResult = new SearchResult()
         def trialRS = null
         def trialMap = [:]
@@ -246,7 +248,7 @@ class TrialController {
     }
 
     def downloadAnalysisTEA = {
-        log.info("Downloading the Trial TEA Analysis view");
+        logger.info("Downloading the Trial TEA Analysis view");
         def sResult = new SearchResult()
 
         sResult.result = clinicalTrialAnalysisTEAService.queryExpAnalysis(session.searchFilter, null)

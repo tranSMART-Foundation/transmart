@@ -1,6 +1,7 @@
 import com.recomdata.genesignature.FileSchemaException
 import com.recomdata.genesignature.WizardModelDetails
 import com.recomdata.util.DomainObjectExcelHelper
+import groovy.util.logging.Slf4j
 import org.transmart.biomart.BioAssayPlatform
 import org.transmart.biomart.CellLine
 import org.transmart.biomart.Compound
@@ -21,6 +22,7 @@ import javax.servlet.ServletOutputStream
  * @author $Author: jliu $
  * @version $Revision: 11258 $
  */
+@Slf4j('logger')
 class GeneSignatureController {
 
     private static final String GENERIC_OTHER_BIO_CONCEPT_CODE = 'OTHER'
@@ -59,7 +61,7 @@ class GeneSignatureController {
     def index = {
         // track usage
         def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: "GeneSignature-Summary", eventmessage: "Gene Signature summary page", accesstime: new Date())
-        //log.info "saving Gene Signature access log"
+        //logger.info "saving Gene Signature access log"
         al.save();
 
         redirect(action: "list")
@@ -83,7 +85,7 @@ class GeneSignatureController {
         // logged in user
         def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
         def bAdmin = user.isAdmin()
-        log.info "Admin? " + bAdmin
+        logger.info "Admin? " + bAdmin
 
         // summary view
         def signatures = geneSignatureService.listPermissionedGeneSignatures(user.id, bAdmin);
@@ -173,7 +175,7 @@ class GeneSignatureController {
         if (clone.experimentTypeCellLine?.id == null) clone.experimentTypeCellLine = null
         // this is hack, don't know how to get around this!
 
-        log.debug "experimentTypeCellLine: " + clone.experimentTypeCellLine + "; null? " + (clone.experimentTypeCellLine == null)
+        logger.debug "experimentTypeCellLine: " + clone.experimentTypeCellLine + "; null? " + (clone.experimentTypeCellLine == null)
         // set onto session
         def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: clone, wizardType: WizardModelDetails.WIZ_TYPE_EDIT, editId: geneSigInst.id);
         session.setAttribute(WIZ_DETAILS_ATTRIBUTE, newWizard)
@@ -419,7 +421,7 @@ class GeneSignatureController {
             // load items from cloned object
             GeneSignature parentGS = GeneSignature.get(wizard.cloneId)
             gs.properties.uploadFile = parentGS.uploadFile
-            log.info "INFO: loading parent of clone '" + parentGS.name + "'"
+            logger.info "INFO: loading parent of clone '" + parentGS.name + "'"
             geneSignatureService.cloneGeneSigItems(parentGS, gs)
         }
 
@@ -598,7 +600,7 @@ class GeneSignatureController {
 
         // refresh items if new file uploaded
         def file = request.getFile('uploadFile')
-        log.debug " update wizard file:'" + file?.getOriginalFilename() + "'"
+        logger.debug " update wizard file:'" + file?.getOriginalFilename() + "'"
 
         // file validation
         if (file != null && file.getOriginalFilename() != "") {
@@ -693,7 +695,7 @@ class GeneSignatureController {
     def addItems = {
 
         def gs = GeneSignature.get(params.id)
-        log.debug " adding items to gs: " + gs.name
+        logger.debug " adding items to gs: " + gs.name
 
         // reset
         flash.message = null
@@ -715,7 +717,7 @@ class GeneSignatureController {
         Iterator iter = params.entrySet().iterator()
         while (iter.hasNext()) {
             param = iter.next()
-            //log.info " eval param: "+param
+            //logger.info " eval param: "+param
             //println "PARAM: " + param
 
             key = param.getKey().trim()
@@ -728,13 +730,13 @@ class GeneSignatureController {
                 geneSymbols.add(symbol)
                 println "Gene: " + symbol + "   FC: " + valueMetric
 
-                log.debug " parsing symbol: '" + symbol + "' with valueMetric: " + valueMetric
+                logger.debug " parsing symbol: '" + symbol + "' with valueMetric: " + valueMetric
                 // parse fold chg metric
                 if (valueMetric != null && valueMetric.trim().length() > 0) {
                     try {
                         valueMetrics.add(Double.valueOf(valueMetric))
                     } catch (RuntimeException e) {
-                        log.error "invalid valueMetric: " + valueMetric + " detected!", e
+                        logger.error "invalid valueMetric: " + valueMetric + " detected!", e
                         flash.message = "<div class='warning'>The value metric '" + valueMetric + "' for symbol: '" + symbol + "' is not a valid number</div>"
                         bError = true
                     }
@@ -747,13 +749,13 @@ class GeneSignatureController {
                 valueMetric = params.get("foldChgMetric_" + itemNum)
                 probes.add(symbol)
 
-                log.debug " parsing symbol: '" + symbol + "' with valueMetric: " + valueMetric
+                logger.debug " parsing symbol: '" + symbol + "' with valueMetric: " + valueMetric
                 // parse fold chg metric
                 if (valueMetric != null && valueMetric.trim().length() > 0) {
                     try {
                         valueMetrics.add(Double.valueOf(valueMetric))
                     } catch (RuntimeException e) {
-                        log.error "invalid valueMetric: " + valueMetric + " detected!", e
+                        logger.error "invalid valueMetric: " + valueMetric + " detected!", e
                         flash.message = "<div class='warning'>The value metric '" + valueMetric + "' for symbol: '" + symbol + "' is not a valid number</div>"
                         bError = true
                     }
@@ -790,11 +792,11 @@ class GeneSignatureController {
                 flash.message = "<div class='message'>" + geneSymbols.size() + " gene signature item(s) were added to '" + gs.name + "'</div>"
 
             } catch (FileSchemaException fse) {
-                log.error "message>> " + fse.getMessage(), fse
+                logger.error "message>> " + fse.getMessage(), fse
                 flash.message = "<div class='warning'>" + fse.getMessage() + "</div>"
                 bError = true
             } catch (RuntimeException re) {
-                log.error "RuntimeException>>" + re.getMessage(), re
+                logger.error "RuntimeException>>" + re.getMessage(), re
                 flash.message = "<div class='warning'>Runtime exception " + re.getClass().getName() + ":<br>" + re.getMessage() + "</div"
                 bError = true
             }
@@ -822,7 +824,7 @@ class GeneSignatureController {
                     i++
                 }
             }
-            log.debug " redirect params>> " + newParams
+            logger.debug " redirect params>> " + newParams
             redirect(action: "showEditItems", params: newParams)
         } else {
             redirect(action: "showEditItems", params: ["id": gs.id])
@@ -932,7 +934,7 @@ class GeneSignatureController {
      * retrieve cell lines for indicated species
      */
     def cellLineLookup = {
-        log.debug " params " + params
+        logger.debug " params " + params
         def speciesId = params.id
 
         def cellLines = []
@@ -945,7 +947,7 @@ class GeneSignatureController {
             if (speciesFilter.indexOf("monkey") != -1) speciesFilter = "Monkey"
 
             // match on species
-            log.debug " speciesFilter " + speciesFilter
+            logger.debug " speciesFilter " + speciesFilter
             cellLines = CellLine.findAllBySpeciesIlike(speciesFilter + "%", [sort: "cellLineName"])
         }
 
@@ -975,7 +977,7 @@ class GeneSignatureController {
 
         // bind params
         bindData(gs, params)
-        log.info "bound params from page " + pageNum + ":\n" + params
+        logger.info "bound params from page " + pageNum + ":\n" + params
     }
 
     /**
@@ -1046,7 +1048,7 @@ class GeneSignatureController {
                 break;
 
             default:
-                log.warn "invalid page requested!"
+                logger.warn "invalid page requested!"
         }
     }
 
@@ -1104,7 +1106,7 @@ class GeneSignatureController {
                 existingValues.put('foldChgMetricConceptCode.id', gs.foldChgMetricConceptCode?.id ?: '')
                 break
             default:
-                log.warn "invalid page requested!"
+                logger.warn "invalid page requested!"
         }
         return existingValues
     }

@@ -3,7 +3,9 @@ package com.recomdata.asynchronous
 import com.recomdata.transmart.domain.i2b2.AsyncJob
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class JobStatusService {
 
     boolean transactional = true
@@ -26,9 +28,9 @@ class JobStatusService {
         def jobNameArray = jobName.split("-")
         def jobID = jobNameArray[2]
 
-        //log.debug("Checking to see if the user cancelled the job")
+        //logger.debug("Checking to see if the user cancelled the job")
         if (jobResultsService[jobName]["Status"] == "Cancelled") {
-            log.warn("${jobName} has been cancelled")
+            logger.warn("${jobName} has been cancelled")
             retValue = true
         } else {
             jobResultsService[jobName]["Status"] = status
@@ -39,7 +41,7 @@ class JobStatusService {
             def asyncJob = AsyncJob.get(jobID)
 
             TimeDuration td = TimeCategory.minus(new Date(), asyncJob.lastRunOn)
-            //log.debug("Job has been running for ${td}}")
+            //logger.debug("Job has been running for ${td}}")
             asyncJob.runTime = td
             asyncJob.jobStatus = status
             if (viewerURL && viewerURL != '') asyncJob.viewerURL = viewerURL

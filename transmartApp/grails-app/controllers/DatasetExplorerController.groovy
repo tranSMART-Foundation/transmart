@@ -1,7 +1,9 @@
 import com.recomdata.transmart.domain.searchapp.Subset
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmart.searchapp.AuthUser
 
+@Slf4j('logger')
 class DatasetExplorerController {
     def springSecurityService
     def i2b2HelperService
@@ -10,7 +12,7 @@ class DatasetExplorerController {
     def defaultAction = "index"
 
     def index = {
-        log.trace("in index");
+        logger.trace("in index");
 
         def pathToExpand
         //If we have an accession passed, retrieve its path
@@ -49,7 +51,7 @@ class DatasetExplorerController {
         def admin = i2b2HelperService.isAdmin(user);
         def tokens = i2b2HelperService.getSecureTokensCommaSeparated(user)
         def initialaccess = new JSON(i2b2HelperService.getAccess(i2b2HelperService.getRootPathsWithTokens(), user)).toString();
-        log.trace("admin =" + admin)
+        logger.trace("admin =" + admin)
         render(view: "datasetExplorer", model: [pathToExpand      : pathToExpand,
                                                 admin             : admin,
                                                 tokens            : tokens,

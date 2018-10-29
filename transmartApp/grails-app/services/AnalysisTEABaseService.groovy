@@ -2,6 +2,7 @@ import com.recomdata.genesignature.TEAScoreManager
 import com.recomdata.search.query.AssayAnalysisDataQuery
 import com.recomdata.search.query.AssayAnalysisDataTeaQuery
 import com.recomdata.search.query.Query
+import groovy.util.logging.Slf4j
 import org.transmart.AnalysisResult
 import org.transmart.AssayAnalysisValue
 import org.transmart.ExpAnalysisResultSet
@@ -18,6 +19,7 @@ import org.transmart.searchapp.SearchBioMarkerCorrelFastMV
  * @version $Revision: 11072 $
  */
 
+@Slf4j('logger')
 class AnalysisTEABaseService {
 
     /**
@@ -47,7 +49,7 @@ class AnalysisTEABaseService {
         if (result != null)
             trialResult.add(result)
 
-        //	log.info("queryExpAnalysis result class: "+result.getClass().getName())
+        //	logger.info("queryExpAnalysis result class: "+result.getClass().getName())
         return new ExpAnalysisResultSet(expAnalysisResults: trialResult, analysisCount: result.analysisCount, expCount: result.expCount, groupByExp: false)
     }
 
@@ -143,7 +145,7 @@ class AnalysisTEABaseService {
 
         // get count
         def result = BioAssayAnalysisDataTea.executeQuery(query.generateSQL())
-        log.info "anal ct result: " + result
+        logger.info "anal ct result: " + result
         if (result != null && result.size() > 0) analysisCount = result[0]
         return analysisCount
     }
@@ -193,19 +195,19 @@ class AnalysisTEABaseService {
                     dynamicValuesQuery = "SELECT DISTINCT sbmcmv.assocBioMarkerId, 1 as valueMetric FROM org.transmart.searchapp.SearchBioMarkerCorrelFastMV sbmcmv WHERE sbmcmv.domainObjectId in (" + mids + ")";
                 }
                 updownResult.addAll(SearchBioMarkerCorrelFastMV.executeQuery(dynamicValuesQuery))
-                log.info "number of search app biomarkers: " + updownResult.size()
+                logger.info "number of search app biomarkers: " + updownResult.size()
             }
 
             // add static biomarkers
             // make sure no homology gene is searched
             def bioMarkersQuery = "SELECT DISTINCT bmcmv.assoBioMarkerId as assocBioMarkerId, 0 as valueMetric FROM org.transmart.biomart.BioMarkerCorrelationMV bmcmv WHERE bmcmv.bioMarkerId in (" + mids + ") AND bmcmv.correlType <>'HOMOLOGENE_GENE'";
             def staticResult = BioMarkerCorrelationMV.executeQuery(bioMarkersQuery);
-            log.info "number of static biomarkers: " + staticResult.size()
+            logger.info "number of static biomarkers: " + staticResult.size()
 
             // merge to get complete gene list
             updownResult.addAll(staticResult)
             def bmCount = updownResult.size();
-            log.info "total biomarkers: " + bmCount
+            logger.info "total biomarkers: " + bmCount
 
             // build biomarker/metric map
             Map mvMap = new HashMap();
@@ -220,14 +222,14 @@ class AnalysisTEABaseService {
 
                     // keep larger abs(fold change)
                     if (testMetric != null && mv[1] != null && Math.abs(mv[1]) > Math.abs(testMetric)) {
-                        log.warn "overriding metric value for biomarker: " + mv[0] + " [ orig: " + testMetric + " new: " + mv[1] + " ]"
+                        logger.warn "overriding metric value for biomarker: " + mv[0] + " [ orig: " + testMetric + " new: " + mv[1] + " ]"
                         mvMap.put(mv[0], mv[1]);
                     }
                 }
             }
             processAnalysisResult(result, tResult, mvMap)
         } else {
-            log.info "in queryExpAnalysis() did not detect any biomarkers!"
+            logger.info "in queryExpAnalysis() did not detect any biomarkers!"
             def allAnalysis = getAllAnalyses(filter);
             def expMap = new HashMap();
             def expLkup = null
@@ -237,7 +239,7 @@ class AnalysisTEABaseService {
                 def expId = row[1]
                 def expAccession = row[2];
                 def countGene = row[3]
-                //log.info "extracting analysisId: "+analysisId+"; expId: "+expId+"; gene ct: "+countGene
+                //logger.info "extracting analysisId: "+analysisId+"; expId: "+expId+"; gene ct: "+countGene
 
                 // create analysis result
                 //	expLkup = expMap.get(expId)
@@ -255,7 +257,7 @@ class AnalysisTEABaseService {
             tResult.analysisCount = tResult.analysisResultList.size();
             tResult.expCount = expMap.size();
         }
-        //log.info "tResult: "+tResult+"; class: "+tResult.getClass().getName()
+        //logger.info "tResult: "+tResult+"; class: "+tResult.getClass().getName()
         return tResult;
     }
 
@@ -316,9 +318,9 @@ class AnalysisTEABaseService {
             def expAccession = row[3];
 
             if (aresult == null) {
-                //		log.info "BAAD: "+analysisData
-                //		log.info "BAAD experiment: "+exp+"; class: "+exp.getClass().getName()
-                //		log.info "BAAD experiment type: "+exp.type+"; id: "+expId;
+                //		logger.info "BAAD: "+analysisData
+                //		logger.info "BAAD experiment: "+exp+"; class: "+exp.getClass().getName()
+                //		logger.info "BAAD experiment type: "+exp.type+"; id: "+expId;
 
                 // build experiment lookup map
                 //def mapExp = expMap.get(exp.id)
@@ -331,7 +333,7 @@ class AnalysisTEABaseService {
                 aresult = new AnalysisResult(analysis: analysisCache, experimentId: expId, experimentAccession: expAccession);
                 analysisResultMap.put(aid, aresult)
             }
-            //	log.info "mvlookup: "+mvlookup
+            //	logger.info "mvlookup: "+mvlookup
             aresult.assayAnalysisValueList.add(new AssayAnalysisValue(analysisData: analysisData, bioMarker: biomarker, valueMetric: mvlookup))
         }
 
@@ -374,8 +376,8 @@ class AnalysisTEABaseService {
         // score each analysis
         analyses.each {
             ar = (AnalysisResult) it
-            //	log.info ""
-            //	log.info ">>>> Assigning TEA metrics to analysis: "+ar.analysis.name+" (N: "+geneCount+")"
+            //	logger.info ""
+            //	logger.info ">>>> Assigning TEA metrics to analysis: "+ar.analysis.name+" (N: "+geneCount+")"
             scoreManager.assignTEAMetrics(ar)
             rankedAnalyses.add(ar);
 

@@ -1,12 +1,12 @@
 package org.transmartproject.export
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.core.dataquery.highdim.chromoregion.RegionRow
 import org.transmartproject.core.dataquery.highdim.projections.Projection
 
-@Log4j
+@Slf4j('logger')
 abstract class AbstractChromosomalRegionBedExporter implements HighDimExporter {
 
     final static String COLUMN_SEPARATOR = '\t'
@@ -32,7 +32,7 @@ abstract class AbstractChromosomalRegionBedExporter implements HighDimExporter {
     @Override
     void export(TabularResult tabularResult, Projection projection,
                 Closure<OutputStream> newOutputStream, Closure<Boolean> isCancelled) {
-        log.info("started exporting to $format ")
+        logger.info("started exporting to $format ")
         def startTime = System.currentTimeMillis()
 
         if (isCancelled && isCancelled()) {
@@ -54,12 +54,12 @@ abstract class AbstractChromosomalRegionBedExporter implements HighDimExporter {
                         return
                     }
                     if (!datarow[assay]) {
-                        log.debug("(datrow.id=${datarow.id}, assay.id=${assay.id}) No cell data.")
+                        logger.debug("(datrow.id=${datarow.id}, assay.id=${assay.id}) No cell data.")
                         continue
                     }
                     List row = calculateRow(datarow, assay)
                     if (row[0..2].any { !it }) {
-                        log.debug("(datrow.id=${datarow.id}, assay.id=${assay.id}) Row has not required values: ${row}. Skip it.")
+                        logger.debug("(datrow.id=${datarow.id}, assay.id=${assay.id}) Row has not required values: ${row}. Skip it.")
                         continue
                     }
                     Writer writer = streamsPerSample[assay.id]
@@ -90,7 +90,7 @@ abstract class AbstractChromosomalRegionBedExporter implements HighDimExporter {
                     rowNumber += 1
                 }
                 if (rowNumber < assayList.size()) {
-                    log.warn("${assayList.size() - rowNumber} rows from ${assayList.size()} were skipped.")
+                    logger.warn("${assayList.size() - rowNumber} rows from ${assayList.size()} were skipped.")
                 }
             }
         } finally {
@@ -99,7 +99,7 @@ abstract class AbstractChromosomalRegionBedExporter implements HighDimExporter {
             }
         }
 
-        log.info("Exporting data took ${System.currentTimeMillis() - startTime} ms")
+        logger.info("Exporting data took ${System.currentTimeMillis() - startTime} ms")
     }
 
     protected abstract calculateRow(RegionRow datarow, AssayColumn assay)

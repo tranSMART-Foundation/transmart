@@ -1,7 +1,9 @@
 import PatientSampleCollection
+import groovy.util.logging.Slf4j
 import groovyx.net.http.HTTPBuilder
 import org.jfree.util.Log
 
+@Slf4j('logger')
 class SolrService {
     def grailsApplication
 
@@ -42,7 +44,7 @@ class SolrService {
                                     resp, xml ->
 
                                         //We should probably do something with the status.
-                                        if (resp.status != "200") Log.error("Response status from solr web service call: ${resp.status}")
+                                        if (resp.status != "200") Logger.error("Response status from solr web service call: ${resp.status}")
 
                                         //Loop through all the list items to find the one for "facet_counts".
                                         xml.lst.each
@@ -154,8 +156,8 @@ class SolrService {
         solrQuery += "&fl=" + resultColumns + "&sort=id desc&rows=" + solrMaxRows
 
         //Throw our query into the debugger log in the event we ever need to analyze it.
-        log.debug("pullResultsBasedOnJson - Printing solr Query to be run")
-        log.debug(solrQuery)
+        logger.debug("pullResultsBasedOnJson - Printing solr Query to be run")
+        logger.debug(solrQuery)
 
         //Create the http object we will use to retrieve the data that meets our criteria.
         def http = new HTTPBuilder(solrServerUrl)
@@ -171,7 +173,7 @@ class SolrService {
                     resp, xml ->
 
                         //We should probably do something with the status.
-                        if (resp.status != "200") Log.error("Response status from solr web service call: ${resp.status}")
+                        if (resp.status != "200") Logger.error("Response status from solr web service call: ${resp.status}")
 
                         //For now we are going to create a hash which will group our rows for us.
                         xml.result.doc.each
@@ -254,7 +256,7 @@ class SolrService {
                         resp, xml ->
 
                             //We should probably do something with the status.
-                            if (resp.status != "200") Log.error("Response status from solr web service call: ${resp.status}")
+                            if (resp.status != "200") Logger.error("Response status from solr web service call: ${resp.status}")
 
                             //For each lst we look for the "terms" one.
                             xml.lst.each
@@ -332,8 +334,8 @@ class SolrService {
         def IdList = []
 
         //Throw our query into the debugger log in the event we ever need to analyze it.
-        log.debug("getIDList - Printing solr Query to be run")
-        log.debug(solrQuery)
+        logger.debug("getIDList - Printing solr Query to be run")
+        logger.debug(solrQuery)
 
         //Find the results based on the JSON object.
         def html = http.get(path: '/solr/' + coreName + '/select/', query: ['q': solrQuery])
@@ -341,7 +343,7 @@ class SolrService {
                     resp, xml ->
 
                         //We should probably do something with the status.
-                        if (resp.status != "200") Log.error("Response status from solr web service call: ${resp.status}")
+                        if (resp.status != "200") Logger.error("Response status from solr web service call: ${resp.status}")
 
                         //For each document we expect a str tag that has the id in it.
                         xml.result.doc.each
@@ -624,8 +626,8 @@ class SolrService {
         if (sampleIds.size() > 0) {
             def solrQuery = "id:(" + sampleIds.join(" OR ") + ")"
 
-            log.debug("getFacetMapForField - ${columnToRetrieve} - Printing solr Query to be run")
-            log.debug(solrQuery)
+            logger.debug("getFacetMapForField - ${columnToRetrieve} - Printing solr Query to be run")
+            logger.debug(solrQuery)
 
             //Facet the search on the field specified in the parameter.
             def html = http.get(path: '/solr/' + coreName + '/select/', query: ['q': solrQuery, 'facet': 'true', 'rows': '0', 'facet.field': columnToRetrieve, 'facet.limit': '-1', 'facet.mincount': '1'])
@@ -633,7 +635,7 @@ class SolrService {
                         resp, xml ->
 
                             //We should probably do something with the status.
-                            if (resp.status != "200") Log.debug("Response status from solr web service call: ${resp.status}")
+                            if (resp.status != "200") Logger.debug("Response status from solr web service call: ${resp.status}")
 
                             //Loop through all the list items to find the one for "facet_counts".
                             xml.lst.each

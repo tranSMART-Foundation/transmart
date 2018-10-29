@@ -1,6 +1,7 @@
 package com.recomdata.transmart.data.export
 
 import com.recomdata.transmart.data.export.util.FileWriterUtil
+import groovy.util.logging.Slf4j
 import org.transmart.biomart.ClinicalTrial
 import org.transmart.biomart.Compound
 import org.transmart.biomart.Experiment
@@ -8,6 +9,7 @@ import org.transmart.biomart.Taxonomy
 
 import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess
 
+@Slf4j('logger')
 class MetadataService {
 
     boolean transactional = true
@@ -34,7 +36,7 @@ class MetadataService {
         //def al = new AccessLog(username:springSecurityService.getPrincipal().username, event:"i2b2DAO - getData", eventmessage:"RID:"+result_instance_ids.toString()+" Concept:"+conceptCodeList.toString(), accesstime:new java.util.Date())
         //al.save()
 
-        log.info("loading study metadata for " + studyAccessions)
+        logger.info("loading study metadata for " + studyAccessions)
         // try to find it by Clinical Trial
         def studiesMap = [:]
         studyAccessions.each { studyUid ->
@@ -190,12 +192,12 @@ class MetadataService {
 				  ) and s.sample_cd is not null and b.file_name like s.sample_cd||'%'
 				)
 			"""
-            log.debug(additionalFilesQuery)
-            log.debug('Study, ResultInstanceId :: ' + study + ', ' + resultInstanceId)
+            logger.debug(additionalFilesQuery)
+            logger.debug('Study, ResultInstanceId :: ' + study + ', ' + resultInstanceId)
             def sample, mapKey, mapValue = null
             filesList = sql.rows(additionalFilesQuery, [study, resultInstanceId])
         } catch (Exception e) {
-            log.error("Problem finding Files for Additional Data :: " + e.getMessage())
+            logger.error("Problem finding Files for Additional Data :: " + e.getMessage())
         } finally {
             sql?.close()
         }
@@ -217,7 +219,7 @@ class MetadataService {
 
             fileDownloadService.getFiles(filesList, additionalDataDir.getPath())
         } else {
-            log.debug('No Additional data files found to download')
+            logger.debug('No Additional data files found to download')
         }
     }
 }

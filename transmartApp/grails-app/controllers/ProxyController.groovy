@@ -4,12 +4,13 @@
  */
 import com.recomdata.datasetexplorer.proxy.XmlHttpProxy
 import com.recomdata.datasetexplorer.proxy.XmlHttpProxyServlet
+import groovy.util.logging.Slf4j
 
 import javax.servlet.ServletContext
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-
+@Slf4j('logger')
 class ProxyController {
 
     static defaultAction = "proxy"
@@ -43,11 +44,11 @@ class ProxyController {
             while ((line = inp.readLine()) != null) {
                 if (bodyContent == null) bodyContent = new StringBuffer();
                 bodyContent.append(line);
-                //log.trace(line);
+                //logger.trace(line);
             }
         } catch (Exception e) {
             println(e)
-            log.error(e.toString())
+            logger.error(e.toString())
         }*/
 
         BufferedReader bufferedReader = null;
@@ -65,14 +66,14 @@ class ProxyController {
                 bodyContent.append("");
             }
         } catch (IOException ex) {
-            log.error(ex);
+            logger.error(ex);
             // throw ex;
         } finally {
             if (bufferedReader != null) {
                 try {
                     bufferedReader.close();
                 } catch (IOException ex) {
-                    log.error(ex)
+                    logger.error(ex)
                     //throw ex;
                 }
             }
@@ -95,7 +96,7 @@ class ProxyController {
 
             try {
                 if (false) {
-                    log.trace("wrong")
+                    logger.trace("wrong")
                 }
                 //code for passing the url directly through instead of using configuration file
                 else if (req.getParameter("url") != null) {
@@ -116,7 +117,7 @@ class ProxyController {
                     return;
                 }
             } catch (Exception ex) {
-                log.error("XmlHttpProxyServlet Error loading service: " + ex);
+                logger.error("XmlHttpProxyServlet Error loading service: " + ex);
             }
 
             Map paramsMap = new HashMap();
@@ -153,7 +154,7 @@ class ProxyController {
                     xslInputStream = xslURL.openStream();
                 } else {
                     String message = "Could not locate the XSL stylesheet provided for service id " + serviceKey + ". Please check the XMLHttpProxy configuration.";
-                    log.debug(message);
+                    logger.debug(message);
                     try {
                         out.write(message.getBytes());
                         out.flush();
@@ -165,16 +166,16 @@ class ProxyController {
             //	println("url:"+urlString);
             //	println("body:"+bodyContent);
             if (!isPost) {
-                log.trace("proxying to:" + urlString);
+                logger.trace("proxying to:" + urlString);
                 xhp.doGet(urlString, out, xslInputStream, paramsMap, userName, password);
             } else {
-                if (bodyContent == null || bodyContent.length() == 0) log.debug("XmlHttpProxyServlet attempting to post to url " + urlString + " with no body content");
-                log.trace("proxying to:" + urlString);
+                if (bodyContent == null || bodyContent.length() == 0) logger.debug("XmlHttpProxyServlet attempting to post to url " + urlString + " with no body content");
+                logger.trace("proxying to:" + urlString);
                 xhp.doPost(urlString, out, xslInputStream, paramsMap, bodyContent.toString(), req.getContentType(), userName, password);
             }
         } catch (Exception iox) {
             iox.printStackTrace();
-            log.trace("XmlHttpProxyServlet: caught " + iox);
+            logger.trace("XmlHttpProxyServlet: caught " + iox);
             try {
                 writer = res.getWriter();
                 writer.write("XmlHttpProxyServlet error loading service for " + serviceKey + " . Please notify the administrator.");

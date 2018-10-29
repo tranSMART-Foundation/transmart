@@ -2,6 +2,7 @@ import fm.FmFile
 import fm.FmFolder
 import grails.converters.JSON
 import groovy.time.TimeCategory
+import groovy.util.logging.Slf4j
 import groovy.xml.StreamingMarkupBuilder
 import org.json.JSONArray
 import org.json.JSONObject
@@ -14,6 +15,7 @@ import org.transmart.searchapp.SearchTaxonomy
 //import bio.BioAnalysisAttribute
 //import RWGVisualizationDAO
 // so we can render as JSON
+@Slf4j('logger')
 class RWGController {
     def trialQueryService
     def searchKeywordService
@@ -291,7 +293,7 @@ class RWGController {
             //newParams.add newGeneString
         }
 
-        log.info("Gene parameter: ${newParams}")
+        logger.info("Gene parameter: ${newParams}")
         return newParams
     }
 
@@ -439,7 +441,7 @@ class RWGController {
                     for (folderName in pathLists[0]) {
                         def folder = FmFolder.findByFolderFullName folderName
                         if (!folder) {
-                            log.info "No folder with full name $folderName"
+                            logger.info "No folder with full name $folderName"
                             continue
                         }
                         def c = numbers[folder.folderType] ?: 0
@@ -560,7 +562,7 @@ class RWGController {
                     eq("id", expNumber)
                 }
                 if (experiment == null) {
-                    log.warn "Unable to find an experiment for ${expNumber}"
+                    logger.warn "Unable to find an experiment for ${expNumber}"
                 } else {
                     exprimentAnalysis.put((experiment), c)
                     total += c

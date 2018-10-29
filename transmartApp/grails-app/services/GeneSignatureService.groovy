@@ -20,6 +20,7 @@
 
 import com.recomdata.genesignature.FileSchemaException
 import com.recomdata.search.query.Query
+import groovy.util.logging.Slf4j
 import org.hibernate.Hibernate
 import org.springframework.web.multipart.MultipartFile
 import org.transmart.biomart.BioAssayDataAnnotation
@@ -38,6 +39,8 @@ import static org.transmartproject.db.support.DatabasePortabilityService.Databas
  * @author $Author: mmcduffie $
  * @version $Revision: 9178 $
  */
+
+@Slf4j('logger')
 public class GeneSignatureService {
 
     // fold change metric codes
@@ -58,7 +61,7 @@ public class GeneSignatureService {
      * verify file matches indicated schema
      */
     def verifyFileFormat(MultipartFile file, Long schemaColCt, String metricType) throws FileSchemaException {
-        log.info "verifyFileFormat() called with schemaColCt: " + schemaColCt + "; metricType: " + metricType
+        logger.info "verifyFileFormat() called with schemaColCt: " + schemaColCt + "; metricType: " + metricType
         BufferedReader br = null;
 
         // check column count
@@ -78,7 +81,7 @@ public class GeneSignatureService {
             while (br.ready() && i < 3) {
                 i++;
                 record = br.readLine().trim();
-                log.info("Line " + i + ": " + record)
+                logger.info("Line " + i + ": " + record)
                 if (record == "") continue;
 
                 List items = new ArrayList();
@@ -145,7 +148,7 @@ public class GeneSignatureService {
                     gsItems.add(new GeneSignatureItem(bioDataUniqueId: snpUid))
                     continue;
                 }
-                log.warn("WARN: invalid gene symbol: "+ geneSymbol)
+                logger.warn("WARN: invalid gene symbol: "+ geneSymbol)
                 invalidSymbols.add(geneSymbol);
                 continue;
             }
@@ -153,7 +156,7 @@ public class GeneSignatureService {
             {
                 def bioMarkerId = marker[j].getAt(0);
                 def uniqueId = marker[j].getAt(1)
-                log.info(">> Gene lookup: 1) marker id: "+bioMarkerId+"; 2) unique id: "+uniqueId)
+                logger.info(">> Gene lookup: 1) marker id: "+bioMarkerId+"; 2) unique id: "+uniqueId)
                 // create item instance
                 GeneSignatureItem item = new GeneSignatureItem(bioMarker: BioMarker.read(bioMarkerId), bioDataUniqueId: uniqueId, foldChgMetric: foldChg);
                 gsItems.add(item);
@@ -162,7 +165,7 @@ public class GeneSignatureService {
 
         // check for invalid symbols
         if(invalidSymbols.size()>0) FileSchemaException.ThrowInvalidGenesFileSchemaException(invalidSymbols);
-        log.info "created (" + gsItems.size() + ") GeneSignatureItem records"
+        logger.info "created (" + gsItems.size() + ") GeneSignatureItem records"
         return gsItems;
     }
 
@@ -176,7 +179,7 @@ public class GeneSignatureService {
         def origFile = file.getOriginalFilename()
 
         // metric type
-        log.debug("\nINFO: Parsing: " + file.originalFilename + " for organism: " + organism + " [Type: " + metricType + "]")
+        logger.debug("\nINFO: Parsing: " + file.originalFilename + " for organism: " + organism + " [Type: " + metricType + "]")
 
         try {
             // establish a reader
@@ -192,7 +195,7 @@ public class GeneSignatureService {
                 //while(br.ready() && i < 5) {
                 i++;
                 record = br.readLine().trim();
-                log.info("Line " + i + ": " + record)
+                logger.info("Line " + i + ": " + record)
                 if (record == "") continue;
 
                 List items = new ArrayList();
@@ -214,7 +217,7 @@ public class GeneSignatureService {
                         try {
                             foldChg = Double.parseDouble(foldChgTest)
                         } catch (NumberFormatException e) {
-                            log.error "invalid number format detected in file (" + foldChgTest + ")", e
+                            logger.error "invalid number format detected in file (" + foldChgTest + ")", e
                             throw new FileSchemaException("Invalid fold-change number detected in file:'" + origFile + "', please correct (" + foldChgTest + ")", e)
                         }
                     }
@@ -225,14 +228,14 @@ public class GeneSignatureService {
                 if (fileSchemaName.toUpperCase() =~ /GENE /) {
                     marker = lookupBioAssociations(geneSymbol, organism)
                     if (marker == null || marker.size() == 0) {
-                        log.warn("WARN: invalid gene symbol: " + geneSymbol)
+                        logger.warn("WARN: invalid gene symbol: " + geneSymbol)
                         invalidSymbols.add(geneSymbol);
                         continue;
                     }
 
                     def bioMarkerId = marker.getAt(0);
                     def uniqueId = marker.getAt(1)
-                    log.info(">> Gene lookup: 1) marker id: " + bioMarkerId + "; 2) uniqued id: " + uniqueId)
+                    logger.info(">> Gene lookup: 1) marker id: " + bioMarkerId + "; 2) uniqued id: " + uniqueId)
 
                     // create item instance
                     GeneSignatureItem item = new GeneSignatureItem(bioMarker: BioMarker.read(bioMarkerId), bioDataUniqueId: uniqueId, foldChgMetric: foldChg);
@@ -245,7 +248,7 @@ public class GeneSignatureService {
                     marker = lookupProbesetBioAssociations_probeIds(geneSymbol, gs.techPlatform.accession) // fixes -- 2014_10_31
 
                     if (marker == null || marker.isEmpty()) {
-                        log.warn("WARN: invalid probe set id: " + geneSymbol + " for platform " + gs.techPlatform.accession)
+                        logger.warn("WARN: invalid probe set id: " + geneSymbol + " for platform " + gs.techPlatform.accession)
                         invalidSymbols.add(geneSymbol);
                         continue;
                     }
@@ -257,7 +260,7 @@ public class GeneSignatureService {
                     String bioDataUniqueId = "GENE:" + String.valueOf(geneId)
                     def bioMarkerId = marker['bioMarkerId']
 
-                    log.info(">> Probeset lookup: 1) probeset id: " + probesetId)
+                    logger.info(">> Probeset lookup: 1) probeset id: " + probesetId)
 
                 // fixes -- 2014_10_31
                     //GeneSignatureItem item = new GeneSignatureItem(probesetId: probesetId, foldChgMetric: foldChg);
@@ -276,7 +279,7 @@ public class GeneSignatureService {
 
             // check for invalid symbols
             if (invalidSymbols.size() > 0) FileSchemaException.ThrowInvalidGenesFileSchemaException(invalidSymbols);
-            log.info "created (" + gsItems.size() + ") GeneSignatureItem records"
+            logger.info "created (" + gsItems.size() + ") GeneSignatureItem records"
             return gsItems;
         } finally {
             br.close();
@@ -293,7 +296,7 @@ public class GeneSignatureService {
         def origFile = file.getOriginalFilename()
 
         // metric type
-        log.debug("\nINFO: Parsing: " + file.originalFilename + " for organism: "+organism+" [Type: "+metricType+"]")
+        logger.debug("\nINFO: Parsing: " + file.originalFilename + " for organism: "+organism+" [Type: "+metricType+"]")
 
         try {
             // establish a reader
@@ -308,7 +311,7 @@ public class GeneSignatureService {
             while(br.ready()) {
                 i++;
                 record = br.readLine().trim();
-                log.info("Line " + i +": " + record)
+                logger.info("Line " + i +": " + record)
                 if(record=="") continue;
 
                 List items = new ArrayList();
@@ -330,7 +333,7 @@ public class GeneSignatureService {
                         try {
                             foldChg = Double.parseDouble(foldChgTest)
                         } catch (NumberFormatException e) {
-                            log.error "invalid number format detected in file ("+foldChgTest+")",e
+                            logger.error "invalid number format detected in file ("+foldChgTest+")",e
                             throw new FileSchemaException("Invalid fold-change number detected in file:'"+origFile+"', please correct ("+foldChgTest+")",e)
                         }
                     }
@@ -347,7 +350,7 @@ public class GeneSignatureService {
                             gsItems.add(new GeneSignatureItem(bioDataUniqueId: snpUid))
                             continue;
                         }
-                        log.warn("WARN: invalid gene symbol: "+ geneSymbol)
+                        logger.warn("WARN: invalid gene symbol: "+ geneSymbol)
                         invalidSymbols.add(geneSymbol);
                         continue;
                     }
@@ -356,7 +359,7 @@ public class GeneSignatureService {
                     {
                         def bioMarkerId = marker[j].getAt(0);
                         def uniqueId = marker[j].getAt(1)
-                        log.info(">> Gene lookup: 1) marker id: "+bioMarkerId+"; 2) unique id: "+uniqueId)
+                        logger.info(">> Gene lookup: 1) marker id: "+bioMarkerId+"; 2) unique id: "+uniqueId)
 
                         // create item instance
                         GeneSignatureItem item = new GeneSignatureItem(bioMarker: BioMarker.read(bioMarkerId), bioDataUniqueId: uniqueId, foldChgMetric: foldChg);
@@ -372,14 +375,14 @@ public class GeneSignatureService {
                             gsItems.add(new GeneSignatureItem(bioDataUniqueId: snpUid))
                             continue;
                         }
-                        log.warn("WARN: invalid gene symbol: "+ geneSymbol)
+                        logger.warn("WARN: invalid gene symbol: "+ geneSymbol)
                         invalidSymbols.add(geneSymbol);
                         continue;
                     }
 					
                     def bioMarkerId = marker.getAt(0);
                     def uniqueId = marker.getAt(1)
-                    log.info(">> Gene lookup: 1) marker id: "+bioMarkerId+"; 2) unique id: "+uniqueId)
+                    logger.info(">> Gene lookup: 1) marker id: "+bioMarkerId+"; 2) unique id: "+uniqueId)
 					
                     // create item instance
                     GeneSignatureItem item = new GeneSignatureItem(bioMarker: BioMarker.read(bioMarkerId), bioDataUniqueId: uniqueId, foldChgMetric: foldChg);
@@ -395,7 +398,7 @@ public class GeneSignatureService {
                             gsItems.add(new GeneSignatureItem(bioDataUniqueId: snpUid))
                             continue;
                         }
-                        log.warn("WARN: invalid probe set id: "+ geneSymbol)
+                        logger.warn("WARN: invalid probe set id: "+ geneSymbol)
                         invalidSymbols.add(geneSymbol);
                         continue;
                     }
@@ -403,7 +406,7 @@ public class GeneSignatureService {
                     //def probesetId = marker.getAt(0);
                     def probesetId = marker.getAt(0);
                     //	def bioMarkerId = marker.getAt(1);
-                    log.info(">> Probeset lookup: 1) probeset id: "+probesetId )
+                    logger.info(">> Probeset lookup: 1) probeset id: "+probesetId )
 					
                     // create item instance if this probeset exists in bio_assay_feature_group table, otherwise do nothing
                     def ba = bio.BioAssayFeatureGroup.read(probesetId);
@@ -419,7 +422,7 @@ public class GeneSignatureService {
 
             // check for invalid symbols
             if(invalidSymbols.size()>0) FileSchemaException.ThrowInvalidGenesFileSchemaException(invalidSymbols);
-            log.info "created (" + gsItems.size() + ") GeneSignatureItem records"
+            logger.info "created (" + gsItems.size() + ") GeneSignatureItem records"
             return gsItems;
         } finally {
             br.close();
@@ -459,12 +462,12 @@ public class GeneSignatureService {
         String inClause = delItems.toString()
         inClause = inClause.replace('[', '')
         inClause = inClause.replace(']', '')
-        log.info "in clause: " + inClause
+        logger.info "in clause: " + inClause
 
         // get one record to get gs id
         //GeneSignatureItem gsi = GeneSignatureItem.get(delItems[0])
         //def gs = gsi.geneSignature
-        log.info "associated GeneSignature id " + gs.id
+        logger.info "associated GeneSignature id " + gs.id
 
         // delete tagged items
         GeneSignatureItem.executeUpdate("delete GeneSignatureItem i where i.id IN (" + inClause + ") and i.geneSignature.id = " + gs.id)
@@ -484,7 +487,7 @@ public class GeneSignatureService {
      */
     def addGenSigItems(GeneSignature gs, List<String> geneSymbols, List<String> probes, List<Double> valueMetrics) {
 
-        log.debug " service addGenSigItems() called >> gs: " + gs + "; symbols: " + geneSymbols + "; metrics: " + valueMetrics
+        logger.debug " service addGenSigItems() called >> gs: " + gs + "; symbols: " + geneSymbols + "; metrics: " + valueMetrics
         def symbol
         def foldChgMetric
 
@@ -508,14 +511,14 @@ public class GeneSignatureService {
             symbol = iter.next()
             foldChgMetric = (valueMetrics != null) ? metricItems[i] : null;
             i++
-            log.info "[iter:" + i + "] trying to add gene symbol: " + symbol + " with foldChgMetric: " + foldChgMetric
+            logger.info "[iter:" + i + "] trying to add gene symbol: " + symbol + " with foldChgMetric: " + foldChgMetric
 
             // check for invalid symbols
             if (fileSchemaId != 3) marker = lookupBioAssociations(symbol, organism)
             if (fileSchemaId == 3) marker = lookupProbesetBioAssociations(symbol, gs.techPlatform.accession)
 
             if (marker == null || marker.size() == 0) {
-                log.warn("WARN: invalid gene symbol: " + symbol)
+                logger.warn("WARN: invalid gene symbol: " + symbol)
                 invalidSymbols.add(symbol)
                 continue
             }
@@ -523,7 +526,7 @@ public class GeneSignatureService {
             if (fileSchemaId != 3) {
                 def bioMarkerId = marker.getAt(0);
                 def uniqueId = marker.getAt(1)
-                log.info(">> Gene lookup: 1) marker id: " + bioMarkerId + "; 2) uniqued id: " + uniqueId + "; 3) FoldChgMetric: " + foldChgMetric)
+                logger.info(">> Gene lookup: 1) marker id: " + bioMarkerId + "; 2) uniqued id: " + uniqueId + "; 3) FoldChgMetric: " + foldChgMetric)
 
                 // create item instance
                 GeneSignatureItem item = new GeneSignatureItem(bioMarker: BioMarker.get(bioMarkerId), bioDataUniqueId: uniqueId, foldChgMetric: foldChgMetric);
@@ -550,7 +553,7 @@ public class GeneSignatureService {
 
         // add new items
         gsItems.each { gs.addToGeneSigItems(it) }
-        log.info "added (" + gsItems.size() + ") GeneSignatureItem records"
+        logger.info "added (" + gsItems.size() + ") GeneSignatureItem records"
 
         gs.validate()
         def saved = gs
@@ -564,7 +567,7 @@ public class GeneSignatureService {
     def saveWizard(GeneSignature gs, MultipartFile file) {
 
         def metricType = gs.foldChgMetricConceptCode?.bioConceptCode
-        log.info("metrictype " + metricType)
+        logger.info("metrictype " + metricType)
         def organism = gs.techPlatform?.organism
         def fileSchemaName = gs.fileSchema?.name
 
@@ -639,7 +642,7 @@ public class GeneSignatureService {
             def gsItems = loadGeneSigItemsFromFile(file, organism, metricType, fileSchemaName, gs);
 
             // delete current items
-            log.info "deleting original items"
+            logger.info "deleting original items"
             GeneSignatureItem.executeUpdate("delete GeneSignatureItem i where i.geneSignature.id = :currentId", [currentId: gs.id])
             gs.geneSigItems = []
 
@@ -686,13 +689,13 @@ public class GeneSignatureService {
         query.addSelect("bd.uniqueId")
 
         def qBuf = query.generateSQL();
-        //log.debug "Lookup query: "+qBuf
+        //logger.debug "Lookup query: "+qBuf
 
         //def markers = BioMarker.executeQuery(qBuf);
         def markers = BioData.executeQuery(qBuf);
 
         // try ext code lookup if necessary
-        //log.info(markers)
+        //logger.info(markers)
 
         if (markers == null || markers.size() == 0 || markers.size() > 1) {
             query = new Query(mainTableAlias: "bm");
@@ -709,7 +712,7 @@ public class GeneSignatureService {
             query.addSelect("bd.uniqueId")
 
             qBuf = query.generateSQL();
-            log.info "Ext Bio Marker lookup query: " + qBuf
+            logger.info "Ext Bio Marker lookup query: " + qBuf
             markers = BioMarker.executeQuery(qBuf)
 
             // check for none or ambiguity
@@ -733,13 +736,13 @@ public class GeneSignatureService {
         query.addSelect("bd.uniqueId")
 
         def qBuf = query.generateSQL();
-        //log.debug "Lookup query: "+qBuf
+        //logger.debug "Lookup query: "+qBuf
 
         //def markers = BioMarker.executeQuery(qBuf);
         def markers = BioData.executeQuery(qBuf);
 
         // try ext code lookup if necessary
-        // log.info(markers)
+        // logger.info(markers)
 
         if(markers==null || markers.size()==0) {
             query = new Query(mainTableAlias:"bm");
@@ -755,7 +758,7 @@ public class GeneSignatureService {
             query.addSelect("bd.uniqueId")
 
             qBuf = query.generateSQL();
-            log.info "Ext Bio Marker lookup query: "+qBuf
+            logger.info "Ext Bio Marker lookup query: "+qBuf
             markers = BioMarker.executeQuery(qBuf)
 
             // check for none or ambiguity

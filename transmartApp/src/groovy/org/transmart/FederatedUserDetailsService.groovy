@@ -2,6 +2,7 @@ package org.transmart
 
 import com.recomdata.security.AuthUserDetailsService
 import org.apache.commons.logging.Log
+import groovy.util.logging.Slf4j
 import org.apache.commons.logging.LogFactory
 import org.hibernate.SessionFactory
 import org.opensaml.xml.XMLObject
@@ -18,6 +19,7 @@ import javax.annotation.Resource
 
 // not in grails-app/services to avoid being automatically instantiated
 // we want to instantiate it only if SAML is on
+@Slf4j('logger')
 public class FederatedUserDetailsService implements SAMLUserDetailsService {
 
     @Resource
@@ -37,12 +39,12 @@ public class FederatedUserDetailsService implements SAMLUserDetailsService {
 
         String federatedId = fetchFederatedId(credential)
         try {
-            log.debug("Searching for user with federated id '$federatedId'")
+            logger.debug("Searching for user with federated id '$federatedId'")
             return userDetailsService.loadUserByProperty('federatedId', federatedId, true)
         } catch (UsernameNotFoundException nf) {
-            log.info("No user found with federated id '$federatedId")
+            logger.info("No user found with federated id '$federatedId")
             tryCreateUser(credential, federatedId, nf)
-            log.info("Trying to load user with federated id '$federatedId' again")
+            logger.info("Trying to load user with federated id '$federatedId' again")
 
             return userDetailsService.loadUserByProperty('federatedId', federatedId, true)
         }
@@ -88,7 +90,7 @@ public class FederatedUserDetailsService implements SAMLUserDetailsService {
 
     private void tryCreateUser(SAMLCredential credential, federatedId, nf) {
         if (grailsApplication.config.org.transmart.security.saml.createInexistentUsers != 'true') {
-            log.warn("Will not try to create user with federated id " +
+            logger.warn("Will not try to create user with federated id " +
                     "'$federatedId', such option is deactivated")
             throw nf
         }
@@ -125,11 +127,11 @@ public class FederatedUserDetailsService implements SAMLUserDetailsService {
 
             def outcome = newUser.save(flush: true)
             if (outcome) {
-                log.info("Created new user. {federatedId=$federatedId, " +
+                logger.info("Created new user. {federatedId=$federatedId, " +
                         "username=$username, realName=$realName, email=" +
                         "$email}")
             } else {
-                log.error("Failed creating new user with federatedId " +
+                logger.error("Failed creating new user with federatedId " +
                         "$federatedId, errors: " + newUser.errors)
                 throw nf
             }

@@ -1,5 +1,6 @@
 import com.recomdata.export.ExportTableNew
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.jfree.chart.servlet.ChartDeleter
 import org.jfree.chart.servlet.ServletUtilities
 import org.transmart.searchapp.AccessLog
@@ -10,6 +11,7 @@ import javax.servlet.ServletException
 import javax.servlet.ServletOutputStream
 import javax.servlet.http.HttpSession
 
+@Slf4j('logger')
 class ChartController {
 
     def index = {}
@@ -25,7 +27,7 @@ class ChartController {
     def displayChart = {
         HttpSession session = request.getSession();
         String filename = request.getParameter("filename");
-        log.trace("Trying to display:" + filename)
+        logger.trace("Trying to display:" + filename)
         if (filename == null) {
             throw new ServletException("Parameter 'filename' must be supplied");
         }
@@ -78,15 +80,15 @@ class ChartController {
         def paramMap = params;
 
         def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
-        log.trace("Called childConceptPatientCounts action in ChartController")
-        log.trace("User is:" + user.username);
-        log.trace(user.toString());
+        logger.trace("Called childConceptPatientCounts action in ChartController")
+        logger.trace("User is:" + user.username);
+        logger.trace(user.toString());
         def concept_key = params.concept_key;
-        log.trace("Requested counts for parent_concept_path=" + concept_key);
+        logger.trace("Requested counts for parent_concept_path=" + concept_key);
         def counts = i2b2HelperService.getChildrenWithPatientCountsForConcept(concept_key,user)
         def access = i2b2HelperService.getChildrenWithAccessForUserNew(concept_key, user)
-        log.trace("access:" + (access as JSON));
-        log.trace("counts = " + (counts as JSON))
+        logger.trace("access:" + (access as JSON));
+        logger.trace("counts = " + (counts as JSON))
 
         def obj = [counts: counts, accesslevels: access, test1: "works"]
         render obj as JSON
@@ -252,13 +254,13 @@ class ChartController {
             List<String> keys = i2b2HelperService.getConceptKeysInSubsets(result_instance_id1, result_instance_id2);
             Set<String> uniqueConcepts = i2b2HelperService.getDistinctConceptSet(result_instance_id1, result_instance_id2);
 
-            log.debug("Unique concepts: " + uniqueConcepts);
-            log.debug("keys: " + keys)
+            logger.debug("Unique concepts: " + uniqueConcepts);
+            logger.debug("keys: " + keys)
 
             for (int i = 0; i < keys.size(); i++) {
 
                 if (!i2b2HelperService.isHighDimensionalConceptKey(keys.get(i))) {
-                    log.trace("adding concept data for " + keys.get(i));
+                    logger.trace("adding concept data for " + keys.get(i));
                     if (s1) i2b2HelperService.addConceptDataToTable(table, keys.get(i), result_instance_id1, user);
                     if (s2) i2b2HelperService.addConceptDataToTable(table, keys.get(i), result_instance_id2, user);
                 }
@@ -334,9 +336,9 @@ class ChartController {
     }
 
     def clearGrid = {
-        log.debug("Clearing grid");
+        logger.debug("Clearing grid");
         request.getSession().setAttribute("gridtable", null);
-        log.debug("Setting export filename to null, since there is nothing to export")
+        logger.debug("Setting export filename to null, since there is nothing to export")
         request.getSession().setAttribute("expdsfilename", null);
         PrintWriter pw = new PrintWriter(response.getOutputStream());
         response.setContentType("text/plain");

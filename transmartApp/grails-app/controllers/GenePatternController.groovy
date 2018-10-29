@@ -5,6 +5,7 @@ import com.recomdata.export.SurvivalAnalysisFiles
 import com.recomdata.genepattern.JobStatus
 import com.recomdata.genepattern.WorkflowStatus
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.json.JSONObject
 import org.quartz.JobDataMap
 import org.quartz.JobDetail
@@ -15,6 +16,7 @@ import org.transmart.ExperimentData
 import org.transmart.HeatmapValidator
 import org.transmart.searchapp.AccessLog
 
+@Slf4j('logger')
 class GenePatternController {
     def quartzScheduler
     def genePatternService
@@ -33,9 +35,9 @@ class GenePatternController {
      */
     def runheatmap = {
 
-        //If debug mode is enabled, write all the parameters to the debug log.
-        if (log.isDebugEnabled()) {
-            request.getParameterMap().keySet().each { _key -> log.debug("${_key} -> ${request.getParameter(_key)}") }
+        //If debug mode is enabled, write all the parameters to the debug logger.
+        if (logger.isDebugEnabled()) {
+            request.getParameterMap().keySet().each { _key -> logger.debug("${_key} -> ${request.getParameter(_key)}") }
         }
 
         //Retrieve the parameters from the submitted form.
@@ -107,24 +109,24 @@ class GenePatternController {
         //Create the object which represents the gene pattern files we use to run the job.
         GenePatternFiles gpf = new GenePatternFiles()
 
-        // Get the user name so we can use it in the access log.
+        // Get the user name so we can use it in the access logger.
         def userName = springSecurityService.getPrincipal().username
 
-        //Create an entry in the access log.
+        //Create an entry in the access logger.
         def al = new AccessLog(username: userName, event: "Heatmap Analysis: ${analysis}, Job: ${jobName}", eventmessage: "RID1: ${rID1}, RID2: ${rID2}", accesstime: new java.util.Date())
         al.save()
 
         //Get the pathway name based on the id passed in.
         def pathway_name = derivePathwayName(analysis, request.getParameter("pathway_name"))
-        log.info("Pathway Name set to ${pathway_name}")
+        logger.info("Pathway Name set to ${pathway_name}")
 
         //We once again validate to make sure two subsets were selected when we run a Comparative Marker Analysis.
-        log.debug("Ensuring at least two subsets for comparative marker selection...")
+        logger.debug("Ensuring at least two subsets for comparative marker selection...")
         if (analysis == "Select" && (rID1 == null || rID2 == null)) {
             def error = "Comparative marker selection requires two subsets"
             jobResultsService[jobName]["Status"] = "Error"
             jobResultsService[jobName]["Exception"] = error
-            log.error(error)
+            logger.error(error)
             return
         }
 
@@ -133,7 +135,7 @@ class GenePatternController {
             return
         }
 
-        //Create stringwriters which we use for writing the query definition to the debug log.
+        //Create stringwriters which we use for writing the query definition to the debug logger.
         StringWriter def1 = new StringWriter()
         StringWriter def2 = new StringWriter()
 
@@ -141,10 +143,10 @@ class GenePatternController {
         i2b2HelperService.renderQueryDefinition(rID1, "Subset1", def1)
         i2b2HelperService.renderQueryDefinition(rID2, "Subset2", def2)
 
-        //Write the query definition to the log.
-        if (log.isDebugEnabled()) {
-            log.debug("def1: " + def1.toString())
-            log.debug("def2: " + def2.toString())
+        //Write the query definition to the logger.
+        if (logger.isDebugEnabled()) {
+            logger.debug("def1: " + def1.toString())
+            logger.debug("def2: " + def2.toString())
         }
 
         //This updates the status and checks to see if the job has been canceled.
@@ -156,10 +158,10 @@ class GenePatternController {
         def subjectIds1 = i2b2HelperService.getSubjects(rID1)
         def subjectIds2 = i2b2HelperService.getSubjects(rID2)
 
-        //If debug is enabled, write the subject IDs to the log.
-        if (log.isDebugEnabled()) {
-            log.debug("subjectIds1: ${subjectIds1}")
-            log.debug("subjectIds2: ${subjectIds2}")
+        //If debug is enabled, write the subject IDs to the logger.
+        if (logger.isDebugEnabled()) {
+            logger.debug("subjectIds1: ${subjectIds1}")
+            logger.debug("subjectIds2: ${subjectIds2}")
         }
 
         //This updates the status and checks to see if the job has been canceled.
@@ -171,10 +173,10 @@ class GenePatternController {
         def concepts1 = i2b2HelperService.getConcepts(rID1)
         def concepts2 = i2b2HelperService.getConcepts(rID2)
 
-        //If debug is enabled, write the concept IDs to the log.
-        if (log.isDebugEnabled()) {
-            log.debug("concepts1: ${concepts1}")
-            log.debug("concepts2: ${concepts2}")
+        //If debug is enabled, write the concept IDs to the logger.
+        if (logger.isDebugEnabled()) {
+            logger.debug("concepts1: ${concepts1}")
+            logger.debug("concepts2: ${concepts2}")
         }
 
         //If we are doing a Heatmap we need to address a "*" in the subject heading.
@@ -192,18 +194,18 @@ class GenePatternController {
                     rbmPanels1, rbmPanels2, datatype, gpf, fixlast, rawdata, analysis)
             def expfilename = System.getProperty("java.io.tmpdir") + File.separator + "datasetexplorer" + File.separator + gpf.getCSVFileName()
             session.expdsfilename = expfilename
-            log.info("Filename for export has been set to ${expfilename}")
+            logger.info("Filename for export has been set to ${expfilename}")
         } catch (Exception e) {
             def error = e.getMessage()
-            log.error("Exception: ${error}", e)
+            logger.error("Exception: ${error}", e)
             jobResultsService[jobName]["Status"] = "Error"
             jobResultsService[jobName]["Exception"] = error
             return
         }
 
-        log.debug("Checking to see if the user cancelled the job prior to running it")
+        logger.debug("Checking to see if the user cancelled the job prior to running it")
         if (jobResultsService[jobName]["Status"] == "Cancelled") {
-            log.warn("${jobName} has been cancelled")
+            logger.warn("${jobName} has been cancelled")
             return
         }
 
@@ -225,7 +227,7 @@ class GenePatternController {
         quartzScheduler.scheduleJob jobDetail, new SimpleTriggerImpl('triggerNow', group)
 
         ////println "WIP: Gene Pattern replacement"
-        // log.debug('WIP: Gene Pattern replacement')
+        // logger.debug('WIP: Gene Pattern replacement')
 
         JSONObject jsonResult = new JSONObject()
         jsonResult.put("jobName", jobName)
@@ -327,10 +329,10 @@ class GenePatternController {
         experimentData.writeGpFiles();
 
         //Verify user has not cancelled job.
-        log.debug("Checking to see if the user cancelled the job prior to running it")
+        logger.debug("Checking to see if the user cancelled the job prior to running it")
         def isCancelled = jobResultsService[jobName + ":Status"]
         if (isCancelled == "Cancelled") {
-            log.warn("${jobName} has been cancelled")
+            logger.warn("${jobName} has been cancelled")
             return
         }
 
@@ -355,7 +357,7 @@ class GenePatternController {
 
         quartzScheduler.scheduleJob jobDetail, new SimpleTriggerImpl('triggerNow', group)
         //   println "WIP: Gene Pattern replacement"
-        // log.debug('WIP: Gene Pattern replacement')
+        // logger.debug('WIP: Gene Pattern replacement')
 
         //We feed some text we got back from the job call back to the browser.
         JSONObject jsonResult = new JSONObject()
@@ -369,9 +371,9 @@ class GenePatternController {
      * Method that will run a survival analysis and is called asynchronously from the datasetexplorer
      */
     def runsurvivalanalysis = {
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             request.getParameterMap().keySet().each { _key ->
-                log.debug("${_key} -> ${request.getParameter(_key)}")
+                logger.debug("${_key} -> ${request.getParameter(_key)}")
             }
         }
 
@@ -425,15 +427,15 @@ class GenePatternController {
             i2b2HelperService.getSurvivalAnalysisData(concepts1, concepts2, subjectIds1, subjectIds2, saFiles)
         } catch (Exception e) {
             def error = e.getMessage()
-            log.error("Exception: ${error}", e)
+            logger.error("Exception: ${error}", e)
             jobResultsService[jobName]["Status"] = "Error"
             jobResultsService[jobName]["Exception"] = error
             return
         }
 
-        log.debug("Checking to see if the user cancelled the job prior to running it")
+        logger.debug("Checking to see if the user cancelled the job prior to running it")
         if (jobResultsService[jobName]["Status"] == "Cancelled") {
-            log.warn("${jobName} has been cancelled")
+            logger.warn("${jobName} has been cancelled")
             return
         }
 
@@ -458,7 +460,7 @@ class GenePatternController {
         asyncJobService.updateStatus(jobName, statusList[3])
         quartzScheduler.scheduleJob jobDetail, new SimpleTriggerImpl('triggerNow', group)
         //println "WIP: Gene Pattern replacement"
-        //log.debug('WIP: Gene Pattern replacement')
+        //logger.debug('WIP: Gene Pattern replacement')
         JSONObject jsonResult = new JSONObject()
         jsonResult.put("jobName", jobName)
         response.setContentType("text/json")
@@ -470,9 +472,9 @@ class GenePatternController {
      * Will run the haploviewer but does not use the Quartz job scheduler due to the need for the database connection
      */
     def runhaploviewer = {
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             request.getParameterMap().keySet().each { _key ->
-                log.debug("${_key} -> ${request.getParameter(_key)}")
+                logger.debug("${_key} -> ${request.getParameter(_key)}")
             }
         }
         def rID1 = nullCheck(request.getParameter("result_instance_id1"))
@@ -521,7 +523,7 @@ class GenePatternController {
             }
         } catch (Exception e) {
             def error = e.getMessage()
-            log.error("Exception: ${error}", e)
+            logger.error("Exception: ${error}", e)
             jobResultsService[jobName]["Status"] = "Error"
             jobResultsService[jobName]["Exception"] = error
         } finally {
@@ -537,9 +539,9 @@ class GenePatternController {
      * Will run the haploviewer but does not use the Quartz job scheduler due to the need for the database connection
      */
     def runhaploviewersample = {
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             request.getParameterMap().keySet().each { _key ->
-                log.debug("${_key} -> ${request.getParameter(_key)}")
+                logger.debug("${_key} -> ${request.getParameter(_key)}")
             }
         }
 
@@ -573,7 +575,7 @@ class GenePatternController {
         //Update to our initial status.
         asyncJobService.updateStatus(jobName, statusList[0])
 
-        //Log the action firing in our access log.
+        //Log the action firing in our access logger.
         def userName = springSecurityService.getPrincipal().username
         def al = new AccessLog(username: userName, event: "Haploview Job: ${jobName}", eventmessage: "Sample IDs JSON: ${sampleIdListJSON}, Genes: ${genes}", accesstime: new java.util.Date())
         al.save()
@@ -612,7 +614,7 @@ class GenePatternController {
                     }
         } catch (Exception e) {
             def error = e.getMessage()
-            log.error("Exception: ${error}", e)
+            logger.error("Exception: ${error}", e)
             jobResultsService[jobName]["Status"] = "Error"
             jobResultsService[jobName]["Exception"] = error
         } finally {
@@ -631,7 +633,7 @@ class GenePatternController {
             Class.forName('edu.mit.wi.haploview.HaploText').
                     newInstance(args)
         } catch (ClassNotFoundException e) {
-            log.error('Haploview class not found. It is not bundled anymore. ' +
+            logger.error('Haploview class not found. It is not bundled anymore. ' +
                     'You will need to add its jar as a dependency')
         }
     }
@@ -761,9 +763,9 @@ class GenePatternController {
      * Method that will run a survival analysis and is called asynchronously from the datasetexplorer
      */
     def runGwas = {
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             request.getParameterMap().keySet().each { _key ->
-                log.debug("${_key} -> ${request.getParameter(_key)}")
+                logger.debug("${_key} -> ${request.getParameter(_key)}")
             }
         }
 
@@ -811,15 +813,15 @@ class GenePatternController {
             i2b2HelperService.getGwasDataByPatient(subjectIds1, subjectIds2, chroms, gwasFiles);
         } catch (Exception e) {
             def error = e.getMessage()
-            log.error("Exception: ${error}", e)
+            logger.error("Exception: ${error}", e)
             jobResultsService[jobName]["Status"] = "Error"
             jobResultsService[jobName]["Exception"] = error
             return
         }
 
-        log.debug("Checking to see if the user cancelled the job prior to running it")
+        logger.debug("Checking to see if the user cancelled the job prior to running it")
         if (jobResultsService[jobName]["Status"] == "Cancelled") {
-            log.warn("${jobName} has been cancelled")
+            logger.warn("${jobName} has been cancelled")
             return
         }
 
@@ -838,7 +840,7 @@ class GenePatternController {
         asyncJobService.updateStatus(jobName, statusList[3])
 	quartzScheduler.scheduleJob(jobDetail, trigger)
         //println "WIP: Gene Pattern replacement"
-        //log.debug('WIP: Gene Pattern replacement')
+        //logger.debug('WIP: Gene Pattern replacement')
 
         JSONObject jsonResult = new JSONObject()
         jsonResult.put("jobName", jobName)
@@ -861,9 +863,9 @@ class GenePatternController {
      * @return null or the input argument if it is not null (or empty or undefined)
      */
     private String nullCheck(inputArg) {
-        log.debug("Input argument to nullCheck: ${inputArg}")
+        logger.debug("Input argument to nullCheck: ${inputArg}")
         if (inputArg == "undefined" || inputArg == "null" || inputArg == "") {
-            log.debug("Returning null in nullCheck")
+            logger.debug("Returning null in nullCheck")
             return null
         }
         return inputArg
@@ -877,18 +879,18 @@ class GenePatternController {
      * @return the pathway name, null or the search result
      */
     private String derivePathwayName(analysis, pathway_name) {
-        log.info("Derived pathway name as ${pathway_name}")
+        logger.info("Derived pathway name as ${pathway_name}")
         if (analysis != "Select" && analysis != "PCA") {
-            log.debug("Pathway name has been set to ${pathway_name}")
+            logger.debug("Pathway name has been set to ${pathway_name}")
             if (pathway_name == null || pathway_name.length() == 0 || pathway_name == "null") {
-                log.debug("Resetting pathway name to null")
+                logger.debug("Resetting pathway name to null")
                 pathway_name = null
             }
             boolean nativeSearch = grailsApplication.config.com.recomdata.search.genepathway == 'native'
-            log.debug("nativeSearch: ${nativeSearch}")
+            logger.debug("nativeSearch: ${nativeSearch}")
             if (!nativeSearch && pathway_name != null) {
                 pathway_name = SearchKeyword.get(Long.valueOf(pathway_name)).uniqueId;
-                log.debug("pathway_name has been set to a keyword ID: ${pathway_name}")
+                logger.debug("pathway_name has been set to a keyword ID: ${pathway_name}")
             }
         }
         return pathway_name

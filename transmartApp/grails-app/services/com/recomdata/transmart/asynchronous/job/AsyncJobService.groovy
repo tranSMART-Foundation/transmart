@@ -3,12 +3,14 @@ package com.recomdata.transmart.asynchronous.job
 import com.recomdata.transmart.domain.i2b2.AsyncJob
 import grails.transaction.Transactional
 import groovy.json.JsonSlurper
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
 import org.json.JSONArray
 import org.json.JSONObject
 import org.springframework.transaction.annotation.Propagation
 import org.transmartproject.core.users.User
 
+@Slf4j('logger')
 class AsyncJobService {
 
     boolean transactional = true
@@ -144,7 +146,7 @@ class AsyncJobService {
         jobResultsService[jobName] = [:]
         updateStatus(jobName, jobStatus)
 
-        log.debug("Sending ${jobName} back to the client")
+        logger.debug("Sending ${jobName} back to the client")
         JSONObject result = new JSONObject()
         result.put("jobName", jobName)
         result.put("jobStatus", jobStatus)
@@ -170,9 +172,9 @@ class AsyncJobService {
     def canceljob(jobName, group = null) {
         def jobStatus = "Cancelled"
         def result = null
-        log.debug("Attempting to delete ${jobName} from the Quartz scheduler")
+        logger.debug("Attempting to delete ${jobName} from the Quartz scheduler")
         result = quartzScheduler.deleteJob(jobName, group)
-        log.debug("Deletion attempt successful? ${result}")
+        logger.debug("Deletion attempt successful? ${result}")
 
         updateStatus(jobName, jobStatus)
 
@@ -203,10 +205,10 @@ class AsyncJobService {
         if (viewerURL != null) {
             def jobResultType = jobResultsService[jobName]["resultType"]
             if (jobResultType != null) result.put("resultType", jobResultType)
-            log.debug("${viewerURL} is being sent to the client")
+            logger.debug("${viewerURL} is being sent to the client")
             result.put("jobViewerURL", viewerURL)
             if (altViewerURL != null) {
-                log.debug("${altViewerURL} for Comparative Marker Selection")
+                logger.debug("${altViewerURL} for Comparative Marker Selection")
                 result.put("jobAltViewerURL", altViewerURL)
             }
             jobStatus = "Completed"
@@ -215,8 +217,8 @@ class AsyncJobService {
             result.put("resultType", jobType)
             jobStatus = "Completed"
         } else if (jobException != null) {
-            log.warn("An exception was thrown, passing this back to the user")
-            log.warn(jobException)
+            logger.warn("An exception was thrown, passing this back to the user")
+            logger.warn(jobException)
             result.put("jobException", jobException)
             jobStatus = "Error"
             errorType = "data"
@@ -230,7 +232,7 @@ class AsyncJobService {
 
         updateStatus(jobName, jobStatus, viewerURL, altViewerURL, jobResults)
 
-        //log.debug("Returning status: ${jobStatus} for ${jobName}")
+        //logger.debug("Returning status: ${jobStatus} for ${jobName}")
         result.put("jobStatus", jobStatus)
         result.put("errorType", errorType)
         result.put("jobName", jobName)
@@ -254,9 +256,9 @@ class AsyncJobService {
         def jobNameArray = jobName.split("-")
         def jobID = jobNameArray[-1]
 
-        //log.debug("Checking to see if the user cancelled the job")
+        //logger.debug("Checking to see if the user cancelled the job")
         if (jobResultsService[jobName]["Status"] == "Cancelled") {
-            log.warn("${jobName} has been cancelled")
+            logger.warn("${jobName} has been cancelled")
             retValue = true
         } else {
             jobResultsService[jobName]["Status"] = status
@@ -266,7 +268,7 @@ class AsyncJobService {
             def asyncJob = AsyncJob.get(Long.parseLong(jobID))
 
             // TimeDuration td = TimeCategory.minus(new Date(), asyncJob.lastRunOn)
-            //log.debug("Job has been running for ${td}}")
+            //logger.debug("Job has been running for ${td}}")
             //asyncJob.runTime = td
             asyncJob.jobStatus = status
             if (viewerURL && viewerURL != '') asyncJob.viewerURL = viewerURL

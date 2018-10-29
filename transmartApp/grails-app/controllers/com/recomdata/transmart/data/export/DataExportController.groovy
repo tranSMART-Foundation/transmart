@@ -1,6 +1,7 @@
 package com.recomdata.transmart.data.export
 
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.exceptions.AccessDeniedException
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.users.User
@@ -8,6 +9,7 @@ import org.transmartproject.core.users.User
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+@Slf4j('logger')
 class DataExportController {
 
     def exportService
@@ -133,7 +135,7 @@ class DataExportController {
         String jobUsername = extractUserFromJobName(jobName)
 
         if (jobUsername != loggedInUsername) {
-            log.warn("Denying access to job $jobName because the " +
+            logger.warn("Denying access to job $jobName because the " +
                     "corresponding username ($jobUsername) does not match " +
                     "that of the current user")
             throw new AccessDeniedException("Job $jobName was not started by " +

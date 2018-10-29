@@ -2,11 +2,11 @@ package org.transmartproject.export
 
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.springframework.stereotype.Component
 
 @Component
-@Log4j
+@Slf4j('logger')
 class HighDimExporterRegistry {
 
     protected Multimap<String, HighDimExporter> exporterRegistry = HashMultimap.create()
@@ -19,7 +19,7 @@ class HighDimExporterRegistry {
     void registerHighDimensionExporter(String exporterFormat,
                                        HighDimExporter exporter) {
         this.exporterRegistry.put(exporterFormat, exporter)
-        log.debug "Registered high dimensional exporter '$exporterFormat'"
+        logger.debug "Registered high dimensional exporter '$exporterFormat'"
     }
 
     /**

@@ -2,6 +2,7 @@
  * $Id: JubilantResNetService.groovy 10098 2011-10-19 18:39:32Z mmcduffie $
  */
 import com.recomdata.util.ariadne.*
+import groovy.util.logging.Slf4j
 import org.transmart.SearchResult
 
 import java.util.regex.Matcher
@@ -13,6 +14,7 @@ import java.util.regex.Pattern
  * @author $Author: mmcduffie $
  * @version $Revision: 10098 $
  */
+@Slf4j('logger')
 class JubilantResNetService {
     boolean transactional = false  // No need for this to be part of a transaction
 
@@ -95,7 +97,7 @@ class JubilantResNetService {
                 String source = searchResult.sourceComponent.trim()
                 String target = searchResult.targetComponent.trim()
                 if (intMisses.contains(source) || intMisses.contains(target)) {
-                    log.info("Source: " + source + " or target: " + target + " is missing...")
+                    logger.info("Source: " + source + " or target: " + target + " is missing...")
                     continue;
                 }
 
@@ -109,7 +111,7 @@ class JubilantResNetService {
                     sourceNode.setLocalId("N" + random.nextInt(RLIMIT))
                     srcURN = literatureQueryService.findGeneURN(source)
                     if (srcURN == null) {
-                        log.info("Missed Source: " + source)
+                        logger.info("Missed Source: " + source)
                         intMisses.add(source)
                         continue;
                     }
@@ -137,7 +139,7 @@ class JubilantResNetService {
                     targetNode.setLocalId("N" + random.nextInt(RLIMIT))
                     tgtURN = literatureQueryService.findGeneURN(target)
                     if (tgtURN == null) {
-                        log.info("Missed Target: " + target)
+                        logger.info("Missed Target: " + target)
                         intMisses.add(target)
                         continue;
                     }
@@ -209,11 +211,11 @@ class JubilantResNetService {
                         createAtt(control, "ControlType", "Expression")
                         createAtt(control, "Mechanism", "Splicing")
                     } else {
-                        log.warn("Unknown interaction mechanism found: " + searchResult.mechanism)
+                        logger.warn("Unknown interaction mechanism found: " + searchResult.mechanism)
                         createAtt(control, "ControlType", searchResult.mechanism)
                     }
                 } else {
-                    log.warn("Interaction mechanism is null, mapping relationship type to unknown")
+                    logger.warn("Interaction mechanism is null, mapping relationship type to unknown")
                     createAtt(control, "ControlType", "Unknown")
                 }
 
@@ -362,7 +364,7 @@ class JubilantResNetService {
                     String component = searchResult.reference.component.trim()
                     String disease = searchResult.reference.disease.trim()
                     if (altMisses.contains(component) || altMisses.contains(disease)) {
-                        log.info("Component: " + component + " or disease: " + disease + " is missing...")
+                        logger.info("Component: " + component + " or disease: " + disease + " is missing...")
                         continue;
                     }
 
@@ -376,7 +378,7 @@ class JubilantResNetService {
                         componentNode.setLocalId("N" + random.nextInt(RLIMIT))
                         cmpURN = literatureQueryService.findGeneURN(component)
                         if (cmpURN == null) {
-                            log.info("Missed Component: " + component)
+                            logger.info("Missed Component: " + component)
                             altMisses.add(component)
                             continue;
                         }
@@ -405,12 +407,12 @@ class JubilantResNetService {
                         if (searchResult.reference.diseaseMesh != null) {
                             disURN = literatureQueryService.findDiseaseURN(searchResult.reference.diseaseMesh.trim())
                         } else {
-                            log.info("DiseaseMesh is null, trying disease...")
+                            logger.info("DiseaseMesh is null, trying disease...")
                         }
                         if (disURN == null) {
                             disURN = literatureQueryService.findDiseaseURN(disease)
                             if (disURN == null) {
-                                log.info("Missed Disease: " + disease)
+                                logger.info("Missed Disease: " + disease)
                                 altMisses.add(disease)
                                 continue
                             }
@@ -449,11 +451,11 @@ class JubilantResNetService {
                         } else if ("PTM".compareToIgnoreCase(searchResult.alterationType) == 0) {
                             createAtt(control, "Mechanism", "Posttranslational modification")
                         } else {
-                            log.warn("Unknown alteration type: " + searchResult.alterationType)
+                            logger.warn("Unknown alteration type: " + searchResult.alterationType)
                             createAtt(control, "ControlType", searchResult.alterationType)
                         }
                     } else {
-                        log.warn("Alteration type is null, mapping relationship type to unknown")
+                        logger.warn("Alteration type is null, mapping relationship type to unknown")
                         createAtt(control, "ControlType", "Unknown")
                     }
 
@@ -656,7 +658,7 @@ class JubilantResNetService {
                     String inhibitor = searchResult.inhibitor.trim()
                     String component = searchResult.reference.component.trim()
                     if (inhMisses.contains(inhibitor) || inhMisses.contains(component)) {
-                        log.info("Inhibitor: " + inhibitor + " or component: " + component + " is missing...")
+                        logger.info("Inhibitor: " + inhibitor + " or component: " + component + " is missing...")
                         continue;
                     }
 
@@ -670,7 +672,7 @@ class JubilantResNetService {
                         inhibitorNode.setLocalId("N" + random.nextInt(RLIMIT))
                         inhURN = literatureQueryService.findSmallMolURN(inhibitor)
                         if (inhURN == null) {
-                            log.info("Missed Inhibitor: " + inhibitor)
+                            logger.info("Missed Inhibitor: " + inhibitor)
                             inhMisses.add(inhibitor)
                             continue;
                         }
@@ -698,7 +700,7 @@ class JubilantResNetService {
                         componentNode.setLocalId("N" + random.nextInt(RLIMIT))
                         cmpURN = literatureQueryService.findGeneURN(component)
                         if (cmpURN == null) {
-                            log.info("Missed Component: " + component)
+                            logger.info("Missed Component: " + component)
                             altMisses.add(component)
                             continue;
                         }
@@ -743,11 +745,11 @@ class JubilantResNetService {
                             createAtt(control, "ControlType", "Regulation")
                             createAtt(control, "Effect", "negative")
                         } else {
-                            log.warn("Unknown molecular effect: " + searchResult.effectMolecular)
+                            logger.warn("Unknown molecular effect: " + searchResult.effectMolecular)
                             createAtt(control, "ControlType", "Unknown")
                         }
                     } else {
-                        log.warn("Molecular effect is null, mapping relationship type to unknown")
+                        logger.warn("Molecular effect is null, mapping relationship type to unknown")
                         createAtt(control, "ControlType", "Unknown")
                     }
 

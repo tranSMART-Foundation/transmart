@@ -1,3 +1,4 @@
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.RandomStringUtils
 import org.codehaus.groovy.grails.exceptions.InvalidPropertyException
 import org.springframework.transaction.TransactionStatus
@@ -6,6 +7,7 @@ import org.transmart.searchapp.*
 /**
  * User controller.
  */
+@Slf4j('logger')
 class AuthUserController {
     /**
      * Dependency injection for the springSecurityService.
@@ -59,17 +61,17 @@ class AuthUserController {
             if (!(authPrincipal instanceof String) && authPrincipal.username == userName) {
                 flash.message = "You can not delete yourself, please login as another admin and try again"
             } else {
-                log.info("Deleting ${person.username} from the roles")
+                logger.info("Deleting ${person.username} from the roles")
                 Role.findAll().each { it.removeFromPeople(person) }
-                log.info("Deleting ${person.username} from secure access list")
+                logger.info("Deleting ${person.username} from secure access list")
                 AuthUserSecureAccess.findAllByAuthUser(person).each { it.delete() }
-                log.info("Deleting the gene signatures created by ${person.username}")
+                logger.info("Deleting the gene signatures created by ${person.username}")
                 try {
                     GeneSignature.findAllByCreatedByAuthUser(person).each { it.delete() }
                 } catch (InvalidPropertyException ipe) {
-                    log.warn("AuthUser properties in the GeneSignature domain need to be enabled")
+                    logger.warn("AuthUser properties in the GeneSignature domain need to be enabled")
                 }
-                log.info("Finally, deleting ${person.username}")
+                logger.info("Finally, deleting ${person.username}")
                 person.delete()
                 def msg = "$person.userRealName has been deleted."
                 flash.message = msg

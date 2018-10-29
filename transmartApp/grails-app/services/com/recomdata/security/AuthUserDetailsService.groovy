@@ -7,6 +7,7 @@ package com.recomdata.security
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.userdetails.GrailsUserDetailsService
+import groovy.util.logging.Slf4j
 import org.hibernate.criterion.CriteriaSpecification
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -19,6 +20,7 @@ import javax.annotation.Resource
  * domain classes to load users and roles.
  * See also GormUserDetailsService
  */
+@Slf4j('logger')
 class AuthUserDetailsService implements GrailsUserDetailsService {
 
     /* @Resource is required because this bean is declared in resources.groovy
@@ -64,7 +66,7 @@ class AuthUserDetailsService implements GrailsUserDetailsService {
                                    boolean ignoreCase = false)
             throws UsernameNotFoundException {
 
-        log.info "Attempting to find user for $property = $value"
+        logger.info "Attempting to find user for $property = $value"
 
         Class<?> userClass = grailsApplication.getDomainClass(
                 conf.userLookup.userDomainClassName).clazz
@@ -79,7 +81,7 @@ class AuthUserDetailsService implements GrailsUserDetailsService {
         def authorities = []
 
         if (!user) {
-            log.warn "User not found with $property = $value"
+            logger.warn "User not found with $property = $value"
             throw new UsernameNotFoundException("User not found",
                     "$property = $value")
         }
@@ -90,8 +92,8 @@ class AuthUserDetailsService implements GrailsUserDetailsService {
             }
         }
 
-        if (loadRoles && log.isDebugEnabled()) {
-            log.debug("Roles for user ${user.username} are: " +
+        if (loadRoles && logger.isDebugEnabled()) {
+            logger.debug("Roles for user ${user.username} are: " +
                     authorities.join(', ') ?: '(none)')
         }
 

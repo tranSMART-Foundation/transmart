@@ -3,6 +3,7 @@ package com.recomdata.transmart.data.export
 import com.recomdata.snp.SnpData
 import com.recomdata.transmart.data.export.exception.DataNotFoundException
 import groovy.json.JsonSlurper
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
 import org.springframework.transaction.annotation.Transactional
 import org.transmartproject.core.ontology.Study
@@ -10,6 +11,7 @@ import org.transmartproject.core.users.User
 
 import static org.transmartproject.core.users.ProtectedOperation.WellKnownOperations.EXPORT
 
+@Slf4j('logger')
 class DataExportService {
 
     boolean transactional = true
@@ -91,13 +93,13 @@ class DataExportService {
                                 )
                                 break
                             case highDimensionResourceService.knownTypes:
-                                log.info "Exporting " + selectedFile + " using core api"
+                                logger.info "Exporting " + selectedFile + " using core api"
 
                                 // For now we ignore the information about the platforms to 
                                 // export. All data that matches the selected concepts
                                 // is exported
                                 highDimDataTypes[subset][selectedFile].keySet().each { format ->
-                                    log.info "  Using format " + format
+                                    logger.info "  Using format " + format
                                     retVal = highDimExportService.exportHighDimData(jobName: jobDataMap.jobName,
                                             resultInstanceId: resultInstanceIdMap[subset],
                                             conceptKeys: selection[subset][selectedFile].selector,
@@ -106,7 +108,7 @@ class DataExportService {
                                             studyDir: studyDir
                                     )
                                 }
-                                log.info "Exported " + selectedFile + " using core api"
+                                logger.info "Exported " + selectedFile + " using core api"
 
                                 //filesDoneMap is used for building the Clinical Data query
                                 filesDoneMap.put('MRNA.TXT', new Boolean(true))
@@ -222,10 +224,10 @@ class DataExportService {
                                 def chromosomes = jobDataMap.get("chroms")
                                 def selectedSNPs = jobDataMap.get("selectedSNPs")
 
-                                log.trace("VCF Parameters")
-                                log.trace("selectedGenes:" + selectedGenes)
-                                log.trace("chromosomes:" + chromosomes)
-                                log.trace("selectedSNPs:" + selectedSNPs)
+                                logger.trace("VCF Parameters")
+                                logger.trace("selectedGenes:" + selectedGenes)
+                                logger.trace("chromosomes:" + chromosomes)
+                                logger.trace("selectedSNPs:" + selectedSNPs)
 
                                 //def IGVFolderLocation = jobTmpDirectory + File.separator + "subset1_${study}" + File.separator + "VCF" + File.separator
 

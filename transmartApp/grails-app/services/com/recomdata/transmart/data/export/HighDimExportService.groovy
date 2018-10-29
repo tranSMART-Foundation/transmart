@@ -1,6 +1,7 @@
 package com.recomdata.transmart.data.export
 
 import au.com.bytecode.opencsv.CSVWriter
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.dataquery.DataRow
 import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.assay.Assay
@@ -13,6 +14,7 @@ import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.ontology.OntologyTermTag
 import org.transmartproject.export.HighDimExporter
 
+@Slf4j('logger')
 class HighDimExportService {
 
     final static List<String> META_FILE_HEADER = ['Attribute', 'Description']
@@ -70,7 +72,7 @@ class HighDimExportService {
 
         def files = []
 
-        log.info("Start a HD data export job: ${jobName}")
+        logger.info("Start a HD data export job: ${jobName}")
 
         HighDimensionDataTypeResource dataTypeResource = highDimensionResourceService
                 .getSubResourceForType(args.dataType)
@@ -84,7 +86,7 @@ class HighDimExportService {
         }
 
         ontologyTerms.each { OntologyTerm term ->
-            log.info("[${jobName}] Start export for a term: ${term.key}")
+            logger.info("[${jobName}] Start export for a term: ${term.key}")
             if (!jobResultsService.isJobCancelled(jobName)) {
                 files.addAll(
                         exportForSingleNode(
@@ -131,7 +133,7 @@ class HighDimExportService {
             throw new RuntimeException("No exporter was found for ${dataTypeResource.dataTypeName} data type" +
                     " and ${format} file format.")
         } else if (exporters.size() > 1) {
-            log.warn("There are more than one exporter for ${dataTypeResource.dataTypeName} data type" +
+            logger.warn("There are more than one exporter for ${dataTypeResource.dataTypeName} data type" +
                     " and ${format} file format. Using first one: ${exporters?.getAt(0)}")
         }
 
@@ -139,22 +141,22 @@ class HighDimExportService {
 
         Projection projection = dataTypeResource.createProjection(exporter.projection)
 
-        if (log.debugEnabled) {
-            log.debug("[job=${jobName} key=${term.key}] " +
+        if (logger.debugEnabled) {
+            logger.debug("[job=${jobName} key=${term.key}] " +
                     "Retrieving the HD data for the term and a patient set: ${resultInstanceId}.")
         }
         TabularResult<AssayColumn, DataRow> tabularResult =
                 dataTypeResource.retrieveData(assayConstraints, [], projection)
 
         File nodeDataFolder = new File(studyDir, getRelativeFolderPathForSingleNode(term))
-        if (log.debugEnabled) {
-            log.debug("Create a node data folder: ${nodeDataFolder.path}.")
+        if (logger.debugEnabled) {
+            logger.debug("Create a node data folder: ${nodeDataFolder.path}.")
         }
         nodeDataFolder.mkdirs()
 
         try {
-            if (log.debugEnabled) {
-                log.debug("[job=${jobName} key=${term.key}] Export the HD data to the file.")
+            if (logger.debugEnabled) {
+                logger.debug("[job=${jobName} key=${term.key}] Export the HD data to the file.")
             }
             exporter.export(
                     tabularResult,
@@ -167,22 +169,22 @@ class HighDimExportService {
                         }
                         nodeDataFolder.mkdirs()
                         outputFiles << outputFile
-                        if (log.debugEnabled) {
-                            log.debug("Inflating the data file: ${outputFile.path}.")
+                        if (logger.debugEnabled) {
+                            logger.debug("Inflating the data file: ${outputFile.path}.")
                         }
                         outputFile.newOutputStream()
                     },
                     { jobResultsService.isJobCancelled(jobName) })
         } catch (RuntimeException e) {
-            log.error('Data export to the file has thrown an exception', e)
+            logger.error('Data export to the file has thrown an exception', e)
         } finally {
             tabularResult.close()
         }
 
         if (exportOptions.samples && !jobResultsService.isJobCancelled(jobName)) {
             if (tabularResult.indicesList) {
-                if (log.debugEnabled) {
-                    log.debug("[job=${jobName} key=${term.key}] Export the assays to the file.")
+                if (logger.debugEnabled) {
+                    logger.debug("[job=${jobName} key=${term.key}] Export the assays to the file.")
                 }
                 outputFiles << exportAssays(tabularResult.indicesList, nodeDataFolder)
             }
@@ -191,8 +193,8 @@ class HighDimExportService {
         if (exportOptions.platform && !jobResultsService.isJobCancelled(jobName)) {
             Set<Platform> platforms = tabularResult.indicesList*.platform
             if (platforms) {
-                if (log.debugEnabled) {
-                    log.debug("[job=${jobName} key=${term.key}] Export the platform to the file.")
+                if (logger.debugEnabled) {
+                    logger.debug("[job=${jobName} key=${term.key}] Export the platform to the file.")
                 }
                 outputFiles << exportPlatform(platforms, nodeDataFolder)
             }
@@ -201,8 +203,8 @@ class HighDimExportService {
         if (exportOptions.meta && !jobResultsService.isJobCancelled(jobName)) {
             def tagsMap = ontologyTermTagsResourceService.getTags([term] as Set, false)
             if (tagsMap && tagsMap[term]) {
-                if (log.debugEnabled) {
-                    log.debug("[job=${jobName} key=${term.key}] Export the tags to the file.")
+                if (logger.debugEnabled) {
+                    logger.debug("[job=${jobName} key=${term.key}] Export the tags to the file.")
                 }
                 outputFiles << exportMetaTags(tagsMap[term], nodeDataFolder)
             }

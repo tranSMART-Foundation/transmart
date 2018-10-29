@@ -1,7 +1,9 @@
 package fm
 
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class FmFolderJob {
 
     def fmFolderService
@@ -14,7 +16,7 @@ class FmFolderJob {
             try {
                 startDelay = Integer.parseInt(startDelay)
             } catch (NumberFormatException nfe) {
-                log.error("Folder job not initialized. Configuration not readable")
+                logger.error("Folder job not initialized. Configuration not readable")
             }
         } else {
             startDelay = null

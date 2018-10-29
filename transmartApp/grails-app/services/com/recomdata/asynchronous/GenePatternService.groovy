@@ -9,6 +9,7 @@ import com.recomdata.genepattern.JobStatus
 import com.sun.pdfview.PDFFile
 import com.sun.pdfview.PDFPage
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 import org.genepattern.client.GPClient
 import org.genepattern.webservice.JobResult
 import org.genepattern.webservice.Parameter
@@ -30,6 +31,8 @@ import java.util.List
  * @author $Author: mmcduffie $
  * @version $Revision: 10246 $
  */
+
+@Slf4j('logger')
 class GenePatternService implements Job {
     static scope = "session"
     GPClient gpClient = null
@@ -49,12 +52,12 @@ class GenePatternService implements Job {
 
         def jobDetail = jobExecutionContext.getJobDetail()
         def jobName = jobDetail.getName()
-        log.info("${jobName} has been triggered to run ")
+        logger.info("${jobName} has been triggered to run ")
 
         def jobDataMap = jobDetail.getJobDataMap()
-//        if (log.isDebugEnabled()) {
+//        if (logger.isDebugEnabled()) {
 //            jobDataMap.getKeys().each { _key ->
-//                log.debug("\t${_key} -> ${jobDataMap[_key]}")
+//                logger.debug("\t${_key} -> ${jobDataMap[_key]}")
 //            }
 //        }
 
@@ -72,9 +75,9 @@ class GenePatternService implements Job {
         def querySum1 = jobDataMap.get("querySum1")
         def querySum2 = jobDataMap.get("querySum2")
 
-        //log.debug("Checking to see if the user cancelled the job")
+        //logger.debug("Checking to see if the user cancelled the job")
         if (jobResultsService[jobName]["Status"] == "Cancelled") {
-            log.warn("${jobName} has been cancelled")
+            logger.warn("${jobName} has been cancelled")
             return
         }
 
@@ -97,10 +100,10 @@ class GenePatternService implements Job {
                 GwasFiles gwasFiles = jobDataMap.get("gwasFiles");
                 sResult = gwas(userName, jobName, gwasFiles, querySum1, querySum2);
             } else {
-                log.error("Analysis not implemented yet!")
+                logger.error("Analysis not implemented yet!")
             }
         } catch (WebServiceException wse) {
-            log.error("WebServiceException thrown executing job: " + wse.getMessage(), wse)
+            logger.error("WebServiceException thrown executing job: " + wse.getMessage(), wse)
             jobResultsService[jobName]["Exception"] = wse.getMessage()
             return
         }
@@ -113,12 +116,12 @@ class GenePatternService implements Job {
             jobResultsService[jobName]["Results"] = jobResults;
         } else {
             def viewerURL = gpURL + jresult[1].getJobNumber() + "?openVisualizers=true"
-            log.debug("URL for viewer: " + viewerURL)
+            logger.debug("URL for viewer: " + viewerURL)
             jobResultsService[jobName]["ViewerURL"] = viewerURL
 
             if (analysis == "Select") {
                 def altviewerURL = gpURL + jresult[2].getJobNumber() + "?openVisualizers=true"
-                log.debug("URL for second viewer: " + altviewerURL)
+                logger.debug("URL for second viewer: " + altviewerURL)
                 jobResultsService[jobName]["AltViewerURL"] = altviewerURL
             }
         }
@@ -133,7 +136,7 @@ class GenePatternService implements Job {
      */
     def updateStatus(jobName, status) {
         jobResultsService[jobName]["Status"] = status
-        log.debug(status)
+        logger.debug(status)
     }
 
     private JobResult runJob(Parameter[] parameters, String analysisType) throws WebServiceException {
@@ -141,7 +144,7 @@ class GenePatternService implements Job {
         JobResult result;
         startWorkflowJob(analysisType);
 
-        log.debug("sending " + analysisType
+        logger.debug("sending " + analysisType
                 + " job to " + gpClient.getServer()
                 + " as user " + gpClient.getUsername()
                 + " with parameters " + parameters);
@@ -152,20 +155,20 @@ class GenePatternService implements Job {
             throw new WebServiceException("User needs to be registered on the Gene Pattern server")
         }
 
-        log.debug("Response: " + result);
-        log.debug("job number: " + result.getJobNumber());
-        log.debug("job was run on: " + result.getServerURL());
-        log.debug("Files:\n")
+        logger.debug("Response: " + result);
+        logger.debug("job number: " + result.getJobNumber());
+        logger.debug("job was run on: " + result.getServerURL());
+        logger.debug("Files:\n")
         for (String f : result.getOutputFileNames()) {
-            log.debug("\t" + result.getURLForFileName(f) + "\n")
+            logger.debug("\t" + result.getURLForFileName(f) + "\n")
         }
-        log.debug("\tdone listing files");
-        log.debug("Parameters:");
+        logger.debug("\tdone listing files");
+        logger.debug("Parameters:");
         //for (Parameter p : result.getParameters()) {
-        //	log.trace("\t file" + p + "\n");
-        //	log.trace("\t url" + result.getURLForFileName(p) + "\n");
+        //	logger.trace("\t file" + p + "\n");
+        //	logger.trace("\t url" + result.getURLForFileName(p) + "\n");
         //}
-        log.debug("\tdone listing parameters");
+        logger.debug("\tdone listing parameters");
 
         if (result.hasStandardError()) {
             URL stderrFileURL = result.getURLForFileName("stderr.txt");
@@ -188,30 +191,30 @@ class GenePatternService implements Job {
      */
     private JobResult runJobNoWF(String userName, Parameter[] parameters, String analysisType) throws WebServiceException {
         GPClient gpClient = getGPClient(userName)
-        if (log.isDebugEnabled()) {
-            log.debug("Sending ${analysisType} job to ${gpClient.getServer()}")
-            log.debug("As user ${gpClient.getUsername()} with parameters: ")
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sending ${analysisType} job to ${gpClient.getServer()}")
+            logger.debug("As user ${gpClient.getUsername()} with parameters: ")
             for (parameter in parameters) {
-                log.debug("\t${parameter}")
+                logger.debug("\t${parameter}")
             }
         }
 
         JobResult result = gpClient.runAnalysis(analysisType, parameters)
-        if (log.isDebugEnabled()) {
-            log.debug("Response: ${result}")
-            log.debug("Job Number: ${result.getJobNumber()}")
-            log.debug("Run on server: ${result.getServerURL()}")
-            log.debug("Files:")
+        if (logger.isDebugEnabled()) {
+            logger.debug("Response: ${result}")
+            logger.debug("Job Number: ${result.getJobNumber()}")
+            logger.debug("Run on server: ${result.getServerURL()}")
+            logger.debug("Files:")
             for (filename in result.getOutputFileNames()) {
-                log.debug("\t${filename}")
-                log.debug("\t${result.getURLForFileName(filename)}")
+                logger.debug("\t${filename}")
+                logger.debug("\t${result.getURLForFileName(filename)}")
             }
         }
         if (result.hasStandardError()) {
-            log.error("Result has standard error")
+            logger.error("Result has standard error")
             URL stderrFileURL = result.getURLForFileName("stderr.txt");
             String stderrFile = (String) stderrFileURL.getContent();
-            log.error("${stderrFile}")
+            logger.error("${stderrFile}")
             throw new WebServiceException("${analysisType} failed: ${stderrFile}")
         }
         return result
@@ -269,12 +272,12 @@ class GenePatternService implements Job {
             viewParameters[3] = columnSize;
             viewParameters[4] = rowSize;
             viewParameters[5] = rowDescs;
-            log.debug("Run job to load the viewer")
+            logger.debug("Run job to load the viewer")
             viewed = runJobNoWF(userName, viewParameters, "HierarchicalClusteringImage");
         }
 
         JobResult[] toReturn = [preProcessed, viewed]
-        log.debug("Returning ${preProcessed} and ${viewed}")
+        logger.debug("Returning ${preProcessed} and ${viewed}")
 
         return toReturn
     }
@@ -293,7 +296,7 @@ class GenePatternService implements Job {
         try {
             nC = Integer.valueOf(nClusters)
         } catch (NumberFormatException nfe) {
-            log.warn("Cluster is not an integer ${nClusters}, using 1")
+            logger.warn("Cluster is not an integer ${nClusters}, using 1")
         }
         Parameter inputFilename = new Parameter("input.filename", gctFile);
         Parameter numberOfClusters = new Parameter("number.of.clusters", nC)
@@ -329,12 +332,12 @@ class GenePatternService implements Job {
             viewParameters[1] = columnSize;
             viewParameters[2] = rowSize;
             viewParameters[3] = rowDescs;
-            log.debug("Run job to load the viewer")
+            logger.debug("Run job to load the viewer")
             viewed = runJobNoWF(userName, viewParameters, "HeatMapImage");
         }
 
         JobResult[] toReturn = [preProcessed, viewed]
-        log.debug("Returning ${preProcessed} and ${viewed}")
+        logger.debug("Returning ${preProcessed} and ${viewed}")
 
         return toReturn
     }
@@ -366,19 +369,19 @@ class GenePatternService implements Job {
             updateStatus(jobName, "Running Heatmap Viewer")
             viewed = runJobNoWF(userName, viewParameters, "HeatMapViewer");
         } else {
-            log.debug("resultType = ${resultType}")
+            logger.debug("resultType = ${resultType}")
             Parameter inputDataset = new Parameter("input.dataset", gctURL);
             Parameter columnSize = new Parameter("column.size", 10);
             Parameter rowSize = new Parameter("row.size", 10);
             Parameter rowDescs = new Parameter("show.row.descriptions", "yes");
 
             Parameter[] viewParameters = [inputDataset, columnSize, rowSize, rowDescs]
-            log.debug("Run job to load the viewer")
+            logger.debug("Run job to load the viewer")
             viewed = runJobNoWF(userName, viewParameters, "HeatMapImage");
         }
 
         JobResult[] toReturn = [preprocessed, viewed]
-        log.debug("Returning ${preprocessed} and ${viewed}")
+        logger.debug("Returning ${preprocessed} and ${viewed}")
 
         return toReturn
     }
@@ -476,12 +479,12 @@ class GenePatternService implements Job {
             viewParameters[1] = columnSize;
             viewParameters[2] = rowSize;
             viewParameters[3] = rowDescs;
-            log.debug("Run job to load the viewer")
+            logger.debug("Run job to load the viewer")
             viewed = runJobNoWF(userName, viewParameters, "HeatMapImage");
         }
 
         JobResult[] toReturn = [extracted, viewed, cmsv]
-        log.debug("Returning ${extracted}, ${viewed} and ${cmsv}")
+        logger.debug("Returning ${extracted}, ${viewed} and ${cmsv}")
 
         return toReturn
     }
@@ -572,12 +575,12 @@ class GenePatternService implements Job {
             viewParameters[2] = rowSize;
             viewParameters[3] = rowDescs;
 
-            log.debug("Run job to load the viewer")
+            logger.debug("Run job to load the viewer")
             viewed = runJobNoWF(userName, viewParameters, "PCAViewer");
         }
 
         JobResult[] toReturn = [pcaResult, viewed]
-        log.debug("Returning ${pcaResult} and ${viewed}")
+        logger.debug("Returning ${pcaResult} and ${viewed}")
 
         return toReturn
     }
@@ -676,7 +679,7 @@ class GenePatternService implements Job {
         }
 
         JobResult[] toReturn = [extracted, viewed, cmsv]
-        log.debug("Returning ${extracted}, ${viewed} and ${cmsv}")
+        logger.debug("Returning ${extracted}, ${viewed} and ${cmsv}")
 
         return toReturn
     }
@@ -768,7 +771,7 @@ class GenePatternService implements Job {
         }
 
         JobResult[] toReturn = [pcaResult, viewed]
-        log.debug("Returning ${pcaResult} and ${viewed}")
+        logger.debug("Returning ${pcaResult} and ${viewed}")
 
         return toReturn
     }
@@ -930,8 +933,8 @@ class GenePatternService implements Job {
         try {
             imageFileName = convertPdfToPng(graphFile, imageTempPath);
         } catch (IOException ioe) {
-            log.warn(ioe.getMessage())
-            log.warn("GP server updated so PDF is no longer part of the results, just use png image file")
+            logger.warn(ioe.getMessage())
+            logger.warn("GP server updated so PDF is no longer part of the results, just use png image file")
         }
 
         def imageUrlPath = contextPath + imageTempDirName + "/" + imageFileName
@@ -1030,7 +1033,7 @@ class GenePatternService implements Job {
         if (gpClient != null) return gpClient;
 
         String userName = springSecurityService.getPrincipal().username
-        log.debug("starting genepattern client at " +
+        logger.debug("starting genepattern client at " +
                 Holders.config.com.recomdata.datasetExplorer.genePatternURL +
                 " as " + userName
         );
@@ -1038,7 +1041,7 @@ class GenePatternService implements Job {
         gpClient = new GPClient(
                 Holders.config.com.recomdata.datasetExplorer.genePatternURL,
                 userName);
-        log.debug("genepattern client initialized");
+        logger.debug("genepattern client initialized");
         return gpClient;
     }
 
@@ -1052,12 +1055,12 @@ class GenePatternService implements Job {
     public GPClient getGPClient(String userName) throws WebServiceException {
         def gpURL = Holders.config.com.recomdata.datasetExplorer.genePatternURL
         if (gpClient != null && userName.compareToIgnoreCase(gpClient.getUsername()) == 0) {
-            log.debug("GPClient is already initialized for ${userName}, returning existing client")
+            logger.debug("GPClient is already initialized for ${userName}, returning existing client")
             return gpClient
         }
-        log.debug("Starting GPClient at ${gpURL} as ${userName}")
+        logger.debug("Starting GPClient at ${gpURL} as ${userName}")
         gpClient = new GPClient(gpURL, userName)
-        log.debug("GPClient has been initialized")
+        logger.debug("GPClient has been initialized")
         return gpClient
     }
 

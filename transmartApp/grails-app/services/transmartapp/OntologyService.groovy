@@ -1,8 +1,10 @@
 package transmartapp
 
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmart.searchapp.AuthUser
 
+@Slf4j('logger')
 class OntologyService {
 
     boolean transactional = true
@@ -18,7 +20,7 @@ class OntologyService {
         if (searchterms?.size() == 0) {
             searchterms = null;
         }
-        log.trace("searching for:" + searchtags + " of type" + tagsearchtype + "with searchterms:" + searchterms?.join(","))
+        logger.trace("searching for:" + searchtags + " of type" + tagsearchtype + "with searchterms:" + searchterms?.join(","))
         def myCount = 0;
         def allSystemCds = []
         def visualAttrHiddenWild = '%H%';
@@ -53,7 +55,7 @@ class OntologyService {
             countQuery = countQuery.replace("_searchterms_", searchtermstring).replace("_accessionSearch_", accessionSearchString)
             nodeQuery = nodeQuery.replace("_searchterms_", searchtermstring).replace("_accessionSearch_", accessionSearchString)
 
-            log.debug(nodeQuery)
+            logger.debug(nodeQuery)
 
             myCount = i2b2.OntNode.executeQuery(countQuery)[0]
             myNodes = i2b2.OntNode.executeQuery(nodeQuery, [max: 100])
@@ -78,16 +80,16 @@ class OntologyService {
         myNodes.each { node ->
             //keys.add("\\"+node.id.substring(0,node.id.indexOf("\\",2))+node.id)
             keys.put(node.id, node.securitytoken)
-            log.trace(node.id + " security token:" + node.securitytoken)
+            logger.trace(node.id + " security token:" + node.securitytoken)
         }
         def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
         def access = i2b2HelperService.getAccess(keys, user);
-        log.trace(access as JSON)
+        logger.trace(access as JSON)
 
         if (returnType.equals("JSON")) {
             //build the JSON for the client
             myNodes.each { node ->
-                log.trace(node.id)
+                logger.trace(node.id)
                 def level = node.hlevel
                 def key = "\\" + node.id.substring(0, node.id.indexOf("\\", 2)) + node.id
                 def name = node.name
@@ -114,7 +116,7 @@ class OntologyService {
             }
 
             def result = [concepts: concepts, resulttext: resulttext]
-            log.trace(result as JSON)
+            logger.trace(result as JSON)
 
             return result
         } else if (returnType.equals("accession")) {

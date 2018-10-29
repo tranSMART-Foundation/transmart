@@ -2,6 +2,7 @@ package com.recomdata.transmart.data.export
 
 import com.recomdata.transmart.data.export.util.FileWriterUtil
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.Rserve.RConnection
@@ -14,6 +15,7 @@ import java.sql.ResultSet
 
 import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess
 
+@Slf4j('logger')
 class SnpDataService {
 
     boolean transactional = false
@@ -116,7 +118,7 @@ class SnpDataService {
         rs = pStmt.executeQuery()
         if (rs.next()) {
             if (rs.getInt(1) == 0) {
-                log.info("No copy number data for these cohorts. Skip copy number export")
+                logger.info("No copy number data for these cohorts. Skip copy number export")
                 return
             }
         }
@@ -127,11 +129,11 @@ class SnpDataService {
             try {
                 fetchSize = Integer.parseInt(rsize);
             } catch (Exception exs) {
-                log.warn("com.recomdata.plugins.resultSize is not set!");
+                logger.warn("com.recomdata.plugins.resultSize is not set!");
             }
         }
 
-        log.debug("Starting the long query to get cnv file information")
+        logger.debug("Starting the long query to get cnv file information")
 
         subjectIds.each { subjectId ->
             def PatientData patientData = patientDataMap.get(subjectId.toLong())
@@ -181,8 +183,8 @@ class SnpDataService {
             output?.close()
         }
 
-        log.debug("Finished the long query to get cnv file information")
-        log.debug("Starting the query to get platform")
+        logger.debug("Finished the long query to get cnv file information")
+        logger.debug("Starting the query to get platform")
 
         String platformQuery = """
 		SELECT dgi.title FROM de_subject_snp_dataset ssd
@@ -196,12 +198,12 @@ class SnpDataService {
         def platformName = firstRow.title
         if (StringUtils.isEmpty(platformName)) platformName = 'Output'
 
-        log.debug("Finished the query to get platform")
+        logger.debug("Finished the query to get platform")
 
         /**
          * R script invocation starts here
          */
-        log.debug("Invoking R for transformations")
+        logger.debug("Invoking R for transformations")
         RConnection c = new RConnection(Holders.config.RModules.host, Holders.config.RModules.port)
         //Set the working directory to be our temporary location.
         String workingDirectoryCommand = "setwd('${parentDir}')".replace("\\", "\\\\")
@@ -216,7 +218,7 @@ class SnpDataService {
         String pivotDataCommand = "PivotSNPCNVData.pivot('$subjectIdsStr', ',', '$parentDir', '$platformName')"
         //Run the R command to pivot the data in the clinical.i2b2trans file.
         REXP pivot = c.eval(pivotDataCommand)
-        log.debug("Finished R transformations")
+        logger.debug("Finished R transformations")
 
         c.close();
     }
@@ -260,8 +262,8 @@ class SnpDataService {
                 }
             }
         } catch (Exception e) {
-            log.info("Potential issue while exporting map file")
-            log.info(e.getMessage())
+            logger.info("Potential issue while exporting map file")
+            logger.info(e.getMessage())
         }
         finally {
             sql?.close()
@@ -529,7 +531,7 @@ class SnpDataService {
 
         sSelect.append(sTables.toString())
 
-        log.debug("SNP Query : " + sSelect.toString())
+        logger.debug("SNP Query : " + sSelect.toString())
 
         //Create objects we use to form JDBC connection.
         def Connection conn = null;
@@ -546,7 +548,7 @@ class SnpDataService {
             try {
                 fetchSize = Integer.parseInt(rsize);
             } catch (Exception exs) {
-                log.warn("com.recomdata.plugins.resultSize is not set!");
+                logger.warn("com.recomdata.plugins.resultSize is not set!");
             }
         }
 
@@ -643,7 +645,7 @@ class SnpDataService {
             pathway_name = pathwayGeneList.collect { SearchKeyword.get(Long.valueOf(it)).uniqueId }.join(",")
         }
 
-        log.debug("pathway_name has been set to a keyword ID: ${pathway_name}")
+        logger.debug("pathway_name has been set to a keyword ID: ${pathway_name}")
         return pathway_name
     }
 
@@ -671,7 +673,7 @@ class SnpDataService {
         pathwayS.append(convertStringToken(pathwayName));
 
         println("query to get genes from pathway: " + pathwayS.toString())
-        log.debug("query to get genes from pathway: " + pathwayS.toString());
+        logger.debug("query to get genes from pathway: " + pathwayS.toString());
 
         //Add genes to an array.
         def genesArray = [];

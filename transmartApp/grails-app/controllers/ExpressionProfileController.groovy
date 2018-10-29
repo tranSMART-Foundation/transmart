@@ -5,6 +5,7 @@
  *
  */
 
+import groovy.util.logging.Slf4j
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartRenderingInfo
 import org.jfree.chart.JFreeChart
@@ -24,6 +25,7 @@ import org.transmart.biomart.Disease
 
 import javax.servlet.ServletException
 
+@Slf4j('logger')
 public class ExpressionProfileController {
 
     def expressionProfileQueryService
@@ -34,7 +36,7 @@ public class ExpressionProfileController {
         session.searchFilter.exprProfileFilter.reset()
 
         // refresh experiment count
-        log.info ">> Count query:"
+        logger.info ">> Count query:"
         def profCount = expressionProfileQueryService.countExperiment(session.searchFilter)
 
         // initialize session with profile results
@@ -42,18 +44,18 @@ public class ExpressionProfileController {
         session.setAttribute("exprProfileResult", epr)
 
         // load genes and cache
-        log.info ">> Gene Query:"
+        logger.info ">> Gene Query:"
         def genes = expressionProfileQueryService.listBioMarkers(session.searchFilter)
         if (genes.size() > 0) session.searchFilter.exprProfileFilter.bioMarkerId = genes[0].id
-        log.info "... number genes: " + genes.size()
+        logger.info "... number genes: " + genes.size()
 
-        log.info ">> Diseases Query:"
+        logger.info ">> Diseases Query:"
         def diseases = expressionProfileQueryService.listDiseases(session.searchFilter)
         if (diseases != null && !diseases.isEmpty()) session.searchFilter.exprProfileFilter.bioDiseaseId = diseases[0].id
 
         def probesets = []
         if (genes != null && !genes.isEmpty() && diseases != null && !diseases.isEmpty()) {
-            log.info ">> Probesets Query:"
+            logger.info ">> Probesets Query:"
             probesets = expressionProfileQueryService.getProbesetsByBioMarker(genes[0], diseases[0]);
             session.searchFilter.exprProfileFilter.probeSet = probesets[0]
 
@@ -71,7 +73,7 @@ public class ExpressionProfileController {
     }
 
     def selectGene = {
-        log.info ">> selectGene:" + params.bioMarkerId
+        logger.info ">> selectGene:" + params.bioMarkerId
 
         // get profile results
         ExpressionProfileResult epr = session.exprProfileResult
@@ -100,7 +102,7 @@ public class ExpressionProfileController {
     }
 
     def selectDisease = {
-        log.info "select Disease:" + params.bioDiseaseId
+        logger.info "select Disease:" + params.bioDiseaseId
         bindData(session.searchFilter.exprProfileFilter, params)
 
         // get profile results
@@ -122,7 +124,7 @@ public class ExpressionProfileController {
     }
 
     def selectProbeset = {
-        log.info "select Probeset:" + params.probeSet
+        logger.info "select Probeset:" + params.probeSet
         bindData(session.searchFilter.exprProfileFilter, params)
 
         // only update graph
@@ -154,10 +156,10 @@ public class ExpressionProfileController {
             chartname = BioMarker.get(eFilter.bioMarkerId).name
         }
 
-        log.info ">> Boxplot query:"
+        logger.info ">> Boxplot query:"
         def allData = expressionProfileQueryService.queryStatisticsDataExpField(session.searchFilter);
         // don't create graph if no data
-        log.info "... number boxplot filter records: " + allData.size()
+        logger.info "... number boxplot filter records: " + allData.size()
         if (allData.size() == 0) {
             epr.graphURL = "empty"
             epr.datasetItems = null
@@ -222,7 +224,7 @@ public class ExpressionProfileController {
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         rangeAxis.setLowerBound(chartMinVal - 0.5);
         rangeAxis.setUpperBound(chartMaxVal + 0.5)
-        log.info "INFO: calculated info ... lowest val: " + chartMinVal + "; highest val: " + chartMaxVal
+        logger.info "INFO: calculated info ... lowest val: " + chartMinVal + "; highest val: " + chartMaxVal
 
         plot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_RIGHT);
         BoxAndWhiskerRenderer rend = (BoxAndWhiskerRenderer) plot.getRenderer();
@@ -233,7 +235,7 @@ public class ExpressionProfileController {
         ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection());
         String filename = ServletUtilities.saveChartAsJPEG(chart, 800, height, info, session);
         String graphURL = request.getContextPath() + "/expressionProfile/displayChart?filename=" + filename;
-        log.info graphURL
+        logger.info graphURL
 
         // store results
         epr.graphURL = graphURL
@@ -243,7 +245,7 @@ public class ExpressionProfileController {
     def displayChart = {
 
         String filename = request.getParameter("filename");
-        // log.info "Trying to display:"+filename
+        // logger.info "Trying to display:"+filename
         if (filename != null) {
 
             //  Replace ".." with ""

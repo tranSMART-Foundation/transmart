@@ -11,10 +11,12 @@ import com.recomdata.util.DomainObjectExcelHelper
 import com.recomdata.util.ElapseTimer
 import fm.FmFolder
 import fm.FmFolderAssociation
+import groovy.util.logging.Slf4j
 import org.transmart.SearchResult
 import org.transmart.biomart.BioAssayAnalysis
 import org.transmart.biomart.Experiment
 
+@Slf4j('logger')
 class ExperimentAnalysisController {
 
     def experimentAnalysisQueryService
@@ -32,18 +34,18 @@ class ExperimentAnalysisController {
 
         def datasources = []
         def stimer = new ElapseTimer();
-        //log.info ">> Compound query:"
+        //logger.info ">> Compound query:"
         def compounds = filterQueryService.experimentCompoundFilter("Experiment");
 
-        //log.info ">> Diseases query:"
+        //logger.info ">> Diseases query:"
         def diseases = filterQueryService.findExperimentDiseaseFilter(session.searchFilter, "Experiment");
         //if(diseases==null) diseases=[]
-        //log.info "diseases: " + diseases)
+        //logger.info "diseases: " + diseases)
 
-        //log.info ">> Exp designs query:"
+        //logger.info ">> Exp designs query:"
         def expDesigns = experimentAnalysisQueryService.findExperimentDesignFilter(filter)
         if (expDesigns == null) expDesigns = []
-        //log.info "expDesigns: " + expDesigns
+        //logger.info "expDesigns: " + expDesigns
 
         // no data?
         def celllines = [] //GeneExprAnalysis.executeQuery(queryCellLines.toString(),filter.gids)
@@ -63,7 +65,7 @@ class ExperimentAnalysisController {
         session.searchFilter.datasource = "experiment"
         bindData(session.searchFilter.expAnalysisFilter, params)
 
-        //  log.info params
+        //  logger.info params
         searchService.doResultCount(sResult, session.searchFilter)
         render(view: '/search/list', model: [searchresult: sResult, page: false])
     }
@@ -73,10 +75,10 @@ class ExperimentAnalysisController {
      */
     def datasourceResult = {
         //def diseases = experimentAnalysisQueryService.findExperimentDiseaseFilter(session.searchFilter, "Experiment");
-        //log.info diseases
+        //logger.info diseases
         def stimer = new ElapseTimer();
 
-        //	log.info params
+        //	logger.info params
         def max = grailsApplication.config.com.recomdata.search.paginate.max
         def paramMap = searchService.createPagingParamMap(params, max, 0)
 
@@ -102,7 +104,7 @@ class ExperimentAnalysisController {
      */
     def datasourceResultTEA = {
         //def diseases = experimentAnalysisQueryService.findExperimentDiseaseFilter(session.searchFilter, "Experiment");
-        //log.info diseases
+        //logger.info diseases
         def stimer = new ElapseTimer();
 
         def max = grailsApplication.config.com.recomdata.search.paginate.max
@@ -145,8 +147,8 @@ class ExperimentAnalysisController {
     }
 
     def expDetail = {
-        log.info "** action: expDetail called!"
-        log.info params
+        logger.info "** action: expDetail called!"
+        logger.info params
         def expid = params.id
         def expaccession = params.accession
 
@@ -156,7 +158,7 @@ class ExperimentAnalysisController {
         } else {
             exp = Experiment.findByAccession(expaccession)
         }
-        log.info "exp.id = " + exp.id
+        logger.info "exp.id = " + exp.id
         def platforms = experimentAnalysisQueryService.getPlatformsForExperment(exp.id);
         def organisms = new HashSet()
         for (pf in platforms) {
@@ -167,11 +169,11 @@ class ExperimentAnalysisController {
 
         def parent = FmFolderAssociation.findByObjectUid(expid)
 
-        log.info "Parent = " + parent
+        logger.info "Parent = " + parent
 
 //		def analysisFolders = FmFolder.executeQuery("from FmFolder as fd where fd.folderType = :folderType and fd.folderLevel = :level and fd.folderFullName like '" + parent.folderFullName + "%' escape '*' order by folderName", [folderType: FolderType.ANALYSIS.name(), level: parent.folderLevel + 1])
 
-//		log.info "Subfolders = " + analysisFolders
+//		logger.info "Subfolders = " + analysisFolders
 
         ExportTableNew table;
 
@@ -228,7 +230,7 @@ class ExperimentAnalysisController {
 
         request.getSession().setAttribute("gridtable", table);
 
-        log.info "formLayout = " + formLayout
+        logger.info "formLayout = " + formLayout
         render(template: '/experiment/expDetail', model: [layout: formLayout, experimentInstance: exp, expPlatforms: platforms, expOrganisms: organisms, search: 1, jSONForGrid: jSONToReturn2, jSONForGrid1: jSONToReturn1])
     }
 
@@ -281,12 +283,12 @@ class ExperimentAnalysisController {
             int nextIdx = it.nextIndex()
             if (nextIdx > lastIndex) break;
         }
-        log.info("Paged data: start Idx: " + offset + "; last idx: " + lastIndex + " ; size: " + pagedData.size())
+        logger.info("Paged data: start Idx: " + offset + "; last idx: " + lastIndex + " ; size: " + pagedData.size())
         return pagedData;
     }
 
     def downloadAnalysis = {
-        log.info("Downloading the Experimental Analysis (Study) view");
+        logger.info("Downloading the Experimental Analysis (Study) view");
         def sResult = new SearchResult()
         def analysisRS = null
         def eaMap = [:]
@@ -300,7 +302,7 @@ class ExperimentAnalysisController {
     }
 
     def downloadAnalysisTEA = {
-        log.info("Downloading the Experimental Analysis TEA view");
+        logger.info("Downloading the Experimental Analysis TEA view");
         def sResult = new SearchResult()
 
         sResult.result = experimentAnalysisTEAService.queryExpAnalysis(session.searchFilter, null)

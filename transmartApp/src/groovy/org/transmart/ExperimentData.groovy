@@ -1,12 +1,14 @@
 package org.transmart
 
 import com.recomdata.export.GenePatternFiles
+import groovy.util.logging.Slf4j
 import i2b2.SampleInfo
 import org.springframework.context.ApplicationContext
 
 import java.sql.ResultSet
 import java.sql.Statement
 
+@Slf4j('logger')
 public class ExperimentData {
 
     ApplicationContext ctx = org.codehaus.groovy.grails.web.context.ServletContextHolder.getServletContext().getAttribute(org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes.APPLICATION_CONTEXT)
@@ -83,7 +85,7 @@ public class ExperimentData {
             experimentDataQuery = createProteinHeatmapQuery(pathwayName, distinctSubjectIds1, distinctSubjectIds2, concepts1, concepts2, timepoints1, timepoints2);
         }
 
-        //log.debug("mRNA heatmap query: " + query);
+        //logger.debug("mRNA heatmap query: " + query);
 
     }
 
@@ -179,7 +181,7 @@ public class ExperimentData {
 
         //We need to get the list of columns. The list of columns is based on what we name them in the subquery creation methods below. Which is subject ID.
         columns = listHeatmapColumnsFromMap("probeset", "S", true) + ", star"
-        //log.debug("SELECT: " + columns)
+        //logger.debug("SELECT: " + columns)
 
         //This will be our counter which we use to build the prefix.
         int subsetCounter = 1;
@@ -292,7 +294,7 @@ public class ExperimentData {
         if (pathwayName != null && pathwayName.length() > 0) {
             s.append(" AND b.gene_id IN (").append(genes).append(")");
         }
-        //log.debug(s.toString());
+        //logger.debug(s.toString());
         return s.toString();
     }
 
@@ -519,12 +521,12 @@ public class ExperimentData {
             String sample1,
             String sample2,
             String intensityType) throws Exception {
-        //log.debug("mRNA: called with ids1=" + ids1 + " and ids2=" + ids2);
+        //logger.debug("mRNA: called with ids1=" + ids1 + " and ids2=" + ids2);
 
         String columns = null;
 
         columns = listHeatmapColumns("probeset", ids1, ids2, "S1_", "S2_") + ", star"
-        //log.debug("SELECT: " + columns)
+        //logger.debug("SELECT: " + columns)
 
         String s1;
         String s2;
@@ -611,7 +613,7 @@ public class ExperimentData {
         if (pathwayName != null && pathwayName.length() > 0) {
             s.append(" AND b.gene_id IN (").append(genes).append(")");
         }
-        //log.debug(s.toString());
+        //logger.debug(s.toString());
         return s.toString();
     }
 
@@ -621,10 +623,10 @@ public class ExperimentData {
         StringBuilder s = new StringBuilder();
         String genes;
 
-        //log.debug("Pathway: " + pathwayName)
+        //logger.debug("Pathway: " + pathwayName)
         if (pathwayName != null && pathwayName.length() > 0 && "SHOWALLANALYTES".compareToIgnoreCase(pathwayName) != 0) {
             genes = getGenes(pathwayName);
-            //log.debug("Genes obtained for given pathway: " + genes)
+            //logger.debug("Genes obtained for given pathway: " + genes)
         }
 
         if (timepoint == null || timepoint.length() == 0) {
@@ -650,24 +652,24 @@ public class ExperimentData {
             s.append(" AND t1.gene_id IN (").append(genes).append(")");
         }
 
-        //log.debug(s.toString());
+        //logger.debug(s.toString());
         return s.toString();
     }
 
 
     def String createProteinHeatmapQuery(String prefix, String pathwayName, String ids, String concepts, String timepoint) {
 
-        //log.debug("createProteinHeatmapQuery called with concepts = " + concepts);
+        //logger.debug("createProteinHeatmapQuery called with concepts = " + concepts);
 
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 
         String cntQuery = "SELECT COUNT(*) as N FROM DE_SUBJECT_SAMPLE_MAPPING WHERE concept_code IN (" + quoteCSV(concepts) + ")";
 
-        //log.debug("createProteinHeatmapQuery created cntQuery = " + cntQuery);
+        //logger.debug("createProteinHeatmapQuery created cntQuery = " + cntQuery);
 
         Integer cnt;
 
-        //log.debug("createProteinHeatmapQuery defined cnt = " + cntQuery);
+        //logger.debug("createProteinHeatmapQuery defined cnt = " + cntQuery);
 
 
         sql.query(cntQuery)
@@ -676,9 +678,9 @@ public class ExperimentData {
                         while (rs.next()) cnt = rs.toRowResult().N;
                 }
 
-        //log.debug("createProteinHeatmapQuery executed query to get count");
+        //logger.debug("createProteinHeatmapQuery executed query to get count");
 
-        //log.debug("createProteinHeatmapQuery cnt=" + cnt);
+        //logger.debug("createProteinHeatmapQuery cnt=" + cnt);
 
         StringBuilder s = new StringBuilder();
 
@@ -739,17 +741,17 @@ public class ExperimentData {
                 s.append("a.patient_id IN (" + ids + ")");
             }
         }
-        //log.debug("createProteinHeatmapQuery complete:" + s.toString() );
-        // log.debug(s.toString());
+        //logger.debug("createProteinHeatmapQuery complete:" + s.toString() );
+        // logger.debug(s.toString());
         return s.toString();
     }
 
     def String createProteinHeatmapQuery(String pathwayName, String ids1, String ids2, String concepts1, String concepts2, String timepoint1, String timepoint2) {
-        //log.debug("Protein: called with ids1=" + ids1 + " and ids2=" + ids2);
+        //logger.debug("Protein: called with ids1=" + ids1 + " and ids2=" + ids2);
 
         String columns = listHeatmapColumns("component", ids1, ids2, "S1_", "S2_") + ", star"
 
-        //log.debug("Protein SELECT: " + columns)
+        //logger.debug("Protein SELECT: " + columns)
 
         String s1;
         String s2;
@@ -764,7 +766,7 @@ public class ExperimentData {
 
         String subjects = getSubjectSelectColumns(ids1, ids2, "S1_", "S2_") + ", '*' as star";
 
-        //log.debug("Protein Pivot: " + subjects)
+        //logger.debug("Protein Pivot: " + subjects)
 
         String r;
         if (s1 != null)
@@ -780,11 +782,11 @@ public class ExperimentData {
 
 
     def String createRBMHeatmapQuery(String pathwayName, String ids1, String ids2, String concepts1, String concepts2, String timepoint1, String timepoint2, String rbmPanels1, String rbmPanels2) {
-        //log.debug("RBM: called with ids1=" + ids1 + " and ids2=" + ids2);
+        //logger.debug("RBM: called with ids1=" + ids1 + " and ids2=" + ids2);
 
         String columns = listHeatmapColumns("antigen_name", ids1, ids2, "S1_", "S2_") + ", star"
 
-        //log.debug("SELECT: " + columns)
+        //logger.debug("SELECT: " + columns)
 
         String s1;
         String s2;
@@ -797,7 +799,7 @@ public class ExperimentData {
 
         String subjects = getSubjectSelectColumns(ids1, ids2, "S1_", "S2_") + ", '*' as star";
 
-        //log.debug("RBM: " + subjects)
+        //logger.debug("RBM: " + subjects)
 
         String r;
         if (s1 != null)
@@ -936,7 +938,7 @@ public class ExperimentData {
 
         assayS.append(" ORDER BY s.assay_id");
 
-        //log.debug("getAssayIds used this query: " + assayS.toString());
+        //logger.debug("getAssayIds used this query: " + assayS.toString());
 
         def assayIdsArray = [];
         sql.eachRow(assayS.toString(),
@@ -1038,7 +1040,7 @@ public class ExperimentData {
         trialQ.append(" where s.SAMPLE_ID in (").append(quoteCSV(ids)).append(")");
 
         //Log the trial query.
-        //log.debug("getTrialNameBySampleID used this query: " + trialQ.toString());
+        //logger.debug("getTrialNameBySampleID used this query: " + trialQ.toString());
 
         //This will be the list of trial names.
         String trialNames = "";
@@ -1108,7 +1110,7 @@ public class ExperimentData {
         StringBuilder trialQ = new StringBuilder("select distinct s.trial_name from de_subject_sample_mapping s ");
         trialQ.append(" where s.patient_id in (").append(ids).append(") and s.platform = 'MRNA_AFFYMETRIX'");
 
-        //log.debug("getTrialName used this query: " + trialQ.toString());
+        //logger.debug("getTrialName used this query: " + trialQ.toString());
 
         String trialNames = "";
         sql.eachRow(trialQ.toString(), { row ->
@@ -1174,7 +1176,7 @@ public class ExperimentData {
         }
         pathwayS.append(pathwayName.replaceAll("'", "''")).append("'");
 
-        //log.debug("query to get genes from pathway: " + pathwayS.toString());
+        //logger.debug("query to get genes from pathway: " + pathwayS.toString());
 
         def genesArray = [];
         sql.eachRow(pathwayS.toString(), { row ->

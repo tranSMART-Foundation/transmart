@@ -21,6 +21,7 @@ package org.transmart.audit
 
 import javax.annotation.Resource
 import grails.plugin.cache.Cacheable
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.exceptions.NoSuchResourceException
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.ontology.Study
@@ -28,6 +29,7 @@ import org.transmartproject.core.ontology.ConceptsResource
 import org.transmartproject.core.querytool.QueriesResource
 import org.transmartproject.core.querytool.QueryResult
 
+@Slf4j('logger')
 class StudyIdService {
 
     @Resource
@@ -59,16 +61,16 @@ class StudyIdService {
         }
         String studyId = ""
         try {
-            log.debug "Query study id for concept key: ${concept_key}"
+            logger.debug "Query study id for concept key: ${concept_key}"
             OntologyTerm term = conceptsResourceService.getByKey(concept_key)
             Study study = term?.study
             studyId = study?.id
             if (options?.studyConceptOnly && study?.ontologyTerm != term) {
                 studyId = null
             }
-            log.debug "Study id for concept key ${concept_key} is: ${studyId}"
+            logger.debug "Study id for concept key ${concept_key} is: ${studyId}"
         } catch(NoSuchResourceException e) {
-            log.warn "Resource not found: " +
+            logger.warn "Resource not found: " +
                     "ConceptResource.getByKey(${concept_key})"
         }
         studyId
@@ -78,11 +80,11 @@ class StudyIdService {
     Set<String> getStudyIdsForQueryId(Long queryId) {
         Set<String> result = []
         try {
-            log.debug "Query trials for query id: ${queryId}"
+            logger.debug "Query trials for query id: ${queryId}"
             QueryResult queryResult = queriesResourceService.getQueryResultFromId(queryId)
             result = queryResult.patients*.trial as Set
         } catch (NoSuchResourceException e) {
-            log.warn "Resource not found: " +
+            logger.warn "Resource not found: " +
                     "QueriesResource.getQueryResultFromId(${queryId})"
         }
         result
@@ -105,7 +107,7 @@ class StudyIdService {
                 queryId = queryId.trim()
                 if (!queryId.empty) {
                     if (!queryId.isLong()) {
-                        log.warn "Query id is not an integer: ${queryId}"
+                        logger.warn "Query id is not an integer: ${queryId}"
                     } else {
                         Long qId = queryId.toLong()
                         studyIds += getStudyIdsForQueryId(qId)

@@ -19,13 +19,13 @@ class OAuth2SyncService {
         def clients = grailsApplication.config.grails.plugin.springsecurity.oauthProvider.clients
 
         if (clients == false) {
-            log.debug('Clients list in config is false; will do no synchronization')
+            logger.debug('Clients list in config is false; will do no synchronization')
             return
         }
 
         clients.each { Map m ->
             if (!m['clientId']) {
-                log.error("Client data without clientId: $m")
+                logger.error("Client data without clientId: $m")
                 return
             }
 
@@ -36,7 +36,7 @@ class OAuth2SyncService {
             def dirty = false
             m.each { String prop, def value ->
                 if (Client.hasProperty(prop)) {
-                    log.error("Invalid property $prop in client definition $m")
+                    logger.error("Invalid property $prop in client definition $m")
                     return
                 }
 
@@ -60,7 +60,7 @@ class OAuth2SyncService {
             }
 
             if (dirty) {
-                log.info("Updating client ${m['clientId']}")
+                logger.info("Updating client ${m['clientId']}")
                 client.save(flush: true)
             }
         }
@@ -78,7 +78,7 @@ class OAuth2SyncService {
         }.deleteAll()
 
         if (n != 0) {
-            log.warn("Deleted $n OAuth2 clients")
+            logger.warn("Deleted $n OAuth2 clients")
         }
     }
 }

@@ -3,6 +3,7 @@ package transmartapp
 import fm.FmFolder
 import fm.FmFolderAssociation
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 import groovy.util.slurpersupport.NoChildren
 import groovy.util.slurpersupport.NodeChild
 import groovy.xml.StreamingMarkupBuilder
@@ -11,6 +12,7 @@ import org.transmart.biomart.BioMarker
 import org.transmart.biomart.BioMarkerExpAnalysisMV
 import org.transmartproject.db.support.InQuery
 
+@Slf4j('logger')
 class SolrFacetService {
 
     def ontologyService
@@ -326,7 +328,7 @@ class SolrFacetService {
                     folderId = idNode.text()
                     searchLog += "Got folder ID from SOLR folder result: " + folderId
                 } else {
-                    log.error "SolrFacetService.getAccessions: result node does not contain an id or folder"
+                    logger.error "SolrFacetService.getAccessions: result node does not contain an id or folder"
                 }
             }
 
@@ -351,7 +353,7 @@ class SolrFacetService {
         def result = new StreamingMarkupBuilder().bind {
             mkp.yield xml
         }
-        log.debug result
+        logger.debug result
 
         def resultNodes = xml.result.doc
 
@@ -370,7 +372,7 @@ class SolrFacetService {
                     folderId = idNode.text()
                     searchLog += "Got folder ID from SOLR folder result: " + folderId
                 } else {
-                    log.error "SolrFacetService.getFolderList: result node does not contain an id or folder"
+                    logger.error "SolrFacetService.getFolderList: result node does not contain an id or folder"
                 }
             }
 
@@ -378,7 +380,7 @@ class SolrFacetService {
             if (fmFolder != null) {
                 folderSearchList.push(fmFolder?.folderFullName)
             } else {
-                log.error "No folder found for unique ID: " + folderId
+                logger.error "No folder found for unique ID: " + folderId
             }
         }
 
@@ -635,7 +637,7 @@ class SolrFacetService {
      */
     def executeSOLRFacetedQuery = { solrRequestUrl, solrQueryParams, returnAnalysisIds ->
 
-        log.debug(solrQueryParams)
+        logger.debug(solrQueryParams)
 
         JSONObject facetCounts = new JSONObject()
 
@@ -694,7 +696,7 @@ class SolrFacetService {
             solrConnection.disconnect()
             return true
         } else {
-            log.error("SOLR update failed! Request url:" + solrRequestUrl + "  Response code:" + solrConnection.responseCode + "  Response message:" + solrConnection.responseMessage)
+            logger.error("SOLR update failed! Request url:" + solrRequestUrl + "  Response code:" + solrConnection.responseCode + "  Response message:" + solrConnection.responseMessage)
         }
 
     }

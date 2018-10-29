@@ -6,6 +6,7 @@
  */
 
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmart.GlobalFilter
 import org.transmart.SearchFilter
 import org.transmart.SearchResult
@@ -15,6 +16,7 @@ import org.transmart.searchapp.CustomFilter
 import org.transmart.searchapp.SearchKeyword
 import org.transmart.searchapp.SearchKeywordTerm
 
+@Slf4j('logger')
 public class SearchController {
     def sessionFactory
     def springSecurityService
@@ -110,7 +112,7 @@ public class SearchController {
                 keywords.add(k[0])
             }
         }
-        //	log.info "keywords size:"+keywords.size()
+        //	logger.info "keywords size:"+keywords.size()
 
         renderSearchKeywords(keywords)
     }
@@ -142,7 +144,7 @@ public class SearchController {
     def loadCurrentFilters = {
 
         def filters = session.searchFilter.globalFilter.getAllFilters()
-        log.info "SearchController.loadCurrentFilters() count = " + filters?.size()
+        logger.info "SearchController.loadCurrentFilters() count = " + filters?.size()
         renderSearchKeywords(filters)
 
     }
@@ -188,7 +190,7 @@ public class SearchController {
         def keywords = new LinkedHashSet()
         for (k in keywordResults) {
             keywords.add(k[0])
-        }        //log.info "keywords:"+keywords.size()
+        }        //logger.info "keywords:"+keywords.size()
         renderSearchKeywords(keywords)
     }
 
@@ -232,7 +234,7 @@ public class SearchController {
                     ssource = "";
                 }
                 itemlist.add([id: keyword.id, source: ssource, keyword: keyword.keyword, synonyms: syntext, category: category, display: display])
-                //				log.info "new Keyword(id:" + keyword.bioDataId + ", source:'" + ssource + "', keyword:'" + keyword.keyword +
+                //				logger.info "new Keyword(id:" + keyword.bioDataId + ", source:'" + ssource + "', keyword:'" + keyword.keyword +
                 //						"', synonyms:'" + syntext + "', category:'" + category + "', display:'" + display + "').save()"
             } else {
                 itemlist.add([id: keyword.id, source: "", keyword: keyword.keyword, synonyms: "", category: "TEXT", display: "Text"])
@@ -248,8 +250,8 @@ public class SearchController {
 
         def filter = session.searchFilter;
         def sResult = new SearchResult()
-        //	log.info "doSearch:"+params
-        //log.info "isTextOnly = " + filter.globalFilter.isTextOnly()
+        //	logger.info "doSearch:"+params
+        //logger.info "isTextOnly = " + filter.globalFilter.isTextOnly()
         SearchService.doResultCount(sResult, filter)
         filter.summaryWithLinks = createSummaryWithLinks(filter)
         filter.createPictorTerms()
@@ -286,7 +288,7 @@ public class SearchController {
      */
     def search = {
         def keyword
-        log.info "search: " + params
+        logger.info "search: " + params
 
         if (params.id != null && params.id.length() > 0) {
             keyword = getSearchKeyword(params.id)
@@ -499,7 +501,7 @@ public class SearchController {
         // get global filter
         GlobalFilter gfilter = filter.globalFilter;
 
-        //	log.info " we are in the summary links - "+searchText
+        //	logger.info " we are in the summary links - "+searchText
         def genes = createSummarySection(gfilter.CATEGORY_GENE, gfilter)
         def pathways = createSummarySection(gfilter.CATEGORY_PATHWAY, gfilter)
         def compounds = createSummarySection(gfilter.CATEGORY_COMPOUND, gfilter)

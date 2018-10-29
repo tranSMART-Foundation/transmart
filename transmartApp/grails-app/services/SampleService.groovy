@@ -1,3 +1,6 @@
+import groovy.util.logging.Slf4j
+
+@Slf4j('logger')
 class SampleService {
 
     def dataSource
@@ -31,8 +34,8 @@ class SampleService {
 
                 sampleSummary[currentCountVariable.value] = solrService.getFacetCountForField(currentCountVariable.key, result_instance_id, 'sample')
 
-                log.debug("Finished count for field ${currentCountVariable.value} - ${currentCountVariable.key}")
-                log.debug(sampleSummary[currentCountVariable.value])
+                logger.debug("Finished count for field ${currentCountVariable.value} - ${currentCountVariable.key}")
+                logger.debug(sampleSummary[currentCountVariable.value])
 
         }
 

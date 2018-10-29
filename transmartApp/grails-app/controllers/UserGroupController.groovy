@@ -2,12 +2,14 @@ import command.UserGroupCommand
 import grails.converters.JSON
 import grails.transaction.Transactional
 import grails.validation.ValidationException
+import groovy.util.logging.Slf4j
 import org.transmart.searchapp.AccessLog
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.Principal
 import org.transmart.searchapp.SecureObjectAccess
 import org.transmart.searchapp.UserGroup
 
+@Slf4j('logger')
 class UserGroupController {
 
     def dataSource
@@ -102,7 +104,7 @@ class UserGroupController {
 
             redirect action: "show", id: userGroupInstance.id
         } catch (ValidationException validationException) {
-            log.error validationException.localizedMessage, validationException
+            logger.error validationException.localizedMessage, validationException
             render view: 'create', model: [userGroupInstance: userGroupInstance]
         }
     }
@@ -231,7 +233,7 @@ class UserGroupController {
             {
                 UserGroupCommand fl ->
                     fl.errors.allErrors.each {
-                        log.error(it)
+                        logger.error(it)
                     }
                     def userGroupInstance = UserGroup.get(params.id)
                     def usersToRemoveIds = fl.userstoremove?.collect { it.toLong() }

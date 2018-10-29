@@ -4,6 +4,7 @@ import com.recomdata.export.SnpViewerFiles
 import com.recomdata.genepattern.JobStatus
 import com.recomdata.genepattern.WorkflowStatus
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.genepattern.webservice.JobResult
 import org.genepattern.webservice.WebServiceException
@@ -19,6 +20,7 @@ import org.transmart.searchapp.AccessLog
  * @version $Revision: 11302 $
  *
  */
+@Slf4j('logger')
 class AnalysisController {
 
     def index = {};
@@ -35,7 +37,7 @@ class AnalysisController {
 
     def heatmapvalidate = {
         def platform = "";
-        log.debug("Received heatmap validation request");
+        logger.debug("Received heatmap validation request");
         String resultInstanceID1 = request.getParameter("result_instance_id1");
         if (resultInstanceID1 != null && resultInstanceID1.length() == 0) {
             resultInstanceID1 = null;
@@ -46,10 +48,10 @@ class AnalysisController {
         }
 
         String analysis = request.getParameter("analysis");
-        log.debug("analysis type: " + analysis);
+        logger.debug("analysis type: " + analysis);
 
-        log.debug("\tresultInstanceID1: " + resultInstanceID1);
-        log.debug("\tresultInstanceID2: " + resultInstanceID2);
+        logger.debug("\tresultInstanceID1: " + resultInstanceID1);
+        logger.debug("\tresultInstanceID2: " + resultInstanceID2);
         def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: "DatasetExplorer-Before Heatmap", eventmessage: "RID1:" + resultInstanceID1 + " RID2:" + resultInstanceID2, accesstime: new java.util.Date())
         al.save()
         String pathwayName = request.getParameter("pathway_name");
@@ -137,7 +139,7 @@ class AnalysisController {
                               hv2.getAll('rbmpanelsLabels')
                       ],
                       markerType            : markerType];
-        //log.debug(result as JSON);
+        //logger.debug(result as JSON);
         render result as JSON;
     }
 
@@ -217,12 +219,12 @@ class AnalysisController {
 
 
         try {
-            log.debug("Received SNPViewer rendering request: " + request);
+            logger.debug("Received SNPViewer rendering request: " + request);
 
             String resultInstanceID1 = request.getParameter("result_instance_id1");
-            log.debug("\tresultInstanceID1: " + resultInstanceID1);
+            logger.debug("\tresultInstanceID1: " + resultInstanceID1);
             String resultInstanceID2 = request.getParameter("result_instance_id2");
-            log.debug("\tresultInstanceID2: " + resultInstanceID2);
+            logger.debug("\tresultInstanceID2: " + resultInstanceID2);
 
             String chroms = request.getParameter("chroms");
             if (chroms == null || chroms.trim().length() == 0) chroms = "ALL";
@@ -232,11 +234,11 @@ class AnalysisController {
             String snps = request.getParameter("snps");
 
             if (resultInstanceID1 == "undefined" || resultInstanceID1 == "null" || resultInstanceID1 == "") {
-                log.debug "\tresultInstanceID1 == undefined or null";
+                logger.debug "\tresultInstanceID1 == undefined or null";
                 resultInstanceID1 = null;
             }
             if (resultInstanceID2 == "undefined" || resultInstanceID2 == "null" || resultInstanceID2 == "") {
-                log.debug "\tresultInstanceID2 == undefined or null";
+                logger.debug "\tresultInstanceID2 == undefined or null";
                 resultInstanceID2 = null;
             }
 
@@ -306,14 +308,14 @@ class AnalysisController {
                                 "/gp/jobResults/" +
                                 jresult[1].getJobNumber() +
                                 "?openVisualizers=true";
-                log.debug("URL for viewer: " + viewerURL)
+                logger.debug("URL for viewer: " + viewerURL)
                 result.put("viewerURL", viewerURL);
 
                 result.put("snpGeneAnnotationPage", geneSnpPageBuf.toString());
 
-                log.debug("result: " + result);
+                logger.debug("result: " + result);
             } catch (JSONException e) {
-                log.error("JSON Exception: " + e.getMessage());
+                logger.error("JSON Exception: " + e.getMessage());
                 result.put("error", "JSON Exception: " + e.getMessage());
             }
         } finally {
@@ -335,7 +337,7 @@ class AnalysisController {
 
 
         try {
-            log.debug("Received SNPViewer rendering request: " + request);
+            logger.debug("Received SNPViewer rendering request: " + request);
 
             //Get parameters from the form.
             String chroms = request.getParameter("chroms");
@@ -454,14 +456,14 @@ class AnalysisController {
                                 "/gp/jobResults/" +
                                 jresult[1].getJobNumber() +
                                 "?openVisualizers=true";
-                log.debug("URL for viewer: " + viewerURL)
+                logger.debug("URL for viewer: " + viewerURL)
                 result.put("viewerURL", viewerURL);
 
                 result.put("snpGeneAnnotationPage", geneSnpPageBuf.toString());
 
-                log.debug("result: " + result);
+                logger.debug("result: " + result);
             } catch (JSONException e) {
-                log.error("JSON Exception: " + e.getMessage());
+                logger.error("JSON Exception: " + e.getMessage());
                 result.put("error", "JSON Exception: " + e.getMessage());
             }
         } finally {
@@ -482,12 +484,12 @@ class AnalysisController {
 
 
         try {
-            log.debug("Received IGV rendering request: " + request);
+            logger.debug("Received IGV rendering request: " + request);
 
             String resultInstanceID1 = request.getParameter("result_instance_id1");
-            log.debug("\tresultInstanceID1: " + resultInstanceID1);
+            logger.debug("\tresultInstanceID1: " + resultInstanceID1);
             String resultInstanceID2 = request.getParameter("result_instance_id2");
-            log.debug("\tresultInstanceID2: " + resultInstanceID2);
+            logger.debug("\tresultInstanceID2: " + resultInstanceID2);
 
             String chroms = request.getParameter("chroms");
             if (chroms == null || chroms.trim().length() == 0) chroms = "ALL";
@@ -497,11 +499,11 @@ class AnalysisController {
             String snps = request.getParameter("snps");
 
             if (resultInstanceID1 == "undefined" || resultInstanceID1 == "null" || resultInstanceID1 == "") {
-                log.debug "\tresultInstanceID1 == undefined or null";
+                logger.debug "\tresultInstanceID1 == undefined or null";
                 resultInstanceID1 = null;
             }
             if (resultInstanceID2 == "undefined" || resultInstanceID2 == "null" || resultInstanceID2 == "") {
-                log.debug "\tresultInstanceID2 == undefined or null";
+                logger.debug "\tresultInstanceID2 == undefined or null";
                 resultInstanceID2 = null;
             }
 
@@ -562,7 +564,7 @@ class AnalysisController {
                 }
             }
             catch (Exception e) {
-                log.error(e.getMessage(), e);
+                logger.error(e.getMessage(), e);
                 result.put("error", e.getMessage());
                 return;
             }
@@ -574,7 +576,7 @@ class AnalysisController {
                 jresult = genePatternService.igvViewer(igvFiles, null, null, userName);
             }
             catch (WebServiceException e) {
-                log.error(e.getMessage(), e);
+                logger.error(e.getMessage(), e);
                 result.put("error", "WebServiceException: " + e.getMessage());
                 return;
             }
@@ -589,14 +591,14 @@ class AnalysisController {
                                 "/gp/jobResults/" +
                                 jresult[1].getJobNumber() +
                                 "?openVisualizers=true";
-                log.debug("URL for viewer: " + viewerURL)
+                logger.debug("URL for viewer: " + viewerURL)
                 result.put("viewerURL", viewerURL);
 
                 result.put("snpGeneAnnotationPage", geneSnpPageBuf.toString());
 
-                log.debug("result: " + result);
+                logger.debug("result: " + result);
             } catch (JSONException e) {
-                log.error("JSON Exception: " + e.getMessage());
+                logger.error("JSON Exception: " + e.getMessage());
                 result.put("error", "JSON Exception: " + e.getMessage());
             }
         } finally {
@@ -617,7 +619,7 @@ class AnalysisController {
 
 
         try {
-            log.debug("Received IGV rendering request: " + request);
+            logger.debug("Received IGV rendering request: " + request);
 
             String genes = request.getParameter("genes");
             String geneAndIdListStr = request.getParameter("geneAndIdList");
@@ -738,14 +740,14 @@ class AnalysisController {
                                 "/gp/jobResults/" +
                                 jresult[1].getJobNumber() +
                                 "?openVisualizers=true";
-                log.debug("URL for viewer: " + viewerURL)
+                logger.debug("URL for viewer: " + viewerURL)
                 result.put("viewerURL", viewerURL);
 
                 result.put("snpGeneAnnotationPage", geneSnpPageBuf.toString());
 
-                log.debug("result: " + result);
+                logger.debug("result: " + result);
             } catch (JSONException e) {
-                log.error("JSON Exception: " + e.getMessage());
+                logger.error("JSON Exception: " + e.getMessage());
                 result.put("error", "JSON Exception: " + e.getMessage());
             }
         } finally {
@@ -766,12 +768,12 @@ class AnalysisController {
         session["workflowstatus"].addNewJob("PLINK");
 
         try {
-            log.debug("Received PLINK rendering request: " + request);
+            logger.debug("Received PLINK rendering request: " + request);
 
             String resultInstanceID1 = request.getParameter("result_instance_id1");
-            log.debug("\tresultInstanceID1: " + resultInstanceID1);
+            logger.debug("\tresultInstanceID1: " + resultInstanceID1);
             String resultInstanceID2 = request.getParameter("result_instance_id2");
-            log.debug("\tresultInstanceID2: " + resultInstanceID2);
+            logger.debug("\tresultInstanceID2: " + resultInstanceID2);
 
             String chroms = request.getParameter("chroms");
             if (chroms == null || chroms.trim().length() == 0) chroms = "ALL";
@@ -786,14 +788,14 @@ class AnalysisController {
             List<String> conceptCodeList2
 
             if (resultInstanceID1 == "undefined" || resultInstanceID1 == "null" || resultInstanceID1 == "") {
-                log.debug "\tresultInstanceID1 == undefined or null";
+                logger.debug "\tresultInstanceID1 == undefined or null";
                 resultInstanceID1 = null;
             } else {
                 conceptCodeList1 = i2b2HelperService.getConceptsAsList(resultInstanceID1)
             }
 
             if (resultInstanceID2 == "undefined" || resultInstanceID2 == "null" || resultInstanceID2 == "") {
-                log.debug "\tresultInstanceID2 == undefined or null";
+                logger.debug "\tresultInstanceID2 == undefined or null";
                 resultInstanceID2 = null;
             } else {
                 conceptCodeList2 = i2b2HelperService.getConceptsAsList(resultInstanceID2)
@@ -863,14 +865,14 @@ class AnalysisController {
                             "/gp/jobResults/" +
                             jresult[1].getJobNumber() +
                             "?openVisualizers=true";*/
-                log.debug("URL for viewer: " + viewerURL)
+                logger.debug("URL for viewer: " + viewerURL)
                 result.put("viewerURL", viewerURL);
 
                 result.put("snpGeneAnnotationPage", geneSnpPageBuf.toString());
 
-                log.debug("result: " + result);
+                logger.debug("result: " + result);
             } catch (JSONException e) {
-                log.error("JSON Exception: " + e.getMessage());
+                logger.error("JSON Exception: " + e.getMessage());
                 result.put("error", "JSON Exception: " + e.getMessage());
             }
 
@@ -909,11 +911,11 @@ class AnalysisController {
     }
 
     def showHaploviewGeneSelector = {
-        //log.debug("called test happleview")
+        //logger.debug("called test happleview")
         String resultInstanceID1 = request.getParameter("result_instance_id1");
-        //log.debug(resultInstanceID1)
+        //logger.debug(resultInstanceID1)
         String resultInstanceID2 = request.getParameter("result_instance_id2");
-        //log.debug("*"+resultInstanceID2+"*")
+        //logger.debug("*"+resultInstanceID2+"*")
         def genes1
         def genes2
         if (resultInstanceID1 != null && resultInstanceID1 != '') {
@@ -1097,7 +1099,7 @@ class AnalysisController {
  */
     def ajaxGetPathwaySearchBoxData = {
         String searchText = request.getParameter("query");
-        log.info("Obtaining pathways for " + searchText)
+        logger.info("Obtaining pathways for " + searchText)
 
         def pathways = [];
 

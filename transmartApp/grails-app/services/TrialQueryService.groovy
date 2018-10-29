@@ -1,5 +1,6 @@
 import com.recomdata.search.query.AssayAnalysisDataQuery
 import com.recomdata.search.query.Query
+import groovy.util.logging.Slf4j
 import org.transmart.*
 import org.transmart.biomart.BioAssayAnalysis
 import org.transmart.biomart.BioAssayAnalysisData
@@ -11,6 +12,7 @@ import org.transmart.biomart.ClinicalTrial
  * @version $Revision: 9178 $
  */
 
+@Slf4j('logger')
 class TrialQueryService {
 
     /**
@@ -134,7 +136,7 @@ class TrialQueryService {
 
         createTrialFilterCriteria(filter.trialFilter, query);
         def sql = query.generateSQL();
-        //log.info(">> TrialAnalysis query:\n"+sql);
+        //logger.info(">> TrialAnalysis query:\n"+sql);
 
         def result = null;
         def tResult = new TrialAnalysisResult(trial: ClinicalTrial.get(clinicalTrialId))

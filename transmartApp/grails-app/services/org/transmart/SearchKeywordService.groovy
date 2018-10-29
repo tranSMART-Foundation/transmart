@@ -1,5 +1,6 @@
 package org.transmart
 
+import groovy.util.logging.Slf4j
 import org.transmart.biomart.BioAssayPlatform
 import org.transmart.biomart.BioDataExternalCode
 import org.transmart.biomart.ConceptCode
@@ -13,6 +14,8 @@ import org.transmart.searchapp.SearchKeywordTerm
  * $Revision: 9178 $
  *
  */
+
+@Slf4j('logger')
 public class SearchKeywordService {
 
     def springSecurityService
@@ -49,7 +52,7 @@ public class SearchKeywordService {
 
     /** Finds all of the search categories pertaining to search keywords */
     def findSearchCategories() {
-        log.info "Finding all of the search categories..."
+        logger.info "Finding all of the search categories..."
 
         def c = SearchKeyword.createCriteria()
         def results = c.list {
@@ -59,7 +62,7 @@ public class SearchKeywordService {
             order("dataCategory", "asc")
         }
 
-        log.info("Categories found: " + results.size())
+        logger.info("Categories found: " + results.size())
 
         def categories = []
 
@@ -126,7 +129,7 @@ public class SearchKeywordService {
 
     /** Searches for all keywords for a given term (like %il%) */
     def findSearchKeywords(category, term, max) {
-        log.info "Finding matches for ${term} in ${category}"
+        logger.info "Finding matches for ${term} in ${category}"
 
         def user = springSecurityService.getPrincipal()
 
@@ -150,7 +153,7 @@ public class SearchKeywordService {
             }
 
             if (!user.isAdmin()) {
-                log.info("User is not an admin so filter out gene lists or signatures that are not public")
+                logger.info("User is not an admin so filter out gene lists or signatures that are not public")
                 or {
                     isNull("ownerAuthUserId")
                     eq("ownerAuthUserId", user.id)
@@ -161,7 +164,7 @@ public class SearchKeywordService {
             order("termLength", "asc")
             order("keywordTerm", "asc")
         }
-        log.info("Search keywords found: " + results.size())
+        logger.info("Search keywords found: " + results.size())
 
         def keywords = []
         def dupeList = []            // store category:keyword for a duplicate check until DB is cleaned up
@@ -174,10 +177,10 @@ public class SearchKeywordService {
             def dupeKey = sk.searchKeyword.displayDataCategory + ":" + sk.searchKeyword.keyword +
                     ":" + sk.searchKeyword.bioDataId
             if (dupeKey in dupeList) {
-                log.info "Found duplicate: " + dupeKey
+                logger.info "Found duplicate: " + dupeKey
                 continue
             } else {
-                log.info "Found new entry, adding to the list: " + dupeList
+                logger.info "Found new entry, adding to the list: " + dupeList
                 dupeList << dupeKey
             }
             ///////////////////////////////////////////////////////////////////////////////////
@@ -226,7 +229,7 @@ public class SearchKeywordService {
                 maxResults(max)
                 order("bioConceptCode", "asc")
             }
-            log.info("Bio concept code keywords found: " + results.size())
+            logger.info("Bio concept code keywords found: " + results.size())
 
             for (result in results) {
                 def m = [:]
@@ -259,7 +262,7 @@ public class SearchKeywordService {
                             maxResults(max)
                             order(cat.platformProperty, "asc")
                         }
-                        log.info("Platform " + cat.platformProperty + " keywords found: " + results.size())
+                        logger.info("Platform " + cat.platformProperty + " keywords found: " + results.size())
 
                         for (result in results) {
                             def m = [:]
@@ -284,7 +287,7 @@ public class SearchKeywordService {
 
     /** Searches for all keywords for a given term (like %il%) */
     def findSearchKeywords(category, term) {
-        log.info "Finding matches for ${term} in ${category}"
+        logger.info "Finding matches for ${term} in ${category}"
 
         def user = springSecurityService.getPrincipal()
 
@@ -306,7 +309,7 @@ public class SearchKeywordService {
             }
 
             if (!user.isAdmin()) {
-                log.info("User is not an admin so filter out gene lists or signatures that are not public")
+                logger.info("User is not an admin so filter out gene lists or signatures that are not public")
                 or {
                     isNull("ownerAuthUserId")
                     eq("ownerAuthUserId", user.id)
@@ -317,7 +320,7 @@ public class SearchKeywordService {
             order("termLength", "asc")
             order("keywordTerm", "asc")
         }
-        log.info("Search keywords found: " + results.size())
+        logger.info("Search keywords found: " + results.size())
 
         def keywords = []
         def dupeList = []            // store category:keyword for a duplicate check until DB is cleaned up
@@ -329,10 +332,10 @@ public class SearchKeywordService {
             // HACK:  Duplicate check until DB is cleaned up
             def dupeKey = sk.searchKeyword.displayDataCategory + ":" + sk.searchKeyword.keyword
             if (dupeKey in dupeList) {
-                log.info "Found duplicate: " + dupeKey
+                logger.info "Found duplicate: " + dupeKey
                 continue
             } else {
-                log.info "Found new entry, adding to the list: " + dupeList
+                logger.info "Found new entry, adding to the list: " + dupeList
                 dupeList << dupeKey
             }
             ///////////////////////////////////////////////////////////////////////////////////
@@ -440,36 +443,36 @@ public class SearchKeywordService {
     def updateGeneSignatureLink(GeneSignature gs, String domainKey, boolean bFlush) {
         // find keyword record
         SearchKeyword keyword = SearchKeyword.findByBioDataIdAndDataCategory(gs.id, domainKey)
-        log.info("updateGeneSignatureLink: domainKey ${domainKey} concept ${gs.foldChgMetricConceptCode.bioConceptCode} retrieved ${keyword}")
+        logger.info("updateGeneSignatureLink: domainKey ${domainKey} concept ${gs.foldChgMetricConceptCode.bioConceptCode} retrieved ${keyword}")
 
         // delete search keywords
         if (gs.deletedFlag || (domainKey == GeneSignature.DOMAIN_KEY_GL && gs.foldChgMetricConceptCode.bioConceptCode != 'NOT_USED') || (domainKey == GeneSignature.DOMAIN_KEY && gs.foldChgMetricConceptCode.bioConceptCode == 'NOT_USED')) {
-            log.info("updateGeneSignatureLink delete keyword")
+            logger.info("updateGeneSignatureLink delete keyword")
             if (keyword != null) keyword.delete(flush: bFlush)
         } else {
             // add if does not exist
             if (keyword == null) {
-                log.info("updateGeneSignatureLink create keyword")
+                logger.info("updateGeneSignatureLink create keyword")
                 keyword = createSearchKeywordFromGeneSig(gs, domainKey)
             } else {
                 // update keyword
-                log.info("updateGeneSignatureLink update keyword ${gs.name} ")
+                logger.info("updateGeneSignatureLink update keyword ${gs.name} ")
                 keyword.keyword = gs.name
                 keyword.ownerAuthUserId = gs.publicFlag ? null : gs.createdByAuthUser.id
                 keyword.terms.each {
-                    log.info("INFO: " + it)
+                    logger.info("INFO: " + it)
                     it.keywordTerm = gs.name.toUpperCase()
                     it.ownerAuthUserId = gs.publicFlag ? null : gs.createdByAuthUser.id
-                    //log.info("INFO: setting owner to: "+it.ownerAuthUserId)
+                    //logger.info("INFO: setting owner to: "+it.ownerAuthUserId)
                 }
             }
 
             keyword.validate()
             if (keyword.hasErrors()) {
-                log.info("WARN: SearchKeyword validation error!")
-                keyword.errors.each {log.info("keyword error: ${it}")}
+                logger.info("WARN: SearchKeyword validation error!")
+                keyword.errors.each {logger.info("keyword error: ${it}")}
             }
-            log.info("INFO: trying to save SearchKeyword")
+            logger.info("INFO: trying to save SearchKeyword")
             keyword.save(flush: bFlush)
         }
     }

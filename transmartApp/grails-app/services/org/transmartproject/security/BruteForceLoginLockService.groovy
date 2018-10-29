@@ -3,6 +3,7 @@ package org.transmartproject.security
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
+import groovy.util.logging.Slf4j
 import org.springframework.util.Assert
 
 import javax.annotation.PostConstruct
@@ -15,6 +16,7 @@ import java.util.concurrent.TimeUnit
  * idea taken from
  * http://www.grygoriy.com/blog/2012/10/06/prevent-brute-force-attack-with-spring-security/
  */
+@Slf4j('logger')
 class BruteForceLoginLockService {
 
     private Cache failedAttempts
@@ -40,7 +42,7 @@ class BruteForceLoginLockService {
      */
     def failLogin(String login) {
         def numberOfAttempts = failedAttempts.get(login)
-        log.debug "fail login ${login} previous number for failedAttempts $numberOfAttempts"
+        logger.debug "fail login ${login} previous number for failedAttempts $numberOfAttempts"
         failedAttempts.put(login, numberOfAttempts + 1)
     }
 
@@ -50,7 +52,7 @@ class BruteForceLoginLockService {
      */
     def loginSuccess(String login) {
         if (!isLocked(login)) {
-            log.debug "successful login for ${login}"
+            logger.debug "successful login for ${login}"
             failedAttempts.invalidate(login)
         }
     }

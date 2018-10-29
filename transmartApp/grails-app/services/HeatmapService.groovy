@@ -4,9 +4,11 @@
  * @version $Revision: 9178 $
  */
 import com.recomdata.search.query.AssayAnalysisDataQuery
+import groovy.util.logging.Slf4j
 import org.transmart.HeatmapDataValue
 import org.transmart.biomart.BioAssayAnalysisData
 
+@Slf4j('logger')
 public class HeatmapService {
     def trialQueryService
 
@@ -19,30 +21,30 @@ public class HeatmapService {
             searchAnalysisIds) {
 
         if (searchAnalysisIds == null || searchAnalysisIds.isEmpty()) {
-            log.warn("Search analysis IDS are null, returning null")
+            logger.warn("Search analysis IDS are null, returning null")
             return null
         }
 
         // TODO: Check heatmap filter to determine if it's 100 gene or not
-        log.info("Find all bioMarkers to be used in heatmaps")
-        log.info("Check for top gene")
+        logger.info("Find all bioMarkers to be used in heatmaps")
+        logger.info("Check for top gene")
 
         def resultList = null
         def total = 50
         if (searchTopGene) {
-            log.info("Run top genes heatmap")
+            logger.info("Run top genes heatmap")
             resultList = findTopBioMarkers(sfilter, method, dataType, total, searchAnalysisIds)
-            log.info("Total top genes:" + resultList.size())
+            logger.info("Total top genes:" + resultList.size())
         } else if (searchGeneList != null && searchGeneList.size() > 0) {
-            log.info("Run data search")
+            logger.info("Run data search")
             resultList = findHeatmapFilterBioMarker(sfilter, method, dataType, searchGeneList, searchAnalysisIds)
         } else {
-            log.info("Run global search")
+            logger.info("Run global search")
             resultList = findGlobalFilterBioMarker(sfilter, method, dataType)
         }
 
         if (resultList == null || resultList.isEmpty()) {
-            log.warn("Result list is empty from the search, returning null")
+            logger.warn("Result list is empty from the search, returning null")
             return null
         }
 
@@ -66,10 +68,10 @@ public class HeatmapService {
             dataQuery.addCondition(" baad.analysis.assayDataType = '" + dataType + "'")
 
         def tquery = dataQuery.generateSQL()
-        log.debug(tquery)
+        logger.debug(tquery)
 
         def dataList = BioAssayAnalysisData.executeQuery(tquery, ['analysisIds': searchAnalysisIds, 'ids': markerList, max: 2000])
-        log.info("Total found: " + dataList.size())
+        logger.info("Total found: " + dataList.size())
 
         def dataMarkerMap = [:]
         def markerId = null
@@ -122,7 +124,7 @@ public class HeatmapService {
         query.addGroupBy("baad_bm.id")
         query.addOrderBy("COUNT(DISTINCT baad.analysis.id) DESC")
         def q = query.generateSQL()
-        log.debug(q)
+        logger.debug(q)
 
         return BioAssayAnalysisData.executeQuery(q, [ids: searchAnalysisIds, max: total])
     }
@@ -147,7 +149,7 @@ public class HeatmapService {
         query.addGroupBy("baad_bm.id")
         query.addOrderBy("COUNT(DISTINCT baad.analysis.id) DESC")
         def q = query.generateSQL()
-        log.debug(q)
+        logger.debug(q)
 
         return BioAssayAnalysisData.executeQuery(q, [max: 100])
     }
@@ -173,7 +175,7 @@ public class HeatmapService {
         query.addGroupBy("baad_bm.id")
         query.addOrderBy("COUNT(DISTINCT baad.analysis.id) DESC")
         def q = query.generateSQL()
-        log.debug(q)
+        logger.debug(q)
 
         return BioAssayAnalysisData.executeQuery(q, ['ids': geneIds, 'analysisIds': searchAnalysisIds, max: 100])
     }

@@ -1,11 +1,11 @@
 package org.transmart.spring
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.ObjectFactory
 import org.springframework.beans.factory.config.Scope
 import org.springframework.core.NamedThreadLocal
 
-@Log4j
+@Slf4j('logger')
 class QuartzSpringScope implements Scope {
 
     private static ThreadLocal<Map<String, Object>> SCOPE_MAP =
@@ -45,7 +45,7 @@ class QuartzSpringScope implements Scope {
 
     @Override
     void registerDestructionCallback(String name, Runnable callback) {
-        log.warn "Destruction callbacks are not supported; tried to add one " +
+        logger.warn "Destruction callbacks are not supported; tried to add one " +
                 "for $name"
     }
 

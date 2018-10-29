@@ -1,7 +1,9 @@
 package bio
 
+import groovy.util.logging.Slf4j
 import org.transmart.biomart.BioData
 
+@Slf4j('logger')
 class BioDataService {
 
     boolean transactional = true
@@ -9,12 +11,12 @@ class BioDataService {
     def getBioDataObject(String uid) {
         def bioDataObject
         def bioData = BioData.findByUniqueId(uid)
-        log.info "bioData = " + bioData
+        logger.info 'bioData = ' + bioData
         if (bioData != null) {
             Class clazz = grailsApplication.getDomainClass().clazz
-            log.info "clazz = " + clazz
+            logger.info 'clazz = ' + clazz
             bioDataObject = clazz.findByObjectUid(folder.getUniqueId())
-            log.info "bioDataObject = " + bioDataObject
+            logger.info 'bioDataObject = ' + bioDataObject
         }
 
         return bioDataObject

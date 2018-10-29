@@ -1,7 +1,7 @@
 package org.transmart.marshallers
 
 import grails.converters.JSON
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.FactoryBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.BeanDefinitionHolder
@@ -12,7 +12,7 @@ import org.springframework.core.type.classreading.MetadataReader
 import org.springframework.core.type.classreading.MetadataReaderFactory
 import org.springframework.core.type.filter.TypeFilter
 
-@Log4j
+@Slf4j('logger')
 public class MarshallerRegistrarService implements FactoryBean {
 
     private final static PACKAGE = "org.transmart.marshallers"
@@ -25,7 +25,7 @@ public class MarshallerRegistrarService implements FactoryBean {
     ApplicationContext ctx
 
     void start() {
-        log.info 'Registering marshallers'
+        logger.info 'Registering marshallers'
 
         ClassPathBeanDefinitionScanner scanner = new
                 ClassPathBeanDefinitionScanner((BeanDefinitionRegistry) ctx, false) {
@@ -33,7 +33,7 @@ public class MarshallerRegistrarService implements FactoryBean {
                     @Override
                     protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
                         Set<BeanDefinitionHolder> superValue = super.doScan(basePackages)
-                        log.debug "Found marshallers: $superValue"
+                        logger.debug "Found marshallers: $superValue"
 
                         superValue.each { holder ->
                             def bean = ctx.getBean(holder.beanName)

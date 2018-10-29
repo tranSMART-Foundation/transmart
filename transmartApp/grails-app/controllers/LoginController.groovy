@@ -4,6 +4,7 @@
  * @version $Revision: 10098 $
  */
 import grails.plugin.springsecurity.SpringSecurityUtils
+import groovy.util.logging.Slf4j
 import org.springframework.security.authentication.AccountExpiredException
 import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.DisabledException
@@ -18,6 +19,7 @@ import org.transmart.searchapp.AccessLog
 /**
  * Login Controller
  */
+@Slf4j('logger')
 class LoginController {
 
     /**
@@ -55,24 +57,24 @@ class LoginController {
 
         def guestAutoLogin = grailsApplication.config.com.recomdata.guestAutoLogin;
         boolean guestLoginEnabled = (guestAutoLogin == 'true' || guestAutoLogin.is(true))
-        log.info("enable guest login: " + guestLoginEnabled)
-        //log.info("request:"+request.getQueryString())
+        logger.info("enable guest login: " + guestLoginEnabled)
+        //logger.info("request:"+request.getQueryString())
         boolean forcedFormLogin = request.getQueryString() != null
-        log.info("User is forcing the form login? : " + forcedFormLogin)
+        logger.info("User is forcing the form login? : " + forcedFormLogin)
 
         // if enabled guest and not forced login
         if (guestLoginEnabled && !forcedFormLogin) {
-            log.info("proceeding with auto guest login")
+            logger.info("proceeding with auto guest login")
             def guestuser = grailsApplication.config.com.recomdata.guestUserName;
 
             try {
                 UserDetails ud = userDetailsService.loadUserByUsername(guestuser)
-                log.debug("We have found user: ${ud.username}")
+                logger.debug("We have found user: ${ud.username}")
                 springSecurityService.reauthenticate(ud.username)
                 redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
             }
             catch (UsernameNotFoundException e) {
-                log.info("can not find the user:" + guestuser);
+                logger.info("can not find the user:" + guestuser);
             }
         }
 

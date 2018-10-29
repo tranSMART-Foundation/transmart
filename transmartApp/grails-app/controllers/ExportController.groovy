@@ -5,10 +5,12 @@
  *
  */
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmart.searchapp.AuthUser
 
 import javax.servlet.ServletOutputStream
 
+@Slf4j('logger')
 class ExportController {
 
     def index = {}
@@ -17,14 +19,14 @@ class ExportController {
     def dataCountService
 
     def exportSecurityCheck = {
-        log.debug("Check export security")
+        logger.debug("Check export security")
         String rid1 = request.getParameter("result_instance_id1");
         String rid2 = request.getParameter("result_instance_id2");
         def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
         def canExport = CanExport(user, rid1, rid2);
-        log.debug("CANEXPORT:" + canExport);
+        logger.debug("CANEXPORT:" + canExport);
         def result = [canExport: canExport]
-        log.trace(result as JSON)
+        logger.trace(result as JSON)
         render result as JSON
     }
 
@@ -33,21 +35,21 @@ class ExportController {
         def sectokens = i2b2HelperService.getSecureTokensWithAccessForUser(user)
         for (String it : trials) {
             if (!sectokens.containsKey(it)) {
-                log.debug("not found key in export check:" + it)
+                logger.debug("not found key in export check:" + it)
                 return false; //short circuit if found a single one that isnt in the tokens collection
 
             } else if (sectokens.containsKey(it)) {
-                log.debug("checking found key:" + it + ":" + sectokens[it])
-                log.debug("equals own:" + sectokens[it].equals("OWN"))
-                log.debug("equals export:" + sectokens[it].equals("EXPORT"))
+                logger.debug("checking found key:" + it + ":" + sectokens[it])
+                logger.debug("equals own:" + sectokens[it].equals("OWN"))
+                logger.debug("equals export:" + sectokens[it].equals("EXPORT"))
                 if (!(sectokens[it].equals("OWN")) & !(sectokens[it].equals("EXPORT"))) //if not export or own then also return false
                 {
-                    log.debug("in return false inner")
+                    logger.debug("in return false inner")
                     return false;
                 }
             }
         }
-        log.debug("made it to end of loop so the user can export");
+        logger.debug("made it to end of loop so the user can export");
         return true;
     }
 
@@ -73,14 +75,14 @@ class ExportController {
      * send it to the user.
      */
     def exportDataset = {
-        log.debug("Export filename: " + session.expdsfilename)
+        logger.debug("Export filename: " + session.expdsfilename)
         byte[] bytes = new String("No data to export").getBytes();
         if (session.expdsfilename != null) {
-            log.debug("Made it to exportDataset for file: " + session.expdsfilename)
+            logger.debug("Made it to exportDataset for file: " + session.expdsfilename)
             File testFile = new File(session.expdsfilename)
             InputStream is = new FileInputStream(testFile);
             long fLen = testFile.length()
-            log.debug("Length: " + fLen)
+            logger.debug("Length: " + fLen)
             bytes = new byte[(int) fLen]
             int offset = 0;
             int numRead = 0;
@@ -96,7 +98,7 @@ class ExportController {
         }
 
         int outputSize = bytes.length;
-        log.debug("Size of bytes: " + outputSize)
+        logger.debug("Size of bytes: " + outputSize)
         response.setContentType("text/csv");
         response.setHeader("Content-disposition", "attachment; filename=" + "exportdatasets.csv");
         response.setContentLength(outputSize);

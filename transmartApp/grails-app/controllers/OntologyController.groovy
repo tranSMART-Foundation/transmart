@@ -3,6 +3,7 @@ import annotation.AmTagTemplate
 import fm.FmFolder
 import fm.FmFolderAssociation
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmart.biomart.Experiment
 import org.transmart.searchapp.AuthUser
 import org.transmartproject.core.dataquery.highdim.HighDimensionResource
@@ -15,6 +16,7 @@ import org.transmartproject.core.ontology.Study
 
 import static org.transmartproject.core.ontology.OntologyTerm.VisualAttributes.HIGH_DIMENSIONAL
 
+@Slf4j('logger')
 class OntologyController {
 
     def index = {}
@@ -34,22 +36,22 @@ class OntologyController {
         tagtypesc.addAll(tagtypes)
         def tags = i2b2.OntNodeTag.executeQuery("SELECT DISTINCT o.tag FROM i2b2.OntNodeTag o order by o.tag")
         /*WHERE o.tagtype='"+tagtypesc[0]+"'*/
-        log.trace "${tags as JSON}"
+        logger.trace "${tags as JSON}"
         render(template: 'filter', model: [tagtypes: tagtypesc, tags: tags])
     }
 
     def ajaxGetOntTagFilterTerms = {
         def tagtype = params.tagtype
-        log.trace("calling search for tagtype:" + tagtype)
+        logger.trace("calling search for tagtype:" + tagtype)
         def tags = i2b2.OntNodeTag.executeQuery("SELECT DISTINCT o.tag FROM i2b2.OntNodeTag o WHERE o.tagtype='" + tagtype + "' order by o.tag")
-        log.trace "${tags as JSON}"
+        logger.trace "${tags as JSON}"
         render(template: 'depSelectTerm', model: [tagtype: tagtype, tags: tags])
     }
 
     def ajaxOntTagFilter =
             {
-                log.trace("called ajaxOntTagFilter")
-                log.trace("tagterm:" + params.tagterm)
+                logger.trace("called ajaxOntTagFilter")
+                logger.trace("tagterm:" + params.tagterm)
                 def tagterm = params.tagterm
                 def ontsearchterm = params.ontsearchterm
                 def tagtype = params.tagtype
@@ -66,13 +68,13 @@ class OntologyController {
             }
     def sectest =
             {
-                log.trace("KEYS:" + params.keys)
+                logger.trace("KEYS:" + params.keys)
                 def keys = params.keys.toString().split(",");
                 def paths = [];
                 def access;
                 if (params.keys != "") {
                     keys.each { key ->
-                        log.debug("in LOOP")
+                        logger.debug("in LOOP")
                         paths.add(i2b2HelperService.keyToPath(key))
                     }
                     def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
@@ -80,7 +82,7 @@ class OntologyController {
 
                     access = i2b2HelperService.getConceptPathAccessCascadeForUser(paths, user)
                 }
-                log.trace(access as JSON)
+                logger.trace(access as JSON)
             }
 
     def showConceptDefinition = {
@@ -116,13 +118,13 @@ class OntologyController {
 
         Experiment experiment = Experiment.findByAccession(study.id.toUpperCase())
         if (!experiment) {
-            log.debug("No experiment entry found for ${study.id} study.")
+            logger.debug("No experiment entry found for ${study.id} study.")
             return [:]
         }
 
         FmFolder folder = FmFolderAssociation.findByObjectUid(experiment.uniqueId?.uniqueId)?.fmFolder
         if (!folder) {
-            log.debug("No fm folder found for ${study.id} study.")
+            logger.debug("No fm folder found for ${study.id} study.")
             return [:]
         }
 

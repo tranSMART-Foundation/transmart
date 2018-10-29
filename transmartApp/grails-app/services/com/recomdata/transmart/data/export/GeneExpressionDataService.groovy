@@ -2,6 +2,7 @@ package com.recomdata.transmart.data.export
 
 import com.recomdata.transmart.data.export.util.FileWriterUtil
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.Rserve.RConnection
@@ -11,6 +12,7 @@ import java.sql.ResultSetMetaData
 
 import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess
 
+@Slf4j('logger')
 class GeneExpressionDataService {
 
     private String valueDelimiter = "\t";
@@ -76,7 +78,7 @@ class GeneExpressionDataService {
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         return dataFound
@@ -289,7 +291,7 @@ class GeneExpressionDataService {
         //Always add an order by to the query.
         assayS.append(" ORDER BY s.assay_id");
 
-        log.debug("getAssayIds used this query: " + assayS.toString());
+        logger.debug("getAssayIds used this query: " + assayS.toString());
         println("getAssayIds used this query: " + assayS.toString());
 
         //Add each result to an array.
@@ -325,7 +327,7 @@ class GeneExpressionDataService {
         //Append the patient ids.
         trialQ.append(" where s.patient_id in (").append(ids).append(") and s.platform = 'MRNA_AFFYMETRIX'");
 
-        //log.debug("getTrialName used this query: " + trialQ.toString());
+        //logger.debug("getTrialName used this query: " + trialQ.toString());
 
         //Add the trial names to a string.
         String trialNames = "";
@@ -435,7 +437,7 @@ class GeneExpressionDataService {
             try {
                 fetchSize = Integer.parseInt(rsize);
             } catch (Exception exs) {
-                log.warn("com.recomdata.plugins.resultSize is not set!");
+                logger.warn("com.recomdata.plugins.resultSize is not set!");
 
             }
         }
@@ -451,7 +453,7 @@ class GeneExpressionDataService {
         stmt1.setFetchSize(fetchSize);
 
         def char separator = '\t';
-        log.info("started file writing")
+        logger.info("started file writing")
         def output;
         def outFile;
 
@@ -490,8 +492,8 @@ class GeneExpressionDataService {
         // use the assay id to look up the sample\tm\tissue type from the map created in the first query
         // and writes to the writer
 
-        log.info("start sample retrieving query");
-        log.debug("Sample Query : " + sampleQuery);
+        logger.info("start sample retrieving query");
+        logger.debug("Sample Query : " + sampleQuery);
         rs = stmt1.executeQuery();
         def sttSampleStr = null;
 
@@ -523,12 +525,12 @@ class GeneExpressionDataService {
             rs?.close();
             stmt1?.close();
         }
-        log.info("finished sample retrieving query");
+        logger.info("finished sample retrieving query");
 
         //Run the query.
-        log.debug("begin data retrieving query: " + sqlQuery)
+        logger.debug("begin data retrieving query: " + sqlQuery)
         rs = stmt.executeQuery();
-        log.info("query completed")
+        logger.info("query completed")
         // get column name map
         ResultSetMetaData metaData = rs.getMetaData();
         def nameIndexMap = [:]
@@ -640,18 +642,18 @@ class GeneExpressionDataService {
                     output.flush();
                     recCount += flushCount;
                     flushCount = 0;
-                    //log.info("# record processed:"+recCount);
+                    //logger.info("# record processed:"+recCount);
                 }
             }
             if (!dataFound) {
                 boolean delFile = outFile?.delete()
                 writeNotEmptyString(output, "No data found to add to file.");
-                /*log.debug("File deleted :: " + delFile)
+                /*logger.debug("File deleted :: " + delFile)
                 if (!delFile) writeNotEmptyString(output, "Unable to delete this file.");
                 filePath = null*/
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e)
+            logger.error(e.getMessage(), e)
         } finally {
             output?.flush();
             output?.close()
@@ -660,14 +662,14 @@ class GeneExpressionDataService {
                 boolean delFile = outFile?.delete()
                 filePath = outFile?.getAbsolutePath()
             }
-            log.info("completed file writing")
+            logger.info("completed file writing")
             stmt?.close();
             con?.close();
         }
 
         // calculate elapse tim
         elapsetime = System.currentTimeMillis() - elapsetime;
-        log.info("\n \t total seconds:" + (elapsetime / 1000) + "\n\n");
+        logger.info("\n \t total seconds:" + (elapsetime / 1000) + "\n\n");
 
         //We need to return a map with two key/values.
         def mapReturnValues = [:]
@@ -688,7 +690,7 @@ class GeneExpressionDataService {
 
     private void pivotData(boolean multipleStudies, String study, String inputFileLoc) {
         //TODO pass the boolean param for deletion of the mRNA.trans file
-        log.info('Pivot File started')
+        logger.info('Pivot File started')
         if (inputFileLoc != "") {
             File inputFile = new File(inputFileLoc)
             if (inputFile) {
@@ -698,7 +700,7 @@ class GeneExpressionDataService {
                 //Set the working directory to be our temporary location.
                 String workingDirectoryCommand = "setwd('${rOutputDirectory}')".replace("\\", "\\\\")
 
-                log.debug("Attempting following R Command : " + "setwd('${rOutputDirectory}')".replace("\\", "\\\\"))
+                logger.debug("Attempting following R Command : " + "setwd('${rOutputDirectory}')".replace("\\", "\\\\"))
                 println("Attempting following R Command : " + "setwd('${rOutputDirectory}')".replace("\\", "\\\\"))
 
                 //Run the R command to set the working directory to our temp directory.
@@ -707,7 +709,7 @@ class GeneExpressionDataService {
                 String rScriptDirectory = grailsApplication.config.com.recomdata.transmart.data.export.rScriptDirectory
                 String compilePivotDataCommand = "source('${rScriptDirectory}/PivotData/PivotGeneExprData.R')".replace("\\", "\\\\")
 
-                log.debug("Attempting following R Command : " + compilePivotDataCommand.replace("\\", "\\\\"))
+                logger.debug("Attempting following R Command : " + compilePivotDataCommand.replace("\\", "\\\\"))
                 println("Attempting following R Command : " + compilePivotDataCommand.replace("\\", "\\\\"))
 
                 REXP comp = c.eval(compilePivotDataCommand)
@@ -715,7 +717,7 @@ class GeneExpressionDataService {
                 //Prepare command to call the PivotGeneExprData.R script
                 String pivotDataCommand = "PivotGeneExprData.pivot('$inputFile.name', '$multipleStudies', '$study')".replace("\\", "\\\\")
 
-                log.debug("Attempting following R Command : " + "PivotGeneExprData.pivot('$inputFile.name', '$multipleStudies', '$study')".replace("\\", "\\\\"))
+                logger.debug("Attempting following R Command : " + "PivotGeneExprData.pivot('$inputFile.name', '$multipleStudies', '$study')".replace("\\", "\\\\"))
                 println("Attempting following R Command : " + "PivotGeneExprData.pivot('$inputFile.name', '$multipleStudies', '$study')".replace("\\", "\\\\"))
 
                 REXP pivot = c.eval(pivotDataCommand)
@@ -740,7 +742,7 @@ class GeneExpressionDataService {
             pathway_name = pathwayGeneList.collect { SearchKeyword.get(Long.valueOf(it)).uniqueId }.join(",")
         }
 
-        log.debug("pathway_name has been set to a keyword ID: ${pathway_name}")
+        logger.debug("pathway_name has been set to a keyword ID: ${pathway_name}")
         return pathway_name
     }
 
@@ -816,7 +818,7 @@ class GeneExpressionDataService {
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e)
+            logger.error(e.getMessage(), e)
         } finally {
             sql?.close()
         }
@@ -846,7 +848,7 @@ class GeneExpressionDataService {
             def queryParams = []
             queryParams.addAll(resultInstanceIdMap.values())
             def rows = sql.rows(sqlQuery, queryParams)
-            log.debug("Common subjects found :: " + rows.size())
+            logger.debug("Common subjects found :: " + rows.size())
             if (rows.size() > 0) throw new Exception(" Common Subjects found in both Subsets. ");
         }
     }
@@ -908,7 +910,7 @@ class GeneExpressionDataService {
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -943,7 +945,7 @@ class GeneExpressionDataService {
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -1042,7 +1044,7 @@ class GeneExpressionDataService {
             try {
                 fetchSize = Integer.parseInt(rsize);
             } catch (Exception exs) {
-                log.warn("com.recomdata.plugins.resultSize is not set!");
+                logger.warn("com.recomdata.plugins.resultSize is not set!");
             }
         }
 
@@ -1062,7 +1064,7 @@ class GeneExpressionDataService {
             stmt.setFetchSize(getStmtFetchSize());
 
             def sampleType, timepoint, tissueType, assayID = null, GPL_ID;
-            log.info("start sample retrieving query");
+            logger.info("start sample retrieving query");
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -1095,7 +1097,7 @@ class GeneExpressionDataService {
             stmt?.close();
             con?.close();
         }
-        log.info("finished sample retrieving query");
+        logger.info("finished sample retrieving query");
 
         return sttMap
     }
@@ -1103,7 +1105,7 @@ class GeneExpressionDataService {
     private String writeCLSData(String sqlQuery, File gseaDir, String fileName, String jobName, Map resultInstanceIdMap) {
         def outFile, output, filePath = null
         try {
-            log.info("started writing CLS file")
+            logger.info("started writing CLS file")
             groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
             outFile = new File(gseaDir, 'GSEA.CLS');
             output = outFile.newWriter(true)
@@ -1131,12 +1133,12 @@ class GeneExpressionDataService {
                 output.newLine();
             }
         } catch (Exception e) {
-            log.error(e.message, e)
+            logger.error(e.message, e)
         } finally {
             output?.flush();
             output?.close()
             filePath = outFile?.getAbsolutePath()
-            log.info("completed writing CLS file")
+            logger.info("completed writing CLS file")
         }
     }
 
@@ -1150,7 +1152,7 @@ class GeneExpressionDataService {
 
         def filePath = null
         def char separator = '\t';
-        log.info("started file writing")
+        logger.info("started file writing")
 
         def outFile = new File(gseaDir, 'GCT.trans');
         def output = outFile.newWriter(true)
@@ -1166,9 +1168,9 @@ class GeneExpressionDataService {
         String log2 = null;
 
         long elapsetime = System.currentTimeMillis();
-        log.info("begin data retrieving query: " + sqlQuery)
+        logger.info("begin data retrieving query: " + sqlQuery)
         rs = stmt.executeQuery();
-        log.info("query completed")
+        logger.info("query completed")
         // get column name map
         ResultSetMetaData metaData = rs.getMetaData();
         def nameIndexMap = [:]
@@ -1257,16 +1259,16 @@ class GeneExpressionDataService {
                     output.flush();
                     recCount += flushCount;
                     flushCount = 0;
-                    //log.info("# record processed:"+recCount);
+                    //logger.info("# record processed:"+recCount);
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e)
+            logger.error(e.getMessage(), e)
         } finally {
             output?.flush();
             output?.close()
             filePath = outFile?.getAbsolutePath()
-            log.info("completed file writing")
+            logger.info("completed file writing")
             rs?.close()
             stmt?.close();
             con?.close();
@@ -1274,12 +1276,12 @@ class GeneExpressionDataService {
 
         // calculate elapse tim
         elapsetime = System.currentTimeMillis() - elapsetime;
-        log.info("\n \t total seconds:" + (elapsetime / 1000) + "\n\n");
+        logger.info("\n \t total seconds:" + (elapsetime / 1000) + "\n\n");
         return filePath
     }
 
     private void pivotGCTData(String inputFileLoc) {
-        log.info('Pivot File started')
+        logger.info('Pivot File started')
         if (inputFileLoc != "") {
             File inputFile = new File(inputFileLoc)
             if (inputFile) {
@@ -1289,7 +1291,7 @@ class GeneExpressionDataService {
                 //Set the working directory to be our temporary location.
                 String workingDirectoryCommand = "setwd('${rOutputDirectory}')".replace("\\", "\\\\")
 
-                log.debug("Attempting following R Command : " + "setwd('${rOutputDirectory}')".replace("\\", "\\\\"))
+                logger.debug("Attempting following R Command : " + "setwd('${rOutputDirectory}')".replace("\\", "\\\\"))
                 println("Attempting following R Command : " + "setwd('${rOutputDirectory}')".replace("\\", "\\\\"))
 
                 //Run the R command to set the working directory to our temp directory.
@@ -1298,7 +1300,7 @@ class GeneExpressionDataService {
                 String rScriptDirectory = grailsApplication.config.com.recomdata.transmart.data.export.rScriptDirectory
                 String compilePivotDataCommand = "source('${rScriptDirectory}/PivotData/PivotGSEAExportGCTData.R')".replace("\\", "\\\\")
 
-                log.debug("Attempting following R Command : " + compilePivotDataCommand)
+                logger.debug("Attempting following R Command : " + compilePivotDataCommand)
                 println("Attempting following R Command : " + compilePivotDataCommand)
 
                 REXP comp = c.eval(compilePivotDataCommand)
@@ -1306,7 +1308,7 @@ class GeneExpressionDataService {
                 //Prepare command to call the PivotGSEAExportGCTData.R script
                 String pivotDataCommand = "PivotGSEAExportGCTData.pivot('$inputFile.name')".replace("\\", "\\\\")
 
-                log.debug("Attempting following R Command : " + pivotDataCommand)
+                logger.debug("Attempting following R Command : " + pivotDataCommand)
                 println("Attempting following R Command : " + pivotDataCommand)
 
                 REXP pivot = c.eval(pivotDataCommand)

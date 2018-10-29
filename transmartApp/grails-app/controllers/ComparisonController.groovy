@@ -1,5 +1,7 @@
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class ComparisonController {
 
     def index = {}
@@ -9,7 +11,7 @@ class ComparisonController {
     def getQueryDefinition = {
         String qid = request.getParameter("qid");
         String q = i2b2HelperService.getQueryDefinitionXMLFromQID(qid);
-        log.debug(q);
+        logger.debug(q);
         PrintWriter pw = new PrintWriter(response.getOutputStream());
         pw.write(q);
         pw.flush();
@@ -41,7 +43,7 @@ class ComparisonController {
         link.append(createLink(controller: 'datasetExplorer', action: 'index', id: s.id, absolute: true))
         link.append("\" target=\"_blank\" class=\"tiny\" style=\"text-decoration:underline;color:blue;font-size:11px;\">Email this comparison</a><br /><br />")
         def result = [success: success, id: s.id, link: link]
-        log.trace(result as JSON)
+        logger.trace(result as JSON)
         render result as JSON
     }
 }

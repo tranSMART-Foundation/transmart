@@ -4,6 +4,7 @@ import com.recomdata.asynchronous.GenericJobExecutor
 import com.recomdata.transmart.domain.i2b2.AsyncJob
 import com.recomdata.transmart.validate.RequestValidator
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
 import org.json.JSONObject
 import org.quartz.JobDataMap
@@ -15,6 +16,7 @@ import org.transmart.searchapp.AccessLog
 
 import javax.annotation.Resource
 
+@Slf4j('logger')
 class ExportService {
 
     static transactional = true
@@ -47,7 +49,7 @@ class ExportService {
         def querySummary = 'Subset 1:' + params.querySummary1 + ((params.querySummary2 != '') ? ' <br/> Subset 2:' + params.querySummary2 : '')
         asyncJobService.updateStatus(jobName, jobStatus, null, querySummary, null)
 
-        log.debug("Sending ${newJob.jobName} back to the client")
+        logger.debug("Sending ${newJob.jobName} back to the client")
         JSONObject result = new JSONObject()
         result.put("jobName", jobName)
         result.put("jobStatus", jobStatus)
@@ -220,12 +222,12 @@ class ExportService {
         //TODO get the required input parameters for the job and validate them
         def rID1 = RequestValidator.nullCheck(params.result_instance_id1)
         def rID2 = RequestValidator.nullCheck(params.result_instance_id2)
-        log.debug('rID1 :: ' + rID1 + ' :: rID2 :: ' + rID2)
+        logger.debug('rID1 :: ' + rID1 + ' :: rID2 :: ' + rID2)
         asyncJobService.updateStatus(params.jobName, statusList[1])
 
-        log.debug("Checking to see if the user cancelled the job prior to running it")
+        logger.debug("Checking to see if the user cancelled the job prior to running it")
         if (jobResultsService[params.jobName]["Status"] == "Cancelled") {
-            log.warn("${params.jobName} has been cancelled")
+            logger.warn("${params.jobName} has been cancelled")
             return
         }
         createExportDataJob(userName, params, statusList)

@@ -1,11 +1,13 @@
 package com.recomdata.transmart.data.export
 
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.export.HighDimExporter
 
 //TODO Remove duplicated code for both subset. Make code more generic for any number of subsets
+@Slf4j('logger')
 class ExportMetadataService {
 
     static transactional = false
@@ -43,7 +45,7 @@ class ExportMetadataService {
 
     def getClinicalMetaData(Long resultInstanceId1, Long resultInstanceId2) {
         //The result instance id's are stored queries which we can use to get information from the i2b2 schema.
-        log.debug('rID1 :: ' + resultInstanceId1 + ' :: rID2 :: ' + resultInstanceId1)
+        logger.debug('rID1 :: ' + resultInstanceId1 + ' :: rID2 :: ' + resultInstanceId1)
 
         //Retrieve the counts for each subset.
         [
@@ -115,12 +117,12 @@ class ExportMetadataService {
         def rIDs = [resultInstanceId1, resultInstanceId2].toArray(new Long[0])
 
         def subsetLen = (resultInstanceId1 && resultInstanceId2) ? 2 : (resultInstanceId1 || resultInstanceId2) ? 1 : 0
-        log.debug('rID1 :: ' + resultInstanceId1 + ' :: rID2 :: ' + resultInstanceId2)
+        logger.debug('rID1 :: ' + resultInstanceId1 + ' :: rID2 :: ' + resultInstanceId2)
 
         //Retrieve the counts for each subset. We get back a map that looks like ['RBM':2,'MRNA':30]
         def subset1CountMap = dataCountService.getDataCounts(resultInstanceId1, rIDs)
         def subset2CountMap = dataCountService.getDataCounts(resultInstanceId2, rIDs)
-        log.debug('subset1CountMap :: ' + subset1CountMap + ' :: subset2CountMap :: ' + subset2CountMap)
+        logger.debug('subset1CountMap :: ' + subset1CountMap + ' :: subset2CountMap :: ' + subset2CountMap)
 
         //This is the map we render to JSON.
         def finalMap = [:]

@@ -1,6 +1,7 @@
 import com.recomdata.util.ExcelGenerator
 import com.recomdata.util.ExcelSheet
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmart.biomart.BioAssayAnalysis
 import org.transmart.biomart.BioAssayAnalysisData
 import org.transmart.searchapp.SearchKeyword
@@ -12,6 +13,7 @@ import org.transmart.searchapp.SearchKeyword
  *
  */
 
+@Slf4j('logger')
 public class HeatmapController {
 
     def trialQueryService
@@ -72,7 +74,7 @@ public class HeatmapController {
         def hmapwidth = 100 / hmapcount;
         // Convert table object to JSON format
 
-        //log.info (heatmap.rhotable==null)?"empty":"not empty"
+        //logger.info (heatmap.rhotable==null)?"empty":"not empty"
         return ["comtable"   : comtable,
                 "cortable"   : cortable,
                 "rbmtable"   : rbmtable,
@@ -85,12 +87,12 @@ public class HeatmapController {
 
         def dataResult = generateHeatmaps()
 
-        //	log.info dataResult
+        //	logger.info dataResult
         def sheets = []
 
         if (!dataResult['comresult']['datatable'].isEmpty()) {
 
-            //log.info "has comparison data"
+            //logger.info "has comparison data"
 
             sheets.add(createExcelSheet(dataResult['comresult']['datatable'].table, "Gene Expression Comparison"))
         }
@@ -106,7 +108,7 @@ public class HeatmapController {
             sheets.add(createExcelSheet(dataResult['rhoresult']['datatable'].table, "RBM Spearman Correlation"))
         }
 
-        //log.info sheets
+        //logger.info sheets
 
         def gen = new ExcelGenerator()
         response.setHeader("Content-Type", "application/vnd.ms-excel; charset=utf-8")
@@ -156,7 +158,7 @@ public class HeatmapController {
                     // pathway
                     List allGenes = searchKeywordService.expandAllListToGenes(keyword.bioDataId, 200);
 
-                    //		log.info allGenes
+                    //		logger.info allGenes
                     for (k in allGenes) {
                         searchGeneIds.add(k.bioDataId)
                     }
@@ -254,7 +256,7 @@ public class HeatmapController {
             for (data in dataList) {
 
                 //analysisId = data.assayAnalysisId
-                //log.info "data:"+data.id+":"+data.bioMarkerId
+                //logger.info "data:"+data.id+":"+data.bioMarkerId
                 analysisName = analysisNameMap.get(data.assayAnalysisId)
                 // reformat & shorten analysis name
                 if (analysisName == null) {
@@ -329,7 +331,7 @@ public class HeatmapController {
                     }
                     rowArray[columnIndex] = datavalue
                 }
-                //	log.info "loading:"+data.bioMarkerId
+                //	logger.info "loading:"+data.bioMarkerId
             }
 
 
@@ -349,7 +351,7 @@ public class HeatmapController {
 
                 // this is an array
                 def rvalues = entryset.value;
-                //log.info rvalues
+                //logger.info rvalues
                 // handle null value rows
                 def hasRowValue = false;
                 // if not RBM
@@ -403,7 +405,7 @@ public class HeatmapController {
         def rows = []
 
         for (row in table.rows) {
-            //log.info row
+            //logger.info row
             if (row[0].f != "N/A") {
                 def newrow = []
                 for (value in row) {

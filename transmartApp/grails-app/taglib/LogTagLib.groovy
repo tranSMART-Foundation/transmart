@@ -1,4 +1,7 @@
 
+import groovy.util.logging.Slf4j
+
+@Slf4j('logger')
 class LogTagLib {
     /**
      * Allows gsp pages to include logging tags
@@ -10,7 +13,7 @@ class LogTagLib {
      */
     def logMsg = { attrs, body ->
         def level = (attrs['level'] = attrs['level'] ?: 'info').toLowerCase()
-        log."${level}"(body())
+        logger."${level}"(body())
     }
 }
     

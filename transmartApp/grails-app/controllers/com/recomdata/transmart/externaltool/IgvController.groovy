@@ -1,8 +1,10 @@
 package com.recomdata.transmart.externaltool
 
 import com.recomdata.export.IgvFiles
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 
+@Slf4j('logger')
 class IgvController {
 
     def springSecurityService;
@@ -37,7 +39,7 @@ class IgvController {
         */
 
         def sessionFileURL = params.sessionFile;
-        log.debug(sessionFileURL)
+        logger.debug(sessionFileURL)
         def ftext = igvDataService.createJNLPasString(webRootDir, sessionFileURL);
 
 
@@ -86,7 +88,7 @@ class IgvController {
         def snp = null;
         if (pFiles != null && !pFiles.isEmpty()) {
             paramfile = pFiles[0]
-            log.debug("find paramfile:" + paramfile)
+            logger.debug("find paramfile:" + paramfile)
             def f = new File(paramfile)
             if (f.exists()) {
                 f.eachLine { line ->

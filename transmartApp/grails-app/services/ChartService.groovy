@@ -1,3 +1,4 @@
+import groovy.util.logging.Slf4j
 import org.apache.commons.math.stat.inference.TestUtils
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.jfree.chart.ChartFactory
@@ -47,6 +48,7 @@ import java.util.List
 /**
  * @author Florian Guitton <f.guitton@imperial.ac.uk>
  */
+@Slf4j('logger')
 class ChartService {
 
 	static transactional = false
@@ -267,7 +269,7 @@ class ChartService {
                                     (p.instance == "" ? null : p.instance as Long)).collect { k, v -> v }
                 }
                 catch (EmptySetException ese) {
-                    log.warn("No assays satisfy the provided criteria in result_instance_id " + p.instance)
+                    logger.warn("No assays satisfy the provided criteria in result_instance_id " + p.instance)
                     p.conceptData = []
                 }
 
@@ -383,7 +385,7 @@ class ChartService {
                 bins = args.bins as Integer
             }
             catch (Exception e) {
-                log.error "Could not parse provided argument to integer: " + args.bins
+                logger.error "Could not parse provided argument to integer: " + args.bins
             }
 
         // We retrieve the dimension if provided

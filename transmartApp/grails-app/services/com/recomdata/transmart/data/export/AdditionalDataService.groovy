@@ -1,9 +1,11 @@
 package com.recomdata.transmart.data.export
 
 import com.recomdata.transmart.data.export.util.FileWriterUtil
+import groovy.util.logging.Slf4j
 
 import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess;
 
+@Slf4j('logger')
 class AdditionalDataService {
 
     boolean transactional = true
@@ -32,12 +34,12 @@ class AdditionalDataService {
 				  ) and s.sample_cd is not null and b.file_name like s.sample_cd||'%'
 				)
 				"""
-            log.debug(additionalFilesQuery)
-            log.debug('ResultInstanceId :: ' + resultInstanceId)
+            logger.debug(additionalFilesQuery)
+            logger.debug('ResultInstanceId :: ' + resultInstanceId)
             def sample, mapKey, mapValue = null
             filesList = sql.rows(additionalFilesQuery, [study, resultInstanceId])
         } catch (Exception e) {
-            log.error("Problem finding Files for Additional Data :: " + e.getMessage())
+            logger.error("Problem finding Files for Additional Data :: " + e.getMessage())
         } finally {
             sql?.close()
         }
@@ -55,7 +57,7 @@ class AdditionalDataService {
                 writerUtil.writeFile(fileURL, writerUtil.outputFile)
             }
         } else {
-            log.debug('No Additional data files found to download')
+            logger.debug('No Additional data files found to download')
         }
     }
 }

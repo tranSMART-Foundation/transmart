@@ -1,8 +1,10 @@
 package com.recomdata.transmart.externaltool
 
 import com.recomdata.export.IgvFiles
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.exceptions.UnexpectedResultException;
 
+@Slf4j('logger')
 class IgvDataService {
 
     def createJNLPasString(webRootDir, sessionFileURL) {
@@ -71,7 +73,7 @@ class IgvDataService {
         try {
             igvToolsClass = Class.forName 'org.broad.igv.tools.IgvTools'
         } catch (e) {
-            log.error 'Could not load IgvTools. The igvtools jar is not ' +
+            logger.error 'Could not load IgvTools. The igvtools jar is not ' +
                     'bundled anymore. You will have to add it as a ' +
                     'dependency to the project'
             throw e

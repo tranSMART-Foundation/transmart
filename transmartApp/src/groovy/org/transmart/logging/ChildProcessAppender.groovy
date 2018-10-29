@@ -22,7 +22,7 @@ package org.transmart.logging
 import com.google.common.base.Charsets
 import groovy.transform.CompileStatic
 import groovy.transform.InheritConstructors
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.apache.log4j.AppenderSkeleton
 import org.apache.log4j.spi.LoggingEvent
 import org.apache.log4j.helpers.LogLog
@@ -62,7 +62,7 @@ import static java.lang.ProcessBuilder.Redirect.*
  * the child process cannot be restarted.
  */
 @CompileStatic
-@Log4j
+@Slf4j('logger')
 class ChildProcessAppender extends AppenderSkeleton {
 
     List<String> command
@@ -158,7 +158,7 @@ class ChildProcessAppender extends AppenderSkeleton {
                 if (throwOnFailure) {
                     throw new ChildFailedException(msg)
                 } else {
-                    log.warn(msg)
+                    logger.warn(msg)
                     return
                 }
             }
@@ -184,7 +184,7 @@ class ChildProcessAppender extends AppenderSkeleton {
 
             assert errmsg != null
             // Log outside of the synchronized block
-            log.error(errmsg)
+            logger.error(errmsg)
             if (throwOnFailure) {
                 throw new ChildFailedException(errmsg)
             }

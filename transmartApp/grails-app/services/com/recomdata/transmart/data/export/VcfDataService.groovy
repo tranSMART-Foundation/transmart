@@ -2,9 +2,11 @@ package com.recomdata.transmart.data.export
 
 import de.DeVariantDataSet
 import de.DeVariantSubjectDetail
+import groovy.util.logging.Slf4j
 
 import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess;
 
+@Slf4j('logger')
 class VcfDataService {
     boolean transactional = false
 
@@ -157,7 +159,7 @@ class VcfDataService {
 
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e)
+            logger.error(e.getMessage(), e)
 
         } finally {
             if (pfilewriter != null) {
@@ -191,7 +193,7 @@ class VcfDataService {
         // each dataset has a new files
         datasetIds.each {
             def nfile = new File(outputDir + File.separator + jobName + "_" + it + "_" + subjectPrefix + ".vcf");
-            log.debug("writing data file for dataset:" + it + " at :" + nfile.getAbsolutePath())
+            logger.debug("writing data file for dataset:" + it + " at :" + nfile.getAbsolutePath())
 
             def nwriter = nfile.newWriter();
             dsWriterMap.put(it, nwriter)
@@ -264,7 +266,7 @@ class VcfDataService {
                 it.flush()
                 it.close()
             } catch (Exception e) {
-                log.error(e.getMessage(), e)
+                logger.error(e.getMessage(), e)
             }
 
         }
@@ -386,7 +388,7 @@ class VcfDataService {
                 datasetIdxMap.put(row.DATASET_ID, sIdx)
             }
             sIdx.put(row.SUBJECT_ID, row.POSITION)
-            //log.debug("sub:"+row.SUBJECT_ID+" pos:"+row.POSITION)
+            //logger.debug("sub:"+row.SUBJECT_ID+" pos:"+row.POSITION)
 
         });
 

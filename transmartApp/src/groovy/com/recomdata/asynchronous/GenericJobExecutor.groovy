@@ -4,7 +4,7 @@ import com.recomdata.transmart.data.export.exception.DataNotFoundException
 import com.recomdata.transmart.data.export.util.FTPUtil
 import com.recomdata.transmart.data.export.util.ZipUtil
 import grails.util.Holders
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.support.PersistenceContextInterceptor
@@ -25,7 +25,7 @@ import java.lang.reflect.UndeclaredThrowableException
  * @author MMcDuffie
  *
  */
-@Log4j
+@Slf4j('logger')
 class GenericJobExecutor implements Job {
 
     def ctx = Holders.grailsApplication.mainContext
@@ -51,19 +51,19 @@ class GenericJobExecutor implements Job {
 
     // TODO -- NEED TO BE REVIEWED (f.guitton@imperial.ac.uk)
     private void init() {
-        //Put an entry in our log.
-        log.info("${jobName} has been triggered to run ")
+        //Put an entry in our logger.
+        logger.info("${jobName} has been triggered to run ")
 
         //Get the data map which shows the attributes for our job.
 
         //Write our attributes to a log file.
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             jobDataMap.getKeys().each { _key ->
-                log.debug("\t${_key} -> ${jobDataMap[_key]}")
+                logger.debug("\t${_key} -> ${jobDataMap[_key]}")
             }
         }
 
-        log.info("Data Export Service: " + dataExportService)
+        logger.info("Data Export Service: " + dataExportService)
 
 //		grailsApplication = jobDataMap.get("SGA")
 //		jobResultsService = jobDataMap.get("SJRS")
@@ -105,7 +105,7 @@ class GenericJobExecutor implements Job {
         jobTmpDirectory = tempFolderDirectory + File.separator + "${jobName}" + File.separator
         jobTmpDirectory = jobTmpDirectory.replace("\\", "\\\\")
         if (new File(jobTmpDirectory).exists()) {
-            log.warn("The job folder ${jobTmpDirectory} already exists. It's going to be overwritten.")
+            logger.warn("The job folder ${jobTmpDirectory} already exists. It's going to be overwritten.")
             FileUtils.deleteDirectory(new File(jobTmpDirectory))
         }
         jobTmpWorkingDirectory = jobTmpDirectory + "workingDirectory"
@@ -144,19 +144,19 @@ class GenericJobExecutor implements Job {
             renderOutput(jobDetail)
 
         } catch (DataNotFoundException dnfe) {
-            log.error("DAO exception thrown executing job: " + dnfe.getMessage(), dnfe)
+            logger.error("DAO exception thrown executing job: " + dnfe.getMessage(), dnfe)
             jobResultsService[jobName]["Exception"] = dnfe.getMessage()
             return
             /*}catch(WebServiceException wse)	{
-                log.error("WebServiceException thrown executing job: " + wse.getMessage(), wse)
+                logger.error("WebServiceException thrown executing job: " + wse.getMessage(), wse)
                 jobResultsService[jobName]["Exception"] = "There was an error running your job. Please contact an administrator."
                 return*/
         } catch (RserveException rse) {
-            log.error("RserveException thrown executing job: " + rse.getMessage(), rse)
+            logger.error("RserveException thrown executing job: " + rse.getMessage(), rse)
             jobResultsService[jobName]["Exception"] = "There was an error running the R script for your job. Please contact an administrator."
             return
         } catch (Exception e) {
-            log.error("Exception thrown executing job: " + e.getMessage(), e)
+            logger.error("Exception thrown executing job: " + e.getMessage(), e)
             def errorMsg = null
             if (e instanceof UndeclaredThrowableException) {
                 errorMsg = ((UndeclaredThrowableException) e)?.getUndeclaredThrowable().message
@@ -251,7 +251,7 @@ class GenericJobExecutor implements Job {
                                         }
                                     }
                                 } catch (Exception e) {
-                                    log.error("Failed to FTP PUT the ZIP file: " + e.getMessage);
+                                    logger.error("Failed to FTP PUT the ZIP file: " + e.getMessage);
                                 }
 
                                 break
@@ -310,7 +310,7 @@ class GenericJobExecutor implements Job {
         //Establish a connection to R Server.
         RConnection c = new RConnection(Holders.config.RModules.host, Holders.config.RModules.port);
 
-        log.debug("Attempting following R Command : " + "setwd('${rOutputDirectory}')".replace("\\", "\\\\"))
+        logger.debug("Attempting following R Command : " + "setwd('${rOutputDirectory}')".replace("\\", "\\\\"))
 
         //Set the working directory to be our temporary location.
         String workingDirectoryCommand = "setwd('${rOutputDirectory}')".replace("\\", "\\\\")
@@ -343,7 +343,7 @@ class GenericJobExecutor implements Job {
                 reformattedCommand = reformattedCommand.replace(variableItem.key, valueFromForm)
             }
 
-            log.debug("Attempting following R Command : " + reformattedCommand)
+            logger.debug("Attempting following R Command : " + reformattedCommand)
 
             //Run the R command against our server.
             //x = c.eval(reformattedCommand);
@@ -362,7 +362,7 @@ class GenericJobExecutor implements Job {
                     rError = rError.replaceFirst(/.*\|\|FRIENDLY\|\|/, "")
                     newError = new RserveException(c, rError);
                 } else {
-                    log.error("RserveException thrown executing job: " + rError)
+                    logger.error("RserveException thrown executing job: " + rError)
                     newError = new RserveException(c, "There was an error running the R script for your job. Please contact an administrator.");
                 }
 
@@ -386,7 +386,7 @@ class GenericJobExecutor implements Job {
      */
     def updateStatus(jobName, status) {
         jobResultsService[jobName]["Status"] = status
-        log.debug(status)
+        logger.debug(status)
         asyncJobService.updateStatus(jobName, status)
     }
 
@@ -396,9 +396,9 @@ class GenericJobExecutor implements Job {
         //if no job has been submitted, it cannot be cancelled
         if (! jobName) return false
 
-        //log.debug("Checking to see if the user cancelled the job")
+        //logger.debug("Checking to see if the user cancelled the job")
         if (jobResultsService[jobName]["Status"] == "Cancelled") {
-            log.warn("${jobName} has been cancelled")
+            logger.warn("${jobName} has been cancelled")
             jobCancelled = true
         }
         return jobCancelled

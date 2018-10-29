@@ -1,16 +1,16 @@
 package org.transmartproject.export
 
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.db.dataquery.highdim.tworegion.DeTwoRegionJunction
 import org.transmartproject.db.dataquery.highdim.tworegion.DeTwoRegionJunctionEvent
 import org.transmartproject.db.dataquery.highdim.tworegion.JunctionRow
-import groovy.util.logging.Log4j
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.transmartproject.core.dataquery.TabularResult;
 import org.transmartproject.core.dataquery.highdim.projections.Projection;
 
-@Log4j
+@Slf4j('logger')
 public class TwoRegionExporter implements HighDimExporter {
     @Autowired
     private HighDimExporterRegistry highDimExporterRegistry;
@@ -43,7 +43,7 @@ public class TwoRegionExporter implements HighDimExporter {
     }
 
     public void export(TabularResult data, Projection projection, Closure<OutputStream> newOutputStream, Closure<java.lang.Boolean> isCancelled) {
-        log.info("started exporting to $format ")
+        logger.info("started exporting to $format ")
         def startTime = System.currentTimeMillis()
 
         if (isCancelled && isCancelled()) {
@@ -117,6 +117,6 @@ public class TwoRegionExporter implements HighDimExporter {
                 it.close()
             }
         }
-        log.info("Exporting data took ${System.currentTimeMillis() - startTime} ms")
+        logger.info("Exporting data took ${System.currentTimeMillis() - startTime} ms")
     }
 }

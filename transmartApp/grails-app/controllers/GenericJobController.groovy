@@ -1,6 +1,8 @@
 import com.recomdata.transmart.domain.i2b2.AsyncJob
+import groovy.util.logging.Slf4j
 import org.json.JSONObject
 
+@Slf4j('logger')
 class GenericJobController {
 
     def springSecurityService
@@ -28,7 +30,7 @@ class GenericJobController {
         jobResultsService[jobName] = [:]
         asyncJobService.updateStatus(jobName, jobStatus)
 
-        log.debug("Sending ${jobName} back to the client")
+        logger.debug("Sending ${jobName} back to the client")
         JSONObject result = new JSONObject()
         result.put("jobName", jobName)
         result.put("jobStatus", jobStatus)

@@ -1,7 +1,9 @@
 import command.SecureObjectAccessCommand
+import groovy.util.logging.Slf4j
 import org.transmart.searchapp.*
 import org.transmartproject.core.users.User
 
+@Slf4j('logger')
 class SecureObjectAccessController {
 
     def accessLogService
@@ -112,9 +114,9 @@ class SecureObjectAccessController {
         def secureObjectAccessList = getSecureObjAccessList(secureObjInstance, access)
         def userwithoutaccess = getPrincipalsWithoutAccess(secureObjInstance, access, searchtext)
 
-        log.debug("accesslist: $secureObjectAccessList")
-        log.debug("noaccess: $userwithoutaccess")
-        log.debug("sec: $secureObjInstance")
+        logger.debug("accesslist: $secureObjectAccessList")
+        logger.debug("noaccess: $userwithoutaccess")
+        logger.debug("sec: $secureObjInstance")
 
         render(view: 'managePrincipalAccess', model: [
                 secureObjectInstance  : secureObjInstance,

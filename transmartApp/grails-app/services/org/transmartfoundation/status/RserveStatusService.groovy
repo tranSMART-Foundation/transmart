@@ -1,12 +1,14 @@
 package org.transmartfoundation.status
 
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.REXPMismatchException
 import org.rosuda.REngine.REngineException
 import org.rosuda.REngine.Rserve.RConnection
 import org.rosuda.REngine.Rserve.RserveException
 
+@Slf4j('logger')
 class RserveStatusService {
     static String SIMPLE_EXPRESSION = "rnorm(10)"
     static String REQUIRED_PACKAGES_NAME = "required.packages";
@@ -100,15 +102,15 @@ class RserveStatusService {
         List<String> list = determineMissingPackages(c);
         if (list == null) {
             // determineMissingPackages will have set lastErrorMessage
-            log.debug("Return from hasNecessaryDependencies because missing packages array is null");
+            logger.debug("Return from hasNecessaryDependencies because missing packages array is null");
             return false;
         }
 
         boolean ok = (list.size() == 0);
 
         if (!ok) {
-            log.debug("list of dependencies is not empty: ${list}");
-            log.debug("lastErrorMessage from determineMissingPackages: ${lastErrorMessage}");
+            logger.debug("list of dependencies is not empty: ${list}");
+            logger.debug("lastErrorMessage from determineMissingPackages: ${lastErrorMessage}");
             lastErrorMessage = "Packages not found: ${list}";
         }
 
@@ -120,8 +122,8 @@ class RserveStatusService {
         try {
             c.assign(REQUIRED_PACKAGES_NAME,REQUIRED_PACKAGES_ARRAY);
         } catch (REngineException e) {
-            log.debug("Return from determineMissingPackages because assignment failed!");
-            log.debug("  " + e.getLocalizedMessage());
+            logger.debug("Return from determineMissingPackages because assignment failed!");
+            logger.debug("  " + e.getLocalizedMessage());
             lastErrorMessage = "exception in assignment of required packages: " + e.getLocalizedMessage();
             return null;
         }
@@ -131,8 +133,8 @@ class RserveStatusService {
             try {
                 array = results.asStrings();
             } catch (REXPMismatchException e) {
-                log.debug("Return from determineMissingPackages because conversion of package array failed!");
-                log.debug("  " + e.getLocalizedMessage());
+                logger.debug("Return from determineMissingPackages because conversion of package array failed!");
+                logger.debug("  " + e.getLocalizedMessage());
                 lastErrorMessage = "Exception in converting results to an String array: " + e.getLocalizedMessage();
                 return null;
             }

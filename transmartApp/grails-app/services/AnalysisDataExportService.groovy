@@ -1,5 +1,6 @@
 import com.recomdata.util.ExcelGenerator
 import com.recomdata.util.ExcelSheet
+import groovy.util.logging.Slf4j
 import org.transmart.SearchResult
 import org.transmart.biomart.BioAssayAnalysis
 import org.transmart.biomart.BioAssayAnalysisData
@@ -11,6 +12,7 @@ import org.transmart.biomart.Experiment
  * @version $Revision: 9178 $
  */
 
+@Slf4j('logger')
 class AnalysisDataExportService {
 
     def renderAnalysisInExcel(BioAssayAnalysis analysis) {
@@ -143,7 +145,7 @@ class AnalysisDataExportService {
         String organism = ""
         int orgIndex = -1
 
-        log.info("Number of Experiments: " + sResult.result.expAnalysisResults.size())
+        logger.info("Number of Experiments: " + sResult.result.expAnalysisResults.size())
 
         expAnalysisMap.each { k, v ->
             values2.add([k.accession] + ["", "", "", "", "", "", "", "", ""] + [k.getCompoundNames()] + [k.getDiseaseNames()])
@@ -206,7 +208,7 @@ class AnalysisDataExportService {
         int orgIndex = -1
 
         def ear = sResult.result.expAnalysisResults[0]
-        log.info("Number of Experiments: " + ear.expCount)
+        logger.info("Number of Experiments: " + ear.expCount)
 
         ear.analysisResultList.each {
             def experiment = Experiment.get(it.experimentId)
@@ -266,12 +268,12 @@ class AnalysisDataExportService {
         String organism = ""
         int orgIndex = -1
 
-        log.info("Number of Trials: " + sResult.result.expAnalysisResults.size())
+        logger.info("Number of Trials: " + sResult.result.expAnalysisResults.size())
 
         trialMap.each { k, v ->
             values2.add([k.trialNumber] + ["", "", "", "", "", "", "", "", ""] + [k.getCompoundNames()] + [k.getDiseaseNames()])
             orgString = ""
-            log.info("Trial Number: " + k.trialNumber)
+            logger.info("Trial Number: " + k.trialNumber)
             v.each {
                 values2.add([""] + [it.calcDisplayTEAScore()] + it.analysis.getValues() + placebm2)
                 // First column is for accession number
@@ -331,7 +333,7 @@ class AnalysisDataExportService {
         String orgString = ""
         String organism = ""
         int orgIndex = -1
-        log.info("Number of Trials: " + sResult.result.expCount)
+        logger.info("Number of Trials: " + sResult.result.expCount)
 
         def ear = sResult.result.expAnalysisResults[0]
         def trialValues = []
@@ -339,7 +341,7 @@ class AnalysisDataExportService {
         ear.analysisResultList.each {
             def experiment = Experiment.get(it.experimentId)
             trialValues = it.experiment.getValues()
-            log.info("Trial Number: " + trialValues[1])
+            logger.info("Trial Number: " + trialValues[1])
             values2.add([trialValues[1]] + [it.calcDisplayTEAScore()] + it.analysis.getValues() + [experiment.getCompoundNames()] + [experiment.getDiseaseNames()] + placebm2)
             orgString = ""
             it.assayAnalysisValueList.each {

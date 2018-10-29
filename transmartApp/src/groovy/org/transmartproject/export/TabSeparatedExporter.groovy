@@ -1,6 +1,6 @@
 package org.transmartproject.export
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.dataquery.DataRow
 import org.transmartproject.core.dataquery.TabularResult
@@ -12,7 +12,7 @@ import org.transmartproject.core.exceptions.NoSuchResourceException
 
 import javax.annotation.PostConstruct
 
-@Log4j
+@Slf4j('logger')
 class TabSeparatedExporter implements HighDimExporter {
     final static String SEPARATOR = "\t"
 
@@ -39,7 +39,7 @@ class TabSeparatedExporter implements HighDimExporter {
                     dataTypeResource.supportedProjections
         } catch (NoSuchResourceException e) {
             // No resource found for datatype, so not supported.
-            log.warn(e.getMessage())
+            logger.warn(e.getMessage())
             return false
         }
     }
@@ -64,7 +64,7 @@ class TabSeparatedExporter implements HighDimExporter {
     public void export(TabularResult tabularResult, Projection projection,
                        Closure<OutputStream> newOutputStream, Closure<Boolean> isCancelled) {
 
-        log.info("started exporting to $format ")
+        logger.info("started exporting to $format ")
         def startTime = System.currentTimeMillis()
 
         if (isCancelled()) {
@@ -122,7 +122,7 @@ class TabSeparatedExporter implements HighDimExporter {
             }
         }
 
-        log.info("Exporting data took ${System.currentTimeMillis() - startTime} ms")
+        logger.info("Exporting data took ${System.currentTimeMillis() - startTime} ms")
     }
 
     /**

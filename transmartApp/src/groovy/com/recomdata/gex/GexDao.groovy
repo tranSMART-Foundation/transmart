@@ -2,6 +2,7 @@ package com.recomdata.gex
 
 import com.recomdata.transmart.data.export.util.FileWriterUtil
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.logging.LogFactory
 import org.rosuda.REngine.REXP
@@ -16,6 +17,7 @@ import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.
  *
  */
 @Deprecated
+@Slf4j('logger')
 public class GexDao {
     ApplicationContext ctx = org.codehaus.groovy.grails.web.context.ServletContextHolder.getServletContext().getAttribute(org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes.APPLICATION_CONTEXT)
     def dataSource = ctx.getBean('dataSource')
@@ -56,7 +58,7 @@ public class GexDao {
             }
 
         } catch (Exception e) {
-            log.info(e.getMessage());
+            logger.info(e.getMessage());
         }
 
     }
@@ -116,7 +118,7 @@ public class GexDao {
 
         s.append(" ORDER BY probe_id, patient_id")
 
-        //log.debug(s.toString());
+        //logger.debug(s.toString());
         return s.toString();
     }
 
@@ -174,7 +176,7 @@ public class GexDao {
         //Always add an order by to the query.
         assayS.append(" ORDER BY s.assay_id");
 
-        log.debug("getAssayIds used this query: " + assayS.toString());
+        logger.debug("getAssayIds used this query: " + assayS.toString());
         println("getAssayIds used this query: " + assayS.toString());
 
         //Add each result to an array.
@@ -211,7 +213,7 @@ public class GexDao {
         //Append the patient ids.
         trialQ.append(" where s.patient_id in (").append(ids).append(") and s.platform = 'MRNA_AFFYMETRIX'");
 
-        //log.debug("getTrialName used this query: " + trialQ.toString());
+        //logger.debug("getTrialName used this query: " + trialQ.toString());
 
         //Add the trial names to a string.
         String trialNames = "";
@@ -291,7 +293,7 @@ public class GexDao {
         //Construct an in list in case the user had multiple genes separated by ",".
         pathwayS.append(convertStringToken(pathwayName));
 
-        log.debug("query to get genes from pathway: " + pathwayS.toString());
+        logger.debug("query to get genes from pathway: " + pathwayS.toString());
 
         //Add genes to an array.
         def genesArray = [];
@@ -397,7 +399,7 @@ public class GexDao {
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 
         def char separator = '\t';
-        log.info("started file writing")
+        logger.info("started file writing")
         def output;
         def outFile;
 
@@ -450,20 +452,20 @@ public class GexDao {
                 lineToWrite = null
             })
         } catch (Exception e) {
-            log.info(e.getMessage())
-            log.info(e.printStackTrace())
+            logger.info(e.getMessage())
+            logger.info(e.printStackTrace())
         } finally {
             output?.close()
             filePath = outFile?.getAbsolutePath()
             //writerUtil.finishWriting();
-            log.info("completed file writing")
+            logger.info("completed file writing")
             sql?.close();
         }
         return filePath
     }
 
     private void pivotData(String inputFileLoc) {
-        log.info('Pivot File started')
+        logger.info('Pivot File started')
         if (inputFileLoc != "") {
             File inputFile = new File(inputFileLoc)
             if (inputFile) {
@@ -489,23 +491,23 @@ public class GexDao {
     }
 
     private String derivePathwayName(pathway_name) {
-        //log.debug("Derived pathway name as ${pathway_name}")
+        //logger.debug("Derived pathway name as ${pathway_name}")
 
-        //log.debug("Pathway name has been set to ${pathway_name}")
+        //logger.debug("Pathway name has been set to ${pathway_name}")
 
         if (pathway_name == null || pathway_name.length() == 0 || pathway_name == "null") {
-            //log.debug("Resetting pathway name to null")
+            //logger.debug("Resetting pathway name to null")
             pathway_name = null
         }
 
         //grailsApplication.config.com.recomdata.search.genepathway=='native'
         boolean nativeSearch = true
 
-        //log.debug("nativeSearch: ${nativeSearch}")
+        //logger.debug("nativeSearch: ${nativeSearch}")
 
         if (!nativeSearch && pathway_name != null) {
             //pathway_name = SearchKeyword.get(Long.valueOf(pathway_name)).uniqueId;
-            //log.debug("pathway_name has been set to a keyword ID: ${pathway_name}")
+            //logger.debug("pathway_name has been set to a keyword ID: ${pathway_name}")
         }
 
         return pathway_name
@@ -567,7 +569,7 @@ public class GexDao {
                 }
             }
         } catch (Exception e) {
-            log.info(e.getMessage())
+            logger.info(e.getMessage())
         } finally {
             sql?.close()
         }

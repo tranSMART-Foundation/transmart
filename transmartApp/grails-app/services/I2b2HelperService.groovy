@@ -2,6 +2,7 @@ import com.recomdata.db.DBHelper
 import com.recomdata.export.*
 import grails.util.Holders
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 import i2b2.*
 import org.transmart.CohortInformation
 import org.transmart.searchapp.AuthUser
@@ -32,6 +33,7 @@ import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.
 import static org.transmartproject.db.ontology.AbstractAcrossTrialsOntologyTerm.ACROSS_TRIALS_TABLE_CODE
 import static org.transmartproject.db.ontology.AbstractAcrossTrialsOntologyTerm.ACROSS_TRIALS_TOP_TERM_NAME
 
+@Slf4j('logger')
 class I2b2HelperService {
 
     static String GENE_PATTERN_WHITE_SPACE_DEFAULT = "0";
@@ -73,7 +75,7 @@ class I2b2HelperService {
 			        from qt_patient_set_collection
 			        where result_instance_id = ?)""";
         sql.eachRow(sqlt, [result_instance_id], { row ->
-//            log.trace("row: " + row[0] + "," + row[1] + "," + row[2])
+//            logger.trace("row: " + row[0] + "," + row[1] + "," + row[2])
             def id = row[2];
             if (row[1]) {
                 def holder = []
@@ -82,7 +84,7 @@ class I2b2HelperService {
                     id = holder[1];
                 }
             }
-//            log.trace ("id = " + id)
+//            logger.trace ("id = " + id)
             if (!idSet.contains(id)) {
                 idSet.add(id)
                 values.add(row[0])
@@ -107,7 +109,7 @@ class I2b2HelperService {
      * Converts a concept key to a path
      */
     def keyToPath(String concept_key) {
-        log.trace("keytoPath from key: " + concept_key);
+        logger.trace("keytoPath from key: " + concept_key);
         String fullname = concept_key.substring(concept_key.indexOf("\\", 2), concept_key.length());
         String path = fullname;
         if (!fullname.endsWith("\\")) {
@@ -191,7 +193,7 @@ class I2b2HelperService {
      * Gets the concept codes associated with a concept key (comma delimited string returned)
      */
     def String getConceptCodeFromKey(String key) {
-        log.trace("Getting concept codes for key:" + key);
+        logger.trace("Getting concept codes for key:" + key);
         //String slash="\\";
         //logMessage("Here is slash: "+slash);
         StringBuilder concepts = new StringBuilder();
@@ -203,10 +205,10 @@ class I2b2HelperService {
         Sql sql = new Sql(dataSource);
         String sqlt =
                 sql.eachRow("SELECT CONCEPT_CD FROM CONCEPT_DIMENSION c WHERE CONCEPT_PATH = ?", [path], { row ->
-                    log.trace("Found code:" + row.CONCEPT_CD);
+                    logger.trace("Found code:" + row.CONCEPT_CD);
                     concepts.append(row.CONCEPT_CD);
                 });
-        log.trace("Done getting concept codes for key:" + key);
+        logger.trace("Done getting concept codes for key:" + key);
         return concepts.toString();
     }
 
@@ -240,7 +242,7 @@ class I2b2HelperService {
      * Gets the level from a concept key (level indicates depth in tree)
      */
     def int getLevelFromKey(String key) {
-        log.trace("Getting level from key:" + key);
+        logger.trace("Getting level from key:" + key);
         String fullname = key.substring(key.indexOf("\\", 2), key.length());
         //path=path.replace("@", slash);
         int res = 0;
@@ -249,12 +251,12 @@ class I2b2HelperService {
                 sql.eachRow("SELECT c_hlevel FROM i2b2metadata.i2b2 WHERE C_FULLNAME = ?", [fullname], { row ->
                     res = row.c_hlevel
                 })
-        log.trace("Level is:" + res);
+        logger.trace("Level is:" + res);
         return res;
     }
 
     def getMarkerTypeFromConceptCd(conceptCd) {
-        log.trace("Getting marker type from concept code:" + conceptCd);
+        logger.trace("Getting marker type from concept code:" + conceptCd);
         Sql sql = new Sql(dataSource)
 
         def markerType = ""
@@ -278,19 +280,19 @@ class I2b2HelperService {
      * Determines if a concept key is a value concept or not
      */
     def Boolean isValueConceptKey(String concept_key) {
-        log.trace "----------------- start isValueConceptKey"
-        log.trace "concept_key: " + concept_key
+        logger.trace "----------------- start isValueConceptKey"
+        logger.trace "concept_key: " + concept_key
         if (isXTrialsConcept(concept_key)) {
             def itemProbe = conceptsResourceService.getByKey(concept_key)
-            log.trace "itemProbe.modifierDimension.valueType = " + itemProbe.modifierDimension.valueType
+            logger.trace "itemProbe.modifierDimension.valueType = " + itemProbe.modifierDimension.valueType
             def xTrialsValueConcept = itemProbe.modifierDimension.valueType.equalsIgnoreCase("N")
-            log.trace "isValueConceptKey returns " + xTrialsValueConcept
+            logger.trace "isValueConceptKey returns " + xTrialsValueConcept
             return xTrialsValueConcept
     }
         def concept_code = getConceptCodeFromKey(concept_key)
-        log.trace "concept_code: " + concept_code
+        logger.trace "concept_code: " + concept_code
         def ret = isValueConceptCode(concept_code)
-        log.trace "isValueConceptKey returns " + ret;
+        logger.trace "isValueConceptKey returns " + ret;
         return ret
     }
 
@@ -313,7 +315,7 @@ class I2b2HelperService {
         // to use the API and to rewrite the underlying object class to use the API.
         // A special case was made for across trials data, because, at this time of this change,
         // there is no unified representation of across trials data and 'normal' data
-        //log.trace "----------------- isLeafConceptKey - String case"
+        //logger.trace "----------------- isLeafConceptKey - String case"
 
         if (isXTrialsConcept(concept_key)) {
             def itemProbe = conceptsResourceService.getByKey(concept_key)
@@ -335,7 +337,7 @@ class I2b2HelperService {
         // profuse appoligies to future programmers reading this code; it is clearly a mess
         // and this is a patch on top of a mess; the correct solution is to rewrite all this code
         // to use the API and to rewrite the underlying object class to use the API.
-        //log.trace "----------------- isLeafConceptKey - AcrossTrialsOntologyTerm case"
+        //logger.trace "----------------- isLeafConceptKey - AcrossTrialsOntologyTerm case"
         EnumSet probeSet = conceptItem.visualAttributes
         if (probeSet.size() == 0) return false;
         return probeSet.any{ it == org.transmartproject.core.ontology.OntologyTerm.VisualAttributes.LEAF }
@@ -348,7 +350,7 @@ class I2b2HelperService {
         // profuse appoligies to future programmers reading this code; it is clearly a mess
         // and this is a patch on top of a mess; the correct solution is to rewrite all this code
         // to use the API and to rewrite the underlying object class to use the API.
-        //log.trace "----------------- isLeafConceptKey - I2b2 case"
+        //logger.trace "----------------- isLeafConceptKey - I2b2 case"
         return conceptItem.cVisualattributes.contains("L")
     }
 
@@ -356,8 +358,8 @@ class I2b2HelperService {
      * Gets the distinct patient counts for the children of a parent concept key
      */
     def getChildrenWithPatientCountsForConcept(String concept_key, AuthUser user) {
-        log.debug "----------------- getChildrenWithPatientCountsForConcept"
-        log.debug "concept_key = " + concept_key
+        logger.debug "----------------- getChildrenWithPatientCountsForConcept"
+        logger.debug "concept_key = " + concept_key
 
         def xTrailsTopNode = "\\\\" + ACROSS_TRIALS_TABLE_CODE + "\\" + ACROSS_TRIALS_TOP_TERM_NAME + "\\"
         def xTrialsCaseFlag = isXTrialsConcept(concept_key) || (concept_key == xTrailsTopNode)
@@ -365,7 +367,7 @@ class I2b2HelperService {
         def counts = [:];
 
         if (xTrialsCaseFlag) {
-            log.trace("XTrials for getConceptDistributionDataForConcept")
+            logger.trace("XTrials for getConceptDistributionDataForConcept")
             def node = conceptsResourceService.getByKey(concept_key)
             def List<OntologyTerm> childNodes = node.children
             for (OntologyTerm term: childNodes) {
@@ -373,9 +375,9 @@ class I2b2HelperService {
             }
         } else {
             Sql sql = new Sql(dataSource);
-            log.trace("Trying to get counts for parent_concept_path=" + keyToPath(concept_key));
+            logger.trace("Trying to get counts for parent_concept_path=" + keyToPath(concept_key));
             sql.eachRow("select * from CONCEPT_COUNTS where parent_concept_path = ?", [keyToPath(concept_key)], { row ->
-                log.trace "Found " << row.concept_path
+                logger.trace "Found " << row.concept_path
                 counts.put(row.concept_path, row.patient_count)
             });
 
@@ -388,18 +390,18 @@ class I2b2HelperService {
      * for display in a distribution histogram
      */
     def getConceptDistributionDataForValueConcept(String concept_cd) {
-        log.trace("Getting concept distribution data for value concept: " + concept_cd);
+        logger.trace("Getting concept distribution data for value concept: " + concept_cd);
         Sql sql = new Sql(dataSource);
         ArrayList<Double> values = new ArrayList<Double>();
         sql.eachRow("SELECT NVAL_NUM FROM OBSERVATION_FACT f WHERE CONCEPT_CD = ?", [concept_cd], { row ->
             if (row.NVAL_NUM != null) {
                 values.add(row.NVAL_NUM);
-                log.trace("adding" + row.NVAL_NUM);
+                logger.trace("adding" + row.NVAL_NUM);
             }
         });
         ArrayList<Double> returnvalues = new ArrayList<Double>(values.size());
         for (int i = 0; i < values.size(); i++) {
-            log.trace("trying to add" + values.get(i));
+            logger.trace("trying to add" + values.get(i));
             returnvalues[i] = values.get(i);
         }
         return returnvalues;
@@ -410,14 +412,14 @@ class I2b2HelperService {
      * for display in a distribution histogram for a given subset
      */
     def getConceptDistributionDataForValueConcept(String concept_key, String result_instance_id, AuthUser user) {
-        log.debug "----------------- getConceptDistributionDataForValueConcept"
-        log.debug("Getting concept distribution data for value concept_key, " + concept_key + ", with results_instance_id = " + result_instance_id);
+        logger.debug "----------------- getConceptDistributionDataForValueConcept"
+        logger.debug("Getting concept distribution data for value concept_key, " + concept_key + ", with results_instance_id = " + result_instance_id);
 
         checkQueryResultAccess result_instance_id
-        log.trace("Access assured")
+        logger.trace("Access assured")
 
         def xTrialsCaseFlag = isXTrialsConcept(concept_key)
-        log.trace("Check for xTrails case = " + xTrialsCaseFlag)
+        logger.trace("Check for xTrails case = " + xTrialsCaseFlag)
 
         ArrayList<Double> values = new ArrayList<Double>();
 
@@ -436,7 +438,7 @@ class I2b2HelperService {
                     concept_cd + "' AND PATIENT_NUM IN (select distinct patient_num " +
                     "from qt_patient_set_collection where result_instance_id = " + result_instance_id + ")";
 
-            log.trace("executing query: sqlt=" + sqlt);
+            logger.trace("executing query: sqlt=" + sqlt);
             try {
                 //sql.eachRow(sqlt, [concept_cd, result_instance_id], {row ->
                 sql.eachRow(sqlt, { row ->
@@ -445,36 +447,36 @@ class I2b2HelperService {
                     }
                 });
             } catch (Exception e) {
-                log.error("exception in getConceptDistributionDataForValueConcept: " + e.getMessage())
+                logger.error("exception in getConceptDistributionDataForValueConcept: " + e.getMessage())
             }
 
         }
 
-        log.debug("getConceptDistributionDataForValueConcept now finished: returning values n = " + values.size());
+        logger.debug("getConceptDistributionDataForValueConcept now finished: returning values n = " + values.size());
         return values;
     }
 
     def getConceptDistributionDataForValueConceptFromCode(String concept_cd, String result_instance_id) {
-        log.debug "----------------- getConceptDistributionDataForValueConceptFromCode"
-        log.debug("Getting concept distribution data for value concept_cd, " + concept_cd + ", with results_instance_id = " + result_instance_id);
+        logger.debug "----------------- getConceptDistributionDataForValueConceptFromCode"
+        logger.debug("Getting concept distribution data for value concept_cd, " + concept_cd + ", with results_instance_id = " + result_instance_id);
 
         checkQueryResultAccess result_instance_id
-        log.trace("Access assured")
+        logger.trace("Access assured")
 
         ArrayList<Double> values = new ArrayList<Double>();
         ArrayList<Double> returnvalues = new ArrayList<Double>(values.size());
         if (result_instance_id == "") {
-            log.debug("getConceptDistributionDataForValueConceptFromCode called with no result_istance_id");
+            logger.debug("getConceptDistributionDataForValueConceptFromCode called with no result_istance_id");
             return getConceptDistributionDataForValueConcept(concept_cd);
         }
-        log.trace("Getting concept distribution data for value concept code:" + concept_cd);
+        logger.trace("Getting concept distribution data for value concept code:" + concept_cd);
         Sql sql = new Sql(dataSource);
-        log.trace("preparing query");
+        logger.trace("preparing query");
         String sqlt = """SELECT NVAL_NUM FROM OBSERVATION_FACT f WHERE CONCEPT_CD = ? AND
 		    PATIENT_NUM IN (select distinct patient_num
 			from qt_patient_set_collection
 			where result_instance_id = ?)""";
-        log.trace("executing query: " + sqlt);
+        logger.trace("executing query: " + sqlt);
         sql.eachRow(sqlt, [
                 concept_cd,
                 result_instance_id
@@ -486,7 +488,7 @@ class I2b2HelperService {
         for (int i = 0; i < values.size(); i++) {
             returnvalues[i] = values.get(i);
         }
-        log.debug("getConceptDistributionDataForValueConceptFromCode now finished: returning values n = " + returnvalues.size());
+        logger.debug("getConceptDistributionDataForValueConceptFromCode now finished: returning values n = " + returnvalues.size());
         return returnvalues;
     }
 
@@ -497,8 +499,8 @@ class I2b2HelperService {
         checkQueryResultAccess result_instance_id
         def authStudies = getAuthorizedStudies(user)
         def authStudiesString = getSqlInString(authStudies)
-        log.debug("authorized patient set studies: " + authStudiesString)
-        log.debug("getPatientSetSize(): result_instance_id = " + result_instance_id);
+        logger.debug("authorized patient set studies: " + authStudiesString)
+        logger.debug("getPatientSetSize(): result_instance_id = " + result_instance_id);
         Integer i = 0;
         Sql sql = new Sql(dataSource);
         // original code counted split_part(pd.sourcesystem_cd , ':', 2)
@@ -516,11 +518,11 @@ class I2b2HelperService {
 //        String sqlt = """select count(distinct(patient_num)) as patcount
 //						 FROM qt_patient_set_collection
 //						 WHERE result_instance_id = CAST(? AS numeric)""";
-        log.trace(sqlt);
+        logger.trace(sqlt);
         sql.eachRow(sqlt, [result_instance_id], { row ->
-            log.trace("inrow");
+            logger.trace("inrow");
             i = row.patcount;
-            log.trace(row.patcount);
+            logger.trace(row.patcount);
         });
         return i;
     }
@@ -531,7 +533,7 @@ class I2b2HelperService {
     def int getPatientSetIntersectionSize(String result_instance_id1, String result_instance_id2) {
         checkQueryResultAccess result_instance_id1, result_instance_id2
 
-        log.debug("Getting patient set intersection - result_instance_id1 = "
+        logger.debug("Getting patient set intersection - result_instance_id1 = "
                 + result_instance_id1 + ", result_instance_id2 = " + result_instance_id2);
         Integer i = 0;
         Sql sql = new Sql(dataSource);
@@ -565,14 +567,14 @@ class I2b2HelperService {
 //                    ON qt_patient_set.patient_num=pd.patient_num
 //		            """;
 
-        log.trace(sqlt);
+        logger.trace(sqlt);
         sql.eachRow(sqlt, [
                 result_instance_id1,
                 result_instance_id2
         ], { row ->
-            log.trace("inrow of intersection")
+            logger.trace("inrow of intersection")
             i = row.patcount;
-            log.trace(row.patcount);
+            logger.trace(row.patcount);
         })
         return i;
     }
@@ -602,17 +604,17 @@ class I2b2HelperService {
      * Determines if a concept code is a value concept code or not by checking the metadata xml
      */
     def Boolean isValueConceptCode(String concept_code) {
-        log.trace "Checking isValueConceptCode for code:" + concept_code
+        logger.trace "Checking isValueConceptCode for code:" + concept_code
         Boolean res = false;
         Sql sql = new Sql(dataSource);
         String sqlt = "SELECT C_METADATAXML FROM I2B2METADATA.I2B2 WHERE C_BASECODE = ?"
         String xml = "";
-        log.trace(sqlt);
+        logger.trace(sqlt);
         sql.eachRow(sqlt, [concept_code], { row ->
-            log.trace("checking metadata xml:" + row.c_metadataxml);
+            logger.trace("checking metadata xml:" + row.c_metadataxml);
             xml = clobToString(row.c_metadataxml);
         });
-        log.trace("METADATA XML:" + xml);
+        logger.trace("METADATA XML:" + xml);
 
         res = nodeXmlRepresentsValueConcept(xml)
         return res;
@@ -675,7 +677,7 @@ class I2b2HelperService {
     }
 
     def HashMap<String, Integer> getConceptDistributionDataForConcept(String concept_key, String result_instance_id, AuthUser user) throws SQLException {
-        log.debug "----------------- start getConceptDistributionDataForConcept"
+        logger.debug "----------------- start getConceptDistributionDataForConcept"
         checkQueryResultAccess result_instance_id
 
         def xTrialsCaseFlag = isXTrialsConcept(concept_key)
@@ -684,16 +686,16 @@ class I2b2HelperService {
 
         def HashMap<String, Integer> results = new LinkedHashMap<String, Integer>()
 
-        log.trace "input concept_key = " + concept_key
+        logger.trace "input concept_key = " + concept_key
         if (leafNodeFlag && !highDimNodeFlag) {
             concept_key = getParentConceptKey(concept_key)
         }
-        log.trace "lookup concept_key = " + concept_key
+        logger.trace "lookup concept_key = " + concept_key
 
         def node = conceptsResourceService.getByKey(concept_key)
 
         if (xTrialsCaseFlag) {
-            log.trace("XTrials for getConceptDistributionDataForConcept")
+            logger.trace("XTrials for getConceptDistributionDataForConcept")
             def List<OntologyTerm> childNodes = node.children
             for (OntologyTerm term: childNodes) {
                 results.put(term.name,getObservationCountForXTrialsNode(term,result_instance_id))
@@ -709,18 +711,18 @@ class I2b2HelperService {
                 WHERE C_FULLNAME LIKE ? escape '\\' AND c_hlevel = ?
                 ORDER BY C_FULLNAME
             """
-            log.trace(sqlt);
+            logger.trace(sqlt);
             sql.eachRow(sqlt, [fullname.asLikeLiteral() + "%", i], { row ->
                 results.put(row[0], getObservationCountForConceptForSubset("\\blah" + row[1], result_instance_id));
             });
         }
 
-        log.debug "getConceptDistributionDataForConcept - returns " + results
+        logger.debug "getConceptDistributionDataForConcept - returns " + results
         return results;
     }
 
     def SortedMap<String, HashMap<String, Integer>> getConceptDistributionDataForConceptByTrial(String concept_key, String result_instance_id, AuthUser user) throws SQLException {
-        log.debug "----------------- start getConceptDistributionDataForConceptByTrial"
+        logger.debug "----------------- start getConceptDistributionDataForConceptByTrial"
         checkQueryResultAccess result_instance_id
 
         def xTrialsCaseFlag = isXTrialsConcept(concept_key)
@@ -728,37 +730,37 @@ class I2b2HelperService {
 
         def SortedMap<String, HashMap<String, Integer>> results = new TreeMap<String, HashMap<String, Integer>>()
 
-        log.trace "input concept_key = " + concept_key
+        logger.trace "input concept_key = " + concept_key
         if (leafNodeFlag) {
             concept_key = getParentConceptKey(concept_key)
         }
-        log.trace "lookup concept_key = " + concept_key
+        logger.trace "lookup concept_key = " + concept_key
 
         def baseNode = conceptsResourceService.getByKey(concept_key)
-        log.trace(baseNode.class.name)
+        logger.trace(baseNode.class.name)
 
         def List<String> trials = trialsForResultSet(result_instance_id, user)
-        log.trace("trials = " + trials)
+        logger.trace("trials = " + trials)
 
         if (xTrialsCaseFlag) {
-            log.trace("Across Trials case")
+            logger.trace("Across Trials case")
             def itemProbe = conceptsResourceService.getByKey(concept_key)
             def String modifier_cd = itemProbe.modifierDimension.code
             for (String trial: trials) {
-                log.trace("results for: " + trial + ", " + concept_key)
+                logger.trace("results for: " + trial + ", " + concept_key)
                 results.put(trial, getAllObservationCountsForXTrialsConceptNodeWithTrial(trial, concept_key, result_instance_id))
             }
 
         } else {
-            log.trace("Single study case")
+            logger.trace("Single study case")
             // if not across trials; all parients in same trial/study
             def study = "Study"
             if (!trials.isEmpty()) study = trials[0]
             results.put(study,getConceptDistributionDataForConcept(concept_key, result_instance_id, user))
         }
 
-        log.trace("results.size() = " + results.size())
-        log.debug "----------------- end getConceptDistributionDataForConceptByTrial"
+        logger.trace("results.size() = " + results.size())
+        logger.debug "----------------- end getConceptDistributionDataForConceptByTrial"
         return results
     }
     /**
@@ -799,19 +801,19 @@ class I2b2HelperService {
      *  Gets the concept distributions for a concept in a subset
      */
     def HashMap<String, Integer> getConceptDistributionDataForConceptOld2(String concept_key, String result_instance_id) throws SQLException {
-        log.debug "----------------- start getConceptDistributionDataForConcept"
+        logger.debug "----------------- start getConceptDistributionDataForConcept"
         String fullname = concept_key.substring(concept_key.indexOf("\\", 2), concept_key.length());
         HashMap<String, Integer> results = new LinkedHashMap<String, Integer>();
 
         def xTrialsCaseFlag = isXTrialsConcept(concept_key)
 
         if (xTrialsCaseFlag) {
-            log.warn("NOT IMPLEMENTED - XTrials for getConceptDistributionDataForConcept")
+            logger.warn("NOT IMPLEMENTED - XTrials for getConceptDistributionDataForConcept")
         } else {
         // check to see if there is a mapping from this concept_key to a concept_key for the results
-            log.trace("looking up parent_concept of fullname: " + fullname)
+            logger.trace("looking up parent_concept of fullname: " + fullname)
         String parent_concept = lookupParentConcept(fullname);
-            log.trace("parent_concept: " + parent_concept);
+            logger.trace("parent_concept: " + parent_concept);
         Set<String> concepts = new HashSet<String>();
         if (parent_concept != null) {
             // lookup appropriate children
@@ -819,15 +821,15 @@ class I2b2HelperService {
             if (childConcepts.isEmpty()) {
                 childConcepts.add(concept_key);
             }
-                log.trace("getConceptDistributionDataForConcept: childConcepts: " + childConcepts);
+                logger.trace("getConceptDistributionDataForConcept: childConcepts: " + childConcepts);
             for (c in childConcepts) {
                 int i = getLevelFromKey(concept_key) + 1;
                 fullname = getConceptPathFromCode(c);
-                    log.trace("** IN LOOP: fullname: " + fullname);
+                    logger.trace("** IN LOOP: fullname: " + fullname);
                 Sql sql = new Sql(dataSource);
                 String sqlt =
                         "SELECT DISTINCT c_name, c_fullname FROM i2b2metadata.i2b2 WHERE C_FULLNAME LIKE ? escape '\\' AND c_hlevel = ? ORDER BY C_FULLNAME";
-                log.trace(sqlt);
+                logger.trace(sqlt);
                 sql.eachRow(sqlt, [fullname.asLikeLiteral() + "%", i], { row ->
                     if (results.get(row[0]) == null) {
                         results.put(row[0], getObservationCountForConceptForSubset("\\blah" + row[1], result_instance_id));
@@ -840,7 +842,7 @@ class I2b2HelperService {
             int i = getLevelFromKey(concept_key) + 1;
             Sql sql = new Sql(dataSource);
             String sqlt = "SELECT DISTINCT c_name, c_fullname FROM i2b2metadata.i2b2 WHERE C_FULLNAME LIKE ? escape '\\' AND c_hlevel = ? ORDER BY C_FULLNAME";
-            log.trace(sqlt);
+            logger.trace(sqlt);
             sql.eachRow(sqlt, [fullname.asLikeLiteral() + "%", i], { row ->
                 results.put(row[0], getObservationCountForConceptForSubset("\\blah" + row[1], result_instance_id));
             });
@@ -865,7 +867,7 @@ class I2b2HelperService {
         sql.eachRow(sqlt, [fullname.asLikeLiteral() + "%", i], { row ->
             String conceptkey = prefix + row.c_fullname;
             xml = clobToString(row.c_metadataxml);
-            log.trace("METADATA XML:" + xml);
+            logger.trace("METADATA XML:" + xml);
             if (!xml.equalsIgnoreCase("")) {
                 DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
                 domFactory.setNamespaceAware(true); // never forget this!
@@ -880,7 +882,7 @@ class I2b2HelperService {
                 //NodeList nodes = (NodeList) result;
                 Node x = (Node) result;
                 String key = x.getTextContent();
-                log.trace("Found oktousevalues: " + key);
+                logger.trace("Found oktousevalues: " + key);
                 if (key.equalsIgnoreCase("Y")) {
                     ls.add(conceptkey);
                 }
@@ -909,7 +911,7 @@ class I2b2HelperService {
     def HashMap<String, Integer> getAllObservationCountsForXTrialsConceptNodeWithTrial(String trial, String concept_key, String result_instance_id)  throws SQLException {
         checkQueryResultAccess result_instance_id
 
-        log.debug "------ getAllObservationCountsForXTrialsConceptNodeWithTrial"
+        logger.debug "------ getAllObservationCountsForXTrialsConceptNodeWithTrial"
 
         def node = conceptsResourceService.getByKey(concept_key)
         def List<OntologyTerm> childNodes = node.children
@@ -919,9 +921,9 @@ class I2b2HelperService {
             modifierList.add(childNode.code)
         }
 
-        log.trace "modifierList = " + modifierList
-        log.trace "result_instance_id = " + result_instance_id
-        log.trace "trial = " + trial
+        logger.trace "modifierList = " + modifierList
+        logger.trace "result_instance_id = " + result_instance_id
+        logger.trace "trial = " + trial
 
         // original code counted split_part(pd.sourcesystem_cd , ':', 2)
         // but this is a postgres-only built-in function
@@ -944,7 +946,7 @@ class I2b2HelperService {
             group by modifier_cd
         """
 
-        log.trace sqlt
+        logger.trace sqlt
 
         def map = [:]
         Sql sql = new Sql(dataSource)
@@ -961,15 +963,15 @@ class I2b2HelperService {
             results.put(term.name,count)
         }
 
-        log.trace(results)
+        logger.trace(results)
 
         return results;
     }
 
     def Integer getObservationCountForXTrialsNode(AcrossTrialsOntologyTerm term_node, String result_instance_id) {
-        log.debug "--------  start getObservationCountForXTrialsNode"
-        log.debug "---------- case: term_node and result_instance_id"
-        log.debug "term_node.name = " + term_node.name
+        logger.debug "--------  start getObservationCountForXTrialsNode"
+        logger.debug "---------- case: term_node and result_instance_id"
+        logger.debug "term_node.name = " + term_node.name
         checkQueryResultAccess result_instance_id
 
         def modifierList = []
@@ -980,8 +982,8 @@ class I2b2HelperService {
 
         Sql sql = new Sql(dataSource)
 
-        log.trace "modifierList = " + modifierList
-        log.trace "result_instance_id = " + result_instance_id
+        logger.trace "modifierList = " + modifierList
+        logger.trace "result_instance_id = " + result_instance_id
 
         // original code counted split_part(pd.sourcesystem_cd , ':', 2)
         // but this is a postgres-only built-in function
@@ -1006,13 +1008,13 @@ class I2b2HelperService {
             count = row[0]
         })
 
-        log.trace "count = " + count
+        logger.trace "count = " + count
         return count
     }
 
     def Integer getObservationCountForXTrialsNode(AcrossTrialsOntologyTerm term_node, AuthUser user) {
-        log.debug "-------- start getObservationCountForXTrailsNode"
-        log.debug "--------------------------- case: term_nade only"
+        logger.debug "-------- start getObservationCountForXTrailsNode"
+        logger.debug "--------------------------- case: term_nade only"
 
         def authStudies = getAuthorizedStudies(user)
         def authStudiesString = getSqlInString(authStudies)
@@ -1027,8 +1029,8 @@ class I2b2HelperService {
         
         Sql sql = new Sql(dataSource)
 
-        log.trace "For case NOT using result_instance_id"
-        log.trace "modifierList = " + modifierList
+        logger.trace "For case NOT using result_instance_id"
+        logger.trace "modifierList = " + modifierList
 
         // original code counted split_part(pd.sourcesystem_cd , ':', 2)
         // but this is a postgres-only built-in function
@@ -1046,15 +1048,15 @@ class I2b2HelperService {
                 ) as subjectList
         """
 
-		log.trace "sql text ="
-		log.trace sqlt
+		logger.trace "sql text ="
+		logger.trace sqlt
 		
         int count = 0
         sql.eachRow(sqlt, { row ->
             count = row[0]
         })
 
-        log.trace "count = " + count
+        logger.trace "count = " + count
         return count
     }
 
@@ -1079,12 +1081,12 @@ class I2b2HelperService {
     def Integer getObservationCountForConceptForSubset(String concept_key, String result_instance_id) {
         checkQueryResultAccess result_instance_id
 
-        log.trace("Getting observation count for concept:" + concept_key + " and instance:" + result_instance_id);
+        logger.trace("Getting observation count for concept:" + concept_key + " and instance:" + result_instance_id);
         String fullname = concept_key.substring(concept_key.indexOf("\\", 2), concept_key.length());
         String fullnameLike = fullname.asLikeLiteral() + "%" // Note: .asLikeLiteral() defined in github: 994dc5bb50055f8b800045f65c8e565b4aa0c113
         int i = 0;
-        log.trace("sql inputs: fullnameLike = " + fullnameLike)
-        log.trace("\tresult_instance_id = " + result_instance_id)
+        logger.trace("sql inputs: fullnameLike = " + fullnameLike)
+        logger.trace("\tresult_instance_id = " + result_instance_id)
         Sql sql = new Sql(dataSource);
         String sqlt = """
             select count(*) as subjectCount from (
@@ -1100,14 +1102,14 @@ class I2b2HelperService {
                         where result_instance_id = ?)
             ) subjectList
         """
-        log.trace(sqlt);
+        logger.trace(sqlt);
         sql.eachRow(sqlt, [
                 fullnameLike,
                 result_instance_id
         ], { row ->
             i = row[0]
         })
-        log.trace("count = " + i)
+        logger.trace("count = " + i)
         return i;
     }
 
@@ -1117,13 +1119,13 @@ class I2b2HelperService {
     def ExportTableNew addAllPatientDemographicDataForSubsetToTable(ExportTableNew tablein, String result_instance_id, String subset, AuthUser user) {
         checkQueryResultAccess result_instance_id
 
-        log.trace("Getting sampleCD's for patient number")
+        logger.trace("Getting sampleCD's for patient number")
         def mapOfSampleCdsByPatientNum = buildMapOfSampleCdsByPatientNum(result_instance_id)
 
         def authStudies = getAuthorizedStudies(user)
         def authStudiesString = getSqlInString(authStudies)
 
-        log.trace("Adding patient demographic data to grid with result instance id:" + result_instance_id + " and subset: " + subset)
+        logger.trace("Adding patient demographic data to grid with result instance id:" + result_instance_id + " and subset: " + subset)
         Sql sql = new Sql(dataSource)
         String sqlt = """
             SELECT
@@ -1149,7 +1151,7 @@ class I2b2HelperService {
             ORDER BY
                 I.PATIENT_NUM""";
 
-        log.trace "Initial grid query: $sqlt, riid: $result_instance_id"
+        logger.trace "Initial grid query: $sqlt, riid: $result_instance_id"
 
         //if i have an empty table structure so far
         if (tablein.getColumns().size() == 0) {
@@ -1199,7 +1201,7 @@ class I2b2HelperService {
                 tablein.putRow(subject, newrow);
             }
         })
-        //log.trace("FOUND DEMOGRAPHIC DATA=:"+founddata.toString())
+        //logger.trace("FOUND DEMOGRAPHIC DATA=:"+founddata.toString())
         return tablein;
     }
 
@@ -1262,14 +1264,14 @@ class I2b2HelperService {
 
         ExportColumn hascol
 
-        log.debug "----------------- start addConceptDataToTable ...... ...... ......"
-        log.trace "concept_key = " + concept_key
+        logger.debug "----------------- start addConceptDataToTable ...... ...... ......"
+        logger.trace "concept_key = " + concept_key
 
         def leafConceptFlag =  isLeafConceptKey(concept_key)
-        log.trace "is Leaf Concept key: " + leafConceptFlag
+        logger.trace "is Leaf Concept key: " + leafConceptFlag
 
         def xTrialsCaseFlag = isXTrialsConcept(concept_key)
-        log.trace "is XTrials case = " + xTrialsCaseFlag
+        logger.trace "is XTrials case = " + xTrialsCaseFlag
 
         /* As the column headers only show the (in many cases ambiguous) leaf part of the concept path,
          * showing the full concept path in the tooltip is much more informative.
@@ -1284,7 +1286,7 @@ class I2b2HelperService {
         String columntooltip = keyToPath(concept_key).replaceAll('[^a-zA-Z0-9_/\\-\\\\()\\[\\]]+','_')
 
         if (leafConceptFlag) {
-            log.debug "----------------- this is a Leaf Node"
+            logger.debug "----------------- this is a Leaf Node"
 
             def valueLeafNodeFlag = isValueConceptKey(concept_key)
             def columnType = "string"
@@ -1319,12 +1321,12 @@ class I2b2HelperService {
             // Check whether the folder is valid: first find all children of the current code
             def item = conceptsResourceService.getByKey(concept_key)
 
-            log.debug "----------------- this is Folder Node"
-            log.trace "concept_key = " + concept_key
-            log.trace "children? " + !!item.children
+            logger.debug "----------------- this is Folder Node"
+            logger.trace "concept_key = " + concept_key
+            logger.trace "children? " + !!item.children
 
             if (!item.children) {
-                log.trace("Can not show data in gridview for empty node: " + concept_key)
+                logger.trace("Can not show data in gridview for empty node: " + concept_key)
                 return tablein
             }
 
@@ -1335,11 +1337,11 @@ class I2b2HelperService {
                     }
                     return !isLeafConceptKey(it) || nodeXmlRepresentsValueConcept(it.metadataxml)
             }) {
-                log.trace("Can not show data in gridview for folder nodes with mixed type of children")
+                logger.trace("Can not show data in gridview for folder nodes with mixed type of children")
                 return tablein
             }
 
-            log.debug "----------------- all folder child nodes are categorical leaf nodes"
+            logger.debug "----------------- all folder child nodes are categorical leaf nodes"
 
             def columnType = "string"
 
@@ -1357,21 +1359,21 @@ class I2b2HelperService {
             }
 
             if (xTrialsCaseFlag) {
-                log.trace "----------------- this is Folder Node - xTrials case"
+                logger.trace "----------------- this is Folder Node - xTrials case"
                 item.children.each { child ->
-                    log.trace "Child key code: " + child.key
+                    logger.trace "Child key code: " + child.key
                     def valueLeafNodeFlag = false
                     concept_key = child.key
                     insertAcrossTrialsConceptDataIntoTable(columnid,concept_key,result_instance_id,valueLeafNodeFlag,tablein,user)
                 }
             } else {
 
-                log.debug "----------------- this is Folder Node - single study case"
+                logger.debug "----------------- this is Folder Node - single study case"
 
                 // Store the concept paths to query
                 def paths = item.children*.fullName
 
-                log.trace "Children Paths: " + paths
+                logger.trace "Children Paths: " + paths
 
                 // Find the concept codes for the given children
                 def conceptCriteria = ConceptDimension.createCriteria()
@@ -1379,7 +1381,7 @@ class I2b2HelperService {
                     'in'("conceptPath", paths)
                 }
 
-                log.trace "Children concepts: " + concepts*.conceptCode
+                logger.trace "Children concepts: " + concepts*.conceptCode
 
                 // Determine the patients to query
                 def patientIds = QtPatientSetCollection.executeQuery(
@@ -1388,7 +1390,7 @@ class I2b2HelperService {
 
                 // If nothing is found, return
                 if (!concepts || !patientIds) {
-                    log.debug "no concept; no parentIds"
+                    logger.debug "no concept; no parentIds"
                 return
             }
 
@@ -1402,7 +1404,7 @@ class I2b2HelperService {
 //                      it?.toLong()
 //              }])
 
-                log.trace "results length: " + results.length
+                logger.trace "results length: " + results.length
 
                 results.each { row ->
 
@@ -1427,7 +1429,7 @@ class I2b2HelperService {
                 }
             }
         }
-        log.debug "----------------- end addConceptDataToTable >>>>>> >>>>>> >>>>>>"
+        logger.debug "----------------- end addConceptDataToTable >>>>>> >>>>>> >>>>>>"
         return tablein;
     }
 
@@ -1436,11 +1438,11 @@ class I2b2HelperService {
         def dataList = []
         if (valueLeafNodeFlag) {
             String concept_cd = getConceptCodeFromKey(concept_key)
-            log.debug "----------------- this is a value Leaf Node"
-            log.debug "concept_key = " + concept_key
-            log.debug "concept_cd = " + concept_cd
+            logger.debug "----------------- this is a value Leaf Node"
+            logger.debug "concept_key = " + concept_key
+            logger.debug "concept_cd = " + concept_cd
             /*get the data*/
-            log.trace "result_instance_id = " + result_instance_id
+            logger.trace "result_instance_id = " + result_instance_id
             Sql sql = new Sql(dataSource)
             String sqlt = """SELECT PATIENT_NUM, NVAL_NUM, START_DATE FROM OBSERVATION_FACT f WHERE CONCEPT_CD = ? AND
 				        PATIENT_NUM IN (select distinct patient_num
@@ -1454,9 +1456,9 @@ class I2b2HelperService {
             })
         } else {
             String concept_cd = getConceptCodeFromKey(concept_key);
-            log.debug "----------------- this is a non-value, catigorical, Leaf Node"
-            log.debug "concept_key = " + concept_key
-            log.debug "concept_cd = " + concept_cd
+            logger.debug "----------------- this is a non-value, catigorical, Leaf Node"
+            logger.debug "concept_key = " + concept_key
+            logger.debug "concept_cd = " + concept_cd
             Sql sql = new Sql(dataSource)
             String sqlt = """SELECT PATIENT_NUM, TVAL_CHAR, START_DATE FROM OBSERVATION_FACT f WHERE CONCEPT_CD = ? AND
 				        PATIENT_NUM IN (select distinct patient_num
@@ -1485,9 +1487,9 @@ class I2b2HelperService {
 
     def insertConceptDataIntoTable(String columnid, String concept_key, String result_instance_id,
                                    Boolean valueLeafNodeFlag, ExportTableNew tablein) {
-        log.debug "----------------- insertConceptDataIntoTable"
-        log.debug "for columnid " + columnid
-        log.debug "and concept_key " + concept_key
+        logger.debug "----------------- insertConceptDataIntoTable"
+        logger.debug "for columnid " + columnid
+        logger.debug "and concept_key " + concept_key
         def data = fetchConceptData(concept_key,result_instance_id)
         data.each{
             def subject = it.subject
@@ -1504,7 +1506,7 @@ class I2b2HelperService {
         }
 
     def fetchAcrossTrialsData(concept_key,result_instance_id, user){
-        log.debug "----------------- fetchAcrossTrialsData"
+        logger.debug "----------------- fetchAcrossTrialsData"
 
         def valueLeafNodeFlag = isValueConceptKey(concept_key)
         def dataList = []
@@ -1515,12 +1517,12 @@ class I2b2HelperService {
         def itemProbe = conceptsResourceService.getByKey(concept_key)
         String modifier_cd = itemProbe.modifierDimension.code
 
-        log.debug "concept_key = " + concept_key
-        log.debug "modifier_cd = " + modifier_cd
-        log.debug "result_instance_id = " + result_instance_id
+        logger.debug "concept_key = " + concept_key
+        logger.debug "modifier_cd = " + modifier_cd
+        logger.debug "result_instance_id = " + result_instance_id
 
         if (valueLeafNodeFlag) {
-            log.debug "----------------- this is a value Leaf Node"
+            logger.debug "----------------- this is a value Leaf Node"
 
             Sql sql = new Sql(dataSource)
 
@@ -1544,7 +1546,7 @@ class I2b2HelperService {
                 dataList.add(['subject': subject, 'value': value])
             })
         } else {
-            log.debug "----------------- this is a non-value, catigorical, Leaf Node"
+            logger.debug "----------------- this is a non-value, catigorical, Leaf Node"
             Sql sql = new Sql(dataSource)
 
             def sqlt = """
@@ -1570,7 +1572,7 @@ class I2b2HelperService {
     }
 
     def insertAcrossTrialsConceptDataIntoTable(columnid,concept_key,result_instance_id,valueLeafNodeFlag,tablein, user) {
-        log.debug "----------------- insertAcrossTrialsConceptDataIntoTable .... ---- ....."
+        logger.debug "----------------- insertAcrossTrialsConceptDataIntoTable .... ---- ....."
 
         def data = fetchAcrossTrialsData(concept_key,result_instance_id,user)
         data.each{
@@ -1586,7 +1588,7 @@ class I2b2HelperService {
                 tablein.putRow(subject, newrow);
             }
         }
-        log.debug "----------------- insertAcrossTrialsConceptDataIntoTable >>>>> ---- >>>>>>"
+        logger.debug "----------------- insertAcrossTrialsConceptDataIntoTable >>>>> ---- >>>>>>"
     }
 
     /**
@@ -1594,8 +1596,8 @@ class I2b2HelperService {
      * */
     def HashMap<String, Integer> getPatientDemographicDataForSubset(String col, String result_instance_id, AuthUser user) {
 
-        log.trace("in getPatientDemographicDataForSubset ...")
-        log.trace("args: col = " + col + ", result_instance_id = " + result_instance_id)
+        logger.trace("in getPatientDemographicDataForSubset ...")
+        logger.trace("args: col = " + col + ", result_instance_id = " + result_instance_id)
         checkQueryResultAccess result_instance_id
         def authStudies = getAuthorizedStudies(user)
         def authStudiesString = getSqlInString(authStudies)
@@ -1626,13 +1628,13 @@ class I2b2HelperService {
 //		Group by UPPER(""" + col + """)) b
 //		ON a.cat=b.cat ORDER BY a.cat""";
 
-        log.trace(sqlt)
+        logger.trace(sqlt)
 
         sql.eachRow(sqlt, [result_instance_id], { row ->
             if (row[0] != null && row[1] != 0) {
                 results.put(row[0], row[1])
-                //log.trace("in row getting patient demographic data for subset")
-                //log.trace("Selected: " + row[0] + ", " + row[1])
+                //logger.trace("in row getting patient demographic data for subset")
+                //logger.trace("Selected: " + row[0] + ", " + row[1])
             }
         })
         return results;
@@ -1643,7 +1645,7 @@ class I2b2HelperService {
      */
     def List<String> getConceptKeysInSubset(String resultInstanceId) {
 
-        log.trace("called getConceptKeysInSubset");
+        logger.trace("called getConceptKeysInSubset");
 
         ArrayList<String> concepts = new ArrayList<String>();
         Sql sql = new Sql(dataSource)
@@ -1654,7 +1656,7 @@ class I2b2HelperService {
         String xmlrequest = "";
         sql.eachRow(sqlt, [resultInstanceId], { row ->
             xmlrequest = clobToString(row.request_xml);
-            log.trace("REQUEST_XML:" + xmlrequest)
+            logger.trace("REQUEST_XML:" + xmlrequest)
 
             DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
             domFactory.setNamespaceAware(true); // never forget this!
@@ -1677,7 +1679,7 @@ class I2b2HelperService {
                 concepts.add(key);
             }
         });
-        log.trace("getConceptKeysInSubset done");
+        logger.trace("getConceptKeysInSubset done");
         return concepts;
     }
 
@@ -1725,25 +1727,25 @@ class I2b2HelperService {
         // In the current ETL, deapp.de_xtrial_child_map, is not populated!
 
         /*get all distinct  concepts for analysis from both subsets into hashmap*/
-        log.debug("lookupParentConcept " + conceptPath);
+        logger.debug("lookupParentConcept " + conceptPath);
         try {
             Sql sql = new Sql(dataSource);
             String sqlQuery = """select parent_cd from deapp.de_xtrial_child_map xcm
 				inner join concept_dimension cd
 				on xcm.concept_cd=cd.concept_cd
 				where concept_path = ?""";
-            log.trace("\ncalled with conceptPath:" + conceptPath);
-            log.trace("\nexecuting query:" + sqlQuery);
+            logger.trace("\ncalled with conceptPath:" + conceptPath);
+            logger.trace("\nexecuting query:" + sqlQuery);
             String parentConcept = "";
             sql.eachRow(sqlQuery, [conceptPath], { row -> parentConcept = row.parent_cd; });
             if (parentConcept != "") {
-                log.trace("returning parentConcept=" + parentConcept);
+                logger.trace("returning parentConcept=" + parentConcept);
                 return parentConcept;
             } else {
                 return null;
             }
         } catch (e) {
-            log.error("Exception occurred when looking up parent concept: " + e.getMessage());
+            logger.error("Exception occurred when looking up parent concept: " + e.getMessage());
             return null;
         }
     }
@@ -1754,12 +1756,12 @@ class I2b2HelperService {
         Set<String> childConcepts = new HashSet<String>();
 
         if (parentConcept == null) {
-            log.debug("lookupChildConcepts called with parentConcept==null");
+            logger.debug("lookupChildConcepts called with parentConcept==null");
             return (childConcepts);
         }
 
         if (result_instance_id1 == "" && result_instance_id2 == "") {
-            log.debug("empty result_instance_id fields");
+            logger.debug("empty result_instance_id fields");
             return (childConcepts)
         }
 
@@ -1798,17 +1800,17 @@ class I2b2HelperService {
             sqlQuery = sqlTemplate1 + result_instance_id1 + sqlTemplate2 + result_instance_id2 + sqlTemplate3 + parentConcept;
         }
 
-        log.debug("query to get child concepts: " + sqlQuery);
-        log.debug("\n");
+        logger.debug("query to get child concepts: " + sqlQuery);
+        logger.debug("\n");
 
         try {
             sql.eachRow(sqlQuery, { row -> childConcepts.add(row.concept_cd); });
         } catch (e) {
-            log.error("Exception occurred when looking up child concepts: " + e.getMessage());
-            log.error("query: " + sqlQuery);
-            log.error("parentConcept: " + parentConcept);
-            log.error("result_instance_id1: " + result_instance_id1);
-            log.error("result_instance_id2: " + result_instance_id2);
+            logger.error("Exception occurred when looking up child concepts: " + e.getMessage());
+            logger.error("query: " + sqlQuery);
+            logger.error("parentConcept: " + parentConcept);
+            logger.error("result_instance_id1: " + result_instance_id1);
+            logger.error("result_instance_id2: " + result_instance_id2);
         }
 
         return (childConcepts);
@@ -1828,7 +1830,7 @@ class I2b2HelperService {
         Set<String> finalSet = new HashSet<String>();
         Set<String> parentSet = new HashSet<String>();
 
-        log.debug("getDistinctConceptSet called with arguments: " + result_instance_id1 + " and " + result_instance_id2)
+        logger.debug("getDistinctConceptSet called with arguments: " + result_instance_id1 + " and " + result_instance_id2)
 
         if (result_instance_id1) {
             workingSet.addAll(getConceptKeysInSubset(result_instance_id1));
@@ -1848,7 +1850,7 @@ class I2b2HelperService {
             }
         }
 
-        log.debug("getDistinctConceptSet returning set: " + finalSet);
+        logger.debug("getDistinctConceptSet returning set: " + finalSet);
         return finalSet;
     }
 
@@ -1871,17 +1873,17 @@ class I2b2HelperService {
      * Gets the request xml for query def id
      */
     def String getQueryDefinitionXMLFromQID(String qid) {
-        log.trace("Called getQueryDefinitionXML")
+        logger.trace("Called getQueryDefinitionXML")
         String xmlrequest = "";
         Sql sql = new Sql(dataSource)
 
         String sqlt = """select REQUEST_XML from QT_QUERY_MASTER WHERE QUERY_MASTER_ID = ?""";
-        log.trace(sqlt);
+        logger.trace(sqlt);
         sql.eachRow(sqlt, [qid], { row ->
-            log.trace("in xml query")
-            log.trace(row.REQUEST_XML)
+            logger.trace("in xml query")
+            logger.trace(row.REQUEST_XML)
             xmlrequest = clobToString(row.REQUEST_XML);
-            log.trace("Request XML:" + xmlrequest);
+            logger.trace("Request XML:" + xmlrequest);
         })
         return xmlrequest;
     }
@@ -1890,19 +1892,19 @@ class I2b2HelperService {
      * Gets the request xml for a result instance id
      */
     def String getQueryDefinitionXML(String resultInstanceId) {
-        log.trace("Called getQueryDefinitionXML")
+        logger.trace("Called getQueryDefinitionXML")
         String xmlrequest = "";
         Sql sql = new Sql(dataSource)
 
         String sqlt = """select REQUEST_XML from QT_QUERY_MASTER c INNER JOIN QT_QUERY_INSTANCE a
 		    ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID INNER JOIN QT_QUERY_RESULT_INSTANCE b
 		    ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID WHERE RESULT_INSTANCE_ID = ?""";
-        log.trace(sqlt);
+        logger.trace(sqlt);
         sql.eachRow(sqlt, [resultInstanceId], { row ->
-            log.trace("in xml query");
-            log.trace(row.REQUEST_XML);
+            logger.trace("in xml query");
+            logger.trace(row.REQUEST_XML);
             xmlrequest = clobToString(row.REQUEST_XML);
-            log.trace("Request XML:" + xmlrequest);
+            logger.trace("Request XML:" + xmlrequest);
         })
         return xmlrequest;
     }
@@ -1921,15 +1923,15 @@ class I2b2HelperService {
 
         String sqlt = """select distinct patient_num from qt_patient_set_collection where result_instance_id = ? 
 		AND patient_num IN (select patient_num from patient_dimension where sourcesystem_cd not like '%:S:%')""";
-        log.trace("before sql call")
+        logger.trace("before sql call")
         sql.eachRow(sqlt, [resultInstanceId], { row ->
-            log.trace("in iterator")
+            logger.trace("in iterator")
             if (subjectIds.length() > 0) {
                 subjectIds.append(",");
             }
             subjectIds.append(row.PATIENT_NUM);
         })
-        log.trace("before return")
+        logger.trace("before return")
         return subjectIds.toString();
     }
 
@@ -1942,7 +1944,7 @@ class I2b2HelperService {
         List<String> subjectIds = new ArrayList<String>();
         Sql sql = new Sql(dataSource)
         String sqlt = "select distinct patient_num from qt_patient_set_collection where result_instance_id = ?";
-        log.trace("before sql call")
+        logger.trace("before sql call")
         sql.eachRow(sqlt, [resultInstanceId], { row ->
             subjectIds.add(row.PATIENT_NUM);
         })
@@ -2056,7 +2058,7 @@ class I2b2HelperService {
         StringBuilder concepts = new StringBuilder();
         String xmlrequest = getQueryDefinitionXML(resultInstanceId);
 
-        log.trace("Request XML:" + xmlrequest);
+        logger.trace("Request XML:" + xmlrequest);
 
         DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true); // never forget this!
@@ -2085,7 +2087,7 @@ class I2b2HelperService {
             if (conceptcds != "") {
                 concepts.append(conceptcds);
             }
-            log.trace("Found Concept_CDs: " + conceptcds + " for key: " + key);
+            logger.trace("Found Concept_CDs: " + conceptcds + " for key: " + key);
         }
         return concepts.toString();
     }
@@ -2095,7 +2097,7 @@ class I2b2HelperService {
         List<String> concepts = new ArrayList<String>();
         String xmlrequest = getQueryDefinitionXML(resultInstanceId);
 
-        log.trace("Request XML:" + xmlrequest);
+        logger.trace("Request XML:" + xmlrequest);
 
         DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true); // never forget this!
@@ -2118,7 +2120,7 @@ class I2b2HelperService {
             key = x.getTextContent();
             //conceptcds=getConceptsFromKey(key);
             conceptcds = getConceptCodeFromKey(key);  //should only return the exact concept_cd not the children
-            log.trace("found concept code:" + conceptcds);
+            logger.trace("found concept code:" + conceptcds);
             concepts.add(conceptcds);
         }
         return concepts;
@@ -2233,7 +2235,7 @@ class I2b2HelperService {
             }
             sqlStr += "group by a.assay_id, b.gene_symbol order by b.gene_symbol, a.assay_id ";
 
-            log.debug("mRNA heatmap query: " + sqlStr);
+            logger.debug("mRNA heatmap query: " + sqlStr);
 
             String curGeneSymbol = null;
             Map<Long, Float> assayIdValueMap = null;
@@ -2418,7 +2420,7 @@ class I2b2HelperService {
                         sample1,
                         sample2,
                         intensityType);
-                log.debug("mRNA heatmap query: " + query);
+                logger.debug("mRNA heatmap query: " + query);
 
                 StringBuilder s = new StringBuilder("");
 
@@ -2502,12 +2504,12 @@ class I2b2HelperService {
 
                 // force clean up
                 //rowsObj = null;
-                //	log.trace("results: " + s);
+                //	logger.trace("results: " + s);
             } else if (datatype.toUpperCase() == "RBM") {
                 StringBuilder s = new StringBuilder("");
                 String query = createRBMHeatmapQuery(pathwayName, ids1, ids2,
                         concepts1, concepts2, timepoint1, timepoint2, rbmPanels1, rbmPanels2);
-                log.debug("RBM heatmap query: " + query);
+                logger.debug("RBM heatmap query: " + query);
                 Sql sql = new Sql(dataSource);
                 def rowsObj = sql.rows(query, numColumnsClosure)
 
@@ -2533,11 +2535,11 @@ class I2b2HelperService {
                 }
 
                 rowsObj = null;
-                //	log.trace("results: " + s);
+                //	logger.trace("results: " + s);
             } else if (datatype.toUpperCase() == "PROTEIN") {
                 String query = createProteinHeatmapQuery(pathwayName, ids1, ids2,
                         concepts1, concepts2, timepoint1, timepoint2);
-                log.debug("Protein heatmap query: " + query);
+                logger.debug("Protein heatmap query: " + query);
 
                 StringBuilder s = new StringBuilder("");
                 Sql sql = new Sql(dataSource);
@@ -2569,7 +2571,7 @@ class I2b2HelperService {
                     gpf.writeToGctFile(s.toString());
                     gpf.writeToCSVFile(s.toString().replaceAll("\t", ","))
                 }
-                //	log.trace("results: " + s);
+                //	logger.trace("results: " + s);
             }
 
             if (rows == 0) {
@@ -4426,7 +4428,7 @@ class I2b2HelperService {
         StringBuilder trialQ = new StringBuilder("select distinct s.trial_name from de_subject_sample_mapping s ");
         trialQ.append(" where s.patient_id in (").append(ids).append(") and s.platform = 'MRNA_AFFYMETRIX'");
 
-        log.trace("getTrialName used this query: " + trialQ.toString());
+        logger.trace("getTrialName used this query: " + trialQ.toString());
 
         String trialNames = "";
         sql.eachRow(trialQ.toString(), { row ->
@@ -4461,7 +4463,7 @@ class I2b2HelperService {
         trialQ.append(" where s.SAMPLE_ID in (").append(quoteCSV(ids)).append(")");
 
         //Log the trial query.
-        log.debug("getTrialNameBySampleID used this query: " + trialQ.toString());
+        logger.debug("getTrialNameBySampleID used this query: " + trialQ.toString());
 
         //This will be the list of trial names.
         String trialNames = "";
@@ -4499,7 +4501,7 @@ class I2b2HelperService {
         def sampleTypesArray = [];
         StringBuilder sampleQ = new StringBuilder("SELECT distinct s.SAMPLE_TYPE_CD FROM de_subject_sample_mapping s WHERE s.CONCEPT_CODE IN ").append(convertStringToken(concepts));
 
-        log.debug("getSampleTypes used this query: " + sampleQ.toString());
+        logger.debug("getSampleTypes used this query: " + sampleQ.toString());
         sql.eachRow(sampleQ.toString(), { row ->
             String st = row.sample_type_cd;
             if (st != null && st.trim().length() > 0) {
@@ -4524,7 +4526,7 @@ class I2b2HelperService {
         }
         assayS.append(" ORDER BY s.assay_id");
 
-        log.debug("getAssayIds used this query: " + assayS.toString());
+        logger.debug("getAssayIds used this query: " + assayS.toString());
 
         def assayIdsArray = [];
         sql.eachRow(assayS.toString(), { row ->
@@ -4566,7 +4568,7 @@ class I2b2HelperService {
         }
         pathwayS.append(pathwayName.replaceAll("'", "''")).append("'");
 
-        log.debug("query to get genes from pathway: " + pathwayS.toString());
+        logger.debug("query to get genes from pathway: " + pathwayS.toString());
 
         def genesArray = [];
         sql.eachRow(pathwayS.toString(), { row ->
@@ -4596,7 +4598,7 @@ class I2b2HelperService {
         s.append(" AND a.assay_id IN (").append(assayIds).append(")");
         // s.append(" order by a.patient_id, a.GENE_SYMBOL, a.PROBESET");
 
-        log.debug("createMRNAHeatmapQuery generated this query: " + s.toString());
+        logger.debug("createMRNAHeatmapQuery generated this query: " + s.toString());
         return s.toString();
     }
 
@@ -4779,10 +4781,10 @@ class I2b2HelperService {
         StringBuilder s = new StringBuilder();
         String genes;
 
-        log.debug("Pathway: " + pathwayName)
+        logger.debug("Pathway: " + pathwayName)
         if (pathwayName != null && pathwayName.length() > 0 && "SHOWALLANALYTES".compareToIgnoreCase(pathwayName) != 0) {
             genes = getGenes(pathwayName);
-            log.debug("Genes obtained for given pathway: " + genes)
+            logger.debug("Genes obtained for given pathway: " + genes)
         }
 
         if (timepoint == null || timepoint.length() == 0) {
@@ -4808,7 +4810,7 @@ class I2b2HelperService {
             s.append(" AND t1.gene_id IN (").append(genes).append(")");
         }
 
-        log.debug(s.toString());
+        logger.debug(s.toString());
         return s.toString();
     }
 
@@ -4816,20 +4818,20 @@ class I2b2HelperService {
     def String createProteinHeatmapQuery(String prefix, String pathwayName,
                                          String ids, String concepts, String timepoint) {
 
-        log.debug("createProteinHeatmapQuery called with concepts = " + concepts);
+        logger.debug("createProteinHeatmapQuery called with concepts = " + concepts);
 
         Sql sql = new Sql(dataSource);
 
-        log.debug("createProteinHeatmapQuery created sql object");
+        logger.debug("createProteinHeatmapQuery created sql object");
 
         String cntQuery = "SELECT COUNT(*) as N FROM DE_SUBJECT_SAMPLE_MAPPING WHERE concept_code IN (" +
                 quoteCSV(concepts) + ")";
 
-        log.debug("createProteinHeatmapQuery created cntQuery = " + cntQuery);
+        logger.debug("createProteinHeatmapQuery created cntQuery = " + cntQuery);
 
         Integer cnt;
 
-        log.debug("createProteinHeatmapQuery defined cnt = " + cntQuery);
+        logger.debug("createProteinHeatmapQuery defined cnt = " + cntQuery);
 
 
         sql.query(cntQuery) { ResultSet rs ->
@@ -4838,9 +4840,9 @@ class I2b2HelperService {
             };
         }
 
-        log.debug("createProteinHeatmapQuery executed query to get count");
+        logger.debug("createProteinHeatmapQuery executed query to get count");
 
-        log.debug("createProteinHeatmapQuery cnt=" + cnt);
+        logger.debug("createProteinHeatmapQuery cnt=" + cnt);
 
         StringBuilder s = new StringBuilder();
 
@@ -4901,8 +4903,8 @@ class I2b2HelperService {
                 s.append("a.patient_id IN (" + ids + ")");
             }
         }
-        log.debug("createProteinHeatmapQuery complete:" + s.toString());
-        // log.debug(s.toString());
+        logger.debug("createProteinHeatmapQuery complete:" + s.toString());
+        // logger.debug(s.toString());
         return s.toString();
     }
 
@@ -4912,10 +4914,10 @@ class I2b2HelperService {
                                          String concepts1, String concepts2,
                                          String timepoint1, String timepoint2) {
 
-        log.debug("Protein: called with ids1=" + ids1 + " and ids2=" + ids2);
+        logger.debug("Protein: called with ids1=" + ids1 + " and ids2=" + ids2);
 
         String columns = listHeatmapColumns("component", ids1, ids2, "S1_", "S2_") + ", star"
-        log.debug("Protein SELECT: " + columns)
+        logger.debug("Protein SELECT: " + columns)
 
         String s1;
         if (ids1 != null && ids1.length() > 0) {
@@ -4927,7 +4929,7 @@ class I2b2HelperService {
         };
         //String subjects = "'" + getSubjectIds(ids1, ids2, "S1_", "S2_", "','") + "'";
         String subjects = getSubjectIds1(ids1, ids2, "S1_", "S2_") + ", '*' as star";
-        log.debug("Protein Pivot: " + subjects)
+        logger.debug("Protein Pivot: " + subjects)
 
         String r;
         if (s1 != null) {
@@ -4956,10 +4958,10 @@ class I2b2HelperService {
                                      String timepoint1, String timepoint2,
                                      String rbmPanels1, String rbmPanels2) {
 
-        log.debug("RBM: called with ids1=" + ids1 + " and ids2=" + ids2);
+        logger.debug("RBM: called with ids1=" + ids1 + " and ids2=" + ids2);
 
         String columns = listHeatmapColumns("antigen_name", ids1, ids2, "S1_", "S2_") + ", star"
-        log.debug("SELECT: " + columns)
+        logger.debug("SELECT: " + columns)
 
         String s1;
         if (ids1 != null && ids1.length() > 0) {
@@ -4971,7 +4973,7 @@ class I2b2HelperService {
         };
         //String subjects = "'" + getSubjectIds(ids1, ids2, "S1_", "S2_", "','") + "'";
         String subjects = getSubjectIds1(ids1, ids2, "S1_", "S2_") + ", '*' as star";
-        log.debug("RBM: " + subjects)
+        logger.debug("RBM: " + subjects)
 
         String r;
         if (s1 != null) {
@@ -5149,7 +5151,7 @@ class I2b2HelperService {
             String sample2,
             String intensityType,
             boolean count) throws Exception {
-        log.debug("mRNA: called with ids1=" + ids1 + " and ids2=" + ids2);
+        logger.debug("mRNA: called with ids1=" + ids1 + " and ids2=" + ids2);
 
         //String select = createMRNAHeatmapSelect(ids1, ids2, "S1_", "S2_") + ", star"
         String columns = null;
@@ -5159,7 +5161,7 @@ class I2b2HelperService {
         } else {
             columns = listHeatmapColumns("probeset", ids1, ids2, "S1_", "S2_") + ", star"
         }
-        //log.debug("SELECT: " + columns)
+        //logger.debug("SELECT: " + columns)
 
         String s1;
         if (ids1 != null && ids1.length() > 0) {
@@ -5262,7 +5264,7 @@ class I2b2HelperService {
         if (pathwayName != null && pathwayName.length() > 0) {
             s.append(" AND b.gene_id IN (").append(genes).append(")");
         }
-        log.debug(s.toString());
+        logger.debug(s.toString());
         return s.toString();
     }
 
@@ -5329,28 +5331,28 @@ class I2b2HelperService {
         for (role in user.authorities) {
             if (isAdminRole(role)) {
                 admin = true;
-                log.trace("ADMINISTRATOR, SKIPPING PERMISSION CHECKING");
+                logger.trace("ADMINISTRATOR, SKIPPING PERMISSION CHECKING");
             }
         }
         if (level == -1 && !admin) //only check on first level of nodes and im not an admin
         {
-            log.trace("NOT AN ADMINISTRATOR CHECKING PERMISSIONS")
+            logger.trace("NOT AN ADMINISTRATOR CHECKING PERMISSIONS")
             //3) get the secure paths that are children of this path and lock them if they are in the children
             StringBuilder s2 = new StringBuilder();
             s2.append("SELECT DISTINCT s FROM SecureObjectPath s WHERE s.conceptPath LIKE'").append(path).append("%'")
 
             def results2 = SecureObjectPath.executeQuery(s2.toString());
-            log.trace("***********************");
+            logger.trace("***********************");
             for (row in results2) {
-                log.trace(row[0]);
+                logger.trace(row[0]);
                 def securePath = row.conceptPath;
-                log.trace("FOUND SECUREPATH:" + securePath);
+                logger.trace("FOUND SECUREPATH:" + securePath);
                 if (access.containsKey(securePath)) {
                     access[securePath] = 'Locked';
-                    log.trace("LOCKING SECURE PATH:" + securePath);
+                    logger.trace("LOCKING SECURE PATH:" + securePath);
                 }
             }
-            log.trace("***********************")
+            logger.trace("***********************")
             //4) get the access levels this user has and unlock the locked resources available to him
             StringBuilder s = new StringBuilder();
             s.append("SELECT DISTINCT ausa.accessLevel, sop.conceptPath FROM AuthUserSecureAccess ausa JOIN ausa.accessLevel JOIN ausa.authUser au JOIN ausa.secureObject.conceptPaths sop ");
@@ -5360,18 +5362,18 @@ class I2b2HelperService {
             //return access levels for the children of this path that have them
             def results = AuthUserSecureAccess.executeQuery(s.toString());
             //for each of the ones that were found with access put their access levels into the object
-            //    log.trace("***********************")
+            //    logger.trace("***********************")
             for (row in results) {
                 def accessLevel = row[0];
                 def accessPath = row[1];
-                log.trace("path: " + accessPath + " accessLevel: " + accessLevel.accessLevelName);
+                logger.trace("path: " + accessPath + " accessLevel: " + accessLevel.accessLevelName);
 
                 if (access.containsKey(accessPath)) {
                     access[accessPath] = accessLevel.accessLevelName;
-                    log.trace("GRANTING ACCESS TO:" + accessPath);
+                    logger.trace("GRANTING ACCESS TO:" + accessPath);
                 }
             }
-            //	log.trace("***********************")
+            //	logger.trace("***********************")
         }
         return access;
     }
@@ -5404,7 +5406,7 @@ class I2b2HelperService {
         def oktousevalues = false;
         def normalunits = "";
         if (xml != null && !xml.equalsIgnoreCase("")) {
-            log.trace(xml)
+            logger.trace(xml)
             try {
                 DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
                 domFactory.setNamespaceAware(true); // never forget this!
@@ -5426,10 +5428,10 @@ class I2b2HelperService {
                 }
 
                 normalunits = ((Node) xpath.evaluate("//ValueMetadata/UnitValues/NormalUnits", doc, XPathConstants.NODE)).getTextContent();
-                //	    log.debug("normalunits": normalunits)
+                //	    logger.debug("normalunits": normalunits)
             }
             catch (ex) {
-                log.error("BAD METADATAXML FOUND")
+                logger.error("BAD METADATAXML FOUND")
             }
         }
         return [oktousevalues: oktousevalues, normalunits: normalunits]
@@ -5451,29 +5453,29 @@ class I2b2HelperService {
         for (role in user.authorities) {
             if (isAdminRole(role)) {
                 admin = true;
-                log.trace("ADMINISTRATOR, SKIPPING PERMISSION CHECKING")
+                logger.trace("ADMINISTRATOR, SKIPPING PERMISSION CHECKING")
             }
         }
 
         if (!admin) //level of nodes and im not an admin
         {
-            log.trace("NOT AN ADMINISTRATOR CHECKING PERMISSIONS");
+            logger.trace("NOT AN ADMINISTRATOR CHECKING PERMISSIONS");
             //3) get the secure paths that are in the list and secure them for later unlocking if necessary
             StringBuilder s2 = new StringBuilder();
             s2.append("SELECT DISTINCT s FROM SecureObjectPath s WHERE s.conceptPath IN (:ids )");
 
             def results2 = SecureObjectPath.executeQuery(s2.toString(), ['ids': paths]);
-            log.trace("***********************");
+            logger.trace("***********************");
             for (row in results2) {
-                log.trace(row[0]);
+                logger.trace(row[0]);
                 def securePath = row.conceptPath;
-                log.trace("FOUND SECUREPATH:" + securePath);
+                logger.trace("FOUND SECUREPATH:" + securePath);
                 if (access.containsKey(securePath)) {
                     access[securePath] = 'Locked';
-                    log.trace("LOCKING SECURE PATH:" + securePath);
+                    logger.trace("LOCKING SECURE PATH:" + securePath);
                 }
             }
-            log.trace("***********************");
+            logger.trace("***********************");
             //4) get the access levels this user has and unlock the locked resources available to him
             StringBuilder s = new StringBuilder();
             s.append("SELECT DISTINCT ausa.accessLevel, sop.conceptPath FROM AuthUserSecureAccess ausa JOIN ausa.accessLevel JOIN ausa.authUser au JOIN ausa.secureObject.conceptPaths sop ");
@@ -5483,17 +5485,17 @@ class I2b2HelperService {
             //return access levels for the children of this path that have them
             def results = AuthUserSecureAccess.executeQuery(s.toString(), ['ids': paths])
             //for each of the ones that were found with access put their access levels into the object
-            log.debug("***********************");
+            logger.debug("***********************");
             for (row in results) {
                 def accessLevel = row[0];
                 def accessPath = row[1];
-                log.trace("path: " + accessPath + " accessLevel: " + accessLevel.accessLevelName);
+                logger.trace("path: " + accessPath + " accessLevel: " + accessLevel.accessLevelName);
                 if (access.containsKey(accessPath)) {
                     access[accessPath] = accessLevel.accessLevelName;
-                    log.trace("GRANTING ACCESS TO:" + accessPath);
+                    logger.trace("GRANTING ACCESS TO:" + accessPath);
                 }
             }
-            log.trace("***********************");
+            logger.trace("***********************");
         }
         return access;
     }
@@ -5502,15 +5504,15 @@ class I2b2HelperService {
     def getGenesForHaploviewFromResultInstanceId(resultInstanceId) {
         checkQueryResultAccess resultInstanceId
 
-        log.debug("getting genes for happloview");
+        logger.debug("getting genes for happloview");
         def genes = [];
         Sql sql = new Sql(dataSource);
         String sqlt = "select distinct gene from haploview_data a inner join qt_patient_set_collection b on a.I2B2_ID=b.patient_num where result_instance_id = ? order by gene asc"
         sql.eachRow(sqlt, [resultInstanceId as Long], { row ->
-            log.trace("IN ROW ITERATOR");
-            log.trace("Found:" + row.gene);
+            logger.trace("IN ROW ITERATOR");
+            logger.trace("Found:" + row.gene);
             genes.add(row.gene);
-            log.trace(row.gene);
+            logger.trace(row.gene);
         })
         return genes;
     }
@@ -5531,26 +5533,26 @@ class I2b2HelperService {
         for (role in user.authorities) {
             if (isAdminRole(role)) {
                 admin = true;
-                log.trace("ADMINISTRATOR, SKIPPING PERMISSION CHECKING");
+                logger.trace("ADMINISTRATOR, SKIPPING PERMISSION CHECKING");
             }
         }
 
         if (!admin) //level of nodes and im not an admin
         {
-            log.trace("NOT AN ADMINISTRATOR CHECKING PERMISSIONS");
+            logger.trace("NOT AN ADMINISTRATOR CHECKING PERMISSIONS");
             //3) get the secure paths that are in the list and secure them for later unlocking if necessary
             StringBuilder s2 = new StringBuilder();
             s2.append("SELECT DISTINCT s FROM SecureObjectPath s");
 
             def results2 = SecureObjectPath.executeQuery(s2.toString())
-            log.trace("***********************")
+            logger.trace("***********************")
             for (row in results2) {
-                log.trace(row[0]);
+                logger.trace(row[0]);
                 def securePath = row.conceptPath;
-                log.trace("FOUND SECUREPATH:" + securePath);
+                logger.trace("FOUND SECUREPATH:" + securePath);
                 setChildrenAccess(access, securePath, "Locked");
             }
-            log.trace("***********************");
+            logger.trace("***********************");
             //4) get the access levels this user has and unlock the locked resources available to him
             StringBuilder s = new StringBuilder();
             s.append("SELECT DISTINCT ausa.accessLevel, sop.conceptPath FROM AuthUserSecureAccess ausa JOIN ausa.accessLevel JOIN ausa.secureObject.conceptPaths sop ");
@@ -5559,13 +5561,13 @@ class I2b2HelperService {
             //return access levels for the children of this path that have them
             def results = AuthUserSecureAccess.executeQuery(s.toString())
             //for each of the ones that were found with access put their access levels into the object
-            log.trace("***********************")
+            logger.trace("***********************")
             for (row in results) {
                 def accessLevel = row[0];
                 def accessPath = row[1];
                 setChildrenAccess(access, accessPath, accessLevel.accessLevelName);
             }
-            log.trace("***********************");
+            logger.trace("***********************");
         }
         return access;
     }
@@ -5576,7 +5578,7 @@ class I2b2HelperService {
             if (it.key.indexOf(path) == 0) {
                 it.value = access
             };
-            log.trace("Setting key: " + it.key + " set to value: " + access);
+            logger.trace("Setting key: " + it.key + " set to value: " + access);
         }
     }
 
@@ -5585,13 +5587,13 @@ class I2b2HelperService {
      * for display in a distribution histogram for a given subset
      */
     def getConceptDistributionDataForValueConceptByTrial(String concept_key, String result_instance_id, AuthUser user) {
-        log.debug "----------------- getConceptDistributionDataForValueConceptByTrial"
+        logger.debug "----------------- getConceptDistributionDataForValueConceptByTrial"
 
         checkQueryResultAccess result_instance_id
-        log.trace "access assured"
+        logger.trace "access assured"
 
         def xTrialsCaseFlag = isXTrialsConcept(concept_key)
-        log.trace "xTrialsCaseFlag = " + xTrialsCaseFlag
+        logger.trace "xTrialsCaseFlag = " + xTrialsCaseFlag
 
         def trialdata = [:];
 
@@ -5599,9 +5601,9 @@ class I2b2HelperService {
         def authStudiesString = getSqlInString(authStudies)
 
         if (result_instance_id != null && result_instance_id != "") {
-            log.debug("Getting concept distribution data for value concept:" + concept_key);
-            log.trace "concept_key = " + concept_key
-            log.trace "result_instance_id = " + result_instance_id
+            logger.debug("Getting concept distribution data for value concept:" + concept_key);
+            logger.trace "concept_key = " + concept_key
+            logger.trace "result_instance_id = " + result_instance_id
 
             Sql sql = new Sql(dataSource);
 
@@ -5610,8 +5612,8 @@ class I2b2HelperService {
                 def itemProbe = conceptsResourceService.getByKey(concept_key)
                 String modifier_cd = itemProbe.modifierDimension.code
 
-                log.debug "modifier_cd = " + modifier_cd
-                log.debug "result_instance_id = " + result_instance_id
+                logger.debug "modifier_cd = " + modifier_cd
+                logger.debug "result_instance_id = " + result_instance_id
 
                 String sqlt = """
                     SELECT TRIAL, NVAL_NUM FROM OBSERVATION_FACT f
@@ -5659,17 +5661,17 @@ class I2b2HelperService {
         }
 
         }
-        log.debug "----------------- end getConceptDistributionDataForValueConceptByTrial"
+        logger.debug "----------------- end getConceptDistributionDataForValueConceptByTrial"
         return trialdata;
     }
 
     def getConceptDistributionDataForValueConceptByTrialByConcepts(Set<String> childConcepts, String result_instance_id) {
-        log.debug "----------------- getConceptDistributionDataForValueConceptByTrialByConcepts"
+        logger.debug "----------------- getConceptDistributionDataForValueConceptByTrialByConcepts"
 
         checkQueryResultAccess result_instance_id
-        log.trace "Access assured"
+        logger.trace "Access assured"
 
-        log.trace "childConcepts list is empty: " + childConcepts.isEmpty()
+        logger.trace "childConcepts list is empty: " + childConcepts.isEmpty()
 
         def trialdata = [:];
 
@@ -5683,7 +5685,7 @@ class I2b2HelperService {
 					from qt_patient_set_collection
 					where result_instance_id=""" + result_instance_id + """) """;
 
-            log.trace("about to execute query: " + sqlt);
+            logger.trace("about to execute query: " + sqlt);
             sql.eachRow(sqlt,
                     { row ->
                         if (row.NVAL_NUM != null) {
@@ -5807,7 +5809,7 @@ class I2b2HelperService {
         sql.eachRow(sqlt, [fullname.asLikeLiteral() + "%", i], { row ->
             String conceptkey = prefix + row.c_fullname;
             ls.put(keyToPath(conceptkey), row.secure_obj_token);
-            log.trace("@@found" + conceptkey);
+            logger.trace("@@found" + conceptkey);
         })
         return ls;
     }
@@ -5852,19 +5854,19 @@ class I2b2HelperService {
      * Gets the children with access for a concept
      */
     def getChildrenWithAccessForUserNew(String concept_key, AuthUser user) {
-        log.debug "----------------- getChildrenWithAccessForUserNew"
+        logger.debug "----------------- getChildrenWithAccessForUserNew"
 
         def xTrialsTopNode = "\\\\" + ACROSS_TRIALS_TABLE_CODE + "\\" + ACROSS_TRIALS_TOP_TERM_NAME + "\\"
         def xTrialsCaseFlag = isXTrialsConcept(concept_key) || (concept_key == xTrialsTopNode)
 
         def results = [:]
 
-        log.trace "input concept_key = " + concept_key
-        log.trace "user = " + user
+        logger.trace "input concept_key = " + concept_key
+        logger.trace "user = " + user
 
         if (xTrialsCaseFlag) {
-            log.trace("XTrials for getChildrenWithAccessForUserNew")
-            log.warn("getChildrenWithAccessForUserNew - For cross trials, make no check at this time!!")
+            logger.trace("XTrials for getChildrenWithAccessForUserNew")
+            logger.warn("getChildrenWithAccessForUserNew - For cross trials, make no check at this time!!")
 
             def node = conceptsResourceService.getByKey(concept_key)
             def List<OntologyTerm> childNodes = node.children
@@ -5890,11 +5892,11 @@ class I2b2HelperService {
         for (role in user.authorities) {
             if (isAdminRole(role)) {
                 admin = true;
-                log.trace("ADMINISTRATOR, SKIPPING PERMISSION CHECKING")
+                logger.trace("ADMINISTRATOR, SKIPPING PERMISSION CHECKING")
                 //1)If we are an admin then grant admin to all the paths
                 for (key in children.keySet()) {
                     access.put(key, 'Admin');
-                    log.trace("putting " + key + " with admin access");
+                    logger.trace("putting " + key + " with admin access");
                 }
                 return access; //just set everything to admin and return it all
             }
@@ -5904,7 +5906,7 @@ class I2b2HelperService {
             def tokens = getSecureTokensWithAccessForUser(user);
             for (key in children.keySet()) {
                 def childtoken = children[key];
-                log.trace("Key:" + key + " Token:" + childtoken.toString());
+                logger.trace("Key:" + key + " Token:" + childtoken.toString());
                 if (childtoken == null) {
                     access.put(key, "VIEW"); //give read access if no security token
                 } else if (tokens.containsKey(childtoken)) //null tokens are assumed to be unlocked
@@ -5917,7 +5919,7 @@ class I2b2HelperService {
                 }
             }
         }
-        log.debug("In getAccess: " + access.toString());
+        logger.debug("In getAccess: " + access.toString());
         return access;
     }
 
@@ -5936,14 +5938,14 @@ class I2b2HelperService {
      * @return an XML String
      */
     def renderQueryDefinition(String resultInstanceId, String title, Writer pw) {
-        if (log.isDebugEnabled()) {
-            log.debug("renderQueryDefinition called with ${resultInstanceId} and ${title}")
+        if (logger.isDebugEnabled()) {
+            logger.debug("renderQueryDefinition called with ${resultInstanceId} and ${title}")
         }
         if (resultInstanceId != null) {
             try {
                 String xmlrequest = getQueryDefinitionXML(resultInstanceId)
-                if (log.isDebugEnabled()) {
-                    log.debug("${xmlrequest}")
+                if (logger.isDebugEnabled()) {
+                    logger.debug("${xmlrequest}")
                 }
                 DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance()
                 domFactory.setNamespaceAware(true) // mandatory!
@@ -5961,13 +5963,13 @@ class I2b2HelperService {
                 pw.write("<tr><th>${title}</th></tr>")
                 pw.write("<tr>")
                 pw.write("<td>")
-                log.debug("Interating over the nodes...")
+                logger.debug("Interating over the nodes...")
                 for (int p = 0; p < panels.getLength(); p++) {
                     panel = panels.item(p)
                     Node panelnumber = (Node) xpath.evaluate("panel_number", panel, XPathConstants.NODE)
 
                     if (panelnumber?.getTextContent()?.equalsIgnoreCase("21")) {
-                        log.debug("Skipping the security panel in printing the output")
+                        logger.debug("Skipping the security panel in printing the output")
                         continue
                     }
 
@@ -5992,7 +5994,7 @@ class I2b2HelperService {
                         Node key = (Node) xpath.evaluate("item_key", item, XPathConstants.NODE)
 
                         String textContent = key.getTextContent()
-                        log.debug("Found item ${textContent}")
+                        logger.debug("Found item ${textContent}")
 
                         Node valueinfo = (Node) xpath.evaluate("constrain_by_value", item, XPathConstants.NODE)
                         String operator = "";
@@ -6028,7 +6030,7 @@ class I2b2HelperService {
                                 if (operator.equals("BETWEEN")) {
                                     String[] bounds = constraints.split(":")
                                     if (bounds.length != 2) {
-                                        log.error "BETWEEN constraint type found with values not seperated by ':'"
+                                        logger.error "BETWEEN constraint type found with values not seperated by ':'"
                                         pw.write(constraints)
                                     }
                                     else {
@@ -6046,18 +6048,18 @@ class I2b2HelperService {
                 }
                 pw.write("</td></tr></table>")
             } catch (Exception e) {
-                log.error(e)
+                logger.error(e)
             }
         }
     }
 
     def getSecureTokensCommaSeparated(user) {
         def tokenmap = getSecureTokensWithAccessForUser(user);
-        log.trace("*********************GOT TO SB******************")
+        logger.trace("*********************GOT TO SB******************")
         StringBuilder sb = new StringBuilder();
         for (v in tokenmap.keySet()) //have some kind of access to each of these tokens
         {
-            log.trace(v);
+            logger.trace(v);
             sb.append("'");
             sb.append(v);
             sb.append("',");
@@ -6091,7 +6093,7 @@ class I2b2HelperService {
             String prefix = fullname.substring(0, fullname.indexOf("\\", 2)); //get the prefix to put on to the fullname to make a key
             String conceptkey = prefix + fullname;
             ls.put(keyToPath(conceptkey), row.secure_obj_token);
-            log.trace("@@found" + conceptkey);
+            logger.trace("@@found" + conceptkey);
         })
         // for across trials - mark top level know with special token for downstream access control
         ls.put("\\Across Trials\\","EXP:ACROSS_TRIALS")
@@ -6134,9 +6136,9 @@ class I2b2HelperService {
         if (subids == null || subids.size == 0 || (subids.size == 1 && subids[0] == "ALL")) {
             subids = null
         };
-        log.trace("validating heatmap:")
-        log.trace(conids)
-        log.trace(subids)
+        logger.trace("validating heatmap:")
+        logger.trace(conids)
+        logger.trace(subids)
 
         Sql sql = new Sql(dataSource)
         String sqlt = "SELECT TISSUE_TYPE, TISSUE_TYPE_CD, PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE FROM DE_SUBJECT_SAMPLE_MAPPING WHERE "
@@ -6212,7 +6214,7 @@ class I2b2HelperService {
             sqlt += "PATIENT_ID IN (" + listToIN(subids) + ") AND "
         };
         sqlt += "CONCEPT_CODE IN (" + listToIN(conids) + ") GROUP BY PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE, TISSUE_TYPE, TISSUE_TYPE_CD";
-        log.trace(sqlt);
+        logger.trace(sqlt);
         sql.eachRow(sqlt, { row ->
             if (row.PLATFORM != null) {
                 hv.platforms.add(row.PLATFORM)
@@ -6423,7 +6425,7 @@ class I2b2HelperService {
                 })
                 break;
             default:
-                log.trace('No Info Type selected');
+                logger.trace('No Info Type selected');
         }
     }
 
@@ -6487,12 +6489,12 @@ class I2b2HelperService {
     def getDistinctTrialsInPatientSets(String rid1, String rid2) {
         checkQueryResultAccess rid1, rid2
 
-        log.debug("Checking patient sets")
+        logger.debug("Checking patient sets")
         def trials = [];
 
-        log.debug(rid1 + " " + rid2);
+        logger.debug(rid1 + " " + rid2);
         if (rid2 == null) {
-            log.debug("TESTED AS NULL");
+            logger.debug("TESTED AS NULL");
         }
         if (rid1 != null & rid2 != null) {
             Sql sql = new Sql(dataSource);
@@ -6500,7 +6502,7 @@ class I2b2HelperService {
 			    WHERE t.PATIENT_NUM IN (select distinct patient_num
 				from qt_patient_set_collection
 				where result_instance_id IN (?, ?))""";
-            log.debug(sqlt);
+            logger.debug(sqlt);
             sql.eachRow(sqlt, [rid1, rid2], { row ->
                 if (row.SECURE_OBJ_TOKEN != null) {
                     trials.add(row.SECURE_OBJ_TOKEN);
@@ -6509,9 +6511,9 @@ class I2b2HelperService {
             return trials;
         }
 
-        log.debug("between tests")
+        logger.debug("between tests")
         if (rid1 != null || rid2 != null) {
-            log.debug("one or the other was null")
+            logger.debug("one or the other was null")
             def rid;
             if (rid1 != null) {
                 rid = rid1;
@@ -6523,7 +6525,7 @@ class I2b2HelperService {
 			    WHERE t.PATIENT_NUM IN (select distinct patient_num
 				from qt_patient_set_collection
 				where result_instance_id = ?)""";
-            log.debug(sqlt);
+            logger.debug(sqlt);
             sql.eachRow(sqlt, [rid], { row ->
                 if (row.SECURE_OBJ_TOKEN != null) {
                     trials.add(row.SECURE_OBJ_TOKEN)
@@ -6551,7 +6553,7 @@ class I2b2HelperService {
             WHERE psc.result_instance_id = ?
             ORDER BY trial
             """
-        log.trace(sqlt)
+        logger.trace(sqlt)
         sql.eachRow(sqlt, [result_instance_id], {row ->
             trials.put(row.trial, row.secure_obj_token)
         })

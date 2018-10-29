@@ -1,7 +1,9 @@
 package com.recomdata.transmart.data.export
 
 import com.recomdata.transmart.domain.i2b2.AsyncJob
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class SweepingService {
 
     boolean transactional = true
@@ -9,7 +11,7 @@ class SweepingService {
     def grailsApplication
 
     def sweep() {
-        log.info "Triggering file sweep"
+        logger.info "Triggering file sweep"
         def fileAge = grailsApplication.config.com.recomdata.export.jobs.sweep.fileAge;
         def now = new Date()
         def c = AsyncJob.createCriteria()

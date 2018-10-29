@@ -1,3 +1,4 @@
+import groovy.util.logging.Slf4j
 import org.json.JSONObject
 import org.transmart.biomart.BioAssayCohort
 import org.transmartproject.db.support.DatabasePortabilityService
@@ -13,6 +14,8 @@ import javax.sql.DataSource
 /**
  * Main Data Access Object to get all of the visualization data for the RWG datasets
  */
+
+@Slf4j('logger')
 class RWGVisualizationDAOService {
 
     DatabasePortabilityService databasePortabilityService
@@ -66,10 +69,10 @@ class RWGVisualizationDAOService {
         def previousProbeId
         def previousProbeName
 
-        log.info("before query in getGenesForProbes")
-        log.info("query=" + s)
+        logger.info("before query in getGenesForProbes")
+        logger.info("query=" + s)
         def rows = sql.rows(s)
-        log.info("after query in getGenesForProbes")
+        logger.info("after query in getGenesForProbes")
         // store the sql results into a map containing one map for each probe (which contains a list of genes)
         rows.each { row ->
             currentProbeId = row.bio_assay_feature_group_id
@@ -97,7 +100,7 @@ class RWGVisualizationDAOService {
             genes.push(currentGene)
             geneIds.push(currentGeneId)
 
-            log.info('getGenesForProbes loop (gene, gene_id):' + currentGene + ', ' + currentGeneId)
+            logger.info('getGenesForProbes loop (gene, gene_id):' + currentGene + ', ' + currentGeneId)
 
             previousProbeId = currentProbeId
             previousProbeName = currentProbeName
@@ -262,14 +265,14 @@ class RWGVisualizationDAOService {
 		   group by h.Bio_Assay_Analysis_Id, h.probe_id, h.cohort_id, h.log_intensity, h.assay_id 
 	  		order by h.Bio_Assay_Analysis_Id, h.probe_id, h.cohort_id, h.log_intensity
 	  """)
-        log.info("${s}")
-        log.info("${sqlParams}")
+        logger.info("${s}")
+        logger.info("${sqlParams}")
 
         // execute query and save rows (since we need to do this loop through once for each analysis, we don't want to execute query each time)
         def results = whereAdded ? sql.rows(s.toString(), sqlParams) : null;
         def analysisMap = [:]
         analysisIds.each { analysisId ->
-            log.debug("Loop through and store all of the intensity values in the array and use the cohort as the key")
+            logger.debug("Loop through and store all of the intensity values in the array and use the cohort as the key")
 
             def gene_id
             def intensityArray = []
@@ -553,7 +556,7 @@ class RWGVisualizationDAOService {
 
 
 
-        log.info("---------- probesList = " + probesList)
+        logger.info("---------- probesList = " + probesList)
 
         // probes list will be null when querying to get rankings
         if (probesList != null && probesList.toString() != 'allProbes') {
@@ -673,28 +676,28 @@ class RWGVisualizationDAOService {
         // order by fold change ratio then pvalue
         s.append(" order by fold_change_ratio desc, tea_normalized_pvalue, probe_id, cohort_id, subject_id ")
 
-        log.info("${s}")
-        log.info("${sqlParams}")
+        logger.info("${s}")
+        logger.info("${sqlParams}")
 
         def cohortList = []
 
         def genesDisplayMap = getGenesForProbes(probesList)
 
 
-        log.info("before data query")
+        logger.info("before data query")
         sql.eachRow(s.toString(), sqlParams, { row ->
             if (currentProbe == null) {
 
-                log.info(row.probe_id)
+                logger.info(row.probe_id)
                 currentProbe = row.probe_id
 
-                log.info(row.bio_assay_feature_group_id)
+                logger.info(row.bio_assay_feature_group_id)
                 def genesDisplay = genesDisplayMap.get(row.bio_assay_feature_group_id)
 
-                //	log.info(genesDisplay)
+                //	logger.info(genesDisplay)
                 //	printlin(genesDisplay)
 
-                log.info(genesDisplay.get("geneId"))
+                logger.info(genesDisplay.get("geneId"))
                 currentGeneID = genesDisplay.get("geneId")
                 currentGene = genesDisplay.get("shortDisplay")
                 currentGeneList = genesDisplay.get("longDisplay")
@@ -738,7 +741,7 @@ class RWGVisualizationDAOService {
             values.add(row.log_intensity)
             sortedValues.add(row.log_intensity)
         })
-        log.info("after data query")
+        logger.info("after data query")
 
         sampleMap["GENE"] = currentGene
         sampleMap["GENE_ID"] = currentGeneID
@@ -870,11 +873,11 @@ class RWGVisualizationDAOService {
         StringBuilder out = new StringBuilder()
 
         def studyID = analysisInfo.get("studyId")
-        log.info("Exporting data for Study ID: " + studyID)
+        logger.info("Exporting data for Study ID: " + studyID)
         out.append("Study ID, " + studyID + "\n")
 
         def cohorts = analysisInfo.get("cohorts")
-        log.info("chorts=" + cohorts)
+        logger.info("chorts=" + cohorts)
         out.append("Cohort ID, Cohort Description\n")
 
         // add the cohort keys to a list
@@ -882,9 +885,9 @@ class RWGVisualizationDAOService {
             // find cohort with specified order
             def cohort = cohorts.find { cohorts.get(it.key).get("order") == cohortIndex }
 
-            log.info("cohort = " + cohort)
-            log.info("cohort key = " + cohort.key)
-            log.info("cohort desc= " + cohorts.get(cohort.key).get("desc"))
+            logger.info("cohort = " + cohort)
+            logger.info("cohort key = " + cohort.key)
+            logger.info("cohort desc= " + cohorts.get(cohort.key).get("desc"))
 
             //out.append(cohort.key +","+cohorts.get(cohort.key).get("desc")+"\n")
 
@@ -908,8 +911,8 @@ class RWGVisualizationDAOService {
 
         s.append(" order by (cohort_id ||':' || assay_id) desc")
 
-        log.info("${s}")
-        log.info("${sqlParams}")
+        logger.info("${s}")
+        logger.info("${sqlParams}")
 
 
 
@@ -941,13 +944,13 @@ class RWGVisualizationDAOService {
         s.append(" group by (cohort_id ||':' ||  assay_id),  LOG_INTENSITY,PROBE_ID,fold_change_ratio,  tea_normalized_pvalue, PREFERRED_PVALUE")
         s.append(" order by probe_id, (cohort_id ||':' || assay_id) desc")
 
-        log.info("${s}")
-        log.info("${sqlParams}")
+        logger.info("${s}")
+        logger.info("${sqlParams}")
 
         def i = 0 //counter used for subjects array
         def currentProbe = ''
 
-        log.info("before data query")
+        logger.info("before data query")
 
 
         sql.eachRow(s.toString(), sqlParams, { row ->
@@ -960,7 +963,7 @@ class RWGVisualizationDAOService {
                 i = 0 //reset the subject count
             }
 
-            //	log.info('-- i=' +i +', row.subject_id = ' +row.key +', subjects[i]='+subjects[i])
+            //	logger.info('-- i=' +i +', row.subject_id = ' +row.key +', subjects[i]='+subjects[i])
 
             //check if the current subject key is the one expected; if so, output the log intensity
             if (row.key == subjects[i]) {
@@ -974,7 +977,7 @@ class RWGVisualizationDAOService {
 
                     out.append(',')//null
                     i = i + 1
-                    //			log.info('while loop| i=' +i +', row.subject_id = ' +row.key +', subjects[i]='+subjects[i])
+                    //			logger.info('while loop| i=' +i +', row.subject_id = ' +row.key +', subjects[i]='+subjects[i])
                 }
                 out.append(',' + row.log_intensity)
                 i = i + 1
@@ -982,7 +985,7 @@ class RWGVisualizationDAOService {
 
         })
 
-        log.info("after data query")
+        logger.info("after data query")
 
         return out.toString()
     }
@@ -1018,8 +1021,8 @@ class RWGVisualizationDAOService {
 
         sqlParams.addAll(
                 databasePortabilityService.convertRangeStyle(startIndex, endIndex))
-        log.info(query)
-        log.info("${sqlParams}")
+        logger.info(query)
+        logger.info("${sqlParams}")
 
         // build the probesList - one object for each probe id
         JSONObject probesList = new JSONObject()
@@ -1027,7 +1030,7 @@ class RWGVisualizationDAOService {
         // build the selectList - one for each probe Id
         JSONObject selectList = new JSONObject()
 
-        log.info("before probe ranking query")
+        logger.info("before probe ranking query")
         // execute query and save rows (since we need to do this twice, we don't want to execute query twice)
         def results = sql.rows(query, sqlParams)
 
@@ -1045,8 +1048,8 @@ class RWGVisualizationDAOService {
             def probeSelectDisplay = /${row.gene_name}${multiGeneIndicator} (${row.probe_id})/
             selectList.put(row.proberank.toString(), probeSelectDisplay)
         }
-        log.info("after probe ranking query second loop")
-        log.info("after probe ranking query")
+        logger.info("after probe ranking query second loop")
+        logger.info("after probe ranking query")
 
         probeMap.put("probesList", probesList)
         probeMap.put("selectList", selectList)
@@ -1076,8 +1079,8 @@ class RWGVisualizationDAOService {
 
         def sqlParams = addHeatmapFilters(s, null, genes, showSigResultsOnly, analysisInfo)
 
-        log.debug("${s}")
-        log.debug("${sqlParams}")
+        logger.debug("${s}")
+        logger.debug("${sqlParams}")
 
         def results = sql.rows(s.toString(), sqlParams)
 
@@ -1194,7 +1197,7 @@ class RWGVisualizationDAOService {
 						and str.parent_id=${parentid}"""
 
         def rows = sql.rows(s)
-        log.info("after query in getChildren")
+        logger.info("after query in getChildren")
         // store the sql results into a map containing one map for each probe (which contains a list of genes)
         def children = []
         rows.each { row ->
@@ -1203,7 +1206,7 @@ class RWGVisualizationDAOService {
             result.put('name', row.term_name)
             children.push(result)
         }
-        log.info(children)
+        logger.info(children)
         return children
     }
 
@@ -1221,7 +1224,7 @@ class RWGVisualizationDAOService {
 						and str.child_id=${childid}"""
 
         def rows = sql.rows(s)
-        log.info("after query in parent")
+        logger.info("after query in parent")
         // store the sql results into a map containing one map for each probe (which contains a list of genes)
         def parents = []
         rows.each { row ->
@@ -1230,7 +1233,7 @@ class RWGVisualizationDAOService {
             result.put('name', row.term_name)
             parents.push(result)
         }
-        log.info(parents)
+        logger.info(parents)
         return parents
     }
 
@@ -1297,7 +1300,7 @@ class RWGVisualizationDAOService {
 		group by st.term_name, st.term_id"""
 
         def rows = sql.rows(s)
-        log.info("after query in getPieChartData")
+        logger.info("after query in getPieChartData")
         // store the sql results into a map containing one map for each probe (which contains a list of genes)
         def chart = [:]
         def data = []
@@ -1314,7 +1317,7 @@ class RWGVisualizationDAOService {
         }
         chart.put("ddid", drilldownid)
         chart.put("data", data)
-        log.info(chart)
+        logger.info(chart)
         return chart
     }
 
@@ -1344,7 +1347,7 @@ class RWGVisualizationDAOService {
 		group by st2.term_name, st2.term_id"""
 
         def rows = sql.rows(s)
-        log.info("after query in getCategoriesWithData")
+        logger.info("after query in getCategoriesWithData")
         // store the sql results into a map containing one map for each probe (which contains a list of genes)
         def categories = []
         rows.each { row ->
@@ -1353,7 +1356,7 @@ class RWGVisualizationDAOService {
             result.put('name', row.term_name)
             categories.push(result)
         }
-        log.info(categories)
+        logger.info(categories)
         return categories
 
 
@@ -1372,7 +1375,7 @@ class RWGVisualizationDAOService {
 				order by abs(fold_change_ratio) desc)
 				where rownum <	   = 20"""
 
-        log.de bug("${s}")
+        logger.de bug("${s}")
 
         def rows = sql.rows(s)
 
@@ -1422,7 +1425,7 @@ class RWGVisualizationDAOService {
         }
 
 
-        log.debug("${s}")
+        logger.debug("${s}")
 
         def rows = sql.rows(s)
 
@@ -1460,7 +1463,7 @@ class RWGVisualizationDAOService {
 		group by bio_assay_analysis_id
 	   """
 
-        log.debug("${s}")
+        logger.debug("${s}")
 
         def rows = sql.rows(s)
 
@@ -1494,7 +1497,7 @@ class RWGVisualizationDAOService {
 		where primary_external_id = '${externalBiomarkerID}')
 			   """
 
-        log.debug("${s}")
+        logger.debug("${s}")
 
         println s
 

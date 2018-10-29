@@ -1,9 +1,11 @@
 package transmartapp
 
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmart.biomart.Experiment
 import org.transmart.searchapp.*
 
+@Slf4j('logger')
 class ExperimentController {
 
     def SpringSecurityService;
@@ -71,7 +73,7 @@ class ExperimentController {
             def token = row[0];
             def dataid = row[1];
             token=token.replaceFirst("EXP:","")
-            log.info(token+":"+dataid);
+            logger.info(token+":"+dataid);
             t.put(token,dataid);
         }
         return t;

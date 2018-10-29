@@ -1,9 +1,10 @@
+import groovy.util.logging.Slf4j
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.AuthUserSecureAccess
 import org.transmart.searchapp.Role
 import org.transmart.searchapp.SecureAccessLevel;
 
-
+@Slf4j('logger')
 class AuthUserSecureAccessController {
 
     def index = { redirect(action: "list", params: params) }
@@ -146,9 +147,9 @@ class AuthUserSecureAccessController {
     }
 
     def listAccessLevel = {
-        //log.debug(params);
+        //logger.debug(params);
 
-        //	log.debug(accessLevelList);
+        //	logger.debug(accessLevelList);
         render(template: 'accessLevelList', model: [accessLevelList: getAccessLevelList(params.id)]);
     }
 }

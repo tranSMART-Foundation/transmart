@@ -1,6 +1,7 @@
 package com.recomdata.dataexport.dao
 
 import com.recomdata.transmart.data.export.util.FileWriterUtil
+import groovy.util.logging.Slf4j
 import org.apache.commons.logging.LogFactory
 import org.springframework.context.ApplicationContext
 import org.transmart.biomart.ClinicalTrial
@@ -13,6 +14,7 @@ import org.transmart.biomart.Taxonomy
  * This class will provide access to the study metadata
  */
 @Deprecated
+@Slf4j('logger')
 public class StudyDao {
     ApplicationContext ctx = org.codehaus.groovy.grails.web.context.ServletContextHolder.getServletContext().getAttribute(org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes.APPLICATION_CONTEXT)
     def dataSource = ctx.getBean('dataSource')
@@ -37,7 +39,7 @@ public class StudyDao {
         //def al = new AccessLog(username:springSecurityService.getPrincipal().username, event:"i2b2DAO - getData", eventmessage:"RID:"+result_instance_ids.toString()+" Concept:"+conceptCodeList.toString(), accesstime:new java.util.Date())
         //al.save()
 
-        log.info("loading study metadata for " + studyAccessions)
+        logger.info("loading study metadata for " + studyAccessions)
         // try to find it by Clinical Trial
         def studiesMap = [:]
         studyAccessions.each { studyUid ->
