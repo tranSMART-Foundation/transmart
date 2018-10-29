@@ -3,6 +3,7 @@ package com.recomdata.grails.plugin.gwas
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter
 import com.recomdata.upload.DataUploadResult
+import groovy.util.logging.Slf4j
 
 import java.math.MathContext
 
@@ -25,6 +26,7 @@ import java.math.MathContext
  *
  ******************************************************************/
 
+@Slf4j('logger')
 public class DataUploadService{
 	def dataSource
     def grailsApplication
@@ -270,7 +272,7 @@ public class DataUploadService{
 
 		try {
 			def nameQuery = analysisNameQuery + analysisQCriteria.toString();
-			log.debug(nameQuery)
+			logger.debug(nameQuery)
 			stmt = con.prepareStatement(nameQuery)
 
 			rs = stmt.executeQuery();
@@ -278,7 +280,7 @@ public class DataUploadService{
 				analysisNameMap.put(rs.getLong("id"), rs.getString("name"));
 			}
 		}catch(Exception e){
-			log.error(e.getMessage(),e)
+			logger.error(e.getMessage(),e)
 			throw e;
 		}
 		finally {
@@ -300,7 +302,7 @@ public class DataUploadService{
 			stmt.setDouble(1, cutoff);
 		}
 
-		log.debug("Executing: " + finalQuery)
+		logger.debug("Executing: " + finalQuery)
 
 
 		def results = []
@@ -322,7 +324,7 @@ public class DataUploadService{
 			}
 		}
 		catch(Exception e){
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		finally{
 			rs?.close();
@@ -339,7 +341,7 @@ public class DataUploadService{
 					stmt.setDouble(1, cutoff);
 				}
 
-				log.debug("Executing count query: " + finalQuery)
+				logger.debug("Executing count query: " + finalQuery)
 
 				rs = stmt.executeQuery();
 				if (rs.next()) {
@@ -347,7 +349,7 @@ public class DataUploadService{
 				}
 			}
 			catch (Exception e) {
-				log.error(e, e.getMessage())
+				logger.error(e, e.getMessage())
 				throw e;
 			}
 			finally {
@@ -590,13 +592,13 @@ public class DataUploadService{
 //		csvRead = new CSVReader(new InputStreamReader(file.getInputStream()), '\t'.charAt(0), CSVWriter.NO_QUOTE_CHARACTER);
 //		
 //		String[] header = csvRead.readNext();
-//		log.debug("Read file");
+//		logger.debug("Read file");
 //		//Verify fields and return immediately if we don't have a required one
 //		def result = verifyFields(header, upload.dataType)
 //		if (!result.success) {
 //			return result;
 //		}
-//		log.debug("Fields verified");
+//		logger.debug("Fields verified");
 //		def headerList = header.toList();
 //		//contains index from the database of field name and index
 //		//<String, long>
@@ -643,7 +645,7 @@ public class DataUploadService{
 //			logpValueIndex = headerList.size();
 //			headerList[headerList.size()] = "log_p_value";
 //		}
-//		log.info("RS at "+rsIdIndex+" pvalue "+pValueIndex+" -logPvalue "+ logpValueIndex)
+//		logger.info("RS at "+rsIdIndex+" pvalue "+pValueIndex+" -logPvalue "+ logpValueIndex)
 //		fileColumnIdx.put ((Long)0,(int)rsIdIndex)
 //		def pvalCol=(Long)columnOrder.size()+1
 //		fileColumnIdx.put (pvalCol,(int)pValueIndex)
@@ -663,9 +665,9 @@ public class DataUploadService{
 //				//System.out.println(rowIdx)
 //				def index=fileColumnIdx.get((Long)rowIdx)
 //				if (index==null)
-//				log.info("file column Index is null for "+ rowIdx +"-"+ fileColumnIdx.toString())
+//				logger.info("file column Index is null for "+ rowIdx +"-"+ fileColumnIdx.toString())
 //				else if (headerList[index]==null)
-//				log.info("header list is null for "+index+" - "+headerList.toString());
+//				logger.info("header list is null for "+index+" - "+headerList.toString());
 //				else
 //				headerRow[rowIdx]=headerList[fileColumnIdx.get((Long)rowIdx)]
 //				
@@ -713,7 +715,7 @@ public class DataUploadService{
 //						System.out.println(rowIdx)
 //						def index=fileColumnIdx.get((Long)rowIdx)
 //						if (index==null)
-//						log.info("file column Index is null for "+ rowIdx +"-"+ fileColumnIdx.toString())
+//						logger.info("file column Index is null for "+ rowIdx +"-"+ fileColumnIdx.toString())
 //						else
 //						curRow[rowIdx]=columns[index]
 //					}
@@ -730,7 +732,7 @@ public class DataUploadService{
 //			return result;
 //		}
 //		catch (Exception e) {
-//			log.error(e.printStackTrace());
+//			logger.error(e.printStackTrace());
 //			throw e;
 //		}
 //		//			upload.status = "ERROR"

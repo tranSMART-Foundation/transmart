@@ -3,6 +3,7 @@ package com.recomdata.grails.plugin.gwas
 import com.recomdata.upload.DataUploadResult
 import fm.FmFile
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 
 /*************************************************************************
  * tranSMART - translational medicine data mart
@@ -33,6 +34,7 @@ import java.text.SimpleDateFormat
  * @author DNewton
  *
  */
+@Slf4j('logger')
 class UploadDataController {
 
     //This server is used to access security objects.
@@ -91,7 +93,7 @@ class UploadDataController {
         def templateFile = new File(templatesDir + "/" + filename)
         String template
         if(templateFile == null) {
-            log.info("template file not found: ${templatesDir}/${filename}")
+            logger.info("template file not found: ${templatesDir}/${filename}")
             template = ""
         } else {
             template = templateFile.getText()
@@ -121,7 +123,7 @@ class UploadDataController {
             dataUploadService.runStaging(upload.id);
         }
         catch (Exception e) {
-            log.error(e.getMessage(), e)
+            logger.error(e.getMessage(), e)
         }
         if (upload.hasErrors()) {
             flash.message = "The metadata could not be saved - please correct the highlighted errors."
@@ -191,7 +193,7 @@ class UploadDataController {
         }
 
         if (params.genotypePlatform) {
-            log.info "genotypePlatform ${params.genotypePlatform}"
+            logger.info "genotypePlatform ${params.genotypePlatform}"
             if (params.genotypePlatform instanceof String) {
                 upload.genotypePlatformIds = params.genotypePlatform
             } else {
@@ -202,7 +204,7 @@ class UploadDataController {
         }
 
         if (params.expressionPlatform) {
-            log.info "expressionPlatform ${params.expressionPlatform}"
+            logger.info "expressionPlatform ${params.expressionPlatform}"
             if (params.expressionPlatform instanceof String) {
                 upload.expressionPlatformIds = params.expressionPlatform
             } else {
@@ -213,7 +215,7 @@ class UploadDataController {
         }
 
         if (params.researchUnit) {
-            log.info "researchUnit ${params.researchUnit}"
+            logger.info "researchUnit ${params.researchUnit}"
             if (params.researchUnit instanceof String) {
                 upload.researchUnit = params.researchUnit
             } else {
@@ -233,7 +235,7 @@ class UploadDataController {
             upload.etlDate = new Date()
             filename = sdf.format(upload.etlDate) + f.getOriginalFilename()
             upload.filename = uploadsDir + "/" + filename
-            log.info "upload.filename ${upload.filename}"
+            logger.info "upload.filename ${upload.filename}"
         }
 
         if (f && !f.isEmpty()) {
@@ -246,16 +248,16 @@ class UploadDataController {
                     render(view: "complete", model: [result: result, uploadDataInstance: upload])
                     return
                 }
-                log.info "wrote uploaded data to file ${fullpath}"
+                logger.info "wrote uploaded data to file ${fullpath}"
             }
             catch (Exception e) {
                 upload.status = "ERROR"
                 upload.save(flush: true)
                 if (e.getMessage() != null) {
-                    log.info "exception message ${e.getMessage()}"
+                    logger.info "exception message ${e.getMessage()}"
                     flash.message2 = e.getMessage() + ". If you wish to skip those SNPs, please click 'Continue'. If you wish to reload, click 'Cancel'."
                     def model = [uploadDataInstance: upload]
-                    log.info "add field data so far ${upload}"
+                    logger.info "add field data so far ${upload}"
                     addFieldData(model, upload)
                     render(view: "uploadData", model: model)
                 } else {
@@ -283,13 +285,13 @@ class UploadDataController {
                 dataUploadService.runStaging(upload.id);
             }
             catch (Exception e) {
-                log.error(e.getMessage(), e)
+                logger.error(e.getMessage(), e)
             }
         }
 
         if (upload.hasErrors()) {
             flash.message = "The metadata could not be saved - please correct the highlighted errors."
-            log.info "upload errors '${upload.errors}'"
+            logger.info "upload errors '${upload.errors}'"
             def errors = upload.errors
             def model = [uploadDataInstance: upload]
             addFieldData(model, upload)
