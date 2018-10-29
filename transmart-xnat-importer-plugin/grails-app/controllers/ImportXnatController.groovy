@@ -1,11 +1,14 @@
 import org.transmart.searchapp.ImportXnatConfiguration;
 import org.transmart.searchapp.ImportXnatVariable;
+import groovy.util.logging.Slf4j
 import groovy.xml.MarkupBuilder
 import org.codehaus.groovy.grails.plugins.GrailsPluginUtils
 
 /**
  * ImportXnat controller.
  */
+
+@Slf4j('logger')
 class ImportXnatController {
 
 	def grailsApplication
@@ -187,18 +190,18 @@ class ImportXnatController {
 			def cmd = ["python",
                                    getScriptsLocation() + "/xnattotransmartlink/downloadscript.py",
                                    url, username, password, project, node, datadir, kitchendir, etldir, scriptdir, kettlehome]
-			log.info("Running cmd ${cmd}")
+			logger.info("Running cmd ${cmd}")
                         def process = new ProcessBuilder(cmd).directory(new File(datadir)).start()
-                        log.info("process started")
+                        logger.info("process started")
 			process.waitFor()
-                        log.info("process ended")
+                        logger.info("process ended")
 			def inText = process.in.text
 			def errText = process.err.text
 			if (errText) {
-				log.error(errText)
+				logger.error(errText)
 				flash.message = "${errText}</br>${inText}"
 			} else {
-				log.info(inText)
+				logger.info(inText)
 				flash.message = inText
 			}
 			redirect action: import_wizard, id: importXnatConfiguration.id
@@ -252,7 +255,7 @@ class ImportXnatController {
             if (dir.isEmpty()) {
                 dir = grailsAttributes.getApplicationContext().getResource("/").getFile().getParentFile().getParentFile().toString() + "/transmart-data"
                 if (dir.isEmpty()) {
-                    log.info("getTransmartDataLocation no value, set empty")
+                    logger.info("getTransmartDataLocation no value, set empty")
                     dir = ""
                 }
             }
@@ -264,7 +267,7 @@ class ImportXnatController {
             if (dir.isEmpty()) {
                 dir = getTransmartDataLocation()+"/env/tranSMART-ETL/Kettle/postgres/Kettle-ETL"
                 if (dir.isEmpty()) {
-                    log.info("getTransmartETLdir no value, set empty")
+                    logger.info("getTransmartETLdir no value, set empty")
                     dir = ""
                 }
             }
@@ -276,7 +279,7 @@ class ImportXnatController {
             if (dir.isEmpty()) { 
                 dir = getTransmartDataLocation()+"/env/data-integration"
                 if (dir.isEmpty()) {
-                    log.info("getTransmartKitchendir no value, set empty")
+                    logger.info("getTransmartKitchendir no value, set empty")
                     dir = ""
                 }
             }
@@ -288,7 +291,7 @@ class ImportXnatController {
             if (dir.isEmpty()) {
                 dir = getTransmartDataLocation()+"/samples/postgres/kettle-home"
                 if (dir.isEmpty()) {
-                    log.info("getKettleHome no value, set empty")
+                    logger.info("getKettleHome no value, set empty")
                     dir = ""
                 }
             }
@@ -301,7 +304,7 @@ class ImportXnatController {
             if (dir.isEmpty()) {
                 dir = grailsApplication.config.RModules.tempFolderDirectory
                 if (dir.isEmpty()) {
-                    log.info("getTransmartWorkingdir no value, set empty")
+                    logger.info("getTransmartWorkingdir no value, set empty")
                     dir = ""
                 }
             }
@@ -349,7 +352,7 @@ class ImportXnatController {
                 if (dir.isEmpty()) {
                     dir = grailsAttributes.getApplicationContext().getResource("/").getFile().getParentFile().getParentFile().toString() + "/xnattotransmartlink/"
                     if (dir.isEmpty()) {
-                        log.info("getScriptsLocation no value, set empty")
+                        logger.info("getScriptsLocation no value, set empty")
                         dir = ""
                     }
                 }
