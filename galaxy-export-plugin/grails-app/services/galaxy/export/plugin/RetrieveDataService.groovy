@@ -9,7 +9,7 @@ import com.github.jmchilton.blend4j.galaxy.beans.LibraryContent
 import com.github.jmchilton.blend4j.galaxy.beans.LibraryFolder
 import com.recomdata.transmart.domain.i2b2.AsyncJob
 import com.sun.jersey.api.client.ClientResponse
-import grails.transaction.Transactionali
+import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
 import org.json.JSONArray
