@@ -4,13 +4,14 @@ import grails.validation.Validateable
 import heim.session.SessionService
 import heim.tasks.TaskResult
 import org.transmartproject.core.exceptions.InvalidArgumentsException
+import sendfile.SendFileService
 
 class ScriptExecutionController {
 
     static scope = 'request'
 
     SessionService sessionService
-    def sendFileService
+    @AutoWired private SendFileService sendFileService
 
     static allowedMethods = [
             init  : 'POST',
