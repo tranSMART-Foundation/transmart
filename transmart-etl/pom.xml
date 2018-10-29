@@ -163,6 +163,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>${log4j.version}</version>
@@ -221,9 +227,10 @@
     </distributionManagement>
 
     <properties>
+        <slf4j.version>1.7.5</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
         <junit.version>4.11</junit.version>
-        <groovy.version>2.1.9</groovy.version>
+        <groovy.version>2.4.5</groovy.version>
          <opencsv.version>2.3</opencsv.version>
           <ojdbc.version>14</ojdbc.version>
         <postgresql.jdbc.version>42.2.2.jre7</postgresql.jdbc.version>
