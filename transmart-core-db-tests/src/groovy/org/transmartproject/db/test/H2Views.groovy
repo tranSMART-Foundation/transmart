@@ -20,7 +20,7 @@
 package org.transmartproject.db.test
 
 import groovy.sql.Sql
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 
 import javax.annotation.PostConstruct
@@ -36,7 +36,7 @@ import static org.transmartproject.db.test.H2Views.ObjectStatus.IS_VIEW
  * the script's classloader nor the context classloader know anything about
  * the test classpath.
  */
-@Log4j
+@Slf4j('logger')
 class H2Views {
 
     private static enum ObjectStatus {
@@ -58,7 +58,7 @@ class H2Views {
                 return
             }
 
-            log.info 'Executing H2Views init actions'
+            logger.info 'Executing H2Views init actions'
 
             createSearchBioMkrCorrelView()
             createSearchAuthUserSecAccessV()
@@ -200,7 +200,7 @@ class H2Views {
             return
         }
 
-        log.info 'Creating SEARCHAPP.SEARCH_AUTH_USER_SEC_ACCESS_V'
+        logger.info 'Creating SEARCHAPP.SEARCH_AUTH_USER_SEC_ACCESS_V'
 
         sql.execute '''
             CREATE VIEW SEARCHAPP.SEARCH_AUTH_USER_SEC_ACCESS_V(
@@ -249,7 +249,7 @@ class H2Views {
             return
         }
 
-        log.info 'Creating SEARCHAPP.SEARCH_BIO_MKR_CORREL_VIEW'
+        logger.info 'Creating SEARCHAPP.SEARCH_BIO_MKR_CORREL_VIEW'
 
         sql.execute '''
             CREATE VIEW SEARCHAPP.SEARCH_BIO_MKR_CORREL_VIEW (
@@ -308,7 +308,7 @@ class H2Views {
             return
         }
 
-        log.info 'Creating BIOMART.BIO_METAB_SUBPATHWAY_VIEW'
+        logger.info 'Creating BIOMART.BIO_METAB_SUBPATHWAY_VIEW'
 
         sql.execute '''
             CREATE VIEW BIOMART.BIO_METAB_SUBPATHWAY_VIEW(
@@ -333,7 +333,7 @@ class H2Views {
             return
         }
 
-        log.info 'Creating BIOMART.BIO_METAB_SUPERPATHWAY_VIEW'
+        logger.info 'Creating BIOMART.BIO_METAB_SUPERPATHWAY_VIEW'
 
         sql.execute '''
             CREATE VIEW BIOMART.BIO_METAB_SUPERPATHWAY_VIEW(
@@ -359,7 +359,7 @@ class H2Views {
             return
         }
 
-        log.info 'Creating I2B2METADATA.I2B2_TRIAL_NODES'
+        logger.info 'Creating I2B2METADATA.I2B2_TRIAL_NODES'
 
         sql.execute '''
             CREATE VIEW I2B2METADATA.I2B2_TRIAL_NODES(C_FULLNAME, TRIAL) AS
@@ -384,7 +384,7 @@ class H2Views {
             return
         }
 
-        log.info 'Creating I2B2DEMODATA.MODIFIER_DIMENSION_VIEW'
+        logger.info 'Creating I2B2DEMODATA.MODIFIER_DIMENSION_VIEW'
 
         sql.execute '''
             CREATE VIEW I2B2DEMODATA.MODIFIER_DIMENSION_VIEW AS
@@ -409,7 +409,7 @@ class H2Views {
             return
         }
 
-        log.info 'Creating DEAPP.DE_VARIANT_SUMMARY_DETAIL_GENE'
+        logger.info 'Creating DEAPP.DE_VARIANT_SUMMARY_DETAIL_GENE'
 
         sql.execute '''
             CREATE OR REPLACE VIEW DEAPP.DE_VARIANT_SUMMARY_DETAIL_GENE AS
@@ -462,7 +462,7 @@ class H2Views {
                 FROM INFORMATION_SCHEMA.VIEWS
                 WHERE TABLE_SCHEMA = $schema AND TABLE_NAME = $viewName)"""
         if (res[0]) {
-            log.debug "Object $schema.$viewName is a already view"
+            logger.debug "Object $schema.$viewName is a already view"
             return IS_VIEW
         }
 
@@ -472,11 +472,11 @@ class H2Views {
                 FROM INFORMATION_SCHEMA.TABLES
                 WHERE TABLE_SCHEMA = $schema AND TABLE_NAME = $viewName)"""
         if (res[0]) {
-            log.debug "Object $schema.$viewName is a table"
+            logger.debug "Object $schema.$viewName is a table"
             return IS_TABLE
         }
 
-        log.debug "Object $schema.$viewName does not exist"
+        logger.debug "Object $schema.$viewName does not exist"
         DOES_NOT_EXIST
     }
 
@@ -485,7 +485,7 @@ class H2Views {
             case DOES_NOT_EXIST:
                 return false
             case IS_TABLE:
-                log.info "Dropping table $schema.$viewName because we are " +
+                logger.info "Dropping table $schema.$viewName because we are " +
                         "creating a view with that name"
                 sql.execute("DROP TABLE $schema.$viewName" as String)
                 return false
