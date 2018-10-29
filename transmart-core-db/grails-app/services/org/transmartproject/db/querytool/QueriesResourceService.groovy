@@ -19,6 +19,7 @@
 
 package org.transmartproject.db.querytool
 
+import groovy.util.logging.Slf4j
 import org.hibernate.jdbc.Work
 import org.transmartproject.core.exceptions.InvalidRequestException
 import org.transmartproject.core.exceptions.NoSuchResourceException
@@ -30,6 +31,7 @@ import org.transmartproject.db.user.User
 
 import java.sql.Connection
 
+@Slf4j('logger')
 class QueriesResourceService implements QueriesResource {
 
     def grailsApplication
@@ -105,14 +107,14 @@ class QueriesResourceService implements QueriesResource {
                 def statement = conn.prepareStatement(sql)
                 setSize = statement.executeUpdate()
 
-                log.debug "Inserted $setSize rows into qt_patient_set_collection"
+                logger.debug "Inserted $setSize rows into qt_patient_set_collection"
             } as Work)
         } catch (InvalidRequestException e) {
-            log.error 'Invalid request; rolling back transaction', e
+            logger.error 'Invalid request; rolling back transaction', e
             throw e /* unchecked; rolls back transaction */
         } catch (Exception e) {
             // 6e. Handle error when building/running patient set query
-            log.error 'Error running (or building) querytool SQL query, ' +
+            logger.error 'Error running (or building) querytool SQL query, ' +
                     "failing query was '$sql'", e
 
             // Rollback to save point
@@ -132,7 +134,7 @@ class QueriesResourceService implements QueriesResource {
             queryInstance.message = sw.toString()
 
             if (!resultInstance.save()) {
-                log.error("After exception from " +
+                logger.error("After exception from " +
                         "patientSetQueryBuilderService::buildService, " +
                         "failed saving updated resultInstance and " +
                         "queryInstance")
@@ -197,7 +199,7 @@ class QueriesResourceService implements QueriesResource {
         try {
             usersResourceService.getUserFromUsername(user)
         } catch (NoSuchResourceException unf) {
-            log.warn("User $user not found. This is permitted for " +
+            logger.warn("User $user not found. This is permitted for " +
                     "compatibility with i2b2, but tranSMART functionality " +
                     "will be degraded, and this behavior is deprecated")
             return null

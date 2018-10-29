@@ -20,6 +20,7 @@
 package org.transmartproject.db.dataquery.highdim.acgh
 
 import groovy.transform.InheritConstructors
+import groovy.util.logging.Slf4j
 import org.hibernate.Query
 import org.transmartproject.core.dataquery.highdim.acgh.ChromosomalSegment
 import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
@@ -31,6 +32,7 @@ import org.transmartproject.db.dataquery.highdim.HighDimensionDataTypeResourceIm
  * Created by glopes on 11/22/13.
  */
 @InheritConstructors
+@Slf4j('logger')
 class AcghDataTypeResource extends HighDimensionDataTypeResourceImpl {
 
     List<ChromosomalSegment> retrieveChromosomalSegments(
@@ -51,7 +53,7 @@ class AcghDataTypeResource extends HighDimensionDataTypeResourceImpl {
                     'No assays satisfy the provided criteria')
         }
 
-        log.debug "Now getting regions for platforms: $platformIds"
+        logger.debug "Now getting regions for platforms: $platformIds"
 
         Query q = module.sessionFactory.currentSession.createQuery('''
             SELECT region.chromosome, min(region.start), max(region.end)

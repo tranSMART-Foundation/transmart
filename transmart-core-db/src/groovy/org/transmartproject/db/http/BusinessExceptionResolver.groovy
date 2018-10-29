@@ -19,7 +19,7 @@
 
 package org.transmartproject.db.http
 
-import org.apache.log4j.Logger
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.web.mapping.DefaultUrlMappingInfo
 import org.codehaus.groovy.grails.web.mapping.UrlMappingData
 import org.codehaus.groovy.grails.web.mapping.UrlMappingInfo
@@ -36,10 +36,9 @@ import javax.servlet.http.HttpServletResponse
 
 import static javax.servlet.http.HttpServletResponse.*
 
+@Slf4j('logger')
 class BusinessExceptionResolver implements ServletContextAware,
         HandlerExceptionResolver, Ordered {
-
-    private Logger log = Logger.getLogger(getClass())
 
     ServletContext servletContext
     int order = Ordered.HIGHEST_PRECEDENCE
@@ -79,7 +78,7 @@ class BusinessExceptionResolver implements ServletContextAware,
                                   Object handler,
                                   Exception ex) {
 
-        log.info("Asked BusinessExceptionResolver to resolve exception from " +
+        logger.info("Asked BusinessExceptionResolver to resolve exception from " +
                 "handler ${handler}", ex)
 
         def exceptionPlusStatus = null
@@ -106,7 +105,7 @@ class BusinessExceptionResolver implements ServletContextAware,
 
         /* we know this exception */
         if (exceptionPlusStatus) {
-            log.debug("BusinessExceptionResolver will handle exception ${e}")
+            logger.debug("BusinessExceptionResolver will handle exception ${e}")
             Map model = exceptionPlusStatus
 
             UrlMappingInfo info = new DefaultUrlMappingInfo(

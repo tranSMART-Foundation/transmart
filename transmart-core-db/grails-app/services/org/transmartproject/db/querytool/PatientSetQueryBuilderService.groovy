@@ -19,6 +19,7 @@
 
 package org.transmartproject.db.querytool
 
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringEscapeUtils
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.exceptions.InvalidRequestException
@@ -38,6 +39,7 @@ import java.util.regex.Pattern
 import static org.transmartproject.core.querytool.ConstraintByValue.Operator.*
 import static org.transmartproject.db.support.DatabasePortabilityService.DatabaseType.ORACLE
 
+@Slf4j('logger')
 class PatientSetQueryBuilderService {
 
     def conceptsResourceService
@@ -147,7 +149,7 @@ class PatientSetQueryBuilderService {
                 " row_number() OVER ($windowFunctionOrderBy) " +
                 "FROM ($patientSubQuery ORDER BY 1) P"
 
-        log.debug "SQL statement: $sql"
+        logger.debug "SQL statement: $sql"
 
         sql
     }
@@ -201,7 +203,7 @@ class PatientSetQueryBuilderService {
                 clause += "AND patient_num IN (" + patient_ids.collect {it.toString()}.join(",") + ")"
             }
             else {
-                log.warn("No implementation exists for building a patient set query for " + resource.getHighDimensionFilterType() + " data.")
+                logger.warn("No implementation exists for building a patient set query for " + resource.getHighDimensionFilterType() + " data.")
             }
         }
         clause

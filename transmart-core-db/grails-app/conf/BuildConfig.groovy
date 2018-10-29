@@ -52,7 +52,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        compile: ':hibernate:3.6.10.19'
+        compile ':hibernate:3.6.10.19'
 	compile ':transmart-shared:16.4-SNAPSHOT'
 
         build ':release:3.1.2', ':rest-client-builder:2.1.1', {

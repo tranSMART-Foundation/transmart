@@ -19,6 +19,7 @@
 
 package org.transmartproject.db.user
 
+import groovy.util.logging.Slf4j
 import org.hibernate.FetchMode
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.ontology.Study
@@ -26,6 +27,7 @@ import org.transmartproject.core.users.ProtectedOperation
 import org.transmartproject.core.users.ProtectedResource
 import org.transmartproject.db.accesscontrol.AccessControlChecks
 
+@Slf4j('logger')
 class User extends PrincipalCoreDb implements org.transmartproject.core.users.User {
 
     @Autowired
@@ -94,7 +96,7 @@ class User extends PrincipalCoreDb implements org.transmartproject.core.users.Us
 
         if (admin) {
             /* administrators bypass all the checks */
-            log.debug "Bypassing check for $protectedOperation on " +
+            logger.debug "Bypassing check for $protectedOperation on " +
                     "$protectedResource for user $this because he is an administrator"
             return true
         }
@@ -106,7 +108,7 @@ class User extends PrincipalCoreDb implements org.transmartproject.core.users.Us
 
     Set<Study> getAccessibleStudies() {
         Set<Study> studies = accessControlChecks.getAccessibleStudiesForUser(this)
-        log.debug "User $this has access to studies: ${studies*.id}"
+        logger.debug "User $this has access to studies: ${studies*.id}"
         studies
     }
 }

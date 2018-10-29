@@ -30,7 +30,7 @@ import org.transmartproject.core.dataquery.highdim.dataconstraints.DataConstrain
 import org.transmartproject.core.dataquery.highdim.projections.Projection
 import org.transmartproject.core.querytool.HighDimensionFilterType
 
-public interface HighDimensionDataTypeModule {
+interface HighDimensionDataTypeModule {
 
     /**
      * The name of the data type supported by this module.

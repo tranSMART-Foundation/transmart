@@ -21,7 +21,7 @@ package org.transmartproject.db.dataquery.highdim.correlations
 
 import grails.orm.HibernateCriteriaBuilder
 import grails.util.Holders
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.hibernate.Criteria
 import org.hibernate.HibernateException
 import org.hibernate.criterion.CriteriaQuery
@@ -42,7 +42,7 @@ import org.transmartproject.db.search.SearchKeywordCoreDb
  * - collect resulting associated biomarker ids (ASSO_BIO_MARKER_ID)
  * - go back to bio_marker to find the PRIMARY_EXTERNAL_ID of these new biomarker ids
  */
-@Log4j
+@Slf4j('logger')
 class CorrelatedBiomarkersDataConstraint implements CriteriaDataConstraint {
 
     List<SearchKeywordCoreDb> searchKeywords
@@ -87,7 +87,7 @@ class CorrelatedBiomarkersDataConstraint implements CriteriaDataConstraint {
                             c.searchKeywords.collect { LongType.INSTANCE }) as Type[]
             )
 
-            log.debug "Params: ${(c.correlationTypes + c.searchKeywords*.bioDataId)}"
+            logger.debug "Params: ${(c.correlationTypes + c.searchKeywords*.bioDataId)}"
 
             outer = c
         }

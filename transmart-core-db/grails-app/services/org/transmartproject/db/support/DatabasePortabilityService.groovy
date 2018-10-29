@@ -20,6 +20,7 @@
 package org.transmartproject.db.support
 
 import grails.orm.HibernateCriteriaBuilder
+import groovy.util.logging.Slf4j
 import org.hibernate.Criteria
 import org.hibernate.criterion.LikeExpression
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,6 +35,8 @@ import java.sql.DatabaseMetaData
  * Helper service to make it easier to write code that works on both Oracle and
  * PostgreSQL. Of course, the best option in this respect is to use Hibernate.
  */
+
+@Slf4j('logger')
 class DatabasePortabilityService {
 
     @Autowired
@@ -201,14 +204,14 @@ class DatabasePortabilityService {
             break
 
         default:
-            log.warn 'Could not detect data source driver as either ' +
+            logger.warn 'Could not detect data source driver as either ' +
                     'PostgreSQL or Oracle; defaulting to PostgreSQL ' +
                     '(this is OK if running H2 in Postgres compatibility ' +
                     'mode)'
             databaseType = DatabaseType.POSTGRESQL
         }
 
-        log.debug 'Selected database type is ' + databaseType
+        logger.debug 'Selected database type is ' + databaseType
 
         doFixups()
     }
