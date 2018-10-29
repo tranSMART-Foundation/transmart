@@ -1,6 +1,7 @@
 
 import grails.converters.JSON
 import groovy.time.TimeCategory
+import groovy.util.logging.Slf4j
 import groovy.xml.StreamingMarkupBuilder
 import org.json.JSONArray
 import org.json.JSONObject
@@ -16,6 +17,8 @@ import javax.xml.transform.stream.StreamSource
 //import RWGVisualizationDAO
 // so we can render as JSON
 //import groovyx.net.http.HTTPBuilder
+
+@Slf4j('logger')
 class GWASController {
     def searchKeywordService
     def springSecurityService
@@ -630,7 +633,7 @@ class GWASController {
         String solrScheme = grailsApplication.config.com.rwg.solr.scheme
         String solrHost = grailsApplication.config.com.rwg.solr.host
         String solrPath = grailsApplication.config.com.rwg.solr.path
-        log.info("SOLR " + solrScheme + solrHost + solrPath);
+        logger.info("SOLR " + solrScheme + solrHost + solrPath);
         String solrRequestUrl = new URI(solrScheme, solrHost, solrPath, "", "").toURL()
 
         return solrRequestUrl
@@ -734,7 +737,7 @@ class GWASController {
             //newParams.add newGeneString
         }
 
-        log.info("Gene parameter: ${newParams}")
+        logger.info("Gene parameter: ${newParams}")
         return newParams
     }
 
@@ -763,7 +766,7 @@ class GWASController {
         // ff params are faceted, but not filtered on
         def facetFieldsParams = request.getParameterValues('ff')
 
-        log.info("facet search: " + params)
+        logger.info("facet search: " + params)
 
         // build the SOLR query
         def nonfacetedQueryString = "";
@@ -836,7 +839,7 @@ class GWASController {
         // ff params are faceted, but not filtered on
         def facetFieldsParams = request.getParameterValues('ff')
 
-        log.info("facet search: " + params)
+        logger.info("facet search: " + params)
 
         // build the SOLR query
         def nonfacetedQueryString = createSOLRNonfacetedQueryString(queryParams)
@@ -871,7 +874,7 @@ class GWASController {
             def token = row[0];
             def dataid = row[1];
             token=token.replaceFirst("EXP:","")
-            log.info(token+":"+dataid);
+            logger.info(token+":"+dataid);
             t.put(token,dataid);
         }
         return t;
@@ -912,7 +915,7 @@ class GWASController {
         //def queryParams = ["ANY_SIGNIFICANT_GENES:1"]
         def queryParams = []
         session['solrSearchFilter'] = queryParams
-        log.info("Initial facet search: " + queryParams)
+        logger.info("Initial facet search: " + queryParams)
 
         // set session var for SOLR genes field (no param passed so default will be used)
         setSOLRGenesField(true)
@@ -951,7 +954,7 @@ class GWASController {
     def searchAutoComplete = {
         def category = params.category == null ? "ALL" : params.category
         def max = params.long('max') ?: 15
-        log.info("searchKeywordService.findSearchKeywords: ${category}")
+        logger.info("searchKeywordService.findSearchKeywords: ${category}")
         render searchKeywordService.findSearchKeywords(category, params.term, max) as JSON
     }
 
@@ -964,7 +967,7 @@ class GWASController {
         def studyWithResultsFound = false
         def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
         def secObjs=getExperimentSecureStudyList()
-        //secObjs.each{ k, v -> log.debug( "${k}:${v}") }
+        //secObjs.each{ k, v -> logger.debug( "${k}:${v}") }
         for (studyId in studyCounts.keys().sort()) {
 
             def c = studyCounts[studyId].toInteger()
@@ -980,7 +983,7 @@ class GWASController {
                 }
 
                 if (experiment == null) {
-                    log.warn "Unable to find an experiment for ${expNumber}"
+                    logger.warn "Unable to find an experiment for ${expNumber}"
                 } else {
                     if(secObjs.containsKey(experiment.accession)){
                         // evaluate if user has access rights to this private study
@@ -989,7 +992,7 @@ class GWASController {
                             total += c
                         }
                         else {
-                            log.warn "Restrict access for ${expNumber}"
+                            logger.warn "Restrict access for ${expNumber}"
                         }
                     }
                     else{
@@ -1004,7 +1007,7 @@ class GWASController {
                     eq("trialNumber", trialNumber, [ignoreCase: true])
                 }
                 if (trial == null)	{
-                    log.warn "Unable to find a trial for ${trialNumber}"
+                    logger.warn "Unable to find a trial for ${trialNumber}"
                 }
                 else  {
                     trialAnalysis.put((trial), c)
@@ -1042,7 +1045,7 @@ class GWASController {
 			   def token=i2b2HelperService.getGWASAccess(analysis.study,user)
 		    	if(token.equals("VIEW") || token.equals("Locked")){
 					analysis.canExport=false
-					log.debug("Can not export "+analysis.study)
+					logger.debug("Can not export "+analysis.study)
 				}
 		   }
 	   }*/

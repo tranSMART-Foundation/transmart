@@ -4,8 +4,10 @@ import au.com.bytecode.opencsv.CSVWriter
 import com.recomdata.transmart.domain.searchapp.FormLayout
 import grails.converters.JSON
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import org.springframework.beans.factory.annotation.Autowired
 import org.transmart.biomart.BioAssayAnalysis
 import org.transmart.biomart.Experiment
 import org.transmart.plugin.shared.SecurityService
@@ -22,6 +24,7 @@ import org.apache.commons.io.FileUtils
 
 import static java.util.UUID.randomUUID
 
+@Slf4j('logger')
 class GwasSearchController {
 
     def regionSearchService
@@ -409,13 +412,13 @@ class GwasSearchController {
                                     //if (it.key-1<newLargeTextField.size())
                                     if (it.key-1<largeTextField?.size())
                                     {
-                                        //log.warn("Key: "+it.key+ "size "+newLargeTextField.size());
+                                        //logger.warn("Key: "+it.key+ "size "+newLargeTextField.size());
                                         newLargeTextField[it.value-1] = largeTextField[it.key-1]
                                         counter++;
                                     }
                                     else
                                     {
-                                        //log.warn("Else clause Key: "+it.key+ "size "+newLargeTextField.size());
+                                        //logger.warn("Else clause Key: "+it.key+ "size "+newLargeTextField.size());
                                         newLargeTextField[counter]="";
                                         counter++;
                                     }
@@ -467,7 +470,7 @@ class GwasSearchController {
                     }
                 }
 
-        log.warn("Results processed")
+        logger.warn("Results processed")
         println("Results processed OK")
         return [analysisData: returnedAnalysisData, columnNames: columnNames, max: max, offset: offset, cutoff: cutoff, totalCount: totalCount, wasRegionFiltered: wasRegionFiltered, wasShortcut: wasShortcut]
 
@@ -510,7 +513,7 @@ class GwasSearchController {
 
         def analysisId = params.getLong('analysisId')
         if (!analysisId) {
-            log.warn "Request without analysisId"
+            logger.warn "Request without analysisId"
             render status: 404
             return
         }
@@ -518,7 +521,7 @@ class GwasSearchController {
         def targetFile = cachedImagePathForQQPlot(analysisId)
 
         if (!targetFile.isFile()) {
-            log.warn "Request for $targetFile, but such file does not exist"
+            logger.warn "Request for $targetFile, but such file does not exist"
             render status: 404
             return
         }
@@ -531,7 +534,7 @@ class GwasSearchController {
 
         def analysisId = params.getLong('analysisId')
         if (!analysisId) {
-            log.warn "Request without analysisId"
+            logger.warn "Request without analysisId"
             render status: 404
             return
         }
@@ -539,7 +542,7 @@ class GwasSearchController {
         def targetFile = cachedImagePathForManhattanPlot(analysisId)
 
         if (!targetFile.isFile()) {
-            log.warn "Request for $targetFile, but such file does not exist"
+            logger.warn "Request for $targetFile, but such file does not exist"
             render status: 404
             return
         }
@@ -1137,7 +1140,7 @@ class GwasSearchController {
                             }
                             regions.push([gene: geneId, chromosome: chrom, low: low, high: high, ver: ver])
                         } else {
-                            log.error("regionSearchService, called from GwasSearchController.getSearchRegions, returned " +
+                            logger.error("regionSearchService, called from GwasSearchController.getSearchRegions, returned " +
                                     "a null value for limit; most likely this is from a filter request that will fail " +
                                     "as a consequence of this error.")
                         }
@@ -1186,7 +1189,7 @@ class GwasSearchController {
 								}
 								else
 								{
-									log.debug("Gene not found deapp:"+geneId)
+									logger.debug("Gene not found deapp:"+geneId)
 								}
 							}
 						
@@ -1348,9 +1351,9 @@ class GwasSearchController {
         } else {
             query=regionSearchService.getAnalysisData(analysisArr, regions, max, 0, cutoff, "data.log_p_value", "desc", null, "eqtl", geneNames,transcriptGeneNames,false)
         }
-		log.debug("Before the result")
+		logger.debug("Before the result")
         def dataset = query.results
-		log.debug("Should be using probes")
+		logger.debug("Should be using probes")
         dataWriter.write "Probe ID\tp-value\t-log10 p-value\tRS Gene\tChromosome\tPosition\tInteronExon\tRecombination Rate\tRegulome Score\n"
         for (row in dataset) {
             def rowData = []
@@ -1384,7 +1387,7 @@ class GwasSearchController {
 			def token = row[0];
 			def dataid = row[1];
 			token=token.replaceFirst("EXP:","")
-			log.info(token+":"+dataid);
+			logger.info(token+":"+dataid);
 			t.put(token,dataid);
 		}
 		return t;
@@ -1451,7 +1454,7 @@ class GwasSearchController {
             String location = grailsApplication.config.grails.mail.attachments.dir
 			String lineSeparator = System.getProperty('line.separator')
             String rootDir = location + File.separator+rootFolder 
-			log.debug(rootDir +" is root directory");
+			logger.debug(rootDir +" is root directory");
 			def analysisAIds=[]
 			for(analysisId in analysisIds){
 				analysisId = analysisId.toLong()
@@ -1475,13 +1478,13 @@ class GwasSearchController {
                     while(match.find()){
                         String s= match.group();
                         analysisName=analysisName.replaceAll("\\"+s, "");
-						log.debug("After: "+analysisName)
+						logger.debug("After: "+analysisName)
                     }
 
                     def dirStudy = rootDir +File.separator+ accession + File.separator
-					log.debug("Study "+dirStudy)
+					logger.debug("Study "+dirStudy)
                     def dirAnalysis = dirStudy +analysisName + File.separator
-					log.debug("Analysis "+ dirAnalysis)
+					logger.debug("Analysis "+ dirAnalysis)
                     def dir = new File(dirAnalysis)
                     dir.mkdirs()
 

@@ -21,11 +21,13 @@
 package com.recomdata.grails.plugin.gwas
 
 import au.com.bytecode.opencsv.CSVWriter
+import groovy.util.logging.Slf4j
 import org.transmart.searchapp.SecureObject;
 import org.transmart.searchapp.AuthUserSecureAccess;
 import org.transmart.searchapp.AuthUser;
 import org.apache.commons.io.FileUtils;
 
+@Slf4j('logger')
 class GwasWebService {
 
     boolean transactional = true
@@ -177,7 +179,7 @@ class GwasWebService {
                 } finally {
                     geneInfoRs.close();
                 }
-                log.debug("Gene strand query:" +geneInfoRs)
+                logger.debug("Gene strand query:" +geneInfoRs)
                 geneStmt.setString(1, entrezGeneId.toString())
                 geneStmt.setString(2, snpSource)
                 geneRs = geneStmt.executeQuery();
@@ -296,7 +298,7 @@ class GwasWebService {
 	def checkSecureStudyAccess(user, accession)
 
 	{
-		log.debug("checking security for the user: "+user)
+		logger.debug("checking security for the user: "+user)
 		def secObjs=getExperimentSecureStudyList()
 		if (secObjs!=null)
 		{if (!secObjs.containsKey(accession))
@@ -332,7 +334,7 @@ class GwasWebService {
 		if(!admin) //if not admin merge the data from the two maps
 		{
 			def tokens=getSecureTokensWithAccessForUser(user);
-			//tokens.each{ k, v -> log.debug( "${k}:${v}") }
+			//tokens.each{ k, v -> logger.debug( "${k}:${v}") }
 			if(tokens.containsKey("EXP:"+study_id)) //null tokens are assumed to be unlocked
 			{
                             return tokens["EXP:"+study_id]; //found access for this token so put in access level
@@ -357,7 +359,7 @@ class GwasWebService {
 			def token = row[0];
 			def dataid = row[1];
 			token=token.replaceFirst("EXP:","")
-			log.info(token+":"+dataid);
+			logger.info(token+":"+dataid);
 			t.put(token,dataid);
 		}
 		return t;
@@ -373,7 +375,7 @@ class GwasWebService {
 		for (row in results){
 			def token = row[1];
 			def accessLevel = row[0];
-			log.trace(token+":"+accessLevel.accessLevelName);
+			logger.trace(token+":"+accessLevel.accessLevelName);
 			t.put(token,accessLevel.accessLevelName);
 		}
 		t.put("EXP:PUBLIC","OWN");

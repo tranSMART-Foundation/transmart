@@ -21,7 +21,9 @@
 package com.recomdata.grails.plugin.gwas
 
 import de.DeSNPInfo;
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class RegionSearchService {
 
     boolean transactional = true
@@ -472,7 +474,7 @@ class RegionSearchService {
                 analysisNameMap.put(rs.getLong("id"), rs.getString("name"));
             }
         }catch(Exception e){
-            log.error(e.getMessage(),e)
+            logger.error(e.getMessage(),e)
             throw e;
         }
         finally {
@@ -494,7 +496,7 @@ class RegionSearchService {
             stmt.setDouble(1, cutoff);
         }
 
-        log.debug("Executing: " + finalQuery)
+        logger.debug("Executing: " + finalQuery)
 
 
         def results = []
@@ -510,7 +512,7 @@ class RegionSearchService {
             }
         }
         catch(Exception e){
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         finally{
             rs?.close();
@@ -527,7 +529,7 @@ class RegionSearchService {
                     stmt.setDouble(1, cutoff);
                 }
 
-                log.debug("Executing count query: " + finalQuery)
+                logger.debug("Executing count query: " + finalQuery)
 
                 rs = stmt.executeQuery();
                 if (rs.next()) {
@@ -535,7 +537,7 @@ class RegionSearchService {
                 }
             }
             catch (Exception e) {
-                log.error(e, e.getMessage())
+                logger.error(e, e.getMessage())
                 throw e;
             }
             finally {
