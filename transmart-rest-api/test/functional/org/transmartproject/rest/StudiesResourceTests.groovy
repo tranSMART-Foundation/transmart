@@ -68,8 +68,6 @@ class StudiesResourceTests extends ResourceTestCase {
     void testListAllStudiesAsHal() {
         def result = getAsHal("${baseURL}studies")
         
-        //log.info "testListAllStudiesAsHal:\n" + result.toString(2) 
-        
         assertStatus 200
 
         assertThat result, halIndexResponse('/studies', ['studies': 
@@ -128,8 +126,6 @@ class StudiesResourceTests extends ResourceTestCase {
         def result = getAsHal("${baseURL}studies/${studyId}")
         assertStatus 200
 
-        //log.info "testGetStudyAsHal:\n" + result.toString(2)
-        
         assertThat result, allOf(
             hasEntry('id', 'STUDY_ID_1'),
             halIndexResponse("/studies/${studyId}".toLowerCase(), [

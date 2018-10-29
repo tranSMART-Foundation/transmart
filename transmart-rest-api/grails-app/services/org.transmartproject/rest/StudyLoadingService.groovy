@@ -25,6 +25,7 @@
 
 package org.transmartproject.rest
 
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.web.context.request.RequestContextHolder
 import org.transmartproject.core.exceptions.AccessDeniedException
@@ -35,6 +36,7 @@ import org.transmartproject.core.users.ProtectedOperation
 import org.transmartproject.rest.misc.CurrentUser
 import org.transmartproject.rest.ontology.OntologyTermCategory
 
+@Slf4j('logger')
 class StudyLoadingService {
 
     static transactional = false
@@ -79,7 +81,7 @@ class StudyLoadingService {
                 ProtectedOperation.WellKnownOperations.API_READ, study)
         if (!result) {
             def username = currentUser.username
-            log.warn "User $username denied access to study ${study.id}"
+            logger.warn "User $username denied access to study ${study.id}"
         }
 
         result
