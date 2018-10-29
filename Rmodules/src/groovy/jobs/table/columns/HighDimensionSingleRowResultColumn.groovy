@@ -1,12 +1,12 @@
 package jobs.table.columns
 
 import com.google.common.collect.ImmutableMap
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.dataquery.DataRow
 import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 
-@Log4j
+@Slf4j('logger')
 class HighDimensionSingleRowResultColumn extends AbstractColumn {
 
     private DataRow row
@@ -27,7 +27,7 @@ class HighDimensionSingleRowResultColumn extends AbstractColumn {
         assert row instanceof DataRow
 
         if (sawRow) {
-            log.warn("Further rows from $dataSourceName ignored")
+            logger.warn("Further rows from $dataSourceName ignored")
             return
         }
 

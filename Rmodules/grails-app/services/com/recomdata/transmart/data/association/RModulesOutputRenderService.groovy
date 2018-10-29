@@ -16,6 +16,9 @@
 
 package com.recomdata.transmart.data.association
 
+import groovy.util.logging.Slf4j
+
+@Slf4j('logger')
 class RModulesOutputRenderService {
 
 	static scope         = "request"
@@ -69,9 +72,9 @@ class RModulesOutputRenderService {
     }
 
     def initializeAttributes(jobName, jobTypeName, linksArray) {
-        log.debug "initializeAttributes for jobName '$jobName'; jobTypeName " +
+        logger.debug "initializeAttributes for jobName '$jobName'; jobTypeName " +
                 "'$jobTypeName'"
-        log.debug "Settings are: jobs directory -> $tempFolderDirectory, " +
+        logger.debug "Settings are: jobs directory -> $tempFolderDirectory, " +
                 "images URL -> $imageURL"
 
         this.jobName = jobName
@@ -89,12 +92,12 @@ class RModulesOutputRenderService {
             String newFileName = currentImageFile.name.replaceAll(/[^.a-zA-Z0-9-_]/, "_")
             File oldImage = new File(currentImageFile.path)
             File renamedImage = new File(tempDirectoryFile, newFileName)
-            log.debug("Rename $oldImage to $renamedImage")
+            logger.debug("Rename $oldImage to $renamedImage")
             oldImage.renameTo(renamedImage)
 
             // Build url to image
             String currentLink = "${imageURL}$jobName/workingDirectory/${newFileName}"
-            log.debug("New image link: " + currentLink)
+            logger.debug("New image link: " + currentLink)
             linksArray.add(currentLink)
         }
 
@@ -109,7 +112,7 @@ class RModulesOutputRenderService {
                 this.zipLink = "${imageURL}${jobName}/zippedData.zip"
             }
         } catch (Exception e) {
-            log.error(e)
+            logger.error(e)
         }
     }
 	
@@ -233,11 +236,11 @@ class RModulesOutputRenderService {
         }
         dirs.each {
             if (!it.mkdir()) {
-                log.error "Directory $it neither exists, " +
+                logger.error "Directory $it neither exists, " +
                         "nor could it be created"
                 return false;
             } else {
-                log.debug "Created directory $it"
+                logger.debug "Created directory $it"
             }
         }
         true

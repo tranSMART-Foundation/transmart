@@ -3,13 +3,13 @@ package jobs.steps
 import com.recomdata.transmart.util.RUtil
 import grails.util.Holders
 import groovy.text.SimpleTemplateEngine
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import jobs.UserParameters
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.Rserve.RConnection
 import org.rosuda.REngine.Rserve.RserveException
 
-@Log4j
+@Slf4j('logger')
 class RCommandsStep implements Step {
 
     final String statusName = 'Running analysis'
@@ -38,7 +38,7 @@ class RCommandsStep implements Step {
         try {
             //Run the R command to set the working directory to our temp directory.
             String wd = RUtil.escapeRStringContent(temporaryDirectory.absolutePath)
-            log.info "About to trigger R command: setwd('$wd')"
+            logger.info "About to trigger R command: setwd('$wd')"
             rConnection.eval "setwd('${wd}')"
 
             /**
@@ -70,13 +70,13 @@ class RCommandsStep implements Step {
 
     private void runRCommand(RConnection connection, String command, Map vars) {
         String finalCommand = processTemplates command, vars
-        log.info "About to trigger R command: $finalCommand"
+        logger.info "About to trigger R command: $finalCommand"
 
         // TODO Set back silent mode REXP rObject = rConnection.parseAndEval("try($finalCommand, silent=TRUE)")
         REXP rObject = connection.parseAndEval("try($finalCommand, silent=FALSE)")
 
         if (rObject.inherits("try-error")) {
-            log.error "R command failure for:$finalCommand"
+            logger.error "R command failure for:$finalCommand"
             handleRError(rObject, connection)
         }
     }

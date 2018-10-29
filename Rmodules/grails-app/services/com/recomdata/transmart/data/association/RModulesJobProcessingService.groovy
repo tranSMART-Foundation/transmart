@@ -1,6 +1,7 @@
 package com.recomdata.transmart.data.association
 
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.Rserve.RConnection
 import org.rosuda.REngine.Rserve.RserveException
@@ -10,6 +11,8 @@ import org.rosuda.Rserve.*
  * This class contains methods for interacting with the R environment.
  *  
 */
+
+@Slf4j('logger')
 class RModulesJobProcessingService {
 	static transactional = true
 	static scope = 'request'
@@ -23,7 +26,7 @@ class RModulesJobProcessingService {
 		c.stringEncoding = 'utf8'
 		
 		//Set the working directory to be our temporary location.
-		log.debug("Attempting following R Command : " + "setwd('${workingDirectory}')".replace("\\","\\\\"))
+		logger.debug("Attempting following R Command : " + "setwd('${workingDirectory}')".replace("\\","\\\\"))
 		println("Attempting following R Command : " + "setwd('${workingDirectory}')".replace("\\","\\\\"))
 		String workingDirectoryCommand = "setwd('${workingDirectory}')".replace("\\","\\\\")
 		
@@ -33,12 +36,12 @@ class RModulesJobProcessingService {
 		//Run the R command to source in the script.
 		def sourceCommand = "source('${rScriptDirectory}/" + scriptName + "');".replace("\\","\\\\")
 		
-		log.debug("Attempting following R Command : " + sourceCommand)
+		logger.debug("Attempting following R Command : " + sourceCommand)
 		println("Attempting following R Command : " + sourceCommand)
 		
 		x = c.eval(sourceCommand);
 		
-		log.debug("Attempting following R Command : " + commandToRun)
+		logger.debug("Attempting following R Command : " + commandToRun)
 		println("Attempting following R Command : " + commandToRun)
 		
 		REXP r = c.parseAndEval("try("+commandToRun+",silent=TRUE)");
@@ -59,8 +62,8 @@ class RModulesJobProcessingService {
 			}
 			else
 			{
-				log.error("RserveException thrown executing job: " + rError)
-				log.debug("RserveException thrown executing job: " + rError)
+				logger.error("RserveException thrown executing job: " + rError)
+				logger.debug("RserveException thrown executing job: " + rError)
 				newError = new RserveException(c,"There was an error running the R script for your job. Please contact an administrator.");
 			}
 			

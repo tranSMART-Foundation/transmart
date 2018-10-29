@@ -1,6 +1,6 @@
 package jobs.steps.helpers
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import jobs.table.Column
 import jobs.table.columns.ConstantValueColumn
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,10 +21,10 @@ import org.transmartproject.core.exceptions.InvalidArgumentsException
  *
  * Does not support multiple numeric variables.
  */
-@Log4j
 @Component
 @Scope('prototype')
 @Qualifier('general')
+@Slf4j('logger')
 class OptionalBinningColumnConfigurator extends ColumnConfigurator {
 
     @Autowired
@@ -56,7 +56,7 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
 
         if (emptyConcept) {
             //when required we will never reach here
-            log.debug("Not required and no value for $keyForConceptPaths, " +
+            logger.debug("Not required and no value for $keyForConceptPaths, " +
                     "assuming constant value column")
 
             innerConfigurator = appCtx.getBean SimpleAddColumnConfigurator
@@ -66,7 +66,7 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
             innerConfigurator.addColumn()
 
         } else if (categorical) {
-            log.debug("Found pipe character in $keyForConceptPaths, " +
+            logger.debug("Found pipe character in $keyForConceptPaths, " +
                     "assuming categorical data")
 
             innerConfigurator = appCtx.getBean CategoricalColumnConfigurator
@@ -74,7 +74,7 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
             innerConfigurator.header             = getHeader()
             innerConfigurator.keyForConceptPaths = keyForConceptPaths
         } else {
-            log.debug("Did not find pipe character in $keyForConceptPaths, " +
+            logger.debug("Did not find pipe character in $keyForConceptPaths, " +
                     "assuming continuous data")
 
             innerConfigurator = appCtx.getBean numericColumnConfigurationClass

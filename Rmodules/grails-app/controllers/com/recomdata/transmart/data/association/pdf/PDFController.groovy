@@ -16,6 +16,7 @@
 
 package com.recomdata.transmart.data.association.pdf
 
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
 import org.w3c.dom.Document
 import org.xhtmlrenderer.pdf.ITextRenderer
@@ -30,6 +31,8 @@ import javax.xml.parsers.DocumentBuilderFactory
  * @author SMunikuntla
  *
  */
+
+@Slf4j('logger')
 class PDFController {
 
     def generatePDF = {
@@ -48,7 +51,7 @@ class PDFController {
 			
 			String html = StringUtils.replace(buf.toString(), '/transmart/images/analysisFiles',
 					'file://' + grailsApplication.config.RModules.tempFolderDirectory)
-			log.info "generatePDF replacing '"+buf.toString()+"' ==> '${html}'"
+			logger.info "generatePDF replacing '"+buf.toString()+"' ==> '${html}'"
 
 			//TODO Check if the htmlStr is a Well-Formatted XHTML string
 			if (StringUtils.isNotEmpty(htmlStr)) {

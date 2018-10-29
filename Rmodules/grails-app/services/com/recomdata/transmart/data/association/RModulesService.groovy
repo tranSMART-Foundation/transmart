@@ -18,12 +18,14 @@ package com.recomdata.transmart.data.association
 
 import com.recomdata.asynchronous.JobResultsService
 import com.recomdata.transmart.data.association.asynchronous.RModulesJobService
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.quartz.JobDataMap
 import org.quartz.JobDetail
 import org.quartz.impl.JobDetailImpl
 import org.quartz.impl.triggers.SimpleTriggerImpl
 
+@Slf4j('logger')
 class RModulesService {
 
     static transactional = false
@@ -142,7 +144,7 @@ class RModulesService {
 			moduleMap = new JSONObject(moduleMapStr) as Map
 		}
 		catch (e) {
-			log.error('Module '+params.analysis+' params could not be loaded', e)
+			logger.error('Module '+params.analysis+' params could not be loaded', e)
 		}
 		
 		if (null != moduleMap) {

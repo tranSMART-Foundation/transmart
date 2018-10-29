@@ -1,4 +1,4 @@
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.runtime.ConvertedMap
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.gmock.GMockController
@@ -13,7 +13,7 @@ import org.transmartproject.core.users.ProtectedOperation
 import org.transmartproject.core.users.ProtectedResource
 import org.transmartproject.core.users.User
 
-@Log4j
+@Slf4j('logger')
 class GMockFactoryBean implements FactoryBean {
 
     final boolean singleton = true
@@ -44,6 +44,7 @@ class GMockFactoryBean implements FactoryBean {
  * which checks whether the returned value matches the value declared
  * on the interface method.
  */
+@Slf4j('logger')
 class GroovyInterceptableProxyFactoryBean implements FactoryBean {
 
     Class<?> objectType
@@ -69,14 +70,14 @@ class GroovyInterceptableProxyFactoryBean implements FactoryBean {
     }()
 }
 
-@Log4j
+@Slf4j
 class CurrentUserBeanMockFactory implements FactoryBean<User> {
     final Class<?> objectType = User
 
     final boolean singleton = true
 
     void registerBeanToTry(String beanName) {
-        log.debug('Mocked call to &currentUserBean.registerBeanToTry with ' +
+        logger.debug('Mocked call to &currentUserBean.registerBeanToTry with ' +
                 "beanName=$beanName")
     }
 
@@ -84,7 +85,7 @@ class CurrentUserBeanMockFactory implements FactoryBean<User> {
         [
             canPerform: { ProtectedOperation operation,
                           ProtectedResource protectedResource ->
-                log.debug("Mocked call to currentUserBean.canPerform with " +
+                logger.debug("Mocked call to currentUserBean.canPerform with " +
                         "operation=$operation, " +
                         "protectedResource=$protectedResource")
                 true

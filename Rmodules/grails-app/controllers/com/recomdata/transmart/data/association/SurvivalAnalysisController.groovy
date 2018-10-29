@@ -16,6 +16,9 @@
 
 package com.recomdata.transmart.data.association
 
+import groovy.util.logging.Slf4j
+
+@Slf4j('logger')
 class SurvivalAnalysisController {
 	
 	def grailsApplication;
@@ -35,7 +38,7 @@ class SurvivalAnalysisController {
 		//Gather the image links.
 		RModulesOutputRenderService.initializeAttributes(jobName,"SurvivalCurve",imageLinks)
 
-		log.info "imageLinks set by initializeAttributes"
+		logger.info "imageLinks set by initializeAttributes"
 		String tempDirectory = RModulesOutputRenderService.tempDirectory
 		
 		//Create a directory object so we can pass it to be traversed.
@@ -54,7 +57,7 @@ class SurvivalAnalysisController {
 		
 		String survivalData = RModulesOutputRenderService.fileParseLoop(tempDirectoryFile,/.*SurvivalCurve.*FitSummary.*\.txt/,/.*SurvivalCurve(.*)FitSummary\.txt/,parseSurvivalCurveSummary)
 
-		log.info "render imageLinks"+imageLinks
+		logger.info "render imageLinks"+imageLinks
 		render(template: "/plugin/survivalAnalysis_out", model:[legendText:legendText, imageLocation:imageLinks,coxData:coxData,survivalData:survivalData,zipLink:RModulesOutputRenderService.zipLink], contextPath:pluginContextPath)
 	}
 	

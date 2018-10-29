@@ -20,12 +20,14 @@
 
 package com.recomdata.transmart.util
 
+import groovy.util.logging.Slf4j
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringUtils
 
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
+@Slf4j('logger')
 class ZipService {
 
     boolean transactional = true
@@ -77,7 +79,7 @@ class ZipService {
             zipOut.close();
         }
         catch (IOException e) {
-            //log.error("Error while creating Zip file");
+            //logger.error("Error while creating Zip file");
         }
 
         return (null != zipFile) ? zipFile.getAbsolutePath() : null;

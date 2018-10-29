@@ -1,7 +1,7 @@
 package jobs.misc
 
 import grails.util.Holders
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import jobs.AbstractAnalysisJob
 import org.codehaus.groovy.grails.support.PersistenceContextInterceptor
 import org.quartz.Job
@@ -11,7 +11,7 @@ import org.quartz.JobExecutionException
 import org.springframework.context.ApplicationContext
 import org.springframework.core.NamedThreadLocal
 
-@Log4j
+@Slf4j('logger')
 class AnalysisQuartzJobAdapter implements Job {
 
     public static final String PARAM_JOB_CLASS = 'jobClass'
@@ -63,7 +63,7 @@ class AnalysisQuartzJobAdapter implements Job {
             try {
                 job = createAnalysisJob()
             } catch (Exception e) {
-                log.error 'Exception while creating the analysis job', e
+                logger.error 'Exception while creating the analysis job', e
                 jobResultsService[jobName]['Exception'] = e.message
                 asyncJobService.updateStatus jobName, 'Error'
                 return
@@ -72,7 +72,7 @@ class AnalysisQuartzJobAdapter implements Job {
             try {
                 job.run()
             } catch (Exception e) {
-                log.error 'Some exception occurred in the processing pipe', e
+                logger.error 'Some exception occurred in the processing pipe', e
                 jobResultsService[jobName]['Exception'] = e.message
                 job.updateStatus 'Error'
             }
@@ -104,7 +104,7 @@ class AnalysisQuartzJobAdapter implements Job {
 
         /* wire things up */
         job.updateStatus = { String status, String viewerUrl = null ->
-            job.log.info "updateStatus called for status:$status, viewerUrl:$viewerUrl"
+            job.logger.info "updateStatus called for status:$status, viewerUrl:$viewerUrl"
             asyncJobService.updateStatus job.name, status, viewerUrl
         }
         job.setStatusList = { List<String> statusList ->

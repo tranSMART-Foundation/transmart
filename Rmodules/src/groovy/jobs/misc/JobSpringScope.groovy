@@ -1,11 +1,11 @@
 package jobs.misc
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.ObjectFactory
 import org.springframework.beans.factory.config.Scope
 import org.springframework.stereotype.Component
 
-@Log4j
+@Slf4j('logger')
 @Component
 class JobSpringScope implements Scope {
 
@@ -26,7 +26,7 @@ class JobSpringScope implements Scope {
 
     @Override
     void registerDestructionCallback(String name, Runnable callback) {
-        log.warn('Destruction callbacks are not supported')
+        logger.warn('Destruction callbacks are not supported')
     }
 
     @Override

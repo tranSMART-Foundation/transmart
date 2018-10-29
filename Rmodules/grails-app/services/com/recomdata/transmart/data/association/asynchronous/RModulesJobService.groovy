@@ -18,6 +18,7 @@ package com.recomdata.transmart.data.association.asynchronous
 
 import com.recomdata.transmart.util.RUtil
 import grails.util.Holders
+import groovy.util.logging.Slf4j
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang.StringUtils
 import org.quartz.Job
@@ -29,6 +30,7 @@ import org.rosuda.REngine.Rserve.RserveException
 
 import java.lang.reflect.UndeclaredThrowableException
 
+@Slf4j('logger')
 class RModulesJobService implements Job {
 
     static transactional = true
@@ -64,13 +66,13 @@ class RModulesJobService implements Job {
 			jobName = jobDetail.getName()
 			jobDataMap = jobDetail.getJobDataMap()
 			if (StringUtils.isEmpty(jobName)) jobName = jobDataMap.getAt('jobName')
-			//Put an entry in our log.
-			log.info("${jobName} has been triggered to run ")
+			//Put an entry in our logger.
+			logger.info("${jobName} has been triggered to run ")
 
 			//Write our attributes to a log file.
-			if (log.isDebugEnabled())	{
+			if (logger.isDebugEnabled())	{
 				jobDataMap.getKeys().each {_key ->
-					log.debug("\t${_key} -> ${jobDataMap[_key]}")
+					logger.debug("\t${_key} -> ${jobDataMap[_key]}")
 				}
 			}
 		} catch (Exception e) {
@@ -84,7 +86,7 @@ class RModulesJobService implements Job {
 			jobTmpDirectory = grailsApplication.config.RModules.tempFolderDirectory + File.separator + "${jobDataMap.jobName}" + File.separator
 			jobTmpDirectory = jobTmpDirectory.replace("\\","\\\\")
 			if (new File(jobTmpDirectory).exists()) {
-				log.warn("The job folder ${jobTmpDirectory} already exists. It's going to be overwritten.")
+				logger.warn("The job folder ${jobTmpDirectory} already exists. It's going to be overwritten.")
 				FileUtils.deleteDirectory(new File(jobTmpDirectory))
 			}
 			jobTmpWorkingDirectory = jobTmpDirectory + "workingDirectory"
@@ -127,7 +129,7 @@ class RModulesJobService implements Job {
 			renderOutput(jobExecutionContext.getJobDetail())
 
 		} catch(Exception e)	{
-			log.error("Exception thrown executing job: " + e.getMessage(), e)
+			logger.error("Exception thrown executing job: " + e.getMessage(), e)
 			def errorMsg = null
 			if (e instanceof UndeclaredThrowableException) {
 				errorMsg = ((UndeclaredThrowableException)e)?.getUndeclaredThrowable().message
@@ -150,7 +152,7 @@ class RModulesJobService implements Job {
 	{
 		jobDataMap.put('jobTmpDirectory', jobTmpDirectory)
 
-		log.debug("RModulesJobService getData directory ${jobTmpDirectory}")
+		logger.debug("RModulesJobService getData directory ${jobTmpDirectory}")
 		dataExportService.exportData(jobDataMap)
 	}
 
@@ -219,7 +221,7 @@ class RModulesJobService implements Job {
 							}
 						}
 					} catch (Exception e) {
-						log.error("Failed to FTP PUT the ZIP file", e);
+						logger.error("Failed to FTP PUT the ZIP file", e);
 					}
 					break
 				case "R":
@@ -291,7 +293,7 @@ class RModulesJobService implements Job {
         String workingDirectoryCommand = "setwd('" +
                 RUtil.escapeRStringContent(rOutputDirectory) + "')"
 
-		log.info("Attempting following R Command : $workingDirectoryCommand")
+		logger.info("Attempting following R Command : $workingDirectoryCommand")
 
 		//Run the R command to set the working directory to our temp directory.
 		c.eval(workingDirectoryCommand);
@@ -319,7 +321,7 @@ class RModulesJobService implements Job {
                 reformattedCommand = reformattedCommand.replace(variableItem.key, valueFromForm)
 		    }
 
-			log.info("Attempting following R Command : " + reformattedCommand)
+			logger.info("Attempting following R Command : " + reformattedCommand)
 
 			REXP r = c.parseAndEval("try("+reformattedCommand+",silent=TRUE)");
 
@@ -339,7 +341,7 @@ class RModulesJobService implements Job {
 				}
 				else
 				{
-					log.error("RserveException thrown executing job: " + rError)
+					logger.error("RserveException thrown executing job: " + rError)
 					newError = new RserveException(c,"There was an error running the R script for your job. Please contact an administrator.");
 				}
 
@@ -362,7 +364,7 @@ class RModulesJobService implements Job {
    def boolean updateStatusAndCheckIfJobCancelled(jobName, status) {
 	   if (StringUtils.isNotEmpty(status)) {
 		   jobResultsService[jobName]["Status"] = status
-		   log.debug(status)
+		   logger.debug(status)
 	   }
 
        def viewerURL = jobResultsService[jobName]["ViewerURL"]
@@ -372,7 +374,7 @@ class RModulesJobService implements Job {
 
 	   boolean jobCancelled = jobResultsService[jobName]["Status"] == "Cancelled"
 	   if (jobCancelled)	{
-		   log.warn("${jobName} has been cancelled")
+		   logger.warn("${jobName} has been cancelled")
 	   }
 
 	   jobCancelled

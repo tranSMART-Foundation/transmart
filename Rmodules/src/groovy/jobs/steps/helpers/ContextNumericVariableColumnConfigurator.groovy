@@ -1,6 +1,6 @@
 package jobs.steps.helpers
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import jobs.table.Column
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Scope
@@ -29,7 +29,7 @@ import javax.annotation.PostConstruct
  */
 @Component
 @Scope('prototype')
-@Log4j
+@Slf4j('logger')
 class ContextNumericVariableColumnConfigurator extends ColumnConfigurator {
 
     /* properties to be set externally:
@@ -57,11 +57,11 @@ class ContextNumericVariableColumnConfigurator extends ColumnConfigurator {
     @Override
     protected void doAddColumn(Closure<Column> decorateColumn) {
         if (clinicalData) {
-            log.debug("$keyForDataType indicates clinical data; " +
+            logger.debug("$keyForDataType indicates clinical data; " +
                     "using the MultiNumericClinicalVariableColumnConfigurator")
             multiClinicalConfigurator.doAddColumn decorateColumn
         } else {
-            log.debug("$keyForDataType indicates high dim data; " +
+            logger.debug("$keyForDataType indicates high dim data; " +
                     "using the HighDimensionColumnConfigurator")
             multiHighDimConfigurator.doAddColumn decorateColumn
         }

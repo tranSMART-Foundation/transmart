@@ -22,12 +22,16 @@
  */
 package com.recomdata.asynchronous
 
+import groovy.util.logging.Slf4j
+
 /**
  * JobResultsService handles the management of the asynchronous job results
  *
  * @author $Author: mmcduffie $
  * @version $Revision: 9178 $
  */
+
+@Slf4j('logger')
 class JobResultsService {
 
     boolean transactional = false
@@ -37,7 +41,7 @@ class JobResultsService {
     boolean isJobCancelled(String jobName) {
         boolean isJobCancelled = jobResults[jobName]["Status"] == "Cancelled"
         if (isJobCancelled) {
-            log.warn("${jobName} has been cancelled")
+            logger.warn("${jobName} has been cancelled")
         }
         isJobCancelled
     }
