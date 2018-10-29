@@ -135,6 +135,7 @@ grails.project.dependency.resolution = {
 			compile ':dalliance-plugin:'          + tmVersion
 			compile ':transmart-mydas:'           + tmVersion
 			compile ':transmart-rest-api:'        + tmVersion
+			compile ':transmart-shared:'          + tmVersion
 			compile ':galaxy-export-plugin:'      + tmVersion
 			compile ':transmart-metacore-plugin:' + tmVersion
 			compile ':transmart-xnat-importer:'   + tmVersion
@@ -170,6 +171,7 @@ dm?.with {
 	configureInternalPlugin 'runtime', 'dalliance-plugin'
 	configureInternalPlugin 'runtime', 'transmart-mydas'
 	configureInternalPlugin 'runtime', 'transmart-rest-api'
+	configureInternalPlugin 'runtime', 'transmart-shared'
 	configureInternalPlugin 'runtime', 'galaxy-export-plugin'
 	configureInternalPlugin 'runtime', 'transmart-metacore-plugin'
 	configureInternalPlugin 'runtime', 'transmart-xnat-importer'

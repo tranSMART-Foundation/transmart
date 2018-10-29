@@ -1,32 +1,40 @@
-grails.project.class.dir = "target/classes"
-grails.project.test.class.dir = "target/test-classes"
-grails.project.test.reports.dir = "target/test-reports"
-//grails.project.war.file = "target/${appName}-${appVersion}.war"
+grails.project.work.dir = 'target'
 
-grails.project.dependency.resolver = "maven"
+grails.project.source.level = 1.7
+grails.project.target.level = 1.7
+
+grails.project.dependency.resolver = 'maven'
+
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
-    inherits("global") {
+    inherits('global') {
         // uncomment to disable ehcache
         // excludes 'ehcache'
     }
-    log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
-	legacyResolve false
+    log 'warn' // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+    legacyResolve false
+
     repositories {
-         grailsCentral()
+        grailsCentral()
         mavenCentral()
         mavenLocal() // Note: use 'grails maven-install' to install required plugins locally
         mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
     }
+
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
     }
+
     plugins {
-		build ':release:3.1.2',
-			':rest-client-builder:2.1.1', {
-		export = false}
-        compile ':biomart-domain:16.4-SNAPSHOT'
+        String tmVersion = '16.4-SNAPSHOT'
+
+	build ':release:3.1.2', ':rest-client-builder:2.1.1', {
+	    export = false
+	}
+
+	compile ':biomart-domain:' + tmVersion
+        compile ':transmart-shared:' + tmVersion
     }
 }

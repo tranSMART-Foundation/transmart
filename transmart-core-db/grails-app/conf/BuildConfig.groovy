@@ -40,8 +40,11 @@ grails.project.dependency.resolution = {
 
     dependencies {
         compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
-        compile group: 'com.google.guava', name: 'guava', version: '14.0.1'
 
+	// not included in 18.1 beta
+	compile group: 'com.google.guava', name: 'guava', version: '14.0.1'
+
+	// not included in 18.1 beta
         runtime 'org.postgresql:postgresql:42.2.2.jre7', {
             transitive = false
             export     = false
@@ -49,15 +52,18 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build ':tomcat:7.0.54'
+        compile: ':hibernate:3.6.10.19'
+	compile ':transmart-shared:16.4-SNAPSHOT'
+
         build ':release:3.1.2', ':rest-client-builder:2.1.1', {
             export = false
         }
 
+	// not included in 18.1 beta
+	build ':tomcat:7.0.54'
         compile ':db-reverse-engineer:0.5', {
             export = false
         }
 
-        runtime ':hibernate:3.6.10.19'
     }
 }

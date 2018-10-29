@@ -1,7 +1,7 @@
 /*
  * Copyright 2014 Janssen Research & Development, LLC.
  *
- * This file is part of REST API: transMART's plugin exposing tranSMART's
+ * This file is part of REST API: tranSMART's plugin exposing tranSMART's
  * data via an HTTP-accessible RESTful API.
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -24,31 +24,100 @@
  */
 grails.servlet.version = '3.0'
 
-def defaultVMSettings = [
-        maxMemory: 768,
-        minMemory: 64,
-        debug:     false,
-        maxPerm:   256
-]
+def defaultVMSettings = [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
 
-grails.project.fork = [
-    test:    [*: defaultVMSettings, daemon:      true],
-    run:     [*: defaultVMSettings, forkReserve: false],
-    war:     [*: defaultVMSettings, forkReserve: false],
-    console: defaultVMSettings
-]
-
-final def CLOVER_VERSION = '4.1.1'
+final String CLOVER_VERSION = '4.1.1'
 def enableClover = System.getenv('CLOVER')
 
-def dm, dmClass
+def dm
 try {
-    dmClass = new GroovyClassLoader().parseClass(
-            new File('../transmart-dev/TransmartRestApiDependencyManagement.groovy'))
-} catch (Exception e) {
-}
+    Class dmClass = new GroovyClassLoader().parseClass(
+            	    new File('../transmart-dev/TransmartRestApiDependencyManagement.groovy'))
+    dm = dmClass?.newInstance()
+} catch (ignored) {}
+
 if (dmClass) {
     dm = dmClass.newInstance()
+}
+
+grails.project.fork = [test: [*: defaultVMSettings, daemon: true], console: defaultVMSettings]
+grails.project.work.dir = 'target'
+grails.servlet.version = '3.0'
+
+grails.project.dependency.resolver = 'maven'
+
+grails.project.dependency.resolution = {
+    inherits('global') {
+        // specify dependency exclusions here; for example, uncomment this to disable ehcache:
+        // excludes 'ehcache'
+    }
+    log 'warn'
+
+    if (!dm) {
+        repositories {
+            grailsCentral()
+            mavenCentral()
+
+            mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
+        }
+    } else {
+        dm.configureRepositories delegate
+    }
+
+    dependencies {
+        compile 'com.google.protobuf:protobuf-java:2.5.0'
+        compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
+
+        runtime 'org.postgresql:postgresql:42.2.2.jre7', { export = false }
+        runtime 'com.oracle:ojdbc7:12.1.0.1', { export = false }
+
+	// not included in 18.1 beta
+	compile 'org.javassist:javassist:3.16.1-GA'
+
+        // includes fix for GRAILS-11126
+        //compile 'org.grails:grails-plugin-rest:2.3.5-hyve4'
+
+        test 'org.gmock:gmock:0.8.3', { transitive = false } // don't bring groovy-all
+        test 'org.hamcrest:hamcrest-library:1.3'
+        test 'org.hamcrest:hamcrest-core:1.3'
+        test 'org.codehaus.groovy.modules.http-builder:http-builder:0.6', {
+            excludes 'groovy', 'nekohtml'
+            exported = false
+        }
+	test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
+    }
+
+    plugins {
+        build ':release:3.1.2', ':rest-client-builder:2.1.1', {
+            export = false
+        }
+        build ':tomcat:7.0.54', {
+            export = false
+        }
+
+        compile ':spring-security-core:2.0.0'
+
+        runtime ':hibernate:3.6.10.19', {
+	    export = false
+	}
+
+        test ':functional-test:2.0.0'
+
+        if (!dm) {
+            compile ':transmart-core:16.4-SNAPSHOT'
+            compile ':transmart-shared:16.4-SNAPSHOT'
+
+	    test ':transmart-core-db-tests:16.4-SNAPSHOT'
+        } else {
+            dm.internalDependencies delegate
+        }
+
+        if (enableClover) {
+            compile ":clover:$CLOVER_VERSION", {
+                export = false
+            }
+        }
+    }
 }
 
 if (enableClover) {
@@ -82,87 +151,6 @@ if (enableClover) {
     }
 }
 
-grails.project.dependency.resolver = 'maven'
-grails.project.dependency.resolution = {
-    inherits('global') {
-        // specify dependency exclusions here; for example, uncomment this to disable ehcache:
-        // excludes 'ehcache'
-    }
-    log 'warn'
-
-    if (!dm) {
-        repositories {
-            grailsCentral()
-            mavenCentral()
-
-            mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
-        }
-    } else {
-        dm.configureRepositories delegate
-    }
-
-    dependencies {
-        compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
-        compile 'org.javassist:javassist:3.16.1-GA'
-
-        // includes fix for GRAILS-11126
-        compile 'org.grails:grails-plugin-rest:2.3.5-hyve4'
-
-        compile 'com.google.protobuf:protobuf-java:2.5.0'
-
-        runtime 'org.postgresql:postgresql:42.2.2.jre7', {
-            export = false
-        }
-        runtime 'com.oracle:ojdbc7:12.1.0.1', {
-            export = false
-        }
-
-        test 'org.gmock:gmock:0.8.3', {
-            transitive = false /* don't bring groovy-all */
-        }
-        test 'junit:junit:4.11', {
-            transitive = false /* don't bring hamcrest */
-        }
-        test 'org.hamcrest:hamcrest-library:1.3'
-        test 'org.hamcrest:hamcrest-core:1.3'
-        test 'org.codehaus.groovy.modules.http-builder:http-builder:0.6', {
-            excludes 'groovy', 'nekohtml'
-            exported = false
-        }
-    }
-
-    plugins {
-        build ':release:3.1.2', ':rest-client-builder:2.1.1', {
-            export = false
-        }
-        build ':tomcat:7.0.54', {
-            export = false
-        }
-
-        compile ':spring-security-core:2.0.0'
-
-        // core-db doesn't export hibernate as dep as it was builtin in 2.2.4
-        runtime ':hibernate:3.6.10.19'
-
-        test ':functional-test:2.0.0'
-
-        if (!dm) {
-            runtime ':transmart-core:16.4-SNAPSHOT'
-
-            //test ':transmart-core:16.4-SNAPSHOT'
-            //test ':transmart-core-db-tests:16.4-SNAPSHOT'
-        } else {
-            dm.internalDependencies delegate
-        }
-
-        if (enableClover) {
-            compile ":clover:$CLOVER_VERSION", {
-                export = false
-            }
-        }
-    }
-}
-
 dm?.with {
     configureInternalPlugin 'runtime', 'transmart-core'
     configureInternalPlugin 'test', 'transmart-core'
@@ -170,4 +158,3 @@ dm?.with {
 }
 
 dm?.inlineInternalDependencies grails, grailsSettings
-Z

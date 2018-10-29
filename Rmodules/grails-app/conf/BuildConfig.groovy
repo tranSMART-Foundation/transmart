@@ -77,17 +77,21 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build ':release:3.1.2',
-              ':rest-client-builder:2.1.1', { export = false }
+	compile ':codenarc:0.21'
+        compile ':quartz:1.0.2'
+	compile ':spring-security-core:2.0.0'
+
+	compile ':transmart-shared:16.4-SNAPSHOT'
+
+	build ':release:3.1.2', ':rest-client-builder:2.1.1', {
+	    export = false
+	}
 
 //        sendfile breaks in grails 2.5.4
 //        compile ':sendfile:0.2'
-        compile ':quartz:1.0.2'
 
+	//not used in 18.1 beta
         runtime ':resources:1.2.14'
-
-        // support for static code analysis
-        compile ":codenarc:0.21"
     }
 }
 
