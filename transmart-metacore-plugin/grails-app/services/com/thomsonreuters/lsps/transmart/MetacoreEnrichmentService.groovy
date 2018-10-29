@@ -7,6 +7,8 @@ import org.apache.http.util.EntityUtils
 import static groovyx.net.http.ContentType.*
 import static groovyx.net.http.Method.*
 
+import org.transmart.plugin.shared.SecurityService
+
 class MetacoreEnrichmentService {
 
     boolean transactional = true
