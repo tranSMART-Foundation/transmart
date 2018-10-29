@@ -23,6 +23,8 @@ import com.recomdata.util.ExcelGenerator
 import com.recomdata.util.ExcelSheet
 import com.recomdata.util.IDomainExcelWorkbook
 
+import groovy.util.logging.Slf4j
+
 import org.transmart.biomart.BioAssayPlatform
 import org.transmart.biomart.CellLine
 import org.transmart.biomart.Compound
@@ -32,6 +34,7 @@ import org.transmart.biomart.ConceptCode
  * GeneSignature domain class
  */
 
+@Slf4j('logger')
 class GeneSignature implements Cloneable, IDomainExcelWorkbook {
 
     static def DOMAIN_KEY = "GENESIG"
@@ -207,7 +210,7 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
     def getPmIdsAsList() {
         List pmidList = new ArrayList();
 
-        log.info("getPmIdsAsList '${pmIds}'")
+        logger.info("getPmIdsAsList '${pmIds}'")
         if (pmIds == null) return pmidList;
 
         // parse into tokens
@@ -216,7 +219,7 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
             pmidList.add(st.nextToken())
         }
 
-        log.info("pmIdList ${pmIdList}")
+        logger.info("pmIdList ${pmIdList}")
 
         return pmidList;
     }
@@ -226,7 +229,7 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
      */
     def clone() {
 
-        log.info("clone")
+        logger.info("clone")
 
         // clone object using a map of params
         GeneSignature clone = new GeneSignature();
@@ -240,7 +243,7 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
      */
     def createParamMap() {
 
-        log.info("createParamMap")
+        logger.info("createParamMap")
 
         Map params = new HashMap();
         params.put("name", name)
@@ -292,7 +295,7 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
      * copy properties from this instance to the specified object
      */
     def copyPropertiesTo(GeneSignature gs) {
-        log.info("GeneSignature copyPropertiesTo")
+        logger.info("GeneSignature copyPropertiesTo")
         gs.name = name
         gs.description = description
         gs.uploadFile = uploadFile
@@ -348,7 +351,7 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
         def headers = []
         def values = []
 
-        log.info("createWorkbook")
+        logger.info("createWorkbook")
 
         // general section
         values.add(["1) General Info"])

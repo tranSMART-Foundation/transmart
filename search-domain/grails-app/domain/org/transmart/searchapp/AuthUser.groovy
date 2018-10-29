@@ -1,5 +1,6 @@
 package org.transmart.searchapp
 
+import groovy.util.logging.Slf4j
 import org.hibernate.SQLQuery
 import org.hibernate.classic.Session
 import org.hibernate.type.StandardBasicTypes
@@ -22,6 +23,8 @@ import org.hibernate.type.StandardBasicTypes
  *
  *
  ******************************************************************/
+
+@Slf4j('logger')
 class AuthUser extends Principal {
     static transients = ['pass']
     static hasMany = [authorities: Role, groups: UserGroup]
@@ -108,7 +111,7 @@ class AuthUser extends Principal {
     {
 //G
         //Long id = query.uniqueResult()
-        //log.debug("New user will have id '$id'")
+        //logger.debug("New user will have id '$id'")
 
         def ret = AuthUser.create()
         //ret.id = id
