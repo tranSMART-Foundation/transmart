@@ -26,13 +26,13 @@ class AuthUserSecureAccess {
     }
 
     public String getObjectAccessName() {
-        return secureObject.displayName + ' (' + accessLevel.accessLevelName + ')';
+        return secureObject.displayName + ' (' + accessLevel.accessLevelName + ')'
     }
 
     public void setObjectAccessName(String s) {}
 
     public String getPrincipalAccessName() {
-        return authUser.name + ' (' + accessLevel.accessLevelName + ')';
+        return authUser.name + ' (' + accessLevel.accessLevelName + ')'
     }
 
     public void setPrincipalAccessName(String s) {}

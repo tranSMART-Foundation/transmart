@@ -29,8 +29,8 @@ class Subset {
 	String creatingUser
 	boolean publicFlag = false
 	boolean deletedFlag = false
-	Long queryID1;
-	Long queryID2;
+	Long queryID1
+	Long queryID2
 	String study
 	
 static mapping = {
@@ -55,7 +55,7 @@ static constraints = {
 	}
 
 def getDisplayDate(){
-	def dateFormat = new SimpleDateFormat("MM-dd-yyyy")
+	def dateFormat = new SimpleDateFormat('MM-dd-yyyy')
 	return dateFormat.format(timestamp)
 }
 

@@ -28,11 +28,11 @@ package com.recomdata.transmart.domain.searchapp
 public class FormLayout {
 
 	Long id
-	String key;
-	String column;
-	String displayName;
-	String dataType;
-	Integer sequence;
+	String key
+	String column
+	String displayName
+	String dataType
+	Integer sequence
 
 	static mapping = {
 		table 'CZ_FORM_LAYOUT'

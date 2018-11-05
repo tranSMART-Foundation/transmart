@@ -36,8 +36,7 @@ class Principal {
         version false
         id generator: 'sequence',
                 params: [sequence: 'hibernate_sequence', schema: 'searchapp']
-        columns
-                {
+        columns {
                     id column: 'ID'
                     uniqueId column: 'UNIQUE_ID'
                     name column: 'NAME'
@@ -57,11 +56,11 @@ class Principal {
     }
 
     def beforeInsert = {
-        uniqueId = type + " " + id;
+        uniqueId = type + ' ' + id
     }
 
     public String getPrincipalNameWithType() {
-        return type + ' - ' + name;
+        return type + ' - ' + name
     }
 
     public void setPrincipalNameWithType(String n) {

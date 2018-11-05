@@ -1,6 +1,6 @@
 package org.transmart.searchapp
 
-import org.transmart.biomart.BioAnalysisAttribute;
+import org.transmart.biomart.BioAnalysisAttribute
 
 
 public class BioAnalysisAttributeLineage  {

@@ -28,11 +28,11 @@ package org.transmart.searchapp
 @Deprecated
 public class AccessLog {
     Long id
-    String username;
-    String event;
-    String eventmessage;
-    String requestURL;
-    Date accesstime;
+    String username
+    String event
+    String eventmessage
+    String requestURL
+    Date accesstime
 
     static mapping = {
         table 'SEARCH_APP_ACCESS_LOG'

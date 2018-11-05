@@ -60,7 +60,7 @@ class SearchKeyword {
     int hashCode() {
         // handle special case for TEXT SearchKeywords
         if (id == -1) {
-            return keyword.hashCode();
+            return keyword.hashCode()
         }
         return id
     }

@@ -68,11 +68,11 @@ class AuthUser extends Principal {
     }
 
     def String toString() {
-        return userRealName + " - " + username;
+        return userRealName + ' - ' + username
     }
 
     public AuthUser() {
-        this.type = 'USER';
+        this.type = 'USER'
     }
 
     def beforeInsert = {
@@ -88,9 +88,9 @@ class AuthUser extends Principal {
 	 * is this user an Admin
 	 */
     def isAdmin() {
-		def bAdmin = false;
+		def bAdmin = false
 		authorities.each { if(it.authority==Role.ADMIN_ROLE) bAdmin = true; }
-		return bAdmin;
+		return bAdmin
 	}
 
     /**
@@ -107,8 +107,7 @@ class AuthUser extends Principal {
                                         String username,
                                         String realName,
                                         String email,
-                                        Session session)
-    {
+                                        Session session) {
 //G
         //Long id = query.uniqueResult()
         //logger.debug("New user will have id '$id'")

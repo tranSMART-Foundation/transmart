@@ -44,11 +44,11 @@ class SecureObjectAccess {
     }
 
     public String toString() {
-        return objectAccessName;
+        return objectAccessName
     }
 
     public String getObjectAccessName() {
-        return secureObject.displayName + ' (' + accessLevel.accessLevelName + ')';
+        return secureObject.displayName + ' (' + accessLevel.accessLevelName + ')'
     }
 
     public void setObjectAccessName(String s) {
@@ -56,7 +56,7 @@ class SecureObjectAccess {
     }
 
     public String getPrincipalAccessName() {
-        return principal.type + '-' + principal.name + ' (' + accessLevel.accessLevelName + ')';
+        return principal.type + '-' + principal.name + ' (' + accessLevel.accessLevelName + ')'
     }
 
     public void setPrincipalAccessName(String s) {

@@ -37,12 +37,12 @@ import org.transmart.biomart.ConceptCode
 @Slf4j('logger')
 class GeneSignature implements Cloneable, IDomainExcelWorkbook {
 
-    static def DOMAIN_KEY = "GENESIG"
-    static def DISPLAY_TAG = "Gene Signature"
+    static def DOMAIN_KEY = 'GENESIG'
+    static def DISPLAY_TAG = 'Gene Signature'
 
     // gene list version
-    static def DOMAIN_KEY_GL = "GENELIST"
-    static def DISPLAY_TAG_GL = "Gene List"
+    static def DOMAIN_KEY_GL = 'GENELIST'
+    static def DISPLAY_TAG_GL = 'Gene List'
 
     Long id
     String name
@@ -190,38 +190,39 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
     def beforeUpdate = {
         lastUpdated = new Date()
         if(uniqueId.startsWith(DOMAIN_KEY_GL)) {
-            uniqueId = DOMAIN_KEY_GL + ":" + id
-        } else {
-            uniqueId = DOMAIN_KEY + ":" + id
+            uniqueId = DOMAIN_KEY_GL + ':' + id
+        }
+        else {
+            uniqueId = DOMAIN_KEY + ':' + id
         }
     }
 
     def updateUniqueId() {
-        setUniqueId(DOMAIN_KEY + ":" + id);
+        setUniqueId(DOMAIN_KEY + ':' + id)
     }
 
     def updateUniqueIdList() {
-        setUniqueId(DOMAIN_KEY_GL + ":" + id);
+        setUniqueId(DOMAIN_KEY_GL + ':' + id)
     }
 
     /**
      * parse comma separated Ids into a list
      */
     def getPmIdsAsList() {
-        List pmidList = new ArrayList();
+        List pmidList = new ArrayList()
 
         logger.info("getPmIdsAsList '${pmIds}'")
-        if (pmIds == null) return pmidList;
+        if (pmIds == null) return pmidList
 
         // parse into tokens
-        StringTokenizer st = new StringTokenizer(pmIds, ",");
+        StringTokenizer st = new StringTokenizer(pmIds, ',')
         while (st.hasMoreTokens()) {
             pmidList.add(st.nextToken())
         }
 
-        logger.info("pmIdList ${pmIdList}")
+        logger.info('pmIdList ' + pmIdList + '')
 
-        return pmidList;
+        return pmidList
     }
 
     /**
@@ -229,13 +230,13 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
      */
     def clone() {
 
-        logger.info("clone")
+        logger.info('clone')
 
         // clone object using a map of params
-        GeneSignature clone = new GeneSignature();
+        GeneSignature clone = new GeneSignature()
         copyPropertiesTo(clone)
         
-        return clone;
+        return clone
     }
 
     /**
@@ -243,59 +244,59 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
      */
     def createParamMap() {
 
-        logger.info("createParamMap")
+        logger.info('createParamMap')
 
-        Map params = new HashMap();
-        params.put("name", name)
-        params.put("description", description)
-        params.put("uploadFile", uploadFile)
-        params.put("fileSchema.id", fileSchema?.id)
-        params.put("foldChgMetricConceptCode.id", foldChgMetricConceptCode?.id)
-        params.put("analyticCatConceptCode.id", analyticCatConceptCode?.id)
-        params.put("analyticCatOther", analyticCatOther)
-        params.put("techPlatform.id", techPlatform?.id)
-        params.put("analystName", analystName)
-        params.put("normMethodConceptCode.id", normMethodConceptCode?.id)
-        params.put("normMethodOther", normMethodOther)
-        params.put("analysisMethodConceptCode.id", analysisMethodConceptCode?.id)
-        params.put("analysisMethodOther", analysisMethodOther)
-        params.put("multipleTestingCorrection", multipleTestingCorrection)
-        params.put("pValueCutoffConceptCode.id", pValueCutoffConceptCode?.id)
-        params.put("uniqueId", uniqueId)
-        params.put("publicFlag", publicFlag)
-        params.put("deletedFlag", deletedFlag)
-        //params.put("parentGeneSignature.id",parentGeneSignature?.id)
-        params.put("sourceConceptCode.id", sourceConceptCode?.id)
-        params.put("sourceOther", sourceOther)
-        params.put("ownerConceptCode.id", ownerConceptCode?.id)
-        params.put("stimulusDescription", stimulusDescription)
-        params.put("stimulusDosing", stimulusDosing)
-        params.put("treatmentDescription", treatmentDescription)
-        params.put("treatmentDosing", treatmentDosing)
-        params.put("treatmentCompound.id", treatmentCompound?.id)
-        params.put("treatmentProtocolNumber", treatmentProtocolNumber)
-        params.put("pmIds", pmIds)
-        params.put("speciesConceptCode.id", speciesConceptCode?.id)
-        params.put("speciesMouseSrcConceptCode.id", speciesMouseSrcConceptCode?.id)
-        params.put("speciesMouseDetail", speciesMouseDetail)
-        params.put("tissueTypeConceptCode.id", tissueTypeConceptCode?.id)
-        params.put("experimentTypeConceptCode.id", experimentTypeConceptCode?.id)
-        params.put("experimentTypeCellLine.id", experimentTypeCellLine?.id)
-        params.put("experimentTypeInVivoDescr", experimentTypeInVivoDescr)
-        params.put("experimentTypeATCCRef", experimentTypeATCCRef)
-        params.put("createdByAuthUser.id", createdByAuthUser?.id)
-        params.put("dateCreated", dateCreated)
-        params.put("modifiedByAuthUser.id", modifiedByAuthUser?.id)
-        params.put("lastUpdated", lastUpdated)
-        params.put("versionNumber", versionNumber)
-        return params;
+        Map params = new HashMap()
+        params.put('name', name)
+        params.put('description', description)
+        params.put('uploadFile', uploadFile)
+        params.put('fileSchema.id', fileSchema?.id)
+        params.put('foldChgMetricConceptCode.id', foldChgMetricConceptCode?.id)
+        params.put('analyticCatConceptCode.id', analyticCatConceptCode?.id)
+        params.put('analyticCatOther', analyticCatOther)
+        params.put('techPlatform.id', techPlatform?.id)
+        params.put('analystName', analystName)
+        params.put('normMethodConceptCode.id', normMethodConceptCode?.id)
+        params.put('normMethodOther', normMethodOther)
+        params.put('analysisMethodConceptCode.id', analysisMethodConceptCode?.id)
+        params.put('analysisMethodOther', analysisMethodOther)
+        params.put('multipleTestingCorrection', multipleTestingCorrection)
+        params.put('pValueCutoffConceptCode.id', pValueCutoffConceptCode?.id)
+        params.put('uniqueId', uniqueId)
+        params.put('publicFlag', publicFlag)
+        params.put('deletedFlag', deletedFlag)
+        //params.put('parentGeneSignature.id',parentGeneSignature?.id)
+        params.put('sourceConceptCode.id', sourceConceptCode?.id)
+        params.put('sourceOther', sourceOther)
+        params.put('ownerConceptCode.id', ownerConceptCode?.id)
+        params.put('stimulusDescription', stimulusDescription)
+        params.put('stimulusDosing', stimulusDosing)
+        params.put('treatmentDescription', treatmentDescription)
+        params.put('treatmentDosing', treatmentDosing)
+        params.put('treatmentCompound.id', treatmentCompound?.id)
+        params.put('treatmentProtocolNumber', treatmentProtocolNumber)
+        params.put('pmIds', pmIds)
+        params.put('speciesConceptCode.id', speciesConceptCode?.id)
+        params.put('speciesMouseSrcConceptCode.id', speciesMouseSrcConceptCode?.id)
+        params.put('speciesMouseDetail', speciesMouseDetail)
+        params.put('tissueTypeConceptCode.id', tissueTypeConceptCode?.id)
+        params.put('experimentTypeConceptCode.id', experimentTypeConceptCode?.id)
+        params.put('experimentTypeCellLine.id', experimentTypeCellLine?.id)
+        params.put('experimentTypeInVivoDescr', experimentTypeInVivoDescr)
+        params.put('experimentTypeATCCRef', experimentTypeATCCRef)
+        params.put('createdByAuthUser.id', createdByAuthUser?.id)
+        params.put('dateCreated', dateCreated)
+        params.put('modifiedByAuthUser.id', modifiedByAuthUser?.id)
+        params.put('lastUpdated', lastUpdated)
+        params.put('versionNumber', versionNumber)
+        return params
     }
 
     /**
      * copy properties from this instance to the specified object
      */
     def copyPropertiesTo(GeneSignature gs) {
-        logger.info("GeneSignature copyPropertiesTo")
+        logger.info('GeneSignature copyPropertiesTo')
         gs.name = name
         gs.description = description
         gs.uploadFile = uploadFile
@@ -351,94 +352,94 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
         def headers = []
         def values = []
 
-        logger.info("createWorkbook")
+        logger.info('createWorkbook')
 
         // general section
-        values.add(["1) General Info"])
+        values.add(['1) General Info'])
         values.add([])
-        values.add(["Name:", name])
-        values.add(["Description:", description])
-        values.add(["Public?:", publicFlag ? "Public" : "Private"])
-        values.add(["Author:", createdByAuthUser?.userRealName])
-        values.add(["Create Date:", dateCreated])
-        values.add(["Modified By:", modifiedByAuthUser?.userRealName])
-        values.add(["Modified Date:", modifiedByAuthUser != null ? lastUpdated : ""])
+        values.add(['Name:', name])
+        values.add(['Description:', description])
+        values.add(['Public?:', publicFlag ? 'Public' : 'Private'])
+        values.add(['Author:', createdByAuthUser?.userRealName])
+        values.add(['Create Date:', dateCreated])
+        values.add(['Modified By:', modifiedByAuthUser?.userRealName])
+        values.add(['Modified Date:', modifiedByAuthUser != null ? lastUpdated : ''])
 
         // meta section
         values.add([])
-        values.add(["2) Meta-Data"])
+        values.add(['2) Meta-Data'])
         values.add([])
 
         descr = sourceConceptCode?.id == 1 ? sourceOther : sourceConceptCode?.codeName
-        values.add(["Source of list:", descr])
+        values.add(['Source of list:', descr])
 
-        values.add(["Owner of data:", ownerConceptCode?.codeName])
+        values.add(['Owner of data:', ownerConceptCode?.codeName])
 
-        values.add(["Stimulus>>"])
-        values.add(["- Description:", stimulusDescription])
-        values.add(["- Dose, units, and time:", stimulusDosing])
+        values.add(['Stimulus>>'])
+        values.add(['- Description:', stimulusDescription])
+        values.add(['- Dose, units, and time:', stimulusDosing])
 
-        values.add(["Treatment>>"])
-        values.add(["- Description:", treatmentDescription])
-        values.add(["- Dose, units, and time:", treatmentDosing])
-        descr = ""
+        values.add(['Treatment>>'])
+        values.add(['- Description:', treatmentDescription])
+        values.add(['- Dose, units, and time:', treatmentDosing])
+        descr = ''
         if (treatmentCompound != null) descr = treatmentCompound?.codeName + ' [' + treatmentCompound?.genericName + ' / ' + treatmentCompound?.brandName + ']'
-        values.add(["- Compound:", descr])
-        values.add(["- Protocol Number:", treatmentProtocolNumber])
+        values.add(['- Compound:', descr])
+        values.add(['- Protocol Number:', treatmentProtocolNumber])
 
-        values.add(["PMIDs (comma separated):", pmIds])
+        values.add(['PMIDs (comma separated):', pmIds])
 
-        values.add(["Species:", speciesConceptCode?.codeName])
-        if (speciesMouseSrcConceptCode != null) values.add(["- Mouse Source:", speciesMouseSrcConceptCode?.codeName])
+        values.add(['Species:', speciesConceptCode?.codeName])
+        if (speciesMouseSrcConceptCode != null) values.add(['- Mouse Source:', speciesMouseSrcConceptCode?.codeName])
         if (speciesMouseDetail != null) values.add(["- knockout/transgenic' or 'other' mouse strain:", speciesMouseDetail])
 
-        descr = ""
+        descr = ''
         if (techPlatform != null) descr = techPlatform?.vendor + ' - ' + techPlatform?.array + ' [' + techPlatform?.accession + ']'
-        values.add(["Technology Platform:", descr])
+        values.add(['Technology Platform:', descr])
 
-        values.add(["Tissue Type:", tissueTypeConceptCode?.codeName])
+        values.add(['Tissue Type:', tissueTypeConceptCode?.codeName])
 
-        values.add(["Experiment Info>>"])
-        values.add(["- Type:", experimentTypeConceptCode?.codeName])
-        if (experimentTypeCellLine != null) values.add(["- Established Cell Line:", experimentTypeCellLine.cellLineName])
+        values.add(['Experiment Info>>'])
+        values.add(['- Type:', experimentTypeConceptCode?.codeName])
+        if (experimentTypeCellLine != null) values.add(['- Established Cell Line:', experimentTypeCellLine.cellLineName])
         if (experimentTypeConceptCode?.bioConceptCode == 'IN_VIVO_ANIMAL' || experimentTypeConceptCode?.bioConceptCode == 'IN_VIVO_HUMAN') values.add(["- 'in vivo' model:", experimentTypeInVivoDescr])
-        values.add(["- ATCC Designation:", experimentTypeATCCRef])
+        values.add(['- ATCC Designation:', experimentTypeATCCRef])
 
         // analysis section
         values.add([])
-        values.add(["3) Analysis Meta-Data"])
+        values.add(['3) Analysis Meta-Data'])
         values.add([])
-        values.add(["Analysis Performed By:", analystName])
+        values.add(['Analysis Performed By:', analystName])
 
         descr = normMethodConceptCode?.id == 1 ? normMethodOther : normMethodConceptCode?.codeName
-        values.add(["Normalization Method:", descr])
+        values.add(['Normalization Method:', descr])
 
         descr = analyticCatConceptCode?.id == 1 ? analyticCatOther : analyticCatConceptCode?.codeName
-        values.add(["Analytic Category:", descr])
+        values.add(['Analytic Category:', descr])
 
         descr = analysisMethodConceptCode?.id == 1 ? analysisMethodOther : analysisMethodConceptCode?.codeName
-        values.add(["Analysis Method:", descr])
+        values.add(['Analysis Method:', descr])
 
-        values.add(["Multiple Testing Correction?", (multipleTestingCorrection != null) ? (multipleTestingCorrection == 1 ? "Yes" : "No") : ""])
-        values.add(["P-value Cutoff:", pValueCutoffConceptCode?.codeName])
-        values.add(["Fold-change metric:", foldChgMetricConceptCode?.codeName])
-        values.add(["Original upload file:", uploadFile])
+        values.add(['Multiple Testing Correction?', (multipleTestingCorrection != null) ? (multipleTestingCorrection == 1 ? 'Yes' : 'No') : ''])
+        values.add(['P-value Cutoff:', pValueCutoffConceptCode?.codeName])
+        values.add(['Fold-change metric:', foldChgMetricConceptCode?.codeName])
+        values.add(['Original upload file:', uploadFile])
 
-        def metaSheet = new ExcelSheet("Gene Signature Info", headers, values);
+        def metaSheet = new ExcelSheet('Gene Signature Info', headers, values)
 
         values = []
 
-        //This is a quick fix. These booleans will tell us whether a gene signature was entered with probes or genes. In the future we should add some indicator field to the "gene" list to say what it is made of.
-        Boolean hasGenes = false;
-        Boolean hasProbes = false;
-        geneSigItems.each
-                {
+        //This is a quick fix. These booleans will tell us whether a gene signature was entered with probes or genes. In the future we should add some indicator field to the 'gene' list to say what it is made of.
+        Boolean hasGenes = false
+        Boolean hasProbes = false
+        geneSigItems.each {
                     if (it.bioMarker != null) {
-                        hasGenes = true;
+                        hasGenes = true
                         values.add([it.bioMarker.name, it.foldChgMetric])
-                    } else if (it.probesetId != null) {
-                        hasProbes = true;
-                        def annot = de.DeMrnaAnnotation.find("from DeMrnaAnnotation as a where a.probesetId=? ", [it.probesetId]);
+                    }
+                    else if (it.probesetId != null) {
+                        hasProbes = true
+                        def annot = de.DeMrnaAnnotation.find('from DeMrnaAnnotation as a where a.probesetId=? ', [it.probesetId])
                         if (annot != null) {
                             for (a in annot) {
                                 values.add([annot.geneSymbol, annot.probeId, it.foldChgMetric])
@@ -447,10 +448,10 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
                     }
                 }
 
-        if (hasGenes) headers = ["Gene Symbol", "Fold Change Metric"]
-        if (hasProbes) headers = ["Gene Symbol", "Probe ID", "Fold Change Metric"]
+        if (hasGenes) headers = ['Gene Symbol', 'Fold Change Metric']
+        if (hasProbes) headers = ['Gene Symbol', 'Probe ID', 'Fold Change Metric']
 
-        def itemsSheet = new ExcelSheet("Gene Signature Items", headers, values);
+        def itemsSheet = new ExcelSheet('Gene Signature Items', headers, values)
         // return Excel bytes
         return ExcelGenerator.generateExcel([metaSheet, itemsSheet])
     }
