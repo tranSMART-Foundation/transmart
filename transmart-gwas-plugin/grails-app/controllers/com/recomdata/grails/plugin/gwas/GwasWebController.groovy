@@ -25,14 +25,14 @@ class GwasWebController {
     def gwasWebService
 
     def computeGeneBounds = {
-        def snpSource = params.snpSource;
+        def snpSource = params.snpSource
         if (!snpSource) {snpSource = '19'}
         def results = gwasWebService.computeGeneBounds(params.geneSymbol, '0', snpSource)
         renderDataSet(results)
     }
 
     def getGeneByPosition = {
-        def snpSource = params.snpSource;
+        def snpSource = params.snpSource
         if (!snpSource) {snpSource = '19'}
         def results = gwasWebService.getGeneByPosition(params.chromosome, params.long('start'), params.long('stop'), snpSource)
         renderDataSet(results)
@@ -40,13 +40,13 @@ class GwasWebController {
 
     def getModelInfoByDataType = {
 
-        def type = "NONE"
+        def type = 'NONE'
         def typeId = params.long('dataType')
 
         switch (typeId) {
-            case 1: type = "GWAS"; break;
-            case 2: type = "EQTL"; break;
-            case 3: type = "Metabolic GWAS"; break;
+            case 1: type = 'GWAS'; break
+            case 2: type = 'EQTL'; break
+            case 3: type = 'Metabolic GWAS'; break
         }
 
         def results = gwasWebService.getModelInfo(type)
@@ -55,14 +55,14 @@ class GwasWebController {
 
 	def getSecureModelInfoByDataType() {
 
-				def type = "NONE"
+				def type = 'NONE'
 				def typeId = params.long('dataType')
 				def cUser = params.user
 
 				switch (typeId) {
-					case 1: type = "GWAS"; break;
-					case 2: type = "EQTL"; break;
-					case 3: type = "Metabolic GWAS"; break;
+					case 1: type = 'GWAS'; break
+					case 2: type = 'EQTL'; break
+					case 3: type = 'Metabolic GWAS'; break
 				}
 
 				def sessionUserMap = servletContext['gwasSessionUserMap']
@@ -76,17 +76,17 @@ class GwasWebController {
 					cUser = sessionUserMap[cUser]
 				}
 				else {
-					cUser = null;
+					cUser = null
 				}
 
 				def results = gwasWebService.getSecureModelInfo(type,cUser)
 				renderDataSet(results)
 			}
     def resultDataForFilteredByModelIdGeneAndRangeRev = { //TODO Negotiate this name into something more reasonable
-        def snpSource = params.snpSource;
+        def snpSource = params.snpSource
         if (!snpSource) {snpSource = '19'}
         def range = params.long('range') ?: 0
-        def analysisIds = params.modelId.split(",")
+        def analysisIds = params.modelId.split(',')
         def sourceId = null
         def geneName = params.geneName
 
@@ -100,11 +100,11 @@ class GwasWebController {
     }
 
     def getSnpSources = {
-        renderDataSet([[18,"HG18",18,"03-2006","http://www.example.com"], [19,"HG19",19,"02-2009","http://www.example.com"]])
+        renderDataSet([[18,'HG18',18,'03-2006','http://www.example.com'], [19,'HG19',19,'02-2009','http://www.example.com']])
     }
 
     def getGeneSources = {
-        renderDataSet([[0,"GRCh37",0,"01-2001","http://www.example.com"]])
+        renderDataSet([[0,'GRCh37',0,'01-2001','http://www.example.com']])
     }
 
     def getRecombinationRatesForGene = {
@@ -120,7 +120,7 @@ class GwasWebController {
         def range = params.long('range') ?: 0
         def rsId = params.snp
         def hgVersion = params.snpSource ?: '19'
-        def analysisIds = params.modelId.split(",")
+        def analysisIds = params.modelId.split(',')
 
         def results = gwasWebService.snpSearch(analysisIds, range, rsId, hgVersion)
 
@@ -138,7 +138,7 @@ class GwasWebController {
 
     def renderDataSet(results) {
 
-        render(contentType:"text/xml",encoding:"UTF-8") {
+        render(contentType:'text/xml',encoding:'UTF-8') {
             rows() {
                 for (result in results) {
                     row() {

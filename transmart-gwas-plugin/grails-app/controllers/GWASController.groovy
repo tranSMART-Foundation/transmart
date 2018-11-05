@@ -26,7 +26,7 @@ class GWASController {
     def gwasWebService
 
     def index = {
-        //render(view: "index", plugin: "transmartGwas")
+        //render(view: 'index', plugin: 'transmartGwas')
     }
 
     /**
@@ -56,7 +56,7 @@ class GWASController {
 
         // submit request
         def solrConnection = new URL(solrRequestUrl).openConnection()
-        solrConnection.requestMethod = "POST"
+        solrConnection.requestMethod = 'POST'
         solrConnection.doOutput = true
 
         // add params to request
@@ -77,8 +77,9 @@ class GWASController {
 
             // retrieve all the document nodes from the xml
             docs = xml.result.find { it.@name == 'response' }.doc
-        } else {
-            throw new Exception("SOLR Request failed! Request url:" + solrRequestUrl + "  Response code:" + solrConnection.responseCode + "  Response message:" + solrConnection.responseMessage)
+        }
+        else {
+            throw new Exception('SOLR Request failed! Request url:' + solrRequestUrl + '  Response code:' + solrConnection.responseCode + '  Response message:' + solrConnection.responseMessage)
         }
 
         solrConnection.disconnect()
@@ -97,7 +98,7 @@ class GWASController {
     /**
      * Add a new node to the taxonomy Dynatree (and recursively add children if any exist).
      * parentNode: Node to add to tree
-     * json: JSON array containing the "children" of the jQuery dynaTree
+     * json: JSON array containing the 'children' of the jQuery dynaTree
      * isCategory: boolean indicating whether the node being added is a category
      * categoryName: name of the category (i.e. as stored in database and displayed in tree)
      * uniqueTreeId: unique identifier for the node being added. This ill be a concatenation of the parent's unique id + the index of this child's index in children list
@@ -114,31 +115,31 @@ class GWASController {
         def trialNumber = params['trialNumber']
 
         // create a copy of the original list (we don't want to mess with original filter params)
-        // (the list is an object, so it is not "passed by val", it's a reference)
+        // (the list is an object, so it is not 'passed by val', it's a reference)
         def filter = []
         sessionFilter.each {
             filter.add(it)
         }
 
-        filter.add("STUDY_ID;" + trialNumber)
+        filter.add('STUDY_ID;' + trialNumber)
         def nonfacetedQueryString = createSOLRNonfacetedQueryString(filter)
 
         String solrRequestUrl = createSOLRQueryPath()
 
         // TODO create a conf setting for max rows
-        String solrQueryString = createSOLRQueryString(nonfacetedQueryString, "", "", 10000, false)
+        String solrQueryString = createSOLRQueryString(nonfacetedQueryString, '', '', 10000, false)
         def analysisIds = executeSOLRTrialAnalysisQuery(solrRequestUrl, solrQueryString)
 
         def analysisList = []
 
         // retrieve the descriptions for each analysis
-        def results = org.transmart.biomart.BioAssayAnalysis.executeQuery("select b.id AS bioAssayAnalysis, b.shortDescription, b.longDescription, b.name,c.sensitiveDesc, b.etlId " +
-                " from org.transmart.biomart.BioAssayAnalysis b LEFT JOIN b.ext c " +
-                " WHERE b.id in (" + analysisIds.join(',') + ") ORDER BY lower(b.name)")
+        def results = org.transmart.biomart.BioAssayAnalysis.executeQuery('select b.id AS bioAssayAnalysis, b.shortDescription, b.longDescription, b.name,c.sensitiveDesc, b.etlId ' +
+                ' from org.transmart.biomart.BioAssayAnalysis b LEFT JOIN b.ext c ' +
+                ' WHERE b.id in (' + analysisIds.join(',') + ") ORDER BY lower(b.name)")
 
         // retrieve the analyses that are of type Time Course by checking the taxonomy
-        def timeCourseAnalyses = org.transmart.searchapp.BioAnalysisAttributeLineage.executeQuery("select b1.bioAnalysisAttribute.bioAssayAnalysisID from org.transmart.searchapp.BioAnalysisAttributeLineage b1" +
-                " where b1.bioAnalysisAttribute.bioAssayAnalysisID in (" + analysisIds.join(',') + ") " +
+        def timeCourseAnalyses = org.transmart.searchapp.BioAnalysisAttributeLineage.executeQuery('select b1.bioAnalysisAttribute.bioAssayAnalysisID from org.transmart.searchapp.BioAnalysisAttributeLineage b1' +
+                ' where b1.bioAnalysisAttribute.bioAssayAnalysisID in (' + analysisIds.join(',') + ") " +
                 " and lower(b1.ancestorTerm.termName) = lower('Time Course')")
 
         for (r in results) {
@@ -167,7 +168,7 @@ class GWASController {
         def parent = [:]
 
         // create a custom attribute for term name
-        parent["termName"] = parentNode.termName
+        parent['termName'] = parentNode.termName
 
         // generate the id for use in tree and for link to active terms
         // if there is a link to an active term, use that as id (i.e. search_keyword_id)
@@ -175,38 +176,40 @@ class GWASController {
         def id
         if (parentNode?.searchKeywordId) {
             id = parentNode.searchKeywordId
-        } else {
+        }
+        else {
             id = 'X' + parentNode.id
         }
-        parent["id"] = id
+        parent['id'] = id
 
         // create the key that matches what we use in javascript to identify search terms
         // assuming for now that the category and the category display are the same (with category being all caps); may
         // need to break this out into separate fields
-        parent["key"] = categoryName + "|" + categoryName.toUpperCase() + ";" + parentNode.termName + ";" + id
+        parent['key'] = categoryName + '|' + categoryName.toUpperCase() + ';' + parentNode.termName + ';' + id
 
         // if category, then display as folder and don't show checkbox; other levels, not a folder and show checkbox
-        parent["isFolder"] = isCategory
-        parent["hideCheckbox"] = isCategory
+        parent['isFolder'] = isCategory
+        parent['hideCheckbox'] = isCategory
 
         // add custom attributes for each node
-        parent["isCategory"] = isCategory
-        parent["categoryName"] = categoryName + "|" + categoryName.toUpperCase()
+        parent['isCategory'] = isCategory
+        parent['categoryName'] = categoryName + '|' + categoryName.toUpperCase()
 
         // create a uniqueTreeId for each node so we can identify it from it's copies
         //  (id and key are not unique amongst copies)
-        parent["uniqueTreeId"] = uniqueTreeId
+        parent['uniqueTreeId'] = uniqueTreeId
 
         // Create custom attributes for the facet count for this node, and one for the initial facet
         //   count which will be used to save the value when the tree gets cleared so we don't have to requery
         // Set to -1 for category nodes
         if (isCategory) {
-            parent["facetCount"] = -1
-            parent["initialFacetCount"] = -1
+            parent['facetCount'] = -1
+            parent['initialFacetCount'] = -1
 
             //title is same as term name for categories
-            parent["title"] = parentNode.termName
-        } else {
+            parent['title'] = parentNode.termName
+        }
+        else {
             // get the json object for the category
             JSONObject jo = (JSONObject) initialFacetCounts.get(getSOLRCategoryName(categoryName))
 
@@ -218,12 +221,13 @@ class GWASController {
             int count
             if (jo.has(idString)) {
                 count = jo.getInt(idString)
-            } else {
+            }
+            else {
                 count = 0
             }
 
-            parent["facetCount"] = count
-            parent["initialFacetCount"] = count
+            parent['facetCount'] = count
+            parent['initialFacetCount'] = count
 
             // if the initial count is zero, don't add to tree
             if (count == 0) {
@@ -231,14 +235,14 @@ class GWASController {
             }
 
             // include facet count in title for non-category nodes
-            parent["title"] = /${parentNode.termName} (${count})/
+            parent['title'] = /${parentNode.termName} (${count})/
         }
 
         def childIndex = 1
         if (parentNode?.children) {
             // recursively add each child
             for (childNode in parentNode.children) {
-                addDynaNode(childNode, children, false, categoryName, uniqueTreeId + ":" + childIndex, initialFacetCounts)
+                addDynaNode(childNode, children, false, categoryName, uniqueTreeId + ':' + childIndex, initialFacetCounts)
                 childIndex++
             }
         }
@@ -250,14 +254,14 @@ class GWASController {
         }
 
         // add children to parent map
-        parent["children"] = children
+        parent['children'] = children
 
         // add parent map to json array
         json.put(parent)
     }
 
     /*
-    * Create the JSON string used as the "children" of the taxonomy DynaTree
+    * Create the JSON string used as the 'children' of the taxonomy DynaTree
     */
     def getDynatree = {
 
@@ -336,7 +340,7 @@ class GWASController {
 
         }
 
-        response.setContentType("text/json")
+        response.setContentType('text/json')
         response.outputStream << categories?.toString()
 
     }
@@ -350,36 +354,37 @@ class GWASController {
 	 */
 	def acceptableForBrowse = {categoryNode ->
 		String catName = categoryNode.termName
-		if (["Analyses","Study","Data Type","Region of Interest"].contains(catName)){
-			return true;
+		if (['Analyses','Study','Data Type','Region of Interest'].contains(catName)){
+			return true
 		}
 		return false; 
 	}
 	
     /**
-     * Create a query string for the category in the form of (<cat1>:"term1" OR <cat1>:"term2")
+     * Create a query string for the category in the form of (<cat1>:'term1' OR <cat1>:'term2')
      */
     def createCategoryQueryString = { category, termList ->
 
-        // create a query for the category in the form of (<cat1>:"term1" OR <cat1>:"term2")
-        String categoryQuery = ""
-        for (t in termList.tokenize("|")) {
+        // create a query for the category in the form of (<cat1>:'term1' OR <cat1>:'term2')
+        String categoryQuery = ''
+        for (t in termList.tokenize('|')) {
 
             t = cleanForSOLR(t)
-//           if (category.toLowerCase().equals("text")) {
-//               if (t.indexOf(" ") > -1) {
-//                   t = ("\"" + t.toLowerCase() + "\"");
+//           if (category.toLowerCase().equals('text')) {
+//               if (t.indexOf(' ') > -1) {
+//                   t = ('\'' + t.toLowerCase() + '\'')
 //               }
 //               else {
-//                   t = ("*" + t.toLowerCase() + "*");
+//                   t = ('*' + t.toLowerCase() + '*')
 //               }
 //           }
 
-            def queryTerm = /${category}:"${t}"/
+            def queryTerm = /${category}:'' + t + ''/
 
-            if (categoryQuery == "") {
+            if (categoryQuery == '') {
                 categoryQuery = queryTerm
-            } else {
+            }
+            else {
                 categoryQuery = /${categoryQuery} OR ${queryTerm}/
             }
         }
@@ -396,22 +401,23 @@ class GWASController {
      * It will be of form facet.field=<cat1>&facet.field=<cat2>
      */
     def createSOLRFacetedFieldsString = { facetFieldsParams ->
-        def facetedFields = ""
+        def facetedFields = ''
         // loop through each regular query parameter
         for (ff in facetFieldsParams) {
 
             //This list should be in a config, but we don't facet on some of the fields.
-            if (ff != "REGION_OF_INTEREST" && ff != "GENE" && ff != "SNP" && ff != "EQTL_TRANSCRIPT_GENE") {
+            if (ff != 'REGION_OF_INTEREST' && ff != 'GENE' && ff != 'SNP' && ff != 'EQTL_TRANSCRIPT_GENE') {
                 // skip TEXT search fields (these wouldn't be in tree so throw exception since this should never happen)
-                if (ff == "TEXT") {
-                    throw new Exception("TEXT field encountered when creating faceted fields string")
+                if (ff == 'TEXT') {
+                    throw new Exception('TEXT field encountered when creating faceted fields string')
                 }
 
                 def ffClause = /facet.field=${ff}/
 
-                if (facetedFields == "") {
+                if (facetedFields == '') {
                     facetedFields = /${ffClause}/
-                } else {
+                }
+                else {
                     facetedFields = /${facetedFields}&${ffClause}/
                 }
             }
@@ -424,22 +430,22 @@ class GWASController {
     /**
      * Create the SOLR query string for the faceted fields (i.e. those that are in tree) that are being filtered
      * It will be of form facet=true&facet.field=(!ex=c1)<cat1>&facet.field=(!ex=c2)<cat2>&
-     *     fq={!tag=c1}(<cat1>:"term1" OR <cat1>:"term2")&.... )
+     *     fq={!tag=c1}(<cat1>:'term1' OR <cat1>:'term2')&.... )
      * Each category query gets tagged in fq clauses {!tag=c1}, and then the category query is excluded
      *   for determining the facet counts (!ex=c1) in facet.field clauses
      */
     def createSOLRFacetedQueryString = { facetQueryParams ->
-        def facetedQuery = ""
+        def facetedQuery = ''
         // loop through each regular query parameter
         for (qp in facetQueryParams) {
 
             // each queryParam is in form cat1:term1|term2|term3
-            String category = qp.split(";")[0]
-            String termList = qp.split(";")[1]
+            String category = qp.split(';')[0]
+            String termList = qp.split(';')[1]
 
             // skip TEXT search fields (these wouldn't be in tree so throw exception since this should never happen)
-            if (category == "TEXT") {
-                throw new Exception("TEXT field encountered when creating faceted search string")
+            if (category == 'TEXT') {
+                throw new Exception('TEXT field encountered when creating faceted search string')
             }
 
             def categoryQueryString = createCategoryQueryString(category, termList)
@@ -453,9 +459,10 @@ class GWASController {
 
             def categoryClause = /${ffClause}&${fqClause}/
 
-            if (facetedQuery == "") {
+            if (facetedQuery == '') {
                 facetedQuery = /${categoryClause}/
-            } else {
+            }
+            else {
                 facetedQuery = /${facetedQuery}&${categoryClause}/
             }
 
@@ -466,34 +473,35 @@ class GWASController {
 
     /**
      * Create the SOLR query string for the nonfaceted fields (i.e. those that are not in tree)
-     * It will be of form ((<cat1>:"term1" OR <cat1>:"term2") AND ( (<cat2>:"term3") ) AND () .. )
+     * It will be of form ((<cat1>:'term1' OR <cat1>:'term2') AND ( (<cat2>:'term3') ) AND () .. )
      */
     public String createSOLRNonfacetedQueryString(queryParams) {
-        def nonfacetedQuery = ""
+        def nonfacetedQuery = ''
         // loop through each regular query parameter
         for (qp in queryParams) {
 
             //Ignore REGIONs here - used later in analysis filter
-            if (qp.startsWith("REGION") || qp.startsWith("GENE") || qp.startsWith("SNP") || qp.startsWith("PVALUE") || qp.startsWith("TRANSCRIPTGENE")) {
-                continue;
+            if (qp.startsWith('REGION') || qp.startsWith('GENE') || qp.startsWith('SNP') || qp.startsWith('PVALUE') || qp.startsWith('TRANSCRIPTGENE')) {
+                continue
             }
             // each queryParam is in form cat1:term1|term2|term3
-            String category = qp.split(";")[0]
-            String termList = qp.split(";")[1]
+            String category = qp.split(';')[0]
+            String termList = qp.split(';')[1]
 
             def categoryQueryString = createCategoryQueryString(category, termList)
 
             // add category query to main nonfaceted query string using ANDs between category clauses
-            if (nonfacetedQuery == "") {
+            if (nonfacetedQuery == '') {
                 nonfacetedQuery = categoryQueryString
-            } else {
+            }
+            else {
                 nonfacetedQuery = /${nonfacetedQuery} AND ${categoryQueryString}/
             }
         }
 
         // use all query if no params provided
-        if (nonfacetedQuery == "") {
-            nonfacetedQuery = "*:*"
+        if (nonfacetedQuery == '') {
+            nonfacetedQuery = '*:*'
         }
 
         nonfacetedQuery = /q=(${nonfacetedQuery})/
@@ -510,15 +518,15 @@ class GWASController {
     def executeSOLRFacetedQuery = { solrRequestUrl, solrQueryParams, returnAnalysisIds ->
 
         JSONObject facetCounts = new JSONObject()
-        //solrQueryParams = "q=(*:*)"
-        //solrQueryParams = solrQueryParams.substring(0, solrQueryParams.lastIndexOf(")")+1)
-        //solrQueryParams += "&facet=true&rows=0&facet.field=ANALYSIS_ID"
+        //solrQueryParams = 'q=(*:*)'
+        //solrQueryParams = solrQueryParams.substring(0, solrQueryParams.lastIndexOf(')')+1)
+        //solrQueryParams += '&facet=true&rows=0&facet.field=ANALYSIS_ID'
 
         def slurper = new XmlSlurper()
 
         // submit request
         def solrConnection = new URL(solrRequestUrl).openConnection()
-        solrConnection.requestMethod = "POST"
+        solrConnection.requestMethod = 'POST'
         solrConnection.doOutput = true
 
         // add params to request
@@ -547,14 +555,16 @@ class GWASController {
                     ids.push(analysisId.text() as long)
                 }
                 return ids
-            } else {
+            }
+            else {
                 // retrieve all the category nodes for the facet fields (contain subnodes which have the actual counts)
                 facetCategoryNodes = xml.lst.find { it.@name == 'facet_counts' }.lst.find {
                     it.@name == 'facet_fields'
                 }.lst
             }
-        } else {
-            throw new Exception("SOLR Request failed! Request url:" + solrRequestUrl + "  Response code:" + solrConnection.responseCode + "  Response message:" + solrConnection.responseMessage)
+        }
+        else {
+            throw new Exception('SOLR Request failed! Request url:' + solrRequestUrl + '  Response code:' + solrConnection.responseCode + '  Response message:' + solrConnection.responseMessage)
         }
 
         solrConnection.disconnect()
@@ -585,7 +595,7 @@ class GWASController {
      */
     def outputFormattedXml(node) {
         def xml = new StreamingMarkupBuilder().bind {
-            mkp.declareNamespace("": node.namespaceURI())
+            mkp.declareNamespace('': node.namespaceURI())
             mkp.yield(node)
         }
 
@@ -595,7 +605,7 @@ class GWASController {
 
         // figured this out by looking at Xalan's serializer.jar
         // org/apache/xml/serializer/output_xml.properties
-        transformer.setOutputProperty("{http\u003a//xml.apache.org/xalan}indent-amount", "2")
+        transformer.setOutputProperty('{http\u003a//xml.apache.org/xalan}indent-amount', '2')
         def result = new StreamResult(new StringWriter())
         transformer.transform(new StreamSource(new ByteArrayInputStream(xml.toString().bytes)), result)
 
@@ -614,11 +624,11 @@ class GWASController {
         nonfacetedQueryString, facetedQueryString, facetedFieldsString, maxRows = 0, facetFlag = true ->
             def solrQuery = /${nonfacetedQueryString}&facet=${facetFlag}&rows=${maxRows}/
 
-            if (facetedQueryString != "") {
+            if (facetedQueryString != '') {
                 solrQuery = /${solrQuery}&${facetedQueryString}/
             }
 
-            if (facetedFieldsString != "") {
+            if (facetedFieldsString != '') {
                 solrQuery = /${solrQuery}&${facetedFieldsString}/
             }
             return solrQuery
@@ -633,8 +643,8 @@ class GWASController {
         String solrScheme = grailsApplication.config.com.rwg.solr.scheme
         String solrHost = grailsApplication.config.com.rwg.solr.host
         String solrPath = grailsApplication.config.com.rwg.solr.path
-        logger.info("SOLR " + solrScheme + solrHost + solrPath);
-        String solrRequestUrl = new URI(solrScheme, solrHost, solrPath, "", "").toURL()
+        logger.info('SOLR ' + solrScheme + solrHost + solrPath)
+        String solrRequestUrl = new URI(solrScheme, solrHost, solrPath, '', '').toURL()
 
         return solrRequestUrl
     }
@@ -653,25 +663,25 @@ class GWASController {
         for (p in params) {
 
             // each queryParam is in form cat1:term1|term2|term3
-            String category = p.split(";")[0]
-            String termList = p.split(";")[1]
+            String category = p.split(';')[0]
+            String termList = p.split(';')[1]
 
             // add all the genes from a gene list/sig to the List of genes
             if (category == 'GENELIST' || category == 'GENESIG') {
-                for (t in termList.tokenize("|")) {
+                for (t in termList.tokenize('|')) {
 
                     // create the paramter list for the hibernate query (need to convert the id explicitly to long)
                     def queryParams = [:]
                     Long l = t.toLong()
-                    queryParams["tid"] = l
+                    queryParams['tid'] = l
 
-                    def geneKeywords = SearchKeyword.executeQuery("select k_gsi.id " +
-                            " from org.transmart.searchapp.SearchKeyword k_gs, org.transmart.searchapp.GeneSignature gs," +
-                            " org.transmart.searchapp.GeneSignatureItem gsi, org.transmart.searchapp.SearchKeyword k_gsi " +
-                            " where k_gs.bioDataId = gs.id " +
-                            " and gs.id = gsi.geneSignature " +
-                            " and gsi.bioMarker = k_gsi.bioDataId" +
-                            " and k_gs.id = :tid ", queryParams)
+                    def geneKeywords = SearchKeyword.executeQuery('select k_gsi.id ' +
+                            ' from org.transmart.searchapp.SearchKeyword k_gs, org.transmart.searchapp.GeneSignature gs,' +
+                            ' org.transmart.searchapp.GeneSignatureItem gsi, org.transmart.searchapp.SearchKeyword k_gsi ' +
+                            ' where k_gs.bioDataId = gs.id ' +
+                            ' and gs.id = gsi.geneSignature ' +
+                            ' and gsi.bioMarker = k_gsi.bioDataId' +
+                            ' and k_gs.id = :tid ', queryParams)
 
                     // loop through each keyword for the gene list items and add to list
                     geneKeywords.each {
@@ -685,21 +695,21 @@ class GWASController {
             }
             // add all the genes from a pathway to the List of genes
             else if (category == 'PATHWAY') {
-                for (t in termList.tokenize("|")) {
+                for (t in termList.tokenize('|')) {
 
                     // create the parameter list for the hibernate query (need to convert the id explicitly to long)
                     def queryParams = [:]
                     Long l = t.toLong()
-                    queryParams["tid"] = l
-                    def geneKeywords = SearchKeyword.executeQuery("select k_gene.id " +
-                            " from org.transmart.searchapp.SearchKeyword k_pathway, org.transmart.biomart.BioMarkerCorrelationMV b," +
-                            " org.transmart.searchapp.SearchKeyword k_gene " +
+                    queryParams['tid'] = l
+                    def geneKeywords = SearchKeyword.executeQuery('select k_gene.id ' +
+                            ' from org.transmart.searchapp.SearchKeyword k_pathway, org.transmart.biomart.BioMarkerCorrelationMV b,' +
+                            ' org.transmart.searchapp.SearchKeyword k_gene ' +
                             " where b.correlType = 'PATHWAY_GENE' " +
-                            " and b.bioMarkerId = k_pathway.bioDataId " +
+                            ' and b.bioMarkerId = k_pathway.bioDataId ' +
                             " and k_pathway.dataCategory = 'PATHWAY' " +
-                            " and b.assoBioMarkerId = k_gene.bioDataId " +
+                            ' and b.assoBioMarkerId = k_gene.bioDataId ' +
                             " and k_gene.dataCategory = 'GENE' " +
-                            " and k_pathway.id = :tid ", queryParams)
+                            ' and k_pathway.id = :tid ', queryParams)
 
                     // loop through each keyword for the gene list items and add to list
                     geneKeywords.each {
@@ -713,23 +723,24 @@ class GWASController {
             }
             // add all the individual genes to the List of genes
             else if (category == 'PROTEIN') {
-                for (t in termList.tokenize("|")) {
+                for (t in termList.tokenize('|')) {
                     genesList.add t
                 }
             }
             // add all the individual genes to the List of genes
             else if (category == 'GENE') {
-                for (t in termList.tokenize("|")) {
+                for (t in termList.tokenize('|')) {
                     genesList.add t
                 }
-            } else {
+            }
+            else {
                 // create the new params with everything that is not a gene or list
                 newParams.add p
             }
         }
 
         // create the new string to be used for genes and lists/sigs and add back to params
-        def newGeneString = ""
+        def newGeneString = ''
 
         if (genesList.size > 0) {
             newGeneString = /${genesField}:${genesList.join('|')}/
@@ -737,7 +748,7 @@ class GWASController {
             //newParams.add newGeneString
         }
 
-        logger.info("Gene parameter: ${newParams}")
+        logger.info('Gene parameter: ' + newParams + '')
         return newParams
     }
 
@@ -766,10 +777,10 @@ class GWASController {
         // ff params are faceted, but not filtered on
         def facetFieldsParams = request.getParameterValues('ff')
 
-        logger.info("facet search: " + params)
+        logger.info('facet search: ' + params)
 
         // build the SOLR query
-        def nonfacetedQueryString = "";
+        def nonfacetedQueryString = ''
         try {
             nonfacetedQueryString = createSOLRNonfacetedQueryString(sessionFilterParams as List)
         }
@@ -778,10 +789,10 @@ class GWASController {
         }
 
         //TODO Patch job - if this is a *.* query, prevent it from running with a sentinel value
-        if (nonfacetedQueryString.equals("q=(*:*)")) {
+        if (nonfacetedQueryString.equals('q=(*:*)')) {
             session['solrAnalysisIds'] = [-1]
-            render(status: 200, text: "NONE");
-            return;
+            render(status: 200, text: 'NONE')
+            return
         }
 
         String solrRequestUrl = createSOLRQueryPath()
@@ -789,7 +800,7 @@ class GWASController {
         def analysisIds = executeSOLRFacetedQuery(solrRequestUrl, solrQueryString, true)
 
         session['solrAnalysisIds'] = analysisIds
-        render(status: 200, text: analysisIds.join(","))
+        render(status: 200, text: analysisIds.join(','))
     }
 
     /**
@@ -819,7 +830,7 @@ class GWASController {
         showSigGenesOnly = false
 
         if (showSigGenesOnly) {
-            queryParams.add "ANY_SIGNIFICANT_GENES:1"
+            queryParams.add 'ANY_SIGNIFICANT_GENES:1'
         }
 
         //fq params are also faceted and also filtered on
@@ -839,7 +850,7 @@ class GWASController {
         // ff params are faceted, but not filtered on
         def facetFieldsParams = request.getParameterValues('ff')
 
-        logger.info("facet search: " + params)
+        logger.info('facet search: ' + params)
 
         // build the SOLR query
         def nonfacetedQueryString = createSOLRNonfacetedQueryString(queryParams)
@@ -859,25 +870,25 @@ class GWASController {
         JSONObject ret = new JSONObject()
         ret.put('facetCounts', facetCounts)
         ret.put('html', html)
-        response.setContentType("text/json")
+        response.setContentType('text/json')
         response.outputStream << ret?.toString()
     }
 
     def getExperimentSecureStudyList(){
 		
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder()
         s.append("SELECT so.bioDataUniqueId, so.bioDataId FROM SecureObject so Where so.dataType='Experiment'")
-        def t=[:];
+        def t=[:]
         //return access levels for the children of this path that have them
-        def results = SecureObject.executeQuery(s.toString());
+        def results = SecureObject.executeQuery(s.toString())
         for (row in results){
-            def token = row[0];
-            def dataid = row[1];
-            token=token.replaceFirst("EXP:","")
-            logger.info(token+":"+dataid);
-            t.put(token,dataid);
+            def token = row[0]
+            def dataid = row[1]
+            token=token.replaceFirst('EXP:','')
+            logger.info(token+':'+dataid)
+            t.put(token,dataid)
         }
-        return t;
+        return t
     }
 
     /**
@@ -893,10 +904,11 @@ class GWASController {
         else
             showSigGenesOnly = showGeneSig
 
-        def solrGenesField = ""  // name of SOLR search field to be used for gene queries (SIGGENE or ALLGENE)
+        def solrGenesField = ''  // name of SOLR search field to be used for gene queries (SIGGENE or ALLGENE)
         if (showSigGenesOnly) {
             solrGenesField = 'SIGGENE'
-        } else {
+        }
+        else {
             solrGenesField = 'ALLGENE'
         }
 
@@ -912,19 +924,19 @@ class GWASController {
     def getInitialFacetResults = { categoriesList ->
         // initial state of the significant field is checked, so need to add the search field to the SOLR query to get the initial facet coutns
         //  and save the search term to the session variable so that is applied to the query to get the analysis list
-        //def queryParams = ["ANY_SIGNIFICANT_GENES:1"]
+        //def queryParams = ['ANY_SIGNIFICANT_GENES:1']
         def queryParams = []
         session['solrSearchFilter'] = queryParams
-        logger.info("Initial facet search: " + queryParams)
+        logger.info('Initial facet search: ' + queryParams)
 
         // set session var for SOLR genes field (no param passed so default will be used)
         setSOLRGenesField(true)
 
         // build the SOLR query
 
-        // get the base query string (i.e. "q=(*:*)" since no filters for initial search
+        // get the base query string (i.e. 'q=(*:*)' since no filters for initial search
         def nonfacetedQueryString = createSOLRNonfacetedQueryString(queryParams)
-        def facetedQueryString = ""
+        def facetedQueryString = ''
         def facetedFieldsString = createSOLRFacetedFieldsString(categoriesList)
 
         String solrRequestUrl = createSOLRQueryPath()
@@ -952,9 +964,9 @@ class GWASController {
 
     // Return search keywords
     def searchAutoComplete = {
-        def category = params.category == null ? "ALL" : params.category
+        def category = params.category == null ? 'ALL' : params.category
         def max = params.long('max') ?: 15
-        logger.info("searchKeywordService.findSearchKeywords: ${category}")
+        logger.info('searchKeywordService.findSearchKeywords: ' + category + '')
         render searchKeywordService.findSearchKeywords(category, params.term, max) as JSON
     }
 
@@ -967,7 +979,7 @@ class GWASController {
         def studyWithResultsFound = false
         def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
         def secObjs=getExperimentSecureStudyList()
-        //secObjs.each{ k, v -> logger.debug( "${k}:${v}") }
+        //secObjs.each{ k, v -> logger.debug( '' + k + ':' + v + '') }
         for (studyId in studyCounts.keys().sort()) {
 
             def c = studyCounts[studyId].toInteger()
@@ -979,20 +991,21 @@ class GWASController {
 
                 def exp = Experiment.createCriteria()
                 def experiment = exp.get {
-                    eq("id", expNumber)
+                    eq('id', expNumber)
                 }
 
                 if (experiment == null) {
-                    logger.warn "Unable to find an experiment for ${expNumber}"
-                } else {
+                    logger.warn 'Unable to find an experiment for ' + expNumber + ''
+                }
+                else {
                     if(secObjs.containsKey(experiment.accession)){
                         // evaluate if user has access rights to this private study
-                        if(!gwasWebService.getGWASAccess(experiment.accession, user).equals("Locked")){
+                        if(!gwasWebService.getGWASAccess(experiment.accession, user).equals('Locked')){
                             exprimentAnalysis.put((experiment), c)
                             total += c
                         }
                         else {
-                            logger.warn "Restrict access for ${expNumber}"
+                            logger.warn 'Restrict access for ' + expNumber + ''
                         }
                     }
                     else{
@@ -1004,10 +1017,10 @@ class GWASController {
                 /*
                 def ct = ClinicalTrial.createCriteria()
                 def trial = ct.get	{
-                    eq("trialNumber", trialNumber, [ignoreCase: true])
+                    eq('trialNumber', trialNumber, [ignoreCase: true])
                 }
                 if (trial == null)	{
-                    logger.warn "Unable to find a trial for ${trialNumber}"
+                    logger.warn 'Unable to find a trial for ' + trialNumber + ''
                 }
                 else  {
                     trialAnalysis.put((trial), c)
@@ -1023,7 +1036,8 @@ class GWASController {
         def html
         if (!studyWithResultsFound) {
             html = g.render(template: '/search/noResult', plugin: "biomartForGit").toString()
-        } else {
+        }
+        else {
             html = g.render(template: '/GWAS/experiments', plugin: "transmartGwas", model: [experiments: exprimentAnalysis, analysisCount: total, duration: TimeCategory.minus(new Date(), startTime)]).toString()
         }
 
@@ -1033,7 +1047,7 @@ class GWASController {
     // Load the trial analysis for the given trial
     def getTrialAnalysis = {
         new AccessLog(username: springSecurityService.getPrincipal().username,
-                event: "Loading trial analysis", eventmessage: params.trialNumber, accesstime: new Date()).save()
+                event: 'Loading trial analysis', eventmessage: params.trialNumber, accesstime: new Date()).save()
 
         //   def user=AuthUser.findByUsername(springSecurityService.getPrincipal().username)
         //  def secObjs=i2b2HelperService.getExperimentSecureStudyList()
@@ -1043,9 +1057,9 @@ class GWASController {
 		   analysis.canExport=true
 		   if(secObjs.containsKey(analysis.study)){
 			   def token=i2b2HelperService.getGWASAccess(analysis.study,user)
-		    	if(token.equals("VIEW") || token.equals("Locked")){
+		    	if(token.equals('VIEW') || token.equals('Locked')){
 					analysis.canExport=false
-					logger.debug("Can not export "+analysis.study)
+					logger.debug('Can not export '+analysis.study)
 				}
 		   }
 	   }*/
@@ -1065,19 +1079,19 @@ class GWASController {
     def browseDataTypesMultiSelect = {
 
         /*
-        def results = SearchTaxonomy.executeQuery("SELECT id, keyword FROM SearchKeyword s WHERE s.dataCategory = 'DATA_TYPE'");
+        def results = SearchTaxonomy.executeQuery("SELECT id, keyword FROM SearchKeyword s WHERE s.dataCategory = 'DATA_TYPE'")
         def dataTypes = []
         for (result in results) {
             dataTypes.add([key:result[0], value:result[1]])
         }
         */
 
-        def dataTypes = ["GWAS": "GWAS", "EQTL": "eQTL", "Metabolic GWAS": "Metabolic GWAS", "GWAS Fail": "GWAS Fail"]
+        def dataTypes = ['GWAS': 'GWAS', 'EQTL': 'eQTL', 'Metabolic GWAS': 'Metabolic GWAS', 'GWAS Fail': 'GWAS Fail']
 
         render(template: 'dataTypesBrowseMulti', model: [dataTypes: dataTypes], plugin: "biomartForGit")
     }
 
     def cleanForSOLR(t) {
-        return t.replace("&", "%26").replace("(", "\\(").replace(")", "\\)");
+        return t.replace('&', '%26').replace('(', '\\(').replace(')', '\\)')
     }
 }
