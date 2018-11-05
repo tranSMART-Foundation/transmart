@@ -8,16 +8,17 @@ class RetrieveDataController  {
     def retrieveDataService
 
     def JobExportToGalaxy = {
-        final  galaxyURL = grailsApplication.config.com.galaxy.export.galaxyURL;
+        final  galaxyURL = grailsApplication.config.com.galaxy.export.galaxyURL
         final tempFolderDirectory  = grailsApplication.config.com.recomdata.plugins.tempFolderDirectory
-        final String idOfTheUser = springSecurityService.getPrincipal().username;
+        final String idOfTheUser = springSecurityService.getPrincipal().username
 
-        def statusOK = retrieveDataService.saveStatusOfExport(params.nameOfTheExportJob,params.nameOfTheLibrary);
+        def statusOK = retrieveDataService.saveStatusOfExport(params.nameOfTheExportJob,params.nameOfTheLibrary)
         if(statusOK){
-            retrieveDataService.uploadExportFolderToGalaxy(galaxyURL, tempFolderDirectory.toString(),idOfTheUser, params.nameOfTheExportJob, params.nameOfTheLibrary );
-            retrieveDataService.updateStatusOfExport(params.nameOfTheExportJob,"Done");
-        }else{
-            retrieveDataService.updateStatusOfExport(params.nameOfTheExportJob,"Error");
+            retrieveDataService.uploadExportFolderToGalaxy(galaxyURL, tempFolderDirectory.toString(),idOfTheUser, params.nameOfTheExportJob, params.nameOfTheLibrary )
+            retrieveDataService.updateStatusOfExport(params.nameOfTheExportJob,'Done')
+        }
+        else{
+            retrieveDataService.updateStatusOfExport(params.nameOfTheExportJob,'Error')
         }
 
         render([statusOk: statusOK] as JSON)
@@ -28,9 +29,9 @@ class RetrieveDataController  {
      */
     def getjobs = {
         def username = springSecurityService.getPrincipal().username
-        def result = retrieveDataService.getjobs(username, "DataExport")
+        def result = retrieveDataService.getjobs(username, 'DataExport')
 
-        response.setContentType("text/json")
+        response.setContentType('text/json')
         response.outputStream << result?.toString()
     }
 
