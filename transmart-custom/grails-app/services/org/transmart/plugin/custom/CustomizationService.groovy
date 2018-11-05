@@ -52,8 +52,8 @@ class CustomizationService implements InitializingBean  {
 
 	/**
 	 * Get the user level for the specified user. Do not call this if the user is
-	 * currently authenticated as it would result in unnecessary database calls;
-	 * use currentUserLevel() instead.
+	 * currently authenticated as it would result in unnecessary database calls.
+	 * Use currentUserLevel() instead.
 	 *
 	 * @return ADMIN if the user has ROLE_ADMIN,
 	 *         TWO if the user has ROLE_DATASET_EXPLORER_ADMIN,
