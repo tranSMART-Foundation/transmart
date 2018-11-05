@@ -18,10 +18,10 @@ import org.transmartproject.core.dataquery.highdim.projections.Projection
 class GeneprintController {
 
     final static Map<String, String> projectionLookup = [
-            "mrna":     "zscore",
-            "acgh":     "acgh_values",
-            "protein":  "zscore",
-            "vcf":      Projection.ALL_DATA_PROJECTION
+            'mrna':     'zscore',
+            'acgh':     'acgh_values',
+            'protein':  'zscore',
+            'vcf':      Projection.ALL_DATA_PROJECTION
     ]
 
     List<Map> geneprintEntries = []
@@ -30,7 +30,7 @@ class GeneprintController {
     HighDimensionResource highDimensionResource
 
     def geneprintOut = {
-        render(template: "/plugin/geneprint_out",
+        render(template: '/plugin/geneprint_out',
                 model:[
                 ],
                 contextPath:pluginContextPath)
@@ -49,7 +49,7 @@ class GeneprintController {
 
         List<String> ontologyTerms = extractOntologyTerms(analysisConstraints)
         List<Integer> searchKeywordIds = extractSearchKeywordIds(analysisConstraints)
-        TabularResult tabularResult;
+        TabularResult tabularResult
 
         Map<String, HighDimensionDataTypeResource> highDimDataTypeResourceCache = [:]
         ontologyTerms.each { ontologyTerm ->
@@ -69,7 +69,8 @@ class GeneprintController {
                     }
                 }
             }
-        } catch(Throwable t) {
+        }
+        catch(Throwable t) {
             tabularResult?.close()
             throw t
         }
@@ -78,7 +79,7 @@ class GeneprintController {
     }
 
     def fetchClinicalAttributes = {
-        render("[]")
+        render('[]')
     }
 
     private void processResult(TabularResult tabularResult, searchKeyword, String dataType,
@@ -118,36 +119,36 @@ class GeneprintController {
 
     private void processMrna(Double value, geneprintEntry, mrnaThreshold) {
         if (value > mrnaThreshold) {
-            geneprintEntry["mrna"] = "UPREGULATED"
+            geneprintEntry['mrna'] = 'UPREGULATED'
         }
         if (value < -mrnaThreshold) {
-            geneprintEntry["mrna"] = "DOWNREGULATED"
+            geneprintEntry['mrna'] = 'DOWNREGULATED'
         }
     }
 
     private void processAcgh(CopyNumberState value, geneprintEntry) {
         switch (value) {
         case CopyNumberState.LOSS:
-            geneprintEntry["cna"] = "LOSS"
+            geneprintEntry['cna'] = 'LOSS'
             break
         case CopyNumberState.NORMAL:
-            geneprintEntry["cna"] = "DIPLOID"
+            geneprintEntry['cna'] = 'DIPLOID'
             break
         case CopyNumberState.GAIN:
-            geneprintEntry["cna"] = "GAINED"
+            geneprintEntry['cna'] = 'GAINED'
             break
         case CopyNumberState.AMPLIFICATION:
-            geneprintEntry["cna"] = "AMPLIFIED"
+            geneprintEntry['cna'] = 'AMPLIFIED'
             break
         }
     }
 
     private void processProtein(Double value, geneprintEntry, proteinThreshold) {
         if (value > proteinThreshold) {
-            geneprintEntry["rppa"] = "UPREGULATED"
+            geneprintEntry['rppa'] = 'UPREGULATED'
         }
         if (value < -proteinThreshold) {
-            geneprintEntry["rppa"] = "DOWNREGULATED"
+            geneprintEntry['rppa'] = 'DOWNREGULATED'
         }
     }
 
@@ -155,24 +156,24 @@ class GeneprintController {
         if (!isReference) {
             // Any non-undefined value will flag it as a mutation
             // TODO: differentiate between types of mutation?
-            geneprintEntry["mutation"] = "1"
+            geneprintEntry['mutation'] = '1'
         }
     }
 
     private void generateAllCombinations() {
         def mappings = [
-                [key: "mrna",
-                 values: ["", "UPREGULATED", "DOWNREGULATED"]],
-                [key: "cna",
-                 values: ["", "LOSS", "DIPLOID", "GAINED", "AMPLIFIED"]],
-                [key: "rppa",
-                 values: ["", "UPREGULATED", "DOWNREGULATED"]],
-                [key: "mutation",
-                 values: ["", "1"]]]
+                [key: 'mrna',
+                 values: ['', 'UPREGULATED', 'DOWNREGULATED']],
+                [key: 'cna',
+                 values: ['', 'LOSS', 'DIPLOID', 'GAINED', 'AMPLIFIED']],
+                [key: 'rppa',
+                 values: ['', 'UPREGULATED', 'DOWNREGULATED']],
+                [key: 'mutation',
+                 values: ['', '1']]]
 
         int nPermutations = mappings.inject(1) { acc, val -> acc * val.values.size() }
         for (i in 0..nPermutations-1) {
-            def entry = [gene: "TEST", sample: ""+i]
+            def entry = [gene: 'TEST', sample: ''+i]
             geneprintEntries << entry
 
             // Add each type of mapping that has a value.
@@ -181,7 +182,7 @@ class GeneprintController {
             mappings.each { mapping ->
                 int n = mapping.values.size()
                 def value = mapping.values[(i/d).intValue() % n]
-                if (value != "") {
+                if (value != '') {
                     entry[mapping.key] = value
                 }
                 d *= n
@@ -228,7 +229,7 @@ class GeneprintController {
     }
 
     private List<Integer> extractPatientSets(analysisConstraints) {
-        analysisConstraints.assayConstraints.remove("patient_set").grep()
+        analysisConstraints.assayConstraints.remove('patient_set').grep()
     }
 
     private TabularResult fetchData(Integer patientSetId, String searchKeywordId, String ontologyTerm,

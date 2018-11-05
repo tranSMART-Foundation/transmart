@@ -35,7 +35,7 @@ class RNASeqReadCountDumpDataStep extends AbstractDumpHighDimensionalDataStep {
     @Lazy List<String> csvHeader = {
         List<String> r = [
                 'regionname',
-        ];
+        ]
 
         assays.each { AssayColumn assay ->
             r << assay.patientInTrialId

@@ -53,7 +53,7 @@ class RNASeqDumpDataStep extends AbstractDumpHighDimensionalDataStep {
                 'num.probes',
                 'cytoband',
                 'genesymbol'
-        ];
+        ]
 
         PER_ASSAY_COLUMNS.keySet().each {String head ->
             assays.each { AssayColumn assay ->

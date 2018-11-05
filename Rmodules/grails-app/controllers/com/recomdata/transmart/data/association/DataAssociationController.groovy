@@ -10,9 +10,8 @@ class DataAssociationController {
     /**
      * Load the initial DataAssociation page.
      */
-    def defaultPage =
-    {
-        render(template: "dataAssociation", model:[], contextPath:pluginContextPath)
+    def defaultPage = {
+        render(template: 'dataAssociation', model:[], contextPath:pluginContextPath)
     }
 
     /**
@@ -20,7 +19,7 @@ class DataAssociationController {
      */
     def variableSelection = {
         def module = pluginService.findPluginModuleByModuleName(params.analysis)
-        render(view:"../plugin/"+module.formPage)
+        render(view:'../plugin/'+module.formPage)
     }
 
     /**
@@ -51,24 +50,24 @@ class DataAssociationController {
         // for all js files
         for (file in scripts) {
             def m = [:]
-            m["path"] = file.toString()
-            m["type"] = "script"
-            rows.put(m);
+            m['path'] = file.toString()
+            m['type'] = 'script'
+            rows.put(m)
         }
 
         // for all css files
         for (file in styles) {
             def n = [:]
-            n["path"] = file.toString()
-            n["type"] = "css"
-            rows.put(n);
+            n['path'] = file.toString()
+            n['type'] = 'css'
+            rows.put(n)
         }
         
-        result.put("success", true)
-        result.put("totalCount", scripts.size())
-        result.put("files", rows)
+        result.put('success', true)
+        result.put('totalCount', scripts.size())
+        result.put('files', rows)
 
-        response.setContentType("text/json")
+        response.setContentType('text/json')
         response.outputStream << result.toString()
     }
 }

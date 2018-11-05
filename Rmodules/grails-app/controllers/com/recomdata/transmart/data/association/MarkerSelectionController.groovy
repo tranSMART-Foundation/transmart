@@ -5,8 +5,7 @@ class MarkerSelectionController {
 
 	def RModulesOutputRenderService
 	
-	def markerSelectionOut = 
-	{
+	def markerSelectionOut =  {
 		//This will be the array of image links.
 		def ArrayList<String> imageLinks = new ArrayList<String>()
 		
@@ -17,7 +16,7 @@ class MarkerSelectionController {
 		String jobName = params.jobName
 		
 		//Gather the image links.
-		RModulesOutputRenderService.initializeAttributes(jobName,"Heatmap",imageLinks)
+		RModulesOutputRenderService.initializeAttributes(jobName,'Heatmap',imageLinks)
 		
 		String tempDirectory = RModulesOutputRenderService.tempDirectory
 		
@@ -25,11 +24,11 @@ class MarkerSelectionController {
 		def tempDirectoryFile = new File(tempDirectory)
 		
 		//Parse the output files.
-		String markerSelectionTable = ""
+		String markerSelectionTable = ''
 		
 		markerSelectionTable = RModulesOutputRenderService.fileParseLoop(tempDirectoryFile,/.*CMS.*\.TXT/,/.*CMS(.*)\.TXT/,parseMarkerSelectionStr)
 		
-		render(template: "/plugin/markerSelection_out", model:[imageLocations:imageLinks,markerSelectionTable:markerSelectionTable,zipLink:RModulesOutputRenderService.zipLink], contextPath:pluginContextPath)
+		render(template: '/plugin/markerSelection_out', model:[imageLocations:imageLinks,markerSelectionTable:markerSelectionTable,zipLink:RModulesOutputRenderService.zipLink], contextPath:pluginContextPath)
 
 	}
 	
@@ -37,7 +36,7 @@ class MarkerSelectionController {
 		inStr ->
 		
 		//These are the buffers we store the HTML text in.
-		StringBuffer buf = new StringBuffer();
+		StringBuffer buf = new StringBuffer()
 		
 		boolean firstLine = true
 		
@@ -60,16 +59,15 @@ class MarkerSelectionController {
 		//Start the table and add headers.
 		buf.append("<table id='markerSelectionTable' class='tablesorterAnalysisResults'>")
 		buf.append(tableHeader)
-		buf.append("<tbody>")
+		buf.append('<tbody>')
 		
 		//Iterate over each line of the summary file.
 		inStr.eachLine {
 			
 			//Every line but the first in the file gets written to the table.
-			if(!firstLine)
-			{
+			if(!firstLine) {
 				//Split the current line (tabs) and trim the entries
-				String[] resultArray = it.split("\t").collect { it.trim() }
+				String[] resultArray = it.split('\t').collect { it.trim() }
 				
 				String tableRow = """\
 						<tr>
@@ -91,8 +89,8 @@ class MarkerSelectionController {
 		}
 		
 		//Close the table
-		buf.append("</tbody>")
-		buf.append("</table><br /><br />")
+		buf.append('</tbody>')
+		buf.append('</table><br /><br />')
 		
 		return buf.toString()
 	}

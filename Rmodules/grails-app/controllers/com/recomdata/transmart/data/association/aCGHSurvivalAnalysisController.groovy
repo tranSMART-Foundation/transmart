@@ -2,13 +2,13 @@ package com.recomdata.transmart.data.association
 
 class aCGHSurvivalAnalysisController {
 
-    def RModulesOutputRenderService;
+    def RModulesOutputRenderService
 
     def index() {}
 
 
     def aCGHSurvivalAnalysisOutput = {
-        def jobTypeName = "aCGHSurvivalAnalysis"
+        def jobTypeName = 'aCGHSurvivalAnalysis'
 
         //This will be the array of image links.
         def ArrayList<String> imageLinks = new ArrayList<String>()
@@ -19,6 +19,6 @@ class aCGHSurvivalAnalysisController {
         //Gather the image links.
         RModulesOutputRenderService.initializeAttributes(jobName, jobTypeName, imageLinks)
 
-        render(template: "/plugin/aCGHSurvivalAnalysis_out")
+        render(template: '/plugin/aCGHSurvivalAnalysis_out')
     }
 }

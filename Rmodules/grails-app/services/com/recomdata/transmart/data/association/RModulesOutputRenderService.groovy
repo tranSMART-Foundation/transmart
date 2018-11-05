@@ -1,14 +1,14 @@
 /*************************************************************************   
 * Copyright 2008-2012 Janssen Research & Development, LLC.
 *
-* Licensed under the Apache License, Version 2.0 (the "License");
+* Licensed under the Apache License, Version 2.0 (the 'License')
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
 *     http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
+* distributed under the License is distributed on an 'AS IS' BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
@@ -21,24 +21,24 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class RModulesOutputRenderService {
 
-	static scope         = "request"
+	static scope         = 'request'
 
 	def grailsApplication
 	def zipService
     def asyncJobService
     def currentUserBean
-	def tempDirectory = ""
-	def jobName = ""
-	def jobTypeName = ""
-	def zipLink = ""
+	def tempDirectory = ''
+	def jobName = ''
+	def jobTypeName = ''
+	def zipLink = ''
 	
-    //<editor-fold desc="Configuration fetching">
+    //<editor-fold desc='Configuration fetching'>
 		
     /**
      * The directOry where the job data is stored and from where the R scripts
      * run.
      *
-     * The odd name ("folderDirectory") is an historical artifact.
+     * The odd name ('folderDirectory') is an historical artifact.
      *
      * @return the jobs directory
      */
@@ -74,14 +74,14 @@ class RModulesOutputRenderService {
     def initializeAttributes(jobName, jobTypeName, linksArray) {
         logger.debug "initializeAttributes for jobName '$jobName'; jobTypeName " +
                 "'$jobTypeName'"
-        logger.debug "Settings are: jobs directory -> $tempFolderDirectory, " +
-                "images URL -> $imageURL"
+        logger.debug 'Settings are: jobs directory -> $tempFolderDirectory, ' +
+                'images URL -> $imageURL'
 
         this.jobName = jobName
         this.jobTypeName = jobTypeName
 
         String analysisDirectory = tempFolderDirectory + jobName + File.separator
-        this.tempDirectory = analysisDirectory + "workingDirectory" + File.separator
+        this.tempDirectory = analysisDirectory + 'workingDirectory' + File.separator
 
         File tempDirectoryFile = new File(this.tempDirectory)
 
@@ -89,15 +89,15 @@ class RModulesOutputRenderService {
         tempDirectoryFile.traverse(nameFilter: ~/(?i).*\.png/) { currentImageFile ->
             // Replace spaces with underscores, as Tomcat 6 is unable
             // to find files with spaces in their name
-            String newFileName = currentImageFile.name.replaceAll(/[^.a-zA-Z0-9-_]/, "_")
+            String newFileName = currentImageFile.name.replaceAll(/[^.a-zA-Z0-9-_]/, '_')
             File oldImage = new File(currentImageFile.path)
             File renamedImage = new File(tempDirectoryFile, newFileName)
-            logger.debug("Rename $oldImage to $renamedImage")
+            logger.debug('Rename $oldImage to $renamedImage')
             oldImage.renameTo(renamedImage)
 
             // Build url to image
-            String currentLink = "${imageURL}$jobName/workingDirectory/${newFileName}"
-            logger.debug("New image link: " + currentLink)
+            String currentLink = '' + imageURL + '$jobName/workingDirectory/' + newFileName + ''
+            logger.debug('New image link: ' + currentLink)
             linksArray.add(currentLink)
         }
 
@@ -105,13 +105,14 @@ class RModulesOutputRenderService {
             boolean isAllowedToExport = asyncJobService.isUserAllowedToExportResults(currentUserBean, jobName)
             if (isAllowedToExport) {
                 // Zip the working directory
-                String zipLocation = "${analysisDirectory}zippedData.zip"
+                String zipLocation = '' + analysisDirectory + 'zippedData.zip'
                 if (!new File(zipLocation).isFile()) {
                     zipService.zipFolder(tempDirectory, zipLocation)
                 }
-                this.zipLink = "${imageURL}${jobName}/zippedData.zip"
+                this.zipLink = '' + imageURL + '' + jobName + '/zippedData.zip'
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.error(e)
         }
     }
@@ -119,7 +120,7 @@ class RModulesOutputRenderService {
 	def String fileParseLoop(tempDirectoryFile, fileNamePattern,
                              fileNameExtractionPattern, fileParseFunction) {
 		//This is the string we return.
-		String parseValueString = ""
+		String parseValueString = ''
 		
 		//Reinitialize the text files array list.
 		def ArrayList<String> txtFiles = new ArrayList<String>()
@@ -139,11 +140,11 @@ class RModulesOutputRenderService {
 			if (matcher.matches() && txtFiles.size > 1) {
 				//Add the HTML that will separate the different files.
 				parseValueString += "<br /><br /><span class='AnalysisHeader'>" +
-                        "${matcher[0][1]}</span><hr />"
+                        '' + matcher[0][1] + '</span><hr />'
 			}
 			
 			//Create objects for the output file.
-			File parsableFile = new File(it);
+			File parsableFile = new File(it)
 			
 			//Parse the output files.
 			parseValueString += fileParseFunction.call(parsableFile.getText())
@@ -152,8 +153,7 @@ class RModulesOutputRenderService {
 		parseValueString
 	}
 
-    def parseVersionFile()
-    {
+    def parseVersionFile() {
         def tempDirectoryFile = new File(tempDirectory)
         String versionData = fileParseLoop(tempDirectoryFile,/.*sessionInfo.*\.txt/,/.*sessionInfo(.*)\.txt/, parseVersionFileClosure)
 
@@ -164,7 +164,7 @@ class RModulesOutputRenderService {
         statsInStr ->
 
             //Buffer that will hold the HTML we output.
-            StringBuffer buf = new StringBuffer();
+            StringBuffer buf = new StringBuffer()
 
             buf.append("<br /><a href='#' onclick='\$(\"versionInfoDiv\").toggle()'><span class='AnalysisHeader'>R Version Information</span></a><br /><br />")
 
@@ -174,58 +174,49 @@ class RModulesOutputRenderService {
             Boolean packageCommand = false
             Boolean firstPackageLine = true
 
-            statsInStr.eachLine
-                    {
-
-                        if(it.contains("||PACKAGEINFO||"))
-                        {
+            statsInStr.eachLine {
+                        if(it.contains('||PACKAGEINFO||')) {
                             packageCommand = true
-                            return;
+                            return
                         }
 
-                        if(!packageCommand)
-                        {
+                        if(!packageCommand) {
                             buf.append(it)
-                            buf.append("<br />")
+                            buf.append('<br />')
                         }
-                        else
-                        {
-                            def currentLine = it.split("\t")
+                        else {
+                            def currentLine = it.split('\t')
 
-                            if(firstPackageLine)
-                            {
+                            if(firstPackageLine) {
                                 buf.append("<br /><br /><table class='AnalysisResults'>")
-                                buf.append("<tr>")
-                                currentLine.each()
-                                        {
+                                buf.append('<tr>')
+                                currentLine.each() {
                                             currentSegment ->
 
-                                                buf.append("<th>${currentSegment}</th>")
+                                                buf.append('<th>' + currentSegment + '</th>')
 
                                         }
-                                buf.append("</tr>")
+                                buf.append('</tr>')
 
                                 firstPackageLine = false
                             }
-                            else
-                            {
-                                buf.append("<tr>")
-                                currentLine.each()
-                                        {
+                            else {
+                                buf.append('<tr>')
+                                currentLine.each() {
                                             currentSegment ->
 
-                                                buf.append("<td>${currentSegment}</td>")
+                                                buf.append('<td>' + currentSegment + '</td>')
 
                                         }
-                                buf.append("</tr>")
+                                buf.append('</tr>')
                             }
                         }
                     }
 
-            buf.append("</table>")
-            buf.append("</div>")
+            buf.append('</table>')
+            buf.append('</div>')
 
-            buf.toString();
+            buf.toString()
     }
 	
     def createDirectory(File directory) {
@@ -236,11 +227,12 @@ class RModulesOutputRenderService {
         }
         dirs.each {
             if (!it.mkdir()) {
-                logger.error "Directory $it neither exists, " +
-                        "nor could it be created"
-                return false;
-            } else {
-                logger.debug "Created directory $it"
+                logger.error 'Directory $it neither exists, ' +
+                        'nor could it be created'
+                return false
+            }
+            else {
+                logger.debug 'Created directory $it'
             }
         }
         true

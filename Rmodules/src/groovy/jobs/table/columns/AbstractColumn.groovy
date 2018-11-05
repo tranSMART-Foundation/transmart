@@ -37,7 +37,7 @@ abstract class AbstractColumn implements Column {
     @Override
     public String toString() {
         com.google.common.base.Objects.toStringHelper(this).
-                add("header", header).
-                toString();
+                add('header', header).
+                toString()
     }
 }

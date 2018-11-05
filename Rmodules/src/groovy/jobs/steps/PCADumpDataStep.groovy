@@ -16,14 +16,14 @@ class PCADumpDataStep extends BioMarkerDumpDataStep {
         assert row instanceof BioMarkerDataRow
 
         // Determine which values to put in rowKey and which in probeValue
-        String rowKey;
-        String probeValue;
-        if (params.doUseExperimentAsVariable == "true") {
-            rowKey = [subsetName, row.label, column.patientInTrialId].join("_")
+        String rowKey
+        String probeValue
+        if (params.doUseExperimentAsVariable == 'true') {
+            rowKey = [subsetName, row.label, column.patientInTrialId].join('_')
             probeValue = seriesName
         }
         else {
-            rowKey = [subsetName, seriesName, column.patientInTrialId].join("_")
+            rowKey = [subsetName, seriesName, column.patientInTrialId].join('_')
             probeValue = row.label
         }
 

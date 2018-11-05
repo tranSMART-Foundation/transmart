@@ -28,12 +28,12 @@ class AnalysisQuartzJobAdapter implements Job {
     JobDataMap jobDataMap
 
     private static ThreadLocal<Map<String, Object>> BEANS_MAP =
-            new NamedThreadLocal<Map<String, Object>>("JobScope") {
+            new NamedThreadLocal<Map<String, Object>>('JobScope') {
                 @Override
                 protected Map<String, Object> initialValue() {
                     new HashMap<String, Object>()
                 }
-            };
+            }
 
     private static ThreadLocal<String> BOUND_JOB_NAME = new ThreadLocal()
 
@@ -62,7 +62,8 @@ class AnalysisQuartzJobAdapter implements Job {
             AbstractAnalysisJob job
             try {
                 job = createAnalysisJob()
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 logger.error 'Exception while creating the analysis job', e
                 jobResultsService[jobName]['Exception'] = e.message
                 asyncJobService.updateStatus jobName, 'Error'
@@ -71,12 +72,14 @@ class AnalysisQuartzJobAdapter implements Job {
 
             try {
                 job.run()
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 logger.error 'Some exception occurred in the processing pipe', e
                 jobResultsService[jobName]['Exception'] = e.message
                 job.updateStatus 'Error'
             }
-        } finally {
+        }
+        finally {
             cleanJobBeans()
             interceptor.flush()
             interceptor.destroy()
@@ -104,11 +107,11 @@ class AnalysisQuartzJobAdapter implements Job {
 
         /* wire things up */
         job.updateStatus = { String status, String viewerUrl = null ->
-            job.logger.info "updateStatus called for status:$status, viewerUrl:$viewerUrl"
+            job.logger.info 'updateStatus called for status:' + status + ', viewerUrl:' + viewerUrl + ''
             asyncJobService.updateStatus job.name, status, viewerUrl
         }
         job.setStatusList = { List<String> statusList ->
-            jobResultsService[job.name]["StatusList"] = statusList
+            jobResultsService[job.name]['StatusList'] = statusList
         }
 
         job.topTemporaryDirectory = new File(Holders.config.RModules.tempFolderDirectory)

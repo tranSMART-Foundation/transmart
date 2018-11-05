@@ -49,7 +49,7 @@ class AcghRegionDumpDataStep extends AbstractDumpHighDimensionalDataStep {
                 'end',
                 'num.probes',
                 'cytoband',
-        ];
+        ]
 
         PER_ASSAY_COLUMNS.keySet().each {String head ->
             assays.each { AssayColumn assay ->

@@ -32,7 +32,7 @@ class ZipService {
 
     boolean transactional = true
 
-    private static final int BUFFER_SIZE = 250 * 1024;
+    private static final int BUFFER_SIZE = 250 * 1024
 
     /**
      * This method will bundle all the files into a zip file.
@@ -45,44 +45,45 @@ class ZipService {
      *
      */
     public static String bundleZipFile(String zipFileName, List<File> files) {
-        File zipFile = null;
-        Map<String, File> filesMap = new HashMap<String, File>();
+        File zipFile = null
+        Map<String, File> filesMap = new HashMap<String, File>()
 
-        if (StringUtils.isEmpty(zipFileName)) return null;
+        if (StringUtils.isEmpty(zipFileName)) return null
 
         try {
-            zipFile = new File(zipFileName);
+            zipFile = new File(zipFileName)
             if (zipFile.exists() && zipFile.isFile() && zipFile.delete()) {
-                zipFile = new File(zipFileName);
+                zipFile = new File(zipFileName)
             }
 
-            ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile));
-            zipOut.setLevel(ZipOutputStream.DEFLATED);
-            byte[] buffer = new byte[BUFFER_SIZE];
+            ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile))
+            zipOut.setLevel(ZipOutputStream.DEFLATED)
+            byte[] buffer = new byte[BUFFER_SIZE]
 
             for (File file : files) {
                 if (filesMap.containsKey(file.getName())) {
-                    continue;
-                } else if (file.exists() && file.canRead()) {
-                    filesMap.put(file.getName(), file);
-                    zipOut.putNextEntry(new ZipEntry(file.getName()));
-                    FileInputStream fis = new FileInputStream(file);
-                    int bytesRead;
+                    continue
+                }
+                else if (file.exists() && file.canRead()) {
+                    filesMap.put(file.getName(), file)
+                    zipOut.putNextEntry(new ZipEntry(file.getName()))
+                    FileInputStream fis = new FileInputStream(file)
+                    int bytesRead
                     while ((bytesRead = fis.read(buffer)) != -1) {
-                        zipOut.write(buffer, 0, bytesRead);
+                        zipOut.write(buffer, 0, bytesRead)
                     }
-                    zipOut.flush();
-                    zipOut.closeEntry();
+                    zipOut.flush()
+                    zipOut.closeEntry()
                 }
             }
-            zipOut.finish();
-            zipOut.close();
+            zipOut.finish()
+            zipOut.close()
         }
         catch (IOException e) {
-            //logger.error("Error while creating Zip file");
+            //logger.error('Error while creating Zip file')
         }
 
-        return (null != zipFile) ? zipFile.getAbsolutePath() : null;
+        return (null != zipFile) ? zipFile.getAbsolutePath() : null
     }
 
     /**
@@ -93,41 +94,43 @@ class ZipService {
      * @throws Exception
      */
     static public String zipFolder(String srcFolder, String destZipFile) throws Exception {
-        File zipFile = null;
-        ZipOutputStream zip = null;
-        FileOutputStream fileWriter = null;
+        File zipFile = null
+        ZipOutputStream zip = null
+        FileOutputStream fileWriter = null
 
-        zipFile = new File(destZipFile);
+        zipFile = new File(destZipFile)
         if (zipFile.exists() && zipFile.isFile() && zipFile.delete()) {
-            zipFile = new File(destZipFile);
+            zipFile = new File(destZipFile)
         }
 
-        fileWriter = new FileOutputStream(zipFile);
-        zip = new ZipOutputStream(fileWriter);
+        fileWriter = new FileOutputStream(zipFile)
+        zip = new ZipOutputStream(fileWriter)
 
-        addFolderToZip("", srcFolder, zip);
-        zip.flush();
-        zip.close();
+        addFolderToZip('', srcFolder, zip)
+        zip.flush()
+        zip.close()
 
-        return zipFile.getName();
+        return zipFile.getName()
     }
 
     static private void addFileToZip(String path, String srcFile, ZipOutputStream zip)
             throws Exception {
 
-        File folder = new File(srcFile);
+        File folder = new File(srcFile)
         if (folder.isDirectory()) {
-            addFolderToZip(path, srcFile, zip);
-        } else {
-            byte[] buf = new byte[BUFFER_SIZE];
-            int len;
-            FileInputStream inStream = new FileInputStream(srcFile);
+            addFolderToZip(path, srcFile, zip)
+        }
+        else {
+            byte[] buf = new byte[BUFFER_SIZE]
+            int len
+            FileInputStream inStream = new FileInputStream(srcFile)
             try {
-                zip.putNextEntry(new ZipEntry(path + "/" + folder.getName()));
+                zip.putNextEntry(new ZipEntry(path + '/' + folder.getName()))
                 while ((len = inStream.read(buf)) > 0) {
-                    zip.write(buf, 0, len);
+                    zip.write(buf, 0, len)
                 }
-            } finally {
+            }
+            finally {
                 IOUtils.closeQuietly(inStream)
             }
         }
@@ -135,13 +138,14 @@ class ZipService {
 
     static private void addFolderToZip(String path, String srcFolder, ZipOutputStream zip)
             throws Exception {
-        File folder = new File(srcFolder);
+        File folder = new File(srcFolder)
 
         for (String fileName : folder.list()) {
-            if (path.equals("")) {
-                addFileToZip(folder.getName(), srcFolder + "/" + fileName, zip);
-            } else {
-                addFileToZip(path + "/" + folder.getName(), srcFolder + "/" + fileName, zip);
+            if (path.equals('')) {
+                addFileToZip(folder.getName(), srcFolder + '/' + fileName, zip)
+            }
+            else {
+                addFileToZip(path + '/' + folder.getName(), srcFolder + '/' + fileName, zip)
             }
         }
     }
