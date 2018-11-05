@@ -21,28 +21,28 @@
 package i2b2
 
 class SnpDataset {
-    public static String SAMPLE_TYPE_NORMAL = "NORMAL";
-    public static String SAMPLE_TYPE_DISEASE = "DISEASE";
+    public static String SAMPLE_TYPE_NORMAL = 'NORMAL'
+    public static String SAMPLE_TYPE_DISEASE = 'DISEASE'
 
-    Long id;
-    String datasetName;
+    Long id
+    String datasetName
 
-    /* conceptId is like "1222211", stored in table "de_subject_snp_dataset", column "concept_cd",
-     * mapped to "concept_cd" in table "patient_dimension".
-     * The conceptName is the display name, like "Normal Blood Lymphocyte", stored in name_char in table "patient_dimension" */
-    String conceptId;
-    String conceptName;
+    /* conceptId is like '1222211', stored in table 'de_subject_snp_dataset', column 'concept_cd',
+     * mapped to 'concept_cd' in table 'patient_dimension'.
+     * The conceptName is the display name, like 'Normal Blood Lymphocyte', stored in name_char in table 'patient_dimension' */
+    String conceptId
+    String conceptName
 
-    String platformName;
-    String trialName;
-    Long patientNum;
-    String patientGender;
-    String timePoint;
-    String subjectId;
+    String platformName
+    String trialName
+    Long patientNum
+    String patientGender
+    String timePoint
+    String subjectId
 
     /* This is used to organized paired datasets in GenePattern sample info text file
-        The value is stored in database table "de_subject_snp_dataset", column "sample_type" */
-    String sampleType;
+        The value is stored in database table 'de_subject_snp_dataset', column 'sample_type' */
+    String sampleType
 
-    Long pairedDatasetId;
+    Long pairedDatasetId
 }

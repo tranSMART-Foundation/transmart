@@ -21,29 +21,29 @@
 package i2b2
 
 class Concept {
-    Long id;
+    Long id
 
-    String fullName;
-    Integer level;
-    String name;
-    String synonym;
-    String visualAttributes;
-    Integer totalNum;
-    String baseCode;
-    String metaDataXml;
-    String factTableColumn;
-    String tableName;
-    String columnName;
-    String columnDataType;
-    String operator;
-    String dimCode;
-    String comment;
-    String toolTip;
-    Date updateDate;
-    Date downloadDate;
-    Date importDate;
-    String sourceSystem;
-    String valueType;
+    String fullName
+    Integer level
+    String name
+    String synonym
+    String visualAttributes
+    Integer totalNum
+    String baseCode
+    String metaDataXml
+    String factTableColumn
+    String tableName
+    String columnName
+    String columnDataType
+    String operator
+    String dimCode
+    String comment
+    String toolTip
+    Date updateDate
+    Date downloadDate
+    Date importDate
+    String sourceSystem
+    String valueType
 
     static mapping = {
         table 'i2b2'

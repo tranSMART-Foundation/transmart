@@ -21,13 +21,13 @@
 package i2b2
 
 class SnpDataByProbe {
-    Long snpDataByProbeId;
-    Long snpInfoId;
-    String snpName;
-    Long probeId;
-    String probeName;
-    String trialName;
-    String chrom;
-    Long chromPos;
+    Long snpDataByProbeId
+    Long snpInfoId
+    String snpName
+    Long probeId
+    String probeName
+    String trialName
+    String chrom
+    Long chromPos
     String[][] dataArray;    // Copy Number, Genotyping Call
 }

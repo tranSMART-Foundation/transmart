@@ -21,9 +21,9 @@
 package i2b2
 
 class SnpInfo {
-    Long id;
-    String name;
-    String chrom;
-    Long chromPos;
+    Long id
+    String name
+    String chrom
+    Long chromPos
 
 }

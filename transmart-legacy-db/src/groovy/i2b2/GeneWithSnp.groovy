@@ -21,14 +21,14 @@
 package i2b2
 
 class GeneWithSnp {
-    Long entrezId;
-    String name;
-    String chrom;
+    Long entrezId
+    String name
+    String chrom
 
     SortedMap<Long, SnpInfo> snpMap;    // <chromPos, SnpInfo>
-    static mapWith = "none";    // Somehow Grails automatically tries to map SortedMap varables to database
+    static mapWith = 'none';    // Somehow Grails automatically tries to map SortedMap varables to database
 
     public GeneWithSnp() {
-        snpMap = new TreeMap<Long, SnpInfo>();
+        snpMap = new TreeMap<Long, SnpInfo>()
     }
 }

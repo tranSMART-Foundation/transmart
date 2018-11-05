@@ -22,8 +22,8 @@ package i2b2
 
 class PatientTrial {
     Long id
-    String trial;
-    String secureObjToken;
+    String trial
+    String secureObjToken
 
 
     static mapping = {

@@ -22,8 +22,8 @@ package i2b2
 
 class Comparison {
     Long id
-    Long queryResultId1;
-    Long queryResultId2;
+    Long queryResultId1
+    Long queryResultId2
 
 
     static mapping = {

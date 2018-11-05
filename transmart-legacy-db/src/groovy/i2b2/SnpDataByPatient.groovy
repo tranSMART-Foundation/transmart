@@ -21,9 +21,9 @@
 package i2b2
 
 class SnpDataByPatient {
-    Long id;
-    String trialName;
-    Long patientNum;
-    String chrom;
-    String dataByPatient;
+    Long id
+    String trialName
+    Long patientNum
+    String chrom
+    String dataByPatient
 }

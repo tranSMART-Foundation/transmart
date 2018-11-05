@@ -21,12 +21,12 @@
 package i2b2
 
 class SnpProbeSortedDef {
-    Long id;
-    String platformName;
-    Integer numProbe;
-    String chrom;
-    String probeDef;
-    String snpIdDef;
+    Long id
+    String platformName
+    Integer numProbe
+    String chrom
+    String probeDef
+    String snpIdDef
 
     static mapping = {
         table 'DE_SNP_PROBE_SORTED_DEF'

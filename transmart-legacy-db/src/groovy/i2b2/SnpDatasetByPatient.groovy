@@ -21,12 +21,12 @@
 package i2b2
 
 class SnpDatasetByPatient {
-    SnpDataset snpDataset;
+    SnpDataset snpDataset
 
-    Map<String, SnpDataByPatient> snpDataByChromMap;
+    Map<String, SnpDataByPatient> snpDataByChromMap
 
     public SnpDatasetByPatient() {
-        snpDataset = new SnpDataset();
-        snpDataByChromMap = new HashMap<String, SnpDataByPatient>();
+        snpDataset = new SnpDataset()
+        snpDataByChromMap = new HashMap<String, SnpDataByPatient>()
     }
 }

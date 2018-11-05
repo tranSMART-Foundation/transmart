@@ -28,26 +28,26 @@ package i2b2
 
 class SubjectSnpDataset {
 
-    public static String SAMPLE_TYPE_NORMAL = "NORMAL";
-    public static String SAMPLE_TYPE_DISEASE = "DISEASE";
+    public static String SAMPLE_TYPE_NORMAL = 'NORMAL'
+    public static String SAMPLE_TYPE_DISEASE = 'DISEASE'
 
-    Long id;
-    String datasetName;
+    Long id
+    String datasetName
 
-    String conceptCd;
+    String conceptCd
 
-    String platformName;
-    String trialName;
-    Long patientNum;
-    String patientGender;
-    String timePoint;
-    String subjectId;
+    String platformName
+    String trialName
+    Long patientNum
+    String patientGender
+    String timePoint
+    String subjectId
 
     /* This is used to organized paired datasets in GenePattern sample info text file
-     The value is stored in database table "de_subject_snp_dataset", column "sample_type" */
-    String sampleType;
+     The value is stored in database table 'de_subject_snp_dataset', column 'sample_type' */
+    String sampleType
 
-    Long pairedDatasetId;
+    Long pairedDatasetId
 
 
     static mapping = {

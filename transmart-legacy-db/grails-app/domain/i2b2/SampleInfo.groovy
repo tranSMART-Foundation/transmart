@@ -30,13 +30,13 @@ package i2b2
  */
 class SampleInfo {
 
-    String id;
-    String sampleName;
+    String id
+    String sampleName
     String platformName;    // The GEO code for the platform
-    String trialName;
-    Long assayId;
-    String conceptCode;
-    Long patientId;
+    String trialName
+    Long assayId
+    String conceptCode
+    Long patientId
 
     static mapping = {
         table 'de_subject_sample_mapping'
