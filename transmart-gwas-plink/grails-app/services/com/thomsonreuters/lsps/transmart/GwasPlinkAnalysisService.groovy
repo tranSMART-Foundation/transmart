@@ -33,7 +33,7 @@ class GwasPlinkAnalysisService {
         }
 
         File getWorkingDir() {
-            new File(jobDir, "workingDirectory")
+            new File(jobDir, 'workingDirectory')
         }
     }
 
@@ -43,13 +43,13 @@ class GwasPlinkAnalysisService {
         }
 
         File getPlinkResultsDir() {
-            new File(workingDir, "plink-results")
+            new File(workingDir, 'plink-results')
         }
     }
 
     String prepareZippedResult(String jobName, String analysisName) {
         final jobWorkspace = new PlinkJobWorkspace(jobName)
-        String zipFileName = "${analysisName}.zip"
+        String zipFileName = '' + analysisName + '.zip'
         byte[] buffer = new byte[512 * 1024]
         File zipFile = new File(jobWorkspace.jobDir, zipFileName)
         if (zipFile.exists()) {
@@ -58,7 +58,7 @@ class GwasPlinkAnalysisService {
         def workDir = jobWorkspace.getWorkingDir()
         def resDirName = (jobWorkspace.getPlinkResultsDir() as String).replace((workDir as String) + workDir.separator, '')
         def zip = new ZipOutputStream(new FileOutputStream(zipFile))
-        zip.setLevel(ZipOutputStream.DEFLATED);
+        zip.setLevel(ZipOutputStream.DEFLATED)
         workDir.eachFileRecurse { file ->
             if (!file.isFile() || !file.canRead()) {
                 return
@@ -112,7 +112,8 @@ class GwasPlinkAnalysisService {
                     result.add(vals)
                     if (reader.getLineNumber() <= previewRowsCount) {
                         continue
-                    } else {
+                    }
+                    else {
                         break
                     }
                 }
@@ -134,7 +135,8 @@ class GwasPlinkAnalysisService {
                     }
                     topLines[pVal] << vals
                     nLines++
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                 }
             }
             topLines.each { _, v ->
@@ -167,11 +169,11 @@ class GwasPlinkAnalysisService {
         params.put(PARAM_USER_PARAMETERS, userParams)
         params.put(PARAM_USER_IN_CONTEXT, currentUserBean.targetSource.target)
         params.put('subsetSelectedFilesMap', [subset1: [], subset2: []])
-        params.put("jobName", params.jobName)
+        params.put('jobName', params.jobName)
 
         JobDetail jobDetail = new JobDetailImpl(params.jobName, params.jobType, AnalysisQuartzJobAdapter)
         jobDetail.jobDataMap = new JobDataMap(params)
         quartzScheduler.scheduleJob jobDetail,
-				new SimpleTriggerImpl("triggerNow ${Calendar.instance.time.time}", analysisGroup)
+				new SimpleTriggerImpl('triggerNow ' + Calendar.instance.time.time + '', analysisGroup)
     }
 }
