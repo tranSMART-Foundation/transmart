@@ -11,26 +11,23 @@ class SubjectService {
 
 
 
-    def getXnatID(def subjectID)
-    {
-        def subject = Subject.findByTranSMART_subjectID(subjectID.toString());
+    def getXnatID(def subjectID) {
+        def subject = Subject.findByTranSMART_subjectID(subjectID.toString())
 
-        return subject.xnat_subjectID;
+        return subject.xnat_subjectID
     }
 
-    def getXnatProject(def subjectID)
-    {
-        def subject = Subject.findByTranSMART_subjectID(subjectID.toString());
+    def getXnatProject(def subjectID) {
+        def subject = Subject.findByTranSMART_subjectID(subjectID.toString())
 
 
-        return subject.xnat_project;
+        return subject.xnat_project
     }
 
-    def SubjectExists(def subjectID)
-    {
+    def SubjectExists(def subjectID) {
         if (Subject.findByTranSMART_subjectIDIsNotNullAndTranSMART_subjectID(subjectID.toString()))
-            return true;
+            return true
         else
-            return false;
+            return false
     }
 }

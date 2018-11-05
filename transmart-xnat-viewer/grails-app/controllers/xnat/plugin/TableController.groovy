@@ -28,66 +28,66 @@ class TableController {
 
     def analysisGrid = {
 
-        String concept_key = params.concept_key;
-        def result_instance_id1 = params.result_instance_id1;
-        def result_instance_id2 = params.result_instance_id2;
+        String concept_key = params.concept_key
+        def result_instance_id1 = params.result_instance_id1
+        def result_instance_id2 = params.result_instance_id2
 
         /*which subsets are present? */
-        boolean s1 = (result_instance_id1 == "" || result_instance_id1 == null) ? false : true;
-        boolean s2 = (result_instance_id2 == "" || result_instance_id2 == null) ? false : true;
+        boolean s1 = (result_instance_id1 == '' || result_instance_id1 == null) ? false : true
+        boolean s2 = (result_instance_id2 == '' || result_instance_id2 == null) ? false : true
 
-        def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: "DatasetExplorer-Grid Analysis Drag", eventmessage: "RID1:" + result_instance_id1 + " RID2:" + result_instance_id2 + " Concept:" + concept_key, accesstime: new java.util.Date())
+        def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'DatasetExplorer-Grid Analysis Drag', eventmessage: 'RID1:' + result_instance_id1 + ' RID2:' + result_instance_id2 + ' Concept:' + concept_key, accesstime: new java.util.Date())
         al.save()
 
         //Copied from Grid view, but must not use the same table!
         //XXX: session is a questionable place to store this because it breaks multi-window/tab nav
-        //ExportTableNew table = (ExportTableNew) request.getSession().getAttribute("gridtable");
-        ExportTableNew table;
+        //ExportTableNew table = (ExportTableNew) request.getSession().getAttribute('gridtable')
+        ExportTableNew table
         if (table == null) {
 
-            table = new ExportTableNew();
-            if (s1) xnatHelperService.addAllPatientDemographicDataForSubsetToTable(table, result_instance_id1, "subset1");
-            if (s2) xnatHelperService.addAllPatientDemographicDataForSubsetToTable(table, result_instance_id2, "subset2");
+            table = new ExportTableNew()
+            if (s1) xnatHelperService.addAllPatientDemographicDataForSubsetToTable(table, result_instance_id1, 'subset1')
+            if (s2) xnatHelperService.addAllPatientDemographicDataForSubsetToTable(table, result_instance_id2, 'subset2')
 
-            List<String> keys = i2b2HelperService.getConceptKeysInSubsets(result_instance_id1, result_instance_id2);
-            Set<String> uniqueConcepts = i2b2HelperService.getDistinctConceptSet(result_instance_id1, result_instance_id2);
+            List<String> keys = i2b2HelperService.getConceptKeysInSubsets(result_instance_id1, result_instance_id2)
+            Set<String> uniqueConcepts = i2b2HelperService.getDistinctConceptSet(result_instance_id1, result_instance_id2)
 
-            logger.debug("Unique concepts: " + uniqueConcepts);
-            logger.debug("keys: " + keys)
+            logger.debug('Unique concepts: ' + uniqueConcepts)
+            logger.debug('keys: ' + keys)
 
             for (int i = 0; i < keys.size(); i++) {
 
-                logger.trace("adding concept data for " + keys.get(i));
-                if (s1) i2b2HelperService.addConceptDataToTable(table, keys.get(i), result_instance_id1);
-                if (s2) i2b2HelperService.addConceptDataToTable(table, keys.get(i), result_instance_id2);
+                logger.trace('adding concept data for ' + keys.get(i))
+                if (s1) i2b2HelperService.addConceptDataToTable(table, keys.get(i), result_instance_id1)
+                if (s2) i2b2HelperService.addConceptDataToTable(table, keys.get(i), result_instance_id2)
             }
         }
-        PrintWriter pw = new PrintWriter(response.getOutputStream());
+        PrintWriter pw = new PrintWriter(response.getOutputStream())
 
         if (concept_key && !concept_key.isEmpty()) {
 
-            String parentConcept = i2b2HelperService.lookupParentConcept(i2b2HelperService.keyToPath(concept_key));
-            Set<String> cconcepts = i2b2HelperService.lookupChildConcepts(parentConcept, result_instance_id1, result_instance_id2);
+            String parentConcept = i2b2HelperService.lookupParentConcept(i2b2HelperService.keyToPath(concept_key))
+            Set<String> cconcepts = i2b2HelperService.lookupChildConcepts(parentConcept, result_instance_id1, result_instance_id2)
 
-            def conceptKeys = [];
-            def prefix = concept_key.substring(0, concept_key.indexOf("\\", 2));
+            def conceptKeys = []
+            def prefix = concept_key.substring(0, concept_key.indexOf('\\', 2))
 
             if (!cconcepts.isEmpty()) {
                 for (cc in cconcepts) {
-                    def ck = prefix + i2b2HelperService.getConceptPathFromCode(cc);
-                    conceptKeys.add(ck);
+                    def ck = prefix + i2b2HelperService.getConceptPathFromCode(cc)
+                    conceptKeys.add(ck)
                 }
             } else
-                conceptKeys.add(concept_key);
+                conceptKeys.add(concept_key)
 
             for (ck in conceptKeys) {
-                if (s1) i2b2HelperService.addConceptDataToTable(table, ck, result_instance_id1);
-                if (s2) i2b2HelperService.addConceptDataToTable(table, ck, result_instance_id2);
+                if (s1) i2b2HelperService.addConceptDataToTable(table, ck, result_instance_id1)
+                if (s2) i2b2HelperService.addConceptDataToTable(table, ck, result_instance_id2)
             }
         }
-        pw.write(table.toJSONObject().toString(5));
-        pw.flush();
+        pw.write(table.toJSONObject().toString(5))
+        pw.flush()
 
-        //request.getSession().setAttribute("gridtable", table);
+        //request.getSession().setAttribute('gridtable', table)
     }
 }
