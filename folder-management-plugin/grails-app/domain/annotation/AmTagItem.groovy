@@ -27,7 +27,7 @@ class AmTagItem implements Comparable<AmTagItem> {
 	id generator: 'sequence', params: [sequence: 'AMAPP.SEQ_AMAPP_DATA_ID'], column: 'tag_item_id'
         version false
         cache true
-        sort "displayOrder"
+        sort 'displayOrder'
         amTagTemplate joinTable: [name: 'am_tag_template', key: 'tag_template_id', column: 'tag_item_id'], lazy: false
         id column: 'tag_item_id', generator: 'sequence', params: [sequence: 'AMAPP.SEQ_AMAPP_DATA_ID']
         amTagTemplate column: 'tag_template_id'
@@ -39,11 +39,12 @@ class AmTagItem implements Comparable<AmTagItem> {
     public int compareTo(AmTagItem itemIn) {
 
         if (itemIn.displayOrder != null && displayOrder != null) {
-            return displayOrder?.compareTo(itemIn.displayOrder);
-        } else {
-            return displayName?.compareTo(itemIn.displayName);
+            return displayOrder?.compareTo(itemIn.displayOrder)
         }
-        return 0;
+        else {
+            return displayName?.compareTo(itemIn.displayName)
+        }
+        return 0
     }
 
     static constraints = {
@@ -60,10 +61,10 @@ class AmTagItem implements Comparable<AmTagItem> {
      * override display
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("ID: ").append(this.id).append(", Display Name: ").append(this.displayName);
-        sb.append(", Display Order: ").append(this.displayOrder);
-        return sb.toString();
+        StringBuffer sb = new StringBuffer()
+        sb.append('ID: ').append(this.id).append(', Display Name: ').append(this.displayName)
+        sb.append(', Display Order: ').append(this.displayOrder)
+        return sb.toString()
     }
 
 }

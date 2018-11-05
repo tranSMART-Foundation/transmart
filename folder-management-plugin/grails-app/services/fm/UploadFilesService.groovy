@@ -39,19 +39,20 @@ class UploadFilesService {
         def fileBytes
         try{
             def fileName = fileToUpload.getOriginalFilename().toString()
-            def fileType = fileName.split("\\.", -1)[fileName.split("\\.",-1).length-1]
+            def fileType = fileName.split('\\.', -1)[fileName.split('\\.',-1).length-1]
             def fileSize = fileToUpload.getSize()
             //create fmfile
             FmFolder fmFolder
             try {
                 fmFolder = FmFolder.get(parentId)
                 if (fmFolder == null) {
-                    logger.error("Folder with id " + parentId + " does not exist.")
-                    return "Folder with id " + parentId + " does not exist."
+                    logger.error('Folder with id ' + parentId + ' does not exist.')
+                    return 'Folder with id ' + parentId + ' does not exist.'
                 }
-            } catch (NumberFormatException ex) {
-                logger.error("Loading failed: "+e.toString())
-                return "Loading failed"
+            }
+            catch (NumberFormatException ex) {
+                logger.error('Loading failed: '+e.toString())
+                return 'Loading failed'
             }
 
             // Check if folder already contains file with same name.
@@ -61,55 +62,56 @@ class UploadFilesService {
             if (fmFile != null) {
                 fmFile.fileVersion++
                 fmFile.fileSize = fileSize
-                fmFile.linkUrl = ""
-                logger.info("File = " + fileName + " (" + fmFile.id + ") - Existing")
-            } else {
+                fmFile.linkUrl = ''
+                logger.info('File = ' + fileName + ' (' + fmFile.id + ') - Existing')
+            }
+            else {
                 fmFile = new FmFile(
                     displayName: fileName,
                     originalName: fileName,
                     fileType: fileType,
                     fileSize: fileSize,
-                    filestoreLocation: "",
-                    filestoreName: "",
-                    linkUrl: ""
+                    filestoreLocation: '',
+                    filestoreName: '',
+                    linkUrl: ''
                 )
                 if (!fmFile.save(flush:true)) {
                     fmFile.errors.each {
-                        logger.error("File saving failed: "+it)
+                        logger.error('File saving failed: '+it)
                     }
-                    return "Loading failed: fmfile saving"
+                    return 'Loading failed: fmfile saving'
                 }
                 fmFolder.addToFmFiles(fmFile)
                 if (!fmFolder.save(flush:true)) {
                     fmFolder.errors.each {
-                        logger.error("Folder saving failed: "+it)
+                        logger.error('Folder saving failed: '+it)
                     }
-                    return "Loading failed: fmfolder saving"
+                    return 'Loading failed: fmfolder saving'
                 }
             }
             fmFile.filestoreLocation = parentId
-            fmFile.filestoreName = fmFile.id + "-" + fmFile.fileVersion + "." + fmFile.fileType;
+            fmFile.filestoreName = fmFile.id + '-' + fmFile.fileVersion + '.' + fmFile.fileType
             if (!fmFile.save(flush:true)) {
                 fmFile.errors.each {
-                    logger.error("File saving failed: "+it)
+                    logger.error('File saving failed: '+it)
                 }
-                return "Loading failed: file saving"
+                return 'Loading failed: file saving'
              }
-            logger.info("File = " + fmFile.filestoreName + " (" + fileName + ") - Stored")
+            logger.info('File = ' + fmFile.filestoreName + ' (' + fileName + ') - Stored')
 
             def useMongo=Holders.config.transmartproject.mongoFiles.enableMongo
             if(!useMongo){
                 logger.info "Writing to filestore file '" + filestoreDirectory + File.separator + parentId + File.separator + fmFile.filestoreName + "'"
-                File filestoreDir = new File(filestoreDirectory + File.separator + parentId);
+                File filestoreDir = new File(filestoreDirectory + File.separator + parentId)
                 if (!filestoreDir.exists()) {
                     if (!filestoreDir.mkdirs()) {
-                        logger.error("unable to create filestoredir " + filestoreDir.getPath());
-                        return "Loading failed: unable to create filestoredir";
+                        logger.error('unable to create filestoredir ' + filestoreDir.getPath())
+                        return 'Loading failed: unable to create filestoredir'
                     }
                 }
                 OutputStream outputStream = new FileOutputStream(new File(filestoreDirectory + File.separator + parentId + File.separator + fmFile.filestoreName))
-                logger.info "Copying from fileToUpload "+fileToUpload
-                logger.info "Create outputStream ${outputStream}"
+                logger.info 'Copying from fileToUpload '+fileToUpload
+                logger.info 'Create outputStream ' + outputStream + ''
                 if(outputStream != null) {
                     fileBytes = new byte[1024]
                     int nread
@@ -117,16 +119,17 @@ class UploadFilesService {
                     while((nread = inputStream.read(fileBytes)) != -1) {
                         outputStream.write(fileBytes,0,nread)
                     }
-                    outputStream.close();
+                    outputStream.close()
                     fmFolderService.indexFile(fmFile)
-                    logger.info("File successfully loaded: "+fmFile.id)
-                    return "File successfully loaded"
+                    logger.info('File successfully loaded: '+fmFile.id)
+                    return 'File successfully loaded'
                 }
                 else {
-                    logger.error "Unable to write to filestoreDirectory "+filestoreDirectory
-                    return "Unable to write to filestoreDirectory"
+                    logger.error 'Unable to write to filestoreDirectory '+filestoreDirectory
+                    return 'Unable to write to filestoreDirectory'
                 }
-            } else {
+            }
+            else {
                     if(Holders.config.transmartproject.mongoFiles.useDriver){
                     MongoClient mongo = new MongoClient(Holders.config.transmartproject.mongoFiles.dbServer,
                                                         Holders.config.transmartproject.mongoFiles.dbPort)
@@ -137,15 +140,16 @@ class UploadFilesService {
                     file.save()
                     mongo.close()
                     fmFolderService.indexFile(fmFile)
-                    logger.info("File successfully loaded: "+fmFile.id)
-                    return "File successfully loaded"
-                }else{
+                    logger.info('File successfully loaded: '+fmFile.id)
+                    return 'File successfully loaded'
+                }
+                else{
                     def apiURL = Holders.config.transmartproject.mongoFiles.apiURL
                     def apiKey = Holders.config.transmartproject.mongoFiles.apiKey
-                    def http = new HTTPBuilder( apiURL+"insert/"+fmFile.filestoreName )
+                    def http = new HTTPBuilder( apiURL+'insert/'+fmFile.filestoreName )
                     http.request(Method.POST) {request ->
                         headers.'apikey' = MongoUtils.hash(apiKey)
-                        requestContentType: "multipart/form-data"
+                        requestContentType: 'multipart/form-data'
                         MultipartEntity multiPartContent = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE)
                         multiPartContent.addPart(fmFile.filestoreName,
                                                  new InputStreamBody(fileToUpload.inputStream,
@@ -157,24 +161,25 @@ class UploadFilesService {
                         response.success = { resp ->
                             if(resp.status < 400){
                                 fmFolderService.indexFile(fmFile)
-                                logger.info("File successfully loaded: "+fmFile.id)
-                                return "File successfully loaded"
+                                logger.info('File successfully loaded: '+fmFile.id)
+                                return 'File successfully loaded'
                             }
                         }
 
                         response.failure = { resp ->
-                            logger.error("Problem during connection to API: "+resp.status)
+                            logger.error('Problem during connection to API: '+resp.status)
                             if(fmFile!=null) fmFile.delete()
                             if(resp.status ==404){
-                                return "Problem during connection to API"
+                                return 'Problem during connection to API'
                             }
-                            return "Loading failed"
+                            return 'Loading failed'
                         }
                     }
                 }
             }
-        }catch(Exception e){
-            logger.error("transfer error: "+e.toString())
+        }
+        catch(Exception e){
+            logger.error('transfer error: '+e.toString())
             if(fmFile != null) fmFile.delete()
         }
     }

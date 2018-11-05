@@ -22,7 +22,7 @@ class AmTagDisplayValue implements Serializable {
             uniqueId = objectUid
         }
 
-        return uniqueId;
+        return uniqueId
     }
 
     String getCodeName() {
@@ -30,7 +30,7 @@ class AmTagDisplayValue implements Serializable {
             codeName = displayValue
         }
 
-        return codeName;
+        return codeName
     }
 
 
@@ -38,8 +38,8 @@ class AmTagDisplayValue implements Serializable {
         table 'am_tag_display_vw'
         version false
         cache true
-        sort "value"
-        id composite: ["subjectUid", "objectUid", "amTagItem"]
+        sort 'value'
+        id composite: ['subjectUid', 'objectUid', 'amTagItem']
         amTagItem column: 'tag_item_id'
 
     }
@@ -67,11 +67,11 @@ class AmTagDisplayValue implements Serializable {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Subject UID: ").append(subjectUid).append(", ");
-        sb.append("Object UID: ").append(objectUid).append(", ");
-        sb.append("Display Value: ").append(displayValue);
-        return sb.toString();
+        StringBuilder sb = new StringBuilder()
+        sb.append('Subject UID: ').append(subjectUid).append(', ')
+        sb.append('Object UID: ').append(objectUid).append(', ')
+        sb.append('Display Value: ').append(displayValue)
+        return sb.toString()
     }
 
 }

@@ -12,15 +12,14 @@ class AmTagAssociation implements Serializable {
         table 'am_tag_association'
         version false
         cache true
-        sort "tagTemplateName"
-        id composite: ["objectUid", "subjectUid"]
+        sort 'tagTemplateName'
+        id composite: ['objectUid', 'subjectUid']
 //		amTagItem column: 'tag_item_id', insert: "false", update: "false"
 
     }
 
 
-    static constraints =
-            {
+    static constraints = {
             }
 
     static AmTagAssociation get(String objectUid, Long tagItemId, String subjectUid) {
@@ -37,10 +36,10 @@ class AmTagAssociation implements Serializable {
      * override display
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("objectType: ").append(this.objectType).append(", subjectUid: ").append(this.subjectUid);
-        sb.append(", objectUid: ").append(this.objectUid).append(", tagItemId: ").append(this.tagItemId.toString());
-        return sb.toString();
+        StringBuffer sb = new StringBuffer()
+        sb.append('objectType: ').append(this.objectType).append(', subjectUid: ').append(this.subjectUid)
+        sb.append(', objectUid: ').append(this.objectUid).append(', tagItemId: ').append(this.tagItemId.toString())
+        return sb.toString()
     }
 
 

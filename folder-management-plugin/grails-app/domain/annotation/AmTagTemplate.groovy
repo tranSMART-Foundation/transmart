@@ -16,7 +16,7 @@ class AmTagTemplate {
         table 'am_tag_template'
         version false
         cache true
-        sort "tagTemplateName"
+        sort 'tagTemplateName'
         id column: 'tag_template_id', generator: 'sequence', params: [sequence: 'AMAPP.SEQ_AMAPP_DATA_ID']
 //		amTagItems joinTable: [name: 'tag_template_item_def',  key:'tag_template_id', column: 'tag_item_id'], 
         amTagItems lazy: false
@@ -34,9 +34,9 @@ class AmTagTemplate {
      * override display
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("ID: ").append(this.id).append(", Template Name: ").append(this.tagTemplateName);
-        sb.append(", Template Type: ").append(this.tagTemplateType);
-        return sb.toString();
+        StringBuffer sb = new StringBuffer()
+        sb.append('ID: ').append(this.id).append(', Template Name: ').append(this.tagTemplateName)
+        sb.append(', Template Type: ').append(this.tagTemplateType)
+        return sb.toString()
     }
 }

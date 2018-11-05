@@ -16,10 +16,12 @@ class FmFolderJob {
             if (startDelay instanceof String) {
                 try {
                     startDelay = Integer.parseInt(startDelay)
-                } catch (NumberFormatException nfe) {
-                    logger.error("Folder job not initialized. Configuration not readable")
                 }
-            } else {
+                catch (NumberFormatException nfe) {
+                    logger.error('Folder job not initialized. Configuration not readable')
+                }
+            }
+            else {
                 startDelay = null
             }
             cron name: 'FmFolderJobTrigger',
@@ -30,6 +32,6 @@ class FmFolderJob {
     }
 
     def execute() {
-        fmFolderService.importFiles();
+        fmFolderService.importFiles()
     }
 }

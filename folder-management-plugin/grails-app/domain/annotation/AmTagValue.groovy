@@ -16,17 +16,18 @@ class AmTagValue {
     String getUniqueId() {
         if (uniqueId == null) {
             if (id) {
-                AmData data = AmData.get(id);
+                AmData data = AmData.get(id)
                 if (data != null) {
                     uniqueId = data.uniqueId
-                    return data.uniqueId;
+                    return data.uniqueId
                 }
-                return null;
-            } else {
-                return null;
+                return null
+            }
+            else {
+                return null
             }
         }
-        return uniqueId;
+        return uniqueId
     }
 
     /**
@@ -35,12 +36,12 @@ class AmTagValue {
      * @return tagValue with matching uniqueId or null, if match not found.
      */
     static AmTagValue findByUniqueId(String uniqueId) {
-        AmTagValue tagValue;
-        AmData data = AmData.findByUniqueId(uniqueId);
+        AmTagValue tagValue
+        AmData data = AmData.findByUniqueId(uniqueId)
         if (data != null) {
-            tagValue = AmTagValue.get(data.id);
+            tagValue = AmTagValue.get(data.id)
         }
-        return tagValue;
+        return tagValue
     }
 
 
@@ -48,7 +49,7 @@ class AmTagValue {
         table 'am_tag_value'
         version false
         cache true
-        sort "value"
+        sort 'value'
         id column: 'tag_value_id', generator: 'sequence', params: [sequence: 'AMAPP.SEQ_AMAPP_DATA_ID']
 //		amTagItem joinTable: [name: 'am_tag_template',  key:'tag_item_id', column: 'tag_value_id'], lazy: false
 //		amTagItem column: 'tag_item_id'
