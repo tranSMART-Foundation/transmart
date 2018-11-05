@@ -38,17 +38,19 @@ class ConceptCode {
     String getUniqueId() {
         if (uniqueId == null) {
             if (id) {
-                BioData data = BioData.get(id);
+                BioData data = BioData.get(id)
                 if (data != null) {
                     uniqueId = data.uniqueId
-                    return data.uniqueId;
+                    return data.uniqueId
                 }
-                return null;
-            } else {
-                return null;
+                return null
             }
-        } else {
-            return uniqueId;
+            else {
+                return null
+            }
+        }
+        else {
+            return uniqueId
         }
     }
 
@@ -58,11 +60,11 @@ class ConceptCode {
 * @return concept code with matching uniqueId or null, if match not found.
 */
     static ConceptCode findByUniqueId(String uniqueId) {
-        ConceptCode cc;
-        BioData bd = BioData.findByUniqueId(uniqueId);
+        ConceptCode cc
+        BioData bd = BioData.findByUniqueId(uniqueId)
         if (bd != null) {
-            cc = ConceptCode.get(bd.id);
+            cc = ConceptCode.get(bd.id)
         }
-        return cc;
+        return cc
     }
 }

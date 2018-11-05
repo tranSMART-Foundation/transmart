@@ -84,8 +84,8 @@ class BioAssayAnalysisDataTea implements IExcelProfile {
      * get top analysis data records for the indicated analysis
      */
     def static getTop50AnalysisDataForAnalysis(Long analysisId) {
-        def query = "SELECT DISTINCT baad, baad_bm FROM org.transmart.biomart.BioAssayAnalysisDataTea baad JOIN baad.featureGroup.markers baad_bm  WHERE baad.analysis.id =:aid and baad.teaRank<=50 ORDER BY baad.teaRank DESC";
-        return BioAssayAnalysisDataTea.executeQuery(query, [aid: analysisId], [max: 50]);
+        def query = 'SELECT DISTINCT baad, baad_bm FROM org.transmart.biomart.BioAssayAnalysisDataTea baad JOIN baad.featureGroup.markers baad_bm  WHERE baad.analysis.id =:aid and baad.teaRank<=50 ORDER BY baad.teaRank DESC'
+        return BioAssayAnalysisDataTea.executeQuery(query, [aid: analysisId], [max: 50])
     }
     /**
      * Get values to Export to Excel

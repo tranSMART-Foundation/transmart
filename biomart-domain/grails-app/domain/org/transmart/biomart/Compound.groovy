@@ -38,13 +38,13 @@ class Compound {
 
     def getName() {
         if (genericName != null)
-            return genericName;
+            return genericName
         if (brandName != null)
-            return brandName;
+            return brandName
         if (number != null)
-            return number;
+            return number
         if (cntoNumber != null)
-            return cntoNumber;
+            return cntoNumber
     }
 
     static mapping = {

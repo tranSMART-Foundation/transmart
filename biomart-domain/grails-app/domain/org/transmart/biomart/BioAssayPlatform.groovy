@@ -53,23 +53,25 @@ class BioAssayPlatform {
     String getUniqueId() {
         if (uniqueId == null) {
             if (id) {
-                BioData data = BioData.get(id);
+                BioData data = BioData.get(id)
                 if (data != null) {
                     uniqueId = data.uniqueId
-                    return data.uniqueId;
+                    return data.uniqueId
                 }
-                return "BAP:"+accession;
-            } else {
-                return null;
+                return 'BAP:'+accession
             }
-        } else {
-            return uniqueId;
+            else {
+                return null
+            }
+        }
+        else {
+            return uniqueId
         }
     }
 
 
     String getFullName() {
-        return (platformType + "/" + platformTechnology + "/" + vendor + "/" + name)
+        return (platformType + '/' + platformTechnology + '/' + vendor + '/' + name)
 
     }
 
@@ -80,11 +82,11 @@ class BioAssayPlatform {
  */
 
     static BioAssayPlatform findByUniqueId(String uniqueId) {
-        BioAssayPlatform cc;
-        BioData bd = BioData.findByUniqueId(uniqueId);
+        BioAssayPlatform cc
+        BioData bd = BioData.findByUniqueId(uniqueId)
         if (bd != null) {
-            cc = BioAssayPlatform.get(bd.id);
+            cc = BioAssayPlatform.get(bd.id)
         }
-        return cc;
+        return cc
     }
 }

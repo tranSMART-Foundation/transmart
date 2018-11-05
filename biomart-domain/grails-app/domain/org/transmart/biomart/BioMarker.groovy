@@ -45,11 +45,11 @@ class BioMarker implements IExcelProfile {
     static transients = ['uniqueId']
     
     def isGene() {
-        return "GENE".equalsIgnoreCase(bioMarkerType)
+        return 'GENE'.equalsIgnoreCase(bioMarkerType)
     }
 
     def isPathway() {
-        return "PATHWAY".equalsIgnoreCase(bioMarkerType)
+        return 'PATHWAY'.equalsIgnoreCase(bioMarkerType)
     }
 
     static mapping = {
@@ -91,26 +91,28 @@ class BioMarker implements IExcelProfile {
     String getUniqueId() {
         if (uniqueId == null) {
             if (id) {
-                BioData data = BioData.get(id);
+                BioData data = BioData.get(id)
                 if (data != null) {
                     uniqueId = data.uniqueId
-                    return data.uniqueId;
+                    return data.uniqueId
                 }
-                return null;
-            } else {
-                return null;
+                return null
             }
-        } else {
-            return uniqueId;
+            else {
+                return null
+            }
+        }
+        else {
+            return uniqueId
         }
     }
     
     static BioMarker findByUniqueId(String uniqueId) {
-        BioMarker cc;
-        BioData bd = BioData.findByUniqueId(uniqueId);
+        BioMarker cc
+        BioData bd = BioData.findByUniqueId(uniqueId)
         if (bd != null) {
-            cc = BioMarker.get(bd.id);
+            cc = BioMarker.get(bd.id)
         }
-        return cc;
+        return cc
     }
 }

@@ -100,7 +100,7 @@ class Experiment implements IExcelProfile {
         compounds.each {
             if (it.getName() != null) {
                 if (compoundNames.length() > 0) {
-                    compoundNames.append("; ")
+                    compoundNames.append('; ')
                 }
                 compoundNames.append(it.getName())
             }
@@ -113,7 +113,7 @@ class Experiment implements IExcelProfile {
         diseases.each {
             if (it.disease != null) {
                 if (diseaseNames.length() > 0) {
-                    diseaseNames.append("; ")
+                    diseaseNames.append('; ')
                 }
                 diseaseNames.append(it.disease)
             }
@@ -126,7 +126,7 @@ class Experiment implements IExcelProfile {
         organisms.each {
             if (it.name != null) {
                 if (taxNames.length() > 0) {
-                    taxNames.append("; ")
+                    taxNames.append('; ')
                 }
                 taxNames.append(it.name)
             }
@@ -150,23 +150,23 @@ class Experiment implements IExcelProfile {
 
     def getUniqueId() {
         if (uniqueIds != null && !uniqueIds.isEmpty())
-            return uniqueIds.iterator().next();
-        return null;
+            return uniqueIds.iterator().next()
+        return null
     }
 
     /**
      * hack to get around gorm inheritance bug
      */
     def getExpId() {
-        return this.getId();
+        return this.getId()
     }
 
     /**
      * override display
      */
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("id: ").append(getExpId()).append("; type: ").append(type).append("; title: ").append(title).append("; description: ").append(description).append("; accesion: ").append(accession);
-        return sb.toString();
+        StringBuilder sb = new StringBuilder()
+        sb.append('id: ').append(getExpId()).append('; type: ').append(type).append('; title: ').append(title).append('; description: ').append(description).append('; accesion: ').append(accession)
+        return sb.toString()
     }
 }
