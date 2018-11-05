@@ -76,7 +76,7 @@ def writeToFileHierarchy = { Set seenFiles, Item item, ItemRepository repos ->
             return false
         }
         if (stack.contains(it)) {
-            Log.err "Circular dependency: $stack and back to $it"
+            Log.err 'Circular dependency: {} and back to {}', stack, it
             return false
         }
         stack << it
@@ -86,7 +86,7 @@ def writeToFileHierarchy = { Set seenFiles, Item item, ItemRepository repos ->
                 return false
             }
             if (parent.owner != it.owner && it.type != 'GRANT') {
-                Log.warn "Cross schema dependency: ${(stack + parent).join(' -> ')}"
+                Log.warn 'Cross schema dependency: {}', (stack + parent).join(' -> ')
                 return true
             }
             return owner.call(parent, stack) /* owner is surrounding closure */
@@ -100,11 +100,11 @@ def writeToFileHierarchy = { Set seenFiles, Item item, ItemRepository repos ->
     }
 
     def getTargetForConstraint  = { RefConstraintItem constraintItem ->
-        new File(topDir, "${constraintItem.constraintTable.nameLower}.sql")
+        new File(topDir, '' + constraintItem.constraintTable.nameLower + '.sql')
     }
 
     def getTargetForIndex  = { IndexItem indexItem ->
-        new File(topDir, "${indexItem.indexTable.nameLower}.sql")
+        new File(topDir, '' + indexItem.indexTable.nameLower + '.sql')
     }
 
     def getTargetFileForSequence = { Item sequenceItem ->
@@ -121,43 +121,52 @@ def writeToFileHierarchy = { Set seenFiles, Item item, ItemRepository repos ->
 
     if (hasCrossDependency(item, new Stack())) {
         targetFile = new File(topDir, '_cross.sql')
-    } else if (item.type == 'TABLE') {
-        targetFile = new File(topDir, "${item.nameLower}.sql")
-    } else if (item.type == 'VIEW' || item.type == 'MATERIALIZED_VIEW') {
+    }
+    else if (item.type == 'TABLE') {
+        targetFile = new File(topDir, '' + item.nameLower + '.sql')
+    }
+    else if (item.type == 'VIEW' || item.type == 'MATERIALIZED_VIEW') {
         File viewsDir = new File(topDir, 'views')
         if (!viewsDir.exists()) {
             viewsDir.mkdir()
         }
-        targetFile = new File(viewsDir, "${item.nameLower}.sql")
-    } else if (item.type == 'FUNCTION' || item.type == 'PROCEDURE') {
+        targetFile = new File(viewsDir, '' + item.nameLower + '.sql')
+    }
+    else if (item.type == 'FUNCTION' || item.type == 'PROCEDURE') {
         File objectDir = new File(topDir, item.type.toLowerCase() + 's')
         if (!objectDir.exists()) {
             objectDir.mkdir()
         }
-        targetFile = new File(objectDir, "${item.nameLower}.sql")
-    } else if (item.type == 'TRIGGER') {
+        targetFile = new File(objectDir, '' + item.nameLower + '.sql')
+    }
+    else if (item.type == 'TRIGGER') {
         targetFile = getTargetFileForTrigger item
-    } else if (item.type == 'SEQUENCE') {
+    }
+    else if (item.type == 'SEQUENCE') {
         targetFile = getTargetFileForSequence item
-    } else if (item.type == 'REF_CONSTRAINT') {
+    }
+    else if (item.type == 'REF_CONSTRAINT') {
         targetFile = getTargetForConstraint item
-    } else if (item.type == 'INDEX') {
+    }
+    else if (item.type == 'INDEX') {
         targetFile = getTargetForIndex item
-    } else {
+    }
+    else {
         targetFile = new File(topDir, '_misc.sql')
     }
 
-    out.println "Writing ${item.type} ${item.owner}.${item.name} to $targetFile"
+    out.println 'Writing ' + item.type + ' ' + item.owner + '.' + item.name + ' to $targetFile'
     Writer writer = targetFile.newWriter 'UTF-8', seenFiles.contains(targetFile)
     seenFiles << targetFile
 
     repos.addFileAssignment item, targetFile
 
     try {
-        writer << "--\n-- Type: ${item.type}; Owner: ${item.owner}; Name: ${item.name}\n--"
+        writer << '--\n-- Type: ' + item.type + '; Owner: ' + item.owner + '; Name: ' + item.name + '\n--'
         writer << item.data.stripIndent().replaceAll(/(?m)[ \t]+$/, '')
         writer << '\n'
-    } finally {
+    }
+    finally {
         writer.close()
     }
 }
@@ -170,15 +179,16 @@ def globalWriteToHierarchy = { Set seenFiles, Item item, ItemRepository repos ->
 
     File targetFile = new File(topDir, item.nameLower + '.sql')
 
-    out.println "Writing ${item.type} ${item.name} to $targetFile"
+    out.println 'Writing ' + item.type + ' ' + item.name + ' to $targetFile'
     Writer writer = targetFile.newWriter 'UTF-8', seenFiles.contains(targetFile)
     seenFiles << targetFile
 
     try {
-        writer << "--\n-- Type: ${item.type}; Name: ${item.name}\n--"
+        writer << '--\n-- Type: ' + item.type + '; Name: ' + item.name + '\n--'
         writer << item.data.stripIndent()
         writer << '\n'
-    } finally {
+    }
+    finally {
         writer.close()
     }
 }
@@ -272,7 +282,7 @@ class ItemFactory {
                 obj = new GrantedItem()
                 break
             case null:
-                throw new RuntimeException("No name")
+                throw new RuntimeException('No name')
             case 'MATERIALIZED VIEW':
                 // the type is actually without underscore, but the fetch DDL
                 // functions expect an underscore
@@ -309,7 +319,7 @@ class DDLFetcher {
             return ''
         }
 
-        def res = sql.firstRow "SELECT DBMS_METADATA.GET_DDL($item.type, $item.name, $item.owner) FROM DUAL"
+        def res = sql.firstRow 'SELECT DBMS_METADATA.GET_DDL($item.type, $item.name, $item.owner) FROM DUAL'
         Clob clob = res[0]
         clob.characterStream.text
     }
@@ -321,19 +331,23 @@ class DDLFetcher {
             if (item.owner) {
                 res = sql.firstRow """SELECT DBMS_METADATA.GET_GRANTED_DDL(
                         $item.type, $item.name, $item.owner) FROM DUAL"""
-            } else {
-                res = sql.firstRow "SELECT DBMS_METADATA.GET_GRANTED_DDL($item.type, $item.name) FROM DUAL"
+            }
+            else {
+                res = sql.firstRow 'SELECT DBMS_METADATA.GET_GRANTED_DDL($item.type, $item.name) FROM DUAL'
             }
             Clob clob = res[0]
             return clob.characterStream.text
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             if (e.vendorCode == 31608) {
                 //ignore, just no dependent objects of this type exist
                 return ''
-            } else {
+            }
+            else {
                 throw e
             }
-        } finally {
+        }
+        finally {
             SQL_LOGGER.level = Level.WARNING
         }
     }
@@ -387,14 +401,13 @@ class ObjectFinder {
     }
 
     private find_dba_dependencies(String owner) {
-        out.println "Fetching from dba_dependencies, owner $owner..."
+        out.println 'Fetching from dba_dependencies, owner $owner...'
         // skip objects of type 'TYPE BODY' as dumping the type already dumps its body
         sql.eachRow """SELECT NAME, TYPE, REFERENCED_OWNER, REFERENCED_NAME, REFERENCED_TYPE
                 FROM dba_dependencies WHERE owner = $owner
                 AND referenced_owner <> 'SYS' AND referenced_owner <> 'PUBLIC'
                 AND type <> 'TYPE BODY' AND name NOT LIKE 'BIN\$%'
-                AND referenced_name NOT LIKE 'BIN\$%'""",
-        {
+                AND referenced_name NOT LIKE 'BIN\$%'""", {
             def parent = factory.createItem owner: it['REFERENCED_OWNER'],
                                             type:  it['REFERENCED_TYPE'],
                                             name:  it['REFERENCED_NAME']
@@ -406,7 +419,7 @@ class ObjectFinder {
     }
 
     private find_dba_objects(String owner) {
-        out.println "Fetching from dba_objects, owner $owner..."
+        out.println 'Fetching from dba_objects, owner $owner...'
         sql.eachRow """SELECT object_type, object_name,
                 dbms_metadata.get_ddl(object_type, object_name, $owner) as ddl
                 FROM dba_objects
@@ -423,7 +436,7 @@ class ObjectFinder {
     }
 
     private find_referential_constraints(String owner) {
-        out.println "Fetching from dba_constraints, owner $owner..."
+        out.println 'Fetching from dba_constraints, owner $owner...'
         sql.eachRow """SELECT
                            C.owner, C.constraint_name, C.table_name,
                            C.r_owner, C.r_constraint_name, D.table_name AS r_table_name,
@@ -454,7 +467,7 @@ class ObjectFinder {
     }
 
     private find_indexes(String owner) {
-        out.println "Fetching from dba_indexes, owner $owner..."
+        out.println 'Fetching from dba_indexes, owner $owner...'
         sql.eachRow """SELECT
                            owner, index_name, table_owner, table_name, table_type,
                            dbms_metadata.get_ddl('INDEX', index_name, owner) as ddl
@@ -476,7 +489,7 @@ class ObjectFinder {
     }
 
     private find_users(List<String> users) {
-        out.println "Fetching from dba_users..."
+        out.println 'Fetching from dba_users...'
         sql.eachRow """SELECT username, dbms_metadata.get_ddl('USER', username) as ddl FROM dba_users""", {
             if (!users.contains(it['USERNAME'])) {
                 return
@@ -497,17 +510,17 @@ class ObjectFinder {
 }
 
 def setupTransformParams(Sql sql) {
-    out.println "Executing setup statements..."
+    out.println 'Executing setup statements...'
     sql.execute '''
 BEGIN
-dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'SEGMENT_ATTRIBUTES', TRUE);
-dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'STORAGE', FALSE);
-dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'TABLESPACE', TRUE);
-dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'SQLTERMINATOR', TRUE);
-dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'CONSTRAINTS', TRUE);
-dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'REF_CONSTRAINTS', FALSE);
-dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'SIZE_BYTE_KEYWORD', TRUE);
-END;
+dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'SEGMENT_ATTRIBUTES', TRUE)
+dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'STORAGE', FALSE)
+dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'TABLESPACE', TRUE)
+dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'SQLTERMINATOR', TRUE)
+dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'CONSTRAINTS', TRUE)
+dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'REF_CONSTRAINTS', FALSE)
+dbms_metadata.set_transform_param(DBMS_METADATA.SESSION_TRANSFORM, 'SIZE_BYTE_KEYWORD', TRUE)
+END
 '''
 }
 
@@ -527,7 +540,8 @@ def seenFiles = new HashSet()
 if (options.g) {
      objectFinder.findGlobal users
     sorter = globalWriteToHierarchy.curry seenFiles
-} else {
+}
+else {
     users.each {
         objectFinder.findAll it
     }
@@ -539,13 +553,13 @@ if (options.g) {
                     writeToFileHierarchy.curry(seenFiles)))
 }
 
-out.println "Start writing files"
+out.println 'Start writing files'
 repository.writeWithSorter sorter
 
 if (!options.g) {
     users.each { String user ->
         File out = new File(user.toLowerCase(Locale.ENGLISH), 'items.json')
-        out.println "Writing item repository file for $user to $out"
+        out.println 'Writing item repository file for {} to {}', user, out
         JacksonMapperProducer.mapper.writeValue out, repository.forUser(user)
     }
 }
