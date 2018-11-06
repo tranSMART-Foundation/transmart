@@ -3,7 +3,7 @@ package com.thomsonreuters.lsps.transmart
 import com.transmart.util.FileWriterUtil
 
 import grails.converters.JSON
-@Slf4j('logger')
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -16,13 +16,13 @@ class MetacoreEnrichmentController {
 	def dataExportService
 	
 	def index = {
-		render (view:"index", model:[])
+		render (view:'index', model:[])
 	}
 	
 	def prepareData = {
 		params['jobName'] = "${springSecurityService.getPrincipal().username}-metacoreEnrichment-${UUID.randomUUID() as String}"
 		
-		def jobData = RModulesService.prepareDataForExport(springSecurityService.getPrincipal().username, params);
+		def jobData = RModulesService.prepareDataForExport(springSecurityService.getPrincipal().username, params)
 		jobData['subsetSelectedFilesMap'] = [
 			subset1: ['CLINICAL.TXT', 'MRNA_DETAILED.TXT'], 
 			subset2: ['CLINICAL.TXT', 'MRNA_DETAILED.TXT']
@@ -31,11 +31,11 @@ class MetacoreEnrichmentController {
 		jobData['pivotData'] = false
 		jobData['jobTmpDirectory'] = grailsApplication.config.com.recomdata.plugins.tempFolderDirectory + '/' + params['jobName']
 		
-		FileWriterUtil f = new FileWriterUtil();
+		FileWriterUtil f = new FileWriterUtil()
 		File baseDir = new File(grailsApplication.config.com.recomdata.plugins.tempFolderDirectory)
 		f.createDir(baseDir, params['jobName'])
 		
-		def res = dataExportService.exportData(jobData);
+		def res = dataExportService.exportData(jobData)
 		// for now, just first subset
 		def mrnaFilename = "${jobData['jobTmpDirectory']}/${res[0]}_${jobData.studyAccessions[0]}/mRNA/Processed_Data/mRNA.trans"
 		def retVal = ['mrnaFilename': mrnaFilename]
@@ -73,7 +73,7 @@ class MetacoreEnrichmentController {
 					z_score = Double.parseDouble(values[7])
 				}
 				catch (e) {
-					logger.debug "Can not parse z_score ${values[7]}"
+					logger.debug 'Can not parse z_score ' + values[7] + ''
 				}
 				if (values[11] && Math.abs(z_score) >= threshold) geneList << values[11]
 			}
@@ -86,7 +86,7 @@ class MetacoreEnrichmentController {
 			Data: [geneList as List]	
 		]
 		
-		logger.info "Running enrichment for ${geneList.size()} genes; |z| >= ${threshold}"
+		logger.info 'Running enrichment for ' + geneList.size() + ' genes; |z| >= ' + threshold + ''
 		
 		render metacoreEnrichmentService.getEnrichmentByMaps(cohortData, metacoreParams) as JSON
 	}
@@ -99,7 +99,7 @@ class MetacoreEnrichmentController {
 			Data: [params.IdList as List]
 		]
 		
-		logger.info "Running enrichment for ${params.IdList.size()} genes (IdType passed: ${params.IdType})"
+		logger.info 'Running enrichment for ' + params.IdList.size() + ' genes (IdType passed: ' + params.IdType + ')'
 		
 		render metacoreEnrichmentService.getEnrichmentByMaps(cohortData, metacoreParams) as JSON
 	}
@@ -119,22 +119,22 @@ class MetacoreEnrichmentController {
 		def settings = params.settings
 		
 		if (params.containsKey('mode')) {
-			logger.info "MC Settings - Setting mode: ${params.mode}"
+			logger.info 'MC Settings - Setting mode: ' + params.mode + ''
 			metacoreEnrichmentService.setMetacoreSettingsMode(params.mode)
 		}	
 		
 		if (params.containsKey('baseUrl')) {
-			logger.info "MC Settings - Setting baseUrl: ${params.baseUrl}"
+			logger.info 'MC Settings - Setting baseUrl: ' + params.baseUrl + ''
 			metacoreEnrichmentService.setMetacoreBaseUrl(params.baseUrl)
 		}	
 		
 		if (params.containsKey('login')) {
-			logger.info "MC Settings - Setting login: ${params.login}"
+			logger.info 'MC Settings - Setting login: ' + params.login + ''
 			metacoreEnrichmentService.setMetacoreLogin(params.login)
 		}
 		
 		if (params.containsKey('password')) {
-			logger.info "MC Settings - Setting new password"
+			logger.info 'MC Settings - Setting new password'
 			metacoreEnrichmentService.setMetacorePassword(params.password)
 		}
 		
@@ -148,22 +148,22 @@ class MetacoreEnrichmentController {
 
         ['metacoreEnrichment.js', 'metacoreEnrichmentDisplay.js', 'raphael-min.js'].each {
             JSONObject aScript = new JSONObject()
-            aScript.put("path", "${servletContext.contextPath}${pluginContextPath}/js/metacore/${it}" as String)
-            aScript.put("type", "script")
+            aScript.put('path', '' + servletContext.contextPath + '' + pluginContextPath + '/js/metacore/' + it + '' as String)
+            aScript.put('type', 'script')
             rows.put(aScript)
         }
         ['metacore.css'].each {
             JSONObject aStylesheet = new JSONObject()
-            aStylesheet.put("path", "${servletContext.contextPath}${pluginContextPath}/css/${it}" as String)
-            aStylesheet.put("type", "stylesheet")
+            aStylesheet.put('path', '' + servletContext.contextPath + '' + pluginContextPath + '/css/' + it + '' as String)
+            aStylesheet.put('type', 'stylesheet')
             rows.put(aStylesheet)
         }
 
-        result.put("success", true)
-        result.put("totalCount", rows.size())
-        result.put("files", rows)
+        result.put('success', true)
+        result.put('totalCount', rows.size())
+        result.put('files', rows)
 
-        response.setContentType("text/json")
+        response.setContentType('text/json')
         response.outputStream << result.toString()
     }
 }
