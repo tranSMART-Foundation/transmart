@@ -46,11 +46,11 @@ final class RegionRowImpl extends AbstractDataRow implements RegionRow, BioMarke
 
     @Override
     public java.lang.String toString() {
-        return "RegionRowImpl{" +
-                "regionId=" + id +
-                ", regionName=" + name +
-                ", data=" + data.toListString() +
-                ", assayIndexMap=" + assayIndexMap.toMapString() +
-                '}';
+        return 'RegionRowImpl{' +
+                'regionId=' + id +
+                ', regionName=' + name +
+                ', data=' + data.toListString() +
+                ', assayIndexMap=' + assayIndexMap.toMapString() +
+                '}'
     }
 }

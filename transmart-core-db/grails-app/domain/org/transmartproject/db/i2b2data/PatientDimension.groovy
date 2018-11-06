@@ -96,7 +96,7 @@ class PatientDimension implements Patient {
     @Override
     String getInTrialId() {
         if (sourcesystemCd == null) {
-            return null;
+            return null
         }
         (sourcesystemCd.split(/:/, 2) as List)[1] /* cast to avoid exception */
     }

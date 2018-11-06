@@ -31,7 +31,8 @@ class GormWorkarounds {
                     session)
             builder.criteriaMetaClass = GroovySystem.metaClassRegistry.
                     getMetaClass(builder.criteria.getClass())
-        } else {
+        }
+        else {
             builder.createCriteriaInstance()
         }
 
@@ -74,6 +75,6 @@ class GormWorkarounds {
                 detachedCriteria,
                 queryableCriteria)
 
-        detachedCriteria;
+        detachedCriteria
     }
 }

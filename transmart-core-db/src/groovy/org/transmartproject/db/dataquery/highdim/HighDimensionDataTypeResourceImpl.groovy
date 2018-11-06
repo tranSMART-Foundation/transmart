@@ -185,7 +185,7 @@ class HighDimensionDataTypeResourceImpl implements HighDimensionDataTypeResource
     @Override
     List<String> searchAnnotation(String concept_code, String search_term, String search_property) {
         if (!getSearchableAnnotationProperties().contains(search_property))
-            throw new InvalidArgumentsException("Expected search_property to be one of ${getSearchableAnnotationProperties()}, got $search_property")
+            throw new InvalidArgumentsException('Expected search_property to be one of ' + getSearchableAnnotationProperties() + ', got ' + search_property + '')
         module.searchAnnotation(concept_code, search_term, search_property)
     }
 
@@ -266,27 +266,27 @@ class HighDimensionDataTypeResourceImpl implements HighDimensionDataTypeResource
                     case ConstraintByOmicsValue.Operator.BETWEEN:
                         def limits = constraint.constraint.split(':')*.toDouble()
                         return {value -> limits[0] <= value && value <= limits[1]}
-                        break;
+                        break
                     case ConstraintByOmicsValue.Operator.EQUAL_TO:
                         def limit = constraint.constraint.toDouble()
                         return {value -> limit == value}
-                        break;
+                        break
                     case ConstraintByOmicsValue.Operator.GREATER_OR_EQUAL_TO:
                         def limit = constraint.constraint.toDouble()
                         return {value -> limit <= value}
-                        break;
+                        break
                     case ConstraintByOmicsValue.Operator.GREATER_THAN:
                         def limit = constraint.constraint.toDouble()
                         return {value -> limit < value}
-                        break;
+                        break
                     case ConstraintByOmicsValue.Operator.LOWER_OR_EQUAL_TO:
                         def limit = constraint.constraint.toDouble()
                         return {value -> limit >= value}
-                        break;
+                        break
                     case ConstraintByOmicsValue.Operator.LOWER_THAN:
                         def limit = constraint.constraint.toDouble()
                         return {value -> limit > value}
-                        break;
+                        break
                 }
             }
             else
@@ -299,8 +299,8 @@ class HighDimensionDataTypeResourceImpl implements HighDimensionDataTypeResource
 
     @Override
     public String toString() {
-        return "HighDimensionDataTypeResourceImpl{dataTypeName=$dataTypeName, " +
-                "identity=${System.identityHashCode(this)}"
+        return 'HighDimensionDataTypeResourceImpl{dataTypeName=' + dataTypeName + ', ' +
+                'identity=' + System.identityHashCode(this) + ''
     }
 
     boolean equals(o) {

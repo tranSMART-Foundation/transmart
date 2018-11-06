@@ -137,13 +137,13 @@ abstract class CollectingTabularResult<C, R extends DataRow>
 
         if (collectedEntries.size() > indicesList.size()) {
             throw new UnexpectedResultException(
-                    "Got more ${columnEntityName}s than expected in a row group. " +
-                            "This can generally only happen if primary keys on " +
-                            "the data table are not being enforced and the same " +
-                            "${columnEntityName} appears twice for same row " +
-                            "entity (current label for rows is " +
+                    'Got more ' + columnEntityName + 's than expected in a row group. ' +
+                            'This can generally only happen if primary keys on ' +
+                            'the data table are not being enforced and the same ' +
+                            '' + columnEntityName + ' appears twice for same row ' +
+                            'entity (current label for rows is ' +
                             "'$rowsDimensionLabel'). Collected " +
-                            "${columnEntityName}s for this row: $indicesList")
+                            '' + columnEntityName + 's for this row: ' + indicesList + '')
         }
 
         if (allowMissingColumns) {
@@ -159,25 +159,25 @@ abstract class CollectingTabularResult<C, R extends DataRow>
         // !allowMissingColumns
         Set columnsNotFound
         if (columnIdFromRow) {
-            Set expectedColumnIds = indicesList*.getAt("id") as Set
+            Set expectedColumnIds = indicesList*.getAt('id') as Set
             Set gottenColumnIds = collectedEntries.collect { row ->
                 columnIdFromRow.call(row)
             } as Set
             columnsNotFound = expectedColumnIds - gottenColumnIds
         }
 
-        String message = "Expected row group to be of size ${indicesList.size()}; " +
-                "got ${collectedEntries.size()} objects"
+        String message = 'Expected row group to be of size ' + indicesList.size() + '; ' +
+                'got ' + collectedEntries.size() + ' objects'
         if (columnsNotFound) {
-            message += ". ${columnEntityName.capitalize()} ids not found: " +
-                    "${columnsNotFound}"
+            message += '. ' + columnEntityName.capitalize() + ' ids not found: ' +
+                    '' + columnsNotFound + ''
         }
 
         throw new UnexpectedResultException(message)
     }
 
     protected Object getIndexObjectId(C object) {
-        object.getAt("id")
+        object.getAt('id')
     }
 
     private void addToCollectedEntries(List collectedEntries, Object row) {
@@ -195,18 +195,19 @@ abstract class CollectingTabularResult<C, R extends DataRow>
                 String rowAsString
                 try {
                     rowAsString = row.toString()
-                } catch (Exception e) {
-                    rowAsString = "<Could not convert row to string, " +
-                            "error was ${e.message}>"
                 }
-                throw new IllegalStateException("Starting at position " +
-                        "$startSize in the $columnEntityName list, could not " +
-                        "find $columnEntityName with id $currentColumnId. " +
-                        "Possible causes: repeated $columnEntityName for " +
-                        "the same row, bad order by clause in module " +
-                        "query or bad columnIdFromRow closure. " +
-                        "Row was: $rowAsString. " +
-                        "${columnEntityName.capitalize()} id list was " +
+                catch (Exception e) {
+                    rowAsString = '<Could not convert row to string, ' +
+                            'error was ' + e.message + '>'
+                }
+                throw new IllegalStateException('Starting at position ' +
+                        '' + startSize + ' in the ' + columnEntityName + ' list, could not ' +
+                        'find ' + columnEntityName + ' with id ' + currentColumnId + '. ' +
+                        'Possible causes: repeated ' + columnEntityName + ' for ' +
+                        'the same row, bad order by clause in module ' +
+                        'query or bad columnIdFromRow closure. ' +
+                        'Row was: ' + rowAsString + '. ' +
+                        '' + columnEntityName.capitalize() + ' id list was ' +
                         indicesList.collect { getIndexObjectId it })
             }
         }

@@ -40,10 +40,10 @@ import java.sql.DatabaseMetaData
 class DatabasePortabilityService {
 
     @Autowired
-    @Qualifier("dataSource")
+    @Qualifier('dataSource')
     DataSource dataSource
 
-    DatabaseType databaseType;
+    DatabaseType databaseType
 
     enum DatabaseType {
         POSTGRESQL,
@@ -57,8 +57,8 @@ class DatabasePortabilityService {
             case DatabaseType.ORACLE:
                 return oracleImpl()
             default:
-                throw new IllegalStateException("Should not reach this point. " +
-                        "Value of databaseType is $databaseType")
+                throw new IllegalStateException('Should not reach this point. ' +
+                        'Value of databaseType is ' + databaseType + '')
         }
     }
 
@@ -84,8 +84,8 @@ class DatabasePortabilityService {
 
     String createTopNQuery(String s) {
         runCorrectImplementation(
-                { "$s LIMIT ?" },
-                { "SELECT * FROM ($s) WHERE ROWNUM <= ?" }
+                { '' + s + ' LIMIT ?' },
+                { 'SELECT * FROM (' + s + ') WHERE ROWNUM <= ?' }
         )
     }
 
@@ -101,11 +101,11 @@ class DatabasePortabilityService {
      */
     String createPaginationQuery(String s, String rowNumberColName=null) {
         runCorrectImplementation(
-                /* PostgreSQL */
-                {
+                /* PostgreSQL */ {
                     if (rowNumberColName == null) {
-                        "$s LIMIT ? OFFSET ?"
-                    } else {
+                        '' + s + ' LIMIT ? OFFSET ?'
+                    }
+                    else {
                         """
                         SELECT
                             row_number() OVER () AS $rowNumberColName, *
@@ -115,11 +115,10 @@ class DatabasePortabilityService {
                         """
                     }
                 },
-                /* Oracle */
-                {
-                    String rowColumnFragment = ""
+                /* Oracle */ {
+                    String rowColumnFragment = ''
                     if (rowNumberColName != null) {
-                        rowColumnFragment = ", rnum AS $rowNumberColName"
+                        rowColumnFragment = ', rnum AS ' + rowNumberColName + ''
                     }
 
                     /* see http://www.oracle.com/technetwork/issue-archive/2006/06-sep/o56asktom-086197.html */
@@ -150,8 +149,8 @@ class DatabasePortabilityService {
 
     String toChar(String expr){
         runCorrectImplementation(
-                {"CAST($expr as character varying)"},
-                {"to_char($expr)"}
+                {'CAST(' + expr + ' as character varying)'},
+                {'to_char(' + expr + ')'}
         )
     }
 
@@ -179,7 +178,7 @@ class DatabasePortabilityService {
     String getNextSequenceValueSql(String schema, String sequenceName) {
         runCorrectImplementation(
                 { "SELECT nextval('${schema}.${sequenceName}')" },
-                { "SELECT ${schema}.${sequenceName}.nextval FROM DUAL" }
+                { 'SELECT ' + schema + '.' + sequenceName + '.nextval FROM DUAL' }
         )
     }
 
@@ -189,7 +188,8 @@ class DatabasePortabilityService {
         DatabaseMetaData metaData
         try {
             metaData = connection.metaData
-        } finally {
+        }
+        finally {
             connection.close()
         }
         def databaseName = metaData.databaseProductName.toLowerCase()
@@ -233,8 +233,8 @@ class DatabasePortabilityService {
             /* beware, if the second arg is not a string, then this implementation is not used! */
 
             if (!delegate.validateSimpleExpression()) {
-                throwRuntimeException(new IllegalArgumentException("Call to [like] with propertyName [" +
-                        propertyName + "] and value [" + propertyValue + "] not allowed here."));
+                throwRuntimeException(new IllegalArgumentException('Call to [like] with propertyName [' +
+                        propertyName + '] and value [' + propertyValue + '] not allowed here.'))
             }
 
             propertyName = delegate.calculatePropertyName propertyName

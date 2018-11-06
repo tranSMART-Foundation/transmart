@@ -40,11 +40,11 @@ class SimpleAnnotationConstraintFactory extends AbstractMethodBasedParameterFact
     }
 
     private def keyToPath(String concept_key) {
-        String fullname = concept_key.substring(concept_key.indexOf("\\", 2), concept_key.length());
-        String path = fullname;
-        if (!fullname.endsWith("\\")) {
-            path = path + "\\";
+        String fullname = concept_key.substring(concept_key.indexOf('\\', 2), concept_key.length())
+        String path = fullname
+        if (!fullname.endsWith('\\')) {
+            path = path + '\\'
         }
-        return path;
+        return path
     }
 }

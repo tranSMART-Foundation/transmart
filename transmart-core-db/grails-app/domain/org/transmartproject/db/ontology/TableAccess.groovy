@@ -112,10 +112,8 @@ class TableAccess extends AbstractQuerySpecifyingType implements
         }
     }
 
-    Class getOntologyTermDomainClassReferred()
-    {
-        def domainClass = Holders.getGrailsApplication().domainClasses.find
-                {
+    Class getOntologyTermDomainClassReferred() {
+        def domainClass = Holders.getGrailsApplication().domainClasses.find {
                     AbstractI2b2Metadata.class.isAssignableFrom(it.clazz) &&
                             tableName.equalsIgnoreCase(it.clazz.backingTable)
                 }
@@ -174,12 +172,12 @@ class TableAccess extends AbstractQuerySpecifyingType implements
         /* validate this table name */
         def domainClass = this.ontologyTermDomainClassReferred
         if (!domainClass) {
-            throw new RuntimeException("Metadata table ${tableName} is not " +
-                    "mapped")
+            throw new RuntimeException('Metadata table ' + tableName + ' is not ' +
+                    'mapped')
         }
 
         /* select level on the original table (is this really necessary?) */
-        c = domainClass.createCriteria();
+        c = domainClass.createCriteria()
         Integer parentLevel = c.get {
             projections {
                 property 'level'
@@ -193,7 +191,7 @@ class TableAccess extends AbstractQuerySpecifyingType implements
         if (parentLevel == null)
             throw new RuntimeException("Could not determine parent's level; " +
                     "could not find it in ${domainClass}'s table (fullname: " +
-                    "$fullName)")
+                    '' + fullName + ')')
 
         /* Finally select the relevant stuff */
         def fullNameSearch = fullName.asLikeLiteral() + '%'
@@ -204,7 +202,8 @@ class TableAccess extends AbstractQuerySpecifyingType implements
                 like 'fullName', fullNameSearch
                 if (allDescendants) {
                     gt 'level', parentLevel
-                } else {
+                }
+                else {
                     eq 'level', parentLevel + 1
                 }
 
@@ -221,7 +220,7 @@ class TableAccess extends AbstractQuerySpecifyingType implements
 
     @Override
     Study getStudy() {
-        /* never has an associated tranSMART study;
+        /* never has an associated tranSMART study
          * in tranSMART table access will only have 'Public Studies' and
          * 'Private Studies' nodes */
         null
@@ -235,6 +234,6 @@ class TableAccess extends AbstractQuerySpecifyingType implements
     @Override
     String toString() {
         getClass().canonicalName + "[${attached?'attached':'not attached'}" +
-                "] [ fullName=$fullName ]"
+                '] [ fullName=' + fullName + ' ]'
     }
 }

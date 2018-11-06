@@ -33,8 +33,8 @@ class VcfCohortStatistics implements VcfCohortInfo {
     List<GenomicVariantType> genomicVariantTypes = []
 
     // Cohort level properties
-    String majorAllele = "."
-    String minorAllele = "."
+    String majorAllele = '.'
+    String minorAllele = '.'
     Double minorAlleleFrequency = 0.0
     
     VcfCohortStatistics( VcfDataRow dataRow ) {
@@ -75,8 +75,8 @@ class VcfCohortStatistics implements VcfCohortInfo {
 
         // Find the most frequent and second most frequent alleles
         majorAllele = numAlleles.max { it.value }?.key
-        minorAllele = numAlleles.findAll { it.key != majorAllele }.max { it.value }?.key ?: "."
-        if( minorAllele != "." )
+        minorAllele = numAlleles.findAll { it.key != majorAllele }.max { it.value }?.key ?: '.'
+        if( minorAllele != '.' )
             minorAlleleFrequency = numAlleles.getAt( minorAllele ) / totalAlleleCount
             
         // Determine genomic variant types, with the major allele as a reference
@@ -91,16 +91,16 @@ class VcfCohortStatistics implements VcfCohortInfo {
         numberOfSamplesWithData = 0
         for (sampleData in dataRow.data) {
             if ( !sampleData )
-                continue;
+                continue
             
             boolean sampleHasData = false
-            if (sampleData.allele1 != null && sampleData.allele1 != ".") {
+            if (sampleData.allele1 != null && sampleData.allele1 != '.') {
                 def allele1 = alleleNames[sampleData.allele1]
                 alleleDistribution[allele1]++
                 sampleHasData = true
             }
             
-            if (sampleData.allele2 != null && sampleData.allele2 != ".") {
+            if (sampleData.allele2 != null && sampleData.allele2 != '.') {
                 def allele2 = alleleNames[sampleData.allele2]
                 alleleDistribution[allele2]++
                 sampleHasData = true
