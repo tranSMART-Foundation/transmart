@@ -67,7 +67,7 @@ class AcrossTrialsTestData {
                 tableCode: 'i2b2 main',
                 tableName: 'i2b2')
 
-        int c = 1;
+        int c = 1
         def i2b2List = [
                 createI2b2Concept(code: c++, level: 1, fullName: '\\foo\\study1\\', name: 'study1',
                         cComment: 'trial:STUDY_ID_1', cVisualattributes: 'FA'),
@@ -145,8 +145,8 @@ class AcrossTrialsTestData {
      */
     static List createModifier(Map<String, Object> properties) {
         if (['path', 'code', 'nodeType'].
-                collect { properties."$it" == null }.any()) {
-            throw new IllegalArgumentException("Missing required property")
+                collect { properties.'' + it + '' == null }.any()) {
+            throw new IllegalArgumentException('Missing required property')
         }
         if (!properties.name) {
             properties.name = new ConceptFullName(properties.path)[-1]

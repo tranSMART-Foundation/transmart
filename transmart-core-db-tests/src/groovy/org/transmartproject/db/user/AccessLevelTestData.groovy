@@ -58,7 +58,7 @@ class AccessLevelTestData {
     }
 
     /*
-     * The alternative concept data still has hard requirements;
+     * The alternative concept data still has hard requirements
      * the study names should be a subset of STUDY_ID_{1,2,3}
      */
     static AccessLevelTestData createWithAlternativeConceptData(
@@ -82,12 +82,14 @@ class AccessLevelTestData {
             def i2b2sec = createI2b2Secure(
                     i2b2.metaClass.properties.findAll {
                         it.name in ['level', 'fullName', 'name', 'cComment']
-                    }.collectEntries {
+                    }
+                    .collectEntries {
                         [it.name, it.getProperty(i2b2)]
                     })
             if (i2b2sec.fullName.contains('study1') || i2b2.cComment == null) {
                 i2b2sec.secureObjectToken = 'EXP:PUBLIC'
-            } else {
+            }
+            else {
                 i2b2sec.secureObjectToken = i2b2.cComment.replace('trial', 'EXP')
             }
             i2b2sec
@@ -139,7 +141,7 @@ class AccessLevelTestData {
     static List<User> createUsers(int count, long baseId) {
         (1..count).collect {
             long id = baseId - it
-            String username = "user_$id"
+            String username = 'user_' + id
             def ret = new User(
                     username: username,
                     uniqueId: username,
@@ -152,7 +154,7 @@ class AccessLevelTestData {
     static List<Group> createGroups(int count, long baseId) {
         (1..count).collect {
             long id = baseId - it
-            def name = "group_$id"
+            def name = 'group_' + id
             def ret = new Group(
                     category: name,
                     uniqueId: name,

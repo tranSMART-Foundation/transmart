@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.*
 @TestMixin(GrailsUnitTestMixin)
 class AbstractI2b2MetadataTests {
 
-    private AbstractI2b2Metadata testee;
+    private AbstractI2b2Metadata testee
 
     @Before
     void before() {

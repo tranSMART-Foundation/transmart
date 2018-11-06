@@ -53,7 +53,7 @@ class QueryResultData {
         )
         queryInstance.addToQueryResults(resultInstance)
 
-        def i = 0;
+        def i = 0
         patients.each { patient ->
             resultInstance.addToPatientSet(new QtPatientSetCollection(
                     setIndex: i++,

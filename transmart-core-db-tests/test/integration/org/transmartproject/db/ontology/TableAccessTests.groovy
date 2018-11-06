@@ -52,13 +52,14 @@ class TableAccessTests {
 
     @Test
     void testBogusTable() {
-        def bogusEntry = TableAccess.findByName('fooh');
+        def bogusEntry = TableAccess.findByName('fooh')
         assert bogusEntry != null
 
         try {
             bogusEntry.children
             fail('Expected exception here')
-        } catch (e) {
+        }
+        catch (e) {
             assertThat e, allOf(
                     isA(RuntimeException),
                     hasProperty('message', containsString('table bogus is ' +
@@ -76,7 +77,8 @@ class TableAccessTests {
         try {
             notInI2b2.children
             fail('Expected exception here')
-        } catch (e) {
+        }
+        catch (e) {
             assertThat e, allOf(
                     isA(RuntimeException),
                     hasProperty('message', containsString('could not find it ' +

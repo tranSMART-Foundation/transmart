@@ -194,7 +194,7 @@ class AcghEndToEndRetrievalTests {
                                 (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [
                                         /* test region wider then the segment */
                                         [ chromosome: '1', start: 44, end: 8888 ],
-                                        /* segment aligned at the end of test region;
+                                        /* segment aligned at the end of test region
                                          *segment shorter than region */
                                         [ chromosome: '2', start: 88, end: 99 ],
                                 ]

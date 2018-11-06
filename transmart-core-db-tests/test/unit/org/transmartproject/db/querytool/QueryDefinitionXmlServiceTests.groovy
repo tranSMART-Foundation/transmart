@@ -44,7 +44,7 @@ import static org.transmartproject.core.querytool.ConstraintByValue.ValueType.NU
 class QueryDefinitionXmlServiceTests {
 
     @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    public ExpectedException expectedException = ExpectedException.none()
 
     private Document xmlStringToDocument(String xmlString) {
         DocumentBuilder builder =
@@ -307,8 +307,8 @@ class QueryDefinitionXmlServiceTests {
     @Test
     void testBadXml() {
         expectedException.expect(InvalidRequestException)
-        expectedException.expectMessage(containsString("Malformed XML " +
-                "document"))
+        expectedException.expectMessage(containsString('Malformed XML ' +
+                'document'))
 
         service.fromXml(new StringReader('<foo></bar>'))
     }
@@ -317,7 +317,7 @@ class QueryDefinitionXmlServiceTests {
     void testBadConstraint() {
         expectedException.expect(InvalidRequestException)
         expectedException.expectMessage(containsString(
-                "Invalid XML query definition constraint"))
+                'Invalid XML query definition constraint'))
 
         def xml = '''<ns3:query_definition xmlns:ns3="http://www.i2b2
 .org/xsd/cell/crc/psm/querydefinition/1.1/">
@@ -340,7 +340,7 @@ class QueryDefinitionXmlServiceTests {
     @Test
     void testBadMarkerType() {
         expectedException.expect(InvalidRequestException)
-        expectedException.expectMessage(containsString("Invalid XML query definition highdimension value constraint"))
+        expectedException.expectMessage(containsString('Invalid XML query definition highdimension value constraint'))
 
         def xml = '''<ns4:query_definition xmlns:ns4="http://www.i2b2.org/xsd/cell/crc/psm/1.1/">
                        <specificity_scale>0</specificity_scale>
@@ -373,7 +373,7 @@ class QueryDefinitionXmlServiceTests {
     @Test
     void testBadProjectionType() {
         expectedException.expect(InvalidRequestException)
-        expectedException.expectMessage(containsString("Invalid projection type in highdimension value constraint"))
+        expectedException.expectMessage(containsString('Invalid projection type in highdimension value constraint'))
 
         def xml = '''<ns4:query_definition xmlns:ns4="http://www.i2b2.org/xsd/cell/crc/psm/1.1/">
                        <specificity_scale>0</specificity_scale>
@@ -406,7 +406,7 @@ class QueryDefinitionXmlServiceTests {
     @Test
     void testBadOperatorType() {
         expectedException.expect(InvalidRequestException)
-        expectedException.expectMessage(containsString("Invalid XML query definition highdimension value constraint"))
+        expectedException.expectMessage(containsString('Invalid XML query definition highdimension value constraint'))
 
         def xml = '''<ns4:query_definition xmlns:ns4="http://www.i2b2.org/xsd/cell/crc/psm/1.1/">
                        <specificity_scale>0</specificity_scale>

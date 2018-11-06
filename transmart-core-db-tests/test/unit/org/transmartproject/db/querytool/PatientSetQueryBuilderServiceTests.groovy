@@ -49,7 +49,7 @@ class PatientSetQueryBuilderServiceTests {
     QtQueryResultInstance resultInstance
 
     @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    public ExpectedException expectedException = ExpectedException.none()
 
     @Before
     void setUp() {
@@ -104,7 +104,7 @@ class PatientSetQueryBuilderServiceTests {
                 containsString('concept_cd IN (SELECT concept_cd FROM ' +
                         'concept_dimension WHERE concept_path LIKE ' +
                         '\'\\\\full\\\\name\\\\%\')')
-                );
+                )
     }
 
     @Test
@@ -140,7 +140,7 @@ class PatientSetQueryBuilderServiceTests {
                         'observation_fact WHERE (concept_cd IN (SELECT ' +
                         'concept_cd FROM concept_dimension WHERE concept_path ' +
                         'LIKE \'\\\\full\\\\name3\\\\%\''),
-        );
+        )
     }
 
     @Test
