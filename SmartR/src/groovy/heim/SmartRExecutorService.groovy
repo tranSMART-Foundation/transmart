@@ -47,7 +47,7 @@ class SmartRExecutorService implements ListeningExecutorService,
 
     static class SmartRThreadFactory implements ThreadFactory {
         private final ThreadGroup group
-        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final AtomicInteger threadNumber = new AtomicInteger(1)
 
         SmartRThreadFactory() {
             SecurityManager s = System.securityManager

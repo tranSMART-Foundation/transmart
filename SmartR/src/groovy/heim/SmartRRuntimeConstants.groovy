@@ -7,18 +7,18 @@ import org.springframework.stereotype.Component
 
 @Component
 class SmartRRuntimeConstants {
-    private static SmartRRuntimeConstants instance;
+    private static SmartRRuntimeConstants instance
 
     public static SmartRRuntimeConstants getInstance() {
         if (instance == null) {
             synchronized (SmartRRuntimeConstants.class) {
                 if (instance == null) {
-                    instance = new SmartRRuntimeConstants();
-                    instance.grailsApplication = Holders.grailsApplication; // thanks to http://stackoverflow.com/a/24501325/535203 (Holders.applicationContext.getBean("smartRRuntimeConstants") and Holders.applicationContext.getBean(SmartRRuntimeConstants) were failing with "org.springframework.beans.factory.NoSuchBeanDefinitionException: No bean named 'smartRRuntimeConstants' is defined"
+                    instance = new SmartRRuntimeConstants()
+                    instance.grailsApplication = Holders.grailsApplication; // thanks to http://stackoverflow.com/a/24501325/535203 (Holders.applicationContext.getBean("smartRRuntimeConstants') and Holders.applicationContext.getBean(SmartRRuntimeConstants) were failing with 'org.springframework.beans.factory.NoSuchBeanDefinitionException: No bean named 'smartRRuntimeConstants' is defined"
                 }
             }
         }
-        instance;
+        instance
     }
 
     @Autowired
@@ -43,8 +43,8 @@ class SmartRRuntimeConstants {
     File getRemoteScriptDirectoryDir() {
         def dir = grailsApplication.config.smartR.remoteScriptDirectory as File
         if (!dir.absolute) {
-            throw new RuntimeException("Invalid configuration: " +
-                    "smartR.remoteScriptDirectory should be an absolute path," +
+            throw new RuntimeException('Invalid configuration: ' +
+                    'smartR.remoteScriptDirectory should be an absolute path,' +
                     " got '$dir'")
         }
         dir
@@ -53,7 +53,7 @@ class SmartRRuntimeConstants {
     File getBaseDir() {
         def dir = grailsApplication.config.smartR.baseDir
         if (!dir) {
-            dir = File.createTempDir("smartR", ".baseDir");
+            dir = File.createTempDir('smartR', '.baseDir')
             setBaseDir(dir)
         }
         dir as File

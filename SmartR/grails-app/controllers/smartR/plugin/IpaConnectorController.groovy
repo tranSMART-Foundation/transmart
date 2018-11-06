@@ -13,7 +13,7 @@ import com.ittm_solutions.ipacore.IpaApiAuthenticationFailedException
 
 @Slf4j('logger')
 class IpaConnectorController {
-    static scope = "singleton"
+    static scope = 'singleton'
 
     def projectName = 'transmartipaapi'
 
@@ -45,7 +45,7 @@ class IpaConnectorController {
             password = ''
         }
         if (! userToIpaApiCached.containsKey(username)) {
-            logger.debug "Creating new IpaApiCached for " + username
+            logger.debug 'Creating new IpaApiCached for ' + username
             userToIpaApiCached[username] = new IpaApiCached(username,password,projectName)
         }
         return userToIpaApiCached[username]
@@ -83,12 +83,14 @@ class IpaConnectorController {
                                                                    analysisParams.applicationName),
             ]
             render retval as JSON
-        } catch (IpaApiAuthenticationFailedException e) {
+        }
+        catch (IpaApiAuthenticationFailedException e) {
             removeIpaApiCached(analysisParams.username)
             render(status: 401, text: 'authentication failed')
-        } catch (IpaApiException|Exception e) {
+        }
+        catch (IpaApiException|Exception e) {
             removeIpaApiCached(analysisParams.username)
-            logger.error("IpaApiCached exception:",e)
+            logger.error('IpaApiCached exception:',e)
             render(status: 500, text: e.getMessage())
         }
     }
@@ -105,12 +107,14 @@ class IpaConnectorController {
                 analysisId: myipaapicached.analysisId(request.JSON.analysisName),
             ]
             render retval as JSON
-        } catch (IpaApiAuthenticationFailedException e) {
+        }
+        catch (IpaApiAuthenticationFailedException e) {
             removeIpaApiCached(analysisParams.username)
             render(status: 401, text: 'authentication failed')
-        } catch (IpaApiException|Exception e) {
+        }
+        catch (IpaApiException|Exception e) {
             removeIpaApiCached(analysisParams.username)
-            logger.error("IpaApiCached exception:",e)
+            logger.error('IpaApiCached exception:',e)
             render(status: 500, text: e.getMessage())
         }
     }
@@ -124,15 +128,17 @@ class IpaConnectorController {
         try {
             def myipaapicached = getIpaApiCached(request.JSON.username, request.JSON.password)
             def ipaResults = myipaapicached.exportAnalysis(request.JSON.analysisId)
-            Gson gson = new Gson();
-            def json = gson.toJson(ipaResults);
+            Gson gson = new Gson()
+            def json = gson.toJson(ipaResults)
             render contentType: 'application/json', text: json
-        } catch (IpaApiAuthenticationFailedException e) {
+        }
+        catch (IpaApiAuthenticationFailedException e) {
             removeIpaApiCached(analysisParams.username)
             render(status: 401, text: 'authentication failed')
-        } catch (IpaApiException|Exception e) {
+        }
+        catch (IpaApiException|Exception e) {
             removeIpaApiCached(analysisParams.username)
-            logger.error("IpaApiCached exception:",e)
+            logger.error('IpaApiCached exception:',e)
             render(status: 500, text: e.getMessage())
         }
     }

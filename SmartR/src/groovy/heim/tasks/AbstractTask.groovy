@@ -16,8 +16,8 @@ abstract class AbstractTask implements Task {
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
-                .add("class", getClass().simpleName)
-                .add("uuid", uuid)
-                .toString();
+                .add('class', getClass().simpleName)
+                .add('uuid', uuid)
+                .toString()
     }
 }

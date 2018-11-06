@@ -21,16 +21,16 @@ class SmartRSessionSpringScope implements Scope, BeanFactoryPostProcessor, Order
 
     private static final boolean PROXY_CLASSES = true // rather than interfaces
 
-    final int order = Ordered.LOWEST_PRECEDENCE;
+    final int order = Ordered.LOWEST_PRECEDENCE
 
 
     private static ThreadLocal<SessionContext> ACTIVE_SESSION =
-            new NamedThreadLocal<SessionContext>("ActiveSmartRSession") {
+            new NamedThreadLocal<SessionContext>('ActiveSmartRSession') {
                 @Override
                 protected SessionContext initialValue() {
                     null
                 }
-            };
+            }
 
     static <T> T withActiveSession(SessionContext ctx, Closure<T> closure) {
         if (ACTIVE_SESSION.get()) {
@@ -38,14 +38,16 @@ class SmartRSessionSpringScope implements Scope, BeanFactoryPostProcessor, Order
                 throw new IllegalStateException(
                         'Attempt to set session in context with another ' +
                                 'one already in place')
-            } else {
+            }
+            else {
                 return
             }
         }
         try {
             ACTIVE_SESSION.set(ctx)
             closure.call()
-        } finally {
+        }
+        finally {
             ACTIVE_SESSION.set(null)
         }
     }

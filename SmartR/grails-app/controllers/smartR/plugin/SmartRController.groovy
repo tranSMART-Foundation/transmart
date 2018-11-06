@@ -43,31 +43,31 @@ class SmartRController {
         // for all js files
         for (file in scripts) {
             def m = [:]
-            m["path"] = file.toString()
-            m["type"] = "script"
-            rows.put(m);
+            m['path'] = file.toString()
+            m['type'] = 'script'
+            rows.put(m)
         }
 
         // for all css files
         for (file in styles) {
             def n = [:]
-            n["path"] = file.toString()
-            n["type"] = "css"
-            rows.put(n);
+            n['path'] = file.toString()
+            n['type'] = 'css'
+            rows.put(n)
         }
 
-        result.put("success", true)
-        result.put("totalCount", scripts.size())
-        result.put("files", rows)
+        result.put('success', true)
+        result.put('totalCount', scripts.size())
+        result.put('files', rows)
 
-        render result as JSON;
+        render result as JSON
     }
 
     /**
      * Get smart-r plugin context path
      */
     def smartRContextPath = {
-        render servletContext.contextPath + pluginContextPath as String;
+        render servletContext.contextPath + pluginContextPath as String
     }
 
     def biocompendium = {

@@ -48,7 +48,7 @@ import static org.transmartproject.core.ontology.OntologyTerm.VisualAttributes.H
 @ToString(includes = 'ontologyTerms,resultInstanceIds,dataType')
 class DataFetchTask extends AbstractTask {
 
-    private static final char SEPARATOR = "\t" as char
+    private static final char SEPARATOR = '\t' as char
 
     private static final int MAX_SIMULTANEOUS_QUERYING = 4
     private static final int MAX_MINUTES_TO_WAIT_FOR_TABRES_FETCH = 2
@@ -97,16 +97,17 @@ class DataFetchTask extends AbstractTask {
             try {
                 if (logger.debugEnabled) {
                     logger.debug("Will now fetch data with label '$label' for " +
-                            "ontology term $ontologyTerm, result instance id " +
-                            "$resultInstanceId")
+                            'ontology term ' + ontologyTerm + ', result instance id ' +
+                            '' + resultInstanceId)
                 }
 
                 TabularResult<?, ?> tabularResult = runWithInterceptor this.&doRun
 
-                logger.debug("Finished opening tabular result for data set $label")
+                logger.debug('Finished opening tabular result for data set ' + label)
                 queryResultsQueue.put([(label): tabularResult])
-            } catch (Exception e) {
-                logger.error("Fetching of data set $label failed: ${e.message}", e)
+            }
+            catch (Exception e) {
+                logger.error('Fetching of data set ' + label + ' failed: ' + e.message, e)
                 queryResultsQueue.put(e)
             }
         }
@@ -117,12 +118,13 @@ class DataFetchTask extends AbstractTask {
             def res
             if (HIGH_DIMENSIONAL in ontologyTerm.visualAttributes) {
                 res = createHighDimensionalResult ontologyTerm, resultInstanceId
-            } else {
+            }
+            else {
                 res = createClinicalDataResult ontologyTerm, resultInstanceId
             }
 
-            logger.info("Fetch for $ontologyTerm (rid $resultInstanceId) " +
-                    "finished in $stopwatch")
+            logger.info('Fetch for ' + ontologyTerm + ' (rid ' + resultInstanceId + ') ' +
+                    'finished in ' + stopwatch)
             res
         }
 
@@ -132,7 +134,8 @@ class DataFetchTask extends AbstractTask {
                 T ret = closure.call()
                 interceptor.flush()
                 ret
-            } finally {
+            }
+            finally {
                 interceptor.destroy()
             }
         }
@@ -154,7 +157,7 @@ class DataFetchTask extends AbstractTask {
                 { Runnable r ->
                     new Thread(r).with {
                         daemon = true
-                        name = "DataFetchQuery-" + THREAD_ID.incrementAndGet()
+                        name = 'DataFetchQuery-' + THREAD_ID.incrementAndGet()
                         it
                     }
                 } as ThreadFactory)
@@ -183,7 +186,7 @@ class DataFetchTask extends AbstractTask {
             def fetchResult = queryResultsQueue.take() // will block
             taken++
 
-            logger.debug("Took from queryResultsQueye: $fetchResult")
+            logger.debug('Took from queryResultsQueye: ' + fetchResult)
 
             if (fetchResult instanceof Exception) {
                 logger.warn('Error fetching one of the datasets, ' +
@@ -199,13 +202,14 @@ class DataFetchTask extends AbstractTask {
             try {
                 String fileName = writeTabularResult(fetchResult.values().first())
                 currentLabels = loadFile(fileName, fetchResult.keySet().first())
-            } finally {
+            }
+            finally {
                 fetchResult.values().first().close()
             }
         }
 
         if (Thread.interrupted()) {
-            throw new InterruptedException("Task was interrupted")
+            throw new InterruptedException('Task was interrupted')
         }
 
         writeParameters()
@@ -260,7 +264,7 @@ class DataFetchTask extends AbstractTask {
             OutputStream os = new BufferedOutputStream(
                     conn.createFile(filename), 81920)
 
-            logger.info("Will start writing tabular result in file $filename")
+            logger.info('Will start writing tabular result in file ' + filename)
             final Stopwatch stopwatch = Stopwatch.createStarted()
 
             Writer writer = new OutputStreamWriter(os, Charsets.UTF_8)
@@ -284,12 +288,13 @@ class DataFetchTask extends AbstractTask {
                     }
                     writeLine csvWriter, isBioMarker, row
                 }
-            } finally {
+            }
+            finally {
                 csvWriter.close()
             }
 
 
-            logger.info("Finished writing file $filename in $stopwatch")
+            logger.info('Finished writing file ' + filename + ' in ' + stopwatch)
         }
 
         filename
@@ -303,7 +308,7 @@ class DataFetchTask extends AbstractTask {
                 "if (!exists('loaded_variables')) { loaded_variables <- list() }",
                 """
                 loaded_variables[['$escapedLabel']] <- read.csv(
-                               '$escapedFilename', sep = "\t", header = TRUE, stringsAsFactors = FALSE);
+                               '$escapedFilename', sep = "\t", header = TRUE, stringsAsFactors = FALSE)
                 loaded_variables <- loaded_variables[order(names(loaded_variables))]; # for determinism
                 names(loaded_variables)""",
         ]
@@ -325,7 +330,8 @@ class DataFetchTask extends AbstractTask {
         line += columns.collect {
             if (it instanceof AssayColumn) {
                 it.patient.id  // for high dim data, use patient id rather than row label as the CSV header
-            } else {
+            }
+            else {
                 it.label
             }
         }
@@ -395,11 +401,12 @@ class DataFetchTask extends AbstractTask {
                             concept_key: term.key)])
 
         if (res.keySet().size() > 1) {
-            throw new UnexpectedResultException("Found multiple possible " +
-                    "data types for ontology term $term: ${res.keySet()}")
-        } else if (res.keySet().size() == 0) {
-            throw new UnexpectedResultException("No data type found " +
-                    "associated with ontology term ${term}.")
+            throw new UnexpectedResultException('Found multiple possible ' +
+                    'data types for ontology term ' + term + ': ' + res.keySet())
+        }
+        else if (res.keySet().size() == 0) {
+            throw new UnexpectedResultException('No data type found ' +
+                    'associated with ontology term ' + term + '.')
         }
 
         res.keySet().first()
@@ -430,24 +437,26 @@ class DataFetchTask extends AbstractTask {
         // retrieveData() may not work well with interruptions,
         // try to call just shutdown() before shutdownNow()
         try {
-            logger.debug("Shutting down query executor in $this")
+            logger.debug('Shutting down query executor in ' + this)
             queriesExecutor.shutdown()
             try {
                 def terminated = queriesExecutor.awaitTermination(
                         MAX_MINUTES_TO_WAIT_FOR_TABRES_FETCH, TimeUnit.MINUTES)
-                logger.debug("Finished waiting for termination in $this. " +
-                        "Terminated? $terminated")
+                logger.debug('Finished waiting for termination in ' + this + '. ' +
+                        'Terminated? ' + terminated)
                 if (!terminated) {
-                    logger.warn("Tabular result fetching threads did not finish " +
-                            "in $MAX_MINUTES_TO_WAIT_FOR_TABRES_FETCH " +
-                            "minutes. Will attempt to interrupt them.")
+                    logger.warn('Tabular result fetching threads did not finish ' +
+                            'in ' + MAX_MINUTES_TO_WAIT_FOR_TABRES_FETCH + ' ' +
+                            'minutes. Will attempt to interrupt them.')
                     queriesExecutor.shutdownNow()
                 }
-            } catch (InterruptedException ie) {
-                logger.warn("Interrupted while awaiting for termination of " +
-                        "TabularResult fetch in $this")
             }
-        } finally {
+            catch (InterruptedException ie) {
+                logger.warn('Interrupted while awaiting for termination of ' +
+                        'TabularResult fetch in ' + this)
+            }
+        }
+        finally {
             Closer closer = Closer.create()
             while (!queryResultsQueue.empty) {
                 def o = queryResultsQueue.poll()
