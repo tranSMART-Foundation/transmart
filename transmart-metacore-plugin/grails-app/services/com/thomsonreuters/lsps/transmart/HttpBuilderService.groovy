@@ -1,17 +1,18 @@
 package com.thomsonreuters.lsps.transmart
 
-import groovyx.net.http.*
-src/main/groovy/org/transmartproject/pipeline/converter/CARDSFormatter.groovy
+import groovy.util.logging.Slf4j
+import groovyx.net.http.HTTPBuilder
 import static groovyx.net.http.ContentType.*
 import static groovyx.net.http.Method.*
-import org.apache.http.auth.*
+import org.apache.http.auth.AuthScope
+import org.apache.http.auth.NTCredentials
 
 @Slf4j('logger')
 class HttpBuilderService {
 	boolean transactional = true
 	
 	def getInstance(uri) {
-		def site = new HTTPBuilder(uri)
+		HTTPBuilder site = new HTTPBuilder(uri)
 			
 		if (System.properties.proxyHost && System.properties.proxyPort) {
 			logger.info "Using proxy -> ${System.properties.proxyHost}:${System.properties.proxyPort}"
@@ -28,7 +29,7 @@ class HttpBuilderService {
 			site.setProxy(System.properties.proxyHost, System.properties.proxyPort.toInteger(), null)
 		}
 		
-		return site
+		site
 		
 	}
 	
