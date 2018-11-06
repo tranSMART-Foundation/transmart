@@ -188,11 +188,11 @@ public interface OntologyTerm {
          */
         PROGRAM             (2, 'P' as Character)
 
-        int position;
-        char keyChar;
+        int position
+        char keyChar
 
         protected VisualAttributes(int position, char keyChar) {
-            this.position = position;
+            this.position = position
             this.keyChar = keyChar
         }
 

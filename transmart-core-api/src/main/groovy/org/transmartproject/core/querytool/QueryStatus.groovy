@@ -8,9 +8,9 @@ enum QueryStatus {
     PROCESSING  (2),
     FINISHED    (3),
     ERROR       (4),
-    COMPLETED   (6);
+    COMPLETED   (6)
 
-    final int id;
+    final int id
 
     protected QueryStatus(id) {
         this.id = id

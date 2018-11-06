@@ -42,7 +42,7 @@ class ConstraintByOmicsValue {
         EQUAL_TO            ('EQ'),
         BETWEEN             ('BETWEEN'),
         GREATER_THAN        ('GT'),
-        GREATER_OR_EQUAL_TO ('GE');
+        GREATER_OR_EQUAL_TO ('GE')
 
         final String value
 
@@ -52,7 +52,7 @@ class ConstraintByOmicsValue {
 
         static Operator forValue(String value) {
             values().find { value == it.value } ?:
-                { throw new IllegalArgumentException("No operator for value $value") }()
+                { throw new IllegalArgumentException('No operator for value ' + value) }()
         }
     }
 
@@ -77,7 +77,7 @@ class ConstraintByOmicsValue {
 
         static OmicsType forValue(String value) {
             values().find { value == it.value } ?:
-                    { throw new IllegalArgumentException("No OmicsType for value $value") }
+                    { throw new IllegalArgumentException('No OmicsType for value ' + value) }
         }
     }
 }
