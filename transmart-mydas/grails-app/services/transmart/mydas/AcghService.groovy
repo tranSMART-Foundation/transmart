@@ -21,7 +21,7 @@ class AcghService extends TransmartDasServiceAbstract {
         //TODO Choose correct cvId(3-d parameter) from http://www.ebi.ac.uk/ontology-lookup/browse.do?ontName=SO
         dasMethod = new DasMethodE('acgh', 'acgh', 'acgh-cv-id')
         projectionName = 'acgh_values'
-        dasTypes = dasTypeToCopyNumberStateMapping.keySet();
+        dasTypes = dasTypeToCopyNumberStateMapping.keySet()
 
     }
 
@@ -47,9 +47,9 @@ class AcghService extends TransmartDasServiceAbstract {
 
             featuresPerSegment[region.chromosome] << new DasFeature(
                     //featureId
-                    "${typeCountEntry.key.id}-${region.id}",
+                    '' + typeCountEntry.key.id + '-' + region.id,
                     //featureLabel
-                    "${typeCountEntry.key.id}-${region.id}",
+                    '' + typeCountEntry.key.id + '-' + region.id,
                     //type
                     typeCountEntry.key,
                     //method

@@ -16,7 +16,7 @@ import org.transmartproject.core.dataquery.highdim.dataconstraints.DataConstrain
 
 abstract class TransmartDasServiceAbstract {
 
-    abstract protected void getSpecificFeatures(RegionRow region, assays, Map<String, String> params, Collection<DasType> dasTypes, Map<String, List<DasFeature>> featuresPerSegment);
+    abstract protected void getSpecificFeatures(RegionRow region, assays, Map<String, String> params, Collection<DasType> dasTypes, Map<String, List<DasFeature>> featuresPerSegment)
 
     HighDimensionResource highDimensionResourceService
     HighDimensionDataTypeResource resource
@@ -72,7 +72,8 @@ abstract class TransmartDasServiceAbstract {
                 if(!featuresPerSegment[region.chromosome]) featuresPerSegment[region.chromosome] = []
                 getSpecificFeatures(region, assays, params, dasTypes, featuresPerSegment)
             }
-        }  finally {
+        }
+        finally {
             regionResult.close()
         }
 

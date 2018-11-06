@@ -15,8 +15,8 @@ class CohortMAFDS extends VcfDS implements RangeHandlingAnnotationDataSource {
 
     @Override
     void init(ServletContext servletContext, Map<String, PropertyType> stringPropertyTypeMap, DataSourceConfiguration dataSourceConfiguration) throws DataSourceException {
-        super.init(servletContext, stringPropertyTypeMap, dataSourceConfiguration);
-        vcfService = servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT).cohortMAFService;
+        super.init(servletContext, stringPropertyTypeMap, dataSourceConfiguration)
+        vcfService = servletContext.getAttribute(GrailsApplicationAttributes.APPLICATION_CONTEXT).cohortMAFService
     }
 
 
