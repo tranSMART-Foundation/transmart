@@ -46,7 +46,7 @@ class RbmModule extends AbstractHighDimensionDataTypeModule {
 
     final String name = 'rbm'
 
-    final String description = "RBM data"
+    final String description = 'RBM data'
 
     final List<String> platformMarkerTypes = ['RBM']
 

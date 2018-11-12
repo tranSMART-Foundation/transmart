@@ -115,8 +115,8 @@ abstract class AbstractHighDimensionDataTypeModule implements HighDimensionDataT
             }
         }
 
-        throw new UnsupportedByDataTypeException("The data type ${this.name} " +
-                "does not support the assay constraint $name")
+        throw new UnsupportedByDataTypeException('The data type ' + this.name + ' ' +
+                'does not support the assay constraint ' + name)
     }
 
     @Override
@@ -129,8 +129,8 @@ abstract class AbstractHighDimensionDataTypeModule implements HighDimensionDataT
             }
         }
 
-        throw new UnsupportedByDataTypeException("The data type ${this.name} " +
-                "does not support the data constraint $name")
+        throw new UnsupportedByDataTypeException('The data type ' + this.name + ' ' +
+                'does not support the data constraint ' + name)
     }
 
     @Override
@@ -143,8 +143,8 @@ abstract class AbstractHighDimensionDataTypeModule implements HighDimensionDataT
             }
         }
 
-        throw new UnsupportedByDataTypeException("The data type ${this.name} " +
-                "does not support the projection $name")
+        throw new UnsupportedByDataTypeException('The data type ' + this.name + ' ' +
+                'does not support the projection ' + name)
     }
 
     final protected Map createAssayIndexMap(List assays) {

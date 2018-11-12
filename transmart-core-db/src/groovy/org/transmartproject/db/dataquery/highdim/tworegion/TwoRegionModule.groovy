@@ -29,8 +29,8 @@ class TwoRegionModule extends AbstractHighDimensionDataTypeModule {
 
     final String name = 'two_region'
 
-    final String description = "Two  Variant data"
-    final String TWO_REGION_PROJECTION = "two_region_label"
+    final String description = 'Two  Variant data'
+    final String TWO_REGION_PROJECTION = 'two_region_label'
 
     final List<String> platformMarkerTypes = ['two_region']
 

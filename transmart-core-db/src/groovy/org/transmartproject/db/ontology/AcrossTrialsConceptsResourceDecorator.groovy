@@ -49,8 +49,8 @@ class AcrossTrialsConceptsResourceDecorator implements ConceptsResource {
         def fullName = conceptKeyObj.conceptFullName
         if (fullName[0] != ACROSS_TRIALS_TOP_TERM_NAME) {
             throw new NoSuchResourceException("All the across trials terms' " +
-                    "first path component should be " +
-                    "${ACROSS_TRIALS_TOP_TERM_NAME}")
+                    'first path component should be ' +
+                    '' + ACROSS_TRIALS_TOP_TERM_NAME)
         }
 
         if (fullName.length == 1) {
@@ -60,7 +60,7 @@ class AcrossTrialsConceptsResourceDecorator implements ConceptsResource {
             def modifier = ModifierDimensionView.get(modifier_path)
             if (!modifier) {
                 throw new NoSuchResourceException('Could not find across ' +
-                        "trials node with modifier_path $modifier_path")
+                        'trials node with modifier_path ' + modifier_path)
             }
 
             new AcrossTrialsOntologyTerm(modifierDimension: modifier)

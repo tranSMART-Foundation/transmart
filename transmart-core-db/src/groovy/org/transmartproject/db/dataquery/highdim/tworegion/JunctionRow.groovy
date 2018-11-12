@@ -17,8 +17,8 @@ class JunctionRow implements DataRow<AssayColumn, Junction> {
 
     @Override
     String getLabel() {
-        "Junction at $junction.upChromosome[$junction.upPos] - " +
-                "$junction.downChromosome[$junction.downPos] for $assay.label"
+        'Junction at ' + junction.upChromosome + '[' + junction.upPos + '] - ' +
+                '' + junction.downChromosome + '[' + junction.downPos + '] for ' + assay.label
     }
 
     @Override
@@ -52,7 +52,8 @@ class JunctionRow implements DataRow<AssayColumn, Junction> {
                 def res
                 if (i == assayIndex) {
                     res = junction
-                } else if (i >= numAssays) {
+                }
+                else if (i >= numAssays) {
                     endOfData()
                 }
                 i++

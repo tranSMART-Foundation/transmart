@@ -38,15 +38,15 @@ class VariantProjection implements CriteriaProjection<String> {
         def projection = builder.instance.projection
 
         if (!(projection instanceof ProjectionList)) {
-            throw new IllegalArgumentException("doWithCriteriaBuilder method" +
-                    " requires a Hibernate Projectionlist to be set.")
+            throw new IllegalArgumentException('doWithCriteriaBuilder method' +
+                    ' requires a Hibernate Projectionlist to be set.')
         }
 
         // add an alias to make this ALIAS_TO_ENTITY_MAP-friendly
         projection.add(
                 Projections.alias(
-                        Projections.property( "summary.variant"),
-                        "variant"))
+                        Projections.property( 'summary.variant'),
+                        'variant'))
     }
 
     @Override

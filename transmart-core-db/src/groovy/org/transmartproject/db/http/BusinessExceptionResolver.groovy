@@ -67,7 +67,8 @@ class BusinessExceptionResolver implements ServletContextAware,
     private Throwable resolveCause(Throwable t) {
         if (t.cause != null && t.cause != t) {
             return t.cause
-        } else if (t.metaClass.hasProperty('target')) {
+        }
+        else if (t.metaClass.hasProperty('target')) {
             return t.target
         }
     }
@@ -78,8 +79,8 @@ class BusinessExceptionResolver implements ServletContextAware,
                                   Object handler,
                                   Exception ex) {
 
-        logger.info("Asked BusinessExceptionResolver to resolve exception from " +
-                "handler ${handler}", ex)
+        logger.info('Asked BusinessExceptionResolver to resolve exception from ' +
+                'handler ' + handler, ex)
 
         def exceptionPlusStatus = null
         def e = ex
@@ -105,7 +106,7 @@ class BusinessExceptionResolver implements ServletContextAware,
 
         /* we know this exception */
         if (exceptionPlusStatus) {
-            logger.debug("BusinessExceptionResolver will handle exception ${e}")
+            logger.debug('BusinessExceptionResolver will handle exception ' + e)
             Map model = exceptionPlusStatus
 
             UrlMappingInfo info = new DefaultUrlMappingInfo(

@@ -61,7 +61,7 @@ class RnaSeqModule extends AbstractHighDimensionDataTypeModule {
 
     final String name = 'rnaseq'
 
-    final String description = "Messenger RNA data (Sequencing)"
+    final String description = 'Messenger RNA data (Sequencing)'
 
     final Map<String, Class> dataProperties = typesMap(DeSubjectRnaseqData,
             ['readcount', 'normalizedReadcount', 'logNormalizedReadcount', 'zscore'])
@@ -188,7 +188,7 @@ class RnaSeqModule extends AbstractHighDimensionDataTypeModule {
                 finalizeGroup:         { List list ->
                         if (list.size() != assays.size()) {
                             throw new UnexpectedResultException(
-                                    "Expected group to be of size ${assays.size()}; got ${list.size()} objects")
+                                    'Expected group to be of size ' + assays.size() + '; got ' + list.size() + ' objects')
                         }
                         def firstNonNullCell = list.find()[0]
                         new RegionRowImpl(

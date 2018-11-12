@@ -47,7 +47,7 @@ class StandardAssayConstraintFactory extends AbstractMethodBasedParameterFactory
     @ProducerFor(AssayConstraint.ONTOLOGY_TERM_CONSTRAINT)
     AssayConstraint createOntologyTermConstraint(Map<String, Object> params) {
         if (params.size() != 1) {
-            throw new InvalidArgumentsException("Expected exactly one parameter (concept_key), got $params")
+            throw new InvalidArgumentsException('Expected exactly one parameter (concept_key), got ' + params)
         }
 
         def conceptKey = getParam params, 'concept_key', String
@@ -55,7 +55,8 @@ class StandardAssayConstraintFactory extends AbstractMethodBasedParameterFactory
         OntologyTerm term
         try {
             term = conceptsResource.getByKey conceptKey
-        } catch (NoSuchResourceException nse) {
+        }
+        catch (NoSuchResourceException nse) {
             throw new InvalidArgumentsException(nse)
         }
 
@@ -65,7 +66,7 @@ class StandardAssayConstraintFactory extends AbstractMethodBasedParameterFactory
     @ProducerFor(AssayConstraint.PATIENT_SET_CONSTRAINT)
     AssayConstraint createPatientSetConstraint(Map<String, Object> params) {
         if (params.size() != 1) {
-            throw new InvalidArgumentsException("Expected exactly one parameter (result_instance_id), got $params")
+            throw new InvalidArgumentsException('Expected exactly one parameter (result_instance_id), got ' + params)
         }
 
         def resultInstanceId = getParam params, 'result_instance_id', Object
@@ -74,7 +75,8 @@ class StandardAssayConstraintFactory extends AbstractMethodBasedParameterFactory
         QueryResult result
         try {
             result = queriesResource.getQueryResultFromId resultInstanceId
-        } catch (NoSuchResourceException nse) {
+        }
+        catch (NoSuchResourceException nse) {
             throw new InvalidArgumentsException(nse)
         }
 

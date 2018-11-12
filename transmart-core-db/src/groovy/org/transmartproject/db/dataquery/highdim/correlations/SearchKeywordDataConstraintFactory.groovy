@@ -82,7 +82,7 @@ class SearchKeywordDataConstraintFactory implements DataRetrievalParameterFactor
                                                     Map<String, Object> params) {
         if (params.size() != 1) {
             throw new InvalidArgumentsException(
-                    "Expected exactly 1 parameter here; got $params.size()")
+                    'Expected exactly 1 parameter here; got ' + params.size + '()')
         }
         if (params.keyword_ids == null) {
             throw new InvalidArgumentsException(
@@ -116,7 +116,7 @@ class SearchKeywordDataConstraintFactory implements DataRetrievalParameterFactor
 
         if (params.size() != 1) {
             throw new InvalidArgumentsException(
-                    "Expected exactly 1 parameter here; got $params.size()")
+                    'Expected exactly 1 parameter here; got ' + params.size + '()')
         }
 
         if (params.containsKey('names')) {
@@ -126,28 +126,30 @@ class SearchKeywordDataConstraintFactory implements DataRetrievalParameterFactor
                             names, correlation.sourceType)
 
             if (keywords.isEmpty()) {
-                throw new InvalidArgumentsException("No search keywords " +
-                        "of the category $correlation.sourceType match with " +
-                        "name in list $names")
+                throw new InvalidArgumentsException('No search keywords ' +
+                        'of the category ' + correlation.sourceType + ' match with ' +
+                        'name in list ' + names)
             }
-        } else if (params.containsKey('ids')) {
+        }
+        else if (params.containsKey('ids')) {
             // these ids are the 'external' ids, not the search keyword PKs
 
             List ids = processStringList 'ids', params.ids
 
-            def uniqueIds = ids.collect { "$correlation.sourceType:$it" as String }
+            def uniqueIds = ids.collect { '' + correlation.sourceType + ':' + it as String }
             keywords = SearchKeywordCoreDb.findAllByUniqueIdInListAndDataCategory(
                             uniqueIds, correlation.sourceType)
 
             if (keywords.isEmpty()) {
-                throw new InvalidArgumentsException("No search keywords " +
-                        "of the category $correlation.sourceType match " +
-                        "UNIQUE_ID in list $uniqueIds")
+                throw new InvalidArgumentsException('No search keywords ' +
+                        'of the category ' + correlation.sourceType + ' match ' +
+                        'UNIQUE_ID in list ' + uniqueIds)
             }
-        } else {
+        }
+        else {
             def paramName = Iterables.getFirst params.keySet(), null
 
-            throw new InvalidArgumentsException("Invalid parameter: $paramName")
+            throw new InvalidArgumentsException('Invalid parameter: ' + paramName)
         }
 
         SearchKeywordDataConstraint.createForSearchKeywords(

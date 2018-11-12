@@ -37,9 +37,9 @@ class CategoricalVariable extends AbstractComposedVariable implements
 
             if (currentValue) {
                 if (!(currentValue instanceof String)) {
-                    throw new UnexpectedResultException("Expected a string " +
-                            "for observation in row $dataRow, categorical " +
-                            "variable $this, when looking at child variable " +
+                    throw new UnexpectedResultException('Expected a string ' +
+                            'for observation in row ' + dataRow + ', categorical ' +
+                            'variable ' + this + ', when looking at child variable ' +
                             "$var. Instead, got '$currentValue'")
                 }
 

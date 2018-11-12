@@ -105,8 +105,8 @@ abstract class AbstractI2b2Metadata extends AbstractQuerySpecifyingType
         }
 
         if (!candidate)
-            throw new RuntimeException("Could not determine table code for " +
-                    "$this")
+            throw new RuntimeException('Could not determine table code for ' +
+                    '' + this)
 
         tableCode = candidate.tableCode
         tableCode
@@ -139,9 +139,9 @@ abstract class AbstractI2b2Metadata extends AbstractQuerySpecifyingType
         def seriesMeta = slurper.SeriesMeta
         if (seriesMeta) {
             ret.seriesMeta = [
-                    "unit": seriesMeta.Unit?.toString(),
-                    "value": seriesMeta.Value?.toString(),
-                    "label": seriesMeta.DisplayName?.toString(),
+                    'unit': seriesMeta.Unit?.toString(),
+                    'value': seriesMeta.Value?.toString(),
+                    'label': seriesMeta.DisplayName?.toString(),
             ]
         }
         ret
@@ -179,7 +179,8 @@ abstract class AbstractI2b2Metadata extends AbstractQuerySpecifyingType
                 like 'fullName', fullNameSearch
                 if (allDescendants) {
                     gt 'level', level
-                } else {
+                }
+                else {
                     eq 'level', level + 1
                 }
 
@@ -204,6 +205,6 @@ abstract class AbstractI2b2Metadata extends AbstractQuerySpecifyingType
     @Override
     String toString() {
         getClass().canonicalName + "[${attached?'attached':'not attached'}" +
-                "] [ fullName=$fullName, level=$level,  ]"
+                '] [ fullName=' + fullName + ', level=' + level + ',  ]'
     }
 }

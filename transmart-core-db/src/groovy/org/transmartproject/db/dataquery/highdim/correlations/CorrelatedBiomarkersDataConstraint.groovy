@@ -72,14 +72,14 @@ class CorrelatedBiomarkersDataConstraint implements CriteriaDataConstraint {
 
         CorrelatedBiomarkersCriterion(CorrelatedBiomarkersDataConstraint c) {
             super(
-                    "CAST ({alias}.{property} AS VARCHAR(200)) IN (\n" +
+                    'CAST ({alias}.{property} AS VARCHAR(200)) IN (\n' +
                             '   SELECT bm.primary_external_id\n' +
                             '   FROM biomart.bio_marker bm\n' +
-                            "       INNER JOIN $c.correlationTable correl\n" +
+                            '       INNER JOIN ' + c.correlationTable + ' correl\n' +
                             '           ON correl.asso_bio_marker_id = bm.bio_marker_id\n' +
                             '   WHERE \n' +
                             '       correl.correl_type IN (' + c.correlationTypes.collect { '?' }.join(', ') + ')\n' +
-                            "           AND correl.$c.correlationColumn IN ( " +
+                            '           AND correl.' + c.correlationColumn + ' IN ( ' +
                             '               ' + c.searchKeywords.collect { '?' }.join(', ') + ')\n' +
                     ')',
                     (c.correlationTypes + c.searchKeywords*.bioDataId) as Object[],
@@ -87,7 +87,7 @@ class CorrelatedBiomarkersDataConstraint implements CriteriaDataConstraint {
                             c.searchKeywords.collect { LongType.INSTANCE }) as Type[]
             )
 
-            logger.debug "Params: ${(c.correlationTypes + c.searchKeywords*.bioDataId)}"
+            logger.debug 'Params: ' + (c.correlationTypes + c.searchKeywords*.bioDataId)
 
             outer = c
         }
@@ -97,16 +97,16 @@ class CorrelatedBiomarkersDataConstraint implements CriteriaDataConstraint {
             Criteria relevantCriteria =
                     criteriaQuery.getAliasedCriteria(outer.entityAlias)
             if (relevantCriteria == null) {
-                throw new HibernateException("Could not find Criteria with " +
-                        "alias ${outer.entityAlias}. Available aliases " +
-                        "are ${criteriaQuery.aliasCriteriaMap.keySet()}")
+                throw new HibernateException('Could not find Criteria with ' +
+                        'alias ' + outer.entityAlias + '. Available aliases ' +
+                        'are ' + criteriaQuery.aliasCriteriaMap.keySet())
             }
 
             String entityName = criteriaQuery.getEntityName(relevantCriteria)
             if (entityName == null) {
-                throw new HibernateException("Could not find entity name " +
-                        "for criteria ${relevantCriteria}. Map of criteria " +
-                        "entity names is " +
+                throw new HibernateException('Could not find entity name ' +
+                        'for criteria ' + relevantCriteria + '. Map of criteria ' +
+                        'entity names is ' +
                         relevantCriteria.criteriaEntityNames)
             }
 

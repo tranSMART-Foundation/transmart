@@ -66,7 +66,7 @@ class HighDimensionResourceService implements HighDimensionResource {
     HighDimensionDataTypeResource getSubResourceForType(String dataTypeName)
             throws NoSuchResourceException {
         if (!dataTypeRegistry.containsKey(dataTypeName)) {
-            throw new NoSuchResourceException("Unknown data type: $dataTypeName")
+            throw new NoSuchResourceException('Unknown data type: ' + dataTypeName)
         }
         dataTypeRegistry[dataTypeName].call name: dataTypeName
     }
@@ -108,7 +108,7 @@ class HighDimensionResourceService implements HighDimensionResource {
 
         if (!res) {
             throw new InvalidArgumentsException(
-                    "Unsupported assay constraint: $name")
+                    'Unsupported assay constraint: ' + name)
         }
         res
     }

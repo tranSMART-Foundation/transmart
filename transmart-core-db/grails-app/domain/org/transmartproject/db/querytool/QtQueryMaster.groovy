@@ -65,6 +65,6 @@ class QtQueryMaster {
     @Override
     String toString() {
         getClass().canonicalName + "[${attached?'attached':'not attached'}" +
-                "] [ id=$id, name=$name, createDate=$createDate ]"
+                '] [ id=' + id + ', name=' + name + ', createDate=' + createDate + ' ]'
     }
 }

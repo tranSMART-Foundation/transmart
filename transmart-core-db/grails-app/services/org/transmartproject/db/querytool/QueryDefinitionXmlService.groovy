@@ -35,7 +35,8 @@ class QueryDefinitionXmlService implements QueryDefinitionXmlConverter {
         def xml
         try {
             xml = new XmlSlurper().parse(reader)
-        } catch (exception) {
+        }
+        catch (exception) {
             throw new InvalidRequestException('Malformed XML document: ' +
                     exception.message, exception)
         }
@@ -52,7 +53,8 @@ class QueryDefinitionXmlService implements QueryDefinitionXmlConverter {
                                     constrain.value_operator.toString()),
                             constraint: constrain.value_constraint?.toString()
                     )
-                } catch (err) {
+                }
+                catch (err) {
                     throw new InvalidRequestException(
                             'Invalid XML query definition constraint', err)
                 }
@@ -71,7 +73,8 @@ class QueryDefinitionXmlService implements QueryDefinitionXmlConverter {
                             property: constrain.omics_property?.toString(),
                             constraint: constrain.omics_value_constraint?.toString()
                     )
-                } catch (err) {
+                }
+                catch (err) {
                     throw new InvalidRequestException(
                             'Invalid XML query definition highdimension value constraint', err)
                 }
@@ -91,7 +94,8 @@ class QueryDefinitionXmlService implements QueryDefinitionXmlConverter {
 
         if (xml.query_name.size()) {
             return new QueryDefinition(xml.query_name.toString(), panels)
-        } else {
+        }
+        else {
             return new QueryDefinition(panels)
         }
     }
@@ -112,7 +116,7 @@ class QueryDefinitionXmlService implements QueryDefinitionXmlConverter {
          * using JAXB and that there's never any validation against the schema
          */
         xml.'qd:query_definition'('xmlns:qd': "http://www.i2b2" +
-                ".org/xsd/cell/crc/psm/querydefinition/1.1/") {
+                '.org/xsd/cell/crc/psm/querydefinition/1.1/') {
             query_name definition.name
 
             definition.panels.each { Panel panelArg ->

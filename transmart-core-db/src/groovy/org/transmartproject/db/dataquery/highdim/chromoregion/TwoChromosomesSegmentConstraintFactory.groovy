@@ -12,7 +12,7 @@ import org.transmartproject.db.dataquery.highdim.parameterproducers.ProducerFor
  * Created by j.hudecek on 5-12-2014.
  */
 @Component
-@Scope("prototype")
+@Scope('prototype')
 class TwoChromosomesSegmentConstraintFactory extends AbstractMethodBasedParameterFactory {
     String setSegmentPrefix(String value) {
         chromosomeSegmentConstraintFactoryUp.segmentPrefix = value

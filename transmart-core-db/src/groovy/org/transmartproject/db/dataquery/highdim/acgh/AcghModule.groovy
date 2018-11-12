@@ -56,7 +56,7 @@ class AcghModule extends AbstractHighDimensionDataTypeModule {
 
     final String name = 'acgh'
 
-    final String description = "ACGH data"
+    final String description = 'ACGH data'
 
     final Map<String, Class> dataProperties = typesMap(DeSubjectAcghData,
             ['chipCopyNumberValue', 'segmentCopyNumberValue', 'flag',
@@ -186,7 +186,7 @@ class AcghModule extends AbstractHighDimensionDataTypeModule {
                 finalizeGroup: { List list -> /* list of arrays with 15 elements (1/projection) */
                     if (list.size() != assays.size()) {
                         throw new UnexpectedResultException(
-                                "Expected group to be of size ${assays.size()}; got ${list.size()} objects")
+                                'Expected group to be of size ' + assays.size() + '; got ' + list.size() + ' objects')
                     }
                     def cell = list.find()[0]
                     def regionRow = new RegionRowImpl(

@@ -30,7 +30,7 @@ abstract class AbstractAcrossTrialsOntologyTerm
         implements OntologyTerm, MetadataSelectQuerySpecification {
 
     public final static String ACROSS_TRIALS_TABLE_CODE = 'xtrials'
-    public final static String ACROSS_TRIALS_TOP_TERM_NAME = "Across Trials"
+    public final static String ACROSS_TRIALS_TOP_TERM_NAME = 'Across Trials'
 
     /* Relies mainly on fullName; also on level */
 
@@ -92,7 +92,7 @@ abstract class AbstractAcrossTrialsOntologyTerm
             }
             if (!allDescendants) {
                 eq 'level',
-                        level - 1L /* "Across Trials" */ + 1L /* children */
+                        level - 1L /* 'Across Trials' */ + 1L /* children */
             }
         }.collect { new AcrossTrialsOntologyTerm(modifierDimension: it) }
     }
@@ -102,8 +102,8 @@ abstract class AbstractAcrossTrialsOntologyTerm
         // can't work right now because this object doesn't have access to
         // user in context. To support this we'll probably have to move
         // the user in context bean from transmartApp to core-db
-        throw new UnsupportedOperationException("Retrieving patients for " +
-                "x-trial node not supported yet")
+        throw new UnsupportedOperationException('Retrieving patients for ' +
+                'x-trial node not supported yet')
     }
 
     /* query specification methods */
@@ -138,7 +138,8 @@ abstract class AbstractAcrossTrialsOntologyTerm
         def conceptFullName = new ConceptFullName(fullName)
         if (conceptFullName.length == 1) {
             '\\'
-        } else {
+        }
+        else {
             "\\${conceptFullName[1..-1].join '\\'}\\"
         }
     }
@@ -147,14 +148,14 @@ abstract class AbstractAcrossTrialsOntologyTerm
     String postProcessQuery(String sql, User userInContext) {
         if (userInContext == null) {
             throw new NullPointerException(
-                    "Across trial nodes need to have the user provided")
+                    'Across trial nodes need to have the user provided')
         }
         def accessibleStudies = userInContext.accessibleStudies
         if (!accessibleStudies) {
-            return "$sql AND FALSE"
+            return '' + sql + ' AND FALSE'
         }
 
-        sql += "AND sourcesystem_cd IN "
+        sql += 'AND sourcesystem_cd IN '
         sql += '(' +
                 userInContext.accessibleStudies.collect {
                     "\'${it.id.replaceAll('\'', '\'\'')}\'"

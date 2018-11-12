@@ -30,7 +30,7 @@ import static org.transmartproject.db.dataquery.highdim.parameterproducers.Bindi
 import static org.transmartproject.db.dataquery.highdim.parameterproducers.BindingUtils.getParam
 
 @Component
-@Scope("prototype")
+@Scope('prototype')
 class ChromosomeSegmentConstraintFactory extends AbstractMethodBasedParameterFactory {
 
     String segmentPrefix = 'region.'
@@ -60,12 +60,15 @@ class ChromosomeSegmentConstraintFactory extends AbstractMethodBasedParameterFac
                     throw new InvalidArgumentsException(
                             'chromosome parameter cannot be empty')
                 }
-            } else if (key == SEGMENT_START_PARAM) {
+            }
+            else if (key == SEGMENT_START_PARAM) {
                 start = convertToLong SEGMENT_START_PARAM, value
-            } else if (key == SEGMENT_END_PARAM) {
+            }
+            else if (key == SEGMENT_END_PARAM) {
                 end = convertToLong SEGMENT_END_PARAM, value
-            } else {
-                throw new InvalidArgumentsException("Unrecognized param: $key")
+            }
+            else {
+                throw new InvalidArgumentsException('Unrecognized param: ' + key)
             }
         }
 

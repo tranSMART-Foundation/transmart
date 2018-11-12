@@ -45,7 +45,7 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
 
     final String name = 'rnaseq_cog'
 
-    final String description = "Messenger RNA data (Sequencing)"
+    final String description = 'Messenger RNA data (Sequencing)'
 
     final List<String> platformMarkerTypes = ['RNASEQ']
 

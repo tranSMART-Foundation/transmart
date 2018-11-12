@@ -47,7 +47,8 @@ class UsersResourceService implements UsersResource {
                 def users = query.list()
 
                 users[0]
-            } else {
+            }
+            else {
                 // in case hibernate is not in use (unit tests)
                 def user = User.findByUsername username
                 user?.roles
@@ -57,8 +58,8 @@ class UsersResourceService implements UsersResource {
         }
 
         if (!user) {
-            throw new NoSuchResourceException("No user with username " +
-                    "$username was found")
+            throw new NoSuchResourceException('No user with username ' +
+                    '' + username + ' was found')
         }
         
         user

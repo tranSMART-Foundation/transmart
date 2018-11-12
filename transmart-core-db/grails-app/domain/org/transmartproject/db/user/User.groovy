@@ -96,8 +96,8 @@ class User extends PrincipalCoreDb implements org.transmartproject.core.users.Us
 
         if (admin) {
             /* administrators bypass all the checks */
-            logger.debug "Bypassing check for $protectedOperation on " +
-                    "$protectedResource for user $this because he is an administrator"
+            logger.debug 'Bypassing check for ' + protectedOperation + ' on ' +
+                    '' + protectedResource + ' for user ' + this + ' because he is an administrator'
             return true
         }
 
@@ -108,7 +108,7 @@ class User extends PrincipalCoreDb implements org.transmartproject.core.users.Us
 
     Set<Study> getAccessibleStudies() {
         Set<Study> studies = accessControlChecks.getAccessibleStudiesForUser(this)
-        logger.debug "User $this has access to studies: ${studies*.id}"
+        logger.debug 'User ' + this + ' has access to studies: ' + studies*.id
         studies
     }
 }

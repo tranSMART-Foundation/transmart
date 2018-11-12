@@ -104,8 +104,8 @@ class CorrelationTypesRegistry {
         registryTable.row(targetType).collectEntries { String sourceType,
                                                        CorrelationType correlation ->
             if (!constraintMap[sourceType]) {
-                throw new InvalidArgumentsException("Source type $sourceType " +
-                        "has no registered constraint name")
+                throw new InvalidArgumentsException('Source type ' + sourceType + ' ' +
+                        'has no registered constraint name')
             }
 
             [ constraintMap[sourceType], correlation ]

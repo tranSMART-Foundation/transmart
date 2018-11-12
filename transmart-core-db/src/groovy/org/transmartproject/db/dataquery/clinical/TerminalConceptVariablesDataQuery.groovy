@@ -72,7 +72,8 @@ class TerminalConceptVariablesDataQuery {
         if (patients instanceof PatientQuery) {
             criteriaBuilder.add(getHibernateInCriterion('patient.id',
                     patients.forIds()))
-        } else {
+        }
+        else {
             criteriaBuilder.in('patient',  Lists.newArrayList(patients))
         }
 
@@ -97,15 +98,16 @@ class TerminalConceptVariablesDataQuery {
 
             if (it.conceptCode) {
                 if (conceptCodes.containsKey(it.conceptCode)) {
-                    throw new InvalidArgumentsException("Specified multiple " +
-                            "variables with the same concept code: " +
+                    throw new InvalidArgumentsException('Specified multiple ' +
+                            'variables with the same concept code: ' +
                             it.conceptCode)
                 }
                 conceptCodes[it.conceptCode] = it
-            } else if (it.conceptPath) {
+            }
+            else if (it.conceptPath) {
                 if (conceptPaths.containsKey(it.conceptPath)) {
-                    throw new InvalidArgumentsException("Specified multiple " +
-                            "variables with the same concept path: " +
+                    throw new InvalidArgumentsException('Specified multiple ' +
+                            'variables with the same concept path: ' +
                             it.conceptPath)
                 }
                 conceptPaths[it.conceptPath] = it
@@ -149,22 +151,22 @@ class TerminalConceptVariablesDataQuery {
         // check we found all the concepts
         for (var in conceptPaths.values()) {
             if (var.conceptCode == null) {
-                throw new InvalidArgumentsException("Concept path " +
+                throw new InvalidArgumentsException('Concept path ' +
                         "'${var.conceptPath}' did not yield any results")
             }
         }
         for (var in conceptCodes.values()) {
             if (var.conceptPath == null) {
-                throw new InvalidArgumentsException("Concept code " +
+                throw new InvalidArgumentsException('Concept code ' +
                         "'${var.conceptCode}' did not yield any results")
             }
         }
 
         Multiset multiset = HashMultiset.create clinicalVariables
         if (multiset.elementSet().size() < clinicalVariables.size()) {
-            throw new InvalidArgumentsException("Repeated variables in the " +
-                    "query (though once their concept path was specified and " +
-                    "on the second time their concept code was specified): " +
+            throw new InvalidArgumentsException('Repeated variables in the ' +
+                    'query (though once their concept path was specified and ' +
+                    'on the second time their concept code was specified): ' +
                     multiset.elementSet().findAll {
                             multiset.count(it) > 1
                     })

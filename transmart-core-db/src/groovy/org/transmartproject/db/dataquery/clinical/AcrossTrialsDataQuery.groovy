@@ -74,7 +74,8 @@ class AcrossTrialsDataQuery {
         if (patients instanceof PatientQuery) {
             criteriaBuilder.add(getHibernateInCriterion('patient.id',
                     patients.forIds()))
-        } else {
+        }
+        else {
             criteriaBuilder.in('patient',  Lists.newArrayList(patients))
         }
 
@@ -98,8 +99,8 @@ class AcrossTrialsDataQuery {
 
             if (!it.modifierCode) {
                 if (conceptPaths.containsKey(it.conceptPath)) {
-                    throw new InvalidArgumentsException("Specified multiple " +
-                            "variables with the same concept path: " +
+                    throw new InvalidArgumentsException('Specified multiple ' +
+                            'variables with the same concept path: ' +
                             it.conceptPath)
                 }
                 conceptPaths[convertPath(it.conceptPath)] = it
@@ -125,7 +126,7 @@ class AcrossTrialsDataQuery {
 
         for (var in conceptPaths.values()) {
             if (var.modifierCode == null) {
-                throw new InvalidArgumentsException("Concept path " +
+                throw new InvalidArgumentsException('Concept path ' +
                         "'${var.conceptPath}' did not yield any results")
             }
         }

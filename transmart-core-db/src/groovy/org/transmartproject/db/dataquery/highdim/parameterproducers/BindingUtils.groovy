@@ -40,17 +40,18 @@ class BindingUtils {
             if (missingParameters.size() == 1) {
                 throw new InvalidArgumentsException('Missing required parameter "' +
                         Iterables.getFirst(missingParameters, null) + '"; got ' +
-                        "the following parameters instead: ${params.keySet()}")
-            } else {
+                        'the following parameters instead: ' + params.keySet())
+            }
+            else {
                 throw new InvalidArgumentsException('Missing several ' +
-                        "required parameters: $missingParameters; " +
-                        "got ${params.keySet()}")
+                        'required parameters: ' + missingParameters + '; ' +
+                        'got ' + params.keySet())
             }
         }
         def extraParameters = params.keySet() - parameterNames
         if (extraParameters) {
-            throw new InvalidArgumentsException("Unrecognized parameters: " +
-                    "$extraParameters; only these are allowed: $parameterNames")
+            throw new InvalidArgumentsException('Unrecognized parameters: ' +
+                    '' + extraParameters + '; only these are allowed: ' + parameterNames)
         }
     }
 
@@ -58,13 +59,13 @@ class BindingUtils {
         def result = params[paramName]
 
         if (result == null) {
-            throw new InvalidArgumentsException("The parameter $paramName is not in map $params")
+            throw new InvalidArgumentsException('The parameter ' + paramName + ' is not in map ' + params)
         }
 
 
         if (!type.isAssignableFrom(result.getClass())) {
-            throw new InvalidArgumentsException("Expected parameter $paramName to be of type $type; " +
-                    "got class ${result.getClass()}")
+            throw new InvalidArgumentsException('Expected parameter ' + paramName + ' to be of type ' + type + '; ' +
+                    'got class ' + result.getClass())
         }
 
         result
@@ -73,10 +74,12 @@ class BindingUtils {
     static Long convertToLong(String paramName, Object obj) {
         if (obj instanceof Number) {
             obj = obj.longValue()
-        } else if (obj instanceof String && obj.isLong()) {
+        }
+        else if (obj instanceof String && obj.isLong()) {
             obj = obj.toLong()
-        } else {
-            throw new InvalidArgumentsException("Invalid value for $paramName: $obj")
+        }
+        else {
+            throw new InvalidArgumentsException('Invalid value for ' + paramName + ': ' + obj)
         }
         obj
     }
@@ -84,7 +87,7 @@ class BindingUtils {
     static List processList(String paramName, Object obj, Closure closure) {
         if (!(obj instanceof List)) {
             throw new InvalidArgumentsException("Parameter '$paramName' " +
-                    "is not a List, got a ${obj.getClass()}")
+                    'is not a List, got a ' + obj.getClass())
         }
 
         if (obj.isEmpty()) {
@@ -99,12 +102,14 @@ class BindingUtils {
         processList paramName, obj, {
             if (it instanceof String) {
                 it
-            } else if (it instanceof Number) {
+            }
+            else if (it instanceof Number) {
                 it.toString()
-            } else {
+            }
+            else {
                 throw new InvalidArgumentsException("Parameter '$paramName' " +
-                        "is not a list of String; found in a list an object with " +
-                        "type ${it.getClass()}")
+                        'is not a list of String; found in a list an object with ' +
+                        'type ' + it.getClass())
             }
         }
     }
@@ -114,17 +119,20 @@ class BindingUtils {
             if (it instanceof String) {
                 if (!it.isLong()) {
                     throw new InvalidArgumentsException("Parameter '$paramName' " +
-                            "is not a list of longs; found in a list an object " +
-                            "with type ${it.getClass()}")
-                } else {
+                            'is not a list of longs; found in a list an object ' +
+                            'with type ' + it.getClass())
+                }
+                else {
                     it as Long
                 }
-            } else if (it instanceof Number) {
+            }
+            else if (it instanceof Number) {
                 ((Number) it).longValue()
-            } else {
+            }
+            else {
                 throw new InvalidArgumentsException("Parameter '$paramName' " +
-                        "is not a list of longs; found in a list an object " +
-                        "with type ${it.getClass()}")
+                        'is not a list of longs; found in a list an object ' +
+                        'with type ' + it.getClass())
             }
         }
     }

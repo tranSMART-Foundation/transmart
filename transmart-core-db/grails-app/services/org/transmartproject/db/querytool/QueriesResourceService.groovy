@@ -107,12 +107,14 @@ class QueriesResourceService implements QueriesResource {
                 def statement = conn.prepareStatement(sql)
                 setSize = statement.executeUpdate()
 
-                logger.debug "Inserted $setSize rows into qt_patient_set_collection"
+                logger.debug 'Inserted ' + setSize + ' rows into qt_patient_set_collection'
             } as Work)
-        } catch (InvalidRequestException e) {
+        }
+        catch (InvalidRequestException e) {
             logger.error 'Invalid request; rolling back transaction', e
             throw e /* unchecked; rolls back transaction */
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             // 6e. Handle error when building/running patient set query
             logger.error 'Error running (or building) querytool SQL query, ' +
                     "failing query was '$sql'", e
@@ -134,17 +136,17 @@ class QueriesResourceService implements QueriesResource {
             queryInstance.message = sw.toString()
 
             if (!resultInstance.save()) {
-                logger.error("After exception from " +
-                        "patientSetQueryBuilderService::buildService, " +
-                        "failed saving updated resultInstance and " +
-                        "queryInstance")
+                logger.error('After exception from ' +
+                        'patientSetQueryBuilderService::buildService, ' +
+                        'failed saving updated resultInstance and ' +
+                        'queryInstance')
             }
             return resultInstance
         }
 
         // 7. Update result instance and query instance
         resultInstance.setSize = resultInstance.realSetSize = setSize
-        resultInstance.description = "Patient set for \"${definition.name}\""
+        resultInstance.description = 'Patient set for \'${definition.name}\''
         resultInstance.endDate = new Date()
         resultInstance.statusTypeId = QueryStatus.FINISHED.id
 
@@ -166,7 +168,7 @@ class QueriesResourceService implements QueriesResource {
     QueryResult getQueryResultFromId(Long id) throws NoSuchResourceException {
         QtQueryResultInstance.get(id) ?:
                 {  throw new NoSuchResourceException(
-                        "Could not find query result instance with id $id") }()
+                        'Could not find query result instance with id ' + id) }()
     }
 
     @Override
@@ -194,14 +196,15 @@ class QueriesResourceService implements QueriesResource {
          * user is not a tranSMART user. Log a warning.
          */
         if (user == null) {
-            throw new NullPointerException("Username not provided")
+            throw new NullPointerException('Username not provided')
         }
         try {
             usersResourceService.getUserFromUsername(user)
-        } catch (NoSuchResourceException unf) {
-            logger.warn("User $user not found. This is permitted for " +
-                    "compatibility with i2b2, but tranSMART functionality " +
-                    "will be degraded, and this behavior is deprecated")
+        }
+        catch (NoSuchResourceException unf) {
+            logger.warn('User ' + user + ' not found. This is permitted for ' +
+                    'compatibility with i2b2, but tranSMART functionality ' +
+                    'will be degraded, and this behavior is deprecated')
             return null
         }
     }

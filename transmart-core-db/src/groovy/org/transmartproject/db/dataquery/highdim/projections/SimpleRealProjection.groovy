@@ -68,6 +68,6 @@ class SimpleRealProjection implements CriteriaProjection<Double> {
             return obj[-1]
         }
         // If the ALIAS_TO_ENTITY_MAP transformer was used, obj is a map, else we just take the corresponding property.
-        return obj."$property"
+        return obj[property]
     }
 }

@@ -40,23 +40,23 @@ class CohortProjection implements CriteriaProjection<Map> {
         def projection = builder.instance.projection
 
         if (!(projection instanceof ProjectionList)) {
-            throw new IllegalArgumentException("doWithCriteriaBuilder method" +
-                    " requires a Hibernate Projectionlist to be set.")
+            throw new IllegalArgumentException('doWithCriteriaBuilder method' +
+                    ' requires a Hibernate Projectionlist to be set.')
         }
 
         // add an alias to make this ALIAS_TO_ENTITY_MAP-friendly
-        ["allele1", "allele2", "subjectId"].each { field ->
+        ['allele1', 'allele2', 'subjectId'].each { field ->
             projection.add(
                     Projections.alias(
-                            Projections.property("summary." + field),
+                            Projections.property('summary.' + field),
                             field))
         }
         
         builder.createAlias('subjectIndex', 'subjectIndex', LEFT_OUTER_JOIN)
         projection.add(
                 Projections.alias(
-                        Projections.property("subjectIndex.position"),
-                        "subjectPosition"))
+                        Projections.property('subjectIndex.position'),
+                        'subjectPosition'))
     }
 
     @Override

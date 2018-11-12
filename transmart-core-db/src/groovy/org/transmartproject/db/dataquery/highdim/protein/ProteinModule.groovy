@@ -45,7 +45,7 @@ class ProteinModule extends AbstractHighDimensionDataTypeModule {
 
     final String name = 'protein'
 
-    final String description = "Proteomics data (Mass Spec)"
+    final String description = 'Proteomics data (Mass Spec)'
 
     final List<String> platformMarkerTypes = ['PROTEOMICS']
 

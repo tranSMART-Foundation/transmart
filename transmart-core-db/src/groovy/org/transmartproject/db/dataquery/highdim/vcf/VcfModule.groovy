@@ -46,7 +46,7 @@ class VcfModule extends AbstractHighDimensionDataTypeModule {
 
     final String name = 'vcf'
 
-    final String description = "Genomic Variant data"
+    final String description = 'Genomic Variant data'
 
     final List<String> platformMarkerTypes = ['VCF']
 

@@ -1,6 +1,6 @@
-grails.project.class.dir = "target/classes"
-grails.project.test.class.dir = "target/test-classes"
-grails.project.test.reports.dir = "target/test-reports"
+grails.project.class.dir = 'target/classes'
+grails.project.test.class.dir = 'target/test-classes'
+grails.project.test.reports.dir = 'target/test-reports'
 
 def defaultVMSettings = [
         maxMemory: 768,
@@ -21,7 +21,7 @@ grails.project.repos."${grails.project.repos.default}".url = 'https://repo.trans
 
 grails.project.dependency.resolver = 'maven'
 grails.project.dependency.resolution = {
-    log "warn"
+    log 'warn'
     legacyResolve false
 
     inherits('global') {}

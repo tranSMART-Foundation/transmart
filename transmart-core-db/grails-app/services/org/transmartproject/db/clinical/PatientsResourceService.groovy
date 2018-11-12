@@ -29,6 +29,6 @@ class PatientsResourceService implements PatientsResource {
     @Override
     Patient getPatientById(Long id) throws NoSuchResourceException {
         PatientDimension.get(id) ?:
-                { throw new NoSuchResourceException("No patient with number $id") }()
+                { throw new NoSuchResourceException('No patient with number ' + id) }()
     }
 }

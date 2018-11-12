@@ -53,7 +53,7 @@ class AcghDataTypeResource extends HighDimensionDataTypeResourceImpl {
                     'No assays satisfy the provided criteria')
         }
 
-        logger.debug "Now getting regions for platforms: $platformIds"
+        logger.debug 'Now getting regions for platforms: ' + platformIds
 
         Query q = module.sessionFactory.currentSession.createQuery('''
             SELECT region.chromosome, min(region.start), max(region.end)
@@ -64,9 +64,10 @@ class AcghDataTypeResource extends HighDimensionDataTypeResourceImpl {
 
         q.list().collect {
             new ChromosomalSegment(chromosome: it[0], start: it[1], end: it[2])
-        } ?: {
+        }
+        ?: {
             throw new EmptySetException(
-                    "No regions found for platform ids: $platformIds")
+                    'No regions found for platform ids: ' + platformIds)
         }()
     }
 }

@@ -63,23 +63,25 @@ class ClinicalVariableFactory {
         def closure = knownTypes[type]
 
         if (!closure) {
-            throw new InvalidArgumentsException("Invalid clinical variable " +
+            throw new InvalidArgumentsException('Invalid clinical variable ' +
                     "type '$type', supported types are ${knownTypes.keySet()}")
         }
 
         if (params.size() != 1) {
-            throw new InvalidArgumentsException("Expected exactly one parameter, " +
-                    "got ${params.keySet()}")
+            throw new InvalidArgumentsException('Expected exactly one parameter, ' +
+                    'got ' + params.keySet())
         }
 
         String conceptCode,
                conceptPath
         if (params['concept_code']) {
             conceptCode = BindingUtils.getParam params, 'concept_code', String
-        } else if (params['concept_path']) {
+        }
+        else if (params['concept_path']) {
             conceptPath = BindingUtils.getParam params, 'concept_path', String
-        } else {
-            throw new InvalidArgumentsException("Expected the given parameter " +
+        }
+        else {
+            throw new InvalidArgumentsException('Expected the given parameter ' +
                     "to be one of 'concept_code', 'concept_path', got " +
                     "'${params.keySet().iterator().next()}'")
         }
@@ -110,8 +112,8 @@ class ClinicalVariableFactory {
         def parent = descendantDimensions[0]
         if (descendantDimensions.size() == 1) {
             throw new InvalidArgumentsException('Concept with path ' +
-                    "$conceptPath was supposed to be the container for a " +
-                    "categorical variable, but instead no children were found")
+                    '' + conceptPath + ' was supposed to be the container for a ' +
+                    'categorical variable, but instead no children were found')
         }
         def children = descendantDimensions[1..-1]
         def parentNumSlashes = parent.conceptPath.count('\\')
@@ -119,9 +121,9 @@ class ClinicalVariableFactory {
         def innerVariables = children.collect {
             def thisCount = it.conceptPath.count('\\')
             if (thisCount != parentNumSlashes + 1) {
-                throw new InvalidArgumentsException("Concept with path " +
+                throw new InvalidArgumentsException('Concept with path ' +
                         "'$conceptPath' does not seem to be a categorical " +
-                        "variable because it has grandchildren (found " +
+                        'variable because it has grandchildren (found ' +
                         "concept path '${it.conceptPath}'")
             }
 
@@ -151,11 +153,11 @@ class ClinicalVariableFactory {
         }
 
         if (!terms) {
-            throw new UnexpectedResultException("Could not find any path in " +
-                    "i2b2 starting with $resolvedConceptPath")
+            throw new UnexpectedResultException('Could not find any path in ' +
+                    'i2b2 starting with ' + resolvedConceptPath)
         }
         if (terms[0].fullName != resolvedConceptPath) {
-            throw new UnexpectedResultException("Expected first result to " +
+            throw new UnexpectedResultException('Expected first result to ' +
                     "have concept path '$resolvedConceptPath', got " +
                     "'${terms[0].fullName}'")
         }
@@ -174,7 +176,8 @@ class ClinicalVariableFactory {
 
         terms.findAll {
             LEAF in it.visualAttributes
-        }.each {
+        }
+        .each {
             ConceptFullName conceptNameObj = new ConceptFullName(it.fullName)
             String parentName = conceptNameObj.parent?.toString()
 
@@ -223,7 +226,8 @@ class ClinicalVariableFactory {
             if (parentName in blackListedCategorical) {
                 // blacklisted
                 composingVariables.addAll childrenVariables
-            } else {
+            }
+            else {
                 composingVariables <<
                         createCategoricalVariableFinal(parentName,
                                                   childrenVariables)
@@ -246,12 +250,13 @@ class ClinicalVariableFactory {
 
             if (!resolvedConceptPath) {
                 throw new InvalidArgumentsException(
-                        "Could not find path of concept with code $conceptCode")
+                        'Could not find path of concept with code ' + conceptCode)
             }
-        } else {
+        }
+        else {
             if (!ConceptDimension.findByConceptPath(conceptPath)) {
-                throw new InvalidArgumentsException("" +
-                        "Could not find concept with path $conceptPath")
+                throw new InvalidArgumentsException('' +
+                        'Could not find concept with path ' + conceptPath)
             }
         }
 
@@ -271,7 +276,7 @@ class ClinicalVariableFactory {
         if (result[0]?.conceptPath != resolvedConceptPath) {
             throw new UnexpectedResultException('Expected first result to have ' +
                     "concept path '$resolvedConceptPath', got " +
-                    "${result[0]?.conceptPath} instead")
+                    '' + result[0]?.conceptPath + ' instead')
         }
 
         result

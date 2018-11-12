@@ -82,8 +82,8 @@ class AccessLevel implements Permission {
     @Override
     public String toString() {
         com.google.common.base.Objects.toStringHelper(this)
-                .add("name", name)
-                .add("value", value).toString()
+                .add('name', name)
+                .add('value', value).toString()
     }
 
     @Override

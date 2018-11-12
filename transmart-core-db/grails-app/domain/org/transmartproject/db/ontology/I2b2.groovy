@@ -95,10 +95,12 @@ class I2b2 extends AbstractI2b2Metadata implements Serializable {
 
         def res = query.list()
         if (res.size() > 1) {
-            throw new UnexpectedResultException("More than one study with name $trial")
-        } else if (res.size() == 1) {
+            throw new UnexpectedResultException('More than one study with name ' + trial)
+        }
+        else if (res.size() == 1) {
             new StudyImpl(ontologyTerm: res[0], id: trial)
-        } else {
+        }
+        else {
             null
         }
     }

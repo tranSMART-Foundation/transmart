@@ -72,14 +72,14 @@ class TerminalClinicalVariablesTabularResult extends
         }
 
         if (indicesList.empty) {
-            throw new InvalidArgumentsException("Indices list is empty")
+            throw new InvalidArgumentsException('Indices list is empty')
         }
 
         def groups = indicesList*.group.unique()
         if (groups.size() != 1) {
-            throw new InvalidArgumentsException("Expected all the clinical " +
-                    "variables in this sub-result to have the same type, " +
-                    "found these: $groups")
+            throw new InvalidArgumentsException('Expected all the clinical ' +
+                    'variables in this sub-result to have the same type, ' +
+                    'found these: ' + groups)
         }
         this.variableGroup = groups[0]
 
@@ -132,18 +132,18 @@ class TerminalClinicalVariablesTabularResult extends
             /* find out the position of this concept in the final result */
             Integer index = codeToIndex[rawRow[CODE_COLUMN_INDEX] as String]
             if (index == null) {
-                throw new IllegalStateException("Unexpected concept code " +
+                throw new IllegalStateException('Unexpected concept code ' +
                         "'${rawRow[CODE_COLUMN_INDEX]}' at this point; " +
-                        "expected one of ${codeToIndex.keySet()}")
+                        'expected one of ' + codeToIndex.keySet())
             }
 
             /* and the corresponding variable */
             TerminalClinicalVariable var = indexToColumn[index]
 
             if (transformedData[index] != null) {
-                throw new UnexpectedResultException("Got more than one fact for " +
-                        "patient ${rawRow[PATIENT_NUM_COLUMN_INDEX]} and " +
-                        "code $var.code. This is currently unsupported")
+                throw new UnexpectedResultException('Got more than one fact for ' +
+                        'patient ' + rawRow[PATIENT_NUM_COLUMN_INDEX] + ' and ' +
+                        'code ' + var.code + '. This is currently unsupported')
             }
 
             transformedData[index] = getVariableValue(rawRow)
@@ -160,7 +160,8 @@ class TerminalClinicalVariablesTabularResult extends
 
         if (valueType == TEXT_VALUE_TYPE) {
             rawRow[TEXT_VALUE_COLUMN_INDEX]
-        } else {
+        }
+        else {
             rawRow[NUMBER_VALUE_COLUMN_INDEX]
         }
     }

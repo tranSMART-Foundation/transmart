@@ -25,7 +25,7 @@ class DeRnaseqAnnotation implements Serializable {
 
     String transcriptId
     String geneSymbol
-    String geneId /* the Entrez accession; "primary external id" */
+    String geneId /* the Entrez accession; 'primary external id' */
 
     // irrelevant
     //String organism

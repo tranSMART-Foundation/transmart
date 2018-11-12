@@ -77,11 +77,13 @@ class StudiesResourceService implements StudiesResource {
         if (OntologyTerm.VisualAttributes.STUDY in term.visualAttributes &&
                 term.hasProperty('studyId') && term.studyId) {
             new StudyImpl(ontologyTerm: term, id: term.studyId)
-        } else if ((trialNodes = I2b2TrialNodes.findByFullName(term.fullName))) {
+        }
+        else if ((trialNodes = I2b2TrialNodes.findByFullName(term.fullName))) {
             new StudyImpl(ontologyTerm: term, id: trialNodes.trial)
-        } else {
+        }
+        else {
             throw new NoSuchResourceException(
-                    "The ontology term $term is not the top node for a study")
+                    'The ontology term ' + term + ' is not the top node for a study')
         }
     }
 }

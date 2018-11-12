@@ -42,14 +42,14 @@ class DefaultConceptsResource implements ConceptsResource {
         domainClass = TableAccess.findByTableCode(ck.tableCode)?.
                 ontologyTermDomainClassReferred
         if (!domainClass)
-            throw new NoSuchResourceException("Unknown or unmapped table " +
-                    "code: $ck.tableCode")
+            throw new NoSuchResourceException('Unknown or unmapped table ' +
+                    'code: ' + ck.tableCode)
         result = domainClass.findByFullNameAndCSynonymCd(ck.conceptFullName
                 .toString(), 'N' as Character)
         if (!result) {
             throw new NoSuchResourceException('No non-synonym concept with ' +
                     "fullName '$ck.conceptFullName' found for type " +
-                    "$domainClass")
+                    '' + domainClass)
         }
         result.setTableCode(ck.tableCode)
         result

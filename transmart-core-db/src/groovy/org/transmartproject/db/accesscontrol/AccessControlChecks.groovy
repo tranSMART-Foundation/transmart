@@ -72,9 +72,9 @@ class AccessControlChecks {
 
         if (user.admin) {
             /* administrators bypass all the checks */
-            logger.debug "Bypassing check for $protectedOperation on " +
-                    "$study for user $this because he is an " +
-                    "administrator"
+            logger.debug 'Bypassing check for ' + protectedOperation + ' on ' +
+                    '' + study + ' for user ' + this + ' because he is an ' +
+                    'administrator'
             return true
         }
 
@@ -83,7 +83,7 @@ class AccessControlChecks {
                 I2b2Secure.findByFullName study.ontologyTerm.fullName
         if (!secure) {
             logger.warn "Could not find object '${study.ontologyTerm.fullName}' " +
-                    "in i2b2_secure; allowing access"
+                    'in i2b2_secure; allowing access'
             // must be true for backwards compatibility reasons
             // see I2b2HelperService::getAccess
             return true
@@ -91,9 +91,9 @@ class AccessControlChecks {
 
         String token = secure.secureObjectToken
         if (!token) {
-            throw new UnexpectedResultException("Found i2b2secure object with empty token")
+            throw new UnexpectedResultException('Found i2b2secure object with empty token')
         }
-        logger.debug "Token for $study is $token"
+        logger.debug 'Token for ' + study + ' is ' + token
 
         /* if token is EXP:PUBLIC, always permit */
         if (token == PUBLIC_SOT) {
@@ -112,22 +112,23 @@ class AccessControlChecks {
         query.setParameter 'token', token
 
         List<AccessLevel> results = query.list()
-        logger.debug("Got access levels for user $this, token $token: $results")
+        logger.debug('Got access levels for user ' + this + ', token ' + token + ': ' + results)
 
         if (!results) {
-            logger.info "No access level entries found for user $this and " +
-                    "token $token; denying access"
+            logger.info 'No access level entries found for user ' + this + ' and ' +
+                    'token ' + token + '; denying access'
             return false
         }
 
         if (results.any { protectedOperation in it }) {
-            logger.debug("Access level of user $this for token $token " +
-                    "granted through permission " +
-                    "${results.find { protectedOperation in it }}")
+            logger.debug('Access level of user ' + this + ' for token ' + token + ' ' +
+                    'granted through permission ' +
+                    results.find { protectedOperation in it })
             true
-        } else {
-            logger.info("Permissions of user $this for token $token are " +
-                    "only ${results as Set}; denying access")
+        }
+        else {
+            logger.info('Permissions of user ' + this + ' for token ' + token + ' are ' +
+                    'only ' + (results as Set) + '; denying access')
             false
         }
     }
@@ -144,14 +145,14 @@ class AccessControlChecks {
                 studySet*.ontologyTerm*.fullName as List)
 
         allI2b2s.find { !it.secureObjectToken }?.collect {
-            throw new UnexpectedResultException("Found I2b2Secure object " +
-                    "with empty secureObjectToken")
+            throw new UnexpectedResultException('Found I2b2Secure object ' +
+                    'with empty secureObjectToken')
         }
 
         Map<Study, String> studySOTMap = studySet.collectEntries { study ->
             /* note that the user is GRANTED access to studies that don't
              * have a corresponding I2b2Secure object. That is
-             * the reason for "?.(...) ?: PUBLIC_SOT" part below
+             * the reason for '?.(...) ?: PUBLIC_SOT' part below
              */
             [study, allI2b2s.find { i2b2secure ->
                 i2b2secure.fullName == study.ontologyTerm.fullName
@@ -184,9 +185,9 @@ class AccessControlChecks {
                        ProtectedOperation operation,
                        QueryDefinition definition) {
         if (operation != ProtectedOperation.WellKnownOperations.BUILD_COHORT) {
-            logger.warn "Requested protected operation different from " +
-                    "BUILD_COHORT on QueryDefinition $definition"
-            throw new UnsupportedOperationException("Operation $operation ")
+            logger.warn 'Requested protected operation different from ' +
+                    'BUILD_COHORT on QueryDefinition ' + definition
+            throw new UnsupportedOperationException('Operation ' + operation + ' ')
         }
 
         // check there is at least one non-inverted panel for which the user
@@ -205,7 +206,7 @@ class AccessControlChecks {
                 def study = concept.study
 
                 if (study == null) {
-                    logger.info "User included concept with no study: $concept"
+                    logger.info 'User included concept with no study: ' + concept
                 }
 
                 study
@@ -220,12 +221,13 @@ class AccessControlChecks {
         }
 
         if (!res) {
-            logger.warn "User $user defined access for definition $definition " +
+            logger.warn 'User ' + user + ' defined access for definition ' + definition + ' ' +
                     "because it doesn't include one non-inverted panel for" +
                     "which the user has permission in all the terms' studies"
-        } else {
-            logger.debug "Granting access to user $user to use " +
-                    "query definition $definition"
+        }
+        else {
+            logger.debug 'Granting access to user ' + user + ' to use ' +
+                    'query definition ' + definition
         }
 
         res
@@ -235,9 +237,9 @@ class AccessControlChecks {
                        ProtectedOperation operation,
                        QueryResult result) {
         if (operation != ProtectedOperation.WellKnownOperations.READ) {
-            logger.warn "Requested protected operation different from " +
-                    "READ on QueryResult $result"
-            throw new UnsupportedOperationException("Operation $operation ")
+            logger.warn 'Requested protected operation different from ' +
+                    'READ on QueryResult ' + result
+            throw new UnsupportedOperationException('Operation ' + operation + ' ')
         }
 
         /* Note that this check doesn't account for the fact that the user's
@@ -260,11 +262,12 @@ class AccessControlChecks {
         def res = result.username == user.username
 
         if (!res) {
-            logger.warn "Denying $user access to query result $result because " +
+            logger.warn 'Denying ' + user + ' access to query result ' + result + ' because ' +
                     "its creator (${result.username}) doesn't match the user " +
-                    "(${user.username})"
-        } else {
-            logger.debug "Granting $user access to $result (usernames match)"
+                    '(' + user.username + ')'
+        }
+        else {
+            logger.debug 'Granting ' + user + ' access to ' + result + ' (usernames match)'
         }
 
         res

@@ -98,14 +98,16 @@ class ClinicalDataResourceService implements ClinicalDataResource {
                 intermediateResults = innerResultFactory.
                         createIntermediateResults(session,
                                 patients, flattenedVariables)
-            } else {
-                logger.info("No patients passed to retrieveData() with" +
-                        "variables $variables; will skip main queries")
+            }
+            else {
+                logger.info('No patients passed to retrieveData() with' +
+                        'variables ' + variables + '; will skip main queries')
             }
 
             new ClinicalDataTabularResult(
                     session, intermediateResults, patientMap)
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
             session.close()
             throw t
         }
@@ -116,7 +118,8 @@ class ClinicalDataResourceService implements ClinicalDataResource {
         variables.each { var ->
             if (var instanceof ComposedVariable) {
                 flattenClinicalVariables target, var.innerClinicalVariables
-            } else {
+            }
+            else {
                 target << var
             }
         }

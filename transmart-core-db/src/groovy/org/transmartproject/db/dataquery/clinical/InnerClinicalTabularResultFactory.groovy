@@ -64,7 +64,7 @@ class InnerClinicalTabularResultFactory {
                 return new TerminalClinicalVariablesTabularResult(
                         query.openResultSet(), relevantVariables)
             default:
-                throw new IllegalArgumentException("Unknown group name: $group")
+                throw new IllegalArgumentException('Unknown group name: ' + group)
         }
     }
 }

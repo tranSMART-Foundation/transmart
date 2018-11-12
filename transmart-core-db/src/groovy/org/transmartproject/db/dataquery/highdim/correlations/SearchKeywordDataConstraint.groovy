@@ -62,9 +62,9 @@ class SearchKeywordDataConstraint implements CriteriaDataConstraint {
                 Set acceptableCategories =
                         origCorrelationTypes*.sourceType as Set
                 throw new InvalidArgumentsException(
-                        "A search keyword with data category $type is not " +
-                                "acceptable for this constraint; must be one of " +
-                                "$acceptableCategories")
+                        'A search keyword with data category ' + type + ' is not ' +
+                                'acceptable for this constraint; must be one of ' +
+                                '' + acceptableCategories)
             }
 
             multimap.put correlationType.correlationTable, it
@@ -84,7 +84,8 @@ class SearchKeywordDataConstraint implements CriteriaDataConstraint {
 
         if (buildParams.size() == 1) {
             createForSearchKeywordIdsInternal(*buildParams[0])
-        } else {
+        }
+        else {
             def ret = new DisjunctionDataConstraint()
             ret.constraints = buildParams.collect {
                 createForSearchKeywordIdsInternal(*it)
