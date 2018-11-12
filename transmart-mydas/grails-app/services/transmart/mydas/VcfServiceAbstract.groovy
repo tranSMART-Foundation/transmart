@@ -42,21 +42,21 @@ abstract class VcfServiceAbstract extends TransmartDasServiceAbstract {
     
     protected List<String> getCommonNotes( VcfValues val ) {
         [
-            "RefSNP=" + val.rsId,
-            "REF=" + val.cohortInfo.referenceAllele,
-            "ALT=" + val.cohortInfo.alternativeAlleles.join(','),
-            "MafAllele=" + val.cohortInfo.minorAllele,
-            "AlleleFrequency=" + String.format( '%.2f', val.cohortInfo.minorAlleleFrequency ),
-            "AlleleCount=" + ( val.cohortInfo.alleleCount ?: NA ),
-            "TotalAllele=" + ( val.cohortInfo.totalAlleleCount ?: NA ),
-            "GenomicVariantTypes=" + val.cohortInfo.genomicVariantTypes.findAll().join(','),
+            'RefSNP=' + val.rsId,
+            'REF=' + val.cohortInfo.referenceAllele,
+            'ALT=' + val.cohortInfo.alternativeAlleles.join(','),
+            'MafAllele=' + val.cohortInfo.minorAllele,
+            'AlleleFrequency=' + String.format( '%.2f', val.cohortInfo.minorAlleleFrequency ),
+            'AlleleCount=' + ( val.cohortInfo.alleleCount ?: NA ),
+            'TotalAllele=' + ( val.cohortInfo.totalAlleleCount ?: NA ),
+            'GenomicVariantTypes=' + val.cohortInfo.genomicVariantTypes.findAll().join(','),
             
-            "VariantClassification=" + ( val.infoFields['VC'] ?: NA ),
-            "QualityOfDepth=" + ( val.qualityOfDepth ?: NA ),
+            'VariantClassification=' + ( val.infoFields['VC'] ?: NA ),
+            'QualityOfDepth=' + ( val.qualityOfDepth ?: NA ),
             
-            "BaseQRankSum=" + ( val.infoFields['BaseQRankSum'] ?: NA ),
-            "MQRankSum=" + ( val.infoFields['MQRankSum'] ?: NA ),
-            "dbSNPMembership=" + ( val.infoFields['DB'] ?: "No" )
+            'BaseQRankSum=' + ( val.infoFields['BaseQRankSum'] ?: NA ),
+            'MQRankSum=' + ( val.infoFields['MQRankSum'] ?: NA ),
+            'dbSNPMembership=' + ( val.infoFields['DB'] ?: "No" )
         ]
     }
 }

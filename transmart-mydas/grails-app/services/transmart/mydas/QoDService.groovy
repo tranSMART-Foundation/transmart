@@ -27,11 +27,11 @@ class QoDService  extends  VcfServiceAbstract {
     private def getQDFeature = { VcfValues val ->
 
         def linkMap = val.rsId == '.' ? [:]
-                : [(new URL("http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=${val.rsId}")): 'NCBI SNP Ref']
+                : [(new URL('http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=' + val.rsId)): 'NCBI SNP Ref']
 
         [new DasFeature(
                 // feature id - any unique id that represent this feature
-                "qd-${val.rsId}",
+                'qd-' + val.rsId,
                 // feature label
                 'Quality of Depth',
                 // das type

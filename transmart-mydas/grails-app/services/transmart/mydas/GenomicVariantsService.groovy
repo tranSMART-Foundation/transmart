@@ -28,7 +28,7 @@ class GenomicVariantsService  extends  VcfServiceAbstract {
     private def getGenomicTypeFeature = { VcfValues val ->
 
         def linkMap = val.rsId == '.' ? [:]
-                : [(new URL("http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=${val.rsId}")): 'NCBI SNP Ref']
+                : [(new URL('http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=' + val.rsId)): 'NCBI SNP Ref']
 
         def results = []
         val.cohortInfo.genomicVariantTypes.eachWithIndex { genomicVariantType, indx ->
@@ -37,11 +37,11 @@ class GenomicVariantsService  extends  VcfServiceAbstract {
                 
             results << new DasFeature(
                     // feature id - any unique id that represent this feature
-                    "gv-${val.rsId}-$genomicVariantType",
+                    'gv-' + val.rsId + '-' + genomicVariantType,
                     // feature label
                     'Genomic Variant Type',
                     // das type
-                    new DasType(genomicVariantType.toString(), "", "", ""),
+                    new DasType(genomicVariantType.toString(), '', '', ''),
                     // das method TODO: pls find out what is actually means
                     dasMethod,
                     // start pos
@@ -55,8 +55,8 @@ class GenomicVariantsService  extends  VcfServiceAbstract {
                     //notes
                     getCommonNotes(val) + 
                     [
-                        "CurrentALT=" + val.cohortInfo.alleles[ indx ],
-                        "Type=" + genomicVariantType,
+                        'CurrentALT=' + val.cohortInfo.alleles[ indx ],
+                        'Type=' + genomicVariantType,
                     ],
                     //links
                     linkMap,

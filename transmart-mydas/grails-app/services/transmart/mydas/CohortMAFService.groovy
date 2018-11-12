@@ -39,11 +39,11 @@ class CohortMAFService  extends  VcfServiceAbstract {
         }
 
         def linkMap = val.rsId == '.' ? [:]
-                : [(new URL("http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=${val.rsId}")): 'NCBI SNP Ref']
+                : [(new URL('http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=' + val.rsId)): 'NCBI SNP Ref']
 
         [new DasFeature(
                 // feature id - any unique id that represent this feature
-                "maf-${val.rsId}",
+                'maf-' + val.rsId,
                 // feature label
                 'Cohort Minor Allele Frequency',
                 // das type
