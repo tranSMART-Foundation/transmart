@@ -24,7 +24,7 @@ class UserParameters {
     }
 
     String toString() {
-        "UserParameters$map"
+        'UserParameters' + map
     }
 
     String toJSON() {

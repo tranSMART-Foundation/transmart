@@ -28,6 +28,6 @@ class PCA extends HighDimensionalOnlyJob {
 
     @Override
     protected getForwardPath() {
-        "/PCA/pcaOut?jobName=${name}"
+        '/PCA/pcaOut?jobName=' + name
     }
 }

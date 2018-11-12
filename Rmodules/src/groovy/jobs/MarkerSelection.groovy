@@ -41,6 +41,6 @@ class MarkerSelection extends HighDimensionalOnlyJob {
 
     @Override
     final String getForwardPath() {
-        "/markerSelection/markerSelectionOut?jobName=${name}"
+        '/markerSelection/markerSelectionOut?jobName=' + name
     }
 }

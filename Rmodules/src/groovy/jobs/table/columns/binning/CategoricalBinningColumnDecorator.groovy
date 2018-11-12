@@ -23,9 +23,9 @@ class CategoricalBinningColumnDecorator implements ColumnDecorator {
             if (castInner.lastRow[clinicalVariable]) {
                 def newValue = transformationMap[clinicalVariable.label /* concept path */]
                 if (!newValue) {
-                    throw new IllegalStateException("Binning invalidly configured. " +
-                            "transformation map is $transformationMap, which does not " +
-                            "contain the key $clinicalVariable.label")
+                    throw new IllegalStateException('Binning invalidly configured. ' +
+                            'transformation map is ' + transformationMap + ', which does not ' +
+                            'contain the key ' + clinicalVariable.label)
                 }
 
                 return ImmutableMap.of(castInner.getPrimaryKey(castInner.lastRow),

@@ -26,7 +26,8 @@ abstract class AbstractDumpHighDimensionalDataStep extends AbstractDumpStep {
     void execute() {
         try {
             writeDefaultCsv results, csvHeader
-        } finally {
+        }
+        finally {
             results.values().each { it?.close() }
         }
     }
@@ -40,10 +41,10 @@ abstract class AbstractDumpHighDimensionalDataStep extends AbstractDumpStep {
     abstract List<String> getCsvHeader()
 
     protected String getRowKey(String subsetName, String seriesName, String patientId) {
-        if (params.doGroupBySubject == "true") {
-            return [subsetName, patientId, seriesName].join("_")
+        if (params.doGroupBySubject == 'true') {
+            return [subsetName, patientId, seriesName].join('_')
         }
-        return [subsetName, seriesName, patientId].join("_")
+        return [subsetName, seriesName, patientId].join('_')
     }
 
     private void withDefaultCsvWriter(Closure constructFile) {
@@ -99,7 +100,8 @@ abstract class AbstractDumpHighDimensionalDataStep extends AbstractDumpStep {
 
                     csvWriter.writeNext csvRow as String[]
                 }
-            } else {
+            }
+            else {
                 def csvRow = computeCsvRow(subsetName,
                         seriesName,
                         row,

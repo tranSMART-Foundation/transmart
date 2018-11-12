@@ -60,18 +60,18 @@ abstract class CategoricalOrBinnedJob extends AbstractAnalysisJob implements Ini
 
         configurator.multiRow              = true
 
-        configurator.keyForConceptPaths    = "${keyVariablePart}Variable"
-        configurator.keyForDataType        = "div${keyVariablePart.capitalize()}VariableType"
-        configurator.keyForSearchKeywordId = "div${keyVariablePart.capitalize()}VariablePathway"
+        configurator.keyForConceptPaths    = '' + keyVariablePart + 'Variable'
+        configurator.keyForDataType        = 'div' + keyVariablePart.capitalize() + 'VariableType'
+        configurator.keyForSearchKeywordId = 'div' + keyVariablePart.capitalize() + 'VariablePathway'
 
         BinningColumnConfigurator binningColumnConfigurator =
                 configurator.binningConfigurator
-        binningColumnConfigurator.keyForDoBinning       = "binning${keyBinPart.capitalize()}"
-        binningColumnConfigurator.keyForManualBinning   = "manualBinning${keyBinPart.capitalize()}"
-        binningColumnConfigurator.keyForNumberOfBins    = "numberOfBins${keyBinPart.capitalize()}"
-        binningColumnConfigurator.keyForBinDistribution = "binDistribution${keyBinPart.capitalize()}"
-        binningColumnConfigurator.keyForBinRanges       = "binRanges${keyBinPart.capitalize()}"
-        binningColumnConfigurator.keyForVariableType    = "variableType${keyBinPart.capitalize()}"
+        binningColumnConfigurator.keyForDoBinning       = 'binning' + keyBinPart.capitalize()
+        binningColumnConfigurator.keyForManualBinning   = 'manualBinning' + keyBinPart.capitalize()
+        binningColumnConfigurator.keyForNumberOfBins    = 'numberOfBins' + keyBinPart.capitalize()
+        binningColumnConfigurator.keyForBinDistribution = 'binDistribution' + keyBinPart.capitalize()
+        binningColumnConfigurator.keyForBinRanges       = 'binRanges' + keyBinPart.capitalize()
+        binningColumnConfigurator.keyForVariableType    = 'variableType' + keyBinPart.capitalize()
     }
 
 }

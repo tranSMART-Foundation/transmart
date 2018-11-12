@@ -40,8 +40,8 @@ class ResultInstanceIdsHolder {
         }.findAll()
 
         if (!r) {
-            throw new InvalidArgumentsException("No result instance ids provided. " +
-                    "Check the parameters $keysForResultInstanceIds")
+            throw new InvalidArgumentsException('No result instance ids provided. ' +
+                    'Check the parameters ' + keysForResultInstanceIds)
         }
 
         r
@@ -52,7 +52,7 @@ class ResultInstanceIdsHolder {
             def queryResult = queriesResource.getQueryResultFromId id
             if (!currentUserBean.canPerform(READ, queryResult)) {
                 throw new AccessDeniedException("Current user doesn't have " +
-                        "access to result instance with id $id")
+                        'access to result instance with id ' + id)
             }
 
             queryResult

@@ -36,7 +36,7 @@ class SurvivalAnalysisResultController {
             render new JSON([error: 'jobName parameter is required. It should contains just alphanumeric characters and dashes.'])
             return
         }
-        def file = new File("${RModulesOutputRenderService.tempFolderDirectory}", "${params.jobName}/workingDirectory/survival-test.txt")
+        def file = new File('' + RModulesOutputRenderService.tempFolderDirectory, '' + params.jobName + '/workingDirectory/survival-test.txt')
         if (file.exists()) {
             def fields = params.fields?.split('\\s*,\\s*') as Set ?: DEFAULT_FIELDS
 
@@ -52,7 +52,8 @@ class SurvivalAnalysisResultController {
             def json = new JSON(obj)
             json.prettyPrint = false
             render json
-        } else {
+        }
+        else {
             response.status = 404
             render '[]'
         }
@@ -62,8 +63,8 @@ class SurvivalAnalysisResultController {
      * This function will return the image path
      */
     def imagePath = {
-        def imagePath = "${RModulesOutputRenderService.relativeImageURL}${params.jobName}/workingDirectory/" +
-                "${params.jobType}_${params.chromosome}_${params.start}_${params.end}.png"
+        def imagePath = '' + RModulesOutputRenderService.relativeImageURL + params.jobName + '/workingDirectory/' +
+                '' + params.jobType + '_' + params.chromosome + '_' + params.start + '_' + params.end + '.png'
         render imagePath
     }
 

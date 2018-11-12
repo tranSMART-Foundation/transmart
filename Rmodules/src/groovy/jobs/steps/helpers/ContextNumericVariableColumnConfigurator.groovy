@@ -57,12 +57,13 @@ class ContextNumericVariableColumnConfigurator extends ColumnConfigurator {
     @Override
     protected void doAddColumn(Closure<Column> decorateColumn) {
         if (clinicalData) {
-            logger.debug("$keyForDataType indicates clinical data; " +
-                    "using the MultiNumericClinicalVariableColumnConfigurator")
+            logger.debug('' + keyForDataType + ' indicates clinical data; ' +
+                    'using the MultiNumericClinicalVariableColumnConfigurator')
             multiClinicalConfigurator.doAddColumn decorateColumn
-        } else {
-            logger.debug("$keyForDataType indicates high dim data; " +
-                    "using the HighDimensionColumnConfigurator")
+        }
+        else {
+            logger.debug('' + keyForDataType + ' indicates high dim data; ' +
+                    'using the HighDimensionColumnConfigurator')
             multiHighDimConfigurator.doAddColumn decorateColumn
         }
     }

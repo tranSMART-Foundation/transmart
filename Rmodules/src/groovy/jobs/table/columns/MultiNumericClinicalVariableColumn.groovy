@@ -55,7 +55,7 @@ class MultiNumericClinicalVariableColumn extends AbstractColumn {
     private void validateNumber(ClinicalVariableColumn col, Object value) {
         if (!(value instanceof Number)) {
             throw new InvalidArgumentsException(
-                    "Got non-numerical value for column $col; value was $value")
+                    'Got non-numerical value for column ' + col + '; value was ' + value)
         }
     }
 }

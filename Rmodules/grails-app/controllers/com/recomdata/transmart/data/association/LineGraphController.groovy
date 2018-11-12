@@ -4,8 +4,7 @@ class LineGraphController {
 
 	def RModulesOutputRenderService
 	
-	def lineGraphOutput =
-	{
+	def lineGraphOutput = {
 		//This will be the array of image links.
 		def ArrayList<String> imageLinks = new ArrayList<String>()
 		
@@ -16,13 +15,13 @@ class LineGraphController {
 		String jobName = params.jobName
 
 		//Gather the image links.
-		RModulesOutputRenderService.initializeAttributes(jobName,"LineGraph",imageLinks)
+		RModulesOutputRenderService.initializeAttributes(jobName,'LineGraph',imageLinks)
 
 		String tempDirectory = RModulesOutputRenderService.tempDirectory
 		
 		//Create a directory object so we can pass it to be traversed.
 		def tempDirectoryFile = new File(tempDirectory)
 
-		render(template: "/plugin/lineGraph_out", model:[imageLocations:imageLinks,zipLink:RModulesOutputRenderService.zipLink], contextPath:pluginContextPath)
+		render(template: '/plugin/lineGraph_out', model:[imageLocations:imageLinks,zipLink:RModulesOutputRenderService.zipLink], contextPath:pluginContextPath)
 	}
 }

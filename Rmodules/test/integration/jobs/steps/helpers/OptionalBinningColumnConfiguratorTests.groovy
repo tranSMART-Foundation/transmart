@@ -111,8 +111,8 @@ class OptionalBinningColumnConfiguratorTests {
 
             def res = table.result
             assertThat res, contains(
-                    contains(equalTo("0 ≤ $COLUMN_HEADER ≤ 45" as String)),
-                    contains(equalTo("45 < $COLUMN_HEADER ≤ 65" as String)))
+                    contains(equalTo('0 ≤ ' + COLUMN_HEADER + ' ≤ 45' as String)),
+                    contains(equalTo('45 < ' + COLUMN_HEADER + ' ≤ 65' as String)))
         }
     }
 
@@ -151,9 +151,9 @@ class OptionalBinningColumnConfiguratorTests {
 
             def res = table.result
             assertThat res, contains(
-                    contains(equalTo("10.0 ≤ $COLUMN_HEADER < $halfPoint" as String)),
-                    contains(equalTo("$halfPoint ≤ $COLUMN_HEADER ≤ 9001.0" as String)),
-                    contains(equalTo("$halfPoint ≤ $COLUMN_HEADER ≤ 9001.0" as String)))
+                    contains(equalTo('10.0 ≤ ' + COLUMN_HEADER + ' < ' + halfPoint as String)),
+                    contains(equalTo('' + halfPoint + ' ≤ ' + COLUMN_HEADER + ' ≤ 9001.0' as String)),
+                    contains(equalTo('' + halfPoint + ' ≤ ' + COLUMN_HEADER + ' ≤ 9001.0' as String)))
         }
     }
 
@@ -194,9 +194,9 @@ class OptionalBinningColumnConfiguratorTests {
 
             //XXX: match to patients
             assertThat res, containsInAnyOrder(
-                    (["5.0 ≤ $COLUMN_HEADER ≤ 44.0" as String] * 3 +
-                            ["44.0 < $COLUMN_HEADER ≤ 66.0" as String] * 3 +
-                            ["66.0 < $COLUMN_HEADER ≤ 95.0" as String] * 4).collect { equalTo([it]) })
+                    (['5.0 ≤ ' + COLUMN_HEADER + ' ≤ 44.0' as String] * 3 +
+                            ['44.0 < ' + COLUMN_HEADER + ' ≤ 66.0' as String] * 3 +
+                            ['66.0 < ' + COLUMN_HEADER + ' ≤ 95.0' as String] * 4).collect { equalTo([it]) })
         }
     }
 
@@ -226,8 +226,8 @@ class OptionalBinningColumnConfiguratorTests {
             def res = table.result
 
             assertThat res, containsInAnyOrder(
-                    is(["12.0 ≤ $COLUMN_HEADER ≤ 12.0" as String]),
-                    is(["12.0 < $COLUMN_HEADER ≤ 20.0" as String]),)
+                    is(['12.0 ≤ ' + COLUMN_HEADER + ' ≤ 12.0' as String]),
+                    is(['12.0 < ' + COLUMN_HEADER + ' ≤ 20.0' as String]),)
         }
     }
 
@@ -261,8 +261,8 @@ class OptionalBinningColumnConfiguratorTests {
              * See comment on calculateQuantileRanks */
             println res
             assertThat res, containsInAnyOrder(
-                    (["20.0 ≤ $COLUMN_HEADER ≤ 20.0" as String] * 4 +
-                    ["20.0 < $COLUMN_HEADER ≤ 31.0" as String] * 2).collect { equalTo([it]) })
+                    (['20.0 ≤ ' + COLUMN_HEADER + ' ≤ 20.0' as String] * 4 +
+                    ['20.0 < ' + COLUMN_HEADER + ' ≤ 31.0' as String] * 2).collect { equalTo([it]) })
         }
     }
 
@@ -303,9 +303,9 @@ class OptionalBinningColumnConfiguratorTests {
 
             def res = table.result
             assertThat res, contains(
-                    contains(equalTo("0 ≤ $COLUMN_HEADER ≤ 45" as String)),
-                    contains(equalTo("0 ≤ $COLUMN_HEADER ≤ 45" as String)),
-                    contains(equalTo("45 < $COLUMN_HEADER ≤ 65" as String)))
+                    contains(equalTo('0 ≤ ' + COLUMN_HEADER + ' ≤ 45' as String)),
+                    contains(equalTo('0 ≤ ' + COLUMN_HEADER + ' ≤ 45' as String)),
+                    contains(equalTo('45 < ' + COLUMN_HEADER + ' ≤ 65' as String)))
         }
     }
 
@@ -320,7 +320,7 @@ class OptionalBinningColumnConfiguratorTests {
                 numberOfBins       : '2',
 
                 binRanges          : ("bin1<>${BUNDLE_OF_CLINICAL_CONCEPT_PATH[0..1].join('<>')}|" +
-                                     "bin2<>${BUNDLE_OF_CLINICAL_CONCEPT_PATH[2]}") as String,
+                                     'bin2<>' + BUNDLE_OF_CLINICAL_CONCEPT_PATH[2]) as String,
                 variableType       : 'Categorical',
 
                 result_instance_id1: RESULT_INSTANCE_ID1,
@@ -330,7 +330,7 @@ class OptionalBinningColumnConfiguratorTests {
         List<ClinicalVariableColumn> columns =
                 createClinicalVariableColumns BUNDLE_OF_CLINICAL_CONCEPT_PATH, true
 
-        List<String> valuesForColumns = (1..3).collect { "value for col$it".toString() }
+        List<String> valuesForColumns = (1..3).collect { 'value for col' + it.toString() }
 
         TabularResult<ClinicalVariableColumn, PatientRow> clinicalResult =
                 mock(TabularResult)
@@ -411,8 +411,8 @@ class OptionalBinningColumnConfiguratorTests {
 
             List res = Lists.newArrayList table.result
             assertThat res, containsInAnyOrder(
-                    contains(equalTo("0 ≤ $COLUMN_HEADER ≤ 45" as String), equalTo('')),
-                    contains(equalTo("45 < $COLUMN_HEADER ≤ 65" as String), equalTo('')),
+                    contains(equalTo('0 ≤ ' + COLUMN_HEADER + ' ≤ 45' as String), equalTo('')),
+                    contains(equalTo('45 < ' + COLUMN_HEADER + ' ≤ 65' as String), equalTo('')),
                     contains(equalTo('foo'), equalTo('bar')))
         }
     }

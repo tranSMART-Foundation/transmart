@@ -74,7 +74,7 @@ class CorrelationAnalysis extends AbstractAnalysisJob {
 
     @Override
     protected getForwardPath() {
-        "/correlationAnalysis/correlationAnalysisOutput?jobName=$name"
+        '/correlationAnalysis/correlationAnalysisOutput?jobName=' + name
     }
 
 }

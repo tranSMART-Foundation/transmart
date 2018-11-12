@@ -28,11 +28,12 @@ class OpenHighDimensionalDataStep implements Step {
             extractPatientSets().eachWithIndex { resultInstanceId, index ->
                 ontologyTerms.each { ontologyTerm ->
                     String seriesLabel = ontologyTerm.split('\\\\')[-1]
-                    List<String> keyList = ["S" + (index + 1), seriesLabel]
+                    List<String> keyList = ['S' + (index + 1), seriesLabel]
                     results[keyList] = fetchSubset(resultInstanceId, ontologyTerm)
                 }
             }
-        } catch(Throwable t) {
+        }
+        catch(Throwable t) {
             results.values().each { it.close() }
             throw t
         }
@@ -45,7 +46,7 @@ class OpenHighDimensionalDataStep implements Step {
     }
 
     private List<Integer> extractPatientSets() {
-        analysisConstraints.assayConstraints.remove("patient_set").grep()
+        analysisConstraints.assayConstraints.remove('patient_set').grep()
     }
 
     private TabularResult fetchSubset(Integer patientSetId, String ontologyTerm) {

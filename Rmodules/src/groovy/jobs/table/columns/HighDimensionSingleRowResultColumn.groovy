@@ -27,7 +27,7 @@ class HighDimensionSingleRowResultColumn extends AbstractColumn {
         assert row instanceof DataRow
 
         if (sawRow) {
-            logger.warn("Further rows from $dataSourceName ignored")
+            logger.warn('Further rows from ' + dataSourceName + ' ignored')
             return
         }
 

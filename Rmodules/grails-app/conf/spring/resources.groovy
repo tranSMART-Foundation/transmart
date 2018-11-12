@@ -78,16 +78,16 @@ class CurrentUserBeanMockFactory implements FactoryBean<User> {
 
     void registerBeanToTry(String beanName) {
         logger.debug('Mocked call to &currentUserBean.registerBeanToTry with ' +
-                "beanName=$beanName")
+                'beanName=' + beanName)
     }
 
     User getObject() throws Exception {
         [
             canPerform: { ProtectedOperation operation,
                           ProtectedResource protectedResource ->
-                logger.debug("Mocked call to currentUserBean.canPerform with " +
-                        "operation=$operation, " +
-                        "protectedResource=$protectedResource")
+                logger.debug('Mocked call to currentUserBean.canPerform with ' +
+                        'operation=' + operation + ', ' +
+                        'protectedResource=' + protectedResource)
                 true
             }
         ] as User

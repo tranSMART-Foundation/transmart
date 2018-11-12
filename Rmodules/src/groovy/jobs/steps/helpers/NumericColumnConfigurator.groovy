@@ -41,7 +41,8 @@ class NumericColumnConfigurator extends ColumnConfigurator {
                 : columnDecorator
         if (isClinical()) {
             addColumnClinical resultColumnDecoretor
-        } else {
+        }
+        else {
             addColumnHighDim resultColumnDecoretor
         }
     }
@@ -93,10 +94,10 @@ class NumericColumnConfigurator extends ColumnConfigurator {
      * @param keyPart
      */
     void setKeys(String keyPart = '') {
-        keyForConceptPath     = "${keyPart}Variable"
-        keyForDataType        = "div${keyPart.capitalize()}VariableType"
-        keyForSearchKeywordId = "div${keyPart.capitalize()}VariablePathway"
-        keyForLog10           = "div${keyPart.capitalize()}VariableLog10"
+        keyForConceptPath     = '' + keyPart + 'Variable'
+        keyForDataType        = 'div' + keyPart.capitalize() + 'VariableType'
+        keyForSearchKeywordId = 'div' + keyPart.capitalize() + 'VariablePathway'
+        keyForLog10           = 'div' + keyPart.capitalize() + 'VariableLog10'
     }
 
 }

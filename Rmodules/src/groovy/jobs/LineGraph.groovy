@@ -99,7 +99,7 @@ class LineGraph extends AbstractAnalysisJob {
         steps << new BuildConceptTimeValuesStep(
                 table: conceptTimeValues,
                 outputFile: new File(temporaryDirectory, SCALING_VALUES_FILENAME),
-                header: [ "GROUP", "VALUE" ]
+                header: [ 'GROUP', 'VALUE' ]
         )
 
         Map<String, Closure<String>> extraParams = [:]
@@ -134,6 +134,6 @@ class LineGraph extends AbstractAnalysisJob {
 
     @Override
     protected getForwardPath() {
-        "/lineGraph/lineGraphOutput?jobName=$name"
+        '/lineGraph/lineGraphOutput?jobName=' + name
     }
 }

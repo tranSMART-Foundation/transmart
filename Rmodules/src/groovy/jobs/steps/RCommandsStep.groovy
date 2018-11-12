@@ -57,26 +57,27 @@ class RCommandsStep implements Step {
             }
 
             vars.pluginDirectory = scriptsDirectory.absolutePath
-            vars.temporaryDirectory = new File(temporaryDirectory, "subset1_$studyName").absolutePath
+            vars.temporaryDirectory = new File(temporaryDirectory, 'subset1_' + studyName).absolutePath
 
             //For each R step there is a list of commands.
             stepList.each { String currentCommand ->
                 runRCommand rConnection, currentCommand, vars
             }
-        } finally {
+        }
+        finally {
             rConnection.close()
         }
     }
 
     private void runRCommand(RConnection connection, String command, Map vars) {
         String finalCommand = processTemplates command, vars
-        logger.info "About to trigger R command: $finalCommand"
+        logger.info 'About to trigger R command: ' + finalCommand
 
-        // TODO Set back silent mode REXP rObject = rConnection.parseAndEval("try($finalCommand, silent=TRUE)")
-        REXP rObject = connection.parseAndEval("try($finalCommand, silent=FALSE)")
+        // TODO Set back silent mode REXP rObject = rConnection.parseAndEval('try(' + finalCommand + ', silent=TRUE)')
+        REXP rObject = connection.parseAndEval('try(' + finalCommand + ', silent=FALSE)')
 
-        if (rObject.inherits("try-error")) {
-            logger.error "R command failure for:$finalCommand"
+        if (rObject.inherits('try-error')) {
+            logger.error 'R command failure for:' + finalCommand
             handleRError(rObject, connection)
         }
     }
@@ -84,7 +85,7 @@ class RCommandsStep implements Step {
     static private void handleRError(REXP rObject, RConnection rConnection) throws RserveException {
         throw new RserveException(rConnection,
                 'There was an error running the R script for your job. ' +
-                        "Details: ${rObject.asString()}")
+                        'Details: ' + rObject.asString())
     }
 
     static private String processTemplates(String template, Map vars) {

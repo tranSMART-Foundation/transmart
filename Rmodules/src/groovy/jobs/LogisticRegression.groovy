@@ -105,6 +105,6 @@ class LogisticRegression extends AbstractAnalysisJob {
 
     @Override
     protected getForwardPath() {
-        return "/logisticRegression/logisticRegressionOutput?jobName=$name"
+        return '/logisticRegression/logisticRegressionOutput?jobName=' + name
     }
 }

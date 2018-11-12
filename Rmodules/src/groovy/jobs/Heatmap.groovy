@@ -33,7 +33,7 @@ class Heatmap extends HighDimensionalOnlyJob {
 
     @Override
     protected getForwardPath() {
-        "/RHeatmap/heatmapOut?jobName=${name}"
+        '/RHeatmap/heatmapOut?jobName=' + name
     }
 
 }

@@ -22,7 +22,7 @@ class AnalysisConstraints {
     }
 
     String toString() {
-        "AnalysisConstraints$map"
+        'AnalysisConstraints' + map
     }
 
 }

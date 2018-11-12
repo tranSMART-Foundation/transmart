@@ -18,8 +18,8 @@ class ConceptTimeValuesTableTest extends GMockTestCase {
 
     ConceptsResource conceptsResource
 
-    String path1 = "\\foo\\"
-    String path2 = "\\bar\\"
+    String path1 = '\\foo\\'
+    String path2 = '\\bar\\'
 
     @Before
     void setUp() {
@@ -95,7 +95,7 @@ class ConceptTimeValuesTableTest extends GMockTestCase {
     private OntologyTerm setConceptResourceKeyExpect(String path, Map metadata) {
         table.conceptPaths << path
 
-        String fullname = "$path fullname"
+        String fullname = '' + path + ' fullname'
         OntologyTerm ot = createMockOntologyTerm(fullname, metadata)
         String key = ConceptTimeValuesTable.getConceptKey(path)
         conceptsResource.getByKey(key).returns(ot).stub()
@@ -105,9 +105,9 @@ class ConceptTimeValuesTableTest extends GMockTestCase {
     private Map createMetadata(String unit, String value) {
         [
             seriesMeta: [
-                    "unit": unit,
-                    "value": value,
-                    "label": "label for $value $unit",
+                    'unit': unit,
+                    'value': value,
+                    'label': 'label for ' + value + ' ' + unit,
             ]
         ]
     }

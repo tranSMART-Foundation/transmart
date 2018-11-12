@@ -12,8 +12,8 @@ class MockTabularResultHelper {
 
     List<AssayColumn> createSampleAssays(int n) {
         (1..n).collect {
-            createMockAssay("patient_${it}_subject_id",
-                    "sample_code_${it}")
+            createMockAssay('patient_' + it + '_subject_id',
+                    'sample_code_' + it)
         }
     }
 
@@ -37,14 +37,14 @@ class MockTabularResultHelper {
     List<Patient> createPatients(int n) {
         (1..n).collect {
             Patient p = mock(Patient)
-            p.inTrialId.returns("subject id #$it".toString()).atLeastOnce()
+            p.inTrialId.returns('subject id #' + it.toString()).atLeastOnce()
             p
         }
     }
 
     List<String> createPatientRowLabels(int n) {
         (1..n).collect {
-            "patient #$it" as String
+            'patient #' + it as String
         }
     }
 
@@ -77,7 +77,7 @@ class MockTabularResultHelper {
                 getPatientInTrialId: { -> patientInTrialId },
                 getLabel:            { -> label },
                 equals:              { other -> delegate.is(other) },
-                toString:            { -> "assay for $patientInTrialId" as String }
+                toString:            { -> 'assay for ' + patientInTrialId as String }
         ] as AssayColumn
     }
 

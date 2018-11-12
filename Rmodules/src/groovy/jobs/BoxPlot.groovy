@@ -70,7 +70,7 @@ class BoxPlot extends CategoricalOrBinnedJob {
 
     @Override
     protected getForwardPath() {
-        "/boxPlot/boxPlotOut?jobName=$name"
+        '/boxPlot/boxPlotOut?jobName=' + name
     }
 
 }

@@ -53,7 +53,7 @@ class AcghRegionDumpDataStep extends AbstractDumpHighDimensionalDataStep {
 
         PER_ASSAY_COLUMNS.keySet().each {String head ->
             assays.each { AssayColumn assay ->
-                r << "${head}.${assay.patientInTrialId}".toString()
+                r << '' + head + '.' + assay.patientInTrialId.toString()
             }
         }
 

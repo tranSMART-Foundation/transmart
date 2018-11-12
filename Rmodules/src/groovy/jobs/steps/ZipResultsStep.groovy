@@ -15,7 +15,7 @@ class ZipResultsStep implements Step {
      * The directOry where the job data is stored and from where the R scripts
      * run.
      *
-     * The odd name ("folderDirectory") is an historical artifact.
+     * The odd name ('folderDirectory') is an historical artifact.
      *
      * @return the jobs directory
      */

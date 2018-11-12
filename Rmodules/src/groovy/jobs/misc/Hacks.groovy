@@ -20,12 +20,12 @@ final class Hacks {
      */
     static String createConceptKeyFrom(String conceptPath) {
         if (conceptPath =~ '^\\\\Across Trials\\\\') {
-            return "\\\\xtrials$conceptPath"
+            return '\\\\xtrials' + conceptPath
         }
 
-        // This crazy dance with slashes is "expected behaviour"
+        // This crazy dance with slashes is 'expected behaviour'
         // as per http://groovy.codehaus.org/Strings+and+GString (search for Slashy Strings)
         def bs = '\\\\'
-        "\\\\" + (conceptPath =~ /$bs([^$bs]+)$bs/)[0][-1] + conceptPath
+        '\\\\' + (conceptPath =~ /$bs([^$bs]+)$bs/)[0][-1] + conceptPath
     }
 }

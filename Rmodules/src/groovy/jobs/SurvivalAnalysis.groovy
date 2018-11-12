@@ -120,7 +120,7 @@ class SurvivalAnalysis extends AbstractAnalysisJob implements InitializingBean {
 
     @Override
     protected getForwardPath() {
-        "/survivalAnalysis/survivalAnalysisOutput?jobName=$name"
+        '/survivalAnalysis/survivalAnalysisOutput?jobName=' + name
     }
 
 }

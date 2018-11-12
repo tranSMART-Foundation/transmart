@@ -70,7 +70,7 @@ class AcghSurvivalAnalysis extends AbstractAnalysisJob implements InitializingBe
         steps << new WriteFileStep(
                 temporaryDirectory: temporaryDirectory,
                 fileName: 'README.txt',
-                fileContent: messageSource.getMessage("jobs.SurvivalAnalysis.readmeFileContent", null, null, null))
+                fileContent: messageSource.getMessage('jobs.SurvivalAnalysis.readmeFileContent', null, null, null))
 
         steps << new BuildTableResultStep(
                 table:         table,
@@ -133,7 +133,7 @@ class AcghSurvivalAnalysis extends AbstractAnalysisJob implements InitializingBe
 
     @Override
     protected getForwardPath() {
-        return "/aCGHSurvivalAnalysis/aCGHSurvivalAnalysisOutput?jobName=${name}"
+        return '/aCGHSurvivalAnalysis/aCGHSurvivalAnalysisOutput?jobName=' + name
     }
 
 }

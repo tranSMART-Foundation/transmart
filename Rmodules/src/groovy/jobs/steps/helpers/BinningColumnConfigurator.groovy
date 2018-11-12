@@ -44,7 +44,8 @@ class BinningColumnConfigurator extends ColumnConfigurator {
                 decorator.inner = originalColumn
                 decorator
             }
-        } else {
+        }
+        else {
             Closure.IDENTITY
         }
     }
@@ -54,21 +55,25 @@ class BinningColumnConfigurator extends ColumnConfigurator {
             if (variableContinuous) {
                 new NumericManualBinningColumnDecorator(
                         binRanges: createBinRanges())
-            } else {
+            }
+            else {
                 new CategoricalBinningColumnDecorator(
                         transformationMap: createConceptPathMap())
             }
-        } else {
+        }
+        else {
             String distribution = getStringParam keyForBinDistribution
             if (distribution == 'EDP') {
                 new EvenDistributionBinningColumnDecorator(
                         numberOfBins: getStringParam(keyForNumberOfBins) as int)
-            } else if (distribution == 'ESB') {
+            }
+            else if (distribution == 'ESB') {
                 new EvenSpacedBinningColumnDecorator(
                         numberOfBins: getStringParam(keyForNumberOfBins) as int)
-            } else {
+            }
+            else {
                 throw new InvalidArgumentsException(
-                        "Invalid value for $keyForBinDistribution: " +
+                        'Invalid value for ' + keyForBinDistribution + ': ' +
                         "expected 'EDP' or 'ESB', got $distribution")
             }
         }
@@ -80,8 +85,8 @@ class BinningColumnConfigurator extends ColumnConfigurator {
         binRangesString.split(/\|/).collect {
             String[] parts = it.split(',')
             if (parts.length != 3) {
-                throw new InvalidArgumentsException("Invalid bin range specification: $it. " +
-                        "Complete value: $binRangesString")
+                throw new InvalidArgumentsException('Invalid bin range specification: ' + it + '. ' +
+                        'Complete value: ' + binRangesString)
             }
 
             new NumericBinRange(
@@ -117,12 +122,12 @@ class BinningColumnConfigurator extends ColumnConfigurator {
      * @param keyPart
      */
     void setKeys(String keyPart = '') {
-        keyForDoBinning       = "binning${keyPart.capitalize()}"
-        keyForManualBinning   = "manualBinning${keyPart.capitalize()}"
-        keyForNumberOfBins    = "numberOfBins${keyPart.capitalize()}"
-        keyForBinDistribution = "binDistribution${keyPart.capitalize()}"
-        keyForBinRanges       = "binRanges${keyPart.capitalize()}"
-        keyForVariableType    = "variableType${keyPart.capitalize()}"
+        keyForDoBinning       = 'binning' + keyPart.capitalize()
+        keyForManualBinning   = 'manualBinning' + keyPart.capitalize()
+        keyForNumberOfBins    = 'numberOfBins' + keyPart.capitalize()
+        keyForBinDistribution = 'binDistribution' + keyPart.capitalize()
+        keyForBinRanges       = 'binRanges' + keyPart.capitalize()
+        keyForVariableType    = 'variableType' + keyPart.capitalize()
     }
 
 }

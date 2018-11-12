@@ -44,7 +44,7 @@ class HighDimensionMultipleRowsResultColumn extends AbstractColumn {
         String rowLabel = row.label
         if (!seenRowLabels.put(dataSourceName, rowLabel)) {
             throw new UnexpectedResultException(
-                    "Got more than one row with label $rowLabel")
+                    'Got more than one row with label ' + rowLabel)
         }
 
         /* empty cells are dropped; see HighDimensionalDataRowMapAdapter */

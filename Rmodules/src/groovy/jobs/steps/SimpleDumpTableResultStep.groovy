@@ -20,7 +20,8 @@ class SimpleDumpTableResultStep extends AbstractDumpStep {
 
                 writeMeat it
             }
-        } finally {
+        }
+        finally {
             table.close()
         }
     }
@@ -41,9 +42,9 @@ class SimpleDumpTableResultStep extends AbstractDumpStep {
     void writeMeat(CSVWriter writer) {
         def rows = getMainRows()
         if (!rows.hasNext()) {
-            throw new EmptySetException("The result set is empty. " +
-                    "Number of patients dropped owing to mismatched " +
-                    "data: ${table.droppedRows}")
+            throw new EmptySetException('The result set is empty. ' +
+                    'Number of patients dropped owing to mismatched ' +
+                    'data: ' + table.droppedRows)
         }
         rows.each {
             writer.writeNext(it as String[])

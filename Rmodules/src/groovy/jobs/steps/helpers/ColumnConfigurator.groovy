@@ -30,7 +30,8 @@ abstract class ColumnConfigurator {
     void addColumn(Closure<Column> decorateColumn) {
         if (!missingValueAction) {
             doAddColumn decorateColumn
-        } else {
+        }
+        else {
             /* we don't do the same sort of thing for header because, unlike the
              * MissingValueAction, which only matters on the outer layer (i.e.,
              * the Column that is actually added to the table, not its eventual
@@ -73,7 +74,7 @@ abstract class ColumnConfigurator {
         }
 
         // @Delegate doesn't seem to work well with overriding properties
-        // when using the simple syntax "MissingValueAction missingValueAction"
+        // when using the simple syntax 'MissingValueAction missingValueAction'
         MissingValueAction getMissingValueAction() {
             this.missingValueAction
         }
@@ -85,12 +86,12 @@ abstract class ColumnConfigurator {
         def v = params[key]
         if (!v && required) {
             throw new InvalidArgumentsException("The parameter '$key' has not " +
-                    "been provided by the client")
+                    'been provided by the client')
         }
 
         if (v && !(v instanceof String)) {
             throw new InvalidArgumentsException("Expected the parameter '$key' " +
-                    "to be a String, got a ${v.getClass()}")
+                    'to be a String, got a ' + v.getClass())
         }
 
         v

@@ -38,7 +38,8 @@ class SimpleConceptVariableColumn extends AbstractColumn {
                 validateNumber column, cellValue
             }
             res = ImmutableMap.of(getPrimaryKey(lastRow), cellValue)
-        } else {
+        }
+        else {
             res = ImmutableMap.of()
         }
 
@@ -53,7 +54,7 @@ class SimpleConceptVariableColumn extends AbstractColumn {
     private void validateNumber(ClinicalVariableColumn col, Object value) {
         if (!(value instanceof Number)) {
             throw new InvalidArgumentsException(
-                    "Got non-numerical value for column $col; value was $value")
+                    'Got non-numerical value for column ' + col + '; value was ' + value)
         }
     }
 }

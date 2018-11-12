@@ -14,8 +14,8 @@ class ExportedUrlMappings {
             }
         }
 
-        "/analysisFiles/$analysisName/$path**"        analysisFilesClosure
-        "/images/analysisFiles/$analysisName/$path**" analysisFilesClosure
+        '/analysisFiles/$analysisName/$path**'        analysisFilesClosure
+        '/images/analysisFiles/$analysisName/$path**' analysisFilesClosure
 
         // see also the exclusion of images/analysisFiles in doWithSpring
     }

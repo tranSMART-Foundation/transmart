@@ -56,8 +56,8 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
 
         if (emptyConcept) {
             //when required we will never reach here
-            logger.debug("Not required and no value for $keyForConceptPaths, " +
-                    "assuming constant value column")
+            logger.debug('Not required and no value for ' + keyForConceptPaths + ', ' +
+                    'assuming constant value column')
 
             innerConfigurator = appCtx.getBean SimpleAddColumnConfigurator
             innerConfigurator.column = new ConstantValueColumn(
@@ -65,17 +65,19 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
                     missingValueAction: missingValueAction)
             innerConfigurator.addColumn()
 
-        } else if (categorical) {
-            logger.debug("Found pipe character in $keyForConceptPaths, " +
-                    "assuming categorical data")
+        }
+        else if (categorical) {
+            logger.debug('Found pipe character in ' + keyForConceptPaths + ', ' +
+                    'assuming categorical data')
 
             innerConfigurator = appCtx.getBean CategoricalColumnConfigurator
 
             innerConfigurator.header             = getHeader()
             innerConfigurator.keyForConceptPaths = keyForConceptPaths
-        } else {
-            logger.debug("Did not find pipe character in $keyForConceptPaths, " +
-                    "assuming continuous data")
+        }
+        else {
+            logger.debug('Did not find pipe character in ' + keyForConceptPaths + ', ' +
+                    'assuming continuous data')
 
             innerConfigurator = appCtx.getBean numericColumnConfigurationClass
 
@@ -102,8 +104,8 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
             if (!binningConfigurator.binningEnabled &&
                     !(innerConfigurator instanceof CategoricalColumnConfigurator) &&
                     forceNumericBinning) {
-                throw new InvalidArgumentsException("Numeric variables must be " +
-                        "binned for column ${getHeader()}")
+                throw new InvalidArgumentsException('Numeric variables must be ' +
+                        'binned for column ' + getHeader())
             }
             
             //configure binning only if has variable
@@ -128,9 +130,9 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
      * @param keyPart
      */
     void setKeys(String keyPart = '') {
-        keyForConceptPaths    = "${keyPart}Variable"
-        keyForDataType        = "div${keyPart.capitalize()}VariableType"
-        keyForSearchKeywordId = "div${keyPart.capitalize()}VariablePathway"
+        keyForConceptPaths    = '' + keyPart + 'Variable'
+        keyForDataType        = 'div' + keyPart.capitalize() + 'VariableType'
+        keyForSearchKeywordId = 'div' + keyPart.capitalize() + 'VariablePathway'
     }
 
     String getConceptPaths() {

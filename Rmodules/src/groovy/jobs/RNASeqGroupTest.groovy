@@ -108,6 +108,6 @@ class RNASeqGroupTest extends AbstractAnalysisJob {
 
     @Override
     protected getForwardPath() {
-        return "/RNASeqgroupTest/RNASeqgroupTestOutput?jobName=${name}"
+        return '/RNASeqgroupTest/RNASeqgroupTestOutput?jobName=' + name
     }
 }

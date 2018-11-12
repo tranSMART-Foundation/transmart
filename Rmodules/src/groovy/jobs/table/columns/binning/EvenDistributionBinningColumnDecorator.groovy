@@ -53,7 +53,7 @@ class EvenDistributionBinningColumnDecorator implements ColumnDecorator {
                     sortedValues[quantileRanks[it]]
 
             def op1 = it == 0 ? '≤' : '<'
-            res[upperBound] = "$lowerBound $op1 $header ≤ $upperBound" as String
+            res[upperBound] = '' + lowerBound + ' ' + op1 + ' ' + header + ' ≤ ' + upperBound as String
         }
 
         res
@@ -138,9 +138,9 @@ class EvenDistributionBinningColumnDecorator implements ColumnDecorator {
             Map.Entry<Number, String> entry = binsForCtx.ceilingEntry(numberValue)
             if (entry == null) {
                 // should not happen
-                throw new IllegalStateException("Could not determine bin for " +
-                        "value $numberValue. Bins available, with key as upper " +
-                        "bound: $binsForCtx")
+                throw new IllegalStateException('Could not determine bin for ' +
+                        'value ' + numberValue + '. Bins available, with key as upper ' +
+                        'bound: ' + binsForCtx)
             }
 
             (Object) entry.value /* the name of the bin */

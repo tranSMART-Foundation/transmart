@@ -17,6 +17,6 @@ class AcghFrequencyPlot extends AcghAnalysisJob {
 
     @Override
     protected getForwardPath() {
-        return "/AcghFrequencyPlot/acghFrequencyPlotOutput?jobName=${name}"
+        return '/AcghFrequencyPlot/acghFrequencyPlotOutput?jobName=' + name
     }
 }

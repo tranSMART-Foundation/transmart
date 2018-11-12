@@ -35,6 +35,6 @@ class HierarchicalClustering extends HighDimensionalOnlyJob {
 
     @Override
     protected getForwardPath() {
-        "/RHClust/heatmapOut?jobName=${name}"
+        '/RHClust/heatmapOut?jobName=' + name
     }
 }

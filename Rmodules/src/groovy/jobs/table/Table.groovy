@@ -36,15 +36,15 @@ class Table implements AutoCloseable {
 
     void addDataSource(String name, Iterable dataSource) {
         if (dataSources.containsKey(name) && dataSources[name] != dataSource) {
-            throw new IllegalStateException("Data source with $name " +
-                    "already exists and it is different. Currently " +
-                    "registered data source under this name is $dataSource")
+            throw new IllegalStateException('Data source with ' + name + ' ' +
+                    'already exists and it is different. Currently ' +
+                    'registered data source under this name is ' + dataSource)
         }
         if (dataSources.containsValue(dataSource) && dataSources.inverse().get(dataSource) != name) {
-            throw new IllegalStateException("Data source $dataSource " +
-                    "was already registered under the name " +
-                    "${dataSources.inverse().get(dataSource)}; " +
-                    "given name $name this time")
+            throw new IllegalStateException('Data source ' + dataSource + ' ' +
+                    'was already registered under the name ' +
+                    '' + dataSources.inverse().get(dataSource) + '; ' +
+                    'given name ' + name + ' this time')
         }
 
         dataSources[name] = dataSource
@@ -61,7 +61,7 @@ class Table implements AutoCloseable {
     void addColumn(Column col, Set<String> subscribedDataSources) {
         def difference = subscribedDataSources - dataSources.keySet()
         if (difference) {
-            throw new IllegalStateException("Cannot subscribe unknown data sources: $difference")
+            throw new IllegalStateException('Cannot subscribe unknown data sources: ' + difference)
         }
 
         validateColumn col
@@ -76,11 +76,11 @@ class Table implements AutoCloseable {
 
     private void validateColumn(Column column) {
         if (!column.header) {
-            throw new IllegalStateException("Header not set on column $column")
+            throw new IllegalStateException('Header not set on column ' + column)
         }
 
 	if (!column.missingValueAction) {
-            throw new IllegalStateException("Missing value action not set on column $column")
+            throw new IllegalStateException('Missing value action not set on column ' + column)
         }
     }
 
@@ -189,7 +189,7 @@ class Table implements AutoCloseable {
         }.collectEntries { Column it -> [columns.indexOf(it), it.consumeResultingTableRows()]
         }.each { int columnNumber, Map<String, Object> values ->
             if (values == null) {
-                throw new NullPointerException("Column $columnNumber returned a null map")
+                throw new NullPointerException('Column ' + columnNumber + ' returned a null map')
             }
             values.each { String primaryKey, cellValue ->
                 putCellToBackingMap primaryKey, columnNumber, cellValue
@@ -268,9 +268,9 @@ class Table implements AutoCloseable {
         }
 
         if (dataSourceExceptions) {
-            throw new RuntimeException("One or more dataSourceExceptions when " +
-                    "closing data sources: " + dataSourceExceptions.collect { Iterable ds, Exception e ->
-                "$ds (${dataSources.inverse().getAt(ds)}): $e.message"
+            throw new RuntimeException('One or more dataSourceExceptions when ' +
+                    'closing data sources: ' + dataSourceExceptions.collect { Iterable ds, Exception e ->
+                '' + ds + ' (' + dataSources.inverse().getAt(ds) + '): ' + e.message
             }.join(', '), (Throwable)Iterables.getFirst(dataSourceExceptions.values(), null))
         }
     }

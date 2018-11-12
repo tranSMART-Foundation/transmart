@@ -82,7 +82,7 @@ abstract class AbstractAnalysisJob {
 
     private void validateName() {
         if (!(name ==~ /^[0-9A-Za-z-]+$/)) {
-            throw new JobExecutionException("Job name mangled")
+            throw new JobExecutionException('Job name mangled')
         }
     }
 

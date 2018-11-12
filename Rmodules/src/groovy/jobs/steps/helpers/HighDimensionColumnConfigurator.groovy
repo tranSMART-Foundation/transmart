@@ -127,9 +127,9 @@ class HighDimensionColumnConfigurator extends ColumnConfigurator {
 
         if (commonPatients.empty) {
             throw new InvalidArgumentsException(
-                    "The intersection of the patients for the assays of the " +
-                            "${commonPatients.size()} result sets is empty. " +
-                            "The patient sets for each result are, in order: " +
+                    'The intersection of the patients for the assays of the ' +
+                            '' + commonPatients.size() + ' result sets is empty. ' +
+                            'The patient sets for each result are, in order: ' +
                             patientsSets
             )
         }
@@ -141,7 +141,7 @@ class HighDimensionColumnConfigurator extends ColumnConfigurator {
     protected void doAddColumn(Closure<Column> decorateColumn) {
         if (conceptPaths.size() == 0) {
             throw new InvalidArgumentsException(
-                    "Found empty concept paths list (key $keyForConceptPath)")
+                    'Found empty concept paths list (key ' + keyForConceptPath + ')')
         }
 
         if (!header) {
@@ -154,11 +154,12 @@ class HighDimensionColumnConfigurator extends ColumnConfigurator {
             tabularResults = ImmutableMap.of(
                     header + '_highdim',
                     openResultSet(conceptPaths[0]))
-        } else {
+        }
+        else {
             if (!multiConcepts) {
                 throw new InvalidArgumentsException(
-                        "Got multiple concept paths (key $keyForConceptPath), " +
-                                "but multiConcepts is not on")
+                        'Got multiple concept paths (key ' + keyForConceptPath + '), ' +
+                                'but multiConcepts is not on')
             }
 
             tabularResults = openMultipleResultSets()
@@ -174,7 +175,8 @@ class HighDimensionColumnConfigurator extends ColumnConfigurator {
         if (!multiRow) {
             highDimColumn = new HighDimensionSingleRowResultColumn(
                     header: header)
-        } else {
+        }
+        else {
             highDimColumn = new HighDimensionMultipleRowsResultColumn(
                     header:             header,
                     patientsToConsider: commonPatients)

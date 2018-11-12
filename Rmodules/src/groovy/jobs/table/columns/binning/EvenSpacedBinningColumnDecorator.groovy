@@ -27,7 +27,7 @@ class EvenSpacedBinningColumnDecorator implements ColumnDecorator {
                 def lowerBound = min[ctx] + ((max[ctx] - min[ctx]) / numberOfBins) * (it - 1)
                 def upperBound = min[ctx] + ((max[ctx] - min[ctx]) / numberOfBins) * it
                 def op2 = it == numberOfBins ? '≤' : '<'
-                "$lowerBound ≤ $header $op2 $upperBound" as String
+                '' + lowerBound + ' ≤ ' + header + ' ' + op2 + ' ' + upperBound as String
             }
         }
 

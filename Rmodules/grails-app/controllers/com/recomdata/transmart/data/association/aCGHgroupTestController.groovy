@@ -12,20 +12,20 @@ class aCGHgroupTestController {
     final Set DEFAULT_NUMBER_FIELDS = ['start', 'end', 'pvalue', 'fdr'] as Set
 
     def aCGHgroupTestOutput = {
-        def jobTypeName = "aCGHgroupTest"
+        def jobTypeName = 'aCGHgroupTest'
 
         def imageLinks = new ArrayList<String>()
 
         RModulesOutputRenderService.initializeAttributes(params.jobName, jobTypeName, imageLinks)
 
-        render(template: "/plugin/aCGHgroupTest_out", model: [zipLink: RModulesOutputRenderService.zipLink, imageLinks: imageLinks])
+        render(template: '/plugin/aCGHgroupTest_out', model: [zipLink: RModulesOutputRenderService.zipLink, imageLinks: imageLinks])
     }
 
     /**
      * This function will return the image path
      */
     def imagePath = {
-        def imagePath = "${RModulesOutputRenderService.relativeImageURL}${params.jobName}/workingDirectory/groups-test.png"
+        def imagePath = '' + RModulesOutputRenderService.relativeImageURL + params.jobName + '/workingDirectory/groups-test.png'
         render imagePath
     }
 
@@ -35,7 +35,7 @@ class aCGHgroupTestController {
             render new JSON([error: 'jobName parameter is required. It should contains just alphanumeric characters and dashes.'])
             return
         }
-        def file = new File("${RModulesOutputRenderService.tempFolderDirectory}", "${params.jobName}/workingDirectory/groups-test.txt")
+        def file = new File('' + RModulesOutputRenderService.tempFolderDirectory, '' + params.jobName + '/workingDirectory/groups-test.txt')
         if (file.exists()) {
             def fields = params.fields?.split('\\s*,\\s*') as Set ?: DEFAULT_FIELDS
 
@@ -51,7 +51,8 @@ class aCGHgroupTestController {
             def json = new JSON(obj)
             json.prettyPrint = false
             render json
-        } else {
+        }
+        else {
             response.status = 404
             render '[]'
         }

@@ -39,9 +39,9 @@ class JobResultsService {
     @Delegate Map jobResults = [:].asSynchronized()
 
     boolean isJobCancelled(String jobName) {
-        boolean isJobCancelled = jobResults[jobName]["Status"] == "Cancelled"
+        boolean isJobCancelled = jobResults[jobName]['Status'] == 'Cancelled'
         if (isJobCancelled) {
-            logger.warn("${jobName} has been cancelled")
+            logger.warn('' + jobName + ' has been cancelled')
         }
         isJobCancelled
     }

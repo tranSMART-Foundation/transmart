@@ -65,9 +65,9 @@ class MultiRowAsGroupDumpTableResultsStep extends SimpleDumpTableResultStep {
 
         preResults = Iterators.peekingIterator(table.result.iterator())
         if (!preResults.hasNext()) {
-            throw new EmptySetException("The result set is empty. " +
-                    "Number of patients dropped owing to mismatched " +
-                    "data: ${table.droppedRows}")
+            throw new EmptySetException('The result set is empty. ' +
+                    'Number of patients dropped owing to mismatched ' +
+                    'data: ' + table.droppedRows)
         }
 
         def originalHeaders = table.headers
@@ -86,8 +86,9 @@ class MultiRowAsGroupDumpTableResultsStep extends SimpleDumpTableResultStep {
     protected void addGroupColumnHeaders(List<String> headerList) {
         if (transformedColumnsIndexes.size() == 1) {
             headerList << 'GROUP'
-        } else {
-            headerList << "GROUP.${transformedColumnsIndexes.size() - 1}".toString()
+        }
+        else {
+            headerList << 'GROUP.' + transformedColumnsIndexes.size() - 1.toString()
         }
     }
 
@@ -95,7 +96,8 @@ class MultiRowAsGroupDumpTableResultsStep extends SimpleDumpTableResultStep {
         prepareResult()
         if (transformedColumnsIndexes.empty) {
             super.getMainRows()
-        } else {
+        }
+        else {
             createDecoratingIterator()
         }
     }

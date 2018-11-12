@@ -114,6 +114,6 @@ class ScatterPlot extends AbstractAnalysisJob {
 
     @Override
     protected getForwardPath() {
-        "/scatterPlot/scatterPlotOut?jobName=$name"
+        '/scatterPlot/scatterPlotOut?jobName=' + name
     }
 }

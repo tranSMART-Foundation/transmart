@@ -94,17 +94,17 @@ class ContextNumericVariableColumnConfiguratorTests {
                     contains(
                             is('patient_2_subject_id'),
                             allOf(
-                                    hasEntry("$CONCEPT_PATH_HIGH_DIMENSION|row1" as String, 0.2),
-                                    hasEntry("$CONCEPT_PATH_HIGH_DIMENSION|row2" as String, 0.5),
-                                    hasEntry("$CONCEPT_PATH_HIGH_DIMENSION_EXTRA|row1" as String, 0.7),
+                                    hasEntry('' + CONCEPT_PATH_HIGH_DIMENSION + '|row1' as String, 0.2),
+                                    hasEntry('' + CONCEPT_PATH_HIGH_DIMENSION + '|row2' as String, 0.5),
+                                    hasEntry('' + CONCEPT_PATH_HIGH_DIMENSION_EXTRA + '|row1' as String, 0.7),
                             )
                     ),
                     contains(
                             is('patient_3_subject_id'),
                             allOf(
-                                    hasEntry("$CONCEPT_PATH_HIGH_DIMENSION|row1" as String, 0.3),
-                                    hasEntry("$CONCEPT_PATH_HIGH_DIMENSION|row2" as String, 0.6),
-                                    hasEntry("$CONCEPT_PATH_HIGH_DIMENSION_EXTRA|row1" as String, 0.8),
+                                    hasEntry('' + CONCEPT_PATH_HIGH_DIMENSION + '|row1' as String, 0.3),
+                                    hasEntry('' + CONCEPT_PATH_HIGH_DIMENSION + '|row2' as String, 0.6),
+                                    hasEntry('' + CONCEPT_PATH_HIGH_DIMENSION_EXTRA + '|row1' as String, 0.8),
                             )
                     ),
             )
@@ -165,8 +165,8 @@ class ContextNumericVariableColumnConfiguratorTests {
             def res = Lists.newArrayList(table.result)
             assertThat res, contains(
                     contains([
-                            ("$CONCEPT_PATH_HIGH_DIMENSION|row1".toString()): 0.7,
-                            ("$CONCEPT_PATH_HIGH_DIMENSION|row2".toString()): 0.8]))
+                            ('' + CONCEPT_PATH_HIGH_DIMENSION + '|row1'.toString()): 0.7,
+                            ('' + CONCEPT_PATH_HIGH_DIMENSION + '|row2'.toString()): 0.8]))
         }
     }
 

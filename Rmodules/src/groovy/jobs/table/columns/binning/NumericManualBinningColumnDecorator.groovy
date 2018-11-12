@@ -21,18 +21,21 @@ class NumericManualBinningColumnDecorator implements ColumnDecorator {
             if (i == 0) {
                 op1 = '≤'
                 lowerBound = binRanges[0].from
-            } else if (binRanges[i].from == binRanges[i - 1].to) {
+            }
+            else if (binRanges[i].from == binRanges[i - 1].to) {
                 op1 = '<'
                 lowerBound = binRanges[i].from
-            } else if (binRanges[i].from > binRanges[i - 1].to) {
+            }
+            else if (binRanges[i].from > binRanges[i - 1].to) {
                 op1 = '≤'
                 lowerBound = binRanges[i].from
-            } else {
-                throw new IllegalStateException("binRanges[$i].from < " +
-                        "binRanges[${i - 1}].from. Bad column definition")
+            }
+            else {
+                throw new IllegalStateException('binRanges[' + i + '].from < ' +
+                        'binRanges[' + i - 1 + '].from. Bad column definition')
             }
 
-            ret << "$lowerBound $op1 $header ≤ ${binRanges[i].to}".toString()
+            ret << '' + lowerBound + ' ' + op1 + ' ' + header + ' ≤ ' + binRanges[i].to.toString()
         }
         ret
     }()

@@ -73,6 +73,6 @@ class Waterfall extends AbstractAnalysisJob {
 
     @Override
     protected getForwardPath() {
-        "/waterfall/waterfallOut?jobName=$name"
+        '/waterfall/waterfallOut?jobName=' + name
     }
 }

@@ -83,7 +83,7 @@ class HighDimensionController {
                 collect { it.name }.
                 minus(['class', 'template']).
                 collectEntries {
-                    [  it, p."$it" ]
+                    [  it, p[it] ]
                 }
     }
 

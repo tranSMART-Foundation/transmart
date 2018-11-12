@@ -46,9 +46,11 @@ class WaterfallColumnConfigurator extends ColumnConfigurator {
                             valueFunction: { originalValue ->
                                 if (testerForLow(originalValue)) {
                                     [LOW: originalValue]
-                                } else if (testerForHigh(originalValue)) {
+                                }
+                                else if (testerForHigh(originalValue)) {
                                     [HIGH: originalValue]
-                                } else {
+                                }
+                                else {
                                     [BASE: originalValue]
                                 }
                             }
@@ -63,7 +65,7 @@ class WaterfallColumnConfigurator extends ColumnConfigurator {
         boolean found = false
 
         if (hasProperty(name)) {
-            def method = "set${name.capitalize()}"
+            def method = 'set' + name.capitalize()
             this."$method"(value)
             found = true
         }
@@ -91,7 +93,7 @@ class WaterfallColumnConfigurator extends ColumnConfigurator {
             case '=':
                 return { it -> it == value }
             default:
-                throw new InvalidArgumentsException("Bad value for operator: $operator")
+                throw new InvalidArgumentsException('Bad value for operator: ' + operator)
         }
     }
 

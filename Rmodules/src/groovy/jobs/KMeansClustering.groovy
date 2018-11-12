@@ -36,6 +36,6 @@ class KMeansClustering extends HighDimensionalOnlyJob {
 
     @Override
     protected getForwardPath() {
-        "/RKMeans/heatmapOut?jobName=${name}"
+        '/RKMeans/heatmapOut?jobName=' + name
     }
 }

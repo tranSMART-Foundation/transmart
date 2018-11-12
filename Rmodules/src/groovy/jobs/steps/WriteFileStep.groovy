@@ -9,7 +9,7 @@ class WriteFileStep implements Step {
     @Override
     String getStatusName() {
         if (sufficientInformationProvided) {
-            "Writing ${fileName} file"
+            'Writing ' + fileName + ' file'
         }
     }
 

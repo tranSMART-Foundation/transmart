@@ -45,7 +45,7 @@ class Geneprint extends HighDimensionalOnlyJob {
 
     @Override
     protected getForwardPath() {
-        "/Geneprint/geneprintOut?jobName=${name}"
+        '/Geneprint/geneprintOut?jobName=' + name
     }
 
 }

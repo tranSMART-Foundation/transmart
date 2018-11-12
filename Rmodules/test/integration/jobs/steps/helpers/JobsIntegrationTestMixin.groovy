@@ -38,7 +38,8 @@ class JobsIntegrationTestMixin implements TestMixinTargetAware {
                         applicationContext,
                         ['Spec', 'Specification','Test', 'Tests'] as String[] )
             }
-        } catch (IllegalStateException ise) {
+        }
+        catch (IllegalStateException ise) {
             // ignore, thrown when application context hasn't been bootstrapped
         }
     }
@@ -99,7 +100,7 @@ class JobsIntegrationTestMixin implements TestMixinTargetAware {
          * are not ignored.
          */
         BeanFactory factory = currentApplicationContext.beanFactory
-        /* "traditional" autowiring, also called in GrailsTestAutowirer#autowire */
+        /* 'traditional' autowiring, also called in GrailsTestAutowirer#autowire */
         factory.autowireBeanProperties(object,
                 AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false)
         /* apply bean post processors' postProcessPropertyValues(), which will
