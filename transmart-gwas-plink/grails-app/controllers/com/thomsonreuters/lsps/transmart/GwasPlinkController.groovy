@@ -14,7 +14,7 @@ class GwasPlinkController {
         int previewRowsCount = (params.previewRowsCount ?: 10).toInteger()
         [
                 previewData     : gwasPlinkAnalysisService.getPreviewData(params.jobName as String, params.previewFileName as String, previewRowsCount),
-                zipLink         : "/analysisFiles/${params.jobName}/${gwasPlinkAnalysisService.prepareZippedResult(params.jobName as String, params.analysisName as String)}",
+                zipLink         : '/analysisFiles/' + params.jobName + '/' + gwasPlinkAnalysisService.prepareZippedResult(params.jobName as String, params.analysisName as String),
                 previewRowsCount: previewRowsCount
         ]
     }
@@ -30,22 +30,22 @@ class GwasPlinkController {
 
         ['gwasPlinkAdd.js'].each {
             JSONObject aScript = new JSONObject()
-            aScript.put("path", "${servletContext.contextPath}${pluginContextPath}/js/${it}" as String)
-            aScript.put("type", "script")
+            aScript.put('path', '' + servletContext.contextPath + pluginContextPath + '/js/' + it as String)
+            aScript.put('type', 'script')
             rows.put(aScript)
         }
         [].each {
             JSONObject aStylesheet = new JSONObject()
-            aStylesheet.put("path", "${servletContext.contextPath}${pluginContextPath}/css/${it}" as String)
-            aStylesheet.put("type", "stylesheet")
+            aStylesheet.put('path', '' + servletContext.contextPath + pluginContextPath + '/css/' + it as String)
+            aStylesheet.put('type', 'stylesheet')
             rows.put(aStylesheet)
         }
 
-        result.put("success", true)
-        result.put("totalCount", rows.size())
-        result.put("files", rows)
+        result.put('success', true)
+        result.put('totalCount', rows.size())
+        result.put('files', rows)
 
-        response.setContentType("text/json")
+        response.setContentType('text/json')
         response.outputStream << result.toString()
     }
 }

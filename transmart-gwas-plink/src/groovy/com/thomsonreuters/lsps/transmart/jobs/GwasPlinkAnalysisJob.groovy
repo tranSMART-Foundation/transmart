@@ -102,7 +102,7 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
 
         @Override
         String getStatusName() {
-            return "Preparing input files..."
+            return 'Preparing input files...'
         }
 
         private InputStream decomressStream(InputStream stream) {
@@ -113,12 +113,12 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
         private Map<String, String> getPatientAndValueByPath(sql, paths, allowCategorical) {
             def hasCategorical = false
             def rawData = [:]
-            sql.rows("""\
+            sql.rows("''\
                 select patient_num, tval_char, nval_num
                   from      i2b2demodata.observation_fact of
                        join i2b2demodata.concept_dimension cd on cd.concept_cd=of.concept_cd
                  where concept_path in ( ${(['?'] * paths.size()).join(',')} )
-            """.stripIndent(), paths).each {
+            "''.stripIndent(), paths).each {
                 def patientId = it.patient_num as String
                 def isNumeric = it.tval_char == 'E'
                 if (!hasCategorical && !isNumeric) {
@@ -139,7 +139,8 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
             rawData.each { pid, val ->
                 if (val.toLowerCase() in missingPheno) {
                     result[pid] = PHENO_MISSING
-                } else {
+                }
+                else {
                     if (control == null) {
                         control = val
                     }
@@ -158,7 +159,7 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
                 resultInstanceIds.add(it)
             }
             if (!resultInstanceIds) {
-                throw new EmptySetException("No subsets selected")
+                throw new EmptySetException('No subsets selected')
             }
 
             def phenotypes = getParams().phenotypes
@@ -166,14 +167,14 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
             Map<String, Map> patients = null
             Map<String, String> valueForPhenotypeByPatient = null, valueForCovariatesByPatient = null
             try {
-                patients = sql.rows("""
+                patients = sql.rows("''
                     select pd.sourcesystem_cd, max(ps.result_instance_id) as result_instance_id, ps.patient_num
                     from i2b2demodata.qt_patient_set_collection ps, i2b2demodata.patient_dimension pd
                     where ps.patient_num = pd.patient_num and ps.result_instance_id IN (${
                     (['?'] * resultInstanceIds.size()).join(',')
                 })
                     group by pd.sourcesystem_cd, ps.patient_num
-                """, resultInstanceIds).collectEntries {
+                "'', resultInstanceIds).collectEntries {
                     def sourceSystemCd = it.sourcesystem_cd as String
                     def parts = sourceSystemCd.split(':', 2)
                     def patientNum = it.patient_num as String
@@ -181,7 +182,7 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
                 }
 
                 if (!patients) {
-                    throw new EmptySetException("The patient set is empty.")
+                    throw new EmptySetException('The patient set is empty.')
                 }
 
                 if (phenotypes.size() > 0)
@@ -189,7 +190,8 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
                 if (covariates.size() > 0)
                     valueForCovariatesByPatient = getPatientAndValueByPath(sql, covariates, true)
 
-            } finally {
+            }
+            finally {
                 sql.close()
             }
 
@@ -199,15 +201,15 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
             def analysisName = getAnalysisName()
             def familyIds = [:]
             transactionTemplate.execute({
-                jdbcTemplate.query("select bed, bim, fam from gwas_plink.plink_data where study_id = ?", [studyId] as Object[], { rs ->
+                jdbcTemplate.query('select bed, bim, fam from gwas_plink.plink_data where study_id = ?', [studyId] as Object[], { rs ->
                     if (!rs.next()) {
                         throw new EmptySetException("The GWAS Plink data not found for study '$studyId'.")
                     }
                     def lobHandler = new DefaultLobHandler(wrapAsLob: true)
-                    new File(tempDir, "${analysisName}.bed") << decomressStream(lobHandler.getBlobAsBinaryStream(rs, 1))
-                    new File(tempDir, "${analysisName}.bim") << decomressStream(lobHandler.getBlobAsBinaryStream(rs, 2))
+                    new File(tempDir, '' + analysisName + '.bed') << decomressStream(lobHandler.getBlobAsBinaryStream(rs, 1))
+                    new File(tempDir, '' + analysisName + '.bim') << decomressStream(lobHandler.getBlobAsBinaryStream(rs, 2))
                     def fam = decomressStream(lobHandler.getBlobAsBinaryStream(rs, 3))
-                    new File(getTemporaryDirectory(), "${getAnalysisName()}.fam").withWriter { out ->
+                    new File(getTemporaryDirectory(), '' + getAnalysisName() + '.fam').withWriter { out ->
                         fam.eachLine { line ->
                             def tokens = line.split(/[ \t]+/)
                             String iid = tokens[1]
@@ -227,34 +229,34 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
                 } as ResultSetExtractor)
             } as TransactionCallbackWithoutResult)
 
-            new File(getTemporaryDirectory(), "${getAnalysisName()}_id.txt").withWriter {
+            new File(getTemporaryDirectory(), '' + getAnalysisName() + '_id.txt').withWriter {
                 for (Map patient in patients.values()) {
                     def iid = patient.iid
                     if (familyIds.containsKey(iid)) {
-                        it.write("${familyIds[iid]}\t$iid\n")
+                        it.write('' + familyIds[iid] + '\t' + iid + '\n')
                     }
                 }
             }
 
             if (phenotypes.size() > 0) {
-                new File(getTemporaryDirectory(), "${getAnalysisName()}_pheno.txt").withWriter {
+                new File(getTemporaryDirectory(), '' + getAnalysisName() + '_pheno.txt').withWriter {
                     for (Map patient in patients.values()) {
                         def iid = patient.iid
                         def patientNum = patient.patientNum
                         if (familyIds.containsKey(iid) && valueForPhenotypeByPatient.containsKey(patientNum)) {
-                            it.write("${familyIds[iid]}\t$iid\t${valueForPhenotypeByPatient[patientNum]}\n")
+                            it.write('' + familyIds[iid] + '\t' + iid + '\t' + valueForPhenotypeByPatient[patientNum] + '\n')
                         }
                     }
                 }
             }
 
             if (covariates.size() > 0) {
-                new File(getTemporaryDirectory(), "${getAnalysisName()}_covar.txt").withWriter {
+                new File(getTemporaryDirectory(), '' + getAnalysisName() + '_covar.txt').withWriter {
                     for (Map patient in patients.values()) {
                         def iid = patient.iid
                         def patientNum = patient.patientNum
                         if (familyIds.containsKey(iid) && valueForCovariatesByPatient.containsKey(patientNum)) {
-                            it.write("${familyIds[iid]}\t$iid\t${valueForCovariatesByPatient[patientNum]}\n")
+                            it.write('' + familyIds[iid] + '\t' + iid + '\t' + valueForCovariatesByPatient[patientNum] + '\n')
                         }
                     }
                 }
@@ -265,7 +267,7 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
     class RunPlinkStep implements Step {
         @Override
         String getStatusName() {
-            return "Running analyze with plink..."
+            return 'Running analyze with plink...'
         }
 
         List<String> getOutputOptions() {
@@ -279,11 +281,11 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
             def phenotypes = getParams().phenotypes
             def covariates = getParams().covariates
             String additionalOption = getParams().additionalOption
-            if (analysisType == "linear" || analysisType == "logistic") {
-                if (additionalOption in ["genotypic", "dominant", "recessive"]) {
+            if (analysisType == 'linear' || analysisType == 'logistic') {
+                if (additionalOption in ['genotypic', 'dominant', 'recessive']) {
                     options << additionalOption
                 }
-                options << "hide-covar"
+                options << 'hide-covar'
                 /* if (phenotypes.size() > 0) {
                     options << '--all-pheno'
                 } */
@@ -292,10 +294,11 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
                 options += ['--pfilter', pValueThreshold]
             }
             if (phenotypes.size() > 0 && analysisType != 'logistic') {
-                def phfname = "${getAnalysisName()}_pheno.txt"
+                def phfname = '' + getAnalysisName() + '_pheno.txt'
                 if (getParams().makePheno) {
                     options += ['--make-pheno', phfname, '*']
-                } else {
+                }
+                else {
                     options += ['--pheno', phfname, '--prune']
                 }
             }
@@ -309,17 +312,17 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
         void execute() {
             def fs = FileSystems.getDefault()
             def plinkPath = Holders.config.grails.plugin.transmartGwasPlink.plinkPath
-            def resultsDir = new File(getTemporaryDirectory(), "plink-results")
+            def resultsDir = new File(getTemporaryDirectory(), 'plink-results')
             resultsDir.mkdir()
-            def error = new File(getTemporaryDirectory(), "error.log")
+            def error = new File(getTemporaryDirectory(), 'error.log')
             def analysisName = getAnalysisName()
             def opts = getOutputOptions()
             Process process = new ProcessBuilder([
                     plinkPath,
-                    "--bfile", analysisName,
-                    "--keep", "${analysisName}_id.txt",
-                    "--out", fs.getPath('plink-results', analysisName) as String,
-                    "--adjust",
+                    '--bfile', analysisName,
+                    '--keep', '' + analysisName + '_id.txt',
+                    '--out', fs.getPath('plink-results', analysisName) as String,
+                    '--adjust',
                     *opts
             ] as String[])
                     .directory(getTemporaryDirectory())
@@ -328,8 +331,9 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
 
             int exitCode = process.waitFor()
             if (exitCode == 127) {
-                throw new NoSuchResourceException("`plink` exited with exit code $exitCode. Most probably `plink` was not found by configured path")
-            } else if (exitCode != 0) {
+                throw new NoSuchResourceException('`plink` exited with exit code ' + exitCode. + ' Most probably `plink` was not found by configured path')
+            }
+            else if (exitCode != 0) {
                 throw new UnexpectedResultException("`plink` exited with error: ${error.exists() ? error.text : 'unknown'}")
             }
         }
