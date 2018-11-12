@@ -19,7 +19,7 @@ grails.project.dependency.resolution = {
         mavenLocal()
         mavenCentral()
 
-        mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
+        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
     }
 
     String tmVersion = '16.4-SNAPSHOT'

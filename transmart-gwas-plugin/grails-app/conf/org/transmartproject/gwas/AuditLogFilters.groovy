@@ -16,13 +16,13 @@ class AuditLogFilters {
 	}
 
     public String getAnalysisNames(String analysisIds) {
-        return analysisIds?.split(",")?.map {getAnalysisName(it.toLong())}?.filter()?.join("|")
+        return analysisIds?.split(',')?.map {getAnalysisName(it.toLong())}?.filter()?.join('|')
     }
 
     def filters = {
 		search(controller: 'GWAS', action: 'getFacetResults') {
 			before = { model ->
-				auditLogService?.report("GWAS Active Filter", request,
+				auditLogService?.report('GWAS Active Filter', request,
 						user: currentUserBean,
 						query: params.q ?: '',
 						facetQuery: params.fq ?: '',
@@ -31,29 +31,31 @@ class AuditLogFilters {
 		}
         other(controller: 'GWAS|gwasSearch|uploadData', action: '*', actionExclude:'getFacetResults|newSearch|index|getDynatree|getSearchCategories') {
             after = { model ->
-                def task = "Gwas (${controllerName}.${actionName})"
+                def task = 'Gwas (' + controllerName + '.' + actionName + ')'
                 switch (actionName) {
-                    case "getAnalysisResults":
+                    case 'getAnalysisResults':
                         if (params.export) {
-                            task = "Gwas CSV Export"
-                        } else {
-                            task = "Gwas Analysis Access"
+                            task = 'Gwas CSV Export'
+                        }
+                        else {
+                            task = 'Gwas Analysis Access'
                         }
                         break
-                    case "getTrialAnalysis":
-                        task = "Gwas Study Access"
+                    case 'getTrialAnalysis':
+                        task = 'Gwas Study Access'
                         break
-                    case "getTableResults":
-                        task = "Gwas Table View"
+                    case 'getTableResults':
+                        task = 'Gwas Table View'
                         break
-                    case "webStartPlotter":
-                        task = "Gwava"
+                    case 'webStartPlotter':
+                        task = 'Gwava'
                         break
-                    case "exportAnalysis":
-                        if (params.isLink == "true") {
-                            task = "Gwas Files Export"
-                        } else {
-                            task = "Gwas Email Analysis"
+                    case 'exportAnalysis':
+                        if (params.isLink == 'true') {
+                            task = 'Gwas Files Export'
+                        }
+                        else {
+                            task = 'Gwas Email Analysis'
                         }
                         break
                 }
