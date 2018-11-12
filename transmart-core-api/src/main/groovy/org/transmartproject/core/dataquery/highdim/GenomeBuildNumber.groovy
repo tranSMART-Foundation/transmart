@@ -8,9 +8,9 @@ public enum GenomeBuildNumber {
 
     UNKNOWN('UNKNOWN')
 
-    static gBuildNumberMap = [ "HG18"  :"GRCH36",
-                               "HG19"  :"GRCH37",
-                               "HG38"  :"GRCH38"
+    static gBuildNumberMap = [ 'HG18'  :'GRCH36',
+                               'HG19'  :'GRCH37',
+                               'HG38'  :'GRCH38'
                              ]
     /**
      * The value of this object for storage purposes.
@@ -30,8 +30,8 @@ public enum GenomeBuildNumber {
 }
 
 /*
- * assert  GenomeBuildNumber.forId("hg18") == GenomeBuildNumber.GRCh36
- * assert  GenomeBuildNumber.forId("hg38") == GenomeBuildNumber.GRCh38
- * assert  GenomeBuildNumber.forId("hg40") == GenomeBuildNumber.UNKNOWN
+ * assert  GenomeBuildNumber.forId('hg18') == GenomeBuildNumber.GRCh36
+ * assert  GenomeBuildNumber.forId('hg38') == GenomeBuildNumber.GRCh38
+ * assert  GenomeBuildNumber.forId('hg40') == GenomeBuildNumber.UNKNOWN
  */
 

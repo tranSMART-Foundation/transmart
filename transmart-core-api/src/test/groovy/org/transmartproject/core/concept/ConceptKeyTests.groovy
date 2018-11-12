@@ -52,8 +52,9 @@ class ConceptKeyTests {
         keys.each({
             try {
                 new ConceptKey(it)
-                fail "Could create ConceptKey with value " + it
-            } catch (Exception iae) {
+                fail 'Could create ConceptKey with value ' + it
+            }
+            catch (Exception iae) {
                 assertThat iae, isA(IllegalArgumentException)
             }
         })

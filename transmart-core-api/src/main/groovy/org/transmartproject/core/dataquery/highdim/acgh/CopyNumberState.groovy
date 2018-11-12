@@ -1,7 +1,7 @@
 package org.transmartproject.core.dataquery.highdim.acgh
 
 /**
- * This enumeration represents the set of possible "hard calls" about copy
+ * This enumeration represents the set of possible 'hard calls' about copy
  * number variations (loss, normal, gain and amplification) for a specific
  * segment or region in copy number variation trials (e.g. an array comparative
  * genomic hybridization trial).

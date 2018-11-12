@@ -37,7 +37,7 @@ class ConceptKey {
         if (key == null)
             throw new IllegalArgumentException('Concept key is null')
         if (key.size() < 5 /* \\a\b */)
-            throw new IllegalArgumentException("Concept key is too short")
+            throw new IllegalArgumentException('Concept key is too short')
         if (key[0..1] != '\\\\')
             throw new IllegalArgumentException('Concept key must start with ' +
                     '\\\\')
@@ -56,14 +56,14 @@ class ConceptKey {
             throw new IllegalArgumentException('Table code or full name are ' +
                     'null')
         if (tableCode.find('\\\\') != null)
-            throw new IllegalArgumentException("Table code includes a " +
-                    "back slash")
+            throw new IllegalArgumentException('Table code includes a ' +
+                    'back slash')
         this.tableCode = tableCode
         conceptFullName = new ConceptFullName(fullName)
     }
 
     @Override
     public String toString() {
-        return "\\\\" + tableCode + conceptFullName
+        return '\\\\' + tableCode + conceptFullName
     }
 }

@@ -54,9 +54,10 @@ class ConceptFullNameTests {
         paths.each({
             try {
                 def c = new ConceptFullName(it)
-                fail "Could create ConceptFullName with path " + it + ", " +
-                        "result: " + c
-            } catch (Exception iae) {
+                fail 'Could create ConceptFullName with path ' + it + ', ' +
+                        'result: ' + c
+            }
+            catch (Exception iae) {
                 assertThat iae, isA(IllegalArgumentException)
             }
         })

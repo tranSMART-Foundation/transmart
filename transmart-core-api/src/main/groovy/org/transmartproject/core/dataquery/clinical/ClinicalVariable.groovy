@@ -36,15 +36,15 @@ public interface ClinicalVariable {
      * </pre>
      *
      * The reason for this is not completely clear. Maybe it's because it allows
-     * showing the concept code next to each possible value (in this case "male"
-     * and "female"). It also allows slightly easier selection of patients with
+     * showing the concept code next to each possible value (in this case 'male'
+     * and 'female'). It also allows slightly easier selection of patients with
      * a given value (one can just drag the concept instead of having to constrain
      * it to a specific value).
      *
      * This type of clinical variable represents a collapsed view the terminal
-     * concepts responsible for implementing a tranSMART "categorical variable".
-     * In the example above, it would return "female" for "Patient1" and "male"
-     * for "Patient2" and "Patient3".
+     * concepts responsible for implementing a tranSMART 'categorical variable'.
+     * In the example above, it would return 'female' for 'Patient1' and 'male'
+     * for 'Patient2' and 'Patient3'.
      *
      * Parameters: concept_code => <string representing the concept code of
      *                              the container concept related to the
@@ -69,7 +69,7 @@ public interface ClinicalVariable {
      * Creates a variable that aggregates all the descendant 1) numerical leaf
      * variable terms and 2) categorical variables (see
      * {@link #CATEGORICAL_VARIABLE}) of the configured ontology term.
-     * "Descendant", as used here, includes also the passed ontology term.
+     * 'Descendant', as used here, includes also the passed ontology term.
      *
      * Parameters: concept_code => <string representing the concept code of
      *                              any concept>
