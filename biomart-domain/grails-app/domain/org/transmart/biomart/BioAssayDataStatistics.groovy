@@ -51,7 +51,7 @@ class BioAssayDataStatistics {
             quartile3 column: 'QUARTILE_3'
             maxValue column: 'MAX_VALUE'
             minValue column: 'MIN_VALUE'
-            meanValue column: "MEAN_VALUE"
+            meanValue column: 'MEAN_VALUE'
             stdDevValue column: 'STD_DEV_VALUE'
             sample column: 'BIO_SAMPLE_ID'
             featureGroupName column: 'FEATURE_GROUP_NAME'

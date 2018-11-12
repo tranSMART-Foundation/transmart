@@ -41,7 +41,7 @@ class AnalysisMetadata {
 	Date etlDate
 	Date processDate
 	String filename
-	String status = "NEW"
+	String status = 'NEW'
 	String sensitiveFlag = 0
 	String sensitiveDesc
 

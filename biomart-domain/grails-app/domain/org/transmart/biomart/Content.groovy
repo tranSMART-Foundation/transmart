@@ -30,9 +30,9 @@ class Content {
     String type
 
     def getAbsolutePath() {
-        String root = repository.location == null ? "" : repository.location
-        String path = location == null ? "" : location
-        String file = name == null ? "" : name
+        String root = repository.location == null ? '' : repository.location
+        String path = location == null ? '' : location
+        String file = name == null ? '' : name
         return root + java.io.File.separator + path + java.io.File.separator + file
     }
 
