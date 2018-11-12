@@ -68,7 +68,7 @@ class FractalisController {
 	def settings() {
 		Authentication auth = SecurityContextHolder.context.authentication
 		if (!auth.respondsTo('getJwtToken')) {
-			throw new RuntimeException("Unable to retrieve Auth0 token.")
+			throw new RuntimeException('Unable to retrieve Auth0 token.')
 		}
 		render([
 			dataSource: dataSource,

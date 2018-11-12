@@ -2,7 +2,7 @@ class TransmartFractalisGrailsPlugin {
 
 	private static final String TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME = 'transmartExtensionsRegistry'
 
-	def version = '18.1-SNAPSHOT'
+	def version = '16.4-SNAPSHOT'
 	def grailsVersion = '2.3 > *'
 	def title = 'Transmart Fractalis Plugin'
 	def author = 'Sascha Herzinger'
