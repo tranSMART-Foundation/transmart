@@ -288,7 +288,7 @@ class Auth0Controller implements InitializingBean {
 
 	def adminUserShow(AuthUser authUser) {
 		if (!authUser) {
-			flash.message = "AuthUser not found with id $params.id"
+			flash.message = 'AuthUser not found with id ' + params.id
 			redirect action: 'adminUserList'
 			return
 		}
@@ -308,7 +308,7 @@ class Auth0Controller implements InitializingBean {
 			buildPersonModel authUser
 		}
 		else {
-			flash.message = "AuthUser not found with id $params.id"
+			flash.message = 'AuthUser not found with id ' + params.id
 			redirect action: 'list'
 		}
 	}
@@ -362,15 +362,15 @@ class Auth0Controller implements InitializingBean {
 
 		String message
 		if (create) {
-			message = "User: ${authUser.username} for ${authUser.userRealName} created"
+			message = 'User: ' + authUser.username + ' for ' + authUser.userRealName + ' created'
 		}
 		else {
-			message = "${authUser.username} has been updated. Changed fields include: "
+			message = '' + authUser.username + ' has been updated. Changed fields include: '
 			message += authUser.dirtyPropertyNames.collect { String field ->
 				def newValue = authUser[field]
 				def oldValue = authUser.getPersistentValue(field)
 				if (newValue != oldValue) {
-					"$field ($oldValue -> $newValue)"
+					'' + field + ' (' + oldValue + ' -> ' + newValue + ')'
 				}
 			}.findAll().join(', ')
 		}

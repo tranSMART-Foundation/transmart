@@ -133,10 +133,10 @@ class Auth0Service implements InitializingBean {
 		Resty resty = new Resty()
 		JSONObject tokenInfo = resty.json(oauthTokenUrl, Resty.content(json)).toObject()
 		// {
-		//   "access_token":"...",
-		//   "expires_in":86400,
-		//   "id_token":"...",
-		//   "token_type":"Bearer"
+		//   'access_token':'...',
+		//   'expires_in':86400,
+		//   'id_token':'...',
+		//   'token_type':'Bearer'
 		// }
 
 		String accessToken = tokenInfo.getString('access_token')
@@ -144,33 +144,33 @@ class Auth0Service implements InitializingBean {
 
 		JSONObject userInfo = resty.json(userInfoUrl + accessToken).toObject()
 		// {
-		// 	"app_metadata":
+		// 	'app_metadata':
 		// 		{
-		// 			"roles":["ROLE_CITI_USER"]
+		// 			'roles':['ROLE_CITI_USER']
 		// 		},
-		// 		"clientID":"...",
-		// 		"created_at":"2017-11-21T15:19:50.683Z",
-		// 		"email":"burtbeckwith@gmail.com",
-		// 		"email_verified":true,
-		// 		"family_name":"Beckwith",
-		// 		"gender":"male",
-		// 		"given_name":"Burt",
-		// 		"identities":[
+		// 		'clientID':'...',
+		// 		'created_at':'2017-11-21T15:19:50.683Z',
+		// 		'email':'burtbeckwith@gmail.com',
+		// 		'email_verified':true,
+		// 		'family_name':'Beckwith',
+		// 		'gender':'male',
+		// 		'given_name':'Burt',
+		// 		'identities':[
 		// 			{
-		// 				"connection":"google-oauth2",
-		// 				"isSocial":true,
-		// 				"provider":"google-oauth2",
-		// 				"user_id":"..."
+		// 				'connection':'google-oauth2',
+		// 				'isSocial':true,
+		// 				'provider':'google-oauth2',
+		// 				'user_id':'...'
 		// 			}
 		// 		],
-		// 		"locale":"en",
-		// 		"name":"Burt Beckwith",
-		// 		"nickname":"burtbeckwith",
-		// 		"picture":"https://lh3.googleusercontent.com/-rG-S66wU1LI/AAAAAAAAAAI/AAAAAAAAAfE/ijUU6rz8j3I/photo.jpg",
-		// 		"roles":["ROLE_CITI_USER"],
-		// 		"sub":"google-oauth2|...",
-		// 		"updated_at":"2018-02-20T13:25:20.721Z",
-		// 		"user_id":"google-oauth2|..."
+		// 		'locale':'en',
+		// 		'name':'Burt Beckwith',
+		// 		'nickname':'burtbeckwith',
+		// 		'picture':'https://lh3.googleusercontent.com/-rG-S66wU1LI/AAAAAAAAAAI/AAAAAAAAAfE/ijUU6rz8j3I/photo.jpg',
+		// 		'roles':['ROLE_CITI_USER'],
+		// 		'sub':'google-oauth2|...',
+		// 		'updated_at':'2018-02-20T13:25:20.721Z',
+		// 		'user_id':'google-oauth2|...'
 		// }
 
 		logger.debug 'Auth0 user info: {}', userInfo
@@ -398,7 +398,7 @@ class Auth0Service implements InitializingBean {
 		logger.debug 'Sent `Registration Request` e-mail to administrator(s)'
 
 		accessLog username ?: email ?: 'unknown', 'user_registration-INFO',
-				"New user $email has been registered"
+				'New user ' + email + ' has been registered'
 
 		// Send registration confirmation e-mail to the user, once the form has been submitted.
 		body = groovyPageRenderer.render(template: '/auth0/email_thankyou', model: [
@@ -474,7 +474,7 @@ class Auth0Service implements InitializingBean {
 
 		updateRoles newLevel, user
 
-		String alertMsg = "User <b>$user.username</b> has been granted <b>$newLevel.description</b> access."
+		String alertMsg = 'User <b>' + user.username + '</b> has been granted <b>' + newLevel.description + '</b> access.'
 		logger.info alertMsg
 		accessLog securityService.currentUsername(), 'GrantAccess', alertMsg
 
