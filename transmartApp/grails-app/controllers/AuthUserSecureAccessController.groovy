@@ -2,12 +2,12 @@ import groovy.util.logging.Slf4j
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.AuthUserSecureAccess
 import org.transmart.searchapp.Role
-import org.transmart.searchapp.SecureAccessLevel;
+import org.transmart.searchapp.SecureAccessLevel
 
 @Slf4j('logger')
 class AuthUserSecureAccessController {
 
-    def index = { redirect(action: "list", params: params) }
+    def index = { redirect(action: 'list', params: params) }
 
     // the delete, save and update actions only accept POST requests
     static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
@@ -20,24 +20,27 @@ class AuthUserSecureAccessController {
         // query AuthUserSecureAccess. Instead we need to build a hibernate query and map custom property names to the subobjects.
         // http://grails.org/GSP+Tag+-+sortableColumn
         params.offset = params.offset ? params.offset.toInteger() : 0
-        params.order = params.order ? params.order : "asc"
-        params.sort = params.sort ? params.sort : "username"
+        params.order = params.order ? params.order : 'asc'
+        params.sort = params.sort ? params.sort : 'username'
         def list = AuthUserSecureAccess.withCriteria {
             maxResults(params.max)
             firstResult(params.offset)
-            if (params.sort == "username") {
+            if (params.sort == 'username') {
                 authUser {
-                    order("username", params.order)
+                    order('username', params.order)
                 }
-            } else if (params.sort == "accessLevelName") {
+            }
+            else if (params.sort == 'accessLevelName') {
                 accessLevel {
-                    order("accessLevelName", params.order)
+                    order('accessLevelName', params.order)
                 }
-            } else if (params.sort == "displayName") {
+            }
+            else if (params.sort == 'displayName') {
                 secureObject {
-                    order("displayName", params.order)
+                    order('displayName', params.order)
                 }
-            } else {
+            }
+            else {
                 order(params.sort, params.order)
             }
         }
@@ -48,9 +51,10 @@ class AuthUserSecureAccessController {
         def authUserSecureAccessInstance = AuthUserSecureAccess.get(params.id)
 
         if (!authUserSecureAccessInstance) {
-            flash.message = "AuthUserSecureAccess not found with id ${params.id}"
-            redirect(action: "list")
-        } else {
+            flash.message = 'AuthUserSecureAccess not found with id ' + params.id
+            redirect(action: 'list')
+        }
+        else {
             return [authUserSecureAccessInstance: authUserSecureAccessInstance]
         }
     }
@@ -60,16 +64,17 @@ class AuthUserSecureAccessController {
         if (authUserSecureAccessInstance) {
             try {
                 authUserSecureAccessInstance.delete()
-                flash.message = "AuthUserSecureAccess ${params.id} deleted"
-                redirect(action: "list")
+                flash.message = 'AuthUserSecureAccess ' + params.id + ' deleted'
+                redirect(action: 'list')
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "AuthUserSecureAccess ${params.id} could not be deleted"
-                redirect(action: "show", id: params.id)
+                flash.message = 'AuthUserSecureAccess ' + params.id + ' could not be deleted'
+                redirect(action: 'show', id: params.id)
             }
-        } else {
-            flash.message = "AuthUserSecureAccess not found with id ${params.id}"
-            redirect(action: "list")
+        }
+        else {
+            flash.message = 'AuthUserSecureAccess not found with id ' + params.id
+            redirect(action: 'list')
         }
     }
 
@@ -77,9 +82,10 @@ class AuthUserSecureAccessController {
         def authUserSecureAccessInstance = AuthUserSecureAccess.get(params.id)
 
         if (!authUserSecureAccessInstance) {
-            flash.message = "AuthUserSecureAccess not found with id ${params.id}"
-            redirect(action: "list")
-        } else {
+            flash.message = 'AuthUserSecureAccess not found with id ' + params.id
+            redirect(action: 'list')
+        }
+        else {
             def id = authUserSecureAccessInstance.authUser.id
             return [authUserSecureAccessInstance: authUserSecureAccessInstance, accessLevelList: getAccessLevelList(id)]
         }
@@ -92,21 +98,23 @@ class AuthUserSecureAccessController {
                 def version = params.version.toLong()
                 if (authUserSecureAccessInstance.version > version) {
 
-                    authUserSecureAccessInstance.errors.rejectValue("version", "authUserSecureAccess.optimistic.locking.failure", "Another user has updated this AuthUserSecureAccess while you were editing.")
+                    authUserSecureAccessInstance.errors.rejectValue('version', 'authUserSecureAccess.optimistic.locking.failure', 'Another user has updated this AuthUserSecureAccess while you were editing.')
                     render(view: 'edit', model: [authUserSecureAccessInstance: authUserSecureAccessInstance])
                     return
                 }
             }
             authUserSecureAccessInstance.properties = params
             if (!authUserSecureAccessInstance.hasErrors() && authUserSecureAccessInstance.save()) {
-                flash.message = "AuthUserSecureAccess ${params.id} updated"
-                redirect(action: "show", id: authUserSecureAccessInstance.id)
-            } else {
+                flash.message = 'AuthUserSecureAccess ' + params.id + ' updated'
+                redirect(action: 'show', id: authUserSecureAccessInstance.id)
+            }
+            else {
                 render(view: 'edit', model: [authUserSecureAccessInstance: authUserSecureAccessInstance])
             }
-        } else {
-            flash.message = "AuthUserSecureAccess not found with id ${params.id}"
-            redirect(action: "edit", id: params.id)
+        }
+        else {
+            flash.message = 'AuthUserSecureAccess not found with id ' + params.id
+            redirect(action: 'edit', id: params.id)
         }
     }
 
@@ -119,37 +127,39 @@ class AuthUserSecureAccessController {
     def save = {
         def authUserSecureAccessInstance = new AuthUserSecureAccess(params)
         if (!authUserSecureAccessInstance.hasErrors() && authUserSecureAccessInstance.save()) {
-            flash.message = "AuthUserSecureAccess ${authUserSecureAccessInstance.id} created"
-            redirect(action: "show", id: authUserSecureAccessInstance.id)
-        } else {
+            flash.message = 'AuthUserSecureAccess ' + authUserSecureAccessInstance.id + ' created'
+            redirect(action: 'show', id: authUserSecureAccessInstance.id)
+        }
+        else {
             render(view: 'create', model: [authUserSecureAccessInstance: authUserSecureAccessInstance])
         }
     }
 
     def isAllowOwn(id) {
-        def authUser = AuthUser.get(id);
+        def authUser = AuthUser.get(id)
         for (role in authUser.authorities) {
             if (Role.SPECTATOR_ROLE.equalsIgnoreCase(role.authority)) {
-                return false;
+                return false
             }
         }
-        return true;
+        return true
     }
 
     def getAccessLevelList(id) {
-        def accessLevelList = [];
+        def accessLevelList = []
         if (!isAllowOwn(id)) {
 
             accessLevelList = SecureAccessLevel.findAll("FROM SecureAccessLevel WHERE accessLevelName <>'OWN' ORDER BY accessLevelValue")
-        } else {
-            accessLevelList = SecureAccessLevel.listOrderByAccessLevelValue();
+        }
+        else {
+            accessLevelList = SecureAccessLevel.listOrderByAccessLevelValue()
         }
     }
 
     def listAccessLevel = {
-        //logger.debug(params);
+        //logger.debug(params)
 
-        //	logger.debug(accessLevelList);
-        render(template: 'accessLevelList', model: [accessLevelList: getAccessLevelList(params.id)]);
+        //	logger.debug(accessLevelList)
+        render(template: 'accessLevelList', model: [accessLevelList: getAccessLevelList(params.id)])
     }
 }

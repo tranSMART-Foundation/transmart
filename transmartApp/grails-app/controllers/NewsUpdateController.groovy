@@ -1,9 +1,8 @@
 class NewsUpdateController {
 
-    def listDetailed =
-            {
+    def listDetailed = {
                 //Render the screen of detailed information about this update.
-                render(template: "listDetailed", model: [thisUpdate: NewsUpdate.get(params.id)]);
+                render(template: 'listDetailed', model: [thisUpdate: NewsUpdate.get(params.id)])
             }
 
 }

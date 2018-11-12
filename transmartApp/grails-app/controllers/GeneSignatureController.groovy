@@ -36,35 +36,35 @@ class GeneSignatureController {
     User currentUserBean
 
     // concept code categories
-    static def SOURCE_CATEGORY = "GENE_SIG_SOURCE"
-    static def OWNER_CATEGORY = "GENE_SIG_OWNER"
-    static def SPECIES_CATEGORY = "SPECIES"
-    static def MOUSE_SOURCE_CATEGORY = "MOUSE_SOURCE"
-    static def TISSUE_TYPE_CATEGORY = "TISSUE_TYPE"
-    static def EXP_TYPE_CATEGORY = "EXPERIMENT_TYPE"
-    static def ANALYTIC_TYPE_CATEGORY = "ANALYTIC_CATEGORY"
-    static def NORM_METHOD_CATEGORY = "NORMALIZATION_METHOD"
-    static def ANALYSIS_METHOD_CATEGORY = "ANALYSIS_METHOD"
-    static def P_VAL_CUTOFF_CATEGORY = "P_VAL_CUTOFF"
-    static def FOLD_CHG_METRIC_CATEGORY = "FOLD_CHG_METRIC"
+    static def SOURCE_CATEGORY = 'GENE_SIG_SOURCE'
+    static def OWNER_CATEGORY = 'GENE_SIG_OWNER'
+    static def SPECIES_CATEGORY = 'SPECIES'
+    static def MOUSE_SOURCE_CATEGORY = 'MOUSE_SOURCE'
+    static def TISSUE_TYPE_CATEGORY = 'TISSUE_TYPE'
+    static def EXP_TYPE_CATEGORY = 'EXPERIMENT_TYPE'
+    static def ANALYTIC_TYPE_CATEGORY = 'ANALYTIC_CATEGORY'
+    static def NORM_METHOD_CATEGORY = 'NORMALIZATION_METHOD'
+    static def ANALYSIS_METHOD_CATEGORY = 'ANALYSIS_METHOD'
+    static def P_VAL_CUTOFF_CATEGORY = 'P_VAL_CUTOFF'
+    static def FOLD_CHG_METRIC_CATEGORY = 'FOLD_CHG_METRIC'
 
     // session attributes
-    static def WIZ_DETAILS_ATTRIBUTE = "wizDetails"
+    static def WIZ_DETAILS_ATTRIBUTE = 'wizDetails'
 
     //static def allowedMethods = [initWizard:'POST', create1:'POST', create2:'POST', create3:'POST', save:'POST', update:'POST']
 
     // map species param
     static mappings = {
-        "/$species"(controller: "geneSignature", action: "cellLineLookup")
+        '/' + species(controller: 'geneSignature', action: 'cellLineLookup')
     }
 
     def index = {
         // track usage
-        def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: "GeneSignature-Summary", eventmessage: "Gene Signature summary page", accesstime: new Date())
-        //logger.info "saving Gene Signature access log"
-        al.save();
+        def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'GeneSignature-Summary', eventmessage: 'Gene Signature summary page', accesstime: new Date())
+        //logger.info 'saving Gene Signature access log'
+        al.save()
 
-        redirect(action: "list")
+        redirect(action: 'list')
     }
 
     /**
@@ -72,7 +72,7 @@ class GeneSignatureController {
      */
     def refreshSummary = {
         flash.message = null
-        redirect(action: "list")
+        redirect(action: 'list')
     }
 
     /**
@@ -85,10 +85,10 @@ class GeneSignatureController {
         // logged in user
         def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
         def bAdmin = user.isAdmin()
-        logger.info "Admin? " + bAdmin
+        logger.info 'Admin? ' + bAdmin
 
         // summary view
-        def signatures = geneSignatureService.listPermissionedGeneSignatures(user.id, bAdmin);
+        def signatures = geneSignatureService.listPermissionedGeneSignatures(user.id, bAdmin)
         def ctMap = geneSignatureService.getPermissionedCountMap(user.id, bAdmin)
 
         // break into owned and public
@@ -98,25 +98,25 @@ class GeneSignatureController {
         def pubListItems = []
 
         signatures.each {
-            if(it.uniqueId?.startsWith("GENESIG") )
-            {
+            if(it.uniqueId?.startsWith('GENESIG') ) {
                 if (user.id == it.createdByAuthUser.id) {
                     myItems.add(it)
-                } else {
+                }
+                else {
                     pubItems.add(it)
                 }
             }
-            else
-            {
+            else {
                 if(user.id==it.createdByAuthUser.id) {
                     myListItems.add(it)
-                } else {
+                }
+                else {
                     pubListItems.add(it)
                 }
             }
         }
 
-	render(view: "list", model:[user: user, adminFlag: bAdmin, myItems: myItems, pubItems: pubItems,
+	render(view: 'list', model:[user: user, adminFlag: bAdmin, myItems: myItems, pubItems: pubItems,
                                     myListItems: myListItems, pubListItems: pubListItems, ctMap: ctMap])
     }
 
@@ -128,16 +128,16 @@ class GeneSignatureController {
         def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
 
         // initialize new gene signature instance
-        def geneSigInst = new GeneSignature();
-        geneSigInst.properties.createdByAuthUser = user;
-        geneSigInst.properties.publicFlag = false;
-        geneSigInst.properties.deletedFlag = false;
+        def geneSigInst = new GeneSignature()
+        geneSigInst.properties.createdByAuthUser = user
+        geneSigInst.properties.publicFlag = false
+        geneSigInst.properties.deletedFlag = false
 
         // initialize session
-        def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: geneSigInst);
+        def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: geneSigInst)
         session.setAttribute(WIZ_DETAILS_ATTRIBUTE, newWizard)
 
-        redirect(action: "create1")
+        redirect(action: 'create1')
     }
 
     /**
@@ -148,14 +148,14 @@ class GeneSignatureController {
         def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
 
         // initialize new gene signature instance
-        def geneSigInst = new GeneSignature();
-        geneSigInst.properties.createdByAuthUser = user;
-        geneSigInst.properties.publicFlag = false;
-        geneSigInst.properties.deletedFlag = false;
-        geneSigInst.properties.list = true;
+        def geneSigInst = new GeneSignature()
+        geneSigInst.properties.createdByAuthUser = user
+        geneSigInst.properties.publicFlag = false
+        geneSigInst.properties.deletedFlag = false
+        geneSigInst.properties.list = true
 
         // initialize session
-        def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: geneSigInst);
+        def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: geneSigInst)
         session.setAttribute(WIZ_DETAILS_ATTRIBUTE, newWizard)
 
         redirect(action:'createList')
@@ -175,12 +175,12 @@ class GeneSignatureController {
         if (clone.experimentTypeCellLine?.id == null) clone.experimentTypeCellLine = null
         // this is hack, don't know how to get around this!
 
-        logger.debug "experimentTypeCellLine: " + clone.experimentTypeCellLine + "; null? " + (clone.experimentTypeCellLine == null)
+        logger.debug 'experimentTypeCellLine: ' + clone.experimentTypeCellLine + '; null? ' + (clone.experimentTypeCellLine == null)
         // set onto session
-        def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: clone, wizardType: WizardModelDetails.WIZ_TYPE_EDIT, editId: geneSigInst.id);
+        def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: clone, wizardType: WizardModelDetails.WIZ_TYPE_EDIT, editId: geneSigInst.id)
         session.setAttribute(WIZ_DETAILS_ATTRIBUTE, newWizard)
 
-        redirect(action: "edit1")
+        redirect(action: 'edit1')
     }
 
     /**
@@ -194,24 +194,24 @@ class GeneSignatureController {
         def geneSigInst = GeneSignature.get(params.id)
         def clone = geneSigInst.clone()
         clone.createdByAuthUser = user
-        clone.modifiedByAuthUser = null;
-        clone.name = clone.name + " (clone)"
-        clone.description = clone.description + " (clone)"
-        clone.publicFlag = false;
-        clone.deletedFlag = false;
-        clone.dateCreated = null;
-        clone.lastUpdated = null;
-        clone.versionNumber = null;
-        clone.uniqueId = null;
+        clone.modifiedByAuthUser = null
+        clone.name = clone.name + ' (clone)'
+        clone.description = clone.description + ' (clone)'
+        clone.publicFlag = false
+        clone.deletedFlag = false
+        clone.dateCreated = null
+        clone.lastUpdated = null
+        clone.versionNumber = null
+        clone.uniqueId = null
         if (clone.experimentTypeCellLine?.id == null) clone.experimentTypeCellLine = null
         // this is hack, don't know how to get around this!
 
         // set onto session
-        def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: clone, wizardType: WizardModelDetails.WIZ_TYPE_CLONE, cloneId: geneSigInst.id);
+        def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: clone, wizardType: WizardModelDetails.WIZ_TYPE_CLONE, cloneId: geneSigInst.id)
         session.setAttribute(WIZ_DETAILS_ATTRIBUTE, newWizard)
 
         // reset items
-        redirect(action: "create1")
+        redirect(action: 'create1')
     }
 
     /**
@@ -224,7 +224,7 @@ class GeneSignatureController {
         geneSignatureService.makePublic(gsInst, true)
 
         flash.message = "GeneSignature '${gsInst.name}' was made public to everyone"
-        redirect(action: "list")
+        redirect(action: 'list')
     }
 
     /**
@@ -237,7 +237,7 @@ class GeneSignatureController {
         geneSignatureService.makePublic(gsInst, false)
 
         flash.message = "GeneSignature '${gsInst.name}' was made private"
-        redirect(action: "list")
+        redirect(action: 'list')
     }
 
     /**
@@ -250,7 +250,7 @@ class GeneSignatureController {
         geneSignatureService.delete(gsInst)
 
         flash.message = "GeneSignature '${gsInst.name}' was marked as deleted"
-        redirect(action: "list")
+        redirect(action: 'list')
     }
 
     /**
@@ -276,7 +276,7 @@ class GeneSignatureController {
         // load data for page 1
         loadWizardItems(1, wizard)
 
-        render(view: "wizard1", model: [wizard: wizard])
+        render(view: 'wizard1', model: [wizard: wizard])
     }
 
     def create2 = {
@@ -290,7 +290,7 @@ class GeneSignatureController {
         loadWizardItems(2, wizard)
         def existingValues = createExistingValues(2, wizard.geneSigInst)
 
-        render(view: "wizard2", model: [wizard: wizard, existingValues: existingValues])
+        render(view: 'wizard2', model: [wizard: wizard, existingValues: existingValues])
     }
 
     def create3 = {
@@ -303,7 +303,7 @@ class GeneSignatureController {
         loadWizardItems(3, wizard)
         def existingValues = createExistingValues(3, wizard.geneSigInst)
 
-        render(view: "wizard3", model: [wizard: wizard, existingValues: existingValues])
+        render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
     }
 
     def createList = {
@@ -312,7 +312,7 @@ class GeneSignatureController {
         // bind params
         bindGeneSigData(params, wizard.geneSigInst)
 
-        render(view: "wizard_list", model:[wizard: wizard])
+        render(view: 'wizard_list', model:[wizard: wizard])
     }
 
     def editList = {
@@ -320,15 +320,15 @@ class GeneSignatureController {
         def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
 
         // initialize new gs inst
-        def geneSigInst = GeneSignature.get(params.id);
+        def geneSigInst = GeneSignature.get(params.id)
         // initialize session
-        def wizard = new WizardModelDetails(loggedInUser: user, geneSigInst: geneSigInst);
+        def wizard = new WizardModelDetails(loggedInUser: user, geneSigInst: geneSigInst)
         session.setAttribute(WIZ_DETAILS_ATTRIBUTE, wizard)
 
         // bind params
         bindGeneSigData(params, wizard.geneSigInst)
-        wizard.wizardType = 1;
-        render(view: "wizard_list", model:[wizard: wizard, gs: wizard.geneSigInst, isEdit: true])
+        wizard.wizardType = 1
+        render(view: 'wizard_list', model:[wizard: wizard, gs: wizard.geneSigInst, isEdit: true])
     }
 
     /**
@@ -342,7 +342,7 @@ class GeneSignatureController {
         // load data for page 1
         loadWizardItems(1, wizard)
 
-        render(view: "wizard1", model: [wizard: wizard])
+        render(view: 'wizard1', model: [wizard: wizard])
     }
 
     /**
@@ -361,7 +361,7 @@ class GeneSignatureController {
         loadWizardItems(2, wizard)
         def existingValues = createExistingValues(2, wizard.geneSigInst)
 
-        render(view: "wizard2", model: [wizard: wizard, existingValues: existingValues])
+        render(view: 'wizard2', model: [wizard: wizard, existingValues: existingValues])
     }
 
     /**
@@ -375,7 +375,7 @@ class GeneSignatureController {
         loadWizardItems(3, wizard)
         def existingValues = createExistingValues(3, wizard.geneSigInst)
 
-        render(view: "wizard3", model: [wizard: wizard, existingValues: existingValues])
+        render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
     }
 
     /**
@@ -393,7 +393,7 @@ class GeneSignatureController {
         def file = request.getFile('uploadFile')
 
         // load file contents, if clone check for file presence
-        boolean bLoadFile = (wizard.wizardType == WizardModelDetails.WIZ_TYPE_CREATE) || (wizard.wizardType == WizardModelDetails.WIZ_TYPE_CLONE && file != null && file.getOriginalFilename() != "")
+        boolean bLoadFile = (wizard.wizardType == WizardModelDetails.WIZ_TYPE_CREATE) || (wizard.wizardType == WizardModelDetails.WIZ_TYPE_CLONE && file != null && file.getOriginalFilename() != '')
         if (!bLoadFile) file = null
         if (bLoadFile) {
             gs.properties.uploadFile = file.getOriginalFilename()
@@ -402,7 +402,7 @@ class GeneSignatureController {
             if (file.empty) {
                 flash.message = "The file:'${gs.properties.uploadFile}' you uploaded is empty"
                 def existingValues = createExistingValues(3, wizard.geneSigInst)
-                return render(view: "wizard3", model: [wizard: wizard, existingValues: existingValues])
+                return render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
             }
 
             // validate file format
@@ -411,13 +411,15 @@ class GeneSignatureController {
 
             try {
                 geneSignatureService.verifyFileFormat(file, schemaColCt, metricType)
-            } catch (FileSchemaException e) {
+            }
+            catch (FileSchemaException e) {
                 flash.message = e.getMessage()
                 def existingValues = createExistingValues(3, wizard.geneSigInst)
-                return render(view: "wizard3", model: [wizard: wizard, existingValues: existingValues])
+                return render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
             }
 
-        } else {
+        }
+        else {
             // load items from cloned object
             GeneSignature parentGS = GeneSignature.get(wizard.cloneId)
             gs.properties.uploadFile = parentGS.uploadFile
@@ -430,11 +432,11 @@ class GeneSignatureController {
             gs = geneSignatureService.saveWizard(gs, file)
             if (gs.hasErrors()) {
                 flash.message = 'Could not save Gene Signature'
-                render(view: "wizard3", model: [wizard: wizard, existingValues: existingValues])
+                render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
                 return
             }
 
-            auditLogService.report("New Gene Signature", request,
+            auditLogService.report('New Gene Signature', request,
                 action: actionName,
                 user: currentUserBean,
                 filename: file?.originalFilename,
@@ -447,16 +449,18 @@ class GeneSignatureController {
 
             // send message to user
             flash.message = "GeneSignature '${gs.name}' was created on: ${gs.dateCreated}"
-            redirect(action: "list")
+            redirect(action: 'list')
 
-        } catch (FileSchemaException fse) {
+        }
+        catch (FileSchemaException fse) {
             flash.message = fse.getMessage()
             def existingValues = createExistingValues(3, wizard.geneSigInst)
-            render(view: "wizard3", model: [wizard: wizard, existingValues: existingValues])
-        } catch (RuntimeException re) {
-            flash.message = "Runtime exception " + re.getClass().getName() + ":<br>" + re.getMessage()
+            render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
+        }
+        catch (RuntimeException re) {
+            flash.message = 'Runtime exception ' + re.getClass().getName() + ':<br>' + re.getMessage()
             def existingValues = createExistingValues(3, wizard.geneSigInst)
-            render(view: "wizard3", model: [wizard: wizard, existingValues: existingValues])
+            render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
         }
     }
 
@@ -476,25 +480,25 @@ class GeneSignatureController {
                 eq('geneSignature', gs)
             }
             for (i in currentListItems) {
-                i.delete();
+                i.delete()
             }
             gs.geneSigItems.clear()
         }
         // species
-        gs.speciesConceptCode =  ConceptCode.findByCodeTypeNameAndBioConceptCode("OTHER", "OTHER")
+        gs.speciesConceptCode =  ConceptCode.findByCodeTypeNameAndBioConceptCode('OTHER', 'OTHER')
 
         // technology platforms
-        gs.techPlatform = BioAssayPlatform.findByName("Other")
-        if(!gs.techPlatform) {gs.techPlatform = BioAssayPlatform.findByName("None")}
+        gs.techPlatform = BioAssayPlatform.findByName('Other')
+        if(!gs.techPlatform) {gs.techPlatform = BioAssayPlatform.findByName('None')}
         
         // p value cutoffs
-        gs.pValueCutoffConceptCode =  ConceptCode.findByCodeTypeNameAndBioConceptCode(P_VAL_CUTOFF_CATEGORY, "UNDEFINED")
+        gs.pValueCutoffConceptCode =  ConceptCode.findByCodeTypeNameAndBioConceptCode(P_VAL_CUTOFF_CATEGORY, 'UNDEFINED')
 
         // file schemas
-        gs.fileSchema =  GeneSignatureFileSchema.findByName("Gene Symbol <tab> Metric Indicator")
+        gs.fileSchema =  GeneSignatureFileSchema.findByName('Gene Symbol <tab> Metric Indicator')
 
         // fold change metrics
-        gs.foldChgMetricConceptCode = ConceptCode.findByCodeTypeNameAndBioConceptCode(FOLD_CHG_METRIC_CATEGORY, "NOT_USED")
+        gs.foldChgMetricConceptCode = ConceptCode.findByCodeTypeNameAndBioConceptCode(FOLD_CHG_METRIC_CATEGORY, 'NOT_USED')
 
         // bind params
         bindData(gs, params)
@@ -504,7 +508,7 @@ class GeneSignatureController {
         gs.properties.name = request.getParameter('name')
 
         // load file contents, if clone check for file presence
-        boolean bLoadFile = (file!=null && file.getOriginalFilename().trim() !="")
+        boolean bLoadFile = (file!=null && file.getOriginalFilename().trim() !='')
         if(!bLoadFile) file = null
         if(bLoadFile) {
             gs.properties.uploadFile = file.getOriginalFilename()
@@ -512,31 +516,33 @@ class GeneSignatureController {
             // check for empty file
             if(file.empty) {
                 flash.message = "The file:'${gs.properties.uploadFile}' you uploaded is empty"
-                return render(view: "wizard_list", model:[wizard: wizard])
+                return render(view: 'wizard_list', model:[wizard: wizard])
             }
 
             // validate file format
-            def metricType = "NOT_USED"
+            def metricType = 'NOT_USED'
             def schemaColCt = 2
 
             try {
                 geneSignatureService.verifyFileFormat(file, schemaColCt, metricType)
-            } catch (FileSchemaException e) {
+            }
+            catch (FileSchemaException e) {
                 flash.message = e.getMessage()
-                return render(view: "wizard_list", model:[wizard: wizard])
+                return render(view: 'wizard_list', model:[wizard: wizard])
             }
 
-        } else {
-            gs.properties.uploadFile = "Manual Item Entry"
+        }
+        else {
+            gs.properties.uploadFile = 'Manual Item Entry'
             // load items from list rather than file
             Iterator iter = params.entrySet().iterator()
-            SortedSet invalidSymbols = new TreeSet();
+            SortedSet invalidSymbols = new TreeSet()
             while(iter.hasNext()) {
                 def param = iter.next()
                 def key = param.getKey().trim()
                 def val = param.getValue()
                 List<String> markers = []
-                if(key.startsWith("biomarker_") && val != null && val != "") {
+                if(key.startsWith('biomarker_') && val != null && val != '') {
                     markers.add(val.trim())
                 }
                 def gsItems = geneSignatureService.loadGeneSigItemsFromList(markers)
@@ -553,7 +559,7 @@ class GeneSignatureController {
         try {
             gs = geneSignatureService.saveWizard(gs, file)
 
-            auditLogService.report("New Gene_RSID List", request,
+            auditLogService.report('New Gene_RSID List', request,
                 action: actionName,
                 user: currentUserBean,
                 filename: file?.originalFilename,
@@ -568,12 +574,14 @@ class GeneSignatureController {
             flash.message = "GeneSignature '${gs.name}' was " + (params.boolean('isEdit') ? "edited" : "created") + " on: ${gs.dateCreated}"
             redirect(action:'list')
 
-        } catch (FileSchemaException fse) {
+        }
+        catch (FileSchemaException fse) {
             flash.message = fse.getMessage()
-            render(view: "wizard_list", model:[wizard: wizard])
-        } catch (RuntimeException re) {
-            flash.message = "Runtime exception "+re.getClass().getName()+":<br>"+re.getMessage()
-            render(view: "wizard_list", model:[wizard: wizard])
+            render(view: 'wizard_list', model:[wizard: wizard])
+        }
+        catch (RuntimeException re) {
+            flash.message = 'Runtime exception '+re.getClass().getName()+':<br>'+re.getMessage()
+            render(view: 'wizard_list', model:[wizard: wizard])
         }
     }
 
@@ -603,12 +611,12 @@ class GeneSignatureController {
         logger.debug " update wizard file:'" + file?.getOriginalFilename() + "'"
 
         // file validation
-        if (file != null && file.getOriginalFilename() != "") {
+        if (file != null && file.getOriginalFilename() != '') {
             // empty?
             if (file.empty) {
                 flash.message = flash.message = "The file:'${file.getOriginalFilename()}' you uploaded is empty"
                 def existingValues = createExistingValues(3, wizard.geneSigInst)
-                return render(view: "wizard3", model: [wizard: wizard, existingValues: existingValues])
+                return render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
             }
 
             // check schema errors
@@ -618,10 +626,11 @@ class GeneSignatureController {
                 geneSignatureService.verifyFileFormat(file, schemaColCt, metricType)
                 gsReal.uploadFile = file.getOriginalFilename()
 
-            } catch (FileSchemaException e) {
+            }
+            catch (FileSchemaException e) {
                 flash.message = e.getMessage()
                 def existingValues = createExistingValues(3, wizard.geneSigInst)
-                return render(view: "wizard3", model: [wizard: wizard, existingValues: existingValues])
+                return render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
             }
         }
 
@@ -635,16 +644,18 @@ class GeneSignatureController {
 
             // send message to user
             flash.message = "GeneSignature '${gsReal.name}' was updated on: ${gsReal.lastUpdated}"
-            redirect(action: "list")
+            redirect(action: 'list')
 
-        } catch (FileSchemaException fse) {
+        }
+        catch (FileSchemaException fse) {
             flash.message = fse.getMessage()
             def existingValues = createExistingValues(3, wizard.geneSigInst)
-            render(view: "wizard3", model: [wizard: wizard, existingValues: existingValues])
-        } catch (RuntimeException re) {
-            flash.message = "Runtime exception " + re.getClass().getName() + ":<br>" + re.getMessage()
+            render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
+        }
+        catch (RuntimeException re) {
+            flash.message = 'Runtime exception ' + re.getClass().getName() + ':<br>' + re.getMessage()
             def existingValues = createExistingValues(3, wizard.geneSigInst)
-            render(view: "wizard3", model: [wizard: wizard, existingValues: existingValues])
+            render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
         }
     }
 
@@ -656,7 +667,8 @@ class GeneSignatureController {
 
         if (params.errorFlag != null) {
             render(view: 'edit_items', model: [gs: gs, errorFlag: true])
-        } else {
+        }
+        else {
             render(view: 'edit_items', model: [gs: gs])
         }
     }
@@ -668,7 +680,7 @@ class GeneSignatureController {
         def delParam = params.delete
         def gs = GeneSignature.get(params.id)
 
-        if (delParam == null || delParam == "") {
+        if (delParam == null || delParam == '') {
             flash.message = "<div class='warning'>You did not select any item(s) to delete</div>"
             return render(view: 'edit_items', model: [gs: gs, errorFlag: true])
         }
@@ -677,7 +689,8 @@ class GeneSignatureController {
         def delItems = []
         if (delParam instanceof String) {
             delItems.add(delParam)
-        } else {
+        }
+        else {
             delParam.each { delItems.add(it) }
         }
 
@@ -695,7 +708,7 @@ class GeneSignatureController {
     def addItems = {
 
         def gs = GeneSignature.get(params.id)
-        logger.debug " adding items to gs: " + gs.name
+        logger.debug ' adding items to gs: ' + gs.name
 
         // reset
         flash.message = null
@@ -717,26 +730,27 @@ class GeneSignatureController {
         Iterator iter = params.entrySet().iterator()
         while (iter.hasNext()) {
             param = iter.next()
-            //logger.info " eval param: "+param
-            //println "PARAM: " + param
+            //logger.info ' eval param: '+param
+            //println 'PARAM: ' + param
 
             key = param.getKey().trim()
             symbol = param.getValue().trim()
 
             // parse gene symbols
-            if (key.startsWith("biomarker_") && symbol.length() > 0) {
+            if (key.startsWith('biomarker_') && symbol.length() > 0) {
                 itemNum = key.substring(10, key.length())
-                valueMetric = params.get("foldChgMetric_" + itemNum)
+                valueMetric = params.get('foldChgMetric_' + itemNum)
                 geneSymbols.add(symbol)
-                println "Gene: " + symbol + "   FC: " + valueMetric
+                println 'Gene: ' + symbol + '   FC: ' + valueMetric
 
                 logger.debug " parsing symbol: '" + symbol + "' with valueMetric: " + valueMetric
                 // parse fold chg metric
                 if (valueMetric != null && valueMetric.trim().length() > 0) {
                     try {
                         valueMetrics.add(Double.valueOf(valueMetric))
-                    } catch (RuntimeException e) {
-                        logger.error "invalid valueMetric: " + valueMetric + " detected!", e
+                    }
+                    catch (RuntimeException e) {
+                        logger.error 'invalid valueMetric: ' + valueMetric + ' detected!', e
                         flash.message = "<div class='warning'>The value metric '" + valueMetric + "' for symbol: '" + symbol + "' is not a valid number</div>"
                         bError = true
                     }
@@ -744,9 +758,9 @@ class GeneSignatureController {
             }
 
             // parse probeset
-            if (key.startsWith("probeset_") && symbol.length() > 0) {
+            if (key.startsWith('probeset_') && symbol.length() > 0) {
                 itemNum = key.substring(9, key.length())
-                valueMetric = params.get("foldChgMetric_" + itemNum)
+                valueMetric = params.get('foldChgMetric_' + itemNum)
                 probes.add(symbol)
 
                 logger.debug " parsing symbol: '" + symbol + "' with valueMetric: " + valueMetric
@@ -754,8 +768,9 @@ class GeneSignatureController {
                 if (valueMetric != null && valueMetric.trim().length() > 0) {
                     try {
                         valueMetrics.add(Double.valueOf(valueMetric))
-                    } catch (RuntimeException e) {
-                        logger.error "invalid valueMetric: " + valueMetric + " detected!", e
+                    }
+                    catch (RuntimeException e) {
+                        logger.error 'invalid valueMetric: ' + valueMetric + ' detected!', e
                         flash.message = "<div class='warning'>The value metric '" + valueMetric + "' for symbol: '" + symbol + "' is not a valid number</div>"
                         bError = true
                     }
@@ -791,12 +806,14 @@ class GeneSignatureController {
                 geneSignatureService.addGenSigItems(gs, geneSymbols, probes, valueMetrics)
                 flash.message = "<div class='message'>" + geneSymbols.size() + " gene signature item(s) were added to '" + gs.name + "'</div>"
 
-            } catch (FileSchemaException fse) {
-                logger.error "message>> " + fse.getMessage(), fse
+            }
+            catch (FileSchemaException fse) {
+                logger.error 'message>> ' + fse.getMessage(), fse
                 flash.message = "<div class='warning'>" + fse.getMessage() + "</div>"
                 bError = true
-            } catch (RuntimeException re) {
-                logger.error "RuntimeException>>" + re.getMessage(), re
+            }
+            catch (RuntimeException re) {
+                logger.error 'RuntimeException>>' + re.getMessage(), re
                 flash.message = "<div class='warning'>Runtime exception " + re.getClass().getName() + ":<br>" + re.getMessage() + "</div"
                 bError = true
             }
@@ -805,29 +822,30 @@ class GeneSignatureController {
         // handle error
         if (bError) {
             // build params map from current params for redirect
-            Map newParams = new HashMap();
-            newParams.putAt("id", gs.id)
-            newParams.putAt("errorFlag", true)
+            Map newParams = new HashMap()
+            newParams.putAt('id', gs.id)
+            newParams.putAt('errorFlag', true)
 
             // add new gene params
-            def i = 1;
+            def i = 1
             geneSymbols.each {
-                newParams.putAt("biomarker_" + i, it)
+                newParams.putAt('biomarker_' + i, it)
                 i++
             }
 
             // add new fold chg params
-            i = 1;
+            i = 1
             if (valueMetrics != null) {
                 valueMetrics.each {
-                    newParams.putAt("foldChgMetric_" + i, it)
+                    newParams.putAt('foldChgMetric_' + i, it)
                     i++
                 }
             }
-            logger.debug " redirect params>> " + newParams
-            redirect(action: "showEditItems", params: newParams)
-        } else {
-            redirect(action: "showEditItems", params: ["id": gs.id])
+            logger.debug ' redirect params>> ' + newParams
+            redirect(action: 'showEditItems', params: newParams)
+        }
+        else {
+            redirect(action: 'showEditItems', params: ['id': gs.id])
         }
     }
 
@@ -838,7 +856,7 @@ class GeneSignatureController {
 
         // download domain object
         def gs = GeneSignature.get(params.id)
-        DomainObjectExcelHelper downloadHelper = new DomainObjectExcelHelper(gs, "gene_sig_" + gs.name + ".xls")
+        DomainObjectExcelHelper downloadHelper = new DomainObjectExcelHelper(gs, 'gene_sig_' + gs.name + '.xls')
         downloadHelper.downloadDomainObject(response)
     }
 
@@ -848,21 +866,22 @@ class GeneSignatureController {
     def downloadGMT = {
         def fileName = null
         // send content to response
-        ServletOutputStream os = null;
+        ServletOutputStream os = null
         try {
             def content = geneSignatureService.getGeneSigGMTContent(params.id)
             fileName = 'gene_sig_' + content?.substring(0, content?.indexOf('\t'))?.replace('-', '') + '.gmt'
             // setup headers for download
-            response.setContentType("application/vnd.gmt");
-            response.setCharacterEncoding("charset=utf-8");
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-            response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
-            response.setHeader("Pragma", "public");
-            response.setHeader("Expires", "0");
-            os = response.getOutputStream();
-            os?.write(content.bytes);
-        } finally {
-            os?.flush();
+            response.setContentType('application/vnd.gmt')
+            response.setCharacterEncoding('charset=utf-8')
+            response.setHeader('Content-Disposition', 'attachment; filename=\'' + fileName + '\'')
+            response.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+            response.setHeader('Pragma', 'public')
+            response.setHeader('Expires', '0')
+            os = response.getOutputStream()
+            os?.write(content.bytes)
+        }
+        finally {
+            os?.flush()
         }
     }
 
@@ -872,61 +891,62 @@ class GeneSignatureController {
     def showUploadSamples = {
 
         // set headers on output stream
-        response.reset();
-        response.setContentType("text/plain");
-        response.setCharacterEncoding("charset=utf-8");
-        response.setHeader("Content-Disposition", "attachment; filename=\"gene_sig_samples.txt\"");
-        response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
-        response.setHeader("Pragma", "public");
-        response.setHeader("Expires", "0");
+        response.reset()
+        response.setContentType('text/plain')
+        response.setCharacterEncoding('charset=utf-8')
+        response.setHeader('Content-Disposition', 'attachment; filename=\'gene_sig_samples.txt\'')
+        response.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+        response.setHeader('Pragma', 'public')
+        response.setHeader('Expires', '0')
 
         // send workbook to response
-        ServletOutputStream os = null;
+        ServletOutputStream os = null
         try {
-            os = response.outputStream;
-            os.println("1) Gene List Example (no tab character, exclude fold change metric):");
-            os.println("")
-            os.println("TCN1")
-            os.println("IL1RN")
-            os.println("KIAA1199")
-            os.println("G0S2")
-            os.println("CXCL2")
-            os.println("IL1RN")
-            os.println("IL24")
-            os.println("APOBEC3A")
-            os.println("VNN3")
-            os.println("DSG3")
-            os.println("")
-            os.println("")
-            os.println("2) Gene Signature Example with actual fold change (separate columns with a tab):")
-            os.println("")
-            os.println("CXCL5\t-19.19385797")
-            os.println("IL8RB\t-18.21493625")
-            os.println("FPR1\t-17.6056338")
-            os.println("FCGR3A\t-15.69858713")
-            os.println("MMP3\t-15.31393568")
-            os.println("CXCL6\t-14.7275405")
-            os.println("BCL2A1\t-12.65822785")
-            os.println("CXCL2\t-12.300123")
-            os.println("SERPINB3\t-12.22493888")
-            os.println("KYNU\t-10.76426265")
-            os.println("")
-            os.println("")
-            os.println("3) Gene Signature Example for composite lists (separate columns with a tab):")
-            os.println("")
-            os.println("CXCL5\t-1")
-            os.println("IL8RB\t-1")
-            os.println("MMP3\t-1")
-            os.println("SOD2\t0")
-            os.println("PI3\t0")
-            os.println("CDH3\t0")
-            os.println("LAIR2\t1")
-            os.println("ZBP1\t1")
-            os.println("SPRR1B\t1")
-            os.println("APOL1\t1")
-        } finally {
-            //os.flush();
-            //	response.flushBuffer();
+            os = response.outputStream
+            os.println('1) Gene List Example (no tab character, exclude fold change metric):')
+            os.println('')
+            os.println('TCN1')
+            os.println('IL1RN')
+            os.println('KIAA1199')
+            os.println('G0S2')
+            os.println('CXCL2')
+            os.println('IL1RN')
+            os.println('IL24')
+            os.println('APOBEC3A')
+            os.println('VNN3')
+            os.println('DSG3')
+            os.println('')
+            os.println('')
+            os.println('2) Gene Signature Example with actual fold change (separate columns with a tab):')
+            os.println('')
+            os.println('CXCL5\t-19.19385797')
+            os.println('IL8RB\t-18.21493625')
+            os.println('FPR1\t-17.6056338')
+            os.println('FCGR3A\t-15.69858713')
+            os.println('MMP3\t-15.31393568')
+            os.println('CXCL6\t-14.7275405')
+            os.println('BCL2A1\t-12.65822785')
+            os.println('CXCL2\t-12.300123')
+            os.println('SERPINB3\t-12.22493888')
+            os.println('KYNU\t-10.76426265')
+            os.println('')
+            os.println('')
+            os.println('3) Gene Signature Example for composite lists (separate columns with a tab):')
+            os.println('')
+            os.println('CXCL5\t-1')
+            os.println('IL8RB\t-1')
+            os.println('MMP3\t-1')
+            os.println('SOD2\t0')
+            os.println('PI3\t0')
+            os.println('CDH3\t0')
+            os.println('LAIR2\t1')
+            os.println('ZBP1\t1')
+            os.println('SPRR1B\t1')
+            os.println('APOL1\t1')
+        }
+        finally {
+            //os.flush()
+            //	response.flushBuffer()
         }
     }
 
@@ -934,24 +954,25 @@ class GeneSignatureController {
      * retrieve cell lines for indicated species
      */
     def cellLineLookup = {
-        logger.debug " params " + params
+        logger.debug ' params ' + params
         def speciesId = params.id
 
         def cellLines = []
-        if (speciesId == null || speciesId == "") {
-            cellLines = CellLine.list([sort: "cellLineName"])
-        } else {
+        if (speciesId == null || speciesId == '') {
+            cellLines = CellLine.list([sort: 'cellLineName'])
+        }
+        else {
             def species = ConceptCode.get(speciesId)
             def speciesFilter = species.codeName
-            if (speciesFilter.indexOf("Mouse") != -1) speciesFilter = "Mouse"
-            if (speciesFilter.indexOf("monkey") != -1) speciesFilter = "Monkey"
+            if (speciesFilter.indexOf('Mouse') != -1) speciesFilter = 'Mouse'
+            if (speciesFilter.indexOf('monkey') != -1) speciesFilter = 'Monkey'
 
             // match on species
-            logger.debug " speciesFilter " + speciesFilter
-            cellLines = CellLine.findAllBySpeciesIlike(speciesFilter + "%", [sort: "cellLineName"])
+            logger.debug ' speciesFilter ' + speciesFilter
+            cellLines = CellLine.findAllBySpeciesIlike(speciesFilter + '%', [sort: 'cellLineName'])
         }
 
-        render(view: "cell_line_lookup", model: [cellLines: cellLines])
+        render(view: 'cell_line_lookup', model: [cellLines: cellLines])
     }
 
     /**
@@ -961,23 +982,23 @@ class GeneSignatureController {
         // skip if page param not specified
         if (params.page == null) return
 
-        long pageNum = Long.parseLong(params.page);
+        long pageNum = Long.parseLong(params.page)
 
         switch (pageNum) {
             case 1:
-                break;
+                break
 
             case 2:
-                break;
+                break
 
             case 3:
-                if (params.multipleTestingCorrection == null) params.multipleTestingCorrection = "";
-                break;
+                if (params.multipleTestingCorrection == null) params.multipleTestingCorrection = ''
+                break
         }
 
         // bind params
         bindData(gs, params)
-        logger.info "bound params from page " + pageNum + ":\n" + params
+        logger.info 'bound params from page ' + pageNum + ':\n' + params
     }
 
     /**
@@ -988,67 +1009,67 @@ class GeneSignatureController {
         switch (pageNum) {
 
             case 1:
-                break;
+                break
 
             case 2:
                 // sources
-                wizard.sources = ConceptCode.findAllByCodeTypeName(SOURCE_CATEGORY, [sort: "bioConceptCode"])
+                wizard.sources = ConceptCode.findAllByCodeTypeName(SOURCE_CATEGORY, [sort: 'bioConceptCode'])
                 wizard.sources.add(genericOtherConceptCode)
-                //WizardModelDetails.addOtherItem(wizard.sources, "other")
+                //WizardModelDetails.addOtherItem(wizard.sources, 'other')
 
                 // owners
-                wizard.owners = ConceptCode.findAllByCodeTypeName(OWNER_CATEGORY, [sort: "bioConceptCode"])
+                wizard.owners = ConceptCode.findAllByCodeTypeName(OWNER_CATEGORY, [sort: 'bioConceptCode'])
 
                 // species
-                wizard.species = ConceptCode.findAllByCodeTypeName(SPECIES_CATEGORY, [sort: "bioConceptCode"])
+                wizard.species = ConceptCode.findAllByCodeTypeName(SPECIES_CATEGORY, [sort: 'bioConceptCode'])
 
                 // mouse sources
-                wizard.mouseSources = ConceptCode.findAllByCodeTypeName(MOUSE_SOURCE_CATEGORY, [sort: "bioConceptCode"])
+                wizard.mouseSources = ConceptCode.findAllByCodeTypeName(MOUSE_SOURCE_CATEGORY, [sort: 'bioConceptCode'])
 
                 // tissue types
-                wizard.tissueTypes = ConceptCode.findAllByCodeTypeName(TISSUE_TYPE_CATEGORY, [sort: "bioConceptCode"])
+                wizard.tissueTypes = ConceptCode.findAllByCodeTypeName(TISSUE_TYPE_CATEGORY, [sort: 'bioConceptCode'])
 
                 // experiment types
-                wizard.expTypes = ConceptCode.findAllByCodeTypeName(EXP_TYPE_CATEGORY, [sort: "bioConceptCode"])
+                wizard.expTypes = ConceptCode.findAllByCodeTypeName(EXP_TYPE_CATEGORY, [sort: 'bioConceptCode'])
 
                 // technology platforms
-                def mrnaPlatforms = de.DeMrnaAnnotation.executeQuery("select DISTINCT gplId from de.DeMrnaAnnotation")
-                def platforms = BioAssayPlatform.findAll("from BioAssayPlatform as p where p.vendor is not null and p.accession in ("+DBHelper.listToInString(mrnaPlatforms)+") order by p.vendor, p.array");
-                BioAssayPlatform other = new BioAssayPlatform();
-                other.accession = "other"
-                //platforms.add(other);
-                wizard.platforms = platforms;
+                def mrnaPlatforms = de.DeMrnaAnnotation.executeQuery('select DISTINCT gplId from de.DeMrnaAnnotation')
+                def platforms = BioAssayPlatform.findAll('from BioAssayPlatform as p where p.vendor is not null and p.accession in ('+DBHelper.listToInString(mrnaPlatforms)+') order by p.vendor, p.array')
+                BioAssayPlatform other = new BioAssayPlatform()
+                other.accession = 'other'
+                //platforms.add(other)
+                wizard.platforms = platforms
 
                 // compounds
-                wizard.compounds = Compound.findAll("from Compound c where c.brandName is not null or c.genericName is not null order by codeName");
+                wizard.compounds = Compound.findAll('from Compound c where c.brandName is not null or c.genericName is not null order by codeName')
 
-                break;
+                break
 
             case 3:
                 // normalization methods
-                wizard.normMethods = ConceptCode.findAllByCodeTypeName(NORM_METHOD_CATEGORY, [sort: "bioConceptCode"])
+                wizard.normMethods = ConceptCode.findAllByCodeTypeName(NORM_METHOD_CATEGORY, [sort: 'bioConceptCode'])
                 wizard.normMethods.add(genericOtherConceptCode)
 
                 // analytic categories
-                wizard.analyticTypes = ConceptCode.findAllByCodeTypeName(ANALYTIC_TYPE_CATEGORY, [sort: "bioConceptCode"])
+                wizard.analyticTypes = ConceptCode.findAllByCodeTypeName(ANALYTIC_TYPE_CATEGORY, [sort: 'bioConceptCode'])
                 wizard.analyticTypes.add(genericOtherConceptCode)
 
                 // analysis methods
-                wizard.analysisMethods = ConceptCode.findAllByCodeTypeName(ANALYSIS_METHOD_CATEGORY, [sort: "bioConceptCode"])
+                wizard.analysisMethods = ConceptCode.findAllByCodeTypeName(ANALYSIS_METHOD_CATEGORY, [sort: 'bioConceptCode'])
                 wizard.analysisMethods.add(genericOtherConceptCode)
 
                 // file schemas
-                wizard.schemas = GeneSignatureFileSchema.findAllBySupported(true, [sort: "name"])
+                wizard.schemas = GeneSignatureFileSchema.findAllBySupported(true, [sort: 'name'])
 
                 // p value cutoffs
-                wizard.pValCutoffs = ConceptCode.findAllByCodeTypeName(P_VAL_CUTOFF_CATEGORY, [sort: "bioConceptCode"])
+                wizard.pValCutoffs = ConceptCode.findAllByCodeTypeName(P_VAL_CUTOFF_CATEGORY, [sort: 'bioConceptCode'])
 
                 // fold change metrics
-                wizard.foldChgMetrics = ConceptCode.findAllByCodeTypeName(FOLD_CHG_METRIC_CATEGORY, [sort: "bioConceptCode"])
-                break;
+                wizard.foldChgMetrics = ConceptCode.findAllByCodeTypeName(FOLD_CHG_METRIC_CATEGORY, [sort: 'bioConceptCode'])
+                break
 
             default:
-                logger.warn "invalid page requested!"
+                logger.warn 'invalid page requested!'
         }
     }
 
@@ -1106,16 +1127,16 @@ class GeneSignatureController {
                 existingValues.put('foldChgMetricConceptCode.id', gs.foldChgMetricConceptCode?.id ?: '')
                 break
             default:
-                logger.warn "invalid page requested!"
+                logger.warn 'invalid page requested!'
         }
         return existingValues
     }
 
     def checkGene = {
         def paramMap = params
-        //SearchKeyword skt = SearchKeyword.findByKeyword(params.geneName?.toUpperCase());
-        SearchKeywordTerm skt = SearchKeywordTerm.findByKeywordTerm(params.geneName?.toUpperCase());
-        SearchKeyword sk = skt.searchKeyword;
+        //SearchKeyword skt = SearchKeyword.findByKeyword(params.geneName?.toUpperCase())
+        SearchKeywordTerm skt = SearchKeywordTerm.findByKeywordTerm(params.geneName?.toUpperCase())
+        SearchKeyword sk = skt.searchKeyword
         if (sk && (sk?.dataCategory?.equals('GENE') || sk?.dataCategory?.equals('SNP'))) {
             render '{"found": "' + sk.dataCategory + '"}'
         }

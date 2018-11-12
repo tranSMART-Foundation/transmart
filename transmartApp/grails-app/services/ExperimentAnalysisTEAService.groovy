@@ -15,16 +15,16 @@ class ExperimentAnalysisTEAService extends AnalysisTEABaseService {
     def experimentAnalysisQueryService
 
     def getExpType() {
-        return "Experiment";
+        return 'Experiment'
     }
 
     def createResultObject() {
-        return new ExperimentAnalysisResult();
+        return new ExperimentAnalysisResult()
     }
 
 
     def createSubFilterCriteria(SearchFilter filter, Query query) {
-        experimentAnalysisQueryService.createSubFilterCriteria(filter.expAnalysisFilter, query);
+        experimentAnalysisQueryService.createSubFilterCriteria(filter.expAnalysisFilter, query)
     }
 
 

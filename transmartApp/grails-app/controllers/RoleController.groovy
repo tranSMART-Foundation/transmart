@@ -3,7 +3,7 @@
  * @author $Author: mmcduffie $
  * @version $Revision: 9178 $
  */
-import org.transmart.searchapp.Role;
+import org.transmart.searchapp.Role
 
 /**
  * Authority Controller.
@@ -16,7 +16,7 @@ class RoleController {
     def springSecurityService
 
     def index = {
-        redirect action: "list", params: params
+        redirect action: 'list', params: params
     }
 
     /**
@@ -35,8 +35,8 @@ class RoleController {
     def show = {
         def authority = Role.get(params.id)
         if (!authority) {
-            flash.message = "Role not found with id $params.id"
-            redirect action: "list"
+            flash.message = 'Role not found with id ' + params.id
+            redirect action: 'list'
             return
         }
         def people = authority.people
@@ -46,12 +46,14 @@ class RoleController {
                 def v2 = peopleFieldSelector(params.sort,o2)
                 v1.compareTo(v2)
             }
-            if (params.order.equals("asc")) {
+            if (params.order.equals('asc')) {
                 people = people.sort(sortFunction)
-            } else {
+            }
+            else {
                 people = people.sort(sortFunction).reverse()
             }
-        } else {
+        }
+        else {
             people = people.sort({it.id})
         }
         [authority: authority, sortedPeople: people]
@@ -59,15 +61,15 @@ class RoleController {
 
     def peopleFieldSelector(feildName,authUser) {
         switch (feildName) {
-            case "id" :
+            case 'id' :
                 return authUser.id
-            case "username" :
+            case 'username' :
                 return authUser.username
-            case "userRealName" :
+            case 'userRealName' :
                 return authUser.userRealName
-            case "enabled" :
+            case 'enabled' :
                 return authUser.enabled
-            case "description" :
+            case 'description' :
                 return authUser.description
             default :
                 return authUser.id
@@ -80,15 +82,15 @@ class RoleController {
     def delete = {
         def authority = Role.get(params.id)
         if (!authority) {
-            flash.message = "Role not found with id $params.id"
-            redirect action: "list"
+            flash.message = 'Role not found with id ' + params.id
+            redirect action: 'list'
             return
         }
 
         springSecurityService.deleteRole(authority)
 
-        flash.message = "Role $params.id deleted."
-        redirect action: "list"
+        flash.message = 'Role ' + params.id + ' deleted.'
+        redirect action: 'list'
     }
 
     /**
@@ -97,8 +99,8 @@ class RoleController {
     def edit = {
         def authority = Role.get(params.id)
         if (!authority) {
-            flash.message = "Role not found with id $params.id"
-            redirect action: "list"
+            flash.message = 'Role not found with id ' + params.id
+            redirect action: 'list'
             return
         }
 
@@ -112,8 +114,8 @@ class RoleController {
 
         def authority = Role.get(params.id)
         if (!authority) {
-            flash.message = "Role not found with id $params.id"
-            redirect action: "edit", id: params.id
+            flash.message = 'Role not found with id ' + params.id
+            redirect action: 'edit', id: params.id
             return
         }
 
@@ -127,8 +129,9 @@ class RoleController {
 
         if (springSecurityService.updateRole(authority, params)) {
             springSecurityService.clearCachedRequestmaps()
-            redirect action: "show", id: authority.id
-        } else {
+            redirect action: 'show', id: authority.id
+        }
+        else {
             render view: 'edit', model: [authority: authority]
         }
     }
@@ -148,24 +151,25 @@ class RoleController {
         role.properties = params
 
         // authority valdiation
-        if (params.authority == null || params.authority == "") {
-            flash.message = "Please enter a role name"
+        if (params.authority == null || params.authority == '') {
+            flash.message = 'Please enter a role name'
             role.authority = params.authority
             role.description = params.description
             return render(view: 'create', model: [authority: role])
         }
 
         // description validation
-        if (params.description == null || params.description == "") {
-            flash.message = "Please enter a role description"
+        if (params.description == null || params.description == '') {
+            flash.message = 'Please enter a role description'
             role.authority = params.authority
             role.description = params.description
             return render(view: 'create', model: [authority: role])
         }
 
         if (role.save()) {
-            redirect action: "show", id: role.id
-        } else {
+            redirect action: 'show', id: role.id
+        }
+        else {
             render view: 'create', model: [authority: role]
         }
     }

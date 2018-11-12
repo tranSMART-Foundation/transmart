@@ -146,8 +146,8 @@ class ExportMetadataService {
                 if (key == 'SNP') {
                     dataType['subset' + i] = createJSONFileObject([".PED, .MAP & .CNV": "Processed Data", ".CEL": "Raw Data", ".TXT": 'Text'], finalMap["subset${i}"][key])
                 }
-                if ((null != finalMap["subset${i}"][key] && finalMap["subset${i}"][key] > 0))
-                    dataTypeHasCounts = true;
+                if ((null != finalMap['subset' + i][key] && finalMap['subset' + i][key] > 0))
+                    dataTypeHasCounts = true
 
                 dataType['subsetId' + i] = "subset" + i
                 dataType['subsetName' + i] = "Subset " + i
@@ -167,7 +167,7 @@ class ExportMetadataService {
      * @see dataTab.js
      * @see ExportService.getClinicalMetaData ( )
      * @see ExportService.getHighDimMetaData ( )
-     * @return Map with root key "exportMetaData", which in turn contains a list of
+     * @return Map with root key 'exportMetaData', which in turn contains a list of
      *              datatypes to export. Each item in the list is a map that has keys,
      *              as below:
      *                  subsetId1
@@ -184,13 +184,13 @@ class ExportMetadataService {
      */
     protected Map convertIntoMetaDataMap(clinicalData, highDimensionalData) {
         def clinicalOutput = [
-                subsetId1        : "subset1",
-                subsetId2        : "subset2",
-                subsetName1      : "Subset 1",
-                subsetName2      : "Subset 2",
+                subsetId1        : 'subset1',
+                subsetId2        : 'subset2',
+                subsetName1      : 'Subset 1',
+                subsetName2      : 'Subset 2',
 
-                dataTypeId       : "CLINICAL",
-                dataTypeName     : "Clinical & Low Dimensional Biomarker Data",
+                dataTypeId       : 'CLINICAL',
+                dataTypeName     : 'Clinical & Low Dimensional Biomarker Data',
                 isHighDimensional: false,
 
                 subset1          : [
@@ -242,10 +242,10 @@ class ExportMetadataService {
                     .sort { it.format }
 
             [
-                    subsetId1        : "subset1",
-                    subsetId2        : "subset2",
-                    subsetName1      : "Subset 1",
-                    subsetName2      : "Subset 2",
+                    subsetId1        : 'subset1',
+                    subsetId2        : 'subset2',
+                    subsetName1      : 'Subset 1',
+                    subsetName2      : 'Subset 2',
 
                     dataTypeId       : highDimRow.datatype.dataTypeName,
                     dataTypeName     : highDimRow.datatype.dataTypeDescription,

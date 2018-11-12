@@ -81,73 +81,73 @@ class LiteratureController {
         searchFilter.litFilter.parseDiseaseSite(params?.diseaseSite)
         searchFilter.litFilter.parseComponentList(params?.componentList)
         for (alterationType in searchFilter.litFilter.alterationTypes.keySet()) {
-            searchFilter.litFilter.alterationTypes.put(alterationType, "on".equals(params.get("alterationtype_" + alterationType.toLowerCase().replace(" ", "_"))))
+            searchFilter.litFilter.alterationTypes.put(alterationType, 'on'.equals(params.get('alterationtype_' + alterationType.toLowerCase().replace(' ', '_'))))
         }
-        searchFilter.datasource = "literature"
+        searchFilter.datasource = 'literature'
         def sResult = new SearchResult()
         searchService.doResultCount(sResult, searchFilter)
         render(view: '/search/list', model: [searchresult: sResult])
     }
 
     def datasourceJubilant = {
-        def datatype = params?.datatype // != null ? params.datatype : "JUBILANT_ONCOLOGY_ALTERATION"
+        def datatype = params?.datatype // != null ? params.datatype : 'JUBILANT_ONCOLOGY_ALTERATION'
         def searchFilter = session.searchFilter
         def sResult = new SearchResult()
         sResult.litJubOncAltCount = literatureQueryService.litJubOncAltCount(searchFilter)
         if (datatype == null && sResult.litJubOncAltCount > 0) {
-            datatype = "JUBILANT_ONCOLOGY_ALTERATION"
+            datatype = 'JUBILANT_ONCOLOGY_ALTERATION'
         }
         sResult.litJubOncInhCount = literatureQueryService.litJubOncInhCount(searchFilter)
         if (datatype == null && sResult.litJubOncInhCount > 0) {
-            datatype = "JUBILANT_ONCOLOGY_INHIBITOR"
+            datatype = 'JUBILANT_ONCOLOGY_INHIBITOR'
         }
         sResult.litJubOncIntCount = literatureQueryService.litJubOncIntCount(searchFilter)
         if (datatype == null && sResult.litJubOncIntCount > 0) {
-            datatype = "JUBILANT_ONCOLOGY_INTERACTION"
+            datatype = 'JUBILANT_ONCOLOGY_INTERACTION'
         }
         sResult.litJubAsthmaAltCount = literatureQueryService.litJubAsthmaAltCount(searchFilter)
         if (datatype == null && sResult.litJubAsthmaAltCount > 0) {
-            datatype = "JUBILANT_ASTHMA_ALTERATION"
+            datatype = 'JUBILANT_ASTHMA_ALTERATION'
         }
         sResult.litJubAsthmaInhCount = literatureQueryService.litJubAsthmaInhCount(searchFilter)
         if (datatype == null && sResult.litJubAsthmaInhCount > 0) {
-            datatype = "JUBILANT_ASTHMA_INHIBITOR"
+            datatype = 'JUBILANT_ASTHMA_INHIBITOR'
         }
         sResult.litJubAsthmaIntCount = literatureQueryService.litJubAsthmaIntCount(searchFilter)
         if (datatype == null && sResult.litJubAsthmaIntCount > 0) {
-            datatype = "JUBILANT_ASTHMA_INTERACTION"
+            datatype = 'JUBILANT_ASTHMA_INTERACTION'
         }
         sResult.litJubAsthmaPECount = literatureQueryService.litJubAsthmaPECount(searchFilter)
         if (datatype == null && sResult.litJubAsthmaPECount > 0) {
-            datatype = "JUBILANT_ASTHMA_PROTEIN_EFFECT"
+            datatype = 'JUBILANT_ASTHMA_PROTEIN_EFFECT'
         }
         sResult.resultType = datatype
         switch (datatype) {
-            case "JUBILANT_ONCOLOGY_ALTERATION":
+            case 'JUBILANT_ONCOLOGY_ALTERATION':
                 sResult.resultCount = sResult.litJubOncAltCount
                 sResult.result = literatureQueryService.litJubOncAltData(searchFilter, params)
                 break
-            case "JUBILANT_ONCOLOGY_INHIBITOR":
+            case 'JUBILANT_ONCOLOGY_INHIBITOR':
                 sResult.resultCount = sResult.litJubOncInhCount
                 sResult.result = literatureQueryService.litJubOncInhData(searchFilter, params)
                 break
-            case "JUBILANT_ONCOLOGY_INTERACTION":
+            case 'JUBILANT_ONCOLOGY_INTERACTION':
                 sResult.resultCount = sResult.litJubOncIntCount
                 sResult.result = literatureQueryService.litJubOncIntData(searchFilter, params)
                 break
-            case "JUBILANT_ASTHMA_ALTERATION":
+            case 'JUBILANT_ASTHMA_ALTERATION':
                 sResult.resultCount = sResult.litJubAsthmaAltCount
                 sResult.result = literatureQueryService.litJubAsthmaAltData(searchFilter, params)
                 break
-            case "JUBILANT_ASTHMA_INHIBITOR":
+            case 'JUBILANT_ASTHMA_INHIBITOR':
                 sResult.resultCount = sResult.litJubAsthmaInhCount
                 sResult.result = literatureQueryService.litJubAsthmaInhData(searchFilter, params)
                 break
-            case "JUBILANT_ASTHMA_INTERACTION":
+            case 'JUBILANT_ASTHMA_INTERACTION':
                 sResult.resultCount = sResult.litJubAsthmaIntCount
                 sResult.result = literatureQueryService.litJubAsthmaIntData(searchFilter, params)
                 break
-            case "JUBILANT_ASTHMA_PROTEIN_EFFECT":
+            case 'JUBILANT_ASTHMA_PROTEIN_EFFECT':
                 sResult.resultCount = sResult.litJubAsthmaPECount
                 sResult.result = literatureQueryService.litJubAsthmaPEData(searchFilter, params)
                 break
@@ -204,215 +204,215 @@ class LiteratureController {
 
     def jubSummaryJSON = {
         def result = createJubSummary()
-        render params.callback + "(" + (result as JSON) + ")"
+        render params.callback + '(' + (result as JSON) + ')'
     }
 
     static List litRefDataColumns = [
-            "component",
-            "componentClass",
-            "geneId",
-            "moleculeType",
-            "variant",
-            "referenceType",
-            "referenceId",
-            "referenceTitle",
-            "backReferences",
-            "studyType",
-            "disease",
-            "diseaseIcd10",
-            "diseaseMesh",
-            "diseaseSite",
-            "diseaseStage",
-            "diseaseGrade",
-            "diseaseTypes",
-            "diseaseDescription",
-            "physiology",
-            "statClinical",
-            "statClinicalCorrelation",
-            "statTests",
-            "statCoefficient",
-            "statPValue",
-            "statDescription"
+            'component',
+            'componentClass',
+            'geneId',
+            'moleculeType',
+            'variant',
+            'referenceType',
+            'referenceId',
+            'referenceTitle',
+            'backReferences',
+            'studyType',
+            'disease',
+            'diseaseIcd10',
+            'diseaseMesh',
+            'diseaseSite',
+            'diseaseStage',
+            'diseaseGrade',
+            'diseaseTypes',
+            'diseaseDescription',
+            'physiology',
+            'statClinical',
+            'statClinicalCorrelation',
+            'statTests',
+            'statCoefficient',
+            'statPValue',
+            'statDescription'
     ]
 
     static List litAltDataColumns = [
-            "alterationType",
-            "control",
-            "effect",
-            "description",
-            "techniques",
-            "patientsPercent",
-            "patientsNumber",
-            "popNumber",
-            "popInclusionCriteria",
-            "popExclusionCriteria",
-            "popDescription",
-            "popType",
-            "popValue",
-            "popPhase",
-            "popStatus",
-            "popExperimentalModel",
-            "popTissue",
-            "popBodySubstance",
-            "popLocalization",
-            "popCellType",
-            "clinSubmucosaMarkerType",
-            "clinSubmucosaUnit",
-            "clinSubmucosaValue",
-            "clinAsmMarkerType",
-            "clinAsmUnit",
-            "clinAsmValue",
-            "clinCellularSource",
-            "clinCellularType",
-            "clinCellularCount",
-            "clinPriorMedPercent",
-            "clinPriorMedDose",
-            "clinPriorMedName",
-            "clinBaselineVariable",
-            "clinBaselinePercent",
-            "clinBaselineValue",
-            "clinSmoker",
-            "clinAtopy",
-            "controlExpPercent",
-            "controlExpNumber",
-            "controlExpValue",
-            "controlExpSd",
-            "controlExpUnit",
-            "overExpPercent",
-            "overExpNumber",
-            "overExpValue",
-            "overExpSd",
-            "overExpUnit",
-            "lossExpPercent",
-            "lossExpNumber",
-            "lossExpValue",
-            "lossExpSd",
-            "lossExpUnit",
-            "totalExpPercent",
-            "totalExpNumber",
-            "totalExpValue",
-            "totalExpSd",
-            "totalExpUnit",
-            "glcControlPercent",
-            "glcMolecularChange",
-            "glcType",
-            "glcPercent",
-            "glcNumber",
-            "ptmRegion",
-            "ptmType",
-            "ptmChange",
-            "lohLoci",
-            "mutationType",
-            "mutationChange",
-            "mutationSites",
-            "epigeneticRegion",
-            "epigeneticType"
+            'alterationType',
+            'control',
+            'effect',
+            'description',
+            'techniques',
+            'patientsPercent',
+            'patientsNumber',
+            'popNumber',
+            'popInclusionCriteria',
+            'popExclusionCriteria',
+            'popDescription',
+            'popType',
+            'popValue',
+            'popPhase',
+            'popStatus',
+            'popExperimentalModel',
+            'popTissue',
+            'popBodySubstance',
+            'popLocalization',
+            'popCellType',
+            'clinSubmucosaMarkerType',
+            'clinSubmucosaUnit',
+            'clinSubmucosaValue',
+            'clinAsmMarkerType',
+            'clinAsmUnit',
+            'clinAsmValue',
+            'clinCellularSource',
+            'clinCellularType',
+            'clinCellularCount',
+            'clinPriorMedPercent',
+            'clinPriorMedDose',
+            'clinPriorMedName',
+            'clinBaselineVariable',
+            'clinBaselinePercent',
+            'clinBaselineValue',
+            'clinSmoker',
+            'clinAtopy',
+            'controlExpPercent',
+            'controlExpNumber',
+            'controlExpValue',
+            'controlExpSd',
+            'controlExpUnit',
+            'overExpPercent',
+            'overExpNumber',
+            'overExpValue',
+            'overExpSd',
+            'overExpUnit',
+            'lossExpPercent',
+            'lossExpNumber',
+            'lossExpValue',
+            'lossExpSd',
+            'lossExpUnit',
+            'totalExpPercent',
+            'totalExpNumber',
+            'totalExpValue',
+            'totalExpSd',
+            'totalExpUnit',
+            'glcControlPercent',
+            'glcMolecularChange',
+            'glcType',
+            'glcPercent',
+            'glcNumber',
+            'ptmRegion',
+            'ptmType',
+            'ptmChange',
+            'lohLoci',
+            'mutationType',
+            'mutationChange',
+            'mutationSites',
+            'epigeneticRegion',
+            'epigeneticType'
     ]
     static List litInhDataColumns = [
-            "effectResponseRate",
-            "effectDownstream",
-            "effectBeneficial",
-            "effectAdverse",
-            "effectDescription",
-            "effectPharmacos",
-            "effectPotentials",
-            "trialType",
-            "trialPhase",
-            "trialStatus",
-            "trialExperimentalModel",
-            "trialTissue",
-            "trialBodySubstance",
-            "trialDescription",
-            "trialDesigns",
-            "trialCellLine",
-            "trialCellType",
-            "trialPatientsNumber",
-            "trialInclusionCriteria",
-            "inhibitor",
-            "inhibitorStandardName",
-            "casid",
-            "description",
-            "concentration",
-            "timeExposure",
-            "administration",
-            "treatment",
-            "techniques",
-            "effectMolecular",
-            "effectPercent",
-            "effectNumber",
-            "effectValue",
-            "effectSd",
-            "effectUnit"
+            'effectResponseRate',
+            'effectDownstream',
+            'effectBeneficial',
+            'effectAdverse',
+            'effectDescription',
+            'effectPharmacos',
+            'effectPotentials',
+            'trialType',
+            'trialPhase',
+            'trialStatus',
+            'trialExperimentalModel',
+            'trialTissue',
+            'trialBodySubstance',
+            'trialDescription',
+            'trialDesigns',
+            'trialCellLine',
+            'trialCellType',
+            'trialPatientsNumber',
+            'trialInclusionCriteria',
+            'inhibitor',
+            'inhibitorStandardName',
+            'casid',
+            'description',
+            'concentration',
+            'timeExposure',
+            'administration',
+            'treatment',
+            'techniques',
+            'effectMolecular',
+            'effectPercent',
+            'effectNumber',
+            'effectValue',
+            'effectSd',
+            'effectUnit'
     ]
     static List litIntDataColumns = [
-            "sourceComponent",
-            "sourceGeneId",
-            "targetComponent",
-            "targetGeneId",
-            "interactionMode",
-            "regulation",
-            "mechanism",
-            "effect",
-            "localization",
-            "region",
-            "techniques"
+            'sourceComponent',
+            'sourceGeneId',
+            'targetComponent',
+            'targetGeneId',
+            'interactionMode',
+            'regulation',
+            'mechanism',
+            'effect',
+            'localization',
+            'region',
+            'techniques'
     ]
     static List litPEDataColumns = [
-            "description"
+            'description'
     ]
 
     static List litModelDataColumns = [
-            "description",
-            "stimulation",
-            "controlChallenge",
-            "challenge",
-            "sentization",
-            "zygosity",
-            "experimentalModel",
-            "animalWildType",
-            "tissue",
-            "cellType",
-            "cellLine",
-            "bodySubstance",
-            "component",
-            "geneId"
+            'description',
+            'stimulation',
+            'controlChallenge',
+            'challenge',
+            'sentization',
+            'zygosity',
+            'experimentalModel',
+            'animalWildType',
+            'tissue',
+            'cellType',
+            'cellLine',
+            'bodySubstance',
+            'component',
+            'geneId'
     ]
 
     static List litAMDDataColumns = [
-            "molecule",
-            "moleculeType",
-            "totalExpPercent",
-            "totalExpNumber",
-            "totalExpValue",
-            "totalExpSd",
-            "totalExpUnit",
-            "overExpPercent",
-            "overExpNumber",
-            "overExpValue",
-            "overExpSd",
-            "overExpUnit",
-            "coExpPercent",
-            "coExpNumber",
-            "coExpValue",
-            "coExpSd",
-            "coExpUnit",
-            "mutationType",
-            "mutationSites",
-            "mutationChange",
-            "mutationPercent",
-            "mutationNumber",
-            "targetExpPercent",
-            "targetExpNumber",
-            "targetExpValue",
-            "targetExpSd",
-            "targetExpUnit",
-            "targetOverExpPercent",
-            "targetOverExpNumber",
-            "targetOverExpValue",
-            "targetOverExpSd",
-            "targetOverExpUnit",
-            "techniques",
-            "description"
+            'molecule',
+            'moleculeType',
+            'totalExpPercent',
+            'totalExpNumber',
+            'totalExpValue',
+            'totalExpSd',
+            'totalExpUnit',
+            'overExpPercent',
+            'overExpNumber',
+            'overExpValue',
+            'overExpSd',
+            'overExpUnit',
+            'coExpPercent',
+            'coExpNumber',
+            'coExpValue',
+            'coExpSd',
+            'coExpUnit',
+            'mutationType',
+            'mutationSites',
+            'mutationChange',
+            'mutationPercent',
+            'mutationNumber',
+            'targetExpPercent',
+            'targetExpNumber',
+            'targetExpValue',
+            'targetExpSd',
+            'targetExpUnit',
+            'targetOverExpPercent',
+            'targetOverExpNumber',
+            'targetOverExpValue',
+            'targetOverExpSd',
+            'targetOverExpUnit',
+            'techniques',
+            'description'
     ]
 
     def createLitSheet(sheetName, tableName, tableCols, results) {
@@ -426,49 +426,50 @@ class LiteratureController {
             for (col in litRefDataColumns) {
                 def value = refRecord[col]
                 if (value != null && value.size() > 0) {
-                    dataCols.add("LiteratureReferenceData." + col)
-                    row.put("LiteratureReferenceData." + col, value)
+                    dataCols.add('LiteratureReferenceData.' + col)
+                    row.put('LiteratureReferenceData.' + col, value)
                 }
             }
             for (col in tableCols) {
                 def value = record[col]
                 if (value != null && value.size() > 0) {
-                    dataCols.add(tableName + "." + col)
-                    row.put(tableName + "." + col, value)
+                    dataCols.add(tableName + '.' + col)
+                    row.put(tableName + '.' + col, value)
                 }
             }
-            if (tableName != "LiteratureInhibitorData" && record.inVivoModel != null) {
+            if (tableName != 'LiteratureInhibitorData' && record.inVivoModel != null) {
                 for (col in litModelDataColumns) {
                     def value = record.inVivoModel[col]
                     if (value != null && value.size() > 0) {
-                        dataCols.add("LiteratureModelData.InVivo." + col)
-                        row.put("LiteratureModelData.InVivo." + col, value)
+                        dataCols.add('LiteratureModelData.InVivo.' + col)
+                        row.put('LiteratureModelData.InVivo.' + col, value)
                     }
                 }
             }
-            if (tableName != "LiteratureInhibitorData" && record.inVitroModel != null) {
+            if (tableName != 'LiteratureInhibitorData' && record.inVitroModel != null) {
                 for (col in litModelDataColumns) {
                     def value = record.inVitroModel[col]
                     if (value != null && value.size() > 0) {
-                        dataCols.add("LiteratureModelData.InVitro." + col)
-                        row.put("LiteratureModelData.InVitro." + col, value)
+                        dataCols.add('LiteratureModelData.InVitro.' + col)
+                        row.put('LiteratureModelData.InVitro.' + col, value)
                     }
                 }
             }
-            if (tableName == "LiteratureAlterationData" && record.assocMoleculeDetails?.size() > 0) {
+            if (tableName == 'LiteratureAlterationData' && record.assocMoleculeDetails?.size() > 0) {
                 for (amdRecord in record.assocMoleculeDetails) {
                     def amdRow = [:]
                     amdRow.putAll(row)
                     for (col in litAMDDataColumns) {
                         def value = amdRecord[col]
                         if (value != null && value.size() > 0) {
-                            dataCols.add("LiteratureAssocMoleculeDetailsData." + col)
-                            row.put("LiteratureAssocMoleculeDetailsData." + col, value)
+                            dataCols.add('LiteratureAssocMoleculeDetailsData.' + col)
+                            row.put('LiteratureAssocMoleculeDetailsData.' + col, value)
                         }
                     }
                     dataRows.add(row)
                 }
-            } else {
+            }
+            else {
                 dataRows.add(row)
             }
         }
@@ -481,38 +482,38 @@ class LiteratureController {
         def cols = []
         def orderedCols = []
         for (col in litRefDataColumns) {
-            def orderedCol = "LiteratureReferenceData." + col
+            def orderedCol = 'LiteratureReferenceData.' + col
             if (dataCols.contains(orderedCol)) {
                 cols.add(message(code: orderedCol, default: orderedCol))
                 orderedCols.add(orderedCol)
             }
         }
         for (col in tableCols) {
-            def orderedCol = tableName + "." + col
+            def orderedCol = tableName + '.' + col
             if (dataCols.contains(orderedCol)) {
                 cols.add(message(code: orderedCol, default: orderedCol))
                 orderedCols.add(orderedCol)
             }
         }
-        if (tableName != "LiteratureInhibitorData") {
+        if (tableName != 'LiteratureInhibitorData') {
             for (col in litModelDataColumns) {
-                def orderedCol = "LiteratureModelData.InVivo." + col
+                def orderedCol = 'LiteratureModelData.InVivo.' + col
                 if (dataCols.contains(orderedCol)) {
-                    cols.add("In Vivo " + message(code: "LiteratureModelData." + col, default: col))
+                    cols.add('In Vivo ' + message(code: 'LiteratureModelData.' + col, default: col))
                     orderedCols.add(orderedCol)
                 }
             }
             for (col in litModelDataColumns) {
-                def orderedCol = "LiteratureModelData.InVitro." + col
+                def orderedCol = 'LiteratureModelData.InVitro.' + col
                 if (dataCols.contains(orderedCol)) {
-                    cols.add("In Vitro " + message(code: "LiteratureModelData." + col, default: col))
+                    cols.add('In Vitro ' + message(code: 'LiteratureModelData.' + col, default: col))
                     orderedCols.add(orderedCol)
                 }
             }
         }
-        if (tableName == "LiteratureAlterationData") {
+        if (tableName == 'LiteratureAlterationData') {
             for (col in litAMDDataColumns) {
-                def orderedCol = "LiteratureAssocMoleculeDetailsData." + col
+                def orderedCol = 'LiteratureAssocMoleculeDetailsData.' + col
                 if (dataCols.contains(orderedCol)) {
                     cols.add(message(code: orderedCol, default: orderedCol))
                     orderedCols.add(orderedCol)
@@ -543,61 +544,61 @@ class LiteratureController {
 
         params.max = literatureQueryService.litJubOncAltCount(searchFilter)
         results = literatureQueryService.litJubOncAltData(searchFilter, params)
-        sheet = createLitSheet("Jub Onc Alterations", "LiteratureAlterationData", litAltDataColumns, results)
+        sheet = createLitSheet('Jub Onc Alterations', 'LiteratureAlterationData', litAltDataColumns, results)
         if (sheet != null) {
             sheets.add(sheet)
         }
 
         params.max = literatureQueryService.litJubOncInhCount(searchFilter)
         results = literatureQueryService.litJubOncInhData(searchFilter, params)
-        sheet = createLitSheet("Jub Onc Inhibitors", "LiteratureInhibitorData", litInhDataColumns, results)
+        sheet = createLitSheet('Jub Onc Inhibitors', 'LiteratureInhibitorData', litInhDataColumns, results)
         if (sheet != null) {
             sheets.add(sheet)
         }
 
         params.max = literatureQueryService.litJubOncIntCount(searchFilter)
         results = literatureQueryService.litJubOncIntData(searchFilter, params)
-        sheet = createLitSheet("Jub Onc Interactions", "LiteratureInteractionData", litIntDataColumns, results)
+        sheet = createLitSheet('Jub Onc Interactions', 'LiteratureInteractionData', litIntDataColumns, results)
         if (sheet != null) {
             sheets.add(sheet)
         }
 
         params.max = literatureQueryService.litJubAsthmaAltCount(searchFilter)
         results = literatureQueryService.litJubAsthmaAltData(searchFilter, params)
-        sheet = createLitSheet("Jub Asthma Alterations", "LiteratureAlterationData", litAltDataColumns, results)
+        sheet = createLitSheet('Jub Asthma Alterations', 'LiteratureAlterationData', litAltDataColumns, results)
         if (sheet != null) {
             sheets.add(sheet)
         }
 
 //		params.max = literatureQueryService.litJubAsthmaInhCount(searchFilter)
 //		results = literatureQueryService.litJubAsthmaInhData(searchFilter, params)
-//		sheet = createLitSheet("Jub Asthma Inhibitors", "LiteratureInhibitorData", litInhDataColumns, results)
+//		sheet = createLitSheet('Jub Asthma Inhibitors', 'LiteratureInhibitorData', litInhDataColumns, results)
 //		if (sheet != null) {
 //			sheets.add(sheet)
 //		}
 
         params.max = literatureQueryService.litJubAsthmaIntCount(searchFilter)
         results = literatureQueryService.litJubAsthmaIntData(searchFilter, params)
-        sheet = createLitSheet("Jub Asthma Interactions", "LiteratureInteractionData", litIntDataColumns, results)
+        sheet = createLitSheet('Jub Asthma Interactions', 'LiteratureInteractionData', litIntDataColumns, results)
         if (sheet != null) {
             sheets.add(sheet)
         }
 
         params.max = literatureQueryService.litJubAsthmaPECount(searchFilter)
         results = literatureQueryService.litJubAsthmaPEData(searchFilter, params)
-        sheet = createLitSheet("Jub Asthma Protein Effects", "LiteratureProteinEffectData", litPEDataColumns, results)
+        sheet = createLitSheet('Jub Asthma Protein Effects', 'LiteratureProteinEffectData', litPEDataColumns, results)
         if (sheet != null) {
             sheets.add(sheet)
         }
 
         if (sheets.size() > 0) {
             def gen = new ExcelGenerator()
-            response.setHeader("Content-Type", "application/vnd.ms-excel; charset=utf-8")
-            response.setHeader("Content-Disposition", "attachment; filename=\"literature.xls\"")
-            response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
-            response.setHeader("Pragma", "public");
-            response.setHeader("Expires", "0");
-            response.outputStream << gen.generateExcel(sheets);
+            response.setHeader('Content-Type', 'application/vnd.ms-excel; charset=utf-8')
+            response.setHeader('Content-Disposition', 'attachment; filename=\'literature.xls\'')
+            response.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+            response.setHeader('Pragma', 'public')
+            response.setHeader('Expires', '0')
+            response.outputStream << gen.generateExcel(sheets)
         }
         // TODO: Display error message if there is no data.
 
@@ -605,53 +606,54 @@ class LiteratureController {
 
 //	def downloadJubSummary = {
 //
-//		def cols = ["Datatype",
-//		            "Alteration Type",
-//		            "Frequency",
-//		            "Affected Cases",
-//		            "Summary",
-//		            "Target Name",
-//		            "Variant Name",
-//		            "Disease",
-//		            "Numerator",
-//		            "Denominator"]
+//		def cols = ['Datatype',
+//		            'Alteration Type',
+//		            'Frequency',
+//		            'Affected Cases',
+//		            'Summary',
+//		            'Target Name',
+//		            'Variant Name',
+//		            'Disease',
+//		            'Numerator',
+//		            'Denominator']
 //		def result = createJubSummary()
 //
 //		def sheets = []
-//		sheets.add(new ExcelSheet(name:"Jubilant Summary", headers:cols, values:result.rows))
+//		sheets.add(new ExcelSheet(name:'Jubilant Summary', headers:cols, values:result.rows))
 //
 //		def gen = new ExcelGenerator()
-//		response.setHeader("Content-Type", "application/vnd.ms-excel; charset=utf-8")
-//		response.setHeader("Content-Disposition", "attachment; filename=\"jubilantsummary.xls\"")
-//		response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
-//		response.setHeader("Pragma", "public");
-//		response.setHeader("Expires", "0");
-//		response.outputStream << gen.generateExcel(sheets);
+//		response.setHeader('Content-Type', 'application/vnd.ms-excel; charset=utf-8')
+//		response.setHeader('Content-Disposition', 'attachment; filename=\'jubilantsummary.xls\'')
+//		response.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+//		response.setHeader('Pragma', 'public')
+//		response.setHeader('Expires', '0')
+//		response.outputStream << gen.generateExcel(sheets)
 //
 //	}
 
     //	 Call the ResNetService to create the ResNet .rnef file
     def downloadresnet = {
-        def misses = "No results found"
+        def misses = 'No results found'
         jubilantResNetService.searchFilter = session.searchFilter
-        JAXBContext context = JAXBContext.newInstance(Batch.class);
-        Marshaller m = context.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        JAXBContext context = JAXBContext.newInstance(Batch.class)
+        Marshaller m = context.createMarshaller()
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
         Batch b = jubilantResNetService.createResNet()
         if (b != null) {
-            misses = "Misses: " + jubilantResNetService.misses
-            response.setHeader("Content-Disposition", "attachment; filename=\"resnetexport.rnef\"")
-            response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
-            response.setHeader("Pragma", "public");
-            response.setHeader("Expires", "0");
+            misses = 'Misses: ' + jubilantResNetService.misses
+            response.setHeader('Content-Disposition', 'attachment; filename=\'resnetexport.rnef\'')
+            response.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+            response.setHeader('Pragma', 'public')
+            response.setHeader('Expires', '0')
             m.marshal(b, response.getWriter())
-        } else {
+        }
+        else {
             render(template: 'noResult')
 
         }
 
         def al = new AccessLog(username: springSecurityService.getPrincipal().username,
-                event: "Export ResNet", eventmessage: misses, accesstime: new Date())
-        al.save();
+                event: 'Export ResNet', eventmessage: misses, accesstime: new Date())
+        al.save()
     }
 }

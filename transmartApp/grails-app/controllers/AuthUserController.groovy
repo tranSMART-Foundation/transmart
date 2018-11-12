@@ -19,7 +19,7 @@ class AuthUserController {
     static Map allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 
     def index = {
-        redirect action: "list", params: params
+        redirect action: 'list', params: params
     }
 
     def list = {
@@ -35,8 +35,8 @@ class AuthUserController {
     def show = {
         def person = AuthUser.get(params.id)
         if (!person) {
-            flash.message = "AuthUser not found with id $params.id"
-            redirect action: "list"
+            flash.message = 'AuthUser not found with id ' + params.id
+            redirect action: 'list'
             return
         }
         List roleNames = []
@@ -59,37 +59,40 @@ class AuthUserController {
             def userName = person.username
             def authPrincipal = springSecurityService.getPrincipal()
             if (!(authPrincipal instanceof String) && authPrincipal.username == userName) {
-                flash.message = "You can not delete yourself, please login as another admin and try again"
-            } else {
-                logger.info("Deleting ${person.username} from the roles")
+                flash.message = 'You can not delete yourself, please login as another admin and try again'
+            }
+            else {
+                logger.info('Deleting ' + person.username + ' from the roles')
                 Role.findAll().each { it.removeFromPeople(person) }
-                logger.info("Deleting ${person.username} from secure access list")
+                logger.info('Deleting ' + person.username + ' from secure access list')
                 AuthUserSecureAccess.findAllByAuthUser(person).each { it.delete() }
-                logger.info("Deleting the gene signatures created by ${person.username}")
+                logger.info('Deleting the gene signatures created by ' + person.username)
                 try {
                     GeneSignature.findAllByCreatedByAuthUser(person).each { it.delete() }
-                } catch (InvalidPropertyException ipe) {
-                    logger.warn("AuthUser properties in the GeneSignature domain need to be enabled")
                 }
-                logger.info("Finally, deleting ${person.username}")
+                catch (InvalidPropertyException ipe) {
+                    logger.warn('AuthUser properties in the GeneSignature domain need to be enabled')
+                }
+                logger.info('Finally, deleting ' + person.username)
                 person.delete()
-                def msg = "$person.userRealName has been deleted."
+                def msg = '' + person.userRealName + ' has been deleted.'
                 flash.message = msg
-                new AccessLog(username: springSecurityService.getPrincipal().username, event: "User Deleted",
+                new AccessLog(username: springSecurityService.getPrincipal().username, event: 'User Deleted',
                         eventmessage: msg,
                         accesstime: new Date()).save()
             }
-        } else {
-            flash.message = "User not found with id $params.id"
         }
-        redirect action: "list"
+        else {
+            flash.message = 'User not found with id ' + params.id
+        }
+        redirect action: 'list'
     }
 
     def edit = {
         def person = AuthUser.get(params.id)
         if (!person) {
-            flash.message = "AuthUser not found with id $params.id"
-            redirect action: "list"
+            flash.message = 'AuthUser not found with id ' + params.id
+            redirect action: 'list'
             return
         }
         return buildPersonModel(person)
@@ -138,12 +141,14 @@ class AuthUserController {
             }
 
             person.passwd = springSecurityService.encodePassword(params.passwd)
-        } else if (create) {
+        }
+        else if (create) {
             if (grailsApplication.config.transmartproject.authUser.create.passwordRequired != false) {
-                flash.message = 'Password must be provided';
+                flash.message = 'Password must be provided'
                 return render(view: create ? 'create' : 'edit', model: buildPersonModel(person))
-            } else {
-                person.passwd = springSecurityService.encodePassword(params.passwd?:"FilledByAuthUserController_" + RandomStringUtils.random(12, true, true));
+            }
+            else {
+                person.passwd = springSecurityService.encodePassword(params.passwd?:'FilledByAuthUserController_' + RandomStringUtils.random(12, true, true))
             }
         }
 
@@ -154,14 +159,15 @@ class AuthUserController {
          * security login (does this happen?) */
         def msg
         if (create) {
-            msg = "User: ${person.username} for ${person.userRealName} created"
-        } else {
-            msg = "${person.username} has been updated. Changed fields include: "
+            msg = 'User: ' + person.username + ' for ' + person.userRealName + ' created'
+        }
+        else {
+            msg = '' + person.username + ' has been updated. Changed fields include: '
             msg += person.dirtyPropertyNames.collect { field ->
                 def newValue = person."$field"
                 def oldValue = person.getPersistentValue(field)
                 if (newValue != oldValue) {
-                    "$field ($oldValue -> $newValue)"
+                    '' + field + ' (' + oldValue + ' -> ' + newValue + ')'
                 }
             }.findAll().join ', '
         }
@@ -174,8 +180,9 @@ class AuthUserController {
                         event: "User ${create ? 'Created' : 'Updated'}",
                         eventmessage: msg.toString(),
                         accesstime: new Date()).save()
-                redirect action: "show", id: person.id
-            } else {
+                redirect action: 'show', id: person.id
+            }
+            else {
                 tx.setRollbackOnly()
                 flash.message = 'An error occured, cannot save user'
                 render view: create ? 'create' : 'edit', model: [authorityList: Role.list(), person: person]
@@ -191,7 +198,8 @@ class AuthUserController {
         } ?: Collections.emptySet()
         def newRoles = params.findAll { String key, String value ->
             key.contains('ROLE') && value == 'on'
-        }.collect {
+        }
+        .collect {
             Role.findByAuthority(it.key)
         } as Set
 

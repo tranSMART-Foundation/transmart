@@ -19,7 +19,7 @@ class DocumentService {
 
         LinkedHashMap<String, ArrayList<String>> terms = documentTerms(sfilter)
         LinkedHashMap<String, ArrayList<String>> filters = sfilter.documentFilter.getFilters()
-        return documentQuery.searchCount(terms, filters);
+        return documentQuery.searchCount(terms, filters)
 
     }
 
@@ -43,7 +43,7 @@ class DocumentService {
 
         def gfilter = sfilter.globalFilter
         def geneFilters = gfilter.getGeneFilters()
-        def pathwayIds = gfilter.formatIdList(gfilter.getAllListFilters(), ",")
+        def pathwayIds = gfilter.formatIdList(gfilter.getAllListFilters(), ',')
         // If there are pathways, then get all genes in pathways and add them to the geneFilters (hash set)
         if (pathwayIds.size() > 0) {
             geneFilters.addAll(searchKeywordService.expandAllListToGenes(pathwayIds))
@@ -55,7 +55,7 @@ class DocumentService {
 
         LinkedHashMap<String, ArrayList<String>> terms = new LinkedHashMap<String, ArrayList<String>>()
 
-        int termCount = 0;
+        int termCount = 0
         if (geneFilters.size() > 0) {
             def list = getTermList(geneFilters)
             termCount += list.size()
@@ -102,7 +102,8 @@ class DocumentService {
         for (keyword in keywords) {
             if (terms.size() < DocumentQuery.MAX_CLAUSE_COUNT - 1) {
                 terms.add(keyword.keyword)
-            } else {
+            }
+            else {
                 break
             }
         }
@@ -114,13 +115,13 @@ class DocumentService {
     String encodeHTML(String value) {
 
         if (value == null) {
-            return ""
+            return ''
         }
-        value = value.replace("<span class=\"search-term\">", "???HIT_OPEN???")
-        value = value.replace("</span>", "???HIT_CLOSE???")
+        value = value.replace('<span class=\'search-term\'>', '???HIT_OPEN???')
+        value = value.replace('</span>', '???HIT_CLOSE???')
         value = value.encodeAsHTML()
-        value = value.replace("???HIT_OPEN???", "<span class=\"search-term\">")
-        value = value.replace("???HIT_CLOSE???", "</span>")
+        value = value.replace('???HIT_OPEN???', '<span class=\'search-term\'>')
+        value = value.replace('???HIT_CLOSE???', '</span>')
 
         def StringBuilder result = new StringBuilder()
 
@@ -130,10 +131,12 @@ class DocumentService {
                 def int ch = value.charAt(i)
                 if (ch < 32) {
                     result.append(' ')
-                } else if (ch >= 128) {
-                    result.append("&#")
+                }
+                else if (ch >= 128) {
+                    result.append('&#')
                     result.append(ch)
-                } else {
+                }
+                else {
                     result.append((char) ch)
                 }
             }

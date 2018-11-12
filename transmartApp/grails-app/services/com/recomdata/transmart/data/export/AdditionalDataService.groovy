@@ -3,7 +3,7 @@ package com.recomdata.transmart.data.export
 import com.recomdata.transmart.data.export.util.FileWriterUtil
 import groovy.util.logging.Slf4j
 
-import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess;
+import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess
 
 @Slf4j('logger')
 class AdditionalDataService {
@@ -38,9 +38,11 @@ class AdditionalDataService {
             logger.debug('ResultInstanceId :: ' + resultInstanceId)
             def sample, mapKey, mapValue = null
             filesList = sql.rows(additionalFilesQuery, [study, resultInstanceId])
-        } catch (Exception e) {
-            logger.error("Problem finding Files for Additional Data :: " + e.getMessage())
-        } finally {
+        }
+        catch (Exception e) {
+            logger.error('Problem finding Files for Additional Data :: ' + e.getMessage())
+        }
+        finally {
             sql?.close()
         }
 
@@ -50,13 +52,14 @@ class AdditionalDataService {
     def downloadFiles(String resultInstanceId, studyList, File studyDir, String jobName) {
         def filesList = findAdditionalDataFiles(resultInstanceId, studyList)
         if (filesList?.size > 0) {
-            def char separator = '\t';
+            def char separator = '\t'
             for (file in filesList) {
                 def fileURL = (new StringBuffer(file.CEL_LOCATION).append(file.FILE_NAME).append(file.CEL_FILE_SUFFIX)).toString()
-                FileWriterUtil writerUtil = new FileWriterUtil(studyDir, file.FILE_NAME, jobName, "Additional_Files", null, separator)
+                FileWriterUtil writerUtil = new FileWriterUtil(studyDir, file.FILE_NAME, jobName, 'Additional_Files', null, separator)
                 writerUtil.writeFile(fileURL, writerUtil.outputFile)
             }
-        } else {
+        }
+        else {
             logger.debug('No Additional data files found to download')
         }
     }

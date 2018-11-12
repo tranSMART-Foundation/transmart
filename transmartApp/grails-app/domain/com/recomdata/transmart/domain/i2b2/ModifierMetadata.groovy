@@ -1,4 +1,4 @@
-package com.recomdata.transmart.domain.i2b2;
+package com.recomdata.transmart.domain.i2b2
 
 class ModifierMetadata {
 

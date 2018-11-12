@@ -20,7 +20,7 @@ public class SearchHelpController {
 //	def listAllPathways = {
 //
 //		def map = [:]
-//		def results = SearchKeyword.findAllByDataCategory("PATHWAY",[sort:"keyword", cache:'read-only'])
+//		def results = SearchKeyword.findAllByDataCategory('PATHWAY',[sort:'keyword', cache:'read-only'])
 //			SearchKeyword.executeQuery("SELECT s FROM SearchKeyword s WHERE s.dataCategory='PATHWAY' ORDER BY s.keyword")
 //		for (keyword in results) {
 //			if (map.containsKey(keyword.dataSource)) {
@@ -32,43 +32,45 @@ public class SearchHelpController {
 //			}
 //		}
 //		List sources = []
-//		sources.addAll(map.keySet());
+//		sources.addAll(map.keySet())
 //
 //		render(view:'pathwayhelp', model:[pathways:map, sources:sources])
 //	}
 
     def loadPathways = {
 
-        def step = params.step ? params.step : "A-C"
-        def datasources = SearchKeyword.executeQuery("select distinct k.dataSource from org.transmart.searchapp.SearchKeyword k where k.dataCategory='PATHWAY' order by upper(k.dataSource)", [], [cache: 'read-only']);
+        def step = params.step ? params.step : 'A-C'
+        def datasources = SearchKeyword.executeQuery("select distinct k.dataSource from org.transmart.searchapp.SearchKeyword k where k.dataCategory='PATHWAY' order by upper(k.dataSource)", [], [cache: 'read-only'])
         def defaultsource = datasources.size() > 0 ? datasources[0] : 'GeneGo'
-        def dataSource = params.datasource ? params.datasource : defaultsource;
+        def dataSource = params.datasource ? params.datasource : defaultsource
         def sql = "select k from org.transmart.searchapp.SearchKeyword k where dataSource='" + dataSource + "' "
-        if ("Other".equals(step)) {
+        if ('Other'.equals(step)) {
             sql += "and upper(substr(k.keyword, 1, 1)) not between 'A' and 'Z' "
-        } else {
+        }
+        else {
             sql += "and upper(substr(k.keyword, 1, 1)) between '" + step.substring(0, 1) + "' and '" + step.substring(step.length() - 1) + "' "
         }
-        sql += "order by upper(k.keyword)"
+        sql += 'order by upper(k.keyword)'
         def pathways = SearchKeyword.executeQuery(sql, [], [cache: 'read-only'])
         render(view: 'pathwayhelp', model: [pathways: pathways, datasources: datasources, selecteddatasource: dataSource])
     }
 
     def listAllPathways = {
-        //	def dataSource = params.datasource ? params.datasource : "GeneGO"
-        def step = params.step ? params.step : "A-C"
-        //def datasources = SearchKeyword.executeQuery("select distinct k.dataSource from org.transmart.searchapp.SearchKeyword k where k.dataCategory='PATHWAY' order by upper(k.dataSource)", [], [cache:'read-only']);
-        def datasources = SearchKeyword.executeQuery("select distinct k.dataSource from org.transmart.searchapp.SearchKeyword k where k.dataCategory='PATHWAY' order by upper(k.dataSource)");
+        //	def dataSource = params.datasource ? params.datasource : 'GeneGO'
+        def step = params.step ? params.step : 'A-C'
+        //def datasources = SearchKeyword.executeQuery("select distinct k.dataSource from org.transmart.searchapp.SearchKeyword k where k.dataCategory='PATHWAY' order by upper(k.dataSource)", [], [cache:'read-only'])
+        def datasources = SearchKeyword.executeQuery("select distinct k.dataSource from org.transmart.searchapp.SearchKeyword k where k.dataCategory='PATHWAY' order by upper(k.dataSource)")
         def defaultsource = datasources.size() > 0 ? datasources[0] : 'GeneGo'
-        def dataSource = params.datasource ? params.datasource : defaultsource;
+        def dataSource = params.datasource ? params.datasource : defaultsource
 
         def sql = "select k from org.transmart.searchapp.SearchKeyword k where dataSource='" + dataSource + "' "
-        if ("Other".equals(step)) {
+        if ('Other'.equals(step)) {
             sql += "and upper(substr(k.keyword, 1, 1)) not between 'A' and 'Z' "
-        } else {
+        }
+        else {
             sql += "and upper(substr(k.keyword, 1, 1)) between '" + step.substring(0, 1) + "' and '" + step.substring(step.length() - 1) + "' "
         }
-        sql += "order by upper(k.keyword)"
+        sql += 'order by upper(k.keyword)'
         //def pathways = SearchKeyword.executeQuery(sql, [], [cache:'read-only'])
         def pathways = SearchKeyword.executeQuery(sql)
         render(view: 'pathwayhelp', model: [pathways: pathways, datasources: datasources, selecteddatasource: dataSource])
@@ -82,7 +84,7 @@ public class SearchHelpController {
     def listAllDiseases = {
         //def all = SearchKeyword.executeQuery("SELECT s, d FROM SearchKeyword s, bio.Disease d WHERE s.dataCategory='DISEASE' AND s.bioDataId=d.id ORDER BY s.keyword")
 
-        def all = SearchKeyword.findAllByDataCategory("DISEASE", [sort: "keyword", cache: 'read-only'])
+        def all = SearchKeyword.findAllByDataCategory('DISEASE', [sort: 'keyword', cache: 'read-only'])
         //SearchKeyword.executeQuery("SELECT s FROM SearchKeyword s WHERE s.dataCategory='DISEASE' ORDER BY s.keyword")
         render(view: 'diseasehelp', model: [diseases: all])
     }
@@ -116,7 +118,7 @@ public class SearchHelpController {
 
             // gene list keyword map
             if (it.foldChgMetricConceptCode != GeneSignatureService.METRIC_CODE_GENE_LIST) {
-                keyword = SearchKeyword.findByUniqueId(GeneSignature.DOMAIN_KEY_GL + ":" + it.id)
+                keyword = SearchKeyword.findByUniqueId(GeneSignature.DOMAIN_KEY_GL + ':' + it.id)
                 mapKeywordsGL.putAt(it.id, keyword)
             }
         }

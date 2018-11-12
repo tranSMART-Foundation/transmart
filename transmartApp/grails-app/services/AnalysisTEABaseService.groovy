@@ -49,7 +49,7 @@ class AnalysisTEABaseService {
         if (result != null)
             trialResult.add(result)
 
-        //	logger.info("queryExpAnalysis result class: "+result.getClass().getName())
+        //	logger.info('queryExpAnalysis result class: '+result.getClass().getName())
         return new ExpAnalysisResultSet(expAnalysisResults: trialResult, analysisCount: result.analysisCount, expCount: result.expCount, groupByExp: false)
     }
 
@@ -57,11 +57,11 @@ class AnalysisTEABaseService {
      * template methods
      */
     def getExpType() {
-        return "Experiment";
+        return 'Experiment'
     }
 
     def createResultObject() {
-        return null;
+        return null
     }
 
     def createSubFilterCriteria(SearchFilter filter, Query query) {
@@ -69,7 +69,7 @@ class AnalysisTEABaseService {
     }
 
     def createNPVCondition(query) {
-        query.addCondition("baad.teaNormalizedPValue<=0.05")
+        query.addCondition('baad.teaNormalizedPValue<=0.05')
     }
 
     /**
@@ -77,21 +77,21 @@ class AnalysisTEABaseService {
      */
     def createCountQuery(SearchFilter filter) {
         if (filter == null || filter.globalFilter.isTextOnly()) {
-            return " WHERE 1=0"
+            return ' WHERE 1=0'
         }
         def gfilter = filter.globalFilter
 
-        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad');
-        query.addTable("org.transmart.biomart.BioAssayAnalysisData baad ");
+        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad')
+        query.addTable('org.transmart.biomart.BioAssayAnalysisData baad ')
         query.addCondition(" baad.experiment.type='" + getExpType() + "'")
 
-        ////query.addTable ("org.transmart.biomart.ClinicalTrial ct ");
-        //query.addCondition("baad.experiment.id = ct.id ")
+        ////query.addTable ('org.transmart.biomart.ClinicalTrial ct ')
+        //query.addCondition('baad.experiment.id = ct.id ')
 
-        query.createGlobalFilterCriteria(gfilter);
-        createSubFilterCriteria(filter, query);
+        query.createGlobalFilterCriteria(gfilter)
+        createSubFilterCriteria(filter, query)
 
-        query.addSelect("COUNT(DISTINCT baad.analysis.id) ");
+        query.addSelect('COUNT(DISTINCT baad.analysis.id) ')
 
         def q = query.generateSQL()
         return q
@@ -103,18 +103,18 @@ class AnalysisTEABaseService {
 
     def createAnalysisIDSelectQuery(SearchFilter filter) {
         if (filter == null || filter.globalFilter.isTextOnly()) {
-            return " SELECT -1 FROM org.transmart.biomart.BioAssayAnalysisData baad WHERE 1 = 1 "
+            return ' SELECT -1 FROM org.transmart.biomart.BioAssayAnalysisData baad WHERE 1 = 1 '
         }
         def gfilter = filter.globalFilter
 
-        def query = new AssayAnalysisDataQuery(mainTableAlias: "baad", setDistinct: true);
-        query.addTable("org.transmart.biomart.BioAssayAnalysisDataTea baad ");
+        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+        query.addTable('org.transmart.biomart.BioAssayAnalysisDataTea baad ')
         query.addCondition(" baad.experiment.type='" + getExpType() + "'")
 
-        query.createGlobalFilterCriteria(gfilter);
-        createSubFilterCriteria(filter, query);
+        query.createGlobalFilterCriteria(gfilter)
+        createSubFilterCriteria(filter, query)
         //	createNPVCondition(query)
-        query.addSelect("baad.analysis.id")
+        query.addSelect('baad.analysis.id')
 
         return query.generateSQL()
     }
@@ -127,25 +127,25 @@ class AnalysisTEABaseService {
         def gfilter = filter.globalFilter
         def analysisCount = 0
 
-        if (filter == null || gfilter.isTextOnly()) return analysisCount;
+        if (filter == null || gfilter.isTextOnly()) return analysisCount
 
         // get distinct analyses
-        def query = new AssayAnalysisDataTeaQuery(mainTableAlias: "baad", setDistinct: true)
-        query.addTable("org.transmart.biomart.BioAssayAnalysisDataTea baad")
-        //query.addTable("JOIN baad.markers baad_bm")
+        def query = new AssayAnalysisDataTeaQuery(mainTableAlias: 'baad', setDistinct: true)
+        query.addTable('org.transmart.biomart.BioAssayAnalysisDataTea baad')
+        //query.addTable('JOIN baad.markers baad_bm')
         query.addCondition(" baad.experiment.type='" + getExpType() + "'")
-        query.addCondition(" baad.analysis.teaDataCount IS NOT NULL")
+        query.addCondition(' baad.analysis.teaDataCount IS NOT NULL')
         // distinct analyses
-        query.addSelect("COUNT(DISTINCT baad.analysis.id)")
+        query.addSelect('COUNT(DISTINCT baad.analysis.id)')
 
         // add critiera
-        query.createGlobalFilterCriteria(gfilter, true);
-        createSubFilterCriteria(filter, query);
+        query.createGlobalFilterCriteria(gfilter, true)
+        createSubFilterCriteria(filter, query)
         //	createNPVCondition(query)
 
         // get count
         def result = BioAssayAnalysisDataTea.executeQuery(query.generateSQL())
-        logger.info "anal ct result: " + result
+        logger.info 'anal ct result: ' + result
         if (result != null && result.size() > 0) analysisCount = result[0]
         return analysisCount
     }
@@ -155,27 +155,27 @@ class AnalysisTEABaseService {
      */
     def queryExpAnalysis(SearchFilter filter) {
         def gfilter = filter.globalFilter
-        def result = null;
-        def tResult = createResultObject();
+        def result = null
+        def tResult = createResultObject()
 
         if (!gfilter.getBioMarkerFilters().isEmpty()) {
-            def query = new AssayAnalysisDataQuery(mainTableAlias: "baad", setDistinct: true)
-            query.addTable("org.transmart.biomart.BioAssayAnalysisDataTea baad")
-            //query.addTable("JOIN FETCH baad.analysis ")
-            query.addTable("JOIN baad.featureGroup.markers baad_bm")
+            def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+            query.addTable('org.transmart.biomart.BioAssayAnalysisDataTea baad')
+            //query.addTable('JOIN FETCH baad.analysis ')
+            query.addTable('JOIN baad.featureGroup.markers baad_bm')
             query.addCondition(" baad.experimentType='" + getExpType() + "'")
 
-            query.addSelect("baad")
-            query.addSelect("baad_bm")
-            query.addSelect("baad.experiment.id")
-            query.addSelect("baad.experiment.accession")
+            query.addSelect('baad')
+            query.addSelect('baad_bm')
+            query.addSelect('baad.experiment.id')
+            query.addSelect('baad.experiment.accession')
 
             // expand biomarkers
-            query.createGlobalFilterCriteria(gfilter, true);
-            createSubFilterCriteria(filter, query);
+            query.createGlobalFilterCriteria(gfilter, true)
+            createSubFilterCriteria(filter, query)
             //createNPVCondition(query)
 
-            def sql = query.generateSQL();
+            def sql = query.generateSQL()
             result = BioAssayAnalysisDataTea.executeQuery(sql)
 
             // get up/down info from mv for all biomarkers
@@ -189,76 +189,79 @@ class AnalysisTEABaseService {
                 // switch for gene sig or list
                 def dynamicValuesQuery
                 if (gfilter.getGeneSignatureFilters().size() > 0) {
-                    dynamicValuesQuery = "SELECT DISTINCT sbmcmv.assocBioMarkerId, sbmcmv.valueMetric FROM org.transmart.searchapp.SearchBioMarkerCorrelFastMV sbmcmv WHERE sbmcmv.domainObjectId in (" + mids + ")";
-                } else {
+                    dynamicValuesQuery = 'SELECT DISTINCT sbmcmv.assocBioMarkerId, sbmcmv.valueMetric FROM org.transmart.searchapp.SearchBioMarkerCorrelFastMV sbmcmv WHERE sbmcmv.domainObjectId in (' + mids + ')'
+                }
+                else {
                     // always up regulated for gene list
-                    dynamicValuesQuery = "SELECT DISTINCT sbmcmv.assocBioMarkerId, 1 as valueMetric FROM org.transmart.searchapp.SearchBioMarkerCorrelFastMV sbmcmv WHERE sbmcmv.domainObjectId in (" + mids + ")";
+                    dynamicValuesQuery = 'SELECT DISTINCT sbmcmv.assocBioMarkerId, 1 as valueMetric FROM org.transmart.searchapp.SearchBioMarkerCorrelFastMV sbmcmv WHERE sbmcmv.domainObjectId in (' + mids + ')'
                 }
                 updownResult.addAll(SearchBioMarkerCorrelFastMV.executeQuery(dynamicValuesQuery))
-                logger.info "number of search app biomarkers: " + updownResult.size()
+                logger.info 'number of search app biomarkers: ' + updownResult.size()
             }
 
             // add static biomarkers
             // make sure no homology gene is searched
-            def bioMarkersQuery = "SELECT DISTINCT bmcmv.assoBioMarkerId as assocBioMarkerId, 0 as valueMetric FROM org.transmart.biomart.BioMarkerCorrelationMV bmcmv WHERE bmcmv.bioMarkerId in (" + mids + ") AND bmcmv.correlType <>'HOMOLOGENE_GENE'";
-            def staticResult = BioMarkerCorrelationMV.executeQuery(bioMarkersQuery);
-            logger.info "number of static biomarkers: " + staticResult.size()
+            def bioMarkersQuery = "SELECT DISTINCT bmcmv.assoBioMarkerId as assocBioMarkerId, 0 as valueMetric FROM org.transmart.biomart.BioMarkerCorrelationMV bmcmv WHERE bmcmv.bioMarkerId in (' + mids + ') AND bmcmv.correlType <>'HOMOLOGENE_GENE'"
+            def staticResult = BioMarkerCorrelationMV.executeQuery(bioMarkersQuery)
+            logger.info 'number of static biomarkers: ' + staticResult.size()
 
             // merge to get complete gene list
             updownResult.addAll(staticResult)
-            def bmCount = updownResult.size();
-            logger.info "total biomarkers: " + bmCount
+            def bmCount = updownResult.size()
+            logger.info 'total biomarkers: ' + bmCount
 
             // build biomarker/metric map
-            Map mvMap = new HashMap();
+            Map mvMap = new HashMap()
             def testMetric
             for (mv in updownResult) {
                 testMetric = mvMap.get(mv[0])
                 if (testMetric == null) {
-                    mvMap.put(mv[0], mv[1]);
-                } else {
+                    mvMap.put(mv[0], mv[1])
+                }
+                else {
                     // if no metric value, keep one with a value
-                    if (testMetric == null && mv[1] != null) mvMap.put(mv[0], mv[1]);
+                    if (testMetric == null && mv[1] != null) mvMap.put(mv[0], mv[1])
 
                     // keep larger abs(fold change)
                     if (testMetric != null && mv[1] != null && Math.abs(mv[1]) > Math.abs(testMetric)) {
-                        logger.warn "overriding metric value for biomarker: " + mv[0] + " [ orig: " + testMetric + " new: " + mv[1] + " ]"
-                        mvMap.put(mv[0], mv[1]);
+                        logger.warn 'overriding metric value for biomarker: ' + mv[0] + ' [ orig: ' + testMetric + ' new: ' + mv[1] + ' ]'
+                        mvMap.put(mv[0], mv[1])
                     }
                 }
             }
             processAnalysisResult(result, tResult, mvMap)
-        } else {
-            logger.info "in queryExpAnalysis() did not detect any biomarkers!"
-            def allAnalysis = getAllAnalyses(filter);
-            def expMap = new HashMap();
+        }
+        else {
+            logger.info 'in queryExpAnalysis() did not detect any biomarkers!'
+            def allAnalysis = getAllAnalyses(filter)
+            def expMap = new HashMap()
             def expLkup = null
 
             for (row in allAnalysis) {
                 def analysisId = row[0]
                 def expId = row[1]
-                def expAccession = row[2];
+                def expAccession = row[2]
                 def countGene = row[3]
-                //logger.info "extracting analysisId: "+analysisId+"; expId: "+expId+"; gene ct: "+countGene
+                //logger.info 'extracting analysisId: '+analysisId+'; expId: '+expId+'; gene ct: '+countGene
 
                 // create analysis result
                 //	expLkup = expMap.get(expId)
                 //	if(expLkup==null) {
-                //		expLkup = Experiment.get(expId);
+                //		expLkup = Experiment.get(expId)
                 //		expMap.put(expId, expLkup)
                 //	}
                 def analysisResult = new AnalysisResult(analysis: BioAssayAnalysis.get(analysisId), experimentId: expId, experimentAccession: expAccession, bioMarkerCount: countGene)
                 tResult.analysisResultList.add(analysisResult)
 
                 // get top 50 biomarkers
-                def bioMarkers = BioAssayAnalysisDataTea.getTop50AnalysisDataForAnalysis(analysisId);
+                def bioMarkers = BioAssayAnalysisDataTea.getTop50AnalysisDataForAnalysis(analysisId)
                 processAnalysisResultNoSort(bioMarkers, analysisResult)
             }
-            tResult.analysisCount = tResult.analysisResultList.size();
-            tResult.expCount = expMap.size();
+            tResult.analysisCount = tResult.analysisResultList.size()
+            tResult.expCount = expMap.size()
         }
-        //logger.info "tResult: "+tResult+"; class: "+tResult.getClass().getName()
-        return tResult;
+        //logger.info 'tResult: '+tResult+'; class: '+tResult.getClass().getName()
+        return tResult
     }
 
     /**
@@ -267,20 +270,20 @@ class AnalysisTEABaseService {
      */
     def getAllAnalyses(SearchFilter filter) {
         // need both filters here
-        def analysisQuery = new AssayAnalysisDataQuery(mainTableAlias: "baad", setDistinct: true)
-        analysisQuery.addTable("org.transmart.biomart.BioAssayAnalysisDataTea baad")
+        def analysisQuery = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+        analysisQuery.addTable('org.transmart.biomart.BioAssayAnalysisDataTea baad')
         analysisQuery.addCondition(" baad.experiment.type='" + getExpType() + "'")
-        analysisQuery.addCondition(" baad.analysis.teaDataCount IS NOT NULL");
+        analysisQuery.addCondition(' baad.analysis.teaDataCount IS NOT NULL')
 
-        analysisQuery.addSelect("baad.analysis.id")
-        analysisQuery.addSelect("baad.experiment.id")
-        analysisQuery.addSelect("baad.experiment.accession")
+        analysisQuery.addSelect('baad.analysis.id')
+        analysisQuery.addSelect('baad.experiment.id')
+        analysisQuery.addSelect('baad.experiment.accession')
 
-        analysisQuery.addSelect("baad.analysis.teaDataCount")
-        analysisQuery.addOrderBy("baad.analysis.teaDataCount DESC")
+        analysisQuery.addSelect('baad.analysis.teaDataCount')
+        analysisQuery.addOrderBy('baad.analysis.teaDataCount DESC')
         //	createNPVCondition(analysisQuery)
-        analysisQuery.createGlobalFilterCriteria(filter.globalFilter, true);
-        createSubFilterCriteria(filter, analysisQuery);
+        analysisQuery.createGlobalFilterCriteria(filter.globalFilter, true)
+        createSubFilterCriteria(filter, analysisQuery)
 
         return BioAssayAnalysisDataTea.executeQuery(analysisQuery.generateSQL())
     }
@@ -290,10 +293,10 @@ class AnalysisTEABaseService {
      */
     def processAnalysisResultNoSort(List result, AnalysisResult aresult) {
 
-        //def aresult = new AnalysisResult(analysis);
+        //def aresult = new AnalysisResult(analysis)
         for (row in result) {
             def analysisData = row[0]
-            def biomarker = row[1];
+            def biomarker = row[1]
             aresult.assayAnalysisValueList.add(new AssayAnalysisValue(analysisData: analysisData, bioMarker: biomarker))
         }
     }
@@ -303,7 +306,7 @@ class AnalysisTEABaseService {
      */
     def processAnalysisResult(List result, tar, mvMap) {
         LinkedHashMap analysisResultMap = new LinkedHashMap()
-        Map expMap = new HashMap();
+        Map expMap = new HashMap()
 
         // loop through data
         for (row in result) {
@@ -311,29 +314,29 @@ class AnalysisTEABaseService {
             def biomarker = row[1]; //org.transmart.biomart.BioMarker.get(row[1])
 
             def mvlookup = mvMap.get(biomarker.id)
-            def aid = analysisData.analysis.id;
-            //println ("before get id")
+            def aid = analysisData.analysis.id
+            //println ('before get id')
             def aresult = analysisResultMap.get(aid)
-            def expId = row[2];
-            def expAccession = row[3];
+            def expId = row[2]
+            def expAccession = row[3]
 
             if (aresult == null) {
-                //		logger.info "BAAD: "+analysisData
-                //		logger.info "BAAD experiment: "+exp+"; class: "+exp.getClass().getName()
-                //		logger.info "BAAD experiment type: "+exp.type+"; id: "+expId;
+                //		logger.info 'BAAD: '+analysisData
+                //		logger.info 'BAAD experiment: '+exp+'; class: '+exp.getClass().getName()
+                //		logger.info 'BAAD experiment type: '+exp.type+'; id: '+expId
 
                 // build experiment lookup map
                 //def mapExp = expMap.get(exp.id)
-                //if(mapExp==null) expMap.put(exp.id, exp);
+                //if(mapExp==null) expMap.put(exp.id, exp)
                 //	def mapExp = expMap.get(expId)
-                //	if(mapExp==null) expMap.put(expId, exp);
-                //println("before cache")
-                def analysisCache = BioAssayAnalysis.get(aid);
+                //	if(mapExp==null) expMap.put(expId, exp)
+                //println('before cache')
+                def analysisCache = BioAssayAnalysis.get(aid)
 
-                aresult = new AnalysisResult(analysis: analysisCache, experimentId: expId, experimentAccession: expAccession);
+                aresult = new AnalysisResult(analysis: analysisCache, experimentId: expId, experimentAccession: expAccession)
                 analysisResultMap.put(aid, aresult)
             }
-            //	logger.info "mvlookup: "+mvlookup
+            //	logger.info 'mvlookup: '+mvlookup
             aresult.assayAnalysisValueList.add(new AssayAnalysisValue(analysisData: analysisData, bioMarker: biomarker, valueMetric: mvlookup))
         }
 
@@ -350,13 +353,14 @@ class AnalysisTEABaseService {
 
             // TODO: sort by analyses by what in this case?
 
-        } else {
+        }
+        else {
             // TEA ranking service
             def teaRankedAnalyses = assignTEAScoresAndRank(aResults, tar.bioMarkerCt?.intValue())
 
             // populate model
             tar.analysisResultList.addAll(teaRankedAnalyses)
-            tar.populateInsignificantTEAAnalysisList();
+            tar.populateInsignificantTEAAnalysisList()
         }
     }
 
@@ -366,8 +370,8 @@ class AnalysisTEABaseService {
      */
     def assignTEAScoresAndRank(Collection<AnalysisResult> analyses, int geneCount) {
 
-        AnalysisResult ar;
-        List<AnalysisResult> rankedAnalyses = new ArrayList();
+        AnalysisResult ar
+        List<AnalysisResult> rankedAnalyses = new ArrayList()
 
         // score manager for TEA
         TEAScoreManager scoreManager = new TEAScoreManager()
@@ -376,10 +380,10 @@ class AnalysisTEABaseService {
         // score each analysis
         analyses.each {
             ar = (AnalysisResult) it
-            //	logger.info ""
-            //	logger.info ">>>> Assigning TEA metrics to analysis: "+ar.analysis.name+" (N: "+geneCount+")"
+            //	logger.info ''
+            //	logger.info '>>>> Assigning TEA metrics to analysis: '+ar.analysis.name+' (N: '+geneCount+')'
             scoreManager.assignTEAMetrics(ar)
-            rankedAnalyses.add(ar);
+            rankedAnalyses.add(ar)
 
             // sort value list on comparison NPV
             Collections.sort(ar.assayAnalysisValueList)

@@ -28,17 +28,17 @@ class PluginService {
      * @return
      */
     def PluginDescriptor registerPlugin(convertor, processor, view, dataTypes, name, id, renderer, variableMapping, pivotData, dataFileInputMapping) {
-        PluginDescriptor plugin = new PluginDescriptor();
-        plugin.setConverter(convertor);
-        plugin.setProcessor(processor);
-        plugin.setView(view);
-        plugin.setDataTypes(dataTypes);
-        plugin.setName(name);
-        plugin.setId(id);
+        PluginDescriptor plugin = new PluginDescriptor()
+        plugin.setConverter(convertor)
+        plugin.setProcessor(processor)
+        plugin.setView(view)
+        plugin.setDataTypes(dataTypes)
+        plugin.setName(name)
+        plugin.setId(id)
         plugin.setRenderer(renderer)
-        plugin.setVariableMapping(variableMapping);
-        plugin.setPivotData(pivotData);
-        plugin.setDataFileInputMapping(dataFileInputMapping);
+        plugin.setVariableMapping(variableMapping)
+        plugin.setPivotData(pivotData)
+        plugin.setDataFileInputMapping(dataFileInputMapping)
         return plugin
     }
 
@@ -68,7 +68,7 @@ class PluginService {
     def getPluginModules(pluginName) {
         def pluginInstance = Plugin.findByName(pluginName)
 
-        return PluginModule.findAllByPluginAndActive(pluginInstance, true);
+        return PluginModule.findAllByPluginAndActive(pluginInstance, true)
 
         //return pluginInstance?.modules
     }
@@ -96,7 +96,7 @@ class PluginService {
                 result.put('success', true)
                 for (module in modules) {
                     // Since each module has the heavy params object,
-                    // we will not use "obj as JSON" as we don't want to pass the heavy params to the UI
+                    // we will not use 'obj as JSON' as we don't want to pass the heavy params to the UI
                     if (module.length == 3) {
                         def moduleJSON = new JSONObject()
                         moduleJSON.put('id', module[0])
@@ -105,12 +105,14 @@ class PluginService {
                         modulesJSON.put(moduleJSON)
                     }
                 }
-            } else {
+            }
+            else {
                 result.put('success', false)
             }
             result.put('count', modules ? modules?.size() : 0)
             result.put('modules', modulesJSON)
-        } else {
+        }
+        else {
             result.put('success', false)
             result.put('message', 'Plugin name is missing!!! Modules cannot be looked up.')
         }
@@ -142,7 +144,8 @@ class PluginService {
             pluginModuleInstance = PluginModule.findByModuleName(moduleMap.params?.id)
             if (null == pluginModuleInstance) {
                 pluginModuleInstance = new PluginModule()
-            } else {
+            }
+            else {
                 pluginModuleExists = true
             }
 
@@ -159,7 +162,8 @@ class PluginService {
             //Add module to plugin
             if (!pluginModuleExists) {
                 pluginInstance.addToModules(pluginModuleInstance)
-            } else {
+            }
+            else {
                 pluginModuleInstance.merge()
             }
             //Save the plugin
@@ -168,14 +172,14 @@ class PluginService {
     }
 
     def String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is))
+        StringBuilder sb = new StringBuilder()
+        String line = null
 
         while ((line = reader.readLine()) != null) {
-            sb.append(line + "\n");
+            sb.append(line + '\n')
         }
-        is.close();
-        return sb.toString();
+        is.close()
+        return sb.toString()
     }
 }

@@ -11,13 +11,13 @@ class SweepingService {
     def grailsApplication
 
     def sweep() {
-        logger.info "Triggering file sweep"
-        def fileAge = grailsApplication.config.com.recomdata.export.jobs.sweep.fileAge;
+        logger.info 'Triggering file sweep'
+        def fileAge = grailsApplication.config.com.recomdata.export.jobs.sweep.fileAge
         def now = new Date()
         def c = AsyncJob.createCriteria()
         def jobList = c.list {
-            eq("jobType", "DataExport")
-            eq("jobStatus", "Completed")
+            eq('jobType', 'DataExport')
+            eq('jobStatus', 'Completed')
             lt('lastRunOn', now - fileAge)
             //between('lastRunOn',now-fileAge, now)
         }

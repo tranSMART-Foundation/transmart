@@ -26,12 +26,12 @@ class LiteratureQueryService {
         if (gfilter == null || gfilter.isTextOnly()) {
             return 0
         }
-        query.addSelect("count(distinct data.id)")
+        query.addSelect('count(distinct data.id)')
         query.addTable(table)
-        if (namedParams.containsKey("dd2ID")) {
-            query.addTable("JOIN data.diseases data_dis2")
+        if (namedParams.containsKey('dd2ID')) {
+            query.addTable('JOIN data.diseases data_dis2')
         }
-        query.createGlobalFilterCriteria(gfilter);
+        query.createGlobalFilterCriteria(gfilter)
         return Literature.executeQuery(query.generateSQL(), namedParams)[0]
     }
 
@@ -55,17 +55,18 @@ class LiteratureQueryService {
             params = globalFilterService.createPagingParamMap(params)
         }
 
-        query.addSelect("data")
-        query.addTable(table + " JOIN fetch data.reference")
-        if (namedParams.containsKey("dd2ID")) {
-            query.addTable("JOIN data.diseases data_dis2")
+        query.addSelect('data')
+        query.addTable(table + ' JOIN fetch data.reference')
+        if (namedParams.containsKey('dd2ID')) {
+            query.addTable('JOIN data.diseases data_dis2')
         }
-        query.createGlobalFilterCriteria(gfilter);
+        query.createGlobalFilterCriteria(gfilter)
 
         def results = []
         if (params != null) {
             results = Literature.executeQuery(query.generateSQL(), namedParams, params)
-        } else {
+        }
+        else {
             results = Literature.executeQuery(query.generateSQL(), namedParams)
         }
         return results
@@ -88,24 +89,25 @@ class LiteratureQueryService {
             return 0
         }
 
-        query.addSelect("count(distinct sumdata.id)")
+        query.addSelect('count(distinct sumdata.id)')
         query.addTable(table)
-        query.addTable("org.transmart.biomart.LiteratureSummaryData sumdata")
-        query.addCondition("sumdata.target=data.reference.component")
-        query.addCondition("sumdata.diseaseSite=data.reference.diseaseSite")
+        query.addTable('org.transmart.biomart.LiteratureSummaryData sumdata')
+        query.addCondition('sumdata.target=data.reference.component')
+        query.addCondition('sumdata.diseaseSite=data.reference.diseaseSite')
         if (litFilter.hasAlterationType()) {
             def types = litFilter.getSelectedAlterationTypes()
             if (types.size() > 0) {
-                query.addCondition("data.alterationType in (:alterationTypes)")
-                namedParams["alterationTypes"] = types
-            } else {
-                query.addCondition("data.alterationType is null")
+                query.addCondition('data.alterationType in (:alterationTypes)')
+                namedParams['alterationTypes'] = types
+            }
+            else {
+                query.addCondition('data.alterationType is null')
             }
         }
-        if (namedParams.containsKey("dd2ID")) {
-            query.addTable("JOIN data.diseases data_dis2")
+        if (namedParams.containsKey('dd2ID')) {
+            query.addTable('JOIN data.diseases data_dis2')
         }
-        query.createGlobalFilterCriteria(gfilter);
+        query.createGlobalFilterCriteria(gfilter)
         return Literature.executeQuery(query.generateSQL(), namedParams)[0]
     }
 
@@ -132,25 +134,26 @@ class LiteratureQueryService {
         params = globalFilterService.createPagingParamMap(params)
 
         query.setDistinct = true
-        query.addSelect("sumdata")
+        query.addSelect('sumdata')
         query.addTable(table)
-        query.addTable("org.transmart.biomart.LiteratureSummaryData sumdata")
-        query.addCondition("sumdata.target=data.reference.component")
-        query.addCondition("sumdata.diseaseSite=data.reference.diseaseSite")
+        query.addTable('org.transmart.biomart.LiteratureSummaryData sumdata')
+        query.addCondition('sumdata.target=data.reference.component')
+        query.addCondition('sumdata.diseaseSite=data.reference.diseaseSite')
         if (litFilter.hasAlterationType()) {
             def types = litFilter.getSelectedAlterationTypes()
             if (types.size() > 0) {
-                query.addCondition("data.alterationType in (:alterationTypes)")
-                namedParams["alterationTypes"] = types
-            } else {
-                query.addCondition("data.alterationType is null")
+                query.addCondition('data.alterationType in (:alterationTypes)')
+                namedParams['alterationTypes'] = types
+            }
+            else {
+                query.addCondition('data.alterationType is null')
             }
         }
-        query.addOrderBy("sumdata." + sort + " " + dir)
-        if (namedParams.containsKey("dd2ID")) {
-            query.addTable("JOIN data.diseases data_dis2")
+        query.addOrderBy('sumdata.' + sort + ' ' + dir)
+        if (namedParams.containsKey('dd2ID')) {
+            query.addTable('JOIN data.diseases data_dis2')
         }
-        query.createGlobalFilterCriteria(gfilter);
+        query.createGlobalFilterCriteria(gfilter)
         return Literature.executeQuery(query.generateSQL(), namedParams, params)
     }
 
@@ -158,44 +161,44 @@ class LiteratureQueryService {
      * Julilant Oncology Alteration methods
      *************************************************************************/
     def litJubOncAltCount(SearchFilter sfilter) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        return executeLitQueryCount("LiteratureAlterationData data",
-                litAltConditions(sfilter.litFilter, "JUBILANT_ONCOLOGY_ALTERATION", query),
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        return executeLitQueryCount('LiteratureAlterationData data',
+                litAltConditions(sfilter.litFilter, 'JUBILANT_ONCOLOGY_ALTERATION', query),
                 sfilter.globalFilter, query)
     }
 
     def litJubOncAltData(SearchFilter sfilter, params) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        return executeLitQueryData("LiteratureAlterationData data",
-                litAltConditions(sfilter.litFilter, "JUBILANT_ONCOLOGY_ALTERATION", query),
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        return executeLitQueryData('LiteratureAlterationData data',
+                litAltConditions(sfilter.litFilter, 'JUBILANT_ONCOLOGY_ALTERATION', query),
                 sfilter.globalFilter, params, query)
     }
 
     def litJubAsthmaAltCount(SearchFilter sfilter) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        return executeLitQueryCount("LiteratureAlterationData data",
-                litAltConditions(sfilter.litFilter, "JUBILANT_ASTHMA_ALTERATION", query),
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        return executeLitQueryCount('LiteratureAlterationData data',
+                litAltConditions(sfilter.litFilter, 'JUBILANT_ASTHMA_ALTERATION', query),
                 sfilter.globalFilter, query)
     }
 
     def litJubAsthmaAltData(SearchFilter sfilter, params) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        return executeLitQueryData("LiteratureAlterationData data",
-                litAltConditions(sfilter.litFilter, "JUBILANT_ASTHMA_ALTERATION", query),
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        return executeLitQueryData('LiteratureAlterationData data',
+                litAltConditions(sfilter.litFilter, 'JUBILANT_ASTHMA_ALTERATION', query),
                 sfilter.globalFilter, params, query)
     }
 
     def litJubOncAltSumCount(SearchFilter sfilter) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        return executeLitSumQueryCount("LiteratureAlterationData data",
-                litAltConditions(sfilter.litFilter, "JUBILANT_ONCOLOGY_ALTERATION", query),
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        return executeLitSumQueryCount('LiteratureAlterationData data',
+                litAltConditions(sfilter.litFilter, 'JUBILANT_ONCOLOGY_ALTERATION', query),
                 sfilter, query)
     }
 
     def litJubOncAltSumData(SearchFilter sfilter, params) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        return executeLitSumQueryData("LiteratureAlterationData data",
-                litAltConditions(sfilter.litFilter, "JUBILANT_ONCOLOGY_ALTERATION", query),
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        return executeLitSumQueryData('LiteratureAlterationData data',
+                litAltConditions(sfilter.litFilter, 'JUBILANT_ONCOLOGY_ALTERATION', query),
                 sfilter, params, query)
     }
 
@@ -211,66 +214,68 @@ class LiteratureQueryService {
     def litAltConditions(LiteratureFilter litFilter, dataType, LiteratureDataQuery query) {
         def namedParameters = [:]
 
-        query.addCondition("data.dataType= :dataType")
-        namedParameters["dataType"] = dataType
+        query.addCondition('data.dataType= :dataType')
+        namedParameters['dataType'] = dataType
 
         if (litFilter.hasDisease()) {
-            query.addCondition("data_dis2.id= :dd2ID")
-            namedParameters["dd2ID"] = litFilter.bioDiseaseId
+            query.addCondition('data_dis2.id= :dd2ID')
+            namedParameters['dd2ID'] = litFilter.bioDiseaseId
         }
         if (litFilter.hasDiseaseSite()) {
-            query.addCondition("data.reference.diseaseSite in (:diseaseSites)")
-            namedParameters["diseaseSites"] = litFilter.diseaseSite
+            query.addCondition('data.reference.diseaseSite in (:diseaseSites)')
+            namedParameters['diseaseSites'] = litFilter.diseaseSite
         }
         if (litFilter.hasComponent()) {
-            query.addCondition("data.reference.component in (:compList)")
-            query.addCondition("data.reference.geneId in (:geneList)")
-            namedParameters["compList"] = litFilter.pairCompList
-            namedParameters["geneList"] = litFilter.pairGeneList
+            query.addCondition('data.reference.component in (:compList)')
+            query.addCondition('data.reference.geneId in (:geneList)')
+            namedParameters['compList'] = litFilter.pairCompList
+            namedParameters['geneList'] = litFilter.pairGeneList
         }
         if (litFilter.hasMutationType()) {
-            query.addCondition("data.mutationType= :mutationType")
-            namedParameters["mutationType"] = litFilter.mutationType
+            query.addCondition('data.mutationType= :mutationType')
+            namedParameters['mutationType'] = litFilter.mutationType
         }
         if (litFilter.hasMutationSite()) {
-            query.addCondition("data.mutationSites= :mutationSite")
-            namedParameters["mutationSite"] = litFilter.mutationSite
+            query.addCondition('data.mutationSites= :mutationSite')
+            namedParameters['mutationSite'] = litFilter.mutationSite
         }
         if (litFilter.hasEpigeneticType()) {
-            query.addCondition("data.epigeneticType= :epigeneticType")
-            namedParameters["epigeneticType"] = litFilter.epigeneticType
+            query.addCondition('data.epigeneticType= :epigeneticType')
+            namedParameters['epigeneticType'] = litFilter.epigeneticType
         }
         if (litFilter.hasEpigeneticRegion()) {
-            query.addCondition("data.epigeneticRegion= :epigeneticRegion")
-            namedParameters["epigeneticRegion"] = litFilter.epigeneticRegion
+            query.addCondition('data.epigeneticRegion= :epigeneticRegion')
+            namedParameters['epigeneticRegion'] = litFilter.epigeneticRegion
         }
         if (litFilter.hasAlterationType()) {
             def types = litFilter.getSelectedAlterationTypes()
             if (types.size() > 0) {
-                query.addCondition("data.alterationType in (:alterationTypes)")
-                namedParameters["alterationTypes"] = types
-            } else {
-                query.addCondition("data.alterationType is null")
+                query.addCondition('data.alterationType in (:alterationTypes)')
+                namedParameters['alterationTypes'] = types
+            }
+            else {
+                query.addCondition('data.alterationType is null')
             }
         }
         if (litFilter.hasMoleculeType()) {
-            query.addCondition("data.reference.moleculeType= :moleculeType")
-            namedParameters["moleculeType"] = litFilter.moleculeType
+            query.addCondition('data.reference.moleculeType= :moleculeType')
+            namedParameters['moleculeType'] = litFilter.moleculeType
         }
         if (litFilter.hasRegulation()) {
-            if (litFilter.regulation.equals("Expression")) {
-                query.addCondition("data.totalExpPercent is not null")
-            } else if (litFilter.regulation.equals("OverExpression")) {
-                query.addCondition("data.overExpPercent is not null")
+            if (litFilter.regulation.equals('Expression')) {
+                query.addCondition('data.totalExpPercent is not null')
+            }
+            else if (litFilter.regulation.equals('OverExpression')) {
+                query.addCondition('data.overExpPercent is not null')
             }
         }
         if (litFilter.hasPtmType()) {
-            query.addCondition("data.ptmType= :ptmType")
-            namedParameters["ptmType"] = litFilter.ptmType
+            query.addCondition('data.ptmType= :ptmType')
+            namedParameters['ptmType'] = litFilter.ptmType
         }
         if (litFilter.hasPtmRegion()) {
-            query.addCondition("data.ptmRegion= :ptmRegion")
-            namedParameters["ptmRegion"] = litFilter.ptmRegion
+            query.addCondition('data.ptmRegion= :ptmRegion')
+            namedParameters['ptmRegion'] = litFilter.ptmRegion
         }
         return namedParameters
     }
@@ -279,32 +284,32 @@ class LiteratureQueryService {
      * Julilant Oncology Inhibitor methods
      *************************************************************************/
     def litJubOncInhCount(SearchFilter sfilter) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        return executeLitQueryCount("LiteratureInhibitorData data",
-                litInhConditions(sfilter.litFilter, "JUBILANT_ONCOLOGY_INHIBITOR", query),
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        return executeLitQueryCount('LiteratureInhibitorData data',
+                litInhConditions(sfilter.litFilter, 'JUBILANT_ONCOLOGY_INHIBITOR', query),
                 sfilter.globalFilter, query)
     }
 
     def litJubOncInhData(SearchFilter sfilter, params) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        return executeLitQueryData("LiteratureInhibitorData data",
-                litInhConditions(sfilter.litFilter, "JUBILANT_ONCOLOGY_INHIBITOR", query),
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        return executeLitQueryData('LiteratureInhibitorData data',
+                litInhConditions(sfilter.litFilter, 'JUBILANT_ONCOLOGY_INHIBITOR', query),
                 sfilter.globalFilter, params, query)
     }
 
     def litJubAsthmaInhCount(SearchFilter sfilter) {
         return 0
 // TODO: Uncomment this code after the asthma inhibitor data has been loaded.
-//      def query = new LiteratureDataQuery(mainTableAlias:"data")
-//		return executeLitQueryCount("LiteratureInhibitorData data",
-//				litInhConditions(sfilter.litFilter, "JUBILANT_ASTHMA_INHIBITOR", query),
+//      def query = new LiteratureDataQuery(mainTableAlias:'data')
+//		return executeLitQueryCount('LiteratureInhibitorData data',
+//				litInhConditions(sfilter.litFilter, 'JUBILANT_ASTHMA_INHIBITOR', query),
 //				sfilter.globalFilter, query)
     }
 
     def litJubAsthmaInhData(SearchFilter sfilter, params) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        return executeLitQueryData("LiteratureInhibitorData data",
-                litInhConditions(sfilter.litFilter, "JUBILANT_ASTHMA_INHIBITOR", query),
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        return executeLitQueryData('LiteratureInhibitorData data',
+                litInhConditions(sfilter.litFilter, 'JUBILANT_ASTHMA_INHIBITOR', query),
                 sfilter.globalFilter, params, query)
     }
 
@@ -320,38 +325,38 @@ class LiteratureQueryService {
     def litInhConditions(LiteratureFilter litFilter, dataType, LiteratureDataQuery query) {
         def namedParameters = [:]
 
-        query.addCondition("data.dataType= :dataType")
-        namedParameters["dataType"] = dataType
+        query.addCondition('data.dataType= :dataType')
+        namedParameters['dataType'] = dataType
 
         if (litFilter.hasDisease()) {
-            query.addCondition("data_dis2.id= :dd2ID")
-            namedParameters["dd2ID"] = litFilter.bioDiseaseId
+            query.addCondition('data_dis2.id= :dd2ID')
+            namedParameters['dd2ID'] = litFilter.bioDiseaseId
         }
         if (litFilter.hasDiseaseSite()) {
-            query.addCondition("data.reference.diseaseSite in (:diseaseSites)")
-            namedParameters["diseaseSites"] = litFilter.diseaseSite
+            query.addCondition('data.reference.diseaseSite in (:diseaseSites)')
+            namedParameters['diseaseSites'] = litFilter.diseaseSite
         }
         if (litFilter.hasComponent()) {
-            query.addCondition("data.reference.component in (:compList)")
-            query.addCondition("data.reference.geneId in (:geneList)")
-            namedParameters["compList"] = litFilter.pairCompList
-            namedParameters["geneList"] = litFilter.pairGeneList
+            query.addCondition('data.reference.component in (:compList)')
+            query.addCondition('data.reference.geneId in (:geneList)')
+            namedParameters['compList'] = litFilter.pairCompList
+            namedParameters['geneList'] = litFilter.pairGeneList
         }
         if (litFilter.hasTrialType()) {
-            query.addCondition("data.trialType= :trialType")
-            namedParameters["trialType"] = litFilter.trialType
+            query.addCondition('data.trialType= :trialType')
+            namedParameters['trialType'] = litFilter.trialType
         }
         if (litFilter.hasTrialPhase()) {
-            query.addCondition("data.trialPhase= :trialPhase")
-            namedParameters["trialPhase"] = litFilter.trialPhase
+            query.addCondition('data.trialPhase= :trialPhase')
+            namedParameters['trialPhase'] = litFilter.trialPhase
         }
         if (litFilter.hasInhibitorName()) {
-            query.addCondition("data.inhibitor= :inhibitor")
-            namedParameters["inhibitor"] = litFilter.inhibitorName
+            query.addCondition('data.inhibitor= :inhibitor')
+            namedParameters['inhibitor'] = litFilter.inhibitorName
         }
         if (litFilter.hasTrialExperimentalModel()) {
-            query.addCondition("data.trialExperimentalModel= :trialExperimentalModel")
-            namedParameters["trialExperimentalModel"] = litFilter.trialExperimentalModel
+            query.addCondition('data.trialExperimentalModel= :trialExperimentalModel')
+            namedParameters['trialExperimentalModel'] = litFilter.trialExperimentalModel
         }
         return namedParameters
     }
@@ -360,46 +365,46 @@ class LiteratureQueryService {
      * Julilant Oncology Interaction methods
      *************************************************************************/
     def litJubOncIntCount(SearchFilter sfilter) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        def table = "org.transmart.biomart.LiteratureInteractionData data"
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        def table = 'org.transmart.biomart.LiteratureInteractionData data'
         if (sfilter.litFilter.hasExperimentalModel()) {
-            table += " LEFT OUTER JOIN data.inVivoModel invivo LEFT OUTER JOIN data.inVitroModel invitro"
+            table += ' LEFT OUTER JOIN data.inVivoModel invivo LEFT OUTER JOIN data.inVitroModel invitro'
         }
         return executeLitQueryCount(table,
-                litIntConditions(sfilter.litFilter, "JUBILANT_ONCOLOGY_INTERACTION", query),
+                litIntConditions(sfilter.litFilter, 'JUBILANT_ONCOLOGY_INTERACTION', query),
                 sfilter.globalFilter, query)
     }
 
     def litJubOncIntData(SearchFilter sfilter, params) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        def table = "org.transmart.biomart.LiteratureInteractionData data"
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        def table = 'org.transmart.biomart.LiteratureInteractionData data'
         if (sfilter.litFilter.hasExperimentalModel()) {
-            table += " LEFT OUTER JOIN data.inVivoModel invivo LEFT OUTER JOIN data.inVitroModel invitro"
+            table += ' LEFT OUTER JOIN data.inVivoModel invivo LEFT OUTER JOIN data.inVitroModel invitro'
         }
         return executeLitQueryData(table,
-                litIntConditions(sfilter.litFilter, "JUBILANT_ONCOLOGY_INTERACTION", query),
+                litIntConditions(sfilter.litFilter, 'JUBILANT_ONCOLOGY_INTERACTION', query),
                 sfilter.globalFilter, params, query)
     }
 
     def litJubAsthmaIntCount(SearchFilter sfilter) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        def table = "org.transmart.biomart.LiteratureInteractionData data"
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        def table = 'org.transmart.biomart.LiteratureInteractionData data'
         if (sfilter.litFilter.hasExperimentalModel()) {
-            table += " LEFT OUTER JOIN data.inVivoModel invivo LEFT OUTER JOIN data.inVitroModel invitro"
+            table += ' LEFT OUTER JOIN data.inVivoModel invivo LEFT OUTER JOIN data.inVitroModel invitro'
         }
         return executeLitQueryCount(table,
-                litIntConditions(sfilter.litFilter, "JUBILANT_ASTHMA_INTERACTION", query),
+                litIntConditions(sfilter.litFilter, 'JUBILANT_ASTHMA_INTERACTION', query),
                 sfilter.globalFilter, query)
     }
 
     def litJubAsthmaIntData(SearchFilter sfilter, params) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        def table = "org.transmart.biomart.LiteratureInteractionData data"
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        def table = 'org.transmart.biomart.LiteratureInteractionData data'
         if (sfilter.litFilter.hasExperimentalModel()) {
-            table += " LEFT OUTER JOIN data.inVivoModel invivo LEFT OUTER JOIN data.inVitroModel invitro"
+            table += ' LEFT OUTER JOIN data.inVivoModel invivo LEFT OUTER JOIN data.inVitroModel invitro'
         }
         return executeLitQueryData(table,
-                litIntConditions(sfilter.litFilter, "JUBILANT_ASTHMA_INTERACTION", query),
+                litIntConditions(sfilter.litFilter, 'JUBILANT_ASTHMA_INTERACTION', query),
                 sfilter.globalFilter, params, query)
     }
 
@@ -415,38 +420,38 @@ class LiteratureQueryService {
     def litIntConditions(LiteratureFilter litFilter, dataType, LiteratureDataQuery query) {
         def namedParameters = [:]
 
-        query.addCondition("data.dataType= :dataType")
-        namedParameters["dataType"] = dataType
+        query.addCondition('data.dataType= :dataType')
+        namedParameters['dataType'] = dataType
 
         if (litFilter.hasDisease()) {
-            query.addCondition("data_dis2.id= :dd2ID")
-            namedParameters["dd2ID"] = litFilter.bioDiseaseId
+            query.addCondition('data_dis2.id= :dd2ID')
+            namedParameters['dd2ID'] = litFilter.bioDiseaseId
         }
         if (litFilter.hasDiseaseSite()) {
-            query.addCondition("data.reference.diseaseSite in (:diseaseSites)")
-            namedParameters["diseaseSites"] = litFilter.diseaseSite
+            query.addCondition('data.reference.diseaseSite in (:diseaseSites)')
+            namedParameters['diseaseSites'] = litFilter.diseaseSite
         }
         if (litFilter.hasComponent()) {
-            query.addCondition("data.reference.component in (:compList)")
-            query.addCondition("data.reference.geneId in (:geneList)")
-            namedParameters["compList"] = litFilter.pairCompList
-            namedParameters["geneList"] = litFilter.pairGeneList
+            query.addCondition('data.reference.component in (:compList)')
+            query.addCondition('data.reference.geneId in (:geneList)')
+            namedParameters['compList'] = litFilter.pairCompList
+            namedParameters['geneList'] = litFilter.pairGeneList
         }
         if (litFilter.hasSource()) {
-            query.addCondition("data.sourceComponent= :sourceComponent")
-            namedParameters["sourceComponent"] = litFilter.source
+            query.addCondition('data.sourceComponent= :sourceComponent')
+            namedParameters['sourceComponent'] = litFilter.source
         }
         if (litFilter.hasTarget()) {
-            query.addCondition("data.targetComponent= :targetComponent")
-            namedParameters["targetComponent"] = litFilter.target
+            query.addCondition('data.targetComponent= :targetComponent')
+            namedParameters['targetComponent'] = litFilter.target
         }
         if (litFilter.hasExperimentalModel()) {
-            query.addCondition("(invivo.experimentalModel= :experimentalModel or invitro.experimentalModel= :experimentalModel)")
-            namedParameters["experimentalModel"] = litFilter.experimentalModel
+            query.addCondition('(invivo.experimentalModel= :experimentalModel or invitro.experimentalModel= :experimentalModel)')
+            namedParameters['experimentalModel'] = litFilter.experimentalModel
         }
         if (litFilter.hasMechanism()) {
-            query.addCondition("data.mechanism= :mechanism")
-            namedParameters["mechanism"] = litFilter.mechanism
+            query.addCondition('data.mechanism= :mechanism')
+            namedParameters['mechanism'] = litFilter.mechanism
         }
         return namedParameters
     }
@@ -455,16 +460,16 @@ class LiteratureQueryService {
      * Julilant Protein Effect methods
      *************************************************************************/
     def litJubAsthmaPECount(SearchFilter sfilter) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        return executeLitQueryCount("LiteratureProteinEffectData data",
-                litPEConditions(sfilter.litFilter, "JUBILANT_ASTHMA_PROTEIN_EFFECT", query),
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        return executeLitQueryCount('LiteratureProteinEffectData data',
+                litPEConditions(sfilter.litFilter, 'JUBILANT_ASTHMA_PROTEIN_EFFECT', query),
                 sfilter.globalFilter, query)
     }
 
     def litJubAsthmaPEData(SearchFilter sfilter, params) {
-        def query = new LiteratureDataQuery(mainTableAlias: "data")
-        return executeLitQueryData("LiteratureProteinEffectData data",
-                litPEConditions(sfilter.litFilter, "JUBILANT_ASTHMA_PROTEIN_EFFECT", query),
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
+        return executeLitQueryData('LiteratureProteinEffectData data',
+                litPEConditions(sfilter.litFilter, 'JUBILANT_ASTHMA_PROTEIN_EFFECT', query),
                 sfilter.globalFilter, params, query)
     }
 
@@ -480,22 +485,22 @@ class LiteratureQueryService {
     def litPEConditions(LiteratureFilter litFilter, dataType, LiteratureDataQuery query) {
         def namedParameters = [:]
 
-        query.addCondition("data.dataType= :dataType")
-        namedParameters["dataType"] = dataType
+        query.addCondition('data.dataType= :dataType')
+        namedParameters['dataType'] = dataType
 
         if (litFilter.hasDisease()) {
-            query.addCondition("data_dis2.id= :dd2ID")
-            namedParameters["dd2ID"] = litFilter.bioDiseaseId
+            query.addCondition('data_dis2.id= :dd2ID')
+            namedParameters['dd2ID'] = litFilter.bioDiseaseId
         }
         if (litFilter.hasDiseaseSite()) {
-            query.addCondition("data.reference.diseaseSite in (:diseaseSites)")
-            namedParameters["diseaseSites"] = litFilter.diseaseSite
+            query.addCondition('data.reference.diseaseSite in (:diseaseSites)')
+            namedParameters['diseaseSites'] = litFilter.diseaseSite
         }
         if (litFilter.hasComponent()) {
-            query.addCondition("data.reference.component in (:compList)")
-            query.addCondition("data.reference.geneId in (:geneList)")
-            namedParameters["compList"] = litFilter.pairCompList
-            namedParameters["geneList"] = litFilter.pairGeneList
+            query.addCondition('data.reference.component in (:compList)')
+            query.addCondition('data.reference.geneId in (:geneList)')
+            namedParameters['compList'] = litFilter.pairCompList
+            namedParameters['geneList'] = litFilter.pairGeneList
         }
         return namedParameters
     }
@@ -507,12 +512,12 @@ class LiteratureQueryService {
         def geneURN = null
 
         if (name.indexOf('.') < 0) {
-            StringBuffer sql = new StringBuffer("select bdec.code from BioDataExternalCode bdec")
-            sql.append(" where bdec.bioDataId in (select innerb.bioDataId from BioDataExternalCode innerb")
-            sql.append(" where upper(innerb.code) = ?)")
-            sql.append(" and bdec.codeType = ?")
+            StringBuffer sql = new StringBuffer('select bdec.code from BioDataExternalCode bdec')
+            sql.append(' where bdec.bioDataId in (select innerb.bioDataId from BioDataExternalCode innerb')
+            sql.append(' where upper(innerb.code) = ?)')
+            sql.append(' and bdec.codeType = ?')
 
-            def result = BioDataExternalCode.executeQuery(sql.toString(), [name.toUpperCase(), "URN"])
+            def result = BioDataExternalCode.executeQuery(sql.toString(), [name.toUpperCase(), 'URN'])
             if (result[0] != null) {
                 geneURN = result[0]
             }
@@ -523,12 +528,12 @@ class LiteratureQueryService {
     def findSmallMolURN(String name) {
         def smURN = null
 
-        StringBuffer sql = new StringBuffer("select bdec.code from BioDataExternalCode bdec")
-        sql.append(" where bdec.bioDataId = (select c.id from Compound c")
-        sql.append(" where upper(c.codeName) = ? and c.productCategory = ?)")
-        sql.append(" and bdec.codeSource = ?")
-        sql.append(" and bdec.codeType = ?")
-        def result = BioDataExternalCode.executeQuery(sql.toString(), [name.toUpperCase(), "Small Molecule", "ARIADNE", "URN"])
+        StringBuffer sql = new StringBuffer('select bdec.code from BioDataExternalCode bdec')
+        sql.append(' where bdec.bioDataId = (select c.id from Compound c')
+        sql.append(' where upper(c.codeName) = ? and c.productCategory = ?)')
+        sql.append(' and bdec.codeSource = ?')
+        sql.append(' and bdec.codeType = ?')
+        def result = BioDataExternalCode.executeQuery(sql.toString(), [name.toUpperCase(), 'Small Molecule', 'ARIADNE', 'URN'])
         if (result.size() == 1) {
             smURN = result[0]
         }
@@ -537,24 +542,25 @@ class LiteratureQueryService {
     }
 
     def findDiseaseURN(String name) {
-        logger.info("Calling findDiseaseURN for " + name)
+        logger.info('Calling findDiseaseURN for ' + name)
         def diseaseURN = null
-        StringBuffer sql = new StringBuffer("select bdec.code from BioDataExternalCode bdec")
-        sql.append(" where bdec.bioDataId in (select bdecInner.bioDataId from BioDataExternalCode bdecInner")
-        sql.append(" where upper(bdecInner.code) = ?")
-        sql.append(" and bdecInner.codeSource = ?")
-        sql.append(" and bdecInner.codeType = ?")
-        sql.append(" and bdecInner.bioDataType = ?)")
-        sql.append(" and bdec.codeSource = ?")
-        sql.append(" and bdec.codeType = ?")
-        sql.append(" and bdec.bioDataType = ?")
+        StringBuffer sql = new StringBuffer('select bdec.code from BioDataExternalCode bdec')
+        sql.append(' where bdec.bioDataId in (select bdecInner.bioDataId from BioDataExternalCode bdecInner')
+        sql.append(' where upper(bdecInner.code) = ?')
+        sql.append(' and bdecInner.codeSource = ?')
+        sql.append(' and bdecInner.codeType = ?')
+        sql.append(' and bdecInner.bioDataType = ?)')
+        sql.append(' and bdec.codeSource = ?')
+        sql.append(' and bdec.codeType = ?')
+        sql.append(' and bdec.bioDataType = ?')
         logger.trace(sql.toString())
         def result = BioDataExternalCode.executeQuery(sql.toString(),
-                [name.toUpperCase(), "ARIADNE", "ALIAS", "BIO_DISEASE", "ARIADNE", "URN", "BIO_DISEASE"])
+                [name.toUpperCase(), 'ARIADNE', 'ALIAS', 'BIO_DISEASE', 'ARIADNE', 'URN', 'BIO_DISEASE'])
         if (result.size() == 1) {
             diseaseURN = result[0]
-        } else {
-            logger.warn("Unable to find the Disease URN.  Size = " + result.size())
+        }
+        else {
+            logger.warn('Unable to find the Disease URN.  Size = ' + result.size())
         }
         return diseaseURN
     }
@@ -568,96 +574,96 @@ class LiteratureQueryService {
             return []
         }
 
-        def query = new LiteratureDataQuery(mainTableAlias: "data");
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
         query.setDistinct = true
-        query.addSelect("data." + column)
-        query.addTable(table + " data")
-        query.addCondition(" data." + column + " is not null ")
-        query.addOrderBy(" data." + column)
-        query.createGlobalFilterCriteria(gfilter);
+        query.addSelect('data.' + column)
+        query.addTable(table + ' data')
+        query.addCondition(' data.' + column + ' is not null ')
+        query.addOrderBy(' data.' + column)
+        query.createGlobalFilterCriteria(gfilter)
         def sql = query.generateSQL()
         def results = Literature.executeQuery(sql)
         return results
     }
 
     def diseaseList(searchFilter) {
-        //return executeJubOncologyQueryFilter("data_dis.preferredName", "org.transmart.biomart.Literature", searchFilter)
+        //return executeJubOncologyQueryFilter('data_dis.preferredName', 'org.transmart.biomart.Literature', searchFilter)
         def gfilter = searchFilter.globalFilter
         if (gfilter == null || gfilter.isTextOnly()) {
             return []
         }
 
-        def query = new LiteratureDataQuery(mainTableAlias: "data");
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
         query.setDistinct = true
-        query.addSelect("data_dis2")
-        query.addTable("org.transmart.biomart.Literature data");
-        query.addTable("JOIN data.diseases data_dis2")
-        query.addOrderBy("data_dis2.preferredName")
-        query.createGlobalFilterCriteria(gfilter, true);
+        query.addSelect('data_dis2')
+        query.addTable('org.transmart.biomart.Literature data')
+        query.addTable('JOIN data.diseases data_dis2')
+        query.addOrderBy('data_dis2.preferredName')
+        query.createGlobalFilterCriteria(gfilter, true)
         def sql = query.generateSQL()
         def results = Literature.executeQuery(sql)
         return results
     }
 
     def diseaseSiteList(searchFilter) {
-        return executeJubOncologyQueryFilter("reference.diseaseSite", "org.transmart.biomart.Literature", searchFilter)
+        return executeJubOncologyQueryFilter('reference.diseaseSite', 'org.transmart.biomart.Literature', searchFilter)
     }
 
     def componentList(searchFilter) {
-        // return executeJubOncologyQueryFilter("reference.component", "org.transmart.biomart.Literature", searchFilter)
+        // return executeJubOncologyQueryFilter('reference.component', 'org.transmart.biomart.Literature', searchFilter)
         // Need to filter and send only genes/proteins
         def gfilter = searchFilter.globalFilter
         if (gfilter == null || gfilter.isTextOnly()) {
             return []
         }
 
-        def query = new LiteratureDataQuery(mainTableAlias: "data");
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
         query.setDistinct = true
-        query.addSelect("data.reference.component")
-        query.addSelect("data.reference.geneId")
-        query.addTable("org.transmart.biomart.Literature data")
-        query.addCondition("data.reference.geneId is not null")
-        query.addOrderBy("data.reference.component")
-        query.createGlobalFilterCriteria(gfilter);
+        query.addSelect('data.reference.component')
+        query.addSelect('data.reference.geneId')
+        query.addTable('org.transmart.biomart.Literature data')
+        query.addCondition('data.reference.geneId is not null')
+        query.addOrderBy('data.reference.component')
+        query.createGlobalFilterCriteria(gfilter)
         def sql = query.generateSQL()
         def results = Literature.executeQuery(sql)
         return results
     }
 
     def mutationTypeList(searchFilter) {
-        return executeJubOncologyQueryFilter("mutationType", "org.transmart.biomart.LiteratureAlterationData", searchFilter)
+        return executeJubOncologyQueryFilter('mutationType', 'org.transmart.biomart.LiteratureAlterationData', searchFilter)
     }
 
     def mutationSiteList(searchFilter) {
-        return executeJubOncologyQueryFilter("mutationSites", "org.transmart.biomart.LiteratureAlterationData", searchFilter)
+        return executeJubOncologyQueryFilter('mutationSites', 'org.transmart.biomart.LiteratureAlterationData', searchFilter)
     }
 
     def epigeneticTypeList(searchFilter) {
-        return executeJubOncologyQueryFilter("epigeneticType", "org.transmart.biomart.LiteratureAlterationData", searchFilter)
+        return executeJubOncologyQueryFilter('epigeneticType', 'org.transmart.biomart.LiteratureAlterationData', searchFilter)
     }
 
     def epigeneticRegionList(searchFilter) {
-        return executeJubOncologyQueryFilter("epigeneticRegion", "org.transmart.biomart.LiteratureAlterationData", searchFilter)
+        return executeJubOncologyQueryFilter('epigeneticRegion', 'org.transmart.biomart.LiteratureAlterationData', searchFilter)
     }
 
     def moleculeTypeList(searchFilter) {
-        return executeJubOncologyQueryFilter("reference.moleculeType", "org.transmart.biomart.Literature", searchFilter)
+        return executeJubOncologyQueryFilter('reference.moleculeType', 'org.transmart.biomart.Literature', searchFilter)
     }
 
     def ptmTypeList(searchFilter) {
-        return executeJubOncologyQueryFilter("ptmType", "org.transmart.biomart.LiteratureAlterationData", searchFilter)
+        return executeJubOncologyQueryFilter('ptmType', 'org.transmart.biomart.LiteratureAlterationData', searchFilter)
     }
 
     def ptmRegionList(searchFilter) {
-        return executeJubOncologyQueryFilter("ptmRegion", "org.transmart.biomart.LiteratureAlterationData", searchFilter)
+        return executeJubOncologyQueryFilter('ptmRegion', 'org.transmart.biomart.LiteratureAlterationData', searchFilter)
     }
 
     def sourceList(searchFilter) {
-        return executeJubOncologyQueryFilter("sourceComponent", "org.transmart.biomart.LiteratureInteractionData", searchFilter)
+        return executeJubOncologyQueryFilter('sourceComponent', 'org.transmart.biomart.LiteratureInteractionData', searchFilter)
     }
 
     def targetList(searchFilter) {
-        return executeJubOncologyQueryFilter("targetComponent", "org.transmart.biomart.LiteratureInteractionData", searchFilter)
+        return executeJubOncologyQueryFilter('targetComponent', 'org.transmart.biomart.LiteratureInteractionData', searchFilter)
     }
 
     def experimentalModelList(searchFilter) {
@@ -666,36 +672,36 @@ class LiteratureQueryService {
             return []
         }
 
-        def query = new LiteratureDataQuery(mainTableAlias: "data");
+        def query = new LiteratureDataQuery(mainTableAlias: 'data')
         query.setDistinct = true
-        query.addSelect("mv.experimentalModel")
-        query.addTable("org.transmart.biomart.LiteratureInteractionData data")
-        query.addTable("org.transmart.biomart.LiteratureInteractionModelMV mv")
-        query.addCondition("data.id = mv.id")
-        query.addOrderBy("mv.experimentalModel")
-        query.createGlobalFilterCriteria(gfilter);
+        query.addSelect('mv.experimentalModel')
+        query.addTable('org.transmart.biomart.LiteratureInteractionData data')
+        query.addTable('org.transmart.biomart.LiteratureInteractionModelMV mv')
+        query.addCondition('data.id = mv.id')
+        query.addOrderBy('mv.experimentalModel')
+        query.createGlobalFilterCriteria(gfilter)
         def sql = query.generateSQL()
         def results = Literature.executeQuery(sql)
         return results
     }
 
     def mechanismList(searchFilter) {
-        return executeJubOncologyQueryFilter("mechanism", "org.transmart.biomart.LiteratureInteractionData", searchFilter)
+        return executeJubOncologyQueryFilter('mechanism', 'org.transmart.biomart.LiteratureInteractionData', searchFilter)
     }
 
     def trialTypeList(searchFilter) {
-        return executeJubOncologyQueryFilter("trialType", "org.transmart.biomart.LiteratureInhibitorData", searchFilter)
+        return executeJubOncologyQueryFilter('trialType', 'org.transmart.biomart.LiteratureInhibitorData', searchFilter)
     }
 
     def trialPhaseList(searchFilter) {
-        return executeJubOncologyQueryFilter("trialPhase", "org.transmart.biomart.LiteratureInhibitorData", searchFilter)
+        return executeJubOncologyQueryFilter('trialPhase', 'org.transmart.biomart.LiteratureInhibitorData', searchFilter)
     }
 
     def inhibitorNameList(searchFilter) {
-        return executeJubOncologyQueryFilter("inhibitor", "org.transmart.biomart.LiteratureInhibitorData", searchFilter)
+        return executeJubOncologyQueryFilter('inhibitor', 'org.transmart.biomart.LiteratureInhibitorData', searchFilter)
     }
 
     def trialExperimentalModelList(searchFilter) {
-        return executeJubOncologyQueryFilter("trialExperimentalModel", "org.transmart.biomart.LiteratureInhibitorData", searchFilter)
+        return executeJubOncologyQueryFilter('trialExperimentalModel', 'org.transmart.biomart.LiteratureInhibitorData', searchFilter)
     }
 }

@@ -29,7 +29,7 @@ import org.transmartproject.security.SSLCertificateValidation
 def logger = Logger.getLogger('com.recomdata.conf.resources')
 
 beans = {
-    xmlns context: "http://www.springframework.org/schema/context"
+    xmlns context: 'http://www.springframework.org/schema/context'
 
     if (grailsApplication.config.org.transmart.security.samlEnabled) {
         importBeans('classpath:/spring/spring-security-saml.xml')
@@ -42,7 +42,8 @@ beans = {
                 includeServerPortInRequestURL = grailsApplication.config.org.transmart.security.saml.lb.includeServerPortInRequestURL
                 contextPath = grailsApplication.config.org.transmart.security.saml.lb.contextPath
             }
-        } else {
+        }
+        else {
             contextProvider(org.springframework.security.saml.context.SAMLContextProviderImpl)
         }
     }
@@ -83,11 +84,11 @@ beans = {
     // would reinitialize the JSON marshaller we use later; rendering the application incompetent
     // It is important this falls first !
     if (!grailsApplication.config.org.transmart.security.sniValidation) {
-        logger.info "Disabling server name indication extension"
-        System.setProperty("jsse.enableSNIExtension", "false");
+        logger.info 'Disabling server name indication extension'
+        System.setProperty('jsse.enableSNIExtension', 'false')
     }
     if (!grailsApplication.config.org.transmart.security.sslValidation) {
-        logger.info "Disabling hostname and certification verification"
+        logger.info 'Disabling hostname and certification verification'
         SSLCertificateValidation.disable()
     }
     restBuilder(grails.plugins.rest.client.RestBuilder)
@@ -97,7 +98,8 @@ beans = {
     sessionAuthenticationStrategy(ConcurrentSessionControlStrategy, sessionRegistry) {
         if (grailsApplication.config.org.transmartproject.maxConcurrentUserSessions) {
                 maximumSessions = grailsApplication.config.org.transmartproject.maxConcurrentUserSessions
-        } else {
+        }
+        else {
                 maximumSessions = 10
         }
     }
@@ -139,12 +141,12 @@ beans = {
         }
 
         if (grailsApplication.config.org.transmart.security.ldap.ad.domain) {
-            xmlns aop:"http://www.springframework.org/schema/aop"
+            xmlns aop:'http://www.springframework.org/schema/aop'
 
             adExtension(ActiveDirectoryLdapAuthenticationExtension)
 
             aop {
-                config("proxy-target-class": true) {
+                config('proxy-target-class': true) {
                     aspect(id: 'adExtensionService', ref: 'adExtension')
                 }
             }
@@ -157,7 +159,7 @@ beans = {
             }
         }
 
-        if (grailsApplication.config.grails.plugin.springsecurity.providerNames.contains("kerberosServiceAuthenticationProvider")) {
+        if (grailsApplication.config.grails.plugin.springsecurity.providerNames.contains('kerberosServiceAuthenticationProvider')) {
             authenticationSuccessHandler(SavedRequestAwareAndResponseHeaderSettingKerberosAuthenticationSuccessHandler) // only active this if both LDAP & Kerberos providers are enabled to avoid ClassCastException (due to https://github.com/grails-plugins/grails-spring-security-kerberos/issues/3 )
         }
     }
@@ -165,11 +167,11 @@ beans = {
     if (!('clientCredentialsAuthenticationProvider' in
             grailsApplication.config.grails.plugin.springsecurity.providerNames)) {
         SpringSecurityOauth2ProviderGrailsPlugin.metaClass.getDoWithSpring = { ->
-            logger.info "Skipped Oauth2 Grails plugin initialization (doWithSpring)"
+            logger.info 'Skipped Oauth2 Grails plugin initialization (doWithSpring)'
             return {}
         }
         SpringSecurityOauth2ProviderGrailsPlugin.metaClass.getDoWithApplicationContext = { ->
-            logger.info "Skipped Oauth2 Grails plugin initialization (doWithApplicationContext)"
+            logger.info 'Skipped Oauth2 Grails plugin initialization (doWithApplicationContext)'
             return {}
         }
     }

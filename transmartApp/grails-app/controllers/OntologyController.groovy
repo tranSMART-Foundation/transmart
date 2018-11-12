@@ -31,27 +31,26 @@ class OntologyController {
 
     def showOntTagFilter = {
         def tagtypesc = []
-        tagtypesc.add("ALL")
-        def tagtypes = i2b2.OntNodeTag.executeQuery("SELECT DISTINCT o.tagtype FROM i2b2.OntNodeTag as o order by o.tagtype")
+        tagtypesc.add('ALL')
+        def tagtypes = i2b2.OntNodeTag.executeQuery('SELECT DISTINCT o.tagtype FROM i2b2.OntNodeTag as o order by o.tagtype')
         tagtypesc.addAll(tagtypes)
-        def tags = i2b2.OntNodeTag.executeQuery("SELECT DISTINCT o.tag FROM i2b2.OntNodeTag o order by o.tag")
+        def tags = i2b2.OntNodeTag.executeQuery('SELECT DISTINCT o.tag FROM i2b2.OntNodeTag o order by o.tag')
         /*WHERE o.tagtype='"+tagtypesc[0]+"'*/
-        logger.trace "${tags as JSON}"
+        logger.trace '' + tags as JSON
         render(template: 'filter', model: [tagtypes: tagtypesc, tags: tags])
     }
 
     def ajaxGetOntTagFilterTerms = {
         def tagtype = params.tagtype
-        logger.trace("calling search for tagtype:" + tagtype)
+        logger.trace('calling search for tagtype:' + tagtype)
         def tags = i2b2.OntNodeTag.executeQuery("SELECT DISTINCT o.tag FROM i2b2.OntNodeTag o WHERE o.tagtype='" + tagtype + "' order by o.tag")
-        logger.trace "${tags as JSON}"
+        logger.trace '' + tags as JSON
         render(template: 'depSelectTerm', model: [tagtype: tagtype, tags: tags])
     }
 
-    def ajaxOntTagFilter =
-            {
-                logger.trace("called ajaxOntTagFilter")
-                logger.trace("tagterm:" + params.tagterm)
+    def ajaxOntTagFilter = {
+                logger.trace('called ajaxOntTagFilter')
+                logger.trace('tagterm:' + params.tagterm)
                 def tagterm = params.tagterm
                 def ontsearchterm = params.ontsearchterm
                 def tagtype = params.tagtype
@@ -60,21 +59,19 @@ class OntologyController {
             }
 
 
-    def getInitialSecurity =
-            {
+    def getInitialSecurity = {
                 def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
-                def result = i2b2HelperService.getAccess(i2b2HelperService.getRootPathsWithTokens(), user);
+                def result = i2b2HelperService.getAccess(i2b2HelperService.getRootPathsWithTokens(), user)
                 render result as JSON
             }
-    def sectest =
-            {
-                logger.trace("KEYS:" + params.keys)
-                def keys = params.keys.toString().split(",");
-                def paths = [];
-                def access;
-                if (params.keys != "") {
+    def sectest = {
+                logger.trace('KEYS:' + params.keys)
+                def keys = params.keys.toString().split(',')
+                def paths = []
+                def access
+                if (params.keys != '') {
                     keys.each { key ->
-                        logger.debug("in LOOP")
+                        logger.debug('in LOOP')
                         paths.add(i2b2HelperService.keyToPath(key))
                     }
                     def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
@@ -118,13 +115,13 @@ class OntologyController {
 
         Experiment experiment = Experiment.findByAccession(study.id.toUpperCase())
         if (!experiment) {
-            logger.debug("No experiment entry found for ${study.id} study.")
+            logger.debug('No experiment entry found for ' + study.id + ' study.')
             return [:]
         }
 
         FmFolder folder = FmFolderAssociation.findByObjectUid(experiment.uniqueId?.uniqueId)?.fmFolder
         if (!folder) {
-            logger.debug("No fm folder found for ${study.id} study.")
+            logger.debug('No fm folder found for ' + study.id + ' study.')
             return [:]
         }
 

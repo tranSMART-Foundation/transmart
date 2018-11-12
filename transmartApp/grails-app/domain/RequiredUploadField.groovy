@@ -1,8 +1,8 @@
 public class RequiredUploadField {
 
     Long id
-    String type;
-    String field;
+    String type
+    String field
 
     static mapping = {
         table 'SEARCH_REQUIRED_UPLOAD_FIELD'

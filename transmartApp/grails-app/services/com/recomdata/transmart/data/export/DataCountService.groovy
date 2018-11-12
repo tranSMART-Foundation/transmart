@@ -21,7 +21,7 @@ class DataCountService {
     QueriesResource queriesResource
 
     //For the given list of Subjects get counts of what kind of data we have for those cohorts.
-    //We want to return a map that looks like {"PLINK": "102","RBM":"28"}
+    //We want to return a map that looks like {'PLINK': '102','RBM':'28'}
     Map getDataCounts(Long rID, Long[] resultInstanceIds) {
         checkQueryResultAccess(*resultInstanceIds)
 
@@ -31,12 +31,12 @@ class DataCountService {
         StringBuilder snpQuery = new StringBuilder()
         StringBuilder subjectsQuery = new StringBuilder()
 
-        subjectsQuery.append("SELECT DISTINCT patient_num FROM qt_patient_set_collection WHERE result_instance_id = ?")
+        subjectsQuery.append('SELECT DISTINCT patient_num FROM qt_patient_set_collection WHERE result_instance_id = ?')
                 .append(" AND patient_num IN (select patient_num from patient_dimension where sourcesystem_cd not like '%:S:%')")
 
         //Build the query we use to get the SNP data. patient_num should be unique across all studies.
-        snpQuery.append("SELECT count(distinct snp.patient_num) FROM de_subject_snp_dataset snp WHERE snp.patient_num IN (")
-                .append(subjectsQuery).append(")");
+        snpQuery.append('SELECT count(distinct snp.patient_num) FROM de_subject_snp_dataset snp WHERE snp.patient_num IN (')
+                .append(subjectsQuery).append(')')
 
         //Get the count of SNP Data for the given list of subject IDs.
         resultMap['SNP'] = StringUtils.isNotEmpty(snpQuery.toString()) && rID ?
@@ -62,19 +62,20 @@ class DataCountService {
 
     def getCountFromDB(String commandString, String rID = null) {
         //We use a groovy object to handle the DB connections.
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 
         //We will store the count results here.
-        def patientSampleCount = 0;
+        def patientSampleCount = 0
 
         //Iterate over results (Should only be 1 row) and grab the count).
         if (rID && rID?.trim() != '') {
-            sql.eachRow(commandString, [rID], { row -> patientSampleCount = row[0]; });
-        } else {
-            sql.eachRow(commandString, { row -> patientSampleCount = row[0]; });
+            sql.eachRow(commandString, [rID], { row -> patientSampleCount = row[0]; })
+        }
+        else {
+            sql.eachRow(commandString, { row -> patientSampleCount = row[0]; })
         }
 
-        return patientSampleCount;
+        return patientSampleCount
     }
 
 }

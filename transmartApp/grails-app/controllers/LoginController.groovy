@@ -40,12 +40,13 @@ class LoginController {
     def index = {
         if (springSecurityService.isLoggedIn()) {
             redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
-        } else {
-            redirect action: "auth", params: params
+        }
+        else {
+            redirect action: 'auth', params: params
         }
     }
     def forceAuth = {
-        session.invalidate();
+        session.invalidate()
         render view: 'auth', model: [postUrl: request.contextPath + SpringSecurityUtils.securityConfig.apf.filterProcessesUrl]
     }
 
@@ -55,26 +56,26 @@ class LoginController {
     def auth = {
         nocache response
 
-        def guestAutoLogin = grailsApplication.config.com.recomdata.guestAutoLogin;
+        def guestAutoLogin = grailsApplication.config.com.recomdata.guestAutoLogin
         boolean guestLoginEnabled = (guestAutoLogin == 'true' || guestAutoLogin.is(true))
-        logger.info("enable guest login: " + guestLoginEnabled)
-        //logger.info("request:"+request.getQueryString())
+        logger.info('enable guest login: ' + guestLoginEnabled)
+        //logger.info('request:'+request.getQueryString())
         boolean forcedFormLogin = request.getQueryString() != null
-        logger.info("User is forcing the form login? : " + forcedFormLogin)
+        logger.info('User is forcing the form login? : ' + forcedFormLogin)
 
         // if enabled guest and not forced login
         if (guestLoginEnabled && !forcedFormLogin) {
-            logger.info("proceeding with auto guest login")
-            def guestuser = grailsApplication.config.com.recomdata.guestUserName;
+            logger.info('proceeding with auto guest login')
+            def guestuser = grailsApplication.config.com.recomdata.guestUserName
 
             try {
                 UserDetails ud = userDetailsService.loadUserByUsername(guestuser)
-                logger.debug("We have found user: ${ud.username}")
+                logger.debug('We have found user: ' + ud.username)
                 springSecurityService.reauthenticate(ud.username)
                 redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
             }
             catch (UsernameNotFoundException e) {
-                logger.info("can not find the user:" + guestuser);
+                logger.info('can not find the user:' + guestuser)
             }
         }
 
@@ -88,7 +89,7 @@ class LoginController {
         if (springSecurityService.isLoggedIn() &&
                 authenticationTrustResolver.isRememberMe(SCH.context?.authentication)) {
             // have cookie but the page is guarded with IS_AUTHENTICATED_FULLY
-            redirect action: "full", params: params
+            redirect action: 'full', params: params
         }
     }
 
@@ -113,18 +114,20 @@ class LoginController {
         }
         if (exception) {
             if (exception instanceof AccountExpiredException) {
-                msg = g.message(code: "springSecurity.errors.login.expired")
-                new AccessLog(username: username, event: "Account Expired",
+                msg = g.message(code: 'springSecurity.errors.login.expired')
+                new AccessLog(username: username, event: 'Account Expired',
                         eventmessage: msg,
                         accesstime: new Date()).save()
-            } else if (exception instanceof CredentialsExpiredException) {
-                msg = g.message(code: "springSecurity.errors.login.passwordExpired")
-                new AccessLog(username: username, event: "Password Expired",
+            }
+            else if (exception instanceof CredentialsExpiredException) {
+                msg = g.message(code: 'springSecurity.errors.login.passwordExpired')
+                new AccessLog(username: username, event: 'Password Expired',
                         eventmessage: msg,
                         accesstime: new Date()).save()
-            } else if (exception instanceof DisabledException) {
-                msg = g.message(code: "springSecurity.errors.login.disabled")
-                new AccessLog(username: username, event: "Login Disabled",
+            }
+            else if (exception instanceof DisabledException) {
+                msg = g.message(code: 'springSecurity.errors.login.disabled')
+                new AccessLog(username: username, event: 'Login Disabled',
                         eventmessage: msg,
                         accesstime: new Date()).save()
             } else if (exception instanceof LockedException
@@ -133,20 +136,21 @@ class LoginController {
                     //That's confusion caused by the fact that spring event listener for failed attempt is triggered
                     // after user status (e.g. locked) is read by spring security.
                     || username && bruteForceLoginLockService.remainedAttempts(username) <= 0) {
-                msg = g.message(code: "springSecurity.errors.login.locked",
+                msg = g.message(code: 'springSecurity.errors.login.locked',
                         args: [ bruteForceLoginLockService.lockTimeInMinutes ])
-                new AccessLog(username: username, event: "Login Locked",
+                new AccessLog(username: username, event: 'Login Locked',
                         eventmessage: msg,
                         accesstime: new Date()).save()
-            } else {
-                msg = g.message(code: "springSecurity.errors.login.fail")
-                new AccessLog(username: username, event: "Login Failed",
+            }
+            else {
+                msg = g.message(code: 'springSecurity.errors.login.fail')
+                new AccessLog(username: username, event: 'Login Failed',
                         eventmessage: msg,
                         accesstime: new Date()).save()
             }
         }
         flash.message = msg
-        redirect action: "auth", params: params
+        redirect action: 'auth', params: params
     }
 
     /** cache controls */

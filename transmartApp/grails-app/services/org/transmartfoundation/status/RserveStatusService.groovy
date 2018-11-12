@@ -10,22 +10,22 @@ import org.rosuda.REngine.Rserve.RserveException
 
 @Slf4j('logger')
 class RserveStatusService {
-    static String SIMPLE_EXPRESSION = "rnorm(10)"
-    static String REQUIRED_PACKAGES_NAME = "required.packages";
-    static String[] REQUIRED_PACKAGES_ARRAY = ["reshape2", "ggplot2", "data.table", "Cairo",
-        "snowfall", "gplots", "Rserve", "foreach", "doParallel", "visreg",
-        "pROC", "jsonlite", "RUnit",
-        "WGCNA", "impute", "multtest", "CGHbase", "CGHtest","CGHtestpar",
-        "edgeR", "snpStats", "preprocessCore",
-        "GO.db", "AnnotationDbi", "QDNAseq"] as String[]
+    static String SIMPLE_EXPRESSION = 'rnorm(10)'
+    static String REQUIRED_PACKAGES_NAME = 'required.packages'
+    static String[] REQUIRED_PACKAGES_ARRAY = ['reshape2', 'ggplot2', 'data.table', 'Cairo',
+        'snowfall', 'gplots', 'Rserve', 'foreach', 'doParallel', 'visreg',
+        'pROC', 'jsonlite', 'RUnit',
+        'WGCNA', 'impute', 'multtest', 'CGHbase', 'CGHtest','CGHtestpar',
+        'edgeR', 'snpStats', 'preprocessCore',
+        'GO.db', 'AnnotationDbi', 'QDNAseq'] as String[]
     static String MISSING_PACKAGES_EXPRESSION =
-            "required.packages[!(required.packages %in% installed.packages()[,\"Package\"])]"
+            'required.packages[!(required.packages %in% installed.packages()[,\'Package\'])]'
 
-    def String lastErrorMessage = "";
+    def String lastErrorMessage = ''
 
     def getStatus() {
 
-        def url = Holders.config.RModules.host + ":" + Holders.config.RModules.port
+        def url = Holders.config.RModules.host + ':' + Holders.config.RModules.port
 
         def canConnect = false
         def evalSimpleExpression = false
@@ -39,9 +39,11 @@ class RserveStatusService {
                 evalSimpleExpression = willEvaluateSimpleExpression(c)
                 librariesOk = hasNecessaryDependencies(c)
             }
-        } catch (Exception e) {
-            lastErrorMessage = "Probe failed with Exception: " + e.message
-        } finally {
+        }
+        catch (Exception e) {
+            lastErrorMessage = 'Probe failed with Exception: ' + e.message
+        }
+        finally {
             if (c) closeConnection(c)
         }
 		def settings = [
@@ -58,115 +60,119 @@ class RserveStatusService {
 	}
 
     boolean connectionExists(RConnection c) {
-        lastErrorMessage = "";
+        lastErrorMessage = ''
         if (c == null){
-            lastErrorMessage = "Connection returned null";
-            return false;
+            lastErrorMessage = 'Connection returned null'
+            return false
         }
         if (!(c instanceof RConnection)) {
-            lastErrorMessage = "Connection returned unrecognized object";
-            return false;
+            lastErrorMessage = 'Connection returned unrecognized object'
+            return false
         }
-        lastErrorMessage = "";
-        return true;
+        lastErrorMessage = ''
+        return true
     }
 
     public boolean willEvaluateSimpleExpression(RConnection c) {
-        lastErrorMessage = "";
+        lastErrorMessage = ''
 
         def d
 
-        REXP results = evaluate(c,SIMPLE_EXPRESSION);
+        REXP results = evaluate(c,SIMPLE_EXPRESSION)
         if (results == null) {
-            lastErrorMessage = "Probe = simple expression; returned null";
-            return false;
+            lastErrorMessage = 'Probe = simple expression; returned null'
+            return false
         }
         try {
-            d = evaluate(c,SIMPLE_EXPRESSION).asDoubles();
-        } catch (REXPMismatchException e) {
-            System.out.println(e.getLocalizedMessage());
-            lastErrorMessage = "Probe = simple expression; exception = " + e.getLocalizedMessage();
-            return false;
+            d = evaluate(c,SIMPLE_EXPRESSION).asDoubles()
+        }
+        catch (REXPMismatchException e) {
+            System.out.println(e.getLocalizedMessage())
+            lastErrorMessage = 'Probe = simple expression; exception = ' + e.getLocalizedMessage()
+            return false
         }
         if (d.length == 10) {
-            lastErrorMessage = "";
-            return true;
+            lastErrorMessage = ''
+            return true
         }
-        lastErrorMessage = "Probe = simple expression; wrong returned value.";
-        return false;
+        lastErrorMessage = 'Probe = simple expression; wrong returned value.'
+        return false
     }
 
     public boolean hasNecessaryDependencies(RConnection c) {
-        lastErrorMessage = "";
+        lastErrorMessage = ''
 
-        List<String> list = determineMissingPackages(c);
+        List<String> list = determineMissingPackages(c)
         if (list == null) {
             // determineMissingPackages will have set lastErrorMessage
-            logger.debug("Return from hasNecessaryDependencies because missing packages array is null");
-            return false;
+            logger.debug('Return from hasNecessaryDependencies because missing packages array is null')
+            return false
         }
 
-        boolean ok = (list.size() == 0);
+        boolean ok = (list.size() == 0)
 
         if (!ok) {
-            logger.debug("list of dependencies is not empty: ${list}");
-            logger.debug("lastErrorMessage from determineMissingPackages: ${lastErrorMessage}");
-            lastErrorMessage = "Packages not found: ${list}";
+            logger.debug('list of dependencies is not empty: ' + list)
+            logger.debug('lastErrorMessage from determineMissingPackages: ' + lastErrorMessage)
+            lastErrorMessage = 'Packages not found: ' + list
         }
 
-        return ok;
+        return ok
     }
 
     public List<String> determineMissingPackages(RConnection c) {
-        lastErrorMessage = "";
+        lastErrorMessage = ''
         try {
-            c.assign(REQUIRED_PACKAGES_NAME,REQUIRED_PACKAGES_ARRAY);
-        } catch (REngineException e) {
-            logger.debug("Return from determineMissingPackages because assignment failed!");
-            logger.debug("  " + e.getLocalizedMessage());
-            lastErrorMessage = "exception in assignment of required packages: " + e.getLocalizedMessage();
-            return null;
+            c.assign(REQUIRED_PACKAGES_NAME,REQUIRED_PACKAGES_ARRAY)
         }
-        String[] array = new String[0];
-        REXP results = evaluate(c,MISSING_PACKAGES_EXPRESSION);
+        catch (REngineException e) {
+            logger.debug('Return from determineMissingPackages because assignment failed!')
+            logger.debug('  ' + e.getLocalizedMessage())
+            lastErrorMessage = 'exception in assignment of required packages: ' + e.getLocalizedMessage()
+            return null
+        }
+        String[] array = new String[0]
+        REXP results = evaluate(c,MISSING_PACKAGES_EXPRESSION)
         if (results != null) { // null may be returned when expression returns null - Character(0)
             try {
-                array = results.asStrings();
-            } catch (REXPMismatchException e) {
-                logger.debug("Return from determineMissingPackages because conversion of package array failed!");
-                logger.debug("  " + e.getLocalizedMessage());
-                lastErrorMessage = "Exception in converting results to an String array: " + e.getLocalizedMessage();
-                return null;
+                array = results.asStrings()
+            }
+            catch (REXPMismatchException e) {
+                logger.debug('Return from determineMissingPackages because conversion of package array failed!')
+                logger.debug('  ' + e.getLocalizedMessage())
+                lastErrorMessage = 'Exception in converting results to an String array: ' + e.getLocalizedMessage()
+                return null
             }
         }
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<String>()
         for (String name: array) {
-            list.add(name);
+            list.add(name)
         }
-        lastErrorMessage = "";
-        return list;
+        lastErrorMessage = ''
+        return list
     }
 
     public void closeConnection(RConnection c){
-        if (c == null) return;
-        c.close();
-        c = null;
+        if (c == null) return
+        c.close()
+        c = null
     }
 
     private REXP evaluate(RConnection c,String expression) {
-        REXP results = null;
+        REXP results = null
         if (c != null) {
             try {
-                results = c.eval(expression);
-            } catch (RserveException e) {
-                results = null;
+                results = c.eval(expression)
+            }
+            catch (RserveException e) {
+                results = null
             }
         }
-        return results;
+        return results
     }
 
     String getLastErrorMessage(){
-        return lastErrorMessage;
+        return lastErrorMessage
     }
 
 }

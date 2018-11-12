@@ -36,7 +36,7 @@ class DataExportService {
         def checkboxList = jobDataMap.get('checkboxList')
         if ((checkboxList.getClass().isArray() && checkboxList?.length == 0) ||
                 (checkboxList instanceof List && checkboxList?.isEmpty())) {
-            throw new Exception("Please select the data to Export.");
+            throw new Exception('Please select the data to Export.')
         }
         def jobTmpDirectory = jobDataMap.jobTmpDirectory
         def resultInstanceIdMap = jobDataMap.result_instance_ids
@@ -76,7 +76,7 @@ class DataExportService {
                 }
 
                 //Pull the data pivot parameter out of the data map.
-                def pivotDataValueDef = jobDataMap.get("pivotData")
+                def pivotDataValueDef = jobDataMap.get('pivotData')
                 boolean pivotData = new Boolean(true)
                 if (pivotDataValueDef == false) pivotData = new Boolean(false)
                 if (resultInstanceIdMap[subset]) {
@@ -93,13 +93,13 @@ class DataExportService {
                                 )
                                 break
                             case highDimensionResourceService.knownTypes:
-                                logger.info "Exporting " + selectedFile + " using core api"
+                                logger.info 'Exporting ' + selectedFile + ' using core api'
 
                                 // For now we ignore the information about the platforms to 
                                 // export. All data that matches the selected concepts
                                 // is exported
                                 highDimDataTypes[subset][selectedFile].keySet().each { format ->
-                                    logger.info "  Using format " + format
+                                    logger.info '  Using format ' + format
                                     retVal = highDimExportService.exportHighDimData(jobName: jobDataMap.jobName,
                                             resultInstanceId: resultInstanceIdMap[subset],
                                             conceptKeys: selection[subset][selectedFile].selector,
@@ -108,141 +108,142 @@ class DataExportService {
                                             studyDir: studyDir
                                     )
                                 }
-                                logger.info "Exported " + selectedFile + " using core api"
+                                logger.info 'Exported ' + selectedFile + ' using core api'
 
                                 //filesDoneMap is used for building the Clinical Data query
                                 filesDoneMap.put('MRNA.TXT', new Boolean(true))
-                                break;
-                            case "MRNA_DETAILED.TXT":
+                                break
+                            case 'MRNA_DETAILED.TXT':
                                 //We need to grab some inputs from the jobs data map.
-                                def pathway = jobDataMap.get("gexpathway")
-                                def timepoint = jobDataMap.get("gextime")
-                                def sampleType = jobDataMap.get("gexsample")
-                                def tissueType = jobDataMap.get("gextissue")
-                                def gplString = jobDataMap.get("gexgpl")
+                                def pathway = jobDataMap.get('gexpathway')
+                                def timepoint = jobDataMap.get('gextime')
+                                def sampleType = jobDataMap.get('gexsample')
+                                def tissueType = jobDataMap.get('gextissue')
+                                def gplString = jobDataMap.get('gexgpl')
 
-                                if (tissueType == ",") tissueType = ""
-                                if (sampleType == ",") sampleType = ""
-                                if (timepoint == ",") timepoint = ""
+                                if (tissueType == ',') tissueType = ''
+                                if (sampleType == ',') sampleType = ''
+                                if (timepoint == ',') timepoint = ''
 
                                 if (gplIds != null) {
-                                    gplIds = gplString.tokenize(",")
-                                } else {
+                                    gplIds = gplString.tokenize(',')
+                                }
+                                else {
                                     gplIds = []
                                 }
 
                                 //adding String to a List to make it compatible to the type expected
                                 //if gexgpl contains multiple gpl(s) as single string we need to convert that to a list
 
-                                retVal = geneExpressionDataService.getData(studyList, studyDir, "mRNA.trans", jobDataMap.get("jobName"), resultInstanceIdMap[subset], pivotData, gplIds, pathway, timepoint, sampleType, tissueType, true)
-                                if (jobDataMap.get("analysis") != "DataExport") {
+                                retVal = geneExpressionDataService.getData(studyList, studyDir, 'mRNA.trans', jobDataMap.get('jobName'), resultInstanceIdMap[subset], pivotData, gplIds, pathway, timepoint, sampleType, tissueType, true)
+                                if (jobDataMap.get('analysis') != 'DataExport') {
                                     //if geneExpressionDataService was not able to find data throw an exception.
                                     if (!retVal) {
-                                        throw new DataNotFoundException("There are no patients that meet the criteria selected therefore no gene expression data was returned.")
+                                        throw new DataNotFoundException('There are no patients that meet the criteria selected therefore no gene expression data was returned.')
                                     }
                                 }
-                                break;
-                            case "ACGH_REGIONS.TXT":
+                                break
+                            case 'ACGH_REGIONS.TXT':
                                 if (studyList.size() != 1) {
-                                    throw new Exception("Only one study " +
-                                            "allowed per analysis; list given" +
-                                            " was : " + studyList);
+                                    throw new Exception('Only one study ' +
+                                            'allowed per analysis; list given' +
+                                            ' was : ' + studyList)
                                 }
                                 this.ACGHDataService.writeRegions(
                                         studyList[0],
                                         studyDir,
                                         'regions.txt',
-                                        jobDataMap.get("jobName"),
+                                        jobDataMap.get('jobName'),
                                         resultInstanceIdMap[subset]
                                         /* currently the interface does not allow filtering,
                                            so don't implement it here was well
                                          */
                                 )
-                                break;
-                            case "RNASEQ.TXT":
+                                break
+                            case 'RNASEQ.TXT':
                                 if (studyList.size() != 1) {
-                                    throw new Exception("Only one study " +
-                                            "allowed per analysis; list given" +
-                                            " was : " + studyList);
+                                    throw new Exception('Only one study ' +
+                                            'allowed per analysis; list given' +
+                                            ' was : ' + studyList)
                                 }
                                 this.RNASeqDataService.writeRegions(
                                         studyList[0],
                                         studyDir,
                                         'RNASeq.txt',
-                                        jobDataMap.get("jobName"),
+                                        jobDataMap.get('jobName'),
                                         resultInstanceIdMap[subset]
                                         /* currently the interface does not allow filtering,
                                            so don't implement it here was well
                                          */
                                 )
-                                break;
-                            case "MRNA.CEL":
-                                geneExpressionDataService.downloadCELFiles(resultInstanceIdMap[subset], studyList, studyDir, jobDataMap.get("jobName"), null, null, null, null)
-                                break;
-                            case "GSEA.GCT & .CLS":
-                                geneExpressionDataService.getGCTAndCLSData(studyList, studyDir, "mRNA.GCT", jobDataMap.get("jobName"), resultInstanceIdMap, pivotData, gplIds)
-                                break;
-                            case "SNP.PED, .MAP & .CNV":
-                                retVal = snpDataService.getData(studyDir, "snp.trans", jobDataMap.get("jobName"), resultInstanceIdMap[subset])
-                                snpDataService.getDataByPatientByProbes(studyDir, resultInstanceIdMap[subset], jobDataMap.get("jobName"))
-                                break;
-                            case "SNP.CEL":
-                                snpDataService.downloadCELFiles(studyList, studyDir, resultInstanceIdMap[subset], jobDataMap.get("jobName"))
-                                break;
-                            case "SNP.TXT":
+                                break
+                            case 'MRNA.CEL':
+                                geneExpressionDataService.downloadCELFiles(resultInstanceIdMap[subset], studyList, studyDir, jobDataMap.get('jobName'), null, null, null, null)
+                                break
+                            case 'GSEA.GCT & .CLS':
+                                geneExpressionDataService.getGCTAndCLSData(studyList, studyDir, 'mRNA.GCT', jobDataMap.get('jobName'), resultInstanceIdMap, pivotData, gplIds)
+                                break
+                            case 'SNP.PED, .MAP & .CNV':
+                                retVal = snpDataService.getData(studyDir, 'snp.trans', jobDataMap.get('jobName'), resultInstanceIdMap[subset])
+                                snpDataService.getDataByPatientByProbes(studyDir, resultInstanceIdMap[subset], jobDataMap.get('jobName'))
+                                break
+                            case 'SNP.CEL':
+                                snpDataService.downloadCELFiles(studyList, studyDir, resultInstanceIdMap[subset], jobDataMap.get('jobName'))
+                                break
+                            case 'SNP.TXT':
                                 //In this case we need to get a file with Patient ID, Probe ID, Gene, Genotype, Copy Number
                                 //We need to grab some inputs from the jobs data map.
-                                def pathway = jobDataMap.get("snppathway")
-                                def sampleType = jobDataMap.get("snpsample")
-                                def timepoint = jobDataMap.get("snptime")
-                                def tissueType = jobDataMap.get("snptissue")
+                                def pathway = jobDataMap.get('snppathway')
+                                def sampleType = jobDataMap.get('snpsample')
+                                def timepoint = jobDataMap.get('snptime')
+                                def tissueType = jobDataMap.get('snptissue')
 
                                 //This object will be our row processor which handles the writing to the SNP text file.
                                 SnpData snpData = new SnpData()
                                 //Construct the path that we create the SNP file on.
-                                def SNPFolderLocation = jobTmpDirectory + File.separator + "subset1_${study}" + File.separator + "SNP" + File.separator
+                                def SNPFolderLocation = jobTmpDirectory + File.separator + 'subset1_' + study + File.separator + 'SNP' + File.separator
                                 //Make sure the directory we want to write the file to is created.
                                 def snpDir = new File(SNPFolderLocation)
                                 snpDir.mkdir()
                                 //This is the exact path of the file to write.
-                                def fileLocation = jobTmpDirectory + File.separator + "subset1_${study}" + File.separator + "SNP" + File.separator + "snp.trans"
+                                def fileLocation = jobTmpDirectory + File.separator + 'subset1_' + study + File.separator + 'SNP' + File.separator + 'snp.trans'
                                 //Call our service which writes the SNP data to a file.
                                 Boolean gotData = snpDataService.getSnpDataByResultInstanceAndGene(resultInstanceIdMap[subset], study, pathway, sampleType, timepoint, tissueType, snpData, fileLocation, true, true)
-                                if (jobDataMap.get("analysis") != "DataExport") {
+                                if (jobDataMap.get('analysis') != 'DataExport') {
                                     //if SNPDataService was not able to find data throw an exception.
                                     if (!gotData) {
-                                        throw new DataNotFoundException("There are no patients that meet the criteria selected therefore no SNP data was returned.")
+                                        throw new DataNotFoundException('There are no patients that meet the criteria selected therefore no SNP data was returned.')
                                     }
                                 }
-                                break;
-                            case "ADDITIONAL":
-                                additionalDataService.downloadFiles(resultInstanceIdMap[subset], studyList, studyDir, jobDataMap.get("jobName"))
-                                break;
-                            case "IGV.VCF":
+                                break
+                            case 'ADDITIONAL':
+                                additionalDataService.downloadFiles(resultInstanceIdMap[subset], studyList, studyDir, jobDataMap.get('jobName'))
+                                break
+                            case 'IGV.VCF':
 
-                                def selectedGenes = jobDataMap.get("selectedGenes")
-                                def chromosomes = jobDataMap.get("chroms")
-                                def selectedSNPs = jobDataMap.get("selectedSNPs")
+                                def selectedGenes = jobDataMap.get('selectedGenes')
+                                def chromosomes = jobDataMap.get('chroms')
+                                def selectedSNPs = jobDataMap.get('selectedSNPs')
 
-                                logger.trace("VCF Parameters")
-                                logger.trace("selectedGenes:" + selectedGenes)
-                                logger.trace("chromosomes:" + chromosomes)
-                                logger.trace("selectedSNPs:" + selectedSNPs)
+                                logger.trace('VCF Parameters')
+                                logger.trace('selectedGenes:' + selectedGenes)
+                                logger.trace('chromosomes:' + chromosomes)
+                                logger.trace('selectedSNPs:' + selectedSNPs)
 
-                                //def IGVFolderLocation = jobTmpDirectory + File.separator + "subset1_${study}" + File.separator + "VCF" + File.separator
+                                //def IGVFolderLocation = jobTmpDirectory + File.separator + 'subset1_' + study + File.separator + 'VCF' + File.separator
 
                                 //
-                                //	def outputDir = "/users/jliu/tmp"
-                                def outputDir = grailsApplication.config.com.recomdata.analysis.data.file.dir;
-                                def webRootName = jobDataMap.get("appRealPath");
+                                //	def outputDir = '/users/jliu/tmp'
+                                def outputDir = grailsApplication.config.com.recomdata.analysis.data.file.dir
+                                def webRootName = jobDataMap.get('appRealPath')
                                 if (webRootName.endsWith(File.separator) == false)
-                                    webRootName += File.separator;
-                                outputDir = webRootName + outputDir;
-                                def prefix = "S1"
+                                    webRootName += File.separator
+                                outputDir = webRootName + outputDir
+                                def prefix = 'S1'
                                 if ('subset2' == subset)
-                                    prefix = "S2"
-                                vcfDataService.getDataAsFile(outputDir, jobDataMap.get("jobName"), null, resultInstanceIdMap[subset], selectedSNPs, selectedGenes, chromosomes, prefix);
-                                break;
+                                    prefix = 'S2'
+                                vcfDataService.getDataAsFile(outputDir, jobDataMap.get('jobName'), null, resultInstanceIdMap[subset], selectedSNPs, selectedGenes, chromosomes, prefix)
+                                break
                         }
                     }
                 }

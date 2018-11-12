@@ -41,15 +41,16 @@ class ACGHDataService {
         def projection = acghResource.createProjection([:], 'acgh_values')
 
         def result,
-            writerUtil;
+            writerUtil
 
         try {
             /* dataType == 'aCGH' => file created in a subdir w/ that name */
             writerUtil = new FileWriterUtil(studyDir, fileName, jobName, 'aCGH',
-                    null, "\t" as char)
+                    null, '\t' as char)
             result = acghResource.retrieveData assayConstraints, [], projection
             doWithResult(result, writerUtil)
-        } finally {
+        }
+        finally {
             writerUtil?.finishWriting()
             result?.close()
         }

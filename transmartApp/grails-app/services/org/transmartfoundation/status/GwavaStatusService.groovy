@@ -10,13 +10,13 @@ import java.net.URLConnection
 
 class GwavaStatusService {
 
-    def errorMessage = ""
+    def errorMessage = ''
 
     def getStatus() {
 
         def urlString = Holders.config.com.recomdata.rwg.webstart.codebase
         def enabled = isGwavaEnabled()
-        def canConnect = canConnect(urlString);
+        def canConnect = canConnect(urlString)
 
         def settings = [
                 'url'                   : urlString,
@@ -31,27 +31,30 @@ class GwavaStatusService {
     }
 
     def isGwavaEnabled() {
-        return !!Holders.config.com.recomdata.rwg.webstart.transmart.url;
+        return !!Holders.config.com.recomdata.rwg.webstart.transmart.url
     }
 
     def canConnect(urlString) {
-        errorMessage = "URL did not respond"
+        errorMessage = 'URL did not respond'
         boolean sawText = false
         URL gwava
         try {
             gwava = new URL(urlString)
             gwava.eachLine {line ->
-                errorMessage = ""
-                if (line.contains("GWAVA QuickStart")) {
-                    sawText = true;
+                errorMessage = ''
+                if (line.contains('GWAVA QuickStart')) {
+                    sawText = true
                 }
             }
-        } catch (MalformedURLException e) {
-            errorMessage = "MalformedURLException: " + e.message
-        } catch (IOException e1) {
-            errorMessage = "IOException: " + e1.message
-        } catch (Exception ex) {
-            errorMessage = "Unexpected error: " + ex.message
+        }
+        catch (MalformedURLException e) {
+            errorMessage = 'MalformedURLException: ' + e.message
+        }
+        catch (IOException e1) {
+            errorMessage = 'IOException: ' + e1.message
+        }
+        catch (Exception ex) {
+            errorMessage = 'Unexpected error: ' + ex.message
         }
         return sawText
     }

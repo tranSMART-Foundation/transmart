@@ -48,15 +48,16 @@ class RNASeqDataService {
         def projection = rnaSeqResource.createProjection([:], 'rnaseq_values')
 
         def result,
-            writerUtil;
+            writerUtil
 
         try {
             /* dataType == 'RNASeq' => file created in a subdir w/ that name */
             writerUtil = new FileWriterUtil(studyDir, fileName, jobName, 'RNASeq',
-                    null, "\t" as char)
+                    null, '\t' as char)
             result = rnaSeqResource.retrieveData assayConstraints, [], projection
             doWithResult(result, writerUtil)
-        } finally {
+        }
+        finally {
             writerUtil?.finishWriting()
             result?.close()
         }
@@ -104,7 +105,7 @@ class RNASeqDataService {
 	List<String> r = ([] + HEADER_NAMES) as List
 
 	for (AssayColumn assay in assays) {
-		r << readcount + "." + assay.patientInTrialId
+		r << readcount + '.' + assay.patientInTrialId
 	}
 
 	r as String[]

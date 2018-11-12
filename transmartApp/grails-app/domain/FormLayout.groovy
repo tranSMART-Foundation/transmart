@@ -1,12 +1,12 @@
 public class FormLayout {
 
     Long id
-    String key;
-    String column;
-    String displayName;
-    String dataType;
-    Integer sequence;
-    Boolean display = true;
+    String key
+    String column
+    String displayName
+    String dataType
+    Integer sequence
+    Boolean display = true
 
     static mapping = {
         table 'SEARCH_FORM_LAYOUT'

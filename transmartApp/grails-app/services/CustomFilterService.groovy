@@ -25,7 +25,7 @@ class CustomFilterService {
 
     def saveCustomFilter(customFilter) {
 
-        CustomFilter.save();
+        CustomFilter.save()
 
     }
 

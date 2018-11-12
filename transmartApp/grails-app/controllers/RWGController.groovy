@@ -28,31 +28,33 @@ class RWGController {
 
     def index = {
 
-        def exportList = session['export'];
+        def exportList = session['export']
 
-        def rwgSearchFilter = session['rwgSearchFilter'];
+        def rwgSearchFilter = session['rwgSearchFilter']
         if (rwgSearchFilter) {
-            rwgSearchFilter = rwgSearchFilter.join(",,,")
-        } else {
-            rwgSearchFilter = "";
+            rwgSearchFilter = rwgSearchFilter.join(',,,')
+        }
+        else {
+            rwgSearchFilter = ''
         }
 
-        def rwgSearchOperators = session['rwgSearchOperators'];
+        def rwgSearchOperators = session['rwgSearchOperators']
         if (rwgSearchOperators) {
-            rwgSearchOperators = rwgSearchOperators.join(";")
-        } else {
-            rwgSearchOperators = "";
+            rwgSearchOperators = rwgSearchOperators.join(';')
+        }
+        else {
+            rwgSearchOperators = ''
         }
 
-        def globalOperator = session['globalOperator'];
-        def searchCategory = session['searchCategory'];
+        def globalOperator = session['globalOperator']
+        def searchCategory = session['searchCategory']
 
-        return [rwgSearchFilter: rwgSearchFilter, rwgSearchOperators: rwgSearchOperators, globalOperator: globalOperator, rwgSearchCategory: searchCategory, exportCount: exportList?.size(), debug: params.debug];
+        return [rwgSearchFilter: rwgSearchFilter, rwgSearchOperators: rwgSearchOperators, globalOperator: globalOperator, rwgSearchCategory: searchCategory, exportCount: exportList?.size(), debug: params.debug]
     }
 
     def ajaxWelcome = {
         //add a unused model to be able to use the template
-        render(template: 'welcome', model: [page: "RWG"]);
+        render(template: 'welcome', model: [page: "RWG"])
     }
 
     def searchLog = {
@@ -61,7 +63,7 @@ class RWGController {
 
     def updateSearchCategory = {
         session['searchCategory'] = params.id
-        render(status: 200, text: "OK")
+        render(status: 200, text: 'OK')
     }
 
     /**
@@ -80,7 +82,7 @@ class RWGController {
     /**
      * Add a new node to the taxonomy Dynatree (and recursively add children if any exist).
      * parentNode: Node to add to tree
-     * json: JSON array containing the "children" of the jQuery dynaTree
+     * json: JSON array containing the 'children' of the jQuery dynaTree
      * isCategory: boolean indicating whether the node being added is a category
      * categoryName: name of the category (i.e. as stored in database and displayed in tree)
      * uniqueTreeId: unique identifier for the node being added. This ill be a concatenation of the parent's unique id + the index of this child's index in children list
@@ -97,7 +99,7 @@ class RWGController {
         def parent = [:]
 
         // create a custom attribute for term name
-        parent["termName"] = parentNode.termName
+        parent['termName'] = parentNode.termName
 
         // generate the id for use in tree and for link to active terms
         // if there is a link to an active term, use that as id (i.e. search_keyword_id)
@@ -105,38 +107,40 @@ class RWGController {
         def id
         if (parentNode.searchKeywordId) {
             id = parentNode.searchKeywordId
-        } else {
+        }
+        else {
             id = 'X' + parentNode.id
         }
-        parent["id"] = id
+        parent['id'] = id
 
         // create the key that matches what we use in javascript to identify search terms
         // assuming for now that the category and the category display are the same (with category being all caps); may
         // need to break this out into separate fields
-        parent["key"] = categoryName + "|" + categoryName.toUpperCase() + ";" + parentNode.termName + ";" + id
+        parent['key'] = categoryName + '|' + categoryName.toUpperCase() + ';' + parentNode.termName + ';' + id
 
         // if category, then display as folder and don't show checkbox; other levels, not a folder and show checkbox
-        parent["isFolder"] = isCategory
-        parent["hideCheckbox"] = isCategory
+        parent['isFolder'] = isCategory
+        parent['hideCheckbox'] = isCategory
 
         // add custom attributes for each node
-        parent["isCategory"] = isCategory
-        parent["categoryName"] = categoryName + "|" + categoryName.toUpperCase()
+        parent['isCategory'] = isCategory
+        parent['categoryName'] = categoryName + '|' + categoryName.toUpperCase()
 
         // create a uniqueTreeId for each node so we can identify it from it's copies
         //  (id and key are not unique amongst copies)
-        parent["uniqueTreeId"] = uniqueTreeId
+        parent['uniqueTreeId'] = uniqueTreeId
 
         // Create custom attributes for the facet count for this node, and one for the initial facet
         //   count which will be used to save the value when the tree gets cleared so we don't have to requery
         // Set to -1 for category nodes
         if (isCategory) {
-            parent["facetCount"] = -1
-            parent["initialFacetCount"] = -1
+            parent['facetCount'] = -1
+            parent['initialFacetCount'] = -1
 
             //title is same as term name for categories
-            parent["title"] = parentNode.termName
-        } else {
+            parent['title'] = parentNode.termName
+        }
+        else {
             // get the json object for the category
             JSONObject jo = (JSONObject) initialFacetCounts.get(getSOLRCategoryName(categoryName))
 
@@ -148,12 +152,13 @@ class RWGController {
             int count
             if (jo.has(idString)) {
                 count = jo.getInt(idString)
-            } else {
+            }
+            else {
                 count = 0
             }
 
-            parent["facetCount"] = count
-            parent["initialFacetCount"] = count
+            parent['facetCount'] = count
+            parent['initialFacetCount'] = count
 
             // if the initial count is zero, don't add to tree
             if (count == 0) {
@@ -161,14 +166,14 @@ class RWGController {
             }
 
             // include facet count in title for non-category nodes
-            parent["title"] = /${parentNode.termName} (${count})/
+            parent['title'] = /${parentNode.termName} (${count})/
         }
 
         def childIndex = 1
         if (parentNode.children) {
             // recursively add each child
             for (childNode in parentNode.children) {
-                addDynaNode(childNode, children, false, categoryName, uniqueTreeId + ";" + childIndex, initialFacetCounts)
+                addDynaNode(childNode, children, false, categoryName, uniqueTreeId + ';' + childIndex, initialFacetCounts)
                 childIndex++
             }
         }
@@ -180,18 +185,18 @@ class RWGController {
         }
 
         // add children to parent map
-        parent["children"] = children
+        parent['children'] = children
 
         // add parent map to json array
         json.put(parent)
     }
 
     /*
-    * Create the JSON string used as the "children" of the taxonomy DynaTree
+    * Create the JSON string used as the 'children' of the taxonomy DynaTree
     */
     def getDynatree = {
 
-        render("Not implemented");
+        render('Not implemented')
 
     }
 
@@ -209,25 +214,25 @@ class RWGController {
         for (p in params) {
 
             // each queryParam is in form cat1:term1|term2|term3
-            String category = p.split(";")[0]
-            String termList = p.split(";")[1]
+            String category = p.split(';')[0]
+            String termList = p.split(';')[1]
 
             // add all the genes from a gene list/sig to the List of genes
             if (category == 'GENELIST' || category == 'GENESIG') {
-                for (t in termList.tokenize("|")) {
+                for (t in termList.tokenize('|')) {
 
                     // create the paramter list for the hibernate query (need to convert the id explicitly to long)
                     def queryParams = [:]
                     Long l = t.toLong()
-                    queryParams["tid"] = l
+                    queryParams['tid'] = l
 
-                    def geneKeywords = SearchKeyword.executeQuery("select k_gsi.id " +
-                            " from org.transmart.searchapp.SearchKeyword k_gs, org.transmart.searchapp.GeneSignature gs," +
-                            " org.transmart.searchapp.GeneSignatureItem gsi, org.transmart.searchapp.SearchKeyword k_gsi " +
-                            " where k_gs.bioDataId = gs.id " +
-                            " and gs.id = gsi.geneSignature " +
-                            " and gsi.bioMarker = k_gsi.bioDataId" +
-                            " and k_gs.id = :tid ", queryParams)
+                    def geneKeywords = SearchKeyword.executeQuery('select k_gsi.id ' +
+                            ' from org.transmart.searchapp.SearchKeyword k_gs, org.transmart.searchapp.GeneSignature gs,' +
+                            ' org.transmart.searchapp.GeneSignatureItem gsi, org.transmart.searchapp.SearchKeyword k_gsi ' +
+                            ' where k_gs.bioDataId = gs.id ' +
+                            ' and gs.id = gsi.geneSignature ' +
+                            ' and gsi.bioMarker = k_gsi.bioDataId' +
+                            ' and k_gs.id = :tid ', queryParams)
 
                     // loop through each keyword for the gene list items and add to list
                     geneKeywords.each {
@@ -241,21 +246,21 @@ class RWGController {
             }
             // add all the genes from a pathway to the List of genes
             else if (category == 'PATHWAY') {
-                for (t in termList.tokenize("|")) {
+                for (t in termList.tokenize('|')) {
 
                     // create the parameter list for the hibernate query (need to convert the id explicitly to long)
                     def queryParams = [:]
                     Long l = t.toLong()
-                    queryParams["tid"] = l
-                    def geneKeywords = SearchKeyword.executeQuery("select k_gene.id " +
-                            " from org.transmart.searchapp.SearchKeyword k_pathway, org.transmart.biomart.BioMarkerCorrelationMV b," +
-                            " org.transmart.searchapp.SearchKeyword k_gene " +
+                    queryParams['tid'] = l
+                    def geneKeywords = SearchKeyword.executeQuery('select k_gene.id ' +
+                            ' from org.transmart.searchapp.SearchKeyword k_pathway, org.transmart.biomart.BioMarkerCorrelationMV b,' +
+                            ' org.transmart.searchapp.SearchKeyword k_gene ' +
                             " where b.correlType = 'PATHWAY GENE' " +
-                            " and b.bioMarkerId = k_pathway.bioDataId " +
+                            ' and b.bioMarkerId = k_pathway.bioDataId ' +
                             " and k_pathway.dataCategory = 'PATHWAY' " +
-                            " and b.assoBioMarkerId = k_gene.bioDataId " +
+                            ' and b.assoBioMarkerId = k_gene.bioDataId ' +
                             " and k_gene.dataCategory = 'GENE' " +
-                            " and k_pathway.id = :tid ", queryParams)
+                            ' and k_pathway.id = :tid ', queryParams)
 
                     // loop through each keyword for the gene list items and add to list
                     geneKeywords.each {
@@ -269,23 +274,24 @@ class RWGController {
             }
             // add all the individual genes to the List of genes
             else if (category == 'PROTEIN') {
-                for (t in termList.tokenize("|")) {
+                for (t in termList.tokenize('|')) {
                     genesList.add t
                 }
             }
             // add all the individual genes to the List of genes
             else if (category == 'GENE') {
-                for (t in termList.tokenize("|")) {
+                for (t in termList.tokenize('|')) {
                     genesList.add t
                 }
-            } else {
+            }
+            else {
                 // create the new params with everything that is not a gene or list
                 newParams.add p
             }
         }
 
         // create the new string to be used for genes and lists/sigs and add back to params
-        def newGeneString = ""
+        def newGeneString = ''
 
         if (genesList.size > 0) {
             newGeneString = /${genesField}:${genesList.join('|')}/
@@ -293,15 +299,15 @@ class RWGController {
             //newParams.add newGeneString
         }
 
-        logger.info("Gene parameter: ${newParams}")
+        logger.info('Gene parameter: ' + newParams)
         return newParams
     }
 
     //Just clear the search filter and render non-null back
     def clearSearchFilter = {
-        session['rwgSearchFilter'] = [:];
-        session['rwgSearchOperators'] = [:];
-        render(text: "OK")
+        session['rwgSearchFilter'] = [:]
+        session['rwgSearchOperators'] = [:]
+        render(text: 'OK')
     }
 
     /**
@@ -321,21 +327,21 @@ class RWGController {
         def searchOperatorsString = params.searchOperators
         def globalOperator = params.globaloperator
 
-        def searchTerms = searchString?.split(",,,")
-        if (searchTerms != null && searchTerms[0] == "") {
-            searchTerms = null;
+        def searchTerms = searchString?.split(',,,')
+        if (searchTerms != null && searchTerms[0] == '') {
+            searchTerms = null
         }
 
-        def searchOperators = searchOperatorsString?.split(";")
-        if (searchOperators != null && searchOperators[0] == "") {
-            searchOperators = null;
+        def searchOperators = searchOperatorsString?.split(';')
+        if (searchOperators != null && searchOperators[0] == '') {
+            searchOperators = null
         }
 
         session['rwgSearchFilter'] = searchTerms
         session['rwgSearchOperators'] = searchOperators
         session['globalOperator'] = globalOperator
         session['geneFilter'] = []
-        def searchLog = ["Starting a new search"]
+        def searchLog = ['Starting a new search']
 
         /*
          * Pre-processing
@@ -351,21 +357,22 @@ class RWGController {
 
         //Separate gene-related search terms into gene groups.
         //Always set geneOperator if this is a gene search term - the last one is the one we want to use.
-        def geneOperator = "or"
+        def geneOperator = 'or'
         for (categoryLine in categorizedSearchTerms) {
-            def operator = ((String) categoryLine).split("::")[1].toUpperCase()
-            def category = ((String) categoryLine).split("::")[0]
+            def operator = ((String) categoryLine).split('::')[1].toUpperCase()
+            def category = ((String) categoryLine).split('::')[0]
 
-            def categoryName = ((String) category).split(":", 2)[0]
-            def termList = ((String) category).split(":", 2)[1].split("\\|")
+            def categoryName = ((String) category).split(':', 2)[0]
+            def termList = ((String) category).split(':', 2)[1].split('\\|')
 
-            if (categoryName.equals("GENE")) {
+            if (categoryName.equals('GENE')) {
                 //Easy - get each term and add them as gene groups of 1
                 for (term in termList) {
                     geneGroups.add([term])
                 }
                 geneOperator = operator
-            } else if (categoryName.equals("GENELIST") || categoryName.equals("GENESIG")) {
+            }
+            else if (categoryName.equals('GENELIST') || categoryName.equals('GENESIG')) {
                 for (t in termList) {
                     def expandedList = geneSignatureService.expandGeneList(t)
                     if (expandedList) {
@@ -373,7 +380,8 @@ class RWGController {
                     }
                 }
                 geneOperator = operator
-            } else if (categoryName.equals("PATHWAY")) {
+            }
+            else if (categoryName.equals('PATHWAY')) {
                 for (t in termList) {
                     def expandedList = geneSignatureService.expandPathway(t)
                     if (expandedList) {
@@ -382,7 +390,8 @@ class RWGController {
                 }
                 geneOperator = operator
 
-            } else {
+            }
+            else {
                 processedSearchTerms.add(categoryLine)
             }
         }
@@ -391,16 +400,16 @@ class RWGController {
         if (geneGroups) {
             def geneGroupStrings = []
             for (group in geneGroups) {
-                geneGroupStrings += group.join("/")
+                geneGroupStrings += group.join('/')
             }
-            def newGeneCategory = "GENE:" + geneGroupStrings.join("|") + "::" + geneOperator
+            def newGeneCategory = 'GENE:' + geneGroupStrings.join('|') + '::' + geneOperator
             processedSearchTerms.add(newGeneCategory)
             session['geneFilter'] = newGeneCategory
         }
 
         //If we have no search terms and this is for RWG, just return the top level
         if ((processedSearchTerms == null || processedSearchTerms.size() == 0) && params.page.equals('RWG')) {
-            searchLog += "No search terms found - returning all programs"
+            searchLog += 'No search terms found - returning all programs'
             session['searchLog'] = searchLog
             //retrieve folders id to expand as opened nodes
             def nodesToExpand = session['rwgOpenedNodes']
@@ -408,7 +417,7 @@ class RWGController {
                    model: [folderContentsAccessLevelMap: fmFolderService.getFolderContentsWithAccessLevelInfo(user, null), nodesToExpand: nodesToExpand])
             return
         }
-        def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: "Browse-Search", eventmessage: "", accesstime: new java.util.Date())
+        def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'Browse-Search', eventmessage: '', accesstime: new java.util.Date())
         al.save()
 
         /*
@@ -421,27 +430,27 @@ class RWGController {
          * Organize and display
          */
         if (params.page.equals('RWG')) {
-            def numbers = new HashMap();
-            numbers.put("PROGRAM", 0)
-            numbers.put("STUDY", 0)
-            numbers.put("ASSAY", 0)
-            numbers.put("ANALYSIS", 0)
-            numbers.put("FOLDER", 0)
+            def numbers = new HashMap()
+            numbers.put('PROGRAM', 0)
+            numbers.put('STUDY', 0)
+            numbers.put('ASSAY', 0)
+            numbers.put('ANALYSIS', 0)
+            numbers.put('FOLDER', 0)
 
             if (combinedResult.paths) {
                 def pathLists = finalizePathLists(combinedResult.paths)
                 session['folderSearchList'] = pathLists
-                def folderSearchString = pathLists[0].join(",") + "," //Extra , - used to identify search results
-                def uniqueLeavesString = pathLists[1].join(",") + ","
+                def folderSearchString = pathLists[0].join(',') + ',' //Extra , - used to identify search results
+                def uniqueLeavesString = pathLists[1].join(',') + ','
                 session['searchLog'] += "Final folder string: " + folderSearchString
 
                 //if no accession in search list, calculate number of each folder type:
                 def numbersJSON
-                if (!searchString.contains("|ACCESSION;")) {
+                if (!searchString.contains('|ACCESSION;')) {
                     for (folderName in pathLists[0]) {
                         def folder = FmFolder.findByFolderFullName folderName
                         if (!folder) {
-                            logger.info "No folder with full name $folderName"
+                            logger.info 'No folder with full name ' + folderName
                             continue
                         }
                         def c = numbers[folder.folderType] ?: 0
@@ -456,16 +465,18 @@ class RWGController {
 
                 def folderContentsAccessLevelMap = fmFolderService.getFolderContentsWithAccessLevelInfo(user, null)
                 render(template: '/fmFolder/folders', plugin: 'folderManagement', model: [folderContentsAccessLevelMap: folderContentsAccessLevelMap, folderSearchString: folderSearchString, uniqueLeavesString: uniqueLeavesString, auto: true, resultNumber: numbersJSON, nodesToExpand: nodesToExpand, nodesToClose: nodesToClose])
-            } else {
+            }
+            else {
                 session['folderSearchList'] = [[], []]
                 def numbersJSON = new JSONObject(numbers)
                 render(template: '/fmFolder/noResults', plugin: 'folderManagement', model: [resultNumber: numbersJSON])
             }
-        } else {
+        }
+        else {
             def pathLists = finalizePathLists(combinedResult.paths)
             def jsonArrays = [:]
-            jsonArrays.put("searchResults", pathLists[0])
-            jsonArrays.put("uniqueLeaves", pathLists[1])
+            jsonArrays.put('searchResults', pathLists[0])
+            jsonArrays.put('uniqueLeaves', pathLists[1])
             render jsonArrays as JSON
         }
     }
@@ -504,10 +515,11 @@ class RWGController {
     def setSOLRGenesField = {
         showSigGenesOnly = true ->
 
-            def solrGenesField = ""  // name of SOLR search field to be used for gene queries (SIGGENE or ALLGENE)
+            def solrGenesField = ''  // name of SOLR search field to be used for gene queries (SIGGENE or ALLGENE)
             if (showSigGenesOnly) {
                 solrGenesField = 'SIGGENE'
-            } else {
+            }
+            else {
                 solrGenesField = 'ALLGENE'
             }
 
@@ -536,7 +548,7 @@ class RWGController {
 
     // Return search keywords
     def searchAutoComplete = {
-        def category = params.category == null ? "ALL" : params.category
+        def category = params.category == null ? 'ALL' : params.category
         def max = params.long('max') ?: 15
         render searchKeywordService.findSearchKeywords(category, params.term, max) as JSON
     }
@@ -559,11 +571,12 @@ class RWGController {
 
                 def exp = Experiment.createCriteria()
                 def experiment = exp.get {
-                    eq("id", expNumber)
+                    eq('id', expNumber)
                 }
                 if (experiment == null) {
-                    logger.warn "Unable to find an experiment for ${expNumber}"
-                } else {
+                    logger.warn 'Unable to find an experiment for ' + expNumber
+                }
+                else {
                     exprimentAnalysis.put((experiment), c)
                     total += c
                 }
@@ -573,7 +586,8 @@ class RWGController {
         def html
         if (!studyWithResultsFound) {
             html = g.render(template: '/search/noResult').toString()
-        } else {
+        }
+        else {
             html = g.render(template: '/RWG/experiments', model: [experiments: exprimentAnalysis, analysisCount: total, duration: TimeCategory.minus(new Date(), startTime)]).toString()
         }
 
@@ -583,7 +597,7 @@ class RWGController {
     // Load the trial analysis for the given trial
     def getTrialAnalysis = {
         new AccessLog(username: springSecurityService.getPrincipal().username,
-                event: "Loading trial analysis", eventmessage: params.trialNumber, accesstime: new Date()).save()
+                event: 'Loading trial analysis', eventmessage: params.trialNumber, accesstime: new Date()).save()
 
         def analysisList = trialQueryService.querySOLRTrialAnalysis(params, session.solrSearchFilter)
         render(template: '/RWG/analysis', model: [aList: analysisList])
@@ -603,7 +617,7 @@ class RWGController {
         // submit request
         def solrRequestUrl = createSOLRQueryPath()
         def solrConnection = new URL(solrRequestUrl).openConnection()
-        solrConnection.requestMethod = "POST"
+        solrConnection.requestMethod = 'POST'
         solrConnection.doOutput = true
 
         // add params to request
@@ -626,9 +640,10 @@ class RWGController {
                 mkp.yield xml
             }
 
-            render(contentType: "application/xml", text: result);
-        } else {
-            render(contentType: "text/plain", text: "SOLR Request failed! Request url:" + solrRequestUrl + "  Response code:" + solrConnection.responseCode + "  Response message:" + solrConnection.responseMessage)
+            render(contentType: 'application/xml', text: result)
+        }
+        else {
+            render(contentType: 'text/plain', text: 'SOLR Request failed! Request url:' + solrRequestUrl + '  Response code:' + solrConnection.responseCode + '  Response message:' + solrConnection.responseMessage)
         }
 
         solrConnection.disconnect()
@@ -646,21 +661,21 @@ class RWGController {
         def searchOperatorsString = params.searchOperators
         def globalOperator = params.globaloperator
 
-        def searchTerms = searchString?.split(",,,")
-        if (searchTerms != null && searchTerms[0] == "") {
-            searchTerms = null;
+        def searchTerms = searchString?.split(',,,')
+        if (searchTerms != null && searchTerms[0] == '') {
+            searchTerms = null
         }
 
-        def searchOperators = searchOperatorsString?.split(";")
-        if (searchOperators != null && searchOperators[0] == "") {
-            searchOperators = null;
+        def searchOperators = searchOperatorsString?.split(';')
+        if (searchOperators != null && searchOperators[0] == '') {
+            searchOperators = null
         }
 
         session['rwgSearchFilter'] = searchTerms
         session['rwgSearchOperators'] = searchOperators
         session['globalOperator'] = globalOperator
         session['geneFilter'] = []
-        render(text: "OK")
+        render(text: 'OK')
     }
 
     def addOpenedNodeRWG = {
@@ -675,12 +690,13 @@ class RWGController {
         def paramMap = params
         if (closedNodes.grep(params.node)) {
             closedNodes -= params.node
-        } else if (!openedNodes.grep(params.node)) {
+        }
+        else if (!openedNodes.grep(params.node)) {
             openedNodes += params.node
         }
         session['rwgOpenedNodes'] = openedNodes
         session['rwgClosedNodes'] = closedNodes
-        render(text: "OK")
+        render(text: 'OK')
     }
     def removeOpenedNodeRWG = {
         if (session['rwgOpenedNodes'] == null) {
@@ -693,21 +709,22 @@ class RWGController {
         def closedNodes = session['rwgClosedNodes']
         if (openedNodes.grep(params.node)) {
             openedNodes -= params.node
-        } else {
+        }
+        else {
             if (!closedNodes.grep(params.node)) {
                 closedNodes += params.node
             }
         }
         session['rwgOpenedNodes'] = openedNodes
         session['rwgClosedNodes'] = closedNodes
-        render(text: "OK")
+        render(text: 'OK')
     }
     def resetOpenedNodes = {//used for RWG and DSE
         session['rwgOpenedNodes'] = []
         session['dseOpenedNodes'] = []
         session['rwgClosedNodes'] = []
         session['dseClosedNodes'] = []
-        render(text: "OK")
+        render(text: 'OK')
     }
 
     def addOpenedNodeDSE = {
@@ -720,14 +737,15 @@ class RWGController {
         def openedNodes = session['dseOpenedNodes']
         def closedNodes = session['dseClosedNodes']
         def paramMap = params
-        if (closedNodes.grep(params.node.replace("\\", "\\\\"))) {
-            closedNodes -= params.node.replace("\\", "\\\\")
-        } else if (!openedNodes.grep(params.node.replace("\\", "\\\\")) && params.node != "treeRoot") {
-            openedNodes += params.node.replace("\\", "\\\\")
+        if (closedNodes.grep(params.node.replace('\\', '\\\\'))) {
+            closedNodes -= params.node.replace('\\', '\\\\')
+        }
+        else if (!openedNodes.grep(params.node.replace('\\', '\\\\')) && params.node != 'treeRoot') {
+            openedNodes += params.node.replace('\\', '\\\\')
         }
         session['dseOpenedNodes'] = openedNodes
         session['dseClosedNodes'] = closedNodes
-        render(text: "OK")
+        render(text: 'OK')
     }
     def removeOpenedNodeDSE = {
         if (session['dseOpenedNodes'] == null) {
@@ -738,16 +756,17 @@ class RWGController {
         }
         def openedNodes = session['dseOpenedNodes']
         def closedNodes = session['dseClosedNodes']
-        if (openedNodes.grep(params.node.replace("\\", "\\\\"))) {
-            openedNodes -= params.node.replace("\\", "\\\\")
-        } else {
-            if (!closedNodes.grep(params.node.replace("\\", "\\\\"))) {
-                closedNodes += params.node.replace("\\", "\\\\")
+        if (openedNodes.grep(params.node.replace('\\', '\\\\'))) {
+            openedNodes -= params.node.replace('\\', '\\\\')
+        }
+        else {
+            if (!closedNodes.grep(params.node.replace('\\', '\\\\'))) {
+                closedNodes += params.node.replace('\\', '\\\\')
             }
         }
         session['dseOpenedNodes'] = openedNodes
         session['dseClosedNodes'] = closedNodes
-        render(text: "OK")
+        render(text: 'OK')
     }
 
 }

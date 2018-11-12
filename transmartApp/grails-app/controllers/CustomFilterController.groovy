@@ -31,15 +31,17 @@ class CustomFilterController {
     def delete = {
         def customFilterInstance = CustomFilter.get(params.id)
         if (!customFilterInstance) {
-            flash.message = "CustomFilter not found with id ${params.id}"
-            redirect(action: "list")
-        } else if (!canUpdate(customFilterInstance)) {
-            flash.message = "You are not authorized to delete the custom filter with ID ${params.id}."
-            redirect(action: "list")
-        } else {
+            flash.message = 'CustomFilter not found with id ' + params.id
+            redirect(action: 'list')
+        }
+        else if (!canUpdate(customFilterInstance)) {
+            flash.message = 'You are not authorized to delete the custom filter with ID ' + params.id + '.'
+            redirect(action: 'list')
+        }
+        else {
             customFilterInstance.delete()
-            flash.message = "CustomFilter ${params.id} deleted"
-            redirect(action: "list", params: [ts: new Date().getTime()])
+            flash.message = 'CustomFilter ' + params.id + ' deleted'
+            redirect(action: 'list', params: [ts: new Date().getTime()])
         }
     }
 
@@ -47,12 +49,14 @@ class CustomFilterController {
         def customFilterInstance = CustomFilter.get(params.id)
 
         if (!customFilterInstance) {
-            flash.message = "CustomFilter not found with id ${params.id}"
-            redirect(action: "list")
-        } else if (!canUpdate(customFilterInstance)) {
-            flash.message = "You are not authorized to edit the custom filter with ID ${params.id}."
-            redirect(action: "list")
-        } else {
+            flash.message = 'CustomFilter not found with id ' + params.id
+            redirect(action: 'list')
+        }
+        else if (!canUpdate(customFilterInstance)) {
+            flash.message = 'You are not authorized to edit the custom filter with ID ' + params.id + '.'
+            redirect(action: 'list')
+        }
+        else {
             def keywordMap = createKeywordMap(customFilterInstance)
             def summary = createSummaryWithLinks(keywordMap)
             customFilterInstance.summary = summary
@@ -61,20 +65,22 @@ class CustomFilterController {
     }
 
     def update = {
-        params.privateFlag = (params?.privateFlag != "on") ? 'N' : 'Y'
+        params.privateFlag = (params?.privateFlag != 'on') ? 'N' : 'Y'
         def customFilterInstance = CustomFilter.get(params.id)
 
         if (customFilterInstance) {
             customFilterInstance.properties = params
             if (!customFilterInstance.hasErrors() && customFilterInstance.save()) {
-                flash.message = "CustomFilter ${params.id} updated"
-                redirect(action: "list", params: [ts: new Date().getTime(), lastFilterID: params.id])
-            } else {
+                flash.message = 'CustomFilter ' + params.id + ' updated'
+                redirect(action: 'list', params: [ts: new Date().getTime(), lastFilterID: params.id])
+            }
+            else {
                 render(view: 'edit', model: [customFilterInstance: customFilterInstance])
             }
-        } else {
-            flash.message = "CustomFilter not found with id ${params.id}"
-            redirect(action: "edit", id: params.id)
+        }
+        else {
+            flash.message = 'CustomFilter not found with id ' + params.id
+            redirect(action: 'edit', id: params.id)
         }
     }
 
@@ -90,8 +96,8 @@ class CustomFilterController {
 
     def save = {
 
-        //	println("private flag:"+params.privateFlag);
-        params.privateFlag = (params?.privateFlag != "on") ? 'N' : 'Y'
+        //	println('private flag:'+params.privateFlag)
+        params.privateFlag = (params?.privateFlag != 'on') ? 'N' : 'Y'
         def filter = new CustomFilter(params)
         //println(filter)
         def map = createKeywordMap(session.searchFilter.globalFilter)
@@ -105,9 +111,10 @@ class CustomFilterController {
             }
         }
         if (!filter.hasErrors() && filter.save()) {
-            flash.message = "CustomFilter ${filter.id} created"
-            redirect(action: "list", params: [ts: new Date().getTime(), lastFilterID: filter.id])
-        } else {
+            flash.message = 'CustomFilter ' + filter.id + ' created'
+            redirect(action: 'list', params: [ts: new Date().getTime(), lastFilterID: filter.id])
+        }
+        else {
             render(view: 'create', model: [customFilterInstance: filter])
         }
     }
@@ -133,35 +140,35 @@ class CustomFilterController {
         def list
         list = gfilter.getGeneFilters()
         if (list.size() > 0) {
-            map.put("GENE", list)
+            map.put('GENE', list)
         }
         list = gfilter.getPathwayFilters()
         if (list.size() > 0) {
-            map.put("PATHWAY", list)
+            map.put('PATHWAY', list)
         }
         list = gfilter.getCompoundFilters()
         if (list.size() > 0) {
-            map.put("COMPOUND", list)
+            map.put('COMPOUND', list)
         }
         list = gfilter.getDiseaseFilters()
         if (list.size() > 0) {
-            map.put("DISEASE", list)
+            map.put('DISEASE', list)
         }
         list = gfilter.getTrialFilters()
         if (list.size() > 0) {
-            map.put("TRIAL", list)
+            map.put('TRIAL', list)
         }
         list = gfilter.getStudyFilters()
         if (list.size() > 0) {
-            map.put("STUDY", list)
+            map.put('STUDY', list)
         }
         list = gfilter.getGeneSignatureFilters()
         if (list.size() > 0) {
-            map.put("GENESIG", list)
+            map.put('GENESIG', list)
         }
         list = gfilter.getTextFilters()
         if (list.size() > 0) {
-            map.put("TEXT", list)
+            map.put('TEXT', list)
         }
 
         return map
@@ -173,21 +180,23 @@ class CustomFilterController {
         def uniqueIds = []
         for (item in filter.items) {
             def id = item.uniqueId
-            if (item.bioDataType == "TEXT") {
+            if (item.bioDataType == 'TEXT') {
                 def list
-                if (map.containsKey("TEXT")) {
-                    list = map["TEXT"]
-                } else {
+                if (map.containsKey('TEXT')) {
+                    list = map['TEXT']
+                }
+                else {
                     list = []
-                    map["TEXT"] = list
+                    map['TEXT'] = list
                 }
                 def keyword = new SearchKeyword()
-                keyword.keyword = id.substring(id.indexOf(":") + 1)
+                keyword.keyword = id.substring(id.indexOf(':') + 1)
                 keyword.id = -1
                 keyword.uniqueId = id
-                keyword.dataCategory = "TEXT"
+                keyword.dataCategory = 'TEXT'
                 list.add(keyword)
-            } else {
+            }
+            else {
                 uniqueIds.add(item.uniqueId)
             }
         }
@@ -197,7 +206,8 @@ class CustomFilterController {
                 def list
                 if (map.containsKey(keyword.dataCategory)) {
                     list = map[(keyword.dataCategory)]
-                } else {
+                }
+                else {
                     list = []
                     map[(keyword.dataCategory)] = list
                 }
@@ -217,17 +227,18 @@ class CustomFilterController {
         def link = new StringBuilder()
         def type = keyword.dataCategory.toLowerCase()
 
-        link.append("<nobr>")
-        if (type == "text") {
+        link.append('<nobr>')
+        if (type == 'text') {
             link.append(createFilterDetailsLink(id: keyword.keyword, label: keyword.keyword, type: type))
-        } else {
+        }
+        else {
             def label = keyword.keyword
-            if (type == "pathway" && keyword.dataSource != null && keyword.dataSource != "") {
-                label = keyword.dataSource + "-" + label
+            if (type == 'pathway' && keyword.dataSource != null && keyword.dataSource != '') {
+                label = keyword.dataSource + '-' + label
             }
             link.append(createFilterDetailsLink(id: keyword.bioDataId, label: label, type: type))
         }
-        link.append("</nobr>")
+        link.append('</nobr>')
         return link.toString()
 
     }
@@ -241,24 +252,24 @@ class CustomFilterController {
         def filters = keywordMap[(category)]
         for (filter in filters) {
             if (section.length() > 0) {
-                section.append(" OR ")
+                section.append(' OR ')
             }
             section.append(createSummaryFilter(filter))
         }
 
         if (section.length() == 0) {
-            return ""
+            return ''
         }
 
         def span = new StringBuilder()
-        span.append("<span class=\"filter-item filter-item-")
+        span.append('<span class="filter-item filter-item-')
         span.append(category.toLowerCase())
-        span.append("\">")
+        span.append('">')
         span.append(formatCategory(category))
         if (filters.size() > 1) {
-            span.append("s")
+            span.append('s')
         }
-        span.append("&gt;&nbsp;</span>")
+        span.append('&gt;&nbsp;</span>')
         span.append(section)
 
         return span.toString()
@@ -269,14 +280,14 @@ class CustomFilterController {
      */
     def createSummaryWithLinks(keywordMap) {
 
-        def genes = createSummarySection("GENE", keywordMap)
-        def pathways = createSummarySection("PATHWAY", keywordMap)
-        def compounds = createSummarySection("COMPOUND", keywordMap)
-        def diseases = createSummarySection("DISEASE", keywordMap)
-        def trials = createSummarySection("TRIAL", keywordMap)
-        def genesigs = createSummarySection("GENESIG", keywordMap)
-        def studies = createSummarySection("STUDY", keywordMap)
-        def texts = createSummarySection("TEXT", keywordMap)
+        def genes = createSummarySection('GENE', keywordMap)
+        def pathways = createSummarySection('PATHWAY', keywordMap)
+        def compounds = createSummarySection('COMPOUND', keywordMap)
+        def diseases = createSummarySection('DISEASE', keywordMap)
+        def trials = createSummarySection('TRIAL', keywordMap)
+        def genesigs = createSummarySection('GENESIG', keywordMap)
+        def studies = createSummarySection('STUDY', keywordMap)
+        def texts = createSummarySection('TEXT', keywordMap)
         def summary = new StringBuilder()
 
         if (genes) {
@@ -284,37 +295,37 @@ class CustomFilterController {
         }
 
         if (summary.length() > 0 && pathways.length() > 0) {
-            summary.append(" OR ")
+            summary.append(' OR ')
         }
         summary.append(pathways)
 
         if (summary.length() > 0 && genesigs.length() > 0) {
-            summary.append(" OR ")
+            summary.append(' OR ')
         }
         summary.append(genesigs)
 
         if (summary.length() > 0 && compounds.length() > 0) {
-            summary.append(" AND ")
+            summary.append(' AND ')
         }
         summary.append(compounds)
 
         if (summary.length() > 0 && diseases.length() > 0) {
-            summary.append(" AND ")
+            summary.append(' AND ')
         }
         summary.append(diseases)
 
         if (summary.length() > 0 && trials.length() > 0) {
-            summary.append(" AND ")
+            summary.append(' AND ')
         }
         summary.append(trials)
 
         if (summary.length() > 0 && studies.length() > 0) {
-            summary.append(" AND ")
+            summary.append(' AND ')
         }
         summary.append(studies)
 
         if (summary.length() > 0 && texts.length() > 0) {
-            summary.append(" AND ")
+            summary.append(' AND ')
         }
         summary.append(texts)
 

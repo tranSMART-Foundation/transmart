@@ -21,7 +21,7 @@ public class HeatmapController {
     def searchKeywordService
 
     def initheatmap = {
-        session.searchFilter.heatmapFilter.reset();
+        session.searchFilter.heatmapFilter.reset()
     }
 
     def filterheatmap = {
@@ -39,25 +39,25 @@ public class HeatmapController {
 
         def dataResult = generateHeatmaps()
 
-        def hmapcount = 1;
-        def comtable = null;
-        def cortable = null;
-        def rbmtable = null;
-        def rhotable = null;
+        def hmapcount = 1
+        def comtable = null
+        def cortable = null
+        def rbmtable = null
+        def rhotable = null
 
         if (!dataResult['comresult']['datatable'].isEmpty()) {
             comtable = (dataResult['comresult']['datatable'] as JSON)
         }
         if (!dataResult['corresult']['datatable'].isEmpty()) {
-            hmapcount++;
-            cortable = (dataResult['corresult']['datatable'] as JSON);
+            hmapcount++
+            cortable = (dataResult['corresult']['datatable'] as JSON)
         }
         if (!dataResult['rbmresult']['datatable'].isEmpty()) {
-            hmapcount++;
+            hmapcount++
             rbmtable = (dataResult['rbmresult']['datatable'] as JSON)
         }
         if (!dataResult['rhoresult']['datatable'].isEmpty()) {
-            hmapcount++;
+            hmapcount++
             rhotable = (dataResult['rhoresult']['datatable'] as JSON)
         }
 
@@ -71,16 +71,16 @@ public class HeatmapController {
         def ac = [compare: { a, b -> a.shortDescription.toLowerCase().compareTo(b.shortDescription.toLowerCase()) }] as Comparator
         Collections.sort(allanalysis, ac)
 
-        def hmapwidth = 100 / hmapcount;
+        def hmapwidth = 100 / hmapcount
         // Convert table object to JSON format
 
-        //logger.info (heatmap.rhotable==null)?"empty":"not empty"
-        return ["comtable"   : comtable,
-                "cortable"   : cortable,
-                "rbmtable"   : rbmtable,
-                "rhotable"   : rhotable,
-                "hmapwidth"  : hmapwidth,
-                "contentlist": allanalysis]
+        //logger.info (heatmap.rhotable==null)?'empty':'not empty'
+        return ['comtable'   : comtable,
+                'cortable'   : cortable,
+                'rbmtable'   : rbmtable,
+                'rhotable'   : rhotable,
+                'hmapwidth'  : hmapwidth,
+                'contentlist': allanalysis]
     }
 
     def downloadheatmapexcel = {
@@ -92,7 +92,7 @@ public class HeatmapController {
 
         if (!dataResult['comresult']['datatable'].isEmpty()) {
 
-            //logger.info "has comparison data"
+            //logger.info 'has comparison data'
 
             sheets.add(createExcelSheet(dataResult['comresult']['datatable'].table, "Gene Expression Comparison"))
         }
@@ -111,12 +111,12 @@ public class HeatmapController {
         //logger.info sheets
 
         def gen = new ExcelGenerator()
-        response.setHeader("Content-Type", "application/vnd.ms-excel; charset=utf-8")
-        response.setHeader("Content-Disposition", "attachment; filename=\"heatmap.xls\"")
-        response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
-        response.setHeader("Pragma", "public");
-        response.setHeader("Expires", "0");
-        response.outputStream << gen.generateExcel(sheets);
+        response.setHeader('Content-Type', 'application/vnd.ms-excel; charset=utf-8')
+        response.setHeader('Content-Disposition', 'attachment; filename=\'heatmap.xls\'')
+        response.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+        response.setHeader('Pragma', 'public')
+        response.setHeader('Expires', '0')
+        response.outputStream << gen.generateExcel(sheets)
 
     }
 
@@ -134,8 +134,8 @@ public class HeatmapController {
         //2) search pathway from heatmap filter
         //3) search genes from global filters
 
-        boolean searchTopGene = false;
-        boolean searchHeatmapFilter = false;
+        boolean searchTopGene = false
+        boolean searchHeatmapFilter = false
 
         // for genes to be displayed in the heatmap - this is used for searchHeatmapFilter and search global filter
         def orderedGenes = new LinkedHashSet()
@@ -143,26 +143,27 @@ public class HeatmapController {
         def searchAnalysisIds = BioAssayAnalysisData.executeQuery(trialQueryService.createAnalysisIDSelectQuery(sfilter), [max: 100])
 
 
-        if ("topgene".equalsIgnoreCase(sfilter.heatmapFilter.heatmapfiltertype)) {
-            searchTopGene = true;
+        if ('topgene'.equalsIgnoreCase(sfilter.heatmapFilter.heatmapfiltertype)) {
+            searchTopGene = true
 
-        } else {
+        }
+        else {
             def keyword = session.searchFilter.heatmapFilter.searchTerm
             if (keyword != null) {
-                searchHeatmapFilter = true;
+                searchHeatmapFilter = true
 
-                if (keyword.dataCategory.equalsIgnoreCase("PATHWAY") ||
-                        keyword.dataCategory.equalsIgnoreCase("GENESIG") ||
-                        keyword.dataCategory.equalsIgnoreCase("GENELIST")
+                if (keyword.dataCategory.equalsIgnoreCase('PATHWAY') ||
+                        keyword.dataCategory.equalsIgnoreCase('GENESIG') ||
+                        keyword.dataCategory.equalsIgnoreCase('GENELIST')
                 ) {
                     // pathway
-                    List allGenes = searchKeywordService.expandAllListToGenes(keyword.bioDataId, 200);
+                    List allGenes = searchKeywordService.expandAllListToGenes(keyword.bioDataId, 200)
 
                     //		logger.info allGenes
                     for (k in allGenes) {
                         searchGeneIds.add(k.bioDataId)
                     }
-                    orderedGenes.addAll(allGenes);
+                    orderedGenes.addAll(allGenes)
 
                 } else { // gene
 
@@ -176,9 +177,9 @@ public class HeatmapController {
         if (!searchTopGene && !searchHeatmapFilter) {
             // otherwise use global filters
 
-            def allPathwayGenes = [];
+            def allPathwayGenes = []
             if (sfilter.globalFilter.hasAnyListFilters())
-                allPathwayGenes = searchKeywordService.expandAllListToGenes(sfilter.globalFilter.getAllListFilters().getKeywordDataIdString(), 200);
+                allPathwayGenes = searchKeywordService.expandAllListToGenes(sfilter.globalFilter.getAllListFilters().getKeywordDataIdString(), 200)
             def genes = sfilter.globalFilter.getGeneFilters()
             orderedGenes.addAll(genes)
             orderedGenes.addAll(allPathwayGenes)
@@ -193,8 +194,8 @@ public class HeatmapController {
 
         // now it's time to get the data back
 
-        def dataList = [:];
-        def maxshortdescr = 39;
+        def dataList = [:]
+        def maxshortdescr = 39
 
         // comparison
 
@@ -210,13 +211,13 @@ public class HeatmapController {
         // rbm spearman
         dataList['rhoresult'] = createHeatmapData("spearman correlation", "RBM", searchTopGene, searchAnalysisIds, searchGeneIds, orderedGenes, maxshortdescr)
 
-        //println(dataList['comresult'].analysislist?.size());
-        //println(dataList['corresult'].analysislist?.size());
-        //println(dataList['rbmresult'].analysislist?.size());
-        //println(dataList['rhoresult'].analysislist?.size());
-        //println("searchanalysisids"+searchAnalysisIds.size());
+        //println(dataList['comresult'].analysislist?.size())
+        //println(dataList['corresult'].analysislist?.size())
+        //println(dataList['rbmresult'].analysislist?.size())
+        //println(dataList['rhoresult'].analysislist?.size())
+        //println('searchanalysisids'+searchAnalysisIds.size())
 
-        return dataList;
+        return dataList
 
     }
 
@@ -234,9 +235,9 @@ public class HeatmapController {
 
         def sfilter = session.searchFilter
 
-        def dataList = heatmapService.createHeatMapData(sfilter, method, dataType, searchTopGene, searchGeneIds, searchAnalysisIds);
+        def dataList = heatmapService.createHeatMapData(sfilter, method, dataType, searchTopGene, searchGeneIds, searchAnalysisIds)
 
-        //println("datalist:"+dataList?.size());
+        //println('datalist:'+dataList?.size())
         def cutoff = 4.5
 
         if (dataList != null && !dataList.isEmpty()) {
@@ -245,7 +246,7 @@ public class HeatmapController {
 
             def columnList = []
             // columns
-            columnList.add([type: "n", label: 'Gene Name', pattern: "", id: 0])
+            columnList.add([type: 'n', label: 'Gene Name', pattern: "", id: 0])
             def ccount = 0
             def columnPosMap = [:]
             def analysisId = null
@@ -256,7 +257,7 @@ public class HeatmapController {
             for (data in dataList) {
 
                 //analysisId = data.assayAnalysisId
-                //logger.info "data:"+data.id+":"+data.bioMarkerId
+                //logger.info 'data:'+data.id+':'+data.bioMarkerId
                 analysisName = analysisNameMap.get(data.assayAnalysisId)
                 // reformat & shorten analysis name
                 if (analysisName == null) {
@@ -266,32 +267,33 @@ public class HeatmapController {
                         analysisName = analysis.name
                     }
 
-                    analysisName = analysisName.replaceAll("\\s+", "_");
-                    analysisName = analysisName.replaceAll("'", "*");
+                    analysisName = analysisName.replaceAll('\\s+', '_')
+                    analysisName = analysisName.replaceAll("'", "*")
 
                     if (analysisName.length() > maxcolLength) {
-                        analysisName = analysisName.substring(0, maxcolLength - 3) + "..."
-                    } else {
-                        def paddingnum = maxcolLength - analysisName.length();
+                        analysisName = analysisName.substring(0, maxcolLength - 3) + '...'
+                    }
+                    else {
+                        def paddingnum = maxcolLength - analysisName.length()
                         def sp = new StringBuilder(maxcolLength).append(analysisName)
                         for (pi in 0..paddingnum - 1) {
-                            sp.append(" ")
+                            sp.append(' ')
                         }
-                        analysisName = sp.toString();
+                        analysisName = sp.toString()
                     }
                     analysisNameMap.put(data.assayAnalysisId, analysisName)
                     assayAnalysisList.add(analysis)
 
                     // add into column list
-                    columnList.add([type: "n", label: analysisName.toUpperCase(), pattern: "", id: ccount])
+                    columnList.add([type: 'n', label: analysisName.toUpperCase(), pattern: '', id: ccount])
                     columnPosMap.put(data.assayAnalysisId, ccount)
-                    ccount++;
+                    ccount++
                 }
             }
 
             // rows
             def rowmap = new TreeMap()
-            def totalcols = columnList.size() - 1;
+            def totalcols = columnList.size() - 1
 
             // build empty data structure first
             // for each data object build a row with bioMaker as first column value
@@ -314,7 +316,7 @@ public class HeatmapController {
 
                 if (rowArray == null) {
                     rowArray = new Object[totalcols]
-                    rowmap.put(data.bioMarkerName, rowArray);
+                    rowmap.put(data.bioMarkerName, rowArray)
                 }
 
                 // find column index by analysis id
@@ -322,21 +324,23 @@ public class HeatmapController {
 
                 if (rowArray != null) {
 
-                    if ("correlation".equals(method)) {
+                    if ('correlation'.equals(method)) {
                         datavalue = data.rvalue
-                    } else if ("spearman correlation".equals(method)) {
+                    }
+                    else if ('spearman correlation'.equals(method)) {
                         datavalue = data.rhoValue
-                    } else {
+                    }
+                    else {
                         datavalue = data.foldChangeRatio
                     }
                     rowArray[columnIndex] = datavalue
                 }
-                //	logger.info "loading:"+data.bioMarkerId
+                //	logger.info 'loading:'+data.bioMarkerId
             }
 
 
             def rowlist = []
-            def rowcount = 0;
+            def rowcount = 0
             for (entryset in rowmap.entrySet()) {
 
                 def row = []
@@ -344,36 +348,39 @@ public class HeatmapController {
                 String rowname = entryset.key
 
                 if (rowname == null) {
-                    rowname = ""
-                } else {
-                    rowname = rowname.replaceAll("'", "*");
+                    rowname = ''
+                }
+                else {
+                    rowname = rowname.replaceAll("'", "*")
                 }
 
                 // this is an array
-                def rvalues = entryset.value;
+                def rvalues = entryset.value
                 //logger.info rvalues
                 // handle null value rows
-                def hasRowValue = false;
+                def hasRowValue = false
                 // if not RBM
-                if ("RBM".equalsIgnoreCase(dataType)) {
+                if ('RBM'.equalsIgnoreCase(dataType)) {
                     for (value in rvalues) {
                         if (value != null) {
-                            hasRowValue = true;
-                            break;
+                            hasRowValue = true
+                            break
                         }
                     }
-                } else {
-                    hasRowValue = true;
+                }
+                else {
+                    hasRowValue = true
                 }
 
                 if (hasRowValue) {
-                    row.add([v: rowname, f: rowname]);
-                } else {
-                    row.add([v: "N/A", f: "N/A"]);
+                    row.add([v: rowname, f: rowname])
+                }
+                else {
+                    row.add([v: 'N/A', f: 'N/A'])
                 }
 
                 for (value in rvalues) {
-                    def vvalue = value;
+                    def vvalue = value
                     if (vvalue != null) {
                         if (vvalue > cutoff)
                             vvalue = cutoff
@@ -390,7 +397,8 @@ public class HeatmapController {
             def table = [table: [cols: columnList, rows: rowlist]]
 
             return ['datatable': table, 'analysislist': assayAnalysisList]
-        } else {
+        }
+        else {
             return ['datatable': [], 'analysislist': []]
         }
 
@@ -406,7 +414,7 @@ public class HeatmapController {
 
         for (row in table.rows) {
             //logger.info row
-            if (row[0].f != "N/A") {
+            if (row[0].f != 'N/A') {
                 def newrow = []
                 for (value in row) {
                     newrow.add(value.f)

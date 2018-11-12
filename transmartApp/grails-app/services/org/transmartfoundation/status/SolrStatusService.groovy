@@ -21,7 +21,7 @@ class SolrStatusService {
 		// https://lucene.apache.org/solr/5_4_1/solr-solrj/index.html
 
         def solrHost = Holders.config.com.rwg.solr.host
-		def urlString = "http://"+ solrHost + "/solr/"
+		def urlString = 'http://'+ solrHost + '/solr/'
 		def solrQuery = '*:*'
 
 //        CloseableHttpClient httpClient = HttpClientBuilder.create().build()
@@ -30,7 +30,7 @@ class SolrStatusService {
 		
 		NamedList nl = new NamedList()
 		nl.addAll(['q':solrQuery])
-		SolrParams p = SolrParams.toSolrParams(nl);
+		SolrParams p = SolrParams.toSolrParams(nl)
 		
 		boolean reachedServer = serverDoesRespond(solr)
 	
@@ -48,9 +48,9 @@ class SolrStatusService {
 
 		def canConnect = reachedServer
 			
-		solr.close();
+		solr.close()
 //        httpClient from DefaultHttpClient does not have .close()
-//        httpClient.close();
+//        httpClient.close()
 		
 		def settings = [
             'url'                   : urlString,
@@ -70,14 +70,16 @@ class SolrStatusService {
 
 	def serverDoesRespond(solr) {
 		try {
-			solr.ping();
+			solr.ping()
 			return true
-		} catch (SolrServerException ex) {
-            // print("server not responding")
+		}
+		catch (SolrServerException ex) {
+            // print('server not responding')
 			return false
-		} catch (Exception ex2) {
+		}
+		catch (Exception ex2) {
             // print(ex2)
-            // print("server responding but does not handle ping")
+            // print('server responding but does not handle ping')
 			return true
 		}
 	}
@@ -85,10 +87,11 @@ class SolrStatusService {
 	def getDocumentCountForQuery(client,coreName,sp) {
 		def n = -1
 		try {
-			QueryResponse queryResponse = client.query(coreName, sp);
+			QueryResponse queryResponse = client.query(coreName, sp)
 			n = queryResponse.results.numFound
-		} catch (all) {
-			// print "$coreName not available"
+		}
+		catch (all) {
+			// print '' + coreName + ' not available'
 		}
 		return n
 	}

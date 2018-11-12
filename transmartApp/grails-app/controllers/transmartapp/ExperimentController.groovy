@@ -8,31 +8,31 @@ import org.transmart.searchapp.*
 @Slf4j('logger')
 class ExperimentController {
 
-    def SpringSecurityService;
-    def gwasWebService;
+    def SpringSecurityService
+    def gwasWebService
 
     /**
      * Find the top 20 experiments with a case-insensitive LIKE
      */
     def extSearch = {
         def paramMap = params
-        def value = params.term.toUpperCase();
-        def studyType = params.studyType?.toUpperCase();
+        def value = params.term.toUpperCase()
+        def studyType = params.studyType?.toUpperCase()
 
-        def experiments = Experiment.executeQuery("SELECT accession, title FROM Experiment e WHERE upper(e.title) LIKE '%' || :term || '%' AND upper(e.type) = :studyType", [term: value, studyType: studyType], [max: 20]);
+        def experiments = Experiment.executeQuery("SELECT accession, title FROM Experiment e WHERE upper(e.title) LIKE '%' || :term || '%' AND upper(e.type) = :studyType", [term: value, studyType: studyType], [max: 20])
 
-        def category = "STUDY"
-        def categoryDisplay = "Study"
+        def category = 'STUDY'
+        def categoryDisplay = 'Study'
         if (studyType.equals('I2B2')) {
-            category = "i2b2"
-            categoryDisplay = "i2b2"
+            category = 'i2b2'
+            categoryDisplay = 'i2b2'
         }
-        def itemlist = [];
+        def itemlist = []
         for (exp in experiments) {
-            itemlist.add([id: exp[0], keyword: exp[1], category: category, display: categoryDisplay]);
+            itemlist.add([id: exp[0], keyword: exp[1], category: category, display: categoryDisplay])
         }
 
-        render itemlist as JSON;
+        render itemlist as JSON
     }
 
     /**
@@ -47,12 +47,13 @@ class ExperimentController {
         if (params.type) {
             experiments = Experiment.findAllByType(params.type)
             experiments = getSortedList(experiments)
-        } else {
+        }
+        else {
             experiments = Experiment.list()
             experiments = getSortedList(experiments)
         }
 
-        experiments=experiments.findAll{!secObjs.containsKey(it.accession) || !gwasWebService.getGWASAccess(it.accession, user).equals("Locked") }
+        experiments=experiments.findAll{!secObjs.containsKey(it.accession) || !gwasWebService.getGWASAccess(it.accession, user).equals('Locked') }
         render(template: 'browseSingle', model: [experiments: experiments])
     }
 
@@ -64,19 +65,19 @@ class ExperimentController {
 
     def getExperimentSecureStudyList(){  
 		
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder()
         s.append("SELECT so.bioDataUniqueId, so.bioDataId FROM SecureObject so Where so.dataType='Experiment'")
-        def t=[:];
+        def t=[:]
         //return access levels for the children of this path that have them
-        def results = SecureObject.executeQuery(s.toString());
+        def results = SecureObject.executeQuery(s.toString())
         for (row in results){
-            def token = row[0];
-            def dataid = row[1];
-            token=token.replaceFirst("EXP:","")
-            logger.info(token+":"+dataid);
-            t.put(token,dataid);
+            def token = row[0]
+            def dataid = row[1]
+            token=token.replaceFirst('EXP:','')
+            logger.info(token+':'+dataid)
+            t.put(token,dataid)
         }
-        return t;
+        return t
     }
 	
     /**
@@ -89,7 +90,8 @@ class ExperimentController {
         if (params.type) {
             experiments = Experiment.findAllByType(params.type)
             experiments = getSortedList(experiments)
-        } else {
+        }
+        else {
             experiments = Experiment.list()
             experiments = getSortedList(experiments)
         }
@@ -100,7 +102,7 @@ class ExperimentController {
     def getSortedList(experiments) {
 
         experiments.sort({ a, b ->
-            return a.title.trim().compareToIgnoreCase(b.title.trim());
+            return a.title.trim().compareToIgnoreCase(b.title.trim())
         })
 
         return experiments

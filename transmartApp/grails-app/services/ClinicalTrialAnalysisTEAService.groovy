@@ -13,15 +13,15 @@ class ClinicalTrialAnalysisTEAService extends AnalysisTEABaseService {
     def trialQueryService
 
     def getExpType() {
-        return "Clinical Trial";
+        return 'Clinical Trial'
     }
 
     def createResultObject() {
-        return new TrialAnalysisResult();
+        return new TrialAnalysisResult()
     }
 
     def createSubFilterCriteria(SearchFilter filter, Query query) {
-        return trialQueryService.createTrialFilterCriteria(filter.trialFilter, query);
+        return trialQueryService.createTrialFilterCriteria(filter.trialFilter, query)
     }
 
     /**
@@ -29,19 +29,19 @@ class ClinicalTrialAnalysisTEAService extends AnalysisTEABaseService {
      */
     def createAnalysisIDSelectQuery(SearchFilter filter) {
         if (filter == null || filter.globalFilter.isTextOnly()) {
-            return " SELECT -1 FROM org.transmart.biomart.BioAssayAnalysisData baad WHERE 1 = 1 "
+            return ' SELECT -1 FROM org.transmart.biomart.BioAssayAnalysisData baad WHERE 1 = 1 '
         }
         def gfilter = filter.globalFilter
 
-        def query = new AssayAnalysisDataQuery(mainTableAlias: "baad", setDistinct: true);
-        query.addTable("org.transmart.biomart.BioAssayAnalysisData baad ");
-        query.addTable("org.transmart.biomart.ClinicalTrial ct ");
-        query.addCondition("baad.experiment.id = ct.id ")
+        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+        query.addTable('org.transmart.biomart.BioAssayAnalysisData baad ')
+        query.addTable('org.transmart.biomart.ClinicalTrial ct ')
+        query.addCondition('baad.experiment.id = ct.id ')
 
-        query.createGlobalFilterCriteria(gfilter);
-        createSubFilterCriteria(filter, query);
+        query.createGlobalFilterCriteria(gfilter)
+        createSubFilterCriteria(filter, query)
 
-        query.addSelect("baad.analysis.id")
+        query.addSelect('baad.analysis.id')
 
         return query.generateSQL()
     }

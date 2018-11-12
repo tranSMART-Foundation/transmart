@@ -6,7 +6,7 @@ import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.
 class PlinkService {
 
 
-    def dataSource;
+    def dataSource
 
     /**
      *  extract the selected corhort through patient_num
@@ -17,10 +17,10 @@ class PlinkService {
 
     def String[] getStudyInfoBySubject(String subjectIds) {
 
-        def sql = new Sql(dataSource);
+        def sql = new Sql(dataSource)
 
-        String query = "select platform_name, trial_name from DE_SUBJECT_SNP_DATASET "
-        query += " where rownum=1 and platform_name is not null and patient_num in (" + subjectIds + ")";
+        String query = 'select platform_name, trial_name from DE_SUBJECT_SNP_DATASET '
+        query += ' where rownum=1 and platform_name is not null and patient_num in (' + subjectIds + ')'
 
         def row = sql.firstRow(query)
 
@@ -36,7 +36,7 @@ class PlinkService {
     def String[] getStudyInfoByResultInstanceId(String resultInstanceId) {
         checkQueryResultAccess resultInstanceId
 
-        def sql = new Sql(dataSource);
+        def sql = new Sql(dataSource)
 
         def query = """
 						select a.platform_name, a.trial_name 
@@ -61,33 +61,34 @@ class PlinkService {
 
     def void getMapDataByChromosome(String subjectIds, String chr, File plinkMapFile) {
 
-        def sql = new Sql(dataSource);
+        def sql = new Sql(dataSource)
 
         // 0 -- Platform Name   1 -- Trial Name
-        def platform = getStudyInfoBySubject(subjectIds)[0];
+        def platform = getStudyInfoBySubject(subjectIds)[0]
 
-        String chroms;
-        if (chr.contains(",")) {
-            chroms = chr.replace(",", "','");
-        } else {
-            chroms = chr;
+        String chroms
+        if (chr.contains(',')) {
+            chroms = chr.replace(",', '','")
+        }
+        else {
+            chroms = chr
         }
 
 
-        String query = """ SELECT probe_def FROM de_snp_probe_sorted_def
-		                   WHERE chrom in (?) and platform_name=?""";
+        String query = ''' SELECT probe_def FROM de_snp_probe_sorted_def
+		                   WHERE chrom in (?) and platform_name=?'''
 
         sql.eachRow(query, [chroms, platform]) { it ->
             if (it.probe_def != null) {
-                java.sql.Clob clob = (java.sql.Clob) it.probe_def;
-                //plinkMapFile.append clob.getAsciiStream().getText();
-                // change probe_def format from "SNP  chr  position" to "chr  SNP position"
+                java.sql.Clob clob = (java.sql.Clob) it.probe_def
+                //plinkMapFile.append clob.getAsciiStream().getText()
+                // change probe_def format from 'SNP  chr  position' to 'chr  SNP position'
                 clob.getAsciiStream().getText().eachLine {
                     def items = it.split()
-                    plinkMapFile.append(items[1] + "\t" + items[0] + "\t" + items[2] + "\n")
+                    plinkMapFile.append(items[1] + '\t' + items[0] + '\t' + items[2] + '\n')
                 }
             }
-        };
+        }
     }
 
     /**
@@ -100,20 +101,21 @@ class PlinkService {
 
     def void getSnpDataBySujectChromosome(String subjectIds, String chr, File plinkPedFile) {
 
-        def query;
-        def sql = new Sql(dataSource);
+        def query
+        def sql = new Sql(dataSource)
 
         // 0 -- Platform Name   1 -- Trial Name
-        def trialName = getStudyInfoBySubject(subjectIds)[1];
+        def trialName = getStudyInfoBySubject(subjectIds)[1]
 
-        String chroms;
-        if (chr.contains(",")) {
-            chroms = chr.replace(",", "','");
-        } else {
-            chroms = chr;
+        String chroms
+        if (chr.contains(',')) {
+            chroms = chr.replace(",', '','")
+        }
+        else {
+            chroms = chr
         }
 
-        query = """SELECT t1.PATIENT_NUM,
+        query = '''SELECT t1.PATIENT_NUM,
 		                  case t2.PATIENT_GENDER 
 		                      when 'M' then 1
 		                      when 'F' then 2
@@ -126,15 +128,15 @@ class PlinkService {
 		           WHERE t1.PATIENT_NUM=t2.PATIENT_NUM and t1.TRIAL_NAME=t2.TRIAL_NAME and 
 		           		 t1.PED_BY_PATIENT_CHR is not null and 
 		           		 t2.SUBJECT_SNP_DATASET_ID=t1.SNP_DATASET_ID and 
-		                 t1.chrom in (?) and t1.trial_name=?""";
+		                 t1.chrom in (?) and t1.trial_name=?'''
 
 
         sql.eachRow(query, [chroms, trialName]) { it ->
             if (it.PED_BY_PATIENT_CHR != null) {
-                java.sql.Clob clob = (java.sql.Clob) it.PED_BY_PATIENT_CHR;
-                plinkPedFile.append("${it.PATIENT_NUM} ${it.PATIENT_NUM} 0 0 ${it.PATIENT_GENDER} 0  ${clob.getAsciiStream().getText()}\n");
+                java.sql.Clob clob = (java.sql.Clob) it.PED_BY_PATIENT_CHR
+                plinkPedFile.append('' + it.PATIENT_NUM + ' ' + it.PATIENT_NUM + ' 0 0 ' + it.PATIENT_GENDER + ' 0  ' + clob.getAsciiStream().getText() + '\n')
             }
-        };
+        }
     }
 
     /**
@@ -148,20 +150,21 @@ class PlinkService {
     def void getSnpDataBySujectChromosome(String subjectIds, String chr, File plinkPedFile,
                                           List<String> conceptCodeList, String isAffected) {
 
-        def query;
-        def sql = new Sql(dataSource);
+        def query
+        def sql = new Sql(dataSource)
 
         // 0 -- Platform Name   1 -- Trial Name
-        def trialName = getStudyInfoBySubject(subjectIds)[1];
+        def trialName = getStudyInfoBySubject(subjectIds)[1]
 
-        String chroms;
-        if (chr.contains(",")) {
-            chroms = chr.replace(",", "','");
-        } else {
-            chroms = chr;
+        String chroms
+        if (chr.contains(',')) {
+            chroms = chr.replace(",', '','")
+        }
+        else {
+            chroms = chr
         }
 
-        String conceptCd = ""
+        String conceptCd = ''
         if (conceptCodeList.size() > 0) {
             for (item in 0..conceptCodeList.size() - 2) {
                 conceptCd += "'" + conceptCodeList[item] + "',"
@@ -169,7 +172,7 @@ class PlinkService {
             conceptCd += "'" + conceptCodeList[conceptCodeList.size() - 1] + "'"
         }
 
-        query = """SELECT t1.PATIENT_NUM,
+        query = '''SELECT t1.PATIENT_NUM,
 						 case t2.PATIENT_GENDER
 							 when 'M' then 1
 							 when 'F' then 2
@@ -179,18 +182,18 @@ class PlinkService {
 				  FROM DE_SNP_DATA_BY_PATIENT t1,
 					   (select distinct PATIENT_NUM, TRIAL_NAME, PATIENT_GENDER, SUBJECT_SNP_DATASET_ID
 						from DE_SUBJECT_SNP_DATASET
-						where concept_cd in (""" + conceptCd + """) and patient_num in (""" + subjectIds + """)) t2
+						where concept_cd in (''' + conceptCd + ''') and patient_num in (''' + subjectIds + ''')) t2
 				  WHERE t1.PATIENT_NUM=t2.PATIENT_NUM and t1.TRIAL_NAME=t2.TRIAL_NAME and
 						   t1.PED_BY_PATIENT_CHR is not null and
 						   t2.SUBJECT_SNP_DATASET_ID=t1.SNP_DATASET_ID and
-						t1.chrom in (?) and t1.trial_name=?""";
+						t1.chrom in (?) and t1.trial_name=?'''
 
         sql.eachRow(query, [chroms, trialName]) { it ->
             if (it.PED_BY_PATIENT_CHR != null) {
-                java.sql.Clob clob = (java.sql.Clob) it.PED_BY_PATIENT_CHR;
-                plinkPedFile.append("${it.PATIENT_NUM} ${it.PATIENT_NUM} 0 0 ${it.PATIENT_GENDER} ${isAffected} ${clob.getAsciiStream().getText()}\n");
+                java.sql.Clob clob = (java.sql.Clob) it.PED_BY_PATIENT_CHR
+                plinkPedFile.append('' + it.PATIENT_NUM + ' ' + it.PATIENT_NUM + ' 0 0 ' + it.PATIENT_GENDER + ' ' + isAffected + ' ' + clob.getAsciiStream().getText() + '\n')
             }
-        };
+        }
     }
 
     def getPhenotypicDataByPatient(String subjectIds) {

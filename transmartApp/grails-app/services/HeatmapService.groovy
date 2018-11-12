@@ -21,30 +21,32 @@ public class HeatmapService {
             searchAnalysisIds) {
 
         if (searchAnalysisIds == null || searchAnalysisIds.isEmpty()) {
-            logger.warn("Search analysis IDS are null, returning null")
+            logger.warn('Search analysis IDS are null, returning null')
             return null
         }
 
         // TODO: Check heatmap filter to determine if it's 100 gene or not
-        logger.info("Find all bioMarkers to be used in heatmaps")
-        logger.info("Check for top gene")
+        logger.info('Find all bioMarkers to be used in heatmaps')
+        logger.info('Check for top gene')
 
         def resultList = null
         def total = 50
         if (searchTopGene) {
-            logger.info("Run top genes heatmap")
+            logger.info('Run top genes heatmap')
             resultList = findTopBioMarkers(sfilter, method, dataType, total, searchAnalysisIds)
-            logger.info("Total top genes:" + resultList.size())
-        } else if (searchGeneList != null && searchGeneList.size() > 0) {
-            logger.info("Run data search")
+            logger.info('Total top genes:' + resultList.size())
+        }
+        else if (searchGeneList != null && searchGeneList.size() > 0) {
+            logger.info('Run data search')
             resultList = findHeatmapFilterBioMarker(sfilter, method, dataType, searchGeneList, searchAnalysisIds)
-        } else {
-            logger.info("Run global search")
+        }
+        else {
+            logger.info('Run global search')
             resultList = findGlobalFilterBioMarker(sfilter, method, dataType)
         }
 
         if (resultList == null || resultList.isEmpty()) {
-            logger.warn("Result list is empty from the search, returning null")
+            logger.warn('Result list is empty from the search, returning null')
             return null
         }
 
@@ -54,13 +56,13 @@ public class HeatmapService {
         }
 
         def dataQuery = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
-        dataQuery.addTable("org.transmart.biomart.BioAssayAnalysisData baad")
-        dataQuery.addTable("JOIN baad.featureGroup.markers baad_bm")
-        dataQuery.addSelect("baad_bm.id, baad_bm.name, baad.analysis.id,baad.foldChangeRatio, baad.rvalue, baad.rhoValue ")
+        dataQuery.addTable('org.transmart.biomart.BioAssayAnalysisData baad')
+        dataQuery.addTable('JOIN baad.featureGroup.markers baad_bm')
+        dataQuery.addSelect('baad_bm.id, baad_bm.name, baad.analysis.id,baad.foldChangeRatio, baad.rvalue, baad.rhoValue ')
         trialQueryService.createTrialFilterCriteria(sfilter.trialFilter, dataQuery)
-        dataQuery.addCondition("baad.analysis.id IN (:analysisIds)")
-        dataQuery.addCondition("baad_bm.id IN(:ids)")
-        dataQuery.addOrderBy("baad_bm.name")
+        dataQuery.addCondition('baad.analysis.id IN (:analysisIds)')
+        dataQuery.addCondition('baad_bm.id IN(:ids)')
+        dataQuery.addOrderBy('baad_bm.name')
 
         if (method != null)
             dataQuery.addCondition(" baad.analysis.analysisMethodCode = '" + method + "'")
@@ -71,7 +73,7 @@ public class HeatmapService {
         logger.debug(tquery)
 
         def dataList = BioAssayAnalysisData.executeQuery(tquery, ['analysisIds': searchAnalysisIds, 'ids': markerList, max: 2000])
-        logger.info("Total found: " + dataList.size())
+        logger.info('Total found: ' + dataList.size())
 
         def dataMarkerMap = [:]
         def markerId = null
@@ -100,7 +102,7 @@ public class HeatmapService {
             if (dataMarkerMap.containsKey(marker))
                 sortedDataList.addAll(dataMarkerMap.get(marker))
         }
-        return sortedDataList;
+        return sortedDataList
     }
 
     /**
@@ -108,12 +110,12 @@ public class HeatmapService {
      */
     def findTopBioMarkers(sfilter, method, dataType, total, searchAnalysisIds) {
 
-        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true);
-        query.addTable("org.transmart.biomart.BioAssayAnalysisData baad")
-        query.addTable("JOIN baad.featureGroup.markers baad_bm")
-        query.addSelect("baad_bm.id")
-        query.addSelect("COUNT(DISTINCT baad.analysis.id) ")
-        query.addCondition("baad.analysis.id IN (:ids)")
+        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+        query.addTable('org.transmart.biomart.BioAssayAnalysisData baad')
+        query.addTable('JOIN baad.featureGroup.markers baad_bm')
+        query.addSelect('baad_bm.id')
+        query.addSelect('COUNT(DISTINCT baad.analysis.id) ')
+        query.addCondition('baad.analysis.id IN (:ids)')
         trialQueryService.createTrialFilterCriteria(sfilter.trialFilter, query)
         query.addCondition("baad_bm.bioMarkerType='GENE'")
 
@@ -121,8 +123,8 @@ public class HeatmapService {
             query.addCondition(" baad.analysis.analysisMethodCode = '" + method + "'")
         if (dataType != null)
             query.addCondition(" baad.analysis.assayDataType = '" + dataType + "'")
-        query.addGroupBy("baad_bm.id")
-        query.addOrderBy("COUNT(DISTINCT baad.analysis.id) DESC")
+        query.addGroupBy('baad_bm.id')
+        query.addOrderBy('COUNT(DISTINCT baad.analysis.id) DESC')
         def q = query.generateSQL()
         logger.debug(q)
 
@@ -134,11 +136,11 @@ public class HeatmapService {
      */
     def findGlobalFilterBioMarker(sfilter, method, dataType) {
 
-        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true);
-        query.addTable("org.transmart.biomart.BioAssayAnalysisData baad")
-        query.addTable("JOIN baad.featureGroup.markers baad_bm")
-        query.addSelect("baad_bm.id")
-        query.addSelect("COUNT(DISTINCT baad.analysis.id) ")
+        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+        query.addTable('org.transmart.biomart.BioAssayAnalysisData baad')
+        query.addTable('JOIN baad.featureGroup.markers baad_bm')
+        query.addSelect('baad_bm.id')
+        query.addSelect('COUNT(DISTINCT baad.analysis.id) ')
         query.createGlobalFilterCriteria(sfilter.globalFilter, true)
 
         if (method != null)
@@ -146,8 +148,8 @@ public class HeatmapService {
         if (dataType != null)
             query.addCondition(" baad.analysis.assayDataType = '" + dataType + "'")
 
-        query.addGroupBy("baad_bm.id")
-        query.addOrderBy("COUNT(DISTINCT baad.analysis.id) DESC")
+        query.addGroupBy('baad_bm.id')
+        query.addOrderBy('COUNT(DISTINCT baad.analysis.id) DESC')
         def q = query.generateSQL()
         logger.debug(q)
 
@@ -159,21 +161,21 @@ public class HeatmapService {
      */
     def findHeatmapFilterBioMarker(sfilter, method, dataType, geneIds, searchAnalysisIds) {
 
-        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true);
-        query.addTable("org.transmart.biomart.BioAssayAnalysisData baad")
-        query.addTable("JOIN baad.featureGroup.markers baad_bm")
-        query.addSelect("baad_bm.id")
-        query.addSelect("COUNT(DISTINCT baad.analysis.id)")
-        query.addCondition("baad_bm.id IN(:ids)")
-        query.addCondition("baad.analysis.id IN (:analysisIds)")
+        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+        query.addTable('org.transmart.biomart.BioAssayAnalysisData baad')
+        query.addTable('JOIN baad.featureGroup.markers baad_bm')
+        query.addSelect('baad_bm.id')
+        query.addSelect('COUNT(DISTINCT baad.analysis.id)')
+        query.addCondition('baad_bm.id IN(:ids)')
+        query.addCondition('baad.analysis.id IN (:analysisIds)')
 
         if (method != null)
             query.addCondition(" baad.analysis.analysisMethodCode = '" + method + "'")
         if (dataType != null)
             query.addCondition(" baad.analysis.assayDataType = '" + dataType + "'")
 
-        query.addGroupBy("baad_bm.id")
-        query.addOrderBy("COUNT(DISTINCT baad.analysis.id) DESC")
+        query.addGroupBy('baad_bm.id')
+        query.addOrderBy('COUNT(DISTINCT baad.analysis.id) DESC')
         def q = query.generateSQL()
         logger.debug(q)
 

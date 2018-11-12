@@ -6,6 +6,6 @@
  */
 class HelpController {
     def index = {
-        render(view: 'guide');
+        render(view: 'guide')
     }
 }

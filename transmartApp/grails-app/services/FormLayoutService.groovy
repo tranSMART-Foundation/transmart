@@ -1,10 +1,10 @@
 /**
  * $Id: DetailsService.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
  */
-//import org.dom4j.Document;
-//import org.dom4j.Element;
-//import org.dom4j.DocumentException;
-//import org.dom4j.io.SAXReader;
+//import org.dom4j.Document
+//import org.dom4j.Element
+//import org.dom4j.DocumentException
+//import org.dom4j.io.SAXReader
 
 class FormLayoutService {
 
@@ -18,43 +18,40 @@ class FormLayoutService {
     }
 
 
-    def getProgramLayout =
-            {
-
+    def getProgramLayout = {
                 def formLayout = [new FormLayout(
-                        dataType: "string",
-                        displayName: "Program title",
-                        column: "Oncology_pan-PI3K inhibition"
+                        dataType: 'string',
+                        displayName: 'Program title',
+                        column: 'Oncology_pan-PI3K inhibition'
                 ),
 
                                   new FormLayout(
-                                          dataType: "string",
-                                          displayName: "Program description",
-                                          column: "pan-PI3K inhibition is a strategy to target all four of the class one PI3K isoforms (alpha, beta, gamma, delta) since the activity of any class 1A PI3K isoform appears to sustain cell proliferation and survival."
+                                          dataType: 'string',
+                                          displayName: 'Program description',
+                                          column: 'pan-PI3K inhibition is a strategy to target all four of the class one PI3K isoforms (alpha, beta, gamma, delta) since the activity of any class 1A PI3K isoform appears to sustain cell proliferation and survival.'
                                   ),
                                   new FormLayout(
-                                          dataType: "string",
-                                          displayName: "Program target",
-                                          column: "pan-PI3K inhibition (PIK3CA, PIK3CB, PIK3CD, PIK3CG)"
+                                          dataType: 'string',
+                                          displayName: 'Program target',
+                                          column: 'pan-PI3K inhibition (PIK3CA, PIK3CB, PIK3CD, PIK3CG)'
                                   ),
                                   new FormLayout(
-                                          dataType: "string",
-                                          displayName: "Therapeutic domain",
-                                          column: "Oncology"
+                                          dataType: 'string',
+                                          displayName: 'Therapeutic domain',
+                                          column: 'Oncology'
                                   )
                                   /*,
                                   new FormLayout(
-                                          dataType: "string",
-                                          displayName: "Institution",
-                                          column: "Sanofi - Oncology BD"
+                                          dataType: 'string',
+                                          displayName: 'Institution',
+                                          column: 'Sanofi - Oncology BD'
                                   )
                                   */
                 ]
                 return formLayout
             }
 /*
-	def getStudyGridLayout =
-	{
+	def getStudyGridLayout = {
 			yes	
 		Institution	yes	Sanofi - Oncology BD
 		Country	yes	USA
@@ -64,30 +61,30 @@ class FormLayoutService {
 		
 		
 		def formLayout = [ new FormLayout(
-			dataType: "string",
-			displayName : "Study title",
-			column : "XL147_Endometrial cancer_ARD11436"
+			dataType: 'string',
+			displayName : 'Study title',
+			column : 'XL147_Endometrial cancer_ARD11436'
 			),
 		
 		new FormLayout(
-			dataType: "string",
-			displayName : "Program description",
-			column : "pan-PI3K inhibition is a strategy to target all four of the class one PI3K isoforms (alpha, beta, gamma, delta) since the activity of any class 1A PI3K isoform appears to sustain cell proliferation and survival."
+			dataType: 'string',
+			displayName : 'Program description',
+			column : 'pan-PI3K inhibition is a strategy to target all four of the class one PI3K isoforms (alpha, beta, gamma, delta) since the activity of any class 1A PI3K isoform appears to sustain cell proliferation and survival.'
 			),
 		new FormLayout(
-			dataType: "string",
-			displayName : "Program target",
-			column : "pan-PI3K inhibition (PIK3CA, PIK3CB, PIK3CD, PIK3CG)"
+			dataType: 'string',
+			displayName : 'Program target',
+			column : 'pan-PI3K inhibition (PIK3CA, PIK3CB, PIK3CD, PIK3CG)'
 			),
 		new FormLayout(
-			dataType: "string",
-			displayName : "Therapeutic domain",
-			column : "Oncology"
+			dataType: 'string',
+			displayName : 'Therapeutic domain',
+			column : 'Oncology'
 			),
 		new FormLayout(
-			dataType: "string",
-			displayName : "Institution",
-			column : "Sanofi - Oncology BD"
+			dataType: 'string',
+			displayName : 'Institution',
+			column : 'Sanofi - Oncology BD'
 			)
 		]
 		return formLayout

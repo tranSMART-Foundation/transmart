@@ -26,48 +26,48 @@ public class SearchKeywordService {
     //Hard-coded list of items that we consider filter categories... configure in Config/database?
     def filtercats = [
 
-            [codeTypeName: "THERAPEUTIC_DOMAIN", category: "THERAPEUTIC_DOMAIN", displayName: "Program Therapeutic Domain"],
-            [codeTypeName: "PROGRAM_INSTITUTION", category: "PROGRAM_INSTITUTION", displayName: "Program Institution"],
+            [codeTypeName: 'THERAPEUTIC_DOMAIN', category: 'THERAPEUTIC_DOMAIN', displayName: 'Program Therapeutic Domain'],
+            [codeTypeName: 'PROGRAM_INSTITUTION', category: 'PROGRAM_INSTITUTION', displayName: 'Program Institution'],
 
-            [codeTypeName: "STUDY_PHASE", category: "STUDY_PHASE", displayName: "Study Phase"],
-            [codeTypeName: "STUDY_OBJECTIVE", category: "STUDY_OBJECTIVE", displayName: "Study Objective"],
-            [codeTypeName: "STUDY_DESIGN", category: "STUDY_DESIGN", displayName: "Study Design"],
-            [codeTypeName: "STUDY_BIOMARKER_TYPE", category: "STUDY_BIOMARKER_TYPE", displayName: "Study Biomarker Type"],
-            [codeTypeName: "STUDY_ACCESS_TYPE", category: "STUDY_ACCESS_TYPE", displayName: "Study Access Type"],
-            [codeTypeName: "STUDY_INSTITUTION", category: "STUDY_INSTITUTION", displayName: "Study Institution"],
+            [codeTypeName: 'STUDY_PHASE', category: 'STUDY_PHASE', displayName: 'Study Phase'],
+            [codeTypeName: 'STUDY_OBJECTIVE', category: 'STUDY_OBJECTIVE', displayName: 'Study Objective'],
+            [codeTypeName: 'STUDY_DESIGN', category: 'STUDY_DESIGN', displayName: 'Study Design'],
+            [codeTypeName: 'STUDY_BIOMARKER_TYPE', category: 'STUDY_BIOMARKER_TYPE', displayName: 'Study Biomarker Type'],
+            [codeTypeName: 'STUDY_ACCESS_TYPE', category: 'STUDY_ACCESS_TYPE', displayName: 'Study Access Type'],
+            [codeTypeName: 'STUDY_INSTITUTION', category: 'STUDY_INSTITUTION', displayName: 'Study Institution'],
 
-            [codeTypeName: "ASSAY_TYPE_OF_BM_STUDIED", category: "ASSAY_TYPE_OF_BM_STUDIED", displayName: "Assay Type of Biomarkers"],
-            [category: "ASSAY_MEASUREMENT_TYPE", displayName: "Assay Measurement Type", useText: true, platformProperty: 'platformType'],
-            [category: "ASSAY_TECHNOLOGY", displayName: "Assay Technology", prefix: true, useText: true, platformProperty: 'platformTechnology'],
-            [category: "ASSAY_VENDOR", displayName: "Assay Vendor", prefix: true, useText: true, platformProperty: 'vendor'],
-            [category: "ASSAY_PLATFORM_NAME", displayName: "Assay Platform Name", useText: true, platformProperty: 'name'],
+            [codeTypeName: 'ASSAY_TYPE_OF_BM_STUDIED', category: 'ASSAY_TYPE_OF_BM_STUDIED', displayName: 'Assay Type of Biomarkers'],
+            [category: 'ASSAY_MEASUREMENT_TYPE', displayName: 'Assay Measurement Type', useText: true, platformProperty: 'platformType'],
+            [category: 'ASSAY_TECHNOLOGY', displayName: 'Assay Technology', prefix: true, useText: true, platformProperty: 'platformTechnology'],
+            [category: 'ASSAY_VENDOR', displayName: 'Assay Vendor', prefix: true, useText: true, platformProperty: 'vendor'],
+            [category: 'ASSAY_PLATFORM_NAME', displayName: 'Assay Platform Name', useText: true, platformProperty: 'name'],
 
-            [category: "ANALYSIS_MEASUREMENT_TYPE", displayName: "Analysis Measurement Type", useText: true, platformProperty: 'platformType'],
-            [category: "ANALYSIS_TECHNOLOGY", displayName: "Analysis Technology", prefix: true, useText: true, platformProperty: 'platformTechnology'],
-            [category: "ANALYSIS_VENDOR", displayName: "Analysis Vendor", prefix: true, useText: true, platformProperty: 'vendor'],
-            [category: "ANALYSIS_PLATFORM_NAME", displayName: "Analysis Platform Name", useText: true, platformProperty: 'name'],
+            [category: 'ANALYSIS_MEASUREMENT_TYPE', displayName: 'Analysis Measurement Type', useText: true, platformProperty: 'platformType'],
+            [category: 'ANALYSIS_TECHNOLOGY', displayName: 'Analysis Technology', prefix: true, useText: true, platformProperty: 'platformTechnology'],
+            [category: 'ANALYSIS_VENDOR', displayName: 'Analysis Vendor', prefix: true, useText: true, platformProperty: 'vendor'],
+            [category: 'ANALYSIS_PLATFORM_NAME', displayName: 'Analysis Platform Name', useText: true, platformProperty: 'name'],
 
-            [codeTypeName: "FILE_TYPE", category: "FILE_TYPE", displayName: "File type"]
+            [codeTypeName: 'FILE_TYPE', category: 'FILE_TYPE', displayName: 'File type']
     ]
 
     /** Finds all of the search categories pertaining to search keywords */
     def findSearchCategories() {
-        logger.info "Finding all of the search categories..."
+        logger.info 'Finding all of the search categories...'
 
         def c = SearchKeyword.createCriteria()
         def results = c.list {
             projections {
-                distinct("dataCategory")
+                distinct('dataCategory')
             }
-            order("dataCategory", "asc")
+            order('dataCategory', 'asc')
         }
 
-        logger.info("Categories found: " + results.size())
+        logger.info('Categories found: ' + results.size())
 
         def categories = []
 
         for (result in results) {
-            categories.add(["category": result])
+            categories.add(['category': result])
         }
 
         return categories
@@ -85,42 +85,46 @@ public class SearchKeywordService {
                     projections {
                         distinct(filtercat.platformProperty)
                     }
-                    order(filtercat.platformProperty, "asc")
+                    order(filtercat.platformProperty, 'asc')
                 }
-            } else if (filtercat.prefix) {
+            }
+            else if (filtercat.prefix) {
                 results = ConceptCode.createCriteria().list {
-                    like("codeTypeName", filtercat.codeTypeName + ":%")
-                    order("codeName", "asc")
+                    like('codeTypeName', filtercat.codeTypeName + ':%')
+                    order('codeName', 'asc')
                 }
-            } else {
+            }
+            else {
                 results = ConceptCode.createCriteria().list {
-                    eq("codeTypeName", filtercat.codeTypeName)
-                    order("codeName", "asc")
+                    eq('codeTypeName', filtercat.codeTypeName)
+                    order('codeName', 'asc')
                 }
             }
 
             def choices = new TreeSet<Map>(new Comparator() {
                 int compare(Object o1, Object o2) {
                     if (!o1 instanceof Map || !o2 instanceof Map) {
-                        return 0;
+                        return 0
                     }
-                    Map m1 = (Map) o1;
-                    Map m2 = (Map) o2;
-                    return o1.get('name').compareTo(o2.get('name'));
+                    Map m1 = (Map) o1
+                    Map m2 = (Map) o2
+                    return o1.get('name').compareTo(o2.get('name'))
                 }
-            });
+            })
             for (result in results) {
                 if (filtercat.platformProperty) {
                     choices.add([name: result, uid: result])
-                } else if (filtercat.useText) {
+                }
+                else if (filtercat.useText) {
                     choices.add([name: result.codeName, uid: result.codeName])
-                } else {
+                }
+                else {
                     choices.add([name: result.codeName, uid: result.bioDataUid.uniqueId[0]])
                 }
             }
 
             if (choices) {
-                categories.add(["category": filtercat, "choices": choices])
+                categories.add(['category': filtercat, 'choices': choices])
             }
         }
 
@@ -129,42 +133,43 @@ public class SearchKeywordService {
 
     /** Searches for all keywords for a given term (like %il%) */
     def findSearchKeywords(category, term, max) {
-        logger.info "Finding matches for ${term} in ${category}"
+        logger.info 'Finding matches for ' + term + ' in ' + category
 
         def user = springSecurityService.getPrincipal()
 
         def c = SearchKeywordTerm.createCriteria()
         def results = c.list {
             if (term.size() > 0) {
-                like("keywordTerm", term.toUpperCase() + '%')
+                like('keywordTerm', term.toUpperCase() + '%')
             }
 
-            if ("GENE_OR_SNP".equals(category)) {
+            if ('GENE_OR_SNP'.equals(category)) {
                 searchKeyword {
                     or {
-                        eq("dataCategory", "GENE")
-                        eq("dataCategory", "SNP")
+                        eq('dataCategory', 'GENE')
+                        eq('dataCategory', 'SNP')
                     }
                 }
-            } else if ("ALL".compareToIgnoreCase(category) != 0) {
+            }
+            else if ('ALL'.compareToIgnoreCase(category) != 0) {
                 searchKeyword {
-                    eq("dataCategory", category.toUpperCase())
+                    eq('dataCategory', category.toUpperCase())
                 }
             }
 
             if (!user.isAdmin()) {
-                logger.info("User is not an admin so filter out gene lists or signatures that are not public")
+                logger.info('User is not an admin so filter out gene lists or signatures that are not public')
                 or {
-                    isNull("ownerAuthUserId")
-                    eq("ownerAuthUserId", user.id)
+                    isNull('ownerAuthUserId')
+                    eq('ownerAuthUserId', user.id)
                 }
             }
             maxResults(max)
-            order("rank", "asc")
-            order("termLength", "asc")
-            order("keywordTerm", "asc")
+            order('rank', 'asc')
+            order('termLength', 'asc')
+            order('keywordTerm', 'asc')
         }
-        logger.info("Search keywords found: " + results.size())
+        logger.info('Search keywords found: ' + results.size())
 
         def keywords = []
         def dupeList = []            // store category:keyword for a duplicate check until DB is cleaned up
@@ -174,42 +179,45 @@ public class SearchKeywordService {
             def sk = result
             //////////////////////////////////////////////////////////////////////////////////
             // HACK:  Duplicate check until DB is cleaned up
-            def dupeKey = sk.searchKeyword.displayDataCategory + ":" + sk.searchKeyword.keyword +
-                    ":" + sk.searchKeyword.bioDataId
+            def dupeKey = sk.searchKeyword.displayDataCategory + ':' + sk.searchKeyword.keyword +
+                    ':' + sk.searchKeyword.bioDataId
             if (dupeKey in dupeList) {
-                logger.info "Found duplicate: " + dupeKey
+                logger.info 'Found duplicate: ' + dupeKey
                 continue
-            } else {
-                logger.info "Found new entry, adding to the list: " + dupeList
+            }
+            else {
+                logger.info 'Found new entry, adding to the list: ' + dupeList
                 dupeList << dupeKey
             }
             ///////////////////////////////////////////////////////////////////////////////////
 
-            m.put("label", sk.searchKeyword.keyword)
-            m.put("category", sk.searchKeyword.displayDataCategory)
-            m.put("categoryId", sk.searchKeyword.dataCategory)
+            m.put('label', sk.searchKeyword.keyword)
+            m.put('category', sk.searchKeyword.displayDataCategory)
+            m.put('categoryId', sk.searchKeyword.dataCategory)
 
-            if ("GENE_OR_SNP".equals(category) || ("SNP".equals(category))) {
-                m.put("id", sk.searchKeyword.id)
-            } else {
-                m.put("id", sk.searchKeyword.uniqueId)
+            if ('GENE_OR_SNP'.equals(category) || ('SNP'.equals(category))) {
+                m.put('id', sk.searchKeyword.id)
+            }
+            else {
+                m.put('id', sk.searchKeyword.uniqueId)
             }
 
-            if ("TEXT".compareToIgnoreCase(sk.searchKeyword.dataCategory) != 0) {
-                def synonyms = org.transmart.biomart.BioDataExternalCode.findAllWhere(bioDataId: sk.searchKeyword.bioDataId, codeType: "SYNONYM")
+            if ('TEXT'.compareToIgnoreCase(sk.searchKeyword.dataCategory) != 0) {
+                def synonyms = org.transmart.biomart.BioDataExternalCode.findAllWhere(bioDataId: sk.searchKeyword.bioDataId, codeType: 'SYNONYM')
                 def synList = new StringBuilder()
                 for (synonym in synonyms) {
                     if (synList.size() > 0) {
-                        synList.append(", ")
-                    } else {
-                        synList.append("(")
+                        synList.append(', ')
+                    }
+                    else {
+                        synList.append('(')
                     }
                     synList.append(synonym.code)
                 }
                 if (synList.size() > 0) {
-                    synList.append(")")
+                    synList.append(')')
                 }
-                m.put("synonyms", synList.toString())
+                m.put('synonyms', synList.toString())
             }
             keywords.add(m)
         }
@@ -218,18 +226,18 @@ public class SearchKeywordService {
         * Get results from Bio Concept Code table
         */
 
-        if (category.equals("ALL")) {
+        if (category.equals('ALL')) {
             results = ConceptCode.createCriteria().list {
                 if (term.size() > 0) {
-                    like("bioConceptCode", term.toUpperCase().replace(" ", "_") + '%')
+                    like('bioConceptCode', term.toUpperCase().replace(' ', '_') + '%')
                 }
                 or {
                     'in'("codeTypeName", filtercats*.codeTypeName)
                 }
                 maxResults(max)
-                order("bioConceptCode", "asc")
+                order('bioConceptCode', 'asc')
             }
-            logger.info("Bio concept code keywords found: " + results.size())
+            logger.info('Bio concept code keywords found: ' + results.size())
 
             for (result in results) {
                 def m = [:]
@@ -237,13 +245,14 @@ public class SearchKeywordService {
                 //Get display name by category
                 def cat = filtercats.find { result.codeTypeName.startsWith(it.codeTypeName) }
 
-                m.put("label", result.codeName)
-                m.put("category", cat.displayName)
-                m.put("categoryId", cat.category)
+                m.put('label', result.codeName)
+                m.put('category', cat.displayName)
+                m.put('categoryId', cat.category)
                 if (cat.useText) {
-                    m.put("id", result.codeName)
-                } else {
-                    m.put("id", result.bioDataUid.uniqueId[0])
+                    m.put('id', result.codeName)
+                }
+                else {
+                    m.put('id', result.bioDataUid.uniqueId[0])
                 }
                 if (!keywords.find { it.id.equals(m.id) }) {
                     keywords.add(m)
@@ -260,16 +269,16 @@ public class SearchKeywordService {
                         results = BioAssayPlatform.createCriteria().list {
                             ilike(cat.platformProperty, term + '%')
                             maxResults(max)
-                            order(cat.platformProperty, "asc")
+                            order(cat.platformProperty, 'asc')
                         }
-                        logger.info("Platform " + cat.platformProperty + " keywords found: " + results.size())
+                        logger.info('Platform ' + cat.platformProperty + ' keywords found: ' + results.size())
 
                         for (result in results) {
                             def m = [:]
 
                             m.put("label", result."${cat.platformProperty}")
-                            m.put("category", cat.displayName)
-                            m.put("categoryId", cat.category)
+                            m.put('category', cat.displayName)
+                            m.put('categoryId', cat.category)
                             m.put("id", result."${cat.platformProperty}")
 
                             if (!keywords.find { it.id.equals(m.id) && it.category.equals(m.category) }) {
@@ -287,40 +296,41 @@ public class SearchKeywordService {
 
     /** Searches for all keywords for a given term (like %il%) */
     def findSearchKeywords(category, term) {
-        logger.info "Finding matches for ${term} in ${category}"
+        logger.info 'Finding matches for ' + term + ' in ' + category
 
         def user = springSecurityService.getPrincipal()
 
         def c = SearchKeywordTerm.createCriteria()
         def results = c.list {
             if (term.size() > 0) {
-                ilike("keywordTerm", '%' + term + '%')
+                ilike('keywordTerm', '%' + term + '%')
             }
             if (category.class.name.toLowerCase() == 'java.util.arraylist') {
                 searchKeyword {
-                    inList("dataCategory", category)
+                    inList('dataCategory', category)
                 }
-            } else {
-                if ("ALL".compareToIgnoreCase(category) != 0) {
+            }
+            else {
+                if ('ALL'.compareToIgnoreCase(category) != 0) {
                     searchKeyword {
-                        eq("dataCategory", category, [ignoreCase: true])
+                        eq('dataCategory', category, [ignoreCase: true])
                     }
                 }
             }
 
             if (!user.isAdmin()) {
-                logger.info("User is not an admin so filter out gene lists or signatures that are not public")
+                logger.info('User is not an admin so filter out gene lists or signatures that are not public')
                 or {
-                    isNull("ownerAuthUserId")
-                    eq("ownerAuthUserId", user.id)
+                    isNull('ownerAuthUserId')
+                    eq('ownerAuthUserId', user.id)
                 }
             }
             maxResults(20)
-            order("rank", "asc")
-            order("termLength", "asc")
-            order("keywordTerm", "asc")
+            order('rank', 'asc')
+            order('termLength', 'asc')
+            order('keywordTerm', 'asc')
         }
-        logger.info("Search keywords found: " + results.size())
+        logger.info('Search keywords found: ' + results.size())
 
         def keywords = []
         def dupeList = []            // store category:keyword for a duplicate check until DB is cleaned up
@@ -330,34 +340,36 @@ public class SearchKeywordService {
             def sk = result
             //////////////////////////////////////////////////////////////////////////////////
             // HACK:  Duplicate check until DB is cleaned up
-            def dupeKey = sk.searchKeyword.displayDataCategory + ":" + sk.searchKeyword.keyword
+            def dupeKey = sk.searchKeyword.displayDataCategory + ':' + sk.searchKeyword.keyword
             if (dupeKey in dupeList) {
-                logger.info "Found duplicate: " + dupeKey
+                logger.info 'Found duplicate: ' + dupeKey
                 continue
-            } else {
-                logger.info "Found new entry, adding to the list: " + dupeList
+            }
+            else {
+                logger.info 'Found new entry, adding to the list: ' + dupeList
                 dupeList << dupeKey
             }
             ///////////////////////////////////////////////////////////////////////////////////
-            m.put("label", sk.searchKeyword.keyword)
-            m.put("id", sk.searchKeyword.id)
-            m.put("category", sk.searchKeyword.displayDataCategory)
-            m.put("categoryId", sk.searchKeyword.dataCategory)
-            if ("TEXT".compareToIgnoreCase(sk.searchKeyword.dataCategory) != 0) {
-                def synonyms = BioDataExternalCode.findAllWhere(bioDataId: sk.searchKeyword.bioDataId, codeType: "SYNONYM")
+            m.put('label', sk.searchKeyword.keyword)
+            m.put('id', sk.searchKeyword.id)
+            m.put('category', sk.searchKeyword.displayDataCategory)
+            m.put('categoryId', sk.searchKeyword.dataCategory)
+            if ('TEXT'.compareToIgnoreCase(sk.searchKeyword.dataCategory) != 0) {
+                def synonyms = BioDataExternalCode.findAllWhere(bioDataId: sk.searchKeyword.bioDataId, codeType: 'SYNONYM')
                 def synList = new StringBuilder()
                 for (synonym in synonyms) {
                     if (synList.size() > 0) {
-                        synList.append(", ")
-                    } else {
-                        synList.append("(")
+                        synList.append(', ')
+                    }
+                    else {
+                        synList.append('(')
                     }
                     synList.append(synonym.code)
                 }
                 if (synList.size() > 0) {
-                    synList.append(")")
+                    synList.append(')')
                 }
-                m.put("synonyms", synList.toString())
+                m.put('synonyms', synList.toString())
             }
             keywords.add(m)
         }
@@ -367,7 +379,7 @@ public class SearchKeywordService {
      * This will render a UI where the user can pick an experiment from a list of all the experiments in the system. Selection of multiple studies is allowed.
      */
     def browseAnalysisMultiSelect = {
-        def analyses = org.transmart.biomart.BioAssayAnalysis.executeQuery("select id, name, etlId from BioAssayAnalysis b order by b.name");
+        def analyses = org.transmart.biomart.BioAssayAnalysis.executeQuery('select id, name, etlId from BioAssayAnalysis b order by b.name')
         render(template: 'browseMulti', model: [analyses: analyses])
     }
 
@@ -385,7 +397,7 @@ public class SearchKeywordService {
         if (pathwayIds == null || pathwayIds.length() == 0) {
             return []
         }
-        def query = "select DISTINCT k from org.transmart.searchapp.SearchKeyword k, org.transmart.biomart.BioDataCorrelation c where k.bioDataId=c.associatedBioDataId and c.bioDataId in (" + pathwayIds + ") ORDER BY k.keyword"
+        def query = 'select DISTINCT k from org.transmart.searchapp.SearchKeyword k, org.transmart.biomart.BioDataCorrelation c where k.bioDataId=c.associatedBioDataId and c.bioDataId in (' + pathwayIds + ') ORDER BY k.keyword'
         if (max != null)
             return SearchKeyword.executeQuery(query, [max: max])
         else
@@ -395,27 +407,28 @@ public class SearchKeywordService {
     }
 
     def expandAllListToGenes(pathwayIds) {
-        return expandAllListToGenes(pathwayIds, null);
+        return expandAllListToGenes(pathwayIds, null)
     }
 
     def expandAllListToGenes(pathwayIds, Long max) {
         if (pathwayIds == null || pathwayIds.length() == 0) {
             return []
         }
-        def result = [];
+        def result = []
         // find pathways
-        def query = "select DISTINCT k from org.transmart.searchapp.SearchKeyword k, org.transmart.biomart.BioDataCorrelation c where k.bioDataId=c.associatedBioDataId and c.bioDataId in (" + pathwayIds + ") ORDER BY k.keyword"
+        def query = 'select DISTINCT k from org.transmart.searchapp.SearchKeyword k, org.transmart.biomart.BioDataCorrelation c where k.bioDataId=c.associatedBioDataId and c.bioDataId in (' + pathwayIds + ') ORDER BY k.keyword'
         // find gene sigs
-        def query2 = "select DISTINCT k from org.transmart.searchapp.SearchKeyword k, org.transmart.searchapp.SearchBioMarkerCorrelFastMV c where k.bioDataId=c.assocBioMarkerId and c.domainObjectId in (" + pathwayIds + ") ORDER BY k.keyword"
+        def query2 = 'select DISTINCT k from org.transmart.searchapp.SearchKeyword k, org.transmart.searchapp.SearchBioMarkerCorrelFastMV c where k.bioDataId=c.assocBioMarkerId and c.domainObjectId in (' + pathwayIds + ') ORDER BY k.keyword'
         if (max != null)
             result.addAll(SearchKeyword.executeQuery(query, [max: max]))
         if (result.size() < max) {
-            result.addAll(SearchKeyword.executeQuery(query2, [max: (max - result.size())]));
-        } else {
-            result.addAll(SearchKeyword.executeQuery(query));
-            result.addAll(SearchKeyword.executeQuery(query2));
+            result.addAll(SearchKeyword.executeQuery(query2, [max: (max - result.size())]))
         }
-        return result;
+        else {
+            result.addAll(SearchKeyword.executeQuery(query))
+            result.addAll(SearchKeyword.executeQuery(query2))
+        }
+        return result
 
     }
 
@@ -427,13 +440,13 @@ public class SearchKeywordService {
         SearchKeyword keyword = createSearchKeywordFromGeneSig(gs)
 
         keyword.validate()
-        println("keyword validate()")
+        println('keyword validate()')
 
         if (keyword.hasErrors()) {
-            println("WARN: SearchKeyword validation error!")
+            println('WARN: SearchKeyword validation error!')
             keyword.errors.each { println it }
         }
-        println("INFO: saving new SearchKeyword!")
+        println('INFO: saving new SearchKeyword!')
         keyword.save(flush: bFlush)
     }
 
@@ -443,36 +456,38 @@ public class SearchKeywordService {
     def updateGeneSignatureLink(GeneSignature gs, String domainKey, boolean bFlush) {
         // find keyword record
         SearchKeyword keyword = SearchKeyword.findByBioDataIdAndDataCategory(gs.id, domainKey)
-        logger.info("updateGeneSignatureLink: domainKey ${domainKey} concept ${gs.foldChgMetricConceptCode.bioConceptCode} retrieved ${keyword}")
+        logger.info('updateGeneSignatureLink: domainKey ' + domainKey + ' concept ' + gs.foldChgMetricConceptCode.bioConceptCode + ' retrieved ' + keyword)
 
         // delete search keywords
         if (gs.deletedFlag || (domainKey == GeneSignature.DOMAIN_KEY_GL && gs.foldChgMetricConceptCode.bioConceptCode != 'NOT_USED') || (domainKey == GeneSignature.DOMAIN_KEY && gs.foldChgMetricConceptCode.bioConceptCode == 'NOT_USED')) {
-            logger.info("updateGeneSignatureLink delete keyword")
+            logger.info('updateGeneSignatureLink delete keyword')
             if (keyword != null) keyword.delete(flush: bFlush)
-        } else {
+        }
+        else {
             // add if does not exist
             if (keyword == null) {
-                logger.info("updateGeneSignatureLink create keyword")
+                logger.info('updateGeneSignatureLink create keyword')
                 keyword = createSearchKeywordFromGeneSig(gs, domainKey)
-            } else {
+            }
+            else {
                 // update keyword
-                logger.info("updateGeneSignatureLink update keyword ${gs.name} ")
+                logger.info('updateGeneSignatureLink update keyword ' + gs.name + ' ')
                 keyword.keyword = gs.name
                 keyword.ownerAuthUserId = gs.publicFlag ? null : gs.createdByAuthUser.id
                 keyword.terms.each {
-                    logger.info("INFO: " + it)
+                    logger.info('INFO: ' + it)
                     it.keywordTerm = gs.name.toUpperCase()
                     it.ownerAuthUserId = gs.publicFlag ? null : gs.createdByAuthUser.id
-                    //logger.info("INFO: setting owner to: "+it.ownerAuthUserId)
+                    //logger.info('INFO: setting owner to: '+it.ownerAuthUserId)
                 }
             }
 
             keyword.validate()
             if (keyword.hasErrors()) {
-                logger.info("WARN: SearchKeyword validation error!")
-                keyword.errors.each {logger.info("keyword error: ${it}")}
+                logger.info('WARN: SearchKeyword validation error!')
+                keyword.errors.each {logger.info('keyword error: ' + it)}
             }
-            logger.info("INFO: trying to save SearchKeyword")
+            logger.info('INFO: trying to save SearchKeyword')
             keyword.save(flush: bFlush)
         }
     }
@@ -481,7 +496,7 @@ public class SearchKeywordService {
      * create a new SearchKeyword for a GeneSignatute
      */
     def createSearchKeywordFromGeneSig(GeneSignature gs, String domainKey) {
-        println("INFO: creating SearchKeyword for GS: " + gs.name + "[" + domainKey + "]")
+        println('INFO: creating SearchKeyword for GS: ' + gs.name + '[' + domainKey + ']')
 
         // display category GS or GL?
         def displayName = (domainKey == GeneSignature.DOMAIN_KEY) ? GeneSignature.DISPLAY_TAG : GeneSignature.DISPLAY_TAG_GL
@@ -492,7 +507,7 @@ public class SearchKeywordService {
         keyword.properties.uniqueId = gs.uniqueId
         keyword.properties.dataCategory = domainKey
         keyword.properties.displayDataCategory = displayName
-        keyword.properties.dataSource = "Internal"
+        keyword.properties.dataSource = 'Internal'
         if (!gs.publicFlag) keyword.properties.ownerAuthUserId = gs.createdByAuthUser?.id
 
         // keyword term
@@ -506,8 +521,8 @@ public class SearchKeywordService {
         keyword.addToTerms(term)
 
         //println(keyword)
-        //println("properties:\n"+keyword.properties)
-        return keyword;
+        //println('properties:\n'+keyword.properties)
+        return keyword
     }
 
 }
