@@ -52,7 +52,7 @@ class VcfDataRow extends AbstractDataRow
     String geneName
     
     List<String> getAlternativeAlleles() {
-        return alternatives.split(",")
+        return alternatives.split(',')
     }
     
     @Lazy
@@ -67,7 +67,7 @@ class VcfDataRow extends AbstractDataRow
     
     @Lazy
     List<String> formatFields = {
-        format.split ":"
+        format.split ':'
     }()
 
     @Lazy

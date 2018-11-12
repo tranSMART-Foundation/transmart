@@ -110,10 +110,10 @@ class SearchKeywordDataConstraint implements CriteriaDataConstraint {
         def constraint = new SearchKeywordDataConstraint()
 
         [ 'entityAlias', 'propertyToRestrict', 'correlationTypes' ].each {
-            if (map."$it" == null) {
+            if (map[it] == null) {
                 throw new IllegalArgumentException("Entry '$it' expected")
             }
-            constraint."$it" = map."$it"
+            constraint[it] = map[it]
         }
 
         constraint
