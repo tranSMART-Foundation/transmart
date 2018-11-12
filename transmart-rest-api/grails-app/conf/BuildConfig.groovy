@@ -58,9 +58,10 @@ grails.project.dependency.resolution = {
             grailsCentral()
             mavenCentral()
 
-            mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
+            mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
         }
-    } else {
+    }
+    else {
         dm.configureRepositories delegate
     }
 
@@ -108,12 +109,13 @@ grails.project.dependency.resolution = {
             compile ':transmart-shared:16.4-SNAPSHOT'
 
 	    test ':transmart-core-db-tests:16.4-SNAPSHOT'
-        } else {
+        }
+        else {
             dm.internalDependencies delegate
         }
 
         if (enableClover) {
-            compile ":clover:$CLOVER_VERSION", {
+            compile ':clover:' + CLOVER_VERSION, {
                 export = false
             }
         }
@@ -130,10 +132,10 @@ if (enableClover) {
         excludes = ['**/conf/**', '**/plugins/**', '**/HighDimProtos.java']
 
         reporttask = { ant, binding, plugin ->
-            def reportDir = "${binding.projectTargetDir}/clover/report"
+            def reportDir = '' + binding.projectTargetDir + '/clover/report'
             ant.'clover-report' {
                 ant.current(outfile: reportDir, title: 'transmart-rest-api') {
-                    format(type: "html", reportStyle: 'adg')
+                    format(type: 'html', reportStyle: 'adg')
                     testresults(dir: 'target/test-reports', includes: '*.xml')
                     ant.columns {
                         lineCount()
@@ -142,8 +144,8 @@ if (enableClover) {
                         totalPercentageCovered()
                     }
                 }
-                ant.current(outfile: "${reportDir}/clover.xml") {
-                    format(type: "xml")
+                ant.current(outfile: '' + reportDir + '/clover.xml') {
+                    format(type: 'xml')
                     testresults(dir: 'target/test-reports', includes: '*.xml')
                 }
             }

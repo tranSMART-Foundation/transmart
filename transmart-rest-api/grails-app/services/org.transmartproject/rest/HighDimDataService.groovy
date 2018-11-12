@@ -62,7 +62,7 @@ class HighDimDataService {
 
         String proj = projectionName ?: getDefaultProjectionFor(typeResource.supportedProjections)
         if (!proj) {
-            throw new InvalidArgumentsException("Projection needs to be specified for $dataType")
+            throw new InvalidArgumentsException('Projection needs to be specified for ' + dataType)
         }
 
         Projection projection = typeResource.createProjection(proj)
@@ -93,7 +93,8 @@ class HighDimDataService {
 
         try {
             HighDimBuilder.write(projection, tabularResult, out)
-        } finally {
+        }
+        finally {
             tabularResult.close() //closing the tabular result, no matter what
         }
     }
@@ -116,7 +117,8 @@ class HighDimDataService {
     private static String getDefaultProjectionFor(Set<String> supportedProjections) {
         if (Projection.DEFAULT_REAL_PROJECTION in supportedProjections) {
             Projection.DEFAULT_REAL_PROJECTION
-        } else if (Projection.ALL_DATA_PROJECTION in supportedProjections) {
+        }
+        else if (Projection.ALL_DATA_PROJECTION in supportedProjections) {
             Projection.ALL_DATA_PROJECTION
         } // else null
     }

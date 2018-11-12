@@ -70,7 +70,7 @@ class StudyLoadingService {
         def study = studiesResourceService.getStudyById(studyId)
 
         if (!checkAccess(study)) {
-            throw new AccessDeniedException("Denied access to study ${study.id}")
+            throw new AccessDeniedException('Denied access to study ' + study.id)
         }
 
         study
@@ -81,7 +81,7 @@ class StudyLoadingService {
                 ProtectedOperation.WellKnownOperations.API_READ, study)
         if (!result) {
             def username = currentUser.username
-            logger.warn "User $username denied access to study ${study.id}"
+            logger.warn 'User ' + username + ' denied access to study ' + study.id
         }
 
         result
@@ -104,20 +104,22 @@ class StudyLoadingService {
             use (OntologyTermCategory) {
                 pathPart = term.encodeAsURLPart study
             }
-        } catch (InvalidArgumentsException iae) {
+        }
+        catch (InvalidArgumentsException iae) {
             //studyId not in params: either /studies or a study controller
             studyId = term.study.id
             if (term.level == 1) {
                 //we are handling a study, which is mapped to $id (can we rename the param to $studyId for consistency?)
                 pathPart = 'ROOT'
-            } else {
+            }
+            else {
                 use (OntologyTermCategory) {
                     pathPart = term.encodeAsURLPart term.study
                 }
             }
         }
         studyId = studyId.toLowerCase(Locale.ENGLISH).encodeAsURL()
-        "/studies/$studyId/concepts/$pathPart"
+        '/studies/' + studyId + '/concepts/' + pathPart
     }
 
 }

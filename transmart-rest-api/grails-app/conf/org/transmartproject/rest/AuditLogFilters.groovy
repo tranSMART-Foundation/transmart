@@ -14,7 +14,7 @@ class AuditLogFilters {
                 def ip = request.getHeader('X-FORWARDED-FOR') ?: request.remoteAddr
 
                 accessLogService.report(currentUserBean, 'REST API Data Retrieval',
-                        eventMessage:  "User (IP: ${ip}) got low dim. data with ${fullUrl}",
+                        eventMessage:  'User (IP: ' + ip + ') got low dim. data with ' + fullUrl,
                         requestURL: fullUrl)
             }
         }
@@ -25,7 +25,7 @@ class AuditLogFilters {
                 def ip = request.getHeader('X-FORWARDED-FOR') ?: request.remoteAddr
 
                 accessLogService.report(currentUserBean, 'REST API Data Retrieval',
-                        eventMessage:  "User (IP: ${ip}) got high dim. data with ${fullUrl}",
+                        eventMessage:  'User (IP: ' + ip + ') got high dim. data with ' + fullUrl,
                         requestURL: fullUrl)
             }
         }

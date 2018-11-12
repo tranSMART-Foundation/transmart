@@ -52,7 +52,7 @@ abstract class ResourceTestCase extends APITestCase {
 
     JSONElement doAsHal(String method, String path, Closure paramSetup = null) {
         client.setStickyHeader('Accept', contentTypeForHAL)
-        "$method"(path, paramSetup)
+        '' + method(path, paramSetup)
 
         //cannot use client.responseAsString, as HAL is considered binary and is trimmed (no parsing is possible)
         //grails.converters.JSON.parse(client.responseAsString)
@@ -88,7 +88,7 @@ abstract class ResourceTestCase extends APITestCase {
 
     Matcher hasLinks(Map<String,String> linkMap) {
         Map expectedLinksMap = linkMap.collectEntries {
-            String tempUrl = "${it.value}"
+            String tempUrl = '' + it.value
             [(it.key): ([href: tempUrl])]
         }
 

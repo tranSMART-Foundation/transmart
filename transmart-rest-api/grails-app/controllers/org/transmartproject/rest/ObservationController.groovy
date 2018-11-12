@@ -64,7 +64,8 @@ class ObservationController {
                         study, variables)
         try {
             respond wrapObservations(observations, variables)
-        } finally {
+        }
+        finally {
             observations.close()
         }
     }
@@ -135,7 +136,8 @@ class ObservationController {
 
             observations = clinicalDataResourceService.retrieveData(
                     queryResults, variables)
-        } else {
+        }
+        else {
             Set<Patient> patients
             wrapException(NoSuchResourceException) {
                 patients = patientIds.collect {
@@ -149,7 +151,8 @@ class ObservationController {
 
         try {
             respond wrapObservations(observations, variables)
-        } finally {
+        }
+        finally {
             observations.close()
         }
     }
@@ -164,7 +167,8 @@ class ObservationController {
                         study, variables)
         try {
             respond wrapObservations(observations, variables)
-        } finally {
+        }
+        finally {
             observations.close()
         }
     }
@@ -179,7 +183,8 @@ class ObservationController {
                         [patient] as Set, variables)
         try {
             respond wrapObservations(observations, variables)
-        } finally {
+        }
+        finally {
             observations.close()
         }
     }
@@ -214,8 +219,8 @@ class ObservationController {
 
         def patient = patientsResourceService.getPatientById(subjectId)
         if (patient.trial != study.id) {
-            throw new NoSuchResourceException("Subject $subjectId does not " +
-                    "belong to study ${study.id}")
+            throw new NoSuchResourceException('Subject ' + subjectId + ' does not ' +
+                    'belong to study ' + study.id)
         }
         patient
     }
@@ -252,7 +257,8 @@ class ObservationController {
                             subject: currentRow.patient,
                             label: entry.key.label,
                             value: entry.value)
-                } else {
+                }
+                else {
                     complexCellIterator = null
                 }
             }
@@ -272,7 +278,8 @@ class ObservationController {
             if (value instanceof Map) {
                 complexCellIterator = value.iterator()
                 computeNext()
-            } else {
+            }
+            else {
                 new ObservationWrapper(
                         subject: currentRow.patient,
                         label: currentVar.label,
@@ -285,10 +292,12 @@ class ObservationController {
                                       Closure<Void> code) {
         try {
             code.call()
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             if (exceptionType.isAssignableFrom(e.getClass())) {
                 throw new InvalidArgumentsException(e)
-            } else {
+            }
+            else {
                 throw e
             }
         }

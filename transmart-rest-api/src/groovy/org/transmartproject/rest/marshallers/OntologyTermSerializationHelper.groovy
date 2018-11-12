@@ -53,7 +53,7 @@ class OntologyTermSerializationHelper extends AbstractHalOrJsonSerializationHelp
 
     final String collectionName = 'ontology_terms'
 
-    public static final RELATIONSHIP_CHILDREN = "children"
+    public static final RELATIONSHIP_CHILDREN = 'children'
 
     @Override
     Collection<Link> getLinks(OntologyTermWrapper obj) {
@@ -65,7 +65,8 @@ class OntologyTermSerializationHelper extends AbstractHalOrJsonSerializationHelp
         Link datalink
         if (obj.isHighDim()) {
             datalink = new Link('highdim', HighDimSummarySerializationHelper.getHighDimIndexUrl(url))
-        } else {
+        }
+        else {
             datalink = new Link('observations', ObservationSerializationHelper.getObservationsIndexUrl(url))
         }
 
@@ -80,7 +81,7 @@ class OntologyTermSerializationHelper extends AbstractHalOrJsonSerializationHelp
 
         def parent = getParent(concept)
         if (parent) {
-            result.add(new Link("parent", studyLoadingServiceProxy.getOntologyTermUrl(parent)))
+            result.add(new Link('parent', studyLoadingServiceProxy.getOntologyTermUrl(parent)))
         }
         result
     }

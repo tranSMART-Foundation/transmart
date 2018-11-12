@@ -37,7 +37,7 @@ class OntologyTermCategory {
         // as part of a component
         if (!term.key.startsWith(study.ontologyTerm.key)) {
             throw new IllegalArgumentException(
-                    "Term $term does not belong to study $study")
+                    'Term ' + term + ' does not belong to study ' + study)
         }
 
         def pathPart = term.key - study.ontologyTerm.key ?: ROOT_CONCEPT_PATH

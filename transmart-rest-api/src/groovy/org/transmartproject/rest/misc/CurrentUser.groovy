@@ -31,13 +31,13 @@ class CurrentUser implements User {
     private User delegate = { ->
         if (springSecurityService == null ||
                 !SpringSecurityUtils.securityConfig.active) {
-            logger.warn "Spring security service not available or inactive, " +
-                    "returning dummy user administrator"
+            logger.warn 'Spring security service not available or inactive, ' +
+                    'returning dummy user administrator'
             return new DummyAdministrator()
         }
 
         if (!springSecurityService.isLoggedIn()) {
-            logger.warn "User is not logged in; throwing"
+            logger.warn 'User is not logged in; throwing'
             throw new AccessDeniedException('User is not logged in')
         }
 
@@ -68,14 +68,14 @@ class CurrentUser implements User {
 
     void checkAccess(ProtectedOperation operation, ProtectedResource resource) {
         if (!canPerform(operation, resource)) {
-            throw new AccessDeniedException("Denied user $this permission " +
-                    "to effect operation $operation on resource $resource")
+            throw new AccessDeniedException('Denied user ' + this + ' permission ' +
+                    'to effect operation ' + operation + ' on resource ' + resource)
         }
     }
 
     @Override
     String toString() {
-        "CurrentUser(${delegate.toString()})"
+        'CurrentUser(' + delegate.toString() + ')'
     }
 
     static class DummyAdministrator implements User {

@@ -60,7 +60,7 @@ class SubjectController {
 
         def studyId = studyLoadingServiceProxy.study.id
         if (patient.trial != studyId) {
-            throw new NoSuchResourceException("The patient with id $id " +
+            throw new NoSuchResourceException('The patient with id ' + id + ' ' +
                     "does not belong to the study '$studyId'")
         }
 
@@ -84,12 +84,12 @@ class SubjectController {
     }
 
     private def selfLinkForStudy() {
-        "/studies/${studyLoadingServiceProxy.studyLowercase}/subjects"
+        '/studies/' + studyLoadingServiceProxy.studyLowercase + '/subjects'
     }
 
     private def selfLinkForConcept(OntologyTerm term) {
         use (OntologyTermCategory) {
-            "/studies/${studyLoadingServiceProxy.studyLowercase}/concepts/" +
+            '/studies/' + studyLoadingServiceProxy.studyLowercase + '/concepts/' +
                     term.encodeAsURLPart(studyLoadingServiceProxy.study) +
             '/subjects'
         }

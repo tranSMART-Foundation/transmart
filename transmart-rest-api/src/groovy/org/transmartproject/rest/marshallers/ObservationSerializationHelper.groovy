@@ -46,7 +46,7 @@ class ObservationSerializationHelper extends AbstractHalOrJsonSerializationHelpe
     }
 
     static String getObservationsIndexUrl(String baseUrl) {
-        "${baseUrl}/observations"
+        '' + baseUrl + '/observations'
     }
 
 }

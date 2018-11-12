@@ -62,7 +62,7 @@ class StudyController {
         (
             container: source,
             componentType: Study,
-            links: [ new Link(AbstractLinkingRenderer.RELATIONSHIP_SELF, "/studies") ]
+            links: [ new Link(AbstractLinkingRenderer.RELATIONSHIP_SELF, '/studies') ]
         )
     }
     

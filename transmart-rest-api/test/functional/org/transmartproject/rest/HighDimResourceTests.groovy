@@ -38,7 +38,7 @@ import static org.thehyve.commons.test.FastMatchers.*
 class HighDimResourceTests extends ResourceTestCase {
 
     def expectedMrnaAssays = [-402, -401]*.toLong() //groovy autoconverts to BigInteger, and we have to force Long here
-    def expectedMrnaRowLabels = ["1553513_at", "1553510_s_at","1553506_at"]
+    def expectedMrnaRowLabels = ['1553513_at', '1553510_s_at','1553506_at']
 
     def expectedAcghAssays = [-3001, -3002]*.toLong()
     def expectedAcghRowLabels = ['region 1:33-9999', 'region 2:66-99']
@@ -52,8 +52,8 @@ class HighDimResourceTests extends ResourceTestCase {
                                         'disjunction', 'pathways', 'proteins',]
 
     Map<String,String> indexUrlMap = [
-            mrna: "/studies/study_id_1/concepts/bar/highdim",
-            acgh: "/studies/study_id_2/concepts/study1/highdim",
+            mrna: '/studies/study_id_1/concepts/bar/highdim',
+            acgh: '/studies/study_id_2/concepts/study1/highdim',
     ]
 
     void testSummaryAsJson() {
@@ -151,9 +151,9 @@ class HighDimResourceTests extends ResourceTestCase {
                                  String projection = null,
                                  String assayConstraints = null,
                                  String dataConstraints = null) {
-        def ret = "${indexUrlMap[dataType]}?dataType=${dataType}"
+        def ret = '' + indexUrlMap[dataType] + '?dataType=' + dataType
         if (projection) {
-            ret += "&projection=${projection}"
+            ret += '&projection=' + projection
         }
         if (assayConstraints) {
             ret += '&assayConstraints='
@@ -179,11 +179,11 @@ class HighDimResourceTests extends ResourceTestCase {
 
     private Map getExpectedMrnaHalLinks() {
         String selfDataLink = getHighDimUrl('mrna')
-        Map expectedLinks = mrnaSupportedProjections.collectEntries { [(it):("${selfDataLink}&projection=${it}")] }
+        Map expectedLinks = mrnaSupportedProjections.collectEntries { [(it):('' + selfDataLink + '&projection=' + it)] }
         expectedLinks.put('self', selfDataLink)
 
         expectedLinks.collectEntries {
-            String tempUrl = "${it.value}"
+            String tempUrl = '' + it.value
             [(it.key): ([href: tempUrl])]
         }
     }
@@ -228,7 +228,8 @@ class HighDimResourceTests extends ResourceTestCase {
             while ((row = HighDimProtos.Row.parseDelimitedFrom(is)) != null) {
                 result.rows << row
             }
-        } finally {
+        }
+        finally {
             is.close()
         }
 

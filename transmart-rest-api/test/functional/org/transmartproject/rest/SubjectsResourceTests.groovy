@@ -36,12 +36,12 @@ class SubjectsResourceTests extends ResourceTestCase {
     def UNKNOWN = 'UNKOWN' // funny typo here
     def concept = 'bar'
 
-    def subjectsPerConceptUrl = "/studies/${study}/concepts/${concept}/subjects"
-    def subjectsPerStudyUrl = "/studies/${study}/subjects"
+    def subjectsPerConceptUrl = '/studies/' + study + '/concepts/' + concept + '/subjects'
+    def subjectsPerStudyUrl = '/studies/' + study + '/subjects'
 
-    def subjectUrl = "/studies/${study}/subjects/${subjectId}"
-    def subjectUrl2 = "/studies/${study}/subjects/-102"
-    def subjectUrl3 = "/studies/${study}/subjects/-103"
+    def subjectUrl = '/studies/' + study + '/subjects/' + subjectId
+    def subjectUrl2 = '/studies/' + study + '/subjects/-102'
+    def subjectUrl3 = '/studies/' + study + '/subjects/-103'
 
     void testShowAsJson() {
         def result = getAsJson subjectUrl
@@ -167,7 +167,7 @@ class SubjectsResourceTests extends ResourceTestCase {
     /*//FIXME response contains null
     void testGetNonExistentStudy() {
         def studyName = 'STUDY_NOT_EXIST'
-        get("${baseURL}studies/${studyName}/subjects")
+        get('' + baseURL + 'studies/' + studyName + '/subjects')
         assertStatus 404
 
         assertThat JSON, allOf(
@@ -180,7 +180,7 @@ class SubjectsResourceTests extends ResourceTestCase {
             //FIXME response contains null
     void testGetNonExistentSubjectForStudy() {
         def patientNum = -9999
-        get("${baseURL}studies/${study}/subjects/${patientNum}")
+        get('' + baseURL + 'studies/' + study + '/subjects/' + patientNum)
         assertStatus 404
 
         assertThat JSON, allOf(

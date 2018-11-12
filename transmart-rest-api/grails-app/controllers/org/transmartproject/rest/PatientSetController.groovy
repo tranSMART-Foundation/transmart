@@ -64,8 +64,8 @@ class PatientSetController {
         MimeType mimeType = new MimeType(request.contentType)
 
         if (!(mimeType in [MimeType.XML, MimeType.TEXT_XML])) {
-            throw new InvalidRequestException("Content type should been " +
-                    "text/xml or application/xml; got $mimeType")
+            throw new InvalidRequestException('Content type should been ' +
+                    'text/xml or application/xml; got ' + mimeType)
         }
 
         QueryDefinition queryDefinition =

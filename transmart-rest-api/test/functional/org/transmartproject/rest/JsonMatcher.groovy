@@ -12,7 +12,7 @@ import org.hamcrest.Matcher
  * Matcher that locates a JSON element (given a path) and delegates matching (to a given matcher) on that element.
  * Json path describes the json fields, separated by '.'.
  * Elements inside an array are defined by [idx].
- * So if we have the following json content ["obj": ["array": [[ "elem": "foo" ], [ "elem": "bar"]]]
+ * So if we have the following json content ['obj': ['array': [[ 'elem': 'foo' ], [ 'elem': 'bar']]]
  * the path 'obj.array[1].elem' would match the scalar value 'bar'
  * @todo this implementation expects to find array elements by position. Maybe it would be possible to match with a fuzzy/unknown array index
  */
@@ -27,16 +27,16 @@ class JsonMatcher extends DiagnosingMatcher<JSONObject> {
 
     @Override
     protected boolean matches(Object item, Description mismatchDescription) {
-        def element = find(jsonPath.split("\\."), 0, item, mismatchDescription)
+        def element = find(jsonPath.split('\\.'), 0, item, mismatchDescription)
         if (!element) {
             return false
         }
 
         if (!matcher.matches(element)) {
-            mismatchDescription.appendText(" no match:")
-            mismatchDescription.appendText(" expecting ")
+            mismatchDescription.appendText(' no match:')
+            mismatchDescription.appendText(' expecting ')
             matcher.describeTo(mismatchDescription)
-            mismatchDescription.appendText(" was ").appendValue(element)
+            mismatchDescription.appendText(' was ').appendValue(element)
             return false
         }
 
@@ -63,8 +63,9 @@ class JsonMatcher extends DiagnosingMatcher<JSONObject> {
         Object elem
         try {
             elem = getElement(current, name, arrayPath)
-        } catch (JSONException ex) {
-            mismatchDescription.appendText("element ${parts[index]} not found in $current")
+        }
+        catch (JSONException ex) {
+            mismatchDescription.appendText('element ' + parts[index] + ' not found in ' + current)
             return null
         }
 
@@ -85,7 +86,8 @@ class JsonMatcher extends DiagnosingMatcher<JSONObject> {
                 //top element is JSONObject
                 JSONObject container = curr
                 array = container.getJSONArray(name)
-            } else {
+            }
+            else {
                 //top element is a JSONArray
                 array = curr
             }
@@ -95,11 +97,13 @@ class JsonMatcher extends DiagnosingMatcher<JSONObject> {
             if (remainderArrayPath) {
                 //recursing: array inside array
                 return getElement(elem, null, remainderArrayPath)
-            } else {
+            }
+            else {
                 return elem
             }
 
-        } else {
+        }
+        else {
             //finding an element in a JSONObject
             JSONObject container = curr
             return container.get(name)

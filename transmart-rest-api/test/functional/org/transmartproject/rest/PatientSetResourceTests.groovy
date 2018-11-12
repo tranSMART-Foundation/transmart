@@ -10,7 +10,7 @@ class PatientSetResourceTests extends ResourceTestCase {
 
 
     public static final String QUERY_DEFINITION = '''
-<ns3:query_definition xmlns:ns3="http://www.i2b2.org/xsd/cell/crc/psm/querydefinition/1.1/">
+<ns3:query_definition xmlns:ns3='http://www.i2b2.org/xsd/cell/crc/psm/querydefinition/1.1/'>
   <query_name>My query</query_name>
   <panel>
     <item>

@@ -72,7 +72,7 @@ class ConceptController {
                 componentType: OntologyTermWrapper,
                 links: [
                         new Link(grails.rest.render.util.AbstractLinkingRenderer.RELATIONSHIP_SELF,
-                                "/studies/${studyLoadingServiceProxy.studyLowercase}/concepts"
+                                '/studies/' + studyLoadingServiceProxy.studyLowercase + '/concepts'
                         )
                 ]
         )

@@ -13,12 +13,13 @@ class JsonParametersParser {
         JSONElement constraintsElement
         try {
             constraintsElement = JSON.parse(paramValue)
-        } catch (ConverterException ce) {
+        }
+        catch (ConverterException ce) {
             throw new InvalidArgumentsException(
-                    "Failed parsing as JSON: $paramValue", ce)
+                    'Failed parsing as JSON: ' + paramValue, ce)
         } catch (StackOverflowError se) { // *sigh*
             throw new InvalidArgumentsException(
-                    "Failed parsing as JSON: $paramValue", se)
+                    'Failed parsing as JSON: ' + paramValue, se)
         }
 
         if (!constraintsElement instanceof JSONObject) {
@@ -31,9 +32,10 @@ class JsonParametersParser {
         return ((JSONObject) constraintsElement).collectEntries { String constraintName, value ->
             if (!(value instanceof Map || value instanceof List)) {
                 throw new InvalidArgumentsException(
-                        "Invalid parameters for contraint $constraintName: " +
-                                "$value (should be a list or a map)")
-            } else if (value instanceof Map) {
+                        'Invalid parameters for contraint ' + constraintName + ': ' +
+                                '' + value + ' (should be a list or a map)')
+            }
+            else if (value instanceof Map) {
                 [constraintName, [value]]
             } else { // List
                 [constraintName, value] // entry unchanged

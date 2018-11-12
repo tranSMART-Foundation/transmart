@@ -69,7 +69,7 @@ public class MarshallersRegistrar implements FactoryBean {
                 scanner.findCandidateComponents packageName
 
         for (BeanDefinition helperDef: serializationHelpers) {
-            logger.debug "Processing serialization helper ${helperDef.beanClassName}"
+            logger.debug 'Processing serialization helper ' + helperDef.beanClassName
 
             // register serialization helper
             def helperDefinitionHolder = createHolderForHelper(helperDef)

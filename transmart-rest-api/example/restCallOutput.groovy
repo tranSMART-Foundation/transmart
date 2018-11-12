@@ -26,7 +26,7 @@ switch (args.length) {
         verifyExpectedFolder(baseExpectedFolder)
         break
     default:
-        println("Usage groovy restCallOutput.groovy [expectedRestOutput]")
+        println('Usage groovy restCallOutput.groovy [expectedRestOutput]')
         break
 }
 
@@ -50,14 +50,14 @@ def messages = []
 //File baseOutput = new File('actualRestResults')
 File baseOutput = new File(File.createTempFile('dummy', '').parentFile, "actualRestResults-${System.currentTimeMillis()}")
 baseOutput.mkdirs()
-System.out.println("Output folder is ${baseOutput.path}")
+System.out.println('Output folder is ' + baseOutput.path)
 
 urls.each {
     String url = it.key
     String filepart = it.value
     formats.each {
         String format = it.key
-        String filename = "$filepart.${it.value}"
+        String filename = '' + filepart. + it.value
         File outputFile = new File(baseOutput, filename)
         outputFile.delete()
         File expectedFile = null
@@ -65,7 +65,8 @@ urls.each {
             File f = new File(baseExpectedFolder, filename)
             if (f.exists()) {
                 expectedFile = f
-            } else {
+            }
+            else {
                 messages.add("Warning: expected file for $filename doesn't exist. Skipping comparison")
             }
         }
@@ -83,10 +84,10 @@ def testCall(String path, String contentType, File output, File expected, List<S
     def tsServer = 'http://localhost:8080/'
     def ctx = 'transmart-rest-api'
     def http = new HTTPBuilder(tsServer)
-    def uriPath = "$ctx$path"
+    def uriPath = '' + ctx + path
 
     http.request(Method.GET, ContentType.JSON) {
-        uri.path = "$uriPath"
+        uri.path = '' + uriPath
         headers.Accept = contentType
 
         response.success = { resp, json ->
@@ -101,16 +102,16 @@ def testCall(String path, String contentType, File output, File expected, List<S
                 def actualRest = slurper.parseText(output.text)
                 def expectedRest = slurper.parseText(expected.text)
                 if (expectedRest != actualRest) {
-                    messages.add("Content mismatch between ${expected.getPath()} and ${output.getPath()}")
-                    //println "expected: $expectedRest"
-                    //println "got: $actualRest"
+                    messages.add('Content mismatch between ' + expected.getPath() + ' and ' + output.getPath())
+                    //println 'expected: ' + expectedRest
+                    //println 'got: ' + actualRest
                 }
             }
         }
 
         response.failure = { resp ->
-            messages.add("Failure calling $contentType on $path : ${resp.statusLine}")
-            //System.err.println "Failure: $resp.statusLine"
+            messages.add('Failure calling ' + contentType + ' on ' + path + ' : ' + resp.statusLine)
+            //System.err.println 'Failure: ' + resp.statusLine
             //System.exit 1
         }
     }
@@ -118,12 +119,12 @@ def testCall(String path, String contentType, File output, File expected, List<S
 
 def verifyExpectedFolder(File file) {
     if (!file.exists()) {
-        throw new IllegalArgumentException("Folder ${file.getPath()}  doesnt exist")
+        throw new IllegalArgumentException('Folder ' + file.getPath() + '  doesnt exist')
     }
     if (!file.isDirectory()) {
-        throw new IllegalArgumentException("${file.getPath()} is not a directory")
+        throw new IllegalArgumentException('' + file.getPath() + ' is not a directory')
     }
     if (!file.canRead()) {
-        throw new IllegalArgumentException("Cannot read from ${file.getPath()}")
+        throw new IllegalArgumentException('Cannot read from ' + file.getPath())
     }
 }

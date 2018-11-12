@@ -41,20 +41,20 @@ class ConceptsResourceTests extends ResourceTestCase {
     def partialConceptName = 'bar'
 
     def rootConceptPath = '\\foo\\study1\\'
-    def rootConceptKey = "\\\\i2b2 main$rootConceptPath"
+    def rootConceptKey = '\\\\i2b2 main' + rootConceptPath
 
-    def conceptPath = "${rootConceptPath}${partialConceptName}\\"
-    def conceptKey = "${rootConceptKey}${partialConceptName}\\"
+    def conceptPath = '' + rootConceptPath + partialConceptName + '\\'
+    def conceptKey = '' + rootConceptKey + partialConceptName + '\\'
     //The full concept path, starting after the studyId
     def conceptId = partialConceptName
 
-    def conceptListUrl = "/studies/${studyId}/concepts"
-    def conceptUrl = "/studies/${studyId}/concepts/${conceptId}"
-    def rootConceptUrl = "/studies/${studyId}/concepts/ROOT"
+    def conceptListUrl = '/studies/' + studyId + '/concepts'
+    def conceptUrl = '/studies/' + studyId + '/concepts/' + conceptId
+    def rootConceptUrl = '/studies/' + studyId + '/concepts/ROOT'
 
     def longConceptName = 'with%some$characters_'
-    def longConceptPath = "\\foo\\study2\\long path\\$longConceptName\\"
-    def longConceptKey = "\\\\i2b2 main$longConceptPath"
+    def longConceptPath = '\\foo\\study2\\long path\\' + longConceptName + '\\'
+    def longConceptKey = '\\\\i2b2 main' + longConceptPath
     def longConceptUrl = '/studies/study_id_2/concepts/long%20path/with%25some%24characters_'
 
     def sexConceptUrl = '/studies/study_id_2/concepts/sex'
@@ -63,8 +63,8 @@ class ConceptsResourceTests extends ResourceTestCase {
     def study2ConceptListUrl = '/studies/study_id_2/concepts'
 
     def study1RootConceptTags = [
-            "1 name 1": "1 description 1",
-            "1 name 2": "1 description 2",
+            '1 name 1': '1 description 1',
+            '1 name 2': '1 description 2',
     ]
 
     void testIndexAsJson() {
@@ -215,7 +215,8 @@ class ConceptsResourceTests extends ResourceTestCase {
         Map links = [self: selfLink]
         if (highDimLink) {
             links.put('highdim', "$selfLink/highdim")
-        } else {
+        }
+        else {
             links.put('observations', "$selfLink/observations")
         }
 
@@ -242,7 +243,7 @@ class NavigationLinksMatcher extends DiagnosingMatcher<JSONObject> {
 
         def baseUrl = selfLink.endsWith('ROOT') ? selfLink.substring(0, selfLink.indexOf('/ROOT')) : selfLink
         List<Matcher> childrenMatchers = children.collect {
-            LinkMatcher.hasLink("$baseUrl/$it", it)
+            LinkMatcher.hasLink('' + baseUrl + '/' + it, it)
         }
 
         def cm = childrenMatchers.isEmpty() ? null : containsInAnyOrder(childrenMatchers.collect { it })
@@ -277,7 +278,8 @@ class NavigationLinksMatcher extends DiagnosingMatcher<JSONObject> {
             if (!parent) {
                 mismatchDescription.appendText("no 'parent' was found")
                 result = false
-            } else {
+            }
+            else {
                 result = parentLinkMatcher.matches(parent, mismatchDescription)
             }
         }
@@ -292,11 +294,13 @@ class NavigationLinksMatcher extends DiagnosingMatcher<JSONObject> {
             if (hasChildren) {
                 JSONArray children = links.getJSONArray('children')
                 result = childrenMatcher.matches(children)
-            } else {
+            }
+            else {
                 mismatchDescription.appendText("no 'children' was found")
                 result = false
             }
-        } else if (hasChildren) {
+        }
+        else if (hasChildren) {
             mismatchDescription.appendText("not expected 'children' was found")
             result = false
         }
@@ -335,18 +339,18 @@ class LinkMatcher extends DiagnosingMatcher<JSONObject> {
         String url = obj.get('href')
 
         if (expectedUrl != url) {
-            mismatchDescription.appendText("link href did not match:")
-            mismatchDescription.appendText(" expecting ").appendValue(expectedUrl)
-            mismatchDescription.appendText(" was ").appendValue(url)
+            mismatchDescription.appendText('link href did not match:')
+            mismatchDescription.appendText(' expecting ').appendValue(expectedUrl)
+            mismatchDescription.appendText(' was ').appendValue(url)
             return false
         }
 
         if (expectedTitle) {
             String title = obj.get('title')
             if (expectedTitle != title) {
-                mismatchDescription.appendText("link title did not match:")
-                mismatchDescription.appendText(" expecting ").appendValue(expectedTitle)
-                mismatchDescription.appendText(" was ").appendValue(title)
+                mismatchDescription.appendText('link title did not match:')
+                mismatchDescription.appendText(' expecting ').appendValue(expectedTitle)
+                mismatchDescription.appendText(' was ').appendValue(title)
                 return false
             }
         }
@@ -379,9 +383,10 @@ class MetadataTagsMatcher extends DiagnosingMatcher<JSONObject> {
 
         if (expectedTags.isEmpty()) {
             if (hasMetadata) {
-                mismatchDescription.appendText(" was not expecting any metadata tags, but got them")
+                mismatchDescription.appendText(' was not expecting any metadata tags, but got them')
                 return false
-            } else {
+            }
+            else {
                 return true
             }
         }
@@ -390,9 +395,9 @@ class MetadataTagsMatcher extends DiagnosingMatcher<JSONObject> {
 
         Map map = md as Map
         if (map != expectedTags) {
-            mismatchDescription.appendText(" tags did not match")
-            mismatchDescription.appendText(" expecting ").appendValue(expectedTags)
-            mismatchDescription.appendText(" was ").appendValue(map)
+            mismatchDescription.appendText(' tags did not match')
+            mismatchDescription.appendText(' expecting ').appendValue(expectedTags)
+            mismatchDescription.appendText(' was ').appendValue(map)
             return false
         }
 

@@ -32,7 +32,7 @@ class MarshallerSupport {
                                                              Set<String> excludes = [] as Set) {
         if (!superType.isAssignableFrom(o.getClass())) {
             throw new IllegalArgumentException("Object '$o' is not of type " +
-                    "$superType")
+                    '' + superType)
         }
 
         superType.metaClass.properties.findAll {

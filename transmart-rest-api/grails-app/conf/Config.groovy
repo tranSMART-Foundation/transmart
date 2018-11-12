@@ -28,14 +28,15 @@ grails.databinding.trimStrings = false
 
 grails.config.locations = []
 def defaultConfigFiles = [
-        "${userHome}/.grails/transmartConfig/DataSource-rest-api.groovy"
+        '' + userHome + '/.grails/transmartConfig/DataSource-rest-api.groovy'
 ]
 defaultConfigFiles.each {filePath ->
     def f = new File(filePath)
     if (f.exists()) {
         println "[INFO] Including configuration file '$f' in configuration building."
-        grails.config.locations << "file:${filePath}"
-    } else {
+        grails.config.locations << 'file:' + filePath
+    }
+    else {
         println "[INFO] Configuration file '$f' not found."
     }
 }
@@ -59,7 +60,7 @@ grails.mime.types = [
 grails.mime.use.accept.header = true
 
 // Legacy setting for codec used to encode data with ${}
-grails.views.default.codec = "html"
+grails.views.default.codec = 'html'
 
 grails.controllers.defaultScope = 'singleton' //default is prototype
 
@@ -84,7 +85,7 @@ grails {
     }
 }
 
-grails.converters.encoding = "UTF-8"
+grails.converters.encoding = 'UTF-8'
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
 

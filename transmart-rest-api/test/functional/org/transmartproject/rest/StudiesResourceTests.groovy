@@ -34,7 +34,7 @@ class StudiesResourceTests extends ResourceTestCase {
     def expectedChildLinkHrefValue = '/studies/study_id_1/concepts/bar'
 
     void testListAllStudies() {
-        get("${baseURL}studies")
+        get('' + baseURL + 'studies')
         assertStatus 200
 
         assertThat JSON, hasEntry(is('studies'), contains(
@@ -66,7 +66,7 @@ class StudiesResourceTests extends ResourceTestCase {
     }
 
     void testListAllStudiesAsHal() {
-        def result = getAsHal("${baseURL}studies")
+        def result = getAsHal('' + baseURL + 'studies')
         
         assertStatus 200
 
@@ -108,7 +108,7 @@ class StudiesResourceTests extends ResourceTestCase {
 
     void testGetStudy() {
         def studyId = 'STUDY_ID_1'
-        get("${baseURL}studies/${studyId}")
+        get('' + baseURL + 'studies/' + studyId)
         assertStatus 200
 
         assertThat JSON, allOf(
@@ -123,12 +123,12 @@ class StudiesResourceTests extends ResourceTestCase {
 
     void testGetStudyAsHal() {
         def studyId = 'STUDY_ID_1'
-        def result = getAsHal("${baseURL}studies/${studyId}")
+        def result = getAsHal('' + baseURL + 'studies/' + studyId)
         assertStatus 200
 
         assertThat result, allOf(
             hasEntry('id', 'STUDY_ID_1'),
-            halIndexResponse("/studies/${studyId}".toLowerCase(), [
+            halIndexResponse('/studies/' + studyId.toLowerCase(), [
                 'ontologyTerm': allOf(
                     hasEntry('name', 'study1'),
                     hasEntry('fullName', '\\foo\\study1\\'),
@@ -139,7 +139,7 @@ class StudiesResourceTests extends ResourceTestCase {
     }
     
     void testListStudiesChildLink() {
-        def path = "_embedded.studies[0].$childLinkHrefPath"
+        def path = '_embedded.studies[0].' + childLinkHrefPath
         def result = getAsHal '/studies'
         assertStatus 200
         assertThat result, JsonMatcher.matching(path, is(expectedChildLinkHrefValue))
@@ -155,7 +155,7 @@ class StudiesResourceTests extends ResourceTestCase {
     /*FIXME Response contains null as content
     void testGetNonExistentStudy() {
         def studyName = 'STUDY_NOT_EXIST'
-        get("${baseURL}studies/${studyName}")
+        get('' + baseURL + 'studies/' + studyName)
         assertStatus 404
 
         assertThat JSON, allOf(

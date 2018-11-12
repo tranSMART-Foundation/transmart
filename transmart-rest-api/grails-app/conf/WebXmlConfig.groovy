@@ -48,24 +48,24 @@ webxml {
 	// The name of the delegate FilterChainProxy bean.  You must ensure you have added a bean
 	// with this name that implements FilterChainProxy to
 	// YOUR-APP/grails-app/conf/spring/resources.groovy.
-	//filterChainProxyDelegator.targetBeanName = "filterChainProxyDelegate"
+	//filterChainProxyDelegator.targetBeanName = 'filterChainProxyDelegate'
 
 	// The URL pattern to which the filter will apply.  Usually set to '/*' to cover all URLs.
-	//filterChainProxyDelegator.urlPattern = "/*"
+	//filterChainProxyDelegator.urlPattern = '/*'
 
 	// Set to true to add Listeners
 	//listener.add = true
-	//listener.classNames = ["org.springframework.web.context.request.RequestContextListener"]
+	//listener.classNames = ['org.springframework.web.context.request.RequestContextListener']
 
 	//-------------------------------------------------
 	// These settings usually do not need to be changed
 	//-------------------------------------------------
 
 	// The name of the delegating filter.
-	//filterChainProxyDelegator.filterName = "filterChainProxyDelegator"
+	//filterChainProxyDelegator.filterName = 'filterChainProxyDelegator'
 
 	// The delegating filter proxy class.
-	//filterChainProxyDelegator.className = "org.springframework.web.filter.DelegatingFilterProxy"
+	//filterChainProxyDelegator.className = 'org.springframework.web.filter.DelegatingFilterProxy'
 
 	// ------------------------------------------------
 	// Example for context aparameters

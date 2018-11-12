@@ -178,7 +178,8 @@ class HighDimDataServiceTests {
             while ((row = HighDimProtos.Row.parseDelimitedFrom(is)) != null) {
                 result.rows << row
             }
-        } finally {
+        }
+        finally {
             is.close()
         }
 
@@ -339,7 +340,7 @@ class HighDimResultRowsMatcher extends DiagnosingMatcher<HighDimResult> {
                 def matcher = hasProperty('bioMarker', is(expectedBioMarker))
                 if (!matcher.matches(gottenRow)) {
                     mismatchDescription
-                            .appendText("on row $i expected ")
+                            .appendText('on row ' + i + ' expected ')
                             .appendDescriptionOf(matcher)
                             .appendText(' but: ')
                     matcher.describeMismatch(gottenRow, mismatchDescription)
@@ -356,7 +357,7 @@ class HighDimResultRowsMatcher extends DiagnosingMatcher<HighDimResult> {
                 ColumnType propertyType = resultDataSpecs[j].type
 
                 // for each DataRow, data is laid out assay first, but for
-                // the protobuf result it is data property ("column") first
+                // the protobuf result it is data property ('column') first
 
                 def expectedValues = expectedRowValues.collect { assayValue ->
                     multiProjection ?
@@ -365,7 +366,7 @@ class HighDimResultRowsMatcher extends DiagnosingMatcher<HighDimResult> {
                 }
                 HighDimProtos.ColumnValue gottenValues = gottenRow.valueList[j]
 
-                // convert the expected values to conform to the "column spec"
+                // convert the expected values to conform to the 'column spec'
                 // we don't test that the column spec is actually what it's
                 // supposed to be because that the job of another matcher
                 // we assume it is correct
@@ -385,7 +386,7 @@ class HighDimResultRowsMatcher extends DiagnosingMatcher<HighDimResult> {
 
                 if (!dataPropertyAssayValuesMatcher.matches(gottenValues)) {
                     mismatchDescription
-                            .appendText("row $i, data property $propertyName ")
+                            .appendText('row ' + i + ', data property ' + propertyName + ' ')
                             .appendText('did not match. ')
                             .appendText('Expecting: ')
                             .appendDescriptionOf(dataPropertyAssayValuesMatcher)
@@ -426,7 +427,7 @@ class HighDimResultRowsMatcher extends DiagnosingMatcher<HighDimResult> {
                         currentExpectedValue.getClass() == String &&
                         !currentExpectedValue.isDouble()) {
                     mismatchDescription
-                            .appendText("on row $rowNumber, property $propertyName ")
+                            .appendText('on row ' + rowNumber + ', property ' + propertyName + ' ')
                             .appendText('the values are numbers according ' +
                             'to the column spec, but got an expected value ' +
                             'that is not convertible for assay with index ')

@@ -34,7 +34,7 @@ import static org.thehyve.commons.test.FastMatchers.mapWith
 class ObservationsResourceTests extends ResourceTestCase {
 
     def studyId = 'STUDY_ID_1'
-    def label = "\\foo\\study1\\bar\\"
+    def label = '\\foo\\study1\\bar\\'
 
     def study1BarExpectedObservations = [
             [
@@ -55,7 +55,7 @@ class ObservationsResourceTests extends ResourceTestCase {
     ]
 
     void testListAllObservationsForStudy() {
-        get("${baseURL}studies/${studyId}/observations")
+        get('' + baseURL + 'studies/' + studyId + '/observations')
         assertStatus 200
 
         assertThat JSON, listOfWithOrder(study1BarExpectedObservations)
@@ -63,7 +63,7 @@ class ObservationsResourceTests extends ResourceTestCase {
 
     void testListAllObservationsForSubject() {
         def subjectId = -101
-        get("${baseURL}studies/${studyId}/subjects/${subjectId}/observations")
+        get('' + baseURL + 'studies/' + studyId + '/subjects/' + subjectId + '/observations')
         assertStatus 200
 
         assertThat JSON, contains(
@@ -88,14 +88,14 @@ class ObservationsResourceTests extends ResourceTestCase {
 
     void testListAllObservationsForConcept() {
         def conceptId = 'bar'
-        get("${baseURL}studies/${studyId}/concepts/${conceptId}/observations")
+        get('' + baseURL + 'studies/' + studyId + '/concepts/' + conceptId + '/observations')
         assertStatus 200
 
         assertThat JSON, listOfWithOrder(study1BarExpectedObservations)
     }
 
     void testVariablesAreNormalized() {
-        get("/studies/study_id_2/concepts/sex/observations")
+        get('/studies/study_id_2/concepts/sex/observations')
         assertStatus 200
 
         assertThat JSON, allOf(

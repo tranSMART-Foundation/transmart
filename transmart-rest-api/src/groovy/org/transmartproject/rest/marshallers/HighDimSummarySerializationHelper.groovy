@@ -51,7 +51,7 @@ class HighDimSummarySerializationHelper extends AbstractHalOrJsonSerializationHe
                 new Link(RELATIONSHIP_SELF, self),
         ]
 
-        result.addAll(object.supportedProjections.collect { new Link(it, "${self}&projection=${it}") })
+        result.addAll(object.supportedProjections.collect { new Link(it, '' + self + '&projection=' + it) })
         result
     }
 
@@ -61,11 +61,11 @@ class HighDimSummarySerializationHelper extends AbstractHalOrJsonSerializationHe
     }
 
     static String getHighDimIndexUrl(String conceptUrl) {
-        "${conceptUrl}/highdim"
+        '' + conceptUrl + '/highdim'
     }
 
     static String getHighDimDataUrl(String conceptUrl, String dataType) {
-        "${conceptUrl}/highdim?dataType=${dataType}"
+        '' + conceptUrl + '/highdim?dataType=' + dataType
     }
 
 }

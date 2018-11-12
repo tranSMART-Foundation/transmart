@@ -16,7 +16,7 @@ class GenericWrapperSerializationHelper extends AbstractHalOrJsonSerializationHe
     final Class targetType = GenericWrapper
 
     String getCollectionName() {
-        throw new UnsupportedOperationException("No collection name for GenericWrapper")
+        throw new UnsupportedOperationException('No collection name for GenericWrapper')
     }
 
     @Override

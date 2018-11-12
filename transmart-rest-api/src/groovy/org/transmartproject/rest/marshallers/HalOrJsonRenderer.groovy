@@ -98,8 +98,9 @@ class HalOrJsonRenderer<T> extends AbstractIncludeExcludeRenderer<T> implements 
 
         if (!(object instanceof Errors)) {
             renderJson(object, context, contentType)
-        } else {
-            throw new InvalidArgumentsException("Errors: $object")
+        }
+        else {
+            throw new InvalidArgumentsException('Errors: ' + object)
         }
     }
 
@@ -107,8 +108,9 @@ class HalOrJsonRenderer<T> extends AbstractIncludeExcludeRenderer<T> implements 
         if (name.indexOf(';') > -1 &&
                 CHARSET_IN_CONTENT_TYPE_REGEXP.matcher(name).find()) {
             name
-        } else {
-            "$name;charset=${this.encoding}"
+        }
+        else {
+            '' + name + ';charset=' + this.encoding
         }
     }
 
