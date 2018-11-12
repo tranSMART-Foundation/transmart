@@ -15,7 +15,7 @@ modules = {
         analyseTab {
             dependsOn 'xnat'
 
-            println("Configuring XNAT resources ...")
+            println('Configuring XNAT resources ...')
         }
     }
 }

@@ -1,6 +1,6 @@
-grails.project.class.dir = "target/classes"
-grails.project.test.class.dir = "target/test-classes"
-grails.project.test.reports.dir = "target/test-reports"
+grails.project.class.dir = 'target/classes'
+grails.project.test.class.dir = 'target/test-classes'
+grails.project.test.reports.dir = 'target/test-reports'
 
 grails.project.fork = [
     // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
@@ -16,14 +16,14 @@ grails.project.fork = [
     console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
 ]
 
-grails.project.dependency.resolver = "maven" // or ivy
+grails.project.dependency.resolver = 'maven' // or ivy
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
-    inherits("global") {
+    inherits('global') {
         // uncomment to disable ehcache
         // excludes 'ehcache'
     }
-    log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+    log 'warn' // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     legacyResolve true
     repositories {
         grailsCentral()
@@ -31,10 +31,10 @@ grails.project.dependency.resolution = {
         mavenCentral()
         // uncomment the below to enable remote dependency resolution
         // from public Maven repositories
-        //mavenRepo "http://repository.codehaus.org"
-        //mavenRepo "http://download.java.net/maven/2/"
-        //mavenRepo "http://repository.jboss.com/maven2/"
-        mavenRepo "https://repo.transmartfoundation.org/content/repositories/public/"
+        //mavenRepo 'http://repository.codehaus.org'
+        //mavenRepo 'http://download.java.net/maven/2/'
+        //mavenRepo 'http://repository.jboss.com/maven2/'
+        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
